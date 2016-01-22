@@ -2,78 +2,51 @@ package edu.kit.iti.formal.automation.sfclang.ast;
 
 import edu.kit.iti.formal.automation.sfclang.SFCAstVisitor;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  *
  *
  */
 public class StepDeclaration {
-	String name;
-	List<String> onExit = new LinkedList<>();
-	List<String> onActive = new LinkedList<>();
-	List<String> onEntry = new LinkedList<>();
-	private boolean initial;
+    boolean initial;
+    String name;
+    Map<String, List<String>> events = new HashMap<>();
 
-	public String getName() {
-		return name;
-	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public boolean isInitial() {
+        return initial;
+    }
 
-	public List<String> getOnExit() {
-		return onExit;
-	}
+    public Map<String, List<String>> getEvents() {
+        return events;
+    }
 
-	public void setOnExit(List<String> on_exit) {
-		this.onExit = on_exit;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public List<String> getOnActive() {
-		return onActive;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setOnActive(List<String> on_active) {
-		this.onActive = on_active;
-	}
+    public void push(String eventType, String actionName) {
+        if (!events.containsKey(eventType)) {
+            events.put(eventType, new ArrayList<>());
+        }
 
-	public List<String> getOnEntry() {
-		return onEntry;
-	}
+        events.get(eventType).add(actionName);
+    }
 
-	public void setOnEntry(List<String> on_entry) {
-		this.onEntry = on_entry;
-	}
+    public <T> T visit(SFCAstVisitor<T> v) {
+        return v.visit(this);
+    }
 
-	public void push(String eventType, String actionName) {
-		switch (eventType) {
-		case "entry":
-			onEntry.add(actionName);
-			break;
-		case "exit":
-			onExit.add(actionName);
-			break;
-		case "active":
-			onActive.add(actionName);
-			break;
-		default:
-			throw new IllegalArgumentException();
-		}
-	}
+    public boolean isInitialStep() {
+        return initial;
+    }
 
-	public <T> T visit(SFCAstVisitor<T> v)
-	{
-		return v.visit(this);
-	}
-
-	public boolean isInitialStep() {
-		return name.equals("Init");
-	}
-
-	public void setInitial(boolean initial) {
-		this.initial = initial;
-	}
+    public void setInitial(boolean initial) {
+        initial = initial;
+    }
 }
