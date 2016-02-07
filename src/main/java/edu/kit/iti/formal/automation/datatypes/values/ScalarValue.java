@@ -1,9 +1,9 @@
 package edu.kit.iti.formal.automation.datatypes.values;
 
 import edu.kit.iti.formal.automation.ast.Expression;
+import edu.kit.iti.formal.automation.ast.Initialization;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import edu.kit.iti.formal.automation.ast.Initialization;
 
 /**
  * Created by weigl on 11.06.14.

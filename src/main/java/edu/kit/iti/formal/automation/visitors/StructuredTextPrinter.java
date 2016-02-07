@@ -1,14 +1,12 @@
 package edu.kit.iti.formal.automation.visitors;
 
-import edu.kit.iti.formal.automation.ast.*;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
+import edu.kit.iti.formal.automation.util.CodeWriter;
 import edu.kit.iti.formal.automation.datatypes.IECArray;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
-import edu.kit.iti.formal.automation.util.CodeWriter;
-
-import static edu.kit.iti.formal.automation.ast.VariableDeclaration.*;
+import edu.kit.iti.formal.automation.ast.*;
 
 /**
  * Created by weigla on 15.06.2014.

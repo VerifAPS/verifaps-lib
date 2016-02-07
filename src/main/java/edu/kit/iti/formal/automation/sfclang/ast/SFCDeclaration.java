@@ -1,16 +1,15 @@
 package edu.kit.iti.formal.automation.sfclang.ast;
 
-import edu.kit.iti.formal.automation.sfclang.SFCAstVisitor;
-import edu.kit.iti.formal.automation.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.ast.Statement;
 import edu.kit.iti.formal.automation.ast.StatementList;
+import edu.kit.iti.formal.automation.sfclang.SFCAstVisitor;
+import edu.kit.iti.formal.automation.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.ast.VariableScope;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**

@@ -2,7 +2,6 @@ package edu.kit.iti.formal.automation.sfclang.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by weigl on 22.01.16.

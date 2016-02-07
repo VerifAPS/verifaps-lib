@@ -30,6 +30,28 @@ fragment Y:('y'|'Y');
 fragment Z:('z'|'Z');
 
 
+
+ON : 	O N ;
+
+STEP : 	S T E P ;
+
+END_STEP : 	E N D '_' S T E P;
+
+COLON : ':' ;
+
+ACTION : 	A C T I O N ;
+
+END_ACTION : E N D '_' A C T I O N ;
+
+SFC : S F C;
+END_SFC : E N D '_' S F C ;
+
+GOTO : G O T O ;
+
+DCOLON : '::';
+RIGHTARROW : '->';
+
+
 fragment
 FIXED_POINT
 :
@@ -212,7 +234,7 @@ TOD_LITERAL
 :
 	(
 		TIME_OF_DAY
-		| 'TOD'
+		| T O D
 	) '#' TOD_VALUE
 ;
 
@@ -220,7 +242,7 @@ DATETIME
 :
 	(
 		DATE_AND_TIME
-		| 'DT'
+		| D T
 	) '#' DATE_VALUE MINUS TOD_VALUE
 ;
 
@@ -258,117 +280,117 @@ WSTRING_LITERAL
  */
 ANY
 :
-	'ANY'
+	 A N Y
 ;
 
 ANY_BIT
 :
-	'ANY_BIT'
+ A N Y '_' B I T
 ;
 
 ANY_DATE
 :
-	'ANY_DATE'
+	A N Y '_' D A T E
 ;
 
 ANY_DERIVED
 :
-	'ANY_DERIVED'
+	 A N Y '_' D E R I V E D
 ;
 
 ANY_ELEMENTARY
 :
-	'ANY_ELEMENTARY'
+	 A N Y '_' E L E M E N T A R Y
 ;
 
 ANY_INT
 :
-	'ANY_INT'
+	 A N Y '_' I N T
 ;
 
 ANY_MAGNITUDE
 :
-	'ANY_MAGNITUDE'
+	 A N Y '_' M A G N I T U D E
 ;
 
 ANY_NUM
 :
-	'ANY_NUM'
+	 A N Y '_' N U M
 ;
 
 ANY_REAL
 :
-	'ANY_REAL'
+	 A N Y '_' R E A L
 ;
 
 ANY_STRING
 :
-	'ANY_STRING'
+	A N Y '_' S T R I N G
 ;
 
 ARRAY
 :
-	'ARRAY'
+	 A R R A Y
 ;
 
 BOOL
 :
-	'BOOL'
+	B O O L
 ;
 
 BYTE
 :
-	'BYTE'
+	B Y T E
 ;
 
 DATE_AND_TIME
 :
-	'DATE_AND_TIME'
+	 D A T E '_' A N D '_' T I M E
 ;
 
 DINT
 :
-	'DINT'
+	D I N T
 ;
 
 DWORD
 :
-	'DWORD'
+	 D W O R D
 ;
 
 INT
 :
-	'INT'
+	 I N T
 ;
 
 LINT
 :
-	'LINT'
+	L I N T
 ;
 
 LREAL
 :
-	'LREAL'
+	 L R E A L
 ;
 
 LWORD
 :
-	'LWORD'
+	 L W O R D
 ;
 
 REAL
 :
-	'REAL'
+	R E A L
 ;
 
 SINT
 :
-	'SINT'
+	 S I N  T
 ;
 
 STRING
 :
-	'STRING'
+	STRING'
 ;
 
 TIME
@@ -378,38 +400,38 @@ TIME
 
 TIME_OF_DAY
 :
-	'TIME_OF_DAY'
-	| 'TOD'
+	T I M E '_' O  F '_' D A Y
+	| T O D
 ;
 
 UDINT
 :
-	'UDINT'
+	 U D I N T
 ;
 
 UINT
 :
-	'UINT'
+	 U I N T
 ;
 
 ULINT
 :
-	'ULINT'
+	U L  I N T
 ;
 
 USINT
 :
-	'USINT'
+	 U S I N T
 ;
 
 WORD
 :
-	'WORD'
+	W O R D
 ;
 
 WSTRING
 :
-	'WSTRING'
+	 W S T R I N G
 ;
 
 /******
@@ -417,17 +439,17 @@ WSTRING
  */
 VAR_OUTPUT
 :
-	'VAR_OUTPUT'
+	V A R '_' O U T P U T
 ;
 
 AT
 :
-	'AT'
+	A T
 ;
 
 BY
 :
-	'BY'
+	B Y
 ;
 
 CASE
@@ -501,227 +523,227 @@ END_FUNCTION_BLOCK
 
 END_IF
 :
-	'END_IF'
+	E N D '_' I F
 ;
 
 END_PROGRAM
 :
-	'END_PROGRAM'
+	E N D '_' P R O G R A M
 ;
 
 END_REPEAT
 :
-	'END_REPEAT'
+	E N D '_' R E P E A T
 ;
 
 END_RESOURCE
 :
-	'END_RESOURCE'
+	E N D '_' R E S O U R C E
 ;
 
 END_STRUCT
 :
-	'END_STRUCT'
+	E N D '_' S T R U C T
 ;
 
 END_TYPE
 :
-	'END_TYPE'
+	E N D '_' T Y P E
 ;
 
 END_VAR
 :
-	'END_VAR'
+	E N D '_' V A R
 ;
 
 END_WHILE
 :
-	'END_WHILE'
+	E N D '_' W H I L E
 ;
 
 EXIT
 :
-	'EXIT'
+	E X I T
 ;
 
 FOR
 :
-	'FOR'
+	F O R
 ;
 
 FUNCTION
 :
-	'FUNCTION'
+	F U N C T I O N
 ;
 
 FUNCTION_BLOCK
 :
-	'FUNCTION_BLOCK'
+	F U N C T I O  N '_' B L O C K
 ;
 
 F_EDGE
 :
-	'F_EDGE'
+	F '_' E D G E
 ;
 
 IF
 :
-	'IF'
+	I F
 ;
 
 INTERVAL
 :
-	'INTERVAL'
+	I N T E R V A L
 ;
 
 NIL
 :
-	'NIL'
+	N I L
 ;
 
 NON_RETAIN
 :
-	'NON_RETAIN'
+	 N O N '_' R E T A I N
 ;
 
 OF
 :
-	'OF'
+	O F
 ;
 
 PRIORITY
 :
-	'PRIORITY'
+	 P R I O  R I T Y
 ;
 
 PROGRAM
 :
-	'PROGRAM'
+	P R O G R A M
 ;
 
 READ_ONLY
 :
-	'READ_ONLY'
+	 R E A D'_' O N L Y
 ;
 
 READ_WRITE
 :
-	'READ_WRITE'
+	R E A D '_' W R I T E
 ;
 
 REPEAT
 :
-	'REPEAT'
+	R E P E A T
 ;
 
 RESOURCE
 :
-	'RESOURCE'
+	 R E S O U R C E
 ;
 
 RETAIN
 :
-	'RETAIN'
+	 R E T  A I N
 ;
 
 RETURN
 :
-	'RETURN'
+	 R E T U R N
 ;
 
 RIGHT_ARROW
 :
-	'RIGHT_ARROW'
+	 R I G H T '_' A R R O W
 ;
 
 R_EDGE
 :
-	'R_EDGE'
-;
+	R '_'  E D G E
+ ;
 
 SINGLE
 :
-	'SINGLE'
+	S I N G L  E
 ;
 
 STRUCT
 :
-	'STRUCT'
+	S T R U C T
 ;
 
 TASK
 :
-	'TASK'
+	T A S K
 ;
 
 THEN
 :
-	'THEN'
+	T H E N
 ;
 
 TO
 :
-	'TO'
+	T O
 ;
 
 TYPE
 :
-	'TYPE'
+	T Y P E
 ;
 
 UNTIL
 :
-	'UNTIL'
+	U N T I L
 ;
 
 VAR
 :
-	'VAR'
+	V A R
 ;
 
 VAR_ACCESS
 :
-	'VAR_ACCESS'
+	V A R '_' A C C E S S
 ;
 
 VAR_CONFIG
 :
-	'VAR_CONFIG'
+	V A R '_' C O N F I G
 ;
 
 VAR_EXTERNAL
 :
-	'VAR_EXTERNAL'
+	V A R '_' E X T E R N A L
 ;
 
 VAR_GLOBAL
 :
-	'VAR_GLOBAL'
+	V A R '_' G L O B A L
 ;
 
 VAR_INPUT
 :
-	'VAR_INPUT'
+	V A R '_' I N P U T
 ;
 
 VAR_IN_OUT
 :
-	'VAR_IN_OUT'
+	V A R '_' I N '_' O U T
 ;
 
 VAR_TEMP
 :
-	'VAR_TEMP'
+	V A R '_' T E M P
 ;
 
 WHILE
 :
-	'WHILE'
+	 W H I L E
 ;
 
 WITH
 :
-	'WITH'
+	W I T H
 ;
 
 /******
@@ -729,7 +751,7 @@ WITH
  */
 AND
 :
-	'AND'
+	A N D
 ;
 
 ARROW_RIGHT
@@ -794,7 +816,7 @@ MINUS
 
 MOD
 :
-	'MOD'
+	M O D
 ;
 
 MULT
@@ -804,7 +826,7 @@ MULT
 
 NOT
 :
-	'NOT'
+	N O T
 ;
 
 NOT_EQUALS
@@ -814,7 +836,7 @@ NOT_EQUALS
 
 OR
 :
-	'OR'
+	O R
 ;
 
 PLUS
@@ -839,7 +861,7 @@ RPAREN
 
 XOR
 :
-	'XOR'
+	X O R
 ;
 
 /*******
@@ -868,7 +890,7 @@ DQUOTE
 
 FALSE
 :
-	'FALSE'
+	F A L S E
 ;
 
 SEMICOLON
@@ -883,7 +905,7 @@ SQUOTE
 
 TRUE
 :
-	'TRUE'
+	T R U E
 ;
 
 DOT
@@ -908,11 +930,6 @@ COMMENT
 	'{*' ~[]* '*}' -> channel ( HIDDEN )
 ;
 
-IDENTIFIER
-:
-	[a-zA-Z_] [$a-zA-Z0-9_]*
-;
-
 CAST_LITERAL
 :
 	IDENTIFIER '#' IDENTIFIER
@@ -923,23 +940,8 @@ DIRECT_VARIABLE_LITERAL
 	'%' [IQM] [XBWDL]? FIXED_POINT
 ;
 
-ON : 	O N ;
 
-STEP : 	S T E P ;
-
-END_STEP : 	E N D '_' S T E P;
-
-COLON : ':' ;
-
-ACTION : 	A C T I O N ;
-
-END_ACTION : E N D '_' A C T I O N ;
-
-SFC : S F C;
-
-END_SFC : E N D '_' S F C ;
-
-GOTO : G O T O ;
-
-DCOLON : '::';
-RIGHTARROW : '->';
+IDENTIFIER
+:
+	[a-zA-Z_] [$a-zA-Z0-9_]*
+;

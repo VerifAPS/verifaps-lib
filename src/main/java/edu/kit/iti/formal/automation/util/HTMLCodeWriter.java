@@ -2,8 +2,6 @@ package edu.kit.iti.formal.automation.util;
 
 import edu.kit.iti.formal.automation.visitors.Sections;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Stack;
 
 public class HTMLCodeWriter extends CodeWriter {

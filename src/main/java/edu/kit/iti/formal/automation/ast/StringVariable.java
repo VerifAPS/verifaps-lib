@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.automation.ast;
 
-import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.IECString;
+import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 
 /**

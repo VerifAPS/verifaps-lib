@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.automation.ast;
 
+import edu.kit.iti.formal.automation.ValueFactory;
+import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import edu.kit.iti.formal.automation.ValueFactory;
-import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 
 public abstract class CaseConditions extends Top {
     public static class Range extends CaseConditions {

@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.automation.sfclang.ast;
 
-import edu.kit.iti.formal.automation.sfclang.SFCAstVisitor;
 import edu.kit.iti.formal.automation.ast.Expression;
+import edu.kit.iti.formal.automation.sfclang.SFCAstVisitor;
 
 import java.util.HashSet;
 import java.util.List;

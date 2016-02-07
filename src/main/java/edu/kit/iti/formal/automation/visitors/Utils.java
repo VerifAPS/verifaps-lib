@@ -1,9 +1,11 @@
 package edu.kit.iti.formal.automation.visitors;
 
-import edu.kit.iti.formal.automation.ast.*;
+import edu.kit.iti.formal.automation.ast.ProgramDeclaration;
+import edu.kit.iti.formal.automation.ast.TopLevelElement;
+import edu.kit.iti.formal.automation.ast.TopLevelElements;
+
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;

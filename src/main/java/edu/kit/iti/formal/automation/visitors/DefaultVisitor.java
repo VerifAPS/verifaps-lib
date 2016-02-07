@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.automation.visitors;
 
-import edu.kit.iti.formal.automation.ast.*;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.ast.*;
 
 /**
  * Created by weigl on 21.06.14.
@@ -93,10 +93,6 @@ public class DefaultVisitor<T> implements Visitor<T> {
         return defaultVisit(caseStatement);
     }
 
-    @Override
-    public T visit(Constant constant) {
-        return defaultVisit(constant);
-    }
 
     @Override
     public T visit(SymbolicReference symbolicReference) {
@@ -116,11 +112,6 @@ public class DefaultVisitor<T> implements Visitor<T> {
     @Override
     public T visit(ScalarValue<? extends Any, ?> tsScalarValue) {
         return defaultVisit(tsScalarValue);
-    }
-
-    @Override
-    public T visit(Literal literal) {
-        return defaultVisit(literal);
     }
 
     @Override

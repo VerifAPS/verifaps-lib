@@ -2,120 +2,123 @@ package edu.kit.iti.formal.automation.sfclang;
 
 import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration;
-import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
-import edu.kit.iti.formal.automation.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.util.CodeWriter;
+import edu.kit.iti.formal.automation.ast.FunctionBlockDeclaration;
+import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
 import edu.kit.iti.formal.automation.visitors.StructuredTextPrinter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class SFCLangPrinter implements SFCAstVisitor<Object> {
-	private CodeWriter cw = new CodeWriter();
-	private StructuredTextPrinter stPrinter;
+    private CodeWriter cw = new CodeWriter();
+    private StructuredTextPrinter stPrinter;
 
-	public SFCLangPrinter() {
-		stPrinter = new StructuredTextPrinter();
-		stPrinter.setCodeWriter(cw);
-	}
+    public SFCLangPrinter() {
+        stPrinter = new StructuredTextPrinter();
+        stPrinter.setCodeWriter(cw);
+    }
 
-	public static String print(SFCDeclaration a) {
-		SFCLangPrinter p = new SFCLangPrinter();
-		a.visit(p);
-		return p.cw.toString();
-	}
+    public static String print(SFCDeclaration a) {
+        SFCLangPrinter p = new SFCLangPrinter();
+        a.visit(p);
+        return p.cw.toString();
+    }
 
-	@Override
-	public Object visit(SFCDeclaration decl) {
-		cw.keyword("sfc").append(" ").append(decl.getName()).nl().increaseIndent();
+    @Override
+    public Object visit(SFCDeclaration decl) {
+        cw.keyword("sfc").append(" ").append(decl.getName()).nl().increaseIndent();
 
-		stPrinter.visit(decl.getScope());
+        stPrinter.visit(decl.getScope());
 
-		cw.nl().nl();
-		
-		for (FunctionBlockDeclaration fbd : decl.getActions()) {
-			printAction(fbd);
-		}
+        cw.nl().nl();
 
-		for (TransitionDeclaration t : decl.getTransitions()) {
-			t.visit(this);
-		}
+        for (FunctionBlockDeclaration fbd : decl.getActions()) {
+            printAction(fbd);
+        }
 
-		for (StepDeclaration s : decl.getSteps()) {
-			s.visit(this);
-		}
+        for (TransitionDeclaration t : decl.getTransitions()) {
+            t.visit(this);
+        }
 
-		cw.decreaseIndent().nl().keyword("end_sfc");
-		return null;
-	}
+        for (StepDeclaration s : decl.getSteps()) {
+            s.visit(this);
+        }
 
-	private void printAction(FunctionBlockDeclaration fbd) {
-		cw.nl().keyword("action").append(" ").append(fbd.getBlockName());
-		cw.increaseIndent();
-		cw.nl();
-		stPrinter.visit(fbd.getScope());
-		stPrinter.visit(fbd.getFunctionBody());		
-		cw.decreaseIndent();
-		cw.nl().keyword("end_action");
-	}
+        cw.decreaseIndent().nl().keyword("end_sfc");
+        return null;
+    }
 
-	@Override
-	public Object visit(StepDeclaration decl) {
-		cw.nl().keyword("step").append(" ").append(decl.getName());
-		cw.increaseIndent();
+    private void printAction(FunctionBlockDeclaration fbd) {
+        cw.nl().keyword("action").append(" ").append(fbd.getBlockName());
+        cw.increaseIndent();
+        cw.nl();
+        stPrinter.visit(fbd.getScope());
+        stPrinter.visit(fbd.getFunctionBody());
+        cw.decreaseIndent();
+        cw.nl().keyword("end_action");
+    }
 
-		appendEvents(decl.getOnEntry(), "entry");
-		appendEvents(decl.getOnActive(), "active");
-		appendEvents(decl.getOnExit(), "exit");
+    @Override
+    public Object visit(StepDeclaration decl) {
+        cw.nl().keyword("step").append(" ").append(decl.getName());
+        cw.increaseIndent();
 
-		cw.decreaseIndent();
-		cw.nl().keyword("end_step");
+        for (Map.Entry<String, List<String>> entry :
+                decl.getEvents().entrySet()) {
+            //FIXME
+            for (String actionName : entry.getValue())
+                cw.nl().keyword("on").append(" ").append(entry.getKey()).append(" ").append(actionName);
+        }
 
-		return null;
-	}
+        cw.decreaseIndent();
+        cw.nl().keyword("end_step");
 
-	private void appendEvents(List<String> seq, String type) {
-		if (!seq.isEmpty()) {
-			cw.nl().keyword("on").append(" ").keyword(type).append(" ");
-			printList(seq);
-			cw.nl();
-		}
-	}
+        return null;
+    }
 
-	private void printList(List<String> seq) {
-		for (String n : seq) {
-			cw.append(n).append(", ");
-		}
-		cw.deleteLast(2);
-	}
+    private void appendEvents(List<String> seq, String type) {
+        if (!seq.isEmpty()) {
+            cw.nl().keyword("on").append(" ").keyword(type).append(" ");
+            printList(seq);
+            cw.nl();
+        }
+    }
 
-	private void printList(Set<String> seq) {
-		ArrayList<String> array = new ArrayList<>(seq);
-		array.sort(String.CASE_INSENSITIVE_ORDER);
-		printList(array);
-	}
+    private void printList(List<String> seq) {
+        for (String n : seq) {
+            cw.append(n).append(", ");
+        }
+        cw.deleteLast(2);
+    }
 
-	@Override
-	public Object visit(TransitionDeclaration decl) {
-		cw.nl().keyword("goto").append(" ");
-		decl.getGuard().visit(stPrinter);
-		cw.append(" ").keyword("::").append(" ");
+    private void printList(Set<String> seq) {
+        ArrayList<String> array = new ArrayList<>(seq);
+        array.sort(String.CASE_INSENSITIVE_ORDER);
+        printList(array);
+    }
 
-		printList(decl.getFrom());
-		cw.append(" ").append("->").append(" ");
-		printList(decl.getTo());
+    @Override
+    public Object visit(TransitionDeclaration decl) {
+        cw.nl().keyword("goto").append(" ");
+        decl.getGuard().visit(stPrinter);
+        cw.append(" ").keyword("::").append(" ");
 
-		return null;
-	}
+        printList(decl.getFrom());
+        cw.append(" ").append("->").append(" ");
+        printList(decl.getTo());
 
-	public CodeWriter getCodeWriter() {
-		return cw;
-	}
+        return null;
+    }
 
-	public void setCodeWriter(CodeWriter cw) {
-		this.cw = cw;
-	}
+    public CodeWriter getCodeWriter() {
+        return cw;
+    }
+
+    public void setCodeWriter(CodeWriter cw) {
+        this.cw = cw;
+    }
 
 }

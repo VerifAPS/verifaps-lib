@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.automation.util;
 
-import edu.kit.iti.formal.automation.ast.*;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.AnyBit;
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
+import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.datatypes.AnyBit;
+import edu.kit.iti.formal.automation.ast.*;
 
 /**
  * Created by weigl on 08/09/14.

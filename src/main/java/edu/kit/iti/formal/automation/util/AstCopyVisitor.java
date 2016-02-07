@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.automation.util;
 
-import edu.kit.iti.formal.automation.ast.*;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.ast.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,11 +92,6 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
 
         setPositions(caseStatement, cs);
         return cs;
-    }
-
-    @Override
-    public Object visit(Constant constant) {
-        return constant;
     }
 
     @Override

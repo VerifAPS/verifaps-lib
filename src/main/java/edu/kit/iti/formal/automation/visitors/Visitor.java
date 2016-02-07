@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.automation.visitors;
 
-import edu.kit.iti.formal.automation.ast.*;
-import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.ast.*;
 
 /**
  * Created by weigla on 14.06.2014.
@@ -40,8 +40,6 @@ public interface Visitor<T> {
 
     T visit(CaseStatement caseStatement);
 
-    T visit(Constant constant);
-
     T visit(SymbolicReference symbolicReference);
 
     T visit(StatementList statements);
@@ -49,8 +47,6 @@ public interface Visitor<T> {
     T visit(ProgramDeclaration programDeclaration);
 
     T visit(ScalarValue<? extends Any, ? extends Object> tsScalarValue);
-
-    T visit(Literal literal);
 
     T visit(ExpressionList expressions);
 

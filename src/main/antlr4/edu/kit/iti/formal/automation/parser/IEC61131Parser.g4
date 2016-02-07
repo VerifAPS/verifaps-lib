@@ -1671,9 +1671,8 @@ locals [ExitStatement ast = new ExitStatement()]
  */
 start_sfc locals [ SFCDeclaration ast = new SFCDeclaration() ]
 :
-	SFC name = IDENTIFIER
+	SFC name=IDENTIFIER
 	{$ast.setName($name.text);}
-
 	(
 		io_var_declarations [$ast.getScope()]
 		| other_var_declarations [$ast.getScope()]

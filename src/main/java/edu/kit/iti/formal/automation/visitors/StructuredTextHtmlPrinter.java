@@ -1,9 +1,9 @@
 package edu.kit.iti.formal.automation.visitors;
 
-import edu.kit.iti.formal.automation.ast.*;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.util.HTMLCodeWriter;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.ast.*;
 
 /**
  * Created by weigla on 15.06.2014.

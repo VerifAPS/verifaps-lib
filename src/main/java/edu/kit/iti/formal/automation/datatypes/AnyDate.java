@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.automation.datatypes;
 
-import edu.kit.iti.formal.automation.datatypes.values.DateAndTimeValue;
 import edu.kit.iti.formal.automation.datatypes.values.DateValue;
+import edu.kit.iti.formal.automation.datatypes.values.DateAndTimeValue;
 import edu.kit.iti.formal.automation.datatypes.values.TimeOfDayValue;
 
 public abstract class AnyDate extends Any {

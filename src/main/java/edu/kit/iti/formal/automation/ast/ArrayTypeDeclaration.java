@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.automation.ast;
 
-import edu.kit.iti.formal.automation.visitors.Visitor;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.DataTypes;
+import edu.kit.iti.formal.automation.visitors.Visitor;
 import edu.kit.iti.formal.automation.datatypes.IECArray;
 
 import java.util.ArrayList;

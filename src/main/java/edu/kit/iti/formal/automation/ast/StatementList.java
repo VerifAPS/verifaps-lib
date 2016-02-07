@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.automation.ast;
 
-import edu.kit.iti.formal.automation.visitors.Visitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
+import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.ArrayList;
 import java.util.Arrays;

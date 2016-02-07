@@ -4,8 +4,8 @@ package edu.kit.iti.formal.automation.sfclang;
 import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
-import edu.kit.iti.formal.automation.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.util.HTMLCodeWriter;
+import edu.kit.iti.formal.automation.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.visitors.StructuredTextHtmlPrinter;
 
 import java.util.ArrayList;
@@ -71,9 +71,11 @@ public class SFCLangHTMLPrinter implements SFCAstVisitor<HTMLCodeWriter> {
 		hcw.nl().keyword("step").append(" ").append(decl.getName());
 		hcw.increaseIndent();
 
+		/*FIXME
 		appendEvents(decl.getOnEntry(), "entry");
 		appendEvents(decl.getOnActive(), "active");
 		appendEvents(decl.getOnExit(), "exit");
+		*/
 
 		hcw.decreaseIndent();
 		hcw.nl().keyword("end_step");

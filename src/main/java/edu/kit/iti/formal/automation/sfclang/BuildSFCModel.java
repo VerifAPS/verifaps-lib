@@ -1,18 +1,17 @@
 package edu.kit.iti.formal.automation.sfclang;
 
 
-import edu.kit.iti.formal.automation.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration;
-import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
-import edu.kit.iti.formal.automation.sfclang.model.SFC;
 import edu.kit.iti.formal.automation.sfclang.model.SFCAction;
 import edu.kit.iti.formal.automation.sfclang.model.SFCStep;
 import edu.kit.iti.formal.automation.sfclang.model.SFCTransition;
+import edu.kit.iti.formal.automation.ast.FunctionBlockDeclaration;
+import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
+import edu.kit.iti.formal.automation.sfclang.model.SFC;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**

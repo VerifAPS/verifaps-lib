@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.automation.util;
 
-import edu.kit.iti.formal.automation.ast.*;
 import edu.kit.iti.formal.automation.visitors.Visitable;
+import edu.kit.iti.formal.automation.ast.*;
 
 import java.util.HashSet;
 import java.util.List;

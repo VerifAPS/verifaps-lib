@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.automation.util;
 
 import edu.kit.iti.formal.automation.ast.AssignmentStatement;
-import edu.kit.iti.formal.automation.ast.SymbolicReference;
 import edu.kit.iti.formal.automation.visitors.Visitable;
+import edu.kit.iti.formal.automation.ast.SymbolicReference;
 
 import java.util.HashSet;
 import java.util.Set;

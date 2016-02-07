@@ -1,11 +1,11 @@
 package edu.kit.iti.formal.automation.util;
 
 import edu.kit.iti.formal.automation.ast.*;
+import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
-import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.visitors.Visitable;
+import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -93,10 +93,6 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return caseStatement;
     }
 
-    @Override
-    public Object visit(Constant constant) {
-        return constant.visit(this);
-    }
 
     @Override
     public Object visit(SymbolicReference symbolicReference) {
@@ -256,11 +252,6 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         for (TypeDeclaration t : typeDeclarations)
             td.add((TypeDeclaration) td.visit(this));
         return td;
-    }
-
-    @Override
-    public Object visit(Literal literal) {
-        return literal;
     }
 
     @Override
