@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation;
 
-import edu.kit.iti.formal.automation.ast.Expression;
+import edu.kit.iti.formal.automation.st.ast.Expression;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.datatypes.values.*;
 
@@ -73,9 +73,9 @@ public class ValueFactory {
     public static ScalarValue<? extends AnyBit, Bits> parseBitLiteral(String s) {
         String first = getPrefix(s);
 
-        if ("TRUE".equals(s))
+        if ("TRUE".equalsIgnoreCase(s))
             return new ScalarValue<>(AnyBit.BOOL, new Bits(1l, AnyBit.BOOL.getBitLength()));
-        if ("FALSE".equals(s))
+        if ("FALSE".equalsIgnoreCase(s))
             return new ScalarValue<>(AnyBit.BOOL, new Bits(0l, AnyBit.BOOL.getBitLength()));
 
         if (first != null) {

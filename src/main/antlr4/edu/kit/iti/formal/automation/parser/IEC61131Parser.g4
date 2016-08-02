@@ -1,20 +1,22 @@
 parser grammar IEC61131Parser;
 
-options {   tokenVocab = IEC61131Lexer; }
+options {
+    tokenVocab = IEC61131Lexer;
+}
 
 @header {
-import java.util.*;
-import edu.kit.iti.formal.automation.sfclang.ast.*;
-import edu.kit.iti.formal.automation.sfclang.*;
-import edu.kit.iti.formal.automation.sfclang.Utils;
-import edu.kit.iti.formal.automation.*;
-import edu.kit.iti.formal.automation.ast.*;
-import edu.kit.iti.formal.automation.datatypes.*;
-import edu.kit.iti.formal.automation.datatypes.values.*;
+    import java.util.*;
+    import edu.kit.iti.formal.automation.sfclang.ast.*;
+    import edu.kit.iti.formal.automation.sfclang.*;
+    import edu.kit.iti.formal.automation.sfclang.Utils;
+    import edu.kit.iti.formal.automation.*;
+    import edu.kit.iti.formal.automation.st.ast.*;
+    import edu.kit.iti.formal.automation.datatypes.*;
+    import edu.kit.iti.formal.automation.datatypes.values.*;
 }
 
 start
-locals [ List<TopLevelElement> ast = new LinkedList<>()]
+locals [ List<TopLevelElement> ast = new LinkedList<>() ]
 :
 	library_element_declaration+
 	{
@@ -23,7 +25,6 @@ locals [ List<TopLevelElement> ast = new LinkedList<>()]
 
 ;
 
-//TODO
 
 library_element_declaration
 :
@@ -587,55 +588,6 @@ locals [ StringTypeDeclaration ast = new StringTypeDeclaration()]
 
 ;
 
-variable
-locals [ Reference ast]
-:
-	direct_variable
-	{ $ast = $direct_variable.ctx.ast; }
-
-	| symbolic_variable
-	{ $ast = $symbolic_variable.ctx.ast; }
-
-;
-
-symbolic_variable
-locals [ SymbolicReference ast = new SymbolicReference()]
-:
-	IDENTIFIER
-	(
-		subscript_list
-		{$ast.setSubscripts($subscript_list.ctx.ast);}
-
-	)?
-	(
-		DOT other = symbolic_variable
-	)?
-	{ $ast.setIdentifier($IDENTIFIER.text);
-       $ast.setSub(
-        $DOT.text != null ? $other.ctx.ast : null);}
-
-;
-
-subscript_list
-locals [ ExpressionList ast = new ExpressionList()]
-:
-	LBRACKET expression
-	{$ast.add($expression.ctx.ast);}
-
-	(
-		COMMA expression
-		{$ast.add($expression.ctx.ast);}
-
-	)* RBRACKET
-;
-
-direct_variable
-locals [ DirectVariable ast]
-:
-	DIRECT_VARIABLE_LITERAL
-	{ $ast=new DirectVariable($DIRECT_VARIABLE_LITERAL.text); }
-
-;
 
 input_declarations [VariableScope gather] @init {
         $gather.push(VariableDeclaration.INPUT);
@@ -753,6 +705,7 @@ temp_var_decl [VariableScope gather]
 :
 	var1_declaration [gather]
 	| array_var_declaration [gather]
+	| pointer_var_declaration [gather]
 	| structured_var_declaration [gather]
 	| string_var_declaration [gather]
 ;
@@ -772,6 +725,22 @@ var1_declaration [VariableScope gather]
 
 	)
 ;
+
+pointer_var_declaration [VariableScope gather]
+:
+    identifier_list COLON POINTER OF
+    ( name=elementary_type_name
+      {
+        $gather.createPointers($identifier_list.ctx.ast, $name.text);
+      }
+    | id=IDENTIFIER
+      {
+        $gather.createPointers($identifier_list.ctx.ast, $id.text);
+      }
+    )
+
+;
+
 
 array_var_declaration [VariableScope gather]
 :
@@ -1336,54 +1305,35 @@ locals [ Expression ast ]
                     $sub.ctx.ast);
       }
 
-	| LPAREN sub = expression RPAREN
-	{
-        $ast = $sub.ctx.ast;
-      }
+	| LPAREN sub=expression RPAREN
+	{ $ast = $sub.ctx.ast; }
+
 
 	| left = expression op = POWER right = expression
 	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.POWER); }
 
-	| < assoc = right > left = expression op =
-	(
-		MOD
-		| DIV
-	) right = expression
+	| <assoc=right> left=expression op=(MOD	| DIV) right = expression
 	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, $op.text); }
 
-	| left = expression op = MULT right = expression
+	| left=expression op=MULT right=expression
 	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.MULT); }
 
-	| left = expression op =
-	(
-		PLUS
-		| MINUS
-	) right = expression
+	| left=expression op =(PLUS|MINUS) right=expression
 	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, $op.text); }
 
-	| left = expression op =
-	(
-		LESS_THAN
-		| GREATER_THAN
-		| GREATER_EQUALS
-		| LESS_EQUALS
-	) right = expression
+	| left=expression op=( LESS_THAN | GREATER_THAN | GREATER_EQUALS | LESS_EQUALS) right=expression
 	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, $op.text); }
 
-	| left = expression op =
-	(
-		EQUALS
-		| NOT_EQUALS
-	) right = expression
+	| left=expression op=(EQUALS|NOT_EQUALS) right=expression
 	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, $op.text); }
 
-	| left = expression op = AND right = expression
+	| left=expression op=AND right=expression
 	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.AND); }
 
-	| left = expression op = OR right = expression
+	| left=expression op=OR right=expression
 	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.OR); }
 
-	| left = expression op = XOR right = expression
+	| left=expression op=XOR right=expression
 	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.XOR); }
 
 	//BASE CASE
@@ -1399,8 +1349,8 @@ locals [ Expression ast]
 	constant
 	{ $ast = $constant.ctx.ast; }
 
-	| variable
-	{ $ast = $variable.ctx.ast; }
+	| v=lhs
+	{ $ast = $v.ctx.ast; }
 
 	| functioncall
 	{ $ast = $functioncall.ctx.ast; }
@@ -1431,12 +1381,12 @@ param_assignment
 	)? expression
 	{
         $functioncall::ast.addInputParameter($id.text, $expression.ctx.ast);
-      }
+    }
 
-	| IDENTIFIER ARROW_RIGHT variable
+	| IDENTIFIER ARROW_RIGHT v=lhs
 	{
-        $functioncall::ast.addOutputParameter($IDENTIFIER.text, $variable.ctx.ast);
-      }
+        $functioncall::ast.addOutputParameter($IDENTIFIER.text, $v.ctx.ast);
+    }
 
 ;
 
@@ -1475,13 +1425,66 @@ locals [ Statement ast]
 assignment_statement
 locals [ AssignmentStatement ast ]
 :
-	variable ASSIGN expression
+	a=variable ASSIGN expression
 	{
-        $ast = new AssignmentStatement($variable.ctx.ast, $expression.ctx.ast);
+        $ast = new AssignmentStatement($a.ctx.ast, $expression.ctx.ast);
         $ast.line($ASSIGN);
     }
 
 ;
+
+variable
+locals [ Reference ast]
+:
+	direct_variable
+	{ $ast = $direct_variable.ctx.ast; }
+
+	| symbolic_variable
+	{ $ast = $symbolic_variable.ctx.ast; }
+
+;
+
+symbolic_variable
+locals [ SymbolicReference ast = new SymbolicReference()]
+:
+	IDENTIFIER
+	(REF       { $ast.derefVar(); })?
+	(
+		subscript_list
+		{$ast.setSubscripts($subscript_list.ctx.ast);}
+
+	)?
+	(REF       { $ast.derefSubscript(); })?
+	(
+		DOT other = symbolic_variable
+	)?
+	{ $ast.setIdentifier($IDENTIFIER.text);
+       $ast.setSub(
+        $DOT.text != null ? $other.ctx.ast : null);}
+
+;
+
+subscript_list
+locals [ ExpressionList ast = new ExpressionList()]
+:
+	LBRACKET expression
+	{$ast.add($expression.ctx.ast);}
+
+	(
+		COMMA expression
+		{$ast.add($expression.ctx.ast);}
+
+	)* RBRACKET
+;
+
+direct_variable
+locals [ DirectVariable ast]
+:
+	DIRECT_VARIABLE_LITERAL
+	{ $ast=new DirectVariable($DIRECT_VARIABLE_LITERAL.text); }
+
+;
+
 
 subprogram_control_statement
 locals [ Statement ast ]

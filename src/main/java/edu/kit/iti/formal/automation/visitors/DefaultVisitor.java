@@ -2,7 +2,7 @@ package edu.kit.iti.formal.automation.visitors;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
-import edu.kit.iti.formal.automation.ast.*;
+import edu.kit.iti.formal.automation.st.ast.*;
 
 /**
  * Created by weigl on 21.06.14.
@@ -11,6 +11,11 @@ public class DefaultVisitor<T> implements Visitor<T> {
 
     public T defaultVisit(Visitable visitable) {
         return visitable.visit(this);
+    }
+
+    @Override
+    public T visit(Location location) {
+        return defaultVisit(location);
     }
 
     @Override
@@ -58,10 +63,6 @@ public class DefaultVisitor<T> implements Visitor<T> {
         return defaultVisit(configurationDeclaration);
     }
 
-    @Override
-    public T visit(DirectVariable directVariable) {
-        return defaultVisit(directVariable);
-    }
 
     @Override
     public T visit(EnumerationTypeDeclaration enumerationTypeDeclaration) {
@@ -93,11 +94,6 @@ public class DefaultVisitor<T> implements Visitor<T> {
         return defaultVisit(caseStatement);
     }
 
-
-    @Override
-    public T visit(SymbolicReference symbolicReference) {
-        return defaultVisit(symbolicReference);
-    }
 
     @Override
     public T visit(StatementList statements) {

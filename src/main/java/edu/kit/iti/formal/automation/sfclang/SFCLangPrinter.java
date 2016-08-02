@@ -2,10 +2,10 @@ package edu.kit.iti.formal.automation.sfclang;
 
 import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration;
-import edu.kit.iti.formal.automation.util.CodeWriter;
-import edu.kit.iti.formal.automation.ast.FunctionBlockDeclaration;
+import edu.kit.iti.formal.automation.st.util.CodeWriter;
+import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
-import edu.kit.iti.formal.automation.visitors.StructuredTextPrinter;
+import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 
 import java.util.ArrayList;
 import java.util.List;

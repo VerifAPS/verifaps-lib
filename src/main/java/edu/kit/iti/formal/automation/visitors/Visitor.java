@@ -2,12 +2,15 @@ package edu.kit.iti.formal.automation.visitors;
 
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.ast.*;
+import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.ast.ArrayInitialization;
 
 /**
  * Created by weigla on 14.06.2014.
  */
 public interface Visitor<T> {
+    T visit(Location location);
+
     T visit(ArrayInitialization initializations);
 
     T visit(ArrayTypeDeclaration arrayTypeDeclaration);
@@ -26,7 +29,7 @@ public interface Visitor<T> {
 
     T visit(ConfigurationDeclaration configurationDeclaration);
 
-    T visit(DirectVariable directVariable);
+    //T visit(DirectVariable directVariable);
 
     T visit(EnumerationTypeDeclaration enumerationTypeDeclaration);
 
@@ -40,7 +43,7 @@ public interface Visitor<T> {
 
     T visit(CaseStatement caseStatement);
 
-    T visit(SymbolicReference symbolicReference);
+    //T visit(SymbolicReference symbolicReference);
 
     T visit(StatementList statements);
 

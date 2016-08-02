@@ -3,7 +3,7 @@ package edu.kit.iti.formal.automation.sfclang;
 import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
-import edu.kit.iti.formal.automation.util.CodeWriter;
+import edu.kit.iti.formal.automation.st.util.CodeWriter;
 
 public class DotPrinter implements SFCAstVisitor<CodeWriter> {
 

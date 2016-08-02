@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.automation.datatypes.values;
 
-import edu.kit.iti.formal.automation.ast.Expression;
-import edu.kit.iti.formal.automation.ast.Initialization;
+import edu.kit.iti.formal.automation.st.ast.Expression;
+import edu.kit.iti.formal.automation.st.ast.Initialization;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 

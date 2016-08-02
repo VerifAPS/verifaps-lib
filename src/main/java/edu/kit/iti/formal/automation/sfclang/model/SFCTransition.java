@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.sfclang.model;
 
-import edu.kit.iti.formal.automation.ast.Expression;
+import edu.kit.iti.formal.automation.st.ast.Expression;
 
 import java.util.Set;
 

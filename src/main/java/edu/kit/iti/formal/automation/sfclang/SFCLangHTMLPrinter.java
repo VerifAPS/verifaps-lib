@@ -4,9 +4,9 @@ package edu.kit.iti.formal.automation.sfclang;
 import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
-import edu.kit.iti.formal.automation.util.HTMLCodeWriter;
-import edu.kit.iti.formal.automation.ast.FunctionBlockDeclaration;
-import edu.kit.iti.formal.automation.visitors.StructuredTextHtmlPrinter;
+import edu.kit.iti.formal.automation.st.util.HTMLCodeWriter;
+import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
+import edu.kit.iti.formal.automation.st.StructuredTextHtmlPrinter;
 
 import java.util.ArrayList;
 import java.util.List;

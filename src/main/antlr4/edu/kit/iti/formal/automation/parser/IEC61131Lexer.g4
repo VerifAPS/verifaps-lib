@@ -29,8 +29,6 @@ fragment X:('x'|'X');
 fragment Y:('y'|'Y');
 fragment Z:('z'|'Z');
 
-
-
 ON : 	O N ;
 
 STEP : 	S T E P ;
@@ -390,7 +388,7 @@ SINT
 
 STRING
 :
-	STRING'
+    S T R I N G
 ;
 
 TIME
@@ -912,6 +910,9 @@ DOT
 :
 	'.'
 ;
+
+
+REF : '^';
 
 RANGE
 :

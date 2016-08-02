@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.datatypes;
 
-import edu.kit.iti.formal.automation.ast.Range;
+import edu.kit.iti.formal.automation.st.ast.Range;
 
 import java.util.ArrayList;
 import java.util.List;

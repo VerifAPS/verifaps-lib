@@ -6,7 +6,7 @@ import edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration;
 import edu.kit.iti.formal.automation.sfclang.model.SFCAction;
 import edu.kit.iti.formal.automation.sfclang.model.SFCStep;
 import edu.kit.iti.formal.automation.sfclang.model.SFCTransition;
-import edu.kit.iti.formal.automation.ast.FunctionBlockDeclaration;
+import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
 import edu.kit.iti.formal.automation.sfclang.model.SFC;
 
