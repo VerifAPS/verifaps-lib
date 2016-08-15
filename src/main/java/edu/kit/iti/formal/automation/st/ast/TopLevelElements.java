@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.ast;
+package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
 

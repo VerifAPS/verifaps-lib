@@ -204,4 +204,14 @@ public class DefaultVisitor<T> implements Visitor<T> {
     public T visit(StructureInitialization structureInitialization) {
         return defaultVisit(structureInitialization);
     }
+
+    @Override
+    public T visit(Deref deref) {
+        return defaultVisit(deref);
+    }
+
+    @Override
+    public T visit(SymbolicReference symbolicReference) {
+        return defaultVisit(symbolicReference);
+    }
 }

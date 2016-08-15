@@ -6,13 +6,13 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * Created by weigl on 11.06.14.
  */
 public class AssignmentStatement extends Statement {
-    private Location variable;
+    private Reference variable;
     private Expression expression;
 
     public AssignmentStatement() {
     }
 
-    public AssignmentStatement(Location variable, Expression expression) {
+    public AssignmentStatement(Reference variable, Expression expression) {
         this.variable = variable;
         this.expression = expression;
     }
@@ -22,11 +22,11 @@ public class AssignmentStatement extends Statement {
         return visitor.visit(this);
     }
 
-    public Location getLocation() {
+    public Reference getLocation() {
         return variable;
     }
 
-    public void setLocation(Location variable) {
+    public void setLocation(Reference variable) {
         this.variable = variable;
     }
 

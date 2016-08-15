@@ -1349,7 +1349,7 @@ locals [ Expression ast]
 	constant
 	{ $ast = $constant.ctx.ast; }
 
-	| v=lhs
+	| v=variable
 	{ $ast = $v.ctx.ast; }
 
 	| functioncall
@@ -1380,13 +1380,12 @@ param_assignment
 		id = IDENTIFIER ASSIGN
 	)? expression
 	{
-        $functioncall::ast.addInputParameter($id.text, $expression.ctx.ast);
-    }
-
-	| IDENTIFIER ARROW_RIGHT v=lhs
+          $functioncall::ast.addInputParameter($id.text, $expression.ctx.ast);
+        }
+	| IDENTIFIER ARROW_RIGHT v=variable
 	{
-        $functioncall::ast.addOutputParameter($IDENTIFIER.text, $v.ctx.ast);
-    }
+          $functioncall::ast.addOutputParameter($IDENTIFIER.text, $v.ctx.ast);
+        }
 
 ;
 
@@ -1752,4 +1751,3 @@ event [StepDeclaration step]
 		  {$step.push($type.text, $action.text);}
 	)
 ;
-

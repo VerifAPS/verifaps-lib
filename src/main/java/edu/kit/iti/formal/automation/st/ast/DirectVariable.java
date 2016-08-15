@@ -9,4 +9,9 @@ public class DirectVariable extends Reference {
     public DirectVariable(String s) {
 
     }
+
+    @Override
+    public <T> T visit(Visitor<T> visitor) {
+        throw new IllegalStateException("not implemented");
+    }
 }

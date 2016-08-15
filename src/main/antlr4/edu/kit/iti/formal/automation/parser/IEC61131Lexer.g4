@@ -435,6 +435,8 @@ WSTRING
 /******
  * Keywords
  */
+POINTER : P O I N T E R;
+
 VAR_OUTPUT
 :
 	V A R '_' O U T P U T

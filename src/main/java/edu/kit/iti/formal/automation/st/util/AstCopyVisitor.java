@@ -28,7 +28,7 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
     @Override
     public Object visit(AssignmentStatement assignmentStatement) {
         AssignmentStatement statement = new AssignmentStatement(
-                (Location) assignmentStatement.getLocation().visit(this),
+                (Reference) assignmentStatement.getLocation().visit(this),
                 (Expression) assignmentStatement.getExpression().visit(this)
         );
         setPositions(assignmentStatement, statement);

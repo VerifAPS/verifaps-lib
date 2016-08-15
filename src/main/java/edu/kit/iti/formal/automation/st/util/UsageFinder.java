@@ -16,7 +16,7 @@ public class UsageFinder extends AstVisitor {
 
     @Override
     public Object visit(AssignmentStatement assignmentStatement) {
-        writtenReferences.add(assignmentStatement.getLocation().asIdentifier());
+        writtenReferences.add(assignmentStatement.getLocation().toString());
         assignmentStatement.getExpression().visit(this);
         return null;
     }

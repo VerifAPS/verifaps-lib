@@ -56,8 +56,8 @@ public class WriteBeforeReadIdentifier extends AstVisitor<WriteBeforeReadIdentif
         WBRState wbrState = new WBRState();
         current = wbrState;
         assignmentStatement.getExpression().visit(this);
-        Location variable = assignmentStatement.getLocation();
-        wbrState.write(variable.asIdentifier());
+        Reference variable = assignmentStatement.getLocation();
+        wbrState.write(variable.toString());
         return wbrState;
     }
 

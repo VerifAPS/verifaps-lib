@@ -88,4 +88,8 @@ public interface Visitor<T> {
     T visit(CommentStatement commentStatement);
 
     T visit(StructureInitialization structureInitialization);
+
+    T visit(Deref deref);
+
+    T visit(SymbolicReference symbolicReference);
 }

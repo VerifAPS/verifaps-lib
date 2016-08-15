@@ -41,7 +41,7 @@ public class FunctionCall extends Expression {
         parameters.add(new Parameter(key, false, visit));
     }
 
-    public void addOutputParameter(String key, Location visit) {
+    public void addOutputParameter(String key, Reference visit) {
         assert key != null;
         assert visit != null;
 

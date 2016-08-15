@@ -28,7 +28,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
     @Override
     public Object visit(AssignmentStatement assignmentStatement) {
         assignmentStatement.setExpression((Expression) assignmentStatement.getExpression().visit(this));
-        assignmentStatement.setLocation((Location) assignmentStatement.getLocation().visit(this));
+        assignmentStatement.setLocation((Reference) assignmentStatement.getLocation().visit(this));
         return assignmentStatement;
     }
 
@@ -216,8 +216,6 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
     public Object visit(ConfigurationDeclaration configurationDeclaration) {
         return configurationDeclaration;
     }
-
-
 
 
     @Override

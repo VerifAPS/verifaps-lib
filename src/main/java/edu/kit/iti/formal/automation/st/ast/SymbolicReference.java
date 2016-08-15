@@ -82,4 +82,16 @@ public class SymbolicReference extends Reference {
         result = 31 * result + (sub != null ? sub.hashCode() : 0);
         return result;
     }
+
+    public void derefVar() {
+    }
+
+    public void derefSubscript() {
+
+    }
+
+    @Override
+    public <T> T visit(Visitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }
