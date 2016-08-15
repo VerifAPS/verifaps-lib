@@ -1,0 +1,31 @@
+SFC A1R
+    VAR t : int; s : int END_VAR
+    
+    VAR_INPUT i : int END_VAR
+	
+	VAR_OUTPUT o :int END_VAR
+    
+    STEP A
+        ON active ACTION 
+            t := i;
+        END_ACTION
+    END_STEP
+
+
+    STEP B
+        ON active ACTION 
+            s := s + 1;
+        END_ACTION
+    END_STEP
+    
+    GOTO true :: A -> B
+    GOTO (s+1)*(s+1) > t :: B -> C
+	GOTO (s+1)*(s+1) <= t :: B -> B
+    
+    STEP C 
+        ON active ACTION 
+            o := s;
+        END_ACTION 
+    END_STEP
+
+END_SFC

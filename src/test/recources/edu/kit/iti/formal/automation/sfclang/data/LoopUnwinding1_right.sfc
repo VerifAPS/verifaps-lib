@@ -1,0 +1,15 @@
+SFC Loop
+
+    VAR_OUTPUT 
+        o : INT;
+    END_VAR
+
+    STEP A
+        ON active ACTION
+            o := o + 1;
+        END_ACTION
+    END_STEP
+	
+	GOTO TRUE :: A->A
+
+END_SFC

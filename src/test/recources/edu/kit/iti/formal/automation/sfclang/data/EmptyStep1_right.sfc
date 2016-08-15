@@ -1,0 +1,28 @@
+SFC ES1R
+
+    VAR_OUTPUT 
+        o : int;
+    END_VAR
+
+
+    STEP A 
+        on active action
+            o := 1
+        end_action
+    END_STEP 
+
+    GOTO true :: A -> I
+    
+    STEP I
+    END_STEP 
+    
+    GOTO true :: I -> B
+    
+    STEP B 
+        on active action 
+            o:=2
+        end_action
+    END_STEP 
+    
+    GOTO true :: B -> A 
+END_SFC

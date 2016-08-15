@@ -1,0 +1,23 @@
+SFC I1L
+
+    VAR_OUTPUT 
+        o : bool;
+    END_VAR
+    
+    VAR_INPUT
+        i : int;
+    END_VAR
+
+    STEP A 
+        
+    END_STEP
+    
+    GOTO true :: A -> B
+    
+    STEP B 
+        on active action
+            o := true;
+        end_action
+    END_STEP 
+    
+END_SFC
