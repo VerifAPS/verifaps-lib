@@ -89,7 +89,7 @@ cast
 locals [ ScalarValue<EnumerateType, String> ast]
 :
 	CAST_LITERAL
-	{ $ast = ValueFactory.makeEnumeratedValue($CAST_LITERAL.text);}
+	{ $ast = ValueFactory.makeEnumeratedValue($CAST_LITERAL);}
 
 ;
 
@@ -97,7 +97,7 @@ integer
 locals [ ScalarValue<? extends AnyInt, Long> ast]
 :
 	INTEGER_LITERAL
-	{ $ast = ValueFactory.parseIntegerLiteral($INTEGER_LITERAL.text);}
+	{ $ast = ValueFactory.parseIntegerLiteral($INTEGER_LITERAL);}
 
 ;
 
@@ -105,7 +105,7 @@ bits
 locals [ ScalarValue<? extends AnyBit, Bits> ast]
 :
 	BITS_LITERAL
-	{ $ast = ValueFactory.parseBitLiteral($BITS_LITERAL.text);}
+	{ $ast = ValueFactory.parseBitLiteral($BITS_LITERAL);}
 
 ;
 
@@ -113,7 +113,7 @@ real
 locals [ ScalarValue<? extends AnyReal, Double> ast ]
 :
 	REAL_LITERAL
-	{ $ast = ValueFactory.parseRealLiteral($REAL_LITERAL.text); }
+	{ $ast = ValueFactory.parseRealLiteral($REAL_LITERAL); }
 
 ;
 
@@ -125,7 +125,7 @@ locals [ ScalarValue<? extends IECString, String> ast]
 		WSTRING_LITERAL
 		| STRING_LITERAL
 	)
-	{$ast = ValueFactory.parseStringLiteral($tok.text);}
+	{$ast = ValueFactory.parseStringLiteral($tok);}
 
 ;
 
@@ -133,7 +133,7 @@ time
 locals [ ScalarValue<TimeType, TimeValue> ast]
 :
 	TIME_LITERAL
-	{$ast = ValueFactory.parseTimeLiteral($TIME_LITERAL.text);}
+	{$ast = ValueFactory.parseTimeLiteral($TIME_LITERAL);}
 
 ;
 
@@ -157,7 +157,7 @@ datetime
 locals [ ScalarValue<AnyDate.DateAndTime, DateAndTimeValue> ast]
 :
 	DATETIME
-	{ $ast = ValueFactory.parseDateAndTimeLiteral($DATETIME.text);}
+	{ $ast = ValueFactory.parseDateAndTimeLiteral($DATETIME);}
 
 ;
 
@@ -1296,50 +1296,69 @@ locals [ Expression ast ]
         $ast = new UnaryExpression(
                     UnaryExpression.Operator.MINUS,
                     $sub.ctx.ast);
-      }
+        Utils.setPosition($ast, $MINUS, $sub.ctx.ast);
+    }
 
 	| NOT sub = expression
 	{
         $ast = new UnaryExpression(
                     UnaryExpression.Operator.NEGATE,
                     $sub.ctx.ast);
-      }
+        Utils.setPosition($ast, $NOT, $sub.ctx.ast);
+    }
 
 	| LPAREN sub=expression RPAREN
-	{ $ast = $sub.ctx.ast; }
+	{ $ast = $sub.ctx.ast;         Utils.setPosition($ast, $LPAREN, $RPAREN); }
 
 
 	| left = expression op = POWER right = expression
-	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.POWER); }
+	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.POWER);
+      Utils.setPosition($ast, $left.ctx.ast, $right.ctx.ast);
+    }
 
 	| <assoc=right> left=expression op=(MOD	| DIV) right = expression
-	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, $op.text); }
+	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, $op.text);
+      Utils.setPosition($ast, $left.ctx.ast, $right.ctx.ast);
+	}
 
 	| left=expression op=MULT right=expression
-	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.MULT); }
+	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.MULT);
+	  Utils.setPosition($ast, $left.ctx.ast, $right.ctx.ast);
+    }
 
 	| left=expression op =(PLUS|MINUS) right=expression
-	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, $op.text); }
+	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, $op.text);
+      Utils.setPosition($ast, $left.ctx.ast, $right.ctx.ast);
+	}
 
 	| left=expression op=( LESS_THAN | GREATER_THAN | GREATER_EQUALS | LESS_EQUALS) right=expression
-	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, $op.text); }
+	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, $op.text);
+      Utils.setPosition($ast, $left.ctx.ast, $right.ctx.ast);
+	}
 
 	| left=expression op=(EQUALS|NOT_EQUALS) right=expression
-	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, $op.text); }
+	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, $op.text);
+      Utils.setPosition($ast, $left.ctx.ast, $right.ctx.ast);
+    }
 
 	| left=expression op=AND right=expression
-	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.AND); }
-
+	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.AND);
+      Utils.setPosition($ast, $left.ctx.ast, $right.ctx.ast);
+	}
 	| left=expression op=OR right=expression
-	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.OR); }
+	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.OR);
+      Utils.setPosition($ast, $left.ctx.ast, $right.ctx.ast);
+	}
 
 	| left=expression op=XOR right=expression
-	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.XOR); }
+	{ $ast = new BinaryExpression($left.ctx.ast, $right.ctx.ast, BinaryExpression.Operator.XOR);
+	  Utils.setPosition($ast, $left.ctx.ast, $right.ctx.ast);
+	}
 
 	//BASE CASE
 
 	| primary_expression
-	{ $ast = $primary_expression.ctx.ast; }
+	{ $ast = $primary_expression.ctx.ast; 	}
 
 ;
 
@@ -1369,7 +1388,7 @@ locals [ FunctionCall ast = new FunctionCall()]
 	)? RPAREN
 	{
         $ast.setFunctionName($IDENTIFIER.text);
-        $ast.line($LPAREN);
+        Utils.setPosition($ast, $IDENTIFIER, $RPAREN);
     }
 
 ;
@@ -1427,7 +1446,7 @@ locals [ AssignmentStatement ast ]
 	a=variable ASSIGN expression
 	{
         $ast = new AssignmentStatement($a.ctx.ast, $expression.ctx.ast);
-        $ast.line($ASSIGN);
+        //$ast.line($ASSIGN);
     }
 
 ;
@@ -1490,9 +1509,11 @@ locals [ Statement ast ]
 :
 	functioncall
 	{$ast = new FunctionCallStatement($functioncall.ctx.ast);}
-
 	| RETURN
-	{$ast = new ReturnStatement(); $ast.line($RETURN);}
+	{
+	  $ast = new ReturnStatement();
+	  Utils.setPositionComplete($ast, $RETURN);
+	}
 
 ;
 
@@ -1511,14 +1532,14 @@ if_statement
 locals [ IfStatement ast = new IfStatement() ]
 :
 	IF
-	{$ast.line($IF); }
-
 	cond = expression THEN thenlist = statement_list
-	{ $ast.addGuardedCommand($cond.ctx.ast, $thenlist.ctx.ast).line($IF); }
+	{
+	    $ast.addGuardedCommand($cond.ctx.ast, $thenlist.ctx.ast);
+	}
 
 	(
 		ELSEIF cond = expression THEN thenlist = statement_list
-		{ $ast.addGuardedCommand($cond.ctx.ast, $thenlist.ctx.ast).line($ELSEIF); }
+		{ $ast.addGuardedCommand($cond.ctx.ast, $thenlist.ctx.ast);}
 
 	)*
 	(
@@ -1527,15 +1548,15 @@ locals [ IfStatement ast = new IfStatement() ]
 	{
         if($ELSE.text != null)
             $ast.setElseBranch($elselist.ctx.ast);
-      }
 
+        Utils.setPosition($ast, $IF, $END_IF);
+    }
 ;
 
 case_statement
 locals [ CaseStatement ast = new CaseStatement()]
 :
 	CASE
-	{$ast.line($CASE);}
 
 	cond = expression OF case_element
 	(
@@ -1548,8 +1569,8 @@ locals [ CaseStatement ast = new CaseStatement()]
 	)? END_CASE
 	{
         $ast.setExpression($cond.ctx.ast);
-      }
-
+        Utils.setPosition($ast, $CASE, $END_CASE);
+    }
 ;
 
 case_element
@@ -1557,7 +1578,7 @@ locals [ CaseStatement.Case cs = new CaseStatement.Case()]
 :
 	case_list COLON statement_list
 	{
-        $cs.line($COLON);
+        //$cs.line($COLON);
         $cs.setStatements($statement_list.ctx.ast);
         $case_statement::ast.addCase($cs);
     }
@@ -1615,23 +1636,24 @@ locals [ ForStatement ast = new ForStatement()]
 	{
         $ast.setVariable($var.text);
         $ast.setStatements($statement_list.ctx.ast);
-        $ast.line($FOR);
-      }
+        //$ast.line($FOR);
+        Utils.setPosition($ast, $FOR, $END_FOR);
+     }
 
 ;
 
 for_list
 :
-	begin = expression TO end = expression
+	begin = expression TO endPosition = expression
 	(
 		BY step = expression
 		{$for_statement::ast.setStep($step.ctx.ast);}
 
 	)?
 	{
-        $for_statement::ast.setStop($end.ctx.ast);
+        $for_statement::ast.setStop($endPosition.ctx.ast);
         $for_statement::ast.setStart($begin.ctx.ast);
-      }
+    }
 
 ;
 
@@ -1642,7 +1664,7 @@ locals [WhileStatement ast = new WhileStatement()]
 	{
         $ast.setCondition($expression.ctx.ast);
         $ast.setStatements($statement_list.ctx.ast);
-        $ast.line($WHILE);
+        //$ast.line($WHILE);
     }
 
 ;
@@ -1654,7 +1676,7 @@ locals [RepeatStatement ast = new RepeatStatement()]
 	{
             $ast.setCondition($expression.ctx.ast);
             $ast.setStatements($statement_list.ctx.ast);
-            $ast.line($REPEAT);
+            //$ast.line($REPEAT);
      }
 
 ;
@@ -1663,7 +1685,9 @@ exit_statement
 locals [ExitStatement ast = new ExitStatement()]
 :
 	EXIT
-	{$ast.line($EXIT);}
+	{
+	    //$ast.line($EXIT);
+	}
 
 ;
 

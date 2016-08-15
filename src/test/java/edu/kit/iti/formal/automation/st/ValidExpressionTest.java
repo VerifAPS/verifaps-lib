@@ -9,9 +9,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,17 +18,17 @@ import java.util.List;
  * Created by weigl on 02.08.16.
  */
 public class ValidExpressionTest {
-    private List<String> testcases = new LinkedList<>();
+    private List<String> validExpression = new LinkedList<>();
 
     @Before
     public void setup() throws IOException {
-        BufferedReader stream = new BufferedReader(
-                new InputStreamReader(
-                        getClass().getResourceAsStream("validexpressions.txt")));
-
+        File ve = new File("src/test/resources/edu/kit/iti/formal/automation/st/expressions/").getAbsoluteFile();
+        BufferedReader stream = new BufferedReader(new FileReader(new File(ve, "valid.txt")));
         String tmp = "";
         while ((tmp = stream.readLine()) != null) {
-            this.testcases.add(tmp);
+            if (tmp.startsWith("#"))
+                continue;
+            this.validExpression.add(tmp);
         }
     }
 
@@ -41,22 +39,21 @@ public class ValidExpressionTest {
         boolean b = true;
         List<Integer> lineNumbers = new ArrayList<>();
 
-        for (int j = 0; j <testcases.size(); j++) {
-            String s = testcases.get(j);
+        for (int j = 0; j < validExpression.size(); j++) {
+            String s = validExpression.get(j);
             if (test(s)) {
                 i++;
             } else {
                 b = false;
                 System.out.println(s);
-
             }
         }
-        System.out.printf("%d of %d testcases are good%n", i, testcases.size());
+        System.out.printf("%d of %d validExpression are good%n", i, validExpression.size());
         assertTrue(b);
 
     }
 
-    private boolean test(String s) {
+    static boolean test(String s) {
         ANTLRInputStream stream = new ANTLRInputStream(s);
         IEC61131Lexer lexer = new IEC61131Lexer(stream);
         CommonTokenStream cts = new CommonTokenStream(lexer);

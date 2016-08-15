@@ -3,7 +3,6 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.visitors.Visitable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import org.antlr.v4.runtime.Token;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -11,15 +10,38 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Top implements Visitable {
-    private int lineNumber = -1;
-    private int positioninLine = -1;
+    public static class Position {
+        final int lineNumber;
+        final int charInLine;
 
-    public int getLineNumber() {
-        return lineNumber;
+        public Position(int lineNumber, int charInLine) {
+            this.lineNumber = lineNumber;
+            this.charInLine = charInLine;
+        }
+
+        public Position() {
+            this(-1, -1);
+        }
     }
 
-    public void setLineNumber(int lineNumber) {
-        this.lineNumber = lineNumber;
+    private Position startPosition = new Position(),
+            endPosition = new Position();
+
+
+    public Position getStartPosition() {
+        return startPosition;
+    }
+
+    public void setStartPosition(Position start) {
+        this.startPosition = start;
+    }
+
+    public Position getEndPosition() {
+        return endPosition;
+    }
+
+    public void setEndPosition(Position endPosition) {
+        this.endPosition = endPosition;
     }
 
     private static void toString(Object o, Class<?> clazz, Map<String, Object> list) {
@@ -73,25 +95,12 @@ public abstract class Top implements Visitable {
     }
 
     public static String repeat(String str, int times) {
-    	StringBuilder sb = new StringBuilder();
-    	for (int i = 0; i < times; i++) {
-			sb.append(str);
-		}
-    	return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < times; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
     }
 
-	public abstract <T> T visit(Visitor<T> visitor);
-
-    public void line(Token aReturn) {
-        setLineNumber(aReturn.getLine());
-        setPositionInLine(aReturn.getCharPositionInLine());
-    }
-
-    public void setPositionInLine(int positioninLine) {
-        this.positioninLine = positioninLine;
-    }
-
-    public int getPositionInLine() {
-        return positioninLine;
-    }
+    public abstract <T> T visit(Visitor<T> visitor);
 }

@@ -1,8 +1,10 @@
 package edu.kit.iti.formal.automation;
 
+import edu.kit.iti.formal.automation.sfclang.Utils;
 import edu.kit.iti.formal.automation.st.ast.Expression;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.datatypes.values.*;
+import org.antlr.v4.runtime.Token;
 
 import java.util.BitSet;
 import java.util.regex.Matcher;
@@ -70,6 +72,13 @@ public class ValueFactory {
         return null;
     }
 
+    public static ScalarValue<? extends AnyBit, Bits> parseBitLiteral(Token s) {
+        ScalarValue<? extends AnyBit, Bits> val = parseBitLiteral(s.getText());
+        Utils.setPositionComplete(val, s);
+        return val;
+    }
+
+
     public static ScalarValue<? extends AnyBit, Bits> parseBitLiteral(String s) {
         String first = getPrefix(s);
 
@@ -97,8 +106,12 @@ public class ValueFactory {
         } else {
             throw new IllegalArgumentException();
         }
+    }
 
-
+    public static ScalarValue<? extends AnyInt, Long> parseIntegerLiteral(Token token) {
+        ScalarValue<? extends AnyInt, Long> val = parseIntegerLiteral(token.getText());
+        Utils.setPositionComplete(val, token);
+        return val;
     }
 
     public static ScalarValue<? extends AnyInt, Long> parseIntegerLiteral(String s) {
@@ -135,6 +148,7 @@ public class ValueFactory {
         throw new IllegalStateException();
     }
 
+
     private static long parseOrdinal(String s) {
         String prefix = getPrefix(s);
         int radix = 10;
@@ -148,10 +162,21 @@ public class ValueFactory {
         }
     }
 
+    public static ScalarValue<EnumerateType, String> makeEnumeratedValue(Token token) {
+        ScalarValue<EnumerateType, String> val = makeEnumeratedValue(token.getText());
+        Utils.setPositionComplete(val, token);
+        return val;
+    }
 
     public static ScalarValue<EnumerateType, String> makeEnumeratedValue(String s) {
         EnumerateType et = new EnumerateType(getPrefix(s));
         return new ScalarValue<>(et, removePrefix(s));
+    }
+
+    public static ScalarValue<? extends IECString, String> parseStringLiteral(Token token) {
+        ScalarValue<? extends IECString, String> val = parseStringLiteral(token.getText());
+        Utils.setPositionComplete(val, token);
+        return val;
     }
 
     public static ScalarValue<? extends IECString, String> parseStringLiteral(String s) {
@@ -160,6 +185,12 @@ public class ValueFactory {
             return new ScalarValue<IECString.String, String>(IECString.STRING_8BIT, content);
         else
             return new ScalarValue<IECString.WString, String>(IECString.STRING_16BIT, content);
+    }
+
+    public static ScalarValue<TimeType, TimeValue> parseTimeLiteral(Token token) {
+        ScalarValue<TimeType, TimeValue> val = parseTimeLiteral(token.getText());
+        Utils.setPositionComplete(val, token);
+        return val;
     }
 
     public static ScalarValue<TimeType, TimeValue> parseTimeLiteral(String s) {
@@ -217,6 +248,13 @@ public class ValueFactory {
         return s.substring(0, beginIndex);
     }
 
+
+    public static ScalarValue<AnyBit.Bool, Bits> makeBool(Token token) {
+        ScalarValue<AnyBit.Bool, Bits> val = makeBool(token.getText());
+        Utils.setPositionComplete(val, token);
+        return val;
+    }
+
     public static ScalarValue<AnyBit.Bool, Bits> makeBool(String text) {
         return new ScalarValue<AnyBit.Bool, Bits>(AnyBit.BOOL, new Bits(text.equals("TRUE") ? 1 : 0, 1));
     }
@@ -225,12 +263,23 @@ public class ValueFactory {
         return new ScalarValue<AnyBit.Bool, Boolean>(AnyBit.BOOL, val);
     }
 
+    public static ScalarValue<? extends AnyReal, Double> parseRealLiteral(Token token) {
+        ScalarValue<? extends AnyReal, Double> val = parseRealLiteral(token.getText());
+        Utils.setPositionComplete(val, token);
+        return val;
+    }
+
     public static ScalarValue<? extends AnyReal, Double> parseRealLiteral(String s) {
         s = removePrefix(s);
         double val = Double.parseDouble(s);
         return new ScalarValue<>(AnyReal.LREAL, val);
     }
 
+    public static ScalarValue<AnyDate.DateAndTime, DateAndTimeValue> parseDateAndTimeLiteral(Token s) {
+        ScalarValue<AnyDate.DateAndTime, DateAndTimeValue> val = parseDateAndTimeLiteral(s.getText());
+        Utils.setPositionComplete(val, s);
+        return val;
+    }
 
     public static ScalarValue<AnyDate.DateAndTime, DateAndTimeValue> parseDateAndTimeLiteral(String s) {
         s = removePrefix(s);
@@ -242,6 +291,12 @@ public class ValueFactory {
         TimeOfDayValue tod = parseTimeOfDayLiteral(b).getValue();
         DateAndTimeValue val = new DateAndTimeValue(date, tod);
         return new ScalarValue<>(AnyDate.DATE_AND_TIME, val);
+    }
+
+    public static ScalarValue<AnyDate.Date, DateValue> parseDateLiteral(Token token) {
+        ScalarValue<AnyDate.Date, DateValue> val = parseDateLiteral(token.getText());
+        Utils.setPositionComplete(val, token);
+        return val;
     }
 
     public static ScalarValue<AnyDate.Date, DateValue> parseDateLiteral(String s) {
@@ -257,6 +312,12 @@ public class ValueFactory {
         } else {
             throw new IllegalArgumentException("given string is not a time of day value");
         }
+    }
+
+    public static ScalarValue<AnyDate.TimeOfDay, TimeOfDayValue> parseTimeOfDayLiteral(Token token) {
+        ScalarValue<AnyDate.TimeOfDay, TimeOfDayValue> val = parseTimeOfDayLiteral(token.getText());
+        Utils.setPositionComplete(val, token);
+        return val;
     }
 
     public static ScalarValue<AnyDate.TimeOfDay, TimeOfDayValue> parseTimeOfDayLiteral(String s) {

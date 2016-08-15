@@ -188,8 +188,8 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
     }
 
     private Top setPositions(Top old, Top fresh) {
-        fresh.setLineNumber(old.getLineNumber());
-        fresh.setPositionInLine(old.getPositionInLine());
+        fresh.setStartPosition(old.getStartPosition());
+        fresh.setEndPosition(old.getEndPosition());
         return fresh;
     }
 
