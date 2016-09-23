@@ -1,0 +1,3 @@
+[submodule "iec61131lang"]
+	path = iec61131lang
+	url = https://github.com/VerifAPS/iec61131lang.git
