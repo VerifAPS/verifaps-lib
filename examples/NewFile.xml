@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extended-test-table xmlns="http://formal.iti.kit.edu/exteta-1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://formal.iti.kit.edu/exteta-1.0 ../src/xsd/exteta-1.0.xsd "
+	version="">
+
+	<variables>
+		<variable data-type="INT" io="input" name="sensor" />
+		<variable data-type="BOOLEAN" io="output" name="actuator" />
+	</variables>
+
+	<steps>
+		<step duration="1">
+			<cell>1</cell>
+			<cell>true</cell>
+		</step>
+
+		<step duration="[1,5]">
+			<cell>1</cell>
+			<cell>sensor*2</cell>
+		</step>
+
+		<step duration="~">
+			<cell>=prev(actuator)</cell>
+			<cell>&gt;2</cell>
+		</step>
+	</steps>
+
+
+</extended-test-table>
