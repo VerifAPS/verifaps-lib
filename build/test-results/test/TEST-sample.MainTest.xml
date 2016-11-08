@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="sample.MainTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2016-11-08T16:58:49" hostname="MsSf2015" time="0.001">
-  <properties/>
-  <testcase name="testSomeLibraryMethod" classname="sample.MainTest" time="0.001"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
