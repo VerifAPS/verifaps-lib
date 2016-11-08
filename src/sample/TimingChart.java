@@ -22,8 +22,6 @@ public class TimingChart extends XYChart<Integer, Integer> {
      */
     public TimingChart(Axis axis, Axis axis2) {
         super(axis, axis2);
-        ObservableList<Node> plotChildren = getPlotChildren();
-        plotChildren.add(new Line());
     }
 
     /**
