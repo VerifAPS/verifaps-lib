@@ -1,7 +1,12 @@
 package sample;
 
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.shape.Line;
+
+import static com.sun.org.apache.xerces.internal.impl.xpath.regex.CaseInsensitiveMap.get;
 
 /**
  * Created by leonk on 08.11.2016.
@@ -17,6 +22,8 @@ public class TimingChart extends XYChart<Integer, Integer> {
      */
     public TimingChart(Axis axis, Axis axis2) {
         super(axis, axis2);
+        ObservableList<Node> plotChildren = getPlotChildren();
+        plotChildren.add(new Line());
     }
 
     /**
@@ -30,7 +37,8 @@ public class TimingChart extends XYChart<Integer, Integer> {
      */
     @Override
     protected void dataItemAdded(Series series, int itemIndex, Data item) {
-
+        ObservableList<Node> plotChildren = getPlotChildren();
+        plotChildren.add(new Line());
     }
 
     /**
@@ -43,7 +51,8 @@ public class TimingChart extends XYChart<Integer, Integer> {
      */
     @Override
     protected void dataItemRemoved(Data item, Series series) {
-
+        ObservableList<Node> plotChildren = getPlotChildren();
+        plotChildren.remove(0);
     }
 
     /**
@@ -67,7 +76,9 @@ public class TimingChart extends XYChart<Integer, Integer> {
      */
     @Override
     protected void seriesAdded(Series series, int seriesIndex) {
-
+        for(int i = 0; i<series.getData().size(); i++){
+            dataItemAdded(series, i, (Data) series.getData().get(i));
+        }
     }
 
     /**
@@ -79,7 +90,9 @@ public class TimingChart extends XYChart<Integer, Integer> {
      */
     @Override
     protected void seriesRemoved(Series series) {
-
+        for(int i = 0; i<series.getData().size(); i++){
+            dataItemRemoved((Data) series.getData().get(i), series);
+        }
     }
 
     /**
@@ -89,6 +102,18 @@ public class TimingChart extends XYChart<Integer, Integer> {
      */
     @Override
     protected void layoutPlotChildren() {
-
+        ObservableList<Node> plotChildren = getPlotChildren();
+        ObservableList<Series<Integer, Integer>> data = getData();
+        int lineIndex = 0;
+        for (Series<Integer, Integer> series : data){
+            ObservableList<Data<Integer,Integer>> dataPoints = series.getData();
+            for(int i = 1; i<dataPoints.size(); i++){
+                Line line = (Line) plotChildren.get(lineIndex++);
+                line.setStartX(getXAxis().getDisplayPosition(dataPoints.get(i-1).getXValue()));
+                line.setStartY(getYAxis().getDisplayPosition(dataPoints.get(i-1).getYValue()));
+                line.setEndX(getXAxis().getDisplayPosition(dataPoints.get(i).getXValue()));
+                line.setEndY(getYAxis().getDisplayPosition(dataPoints.get(i).getYValue()));
+            }
+        }
     }
 }
