@@ -1,11 +1,8 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -14,9 +11,8 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
-import org.fife.ui.rtextarea.RTextScrollPane;
+import org.fxmisc.richtext.InlineStyleTextArea;
+import org.fxmisc.richtext.LineNumberFactory;
 
 import java.util.ArrayList;
 
@@ -43,24 +39,15 @@ public class Main extends Application {
         tc.prefHeightProperty().bind(pane.heightProperty());
         pane.getChildren().add(tc);
 
-        SwingNode swingNode = (SwingNode) scene.lookup("#swingnode");
 
-        RSyntaxTextArea textArea = new RSyntaxTextArea(20, 60);
-        textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
-        textArea.setCodeFoldingEnabled(true);
-        RTextScrollPane sp = new RTextScrollPane(textArea);
-
-        swingNode.setContent(sp);
-
-        AnchorPane anchorPane = (AnchorPane) scene.lookup("#anchorpane_left");
-        ChangeListener<Number> repaintOnChangeSizeListener = new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                swingNode.getContent().repaint();
-            }
-        };
-        anchorPane.widthProperty().addListener(repaintOnChangeSizeListener);
-        anchorPane.heightProperty().addListener(repaintOnChangeSizeListener);
+        InlineStyleTextArea<EditorTextStyle> textArea = new InlineStyleTextArea<>(new EditorTextStyle(), styleInfo -> styleInfo.toCss());
+        AnchorPane anchorPaneLeft = (AnchorPane) scene.lookup("#anchorpane_left");
+        anchorPaneLeft.getChildren().add(textArea);
+        AnchorPane.setBottomAnchor(textArea, 0.0);
+        AnchorPane.setTopAnchor(textArea, 0.0);
+        AnchorPane.setLeftAnchor(textArea, 0.0);
+        AnchorPane.setRightAnchor(textArea, 0.0);
+        textArea.setParagraphGraphicFactory(LineNumberFactory.get(textArea));
     }
 
 
