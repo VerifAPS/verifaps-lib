@@ -3,12 +3,15 @@ package sample;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.fxmisc.richtext.InlineStyleTextArea;
@@ -48,6 +51,12 @@ public class Main extends Application {
         AnchorPane.setLeftAnchor(textArea, 0.0);
         AnchorPane.setRightAnchor(textArea, 0.0);
         textArea.setParagraphGraphicFactory(LineNumberFactory.get(textArea));
+
+        textArea.setOnMouseClicked(event -> {
+            EditorTextStyle css = EditorTextStyle.random();
+            System.out.println(css);
+            textArea.setStyle(0, textArea.getText().length(), css);
+        });
     }
 
 
