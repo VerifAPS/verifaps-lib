@@ -1,15 +1,22 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rtextarea.RTextScrollPane;
 
 import java.util.ArrayList;
 
@@ -35,6 +42,25 @@ public class Main extends Application {
         tc.prefWidthProperty().bind(pane.widthProperty());
         tc.prefHeightProperty().bind(pane.heightProperty());
         pane.getChildren().add(tc);
+
+        SwingNode swingNode = (SwingNode) scene.lookup("#swingnode");
+
+        RSyntaxTextArea textArea = new RSyntaxTextArea(20, 60);
+        textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+        textArea.setCodeFoldingEnabled(true);
+        RTextScrollPane sp = new RTextScrollPane(textArea);
+
+        swingNode.setContent(sp);
+
+        AnchorPane anchorPane = (AnchorPane) scene.lookup("#anchorpane_left");
+        ChangeListener<Number> repaintOnChangeSizeListener = new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                swingNode.getContent().repaint();
+            }
+        };
+        anchorPane.widthProperty().addListener(repaintOnChangeSizeListener);
+        anchorPane.heightProperty().addListener(repaintOnChangeSizeListener);
     }
 
 
