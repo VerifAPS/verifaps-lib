@@ -6,8 +6,6 @@ import javafx.scene.chart.Axis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.shape.Line;
 
-import static com.sun.org.apache.xerces.internal.impl.xpath.regex.CaseInsensitiveMap.get;
-
 /**
  * Created by leonk on 08.11.2016.
  */
