@@ -18,6 +18,8 @@ import java.util.ArrayList;
 
 public class Main extends Application {
 
+    private InlineStyleTextArea<EditorTextStyle> textArea;
+
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
@@ -40,7 +42,8 @@ public class Main extends Application {
         pane.getChildren().add(tc);
 
 
-        InlineStyleTextArea<EditorTextStyle> textArea = new InlineStyleTextArea<>(new EditorTextStyle(), styleInfo -> styleInfo.toCss());
+        textArea = new InlineStyleTextArea<>(new EditorTextStyle(), EditorTextStyle::toCss);
+        textArea.setId("textArea");
         AnchorPane anchorPaneLeft = (AnchorPane) scene.lookup("#anchorpane_left");
         anchorPaneLeft.getChildren().add(textArea);
         AnchorPane.setBottomAnchor(textArea, 0.0);
@@ -54,6 +57,10 @@ public class Main extends Application {
             System.out.println(css);
             textArea.setStyle(0, textArea.getText().length(), css);
         });
+    }
+
+    public InlineStyleTextArea<EditorTextStyle> getTextArea() {
+        return textArea;
     }
 
 
