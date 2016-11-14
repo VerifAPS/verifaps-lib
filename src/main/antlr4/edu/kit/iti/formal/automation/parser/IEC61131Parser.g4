@@ -1416,7 +1416,9 @@ locals [ StatementList ast = new StatementList()]
 
 statement
 locals [ Statement ast]
-: 	
+:
+    SEMICOLON // the empty statement
+    |
 	  assignment_statement
 	{ $ast = $assignment_statement.ctx.ast; }
 
@@ -1454,7 +1456,7 @@ locals [ Reference ast]
 ;
 
 symbolic_variable
-locals [ SymbolicReference ast = new SymbolicReference()]
+locals [ SymbolicReference ast = new SymbolicReference() ]
 :
 	IDENTIFIER
 	(REF       { $ast.derefVar(); })?
@@ -1535,7 +1537,7 @@ locals [ IfStatement ast = new IfStatement() ]
 	)*
 	(
 		ELSE elselist = statement_list
-	)? END_IF
+	)? END_IF SEMICOLON?
 	{
         if($ELSE.text != null)
             $ast.setElseBranch($elselist.ctx.ast);

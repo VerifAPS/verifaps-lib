@@ -1,11 +1,15 @@
 package edu.kit.iti.formal.automation.st;
 
+import edu.kit.iti.formal.automation.TestUtils;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import edu.kit.iti.formal.automation.st.ast.Expression;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.*;
 
@@ -17,39 +21,20 @@ import java.util.List;
 /**
  * Created by weigl on 02.08.16.
  */
+@RunWith(Parameterized.class)
 public class ValidExpressionTest {
-    private List<String> validExpression = new LinkedList<>();
 
-    @Before
-    public void setup() throws IOException {
-        File ve = new File("src/test/resources/edu/kit/iti/formal/automation/st/expressions/").getAbsoluteFile();
-        BufferedReader stream = new BufferedReader(new FileReader(new File(ve, "valid.txt")));
-        String tmp = "";
-        while ((tmp = stream.readLine()) != null) {
-            if (tmp.startsWith("#"))
-                continue;
-            this.validExpression.add(tmp);
-        }
+    @Parameterized.Parameters(name = "{0}")
+    public static Iterable<Object[]> setup() throws IOException {
+        return TestUtils.loadLines("/edu/kit/iti/formal/automation/st/expressions/valid.txt");
     }
 
+    @Parameterized.Parameter
+    public String validExpression;
 
     @Test
     public void testValidExpression() {
-        int i = 0;
-        boolean b = true;
-        List<Integer> lineNumbers = new ArrayList<>();
-
-        for (int j = 0; j < validExpression.size(); j++) {
-            String s = validExpression.get(j);
-            if (test(s)) {
-                i++;
-            } else {
-                b = false;
-                System.out.println(s);
-            }
-        }
-        System.out.printf("%d of %d validExpression are good%n", i, validExpression.size());
-        assertTrue(b);
+        assertTrue(test(validExpression));
 
     }
 
@@ -60,7 +45,8 @@ public class ValidExpressionTest {
         IEC61131Parser parser = new IEC61131Parser(cts);
 
         try {
-            parser.expression();
+            Expression e = parser.expression().ast;
+            //System.out.println(e);
         } catch (Exception e) {
             e.printStackTrace();
             return false;

@@ -22,6 +22,11 @@ public abstract class Top implements Visitable {
         public Position() {
             this(-1, -1);
         }
+
+        @Override
+        public String toString() {
+            return "@" + lineNumber + ":" + charInLine;
+        }
     }
 
     private Position startPosition = new Position(),
