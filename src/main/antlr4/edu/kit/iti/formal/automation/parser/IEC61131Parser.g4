@@ -1411,22 +1411,13 @@ param_assignment
 statement_list
 locals [ StatementList ast = new StatementList()]
 :
-	statement
-	{ $ast.add($statement.ctx.ast); }
-
-	(
-		SEMICOLON statement
-		{ $ast.add($statement.ctx.ast);}
-
-	)* SEMICOLON?
+	(statement { $ast.add($statement.ctx.ast); })*
 ;
 
 statement
 locals [ Statement ast]
-: /*empty*/
-	{ } //empty statement
-
-	| assignment_statement
+: 	
+	  assignment_statement
 	{ $ast = $assignment_statement.ctx.ast; }
 
 	| subprogram_control_statement
@@ -1443,7 +1434,7 @@ locals [ Statement ast]
 assignment_statement
 locals [ AssignmentStatement ast ]
 :
-	a=variable ASSIGN expression
+	a=variable ASSIGN expression SEMICOLON
 	{
         $ast = new AssignmentStatement($a.ctx.ast, $expression.ctx.ast);
         //$ast.line($ASSIGN);
@@ -1507,9 +1498,9 @@ locals [ DirectVariable ast]
 subprogram_control_statement
 locals [ Statement ast ]
 :
-	functioncall
+	functioncall SEMICOLON
 	{$ast = new FunctionCallStatement($functioncall.ctx.ast);}
-	| RETURN
+	| RETURN SEMICOLON
 	{
 	  $ast = new ReturnStatement();
 	  Utils.setPositionComplete($ast, $RETURN);

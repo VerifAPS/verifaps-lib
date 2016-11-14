@@ -921,17 +921,6 @@ RANGE
 	'..'
 ;
 
-//Ignore
-
-WS
-:
-	[ \r\t\n]+ -> channel ( HIDDEN )
-;
-
-COMMENT
-:
-	'{*' ~[]* '*}' -> channel ( HIDDEN )
-;
 
 CAST_LITERAL
 :
@@ -948,3 +937,20 @@ IDENTIFIER
 :
 	[a-zA-Z_] [$a-zA-Z0-9_]*
 ;
+
+
+//Ignore
+
+WS
+:
+	[ \r\t\n]+ -> channel ( HIDDEN )
+;
+
+COMMENT
+:
+	'(*' ~[]* '*)' -> channel ( HIDDEN )
+;
+
+LINE_COMMENT
+  : '//' ~[\r\n]* -> channel(HIDDEN)
+  ;
