@@ -7,7 +7,6 @@ mkdir build
 cp -r doc/pflichtenheft/* build
 cd build
 
-latex $filename
+latexmk -silent -f $filename
 makeglossaries $filename
-latex $filename
-latexmk -pdfdvi $filename
+pdflatex -interaction=batchmode $filename
