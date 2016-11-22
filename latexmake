@@ -1,0 +1,13 @@
+#!/bin/bash
+
+
+filename="Pflichtenheft"
+
+cp -r doc/pflichtenheft/* build
+
+cd build
+
+latex $filename
+makeglossaries $filename
+latex $filename
+latexmk $filename
