@@ -10,4 +10,4 @@ cd build
 latex $filename
 makeglossaries $filename
 latex $filename
-latexmk $filename
+latexmk -pdfdvi $filename
