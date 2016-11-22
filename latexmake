@@ -2,9 +2,9 @@
 
 
 filename="Pflichtenheft"
+mkdir build
 
 cp -r doc/pflichtenheft/* build
-
 cd build
 
 latex $filename
