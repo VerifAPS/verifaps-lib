@@ -1,9 +1,7 @@
 .idea
-<<<<<<< HEAD
 /.gradle
 /build
 /doc/build
-=======
 
 build/*
 
@@ -158,4 +156,3 @@ _minted*
 
 # scrwfile
 *.wrt
->>>>>>> pflichtenheft-csicar
