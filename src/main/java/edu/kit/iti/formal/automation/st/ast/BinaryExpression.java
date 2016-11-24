@@ -1,23 +1,18 @@
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.st.ast.operators.BinaryOperator;
+import edu.kit.iti.formal.automation.st.ast.operators.Operator;
+import edu.kit.iti.formal.automation.st.ast.operators.Operators;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class BinaryExpression extends Expression {
-    public static final Map<String, Operator> OPERATOR_MAP = new HashMap<>();
-
-    static {
-        for (Operator o : Operator.values()) {
-            OPERATOR_MAP.put(o.symbol, o);
-        }
-    }
-
     private Expression leftExpr, rightExpr;
-    private Operator operator;
+    private BinaryOperator operator;
 
-    public BinaryExpression(Expression leftExpr, Expression rightExpr, Operator operator) {
+    public BinaryExpression(Expression leftExpr, Expression rightExpr, BinaryOperator operator) {
         if (leftExpr == null || rightExpr == null || operator == null) {
             throw new IllegalArgumentException();
         }
@@ -29,13 +24,11 @@ public class BinaryExpression extends Expression {
     }
 
     public BinaryExpression(Expression leftExpr, Expression rightExpr, String operator) {
-        this(leftExpr, rightExpr, OPERATOR_MAP.get(operator));
+        this.leftExpr = leftExpr;
+        this.rightExpr = rightExpr;
+        this.operator = (BinaryOperator) Operators.lookup(operator);
     }
 
-
-    public static Map<String, Operator> getOperatorMap() {
-        return OPERATOR_MAP;
-    }
 
     public Expression getLeftExpr() {
         return leftExpr;
@@ -53,11 +46,11 @@ public class BinaryExpression extends Expression {
         this.rightExpr = rightExpr;
     }
 
-    public Operator getOperator() {
+    public BinaryOperator getOperator() {
         return operator;
     }
 
-    public void setOperator(Operator operator) {
+    public void setOperator(BinaryOperator operator) {
         this.operator = operator;
     }
 
@@ -65,36 +58,13 @@ public class BinaryExpression extends Expression {
         return visitor.visit(this);
     }
 
-    public static enum Operator {
-        //airthmetic
-        ADD("+"),
-        MULT("*"),
-        SUB("-"),
-        DIV("/"),
-        MOD("MOD"),
-
-        //logical
-        AND("AND"),
-        OR("OR"),
-        XOR("XOR"),
-
-        //comparison
-        EQUALS("="),
-        NOT_EQUALS("<>"),
-
-        POWER("**"),
-
-        LESS_THAN("<"),
-        GREATER_THAN(">"),
-        GREATER_EQUALS(">="),
-        LESS_EQUALS("<=");
-
-        public final String symbol;
-
-        Operator(String t) {
-            symbol = t;
-        }
+    @Override
+    public Any dataType(VariableScope scope) {
+        Any a = leftExpr.dataType(scope);
+        Any b = rightExpr.dataType(scope);
+        return operator.getPromotedType(a, b);
     }
+
 
     @Override
     public boolean equals(Object o) {

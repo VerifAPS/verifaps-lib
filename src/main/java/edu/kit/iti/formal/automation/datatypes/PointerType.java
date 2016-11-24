@@ -15,6 +15,7 @@ public class PointerType extends Any {
         return of + "^";
     }
 
+
     @Override
     public String repr(Object obj) {
         return "n/a";

@@ -11,8 +11,9 @@ public abstract class AnyBit extends Any {
     public final static Word WORD = new Word();
     public final static DWord DWORD = new DWord();
     public final static LWord LWORD = new LWord();
-    protected int bitLength;
 
+
+    protected int bitLength;
 
     private AnyBit(int bitLength) {
         this.bitLength = bitLength;

@@ -19,10 +19,6 @@ start
 locals [ List<TopLevelElement> ast = new LinkedList<>() ]
 :
 	library_element_declaration+
-	{
-        //System.out.println("Parsers gonna parse");
-    }
-
 ;
 
 
@@ -46,7 +42,6 @@ library_element_declaration
 ;
 
 library_element_name
-locals []
 :
 	data_type_name
 	| IDENTIFIER

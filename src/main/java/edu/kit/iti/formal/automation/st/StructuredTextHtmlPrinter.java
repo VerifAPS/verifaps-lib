@@ -74,7 +74,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         sb.append('(');
         binaryExpression.getLeftExpr().visit(this);
         sb.div(Sections.OPERATOR, Sections.KEYWORD);
-        sb.append(" ").append(binaryExpression.getOperator().symbol).append(" ");
+        sb.append(" ").append(binaryExpression.getOperator().symbol()).append(" ");
         sb.end().end();
         binaryExpression.getRightExpr().visit(this);
         sb.append(')');

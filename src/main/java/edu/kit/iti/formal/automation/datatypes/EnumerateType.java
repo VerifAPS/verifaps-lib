@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.automation.datatypes;
 
+import java.util.Arrays;
+
 /**
  * Created by weigl on 10.06.14.
  */
@@ -7,20 +9,20 @@ public class EnumerateType extends Any {
     private String name;
     private String[] allowedValues;
     private String defValue;
+    private int bitlength;
 
     public EnumerateType() {
         //the unknown type
     }
 
     private EnumerateType(String name, String[] allowedValues) {
-        this.name = name;
-        this.allowedValues = allowedValues;
-        defValue = allowedValues[0];
+        this(name, allowedValues, allowedValues[0]);
     }
 
     public EnumerateType(String name, String[] allowedValues, String defValue) {
-        this(name, allowedValues);
-        this.defValue = defValue;
+        this.name = name;
+        setAllowedValues(allowedValues);
+        setDefValue(defValue);
     }
 
     public EnumerateType(String prefix) {
@@ -41,6 +43,8 @@ public class EnumerateType extends Any {
 
     public void setAllowedValues(String[] allowedValues) {
         this.allowedValues = allowedValues;
+        Arrays.sort(this.allowedValues);
+        bitlength = (int) Math.ceil(Math.log(allowedValues.length));
     }
 
     public String getDefValue() {
@@ -48,6 +52,7 @@ public class EnumerateType extends Any {
     }
 
     public void setDefValue(String defValue) {
+        assert Arrays.binarySearch(allowedValues, defValue) != -1;
         this.defValue = defValue;
     }
 

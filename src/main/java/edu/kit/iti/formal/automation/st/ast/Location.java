@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.ArrayList;
@@ -35,5 +36,10 @@ public class Location extends Expression {
 
     public String asIdentifier() {
         return path.stream().map(a -> a.toString()).reduce("", (a, b) -> a + "." + b);
+    }
+
+    @Override
+    public Any dataType(VariableScope scope) {
+        return null;//TODO
     }
 }

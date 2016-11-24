@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.datatypes;
 
-public class AnyReal extends AnyNum {
+public abstract class AnyReal extends AnyNum {
 
     public static final LReal LREAL = new LReal();
     public static final Real REAL = new Real();

@@ -14,36 +14,36 @@ import java.util.regex.Pattern;
  * Created by weigl on 11.06.14.
  */
 public class ValueFactory {
-    public static ScalarValue<AnyInt.Int, Integer> makeInt(int value) {
+    public static ScalarValue<Int, Integer> makeInt(int value) {
         return new ScalarValue<>(AnyInt.INT, value);
     }
 
-    public static ScalarValue<AnyInt.SInt.SInt, Integer> makeSInt(int value) {
+    public static ScalarValue<SInt, Integer> makeSInt(int value) {
         return new ScalarValue<>(AnyInt.SINT, value);
     }
 
-    public static ScalarValue<AnyInt.DInt, Integer> makeLInt(int value) {
+    public static ScalarValue<DInt, Integer> makeLInt(int value) {
         return new ScalarValue<>(AnyInt.DINT, value);
     }
 
-    public static ScalarValue<AnyInt.LInt, Integer> makeDInt(int value) {
+    public static ScalarValue<LInt, Integer> makeDInt(int value) {
         return new ScalarValue<>(AnyInt.LINT, value);
     }
 
 
-    public static ScalarValue<AnyInt.Int, Integer> makeInt() {
+    public static ScalarValue<Int, Integer> makeInt() {
         return new ScalarValue<>(AnyInt.INT, AnyInt.DEFAULT);
     }
 
-    public static ScalarValue<AnyInt.SInt.SInt, Integer> makeSInt() {
+    public static ScalarValue<SInt, Integer> makeSInt() {
         return new ScalarValue<>(AnyInt.SINT, AnyInt.DEFAULT);
     }
 
-    public static ScalarValue<AnyInt.DInt, Integer> makeLInt() {
+    public static ScalarValue<DInt, Integer> makeLInt() {
         return new ScalarValue<>(AnyInt.DINT, AnyInt.DEFAULT);
     }
 
-    public static ScalarValue<AnyInt.LInt, Integer> makeDInt() {
+    public static ScalarValue<LInt, Integer> makeDInt() {
         return new ScalarValue<>(AnyInt.LINT, AnyInt.DEFAULT);
     }
 

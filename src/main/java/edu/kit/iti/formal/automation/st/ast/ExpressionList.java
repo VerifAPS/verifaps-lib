@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.*;
@@ -11,7 +12,8 @@ import java.util.stream.Stream;
 /**
  * Created by weigl on 11.06.14.
  */
-public class ExpressionList extends Expression implements List<Expression> {
+public class ExpressionList extends Expression
+        implements List<Expression> {
     private List<Expression> expressions = new ArrayList<>();
 
     @Override
@@ -177,5 +179,10 @@ public class ExpressionList extends Expression implements List<Expression> {
     @Override
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public Any dataType(VariableScope scope) {
+        throw new IllegalStateException("not implemented");
     }
 }

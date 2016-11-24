@@ -10,9 +10,10 @@ public abstract class AnyInt extends AnyNum {
     public static final DInt DINT = new DInt();
     public static final ULInt ULINT = new ULInt();
     public static final LInt LINT = new LInt();
-    protected int bitLength = 0;
-    private boolean signed = false;
 
+    protected int bitLength = 0;
+
+    protected boolean signed = false;
 
     public AnyInt(int bitLength) {
         this.bitLength = bitLength;
@@ -28,11 +29,6 @@ public abstract class AnyInt extends AnyNum {
         return getClass().getSimpleName().toUpperCase() + "#" + obj;
     }
 
-    public boolean isValid(int value) {
-        long max = (2 << bitLength) - 1;
-        long min = -(2 << bitLength);
-        return value <= max && value >= min;
-    }
 
     public int getBitLength() {
         return bitLength;
@@ -74,69 +70,55 @@ public abstract class AnyInt extends AnyNum {
                 }
             };
         else
-            return new AnyInt(bits) {
+            return new AnySignedInt(bits) {
                 @Override
                 public String getName() {
-                    return "INT";
+                    return "INT[" + bitLength + "]";
                 }
             };
     }
 
-    public final static class SInt extends AnyInt {
-        private SInt() {
-            super(8, false);
-        }
+    /**
+     * @return
+     */
+    public abstract AnyInt next();
+
+    /**
+     * @return
+     */
+    public abstract AnyUInt asUnsgined();
+
+    /**
+     * @return
+     */
+    public abstract AnyInt asSigned();
+
+
+    /**
+     * @param value
+     * @return
+     */
+    public abstract boolean isValid(long value);
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AnyInt anyInt = (AnyInt) o;
+
+        if (bitLength != anyInt.bitLength) return false;
+        return signed == anyInt.signed;
+
     }
 
-    public final static class Int extends AnyInt {
-        private Int() {
-            super(16, false);
-        }
+    @Override
+    public int hashCode() {
+        int result = bitLength;
+        result = 31 * result + (signed ? 1 : 0);
+        return result;
     }
 
-    public final static class DInt extends AnyInt {
-        private DInt() {
-            super(32, false);
-        }
-    }
 
-    public final static class LInt extends AnyInt {
-        private LInt() {
-            super(64, false);
-        }
-    }
-
-    public static class AnyUInt extends AnyInt {
-        public AnyUInt(int bitLength) {
-            super(bitLength);
-        }
-
-        private AnyUInt(int bitLength, boolean signed) {
-            super(bitLength, signed);
-        }
-    }
-
-    public final static class USInt extends AnyUInt {
-        private USInt() {
-            super(8, true);
-        }
-    }
-
-    public final static class UInt extends AnyUInt {
-        private UInt() {
-            super(16, true);
-        }
-    }
-
-    public final static class UDInt extends AnyUInt {
-        private UDInt() {
-            super(32, true);
-        }
-    }
-
-    public final static class ULInt extends AnyUInt {
-        private ULInt() {
-            super(64, true);
-        }
-    }
 }

@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.ArrayList;
@@ -59,6 +60,11 @@ public class FunctionCall extends Expression {
     @Override
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public Any dataType(VariableScope scope) {
+        return null;//TODO lookup function
     }
 
 

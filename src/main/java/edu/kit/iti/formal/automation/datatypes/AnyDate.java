@@ -21,6 +21,8 @@ public abstract class AnyDate extends Any {
             return String.format("TOD#%2d:%2d:%2d.%3d",
                     dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMillieseconds());
         }
+
+
     }
 
     public static class DateAndTime extends AnyDate {
