@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.st.ast.operators;
+package edu.kit.iti.formal.automation.operators;
 
 import edu.kit.iti.formal.automation.datatypes.AnyNum;
 

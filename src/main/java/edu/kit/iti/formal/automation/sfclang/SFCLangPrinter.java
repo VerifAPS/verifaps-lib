@@ -29,9 +29,9 @@ public class SFCLangPrinter implements SFCAstVisitor<Object> {
 
     @Override
     public Object visit(SFCDeclaration decl) {
-        cw.keyword("sfc").append(" ").append(decl.getName()).nl().increaseIndent();
+        cw.keyword("sfc").append(" ").append(decl.getBlockName()).nl().increaseIndent();
 
-        stPrinter.visit(decl.getScope());
+        stPrinter.visit(decl.getLocalScope());
 
         cw.nl().nl();
 
@@ -55,7 +55,7 @@ public class SFCLangPrinter implements SFCAstVisitor<Object> {
         cw.nl().keyword("action").append(" ").append(fbd.getBlockName());
         cw.increaseIndent();
         cw.nl();
-        stPrinter.visit(fbd.getScope());
+        stPrinter.visit(fbd.getLocalScope());
         stPrinter.visit(fbd.getFunctionBody());
         cw.decreaseIndent();
         cw.nl().keyword("end_action");

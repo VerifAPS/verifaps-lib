@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.st.ast.operators;
+package edu.kit.iti.formal.automation.datatypes.promotion;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
 

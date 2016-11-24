@@ -15,7 +15,7 @@ public class EnumerateType extends Any {
         //the unknown type
     }
 
-    private EnumerateType(String name, String[] allowedValues) {
+    public EnumerateType(String name, String[] allowedValues) {
         this(name, allowedValues, allowedValues[0]);
     }
 

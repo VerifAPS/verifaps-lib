@@ -10,4 +10,9 @@ public class AnyNum extends Any {
     public String repr(Object obj) {
         throw new IllegalStateException("No repr for AnyNum");
     }
+
+    @Override
+    public String toString() {
+        return "ANY_NUM";
+    }
 }

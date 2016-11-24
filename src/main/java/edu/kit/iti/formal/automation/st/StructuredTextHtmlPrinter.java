@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st;
 
+import edu.kit.iti.formal.automation.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.st.util.HTMLCodeWriter;
 import edu.kit.iti.formal.automation.datatypes.Any;
@@ -133,7 +134,8 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(UnaryExpression unaryExpression) {
-        sb.div(Sections.UNARY_EXPRESSION, Sections.OPERATOR).append(unaryExpression.getOperator().symbol);
+        sb.div(Sections.UNARY_EXPRESSION, Sections.OPERATOR)
+                .append(unaryExpression.getOperator().symbol());
         sb.end().append(" ");
         unaryExpression.getExpression().visit(this);
         sb.end();
@@ -210,7 +212,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         sb.div(Sections.VARIABLE).append(programDeclaration.getProgramName());
         sb.end().append('\n');
 
-        programDeclaration.getScope().visit(this);
+        programDeclaration.getLocalScope().visit(this);
 
         programDeclaration.getProgramBody().visit(this);
         sb.keyword("END_PROGRAM");
@@ -279,7 +281,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
         sb.div(Sections.FB).keyword("FUNCTION_BLOCK ").variable(functionBlockDeclaration.getFunctionBlockName());
 
-        functionBlockDeclaration.getScope().visit(this);
+        functionBlockDeclaration.getLocalScope().visit(this);
 
         functionBlockDeclaration.getFunctionBody().visit(this);
         sb.keyword("END_FUNCTION_BLOCK").ts().end();
@@ -352,9 +354,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     }
 
     @Override
-    public Object visit(VariableScope variableScope) {
+    public Object visit(LocalScope localScope) {
         sb.div(Sections.VARIABLES_DEFINITIONS);
-        for (VariableDeclaration vd : variableScope.getVariableMap().values()) {
+        for (VariableDeclaration vd : localScope.getLocalVariables().values()) {
             vd.getDataType();
             sb.div(Sections.VARIABLES_DEFINITION);
 

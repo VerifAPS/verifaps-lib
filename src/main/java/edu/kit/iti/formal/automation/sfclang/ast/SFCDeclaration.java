@@ -1,10 +1,9 @@
 package edu.kit.iti.formal.automation.sfclang.ast;
 
-import edu.kit.iti.formal.automation.st.ast.Statement;
-import edu.kit.iti.formal.automation.st.ast.StatementList;
+import edu.kit.iti.formal.automation.LocalScope;
+import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.sfclang.SFCAstVisitor;
-import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
-import edu.kit.iti.formal.automation.st.ast.VariableScope;
+import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -16,13 +15,12 @@ import java.util.stream.Collectors;
  * Top-Level Declaration for a Sequential Function Chart,
  * containing steps, actions, transitions, variables declaration.
  */
-public class SFCDeclaration {
+public class SFCDeclaration extends TopLevelScopeElement {
 
-    private VariableScope scope = new VariableScope();
-    private String name;
     private List<StepDeclaration> steps = new LinkedList<>();
     private List<FunctionBlockDeclaration> actions = new LinkedList<>();
     private List<TransitionDeclaration> transitions = new LinkedList<>();
+    private String name;
 
     public List<StepDeclaration> getSteps() {
         return steps;
@@ -38,22 +36,6 @@ public class SFCDeclaration {
 
     public void setTransitions(List<TransitionDeclaration> transition) {
         this.transitions = transition;
-    }
-
-    public VariableScope getScope() {
-        return scope;
-    }
-
-    public void setScope(VariableScope scope) {
-        this.scope = scope;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public List<StepDeclaration> getDeclaration() {
@@ -74,7 +56,12 @@ public class SFCDeclaration {
 
     @Override
     public String toString() {
-        return name;
+        return getBlockName();
+    }
+
+    @Override
+    public <T> T visit(Visitor<T> visitor) {
+        return null;
     }
 
     public <T> T visit(SFCAstVisitor<T> v) {
@@ -106,4 +93,14 @@ public class SFCDeclaration {
         }
 
     }
+
+    @Override
+    public String getBlockName() {
+        return name;
+    }
+
+    public void setBlockName(String name) {
+        this.name = name;
+    }
+
 }

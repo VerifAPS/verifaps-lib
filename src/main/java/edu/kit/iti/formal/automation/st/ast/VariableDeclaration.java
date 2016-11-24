@@ -47,7 +47,12 @@ public class VariableDeclaration implements Visitable, Comparable<VariableDeclar
         init = i;
     }
 
-    public VariableDeclaration(String name, Integer type) {
+    public VariableDeclaration(String name, Any dataType) {
+        this.name = name;
+        this.dataType = dataType;
+    }
+
+    public VariableDeclaration(String name, int type) {
         this(name);
         this.type = type;
     }

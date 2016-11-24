@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.visitors;
 
+import edu.kit.iti.formal.automation.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.st.ast.*;
@@ -81,7 +82,7 @@ public interface Visitor<T> {
 
     T visit(SimpleTypeDeclaration simpleTypeDeclaration);
 
-    T visit(VariableScope variableScope);
+    T visit(LocalScope localScope);
 
     T visit(VariableDeclaration variableDeclaration);
 

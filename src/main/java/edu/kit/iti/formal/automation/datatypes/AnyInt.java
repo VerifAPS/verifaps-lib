@@ -100,11 +100,18 @@ public abstract class AnyInt extends AnyNum {
      */
     public abstract boolean isValid(long value);
 
+    @Override
+    public String toString() {
+        if (name.isEmpty())
+            return (signed ? "" : "U") + "INT(" + bitLength + ")";
+        else
+            return name;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof AnyInt)) return false;
 
         AnyInt anyInt = (AnyInt) o;
 
@@ -119,6 +126,4 @@ public abstract class AnyInt extends AnyNum {
         result = 31 * result + (signed ? 1 : 0);
         return result;
     }
-
-
 }

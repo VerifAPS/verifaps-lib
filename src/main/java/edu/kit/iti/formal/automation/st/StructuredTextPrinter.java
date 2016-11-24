@@ -1,7 +1,9 @@
 package edu.kit.iti.formal.automation.st;
 
+import edu.kit.iti.formal.automation.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.*;
-import edu.kit.iti.formal.automation.st.ast.operators.Operator;
+import edu.kit.iti.formal.automation.operators.Operator;
+import edu.kit.iti.formal.automation.operators.UnaryOperator;
 import edu.kit.iti.formal.automation.st.util.CodeWriter;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.st.ast.*;
@@ -211,7 +213,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public Object visit(ProgramDeclaration programDeclaration) {
         sb.append("PROGRAM ").append(programDeclaration.getProgramName()).append('\n');
 
-        programDeclaration.getScope().visit(this);
+        programDeclaration.getLocalScope().visit(this);
 
         programDeclaration.getProgramBody().visit(this);
         sb.decreaseIndent().nl().append("END_PROGRAM").nl();
@@ -270,7 +272,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
         sb.append("FUNCTION_BLOCK ").append(functionBlockDeclaration.getFunctionBlockName()).increaseIndent();
 
-        functionBlockDeclaration.getScope().visit(this);
+        functionBlockDeclaration.getLocalScope().visit(this);
 
         sb.nl();
 
@@ -364,8 +366,8 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     }
 
     @Override
-    public Object visit(VariableScope variableScope) {
-        for (VariableDeclaration vd : variableScope.getVariableMap().values()) {
+    public Object visit(LocalScope localScope) {
+        for (VariableDeclaration vd : localScope.getLocalVariables().values()) {
             vd.getDataType();
             sb.nl().append("VAR");
 
@@ -470,8 +472,8 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
             return "EXIT";
         }
 
-        public String operator(UnaryExpression.Operator operator) {
-            return operator.symbol;
+        public String operator(UnaryOperator operator) {
+            return operator.symbol();
         }
 
         public String comment_close() {
@@ -490,13 +492,13 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public static StringLiterals SL_ST = StringLiterals.create();
     public static StringLiterals SL_SMV = new StringLiterals() {
         @Override
-        public String operator(UnaryExpression.Operator operator) {
-            switch (operator) {
+        public String operator(UnaryOperator operator) {
+            /*switch (operator) {
                 case MINUS:
                     return "-";
                 case NEGATE:
                     return "!";
-            }
+            }*/
             return "<<unknown ue operator>>";
         }
 

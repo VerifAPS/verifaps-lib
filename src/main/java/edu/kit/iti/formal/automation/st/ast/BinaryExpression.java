@@ -1,12 +1,12 @@
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.st.ast.operators.BinaryOperator;
-import edu.kit.iti.formal.automation.st.ast.operators.Operator;
-import edu.kit.iti.formal.automation.st.ast.operators.Operators;
+import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
+import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedinScope;
+import edu.kit.iti.formal.automation.operators.BinaryOperator;
+import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-
-import java.util.Map;
 
 public class BinaryExpression extends Expression {
     private Expression leftExpr, rightExpr;
@@ -59,10 +59,14 @@ public class BinaryExpression extends Expression {
     }
 
     @Override
-    public Any dataType(VariableScope scope) {
-        Any a = leftExpr.dataType(scope);
-        Any b = rightExpr.dataType(scope);
-        return operator.getPromotedType(a, b);
+    public Any dataType(LocalScope localScope) throws VariableNotDefinedinScope, TypeConformityException {
+        Any a = leftExpr.dataType(localScope);
+        Any b = rightExpr.dataType(localScope);
+        Any c = operator.getPromotedType(a, b);
+        if (c == null) throw new TypeConformityException(
+                this, operator.getExpectedDataTypes(), a, b
+        );
+        return c;
     }
 
 

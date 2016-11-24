@@ -31,9 +31,9 @@ public class SFCLangHTMLPrinter implements SFCAstVisitor<HTMLCodeWriter> {
 	@Override
 	public HTMLCodeWriter visit(SFCDeclaration decl) {
 
-		hcw.keyword("sfc").append(" ").append(decl.getName()).nl().increaseIndent();
+		hcw.keyword("sfc").append(" ").append(decl.getBlockName()).nl().increaseIndent();
 
-		stPrinter.visit(decl.getScope());
+		stPrinter.visit(decl.getLocalScope());
 
 		hcw.nl().nl();
 
@@ -87,7 +87,7 @@ public class SFCLangHTMLPrinter implements SFCAstVisitor<HTMLCodeWriter> {
 		hcw.nl().keyword("action").append(" ").append(fbd.getBlockName());
 		hcw.increaseIndent();
 		hcw.nl();
-		stPrinter.visit(fbd.getScope());
+		stPrinter.visit(fbd.getLocalScope());
 		stPrinter.visit(fbd.getFunctionBody());
 		hcw.decreaseIndent();
 		hcw.nl().keyword("end_action");

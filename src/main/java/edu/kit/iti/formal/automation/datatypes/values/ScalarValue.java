@@ -3,7 +3,7 @@ package edu.kit.iti.formal.automation.datatypes.values;
 import edu.kit.iti.formal.automation.st.ast.Expression;
 import edu.kit.iti.formal.automation.st.ast.Initialization;
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.st.ast.VariableScope;
+import edu.kit.iti.formal.automation.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -70,7 +70,7 @@ public class ScalarValue<T extends Any, S> extends Expression implements Value<T
     }
 
     @Override
-    public Any dataType(VariableScope scope) {
+    public Any dataType(LocalScope localScope) {
         return getDataType();
     }
 }

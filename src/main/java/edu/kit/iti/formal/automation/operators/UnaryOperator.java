@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.st.ast.operators;
+package edu.kit.iti.formal.automation.operators;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.AnyUInt;
@@ -18,8 +18,13 @@ public class UnaryOperator implements Operator {
         return this.symbol;
     }
 
+    @Override
+    public Any[] getExpectedDataTypes() {
+        return new Any[]{validFor};
+    }
+
     public boolean isValid(Any a) {
-        return a.getClass().isAssignableFrom(validFor.getClass());
+        return validFor.getClass().isAssignableFrom(a.getClass());
     }
 
     public Any getPromotedType(Any a) {

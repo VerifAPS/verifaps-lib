@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -7,7 +8,8 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  */
 public class FunctionDeclaration extends TopLevelScopeElement {
     private String functionName;
-    private String returnType;
+    private String returnTypeName;
+    private Any returnType;
     private StatementList statements = new StatementList();
 
     public String getFunctionName() {
@@ -18,12 +20,12 @@ public class FunctionDeclaration extends TopLevelScopeElement {
         this.functionName = functionName;
     }
 
-    public String getReturnType() {
-        return returnType;
+    public String getReturnTypeName() {
+        return returnTypeName;
     }
 
-    public void setReturnType(String returnType) {
-        this.returnType = returnType;
+    public void setReturnTypeName(String returnType) {
+        this.returnTypeName = returnType;
     }
 
     public StatementList getStatements() {

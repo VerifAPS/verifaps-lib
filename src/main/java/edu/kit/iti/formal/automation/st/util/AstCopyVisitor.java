@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st.util;
 
+import edu.kit.iti.formal.automation.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
@@ -56,7 +57,8 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(UnaryExpression unaryExpression) {
-        UnaryExpression ue = new UnaryExpression(unaryExpression.getOperator(), (Expression) unaryExpression.getExpression().visit(this));
+        UnaryExpression ue = new UnaryExpression(unaryExpression.getOperator(),
+                (Expression) unaryExpression.getExpression().visit(this));
         return ue;
     }
 
@@ -133,15 +135,15 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
         ProgramDeclaration pd = new ProgramDeclaration(programDeclaration);
-        pd.setScope((VariableScope) programDeclaration.getScope().visit(this));
+        pd.setLocalScope((LocalScope) programDeclaration.getLocalScope().visit(this));
         pd.setProgramBody((StatementList) programDeclaration.getProgramBody().visit(this));
         return pd;
     }
 
     @Override
-    public Object visit(VariableScope variableScope) {
-        VariableScope vs = new VariableScope();
-        for (VariableDeclaration vd : variableScope.getVariableMap().values())
+    public Object visit(LocalScope localScope) {
+        LocalScope vs = new LocalScope();
+        for (VariableDeclaration vd : localScope.getLocalVariables().values())
             vs.add((VariableDeclaration) vd.visit(this));
         return vs;
     }

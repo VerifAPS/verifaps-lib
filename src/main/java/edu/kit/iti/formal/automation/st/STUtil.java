@@ -3,7 +3,7 @@ package edu.kit.iti.formal.automation.st;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.st.ast.Expression;
-import org.antlr.v4.runtime.ANTLRFileStream;
+import edu.kit.iti.formal.automation.st.ast.Top;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
@@ -15,5 +15,11 @@ public class STUtil {
         IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(str));
         IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
         return parser.expression().ast;
+    }
+
+    public static String print(Top ast) {
+        StructuredTextPrinter stp = new StructuredTextPrinter();
+        ast.visit(stp);
+        return stp.getString();
     }
 }

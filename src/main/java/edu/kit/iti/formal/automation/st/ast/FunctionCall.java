@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
@@ -63,7 +64,7 @@ public class FunctionCall extends Expression {
     }
 
     @Override
-    public Any dataType(VariableScope scope) {
+    public Any dataType(LocalScope localScope) {
         return null;//TODO lookup function
     }
 

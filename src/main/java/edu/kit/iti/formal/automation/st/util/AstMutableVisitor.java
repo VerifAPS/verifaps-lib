@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st.util;
 
+import edu.kit.iti.formal.automation.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
@@ -118,7 +119,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
-        programDeclaration.setScope((VariableScope) programDeclaration.getScope().visit(this));
+        programDeclaration.setLocalScope((LocalScope) programDeclaration.getLocalScope().visit(this));
         programDeclaration.setProgramBody((StatementList) programDeclaration.getProgramBody().visit(this));
         return programDeclaration;
     }
@@ -219,8 +220,8 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
 
 
     @Override
-    public Object visit(VariableScope variableScope) {
-        return variableScope;
+    public Object visit(LocalScope localScope) {
+        return localScope;
     }
 
     @Override
@@ -259,7 +260,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
-        functionDeclaration.setScope((VariableScope) functionDeclaration.getScope().visit(this));
+        functionDeclaration.setLocalScope((LocalScope) functionDeclaration.getLocalScope().visit(this));
         functionDeclaration.setStatements((StatementList) functionDeclaration.getStatements().visit(this));
         return functionDeclaration;
     }
@@ -271,7 +272,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        functionBlockDeclaration.setScope((VariableScope) functionBlockDeclaration.getScope().visit(this));
+        functionBlockDeclaration.setLocalScope((LocalScope) functionBlockDeclaration.getLocalScope().visit(this));
         functionBlockDeclaration.setFunctionBody((StatementList) functionBlockDeclaration.getFunctionBody().visit(this));
         return functionBlockDeclaration;
     }

@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
@@ -17,7 +18,7 @@ public class DirectVariable extends Reference {
     }
 
     @Override
-    public Any dataType(VariableScope scope) {
+    public Any dataType(LocalScope localScope) {
         throw new IllegalStateException(("not implemented"));
     }
 }

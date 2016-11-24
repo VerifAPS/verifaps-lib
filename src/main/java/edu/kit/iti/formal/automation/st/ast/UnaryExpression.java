@@ -1,23 +1,27 @@
 package edu.kit.iti.formal.automation.st.ast;
 
 
+import edu.kit.iti.formal.automation.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
+import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedinScope;
+import edu.kit.iti.formal.automation.operators.UnaryOperator;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 public class UnaryExpression extends Expression {
-    Operator operator;
+    UnaryOperator operator;
     Expression expression;
 
-    public UnaryExpression(Operator operator, Expression expression) {
+    public UnaryExpression(UnaryOperator operator, Expression expression) {
         this.operator = operator;
         this.expression = expression;
     }
 
-    public Operator getOperator() {
+    public UnaryOperator getOperator() {
         return operator;
     }
 
-    public void setOperator(Operator operator) {
+    public void setOperator(UnaryOperator operator) {
         this.operator = operator;
     }
 
@@ -34,20 +38,14 @@ public class UnaryExpression extends Expression {
     }
 
     @Override
-    public Any dataType(VariableScope scope) {
-        return expression.dataType(scope);
-    }
-
-
-    public static enum Operator {
-        MINUS("-"), NEGATE("NOT");
-
-        public final String symbol;
-
-        Operator(String symbol) {
-            this.symbol = symbol;
+    public Any dataType(LocalScope localScope) throws VariableNotDefinedinScope, TypeConformityException {
+        Any a = operator.getPromotedType(expression.dataType(localScope));
+        if (a == null) {
+            throw new TypeConformityException(this, operator.getExpectedDataTypes(), a);
         }
+        return a;
     }
+
 
     @Override
     public boolean equals(Object o) {

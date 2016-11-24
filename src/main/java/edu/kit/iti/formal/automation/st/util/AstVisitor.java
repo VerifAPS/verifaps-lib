@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st.util;
 
+import edu.kit.iti.formal.automation.LocalScope;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 import edu.kit.iti.formal.automation.st.ast.*;
@@ -100,7 +101,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(ProgramDeclaration programDeclaration) {
         programDeclaration.getProgramBody().visit(this);
-        programDeclaration.getScope().visit(this);
+        programDeclaration.getLocalScope().visit(this);
         return null;
     }
 
@@ -113,7 +114,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(FunctionDeclaration functionDeclaration) {
-        functionDeclaration.getScope().visit(this);
+        functionDeclaration.getLocalScope().visit(this);
         functionDeclaration.getStatements().visit(this);
         return null;
     }
@@ -130,7 +131,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(FunctionBlockDeclaration functionBlockDeclaration) {
         functionBlockDeclaration.getFunctionBody().visit(this);
-        functionBlockDeclaration.getScope().visit(this);
+        functionBlockDeclaration.getLocalScope().visit(this);
         return null;
     }
 
@@ -160,8 +161,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     }
 
     @Override
-    public T visit(VariableScope variableScope) {
-        for (VariableDeclaration vd : variableScope.getVariableMap().values())
+    public T visit(LocalScope localScope) {
+        for (VariableDeclaration vd : localScope.getLocalVariables().values())
             vd.visit(this);
         return null;
     }

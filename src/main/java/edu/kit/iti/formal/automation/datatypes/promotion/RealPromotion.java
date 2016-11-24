@@ -1,6 +1,7 @@
-package edu.kit.iti.formal.automation.st.ast.operators;
+package edu.kit.iti.formal.automation.datatypes.promotion;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.AnyReal;
 
 /**
@@ -15,8 +16,20 @@ public class RealPromotion implements TypePromotion {
         try {
             return promote((AnyReal) a, (AnyReal) b);
         } catch (ClassCastException e) {
-            return null;
+            try {
+                return promote((AnyReal) a, (AnyInt) b);
+            } catch (ClassCastException e1) {
+                try {
+                    return promote((AnyReal) b, (AnyInt) a);
+                } catch (ClassCastException e2) {
+                    return null;
+                }
+            }
         }
+    }
+
+    private Any promote(AnyReal a, AnyInt b) {
+        return a;
     }
 
     private Any promote(AnyReal a, AnyReal b) {

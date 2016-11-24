@@ -23,7 +23,7 @@ public class BuildSFCModel {
 
     public BuildSFCModel(SFCDeclaration decl) {
         sfcdecl = decl;
-        model.name = decl.getName();
+        model.name = decl.getBlockName();
 
         for (FunctionBlockDeclaration adecl :
                 decl.getActions()) {

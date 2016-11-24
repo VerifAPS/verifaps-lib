@@ -1,6 +1,8 @@
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedinScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -95,7 +97,7 @@ public class SymbolicReference extends Reference {
     }
 
     @Override
-    public Any dataType(VariableScope scope) {
-        return scope.getVariableMap().get(getIdentifier()).getDataType();
+    public Any dataType(LocalScope localScope) throws VariableNotDefinedinScope {
+        return localScope.getVariable(this).getDataType();
     }
 }
