@@ -1,15 +1,15 @@
 package edu.kit.iti.formal.automation.st.ast;
 
-import edu.kit.iti.formal.automation.visitors.Visitable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
  * Created by weigl on 13.06.14.
  */
-public abstract class TypeDeclaration<T> implements Visitable {
+public abstract class TypeDeclaration<T extends Initialization> extends Top {
     protected String typeName;
     protected String baseTypeName;
     protected T initializationValue;
+    private T initialization;
 
     public TypeDeclaration() {
     }
@@ -45,4 +45,7 @@ public abstract class TypeDeclaration<T> implements Visitable {
 
     public abstract <S> S visit(Visitor<S> visitor);
 
+    public void setInitialization(T initialization) {
+        this.initialization = initialization;
+    }
 }

@@ -1,6 +1,8 @@
 package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
+import edu.kit.iti.formal.automation.datatypes.IECString;
+import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.LinkedList;
@@ -9,7 +11,7 @@ import java.util.List;
 /**
  * Created by weigl on 13.06.14.
  */
-public class EnumerationTypeDeclaration extends TypeDeclaration<String> {
+public class EnumerationTypeDeclaration extends TypeDeclaration<ScalarValue<EnumerateType, ?>> {
     private List<String> allowedValues = new LinkedList<>();
 
     public EnumerationTypeDeclaration() {
@@ -36,7 +38,14 @@ public class EnumerationTypeDeclaration extends TypeDeclaration<String> {
     public EnumerateType toDataType() {
         String[] aV = allowedValues.toArray(new String[0]);
 
-        String init = initializationValue != null ? initializationValue : aV[0];
+        String init = aV[0];
+        if (initializationValue.getValue() instanceof String) {
+            String value = (String) initializationValue.getValue();
+            init = value;
+        } else if (initializationValue.getValue() instanceof Integer) {
+            Integer value = (Integer) initializationValue.getValue();
+            init = aV[value];
+        }
 
         EnumerateType et = new EnumerateType(getTypeName(), aV, init);
         return et;

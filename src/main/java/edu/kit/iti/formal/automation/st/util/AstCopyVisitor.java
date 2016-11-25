@@ -236,13 +236,13 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(VariableDeclaration variableDeclaration) {
-        VariableDeclaration vd = new VariableDeclaration();
-        vd.setDataType(variableDeclaration.getDataType());
+        VariableDeclaration vd = new VariableDeclaration(variableDeclaration);
+        /*vd.setDataType(variableDeclaration.getDataType());
         vd.setDataTypeName(variableDeclaration.getDataTypeName());
         if (variableDeclaration.getInit() != null)
             vd.setInit((Initialization) variableDeclaration.getInit().visit(this));
         vd.setName(variableDeclaration.getName());
-        vd.setType(variableDeclaration.getType());
+        vd.setType(variableDeclaration.getType());*/
         return vd;
     }
 

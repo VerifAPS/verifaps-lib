@@ -226,8 +226,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(VariableDeclaration variableDeclaration) {
-        variableDeclaration.setInit((Initialization)
-                variableDeclaration.getInit().visit(this));
+        variableDeclaration.setTypeDeclaration(
+                (TypeDeclaration<?>)
+                        variableDeclaration.getTypeDeclaration().visit(this));
 
         return variableDeclaration;
     }

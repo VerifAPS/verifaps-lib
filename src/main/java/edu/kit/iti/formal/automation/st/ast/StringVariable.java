@@ -6,14 +6,16 @@ import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 
 /**
  * Created by weigl on 13.06.14.
+ * @deprecated
  */
 public class StringVariable extends VariableDeclaration {
     private ScalarValue<? extends AnyInt, Long> length;
 
-    public StringVariable(String name, Integer peek, ScalarValue<? extends AnyInt, Long> length, ScalarValue<? extends IECString, String> def) {
-        super(name, peek);
-        this.length = length;
-        setInit(def);
+    public StringVariable(String name, Integer peek,
+                          ScalarValue<? extends AnyInt, Long> length, ScalarValue<? extends IECString, String> def) {
+        //super(name, peek);
+        //this.length = length;
+        //setInit(def);
     }
 
     public ScalarValue<? extends AnyInt, Long> getLength() {

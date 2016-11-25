@@ -5,15 +5,16 @@ options {
 }
 
 @header {
-    import java.util.*;
-    import edu.kit.iti.formal.automation.sfclang.ast.*;
-    import edu.kit.iti.formal.automation.sfclang.*;
-    import edu.kit.iti.formal.automation.sfclang.Utils;
-    import edu.kit.iti.formal.automation.*;
-    import edu.kit.iti.formal.automation.st.ast.*;
-    import edu.kit.iti.formal.automation.datatypes.*;
-    import edu.kit.iti.formal.automation.operators.*;
-    import edu.kit.iti.formal.automation.datatypes.values.*;
+import java.util.*;
+import edu.kit.iti.formal.automation.sfclang.ast.*;
+import edu.kit.iti.formal.automation.sfclang.Utils;
+import edu.kit.iti.formal.automation.*;
+import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.datatypes.*;
+import edu.kit.iti.formal.automation.operators.*;
+import edu.kit.iti.formal.automation.datatypes.values.*;
+import static edu.kit.iti.formal.automation.st.ast.VariableDeclaration.*;
+
 }
 
 @members {
@@ -92,7 +93,8 @@ cast
 returns [ ScalarValue<EnumerateType, String> ast]
 :
 	CAST_LITERAL
-	{ $ast = ValueFactory.makeEnumeratedValue($CAST_LITERAL);}
+	{ $ast = ValueFactory.makeEnumeratedValue($CAST_LITERAL);
+		  Utils.setPosition($ast, $CAST_LITERAL); }
 
 ;
 
@@ -100,7 +102,8 @@ integer
 returns [ ScalarValue<? extends AnyInt, Long> ast]
 :
 	INTEGER_LITERAL
-	{ $ast = ValueFactory.parseIntegerLiteral($INTEGER_LITERAL);}
+	{ $ast = ValueFactory.parseIntegerLiteral($INTEGER_LITERAL);
+		  Utils.setPosition($ast, $INTEGER_LITERAL); }
 
 ;
 
@@ -108,7 +111,8 @@ bits
 returns [ ScalarValue<? extends AnyBit, Bits> ast]
 :
 	BITS_LITERAL
-	{ $ast = ValueFactory.parseBitLiteral($BITS_LITERAL);}
+	{ $ast = ValueFactory.parseBitLiteral($BITS_LITERAL);
+		  Utils.setPosition($ast, $BITS_LITERAL); }
 
 ;
 
@@ -116,7 +120,8 @@ real
 returns [ ScalarValue<? extends AnyReal, Double> ast ]
 :
 	REAL_LITERAL
-	{ $ast = ValueFactory.parseRealLiteral($REAL_LITERAL); }
+	{ $ast = ValueFactory.parseRealLiteral($REAL_LITERAL);
+	  Utils.setPosition($ast, $REAL_LITERAL); }
 
 ;
 
@@ -128,7 +133,9 @@ returns [ ScalarValue<? extends IECString, String> ast]
 		WSTRING_LITERAL
 		| STRING_LITERAL
 	)
-	{$ast = ValueFactory.parseStringLiteral($tok);}
+	{ $ast = ValueFactory.parseStringLiteral($tok);
+	  Utils.setPosition($ast, $tok); }
+
 
 ;
 
@@ -136,7 +143,9 @@ time
 returns [ ScalarValue<TimeType, TimeValue> ast]
 :
 	TIME_LITERAL
-	{$ast = ValueFactory.parseTimeLiteral($TIME_LITERAL);}
+	{$ast = ValueFactory.parseTimeLiteral($TIME_LITERAL);
+		 Utils.setPosition($ast, $TIME_LITERAL); }
+
 
 ;
 
@@ -144,7 +153,9 @@ timeofday
 returns [ ScalarValue<AnyDate.TimeOfDay, TimeOfDayValue> ast]
 :
 	TOD_LITERAL
-	{ $ast =ValueFactory.parseTimeOfDayLiteral($TOD_LITERAL.text);}
+	{ $ast =ValueFactory.parseTimeOfDayLiteral($TOD_LITERAL.text);
+		 Utils.setPosition($ast, $TOD_LITERAL); }
+
 
 ;
 
@@ -152,7 +163,8 @@ date
 returns [ ScalarValue<AnyDate.Date, DateValue> ast]
 :
 	DATE_LITERAL
-	{$ast = ValueFactory.parseDateLiteral($DATE_LITERAL.text);}
+	{$ast = ValueFactory.parseDateLiteral($DATE_LITERAL.text);
+		 Utils.setPosition($ast, $DATE_LITERAL); }
 
 ;
 
@@ -160,7 +172,8 @@ datetime
 returns [ ScalarValue<AnyDate.DateAndTime, DateAndTimeValue> ast]
 :
 	DATETIME
-	{ $ast = ValueFactory.parseDateAndTimeLiteral($DATETIME);}
+	{ $ast = ValueFactory.parseDateAndTimeLiteral($DATETIME);
+		 Utils.setPosition($ast, $DATETIME); }
 
 ;
 
@@ -256,132 +269,66 @@ returns [ TypeDeclarations ast = new TypeDeclarations();  ]
 :
 	TYPE
 	(
-		type_declaration SEMICOLON
+	    IDENTIFIER COLON type_declaration
+	    SEMICOLON
 		{$ast.add($type_declaration.ast);}
 	)+ END_TYPE
+	{Utils.setPosition($ast,$TYPE,$END_TYPE);}
 ;
 
 type_declaration
 returns [TypeDeclaration ast]
 :
-	( array_type_declaration 	    {$ast = $array_type_declaration.ast;}
-	| structure_type_declaration 	{$ast = $structure_type_declaration.ast;}
+	( array_specification       {$ast = $array_specification.ast;}
+	| enumerated_specification 	{$ast = $enumerated_specification.ast;}
 	| string_type_declaration 	    {$ast = $string_type_declaration.ast;}
-	| simple_type_declaration	    {$ast = $simple_type_declaration.ast;}
-	| subrange_type_declaration	    {$ast = $subrange_type_declaration.ast;}
-	| enumerated_type_declaration   {$ast = $enumerated_type_declaration.ast;})
+	| subrange_spec_init	    {$ast = $subrange_spec_init.ast;}
+	| structure_declaration     {$ast = $structure_declaration.ast;}
+	| (data_type_name)
+	  ( R_EDGE {/*dt.pushRisingEdge(); */}
+	  | F_EDGE {/*dt.pushFallingEdge();*/}
+	  )?
+	  { SimpleTypeDeclaration td = new SimpleTypeDeclaration();
+        td.setBaseTypeName($data_type_name.text);
+        $ast = td; }
+	)
+	( ASSIGN i=initializations
+	  { $ast.setInitialization($i.ast);
+	    Utils.setLastPosition($ast, $i.ast); } )?
 ;
 
-simple_type_declaration
-returns [ SimpleTypeDeclaration ast]
+
+//region initializations
+initializations
+returns [ Initialization ast ]
 :
-	IDENTIFIER COLON simple_spec_init
-	{
-        $ast = $simple_spec_init.ast;
-        $ast.setTypeName($IDENTIFIER.text);
-        
-    }
-
-;
-
-simple_spec_init
-returns [ SimpleTypeDeclaration ast = new SimpleTypeDeclaration()]
-:
-	simple_specification
-	(
-		ASSIGN constant
-		{$ast.setInitializationValue($constant.ast);}
-
-	)?
-	{
-        $ast.setBaseTypeName($simple_specification.text);
-    }
-
-;
-
-simple_specification
-:
-	elementary_type_name
-	| IDENTIFIER
-;
-
-subrange_type_declaration
-returns [ SubRangeDataType ast]
-:
-	IDENTIFIER COLON subrange_spec_init
-	{
-        $ast = $subrange_spec_init.ast;
-        $ast.setTypeName($IDENTIFIER.text);
-        
-    }
-
+    constant
+    {$ast = $constant.ast;}
+    | array_initialization
+    {$ast = $array_initialization.ast;}
+    | structure_initialization
+    {$ast = $structure_initialization.ast;}
 ;
 
 subrange_spec_init
-returns [ SubRangeDataType ast]
-:
-	subrange_specification
-	(
-		ASSIGN integer
-		{$ast.setInitializationValue($integer.ast);}
-
-	)?
-	{
-        $ast = $subrange_specification.ast;
-    }
-
-;
-
-subrange_specification
-returns [ SubRangeDataType ast = new SubRangeDataType()]
+returns [SubRangeDataType ast = new SubRangeDataType()]
 :
 	integer_type_name LPAREN subrange RPAREN
-	{
-        $ast.setBaseTypeName($integer_type_name.text);
-        $ast.setRange($subrange.ast);
-    }
-
-	| IDENTIFIER
-	{
-        $ast.setBaseTypeName($IDENTIFIER.text);
-    }
-
+	{ $ast.setBaseTypeName($integer_type_name.text);
+      $ast.setRange($subrange.ast);
+      Utils.setPosition($ast, $integer_type_name.ctx ,$RPAREN); }
 ;
 
 subrange
 returns [ Range ast]
+locals [ int x1=1, int x2 = 1]
 :
-	a = MINUS? c = integer RANGE b = MINUS? d = integer
-	{
-        //TODO signs
-        $ast = new Range($c.ast, $d.ast);
-    }
-
+	(a=MINUS {$x1=-1;})?  c=integer RANGE
+	(b=MINUS {$x2=-1;})?  d=integer
+	{ $ast = new Range(/*$x1*/$c.ast, /*$x2*/$d.ast);
+      }//Utils.setPosition($ast, $c.ctx, $d.ctx); }
 ;
 
-enumerated_type_declaration
-returns [ EnumerationTypeDeclaration  ast]
-:
-	name=IDENTIFIER COLON enumerated_specification
-	(
-		ASSIGN value =
-		(
-			IDENTIFIER
-			| CAST_LITERAL
-		)
-	)?
-	{
-        $ast = $enumerated_specification.ast;
-        $ast.setTypeName($name.text);
-
-        if($value != null) {
-            $ast.setInitializationValue($value.text);
-        }
-    }
-
-;
-
-/* removed: casting of identifiers */
 enumerated_specification
 returns [ EnumerationTypeDeclaration  ast = new EnumerationTypeDeclaration()]
 :
@@ -391,57 +338,29 @@ returns [ EnumerationTypeDeclaration  ast = new EnumerationTypeDeclaration()]
 			COMMA names += IDENTIFIER
 		)* RPAREN
 	)
-	{
-        for(Token tok : $names)
-            $ast.addValue(tok.getText());
-    }
+	{ for(Token tok : $names)
+        $ast.addValue(tok.getText());
+      Utils.setPosition($ast, $LPAREN, $RPAREN); }
 
-	| IDENTIFIER
-	{
-        $ast.setBaseTypeName($IDENTIFIER.text);
-    }
+	| IDENTIFIER { $ast.setBaseTypeName($IDENTIFIER.text);
+          Utils.setPosition($ast, $IDENTIFIER); }
 ;
 
-array_type_declaration
-returns [ ArrayTypeDeclaration ast]
-:
-	IDENTIFIER COLON array_spec_init
-	{
-        $ast = $array_spec_init.ast;
-        $ast.setTypeName($IDENTIFIER.text);
-    }
-;
-
-array_spec_init
-returns [ ArrayTypeDeclaration ast]
-:
-	array_specification
-	{$ast = $array_specification.ast;}
-
-	(
-		ASSIGN array_initialization
-		{$ast.setInitializationValue($array_initialization.ast);}
-	)?
-;
 
 array_specification
 returns [ ArrayTypeDeclaration ast = new ArrayTypeDeclaration() ]
 :
-	IDENTIFIER
+	/*IDENTIFIER
 	{ $ast.setBaseTypeName($IDENTIFIER.text);}
-
-	| ARRAY LBRACKET ranges += subrange
+	|*/ ARRAY LBRACKET ranges += subrange
 	(
 		COMMA ranges += subrange
 	)* RBRACKET OF non_generic_type_name
-	{
-        $ast.setBaseTypeName($non_generic_type_name.text);
-
-        for(SubrangeContext src : $ranges) {
-            $ast.addSubRange(src.ast);
-        }
-    }
-
+	{ Utils.setPosition($ast, $ARRAY, $non_generic_type_name.ctx);
+      $ast.setBaseTypeName($non_generic_type_name.text);
+      for(SubrangeContext src : $ranges) {
+        $ast.addSubRange(src.ast);
+      }}
 ;
 
 array_initialization
@@ -451,6 +370,7 @@ returns [ ArrayInitialization ast = new ArrayInitialization()]
 	(
 		COMMA array_initial_elements
 	)* RBRACKET
+	{ Utils.setPosition($ast, $LBRACKET,$RBRACKET); }
 ;
 
 array_initial_elements
@@ -475,414 +395,38 @@ array_initial_element
 
 ;
 
-structure_type_declaration
-returns [ StructureTypeDeclaration ast = new StructureTypeDeclaration()]
-:
-	IDENTIFIER COLON structure_specification
-	{ $ast = $structure_specification.ast;
-	  $ast.setTypeName($IDENTIFIER.text); }
-;
-
-structure_specification
-returns [ StructureTypeDeclaration ast ]
-:
-	(structure_declaration
-	   {$ast = $structure_declaration.ast; }
-    | initialized_structure
-	   {//$ast = $initialized_structure.ast;
-	   })
-;
-
-initialized_structure
-returns [ StructureInitialization ast = new StructureInitialization()]
-:
-	IDENTIFIER
-	(
-		ASSIGN structure_initialization
-	)?
-	{ $ast = $structure_initialization.ast;
-      $ast.setStructureName($IDENTIFIER.text);
-    }
-
-;
-
 structure_declaration
-returns [ StructureTypeDeclaration ast = null ]
+returns [ StructureTypeDeclaration ast = new StructureTypeDeclaration() ]
 :
-	STRUCT structure_element_declaration SEMICOLON
-	(
-		structure_element_declaration SEMICOLON
-	)* END_STRUCT
-;
-
-structure_element_declaration
-returns [
-    ]
-:
-	IDENTIFIER COLON
-	(
-		simple_spec_init
-		{ $structure_type_declaration::ast.addField($IDENTIFIER.text, $simple_spec_init.ast);}
-
-		| subrange_spec_init
-		{ $structure_type_declaration::ast.addField($IDENTIFIER.text, $subrange_spec_init.ast);}
-
-		| cast
-		{ $structure_type_declaration::ast.addField($IDENTIFIER.text, $cast.ast);}
-
-		| array_spec_init
-		{ $structure_type_declaration::ast.addField($IDENTIFIER.text, $array_spec_init.ast);}
-
-		| initialized_structure
-		{ $structure_type_declaration::ast.addField($IDENTIFIER.text, $initialized_structure.ast);}
-
-	)
+	STRUCT
+	(IDENTIFIER COLON type_declaration SEMICOLON
+	 { $ast.addField($IDENTIFIER.text, $type_declaration.ast);}
+	)+
+	END_STRUCT
 ;
 
 structure_initialization
 returns [ StructureInitialization ast = new StructureInitialization()]
 :
-	LPAREN structure_element_initialization
-	(
-		COMMA structure_element_initialization
-	)* RPAREN
-;
-
-structure_element_initialization
-:
-	n = IDENTIFIER ASSIGN
-	(
-		constant
-		{$structure_initialization::ast.addField($n.text, $constant.ast);}
-
-		| array_initialization
-		{$structure_initialization::ast.addField($n.text, $array_initialization.ast);}
-
-		| structure_initialization
-		{$structure_initialization::ast.addField($n.text, $structure_initialization.ast);}
-
-	)
+	LPAREN
+	I=IDENTIFIER ASSIGN i=initializations
+	{$ast.addField($I.text, $i.ast);}
+	( I=IDENTIFIER ASSIGN i=initializations
+	  {$ast.addField($I.text, $i.ast);}
+	)*
+	RPAREN
 ;
 
 string_type_declaration
 returns [ StringTypeDeclaration ast = new StringTypeDeclaration()]
 :
-	IDENTIFIER COLON base =
-	(
-		STRING
-		| WSTRING
-	)
-	(
-		LBRACKET integer
-		{ $ast.setSize($integer.ast);}
-
-		RBRACKET
-	)?
-	(
-		ASSIGN value = string
-		{$ast.setInitializationValue($value.ast);}
-
-	)?
-	{
-        $ast.setTypeName($IDENTIFIER.text);
-        $ast.setBaseTypeName($base.text);
-        
-    }
-
+	base=(STRING|WSTRING)
+    {$ast.setBaseTypeName($base.text);   }
+	( LBRACKET integer
+	  { $ast.setSize($integer.ast);}
+	  RBRACKET )?
 ;
 
-
-input_declarations [VariableBuilder gather]
-@init {
-    gather.push(VariableDeclaration.INPUT);
-}
-:
-	VAR_INPUT
-	(
-		RETAIN
-		{gather.mix(VariableDeclaration.RETAIN);}
-
-		| NON_RETAIN
-	)?
-	(
-		input_declaration [gather] SEMICOLON
-	)+ END_VAR
-;
-
-input_declaration [VariableBuilder gather]
-:
-	var_init_decl [gather]
-	| edge_declaration [gather]
-;
-
-edge_declaration [VariableBuilder gather]
-:
-	identifier_list COLON BOOL
-	(
-		R_EDGE
-		| F_EDGE
-	)
-	{   gather.createBoolEdge($identifier_list.ast, $R_EDGE!=null); }
-
-;
-
-var_init_decl [VariableBuilder gather]
-:
-	var1_init_decl [gather]
-	| array_var_init_decl [gather]
-	| structured_var_init_decl [gather]
-	| fb_name_decl [gather]
-	| string_var_declaration [gather]
-;
-
-var1_init_decl [VariableBuilder gather]
-:
-	identifier_list COLON
-	(
-		simple_spec_init
-		{gather.create($identifier_list.ast, $simple_spec_init.ast);}
-
-		| subrange_spec_init
-		{gather.create($identifier_list.ast, $subrange_spec_init.ast);}
-
-		| cast
-		{gather.create($identifier_list.ast, $cast.ast);}
-
-	)
-;
-
-array_var_init_decl [VariableBuilder gather]
-:
-	identifier_list COLON array_spec_init
-	{gather.create($identifier_list.ast, $array_spec_init.ast);}
-
-;
-
-structured_var_init_decl [VariableBuilder gather]
-:
-	identifier_list COLON initialized_structure
-	{gather.create($identifier_list.ast, $initialized_structure.ast);}
-
-;
-
-fb_name_decl [VariableBuilder gather]
-:
-	identifier_list COLON IDENTIFIER
-	(
-		ASSIGN structure_initialization
-	)?
-	{ //gather.createFBName($identifier_list.ast, $IDENTIFIER.text, $structure_initialization.ast);}
-    }
-;
-
-output_declarations [VariableBuilder gather]
-@init {gather.clear(VariableDeclaration.OUTPUT);}
-:
-	VAR_OUTPUT
-	(
-		RETAIN
-		{gather.mix(VariableDeclaration.RETAIN);}
-
-		| NON_RETAIN
-	)?
-	(
-		var_init_decl [gather] SEMICOLON
-	)+ END_VAR
-;
-
-input_output_declarations [VariableBuilder gather]
-@init {gather.clear(VariableDeclaration.INOUT);}
-:
-	VAR_IN_OUT
-	(
-		var_declaration [gather] SEMICOLON
-	)+ END_VAR
-;
-
-var_declaration [VariableBuilder gather]
-:
-	temp_var_decl [gather]
-	| fb_name_decl [gather]
-;
-
-temp_var_decl [VariableBuilder gather]
-:
-	var1_declaration [gather]
-	| array_var_declaration [gather]
-	| pointer_var_declaration [gather]
-	| structured_var_declaration [gather]
-	| string_var_declaration [gather]
-;
-
-var1_declaration [VariableBuilder gather]
-:
-	identifier_list COLON
-	(
-		simple_specification
-		{ gather.create($identifier_list.ast, $simple_specification.text); }
-
-		| subrange_specification
-		{ gather.create($identifier_list.ast, $subrange_specification.ast); }
-
-		| enumerated_specification
-		{ gather.create($identifier_list.ast, $enumerated_specification.ast); }
-
-	)
-;
-
-pointer_var_declaration [VariableBuilder gather]
-:
-    identifier_list COLON POINTER OF
-    ( name=elementary_type_name
-      {
-        gather.createPointers($identifier_list.ast, $name.text);
-      }
-    | id=IDENTIFIER
-      {
-        gather.createPointers($identifier_list.ast, $id.text);
-      }
-    )
-
-;
-
-
-array_var_declaration [VariableBuilder gather]
-:
-	identifier_list COLON array_specification
-;
-
-structured_var_declaration [VariableBuilder gather]
-:
-	identifier_list COLON IDENTIFIER
-;
-
-var_declarations [VariableBuilder gather] @init { gather.clear(); }
-:
-	VAR
-	(
-		CONSTANT
-		{ gather.mix(VariableDeclaration.CONSTANT);}
-
-	)?
-	(
-		var_init_decl [gather] SEMICOLON
-	)+ END_VAR
-;
-
-retentive_var_declarations [VariableBuilder gather]
-@init { gather.clear(VariableDeclaration.RETAIN); }
-:
-	VAR RETAIN
-	(
-		var_init_decl [gather] SEMICOLON
-	)+ END_VAR
-;
-
-located_var_declarations [VariableBuilder gather]
-@init {
-    gather.clear(VariableDeclaration.LOCATED);
-}
-:
-	VAR
-	(
-		CONSTANT
-		{gather.mix(VariableDeclaration.CONSTANT);}
-
-		| RETAIN
-		{gather.mix(VariableDeclaration.RETAIN);}
-
-		| NON_RETAIN
-	)?
-	(
-		located_var_decl [gather] SEMICOLON
-	)+ END_VAR
-;
-
-located_var_decl [VariableBuilder gather]
-:
-	(
-		IDENTIFIER
-	)? location COLON located_var_spec_init [gather]
-;
-
-external_var_declarations [VariableBuilder gather]
-@init { gather.clear(VariableDeclaration.EXTERNAL);}
-:
-	VAR_EXTERNAL
-	(
-		CONSTANT
-		{gather.mix(VariableDeclaration.CONSTANT);}
-
-	)?
-	(
-		external_declaration [gather] SEMICOLON
-	)+ END_VAR
-;
-
-external_declaration [VariableBuilder gather]
-:
-	IDENTIFIER COLON
-	(
-		simple_specification
-		| subrange_specification
-		| enumerated_specification
-		| array_specification
-		| IDENTIFIER
-	)
-;
-
-global_var_declarations [VariableBuilder gather]
-@init {gather.push(VariableDeclaration.GLOBAL);}
-:
-	VAR_GLOBAL
-	(
-		CONSTANT
-		{gather.mix(VariableDeclaration.CONSTANT);}
-
-		| RETAIN
-		{gather.mix(VariableDeclaration.RETAIN);}
-
-	)?
-	(
-		global_var_decl [gather] SEMICOLON
-	)+ END_VAR
-;
-
-global_var_decl [VariableBuilder gather]
-:
-	global_var_spec [gather] COLON
-	(
-		located_var_spec_init [gather]
-	)?
-;
-
-global_var_spec [VariableBuilder gather]
-:
-	identifier_list
-	|
-	(
-		IDENTIFIER
-	)? location
-	{
-        System.err.println("global var spec not implemetned");//TODO
-    }
-
-;
-
-located_var_spec_init [VariableBuilder gather]
-:
-	simple_spec_init
-	| subrange_spec_init
-	| cast
-	| array_spec_init
-	| initialized_structure
-	| string_var_declaration [gather]
-;
-
-location
-:
-	AT direct_variable
-;
 
 identifier_list
 returns [ List<String> ast = new ArrayList<>()]
@@ -898,206 +442,84 @@ returns [ List<String> ast = new ArrayList<>()]
 
 ;
 
-string_var_declaration [VariableBuilder gather]
-returns
-[ ScalarValue<? extends AnyInt,Long> length = null, ScalarValue<? extends IECString,String> def = null ]
-:
-	identifier_list COLON type =
-	(
-		WSTRING
-		| STRING
-	)
-	(
-		LBRACKET integer
-		{$length=$integer.ast;}
-
-		RBRACKET
-	)?
-	(
-		ASSIGN string
-		{$def=$string.ast;}
-
-	)?
-	{ gather.create($identifier_list.ast, $length, $def); }
-
-;
-
-incompl_located_var_declarations [VariableBuilder gather]
-@init { gather.clear(VariableDeclaration.RETAIN);}
-:
-	VAR
-	(
-		RETAIN
-		| NON_RETAIN
-	)? incompl_located_var_decl SEMICOLON
-	(
-		incompl_located_var_decl SEMICOLON
-	)* END_VAR
-;
-
-incompl_located_var_decl
-:
-	IDENTIFIER INCOMPL_LOCATION_LITERAL COLON var_spec
-;
-
-var_spec
-:
-	simple_specification
-	| subrange_specification
-	| enumerated_specification
-	| array_specification
-	| IDENTIFIER
-	|
-	(
-		STRING
-		| WSTRING
-	)
-	(
-		LBRACKET integer RBRACKET
-	)?
-;
-
 function_declaration
 returns [ FunctionDeclaration ast = new FunctionDeclaration() ]
 :
 	FUNCTION name = IDENTIFIER COLON
-	(
-		elementary_type_name
-		{$ast.setReturnTypeName($elementary_type_name.text);}
+	( elementary_type_name
+	  {$ast.setReturnTypeName($elementary_type_name.text);}
+	| IDENTIFIER
+      {$ast.setReturnTypeName($IDENTIFIER.text);})
+	var_decls[$ast.getLocalScope().builder()]
+	body = statement_list END_FUNCTION
+	{ $ast.setFunctionName($name.text); }
+;
 
-		| IDENTIFIER
-		{$ast.setReturnTypeName($IDENTIFIER.text);}
+var_decls [VariableBuilder gather]
+:
+    ( { gather.clear(); }
+      variable_keyword[gather]
+      identifier_list
+        {gather.identifiers($identifier_list.ast);}
+      COLON
+      td=type_declaration
+      SEMICOLON
+      { gather.setPosition($variable_keyword.ctx, $SEMICOLON);
+        gather.type($td.ast);
+        gather.close(); }
+    )*
+;
 
+variable_keyword[VariableBuilder v]
+:
+	( VAR        {v.push(LOCAL);}
+	| VAR_INPUT  {v.push(INPUT);}
+	| VAR_OUTPUT {v.push(OUTPUT);}
+	| VAR_IN_OUT {v.push(INOUT);}
+	| VAR_EXTERNAL  { v.clear(VariableDeclaration.EXTERNAL);}
+	| VAR_GLOBAL {v.push(INOUT);}
 	)
-	(
-		io_var_declarations [$ast.getLocalScope().builder()]
-		| function_var_decls [$ast.getLocalScope().builder()]
-	)* body = statement_list END_FUNCTION
-	{
-        $ast.setFunctionName($name.text);
-      }
-
+	( CONSTANT
+		{v.mix(VariableDeclaration.CONSTANT);}
+	| RETAIN
+        {v.mix(VariableDeclaration.RETAIN);}
+    | NON_RETAIN
+    )?
 ;
 
-io_var_declarations [VariableBuilder gather]
-:
-	input_declarations [gather]
-	| output_declarations [gather]
-	| input_output_declarations [gather]
-;
 
-function_var_decls [VariableBuilder gather]
-@init {gather.push(VariableDeclaration.LOCAL);}
-:
-	VAR
-	(
-		CONSTANT
-		{gather.mix(VariableDeclaration.CONSTANT);}
-
-	)?
-	(
-		var2_init_decl [gather] SEMICOLON
-	)+ END_VAR
-	{gather.pop();}
-
-;
-
-var2_init_decl [VariableBuilder gather]
-:
-	var1_init_decl [gather]
-	| array_var_init_decl [gather]
-	| structured_var_init_decl [gather]
-	| string_var_declaration [gather]
-;
+//endregion
 
 function_block_declaration
 returns [ FunctionBlockDeclaration ast = new FunctionBlockDeclaration()]
 :
 	FUNCTION_BLOCK name = IDENTIFIER
-	(
-		io_var_declarations [$ast.getLocalScope().builder()]
-		| other_var_declarations [$ast.getLocalScope().builder()]
-	)* body = statement_list END_FUNCTION_BLOCK
-	{
-        $ast.setFunctionBlockName($name.text);
-        $ast.setFunctionBody($body.ast);
-      }
+	var_decls [$ast.getLocalScope().builder()]
+	body = statement_list END_FUNCTION_BLOCK
+	{ $ast.setFunctionBlockName($name.text);
+      $ast.setFunctionBody($body.ast);
+      Utils.setPosition($ast, $FUNCTION_BLOCK, $END_FUNCTION_BLOCK);}
 
 ;
 
-other_var_declarations [VariableBuilder gather]
-:
-	external_var_declarations [gather]
-	| var_declarations [gather]
-	| retentive_var_declarations [gather]
-	| non_retentive_var_declarations [gather]
-	| temp_var_decls [gather]
-	| incompl_located_var_declarations [gather]
-;
-
-temp_var_decls [VariableBuilder gather]
-@init { gather.clear(VariableDeclaration.TEMP); }
-:
-	VAR_TEMP
-	(
-		temp_var_decl [gather] SEMICOLON
-	)+ END_VAR
-	{ gather.pop(); }
-
-;
-
-non_retentive_var_declarations [VariableBuilder gather]
-@init { gather.clear(); }
-:
-	VAR NON_RETAIN
-	(
-		var_init_decl [gather] SEMICOLON
-	)+ END_VAR
-	{ gather.pop(); }
-
-;
 
 program_declaration
 returns [ ProgramDeclaration ast = new ProgramDeclaration()]
 :
-	PROGRAM name = IDENTIFIER
-	(
-		io_var_declarations [$ast.getLocalScope().builder()]
-		| other_var_declarations [$ast.getLocalScope().builder()]
-		| located_var_declarations [$ast.getLocalScope().builder()]
-		| program_access_decls
-	)* body = statement_list END_PROGRAM
-	{
-        $ast.setProgramName($name.text);
-        $ast.setProgramBody($body.ast);
+	PROGRAM name=IDENTIFIER
+	var_decls[$ast.getLocalScope().builder()]
+	body = statement_list END_PROGRAM
+	{ $ast.setProgramName($name.text);
+      $ast.setProgramBody($body.ast);
+      Utils.setPosition($ast, $PROGRAM, $END_PROGRAM);}
 
-      }
-
-;
-
-program_access_decls
-:
-	VAR_ACCESS program_access_decl SEMICOLON
-	(
-		program_access_decl SEMICOLON
-	)* END_VAR
-;
-
-program_access_decl
-:
-	IDENTIFIER COLON symbolic_variable COLON non_generic_type_name
-	(
-		direction
-	)?
 ;
 
 configuration_declaration
 returns [ ConfigurationDeclaration ast = new ConfigurationDeclaration()]
 :
 	CONFIGURATION name = IDENTIFIER
-	(
-		global_var_declarations [$ast.getLocalScope().builder()]
-	)?
+    //(global_var_declarations [$ast.getLocalScope().builder()]	)?
 	(
 		single_resource_declaration
 		|
@@ -1112,7 +534,7 @@ returns [ ConfigurationDeclaration ast = new ConfigurationDeclaration()]
 		access_declarations
 	)?
 	(
-		instance_specific_initializations [$ast.getLocalScope().builder()]
+		//instance_specific_initializations [$ast.getLocalScope().builder()]
 	)? END_CONFIGURATION
 ;
 
@@ -1121,7 +543,7 @@ returns [ ResourceDeclaration ast = new ResourceDeclaration()]
 :
 	RESOURCE IDENTIFIER ON IDENTIFIER
 	(
-		global_var_declarations [$ast.getLocalScope().builder()]
+		//global_var_declarations [$ast.getLocalScope().builder()]
 	)? single_resource_declaration END_RESOURCE
 ;
 
@@ -1260,15 +682,15 @@ data_sink
 	| direct_variable
 ;
 
+/*
 instance_specific_initializations [VariableBuilder gather]
 :
 	VAR_CONFIG
 	(
 		instance_specific_init [gather] SEMICOLON
 	)+ END_VAR
-;
-
-instance_specific_init [VariableBuilder gather]
+;*/
+/*instance_specific_init [VariableBuilder gather]
 :
 	IDENTIFIER DOT
 	(
@@ -1286,7 +708,7 @@ instance_specific_init [VariableBuilder gather]
 			IDENTIFIER COLON IDENTIFIER ASSIGN structure_initialization
 		)
 	)
-;
+;*/
 
 expression
 returns [ Expression ast ]
@@ -1693,10 +1115,7 @@ start_sfc returns [ SFCDeclaration ast = new SFCDeclaration() ]
 :
 	SFC name=IDENTIFIER
 	{$ast.setBlockName($name.text);}
-	(
-		io_var_declarations [$ast.getLocalScope().builder()]
-		| other_var_declarations [$ast.getLocalScope().builder()]
-	)*
+	var_decls[$ast.getLocalScope().builder()]
 	(
 		action_declaration [$ast.getActions()]
 		| goto_declaration [$ast.getTransitions()]
@@ -1726,10 +1145,8 @@ returns [ FunctionBlockDeclaration ast = new FunctionBlockDeclaration() ]
 		{$ast.setFunctionBlockName($name.text);}
 
 	)?
-	(
-		io_var_declarations [$ast.getLocalScope().builder()]
-		| function_var_decls [$ast.getLocalScope().builder()]
-	)* body=statement_list
+	var_decls[$ast.getLocalScope().builder()]
+	body=statement_list
 	{
 		$ast.setFunctionBody($body.ast);
 		$actions.add($ast);

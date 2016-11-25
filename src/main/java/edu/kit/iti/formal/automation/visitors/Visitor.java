@@ -93,4 +93,6 @@ public interface Visitor<T> {
     T visit(Deref deref);
 
     T visit(SymbolicReference symbolicReference);
+
+    T visit(PointerTypeDeclaration ptd);
 }

@@ -1,5 +1,9 @@
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.LocalScope;
+import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
+import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedinScope;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
@@ -12,7 +16,8 @@ import java.util.stream.Stream;
 /**
  * Created by weigl on 13.06.14.
  */
-public class ArrayInitialization<T> implements Initialization, List<Initialization>, Visitable {
+public class ArrayInitialization<T> extends Initialization
+        implements List<Initialization>, Visitable {
     private List<Initialization> initValues = new ArrayList<>();
 
 
@@ -181,4 +186,10 @@ public class ArrayInitialization<T> implements Initialization, List<Initializati
         return visitor.visit(this);
     }
 
+    @Override
+    public Any dataType(LocalScope localScope)
+            throws VariableNotDefinedinScope, TypeConformityException {
+        //TODO
+        return null;
+    }
 }

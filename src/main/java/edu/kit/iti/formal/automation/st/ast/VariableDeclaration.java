@@ -2,13 +2,13 @@ package edu.kit.iti.formal.automation.st.ast;
 
 
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.visitors.Visitable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
  * Created by weigla on 09.06.2014.
  */
-public class VariableDeclaration implements Visitable, Comparable<VariableDeclaration> {
+public class VariableDeclaration
+        extends Top implements Comparable<VariableDeclaration> {
     public static final int INPUT = 1;
     public static final int OUTPUT = 2;
     public static final int INOUT = 4;
@@ -28,23 +28,18 @@ public class VariableDeclaration implements Visitable, Comparable<VariableDeclar
     public static final int NOT_READED = 4096;
 
     private String name;
-    private Initialization init;
-    private String dataTypeName;
     private Any dataType;
     private int type;
+    private TypeDeclaration typeDeclaration;
 
     public VariableDeclaration() {
 
     }
 
-    public VariableDeclaration(String name) {
+    public VariableDeclaration(String name, TypeDeclaration td) {
         this();
         this.name = name;
-    }
-
-    public VariableDeclaration(String name, int type, Initialization i) {
-        this(name, type);
-        init = i;
+        typeDeclaration = td;
     }
 
     public VariableDeclaration(String name, Any dataType) {
@@ -52,15 +47,16 @@ public class VariableDeclaration implements Visitable, Comparable<VariableDeclar
         this.dataType = dataType;
     }
 
-    public VariableDeclaration(String name, int type) {
-        this(name);
-        this.type = type;
+    public VariableDeclaration(VariableDeclaration value) {
+        this(value.getName(), value.getType(), value.getTypeDeclaration());
+        dataType = value.dataType;
+        typeDeclaration = value.typeDeclaration;
     }
 
-    public VariableDeclaration(VariableDeclaration value) {
-        this(value.getName(), value.getType(), value.getInit());
-        dataType = value.dataType;
-        dataTypeName = value.dataTypeName;
+    public VariableDeclaration(String name, int flags, TypeDeclaration td) {
+        this.name = name;
+        type = flags;
+        typeDeclaration = td;
     }
 
     public String getName() {
@@ -72,21 +68,19 @@ public class VariableDeclaration implements Visitable, Comparable<VariableDeclar
     }
 
     public Initialization getInit() {
-        return init;
+        return typeDeclaration.getInitializationValue();
     }
 
-    public void setInit(Initialization init) {
-        this.init = init;
-    }
+    /*public void setInit(Initialization init) {
+        this.typeDeclaration.setInitialization(init);
+    }*/
 
     public String getDataTypeName() {
         if (dataType != null)
             return dataType.getName();
-        return dataTypeName;
-    }
-
-    public void setDataTypeName(String dataTypeName) {
-        this.dataTypeName = dataTypeName;
+        if (typeDeclaration != null)
+            return typeDeclaration.getTypeName();
+        return null;
     }
 
     public Any getDataType() {
@@ -118,31 +112,25 @@ public class VariableDeclaration implements Visitable, Comparable<VariableDeclar
         return is(CONSTANT);
     }
 
-
     public boolean isExternal() {
         return is(EXTERNAL);
     }
-
 
     public boolean isTemp() {
         return is(TEMP);
     }
 
-
     public boolean isLocated() {
         return is(LOCATED);
     }
-
 
     public boolean isLocal() {
         return is(LOCAL);
     }
 
-
     public boolean isOutput() {
         return is(OUTPUT);
     }
-
 
     public boolean isInput() {
         return is(INPUT);
@@ -159,7 +147,6 @@ public class VariableDeclaration implements Visitable, Comparable<VariableDeclar
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -186,5 +173,17 @@ public class VariableDeclaration implements Visitable, Comparable<VariableDeclar
     @Override
     public String toString() {
         return name + " : " + getDataTypeName() + ":=" + getInit();
+    }
+
+    public TypeDeclaration getTypeDeclaration() {
+        return typeDeclaration;
+    }
+
+    /**
+     * @param typeDeclaration
+     * @dangerous, shared data
+     */
+    public void setTypeDeclaration(TypeDeclaration<?> typeDeclaration) {
+        this.typeDeclaration = typeDeclaration;
     }
 }

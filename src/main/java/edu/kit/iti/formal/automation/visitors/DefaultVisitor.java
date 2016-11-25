@@ -215,4 +215,9 @@ public class DefaultVisitor<T> implements Visitor<T> {
     public T visit(SymbolicReference symbolicReference) {
         return defaultVisit(symbolicReference);
     }
+
+    @Override
+    public T visit(PointerTypeDeclaration ptd) {
+        return defaultVisit(ptd);
+    }
 }

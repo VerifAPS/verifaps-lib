@@ -9,7 +9,8 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
 /**
  * Created by weigl on 11.06.14.
  */
-public class ScalarValue<T extends Any, S> extends Expression implements Value<T>, Initialization {
+public class ScalarValue<T extends Any, S> extends Initialization
+        implements Value<T> {
     private T dataType;
     private S value;
 
