@@ -1,8 +1,5 @@
 .idea
 /.gradle
-/build
-/doc/build
-
 build/*
 
    Latex
