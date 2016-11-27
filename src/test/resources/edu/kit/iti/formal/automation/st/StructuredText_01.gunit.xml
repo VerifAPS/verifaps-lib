@@ -1,0 +1,39 @@
+<gunit>
+    <parser rule="statement">
+        IF a THEN b:=1; END_IF
+        IF a THEN b:=1; ELSE b:=1; END_IF
+        IF a THEN b:=1; ELSEIF b THEN c:=1; END_IF
+    </parser>
+
+
+    <parser rule="expression">
+        a + b
+        a * b + c
+        2 * 6
+        2 + 6
+        6161 + 262
+        (a+b)*c
+        ((a+b)*c)
+        (a+b)*(c)
+        ((a+b)*(c))
+        (a+b+c+c+d+d+e+f+a+f+a+b+a+df)
+        (a-b)
+        (a/b)
+        a/b
+        a+b+c
+        -2
+        -a
+        a**2
+        5e2
+        6
+        BYTE#5
+    </parser>
+
+    <parser rule="variable">
+        abc
+        def
+        abc[2]
+        abc[2,3]
+        abc.def
+    </parser>
+</gunit>
