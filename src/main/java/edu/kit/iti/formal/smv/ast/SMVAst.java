@@ -4,26 +4,12 @@
 
 package edu.kit.iti.formal.smv.ast;
 
+import edu.kit.iti.formal.smv.SMVAstVisitor;
+
 /************************************************************/
 /**
  * 
  */
-public enum UnaryOperator {
-	/**
-	 * 
-	 */
-	NEGATE,
-	/**
-	 * 
-	 */
-	MINUS;
-
-	@Override
-	public String toString() {
-		switch (this) {
-		case NEGATE: return "!";
-		case MINUS:  return  "-"	;
-		}
-		return "";
-	}
-};
+abstract public class SMVAst {
+	public abstract <T> T accept(SMVAstVisitor<T> visitor);
+}

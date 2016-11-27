@@ -4,28 +4,28 @@
 
 package edu.kit.iti.formal.smv.ast;
 
-import edu.kit.iti.formal.smv.Visitor;
-import edu.kit.iti.formal.smv.ast.Expression;
-import edu.kit.iti.formal.smv.ast.Statement;
-import edu.kit.iti.formal.smv.ast.Variable;
+import edu.kit.iti.formal.smv.SMVAstVisitor;
 
 /************************************************************/
 /**
  * 
  */
-public class Assignment extends Statement {
+public class SAssignment extends SMVAst {
 	/**
 	 * 
 	 */
-	public Variable target;
+	public SVariable target;
 	/**
 	 * 
 	 */
-	public Expression expression;
-	
-	
+	public SMVExpr SMVExpr;
 
-	<T> T visit(Visitor<T> visitor) {
+	public SAssignment(SVariable v, SMVExpr object) {
+		target = v;
+		SMVExpr = object;
+	}
+
+	public <T> T accept(SMVAstVisitor<T> visitor) {
 		return visitor.visit(this);
 	}
 

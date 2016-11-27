@@ -4,14 +4,14 @@
 
 package edu.kit.iti.formal.smv.ast;
 
-import edu.kit.iti.formal.smv.Visitor;
-
 /************************************************************/
 /**
  * 
  */
-public class Top {
-	public <T> T visit(Visitor<T> visitor) {
-		return visitor.visit(this);
-	}
+public abstract class SMVExpr extends SMVAst {
+
+	/**
+	 * 
+	 */
+	public abstract SMVType getSMVType();
 };

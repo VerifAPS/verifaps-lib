@@ -4,16 +4,26 @@
 
 package edu.kit.iti.formal.smv.ast;
 
-import edu.kit.iti.formal.smv.ast.Top;
-
 /************************************************************/
 /**
  * 
  */
-public abstract class Expression extends Top {
-
+public enum SUnaryOperator {
 	/**
 	 * 
 	 */
-	public abstract DataType getDataType();
+	NEGATE,
+	/**
+	 * 
+	 */
+	MINUS;
+
+	@Override
+	public String toString() {
+		switch (this) {
+		case NEGATE: return "!";
+		case MINUS:  return  "-"	;
+		}
+		return "";
+	}
 };
