@@ -5,25 +5,40 @@
 package edu.kit.iti.formal.smv.ast;
 
 /************************************************************/
-/**
- * 
- */
-public enum SUnaryOperator {
-	/**
-	 * 
-	 */
-	NEGATE,
-	/**
-	 * 
-	 */
-	MINUS;
 
-	@Override
-	public String toString() {
-		switch (this) {
-		case NEGATE: return "!";
-		case MINUS:  return  "-"	;
-		}
-		return "";
-	}
-};
+/**
+ *
+ */
+public enum SUnaryOperator implements SOperator {
+    /**
+     *
+     */
+    NEGATE("!", 1),
+    /**
+     *
+     */
+    MINUS("-", 3);
+
+    private final int precedence;
+    private String symbol;
+
+    SUnaryOperator(String symbol, int p) {
+        this.symbol = symbol;
+        precedence = p;
+    }
+
+    @Override
+    public int precedence() {
+        return precedence;
+    }
+
+    @Override
+    public String symbol() {
+        return symbol;
+    }
+
+    @Override
+    public String toString() {
+        return symbol();
+    }
+}

@@ -7,19 +7,21 @@ import edu.kit.iti.formal.smv.ast.SUnaryExpression;
 import edu.kit.iti.formal.smv.ast.SVariable;
 
 public interface SMVAstVisitor<T> {
-	T visit(SMVAst top);
+    T visit(SMVAst top);
 
-	T visit(SVariable v);
-	
-	T visit(SMVModule m);
+    T visit(SVariable v);
 
-	T visit(SBinaryExpression be);
+    T visit(SBinaryExpression be);
 
-	T visit(SUnaryExpression ue);
+    T visit(SUnaryExpression ue);
 
-	T visit(SLiteral l);
+    T visit(SLiteral l);
 
-	T visit(SAssignment a);
+    T visit(SAssignment a);
 
-	T visit(SCaseExpression ce);
+    T visit(SCaseExpression ce);
+
+    T visit(SMVModule smvModule);
+
+    T visit(SFunction func);
 }

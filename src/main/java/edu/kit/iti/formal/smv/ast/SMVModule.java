@@ -1,40 +1,52 @@
 package edu.kit.iti.formal.smv.ast;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import edu.kit.iti.formal.smv.SMVAstVisitor;
 
-/************************************************************/
+import java.util.List;
+import java.util.Map;
+
 /**
- * 
+ * @author Alexander Weigl
+ * @version 1 (11.12.16)
  */
-public class SMVModule extends SMVAst {
-	/**
-	 * 
-	 */
-	public List<SVariable> inputvars = new ArrayList<>();
-	/**
-	 * 
-	 */
-	public List<SVariable> statevars = new ArrayList<>();
-	/**
-	 * 
-	 */
-	public List<SVariable> frozenvars = new ArrayList<>();
+public interface SMVModule {
+    List<SVariable> getModuleParameter();
 
-	public List<SAssignment> init = new ArrayList<>();
+    /**
+     *
+     */
+    List<SVariable> getInputVars();
 
-	public List<SMVExpr> invariants = new ArrayList<>(), invariantspecs = new ArrayList<>(),
-			ltlspec = new ArrayList<>(), ctlspec = new ArrayList<>();
+    /**
+     *
+     */
+    List<SVariable> getStateVars();
 
-	public List<SAssignment> next = new ArrayList<>();
+    List<SVariable> getFrozenVars();
 
-	public String name;
+    List<SMVExpr> getInvar();
 
-	@Override
-	public <T> T accept(SMVAstVisitor<T> visitor) {
-		return visitor.visit(this);
-	}
+    List<SMVExpr> getInvarSpec();
+
+    List<SMVExpr> getLTLSpec();
+
+    List<SMVExpr> getTrans();
+
+    List<SMVExpr> getInit();
+
+    List<SMVExpr> getCTLSpec();
+
+    List<SAssignment> getInitAssignments();
+
+    List<SAssignment> getNextAssignments();
+
+    Map<SVariable, SMVExpr> getDefinitions();
+
+    String getName();
+
+    default
+    public <T> T accept(SMVAstVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 
 }

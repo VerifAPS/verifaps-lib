@@ -7,66 +7,122 @@ package edu.kit.iti.formal.smv.ast;
 /************************************************************/
 
 /**
- *
+ * The order of parsing precedence for operators from high to low is:
+ * 0: [ ] , [ : ]
+ * 1: !
+ * 2: ::
+ * 3: - (unary minus)
+ * 4: /
+ * 6: mod
+ * 7: *
+ * 8: + -
+ * 9: << >>
+ * 10: union
+ * 11: in
+ * 12: = !=  <  >
+ * 13: &
+ * 14: | xor xnor
+ * 15: (• ? • : •)
+ * 16: <->
+ * 17: ->
  */
-public enum SBinaryOperator {
+public enum SBinaryOperator implements SOperator {
     /**
      *
      */
-    PLUS("+"),
+    PLUS("+", 8),
     /**
      *
      */
-    MINUS("-"),
+    MINUS("-", 8),
     /**
      *
      */
-    DIV("/"),
+    DIV("/", 4),
     /**
      *
      */
-    MUL("*"),
+    MUL("*", 6),
     /**
      *
      */
-    AND("&"),
+    AND("&", 13),
     /**
      *
      */
-    OR("|"),
+    OR("|", 14),
     /**
      *
      */
-    LESS_THAN("<"),
+    LESS_THAN("<", 12),
     /**
      *
      */
-    LESS_EQUAL("<="),
+    LESS_EQUAL("<=", 12),
     /**
      *
      */
-    GREATER_THAN(">"),
+    GREATER_THAN(">", 12),
     /**
      *
      */
-    GREATER_EQUAL(">="),
+    GREATER_EQUAL(">=", 12),
     /**
      *
      */
-    XOR("^"),
-    /**
-     *
-     */
-    EQUAL("="),
-    /**
-     *
-     */
-    NOT_EQUAL("!=");
+    XOR("xor", 14),
 
+    /**
+     *
+     */
+    XNOR("xnor", 14),
+
+    /**
+     *
+     */
+    EQUAL("=", 12),
+
+    /**
+     *
+     */
+    IMPL("->", 17),
+
+    /**
+     *
+     */
+    EQUIV("<->", 16),
+
+    /**
+     *
+     */
+    NOT_EQUAL("!=", 12),
+
+    /**
+     *
+     */
+    MOD("mod", 5),
+
+    /**
+     *
+     */
+    SHL("<<", 9),
+
+    /**
+     *
+     */
+    SHR(">>", 9);
+
+    private final int precedence;
     private final String symbol;
 
-    SBinaryOperator(String symbol) {
+    SBinaryOperator(String symbol, int p) {
         this.symbol = symbol;
+        precedence = p;
+    }
+
+    @Override
+    public int precedence() {
+        return precedence;
     }
 
     public String symbol() {

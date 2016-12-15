@@ -18,11 +18,11 @@ public class SAssignment extends SMVAst {
 	/**
 	 * 
 	 */
-	public SMVExpr SMVExpr;
+	public SMVExpr expr;
 
 	public SAssignment(SVariable v, SMVExpr object) {
 		target = v;
-		SMVExpr = object;
+		expr = object;
 	}
 
 	public <T> T accept(SMVAstVisitor<T> visitor) {

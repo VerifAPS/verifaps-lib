@@ -20,12 +20,12 @@ import static edu.kit.iti.formal.smv.BExpressionBuilder.*;
  * @author weigl
  */
 public class TStateSystem {
-    protected SMVModule m = new SMVModule();
+    protected SMVModuleImpl m = new SMVModuleImpl();
     public State init = new State();
     public String name;
 
-    public SMVModule asModule() {
-        Set<State> states = getStates();
+    public SMVModuleImpl asModule() {
+       /* Set<State> states = getStates();
 
         List<SVariable> statesX = states.stream().map(TStateSystem::toVar).collect(Collectors.toList());
         // SVariable curState = new SVariable("CURRENT_STATE", new
@@ -61,7 +61,7 @@ public class TStateSystem {
         for (Transition t : getTransitions()) {
             SVariable from = toVar(t.outgoing);
             SVariable to = toVar(t.incoming);
-            SMVExpr cond = expr(from).and().to(t.guard).get();
+            expr cond = expr(from).and().to(t.guard).get();
             a.get(to).addCase(cond, SLiteral.TRUE);
         }
 
@@ -72,6 +72,7 @@ public class TStateSystem {
         m.next.addAll(toAssignments(a));
 
         m.name = name;
+        */
         return m;
     }
 

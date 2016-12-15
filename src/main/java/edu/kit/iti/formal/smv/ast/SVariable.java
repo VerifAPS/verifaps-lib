@@ -6,11 +6,13 @@ package edu.kit.iti.formal.smv.ast;
 
 import edu.kit.iti.formal.smv.SMVAstVisitor;
 
+import java.util.Comparator;
+
 /************************************************************/
 /**
  * 
  */
-public class SVariable extends SMVExpr {
+public class SVariable extends SMVExpr  implements Comparable<SVariable> {
 
 	public String name;
 	public SMVType datatype;
@@ -30,10 +32,7 @@ public class SVariable extends SMVExpr {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
+		return name.hashCode();
 	}
 
 	@Override
@@ -65,5 +64,15 @@ public class SVariable extends SMVExpr {
 	@Override
 	public <T> T accept(SMVAstVisitor<T> visitor) {
 		return visitor.visit(this);
+	}
+
+	@Override
+	public int compareTo(SVariable o) {
+		return name.compareTo(o.name);
+	}
+
+	@Override
+	public String toString() {
+		return name;
 	}
 }
