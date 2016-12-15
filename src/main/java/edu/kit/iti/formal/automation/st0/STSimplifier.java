@@ -29,7 +29,7 @@ public class STSimplifier {
     public void transform() {
         step0();
         step1();
-        step2();
+        //TODO unhandled cases in visitor: step2();
         step3();
         step4();
         step5();
@@ -69,7 +69,8 @@ public class STSimplifier {
     }
 
     private void step2() {
-        TimerToCounter ttc = new TimerToCounter(4); //TODO to be defined by console
+        TimerToCounter ttc = new TimerToCounter(4);
+        //TODO to be defined by console
         theProgram = (ProgramDeclaration) ttc.visit(theProgram);
     }
 
@@ -143,9 +144,11 @@ public class STSimplifier {
             } else if (tle instanceof TypeDeclarations) {
                 TypeDeclarations typeDeclarations = (TypeDeclarations) tle;
                 appendTypeDeclarations(typeDeclarations);
+            } else if (tle instanceof FunctionDeclaration) {
+                //FunctionDeclaration functionDeclaration = (FunctionDeclaration) tle;
+                //functions
             } else {
                 throw new IllegalArgumentException("TLE: " + tle.getClass() + " is not handled yet.");
-
             }
         }
 

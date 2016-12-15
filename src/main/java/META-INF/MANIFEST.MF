@@ -1,3 +1,2 @@
 Manifest-Version: 1.0
-Main-Class: edu.kit.iti.formal.automation.apps.CLIInterface
-
+Main-Class:

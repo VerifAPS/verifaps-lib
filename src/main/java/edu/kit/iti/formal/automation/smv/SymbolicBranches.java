@@ -1,20 +1,19 @@
-package edu.kit.iti.formal.automation;
+package edu.kit.iti.formal.automation.smv;
 
-import edu.kit.iti.formal.automation.st.ast.CaseStatement;
-import edu.kit.iti.formal.automation.st.util.Tuple;
-import edu.kit.iti.formal.smv.SMV;
 import edu.kit.iti.formal.smv.ast.SCaseExpression;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
+import edu.kit.iti.formal.smv.ast.SVariable;
 
 import java.util.*;
+
 
 /**
  * Created by weigl on 27.11.16.
  */
 public class SymbolicBranches
-        extends HashMap<String, SCaseExpression> {
+        extends HashMap<SVariable, SCaseExpression> {
     public void addBranch(SMVExpr condition, SymbolicState state) {
-        for (Entry<String, SMVExpr> e : state.entrySet()) {
+        for (Entry<SVariable, SMVExpr> e : state.entrySet()) {
             get(e.getKey()).add(condition, e.getValue());
         }
     }
@@ -25,7 +24,7 @@ public class SymbolicBranches
         if (a != null)
             return a;
         a = new SCaseExpression();
-        put(key.toString(), a);
+        put((SVariable) key, a);
         return a;
     }
 }

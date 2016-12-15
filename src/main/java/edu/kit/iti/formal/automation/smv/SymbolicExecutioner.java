@@ -1,29 +1,54 @@
-package edu.kit.iti.formal.automation;
+package edu.kit.iti.formal.automation.smv;
 
+import edu.kit.iti.formal.automation.SymbExFacade;
+import edu.kit.iti.formal.automation.Utils;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.exceptions.FunctionInvocationArgumentNumberException;
 import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException;
+import edu.kit.iti.formal.automation.exceptions.UnknownDatatype;
+import edu.kit.iti.formal.automation.exceptions.UnknownVariableException;
+import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
-import edu.kit.iti.formal.automation.st.util.Tuple;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
+import edu.kit.iti.formal.automation.visitors.Visitable;
+import edu.kit.iti.formal.smv.SMVFacade;
 import edu.kit.iti.formal.smv.ast.*;
 
 import java.util.*;
+import java.util.function.BinaryOperator;
 
 /**
  * Created by weigl on 26.11.16.
  */
 public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
-    private SMVModule module;
-    private GlobalScope globalScope;
-    private LocalScope localScope;
+    private GlobalScope globalScope = GlobalScope.defaultScope();
+    private LocalScope localScope = new LocalScope(globalScope);
+    private Map<String, SVariable> varCache = new HashMap<>();
 
     public SymbolicExecutioner() {
         push(new SymbolicState());
     }
+
+    //region getter and setters
+    public GlobalScope getGlobalScope() {
+        return globalScope;
+    }
+
+    public void setGlobalScope(GlobalScope globalScope) {
+        this.globalScope = globalScope;
+    }
+
+    public LocalScope getLocalScope() {
+        return localScope;
+    }
+
+    public void setLocalScope(LocalScope localScope) {
+        this.localScope = localScope;
+    }
+    //endregion
 
     //region state handling
     private Stack<SymbolicState> state = new Stack<>();
@@ -40,10 +65,29 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         push(new SymbolicState(peek()));
     }
 
-    private <K, V> void push(SymbolicState map) {
+    public <K, V> void push(SymbolicState map) {
         state.push(map);
     }
     //endregion
+
+    public SVariable lift(VariableDeclaration vd) {
+        try {
+            if (!varCache.containsKey(vd))
+                varCache.put(vd.getName(), SymbExFacade.asSVariable(vd));
+            return varCache.get(vd.getName());
+        } catch (NullPointerException e) {
+            throw new UnknownDatatype("Datatype not given/inferred for variable " + vd.getName(), e);
+        }
+    }
+
+
+    public SVariable lift(SymbolicReference vd) {
+        if (varCache.containsKey(vd.getIdentifier()))
+            return varCache.get(vd.getIdentifier());
+        else
+            throw new UnknownVariableException("Variable access to not declared variable" + vd);
+    }
+
 
     //region rewriting of expressions using the current state
     @Override
@@ -64,7 +108,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
     @Override
     public SMVExpr visit(SymbolicReference symbolicReference) {
-        return peek().get(symbolicReference.getIdentifier());
+        return peek().get(lift(symbolicReference));
     }
 
     @Override
@@ -83,7 +127,8 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
         // initialize root state
         for (VariableDeclaration vd : localScope) {
-            peek().put(vd.getName(), Utils.asSMVVariable(vd));
+            SVariable s = lift(vd);
+            peek().put(s,s);
         }
 
         programDeclaration.getProgramBody().visit(this);
@@ -92,9 +137,9 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
     @Override
     public SMVExpr visit(AssignmentStatement assign) {
-        Map<String, SMVExpr> s = peek();
-        String name = ((SymbolicReference) assign.getLocation()).getIdentifier();
-        s.put(name, assign.getExpression().visit(this));
+        SymbolicState s = peek();
+        s.put(lift((SymbolicReference) assign.getLocation()),
+                assign.getExpression().visit(this));
         return null;
     }
 
@@ -127,8 +172,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
             for (int i = 0; i < parameters.size(); i++) {
                 // name from definition, in order of declaration, expression from caller site
-                String name = inputVars.get(i).getName();
-                calleeState.put(name,
+                calleeState.put(lift(inputVars.get(i)),
                         parameters.get(i).getExpression().visit(this));
             }
             push(calleeState);
@@ -141,7 +185,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
                     if (td != null && td.getInitialization() != null) {
                         td.getInitialization().visit(this);
                     } else {
-                        calleeState.put(vd.getName(), Utils.getDefaultValue(vd.getDataType()));
+                        calleeState.put(lift(vd), Utils.getDefaultValue(vd.getDataType()));
                     }
                 }
             }
@@ -177,7 +221,51 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     }
 
     @Override
-    public SCaseExpression visit(GuardedStatement guardedStatement) {
+    public SMVExpr visit(CaseStatement caseStatement) {
+        SymbolicBranches branchStates = new SymbolicBranches();
+
+        for (CaseStatement.Case gs : caseStatement.getCases()) {
+            SMVExpr condition = buildCondition(caseStatement.getExpression(), gs);
+            push();
+            gs.getStatements().visit(this);
+            branchStates.addBranch(condition, pop());
+        }
+
+        if (caseStatement.getElseCase().size() > 0) {
+            push();
+            caseStatement.getElseCase().visit(this);
+            branchStates.addBranch(SLiteral.TRUE, pop());
+        }
+        peek().putAll(branchStates);
         return null;
+    }
+
+    private Expression caseExpression;
+
+    private SMVExpr buildCondition(Expression e, CaseStatement.Case c) {
+        caseExpression = e;
+        return c.getConditions()
+                .stream()
+                .map(a -> a.visit(this))
+                .reduce(SMVFacade.reducer(SBinaryOperator.OR)).get();
+    }
+
+    @Override
+    public SMVExpr visit(CaseConditions.Range r) {
+        throw new IllegalArgumentException("unsupported");
+    }
+
+    @Override
+    public SMVExpr visit(CaseConditions.IntegerCondition i) {
+        BinaryExpression be = new BinaryExpression(caseExpression, i.getValue(), Operators.EQUALS);
+        return be.visit(this);
+    }
+
+
+    @Override
+    public SMVExpr visit(CaseConditions.Enumeration e) {
+        BinaryExpression be = new BinaryExpression(caseExpression, e.getStart(), Operators.EQUALS);
+        return be.visit(this);
+        //TODO rework case conditions
     }
 }
