@@ -12,7 +12,7 @@ import java.util.Arrays;
 /**
  * Created by weigl on 24.11.16.
  */
-public class TypeConformityException extends Exception {
+public class TypeConformityException extends IECException {
     private final Any[] actual, expected;
     private final Expression expression;
 

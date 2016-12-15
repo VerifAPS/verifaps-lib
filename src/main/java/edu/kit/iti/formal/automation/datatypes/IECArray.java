@@ -34,4 +34,10 @@ public class IECArray extends Any {
     public String repr(Object obj) {
         return null;
     }
+
+
+    @Override
+    public <T> T accept(DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }

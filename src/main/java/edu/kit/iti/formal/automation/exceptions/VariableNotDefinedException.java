@@ -1,16 +1,16 @@
 package edu.kit.iti.formal.automation.exceptions;
 
-import edu.kit.iti.formal.automation.LocalScope;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
 
 /**
  * Created by weigl on 24.11.16.
  */
-public class VariableNotDefinedinScope extends Exception {
+public class VariableNotDefinedException extends IECException {
     private final SymbolicReference reference;
     private final LocalScope localScope;
 
-    public VariableNotDefinedinScope(LocalScope variableDeclarations, SymbolicReference reference) {
+    public VariableNotDefinedException(LocalScope variableDeclarations, SymbolicReference reference) {
         this.localScope = variableDeclarations;
         this.reference = reference;
     }

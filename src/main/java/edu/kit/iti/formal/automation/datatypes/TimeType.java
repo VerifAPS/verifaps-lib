@@ -20,6 +20,11 @@ public class TimeType extends Any {
         stb.add(time.getMillieseconds(), "ms");
         return stb.sb.toString();
     }
+
+    @Override
+    public <T> T accept(DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }
 
 class StringTimeBuilder {

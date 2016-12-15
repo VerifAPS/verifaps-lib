@@ -10,12 +10,23 @@ public abstract class IECString extends Any {
         public java.lang.String repr(Object obj) {
             return "WSTRING#\"" + obj + "\"";
         }
+
+
+        @Override
+        public <T> T accept(DataTypeVisitor<T> visitor) {
+            return visitor.visit(this);
+        }
     }
 
     public final static class String extends IECString {
         @Override
         public java.lang.String repr(Object obj) {
             return "WSTRING#'" + obj + "'";
+        }
+
+        @Override
+        public <T> T accept(DataTypeVisitor<T> visitor) {
+            return visitor.visit(this);
         }
     }
 

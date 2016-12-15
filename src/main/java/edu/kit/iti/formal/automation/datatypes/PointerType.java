@@ -20,4 +20,10 @@ public class PointerType extends Any {
     public String repr(Object obj) {
         return "n/a";
     }
+
+
+    @Override
+    public <T> T accept(DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }

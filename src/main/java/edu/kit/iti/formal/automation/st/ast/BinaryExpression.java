@@ -1,9 +1,9 @@
 package edu.kit.iti.formal.automation.st.ast;
 
-import edu.kit.iti.formal.automation.LocalScope;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
-import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedinScope;
+import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.operators.BinaryOperator;
 import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.visitors.Visitor;
@@ -59,7 +59,7 @@ public class BinaryExpression extends Expression {
     }
 
     @Override
-    public Any dataType(LocalScope localScope) throws VariableNotDefinedinScope, TypeConformityException {
+    public Any dataType(LocalScope localScope) throws VariableNotDefinedException, TypeConformityException {
         Any a = leftExpr.dataType(localScope);
         Any b = rightExpr.dataType(localScope);
         Any c = operator.getPromotedType(a, b);

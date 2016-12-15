@@ -5,7 +5,7 @@ public abstract class AnyInt extends AnyNum {
     public static final SInt SINT = new SInt();
     public static final USInt USINT = new USInt();
     public static final Int INT = new Int();
-    public static final AnyInt UINT = new UInt();
+    public static final UInt UINT = new UInt();
     public static final UDInt UDINT = new UDInt();
     public static final DInt DINT = new DInt();
     public static final ULInt ULINT = new ULInt();
@@ -125,5 +125,11 @@ public abstract class AnyInt extends AnyNum {
         int result = bitLength;
         result = 31 * result + (signed ? 1 : 0);
         return result;
+    }
+
+
+    @Override
+    public <T> T accept(DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

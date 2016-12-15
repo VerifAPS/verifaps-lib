@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.st;
 
-import edu.kit.iti.formal.automation.LocalScope;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.st.util.HTMLCodeWriter;
 import edu.kit.iti.formal.automation.datatypes.Any;

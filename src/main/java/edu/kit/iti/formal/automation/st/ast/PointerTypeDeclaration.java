@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.datatypes.PointerType;
 import edu.kit.iti.formal.automation.datatypes.values.PointerValue;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
@@ -11,9 +12,15 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  */
 public class PointerTypeDeclaration
         extends TypeDeclaration<ScalarValue<PointerType, PointerValue>> {
+    public PointerTypeDeclaration(String pt) {
+        setBaseTypeName(pt);
+    }
 
-    public PointerTypeDeclaration(String pointsTo) {
-
+    @Override
+    public PointerType getDataType(GlobalScope globalScope) {
+        PointerType pt = new PointerType(super.getDataType(globalScope));
+        baseType = pt;
+        return pt;
     }
 
     @Override

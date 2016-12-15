@@ -59,6 +59,11 @@ public class VariableDeclaration
         typeDeclaration = td;
     }
 
+    public VariableDeclaration(String name, int flags, Any dt) {
+        this(name, dt);
+        setType(flags);
+    }
+
     public String getName() {
         return name;
     }
@@ -149,23 +154,6 @@ public class VariableDeclaration
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        VariableDeclaration that = (VariableDeclaration) o;
-
-        if (!name.equals(that.name)) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return name.hashCode();
-    }
-
-    @Override
     public int compareTo(VariableDeclaration o) {
         return getName().compareTo(o.getName());
     }
@@ -185,5 +173,21 @@ public class VariableDeclaration
      */
     public void setTypeDeclaration(TypeDeclaration<?> typeDeclaration) {
         this.typeDeclaration = typeDeclaration;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        VariableDeclaration that = (VariableDeclaration) o;
+
+        return name.equals(that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
 }

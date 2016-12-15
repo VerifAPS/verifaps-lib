@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -8,6 +10,7 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
 public abstract class TypeDeclaration<T extends Initialization> extends Top {
     protected String typeName;
     protected String baseTypeName;
+    protected Any baseType;
     protected T initializationValue;
     private T initialization;
 
@@ -22,6 +25,7 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
         if (typeName == null) return baseTypeName;
         return typeName;
     }
+
 
     public void setTypeName(String typeName) {
         this.typeName = typeName;
@@ -48,4 +52,23 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
     public void setInitialization(T initialization) {
         this.initialization = initialization;
     }
+
+
+    public Any getBaseType() {
+        return baseType;
+    }
+
+    public void setBaseType(Any baseType) {
+        this.baseType = baseType;
+    }
+
+    public T getInitialization() {
+        return initialization;
+    }
+
+    public Any getDataType(GlobalScope globalScope) {
+        setBaseType(globalScope.resolveDataType(getBaseTypeName()));
+        return getBaseType();
+    }
+
 }

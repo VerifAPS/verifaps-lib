@@ -30,7 +30,8 @@ public class VariableBuilder {
 
     //region Handling of special flags (like constant, input or global)
     public VariableBuilder clear() {
-        return clear(0);
+        identifiers = null;
+        return this;
     }
 
     public VariableBuilder pop() {

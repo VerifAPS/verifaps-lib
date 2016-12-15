@@ -14,8 +14,12 @@ import java.util.regex.Pattern;
  * Created by weigl on 11.06.14.
  */
 public class ValueFactory {
-    public static ScalarValue<Int, Integer> makeInt(int value) {
-        return new ScalarValue<>(AnyInt.INT, value);
+    public static ScalarValue<Int, Long> makeInt(long value) {
+        return new ScalarValue<Int, Long>(AnyInt.INT, value);
+    }
+
+    public static ScalarValue<UInt, Long> makeUInt(long value) {
+        return new ScalarValue<UInt, Long>(AnyInt.UINT, value);
     }
 
     public static ScalarValue<SInt, Integer> makeSInt(int value) {

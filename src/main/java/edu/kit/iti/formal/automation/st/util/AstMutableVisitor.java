@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.st.util;
 
-import edu.kit.iti.formal.automation.LocalScope;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
@@ -294,8 +294,8 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
     }
 
     @Override
-    public Object visit(SubRangeDataType subRangeDataType) {
-        return subRangeDataType;
+    public Object visit(SubRangeTypeDeclaration subRangeTypeDeclaration) {
+        return subRangeTypeDeclaration;
     }
 
     @Override

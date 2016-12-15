@@ -12,6 +12,11 @@ public abstract class AnyDate extends Any {
             return String.format("DATE#%4d-%2d-%2d",
                     dt.getYear(), dt.getMonth(), dt.getDay());
         }
+
+        @Override
+        public <T> T accept(DataTypeVisitor<T> visitor) {
+            return visitor.visit(this);
+        }
     }
 
     public static class TimeOfDay extends AnyDate {
@@ -23,6 +28,10 @@ public abstract class AnyDate extends Any {
         }
 
 
+        @Override
+        public <T> T accept(DataTypeVisitor<T> visitor) {
+            return visitor.visit(this);
+        }
     }
 
     public static class DateAndTime extends AnyDate {
@@ -31,6 +40,11 @@ public abstract class AnyDate extends Any {
             DateAndTimeValue dt = (DateAndTimeValue) obj;
             return String.format("DT#%4d-%2d-%2d-%2d:%2d:%2d.%3d",
                     dt.getYear(), dt.getMonth(), dt.getDay(), dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMillieSeconds());
+        }
+
+        @Override
+        public <T> T accept(DataTypeVisitor<T> visitor) {
+            return visitor.visit(this);
         }
     }
 

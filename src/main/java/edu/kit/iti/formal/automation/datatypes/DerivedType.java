@@ -4,7 +4,7 @@ package edu.kit.iti.formal.automation.datatypes;
  * @author weigla
  * @date 25.06.2014
  */
-public class DerivedType extends Any {
+public abstract  class DerivedType extends Any {
     private Any derivedFrom;
     private String derivedFromName;
 

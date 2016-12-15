@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.automation.sfclang.ast;
 
-import edu.kit.iti.formal.automation.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.sfclang.SFCAstVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitor;

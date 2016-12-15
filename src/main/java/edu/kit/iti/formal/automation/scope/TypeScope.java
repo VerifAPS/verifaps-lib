@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.st.ast;
+package edu.kit.iti.formal.automation.scope;
 
 import edu.kit.iti.formal.automation.datatypes.*;
 
@@ -18,12 +18,12 @@ public class TypeScope extends TreeMap<String, Any> {
     private TypeScope() {
     }
 
-    public TypeScope empty() {
+    public static TypeScope empty() {
         return new TypeScope();
     }
 
 
-    public TypeScope builtin() {
+    public static TypeScope builtin() {
         TypeScope e = empty();
         e.register(SINT, INT, LINT, DINT);
         e.register(USINT, UINT, ULINT, UDINT);

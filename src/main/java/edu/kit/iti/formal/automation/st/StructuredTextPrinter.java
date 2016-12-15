@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.st;
 
-import edu.kit.iti.formal.automation.LocalScope;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.operators.Operator;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;

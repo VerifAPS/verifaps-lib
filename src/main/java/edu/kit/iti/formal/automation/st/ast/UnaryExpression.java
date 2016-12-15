@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.automation.st.ast;
 
 
-import edu.kit.iti.formal.automation.LocalScope;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
-import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedinScope;
+import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
@@ -38,7 +38,7 @@ public class UnaryExpression extends Expression {
     }
 
     @Override
-    public Any dataType(LocalScope localScope) throws VariableNotDefinedinScope, TypeConformityException {
+    public Any dataType(LocalScope localScope) throws VariableNotDefinedException, TypeConformityException {
         Any a = operator.getPromotedType(expression.dataType(localScope));
         if (a == null) {
             throw new TypeConformityException(this, operator.getExpectedDataTypes(), a);

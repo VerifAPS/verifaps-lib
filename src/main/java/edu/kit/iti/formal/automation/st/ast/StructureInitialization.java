@@ -1,14 +1,13 @@
 package edu.kit.iti.formal.automation.st.ast;
 
-import edu.kit.iti.formal.automation.LocalScope;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
-import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedinScope;
+import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by weigl on 13.06.14.
@@ -44,7 +43,7 @@ public class StructureInitialization extends Initialization {
     }
 
     @Override
-    public Any dataType(LocalScope localScope) throws VariableNotDefinedinScope, TypeConformityException {
+    public Any dataType(LocalScope localScope) throws VariableNotDefinedException, TypeConformityException {
         //TODO
         return null;
     }

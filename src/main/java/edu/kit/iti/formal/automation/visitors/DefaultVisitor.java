@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.visitors;
 
-import edu.kit.iti.formal.automation.LocalScope;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.st.ast.*;
@@ -11,7 +11,8 @@ import edu.kit.iti.formal.automation.st.ast.*;
 public class DefaultVisitor<T> implements Visitor<T> {
 
     public T defaultVisit(Visitable visitable) {
-        return visitable.visit(this);
+        //return visitable.visit(this);
+        return null;
     }
 
     @Override
@@ -177,8 +178,8 @@ public class DefaultVisitor<T> implements Visitor<T> {
     }
 
     @Override
-    public T visit(SubRangeDataType subRangeDataType) {
-        return defaultVisit(subRangeDataType);
+    public T visit(SubRangeTypeDeclaration subRangeTypeDeclaration) {
+        return defaultVisit(subRangeTypeDeclaration);
     }
 
     @Override

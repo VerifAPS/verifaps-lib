@@ -23,4 +23,6 @@ public abstract class Any {
     }
 
     public abstract String repr(Object obj);
+
+    public abstract <T> T accept(DataTypeVisitor<T> visitor);
 }

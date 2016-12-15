@@ -1,18 +1,14 @@
-package edu.kit.iti.formal.automation;
+package edu.kit.iti.formal.automation.scope;
 
-import edu.kit.iti.formal.automation.datatypes.AnyInt;
-import edu.kit.iti.formal.automation.datatypes.DataTypes;
-import edu.kit.iti.formal.automation.datatypes.IECString;
-import edu.kit.iti.formal.automation.datatypes.PointerType;
-import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedinScope;
+import edu.kit.iti.formal.automation.VariableScope;
+import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.Visitable;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import jdk.nashorn.internal.objects.Global;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Created by weigl on 13.06.14.
@@ -30,10 +26,11 @@ public class LocalScope implements Visitable, Iterable<VariableDeclaration> {
 
     /**
      * Deep copy of the local scope.
+     *
      * @param local
      */
     public LocalScope(LocalScope local) {
-        globalScope= local.globalScope;
+        globalScope = local.globalScope;
         for (Map.Entry<String, VariableDeclaration> e : local.localVariables.entrySet()) {
             localVariables.put(e.getKey(), new VariableDeclaration(e.getValue()));
         }
@@ -43,6 +40,7 @@ public class LocalScope implements Visitable, Iterable<VariableDeclaration> {
     public Map<String, VariableDeclaration> getLocalVariables() {
         return localVariables;
     }
+
     public void setLocalVariables(VariableScope localVariables) {
         this.localVariables = localVariables;
     }
@@ -97,10 +95,10 @@ public class LocalScope implements Visitable, Iterable<VariableDeclaration> {
     }
 
     public VariableDeclaration getVariable(SymbolicReference reference)
-            throws VariableNotDefinedinScope {
+            throws VariableNotDefinedException {
         if (localVariables.containsKey(reference.getIdentifier()))
             return localVariables.get(reference.getIdentifier());
-        throw new VariableNotDefinedinScope(this, reference);
+        throw new VariableNotDefinedException(this, reference);
     }
 
     public void setGlobalScope(GlobalScope globalScope) {
@@ -113,5 +111,13 @@ public class LocalScope implements Visitable, Iterable<VariableDeclaration> {
 
     public VariableBuilder builder() {
         return new VariableBuilder(localVariables);
+    }
+
+    public List<VariableDeclaration> filterByFlags(int flags) {
+        return localVariables.values().stream().filter((v) -> v.is(flags)).collect(Collectors.toList());
+    }
+
+    public VariableDeclaration getVariable(String s) {
+        return localVariables.get(s);
     }
 }

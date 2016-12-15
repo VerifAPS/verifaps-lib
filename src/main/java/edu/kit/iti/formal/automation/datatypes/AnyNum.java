@@ -15,4 +15,10 @@ public class AnyNum extends Any {
     public String toString() {
         return "ANY_NUM";
     }
+
+
+    @Override
+    public <T> T accept(DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }

@@ -27,6 +27,7 @@ public class RecordType extends Any {
         return null;
     }
 
+
     public class Field {
         private String name;
         private Any dataType;
@@ -60,5 +61,12 @@ public class RecordType extends Any {
         public void setDefValue(Object defValue) {
             this.defValue = defValue;
         }
+
+    }
+
+
+    @Override
+    public <T> T accept(DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

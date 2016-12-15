@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.st.ast;
 
-import edu.kit.iti.formal.automation.LocalScope;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.*;
@@ -13,13 +13,18 @@ import java.util.stream.Stream;
  * @date 04.07.2014
  */
 public class TopLevelElements extends Top implements List<TopLevelElement> {
-    private LocalScope commonScore = new LocalScope();
+    //private LocalScope commonScore = new LocalScope();
     private List<TopLevelElement> list = new ArrayList<>();
 
     public TopLevelElements() {
     }
 
+    public TopLevelElements(List<TopLevelElement> elements) {
+        list = new ArrayList<>(elements);
+    }
+
     public <T> T visit(Visitor<T> sev) {//empty
+        list.stream().forEach(a->a.visit(sev));
         return null;
     }
 

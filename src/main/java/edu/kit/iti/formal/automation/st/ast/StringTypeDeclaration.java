@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.IECString;
@@ -28,6 +30,12 @@ public class StringTypeDeclaration extends TypeDeclaration<ScalarValue<? extends
         this.size = size;
     }
 
+    @Override
+    public Any getDataType(GlobalScope globalScope) {
+        //TODO
+        setBaseType(IECString.STRING_16BIT);
+        return getBaseType();
+    }
 
     @Override
     public <S> S visit(Visitor<S> visitor) {

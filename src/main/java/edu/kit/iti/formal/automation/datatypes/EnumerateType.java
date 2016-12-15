@@ -1,13 +1,13 @@
 package edu.kit.iti.formal.automation.datatypes;
 
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by weigl on 10.06.14.
  */
 public class EnumerateType extends Any {
     private String name;
-    private String[] allowedValues;
+    private List<String> allowedValues;
     private String defValue;
     private int bitlength;
 
@@ -15,11 +15,11 @@ public class EnumerateType extends Any {
         //the unknown type
     }
 
-    public EnumerateType(String name, String[] allowedValues) {
-        this(name, allowedValues, allowedValues[0]);
+    public EnumerateType(String name, List<String> allowedValues) {
+        this(name, allowedValues, allowedValues.get(0));
     }
 
-    public EnumerateType(String name, String[] allowedValues, String defValue) {
+    public EnumerateType(String name, List<String> allowedValues, String defValue) {
         this.name = name;
         setAllowedValues(allowedValues);
         setDefValue(defValue);
@@ -37,14 +37,13 @@ public class EnumerateType extends Any {
         this.name = name;
     }
 
-    public String[] getAllowedValues() {
+    public List<String> getAllowedValues() {
         return allowedValues;
     }
 
-    public void setAllowedValues(String[] allowedValues) {
+    public void setAllowedValues(List<String> allowedValues) {
         this.allowedValues = allowedValues;
-        Arrays.sort(this.allowedValues);
-        bitlength = (int) Math.ceil(Math.log(allowedValues.length));
+        bitlength = (int) Math.ceil(Math.log(allowedValues.size()));
     }
 
     public String getDefValue() {
@@ -52,7 +51,7 @@ public class EnumerateType extends Any {
     }
 
     public void setDefValue(String defValue) {
-        assert Arrays.binarySearch(allowedValues, defValue) != -1;
+        assert allowedValues.contains(defValue);
         this.defValue = defValue;
     }
 
@@ -60,5 +59,11 @@ public class EnumerateType extends Any {
     public String repr(Object obj) {
         if (name == null) return String.valueOf(obj);
         else return name + "#" + obj;
+    }
+
+
+    @Override
+    public <T> T accept(DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

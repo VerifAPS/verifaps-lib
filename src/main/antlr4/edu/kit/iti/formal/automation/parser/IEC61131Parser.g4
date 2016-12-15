@@ -271,7 +271,8 @@ returns [ TypeDeclarations ast = new TypeDeclarations();  ]
 	(
 	    IDENTIFIER COLON type_declaration
 	    SEMICOLON
-		{$ast.add($type_declaration.ast);}
+		{$ast.add($type_declaration.ast);
+		 $type_declaration.ast.setTypeName($IDENTIFIER.getText()); }
 	)+ END_TYPE
 	{Utils.setPosition($ast,$TYPE,$END_TYPE);}
 ;
@@ -311,7 +312,7 @@ returns [ Initialization ast ]
 ;
 
 subrange_spec_init
-returns [SubRangeDataType ast = new SubRangeDataType()]
+returns [SubRangeTypeDeclaration ast = new SubRangeTypeDeclaration()]
 :
 	integer_type_name LPAREN subrange RPAREN
 	{ $ast.setBaseTypeName($integer_type_name.text);
@@ -333,14 +334,21 @@ enumerated_specification
 returns [ EnumerationTypeDeclaration  ast = new EnumerationTypeDeclaration()]
 :
 	(
-		LPAREN names += IDENTIFIER
-		(
-			COMMA names += IDENTIFIER
-		)* RPAREN
+		LPAREN
+		    a=IDENTIFIER
+            {$ast.addValue($a.text);}
+		    ( ASSIGN integer
+		      {$ast.setInt($integer.ast);}
+		    )?
+
+			( COMMA names+=IDENTIFIER
+    		  ( ASSIGN integer
+    		    {$ast.setInt($integer.ast);}
+    		  )?
+		    )*
+		RPAREN
 	)
-	{ for(Token tok : $names)
-        $ast.addValue(tok.getText());
-      Utils.setPosition($ast, $LPAREN, $RPAREN); }
+	{ Utils.setPosition($ast, $LPAREN, $RPAREN); }
 
 	| IDENTIFIER { $ast.setBaseTypeName($IDENTIFIER.text);
           Utils.setPosition($ast, $IDENTIFIER); }
@@ -452,21 +460,25 @@ returns [ FunctionDeclaration ast = new FunctionDeclaration() ]
       {$ast.setReturnTypeName($IDENTIFIER.text);})
 	var_decls[$ast.getLocalScope().builder()]
 	body = statement_list END_FUNCTION
-	{ $ast.setFunctionName($name.text); }
+	{ Utils.setPosition($ast, $FUNCTION, $END_FUNCTION);
+	  $ast.setFunctionName($name.text);
+	  $ast.setStatements($body.ast); }
 ;
 
 var_decls [VariableBuilder gather]
 :
     ( { gather.clear(); }
       variable_keyword[gather]
-      identifier_list
-        {gather.identifiers($identifier_list.ast);}
-      COLON
-      td=type_declaration
-      SEMICOLON
-      { gather.setPosition($variable_keyword.ctx, $SEMICOLON);
-        gather.type($td.ast);
-        gather.close(); }
+      (
+        identifier_list {gather.identifiers($identifier_list.ast);}
+        COLON
+        td=type_declaration
+        SEMICOLON
+        { gather.setPosition($variable_keyword.ctx, $SEMICOLON);
+                gather.type($td.ast);
+                gather.close(); }
+      )*
+      END_VAR
     )*
 ;
 
@@ -479,10 +491,8 @@ variable_keyword[VariableBuilder v]
 	| VAR_EXTERNAL  { v.clear(VariableDeclaration.EXTERNAL);}
 	| VAR_GLOBAL {v.push(INOUT);}
 	)
-	( CONSTANT
-		{v.mix(VariableDeclaration.CONSTANT);}
-	| RETAIN
-        {v.mix(VariableDeclaration.RETAIN);}
+	( CONSTANT   {v.mix(VariableDeclaration.CONSTANT);}
+	| RETAIN     {v.mix(VariableDeclaration.RETAIN);}
     | NON_RETAIN
     )?
 ;

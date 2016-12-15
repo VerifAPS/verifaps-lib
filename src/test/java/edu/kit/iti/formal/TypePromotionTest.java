@@ -8,12 +8,14 @@ import static edu.kit.iti.formal.automation.datatypes.AnyInt.*;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.datatypes.promotion.IntegerPromotion;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
-import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedinScope;
+import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.st.STUtil;
-import edu.kit.iti.formal.automation.LocalScope;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 /**
  * Created by weigl on 15.11.16.
@@ -23,7 +25,7 @@ public class TypePromotionTest {
 
 
     LocalScope vd = new LocalScope();
-    EnumerateType et = new EnumerateType("states", new String[]{"X", "Y", "Z"});
+    EnumerateType et = new EnumerateType("states", Arrays.asList("X", "Y", "Z"));
 
     @Before
     public void setup() {
@@ -107,7 +109,7 @@ public class TypePromotionTest {
     }
 
     @Test
-    public void basicOperators() throws VariableNotDefinedinScope, TypeConformityException {
+    public void basicOperators() throws VariableNotDefinedException, TypeConformityException {
         assertDataType(INT, "-SINT#2 + UINT#2", null);
         assertDataType(LINT, "-SINT#2 - LINT#2", null);
         assertDataType(SINT, "-SINT#2", null);
@@ -122,21 +124,21 @@ public class TypePromotionTest {
     }
 
     @Test
-    public void functions() throws VariableNotDefinedinScope, TypeConformityException {
+    public void functions() throws VariableNotDefinedException, TypeConformityException {
         assertDataType(INT, "MAX(2,3)", null);
     }
 
-    private void assertDataType(Any dt, String sexpr, LocalScope vd) throws VariableNotDefinedinScope, TypeConformityException {
+    private void assertDataType(Any dt, String sexpr, LocalScope vd) throws VariableNotDefinedException, TypeConformityException {
         assertEquals(dt, STUtil.expr(sexpr).dataType(vd));
     }
 
-    @Test(expected = VariableNotDefinedinScope.class)
-    public void testVariableNotDefined() throws VariableNotDefinedinScope, TypeConformityException {
+    @Test(expected = VariableNotDefinedException.class)
+    public void testVariableNotDefined() throws VariableNotDefinedException, TypeConformityException {
         assertDataType(AnyReal.LREAL, "LLLL", vd);
     }
 
     @Test(expected = TypeConformityException.class)
-    public void typeMismatch() throws VariableNotDefinedinScope, TypeConformityException {
+    public void typeMismatch() throws VariableNotDefinedException, TypeConformityException {
         assertDataType(AnyReal.LREAL, "TRUE + 2", vd);
     }
 

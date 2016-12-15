@@ -7,6 +7,6 @@ public final class Int extends AnySignedInt {
     }
 
     public Int() {
-        super(16, false);
+        super(16, true);
     }
 }

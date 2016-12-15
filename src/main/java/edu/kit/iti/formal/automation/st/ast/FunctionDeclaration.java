@@ -7,10 +7,10 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * Created by weigl on 13.06.14.
  */
 public class FunctionDeclaration extends TopLevelScopeElement {
-    private String functionName;
-    private String returnTypeName;
-    private Any returnType;
-    private StatementList statements = new StatementList();
+    protected String functionName;
+    protected String returnTypeName;
+    protected Any returnType;
+    protected StatementList statements = new StatementList();
 
     public String getFunctionName() {
         return functionName;
@@ -44,5 +44,13 @@ public class FunctionDeclaration extends TopLevelScopeElement {
     @Override
     public String getBlockName() {
         return getFunctionName();
+    }
+
+    public void setReturnType(Any returnType) {
+        this.returnType = returnType;
+    }
+
+    public Any getReturnType() {
+        return returnType;
     }
 }

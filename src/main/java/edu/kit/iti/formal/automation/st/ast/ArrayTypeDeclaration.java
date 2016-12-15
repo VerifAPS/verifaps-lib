@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.DataTypes;
 import edu.kit.iti.formal.automation.visitors.Visitor;
@@ -23,9 +24,12 @@ public class ArrayTypeDeclaration extends TypeDeclaration<ArrayInitialization> {
         ranges.add(ast);
     }
 
-    public Any asDataType() {
+    @Override
+    public Any getDataType(GlobalScope globalScope) {
+        super.getDataType(globalScope);
         Any dt = DataTypes.getDataType(getBaseTypeName());
-        IECArray array = new IECArray(getTypeName(), dt, ranges);
+        IECArray array = new IECArray(getTypeName(), getBaseType(), ranges);
+        setBaseType(dt);
         return array;
     }
 }

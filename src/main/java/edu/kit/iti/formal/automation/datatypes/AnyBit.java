@@ -23,6 +23,13 @@ public abstract class AnyBit extends Any {
         return bitLength;
     }
 
+
+
+    @Override
+    public <T> T accept(DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
     @Override
     public String repr(Object obj) {
         if (obj instanceof Bits) {

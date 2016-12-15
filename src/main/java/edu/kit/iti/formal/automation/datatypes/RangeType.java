@@ -40,4 +40,10 @@ public class RangeType extends Any {
     public String repr(Object obj) {
         return base.repr(obj);
     }
+
+
+    @Override
+    public <T> T accept(DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }

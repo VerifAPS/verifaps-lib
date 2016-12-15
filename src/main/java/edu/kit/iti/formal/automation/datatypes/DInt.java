@@ -7,6 +7,6 @@ public final class DInt extends AnySignedInt {
     }
 
     public DInt() {
-        super(32, false);
+        super(32, true);
     }
 }
