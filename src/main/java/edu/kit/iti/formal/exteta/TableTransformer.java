@@ -1,148 +1,223 @@
 package edu.kit.iti.formal.exteta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.xml.bind.JAXBElement;
-
-
-import static edu.kit.iti.formal.smv.BExpressionBuilder.*;
-import edu.kit.formal.exteta.schema.DataTypeType;
-import edu.kit.formal.exteta.schema.ExtendedTestTableType;
-import edu.kit.formal.exteta.schema.VariableType;
-import edu.kit.formal.exteta.schema.VariablesType;
-import edu.kit.iti.formal.smv.ast.DataType;
-import edu.kit.iti.formal.smv.ast.Expression;
-import edu.kit.iti.formal.smv.ast.GroundDataType;
-import edu.kit.iti.formal.smv.ast.Literal;
-import edu.kit.iti.formal.smv.ast.Module;
-import edu.kit.iti.formal.smv.ast.Variable;
-import edu.kit.iti.formal.smv.model.State;
-import edu.kit.iti.formal.smv.model.TStateSystem;
-import edu.kit.iti.formal.smv.model.Transition;
+import edu.kit.iti.formal.exteta.io.IOFacade;
+import edu.kit.iti.formal.exteta.io.Report;
+import edu.kit.iti.formal.exteta.model.Duration;
+import edu.kit.iti.formal.exteta.model.GeneralizedTestTable;
+import edu.kit.iti.formal.exteta.model.State;
+import edu.kit.iti.formal.exteta.model.TableModule;
+import edu.kit.iti.formal.exteta.schema.ConstraintVariable;
+import edu.kit.iti.formal.smv.SMVFacade;
+import edu.kit.iti.formal.smv.ast.*;
 
 public class TableTransformer {
+    private final StateReachability reachability;
+    private GeneralizedTestTable gtt;
+    private TableModule mt = new TableModule();
+    private SVariable errorState = new SVariable("ERROR", SMVType.BOOLEAN);
 
-	private ExtendedTestTableType table;
+//    private List<Transformation> transformations = new LinkedList<>();
 
-	private Module module = new Module();
+    public TableTransformer(GeneralizedTestTable table) {
+        this.gtt = table;
+        reachability = new StateReachability(table);
+    }
 
-	public TableTransformer(ExtendedTestTableType table) {
-		this.table = table;
-	}
+    public SMVModule transform() {
+        transformName();
+        moduleParameters();
+        addConstraintVariables();
+        createStates();
+        addInvarSpec();
 
-	public Module transform() {
-		TStateSystem tss = new TStateSystem();
-		tss.name = "table";
+        return mt;
+    }
 
-		List<VariableType> vt = table.getVariables().getVariable();
-		List<Variable> v = vt.stream().map(TableTransformer::toVar).collect(Collectors.toList());
-		tss.statevars.addAll(v);
+    private void transformName() {
+        if (mt.getName() == null || mt.getName().isEmpty()) {
+            Report.fatal("No table name given.");
+        }
 
-		List<State> lines = new ArrayList<>();
-		int lineno = 0;
+        mt.setName(gtt.getName());
+    }
 
-		for (TimeFrameType tf : table.getTimeFrames().getTimeFrame()) {
-			State s = new State();
-			s.id = "" + lineno;
-			lineno++;
-			s.assignments = buildAssignments(tf.getConstOrCaptureOrExpr(), v);
-			lines.add(s);
-		}
+    private void moduleParameters() {
+        for (String cv : gtt.getIoVariables().keySet()) {
+            SVariable var = gtt.getSMVVariable(cv);
+            mt.getModuleParameter().add(var);
+        }
+    }
 
-		State sfinal = new State("final");
+    private void addConstraintVariables() {
+        for (ConstraintVariable cv : gtt.getConstraintVariable().values()) {
+            SVariable var = gtt.getSMVVariable(cv.getName());
+            mt.getFrozenVars().add(var);
+            mt.getInit().add(IOFacade.parseCellExpression(cv.getConstraint(), var, gtt));
+            //TODO add invar for each frozenvar
+        }
+    }
 
-		for (int i = 0; i < lines.size(); i++) {
-			TimeEntry te = parse(table.getTimeFrames().getTimeFrame().get(i).getTimeEntry());
-			State c = lines.get(i);
-			State n = i < lines.size() - 1 ? lines.get(i + 1) : sfinal;
+    private void createStates() {
+        for (State s : gtt.getRegion().getStates()) {
+            introduceState(s);
+        }
 
-			if (te.oneStep()) {
-				c.next.add(new Transition().from(c).to(n).on(Literal.TRUE));
+        addInitState();
 
-			}
-		}
+        for (State s : reachability.getStates()) {
+            addState(s);
+        }
 
-		tss.init = lines.get(0);
+        errorState();
+    }
 
-		return tss.asModule();
-	}
+    private void introduceState(State s) {
+        Duration d = s.getDuration();
+        mt.getStateVars().add(s.getSMVVariable());
 
-	class TimeEntry {
-		int start, stop;
+        SMVExpr clockVariableKeep;
+        SMVExpr clockVariableFwd;
+        if (d.isOneStep()) { // [1,1]
+            clockVariableFwd = SLiteral.TRUE;
+            clockVariableKeep = SLiteral.FALSE;
+        } else if (d.isUnbounded()) {
+            clockVariableFwd = SLiteral.TRUE;
+            clockVariableKeep = SLiteral.TRUE;
+        } else {
+            //excluded 1, [0,*]
+            //possible [n,m], [0,m], [n,*]
+            SVariable clock = introduceClock(s);
 
-		public boolean oneStep() {
-			return start == 1 && stop == 1;
-		}
+            if (d.lower <= 0) {
+                clockVariableFwd = SLiteral.TRUE;
+            } else {
+                clockVariableFwd = new SBinaryExpression(clock,
+                        SBinaryOperator.GREATER_EQUAL,
+                        new SLiteral(clock.getSMVType(), d.lower));
+            }
 
-		public boolean fixedStep() {
-			return start == stop;
-		}
+            if (d.upper == -1) {
+                clockVariableKeep = SLiteral.TRUE;
+            } else {
+                clockVariableKeep = new SBinaryExpression(clock,
+                        SBinaryOperator.LESS_THAN,
+                        new SLiteral(clock.getSMVType(), d.upper));
+            }
+        }
 
-		public boolean finiteInterval() {
-			return stop != -1;
-		}
-	}
+        // define output predicate
+        mt.getDefinitions().put(s.getDefOutput(),
+                SMVFacade.combine(SBinaryOperator.AND, s.getOutputExpr()));
 
-	private TimeEntry parse(String timeEntry) {
-		TimeEntry te = new TimeEntry();
-		if (timeEntry.matches("\\d+")) {
-			int i = Integer.parseInt(timeEntry);
-			te.start = te.stop = i;
-		} else {
-			// String[] q = timeEntry.replace('[', ' ').replace(']', '
-			// ').split(' ');
-			throw new IllegalArgumentException("TODO");
-			// TODO
-		}
-		return te;
-	}
+        // define input predicate
+        mt.getDefinitions().put(s.getDefInput(),
+                SMVFacade.combine(SBinaryOperator.AND, s.getInputExpr()));
 
-	private Map<Variable, Expression> buildAssignments(List<JAXBElement<String>> list, List<Variable> vars) {
-		Map<Variable, Expression> map = new HashMap<>();
-		for (int i = 0; i < vars.size(); i++) {
-			Variable v = vars.get(i);
-			JAXBElement<String> e = list.get(i);
+        // define input predicate
+        mt.getDefinitions().put(s.getDefKeep(),
+                SMVFacade.combine(SBinaryOperator.AND,
+                        s.getDefInput(), s.getDefOutput(), clockVariableKeep));
 
-			switch (e.getName().getLocalPart()) {
-			case "const":
-				map.put(v, expr(v).equal().to(v.getDataType().valueOf(e.getValue())).get());
-				break;
-			default:
-				throw new IllegalArgumentException();
-				/*
-				 * case "dontcare": break; case "expr": break; case "rel":
-				 * break; case "capture": break;
-				 */
-			}
-		}
+        // define input predicate
+        mt.getDefinitions().put(s.getDefForward(),
+                SMVFacade.combine(SBinaryOperator.AND,
+                        s.getDefInput(), s.getDefOutput(), clockVariableFwd));
+    }
 
-		return map;
-	}
+    private SVariable introduceClock(State s) {
+        int max = s.getDuration().maxCounterValue();
+        int bits = (int) Math.ceil(Math.log(1 + max)/Math.log(2));
+        SMVType.SMVTypeWithWidth dt = new SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, bits);
 
-	public static Variable toVar(VariableType v) {
-		DataType dt = convert(v.getDataType());
-		return new Variable(v.getName(), dt);
-	}
+        // clock variable
+        SVariable clockModule = new SVariable("clock" + s.getId(), dt);
 
-	private static DataType convert(DataTypeType dataType) {
-		switch (dataType) {
-		case BOOLEAN:
-			return DataType.BOOLEAN;
-		case BYTE:
-			return DataType.unsigned(8);
-		case INT:
-			return DataType.signed(16);
-		case SINT:
-			return DataType.signed(8);
-		case WORD:
-			return DataType.unsigned(16);
+        // definitions
+        SVariable reset = new SVariable("clock" + s.getId() + "_rs", dt);
+        SVariable inc = new SVariable("clock" + s.getId() + "_tic", dt);
+        SVariable limit = new SVariable("clock" + s.getId() + "_limit", dt);
 
-		}
-		return null;
-	}
+        mt.getDefinitions().put(reset, SMVFacade.NOT(s.getDefKeep()));
+        mt.getDefinitions().put(inc, s.getDefKeep());
+        mt.getDefinitions().put(limit, // c > 0dX_MAX
+                new SBinaryExpression(clockModule,
+                        SBinaryOperator.GREATER_THAN,
+                        new SLiteral(dt, max)));
 
+        // clock assignments
+        SAssignment init = new SAssignment(clockModule, new SLiteral(dt, 0));
+        SAssignment next = new SAssignment(clockModule, SMVFacade.caseexpr(
+                reset, new SLiteral(dt, 0),
+                SMVFacade.combine(SBinaryOperator.AND, inc, limit), clockModule,
+                inc, new SBinaryExpression(clockModule, SBinaryOperator.PLUS,
+                        new SLiteral(dt, 1)),
+                SMVFacade.next(s.getSMVVariable()), new SLiteral(dt, 1)
+        ));
+
+        mt.getStateVars().add(clockModule);
+        mt.getInitAssignments().add(init);
+        mt.getNextAssignments().add(next);
+
+        return clockModule;
+    }
+
+    private void addState(State inc) {
+        // I get actived if one of my outgoing is valid
+        SMVExpr or = reachability.getOutgoing(inc)
+                .map(State::getDefForward)
+                .map(fwd -> (SMVExpr) fwd)
+                .reduce(SMVFacade.reducer(SBinaryOperator.OR))
+                .orElseGet(() -> SLiteral.FALSE);
+
+        SAssignment assignment = new SAssignment(inc.getSMVVariable(),
+                SMVFacade.combine(SBinaryOperator.OR,
+                        or, inc.getDefKeep()));
+        mt.getNextAssignments().add(assignment);
+    }
+
+    private void errorState() {
+        // new error state
+        mt.getStateVars().add(errorState);
+
+        // disable in the beginning
+        mt.getInit().add(SMVFacade.NOT(errorState));
+
+        SMVExpr e = reachability.getStates().stream()
+                .map(s ->
+                        // s_i & I_i & !O_i
+                        SMVFacade.combine(SBinaryOperator.AND,
+                                s.getSMVVariable(),
+                                s.getDefInput(),
+                                SMVFacade.NOT(s.getDefOutput())))
+                .reduce(SMVFacade.reducer(SBinaryOperator.OR))
+                .get();
+
+        SAssignment a = new SAssignment(errorState, e);
+        mt.getNextAssignments().add(a);
+    }
+
+    private void addInitState() {
+        for (State s : reachability.getStates()) {
+            mt.getInit().add(
+                    !reachability.isInitialReachable(s)
+                            ? SMVFacade.NOT(s.getSMVVariable())
+                            : s.getSMVVariable());
+        }
+    }
+
+
+    private void addInvarSpec() {
+        SMVExpr states = reachability.getStates().stream()
+                .map(State::getSMVVariable)
+                .map(v -> (SMVExpr) v)
+                .reduce(SMVFacade.reducer(SBinaryOperator.OR))
+                .get();
+
+        // ! ( \/ states) -> !error
+        SMVExpr invar = SMVFacade.combine(SBinaryOperator.IMPL,
+                errorState,
+                states);
+
+        mt.getInvarSpec().add(invar);
+    }
 }

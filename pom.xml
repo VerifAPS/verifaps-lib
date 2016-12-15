@@ -1,83 +1,111 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>edu.kit.iti.formal</groupId>
-	<artifactId>exteta</artifactId>
-	<version>1.0-SNAPSHOT</version>
-	<name>exteta</name>
-	<url>http://maven.apache.org</url>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>edu.kit.iti.formal</groupId>
+    <artifactId>exteta</artifactId>
+    <version>0.1</version>
+    <name>exteta</name>
+    <url>http://maven.apache.org</url>
 
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.0</version>
-			<scope>test</scope>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>commons-cli</groupId>
-			<artifactId>commons-cli</artifactId>
-			<version>1.3.1</version>
-		</dependency>
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.3.1</version>
+        </dependency>
 
-		<dependency>
-			<groupId>edu.kit.iti</groupId>
-			<artifactId>iec61131lang</artifactId>
-			<version>0.1.1</version>
-		</dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>LATEST</version>
+        </dependency>
 
-		<dependency>
-			<groupId>edu.kit.iti.formal</groupId>
-			<artifactId>smvtools</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>edu.kit.iti</groupId>
+            <artifactId>iec61131lang</artifactId>
+            <version>0.1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>edu.kit.iti.formal</groupId>
+            <artifactId>iec2smv</artifactId>
+            <version>LATEST</version>
+        </dependency>
+
+        <dependency>
+            <groupId>edu.kit.iti.formal</groupId>
+            <artifactId>smvtools</artifactId>
+            <version>LATEST</version>
+        </dependency>
+    </dependencies>
 
 
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<configuration>
-						<source>1.8</source>
-						<target>1.8</target>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                </plugin>
 
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jaxb2-maven-plugin</artifactId>
-				<version>2.3</version>
-				<executions>
-					<execution>
-						<id>xjc</id>
-						<goals>
-							<goal>xjc</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<packageName>edu.kit.formal.exteta.schema</packageName>
-					<sources>
-						<source>src/xsd/</source>
-					</sources>
-				</configuration>
-			</plugin>
-			
-			            <plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>3.0.4</version>
+                </plugin>
+
+            </plugins>
+
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>xjc-exteta</id>
+                        <goals><goal>xjc</goal></goals>
+                        <configuration>
+                            <packageName>edu.kit.iti.formal.exteta.schema</packageName>
+                            <sources><source>src/main/xsd/exteta-1.0.xsd</source></sources>
+                            <clearOutputDir>false</clearOutputDir>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>xjc-report</id>
+                        <goals><goal>xjc</goal></goals>
+                        <configuration>
+                            <packageName>edu.kit.iti.formal.exteta.report</packageName>
+                            <sources><source>src/main/xsd/report.xsd</source></sources>
+                            <clearOutputDir>false</clearOutputDir>
+                        </configuration>
+                    </execution>
+                </executions>
+
+
+            </plugin>
+
+            <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>4.5.1-1</version>
 
                 <configuration>
-                    <visitor>false</visitor>
-                    <listener>false</listener>
+                    <visitor>true</visitor>
+                    <listener>true</listener>
                     <libDirectory>src/main/antlr4/edu/kit/iti/formal/exteta/grammar</libDirectory>
                 </configuration>
 
@@ -90,7 +118,17 @@
                     </execution>
                 </executions>
             </plugin>
-			
-		</plugins>
-	</build>
+
+        </plugins>
+    </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>3.0.4</version>
+            </plugin>
+        </plugins>
+    </reporting>
+
 </project>
