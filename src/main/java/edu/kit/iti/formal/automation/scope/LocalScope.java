@@ -11,7 +11,9 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * Created by weigl on 13.06.14.
+ *
+ * @author Alexander Weigl
+ * @version 1 (13.06.14)
  */
 public class LocalScope implements Visitable, Iterable<VariableDeclaration> {
     private VariableScope localVariables = new VariableScope();

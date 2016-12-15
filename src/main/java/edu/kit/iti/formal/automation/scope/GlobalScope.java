@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.scope;
 
-import edu.kit.iti.formal.automation.DataTypeNotDefinedException;
+import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
 import edu.kit.iti.formal.automation.st.ast.*;

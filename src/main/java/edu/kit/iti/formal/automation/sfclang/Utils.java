@@ -26,6 +26,10 @@ public class Utils {
         top.setEndPosition(last.getEndPosition());
     }
 
+    public static void setPosition(Top top, ParserRuleContext ctx) {
+        setPosition(top, ctx.getStart());
+        setLastPosition(top, ctx.getStop());
+    }
 
     public static void setPosition(Top top, Token first, Token last) {
         setPosition(top, first);
@@ -38,6 +42,7 @@ public class Utils {
     }
 
     public static void setLastPosition(Top ast, Token tok) {
+        if (tok == null) return;
         ast.setEndPosition(new Top.Position(tok.getLine(), tok.getCharPositionInLine()));
     }
 

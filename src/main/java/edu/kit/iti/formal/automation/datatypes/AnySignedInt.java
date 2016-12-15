@@ -1,13 +1,10 @@
 package edu.kit.iti.formal.automation.datatypes;
 
 public class AnySignedInt extends AnyInt {
-    public AnySignedInt(int bitLength, boolean signed) {
-        super(bitLength, signed);
+    public AnySignedInt(int bits) {
+        super(bits, true);
     }
 
-    public AnySignedInt(int bits) {
-        super(bits);
-    }
 
     @Override
     public AnyInt asSigned() {

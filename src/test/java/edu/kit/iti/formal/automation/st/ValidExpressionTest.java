@@ -46,7 +46,7 @@ public class ValidExpressionTest {
 
         try {
             Expression e = parser.expression().ast;
-            //System.out.println(e);
+            System.out.println(e);
         } catch (Exception e) {
             e.printStackTrace();
             return false;

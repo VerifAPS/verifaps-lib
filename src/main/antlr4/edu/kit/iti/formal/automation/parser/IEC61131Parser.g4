@@ -7,14 +7,14 @@ options {
 @header {
 import java.util.*;
 import edu.kit.iti.formal.automation.sfclang.ast.*;
-import edu.kit.iti.formal.automation.sfclang.Utils;
+import static edu.kit.iti.formal.automation.sfclang.Utils.*;
+import   edu.kit.iti.formal.automation.sfclang.Utils;
 import edu.kit.iti.formal.automation.*;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.operators.*;
 import edu.kit.iti.formal.automation.datatypes.values.*;
 import static edu.kit.iti.formal.automation.st.ast.VariableDeclaration.*;
-
 }
 
 @members {
@@ -872,7 +872,7 @@ returns [ AssignmentStatement ast ]
 	a=variable ASSIGN expression SEMICOLON
 	{
         $ast = new AssignmentStatement($a.ast, $expression.ast);
-        //$ast.line($ASSIGN);
+        setPosition($ast, $ctx);
     }
 
 ;
@@ -891,20 +891,21 @@ returns [ Reference ast]
 symbolic_variable
 returns [ SymbolicReference ast = new SymbolicReference() ]
 :
+    //x^[a,252]
 	IDENTIFIER
 	(REF       { $ast.derefVar(); })?
 	(
 		subscript_list
 		{$ast.setSubscripts($subscript_list.ast);}
-
+        (REF       { $ast.derefSubscript(); })?
 	)?
-	(REF       { $ast.derefSubscript(); })?
 	(
-		DOT other = symbolic_variable
+		DOT other=symbolic_variable
 	)?
 	{ $ast.setIdentifier($IDENTIFIER.text);
-       $ast.setSub(
-        $DOT.text != null ? $other.ast : null);}
+      $ast.setSub($DOT.text != null ? $other.ast : null);
+      setPosition($ast, $ctx);
+    }
 
 ;
 

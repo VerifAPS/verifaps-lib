@@ -115,8 +115,8 @@ public abstract class AnyInt extends AnyNum {
 
         AnyInt anyInt = (AnyInt) o;
 
-        if (bitLength != anyInt.bitLength) return false;
-        return signed == anyInt.signed;
+        if (getBitLength() != anyInt.getBitLength()) return false;
+        return isSigned() == anyInt.isSigned();
 
     }
 

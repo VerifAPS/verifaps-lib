@@ -22,7 +22,10 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
     @Override
     public Object defaultVisit(Visitable visitable) {
         System.out.println("AstTransform.defaultVisit");
-        System.err.println(("maybe not fully and right supported " + visitable.getClass()));
+        System.err.println(("maybe not fully and right supported "
+                + visitable.getClass()
+                + " from implementation "
+                + getClass()));
         return visitable;
     }
 

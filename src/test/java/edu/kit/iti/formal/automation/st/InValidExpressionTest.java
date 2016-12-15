@@ -14,7 +14,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by weigl on 02.08.16.
+ * @author Alexander Weigl
+ * @version 1 (02.08.16)
  */
 @RunWith(Parameterized.class)
 public class InValidExpressionTest {

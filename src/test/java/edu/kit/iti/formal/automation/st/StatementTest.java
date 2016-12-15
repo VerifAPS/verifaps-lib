@@ -35,7 +35,6 @@ public class StatementTest {
 
     @Test
     public void testParser() throws IOException {
-        System.err.println("Test:" + testFile);
         IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRFileStream(testFile));
         IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
         parser.statement_list();

@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation;
+package edu.kit.iti.formal.automation.exceptions;
 
 /**
  * Created by weigl on 25.11.16.

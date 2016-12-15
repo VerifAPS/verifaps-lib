@@ -7,6 +7,6 @@ public final class LInt extends AnySignedInt {
     }
 
     public LInt() {
-        super(64, true);
+        super(64);
     }
 }

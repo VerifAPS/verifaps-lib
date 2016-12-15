@@ -93,7 +93,7 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(VariableDeclaration variableDeclaration) {
-        if (!registerPhase) {//every data type is registered
+        if (!registerPhase) { //every data type is registered
             variableDeclaration.setDataType(
                     variableDeclaration.getTypeDeclaration().getDataType(scope));
         }

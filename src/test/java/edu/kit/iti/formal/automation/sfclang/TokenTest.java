@@ -13,7 +13,7 @@ public class TokenTest {
         IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream("SFC"));
         for (Token t:
              lexer.getAllTokens()) {
-            System.out.println(t.getType());
+            //System.out.println(t.getType());
         }
     }
 }

@@ -2,7 +2,10 @@ package edu.kit.iti.formal.automation;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by weigl on 14.11.16.
@@ -27,9 +30,14 @@ public class TestUtils {
             validExpression.add(new Object[]{tmp});
         }
 
-        System.out.println("Found: " + filename + " with " + validExpression.size() +" lines!");
+        System.out.println("Found: " + filename + " with " + validExpression.size() + " lines!");
 
         return validExpression;
     }
 
+    public static Collection<Object[]> asParameters(String[] cases) {
+        return Arrays.stream(cases)
+                .map(s -> new Object[]{s})
+                .collect(Collectors.toList());
+    }
 }

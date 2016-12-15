@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class FunctionResolverMUX implements FunctionResolver {
     @Override
     public FunctionDeclaration resolve(FunctionCall call, LocalScope scope) {
-        if (call.getFunctionName().equals("MUX")) {
+        if ("MUX".equals(call.getFunctionName())) {
 
             List<Any> datatypes = call.getParameters().stream().map((expr) -> {
                 try {
