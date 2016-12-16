@@ -304,11 +304,13 @@ initializations
 returns [ Initialization ast ]
 :
     constant
-    {$ast = $constant.ast;}
+      {$ast = $constant.ast;}
+    | IDENTIFIER
+      {$ast = new IdentifierInitializer($IDENTIFIER.text);}
     | array_initialization
-    {$ast = $array_initialization.ast;}
+      {$ast = $array_initialization.ast;}
     | structure_initialization
-    {$ast = $structure_initialization.ast;}
+      {$ast = $structure_initialization.ast;}
 ;
 
 subrange_spec_init

@@ -95,4 +95,6 @@ public interface Visitor<T> {
     T visit(SymbolicReference symbolicReference);
 
     T visit(PointerTypeDeclaration ptd);
+
+    T visit(IdentifierInitializer init);
 }

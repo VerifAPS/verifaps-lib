@@ -58,6 +58,7 @@ public class Utils {
     }
 
     public static void setLastPosition(Top ast, Top ast2) {
+        if(ast2==null || ast == null) return;
         ast.setEndPosition(ast2.getEndPosition());
     }
 

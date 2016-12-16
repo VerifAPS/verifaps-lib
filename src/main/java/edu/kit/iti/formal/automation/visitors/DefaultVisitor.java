@@ -221,4 +221,9 @@ public class DefaultVisitor<T> implements Visitor<T> {
     public T visit(PointerTypeDeclaration ptd) {
         return defaultVisit(ptd);
     }
+
+    @Override
+    public T visit(IdentifierInitializer init) {
+        return defaultVisit(init);
+    }
 }
