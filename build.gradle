@@ -7,8 +7,7 @@
  * user guide available at https://docs.gradle.org/3.1/userguide/tutorial_java_projects.html
  */
 
-apply plugin: 'application'
-mainClassName = "sample.Main"
+apply plugin: 'java'
 
 // In this section you declare where to find the dependencies of your project
 repositories {
