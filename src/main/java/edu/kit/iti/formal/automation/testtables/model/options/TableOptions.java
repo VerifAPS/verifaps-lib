@@ -22,8 +22,6 @@ package edu.kit.iti.formal.automation.testtables.model.options;
  * #L%
  */
 
-import java.util.HashMap;
-
 /**
  * Created by weigl on 16.12.16.
  */
@@ -39,7 +37,7 @@ public class TableOptions {
     private DataTypeOptions dataTypeOptions = new DataTypeOptions();
 
     public Mode getMode() {
-        if (mode != null)
+        if (mode == null)
             mode = Mode.CONFORMANCE;
         return mode;
     }

@@ -22,8 +22,9 @@ package edu.kit.iti.formal.automation.testtables;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.testtables.model.Region;
+import edu.kit.iti.formal.automation.testtables.io.Report;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
+import edu.kit.iti.formal.automation.testtables.model.Region;
 import edu.kit.iti.formal.automation.testtables.model.State;
 
 import java.util.*;
@@ -35,8 +36,8 @@ import java.util.stream.Stream;
  */
 public class StateReachability {
     private final GeneralizedTestTable gtt;
-    private List<State> flatList;
     Map<State, Set<State>> reachability = new HashMap<>();
+    private List<State> flatList;
 
     public StateReachability(GeneralizedTestTable table) {
         gtt = table;
@@ -44,6 +45,16 @@ public class StateReachability {
         initTable();
         addRegions(gtt.getRegion());
         fixpoint();
+
+        // report
+        reachability.forEach((k, v) -> {
+            Report.debug("Row %d can reach: {%s}",
+                    k.getId(),
+                    v.stream()
+                            .map(State::getId)
+                            .map(Object::toString)
+                            .reduce((a, b) -> a + ", " + b).orElse(""));
+        });
     }
 
 
@@ -51,9 +62,9 @@ public class StateReachability {
         boolean changed = true;
         while (changed) {
             changed = false;
-
             for (Map.Entry<State, Set<State>> current : reachability.entrySet()) {
-                for (State reachable : current.getValue()) {
+                Set<State> reachables = new HashSet<>(current.getValue());
+                for (State reachable : reachables) {
                     if (reachable.getDuration().skipable()) {
                         Set<State> r = reachability.get(current.getKey());
                         int oldsze = r.size();
@@ -69,9 +80,9 @@ public class StateReachability {
 
 
     private void addRegions(Region r) {
-        if (!r.getDuration().isOneStep()) {
-            reachability.get(r.getStates().get(0)).add(
-                    r.getStates().get(r.getStates().size() - 1));
+        if (r.getDuration().getUpper() != 1) {
+            reachability.get(r.getStates().get(r.getStates().size() - 1))
+                    .add(r.getStates().get(0));
         }
 
         for (State s : r.getStates()) {

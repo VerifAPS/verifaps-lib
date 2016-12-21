@@ -73,8 +73,8 @@ guardedcommand
 ;
 
 fixed_interval :
-      MINUS
-    | LBRACKET a=i COMMA (MINUS | b=i) RBRACKET
+      dc=MINUS
+    | LBRACKET a=i COMMA (inf=MINUS | b=i) RBRACKET
     | c=i
 ;
 

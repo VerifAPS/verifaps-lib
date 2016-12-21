@@ -22,21 +22,20 @@ package edu.kit.iti.formal.automation.testtables.io;
  * #L%
  */
 
-import java.io.File;
-import java.util.List;
+import edu.kit.iti.formal.automation.IEC61131Facade;
+import edu.kit.iti.formal.automation.testtables.ExTeTa;
+import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
+import edu.kit.iti.formal.automation.testtables.model.Region;
+import edu.kit.iti.formal.automation.testtables.model.State;
+import edu.kit.iti.formal.automation.testtables.schema.*;
+import edu.kit.iti.formal.smv.ast.SMVExpr;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
-import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.testtables.schema.*;
-import edu.kit.iti.formal.automation.testtables.model.Region;
-import edu.kit.iti.formal.automation.testtables.model.State;
-import edu.kit.iti.formal.smv.ast.SMVExpr;
-import edu.kit.iti.formal.automation.testtables.ExTeTa;
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
+import java.io.File;
+import java.util.List;
 
 public class TableReader {
     private File input;
@@ -98,39 +97,22 @@ public class TableReader {
         gtt.setRegion(r);
     }
 
-    /*for (Step step : xml.getSteps().getBlockOrStep()) {
-            stepNumber++;
+    private Region translateSteps(List<Object> blockOrStep) {
+        Block b = new Block();
+        b.setDuration("1");
+        b.getStepOrBlock().addAll(blockOrStep);
+        return translateSteps(b);
+    }
 
-            if (ExTeTa.DEBUG) {
-                System.out.format("Step #%d%n", stepNumber);
-            }
-
-            if (step.getCell().size() != xml.getVariables().getVariable().size()) {
-                System.err.format("The amount of cells does not match the number of variables in step #%d%n",
-                        stepNumber);
-            }
-                    if (ExTeTa.DEBUG) {
-                        System.out.format("\t%s => %s%n", v.getName(), expr);
-                    }
-                } catch (ParseCancellationException e) {
-                    System.err.format("Syntax Error in step %d in cell %d (%s): %s%n", stepNumber, i, cell,
-                            e.getMessage());
-*/
-
-    private Region translateSteps(List<Object> steps) {
+    private Region translateSteps(Block steps) {
         Region r = new Region(stepNumber++);
-        for (Object o : steps) {
-            if (o instanceof Step) {
-                Step step = (Step) o;
-                r.getStates().add(translateStep(step));
-            }
+        r.setDuration(IOFacade.parseDuration(steps.getDuration()));
 
-            if (o instanceof Block) {
-            /* Block block = (Block) o;
-                Region s = translateSteps(block.getStepOrBlock());
-                r.setDuration(IOFacade.parseDuration(block.getDuration()));
-                r.getStates().add(s);*/
-                throw new IllegalStateException("Nested blocks are currently not supported");
+        for (Object o : steps.getStepOrBlock()) {
+            if (o instanceof Step) {
+                r.getStates().add(translateStep((Step) o));
+            } else if (o instanceof Block) {
+                r.getStates().add(translateSteps((Block) o));
             }
         }
         return r;

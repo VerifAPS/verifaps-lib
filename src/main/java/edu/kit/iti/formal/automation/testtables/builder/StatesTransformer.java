@@ -30,6 +30,8 @@ import edu.kit.iti.formal.automation.testtables.model.TableModule;
 import edu.kit.iti.formal.smv.SMVFacade;
 import edu.kit.iti.formal.smv.ast.*;
 
+import java.util.List;
+
 /**
  * Created by weigl on 17.12.16.
  */
@@ -40,8 +42,9 @@ public class StatesTransformer implements TableTransformer {
     private SVariable errorState;
 
     private void createStates() {
-        gtt.getRegion().getStates().forEach(this::introduceState);
-        reachable.getStates().forEach(this::addNextAssignments);
+        List<State> flat = gtt.getRegion().flat();
+        flat.forEach(this::introduceState);
+        flat.forEach(this::addNextAssignments);
         insertErrorState();
         insertInitialState();
     }

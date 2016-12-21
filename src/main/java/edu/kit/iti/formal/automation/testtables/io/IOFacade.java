@@ -22,12 +22,12 @@ package edu.kit.iti.formal.automation.testtables.io;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.testtables.schema.Variable;
 import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionLexer;
 import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionParser;
 import edu.kit.iti.formal.automation.testtables.model.Duration;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.schema.DataType;
+import edu.kit.iti.formal.automation.testtables.schema.Variable;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
 import edu.kit.iti.formal.smv.ast.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
@@ -73,22 +73,16 @@ public final class IOFacade {
             int i = Integer.parseInt(p.c.getText());
             d.lower = i;
             d.upper = i;
-        }
-
-        if (p.MINUS() != null) {
+        } else if (p.dc != null) {
             d.lower = 0;
             d.upper = -1;
-        }
-
-        if (p.a != null)
+        } else {
             d.lower = Integer.parseInt(p.a.getText());
-
-        if (p.b != null)
-            if ("-".equals(p.b.getText()))
+            if (p.inf != null)
                 d.upper = -1;
             else
                 d.upper = Integer.parseInt(p.b.getText());
-
+        }
         return d;
     }
 
