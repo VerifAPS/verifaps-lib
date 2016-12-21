@@ -2,41 +2,43 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>edu.kit.iti.formal</groupId>
-    <artifactId>iec2smv</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>iec-symbex</artifactId>
+    <version>0.2.0</version>
     <packaging>jar</packaging>
 
-    <name>iec2smv</name>
-    <url>http://maven.apache.org</url>
+    <name>iec-symbex</name>
+    <url>http://formal.iti.kit.edu/weigl/software/iec-symbex</url>
+	<description>Symbolic Execution of IEC-Software</description>
 
-    <properties>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+	<parent>
+		<groupId>edu.kit.iti.formal</groupId>
+		<artifactId>verifaps</artifactId>
+		<version>1.0.0</version>
+	</parent>
+
+	<repositories>
+		<repository>
+			<id>institute</id>
+			<url>http://formal.iti.kit.edu/</url>
+		</repository>
+	</repositories>
 
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>edu.kit.iti</groupId>
-            <artifactId>iec61131lang</artifactId>
-            <version>0.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>edu.kit.iti.formal</groupId>
-            <artifactId>smvtools</artifactId>
-            <version>0.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>RELEASE</version>
-        </dependency>
+	    <dependency>
+		    <groupId>commons-io</groupId>
+		    <artifactId>commons-io</artifactId>
+		    <version>2.5</version>
+		    <scope>test</scope>
+	    </dependency>
+	    <dependency>
+		    <groupId>edu.kit.iti.formal</groupId>
+		    <artifactId>iec61131lang</artifactId>
+		    <version>0.1.9</version>
+	    </dependency>
+	    <dependency>
+		    <groupId>edu.kit.iti.formal</groupId>
+		    <artifactId>smv-model</artifactId>
+		    <version>0.1.0</version>
+	    </dependency>
     </dependencies>
 </project>

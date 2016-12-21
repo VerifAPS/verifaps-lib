@@ -1,5 +1,28 @@
 package edu.kit.iti.formal.automation.smv;
 
+/*-
+ * #%L
+ * iec-symbex
+ * %%
+ * Copyright (C) 2016 Alexander Weigl
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
+import com.sun.org.apache.xpath.internal.operations.Variable;
 import edu.kit.iti.formal.automation.SymbExFacade;
 import edu.kit.iti.formal.automation.Utils;
 import edu.kit.iti.formal.automation.datatypes.Any;
@@ -72,11 +95,16 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
     public SVariable lift(VariableDeclaration vd) {
         try {
+            if (vd.getDataType() == null) {
+                vd.setDataType(localScope.getGlobalScope()
+                        .resolveDataType(vd.getDataTypeName()));
+            }
             if (!varCache.containsKey(vd))
                 varCache.put(vd.getName(), SymbExFacade.asSVariable(vd));
             return varCache.get(vd.getName());
         } catch (NullPointerException e) {
-            throw new UnknownDatatype("Datatype not given/inferred for variable " + vd.getName(), e);
+            throw new UnknownDatatype("Datatype not given/inferred for variable "
+                    + vd.getName(), e);
         }
     }
 
@@ -128,7 +156,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         // initialize root state
         for (VariableDeclaration vd : localScope) {
             SVariable s = lift(vd);
-            peek().put(s,s);
+            peek().put(s, s);
         }
 
         programDeclaration.getProgramBody().visit(this);
@@ -162,6 +190,30 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
             //initialize data structure
             SymbolicState calleeState = new SymbolicState();
             SymbolicState callerState = peek();
+
+            //region register function name as output variable
+            if (null == fd.getLocalScope().getVariable(fd.getFunctionName())) {
+                fd.getLocalScope().builder()
+                        .setBaseType(fd.getReturnTypeName())
+                        .push(VariableDeclaration.OUTPUT)
+                        .identifiers(fd.getFunctionName())
+                        .create();
+            }
+            //endregion
+
+            //region local variables (declaration and initialization)
+            for (VariableDeclaration vd : fd.getLocalScope().getLocalVariables().values()) {
+                if (!calleeState.containsKey(vd.getName())) {
+                    TypeDeclaration td = vd.getTypeDeclaration();
+                    if (td != null && td.getInitialization() != null) {
+                        td.getInitialization().visit(this);
+                    } else {
+                        calleeState.put(lift(vd), Utils.getDefaultValue(vd.getDataType()));
+                    }
+                }
+            }
+            //endregion
+
             //region transfer variables
             List<FunctionCall.Parameter> parameters = functionCall.getParameters();
             List<VariableDeclaration> inputVars = fd.getLocalScope().filterByFlags(VariableDeclaration.INPUT);
@@ -178,24 +230,11 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
             push(calleeState);
             //endregion
 
-            //region local variables (declaration and initialization)
-            for (VariableDeclaration vd : fd.getLocalScope().getLocalVariables().values()) {
-                if (!calleeState.containsKey(vd.getName())) {
-                    TypeDeclaration td = vd.getTypeDeclaration();
-                    if (td != null && td.getInitialization() != null) {
-                        td.getInitialization().visit(this);
-                    } else {
-                        calleeState.put(lift(vd), Utils.getDefaultValue(vd.getDataType()));
-                    }
-                }
-            }
-            //endregion
-
             // execution of body
             fd.getStatements().visit(this);
             pop();
 
-            return calleeState.get(fd.getFunctionName());
+            return calleeState.get(lift(fd.getLocalScope().getVariable(fd.getFunctionName())));
         } else
             throw new FunctionUndefinedException();
     }
@@ -211,12 +250,11 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
             branchStates.addBranch(condition, pop());
         }
 
-        if (statement.getElseBranch().size() > 0) {
-            push();
-            statement.getElseBranch().visit(this);
-            branchStates.addBranch(SLiteral.TRUE, pop());
-        }
-        peek().putAll(branchStates);
+        push();
+        statement.getElseBranch().visit(this);
+        branchStates.addBranch(SLiteral.TRUE, pop());
+
+        peek().putAll(branchStates.asCompressed());
         return null;
     }
 
@@ -231,12 +269,11 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
             branchStates.addBranch(condition, pop());
         }
 
-        if (caseStatement.getElseCase().size() > 0) {
-            push();
-            caseStatement.getElseCase().visit(this);
-            branchStates.addBranch(SLiteral.TRUE, pop());
-        }
-        peek().putAll(branchStates);
+        push();
+        caseStatement.getElseCase().visit(this);
+        branchStates.addBranch(SLiteral.TRUE, pop());
+
+        peek().putAll(branchStates.asCompressed());
         return null;
     }
 
