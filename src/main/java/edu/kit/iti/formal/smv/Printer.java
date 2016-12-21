@@ -1,5 +1,27 @@
 package edu.kit.iti.formal.smv;
 
+/*-
+ * #%L
+ * smv-model
+ * %%
+ * Copyright (C) 2016 Alexander Weigl
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +115,7 @@ public class Printer implements SMVAstVisitor<String> {
         if (!m.getModuleParameter().isEmpty()) {
             sb.append("(").append(
                     m.getModuleParameter().stream()
-                            .map(p -> p.name)
+                            .map(p -> p.getName())
                             .reduce((a, b) -> a + ", " + b)
                             .get())
                     .append(")");
@@ -137,7 +159,7 @@ public class Printer implements SMVAstVisitor<String> {
             sb.append("\t")
                     .append(func)
                     .append('(')
-                    .append(a.target.name)
+                    .append(a.target.getName())
                     .append(") := ")
                     .append(a.expr.accept(this)).append(";\n");
         }
@@ -160,7 +182,7 @@ public class Printer implements SMVAstVisitor<String> {
             sb.append(section).append("\n");
             for (SVariable k : keys) {
                 sb.append("\t")
-                        .append(k.name)
+                        .append(k.getName())
                         .append(" := ")
                         .append(definitions.get(k).accept(this))
                         .append(";\n");
@@ -184,9 +206,9 @@ public class Printer implements SMVAstVisitor<String> {
 
             for (SVariable var : vars) {
                 sb.append('\t')
-                        .append(var.name)
+                        .append(var.getName())
                         .append(" : ")
-                        .append(var.datatype)
+                        .append(var.getSMVType())
                         .append(";\n");
             }
 
@@ -196,6 +218,6 @@ public class Printer implements SMVAstVisitor<String> {
 
     @Override
     public String visit(SVariable v) {
-        return v.name;
+        return v.getName();
     }
 }

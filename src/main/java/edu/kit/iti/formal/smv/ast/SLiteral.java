@@ -4,6 +4,28 @@
 
 package edu.kit.iti.formal.smv.ast;
 
+/*-
+ * #%L
+ * smv-model
+ * %%
+ * Copyright (C) 2016 Alexander Weigl
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import edu.kit.iti.formal.smv.SMVAstVisitor;
 
 /************************************************************/
@@ -46,5 +68,60 @@ public class SLiteral extends SMVExpr {
     @Override
     public <T> T accept(SMVAstVisitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SLiteral sLiteral = (SLiteral) o;
+
+        if (!dataType.equals(sLiteral.dataType)) return false;
+        return value != null ? value.equals(sLiteral.value) : sLiteral.value == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = dataType.hashCode();
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
+    }
+
+    public static LiteralBuilder create(Object value) {
+        return new LiteralBuilder(value);
+    }
+
+    public static class LiteralBuilder {
+
+        private final SLiteral literal;
+
+        public LiteralBuilder(Object value) {
+            literal = new SLiteral();
+            literal.value = value;
+        }
+
+        public SLiteral as(SMVType type) {
+            literal.dataType = type;
+            return literal;
+        }
+
+
+        public SLiteral as(int width, GroundDataType dt) {
+            return as(new SMVType.SMVTypeWithWidth(dt, width));
+        }
+
+        public SLiteral asSigned(int width) {
+            return as(new SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, width));
+        }
+
+        public SLiteral asUnsigned(int width) {
+            return as(new SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, width));
+        }
+
+        public SLiteral asBool() {
+            return as(SMVType.BOOLEAN);
+        }
     }
 }

@@ -1,25 +1,36 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>edu.kit.iti.formal</groupId>
-  <artifactId>smvtools</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+    <parent>
+        <groupId>edu.kit.iti.formal</groupId>
+        <artifactId>verifaps</artifactId>
+        <version>1.0.0</version>
+    </parent>
 
-  <name>smv</name>
-  <url>http://maven.apache.org</url>
+    <artifactId>smv-model</artifactId>
+    <version>0.1.0</version>
+    <packaging>jar</packaging>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <name>smv-model</name>
+    <url>http://formal.iti.kit.edu/weigl/software/smv-model</url>
+    <description>
+        AST and Printer for Symbolic Model Verifier format.
+    </description>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+    <repositories>
+        <repository>
+            <id>institute</id>
+            <url>http://formal.iti.kit.edu/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>20.0</version>
+        </dependency>
+    </dependencies>
+
 </project>

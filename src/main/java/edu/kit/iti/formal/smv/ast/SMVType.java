@@ -1,17 +1,64 @@
 package edu.kit.iti.formal.smv.ast;
 
+/*-
+ * #%L
+ * smv-model
+ * %%
+ * Copyright (C) 2016 Alexander Weigl
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SMVType {
     public static final SMVType BOOLEAN = new SMVType(GroundDataType.BOOLEAN);
-
-    public GroundDataType base;
+    protected GroundDataType baseType;
 
     public SMVType() {
     }
 
     public SMVType(GroundDataType b) {
-        base = b;
+        baseType = b;
+    }
+
+    public GroundDataType getBaseType() {
+        return baseType;
+    }
+
+    public SMVType setBaseType(GroundDataType baseType) {
+        this.baseType = baseType;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SMVType)) return false;
+
+        SMVType smvType = (SMVType) o;
+
+        return baseType == smvType.baseType;
+    }
+
+    @Override
+    public int hashCode() {
+        return baseType.hashCode();
     }
 
     public static SMVType infer(List<SMVType> list) {
@@ -39,9 +86,30 @@ public class SMVType {
         @Override
         public String toString() {
             return String.format("%s word[%d]",
-                    (base == GroundDataType.UNSIGNED_WORD
+                    (baseType == GroundDataType.UNSIGNED_WORD
                             ? "unsigned" : "signed")
                     , width);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+
+            SMVTypeWithWidth that = (SMVTypeWithWidth) o;
+
+            if (getWidth() != that.getWidth()) return false;
+            return getBaseType() == that.getBaseType();
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = super.hashCode();
+            result = 31 * result + getWidth();
+            result = 31 * result + getBaseType().hashCode();
+            return result;
         }
 
         @Override
@@ -58,7 +126,7 @@ public class SMVType {
 
             return String.format("%s0%sd%d_%d",
                     (l < 0 ? "-" : ""),
-                    (base == GroundDataType.SIGNED_WORD ? "s" : "u"),
+                    (baseType == GroundDataType.SIGNED_WORD ? "s" : "u"),
                     width,
                     Math.abs(l));
         }
@@ -68,7 +136,7 @@ public class SMVType {
         List<String> values;
 
         public EnumType(List<String> id) {
-            values = id;
+            values = new ArrayList<>(id);
         }
 
         public SLiteral valueOf(String value) {
@@ -77,6 +145,25 @@ public class SMVType {
                 throw new IllegalArgumentException();
             }
             return l;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+
+            EnumType enumType = (EnumType) o;
+
+            return values.equals(enumType.values);
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = super.hashCode();
+            result = 31 * result + values.hashCode();
+            return result;
         }
 
         @Override
@@ -101,12 +188,12 @@ public class SMVType {
     public SLiteral valueOf(String value) {
         SLiteral l = new SLiteral();
         l.dataType = this;
-        l.value = base.parse(value);
+        l.value = baseType.parse(value);
         return l;
     }
 
     public String format(Object value) {
-        return base.format(value);
+        return baseType.format(value);
     }
 
     @Override
@@ -123,13 +210,38 @@ public class SMVType {
             this.parameters = moduleParameter;
         }
 
+        public Module(String name, SVariable... variables) {
+            this(name, Arrays.asList(variables));
+        }
+
         @Override
         public String toString() {
             return String.format("%s(%s)",
                     moduleName,
                     parameters.stream()
-                            .map(v -> v.name)
+                            .map(v -> v.getName())
                             .reduce((a, b) -> a + ", " + b).get());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+
+            Module module = (Module) o;
+
+            if (!parameters.equals(module.parameters)) return false;
+            return moduleName.equals(module.moduleName);
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = super.hashCode();
+            result = 31 * result + parameters.hashCode();
+            result = 31 * result + moduleName.hashCode();
+            return result;
         }
     }
 }

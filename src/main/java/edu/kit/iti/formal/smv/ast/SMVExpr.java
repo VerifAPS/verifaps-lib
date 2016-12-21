@@ -4,14 +4,63 @@
 
 package edu.kit.iti.formal.smv.ast;
 
-/************************************************************/
-/**
+/*-
+ * #%L
+ * smv-model
+ * %%
+ * Copyright (C) 2016 Alexander Weigl
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
+/************************************************************/
+
+/**
+ *
  */
 public abstract class SMVExpr extends SMVAst {
 
-	/**
-	 * 
-	 */
-	public abstract SMVType getSMVType();
-};
+    /**
+     *
+     */
+    public abstract SMVType getSMVType();
+
+
+    //region builder methods
+    public SBinaryExpression equal(SMVExpr e) {
+        return op(SBinaryOperator.EQUAL, e);
+    }
+
+    public SBinaryExpression and(SMVExpr e) {
+        return op(SBinaryOperator.AND, e);
+    }
+
+    public SBinaryExpression op(SBinaryOperator o, SMVExpr e) {
+        SBinaryExpression product = new SBinaryExpression(this, o, e);
+        product.operator = o;
+        product.right = e;
+        return product;
+    }
+
+    public SUnaryExpression not() {
+        return new SUnaryExpression(SUnaryOperator.NEGATE, this);
+    }
+
+    public SUnaryExpression minus() {
+        return new SUnaryExpression(SUnaryOperator.MINUS, this);
+    }
+    //endregion
+}
