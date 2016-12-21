@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="Generalized Test Table"
+         xmlns="http://maven.apache.org/DECORATION/1.7.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.7.0 https://maven.apache.org/xsd/decoration-1.7.0.xsd">
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.6</version>
+    </skin>
+
+    <body>
+        <links>
+            <item name="Application-oriented Verification"
+                  href="http://formal.iti.kit.edu/"/>
+            <item name="IMPROVE APS"
+                  href="http://formal.iti.kit.edu/projects/improve-aps/"/>
+        </links>
+
+        <menu name="About">
+            <item name="Introduction" href="introduction.html"/>
+            <item name="Cell Expression" href="cellexpr.html"/>
+            <item name="Format" href="design.html"/>
+        </menu>
+
+        <menu ref="reports"/>
+    </body>
+</project>

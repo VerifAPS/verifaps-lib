@@ -105,11 +105,11 @@
 		</restriction>
 	</simpleType>
 
-	<!-- <simpleType name="cellType"> <restriction base="string"></restriction> 
-		</simpleType> <simpleType name="cellSimpleValueType"> <restriction base="tns:cellType"></restriction> 
-		</simpleType> <simpleType name="cellDontCareType"> <restriction base="tns:cellType"></restriction> 
-		</simpleType> <simpleType name="cellRelationType"> <restriction base="tns:cellType"></restriction> 
-		</simpleType> <simpleType name="cellExpressionType"> <restriction base="tns:cellType"></restriction> 
+	<!-- <simpleType name="cellType"> <restriction base="string"></restriction>
+		</simpleType> <simpleType name="cellSimpleValueType"> <restriction base="tns:cellType"></restriction>
+		</simpleType> <simpleType name="cellDontCareType"> <restriction base="tns:cellType"></restriction>
+		</simpleType> <simpleType name="cellRelationType"> <restriction base="tns:cellType"></restriction>
+		</simpleType> <simpleType name="cellExpressionType"> <restriction base="tns:cellType"></restriction>
 		</simpleType> -->
 
 
