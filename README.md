@@ -1,7 +1,7 @@
 # iec61131lang
 
 [![Build Status](https://travis-ci.org/VerifAPS/iec61131lang.svg?branch=master)](https://travis-ci.org/VerifAPS/iec61131lang)
-
+[![CircleCI](https://circleci.com/gh/VerifAPS/iec61131lang.svg?style=svg)](https://circleci.com/gh/VerifAPS/iec61131lang)
 
 Parser and AST for StructuredText, Sequential Function Charts and Function Blocks.
 
@@ -42,6 +42,7 @@ $ mvn install
     * [x] Function Block
     * [x] Program
   * [ ] User-defined Datatypes
+    * [x] Enums
     * [x] Ranges
     * [x] Arrays
     * [x] Structs/Records

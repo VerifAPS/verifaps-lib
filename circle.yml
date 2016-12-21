@@ -1,3 +1,9 @@
+machine:
+  java:
+    version: openjdk8
+general:
+  artifacts:
+    - target/
 test:
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/

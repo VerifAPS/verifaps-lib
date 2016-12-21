@@ -285,7 +285,7 @@ VAR_INPUT
 END_VAR
 
 END_FUNCTION
-(* in, base 10 *)
+(* in, baseType 10 *)
 FUNCTION LOG
 VAR_INPUT
         in : ANY_BIT;

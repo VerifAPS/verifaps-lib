@@ -430,8 +430,8 @@ returns [ StructureInitialization ast = new StructureInitialization()]
 string_type_declaration
 returns [ StringTypeDeclaration ast = new StringTypeDeclaration()]
 :
-	base=(STRING|WSTRING)
-    {$ast.setBaseTypeName($base.text);   }
+	baseType=(STRING|WSTRING)
+    {$ast.setBaseTypeName($baseType.text);   }
 	( LBRACKET integer
 	  { $ast.setSize($integer.ast);}
 	  RBRACKET )?

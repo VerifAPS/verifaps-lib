@@ -1,36 +1,32 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>edu.kit.iti</groupId>
+    <parent>
+        <groupId>edu.kit.iti.formal</groupId>
+        <artifactId>verifaps</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
     <artifactId>iec61131lang</artifactId>
     <version>0.1.9</version>
     <packaging>jar</packaging>
 
     <name>iec61131lang</name>
+    <description>Parser and AST for IEC61131-3 languages</description>
     <url>http://github.com/VerifAPS/iec61131lang</url>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
-    <prerequisites>
-        <maven>3.0</maven>
-    </prerequisites>
+    <repositories>
+        <repository>
+            <id>institute</id>
+            <url>http://formal.iti.kit.edu/</url>
+        </repository>
+    </repositories>
 
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.0</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
@@ -64,7 +60,6 @@
                     <check>false</check>
                     <format>xml</format>
                     <maxmem>256m</maxmem>
-                    <!-- aggregated reports for multi-module projects -->
                     <aggregate>true</aggregate>
                 </configuration>
             </plugin>
@@ -72,41 +67,12 @@
         </plugins>
 
     </build>
+
     <dependencies>
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4</artifactId>
             <version>4.5.3</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.17</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>checkstyle</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.4</version>
-            </plugin>
-        </plugins>
-    </reporting>
-
-
 </project>

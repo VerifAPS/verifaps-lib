@@ -1,5 +1,27 @@
 package edu.kit.iti.formal.automation.st;
 
+/*-
+ * #%L
+ * iec61131lang
+ * %%
+ * Copyright (C) 2016 Alexander Weigl
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.operators.Operator;
@@ -12,43 +34,72 @@ import edu.kit.iti.formal.automation.visitors.Visitable;
 
 /**
  * Created by weigla on 15.06.2014.
+ *
+ * @author weigl
+ * @version $Id: $Id
  */
 public class StructuredTextPrinter extends DefaultVisitor<Object> {
     private final StringLiterals literals;
     public CodeWriter sb = new CodeWriter();
     private boolean printComments;
 
+    /**
+     * <p>Constructor for StructuredTextPrinter.</p>
+     */
     public StructuredTextPrinter() {
         this(SL_ST);
     }
 
+    /**
+     * <p>Constructor for StructuredTextPrinter.</p>
+     *
+     * @param sl_smv a {@link edu.kit.iti.formal.automation.st.StructuredTextPrinter.StringLiterals} object.
+     */
     public StructuredTextPrinter(StringLiterals sl_smv) {
         literals = sl_smv;
     }
 
+    /**
+     * <p>isPrintComments.</p>
+     *
+     * @return a boolean.
+     */
     public boolean isPrintComments() {
         return printComments;
     }
 
+    /**
+     * <p>Setter for the field <code>printComments</code>.</p>
+     *
+     * @param printComments a boolean.
+     */
     public void setPrintComments(boolean printComments) {
         this.printComments = printComments;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object defaultVisit(Visitable visitable) {
         throw new IllegalArgumentException("not implemented: " + visitable.getClass());
     }
 
+    /**
+     * <p>getString.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getString() {
         return sb.toString();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(ExitStatement exitStatement) {
         sb.append(literals.exit()).append(literals.statement_separator());
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(CaseConditions.IntegerCondition integerCondition) {
         sb.appendIdent();
@@ -56,6 +107,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(CaseConditions.Enumeration enumeration) {
         if (enumeration.getStart() == enumeration.getStop()) {
@@ -69,6 +121,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(BinaryExpression binaryExpression) {
         sb.append('(');
@@ -79,6 +132,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(AssignmentStatement assignStatement) {
         sb.nl();
@@ -89,12 +143,14 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(ConfigurationDeclaration configurationDeclaration) {
         return null;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(EnumerationTypeDeclaration enumerationTypeDeclaration) {
         sb.nl().append(enumerationTypeDeclaration.getTypeName()).append(" : ");
@@ -110,6 +166,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(RepeatStatement repeatStatement) {
         sb.nl();
@@ -122,6 +179,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(WhileStatement whileStatement) {
         sb.nl();
@@ -134,6 +192,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(UnaryExpression unaryExpression) {
         sb.append(literals.operator(unaryExpression.getOperator())).append(" ");
@@ -141,6 +200,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(TypeDeclarations typeDeclarations) {
 
@@ -154,6 +214,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(CaseStatement caseStatement) {
 
@@ -176,6 +237,12 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     }
 
 
+    /**
+     * <p>visit.</p>
+     *
+     * @param symbolicReference a {@link edu.kit.iti.formal.automation.st.ast.SymbolicReference} object.
+     * @return a {@link java.lang.Object} object.
+     */
     public Object visit(SymbolicReference symbolicReference) {
         sb.append(symbolicReference.getIdentifier());
 
@@ -197,6 +264,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(StatementList statements) {
         for (Statement stmt : statements) {
@@ -209,6 +277,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
         sb.append("PROGRAM ").append(programDeclaration.getProgramName()).append('\n');
@@ -220,12 +289,14 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(ScalarValue<? extends Any, ?> tsScalarValue) {
         sb.append(literals.repr(tsScalarValue));
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(ExpressionList expressions) {
         for (Expression e : expressions) {
@@ -236,6 +307,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(FunctionCall functionCall) {
         // TODO
@@ -253,6 +325,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
      * sb.append("ELSE -> "); caseExpression.getElseExpression().visit(this);
      * sb.append(")").decreaseIndent(); return null; }
      */
+    /** {@inheritDoc} */
     @Override
     public Object visit(ForStatement forStatement) {
         sb.nl();
@@ -268,6 +341,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
         sb.append("FUNCTION_BLOCK ").append(functionBlockDeclaration.getFunctionBlockName()).increaseIndent();
@@ -281,6 +355,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(ReturnStatement returnStatement) {
         sb.appendIdent();
@@ -288,6 +363,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(IfStatement ifStatement) {
         for (int i = 0; i < ifStatement.getConditionalBranches().size(); i++) {
@@ -314,6 +390,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(FunctionCallStatement functionCallStatement) {
         sb.nl();
@@ -340,6 +417,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(CaseStatement.Case aCase) {
         sb.nl();
@@ -355,6 +433,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(SimpleTypeDeclaration simpleTypeDeclaration) {
         sb.append(simpleTypeDeclaration.getBaseTypeName());
@@ -365,6 +444,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(LocalScope localScope) {
         for (VariableDeclaration vd : localScope.getLocalVariables().values()) {
@@ -434,6 +514,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object visit(CommentStatement commentStatement) {
         if (printComments) {
@@ -446,6 +527,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
     }
 
+    /**
+     * <p>clear.</p>
+     */
     public void clear() {
         sb = new CodeWriter();
     }
@@ -489,7 +573,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         }
     }
 
+    /** Constant <code>SL_ST</code> */
     public static StringLiterals SL_ST = StringLiterals.create();
+    /** Constant <code>SL_SMV</code> */
     public static StringLiterals SL_SMV = new StringLiterals() {
         @Override
         public String operator(UnaryOperator operator) {
@@ -538,6 +624,11 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         }
     };
 
+    /**
+     * <p>setCodeWriter.</p>
+     *
+     * @param cw a {@link edu.kit.iti.formal.automation.st.util.CodeWriter} object.
+     */
     public void setCodeWriter(CodeWriter cw) {
         this.sb = cw;
     }

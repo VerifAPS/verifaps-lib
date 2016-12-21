@@ -1,5 +1,27 @@
 package edu.kit.iti.formal.automation.st.util;
 
+/*-
+ * #%L
+ * iec61131lang
+ * %%
+ * Copyright (C) 2016 Alexander Weigl
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.datatypes.Any;
@@ -13,12 +35,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * @author weigla
- * @date 26.06.2014
- * This visitors defines all function with go down and setting the results of visit as the new value.
- * Not copying datastructures.
+ * <p>AstMutableVisitor class.</p>
+ *
+ * @author weigla (26.06.2014)
+ *         This visitors defines all function with go down and setting the results of visit as the new value.
+ *         Not copying datastructures.
  */
 public class AstMutableVisitor extends DefaultVisitor<Object> {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object defaultVisit(Visitable visitable) {
         System.out.println("AstTransform.defaultVisit");
@@ -26,6 +52,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return visitable;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(AssignmentStatement assignmentStatement) {
         assignmentStatement.setExpression((Expression) assignmentStatement.getExpression().visit(this));
@@ -33,6 +62,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return assignmentStatement;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseConditions.IntegerCondition integerCondition) {
         ScalarValue sv = (ScalarValue) integerCondition.getValue().<Object>visit(this);
@@ -40,6 +72,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return integerCondition;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseConditions.Enumeration enumeration) {
         enumeration.setStart((ScalarValue<EnumerateType, String>) enumeration.getStart().<Object>visit(this));
@@ -47,6 +82,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return enumeration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(BinaryExpression binaryExpression) {
         binaryExpression.setLeftExpr(
@@ -58,12 +96,18 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return binaryExpression;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(UnaryExpression unaryExpression) {
         unaryExpression.setExpression((Expression) unaryExpression.getExpression().<Object>visit(this));
         return unaryExpression;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(RepeatStatement repeatStatement) {
         repeatStatement.setCondition((Expression) repeatStatement.getCondition().<Object>visit(this));
@@ -71,6 +115,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return repeatStatement;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(WhileStatement whileStatement) {
         whileStatement.setCondition((Expression) whileStatement.getCondition().<Object>visit(this));
@@ -79,6 +126,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseStatement caseStatement) {
         LinkedList<CaseStatement.Case> l = new LinkedList<>();
@@ -108,6 +158,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return symbolicReference;
     }*/
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(StatementList statements) {
         StatementList r = new StatementList();
@@ -117,6 +170,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return r;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
         programDeclaration.setLocalScope((LocalScope) programDeclaration.getLocalScope().visit(this));
@@ -124,6 +180,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return programDeclaration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ScalarValue<? extends Any, ?> tsScalarValue) {
         return tsScalarValue;
@@ -131,6 +190,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(FunctionCall functionCall) {
         LinkedList<FunctionCall.Parameter> list = new LinkedList<>();
@@ -141,6 +203,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return functionCall;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ForStatement forStatement) {
         forStatement.setStart((Expression) forStatement.getStart().visit(this));
@@ -150,6 +215,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return forStatement;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(IfStatement i) {
         LinkedList<GuardedStatement> guards = new LinkedList<>();
@@ -161,12 +229,18 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return i;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CommentStatement commentStatement) {
         return commentStatement;
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(GuardedStatement guardedStatement) {
         guardedStatement.setCondition((Expression) guardedStatement.getCondition().visit(this));
@@ -174,6 +248,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return guardedStatement;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(FunctionCallStatement functionCallStatement) {
         functionCallStatement.setFunctionCall((FunctionCall)
@@ -181,6 +258,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return functionCallStatement;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseStatement.Case aCase) {
         List<CaseConditions> v = this.<CaseConditions>visitList(aCase.getConditions());
@@ -196,16 +276,25 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return l;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ArrayTypeDeclaration arrayTypeDeclaration) {
         return arrayTypeDeclaration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ExitStatement exitStatement) {
         return exitStatement;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseConditions.Range range) {
         range.setStart((ScalarValue) range.getStart().visit(this));
@@ -213,17 +302,26 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return super.visit(range);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ConfigurationDeclaration configurationDeclaration) {
         return configurationDeclaration;
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(LocalScope localScope) {
         return localScope;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(VariableDeclaration variableDeclaration) {
         variableDeclaration.setTypeDeclaration(
@@ -233,16 +331,25 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return variableDeclaration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ArrayInitialization initializations) {
         return initializations;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(EnumerationTypeDeclaration enumerationTypeDeclaration) {
         return enumerationTypeDeclaration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(TypeDeclarations typeDeclarations) {
         TypeDeclarations td = new TypeDeclarations();
@@ -251,6 +358,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return td;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ExpressionList expressions) {
         ExpressionList expressionList = new ExpressionList();
@@ -259,6 +369,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return expressionList;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
         functionDeclaration.setLocalScope((LocalScope) functionDeclaration.getLocalScope().visit(this));
@@ -266,11 +379,17 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return functionDeclaration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ResourceDeclaration resourceDeclaration) {
         return resourceDeclaration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
         functionBlockDeclaration.setLocalScope((LocalScope) functionBlockDeclaration.getLocalScope().visit(this));
@@ -278,32 +397,50 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         return functionBlockDeclaration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ReturnStatement returnStatement) {
         return returnStatement;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(StringTypeDeclaration stringTypeDeclaration) {
         return stringTypeDeclaration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(StructureTypeDeclaration structureTypeDeclaration) {
         return structureTypeDeclaration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(SubRangeTypeDeclaration subRangeTypeDeclaration) {
         return subRangeTypeDeclaration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(SimpleTypeDeclaration simpleTypeDeclaration) {
         return simpleTypeDeclaration;
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(StructureInitialization structureInitialization) {
         return structureInitialization;

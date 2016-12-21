@@ -1,5 +1,27 @@
 package edu.kit.iti.formal.automation.st.util;
 
+/*-
+ * #%L
+ * iec61131lang
+ * %%
+ * Copyright (C) 2016 Alexander Weigl
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
@@ -11,14 +33,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author weigla
- * @date 26.06.2014
- * <p>
- * <bold>ATTTENTION</bold> this is only useable on statement level and below!
- * <p>
- * This visitors defines all function with go down and setting the results of visit as the new value.
+ * <p>AstCopyVisitor class.</p>
+ *
+ * @author weigla 26.06.2014
+ *         <p>
+ *         <b>ATTTENTION</b> this is only useable on statement level and below!
+ *         <p>
+ *         This visitors defines all function with go down and setting the results of visit as the new value.
+ * @version $Id: $Id
  */
 public class AstCopyVisitor extends DefaultVisitor<Object> {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object defaultVisit(Visitable visitable) {
         System.out.println("AstTransform.defaultVisit");
@@ -29,6 +56,9 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return visitable;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(AssignmentStatement assignmentStatement) {
         AssignmentStatement statement = new AssignmentStatement(
@@ -39,16 +69,25 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return statement;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseConditions.IntegerCondition integerCondition) {
         return integerCondition;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseConditions.Enumeration enumeration) {
         return enumeration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(BinaryExpression binaryExpression) {
         BinaryExpression be = new BinaryExpression(
@@ -58,6 +97,9 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return be;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(UnaryExpression unaryExpression) {
         UnaryExpression ue = new UnaryExpression(unaryExpression.getOperator(),
@@ -65,6 +107,9 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return ue;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(RepeatStatement repeatStatement) {
         RepeatStatement w = new RepeatStatement();
@@ -74,6 +119,9 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return w;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(WhileStatement whileStatement) {
         WhileStatement w = new WhileStatement();
@@ -84,6 +132,9 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseStatement caseStatement) {
         CaseStatement cs = new CaseStatement();
@@ -116,6 +167,10 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return sr;
     }
 */
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(StatementList statements) {
         StatementList r = new StatementList();
@@ -135,6 +190,9 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return r;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
         ProgramDeclaration pd = new ProgramDeclaration(programDeclaration);
@@ -143,6 +201,9 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return pd;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(LocalScope localScope) {
         LocalScope vs = new LocalScope();
@@ -151,12 +212,18 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return vs;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ScalarValue<? extends Any, ?> tsScalarValue) {
         return new ScalarValue<>(tsScalarValue.getDataType(), tsScalarValue.getValue());
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(FunctionCall functionCall) {
         FunctionCall fc = new FunctionCall(functionCall);
@@ -168,6 +235,9 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return fc;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ForStatement forStatement) {
         ForStatement f = new ForStatement();
@@ -181,6 +251,9 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return f;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(IfStatement ifStatement) {
         IfStatement i = new IfStatement();
@@ -198,12 +271,18 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return fresh;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CommentStatement commentStatement) {
         return commentStatement;
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(GuardedStatement guardedStatement) {
         GuardedStatement gs = new GuardedStatement();
@@ -212,12 +291,18 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return setPositions(guardedStatement, gs);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(FunctionCallStatement functionCallStatement) {
         FunctionCallStatement fc = new FunctionCallStatement((FunctionCall) functionCallStatement.getFunctionCall().visit(this));
         return fc;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseStatement.Case aCase) {
         CaseStatement.Case c = new CaseStatement.Case();
@@ -237,6 +322,9 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(VariableDeclaration variableDeclaration) {
         VariableDeclaration vd = new VariableDeclaration(variableDeclaration);
@@ -249,6 +337,9 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return vd;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ReturnStatement returnStatement) {
         return setPositions(returnStatement, new ReturnStatement());

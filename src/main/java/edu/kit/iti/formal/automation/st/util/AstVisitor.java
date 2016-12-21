@@ -1,5 +1,27 @@
 package edu.kit.iti.formal.automation.st.util;
 
+/*-
+ * #%L
+ * iec61131lang
+ * %%
+ * Copyright (C) 2016 Alexander Weigl
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
@@ -7,14 +29,19 @@ import edu.kit.iti.formal.automation.st.ast.*;
 
 /**
  * Created by weigl on 10/07/14.
+ *
+ * @author weigl
+ * @version $Id: $Id
  */
 public class AstVisitor<T> extends DefaultVisitor<T> {
+    /** {@inheritDoc} */
     @Override
     public T defaultVisit(Visitable visitable) {
         return null;//throw new Error("not implemented for " + visitable.getClass());
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public T visit(AssignmentStatement assignmentStatement) {
         assignmentStatement.getExpression().visit(this);
@@ -23,6 +50,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public T visit(CaseConditions.Range range) {
         range.getStart().visit(this);
@@ -30,12 +58,14 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(CaseConditions.IntegerCondition integerCondition) {
         integerCondition.getValue().visit(this);
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(CaseConditions.Enumeration enumeration) {
         enumeration.getStart().visit(this);
@@ -45,6 +75,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(BinaryExpression binaryExpression) {
         binaryExpression.getLeftExpr().visit(this);
@@ -52,6 +83,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(RepeatStatement repeatStatement) {
         repeatStatement.getCondition().visit(this);
@@ -59,6 +91,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(WhileStatement whileStatement) {
         whileStatement.getCondition().visit(this);
@@ -67,12 +100,14 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(UnaryExpression unaryExpression) {
         unaryExpression.getExpression().visit(this);
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(TypeDeclarations typeDeclarations) {
         for (TypeDeclaration td : typeDeclarations)
@@ -80,6 +115,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(CaseStatement caseStatement) {
         caseStatement.getExpression().visit(this);
@@ -91,6 +127,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(StatementList statements) {
         for (Statement s : statements)
@@ -98,6 +135,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(ProgramDeclaration programDeclaration) {
         programDeclaration.getProgramBody().visit(this);
@@ -105,6 +143,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(ExpressionList expressions) {
         for (Expression e : expressions)
@@ -112,6 +151,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(FunctionDeclaration functionDeclaration) {
         functionDeclaration.getLocalScope().visit(this);
@@ -119,6 +159,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(ForStatement forStatement) {
         forStatement.getStart().visit(this);
@@ -128,6 +169,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(FunctionBlockDeclaration functionBlockDeclaration) {
         functionBlockDeclaration.getFunctionBody().visit(this);
@@ -136,6 +178,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public T visit(IfStatement ifStatement) {
         for (GuardedStatement gs : ifStatement.getConditionalBranches())
@@ -145,6 +188,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(GuardedStatement guardedStatement) {
         guardedStatement.getCondition().visit(this);
@@ -152,6 +196,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(CaseStatement.Case aCase) {
         aCase.getStatements().visit(this);
@@ -160,6 +205,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(LocalScope localScope) {
         for (VariableDeclaration vd : localScope.getLocalVariables().values())
@@ -167,6 +213,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T visit(VariableDeclaration variableDeclaration) {
         return super.visit(variableDeclaration);
