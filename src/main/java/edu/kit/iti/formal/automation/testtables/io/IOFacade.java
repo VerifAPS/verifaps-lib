@@ -71,18 +71,19 @@ public final class IOFacade {
         Duration d = new Duration();
         if (p.c != null) {
             int i = Integer.parseInt(p.c.getText());
-            d.lower = i;
-            d.upper = i;
+            d.setLower(i);
+            d.setUpper(i);
         } else if (p.dc != null) {
-            d.lower = 0;
-            d.upper = -1;
+            d.setLower(0);
+            d.setUpper(-1);
         } else {
-            d.lower = Integer.parseInt(p.a.getText());
+            d.setLower(Integer.parseInt(p.a.getText()));
             if (p.inf != null)
-                d.upper = -1;
+                d.setUpper(-1);
             else
-                d.upper = Integer.parseInt(p.b.getText());
+                d.setUpper(Integer.parseInt(p.b.getText()));
         }
+        assert d.invariant();
         return d;
     }
 

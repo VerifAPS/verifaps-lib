@@ -27,27 +27,34 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Created by weigl on 10.12.16.
+ * @author Alexander Weigl
+ * @vesion 1 (10.12.16)
  */
 public class Region extends State {
-    List<State> sub = new ArrayList<>();
+    private List<State> children = new ArrayList<>();
 
     public Region(int id) {
         super(id);
     }
 
     public List<State> getStates() {
-        return sub;
+        return children;
     }
 
+    /**
+     * @return
+     */
     @Override
     public int count() {
-        return sub.stream().mapToInt(State::count).sum();
+        return children.stream().mapToInt(State::count).sum();
     }
 
-
+    /**
+     *
+     * @return
+     */
     public List<State> flat() {
-        return sub.stream()
+        return children.stream()
                 .flatMap((a) -> a.flat().stream())
                 .collect(Collectors.toList());
     }

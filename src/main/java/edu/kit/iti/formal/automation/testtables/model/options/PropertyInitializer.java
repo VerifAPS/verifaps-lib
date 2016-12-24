@@ -22,36 +22,49 @@ package edu.kit.iti.formal.automation.testtables.model.options;
  * #L%
  */
 
-import java.lang.reflect.Field;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
 /**
- * Created by weigl on 16.12.16.
+ * Created on 16.12.16
+ * @author Alexander Weigl
+ * @version 2
  */
 public class PropertyInitializer {
 
-    private Object value;
     private final Properties properties;
+    private Object value;
 
     public PropertyInitializer(Object value, Properties properties) {
         this.value = value;
         this.properties = properties;
     }
 
+    public static void initialize(Object value, Properties properties) {
+        new PropertyInitializer(value, properties).inject("");
+    }
+
     public void inject(String namespace) {
-        Class<?> clazz = value.getClass();
-        for (Field f : clazz.getFields()) {
-            Property p = f.getAnnotation(Property.class);
-            if (p != null) {
-                String path = join(namespace, p.value());
-                if (isSimpleType(f.getType())) {
-                    set(path, f);
-                } else {
-                    goDeeper(path, f);
+        try {
+            BeanInfo info = Introspector.getBeanInfo(value.getClass());
+            for (PropertyDescriptor prop : info.getPropertyDescriptors()) {
+                Property p = prop.getReadMethod().getAnnotation(Property.class);
+                if (p != null) {
+                    String path = getPath(namespace, p, prop);
+                    if (isSimpleType(prop.getPropertyType())) {
+                        set(path, prop);
+                    } else {
+                        goDeeper(path, prop);
+                    }
                 }
             }
+        } catch (IntrospectionException e) {
+            e.printStackTrace();
         }
-
         try {
             InitializableFromProperties pi = (InitializableFromProperties) value;
             pi.initialize(namespace, properties);
@@ -59,46 +72,52 @@ public class PropertyInitializer {
         }
     }
 
-    private void goDeeper(String path, Field f) {
+    private String getPath(String namespace, Property p, PropertyDescriptor f) {
+        if (p.value().isEmpty()) {
+            return join(namespace, f.getName());
+        } else {
+            return join(namespace, p.value());
+        }
+    }
+
+    private void goDeeper(String path, PropertyDescriptor f) {
         try {
             Object oldValue = value;
-            value = f.get(value);
+            value = f.getReadMethod().invoke(value);
             inject(path);
             value = oldValue;
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
         }
     }
 
-    private void set(String name, Field f) {
+    private void set(String name, PropertyDescriptor f) {
+        Class<?> type = f.getPropertyType();
         try {
             String val = getString(name);
-
-
-            if (f.getType().isEnum()) {
-                for (Object s : f.getType().getEnumConstants()) {
-                    if(s.toString().equals(val))
-                        f.set(value, s);
+            Object s = null;
+            if (type.isEnum()) {
+                for (Object o : type.getEnumConstants()) {
+                    if (o.toString().equals(val))
+                        s = o;
                 }
-            }
+            } else if (type == Integer.class)
+                s = Integer.parseInt(val);
+            else if (type == Boolean.class)
+                s = val.equalsIgnoreCase("true");
+            else if (type == String.class)
+                s = val;
+            else if (type == Long.class)
+                s = Long.parseLong(val);
 
-            if (f.getType() == Integer.class)
-                f.setInt(value, Integer.parseInt(val));
-            if (f.getType() == Boolean.class)
-                f.setBoolean(value, val.equalsIgnoreCase("true"));
-            if (f.getType() == String.class)
-                f.set(value, val);
-            if (f.getType() == Long.class)
-                f.set(value, Long.parseLong(val));
+            f.getWriteMethod().invoke(value, s);
         } catch (NullPointerException npe) {
             //do nothing
-        } catch (
-                IllegalAccessException e)
-
-        {
+        } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
-
     }
 
     private String getString(String name) {
@@ -109,15 +128,12 @@ public class PropertyInitializer {
     }
 
     private String join(String namespace, String name) {
+        if (namespace == null || namespace.isEmpty())
+            return name;
         return String.join(".", namespace, name);
     }
 
-
     private boolean isSimpleType(Class<?> type) {
         return type.isEnum() || type == Integer.class || type == Boolean.class || type == String.class || type == Long.class;
-    }
-
-    public static void initialize(Object value, Properties properties) {
-        new PropertyInitializer(value, properties).inject("");
     }
 }

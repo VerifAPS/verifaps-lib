@@ -22,30 +22,32 @@ package edu.kit.iti.formal.automation.testtables.model;
  * #L%
  */
 
-import java.util.*;
-
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
 import edu.kit.iti.formal.automation.testtables.io.IOFacade;
 import edu.kit.iti.formal.automation.testtables.model.options.PropertyInitializer;
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions;
 import edu.kit.iti.formal.automation.testtables.schema.ConstraintVariable;
-import edu.kit.iti.formal.automation.testtables.schema.Variable;
 import edu.kit.iti.formal.automation.testtables.schema.IoVariable;
+import edu.kit.iti.formal.automation.testtables.schema.Variable;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
 import edu.kit.iti.formal.smv.ast.SVariable;
-import jdk.nashorn.internal.runtime.options.Option;
 
+import java.util.*;
+
+/**
+ * @author Alexander Weigl
+ * @version 2
+ */
 public class GeneralizedTestTable {
-    private Region region;
-    private TableOptions options = null;
     private final LinkedHashMap<String, IoVariable> ioVariables = new LinkedHashMap<>();
     private final Map<String, ConstraintVariable> constraintVariables = new HashMap<>();
     private final Map<String, SVariable> variableMap = new HashMap<>();
     private final Properties properties = new Properties(System.getProperties());
     private final Map<String, FunctionDeclaration> functions = new HashMap<>();
     private final Map<SVariable, Integer> references = new HashMap<>();
-
+    private Region region;
+    private TableOptions options = null;
     private String name;
 
     public TableOptions getOptions() {
@@ -69,12 +71,12 @@ public class GeneralizedTestTable {
         return constraintVariables;
     }
 
-    public void setRegion(Region region) {
-        this.region = region;
-    }
-
     public Region getRegion() {
         return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
     }
 
     public SVariable getSMVVariable(String text) {
@@ -115,16 +117,16 @@ public class GeneralizedTestTable {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public IoVariable getIoVariables(int i) {
         int k = 0;
         for (IoVariable v : ioVariables.values()) {
             if (k++ == i) return v;
         }
         return null;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Map<SVariable, Integer> getReferences() {

@@ -27,22 +27,28 @@ import edu.kit.iti.formal.automation.testtables.Facade;
 import edu.kit.iti.formal.smv.ast.SVariable;
 
 /**
- * Created by weigl on 17.12.16.
+ *
+ * @author Alexander Weigl
+ * @version 1 (17.12.16)
  */
 public class BackwardsReferencesTransformer implements TableTransformer {
+    private TableTransformation tt;
+
     @Override
     public void accept(TableTransformation tt) {
-        tt.getTestTable().getReferences().forEach(
-                (key, value) -> {
-                    DelayModuleBuilder b = new DelayModuleBuilder(key, value);
-                    b.run();
-                    //Add Var
-                    SVariable var = new SVariable(Facade.getHistoryName(key), b.getModuleType());
-                    tt.getTableModule().getStateVars().add(var);
+        this.tt = tt;
+        tt.getTestTable().getReferences().forEach(this::addDelayModule);
+    }
 
-                    //add helper module
-                    tt.getHelperModules().add(b.getModule());
-                }
-        );
+    private void addDelayModule(SVariable variable, Integer history) {
+        DelayModuleBuilder b = new DelayModuleBuilder(variable, history);
+        b.run();
+        //Add Var
+        SVariable var = new SVariable(Facade.getHistoryName(variable),
+                b.getModuleType());
+        tt.getTableModule().getStateVars().add(var);
+
+        //add helper module
+        tt.getHelperModules().add(b.getModule());
     }
 }

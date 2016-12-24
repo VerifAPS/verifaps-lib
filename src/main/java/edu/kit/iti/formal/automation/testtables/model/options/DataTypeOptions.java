@@ -27,30 +27,23 @@ package edu.kit.iti.formal.automation.testtables.model.options;
  */
 public class DataTypeOptions {
 
-    @Property("int")
     private int widthInt = 16;
 
-    @Property("uint")
     private int widthUInt = 16;
 
-    @Property("sint")
     private int widthSInt = 8;
 
-    @Property("usint")
     private int widthUSInt = 8;
 
-    @Property("lint")
     private int widthLInt = 64;
 
-    @Property("ulint")
     private int widthULInt = 64;
 
-    @Property("dint")
     private int widthDInt = 32;
 
-    @Property("udint")
     private int widthUDInt = 32;
 
+    @Property("int")
     public int getWidthInt() {
         return widthInt;
     }
@@ -59,6 +52,8 @@ public class DataTypeOptions {
         this.widthInt = widthInt;
         return this;
     }
+
+    @Property("uint")
 
     public int getWidthUInt() {
         return widthUInt;
@@ -69,6 +64,8 @@ public class DataTypeOptions {
         return this;
     }
 
+    @Property("sint")
+
     public int getWidthSInt() {
         return widthSInt;
     }
@@ -77,6 +74,8 @@ public class DataTypeOptions {
         this.widthSInt = widthSInt;
         return this;
     }
+
+    @Property("usint")
 
     public int getWidthUSInt() {
         return widthUSInt;
@@ -87,6 +86,8 @@ public class DataTypeOptions {
         return this;
     }
 
+    @Property("lint")
+
     public int getWidthLInt() {
         return widthLInt;
     }
@@ -95,6 +96,8 @@ public class DataTypeOptions {
         this.widthLInt = widthLInt;
         return this;
     }
+
+    @Property("ulint")
 
     public int getWidthULInt() {
         return widthULInt;
@@ -105,6 +108,7 @@ public class DataTypeOptions {
         return this;
     }
 
+    @Property("dint")
     public int getWidthDInt() {
         return widthDInt;
     }
@@ -118,6 +122,7 @@ public class DataTypeOptions {
         return widthUDInt;
     }
 
+    @Property("udint")
     public DataTypeOptions setWidthUDInt(int widthUDInt) {
         this.widthUDInt = widthUDInt;
         return this;

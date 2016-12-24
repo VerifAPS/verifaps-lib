@@ -26,42 +26,38 @@ package edu.kit.iti.formal.automation.testtables.model.options;
  * Created by weigl on 16.12.16.
  */
 public class TableOptions {
-
-    @Property
     private Mode mode;
 
-    @Property(namespace = "concrete-table")
     private ConcreteTableOptions concreteTableOptions = new ConcreteTableOptions();
 
-    @Property(namespace = "datatype")
     private DataTypeOptions dataTypeOptions = new DataTypeOptions();
 
+    @Property
     public Mode getMode() {
         if (mode == null)
             mode = Mode.CONFORMANCE;
         return mode;
     }
 
-    public TableOptions setMode(Mode mode) {
+    public void setMode(Mode mode) {
         this.mode = mode;
-        return this;
     }
 
+    @Property(value = "cycles")
     public ConcreteTableOptions getConcreteTableOptions() {
         return concreteTableOptions;
     }
 
-    public TableOptions setConcreteTableOptions(ConcreteTableOptions concreteTableOptions) {
+    public void setConcreteTableOptions(ConcreteTableOptions concreteTableOptions) {
         this.concreteTableOptions = concreteTableOptions;
-        return this;
     }
 
+    @Property(value = "datatype")
     public DataTypeOptions getDataTypeOptions() {
         return dataTypeOptions;
     }
 
-    public TableOptions setDataTypeOptions(DataTypeOptions dataTypeOptions) {
+    public void setDataTypeOptions(DataTypeOptions dataTypeOptions) {
         this.dataTypeOptions = dataTypeOptions;
-        return this;
     }
 }

@@ -58,7 +58,7 @@ public class StatesTransformer implements TableTransformer {
         if (d.isOneStep()) { // [1,1]
             clockVariableFwd = SLiteral.TRUE;
             clockVariableKeep = SLiteral.FALSE;
-        } else if (d.isUnbounded()) {
+        } else if (d.getLower() == 0 && d.isUnbounded()) {
             clockVariableFwd = SLiteral.TRUE;
             clockVariableKeep = SLiteral.TRUE;
         } else {
@@ -66,20 +66,20 @@ public class StatesTransformer implements TableTransformer {
             //possible [n,m], [0,m], [n,*]
             SVariable clock = introduceClock(s);
 
-            if (d.lower <= 0) {
+            if (d.getLower() <= 0) {
                 clockVariableFwd = SLiteral.TRUE;
             } else {
                 clockVariableFwd = new SBinaryExpression(clock,
                         SBinaryOperator.GREATER_EQUAL,
-                        new SLiteral(clock.getSMVType(), d.lower));
+                        new SLiteral(clock.getSMVType(), d.getLower()));
             }
 
-            if (d.upper == -1) {
+            if (d.getUpper() == -1) {
                 clockVariableKeep = SLiteral.TRUE;
             } else {
                 clockVariableKeep = new SBinaryExpression(clock,
                         SBinaryOperator.LESS_THAN,
-                        new SLiteral(clock.getSMVType(), d.upper));
+                        new SLiteral(clock.getSMVType(), d.getUpper()));
             }
         }
 
@@ -103,9 +103,13 @@ public class StatesTransformer implements TableTransformer {
     }
 
     private SVariable introduceClock(State s) {
-        int max = s.getDuration().maxCounterValue();
+
+        //region Find suitable datatype
+        int concreteValue = gtt.getOptions().getConcreteTableOptions().getCount(s.getId(), -1);
+        int max = Math.max(concreteValue, s.getDuration().maxCounterValue());
         int bits = (int) Math.ceil(Math.log(1 + max) / Math.log(2));
         SMVType.SMVTypeWithWidth dt = new SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, bits);
+        //endregion
 
         // clock variable
         SVariable clockModule = new SVariable("clock" + s.getId(), dt);
@@ -135,9 +139,10 @@ public class StatesTransformer implements TableTransformer {
         mt.getStateVars().add(clockModule);
         mt.getInitAssignments().add(init);
         mt.getNextAssignments().add(next);
-
+        mt.getClocks().put(s, clockModule);
         return clockModule;
     }
+
 
     private void addNextAssignments(State inc) {
         // I get actived if one of my outgoing is valid
@@ -187,7 +192,7 @@ public class StatesTransformer implements TableTransformer {
         mt = tt.getTableModule();
         gtt = tt.getTestTable();
         reachable = tt.getReachable();
-        errorState= tt.getErrorState();
+        errorState = tt.getErrorState();
         createStates();
     }
 }

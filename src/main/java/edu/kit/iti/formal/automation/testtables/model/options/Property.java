@@ -31,9 +31,7 @@ import java.lang.annotation.Target;
  * Created by weigl on 16.12.16.
  */
 @Retention(value = RetentionPolicy.RUNTIME)
-@Target(value = ElementType.FIELD)
+@Target(value = ElementType.METHOD)
 public @interface Property {
     String value() default "";
-
-    String namespace() default "";
 }

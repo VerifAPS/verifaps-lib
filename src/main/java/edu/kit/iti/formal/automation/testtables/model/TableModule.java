@@ -25,11 +25,19 @@ package edu.kit.iti.formal.automation.testtables.model;
 import edu.kit.iti.formal.smv.ast.SMVModuleImpl;
 import edu.kit.iti.formal.smv.ast.SVariable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Alexander Weigl
  * @version 1 (11.12.16)
  */
 public class TableModule extends SMVModuleImpl {
+    private Map<State, SVariable> clocks = new HashMap<>();
+
+    public Map<State, SVariable> getClocks() {
+        return clocks;
+    }
 
     public void setName(String name) {
         this.name = name;

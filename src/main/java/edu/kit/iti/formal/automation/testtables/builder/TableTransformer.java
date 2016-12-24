@@ -25,7 +25,10 @@ package edu.kit.iti.formal.automation.testtables.builder;
 import java.util.function.Consumer;
 
 /**
- * Created by weigl on 17.12.16.
+ * A {@link TableTransformer} modifies a {@link TableTransformation} object.
+ *
+ * @author Alexander Weigl
+ * @version 1 (17.12.16)
  */
 public interface TableTransformer extends Consumer<TableTransformation> {
 

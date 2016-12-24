@@ -22,7 +22,7 @@
     </steps>
 
     <options>
-        <option key="MODE" value="CONFORMANCE"/>
+        <option key="mode" value="CONCRETE_TABLE"/>
     </options>
 
 </test-table>

@@ -23,36 +23,71 @@ package edu.kit.iti.formal.automation.testtables.model;
  */
 
 /**
- * Created by weigl on 10.12.16.
+ * <p>Created on 10.12.16</p>
+ *
+ * @author Alexander Weigl
  */
 public class Duration {
-    public int lower;
-    public int upper;
+    private int lower;
+    private int upper;
 
     public Duration() {
+        assert invariant();
     }
 
     public Duration(int l, int u) {
         lower = l;
         upper = u;
+        assert invariant();
     }
 
+    public boolean invariant() {
+        return (upper >= lower || isUnbounded()) && lower >= 0;
+    }
+
+    /**
+     * returns true, iff the step can be applied arbitrary often (no upper bound)
+     *
+     * @return
+     */
     public boolean isUnbounded() {
         return upper == -1;
     }
 
+    /**
+     * returns true, iff the step is applied only once
+     *
+     * @return
+     */
     public boolean isOneStep() {
         return fixedStep() && upper == 1;
     }
 
-    public boolean skipable() {
+    /**
+     * returns true, if the step can be overjumped directly
+     *
+     * @return
+     */
+    public boolean skippable() {
         return lower == 0;
     }
 
+    /**
+     * returns the maximum integer interval border.
+     * <p>
+     * <p>Useful for the integer width needed to store the clock value</p>
+     *
+     * @return
+     */
     public int maxCounterValue() {
         return Math.max(lower, upper) + 1;
     }
 
+    /**
+     * Returns true if the duration is a singleton interval
+     *
+     * @return
+     */
     public boolean fixedStep() {
         return upper == lower;
     }
@@ -61,7 +96,25 @@ public class Duration {
         return lower;
     }
 
+    public void setLower(int lower) {
+        this.lower = lower;
+    }
+
     public int getUpper() {
         return upper;
+    }
+
+    public void setUpper(int upper) {
+        this.upper = upper;
+    }
+
+    /**
+     * checks if the given integer lies within the duration
+     *
+     * @param cycles
+     * @return
+     */
+    public boolean contains(int cycles) {
+        return (lower <= cycles && (isUnbounded() || cycles <= upper));
     }
 }

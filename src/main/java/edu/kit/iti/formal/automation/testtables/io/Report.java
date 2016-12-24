@@ -22,9 +22,9 @@ package edu.kit.iti.formal.automation.testtables.io;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.testtables.exception.ProgramAbortionException;
 import edu.kit.iti.formal.automation.testtables.report.Counterexample;
 import edu.kit.iti.formal.automation.testtables.report.Message;
-import edu.kit.iti.formal.automation.testtables.exception.ProgramAbortionException;
 import edu.kit.iti.formal.automation.testtables.report.ObjectFactory;
 
 import javax.xml.bind.JAXBContext;
@@ -36,14 +36,15 @@ import javax.xml.bind.Marshaller;
  * @version 1 (11.12.16)
  */
 public class Report {
-    static long START_TIME = System.currentTimeMillis();
     public static boolean XML_MODE = false;
+    static long START_TIME = System.currentTimeMillis();
     static Message msg;
 
     static {
         msg = new Message();
         Message.Log log = new Message.Log();
         msg.setLog(log);
+        msg.setReturncode("unknown");
     }
 
     public static void debug(String msg, Object... args) {

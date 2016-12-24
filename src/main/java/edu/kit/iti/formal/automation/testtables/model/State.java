@@ -32,7 +32,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by weigl on 10.12.16.
+ * @author Alexander Weigl
+ * @vesion 1 (10.12.16)
  */
 public class State {
     private final int id;
@@ -69,10 +70,17 @@ public class State {
         return new SVariable("s" + id, SMVType.BOOLEAN);
     }
 
+    /**
+     * @return
+     */
     public int count() {
         return 1;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getId() {
         return id;
     }

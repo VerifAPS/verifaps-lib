@@ -25,7 +25,6 @@ package edu.kit.iti.formal.automation.testtables.builder;
 import edu.kit.iti.formal.automation.testtables.io.Report;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.TableModule;
-import edu.kit.iti.formal.smv.ast.SMVModule;
 
 /**
  * Created by weigl on 17.12.16.
@@ -35,7 +34,7 @@ public class NameSetterTransformer implements TableTransformer {
     public void accept(TableTransformation tt) {
         TableModule mt = tt.getTableModule();
         GeneralizedTestTable gtt = tt.getTestTable();
-        if (mt.getName() == null || mt.getName().isEmpty()) {
+        if (gtt.getName() == null || gtt.getName().isEmpty()) {
             Report.fatal("No table name given.");
         }
         mt.setName(gtt.getName());
