@@ -5,11 +5,12 @@
     <parent>
         <groupId>edu.kit.iti.formal</groupId>
         <artifactId>verifaps</artifactId>
-        <version>1.0.0</version>
+        <version>1.2.0</version>
     </parent>
 
     <artifactId>geteta</artifactId>
-    <version>0.3.0</version>
+    <!-- Every version upgrade, add a changelog to src/site/index.md -->
+    <version>0.2.1-beta</version>
 
     <repositories>
         <repository>
@@ -112,6 +113,30 @@
                         <goals>
                             <goal>antlr4</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <configuration>
+                    <!-- put your configurations here -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>edu.kit.iti.formal.automation.testtables.ExTeTa</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

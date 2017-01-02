@@ -4,7 +4,7 @@ package edu.kit.iti.formal.automation.testtables.exception;
  * #%L
  * geteta
  * %%
- * Copyright (C) 2016 Alexander Weigl
+ * Copyright (C) 2016 - 2017 Alexander Weigl
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -23,27 +23,26 @@ package edu.kit.iti.formal.automation.testtables.exception;
  */
 
 /**
- * @author Alexander Weigl
- * @version 1 (24.12.16)
+ * Created by weigl on 02.01.17.
  */
-public class IllegalClockCyclesException extends GetetaException {
-    public IllegalClockCyclesException() {
+public class GetetaException extends RuntimeException {
+    public GetetaException() {
         super();
     }
 
-    public IllegalClockCyclesException(String message) {
+    public GetetaException(String message) {
         super(message);
     }
 
-    public IllegalClockCyclesException(String message, Throwable cause) {
+    public GetetaException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public IllegalClockCyclesException(Throwable cause) {
+    public GetetaException(Throwable cause) {
         super(cause);
     }
 
-    protected IllegalClockCyclesException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected GetetaException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

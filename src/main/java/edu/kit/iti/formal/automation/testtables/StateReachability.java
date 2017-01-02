@@ -33,8 +33,8 @@ import java.util.stream.Stream;
 /**
  * Calculation of the State/Row reachability.
  * <p>
- * <p>
  * A <i>i</i>th row can reach (directly) the <i>j</i>th row iff
+ * </p>
  * <ol>
  * <li><i>(i+1)</i>th can reach the <i>j</i>th row and the duration
  * of <i>i+1</i> can be zero ({@link edu.kit.iti.formal.automation.testtables.model.Duration}.getLower() == 0).
@@ -43,9 +43,9 @@ import java.util.stream.Stream;
  * <i>i</i>th row is the end of block and <i>j</i>th row is the beginning of the same block.
  * </li>
  * </ol>
- * </p>
  * <p>
  * This resolution is programmed as a fixpoint algorithm.
+ * </p>
  * <p>
  * Currently supports of blocks and arbitrary durations.
  * </p>
@@ -169,7 +169,6 @@ public class StateReachability {
     }
 
     /**
-     *
      * @param incoming
      * @return
      */

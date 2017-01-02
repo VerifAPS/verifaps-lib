@@ -25,5 +25,5 @@ package edu.kit.iti.formal.automation.testtables.exception;
 /**
  * Created by weigl on 15.12.16.
  */
-public class ProgramAbortionException extends RuntimeException {
+public class ProgramAbortionException extends GetetaException {
 }

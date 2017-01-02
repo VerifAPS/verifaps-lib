@@ -29,7 +29,7 @@ import edu.kit.iti.formal.smv.ast.SVariable;
  * @author Alexander Weigl
  * @version 1 (13.12.16)
  */
-public class SpecificationInterfaceMisMatchException extends RuntimeException {
+public class SpecificationInterfaceMisMatchException extends GetetaException {
     public SpecificationInterfaceMisMatchException() {
         super();
     }

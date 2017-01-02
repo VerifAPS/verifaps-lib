@@ -33,7 +33,7 @@ import java.util.List;
 
 /**
  * @author Alexander Weigl
- * @vesion 1 (10.12.16)
+ * @version 1 (10.12.16)
  */
 public class State {
     private final int id;

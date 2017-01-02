@@ -9,6 +9,11 @@
         <version>1.6</version>
     </skin>
 
+    <bannerRight>
+        <height>8em</height>
+        <src>http://formal.iti.kit.edu/projects/improve-aps/Logo.png</src>
+    </bannerRight>
+
     <body>
         <links>
             <item name="Application-oriented Verification"
@@ -18,9 +23,8 @@
         </links>
 
         <menu name="About">
-            <item name="Introduction" href="introduction.html"/>
-            <item name="Cell Expression" href="cellexpr.html"/>
-            <item name="Format" href="design.html"/>
+            <item name="How to use" href="index.html"/>
+            <item name="Test tables" href="intro.html"/>
         </menu>
 
         <menu ref="reports"/>

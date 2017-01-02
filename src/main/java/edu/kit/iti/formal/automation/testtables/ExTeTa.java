@@ -25,6 +25,7 @@ package edu.kit.iti.formal.automation.testtables;
 import edu.kit.iti.formal.automation.SymbExFacade;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.testtables.builder.TableTransformation;
+import edu.kit.iti.formal.automation.testtables.exception.GetetaException;
 import edu.kit.iti.formal.automation.testtables.io.Report;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.smv.ast.SMVModule;
@@ -48,6 +49,8 @@ public class ExTeTa {
             Report.fatal(e.getLinkedException().getMessage());
         } catch (IOException e) {
             Report.fatal("IOExcepton: %s", e.getMessage());
+        } catch (GetetaException e) {
+            Report.fatal("Internal error: %s", e.getMessage());
         }
     }
 

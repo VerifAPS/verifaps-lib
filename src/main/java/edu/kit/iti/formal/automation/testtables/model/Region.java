@@ -27,8 +27,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * created on 10.12.16.
  * @author Alexander Weigl
- * @vesion 1 (10.12.16)
+ * @version  1
  */
 public class Region extends State {
     private List<State> children = new ArrayList<>();
