@@ -192,7 +192,7 @@ public class VariableDeclaration
      * @return a {@link edu.kit.iti.formal.automation.st.ast.Initialization} object.
      */
     public Initialization getInit() {
-        return typeDeclaration.getInitializationValue();
+        return typeDeclaration.initialization;
     }
 
     /*public void setInit(Initialization init) {

@@ -410,9 +410,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     @Override
     public Object visit(SimpleTypeDeclaration simpleTypeDeclaration) {
         sb.div(Sections.TYPE_DECL_SIMPLE).type(simpleTypeDeclaration.getBaseTypeName());
-        if (simpleTypeDeclaration.getInitializationValue() != null) {
+        if (simpleTypeDeclaration.getInitialization() != null) {
             sb.operator(" := ");
-            simpleTypeDeclaration.getInitializationValue().visit(this);
+            simpleTypeDeclaration.getInitialization().visit(this);
         }
         sb.end();
         return null;

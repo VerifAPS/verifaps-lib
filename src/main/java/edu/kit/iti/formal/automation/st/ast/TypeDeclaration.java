@@ -36,8 +36,7 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
     protected String typeName;
     protected String baseTypeName;
     protected Any baseType;
-    protected T initializationValue;
-    private T initialization;
+    protected T initialization;
 
     /**
      * <p>Constructor for TypeDeclaration.</p>
@@ -90,24 +89,6 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
      */
     public void setBaseTypeName(String baseTypeName) {
         this.baseTypeName = baseTypeName;
-    }
-
-    /**
-     * <p>Getter for the field <code>initializationValue</code>.</p>
-     *
-     * @return a T object.
-     */
-    public T getInitializationValue() {
-        return initializationValue;
-    }
-
-    /**
-     * <p>Setter for the field <code>initializationValue</code>.</p>
-     *
-     * @param initializationValue a T object.
-     */
-    public void setInitializationValue(T initializationValue) {
-        this.initializationValue = initializationValue;
     }
 
     /** {@inheritDoc} */

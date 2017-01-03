@@ -39,25 +39,6 @@ public class StringTypeDeclaration extends TypeDeclaration<ScalarValue<? extends
     private ScalarValue<? extends AnyInt, Long> size;
 
     /**
-     * <p>getInitializationValue.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
-     */
-    public ScalarValue<? extends IECString, String> getInitializationValue() {
-        return initializationValue;
-    }
-
-    /**
-     * <p>setInitializationValue.</p>
-     *
-     * @param initializationValue a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
-     */
-    public void setInitializationValue(ScalarValue<? extends IECString, String> initializationValue) {
-        this.initializationValue = initializationValue;
-
-    }
-
-    /**
      * <p>Getter for the field <code>size</code>.</p>
      *
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.

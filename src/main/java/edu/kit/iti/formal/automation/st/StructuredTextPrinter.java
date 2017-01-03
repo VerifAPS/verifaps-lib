@@ -437,9 +437,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     @Override
     public Object visit(SimpleTypeDeclaration simpleTypeDeclaration) {
         sb.append(simpleTypeDeclaration.getBaseTypeName());
-        if (simpleTypeDeclaration.getInitializationValue() != null) {
+        if (simpleTypeDeclaration.getInitialization() != null) {
             sb.append(" := ");
-            simpleTypeDeclaration.getInitializationValue().visit(this);
+            simpleTypeDeclaration.getInitialization().visit(this);
         }
         return null;
     }

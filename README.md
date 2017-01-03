@@ -6,18 +6,44 @@
 Parser and AST for StructuredText, Sequential Function Charts and Function Blocks.
 
 
-* Licsense: GPL v3
+* License: GPL v3
 * Author
-  * Alexander Weigl (@wadoon)
+  * Alexander Weigl <weigl@kit.edu>
 
 # Getting Started
 
+## From the repository
+
+```
+<project>
+    ...
+    <dependency>
+        <groupId>edu.kit.iti.formal</groupId>
+        <artifactId>iec61131lang</artifactId>
+        <version>0.1.9</version>
+    </dependency>
+    ...
+    <repositories>
+        <repository>
+            <id>formal-iti-kit</id>
+            <url>http://formal.iti.kit.edu/</url>
+        </repository>
+    </repositories>
+    ... 
+</project>
+
+
+
+```
+
+## from source
 
 ```
 $ git clone  https://github.com/VerifAPS/iec61131lang.git
 $ mvn compile assembly
 $ mvn install
 ```
+
 
 # TODO
 

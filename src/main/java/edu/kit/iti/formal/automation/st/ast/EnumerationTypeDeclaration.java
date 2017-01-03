@@ -87,12 +87,12 @@ public class EnumerationTypeDeclaration extends TypeDeclaration<ScalarValue<Enum
     @Override
     public EnumerateType getDataType(GlobalScope globalScope) {
         String init = allowedValues.get(0);
-        if (initializationValue != null && initializationValue.getValue() != null) {
-            if (initializationValue.getValue() instanceof String) {
-                String value = (String) initializationValue.getValue();
+        if (initialization != null && initialization.getValue() != null) {
+            if (initialization.getValue() instanceof String) {
+                String value = (String) initialization.getValue();
                 init = value;
-            } else if (initializationValue.getValue() instanceof Integer) {
-                Integer value = (Integer) initializationValue.getValue();
+            } else if (initialization.getValue() instanceof Integer) {
+                Integer value = (Integer) initialization.getValue();
                 init = allowedValues.get(value);
             }
         }

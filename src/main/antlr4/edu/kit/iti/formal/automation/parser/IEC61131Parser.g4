@@ -477,9 +477,8 @@ var_decls [VariableBuilder gather]
         td=type_declaration
         SEMICOLON
         { gather.setPosition($variable_keyword.ctx, $SEMICOLON);
-                gather.type($td.ast);
-                gather.close(); }
-      )*
+          gather.type($td.ast).close(); }
+        )*
       END_VAR
     )*
 ;
