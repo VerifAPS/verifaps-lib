@@ -115,7 +115,7 @@ public class Printer implements SMVAstVisitor<String> {
         if (!m.getModuleParameter().isEmpty()) {
             sb.append("(").append(
                     m.getModuleParameter().stream()
-                            .map(p -> p.getName())
+                            .map(p -> p.accept(this))
                             .reduce((a, b) -> a + ", " + b)
                             .get())
                     .append(")");
@@ -215,6 +215,8 @@ public class Printer implements SMVAstVisitor<String> {
             sb.append("-- end of ").append(type).append('\n');
         }
     }
+
+
 
     @Override
     public String visit(SVariable v) {

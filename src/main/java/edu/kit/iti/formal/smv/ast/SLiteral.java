@@ -62,7 +62,10 @@ public class SLiteral extends SMVExpr {
 
     @Override
     public String toString() {
-        return dataType.format(value);
+        if (dataType != null)
+            return dataType.format(value);
+        else
+            return value.toString();
     }
 
     @Override

@@ -60,6 +60,10 @@ public class SMVFacade {
         return exprs.stream().reduce(reducer(op)).get();
     }
 
+    public static SMVExpr combine(SBinaryOperator op, List<SMVExpr> exprs, SMVExpr defaultValue) {
+        return exprs.stream().reduce(reducer(op)).orElse(defaultValue);
+    }
+
     public static BinaryOperator<SMVExpr> reducer(SBinaryOperator op) {
         return (SMVExpr a, SMVExpr b) -> {
             return new SBinaryExpression(a, op, b);

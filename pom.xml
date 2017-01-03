@@ -5,11 +5,11 @@
     <parent>
         <groupId>edu.kit.iti.formal</groupId>
         <artifactId>verifaps</artifactId>
-        <version>1.0.0</version>
+        <version>1.2.0</version>
     </parent>
 
     <artifactId>smv-model</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <packaging>jar</packaging>
 
     <name>smv-model</name>

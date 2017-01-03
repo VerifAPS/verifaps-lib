@@ -22,6 +22,8 @@ package edu.kit.iti.formal.smv.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.smv.Printer;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -202,10 +204,10 @@ public class SMVType {
     }
 
     public static class Module extends SMVType {
-        private final List<SVariable> parameters;
+        private final List<? extends SMVExpr> parameters;
         private final String moduleName;
 
-        public Module(String name, List<SVariable> moduleParameter) {
+        public Module(String name, List<? extends SMVExpr> moduleParameter) {
             this.moduleName = name;
             this.parameters = moduleParameter;
         }
@@ -216,11 +218,12 @@ public class SMVType {
 
         @Override
         public String toString() {
+            Printer printer = new Printer();
             return String.format("%s(%s)",
                     moduleName,
                     parameters.stream()
-                            .map(v -> v.getName())
-                            .reduce((a, b) -> a + ", " + b).get());
+                            .map(v -> v.accept(printer))
+                            .reduce((a, b) -> a + ", " + b).orElse(""));
         }
 
         @Override
