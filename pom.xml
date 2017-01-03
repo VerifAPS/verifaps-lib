@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>iec61131lang</artifactId>
-    <version>0.1.9</version>
+    <version>0.1.10</version>
     <packaging>jar</packaging>
 
     <name>iec61131lang</name>
