@@ -1,4 +1,4 @@
-# Geteta - ${project.version}
+# Geteta 
 
 Generalized Test Tables ensures safety in automation software.
 
@@ -6,7 +6,10 @@ Generalized Test Tables ensures safety in automation software.
 
 These are jar files include all dependencies:
 
-* 0.3.0: *not released* [geteta-0.3.0.jar](downloads/geteta-0.3.0.jar)
+* 0.3.0: [geteta-0.3.0.jar](downloads/geteta-0.3.0.jar)
+  * enum support tested and fixed
+* 0.2.2-beta: [geteta-0.2.2-beta.jar](downloads/geteta-0.2.2-beta.jar)
+  * better nuxmv output parser
 * 0.2.1-beta: [geteta-0.2.1-beta.jar](downloads/geteta-0.2.1-beta.jar)
   * Internal changes
 * 0.2.0: [geteta-0.2.0.jar](downloads/geteta-0.2.0.jar)

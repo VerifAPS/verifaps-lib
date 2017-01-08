@@ -10,7 +10,7 @@
 
     <artifactId>geteta</artifactId>
     <!-- Every version upgrade, add a changelog to src/site/index.md -->
-    <version>0.2.1-beta</version>
+    <version>0.3.0</version>
 
     <repositories>
         <repository>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>edu.kit.iti.formal</groupId>
             <artifactId>iec61131lang</artifactId>
-            <version>0.1.9</version>
+            <version>0.1.10</version>
         </dependency>
 
         <dependency>
@@ -54,7 +54,7 @@
         <dependency>
             <groupId>edu.kit.iti.formal</groupId>
             <artifactId>smv-model</artifactId>
-            <version>0.1.0</version>
+            <version>0.1.1</version>
         </dependency>
 
 
