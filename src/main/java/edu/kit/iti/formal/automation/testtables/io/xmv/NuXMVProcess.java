@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.testtables.io;
+package edu.kit.iti.formal.automation.testtables.io.xmv;
 
 /*-
  * #%L
@@ -22,17 +22,14 @@ package edu.kit.iti.formal.automation.testtables.io;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.testtables.report.Assignment;
+import edu.kit.iti.formal.automation.testtables.io.Report;
 import edu.kit.iti.formal.automation.testtables.report.Counterexample;
 import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -133,8 +130,9 @@ public class NuXMVProcess implements Runnable {
 
             Process p = pb.start();
             p.waitFor();
-            Counterexample ce = NuXMVOutputParser.parseOutput(outputFile);
-            verified = ce == null;
+            NuXMVOutputParser parser = new NuXMVOutputParser(outputFile);
+            Counterexample ce = parser.run();
+            verified = parser.invariantHolds;
         } catch (IOException e) {
             Report.error("Error in running nuxmv: %s", e.getMessage());
             Report.error("Command line are: %s", Arrays.toString(commands));
@@ -158,85 +156,6 @@ public class NuXMVProcess implements Runnable {
         return verified;
     }
 
-    static class NuXMVOutputParser {
-        static final String SKIP_MARKER = "Counterexample";
-        static final String START_MARKER = "-> State: 1.1 <-";
-        static final Pattern STATE_SEPERATOR = Pattern.compile("-> Input: .* <-");
-        static final String ASSIGNMENT_SEPERATOR = "=";
-        static final Pattern INPUT_STATE_SEPERATOR = Pattern.compile("-> .* <-");
-        public static final Pattern NEWLINE = Pattern.compile("\n");
-
-        private static Counterexample parseOutput(File input) throws IOException {
-            Counterexample ce = new Counterexample();
-            try (BufferedReader fr = new BufferedReader(new FileReader(input))) {
-                String content = IOUtils.toString(fr);
-                int posCe = content.indexOf(SKIP_MARKER);
-                if (posCe >= 0) {
-                    content = content.substring(content.indexOf(START_MARKER));
-                    String[] states = STATE_SEPERATOR.split(content);
-                    List<Counterexample.Step> l = Arrays.stream(states)
-                            .map(NuXMVOutputParser::parseState)
-                            .collect(Collectors.toList());
-                    ce.getStep().addAll(l);
-                    Report.setErrorLevel("not-verified");
-                    Report.setCounterExample(ce);
-                } else {
-                    if (content.contains("is true")) {
-                        Report.setErrorLevel("verified");
-                        return null;
-                    } else {
-                        Report.setErrorLevel("nuxmv-error");
-                        handleErrors(content);
-                        return ce;
-                    }
-                }
-            }
-            return ce;
-        }
-
-        private static void handleErrors(String content) {
-            NEWLINE.splitAsStream(content).forEach(
-                    line ->
-                    {
-                        if (line.contains("error")
-                                || line.contains("TYPE ERROR")
-                                || line.contains("undefined"))
-                            Report.fatal("NUXVM error: %s", line);
-                    });
-        }
-
-        private static Counterexample.Step parseState(String state) {
-            Function<String, Assignment> parseLine = (String line) -> {
-                if (line.trim().isEmpty())
-                    return null;
-                String[] s = line.split(ASSIGNMENT_SEPERATOR);
-                if (s.length != 2)
-                    return null;
-                Assignment a = new Assignment();
-                a.setName(s[0].trim());
-                a.setValue(s[1].trim());
-                return a;
-            };
-
-            Counterexample.Step step = new Counterexample.Step();
-
-            // split into input/output
-
-            String[] io = INPUT_STATE_SEPERATOR.split(state);
-
-            NEWLINE.splitAsStream(io[0])
-                    .map(parseLine)
-                    .filter(Objects::nonNull)
-                    .forEachOrdered(step.getInput()::add);
-            NEWLINE.splitAsStream(io[1])
-                    .map(parseLine)
-                    .filter(Objects::nonNull)
-                    .forEachOrdered(step.getState()::add);
-
-            return step;
-        }
-
-    }
 }
 
 //file /home/weigl/work/verifaps/exteta/src/test/resources/success.smv: line 9: at token "": syntax error

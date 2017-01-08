@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.testtables.io;
+package edu.kit.iti.formal.automation.testtables.io.xmv;
 
 /*-
  * #%L
@@ -23,8 +23,7 @@ package edu.kit.iti.formal.automation.testtables.io;
  */
 
 
-import edu.kit.iti.formal.automation.testtables.io.xmv.NuXMVAdapter;
-import edu.kit.iti.formal.automation.testtables.io.xmv.NuXMVProcess;
+import edu.kit.iti.formal.automation.testtables.io.Report;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;

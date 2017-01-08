@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.testtables.io;
+package edu.kit.iti.formal.automation.testtables.io.xmv;
 
 /*-
  * #%L
@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.testtables.io;
  */
 
 
+import edu.kit.iti.formal.automation.testtables.io.Report;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 
 import java.io.File;

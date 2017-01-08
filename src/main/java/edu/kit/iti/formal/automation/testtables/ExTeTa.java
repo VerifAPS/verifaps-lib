@@ -29,7 +29,10 @@ import edu.kit.iti.formal.automation.testtables.exception.GetetaException;
 import edu.kit.iti.formal.automation.testtables.io.Report;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.smv.ast.SMVModule;
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.ParseException;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
@@ -79,7 +82,7 @@ public class ExTeTa {
         TableTransformation tt = new TableTransformation(table);
         SMVModule modTable = tt.transform();
         SMVModule modCode = SymbExFacade.evaluateProgram(code);
-        SMVModule mainModule = Facade.glue(modTable, modCode);
+        SMVModule mainModule = Facade.glue(modTable, modCode, table.getOptions());
 
         List<SMVModule> modules = new LinkedList<>();
         modules.add(mainModule);

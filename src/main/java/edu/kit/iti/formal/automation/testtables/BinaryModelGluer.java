@@ -23,10 +23,9 @@ package edu.kit.iti.formal.automation.testtables;
  */
 
 import edu.kit.iti.formal.automation.testtables.exception.SpecificationInterfaceMisMatchException;
-import edu.kit.iti.formal.smv.ast.SMVModule;
-import edu.kit.iti.formal.smv.ast.SMVModuleImpl;
-import edu.kit.iti.formal.smv.ast.SMVType;
-import edu.kit.iti.formal.smv.ast.SVariable;
+import edu.kit.iti.formal.automation.testtables.model.options.TableOptions;
+import edu.kit.iti.formal.smv.SMVFacade;
+import edu.kit.iti.formal.smv.ast.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,9 +40,13 @@ public class BinaryModelGluer implements Runnable {
     public static final String MAIN_MODULE = "main";
     private final SMVModule code;
     private final SMVModule table;
+    private final TableOptions options;
     private SMVModuleImpl product = new SMVModuleImpl();
 
-    public BinaryModelGluer(SMVModule modTable, SMVModule modCode) {
+    public BinaryModelGluer(TableOptions options,
+                            SMVModule modTable,
+                            SMVModule modCode) {
+        this.options = options;
         table = modTable;
         code = modCode;
     }
@@ -56,24 +59,28 @@ public class BinaryModelGluer implements Runnable {
     @Override
     public void run() {
         product.setName(MAIN_MODULE);
-        code.getModuleParameter().forEach(product.getInputVars()::add);
+        product.getInputVars().addAll(code.getModuleParameter());
 
         product.getStateVars().add(new SVariable(
                 CODE_MODULE,
                 new SMVType.Module(code.getName(),
                         code.getModuleParameter())));
 
-        List<SVariable> taP =
+        List<SMVExpr> taP =
                 table.getModuleParameter().stream().map(
                         v -> {
                             if (code.getModuleParameter().contains(v)) {
                                 return v;
                             } else {
+                                //output of program code
                                 if (!code.getStateVars().contains(v)) {
                                     throw new SpecificationInterfaceMisMatchException(code, v);
                                 }
-                                return new SVariable(CODE_MODULE +"."+ v,
-                                        v.getSMVType());
+
+                                SMVExpr var = new SVariable(CODE_MODULE + "." + v, v.getSMVType());
+                                return options.isUseNext()
+                                        ? SMVFacade.next(var)
+                                        : var;
                             }
                         }
                 ).collect(Collectors.toList());

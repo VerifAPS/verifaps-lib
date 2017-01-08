@@ -85,11 +85,11 @@ public class StatesTransformer implements TableTransformer {
 
         // define output predicate
         mt.getDefinitions().put(s.getDefOutput(),
-                SMVFacade.combine(SBinaryOperator.AND, s.getOutputExpr()));
+                SMVFacade.combine(SBinaryOperator.AND, s.getOutputExpr(), SLiteral.TRUE));
 
         // define input predicate
         mt.getDefinitions().put(s.getDefInput(),
-                SMVFacade.combine(SBinaryOperator.AND, s.getInputExpr()));
+                SMVFacade.combine(SBinaryOperator.AND, s.getInputExpr(), SLiteral.TRUE));
 
         // define keep predicate
         mt.getDefinitions().put(s.getDefKeep(),

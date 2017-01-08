@@ -31,6 +31,7 @@ public class TableOptions {
     private ConcreteTableOptions concreteTableOptions = new ConcreteTableOptions();
 
     private DataTypeOptions dataTypeOptions = new DataTypeOptions();
+    private boolean useNext = true;
 
     @Property
     public Mode getMode() {
@@ -59,5 +60,14 @@ public class TableOptions {
 
     public void setDataTypeOptions(DataTypeOptions dataTypeOptions) {
         this.dataTypeOptions = dataTypeOptions;
+    }
+
+    @Property("usenext")
+    public boolean isUseNext() {
+        return useNext;
+    }
+
+    public void setUseNext(boolean useNext) {
+        this.useNext = useNext;
     }
 }

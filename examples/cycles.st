@@ -4,10 +4,12 @@
 
 PROGRAM cycles
     VAR_INPUT
+    i : BOOL;
     END_VAR
 
     VAR
-        macro := 1, micro := 1 : INT;
+        macro : INT := 1;
+        micro : INT := 1;
     END_VAR
 
     VAR_OUTPUT

@@ -25,9 +25,10 @@ package edu.kit.iti.formal.automation.testtables;
 import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.testtables.io.TableReader;
-import edu.kit.iti.formal.automation.testtables.model.SReference;
-import edu.kit.iti.formal.automation.testtables.io.NuXMVAdapter;
+import edu.kit.iti.formal.automation.testtables.io.xmv.NuXMVAdapter;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
+import edu.kit.iti.formal.automation.testtables.model.SReference;
+import edu.kit.iti.formal.automation.testtables.model.options.TableOptions;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SVariable;
 import org.apache.commons.io.IOUtils;
@@ -61,8 +62,8 @@ public class Facade {
     }
 
 
-    public static SMVModule glue(SMVModule modTable, SMVModule modCode) {
-        BinaryModelGluer mg = new BinaryModelGluer(modTable, modCode);
+    public static SMVModule glue(SMVModule modTable, SMVModule modCode, TableOptions options) {
+        BinaryModelGluer mg = new BinaryModelGluer(options, modTable, modCode);
         mg.run();
         return mg.getProduct();
     }
