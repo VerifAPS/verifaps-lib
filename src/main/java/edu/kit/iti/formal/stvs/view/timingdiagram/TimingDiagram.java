@@ -6,7 +6,9 @@ import edu.kit.iti.formal.stvs.model.common.IOVariable;
  * Created by csicar on 09.01.17.
  */
 public class TimingDiagram {
-    public TimingDiagram(IOVariable ioVariable, TableColumn ioVarValues, Selection selection) {
+    public TimingDiagramView view;
+
+    public TimingDiagram(IOVariable ioVariable, TableColumn ioVarValues) {
 
     }
 }
