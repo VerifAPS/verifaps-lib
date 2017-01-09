@@ -153,3 +153,4 @@ _minted*
 
 # scrwfile
 *.wrt
+/bin/
