@@ -1,9 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
+import edu.kit.iti.formal.stvs.model.code.Code;
 import org.w3c.dom.Node;
-
-import java.util.Collection;
-import java.util.concurrent.Future;
 
 /**
  * Created by csicar on 09.01.17.
