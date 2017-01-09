@@ -28,6 +28,7 @@ dependencies {
     compile 'com.fifesoft:rsyntaxtextarea:2.6.0'
     compile 'org.apache.commons:commons-collections4:4.0'
     compile 'edu.kit.iti.formal:geteta:0.2.2-beta'
+    compile 'org.choco-solver:choco-solver:4.0.0'
 
     // Declare the dependency for your favourite test framework you want to use in your tests.
     // TestNG is also supported by the Gradle Test task. Just change the
