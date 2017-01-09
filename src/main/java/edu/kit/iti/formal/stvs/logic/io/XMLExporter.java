@@ -1,13 +1,16 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
 import edu.kit.iti.formal.stvs.model.code.Code;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.model.history.History;
+import edu.kit.iti.formal.stvs.model.io.TestCase;
 import org.w3c.dom.Node;
 
 /**
  * Created by csicar on 09.01.17.
  */
 public class XMLExporter {
-    public Node exportSession(Code code, Collection<SpecificationTable> specs, Config config, History history) {
+    public Node exportSession(Code code, Collection<SpecificationTable> specs, GlobalConfig config, History history) {
         return null;
     }
 
@@ -19,7 +22,7 @@ public class XMLExporter {
         return null;
     }
 
-    public Node exportConfig(Config config) {
+    public Node exportConfig(GlobalConfig config) {
         return null;
     }
 

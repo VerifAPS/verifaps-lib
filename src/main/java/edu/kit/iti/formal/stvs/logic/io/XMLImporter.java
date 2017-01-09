@@ -1,28 +1,30 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.model.history.History;
+import edu.kit.iti.formal.stvs.model.io.TestCase;
 import org.w3c.dom.Node;
 
 /**
  * Created by csicar on 09.01.17.
  */
 public class XMLImporter {
-    public Node readFormFile(String fileName) {
+    public Node readFromFile(String fileName) {
+    }
+
+    public TestCase importVerificationScenario(Node node) throws ImportException {
         return null;
     }
 
-    public TestCase importVerificationScenario(Node node) {
+    public SpecificationTable importTable(Node node) throws ImportException {
         return null;
     }
 
-    public SpecificationTable importTable(Node node) {
+    public GlobalConfig importConfig(Node node) throws ImportException {
         return null;
     }
 
-    public GlobalConfig importConfig(Node node) {
-        return null;
-    }
-
-    public History importHistory(Node node) {
+    public History importHistory(Node node) throws ImportException {
         return null;
     }
 }
