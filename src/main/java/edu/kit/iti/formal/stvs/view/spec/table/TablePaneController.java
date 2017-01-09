@@ -13,6 +13,6 @@ public class TablePaneController {
     private ObservableMap<IOVariable, TableColumnController> columns;
     private DurationsColumnController durationColumn;
 
-    public TablePaneController(HybridTables hybridTable, ObservableSet<String> definedVars, ObservableList<Type> types, ObservableList<IOVariables> ioVars) {
+    public TablePaneController(HybridSpecification hybridSpecification, ObservableSet<String> definedVars, ObservableList<Type> types, ObservableList<IOVariables> ioVars) {
     }
 }
