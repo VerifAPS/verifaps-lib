@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
-class SpecificationsPaneController {
+public class SpecificationsPaneController {
     public SpecificationsPaneController(ObservableList<Type> types, ObservableList<IOVariables> ioVars, ObservableList<HybridTable> hybridTables) {
     }
 

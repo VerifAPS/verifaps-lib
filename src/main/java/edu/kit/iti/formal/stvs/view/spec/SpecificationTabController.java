@@ -3,7 +3,7 @@ package edu.kit.iti.formal.stvs.view.spec;
 
 import javafx.collections.ObservableSet;
 
-class SpecificationTabController {
+public class SpecificationTabController {
     public SpecificationTabController(HybridTables hybridTable, ObservableList<Type> types, ObservableList<IOVariables> ioVars) {
     }
 

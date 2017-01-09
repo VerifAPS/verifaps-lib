@@ -2,6 +2,6 @@ package edu.kit.iti.formal.stvs.view.spec.table.rowActions;
 
 import edu.kit.iti.formal.stvs.view.spec.table.DurationsColumnController;
 
-class AddButtonColumnController{
+public class AddButtonColumnController{
         AddButtonColumnController(DurationsColumnController durations){}
         }

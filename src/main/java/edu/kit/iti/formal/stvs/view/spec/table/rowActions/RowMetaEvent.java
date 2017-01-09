@@ -5,7 +5,7 @@ import javafx.event.EventTarget;
 import javafx.event.EventType;
 
 
-class RowMetaEvent extends Event {
+public class RowMetaEvent extends Event {
     static public EventType<RowMetaEvent> CHANGE_COMMENT;
     private int rowNumber;
     private String comment;

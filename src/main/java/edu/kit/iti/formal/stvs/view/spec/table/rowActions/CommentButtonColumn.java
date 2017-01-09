@@ -1,3 +1,3 @@
 package edu.kit.iti.formal.stvs.view.spec.table.rowActions;
 
-class CommentButtonColumn{}
+public class CommentButtonColumn{}
