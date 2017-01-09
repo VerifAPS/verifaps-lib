@@ -9,7 +9,10 @@ import java.util.function.Consumer;
 public class Code {
     private List<Consumer<Code>> changeListeners;
     private List<Consumer<List<IOVariable>>> ioVariableListeners;
+    private List<Consumer<ParsedCode>> parsedCodeListeners;
+    private ParsedCode parsedCode;
     private String filename;
+    private String sourcecode;
 
     /**
      * creates a Dummy-Codefile
@@ -23,7 +26,7 @@ public class Code {
     }
 
     public String getFilename() {
-        return null
+        return filename;
     }
 
     public void setFilename() {
@@ -31,18 +34,14 @@ public class Code {
     }
 
     public String getSourcecode() {
-        return null;
+        return sourcecode;
     }
 
-    public AST parseCode() {
-        return null;
+    public void insertSourcecode(int position, String code) {
+
     }
 
-    public List<IOVariable> extractVariables() {
-        return null;
-    }
-
-    public List<Token> lexCode() {
+    public List<SourcecodeToken> lexCode() {
         return null;
     }
 
@@ -50,7 +49,11 @@ public class Code {
 
     }
 
-    public void addIOVariablesListener(Consumer<List<IOVariable>>) {
+    public void addIOVariablesListener(Consumer<List<IOVariable>> ioVariablesListener) {
+
+    }
+
+    public void addParsedCodeListener(Consumer<ParsedCode> parsedCodeListener) {
 
     }
 }
