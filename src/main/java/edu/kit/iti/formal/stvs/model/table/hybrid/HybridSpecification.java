@@ -1,0 +1,49 @@
+package edu.kit.iti.formal.stvs.model.table.hybrid;
+
+import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteCell;
+import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteDuration;
+import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintSpecification;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+
+/**
+ * Created by philipp on 10.01.17.
+ */
+public class HybridSpecification extends ConstraintSpecification {
+
+    private Optional<ConcreteSpecification> concreteInstance;
+    private List<Consumer<Optional<ConcreteSpecification>>> concreteInstanceChangedListeners;
+
+    public HybridSpecification(Set<Type> typeContext, Set<IOVariable> ioVariables) {
+        super(typeContext, ioVariables);
+    }
+
+    public Optional<ConcreteSpecification> getConcreteInstance() {
+        return concreteInstance;
+    }
+
+    public void setConcreteInstance(ConcreteSpecification concreteInstance) {
+    }
+
+    public void removeConcreteInstance() {
+
+    }
+
+    public void addConcreteInstanceChangedListener(Consumer<Optional<ConcreteSpecification>> listener) {
+
+    }
+
+    public List<ConcreteCell> getConcreteValuesForConstraint(IOVariable column, int row) {
+        return null;
+    }
+
+    public ConcreteDuration getDurationForConstraint(int row) {
+        return null;
+    }
+}

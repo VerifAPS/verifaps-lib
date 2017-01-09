@@ -29,4 +29,11 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
         return null;
     }
 
+    public Set<Type> getTypeContext() {
+        return typeContext;
+    }
+
+    public void setTypeContext(Set<Type> typeContext) {
+        this.typeContext = typeContext;
+    }
 }
