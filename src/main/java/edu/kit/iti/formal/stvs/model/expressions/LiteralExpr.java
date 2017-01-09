@@ -1,4 +1,4 @@
-package stverificationstudio.expressions;
+package edu.kit.iti.formal.stvs.model.expressions;
 
 public class LiteralExpr extends Expression {
 	

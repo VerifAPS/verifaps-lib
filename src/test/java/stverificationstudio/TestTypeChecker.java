@@ -6,17 +6,17 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
-import stverificationstudio.expressions.Expression;
-import stverificationstudio.expressions.FunctionExpr;
-import stverificationstudio.expressions.LiteralExpr;
-import stverificationstudio.expressions.Type;
-import stverificationstudio.expressions.TypeEnum;
-import stverificationstudio.expressions.TypeFactory;
-import stverificationstudio.expressions.ValueBool;
-import stverificationstudio.expressions.ValueInt;
-import stverificationstudio.expressions.VariableExpr;
-import stverificationstudio.typechecker.TypeCheckException;
-import stverificationstudio.typechecker.TypeChecker;
+import edu.kit.iti.formal.stvs.model.expressions.Expression;
+import edu.kit.iti.formal.stvs.model.expressions.FunctionExpr;
+import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
+import edu.kit.iti.formal.stvs.model.expressions.TypeFactory;
+import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
+import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
+import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
+import edu.kit.iti.formal.stvs.model.typechecker.TypeCheckException;
+import edu.kit.iti.formal.stvs.model.typechecker.TypeChecker;
 
 public class TestTypeChecker {
 

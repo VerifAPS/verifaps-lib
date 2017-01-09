@@ -1,4 +1,4 @@
-package stverificationstudio.expressions;
+package edu.kit.iti.formal.stvs.model.expressions;
 
 import java.util.Arrays;
 

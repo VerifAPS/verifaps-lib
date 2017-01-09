@@ -1,15 +1,15 @@
-package stverificationstudio.typechecker;
+package edu.kit.iti.formal.stvs.model.typechecker;
 
 import java.util.List;
 import java.util.Map;
 
-import stverificationstudio.expressions.Expression;
-import stverificationstudio.expressions.ExpressionVisitor;
-import stverificationstudio.expressions.FunctionExpr;
-import stverificationstudio.expressions.LiteralExpr;
-import stverificationstudio.expressions.Type;
-import stverificationstudio.expressions.TypeFactory;
-import stverificationstudio.expressions.VariableExpr;
+import edu.kit.iti.formal.stvs.model.expressions.Expression;
+import edu.kit.iti.formal.stvs.model.expressions.ExpressionVisitor;
+import edu.kit.iti.formal.stvs.model.expressions.FunctionExpr;
+import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.TypeFactory;
+import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
 
 public class TypeChecker implements ExpressionVisitor<Type> {
 	

@@ -1,6 +1,6 @@
-package stverificationstudio.typechecker;
+package edu.kit.iti.formal.stvs.model.typechecker;
 
-import stverificationstudio.expressions.Expression;
+import edu.kit.iti.formal.stvs.model.expressions.Expression;
 
 public class TypeCheckException extends Exception {
 	private static final long serialVersionUID = 1L;
