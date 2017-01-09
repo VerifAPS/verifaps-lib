@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class CategoryTableController {
     private String title;
-    private HybridTable hybridTable;
+    private HybridSpecification hybridSpecification;
     private ObservableList<Type> types;
     private Predicate<IOVariable> categoryFilter;
     private ObservableList<IOVariables> ioVars;
@@ -15,7 +15,7 @@ public class CategoryTableController {
     private Map<TableColumnController, Integer> columnIndices;
     private SortedList<TableColumnController> sortedColumns;
 
-    public CategoryTableController(String title, HybridTable hybridTable, ObservableList<Type> types, Predicate<IOVariable> categoryFilter, ObservableList<IOVariables> ioVars) {
+    public CategoryTableController(String title, HybridSpecification hybridSpecification, ObservableList<Type> types, Predicate<IOVariable> categoryFilter, ObservableList<IOVariables> ioVars) {
     }
 
     public ObservableList<TableColumnController> getColumns() {
