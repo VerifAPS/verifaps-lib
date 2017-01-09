@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.view.timingdiagram;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteSpecification;
 import javafx.collections.ObservableList;
 
 /**

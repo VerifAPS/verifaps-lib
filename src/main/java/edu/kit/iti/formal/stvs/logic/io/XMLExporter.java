@@ -4,7 +4,10 @@ import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.history.History;
 import edu.kit.iti.formal.stvs.model.io.TestCase;
+import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import org.w3c.dom.Node;
+
+import java.util.Collection;
 
 /**
  * Created by csicar on 09.01.17.
@@ -31,6 +34,5 @@ public class XMLExporter {
     }
 
     public void writeToFile(Node xml, String filename) {
-        return null;
     }
 }
