@@ -11,7 +11,6 @@ import java.util.List;
 public class HybridCellController implements Controller {
     private StringProperty comment;
     private ObservableList<String> counterexamples;
-    private ValueCellController valueCellController;
     private ObservableList<SpecProblem> problems;
     private HybridCell hybridCell;
 
