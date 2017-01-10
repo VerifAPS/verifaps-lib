@@ -32,11 +32,12 @@ public class TypeEnum implements Type {
 		return other.match(
 				() -> false, 
 				() -> false,
-				(otherEnum) -> otherEnum.getEnumTypeName().equals(getEnumTypeName())
+				(otherEnum) -> otherEnum.getTypeName().equals(getTypeName())
 				);
 	}
 
-	public String getEnumTypeName() {
+	@Override
+	public String getTypeName() {
 		return enumTypeName;
 	}
 	
@@ -50,7 +51,7 @@ public class TypeEnum implements Type {
 	}
 	
 	public String toString() {
-		return "TypeEnum(" + getEnumTypeName() +")";
+		return "TypeEnum(" + getTypeName() +")";
 	}
 
 }
