@@ -121,13 +121,10 @@
    <editor>
      <showLineNumbers>true</showLineNumbers>
    </editor>
-   <table>
-     <defaultColWidth>40</defaultColWidth>
-   </table>
-   <history>
-     <code>/path/to/someCode.st</code>
-     <spec>/path/to/someSpec.xml</spec>
-     <spec>/path/to/anotherSpec.xml</spec>
-   </history>
  </config>
+  <history>
+    <code>/path/to/someCode.st</code>
+    <spec>/path/to/someSpec.xml</spec>
+    <spec>/path/to/anotherSpec.xml</spec>
+  </history>
 </session>

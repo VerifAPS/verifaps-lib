@@ -9,18 +9,12 @@
       <width>800</width>
       <height>500</height>
     </windowSize>
+    <verificationTimeout>100</verificationTimeout>
+    <simulationTimeout>100</simulationTimeout>
   </general>
   <editor>
     <showLineNumbers>true</showLineNumbers>
     <fontFamily>Comic Sans</fontFamily>
     <fontSize>12</fontSize>
   </editor>
-  <table>
-    <defaultColWidth>40</defaultColWidth>
-  </table>
-  <history>
-    <code>/path/to/someCode.st</code>
-    <spec>/path/to/someSpec.xml</spec>
-    <spec>/path/to/anotherSpec.xml</spec>
-  </history>
 </config>

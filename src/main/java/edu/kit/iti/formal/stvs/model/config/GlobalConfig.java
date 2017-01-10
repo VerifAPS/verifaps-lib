@@ -1,14 +1,19 @@
 package edu.kit.iti.formal.stvs.model.config;
 
+import edu.kit.iti.formal.stvs.model.table.StringEditable;
+
 /**
  * Contains global configuration specified by the user
  */
 public class GlobalConfig {
     private int verificationTimeout;
     private int simulationTimeout;
+    private int windowHeight;
+    private int windowWidth;
     private int editorFontSize;
     private String editorFontFamily;
     private boolean showLineNumbers;
+    private String uiLanguage;
 
     /**
      * Default configuration
@@ -72,6 +77,15 @@ public class GlobalConfig {
     }
 
     /**
+     * What is the current UI language?
+     *
+     * @return The current UI language
+     */
+    public String getUiLanguage() {
+        return uiLanguage;
+    }
+
+    /**
      * Set the current verification timeout
      *
      * @param verificationTimeout The verification timeout to set
@@ -114,5 +128,28 @@ public class GlobalConfig {
      */
     public void setShowLineNumbers(boolean showLineNumbers) {
         this.showLineNumbers = showLineNumbers;
+    }
+
+    /**
+     * Set the current UI language
+     *
+     * @param uiLanguage
+     */
+    public void setUiLanguage(String uiLanguage) { this.uiLanguage = uiLanguage; }
+
+    public int getWindowHeight() {
+        return windowHeight;
+    }
+
+    public void setWindowHeight(int windowHeight) {
+        this.windowHeight = windowHeight;
+    }
+
+    public int getWindowWidth() {
+        return windowWidth;
+    }
+
+    public void setWindowWidth(int windowWidth) {
+        this.windowWidth = windowWidth;
     }
 }

@@ -14,6 +14,8 @@
                 </sequence>
               </complexType>
             </element>
+            <element name="verificationTimeout" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
+            <element name="simulationTimeout" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
           </sequence>
         </complexType>
       </element>
@@ -23,21 +25,6 @@
             <element name="showLineNumbers" type="boolean" minOccurs="1" maxOccurs="1"></element>
             <element name="fontFamily" type="string" minOccurs="0" maxOccurs="1"></element>
             <element name="fontSize" type="positiveInteger" minOccurs="0" maxOccurs="1"></element>
-          </sequence>
-        </complexType>
-      </element>
-      <element name="table">
-        <complexType>
-          <sequence>
-            <element name="defaultColWidth" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
-          </sequence>
-        </complexType>
-      </element>
-      <element name="history">
-        <complexType>
-          <sequence>
-            <element name="code" type="string" minOccurs="0" maxOccurs="unbounded"></element>
-            <element name="spec" type="string" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
         </complexType>
       </element>

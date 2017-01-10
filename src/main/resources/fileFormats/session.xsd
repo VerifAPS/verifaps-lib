@@ -5,6 +5,7 @@
   elementFormDefault="qualified">
   <include schemaLocation="specification.xsd"/>
   <include schemaLocation="config.xsd"/>
+  <include schemaLocation="history.xsd"/>
 
   <complexType name="Code">
     <sequence>
@@ -39,6 +40,7 @@
           </complexType>
         </element>
         <element name="config" type="tns:Config" minOccurs="1" maxOccurs="1"></element>
+          <element name="history" type="tns:History" minOccurs="1" maxOccurs="1"></element>
       </sequence>
     </complexType>
   </element>
