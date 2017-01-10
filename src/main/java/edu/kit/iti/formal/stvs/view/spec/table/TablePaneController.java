@@ -24,7 +24,7 @@ public class TablePaneController implements Controller {
     private Selection selection;
     private InputTableController inputTableController;
 
-    private void onSelectionChange(Selection){
+    private void onSelectionChange(Selection selection){
 
     }
 

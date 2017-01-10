@@ -5,6 +5,7 @@ import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintSpecification;
 
 import java.util.ArrayList;
+import java.util.Stack;
 import java.util.function.Consumer;
 
 /**
@@ -14,6 +15,7 @@ public class SpecificationConcretizer {
     private ConcretizerContext context;
     private ConcreteSpecification concreteSpecification;
     private ConstraintSpecification constraintSpecification;
+    private Stack<RowSolver> rowSolverStack;
 
     public SpecificationConcretizer(ConcretizerContext context) {
 

@@ -13,9 +13,11 @@ public class Code {
     private List<Consumer<Code>> changeListeners;
     private List<Consumer<List<IOVariable>>> ioVariableListeners;
     private List<Consumer<ParsedCode>> parsedCodeListeners;
+    private List<Consumer<List<SourcecodeToken>>> lexedCodeListeners;
     private ParsedCode parsedCode;
     private String filename;
     private String sourcecode;
+    private List<SourcecodeToken> tokens;
 
     /**
      * creates a Dummy-Codefile
@@ -40,15 +42,11 @@ public class Code {
         return sourcecode;
     }
 
-    public void insertSourcecode(int position, String code) {
-
-    }
-
     public List<SourcecodeToken> lexCode() {
         return null;
     }
 
-    public void addChangeListener(Consumer<Code> listener) {
+    public void addSourcecodeListener(Consumer<String> listener) {
 
     }
 
@@ -60,5 +58,12 @@ public class Code {
 
     }
 
+    public void addLexedCodeListener(Consumer<List<SourcecodeToken>> lexed){
 
+    }
+
+
+    public void setSourcecode(String sourcecode) {
+        this.sourcecode = sourcecode;
+    }
 }
