@@ -2,7 +2,6 @@ package edu.kit.iti.formal.stvs.view.editor;
 
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.view.Controller;
-import javafx.scene.Node;
 import org.fxmisc.richtext.StyleSpans;
 
 /**

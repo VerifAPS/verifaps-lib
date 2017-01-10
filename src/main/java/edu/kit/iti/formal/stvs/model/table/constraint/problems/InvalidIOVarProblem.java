@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table.constraint.problems;
 
-import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 
 import java.util.function.Function;
 
@@ -14,10 +14,10 @@ public class InvalidIOVarProblem extends SpecProblem {
         INVALID_TYPE
     }
 
-    private final IOVariable column;
+    private final VariableIdentifier column;
     private final Type type;
 
-    public InvalidIOVarProblem(IOVariable column, Type type) {
+    public InvalidIOVarProblem(VariableIdentifier column, Type type) {
         this.column = column;
         this.type = type;
     }
@@ -27,11 +27,12 @@ public class InvalidIOVarProblem extends SpecProblem {
             Function<TypeErrorProblem, R> matchTypeError,
             Function<InvalidIOVarProblem, R> matchInvalidIOVar,
             Function<CyclicDependencyProblem, R> matchCyclicDependency,
-            Function<ParseErrorProblem, R> matchParseError) {
+            Function<ParseErrorProblem, R> matchParseError,
+            Function<DurationProblem, R> matchDurationProblem) {
         return matchInvalidIOVar.apply(this);
     }
 
-    public IOVariable getIOVariable() {
+    public VariableIdentifier getVariableIdentifier() {
         return column;
     }
 

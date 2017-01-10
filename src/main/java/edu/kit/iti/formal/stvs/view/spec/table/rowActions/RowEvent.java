@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.table.rowActions;
 
 import javafx.event.Event;
-import javafx.event.EventTarget;
 import javafx.event.EventType;
 import javafx.scene.Node;
 

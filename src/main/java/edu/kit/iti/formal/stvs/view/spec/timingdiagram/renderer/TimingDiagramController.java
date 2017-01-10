@@ -5,7 +5,6 @@ import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
 import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteCell;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.scene.Node;
-
 import java.util.List;
 import java.util.function.Function;
 

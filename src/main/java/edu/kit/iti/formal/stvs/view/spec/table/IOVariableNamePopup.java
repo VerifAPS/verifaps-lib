@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
-import javafx.beans.property.StringProperty;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 

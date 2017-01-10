@@ -9,13 +9,10 @@ import edu.kit.iti.formal.stvs.model.table.hybrid.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 
 import java.util.Map;
-import java.util.function.Consumer;
 
 abstract public class CategoryTableController implements Controller {
     private String title;
@@ -30,16 +27,21 @@ abstract public class CategoryTableController implements Controller {
      * Gets called if button for new IOVariable is pressed.
      * Creates IOVariableNamePopupController.
      */
-    private EventHandler<ActionEvent> onNewIOVariableButton;
+    private void onNewIOVariableButton(ActionEvent e){
+
+    }
+
     /**
      * Listens on changed rows in Specification model and adds cells, removes cells in columns
      */
-    private Consumer<SpecificationTable.RowChangeInfo<ConstraintCell, ConstraintDuration>> rowChangeInfoConsumer;
+    private void onRowChange(SpecificationTable.RowChangeInfo<ConstraintCell, ConstraintDuration> change) {
+    }
 
     /**
      * Listens on changed columns in Specification model and adds columns, removes columns
      */
-    protected Consumer<SpecificationTable.ColumnChangeInfo<ConstraintCell>> columnChangeInfoConsumer;
+    protected void onColumnChange(SpecificationTable.ColumnChangeInfo<ConstraintCell> change) {
+    }
 
     public CategoryTableController(String title, HybridSpecification spec, ObservableList<Type> types, ObservableList<IOVariable> ioVars, TablePaneController tablePaneController) {
     }
