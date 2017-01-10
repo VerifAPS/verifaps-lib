@@ -5,7 +5,6 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 
 public class ColumnHeaderController implements Controller {
     private StringProperty selectedType;

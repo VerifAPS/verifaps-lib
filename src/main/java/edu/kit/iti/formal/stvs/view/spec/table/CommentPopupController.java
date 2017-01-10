@@ -3,7 +3,6 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 import edu.kit.iti.formal.stvs.model.table.Commentable;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.property.StringProperty;
-import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
 public class CommentPopupController implements Controller {

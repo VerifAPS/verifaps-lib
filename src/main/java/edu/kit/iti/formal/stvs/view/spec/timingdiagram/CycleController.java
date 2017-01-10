@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
 import edu.kit.iti.formal.stvs.view.Controller;
-import javafx.scene.Node;
 
 /**
  * Controller for the Cycle-Display on the X-Axis

@@ -4,7 +4,6 @@ import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 
 public class DurationsColumnController implements Controller {
     private IntegerProperty width;

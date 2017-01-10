@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view;
 
-import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;

@@ -2,7 +2,6 @@ package edu.kit.iti.formal.stvs.view.spec.table.rowActions;
 
 import edu.kit.iti.formal.stvs.view.spec.table.DurationsColumnController;
 import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
-import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 
 /**
