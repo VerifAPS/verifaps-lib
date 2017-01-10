@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table.hybrid;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteCell;
 import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteDuration;
@@ -19,6 +20,12 @@ public class HybridSpecification extends ConstraintSpecification {
 
     private Optional<ConcreteSpecification> concreteInstance;
     private List<Consumer<Optional<ConcreteSpecification>>> concreteInstanceChangedListeners;
+
+    /**
+     * Selection for Spec to Timing-Diagram synchronisation.
+     * Should be created <b>once</b> on creation of this class
+     */
+    private Selection selection;
 
     public HybridSpecification(Set<Type> typeContext, Set<IOVariable> ioVariables) {
         super(typeContext, ioVariables);

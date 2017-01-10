@@ -24,6 +24,8 @@ public class ConstraintCell implements StringEditable {
         return expression;
     }
 
+
+
     @Override
     public String getUserInputString() {
         return userInputString;
