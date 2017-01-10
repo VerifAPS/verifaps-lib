@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
+import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.constraint.problems.SpecProblem;
@@ -16,6 +17,7 @@ import javafx.scene.Node;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 abstract public class CategoryTableController implements Controller {
     private String title;
@@ -69,9 +71,16 @@ abstract public class CategoryTableController implements Controller {
     abstract public void addIOVariable(String string);
 
     /**
-     * Resorts
+     * Resorts columns
      */
     private void updateSort() {
+
+    }
+
+    /**
+     * Listens on changed concrete specification and updates cells
+     */
+    private void onConcreteSpecificationChanged(Optional<ConcreteSpecification> concreteSpecificationOptional){
 
     }
 
