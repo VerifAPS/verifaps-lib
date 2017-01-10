@@ -7,20 +7,15 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
  */
 public class IOVariable {
 
-    public enum Category {
-        INPUT,
-        OUTPUT
-    }
-
-    private Category category;
+    private VariableCategory category;
     private Type type;
 
-    public IOVariable(Category category, Type type) {
+    public IOVariable(VariableCategory category, Type type) {
         this.category = category;
         this.type = type;
     }
 
-    public Category getCategory() {
+    public VariableCategory getCategory() {
         return category;
     }
 
