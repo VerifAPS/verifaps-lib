@@ -29,17 +29,21 @@ abstract public class CategoryTableController {
      * Creates IOVariableNamePopupController.
      */
     private EventHandler<ActionEvent> onNewIOVariableButton;
-    //private TablePaneController parent;
     /**
-     * Listens on changed rows in Specification
+     * Listens on changed rows in Specification model and adds cells, removes cells in columns
      */
     private Consumer<SpecificationTable.RowChangeInfo<ConstraintCell, ConstraintDuration>> rowChangeInfoConsumer;
 
+    /**
+     * Listens on changed columns in Specification model and adds columns, removes columns
+     */
+    protected Consumer<SpecificationTable.ColumnChangeInfo<ConstraintCell>> columnChangeInfoConsumer;
+    
     public CategoryTableController(String title, HybridSpecification spec, ObservableList<Type> types, ObservableList<IOVariable> ioVars, TablePaneController tablePaneController) {
     }
 
     public ObservableList<TableColumnController> getColumns() {
-        return columns;
+        return sortedColumns;
     }
 
     /**
