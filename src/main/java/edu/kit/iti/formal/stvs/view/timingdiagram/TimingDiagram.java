@@ -7,6 +7,7 @@ import edu.kit.iti.formal.stvs.view.spec.SpecificationsPaneController;
 
 /**
  * Created by csicar on 09.01.17.
+ * Controller for a single TimingDiagram e.g. for <b>one</b> Variable and over all Timesteps
  */
 public class TimingDiagram {
     public TimingDiagramView view;

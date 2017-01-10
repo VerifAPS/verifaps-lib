@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 /**
  * Created by csicar on 09.01.17.
  * creates TimingDiagramCollectionView
+ * gets created by SpecificationTabController; is toplevel class for timingdiagram-package
  */
 public class TimingDiagramCollection {
     private ConcreteSpecification concreteSpecification;
