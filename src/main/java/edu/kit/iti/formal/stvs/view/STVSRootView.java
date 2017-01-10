@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.view;
 
 import edu.kit.iti.formal.stvs.view.editor.EditorPane;
-import edu.kit.iti.formal.stvs.view.spec.SpecificationsPaneController;
+import edu.kit.iti.formal.stvs.view.spec.SpecificationsPane;
 import javafx.scene.layout.Pane;
 
 /**
@@ -10,7 +10,7 @@ import javafx.scene.layout.Pane;
 public class STVSRootView extends Pane {
     private STVSMenuBar menuBar;
     private EditorPane editor;
-    private SpecificationsPaneController specifications;
+    private SpecificationsPane specifications;
 
     public STVSMenuBar getMenuBar() {
         return menuBar;
@@ -20,7 +20,7 @@ public class STVSRootView extends Pane {
         return editor;
     }
 
-    public SpecificationsPaneController getSpecifications() {
+    public SpecificationsPane getSpecifications() {
         return specifications;
     }
 
@@ -32,7 +32,7 @@ public class STVSRootView extends Pane {
         this.editor = editor;
     }
 
-    public void setSpecifications(SpecificationsPaneController specifications) {
+    public void setSpecifications(SpecificationsPane specifications) {
         this.specifications = specifications;
     }
 }
