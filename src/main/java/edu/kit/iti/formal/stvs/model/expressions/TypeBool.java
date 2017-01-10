@@ -20,7 +20,12 @@ public class TypeBool implements Type {
 					() -> true, 
 					(otherEnum) -> false);
 	}
-	
+
+	@Override
+	public String getTypeName() {
+		return null;
+	}
+
 	public String toString() {
 		return "TypeBool";
 	}

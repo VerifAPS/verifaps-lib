@@ -1,7 +1,11 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
+import javafx.scene.control.TabPane;
 
-import javafx.scene.layout.AnchorPane;
+public class SpecificationsPane extends javafx.scene.layout.AnchorPane {
+    private TabPane tabPane;
 
-public class SpecificationsPane extends AnchorPane {
+    public TabPane getTabPane() {
+        return tabPane;
+    }
 }

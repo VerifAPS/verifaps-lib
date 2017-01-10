@@ -20,7 +20,12 @@ public class TypeInt implements Type {
 				() -> false, 
 				(otherEnum) -> false);
 	}
-	
+
+	@Override
+	public String getTypeName() {
+		return null;
+	}
+
 	public String toString() {
 		return "TypeInt";
 	}
