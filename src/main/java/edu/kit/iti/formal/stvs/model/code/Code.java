@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.code;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.view.editor.EditorPaneController;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.function.Consumer;
 public class Code {
     private List<Consumer<Code>> changeListeners;
     private List<Consumer<List<IOVariable>>> ioVariableListeners;
+    private List<Consumer<List<Type>>> typeListeners;
     private List<Consumer<ParsedCode>> parsedCodeListeners;
     private List<Consumer<List<SourcecodeToken>>> lexedCodeListeners;
     private ParsedCode parsedCode;
@@ -59,6 +61,10 @@ public class Code {
     }
 
     public void addLexedCodeListener(Consumer<List<SourcecodeToken>> lexed){
+
+    }
+
+    public void addTypesListener(Consumer<List<Type>> types){
 
     }
 
