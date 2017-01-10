@@ -21,6 +21,7 @@ public class HybridSpecification extends ConstraintSpecification {
 
     private Optional<ConcreteSpecification> concreteInstance;
     private List<Consumer<Optional<ConcreteSpecification>>> concreteInstanceChangedListeners;
+    private final boolean editable;
 
     /**
      * Selection for Spec to Timing-Diagram synchronisation.
@@ -28,8 +29,9 @@ public class HybridSpecification extends ConstraintSpecification {
      */
     private Selection selection;
 
-    public HybridSpecification(Set<Type> typeContext, Set<IOVariable> ioVariables) {
+    public HybridSpecification(Set<Type> typeContext, Set<IOVariable> ioVariables, boolean editable) {
         super(typeContext, ioVariables);
+        this.editable = editable;
     }
 
     public Optional<ConcreteSpecification> getConcreteInstance() {
@@ -59,4 +61,7 @@ public class HybridSpecification extends ConstraintSpecification {
         return null;
     }
 
+    public boolean isEditable() {
+        return editable;
+    }
 }
