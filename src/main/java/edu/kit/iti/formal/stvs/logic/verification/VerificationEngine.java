@@ -3,8 +3,9 @@ package edu.kit.iti.formal.stvs.logic.verification;
 import edu.kit.iti.formal.stvs.logic.io.VerificationExporter;
 import edu.kit.iti.formal.stvs.logic.io.VerificationImporter;
 import edu.kit.iti.formal.stvs.model.code.Code;
+import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
-import edu.kit.iti.formal.automation.testtables; //TODO this doesn't import despite Maven repo
+//import edu.kit.iti.formal.automation.testtables; //TODO this doesn't import despite Maven repo
 
 import java.util.function.Consumer;
 
@@ -16,7 +17,7 @@ public class VerificationEngine {
     private VerificationImporter importer;
     private VerificationResult result;
     private Consumer<VerificationResult> verificationFinishedListener;
-    private ExTeTa exteta;
+    //private ExTeTa exteta;
 
     public VerificationEngine(Consumer<VerificationResult> verificationFinishedListener) {
 

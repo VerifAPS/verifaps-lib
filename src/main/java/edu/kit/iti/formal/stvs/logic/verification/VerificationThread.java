@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.verification;
 
 import edu.kit.iti.formal.stvs.model.code.Code;
+import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintSpecification;
 
 /**
  * Created by bal on 09.01.17.

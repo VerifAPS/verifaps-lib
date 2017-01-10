@@ -1,8 +1,11 @@
 package edu.kit.iti.formal.stvs.logic.specification;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintSpecification;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 /**
  * Created by bal on 09.01.17.
@@ -26,10 +29,12 @@ public class SpecificationConcretizer {
 
     public ConcretizerContext getContext() {
 
+        return null;
     }
 
     public ConcreteSpecification getConcreteSpecification() {
 
+        return null;
     }
 
     public void onSpecificationChanged(ConstraintSpecification spec) {
