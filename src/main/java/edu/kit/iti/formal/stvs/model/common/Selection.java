@@ -18,7 +18,7 @@ public class Selection {
     }
 
     public VariableIdentifier getIoVariable() {
-        return VariableIdentifier;
+        return ioVariable;
     }
 
     public int getRow() {
@@ -26,7 +26,7 @@ public class Selection {
     }
 
     public void setIoVariable(VariableIdentifier ioVariable) {
-        this.ioVariable = VariableIdentifier;
+        this.ioVariable = ioVariable;
     }
 
     public void setRow(int row) {
