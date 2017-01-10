@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.view.timingdiagram;
+package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
@@ -8,8 +8,9 @@ import javafx.collections.ObservableList;
 /**
  * Created by csicar on 09.01.17.
  */
-public class OutputVariablesTimingDiagramCollection extends CategoryTimingDiagramCollection {
-    public OutputVariablesTimingDiagramCollection(ConcreteSpecification concreteSpecification, ObservableList<IOVariable> ioVariables, Selection selection) {
+public class InputVariablesTimingDiagramCollection extends CategoryTimingDiagramCollection {
+
+    public InputVariablesTimingDiagramCollection(ConcreteSpecification concreteSpecification, ObservableList<IOVariable> ioVariables, Selection selection) {
         super(concreteSpecification, ioVariables);
     }
 }

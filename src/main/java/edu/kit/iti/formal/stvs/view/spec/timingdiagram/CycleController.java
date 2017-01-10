@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.view.timingdiagram;
+package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
 /**
  * Controller for the Cycle-Display on the X-Axis

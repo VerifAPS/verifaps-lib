@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.view.timingdiagram;
+package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteSpecification;
