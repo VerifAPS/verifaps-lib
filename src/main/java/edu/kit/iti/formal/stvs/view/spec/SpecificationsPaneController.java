@@ -6,8 +6,6 @@ import edu.kit.iti.formal.stvs.model.table.hybrid.HybridSpecification;
 import javafx.collections.ObservableList;
 
 public class SpecificationsPaneController {
-    public SpecificationsPaneController(ObservableList<Type> types, ObservableList<IOVariable> ioVars, ObservableList<HybridSpecification> hybridSpecifications) {
-    }
 
     private ObservableList<HybridSpecification> hybridSpecifications;
 
@@ -17,4 +15,20 @@ public class SpecificationsPaneController {
 
     private ObservableList<Type> types;
     private ObservableList<IOVariable> ioVars;
+    private SpecificationsPane view;
+
+    public SpecificationsPaneController(ObservableList<Type> types, ObservableList<IOVariable> ioVars, ObservableList<HybridSpecification> hybridSpecifications) {
+    }
+
+    public SpecificationsPane getView() {
+        return view;
+    }
+
+    private void addTab(HybridSpecification spec){
+
+    }
+
+    private void removeTab(int tabIndex){
+
+    }
 }

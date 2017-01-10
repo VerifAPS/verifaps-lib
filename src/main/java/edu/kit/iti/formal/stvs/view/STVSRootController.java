@@ -11,11 +11,15 @@ import java.util.Comparator;
  * Created by csicar on 09.01.17.
  */
 public class STVSRootController {
-    ObservableList<Type> types;
-    SortedList<Type> sortedTyes;
+    private STVSRootView view;
+    private ObservableList<Type> types;
+    private SortedList<Type> sortedTyes;
     /**
      * Used to sort Types (Enums should be at the bottom)
      */
-    Comparator<Type> typeComparator;
-    Code code;
+    private Comparator<Type> typeComparator;
+
+    public STVSRootView getView(){
+        return view;
+    }
 }
