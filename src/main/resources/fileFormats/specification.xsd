@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://formal.iti.kit.edu/exteta-1.0"
+        elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:tns="http://formal.iti.kit.edu/exteta-1.0">
+    <include schemaLocation="exteta-1.0.xsd"></include>
+
+    <complexType name="DisplayInfo">
+        <annotation>
+            <documentation>Contains information for displaying the specification table.</documentation>
+        </annotation>
+        <complexContent>
+            <sequence>
+                <element name="ioVariables" minOccurs="0" maxOccurs="1">
+                    <complexType>
+                        <sequence>
+                            <element name="ioVariable" minOccurs="0" maxOccurs="unbounded">
+                                <complexType>
+                                    <sequence>
+                                        <element name="colWidth" type="positiveInteger" minOccurs="0" maxOccurs="1"></element>
+                                        <element name="comment" type="string" minOccurs="0" maxOccurs="1"></element>
+                                    </sequence>
+                                    <attribute name="name" type="string" use="required"></attribute>
+                                </complexType>
+                            </element>
+                        </sequence>
+                    </complexType>
+                </element>
+                <element name="table" minOccurs="0" maxOccurs="1">
+                    <complexType>
+                        <sequence>
+                            <element name="comment" type="string" minOccurs="0" maxOccurs="1"></element>
+                        </sequence>
+                    </complexType>
+                </element>
+                <element name="rows" minOccurs="0" maxOccurs="1">
+                    <complexType>
+                        <sequence>
+                            <element name="row" minOccurs="0" maxOccurs="unbounded">
+                                <complexType>
+                                    <sequence>
+                                        <element name="comment" type="string" minOccurs="0" maxOccurs="1"></element>
+                                    </sequence>
+                                    <attribute name="id" use="required"></attribute>
+                                </complexType>
+                            </element>
+                        </sequence>
+                    </complexType>
+                </element>
+            </sequence>
+
+        </complexContent>
+    </complexType>
+
+    <complexType name="AdditionalInfo">
+        <annotation>
+            <documentation>Non-GUI-related stuff we need to save in addition to what is in tns:testTable</documentation>
+        </annotation>
+        <complexContent>
+            <sequence>
+                <element name="constraintVariables" minOccurs="0" maxOccurs="1">
+                    <complexType>
+                        <sequence>
+                            <element name="constraintVariable" minOccurs="0" maxOccurs="unbounded">
+                                <complexType>
+                                    <sequence>
+                                        <element name="defaultValue" type="string" minOccurs="1" maxOccurs="1"></element>
+                                    </sequence>
+                                    <attribute name="name" type="string" use="required"></attribute>
+                                </complexType>
+                            </element>
+                        </sequence>
+                    </complexType>
+                </element>
+                <element name="ioVariables" minOccurs="0" maxOccurs="1">
+                    <complexType>
+                        <sequence>
+                            <element name="ioVariable" minOccurs="0" maxOccurs="unbounded">
+                                <complexType>
+                                    <sequence>
+                                        <element name="annotation" type="string" minOccurs="0" maxOccurs="1"></element>
+                                    </sequence>
+                                    <attribute name="name" type="string" use="required"></attribute>
+                                </complexType>
+                            </element>
+                        </sequence>
+                    </complexType>
+                </element>
+            </sequence>
+        </complexContent>
+    </complexType>
+
+    <complexType name="Specification">
+        <complexContent>
+            <sequence>
+                <element name="filename" type="string" minOccurs="0" maxOccurs="1"></element>
+                <element name="test-table" type="tns:testTable" minOccurs="1" maxOccurs="1"></element>
+                <element name="display-info" type="tns:DisplayInfo" minOccurs="0" maxOccurs="1"></element>
+                <element name="additional-info" type="tns:AdditionalInfo" minOccurs="0" maxOccurs="1"></element>
+            </sequence>
+        </complexContent>
+    </complexType>
+
+    <element name="specification" type="tns:Specification"></element>
+</schema>

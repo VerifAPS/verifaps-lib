@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://formal.iti.kit.edu/exteta-1.0"
+        elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:tns="http://formal.iti.kit.edu/exteta-1.0">
+
+    <element name="test-table" type="tns:testTable" />
+
+    <complexType name="testTable">
+        <sequence>
+            <element name="variables" type="tns:variables" minOccurs="1"
+                     maxOccurs="1" />
+
+            <element name="steps" type="tns:steps" minOccurs="1"
+                     maxOccurs="1" />
+
+            <element name="functions" type="string" minOccurs="0"
+                     maxOccurs="1">
+            </element>
+
+            <element name="options" type="tns:options" minOccurs="0"
+                     maxOccurs="1" />
+        </sequence>
+        <attribute name="version" type="string" use="required"
+                   fixed="1.0" />
+
+        <attribute name="name" default="TTable" use="optional">
+            <simpleType>
+                <restriction base="string">
+                    <minLength value="2" />
+                    <pattern value="\w{2,}" />
+                </restriction>
+            </simpleType>
+        </attribute>
+    </complexType>
+
+    <complexType name="variables">
+        <sequence minOccurs="1" maxOccurs="unbounded">
+            <choice>
+                <element name="variable" type="tns:ioVariable" />
+                <element name="constraint" type="tns:constraintVariable" />
+            </choice>
+        </sequence>
+    </complexType>
+
+    <complexType name="ioVariable">
+        <complexContent>
+            <extension base="tns:variable">
+                <attribute name="io" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <enumeration value="input" />
+                            <enumeration value="output" />
+                        </restriction>
+                    </simpleType>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="steps">
+        <sequence minOccurs="0" maxOccurs="unbounded">
+            <choice>
+                <element name="block" type="tns:block" />
+                <element name="step" type="tns:step" />
+            </choice>
+        </sequence>
+    </complexType>
+
+    <complexType name="step">
+        <sequence minOccurs="0" maxOccurs="unbounded">
+            <element name="cell" type="string" />
+        </sequence>
+        <attribute name="duration" type="tns:duration" use="optional" default="[1,1]" />
+    </complexType>
+
+    <simpleType name="duration">
+        <restriction base="string">
+            <!--<pattern value="\d+" />
+            <pattern value="\*" />-->
+            <pattern value="\[\d+,(\d+|-)\]" />
+        </restriction>
+    </simpleType>
+
+
+    <simpleType name="dataType">
+        <restriction base="string">
+            <enumeration value="INT" />
+            <enumeration value="SINT" />
+            <enumeration value="LINT" />
+            <enumeration value="DINT" />
+            <enumeration value="UINT" />
+            <enumeration value="UDINT" />
+            <enumeration value="ULINT" />
+            <enumeration value="USINT" />
+            <enumeration value="BOOLEAN" />
+            <enumeration value="BYTE" />
+            <enumeration value="WORD" />
+            <enumeration value="LWORD" />
+            <enumeration value="DWORD" />
+        </restriction>
+    </simpleType>
+
+    <!-- <simpleType name="cellType"> <restriction base="string"></restriction>
+        </simpleType> <simpleType name="cellSimpleValueType"> <restriction base="tns:cellType"></restriction>
+        </simpleType> <simpleType name="cellDontCareType"> <restriction base="tns:cellType"></restriction>
+        </simpleType> <simpleType name="cellRelationType"> <restriction base="tns:cellType"></restriction>
+        </simpleType> <simpleType name="cellExpressionType"> <restriction base="tns:cellType"></restriction>
+        </simpleType> -->
+
+
+    <complexType name="constraintVariable">
+        <complexContent>
+            <extension base="tns:variable">
+                <attribute name="constraint" type="string" />
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="options">
+        <sequence minOccurs="1" maxOccurs="unbounded">
+            <element name="option">
+                <complexType>
+                    <attribute name="key">
+                        <simpleType>
+                            <restriction base="string">
+                                <pattern value="(\w+\.?)+" />
+                            </restriction>
+                        </simpleType>
+                    </attribute>
+                    <attribute name="value" type="string" />
+                </complexType>
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="block">
+        <sequence minOccurs="1" maxOccurs="unbounded">
+            <choice>
+                <element name="step" type="tns:step" />
+                <element name="block" type="tns:block" />
+            </choice>
+        </sequence>
+        <attribute name="duration" type="tns:duration" />
+    </complexType>
+
+    <complexType name="variable">
+        <attribute name="name" type="string" />
+        <attribute name="data-type" type="tns:dataType" />
+    </complexType>
+</schema>
