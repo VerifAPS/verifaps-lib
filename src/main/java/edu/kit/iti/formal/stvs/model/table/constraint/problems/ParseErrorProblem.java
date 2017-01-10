@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table.constraint.problems;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 
 import java.util.function.Function;
 
@@ -10,10 +11,10 @@ import java.util.function.Function;
 public class ParseErrorProblem extends SpecProblem {
 
     // TODO: Give Parse Error information
-    private final IOVariable column;
+    private final VariableIdentifier column;
     private final int row;
 
-    public ParseErrorProblem(IOVariable column, int row) {
+    public ParseErrorProblem(VariableIdentifier column, int row) {
         this.column = column;
         this.row = row;
     }
@@ -28,7 +29,7 @@ public class ParseErrorProblem extends SpecProblem {
         return matchParseError.apply(this);
     }
 
-    public IOVariable getColumn() {
+    public VariableIdentifier getColumn() {
         return column;
     }
 

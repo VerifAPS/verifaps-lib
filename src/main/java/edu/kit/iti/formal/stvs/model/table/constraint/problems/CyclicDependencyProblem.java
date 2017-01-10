@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table.constraint.problems;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 
 import java.util.List;
 import java.util.function.Function;
@@ -11,9 +12,9 @@ import java.util.function.Function;
 public class CyclicDependencyProblem extends SpecProblem {
 
     private final int row;
-    private final List<IOVariable> cycle;
+    private final List<VariableIdentifier> cycle;
 
-    public CyclicDependencyProblem(int row, List<IOVariable> cycle) {
+    public CyclicDependencyProblem(int row, List<VariableIdentifier> cycle) {
         this.row = row;
         this.cycle = cycle;
     }
@@ -31,7 +32,7 @@ public class CyclicDependencyProblem extends SpecProblem {
         return row;
     }
 
-    public List<IOVariable> getCycle() {
+    public List<VariableIdentifier> getCycle() {
         return cycle;
     }
 }

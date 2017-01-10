@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.model.table.hybrid;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
+import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteCell;
 import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteDuration;
@@ -46,7 +47,7 @@ public class HybridSpecification extends ConstraintSpecification {
 
     }
 
-    public List<ConcreteCell> getConcreteValuesForConstraint(IOVariable column, int row) {
+    public List<ConcreteCell> getConcreteValuesForConstraint(VariableIdentifier column, int row) {
         return null;
     }
 
