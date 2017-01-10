@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.view.timingdiagram;
+package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
 /**
  * Created by csicar on 10.01.17.
