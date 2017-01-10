@@ -5,5 +5,6 @@ package edu.kit.iti.formal.stvs.model.config;
  */
 public interface Configurable<Cnf> {
     public void setConfig(Cnf config);
+
     public Cnf getConfig();
 }

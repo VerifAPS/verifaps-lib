@@ -19,7 +19,7 @@ public class STVSRootController implements Controller {
      */
     private Comparator<Type> typeComparator;
 
-    public STVSRootView getView(){
+    public STVSRootView getView() {
         return view;
     }
 }

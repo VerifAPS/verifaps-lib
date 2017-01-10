@@ -5,7 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 
-public class TableColumn extends VBox{
+public class TableColumn extends VBox {
     private BooleanProperty editableProperty;
 
     public BooleanProperty getEditableProperty() {

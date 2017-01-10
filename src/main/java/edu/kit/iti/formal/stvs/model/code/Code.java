@@ -20,7 +20,7 @@ public class Code {
     /**
      * creates a Dummy-Codefile
      */
-    public Code(){
+    public Code() {
 
     }
 

@@ -15,6 +15,7 @@ public class ColumnConfig {
 
     /**
      * Create a new ColumnConfig
+     *
      * @param colwidth The initial column width
      */
     public ColumnConfig(int colwidth) {
@@ -23,6 +24,7 @@ public class ColumnConfig {
 
     /**
      * Get the current column width
+     *
      * @return The current column width
      */
     public int getWidth() {
@@ -31,6 +33,7 @@ public class ColumnConfig {
 
     /**
      * Set the current column width
+     *
      * @param width The current column width
      */
     public void setWidth(int width) {

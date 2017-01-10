@@ -5,12 +5,12 @@ import java.util.function.Supplier;
 
 public interface Type {
 
-	public <R> R match(
-			Supplier<R> matchIntType,
-			Supplier<R> matchBoolType,
-			Function<TypeEnum,R> matchEnumType);
-	
-	public boolean checksAgainst(Type other);
+    public <R> R match(
+            Supplier<R> matchIntType,
+            Supplier<R> matchBoolType,
+            Function<TypeEnum, R> matchEnumType);
 
-	public String getTypeName();
+    public boolean checksAgainst(Type other);
+
+    public String getTypeName();
 }

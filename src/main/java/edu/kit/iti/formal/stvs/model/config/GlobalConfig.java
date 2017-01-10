@@ -19,6 +19,7 @@ public class GlobalConfig {
 
     /**
      * Copy constructor
+     *
      * @param conf The config to copy
      */
     public GlobalConfig(GlobalConfig conf) {
@@ -27,6 +28,7 @@ public class GlobalConfig {
 
     /**
      * Get the current verification timeout
+     *
      * @return The current verification timeout
      */
     public int getVerificationTimeout() {
@@ -35,6 +37,7 @@ public class GlobalConfig {
 
     /**
      * Get the current simulation timeout
+     *
      * @return The current simulation timeout
      */
     public int getSimulationTimeout() {
@@ -43,6 +46,7 @@ public class GlobalConfig {
 
     /**
      * Get the current editor font size
+     *
      * @return The current editor font size
      */
     public int getEditorFontSize() {
@@ -51,6 +55,7 @@ public class GlobalConfig {
 
     /**
      * Get the current editor font family
+     *
      * @return The current editor font family
      */
     public String getEditorFontFamily() {
@@ -59,6 +64,7 @@ public class GlobalConfig {
 
     /**
      * Are line numbers to be shown in the editor?
+     *
      * @return Whether line numbers are to be shown in the editor
      */
     public boolean getShowLineNumbers() {
@@ -67,6 +73,7 @@ public class GlobalConfig {
 
     /**
      * Set the current verification timeout
+     *
      * @param verificationTimeout The verification timeout to set
      */
     public void setVerificationTimeout(int verificationTimeout) {
@@ -75,6 +82,7 @@ public class GlobalConfig {
 
     /**
      * Set the current simulation timeout
+     *
      * @param simulationTimeout The simulation timeout to set
      */
     public void setSimulationTimeout(int simulationTimeout) {
@@ -83,6 +91,7 @@ public class GlobalConfig {
 
     /**
      * Set the current editor font size
+     *
      * @param editorFontSize The editor font size to set
      */
     public void setEditorFontSize(int editorFontSize) {
@@ -91,6 +100,7 @@ public class GlobalConfig {
 
     /**
      * Set the current editor font family
+     *
      * @param editorFontFamily The verification timeout to set
      */
     public void setEditorFontFamily(String editorFontFamily) {
@@ -99,6 +109,7 @@ public class GlobalConfig {
 
     /**
      * Are line numbers to be shown in the editor?
+     *
      * @param showLineNumbers Whether line numbers are to be shown in the editor
      */
     public void setShowLineNumbers(boolean showLineNumbers) {

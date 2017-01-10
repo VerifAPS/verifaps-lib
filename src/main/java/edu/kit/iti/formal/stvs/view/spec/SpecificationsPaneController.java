@@ -27,11 +27,11 @@ public class SpecificationsPaneController implements Controller {
         return view;
     }
 
-    private void addTab(HybridSpecification spec){
+    private void addTab(HybridSpecification spec) {
 
     }
 
-    private void removeTab(int tabIndex){
+    private void removeTab(int tabIndex) {
 
     }
 }

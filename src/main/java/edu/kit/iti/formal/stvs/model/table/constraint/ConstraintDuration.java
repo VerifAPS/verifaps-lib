@@ -29,6 +29,7 @@ public class ConstraintDuration implements CellOperationProvider {
     public void setBounds(LowerBoundedInterval bounds) {
         this.bounds = bounds;
     }
+
     @Override
     public String getUserInputString() {
         return this.userInputString;

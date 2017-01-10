@@ -8,6 +8,8 @@ import java.util.function.Consumer;
 public interface StringEditable {
 
     String getUserInputString();
+
     void setUserInputString(String input);
+
     void addUserInputStringListener(Consumer<String> listener);
 }

@@ -2,12 +2,12 @@ package edu.kit.iti.formal.stvs.view.spec;
 
 import edu.kit.iti.formal.stvs.view.spec.table.TablePane;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionView;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-public class SpecificationTab extends VBox{
+public class SpecificationTab extends VBox {
     private TablePane table;
     private TimingDiagramCollectionView diagram;
+
     public SpecificationTab() {
     }
 

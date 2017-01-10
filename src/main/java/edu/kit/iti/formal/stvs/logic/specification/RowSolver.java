@@ -11,6 +11,7 @@ public class RowSolver {
     public RowSolver(int duration, int rownum) {
 
     }
+
     public boolean solve() {
         return true;
     }

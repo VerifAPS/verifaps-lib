@@ -29,7 +29,6 @@ public class ConstraintCell implements CellOperationProvider {
     }
 
 
-
     @Override
     public String getUserInputString() {
         return userInputString;

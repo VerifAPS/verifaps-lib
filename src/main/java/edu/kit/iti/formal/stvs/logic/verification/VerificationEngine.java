@@ -25,6 +25,7 @@ public class VerificationEngine {
 
     /**
      * Starts a verification in its own thread
+     *
      * @param code The code to verify
      * @param spec The specification to verify against
      */

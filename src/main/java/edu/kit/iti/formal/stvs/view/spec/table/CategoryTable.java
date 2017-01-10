@@ -4,7 +4,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 
-public class CategoryTable extends HBox{
+public class CategoryTable extends HBox {
     @Override
     public ObservableList<Node> getChildren() {
         return super.getChildren();

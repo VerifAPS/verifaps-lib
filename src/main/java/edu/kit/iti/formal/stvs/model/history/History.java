@@ -12,6 +12,7 @@ public class History {
 
     /**
      * Get the code file history
+     *
      * @return A list of filepaths of code files
      */
     public Collection<String> getCodeFiles() {
@@ -20,6 +21,7 @@ public class History {
 
     /**
      * Get the spec file history
+     *
      * @return A list of filepaths of spec files
      */
     public Collection<String> getSpecFiles() {
@@ -28,6 +30,7 @@ public class History {
 
     /**
      * Add the path to an opened code file to the history
+     *
      * @param filename The path to the opened code file
      */
     public void addCodeFile(String filename) {
@@ -36,6 +39,7 @@ public class History {
 
     /**
      * Add the path to an opened spec file to the history
+     *
      * @param filename The path to the opened spec file
      */
     public void addSpecFile(String filename) {
