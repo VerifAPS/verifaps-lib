@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table.constraint;
 
+import edu.kit.iti.formal.stvs.model.table.StringEditable;
+
 import java.util.List;
 import java.util.function.Consumer;
 

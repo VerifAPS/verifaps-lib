@@ -6,13 +6,14 @@ public class TablePane {
     private BooleanProperty editableProperty;
 
     public BooleanProperty getEditableProperty() {
-        return null;
+        return editableProperty;
     }
 
     public void setEditable(boolean b) {
+        
     }
 
     public boolean getEditable() {
-        return false;
+        return editableProperty.get();
     }
 }
