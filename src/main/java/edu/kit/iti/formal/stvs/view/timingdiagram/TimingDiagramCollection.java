@@ -1,13 +1,14 @@
 package edu.kit.iti.formal.stvs.view.timingdiagram;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteSpecification;
 import javafx.collections.ObservableList;
 
 /**
  * Created by csicar on 09.01.17.
- * creates TimingDiagramsView
+ * creates TimingDiagramCollectionView
  */
-public class TimingDiagrams {
+public class TimingDiagramCollection {
     private ConcreteSpecification concreteSpecification;
     private ObservableList<IOVariable> ioVariables;
 
@@ -17,7 +18,7 @@ public class TimingDiagrams {
      * @param concreteSpecification
      * @param ioVariables
      */
-    public TimingDiagrams(ConcreteSpecification concreteSpecification, ObservableList<IOVariable> ioVariables, Selection selection) {
+    public TimingDiagramCollection(ConcreteSpecification concreteSpecification, ObservableList<IOVariable> ioVariables) {
 
     }
 

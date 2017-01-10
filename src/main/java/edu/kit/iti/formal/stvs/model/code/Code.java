@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.model.code;
 
+import edu.kit.iti.formal.stvs.model.common.IOVariable;
+
 import java.util.List;
 import java.util.function.Consumer;
 

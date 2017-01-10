@@ -4,7 +4,10 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.history.History;
 import edu.kit.iti.formal.stvs.model.memento.NoSuchMementoException;
 import edu.kit.iti.formal.stvs.model.memento.RootModelMemento;
+import edu.kit.iti.formal.stvs.model.table.hybrid.HybridSpecification;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
+
+import java.util.HashSet;
 
 public class RootModel {
     private final int NUMBER_OF_MEMENTOS = 100;

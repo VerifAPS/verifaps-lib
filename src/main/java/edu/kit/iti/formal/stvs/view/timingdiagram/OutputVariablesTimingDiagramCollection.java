@@ -6,8 +6,8 @@ import javafx.collections.ObservableList;
 /**
  * Created by csicar on 09.01.17.
  */
-public class OutputVariablesTimingDiagrams extends CategoryTimingDiagrams {
-    public OutputVariablesTimingDiagrams(ConcreteSpecification concreteSpecification, ObservableList<IOVariable> ioVariables, Selection selection) {
+public class OutputVariablesTimingDiagramCollection extends CategoryTimingDiagramCollection {
+    public OutputVariablesTimingDiagramCollection(ConcreteSpecification concreteSpecification, ObservableList<IOVariable> ioVariables, Selection selection) {
         super(concreteSpecification, ioVariables, selection);
     }
 }

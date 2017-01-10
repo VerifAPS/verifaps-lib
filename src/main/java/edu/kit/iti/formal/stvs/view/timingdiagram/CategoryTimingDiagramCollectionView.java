@@ -5,5 +5,5 @@ import javafx.scene.layout.VBox;
 /**
  * Created by csicar on 09.01.17.
  */
-public class CategoryTimingDiagramsView extends VBox {
+public class CategoryTimingDiagramCollectionView extends VBox {
 }
