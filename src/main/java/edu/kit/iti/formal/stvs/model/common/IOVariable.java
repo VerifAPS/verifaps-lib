@@ -28,7 +28,7 @@ public class IOVariable {
         return type;
     }
 
-    public void setType() {
+    public void setType(Type type) {
 
     }
 
