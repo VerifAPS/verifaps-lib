@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.table.hybrid.HybridSpecification;
 import javafx.collections.ObservableList;
 
 public class InputTableController extends CategoryTableController {

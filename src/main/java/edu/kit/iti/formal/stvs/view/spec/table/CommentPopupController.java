@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
+import edu.kit.iti.formal.stvs.model.table.Commentable;
 import javafx.beans.property.StringProperty;
 
 public class CommentPopupController {
