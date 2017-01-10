@@ -1,11 +1,13 @@
-package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
+package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
 import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteCell;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.scene.Node;
-import javafx.scene.layout.Pane;
+
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * Created by csicar on 09.01.17.
@@ -14,7 +16,13 @@ import javafx.scene.layout.Pane;
 public class TimingDiagramController implements Controller {
     public TimingDiagramView view;
 
-    public TimingDiagramController(IOVariable ioVariable, SpecificationColumn<ConcreteCell> ioVarValues) {
+    /**
+     * TimingDiagramController
+     * @param ioVariable ioVariable's data that should be rendered
+     * @param ioVarValues
+     * @param getConcreteValuesForConstraint
+     */
+    public TimingDiagramController(IOVariable ioVariable, SpecificationColumn<ConcreteCell> ioVarValues, Function<Integer, List<ConcreteCell>> getConcreteValuesForConstraint) {
 
     }
 

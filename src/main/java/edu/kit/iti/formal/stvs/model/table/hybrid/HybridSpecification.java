@@ -46,11 +46,16 @@ public class HybridSpecification extends ConstraintSpecification {
 
     }
 
+    public Selection getSelection() {
+        return null;
+    }
+
     public List<ConcreteCell> getConcreteValuesForConstraint(IOVariable column, int row) {
         return null;
     }
 
-    public ConcreteDuration getDurationForConstraint(int row) {
+    public ConcreteDuration getDurationForRow(int row) {
         return null;
     }
+
 }
