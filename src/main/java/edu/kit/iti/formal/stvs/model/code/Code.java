@@ -42,10 +42,6 @@ public class Code {
         return sourcecode;
     }
 
-    public void insertSourcecode(int position, String code) {
-
-    }
-
     public List<SourcecodeToken> lexCode() {
         return null;
     }
@@ -62,8 +58,8 @@ public class Code {
 
     }
 
-    public void addLexedCodeListener(Consumer<List<SourcecodeToken>>){
-        
+    public void addLexedCodeListener(Consumer<List<SourcecodeToken>> lexed){
+
     }
 
 
