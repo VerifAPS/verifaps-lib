@@ -12,6 +12,7 @@ import java.util.List;
 public class DurationsColumnController extends ColumnController {
     private IntegerProperty width;
     private ObservableList<HybridCellController> cells;
+    private DurationsColumn durationsColumn;
 
     public IntegerProperty getWidthProperty() {
         return width;
@@ -35,6 +36,6 @@ public class DurationsColumnController extends ColumnController {
 
     @Override
     public DurationsColumn getView() {
-        return null;
+        return durationsColumn;
     }
 }

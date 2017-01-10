@@ -22,6 +22,7 @@ public class TableColumnController extends ColumnController {
     private ObservableList<HybridCellController> cells;
     private ObjectProperty<VariableIdentifier> ioVar;
     private ObservableList<SpecProblem> problems;
+    private TableColumn tableColumn;
 
     public TableColumnController(ObservableList<Type> types, ObservableList<IOVariable> ioVars, ObjectProperty<VariableIdentifier> ioVar, ColumnConfig config) {
         super(config);
@@ -49,6 +50,6 @@ public class TableColumnController extends ColumnController {
 
     @Override
     public TableColumn getView() {
-        return null;
+        return tableColumn;
     }
 }

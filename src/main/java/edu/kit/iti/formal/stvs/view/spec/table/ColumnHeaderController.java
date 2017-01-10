@@ -16,6 +16,6 @@ public class ColumnHeaderController implements Controller {
 
     @Override
     public ColumnHeader getView() {
-        return null;
+        return columnHeader;
     }
 }

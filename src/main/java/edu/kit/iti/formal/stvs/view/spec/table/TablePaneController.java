@@ -19,6 +19,7 @@ public class TablePaneController implements Controller {
     private HybridSpecification spec;
     private ObservableSet<String> definedVars;
     private DurationsColumnController durationColumn;
+    private TablePane table;
 
     /**
      * Listens on changed rows in Specification and adds cells or remove cells in durationColumn
@@ -57,6 +58,6 @@ public class TablePaneController implements Controller {
     }
 
     public TablePane getView() {
-        return null;
+        return table;
     }
 }

@@ -1,10 +1,12 @@
 package edu.kit.iti.formal.stvs.view.spec.table.cells;
 
+import edu.kit.iti.formal.stvs.model.expressions.Value;
 import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintCell;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.property.StringProperty;
 
 public class ValueCellController implements Controller {
+    private ValueCell valueCell;
     /**
      * Listens if model cell changes
      */
@@ -16,6 +18,6 @@ public class ValueCellController implements Controller {
 
     @Override
     public ValueCell getView() {
-        return null;
+        return valueCell;
     }
 }

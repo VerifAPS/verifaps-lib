@@ -24,6 +24,7 @@ abstract public class CategoryTableController implements Controller {
     private HybridSpecification spec;
     private ObservableList<Type> types;
     private ObservableList<IOVariable> ioVars;
+    private CategoryTable categoryTable;
 
     private ObservableMap<VariableIdentifier, ColumnController> columns;
     private Map<ColumnController, Integer> columnIndices;
@@ -84,7 +85,7 @@ abstract public class CategoryTableController implements Controller {
 
     }
 
-    public Node getView() {
-        return null;
+    public CategoryTable getView() {
+        return categoryTable;
     }
 }

@@ -13,6 +13,7 @@ public class HybridCellController implements Controller {
     private ObservableList<String> counterexamples;
     private ValueCellController valueCellController;
     private ObservableList<SpecProblem> problems;
+    private HybridCell hybridCell;
 
     public ObservableList<String> getCounterexamples() {
         return null;
@@ -36,6 +37,6 @@ public class HybridCellController implements Controller {
     }
 
     public HybridCell getView() {
-        return null;
+        return hybridCell;
     }
 }
