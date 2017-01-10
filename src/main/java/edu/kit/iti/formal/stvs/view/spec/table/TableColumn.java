@@ -6,12 +6,13 @@ public class TableColumn {
     private BooleanProperty editableProperty;
 
     public BooleanProperty getEditableProperty() {
-        return null;
+        return editableProperty;
     }
 
     public void setEditable(boolean b) {
     }
 
-    public void getEditable() {
+    public boolean getEditable() {
+        return editableProperty.get();
     }
 }

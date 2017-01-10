@@ -1,10 +1,8 @@
 package edu.kit.iti.formal.stvs.view.spec.table.rowActions;
 
 import edu.kit.iti.formal.stvs.view.spec.table.DurationsColumnController;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
 
 /**
  * Controller of column next to the table which holds add buttons for rows
