@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteSpecification;
@@ -20,6 +21,12 @@ public class TablePaneController implements Controller {
     private ObservableSet<String> definedVars;
     private DurationsColumnController durationColumn;
     private TablePane table;
+    private Selection selection;
+    private InputTableController inputTableController;
+
+    private void onSelectionChange(Selection){
+
+    }
 
     /**
      * Listens on changed rows in Specification and adds cells or remove cells in durationColumn
