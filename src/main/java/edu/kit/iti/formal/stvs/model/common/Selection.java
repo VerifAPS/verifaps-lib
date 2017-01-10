@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -9,28 +10,33 @@ import java.util.function.Consumer;
 public class Selection {
 
     private List<Consumer<Selection>> listener;
-    private VariableIdentifier ioVariable;
-    private int row;
+    private Optional<VariableIdentifier> variableIdentifier;
+    private Optional<Integer> row;
 
-    public Selection(VariableIdentifier ioVariable, int row) {
-        this.ioVariable = ioVariable;
-        this.row = row;
+    public Selection(VariableIdentifier variableIdentifier, int row) {
+        this.variableIdentifier = Optional.ofNullable(variableIdentifier);
+        this.row = Optional.ofNullable(row);
     }
 
-    public VariableIdentifier getIoVariable() {
-        return ioVariable;
+    public Selection() {
+        this.variableIdentifier = Optional.empty();
+        this.row = Optional.empty();
     }
 
-    public int getRow() {
+    public Optional<VariableIdentifier> getVariableIdentifier() {
+        return variableIdentifier;
+    }
+
+    public Optional<Integer> getRow() {
         return row;
     }
 
-    public void setIoVariable(VariableIdentifier ioVariable) {
-        this.ioVariable = ioVariable;
+    public void setVariableIdentifier(VariableIdentifier variableIdentifier) {
+        this.variableIdentifier = Optional.ofNullable(variableIdentifier);
     }
 
     public void setRow(int row) {
-        this.row = row;
+        this.row = Optional.ofNullable(row);
     }
 
     public void addListener(Consumer<Selection> listener) {

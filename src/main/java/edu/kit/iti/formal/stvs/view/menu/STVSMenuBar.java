@@ -6,7 +6,7 @@ import javafx.scene.control.MenuBar;
 /**
  * Created by csicar on 10.01.17.
  */
-public class STVSMenuBarView extends MenuBar {
+public class STVSMenuBar extends MenuBar {
 
 
 }
