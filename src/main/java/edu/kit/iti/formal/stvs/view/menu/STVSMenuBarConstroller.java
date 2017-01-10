@@ -9,12 +9,14 @@ import edu.kit.iti.formal.stvs.view.STVSRootController;
  * does just fire to the root controller
  */
 public class STVSMenuBarConstroller implements Controller {
+    private STVSMenuBar view;
+
     public STVSMenuBarConstroller(STVSRootController rootController) {
 
     }
 
     @Override
-    public STVSMenuBarView getView() {
-        return null;
+    public STVSMenuBar getView() {
+        return view;
     }
 }

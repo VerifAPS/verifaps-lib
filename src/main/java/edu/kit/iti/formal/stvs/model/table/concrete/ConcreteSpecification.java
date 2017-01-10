@@ -7,4 +7,13 @@ import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
  */
 public class ConcreteSpecification extends SpecificationTable<ConcreteCell, ConcreteDuration> {
 
+    private final boolean isCounterExample;
+
+    public ConcreteSpecification(boolean isCounterExample) {
+        this.isCounterExample = isCounterExample;
+    }
+
+    public boolean isCounterExample() {
+        return isCounterExample;
+    }
 }
