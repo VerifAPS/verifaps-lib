@@ -11,6 +11,6 @@ public abstract class SpecProblem {
             Function<TypeErrorProblem, R> matchTypeError,
             Function<InvalidIOVarProblem, R> matchInvalidIOVar,
             Function<CyclicDependencyProblem, R> matchCyclicDependency,
-            Function<ParseErrorProblem, R> matchParseError
-    );
+            Function<ParseErrorProblem, R> matchParseError,
+            Function<DurationProblem, R> matchDurationProblem);
 }
