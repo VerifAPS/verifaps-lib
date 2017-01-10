@@ -15,8 +15,13 @@ public class SpecificationTabController implements Controller {
     private ObservableSet<String> definedVars;
     private ObservableList<Type> types;
     private ObservableList<IOVariable> ioVars;
+    private HybridSpecification spec;
 
     public SpecificationTab getView() {
         return null;
+    }
+
+    private void onVerificationStartet(){
+        
     }
 }
