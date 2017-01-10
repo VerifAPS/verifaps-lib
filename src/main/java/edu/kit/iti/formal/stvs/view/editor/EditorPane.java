@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.view.editor;
 
 import javafx.beans.property.StringProperty;
 import javafx.scene.layout.Pane;
+import org.fxmisc.richtext.StyleSpans;
 
 /**
  * Created by csicar on 09.01.17.
