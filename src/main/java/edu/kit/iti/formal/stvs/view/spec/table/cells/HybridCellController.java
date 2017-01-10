@@ -5,13 +5,10 @@ import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 
-import java.util.function.Consumer;
-
 public class HybridCellController implements Controller {
     private StringProperty comment;
     private ObservableList<String> counterexamples;
     private ValueCellController valueCellController;
-    private Consumer<String> addUserInputStringListener;
 
     public ObservableList<String> getCounterexamples() {
         return null;
@@ -24,6 +21,8 @@ public class HybridCellController implements Controller {
     public StringProperty getCommentProperty() {
         return null;
     }
+
+    private void onAddUserInputStringChanged(String string){}
 
     public HybridCellController(CellOperationProvider cell, ObservableList<String> counterexamples) {
     }

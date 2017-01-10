@@ -12,10 +12,8 @@ public class IOVariableNamePopupController implements Controller {
     private List<IOVariable> ioVars;
     private StringProperty name;
     /**
-     * Is called if variable name was confirmed
+     * @param variableChosenListener Is called if variable name was confirmed
      */
-    private Consumer<String> variableChosenListener;
-
     public IOVariableNamePopupController(List<IOVariable> ioVariables, Consumer<String> variableChosenListener) {
     }
 
