@@ -25,4 +25,8 @@ public class HybridCellController {
     }
     public HybridCellController(CellOperationProvider cell, ObservableList<String> counterexamples){
     }
+
+    public HybridCell getView() {
+        return null;
+    }
 }

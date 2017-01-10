@@ -1,8 +1,10 @@
 package edu.kit.iti.formal.stvs.view.spec.table.rowActions;
 
 import edu.kit.iti.formal.stvs.view.spec.table.DurationsColumnController;
+import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Button;
 
 /**
  * Controller of column next to the table which holds add buttons for rows
@@ -10,10 +12,21 @@ import javafx.event.EventHandler;
  */
 public class AddButtonColumnController extends RowActionColumnController{
     private AddButtonColumn view;
-    private EventHandler<ActionEvent> addButtonHandler;
-    AddButtonColumnController(DurationsColumnController durations) {
+    public AddButtonColumnController(DurationsColumnController durations) {
         super(durations);
     }
+
+    @Override
+    public void removeButton(int row) {
+
+    }
+
+    @Override
+    public void addButton(int row, HybridCellController cell) {
+        getView().getChildren().addAll(new Button());
+
+    }
+
     public AddButtonColumn getView(){
         return view;
     }
