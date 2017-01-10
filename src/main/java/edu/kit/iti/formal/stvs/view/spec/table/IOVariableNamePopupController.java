@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 public class IOVariableNamePopupController implements Controller {
     private List<IOVariable> ioVars;
     private StringProperty name;
+    private IOVariableNamePopup ioVariableNamePopup;
     /**
      * @param variableChosenListener Is called if variable name was confirmed
      */

@@ -70,10 +70,6 @@ public class TablePane extends HBox {
         return editableProperty;
     }
 
-    public void setEditableProperty(boolean editableProperty) {
-        this.editableProperty.set(editableProperty);
-    }
-
     private BooleanProperty editableProperty;
 
     public BooleanProperty getEditableProperty() {

@@ -48,7 +48,7 @@ public class Code {
         return null;
     }
 
-    public void addChangeListener(Consumer<Code> listener) {
+    public void addSourcecodeListener(Consumer<String> listener) {
 
     }
 
@@ -61,4 +61,7 @@ public class Code {
     }
 
 
+    public void setSourcecode(String sourcecode) {
+        this.sourcecode = sourcecode;
+    }
 }

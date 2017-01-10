@@ -1,13 +1,18 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
+import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
+import edu.kit.iti.formal.stvs.model.table.constraint.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.ObservableList;
 
-public class DurationsColumnController implements Controller {
+import java.util.List;
+
+public class DurationsColumnController extends ColumnController {
     private IntegerProperty width;
     private ObservableList<HybridCellController> cells;
+    private DurationsColumn durationsColumn;
 
     public IntegerProperty getWidthProperty() {
         return width;
@@ -17,7 +22,12 @@ public class DurationsColumnController implements Controller {
         return width.get();
     }
 
-    public DurationsColumnController() {
+    public DurationsColumnController(ColumnConfig config) {
+        super(config);
+    }
+
+    public void onProblemsChange(List<SpecProblem> problems){
+
     }
 
     public ObservableList<HybridCellController> getCells() {
@@ -26,6 +36,6 @@ public class DurationsColumnController implements Controller {
 
     @Override
     public DurationsColumn getView() {
-        return null;
+        return durationsColumn;
     }
 }

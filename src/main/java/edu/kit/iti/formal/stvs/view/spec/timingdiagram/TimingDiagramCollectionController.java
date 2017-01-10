@@ -1,27 +1,29 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteDuration;
 import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.model.table.hybrid.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.collections.ObservableList;
+
+import java.util.function.Function;
 
 /**
  * Created by csicar on 09.01.17.
  * creates TimingDiagramCollectionView
  * gets created by SpecificationTabController; is toplevel class for timingdiagram-package
  */
-public class TimingDiagramCollection implements Controller {
-    private ConcreteSpecification concreteSpecification;
-    private ObservableList<IOVariable> ioVariables;
+public class TimingDiagramCollectionController implements Controller {
+    private HybridSpecification spec;
 
 
     /**
      * creates VariableTimingDiagram for each given Variable
      *
-     * @param concreteSpecification
-     * @param ioVariables
+     * @param spec
      */
-    public TimingDiagramCollection(ConcreteSpecification concreteSpecification, ObservableList<IOVariable> ioVariables) {
+    public TimingDiagramCollectionController(HybridSpecification spec) {
 
     }
 

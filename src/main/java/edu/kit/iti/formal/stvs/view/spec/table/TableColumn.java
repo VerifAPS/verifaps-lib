@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 
 public class TableColumn extends VBox {
+    private ColumnHeader colHead;
     private BooleanProperty editableProperty;
 
     public BooleanProperty getEditableProperty() {

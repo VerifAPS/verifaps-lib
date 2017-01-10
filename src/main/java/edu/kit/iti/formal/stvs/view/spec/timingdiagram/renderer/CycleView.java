@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
+package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
 
 import javafx.scene.layout.Pane;
