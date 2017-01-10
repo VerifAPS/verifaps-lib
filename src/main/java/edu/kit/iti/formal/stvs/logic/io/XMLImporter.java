@@ -2,7 +2,7 @@ package edu.kit.iti.formal.stvs.logic.io;
 
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.history.History;
-import edu.kit.iti.formal.stvs.model.io.TestCase;
+import edu.kit.iti.formal.stvs.model.io.VerificationScenario;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import org.w3c.dom.Node;
 
@@ -14,7 +14,7 @@ public class XMLImporter {
         return null;
     }
 
-    public TestCase importVerificationScenario(Node node) throws ImportException {
+    public VerificationScenario importVerificationScenario(Node node) throws ImportException {
         return null;
     }
 
