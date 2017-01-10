@@ -1,22 +1,14 @@
 package stverificationstudio;
 
+import edu.kit.iti.formal.stvs.model.expressions.*;
+import edu.kit.iti.formal.stvs.model.typechecker.TypeCheckException;
+import edu.kit.iti.formal.stvs.model.typechecker.TypeChecker;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
-import edu.kit.iti.formal.stvs.model.expressions.Expression;
-import edu.kit.iti.formal.stvs.model.expressions.FunctionExpr;
-import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
-import edu.kit.iti.formal.stvs.model.expressions.TypeFactory;
-import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
-import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
-import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
-import edu.kit.iti.formal.stvs.model.typechecker.TypeCheckException;
-import edu.kit.iti.formal.stvs.model.typechecker.TypeChecker;
 
 public class TestTypeChecker {
 
