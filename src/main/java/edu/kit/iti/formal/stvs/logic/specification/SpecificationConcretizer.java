@@ -16,7 +16,7 @@ public class SpecificationConcretizer {
 
     }
 
-    public void addSuccessfulConcretizationListener(Consumer<ConcreteSpecification>) {
+    public void addSuccessfulConcretizationListener(Consumer<ConcreteSpecification> listener) {
 
     }
 
