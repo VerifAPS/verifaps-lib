@@ -16,17 +16,16 @@ public class TimingDiagramController implements Controller {
     public TimingDiagramView view;
 
     /**
-     * TimingDiagramController
-     * @param ioVariable ioVariable's data that should be rendered
+     *TimingDiagramController
+     * @param ioVariable
      * @param ioVarValues
-     * @param getConcreteValuesForConstraint
      */
-    public TimingDiagramController(IOVariable ioVariable, SpecificationColumn<ConcreteCell> ioVarValues, Function<Integer, List<ConcreteCell>> getConcreteValuesForConstraint) {
+    public TimingDiagramController(IOVariable ioVariable, SpecificationColumn<ConcreteCell> ioVarValues) {
 
     }
 
     /**
-     * will be registered on all datapoints similar to http://stackoverflow.com/questions/25892695/tooltip-on-line-chart-showing-date
+     * will be registered on all data-points similar to http://stackoverflow.com/questions/25892695/tooltip-on-line-chart-showing-date
      * this event will be bubbled up to the specificationTabController which will change the selection
      */
     private void onMouseOver(Node selection) {
