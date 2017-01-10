@@ -23,7 +23,6 @@ public class TablePaneController implements Controller {
     private TablePane table;
     private Selection selection;
     private InputTableController inputTableController;
-    privat
 
     private void onSelectionChange(Selection){
 
