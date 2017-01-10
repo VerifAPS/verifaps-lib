@@ -22,7 +22,7 @@ public class TablePaneController implements Controller {
     /**
      * Listens on changed rows in Specification and adds cells or remove cells in durationColumn
      */
-    private void onRemoveRow(SpecificationTable.RowChangeInfo<ConstraintCell, ConstraintDuration> change){
+    private void onRowChange(SpecificationTable.RowChangeInfo<ConstraintCell, ConstraintDuration> change){
 
     }
 
