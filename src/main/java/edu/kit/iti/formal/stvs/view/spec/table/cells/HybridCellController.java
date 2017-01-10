@@ -1,14 +1,18 @@
 package edu.kit.iti.formal.stvs.view.spec.table.cells;
 
 import edu.kit.iti.formal.stvs.model.table.CellOperationProvider;
+import edu.kit.iti.formal.stvs.model.table.constraint.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
+
+import java.util.List;
 
 public class HybridCellController implements Controller {
     private StringProperty comment;
     private ObservableList<String> counterexamples;
     private ValueCellController valueCellController;
+    private ObservableList<SpecProblem> problems;
 
     public ObservableList<String> getCounterexamples() {
         return null;
@@ -23,6 +27,10 @@ public class HybridCellController implements Controller {
     }
 
     private void onAddUserInputStringChanged(String string){}
+
+    public void onProblemsChange(List<SpecProblem> problems){
+
+    }
 
     public HybridCellController(CellOperationProvider cell, ObservableList<String> counterexamples) {
     }
