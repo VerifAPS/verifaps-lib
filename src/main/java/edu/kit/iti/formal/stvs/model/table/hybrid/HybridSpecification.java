@@ -29,7 +29,7 @@ public class HybridSpecification extends ConstraintSpecification {
     private Selection selection;
 
     public HybridSpecification(Set<Type> typeContext, Set<IOVariable> ioVariables) {
-        super(typeContext, ioVariables);
+        super(typeContext, ioVariables, freeVariableSet);
     }
 
     public Optional<ConcreteSpecification> getConcreteInstance() {
@@ -48,7 +48,7 @@ public class HybridSpecification extends ConstraintSpecification {
     }
 
     public Selection getSelection() {
-        return null;
+        return selection;
     }
 
     public List<ConcreteCell> getConcreteValuesForConstraint(VariableIdentifier column, int row) {
