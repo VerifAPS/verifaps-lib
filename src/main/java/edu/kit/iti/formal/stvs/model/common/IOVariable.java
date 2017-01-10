@@ -28,4 +28,8 @@ public class IOVariable {
         return type;
     }
 
+    public void setType() {
+
+    }
+
 }
