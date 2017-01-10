@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table.constraint;
 
+import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
@@ -16,9 +17,11 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
     private List<Consumer<List<SpecProblem>>> problemsListeners;
     private Set<Type> typeContext;
+    private FreeVariableSet freeVariableSet;
 
-    public ConstraintSpecification(Set<Type> typeContext, Set<IOVariable> ioVariables) {
+    public ConstraintSpecification(Set<Type> typeContext, Set<IOVariable> ioVariables, FreeVariableSet freeVariableSet) {
         this.typeContext = typeContext;
+        this.freeVariableSet = freeVariableSet;
     }
 
     public void addProblemsListener(Consumer<List<SpecProblem>> listener) {
@@ -35,5 +38,9 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
     public void setTypeContext(Set<Type> typeContext) {
         this.typeContext = typeContext;
+    }
+
+    public FreeVariableSet getFreeVariableSet() {
+        return freeVariableSet;
     }
 }

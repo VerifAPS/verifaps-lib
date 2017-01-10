@@ -36,13 +36,13 @@
     <complexType name="variables">
         <sequence minOccurs="1" maxOccurs="unbounded">
             <choice>
-                <element name="variable" type="tns:ioVariable" />
+                <element name="variable" type="tns:variableIdentifier" />
                 <element name="constraint" type="tns:constraintVariable" />
             </choice>
         </sequence>
     </complexType>
 
-    <complexType name="ioVariable">
+    <complexType name="variableIdentifier">
         <complexContent>
             <extension base="tns:variable">
                 <attribute name="io" use="required">

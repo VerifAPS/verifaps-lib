@@ -32,21 +32,21 @@
             </constraintVariable>
         </constraintVariables>
         <ioVariables>
-            <ioVariable name="A">
+            <variableIdentifier name="A">
                 <annotation>If we support annotations, this is where they would go</annotation>
-            </ioVariable>
+            </variableIdentifier>
         </ioVariables>
     </additional-info>
 
     <display-info>
         <ioVariables>
-            <ioVariable name="B">
+            <variableIdentifier name="B">
                 <colWidth>30</colWidth>
                 <comment>Some column comment!</comment>
-            </ioVariable>
-            <ioVariable name="C">
+            </variableIdentifier>
+            <variableIdentifier name="C">
                 <comment>Another column comment!</comment>
-            </ioVariable>
+            </variableIdentifier>
         </ioVariables>
         <rows>
             <row id="3">
