@@ -13,4 +13,5 @@ public class InputVariablesTimingDiagramCollection extends CategoryTimingDiagram
     public InputVariablesTimingDiagramCollection(ConcreteSpecification concreteSpecification, ObservableList<IOVariable> ioVariables, Selection selection) {
         super(concreteSpecification, ioVariables);
     }
+
 }

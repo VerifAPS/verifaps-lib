@@ -7,7 +7,7 @@ import javafx.scene.layout.Pane;
 /**
  * Column next to the table which holds remove buttons for rows
  */
-public class RemoveButtonColumn extends Pane{
+public class RemoveButtonColumn extends Pane {
     @Override
     public ObservableList<Node> getChildren() {
         return super.getChildren();

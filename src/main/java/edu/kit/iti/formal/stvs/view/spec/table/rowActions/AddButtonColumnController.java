@@ -10,8 +10,9 @@ import javafx.scene.control.Button;
  * Controller of column next to the table which holds add buttons for rows
  * Fires RowEvent with ADD_ROW EventType on View
  */
-public class AddButtonColumnController extends RowActionColumnController{
+public class AddButtonColumnController extends RowActionColumnController {
     private AddButtonColumn view;
+
     public AddButtonColumnController(DurationsColumnController durations) {
         super(durations);
     }
@@ -27,7 +28,7 @@ public class AddButtonColumnController extends RowActionColumnController{
 
     }
 
-    public AddButtonColumn getView(){
+    public AddButtonColumn getView() {
         return view;
     }
 }

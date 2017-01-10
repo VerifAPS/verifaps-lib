@@ -2,12 +2,14 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 
-public class TableColumnController {
+public class TableColumnController implements Controller {
     private IntegerProperty width;
     private ObservableList<Type> types;
     private ObservableList<String> typeNames;
@@ -30,6 +32,11 @@ public class TableColumnController {
     }
 
     public ObservableList<HybridCellController> getCells() {
+        return null;
+    }
+
+    @Override
+    public TableColumn getView() {
         return null;
     }
 }

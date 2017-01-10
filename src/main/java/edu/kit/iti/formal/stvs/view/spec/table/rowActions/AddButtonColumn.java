@@ -7,7 +7,7 @@ import javafx.scene.layout.Pane;
 /**
  * Column next to the table which holds add buttons for rows
  */
-public class AddButtonColumn extends Pane{
+public class AddButtonColumn extends Pane {
     @Override
     public ObservableList<Node> getChildren() {
         return super.getChildren();

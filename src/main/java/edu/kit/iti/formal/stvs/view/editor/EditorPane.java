@@ -11,7 +11,7 @@ public class EditorPane extends Pane {
     StringProperty code;
     StyleSpans spans;
 
-    public StringProperty getCodeProperty(){
+    public StringProperty getCodeProperty() {
         return null;
     }
 

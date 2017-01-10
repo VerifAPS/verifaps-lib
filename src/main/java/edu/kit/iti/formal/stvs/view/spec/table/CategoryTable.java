@@ -1,4 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
-public class CategoryTable {
+import javafx.scene.layout.Pane;
+
+public class CategoryTable extends Pane {
 }

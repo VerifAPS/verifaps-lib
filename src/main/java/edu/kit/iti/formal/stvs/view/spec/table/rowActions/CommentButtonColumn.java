@@ -7,7 +7,7 @@ import javafx.scene.layout.Pane;
 /**
  * Column next to the table which holds comment buttons for rows
  */
-public class CommentButtonColumn extends Pane{
+public class CommentButtonColumn extends Pane {
     @Override
     public ObservableList<Node> getChildren() {
         return super.getChildren();

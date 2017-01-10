@@ -9,8 +9,9 @@ import javafx.event.EventHandler;
  * Controller of column next to the table which holds comment buttons for rows
  * Fires RowEvent with COMMENT_ROW EventType on View
  */
-public class CommentButtonColumnController extends RowActionColumnController{
+public class CommentButtonColumnController extends RowActionColumnController {
     private CommentButtonColumn view;
+
     public CommentButtonColumnController(DurationsColumnController durations) {
         super(durations);
     }
@@ -25,7 +26,7 @@ public class CommentButtonColumnController extends RowActionColumnController{
 
     }
 
-    public CommentButtonColumn getView(){
+    public CommentButtonColumn getView() {
         return view;
     }
 }

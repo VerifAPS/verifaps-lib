@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.view.spec.table.cells;
 
-public class CommentButton {
+import javafx.scene.control.Button;
+
+public class CommentButton extends Button {
 
 }

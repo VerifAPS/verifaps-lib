@@ -1,4 +1,7 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
-public class SpecificationsPane extends javafx.scene.layout.AnchorPane {
+
+import javafx.scene.layout.AnchorPane;
+
+public class SpecificationsPane extends AnchorPane {
 }

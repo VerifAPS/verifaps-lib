@@ -6,6 +6,7 @@ import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.hybrid.HybridSpecification;
+import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.table.rowActions.RowEvent;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -14,7 +15,7 @@ import javafx.event.EventHandler;
 
 import java.util.function.Consumer;
 
-public class TablePaneController {
+public class TablePaneController implements Controller {
     private EventHandler<RowEvent> addRowHandler;
     private EventHandler<RowEvent> removeRowHandler;
     private EventHandler<RowEvent> commentRowHandler;
@@ -32,5 +33,9 @@ public class TablePaneController {
     }
 
     public void addIOVariable(IOVariable ioVar) {
+    }
+
+    public TablePane getView() {
+        return null;
     }
 }

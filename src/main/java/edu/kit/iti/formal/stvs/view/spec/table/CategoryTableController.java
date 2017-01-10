@@ -6,21 +6,23 @@ import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.hybrid.HybridSpecification;
+import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 
 import java.util.Map;
 import java.util.function.Consumer;
 
-abstract public class CategoryTableController {
+abstract public class CategoryTableController implements Controller {
     private String title;
     private HybridSpecification spec;
     private ObservableList<Type> types;
     private ObservableList<IOVariable> ioVars;
-    
+
     private ObservableMap<IOVariable, TableColumnController> columns;
     private Map<TableColumnController, Integer> columnIndices;
     private ObservableList<TableColumnController> sortedColumns;
@@ -38,7 +40,7 @@ abstract public class CategoryTableController {
      * Listens on changed columns in Specification model and adds columns, removes columns
      */
     protected Consumer<SpecificationTable.ColumnChangeInfo<ConstraintCell>> columnChangeInfoConsumer;
-    
+
     public CategoryTableController(String title, HybridSpecification spec, ObservableList<Type> types, ObservableList<IOVariable> ioVars, TablePaneController tablePaneController) {
     }
 
@@ -47,19 +49,22 @@ abstract public class CategoryTableController {
     }
 
     /**
-     * 
      * Adds a column of an IOVariable that exists in the code or is newly defined.
      * Automatically adds view listeners for drag detected, mouse moved and drag done to column.
      * Automatically adds model listener to spec.rowsListeners to add remove cells on row change.
-     * 
+     *
      * @param string name of Variable
      */
     abstract public void addIOVariable(String string);
 
     /**
-     * Resorts 
+     * Resorts
      */
-    private void updateSort(){
-        
+    private void updateSort() {
+
+    }
+
+    public Node getView() {
+        return null;
     }
 }

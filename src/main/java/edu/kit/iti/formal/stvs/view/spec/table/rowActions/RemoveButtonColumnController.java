@@ -10,8 +10,9 @@ import javafx.scene.control.Button;
  * Controller of column next to the table which holds remove buttons for rows
  * Fires RowEvent with REMOVE_ROW EventType on View
  */
-public class RemoveButtonColumnController extends RowActionColumnController{
+public class RemoveButtonColumnController extends RowActionColumnController {
     private RemoveButtonColumn view;
+
     public RemoveButtonColumnController(DurationsColumnController durations) {
         super(durations);
     }
@@ -26,7 +27,7 @@ public class RemoveButtonColumnController extends RowActionColumnController{
 
     }
 
-    public RemoveButtonColumn getView(){
+    public RemoveButtonColumn getView() {
         return view;
     }
 }

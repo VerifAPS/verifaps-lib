@@ -1,6 +1,8 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
-public class SpecificationTab {
+import javafx.scene.control.TabPane;
+
+public class SpecificationTab extends TabPane {
     public SpecificationTab(DiagramPane d, TablePane t) {
     }
 }

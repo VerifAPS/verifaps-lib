@@ -2,8 +2,9 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import javafx.beans.property.BooleanProperty;
+import javafx.scene.layout.Pane;
 
-public class ColumnHeader {
+public class ColumnHeader extends Pane {
     private BooleanProperty editableProperty;
     private String VariableName;
     private Type VariableType;
