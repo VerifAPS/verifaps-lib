@@ -15,15 +15,18 @@ import javafx.collections.ObservableSet;
 public class TablePaneController implements Controller {
     private HybridSpecification spec;
     private ObservableSet<String> definedVars;
-    private ObservableList<Type> types;
-    private ObservableMap<IOVariable, TableColumnController> columns;
     private DurationsColumnController durationColumn;
 
     /**
      * Listens on changed rows in Specification and adds cells or remove cells in durationColumn
      */
     private void onRowChange(SpecificationTable.RowChangeInfo<ConstraintCell, ConstraintDuration> change){
+    }
 
+    /**
+     * Listens on changed problem list in Specification and modifies cells in durationColumn
+     */
+    private void onProblemsChanged(SpecificationTable.RowChangeInfo<ConstraintCell, ConstraintDuration> change){
     }
 
     private void onAddRowClicked(RowEvent event){

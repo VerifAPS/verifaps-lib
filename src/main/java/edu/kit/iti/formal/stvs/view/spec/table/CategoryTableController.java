@@ -1,10 +1,12 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintDuration;
+import edu.kit.iti.formal.stvs.model.table.constraint.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.model.table.hybrid.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.collections.ObservableList;
@@ -12,6 +14,7 @@ import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 
+import java.util.List;
 import java.util.Map;
 
 abstract public class CategoryTableController implements Controller {
@@ -20,14 +23,15 @@ abstract public class CategoryTableController implements Controller {
     private ObservableList<Type> types;
     private ObservableList<IOVariable> ioVars;
 
-    private ObservableMap<IOVariable, TableColumnController> columns;
-    private Map<TableColumnController, Integer> columnIndices;
-    private ObservableList<TableColumnController> sortedColumns;
+    private ObservableMap<VariableIdentifier, ColumnController> columns;
+    private Map<ColumnController, Integer> columnIndices;
+    private ObservableList<ColumnController> sortedColumns;
+
     /**
      * Gets called if button for new IOVariable is pressed.
      * Creates IOVariableNamePopupController.
      */
-    private void onNewIOVariableButton(ActionEvent e){
+    private void onNewIOVariableButton(ActionEvent e) {
 
     }
 
@@ -35,6 +39,7 @@ abstract public class CategoryTableController implements Controller {
      * Listens on changed rows in Specification model and adds cells, removes cells in columns
      */
     private void onRowChange(SpecificationTable.RowChangeInfo<ConstraintCell, ConstraintDuration> change) {
+
     }
 
     /**
@@ -43,10 +48,14 @@ abstract public class CategoryTableController implements Controller {
     protected void onColumnChange(SpecificationTable.ColumnChangeInfo<ConstraintCell> change) {
     }
 
+    private void onSpecProblemsChanged(List<SpecProblem> problems){
+
+    }
+
     public CategoryTableController(String title, HybridSpecification spec, ObservableList<Type> types, ObservableList<IOVariable> ioVars, TablePaneController tablePaneController) {
     }
 
-    public ObservableList<TableColumnController> getColumns() {
+    public ObservableList<ColumnController> getColumns() {
         return sortedColumns;
     }
 
