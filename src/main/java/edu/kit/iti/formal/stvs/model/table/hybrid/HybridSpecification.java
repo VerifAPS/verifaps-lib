@@ -50,7 +50,7 @@ public class HybridSpecification extends ConstraintSpecification {
     }
 
     public Selection getSelection() {
-        return null;
+        return selection;
     }
 
     public List<ConcreteCell> getConcreteValuesForConstraint(VariableIdentifier column, int row) {

@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+
+<specification xmlns="http://formal.iti.kit.edu/exteta-1.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://formal.iti.kit.edu/exteta-1.0 specification.xsd">
+    <filename>/path/to/exampleSpec.xml</filename> <!-- This is useful for session import/export, because one knows which tab corresponds to which file (if any) -->
+    <test-table version="1.0">
+        <variables>
+            <variable io="input" name="A" data-type="INT"></variable>
+            <variable io="input" name="B" data-type="BOOLEAN"></variable>
+            <variable io="output" name="C" data-type="INT"></variable>
+            <constraint name="p" data-type="INT" constraint="[-5,5]"></constraint>
+        </variables>
+        <steps>
+            <step duration="[5,-]"><!-- Hier ist die Reihenfolge der Cells wichtig! -->
+                <cell>5</cell>
+                <cell>FALSE</cell>
+                <cell>A+2</cell>
+            </step>
+            <step duration="[1,1]">
+                <cell>C[-1]</cell>
+                <cell>!B[-1]</cell>
+                <cell>A</cell>
+            </step>
+        </steps>
+    </test-table>
+
+    <additional-info>
+        <constraintVariables>
+            <constraintVariable name="p">
+                <defaultValue>2</defaultValue>
+            </constraintVariable>
+        </constraintVariables>
+        <ioVariables>
+            <variableIdentifier name="A">
+                <annotation>If we support annotations, this is where they would go</annotation>
+            </variableIdentifier>
+        </ioVariables>
+    </additional-info>
+
+    <display-info>
+        <ioVariables>
+            <variableIdentifier name="B">
+                <colWidth>30</colWidth>
+                <comment>Some column comment!</comment>
+            </variableIdentifier>
+            <variableIdentifier name="C">
+                <comment>Another column comment!</comment>
+            </variableIdentifier>
+        </ioVariables>
+        <rows>
+            <row id="3">
+                <comment>I am a row comment!</comment>
+            </row>
+        </rows>
+        <table>
+            <comment>I am a table comment!</comment>
+        </table>
+    </display-info>
+
+</specification>
