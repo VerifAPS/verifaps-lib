@@ -1,17 +1,22 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
-import edu.kit.iti.formal.stvs.model.code.SourcecodeToken;
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.view.spec.table.cells.MultiCellController;
+import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 
 public class TableColumnController {
     private IntegerProperty width;
-    private ObservableList<SourcecodeToken.Type> types;
+    private ObservableList<Type> types;
+    private ObservableList<String> typeNames;
     private IOVariable ioVar;
-    private ObservableList<MultiCellController> cells;
+    private ObservableList<HybridCellController> cells;
+    /**
+     * Gets called if an other type was selected.
+     */
+    private ChangeListener<String> selectedType;
 
     public TableColumnController(ObservableList<Type> types, IOVariable ioVar) {
     }
@@ -24,7 +29,7 @@ public class TableColumnController {
         return 0;
     }
 
-    public ObservableList<MultiCellController> getCells() {
+    public ObservableList<HybridCellController> getCells() {
         return null;
     }
 }

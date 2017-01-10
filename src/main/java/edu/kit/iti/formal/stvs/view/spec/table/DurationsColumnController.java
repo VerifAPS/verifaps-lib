@@ -1,12 +1,12 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
-import edu.kit.iti.formal.stvs.view.spec.table.cells.MultiCellController;
+import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.ObservableList;
 
 public class DurationsColumnController {
     private IntegerProperty width;
-    private ObservableList<MultiCellController> cells;
+    private ObservableList<HybridCellController> cells;
 
     public IntegerProperty getWidthProperty() {
         return width;
@@ -19,7 +19,7 @@ public class DurationsColumnController {
     public DurationsColumnController() {
     }
 
-    public ObservableList<MultiCellController> getCells() {
+    public ObservableList<HybridCellController> getCells() {
         return cells;
     }
 }

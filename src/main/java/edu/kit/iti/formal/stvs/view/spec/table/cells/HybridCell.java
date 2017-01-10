@@ -2,7 +2,7 @@ package edu.kit.iti.formal.stvs.view.spec.table.cells;
 
 import javafx.beans.property.BooleanProperty;
 
-public class MultiCell extends TableCell {
+public class HybridCell extends TableCell {
     private BooleanProperty editableProperty;
 
     public BooleanProperty getEditableProperty() {
