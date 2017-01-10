@@ -20,8 +20,6 @@ public class SpecificationsPaneController implements Controller {
     private ObservableList<IOVariable> ioVars;
     private SpecificationsPane view;
 
-    public SpecificationsPaneController(ObservableList<Type> types, ObservableList<IOVariable> ioVars, ObservableList<HybridSpecification> hybridSpecifications) {
-    }
 
     public SpecificationsPane getView() {
         return view;
