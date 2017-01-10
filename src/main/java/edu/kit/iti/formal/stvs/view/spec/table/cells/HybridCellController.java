@@ -1,8 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.table.cells;
 
-import edu.kit.iti.formal.stvs.model.table.StringEditable;
-import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteCell;
-import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintCell;
+import edu.kit.iti.formal.stvs.model.table.CellOperationProvider;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 
@@ -25,6 +23,6 @@ public class HybridCellController {
     public StringProperty getCommentProperty() {
         return null;
     }
-    public HybridCellController(StringEditable stringEditable, ObservableList<String> counterexamples){
+    public HybridCellController(CellOperationProvider cell, ObservableList<String> counterexamples){
     }
 }
