@@ -11,4 +11,6 @@ public interface Type {
 			Function<TypeEnum,R> matchEnumType);
 	
 	public boolean checksAgainst(Type other);
+
+	public String getTypeName();
 }
