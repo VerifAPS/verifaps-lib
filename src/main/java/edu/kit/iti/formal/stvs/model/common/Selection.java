@@ -9,24 +9,24 @@ import java.util.function.Consumer;
 public class Selection {
 
     private List<Consumer<Selection>> listener;
-    private IOVariable ioVariable;
+    private VariableIdentifier ioVariable;
     private int row;
 
-    public Selection(IOVariable ioVariable, int row) {
+    public Selection(VariableIdentifier ioVariable, int row) {
         this.ioVariable = ioVariable;
         this.row = row;
     }
 
-    public IOVariable getIoVariable() {
-        return ioVariable;
+    public VariableIdentifier getIoVariable() {
+        return VariableIdentifier;
     }
 
     public int getRow() {
         return row;
     }
 
-    public void setIoVariable(IOVariable ioVariable) {
-        this.ioVariable = ioVariable;
+    public void setIoVariable(VariableIdentifier ioVariable) {
+        this.ioVariable = VariableIdentifier;
     }
 
     public void setRow(int row) {
