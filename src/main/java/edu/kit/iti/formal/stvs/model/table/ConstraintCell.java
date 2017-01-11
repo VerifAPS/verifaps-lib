@@ -22,17 +22,17 @@ public class ConstraintCell implements CellOperationProvider {
     }
 
     @Override
-    public String getUserInputString() {
+    public String getAsString() {
         return userInputString;
     }
 
     @Override
-    public void setUserInputString(String userInputString) {
+    public void setFromString(String userInputString) {
         this.userInputString = userInputString;
     }
 
     @Override
-    public void addUserInputStringListener(Consumer<String> listener) {
+    public void addStringListener(Consumer<String> listener) {
 
     }
 

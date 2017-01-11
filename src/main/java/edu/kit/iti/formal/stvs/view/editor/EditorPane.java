@@ -16,7 +16,6 @@ import java.util.List;
  * https://github.com/TomasMikula/RichTextFX/blob/a098da6309a0f624052fd1d4d6f5079dd6265fbe/richtextfx-demos/src/main/java/org/fxmisc/richtext/demo/JavaKeywords.java
  */
 public class EditorPane extends Pane {
-    StringProperty code;
     private CodeArea codeArea;
 
 
@@ -25,7 +24,7 @@ public class EditorPane extends Pane {
     }
 
     public String getCode() {
-        return code.toString();
+        return null;
     }
 
     public void setCode(String code) {

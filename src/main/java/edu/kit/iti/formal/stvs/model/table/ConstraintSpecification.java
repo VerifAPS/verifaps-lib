@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.model.table;
 import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.SpecIOVariable;
+import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
 import edu.kit.iti.formal.stvs.model.expressions.ExpressionParser;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeChecker;
@@ -28,6 +29,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     private FreeVariableSet freeVariableSet;
     private List<RowComment> rowComments;
     private Optional<ValidSpecification> validSpecification;
+    private Map<String, ColumnConfig> columnConfigMap;
 
     // For finding SpecProblems when cells change.
     private ExpressionParser parser;
@@ -47,7 +49,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
     }
 
-    public Type getTypeForColumn(String column) {
+    public SpecIOVariable getSpecIOVariableForColumn(String column) {
         return null;
     }
 

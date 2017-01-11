@@ -15,6 +15,7 @@ import java.util.function.Consumer;
  */
 public class HybridSpecification extends ConstraintSpecification {
 
+
     private Optional<ConcreteSpecification> concreteInstance;
     private List<Consumer<Optional<ConcreteSpecification>>> concreteInstanceChangedListeners;
     private final boolean editable;
@@ -35,6 +36,7 @@ public class HybridSpecification extends ConstraintSpecification {
      * @param spec The spec to copy
      */
     public HybridSpecification(HybridSpecification spec) {
+        super(null);
         //...
         this.editable = spec.editable;
     }

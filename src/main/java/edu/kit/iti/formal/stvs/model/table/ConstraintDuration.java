@@ -21,12 +21,12 @@ public class ConstraintDuration implements CellOperationProvider {
     }
 
     @Override
-    public String getUserInputString() {
+    public String getAsString() {
         return this.userInputString;
     }
 
     @Override
-    public void setUserInputString(String input) {
+    public void setFromString(String input) {
         this.userInputString = userInputString;
     }
 
@@ -39,7 +39,7 @@ public class ConstraintDuration implements CellOperationProvider {
     }
 
     @Override
-    public void addUserInputStringListener(Consumer<String> listener) {
+    public void addStringListener(Consumer<String> listener) {
 
     }
 

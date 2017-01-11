@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.model;
 
+import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
@@ -13,12 +14,10 @@ public class STVSRootModel {
     private List<HybridSpecification> hybridSpecifications;
     private GlobalConfig globalConfig;
     private History history;
-    private CircularFifoQueue<RootModelMemento> mementos;
     private VerificationScenario scenario;
-    private Code code;
 
     public STVSRootModel() {
-        mementos = new CircularFifoQueue<RootModelMemento>(globalConfig.getNumberOfMementos());
+
     }
 
     public List<HybridSpecification> getHybridSpecifications() {
@@ -32,29 +31,6 @@ public class STVSRootModel {
     public History getHistory() {
         return history;
     }
-
-    public Code getCode() {
-        return code;
-    }
-
-    public void undo() throws NoSuchMementoException {
-        // applyMemento() with previous item in queue (if any)
-        // Must keep track of current position in "timeline"
-    }
-
-    public void redo() throws NoSuchMementoException {
-        // applyMemento() with next item in queue (if any)
-        // Must keep track of current position in "timeline"
-    }
-
-    private void applyMemento(RootModelMemento memento) {
-
-    }
-
-    private void addOnMementoAppliedListener(Runnable listener){
-
-    }
-
 
     public VerificationScenario getScenario() {
         return scenario;
