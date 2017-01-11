@@ -2,7 +2,9 @@ package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.expressions.ExpressionParser;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.TypeChecker;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 
 import java.util.List;
@@ -11,12 +13,18 @@ import java.util.function.Consumer;
 
 /**
  * Created by philipp on 09.01.17.
+ *
  */
 public class ConstraintSpecification extends SpecificationTable<ConstraintCell, ConstraintDuration> {
 
     private List<Consumer<List<SpecProblem>>> problemsListeners;
     private Set<Type> typeContext;
     private FreeVariableSet freeVariableSet;
+    private List<RowComment> rowComments;
+
+    // For finding SpecProblems when cells change.
+    private ExpressionParser parser;
+    private TypeChecker typeChecker;
 
     public ConstraintSpecification(Set<Type> typeContext, Set<IOVariable> ioVariables, FreeVariableSet freeVariableSet) {
         this.typeContext = typeContext;
@@ -41,5 +49,13 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
     public FreeVariableSet getFreeVariableSet() {
         return freeVariableSet;
+    }
+
+    public List<RowComment> getRowComments() {
+        return rowComments;
+    }
+
+    public void setRowComments(List<RowComment> rowComments) {
+        this.rowComments = rowComments;
     }
 }

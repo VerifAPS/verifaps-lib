@@ -13,12 +13,14 @@ import java.util.function.Consumer;
 public class Code {
     private List<Consumer<List<IOVariable>>> ioVariableListeners;
     private List<Consumer<ParsedCode>> parsedCodeListeners;
+    private List<Consumer<List<ANTLRSyntaxError>>> syntaxErrorsListeners;
     private List<Consumer<List<SourcecodeToken>>> lexedCodeListeners;
 
     private ParsedCode parsedCode;
     private String filename;
     private String sourcecode;
     private List<SourcecodeToken> tokens;
+    private List<ANTLRSyntaxError> syntaxErrors;
 
     /**
      * creates a Dummy-Codefile
@@ -60,4 +62,15 @@ public class Code {
     }
 
 
+    public List<ANTLRSyntaxError> getSyntaxErrors() {
+        return syntaxErrors;
+    }
+
+    public void setSyntaxErrors(List<ANTLRSyntaxError> syntaxErrors) {
+        this.syntaxErrors = syntaxErrors;
+    }
+
+    public void addSyntaxErrorsListener(Consumer<List<ANTLRSyntaxError>> listener) {
+
+    }
 }
