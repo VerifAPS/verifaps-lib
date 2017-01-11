@@ -33,7 +33,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     private ExpressionParser parser;
     private TypeChecker typeChecker;
 
-    public ConstraintSpecification() {
+    public ConstraintSpecification(ConstraintSpecification constraintSpecification) {
 
     }
 

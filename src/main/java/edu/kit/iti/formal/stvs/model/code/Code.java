@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.model.code;
 
 import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
 
+import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.function.Consumer;
 public class Code {
     private List<Consumer<List<CodeIOVariable>>> ioVariableListeners;
     private List<Consumer<ParsedCode>> parsedCodeListeners;
-    private List<Consumer<List<ANTLRException>>> syntaxErrorsListeners;
+    private List<Consumer<List<RecognitionException>>> syntaxErrorsListeners;
     private List<Consumer<List<Token>>> lexedCodeListeners;
 
     /**
@@ -23,7 +24,7 @@ public class Code {
     private String filename;
     private String sourcecode;
     private List<Token> tokens;
-    private List<ANTLRSyntaxError> syntaxErrors;
+    private List<RecognitionException> syntaxErrors;
 
     /**
      * creates a Dummy-Codefile
@@ -73,15 +74,15 @@ public class Code {
     }
 
 
-    public List<ANTLRSyntaxError> getSyntaxErrors() {
+    public List<RecognitionException> getSyntaxErrors() {
         return syntaxErrors;
     }
 
-    public void setSyntaxErrors(List<ANTLRSyntaxError> syntaxErrors) {
+    public void setSyntaxErrors(List<RecognitionException> syntaxErrors) {
         this.syntaxErrors = syntaxErrors;
     }
 
-    public void addSyntaxErrorsListener(Consumer<List<ANTLRSyntaxError>> listener) {
+    public void addSyntaxErrorsListener(Consumer<List<RecognitionException>> listener) {
 
     }
 }
