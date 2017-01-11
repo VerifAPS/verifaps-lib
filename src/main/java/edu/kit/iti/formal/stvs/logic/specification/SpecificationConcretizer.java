@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.specification;
 
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
-import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 
 import java.util.function.Consumer;
 
@@ -22,6 +22,6 @@ public interface SpecificationConcretizer {
      * Launch a new simulation after a specification change, unless one is already running
      * @param spec The changed spec
      */
-    public void onSpecificationChanged(ConstraintSpecification spec);
+    public void onSpecificationChanged(ValidSpecification spec);
 }
 

@@ -28,6 +28,11 @@ public class CyclicDependencyProblem extends SpecProblem {
         return matchCyclicDependency.apply(this);
     }
 
+    @Override
+    public String getErrorMessage() {
+        return null;
+    }
+
     public int getRow() {
         return row;
     }

@@ -1,8 +1,10 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -27,5 +29,9 @@ public class FreeVariableSet {
 
     public void setVariableSet(List<FreeVariable> variableSet) {
         this.variableSet = variableSet;
+    }
+
+    public Map<String, Type> getVariableContext() {
+        return null;
     }
 }

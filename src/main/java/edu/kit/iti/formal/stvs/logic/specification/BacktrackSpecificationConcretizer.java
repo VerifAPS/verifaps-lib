@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.stvs.logic.specification;
 
-import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
+import org.reactfx.value.Val;
 
-import java.util.ArrayList;
 import java.util.Stack;
 import java.util.function.Consumer;
 
@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 public class BacktrackSpecificationConcretizer implements SpecificationConcretizer {
     private ConcretizerContext context;
     private ConcreteSpecification concreteSpecification;
-    private ConstraintSpecification constraintSpecification;
+    private ValidSpecification validSpecification;
     private Stack<RowSolver> rowSolverStack;
 
     public BacktrackSpecificationConcretizer(ConcretizerContext context) {
@@ -26,7 +26,6 @@ public class BacktrackSpecificationConcretizer implements SpecificationConcretiz
     }
 
     public ConcretizerContext getContext() {
-
         return null;
     }
 
@@ -42,7 +41,7 @@ public class BacktrackSpecificationConcretizer implements SpecificationConcretiz
      * Launch a new simulation after a specification change, unless one is already running
      * @param spec The changed spec
      */
-    public void onSpecificationChanged(ConstraintSpecification spec) {
+    public void onSpecificationChanged(ValidSpecification spec) {
 
     }
 }

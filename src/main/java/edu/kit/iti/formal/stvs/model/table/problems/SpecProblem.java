@@ -7,10 +7,14 @@ import java.util.function.Function;
  */
 public abstract class SpecProblem {
 
+
+
     public abstract <R> R match(
             Function<TypeErrorProblem, R> matchTypeError,
             Function<InvalidIOVarProblem, R> matchInvalidIOVar,
             Function<CyclicDependencyProblem, R> matchCyclicDependency,
             Function<ParseErrorProblem, R> matchParseError,
             Function<DurationProblem, R> matchDurationProblem);
+
+    public abstract String getErrorMessage();
 }

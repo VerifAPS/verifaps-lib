@@ -1,15 +1,11 @@
 package edu.kit.iti.formal.stvs.model;
 
-import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
-import edu.kit.iti.formal.stvs.model.io.VerificationScenario;
-import edu.kit.iti.formal.stvs.model.memento.NoSuchMementoException;
-import edu.kit.iti.formal.stvs.model.memento.RootModelMemento;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
+import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
-import java.util.HashSet;
 import java.util.List;
 
 public class STVSRootModel {

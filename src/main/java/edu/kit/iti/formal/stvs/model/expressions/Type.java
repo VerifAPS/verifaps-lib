@@ -13,4 +13,6 @@ public interface Type {
     public boolean checksAgainst(Type other);
 
     public String getTypeName();
+
+    public Value generateDefaultValue();
 }

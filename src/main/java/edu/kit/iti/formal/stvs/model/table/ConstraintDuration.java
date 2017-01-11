@@ -1,6 +1,9 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import edu.kit.iti.formal.stvs.model.expressions.Expression;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -8,22 +11,13 @@ import java.util.function.Consumer;
  */
 public class ConstraintDuration implements CellOperationProvider {
 
-    private LowerBoundedInterval bounds;
     private String userInputString;
     private String comment;
 
-    private List<Consumer<LowerBoundedInterval>> Listeners;
+    private List<Consumer<String>> Listeners;
 
-    public ConstraintDuration(LowerBoundedInterval bounds) {
-        this.bounds = bounds;
-    }
+    public ConstraintDuration(String userInputString) {
 
-    public LowerBoundedInterval getBounds() {
-        return bounds;
-    }
-
-    public void setBounds(LowerBoundedInterval bounds) {
-        this.bounds = bounds;
     }
 
     @Override
@@ -38,6 +32,10 @@ public class ConstraintDuration implements CellOperationProvider {
 
     public void addBoundsListener(Consumer<LowerBoundedInterval> listener) {
 
+    }
+
+    public Optional<SpecificationRow<Expression, LowerBoundedInterval>> getParsedRow() {
+        return null;
     }
 
     @Override

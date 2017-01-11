@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.verification;
 
-import edu.kit.iti.formal.stvs.model.io.VerificationScenario;
+import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 //import edu.kit.iti.formal.automation.testtables; //TODO this doesn't import despite Maven repo
 

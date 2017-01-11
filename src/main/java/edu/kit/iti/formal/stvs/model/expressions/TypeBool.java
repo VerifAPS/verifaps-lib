@@ -26,6 +26,11 @@ public class TypeBool implements Type {
         return null;
     }
 
+    @Override
+    public Value generateDefaultValue() {
+        return null;
+    }
+
     public String toString() {
         return "TypeBool";
     }

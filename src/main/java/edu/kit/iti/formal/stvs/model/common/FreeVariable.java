@@ -10,11 +10,18 @@ import java.util.function.Consumer;
  * Created by csicar on 10.01.17.
  */
 public class FreeVariable {
+    private List<Consumer<FreeVariable>> listeners;
+
     private String name;
     private Type type;
     private Value defaultValue;
-    private List<Consumer<FreeVariable>> listeners;
 
+    /**
+     * FreeVariable
+     * if no default value is given, a default value will be generated
+     * @param name
+     * @param type
+     */
     public FreeVariable(String name, Type type) {
         this.name = name;
         this.type = type;

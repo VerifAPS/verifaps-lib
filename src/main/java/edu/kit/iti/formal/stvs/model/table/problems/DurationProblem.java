@@ -7,11 +7,12 @@ import java.util.function.Function;
  */
 public class DurationProblem extends SpecProblem {
 
-    // TODO: Give Parse Error information
     private final int row;
+    private final String errorMessage;
 
-    public DurationProblem(int row) {
+    public DurationProblem(int row, String errorMessage) {
         this.row = row;
+        this.errorMessage = errorMessage;
     }
 
     @Override
@@ -22,6 +23,11 @@ public class DurationProblem extends SpecProblem {
             Function<ParseErrorProblem, R> matchParseError,
             Function<DurationProblem, R> matchDurationProblem) {
         return matchDurationProblem.apply(this);
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return errorMessage;
     }
 
     public int getRow() {

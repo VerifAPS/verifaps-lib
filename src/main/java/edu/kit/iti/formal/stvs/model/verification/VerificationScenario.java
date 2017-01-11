@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.model.io;
+package edu.kit.iti.formal.stvs.model.verification;
 
 import edu.kit.iti.formal.stvs.logic.specification.VerificationState;
 import edu.kit.iti.formal.stvs.logic.verification.VerificationEngine;

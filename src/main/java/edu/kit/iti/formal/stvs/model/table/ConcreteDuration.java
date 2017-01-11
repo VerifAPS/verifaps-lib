@@ -14,4 +14,8 @@ public class ConcreteDuration {
     public int getDuration() {
         return duration;
     }
+
+    public String toString() {
+        return null;
+    }
 }

@@ -16,4 +16,8 @@ public class ConcreteCell {
     public Value getValue() {
         return value;
     }
+
+    public String toString() {
+        return null;
+    }
 }

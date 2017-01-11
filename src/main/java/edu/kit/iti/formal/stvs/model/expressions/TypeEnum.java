@@ -41,6 +41,11 @@ public class TypeEnum implements Type {
         return enumTypeName;
     }
 
+    @Override
+    public Value generateDefaultValue() {
+        return null;
+    }
+
     public ValueEnum valueOf(String enumName) {
         ValueEnum enumVal = valueMap.get(enumName);
         if (enumVal == null) {

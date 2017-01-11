@@ -2,7 +2,7 @@ package edu.kit.iti.formal.stvs.logic.verification;
 
 import edu.kit.iti.formal.stvs.logic.io.verification.VerificationExporter;
 import edu.kit.iti.formal.stvs.logic.io.verification.VerificationImporter;
-import edu.kit.iti.formal.stvs.model.io.VerificationScenario;
+import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 
 import java.util.function.Consumer;

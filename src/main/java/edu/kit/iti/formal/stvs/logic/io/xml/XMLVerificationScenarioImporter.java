@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
-import edu.kit.iti.formal.stvs.model.io.VerificationScenario;
+import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 
 import java.io.InputStream;
 

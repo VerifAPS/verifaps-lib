@@ -9,11 +9,12 @@ import java.util.function.Function;
  */
 public class ParseErrorProblem extends SpecProblem {
 
-    // TODO: Give Parse Error information
+    private final String errorMessage;
     private final VariableIdentifier column;
     private final int row;
 
-    public ParseErrorProblem(VariableIdentifier column, int row) {
+    public ParseErrorProblem(String errorMessage, VariableIdentifier column, int row) {
+        this.errorMessage = errorMessage;
         this.column = column;
         this.row = row;
     }
@@ -27,6 +28,11 @@ public class ParseErrorProblem extends SpecProblem {
             Function<ParseErrorProblem, R> matchParseError,
             Function<DurationProblem, R> matchDurationProblem) {
         return matchParseError.apply(this);
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return null;
     }
 
     public VariableIdentifier getColumn() {

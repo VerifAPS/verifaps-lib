@@ -32,6 +32,11 @@ public class InvalidIOVarProblem extends SpecProblem {
         return matchInvalidIOVar.apply(this);
     }
 
+    @Override
+    public String getErrorMessage() {
+        return null;
+    }
+
     public VariableIdentifier getVariableIdentifier() {
         return column;
     }

@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.model.memento;
+package edu.kit.iti.formal.stvs.model;
 
 /**
  * Created by bal on 09.01.17.
