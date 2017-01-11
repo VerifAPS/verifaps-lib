@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
@@ -22,6 +23,7 @@ public class TablePaneController implements Controller {
     private TablePane table;
     private Selection selection;
     private InputTableController inputTableController;
+    private GlobalConfig globalConfig;
 
     private void onSelectionChange(Selection selection){
 
@@ -57,7 +59,8 @@ public class TablePaneController implements Controller {
     }
 
 
-    public TablePaneController(HybridSpecification spec, ObservableSet<String> definedVars, ObservableList<Type> types, ObservableList<IOVariable> ioVars) {
+    public TablePaneController(HybridSpecification spec, ObservableSet<String> definedVars, ObservableList<Type> types, ObservableList<IOVariable> ioVars, GlobalConfig globalConfig) {
+        this.globalConfig = globalConfig;
     }
 
     public void addIOVariable(IOVariable ioVar) {

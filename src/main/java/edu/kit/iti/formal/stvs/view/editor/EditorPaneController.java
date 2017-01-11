@@ -1,9 +1,10 @@
 package edu.kit.iti.formal.stvs.view.editor;
 
 import edu.kit.iti.formal.stvs.model.code.Code;
-import edu.kit.iti.formal.stvs.model.code.SourcecodeToken;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 import org.fxmisc.richtext.StyleSpans;
+import org.antlr.v4.runtime.Token;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,8 +15,9 @@ import java.util.List;
 public class EditorPaneController implements Controller {
     private EditorPane view;
 
-    public EditorPaneController(Code code) {
+    public EditorPaneController(Code code, GlobalConfig globalConfig) {
 
+        this.globalConfig = globalConfig;
     }
 
     public void onCodeChange(Code code) {
@@ -26,17 +28,19 @@ public class EditorPaneController implements Controller {
         return null;
     }
 
-    private void onLexedCodeChange(List<SourcecodeToken> tokens){
+    private void onLexedCodeChange(List<Token> tokens){
 
     }
 
-    private static StyleSpans<Collection<String>> toStyleSpans(List<SourcecodeToken> tokens){
+    private static StyleSpans<Collection<String>> toStyleSpans(List<Token> tokens){
         return null;
     }
 
     public void setStylesheet(String url) {
 
     }
+
+    private GlobalConfig globalConfig;
 
     @Override
     public EditorPane getView() {

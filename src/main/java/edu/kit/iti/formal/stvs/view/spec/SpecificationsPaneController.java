@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
@@ -8,9 +9,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TabPane;
 
 public class SpecificationsPaneController implements Controller {
-    public SpecificationsPaneController(ObservableList<Type> types, ObservableList<IOVariable> ioVars, ObservableList<HybridSpecification> hybridSpecifications) {
+    public SpecificationsPaneController(ObservableList<Type> types, ObservableList<IOVariable> ioVars, ObservableList<HybridSpecification> hybridSpecifications, GlobalConfig globalConfig) {
     }
-
+    private GlobalConfig globalConfig;
     private ObservableList<HybridSpecification> hybridSpecifications;
 
     public ObservableList<HybridSpecification> getHybridSpecifications() {

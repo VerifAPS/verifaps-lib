@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
@@ -20,9 +21,11 @@ public class TableColumnController extends ColumnController {
     private ObjectProperty<VariableIdentifier> ioVar;
     private ObservableList<SpecProblem> problems;
     private TableColumn tableColumn;
+    private GlobalConfig globalConfig;
 
-    public TableColumnController(ObservableList<Type> types, ObservableList<IOVariable> ioVars, ObjectProperty<VariableIdentifier> ioVar, ColumnConfig config) {
+    public TableColumnController(ObservableList<Type> types, ObservableList<IOVariable> ioVars, ObjectProperty<VariableIdentifier> ioVar, ColumnConfig config, GlobalConfig globalConfig) {
         super(config);
+        this.globalConfig = globalConfig;
     }
 
     @Override

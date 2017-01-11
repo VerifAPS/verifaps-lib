@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.table.rowActions;
 
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.spec.table.DurationsColumnController;
 import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
 import javafx.scene.control.Button;
@@ -10,9 +11,11 @@ import javafx.scene.control.Button;
  */
 public class AddButtonColumnController extends RowActionColumnController {
     private AddButtonColumn view;
+    private GlobalConfig globalConfig;
 
-    public AddButtonColumnController(DurationsColumnController durations) {
+    public AddButtonColumnController(DurationsColumnController durations, GlobalConfig globalConfig) {
         super(durations);
+        this.globalConfig = globalConfig;
     }
 
     @Override

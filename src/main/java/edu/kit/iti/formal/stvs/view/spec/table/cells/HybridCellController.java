@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.table.cells;
 
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.CellOperationProvider;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.view.Controller;
@@ -13,6 +14,7 @@ public class HybridCellController implements Controller {
     private ObservableList<String> counterexamples;
     private ObservableList<SpecProblem> problems;
     private HybridCell hybridCell;
+    private GlobalConfig globalConfig;
 
     public ObservableList<String> getCounterexamples() {
         return null;
@@ -32,7 +34,8 @@ public class HybridCellController implements Controller {
 
     }
 
-    public HybridCellController(CellOperationProvider cell, ObservableList<String> counterexamples) {
+    public HybridCellController(CellOperationProvider cell, ObservableList<String> counterexamples, GlobalConfig globalConfig) {
+        this.globalConfig = globalConfig;
     }
 
     public HybridCell getView() {

@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
 import javafx.beans.property.IntegerProperty;
@@ -12,6 +13,7 @@ public class DurationsColumnController extends ColumnController {
     private IntegerProperty width;
     private ObservableList<HybridCellController> cells;
     private DurationsColumn durationsColumn;
+    private GlobalConfig globalConfig;
 
     public IntegerProperty getWidthProperty() {
         return width;
@@ -21,8 +23,9 @@ public class DurationsColumnController extends ColumnController {
         return width.get();
     }
 
-    public DurationsColumnController(ColumnConfig config) {
+    public DurationsColumnController(ColumnConfig config, GlobalConfig globalConfig) {
         super(config);
+        this.globalConfig = globalConfig;
     }
 
     public void onProblemsChange(List<SpecProblem> problems){

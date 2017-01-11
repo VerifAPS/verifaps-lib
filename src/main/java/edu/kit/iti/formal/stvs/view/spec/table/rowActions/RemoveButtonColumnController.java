@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.table.rowActions;
 
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.spec.table.DurationsColumnController;
 import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
 
@@ -9,9 +10,11 @@ import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
  */
 public class RemoveButtonColumnController extends RowActionColumnController {
     private RemoveButtonColumn view;
+    private GlobalConfig globalConfig;
 
-    public RemoveButtonColumnController(DurationsColumnController durations) {
+    public RemoveButtonColumnController(DurationsColumnController durations, GlobalConfig globalConfig) {
         super(durations);
+        this.globalConfig = globalConfig;
     }
 
     @Override

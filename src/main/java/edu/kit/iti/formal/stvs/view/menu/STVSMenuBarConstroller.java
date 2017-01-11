@@ -2,7 +2,6 @@ package edu.kit.iti.formal.stvs.view.menu;
 
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
-import edu.kit.iti.formal.stvs.view.STVSRootController;
 
 /**
  * Created by csicar on 10.01.17.
@@ -11,9 +10,11 @@ import edu.kit.iti.formal.stvs.view.STVSRootController;
  */
 public class STVSMenuBarConstroller implements Controller {
     private STVSMenuBar view;
+    private GlobalConfig globalConfig;
 
-    public STVSMenuBarConstroller(GlobalConfig config) {
+    public STVSMenuBarConstroller(GlobalConfig config, GlobalConfig globalConfig) {
 
+        this.globalConfig = globalConfig;
     }
 
     @Override
