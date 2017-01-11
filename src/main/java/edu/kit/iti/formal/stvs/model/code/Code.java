@@ -11,11 +11,10 @@ import java.util.function.Consumer;
  * Created by csicar on 09.01.17.
  */
 public class Code {
-    private List<Consumer<Code>> changeListeners;
     private List<Consumer<List<IOVariable>>> ioVariableListeners;
-    private List<Consumer<List<Type>>> typeListeners;
     private List<Consumer<ParsedCode>> parsedCodeListeners;
     private List<Consumer<List<SourcecodeToken>>> lexedCodeListeners;
+
     private ParsedCode parsedCode;
     private String filename;
     private String sourcecode;
@@ -44,19 +43,11 @@ public class Code {
         return sourcecode;
     }
 
-    public List<SourcecodeToken> lexCode() {
-        return null;
+    public void setSourcecode(String sourcecode) {
+        this.sourcecode = sourcecode;
     }
 
     public void addSourcecodeListener(Consumer<String> listener) {
-
-    }
-
-    public void addIOVariablesListener(Consumer<List<IOVariable>> ioVariablesListener) {
-
-    }
-
-    public void addParsedCodeListener(Consumer<ParsedCode> parsedCodeListener) {
 
     }
 
@@ -64,12 +55,9 @@ public class Code {
 
     }
 
-    public void addTypesListener(Consumer<List<Type>> types){
+    public void addParsedCodeListener(Consumer<ParsedCode> parsedCodeListener) {
 
     }
 
 
-    public void setSourcecode(String sourcecode) {
-        this.sourcecode = sourcecode;
-    }
 }
