@@ -1,7 +1,9 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
+import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.collections.ObservableList;
 
 /**
  * Controller for the set of either InputVariables TimingDiagramCollectionController or OutputVariables TimingDiagramCollectionController
@@ -11,7 +13,7 @@ public abstract class CategoryTimingDiagramCollection implements Controller {
     private CategoryTimingDiagramCollectionView view;
     private HybridSpecification spec;
 
-    public CategoryTimingDiagramCollection(HybridSpecification spec) {
+    public CategoryTimingDiagramCollection(HybridSpecification spec, ObservableList<VariableIdentifier> ioVariables) {
 
     }
 

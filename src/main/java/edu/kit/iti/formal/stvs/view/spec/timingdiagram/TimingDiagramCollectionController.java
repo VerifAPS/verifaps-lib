@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 
@@ -10,15 +11,17 @@ import edu.kit.iti.formal.stvs.view.Controller;
  */
 public class TimingDiagramCollectionController implements Controller {
     private HybridSpecification spec;
-
+    private GlobalConfig globalConfig;
 
     /**
      * creates VariableTimingDiagram for each given Variable
      *
      * @param spec
+     * @param globalConfig
      */
-    public TimingDiagramCollectionController(HybridSpecification spec) {
+    public TimingDiagramCollectionController(HybridSpecification spec, GlobalConfig globalConfig) {
 
+        this.globalConfig = globalConfig;
     }
 
     public TimingDiagramCollectionView getView() {
