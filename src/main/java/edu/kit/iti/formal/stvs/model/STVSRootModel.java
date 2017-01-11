@@ -10,7 +10,7 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.util.HashSet;
 
-public class RootModel {
+public class STVSRootModel {
     private final int NUMBER_OF_MEMENTOS = 100;
 
     private HashSet<HybridSpecification> hybridSpecifications;
@@ -19,7 +19,7 @@ public class RootModel {
     private CircularFifoQueue<RootModelMemento> mementos;
     private Code code;
 
-    public RootModel() {
+    public STVSRootModel() {
         mementos = new CircularFifoQueue<RootModelMemento>(NUMBER_OF_MEMENTOS);
     }
 
