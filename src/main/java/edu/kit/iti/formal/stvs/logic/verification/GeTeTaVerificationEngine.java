@@ -21,12 +21,17 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     //private ExTeTa exteta;
 
 
-    public GeTeTaVerificationEngine(Consumer<VerificationResult> verificationFinishedListener) {
+    public GeTeTaVerificationEngine() {
 
     };
 
     @Override
     public void startVerification(VerificationScenario scenario) {
+
+    }
+
+    @Override
+    public void addVerificationFinishedListener(Consumer<VerificationResult> verificationFinishedListener) {
 
     }
 

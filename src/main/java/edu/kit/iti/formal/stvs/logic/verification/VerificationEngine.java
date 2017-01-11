@@ -22,5 +22,7 @@ public interface VerificationEngine {
      */
     public void startVerification(VerificationScenario scenario);
 
+    public void addVerificationFinishedListener(Consumer<VerificationResult> verificationFinishedListener);
+
     public void cancelVerification();
 }
