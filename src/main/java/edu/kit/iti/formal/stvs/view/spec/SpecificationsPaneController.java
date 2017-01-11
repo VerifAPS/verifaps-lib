@@ -5,6 +5,7 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.collections.ObservableList;
+import javafx.scene.control.TabPane;
 
 public class SpecificationsPaneController implements Controller {
     public SpecificationsPaneController(ObservableList<Type> types, ObservableList<IOVariable> ioVars, ObservableList<HybridSpecification> hybridSpecifications) {
@@ -18,10 +19,10 @@ public class SpecificationsPaneController implements Controller {
 
     private ObservableList<Type> types;
     private ObservableList<IOVariable> ioVars;
-    private SpecificationsPane view;
+    private TabPane view;
 
 
-    public SpecificationsPane getView() {
+    public TabPane getView() {
         return view;
     }
 
