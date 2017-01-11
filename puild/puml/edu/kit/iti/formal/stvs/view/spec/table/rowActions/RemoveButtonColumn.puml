@@ -1,7 +1,0 @@
-@startuml
-
-    class RemoveButtonColumn {
-        +getChildren(): ObservableList<Node>
-    }
-
-@enduml

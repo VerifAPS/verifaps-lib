@@ -1,7 +1,0 @@
-@startuml
-
-    class DurationsColumn {
-        +getChildren(): ObservableList<Node>
-    }
-
-@enduml

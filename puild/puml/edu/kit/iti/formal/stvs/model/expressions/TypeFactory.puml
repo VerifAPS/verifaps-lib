@@ -1,9 +1,0 @@
-@startuml
-
-    class TypeFactory {
-        {static} +INT: TypeInt
-        {static} +BOOL: TypeBool
-        {static} +enumOfName(name:String, values:String[]): TypeEnum
-    }
-
-@enduml

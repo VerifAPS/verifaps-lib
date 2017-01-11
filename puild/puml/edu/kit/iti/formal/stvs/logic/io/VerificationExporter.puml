@@ -1,7 +1,0 @@
-@startuml
-
-    class VerificationExporter {
-        +export(): Node
-    }
-
-@enduml

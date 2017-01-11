@@ -1,9 +1,0 @@
-@startuml
-
-    class VariableIdentifier {
-        -variableName: String
-        -category: VariableCategory
-        +VariableIdentifier(variableName:String, category:VariableCategory)
-    }
-
-@enduml

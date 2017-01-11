@@ -1,6 +1,0 @@
-@startuml
-
-    class TimingDiagramCollectionView {
-    }
-
-@enduml

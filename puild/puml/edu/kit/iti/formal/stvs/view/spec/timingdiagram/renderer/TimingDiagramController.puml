@@ -1,9 +1,0 @@
-@startuml
-
-    class TimingDiagramController {
-        +view: TimingDiagramView
-        +TimingDiagramController(ioVariable:IOVariable, ioVarValues:SpecificationColumn<ConcreteCell>, selection:Selection)
-        +getView(): TimingDiagramView
-    }
-
-@enduml

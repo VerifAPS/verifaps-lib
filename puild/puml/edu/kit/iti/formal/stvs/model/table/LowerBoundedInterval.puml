@@ -1,9 +1,0 @@
-@startuml
-
-    class LowerBoundedInterval {
-        -lowerBound: int
-        -upperBound: Optional<Integer>
-        +LowerBoundedInterval(lowerBound:int, upperBound:Optional<Integer>)
-    }
-
-@enduml

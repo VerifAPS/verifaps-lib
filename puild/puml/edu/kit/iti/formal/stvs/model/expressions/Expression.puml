@@ -1,7 +1,0 @@
-@startuml
-
-    abstract class Expression {
-        {abstract} +takeVisitor(visitor:ExpressionVisitor<R>): R
-    }
-
-@enduml

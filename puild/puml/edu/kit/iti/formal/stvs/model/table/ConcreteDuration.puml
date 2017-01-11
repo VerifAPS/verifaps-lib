@@ -1,9 +1,0 @@
-@startuml
-
-    class ConcreteDuration {
-        -duration: int
-        +ConcreteDuration(duration:int)
-        +getDuration(): int
-    }
-
-@enduml

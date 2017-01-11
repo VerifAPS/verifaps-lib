@@ -1,8 +1,0 @@
-@startuml
-
-    class ParsedCode {
-        -foldableCodeBlocks: List<FoldableCodeBlock>
-        +getFoldableCodeBlocks(): List<FoldableCodeBlock>
-    }
-
-@enduml

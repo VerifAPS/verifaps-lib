@@ -1,9 +1,0 @@
-@startuml
-
-    interface ExpressionVisitor<R> {
-        {abstract} +visitFunctionExpr(functionExpr:FunctionExpr): R
-        {abstract} +visitLiteral(literalExpr:LiteralExpr): R
-        {abstract} +visitVariable(variableExpr:VariableExpr): R
-    }
-
-@enduml

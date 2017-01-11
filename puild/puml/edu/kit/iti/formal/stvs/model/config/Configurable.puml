@@ -1,8 +1,0 @@
-@startuml
-
-    interface Configurable<Cnf> {
-        {abstract} +setConfig(config:Cnf): void
-        {abstract} +getConfig(): Cnf
-    }
-
-@enduml

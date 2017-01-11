@@ -1,8 +1,0 @@
-@startuml
-
-    class SpecificationsPane {
-        -tabPane: TabPane
-        +getTabPane(): TabPane
-    }
-
-@enduml

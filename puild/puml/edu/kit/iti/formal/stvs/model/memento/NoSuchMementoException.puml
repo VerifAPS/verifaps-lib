@@ -1,6 +1,0 @@
-@startuml
-
-    class NoSuchMementoException {
-    }
-
-@enduml

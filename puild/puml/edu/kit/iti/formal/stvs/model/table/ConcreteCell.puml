@@ -1,9 +1,0 @@
-@startuml
-
-    class ConcreteCell {
-        -value: Value
-        +ConcreteCell(value:Value)
-        +getValue(): Value
-    }
-
-@enduml

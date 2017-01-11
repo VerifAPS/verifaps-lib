@@ -1,6 +1,0 @@
-@startuml
-
-    interface CellOperationProvider {
-    }
-
-@enduml

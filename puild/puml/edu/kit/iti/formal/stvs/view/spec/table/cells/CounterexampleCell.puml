@@ -1,8 +1,0 @@
-@startuml
-
-    class CounterexampleCell {
-        -text: String
-        +CounterexampleCell(text:String)
-    }
-
-@enduml

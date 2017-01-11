@@ -1,9 +1,0 @@
-@startuml
-
-    class ConcreteSpecification {
-        -isCounterExample: boolean
-        +ConcreteSpecification(isCounterExample:boolean)
-        +isCounterExample(): boolean
-    }
-
-@enduml
