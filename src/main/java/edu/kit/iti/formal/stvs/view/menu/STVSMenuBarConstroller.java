@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.STVSRootController;
 
@@ -11,7 +12,7 @@ import edu.kit.iti.formal.stvs.view.STVSRootController;
 public class STVSMenuBarConstroller implements Controller {
     private STVSMenuBar view;
 
-    public STVSMenuBarConstroller(STVSRootController rootController) {
+    public STVSMenuBarConstroller(GlobalConfig config) {
 
     }
 

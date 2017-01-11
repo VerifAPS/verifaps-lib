@@ -4,6 +4,8 @@ import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.view.editor.EditorPaneController;
 
+import org.antlr.v4.runtime.Token;
+
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -14,12 +16,12 @@ public class Code {
     private List<Consumer<List<IOVariable>>> ioVariableListeners;
     private List<Consumer<ParsedCode>> parsedCodeListeners;
     private List<Consumer<List<ANTLRSyntaxError>>> syntaxErrorsListeners;
-    private List<Consumer<List<SourcecodeToken>>> lexedCodeListeners;
+    private List<Consumer<List<Token>>> lexedCodeListeners;
 
     private ParsedCode parsedCode;
     private String filename;
     private String sourcecode;
-    private List<SourcecodeToken> tokens;
+    private List<Token> tokens;
     private List<ANTLRSyntaxError> syntaxErrors;
 
     /**
@@ -53,7 +55,7 @@ public class Code {
 
     }
 
-    public void addLexedCodeListener(Consumer<List<SourcecodeToken>> lexed){
+    public void addLexedCodeListener(Consumer<List<Token>> lexed){
 
     }
 
