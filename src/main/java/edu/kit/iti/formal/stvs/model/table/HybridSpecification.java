@@ -35,6 +35,15 @@ public class HybridSpecification extends ConstraintSpecification {
         this.editable = editable;
     }
 
+    /**
+     * Copy constructor
+     * @param spec The spec to copy
+     */
+    public HybridSpecification(HybridSpecification spec) {
+        //...
+        this.editable = spec.editable;
+    }
+
     public Optional<ConcreteSpecification> getConcreteInstance() {
         return concreteInstance;
     }

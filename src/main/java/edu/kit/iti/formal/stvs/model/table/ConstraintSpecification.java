@@ -33,6 +33,10 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     private ExpressionParser parser;
     private TypeChecker typeChecker;
 
+    public ConstraintSpecification() {
+
+    }
+
     public ConstraintSpecification(Set<Type> typeContext, Set<IOVariable> ioVariables, FreeVariableSet freeVariableSet) {
         this.typeContext = typeContext;
         this.freeVariableSet = freeVariableSet;
