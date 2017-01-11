@@ -3,21 +3,21 @@ package edu.kit.iti.formal.stvs.logic.specification;
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by bal on 09.01.17.
  */
 public class ConcretizerContext {
-    private HashMap<IOVariable, Value> ioVars;
-    private HashMap<String, Value> constraintVars;
+    private Map<IOVariable, Value> ioVars;
+    private Map<String, Value> constraintVars;
 
 
-    public HashMap<IOVariable, Value> getIoVars() {
+    public Map<IOVariable, Value> getIoVars() {
         return ioVars;
     }
 
-    public HashMap<String, Value> getConstraintVars() {
+    public Map<String, Value> getConstraintVars() {
         return constraintVars;
     }
 }
