@@ -15,4 +15,5 @@ public class FoldableCodeBlock {
     public int getEndLine() {
         return endLine;
     }
+
 }

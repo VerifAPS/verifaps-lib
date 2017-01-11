@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.config;
 
-import edu.kit.iti.formal.stvs.model.table.StringEditable;
-
 /**
  * Contains global configuration specified by the user
  */
@@ -13,6 +11,7 @@ public class GlobalConfig {
     private int editorFontSize;
     private String editorFontFamily;
     private boolean showLineNumbers;
+    private int numberOfMementos;
     private String uiLanguage;
 
     /**
@@ -151,5 +150,13 @@ public class GlobalConfig {
 
     public void setWindowWidth(int windowWidth) {
         this.windowWidth = windowWidth;
+    }
+
+    public int getNumberOfMementos() {
+        return numberOfMementos;
+    }
+
+    public void setNumberOfMementos(int numberOfMementos) {
+        this.numberOfMementos = numberOfMementos;
     }
 }

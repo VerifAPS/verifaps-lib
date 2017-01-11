@@ -18,6 +18,9 @@ public class Code {
     private List<Consumer<List<ANTLRSyntaxError>>> syntaxErrorsListeners;
     private List<Consumer<List<Token>>> lexedCodeListeners;
 
+    /**
+     * last valid parsed Code
+     */
     private ParsedCode parsedCode;
     private String filename;
     private String sourcecode;

@@ -10,22 +10,21 @@ import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.util.HashSet;
+import java.util.List;
 
 public class STVSRootModel {
-    private final int NUMBER_OF_MEMENTOS = 100;
 
-    private HashSet<HybridSpecification> hybridSpecifications;
+    private List<HybridSpecification> hybridSpecifications;
     private GlobalConfig globalConfig;
     private History history;
     private CircularFifoQueue<RootModelMemento> mementos;
-    private Code code;
     private VerificationScenario scenario;
 
     public STVSRootModel() {
-        mementos = new CircularFifoQueue<RootModelMemento>(NUMBER_OF_MEMENTOS);
+        mementos = new CircularFifoQueue<RootModelMemento>(globalConfig.getNumberOfMementos());
     }
 
-    public HashSet<HybridSpecification> getHybridSpecifications() {
+    public List<HybridSpecification> getHybridSpecifications() {
         return hybridSpecifications;
     }
 
@@ -55,13 +54,6 @@ public class STVSRootModel {
 
     }
 
-    public Code getCode() {
-        return code;
-    }
-
-    public void setCode(Code code) {
-        this.code = code;
-    }
 
     public VerificationScenario getScenario() {
         return scenario;
