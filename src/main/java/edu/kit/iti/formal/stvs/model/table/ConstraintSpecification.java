@@ -17,6 +17,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     private List<Consumer<List<SpecProblem>>> problemsListeners;
     private Set<Type> typeContext;
     private FreeVariableSet freeVariableSet;
+    private List<RowComment> rowComments;
 
     public ConstraintSpecification(Set<Type> typeContext, Set<IOVariable> ioVariables, FreeVariableSet freeVariableSet) {
         this.typeContext = typeContext;
@@ -41,5 +42,13 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
     public FreeVariableSet getFreeVariableSet() {
         return freeVariableSet;
+    }
+
+    public List<RowComment> getRowComments() {
+        return rowComments;
+    }
+
+    public void setRowComments(List<RowComment> rowComments) {
+        this.rowComments = rowComments;
     }
 }
