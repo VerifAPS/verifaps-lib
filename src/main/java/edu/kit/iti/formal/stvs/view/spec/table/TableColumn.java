@@ -1,11 +1,12 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
+import edu.kit.iti.formal.stvs.view.spec.Lockable;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 
-public class TableColumn extends VBox {
+public class TableColumn extends VBox implements Lockable {
     private ColumnHeader colHead;
     private BooleanProperty editableProperty;
 
