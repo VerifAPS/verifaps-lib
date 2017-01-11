@@ -11,4 +11,12 @@ public class VerificationScenario {
     private ConstraintSpecification spec;
     private VerificationResult verificationResult;
     private Code code;
+
+    public void verify() {
+
+    }
+
+    public void cancel() {
+
+    }
 }
