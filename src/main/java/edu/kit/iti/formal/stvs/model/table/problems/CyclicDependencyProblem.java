@@ -1,20 +1,21 @@
-package edu.kit.iti.formal.stvs.model.table.constraint.problems;
+package edu.kit.iti.formal.stvs.model.table.problems;
 
 import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 
+import java.util.List;
 import java.util.function.Function;
 
 /**
  * Created by philipp on 09.01.17.
  */
-public class TypeErrorProblem extends SpecProblem {
+public class CyclicDependencyProblem extends SpecProblem {
 
-    private final VariableIdentifier column;
     private final int row;
+    private final List<VariableIdentifier> cycle;
 
-    public TypeErrorProblem(VariableIdentifier column, int row) {
-        this.column = column;
+    public CyclicDependencyProblem(int row, List<VariableIdentifier> cycle) {
         this.row = row;
+        this.cycle = cycle;
     }
 
     @Override
@@ -24,14 +25,14 @@ public class TypeErrorProblem extends SpecProblem {
             Function<CyclicDependencyProblem, R> matchCyclicDependency,
             Function<ParseErrorProblem, R> matchParseError,
             Function<DurationProblem, R> matchDurationProblem) {
-        return matchTypeError.apply(this);
-    }
-
-    public VariableIdentifier getColumn() {
-        return column;
+        return matchCyclicDependency.apply(this);
     }
 
     public int getRow() {
         return row;
+    }
+
+    public List<VariableIdentifier> getCycle() {
+        return cycle;
     }
 }

@@ -3,7 +3,7 @@ package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
-import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteCell;
+import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.scene.Node;
 

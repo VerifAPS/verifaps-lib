@@ -7,9 +7,9 @@ import java.util.List;
  */
 public class ParsedCode {
 
-    private List<CodeBlock> codeBlocks;
+    private List<FoldableCodeBlock> foldableCodeBlocks;
 
-    public List<CodeBlock> getCodeBlocks() {
-        return codeBlocks;
+    public List<FoldableCodeBlock> getFoldableCodeBlocks() {
+        return foldableCodeBlocks;
     }
 }

@@ -3,7 +3,7 @@ package edu.kit.iti.formal.stvs.logic.verification;
 import edu.kit.iti.formal.stvs.logic.io.VerificationExporter;
 import edu.kit.iti.formal.stvs.logic.io.VerificationImporter;
 import edu.kit.iti.formal.stvs.model.code.Code;
-import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 //import edu.kit.iti.formal.automation.testtables; //TODO this doesn't import despite Maven repo
 

@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.model.verification;
 
-import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 
 /**
  * Created by csicar on 09.01.17.

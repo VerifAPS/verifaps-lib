@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.model.table.constraint;
+package edu.kit.iti.formal.stvs.model.table;
 
 import java.util.Optional;
 

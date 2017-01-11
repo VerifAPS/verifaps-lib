@@ -1,13 +1,14 @@
-package edu.kit.iti.formal.stvs.model.table.hybrid;
+package edu.kit.iti.formal.stvs.model.table;
 
+import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteCell;
-import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteDuration;
-import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteSpecification;
-import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
+import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,8 +30,8 @@ public class HybridSpecification extends ConstraintSpecification {
      */
     private Selection selection;
 
-    public HybridSpecification(Set<Type> typeContext, Set<IOVariable> ioVariables, boolean editable) {
-        super(typeContext, ioVariables);
+    public HybridSpecification(Set<Type> typeContext, Set<IOVariable> ioVariables, FreeVariableSet freeVariableSet, boolean editable) {
+        super(typeContext, ioVariables, freeVariableSet);
         this.editable = editable;
     }
 

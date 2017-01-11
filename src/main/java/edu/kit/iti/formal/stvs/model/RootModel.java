@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.stvs.model;
 
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
-import edu.kit.iti.formal.stvs.model.history.History;
+import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.memento.NoSuchMementoException;
 import edu.kit.iti.formal.stvs.model.memento.RootModelMemento;
-import edu.kit.iti.formal.stvs.model.table.hybrid.HybridSpecification;
+import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.util.HashSet;

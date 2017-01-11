@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.model.table.concrete;
+package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 

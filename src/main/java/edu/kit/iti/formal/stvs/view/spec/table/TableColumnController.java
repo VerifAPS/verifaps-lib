@@ -4,13 +4,10 @@ import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.table.constraint.problems.SpecProblem;
-import edu.kit.iti.formal.stvs.view.Controller;
+import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 
 import java.util.List;

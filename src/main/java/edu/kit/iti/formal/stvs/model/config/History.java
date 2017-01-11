@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.model.history;
+package edu.kit.iti.formal.stvs.model.config;
 
 import java.util.ArrayList;
 import java.util.Collection;

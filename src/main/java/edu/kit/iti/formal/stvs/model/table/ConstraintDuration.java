@@ -1,8 +1,4 @@
-package edu.kit.iti.formal.stvs.model.table.constraint;
-
-import edu.kit.iti.formal.stvs.model.table.CellOperationProvider;
-import edu.kit.iti.formal.stvs.model.table.Commentable;
-import edu.kit.iti.formal.stvs.model.table.StringEditable;
+package edu.kit.iti.formal.stvs.model.table;
 
 import java.util.List;
 import java.util.function.Consumer;

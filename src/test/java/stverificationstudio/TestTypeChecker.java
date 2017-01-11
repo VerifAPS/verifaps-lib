@@ -1,8 +1,8 @@
 package stverificationstudio;
 
 import edu.kit.iti.formal.stvs.model.expressions.*;
-import edu.kit.iti.formal.stvs.model.typechecker.TypeCheckException;
-import edu.kit.iti.formal.stvs.model.typechecker.TypeChecker;
+import edu.kit.iti.formal.stvs.model.expressions.TypeCheckException;
+import edu.kit.iti.formal.stvs.model.expressions.TypeChecker;
 import org.junit.Assert;
 import org.junit.Test;
 

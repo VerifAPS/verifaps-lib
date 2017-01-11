@@ -4,14 +4,13 @@ import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
-import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteSpecification;
-import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintCell;
-import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintDuration;
-import edu.kit.iti.formal.stvs.model.table.hybrid.HybridSpecification;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
+import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
+import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.table.rowActions.RowEvent;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 
 import java.util.Optional;

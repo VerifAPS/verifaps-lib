@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.model.table.constraint.problems;
+package edu.kit.iti.formal.stvs.model.table.problems;
 
 import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 
@@ -7,17 +7,20 @@ import java.util.function.Function;
 /**
  * Created by philipp on 09.01.17.
  */
-public class ParseErrorProblem extends SpecProblem {
+public class InvalidIOVarProblem extends SpecProblem {
 
-    // TODO: Give Parse Error information
-    private final VariableIdentifier column;
-    private final int row;
-
-    public ParseErrorProblem(VariableIdentifier column, int row) {
-        this.column = column;
-        this.row = row;
+    public enum Type {
+        INVALID_NAME,
+        INVALID_TYPE
     }
 
+    private final VariableIdentifier column;
+    private final Type type;
+
+    public InvalidIOVarProblem(VariableIdentifier column, Type type) {
+        this.column = column;
+        this.type = type;
+    }
 
     @Override
     public <R> R match(
@@ -26,14 +29,15 @@ public class ParseErrorProblem extends SpecProblem {
             Function<CyclicDependencyProblem, R> matchCyclicDependency,
             Function<ParseErrorProblem, R> matchParseError,
             Function<DurationProblem, R> matchDurationProblem) {
-        return matchParseError.apply(this);
+        return matchInvalidIOVar.apply(this);
     }
 
-    public VariableIdentifier getColumn() {
+    public VariableIdentifier getVariableIdentifier() {
         return column;
     }
 
-    public int getRow() {
-        return row;
+    public Type getType() {
+        return type;
     }
+
 }

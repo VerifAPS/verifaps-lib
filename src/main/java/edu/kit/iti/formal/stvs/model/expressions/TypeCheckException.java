@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.model.typechecker;
+package edu.kit.iti.formal.stvs.model.expressions;
 
 import edu.kit.iti.formal.stvs.model.expressions.Expression;
 

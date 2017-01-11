@@ -1,6 +1,4 @@
-package edu.kit.iti.formal.stvs.model.table.concrete;
-
-import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
+package edu.kit.iti.formal.stvs.model.table;
 
 /**
  * Created by philipp on 10.01.17.

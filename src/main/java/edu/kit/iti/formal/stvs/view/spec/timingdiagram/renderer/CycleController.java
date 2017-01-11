@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
-import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteDuration;
+import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
 import edu.kit.iti.formal.stvs.view.Controller;
 
 import java.util.function.Function;

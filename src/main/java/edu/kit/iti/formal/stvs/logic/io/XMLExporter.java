@@ -2,7 +2,7 @@ package edu.kit.iti.formal.stvs.logic.io;
 
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
-import edu.kit.iti.formal.stvs.model.history.History;
+import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.io.VerificationScenario;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import org.w3c.dom.Node;

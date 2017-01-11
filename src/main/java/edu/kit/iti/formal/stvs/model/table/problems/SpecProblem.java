@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.model.table.constraint.problems;
+package edu.kit.iti.formal.stvs.model.table.problems;
 
 import java.util.function.Function;
 

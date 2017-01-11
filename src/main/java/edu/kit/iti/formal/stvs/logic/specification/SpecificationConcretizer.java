@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.logic.specification;
 
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
-import edu.kit.iti.formal.stvs.model.table.concrete.ConcreteSpecification;
-import edu.kit.iti.formal.stvs.model.table.constraint.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 
 import java.util.ArrayList;
 import java.util.Stack;

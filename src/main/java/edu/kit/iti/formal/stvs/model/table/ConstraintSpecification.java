@@ -1,10 +1,9 @@
-package edu.kit.iti.formal.stvs.model.table.constraint;
+package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
-import edu.kit.iti.formal.stvs.model.table.constraint.problems.SpecProblem;
+import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 
 import java.util.List;
 import java.util.Set;
