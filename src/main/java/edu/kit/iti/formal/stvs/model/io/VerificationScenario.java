@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.model.io;
 
+import edu.kit.iti.formal.stvs.logic.specification.VerificationState;
 import edu.kit.iti.formal.stvs.logic.verification.VerificationEngine;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
@@ -24,5 +25,9 @@ public class VerificationScenario {
 
     public void addOnVerifficationStoppedListener(){
 
+    }
+
+    public VerificationState getVerificationState() {
+        return null;
     }
 }

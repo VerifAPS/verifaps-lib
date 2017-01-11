@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
+import edu.kit.iti.formal.stvs.logic.specification.VerificationState;
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
@@ -8,7 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TabPane;
 
 public class SpecificationsPaneController implements Controller {
-    public SpecificationsPaneController(ObservableList<Type> types, ObservableList<IOVariable> ioVars, ObservableList<HybridSpecification> hybridSpecifications) {
+    public SpecificationsPaneController(ObservableList<Type> types, ObservableList<IOVariable> ioVars, ObservableList<HybridSpecification> hybridSpecifications, VerificationState state) {
     }
 
     private ObservableList<HybridSpecification> hybridSpecifications;
