@@ -7,6 +7,15 @@ public class ConcreteSpecification extends SpecificationTable<ConcreteCell, Conc
 
     private final boolean isCounterExample;
 
+
+    /**
+     * Copy constructor
+     */
+    public ConcreteSpecification(ConcreteSpecification spec) {
+        //...
+        isCounterExample = spec.isCounterExample;
+    }
+
     public ConcreteSpecification(boolean isCounterExample) {
         this.isCounterExample = isCounterExample;
     }

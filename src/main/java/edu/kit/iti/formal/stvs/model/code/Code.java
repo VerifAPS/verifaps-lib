@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 public class Code {
     private List<Consumer<List<CodeIOVariable>>> ioVariableListeners;
     private List<Consumer<ParsedCode>> parsedCodeListeners;
-    private List<Consumer<List<ANTLRSyntaxError>>> syntaxErrorsListeners;
+    private List<Consumer<List<ANTLRException>>> syntaxErrorsListeners;
     private List<Consumer<List<Token>>> lexedCodeListeners;
 
     /**
@@ -29,6 +29,14 @@ public class Code {
      * creates a Dummy-Codefile
      */
     public Code() {
+
+    }
+
+    /**
+     * Copy constructor
+     * @param code
+     */
+    public Code (Code code) {
 
     }
 

@@ -15,6 +15,7 @@ public class STVSRootModel {
     private History history;
     private CircularFifoQueue<RootModelMemento> mementos;
     private VerificationScenario scenario;
+    private Code code;
 
     public STVSRootModel() {
         mementos = new CircularFifoQueue<RootModelMemento>(globalConfig.getNumberOfMementos());
@@ -30,6 +31,10 @@ public class STVSRootModel {
 
     public History getHistory() {
         return history;
+    }
+
+    public Code getCode() {
+        return code;
     }
 
     public void undo() throws NoSuchMementoException {
