@@ -1,0 +1,11 @@
+@startuml
+
+    enum SourcecodeToken.Type {
+        {static} +NUMBER
+        {static} +STRING
+        {static} +KEYWORD
+        {static} +COMMENT
+        {static} +OTHER
+    }
+
+@enduml

@@ -1,0 +1,8 @@
+@startuml
+
+    interface Value {
+        {abstract} +match(matchInt:IntFunction<R>, matchBoolean:Function<Boolean, R>, matchEnum:Function<ValueEnum, R>): R
+        {abstract} +getType(): Type
+    }
+
+@enduml

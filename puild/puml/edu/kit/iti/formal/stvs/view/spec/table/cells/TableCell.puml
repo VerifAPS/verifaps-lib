@@ -1,0 +1,9 @@
+@startuml
+
+    abstract class TableCell {
+        -editableProperty: ReadOnlyBooleanProperty
+        +getEditableProperty(): ReadOnlyBooleanProperty
+        +getEditable(): boolean
+    }
+
+@enduml

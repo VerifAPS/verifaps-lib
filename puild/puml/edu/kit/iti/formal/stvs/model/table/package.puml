@@ -1,0 +1,180 @@
+@startuml
+
+    namespace edu.kit.iti.formal.stvs.model.table {
+
+        interface StringEditable {
+            {abstract} +getUserInputString(): String
+            {abstract} +setUserInputString(input:String): void
+            {abstract} +addUserInputStringListener(listener:Consumer<String>): void
+        }
+
+        class ConstraintSpecification {
+            -problemsListeners: List<Consumer<List<SpecProblem>>>
+            -typeContext: Set<Type>
+            -freeVariableSet: FreeVariableSet
+            +ConstraintSpecification(typeContext:Set<Type>, ioVariables:Set<IOVariable>, freeVariableSet:FreeVariableSet)
+            +addProblemsListener(listener:Consumer<List<SpecProblem>>): void
+            +getProblems(): List<SpecProblem>
+            +getTypeContext(): Set<Type>
+            +setTypeContext(typeContext:Set<Type>): void
+            +getFreeVariableSet(): FreeVariableSet
+        }
+
+        class ConcreteSpecification {
+            -isCounterExample: boolean
+            +ConcreteSpecification(isCounterExample:boolean)
+            +isCounterExample(): boolean
+        }
+
+        class LowerBoundedInterval {
+            -lowerBound: int
+            -upperBound: Optional<Integer>
+            +LowerBoundedInterval(lowerBound:int, upperBound:Optional<Integer>)
+        }
+
+        class ConcreteCell {
+            -value: Value
+            +ConcreteCell(value:Value)
+            +getValue(): Value
+        }
+
+        class SpecificationRow<C, D> {
+            -duration: D
+            -cells: Map<VariableIdentifier, C>
+            +SpecificationRow(duration:D, cells:Map<VariableIdentifier, C>)
+            +getEntryForVariable(variable:VariableIdentifier): C
+            +getDuration(): D
+        }
+
+        class HybridSpecification {
+            -concreteInstanceChangedListeners: List<Consumer<Optional<ConcreteSpecification>>>
+            -editable: boolean
+            -selection: Selection
+            +HybridSpecification(typeContext:Set<Type>, ioVariables:Set<IOVariable>, freeVariableSet:FreeVariableSet, editable:boolean)
+            +removeConcreteInstance(): void
+            +addConcreteInstanceChangedListener(listener:Consumer<Optional<ConcreteSpecification>>): void
+            +getSelection(): Selection
+            +getConcreteValuesForConstraint(column:VariableIdentifier, row:int): List<ConcreteCell>
+            +getDurationForRow(row:int): ConcreteDuration
+            +isEditable(): boolean
+        }
+
+        class SpecificationColumn<C> {
+            +getEntryForRow(row:int): C
+            +getConfig(): Optional<ColumnConfig>
+        }
+
+        interface CellOperationProvider {
+        }
+
+        class ConcreteDuration {
+            -duration: int
+            +ConcreteDuration(duration:int)
+            +getDuration(): int
+        }
+
+        interface Commentable {
+            {abstract} +setComment(comment:String): void
+            {abstract} +getComment(): String
+            {abstract} +addCommentListener(consumer:Consumer<Commentable>): void
+        }
+
+        class ConstraintDuration {
+            -userInputString: String
+            -comment: String
+            -Listeners: List<Consumer<LowerBoundedInterval>>
+            +ConstraintDuration(bounds:LowerBoundedInterval)
+            +getUserInputString(): String
+            +setUserInputString(input:String): void
+            +addBoundsListener(listener:Consumer<LowerBoundedInterval>): void
+            +addUserInputStringListener(listener:Consumer<String>): void
+            +setComment(comment:String): void
+            +getComment(): String
+            +addCommentListener(consumer:Consumer<Commentable>): void
+        }
+
+        class SpecificationTable<C, D> {
+            -columnsListeners: List<Consumer<SpecificationTable.ColumnChangeInfo<C>>>
+            -rowsListeners: List<Consumer<SpecificationTable.RowChangeInfo<C, D>>>
+            -durations: List<D>
+            +getCell(row:int, column:VariableIdentifier): C
+            +getColumn(column:VariableIdentifier): SpecificationColumn<C>
+            +addColumn(columnId:VariableIdentifier, column:SpecificationColumn<C>): void
+            +removeColumn(columnId:VariableIdentifier): void
+            +getRow(row:int): SpecificationRow<C, D>
+            +addRow(rowNum:int, row:SpecificationRow<C, D>): void
+            +removeRow(rowNum:int): void
+            +getDuration(rowNum:int): D
+            +addColumnsListener(columnsListener:Consumer<SpecificationTable.ColumnChangeInfo<C>>): void
+            +addRowsListener(rowsListener:Consumer<SpecificationTable.RowChangeInfo<C, D>>): void
+        }
+
+        enum edu.kit.iti.formal.stvs.model.table.SpecificationTable.Change {
+            {static} +ADD
+            {static} +REMOVE
+        }
+
+        class edu.kit.iti.formal.stvs.model.table.SpecificationTable.ColumnChangeInfo<C> {
+            +columnId: VariableIdentifier
+            +ColumnChangeInfo(column:SpecificationColumn<C>, columnId:VariableIdentifier, changeType:SpecificationTable.Change)
+        }
+
+        class edu.kit.iti.formal.stvs.model.table.SpecificationTable.RowChangeInfo<C, D> {
+            +rowNum: int
+            +RowChangeInfo(row:SpecificationRow<C, D>, rowNum:int, changeType:SpecificationTable.Change)
+        }
+
+        class ConstraintCell {
+            -expression: Expression
+            -userInputString: String
+            -comment: String
+            -expressionListeners: List<Consumer<Expression>>
+            -userInputStringListeners: List<Consumer<String>>
+            +ConstraintCell(userInputString:String)
+            +getExpression(): Expression
+            +getUserInputString(): String
+            +setUserInputString(userInputString:String): void
+            +addExpressionListener(listener:Consumer<Expression>): void
+            +addUserInputStringListener(listener:Consumer<String>): void
+            +setComment(comment:String): void
+            +getComment(): String
+            +addCommentListener(consumer:Consumer<Commentable>): void
+        }
+
+        SpecificationTable <|-- ConstraintSpecification
+
+        SpecificationTable <|-- ConcreteSpecification
+
+        ConstraintSpecification <|-- HybridSpecification
+
+        Commentable <|.. CellOperationProvider
+
+        StringEditable <|.. CellOperationProvider
+
+        CellOperationProvider <|.. ConstraintDuration
+
+        SpecificationTable +-- edu.kit.iti.formal.stvs.model.table.SpecificationTable.Change
+
+        SpecificationTable +-- edu.kit.iti.formal.stvs.model.table.SpecificationTable.ColumnChangeInfo
+
+        SpecificationTable +-- edu.kit.iti.formal.stvs.model.table.SpecificationTable.RowChangeInfo
+
+        CellOperationProvider <|.. ConstraintCell
+
+        HybridSpecification --> "0..1" ConcreteSpecification: concreteInstance
+
+        HybridSpecification --> ConcreteSpecification: concreteInstance
+
+        ConstraintDuration --> LowerBoundedInterval: bounds
+
+        edu.kit.iti.formal.stvs.model.table.SpecificationTable.ColumnChangeInfo --> SpecificationColumn: column
+
+        edu.kit.iti.formal.stvs.model.table.SpecificationTable.ColumnChangeInfo --> edu.kit.iti.formal.stvs.model.table.SpecificationTable.Change: changeType
+
+        edu.kit.iti.formal.stvs.model.table.SpecificationTable.RowChangeInfo --> SpecificationRow: row
+
+        edu.kit.iti.formal.stvs.model.table.SpecificationTable.RowChangeInfo --> edu.kit.iti.formal.stvs.model.table.SpecificationTable.Change: changeType
+
+    }
+
+@enduml

@@ -1,0 +1,13 @@
+@startuml
+
+    class TypeEnum {
+        -enumTypeName: String
+        -valueMap: Map<String, ValueEnum>
+        +TypeEnum(enumTypeName:String, values:List<String>)
+        +match(matchIntType:Supplier<R>, matchBoolType:Supplier<R>, matchEnumType:Function<TypeEnum, R>): R
+        +checksAgainst(other:Type): boolean
+        +getTypeName(): String
+        +valueOf(enumName:String): ValueEnum
+    }
+
+@enduml

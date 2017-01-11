@@ -1,0 +1,14 @@
+@startuml
+
+    class STVSRootController {
+        -view: STVSRootView
+        -types: ObservableList<Type>
+        -sortedTyes: SortedList<Type>
+        -ioVars: ObservableList<IOVariable>
+        -code: Code
+        -typeComparator: Comparator<Type>
+        +getView(): STVSRootView
+        +getCode(): Code
+    }
+
+@enduml

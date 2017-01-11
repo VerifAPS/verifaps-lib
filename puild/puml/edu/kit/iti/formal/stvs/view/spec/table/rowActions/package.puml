@@ -1,0 +1,74 @@
+@startuml
+
+    namespace edu.kit.iti.formal.stvs.view.spec.table.rowActions {
+
+        class AddButtonColumnController {
+            +AddButtonColumnController(durations:DurationsColumnController)
+            +removeButton(row:int): void
+            +addButton(row:int, cell:HybridCellController): void
+        }
+
+        class CommentButtonColumn {
+            +getChildren(): ObservableList<Node>
+        }
+
+        class RowEvent {
+            {static} +ADD_ROW_BELOW: EventType<RowEvent>
+            {static} +REMOVE_ROW: EventType<RowEvent>
+            {static} +COMMENT_ROW: EventType<RowEvent>
+            -rowNumber: int
+            +RowEvent(source:Node, type:EventType<RowEvent>, rowNumber:int)
+        }
+
+        abstract class RowActionColumnController {
+            +RowActionColumnController(durations:DurationsColumnController)
+            {abstract} +removeButton(row:int): void
+            {abstract} +addButton(row:int, cell:HybridCellController): void
+            {abstract} +getView(): Node
+        }
+
+        class AddButtonColumn {
+            +getChildren(): ObservableList<Node>
+        }
+
+        class CommentButtonColumnController {
+            +CommentButtonColumnController(durations:DurationsColumnController)
+            +removeButton(row:int): void
+            +addButton(row:int, cell:HybridCellController): void
+        }
+
+        class RemoveButtonColumnController {
+            +RemoveButtonColumnController(durations:DurationsColumnController)
+            +removeButton(row:int): void
+            +addButton(row:int, cell:HybridCellController): void
+        }
+
+        class RemoveButtonColumn {
+            +getChildren(): ObservableList<Node>
+        }
+
+        RowActionColumnController <|-- AddButtonColumnController
+
+        class javafx.scene.layout.Pane
+        javafx.scene.layout.Pane <|-- CommentButtonColumn
+
+        class javafx.event.Event
+        javafx.event.Event <|-- RowEvent
+
+        javafx.scene.layout.Pane <|-- AddButtonColumn
+
+        RowActionColumnController <|-- CommentButtonColumnController
+
+        RowActionColumnController <|-- RemoveButtonColumnController
+
+        javafx.scene.layout.Pane <|-- RemoveButtonColumn
+
+        AddButtonColumnController --> AddButtonColumn: view
+
+        CommentButtonColumnController --> CommentButtonColumn: view
+
+        RemoveButtonColumnController --> RemoveButtonColumn: view
+
+    }
+
+@enduml

@@ -1,0 +1,7 @@
+@startuml
+
+    interface Controller {
+        {abstract} +getView(): Node
+    }
+
+@enduml

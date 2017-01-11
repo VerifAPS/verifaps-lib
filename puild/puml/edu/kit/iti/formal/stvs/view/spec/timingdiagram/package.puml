@@ -1,0 +1,57 @@
+@startuml
+
+    namespace edu.kit.iti.formal.stvs.view.spec.timingdiagram {
+
+        class InputVariablesTimingDiagramCollection {
+            +InputVariablesTimingDiagramCollection(concreteSpecification:ConcreteSpecification, ioVariables:ObservableList<IOVariable>, selection:Selection)
+        }
+
+        abstract class CategoryTimingDiagramCollection {
+            -spec: HybridSpecification
+            +CategoryTimingDiagramCollection(spec:HybridSpecification)
+        }
+
+        class CycleController {
+            +getView(): CycleView
+        }
+
+        class TimingDiagramCollectionView {
+        }
+
+        class TimingDiagramCollectionController {
+            -spec: HybridSpecification
+            +TimingDiagramCollectionController(spec:HybridSpecification)
+        }
+
+        class CategoryTimingDiagramCollectionView {
+        }
+
+        class OutputVariablesTimingDiagramCollection {
+            +OutputVariablesTimingDiagramCollection(concreteSpecification:ConcreteSpecification, ioVariables:ObservableList<IOVariable>, selection:Selection)
+        }
+
+        CategoryTimingDiagramCollection <|-- InputVariablesTimingDiagramCollection
+
+        interface edu.kit.iti.formal.stvs.view.Controller {
+            {abstract} +getView(): Node
+        }
+        edu.kit.iti.formal.stvs.view.Controller <|.. CategoryTimingDiagramCollection
+
+        edu.kit.iti.formal.stvs.view.Controller <|.. CycleController
+
+        class javafx.scene.layout.VBox
+        javafx.scene.layout.VBox <|-- TimingDiagramCollectionView
+
+        edu.kit.iti.formal.stvs.view.Controller <|.. TimingDiagramCollectionController
+
+        javafx.scene.layout.VBox <|-- CategoryTimingDiagramCollectionView
+
+        CategoryTimingDiagramCollection <|-- OutputVariablesTimingDiagramCollection
+
+        CategoryTimingDiagramCollection --> CategoryTimingDiagramCollectionView: view
+
+        TimingDiagramCollectionController --> TimingDiagramCollectionView: view
+
+    }
+
+@enduml

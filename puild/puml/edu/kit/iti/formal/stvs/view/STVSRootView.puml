@@ -1,0 +1,15 @@
+@startuml
+
+    class STVSRootView {
+        -menuBar: STVSMenuBar
+        -editor: EditorPane
+        -specifications: SpecificationsPane
+        +getMenuBar(): STVSMenuBar
+        +getEditor(): EditorPane
+        +getSpecifications(): SpecificationsPane
+        +setMenuBar(menuBar:STVSMenuBar): void
+        +setEditor(editor:EditorPane): void
+        +setSpecifications(specifications:SpecificationsPane): void
+    }
+
+@enduml

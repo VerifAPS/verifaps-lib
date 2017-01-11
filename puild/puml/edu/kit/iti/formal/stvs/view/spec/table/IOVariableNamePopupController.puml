@@ -1,0 +1,11 @@
+@startuml
+
+    class IOVariableNamePopupController {
+        -ioVars: List<IOVariable>
+        -name: StringProperty
+        -ioVariableNamePopup: IOVariableNamePopup
+        +IOVariableNamePopupController(ioVariables:List<IOVariable>, variableChosenListener:Consumer<String>)
+        +getView(): Node
+    }
+
+@enduml

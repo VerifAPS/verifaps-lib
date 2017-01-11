@@ -1,0 +1,11 @@
+@startuml
+
+    class EditorPaneController {
+        -view: EditorPane
+        +EditorPaneController(code:Code)
+        +onCodeChange(code:Code): void
+        +setStylesheet(url:String): void
+        +getView(): EditorPane
+    }
+
+@enduml

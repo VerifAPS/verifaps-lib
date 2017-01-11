@@ -1,0 +1,8 @@
+@startuml
+
+    class STVSApplication {
+        {static} +main(args:String[]): void
+        +start(primaryStage:Stage): void
+    }
+
+@enduml

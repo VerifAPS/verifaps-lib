@@ -1,0 +1,11 @@
+@startuml
+
+    class AddButtonColumnController {
+        -view: AddButtonColumn
+        +AddButtonColumnController(durations:DurationsColumnController)
+        +removeButton(row:int): void
+        +addButton(row:int, cell:HybridCellController): void
+        +getView(): AddButtonColumn
+    }
+
+@enduml

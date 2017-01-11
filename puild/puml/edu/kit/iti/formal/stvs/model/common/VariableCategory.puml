@@ -1,0 +1,8 @@
+@startuml
+
+    enum VariableCategory {
+        {static} +INPUT
+        {static} +OUTPUT
+    }
+
+@enduml

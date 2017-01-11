@@ -1,0 +1,20 @@
+@startuml
+
+    class ConstraintCell {
+        -expression: Expression
+        -userInputString: String
+        -comment: String
+        -expressionListeners: List<Consumer<Expression>>
+        -userInputStringListeners: List<Consumer<String>>
+        +ConstraintCell(userInputString:String)
+        +getExpression(): Expression
+        +getUserInputString(): String
+        +setUserInputString(userInputString:String): void
+        +addExpressionListener(listener:Consumer<Expression>): void
+        +addUserInputStringListener(listener:Consumer<String>): void
+        +setComment(comment:String): void
+        +getComment(): String
+        +addCommentListener(consumer:Consumer<Commentable>): void
+    }
+
+@enduml

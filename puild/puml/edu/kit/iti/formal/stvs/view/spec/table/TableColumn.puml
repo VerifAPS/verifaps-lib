@@ -1,0 +1,12 @@
+@startuml
+
+    class TableColumn {
+        -colHead: ColumnHeader
+        -editableProperty: BooleanProperty
+        +getEditableProperty(): BooleanProperty
+        +setEditable(b:boolean): void
+        +getEditable(): boolean
+        +getChildren(): ObservableList<Node>
+    }
+
+@enduml

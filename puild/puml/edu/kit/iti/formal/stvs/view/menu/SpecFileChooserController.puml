@@ -1,0 +1,7 @@
+@startuml
+
+    class SpecFileChooserController {
+        +SpecFileChooserController(hybridSpecifications:ObservableList<HybridSpecification>)
+    }
+
+@enduml

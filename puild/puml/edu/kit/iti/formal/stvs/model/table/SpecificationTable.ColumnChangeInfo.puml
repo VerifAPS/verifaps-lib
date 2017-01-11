@@ -1,0 +1,10 @@
+@startuml
+
+    class SpecificationTable.ColumnChangeInfo<C> {
+        +column: SpecificationColumn<C>
+        +columnId: VariableIdentifier
+        +changeType: SpecificationTable.Change
+        +ColumnChangeInfo(column:SpecificationColumn<C>, columnId:VariableIdentifier, changeType:SpecificationTable.Change)
+    }
+
+@enduml

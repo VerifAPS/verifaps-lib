@@ -1,0 +1,10 @@
+@startuml
+
+    class TypeCheckException {
+        {static} -serialVersionUID: long
+        -mistypedExpression: Expression
+        +TypeCheckException(mistypedExpression:Expression, message:String)
+        +getMistypedExpression(): Expression
+    }
+
+@enduml

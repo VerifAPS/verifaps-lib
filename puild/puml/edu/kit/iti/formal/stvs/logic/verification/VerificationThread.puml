@@ -1,0 +1,10 @@
+@startuml
+
+    class VerificationThread {
+        -code: Code
+        -specification: ConstraintSpecification
+        +VerificationThread(code:Code, specification:ConstraintSpecification)
+        +run(): void
+    }
+
+@enduml

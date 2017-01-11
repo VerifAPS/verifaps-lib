@@ -1,0 +1,17 @@
+@startuml
+
+    namespace edu.kit.iti.formal.stvs {
+
+        class STVSApplication {
+            {static} +main(args:String[]): void
+            +start(primaryStage:Stage): void
+        }
+
+        abstract class javafx.application.Application {
+            {abstract} +start(arg0:Stage): void
+        }
+        javafx.application.Application <|-- STVSApplication
+
+    }
+
+@enduml

@@ -1,0 +1,16 @@
+@startuml
+
+    class SpecificationConcretizer {
+        -context: ConcretizerContext
+        -concreteSpecification: ConcreteSpecification
+        -constraintSpecification: ConstraintSpecification
+        -rowSolverStack: Stack<RowSolver>
+        +SpecificationConcretizer(context:ConcretizerContext)
+        +addSuccessfulConcretizationListener(listener:Consumer<ConcreteSpecification>): void
+        +onIOVariablesChange(changedIOVariables:ArrayList<IOVariable>): void
+        +getContext(): ConcretizerContext
+        +getConcreteSpecification(): ConcreteSpecification
+        +onSpecificationChanged(spec:ConstraintSpecification): void
+    }
+
+@enduml

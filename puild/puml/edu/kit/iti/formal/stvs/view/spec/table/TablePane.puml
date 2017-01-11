@@ -1,0 +1,30 @@
+@startuml
+
+    class TablePane {
+        -inputTable: CategoryTable
+        -outputTable: CategoryTable
+        -durations: DurationsColumn
+        -addButtons: AddButtonColumn
+        -removeButtonColumn: RemoveButtonColumn
+        -commentButtonColumn: CommentButtonColumn
+        -editableProperty: BooleanProperty
+        +getInputTable(): CategoryTable
+        +setInputTable(inputTable:CategoryTable): void
+        +getOutputTable(): CategoryTable
+        +setOutputTable(outputTable:CategoryTable): void
+        +getDurations(): DurationsColumn
+        +setDurations(durations:DurationsColumn): void
+        +getAddButtons(): AddButtonColumn
+        +setAddButtons(addButtons:AddButtonColumn): void
+        +getRemoveButtonColumn(): RemoveButtonColumn
+        +setRemoveButtonColumn(removeButtonColumn:RemoveButtonColumn): void
+        +getCommentButtonColumn(): CommentButtonColumn
+        +setCommentButtonColumn(commentButtonColumn:CommentButtonColumn): void
+        +isEditableProperty(): boolean
+        +editablePropertyProperty(): BooleanProperty
+        +getEditableProperty(): BooleanProperty
+        +setEditable(b:boolean): void
+        +getEditable(): boolean
+    }
+
+@enduml

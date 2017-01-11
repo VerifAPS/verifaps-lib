@@ -1,0 +1,7 @@
+@startuml
+
+    class InputVariablesTimingDiagramCollection {
+        +InputVariablesTimingDiagramCollection(concreteSpecification:ConcreteSpecification, ioVariables:ObservableList<IOVariable>, selection:Selection)
+    }
+
+@enduml

@@ -1,0 +1,10 @@
+@startuml
+
+    abstract class CategoryTimingDiagramCollection {
+        -view: CategoryTimingDiagramCollectionView
+        -spec: HybridSpecification
+        +CategoryTimingDiagramCollection(spec:HybridSpecification)
+        +getView(): CategoryTimingDiagramCollectionView
+    }
+
+@enduml

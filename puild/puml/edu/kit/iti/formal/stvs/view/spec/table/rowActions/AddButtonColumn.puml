@@ -1,0 +1,7 @@
+@startuml
+
+    class AddButtonColumn {
+        +getChildren(): ObservableList<Node>
+    }
+
+@enduml

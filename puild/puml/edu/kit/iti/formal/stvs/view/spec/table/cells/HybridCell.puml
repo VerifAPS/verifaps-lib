@@ -1,0 +1,15 @@
+@startuml
+
+    class HybridCell {
+        -valueCell: ValueCell
+        -counterExampleContainer: VBox
+        -editableProperty: BooleanProperty
+        -commentButton: Button
+        +getEditableProperty(): BooleanProperty
+        +setEditable(b:boolean): void
+        +getEditable(): boolean
+        +getCounterExampleContainer(): VBox
+        +getValueCell(): ValueCell
+    }
+
+@enduml

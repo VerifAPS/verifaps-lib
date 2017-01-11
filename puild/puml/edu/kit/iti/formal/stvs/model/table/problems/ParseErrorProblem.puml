@@ -1,0 +1,12 @@
+@startuml
+
+    class ParseErrorProblem {
+        -column: VariableIdentifier
+        -row: int
+        +ParseErrorProblem(column:VariableIdentifier, row:int)
+        +match(matchTypeError:Function<TypeErrorProblem, R>, matchInvalidIOVar:Function<InvalidIOVarProblem, R>, matchCyclicDependency:Function<CyclicDependencyProblem, R>, matchParseError:Function<ParseErrorProblem, R>, matchDurationProblem:Function<DurationProblem, R>): R
+        +getColumn(): VariableIdentifier
+        +getRow(): int
+    }
+
+@enduml

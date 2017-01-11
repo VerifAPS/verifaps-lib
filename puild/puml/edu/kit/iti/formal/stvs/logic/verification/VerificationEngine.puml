@@ -1,0 +1,12 @@
+@startuml
+
+    class VerificationEngine {
+        -exporter: VerificationExporter
+        -importer: VerificationImporter
+        -result: VerificationResult
+        -verificationFinishedListener: Consumer<VerificationResult>
+        +VerificationEngine(verificationFinishedListener:Consumer<VerificationResult>)
+        +startVerification(code:Code, spec:ConstraintSpecification): void
+    }
+
+@enduml

@@ -1,0 +1,8 @@
+@startuml
+
+    enum SpecificationTable.Change {
+        {static} +ADD
+        {static} +REMOVE
+    }
+
+@enduml

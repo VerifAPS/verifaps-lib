@@ -1,0 +1,10 @@
+@startuml
+
+    class ConcretizerContext {
+        -ioVars: HashMap<IOVariable, Value>
+        -constraintVars: HashMap<String, Value>
+        +getIoVars(): HashMap<IOVariable, Value>
+        +getConstraintVars(): HashMap<String, Value>
+    }
+
+@enduml

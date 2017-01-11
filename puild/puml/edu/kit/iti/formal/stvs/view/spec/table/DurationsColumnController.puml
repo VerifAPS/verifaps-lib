@@ -1,0 +1,15 @@
+@startuml
+
+    class DurationsColumnController {
+        -width: IntegerProperty
+        -cells: ObservableList<HybridCellController>
+        -durationsColumn: DurationsColumn
+        +DurationsColumnController(config:ColumnConfig)
+        +getWidthProperty(): IntegerProperty
+        +getWidth(): int
+        +onProblemsChange(problems:List<SpecProblem>): void
+        +getCells(): ObservableList<HybridCellController>
+        +getView(): DurationsColumn
+    }
+
+@enduml

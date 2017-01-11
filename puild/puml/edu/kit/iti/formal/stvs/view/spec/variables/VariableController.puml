@@ -1,0 +1,10 @@
+@startuml
+
+    class VariableController {
+        -freeVariable: FreeVariable
+        -view: VariableView
+        +VariableController(freeVariable:FreeVariable)
+        +getView(): Node
+    }
+
+@enduml

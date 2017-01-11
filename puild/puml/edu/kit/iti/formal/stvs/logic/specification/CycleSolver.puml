@@ -1,0 +1,8 @@
+@startuml
+
+    class CycleSolver {
+        +solve(): boolean
+        +getModel(): Model
+    }
+
+@enduml

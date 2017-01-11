@@ -1,0 +1,9 @@
+@startuml
+
+    class TimingDiagramCollectionController {
+        -spec: HybridSpecification
+        +TimingDiagramCollectionController(spec:HybridSpecification)
+        +getView(): TimingDiagramCollectionView
+    }
+
+@enduml

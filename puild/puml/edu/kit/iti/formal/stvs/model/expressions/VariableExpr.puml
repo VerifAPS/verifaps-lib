@@ -1,0 +1,10 @@
+@startuml
+
+    class VariableExpr {
+        -varName: String
+        +VariableExpr(varName:String)
+        +takeVisitor(visitor:ExpressionVisitor<R>): R
+        +getVariableName(): String
+    }
+
+@enduml

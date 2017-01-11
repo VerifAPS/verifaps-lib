@@ -1,0 +1,7 @@
+@startuml
+
+    class CategoryTable {
+        +getChildren(): ObservableList<Node>
+    }
+
+@enduml

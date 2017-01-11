@@ -1,0 +1,14 @@
+@startuml
+
+    class ColumnHeader {
+        -editableProperty: BooleanProperty
+        -varNameField: TextField
+        -typesListView: ListView<Type>
+        +getEditableProperty(): BooleanProperty
+        +setEditable(b:boolean): void
+        +getEditable(): boolean
+        +getVarNameField(): TextField
+        +getTypesListView(): ListView<Type>
+    }
+
+@enduml

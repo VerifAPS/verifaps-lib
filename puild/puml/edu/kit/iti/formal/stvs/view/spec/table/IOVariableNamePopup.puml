@@ -1,0 +1,10 @@
+@startuml
+
+    class IOVariableNamePopup {
+        -textField: TextField
+        -ioVariables: ListView<IOVariable>
+        +getTextField(): TextField
+        +getIoVariables(): ListView<IOVariable>
+    }
+
+@enduml

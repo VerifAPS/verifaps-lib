@@ -1,0 +1,66 @@
+@startuml
+
+    namespace edu.kit.iti.formal.stvs.model.common {
+
+        class FreeVariable {
+            -name: String
+            -type: Type
+            -defaultValue: Value
+            -listeners: List<Consumer<FreeVariable>>
+            +FreeVariable(name:String, type:Type)
+            +FreeVariable(name:String, type:Type, defaultValue:Value)
+            +addChangeListener(listener:Consumer<FreeVariable>): void
+            +getType(): Type
+            +setType(type:Type): void
+            +getName(): String
+            +setName(name:String): void
+            +getDefaultValue(): Value
+            +setDefaultValue(defaultValue:Value): void
+        }
+
+        class IOVariable {
+            -type: Type
+            +IOVariable(category:VariableCategory, type:Type)
+            +getType(): Type
+            +setType(type:Type): void
+        }
+
+        class FreeVariableSet {
+            -listeners: List<Consumer<FreeVariableSet>>
+            +FreeVariableSet(variableSet:List<FreeVariable>)
+            +addChangeListener(listener:Consumer<FreeVariableSet>): void
+        }
+
+        enum VariableCategory {
+            {static} +INPUT
+            {static} +OUTPUT
+        }
+
+        class VariableIdentifier {
+            -variableName: String
+            +VariableIdentifier(variableName:String, category:VariableCategory)
+        }
+
+        class Selection {
+            -listener: List<Consumer<Selection>>
+            -row: Optional<Integer>
+            +Selection(variableIdentifier:VariableIdentifier, row:int)
+            +Selection()
+            +getRow(): Optional<Integer>
+            +setRow(row:int): void
+            +addListener(listener:Consumer<Selection>): void
+        }
+
+        IOVariable --> VariableCategory: category
+
+        FreeVariableSet --> "*" FreeVariable: variableSet
+
+        VariableIdentifier --> VariableCategory: category
+
+        Selection --> "0..1" VariableIdentifier: variableIdentifier
+
+        Selection --> VariableIdentifier: variableIdentifier
+
+    }
+
+@enduml

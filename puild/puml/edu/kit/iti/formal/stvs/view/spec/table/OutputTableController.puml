@@ -1,0 +1,8 @@
+@startuml
+
+    class OutputTableController {
+        +OutputTableController(spec:HybridSpecification, types:ObservableList<Type>, ioVars:ObservableList<IOVariable>, tablePaneController:TablePaneController)
+        +addIOVariable(string:String): void
+    }
+
+@enduml

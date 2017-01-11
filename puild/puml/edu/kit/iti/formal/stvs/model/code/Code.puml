@@ -1,0 +1,27 @@
+@startuml
+
+    class Code {
+        -changeListeners: List<Consumer<Code>>
+        -ioVariableListeners: List<Consumer<List<IOVariable>>>
+        -typeListeners: List<Consumer<List<Type>>>
+        -parsedCodeListeners: List<Consumer<ParsedCode>>
+        -lexedCodeListeners: List<Consumer<List<SourcecodeToken>>>
+        -parsedCode: ParsedCode
+        -filename: String
+        -sourcecode: String
+        -tokens: List<SourcecodeToken>
+        +Code()
+        +Code(filename:String, sourceCode:String)
+        +getFilename(): String
+        +setFilename(): void
+        +getSourcecode(): String
+        +lexCode(): List<SourcecodeToken>
+        +addSourcecodeListener(listener:Consumer<String>): void
+        +addIOVariablesListener(ioVariablesListener:Consumer<List<IOVariable>>): void
+        +addParsedCodeListener(parsedCodeListener:Consumer<ParsedCode>): void
+        +addLexedCodeListener(lexed:Consumer<List<SourcecodeToken>>): void
+        +addTypesListener(types:Consumer<List<Type>>): void
+        +setSourcecode(sourcecode:String): void
+    }
+
+@enduml

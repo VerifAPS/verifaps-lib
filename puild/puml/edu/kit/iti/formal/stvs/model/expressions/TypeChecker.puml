@@ -1,0 +1,12 @@
+@startuml
+
+    class TypeChecker {
+        -variableTypeContext: Map<String, Type>
+        +TypeChecker(variableTypeContext:Map<String, Type>)
+        +typeCheck(expr:Expression): Type
+        +visitFunctionExpr(functionExpr:FunctionExpr): Type
+        +visitLiteral(literalExpr:LiteralExpr): Type
+        +visitVariable(variableExpr:VariableExpr): Type
+    }
+
+@enduml

@@ -1,0 +1,38 @@
+@startuml
+
+    namespace edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer {
+
+        class CycleView {
+        }
+
+        class CycleController {
+            +CycleController(getDurationForRow:Function<Integer, ConcreteDuration>)
+        }
+
+        class TimingDiagramController {
+            +TimingDiagramController(ioVariable:IOVariable, ioVarValues:SpecificationColumn<ConcreteCell>, selection:Selection)
+        }
+
+        class TimingDiagramView {
+        }
+
+        class javafx.scene.layout.Pane
+        javafx.scene.layout.Pane <|-- CycleView
+
+        interface edu.kit.iti.formal.stvs.view.Controller {
+            {abstract} +getView(): Node
+        }
+        edu.kit.iti.formal.stvs.view.Controller <|.. CycleController
+
+        edu.kit.iti.formal.stvs.view.Controller <|.. TimingDiagramController
+
+        class javafx.scene.layout.HBox
+        javafx.scene.layout.HBox <|-- TimingDiagramView
+
+        CycleController --> CycleView: view
+
+        TimingDiagramController --> TimingDiagramView: view
+
+    }
+
+@enduml

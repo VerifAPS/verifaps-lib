@@ -1,0 +1,8 @@
+@startuml
+
+    class CycleController {
+        +CycleController(getDurationForRow:Function<Integer, ConcreteDuration>)
+        +getView(): CycleView
+    }
+
+@enduml

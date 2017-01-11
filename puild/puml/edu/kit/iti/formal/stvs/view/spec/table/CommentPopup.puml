@@ -1,0 +1,9 @@
+@startuml
+
+    class CommentPopup {
+        {static} -commentHeadline: Text
+        -commentField: TextField
+        +getCommentField(): TextField
+    }
+
+@enduml

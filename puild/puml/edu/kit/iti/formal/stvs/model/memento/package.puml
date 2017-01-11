@@ -1,0 +1,16 @@
+@startuml
+
+    namespace edu.kit.iti.formal.stvs.model.memento {
+
+        class RootModelMemento {
+        }
+
+        class NoSuchMementoException {
+        }
+
+        class java.lang.Exception
+        java.lang.Exception <|-- NoSuchMementoException
+
+    }
+
+@enduml

@@ -1,0 +1,38 @@
+@startuml
+
+    namespace edu.kit.iti.formal.stvs.view.spec.variables {
+
+        class VariableCollectionController {
+            -freeVariableSet: FreeVariableSet
+            +VariableCollectionController(freeVariableSet:FreeVariableSet)
+        }
+
+        class VariableCollection {
+        }
+
+        class VariableView {
+        }
+
+        class VariableController {
+            -freeVariable: FreeVariable
+            +VariableController(freeVariable:FreeVariable)
+            +getView(): Node
+        }
+
+        interface edu.kit.iti.formal.stvs.view.Controller {
+            {abstract} +getView(): Node
+        }
+        edu.kit.iti.formal.stvs.view.Controller <|.. VariableCollectionController
+
+        class javafx.scene.layout.HBox
+        javafx.scene.layout.HBox <|-- VariableCollection
+
+        edu.kit.iti.formal.stvs.view.Controller <|.. VariableController
+
+        VariableCollectionController --> VariableCollection: view
+
+        VariableController --> VariableView: view
+
+    }
+
+@enduml

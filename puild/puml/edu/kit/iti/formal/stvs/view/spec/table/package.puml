@@ -1,0 +1,213 @@
+@startuml
+
+    namespace edu.kit.iti.formal.stvs.view.spec.table {
+
+        class ColumnHeaderController {
+            +ColumnHeaderController(types:ObservableList<Type>, ioVars:ObservableList<IOVariable>, ioVar:ObjectProperty<VariableIdentifier>)
+        }
+
+        class IOVariableNamePopup {
+            -textField: TextField
+            -ioVariables: ListView<IOVariable>
+            +getTextField(): TextField
+            +getIoVariables(): ListView<IOVariable>
+        }
+
+        abstract class ColumnController {
+            +ColumnController(config:ColumnConfig)
+            {abstract} +onProblemsChange(problems:List<SpecProblem>): void
+            {abstract} +getWidthProperty(): IntegerProperty
+            {abstract} +getWidth(): int
+            {abstract} +getCells(): ObservableList<HybridCellController>
+            {abstract} +getView(): Node
+        }
+
+        class InputTableController {
+            +InputTableController(spec:HybridSpecification, types:ObservableList<Type>, ioVars:ObservableList<IOVariable>, tablePaneController:TablePaneController)
+            +addIOVariable(string:String): void
+        }
+
+        class TableColumn {
+            -editableProperty: BooleanProperty
+            +getEditableProperty(): BooleanProperty
+            +setEditable(b:boolean): void
+            +getEditable(): boolean
+            +getChildren(): ObservableList<Node>
+        }
+
+        class TablePaneController {
+            -spec: HybridSpecification
+            -definedVars: ObservableSet<String>
+            -selection: Selection
+            +TablePaneController(spec:HybridSpecification, definedVars:ObservableSet<String>, types:ObservableList<Type>, ioVars:ObservableList<IOVariable>)
+            +addIOVariable(ioVar:IOVariable): void
+        }
+
+        class DurationsColumn {
+            +getChildren(): ObservableList<Node>
+        }
+
+        class TableColumnController {
+            -width: IntegerProperty
+            -types: ObservableList<Type>
+            -typeNames: ObservableList<String>
+            -cells: ObservableList<HybridCellController>
+            -ioVar: ObjectProperty<VariableIdentifier>
+            -problems: ObservableList<SpecProblem>
+            +TableColumnController(types:ObservableList<Type>, ioVars:ObservableList<IOVariable>, ioVar:ObjectProperty<VariableIdentifier>, config:ColumnConfig)
+            +onProblemsChange(problems:List<SpecProblem>): void
+            +getWidthProperty(): IntegerProperty
+            +getWidth(): int
+            +getCells(): ObservableList<HybridCellController>
+        }
+
+        class CommentPopup {
+            {static} -commentHeadline: Text
+            -commentField: TextField
+            +getCommentField(): TextField
+        }
+
+        class ColumnHeader {
+            -editableProperty: BooleanProperty
+            -varNameField: TextField
+            -typesListView: ListView<Type>
+            +getEditableProperty(): BooleanProperty
+            +setEditable(b:boolean): void
+            +getEditable(): boolean
+            +getVarNameField(): TextField
+            +getTypesListView(): ListView<Type>
+        }
+
+        class CategoryTable {
+            +getChildren(): ObservableList<Node>
+        }
+
+        class CommentPopupController {
+            -editable: boolean
+            -comment: StringProperty
+            +CommentPopupController(commentable:Commentable, editable:boolean)
+            +getCommentProperty(): StringProperty
+        }
+
+        class OutputTableController {
+            +OutputTableController(spec:HybridSpecification, types:ObservableList<Type>, ioVars:ObservableList<IOVariable>, tablePaneController:TablePaneController)
+            +addIOVariable(string:String): void
+        }
+
+        class TablePane {
+            -addButtons: AddButtonColumn
+            -removeButtonColumn: RemoveButtonColumn
+            -commentButtonColumn: CommentButtonColumn
+            -editableProperty: BooleanProperty
+            +getAddButtons(): AddButtonColumn
+            +setAddButtons(addButtons:AddButtonColumn): void
+            +getRemoveButtonColumn(): RemoveButtonColumn
+            +setRemoveButtonColumn(removeButtonColumn:RemoveButtonColumn): void
+            +getCommentButtonColumn(): CommentButtonColumn
+            +setCommentButtonColumn(commentButtonColumn:CommentButtonColumn): void
+            +isEditableProperty(): boolean
+            +editablePropertyProperty(): BooleanProperty
+            +getEditableProperty(): BooleanProperty
+            +setEditable(b:boolean): void
+            +getEditable(): boolean
+        }
+
+        abstract class CategoryTableController {
+            -title: String
+            -spec: HybridSpecification
+            -types: ObservableList<Type>
+            -ioVars: ObservableList<IOVariable>
+            -columns: ObservableMap<VariableIdentifier, ColumnController>
+            -columnIndices: Map<ColumnController, Integer>
+            +CategoryTableController(title:String, spec:HybridSpecification, types:ObservableList<Type>, ioVars:ObservableList<IOVariable>, tablePaneController:TablePaneController)
+            #onColumnChange(change:SpecificationTable.ColumnChangeInfo<ConstraintCell>): void
+            {abstract} +addIOVariable(string:String): void
+        }
+
+        class DurationsColumnController {
+            -width: IntegerProperty
+            -cells: ObservableList<HybridCellController>
+            +DurationsColumnController(config:ColumnConfig)
+            +getWidthProperty(): IntegerProperty
+            +getWidth(): int
+            +onProblemsChange(problems:List<SpecProblem>): void
+            +getCells(): ObservableList<HybridCellController>
+        }
+
+        class IOVariableNamePopupController {
+            -ioVars: List<IOVariable>
+            -name: StringProperty
+            +IOVariableNamePopupController(ioVariables:List<IOVariable>, variableChosenListener:Consumer<String>)
+            +getView(): Node
+        }
+
+        interface edu.kit.iti.formal.stvs.view.Controller {
+            {abstract} +getView(): Node
+        }
+        edu.kit.iti.formal.stvs.view.Controller <|.. ColumnHeaderController
+
+        class javafx.stage.Popup
+        javafx.stage.Popup <|-- IOVariableNamePopup
+
+        edu.kit.iti.formal.stvs.view.Controller <|.. ColumnController
+
+        CategoryTableController <|-- InputTableController
+
+        class javafx.scene.layout.VBox
+        javafx.scene.layout.VBox <|-- TableColumn
+
+        edu.kit.iti.formal.stvs.view.Controller <|.. TablePaneController
+
+        javafx.scene.layout.VBox <|-- DurationsColumn
+
+        ColumnController <|-- TableColumnController
+
+        javafx.stage.Popup <|-- CommentPopup
+
+        class javafx.scene.layout.Pane
+        javafx.scene.layout.Pane <|-- ColumnHeader
+
+        class javafx.scene.layout.HBox
+        javafx.scene.layout.HBox <|-- CategoryTable
+
+        edu.kit.iti.formal.stvs.view.Controller <|.. CommentPopupController
+
+        CategoryTableController <|-- OutputTableController
+
+        javafx.scene.layout.HBox <|-- TablePane
+
+        edu.kit.iti.formal.stvs.view.Controller <|.. CategoryTableController
+
+        ColumnController <|-- DurationsColumnController
+
+        edu.kit.iti.formal.stvs.view.Controller <|.. IOVariableNamePopupController
+
+        ColumnHeaderController --> ColumnHeader: columnHeader\nview
+
+        TableColumn --> ColumnHeader: colHead
+
+        TablePaneController --> DurationsColumnController: durationColumn
+
+        TablePaneController --> TablePane: table\nview
+
+        TablePaneController --> InputTableController: inputTableController
+
+        TableColumnController --> TableColumn: tableColumn\nview
+
+        CommentPopupController --> javafx.scene.layout.Pane: view
+
+        TablePane --> CategoryTable: inputTable\noutputTable
+
+        TablePane --> DurationsColumn: durations
+
+        CategoryTableController --> CategoryTable: categoryTable\nview
+
+        CategoryTableController --> "*" ColumnController: sortedColumns\ncolumns
+
+        DurationsColumnController --> DurationsColumn: durationsColumn\nview
+
+        IOVariableNamePopupController --> IOVariableNamePopup: ioVariableNamePopup
+
+    }
+
+@enduml

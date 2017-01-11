@@ -1,0 +1,8 @@
+@startuml
+
+    enum InvalidIOVarProblem.Type {
+        {static} +INVALID_NAME
+        {static} +INVALID_TYPE
+    }
+
+@enduml

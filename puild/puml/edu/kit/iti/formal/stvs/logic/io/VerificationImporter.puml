@@ -1,0 +1,7 @@
+@startuml
+
+    class VerificationImporter {
+        +doImport(verificationResultXML:String): VerificationResult
+    }
+
+@enduml

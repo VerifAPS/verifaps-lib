@@ -1,0 +1,32 @@
+@startuml
+
+    namespace edu.kit.iti.formal.stvs.view.menu {
+
+        class STVSMenuBarConstroller {
+            +STVSMenuBarConstroller(rootController:STVSRootController)
+        }
+
+        class STFileChooserController {
+            +STFileChooserController(code:Code)
+        }
+
+        class SpecFileChooserController {
+            +SpecFileChooserController(hybridSpecifications:ObservableList<HybridSpecification>)
+        }
+
+        class STVSMenuBar {
+        }
+
+        interface edu.kit.iti.formal.stvs.view.Controller {
+            {abstract} +getView(): Node
+        }
+        edu.kit.iti.formal.stvs.view.Controller <|.. STVSMenuBarConstroller
+
+        class javafx.scene.control.MenuBar
+        javafx.scene.control.MenuBar <|-- STVSMenuBar
+
+        STVSMenuBarConstroller --> STVSMenuBar: view
+
+    }
+
+@enduml

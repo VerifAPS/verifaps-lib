@@ -1,0 +1,13 @@
+@startuml
+
+    enum FunctionExpr.Operation {
+        {static} +AND
+        {static} +OR
+        {static} +EQUALS
+        {static} +PLUS
+        {static} +MINUS
+        {static} +MULTIPLICATION
+        {static} +DIVISION
+    }
+
+@enduml

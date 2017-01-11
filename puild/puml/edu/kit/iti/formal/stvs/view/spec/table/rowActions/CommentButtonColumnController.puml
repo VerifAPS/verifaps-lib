@@ -1,0 +1,11 @@
+@startuml
+
+    class CommentButtonColumnController {
+        -view: CommentButtonColumn
+        +CommentButtonColumnController(durations:DurationsColumnController)
+        +removeButton(row:int): void
+        +addButton(row:int, cell:HybridCellController): void
+        +getView(): CommentButtonColumn
+    }
+
+@enduml

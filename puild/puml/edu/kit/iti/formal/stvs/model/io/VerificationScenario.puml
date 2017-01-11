@@ -1,0 +1,9 @@
+@startuml
+
+    class VerificationScenario {
+        -spec: ConstraintSpecification
+        -verificationResult: VerificationResult
+        -code: Code
+    }
+
+@enduml

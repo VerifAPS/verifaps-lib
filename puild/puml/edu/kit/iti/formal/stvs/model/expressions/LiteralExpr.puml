@@ -1,0 +1,10 @@
+@startuml
+
+    class LiteralExpr {
+        -value: Value
+        +LiteralExpr(val:Value)
+        +takeVisitor(visitor:ExpressionVisitor<R>): R
+        +getValue(): Value
+    }
+
+@enduml

@@ -1,0 +1,8 @@
+@startuml
+
+    class VerificationResult {
+        +isSuccessful(): boolean
+        +getCounterExample(): ConcreteSpecification
+    }
+
+@enduml

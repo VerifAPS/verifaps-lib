@@ -1,0 +1,19 @@
+@startuml
+
+    class HybridSpecification {
+        -concreteInstance: Optional<ConcreteSpecification>
+        -concreteInstanceChangedListeners: List<Consumer<Optional<ConcreteSpecification>>>
+        -editable: boolean
+        -selection: Selection
+        +HybridSpecification(typeContext:Set<Type>, ioVariables:Set<IOVariable>, freeVariableSet:FreeVariableSet, editable:boolean)
+        +getConcreteInstance(): Optional<ConcreteSpecification>
+        +setConcreteInstance(concreteInstance:ConcreteSpecification): void
+        +removeConcreteInstance(): void
+        +addConcreteInstanceChangedListener(listener:Consumer<Optional<ConcreteSpecification>>): void
+        +getSelection(): Selection
+        +getConcreteValuesForConstraint(column:VariableIdentifier, row:int): List<ConcreteCell>
+        +getDurationForRow(row:int): ConcreteDuration
+        +isEditable(): boolean
+    }
+
+@enduml

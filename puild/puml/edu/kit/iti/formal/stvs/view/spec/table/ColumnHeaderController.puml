@@ -1,0 +1,9 @@
+@startuml
+
+    class ColumnHeaderController {
+        -columnHeader: ColumnHeader
+        +ColumnHeaderController(types:ObservableList<Type>, ioVars:ObservableList<IOVariable>, ioVar:ObjectProperty<VariableIdentifier>)
+        +getView(): ColumnHeader
+    }
+
+@enduml

@@ -1,0 +1,9 @@
+@startuml
+
+    class RowSolver {
+        -cycleSolvers: Stack<CycleSolver>
+        +RowSolver(duration:int, rownum:int)
+        +solve(): boolean
+    }
+
+@enduml

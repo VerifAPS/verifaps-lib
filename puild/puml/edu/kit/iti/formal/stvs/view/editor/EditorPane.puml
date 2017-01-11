@@ -1,0 +1,11 @@
+@startuml
+
+    class EditorPane {
+        -codeArea: CodeArea
+        +getCodeProperty(): StringProperty
+        +getCode(): String
+        +setCode(code:String): void
+        +setStyleSpans(style:<any>): void
+    }
+
+@enduml

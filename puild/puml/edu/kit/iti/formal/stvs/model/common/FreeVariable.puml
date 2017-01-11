@@ -1,0 +1,19 @@
+@startuml
+
+    class FreeVariable {
+        -name: String
+        -type: Type
+        -defaultValue: Value
+        -listeners: List<Consumer<FreeVariable>>
+        +FreeVariable(name:String, type:Type)
+        +FreeVariable(name:String, type:Type, defaultValue:Value)
+        +addChangeListener(listener:Consumer<FreeVariable>): void
+        +getType(): Type
+        +setType(type:Type): void
+        +getName(): String
+        +setName(name:String): void
+        +getDefaultValue(): Value
+        +setDefaultValue(defaultValue:Value): void
+    }
+
+@enduml

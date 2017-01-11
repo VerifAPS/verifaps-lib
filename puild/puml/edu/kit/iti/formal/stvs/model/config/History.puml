@@ -1,0 +1,12 @@
+@startuml
+
+    class History {
+        -codeFiles: ArrayList<String>
+        -specFiles: ArrayList<String>
+        +getCodeFiles(): Collection<String>
+        +getSpecFiles(): Collection<String>
+        +addCodeFile(filename:String): void
+        +addSpecFile(filename:String): void
+    }
+
+@enduml

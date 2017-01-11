@@ -1,0 +1,31 @@
+@startuml
+
+    namespace edu.kit.iti.formal.stvs.view.editor {
+
+        class EditorPaneController {
+            +EditorPaneController(code:Code)
+            +onCodeChange(code:Code): void
+            +setStylesheet(url:String): void
+        }
+
+        class EditorPane {
+            -codeArea: CodeArea
+            +getCodeProperty(): StringProperty
+            +getCode(): String
+            +setCode(code:String): void
+            +setStyleSpans(style:<any>): void
+        }
+
+        interface edu.kit.iti.formal.stvs.view.Controller {
+            {abstract} +getView(): Node
+        }
+        edu.kit.iti.formal.stvs.view.Controller <|.. EditorPaneController
+
+        class javafx.scene.layout.Pane
+        javafx.scene.layout.Pane <|-- EditorPane
+
+        EditorPaneController --> EditorPane: view
+
+    }
+
+@enduml

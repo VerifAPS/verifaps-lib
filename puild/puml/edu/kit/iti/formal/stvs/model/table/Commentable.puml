@@ -1,0 +1,9 @@
+@startuml
+
+    interface Commentable {
+        {abstract} +setComment(comment:String): void
+        {abstract} +getComment(): String
+        {abstract} +addCommentListener(consumer:Consumer<Commentable>): void
+    }
+
+@enduml

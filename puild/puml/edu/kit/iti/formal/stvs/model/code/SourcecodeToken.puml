@@ -1,0 +1,11 @@
+@startuml
+
+    class SourcecodeToken {
+        -text: String
+        -type: SourcecodeToken.Type
+        +SourcecodeToken(text:String, type:SourcecodeToken.Type)
+        +getType(): SourcecodeToken.Type
+        +getText(): String
+    }
+
+@enduml

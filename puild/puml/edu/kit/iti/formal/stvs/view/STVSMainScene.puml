@@ -1,0 +1,10 @@
+@startuml
+
+    class STVSMainScene {
+        -rootController: STVSRootController
+        +STVSMainScene(root:Parent)
+        +getRootController(): STVSRootController
+        +setRootController(rootController:STVSRootController): void
+    }
+
+@enduml

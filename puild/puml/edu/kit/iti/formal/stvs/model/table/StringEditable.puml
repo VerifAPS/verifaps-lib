@@ -1,0 +1,9 @@
+@startuml
+
+    interface StringEditable {
+        {abstract} +getUserInputString(): String
+        {abstract} +setUserInputString(input:String): void
+        {abstract} +addUserInputStringListener(listener:Consumer<String>): void
+    }
+
+@enduml

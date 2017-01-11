@@ -1,0 +1,11 @@
+@startuml
+
+    class CommentPopupController {
+        -editable: boolean
+        -comment: StringProperty
+        +CommentPopupController(commentable:Commentable, editable:boolean)
+        +getCommentProperty(): StringProperty
+        +getView(): Pane
+    }
+
+@enduml

@@ -1,0 +1,12 @@
+@startuml
+
+    class FunctionExpr {
+        -operation: FunctionExpr.Operation
+        -arguments: List<Expression>
+        +FunctionExpr(op:FunctionExpr.Operation, arguments:List<Expression>)
+        +takeVisitor(visitor:ExpressionVisitor<R>): R
+        +getOperation(): FunctionExpr.Operation
+        +getArguments(): List<Expression>
+    }
+
+@enduml

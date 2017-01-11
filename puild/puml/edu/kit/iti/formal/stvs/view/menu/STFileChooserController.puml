@@ -1,0 +1,7 @@
+@startuml
+
+    class STFileChooserController {
+        +STFileChooserController(code:Code)
+    }
+
+@enduml

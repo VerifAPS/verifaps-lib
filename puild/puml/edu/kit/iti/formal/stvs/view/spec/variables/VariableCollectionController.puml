@@ -1,0 +1,10 @@
+@startuml
+
+    class VariableCollectionController {
+        -freeVariableSet: FreeVariableSet
+        -view: VariableCollection
+        +VariableCollectionController(freeVariableSet:FreeVariableSet)
+        +getView(): VariableCollection
+    }
+
+@enduml

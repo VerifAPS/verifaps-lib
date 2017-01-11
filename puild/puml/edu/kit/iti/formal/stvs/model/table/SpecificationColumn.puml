@@ -1,0 +1,8 @@
+@startuml
+
+    class SpecificationColumn<C> {
+        +getEntryForRow(row:int): C
+        +getConfig(): Optional<ColumnConfig>
+    }
+
+@enduml

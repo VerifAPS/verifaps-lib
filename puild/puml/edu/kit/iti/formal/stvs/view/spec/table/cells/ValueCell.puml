@@ -1,0 +1,11 @@
+@startuml
+
+    class ValueCell {
+        -editableProperty: BooleanProperty
+        -valueProperty: StringProperty
+        +getEditableProperty(): BooleanProperty
+        +setEditable(b:boolean): void
+        +getValueProperty(): StringProperty
+    }
+
+@enduml

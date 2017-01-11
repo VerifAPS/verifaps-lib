@@ -1,0 +1,9 @@
+@startuml
+
+    class STVSMenuBarConstroller {
+        -view: STVSMenuBar
+        +STVSMenuBarConstroller(rootController:STVSRootController)
+        +getView(): STVSMenuBar
+    }
+
+@enduml

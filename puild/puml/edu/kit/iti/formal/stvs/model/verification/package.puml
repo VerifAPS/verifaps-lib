@@ -1,0 +1,12 @@
+@startuml
+
+    namespace edu.kit.iti.formal.stvs.model.verification {
+
+        class VerificationResult {
+            +isSuccessful(): boolean
+            +getCounterExample(): ConcreteSpecification
+        }
+
+    }
+
+@enduml
