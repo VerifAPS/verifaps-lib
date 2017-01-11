@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.model;
 
+import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.memento.NoSuchMementoException;
@@ -16,6 +17,7 @@ public class RootModel {
     private GlobalConfig globalConfig;
     private History history;
     private CircularFifoQueue<RootModelMemento> mementos;
+    private Code code;
 
     public RootModel() {
         mementos = new CircularFifoQueue<RootModelMemento>(NUMBER_OF_MEMENTOS);
@@ -47,4 +49,11 @@ public class RootModel {
 
     }
 
+    public Code getCode() {
+        return code;
+    }
+
+    public void setCode(Code code) {
+        this.code = code;
+    }
 }
