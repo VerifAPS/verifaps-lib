@@ -1,10 +1,8 @@
 package edu.kit.iti.formal.stvs.logic.verification;
 
-import edu.kit.iti.formal.stvs.logic.io.VerificationExporter;
-import edu.kit.iti.formal.stvs.logic.io.VerificationImporter;
-import edu.kit.iti.formal.stvs.model.code.Code;
+import edu.kit.iti.formal.stvs.logic.io.verification.VerificationExporter;
+import edu.kit.iti.formal.stvs.logic.io.verification.VerificationImporter;
 import edu.kit.iti.formal.stvs.model.io.VerificationScenario;
-import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 
 import java.util.function.Consumer;

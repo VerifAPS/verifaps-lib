@@ -3,10 +3,12 @@ package edu.kit.iti.formal.stvs.view.spec;
 import edu.kit.iti.formal.stvs.view.spec.table.TablePane;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionView;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableView;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
-public class SpecificationTab extends VBox {
+public class SpecificationTab extends VBox implements Lockable {
     private VariableView variableView;
     private TablePane table;
     private TimingDiagramCollectionView diagram;
@@ -33,5 +35,19 @@ public class SpecificationTab extends VBox {
 
     public Button getStartButton() {
         return startButton;
+    }
+
+    @Override
+    public boolean getEditable(){
+        return false;
+    }
+
+    @Override
+    public void setEditable(boolean b) {
+    }
+
+    @Override
+    public BooleanProperty getEditableProperty() {
+        return null;
     }
 }

@@ -1,12 +1,13 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
+import edu.kit.iti.formal.stvs.view.spec.Lockable;
 import edu.kit.iti.formal.stvs.view.spec.table.rowActions.AddButtonColumn;
 import edu.kit.iti.formal.stvs.view.spec.table.rowActions.CommentButtonColumn;
 import edu.kit.iti.formal.stvs.view.spec.table.rowActions.RemoveButtonColumn;
 import javafx.beans.property.BooleanProperty;
 import javafx.scene.layout.HBox;
 
-public class TablePane extends HBox {
+public class TablePane extends HBox implements Lockable {
     private CategoryTable inputTable;
     private CategoryTable outputTable;
     private DurationsColumn durations;
@@ -60,14 +61,6 @@ public class TablePane extends HBox {
 
     public void setCommentButtonColumn(CommentButtonColumn commentButtonColumn) {
         this.commentButtonColumn = commentButtonColumn;
-    }
-
-    public boolean isEditableProperty() {
-        return editableProperty.get();
-    }
-
-    public BooleanProperty editablePropertyProperty() {
-        return editableProperty;
     }
 
     private BooleanProperty editableProperty;
