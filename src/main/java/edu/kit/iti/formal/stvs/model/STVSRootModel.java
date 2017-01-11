@@ -51,6 +51,10 @@ public class STVSRootModel {
 
     }
 
+    private void addOnMementoAppliedListener(Runnable listener){
+
+    }
+
     public Code getCode() {
         return code;
     }
