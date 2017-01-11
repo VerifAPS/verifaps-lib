@@ -21,4 +21,8 @@ public class VerificationScenario {
     public void cancel() {
 
     }
+
+    public void addOnVerifficationStoppedListener(){
+
+    }
 }

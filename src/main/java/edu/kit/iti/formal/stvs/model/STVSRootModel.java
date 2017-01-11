@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.model;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
+import edu.kit.iti.formal.stvs.model.io.VerificationScenario;
 import edu.kit.iti.formal.stvs.model.memento.NoSuchMementoException;
 import edu.kit.iti.formal.stvs.model.memento.RootModelMemento;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
@@ -18,6 +19,7 @@ public class STVSRootModel {
     private History history;
     private CircularFifoQueue<RootModelMemento> mementos;
     private Code code;
+    private VerificationScenario scenario;
 
     public STVSRootModel() {
         mementos = new CircularFifoQueue<RootModelMemento>(NUMBER_OF_MEMENTOS);
@@ -55,5 +57,9 @@ public class STVSRootModel {
 
     public void setCode(Code code) {
         this.code = code;
+    }
+
+    public VerificationScenario getScenario() {
+        return scenario;
     }
 }
