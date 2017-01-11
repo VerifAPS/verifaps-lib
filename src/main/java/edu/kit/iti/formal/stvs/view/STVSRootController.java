@@ -1,11 +1,8 @@
 package edu.kit.iti.formal.stvs.view;
 
-import edu.kit.iti.formal.stvs.model.RootModel;
-import edu.kit.iti.formal.stvs.model.code.Code;
+import edu.kit.iti.formal.stvs.model.STVSRootModel;
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 
 import java.util.Comparator;
 import java.util.List;
@@ -15,7 +12,7 @@ import java.util.List;
  */
 public class STVSRootController implements Controller {
     private STVSRootView view;
-    private RootModel rootModel;
+    private STVSRootModel STVSRootModel;
     /**
      * Used to sort Types (Enums should be at the bottom)
      */
