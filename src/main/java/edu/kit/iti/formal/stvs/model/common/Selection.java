@@ -10,29 +10,29 @@ import java.util.function.Consumer;
 public class Selection {
 
     private List<Consumer<Selection>> listener;
-    private Optional<VariableIdentifier> variableIdentifier;
+    private Optional<String> column;
     private Optional<Integer> row;
 
-    public Selection(VariableIdentifier variableIdentifier, int row) {
-        this.variableIdentifier = Optional.ofNullable(variableIdentifier);
+    public Selection(String column, int row) {
+        this.column = Optional.ofNullable(column);
         this.row = Optional.ofNullable(row);
     }
 
     public Selection() {
-        this.variableIdentifier = Optional.empty();
+        this.column = Optional.empty();
         this.row = Optional.empty();
     }
 
-    public Optional<VariableIdentifier> getVariableIdentifier() {
-        return variableIdentifier;
+    public Optional<String> getColumn() {
+        return column;
     }
 
     public Optional<Integer> getRow() {
         return row;
     }
 
-    public void setVariableIdentifier(VariableIdentifier variableIdentifier) {
-        this.variableIdentifier = Optional.ofNullable(variableIdentifier);
+    public void setColumn(String column) {
+        this.column = Optional.ofNullable(column);
     }
 
     public void setRow(int row) {

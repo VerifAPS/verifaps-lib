@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table.problems;
 
-import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
+import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.common.SpecIOVariable;
 import edu.kit.iti.formal.stvs.model.expressions.TypeCheckException;
 
 import java.util.function.Function;
@@ -10,11 +11,11 @@ import java.util.function.Function;
  */
 public class TypeErrorProblem extends SpecProblem {
 
-    private final VariableIdentifier column;
+    private final SpecIOVariable column;
     private final int row;
     private final TypeCheckException typeCheckException;
 
-    public TypeErrorProblem(VariableIdentifier column, int row, TypeCheckException typeCheckException) {
+    public TypeErrorProblem(SpecIOVariable column, int row, TypeCheckException typeCheckException) {
         this.column = column;
         this.row = row;
         this.typeCheckException = typeCheckException;
@@ -39,7 +40,7 @@ public class TypeErrorProblem extends SpecProblem {
         return null;
     }
 
-    public VariableIdentifier getColumn() {
+    public SpecIOVariable getIOVariable() {
         return column;
     }
 

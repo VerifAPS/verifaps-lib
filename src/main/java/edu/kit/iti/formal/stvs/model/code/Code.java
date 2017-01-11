@@ -1,8 +1,6 @@
 package edu.kit.iti.formal.stvs.model.code;
 
-import edu.kit.iti.formal.stvs.model.common.IOVariable;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.view.editor.EditorPaneController;
+import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
 
 import org.antlr.v4.runtime.Token;
 
@@ -13,7 +11,7 @@ import java.util.function.Consumer;
  * Created by csicar on 09.01.17.
  */
 public class Code {
-    private List<Consumer<List<IOVariable>>> ioVariableListeners;
+    private List<Consumer<List<CodeIOVariable>>> ioVariableListeners;
     private List<Consumer<ParsedCode>> parsedCodeListeners;
     private List<Consumer<List<ANTLRSyntaxError>>> syntaxErrorsListeners;
     private List<Consumer<List<Token>>> lexedCodeListeners;

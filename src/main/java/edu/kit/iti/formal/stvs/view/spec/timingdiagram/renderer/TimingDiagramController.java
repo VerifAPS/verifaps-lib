@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
-import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
 import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
@@ -19,7 +19,7 @@ public class TimingDiagramController implements Controller {
      * @param ioVariable
      * @param ioVarValues
      */
-    public TimingDiagramController(IOVariable ioVariable, SpecificationColumn<ConcreteCell> ioVarValues, Selection selection) {
+    public TimingDiagramController(CodeIOVariable ioVariable, SpecificationColumn<ConcreteCell> ioVarValues, Selection selection) {
 
     }
 

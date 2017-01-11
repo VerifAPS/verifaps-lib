@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
-import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
@@ -59,11 +59,11 @@ public class TablePaneController implements Controller {
     }
 
 
-    public TablePaneController(HybridSpecification spec, ObservableSet<String> definedVars, ObservableList<Type> types, ObservableList<IOVariable> ioVars, GlobalConfig globalConfig) {
+    public TablePaneController(HybridSpecification spec, ObservableSet<String> definedVars, ObservableList<Type> types, ObservableList<CodeIOVariable> ioVars, GlobalConfig globalConfig) {
         this.globalConfig = globalConfig;
     }
 
-    public void addIOVariable(IOVariable ioVar) {
+    public void addIOVariable(CodeIOVariable ioVar) {
     }
 
     public TablePane getView() {

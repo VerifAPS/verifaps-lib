@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.stvs.model.common.IOVariable;
-import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 
 import java.util.Map;
 
@@ -11,14 +9,14 @@ import java.util.Map;
 public class SpecificationRow<C, D> {
 
     private final D duration;
-    private final Map<VariableIdentifier, C> cells;
+    private final Map<String, C> cells;
 
-    public SpecificationRow(D duration, Map<VariableIdentifier, C> cells) {
+    public SpecificationRow(D duration, Map<String, C> cells) {
         this.duration = duration;
         this.cells = cells;
     }
 
-    public C getEntryForVariable(VariableIdentifier variable) {
+    public C getEntryForVariable(String variable) {
         return null;
     }
 

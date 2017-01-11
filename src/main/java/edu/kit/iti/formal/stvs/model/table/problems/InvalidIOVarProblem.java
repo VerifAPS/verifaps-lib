@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table.problems;
 
-import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
+import edu.kit.iti.formal.stvs.model.common.SpecIOVariable;
 
 import java.util.function.Function;
 
@@ -14,12 +14,10 @@ public class InvalidIOVarProblem extends SpecProblem {
         INVALID_TYPE
     }
 
-    private final VariableIdentifier column;
-    private final Type type;
+    private SpecIOVariable column;
 
-    public InvalidIOVarProblem(VariableIdentifier column, Type type) {
+    public InvalidIOVarProblem(SpecIOVariable column) {
         this.column = column;
-        this.type = type;
     }
 
     @Override
@@ -35,14 +33,6 @@ public class InvalidIOVarProblem extends SpecProblem {
     @Override
     public String getErrorMessage() {
         return null;
-    }
-
-    public VariableIdentifier getVariableIdentifier() {
-        return column;
-    }
-
-    public Type getType() {
-        return type;
     }
 
 }

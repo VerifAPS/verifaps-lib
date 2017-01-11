@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
-import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
@@ -22,7 +22,7 @@ abstract public class CategoryTableController implements Controller {
     private String title;
     private HybridSpecification spec;
     private ObservableList<Type> types;
-    private ObservableList<IOVariable> ioVars;
+    private ObservableList<CodeIOVariable> ioVars;
     private CategoryTable categoryTable;
 
     private ObservableMap<VariableIdentifier, ColumnController> columns;
@@ -30,7 +30,7 @@ abstract public class CategoryTableController implements Controller {
     private ObservableList<ColumnController> sortedColumns;
 
     /**
-     * Gets called if button for new IOVariable is pressed.
+     * Gets called if button for new CodeIOVariable is pressed.
      * Creates IOVariableNamePopupController.
      */
     private void onNewIOVariableButton(ActionEvent e) {
@@ -54,7 +54,7 @@ abstract public class CategoryTableController implements Controller {
 
     }
 
-    public CategoryTableController(String title, HybridSpecification spec, ObservableList<Type> types, ObservableList<IOVariable> ioVars, TablePaneController tablePaneController) {
+    public CategoryTableController(String title, HybridSpecification spec, ObservableList<Type> types, ObservableList<CodeIOVariable> ioVars, TablePaneController tablePaneController) {
     }
 
     public ObservableList<ColumnController> getColumns() {
@@ -62,7 +62,7 @@ abstract public class CategoryTableController implements Controller {
     }
 
     /**
-     * Adds a column of an IOVariable that exists in the code or is newly defined.
+     * Adds a column of an CodeIOVariable that exists in the code or is newly defined.
      * Automatically adds view listeners for drag detected, mouse moved and drag done to column.
      * Automatically adds model listener to spec.rowsListeners to add remove cells on row change.
      *

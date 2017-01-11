@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.model.code;
 
-import edu.kit.iti.formal.stvs.model.common.IOVariable;
+import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 
 import java.util.List;
@@ -12,10 +12,10 @@ import java.util.Set;
 public class ParsedCode {
 
     private List<FoldableCodeBlock> foldableCodeBlocks;
-    private Set<IOVariable> definedVariables;
+    private Set<CodeIOVariable> definedVariables;
     private Set<Type> definedTypes;
 
-    public ParsedCode(List<FoldableCodeBlock> foldableCodeBlocks, Set<IOVariable> definedVariables, Set<Type> definedTypes) {
+    public ParsedCode(List<FoldableCodeBlock> foldableCodeBlocks, Set<CodeIOVariable> definedVariables, Set<Type> definedTypes) {
         this.foldableCodeBlocks = foldableCodeBlocks;
         this.definedVariables = definedVariables;
         this.definedTypes = definedTypes;
@@ -25,7 +25,7 @@ public class ParsedCode {
         return foldableCodeBlocks;
     }
 
-    public Set<IOVariable> getDefinedVariables() {
+    public Set<CodeIOVariable> getDefinedVariables() {
         return definedVariables;
     }
 

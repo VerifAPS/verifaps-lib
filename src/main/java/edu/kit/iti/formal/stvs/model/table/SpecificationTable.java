@@ -1,8 +1,5 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.stvs.model.common.IOVariable;
-import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
-
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -22,10 +19,10 @@ public class SpecificationTable<C, D> {
 
     public static class ColumnChangeInfo<C> {
         public final SpecificationColumn<C> column;
-        public final VariableIdentifier columnId;
+        public final String columnId;
         public final Change changeType;
 
-        public ColumnChangeInfo(SpecificationColumn<C> column, VariableIdentifier columnId, Change changeType) {
+        public ColumnChangeInfo(SpecificationColumn<C> column, String columnId, Change changeType) {
             this.column = column;
             this.columnId = columnId;
             this.changeType = changeType;
@@ -44,19 +41,19 @@ public class SpecificationTable<C, D> {
         }
     }
 
-    public C getCell(int row, VariableIdentifier column) {
+    public C getCell(int row, String column) {
         return null;
     }
 
-    public SpecificationColumn<C> getColumn(VariableIdentifier column) {
+    public SpecificationColumn<C> getColumn(String column) {
         return null;
     }
 
-    public void addColumn(VariableIdentifier columnId, SpecificationColumn<C> column) {
+    public void addColumn(String columnId, SpecificationColumn<C> column) {
 
     }
 
-    public void removeColumn(VariableIdentifier columnId) {
+    public void removeColumn(String columnId) {
 
     }
 
