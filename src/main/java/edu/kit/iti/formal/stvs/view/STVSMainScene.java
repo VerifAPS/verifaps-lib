@@ -10,7 +10,7 @@ import javafx.scene.Scene;
 public class STVSMainScene extends Scene {
     private STVSRootController rootController;
 
-    public STVSMainScene(@NamedArg("root") Parent root) {
+    public STVSMainScene(Parent root) {
         super(root);
     }
 

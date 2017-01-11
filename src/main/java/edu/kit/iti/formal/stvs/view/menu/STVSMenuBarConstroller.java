@@ -1,7 +1,10 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
+import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.collections.ObservableList;
 
 /**
  * Created by csicar on 10.01.17.
@@ -12,7 +15,7 @@ public class STVSMenuBarConstroller implements Controller {
     private STVSMenuBar view;
     private GlobalConfig globalConfig;
 
-    public STVSMenuBarConstroller(GlobalConfig config, GlobalConfig globalConfig) {
+    public STVSMenuBarConstroller(ObservableList<HybridSpecification> hybridSpecifications, Code code, GlobalConfig globalConfig) {
 
         this.globalConfig = globalConfig;
     }

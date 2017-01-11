@@ -24,7 +24,5 @@ public class SpecificationTabController implements Controller {
         return null;
     }
 
-    private void onVerificationStart(){
-        //fireEvent("")
-    }
+
 }
