@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view;
 
+import edu.kit.iti.formal.stvs.model.RootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.common.IOVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
@@ -14,10 +15,7 @@ import java.util.List;
  */
 public class STVSRootController implements Controller {
     private STVSRootView view;
-    private ObservableList<Type> types;
-    private SortedList<Type> sortedTyes;
-    private ObservableList<IOVariable> ioVars;
-    private Code code;
+    private RootModel rootModel;
     /**
      * Used to sort Types (Enums should be at the bottom)
      */
@@ -28,10 +26,6 @@ public class STVSRootController implements Controller {
     }
     public STVSRootController(){
 
-    }
-
-    public Code getCode() {
-        return code;
     }
 
     private void onIOVariablesChange(List<IOVariable> ioVars){
