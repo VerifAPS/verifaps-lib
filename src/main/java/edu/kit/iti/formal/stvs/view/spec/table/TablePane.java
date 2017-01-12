@@ -8,26 +8,26 @@ import javafx.beans.property.BooleanProperty;
 import javafx.scene.layout.HBox;
 
 public class TablePane extends HBox implements Lockable {
-    private CategoryTable inputTable;
-    private CategoryTable outputTable;
+    private TableCategory inputTable;
+    private TableCategory outputTable;
     private DurationsColumn durations;
     private AddButtonColumn addButtons;
     private RemoveButtonColumn removeButtonColumn;
     private CommentButtonColumn commentButtonColumn;
 
-    public CategoryTable getInputTable() {
+    public TableCategory getInputTable() {
         return inputTable;
     }
 
-    public void setInputTable(CategoryTable inputTable) {
+    public void setInputTable(TableCategory inputTable) {
         this.inputTable = inputTable;
     }
 
-    public CategoryTable getOutputTable() {
+    public TableCategory getOutputTable() {
         return outputTable;
     }
 
-    public void setOutputTable(CategoryTable outputTable) {
+    public void setOutputTable(TableCategory outputTable) {
         this.outputTable = outputTable;
     }
 

@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.TypeCheckException;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class FreeVariable {
         this.type = type;
     }
 
-    public FreeVariable(String name, Type type, Value defaultValue) {
+    public FreeVariable(String name, Type type, Value defaultValue) throws TypeCheckException {
         this.name = name;
         this.type = type;
         this.defaultValue = defaultValue;
@@ -57,7 +58,7 @@ public class FreeVariable {
         return defaultValue;
     }
 
-    public void setDefaultValue(Value defaultValue) {
+    public void setDefaultValue(Value defaultValue) throws TypeCheckException {
         this.defaultValue = defaultValue;
     }
 }

@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
 import edu.kit.iti.formal.stvs.model.common.Selection;
+import edu.kit.iti.formal.stvs.model.common.SpecIOVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
@@ -11,9 +12,7 @@ import javafx.collections.ObservableList;
  */
 public class InputVariablesTimingDiagramCollection extends CategoryTimingDiagramCollection {
 
-    public InputVariablesTimingDiagramCollection(HybridSpecification concreteSpecification, ObservableList<VariableIdentifier> ioVariables, Selection selection, GlobalConfig globalConfig) {
-        super(concreteSpecification, ioVariables);
-        this.globalConfig = globalConfig;
+    public InputVariablesTimingDiagramCollection(HybridSpecification spec, ObservableList<SpecIOVariable> definedVariables, GlobalConfig config, Selection selection) {
+        super(spec, definedVariables, config, selection);
     }
-    private GlobalConfig globalConfig;
 }

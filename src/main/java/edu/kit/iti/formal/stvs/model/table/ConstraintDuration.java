@@ -11,23 +11,23 @@ import java.util.function.Consumer;
  */
 public class ConstraintDuration implements CellOperationProvider {
 
-    private String userInputString;
+    private String stringRepresentation;
     private String comment;
 
     private List<Consumer<String>> Listeners;
 
-    public ConstraintDuration(String userInputString) {
+    public ConstraintDuration(String stringRepresentation) {
 
     }
 
     @Override
     public String getAsString() {
-        return this.userInputString;
+        return this.stringRepresentation;
     }
 
     @Override
-    public void setFromString(String input) {
-        this.userInputString = userInputString;
+    public void setFromString(String stringRepresentation) {
+        this.stringRepresentation = stringRepresentation;
     }
 
     public void addBoundsListener(Consumer<LowerBoundedInterval> listener) {

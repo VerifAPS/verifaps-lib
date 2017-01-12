@@ -1,8 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
-import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
-import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
@@ -10,7 +7,6 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ContextMenu;
@@ -19,17 +15,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-abstract public class CategoryTableController implements Controller {
+abstract public class TableCategoryController implements Controller {
     private String title;
     private HybridSpecification spec;
-    private ObservableList<Type> types;
-    private ObservableList<CodeIOVariable> ioVars;
-    private CategoryTable categoryTable;
+    private TableCategory tableCategory;
     private ContextMenu contextMenu;
 
-    private ObservableMap<VariableIdentifier, ColumnController> columns;
+    private ObservableMap<String, ColumnController> columns;
     private Map<ColumnController, Integer> columnIndices;
-    private ObservableList<ColumnController> sortedColumns;
+
 
     /**
      * Gets called if button for new CodeIOVariable is pressed.
@@ -56,12 +50,9 @@ abstract public class CategoryTableController implements Controller {
 
     }
 
-    public CategoryTableController(String title, HybridSpecification spec, ObservableList<Type> types, ObservableList<CodeIOVariable> ioVars, TablePaneController tablePaneController) {
+    public TableCategoryController(String title, HybridSpecification spec, TablePaneController tablePaneController) {
     }
 
-    public ObservableList<ColumnController> getColumns() {
-        return sortedColumns;
-    }
 
     /**
      * Adds a column of an CodeIOVariable that exists in the code or is newly defined.
@@ -86,7 +77,7 @@ abstract public class CategoryTableController implements Controller {
 
     }
 
-    public CategoryTable getView() {
-        return categoryTable;
+    public TableCategory getView() {
+        return tableCategory;
     }
 }

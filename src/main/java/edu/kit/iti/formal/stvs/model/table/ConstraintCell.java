@@ -1,9 +1,5 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.stvs.model.table.CellOperationProvider;
-import edu.kit.iti.formal.stvs.model.table.Commentable;
-import edu.kit.iti.formal.stvs.model.table.StringEditable;
-
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -12,23 +8,23 @@ import java.util.function.Consumer;
  */
 public class ConstraintCell implements CellOperationProvider {
 
-    private String userInputString;
+    private String stringRepresentation;
     private String comment;
 
     private List<Consumer<String>> userInputStringListeners;
 
-    public ConstraintCell(String userInputString) {
-        this.userInputString = userInputString;
+    public ConstraintCell(String stringRepresentation) {
+        this.stringRepresentation = stringRepresentation;
     }
 
     @Override
     public String getAsString() {
-        return userInputString;
+        return stringRepresentation;
     }
 
     @Override
-    public void setFromString(String userInputString) {
-        this.userInputString = userInputString;
+    public void setFromString(String stringRepresentation) {
+        this.stringRepresentation = stringRepresentation;
     }
 
     @Override

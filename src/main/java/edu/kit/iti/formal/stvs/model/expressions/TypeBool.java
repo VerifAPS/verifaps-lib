@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -23,6 +24,11 @@ public class TypeBool implements Type {
 
     @Override
     public String getTypeName() {
+        return null;
+    }
+
+    @Override
+    public Optional<Value> parseLiteral(String literal) {
         return null;
     }
 

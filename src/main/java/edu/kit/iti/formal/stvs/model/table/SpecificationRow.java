@@ -1,6 +1,8 @@
 package edu.kit.iti.formal.stvs.model.table;
 
 
+import edu.kit.iti.formal.stvs.model.common.SpecIOVariable;
+
 import java.util.Map;
 
 /**

@@ -6,6 +6,9 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
  * Created by csicar on 11.01.17.
  */
 public class SpecIOVariable extends IOVariable {
+    private String name;
+    private Type type;
+    private VariableCategory category;
 
     public void setCategory(VariableCategory category) {
 

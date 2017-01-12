@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -13,6 +14,8 @@ public interface Type {
     public boolean checksAgainst(Type other);
 
     public String getTypeName();
+
+    public Optional<Value> parseLiteral(String literal);
 
     public Value generateDefaultValue();
 }

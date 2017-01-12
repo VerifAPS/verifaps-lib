@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.model.expressions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -39,6 +40,11 @@ public class TypeEnum implements Type {
     @Override
     public String getTypeName() {
         return enumTypeName;
+    }
+
+    @Override
+    public Optional<Value> parseLiteral(String literal) {
+        return null;
     }
 
     @Override

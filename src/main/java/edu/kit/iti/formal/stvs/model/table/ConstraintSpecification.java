@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.SpecIOVariable;
@@ -46,6 +47,10 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     }
 
     public void addProblemsListener(Consumer<List<SpecProblem>> listener) {
+
+    }
+
+    public void addEmptyColumn(SpecIOVariable variable) {
 
     }
 

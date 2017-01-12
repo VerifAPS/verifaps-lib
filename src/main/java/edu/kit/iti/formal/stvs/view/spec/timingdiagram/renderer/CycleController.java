@@ -1,9 +1,12 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
+import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
+import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.scene.control.ContextMenu;
 
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -13,11 +16,7 @@ import java.util.function.Function;
 public class CycleController implements Controller {
     private ContextMenu contextMenu;
 
-    /**
-     *
-     * @param getDurationForRow method from HybridSpecification as a function
-     */
-    public CycleController(Function<Integer, ConcreteDuration> getDurationForRow) {
+    public CycleController(HybridSpecification spec,  Selection selection) {
 
     }
 

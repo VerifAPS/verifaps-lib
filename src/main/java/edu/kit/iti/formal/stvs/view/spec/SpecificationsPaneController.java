@@ -12,7 +12,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TabPane;
 
 public class SpecificationsPaneController implements Controller {
-    public SpecificationsPaneController(ObservableList<Type> types, ObservableList<CodeIOVariable> ioVars, ObservableList<HybridSpecification> hybridSpecifications, ObjectProperty<VerificationState> state, GlobalConfig globalConfig) {
+    public SpecificationsPaneController(ObservableList<HybridSpecification> hybridSpecifications, ObjectProperty<VerificationState> state, GlobalConfig globalConfig) {
     }
 
     private GlobalConfig globalConfig;
@@ -22,8 +22,6 @@ public class SpecificationsPaneController implements Controller {
         return null;
     }
 
-    private ObservableList<Type> types;
-    private ObservableList<CodeIOVariable> ioVars;
     private TabPane view;
     private ContextMenu contextMenu;
 

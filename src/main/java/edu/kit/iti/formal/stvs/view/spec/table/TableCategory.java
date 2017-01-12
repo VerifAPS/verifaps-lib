@@ -6,7 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 
-public class CategoryTable extends HBox implements Lockable {
+public class TableCategory extends HBox implements Lockable {
     @Override
     public ObservableList<Node> getChildren() {
         return super.getChildren();

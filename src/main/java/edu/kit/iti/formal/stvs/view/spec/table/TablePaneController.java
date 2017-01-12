@@ -3,7 +3,6 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
@@ -11,18 +10,15 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.table.rowActions.RowEvent;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 
 import java.util.Optional;
 
 public class TablePaneController implements Controller {
     private HybridSpecification spec;
-    private ObservableSet<String> definedVars;
     private DurationsColumnController durationColumn;
     private TablePane table;
     private Selection selection;
-    private InputTableController inputTableController;
+    private TableInputController inputTableController;
     private GlobalConfig globalConfig;
 
     private void onSelectionChange(Selection selection){
@@ -59,7 +55,7 @@ public class TablePaneController implements Controller {
     }
 
 
-    public TablePaneController(HybridSpecification spec, ObservableSet<String> definedVars, ObservableList<Type> types, ObservableList<CodeIOVariable> ioVars, GlobalConfig globalConfig) {
+    public TablePaneController(HybridSpecification spec, GlobalConfig globalConfig) {
         this.globalConfig = globalConfig;
     }
 

@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
+import edu.kit.iti.formal.stvs.model.common.SpecIOVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
 import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
@@ -17,16 +18,23 @@ import java.util.List;
 public class TableColumnController extends ColumnController {
     private IntegerProperty width;
     private ObservableList<Type> types;
-    private ObservableList<String> typeNames;
     private ObservableList<HybridCellController> cells;
-    private ObjectProperty<VariableIdentifier> ioVar;
+    private ObjectProperty<SpecIOVariable> columnName;
     private ObservableList<SpecProblem> problems;
     private TableColumn tableColumn;
     private GlobalConfig globalConfig;
     private ContextMenu contextMenu;
 
-    public TableColumnController(ObservableList<Type> types, ObservableList<CodeIOVariable> ioVars, ObjectProperty<VariableIdentifier> ioVar, ColumnConfig config, GlobalConfig globalConfig) {
-        super(config);
+    /**
+     *
+     * @param types all defined Types extracted from the code
+     * @param codeVars input and output variables exposed by the code
+     * @param columnName the SpecIOVariable that this TableColumn modifies
+     * @param columnConfig
+     * @param globalConfig
+     */
+    public TableColumnController(ObservableList<Type> types, ObservableList<CodeIOVariable> codeVars, ObjectProperty<SpecIOVariable> columnName, ColumnConfig columnConfig, GlobalConfig globalConfig) {
+        super(columnConfig);
         this.globalConfig = globalConfig;
     }
 

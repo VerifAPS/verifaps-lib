@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 public class HybridSpecification extends ConstraintSpecification {
 
 
+    private Optional<ConcreteSpecification> counterExample;
     private Optional<ConcreteSpecification> concreteInstance;
     private List<Consumer<Optional<ConcreteSpecification>>> concreteInstanceChangedListeners;
     private final boolean editable;
@@ -41,11 +42,11 @@ public class HybridSpecification extends ConstraintSpecification {
         this.editable = spec.editable;
     }
 
-    public Optional<ConcreteSpecification> getConcreteInstance() {
-        return concreteInstance;
+    public Optional<ConcreteSpecification> getCounterExample() {
+        return counterExample;
     }
 
-    public void setConcreteInstance(ConcreteSpecification concreteInstance) {
+    public void setCounterExample(ConcreteSpecification counterExample) {
     }
 
     public void removeConcreteInstance() {
@@ -59,6 +60,7 @@ public class HybridSpecification extends ConstraintSpecification {
     public Selection getSelection() {
         return selection;
     }
+
 
     public List<ConcreteCell> getConcreteValuesForConstraint(String column, int row) {
         return null;

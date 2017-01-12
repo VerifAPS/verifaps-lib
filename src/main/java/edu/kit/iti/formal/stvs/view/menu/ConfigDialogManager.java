@@ -7,15 +7,12 @@ import javafx.scene.control.DialogPane;
 /**
  * Created by csicar on 11.01.17.
  */
-public class ConfigDialogController implements Controller {
+public class ConfigDialogManager {
     private GlobalConfig config;
 
-    public ConfigDialogController(GlobalConfig config) {
+    public ConfigDialogManager(GlobalConfig config) {
 
     }
 
-    public DialogPane getView() {
-        return null;
-    }
 
 }

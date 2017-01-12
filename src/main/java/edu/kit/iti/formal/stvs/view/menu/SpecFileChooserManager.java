@@ -9,15 +9,11 @@ import javafx.scene.Node;
 /**
  * Created by csicar on 10.01.17.
  */
-public class SpecFileChooserController implements Controller {
+public class SpecFileChooserManager {
     private GlobalConfig globalConfig;
-    public SpecFileChooserController(ObservableList<HybridSpecification> hybridSpecifications, GlobalConfig globalConfig) {
+    public SpecFileChooserManager(ObservableList<HybridSpecification> hybridSpecifications, GlobalConfig globalConfig) {
 
         this.globalConfig = globalConfig;
     }
 
-    @Override
-    public Node getView() {
-        return null;
-    }
 }
