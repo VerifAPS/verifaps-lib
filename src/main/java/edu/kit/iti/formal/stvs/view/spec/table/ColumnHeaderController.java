@@ -7,10 +7,12 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ContextMenu;
 
 public class ColumnHeaderController implements Controller {
     private ColumnHeader columnHeader;
     private GlobalConfig globalConfig;
+    private ContextMenu contextMenu;
 
     public ColumnHeaderController(ObservableList<Type> types, ObservableList<CodeIOVariable> ioVars, ObjectProperty<VariableIdentifier> ioVar, GlobalConfig globalConfig) {
         this.globalConfig = globalConfig;

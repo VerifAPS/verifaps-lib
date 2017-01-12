@@ -10,6 +10,7 @@ import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ContextMenu;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class TableColumnController extends ColumnController {
     private ObservableList<SpecProblem> problems;
     private TableColumn tableColumn;
     private GlobalConfig globalConfig;
+    private ContextMenu contextMenu;
 
     public TableColumnController(ObservableList<Type> types, ObservableList<CodeIOVariable> ioVars, ObjectProperty<VariableIdentifier> ioVar, ColumnConfig config, GlobalConfig globalConfig) {
         super(config);

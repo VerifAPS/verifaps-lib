@@ -8,6 +8,7 @@ import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TabPane;
 
 public class SpecificationsPaneController implements Controller {
@@ -24,6 +25,7 @@ public class SpecificationsPaneController implements Controller {
     private ObservableList<Type> types;
     private ObservableList<CodeIOVariable> ioVars;
     private TabPane view;
+    private ContextMenu contextMenu;
 
 
     public TabPane getView() {

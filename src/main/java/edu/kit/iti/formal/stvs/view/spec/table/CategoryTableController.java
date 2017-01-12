@@ -13,6 +13,7 @@ import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
+import javafx.scene.control.ContextMenu;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ abstract public class CategoryTableController implements Controller {
     private ObservableList<Type> types;
     private ObservableList<CodeIOVariable> ioVars;
     private CategoryTable categoryTable;
+    private ContextMenu contextMenu;
 
     private ObservableMap<VariableIdentifier, ColumnController> columns;
     private Map<ColumnController, Integer> columnIndices;

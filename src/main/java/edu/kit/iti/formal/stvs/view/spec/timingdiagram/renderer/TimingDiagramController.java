@@ -7,13 +7,17 @@ import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
 import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
+
+import javax.naming.Context;
 
 /**
  * Created by csicar on 09.01.17.
  * Controller for a single TimingDiagramController e.g. for <b>one</b> Variable and over all Timesteps
  */
 public class TimingDiagramController implements Controller {
-    public TimingDiagramView view;
+    private ContextMenu contextMenu;
+    private TimingDiagramView view;
 
     /**
      *TimingDiagramController

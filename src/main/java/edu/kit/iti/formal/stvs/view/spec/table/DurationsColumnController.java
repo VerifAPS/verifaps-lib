@@ -6,6 +6,7 @@ import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ContextMenu;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ public class DurationsColumnController extends ColumnController {
     private ObservableList<HybridCellController> cells;
     private DurationsColumn durationsColumn;
     private GlobalConfig globalConfig;
+    private ContextMenu contextMenu;
 
     public IntegerProperty getWidthProperty() {
         return width;
