@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 /**
  * Created by philipp on 09.01.17.
  */
-public class Specification<C, D> {
+public class SpecificationTable<C, D> {
 
     private List<Consumer<ColumnChangeInfo<C>>> columnsListeners;
     private List<Consumer<RowChangeInfo<C, D>>> rowsListeners;
