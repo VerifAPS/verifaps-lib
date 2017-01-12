@@ -15,8 +15,11 @@ import java.util.List;
  * Created by leonk on 10.01.2017.
  */
 public abstract class ColumnController implements Controller {
+    private ColumnConfig config;
+
     public ColumnController(ColumnConfig config) {
 
+        this.config = config;
     }
 
     public abstract void onProblemsChange(List<SpecProblem> problems);
