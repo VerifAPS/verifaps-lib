@@ -1,9 +1,7 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
-import edu.kit.iti.formal.stvs.logic.specification.VerificationState;
-import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
+import edu.kit.iti.formal.stvs.logic.verification.VerificationState;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.property.ObjectProperty;

@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.logic.specification;
+package edu.kit.iti.formal.stvs.logic.verification;
 
 /**
  * Created by csicar on 11.01.17.
