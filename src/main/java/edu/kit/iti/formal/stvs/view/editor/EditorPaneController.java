@@ -31,7 +31,7 @@ public class EditorPaneController implements Controller {
 
     }
 
-    private void handleParsedCodeFoldingBlocks(List<FoldableCodeBlock>){
+    private void handleParsedCodeFoldingBlocks(List<FoldableCodeBlock> foldableCodeBlocks){
 
     }
 
