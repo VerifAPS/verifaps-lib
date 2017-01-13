@@ -1,10 +1,9 @@
 package edu.kit.iti.formal.stvs.model.verification;
 
-import edu.kit.iti.formal.stvs.logic.specification.VerificationState;
+import edu.kit.iti.formal.stvs.logic.verification.VerificationState;
 import edu.kit.iti.formal.stvs.logic.verification.VerificationEngine;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
-import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 
 /**
  * Created by csicar on 09.01.17.
