@@ -13,13 +13,13 @@ import javafx.scene.control.ContextMenu;
  * Controller for the set of either InputVariables TimingDiagramCollectionController or OutputVariables TimingDiagramCollectionController
  * Created by csicar on 09.01.17.
  */
-public abstract class CategoryTimingDiagramCollection implements Controller {
+public abstract class CategoryTimingDiagramCollectionController implements Controller {
     private CategoryTimingDiagramCollectionView view;
     private HybridSpecification spec;
     private ContextMenu contextMenu;
     private ObservableList<SpecIOVariable> definedVariables;
 
-    public CategoryTimingDiagramCollection(HybridSpecification spec, ObservableList<SpecIOVariable> definedVariables, GlobalConfig config, Selection selection) {
+    public CategoryTimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIOVariable> definedVariables, GlobalConfig config, Selection selection) {
 
     }
 

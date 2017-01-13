@@ -20,6 +20,10 @@ public class VariableCollectionController implements Controller{
         this.freeVariableSet = freeVariableSet;
     }
 
+    private void addFreeVariable() {
+
+    }
+
     @Override
     public VariableCollection getView() {
         return view;
