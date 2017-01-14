@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.kit.edu/StVerificationStudio" xmlns:tns="http://www.kit.edu/StVerificationStudio" elementFormDefault="qualified">
+  <complexType name="Config">
+    <sequence>
+      <element name="general">
+        <complexType>
+          <sequence>
+            <element name="uiLanguage" type="string" minOccurs="1" maxOccurs="1"></element>
+            <element name="windowSize" minOccurs="1" maxOccurs="1">
+              <complexType>
+                <sequence>
+                  <element name="width" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
+                  <element name="height" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
+                </sequence>
+              </complexType>
+            </element>
+            <element name="verificationTimeout" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
+            <element name="simulationTimeout" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
+            <element name="undoDepth" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
+          </sequence>
+        </complexType>
+      </element>
+      <element name="editor">
+        <complexType>
+          <sequence>
+            <element name="showLineNumbers" type="boolean" minOccurs="1" maxOccurs="1"></element>
+            <element name="fontFamily" type="string" minOccurs="0" maxOccurs="1"></element>
+            <element name="fontSize" type="positiveInteger" minOccurs="0" maxOccurs="1"></element>
+          </sequence>
+        </complexType>
+      </element>
+    </sequence>
+  </complexType>
+
+  <element name="config" type="tns:Config"></element>
+</schema>

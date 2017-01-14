@@ -1,9 +1,6 @@
-.idea
-/.gradle
-build/*
-
-   Latex
-===========
+doc/entwurf/Entwurf.pdf
+doc/pflichtenheft/Pflichtenheft.pdf
+buildtmp
 
 
 ## Core latex/pdflatex auxiliary files:
@@ -153,3 +150,10 @@ _minted*
 
 # scrwfile
 *.wrt
+/bin/
+=======
+.*
+/.idea/
+/out/
+*.iml
+/build/

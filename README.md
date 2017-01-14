@@ -1,1 +1,0 @@
-# Structured Text Verification Studio
