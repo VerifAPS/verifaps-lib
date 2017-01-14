@@ -8,7 +8,7 @@ import org.w3c.dom.Node;
  * Created by bal on 11.01.17.
  */
 public abstract class XMLExporter<F> implements Exporter<F> {
-    public void writeToFile(Node node) {
+    public void writeToFile(Node node, String filename) {
 
     }
 

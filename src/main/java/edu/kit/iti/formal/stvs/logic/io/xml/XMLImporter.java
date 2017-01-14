@@ -13,7 +13,7 @@ public abstract class XMLImporter<T> implements Importer<T> {
         return null;
     }
 
-    public T doImportFromXMLNode(InputStream inputStream) {
+    public T doImportFromXMLNode(Node node) {
         return null;
     }
 }
