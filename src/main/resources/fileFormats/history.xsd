@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.kit.edu/StVerificationStudio" xmlns:tns="http://www.kit.edu/StVerificationStudio" elementFormDefault="qualified">
-    <complexType name="History">
-        <sequence>
-            <element name="code" type="string" minOccurs="0" maxOccurs="unbounded"></element>
-            <element name="spec" type="string" minOccurs="0" maxOccurs="unbounded"></element>
-        </sequence>
-    </complexType>
+  <complexType name="History">
+    <sequence>
+      <element name="code" type="string" minOccurs="0" maxOccurs="unbounded"></element>
+      <element name="spec" type="string" minOccurs="0" maxOccurs="unbounded"></element>
+    </sequence>
+  </complexType>
 </schema>
