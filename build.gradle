@@ -17,10 +17,6 @@ repositories {
     mavenCentral()
 }
 
-configurations {
-    umlDoclet
-}
-
 // In this section you declare the dependencies for your production and test code
 dependencies {
     // The production code uses the SLF4J logging API at compile time
@@ -37,15 +33,4 @@ dependencies {
     // testCompile dependency to testCompile 'org.testng:testng:6.8.1' and add
     // 'test.useTestNG()' to your build script.
     testCompile 'junit:junit:4.12'
-    umlDoclet "nl.talsmasoftware:umldoclet:1.0.8"
-}
-
-task generatePUML(type: Javadoc) {
-    source = sourceSets.main.allJava
-    options.docletpath = configurations.umlDoclet.files.asType(List)
-    options.doclet = "nl.talsmasoftware.umldoclet.UMLDoclet"
-    options.addStringOption "umlBasePath", "build/puml"
-    options.addStringOption "umlIncludePrivateFields", "true"
-    options.addStringOption "umlIncludeMethodParamNames", "true"
-
 }
