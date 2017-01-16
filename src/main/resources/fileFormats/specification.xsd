@@ -10,7 +10,7 @@
         </annotation>
         <complexContent>
             <sequence>
-                <element name="iovariables" minOccurs="0" maxOccurs="1">
+                <element name="ioVariables" minOccurs="0" maxOccurs="1">
                     <complexType>
                         <sequence>
                             <element name="variableIdentifier" minOccurs="0" maxOccurs="unbounded">
@@ -100,5 +100,5 @@
         </complexContent>
     </complexType>
 
-    <element name="specification" type="tns:Specification"></element>
+    <element name="specification" type="tns:SpecificationTable"></element>
 </schema>

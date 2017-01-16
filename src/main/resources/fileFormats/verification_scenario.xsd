@@ -6,8 +6,8 @@
     <complexType>
       <sequence>
         <element name="code" type="tns:Code" minOccurs="1" maxOccurs="1"></element>
-        <element name="spec" type="tns:Specification" minOccurs="1" maxOccurs="1"></element>
-        <element name="testResult" type="tns:Specification" minOccurs="1" maxOccurs="1"></element>
+        <element name="spec" type="tns:SpecificationTable" minOccurs="1" maxOccurs="1"></element>
+        <element name="testResult" type="tns:SpecificationTable" minOccurs="1" maxOccurs="1"></element>
       </sequence>
     </complexType>
   </element>
