@@ -1,7 +1,10 @@
-doc/entwurf/Entwurf.pdf
-doc/pflichtenheft/Pflichtenheft.pdf
-buildtmp
-
+## Manual STVS gitignore rules
+/bin/
+.*
+/.idea/
+/out/
+*.iml
+/build/
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
@@ -150,10 +153,3 @@ _minted*
 
 # scrwfile
 *.wrt
-/bin/
-=======
-.*
-/.idea/
-/out/
-*.iml
-/build/
