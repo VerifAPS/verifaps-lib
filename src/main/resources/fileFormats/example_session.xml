@@ -1,6 +1,6 @@
 <?xml version="1.0" standalone="no"?>
 
-<session xmlns="http://www.kit.edu/StVerificationStudio"
+<session xmlns=xmlns:tns="http://formal.iti.kit.edu/exteta-1.0">
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://www.kit.edu/StVerificationStudio file:///home/bal/Projects/kit/pse/stverificationstudio/doc/entwurf/fileFormats/session.xsd">
  <code>

@@ -16,7 +16,6 @@
             </element>
             <element name="verificationTimeout" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
             <element name="simulationTimeout" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
-            <element name="undoDepth" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
           </sequence>
         </complexType>
       </element>
