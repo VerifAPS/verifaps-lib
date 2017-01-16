@@ -1,4 +1,5 @@
-package edu.kit.iti.formal.stvs;/**
+package edu.kit.iti.formal.stvs;
+/**
  * Created by csicar on 09.01.17.
  */
 
@@ -8,7 +9,8 @@ import javafx.stage.Stage;
 public class STVSApplication extends Application {
 
     public static void main(String[] args) {
-        launch(args);
+        System.out.println("I'm alive.");
+        // TODO: Implement GUI: launch(args);
     }
 
     @Override

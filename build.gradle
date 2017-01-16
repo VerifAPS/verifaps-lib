@@ -29,7 +29,7 @@ dependencies {
     compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.6.10'
     compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.6'
 
-    testCompile "org.testfx:testfx-junit:4.0.+"
+    testCompile "junit:junit:4.12"
 }
 
 jar {
