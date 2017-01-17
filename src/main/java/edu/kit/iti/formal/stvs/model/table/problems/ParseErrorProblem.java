@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table.problems;
 
-import edu.kit.iti.formal.stvs.model.common.SpecIOVariable;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 
 import java.util.function.Function;
 
@@ -10,10 +10,10 @@ import java.util.function.Function;
 public class ParseErrorProblem extends SpecProblem {
 
     private final String errorMessage;
-    private final SpecIOVariable ioVariable;
+    private final SpecIoVariable ioVariable;
     private final int row;
 
-    public ParseErrorProblem(String errorMessage, SpecIOVariable column, int row) {
+    public ParseErrorProblem(String errorMessage, SpecIoVariable column, int row) {
         this.errorMessage = errorMessage;
         this.ioVariable = column;
         this.row = row;
@@ -35,7 +35,7 @@ public class ParseErrorProblem extends SpecProblem {
         return null;
     }
 
-    public SpecIOVariable getIOVariable() {
+    public SpecIoVariable getIOVariable() {
         return ioVariable;
     }
 

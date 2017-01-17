@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
-import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
@@ -59,7 +59,7 @@ public class TablePaneController implements Controller {
         this.globalConfig = globalConfig;
     }
 
-    public void addIOVariable(CodeIOVariable ioVar) {
+    public void addIOVariable(CodeIoVariable ioVar) {
     }
 
     public TablePane getView() {

@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.view;
 
 import edu.kit.iti.formal.stvs.model.STVSRootModel;
-import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import javafx.collections.ObservableList;
 
@@ -15,7 +15,7 @@ public class STVSRootController implements Controller {
     private STVSRootView view;
     private STVSRootModel STVSRootModel;
     private ObservableList<Type> types;
-    private ObservableList<CodeIOVariable> ioVars;
+    private ObservableList<CodeIoVariable> ioVars;
     /**
      * Used to sort Types (Enums should be at the bottom)
      */
@@ -25,7 +25,7 @@ public class STVSRootController implements Controller {
         return view;
     }
 
-    private void onIOVariablesChange(List<CodeIOVariable> ioVars){
+    private void onIOVariablesChange(List<CodeIoVariable> ioVars){
 
     }
     private void onTypesChange(List<Type> types){

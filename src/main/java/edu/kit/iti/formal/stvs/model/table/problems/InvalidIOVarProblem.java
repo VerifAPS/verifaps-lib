@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table.problems;
 
-import edu.kit.iti.formal.stvs.model.common.SpecIOVariable;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 
 import java.util.function.Function;
 
@@ -14,9 +14,9 @@ public class InvalidIOVarProblem extends SpecProblem {
         INVALID_TYPE
     }
 
-    private SpecIOVariable column;
+    private SpecIoVariable column;
 
-    public InvalidIOVarProblem(SpecIOVariable column) {
+    public InvalidIOVarProblem(SpecIoVariable column) {
         this.column = column;
     }
 

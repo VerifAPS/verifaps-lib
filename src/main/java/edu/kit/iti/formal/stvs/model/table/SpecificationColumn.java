@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.stvs.model.common.SpecIOVariable;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
 
 import java.util.Optional;
@@ -14,7 +14,7 @@ public class SpecificationColumn<C> {
         return null;
     }
 
-    public SpecIOVariable getSpecIOVariable() {
+    public SpecIoVariable getSpecIOVariable() {
         return null;
     }
 

@@ -26,7 +26,7 @@ abstract public class TableCategoryController implements Controller {
 
 
     /**
-     * Gets called if button for new CodeIOVariable is pressed.
+     * Gets called if button for new CodeIoVariable is pressed.
      * Creates IOVariableNamePopupController.
      */
     private void onNewIOVariableButton(ActionEvent e) {
@@ -55,7 +55,7 @@ abstract public class TableCategoryController implements Controller {
 
 
     /**
-     * Adds a column of an CodeIOVariable that exists in the code or is newly defined.
+     * Adds a column of an CodeIoVariable that exists in the code or is newly defined.
      * Automatically adds view listeners for drag detected, mouse moved and drag done to column.
      * Automatically adds model listener to spec.rowsListeners to add remove cells on row change.
      *

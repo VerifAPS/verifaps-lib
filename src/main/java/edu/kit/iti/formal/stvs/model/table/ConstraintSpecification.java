@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
-import edu.kit.iti.formal.stvs.model.common.SpecIOVariable;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
 import edu.kit.iti.formal.stvs.model.expressions.ExpressionParser;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
@@ -24,8 +24,8 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     private List<Consumer<List<SpecProblem>>> problemsListeners;
 
     private Set<Type> typeContext;
-    private Set<CodeIOVariable> codeIOVariables;
-    private Set<SpecIOVariable> specIOVariables;
+    private Set<CodeIoVariable> codeIoVariables;
+    private Set<SpecIoVariable> specIOVariables;
     private FreeVariableSet freeVariableSet;
     private List<RowComment> rowComments;
     private Optional<ValidSpecification> validSpecification;
@@ -39,7 +39,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
     }
 
-    public ConstraintSpecification(Set<Type> typeContext, Set<CodeIOVariable> ioVariables, FreeVariableSet freeVariableSet) {
+    public ConstraintSpecification(Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet) {
         this.typeContext = typeContext;
         this.freeVariableSet = freeVariableSet;
         // TODO
@@ -49,11 +49,11 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
     }
 
-    public void addEmptyColumn(SpecIOVariable variable) {
+    public void addEmptyColumn(SpecIoVariable variable) {
 
     }
 
-    public SpecIOVariable getSpecIOVariableForColumn(String column) {
+    public SpecIoVariable getSpecIOVariableForColumn(String column) {
         return null;
     }
 
