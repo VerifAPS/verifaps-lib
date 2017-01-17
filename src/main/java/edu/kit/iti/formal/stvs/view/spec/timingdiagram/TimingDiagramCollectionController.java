@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
-import edu.kit.iti.formal.stvs.model.common.SpecIOVariable;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
@@ -14,7 +14,7 @@ import javafx.collections.ObservableList;
 public class TimingDiagramCollectionController implements Controller {
     private HybridSpecification spec;
     private GlobalConfig globalConfig;
-    private ObservableList<SpecIOVariable> definedVariables;
+    private ObservableList<SpecIoVariable> definedVariables;
 
     /**
      * creates VariableTimingDiagram for each given Variable
@@ -22,7 +22,7 @@ public class TimingDiagramCollectionController implements Controller {
      * @param spec
      * @param globalConfig
      */
-    public TimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIOVariable> definedVariables, GlobalConfig globalConfig) {
+    public TimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIoVariable> definedVariables, GlobalConfig globalConfig) {
 
         this.globalConfig = globalConfig;
     }

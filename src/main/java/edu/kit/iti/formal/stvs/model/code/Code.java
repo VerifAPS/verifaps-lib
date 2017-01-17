@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.model.code;
 
-import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  * Created by csicar on 09.01.17.
  */
 public class Code {
-    private List<Consumer<List<CodeIOVariable>>> ioVariableListeners;
+    private List<Consumer<List<CodeIoVariable>>> ioVariableListeners;
     private List<Consumer<ParsedCode>> parsedCodeListeners;
     private List<Consumer<List<RecognitionException>>> syntaxErrorsListeners;
     private List<Consumer<List<Token>>> lexedCodeListeners;

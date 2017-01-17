@@ -1,8 +1,7 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
 import edu.kit.iti.formal.stvs.model.common.Selection;
-import edu.kit.iti.formal.stvs.model.common.SpecIOVariable;
-import edu.kit.iti.formal.stvs.model.common.VariableIdentifier;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
@@ -17,9 +16,9 @@ public abstract class CategoryTimingDiagramCollectionController implements Contr
     private CategoryTimingDiagramCollectionView view;
     private HybridSpecification spec;
     private ContextMenu contextMenu;
-    private ObservableList<SpecIOVariable> definedVariables;
+    private ObservableList<SpecIoVariable> definedVariables;
 
-    public CategoryTimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIOVariable> definedVariables, GlobalConfig config, Selection selection) {
+    public CategoryTimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIoVariable> definedVariables, GlobalConfig config, Selection selection) {
 
     }
 

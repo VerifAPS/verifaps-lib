@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
-import edu.kit.iti.formal.stvs.model.common.CodeIOVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 
@@ -27,7 +27,7 @@ public class HybridSpecification extends ConstraintSpecification {
      */
     private Selection selection;
 
-    public HybridSpecification(Set<Type> typeContext, Set<CodeIOVariable> ioVariables, FreeVariableSet freeVariableSet, boolean editable) {
+    public HybridSpecification(Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet, boolean editable) {
         super(typeContext, ioVariables, freeVariableSet);
         this.editable = editable;
     }

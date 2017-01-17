@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table.problems;
 
-import edu.kit.iti.formal.stvs.model.common.SpecIOVariable;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 
 import java.util.List;
 import java.util.function.Function;
@@ -11,9 +11,9 @@ import java.util.function.Function;
 public class CyclicDependencyProblem extends SpecProblem {
 
     private final int row;
-    private final List<SpecIOVariable> cycle;
+    private final List<SpecIoVariable> cycle;
 
-    public CyclicDependencyProblem(int row, List<SpecIOVariable> cycle) {
+    public CyclicDependencyProblem(int row, List<SpecIoVariable> cycle) {
         this.row = row;
         this.cycle = cycle;
     }
@@ -37,7 +37,7 @@ public class CyclicDependencyProblem extends SpecProblem {
         return row;
     }
 
-    public List<SpecIOVariable> getCycle() {
+    public List<SpecIoVariable> getCycle() {
         return cycle;
     }
 }
