@@ -73,11 +73,6 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
     }
 
     @Override
-    public Expression visitChunk(CellExpressionParser.ChunkContext ctx) {
-        return visitChildren(ctx);
-    }
-
-    @Override
     public Expression visitDontcare(CellExpressionParser.DontcareContext ctx) {
         return new LiteralExpr(ValueBool.TRUE);
     }
