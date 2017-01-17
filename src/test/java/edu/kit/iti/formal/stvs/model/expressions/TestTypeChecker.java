@@ -29,17 +29,17 @@ public class TestTypeChecker {
 		TypeEnum colorsEnum = TypeFactory.enumOfName("Colors", "Red", "Blue");
 
 		Expression redEqualsBlue =
-				eq(
+				equal(
 						literal(colorsEnum.valueOf("Red")),
 						literal(colorsEnum.valueOf("Blue")));
 
 		Expression xEqualsThree =
-				eq(
+				equal(
 						var("X"),
 						literal(3));
 
 		Expression sumIsEleven =
-				eq(
+				equal(
 						plus(literal(5), var("X")),
 						literal(8));
 

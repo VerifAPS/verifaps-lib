@@ -1,17 +1,14 @@
-package edu.kit.iti.formal.stvs.model.expressions.parser;// Generated from /home/philipp/program/PSE/stverificationstudio/CellExpression.g4 by ANTLR 4.6
+package edu.kit.iti.formal.stvs.model.expressions.parser;// Generated from /home/philipp/program/PSE/stverificationstudio/antlr/CellExpression.g4 by ANTLR 4.6
 
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import org.antlr.v4.runtime.tree.TerminalNode;
-
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.tree.*;
 import java.util.List;
+import java.util.Iterator;
+import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class CellExpressionParser extends Parser {
@@ -471,6 +468,7 @@ public class CellExpressionParser extends Parser {
 	}
 
 	public static class Relational_operatorContext extends ParserRuleContext {
+		public Token relOp;
 		public TerminalNode GREATER_THAN() { return getToken(CellExpressionParser.GREATER_THAN, 0); }
 		public TerminalNode GREATER_EQUALS() { return getToken(CellExpressionParser.GREATER_EQUALS, 0); }
 		public TerminalNode LESS_THAN() { return getToken(CellExpressionParser.LESS_THAN, 0); }
@@ -504,9 +502,10 @@ public class CellExpressionParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(51);
+			((Relational_operatorContext)_localctx).relOp = _input.LT(1);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << EQUALS) | (1L << GREATER_EQUALS) | (1L << GREATER_THAN) | (1L << LESS_EQUALS) | (1L << LESS_THAN) | (1L << NOT_EQUALS))) != 0)) ) {
-			_errHandler.recoverInline(this);
+				((Relational_operatorContext)_localctx).relOp = (Token)_errHandler.recoverInline(this);
 			}
 			else {
 				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;

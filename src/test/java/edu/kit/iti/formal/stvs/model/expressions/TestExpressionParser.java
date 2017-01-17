@@ -26,47 +26,51 @@ public class TestExpressionParser {
         variableContext.put("constraintVar", TypeInt.INT);
     }
 
+    private Expression assertParseExpressionEqual(String expr, Expression expected) {
+        Expression parsedExpr = parser.parseExpression(expr);
+        System.out.println(expr + " <means> " + parsedExpr);
+        assertEquals(
+                expected,
+                parsedExpr
+        );
+        return parsedExpr;
+    }
+
     @Test
     public void testDontcare() throws RecognitionException {
         // - means TRUE
-        Expression parsedExpr = parser.parseExpression("-");
-        System.out.println("- <means> " + parsedExpr);
-        assertEquals(
-                literal(true),
-                parsedExpr
-        );
+        assertParseExpressionEqual("-", literal(true));
     }
 
     @Test
     public void testBoolConstant() throws RecognitionException {
         // TRUE means X = TRUE
-        Expression parsedExpr = parser.parseExpression("TRUE");
-        System.out.println("TRUE <means> " + parsedExpr);
-        assertEquals(
-                eq(var(cellName), literal(true)),
-                parsedExpr
-        );
+        assertParseExpressionEqual("TRUE", equal(var(cellName), literal(true)));
     }
 
     @Test
     public void testIntConstant() throws RecognitionException {
         // 1 means X = 1
-        Expression parsedExpr = parser.parseExpression("1");
-        System.out.println("1 <means> " + parsedExpr);
-        assertEquals(
-                eq(var(cellName), literal(1)),
-                parsedExpr
-        );
+        assertParseExpressionEqual("1", equal(var(cellName), literal(1)));
     }
 
     @Test
     public void testOnesided() throws RecognitionException {
+        // < 2 means X < 2
+        assertParseExpressionEqual("< 2", lessThan(var(cellName), literal(2)));
+    }
+
+    @Test
+    public void testPlus() throws RecognitionException {
         // = 2+2 means X = 2 + 2
-        Expression parsedExpr = parser.parseExpression("= 2+2");
-        System.out.println("= 2+2 <means> " + parsedExpr);
-        assertEquals(
-                eq(var(cellName), plus(literal(2), literal(2))),
-                parsedExpr
+        assertParseExpressionEqual("= 2+2",
+                equal(var(cellName), plus(literal(2), literal(2)))
         );
     }
+
+    // TODO: Write Implementations for not-to-be-supported grammar rules, like
+    // - stvs functions
+    // - 'guarded commands' i.e. ifs
+    // TODO: Implement intervals!
+
 }

@@ -20,10 +20,14 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
     private Map<String, Type> variableContext;
     private String cellName;
 
+    private Expression cellAsVariable;
+
     public ExpressionParser(String cellName, Set<Type> typeContext, Map<String, Type> variableContext) {
         this.typeContext = typeContext;
         this.variableContext = variableContext;
         this.cellName = cellName;
+
+        this.cellAsVariable = new VariableExpr(cellName);
     }
 
     public Expression parseExpression(String expressionAsString) throws RecognitionException {
@@ -79,27 +83,52 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 
     @Override
     public Expression visitConstant(CellExpressionParser.ConstantContext ctx) {
-        Value value = null;
+        Expression literalExpr = new LiteralExpr(valueFromConstantToken(ctx));
+        System.out.println(ctx.depth());
+        return new FunctionExpr(FunctionExpr.Operation.EQUALS,
+                Arrays.asList(cellAsVariable, literalExpr));
+    }
 
+    private Value valueFromConstantToken(CellExpressionParser.ConstantContext ctx) {
         // I have to trust ANTLR to not have any other values here... :/
         switch (ctx.a.getType()) {
-            case CellExpressionLexer.INTEGER:
-                value = new ValueInt(Integer.parseInt(ctx.getText()));
-                break;
-            case CellExpressionLexer.T:
-                value = ValueBool.TRUE;
-                break;
-            case CellExpressionLexer.F:
-                value = ValueBool.FALSE;
-                break;
+            case CellExpressionLexer.INTEGER: return new ValueInt(Integer.parseInt(ctx.getText()));
+            case CellExpressionLexer.T: return ValueBool.TRUE;
+            case CellExpressionLexer.F: return ValueBool.FALSE;
+            default: return null;
         }
-        return new FunctionExpr(FunctionExpr.Operation.EQUALS,
-                Arrays.asList(new VariableExpr(cellName), new LiteralExpr(value)));
     }
 
     @Override
     public Expression visitSinglesided(CellExpressionParser.SinglesidedContext ctx) {
-        // TODO: Implement
-        return null;
+        FunctionExpr.Operation op = operationFromRelOpToken(ctx);
+        Expression rightSide = ctx.expr().accept(this);
+        return new FunctionExpr(op,
+                Arrays.asList(cellAsVariable, rightSide));
+    }
+
+    private FunctionExpr.Operation operationFromRelOpToken(CellExpressionParser.SinglesidedContext ctx) {
+        switch (ctx.op.relOp.getType()) {
+            case CellExpressionLexer.EQUALS: return FunctionExpr.Operation.EQUALS;
+            case CellExpressionLexer.NOT_EQUALS: return FunctionExpr.Operation.NOT_EQUALS;
+            case CellExpressionLexer.GREATER_THAN: return FunctionExpr.Operation.GREATER_THAN;
+            case CellExpressionLexer.GREATER_EQUALS: return FunctionExpr.Operation.GREATER_EQUALS;
+            case CellExpressionLexer.LESS_THAN: return FunctionExpr.Operation.LESS_THAN;
+            case CellExpressionLexer.LESS_EQUALS: return FunctionExpr.Operation.LESS_EQUALS;
+            default: return null;
+        }
+    }
+
+    @Override
+    public Expression visitPlus(CellExpressionParser.PlusContext ctx) {
+        Expression left = ctx.left.accept(this);
+        Expression right = ctx.right.accept(this);
+        return new FunctionExpr(FunctionExpr.Operation.PLUS,
+                Arrays.asList(left, right));
+    }
+
+    @Override
+    public Expression visitBconstant(CellExpressionParser.BconstantContext ctx) {
+        return new LiteralExpr(valueFromConstantToken(ctx.constant()));
     }
 }

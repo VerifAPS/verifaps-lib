@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.model.expressions.parser;// Generated from /home/philipp/program/PSE/stverificationstudio/CellExpression.g4 by ANTLR 4.6
+package edu.kit.iti.formal.stvs.model.expressions.parser;// Generated from /home/philipp/program/PSE/stverificationstudio/antlr/CellExpression.g4 by ANTLR 4.6
 
 
 import org.antlr.v4.runtime.Lexer;

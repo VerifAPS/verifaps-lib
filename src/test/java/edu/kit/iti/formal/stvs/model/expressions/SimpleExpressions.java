@@ -18,8 +18,12 @@ public final class SimpleExpressions {
         return new FunctionExpr(FunctionExpr.Operation.PLUS, Arrays.asList(e1, e2));
     }
 
-    public static Expression eq(Expression e1, Expression e2) {
+    public static Expression equal(Expression e1, Expression e2) {
         return new FunctionExpr(FunctionExpr.Operation.EQUALS, Arrays.asList(e1, e2));
+    }
+
+    public static Expression lessThan(Expression e1, Expression e2) {
+        return new FunctionExpr(FunctionExpr.Operation.LESS_THAN, Arrays.asList(e1, e2));
     }
 
     public static Expression var(String name) {

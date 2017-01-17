@@ -22,9 +22,14 @@ constant : a=(INTEGER | T | F);
 singlesided : op=relational_operator expr;
 interval : 	LBRACKET lower=expr COMMA upper=expr RBRACKET ;
 
-relational_operator: 
-	  GREATER_THAN | GREATER_EQUALS | LESS_THAN 
-	| LESS_EQUALS  | EQUALS         | NOT_EQUALS
+relational_operator:
+	relOp=(
+	  GREATER_THAN
+	| GREATER_EQUALS
+	| LESS_THAN
+	| LESS_EQUALS
+	| EQUALS
+	| NOT_EQUALS)
 ;
 
 // 2+(26+22)+A
