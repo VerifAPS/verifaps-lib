@@ -5,9 +5,16 @@ import java.util.function.IntFunction;
 
 public class ValueBool implements Value {
 
+    public static final ValueBool TRUE = new ValueBool(true);
+    public static final ValueBool FALSE = new ValueBool(false);
+
+    public static ValueBool of(boolean bool) {
+        return bool ? TRUE : FALSE;
+    }
+
     private final boolean value;
 
-    public ValueBool(boolean value) {
+    private ValueBool(boolean value) {
         this.value = value;
     }
 
@@ -19,9 +26,17 @@ public class ValueBool implements Value {
         return matchBoolean.apply(value);
     }
 
+    public boolean getValue() {
+        return value;
+    }
+
     @Override
     public Type getType() {
-        return TypeFactory.BOOL;
+        return TypeBool.BOOL;
+    }
+
+    public String toString() {
+        return "ValueBool(" + value + ")";
     }
 
 }

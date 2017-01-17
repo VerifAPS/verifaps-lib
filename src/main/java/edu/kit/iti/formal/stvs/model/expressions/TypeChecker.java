@@ -3,6 +3,8 @@ package edu.kit.iti.formal.stvs.model.expressions;
 import java.util.List;
 import java.util.Map;
 
+import static edu.kit.iti.formal.stvs.model.expressions.FunctionExpr.Operation.*;
+
 public class TypeChecker implements ExpressionVisitor<Type> {
 
     private static class InternalTypeCheckException extends RuntimeException {
@@ -44,16 +46,23 @@ public class TypeChecker implements ExpressionVisitor<Type> {
             case MINUS:
             case MULTIPLICATION:
             case DIVISION:
-                ensureArgsOfType(functionExpr, TypeFactory.INT, TypeFactory.INT);
-                return TypeFactory.INT;
+                ensureArgsOfType(functionExpr, TypeInt.INT, TypeInt.INT);
+                return TypeInt.INT;
             case AND:
             case OR:
-                ensureArgsOfType(functionExpr, TypeFactory.BOOL, TypeFactory.BOOL);
-                return TypeFactory.BOOL;
+                ensureArgsOfType(functionExpr, TypeBool.BOOL, TypeBool.BOOL);
+                return TypeBool.BOOL;
             case EQUALS:
+            case NOT_EQUALS:
                 ensureArgNum(functionExpr, 2);
                 ensureEqualTypes(functionExpr);
-                return TypeFactory.BOOL;
+                return TypeBool.BOOL;
+            case GREATER_THAN:
+            case GREATER_EQUALS:
+            case LESS_THAN:
+            case LESS_EQUALS:
+                ensureArgsOfType(functionExpr, TypeInt.INT, TypeInt.INT);
+                return TypeBool.BOOL;
             default:
                 throw new InternalTypeCheckException(
                         functionExpr,

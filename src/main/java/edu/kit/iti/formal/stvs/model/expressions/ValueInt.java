@@ -19,13 +19,26 @@ public class ValueInt implements Value {
         return matchInt.apply(value);
     }
 
+    public int getValue() {
+        return value;
+    }
+
+    public boolean equals(ValueInt other) {
+        return other != null && value == other.value;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof ValueInt) && this.equals((ValueInt) other);
+    }
+
     public String toString() {
-        return "IntValue(" + value + ")";
+        return "ValueInt(" + value + ")";
     }
 
     @Override
     public Type getType() {
-        return TypeFactory.INT;
+        return TypeInt.INT;
     }
 
 }

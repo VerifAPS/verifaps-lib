@@ -21,6 +21,15 @@ public class ValueEnum implements Value {
         return null;
     }
 
+    public boolean equals(ValueEnum other) {
+        return other != null && enumValue.equals(other.enumValue) && enumType.equals(other.enumType);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof ValueEnum) && this.equals((ValueEnum) other);
+    }
+
     @Override
     public Type getType() {
         return enumType;
@@ -28,6 +37,10 @@ public class ValueEnum implements Value {
 
     public String getEnumValue() {
         return enumValue;
+    }
+
+    public String toString() {
+        return "ValueEnum(" + enumValue + ")";
     }
 
 }

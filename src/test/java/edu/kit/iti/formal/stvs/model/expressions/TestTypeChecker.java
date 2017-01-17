@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.*;
+
 public class TestTypeChecker {
 
 	private final TypeChecker checker;
@@ -14,7 +16,7 @@ public class TestTypeChecker {
 
 	public TestTypeChecker() {
 		varTypeCtx = new HashMap<>();
-		varTypeCtx.put("X", TypeFactory.INT);
+		varTypeCtx.put("X", TypeInt.INT);
 
 		checker = new TypeChecker(varTypeCtx);
 	}
@@ -47,7 +49,7 @@ public class TestTypeChecker {
 				and(redEqualsBlue, and(xEqualsThree, and(sumIsEleven, trueExpr)));
 
 		Type type = checker.typeCheck(validExpression);
-        Assert.assertEquals(type, TypeFactory.BOOL);
+        Assert.assertEquals(type, TypeBool.BOOL);
 	}
 
 	@Test(expected = TypeCheckException.class)
@@ -67,33 +69,4 @@ public class TestTypeChecker {
                                 literal(7)));
         checker.typeCheck(invalidExpression);
     }
-	
-	public static Expression and(Expression e1, Expression e2) {
-		return new FunctionExpr(FunctionExpr.Operation.AND, Arrays.asList(e1, e2));
-	}
-	
-	public static Expression plus(Expression e1, Expression e2) {
-		return new FunctionExpr(FunctionExpr.Operation.PLUS, Arrays.asList(e1, e2));
-	}
-	
-	public static Expression eq(Expression e1, Expression e2) {
-		return new FunctionExpr(FunctionExpr.Operation.EQUALS, Arrays.asList(e1, e2));
-	}
-	
-	public static Expression var(String name) {
-		return new VariableExpr(name);
-	}
-	
-	public static Expression literal(int i) {
-		return new LiteralExpr(new ValueInt(i));
-	}
-	
-	public static Expression literal(boolean b) {
-		return new LiteralExpr(new ValueBool(b));
-	}
-
-	public static Expression literal(ValueEnum e) {
-	    return new LiteralExpr(e);
-    }
-
 }

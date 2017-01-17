@@ -8,6 +8,11 @@ public class FunctionExpr extends Expression {
         AND,
         OR,
         EQUALS,
+        GREATER_THAN,
+        GREATER_EQUALS,
+        LESS_THAN,
+        LESS_EQUALS,
+        NOT_EQUALS,
         PLUS,
         MINUS,
         MULTIPLICATION,
@@ -33,6 +38,20 @@ public class FunctionExpr extends Expression {
 
     public List<Expression> getArguments() {
         return arguments;
+    }
+
+    public boolean equals(FunctionExpr expr) {
+        return getOperation().equals(expr.getOperation())
+                && getArguments().equals(expr.getArguments());
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof FunctionExpr) && this.equals((FunctionExpr) other);
+    }
+
+    public String toString() {
+        return "FunctionExpr(" + operation + ", " + arguments + ")";
     }
 
 }

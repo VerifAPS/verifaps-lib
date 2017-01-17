@@ -44,14 +44,18 @@ public class TypeEnum implements Type {
 
     @Override
     public Optional<Value> parseLiteral(String literal) {
-        return null;
+        return Optional.ofNullable(valueMap.get(literal));
     }
 
     @Override
     public Value generateDefaultValue() {
-        return null;
+        // return first element in the values array
+        // TODO: Handle Enum without any values?
+        // Could such an enum even be represented in ST code?
+        return valueMap.values().iterator().next();
     }
 
+    // The fuck is this? TODO: Maybe remove this method
     public ValueEnum valueOf(String enumName) {
         ValueEnum enumVal = valueMap.get(enumName);
         if (enumVal == null) {
@@ -59,6 +63,15 @@ public class TypeEnum implements Type {
         } else {
             return enumVal;
         }
+    }
+
+    public boolean equals(TypeEnum other) {
+        return enumTypeName.equals(other.enumTypeName);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof TypeEnum) && equals((TypeEnum) other);
     }
 
     public String toString() {

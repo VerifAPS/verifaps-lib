@@ -6,6 +6,11 @@ import java.util.function.Supplier;
 
 public class TypeBool implements Type {
 
+    public static final TypeBool BOOL = new TypeBool();
+
+    private TypeBool() {
+    }
+
     @Override
     public <R> R match(
             Supplier<R> matchIntType,
@@ -24,12 +29,14 @@ public class TypeBool implements Type {
 
     @Override
     public String getTypeName() {
-        return null;
+        return "BOOL";
     }
 
     @Override
     public Optional<Value> parseLiteral(String literal) {
-        return null;
+        if ("true".equalsIgnoreCase(literal)) return Optional.of(ValueBool.TRUE);
+        if ("false".equalsIgnoreCase(literal)) return Optional.of(ValueBool.FALSE);
+        return Optional.empty();
     }
 
     @Override

@@ -17,4 +17,17 @@ public class LiteralExpr extends Expression {
         return value;
     }
 
+    public boolean equals(LiteralExpr expr) {
+        return getValue().equals(expr.getValue());
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof LiteralExpr) && this.equals((LiteralExpr) other);
+    }
+
+    public String toString() {
+        return "LiteralExpr(" + value + ")";
+    }
+
 }

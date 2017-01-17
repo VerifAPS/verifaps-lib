@@ -17,4 +17,17 @@ public class VariableExpr extends Expression {
         return varName;
     }
 
+    public boolean equals(VariableExpr expr) {
+        return getVariableName().equals(expr.getVariableName());
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof VariableExpr) && this.equals((VariableExpr) other);
+    }
+
+    public String toString() {
+        return "VariableExpr(" + varName + ")";
+    }
+
 }
