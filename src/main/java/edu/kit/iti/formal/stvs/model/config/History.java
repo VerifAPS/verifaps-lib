@@ -1,21 +1,26 @@
 package edu.kit.iti.formal.stvs.model.config;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Contains information about recently opened code and spec files
  */
 public class History {
-    private ArrayList<String> codeFiles;
-    private ArrayList<String> specFiles;
+    private List<String> codeFiles;
+    private List<String> specFiles;
+
+    public History() {
+        codeFiles = new ArrayList<>();
+        specFiles = new ArrayList<>();
+    }
 
     /**
      * Get the code file history
      *
      * @return A list of filepaths of code files
      */
-    public Collection<String> getCodeFiles() {
+    public List<String> getCodeFiles() {
         return codeFiles;
     }
 
@@ -24,7 +29,7 @@ public class History {
      *
      * @return A list of filepaths of spec files
      */
-    public Collection<String> getSpecFiles() {
+    public List<String> getSpecFiles() {
         return specFiles;
     }
 
@@ -34,7 +39,7 @@ public class History {
      * @param filename The path to the opened code file
      */
     public void addCodeFile(String filename) {
-
+        codeFiles.add(filename);
     }
 
     /**
@@ -43,6 +48,6 @@ public class History {
      * @param filename The path to the opened spec file
      */
     public void addSpecFile(String filename) {
-
+        specFiles.add(filename);
     }
 }
