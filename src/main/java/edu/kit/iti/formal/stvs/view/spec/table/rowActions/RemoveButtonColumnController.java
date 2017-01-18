@@ -9,25 +9,25 @@ import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
  * Fires RowEvent with REMOVE_ROW EventType on View
  */
 public class RemoveButtonColumnController extends RowActionColumnController {
-    private RemoveButtonColumn view;
-    private GlobalConfig globalConfig;
+  private RemoveButtonColumn view;
+  private GlobalConfig globalConfig;
 
-    public RemoveButtonColumnController(DurationsColumnController durations, GlobalConfig globalConfig) {
-        super(durations);
-        this.globalConfig = globalConfig;
-    }
+  public RemoveButtonColumnController(DurationsColumnController durations, GlobalConfig globalConfig) {
+    super(durations);
+    this.globalConfig = globalConfig;
+  }
 
-    @Override
-    public void removeButton(int row) {
+  @Override
+  public void removeButton(int row) {
 
-    }
+  }
 
-    @Override
-    public void addButton(int row, HybridCellController cell) {
+  @Override
+  public void addButton(int row, HybridCellController cell) {
 
-    }
+  }
 
-    public RemoveButtonColumn getView() {
-        return view;
-    }
+  public RemoveButtonColumn getView() {
+    return view;
+  }
 }

@@ -1,13 +1,6 @@
 package edu.kit.iti.formal.stvs.model.expressions.parser;
 
-import edu.kit.iti.formal.stvs.model.expressions.Expression;
-import edu.kit.iti.formal.stvs.model.expressions.FunctionExpr;
-import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.expressions.Value;
-import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
-import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
-import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
+import edu.kit.iti.formal.stvs.model.expressions.*;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -15,9 +8,7 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Created by philipp on 09.01.17.
@@ -35,7 +26,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   /**
    * @param expressionAsString the String to interpret as cell-expression
    * @return the expression covering the semantics of the given string interpreted as cell-expression.
-   * @throws ParseException When parsing could not be successful
+   * @throws ParseException                 When parsing could not be successful
    * @throws UnsupportedExpressionException When unsupported grammar features are reached
    */
   public Expression parseExpression(String expressionAsString) throws ParseException, UnsupportedExpressionException {
@@ -104,6 +95,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   public Expression visitBvariable(CellExpressionParser.BvariableContext ctx) {
     return new VariableExpr(ctx.getText());
   }
+
   private Value valueFromConstantToken(CellExpressionParser.ConstantContext ctx) {
     // I have to trust ANTLR to not have any other values here... :/
     switch (ctx.a.getType()) {

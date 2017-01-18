@@ -8,13 +8,13 @@ import javafx.stage.Stage;
 
 public class STVSApplication extends Application {
 
-    public static void main(String[] args) {
-        System.out.println("I'm alive.");
-        // TODO: Implement GUI: launch(args);
-    }
+  public static void main(String[] args) {
+    System.out.println("I'm alive.");
+    // TODO: Implement GUI: launch(args);
+  }
 
-    @Override
-    public void start(Stage primaryStage) {
+  @Override
+  public void start(Stage primaryStage) {
 
-    }
+  }
 }

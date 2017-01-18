@@ -7,22 +7,22 @@ import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 
 public class TableColumn extends VBox implements Lockable {
-    private ColumnHeader colHead;
-    private BooleanProperty editableProperty;
+  private ColumnHeader colHead;
+  private BooleanProperty editableProperty;
 
-    public BooleanProperty getEditableProperty() {
-        return editableProperty;
-    }
+  public BooleanProperty getEditableProperty() {
+    return editableProperty;
+  }
 
-    public void setEditable(boolean b) {
-    }
+  public void setEditable(boolean b) {
+  }
 
-    public boolean getEditable() {
-        return editableProperty.get();
-    }
+  public boolean getEditable() {
+    return editableProperty.get();
+  }
 
-    @Override
-    public ObservableList<Node> getChildren() {
-        return super.getChildren();
-    }
+  @Override
+  public ObservableList<Node> getChildren() {
+    return super.getChildren();
+  }
 }

@@ -10,8 +10,8 @@ import java.io.InputStream;
  */
 public class XMLVerificationScenarioImporter extends XMLImporter<VerificationScenario> {
 
-    @Override
-    public VerificationScenario doImport(InputStream source) throws ImportException {
-        return null;
-    }
+  @Override
+  public VerificationScenario doImport(InputStream source) throws ImportException {
+    return null;
+  }
 }

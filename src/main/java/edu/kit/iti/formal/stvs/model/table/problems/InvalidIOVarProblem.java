@@ -9,30 +9,30 @@ import java.util.function.Function;
  */
 public class InvalidIOVarProblem extends SpecProblem {
 
-    public enum Type {
-        INVALID_NAME,
-        INVALID_TYPE
-    }
+  public enum Type {
+    INVALID_NAME,
+    INVALID_TYPE
+  }
 
-    private SpecIoVariable column;
+  private SpecIoVariable column;
 
-    public InvalidIOVarProblem(SpecIoVariable column) {
-        this.column = column;
-    }
+  public InvalidIOVarProblem(SpecIoVariable column) {
+    this.column = column;
+  }
 
-    @Override
-    public <R> R match(
-            Function<TypeErrorProblem, R> matchTypeError,
-            Function<InvalidIOVarProblem, R> matchInvalidIOVar,
-            Function<CyclicDependencyProblem, R> matchCyclicDependency,
-            Function<ParseErrorProblem, R> matchParseError,
-            Function<DurationProblem, R> matchDurationProblem) {
-        return matchInvalidIOVar.apply(this);
-    }
+  @Override
+  public <R> R match(
+      Function<TypeErrorProblem, R> matchTypeError,
+      Function<InvalidIOVarProblem, R> matchInvalidIOVar,
+      Function<CyclicDependencyProblem, R> matchCyclicDependency,
+      Function<ParseErrorProblem, R> matchParseError,
+      Function<DurationProblem, R> matchDurationProblem) {
+    return matchInvalidIOVar.apply(this);
+  }
 
-    @Override
-    public String getErrorMessage() {
-        return null;
-    }
+  @Override
+  public String getErrorMessage() {
+    return null;
+  }
 
 }

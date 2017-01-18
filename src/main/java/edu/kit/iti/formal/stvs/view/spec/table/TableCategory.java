@@ -7,23 +7,23 @@ import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 
 public class TableCategory extends HBox implements Lockable {
-    @Override
-    public ObservableList<Node> getChildren() {
-        return super.getChildren();
-    }
+  @Override
+  public ObservableList<Node> getChildren() {
+    return super.getChildren();
+  }
 
-    @Override
-    public boolean getEditable() {
-        return false;
-    }
+  @Override
+  public boolean getEditable() {
+    return false;
+  }
 
-    @Override
-    public void setEditable(boolean b) {
+  @Override
+  public void setEditable(boolean b) {
 
-    }
+  }
 
-    @Override
-    public BooleanProperty getEditableProperty() {
-        return null;
-    }
+  @Override
+  public BooleanProperty getEditableProperty() {
+    return null;
+  }
 }

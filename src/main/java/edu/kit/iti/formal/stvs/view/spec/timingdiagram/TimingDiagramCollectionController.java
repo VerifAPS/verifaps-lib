@@ -12,23 +12,23 @@ import javafx.collections.ObservableList;
  * gets created by SpecificationTabController; is toplevel class for timingdiagram-package
  */
 public class TimingDiagramCollectionController implements Controller {
-    private HybridSpecification spec;
-    private GlobalConfig globalConfig;
-    private ObservableList<SpecIoVariable> definedVariables;
+  private HybridSpecification spec;
+  private GlobalConfig globalConfig;
+  private ObservableList<SpecIoVariable> definedVariables;
 
-    /**
-     * creates VariableTimingDiagram for each given Variable
-     *
-     * @param spec
-     * @param globalConfig
-     */
-    public TimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIoVariable> definedVariables, GlobalConfig globalConfig) {
+  /**
+   * creates VariableTimingDiagram for each given Variable
+   *
+   * @param spec
+   * @param globalConfig
+   */
+  public TimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIoVariable> definedVariables, GlobalConfig globalConfig) {
 
-        this.globalConfig = globalConfig;
-    }
+    this.globalConfig = globalConfig;
+  }
 
-    public TimingDiagramCollectionView getView() {
-        return null;
-    }
+  public TimingDiagramCollectionView getView() {
+    return null;
+  }
 
 }

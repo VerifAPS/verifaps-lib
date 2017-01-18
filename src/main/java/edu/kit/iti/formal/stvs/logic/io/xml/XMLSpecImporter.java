@@ -10,8 +10,8 @@ import java.io.InputStream;
  */
 public class XMLSpecImporter extends XMLImporter<ConstraintSpecification> {
 
-    @Override
-    public ConstraintSpecification doImport(InputStream source) throws ImportException {
-        return null;
-    }
+  @Override
+  public ConstraintSpecification doImport(InputStream source) throws ImportException {
+    return null;
+  }
 }

@@ -7,26 +7,26 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 
 public class ColumnHeader extends Pane {
-    private BooleanProperty editableProperty;
-    private TextField varNameField;
-    private ListView<Type> typesListView;
+  private BooleanProperty editableProperty;
+  private TextField varNameField;
+  private ListView<Type> typesListView;
 
-    public BooleanProperty getEditableProperty() {
-        return editableProperty;
-    }
+  public BooleanProperty getEditableProperty() {
+    return editableProperty;
+  }
 
-    public void setEditable(boolean b) {
-    }
+  public void setEditable(boolean b) {
+  }
 
-    public boolean getEditable() {
-        return editableProperty.get();
-    }
+  public boolean getEditable() {
+    return editableProperty.get();
+  }
 
-    public TextField getVarNameField() {
-        return varNameField;
-    }
+  public TextField getVarNameField() {
+    return varNameField;
+  }
 
-    public ListView<Type> getTypesListView() {
-        return typesListView;
-    }
+  public ListView<Type> getTypesListView() {
+    return typesListView;
+  }
 }

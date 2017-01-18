@@ -10,15 +10,15 @@ import java.util.Optional;
  */
 public class SpecificationColumn<C> {
 
-    public C getEntryForRow(int row) {
-        return null;
-    }
+  public C getEntryForRow(int row) {
+    return null;
+  }
 
-    public SpecIoVariable getSpecIOVariable() {
-        return null;
-    }
+  public SpecIoVariable getSpecIOVariable() {
+    return null;
+  }
 
-    public Optional<ColumnConfig> getConfig() {
-        return null;
-    }
+  public Optional<ColumnConfig> getConfig() {
+    return null;
+  }
 }

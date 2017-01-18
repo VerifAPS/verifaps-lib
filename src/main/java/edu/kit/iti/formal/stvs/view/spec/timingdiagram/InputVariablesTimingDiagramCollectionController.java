@@ -11,7 +11,7 @@ import javafx.collections.ObservableList;
  */
 public class InputVariablesTimingDiagramCollectionController extends CategoryTimingDiagramCollectionController {
 
-    public InputVariablesTimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIoVariable> definedVariables, GlobalConfig config, Selection selection) {
-        super(spec, definedVariables, config, selection);
-    }
+  public InputVariablesTimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIoVariable> definedVariables, GlobalConfig config, Selection selection) {
+    super(spec, definedVariables, config, selection);
+  }
 }

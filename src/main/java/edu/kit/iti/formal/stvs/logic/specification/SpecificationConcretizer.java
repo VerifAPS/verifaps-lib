@@ -10,18 +10,19 @@ import java.util.function.Consumer;
  */
 public interface SpecificationConcretizer {
 
-    public void addSuccessfulConcretizationListener(Consumer<ConcreteSpecification> listener);
+  public void addSuccessfulConcretizationListener(Consumer<ConcreteSpecification> listener);
 
-    public ConcretizerContext getContext();
+  public ConcretizerContext getContext();
 
-    public void setContext(ConcretizerContext context);
+  public void setContext(ConcretizerContext context);
 
-    public void createConcreteSpecification();
+  public void createConcreteSpecification();
 
-    /**
-     * Launch a new simulation after a specification change, unless one is already running
-     * @param spec The changed spec
-     */
-    public void onSpecificationChanged(ValidSpecification spec);
+  /**
+   * Launch a new simulation after a specification change, unless one is already running
+   *
+   * @param spec The changed spec
+   */
+  public void onSpecificationChanged(ValidSpecification spec);
 }
 

@@ -13,17 +13,17 @@ import javafx.scene.control.ContextMenu;
  * Created by csicar on 09.01.17.
  */
 public abstract class CategoryTimingDiagramCollectionController implements Controller {
-    private CategoryTimingDiagramCollectionView view;
-    private HybridSpecification spec;
-    private ContextMenu contextMenu;
-    private ObservableList<SpecIoVariable> definedVariables;
+  private CategoryTimingDiagramCollectionView view;
+  private HybridSpecification spec;
+  private ContextMenu contextMenu;
+  private ObservableList<SpecIoVariable> definedVariables;
 
-    public CategoryTimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIoVariable> definedVariables, GlobalConfig config, Selection selection) {
+  public CategoryTimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIoVariable> definedVariables, GlobalConfig config, Selection selection) {
 
-    }
+  }
 
-    public CategoryTimingDiagramCollectionView getView() {
-        return view;
-    }
+  public CategoryTimingDiagramCollectionView getView() {
+    return view;
+  }
 
 }

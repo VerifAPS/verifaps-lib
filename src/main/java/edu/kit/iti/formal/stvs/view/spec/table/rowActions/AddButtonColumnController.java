@@ -10,26 +10,26 @@ import javafx.scene.control.Button;
  * Fires RowEvent with ADD_ROW EventType on View
  */
 public class AddButtonColumnController extends RowActionColumnController {
-    private AddButtonColumn view;
-    private GlobalConfig globalConfig;
+  private AddButtonColumn view;
+  private GlobalConfig globalConfig;
 
-    public AddButtonColumnController(DurationsColumnController durations, GlobalConfig globalConfig) {
-        super(durations);
-        this.globalConfig = globalConfig;
-    }
+  public AddButtonColumnController(DurationsColumnController durations, GlobalConfig globalConfig) {
+    super(durations);
+    this.globalConfig = globalConfig;
+  }
 
-    @Override
-    public void removeButton(int row) {
+  @Override
+  public void removeButton(int row) {
 
-    }
+  }
 
-    @Override
-    public void addButton(int row, HybridCellController cell) {
-        getView().getChildren().addAll(new Button());
+  @Override
+  public void addButton(int row, HybridCellController cell) {
+    getView().getChildren().addAll(new Button());
 
-    }
+  }
 
-    public AddButtonColumn getView() {
-        return view;
-    }
+  public AddButtonColumn getView() {
+    return view;
+  }
 }

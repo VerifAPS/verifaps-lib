@@ -2,32 +2,32 @@ package edu.kit.iti.formal.stvs.model.expressions;
 
 public class VariableExpr extends Expression {
 
-    private final String varName;
+  private final String varName;
 
-    public VariableExpr(String varName) {
-        this.varName = varName;
-    }
+  public VariableExpr(String varName) {
+    this.varName = varName;
+  }
 
-    @Override
-    public <R> R takeVisitor(ExpressionVisitor<R> visitor) {
-        return visitor.visitVariable(this);
-    }
+  @Override
+  public <R> R takeVisitor(ExpressionVisitor<R> visitor) {
+    return visitor.visitVariable(this);
+  }
 
-    public String getVariableName() {
-        return varName;
-    }
+  public String getVariableName() {
+    return varName;
+  }
 
-    public boolean equals(VariableExpr expr) {
-        return getVariableName().equals(expr.getVariableName());
-    }
+  public boolean equals(VariableExpr expr) {
+    return getVariableName().equals(expr.getVariableName());
+  }
 
-    @Override
-    public boolean equals(Object other) {
-        return (other instanceof VariableExpr) && this.equals((VariableExpr) other);
-    }
+  @Override
+  public boolean equals(Object other) {
+    return (other instanceof VariableExpr) && this.equals((VariableExpr) other);
+  }
 
-    public String toString() {
-        return "VariableExpr(" + varName + ")";
-    }
+  public String toString() {
+    return "VariableExpr(" + varName + ")";
+  }
 
 }

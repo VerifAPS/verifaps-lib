@@ -5,11 +5,11 @@ package edu.kit.iti.formal.stvs.model.common;
  */
 public class VariableIdentifier {
 
-    private final String variableName;
-    private final VariableCategory category;
+  private final String variableName;
+  private final VariableCategory category;
 
-    public VariableIdentifier(String variableName, VariableCategory category) {
-        this.variableName = variableName;
-        this.category = category;
-    }
+  public VariableIdentifier(String variableName, VariableCategory category) {
+    this.variableName = variableName;
+    this.category = category;
+  }
 }

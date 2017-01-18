@@ -10,8 +10,8 @@ import java.io.InputStream;
  */
 public class XMLSessionImporter extends XMLImporter<STVSRootModel> {
 
-    @Override
-    public STVSRootModel doImport(InputStream source) throws ImportException {
-        return null;
-    }
+  @Override
+  public STVSRootModel doImport(InputStream source) throws ImportException {
+    return null;
+  }
 }

@@ -12,16 +12,16 @@ import javafx.collections.ObservableList;
  * does just fire to the root controller
  */
 public class STVSMenuBarController implements Controller {
-    private STVSMenuBar view;
-    private GlobalConfig globalConfig;
+  private STVSMenuBar view;
+  private GlobalConfig globalConfig;
 
-    public STVSMenuBarController(ObservableList<HybridSpecification> hybridSpecifications, Code code, GlobalConfig globalConfig) {
+  public STVSMenuBarController(ObservableList<HybridSpecification> hybridSpecifications, Code code, GlobalConfig globalConfig) {
 
-        this.globalConfig = globalConfig;
-    }
+    this.globalConfig = globalConfig;
+  }
 
-    @Override
-    public STVSMenuBar getView() {
-        return view;
-    }
+  @Override
+  public STVSMenuBar getView() {
+    return view;
+  }
 }

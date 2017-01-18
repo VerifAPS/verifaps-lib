@@ -9,8 +9,8 @@ import java.io.OutputStream;
  */
 public class XMLVerificationScenarioExporter extends XMLExporter<VerificationScenario> {
 
-    @Override
-    public OutputStream export(VerificationScenario source) {
-        return null;
-    }
+  @Override
+  public OutputStream export(VerificationScenario source) {
+    return null;
+  }
 }

@@ -12,7 +12,7 @@ import javafx.collections.ObservableList;
 public class OutputVariablesTimingDiagramCollectionController extends CategoryTimingDiagramCollectionController {
 
 
-    public OutputVariablesTimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIoVariable> definedVariables, GlobalConfig config, Selection selection) {
-        super(spec, definedVariables, config, selection);
-    }
+  public OutputVariablesTimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIoVariable> definedVariables, GlobalConfig config, Selection selection) {
+    super(spec, definedVariables, config, selection);
+  }
 }

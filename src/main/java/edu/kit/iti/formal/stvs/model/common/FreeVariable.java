@@ -2,11 +2,7 @@ package edu.kit.iti.formal.stvs.model.common;
 
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
 /**
  * Created by csicar on 10.01.17.
@@ -32,11 +28,11 @@ public class FreeVariable {
   /**
    * Creates a free variable with a name, type and default value.
    *
-   * @param name Name of the free variable
-   * @param type Type of the free variable
+   * @param name         Name of the free variable
+   * @param type         Type of the free variable
    * @param defaultValue Default value of the free variable
    * @throws IllegalValueTypeException thrown if {@link Type}
-   *        of {@code defaultValue} does not match {@code type}
+   *                                   of {@code defaultValue} does not match {@code type}
    */
   public FreeVariable(String name, Type type, Value defaultValue) throws IllegalValueTypeException {
     this.name = new SimpleStringProperty(name);
@@ -99,7 +95,7 @@ public class FreeVariable {
    *
    * @param defaultValue New default value for the free variable
    * @throws IllegalValueTypeException thrown if {@link Type}
-   *        of {@code defaultValue} does not match {@code type}
+   *                                   of {@code defaultValue} does not match {@code type}
    */
   public void setDefaultValue(Value defaultValue) throws IllegalValueTypeException {
     if (!defaultValue.getType().checksAgainst(this.type.get())) {

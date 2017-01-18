@@ -11,13 +11,13 @@ import java.io.OutputStream;
  */
 public class VerificationExporter implements Exporter<ConstraintSpecification> {
 
-    private XMLSpecExporter xmlExporter;
+  private XMLSpecExporter xmlExporter;
 
-    public VerificationExporter() {
+  public VerificationExporter() {
 
-    }
+  }
 
-    public  OutputStream export(ConstraintSpecification source) {
-        return null;
-    }
+  public OutputStream export(ConstraintSpecification source) {
+    return null;
+  }
 }

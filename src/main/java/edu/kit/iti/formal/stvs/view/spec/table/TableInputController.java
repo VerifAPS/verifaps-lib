@@ -6,13 +6,14 @@ import javafx.scene.control.ContextMenu;
 
 public class TableInputController extends TableCategoryController {
 
-    public TableInputController(HybridSpecification spec, TablePaneController tablePaneController) {
-        super("Input", spec, tablePaneController);
-    }
+  public TableInputController(HybridSpecification spec, TablePaneController tablePaneController) {
+    super("Input", spec, tablePaneController);
+  }
 
-    public void addIOVariable(String string) {
+  public void addIOVariable(String string) {
 
-    }
-    private GlobalConfig globalConfig;
-    private ContextMenu contextMenu;
+  }
+
+  private GlobalConfig globalConfig;
+  private ContextMenu contextMenu;
 }

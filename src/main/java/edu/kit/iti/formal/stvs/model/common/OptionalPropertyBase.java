@@ -1,11 +1,7 @@
 package edu.kit.iti.formal.stvs.model.common;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.Property;
-import javafx.beans.property.StringProperty;
 
 /**
  * Created by leonk on 17.01.2017.
@@ -13,6 +9,7 @@ import javafx.beans.property.StringProperty;
 public class OptionalPropertyBase<S, R extends Property<S>> extends ObjectPropertyBase<S> {
   private final String name;
   private final R property;
+
   /**
    * Returns the {@code Object} that contains this property. If this property
    * is not contained in an {@code Object}, {@code null} is returned.

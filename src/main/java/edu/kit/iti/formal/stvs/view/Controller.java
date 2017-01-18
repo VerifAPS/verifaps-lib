@@ -6,5 +6,5 @@ import javafx.scene.Node;
  * Created by csicar on 10.01.17.
  */
 public interface Controller {
-    public Node getView();
+  public Node getView();
 }

@@ -7,11 +7,11 @@ import org.chocosolver.solver.Model;
  */
 public class CycleSolver {
 
-    public boolean solve() {
-        return true;
-    }
+  public boolean solve() {
+    return true;
+  }
 
-    public Model getModel() {
-        return null;
-    }
+  public Model getModel() {
+    return null;
+  }
 }

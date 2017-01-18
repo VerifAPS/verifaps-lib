@@ -11,8 +11,8 @@ import java.io.InputStream;
  */
 public class VerificationImporter implements Importer<VerificationResult> {
 
-    @Override
-    public VerificationResult doImport(InputStream source) throws ImportException {
-        return null;
-    }
+  @Override
+  public VerificationResult doImport(InputStream source) throws ImportException {
+    return null;
+  }
 }

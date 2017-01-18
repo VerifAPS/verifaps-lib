@@ -15,50 +15,49 @@ import javafx.scene.control.ContextMenu;
 import java.util.List;
 
 public class TableColumnController extends ColumnController {
-    private IntegerProperty width;
-    private ObservableList<Type> types;
-    private ObservableList<HybridCellController> cells;
-    private ObjectProperty<SpecIoVariable> columnName;
-    private ObservableList<SpecProblem> problems;
-    private TableColumn tableColumn;
-    private GlobalConfig globalConfig;
-    private ContextMenu contextMenu;
+  private IntegerProperty width;
+  private ObservableList<Type> types;
+  private ObservableList<HybridCellController> cells;
+  private ObjectProperty<SpecIoVariable> columnName;
+  private ObservableList<SpecProblem> problems;
+  private TableColumn tableColumn;
+  private GlobalConfig globalConfig;
+  private ContextMenu contextMenu;
 
-    /**
-     *
-     * @param types all defined Types extracted from the code
-     * @param codeVars input and output variables exposed by the code
-     * @param columnName the SpecIoVariable that this TableColumn modifies
-     * @param columnConfig
-     * @param globalConfig
-     */
-    public TableColumnController(ObservableList<Type> types, ObservableList<CodeIoVariable> codeVars, ObjectProperty<SpecIoVariable> columnName, ColumnConfig columnConfig, GlobalConfig globalConfig) {
-        super(columnConfig);
-        this.globalConfig = globalConfig;
-    }
+  /**
+   * @param types        all defined Types extracted from the code
+   * @param codeVars     input and output variables exposed by the code
+   * @param columnName   the SpecIoVariable that this TableColumn modifies
+   * @param columnConfig
+   * @param globalConfig
+   */
+  public TableColumnController(ObservableList<Type> types, ObservableList<CodeIoVariable> codeVars, ObjectProperty<SpecIoVariable> columnName, ColumnConfig columnConfig, GlobalConfig globalConfig) {
+    super(columnConfig);
+    this.globalConfig = globalConfig;
+  }
 
-    @Override
-    public void onProblemsChange(List<SpecProblem> problems){
+  @Override
+  public void onProblemsChange(List<SpecProblem> problems) {
 
-    }
+  }
 
-    @Override
-    public IntegerProperty getWidthProperty() {
-        return null;
-    }
+  @Override
+  public IntegerProperty getWidthProperty() {
+    return null;
+  }
 
-    @Override
-    public int getWidth() {
-        return 0;
-    }
+  @Override
+  public int getWidth() {
+    return 0;
+  }
 
-    @Override
-    public ObservableList<HybridCellController> getCells() {
-        return null;
-    }
+  @Override
+  public ObservableList<HybridCellController> getCells() {
+    return null;
+  }
 
-    @Override
-    public TableColumn getView() {
-        return tableColumn;
-    }
+  @Override
+  public TableColumn getView() {
+    return tableColumn;
+  }
 }

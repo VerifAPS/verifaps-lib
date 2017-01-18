@@ -5,15 +5,15 @@ package edu.kit.iti.formal.stvs.model.code;
  */
 public class FoldableCodeBlock {
 
-    private int startLine;
-    private int endLine;
+  private int startLine;
+  private int endLine;
 
-    public int getStartLine() {
-        return startLine;
-    }
+  public int getStartLine() {
+    return startLine;
+  }
 
-    public int getEndLine() {
-        return endLine;
-    }
+  public int getEndLine() {
+    return endLine;
+  }
 
 }

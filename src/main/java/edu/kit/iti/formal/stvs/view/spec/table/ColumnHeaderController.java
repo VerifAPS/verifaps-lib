@@ -10,22 +10,22 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 
 public class ColumnHeaderController implements Controller {
-    private ColumnHeader columnHeader;
-    private final ObservableList<CodeIoVariable> codeVars;
-    private final ObjectProperty<SpecIoVariable> columnName;
-    private GlobalConfig globalConfig;
-    private ContextMenu contextMenu;
-    private ObservableList<Type> types;
+  private ColumnHeader columnHeader;
+  private final ObservableList<CodeIoVariable> codeVars;
+  private final ObjectProperty<SpecIoVariable> columnName;
+  private GlobalConfig globalConfig;
+  private ContextMenu contextMenu;
+  private ObservableList<Type> types;
 
-    public ColumnHeaderController(ObservableList<Type> types, ObservableList<CodeIoVariable> codeVars, ObjectProperty<SpecIoVariable> columnName, GlobalConfig globalConfig) {
-        this.types = types;
-        this.codeVars = codeVars;
-        this.columnName = columnName;
-        this.globalConfig = globalConfig;
-    }
+  public ColumnHeaderController(ObservableList<Type> types, ObservableList<CodeIoVariable> codeVars, ObjectProperty<SpecIoVariable> columnName, GlobalConfig globalConfig) {
+    this.types = types;
+    this.codeVars = codeVars;
+    this.columnName = columnName;
+    this.globalConfig = globalConfig;
+  }
 
-    @Override
-    public ColumnHeader getView() {
-        return columnHeader;
-    }
+  @Override
+  public ColumnHeader getView() {
+    return columnHeader;
+  }
 }

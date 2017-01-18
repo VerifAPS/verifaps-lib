@@ -6,48 +6,48 @@ import java.util.function.Supplier;
 
 public class TypeInt implements Type {
 
-    public static final TypeInt INT = new TypeInt();
+  public static final TypeInt INT = new TypeInt();
 
-    private TypeInt() {
-    }
+  private TypeInt() {
+  }
 
-    @Override
-    public <R> R match(
-            Supplier<R> matchIntType,
-            Supplier<R> matchBoolType,
-            Function<TypeEnum, R> matchEnumType) {
-        return matchIntType.get();
-    }
+  @Override
+  public <R> R match(
+      Supplier<R> matchIntType,
+      Supplier<R> matchBoolType,
+      Function<TypeEnum, R> matchEnumType) {
+    return matchIntType.get();
+  }
 
-    @Override
-    public boolean checksAgainst(Type other) {
-        return other.match(
-                () -> true,
-                () -> false,
-                (otherEnum) -> false);
-    }
+  @Override
+  public boolean checksAgainst(Type other) {
+    return other.match(
+        () -> true,
+        () -> false,
+        (otherEnum) -> false);
+  }
 
-    @Override
-    public String getTypeName() {
-        return "INT";
-    }
+  @Override
+  public String getTypeName() {
+    return "INT";
+  }
 
-    @Override
-    public Optional<Value> parseLiteral(String literal) {
-        try {
-            return Optional.of(new ValueInt(Integer.parseInt(literal)));
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
+  @Override
+  public Optional<Value> parseLiteral(String literal) {
+    try {
+      return Optional.of(new ValueInt(Integer.parseInt(literal)));
+    } catch (NumberFormatException e) {
+      return Optional.empty();
     }
+  }
 
-    @Override
-    public Value generateDefaultValue() {
-        return new ValueInt(1);
-    }
+  @Override
+  public Value generateDefaultValue() {
+    return new ValueInt(1);
+  }
 
-    public String toString() {
-        return "TypeInt";
-    }
+  public String toString() {
+    return "TypeInt";
+  }
 
 }

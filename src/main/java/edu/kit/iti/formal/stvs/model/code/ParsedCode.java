@@ -11,25 +11,25 @@ import java.util.Set;
  */
 public class ParsedCode {
 
-    private List<FoldableCodeBlock> foldableCodeBlocks;
-    private Set<CodeIoVariable> definedVariables;
-    private Set<Type> definedTypes;
+  private List<FoldableCodeBlock> foldableCodeBlocks;
+  private Set<CodeIoVariable> definedVariables;
+  private Set<Type> definedTypes;
 
-    public ParsedCode(List<FoldableCodeBlock> foldableCodeBlocks, Set<CodeIoVariable> definedVariables, Set<Type> definedTypes) {
-        this.foldableCodeBlocks = foldableCodeBlocks;
-        this.definedVariables = definedVariables;
-        this.definedTypes = definedTypes;
-    }
+  public ParsedCode(List<FoldableCodeBlock> foldableCodeBlocks, Set<CodeIoVariable> definedVariables, Set<Type> definedTypes) {
+    this.foldableCodeBlocks = foldableCodeBlocks;
+    this.definedVariables = definedVariables;
+    this.definedTypes = definedTypes;
+  }
 
-    public List<FoldableCodeBlock> getFoldableCodeBlocks() {
-        return foldableCodeBlocks;
-    }
+  public List<FoldableCodeBlock> getFoldableCodeBlocks() {
+    return foldableCodeBlocks;
+  }
 
-    public Set<CodeIoVariable> getDefinedVariables() {
-        return definedVariables;
-    }
+  public Set<CodeIoVariable> getDefinedVariables() {
+    return definedVariables;
+  }
 
-    public Set<Type> getDefinedTypes() {
-        return definedTypes;
-    }
+  public Set<Type> getDefinedTypes() {
+    return definedTypes;
+  }
 }

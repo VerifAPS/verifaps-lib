@@ -7,6 +7,6 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
  */
 public interface CyclicReferenceFinder {
 
-    public boolean checkForCyclicReferences(ConstraintSpecification spec);
+  public boolean checkForCyclicReferences(ConstraintSpecification spec);
 
 }

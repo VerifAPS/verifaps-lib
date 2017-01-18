@@ -5,8 +5,8 @@ import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 
 public class DurationsColumn extends VBox {
-    @Override
-    public ObservableList<Node> getChildren() {
-        return super.getChildren();
-    }
+  @Override
+  public ObservableList<Node> getChildren() {
+    return super.getChildren();
+  }
 }

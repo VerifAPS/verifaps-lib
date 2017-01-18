@@ -7,24 +7,24 @@ import java.util.function.Consumer;
  */
 public class RowComment implements Commentable {
 
-    private String comment;
+  private String comment;
 
-    public RowComment(String comment) {
-        this.comment = comment;
-    }
+  public RowComment(String comment) {
+    this.comment = comment;
+  }
 
-    @Override
-    public void setComment(String comment) {
+  @Override
+  public void setComment(String comment) {
 
-    }
+  }
 
-    @Override
-    public String getComment() {
-        return null;
-    }
+  @Override
+  public String getComment() {
+    return null;
+  }
 
-    @Override
-    public void addCommentListener(Consumer<Commentable> consumer) {
+  @Override
+  public void addCommentListener(Consumer<Commentable> consumer) {
 
-    }
+  }
 }

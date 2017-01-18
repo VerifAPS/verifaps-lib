@@ -10,11 +10,11 @@ import javafx.scene.Node;
  * so the automatically align to rows.
  */
 public abstract class RowActionColumnController {
-    /**
-     * @param durations A controller for the DurationsColumn that should be observed
-     */
+  /**
+   * @param durations A controller for the DurationsColumn that should be observed
+   */
 
-    public RowActionColumnController(DurationsColumnController durations) {
+  public RowActionColumnController(DurationsColumnController durations) {
         /*
         durations.getCells().addListener(
                 (ListChangeListener.Change<? extends HybridCellController> c) -> {
@@ -23,11 +23,11 @@ public abstract class RowActionColumnController {
                 }
         );
         */
-    }
+  }
 
-    public abstract void removeButton(int row);
+  public abstract void removeButton(int row);
 
-    public abstract void addButton(int row, HybridCellController cell);
+  public abstract void addButton(int row, HybridCellController cell);
 
-    public abstract Node getView();
+  public abstract Node getView();
 }

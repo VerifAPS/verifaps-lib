@@ -9,25 +9,25 @@ import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
  * Fires RowEvent with COMMENT_ROW EventType on View
  */
 public class CommentButtonColumnController extends RowActionColumnController {
-    private CommentButtonColumn view;
-    private GlobalConfig globalConfig;
+  private CommentButtonColumn view;
+  private GlobalConfig globalConfig;
 
-    public CommentButtonColumnController(DurationsColumnController durations, GlobalConfig globalConfig) {
-        super(durations);
-        this.globalConfig = globalConfig;
-    }
+  public CommentButtonColumnController(DurationsColumnController durations, GlobalConfig globalConfig) {
+    super(durations);
+    this.globalConfig = globalConfig;
+  }
 
-    @Override
-    public void removeButton(int row) {
+  @Override
+  public void removeButton(int row) {
 
-    }
+  }
 
-    @Override
-    public void addButton(int row, HybridCellController cell) {
+  @Override
+  public void addButton(int row, HybridCellController cell) {
 
-    }
+  }
 
-    public CommentButtonColumn getView() {
-        return view;
-    }
+  public CommentButtonColumn getView() {
+    return view;
+  }
 }

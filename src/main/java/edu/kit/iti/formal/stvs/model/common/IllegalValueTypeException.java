@@ -22,7 +22,7 @@ public class IllegalValueTypeException extends Exception {
    */
   public IllegalValueTypeException(Value mistypedValue, Type expectedType, String message) {
     super(message + "\nGiven Type: " + mistypedValue.getType().getTypeName()
-            + "\nExpected Type: " + expectedType.getTypeName());
+        + "\nExpected Type: " + expectedType.getTypeName());
     this.mistypedValue = mistypedValue;
     this.expectedType = expectedType;
   }

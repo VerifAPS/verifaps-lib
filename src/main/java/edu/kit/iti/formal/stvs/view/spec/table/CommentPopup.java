@@ -5,10 +5,10 @@ import javafx.scene.text.Text;
 import javafx.stage.Popup;
 
 public class CommentPopup extends Popup {
-    private static Text commentHeadline;
-    private TextField commentField;
+  private static Text commentHeadline;
+  private TextField commentField;
 
-    public TextField getCommentField() {
-        return commentField;
-    }
+  public TextField getCommentField() {
+    return commentField;
+  }
 }

@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
-import org.w3c.dom.Node;
 
 import java.io.OutputStream;
 
@@ -10,8 +9,8 @@ import java.io.OutputStream;
  */
 public class XMLSpecExporter extends XMLExporter<ConstraintSpecification> {
 
-    @Override
-    public OutputStream export(ConstraintSpecification source) {
-        return null;
-    }
+  @Override
+  public OutputStream export(ConstraintSpecification source) {
+    return null;
+  }
 }
