@@ -5,18 +5,29 @@ import java.util.List;
 public class FunctionExpr extends Expression {
 
     public static enum Operation {
+        // BOOL -> BOOL
+        NOT,
+        // INT -> INT
+        UNARY_MINUS,
+        // (BOOL, BOOL) -> BOOL
         AND,
         OR,
-        EQUALS,
+        XOR,
+        // (INT, INT) -> BOOL
         GREATER_THAN,
         GREATER_EQUALS,
         LESS_THAN,
         LESS_EQUALS,
+        // (a, a) -> BOOL
+        EQUALS,
         NOT_EQUALS,
+        // (INT, INT) -> INT
         PLUS,
         MINUS,
         MULTIPLICATION,
-        DIVISION
+        DIVISION,
+        MODULO,
+        POWER
     }
 
     private final Operation operation;
