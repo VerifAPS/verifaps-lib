@@ -42,21 +42,31 @@ public class TypeChecker implements ExpressionVisitor<Type> {
     @Override
     public Type visitFunctionExpr(FunctionExpr functionExpr) {
         switch (functionExpr.getOperation()) {
+            // BOOL -> BOOL
+            case NOT:
+                ensureArgsOfType(functionExpr, TypeBool.BOOL);
+            // (INT, INT) -> INT
             case PLUS:
             case MINUS:
             case MULTIPLICATION:
             case DIVISION:
+            case MODULO:
+            case POWER:
                 ensureArgsOfType(functionExpr, TypeInt.INT, TypeInt.INT);
                 return TypeInt.INT;
+            // (BOOL, BOOL) -> BOOL
             case AND:
             case OR:
+            case XOR:
                 ensureArgsOfType(functionExpr, TypeBool.BOOL, TypeBool.BOOL);
                 return TypeBool.BOOL;
+            // (a, a) -> BOOL
             case EQUALS:
             case NOT_EQUALS:
                 ensureArgNum(functionExpr, 2);
                 ensureEqualTypes(functionExpr);
                 return TypeBool.BOOL;
+            // (INT, INT) -> BOOL
             case GREATER_THAN:
             case GREATER_EQUALS:
             case LESS_THAN:
