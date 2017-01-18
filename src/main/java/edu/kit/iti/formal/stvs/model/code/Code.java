@@ -30,7 +30,8 @@ public class Code {
      * creates a Dummy-Codefile
      */
     public Code() {
-
+        this.filename = "New Code";
+        this.sourcecode = "";
     }
 
     /**
@@ -38,19 +39,21 @@ public class Code {
      * @param code
      */
     public Code (Code code) {
-
+        this.filename = code.getFilename();
+        this.sourcecode = code.getSourcecode();
     }
 
-    public Code(String filename, String sourceCode) {
-
+    public Code(String filename, String sourcecode) {
+        this.filename = filename;
+        this.sourcecode = sourcecode;
     }
 
     public String getFilename() {
         return filename;
     }
 
-    public void setFilename() {
-
+    public void setFilename(String newFilename) {
+        this.filename = newFilename;
     }
 
     public String getSourcecode() {
