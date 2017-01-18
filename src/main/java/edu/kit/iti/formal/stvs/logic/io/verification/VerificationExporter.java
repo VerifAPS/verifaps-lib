@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.io.verification;
 
 import edu.kit.iti.formal.stvs.logic.io.Exporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XMLSpecExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlSpecExporter;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 
 import java.io.OutputStream;
@@ -11,7 +11,7 @@ import java.io.OutputStream;
  */
 public class VerificationExporter implements Exporter<ConstraintSpecification> {
 
-  private XMLSpecExporter xmlExporter;
+  private XmlSpecExporter xmlExporter;
 
   public VerificationExporter() {
 

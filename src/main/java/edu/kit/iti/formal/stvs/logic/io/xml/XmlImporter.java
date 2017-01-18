@@ -6,12 +6,12 @@ import org.w3c.dom.Node;
 /**
  * Created by bal on 11.01.17.
  */
-public abstract class XMLImporter<T> implements Importer<T> {
+public abstract class XmlImporter<T> implements Importer<T> {
   public Node readFromFile(String xmlFilename) {
     return null;
   }
 
-  public T doImportFromXMLNode(Node node) {
+  public T doImportFromXmlNode(Node node) {
     return null;
   }
 }

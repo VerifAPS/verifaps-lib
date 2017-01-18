@@ -1,18 +1,18 @@
-package edu.kit.iti.formal.stvs.view.spec.table.rowActions;
+package edu.kit.iti.formal.stvs.view.spec.table.rowactions;
 
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.spec.table.DurationsColumnController;
 import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
 
 /**
- * Controller of column next to the table which holds comment buttons for rows
- * Fires RowEvent with COMMENT_ROW EventType on View
+ * Controller of column next to the table which holds remove buttons for rows
+ * Fires RowEvent with REMOVE_ROW EventType on View
  */
-public class CommentButtonColumnController extends RowActionColumnController {
-  private CommentButtonColumn view;
+public class RemoveButtonColumnController extends RowActionColumnController {
+  private RemoveButtonColumn view;
   private GlobalConfig globalConfig;
 
-  public CommentButtonColumnController(DurationsColumnController durations, GlobalConfig globalConfig) {
+  public RemoveButtonColumnController(DurationsColumnController durations, GlobalConfig globalConfig) {
     super(durations);
     this.globalConfig = globalConfig;
   }
@@ -27,7 +27,7 @@ public class CommentButtonColumnController extends RowActionColumnController {
 
   }
 
-  public CommentButtonColumn getView() {
+  public RemoveButtonColumn getView() {
     return view;
   }
 }

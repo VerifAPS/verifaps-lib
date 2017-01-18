@@ -1,19 +1,19 @@
 package edu.kit.iti.formal.stvs.view;
 
 import edu.kit.iti.formal.stvs.view.editor.EditorPane;
-import edu.kit.iti.formal.stvs.view.menu.STVSMenuBar;
+import edu.kit.iti.formal.stvs.view.menu.StvsMenuBar;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Pane;
 
 /**
  * Created by csicar on 09.01.17.
  */
-public class STVSRootView extends Pane {
-  private STVSMenuBar menuBar;
+public class StvsRootView extends Pane {
+  private StvsMenuBar menuBar;
   private EditorPane editor;
   private TabPane specifications;
 
-  public STVSMenuBar getMenuBar() {
+  public StvsMenuBar getMenuBar() {
     return menuBar;
   }
 
@@ -25,7 +25,7 @@ public class STVSRootView extends Pane {
     return specifications;
   }
 
-  public void setMenuBar(STVSMenuBar menuBar) {
+  public void setMenuBar(StvsMenuBar menuBar) {
     this.menuBar = menuBar;
   }
 

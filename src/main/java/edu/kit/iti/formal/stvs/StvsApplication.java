@@ -6,7 +6,7 @@ package edu.kit.iti.formal.stvs;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-public class STVSApplication extends Application {
+public class StvsApplication extends Application {
 
   public static void main(String[] args) {
     System.out.println("I'm alive.");

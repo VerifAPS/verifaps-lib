@@ -24,7 +24,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
   private Set<Type> typeContext;
   private Set<CodeIoVariable> codeIoVariables;
-  private Set<SpecIoVariable> specIOVariables;
+  private Set<SpecIoVariable> specIoVariables;
   private FreeVariableSet freeVariableSet;
   private List<RowComment> rowComments;
   private Optional<ValidSpecification> validSpecification;
@@ -52,7 +52,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
   }
 
-  public SpecIoVariable getSpecIOVariableForColumn(String column) {
+  public SpecIoVariable getSpecIoVariableForColumn(String column) {
     return null;
   }
 

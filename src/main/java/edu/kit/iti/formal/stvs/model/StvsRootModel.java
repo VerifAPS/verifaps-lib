@@ -7,14 +7,14 @@ import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 
 import java.util.List;
 
-public class STVSRootModel {
+public class StvsRootModel {
 
   private List<HybridSpecification> hybridSpecifications;
   private GlobalConfig globalConfig;
   private History history;
   private VerificationScenario scenario;
 
-  public STVSRootModel() {
+  public StvsRootModel() {
 
   }
 

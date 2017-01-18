@@ -8,7 +8,7 @@ import java.io.InputStream;
 /**
  * Created by bal on 11.01.17.
  */
-public class XMLSpecImporter extends XMLImporter<ConstraintSpecification> {
+public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
 
   @Override
   public ConstraintSpecification doImport(InputStream source) throws ImportException {

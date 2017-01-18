@@ -7,12 +7,12 @@ import org.w3c.dom.Node;
 /**
  * Created by bal on 11.01.17.
  */
-public abstract class XMLExporter<F> implements Exporter<F> {
+public abstract class XmlExporter<F> implements Exporter<F> {
   public void writeToFile(Node node, String filename) {
 
   }
 
-  public Node exportToXMLNode(F source) {
+  public Node exportToXmlNode(F source) {
     return null;
   }
 }

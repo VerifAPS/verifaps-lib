@@ -11,17 +11,17 @@ import javafx.collections.ObservableList;
  * Controller for the MenuBar at the top of the window
  * does just fire to the root controller
  */
-public class STVSMenuBarController implements Controller {
-  private STVSMenuBar view;
+public class StvsMenuBarController implements Controller {
+  private StvsMenuBar view;
   private GlobalConfig globalConfig;
 
-  public STVSMenuBarController(ObservableList<HybridSpecification> hybridSpecifications, Code code, GlobalConfig globalConfig) {
+  public StvsMenuBarController(ObservableList<HybridSpecification> hybridSpecifications, Code code, GlobalConfig globalConfig) {
 
     this.globalConfig = globalConfig;
   }
 
   @Override
-  public STVSMenuBar getView() {
+  public StvsMenuBar getView() {
     return view;
   }
 }

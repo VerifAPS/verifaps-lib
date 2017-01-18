@@ -7,7 +7,7 @@ import java.io.OutputStream;
 /**
  * Created by bal on 11.01.17.
  */
-public class XMLConfigExporter extends XMLExporter<GlobalConfig> {
+public class XmlConfigExporter extends XmlExporter<GlobalConfig> {
 
   @Override
   public OutputStream export(GlobalConfig source) {

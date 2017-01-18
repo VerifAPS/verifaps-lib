@@ -5,7 +5,7 @@ import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.*;
 import edu.kit.iti.formal.stvs.view.Controller;
-import edu.kit.iti.formal.stvs.view.spec.table.rowActions.RowEvent;
+import edu.kit.iti.formal.stvs.view.spec.table.rowactions.RowEvent;
 
 import java.util.Optional;
 
@@ -57,7 +57,7 @@ public class TablePaneController implements Controller {
     this.globalConfig = globalConfig;
   }
 
-  public void addIOVariable(CodeIoVariable ioVar) {
+  public void addIoVariable(CodeIoVariable ioVar) {
   }
 
   public TablePane getView() {

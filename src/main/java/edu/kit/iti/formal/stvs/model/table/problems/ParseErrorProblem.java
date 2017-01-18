@@ -23,7 +23,7 @@ public class ParseErrorProblem extends SpecProblem {
   @Override
   public <R> R match(
       Function<TypeErrorProblem, R> matchTypeError,
-      Function<InvalidIOVarProblem, R> matchInvalidIOVar,
+      Function<InvalidIoVarProblem, R> matchInvalidIoVar,
       Function<CyclicDependencyProblem, R> matchCyclicDependency,
       Function<ParseErrorProblem, R> matchParseError,
       Function<DurationProblem, R> matchDurationProblem) {
@@ -35,7 +35,7 @@ public class ParseErrorProblem extends SpecProblem {
     return null;
   }
 
-  public SpecIoVariable getIOVariable() {
+  public SpecIoVariable getIoVariable() {
     return ioVariable;
   }
 

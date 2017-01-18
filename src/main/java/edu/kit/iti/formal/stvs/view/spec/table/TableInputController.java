@@ -10,7 +10,7 @@ public class TableInputController extends TableCategoryController {
     super("Input", spec, tablePaneController);
   }
 
-  public void addIOVariable(String string) {
+  public void addIoVariable(String string) {
 
   }
 

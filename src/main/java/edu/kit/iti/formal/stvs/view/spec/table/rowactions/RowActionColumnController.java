@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.view.spec.table.rowActions;
+package edu.kit.iti.formal.stvs.view.spec.table.rowactions;
 
 import edu.kit.iti.formal.stvs.view.spec.table.DurationsColumnController;
 import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;

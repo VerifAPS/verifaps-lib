@@ -9,17 +9,17 @@ import javafx.scene.Node;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class IOVariableNamePopupController implements Controller {
+public class IoVariableNamePopupController implements Controller {
   private List<CodeIoVariable> ioVars;
   private StringProperty name;
-  private IOVariableNamePopup ioVariableNamePopup;
+  private IoVariableNamePopup ioVariableNamePopup;
   private GlobalConfig globalConfig;
 
   /**
    * @param variableChosenListener Is called if variable name was confirmed
    * @param globalConfig
    */
-  public IOVariableNamePopupController(List<CodeIoVariable> ioVariables, Consumer<String> variableChosenListener, GlobalConfig globalConfig) {
+  public IoVariableNamePopupController(List<CodeIoVariable> ioVariables, Consumer<String> variableChosenListener, GlobalConfig globalConfig) {
     this.globalConfig = globalConfig;
   }
 

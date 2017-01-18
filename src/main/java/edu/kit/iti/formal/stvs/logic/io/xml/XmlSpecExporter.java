@@ -7,7 +7,7 @@ import java.io.OutputStream;
 /**
  * Created by bal on 11.01.17.
  */
-public class XMLSpecExporter extends XMLExporter<ConstraintSpecification> {
+public class XmlSpecExporter extends XmlExporter<ConstraintSpecification> {
 
   @Override
   public OutputStream export(ConstraintSpecification source) {

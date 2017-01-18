@@ -12,7 +12,7 @@ public class TableOutputController extends TableCategoryController {
     super("Output", spec, tablePaneController);
   }
 
-  public void addIOVariable(String string) {
+  public void addIoVariable(String string) {
 
   }
 }

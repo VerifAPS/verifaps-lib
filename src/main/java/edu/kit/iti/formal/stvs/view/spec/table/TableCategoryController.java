@@ -23,9 +23,9 @@ abstract public class TableCategoryController implements Controller {
 
   /**
    * Gets called if button for new CodeIoVariable is pressed.
-   * Creates IOVariableNamePopupController.
+   * Creates IoVariableNamePopupController.
    */
-  private void onNewIOVariableButton(ActionEvent e) {
+  private void onNewIoVariableButton(ActionEvent e) {
 
   }
 
@@ -57,7 +57,7 @@ abstract public class TableCategoryController implements Controller {
    *
    * @param string name of Variable
    */
-  abstract public void addIOVariable(String string);
+  abstract public void addIoVariable(String string);
 
   /**
    * Resorts columns

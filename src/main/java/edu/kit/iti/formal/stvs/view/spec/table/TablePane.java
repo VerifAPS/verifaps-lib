@@ -1,9 +1,9 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.view.spec.Lockable;
-import edu.kit.iti.formal.stvs.view.spec.table.rowActions.AddButtonColumn;
-import edu.kit.iti.formal.stvs.view.spec.table.rowActions.CommentButtonColumn;
-import edu.kit.iti.formal.stvs.view.spec.table.rowActions.RemoveButtonColumn;
+import edu.kit.iti.formal.stvs.view.spec.table.rowactions.AddButtonColumn;
+import edu.kit.iti.formal.stvs.view.spec.table.rowactions.CommentButtonColumn;
+import edu.kit.iti.formal.stvs.view.spec.table.rowactions.RemoveButtonColumn;
 import javafx.beans.property.BooleanProperty;
 import javafx.scene.layout.HBox;
 

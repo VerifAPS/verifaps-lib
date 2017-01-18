@@ -14,7 +14,7 @@ public class SpecificationColumn<C> {
     return null;
   }
 
-  public SpecIoVariable getSpecIOVariable() {
+  public SpecIoVariable getSpecIoVariable() {
     return null;
   }
 

@@ -8,7 +8,7 @@ import java.io.InputStream;
 /**
  * Created by bal on 11.01.17.
  */
-public class XMLVerificationScenarioImporter extends XMLImporter<VerificationScenario> {
+public class XmlVerificationScenarioImporter extends XmlImporter<VerificationScenario> {
 
   @Override
   public VerificationScenario doImport(InputStream source) throws ImportException {

@@ -7,7 +7,7 @@ import java.io.OutputStream;
 /**
  * Created by bal on 11.01.17.
  */
-public class XMLVerificationScenarioExporter extends XMLExporter<VerificationScenario> {
+public class XmlVerificationScenarioExporter extends XmlExporter<VerificationScenario> {
 
   @Override
   public OutputStream export(VerificationScenario source) {

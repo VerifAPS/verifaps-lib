@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.view.spec.table.rowActions;
+package edu.kit.iti.formal.stvs.view.spec.table.rowactions;
 
 import javafx.event.Event;
 import javafx.event.EventType;
