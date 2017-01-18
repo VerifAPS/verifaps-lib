@@ -41,7 +41,7 @@ public class TypeBool implements Type {
 
     @Override
     public Value generateDefaultValue() {
-        return null;
+        return ValueBool.FALSE;
     }
 
     public String toString() {
