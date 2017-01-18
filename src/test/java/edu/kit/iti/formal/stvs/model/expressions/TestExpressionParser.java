@@ -49,7 +49,7 @@ public class TestExpressionParser {
 
   @Test
   public void testVariables() throws ParseException, UnsupportedExpressionException {
-    assertParseExpressionEqual("b", var("b"));
+    assertParseExpressionEqual("b", equal(var(cellName), var("b")));
     assertParseExpressionEqual("b = ! FALSE", equal(var("b"), not(literal(false))));
   }
 

@@ -89,15 +89,21 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   }
 
   @Override
-  public Expression visitBvariable(CellExpressionParser.BvariableContext ctx) {
-    return new VariableExpr(ctx.getText());
+  public Expression visitBconstant(CellExpressionParser.BconstantContext ctx) {
+    return new LiteralExpr(valueFromConstantToken(ctx.constant()));
   }
 
   @Override
   public Expression visitVariable(CellExpressionParser.VariableContext ctx) {
-    return new VariableExpr(ctx.getText());
+    Expression variableExpr = new VariableExpr(ctx.getText());
+    return new FunctionExpr(FunctionExpr.Operation.EQUALS,
+        Arrays.asList(cellAsVariable, variableExpr));
   }
 
+  @Override
+  public Expression visitBvariable(CellExpressionParser.BvariableContext ctx) {
+    return new VariableExpr(ctx.getText());
+  }
   private Value valueFromConstantToken(CellExpressionParser.ConstantContext ctx) {
     // I have to trust ANTLR to not have any other values here... :/
     switch (ctx.a.getType()) {
@@ -244,11 +250,6 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
     Expression right = ctx.right.accept(this);
     return new FunctionExpr(binaryOperationFromToken(ctx.op.getType()),
         Arrays.asList(left, right));
-  }
-
-  @Override
-  public Expression visitBconstant(CellExpressionParser.BconstantContext ctx) {
-    return new LiteralExpr(valueFromConstantToken(ctx.constant()));
   }
 
   @Override
