@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>iec61131lang</artifactId>
-    <version>0.1.10</version>
+    <version>0.1.11</version>
     <packaging>jar</packaging>
 
     <name>iec61131lang</name>
@@ -20,7 +20,7 @@
     <repositories>
         <repository>
             <id>institute</id>
-            <url>http://formal.iti.kit.edu/</url>
+            <url>http://formal.iti.kit.edu/maven2/</url>
         </repository>
     </repositories>
 

@@ -9,6 +9,7 @@ Parser and AST for StructuredText, Sequential Function Charts and Function Block
 * License: GPL v3
 * Author
   * Alexander Weigl <weigl@kit.edu>
+  * Contributions from @matheus23
 
 # Getting Started
 
@@ -44,6 +45,11 @@ $ mvn compile assembly
 $ mvn install
 ```
 
+# Changelog 
+
+* 0.1.11 
+ * Bug fix in `IEC61131Facade.file()`
+ * 
 
 # TODO
 

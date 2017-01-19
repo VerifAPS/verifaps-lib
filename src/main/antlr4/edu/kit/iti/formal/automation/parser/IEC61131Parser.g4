@@ -25,7 +25,8 @@ returns [ List<TopLevelElement> ast = new LinkedList<>() ]
 :
 	(library_element_declaration
 	    {
-            $ast.add($library_element_declaration.ast);
+	        if($library_element_declaration.ast != null)
+              $ast.add($library_element_declaration.ast);
 	    })+
 ;
 
@@ -343,7 +344,8 @@ returns [ EnumerationTypeDeclaration  ast = new EnumerationTypeDeclaration()]
 		      {$ast.setInt($integer.ast);}
 		    )?
 
-			( COMMA names+=IDENTIFIER
+			( COMMA a=IDENTIFIER
+              {$ast.addValue($a.text);}
     		  ( ASSIGN integer
     		    {$ast.setInt($integer.ast);}
     		  )?

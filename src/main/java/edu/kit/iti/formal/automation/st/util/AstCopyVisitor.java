@@ -207,6 +207,8 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
     @Override
     public Object visit(LocalScope localScope) {
         LocalScope vs = new LocalScope();
+        //copy global function/block and types declaration
+        vs.setGlobalScope(localScope.getGlobalScope());
         for (VariableDeclaration vd : localScope.getLocalVariables().values())
             vs.add((VariableDeclaration) vd.visit(this));
         return vs;
