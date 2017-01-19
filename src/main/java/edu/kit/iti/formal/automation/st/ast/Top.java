@@ -50,6 +50,14 @@ public abstract class Top implements Visitable {
         public Position() {
             this(-1, -1);
         }
+        
+        public int getLineNumber() {
+            return lineNumber;
+        }
+        
+        public int getCharInLine() {
+            return charInLine;
+        }
 
         @Override
         public String toString() {
