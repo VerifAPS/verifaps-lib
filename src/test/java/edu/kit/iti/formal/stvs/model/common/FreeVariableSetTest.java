@@ -43,10 +43,34 @@ public class FreeVariableSetTest {
   @Test
   public void testSameNameProblems(){
     FreeVariableSet freeVariableSet = new FreeVariableSet();
+    FreeVariable free1 = new FreeVariable("Test", TypeBool.BOOL);
+    FreeVariable free2 = new FreeVariable("Test", TypeInt.INT);
     freeVariableSet.getVariableSet().addAll(
-        new FreeVariable("Test", TypeBool.BOOL),
-        new FreeVariable("Test", TypeInt.INT)
+        free1,
+        free2
     );
+    assertEquals(1, freeVariableSet.getProblems().size());
+    free1.setName("Test2");
+    assertEquals(0, freeVariableSet.getProblems().size());
+    free1.setName("Test");
+    assertEquals(1, freeVariableSet.getProblems().size());
+    free1.setName("Test2");
+    assertEquals(0, freeVariableSet.getProblems().size());
+    freeVariableSet.getVariableSet().add(new FreeVariable("Test", TypeInt.INT));
+    freeVariableSet.getVariableSet().add(new FreeVariable("Test2", TypeInt.INT));
     assertEquals(2, freeVariableSet.getProblems().size());
+  }
+
+  @Test
+  public void testSameNameProblemsRemove(){
+    FreeVariableSet freeVariableSet = new FreeVariableSet();
+    FreeVariable free1 = new FreeVariable("Test", TypeBool.BOOL);
+    FreeVariable free2 = new FreeVariable("Test", TypeInt.INT);
+    freeVariableSet.getVariableSet().addAll(
+        free1,
+        free2
+    );
+    freeVariableSet.getVariableSet().remove(1);
+    assertEquals(0, freeVariableSet.getProblems().size());
   }
 }
