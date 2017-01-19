@@ -1,14 +1,18 @@
 package edu.kit.iti.formal.stvs.model.code;
 
+import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import org.antlr.v4.runtime.Token;
 import org.junit.Test;
+import sun.misc.IOUtils;
 
+import java.io.InputStream;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -18,6 +22,18 @@ public class CodeTest {
 
   private final Code code = new Code();
   private final Code exampleCode = new Code("stfile.st", "THIS IS SPARTA");
+  private final Code enumDefinition = loadCodeFromFile("define_type.st");
+
+  private static String convertStreamToString(InputStream is) {
+    java.util.Scanner s = new java.util.Scanner(is, "UTF-8").useDelimiter("\\A");
+    return s.hasNext() ? s.next() : "";
+  }
+
+  private static Code loadCodeFromFile(String filename) {
+    return new Code(
+        filename,
+        convertStreamToString(CodeTest.class.getResourceAsStream(filename)));
+  }
 
   @Test
   public void testIsEmptyInitially() {
@@ -48,5 +64,11 @@ public class CodeTest {
         .map(Token::getText)
         .reduce("", String::concat);
     assertEquals("Lexer tokens concatenated are source code", source, tokensConcatenated);
+  }
+
+  @Test
+  public void testGetParsedCode() {
+    OptionalProperty<ParsedCode> parsed = enumDefinition.parsedCodeProperty();
+    assertEquals("Have one defined type", 1, parsed.get().getDefinedTypes());
   }
 }
