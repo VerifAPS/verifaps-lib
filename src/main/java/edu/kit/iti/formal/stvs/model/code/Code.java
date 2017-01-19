@@ -1,6 +1,8 @@
 package edu.kit.iti.formal.stvs.model.code;
 
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 
@@ -24,6 +26,7 @@ public class Code {
   private String sourcecode;
   private List<Token> tokens;
   private List<RecognitionException> syntaxErrors;
+  private StringProperty sourceCodeProperty;
 
     /**
      * creates a Dummy-Codefile
@@ -31,20 +34,14 @@ public class Code {
     public Code() {
         this.filename = "New Code";
         this.sourcecode = "";
+        this.sourceCodeProperty = new SimpleStringProperty(this.sourcecode);
     }
 
-    /**
-     * Copy constructor
-     * @param code
-     */
-    public Code (Code code) {
-        this.filename = code.getFilename();
-        this.sourcecode = code.getSourcecode();
-    }
 
     public Code(String filename, String sourcecode) {
         this.filename = filename;
         this.sourcecode = sourcecode;
+        this.sourceCodeProperty = new SimpleStringProperty(this.sourcecode);
     }
 
   public String getFilename() {
@@ -86,5 +83,9 @@ public class Code {
 
   public void addSyntaxErrorsListener(Consumer<List<RecognitionException>> listener) {
 
+  }
+
+  public StringProperty sourcecodeProperty() {
+    return this.sourceCodeProperty;
   }
 }
