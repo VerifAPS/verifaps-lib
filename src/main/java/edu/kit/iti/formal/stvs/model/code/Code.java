@@ -26,7 +26,7 @@ public class Code {
    * last valid parsed Code
    */
   private ParsedCode parsedCode;
-  private final String filename;
+  private StringProperty  filename;
   private List<RecognitionException> syntaxErrors;
   private StringProperty sourceCodeProperty;
   private Binding<List<? extends Token>> tokensBinding;
@@ -35,13 +35,13 @@ public class Code {
    * creates a Dummy-Codefile
    */
   public Code() {
-    this.filename = "New Code";
+    this.filename.set("New Code");
     this.sourceCodeProperty = new SimpleStringProperty("");
     this.tokensBinding = createTokensBinding();
   }
 
   public Code(String filename, String sourcecode) {
-    this.filename = filename;
+    this.filename.set(filename);
     this.sourceCodeProperty = new SimpleStringProperty(sourcecode);
   }
 
@@ -57,14 +57,6 @@ public class Code {
         return lexer.getAllTokens();
       }
     };
-  }
-
-  public String getFilename() {
-    return filename;
-  }
-
-  public void setFilename(String newFilename) {
-    this.filename = newFilename;
   }
 
   public StringProperty sourcecodeProperty() {
