@@ -4,7 +4,6 @@ import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -27,45 +26,46 @@ public class Code {
    * last valid parsed Code
    */
   private ParsedCode parsedCode;
-  private String filename;
+  private final String filename;
   private List<RecognitionException> syntaxErrors;
   private StringProperty sourceCodeProperty;
   private Binding<List<? extends Token>> tokensBinding;
 
-    /**
-     * creates a Dummy-Codefile
-     */
-    public Code() {
-        this.filename = "New Code";
-        this.sourceCodeProperty = new SimpleStringProperty("");
-        this.tokensBinding = createTokensBinding();
-    }
+  /**
+   * creates a Dummy-Codefile
+   */
+  public Code() {
+    this.filename = "New Code";
+    this.sourceCodeProperty = new SimpleStringProperty("");
+    this.tokensBinding = createTokensBinding();
+  }
 
-    public Code(String filename, String sourcecode) {
-        this.filename = filename;
-        this.sourceCodeProperty = new SimpleStringProperty(sourcecode);
-    }
+  public Code(String filename, String sourcecode) {
+    this.filename = filename;
+    this.sourceCodeProperty = new SimpleStringProperty(sourcecode);
+  }
 
-    private Binding<List<? extends Token>> createTokensBinding() {
-      return new ObjectBinding<List<? extends Token>>() {
-        {
-          bind(sourceCodeProperty);
-        }
-        @Override
-        protected List<? extends Token> computeValue() {
-          IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(sourceCodeProperty.get()));
-          return lexer.getAllTokens();
-        }
-      };
-    }
+  private Binding<List<? extends Token>> createTokensBinding() {
+    return new ObjectBinding<List<? extends Token>>() {
+      {
+        bind(sourceCodeProperty);
+      }
+
+      @Override
+      protected List<? extends Token> computeValue() {
+        IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(sourceCodeProperty.get()));
+        return lexer.getAllTokens();
+      }
+    };
+  }
 
   public String getFilename() {
     return filename;
   }
 
-    public void setFilename(String newFilename) {
-        this.filename = newFilename;
-    }
+  public void setFilename(String newFilename) {
+    this.filename = newFilename;
+  }
 
   public StringProperty sourcecodeProperty() {
     return this.sourceCodeProperty;
