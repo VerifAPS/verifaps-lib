@@ -37,6 +37,6 @@ public class FreeVariableSetTest {
     list.add(new FreeVariable("Test2", TypeInt.INT, new ValueInt(6)));
     list.add(new FreeVariable("Test3", TypeInt.INT, new ValueInt(7)));
     FreeVariableSet freeVariables = new FreeVariableSet(list);
-    assertEquals(freeVariables.getVariableSet().size(), 3);
+    assertEquals(3, freeVariables.getVariableSet().size());
   }
 }

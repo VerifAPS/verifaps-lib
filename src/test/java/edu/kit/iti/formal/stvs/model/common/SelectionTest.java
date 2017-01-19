@@ -25,7 +25,7 @@ public class SelectionTest {
     selection.columnProperty().removeListener(listener);
     selection.setColumn("Test");
     assertFalse(wasCalled.get());
-    assertEquals(selection.getColumn(), "Test");
+    assertEquals("Test", selection.getColumn());
   }
 
   @Test
@@ -33,7 +33,7 @@ public class SelectionTest {
     Selection selection = new Selection();
     assertTrue(selection.rowProperty().isNull().get());
     selection.setRow(5);
-    assertEquals(selection.getRow(), 5);
-    assertEquals(selection.rowProperty().get(), 5);
+    assertEquals(5, selection.getRow());
+    assertEquals(5, selection.rowProperty().get());
   }
 }
