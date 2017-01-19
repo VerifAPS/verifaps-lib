@@ -1,12 +1,17 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 /*
   TODO: Possible rename of the class?
@@ -22,7 +27,7 @@ import java.util.stream.Collectors;
  */
 public class FreeVariableSet {
   private ObservableList<FreeVariable> variableSet = FXCollections.observableArrayList();
-  private ObservableList<SameNameProblem> problems = FXCollections.observableArrayList();
+  private ObjectProperty<Map<String,Set<FreeVariable>>> problems = new SimpleObjectProperty<>(new HashMap<>());
 
   /**
    * Creates a new list of free variables with an existing base.
@@ -31,12 +36,40 @@ public class FreeVariableSet {
    */
   public FreeVariableSet(List<FreeVariable> variableSet) {
     this.variableSet.addAll(variableSet);
+    initItemChangeListener();
+  }
+
+  private void initItemChangeListener() {
+    this.variableSet.addListener((ListChangeListener.Change<? extends FreeVariable> change) -> {
+      boolean criticalOperationOccured = false;
+      while (change.next()) {
+        if (change.wasAdded() || change.wasUpdated()) {
+          criticalOperationOccured = true;
+        }
+      }
+      if (criticalOperationOccured) {
+        findProblems();
+      }
+    });
+  }
+
+  private void findProblems() {
+    variableSet.stream()
+        .map(FreeVariable::getName)
+        .distinct()
+        .map(name -> variableSet.stream()
+            .filter(var -> var.getName().equals(name))
+            .collect(Collectors.toSet())
+        )
+        .filter(set -> set.size() < 2);
+
   }
 
   /**
    * Creates a new empty list of free variables.
    */
   public FreeVariableSet() {
+    initItemChangeListener();
   }
 
   /**
@@ -53,7 +86,11 @@ public class FreeVariableSet {
     return variableSet;
   }
 
-  public ObservableList<SameNameProblem> getProblems() {
-    return FXCollections.unmodifiableObservableList(problems);
+  public Map<String, Set<FreeVariable>> getProblems() {
+    return problems.get();
+  }
+
+  public ObjectProperty<Map<String, Set<FreeVariable>>> problemsProperty() {
+    return problems;
   }
 }

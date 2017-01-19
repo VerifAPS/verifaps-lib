@@ -39,4 +39,14 @@ public class FreeVariableSetTest {
     FreeVariableSet freeVariables = new FreeVariableSet(list);
     assertEquals(3, freeVariables.getVariableSet().size());
   }
+
+  @Test
+  public void testSameNameProblems(){
+    FreeVariableSet freeVariableSet = new FreeVariableSet();
+    freeVariableSet.getVariableSet().addAll(
+        new FreeVariable("Test", TypeBool.BOOL),
+        new FreeVariable("Test", TypeInt.INT)
+    );
+    assertEquals(2, freeVariableSet.getProblems().size());
+  }
 }
