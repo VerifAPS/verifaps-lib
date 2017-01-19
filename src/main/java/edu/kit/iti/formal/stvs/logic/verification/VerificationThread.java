@@ -8,14 +8,14 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
  */
 public class VerificationThread extends Thread {
 
-    private Code code;
-    private ConstraintSpecification specification;
+  private Code code;
+  private ConstraintSpecification specification;
 
-    public VerificationThread(Code code, ConstraintSpecification specification) {
+  public VerificationThread(Code code, ConstraintSpecification specification) {
 
-    }
+  }
 
-    public void run() {
+  public void run() {
 
-    }
+  }
 }

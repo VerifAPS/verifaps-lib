@@ -5,40 +5,40 @@ import java.util.function.IntFunction;
 
 public class ValueInt implements Value {
 
-    private final int value;
+  private final int value;
 
-    public ValueInt(int value) {
-        this.value = value;
-    }
+  public ValueInt(int value) {
+    this.value = value;
+  }
 
-    @Override
-    public <R> R match(
-            IntFunction<R> matchInt,
-            Function<Boolean, R> matchBoolean,
-            Function<ValueEnum, R> matchEnum) {
-        return matchInt.apply(value);
-    }
+  @Override
+  public <R> R match(
+      IntFunction<R> matchInt,
+      Function<Boolean, R> matchBoolean,
+      Function<ValueEnum, R> matchEnum) {
+    return matchInt.apply(value);
+  }
 
-    public int getValue() {
-        return value;
-    }
+  public int getValue() {
+    return value;
+  }
 
-    public boolean equals(ValueInt other) {
-        return other != null && value == other.value;
-    }
+  public boolean equals(ValueInt other) {
+    return other != null && value == other.value;
+  }
 
-    @Override
-    public boolean equals(Object other) {
-        return (other instanceof ValueInt) && this.equals((ValueInt) other);
-    }
+  @Override
+  public boolean equals(Object other) {
+    return (other instanceof ValueInt) && this.equals((ValueInt) other);
+  }
 
-    public String toString() {
-        return "ValueInt(" + value + ")";
-    }
+  public String toString() {
+    return "ValueInt(" + value + ")";
+  }
 
-    @Override
-    public Type getType() {
-        return TypeInt.INT;
-    }
+  @Override
+  public Type getType() {
+    return TypeInt.INT;
+  }
 
 }

@@ -10,41 +10,40 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 
-import java.util.List;
-
 public class HybridCellController implements Controller {
-    private StringProperty comment;
-    private ObservableList<String> counterexamples;
-    private StringProperty errorTooltip;
-    private BooleanProperty errorInCell;
-    private HybridCell hybridCell;
-    private GlobalConfig globalConfig;
-    private ContextMenu contextMenu;
+  private StringProperty comment;
+  private ObservableList<String> counterexamples;
+  private StringProperty errorTooltip;
+  private BooleanProperty errorInCell;
+  private HybridCell hybridCell;
+  private GlobalConfig globalConfig;
+  private ContextMenu contextMenu;
 
-    public ObservableList<String> getCounterexamples() {
-        return null;
-    }
+  public ObservableList<String> getCounterexamples() {
+    return null;
+  }
 
-    public StringProperty getValueProperty() {
-        return null;
-    }
+  public StringProperty getValueProperty() {
+    return null;
+  }
 
-    public StringProperty getCommentProperty() {
-        return null;
-    }
+  public StringProperty getCommentProperty() {
+    return null;
+  }
 
-    private void onAddUserInputStringChanged(String string){}
+  private void onAddUserInputStringChanged(String string) {
+  }
 
-    public void onProblemOccured(ObjectProperty<SpecProblem> problem){
+  public void onProblemOccured(ObjectProperty<SpecProblem> problem) {
 
-    }
+  }
 
-    public HybridCellController(CellOperationProvider cell, ObservableList<String> counterexamples, GlobalConfig globalConfig) {
-        this.globalConfig = globalConfig;
+  public HybridCellController(CellOperationProvider cell, ObservableList<String> counterexamples, GlobalConfig globalConfig) {
+    this.globalConfig = globalConfig;
 
-    }
+  }
 
-    public HybridCell getView() {
-        return hybridCell;
-    }
+  public HybridCell getView() {
+    return hybridCell;
+  }
 }

@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
@@ -15,21 +14,21 @@ import java.util.List;
  * Created by leonk on 10.01.2017.
  */
 public abstract class ColumnController implements Controller {
-    private ColumnConfig config;
+  private ColumnConfig config;
 
-    public ColumnController(ColumnConfig config) {
+  public ColumnController(ColumnConfig config) {
 
-        this.config = config;
-    }
+    this.config = config;
+  }
 
-    public abstract void onProblemsChange(List<SpecProblem> problems);
+  public abstract void onProblemsChange(List<SpecProblem> problems);
 
-    public abstract IntegerProperty getWidthProperty();
+  public abstract IntegerProperty getWidthProperty();
 
-    public abstract int getWidth();
+  public abstract int getWidth();
 
-    public abstract ObservableList<HybridCellController> getCells();
+  public abstract ObservableList<HybridCellController> getCells();
 
-    @Override
-    public abstract Node getView();
+  @Override
+  public abstract Node getView();
 }

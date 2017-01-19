@@ -16,7 +16,7 @@ public abstract class IoVariable {
 
   public boolean matches(IoVariable other) {
     return getName().equals(other.getName())
-            && getType().checksAgainst(other.getType())
-            && getCategory() == other.getCategory();
+        && getType().checksAgainst(other.getType())
+        && getCategory() == other.getCategory();
   }
 }

@@ -7,11 +7,11 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
  */
 public class VerificationResult {
 
-    public boolean isSuccessful() {
-        return false;
-    }
+  public boolean isSuccessful() {
+    return false;
+  }
 
-    public ConcreteSpecification getCounterExample() {
-        return null;
-    }
+  public ConcreteSpecification getCounterExample() {
+    return null;
+  }
 }

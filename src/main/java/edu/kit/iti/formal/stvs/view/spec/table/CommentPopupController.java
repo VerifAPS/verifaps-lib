@@ -7,21 +7,21 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.layout.Pane;
 
 public class CommentPopupController implements Controller {
-    private boolean editable;
-    private StringProperty comment;
-    private GlobalConfig globalConfig;
+  private boolean editable;
+  private StringProperty comment;
+  private GlobalConfig globalConfig;
 
-    public CommentPopupController(Commentable commentable, boolean editable, GlobalConfig globalConfig) {
-        this.globalConfig = globalConfig;
-    }
+  public CommentPopupController(Commentable commentable, boolean editable, GlobalConfig globalConfig) {
+    this.globalConfig = globalConfig;
+  }
 
-    public StringProperty getCommentProperty() {
-        return comment;
-    }
+  public StringProperty getCommentProperty() {
+    return comment;
+  }
 
-    @Override
-    //Pane is not the right type here. We will need to change this
-    public Pane getView() {
-        return null;
-    }
+  @Override
+  //Pane is not the right type here. We will need to change this
+  public Pane getView() {
+    return null;
+  }
 }

@@ -7,17 +7,17 @@ import edu.kit.iti.formal.stvs.model.expressions.Value;
  */
 public class ConcreteCell {
 
-    private final Value value;
+  private final Value value;
 
-    public ConcreteCell(Value value) {
-        this.value = value;
-    }
+  public ConcreteCell(Value value) {
+    this.value = value;
+  }
 
-    public Value getValue() {
-        return value;
-    }
+  public Value getValue() {
+    return value;
+  }
 
-    public String toString() {
-        return null;
-    }
+  public String toString() {
+    return null;
+  }
 }

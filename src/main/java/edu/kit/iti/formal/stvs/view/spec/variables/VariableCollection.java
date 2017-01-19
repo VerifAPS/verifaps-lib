@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.variables;
 
 import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 /**
@@ -9,5 +8,5 @@ import javafx.scene.layout.VBox;
  */
 public class VariableCollection extends VBox {
 
-    private Button addFreeVariable;
+  private Button addFreeVariable;
 }

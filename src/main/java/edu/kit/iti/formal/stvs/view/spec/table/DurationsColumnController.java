@@ -11,35 +11,35 @@ import javafx.scene.control.ContextMenu;
 import java.util.List;
 
 public class DurationsColumnController extends ColumnController {
-    private IntegerProperty width;
-    private ObservableList<HybridCellController> cells;
-    private DurationsColumn durationsColumn;
-    private GlobalConfig globalConfig;
-    private ContextMenu contextMenu;
+  private IntegerProperty width;
+  private ObservableList<HybridCellController> cells;
+  private DurationsColumn durationsColumn;
+  private GlobalConfig globalConfig;
+  private ContextMenu contextMenu;
 
-    public IntegerProperty getWidthProperty() {
-        return width;
-    }
+  public IntegerProperty getWidthProperty() {
+    return width;
+  }
 
-    public int getWidth() {
-        return width.get();
-    }
+  public int getWidth() {
+    return width.get();
+  }
 
-    public DurationsColumnController(ColumnConfig config, GlobalConfig globalConfig) {
-        super(config);
-        this.globalConfig = globalConfig;
-    }
+  public DurationsColumnController(ColumnConfig config, GlobalConfig globalConfig) {
+    super(config);
+    this.globalConfig = globalConfig;
+  }
 
-    public void onProblemsChange(List<SpecProblem> problems){
+  public void onProblemsChange(List<SpecProblem> problems) {
 
-    }
+  }
 
-    public ObservableList<HybridCellController> getCells() {
-        return cells;
-    }
+  public ObservableList<HybridCellController> getCells() {
+    return cells;
+  }
 
-    @Override
-    public DurationsColumn getView() {
-        return durationsColumn;
-    }
+  @Override
+  public DurationsColumn getView() {
+    return durationsColumn;
+  }
 }

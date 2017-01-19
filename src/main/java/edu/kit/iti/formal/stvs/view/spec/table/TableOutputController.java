@@ -5,14 +5,14 @@ import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import javafx.scene.control.ContextMenu;
 
 public class TableOutputController extends TableCategoryController {
-    private GlobalConfig globalConfig;
-    private ContextMenu contextMenu;
+  private GlobalConfig globalConfig;
+  private ContextMenu contextMenu;
 
-    public TableOutputController(HybridSpecification spec, TablePaneController tablePaneController) {
-        super("Output", spec, tablePaneController);
-    }
+  public TableOutputController(HybridSpecification spec, TablePaneController tablePaneController) {
+    super("Output", spec, tablePaneController);
+  }
 
-    public void addIOVariable(String string) {
+  public void addIoVariable(String string) {
 
-    }
+  }
 }

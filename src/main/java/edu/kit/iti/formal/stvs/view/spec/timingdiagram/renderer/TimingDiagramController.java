@@ -12,22 +12,23 @@ import javafx.scene.control.ContextMenu;
  * Controller for a single TimingDiagramController e.g. for <b>one</b> Variable and over all Timesteps
  */
 public class TimingDiagramController implements Controller {
-    private ContextMenu contextMenu;
-    private TimingDiagramView view;
+  private ContextMenu contextMenu;
+  private TimingDiagramView view;
 
-    public TimingDiagramController(SpecIoVariable ioVariable, HybridSpecification spec, Selection selection) {
+  public TimingDiagramController(SpecIoVariable ioVariable, HybridSpecification spec, Selection selection) {
 
-    }
+  }
 
-    /**
-     * sets the selection on selection
-     * @param selection selected node
-     */
-    private void onSelection(Node selection) {
+  /**
+   * sets the selection on selection
+   *
+   * @param selection selected node
+   */
+  private void onSelection(Node selection) {
 
-    }
+  }
 
-    public TimingDiagramView getView() {
-        return null;
-    }
+  public TimingDiagramView getView() {
+    return null;
+  }
 }

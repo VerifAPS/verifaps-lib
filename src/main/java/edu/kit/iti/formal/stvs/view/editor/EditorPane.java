@@ -8,45 +8,42 @@ import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.StyleSpans;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by csicar on 09.01.17.
- *
  */
 public class EditorPane extends Pane {
 
-    /**
-     * Contains ButtonList and CodeArea
-     */
-    private HBox horizontalBox;
-    private CodeArea codeArea;
-    private VBox buttonList;
+  /**
+   * Contains ButtonList and CodeArea
+   */
+  private HBox horizontalBox;
+  private CodeArea codeArea;
+  private VBox buttonList;
 
 
-    public StringProperty getCodeProperty() {
-        return null;
-    }
+  public StringProperty getCodeProperty() {
+    return null;
+  }
 
-    public String getCode() {
-        return null;
-    }
+  public String getCode() {
+    return null;
+  }
 
-    public void setCode(String code) {
+  public void setCode(String code) {
 
-    }
+  }
 
 
+  public void setStyleSpans(StyleSpans<Collection<String>> style) {
 
-    public void setStyleSpans(StyleSpans<Collection<String>> style){
+  }
 
-    }
+  public CodeArea getCodeArea() {
+    return codeArea;
+  }
 
-    public CodeArea getCodeArea() {
-        return codeArea;
-    }
-
-    public VBox getButtonList() {
-        return buttonList;
-    }
+  public VBox getButtonList() {
+    return buttonList;
+  }
 }

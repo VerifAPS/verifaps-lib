@@ -7,9 +7,9 @@ import java.util.function.Consumer;
  */
 public interface StringEditable {
 
-    String getAsString();
+  String getAsString();
 
-    void setFromString(String input);
+  void setFromString(String input);
 
-    void addStringListener(Consumer<String> listener);
+  void addStringListener(Consumer<String> listener);
 }

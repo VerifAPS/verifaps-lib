@@ -8,42 +8,42 @@ import java.util.function.Consumer;
  */
 public class ConstraintCell implements CellOperationProvider {
 
-    private String stringRepresentation;
-    private String comment;
+  private String stringRepresentation;
+  private String comment;
 
-    private List<Consumer<String>> userInputStringListeners;
+  private List<Consumer<String>> userInputStringListeners;
 
-    public ConstraintCell(String stringRepresentation) {
-        this.stringRepresentation = stringRepresentation;
-    }
+  public ConstraintCell(String stringRepresentation) {
+    this.stringRepresentation = stringRepresentation;
+  }
 
-    @Override
-    public String getAsString() {
-        return stringRepresentation;
-    }
+  @Override
+  public String getAsString() {
+    return stringRepresentation;
+  }
 
-    @Override
-    public void setFromString(String stringRepresentation) {
-        this.stringRepresentation = stringRepresentation;
-    }
+  @Override
+  public void setFromString(String stringRepresentation) {
+    this.stringRepresentation = stringRepresentation;
+  }
 
-    @Override
-    public void addStringListener(Consumer<String> listener) {
+  @Override
+  public void addStringListener(Consumer<String> listener) {
 
-    }
+  }
 
-    @Override
-    public void setComment(String comment) {
+  @Override
+  public void setComment(String comment) {
 
-    }
+  }
 
-    @Override
-    public String getComment() {
-        return comment;
-    }
+  @Override
+  public String getComment() {
+    return comment;
+  }
 
-    @Override
-    public void addCommentListener(Consumer<Commentable> consumer) {
+  @Override
+  public void addCommentListener(Consumer<Commentable> consumer) {
 
-    }
+  }
 }

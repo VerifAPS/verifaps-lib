@@ -10,34 +10,34 @@ import java.util.function.Function;
  */
 public class CyclicDependencyProblem extends SpecProblem {
 
-    private final int row;
-    private final List<SpecIoVariable> cycle;
+  private final int row;
+  private final List<SpecIoVariable> cycle;
 
-    public CyclicDependencyProblem(int row, List<SpecIoVariable> cycle) {
-        this.row = row;
-        this.cycle = cycle;
-    }
+  public CyclicDependencyProblem(int row, List<SpecIoVariable> cycle) {
+    this.row = row;
+    this.cycle = cycle;
+  }
 
-    @Override
-    public <R> R match(
-            Function<TypeErrorProblem, R> matchTypeError,
-            Function<InvalidIOVarProblem, R> matchInvalidIOVar,
-            Function<CyclicDependencyProblem, R> matchCyclicDependency,
-            Function<ParseErrorProblem, R> matchParseError,
-            Function<DurationProblem, R> matchDurationProblem) {
-        return matchCyclicDependency.apply(this);
-    }
+  @Override
+  public <R> R match(
+      Function<TypeErrorProblem, R> matchTypeError,
+      Function<InvalidIoVarProblem, R> matchInvalidIoVar,
+      Function<CyclicDependencyProblem, R> matchCyclicDependency,
+      Function<ParseErrorProblem, R> matchParseError,
+      Function<DurationProblem, R> matchDurationProblem) {
+    return matchCyclicDependency.apply(this);
+  }
 
-    @Override
-    public String getErrorMessage() {
-        return null;
-    }
+  @Override
+  public String getErrorMessage() {
+    return null;
+  }
 
-    public int getRow() {
-        return row;
-    }
+  public int getRow() {
+    return row;
+  }
 
-    public List<SpecIoVariable> getCycle() {
-        return cycle;
-    }
+  public List<SpecIoVariable> getCycle() {
+    return cycle;
+  }
 }

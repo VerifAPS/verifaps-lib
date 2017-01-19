@@ -5,22 +5,22 @@ package edu.kit.iti.formal.stvs.model.table;
  */
 public class ConcreteSpecification extends SpecificationTable<ConcreteCell, ConcreteDuration> {
 
-    private final boolean isCounterExample;
+  private final boolean isCounterExample;
 
 
-    /**
-     * Copy constructor
-     */
-    public ConcreteSpecification(ConcreteSpecification spec) {
-        //...
-        isCounterExample = spec.isCounterExample;
-    }
+  /**
+   * Copy constructor
+   */
+  public ConcreteSpecification(ConcreteSpecification spec) {
+    //...
+    isCounterExample = spec.isCounterExample;
+  }
 
-    public ConcreteSpecification(boolean isCounterExample) {
-        this.isCounterExample = isCounterExample;
-    }
+  public ConcreteSpecification(boolean isCounterExample) {
+    this.isCounterExample = isCounterExample;
+  }
 
-    public boolean isCounterExample() {
-        return isCounterExample;
-    }
+  public boolean isCounterExample() {
+    return isCounterExample;
+  }
 }

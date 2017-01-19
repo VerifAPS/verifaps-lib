@@ -8,19 +8,19 @@ import java.util.Map;
  */
 public class SpecificationRow<C, D> {
 
-    private final D duration;
-    private final Map<String, C> cells;
+  private final D duration;
+  private final Map<String, C> cells;
 
-    public SpecificationRow(D duration, Map<String, C> cells) {
-        this.duration = duration;
-        this.cells = cells;
-    }
+  public SpecificationRow(D duration, Map<String, C> cells) {
+    this.duration = duration;
+    this.cells = cells;
+  }
 
-    public C getEntryForVariable(String variable) {
-        return null;
-    }
+  public C getEntryForVariable(String variable) {
+    return null;
+  }
 
-    public D getDuration() {
-        return duration;
-    }
+  public D getDuration() {
+    return duration;
+  }
 }

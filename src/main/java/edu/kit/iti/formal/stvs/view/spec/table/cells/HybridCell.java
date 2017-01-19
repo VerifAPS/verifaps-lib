@@ -6,27 +6,27 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
 public class HybridCell extends TableCell implements Lockable {
-    private ValueCell valueCell;
-    private VBox counterExampleContainer;
-    private BooleanProperty editableProperty;
-    private Button commentButton;
+  private ValueCell valueCell;
+  private VBox counterExampleContainer;
+  private BooleanProperty editableProperty;
+  private Button commentButton;
 
-    public BooleanProperty getEditableProperty() {
-        return null;
-    }
+  public BooleanProperty getEditableProperty() {
+    return null;
+  }
 
-    public void setEditable(boolean b) {
-    }
+  public void setEditable(boolean b) {
+  }
 
-    public boolean getEditable() {
-        return false;
-    }
+  public boolean getEditable() {
+    return false;
+  }
 
-    public VBox getCounterExampleContainer() {
-        return counterExampleContainer;
-    }
+  public VBox getCounterExampleContainer() {
+    return counterExampleContainer;
+  }
 
-    public ValueCell getValueCell() {
-        return valueCell;
-    }
+  public ValueCell getValueCell() {
+    return valueCell;
+  }
 }

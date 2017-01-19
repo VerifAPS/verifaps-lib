@@ -6,9 +6,9 @@ import javafx.beans.property.BooleanProperty;
  * Created by leonk on 11.01.2017.
  */
 public interface Lockable {
-    boolean getEditable();
+  boolean getEditable();
 
-    void setEditable(boolean b);
+  void setEditable(boolean b);
 
-    BooleanProperty getEditableProperty();
+  BooleanProperty getEditableProperty();
 }
