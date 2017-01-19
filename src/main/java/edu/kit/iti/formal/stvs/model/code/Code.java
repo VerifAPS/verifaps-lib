@@ -2,6 +2,11 @@ package edu.kit.iti.formal.stvs.model.code;
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
+
+import java.util.function.Consumer;
+import java.util.List;
+
+import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.SimpleStringProperty;
@@ -10,24 +15,17 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 
-import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * Created by csicar on 09.01.17.
- *
  */
 public class Code {
-  private List<Consumer<List<CodeIoVariable>>> ioVariableListeners;
-  private List<Consumer<ParsedCode>> parsedCodeListeners;
-  private List<Consumer<List<RecognitionException>>> syntaxErrorsListeners;
-  private List<Consumer<List<Token>>> lexedCodeListeners;
 
   /**
    * last valid parsed Code
    */
-  private ParsedCode parsedCode;
-  private StringProperty  filename;
+  private OptionalProperty<ParsedCode> parsedCode;
+  private StringProperty filename;
   private List<RecognitionException> syntaxErrors;
   private StringProperty sourceCodeProperty;
   private Binding<List<? extends Token>> tokensBinding;

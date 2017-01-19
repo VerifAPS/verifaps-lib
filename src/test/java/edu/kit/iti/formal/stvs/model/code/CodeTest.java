@@ -2,7 +2,6 @@ package edu.kit.iti.formal.stvs.model.code;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import edu.kit.iti.formal.stvs.model.code.Code;
 import org.antlr.v4.runtime.Token;
 import org.junit.Test;
 
