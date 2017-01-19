@@ -20,9 +20,9 @@ public class FreeVariableTest {
     FreeVariable testVar1 = new FreeVariable("testVar1", TypeBool.BOOL);
     FreeVariable testVar2 = new FreeVariable("testVar2", TypeInt.INT, new ValueInt(1233));
     assertTrue(testVar1.getType().checksAgainst(TypeBool.BOOL));
-    assertEquals(testVar1.getName(), "testVar1");
-    assertEquals(testVar1.getDefaultValue(), TypeBool.BOOL.generateDefaultValue());
-    assertEquals(testVar2.getDefaultValue(), new ValueInt(1233));
+    assertEquals("testVar1", testVar1.getName());
+    assertEquals(TypeBool.BOOL.generateDefaultValue(), testVar1.getDefaultValue());
+    assertEquals(new ValueInt(1233), testVar2.getDefaultValue());
   }
 
   @Test
@@ -30,8 +30,8 @@ public class FreeVariableTest {
     //Tests if the value is set to types default value in case of type mismatch
     FreeVariable var = new FreeVariable("testVar2", TypeInt.INT, new ValueInt(1233));
     var.setType(TypeBool.BOOL);
-    assertEquals(var.getType(), TypeBool.BOOL);
-    assertEquals(var.getDefaultValue(), TypeBool.BOOL.generateDefaultValue());
+    assertEquals(TypeBool.BOOL, var.getType());
+    assertEquals(TypeBool.BOOL.generateDefaultValue(), var.getDefaultValue());
   }
 
   @Test
@@ -41,8 +41,8 @@ public class FreeVariableTest {
     try {
       var.setDefaultValue(ValueBool.FALSE);
     } catch (IllegalValueTypeException e) {
-      assertEquals(e.getExpectedType(), TypeInt.INT);
-      assertEquals(e.getMistypedValue().getType(), TypeBool.BOOL);
+      assertEquals(TypeInt.INT, e.getExpectedType());
+      assertEquals(TypeBool.BOOL, e.getMistypedValue().getType());
     }
   }
 
@@ -55,6 +55,6 @@ public class FreeVariableTest {
     var.defaultValueProperty().addListener(value -> gotCalled.set(true));
     var.setType(TypeInt.INT);
     assertTrue(gotCalled.get());
-    assertEquals(var.getDefaultValue(), TypeInt.INT.generateDefaultValue());
+    assertEquals(TypeInt.INT.generateDefaultValue(), var.getDefaultValue());
   }
 }

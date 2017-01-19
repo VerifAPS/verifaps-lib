@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
  */
 public class FreeVariableSet {
   private ObservableList<FreeVariable> variableSet = FXCollections.observableArrayList();
+  private ObservableList<SameNameProblem> problems = FXCollections.observableArrayList();
 
   /**
    * Creates a new list of free variables with an existing base.
@@ -49,5 +51,9 @@ public class FreeVariableSet {
 
   public ObservableList<FreeVariable> getVariableSet() {
     return variableSet;
+  }
+
+  public ObservableList<SameNameProblem> getProblems() {
+    return FXCollections.unmodifiableObservableList(problems);
   }
 }

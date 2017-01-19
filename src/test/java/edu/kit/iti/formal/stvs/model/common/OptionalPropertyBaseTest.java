@@ -24,9 +24,9 @@ public class OptionalPropertyBaseTest {
     testOptional.clear();
     assertTrue(testOptional.isNull().get());
     //Removing the optionals value does not affect the wrapped property.
-    assertEquals(testOptional.getProperty().get(), "Das ist ein Test");
+    assertEquals("Das ist ein Test", testOptional.getProperty().get());
     testOptional.set(null);
-    assertEquals(testOptional.getProperty().get(), "Das ist ein Test");
+    assertEquals("Das ist ein Test", testOptional.getProperty().get());
   }
 
   @Test
@@ -45,8 +45,8 @@ public class OptionalPropertyBaseTest {
     OptionalPropertyBase<Number, IntegerProperty> testOptional =
             new OptionalPropertyBase<>(testProperty);
     testOptional.set(5);
-    assertEquals(testOptional.getValue(), 5);
+    assertEquals(5, testOptional.getValue());
     testOptional.setValue(4);
-    assertEquals(testOptional.getValue(), 4);
+    assertEquals(4, testOptional.getValue());
   }
 }
