@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.model.code;
 
+import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -67,7 +68,7 @@ public class CodeTest {
 
   @Test
   public void testGetParsedCode() {
-    OptionalProperty<ParsedCode> parsed = enumDefinition.parsedCodeProperty();
-    assertEquals("Have one defined type", 1, parsed.get().getDefinedTypes());
+    NullableProperty<ParsedCode> parsed = enumDefinition.parsedCodeProperty();
+    assertEquals("Have one defined type", 1, parsed.get().getDefinedTypes().size());
   }
 }

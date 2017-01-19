@@ -1,3 +1,3 @@
 TYPE
-    my_enum : (OnePossibleValue, AnotherPossibleValue, Blah)
+    AMPEL: (Rot, Gelb, Gruen);
 END_TYPE

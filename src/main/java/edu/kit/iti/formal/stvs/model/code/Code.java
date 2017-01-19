@@ -3,14 +3,17 @@ package edu.kit.iti.formal.stvs.model.code;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 
+import java.util.Observable;
 import java.util.function.Consumer;
 import java.util.List;
 
+import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
@@ -24,7 +27,7 @@ public class Code {
   /**
    * last valid parsed Code
    */
-  private OptionalProperty<ParsedCode> parsedCode;
+  private NullableProperty<ParsedCode> parsedCode;
   private StringProperty filename;
   private List<RecognitionException> syntaxErrors;
   private StringProperty sourceCodeProperty;
@@ -37,12 +40,22 @@ public class Code {
     this.filename = new SimpleStringProperty("New Code");
     this.sourceCodeProperty = new SimpleStringProperty("");
     this.tokensBinding = createTokensBinding();
+    this.parsedCode = new NullableProperty<ParsedCode>(null);
+
+    sourceCodeProperty.addListener(this::rebuildParsedCode);
   }
 
   public Code(String filename, String sourcecode) {
     this.filename = new SimpleStringProperty(filename);
     this.sourceCodeProperty = new SimpleStringProperty(sourcecode);
     this.tokensBinding = createTokensBinding();
+    this.parsedCode = new NullableProperty<ParsedCode>(ParsedCode.parseCode(sourceCodeProperty.get()));
+
+    sourceCodeProperty.addListener(this::rebuildParsedCode);
+  }
+
+  private void rebuildParsedCode(ObservableValue<? extends String> observableValue, String oldVal, String newVal) {
+    parsedCode.set(ParsedCode.parseCode(newVal));
   }
 
   private Binding<List<? extends Token>> createTokensBinding() {
@@ -65,5 +78,9 @@ public class Code {
 
   public Binding<List<? extends Token>> tokensBinding() {
     return tokensBinding;
+  }
+
+  public NullableProperty<ParsedCode> parsedCodeProperty() {
+    return parsedCode;
   }
 }
