@@ -14,15 +14,22 @@ public class Selection implements Observable {
 
   private OptionalPropertyBase<String, StringProperty> column;
   private OptionalPropertyBase<Number, IntegerProperty> row;
+  private ProxyBinding<Selection> proxyBinding;
 
   public Selection(String column, int row) {
     this.column = new OptionalPropertyBase<>(new SimpleStringProperty(column));
     this.row = new OptionalPropertyBase<>(new SimpleIntegerProperty(row));
+    initBinding();
+  }
+
+  private void initBinding() {
+    proxyBinding = new ProxyBinding<Selection>(this, column, row);
   }
 
   public Selection() {
     this.column = OptionalPropertyBase.ofNull(new SimpleStringProperty());
     this.row = OptionalPropertyBase.ofNull(new SimpleIntegerProperty());
+    initBinding();
   }
 
   public String getColumn() {
@@ -71,8 +78,7 @@ public class Selection implements Observable {
    */
   @Override
   public void addListener(InvalidationListener listener) {
-    this.column.addListener(listener);
-    this.row.addListener(listener);
+    proxyBinding.addListener(listener);
   }
 
   /**
@@ -90,7 +96,6 @@ public class Selection implements Observable {
    */
   @Override
   public void removeListener(InvalidationListener listener) {
-    this.column.removeListener(listener);
-    this.row.removeListener(listener);
+    proxyBinding.removeListener(listener);
   }
 }
