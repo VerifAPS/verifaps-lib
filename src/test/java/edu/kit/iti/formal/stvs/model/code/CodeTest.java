@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 public class CodeTest {
 
     private final Code code = new Code();
+    private final Code exampleCode = new Code("stfile.st", "THIS IS SPARTA");
 
     @Test
     public void testIsEmptyInitially() {
@@ -37,5 +38,15 @@ public class CodeTest {
         List<? extends Token> tokens = code.tokensBinding().getValue();
         System.out.println(tokens);
         assertTrue(tokens.size() > 0);
+    }
+
+    @Test
+    public void testTokensConcatenated() {
+        String source = exampleCode.sourcecodeProperty().get();
+        List<? extends Token> tokens = exampleCode.tokensBinding().getValue();
+        String tokensConcatenated = tokens.stream()
+                .map(Token::getText)
+                .reduce("", String::concat);
+        assertEquals("Lexer tokens concatenated are source code", source, tokensConcatenated);
     }
 }
