@@ -75,7 +75,7 @@ public class TypeEnum implements Type {
   }
 
   public String toString() {
-    return "TypeEnum(" + getTypeName() + ")";
+    return "TypeEnum(" + getTypeName() + " : " + valueMap.keySet() + ")";
   }
 
 }

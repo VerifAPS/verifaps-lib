@@ -39,4 +39,8 @@ public class CodeIoVariable extends IoVariable {
   public Type getType() {
     return type;
   }
+
+  public String toString() {
+    return "CodeIoVariable(" + category + " " + name + " : " + type + ")";
+  }
 }

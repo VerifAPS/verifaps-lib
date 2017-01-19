@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.code;
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
+import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
@@ -53,11 +54,6 @@ public class ParsedCode {
     VariableVisitor(Map<String, Type> definedTypes) {
       this.definedVariables = new HashSet<>();
       this.definedTypes = definedTypes;
-    }
-    @Override
-    public Void visit(ProgramDeclaration declaration) {
-      //elements.stream().forEach(element -> element.visit(this));
-      return null;
     }
 
     @Override
