@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 
 /**
  * Created by csicar on 09.01.17.
+ *
  */
 public class Code {
   private List<Consumer<List<CodeIoVariable>>> ioVariableListeners;
@@ -35,7 +36,7 @@ public class Code {
    * creates a Dummy-Codefile
    */
   public Code() {
-    this.filename.set("New Code");
+    this.filename = new SimpleStringProperty("New Code");
     this.sourceCodeProperty = new SimpleStringProperty("");
     this.tokensBinding = createTokensBinding();
   }
