@@ -42,8 +42,9 @@ public class Code {
   }
 
   public Code(String filename, String sourcecode) {
-    this.filename.set(filename);
+    this.filename = new SimpleStringProperty(filename);
     this.sourceCodeProperty = new SimpleStringProperty(sourcecode);
+    this.tokensBinding = createTokensBinding();
   }
 
   private Binding<List<? extends Token>> createTokensBinding() {
