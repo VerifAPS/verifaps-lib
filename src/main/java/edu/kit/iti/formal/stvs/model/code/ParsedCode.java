@@ -1,8 +1,10 @@
 package edu.kit.iti.formal.stvs.model.code;
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.datatypes.EnumerateType;
-import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration;
+import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
+import edu.kit.iti.formal.automation.st.ast.TypeDeclarations;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;

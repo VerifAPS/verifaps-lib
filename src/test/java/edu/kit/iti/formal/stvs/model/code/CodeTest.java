@@ -2,7 +2,6 @@ package edu.kit.iti.formal.stvs.model.code;
 
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
-import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
@@ -13,7 +12,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import org.antlr.v4.runtime.Token;
 import org.junit.Ignore;
 import org.junit.Test;
-import sun.misc.IOUtils;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -22,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
