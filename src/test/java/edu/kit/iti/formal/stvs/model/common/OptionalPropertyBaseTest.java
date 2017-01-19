@@ -43,11 +43,10 @@ public class OptionalPropertyBaseTest {
   public void testAdditional() {
     IntegerProperty testProperty = new SimpleIntegerProperty(4);
     OptionalPropertyBase<Number, IntegerProperty> testOptional =
-            new OptionalPropertyBase<>(testProperty, "myProperty");
-    assertEquals(testOptional.getName(), "myProperty");
+            new OptionalPropertyBase<>(testProperty);
     testOptional.set(5);
-    assertEquals(testOptional.getBean().getValue(), 5);
+    assertEquals(testOptional.getValue(), 5);
     testOptional.setValue(4);
-    assertEquals(testOptional.getBean().getValue(), 4);
+    assertEquals(testOptional.getValue(), 4);
   }
 }

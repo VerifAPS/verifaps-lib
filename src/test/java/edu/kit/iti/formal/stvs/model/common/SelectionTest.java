@@ -16,13 +16,13 @@ public class SelectionTest {
     BooleanProperty wasCalled = new SimpleBooleanProperty(false);
     Selection selection = new Selection("fgrfg", 4);
     InvalidationListener listener = i -> wasCalled.set(true);
-    selection.addListener(listener);
+    selection.columnProperty().addListener(listener);
     selection.columnProperty().clear();
     assertTrue(wasCalled.get());
     assertTrue(selection.columnProperty().isNull().get());
 
     wasCalled.set(false);
-    selection.removeListener(listener);
+    selection.columnProperty().removeListener(listener);
     selection.setColumn("Test");
     assertFalse(wasCalled.get());
     assertEquals(selection.getColumn(), "Test");

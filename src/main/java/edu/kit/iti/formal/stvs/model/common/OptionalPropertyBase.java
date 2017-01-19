@@ -17,8 +17,8 @@ public class OptionalPropertyBase<S, R extends Property<S>> extends ObjectProper
    * @return the containing {@code Object} or {@code null}
    */
   @Override
-  public Property<S> getBean() {
-    return null;
+  public Object getBean() {
+    return property.getBean();
   }
 
   /**
@@ -41,19 +41,6 @@ public class OptionalPropertyBase<S, R extends Property<S>> extends ObjectProper
   public OptionalPropertyBase(R property) {
     super(property.getValue());
     this.name = "";
-    this.property = property;
-  }
-
-  /**
-   * Creates a named property that wraps an existing property and adds
-   * the possibility of an absent value.
-   *
-   * @param property Property to be wrapped
-   * @param name Name of the new optional Property
-   */
-  public OptionalPropertyBase(R property, String name) {
-    super(property.getValue());
-    this.name = name;
     this.property = property;
   }
 
