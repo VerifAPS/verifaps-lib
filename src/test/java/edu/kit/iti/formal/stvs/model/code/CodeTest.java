@@ -67,8 +67,14 @@ public class CodeTest {
   }
 
   @Test
-  public void testGetParsedCode() {
+  public void testParsedCodeTypeExtraction() {
     NullableProperty<ParsedCode> parsed = enumDefinition.parsedCodeProperty();
-    assertEquals("Have one defined type", 1, parsed.get().getDefinedTypes().size());
+    assertEquals("Have three defined variables", 1, parsed.get().getDefinedTypes().size());
+  }
+
+  @Test
+  public void testParsedCodeIOVariableExctraction() {
+    NullableProperty<ParsedCode> parsed = enumDefinition.parsedCodeProperty();
+    assertEquals("Have three defined variables", 3, parsed.get().getDefinedVariables().size());
   }
 }
