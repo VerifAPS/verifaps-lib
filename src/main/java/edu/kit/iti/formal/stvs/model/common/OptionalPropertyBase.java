@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.model.common;
 
-import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.Property;
+import javafx.beans.property.ObjectPropertyBase;
 
 /**
  * Created by leonk on 17.01.2017.
@@ -18,7 +18,7 @@ public class OptionalPropertyBase<S, R extends Property<S>> extends ObjectProper
    */
   @Override
   public Property<S> getBean() {
-    return property;
+    return null;
   }
 
   /**
@@ -29,26 +29,51 @@ public class OptionalPropertyBase<S, R extends Property<S>> extends ObjectProper
    */
   @Override
   public String getName() {
-    return name;
+    return "";
   }
 
+  /**
+   * Creates an property that wraps an existing property and adds
+   * the possibility of an absent value.
+   *
+   * @param property Property to be wrapped
+   */
   public OptionalPropertyBase(R property) {
     super(property.getValue());
     this.name = "";
     this.property = property;
   }
 
+  /**
+   * Creates a named property that wraps an existing property and adds
+   * the possibility of an absent value.
+   *
+   * @param property Property to be wrapped
+   * @param name Name of the new optional Property
+   */
   public OptionalPropertyBase(R property, String name) {
     super(property.getValue());
     this.name = name;
     this.property = property;
   }
 
+  /**
+   * Copy of {@link OptionalPropertyBase#set(Object)}.
+   *
+   * @param value Value that the property should be set to
+   * @see OptionalPropertyBase#set
+   */
   @Override
   public void setValue(S value) {
     set(value);
   }
 
+  /**
+   * Set this property to a given value.
+   * If the value is null the inner property is not touched.
+   *
+   * @param value Value that the property should be set to
+   */
   @Override
   public void set(S value) {
     super.set(value);
@@ -65,4 +90,17 @@ public class OptionalPropertyBase<S, R extends Property<S>> extends ObjectProper
     set(null);
   }
 
+  /**
+   * Wraps a property into an {@link OptionalPropertyBase} and sets its value to null.
+   *
+   * @param property Property to be wrapped
+   * @param <S> Type of the object wrapped in {@code property}
+   * @param <R> Type of the {@code property}
+   * @return optional Propertie wrapping {@code property}
+   */
+  public static <S, R extends Property<S>> OptionalPropertyBase<S, R> ofNull(R property) {
+    OptionalPropertyBase<S, R> optionalPropertyBase = new OptionalPropertyBase<>(property);
+    optionalPropertyBase.clear();
+    return optionalPropertyBase;
+  }
 }
