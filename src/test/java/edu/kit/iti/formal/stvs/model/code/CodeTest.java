@@ -21,6 +21,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static edu.kit.iti.formal.stvs.model.TestUtils.assertCollectionsEqual;
 
 /**
  * Created by Philipp on 19.01.2017.
@@ -73,28 +74,25 @@ public class CodeTest {
     assertEquals("Lexer tokens concatenated are source code", source, tokensConcatenated);
   }
 
-  @Ignore // Bug in the Parser? Enums dont get all possible values assigned...
   @Test
   public void testParsedCodeTypeExtraction() {
     NullableProperty<ParsedCode> parsed = enumDefinition.parsedCodeProperty();
     assertEquals("Find all defined Types", 3, parsed.get().getDefinedTypes().size());
 
+    Type myEnum = new TypeEnum("MY_ENUM", Arrays.asList("possible", "values", "enum"));
     Set<Type> expectedDefinedTypes = new HashSet<>();
     expectedDefinedTypes.add(TypeBool.BOOL);
     expectedDefinedTypes.add(TypeInt.INT);
-    expectedDefinedTypes.add(new TypeEnum("MY_ENUM",
-        Arrays.asList("possible", "values", "enum")));
-    assertEquals(expectedDefinedTypes, parsed.get().getDefinedTypes());
+    expectedDefinedTypes.add(myEnum);
+    assertCollectionsEqual(expectedDefinedTypes, parsed.get().getDefinedTypes());
   }
 
-  @Ignore // same bug problem
   @Test
   public void testParsedCodeIOVariableExtraction() {
     NullableProperty<ParsedCode> parsed = enumDefinition.parsedCodeProperty();
     assertEquals("Find all defined IOVariables", 5, parsed.get().getDefinedVariables().size());
 
-    TypeEnum myEnum = new TypeEnum("MY_ENUM", Arrays.asList("possible", "values", "enum"));
-
+    Type myEnum = new TypeEnum("MY_ENUM", Arrays.asList("possible", "values", "enum"));
     Set<CodeIoVariable> expectedVariables = new HashSet<>();
     expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, TypeBool.BOOL, "active"));
     expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "number"));
@@ -102,6 +100,6 @@ public class CodeTest {
     expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, myEnum, "my_output"));
     expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, TypeBool.BOOL, "seriously"));
 
-    assertEquals(expectedVariables, parsed.get().getDefinedVariables());
+    assertCollectionsEqual(expectedVariables, parsed.get().getDefinedVariables());
   }
 }
