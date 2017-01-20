@@ -26,7 +26,6 @@ public class ParsedCode {
       this.definedTypes.add(TypeInt.INT);
     }
 
-
     @Override
     public Void visit(TypeDeclarations decls) {
       decls.stream().forEach(decl -> decl.visit(this));
@@ -54,16 +53,11 @@ public class ParsedCode {
       this.definedVariables = new HashSet<>();
       this.definedTypes = definedTypes;
     }
-    @Override
-    public Void visit(ProgramDeclaration declaration) {
-      //elements.stream().forEach(element -> element.visit(this));
-      return null;
-    }
 
     @Override
     public Void visit(FunctionDeclaration function) {
       function.getLocalScope().getLocalVariables().entrySet().forEach(variableEntry -> {
-        String varName = variableEntry.getKey();
+        //String varName = variableEntry.getKey();
         VariableDeclaration varDecl = variableEntry.getValue();
         Type type = definedTypes.get(varDecl.getDataTypeName());
         VariableCategory category;
@@ -85,6 +79,17 @@ public class ParsedCode {
     }
     public Set<CodeIoVariable> getDefinedVariables() {
       return definedVariables;
+    }
+  }
+
+  private static class FunctionVisitor extends DefaultVisitor<Void>{
+    FunctionVisitor() {
+    }
+
+    @Override
+    public Void visit(FunctionDeclaration function){
+
+      return null;
     }
   }
 
