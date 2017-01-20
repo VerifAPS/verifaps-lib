@@ -102,4 +102,14 @@ public class CodeTest {
 
     assertCollectionsEqual(expectedVariables, parsed.get().getDefinedVariables());
   }
+
+  @Test
+  public void testParsedCCodeBlocks() {
+    FoldableCodeBlock expectedBlock = new FoldableCodeBlock(5, 15);
+    assertEquals(expectedBlock, enumDefinition.parsedCodeProperty().get().getFoldableCodeBlocks().get(0));
+    assertEquals(1, enumDefinition.parsedCodeProperty().get().getFoldableCodeBlocks().size());
+    assertEquals(5, enumDefinition.parsedCodeProperty().get().getFoldableCodeBlocks().get(0).getStartLine());
+    assertEquals(15, enumDefinition.parsedCodeProperty().get().getFoldableCodeBlocks().get(0).getEndLine());
+
+  }
 }

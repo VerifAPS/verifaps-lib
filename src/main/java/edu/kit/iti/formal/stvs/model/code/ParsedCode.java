@@ -76,23 +76,32 @@ public class ParsedCode {
             //TODO: recognize INOUT or other variables
             return;
         }
-        this.definedVariables.add(new CodeIoVariable(category,type, varDecl.getName()));
+        this.definedVariables.add(new CodeIoVariable(category, type, varDecl.getName()));
       });
       return null;
     }
+
     public Set<CodeIoVariable> getDefinedVariables() {
       return definedVariables;
     }
   }
 
-  private static class FunctionVisitor extends DefaultVisitor<Void>{
-    FunctionVisitor() {
+  private static class BlockVisitor extends DefaultVisitor<Void> {
+    private List<FoldableCodeBlock> foldableCodeBlocks;
+
+    BlockVisitor() {
+      this.foldableCodeBlocks = new ArrayList<>();
     }
 
     @Override
-    public Void visit(FunctionDeclaration function){
-
+    public Void visit(FunctionDeclaration function) {
+      FoldableCodeBlock newBlock = new FoldableCodeBlock(function.getStartPosition().getLineNumber(), function.getEndPosition().getLineNumber());
+      this.foldableCodeBlocks.add(newBlock);
       return null;
+    }
+
+    public List<FoldableCodeBlock> getFoldableCodeBlocks() {
+      return this.foldableCodeBlocks;
     }
   }
 
@@ -107,7 +116,6 @@ public class ParsedCode {
   }
 
   public static ParsedCode parseCode(String input) {
-    List<FoldableCodeBlock> foldableCodeBlocks = new ArrayList<>();
 
     try {
       TypeDeclarationVisitor typeVisitor = new TypeDeclarationVisitor();
@@ -119,6 +127,12 @@ public class ParsedCode {
 
       VariableVisitor variableVisitor = new VariableVisitor(definedTypesByName);
       IEC61131Facade.file(input).visit(variableVisitor);
+
+      BlockVisitor blockVisitor = new BlockVisitor();
+      IEC61131Facade.file(input).visit(blockVisitor);
+      List<FoldableCodeBlock> foldableCodeBlocks;
+      foldableCodeBlocks = blockVisitor.getFoldableCodeBlocks();
+
       return new ParsedCode(foldableCodeBlocks, variableVisitor.getDefinedVariables(), typeVisitor.getDefinedTypes());
     } catch (Exception exception) {
       return null;
