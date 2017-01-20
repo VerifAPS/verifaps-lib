@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>smv-model</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <packaging>jar</packaging>
 
     <name>smv-model</name>
@@ -21,7 +21,7 @@
     <repositories>
         <repository>
             <id>institute</id>
-            <url>http://formal.iti.kit.edu/</url>
+            <url>https://formal.iti.kit.edu/maven2</url>
         </repository>
     </repositories>
 

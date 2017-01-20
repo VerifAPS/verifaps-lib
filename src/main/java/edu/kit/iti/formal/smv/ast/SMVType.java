@@ -135,7 +135,7 @@ public class SMVType {
     }
 
     public static class EnumType extends SMVType {
-        List<String> values;
+        private List<String> values;
 
         public EnumType(List<String> id) {
             values = new ArrayList<>(id);
@@ -166,6 +166,10 @@ public class SMVType {
             int result = super.hashCode();
             result = 31 * result + values.hashCode();
             return result;
+        }
+
+        public List<String> getValues() {
+            return values;
         }
 
         @Override
