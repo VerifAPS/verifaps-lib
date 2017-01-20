@@ -28,8 +28,19 @@ public class ValueInt implements Value {
   }
 
   @Override
-  public boolean equals(Object other) {
-    return (other instanceof ValueInt) && this.equals((ValueInt) other);
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (!(obj instanceof ValueInt)) return false;
+
+    ValueInt valueInt = (ValueInt) obj;
+
+    return value == valueInt.value;
+
+  }
+
+  @Override
+  public int hashCode() {
+    return value;
   }
 
   public String toString() {

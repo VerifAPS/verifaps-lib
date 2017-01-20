@@ -39,4 +39,19 @@ public class ValueBool implements Value {
     return "ValueBool(" + value + ")";
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (!(obj instanceof ValueBool)) return false;
+
+    ValueBool valueBool = (ValueBool) obj;
+
+    return value == valueBool.value;
+
+  }
+
+  @Override
+  public int hashCode() {
+    return (value ? 1 : 0);
+  }
 }

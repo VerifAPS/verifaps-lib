@@ -70,8 +70,22 @@ public class TypeEnum implements Type {
   }
 
   @Override
-  public boolean equals(Object other) {
-    return (other instanceof TypeEnum) && equals((TypeEnum) other);
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (!(obj instanceof TypeEnum)) return false;
+
+    TypeEnum typeEnum = (TypeEnum) obj;
+
+    if (!enumTypeName.equals(typeEnum.enumTypeName)) return false;
+    return valueMap.equals(typeEnum.valueMap);
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = enumTypeName.hashCode();
+    result = 31 * result + valueMap.hashCode();
+    return result;
   }
 
   public String toString() {

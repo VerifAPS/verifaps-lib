@@ -26,8 +26,22 @@ public class ValueEnum implements Value {
   }
 
   @Override
-  public boolean equals(Object other) {
-    return (other instanceof ValueEnum) && this.equals((ValueEnum) other);
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (!(obj instanceof ValueEnum)) return false;
+
+    ValueEnum valueEnum = (ValueEnum) obj;
+
+    if (!enumValue.equals(valueEnum.enumValue)) return false;
+    return enumType.equals(valueEnum.enumType);
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = enumValue.hashCode();
+    result = 31 * result + enumType.hashCode();
+    return result;
   }
 
   @Override
