@@ -1,36 +1,57 @@
 package edu.kit.iti.formal.stvs.model.config;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 /**
  * Contains information about recently opened code and spec files
  */
 public class History {
-  private List<String> codeFiles;
-  private List<String> specFiles;
+  private CircularFifoQueue<String> codeFiles;
+  private CircularFifoQueue<String> specFiles;
+
+  public static final int HISTORY_DEPTH = 10;
 
   public History() {
-    codeFiles = new ArrayList<>();
-    specFiles = new ArrayList<>();
+    codeFiles = new CircularFifoQueue<String>(HISTORY_DEPTH);
+    specFiles = new CircularFifoQueue<String>(HISTORY_DEPTH);
+  }
+
+  public History(Collection<String> codeFiles, Collection<String> specFiles) {
+    if (codeFiles.size() > HISTORY_DEPTH || specFiles.size() > HISTORY_DEPTH) {
+      // Don't silently cut off the part of the input collection that doesn't fit
+      throw new IllegalArgumentException("List of filenames exceeds history size");
+    }
+    this.codeFiles = new CircularFifoQueue<String>(HISTORY_DEPTH);
+    this.specFiles = new CircularFifoQueue<String>(HISTORY_DEPTH);
+
+    for (String codeFilePath : codeFiles) {
+      this.codeFiles.add(codeFilePath);
+    }
+    for (String specFilePath : specFiles) {
+      this.specFiles.add(specFilePath);
+    }
   }
 
   /**
    * Get the code file history
    *
-   * @return A list of filepaths of code files
+   * @return A collection of filepaths of code files
    */
   public List<String> getCodeFiles() {
-    return codeFiles;
+    return Arrays.asList(codeFiles.toArray(new String[0]));
   }
 
   /**
    * Get the spec file history
    *
-   * @return A list of filepaths of spec files
+   * @return A collection of filepaths of spec files
    */
   public List<String> getSpecFiles() {
-    return specFiles;
+    return Arrays.asList(specFiles.toArray(new String[0]));
   }
 
   /**
