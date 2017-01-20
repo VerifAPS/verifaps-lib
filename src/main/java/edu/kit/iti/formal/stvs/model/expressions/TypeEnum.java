@@ -77,14 +77,14 @@ public class TypeEnum implements Type {
     TypeEnum typeEnum = (TypeEnum) obj;
 
     if (!enumTypeName.equals(typeEnum.enumTypeName)) return false;
-    return valueMap.equals(typeEnum.valueMap);
+    return valueMap.keySet().equals(typeEnum.valueMap.keySet());
 
   }
 
   @Override
   public int hashCode() {
     int result = enumTypeName.hashCode();
-    result = 31 * result + valueMap.hashCode();
+    result = 31 * result + valueMap.keySet().hashCode();
     return result;
   }
 
