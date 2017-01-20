@@ -1,12 +1,18 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import javafx.beans.property.BooleanProperty;
+import javafx.beans.Observable;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 /*
   TODO: Possible rename of the class?
@@ -21,8 +27,11 @@ import java.util.stream.Collectors;
  * Created by csicar on 10.01.17.
  */
 public class FreeVariableSet {
-  private ObservableList<FreeVariable> variableSet = FXCollections.observableArrayList();
-  private ObservableList<SameNameProblem> problems = FXCollections.observableArrayList();
+  private ObservableList<FreeVariable> variableSet = FXCollections.observableArrayList(p ->
+      new Observable[]{p.nameProperty(), p.defaultValueProperty(), p.typeProperty()}
+  );
+  private ObjectProperty<Map<String, Set<FreeVariable>>> problems =
+      new SimpleObjectProperty<>(new HashMap<>());
 
   /**
    * Creates a new list of free variables with an existing base.
@@ -30,13 +39,60 @@ public class FreeVariableSet {
    * @param variableSet List of existing variables
    */
   public FreeVariableSet(List<FreeVariable> variableSet) {
+    initItemChangeListener();
     this.variableSet.addAll(variableSet);
+  }
+
+  /**
+   * Creates listener that observes changes to the list to create problems if they exist.
+   */
+  private void initItemChangeListener() {
+    this.variableSet.addListener((ListChangeListener.Change<? extends FreeVariable> change) -> {
+      boolean criticalOperationOccurred = false;
+      while (change.next()) {
+        if (!change.wasPermutated()) {
+          criticalOperationOccurred = true;
+        }
+      }
+      if (criticalOperationOccurred) {
+        findProblems();
+      }
+    });
+  }
+
+  /**
+   * Checks if two or more variables have the same name.
+   * If so they are added to the map {@code problems}
+   */
+  private void findProblems() {
+    this.problems.setValue(
+        variableSet.stream()
+            .map(FreeVariable::getName)
+            .distinct()
+            .map(this::variablesWithName)
+            .filter(set -> set.size() > 1)
+            .collect(Collectors.toMap(
+                (Set<FreeVariable> set) -> set.iterator().next().getName(), Function.identity()))
+    );
+  }
+
+  /**
+   * Finds variables with the same name
+   *
+   * @param name Name to be searched
+   * @return Set of variables with that name
+   */
+  private Set<FreeVariable> variablesWithName(String name) {
+    return variableSet.stream()
+        .filter((FreeVariable var) -> var.getName().equals(name))
+        .collect(Collectors.toSet());
   }
 
   /**
    * Creates a new empty list of free variables.
    */
   public FreeVariableSet() {
+    initItemChangeListener();
   }
 
   /**
@@ -53,7 +109,11 @@ public class FreeVariableSet {
     return variableSet;
   }
 
-  public ObservableList<SameNameProblem> getProblems() {
-    return FXCollections.unmodifiableObservableList(problems);
+  public Map<String, Set<FreeVariable>> getProblems() {
+    return problems.get();
+  }
+
+  public ObjectProperty<Map<String, Set<FreeVariable>>> problemsProperty() {
+    return problems;
   }
 }
