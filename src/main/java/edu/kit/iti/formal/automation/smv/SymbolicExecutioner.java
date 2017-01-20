@@ -186,57 +186,58 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     @Override
     public SMVExpr visit(FunctionCall functionCall) {
         FunctionDeclaration fd = globalScope.resolveFunction(functionCall, localScope);
-        if (fd != null) {
-            //initialize data structure
-            SymbolicState calleeState = new SymbolicState();
-            SymbolicState callerState = peek();
+        if (fd == null)
+            throw new FunctionUndefinedException();
 
-            //region register function name as output variable
-            if (null == fd.getLocalScope().getVariable(fd.getFunctionName())) {
-                fd.getLocalScope().builder()
-                        .setBaseType(fd.getReturnTypeName())
-                        .push(VariableDeclaration.OUTPUT)
-                        .identifiers(fd.getFunctionName())
-                        .create();
-            }
-            //endregion
 
-            //region local variables (declaration and initialization)
-            for (VariableDeclaration vd : fd.getLocalScope().getLocalVariables().values()) {
-                if (!calleeState.containsKey(vd.getName())) {
-                    TypeDeclaration td = vd.getTypeDeclaration();
-                    if (td != null && td.getInitialization() != null) {
-                        td.getInitialization().visit(this);
-                    } else {
-                        calleeState.put(lift(vd), Utils.getDefaultValue(vd.getDataType()));
-                    }
+        //initialize data structure
+        SymbolicState calleeState = new SymbolicState();
+        SymbolicState callerState = peek();
+
+        //region register function name as output variable
+        if (null == fd.getLocalScope().getVariable(fd.getFunctionName())) {
+            fd.getLocalScope().builder()
+                    .setBaseType(fd.getReturnTypeName())
+                    .push(VariableDeclaration.OUTPUT)
+                    .identifiers(fd.getFunctionName())
+                    .create();
+        }
+        //endregion
+
+        //region local variables (declaration and initialization)
+        for (VariableDeclaration vd : fd.getLocalScope().getLocalVariables().values()) {
+            if (!calleeState.containsKey(vd.getName())) {
+                TypeDeclaration td = vd.getTypeDeclaration();
+                if (td != null && td.getInitialization() != null) {
+                    td.getInitialization().visit(this);
+                } else {
+                    calleeState.put(lift(vd), Utils.getDefaultValue(vd.getDataType()));
                 }
             }
-            //endregion
+        }
+        //endregion
 
-            //region transfer variables
-            List<FunctionCall.Parameter> parameters = functionCall.getParameters();
-            List<VariableDeclaration> inputVars = fd.getLocalScope().filterByFlags(VariableDeclaration.INPUT);
+        //region transfer variables
+        List<FunctionCall.Parameter> parameters = functionCall.getParameters();
+        List<VariableDeclaration> inputVars = fd.getLocalScope().filterByFlags(VariableDeclaration.INPUT);
 
-            if (parameters.size() != inputVars.size()) {
-                throw new FunctionInvocationArgumentNumberException();
-            }
+        if (parameters.size() != inputVars.size()) {
+            throw new FunctionInvocationArgumentNumberException();
+        }
 
-            for (int i = 0; i < parameters.size(); i++) {
-                // name from definition, in order of declaration, expression from caller site
-                calleeState.put(lift(inputVars.get(i)),
-                        parameters.get(i).getExpression().visit(this));
-            }
-            push(calleeState);
-            //endregion
+        for (int i = 0; i < parameters.size(); i++) {
+            // name from definition, in order of declaration, expression from caller site
+            calleeState.put(lift(inputVars.get(i)),
+                    parameters.get(i).getExpression().visit(this));
+        }
+        push(calleeState);
+        //endregion
 
-            // execution of body
-            fd.getStatements().visit(this);
-            pop();
+        // execution of body
+        fd.getStatements().visit(this);
+        pop();
 
-            return calleeState.get(lift(fd.getLocalScope().getVariable(fd.getFunctionName())));
-        } else
-            throw new FunctionUndefinedException();
+        return calleeState.get(lift(fd.getLocalScope().getVariable(fd.getFunctionName())));
     }
 
     @Override

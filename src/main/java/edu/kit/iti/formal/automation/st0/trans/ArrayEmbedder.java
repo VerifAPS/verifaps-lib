@@ -26,12 +26,19 @@ import edu.kit.iti.formal.automation.datatypes.IECArray;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstCopyVisitor;
+import edu.kit.iti.formal.automation.visitors.Visitable;
 
 /**
  * Created by weigl on 03/10/14.
  */
 public class ArrayEmbedder extends AstCopyVisitor {
     private LocalScope currentScope;
+
+
+    @Override
+    public Object defaultVisit(Visitable visitable) {
+        return visitable;
+    }
 
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {

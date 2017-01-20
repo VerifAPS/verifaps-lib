@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstCopyVisitor;
+import edu.kit.iti.formal.automation.visitors.Visitable;
 
 /**
  * Created by weigl on 03/10/14.
@@ -36,6 +37,11 @@ public class LoopUnwinding extends AstCopyVisitor {
 
     public LoopUnwinding() {
 
+    }
+
+    @Override
+    public Object defaultVisit(Visitable visitable) {
+        return visitable;
     }
 
     @Override

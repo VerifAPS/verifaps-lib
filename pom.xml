@@ -38,7 +38,7 @@
 	    <dependency>
 		    <groupId>edu.kit.iti.formal</groupId>
 		    <artifactId>smv-model</artifactId>
-		    <version>0.1.0</version>
+		    <version>0.1.2</version>
 	    </dependency>
     </dependencies>
 </project>

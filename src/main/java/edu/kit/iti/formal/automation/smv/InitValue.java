@@ -34,7 +34,11 @@ public class InitValue {
     public static final InitValue INSTANCE = new InitValue();
 
     public SMVExpr getInit(SMVType type) {
-        //TODO
-        return new SLiteral(type, 0);
+        Object def;
+        if (type instanceof SMVType.EnumType) {
+            def = ((SMVType.EnumType) type).getValues().get(0);
+        } else if (type instanceof SMVType.SMVTypeWithWidth) def = 0;
+        else def = false;
+        return new SLiteral(type, def);
     }
 }
