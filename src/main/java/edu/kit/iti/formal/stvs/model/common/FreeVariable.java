@@ -54,7 +54,7 @@ public class FreeVariable {
   /**
    * Rename the variable.
    *
-   * @param name New Name for the free variable
+   * @param name New name for the free variable
    */
   public void setName(String name) {
     this.name.set(name);

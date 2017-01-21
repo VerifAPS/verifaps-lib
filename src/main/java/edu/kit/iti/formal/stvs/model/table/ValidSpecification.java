@@ -8,7 +8,7 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import java.util.Set;
 
 /**
- * Created by csicar on 11.01.17.
+ * @author Benjamin Alt
  */
 public class ValidSpecification extends SpecificationTable<Expression, LowerBoundedInterval> {
 

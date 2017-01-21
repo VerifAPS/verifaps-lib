@@ -3,7 +3,7 @@ package edu.kit.iti.formal.stvs.model.table;
 import java.util.Optional;
 
 /**
- * Created by philipp on 09.01.17.
+ * @author Benjamin Alt
  */
 public class LowerBoundedInterval {
   private int lowerBound;

@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
+import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 
@@ -11,13 +12,12 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * Created by philipp on 10.01.17.
+ * @author Benjamin Alt
  */
 public class HybridSpecification extends ConstraintSpecification {
 
-
   private Optional<ConcreteSpecification> counterExample;
-  private Optional<ConcreteSpecification> concreteInstance;
+  private OptionalProperty<ConcreteSpecification> concreteInstance;
   private List<Consumer<Optional<ConcreteSpecification>>> concreteInstanceChangedListeners;
   private final boolean editable;
 
@@ -32,17 +32,6 @@ public class HybridSpecification extends ConstraintSpecification {
     this.editable = editable;
   }
 
-  /**
-   * Copy constructor
-   *
-   * @param spec The spec to copy
-   */
-  public HybridSpecification(HybridSpecification spec) {
-    super(null);
-    //...
-    this.editable = spec.editable;
-  }
-
   public Optional<ConcreteSpecification> getCounterExample() {
     return counterExample;
   }
@@ -50,18 +39,9 @@ public class HybridSpecification extends ConstraintSpecification {
   public void setCounterExample(ConcreteSpecification counterExample) {
   }
 
-  public void removeConcreteInstance() {
-
-  }
-
-  public void addConcreteInstanceChangedListener(Consumer<Optional<ConcreteSpecification>> listener) {
-
-  }
-
   public Selection getSelection() {
     return selection;
   }
-
 
   public List<ConcreteCell> getConcreteValuesForConstraint(String column, int row) {
     return null;
@@ -73,5 +53,21 @@ public class HybridSpecification extends ConstraintSpecification {
 
   public boolean isEditable() {
     return editable;
+  }
+
+  public ConcreteSpecification getConcreteInstance() {
+    return concreteInstance.get();
+  }
+
+  public OptionalProperty<ConcreteSpecification> concreteInstanceProperty() {
+    return concreteInstance;
+  }
+
+  public void setConcreteInstance(ConcreteSpecification concreteInstance) {
+    this.concreteInstance.set(concreteInstance);
+  }
+
+  public void removeConcreteInstance() {
+    concreteInstance.clear();
   }
 }

@@ -44,11 +44,6 @@ public class ConstraintDuration implements CellOperationProvider {
     return lowerBoundedInterval;
   }
 
-  //TODO
-  public Optional<SpecificationRow<Expression, LowerBoundedInterval>> getParsedRow() {
-    return null;
-  }
-
   @Override
   public void setComment(String comment) {
     this.comment.set(comment);

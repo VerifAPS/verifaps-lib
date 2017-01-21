@@ -1,15 +1,16 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import javafx.beans.property.ObjectProperty;
+
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
- * Created by philipp on 09.01.17.
+ * @author Benjamin Alt
  */
 public class SpecificationTable<C, D> {
 
-  private List<Consumer<ColumnChangeInfo<C>>> columnsListeners;
-  private List<Consumer<RowChangeInfo<C, D>>> rowsListeners;
+  private ObjectProperty<ColumnChangeInfo<C>> columnChange;
+  private ObjectProperty<RowChangeInfo<C, D>> rowChange;
   private List<D> durations;
 
   public enum Change {
@@ -73,13 +74,27 @@ public class SpecificationTable<C, D> {
     return null;
   }
 
-  public void addColumnsListener(Consumer<ColumnChangeInfo<C>> columnsListener) {
-
+  public RowChangeInfo getRowChange() {
+    return rowChange.get();
   }
 
-  public void addRowsListener(Consumer<RowChangeInfo<C, D>> rowsListener) {
-
+  public ObjectProperty<RowChangeInfo<C, D>> rowChangeProperty() {
+    return rowChange;
   }
 
+  public void setRowChange(RowChangeInfo rowChange) {
+    this.rowChange.set(rowChange);
+  }
 
+  public ColumnChangeInfo getColumnChange() {
+    return columnChange.get();
+  }
+
+  public ObjectProperty<ColumnChangeInfo<C>> columnChangeProperty() {
+    return columnChange;
+  }
+
+  public void setColumnChange(ColumnChangeInfo columnChange) {
+    this.columnChange.set(columnChange);
+  }
 }

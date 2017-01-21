@@ -8,20 +8,21 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeChecker;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.ObservableList;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
+
+import static java.util.Optional.empty;
 
 /**
  * @author Benjamin Alt
  */
 public class ConstraintSpecification extends SpecificationTable<ConstraintCell, ConstraintDuration> {
 
-  private List<Consumer<List<SpecProblem>>> problemsListeners;
-
+  private ListProperty<SpecProblem> problems;
   private Set<Type> typeContext;
   private Set<CodeIoVariable> codeIoVariables;
   private Set<SpecIoVariable> specIoVariables;
@@ -30,22 +31,14 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
   private Optional<ValidSpecification> validSpecification;
   private Map<String, ColumnConfig> columnConfigMap;
 
-  // For finding SpecProblems when cells change.
-  private ExpressionParser parser;
-  private TypeChecker typeChecker;
-
-  public ConstraintSpecification(ConstraintSpecification constraintSpecification) {
-
-  }
-
   public ConstraintSpecification(Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet) {
     this.typeContext = typeContext;
     this.freeVariableSet = freeVariableSet;
-    // TODO
-  }
-
-  public void addProblemsListener(Consumer<List<SpecProblem>> listener) {
-
+    this.codeIoVariables = ioVariables;
+    this.freeVariableSet = freeVariableSet;
+    this.problems = new SimpleListProperty<>();
+    this.validSpecification = Optional.empty();
+    this.columnConfigMap = new HashMap<>();
   }
 
   public void addEmptyColumn(SpecIoVariable variable) {
@@ -53,10 +46,6 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
   }
 
   public SpecIoVariable getSpecIoVariableForColumn(String column) {
-    return null;
-  }
-
-  public List<SpecProblem> getProblems() {
     return null;
   }
 
@@ -85,5 +74,17 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
    */
   public Optional<ValidSpecification> getValidSpecification() {
     return null;
+  }
+
+  public ObservableList<SpecProblem> getProblems() {
+    return problems.get();
+  }
+
+  public ListProperty<SpecProblem> problemsProperty() {
+    return problems;
+  }
+
+  public void setProblems(ObservableList<SpecProblem> problems) {
+    this.problems.set(problems);
   }
 }

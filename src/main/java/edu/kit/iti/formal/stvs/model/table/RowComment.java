@@ -1,30 +1,33 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import java.util.function.Consumer;
 
 /**
- * Created by Philipp on 11.01.2017.
+ * @author Benjamin Alt
  */
 public class RowComment implements Commentable {
 
-  private String comment;
+  private StringProperty comment;
 
   public RowComment(String comment) {
-    this.comment = comment;
+    this.comment = new SimpleStringProperty(comment);
   }
 
   @Override
   public void setComment(String comment) {
-
+    this.comment.set(comment);
   }
 
   @Override
   public String getComment() {
-    return null;
+    return comment.get();
   }
 
   @Override
-  public void addCommentListener(Consumer<Commentable> consumer) {
-
+  public StringProperty commentProperty() {
+    return comment;
   }
 }

@@ -4,7 +4,7 @@ package edu.kit.iti.formal.stvs.model.table;
 import java.util.Map;
 
 /**
- * Created by philipp on 09.01.17.
+ * @author Benjamin Alt
  */
 public class SpecificationRow<C, D> {
 
