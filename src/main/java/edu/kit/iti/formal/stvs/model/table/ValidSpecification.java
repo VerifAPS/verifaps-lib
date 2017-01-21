@@ -13,11 +13,11 @@ import java.util.Set;
 public class ValidSpecification extends SpecificationTable<Expression, LowerBoundedInterval> {
 
   private final Set<Type> typeContext;
-  private Set<SpecIoVariable> specIoVariables;
   private FreeVariableSet freeVariableSet;
 
-  public ValidSpecification(Set<Type> typeContext) {
+  public ValidSpecification(Set<Type> typeContext, FreeVariableSet freeVariableSet) {
     super();
     this.typeContext = typeContext;
+    this.freeVariableSet = freeVariableSet;
   }
 }

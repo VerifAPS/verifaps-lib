@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.model.table;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeChecker;
@@ -10,6 +11,8 @@ import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 
 import java.util.*;
@@ -77,10 +80,24 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
   }
 
   /**
+   * TODO: When to do the parsing and type checking? Ideally any time a constraintCell/duration/SpecIoVariable changes --> must register listeners for these events
    * @return a parsed and type-checked specification
    */
   public Optional<ValidSpecification> getValidSpecification() {
-    return null;
+    return validSpecification;
+  }
+
+  @Override
+  public void addColumn(String columnId, SpecificationColumn<ConstraintCell> column) {
+    super.addColumn(columnId, column);
+    column.getSpecIoVariable().typeProperty().addListener(new SpecificationChangedListener<Type>());
+    column.getSpecIoVariable().nameProperty().addListener(new SpecificationChangedListener<String>());
+    column.getSpecIoVariable().categoryProperty().addListener(new SpecificationChangedListener<VariableCategory>());
+  }
+
+  public void removeColumn(String columnId) {
+    super.removeColumn(columnId);
+
   }
 
   public ObservableList<SpecProblem> getProblems() {
@@ -93,5 +110,16 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
   public void setProblems(ObservableList<SpecProblem> problems) {
     this.problems.set(problems);
+  }
+
+  private void onSpecificationChanged() {
+
+  }
+
+  class SpecificationChangedListener<T> implements ChangeListener<T> {
+    @Override
+    public void changed(ObservableValue observableValue, Object o, Object t1) {
+      onSpecificationChanged();
+    }
   }
 }
