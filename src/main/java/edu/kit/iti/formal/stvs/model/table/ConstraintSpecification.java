@@ -13,9 +13,6 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.ObservableList;
 
 import java.util.*;
-import java.util.function.Consumer;
-
-import static java.util.Optional.empty;
 
 /**
  * @author Benjamin Alt
@@ -32,6 +29,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
   private Map<String, ColumnConfig> columnConfigMap;
 
   public ConstraintSpecification(Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet) {
+    super();
     this.typeContext = typeContext;
     this.freeVariableSet = freeVariableSet;
     this.codeIoVariables = ioVariables;
@@ -42,11 +40,20 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
   }
 
   public void addEmptyColumn(SpecIoVariable variable) {
-
+      ArrayList<ConstraintCell> emptyCells = new ArrayList<ConstraintCell>();
+      for (int i = 0; i < durations.size(); i++) {
+        emptyCells.add(new ConstraintCell(""));
+      }
+      addColumn(variable.getName(), new SpecificationColumn<ConstraintCell>(variable, emptyCells, new ColumnConfig()));
   }
 
+  /**
+   * TODO
+   * This method is redundant, as one can just do SpecificationTable.getColumn(column).getSpecIoVariable()
+   */
+  @Deprecated
   public SpecIoVariable getSpecIoVariableForColumn(String column) {
-    return null;
+    throw new UnsupportedOperationException("This method is on the kill list and may be removed at any time. See Javadoc for alternative");
   }
 
   public Set<Type> getTypeContext() {

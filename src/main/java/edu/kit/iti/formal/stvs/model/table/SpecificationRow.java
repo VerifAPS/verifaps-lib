@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * @author Benjamin Alt
@@ -16,8 +16,12 @@ public class SpecificationRow<C, D> {
     this.cells = cells;
   }
 
-  public C getEntryForVariable(String variable) {
-    return null;
+  public C getCellForVariable(String variable) {
+    C cell = cells.get(variable);
+    if (cell == null) {
+      throw new NoSuchElementException("Cannot get cell for variable " + variable + " : No such variable");
+    }
+    return cell;
   }
 
   public D getDuration() {

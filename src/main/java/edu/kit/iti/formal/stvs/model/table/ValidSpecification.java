@@ -16,8 +16,8 @@ public class ValidSpecification extends SpecificationTable<Expression, LowerBoun
   private Set<SpecIoVariable> specIoVariables;
   private FreeVariableSet freeVariableSet;
 
-
   public ValidSpecification(Set<Type> typeContext) {
+    super();
     this.typeContext = typeContext;
   }
 }
