@@ -4,8 +4,10 @@ import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.code.FoldableCodeBlock;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.beans.value.ObservableValue;
 import org.antlr.v4.runtime.Token;
 import org.fxmisc.richtext.StyleSpans;
+import org.reactfx.Observable;
 
 import java.util.Collection;
 import java.util.List;
@@ -23,19 +25,25 @@ public class EditorPaneController implements Controller {
 
   public EditorPaneController(Code code, GlobalConfig globalConfig) {
     this.code = code;
-
+    this.view = new EditorPane(code.sourcecodeProperty().get());
     this.globalConfig = globalConfig;
+
+    code.tokensBinding().addListener(this::onLexedCodeChange);
   }
 
-  private void onLexedCodeChange(List<Token> tokens) {
-
+  private void onLexedCodeChange(
+      ObservableValue<? extends List<? extends Token>> val,
+      List<? extends Token> oldTokens,
+      List<? extends Token> tokens) {
+    view.setStyleSpans(toStyleSpans(tokens));
   }
 
   private void handleParsedCodeFoldingBlocks(List<FoldableCodeBlock> foldableCodeBlocks) {
 
   }
 
-  private static StyleSpans<Collection<String>> toStyleSpans(List<Token> tokens) {
+  private static StyleSpans<Collection<String>> toStyleSpans(List<? extends Token> tokens) {
+
     return null;
   }
 

@@ -21,22 +21,25 @@ public class EditorPane extends Pane {
   private CodeArea codeArea;
   private VBox buttonList;
 
+  public EditorPane(String code) {
+    codeArea = new CodeArea(code);
+  }
+
 
   public StringProperty getCodeProperty() {
     return null;
   }
 
   public String getCode() {
-    return null;
+    return this.codeArea.getText();
   }
 
   public void setCode(String code) {
-
+    codeArea = new CodeArea(code);
   }
 
 
   public void setStyleSpans(StyleSpans<Collection<String>> style) {
-
   }
 
   public CodeArea getCodeArea() {
