@@ -54,6 +54,22 @@ public class TestExpressionParser {
   }
 
   @Test
+  public void testVariablesWithIndex() throws ParseException, UnsupportedExpressionException {
+    assertParseExpressionEqual("A[-2]", equal(var(cellName), var("A", -2)));
+    assertParseExpressionEqual("(A[0])", var("A", 0));
+  }
+
+  @Test(expected = UnsupportedExpressionException.class)
+  public void testVariablesOnlyNegativeIndex1() throws ParseException, UnsupportedExpressionException {
+    parser.parseExpression("A[2]");
+  }
+
+  @Test(expected = UnsupportedExpressionException.class)
+  public void testVariablesOnlyNegativeIndex2() throws ParseException, UnsupportedExpressionException {
+    parser.parseExpression("(A[2])");
+  }
+
+  @Test
   public void testOnesided() throws ParseException, UnsupportedExpressionException {
     // < 2 means X < 2
     assertParseExpressionEqual("< 2", lessThan(var(cellName), literal(2)));

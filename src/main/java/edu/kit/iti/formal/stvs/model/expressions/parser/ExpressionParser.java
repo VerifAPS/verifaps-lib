@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -86,14 +87,29 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 
   @Override
   public Expression visitVariable(CellExpressionParser.VariableContext ctx) {
-    Expression variableExpr = new VariableExpr(ctx.getText());
+    Expression variableExpr = new VariableExpr(parseIdentifier(ctx), parseArrayIndex(ctx));
     return new FunctionExpr(FunctionExpr.Operation.EQUALS,
         Arrays.asList(cellAsVariable, variableExpr));
   }
 
   @Override
   public Expression visitBvariable(CellExpressionParser.BvariableContext ctx) {
-    return new VariableExpr(ctx.getText());
+    return new VariableExpr(parseIdentifier(ctx.variable()), parseArrayIndex(ctx.variable()));
+  }
+
+  private Optional<Integer> parseArrayIndex(CellExpressionParser.VariableContext ctx) {
+    return Optional.ofNullable(ctx.INTEGER())
+        .map(node -> {
+          int index = Integer.valueOf(node.getText());
+          if (index > 0) {
+            throw new UnsupportedExpressionRuntimeException("Positive Variable Index");
+          }
+          return index;
+        });
+  }
+
+  private String parseIdentifier(CellExpressionParser.VariableContext ctx) {
+    return ctx.IDENTIFIER().getText();
   }
 
   private Value valueFromConstantToken(CellExpressionParser.ConstantContext ctx) {

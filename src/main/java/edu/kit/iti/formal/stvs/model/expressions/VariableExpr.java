@@ -1,11 +1,20 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
+import java.util.Optional;
+
 public class VariableExpr extends Expression {
 
   private final String varName;
+  private final Optional<Integer> index;
 
-  public VariableExpr(String varName) {
+  public VariableExpr(String varName, Optional<Integer> index) {
     this.varName = varName;
+    this.index = index;
+  }
+
+  public VariableExpr(String name) {
+    this.varName = name;
+    this.index = Optional.empty();
   }
 
   @Override
@@ -15,6 +24,10 @@ public class VariableExpr extends Expression {
 
   public String getVariableName() {
     return varName;
+  }
+
+  public Optional<Integer> getIndex() {
+    return index;
   }
 
   public boolean equals(VariableExpr expr) {
@@ -27,7 +40,8 @@ public class VariableExpr extends Expression {
   }
 
   public String toString() {
-    return "VariableExpr(" + varName + ")";
+    String indexStr = index.map(i -> "[" + i + "]").orElse("");
+    return "VariableExpr(" + varName + indexStr + ")";
   }
 
 }

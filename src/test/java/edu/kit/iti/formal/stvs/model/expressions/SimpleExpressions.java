@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Created by philipp on 17.01.17.
@@ -49,6 +50,10 @@ public final class SimpleExpressions {
 
   public static Expression var(String name) {
     return new VariableExpr(name);
+  }
+
+  public static Expression var(String name, int index) {
+    return new VariableExpr(name, Optional.of(index));
   }
 
   public static Expression literal(int integer) {
