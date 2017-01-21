@@ -1,9 +1,9 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import java.util.function.Consumer;
+import javafx.beans.property.StringProperty;
 
 /**
- * Created by philipp on 09.01.17.
+ * @author Benjamin Alt
  */
 public interface StringEditable {
 
@@ -11,5 +11,5 @@ public interface StringEditable {
 
   void setFromString(String input);
 
-  void addStringListener(Consumer<String> listener);
+  StringProperty stringRepresentationProperty();
 }

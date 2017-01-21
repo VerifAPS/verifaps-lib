@@ -3,7 +3,7 @@ package edu.kit.iti.formal.stvs.model.table;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 
 /**
- * Created by philipp on 10.01.17.
+ * @author Benjamin Alt
  */
 public class ConcreteCell {
 

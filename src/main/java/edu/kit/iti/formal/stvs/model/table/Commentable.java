@@ -1,11 +1,16 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import java.util.function.Consumer;
+import javafx.beans.property.StringProperty;
 
+
+/**
+ * @author Benjamin Alt
+ */
 public interface Commentable {
-  public void setComment(String comment);
 
-  public String getComment();
+  void setComment(String comment);
 
-  public void addCommentListener(Consumer<Commentable> consumer);
+  String getComment();
+
+  StringProperty commentProperty();
 }

@@ -1,14 +1,15 @@
 package edu.kit.iti.formal.stvs.model.table;
 
 /**
- * Created by philipp on 10.01.17.
+ * @author Benjamin Alt
  */
 public class ConcreteDuration {
 
   private int duration;
   private int beginCycle;
 
-  public ConcreteDuration(int duration) {
+  public ConcreteDuration(int beginCycle, int duration) {
+    this.beginCycle = beginCycle;
     this.duration = duration;
   }
 
@@ -16,11 +17,15 @@ public class ConcreteDuration {
     return duration;
   }
 
+  public int getBeginCycle() {
+    return beginCycle;
+  }
+
   public int getEndCycle() {
-    return -1;
+    return beginCycle + duration;
   }
 
   public String toString() {
-    return null;
+    return Integer.toString(duration);
   }
 }

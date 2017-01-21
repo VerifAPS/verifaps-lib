@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * Created by philipp on 09.01.17.
+ * @author Benjamin Alt
  */
 public class ConstraintSpecification extends SpecificationTable<ConstraintCell, ConstraintDuration> {
 

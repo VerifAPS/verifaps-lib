@@ -1,49 +1,48 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import java.util.List;
-import java.util.function.Consumer;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
- * Created by philipp on 09.01.17.
+ * @author Benjamin Alt
  */
 public class ConstraintCell implements CellOperationProvider {
 
-  private String stringRepresentation;
-  private String comment;
-
-  private List<Consumer<String>> userInputStringListeners;
+  private StringProperty stringRepresentation;
+  private StringProperty comment;
 
   public ConstraintCell(String stringRepresentation) {
-    this.stringRepresentation = stringRepresentation;
+    this.stringRepresentation = new SimpleStringProperty(stringRepresentation);
+    this.comment = new SimpleStringProperty();
   }
 
   @Override
   public String getAsString() {
-    return stringRepresentation;
+    return stringRepresentation.get();
   }
 
   @Override
   public void setFromString(String stringRepresentation) {
-    this.stringRepresentation = stringRepresentation;
+    this.stringRepresentation.set(stringRepresentation);
   }
 
   @Override
-  public void addStringListener(Consumer<String> listener) {
-
+  public StringProperty stringRepresentationProperty() {
+    return stringRepresentation;
   }
 
   @Override
   public void setComment(String comment) {
-
+    this.comment.set(comment);
   }
 
   @Override
   public String getComment() {
-    return comment;
+    return comment.get();
   }
 
   @Override
-  public void addCommentListener(Consumer<Commentable> consumer) {
-
+  public StringProperty commentProperty() {
+    return comment;
   }
 }
