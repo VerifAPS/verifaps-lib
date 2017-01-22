@@ -7,6 +7,7 @@ import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -16,6 +17,8 @@ import java.util.function.Consumer;
  */
 public class HybridSpecification extends ConstraintSpecification {
 
+
+  //TODO: Kann eine HybridSpecification sowohl ein Counterexample als auch eine ConcreteInstance haben?
   private Optional<ConcreteSpecification> counterExample;
   private OptionalProperty<ConcreteSpecification> concreteInstance;
   private List<Consumer<Optional<ConcreteSpecification>>> concreteInstanceChangedListeners;
@@ -30,6 +33,14 @@ public class HybridSpecification extends ConstraintSpecification {
   public HybridSpecification(Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet, boolean editable) {
     super(typeContext, ioVariables, freeVariableSet);
     this.editable = editable;
+    this.selection = new Selection();
+  }
+
+  public HybridSpecification(Map<String, SpecificationColumn<ConstraintCell>> columns, List<ConstraintDuration> durations,
+                             Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet, boolean editable) {
+    super(columns, durations, typeContext, ioVariables, freeVariableSet);
+    this.editable = editable;
+    this.selection = new Selection();
   }
 
   public Optional<ConcreteSpecification> getCounterExample() {
@@ -37,18 +48,46 @@ public class HybridSpecification extends ConstraintSpecification {
   }
 
   public void setCounterExample(ConcreteSpecification counterExample) {
+    this.counterExample = Optional.of(counterExample);
   }
 
   public Selection getSelection() {
     return selection;
   }
 
+  /**
+   * TODO: Should we keep this? It's really just convenience for getCounterExample().get().getColumn(column).getCells()
+   */
+  @Deprecated
   public List<ConcreteCell> getConcreteValuesForConstraint(String column, int row) {
-    return null;
+    throw new UnsupportedOperationException("This method is on the kill list and may be removed at any time. For alternatives," +
+        "" +
+        "check the Javadoc of this method");
+    /* Check counterexample first
+    if (counterExample.isPresent()) {
+      return counterExample.get().getColumn(column).getCells();
+    } else if (concreteInstance.get() != null) {
+      return concreteInstance.get().getColumn(column).getCells();
+    } else {
+      //TODO: Should I throw an exception here?
+      return null;
+    }*/
   }
 
-  public ConcreteDuration getDurationForRow(int row) {
-    return null;
+  /**
+   * TODO: Should we keep this? It's really just convenience for getCounterExample().get().getDuration(row)
+   */
+  @Deprecated
+  public ConcreteDuration getConcreteDurationForRow(int row) {
+    throw new UnsupportedOperationException("This method is on the kill list and may be removed at any time. For alternatives," +
+        "" +
+        "check the Javadoc of this method");
+    /*
+    if (counterExample.isPresent()) {
+      return counterExample.get().getDuration(row);
+    } else if (concreteInstance.get() != null) {
+      return concreteInstance.get().getDuration(row);
+    }*/
   }
 
   public boolean isEditable() {
