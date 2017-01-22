@@ -3,7 +3,7 @@ package edu.kit.iti.formal.stvs.model.table.problems;
 import java.util.function.Function;
 
 /**
- * Created by philipp on 09.01.17.
+ * @author Benjamin Alt
  */
 public abstract class SpecProblem {
 

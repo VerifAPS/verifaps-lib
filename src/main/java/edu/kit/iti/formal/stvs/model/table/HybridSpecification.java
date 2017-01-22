@@ -1,11 +1,16 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import edu.kit.iti.formal.stvs.logic.specification.BacktrackSpecificationConcretizer;
+import edu.kit.iti.formal.stvs.logic.specification.ConcretizerContext;
+import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import javafx.beans.value.ObservableValue;
 
+import javafx.beans.value.ChangeListener;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,6 +28,7 @@ public class HybridSpecification extends ConstraintSpecification {
   private OptionalProperty<ConcreteSpecification> concreteInstance;
   private List<Consumer<Optional<ConcreteSpecification>>> concreteInstanceChangedListeners;
   private final boolean editable;
+  private SpecificationConcretizer concretizer;
 
   /**
    * Selection for Spec to Timing-Diagram synchronisation.
@@ -34,13 +40,9 @@ public class HybridSpecification extends ConstraintSpecification {
     super(typeContext, ioVariables, freeVariableSet);
     this.editable = editable;
     this.selection = new Selection();
-  }
-
-  public HybridSpecification(Map<String, SpecificationColumn<ConstraintCell>> columns, List<ConstraintDuration> durations,
-                             Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet, boolean editable) {
-    super(columns, durations, typeContext, ioVariables, freeVariableSet);
-    this.editable = editable;
-    this.selection = new Selection();
+    validSpecificationProperty().addListener(new ValidSpecificationChangedListener<ValidSpecification>());
+    concretizer = new BacktrackSpecificationConcretizer(new ConcretizerContext());
+    concretizer.concreteSpecProperty().addListener(new ConcreteSpecificationChangedListener<ConcreteSpecification>());
   }
 
   public Optional<ConcreteSpecification> getCounterExample() {
@@ -109,4 +111,36 @@ public class HybridSpecification extends ConstraintSpecification {
   public void removeConcreteInstance() {
     concreteInstance.clear();
   }
+
+  /**
+   * Called every time a new valid specification is available.
+   * Triggers a concretization.
+   */
+  private void onValidSpecificationChanged() {
+    concretizer.createConcreteSpecification(getValidSpecification());
+  }
+
+  private void onConcreteSpecificationChanged() {
+    ConcreteSpecification newConcreteSpec = concretizer.getConcreteSpec();
+    if(newConcreteSpec != null) {
+      concreteInstance.set(newConcreteSpec);
+    } else {
+      concreteInstance.clear();
+    }
+  }
+
+  class ValidSpecificationChangedListener<T> implements ChangeListener<T> {
+    @Override
+    public void changed(ObservableValue<? extends T> observableValue, T t, T t1) {
+      onValidSpecificationChanged();
+    }
+  }
+
+  class ConcreteSpecificationChangedListener<T> implements ChangeListener<T> {
+    @Override
+    public void changed(ObservableValue<? extends T> observableValue, T t, T t1) {
+      onConcreteSpecificationChanged();
+    }
+  }
+
 }

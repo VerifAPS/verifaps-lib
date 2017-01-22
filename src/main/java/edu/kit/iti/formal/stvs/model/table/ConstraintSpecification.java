@@ -48,17 +48,6 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     this.validSpecification = new OptionalProperty<>(new SimpleObjectProperty<>());
   }
 
-  public ConstraintSpecification(Map<String, SpecificationColumn<ConstraintCell>> columns, List<ConstraintDuration> durations,
-                                 Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet) {
-    super(columns, durations);
-    this.typeContext = typeContext;
-    this.freeVariableSet = freeVariableSet;
-    this.codeIoVariables = ioVariables;
-    this.freeVariableSet = freeVariableSet;
-    this.problems = new SimpleObjectProperty<List<SpecProblem>>();
-    this.validSpecification = new OptionalProperty<>(new SimpleObjectProperty<>());
-  }
-
   public void addEmptyColumn(SpecIoVariable variable) {
       ArrayList<ConstraintCell> emptyCells = new ArrayList<ConstraintCell>();
       for (int i = 0; i < durations.size(); i++) {
@@ -183,7 +172,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
           problemsFound.add(new ParseErrorProblem(e.getMessage(), rawColumn.getSpecIoVariable(), rowNum));
           // Do not break, as all cells must be parsed in order for all specProblems to be found
         } catch (TypeCheckException e) {
-          problemsFound.add(new TypeErrorProblem(rawColumn.getSpecIoVariable(), rowNum, e));
+          problemsFound.add(new TypeErrorProblem("Type error in column " + columnId + ", row " + rowNum, rawColumn.getSpecIoVariable(), rowNum, e));
         }
       }
       parsedColumns.put(columnId, new SpecificationColumn<>(rawColumn.getSpecIoVariable(), parsedCells, rawColumn.getConfig()));

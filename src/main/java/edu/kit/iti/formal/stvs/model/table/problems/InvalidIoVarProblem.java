@@ -5,7 +5,7 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import java.util.function.Function;
 
 /**
- * Created by philipp on 09.01.17.
+ * @author Benjamin Alt
  */
 public class InvalidIoVarProblem extends SpecProblem {
 

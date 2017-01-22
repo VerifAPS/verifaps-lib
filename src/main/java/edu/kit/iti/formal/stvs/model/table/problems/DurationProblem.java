@@ -3,14 +3,14 @@ package edu.kit.iti.formal.stvs.model.table.problems;
 import java.util.function.Function;
 
 /**
- * Created by Philipp on 10.01.2017.
+ * @author Benjamin Alt
  */
 public class DurationProblem extends SpecProblem {
 
   private final int row;
   private final String errorMessage;
 
-  public DurationProblem(int row, String errorMessage) {
+  public DurationProblem(String errorMessage, int row) {
     this.row = row;
     this.errorMessage = errorMessage;
   }

@@ -5,7 +5,7 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import java.util.function.Function;
 
 /**
- * Created by philipp on 09.01.17.
+ * @author Benjamin Alt
  */
 public class ParseErrorProblem extends SpecProblem {
 
@@ -32,7 +32,7 @@ public class ParseErrorProblem extends SpecProblem {
 
   @Override
   public String getErrorMessage() {
-    return null;
+    return errorMessage;
   }
 
   public SpecIoVariable getIoVariable() {
