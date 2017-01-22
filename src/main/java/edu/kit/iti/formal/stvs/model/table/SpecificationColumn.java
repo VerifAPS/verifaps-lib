@@ -21,6 +21,10 @@ public class SpecificationColumn<C> {
     this.ioVar = ioVar;
   }
 
+  public List<C> getCells() {
+    return cells;
+  }
+
   public C getCellForRow(int row) {
     return cells.get(row);
   }

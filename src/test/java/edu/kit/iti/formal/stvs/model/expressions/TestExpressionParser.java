@@ -18,8 +18,8 @@ import static org.junit.Assert.assertEquals;
 public class TestExpressionParser {
 
   // Initialize parser with context information:
-  private final String cellName = "X";
-  private final ExpressionParser parser = new ExpressionParser(cellName);
+  private final String columnName = "X";
+  private final ExpressionParser parser = new ExpressionParser(columnName);
 
   public TestExpressionParser() {
   }
@@ -38,24 +38,24 @@ public class TestExpressionParser {
   @Test
   public void testConstants() throws ParseException, UnsupportedExpressionException {
     // TRUE means X = TRUE
-    assertParseExpressionEqual("TRUE", equal(var(cellName), literal(true)));
+    assertParseExpressionEqual("TRUE", equal(var(columnName), literal(true)));
     // both upper and lower case
-    assertParseExpressionEqual("false", equal(var(cellName), literal(false)));
+    assertParseExpressionEqual("false", equal(var(columnName), literal(false)));
     // 1 means X = 1
-    assertParseExpressionEqual("1", equal(var(cellName), literal(1)));
+    assertParseExpressionEqual("1", equal(var(columnName), literal(1)));
     // - means TRUE
     assertParseExpressionEqual("-", literal(true));
   }
 
   @Test
   public void testVariables() throws ParseException, UnsupportedExpressionException {
-    assertParseExpressionEqual("b", equal(var(cellName), var("b")));
+    assertParseExpressionEqual("b", equal(var(columnName), var("b")));
     assertParseExpressionEqual("b = ! FALSE", equal(var("b"), not(literal(false))));
   }
 
   @Test
   public void testVariablesWithIndex() throws ParseException, UnsupportedExpressionException {
-    assertParseExpressionEqual("A[-2]", equal(var(cellName), var("A", -2)));
+    assertParseExpressionEqual("A[-2]", equal(var(columnName), var("A", -2)));
     assertParseExpressionEqual("(A[0])", var("A", 0));
   }
 
@@ -72,7 +72,7 @@ public class TestExpressionParser {
   @Test
   public void testOnesided() throws ParseException, UnsupportedExpressionException {
     // < 2 means X < 2
-    assertParseExpressionEqual("< 2", lessThan(var(cellName), literal(2)));
+    assertParseExpressionEqual("< 2", lessThan(var(columnName), literal(2)));
   }
 
   @Test
@@ -130,7 +130,7 @@ public class TestExpressionParser {
   public void testInterval() throws ParseException, UnsupportedExpressionException {
     // [1, 4] means X >= 1 AND X <= 4
     assertParseExpressionEqual("[4, 1]",
-        and(greaterEqual(var(cellName), literal(4)), lessEqual(var(cellName), literal(1)))
+        and(greaterEqual(var(columnName), literal(4)), lessEqual(var(columnName), literal(1)))
     );
   }
 

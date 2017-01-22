@@ -12,7 +12,7 @@ public class SpecificationTable<C, D> {
 
   private ObjectProperty<ColumnChangeInfo<C>> columnChange;
   private ObjectProperty<RowChangeInfo<C, D>> rowChange;
-  private Map<String, SpecificationColumn<C>> columns;
+  protected Map<String, SpecificationColumn<C>> columns;
   protected List<D> durations;
 
   public SpecificationTable() {
@@ -20,6 +20,13 @@ public class SpecificationTable<C, D> {
     rowChange = new SimpleObjectProperty<>();
     columns = new HashMap<>();
     durations = new ArrayList<>();
+  }
+
+  public SpecificationTable(Map<String, SpecificationColumn<C>> columns, List<D> durations) {
+    columnChange = new SimpleObjectProperty<>();
+    rowChange = new SimpleObjectProperty<>();
+    this.columns = columns;
+    this.durations = durations;
   }
 
   public enum Change {

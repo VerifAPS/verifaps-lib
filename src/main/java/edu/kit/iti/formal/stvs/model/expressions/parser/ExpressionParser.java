@@ -16,12 +16,12 @@ import java.util.Optional;
  */
 public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 
-  private String cellName;
+  private String columnName;
   private Expression cellAsVariable;
 
-  public ExpressionParser(String cellName) {
-    this.cellName = cellName;
-    this.cellAsVariable = new VariableExpr(cellName);
+  public ExpressionParser(String columnName) {
+    this.columnName = columnName;
+    this.cellAsVariable = new VariableExpr(columnName);
   }
 
   /**
@@ -46,12 +46,12 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
     }
   }
 
-  public String getCellName() {
-    return cellName;
+  public String getcolumnName() {
+    return columnName;
   }
 
-  public void setCellName(String cellName) {
-    this.cellName = cellName;
+  public void setcolumnName(String columnName) {
+    this.columnName = columnName;
   }
 
   @Override
