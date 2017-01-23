@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -16,12 +15,12 @@ import java.util.Optional;
  */
 public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 
-  private String cellName;
-  private Expression cellAsVariable;
+  private String columnName;
+  private Expression columnAsVariable;
 
-  public ExpressionParser(String cellName) {
-    this.cellName = cellName;
-    this.cellAsVariable = new VariableExpr(cellName);
+  public ExpressionParser(String columnName) {
+    this.columnName = columnName;
+    this.columnAsVariable = new VariableExpr(columnName);
   }
 
   /**
@@ -46,12 +45,12 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
     }
   }
 
-  public String getCellName() {
-    return cellName;
+  public String getColumnName() {
+    return columnName;
   }
 
-  public void setCellName(String cellName) {
-    this.cellName = cellName;
+  public void setColumnName(String columnName) {
+    this.columnName = columnName;
   }
 
   @Override
@@ -77,7 +76,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   public Expression visitConstant(CellExpressionParser.ConstantContext ctx) {
     Expression literalExpr = new LiteralExpr(valueFromConstantToken(ctx));
     return new FunctionExpr(FunctionExpr.Operation.EQUALS,
-        Arrays.asList(cellAsVariable, literalExpr));
+        Arrays.asList(columnAsVariable, literalExpr));
   }
 
   @Override
@@ -89,7 +88,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   public Expression visitVariable(CellExpressionParser.VariableContext ctx) {
     Expression variableExpr = new VariableExpr(parseIdentifier(ctx), parseArrayIndex(ctx));
     return new FunctionExpr(FunctionExpr.Operation.EQUALS,
-        Arrays.asList(cellAsVariable, variableExpr));
+        Arrays.asList(columnAsVariable, variableExpr));
   }
 
   @Override
@@ -131,7 +130,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
     FunctionExpr.Operation op = binaryOperationFromToken(ctx.op.relOp.getType());
     Expression rightSide = ctx.expr().accept(this);
     return new FunctionExpr(op,
-        Arrays.asList(cellAsVariable, rightSide));
+        Arrays.asList(columnAsVariable, rightSide));
   }
 
   private FunctionExpr.Operation binaryOperationFromToken(int token) {
@@ -264,7 +263,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   public Expression visitInterval(CellExpressionParser.IntervalContext ctx) {
     Expression lower = ctx.lower.accept(this);
     Expression upper = ctx.upper.accept(this);
-    return makeInterval(cellAsVariable, lower, upper);
+    return makeInterval(columnAsVariable, lower, upper);
   }
 
   // Transforms: variable "X", lower "-5", upper "1+2" into "x >= -5 && x <= 1+2" as expression
