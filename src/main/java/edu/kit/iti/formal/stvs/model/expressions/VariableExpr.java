@@ -7,9 +7,9 @@ public class VariableExpr extends Expression {
   private final String varName;
   private final Optional<Integer> index;
 
-  public VariableExpr(String varName, Optional<Integer> index) {
+  public VariableExpr(String varName, int index) {
     this.varName = varName;
-    this.index = index;
+    this.index = Optional.of(index);
   }
 
   public VariableExpr(String name) {

@@ -6,10 +6,8 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by philipp on 09.01.17.
@@ -17,11 +15,40 @@ import java.util.Optional;
 public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 
   private String columnName;
-  private Expression cellAsVariable;
+  private Expression columnAsVariable;
+  private Map<String, ValueEnum> enumValues;
 
   public ExpressionParser(String columnName) {
     this.columnName = columnName;
-    this.cellAsVariable = new VariableExpr(columnName);
+    this.columnAsVariable = new VariableExpr(columnName);
+    this.enumValues = new HashMap<>(); // empty enum value set, because no context given
+  }
+
+  public ExpressionParser(String columnName, Set<Type> typeContext) {
+    this.columnName = columnName;
+    this.columnAsVariable = new VariableExpr(columnName);
+    this.enumValues = computeEnumValuesByName(typeContext);
+  }
+
+  private Map<String, ValueEnum> computeEnumValuesByName(Set<Type> typeSet) {
+    Map<String, ValueEnum> byName = new HashMap<>();
+    typeSet.stream()
+        .map(this::filterEnumType)
+        .filter(Optional::isPresent)
+        .map(Optional::get) // Filter only the TypeEnums out of there
+        .forEach(typeEnum ->
+          typeEnum.getValues().forEach(valueEnum -> // For every possible enum value
+            byName.put(valueEnum.getEnumValue(), valueEnum) // sort it in by name
+          ));
+    return byName;
+  }
+
+  private Optional<TypeEnum> filterEnumType(Type type) {
+    return type.match(
+        Optional::empty, // If its a TypeInt
+        Optional::empty, // If its a TypeBool
+        Optional::of     // If its a TypeEnum
+    );
   }
 
   /**
@@ -46,12 +73,17 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
     }
   }
 
-  public String getcolumnName() {
+  public String getColumnName() {
     return columnName;
   }
 
-  public void setcolumnName(String columnName) {
+  public void setColumnName(String columnName) {
     this.columnName = columnName;
+    this.columnAsVariable = new VariableExpr(columnName);
+  }
+
+  public void setTypeContext(Set<Type> context) {
+    this.enumValues = computeEnumValuesByName(context);
   }
 
   @Override
@@ -77,7 +109,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   public Expression visitConstant(CellExpressionParser.ConstantContext ctx) {
     Expression literalExpr = new LiteralExpr(valueFromConstantToken(ctx));
     return new FunctionExpr(FunctionExpr.Operation.EQUALS,
-        Arrays.asList(cellAsVariable, literalExpr));
+        Arrays.asList(columnAsVariable, literalExpr));
   }
 
   @Override
@@ -87,14 +119,37 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 
   @Override
   public Expression visitVariable(CellExpressionParser.VariableContext ctx) {
-    Expression variableExpr = new VariableExpr(parseIdentifier(ctx), parseArrayIndex(ctx));
+    // If we come here, its a top-level variable.
+    // In this case there's an implicit equality with the column variable.
+    Expression variableExpr = parseOccuringString(ctx);
     return new FunctionExpr(FunctionExpr.Operation.EQUALS,
-        Arrays.asList(cellAsVariable, variableExpr));
+        Arrays.asList(columnAsVariable, variableExpr));
   }
 
   @Override
   public Expression visitBvariable(CellExpressionParser.BvariableContext ctx) {
-    return new VariableExpr(parseIdentifier(ctx.variable()), parseArrayIndex(ctx.variable()));
+    return parseOccuringString(ctx.variable());
+  }
+
+  // A seemingly arbitrary string in a CellExpression can either be an Enum value or a variable...
+  private Expression parseOccuringString(CellExpressionParser.VariableContext ctx) {
+    return parseArrayIndex(ctx).map(index ->
+        // If it has an index to it, like A[-2], its a variable for sure (indices don't make sense for enums!)
+        (Expression) new VariableExpr(parseIdentifier(ctx), index)) // really java? really?
+        // Otherwise we still have to find out
+        .orElse(maybeParseEnum(ctx));
+  }
+
+  private Expression maybeParseEnum(CellExpressionParser.VariableContext ctx) {
+    String identifier = parseIdentifier(ctx);
+    ValueEnum enumValue = enumValues.get(identifier);
+
+    // If the enum value exists, we take it, else we think it's a variable.
+    if (enumValue == null) {
+      return new VariableExpr(identifier);
+    } else {
+      return new LiteralExpr(enumValue);
+    }
   }
 
   private Optional<Integer> parseArrayIndex(CellExpressionParser.VariableContext ctx) {
@@ -131,7 +186,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
     FunctionExpr.Operation op = binaryOperationFromToken(ctx.op.relOp.getType());
     Expression rightSide = ctx.expr().accept(this);
     return new FunctionExpr(op,
-        Arrays.asList(cellAsVariable, rightSide));
+        Arrays.asList(columnAsVariable, rightSide));
   }
 
   private FunctionExpr.Operation binaryOperationFromToken(int token) {
@@ -264,7 +319,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   public Expression visitInterval(CellExpressionParser.IntervalContext ctx) {
     Expression lower = ctx.lower.accept(this);
     Expression upper = ctx.upper.accept(this);
-    return makeInterval(cellAsVariable, lower, upper);
+    return makeInterval(columnAsVariable, lower, upper);
   }
 
   // Transforms: variable "X", lower "-5", upper "1+2" into "x >= -5 && x <= 1+2" as expression

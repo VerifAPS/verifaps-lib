@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.expressions.Expression;
+import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 
 import java.util.List;

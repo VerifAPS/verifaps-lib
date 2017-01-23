@@ -3,8 +3,6 @@ package edu.kit.iti.formal.stvs.model.expressions;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
 import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.misc.Pair;
 import org.junit.Test;
 
 import java.util.*;
@@ -147,6 +145,17 @@ public class TestExpressionParser {
   @Test(expected = UnsupportedExpressionException.class)
   public void testUnsupportedGuardedIf() throws ParseException, UnsupportedExpressionException {
     parser.parseExpression("if :: TRUE -> FALSE :: FALSE -> TRUE fi");
+  }
+
+  @Test
+  public void testRecognizeEnum() throws ParseException, UnsupportedExpressionException {
+    TypeEnum colorsEnum = new TypeEnum("COLORS", Arrays.asList("red", "green", "blue"));
+    Set<Type> typeContext = new HashSet<>();
+    typeContext.add(colorsEnum);
+
+    parser.setTypeContext(typeContext);
+    assertParseExpressionEqual("(blue)", literalEnum("blue", colorsEnum));
+    assertParseExpressionEqual("red", equal(var(cellName), literalEnum("red", colorsEnum)));
   }
 
 }

@@ -53,7 +53,7 @@ public final class SimpleExpressions {
   }
 
   public static Expression var(String name, int index) {
-    return new VariableExpr(name, Optional.of(index));
+    return new VariableExpr(name, index);
   }
 
   public static Expression literal(int integer) {
@@ -66,6 +66,10 @@ public final class SimpleExpressions {
 
   public static Expression literal(ValueEnum e) {
     return new LiteralExpr(e);
+  }
+
+  public static Expression literalEnum(String value, TypeEnum sourceType) {
+    return literal(new ValueEnum(value, sourceType));
   }
 
 }
