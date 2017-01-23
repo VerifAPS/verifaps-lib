@@ -44,6 +44,7 @@ jar {
 
 test {
     filter {
-        includeTestsMatching "edu.kit.iti.formal.*"
+        includeTestsMatching "edu.kit.iti.formal.stvs.model.*"
+        includeTestsMatching "edu.kit.iti.formal.stvs.logic.*"
     }
 }
