@@ -42,11 +42,21 @@ public class TestIntervalParser {
 
   @Test(expected = ParseException.class)
   public void testNotNumbersInInterval() throws ParseException {
-    assertParseEqual("[a,b]", " should fail", 0, 0);
+    IntervalParser.parse("[a,b]");
   }
 
   @Test(expected = ParseException.class)
   public void testLowerBoundHigherThanHigherBound() throws ParseException {
-    assertParseEqual("[3,2]", " should fail", 3, 2);
+    IntervalParser.parse("[3,2]");
+  }
+
+  @Test(expected = ParseException.class)
+  public void testNoNegativeNumbersAllowedInConstant() throws ParseException {
+    IntervalParser.parse("-1");
+  }
+
+  @Test(expected = ParseException.class)
+  public void testNoNegativeNumbersAllowedInInterval() throws ParseException {
+    IntervalParser.parse("[-3,-1]");
   }
 }
