@@ -1,9 +1,6 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -55,7 +52,10 @@ public class TypeEnum implements Type {
     return valueMap.values().iterator().next();
   }
 
-  // The fuck is this? TODO: Maybe remove this method
+  public Collection<ValueEnum> getValues() {
+    return valueMap.values();
+  }
+
   public ValueEnum valueOf(String enumName) {
     ValueEnum enumVal = valueMap.get(enumName);
     if (enumVal == null) {
