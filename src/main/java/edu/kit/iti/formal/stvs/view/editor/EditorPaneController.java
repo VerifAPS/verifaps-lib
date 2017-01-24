@@ -81,7 +81,7 @@ public class EditorPaneController implements Controller {
         = new StyleSpansBuilder<>();
 
     tokens.forEach(token ->
-      spansBuilder.add(getStyleClassesFor(token), token.getText().length())
+      spansBuilder.add(getStyleClassesFor(token), token.getText().replaceAll("\\r", "").length())
     );
     return spansBuilder.create();
   }
