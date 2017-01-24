@@ -22,6 +22,8 @@ public class EditorTest {
     Code code = CodeTest.loadCodeFromFile("define_type.st");
     EditorPaneController controller = new EditorPaneController(code, new GlobalConfig());
     Scene scene = new Scene(controller.getView(), 800, 600);
+    System.out.println("\n\n" + "Defined Variables: " + controller.getCode().parsedCodeProperty().get().getDefinedVariables().toString() + "\n");
+    System.out.println("Defined Types: " + controller.getCode().parsedCodeProperty().get().getDefinedTypes().toString() + "\n");
     return scene;
   }
 }

@@ -128,8 +128,13 @@ public class EditorPaneController implements Controller {
   public void setStylesheet(String url) {
   }
 
+  public Code getCode() {
+    return this.code;
+  }
+
   @Override
   public EditorPane getView() {
     return view;
   }
 }
+
