@@ -66,10 +66,14 @@ public class Code {
 
       @Override
       protected List<? extends Token> computeValue() {
-        IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(sourceCodeProperty.get()));
-        return lexer.getAllTokens();
+        return Code.this.computeTokens(Code.this.sourcecodeProperty().get());
       }
     };
+  }
+
+  public List<? extends Token> computeTokens(String sourcecode) {
+    IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(sourcecode));
+    return lexer.getAllTokens();
   }
 
   public StringProperty sourcecodeProperty() {

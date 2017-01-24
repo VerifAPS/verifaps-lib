@@ -37,7 +37,7 @@ public class CodeTest {
     return s.hasNext() ? s.next() : "";
   }
 
-  private static Code loadCodeFromFile(String filename) {
+  public static Code loadCodeFromFile(String filename) {
     return new Code(
         filename,
         convertStreamToString(CodeTest.class.getResourceAsStream(filename)));
