@@ -81,12 +81,13 @@ public class EditorPaneController implements Controller {
         = new StyleSpansBuilder<>();
 
     tokens.forEach(token ->
-      spansBuilder.add(getStyleClassesFor(token), token.getText().length())
+      spansBuilder.add(getStyleClassesFor(token), token.getText().replaceAll("\\r", "").length())
     );
     return spansBuilder.create();
   }
 
   private Collection<String> getStyleClassesFor(Token token) {
+    System.out.print(token.getText());
     // TODO: Add more colours (styles) to tokens
     switch (token.getType()) {
       case IEC61131Lexer.TYPE:
