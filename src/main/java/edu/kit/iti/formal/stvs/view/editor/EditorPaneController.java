@@ -38,11 +38,11 @@ public class EditorPaneController implements Controller {
 
     this.view.getStylesheets().add(EditorPane.class.getResource("st-keywords.css").toExternalForm());
     this.executor = Executors.newSingleThreadExecutor();
-    configureSyntaxHighlighting();
-    applyHighlighting(computeHighlighting(code.sourcecodeProperty().get()));
+    configureTextArea();
+    handleTextChange(computeHighlighting(code.sourcecodeProperty().get()));
   }
 
-  private void configureSyntaxHighlighting() {
+  private void configureTextArea() {
     CodeArea codeArea = view.getCodeArea();
     codeArea.richChanges()
         .filter(ch -> !ch.getInserted().equals(ch.getRemoved()))
@@ -58,7 +58,7 @@ public class EditorPaneController implements Controller {
             return Optional.empty();
           }
         })
-        .subscribe(this::applyHighlighting);
+        .subscribe(this::handleTextChange);
   }
 
   private Task<StyleSpans<Collection<String>>> computeHighlightingAsync() {
@@ -87,7 +87,6 @@ public class EditorPaneController implements Controller {
   }
 
   private Collection<String> getStyleClassesFor(Token token) {
-    System.out.print(token.getText());
     // TODO: Add more colours (styles) to tokens
     switch (token.getType()) {
       case IEC61131Lexer.TYPE:
@@ -116,7 +115,8 @@ public class EditorPaneController implements Controller {
     }
   }
 
-  private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
+  private void handleTextChange(StyleSpans<Collection<String>> highlighting) {
+    code.sourcecodeProperty().setValue(view.getCodeArea().getText());
     view.setStyleSpans(highlighting);
   }
 
