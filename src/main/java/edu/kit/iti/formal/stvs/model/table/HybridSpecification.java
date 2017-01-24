@@ -41,7 +41,7 @@ public class HybridSpecification extends ConstraintSpecification {
     this.editable = editable;
     this.selection = new Selection();
     validSpecificationProperty().addListener(new ValidSpecificationChangedListener<ValidSpecification>());
-    concretizer = new BacktrackSpecificationConcretizer(new ConcretizerContext());
+    concretizer = new BacktrackSpecificationConcretizer();
     concretizer.concreteSpecProperty().addListener(new ConcreteSpecificationChangedListener<ConcreteSpecification>());
   }
 

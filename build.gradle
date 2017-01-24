@@ -26,6 +26,7 @@ repositories {
 dependencies {
     compile 'com.fifesoft:rsyntaxtextarea:2.6.0'
     compile 'org.apache.commons:commons-collections4:4.0'
+    compile 'org.apache.commons:commons-lang3:3.1'
     compile 'org.choco-solver:choco-solver:4.0.0'
     // This dependency does not exist yet (for some reason).
     //compile 'edu.kit.iti.formal:geteta:jar:0.2.2-beta'

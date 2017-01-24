@@ -13,7 +13,7 @@ public class SpecificationTable<C, D> {
   private ObjectProperty<ColumnChangeInfo<C>> columnChange;
   private ObjectProperty<RowChangeInfo<C, D>> rowChange;
   protected Map<String, SpecificationColumn<C>> columns;
-  protected List<D> durations;
+  protected ArrayList<D> durations;
 
   public SpecificationTable() {
     columnChange = new SimpleObjectProperty<>();
@@ -26,7 +26,7 @@ public class SpecificationTable<C, D> {
     columnChange = new SimpleObjectProperty<>();
     rowChange = new SimpleObjectProperty<>();
     this.columns = columns;
-    this.durations = durations;
+    this.durations = new ArrayList(durations);
   }
 
   public enum Change {
@@ -77,7 +77,7 @@ public class SpecificationTable<C, D> {
   public void addColumn(String columnId, SpecificationColumn<C> column) {
     //TODO: Throw error if column already exists?
     columns.put(columnId, column);
-    columnChange.setValue(new ColumnChangeInfo<C>(column, columnId, Change.ADD));
+    columnChange.set(new ColumnChangeInfo<C>(column, columnId, Change.ADD));
   }
 
   public void removeColumn(String columnId) {
@@ -85,7 +85,7 @@ public class SpecificationTable<C, D> {
       throw new NoSuchElementException("No such table column: " + columnId);
     }
     SpecificationColumn<C> column = columns.remove(columnId);
-    columnChange.setValue(new ColumnChangeInfo<C>(column, columnId, Change.REMOVE));
+    columnChange.set(new ColumnChangeInfo<C>(column, columnId, Change.REMOVE));
   }
 
   public SpecificationRow<C, D> getRow(int rowNum) {
