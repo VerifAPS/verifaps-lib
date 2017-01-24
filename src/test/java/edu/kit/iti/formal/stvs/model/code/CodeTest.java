@@ -10,9 +10,11 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import org.antlr.v4.runtime.Token;
+import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -32,15 +34,14 @@ public class CodeTest {
   private final Code exampleCode = new Code("stfile.st", "THIS IS SPARTA");
   private final Code enumDefinition = loadCodeFromFile("define_type.st");
 
-  private static String convertStreamToString(InputStream is) {
-    java.util.Scanner s = new java.util.Scanner(is, "UTF-8").useDelimiter("\\A");
-    return s.hasNext() ? s.next() : "";
-  }
-
   public static Code loadCodeFromFile(String filename) {
-    return new Code(
-        filename,
-        convertStreamToString(CodeTest.class.getResourceAsStream(filename)));
+    try {
+      return new Code(
+          filename,
+          IOUtils.toString(CodeTest.class.getResourceAsStream(filename), "UTF-8"));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Test
