@@ -47,6 +47,7 @@ public class EditorPaneController implements Controller {
     codeArea.richChanges()
         .filter(ch -> !ch.getInserted().equals(ch.getRemoved()))
         .successionEnds(Duration.ofMillis(500))
+        .hook(collectionRichTextChange -> codeArea.getUndoManager().mark())
         .supplyTask(this::computeHighlightingAsync)
         .awaitLatest(codeArea.richChanges())
         .filterMap(t -> {
