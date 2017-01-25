@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotEquals;
  * @author Benjamin Alt
  */
 public class SpecificationRowTest {
-  private SpecificationRow<String, Integer> row;
+  private SpecificationRow<String> row;
 
   @Before
   public void setUp() {
@@ -22,7 +22,7 @@ public class SpecificationRowTest {
     cells.put("B", "B3");
     cells.put("C", "C3");
     cells.put("D", "D3");
-    row = new SpecificationRow<>(4, cells);
+    row = new SpecificationRow<>(cells);
   }
 
   @Test
@@ -43,10 +43,11 @@ public class SpecificationRowTest {
     cells.put("B", "B3");
     cells.put("C", "C3");
     cells.put("D", "D3");
-    SpecificationRow<String, Integer> otherRow = new SpecificationRow<>(4, cells);
+    SpecificationRow<String> otherRow = new SpecificationRow<>(cells);
     assertEquals(otherRow, row);
     assertEquals(row, row);
-    otherRow = new SpecificationRow<>(2, cells);
+    cells.put("C", "C4");
+    otherRow = new SpecificationRow<>(cells);
     assertNotEquals(otherRow, row);
   }
 }

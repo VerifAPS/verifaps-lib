@@ -41,7 +41,10 @@ public class ConstraintSpecificationTest {
         new SpecIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableC"), cellsC, new ColumnConfig()));
     columns.put("VariableD", new SpecificationColumn<>(
         new SpecIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableD"), cellsD, new ColumnConfig(55)));
-    List<ConstraintDuration> durations = Arrays.asList(new ConstraintDuration("1"), new ConstraintDuration("4"), new ConstraintDuration("5"));
+    Map<Integer, ConstraintDuration> durations = new HashMap<>();
+    durations.put(0, new ConstraintDuration("1"));
+    durations.put(1, new ConstraintDuration("4"));
+    durations.put(2, new ConstraintDuration("5"));
 
     Set<Type> typeContext = new HashSet<Type>();
     typeContext.add(TypeInt.INT);
@@ -54,8 +57,8 @@ public class ConstraintSpecificationTest {
     Set<CodeIoVariable> codeIoVariables = new HashSet<>();
     codeIoVariables.add(new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableA"));
     codeIoVariables.add(new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableB"));
-    codeIoVariables.add(new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableC"));
-    codeIoVariables.add(new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableD"));
+    codeIoVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableC"));
+    codeIoVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableD"));
 
     spec = new ConstraintSpecification(columns, durations, typeContext, codeIoVariables, freeVariableSet);
     validSpec = null;
@@ -66,8 +69,7 @@ public class ConstraintSpecificationTest {
   public void testAddEmptyColumn() {
     SpecIoVariable variable = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableD");
     spec.addEmptyColumn(variable);
-    List<ConstraintCell> emptyCells = Arrays.asList(new ConstraintCell(""), new ConstraintCell(""), new ConstraintCell(""));
-    SpecificationColumn<ConstraintCell> expectedColumn =  new SpecificationColumn<ConstraintCell>(variable, emptyCells, new ColumnConfig());
+    SpecificationColumn<ConstraintCell> expectedColumn =  new SpecificationColumn<>(variable, new ArrayList<>(), new ColumnConfig());
     assertEquals(expectedColumn, spec.getColumn("VariableD"));
   }
 
@@ -113,7 +115,7 @@ public class ConstraintSpecificationTest {
   public void testDurationErrorHandling() {
     spec.getColumn("VariableA").getCellForRow(2).setFromString("100");
     assertNotNull(validSpec);
-    spec.getRow(1).getDuration().setFromString("bogus duration");
+    spec.getDuration(2).setFromString("bogus duration");
     assertNull(validSpec);
     assertNotEquals(0, spec.getProblems().size());
     assertThat(spec.getProblems().get(0), instanceOf(DurationProblem.class));

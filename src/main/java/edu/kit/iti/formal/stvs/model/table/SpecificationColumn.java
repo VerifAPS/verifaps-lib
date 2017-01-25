@@ -17,7 +17,7 @@ public class SpecificationColumn<C> {
   private SpecIoVariable ioVar;
 
   public SpecificationColumn(SpecIoVariable ioVar, List<C> cells, ColumnConfig config) {
-    this.cells = cells;
+    this.cells = new ArrayList(cells);
     this.config = config;
     this.ioVar = ioVar;
   }

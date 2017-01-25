@@ -20,7 +20,7 @@ import java.util.*;
 public class SpecificationTableTest {
 
   private SpecificationTable<String, Integer> table; // C and D can be anything, so why not String and Integer
-  private SpecificationTable.RowChangeInfo<String, Integer> rowChangeInfo;
+  private SpecificationTable.RowChangeInfo<String> rowChangeInfo;
   private SpecificationTable.ColumnChangeInfo<String> colChangeInfo;
 
   @Before
@@ -38,29 +38,14 @@ public class SpecificationTableTest {
         new SpecIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableC"), cellsC, new ColumnConfig()));
     columns.put("D", new SpecificationColumn<>(
         new SpecIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableD"), cellsD, new ColumnConfig(55)));
-    List<Integer> durations = Arrays.asList(2, 4, 5, 10);
+    Map<Integer, Integer> durations = new HashMap<>();
+    durations.put(0,2);
+    durations.put(1,4);
+    durations.put(2,5);
+    durations.put(3,10);
     table = new SpecificationTable<>(columns, durations);
     rowChangeInfo = null;
     colChangeInfo = null;
-  }
-
-  @Test(expected=IllegalArgumentException.class)
-  public void testInvalidTableInConstructor() {
-    Map<String,SpecificationColumn<String>> columns = new HashMap<>();
-    List<String> cellsA = Arrays.asList("A0", "A1", "A2", "A3");
-    List<String> cellsB = Arrays.asList("B0", "B1", "B2", "B3");
-    List<String> cellsC = Arrays.asList("C0", "C1", "C2", "C3");
-    List<String> cellsD = Arrays.asList("D0", "D1", "D2", "D3");
-    columns.put("A", new SpecificationColumn<>(
-        new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableA"), cellsA, new ColumnConfig()));
-    columns.put("B", new SpecificationColumn<>(
-        new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableB"), cellsB, new ColumnConfig(20)));
-    columns.put("C", new SpecificationColumn<>(
-        new SpecIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableC"), cellsC, new ColumnConfig()));
-    columns.put("D", new SpecificationColumn<>(
-        new SpecIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableD"), cellsD, new ColumnConfig(55)));
-    List<Integer> durations = Arrays.asList(2, 4, 5);
-    table = new SpecificationTable(columns, durations);
   }
 
   @Test
@@ -134,13 +119,13 @@ public class SpecificationTableTest {
 
   @Test
   public void testGetRow() {
-    SpecificationRow<String, Integer> row = table.getRow(2);
+    SpecificationRow<String> row = table.getRow(2);
     HashMap<String, String> expectedCells = new HashMap<String, String>();
     expectedCells.put("A", "A2");
     expectedCells.put("B", "B2");
     expectedCells.put("C", "C2");
     expectedCells.put("D", "D2");
-    assertEquals(new SpecificationRow<String, Integer>(5, expectedCells), row);
+    assertEquals(new SpecificationRow<String>(expectedCells), row);
   }
 
   @Test(expected=IndexOutOfBoundsException.class)
@@ -150,18 +135,18 @@ public class SpecificationTableTest {
 
   @Test
   public void testAddRow() {
-    table.rowChangeProperty().addListener(new ChangeListener<SpecificationTable.RowChangeInfo<String, Integer>>() {
+    table.rowChangeProperty().addListener(new ChangeListener<SpecificationTable.RowChangeInfo<String>>() {
       @Override
-      public void changed(ObservableValue<? extends SpecificationTable.RowChangeInfo<String, Integer>> observableValue, SpecificationTable.RowChangeInfo<String, Integer> theRowChangeInfo, SpecificationTable.RowChangeInfo<String, Integer> t1) {
+      public void changed(ObservableValue<? extends SpecificationTable.RowChangeInfo<String>> observableValue, SpecificationTable.RowChangeInfo<String> theRowChangeInfo, SpecificationTable.RowChangeInfo<String> t1) {
         rowChangeInfo = t1;
       }
     });
-    HashMap<String, String> newCells = new HashMap<String, String>();
+    HashMap<String, String> newCells = new HashMap<>();
     newCells.put("A", "A4");
     newCells.put("B", "B4");
     newCells.put("C", "C4");
     newCells.put("D", "D4");
-    SpecificationRow<String, Integer> newRow = new SpecificationRow<String, Integer>(7, newCells);
+    SpecificationRow<String> newRow = new SpecificationRow<>(newCells);
     table.addRow(4, newRow);
     assertEquals(newRow, table.getRow(4));
     assertNotNull(rowChangeInfo);
@@ -172,9 +157,9 @@ public class SpecificationTableTest {
 
   @Test
   public void testRemoveRow() {
-    table.rowChangeProperty().addListener(new ChangeListener<SpecificationTable.RowChangeInfo<String, Integer>>() {
+    table.rowChangeProperty().addListener(new ChangeListener<SpecificationTable.RowChangeInfo<String>>() {
       @Override
-      public void changed(ObservableValue<? extends SpecificationTable.RowChangeInfo<String, Integer>> observableValue, SpecificationTable.RowChangeInfo<String, Integer> theRowChangeInfo, SpecificationTable.RowChangeInfo<String, Integer> t1) {
+      public void changed(ObservableValue<? extends SpecificationTable.RowChangeInfo<String>> observableValue, SpecificationTable.RowChangeInfo<String> theRowChangeInfo, SpecificationTable.RowChangeInfo<String> t1) {
         rowChangeInfo = t1;
       }
     });
@@ -183,7 +168,7 @@ public class SpecificationTableTest {
     expectedCells.put("B", "B2");
     expectedCells.put("C", "C2");
     expectedCells.put("D", "D2");
-    SpecificationRow<String, Integer> expectedRow = new SpecificationRow<>(5, expectedCells);
+    SpecificationRow<String> expectedRow = new SpecificationRow<>(expectedCells);
     table.removeRow(2);
     assertNotNull(rowChangeInfo);
     assertEquals(expectedRow, rowChangeInfo.row);

@@ -44,6 +44,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     this.typeContext = typeContext;
     this.freeVariableSet = freeVariableSet;
     this.codeIoVariables = ioVariables;
+    this.specIoVariables = new HashSet<>();
     this.freeVariableSet = freeVariableSet;
     this.problems = new SimpleObjectProperty<List<SpecProblem>>();
     this.validSpecification = new OptionalProperty<>(new SimpleObjectProperty<>());
@@ -61,14 +62,19 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
                                  Map<Integer,ConstraintDuration> durations,
                                  Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet) {
     super(columns, durations);
+    specIoVariables = new HashSet<>();
     for (SpecificationColumn<ConstraintCell> col : columns.values()) {
-      col.getSpecIoVariable().categoryProperty().addListener(new SpecificationChangedListener<VariableCategory>());
-      col.getSpecIoVariable().nameProperty().addListener(new SpecificationChangedListener<String>());
-      col.getSpecIoVariable().typeProperty().addListener(new SpecificationChangedListener<Type>());
+      specIoVariables.add(col.getSpecIoVariable());
+      col.getSpecIoVariable().categoryProperty().addListener(new SpecificationChangedListener<>());
+      col.getSpecIoVariable().nameProperty().addListener(new SpecificationChangedListener<>());
+      col.getSpecIoVariable().typeProperty().addListener(new SpecificationChangedListener<>());
       for (int i = 0; i < durations.size(); i++) {
         ConstraintCell cell = col.getCellForRow(i);
         cell.stringRepresentationProperty().addListener(new SpecificationChangedListener<String>());
       }
+    }
+    for (ConstraintDuration duration : durations.values()) {
+      duration.stringRepresentationProperty().addListener(new SpecificationChangedListener<>());
     }
     this.typeContext = typeContext;
     this.freeVariableSet = freeVariableSet;
@@ -102,6 +108,10 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
   public void setFreeVariableSet(FreeVariableSet freeVariableSet) {
     this.freeVariableSet = freeVariableSet;
     onSpecificationChanged();
+  }
+
+  public void setCodeIoVariables(Set<CodeIoVariable> codeIoVariables) {
+    this.codeIoVariables = codeIoVariables;
   }
 
   public ValidSpecification getValidSpecification() {
@@ -174,7 +184,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
   public void addRow(int rowNum, SpecificationRow<ConstraintCell> row) {
     super.addRow(rowNum, row);
     for (String varName : columns.keySet()) {
-      row.getCellForVariable(varName).stringRepresentationProperty().addListener(new SpecificationChangedListener<String>());
+      row.getCellForVariable(varName).stringRepresentationProperty().addListener(new SpecificationChangedListener<>());
     }
     onSpecificationChanged();
   }
@@ -182,7 +192,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
   public void addRow(int rowNum, SpecificationRow<ConstraintCell> row, ConstraintDuration duration) {
     super.addRow(rowNum, row, duration);
     for (String varName : columns.keySet()) {
-      row.getCellForVariable(varName).stringRepresentationProperty().addListener(new SpecificationChangedListener<String>());
+      row.getCellForVariable(varName).stringRepresentationProperty().addListener(new SpecificationChangedListener<>());
     }
     onSpecificationChanged();
   }
@@ -194,6 +204,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
   public void setDuration(int rowNum, ConstraintDuration duration) {
     super.setDuration(rowNum, duration);
+    duration.stringRepresentationProperty().addListener(new SpecificationChangedListener<>());
     onSpecificationChanged();
   }
 
@@ -230,17 +241,26 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
       parsedColumns.put(columnId, new SpecificationColumn<>(rawColumn.getSpecIoVariable(), parsedCells, rawColumn.getConfig()));
     }
     // Parse durations
-    ArrayList<LowerBoundedInterval> parsedDurations = new ArrayList<>();
+    Map<Integer,LowerBoundedInterval> parsedDurations = new HashMap<>();
     for(int i : durations.get().keySet()) {
       try {
-        parsedDurations.add(IntervalParser.parse(durations.get().get(i).getAsString()));
+        parsedDurations.put(i, IntervalParser.parse(durations.get().get(i).getAsString()));
       } catch (ParseException e) {
         problemsFound.add(new DurationProblem(e.getParseErrorMessage(), i));
       }
     }
     // Are there invalid IO variables? (Is there a specIoVariable that is not a codeIoVariable?)
     for (SpecIoVariable specIoVariable : specIoVariables) {
-      if (!codeIoVariables.contains(new CodeIoVariable(specIoVariable.getCategory(), specIoVariable.getType(), specIoVariable.getName()))) {
+      /*if (!codeIoVariables.contains(new CodeIoVariable(specIoVariable.getCategory(), specIoVariable.getType(), specIoVariable.getName()))) {
+        problemsFound.add(new InvalidIoVarProblem(specIoVariable));
+      }*/
+      boolean found = false;
+      for (CodeIoVariable codeIoVariable : codeIoVariables) {
+        if (codeIoVariable.matches(specIoVariable)) {
+          found = true;
+        }
+      }
+      if (!found) {
         problemsFound.add(new InvalidIoVarProblem(specIoVariable));
       }
     }

@@ -32,7 +32,7 @@ abstract public class TableCategoryController implements Controller {
   /**
    * Listens on changed rows in Specification model and adds cells, removes cells in columns
    */
-  private void onRowChange(SpecificationTable.RowChangeInfo<ConstraintCell, ConstraintDuration> change) {
+  private void onRowChange(SpecificationTable.RowChangeInfo<ConstraintCell> change) {
 
   }
 
