@@ -2,8 +2,6 @@ package edu.kit.iti.formal.stvs.model.table;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 
 import java.util.*;
 
@@ -13,29 +11,22 @@ import java.util.*;
 public class SpecificationTable<C, D> {
 
   private ObjectProperty<ColumnChangeInfo<C>> columnChange;
-  private ObjectProperty<RowChangeInfo<C, D>> rowChange;
+  private ObjectProperty<RowChangeInfo<C>> rowChange;
   protected Map<String, SpecificationColumn<C>> columns;
-  protected ArrayList<D> durations;
+  protected ObjectProperty<Map<Integer,D>> durations;
 
   public SpecificationTable() {
     columnChange = new SimpleObjectProperty<>();
     rowChange = new SimpleObjectProperty<>();
     columns = new HashMap<>();
-    durations = new ArrayList<>();
+    durations = new SimpleObjectProperty<>(new HashMap<Integer,D>());
   }
 
-  public SpecificationTable(Map<String, SpecificationColumn<C>> columns, List<D> durations) {
+  public SpecificationTable(Map<String, SpecificationColumn<C>> columns, Map<Integer,D> durations) {
     columnChange = new SimpleObjectProperty<>();
     rowChange = new SimpleObjectProperty<>();
-    // TODO: Make sure that the "height" of each column is the same as durations.size()
-    for (SpecificationColumn<C> col : columns.values()) {
-      if (col.getCells().size() != durations.size()) {
-        throw new IllegalArgumentException("The height of each column must be identical to" +
-            "the number of durations");
-      }
-    }
     this.columns = columns;
-    this.durations = new ArrayList(durations);
+    this.durations = new SimpleObjectProperty<>(new HashMap<>(durations));
   }
 
   public enum Change {
@@ -55,12 +46,12 @@ public class SpecificationTable<C, D> {
     }
   }
 
-  public static class RowChangeInfo<C, D> {
-    public final SpecificationRow<C, D> row;
+  public static class RowChangeInfo<C> {
+    public final SpecificationRow<C> row;
     public final int rowNum;
     public final Change changeType;
 
-    public RowChangeInfo(SpecificationRow<C, D> row, int rowNum, Change changeType) {
+    public RowChangeInfo(SpecificationRow<C> row, int rowNum, Change changeType) {
       this.row = row;
       this.rowNum = rowNum;
       this.changeType = changeType;
@@ -97,16 +88,15 @@ public class SpecificationTable<C, D> {
     columnChange.set(new ColumnChangeInfo<C>(column, columnId, Change.REMOVE));
   }
 
-  public SpecificationRow<C, D> getRow(int rowNum) {
+  public SpecificationRow<C> getRow(int rowNum) {
     Map<String, C> cells = new HashMap<String, C>();
     for (String columnId : columns.keySet()) {
       cells.put(columnId, columns.get(columnId).getCellForRow(rowNum));
     }
-    D duration = durations.get(rowNum);
-    return new SpecificationRow<C, D>(duration, cells);
+    return new SpecificationRow<C>(cells);
   }
 
-  public void addRow(int rowNum, SpecificationRow<C, D> row) {
+  public void addRow(int rowNum, SpecificationRow<C> row) {
     // Insert a cell into each column
     for (String columnId : columns.keySet()) {
       C newCell = row.getCellForVariable(columnId);
@@ -115,31 +105,50 @@ public class SpecificationTable<C, D> {
       }
       columns.get(columnId).insertCell(rowNum, newCell);
     }
-    durations.add(rowNum, row.getDuration());
-    rowChange.setValue(new RowChangeInfo<C, D>(row, rowNum, Change.ADD));
+    rowChange.setValue(new RowChangeInfo<C>(row, rowNum, Change.ADD));
+  }
+
+  /**
+   * Convenience method to add a duration along with a row.
+   * @param rowNum
+   * @param row
+   * @param duration
+   */
+  public void addRow(int rowNum, SpecificationRow<C> row, D duration) {
+    addRow(rowNum, row);
+    durations.get().put(rowNum, duration);
   }
 
   public void removeRow(int rowNum) {
-    // Remove the cell from each column
+    /* Remove the cell from each column */
     HashMap<String, C> removedCells = new HashMap<String, C>();
     for (String columnId : columns.keySet()) {
       SpecificationColumn<C> column = columns.get(columnId);
       C removedCell = column.removeCell(rowNum);
       removedCells.put(columnId, removedCell);
     }
-    D duration = durations.remove(rowNum);
-    rowChange.setValue(new RowChangeInfo<C, D>(new SpecificationRow<C, D>(duration, removedCells), rowNum, Change.REMOVE));
+    /* If there is a duration for that row, remove it as well */
+    durations.get().remove(rowNum);
+    rowChange.setValue(new RowChangeInfo<C>(new SpecificationRow<C>(removedCells), rowNum, Change.REMOVE));
+  }
+
+  public void setDuration(int rowNum, D duration) {
+    durations.get().put(rowNum, duration);
   }
 
   public D getDuration(int rowNum) {
-    return durations.get(rowNum);
+    return durations.get().get(rowNum);
+  }
+
+  public ObjectProperty<Map<Integer,D>> durationsProperty() {
+    return durations;
   }
 
   public RowChangeInfo getRowChange() {
     return rowChange.get();
   }
 
-  public ObjectProperty<RowChangeInfo<C, D>> rowChangeProperty() {
+  public ObjectProperty<RowChangeInfo<C>> rowChangeProperty() {
     return rowChange;
   }
 

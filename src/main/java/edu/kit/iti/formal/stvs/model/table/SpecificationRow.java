@@ -1,20 +1,16 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
  * @author Benjamin Alt
  */
-public class SpecificationRow<C, D> {
+public class SpecificationRow<C> {
 
-  private final D duration;
   private final Map<String, C> cells;
 
-  public SpecificationRow(D duration, Map<String, C> cells) {
-    this.duration = duration;
+  public SpecificationRow(Map<String, C> cells) {
     this.cells = cells;
   }
 
@@ -26,18 +22,11 @@ public class SpecificationRow<C, D> {
     return cell;
   }
 
-  public D getDuration() {
-    return duration;
-  }
-
   @Override
   public boolean equals(Object obj) {
     if (!(obj instanceof SpecificationRow)) return false;
     if (obj == this) return true;
     SpecificationRow other = (SpecificationRow) obj;
-    return new EqualsBuilder().
-        append(duration, other.duration).
-        append(cells, other.cells).
-        isEquals();
+    return this.cells.equals(other.cells);
   }
 }

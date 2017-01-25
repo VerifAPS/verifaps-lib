@@ -13,11 +13,11 @@ import java.util.List;
 public class SpecificationColumn<C> {
 
   private ColumnConfig config;
-  private ArrayList<C> cells;
+  private List<C> cells;
   private SpecIoVariable ioVar;
 
   public SpecificationColumn(SpecIoVariable ioVar, List<C> cells, ColumnConfig config) {
-    this.cells = new ArrayList(cells);
+    this.cells = cells;
     this.config = config;
     this.ioVar = ioVar;
   }
@@ -36,6 +36,10 @@ public class SpecificationColumn<C> {
 
   public C removeCell(int row) {
     return cells.remove(row);
+  }
+
+  public int getNumberOfCells() {
+    return cells.size();
   }
 
   public SpecIoVariable getSpecIoVariable() {

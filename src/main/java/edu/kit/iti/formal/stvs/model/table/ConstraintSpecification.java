@@ -58,7 +58,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
    * @param freeVariableSet
    */
   public ConstraintSpecification(Map<String, SpecificationColumn<ConstraintCell>> columns,
-                                 List<ConstraintDuration> durations,
+                                 Map<Integer,ConstraintDuration> durations,
                                  Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet) {
     super(columns, durations);
     for (SpecificationColumn<ConstraintCell> col : columns.values()) {
@@ -69,11 +69,6 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
         ConstraintCell cell = col.getCellForRow(i);
         cell.stringRepresentationProperty().addListener(new SpecificationChangedListener<String>());
       }
-    }
-    for (int i = 0; i < durations.size(); i++) {
-      SpecificationRow<ConstraintCell, ConstraintDuration> row = getRow(i);
-      row.getDuration().stringRepresentationProperty().addListener(new SpecificationChangedListener<String>());
-      row.getDuration().stringRepresentationProperty().addListener(new DurationChangedListener(i));
     }
     this.typeContext = typeContext;
     this.freeVariableSet = freeVariableSet;
@@ -88,21 +83,8 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
       if (specIoVariables.contains(variable)) {
         throw new IllegalArgumentException("Column for " + variable.getName() + " already exists");
       }
-      ArrayList<ConstraintCell> emptyCells = new ArrayList<ConstraintCell>();
-      for (int i = 0; i < durations.size(); i++) {
-        emptyCells.add(new ConstraintCell(""));
-      }
-      addColumn(variable.getName(), new SpecificationColumn<ConstraintCell>(variable, emptyCells, new ColumnConfig()));
+      addColumn(variable.getName(), new SpecificationColumn<ConstraintCell>(variable, new ArrayList<ConstraintCell>(), new ColumnConfig()));
       specIoVariables.add(variable);
-  }
-
-  /**
-   * TODO: Remove?
-   * This method is redundant, as one can just do SpecificationTable.getColumn(column).getSpecIoVariable()
-   */
-  @Deprecated
-  public SpecIoVariable getSpecIoVariableForColumn(String column) {
-    throw new UnsupportedOperationException("This method is on the kill list and may be removed at any time. See Javadoc for alternative");
   }
 
   public Set<Type> getTypeContext() {
@@ -174,7 +156,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     column.getSpecIoVariable().categoryProperty().addListener(new SpecificationChangedListener<VariableCategory>());
     column.getSpecIoVariable().nameProperty().addListener(new SpecificationChangedListener<String>());
     column.getSpecIoVariable().typeProperty().addListener(new SpecificationChangedListener<Type>());
-    for (int i = 0; i < durations.size(); i++) {
+    for (int i = 0; i < column.getNumberOfCells(); i++) {
       ConstraintCell cell = column.getCellForRow(i);
       cell.stringRepresentationProperty().addListener(new SpecificationChangedListener<String>());
       // No need to listen for changes to comments, as they have no effect (annotations would)
@@ -189,25 +171,29 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     onSpecificationChanged();
   }
 
-  public SpecificationRow<ConstraintCell, ConstraintDuration> getRow(int rowNum) {
-    SpecificationRow<ConstraintCell, ConstraintDuration> row = super.getRow(rowNum);
-    // Register listener so we can adapt durations here if someone changes them through the row
-    //row.getDuration().stringRepresentationProperty().addListener(new DurationChangedListener(rowNum));
-    return row;
-  }
-
-  public void addRow(int rowNum, SpecificationRow<ConstraintCell, ConstraintDuration> row) {
+  public void addRow(int rowNum, SpecificationRow<ConstraintCell> row) {
     super.addRow(rowNum, row);
     for (String varName : columns.keySet()) {
       row.getCellForVariable(varName).stringRepresentationProperty().addListener(new SpecificationChangedListener<String>());
     }
-    row.getDuration().stringRepresentationProperty().addListener(new SpecificationChangedListener<String>());
-    row.getDuration().stringRepresentationProperty().addListener(new DurationChangedListener(rowNum));
+    onSpecificationChanged();
+  }
+
+  public void addRow(int rowNum, SpecificationRow<ConstraintCell> row, ConstraintDuration duration) {
+    super.addRow(rowNum, row, duration);
+    for (String varName : columns.keySet()) {
+      row.getCellForVariable(varName).stringRepresentationProperty().addListener(new SpecificationChangedListener<String>());
+    }
     onSpecificationChanged();
   }
 
   public void removeRow(int rowNum) {
     super.removeRow(rowNum);
+    onSpecificationChanged();
+  }
+
+  public void setDuration(int rowNum, ConstraintDuration duration) {
+    super.setDuration(rowNum, duration);
     onSpecificationChanged();
   }
 
@@ -245,9 +231,9 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     }
     // Parse durations
     ArrayList<LowerBoundedInterval> parsedDurations = new ArrayList<>();
-    for(int i = 0; i < durations.size(); i++) {
+    for(int i : durations.get().keySet()) {
       try {
-        parsedDurations.add(IntervalParser.parse(durations.get(i).getAsString()));
+        parsedDurations.add(IntervalParser.parse(durations.get().get(i).getAsString()));
       } catch (ParseException e) {
         problemsFound.add(new DurationProblem(e.getParseErrorMessage(), i));
       }
@@ -273,29 +259,11 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     }
   }
 
-  private void onDurationChanged(int rownum, String newValue) {
-    //Update the internal list of durations
-    durations.set(rownum, new ConstraintDuration(newValue));
-  }
-
   private class SpecificationChangedListener<T> implements ChangeListener<T> {
 
     @Override
     public void changed(ObservableValue<? extends T> observableValue, T oldValue, T newValue) {
       onSpecificationChanged();
-    }
-  }
-
-  private class DurationChangedListener implements ChangeListener<String> {
-
-    private int rownum;
-
-    public DurationChangedListener(int rownum) {
-      this.rownum = rownum;
-    }
-    @Override
-    public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
-      onDurationChanged(rownum, newValue);
     }
   }
 }

@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.logic.specification.BacktrackSpecificationConcretizer;
-import edu.kit.iti.formal.stvs.logic.specification.ConcretizerContext;
 import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
@@ -11,6 +10,8 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import javafx.beans.value.ObservableValue;
 
 import javafx.beans.value.ChangeListener;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -61,34 +62,28 @@ public class HybridSpecification extends ConstraintSpecification {
    * mapping between the two.
    */
   public List<ConcreteCell> getConcreteValuesForConstraint(String column, int row) {
-    ConcreteSpecification concreteSpec;
-    /* Check counterexample first */
     if (counterExample.isPresent()) {
-      concreteSpec = counterExample.get();
-    } else if (concreteInstance.get() != null) {
-      concreteSpec = concreteInstance.get();
+      int startIndex = counterExample.get().getDuration(row).getBeginCycle();
+      int endIndex = counterExample.get().getDuration(row).getEndCycle();
+      ArrayList<ConcreteCell> concreteCells = new ArrayList<>();
+      for (int i = startIndex; i < endIndex + 1; i++) {
+        concreteCells.add(counterExample.get().getCell(i, column));
+      }
+      return concreteCells;
     } else {
-      return null;
+      return new ArrayList<ConcreteCell>();
     }
-    SpecificationColumn concreteColumn = concreteSpec.getColumn(column);
-    // Find out what my "row" corresponds to in the ConcreteSpecification
 
   }
 
   /**
-   * TODO: Should we keep this? It's really just convenience for getCounterExample().get().getDuration(row)
+   * This is necessary as "row" means something else in the counterexample. Here "row" means "row"; there, "row" means
+   * cycle. However, not every "cycle-row" in the counterexample has a duration
+   * @param row
+   * @return
    */
-  @Deprecated
   public ConcreteDuration getConcreteDurationForRow(int row) {
-    throw new UnsupportedOperationException("This method is on the kill list and may be removed at any time. For alternatives," +
-        "" +
-        "check the Javadoc of this method");
-    /*
-    if (counterExample.isPresent()) {
-      return counterExample.get().getDuration(row);
-    } else if (concreteInstance.get() != null) {
-      return concreteInstance.get().getDuration(row);
-    }*/
+    return counterExample.get().getDuration(row);
   }
 
   public boolean isEditable() {
