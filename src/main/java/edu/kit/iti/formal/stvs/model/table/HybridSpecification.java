@@ -12,7 +12,6 @@ import javafx.beans.value.ObservableValue;
 
 import javafx.beans.value.ChangeListener;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -58,22 +57,22 @@ public class HybridSpecification extends ConstraintSpecification {
   }
 
   /**
-   * TODO: Should we keep this? It's really just convenience for getCounterExample().get().getColumn(column).getCells()
+   * A row in a ConcreteSpecification is not the same as a row in a ConstraintSpecification. This function does the
+   * mapping between the two.
    */
-  @Deprecated
   public List<ConcreteCell> getConcreteValuesForConstraint(String column, int row) {
-    throw new UnsupportedOperationException("This method is on the kill list and may be removed at any time. For alternatives," +
-        "" +
-        "check the Javadoc of this method");
-    /* Check counterexample first
+    ConcreteSpecification concreteSpec;
+    /* Check counterexample first */
     if (counterExample.isPresent()) {
-      return counterExample.get().getColumn(column).getCells();
+      concreteSpec = counterExample.get();
     } else if (concreteInstance.get() != null) {
-      return concreteInstance.get().getColumn(column).getCells();
+      concreteSpec = concreteInstance.get();
     } else {
-      //TODO: Should I throw an exception here?
       return null;
-    }*/
+    }
+    SpecificationColumn concreteColumn = concreteSpec.getColumn(column);
+    // Find out what my "row" corresponds to in the ConcreteSpecification
+
   }
 
   /**

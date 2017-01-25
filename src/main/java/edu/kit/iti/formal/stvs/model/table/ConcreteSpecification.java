@@ -1,5 +1,9 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.List;
+
 /**
  * @author Benjamin Alt
  */

@@ -2,6 +2,8 @@ package edu.kit.iti.formal.stvs.model.table;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
 import java.util.*;
 
@@ -25,6 +27,13 @@ public class SpecificationTable<C, D> {
   public SpecificationTable(Map<String, SpecificationColumn<C>> columns, List<D> durations) {
     columnChange = new SimpleObjectProperty<>();
     rowChange = new SimpleObjectProperty<>();
+    // TODO: Make sure that the "height" of each column is the same as durations.size()
+    for (SpecificationColumn<C> col : columns.values()) {
+      if (col.getCells().size() != durations.size()) {
+        throw new IllegalArgumentException("The height of each column must be identical to" +
+            "the number of durations");
+      }
+    }
     this.columns = columns;
     this.durations = new ArrayList(durations);
   }
@@ -149,4 +158,5 @@ public class SpecificationTable<C, D> {
   public void setColumnChange(ColumnChangeInfo columnChange) {
     this.columnChange.set(columnChange);
   }
+
 }

@@ -25,7 +25,7 @@ public class SpecificationTableTest {
 
   @Before
   public void setUp() {
-    HashMap<String, SpecificationColumn<String>> columns = new HashMap<>();
+    Map<String, SpecificationColumn<String>> columns = new HashMap<>();
     List<String> cellsA = Arrays.asList("A0", "A1", "A2", "A3");
     List<String> cellsB = Arrays.asList("B0", "B1", "B2", "B3");
     List<String> cellsC = Arrays.asList("C0", "C1", "C2", "C3");
@@ -42,6 +42,25 @@ public class SpecificationTableTest {
     table = new SpecificationTable<>(columns, durations);
     rowChangeInfo = null;
     colChangeInfo = null;
+  }
+
+  @Test(expected=IllegalArgumentException.class)
+  public void testInvalidTableInConstructor() {
+    Map<String,SpecificationColumn<String>> columns = new HashMap<>();
+    List<String> cellsA = Arrays.asList("A0", "A1", "A2", "A3");
+    List<String> cellsB = Arrays.asList("B0", "B1", "B2", "B3");
+    List<String> cellsC = Arrays.asList("C0", "C1", "C2", "C3");
+    List<String> cellsD = Arrays.asList("D0", "D1", "D2", "D3");
+    columns.put("A", new SpecificationColumn<>(
+        new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableA"), cellsA, new ColumnConfig()));
+    columns.put("B", new SpecificationColumn<>(
+        new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableB"), cellsB, new ColumnConfig(20)));
+    columns.put("C", new SpecificationColumn<>(
+        new SpecIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableC"), cellsC, new ColumnConfig()));
+    columns.put("D", new SpecificationColumn<>(
+        new SpecIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableD"), cellsD, new ColumnConfig(55)));
+    List<Integer> durations = Arrays.asList(2, 4, 5);
+    table = new SpecificationTable(columns, durations);
   }
 
   @Test
