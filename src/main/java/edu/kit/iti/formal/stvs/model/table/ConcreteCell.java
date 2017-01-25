@@ -18,6 +18,6 @@ public class ConcreteCell {
   }
 
   public String toString() {
-    return null;
+    return value.toString();
   }
 }

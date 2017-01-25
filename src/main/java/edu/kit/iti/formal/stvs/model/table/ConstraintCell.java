@@ -2,6 +2,8 @@ package edu.kit.iti.formal.stvs.model.table;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.reactfx.util.LL;
 
 /**
  * @author Benjamin Alt
@@ -44,5 +46,16 @@ public class ConstraintCell implements CellOperationProvider {
   @Override
   public StringProperty commentProperty() {
     return comment;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof ConstraintCell)) return false;
+    if (obj == this) return true;
+    ConstraintCell other = (ConstraintCell) obj;
+    return new EqualsBuilder().
+        append(stringRepresentation.get(), other.stringRepresentation.get()).
+        append(comment.get(), other.comment.get()).
+        isEquals();
   }
 }

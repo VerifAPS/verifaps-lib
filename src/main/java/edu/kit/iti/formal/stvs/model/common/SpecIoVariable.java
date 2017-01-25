@@ -7,6 +7,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
  * Created by csicar on 11.01.17.
@@ -61,5 +62,17 @@ public class SpecIoVariable extends IoVariable {
 
   public ObjectProperty<VariableCategory> categoryProperty() {
     return category;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof SpecIoVariable)) return false;
+    if (obj == this) return true;
+    SpecIoVariable other = (SpecIoVariable) obj;
+    return new EqualsBuilder().
+        append(name.get(), other.name.get()).
+        append(type.get(), other.type.get()).
+        append(category.get(), other.category.get()).
+        isEquals();
   }
 }

@@ -3,16 +3,14 @@ package edu.kit.iti.formal.stvs.model.config;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by bal on 21.01.17.
+ * @author Benjamin Alt
  */
 public class HistoryTest {
   private History history;

@@ -13,12 +13,10 @@ public class ConstraintDuration implements CellOperationProvider {
 
   private StringProperty stringRepresentation;
   private StringProperty comment;
-  private ObjectProperty<LowerBoundedInterval> lowerBoundedInterval;
 
   public ConstraintDuration(String stringRepresentation) {
     this.comment = new SimpleStringProperty();
     this.stringRepresentation = new SimpleStringProperty(stringRepresentation);
-    this.lowerBoundedInterval = new SimpleObjectProperty<>();
   }
 
   @Override
@@ -34,10 +32,6 @@ public class ConstraintDuration implements CellOperationProvider {
   @Override
   public StringProperty stringRepresentationProperty() {
     return stringRepresentation;
-  }
-
-  public ObjectProperty<LowerBoundedInterval> lowerBoundedIntervalProperty() {
-    return lowerBoundedInterval;
   }
 
   @Override
