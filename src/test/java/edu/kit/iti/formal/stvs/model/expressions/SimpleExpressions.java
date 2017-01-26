@@ -12,39 +12,39 @@ public final class SimpleExpressions {
   }
 
   public static Expression negate(Expression e) {
-    return new FunctionExpr(FunctionExpr.Operation.UNARY_MINUS, Arrays.asList(e));
+    return new UnaryFunctionExpr(UnaryFunctionExpr.Op.UNARY_MINUS, e);
   }
 
   public static Expression not(Expression e) {
-    return new FunctionExpr(FunctionExpr.Operation.NOT, Arrays.asList(e));
+    return new UnaryFunctionExpr(UnaryFunctionExpr.Op.NOT, e);
   }
 
   public static Expression and(Expression e1, Expression e2) {
-    return new FunctionExpr(FunctionExpr.Operation.AND, Arrays.asList(e1, e2));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.AND, e1, e2);
   }
 
   public static Expression plus(Expression e1, Expression e2) {
-    return new FunctionExpr(FunctionExpr.Operation.PLUS, Arrays.asList(e1, e2));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.PLUS, e1, e2);
   }
 
   public static Expression minus(Expression e1, Expression e2) {
-    return new FunctionExpr(FunctionExpr.Operation.PLUS, Arrays.asList(e1, e2));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.PLUS, e1, e2);
   }
 
   public static Expression equal(Expression e1, Expression e2) {
-    return new FunctionExpr(FunctionExpr.Operation.EQUALS, Arrays.asList(e1, e2));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.EQUALS, e1, e2);
   }
 
   public static Expression lessThan(Expression e1, Expression e2) {
-    return new FunctionExpr(FunctionExpr.Operation.LESS_THAN, Arrays.asList(e1, e2));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.LESS_THAN, e1, e2);
   }
 
   public static Expression lessEqual(Expression e1, Expression e2) {
-    return new FunctionExpr(FunctionExpr.Operation.LESS_EQUALS, Arrays.asList(e1, e2));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.LESS_EQUALS, e1, e2);
   }
 
   public static Expression greaterEqual(Expression e1, Expression e2) {
-    return new FunctionExpr(FunctionExpr.Operation.GREATER_EQUALS, Arrays.asList(e1, e2));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.GREATER_EQUALS, e1, e2);
   }
 
 

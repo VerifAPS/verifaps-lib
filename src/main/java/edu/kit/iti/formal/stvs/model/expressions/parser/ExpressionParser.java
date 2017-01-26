@@ -1,10 +1,7 @@
 package edu.kit.iti.formal.stvs.model.expressions.parser;
 
 import edu.kit.iti.formal.stvs.model.expressions.*;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.*;
@@ -96,7 +93,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
     Optional<Expression> optionalExpression = ctx.chunk().stream()
         .map(chunkContext -> chunkContext.accept(this))
         .reduce((e1, e2) ->
-            new FunctionExpr(FunctionExpr.Operation.AND, Arrays.asList(e1, e2)));
+            new BinaryFunctionExpr(BinaryFunctionExpr.Op.AND, e1, e2));
     return optionalExpression.get();
   }
 
@@ -108,8 +105,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   @Override
   public Expression visitConstant(CellExpressionParser.ConstantContext ctx) {
     Expression literalExpr = new LiteralExpr(valueFromConstantToken(ctx));
-    return new FunctionExpr(FunctionExpr.Operation.EQUALS,
-        Arrays.asList(columnAsVariable, literalExpr));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.EQUALS, columnAsVariable, literalExpr);
   }
 
   @Override
@@ -122,8 +118,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
     // If we come here, its a top-level variable.
     // In this case there's an implicit equality with the column variable.
     Expression variableExpr = parseOccuringString(ctx);
-    return new FunctionExpr(FunctionExpr.Operation.EQUALS,
-        Arrays.asList(columnAsVariable, variableExpr));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.EQUALS, columnAsVariable, variableExpr);
   }
 
   @Override
@@ -183,46 +178,46 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 
   @Override
   public Expression visitSinglesided(CellExpressionParser.SinglesidedContext ctx) {
-    FunctionExpr.Operation op = binaryOperationFromToken(ctx.op.relOp.getType());
+    BinaryFunctionExpr.Op op = binaryOperationFromToken(ctx.op.relOp);
     Expression rightSide = ctx.expr().accept(this);
-    return new FunctionExpr(op,
-        Arrays.asList(columnAsVariable, rightSide));
+    return new BinaryFunctionExpr(op, columnAsVariable, rightSide);
   }
 
-  private FunctionExpr.Operation binaryOperationFromToken(int token) {
-    switch (token) {
+  private BinaryFunctionExpr.Op binaryOperationFromToken(Token token) {
+    switch (token.getType()) {
       case CellExpressionLexer.EQUALS:
-        return FunctionExpr.Operation.EQUALS;
+        return BinaryFunctionExpr.Op.EQUALS;
       case CellExpressionLexer.NOT_EQUALS:
-        return FunctionExpr.Operation.NOT_EQUALS;
+        return BinaryFunctionExpr.Op.NOT_EQUALS;
       case CellExpressionLexer.GREATER_THAN:
-        return FunctionExpr.Operation.GREATER_THAN;
+        return BinaryFunctionExpr.Op.GREATER_THAN;
       case CellExpressionLexer.GREATER_EQUALS:
-        return FunctionExpr.Operation.GREATER_EQUALS;
+        return BinaryFunctionExpr.Op.GREATER_EQUALS;
       case CellExpressionLexer.LESS_THAN:
-        return FunctionExpr.Operation.LESS_THAN;
+        return BinaryFunctionExpr.Op.LESS_THAN;
       case CellExpressionLexer.LESS_EQUALS:
-        return FunctionExpr.Operation.LESS_EQUALS;
-      case CellExpressionLexer.NOT:
-        return FunctionExpr.Operation.NOT;
+        return BinaryFunctionExpr.Op.LESS_EQUALS;
       case CellExpressionLexer.AND:
-        return FunctionExpr.Operation.AND;
+        return BinaryFunctionExpr.Op.AND;
       case CellExpressionLexer.OR:
-        return FunctionExpr.Operation.OR;
+        return BinaryFunctionExpr.Op.OR;
       case CellExpressionLexer.XOR:
-        return FunctionExpr.Operation.XOR;
+        return BinaryFunctionExpr.Op.XOR;
       case CellExpressionLexer.PLUS:
-        return FunctionExpr.Operation.PLUS;
+        return BinaryFunctionExpr.Op.PLUS;
       case CellExpressionLexer.MINUS:
-        return FunctionExpr.Operation.MINUS;
+        return BinaryFunctionExpr.Op.MINUS;
       case CellExpressionLexer.MULT:
-        return FunctionExpr.Operation.MULTIPLICATION;
+        return BinaryFunctionExpr.Op.MULTIPLICATION;
       case CellExpressionLexer.DIV:
-        return FunctionExpr.Operation.DIVISION;
+        return BinaryFunctionExpr.Op.DIVISION;
       case CellExpressionLexer.MOD:
-        return FunctionExpr.Operation.MODULO;
+        return BinaryFunctionExpr.Op.MODULO;
       default:
-        return null;
+        throw new ParseRuntimeException(
+            new ParseException(token.getLine(), token.getCharPositionInLine(),
+                "Unsupported singlesided operation: \"" + token.getType() + "\"")
+        );
     }
   }
 
@@ -230,80 +225,70 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   public Expression visitPlus(CellExpressionParser.PlusContext ctx) {
     Expression left = ctx.left.accept(this);
     Expression right = ctx.right.accept(this);
-    return new FunctionExpr(FunctionExpr.Operation.PLUS,
-        Arrays.asList(left, right));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.PLUS, left, right);
   }
 
   @Override
   public Expression visitSubstract(CellExpressionParser.SubstractContext ctx) {
     Expression left = ctx.left.accept(this);
     Expression right = ctx.right.accept(this);
-    return new FunctionExpr(FunctionExpr.Operation.MINUS,
-        Arrays.asList(left, right));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.MINUS, left, right);
   }
 
   @Override
   public Expression visitMult(CellExpressionParser.MultContext ctx) {
     Expression left = ctx.left.accept(this);
     Expression right = ctx.right.accept(this);
-    return new FunctionExpr(FunctionExpr.Operation.MULTIPLICATION,
-        Arrays.asList(left, right));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.MULTIPLICATION, left, right);
   }
 
   @Override
   public Expression visitDiv(CellExpressionParser.DivContext ctx) {
     Expression left = ctx.left.accept(this);
     Expression right = ctx.right.accept(this);
-    return new FunctionExpr(FunctionExpr.Operation.DIVISION,
-        Arrays.asList(left, right));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.DIVISION, left, right);
   }
 
   @Override
   public Expression visitMod(CellExpressionParser.ModContext ctx) {
     Expression left = ctx.left.accept(this);
     Expression right = ctx.right.accept(this);
-    return new FunctionExpr(FunctionExpr.Operation.MODULO,
-        Arrays.asList(left, right));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.MODULO, left, right);
   }
 
   @Override
   public Expression visitLogicalAnd(CellExpressionParser.LogicalAndContext ctx) {
     Expression left = ctx.left.accept(this);
     Expression right = ctx.right.accept(this);
-    return new FunctionExpr(FunctionExpr.Operation.AND,
-        Arrays.asList(left, right));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.AND, left, right);
   }
 
   @Override
   public Expression visitLogicalXor(CellExpressionParser.LogicalXorContext ctx) {
     Expression left = ctx.left.accept(this);
     Expression right = ctx.right.accept(this);
-    return new FunctionExpr(FunctionExpr.Operation.XOR,
-        Arrays.asList(left, right));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.XOR, left, right);
   }
 
   @Override
   public Expression visitLogicalOr(CellExpressionParser.LogicalOrContext ctx) {
     Expression left = ctx.left.accept(this);
     Expression right = ctx.right.accept(this);
-    return new FunctionExpr(FunctionExpr.Operation.OR,
-        Arrays.asList(left, right));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.OR, left, right);
   }
 
   @Override
   public Expression visitInequality(CellExpressionParser.InequalityContext ctx) {
     Expression left = ctx.left.accept(this);
     Expression right = ctx.right.accept(this);
-    return new FunctionExpr(FunctionExpr.Operation.NOT_EQUALS,
-        Arrays.asList(left, right));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.NOT_EQUALS, left, right);
   }
 
   @Override
   public Expression visitEquality(CellExpressionParser.EqualityContext ctx) {
     Expression left = ctx.left.accept(this);
     Expression right = ctx.right.accept(this);
-    return new FunctionExpr(FunctionExpr.Operation.EQUALS,
-        Arrays.asList(left, right));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.EQUALS, left, right);
   }
 
 
@@ -311,8 +296,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   public Expression visitCompare(CellExpressionParser.CompareContext ctx) {
     Expression left = ctx.left.accept(this);
     Expression right = ctx.right.accept(this);
-    return new FunctionExpr(binaryOperationFromToken(ctx.op.getType()),
-        Arrays.asList(left, right));
+    return new BinaryFunctionExpr(binaryOperationFromToken(ctx.op), left, right);
   }
 
   @Override
@@ -324,24 +308,23 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 
   // Transforms: variable "X", lower "-5", upper "1+2" into "x >= -5 && x <= 1+2" as expression
   private Expression makeInterval(Expression variable, Expression lower, Expression upper) {
-    Expression greaterThanLower = new FunctionExpr(
-        FunctionExpr.Operation.GREATER_EQUALS, Arrays.asList(variable, lower));
-    Expression smallerThanUpper = new FunctionExpr(
-        FunctionExpr.Operation.LESS_EQUALS, Arrays.asList(variable, upper));
+    Expression greaterThanLower = new BinaryFunctionExpr(
+        BinaryFunctionExpr.Op.GREATER_EQUALS, variable, lower);
+    Expression smallerThanUpper = new BinaryFunctionExpr(
+        BinaryFunctionExpr.Op.LESS_EQUALS, variable, upper);
 
-    return new FunctionExpr(FunctionExpr.Operation.AND,
-        Arrays.asList(greaterThanLower, smallerThanUpper));
+    return new BinaryFunctionExpr(BinaryFunctionExpr.Op.AND, greaterThanLower, smallerThanUpper);
   }
 
   @Override
   public Expression visitMinus(CellExpressionParser.MinusContext ctx) {
     Expression toBeNegated = ctx.sub.accept(this);
-    return new FunctionExpr(FunctionExpr.Operation.UNARY_MINUS, Arrays.asList(toBeNegated));
+    return new UnaryFunctionExpr(UnaryFunctionExpr.Op.UNARY_MINUS, toBeNegated);
   }
 
   @Override
   public Expression visitNegation(CellExpressionParser.NegationContext ctx) {
-    return new FunctionExpr(FunctionExpr.Operation.NOT, Arrays.asList(ctx.sub.accept(this)));
+    return new UnaryFunctionExpr(UnaryFunctionExpr.Op.NOT, ctx.sub.accept(this));
   }
 
   @Override

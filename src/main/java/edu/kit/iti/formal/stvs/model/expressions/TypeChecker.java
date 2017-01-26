@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
-import java.util.List;
 import java.util.Map;
 
 public class TypeChecker implements ExpressionVisitor<Type> {
@@ -38,44 +37,79 @@ public class TypeChecker implements ExpressionVisitor<Type> {
   }
 
   @Override
-  public Type visitFunctionExpr(FunctionExpr functionExpr) {
-    switch (functionExpr.getOperation()) {
-      // BOOL -> BOOL
+  public Type visitUnaryFunction(UnaryFunctionExpr unaryFunctionExpr) {
+    Type argType = unaryFunctionExpr.getArgument().takeVisitor(this);
+    switch (unaryFunctionExpr.getOperation()) {
       case NOT:
-        ensureArgsOfType(functionExpr, TypeBool.BOOL);
-        // (INT, INT) -> INT
+        assertTypeEquality(TypeBool.BOOL, argType, unaryFunctionExpr);
+        return TypeBool.BOOL;
+      case UNARY_MINUS:
+        assertTypeEquality(TypeInt.INT, argType, unaryFunctionExpr);
+        return TypeInt.INT;
+      default:
+        return throwUnkownOperation(unaryFunctionExpr.getOperation().toString(), unaryFunctionExpr);
+    }
+  }
+
+  @Override
+  public Type visitBinaryFunction(BinaryFunctionExpr binaryFunctionExpr) {
+    Type firstArgType = binaryFunctionExpr.getFirstArgument().takeVisitor(this);
+    Type secondArgType = binaryFunctionExpr.getSecondArgument().takeVisitor(this);
+    switch (binaryFunctionExpr.getOperation()) {
+      // (INT, INT) -> INT
       case PLUS:
       case MINUS:
       case MULTIPLICATION:
       case DIVISION:
       case MODULO:
       case POWER:
-        ensureArgsOfType(functionExpr, TypeInt.INT, TypeInt.INT);
+        assertTypeEquality(TypeInt.INT, firstArgType, binaryFunctionExpr);
+        assertTypeEquality(TypeInt.INT, secondArgType, binaryFunctionExpr);
         return TypeInt.INT;
       // (BOOL, BOOL) -> BOOL
       case AND:
       case OR:
       case XOR:
-        ensureArgsOfType(functionExpr, TypeBool.BOOL, TypeBool.BOOL);
-        return TypeBool.BOOL;
-      // (a, a) -> BOOL
-      case EQUALS:
-      case NOT_EQUALS:
-        ensureArgNum(functionExpr, 2);
-        ensureEqualTypes(functionExpr);
+        assertTypeEquality(TypeBool.BOOL, firstArgType, binaryFunctionExpr);
+        assertTypeEquality(TypeBool.BOOL, secondArgType, binaryFunctionExpr);
         return TypeBool.BOOL;
       // (INT, INT) -> BOOL
       case GREATER_THAN:
       case GREATER_EQUALS:
       case LESS_THAN:
       case LESS_EQUALS:
-        ensureArgsOfType(functionExpr, TypeInt.INT, TypeInt.INT);
+        assertTypeEquality(TypeInt.INT, firstArgType, binaryFunctionExpr);
+        assertTypeEquality(TypeInt.INT, secondArgType, binaryFunctionExpr);
+        return TypeBool.BOOL;
+      // (a, a) -> BOOL
+      case EQUALS:
+      case NOT_EQUALS:
+        assertEqualTypes(firstArgType, secondArgType, binaryFunctionExpr);
         return TypeBool.BOOL;
       default:
-        throw new InternalTypeCheckException(
-            functionExpr,
-            "Unkown operator: " + functionExpr.getOperation());
+        return throwUnkownOperation(binaryFunctionExpr.getOperation().toString(), binaryFunctionExpr);
     }
+  }
+
+  private void assertTypeEquality(Type expectedType, Type actualType, Expression expr) {
+    if (!actualType.checksAgainst(expectedType)) {
+      throw new InternalTypeCheckException(expr,
+          "Expected type \"" + expectedType.getTypeName() + "\"," +
+              "but got \"" + actualType.getTypeName() + "\"");
+    }
+  }
+
+  // Almost Only differs in error message from assertTypeEquality
+  private void assertEqualTypes(Type type1, Type type2, Expression expr) {
+    if (!type1.equals(type2)) {
+      throw new InternalTypeCheckException(expr,
+          "Expected equal types, but got 2 different types: \"" + type1.getTypeName() + "\"" +
+              " and \"" + type2.getTypeName() + "\"");
+    }
+  }
+
+  private <A> A throwUnkownOperation(String operationName, Expression expr) {
+    throw new InternalTypeCheckException(expr, "Unknown Operation \"" + operationName + "\"");
   }
 
   @Override
@@ -92,52 +126,6 @@ public class TypeChecker implements ExpressionVisitor<Type> {
           "Don't know type of variable: " + variableExpr.getVariableName());
     } else {
       return varType;
-    }
-  }
-
-  private int ensureArgNum(FunctionExpr funExpr, int expectedNum) {
-    List<Expression> args = funExpr.getArguments();
-    int argLength = args.size();
-    if (argLength != expectedNum) {
-      throw new InternalTypeCheckException(
-          funExpr,
-          "Expected # of arguments is " + expectedNum +
-              ", but actual # of arguments is " + argLength + ".");
-    }
-    return argLength;
-  }
-
-  private void ensureArgsOfType(FunctionExpr funExpr, Type... expectedTypes) {
-    int argNum = ensureArgNum(funExpr, expectedTypes.length);
-
-    List<Expression> args = funExpr.getArguments();
-
-    for (int i = 0; i < argNum; i++) {
-      Expression arg = args.get(i);
-      Type argType = arg.takeVisitor(this);
-      if (!argType.checksAgainst(expectedTypes[i])) {
-        throw new InternalTypeCheckException(
-            arg,
-            "Expected type " + expectedTypes[i] +
-                ", but actual type is: " + argType + ".");
-      }
-    }
-  }
-
-  private void ensureEqualTypes(FunctionExpr funExpr) {
-    List<Expression> args = funExpr.getArguments();
-
-    Type firstType = args.get(0).takeVisitor(this);
-
-    for (int i = 0; i < args.size(); i++) {
-      Expression arg = args.get(i);
-      Type argType = arg.takeVisitor(this);
-      if (!argType.checksAgainst(firstType)) {
-        throw new InternalTypeCheckException(
-            arg,
-            "Expected equal types but got " + argType +
-                "conflicting with " + firstType + ".");
-      }
     }
   }
 
