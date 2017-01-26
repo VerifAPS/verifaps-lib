@@ -58,15 +58,4 @@ public class TestTypeChecker {
 				and(literal(false), literal(2));
 		checker.typeCheck(invalidExpression);
 	}
-
-	@Test(expected = TypeCheckException.class)
-	public void testInvalidArgumentNumber() throws TypeCheckException {
-        Expression invalidExpression =
-                new FunctionExpr(FunctionExpr.Operation.DIVISION,
-                        Arrays.asList(
-                                literal(1),
-                                literal(3),
-                                literal(7)));
-        checker.typeCheck(invalidExpression);
-    }
 }
