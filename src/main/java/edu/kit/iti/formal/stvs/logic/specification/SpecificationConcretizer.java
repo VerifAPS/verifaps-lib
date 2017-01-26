@@ -1,28 +1,44 @@
 package edu.kit.iti.formal.stvs.logic.specification;
 
+import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 
 import java.util.function.Consumer;
 
 /**
- * Created by bal on 11.01.17.
+ * @author Benjamin Alt
  */
-public interface SpecificationConcretizer {
+public abstract class SpecificationConcretizer {
 
-  public void addSuccessfulConcretizationListener(Consumer<ConcreteSpecification> listener);
+  private OptionalProperty<ConcreteSpecification> concreteSpec;
+  private ConcretizerContext context;
 
-  public ConcretizerContext getContext();
+  public ConcretizerContext getContext() {
+    return context;
+  }
 
-  public void setContext(ConcretizerContext context);
-
-  public void createConcreteSpecification();
+  public void setContext(ConcretizerContext context) {
+    this.context = context;
+  }
 
   /**
    * Launch a new simulation after a specification change, unless one is already running
    *
    * @param spec The changed spec
    */
-  public void onSpecificationChanged(ValidSpecification spec);
+  public abstract void createConcreteSpecification(ValidSpecification spec);
+
+  public ConcreteSpecification getConcreteSpec() {
+    return concreteSpec.get();
+  }
+
+  public OptionalProperty<ConcreteSpecification> concreteSpecProperty() {
+    return concreteSpec;
+  }
+
+  public void setConcreteSpec(ConcreteSpecification concreteSpec) {
+    this.concreteSpec.set(concreteSpec);
+  }
 }
 

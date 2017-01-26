@@ -50,4 +50,8 @@ public class TypeInt implements Type {
     return "TypeInt";
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof TypeInt;
+  }
 }

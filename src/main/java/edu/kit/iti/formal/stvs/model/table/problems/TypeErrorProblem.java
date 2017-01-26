@@ -6,18 +6,20 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeCheckException;
 import java.util.function.Function;
 
 /**
- * Created by philipp on 09.01.17.
+ * @author Benjamin Alt
  */
 public class TypeErrorProblem extends SpecProblem {
 
   private final SpecIoVariable column;
   private final int row;
   private final TypeCheckException typeCheckException;
+  private final String errorMessage;
 
-  public TypeErrorProblem(SpecIoVariable column, int row, TypeCheckException typeCheckException) {
+  public TypeErrorProblem(String errorMessage, SpecIoVariable column, int row, TypeCheckException typeCheckException) {
     this.column = column;
     this.row = row;
     this.typeCheckException = typeCheckException;
+    this.errorMessage = errorMessage;
   }
 
   @Override
@@ -31,12 +33,12 @@ public class TypeErrorProblem extends SpecProblem {
   }
 
   public TypeCheckException getTypeCheckException() {
-    return null;
+    return typeCheckException;
   }
 
   @Override
   public String getErrorMessage() {
-    return null;
+    return errorMessage;
   }
 
   public SpecIoVariable getIoVariable() {

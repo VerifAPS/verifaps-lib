@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -48,4 +50,8 @@ public class TypeBool implements Type {
     return "TypeBool";
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof TypeBool;
+  }
 }

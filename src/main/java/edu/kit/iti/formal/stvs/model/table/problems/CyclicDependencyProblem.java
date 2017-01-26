@@ -6,16 +6,18 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * Created by philipp on 09.01.17.
+ * @author Benjamin Alt
  */
 public class CyclicDependencyProblem extends SpecProblem {
 
   private final int row;
   private final List<SpecIoVariable> cycle;
+  private final String errorMessage;
 
-  public CyclicDependencyProblem(int row, List<SpecIoVariable> cycle) {
+  public CyclicDependencyProblem(String errorMessage, int row, List<SpecIoVariable> cycle) {
     this.row = row;
     this.cycle = cycle;
+    this.errorMessage = errorMessage;
   }
 
   @Override
@@ -30,7 +32,7 @@ public class CyclicDependencyProblem extends SpecProblem {
 
   @Override
   public String getErrorMessage() {
-    return null;
+    return errorMessage;
   }
 
   public int getRow() {

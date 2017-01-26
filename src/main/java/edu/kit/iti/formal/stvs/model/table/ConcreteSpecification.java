@@ -8,6 +8,7 @@ public class ConcreteSpecification extends SpecificationTable<ConcreteCell, Conc
   private final boolean isCounterExample;
 
   public ConcreteSpecification(boolean isCounterExample) {
+    super();
     this.isCounterExample = isCounterExample;
   }
 

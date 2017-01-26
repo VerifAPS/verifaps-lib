@@ -2,10 +2,9 @@ package edu.kit.iti.formal.stvs.model.expressions;
 
 public interface ExpressionVisitor<R> {
 
-  public R visitFunctionExpr(FunctionExpr functionExpr);
-
-  public R visitLiteral(LiteralExpr literalExpr);
-
-  public R visitVariable(VariableExpr variableExpr);
+  R visitBinaryFunction(BinaryFunctionExpr binaryFunctionExpr);
+  R visitUnaryFunction(UnaryFunctionExpr unaryFunctionExpr);
+  R visitLiteral(LiteralExpr literalExpr);
+  R visitVariable(VariableExpr variableExpr);
 
 }
