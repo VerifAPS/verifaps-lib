@@ -1,6 +1,9 @@
-package edu.kit.iti.formal.stvs.logic.specification;
+package edu.kit.iti.formal.stvs.logic.specification.choco;
 
+import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
+import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
+import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.expression.discrete.arithmetic.ArExpression;
@@ -12,7 +15,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * This is a wrapper for a choco model which allows to assign values for a subset of the used variables
@@ -29,7 +32,7 @@ public class ChocoModel {
     model = new Model(name);
   }
 
-  public ArExpression addBool(String name) {
+  protected ArExpression addBool(String name) {
     if (bools.containsKey(name)) {
       return bools.get(name);
     }
@@ -38,7 +41,7 @@ public class ChocoModel {
     return bool;
   }
 
-  public ArExpression addInt(String name) {
+  protected ArExpression addInt(String name) {
     if (ints.containsKey(name)) {
       return ints.get(name);
     }
@@ -47,21 +50,26 @@ public class ChocoModel {
     return integ;
   }
 
-  public ArExpression addBoolLiteral(boolean value) {
+  protected ArExpression addBoolLiteral(boolean value) {
     return model.boolVar(value);
   }
 
-  public ArExpression addIntLiteral(int value) {
+  protected ArExpression addIntLiteral(int value) {
     return model.intVar(value);
   }
 
-  public void addEnum(String name, int elements) {
+  protected void addEnum(String name, int elements) {
     //TODO: Implement Enums. Propably with IntVars. Requires order of enum values of some kind...
   }
 
-  public void solve() {
+  public Optional<ConcreteSolution> solve() {
     model.getSolver().reset();
-    model.getSolver().solve();
+    boolean solved = model.getSolver().solve();
+    if (solved) {
+      return Optional.of(buildSolution());
+    } else {
+      return Optional.empty();
+    }
   }
 
   public void clearAssignment() {
@@ -69,7 +77,7 @@ public class ChocoModel {
     assignment.clear();
   }
 
-  public void solve(Map<String, Value> values) {
+  public Optional<ConcreteSolution> solve(Map<String, Value> values) {
     //Clears previous assignment
     clearAssignment();
     //Posts a new constraint to set each variable in the map to a specific value
@@ -96,18 +104,45 @@ public class ChocoModel {
         assignment.add(constraint);
       });
     });
-    solve();
+    return solve();
   }
 
-  public Map<String, BoolVar> getBools() {
+  private ConcreteSolution buildSolution() {
+    Map<String, ValueBool> boolMap = bools.entrySet().stream()
+        .collect(Collectors.toMap(
+            entry -> entry.getKey(),
+            entry -> ValueBool.of(entry.getValue().getValue() == 1)
+        ));
+    Map<String, ValueInt> intMap = ints.entrySet().stream()
+        .collect(Collectors.toMap(
+            entry -> entry.getKey(),
+            entry -> new ValueInt(entry.getValue().getValue())
+        ));
+    Map<String, ValueInt> enumMap = new HashMap<>();
+    return new ConcreteSolution(intMap, boolMap, enumMap);
+  }
+
+  protected Map<String, BoolVar> getBools() {
     return bools;
   }
 
-  public Map<String, IntVar> getInts() {
+  protected Map<String, IntVar> getInts() {
     return ints;
   }
 
-  public Map<String, IntVar> getEnums() {
+  protected Map<String, IntVar> getEnums() {
     return enums;
+  }
+
+  public void init(Map<String, Type> typeContext) {
+    typeContext.entrySet().forEach(entry -> {
+      entry.getValue().match(
+          () -> addInt(entry.getKey()),
+          () -> addBool(entry.getKey()),
+          (e) -> {
+            throw new IllegalStateException("Not implemented yet");
+          }
+      );
+    });
   }
 }
