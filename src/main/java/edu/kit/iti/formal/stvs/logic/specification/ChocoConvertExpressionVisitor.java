@@ -1,15 +1,13 @@
 package edu.kit.iti.formal.stvs.logic.specification;
 
-import edu.kit.iti.formal.stvs.model.expressions.Expression;
+import edu.kit.iti.formal.stvs.model.expressions.BinaryFunctionExpr;
 import edu.kit.iti.formal.stvs.model.expressions.ExpressionVisitor;
-import edu.kit.iti.formal.stvs.model.expressions.FunctionExpr;
 import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.UnaryFunctionExpr;
 import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
 
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * This class provides a visitor for an Expression to convert it into a choco model
@@ -39,38 +37,36 @@ public class ChocoConvertExpressionVisitor implements ExpressionVisitor<ChocoExp
     return rowModel;
   }
 
+
   @Override
-  public ChocoExpressionWrapper visitFunctionExpr(FunctionExpr functionExpr) {
-    List<Expression> arguments = functionExpr.getArguments();
-    List<ChocoExpressionWrapper> chocoExpressions = arguments.stream()
-        .map(expression -> expression.takeVisitor(this))
-        .collect(Collectors.toList());
-    switch (functionExpr.getOperation()) {
-      case NOT:
-        assureArgumentCount(chocoExpressions, 1);
-        return chocoExpressions.get(0).autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.getModel().intVar(1).sub(arExpression))
-        );
+  public ChocoExpressionWrapper visitBinaryFunction(BinaryFunctionExpr binaryFunctionExpr) {
+    ChocoExpressionWrapper left = binaryFunctionExpr.getFirstArgument().takeVisitor(ChocoConvertExpressionVisitor.this);
+    System.out.println(left);
+    ChocoExpressionWrapper right = binaryFunctionExpr.getSecondArgument().takeVisitor(ChocoConvertExpressionVisitor.this);
+    switch (binaryFunctionExpr.getOperation()) {
       case EQUALS:
-        assureArgumentCount(chocoExpressions, 2);
-        return chocoExpressions.get(0).autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.eq(chocoExpressions.get(1).convertToArithmetic()))
+        return left.autoArithmetic(arExpression ->
+            new ChocoExpressionWrapper(arExpression.eq(right.convertToArithmetic()))
         );
       case PLUS:
-        assureArgumentCount(chocoExpressions,2);
-        return chocoExpressions.get(0).autoArithmetic(arExpression ->
-          new ChocoExpressionWrapper(arExpression.add(chocoExpressions.get(1).convertToArithmetic()))
+        return left.autoArithmetic(arExpression ->
+            new ChocoExpressionWrapper(arExpression.add(right.convertToArithmetic()))
         );
     }
-    throw new IllegalArgumentException("Operation not implemented: " + functionExpr.getOperation().name());
+    throw new IllegalArgumentException("Operation not implemented: " + binaryFunctionExpr.getOperation().name());
   }
 
-  private static void assureArgumentCount(List<?> list, int expected) {
-    if (list.size() != expected) {
-      throw new IllegalStateException("Wrong number of arguments in FunctionExpr while converting to choco");
+  @Override
+  public ChocoExpressionWrapper visitUnaryFunction(UnaryFunctionExpr unaryFunctionExpr) {
+    ChocoExpressionWrapper argumentChoko = unaryFunctionExpr.getArgument().takeVisitor(this);
+    switch (unaryFunctionExpr.getOperation()) {
+      case NOT:
+        return argumentChoko.autoArithmetic(arExpression ->
+            new ChocoExpressionWrapper(arExpression.getModel().intVar(1).sub(arExpression))
+        );
     }
+    throw new IllegalArgumentException("Operation not implemented: " + unaryFunctionExpr.getOperation().name());
   }
-
 
   @Override
   public ChocoExpressionWrapper visitLiteral(LiteralExpr literalExpr) {
@@ -83,22 +79,22 @@ public class ChocoConvertExpressionVisitor implements ExpressionVisitor<ChocoExp
 
   @Override
   public ChocoExpressionWrapper visitVariable(VariableExpr variableExpr) {
-    //Check if variable is a back reference
-    if (variableExpr.getIndex().isPresent()) {
-      //TODO: implement backreferences
-    } else {
-      String variableName = variableExpr.getVariableName();
-      //Check if variable is in typeContext
-      if (!typeContext.containsKey(variableName)) {
-        throw new IllegalStateException("Wrong Context: No variable of name '" + variableName + "' in typeContext");
-      }
-      Type type = typeContext.get(variableName);
-      return type.match(
-          () -> new ChocoExpressionWrapper(rowModel.addInt(variableName)),
-          () -> new ChocoExpressionWrapper(rowModel.addBool(variableName)),
-          (e) -> null //TODO: implement
-      );
+    //If variable X is a backreference it will be indexed by X[-y]
+    String variableName = variableExpr.getVariableName();
+    String indexString = variableExpr.getIndex().map(index -> "[" + index + "]").orElse("");
+    String fullName = variableName + indexString;
+    //Check if variable is in typeContext
+    if (!typeContext.containsKey(variableName)) {
+      throw new IllegalStateException("Wrong Context: No variable of name '" + variableName + "' in typeContext");
     }
-    return null;
+    Type type = typeContext.get(variableName);
+    return type.match(
+        () -> new ChocoExpressionWrapper(rowModel.addInt(fullName)),
+        () -> new ChocoExpressionWrapper(rowModel.addBool(fullName)),
+        (e) -> {
+          //TODO: implement
+          throw new IllegalStateException("Not implemented yet");
+        }
+    );
   }
 }
