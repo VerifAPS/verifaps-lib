@@ -18,7 +18,7 @@ public class ValueEnum implements Value {
       IntFunction<R> matchInt,
       Function<Boolean, R> matchBoolean,
       Function<ValueEnum, R> matchEnum) {
-    return null;
+    return matchEnum.apply(this);
   }
 
   public boolean equals(ValueEnum other) {
