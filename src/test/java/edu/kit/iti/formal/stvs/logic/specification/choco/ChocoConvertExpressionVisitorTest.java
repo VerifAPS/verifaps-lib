@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.logic.specification.choco;
 import edu.kit.iti.formal.stvs.model.expressions.Expression;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
+import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
@@ -11,10 +12,13 @@ import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
 import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -180,6 +184,21 @@ public class ChocoConvertExpressionVisitorTest {
   @Test
   public void testUnaryMinus() throws UnsupportedExpressionException, ParseException {
     assertSimpleIntSolved("=-3*-2*-1", -6);
+  }
+
+  @Test
+  public void enumTest() throws UnsupportedExpressionException, ParseException {
+    TypeEnum colorsEnum = new TypeEnum("COLORS", Arrays.asList("red", "green", "blue"));
+    Set<Type> typeContext = new HashSet<>();
+    typeContext.add(colorsEnum);
+    ExpressionParser bParser = new ExpressionParser("B", typeContext);
+    Expression expression = bParser.parseExpression("=blue");
+    Map<String, Type> columnTypeContext = new HashMap<>();
+    columnTypeContext.put("B", colorsEnum);
+    ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(columnTypeContext);
+    expression.takeVisitor(chocoConvertExpressionVisitor).postIfRelational();
+    ChocoModel model = chocoConvertExpressionVisitor.getModel();
+    Optional<ConcreteSolution> solve = model.solve();
   }
 
   private void assertSimpleIntSolved(String expression, int value) throws UnsupportedExpressionException, ParseException {

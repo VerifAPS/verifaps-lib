@@ -1,8 +1,11 @@
 package edu.kit.iti.formal.stvs.logic.specification.choco;
 
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
+import edu.kit.iti.formal.stvs.model.expressions.TypeFactory;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
+import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
 import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.constraints.Constraint;
@@ -10,8 +13,10 @@ import org.chocosolver.solver.expression.discrete.arithmetic.ArExpression;
 import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -27,6 +32,9 @@ public class ChocoModel {
   private Map<String, IntVar> ints = new HashMap<>();
   private Map<String, IntVar> enums = new HashMap<>();
   private Set<Constraint> assignment = new HashSet<>();
+  //TODO:Should this be here? An ordered List of Enum values is required for their mapping to ints
+  private Map<String, List<String>> orderedEnumTypes = new HashMap<>();
+  private Map<String, TypeEnum> enumTypes = new HashMap<>();
 
   public ChocoModel(String name) {
     model = new Model(name);
@@ -50,6 +58,23 @@ public class ChocoModel {
     return integ;
   }
 
+  protected ArExpression addEnum(String name, TypeEnum type) {
+    //Add enum as int
+    if (enums.containsKey(name)) {
+      return enums.get(name);
+    }
+    orderedEnumTypes.put(
+        type.getTypeName(), type.getValues().stream().map(ValueEnum::getEnumValue).collect(Collectors.toList())
+    );
+    enumTypes.put(name, type);
+    IntVar integ = model.intVar(name, IntVar.MIN_INT_BOUND, IntVar.MAX_INT_BOUND);
+    enums.put(name, integ);
+    //Add constraints to int to be in range of its mapped values
+    integ.ge(0).post();
+    integ.lt(type.getValues().size()).post();
+    return integ;
+  }
+
   protected ArExpression addBoolLiteral(boolean value) {
     return model.boolVar(value);
   }
@@ -58,8 +83,12 @@ public class ChocoModel {
     return model.intVar(value);
   }
 
-  protected void addEnum(String name, int elements) {
-    //TODO: Implement Enums. Propably with IntVars. Requires order of enum values of some kind...
+  protected ArExpression addEnumLiteral(Type type, String enumValue) {
+    return model.intVar(findIndexOfEnumValue(type, enumValue));
+  }
+
+  private int findIndexOfEnumValue(Type type, String enumValue){
+    return orderedEnumTypes.get(type.getTypeName()).indexOf(enumValue);
   }
 
   public Optional<ConcreteSolution> solve() {
@@ -97,7 +126,15 @@ public class ChocoModel {
             }
             return Optional.empty();
           },
-          enumeration -> Optional.empty()
+          enumeration -> {
+            if (enums.containsKey(entry.getKey())) {
+              Constraint constraint = enums.get(entry.getKey()).intVar().eq(
+                  findIndexOfEnumValue(enumeration.getType(), enumeration.getEnumValue())
+              ).decompose();
+              return Optional.of(constraint);
+            }
+            return Optional.empty();
+          }
       );
       optionalConstraint.ifPresent(constraint -> {
         constraint.post();
@@ -118,7 +155,18 @@ public class ChocoModel {
             entry -> entry.getKey(),
             entry -> new ValueInt(entry.getValue().getValue())
         ));
-    Map<String, ValueInt> enumMap = new HashMap<>();
+    Map<String, ValueEnum> enumMap = enums.entrySet().stream()
+        .collect(Collectors.toMap(
+            entry -> entry.getKey(),
+            entry ->{
+              List<String> enumValues = orderedEnumTypes.get(
+                  enumTypes.get(entry.getKey()).getTypeName()
+              );
+              String enumValueString = enumValues.get(entry.getValue().getValue());
+              TypeEnum type = enumTypes.get(entry.getKey());
+              return new ValueEnum(enumValueString, type);
+            }
+        ));
     return new ConcreteSolution(intMap, boolMap, enumMap);
   }
 
@@ -139,9 +187,7 @@ public class ChocoModel {
       entry.getValue().match(
           () -> addInt(entry.getKey()),
           () -> addBool(entry.getKey()),
-          (e) -> {
-            throw new IllegalStateException("Not implemented yet");
-          }
+          (e) -> addEnum(entry.getKey(), e)
       );
     });
   }

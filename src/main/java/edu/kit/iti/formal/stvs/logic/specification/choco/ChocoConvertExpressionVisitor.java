@@ -130,7 +130,7 @@ public class ChocoConvertExpressionVisitor implements ExpressionVisitor<ChocoExp
     return literalExpr.getValue().match(
         (integ) -> new ChocoExpressionWrapper(rowModel.addIntLiteral(integ)),
         (bool) -> new ChocoExpressionWrapper(rowModel.addBoolLiteral(bool)),
-        (e) -> null //TODO: implement
+        (e) -> new ChocoExpressionWrapper(rowModel.addEnumLiteral(e.getType(), e.getEnumValue()))
     );
   }
 
@@ -148,10 +148,7 @@ public class ChocoConvertExpressionVisitor implements ExpressionVisitor<ChocoExp
     return type.match(
         () -> new ChocoExpressionWrapper(rowModel.addInt(fullName)),
         () -> new ChocoExpressionWrapper(rowModel.addBool(fullName)),
-        (e) -> {
-          //TODO: implement
-          throw new IllegalStateException("Not implemented yet");
-        }
+        (e) -> new ChocoExpressionWrapper(rowModel.addEnum(fullName, e))
     );
   }
 }
