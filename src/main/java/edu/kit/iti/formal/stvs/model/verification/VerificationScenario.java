@@ -5,12 +5,20 @@ import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 
 /**
- * Created by csicar on 09.01.17.
+ * @author Benjamin Alt
  */
 public class VerificationScenario {
   private VerificationResult verificationResult;
   private VerificationEngine verificationEngine;
   private Code code;
+
+  public VerificationScenario() {
+    code = new Code();
+  }
+
+  public VerificationScenario(Code code) {
+    this.code = code;
+  }
 
   public void verify(ConstraintSpecification spec) {
 
@@ -26,5 +34,13 @@ public class VerificationScenario {
 
   public VerificationState getVerificationState() {
     return null;
+  }
+
+  public Code getCode() {
+    return code;
+  }
+
+  public void setCode(Code code) {
+    this.code = code;
   }
 }
