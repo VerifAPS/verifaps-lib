@@ -179,7 +179,7 @@ public class SpecificationTableTest {
   @Test
   public void testGetDuration() {
     // Casts required to get rid of "ambiguous method call" error
-    assertEquals((long)2, (long)table.getDuration(0));
-    assertEquals((long)5, (long)table.getDuration(2));
+    assertEquals(2, (int)table.getDuration(0));
+    assertEquals(5, (int)table.getDuration(2));
   }
 }

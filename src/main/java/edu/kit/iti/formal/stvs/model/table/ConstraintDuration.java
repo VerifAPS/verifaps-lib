@@ -5,6 +5,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
  * @author Benjamin Alt
@@ -47,5 +48,16 @@ public class ConstraintDuration implements CellOperationProvider {
   @Override
   public StringProperty commentProperty() {
     return comment;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof ConstraintDuration)) return false;
+    if (obj == this) return true;
+    ConstraintDuration other = (ConstraintDuration) obj;
+    return new EqualsBuilder().
+        append(stringRepresentation.get(), other.stringRepresentation.get()).
+        append(comment.get(), other.comment.get()).
+        isEquals();
   }
 }
