@@ -1,9 +1,11 @@
 package edu.kit.iti.formal.stvs.model.verification;
 
 /**
- * Created by csicar on 11.01.17.
+ * @author Benjamin Alt
  */
 public enum VerificationState {
   RUNNING,
-  FINISHED
+  FINISHED,
+  NOT_STARTED,
+  CANCELLED
 }
