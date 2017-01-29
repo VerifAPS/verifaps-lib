@@ -3,6 +3,12 @@ package edu.kit.iti.formal.stvs.model.expressions;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
+/**
+ * runtime-representation for boolean values of {@link Expression}s.
+ *
+ * This is a singleton with two instances, TRUE and FALSE, since there
+ * is no state to the values.
+ */
 public class ValueBool implements Value {
 
   public static final ValueBool TRUE = new ValueBool(true);

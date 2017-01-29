@@ -4,11 +4,27 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+/**
+ * runtime-representation for enum types.
+ *
+ * This is (in contrast to {@link TypeInt} or {@link TypeBool}) NOT a
+ * singleton, since different instances of this can be created at runtime.
+ */
 public class TypeEnum implements Type {
 
   private final String enumTypeName;
   private final Map<String, ValueEnum> valueMap;
 
+  /**
+   * Create a new enum-type. This should only happen, when
+   * an enum is parsed in st-code.
+   *
+   * St-code example definition of an enum:
+   * <tt>COLORS : (red, green, blue)</tt>
+   * @param enumTypeName the type name (<tt>COLORS</tt> in this example)
+   * @param values the possible values that this enum can be
+   *               ([<tt>red</tt>, <tt>green</tt>, <tt>blue</tt>] in this example)
+   */
   public TypeEnum(String enumTypeName, List<String> values) {
     this.enumTypeName = enumTypeName;
     this.valueMap = new HashMap<>();
@@ -71,12 +87,18 @@ public class TypeEnum implements Type {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!(obj instanceof TypeEnum)) return false;
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof TypeEnum)) {
+      return false;
+    }
 
     TypeEnum typeEnum = (TypeEnum) obj;
 
-    if (!enumTypeName.equals(typeEnum.enumTypeName)) return false;
+    if (!enumTypeName.equals(typeEnum.enumTypeName)) {
+      return false;
+    }
     return valueMap.keySet().equals(typeEnum.valueMap.keySet());
 
   }

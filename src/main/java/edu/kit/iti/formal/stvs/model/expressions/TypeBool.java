@@ -1,11 +1,14 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+/**
+ * runtime-representation for boolean types.
+ *
+ * This is a singleton since this class does not have any state.
+ */
 public class TypeBool implements Type {
 
   public static final TypeBool BOOL = new TypeBool();

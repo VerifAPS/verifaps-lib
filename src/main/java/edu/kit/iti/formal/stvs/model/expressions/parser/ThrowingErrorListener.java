@@ -10,7 +10,8 @@ import org.antlr.v4.runtime.dfa.DFA;
 import java.util.BitSet;
 
 /**
- * Created by philipp on 18.01.17.
+ * A {@link ThrowingErrorListener} that throws {@link ParseRuntimeException}s on
+ * every syntaxError.
  */
 public class ThrowingErrorListener implements ANTLRErrorListener {
   @Override

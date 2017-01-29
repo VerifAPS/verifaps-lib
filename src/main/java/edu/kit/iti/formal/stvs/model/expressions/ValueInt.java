@@ -3,10 +3,19 @@ package edu.kit.iti.formal.stvs.model.expressions;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
+/**
+ * runtime-representation for integer values of {@link Expression}s.
+ *
+ * <p>This is not a singleton (in contrast to {@link ValueBool}), since
+ * many different instances can be created at runtime.
+ */
 public class ValueInt implements Value {
 
   private final int value;
 
+  /**
+   * @param value the integer this value should represent.
+   */
   public ValueInt(int value) {
     this.value = value;
   }

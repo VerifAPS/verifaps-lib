@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.model.expressions.parser;
 
 /**
- * Created by philipp on 18.01.17.
+ * An Exception for parsing errors.
  */
 public class ParseException extends Exception {
 
@@ -9,6 +9,12 @@ public class ParseException extends Exception {
   private final int characterInLine;
   private final String parseErrorMessage;
 
+  /**
+   * Any kind of parsing exception for human-readable files.
+   * @param line the first line the error occured
+   * @param characterInLine the first character of the character in the line.
+   * @param parseErrorMessage an error message to provide further information to the user.
+   */
   public ParseException(int line, int characterInLine, String parseErrorMessage) {
     super("(line " + line + " character " + characterInLine + "): " + parseErrorMessage);
     this.line = line;
