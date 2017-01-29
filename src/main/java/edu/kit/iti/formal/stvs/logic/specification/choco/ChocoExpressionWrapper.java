@@ -40,8 +40,15 @@ public class ChocoExpressionWrapper {
     return optionalReExpression.map(function);
   }
 
-  public void postIfRelational(){
+  public void postIfConstraint(){
+    //if Expression is already relational it can be used as a contraint directly
     ifRelational(ReExpression::post);
+    //if Expression is arithmetic and has a [0,1] domain a comparison with 1=true is used as a constraint
+    ifArithmetic(arExpression -> {
+      if(arExpression.intVar().isBool()){
+        arExpression.intVar().eq(1).post();
+      }
+    });
   }
 
   /**
