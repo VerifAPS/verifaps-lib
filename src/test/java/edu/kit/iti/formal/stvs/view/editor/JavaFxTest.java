@@ -23,6 +23,11 @@ public class JavaFxTest extends Application {
     JavaFxTest.toBeViewed = toBeViewed;
   }
 
+  public static void runView(Supplier<Scene> toBeViewed) {
+    setToBeViewed(toBeViewed);
+    Application.launch(JavaFxTest.class);
+  }
+
   @Override
   public void start(Stage primaryStage) throws Exception {
     primaryStage.setScene(toBeViewed.get());
