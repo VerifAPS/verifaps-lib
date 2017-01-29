@@ -6,6 +6,9 @@ import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.UnaryFunctionExpr;
 import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
+import org.chocosolver.solver.constraints.Constraint;
+import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.util.tools.VariableUtils;
 
 import java.util.Map;
 
@@ -94,12 +97,46 @@ public class ChocoConvertExpressionVisitor implements ExpressionVisitor<ChocoExp
             new ChocoExpressionWrapper(arExpression.mul(right.convertToArithmetic()))
         );
       case DIVISION:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.div(right.convertToArithmetic()))
+        return left.autoArithmetic(arExpression -> {
+              //return new ChocoExpressionWrapper(arExpression.div(right.convertToArithmetic()));
+              /*
+                Chocos domain bounds calculation is flawed.
+                A new temporary variable for the result
+                is introduced with the bounds defined in VariableUtils.boundsForDivision()
+                if the right domain does not include elements of different signs.
+                Otherwise [-A,A] with A=max(abs(leftLowerLimit),abs(leftUpperLimit))
+               */
+              IntVar rightAr = right.convertToArithmetic().intVar();
+              IntVar leftAr = arExpression.intVar();
+              int[] bounds;
+              if (rightAr.contains(-1) && rightAr.contains(1)) {
+                bounds = VariableUtils.boundsForDivision(leftAr, rightAr);
+              }
+              else{
+                int maxDistanceToZero = Math.max(Math.abs(leftAr.getLB()), Math.abs(leftAr.getUB()));
+                bounds = new int[]{-maxDistanceToZero, maxDistanceToZero};
+              }
+              IntVar result = arExpression.getModel().intVar(bounds[0], bounds[1]);
+              Constraint constraint = arExpression.getModel().div(leftAr, right.convertToArithmetic().intVar(), result);
+              constraint.post();
+              return new ChocoExpressionWrapper(result);
+            }
         );
       case MODULO:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.mod(right.convertToArithmetic()))
+        return left.autoArithmetic(arExpression -> {
+              //new ChocoExpressionWrapper(arExpression.mod(right.convertToArithmetic()))
+              /*
+                Chocos domain bounds calculation is flawed.
+                A new temporary variable for the result
+                is introduced with the bounds [0, upperLimit of right expression]
+                TODO: Check if ST allows negative results for modulo operations like Java(Script)
+               */
+              IntVar rightAr = right.convertToArithmetic().intVar();
+              IntVar result = arExpression.getModel().intVar(0, rightAr.getUB());
+              Constraint constraint = arExpression.getModel().mod(arExpression.intVar(), rightAr, result);
+              constraint.post();
+              return new ChocoExpressionWrapper(result);
+            }
         );
       case POWER:
         return left.autoArithmetic(arExpression ->
