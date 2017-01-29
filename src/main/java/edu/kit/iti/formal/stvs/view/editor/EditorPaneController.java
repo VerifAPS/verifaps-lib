@@ -36,7 +36,8 @@ public class EditorPaneController implements Controller {
     this.view = new EditorPane(code.sourcecodeProperty().get());
     this.globalConfig = globalConfig;
 
-    this.view.getStylesheets().add(EditorPane.class.getResource("st-keywords.css").toExternalForm());
+    this.view.getStylesheets().add(
+        EditorPane.class.getResource("st-keywords.css").toExternalForm());
     this.executor = Executors.newSingleThreadExecutor();
     configureTextArea();
     handleTextChange(computeHighlighting(code.sourcecodeProperty().get()));
