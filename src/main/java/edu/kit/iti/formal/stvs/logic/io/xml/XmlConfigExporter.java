@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import org.w3c.dom.Node;
 
 import java.io.OutputStream;
 
@@ -10,8 +11,7 @@ import java.io.OutputStream;
 public class XmlConfigExporter extends XmlExporter<GlobalConfig> {
 
   @Override
-  public OutputStream export(GlobalConfig source) {
+  public Node exportToXmlNode(GlobalConfig source) {
     return null;
   }
-
 }
