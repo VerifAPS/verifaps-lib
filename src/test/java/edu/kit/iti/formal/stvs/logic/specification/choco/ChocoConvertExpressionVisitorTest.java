@@ -6,10 +6,17 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
+import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
+import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
 import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
 import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
+import org.chocosolver.solver.Model;
+import org.chocosolver.solver.exception.ContradictionException;
+import org.chocosolver.solver.search.loop.monitors.IMonitorContradiction;
+import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.util.tools.VariableUtils;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -29,7 +36,7 @@ import static edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.var;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -42,7 +49,7 @@ public class ChocoConvertExpressionVisitorTest {
     typeContext.put("b", TypeBool.BOOL);
     Expression expr = equal(var("b"), not(literal(false)));
     ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(typeContext);
-    expr.takeVisitor(chocoConvertExpressionVisitor).postIfRelational();
+    expr.takeVisitor(chocoConvertExpressionVisitor).postIfConstraint();
     Optional<ConcreteSolution> solution = chocoConvertExpressionVisitor.getModel().solve();
     boolean b = solution.get().getBoolMap().get("b").getValue();
     assertTrue(b);
@@ -62,7 +69,7 @@ public class ChocoConvertExpressionVisitorTest {
     ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(typeContext);
     expressions.forEach(expression -> {
       ChocoExpressionWrapper chocoExpressionWrapper = expression.takeVisitor(chocoConvertExpressionVisitor);
-      chocoExpressionWrapper.postIfRelational();
+      chocoExpressionWrapper.postIfConstraint();
     });
     Optional<ConcreteSolution> concreteSolution = chocoConvertExpressionVisitor.getModel().solve();
     assertEquals(3, concreteSolution.get().getIntMap().get("B").getValue());
@@ -77,7 +84,7 @@ public class ChocoConvertExpressionVisitorTest {
     typeContext.put("B", TypeInt.INT);
     ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(typeContext);
     ChocoExpressionWrapper chocoExpressionWrapper = expression.takeVisitor(chocoConvertExpressionVisitor);
-    chocoExpressionWrapper.postIfRelational();
+    chocoExpressionWrapper.postIfConstraint();
     Map<String, Value> varAssignment = new HashMap<>();
     varAssignment.put("B[-1]", new ValueInt(5));
     Optional<ConcreteSolution> concreteSolution = chocoConvertExpressionVisitor.getModel().solve(varAssignment);
@@ -90,8 +97,8 @@ public class ChocoConvertExpressionVisitorTest {
     typeContext.put("B", TypeInt.INT);
     ExpressionParser bParser = new ExpressionParser("B");
     ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(typeContext);
-    bParser.parseExpression("=5").takeVisitor(chocoConvertExpressionVisitor).postIfRelational();
-    bParser.parseExpression("=6").takeVisitor(chocoConvertExpressionVisitor).postIfRelational();
+    bParser.parseExpression("=5").takeVisitor(chocoConvertExpressionVisitor).postIfConstraint();
+    bParser.parseExpression("=6").takeVisitor(chocoConvertExpressionVisitor).postIfConstraint();
     Optional<ConcreteSolution> concreteSolution = chocoConvertExpressionVisitor.getModel().solve();
     assertFalse(concreteSolution.isPresent());
   }
@@ -122,11 +129,11 @@ public class ChocoConvertExpressionVisitorTest {
 
   @Test
   public void testRelational() throws UnsupportedExpressionException, ParseException {
-    assertTrue(calculateInt("X>5", "X")>5);
-    assertTrue(calculateInt("X<-5", "X")<-5);
+    assertTrue(calculateInt("X>5", "X") > 5);
+    assertTrue(calculateInt("X<-5", "X") < -5);
     int interval = calculateInt("[-5,5]", "X");
-    assertTrue(interval>=-5);
-    assertTrue(interval<=5);
+    assertTrue(interval >= -5);
+    assertTrue(interval <= 5);
     assertEquals(1337, calculateInt("X>1336 AND X<1338", "X"));
     assertEquals(42, calculateInt("X>=42 AND X<=42", "X"));
   }
@@ -196,9 +203,56 @@ public class ChocoConvertExpressionVisitorTest {
     Map<String, Type> columnTypeContext = new HashMap<>();
     columnTypeContext.put("B", colorsEnum);
     ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(columnTypeContext);
-    expression.takeVisitor(chocoConvertExpressionVisitor).postIfRelational();
+    expression.takeVisitor(chocoConvertExpressionVisitor).postIfConstraint();
     ChocoModel model = chocoConvertExpressionVisitor.getModel();
     Optional<ConcreteSolution> solve = model.solve();
+  }
+
+  @Test
+  public void complicatedExpressionsTest() throws UnsupportedExpressionException, ParseException {
+    TypeEnum colorsEnum = new TypeEnum("COLORS", Arrays.asList("red", "green", "blue"));
+    Set<Type> typeContext = new HashSet<>();
+    typeContext.add(colorsEnum);
+
+    List<Expression> columns = Stream.of(
+        new ExpressionParser("Color", typeContext).parseExpression("=green"), //Color=green
+        new ExpressionParser("Color2", typeContext).parseExpression("!=Color"), //Color2 is in {red, blue}
+        new ExpressionParser("SomethingInt", typeContext).parseExpression("-"), //dontcare
+        new ExpressionParser("PrimeProduct", typeContext).parseExpression("=6858497,=Prime1*Prime2*Prime3"),//Product of primes: 439,919,17
+        new ExpressionParser("Prime1", typeContext).parseExpression("[2,200]"),//Prime1=17
+        new ExpressionParser("Prime2", typeContext).parseExpression("Prime2%17=14,>=2"),//Prime2=439
+        new ExpressionParser("Prime3", typeContext).parseExpression(">=2"),//Prime3=919
+        new ExpressionParser("was439Involved", typeContext).parseExpression("=(Prime1 = 439 OR Prime2 = 439 OR Prime3 = 439)")//was439Involved=true*/
+    ).collect(Collectors.toList());
+
+    Map<String, Type> columnTypeContext = new HashMap<>();
+    columnTypeContext.put("Color", colorsEnum);
+    columnTypeContext.put("Color2", colorsEnum);
+    columnTypeContext.put("Something", colorsEnum);
+    columnTypeContext.put("SomethingInt", TypeInt.INT);
+    columnTypeContext.put("PrimeProduct", TypeInt.INT);
+    columnTypeContext.put("Prime1", TypeInt.INT);
+    columnTypeContext.put("Prime2", TypeInt.INT);
+    columnTypeContext.put("Prime3", TypeInt.INT);
+    columnTypeContext.put("was439Involved", TypeBool.BOOL);
+    ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(columnTypeContext);
+    columns.forEach(columnExpression -> columnExpression.takeVisitor(chocoConvertExpressionVisitor).postIfConstraint());
+    ChocoModel model = chocoConvertExpressionVisitor.getModel();
+    Optional<ConcreteSolution> solution = model.solve();
+
+    assertNotNull(solution.get());
+    Map<String, ValueInt> intMap = solution.get().getIntMap();
+    Map<String, ValueBool> boolMap = solution.get().getBoolMap();
+    Map<String, ValueEnum> enumMap = solution.get().getEnumMap();
+
+    assertEquals("green", enumMap.get("Color").getEnumValue());
+    assertNotEquals("green", enumMap.get("Color2").getEnumValue());
+    assertNotNull(intMap.get("SomethingInt"));
+    assertEquals(6858497, intMap.get("PrimeProduct").getValue());
+    assertEquals(17, intMap.get("Prime1").getValue());
+    assertEquals(439, intMap.get("Prime2").getValue());
+    assertEquals(919, intMap.get("Prime3").getValue());
+    assertTrue(boolMap.get("was439Involved").getValue());
   }
 
   private void assertSimpleIntSolved(String expression, int value) throws UnsupportedExpressionException, ParseException {
@@ -210,7 +264,7 @@ public class ChocoConvertExpressionVisitorTest {
     Map<String, Type> typeContext = new HashMap<>();
     typeContext.put(variable, TypeInt.INT);
     ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(typeContext);
-    new ExpressionParser(variable).parseExpression(expression).takeVisitor(chocoConvertExpressionVisitor).postIfRelational();
+    new ExpressionParser(variable).parseExpression(expression).takeVisitor(chocoConvertExpressionVisitor).postIfConstraint();
     ChocoModel model = chocoConvertExpressionVisitor.getModel();
     Optional<ConcreteSolution> concreteSolution = model.solve();
     return concreteSolution.get().getIntMap().get(variable).getValue();
@@ -221,7 +275,7 @@ public class ChocoConvertExpressionVisitorTest {
     Map<String, Type> typeContext = new HashMap<>();
     typeContext.put(variable, TypeBool.BOOL);
     ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(typeContext);
-    new ExpressionParser(variable).parseExpression(expression).takeVisitor(chocoConvertExpressionVisitor).postIfRelational();
+    new ExpressionParser(variable).parseExpression(expression).takeVisitor(chocoConvertExpressionVisitor).postIfConstraint();
     ChocoModel model = chocoConvertExpressionVisitor.getModel();
     Optional<ConcreteSolution> concreteSolution = model.solve();
     assertEquals(value, concreteSolution.get().getBoolMap().get(variable).getValue());
