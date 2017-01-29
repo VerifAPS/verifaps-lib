@@ -114,21 +114,21 @@ public class ChocoModel {
       Optional<Constraint> optionalConstraint = entry.getValue().match(
           integer -> {
             if (ints.containsKey(entry.getKey())) {
-              Constraint constraint = ints.get(entry.getKey()).intVar().eq(integer).decompose();
+              Constraint constraint = ints.get(entry.getKey()).eq(integer).decompose();
               return Optional.of(constraint);
             }
             return Optional.empty();
           },
           bool -> {
             if (ints.containsKey(entry.getKey())) {
-              Constraint constraint = ints.get(entry.getKey()).intVar().eq(bool ? 1 : 0).decompose();
+              Constraint constraint = ints.get(entry.getKey()).eq(bool ? 1 : 0).decompose();
               return Optional.of(constraint);
             }
             return Optional.empty();
           },
           enumeration -> {
             if (enums.containsKey(entry.getKey())) {
-              Constraint constraint = enums.get(entry.getKey()).intVar().eq(
+              Constraint constraint = enums.get(entry.getKey()).eq(
                   findIndexOfEnumValue(enumeration.getType(), enumeration.getEnumValue())
               ).decompose();
               return Optional.of(constraint);
