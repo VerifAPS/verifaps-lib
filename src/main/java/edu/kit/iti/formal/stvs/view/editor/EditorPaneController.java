@@ -81,7 +81,10 @@ public class EditorPaneController implements Controller {
         = new StyleSpansBuilder<>();
 
     tokens.forEach(token ->
-      spansBuilder.add(getStyleClassesFor(token), token.getText().replaceAll("\\r", "").length())
+      // replaceAll is a work-around for a bug when ANTLR has a
+      // different character count than this CodeArea.
+      spansBuilder.add(getStyleClassesFor(token),
+          token.getText().replaceAll("\\r", "").length())
     );
     return spansBuilder.create();
   }
