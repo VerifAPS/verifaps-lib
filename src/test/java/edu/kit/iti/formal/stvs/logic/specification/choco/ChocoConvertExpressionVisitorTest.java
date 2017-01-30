@@ -12,11 +12,6 @@ import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
 import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
-import org.chocosolver.solver.Model;
-import org.chocosolver.solver.exception.ContradictionException;
-import org.chocosolver.solver.search.loop.monitors.IMonitorContradiction;
-import org.chocosolver.solver.variables.IntVar;
-import org.chocosolver.util.tools.VariableUtils;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -50,8 +45,8 @@ public class ChocoConvertExpressionVisitorTest {
     Expression expr = equal(var("b"), not(literal(false)));
     ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(typeContext);
     expr.takeVisitor(chocoConvertExpressionVisitor).postIfConstraint();
-    Optional<ConcreteSolution> solution = chocoConvertExpressionVisitor.getModel().solve();
-    boolean b = solution.get().getBoolMap().get("b").getValue();
+    Optional<Map<String, Value>> solution = chocoConvertExpressionVisitor.getModel().solve();
+    boolean b = getBool(solution.get().get("b"));
     assertTrue(b);
   }
 
@@ -71,10 +66,10 @@ public class ChocoConvertExpressionVisitorTest {
       ChocoExpressionWrapper chocoExpressionWrapper = expression.takeVisitor(chocoConvertExpressionVisitor);
       chocoExpressionWrapper.postIfConstraint();
     });
-    Optional<ConcreteSolution> concreteSolution = chocoConvertExpressionVisitor.getModel().solve();
-    assertEquals(3, concreteSolution.get().getIntMap().get("B").getValue());
-    assertEquals(6, concreteSolution.get().getIntMap().get("C").getValue());
-    assertEquals(9, concreteSolution.get().getIntMap().get("D").getValue());
+    Optional<Map<String, Value>> concreteSolution = chocoConvertExpressionVisitor.getModel().solve();
+    assertEquals(3, getInt(concreteSolution.get().get("B")));
+    assertEquals(6, getInt(concreteSolution.get().get("C")));
+    assertEquals(9, getInt(concreteSolution.get().get("D")));
   }
 
   @Test
@@ -87,8 +82,8 @@ public class ChocoConvertExpressionVisitorTest {
     chocoExpressionWrapper.postIfConstraint();
     Map<String, Value> varAssignment = new HashMap<>();
     varAssignment.put("B[-1]", new ValueInt(5));
-    Optional<ConcreteSolution> concreteSolution = chocoConvertExpressionVisitor.getModel().solve(varAssignment);
-    assertEquals(12, concreteSolution.get().getIntMap().get("B").getValue());
+    Optional<Map<String, Value>> concreteSolution = chocoConvertExpressionVisitor.getModel().solve(varAssignment);
+    assertEquals(12, getInt(concreteSolution.get().get("B")));
   }
 
   @Test
@@ -99,7 +94,7 @@ public class ChocoConvertExpressionVisitorTest {
     ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(typeContext);
     bParser.parseExpression("=5").takeVisitor(chocoConvertExpressionVisitor).postIfConstraint();
     bParser.parseExpression("=6").takeVisitor(chocoConvertExpressionVisitor).postIfConstraint();
-    Optional<ConcreteSolution> concreteSolution = chocoConvertExpressionVisitor.getModel().solve();
+    Optional<Map<String, Value>> concreteSolution = chocoConvertExpressionVisitor.getModel().solve();
     assertFalse(concreteSolution.isPresent());
   }
 
@@ -205,7 +200,7 @@ public class ChocoConvertExpressionVisitorTest {
     ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(columnTypeContext);
     expression.takeVisitor(chocoConvertExpressionVisitor).postIfConstraint();
     ChocoModel model = chocoConvertExpressionVisitor.getModel();
-    Optional<ConcreteSolution> solve = model.solve();
+    Optional<Map<String, Value>> solve = model.solve();
   }
 
   @Test
@@ -238,21 +233,18 @@ public class ChocoConvertExpressionVisitorTest {
     ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(columnTypeContext);
     columns.forEach(columnExpression -> columnExpression.takeVisitor(chocoConvertExpressionVisitor).postIfConstraint());
     ChocoModel model = chocoConvertExpressionVisitor.getModel();
-    Optional<ConcreteSolution> solution = model.solve();
+    Optional<Map<String, Value>> solution = model.solve();
 
     assertNotNull(solution.get());
-    Map<String, ValueInt> intMap = solution.get().getIntMap();
-    Map<String, ValueBool> boolMap = solution.get().getBoolMap();
-    Map<String, ValueEnum> enumMap = solution.get().getEnumMap();
 
-    assertEquals("green", enumMap.get("Color").getEnumValue());
-    assertNotEquals("green", enumMap.get("Color2").getEnumValue());
-    assertNotNull(intMap.get("SomethingInt"));
-    assertEquals(6858497, intMap.get("PrimeProduct").getValue());
-    assertEquals(17, intMap.get("Prime1").getValue());
-    assertEquals(439, intMap.get("Prime2").getValue());
-    assertEquals(919, intMap.get("Prime3").getValue());
-    assertTrue(boolMap.get("was439Involved").getValue());
+    assertEquals("green", getEnum(solution.get().get("Color")).getEnumValue());
+    assertNotEquals("green", getEnum(solution.get().get("Color2")).getEnumValue());
+    assertNotNull(solution.get().get("SomethingInt"));
+    assertEquals(6858497, getInt(solution.get().get("PrimeProduct")));
+    assertEquals(17, getInt(solution.get().get("Prime1")));
+    assertEquals(439, getInt(solution.get().get("Prime2")));
+    assertEquals(919, getInt(solution.get().get("Prime3")));
+    assertTrue(getBool(solution.get().get("was439Involved")));
   }
 
   private void assertSimpleIntSolved(String expression, int value) throws UnsupportedExpressionException, ParseException {
@@ -266,8 +258,8 @@ public class ChocoConvertExpressionVisitorTest {
     ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(typeContext);
     new ExpressionParser(variable).parseExpression(expression).takeVisitor(chocoConvertExpressionVisitor).postIfConstraint();
     ChocoModel model = chocoConvertExpressionVisitor.getModel();
-    Optional<ConcreteSolution> concreteSolution = model.solve();
-    return concreteSolution.get().getIntMap().get(variable).getValue();
+    Optional<Map<String, Value>> concreteSolution = model.solve();
+    return getInt(concreteSolution.get().get(variable));
   }
 
   private void assertSimpleBoolSolved(String expression, boolean value) throws UnsupportedExpressionException, ParseException {
@@ -277,7 +269,43 @@ public class ChocoConvertExpressionVisitorTest {
     ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(typeContext);
     new ExpressionParser(variable).parseExpression(expression).takeVisitor(chocoConvertExpressionVisitor).postIfConstraint();
     ChocoModel model = chocoConvertExpressionVisitor.getModel();
-    Optional<ConcreteSolution> concreteSolution = model.solve();
-    assertEquals(value, concreteSolution.get().getBoolMap().get(variable).getValue());
+    Optional<Map<String, Value>> concreteSolution = model.solve();
+    assertEquals(value, getBool(concreteSolution.get().get(variable)));
+  }
+
+  private int getInt(Value val) {
+    return val.match(
+        i -> i,
+        b -> {
+          throw new IllegalStateException("Ist not a Integer");
+        },
+        e -> {
+          throw new IllegalStateException("Ist not a Enum");
+        }
+    );
+  }
+
+  private boolean getBool(Value val) {
+    return val.match(
+        i -> {
+          throw new IllegalStateException("Ist not a Integer");
+        },
+        b -> b,
+        e -> {
+          throw new IllegalStateException("Ist not a Enum");
+        }
+    );
+  }
+
+  private ValueEnum getEnum(Value val) {
+    return val.match(
+        i -> {
+          throw new IllegalStateException("Ist not a Integer");
+        },
+        b -> {
+          throw new IllegalStateException("Ist not a Boolean");
+        },
+        e -> e
+    );
   }
 }

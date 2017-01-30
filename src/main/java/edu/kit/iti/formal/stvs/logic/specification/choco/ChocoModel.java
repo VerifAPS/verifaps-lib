@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This is a wrapper for a choco model which allows to assign values for a subset of the used variables
@@ -91,7 +92,7 @@ public class ChocoModel {
     return orderedEnumTypes.get(type.getTypeName()).indexOf(enumValue);
   }
 
-  public Optional<ConcreteSolution> solve() {
+  public Optional<Map<String, Value>> solve() {
     model.getSolver().reset();
     boolean solved = model.getSolver().solve();
     if (solved) {
@@ -106,7 +107,7 @@ public class ChocoModel {
     assignment.clear();
   }
 
-  public Optional<ConcreteSolution> solve(Map<String, Value> values) {
+  public Optional<Map<String, Value>> solve(Map<String, Value> values) {
     //Clears previous assignment
     clearAssignment();
     //Posts a new constraint to set each variable in the map to a specific value
@@ -144,20 +145,20 @@ public class ChocoModel {
     return solve();
   }
 
-  private ConcreteSolution buildSolution() {
+  private Map<String, Value> buildSolution() {
     Map<String, ValueBool> boolMap = bools.entrySet().stream()
         .collect(Collectors.toMap(
-            entry -> entry.getKey(),
+            Map.Entry::getKey,
             entry -> ValueBool.of(entry.getValue().getValue() == 1)
         ));
     Map<String, ValueInt> intMap = ints.entrySet().stream()
         .collect(Collectors.toMap(
-            entry -> entry.getKey(),
+            Map.Entry::getKey,
             entry -> new ValueInt(entry.getValue().getValue())
         ));
     Map<String, ValueEnum> enumMap = enums.entrySet().stream()
         .collect(Collectors.toMap(
-            entry -> entry.getKey(),
+            Map.Entry::getKey,
             entry ->{
               List<String> enumValues = orderedEnumTypes.get(
                   enumTypes.get(entry.getKey()).getTypeName()
@@ -167,7 +168,11 @@ public class ChocoModel {
               return new ValueEnum(enumValueString, type);
             }
         ));
-    return new ConcreteSolution(intMap, boolMap, enumMap);
+    Map<String, Value> solution = new HashMap<>();
+    solution.putAll(boolMap);
+    solution.putAll(intMap);
+    solution.putAll(enumMap);
+    return solution;
   }
 
   protected Map<String, BoolVar> getBools() {
