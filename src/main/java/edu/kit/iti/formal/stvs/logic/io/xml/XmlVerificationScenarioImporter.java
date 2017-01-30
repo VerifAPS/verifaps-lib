@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
+import org.w3c.dom.Node;
 
 import java.io.InputStream;
 
@@ -11,7 +12,7 @@ import java.io.InputStream;
 public class XmlVerificationScenarioImporter extends XmlImporter<VerificationScenario> {
 
   @Override
-  public VerificationScenario doImport(InputStream source) throws ImportException {
+  public VerificationScenario doImportFromXmlNode(Node source) {
     return null;
   }
 }

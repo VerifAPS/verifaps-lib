@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
+import org.w3c.dom.Node;
 
 import java.io.OutputStream;
 
@@ -12,8 +13,7 @@ public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
   private XmlSpecExporter specExporter;
 
   @Override
-  public OutputStream export(StvsRootModel source) {
+  public Node exportToXmlNode(StvsRootModel source) {
     return null;
   }
-
 }
