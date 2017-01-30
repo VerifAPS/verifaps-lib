@@ -3,8 +3,8 @@ package edu.kit.iti.formal.stvs.logic.io;
 import java.io.OutputStream;
 
 /**
- * Created by bal on 11.01.17.
+ * @author Benjamin Alt
  */
 public interface Exporter<F> {
-  public OutputStream export(F source);
+  public OutputStream export(F source) throws ExportException;
 }

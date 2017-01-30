@@ -3,15 +3,34 @@ package edu.kit.iti.formal.stvs.model.verification;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 
 /**
- * Created by csicar on 09.01.17.
+ * @author Benjamin Alt
  */
 public class VerificationResult {
 
+  private ConcreteSpecification counterexample;
+  private boolean successful;
+
+  /**
+   * Construct a new VerificationResult for a successful verification.
+   */
+  public VerificationResult() {
+    successful = true;
+  }
+
+  /**
+   * Construct a new VerificationResult with a counterexample for an unsuccessful verification
+   * @param counterexample
+   */
+  public VerificationResult(ConcreteSpecification counterexample) {
+    this.counterexample = counterexample;
+    successful = false;
+  }
+
   public boolean isSuccessful() {
-    return false;
+    return successful;
   }
 
   public ConcreteSpecification getCounterExample() {
-    return null;
+    return counterexample;
   }
 }

@@ -46,29 +46,21 @@ public class CodeTest {
 
   @Test
   public void testIsEmptyInitially() {
-    assertEquals("", code.sourcecodeProperty().get());
-  }
-
-  @Test
-  public void testSourcecodeListenable() {
-    BooleanProperty sourcecodeChanged = new SimpleBooleanProperty(false);
-    code.sourcecodeProperty().addListener(change -> sourcecodeChanged.set(true));
-    code.sourcecodeProperty().set("TYPE months := (jan, feb) END_TYPE");
-    assertEquals("Sourcecode changed", true, sourcecodeChanged.get());
+    assertEquals("", code.getSourcecode());
   }
 
   @Test
   public void testTokensExist() {
-    code.sourcecodeProperty().set("TYPE is a keyword END_TYPE");
-    List<? extends Token> tokens = code.tokensBinding().getValue();
+    code.updateSourcecode("TYPE is a keyword END_TYPE");
+    List<? extends Token> tokens = code.getTokens();
     System.out.println(tokens);
     assertTrue(tokens.size() > 0);
   }
 
   @Test
   public void testTokensConcatenated() {
-    String source = exampleCode.sourcecodeProperty().get();
-    List<? extends Token> tokens = exampleCode.tokensBinding().getValue();
+    String source = exampleCode.getSourcecode();
+    List<? extends Token> tokens = exampleCode.getTokens();
     String tokensConcatenated = tokens.stream()
         .map(Token::getText)
         .reduce("", String::concat);
@@ -77,21 +69,21 @@ public class CodeTest {
 
   @Test
   public void testParsedCodeTypeExtraction() {
-    NullableProperty<ParsedCode> parsed = enumDefinition.parsedCodeProperty();
-    assertEquals("Find all defined Types", 3, parsed.get().getDefinedTypes().size());
+    ParsedCode parsed = enumDefinition.getParsedCode();
+    assertEquals("Find all defined Types", 3, parsed.getDefinedTypes().size());
 
     Type myEnum = new TypeEnum("MY_ENUM", Arrays.asList("possible", "values", "enum"));
     Set<Type> expectedDefinedTypes = new HashSet<>();
     expectedDefinedTypes.add(TypeBool.BOOL);
     expectedDefinedTypes.add(TypeInt.INT);
     expectedDefinedTypes.add(myEnum);
-    assertCollectionsEqual(expectedDefinedTypes, parsed.get().getDefinedTypes());
+    assertCollectionsEqual(expectedDefinedTypes, parsed.getDefinedTypes());
   }
 
   @Test
   public void testParsedCodeIOVariableExtraction() {
-    NullableProperty<ParsedCode> parsed = enumDefinition.parsedCodeProperty();
-    assertEquals("Find all defined IOVariables", 5, parsed.get().getDefinedVariables().size());
+    ParsedCode parsed = enumDefinition.getParsedCode();
+    assertEquals("Find all defined IOVariables", 5, parsed.getDefinedVariables().size());
 
     Type myEnum = new TypeEnum("MY_ENUM", Arrays.asList("possible", "values", "enum"));
     Set<CodeIoVariable> expectedVariables = new HashSet<>();
@@ -101,16 +93,15 @@ public class CodeTest {
     expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, myEnum, "my_output"));
     expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, TypeBool.BOOL, "seriously"));
 
-    assertCollectionsEqual(expectedVariables, parsed.get().getDefinedVariables());
+    assertCollectionsEqual(expectedVariables, parsed.getDefinedVariables());
   }
 
   @Test
   public void testParsedCCodeBlocks() {
     FoldableCodeBlock expectedBlock = new FoldableCodeBlock(5, 15);
-    assertEquals(expectedBlock, enumDefinition.parsedCodeProperty().get().getFoldableCodeBlocks().get(0));
-    assertEquals(1, enumDefinition.parsedCodeProperty().get().getFoldableCodeBlocks().size());
-    assertEquals(5, enumDefinition.parsedCodeProperty().get().getFoldableCodeBlocks().get(0).getStartLine());
-    assertEquals(15, enumDefinition.parsedCodeProperty().get().getFoldableCodeBlocks().get(0).getEndLine());
-
+    assertEquals(expectedBlock, enumDefinition.getParsedCode().getFoldableCodeBlocks().get(0));
+    assertEquals(1, enumDefinition.getParsedCode().getFoldableCodeBlocks().size());
+    assertEquals(5, enumDefinition.getParsedCode().getFoldableCodeBlocks().get(0).getStartLine());
+    assertEquals(15, enumDefinition.getParsedCode().getFoldableCodeBlocks().get(0).getEndLine());
   }
 }

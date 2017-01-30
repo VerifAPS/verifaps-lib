@@ -1,7 +1,8 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 /**
- * Created by philipp on 26.01.17.
+ * The runtime-representation for parsed, binary function expressions.
+ * Examples are: +, -, =, AND, OR, etc. Anything that has two arguments.
  */
 public class BinaryFunctionExpr extends Expression {
 
@@ -31,6 +32,11 @@ public class BinaryFunctionExpr extends Expression {
   private final Expression firstArgument;
   private final Expression secondArgument;
 
+  /**
+   * @param operation the {@link Op} that this expression should do with its arguments.
+   * @param firstArgument the first (or left) argument
+   * @param secondArgument the second (or right) argument
+   */
   public BinaryFunctionExpr(Op operation, Expression firstArgument, Expression secondArgument) {
     this.operation = operation;
     this.firstArgument = firstArgument;
@@ -61,8 +67,12 @@ public class BinaryFunctionExpr extends Expression {
 
     BinaryFunctionExpr that = (BinaryFunctionExpr) o;
 
-    if (operation != that.operation) return false;
-    if (firstArgument != null ? !firstArgument.equals(that.firstArgument) : that.firstArgument != null) return false;
+    if (operation != that.operation) {
+      return false;
+    }
+    if (firstArgument != null ? !firstArgument.equals(that.firstArgument) : that.firstArgument != null) {
+      return false;
+    }
     return secondArgument != null ? secondArgument.equals(that.secondArgument) : that.secondArgument == null;
   }
 

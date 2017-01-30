@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.verification;
 
+import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 
@@ -19,7 +20,9 @@ public interface VerificationEngine {
    */
   public void startVerification(VerificationScenario scenario);
 
-  public void addVerificationFinishedListener(Consumer<VerificationResult> verificationFinishedListener);
+  public OptionalProperty<VerificationResult> getVerificationResultProperty();
+
+  public VerificationResult getVerificationResult();
 
   public void cancelVerification();
 }

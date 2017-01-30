@@ -4,6 +4,11 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+/**
+ * runtime-representation for int types.
+ *
+ * <p>This class is a singleton, since it does not hold any state at all.
+ */
 public class TypeInt implements Type {
 
   public static final TypeInt INT = new TypeInt();

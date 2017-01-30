@@ -251,9 +251,6 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     }
     // Are there invalid IO variables? (Is there a specIoVariable that is not a codeIoVariable?)
     for (SpecIoVariable specIoVariable : specIoVariables) {
-      /*if (!codeIoVariables.contains(new CodeIoVariable(specIoVariable.getCategory(), specIoVariable.getType(), specIoVariable.getName()))) {
-        problemsFound.add(new InvalidIoVarProblem(specIoVariable));
-      }*/
       boolean found = false;
       for (CodeIoVariable codeIoVariable : codeIoVariables) {
         if (codeIoVariable.matches(specIoVariable)) {

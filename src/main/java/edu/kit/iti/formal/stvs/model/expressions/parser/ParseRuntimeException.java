@@ -1,9 +1,9 @@
 package edu.kit.iti.formal.stvs.model.expressions.parser;
 
 /**
- * Created by philipp on 18.01.17.
+ * package-local class!
  */
-public class ParseRuntimeException extends RuntimeException {
+class ParseRuntimeException extends RuntimeException {
 
   private final ParseException parseException;
 

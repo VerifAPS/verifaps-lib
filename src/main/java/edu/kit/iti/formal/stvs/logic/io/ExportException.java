@@ -3,16 +3,16 @@ package edu.kit.iti.formal.stvs.logic.io;
 /**
  * Created by csicar on 09.01.17.
  */
-public class ImportException extends Exception {
+public class ExportException extends Exception {
   private String message;
   private Exception originalException;
 
-  public ImportException(String message) {
+  public ExportException(String message) {
     this.message = message;
     originalException = null;
   }
 
-  public ImportException(Exception e) {
+  public ExportException(Exception e) {
     originalException = e;
     message = e.getMessage();
   }

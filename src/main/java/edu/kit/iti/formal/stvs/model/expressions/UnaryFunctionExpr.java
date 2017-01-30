@@ -1,7 +1,8 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 /**
- * Created by philipp on 26.01.17.
+ * runtime-representation of unary expressions. Examples:
+ * <tt>NOT TRUE</tt>, <tt>- 3</tt>.
  */
 public class UnaryFunctionExpr extends Expression {
 
@@ -15,6 +16,10 @@ public class UnaryFunctionExpr extends Expression {
   private final Op operation;
   private final Expression argument;
 
+  /**
+   * @param operation the unary operation
+   * @param argument the expression to apply the operation to
+   */
   public UnaryFunctionExpr(Op operation, Expression argument) {
     this.operation = operation;
     this.argument = argument;
@@ -35,12 +40,18 @@ public class UnaryFunctionExpr extends Expression {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof UnaryFunctionExpr)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof UnaryFunctionExpr)) {
+      return false;
+    }
 
     UnaryFunctionExpr that = (UnaryFunctionExpr) o;
 
-    if (operation != that.operation) return false;
+    if (operation != that.operation) {
+      return false;
+    }
     return argument != null ? argument.equals(that.argument) : that.argument == null;
   }
 

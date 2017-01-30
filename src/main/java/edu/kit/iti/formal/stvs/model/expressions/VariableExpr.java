@@ -2,16 +2,34 @@ package edu.kit.iti.formal.stvs.model.expressions;
 
 import java.util.Optional;
 
+/**
+ * runtime-representation for variables in {@link Expression}s.
+ *
+ * <p>At this point it is not known, whether this is a reference to a
+ * {@link edu.kit.iti.formal.stvs.model.common.FreeVariable}
+ * or an {@link edu.kit.iti.formal.stvs.model.common.IoVariable}, it
+ * is simply the String name of either of those.
+ */
 public class VariableExpr extends Expression {
 
   private final String varName;
   private final Optional<Integer> index;
 
+  /**
+   * Constructs a new VariableExpr with a backwards reference.
+   * @param varName the name as a reference to a variable
+   * @param index the index of the backwards-reference
+   *              (for expressions like <tt>A[-1]</tt> for example)
+   */
   public VariableExpr(String varName, int index) {
     this.varName = varName;
     this.index = Optional.of(index);
   }
 
+  /**
+   * Constructs a new VariableExpr without a backwards reference.
+   * @param name the name as a reference to a variable.
+   */
   public VariableExpr(String name) {
     this.varName = name;
     this.index = Optional.empty();

@@ -4,41 +4,31 @@ import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 
-import java.util.function.Consumer;
 
 /**
  * @author Benjamin Alt
  */
-public abstract class SpecificationConcretizer {
+public interface SpecificationConcretizer {
 
-  private OptionalProperty<ConcreteSpecification> concreteSpec;
-  private ConcretizerContext context;
+  public ConcretizerContext getContext();
 
-  public ConcretizerContext getContext() {
-    return context;
-  }
-
-  public void setContext(ConcretizerContext context) {
-    this.context = context;
-  }
+  public void setContext(ConcretizerContext context);
 
   /**
    * Launch a new simulation after a specification change, unless one is already running
    *
    * @param spec The changed spec
    */
-  public abstract void createConcreteSpecification(ValidSpecification spec);
+  public void createConcreteSpecification(ValidSpecification spec);
 
-  public ConcreteSpecification getConcreteSpec() {
-    return concreteSpec.get();
-  }
+  /**
+   * Get the current concrete specification.
+   * @return The concrete specification or null if no concrete specification exists.
+   */
+  public ConcreteSpecification getConcreteSpec();
 
-  public OptionalProperty<ConcreteSpecification> concreteSpecProperty() {
-    return concreteSpec;
-  }
+  public OptionalProperty<ConcreteSpecification> concreteSpecProperty();
 
-  public void setConcreteSpec(ConcreteSpecification concreteSpec) {
-    this.concreteSpec.set(concreteSpec);
-  }
+  public void setConcreteSpec(ConcreteSpecification concreteSpec);
 }
 

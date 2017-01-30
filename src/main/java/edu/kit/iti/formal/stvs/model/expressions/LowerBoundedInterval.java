@@ -3,25 +3,38 @@ package edu.kit.iti.formal.stvs.model.expressions;
 import java.util.Optional;
 
 /**
+ * The runtime representation for intervals that possibly have no
+ * upper bound, but have a guaranteed lower bound.
+ *
  * @author Benjamin Alt
  */
 public class LowerBoundedInterval {
   private int lowerBound;
   private Optional<Integer> upperBound;
 
+  /**
+   * @param lowerBound the lower bound for this interval
+   * @param upperBound the optional upper bound for this interval
+   */
   public LowerBoundedInterval(int lowerBound, Optional<Integer> upperBound) {
     this.lowerBound = lowerBound;
     this.upperBound = upperBound;
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof LowerBoundedInterval)) return false;
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof LowerBoundedInterval)) {
+      return false;
+    }
 
-    LowerBoundedInterval that = (LowerBoundedInterval) o;
+    LowerBoundedInterval that = (LowerBoundedInterval) other;
 
-    if (lowerBound != that.lowerBound) return false;
+    if (lowerBound != that.lowerBound) {
+      return false;
+    }
     return upperBound.equals(that.upperBound);
   }
 
@@ -34,8 +47,8 @@ public class LowerBoundedInterval {
 
   @Override
   public String toString() {
-    return "LowerBoundedInterval(" + lowerBound + "," +
-        (upperBound.isPresent() ? upperBound.get() : "-") +
-        ")";
+    return "LowerBoundedInterval(" + lowerBound + ","
+        + (upperBound.isPresent() ? upperBound.get() : "-")
+        + ")";
   }
 }

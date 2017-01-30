@@ -1,7 +1,9 @@
 package edu.kit.iti.formal.stvs.model.expressions.parser;
 
 /**
- * Created by philipp on 18.01.17.
+ * An Exception invoked, when expressions like function expressions are
+ * encountered inside cell-expressions. Generally thrown on all expressions
+ * that the grammar supports, but our program does not yet.
  */
 public class UnsupportedExpressionException extends Exception {
 

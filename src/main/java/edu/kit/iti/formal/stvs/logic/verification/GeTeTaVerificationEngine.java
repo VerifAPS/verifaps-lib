@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.logic.verification;
 
 import edu.kit.iti.formal.stvs.logic.io.verification.VerificationExporter;
 import edu.kit.iti.formal.stvs.logic.io.verification.VerificationImporter;
+import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 
@@ -31,8 +32,13 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   }
 
   @Override
-  public void addVerificationFinishedListener(Consumer<VerificationResult> verificationFinishedListener) {
+  public OptionalProperty<VerificationResult> getVerificationResultProperty() {
+    return null;
+  }
 
+  @Override
+  public VerificationResult getVerificationResult() {
+    return null;
   }
 
   @Override

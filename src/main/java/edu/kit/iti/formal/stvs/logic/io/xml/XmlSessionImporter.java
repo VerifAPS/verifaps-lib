@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
+import org.w3c.dom.Node;
 
 import java.io.InputStream;
 
@@ -9,9 +10,8 @@ import java.io.InputStream;
  * Created by bal on 11.01.17.
  */
 public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
-
   @Override
-  public StvsRootModel doImport(InputStream source) throws ImportException {
+  public StvsRootModel doImportFromXmlNode(Node source) {
     return null;
   }
 }

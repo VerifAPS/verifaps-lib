@@ -4,10 +4,14 @@ import edu.kit.iti.formal.stvs.model.expressions.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
- * Created by philipp on 09.01.17.
+ * This class parses Expressions using the ANTLR parser generator library.
+ * The resulting Expression format is an {@link Expression}.
  */
 public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 
@@ -15,12 +19,25 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   private Expression columnAsVariable;
   private Map<String, ValueEnum> enumValues;
 
+  /**
+   * Creates an Expression parser without a type context.
+   * That means this parser can't parse enums.
+   * @param columnName name of this column's IoVariable for
+   *                   parsing single-sided expressions.
+   */
   public ExpressionParser(String columnName) {
     this.columnName = columnName;
     this.columnAsVariable = new VariableExpr(columnName);
     this.enumValues = new HashMap<>(); // empty enum value set, because no context given
   }
 
+  /**
+   * @param columnName name of this column's IoVariable for
+   *                   parsing single-sided expressions.
+   * @param typeContext available types for figuring out whether
+   *                    an occuring string in an expression is
+   *                    an enum-literal.
+   */
   public ExpressionParser(String columnName, Set<Type> typeContext) {
     this.columnName = columnName;
     this.columnAsVariable = new VariableExpr(columnName);
@@ -63,10 +80,10 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
     parser.addErrorListener(new ThrowingErrorListener());
     try {
       return this.visit(parser.cell());
-    } catch (ParseRuntimeException e) {
-      throw e.getParseException();
-    } catch (UnsupportedExpressionRuntimeException e) {
-      throw e.getException();
+    } catch (ParseRuntimeException runtimeException) {
+      throw runtimeException.getParseException();
+    } catch (UnsupportedExpressionRuntimeException runtimeException) {
+      throw runtimeException.getException();
     }
   }
 
@@ -94,6 +111,8 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
         .map(chunkContext -> chunkContext.accept(this))
         .reduce((e1, e2) ->
             new BinaryFunctionExpr(BinaryFunctionExpr.Op.AND, e1, e2));
+    // We can always .get() this value, since the grammar enforces
+    // that at least one chunk exists in a cell.
     return optionalExpression.get();
   }
 
@@ -129,7 +148,8 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   // A seemingly arbitrary string in a CellExpression can either be an Enum value or a variable...
   private Expression parseOccuringString(CellExpressionParser.VariableContext ctx) {
     return parseArrayIndex(ctx).map(index ->
-        // If it has an index to it, like A[-2], its a variable for sure (indices don't make sense for enums!)
+        // If it has an index to it, like A[-2], its a variable for sure
+        // (indices don't make sense for enums!)
         (Expression) new VariableExpr(parseIdentifier(ctx), index)) // really java? really?
         // Otherwise we still have to find out
         .orElse(maybeParseEnum(ctx));

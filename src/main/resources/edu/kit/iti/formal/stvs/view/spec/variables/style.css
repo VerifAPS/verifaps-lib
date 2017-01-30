@@ -1,0 +1,13 @@
+.freevar .typeof-label {
+    -fx-font-family: monospace;
+}
+
+.freevar .name-field {
+    -fx-font-family: monospace;
+}
+
+.freevar .type-combo-box-cell {
+    -fx-font-family: monospace;
+    -fx-font-weight: bold;
+    -fx-fill: darkgreen;
+}

@@ -33,13 +33,14 @@ public class EditorPaneController implements Controller {
 
   public EditorPaneController(Code code, GlobalConfig globalConfig) {
     this.code = code;
-    this.view = new EditorPane(code.sourcecodeProperty().get());
+    this.view = new EditorPane(code.getSourcecode());
     this.globalConfig = globalConfig;
 
-    this.view.getStylesheets().add(EditorPane.class.getResource("st-keywords.css").toExternalForm());
+    this.view.getStylesheets().add(
+        EditorPane.class.getResource("st-keywords.css").toExternalForm());
     this.executor = Executors.newSingleThreadExecutor();
     configureTextArea();
-    handleTextChange(computeHighlighting(code.sourcecodeProperty().get()));
+    handleTextChange(computeHighlighting(code.getSourcecode()));
   }
 
   private void configureTextArea() {
@@ -75,13 +76,17 @@ public class EditorPaneController implements Controller {
   }
 
   private StyleSpans<Collection<String>> computeHighlighting(String sourcecode) {
-    List<? extends Token> tokens = code.computeTokens(sourcecode);
+    code.updateSourcecode(sourcecode);
+    List<? extends Token> tokens = code.getTokens();
 
     StyleSpansBuilder<Collection<String>> spansBuilder
         = new StyleSpansBuilder<>();
 
     tokens.forEach(token ->
-      spansBuilder.add(getStyleClassesFor(token), token.getText().replaceAll("\\r", "").length())
+      // replaceAll is a work-around for a bug when ANTLR has a
+      // different character count than this CodeArea.
+      spansBuilder.add(getStyleClassesFor(token),
+          token.getText().replaceAll("\\r", "").length())
     );
     return spansBuilder.create();
   }
@@ -116,7 +121,7 @@ public class EditorPaneController implements Controller {
   }
 
   private void handleTextChange(StyleSpans<Collection<String>> highlighting) {
-    code.sourcecodeProperty().setValue(view.getCodeArea().getText());
+    code.updateSourcecode(view.getCodeArea().getText());
     view.setStyleSpans(highlighting);
   }
 

@@ -1,32 +1,38 @@
 package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.logic.specification.BacktrackSpecificationConcretizer;
+import edu.kit.iti.formal.stvs.logic.specification.ConcretizerContext;
 import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import javafx.beans.value.ObservableValue;
-
-import javafx.beans.value.ChangeListener;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
+
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
 /**
+ * A ConstraintSpecification which also has an associated counterexample (ConcreteSpecification),
+ * concrete instance (ConcreteSpecification) or both.
+ * This class is the model on which the
+ * {@link edu.kit.iti.formal.stvs.view.spec.table.TablePaneController}
+ * and {@link edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController}
+ * operate. This class is responsible for triggering the generation of a new concrete instance of a
+ * specification whenever one of its {@link ConstraintCell}s or {@link ConstraintDuration}s change
+ * or new cells or durations are added.
  * @author Benjamin Alt
  */
 public class HybridSpecification extends ConstraintSpecification {
 
 
-  //TODO: Kann eine HybridSpecification sowohl ein Counterexample als auch eine ConcreteInstance haben?
-  private Optional<ConcreteSpecification> counterExample;
+  private ConcreteSpecification counterExample;
   private OptionalProperty<ConcreteSpecification> concreteInstance;
-  private List<Consumer<Optional<ConcreteSpecification>>> concreteInstanceChangedListeners;
   private final boolean editable;
   private SpecificationConcretizer concretizer;
 
@@ -36,44 +42,83 @@ public class HybridSpecification extends ConstraintSpecification {
    */
   private Selection selection;
 
-  public HybridSpecification(Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet, boolean editable) {
+  /**
+   * Constructor for an "empty" HybridSpecification that contains no cells.
+   * @param typeContext The type context (which types exist?)
+   * @param ioVariables The IO variables declared in the code
+   * @param freeVariableSet The set of declared free variables
+   * @param editable Is this HybridSpecification supposed to be editable?
+   */
+  public HybridSpecification(Set<Type> typeContext, Set<CodeIoVariable> ioVariables,
+                             FreeVariableSet freeVariableSet, boolean editable) {
     super(typeContext, ioVariables, freeVariableSet);
     this.editable = editable;
-    this.selection = new Selection();
-    validSpecificationProperty().addListener(new ValidSpecificationChangedListener<ValidSpecification>());
-    concretizer = new BacktrackSpecificationConcretizer();
-    concretizer.concreteSpecProperty().addListener(new ConcreteSpecificationChangedListener<ConcreteSpecification>());
+    initialize();
   }
 
-  public Optional<ConcreteSpecification> getCounterExample() {
+  /**
+   * Constructor for a HybridSpecification that already contains some cells.
+   * @param columns The columns of the specification
+   * @param durations The durations for the specification
+   * @param typeContext The type context (which types exist?)
+   * @param ioVariables The IO variables declared in the code
+   * @param freeVariableSet The set of declared free variables
+   * @param editable Is this HybridSpecification supposed to be editable?
+   */
+  public HybridSpecification(Map<String, SpecificationColumn<ConstraintCell>> columns,
+                             Map<Integer,ConstraintDuration> durations, Set<Type> typeContext,
+                             Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet,
+                             boolean editable) {
+    super(columns, durations, typeContext, ioVariables, freeVariableSet);
+    this.editable = editable;
+    initialize();
+  }
+
+  private void initialize() {
+    this.selection = new Selection();
+    concreteInstance = new OptionalProperty<>(new SimpleObjectProperty<>());
+    validSpecificationProperty().addListener(new ValidSpecificationChangedListener<>());
+    concretizer = new BacktrackSpecificationConcretizer(new ConcretizerContext());
+    concretizer.concreteSpecProperty().addListener(new ConcreteSpecificationChangedListener<>());
+  }
+
+  public ConcreteSpecification getCounterExample() {
     return counterExample;
   }
 
   public void setCounterExample(ConcreteSpecification counterExample) {
-    this.counterExample = Optional.of(counterExample);
+    this.counterExample = counterExample;
   }
 
   public Selection getSelection() {
     return selection;
   }
 
+  /* TODO: This was not specified originally, but it would not make sense for the selection to be
+     read-only */
+  public void setSelection(Selection selection) {
+    this.selection = selection;
+  }
+
   /**
-   * A row in a ConcreteSpecification is not the same as a row in a ConstraintSpecification. This function does the
-   * mapping between the two.
+   *
+   * For the counterexample.
+   * A row in a ConcreteSpecification is not the same as a row in a ConstraintSpecification.
+   * This function does the mapping between the two.
+   * TODO: Should we move this method into ConcreteSpecification? It seems artificial to keep it here.
    */
   public List<ConcreteCell> getConcreteValuesForConstraint(String column, int row) {
-    if (counterExample.isPresent()) {
-      int startIndex = counterExample.get().getDuration(row).getBeginCycle();
-      int endIndex = counterExample.get().getDuration(row).getEndCycle();
+    if (counterExample != null) {
+      int startIndex = counterExample.getDuration(row).getBeginCycle();
+      int endIndex = counterExample.getDuration(row).getEndCycle();
       ArrayList<ConcreteCell> concreteCells = new ArrayList<>();
-      for (int i = startIndex; i < endIndex + 1; i++) {
-        concreteCells.add(counterExample.get().getCell(i, column));
+      for (int i = startIndex; i < endIndex; i++) {
+        concreteCells.add(counterExample.getCell(i, column));
       }
       return concreteCells;
     } else {
       return new ArrayList<ConcreteCell>();
     }
-
   }
 
   /**
@@ -83,7 +128,11 @@ public class HybridSpecification extends ConstraintSpecification {
    * @return
    */
   public ConcreteDuration getConcreteDurationForRow(int row) {
-    return counterExample.get().getDuration(row);
+     if (counterExample != null) {
+       return counterExample.getDuration(row);
+     } else {
+       return null;
+     }
   }
 
   public boolean isEditable() {
