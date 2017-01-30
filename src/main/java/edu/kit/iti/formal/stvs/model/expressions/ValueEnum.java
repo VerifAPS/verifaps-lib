@@ -16,18 +16,14 @@ public class ValueEnum implements Value {
   private final TypeEnum enumType;
 
   /**
+   * package-local. Generate values from TypeEnum!
    * Construct a new value of given type with given constructor.
    * @param enumValue enum constructor (for example <tt>red</tt>)
    * @param enumType enum type (for example <tt>TypeEnum(COLORS, [red, green, blue])</tt>)
-   * @throws IllegalArgumentException when the given enumValue is not existant in the enum type
-   *                                  (for example <tt>purple</tt>)
    */
-  public ValueEnum(String enumValue, TypeEnum enumType) {
+  ValueEnum(String enumValue, TypeEnum enumType) {
     this.enumValue = enumValue;
     this.enumType = enumType;
-    if (!enumType.getValues().contains(enumValue)) {
-      throw new IllegalArgumentException("new ValueEnum: the type does not contain the given constructor!");
-    }
   }
 
   @Override
