@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.code.CodeTest;
 import edu.kit.iti.formal.stvs.model.code.ParsedCode;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;

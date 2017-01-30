@@ -10,7 +10,7 @@ import javafx.collections.ObservableList;
 public class SpecFileChooserManager {
   private GlobalConfig globalConfig;
 
-  public SpecFileChooserManager(ObservableList<HybridSpecification> hybridSpecifications, GlobalConfig globalConfig) {
+  public SpecFileChooserManager(ObservableList<HybridSpecification> hybridSpecifications) {
 
     this.globalConfig = globalConfig;
   }

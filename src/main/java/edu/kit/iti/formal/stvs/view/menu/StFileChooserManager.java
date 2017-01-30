@@ -7,11 +7,10 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
  * Created by csicar on 10.01.17.
  */
 public class StFileChooserManager {
-  public StFileChooserManager(Code code, GlobalConfig globalConfig) {
+  private Code code;
 
-    this.globalConfig = globalConfig;
+  public StFileChooserManager(Code code) {
+    this.code = code;
   }
-
-  private GlobalConfig globalConfig;
 
 }
