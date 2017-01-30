@@ -34,20 +34,13 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
   private OptionalProperty<ValidSpecification> validSpecification;
 
   /**
-   * TODO: Should we keep this constructor?
    * @param typeContext
    * @param ioVariables
    * @param freeVariableSet
    */
   public ConstraintSpecification(Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet) {
-    super();
-    this.typeContext = typeContext;
-    this.freeVariableSet = freeVariableSet;
-    this.codeIoVariables = ioVariables;
-    this.specIoVariables = new HashSet<>();
-    this.freeVariableSet = freeVariableSet;
-    this.problems = new SimpleObjectProperty<List<SpecProblem>>();
-    this.validSpecification = new OptionalProperty<>(new SimpleObjectProperty<>());
+    this(new HashMap<String, SpecificationColumn<ConstraintCell>>(), new HashMap<Integer,
+        ConstraintDuration>(), typeContext, ioVariables, freeVariableSet);
   }
 
   /**
