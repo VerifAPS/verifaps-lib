@@ -1,10 +1,9 @@
 package edu.kit.iti.formal.stvs.model.code;
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration;
-import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
-import edu.kit.iti.formal.automation.st.ast.TypeDeclarations;
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
+import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
@@ -12,8 +11,12 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Token;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Created by philipp on 09.01.17.
@@ -115,27 +118,41 @@ public class ParsedCode {
     this.definedTypes = definedTypes;
   }
 
-  public static ParsedCode parseCode(String input) {
-
+  public static void parseCode(String input,
+                               Consumer<List<? extends Token>> tokenListener,
+                               Consumer<ParsedCode> parsedCodeListener) {
     try {
+      IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(input));
+      tokenListener.accept(lexer.getAllTokens());
+      lexer.reset();
+
+      IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
+      TopLevelElements ast = new TopLevelElements(parser.start().ast);
+
+      // Find types in parsed code
       TypeDeclarationVisitor typeVisitor = new TypeDeclarationVisitor();
-      IEC61131Facade.file(input).visit(typeVisitor);
-
-      Set<Type> definedTypes = typeVisitor.getDefinedTypes();
+      ast.visit(typeVisitor);
       Map<String, Type> definedTypesByName = new HashMap<>();
-      definedTypes.forEach(type -> definedTypesByName.put(type.getTypeName(), type));
+      typeVisitor.getDefinedTypes().forEach(type -> definedTypesByName.put(type.getTypeName(), type));
 
+      // Find IoVariables in parsed code
       VariableVisitor variableVisitor = new VariableVisitor(definedTypesByName);
-      IEC61131Facade.file(input).visit(variableVisitor);
+      ast.visit(variableVisitor);
 
+      // Find code blocks in parsed code
       BlockVisitor blockVisitor = new BlockVisitor();
-      IEC61131Facade.file(input).visit(blockVisitor);
-      List<FoldableCodeBlock> foldableCodeBlocks;
-      foldableCodeBlocks = blockVisitor.getFoldableCodeBlocks();
+      ast.visit(blockVisitor);
+      List<FoldableCodeBlock> foldableCodeBlocks = blockVisitor.getFoldableCodeBlocks();
 
-      return new ParsedCode(foldableCodeBlocks, variableVisitor.getDefinedVariables(), typeVisitor.getDefinedTypes());
+      parsedCodeListener.accept(
+          new ParsedCode(
+              foldableCodeBlocks,
+              variableVisitor.getDefinedVariables(),
+              typeVisitor.getDefinedTypes())
+      );
+      // GOTTA CATCH 'EM ALL! *sings*
     } catch (Exception exception) {
-      return null;
+      exception.printStackTrace();
     }
 
   }

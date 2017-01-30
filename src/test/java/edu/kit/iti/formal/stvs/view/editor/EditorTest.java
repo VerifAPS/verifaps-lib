@@ -40,8 +40,9 @@ public class EditorTest {
     final TextArea textArea = new TextArea();
     //textArea.setEditable(false);
 
-    updateText(textArea, code.parsedCodeProperty().get());
-    code.parsedCodeProperty().addListener((ob, old, parsedCode) -> updateText(textArea, parsedCode));
+    updateText(textArea, code.getParsedCode());
+    // TODO: FIX THIS SHIT
+    //code.parsedCodeProperty().addListener((ob, old, parsedCode) -> updateText(textArea, parsedCode));
 
     return new StackPane(textArea);
   }
