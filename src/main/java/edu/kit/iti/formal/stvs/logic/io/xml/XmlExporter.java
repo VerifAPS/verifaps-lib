@@ -17,13 +17,14 @@ import java.io.StringWriter;
  * @author Benjamin Alt
  */
 public abstract class XmlExporter<F> implements Exporter<F> {
+
   public OutputStream export(F source) throws ExportException {
     Node xmlNode = exportToXmlNode(source);
     StringWriter writer = new StringWriter();
     try {
-      Transformer t = TransformerFactory.newInstance().newTransformer();
-      t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-      t.transform(new DOMSource(xmlNode), new StreamResult(writer));
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+      transformer.transform(new DOMSource(xmlNode), new StreamResult(writer));
       String xmlString = writer.toString();
       ByteArrayOutputStream stream = new ByteArrayOutputStream();
       stream.write(xmlString.getBytes());
