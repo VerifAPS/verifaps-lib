@@ -1,9 +1,15 @@
 package edu.kit.iti.formal.stvs.model.config;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Contains global configuration specified by the user
  */
 public class GlobalConfig {
+
+  private List<String> validLanguages = Arrays.asList("EN");
+
   private int verificationTimeout;
   private int simulationTimeout;
   private int windowHeight;
@@ -11,23 +17,20 @@ public class GlobalConfig {
   private int editorFontSize;
   private String editorFontFamily;
   private boolean showLineNumbers;
-  private int numberOfMementos;
   private String uiLanguage;
 
   /**
    * Default configuration
    */
   public GlobalConfig() {
-
-  }
-
-  /**
-   * Copy constructor
-   *
-   * @param conf The config to copy
-   */
-  public GlobalConfig(GlobalConfig conf) {
-
+    verificationTimeout = 3600;
+    simulationTimeout = 60;
+    windowHeight = 600;
+    windowWidth = 800;
+    editorFontSize = 12;
+    editorFontFamily = "Courier";
+    showLineNumbers = true;
+    uiLanguage = "EN";
   }
 
   /**
@@ -90,6 +93,9 @@ public class GlobalConfig {
    * @param verificationTimeout The verification timeout to set
    */
   public void setVerificationTimeout(int verificationTimeout) {
+    if (verificationTimeout <= 0) {
+      throw new IllegalArgumentException("Invalid verification timeout: " + verificationTimeout);
+    }
     this.verificationTimeout = verificationTimeout;
   }
 
@@ -99,6 +105,9 @@ public class GlobalConfig {
    * @param simulationTimeout The simulation timeout to set
    */
   public void setSimulationTimeout(int simulationTimeout) {
+    if (simulationTimeout <= 0) {
+      throw new IllegalArgumentException("Invalid simulation timeout: " + simulationTimeout);
+    }
     this.simulationTimeout = simulationTimeout;
   }
 
@@ -108,6 +117,9 @@ public class GlobalConfig {
    * @param editorFontSize The editor font size to set
    */
   public void setEditorFontSize(int editorFontSize) {
+    if (editorFontSize <= 0) {
+      throw new IllegalArgumentException("Invalid editor font size: " + editorFontSize);
+    }
     this.editorFontSize = editorFontSize;
   }
 
@@ -135,6 +147,9 @@ public class GlobalConfig {
    * @param uiLanguage
    */
   public void setUiLanguage(String uiLanguage) {
+    if (!validLanguages.contains(uiLanguage))  {
+      throw new IllegalArgumentException("Input language " + uiLanguage + " is not supported");
+    }
     this.uiLanguage = uiLanguage;
   }
 
@@ -143,6 +158,9 @@ public class GlobalConfig {
   }
 
   public void setWindowHeight(int windowHeight) {
+    if (windowHeight <= 0) {
+      throw new IllegalArgumentException("Illegal window height: " + windowHeight);
+    }
     this.windowHeight = windowHeight;
   }
 
@@ -151,14 +169,10 @@ public class GlobalConfig {
   }
 
   public void setWindowWidth(int windowWidth) {
+    if (windowWidth <= 0) {
+      throw new IllegalArgumentException("Illegal window width: " + windowWidth);
+    }
     this.windowWidth = windowWidth;
   }
 
-  public int getNumberOfMementos() {
-    return numberOfMementos;
-  }
-
-  public void setNumberOfMementos(int numberOfMementos) {
-    this.numberOfMementos = numberOfMementos;
-  }
 }

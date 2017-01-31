@@ -77,21 +77,9 @@ public class HybridSpecificationTest {
     hybridSpec.setCounterExample(counterexample);
   }
 
-  @Test
-  public void testGetConcreteValuesForConstraint() {
-    List<ConcreteCell> concreteCells = hybridSpec.getConcreteValuesForConstraint("VariableA", 1);
-    List<ConcreteCell> expectedCells = Arrays.asList(new ConcreteCell(new ValueInt(2)), new ConcreteCell(new ValueInt(4)));
-    assertEquals(expectedCells, concreteCells);
-  }
-
-  @Test
-  public void testGetConcreteDurationForRow() {
-    ConcreteDuration duration = hybridSpec.getConcreteDurationForRow(1);
-    assertEquals(new ConcreteDuration(1, 2), duration);
-  }
-
   /* TODO: Concretizer not implemented yet, so cannot really test the generation of concrete specs once a
-  valid spec is available. */
+  valid spec is available. This is more or less the only intelligent thing HybridSpecification
+  does */
 
   private void setValidSpecListener(ConstraintSpecification theSpec) {
     theSpec.validSpecificationProperty().addListener(new ChangeListener<ValidSpecification>() {
