@@ -8,10 +8,16 @@ import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
 import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
 import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
 import org.chocosolver.solver.Model;
+import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.expression.discrete.arithmetic.ArExpression;
+import org.chocosolver.solver.objective.ObjectiveStrategy;
+import org.chocosolver.solver.objective.OptimizationPolicy;
+import org.chocosolver.solver.search.strategy.Search;
+import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.util.ESat;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,6 +43,9 @@ public class ChocoModel {
   private Map<String, List<String>> orderedEnumTypes = new HashMap<>();
   private Map<String, TypeEnum> enumTypes = new HashMap<>();
 
+  public static int MAX_BOUND = 32767;
+  public static int MIN_BOUND = -32768;
+
   public ChocoModel(String name) {
     model = new Model(name);
   }
@@ -54,7 +63,7 @@ public class ChocoModel {
     if (ints.containsKey(name)) {
       return ints.get(name);
     }
-    IntVar integ = model.intVar(name, IntVar.MIN_INT_BOUND, IntVar.MAX_INT_BOUND);
+    IntVar integ = model.intVar(name, MIN_BOUND, MAX_BOUND);
     ints.put(name, integ);
     return integ;
   }
@@ -68,7 +77,7 @@ public class ChocoModel {
         type.getTypeName(), type.getValues().stream().map(ValueEnum::getEnumValue).collect(Collectors.toList())
     );
     enumTypes.put(name, type);
-    IntVar integ = model.intVar(name, IntVar.MIN_INT_BOUND, IntVar.MAX_INT_BOUND);
+    IntVar integ = model.intVar(name, MIN_BOUND, MAX_BOUND);
     enums.put(name, integ);
     //Add constraints to int to be in range of its mapped values
     integ.ge(0).post();
@@ -93,10 +102,31 @@ public class ChocoModel {
   }
 
   public Optional<Map<String, Value>> solve() {
+
+    model.clearObjective();
+
+    List<IntVar> intVars = Stream.of(bools, ints, enums).flatMap(
+        map -> map.values().stream()
+    ).collect(Collectors.toList());
+    //Sum of absolute values of all variables should be minimal to prevent high values
+    ArExpression sumOfAbsolutes = intVars.stream()
+        .map(ArExpression::abs)
+        .reduce(ArExpression::add)
+        .orElseThrow(() -> new IllegalStateException("Cold not build objective Expression"));
+    model.setObjective(Model.MINIMIZE, sumOfAbsolutes.intVar());
+
     model.getSolver().reset();
-    boolean solved = model.getSolver().solve();
-    if (solved) {
-      return Optional.of(buildSolution());
+    //Always choose the bound that minimizes the objective first
+    ObjectiveStrategy objectiveStrategy = new ObjectiveStrategy(sumOfAbsolutes.intVar(), OptimizationPolicy.DICHOTOMIC);
+    //AbstractStrategy strategy = Search.sequencer(Search.defaultSearch(model), objectiveStrategy);
+    model.getSolver().setSearch(objectiveStrategy, Search.defaultSearch(model));
+    //improves solution (if existent) in every iteration
+    Solution solution = new Solution(model);
+    while (model.getSolver().solve()) {
+      solution.record();
+    }
+    if (model.getSolver().isFeasible() == ESat.TRUE) {
+      return Optional.of(buildSolution(solution));
     } else {
       return Optional.empty();
     }
@@ -145,16 +175,16 @@ public class ChocoModel {
     return solve();
   }
 
-  private Map<String, Value> buildSolution() {
+  private Map<String, Value> buildSolution(Solution solution) {
     Map<String, ValueBool> boolMap = bools.entrySet().stream()
         .collect(Collectors.toMap(
             Map.Entry::getKey,
-            entry -> ValueBool.of(entry.getValue().getValue() == 1)
+            entry -> ValueBool.of(solution.getIntVal(entry.getValue()) == 1)
         ));
     Map<String, ValueInt> intMap = ints.entrySet().stream()
         .collect(Collectors.toMap(
             Map.Entry::getKey,
-            entry -> new ValueInt(entry.getValue().getValue())
+            entry -> new ValueInt(solution.getIntVal(entry.getValue()))
         ));
     Map<String, ValueEnum> enumMap = enums.entrySet().stream()
         .collect(Collectors.toMap(
@@ -163,16 +193,16 @@ public class ChocoModel {
               List<String> enumValues = orderedEnumTypes.get(
                   enumTypes.get(entry.getKey()).getTypeName()
               );
-              String enumValueString = enumValues.get(entry.getValue().getValue());
+              String enumValueString = enumValues.get(solution.getIntVal(entry.getValue()));
               TypeEnum type = enumTypes.get(entry.getKey());
               return new ValueEnum(enumValueString, type);
             }
         ));
-    Map<String, Value> solution = new HashMap<>();
-    solution.putAll(boolMap);
-    solution.putAll(intMap);
-    solution.putAll(enumMap);
-    return solution;
+    Map<String, Value> builtSolution = new HashMap<>();
+    builtSolution.putAll(boolMap);
+    builtSolution.putAll(intMap);
+    builtSolution.putAll(enumMap);
+    return builtSolution;
   }
 
   protected Map<String, BoolVar> getBools() {

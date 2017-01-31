@@ -6,7 +6,6 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
-import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
 import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
 import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
@@ -213,11 +212,11 @@ public class ChocoConvertExpressionVisitorTest {
         new ExpressionParser("Color", typeContext).parseExpression("=green"), //Color=green
         new ExpressionParser("Color2", typeContext).parseExpression("!=Color"), //Color2 is in {red, blue}
         new ExpressionParser("SomethingInt", typeContext).parseExpression("-"), //dontcare
-        new ExpressionParser("PrimeProduct", typeContext).parseExpression("=6858497,=Prime1*Prime2*Prime3"),//Product of primes: 439,919,17
-        new ExpressionParser("Prime1", typeContext).parseExpression("[2,200]"),//Prime1=17
-        new ExpressionParser("Prime2", typeContext).parseExpression("Prime2%17=14,>=2"),//Prime2=439
-        new ExpressionParser("Prime3", typeContext).parseExpression(">=2"),//Prime3=919
-        new ExpressionParser("was439Involved", typeContext).parseExpression("=(Prime1 = 439 OR Prime2 = 439 OR Prime3 = 439)")//was439Involved=true*/
+        new ExpressionParser("PrimeProduct", typeContext).parseExpression("=231,=Prime1*Prime2*Prime3"),//Product of primes: 439,919,17
+        new ExpressionParser("Prime1", typeContext).parseExpression("[2,5]"),//Prime1=3
+        new ExpressionParser("Prime2", typeContext).parseExpression("Prime2%8=7,>=2"),//Prime2=7
+        new ExpressionParser("Prime3", typeContext).parseExpression(">=2"),//Prime3=11
+        new ExpressionParser("was11Involved", typeContext).parseExpression("=(Prime1 = 11 OR Prime2 = 11 OR Prime3 = 11)")//was11Involved=true*/
     ).collect(Collectors.toList());
 
     Map<String, Type> columnTypeContext = new HashMap<>();
@@ -229,7 +228,7 @@ public class ChocoConvertExpressionVisitorTest {
     columnTypeContext.put("Prime1", TypeInt.INT);
     columnTypeContext.put("Prime2", TypeInt.INT);
     columnTypeContext.put("Prime3", TypeInt.INT);
-    columnTypeContext.put("was439Involved", TypeBool.BOOL);
+    columnTypeContext.put("was11Involved", TypeBool.BOOL);
     ChocoConvertExpressionVisitor chocoConvertExpressionVisitor = new ChocoConvertExpressionVisitor(columnTypeContext);
     columns.forEach(columnExpression -> columnExpression.takeVisitor(chocoConvertExpressionVisitor).postIfConstraint());
     ChocoModel model = chocoConvertExpressionVisitor.getModel();
@@ -240,11 +239,11 @@ public class ChocoConvertExpressionVisitorTest {
     assertEquals("green", getEnum(solution.get().get("Color")).getEnumValue());
     assertNotEquals("green", getEnum(solution.get().get("Color2")).getEnumValue());
     assertNotNull(solution.get().get("SomethingInt"));
-    assertEquals(6858497, getInt(solution.get().get("PrimeProduct")));
-    assertEquals(17, getInt(solution.get().get("Prime1")));
-    assertEquals(439, getInt(solution.get().get("Prime2")));
-    assertEquals(919, getInt(solution.get().get("Prime3")));
-    assertTrue(getBool(solution.get().get("was439Involved")));
+    assertEquals(231, getInt(solution.get().get("PrimeProduct")));
+    assertEquals(3, getInt(solution.get().get("Prime1")));
+    assertEquals(7, getInt(solution.get().get("Prime2")));
+    assertEquals(11, getInt(solution.get().get("Prime3")));
+    assertTrue(getBool(solution.get().get("was11Involved")));
   }
 
   private void assertSimpleIntSolved(String expression, int value) throws UnsupportedExpressionException, ParseException {

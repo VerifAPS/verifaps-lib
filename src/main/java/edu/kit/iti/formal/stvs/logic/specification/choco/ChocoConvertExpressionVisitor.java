@@ -6,10 +6,13 @@ import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.UnaryFunctionExpr;
 import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
-import org.chocosolver.solver.constraints.Constraint;
+import org.chocosolver.solver.constraints.extension.TuplesFactory;
+import org.chocosolver.solver.expression.discrete.arithmetic.ArExpression;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.util.tools.MathUtils;
 import org.chocosolver.util.tools.VariableUtils;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -45,105 +48,101 @@ public class ChocoConvertExpressionVisitor implements ExpressionVisitor<ChocoExp
   @Override
   public ChocoExpressionWrapper visitBinaryFunction(BinaryFunctionExpr binaryFunctionExpr) {
     ChocoExpressionWrapper left = binaryFunctionExpr.getFirstArgument().takeVisitor(ChocoConvertExpressionVisitor.this);
-    System.out.println(left);
     ChocoExpressionWrapper right = binaryFunctionExpr.getSecondArgument().takeVisitor(ChocoConvertExpressionVisitor.this);
+    ArExpression leftAr = left.convertToArithmetic();
+    ArExpression rightAr = right.convertToArithmetic();
+    IntVar result;
     switch (binaryFunctionExpr.getOperation()) {
       case AND:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.add(right.convertToArithmetic()).eq(2))
-        );
+        return new ChocoExpressionWrapper(leftAr.add(rightAr).eq(2));
       case OR:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.add(right.convertToArithmetic()).gt(0))
-        );
+        return new ChocoExpressionWrapper(leftAr.add(rightAr).gt(0));
       case XOR:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.add(right.convertToArithmetic()).eq(1))
-        );
+        return new ChocoExpressionWrapper(leftAr.add(rightAr).eq(1));
       case GREATER_THAN:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.gt(right.convertToArithmetic()))
-        );
+        return new ChocoExpressionWrapper(leftAr.gt(rightAr));
       case GREATER_EQUALS:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.ge(right.convertToArithmetic()))
-        );
+        return new ChocoExpressionWrapper(leftAr.ge(rightAr));
       case LESS_THAN:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.lt(right.convertToArithmetic()))
-        );
+        return new ChocoExpressionWrapper(leftAr.lt(rightAr));
       case LESS_EQUALS:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.le(right.convertToArithmetic()))
-        );
+        return new ChocoExpressionWrapper(leftAr.le(rightAr));
       case EQUALS:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.eq(right.convertToArithmetic()))
-        );
+        return new ChocoExpressionWrapper(leftAr.eq(rightAr));
       case NOT_EQUALS:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.ne(right.convertToArithmetic()))
-        );
+        return new ChocoExpressionWrapper(leftAr.ne(rightAr));
       case PLUS:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.add(right.convertToArithmetic()))
-        );
+        int[] boundsForAddition = VariableUtils.boundsForAddition(leftAr.intVar(), rightAr.intVar());
+        boundsForAddition = preventOverflowBounds(boundsForAddition);
+        result = leftAr.getModel().intVar(boundsForAddition[0], boundsForAddition[1]);
+        leftAr.getModel().arithm(leftAr.intVar(), "+", rightAr.intVar(), "=", result).post();
+        return new ChocoExpressionWrapper(result);
       case MINUS:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.sub(right.convertToArithmetic()))
-        );
+        int[] boundsForSubtraction = VariableUtils.boundsForSubstraction(leftAr.intVar(), rightAr.intVar());
+        boundsForSubtraction = preventOverflowBounds(boundsForSubtraction);
+        result = leftAr.getModel().intVar(boundsForSubtraction[0], boundsForSubtraction[1]);
+        leftAr.getModel().arithm(leftAr.intVar(), "-", rightAr.intVar(), "=", result).post();
+        return new ChocoExpressionWrapper(result);
       case MULTIPLICATION:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.mul(right.convertToArithmetic()))
-        );
+        int[] boundsForMultiplication = VariableUtils.boundsForMultiplication(leftAr.intVar(), rightAr.intVar());
+        boundsForMultiplication = preventOverflowBounds(boundsForMultiplication);
+        result = leftAr.getModel().intVar(boundsForMultiplication[0], boundsForMultiplication[1]);
+        leftAr.getModel().times(leftAr.intVar(), rightAr.intVar(), result).post();
+        return new ChocoExpressionWrapper(result);
       case DIVISION:
-        return left.autoArithmetic(arExpression -> {
-              //return new ChocoExpressionWrapper(arExpression.div(right.convertToArithmetic()));
-              /*
-                Chocos domain bounds calculation is flawed.
-                A new temporary variable for the result
-                is introduced with the bounds defined in VariableUtils.boundsForDivision()
-                if the right domain does not include elements of different signs.
-                Otherwise [-A,A] with A=max(abs(leftLowerLimit),abs(leftUpperLimit))
-               */
-              IntVar rightAr = right.convertToArithmetic().intVar();
-              IntVar leftAr = arExpression.intVar();
-              int[] bounds;
-              if (rightAr.contains(-1) && rightAr.contains(1)) {
-                bounds = VariableUtils.boundsForDivision(leftAr, rightAr);
-              }
-              else{
-                int maxDistanceToZero = Math.max(Math.abs(leftAr.getLB()), Math.abs(leftAr.getUB()));
-                bounds = new int[]{-maxDistanceToZero, maxDistanceToZero};
-              }
-              IntVar result = arExpression.getModel().intVar(bounds[0], bounds[1]);
-              Constraint constraint = arExpression.getModel().div(leftAr, right.convertToArithmetic().intVar(), result);
-              constraint.post();
-              return new ChocoExpressionWrapper(result);
-            }
-        );
+        //return new ChocoExpressionWrapper(arExpression.div(right.convertToArithmetic()));
+        /*
+          Chocos domain bounds calculation is flawed.
+          A new temporary variable for the result
+          is introduced with the bounds defined in VariableUtils.boundsForDivision()
+          if the right domain does not include elements of different signs.
+          Otherwise [-A,A] with A=max(abs(leftLowerLimit),abs(leftUpperLimit))
+         */
+        int[] bounds;
+        if (rightAr.intVar().contains(-1) && rightAr.intVar().contains(1)) {
+          bounds = VariableUtils.boundsForDivision(leftAr.intVar(), rightAr.intVar());
+        } else {
+          int maxDistanceToZero = Math.max(Math.abs(leftAr.intVar().getLB()), Math.abs(leftAr.intVar().getUB()));
+          bounds = new int[]{-maxDistanceToZero, maxDistanceToZero};
+        }
+        result = leftAr.getModel().intVar(bounds[0], bounds[1]);
+        leftAr.getModel().div(leftAr.intVar(), rightAr.intVar(), result).post();
+        return new ChocoExpressionWrapper(result);
       case MODULO:
-        return left.autoArithmetic(arExpression -> {
-              //new ChocoExpressionWrapper(arExpression.mod(right.convertToArithmetic()))
-              /*
-                Chocos domain bounds calculation is flawed.
-                A new temporary variable for the result
-                is introduced with the bounds [0, upperLimit of right expression]
-                TODO: Check if ST allows negative results for modulo operations like Java(Script)
-               */
-              IntVar rightAr = right.convertToArithmetic().intVar();
-              IntVar result = arExpression.getModel().intVar(0, rightAr.getUB());
-              Constraint constraint = arExpression.getModel().mod(arExpression.intVar(), rightAr, result);
-              constraint.post();
-              return new ChocoExpressionWrapper(result);
-            }
-        );
+        //new ChocoExpressionWrapper(arExpression.mod(right.convertToArithmetic()))
+        /*
+          Chocos domain bounds calculation is flawed.
+          A new temporary variable for the result
+          is introduced with the bounds [0, upperLimit of right expression]
+          TODO: Check if ST allows negative results for modulo operations like Java(Script)
+         */
+        result = leftAr.getModel().intVar(0, rightAr.intVar().getUB());
+        leftAr.getModel().mod(leftAr.intVar(), rightAr.intVar(), result).post();
+        return new ChocoExpressionWrapper(result);
+      //TODO: Test
       case POWER:
-        return left.autoArithmetic(arExpression ->
-            new ChocoExpressionWrapper(arExpression.pow(right.convertToArithmetic()))
-        );
+        int[] boundsForPower = VariableUtils.boundsForPow(leftAr.intVar(), rightAr.intVar());
+        boundsForPower = preventOverflowBounds(boundsForPower);
+        result = leftAr.getModel().intVar(boundsForPower[0], boundsForPower[1]);
+
+        //The following 3 lines are copied from BiArArxpression (Choco) und untested
+        leftAr.getModel().table(new IntVar[]{rightAr.intVar(), leftAr.intVar(), result},
+            TuplesFactory.generateTuples(vs -> vs[2] == MathUtils.pow(vs[0], vs[1]),
+                true, rightAr.intVar(), leftAr.intVar(), result)).post();
+        return new ChocoExpressionWrapper(result);
     }
-    throw new IllegalArgumentException("Operation not implemented: " + binaryFunctionExpr.getOperation().name());
+    throw new
+
+        IllegalArgumentException("Operation not implemented: " + binaryFunctionExpr.getOperation().
+
+        name());
+  }
+
+  private int[] preventOverflowBounds(int[] bounds) {
+    return Arrays.stream(bounds)
+        .map(bound -> Math.min(bound, ChocoModel.MAX_BOUND))
+        .map(bound -> Math.max(bound, ChocoModel.MIN_BOUND))
+        .toArray();
   }
 
   @Override
