@@ -73,10 +73,11 @@ public class ConstraintSpecificationTest {
 
   @Test
   public void testAddEmptyColumn() {
-    SpecIoVariable variable = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableD");
+    SpecIoVariable variable = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableE");
     spec.addEmptyColumn(variable);
     SpecificationColumn<ConstraintCell> expectedColumn =  new SpecificationColumn<>(variable, new ArrayList<>(), new ColumnConfig());
-    assertEquals(expectedColumn, spec.getColumn("VariableD"));
+    assertEquals(expectedColumn, spec.getColumn("VariableE"));
+    assertEquals(0, spec.getColumn("VariableE").getNumberOfCells());
   }
 
   /**
