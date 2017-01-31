@@ -1,11 +1,9 @@
-package edu.kit.iti.formal.stvs.view.editor;
+package edu.kit.iti.formal.stvs.view;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-import java.util.Collections;
 import java.util.function.Supplier;
 
 /**

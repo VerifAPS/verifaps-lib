@@ -13,6 +13,7 @@ import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.ObjectBinding;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
@@ -32,7 +33,7 @@ public class Code {
   private StringProperty filename;
   private List<RecognitionException> syntaxErrors;
   private StringProperty sourceCodeProperty;
-  private ParsedCode parsedCode;
+  private NullableProperty<ParsedCode> parsedCode;
   private List<? extends Token> tokens;
 
   /**
@@ -45,6 +46,7 @@ public class Code {
   public Code(String filename, String sourcecode) {
     this.filename = new SimpleStringProperty(filename);
     this.sourceCodeProperty = new SimpleStringProperty(sourcecode);
+    this.parsedCode = new NullableProperty<>();
 
     invalidate();
   }
@@ -52,7 +54,7 @@ public class Code {
   private void invalidate() {
     ParsedCode.parseCode(sourceCodeProperty.get(),
         tokens -> this.tokens = tokens,
-        parsedCode -> this.parsedCode = parsedCode);
+        parsedCode -> this.parsedCode.set(parsedCode));
   }
 
   public void updateSourcecode(String sourcecode) {
@@ -69,6 +71,10 @@ public class Code {
   }
 
   public ParsedCode getParsedCode() {
+    return parsedCode.get();
+  }
+
+  public NullableProperty<ParsedCode> parsedCodeProperty() {
     return parsedCode;
   }
 
