@@ -23,7 +23,7 @@ import java.net.URISyntaxException;
  * @author Benjamin Alt
  */
 public abstract class XmlImporter<T> implements Importer<T> {
-  private final String INPUT_ENCODING = "utf8";
+  private static final String INPUT_ENCODING = "utf8";
 
   private void validateAgainstXSD(InputStream xml) throws SAXException, IOException, URISyntaxException {
     SchemaFactory factory =

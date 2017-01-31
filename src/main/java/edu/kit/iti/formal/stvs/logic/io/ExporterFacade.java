@@ -5,6 +5,8 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 
+import java.io.OutputStream;
+
 /**
  * Facade class for facilitating the export of different objects to different export formats.
  * @author Benjamin Alt
@@ -16,20 +18,20 @@ public class ExporterFacade {
     GETETA
   }
 
-  public static void exportSpec(ConstraintSpecification spec, ExportFormat format) {
-
+  public static OutputStream exportSpec(ConstraintSpecification spec, ExportFormat format) {
+    return null;
   }
 
-  public static void exportConfig(GlobalConfig config, ExportFormat format) {
-
+  public static OutputStream exportConfig(GlobalConfig config, ExportFormat format) {
+    return null;
   }
 
-  public static void exportSession(StvsRootModel session, ExportFormat format) {
-
+  public static OutputStream exportSession(StvsRootModel session, ExportFormat format) {
+    return null;
   }
 
-  public static void exportVerificationScenario(VerificationScenario scenario,
+  public static OutputStream exportVerificationScenario(VerificationScenario scenario,
                                                 ExportFormat format) {
-
+    return null;
   }
 }
