@@ -1,14 +1,7 @@
 package edu.kit.iti.formal.stvs.model.code;
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
-import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
-
-import java.util.Observable;
-import java.util.function.Consumer;
-import java.util.List;
-
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
-import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.SimpleStringProperty;
@@ -17,6 +10,9 @@ import javafx.beans.value.ObservableValue;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
+
+import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -71,6 +67,10 @@ public class Code {
     };
   }
 
+  public void invalidate() {
+
+  }
+
   public List<? extends Token> computeTokens(String sourcecode) {
     IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(sourcecode));
     return lexer.getAllTokens();
@@ -86,5 +86,9 @@ public class Code {
 
   public NullableProperty<ParsedCode> parsedCodeProperty() {
     return parsedCode;
+  }
+
+  public Optional<ParsedCode> computeParsedCode(String sourcecode) {
+    return null;
   }
 }

@@ -11,19 +11,17 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import org.antlr.v4.runtime.Token;
 import org.apache.commons.io.IOUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static edu.kit.iti.formal.stvs.model.TestUtils.assertCollectionsEqual;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static edu.kit.iti.formal.stvs.model.TestUtils.assertCollectionsEqual;
 
 /**
  * Created by Philipp on 19.01.2017.

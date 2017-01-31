@@ -38,7 +38,7 @@ public class EditorTest {
 
   private Pane createExtractedVarsTextArea(Code code) {
     final TextArea textArea = new TextArea();
-    //textArea.setEditable(false);
+    textArea.setEditable(false);
 
     updateText(textArea, code.parsedCodeProperty().get());
     code.parsedCodeProperty().addListener((ob, old, parsedCode) -> updateText(textArea, parsedCode));
@@ -47,6 +47,7 @@ public class EditorTest {
   }
 
   private void updateText(TextArea textArea, ParsedCode parsedCode) {
+    System.out.println(parsedCode);
     if (parsedCode != null) {
       StringBuilder output = new StringBuilder();
       output.append("Defined types:\n");

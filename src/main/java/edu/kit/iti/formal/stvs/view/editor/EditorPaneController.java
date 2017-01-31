@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.view.editor;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.code.FoldableCodeBlock;
+import edu.kit.iti.formal.stvs.model.code.ParsedCode;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.concurrent.Task;
@@ -76,6 +77,7 @@ public class EditorPaneController implements Controller {
 
   private StyleSpans<Collection<String>> computeHighlighting(String sourcecode) {
     List<? extends Token> tokens = code.computeTokens(sourcecode);
+    List<SyntaxError> syntaxErrors = code.getSyntaxErrors(sourcecode);
 
     StyleSpansBuilder<Collection<String>> spansBuilder
         = new StyleSpansBuilder<>();

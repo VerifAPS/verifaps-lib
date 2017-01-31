@@ -135,6 +135,7 @@ public class ParsedCode {
 
       return new ParsedCode(foldableCodeBlocks, variableVisitor.getDefinedVariables(), typeVisitor.getDefinedTypes());
     } catch (Exception exception) {
+      exception.printStackTrace();
       return null;
     }
 
