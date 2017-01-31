@@ -47,6 +47,10 @@ public class VariableView extends HBox {
     return typeComboBox;
   }
 
+  public Button getRemoveButton() {
+    return removeButton;
+  }
+
   private class TypeListCell extends ListCell<Type> {
     TypeListCell() {
       getStyleClass().addAll("freevar", "type-combo-box-cell");

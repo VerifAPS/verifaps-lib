@@ -16,6 +16,7 @@ public class VariableCollectionController implements Controller {
   private ObservableList<Type> codeTypes;
   private FreeVariableSet freeVariableSet;
   private VariableCollection view;
+
   private ContextMenu contextMenu;
 
   public VariableCollectionController(ObservableList<Type> codeTypes, FreeVariableSet freeVariableSet) {
@@ -37,6 +38,10 @@ public class VariableCollectionController implements Controller {
 
   private void addVariableToView(FreeVariable freeVariable) {
     VariableController varController = new VariableController(codeTypes, freeVariable);
+    varController.getView().getRemoveButton().setOnAction(event -> {
+      view.removeVariableView(varController.getView());
+      freeVariableSet.getVariableSet().remove(freeVariable);
+    });
     view.addVariableView(varController.getView());
   }
 
@@ -65,4 +70,9 @@ public class VariableCollectionController implements Controller {
   public VariableCollection getView() {
     return view;
   }
+
+  public FreeVariableSet getFreeVariableSet() {
+    return freeVariableSet;
+  }
+
 }

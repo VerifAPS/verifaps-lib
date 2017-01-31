@@ -31,4 +31,7 @@ public class VariableCollection extends VBox {
     return addFreeVariable;
   }
 
+  public void removeVariableView(Node view) {
+    this.getChildren().removeAll(view);
+  }
 }

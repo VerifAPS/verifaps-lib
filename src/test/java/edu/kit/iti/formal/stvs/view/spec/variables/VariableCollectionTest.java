@@ -9,7 +9,9 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
@@ -17,6 +19,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,38 +29,31 @@ public class VariableCollectionTest {
 
   @Test
   public void testVariableView() {
-    JavaFxTest.runView(this::variableViewScene);
+    JavaFxTest.runSplitView(this::variableViewScene);
   }
 
-  private Scene variableViewScene() {
+  private List<Node> variableViewScene() {
     ObservableList<Type> types = FXCollections.observableArrayList(TypeInt.INT, TypeBool.BOOL);
     ObservableList<FreeVariable> vars = FXCollections.observableArrayList();
     FreeVariableSet set = new FreeVariableSet(vars);
 
     VariableCollectionController controller = new VariableCollectionController(types, set);
-    Scene scene = new Scene(controller.getView(), 600, 400);
-    return scene;
+
+    Pane rightPane = createExtractedVarsTextArea(controller);
+
+    return Arrays.asList(controller.getView(), rightPane);
   }
 
-
-/*
-  Pane rightPane = createExtractedVarsTextArea(code);
-
-  SplitPane pane = new SplitPane();
-    pane.getItems().addAll(controller.getView(), rightPane);
-
-  Scene scene = new Scene(pane, 800, 600);
-    scene.getStylesheets().add(this.getClass().getResource("style.css").toExternalForm());
-    return scene;
-}
-  private Pane createExtractedVarsTextArea(Code code) {
+  private Pane createExtractedVarsTextArea(VariableCollectionController controller) {
     final TextArea textArea = new TextArea();
     textArea.getStyleClass().addAll("model-text-area");
     textArea.setEditable(false);
 
-    updateText(textArea, code.getParsedCode());
-    code.parsedCodeProperty().addListener((ob, old, parsedCode) ->
-        updateText(textArea, parsedCode));
+    FreeVariableSet set = controller.getFreeVariableSet();
+
+    updateText(textArea, set.getVariableSet());
+    set.getVariableSet().addListener((ListChangeListener<? super FreeVariable>) c ->
+        updateText(textArea, set.getVariableSet()));
 
     return new StackPane(textArea);
   }
@@ -70,5 +66,4 @@ public class VariableCollectionTest {
       textArea.setText(output.toString());
     }
   }
-*/
 }
