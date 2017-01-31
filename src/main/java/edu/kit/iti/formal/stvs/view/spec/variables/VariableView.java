@@ -25,7 +25,6 @@ public class VariableView extends HBox {
 
     getStylesheets().add(VariableView.class.getResource("style.css").toExternalForm());
 
-    // TODO: WHY DOESNT IT APPLY THE CSS ON THE FIELD AND LABEL ANYMORE??!??!?
     varNameField.getStyleClass().addAll("freevar", "name-field");
     hasTypeLabel.getStyleClass().addAll("freevar", "typeof-label");
     typeComboBox.getStyleClass().addAll("freevar", "type-combo-box");
