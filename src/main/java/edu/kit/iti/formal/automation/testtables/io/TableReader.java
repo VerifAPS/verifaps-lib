@@ -151,6 +151,11 @@ public class TableReader {
                 gtt.add(v);
             }
         }
+
+        gtt.getIoVariables().forEach((k, v) -> {
+            if (v.getDataType() == null || v.getName() == null || v.getName().isEmpty() || v.getIo() == null || v.getIo().isEmpty())
+                throw new IllegalArgumentException("variable " + v.getName() + " is bad");
+        });
     }
 
     public GeneralizedTestTable getProduct() {

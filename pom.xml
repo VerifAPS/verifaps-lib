@@ -15,7 +15,7 @@
     <repositories>
         <repository>
             <id>institute</id>
-            <url>http://formal.iti.kit.edu/</url>
+            <url>http://formal.iti.kit.edu/maven</url>
         </repository>
     </repositories>
 
@@ -54,10 +54,20 @@
         <dependency>
             <groupId>edu.kit.iti.formal</groupId>
             <artifactId>smv-model</artifactId>
-            <version>0.1.1</version>
+            <version>0.1.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.choco-solver</groupId>
+            <artifactId>choco-solver</artifactId>
+            <version>4.0.2</version>
+        </dependency>
 
+        <dependency>
+            <groupId>org.sosy-lab</groupId>
+            <artifactId>java-smt</artifactId>
+            <version>1.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -132,7 +142,8 @@
                         </goals>
                         <configuration>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>edu.kit.iti.formal.automation.testtables.ExTeTa</mainClass>
                                 </transformer>
                             </transformers>

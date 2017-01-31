@@ -88,6 +88,7 @@ public final class IOFacade {
     }
 
     public static SVariable asSMVVariable(Variable column) {
+        if(column==null) return null;
         SVariable v = new SVariable(column.getName(),
                 getSMVDataType(column.getDataType()));
         return v;

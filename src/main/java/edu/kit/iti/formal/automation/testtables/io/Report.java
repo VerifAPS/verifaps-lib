@@ -65,6 +65,7 @@ public class Report {
 
     public static void fatal(String msg, Object... args) {
         print("fatal", msg, args);
+        setErrorLevel("fatal-error");
     }
 
     public static void abort() {

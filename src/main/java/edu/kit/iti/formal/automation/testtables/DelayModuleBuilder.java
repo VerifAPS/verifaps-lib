@@ -26,8 +26,9 @@ import edu.kit.iti.formal.smv.ast.*;
 
 /**
  * created on 15.12.16
+ *
  * @author Alexander Weigl
- * @version  1
+ * @version 1
  */
 public class DelayModuleBuilder implements Runnable {
     private final int historyLength;
@@ -37,11 +38,16 @@ public class DelayModuleBuilder implements Runnable {
     private SMVModuleImpl module = new SMVModuleImpl();
 
     public DelayModuleBuilder(SVariable var, int cycles) {
+
         historyLength = Math.abs(cycles);
         assert historyLength > 0;
         datatype = var.getDatatype();
         variable = var;
         module.setName(String.format("History_%d_of_%s", historyLength, var.getName()));
+
+        if (datatype == null)
+            throw new IllegalArgumentException("No datatype given");
+
     }
 
     @Override
@@ -51,8 +57,8 @@ public class DelayModuleBuilder implements Runnable {
         module.getModuleParameter().add(mp);
 
         // state variables
-        SVariable[] vars = new SVariable[historyLength+1];
-        vars[0]=mp;
+        SVariable[] vars = new SVariable[historyLength + 1];
+        vars[0] = mp;
         for (int i = 1; i <= historyLength; i++) {
             SVariable v = new SVariable("_$" + i, datatype);
             vars[i] = v;

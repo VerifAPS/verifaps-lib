@@ -81,13 +81,17 @@ public class GeneralizedTestTable {
 
     public SVariable getSMVVariable(String text) {
         variableMap.computeIfAbsent(text,
-                (k) -> IOFacade.asSMVVariable(getVariable(text)));
+                (k) -> IOFacade.asSMVVariable(getVariable(k)));
         return variableMap.get(text);
     }
 
     private Variable getVariable(String text) {
         IoVariable a = ioVariables.get(text);
         ConstraintVariable b = constraintVariables.get(text);
+
+        if(a!=null && b!=null)
+            throw new IllegalStateException("constraint and io variable have the same name.");
+
         if (a != null)
             return a;
         else
@@ -133,8 +137,7 @@ public class GeneralizedTestTable {
         return references;
     }
 
-    public SMVExpr getReference(String text, int i) {
-        SVariable columnVariable = getSMVVariable(text);
+    public SMVExpr getReference(SVariable columnVariable, int i) {
         if (i == 0) {
             return columnVariable;
         } else {

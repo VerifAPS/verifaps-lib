@@ -25,9 +25,12 @@ package edu.kit.iti.formal.automation.testtables;
 import edu.kit.iti.formal.automation.SymbExFacade;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.testtables.builder.TableTransformation;
+import edu.kit.iti.formal.automation.testtables.concretizer.ConcretizerFacade;
 import edu.kit.iti.formal.automation.testtables.exception.GetetaException;
+import edu.kit.iti.formal.automation.testtables.exception.IllegalExpressionException;
 import edu.kit.iti.formal.automation.testtables.io.Report;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
+import edu.kit.iti.formal.automation.testtables.model.options.Mode;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -53,8 +56,11 @@ public class ExTeTa {
         } catch (IOException e) {
             Report.fatal("IOExcepton: %s", e.getMessage());
         } catch (GetetaException e) {
-            Report.fatal("Internal error: %s", e.getMessage());
+            Report.fatal("%s: %s", e.getClass().getSimpleName(),
+                    e.getMessage());
+
         }
+
     }
 
     public static void run(CommandLine cli)
@@ -79,19 +85,50 @@ public class ExTeTa {
         GeneralizedTestTable table = Facade.readTable(tableFilename);
         TopLevelElements code = Facade.readProgram(codeFilename);
 
-        TableTransformation tt = new TableTransformation(table);
-        SMVModule modTable = tt.transform();
-        SMVModule modCode = SymbExFacade.evaluateProgram(code);
-        SMVModule mainModule = Facade.glue(modTable, modCode, table.getOptions());
 
-        List<SMVModule> modules = new LinkedList<>();
-        modules.add(mainModule);
-        modules.add(modTable);
-        modules.add(modCode);
-        modules.addAll(tt.getHelperModules());
+        switch (cli.getOptionValue('m')) {
+            case "concrete-smt":
+                table.getOptions().setMode(Mode.CONCRETE_TABLE_SMT);
+                break;
+            case "concrete-choco":
+                table.getOptions().setMode(Mode.CONCRETE_TABLE_CHOCO);
+                break;
+            case "concrete-smv":
+                table.getOptions().setMode(Mode.CONCRETE_TABLE);
+                break;
+            case "conformance":
+                table.getOptions().setMode(Mode.CONFORMANCE);
+                break;
+            case "input-seq-exists":
+                table.getOptions().setMode(Mode.INPUT_SEQUENCE_EXISTS);
+                break;
+        }
 
 
-        boolean b = Facade.runNuXMV(tableFilename,modules);
+        //
+        switch (table.getOptions().getMode()) {
+            case CONCRETE_TABLE:
+            case CONFORMANCE:
+            case INPUT_SEQUENCE_EXISTS:
+                TableTransformation tt = new TableTransformation(table);
+                SMVModule modTable = tt.transform();
+                SMVModule modCode = SymbExFacade.evaluateProgram(code);
+                SMVModule mainModule = Facade.glue(modTable, modCode, table.getOptions());
+
+                List<SMVModule> modules = new LinkedList<>();
+                modules.add(mainModule);
+                modules.add(modTable);
+                modules.add(modCode);
+                modules.addAll(tt.getHelperModules());
+                boolean b = Facade.runNuXMV(tableFilename, modules);
+                break;
+            case CONCRETE_TABLE_SMT:
+                ConcretizerFacade.concretizeWithSMT(table);
+                break;
+            case CONCRETE_TABLE_CHOCO:
+                ConcretizerFacade.concretizeWithChoco(table);
+                break;
+        }
     }
 
     private static CommandLine parse(String[] args) throws ParseException {
@@ -102,6 +139,7 @@ public class ExTeTa {
         options.addOption("t", "table", true, "the xml file of the table");
         options.addOption("o", "output", true, "ouput");
         options.addOption("c", "code", true, "program files");
+        options.addOption("m", "mode", true, "mode");
 
         return clp.parse(options, args, true);
     }

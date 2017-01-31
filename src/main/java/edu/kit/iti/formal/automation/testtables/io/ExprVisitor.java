@@ -22,12 +22,14 @@ package edu.kit.iti.formal.automation.testtables.io;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.testtables.exception.IllegalExpressionException;
 import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionBaseVisitor;
 import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionParser;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.smv.ast.*;
 
 import javax.swing.plaf.SliderUI;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +37,7 @@ import java.util.stream.Collectors;
  * Created by weigl on 09.12.16.
  */
 public class ExprVisitor extends CellExpressionBaseVisitor<SMVExpr> {
+    private static final SMVType ENUM_TYPE = new SMVType.EnumType(new LinkedList<>());
     private final SVariable columnVariable;
     private final GeneralizedTestTable gtt;
 
@@ -65,7 +68,7 @@ public class ExprVisitor extends CellExpressionBaseVisitor<SMVExpr> {
             return ctx.singlesided().accept(this);
         if (ctx.expr() != null)
             return ctx.expr().accept(this);
-        if(ctx.variable() != null) {
+        if (ctx.variable() != null) {
             SMVExpr v = ctx.variable().accept(this);
             return v.equal(columnVariable);
         }
@@ -210,12 +213,20 @@ public class ExprVisitor extends CellExpressionBaseVisitor<SMVExpr> {
 
     @Override
     public SMVExpr visitVariable(CellExpressionParser.VariableContext ctx) {
-        if (ctx.RBRACKET() != null) {
-            return gtt.getReference(ctx.IDENTIFIER().getText(),
-                    Integer.parseInt(ctx.i().getText()));
-        } else {
-            return gtt.getSMVVariable(ctx.IDENTIFIER().getText());
+        SVariable var = gtt.getSMVVariable(ctx.IDENTIFIER().getText());
+        boolean isReference = ctx.RBRACKET() != null;
+
+        if (var == null) {
+            if (isReference)
+                throw new IllegalExpressionException(
+                        "You referenced a variable " + ctx.IDENTIFIER().getText() + ", but it is not found as a defined io-variable.");
+            return new SLiteral(ENUM_TYPE, ctx.IDENTIFIER().getText());
         }
+
+        if (isReference)
+            return gtt.getReference(var, Integer.parseInt(ctx.i().getText()));
+        else
+            return var;
 
     }
 
