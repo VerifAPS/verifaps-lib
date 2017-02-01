@@ -1,6 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 
 <session xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml"
+         xmlns:ns2="http://formal.iti.kit.edu/exteta-1.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://formal.iti.kit.edu/stvs/logic/io/xml session.xsd">
  <code>
