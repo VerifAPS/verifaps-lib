@@ -1,13 +1,29 @@
-.freevar .typeof-label {
+/* the h-box for one variable with the label, field, combobox and remove button */
+.freevar.variable-container {
+}
+
+.freevar.typeof-label {
     -fx-font-family: monospace;
 }
 
-.freevar .name-field {
+.freevar.name-field {
     -fx-font-family: monospace;
 }
 
-.freevar .type-combo-box-cell {
+.freevar.type-combo-box-cell {
     -fx-font-family: monospace;
     -fx-font-weight: bold;
     -fx-fill: darkgreen;
+}
+
+.freevar.remove-button {
+}
+
+/* the v-box for all the variables */
+.freevar.collection {
+}
+
+.freevar.overview-label {
+    -fx-font-size: 26pt;
+    -fx-font-weight: bold;
 }

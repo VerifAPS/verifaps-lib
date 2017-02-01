@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.view.spec.table.rowactions;
 
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.spec.table.DurationsColumnController;
 import edu.kit.iti.formal.stvs.view.spec.table.cells.HybridCellController;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import javafx.scene.control.Button;
 
 /**

@@ -1,8 +1,9 @@
 <?xml version="1.0" standalone="no"?>
 
-<session xmlns=xmlns:tns="http://formal.iti.kit.edu/exteta-1.0">
+<session xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml"
+         xmlns:ns2="http://formal.iti.kit.edu/exteta-1.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://www.kit.edu/StVerificationStudio file:///home/bal/Projects/kit/pse/stverificationstudio/doc/entwurf/fileFormats/session.xsd">
+           xsi:schemaLocation="http://formal.iti.kit.edu/stvs/logic/io/xml session.xsd">
  <code>
    <filename>/path/to/codefile.st</filename>
    <plaintext>I am some ST code!</plaintext>

@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.view.spec.table.cells;
 
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.CellOperationProvider;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;

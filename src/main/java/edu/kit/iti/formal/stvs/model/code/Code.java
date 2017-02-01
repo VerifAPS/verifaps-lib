@@ -1,22 +1,14 @@
 package edu.kit.iti.formal.stvs.model.code;
 
-import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
-import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
-
-import java.util.Collections;
-import java.util.Observable;
-import java.util.function.Consumer;
 import java.util.List;
 
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.ObjectBinding;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
-import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 
@@ -32,7 +24,7 @@ public class Code {
   private StringProperty filename;
   private List<RecognitionException> syntaxErrors;
   private StringProperty sourceCodeProperty;
-  private ParsedCode parsedCode;
+  private NullableProperty<ParsedCode> parsedCode;
   private List<? extends Token> tokens;
 
   /**
@@ -45,6 +37,7 @@ public class Code {
   public Code(String filename, String sourcecode) {
     this.filename = new SimpleStringProperty(filename);
     this.sourceCodeProperty = new SimpleStringProperty(sourcecode);
+    this.parsedCode = new NullableProperty<>();
 
     invalidate();
   }
@@ -52,7 +45,7 @@ public class Code {
   private void invalidate() {
     ParsedCode.parseCode(sourceCodeProperty.get(),
         tokens -> this.tokens = tokens,
-        parsedCode -> this.parsedCode = parsedCode);
+        parsedCode -> this.parsedCode.set(parsedCode));
   }
 
   public void updateSourcecode(String sourcecode) {
@@ -69,6 +62,10 @@ public class Code {
   }
 
   public ParsedCode getParsedCode() {
+    return parsedCode.get();
+  }
+
+  public NullableProperty<ParsedCode> parsedCodeProperty() {
     return parsedCode;
   }
 

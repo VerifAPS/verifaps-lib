@@ -3,7 +3,6 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.Importer;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.CloseShieldInputStream;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -40,7 +39,9 @@ public abstract class XmlImporter<T> implements Importer<T> {
       validateAgainstXSD(new ByteArrayInputStream(byteArray));
       IOUtils.copy(new ByteArrayInputStream(byteArray), writer, INPUT_ENCODING);
       String inputString = writer.toString();
-      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      dbf.setNamespaceAware(true);
+      Document doc = dbf.newDocumentBuilder()
           .parse(new InputSource(new StringReader(inputString)));
       return doImportFromXmlNode(doc.getDocumentElement());
     } catch (SAXException | IOException | ParserConfigurationException | URISyntaxException e) {

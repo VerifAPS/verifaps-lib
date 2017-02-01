@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="http://www.kit.edu/StVerificationStudio"
-  xmlns:tns="http://www.kit.edu/StVerificationStudio"
+  targetNamespace="http://formal.iti.kit.edu/stvs/logic/io/xml"
+  xmlns:tns="http://formal.iti.kit.edu/stvs/logic/io/xml"
   elementFormDefault="qualified">
   <include schemaLocation="specification.xsd"/>
   <include schemaLocation="config.xsd"/>
@@ -16,8 +16,8 @@
 
   <complexType name="Tab">
     <choice>
-      <element name="specification" type="tns:Specification"></element>
-      <element name="specificationInstance" type="tns:Specification"></element>
+      <element name="specification" type="tns:SpecificationTable"></element>
+      <element name="specificationInstance" type="tns:SpecificationTable"></element>
     </choice>
     <attribute name="id" type="nonNegativeInteger" use="required"></attribute>
     <attribute name="open" type="boolean" use="required">

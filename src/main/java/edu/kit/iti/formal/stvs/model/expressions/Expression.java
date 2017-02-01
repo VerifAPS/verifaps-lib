@@ -1,14 +1,17 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
+import edu.kit.iti.formal.stvs.model.common.IoVariable;
+import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
+
 /**
  * The abstract super-class for all Expressions.
  *
  * <p>This type does not contain all information the source
  * expression string had. That means you can't get back the
  * expression string from this Expression. For example an expression
- * <tt>= 3</tt> in a column for {@link edu.kit.iti.formal.stvs.model.common.IoVariable}
+ * <tt>= 3</tt> in a column for {@link IoVariable}
  * <tt>X</tt> is parsed as <tt>X = 3</tt> by the
- * {@link edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser}.
+ * {@link ExpressionParser}.
  *
  * <p>The only ability all Expressions currently share is
  * getting visited.
