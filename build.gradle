@@ -11,6 +11,22 @@ apply plugin: 'application'
 
 compileJava.options.encoding = 'UTF-8'
 
+sourceSets {
+    generated{
+        java.srcDir "${buildDir}/generated/"
+    }
+
+    main {
+        compileClasspath += generated.output
+        runtimeClasspath += generated.output
+    }
+
+    test {
+        compileClasspath += generated.output
+        runtimeClasspath += generated.output
+    }
+}
+
 // In this section you declare where to find the dependencies of your project
 repositories {
     // Use 'jcenter' for resolving your dependencies.

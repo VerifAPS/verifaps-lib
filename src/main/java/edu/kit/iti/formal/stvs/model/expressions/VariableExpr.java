@@ -1,13 +1,16 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
+import edu.kit.iti.formal.stvs.model.common.FreeVariable;
+import edu.kit.iti.formal.stvs.model.common.IoVariable;
+
 import java.util.Optional;
 
 /**
  * runtime-representation for variables in {@link Expression}s.
  *
  * <p>At this point it is not known, whether this is a reference to a
- * {@link edu.kit.iti.formal.stvs.model.common.FreeVariable}
- * or an {@link edu.kit.iti.formal.stvs.model.common.IoVariable}, it
+ * {@link FreeVariable}
+ * or an {@link IoVariable}, it
  * is simply the String name of either of those.
  */
 public class VariableExpr extends Expression {

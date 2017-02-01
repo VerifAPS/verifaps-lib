@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.kit.edu/StVerificationStudio" xmlns:tns="http://www.kit.edu/StVerificationStudio" elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://formal.iti.kit.edu/stvs/logic/io/xml" xmlns:tns="http://formal.iti.kit.edu/stvs/logic/io/xml" elementFormDefault="qualified">
   <include schemaLocation="session.xsd"></include>
   <element name="project">
     <complexType>

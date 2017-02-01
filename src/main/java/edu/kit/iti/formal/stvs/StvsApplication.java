@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs;
+package edu.kit.iti.formal.stvs.logic.io.xml;
 /**
  * Created by csicar on 09.01.17.
  */
