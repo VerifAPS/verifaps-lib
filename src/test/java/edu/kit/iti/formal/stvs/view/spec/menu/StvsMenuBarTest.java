@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.menu;
 
+import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.code.CodeTest;
 import edu.kit.iti.formal.stvs.model.code.ParsedCode;
@@ -34,18 +35,9 @@ public class StvsMenuBarTest {
   private Scene simpleScene() {
     Scene scene = new Scene(new VBox(), 400, 350);
 
-    ObservableList<HybridSpecification> hybridSpecifications = new ListBinding<HybridSpecification>() {
-      @Override
-      protected ObservableList<HybridSpecification> computeValue() {
-        return null;
-      }
-    };
+    StvsRootModel rootModel = new StvsRootModel();
 
-    Code code = new Code("dummy", "");
-    GlobalConfig config = new GlobalConfig();
-
-    StvsMenuBarController menuBarController = new StvsMenuBarController(hybridSpecifications,
-        code);
+    StvsMenuBarController menuBarController = new StvsMenuBarController(rootModel);
     ((VBox) scene.getRoot()).getChildren().addAll(menuBarController.getView());
 
     return scene;
