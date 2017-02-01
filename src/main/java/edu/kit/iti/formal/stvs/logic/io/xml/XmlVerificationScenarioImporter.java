@@ -1,10 +1,8 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
-import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import org.w3c.dom.Node;
 
-import java.io.InputStream;
 import java.net.URISyntaxException;
 
 /**

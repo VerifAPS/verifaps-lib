@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema targetNamespace="http://formal.iti.kit.edu/exteta-1.0"
+<schema targetNamespace="http://formal.iti.kit.edu/stvs/logic/io/xml"
   elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema"
-  xmlns:tns="http://formal.iti.kit.edu/exteta-1.0">
- <include schemaLocation="exteta-1.0.xsd"></include>
+  xmlns:tns="http://formal.iti.kit.edu/stvs/logic/io/xml"
+        xmlns:exteta="http://formal.iti.kit.edu/exteta-1.0">
+  <import namespace="http://formal.iti.kit.edu/exteta-1.0" schemaLocation="exteta-1.0.xsd" />
 
  <complexType name="DisplayInfo">
   <annotation>
    <documentation>Contains information for displaying the specification table.</documentation>
   </annotation>
-  <complexContent>
    <sequence>
     <element name="ioVariables" minOccurs="0" maxOccurs="1">
      <complexType>
@@ -47,15 +47,12 @@
      </complexType>
     </element>
    </sequence>
-
-  </complexContent>
  </complexType>
 
  <complexType name="AdditionalInfo">
   <annotation>
    <documentation>Non-GUI-related stuff we need to save in addition to what is in tns:testTable</documentation>
   </annotation>
-  <complexContent>
    <sequence>
     <element name="constraintVariables" minOccurs="0" maxOccurs="1">
      <complexType>
@@ -86,18 +83,15 @@
      </complexType>
     </element>
    </sequence>
-  </complexContent>
  </complexType>
 
  <complexType name="SpecificationTable">
-  <complexContent>
    <sequence>
     <element name="filename" type="string" minOccurs="0" maxOccurs="1"></element>
-    <element name="test-table" type="tns:testTable" minOccurs="1" maxOccurs="1"></element>
+    <element name="test-table" type="exteta:testTable" minOccurs="1" maxOccurs="1"></element>
     <element name="display-info" type="tns:DisplayInfo" minOccurs="0" maxOccurs="1"></element>
     <element name="additional-info" type="tns:AdditionalInfo" minOccurs="0" maxOccurs="1"></element>
    </sequence>
-  </complexContent>
  </complexType>
 
  <element name="specification" type="tns:SpecificationTable"></element>

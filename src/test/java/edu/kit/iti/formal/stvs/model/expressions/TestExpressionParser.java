@@ -1,13 +1,12 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
+import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
-import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 import org.junit.Test;
 
 import java.util.*;
 
-import static edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.*;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -36,25 +35,25 @@ public class TestExpressionParser {
   @Test
   public void testConstants() throws ParseException, UnsupportedExpressionException {
     // TRUE means X = TRUE
-    assertParseExpressionEqual("TRUE", equal(var(columnName), literal(true)));
+    assertParseExpressionEqual("TRUE", SimpleExpressions.equal(SimpleExpressions.var(columnName), SimpleExpressions.literal(true)));
     // both upper and lower case
-    assertParseExpressionEqual("false", equal(var(columnName), literal(false)));
+    assertParseExpressionEqual("false", SimpleExpressions.equal(SimpleExpressions.var(columnName), SimpleExpressions.literal(false)));
     // 1 means X = 1
-    assertParseExpressionEqual("1", equal(var(columnName), literal(1)));
+    assertParseExpressionEqual("1", SimpleExpressions.equal(SimpleExpressions.var(columnName), SimpleExpressions.literal(1)));
     // - means TRUE
-    assertParseExpressionEqual("-", literal(true));
+    assertParseExpressionEqual("-", SimpleExpressions.literal(true));
   }
 
   @Test
   public void testVariables() throws ParseException, UnsupportedExpressionException {
-    assertParseExpressionEqual("b", equal(var(columnName), var("b")));
-    assertParseExpressionEqual("b = ! FALSE", equal(var("b"), not(literal(false))));
+    assertParseExpressionEqual("b", SimpleExpressions.equal(SimpleExpressions.var(columnName), SimpleExpressions.var("b")));
+    assertParseExpressionEqual("b = ! FALSE", SimpleExpressions.equal(SimpleExpressions.var("b"), SimpleExpressions.not(SimpleExpressions.literal(false))));
   }
 
   @Test
   public void testVariablesWithIndex() throws ParseException, UnsupportedExpressionException {
-    assertParseExpressionEqual("A[-2]", equal(var(columnName), var("A", -2)));
-    assertParseExpressionEqual("(A[0])", var("A", 0));
+    assertParseExpressionEqual("A[-2]", SimpleExpressions.equal(SimpleExpressions.var(columnName), SimpleExpressions.var("A", -2)));
+    assertParseExpressionEqual("(A[0])", SimpleExpressions.var("A", 0));
   }
 
   @Test(expected = UnsupportedExpressionException.class)
@@ -70,7 +69,7 @@ public class TestExpressionParser {
   @Test
   public void testOnesided() throws ParseException, UnsupportedExpressionException {
     // < 2 means X < 2
-    assertParseExpressionEqual("< 2", lessThan(var(columnName), literal(2)));
+    assertParseExpressionEqual("< 2", SimpleExpressions.lessThan(SimpleExpressions.var(columnName), SimpleExpressions.literal(2)));
   }
 
   @Test
@@ -106,7 +105,7 @@ public class TestExpressionParser {
       BinaryFunctionExpr.Op operation = binaryOperationEntry.getValue();
 
       assertParseExpressionEqual("2" + operator + "2",
-          new BinaryFunctionExpr(operation, literal(2), literal(2))
+          new BinaryFunctionExpr(operation, SimpleExpressions.literal(2), SimpleExpressions.literal(2))
       );
     }
   }
@@ -114,9 +113,9 @@ public class TestExpressionParser {
   @Test
   public void testUnaryOperators() throws ParseException, UnsupportedExpressionException {
     // parens enforce a "expression" rule (not single-sided or constant or blah)
-    assertParseExpressionEqual("(- (2))", negate(literal(2)));
-    assertParseExpressionEqual("(!TRUE)", not(literal(true)));
-    assertParseExpressionEqual("(NOT TRUE)", not(literal(true)));
+    assertParseExpressionEqual("(- (2))", SimpleExpressions.negate(SimpleExpressions.literal(2)));
+    assertParseExpressionEqual("(!TRUE)", SimpleExpressions.not(SimpleExpressions.literal(true)));
+    assertParseExpressionEqual("(NOT TRUE)", SimpleExpressions.not(SimpleExpressions.literal(true)));
   }
 
   @Test(expected = ParseException.class)
@@ -128,7 +127,7 @@ public class TestExpressionParser {
   public void testInterval() throws ParseException, UnsupportedExpressionException {
     // [1, 4] means X >= 1 AND X <= 4
     assertParseExpressionEqual("[4, 1]",
-        and(greaterEqual(var(columnName), literal(4)), lessEqual(var(columnName), literal(1)))
+        SimpleExpressions.and(SimpleExpressions.greaterEqual(SimpleExpressions.var(columnName), SimpleExpressions.literal(4)), SimpleExpressions.lessEqual(SimpleExpressions.var(columnName), SimpleExpressions.literal(1)))
     );
   }
 
@@ -154,7 +153,7 @@ public class TestExpressionParser {
     typeContext.add(colorsEnum);
 
     parser.setTypeContext(typeContext);
-    assertParseExpressionEqual("(blue)", literalEnum("blue", colorsEnum));
+    assertParseExpressionEqual("(blue)", SimpleExpressions.literalEnum("blue", colorsEnum));
     //assertParseExpressionEqual("red", equal(var(cellName), literalEnum("red", colorsEnum)));
   }
 

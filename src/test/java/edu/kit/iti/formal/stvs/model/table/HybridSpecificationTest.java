@@ -4,12 +4,11 @@ import edu.kit.iti.formal.stvs.model.common.*;
 import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
-import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
+import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import org.junit.Before;
-import org.junit.Test;
 
 import java.util.*;
 

@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import edu.kit.iti.formal.stvs.view.spec.table.TablePaneController;
+import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.logic.specification.BacktrackSpecificationConcretizer;
 import edu.kit.iti.formal.stvs.logic.specification.ConcretizerContext;
 import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
@@ -19,8 +21,8 @@ import javafx.beans.value.ObservableValue;
  * A ConstraintSpecification which also has an associated counterexample (ConcreteSpecification),
  * concrete instance (ConcreteSpecification) or both.
  * This class is the model on which the
- * {@link edu.kit.iti.formal.stvs.view.spec.table.TablePaneController}
- * and {@link edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController}
+ * {@link TablePaneController}
+ * and {@link TimingDiagramCollectionController}
  * operate. This class is responsible for triggering the generation of a new concrete instance of a
  * specification whenever one of its {@link ConstraintCell}s or {@link ConstraintDuration}s change
  * or new cells or durations are added.

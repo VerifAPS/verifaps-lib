@@ -3,11 +3,8 @@ package edu.kit.iti.formal.stvs.model.expressions;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import static edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.*;
 
 public class TestTypeChecker {
 
@@ -29,24 +26,24 @@ public class TestTypeChecker {
 		TypeEnum colorsEnum = TypeFactory.enumOfName("Colors", "Red", "Blue");
 
 		Expression redEqualsBlue =
-				equal(
-						literal(colorsEnum.valueOf("Red")),
-						literal(colorsEnum.valueOf("Blue")));
+				SimpleExpressions.equal(
+						SimpleExpressions.literal(colorsEnum.valueOf("Red")),
+						SimpleExpressions.literal(colorsEnum.valueOf("Blue")));
 
 		Expression xEqualsThree =
-				equal(
-						var("X"),
-						literal(3));
+				SimpleExpressions.equal(
+						SimpleExpressions.var("X"),
+						SimpleExpressions.literal(3));
 
 		Expression sumIsEleven =
-				equal(
-						plus(literal(5), var("X")),
-						literal(8));
+				SimpleExpressions.equal(
+						SimpleExpressions.plus(SimpleExpressions.literal(5), SimpleExpressions.var("X")),
+						SimpleExpressions.literal(8));
 
-		Expression trueExpr = literal(true);
+		Expression trueExpr = SimpleExpressions.literal(true);
 
 		Expression validExpression =
-				and(redEqualsBlue, and(xEqualsThree, and(sumIsEleven, trueExpr)));
+				SimpleExpressions.and(redEqualsBlue, SimpleExpressions.and(xEqualsThree, SimpleExpressions.and(sumIsEleven, trueExpr)));
 
 		Type type = checker.typeCheck(validExpression);
         Assert.assertEquals(type, TypeBool.BOOL);
@@ -55,7 +52,7 @@ public class TestTypeChecker {
 	@Test(expected = TypeCheckException.class)
 	public void testInvalidArgumentType() throws TypeCheckException {
 		Expression invalidExpression =
-				and(literal(false), literal(2));
+				SimpleExpressions.and(SimpleExpressions.literal(false), SimpleExpressions.literal(2));
 		checker.typeCheck(invalidExpression);
 	}
 }

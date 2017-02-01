@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view;
 
-import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import javafx.collections.ObservableList;
@@ -13,7 +12,7 @@ import java.util.List;
  */
 public class StvsRootController implements Controller {
   private StvsRootView view;
-  private StvsRootModel StvsRootModel;
+  private edu.kit.iti.formal.stvs.model.StvsRootModel StvsRootModel;
   private ObservableList<Type> types;
   private ObservableList<CodeIoVariable> ioVars;
   /**

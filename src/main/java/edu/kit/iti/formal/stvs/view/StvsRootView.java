@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.view;
 
-import edu.kit.iti.formal.stvs.view.editor.EditorPane;
 import edu.kit.iti.formal.stvs.view.menu.StvsMenuBar;
+import edu.kit.iti.formal.stvs.view.editor.EditorPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Pane;
 

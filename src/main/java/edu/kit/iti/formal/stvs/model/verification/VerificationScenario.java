@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.stvs.model.verification;
 
 import edu.kit.iti.formal.stvs.logic.verification.GeTeTaVerificationEngine;
-import edu.kit.iti.formal.stvs.logic.verification.VerificationEngine;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.logic.verification.VerificationEngine;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

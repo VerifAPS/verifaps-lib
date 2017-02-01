@@ -3,11 +3,9 @@ package edu.kit.iti.formal.stvs.logic.specification;
 import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.Stack;
-import java.util.function.Consumer;
 
 /**
  * Created by bal on 09.01.17.

@@ -4,8 +4,6 @@ import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 
-import java.util.function.Consumer;
-
 //import edu.kit.iti.formal.automation.testtables; //TODO this doesn't import despite Maven repo
 
 /**

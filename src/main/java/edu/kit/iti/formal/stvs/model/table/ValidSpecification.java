@@ -4,9 +4,7 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.expressions.Expression;
 import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
