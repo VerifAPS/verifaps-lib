@@ -3,14 +3,18 @@ package edu.kit.iti.formal.stvs.logic.io;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 
+import java.io.File;
 import java.io.InputStream;
+import java.util.function.Consumer;
 
 /**
  * @author Benjamin Alt
  */
 public class ImporterFacade {
+
 
   public enum ImportFormat {
     XML,
@@ -32,4 +36,18 @@ public class ImporterFacade {
   public static VerificationScenario importVerificationScenario(InputStream input, ImportFormat format) {
     return null;
   }
+
+
+  /**
+   * imports a file with unknown type
+   * @param file file to open
+   * @param specificationConsumer consumer of the file (if the file is a Specification)
+   * @param rootModelConsumer consumer of the file (if the file is a rootModel)
+   * @param scenarioConsumer consumer of the file (if the file is a scenario)
+   */
+  public static void importFile(File file, Consumer<ConstraintSpecification>
+      specificationConsumer, Consumer<StvsRootModel> rootModelConsumer,
+                                Consumer<VerificationScenario> scenarioConsumer) {
+  }
+
 }

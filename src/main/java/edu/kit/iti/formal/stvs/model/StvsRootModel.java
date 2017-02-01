@@ -6,6 +6,7 @@ import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class StvsRootModel {
   private GlobalConfig globalConfig;
   private History history;
   private VerificationScenario scenario;
+  private File workingdir;
 
   /**
    * Create a new empty StvsRootModel with no specifications or verification, an empty history
@@ -28,6 +30,7 @@ public class StvsRootModel {
     globalConfig = new GlobalConfig();
     history = new History();
     scenario = new VerificationScenario();
+    workingdir = new File(System.getProperty("user.home"));
   }
 
   /**
@@ -36,13 +39,15 @@ public class StvsRootModel {
    * @param globalConfig
    * @param history
    * @param code
+   * @param workingdir working-directory that should be used (e.g. for opening and saving)
    */
   public StvsRootModel(List<HybridSpecification> hybridSpecifications, GlobalConfig globalConfig,
-                       History history, Code code) {
+                       History history, Code code, File workingdir) {
     this.hybridSpecifications = hybridSpecifications;
     this.globalConfig = globalConfig;
     this.history = history;
     this.scenario = new VerificationScenario(code);
+    this.workingdir = workingdir;
   }
 
   public List<HybridSpecification> getHybridSpecifications() {
@@ -59,5 +64,13 @@ public class StvsRootModel {
 
   public VerificationScenario getScenario() {
     return scenario;
+  }
+
+  public File getWorkingdir() {
+    return workingdir;
+  }
+
+  public void setWorkingdir(File workingdir) {
+    this.workingdir = workingdir;
   }
 }

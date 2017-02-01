@@ -7,14 +7,16 @@ import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
+import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
+import javafx.stage.FileChooser;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Optional;
 
 /**
@@ -43,38 +45,58 @@ public class StvsMenuBarController implements Controller {
     view.saveAll.setOnAction(this::saveAll);
     view.saveCode.setOnAction(this::saveCode);
     view.saveSpec.setOnAction(this::saveSpec);
+    view.config.setOnAction(this::openConfigDialog);
 
 
   }
 
-  private void openFile(ActionEvent t) {
-
-    //seems legit http://stackoverflow.com/a/31686775
-    Stage stage = (Stage) this.getView().getScene().getWindow();
-
-    StvsFileChooserManager manager = new StvsFileChooserManager(stage);
-    manager.getFile().ifPresent((File file) -> {
-      // TODO: handle opened file
-
+  private void openConfigDialog(ActionEvent t) {
+    ConfigDialogManager manager = new ConfigDialogManager(rootModel.getGlobalConfig());
+    Optional<GlobalConfig> newConfig = manager.showAndWait();
+    newConfig.ifPresent(config -> {
+      //rootModel.getGlobalConfig() = config;
     });
   }
 
+  private void openFile(ActionEvent t) {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Open file");
+    fileChooser.setInitialDirectory(rootModel.getWorkingdir());
+    File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
+    if(chosenFile != null) {
+      try {
+        ImporterFacade.importFile(chosenFile, (constraintSpecification) -> {
+            rootModel.getHybridSpecifications().addAll(constraintSpecification);
+        });
+      } catch (IOException e) {
+        new ErrorMessageDialog(e);
+      }
+    }
+  }
+
   private void saveAll(ActionEvent t) {
-    // Todo: implement
-    ExporterFacade.exportSession(rootModel, ExporterFacade.ExportFormat.XML);
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Save session");
+    fileChooser.setInitialDirectory(rootModel.getWorkingdir());
+    File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
+    if(chosenFile != null) {
+      try {
+        ExporterFacade.exportSession(rootModel, ExporterFacade.ExportFormat
+            .XML, chosenFile);
+
+      } catch (IOException e) {
+        new ErrorMessageDialog(e);
+      }
+    }
   }
 
   private void saveCode(ActionEvent t) {
     // Todo: implement
     Code code = rootModel.getScenario().getCode();
-    BufferedWriter writer = null;
     try {
-      File file = new File(code.getFilename());
-      writer = new BufferedWriter(new FileWriter(file));
-      writer.write(code.getSourcecode());
-      writer.close();
-    }catch(IOException e) {
-      // TODO: show popup with errormessage
+      ExporterFacade.exportCode(code);
+    } catch (IOException e) {
+      new ErrorMessageDialog(e);
     }
   }
 

@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.view.menu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
 
 
@@ -10,6 +11,7 @@ import javafx.scene.input.KeyCombination;
  * Created by csicar on 10.01.17.
  */
 public class StvsMenuBar extends MenuBar {
+
   public Menu file;
   public Menu edit;
   public Menu view;
@@ -19,6 +21,7 @@ public class StvsMenuBar extends MenuBar {
   public MenuItem saveCode;
   public MenuItem saveSpec;
   public MenuItem saveAll;
+  public MenuItem config;
 
   public StvsMenuBar() {
     //create top-level menus
@@ -37,9 +40,12 @@ public class StvsMenuBar extends MenuBar {
     saveAll = new MenuItem("Save all");
     saveAll.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+s"));
 
+    config = new MenuItem("Configuration");
+    config.setAccelerator(KeyCombination.keyCombination("Ctrl+,"));
+
 
     //add menu-items to
-    file.getItems().addAll(open, saveCode, saveSpec, saveAll);
+    file.getItems().addAll(open, saveCode, saveSpec, saveAll, (new SeparatorMenuItem()), config);
 
     //add menus to itself
     this.getMenus().addAll(file, edit, view, help);

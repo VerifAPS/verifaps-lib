@@ -1,14 +1,13 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
+import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * Facade class for facilitating the export of different objects to different export formats.
@@ -80,5 +79,18 @@ public class ExporterFacade {
   public static void exportVerificationScenario(VerificationScenario verificationScenario,
                                                 ExportFormat format, File file) throws IOException {
 
+  }
+
+  /**
+   * exports code to the file specified in code-model
+   * @param code Code to export
+   * @throws IOException will be thrown, when an error occurs while saving
+   */
+  public static void exportCode(Code code) throws IOException {
+    File file = new File(code.getFilename());
+
+    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+    writer.write(code.getSourcecode());
+    writer.close();
   }
 }
