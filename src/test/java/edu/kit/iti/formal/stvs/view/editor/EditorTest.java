@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.code.CodeTest;
 import edu.kit.iti.formal.stvs.model.code.ParsedCode;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
@@ -33,15 +34,18 @@ public class EditorTest {
     pane.getItems().addAll(controller.getView(), rightPane);
 
     Scene scene = new Scene(pane, 800, 600);
+    scene.getStylesheets().add(this.getClass().getResource("style.css").toExternalForm());
     return scene;
   }
 
   private Pane createExtractedVarsTextArea(Code code) {
     final TextArea textArea = new TextArea();
+    textArea.getStyleClass().addAll("model-text-area");
     textArea.setEditable(false);
 
-    updateText(textArea, code.parsedCodeProperty().get());
-    code.parsedCodeProperty().addListener((ob, old, parsedCode) -> updateText(textArea, parsedCode));
+    updateText(textArea, code.getParsedCode());
+    code.parsedCodeProperty().addListener((ob, old, parsedCode) ->
+        updateText(textArea, parsedCode));
 
     return new StackPane(textArea);
   }
@@ -56,7 +60,6 @@ public class EditorTest {
       output.append("\n");
       output.append("Defined IOVariables:\n");
       parsedCode.getDefinedVariables().forEach(codeIoVariable -> output.append(" - " + codeIoVariable + "\n"));
-      System.out.println("textArea.setText(\"\"\"\n" + output.toString() + "\"\"\");");
       textArea.setText(output.toString());
     }
   }

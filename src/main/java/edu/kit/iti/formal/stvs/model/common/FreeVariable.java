@@ -103,4 +103,13 @@ public class FreeVariable {
     }
     this.defaultValue.set(defaultValue);
   }
+
+  @Override
+  public String toString() {
+    return "FreeVariable{"
+        + "name=" + name.get()
+        + ", type=" + type.get()
+        + ", defaultValue=" + defaultValue.get()
+        + '}';
+  }
 }

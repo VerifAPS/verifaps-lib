@@ -5,6 +5,7 @@ import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import org.w3c.dom.Node;
 
 import java.io.InputStream;
+import java.net.URISyntaxException;
 
 /**
  * Created by bal on 11.01.17.
@@ -13,6 +14,11 @@ public class XmlVerificationScenarioImporter extends XmlImporter<VerificationSce
 
   @Override
   public VerificationScenario doImportFromXmlNode(Node source) {
+    return null;
+  }
+
+  @Override
+  protected String getXSDFilePath() throws URISyntaxException {
     return null;
   }
 }

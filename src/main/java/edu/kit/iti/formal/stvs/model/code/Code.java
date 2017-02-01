@@ -1,9 +1,18 @@
 package edu.kit.iti.formal.stvs.model.code;
 
+import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
+
+import java.util.Collections;
+import java.util.Observable;
+import java.util.function.Consumer;
+import java.util.List;
+
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.ObjectBinding;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
@@ -23,72 +32,55 @@ public class Code {
   /**
    * last valid parsed Code
    */
-  private NullableProperty<ParsedCode> parsedCode;
   private StringProperty filename;
   private List<RecognitionException> syntaxErrors;
   private StringProperty sourceCodeProperty;
-  private Binding<List<? extends Token>> tokensBinding;
+  private NullableProperty<ParsedCode> parsedCode;
+  private List<? extends Token> tokens;
 
   /**
    * creates a Dummy-Codefile
    */
   public Code() {
-    this.filename = new SimpleStringProperty("New Code");
-    this.sourceCodeProperty = new SimpleStringProperty("");
-    this.tokensBinding = createTokensBinding();
-    this.parsedCode = new NullableProperty<ParsedCode>(null);
-
-    sourceCodeProperty.addListener(this::rebuildParsedCode);
+    this("New Code", "");
   }
 
   public Code(String filename, String sourcecode) {
     this.filename = new SimpleStringProperty(filename);
     this.sourceCodeProperty = new SimpleStringProperty(sourcecode);
-    this.tokensBinding = createTokensBinding();
-    this.parsedCode = new NullableProperty<ParsedCode>(ParsedCode.parseCode(sourceCodeProperty.get()));
+    this.parsedCode = new NullableProperty<>();
 
-    sourceCodeProperty.addListener(this::rebuildParsedCode);
+    invalidate();
   }
 
-  private void rebuildParsedCode(ObservableValue<? extends String> observableValue, String oldVal, String newVal) {
-    parsedCode.set(ParsedCode.parseCode(newVal));
+  private void invalidate() {
+    ParsedCode.parseCode(sourceCodeProperty.get(),
+        tokens -> this.tokens = tokens,
+        parsedCode -> this.parsedCode.set(parsedCode));
   }
 
-  private Binding<List<? extends Token>> createTokensBinding() {
-    return new ObjectBinding<List<? extends Token>>() {
-      {
-        bind(sourceCodeProperty);
-      }
-
-      @Override
-      protected List<? extends Token> computeValue() {
-        return Code.this.computeTokens(Code.this.sourcecodeProperty().get());
-      }
-    };
+  public void updateSourcecode(String sourcecode) {
+    sourceCodeProperty.setValue(sourcecode);
+    invalidate();
   }
 
-  public void invalidate() {
-
+  public String getSourcecode() {
+    return sourceCodeProperty.get();
   }
 
-  public List<? extends Token> computeTokens(String sourcecode) {
-    IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(sourcecode));
-    return lexer.getAllTokens();
+  public List<RecognitionException> getSyntaxErrors() {
+    return syntaxErrors;
   }
 
-  public StringProperty sourcecodeProperty() {
-    return this.sourceCodeProperty;
-  }
-
-  public Binding<List<? extends Token>> tokensBinding() {
-    return tokensBinding;
+  public ParsedCode getParsedCode() {
+    return parsedCode.get();
   }
 
   public NullableProperty<ParsedCode> parsedCodeProperty() {
     return parsedCode;
   }
 
-  public Optional<ParsedCode> computeParsedCode(String sourcecode) {
-    return null;
+  public List<? extends Token> getTokens() {
+    return tokens;
   }
 }

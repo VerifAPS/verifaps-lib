@@ -8,10 +8,8 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -51,9 +49,8 @@ public class HybridSpecification extends ConstraintSpecification {
    */
   public HybridSpecification(Set<Type> typeContext, Set<CodeIoVariable> ioVariables,
                              FreeVariableSet freeVariableSet, boolean editable) {
-    super(typeContext, ioVariables, freeVariableSet);
-    this.editable = editable;
-    initialize();
+    this(new HashMap<String, SpecificationColumn<ConstraintCell>>(), new HashMap<Integer,
+        ConstraintDuration>(), typeContext, ioVariables, freeVariableSet, editable);
   }
 
   /**
@@ -71,10 +68,6 @@ public class HybridSpecification extends ConstraintSpecification {
                              boolean editable) {
     super(columns, durations, typeContext, ioVariables, freeVariableSet);
     this.editable = editable;
-    initialize();
-  }
-
-  private void initialize() {
     this.selection = new Selection();
     concreteInstance = new OptionalProperty<>(new SimpleObjectProperty<>());
     validSpecificationProperty().addListener(new ValidSpecificationChangedListener<>());
@@ -92,47 +85,6 @@ public class HybridSpecification extends ConstraintSpecification {
 
   public Selection getSelection() {
     return selection;
-  }
-
-  /* TODO: This was not specified originally, but it would not make sense for the selection to be
-     read-only */
-  public void setSelection(Selection selection) {
-    this.selection = selection;
-  }
-
-  /**
-   *
-   * For the counterexample.
-   * A row in a ConcreteSpecification is not the same as a row in a ConstraintSpecification.
-   * This function does the mapping between the two.
-   * TODO: Should we move this method into ConcreteSpecification? It seems artificial to keep it here.
-   */
-  public List<ConcreteCell> getConcreteValuesForConstraint(String column, int row) {
-    if (counterExample != null) {
-      int startIndex = counterExample.getDuration(row).getBeginCycle();
-      int endIndex = counterExample.getDuration(row).getEndCycle();
-      ArrayList<ConcreteCell> concreteCells = new ArrayList<>();
-      for (int i = startIndex; i < endIndex; i++) {
-        concreteCells.add(counterExample.getCell(i, column));
-      }
-      return concreteCells;
-    } else {
-      return new ArrayList<ConcreteCell>();
-    }
-  }
-
-  /**
-   * This is necessary as "row" means something else in the counterexample. Here "row" means "row"; there, "row" means
-   * cycle. However, not every "cycle-row" in the counterexample has a duration
-   * @param row
-   * @return
-   */
-  public ConcreteDuration getConcreteDurationForRow(int row) {
-     if (counterExample != null) {
-       return counterExample.getDuration(row);
-     } else {
-       return null;
-     }
   }
 
   public boolean isEditable() {

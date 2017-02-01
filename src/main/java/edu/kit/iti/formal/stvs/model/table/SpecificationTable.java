@@ -75,7 +75,9 @@ public class SpecificationTable<C, D> {
   }
 
   public void addColumn(String columnId, SpecificationColumn<C> column) {
-    //TODO: Throw error if column already exists?
+    if (columns.containsKey(columnId)) {
+      throw new IllegalArgumentException("A column with the name " + columnId + " already exists!");
+    }
     columns.put(columnId, column);
     columnChange.set(new ColumnChangeInfo<C>(column, columnId, Change.ADD));
   }
