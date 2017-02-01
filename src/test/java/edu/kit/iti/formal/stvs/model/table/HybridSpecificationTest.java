@@ -37,10 +37,8 @@ public class HybridSpecificationTest {
     columns.put("VariableB", new SpecificationColumn<>(variableB, cellsB, new ColumnConfig(20)));
     columns.put("VariableC", new SpecificationColumn<>(variableC, cellsC, new ColumnConfig()));
     columns.put("VariableD", new SpecificationColumn<>(variableD, cellsD, new ColumnConfig(55)));
-    Map<Integer, ConstraintDuration> durations = new HashMap<>();
-    durations.put(0, new ConstraintDuration("1"));
-    durations.put(1, new ConstraintDuration("4"));
-    durations.put(2, new ConstraintDuration("5"));
+    List<ConstraintDuration> durations = Arrays.asList(new ConstraintDuration("1"),
+        new ConstraintDuration("4"), new ConstraintDuration("5"));
 
     Set<Type> typeContext = new HashSet<Type>();
     typeContext.add(TypeInt.INT);
@@ -68,10 +66,8 @@ public class HybridSpecificationTest {
     counterexampleColumns.put("VariableB", new SpecificationColumn<>(variableB, concreteCellsB, new ColumnConfig()));
     counterexampleColumns.put("VariableC", new SpecificationColumn<>(variableC, concreteCellsC, new ColumnConfig()));
     counterexampleColumns.put("VariableD", new SpecificationColumn<>(variableD, concreteCellsD, new ColumnConfig()));
-    Map<Integer, ConcreteDuration> counterexampleDurations = new HashMap<>();
-    counterexampleDurations.put(0, new ConcreteDuration(0, 1));
-    counterexampleDurations.put(1, new ConcreteDuration(1, 2));
-    counterexampleDurations.put(3, new ConcreteDuration(3, 1));
+    List<ConcreteDuration> counterexampleDurations = Arrays.asList(new ConcreteDuration(0, 1),
+        new ConcreteDuration(1, 2), new ConcreteDuration(3, 1));
     ConcreteSpecification counterexample = new ConcreteSpecification(counterexampleColumns, counterexampleDurations, true);
     hybridSpec.setCounterExample(counterexample);
   }

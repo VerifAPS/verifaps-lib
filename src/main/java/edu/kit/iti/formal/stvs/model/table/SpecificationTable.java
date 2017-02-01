@@ -2,6 +2,9 @@ package edu.kit.iti.formal.stvs.model.table;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 
 import java.util.*;
 
@@ -12,21 +15,25 @@ public class SpecificationTable<C, D> {
 
   private ObjectProperty<ColumnChangeInfo<C>> columnChange;
   private ObjectProperty<RowChangeInfo<C>> rowChange;
+  private int height;
   protected Map<String, SpecificationColumn<C>> columns;
-  protected ObjectProperty<Map<Integer,D>> durations;
+  protected ObservableList<D> durations;
 
   public SpecificationTable() {
-    columnChange = new SimpleObjectProperty<>();
-    rowChange = new SimpleObjectProperty<>();
-    columns = new HashMap<>();
-    durations = new SimpleObjectProperty<>(new HashMap<Integer,D>());
+    this(new HashMap<>(), new ArrayList<>());
   }
 
-  public SpecificationTable(Map<String, SpecificationColumn<C>> columns, Map<Integer,D> durations) {
+  public SpecificationTable(Map<String, SpecificationColumn<C>> columns, List<D> durations) {
     columnChange = new SimpleObjectProperty<>();
     rowChange = new SimpleObjectProperty<>();
     this.columns = columns;
-    this.durations = new SimpleObjectProperty<>(new HashMap<>(durations));
+    height = -1;
+    for (SpecificationColumn<C> col : this.columns.values()) {
+      if (height == -1) height = col.getNumberOfCells();
+      if (height != col.getNumberOfCells()) throw new IllegalArgumentException("Inconsistent " +
+          "column heights: Not all columns have height " + height);
+    }
+    this.durations = FXCollections.observableArrayList(durations);
   }
 
   public enum Change {
@@ -58,6 +65,10 @@ public class SpecificationTable<C, D> {
     }
   }
 
+  public int getHeight() {
+    return height;
+  }
+
   public C getCell(int row, String columnId) {
     SpecificationColumn<C> specColumn = columns.get(columnId);
     if (specColumn == null) {
@@ -77,6 +88,8 @@ public class SpecificationTable<C, D> {
   public void addColumn(String columnId, SpecificationColumn<C> column) {
     if (columns.containsKey(columnId)) {
       throw new IllegalArgumentException("A column with the name " + columnId + " already exists!");
+    } else if (column.getNumberOfCells() != height) {
+      throw new IllegalArgumentException("Column does not have height " + height);
     }
     columns.put(columnId, column);
     columnChange.set(new ColumnChangeInfo<C>(column, columnId, Change.ADD));
@@ -107,6 +120,7 @@ public class SpecificationTable<C, D> {
       }
       columns.get(columnId).insertCell(rowNum, newCell);
     }
+    height += 1;
     rowChange.setValue(new RowChangeInfo<C>(row, rowNum, Change.ADD));
   }
 
@@ -118,31 +132,27 @@ public class SpecificationTable<C, D> {
    */
   public void addRow(int rowNum, SpecificationRow<C> row, D duration) {
     addRow(rowNum, row);
-    durations.get().put(rowNum, duration);
+    durations.add(rowNum, duration);
+    height += 1;
   }
 
+  /**
+   * NB: Does not remove a possible duration for that row
+   * @param rowNum
+   */
   public void removeRow(int rowNum) {
     /* Remove the cell from each column */
-    HashMap<String, C> removedCells = new HashMap<String, C>();
+    HashMap<String, C> removedCells = new HashMap<>();
     for (String columnId : columns.keySet()) {
       SpecificationColumn<C> column = columns.get(columnId);
       C removedCell = column.removeCell(rowNum);
       removedCells.put(columnId, removedCell);
     }
-    /* If there is a duration for that row, remove it as well */
-    durations.get().remove(rowNum);
     rowChange.setValue(new RowChangeInfo<C>(new SpecificationRow<C>(removedCells), rowNum, Change.REMOVE));
+    height -= 1;
   }
 
-  public void setDuration(int rowNum, D duration) {
-    durations.get().put(rowNum, duration);
-  }
-
-  public D getDuration(int rowNum) {
-    return durations.get().get(rowNum);
-  }
-
-  public ObjectProperty<Map<Integer,D>> durationsProperty() {
+  public ObservableList<D> getDurations() {
     return durations;
   }
 
@@ -169,5 +179,4 @@ public class SpecificationTable<C, D> {
   public void setColumnChange(ColumnChangeInfo columnChange) {
     this.columnChange.set(columnChange);
   }
-
 }
