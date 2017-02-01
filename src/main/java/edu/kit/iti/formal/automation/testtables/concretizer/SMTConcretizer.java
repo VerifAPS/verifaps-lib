@@ -88,7 +88,7 @@ public class SMTConcretizer extends DefaultConcretizer {
         for (ConstraintVariable var : tt.getConstraintVariable().values()) {
             SMVExpr expr = IOFacade.parseCellExpression(var.getConstraint(),
                     tt.getSMVVariable(var.getName()), tt);
-            prover.addConstraint((BooleanFormula) asSMT(expr, 0));
+         //   prover.addConstraint((BooleanFormula) asSMT(expr, 0));
         }
 
         for (int i = 0; i < cycles.size(); i++) {
@@ -122,16 +122,14 @@ public class SMTConcretizer extends DefaultConcretizer {
     }
 
     private Formula asSMT(List<SMVExpr> inputExpr, int i) {
-        return inputExpr.stream()
+        return null;
+        /*inputExpr.stream()
                 .map(a -> asSMT(a, i))
                 .reduce((a, b) -> boolmgr.and((BooleanFormula) a, (BooleanFormula) b))
-                .orElse(boolmgr.makeTrue());
+                .orElse(boolmgr.makeTrue());*/
 
     }
 
-    private Formula asSMT(SMVExpr smvExpr, int i) {
-        return smvExpr.accept(new SMTPrinter(context.getFormulaManager(), vfactory, i));
-    }
 }
 
 
