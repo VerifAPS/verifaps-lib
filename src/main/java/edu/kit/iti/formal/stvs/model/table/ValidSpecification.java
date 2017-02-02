@@ -17,7 +17,7 @@ public class ValidSpecification extends SpecificationTable<Expression, LowerBoun
   private final Set<Type> typeContext;
   private FreeVariableSet freeVariableSet;
 
-  public ValidSpecification(Map<String, SpecificationColumn<Expression>> columns,
+  public ValidSpecification(List<SpecificationColumn<Expression>> columns,
                             List<LowerBoundedInterval> durations,
                             Set<Type> typeContext, FreeVariableSet freeVariableSet) {
     super(columns, durations);

@@ -13,15 +13,14 @@ import java.util.List;
 /**
  * @author Benjamin Alt
  */
-public class SpecificationColumn<C extends StringReadable> {
+public class SpecificationColumn<C> {
 
   private ColumnConfig config;
   private ObservableList<C> cells;
   private SpecIoVariable ioVar;
 
   public SpecificationColumn(SpecIoVariable ioVar, List<C> cells, ColumnConfig config) {
-    this.cells = FXCollections.observableArrayList((C cell) -> new Observable[]{cell
-        .stringRepresentationProperty()}); // Should now fire changeevent if cell entries change
+    this.cells = FXCollections.observableArrayList();
     this.cells.addAll(cells);
     this.config = config;
     this.ioVar = ioVar;

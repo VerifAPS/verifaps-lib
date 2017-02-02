@@ -30,7 +30,6 @@ import javafx.beans.value.ObservableValue;
  */
 public class HybridSpecification extends ConstraintSpecification {
 
-
   private ConcreteSpecification counterExample;
   private OptionalProperty<ConcreteSpecification> concreteInstance;
   private final boolean editable;
@@ -72,9 +71,9 @@ public class HybridSpecification extends ConstraintSpecification {
     this.editable = editable;
     this.selection = new Selection();
     concreteInstance = new OptionalProperty<>(new SimpleObjectProperty<>());
-    validSpecificationProperty().addListener(new ValidSpecificationChangedListener<>());
+    validSpecificationProperty().addListener((observable, oldValue, newValue) -> onValidSpecificationChanged());
     concretizer = new BacktrackSpecificationConcretizer(new ConcretizerContext());
-    concretizer.concreteSpecProperty().addListener(new ConcreteSpecificationChangedListener<>());
+    concretizer.concreteSpecProperty().addListener((observable, oldValue, newValue) -> onConcreteSpecificationChanged());
   }
 
   public ConcreteSpecification getCounterExample() {
@@ -123,20 +122,6 @@ public class HybridSpecification extends ConstraintSpecification {
       concreteInstance.set(newConcreteSpec);
     } else {
       concreteInstance.clear();
-    }
-  }
-
-  class ValidSpecificationChangedListener<T> implements ChangeListener<T> {
-    @Override
-    public void changed(ObservableValue<? extends T> observableValue, T t, T t1) {
-      onValidSpecificationChanged();
-    }
-  }
-
-  class ConcreteSpecificationChangedListener<T> implements ChangeListener<T> {
-    @Override
-    public void changed(ObservableValue<? extends T> observableValue, T t, T t1) {
-      onConcreteSpecificationChanged();
     }
   }
 

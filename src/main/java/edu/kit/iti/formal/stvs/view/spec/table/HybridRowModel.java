@@ -27,12 +27,12 @@ public class HybridRowModel extends SpecificationRow<HybridCellModel> {
   }
 
   public HybridRowModel add(String column, ConstraintCell cell) {
-    cells.put(column, new HybridCellModel(cell));
+    getCells().put(column, new HybridCellModel(cell));
     return this;
   }
 
   public void put(String column, HybridCellModel cell) {
-    cells.put(column, cell);
+    getCells().put(column, cell);
   }
 
   public HybridCellModel getDuration() {

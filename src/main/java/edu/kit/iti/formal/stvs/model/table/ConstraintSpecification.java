@@ -63,16 +63,20 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
             ().categoryProperty(), column.getSpecIoVariable().typeProperty(), column
             .getSpecIoVariable().nameProperty(), column.getCells()});
     this.columns.addAll(columns);
-    this.columns.addListener(new ColumnsChangedListener());
-    this.columns.addListener(new SpecificationChangedListListener<>());
+    this.columns.addListener(this::onColumnChange);
+    this.columns.addListener(
+        (ListChangeListener.Change<? extends SpecificationColumn<ConstraintCell>> c) ->
+        onSpecificationChanged());
     initHeight();
     this.rows = FXCollections.observableArrayList(makeRowList(columns));
-    this.rows.addListener(new RowsChangedListener());
+    this.rows.addListener(this::onRowChange);
 
     this.durations = FXCollections.observableArrayList(
         (ConstraintDuration tp) -> new Observable[]{tp.stringRepresentationProperty()});
     this.durations.addAll(durations);
-    this.durations.addListener(new SpecificationChangedListListener<>());
+    this.durations.addListener(
+        (ListChangeListener.Change<? extends ConstraintDuration> c) ->
+        onSpecificationChanged());
     this.typeContext = FXCollections.observableSet(typeContext);
     this.freeVariableSet = freeVariableSet;
     this.codeIoVariables = FXCollections.observableSet(ioVariables);
@@ -135,7 +139,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
   private void onSpecificationChanged() {
     ArrayList<SpecProblem> problemsFound = new ArrayList<>();
     // Parse and type-check cells
-    HashMap<String,SpecificationColumn<Expression>> parsedColumns = new HashMap<>();
+    List<SpecificationColumn<Expression>> parsedColumns = new ArrayList<>();
     HashMap<String, Type> typeCheckerTypeContext = new HashMap<>(freeVariableSet.getVariableContext());
     for (SpecificationColumn column : columns) {
       typeCheckerTypeContext.put(column.getSpecIoVariable().getName(), column.getSpecIoVariable().getType());
@@ -160,7 +164,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
               rowNum, rawColumn.getSpecIoVariable(), rowNum, e));
         }
       }
-      parsedColumns.put(columnId, new SpecificationColumn<>(rawColumn.getSpecIoVariable(), parsedCells, rawColumn.getConfig()));
+      parsedColumns.add(new SpecificationColumn<>(rawColumn.getSpecIoVariable(), parsedCells, rawColumn.getConfig()));
     }
     // Parse durations
     List<LowerBoundedInterval> parsedDurations = new ArrayList<>();
@@ -195,22 +199,6 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
       validSpecification.set(new ValidSpecification(parsedColumns, parsedDurations, typeContext, freeVariableSet));
     } else {
       validSpecification.clear();
-    }
-  }
-
-  private class SpecificationChangedListener<T> implements ChangeListener<T> {
-
-    @Override
-    public void changed(ObservableValue<? extends T> observableValue, T oldValue, T newValue) {
-      onSpecificationChanged();
-    }
-  }
-
-  private class SpecificationChangedListListener<T> implements ListChangeListener<T> {
-
-    @Override
-    public void onChanged(Change<? extends T> change) {
-      onSpecificationChanged();
     }
   }
 

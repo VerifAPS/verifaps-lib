@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * @author Benjamin Alt
  */
-public class SpecificationTable<C extends StringReadable, D> {
+public class SpecificationTable<C, D> {
 
   protected int height;
   protected ObservableList<SpecificationColumn<C>> columns;

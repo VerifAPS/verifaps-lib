@@ -35,15 +35,15 @@ abstract public class TableCategoryController implements Controller {
   /**
    * Listens on changed rows in Specification model and adds cells, removes cells in columns
    */
-  private void onRowChange(SpecificationTable.RowChangeInfo<ConstraintCell> change) {
+  //private void onRowChange(SpecificationTable.RowChangeInfo<ConstraintCell> change) {
 
-  }
+  //}
 
   /**
    * Listens on changed columns in Specification model and adds columns, removes columns
    */
-  protected void onColumnChange(SpecificationTable.ColumnChangeInfo<ConstraintCell> change) {
-  }
+  //protected void onColumnChange(SpecificationTable.ColumnChangeInfo<ConstraintCell> change) {
+  //}
 
   private void onSpecProblemsChanged(List<SpecProblem> problems) {
 

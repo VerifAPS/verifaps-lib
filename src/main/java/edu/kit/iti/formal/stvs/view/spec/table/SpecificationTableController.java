@@ -122,7 +122,7 @@ public class SpecificationTableController implements Controller {
     column.getColumns().add(
         createColumn(
             columnName,
-            hybridRowModel -> hybridRowModel.getCellForVariable(columnName))
+            hybridRowModel -> hybridRowModel.getCells().get(columnName))
     );
   }
 
