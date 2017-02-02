@@ -275,6 +275,14 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     }
   }
 
+  private class SpecificationChangedListener<T> implements ChangeListener<T> {
+
+    @Override
+    public void changed(ObservableValue<? extends T> observableValue, T oldValue, T newValue) {
+      onSpecificationChanged();
+    }
+  }
+
   private class SpecificationChangedListListener<T> implements ListChangeListener<T> {
 
     @Override
