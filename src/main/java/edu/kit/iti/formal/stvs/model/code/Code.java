@@ -72,4 +72,8 @@ public class Code {
   public List<? extends Token> getTokens() {
     return tokens;
   }
+
+  public String getFilename() {
+    return filename.get();
+  }
 }

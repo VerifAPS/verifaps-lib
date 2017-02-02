@@ -1,11 +1,13 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
+import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * Facade class for facilitating the export of different objects to different export formats.
@@ -22,16 +24,73 @@ public class ExporterFacade {
     return null;
   }
 
+  /**
+   * exports spec to a given file
+   * @param spec spec to export
+   * @param format format to use (can be found in ExporterFascade.ExportFormat)
+   * @param file file to write to
+   */
+  public static void exportSpec(ConstraintSpecification spec, ExportFormat format, File file)
+      throws IOException {
+
+  }
+
   public static OutputStream exportConfig(GlobalConfig config, ExportFormat format) {
     return null;
+  }
+
+  /**
+   * exports config to a given file
+   * @param config config that should be exported
+   * @param format format to use (can be found in ExporterFascade.ExportFormat)
+   * @param file file to write to
+   */
+  public static void exportConfig(GlobalConfig config, ExportFormat format, File file) throws
+      IOException {
+
   }
 
   public static OutputStream exportSession(StvsRootModel session, ExportFormat format) {
     return null;
   }
 
+  /**
+   * exports session to a given file
+   * @param session session that should be exported
+   * @param format format to use (can be found in ExporterFascade.ExportFormat)
+   * @param file file to write to
+   */
+  public static void exportSession(StvsRootModel session, ExportFormat format, File file) throws
+      IOException {
+
+  }
+
   public static OutputStream exportVerificationScenario(VerificationScenario scenario,
                                                 ExportFormat format) {
     return null;
+  }
+
+  /**
+   * exports verificationscenario to a given file
+   * @param verificationScenario verification scenario that should be exported
+   * @param format format to use (can be found in ExporterFascade.ExportFormat)
+   * @param file file to write to
+   */
+  public static void exportVerificationScenario(VerificationScenario verificationScenario,
+                                                ExportFormat format, File file) throws IOException {
+
+  }
+
+  /**
+   * exports code to the file specified in code-model
+   * @param code Code to export
+   * @throws IOException will be thrown, when an error occurs while saving
+   */
+  public static void exportCode(Code code) throws IOException {
+    File file = new File(code.getFilename());
+
+    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+    writer.write(code.getSourcecode());
+    writer.close();
   }
 }
