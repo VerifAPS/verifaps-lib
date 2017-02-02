@@ -45,10 +45,10 @@ public class ConfigDialogPane extends DialogPane {
     grid.add(new Label("Simulation Timeout"), 0, 1);
     grid.add(simulationTimeout, 1, 1);
 
-    grid.add(new Label("Windowheight"), 0, 2);
+    grid.add(new Label("Window-Height"), 0, 2);
     grid.add(windowHeight, 1, 2);
 
-    grid.add(new Label("Windowwidth"), 0, 3);
+    grid.add(new Label("Window-Width"), 0, 3);
     grid.add(windowWidth, 1, 3);
 
     grid.add(new Label("Editor-Fontsize"), 0, 4);
