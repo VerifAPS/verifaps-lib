@@ -16,9 +16,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static edu.kit.iti.formal.stvs.model.TestUtils.assertCollectionsEqual;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static edu.kit.iti.formal.stvs.model.TestUtils.assertCollectionsEqual;
 
 /**
  * Created by Philipp on 19.01.2017.
@@ -26,7 +26,6 @@ import static edu.kit.iti.formal.stvs.model.TestUtils.assertCollectionsEqual;
 public class CodeTest {
 
   private final Code code = new Code();
-  private final Code exampleCode = new Code("stfile.st", "THIS IS SPARTA");
   private final Code enumDefinition = loadCodeFromFile("define_type.st");
 
   public static Code loadCodeFromFile(String filename) {
@@ -54,8 +53,8 @@ public class CodeTest {
 
   @Test
   public void testTokensConcatenated() {
-    String source = exampleCode.getSourcecode();
-    List<? extends Token> tokens = exampleCode.getTokens();
+    String source = enumDefinition.getSourcecode();
+    List<? extends Token> tokens = enumDefinition.getTokens();
     String tokensConcatenated = tokens.stream()
         .map(Token::getText)
         .reduce("", String::concat);

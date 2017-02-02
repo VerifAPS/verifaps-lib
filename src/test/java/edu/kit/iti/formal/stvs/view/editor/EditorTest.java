@@ -5,13 +5,14 @@ import edu.kit.iti.formal.stvs.model.code.CodeTest;
 import edu.kit.iti.formal.stvs.model.code.ParsedCode;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.SplitPane;
+import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Lukas on 20.01.2017.
@@ -20,22 +21,16 @@ public class EditorTest {
 
   @Test
   public void javaFxTest() {
-    JavaFxTest.setToBeViewed(this::simpleScene);
-    Application.launch(JavaFxTest.class);
+    JavaFxTest.runSplitView(this::editorAndModelSplit);
   }
 
-  private Scene simpleScene() {
+  private List<Node> editorAndModelSplit() {
     Code code = CodeTest.loadCodeFromFile("define_type.st");
     EditorPaneController controller = new EditorPaneController(code, new GlobalConfig());
 
     Pane rightPane = createExtractedVarsTextArea(code);
 
-    SplitPane pane = new SplitPane();
-    pane.getItems().addAll(controller.getView(), rightPane);
-
-    Scene scene = new Scene(pane, 800, 600);
-    scene.getStylesheets().add(this.getClass().getResource("style.css").toExternalForm());
-    return scene;
+    return Arrays.asList(controller.getView(), rightPane);
   }
 
   private Pane createExtractedVarsTextArea(Code code) {
@@ -43,14 +38,15 @@ public class EditorTest {
     textArea.getStyleClass().addAll("model-text-area");
     textArea.setEditable(false);
 
-    updateText(textArea, code.getParsedCode());
+    updateText(textArea, code);
     code.parsedCodeProperty().addListener((ob, old, parsedCode) ->
-        updateText(textArea, parsedCode));
+        updateText(textArea, code));
 
     return new StackPane(textArea);
   }
 
-  private void updateText(TextArea textArea, ParsedCode parsedCode) {
+  private void updateText(TextArea textArea, Code code) {
+    ParsedCode parsedCode = code.getParsedCode();
     if (parsedCode != null) {
       StringBuilder output = new StringBuilder();
       output.append("Defined types:\n");
@@ -59,6 +55,8 @@ public class EditorTest {
       output.append("\n");
       output.append("Defined IOVariables:\n");
       parsedCode.getDefinedVariables().forEach(codeIoVariable -> output.append(" - " + codeIoVariable + "\n"));
+      output.append("SyntaxErrors: \n");
+      code.getSyntaxErrors().forEach(syntaxError -> output.append(" - " + syntaxError + "\n"));
       textArea.setText(output.toString());
     }
   }

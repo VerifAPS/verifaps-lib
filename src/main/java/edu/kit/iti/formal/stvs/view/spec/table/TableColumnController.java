@@ -20,14 +20,14 @@ public class TableColumnController extends ColumnController {
   private ObservableList<HybridCellController> cells;
   private ObjectProperty<SpecIoVariable> columnName;
   private ObservableList<SpecProblem> problems;
-  private TableColumn tableColumn;
+  private SpecificationTableColumn specificationTableColumn;
   private GlobalConfig globalConfig;
   private ContextMenu contextMenu;
 
   /**
    * @param types        all defined Types extracted from the code
    * @param codeVars     input and output variables exposed by the code
-   * @param columnName   the SpecIoVariable that this TableColumn modifies
+   * @param columnName   the SpecIoVariable that this SpecificationTableColumn modifies
    * @param columnConfig
    * @param globalConfig
    */
@@ -57,7 +57,7 @@ public class TableColumnController extends ColumnController {
   }
 
   @Override
-  public TableColumn getView() {
-    return tableColumn;
+  public SpecificationTableColumn getView() {
+    return specificationTableColumn;
   }
 }
