@@ -34,6 +34,7 @@ public class XmlConfigImporterTest {
     assertEquals(100, config.getSimulationTimeout());
     assertEquals("Comic Sans", config.getEditorFontFamily());
     assertEquals(12, config.getEditorFontSize());
+    assertEquals(true, config.getShowLineNumbers());
   }
 
   @Test(expected=ImportException.class)

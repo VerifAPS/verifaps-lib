@@ -48,10 +48,8 @@ public class ConstraintSpecificationTest {
         new SpecIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableC"), cellsC, new ColumnConfig()));
     columns.put("VariableD", new SpecificationColumn<>(
         new SpecIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableD"), cellsD, new ColumnConfig(55)));
-    Map<Integer, ConstraintDuration> durations = new HashMap<>();
-    durations.put(0, new ConstraintDuration("1"));
-    durations.put(1, new ConstraintDuration("4"));
-    durations.put(2, new ConstraintDuration("5"));
+    List<ConstraintDuration> durations = Arrays.asList(new ConstraintDuration("1"), new
+        ConstraintDuration("4"), new ConstraintDuration("5"));
 
     Set<Type> typeContext = new HashSet<Type>();
     typeContext.add(TypeInt.INT);
@@ -75,9 +73,14 @@ public class ConstraintSpecificationTest {
   public void testAddEmptyColumn() {
     SpecIoVariable variable = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableE");
     spec.addEmptyColumn(variable);
-    SpecificationColumn<ConstraintCell> expectedColumn =  new SpecificationColumn<>(variable, new ArrayList<>(), new ColumnConfig());
+    ArrayList<ConstraintCell> expectedCells = new ArrayList<>();
+    for (int i = 0; i < spec.getHeight(); i++) {
+      expectedCells.add(new ConstraintCell(""));
+    }
+    SpecificationColumn<ConstraintCell> expectedColumn =  new SpecificationColumn<>(variable, expectedCells,
+        new ColumnConfig());
     assertEquals(expectedColumn, spec.getColumn("VariableE"));
-    assertEquals(0, spec.getColumn("VariableE").getNumberOfCells());
+    assertEquals(3, spec.getColumn("VariableE").getNumberOfCells());
   }
 
   /**
@@ -92,7 +95,7 @@ public class ConstraintSpecificationTest {
     validSpec = null;
     spec.getColumn("VariableB").getSpecIoVariable().setName("VariableX");
     assertNotNull(validSpec);
-    spec.getDuration(2).setFromString("]"); // This should cause a duration parse error
+    spec.getDurations().get(2).setFromString("]"); // This should cause a duration parse error
     assertNull(validSpec);
   }
 
@@ -125,7 +128,7 @@ public class ConstraintSpecificationTest {
   public void testDurationErrorHandling() {
     spec.getColumn("VariableA").getCellForRow(2).setFromString("100");
     assertNotNull(validSpec);
-    spec.getDuration(2).setFromString("bogus duration");
+    spec.getDurations().get(2).setFromString("bogus duration");
     assertNull(validSpec);
     assertNotEquals(0, spec.getProblems().size());
     assertThat(spec.getProblems().get(0), instanceOf(DurationProblem.class));
@@ -196,11 +199,11 @@ public class ConstraintSpecificationTest {
   public void testSetDuration() {
     assertNotNull(validSpec);
     ValidSpecification oldValidSpec = validSpec;
-    spec.setDuration(2, new ConstraintDuration("3"));
+    spec.getDurations().set(2, new ConstraintDuration("3"));
     assertNotNull(validSpec);
     // Test if listeners on added durations work
     assertNotEquals(oldValidSpec, validSpec);
-    spec.getDuration(2).setFromString("["); // This should cause a duration parse error
+    spec.getDurations().get(2).setFromString("["); // This should cause a duration parse error
     assertNull(validSpec);
   }
 

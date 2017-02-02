@@ -5,6 +5,7 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
@@ -18,9 +19,9 @@ public class XmlConfigImporter extends XmlImporter<GlobalConfig> {
   @Override
   public GlobalConfig doImportFromXmlNode(Node source) throws ImportException {
     try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(Config.class);
+      JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-      Config importedConfig = (Config) jaxbUnmarshaller.unmarshal(source);
+      Config importedConfig = ((JAXBElement<Config>) jaxbUnmarshaller.unmarshal(source)).getValue();
       GlobalConfig config = new GlobalConfig();
       Config.General general = importedConfig.getGeneral();
       Config.Editor editor = importedConfig.getEditor();
