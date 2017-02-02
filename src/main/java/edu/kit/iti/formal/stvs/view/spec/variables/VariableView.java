@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.layout.HBox;
 
 import javax.swing.*;

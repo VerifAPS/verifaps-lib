@@ -22,21 +22,29 @@ public class VariableController implements Controller {
 
     this.view = new VariableView(freeVariable);
 
-    view.getVarNameField().setOnAction(this::handleTextFieldChanged);
+    view.getVarNameField().setOnAction((e) -> handleTextFieldChanged());
+    view.getVarNameField().focusedProperty().addListener((o, old, focused) -> {
+      if (!focused) {
+        handleTextFieldChanged();
+      }
+    });
+
     view.getTypeComboBox().getItems().addAll(codeTypes);
-    if (codeTypes.size() > 0) {
-      view.getTypeComboBox().getSelectionModel().select(0);
-    }
+    view.getTypeComboBox().getSelectionModel().select(freeVariable.getType());
     view.getTypeComboBox().setOnAction(this::handleTypeChanged);
   }
 
   private void handleTypeChanged(ActionEvent actionEvent) {
-    System.out.println("Changed type: "
-        + view.getTypeComboBox().getSelectionModel().getSelectedItem());
+    Type newType = view.getTypeComboBox().getSelectionModel().getSelectedItem();
+    freeVariable.setType(newType);
   }
 
-  private void handleTextFieldChanged(ActionEvent actionEvent) {
-    freeVariable.setName(view.getVarNameField().getText());
+  private void handleTextFieldChanged() {
+    try {
+      freeVariable.setName(view.getVarNameField().getText());
+    } catch (IllegalArgumentException exc) {
+      System.err.println("Invalid name: " + exc.getMessage());
+    }
   }
 
   @Override

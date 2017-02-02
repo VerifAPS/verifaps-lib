@@ -276,4 +276,8 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
       onSpecificationChanged();
     }
   }
+
+  public int getHeight() {
+    return durations.get().size();
+  }
 }
