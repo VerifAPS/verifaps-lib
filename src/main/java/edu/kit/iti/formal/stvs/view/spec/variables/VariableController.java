@@ -6,11 +6,13 @@ import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ListCell;
 
 /**
  * Created by csicar on 10.01.17.
  */
-public class VariableController implements Controller {
+public class VariableController extends ListCell<FreeVariable> implements Controller {
+
   private ObservableList<Type> codeTypes;
   private FreeVariable freeVariable;
   private VariableView view;

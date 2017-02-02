@@ -8,6 +8,10 @@ import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+
+import java.util.stream.Collectors;
 
 /**
  * Created by csicar on 10.01.17.
@@ -26,30 +30,39 @@ public class VariableCollectionController implements Controller {
     this.contextMenu = new ContextMenu();
     this.view = new VariableCollection();
 
-    view.getAddFreeVariable().setOnAction(event -> addFreeVariable());
-    freeVariableSet.getVariableSet().addListener(this::updateVarsFromSet);
-  }
-
-  private void updateVarsFromSet(ListChangeListener.Change<? extends FreeVariable> c) {
-    while (c.next()) {
-      c.getAddedSubList().forEach(this::addVariableToView);
-    }
-  }
-
-  private void addVariableToView(FreeVariable freeVariable) {
-    VariableController varController = new VariableController(codeTypes, freeVariable);
-    varController.getView().getRemoveButton().setOnAction(event -> {
-      view.removeVariableView(varController.getView());
-      freeVariableSet.getVariableSet().remove(freeVariable);
+    view.getAddFreeVariable().setOnAction(event -> {
+      addFreeVariable();
+      ListView<FreeVariable> listView = view.getFreeVariableListView();
+      listView.scrollTo(listView.getItems().size() - 1);
+      listView.layout();
+      listView.edit(listView.getItems().size() - 1);
     });
-    view.addVariableView(varController.getView());
+    view.getFreeVariableListView().setItems(freeVariableSet.getVariableSet());
+    view.getFreeVariableListView().setCellFactory(this::createListCell);
+  }
+
+  private ListCell<FreeVariable> createListCell(ListView<FreeVariable> freeVariableListView) {
+    return new ListCell<FreeVariable>() {
+      {
+        this.setEditable(true);
+      }
+      @Override
+      public void updateItem(FreeVariable freeVariable, boolean empty) {
+        super.updateItem(freeVariable, empty);
+        if (empty) {
+          this.setGraphic(null);
+        } else {
+          VariableController controller = new VariableController(
+              VariableCollectionController.this.codeTypes, freeVariable);
+          this.setGraphic(controller.getView());
+        }
+      }
+    };
   }
 
   private boolean containsVarWithName(String name) {
     return freeVariableSet.getVariableSet().stream()
-        .filter(variable -> variable.getName().equals(name))
-        .findAny()
-        .isPresent();
+        .anyMatch(variable -> variable.getName().equals(name));
   }
 
   private String findNewName() {
@@ -63,7 +76,7 @@ public class VariableCollectionController implements Controller {
 
   private void addFreeVariable() {
     FreeVariable freeVariable = new FreeVariable(findNewName(), TypeBool.BOOL);
-    freeVariableSet.getVariableSet().add(freeVariable);
+    view.getFreeVariableListView().getItems().add(freeVariable);
   }
 
   @Override
