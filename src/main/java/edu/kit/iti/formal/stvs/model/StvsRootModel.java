@@ -66,6 +66,11 @@ public class StvsRootModel {
     return scenario;
   }
 
+  public void setScenario(VerificationScenario verificationScenario) {
+    // TODO: implement event passing etc.
+    this.scenario = verificationScenario;
+  }
+
   public File getWorkingdir() {
     return workingdir;
   }
@@ -73,4 +78,6 @@ public class StvsRootModel {
   public void setWorkingdir(File workingdir) {
     this.workingdir = workingdir;
   }
+
+
 }

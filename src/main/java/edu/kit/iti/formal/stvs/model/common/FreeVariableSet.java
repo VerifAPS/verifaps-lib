@@ -36,11 +36,11 @@ public class FreeVariableSet {
   /**
    * Creates a new list of free variables with an existing base.
    *
-   * @param variableSet List of existing variables
+   * @param variableList List of existing variables
    */
-  public FreeVariableSet(List<FreeVariable> variableSet) {
+  public FreeVariableSet(List<FreeVariable> variableList) {
     initItemChangeListener();
-    this.variableSet.addAll(variableSet);
+    this.variableSet.addAll(variableList);
   }
 
   /**

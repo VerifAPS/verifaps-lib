@@ -38,11 +38,7 @@ public class SpecificationTableTest {
         new SpecIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableC"), cellsC, new ColumnConfig()));
     columns.put("D", new SpecificationColumn<>(
         new SpecIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableD"), cellsD, new ColumnConfig(55)));
-    Map<Integer, Integer> durations = new HashMap<>();
-    durations.put(0,2);
-    durations.put(1,4);
-    durations.put(2,5);
-    durations.put(3,10);
+    List<Integer> durations = Arrays.asList(2,4,5,10);
     table = new SpecificationTable<>(columns, durations);
     rowChangeInfo = null;
     colChangeInfo = null;
@@ -179,7 +175,7 @@ public class SpecificationTableTest {
   @Test
   public void testGetDuration() {
     // Casts required to get rid of "ambiguous method call" error
-    assertEquals(2, (int)table.getDuration(0));
-    assertEquals(5, (int)table.getDuration(2));
+    assertEquals(2, (int)table.getDurations().get(0));
+    assertEquals(5, (int)table.getDurations().get(2));
   }
 }

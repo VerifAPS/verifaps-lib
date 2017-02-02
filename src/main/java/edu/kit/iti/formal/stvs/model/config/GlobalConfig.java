@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.model.config;
 
+import javafx.beans.property.*;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,27 +12,27 @@ public class GlobalConfig {
 
   private List<String> validLanguages = Arrays.asList("EN");
 
-  private int verificationTimeout;
-  private int simulationTimeout;
-  private int windowHeight;
-  private int windowWidth;
-  private int editorFontSize;
-  private String editorFontFamily;
-  private boolean showLineNumbers;
-  private String uiLanguage;
+  private IntegerProperty verificationTimeout;
+  private IntegerProperty simulationTimeout;
+  private IntegerProperty windowHeight;
+  private IntegerProperty  windowWidth;
+  private IntegerProperty editorFontSize;
+  private StringProperty editorFontFamily;
+  private BooleanProperty showLineNumbers;
+  private StringProperty uiLanguage;
 
   /**
    * Default configuration
    */
   public GlobalConfig() {
-    verificationTimeout = 3600;
-    simulationTimeout = 60;
-    windowHeight = 600;
-    windowWidth = 800;
-    editorFontSize = 12;
-    editorFontFamily = "Courier";
-    showLineNumbers = true;
-    uiLanguage = "EN";
+    verificationTimeout = new SimpleIntegerProperty(3600);
+    simulationTimeout = new SimpleIntegerProperty(60);
+    windowHeight = new SimpleIntegerProperty(600);
+    windowWidth = new SimpleIntegerProperty(800);
+    editorFontSize = new SimpleIntegerProperty(12);
+    editorFontFamily = new SimpleStringProperty("Courier");
+    showLineNumbers = new SimpleBooleanProperty(true);
+    uiLanguage = new SimpleStringProperty("EN");
   }
 
   /**
@@ -39,7 +41,7 @@ public class GlobalConfig {
    * @return The current verification timeout
    */
   public int getVerificationTimeout() {
-    return verificationTimeout;
+    return verificationTimeout.get();
   }
 
   /**
@@ -48,7 +50,7 @@ public class GlobalConfig {
    * @return The current simulation timeout
    */
   public int getSimulationTimeout() {
-    return simulationTimeout;
+    return simulationTimeout.get();
   }
 
   /**
@@ -57,7 +59,7 @@ public class GlobalConfig {
    * @return The current editor font size
    */
   public int getEditorFontSize() {
-    return editorFontSize;
+    return editorFontSize.get();
   }
 
   /**
@@ -66,7 +68,7 @@ public class GlobalConfig {
    * @return The current editor font family
    */
   public String getEditorFontFamily() {
-    return editorFontFamily;
+    return editorFontFamily.get();
   }
 
   /**
@@ -75,7 +77,7 @@ public class GlobalConfig {
    * @return Whether line numbers are to be shown in the editor
    */
   public boolean getShowLineNumbers() {
-    return showLineNumbers;
+    return showLineNumbers.get();
   }
 
   /**
@@ -84,7 +86,7 @@ public class GlobalConfig {
    * @return The current UI language
    */
   public String getUiLanguage() {
-    return uiLanguage;
+    return uiLanguage.get();
   }
 
   /**
@@ -96,7 +98,7 @@ public class GlobalConfig {
     if (verificationTimeout <= 0) {
       throw new IllegalArgumentException("Invalid verification timeout: " + verificationTimeout);
     }
-    this.verificationTimeout = verificationTimeout;
+    this.verificationTimeout.set(verificationTimeout);
   }
 
   /**
@@ -108,7 +110,7 @@ public class GlobalConfig {
     if (simulationTimeout <= 0) {
       throw new IllegalArgumentException("Invalid simulation timeout: " + simulationTimeout);
     }
-    this.simulationTimeout = simulationTimeout;
+    this.simulationTimeout.set(simulationTimeout);
   }
 
   /**
@@ -120,7 +122,7 @@ public class GlobalConfig {
     if (editorFontSize <= 0) {
       throw new IllegalArgumentException("Invalid editor font size: " + editorFontSize);
     }
-    this.editorFontSize = editorFontSize;
+    this.editorFontSize.set(editorFontSize);
   }
 
   /**
@@ -129,7 +131,7 @@ public class GlobalConfig {
    * @param editorFontFamily The verification timeout to set
    */
   public void setEditorFontFamily(String editorFontFamily) {
-    this.editorFontFamily = editorFontFamily;
+    this.editorFontFamily.set(editorFontFamily);
   }
 
   /**
@@ -138,7 +140,7 @@ public class GlobalConfig {
    * @param showLineNumbers Whether line numbers are to be shown in the editor
    */
   public void setShowLineNumbers(boolean showLineNumbers) {
-    this.showLineNumbers = showLineNumbers;
+    this.showLineNumbers.set(showLineNumbers);
   }
 
   /**
@@ -150,29 +152,29 @@ public class GlobalConfig {
     if (!validLanguages.contains(uiLanguage))  {
       throw new IllegalArgumentException("Input language " + uiLanguage + " is not supported");
     }
-    this.uiLanguage = uiLanguage;
+    this.uiLanguage.set(uiLanguage);
   }
 
   public int getWindowHeight() {
-    return windowHeight;
+    return windowHeight.get();
   }
 
   public void setWindowHeight(int windowHeight) {
     if (windowHeight <= 0) {
       throw new IllegalArgumentException("Illegal window height: " + windowHeight);
     }
-    this.windowHeight = windowHeight;
+    this.windowHeight.set(windowHeight);
   }
 
   public int getWindowWidth() {
-    return windowWidth;
+    return windowWidth.get();
   }
 
   public void setWindowWidth(int windowWidth) {
     if (windowWidth <= 0) {
       throw new IllegalArgumentException("Illegal window width: " + windowWidth);
     }
-    this.windowWidth = windowWidth;
+    this.windowWidth.set(windowWidth);
   }
 
 }

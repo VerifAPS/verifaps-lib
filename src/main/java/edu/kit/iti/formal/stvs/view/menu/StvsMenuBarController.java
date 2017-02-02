@@ -8,6 +8,7 @@ import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
@@ -26,13 +27,13 @@ import java.util.Optional;
  */
 public class StvsMenuBarController implements Controller {
   private StvsMenuBar view;
-  private StvsRootModel rootModel;
+  private ObjectProperty<StvsRootModel> rootModel;
 
   /**
    * create a StvsMenuBarController; the parameters will be modified.
    * @param rootModel the applications root model
    */
-  public StvsMenuBarController(StvsRootModel rootModel) {
+  public StvsMenuBarController(ObjectProperty<StvsRootModel> rootModel) {
     //set own properties
     this.rootModel = rootModel;
 
@@ -51,7 +52,7 @@ public class StvsMenuBarController implements Controller {
   }
 
   private void openConfigDialog(ActionEvent t) {
-    ConfigDialogManager manager = new ConfigDialogManager(rootModel.getGlobalConfig());
+    ConfigDialogManager manager = new ConfigDialogManager(rootModel.get().getGlobalConfig());
     Optional<GlobalConfig> newConfig = manager.showAndWait();
     newConfig.ifPresent(config -> {
       //rootModel.getGlobalConfig() = config;
@@ -61,12 +62,19 @@ public class StvsMenuBarController implements Controller {
   private void openFile(ActionEvent t) {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Open file");
-    fileChooser.setInitialDirectory(rootModel.getWorkingdir());
+    fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
     if(chosenFile != null) {
       try {
-        ImporterFacade.importFile(chosenFile, (constraintSpecification) -> {
-            rootModel.getHybridSpecifications().addAll(constraintSpecification);
+        ImporterFacade.importFile(chosenFile, (hybridSpecification) -> {
+          //handle hybridspecification
+          rootModel.get().getHybridSpecifications().add(hybridSpecification);
+        }, (rootModel) -> {
+          //handle rootModel
+          this.rootModel.setValue(rootModel);
+        }, (verificationScenario) -> {
+          // handle verification scenario
+          this.rootModel.get().setScenario(verificationScenario);
         });
       } catch (IOException e) {
         new ErrorMessageDialog(e);
@@ -77,13 +85,12 @@ public class StvsMenuBarController implements Controller {
   private void saveAll(ActionEvent t) {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Save session");
-    fileChooser.setInitialDirectory(rootModel.getWorkingdir());
+    fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
     if(chosenFile != null) {
       try {
-        ExporterFacade.exportSession(rootModel, ExporterFacade.ExportFormat
+        ExporterFacade.exportSession(rootModel.get(), ExporterFacade.ExportFormat
             .XML, chosenFile);
-
       } catch (IOException e) {
         new ErrorMessageDialog(e);
       }
@@ -91,8 +98,7 @@ public class StvsMenuBarController implements Controller {
   }
 
   private void saveCode(ActionEvent t) {
-    // Todo: implement
-    Code code = rootModel.getScenario().getCode();
+    Code code = rootModel.get().getScenario().getCode();
     try {
       ExporterFacade.exportCode(code);
     } catch (IOException e) {
@@ -102,6 +108,8 @@ public class StvsMenuBarController implements Controller {
 
   private void saveSpec(ActionEvent t) {
     // Todo: implement
+
+    HybridSpecification spec = null; // get the active tab's hybrid-specification
   }
 
 

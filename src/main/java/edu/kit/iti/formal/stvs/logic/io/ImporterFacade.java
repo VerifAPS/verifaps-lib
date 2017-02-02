@@ -7,6 +7,7 @@ import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
 
@@ -22,6 +23,12 @@ public class ImporterFacade {
   }
 
   public static ConstraintSpecification importSpec(InputStream input, ImportFormat format) {
+    return null;
+  }
+
+  public static HybridSpecification importHybridSpec(InputStream input, ImportFormat format) {
+
+    // TODO: implement
     return null;
   }
 
@@ -44,10 +51,13 @@ public class ImporterFacade {
    * @param specificationConsumer consumer of the file (if the file is a Specification)
    * @param rootModelConsumer consumer of the file (if the file is a rootModel)
    * @param scenarioConsumer consumer of the file (if the file is a scenario)
+   * @throws IOException exception while reading a file
    */
-  public static void importFile(File file, Consumer<ConstraintSpecification>
+  public static void importFile(File file, Consumer<HybridSpecification>
       specificationConsumer, Consumer<StvsRootModel> rootModelConsumer,
-                                Consumer<VerificationScenario> scenarioConsumer) {
+                                Consumer<VerificationScenario> scenarioConsumer) throws
+      IOException {
+    // TODO: implement
   }
 
 }
