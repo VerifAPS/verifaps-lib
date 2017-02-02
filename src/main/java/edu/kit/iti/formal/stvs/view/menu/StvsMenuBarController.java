@@ -4,23 +4,14 @@ import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
-import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
-import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
 import javafx.beans.property.ObjectProperty;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
-import javafx.stage.Popup;
-import javafx.stage.Stage;
 
 import java.io.*;
-import java.util.Optional;
 
 /**
  * Created by csicar on 10.01.17.

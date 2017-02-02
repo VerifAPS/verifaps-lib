@@ -2,19 +2,25 @@ package edu.kit.iti.formal.stvs.view;
 
 import edu.kit.iti.formal.stvs.view.menu.StvsMenuBar;
 import edu.kit.iti.formal.stvs.view.editor.EditorPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
 /**
  * Created by csicar on 09.01.17.
  */
-public class StvsRootView extends Pane {
-  private StvsMenuBar menuBar;
+public class StvsRootView extends SplitPane {
   private EditorPane editor;
   private TabPane specifications;
 
-  public StvsMenuBar getMenuBar() {
-    return menuBar;
+  public StvsRootView(EditorPane editor, TabPane specifications) {
+    this.editor = editor;
+    this.specifications = specifications;
+
+    this.setStyle("height: 100%;");
+
+    this.getItems().addAll(editor, specifications);
   }
 
   public EditorPane getEditor() {
@@ -23,10 +29,6 @@ public class StvsRootView extends Pane {
 
   public TabPane getSpecifications() {
     return specifications;
-  }
-
-  public void setMenuBar(StvsMenuBar menuBar) {
-    this.menuBar = menuBar;
   }
 
   public void setEditor(EditorPane editor) {

@@ -9,9 +9,7 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.concurrent.Task;
 import org.antlr.v4.runtime.Token;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.StyleSpans;
-import org.fxmisc.richtext.StyleSpansBuilder;
+import org.fxmisc.richtext.*;
 
 import java.time.Duration;
 import java.util.*;
@@ -80,6 +78,11 @@ public class EditorPaneController implements Controller {
 
     StyleSpansBuilder<Collection<String>> spansBuilder
         = new StyleSpansBuilder<>();
+
+    if (tokens.isEmpty()) {
+      spansBuilder.add(Collections.emptyList(), 0);
+      return spansBuilder.create();
+    }
 
     tokens.forEach(token ->
       // replaceAll is a work-around for a bug when ANTLR has a
