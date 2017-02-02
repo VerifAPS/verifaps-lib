@@ -40,7 +40,6 @@ public class StvsMenuBarController implements Controller {
     //create view
     this.view = new StvsMenuBar();
 
-
     //add listener
     view.open.setOnAction(this::openFile);
     view.saveAll.setOnAction(this::saveAll);
@@ -48,15 +47,10 @@ public class StvsMenuBarController implements Controller {
     view.saveSpec.setOnAction(this::saveSpec);
     view.config.setOnAction(this::openConfigDialog);
 
-
   }
 
   private void openConfigDialog(ActionEvent t) {
-    ConfigDialogManager manager = new ConfigDialogManager(rootModel.get().getGlobalConfig());
-    Optional<GlobalConfig> newConfig = manager.showAndWait();
-    newConfig.ifPresent(config -> {
-      //rootModel.getGlobalConfig() = config;
-    });
+    ConfigDialogManager dialogManager = new ConfigDialogManager(rootModel.get().getGlobalConfig());
   }
 
   private void openFile(ActionEvent t) {
@@ -64,21 +58,23 @@ public class StvsMenuBarController implements Controller {
     fileChooser.setTitle("Open file");
     fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
-    if(chosenFile != null) {
-      try {
-        ImporterFacade.importFile(chosenFile, (hybridSpecification) -> {
-          //handle hybridspecification
-          rootModel.get().getHybridSpecifications().add(hybridSpecification);
-        }, (rootModel) -> {
-          //handle rootModel
-          this.rootModel.setValue(rootModel);
-        }, (verificationScenario) -> {
-          // handle verification scenario
-          this.rootModel.get().setScenario(verificationScenario);
-        });
-      } catch (IOException e) {
-        new ErrorMessageDialog(e);
-      }
+
+    if (chosenFile == null) {
+      return;
+    }
+    try {
+      ImporterFacade.importFile(chosenFile, (hybridSpecification) -> {
+        //handle hybridspecification
+        rootModel.get().getHybridSpecifications().add(hybridSpecification);
+      }, (rootModel) -> {
+        //handle rootModel
+        this.rootModel.setValue(rootModel);
+      }, (verificationScenario) -> {
+        // handle verification scenario
+        this.rootModel.get().setScenario(verificationScenario);
+      });
+    } catch (IOException e) {
+      new ErrorMessageDialog(e);
     }
   }
 
@@ -109,7 +105,7 @@ public class StvsMenuBarController implements Controller {
   private void saveSpec(ActionEvent t) {
     // Todo: implement
 
-    HybridSpecification spec = null; // get the active tab's hybrid-specification
+    HybridSpecification spec = null; // TODO: get the active tab's hybrid-specification
   }
 
 

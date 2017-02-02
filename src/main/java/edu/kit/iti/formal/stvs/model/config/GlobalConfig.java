@@ -143,6 +143,10 @@ public class GlobalConfig {
     this.showLineNumbers.set(showLineNumbers);
   }
 
+  public List<String> getValidLanguages() {
+    return this.validLanguages;
+  }
+
   /**
    * Set the current UI language
    *
@@ -177,4 +181,39 @@ public class GlobalConfig {
     this.windowWidth.set(windowWidth);
   }
 
+  public IntegerProperty verificationTimeoutProperty() {
+    return this.verificationTimeout;
+  }
+
+  public IntegerProperty simulationTimeoutProperty() {
+    return simulationTimeout;
+  }
+
+  public IntegerProperty windowHeightProperty() {
+    return windowHeight;
+  }
+
+  public IntegerProperty windowWidthProperty() {
+    return windowWidth;
+  }
+
+  public IntegerProperty editorFontSizeProperty() {
+    return editorFontSize;
+  }
+
+  public StringProperty editorFontFamilyProperty() {
+    return editorFontFamily;
+  }
+
+  public boolean isShowLineNumbers() {
+    return showLineNumbers.get();
+  }
+
+  public BooleanProperty showLineNumbersProperty() {
+    return showLineNumbers;
+  }
+
+  public StringProperty uiLanguageProperty() {
+    return uiLanguage;
+  }
 }
