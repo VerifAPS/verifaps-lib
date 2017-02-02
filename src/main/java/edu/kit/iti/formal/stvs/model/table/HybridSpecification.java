@@ -51,7 +51,7 @@ public class HybridSpecification extends ConstraintSpecification {
    */
   public HybridSpecification(Set<Type> typeContext, Set<CodeIoVariable> ioVariables,
                              FreeVariableSet freeVariableSet, boolean editable) {
-    this(new HashMap<>(), new ArrayList<>(),
+    this(new ArrayList<>(), new ArrayList<>(),
         typeContext, ioVariables, freeVariableSet, editable);
   }
 
@@ -64,7 +64,7 @@ public class HybridSpecification extends ConstraintSpecification {
    * @param freeVariableSet The set of declared free variables
    * @param editable Is this HybridSpecification supposed to be editable?
    */
-  public HybridSpecification(Map<String, SpecificationColumn<ConstraintCell>> columns,
+  public HybridSpecification(List<SpecificationColumn<ConstraintCell>> columns,
                              List<ConstraintDuration> durations, Set<Type> typeContext,
                              Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet,
                              boolean editable) {

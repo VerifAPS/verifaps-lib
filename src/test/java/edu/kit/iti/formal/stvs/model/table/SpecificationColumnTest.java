@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotEquals;
  * @author Benjamin Alt
  */
 public class SpecificationColumnTest {
-
+/*
   private SpecificationColumn<String> column;
 
   @Before
@@ -64,5 +64,5 @@ public class SpecificationColumnTest {
     assertEquals(column, column);
     otherColumn.insertCell(3, "A3");
     assertNotEquals(otherColumn, column);
-  }
+  }*/
 }

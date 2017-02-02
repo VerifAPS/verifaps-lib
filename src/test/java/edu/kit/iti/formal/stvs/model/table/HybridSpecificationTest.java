@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
  * @author Benjamin Alt
  */
 public class HybridSpecificationTest {
-
+/*
   private HybridSpecification hybridSpec;
   private ValidSpecification validSpec;
 
@@ -72,9 +72,6 @@ public class HybridSpecificationTest {
     hybridSpec.setCounterExample(counterexample);
   }
 
-  /* TODO: Concretizer not implemented yet, so cannot really test the generation of concrete specs once a
-  valid spec is available. This is more or less the only intelligent thing HybridSpecification
-  does */
 
   private void setValidSpecListener(ConstraintSpecification theSpec) {
     theSpec.validSpecificationProperty().addListener(new ChangeListener<ValidSpecification>() {
@@ -83,5 +80,5 @@ public class HybridSpecificationTest {
         validSpec = newValue;
       }
     });
-  }
+  }*/
 }

@@ -2,6 +2,9 @@ package edu.kit.iti.formal.stvs.model.expressions;
 
 import edu.kit.iti.formal.stvs.model.common.IoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
+import edu.kit.iti.formal.stvs.model.table.StringReadable;
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.SimpleStringProperty;
 
 /**
  * The abstract super-class for all Expressions.
@@ -16,7 +19,9 @@ import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
  * <p>The only ability all Expressions currently share is
  * getting visited.
  */
-public abstract class Expression {
+public abstract class Expression implements StringReadable {
+
+  private ReadOnlyStringProperty stringRepresentation;
 
   /**
    * Find out what subclass of Expression this is by supplying
@@ -27,5 +32,13 @@ public abstract class Expression {
    * @return the return value that the expression visitor produced
    */
   public abstract <R> R takeVisitor(ExpressionVisitor<R> visitor);
+
+  public String getAsString() {
+    return toString();
+  }
+
+  public ReadOnlyStringProperty stringRepresentationProperty() {
+    return new SimpleStringProperty(toString());
+  }
 
 }

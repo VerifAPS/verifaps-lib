@@ -1,5 +1,8 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 /**
  * The class for expressions that are constant. Examples are
  * <tt>42</tt>, <tt>TRUE</tt> or <tt>my_enum_constructor</tt>.
@@ -33,8 +36,8 @@ public class LiteralExpr extends Expression {
     return (other instanceof LiteralExpr) && this.equals((LiteralExpr) other);
   }
 
+  @Override
   public String toString() {
     return "LiteralExpr(" + value + ")";
   }
-
 }

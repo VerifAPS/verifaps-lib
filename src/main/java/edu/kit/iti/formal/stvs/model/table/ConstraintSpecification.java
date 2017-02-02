@@ -16,6 +16,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,13 +31,9 @@ import java.util.Set;
 public class ConstraintSpecification extends SpecificationTable<ConstraintCell, ConstraintDuration> implements Commentable {
 
   private ObjectProperty<List<SpecProblem>> problems;
-  private Set<Type> typeContext;
-  private Set<CodeIoVariable> codeIoVariables;
-  private Set<SpecIoVariable> specIoVariables; // TODO: Do we need this (implicitly stored in columns)?
-  private FreeVariableSet freeVariableSet;
-  /* Need to store this here, because we don't want ALL SpecificationRows to be commentable, only those
-  containing ConstraintCells */
-  private List<RowComment> rowComments;
+  private ObservableSet<Type> typeContext;
+  private ObservableSet<CodeIoVariable> codeIoVariables;
+  private final FreeVariableSet freeVariableSet;
   private StringProperty comment;
 
   private OptionalProperty<ValidSpecification> validSpecification;
@@ -47,7 +44,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
    * @param freeVariableSet
    */
   public ConstraintSpecification(Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet) {
-    this(new HashMap<>(), new ArrayList<>(), typeContext, ioVariables, freeVariableSet);
+    this(new ArrayList<>(), new ArrayList<>(), typeContext, ioVariables, freeVariableSet);
   }
 
   /**
@@ -58,65 +55,42 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
    * @param ioVariables
    * @param freeVariableSet
    */
-  public ConstraintSpecification(Map<String, SpecificationColumn<ConstraintCell>> columns,
+  public ConstraintSpecification(List<SpecificationColumn<ConstraintCell>> columns,
                                  List<ConstraintDuration> durations,
                                  Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet) {
-    super(columns, durations);
-    specIoVariables = new HashSet<>();
-    for (SpecificationColumn<ConstraintCell> col : columns.values()) {
-      specIoVariables.add(col.getSpecIoVariable());
-      col.getSpecIoVariable().categoryProperty().addListener(new SpecificationChangedListener<>());
-      col.getSpecIoVariable().nameProperty().addListener(new SpecificationChangedListener<>());
-      col.getSpecIoVariable().typeProperty().addListener(new SpecificationChangedListener<>());
-      for (int i = 0; i < durations.size(); i++) {
-        ConstraintCell cell = col.getCellForRow(i);
-        cell.stringRepresentationProperty().addListener(new SpecificationChangedListener<String>());
-      }
-    }
+    this.columns = FXCollections.observableArrayList(
+        (SpecificationColumn<ConstraintCell> column) -> new Observable[]{column.getSpecIoVariable
+            ().categoryProperty(), column.getSpecIoVariable().typeProperty(), column
+            .getSpecIoVariable().nameProperty(), column.getCells()});
+    this.columns.addAll(columns);
+    this.columns.addListener(new ColumnsChangedListener());
+    this.columns.addListener(new SpecificationChangedListListener<>());
+    initHeight();
+    this.rows = FXCollections.observableArrayList(makeRowList(columns));
+    this.rows.addListener(new RowsChangedListener());
+
     this.durations = FXCollections.observableArrayList(
         (ConstraintDuration tp) -> new Observable[]{tp.stringRepresentationProperty()});
     this.durations.addAll(durations);
     this.durations.addListener(new SpecificationChangedListListener<>());
-    this.typeContext = typeContext;
+    this.typeContext = FXCollections.observableSet(typeContext);
     this.freeVariableSet = freeVariableSet;
-    this.codeIoVariables = ioVariables;
-    this.freeVariableSet = freeVariableSet;
+    this.codeIoVariables = FXCollections.observableSet(ioVariables);
     this.problems = new SimpleObjectProperty<>();
     this.validSpecification = new OptionalProperty<>(new SimpleObjectProperty<>());
     onSpecificationChanged();
   }
 
-  public void addEmptyColumn(SpecIoVariable variable) {
-      if (specIoVariables.contains(variable)) {
-        throw new IllegalArgumentException("Column for " + variable.getName() + " already exists");
-      }
-      List<ConstraintCell> cells = new ArrayList<>();
-      for (int i = 0; i < getHeight(); i++) {
-        cells.add(new ConstraintCell(""));
-      }
-      addColumn(variable.getName(), new SpecificationColumn<>(variable, cells, new ColumnConfig()));
-      specIoVariables.add(variable);
-  }
-
-  public Set<Type> getTypeContext() {
+  public ObservableSet<Type> getTypeContext() {
     return typeContext;
-  }
-
-  public void setTypeContext(Set<Type> typeContext) {
-    this.typeContext = typeContext;
   }
 
   public FreeVariableSet getFreeVariableSet() {
     return freeVariableSet;
   }
 
-  public void setFreeVariableSet(FreeVariableSet freeVariableSet) {
-    this.freeVariableSet = freeVariableSet;
-    onSpecificationChanged();
-  }
-
-  public void setCodeIoVariables(Set<CodeIoVariable> codeIoVariables) {
-    this.codeIoVariables = codeIoVariables;
+  public ObservableSet<CodeIoVariable> getCodeIoVariables() {
+    return codeIoVariables;
   }
 
   public ValidSpecification getValidSpecification() {
@@ -125,14 +99,6 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
   public OptionalProperty<ValidSpecification> validSpecificationProperty() {
     return validSpecification;
-  }
-
-  public List<RowComment> getRowComments() {
-    return rowComments;
-  }
-
-  public void setRowComments(List<RowComment> rowComments) {
-    this.rowComments = rowComments;
   }
 
   public List<SpecProblem> getProblems() {
@@ -162,51 +128,6 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     return comment;
   }
 
-  @Override
-  public void addColumn(String columnId, SpecificationColumn<ConstraintCell> column) {
-    if (specIoVariables.contains(column.getSpecIoVariable())) {
-      throw new IllegalArgumentException("Column for " + column.getSpecIoVariable().getName() + " already exists");
-    }
-    super.addColumn(columnId, column);
-    column.getSpecIoVariable().categoryProperty().addListener(new SpecificationChangedListener<VariableCategory>());
-    column.getSpecIoVariable().nameProperty().addListener(new SpecificationChangedListener<String>());
-    column.getSpecIoVariable().typeProperty().addListener(new SpecificationChangedListener<Type>());
-    for (int i = 0; i < column.getNumberOfCells(); i++) {
-      ConstraintCell cell = column.getCellForRow(i);
-      cell.stringRepresentationProperty().addListener(new SpecificationChangedListener<String>());
-      // No need to listen for changes to comments, as they have no effect (annotations would)
-    }
-    specIoVariables.add(column.getSpecIoVariable());
-    onSpecificationChanged();
-  }
-
-  public void removeColumn(String columnId) {
-    specIoVariables.remove(columns.get(columnId).getSpecIoVariable());
-    super.removeColumn(columnId);
-    onSpecificationChanged();
-  }
-
-  public void addRow(int rowNum, SpecificationRow<ConstraintCell> row) {
-    super.addRow(rowNum, row);
-    for (String varName : columns.keySet()) {
-      row.getCellForVariable(varName).stringRepresentationProperty().addListener(new SpecificationChangedListener<>());
-    }
-    onSpecificationChanged();
-  }
-
-  public void addRow(int rowNum, SpecificationRow<ConstraintCell> row, ConstraintDuration duration) {
-    super.addRow(rowNum, row, duration);
-    for (String varName : columns.keySet()) {
-      row.getCellForVariable(varName).stringRepresentationProperty().addListener(new SpecificationChangedListener<>());
-    }
-    onSpecificationChanged();
-  }
-
-  public void removeRow(int rowNum) {
-    super.removeRow(rowNum);
-    onSpecificationChanged();
-  }
-
   /**
    * Called when the specification changed. Try to create a new ValidSpecification (parsed and type-checked) if possible;
    * record all problems encountered in doing so. If parsing and type-checking successful, sets the optional ValidSpecification.
@@ -216,12 +137,13 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     // Parse and type-check cells
     HashMap<String,SpecificationColumn<Expression>> parsedColumns = new HashMap<>();
     HashMap<String, Type> typeCheckerTypeContext = new HashMap<>(freeVariableSet.getVariableContext());
-    for (String columnId : columns.keySet()) {
-      typeCheckerTypeContext.put(columnId, columns.get(columnId).getSpecIoVariable().getType());
+    for (SpecificationColumn column : columns) {
+      typeCheckerTypeContext.put(column.getSpecIoVariable().getName(), column.getSpecIoVariable().getType());
     }
     TypeChecker typeChecker = new TypeChecker(typeCheckerTypeContext);
-    for (String columnId : columns.keySet()) {
-      SpecificationColumn<ConstraintCell> rawColumn = columns.get(columnId);
+    for (SpecificationColumn column : columns) {
+      SpecificationColumn<ConstraintCell> rawColumn = column;
+      String columnId = column.getSpecIoVariable().getName();
       ArrayList<Expression> parsedCells = new ArrayList<Expression>();
       List<ConstraintCell> rawCells = rawColumn.getCells();
       ExpressionParser parser = new ExpressionParser(columnId);
@@ -234,7 +156,8 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
           problemsFound.add(new ParseErrorProblem(e.getMessage(), rawColumn.getSpecIoVariable(), rowNum));
           // Do not break, as all cells must be parsed in order for all specProblems to be found
         } catch (TypeCheckException e) {
-          problemsFound.add(new TypeErrorProblem("Type error in column " + columnId + ", row " + rowNum, rawColumn.getSpecIoVariable(), rowNum, e));
+          problemsFound.add(new TypeErrorProblem("Type error in column " + columnId + ", row " +
+              rowNum, rawColumn.getSpecIoVariable(), rowNum, e));
         }
       }
       parsedColumns.put(columnId, new SpecificationColumn<>(rawColumn.getSpecIoVariable(), parsedCells, rawColumn.getConfig()));
@@ -249,15 +172,15 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
       }
     }
     // Are there invalid IO variables? (Is there a specIoVariable that is not a codeIoVariable?)
-    for (SpecIoVariable specIoVariable : specIoVariables) {
+    for (SpecificationColumn column : columns) {
       boolean found = false;
       for (CodeIoVariable codeIoVariable : codeIoVariables) {
-        if (codeIoVariable.matches(specIoVariable)) {
+        if (codeIoVariable.matches(column.getSpecIoVariable())) {
           found = true;
         }
       }
       if (!found) {
-        problemsFound.add(new InvalidIoVarProblem(specIoVariable));
+        problemsFound.add(new InvalidIoVarProblem(column.getSpecIoVariable()));
       }
     }
     // Create the new ValidSpecification

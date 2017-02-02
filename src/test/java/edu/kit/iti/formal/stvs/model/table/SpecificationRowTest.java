@@ -14,7 +14,7 @@ import static org.junit.Assert.assertNotEquals;
  */
 public class SpecificationRowTest {
   private SpecificationRow<String> row;
-
+/*
   @Before
   public void setUp() {
     HashMap<String, String> cells = new HashMap<>();
@@ -49,5 +49,5 @@ public class SpecificationRowTest {
     cells.put("C", "C4");
     otherRow = new SpecificationRow<>(cells);
     assertNotEquals(otherRow, row);
-  }
+  }*/
 }

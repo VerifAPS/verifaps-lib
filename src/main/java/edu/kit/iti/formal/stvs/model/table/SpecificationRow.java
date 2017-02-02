@@ -1,25 +1,27 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
+
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 /**
  * @author Benjamin Alt
  */
-public class SpecificationRow<C> {
+public class SpecificationRow<C> implements Commentable {
 
-  protected final Map<String, C> cells;
+  private ObservableMap<String, C> cells;
+  private StringProperty comment;
 
   public SpecificationRow(Map<String, C> cells) {
-    this.cells = cells;
+    this.cells = FXCollections.observableMap(cells);
+    comment = new SimpleStringProperty();
   }
 
-  public C getCellForVariable(String variable) {
-    C cell = cells.get(variable);
-    if (cell == null) {
-      throw new NoSuchElementException("Cannot get cell for variable " + variable + " : No such variable");
-    }
-    return cell;
+  public ObservableMap<String,C> getCells() {
+    return cells;
   }
 
   @Override
@@ -28,5 +30,20 @@ public class SpecificationRow<C> {
     if (obj == this) return true;
     SpecificationRow other = (SpecificationRow) obj;
     return this.cells.equals(other.cells);
+  }
+
+  @Override
+  public void setComment(String comment) {
+    this.comment.set(comment);
+  }
+
+  @Override
+  public String getComment() {
+    return this.comment.get();
+  }
+
+  @Override
+  public StringProperty commentProperty() {
+    return comment;
   }
 }

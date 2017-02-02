@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -11,57 +9,32 @@ import java.util.*;
 /**
  * @author Benjamin Alt
  */
-public class SpecificationTable<C, D> {
+public class SpecificationTable<C extends StringReadable, D> {
 
-  private ObjectProperty<ColumnChangeInfo<C>> columnChange;
-  private ObjectProperty<RowChangeInfo<C>> rowChange;
-  private int height;
-  protected Map<String, SpecificationColumn<C>> columns;
+  protected int height;
+  protected ObservableList<SpecificationColumn<C>> columns;
+  protected ObservableList<SpecificationRow<C>> rows;
   protected ObservableList<D> durations;
 
   public SpecificationTable() {
-    this(new HashMap<>(), new ArrayList<>());
+    this(new ArrayList<>(), new ArrayList<>());
   }
 
-  public SpecificationTable(Map<String, SpecificationColumn<C>> columns, List<D> durations) {
-    columnChange = new SimpleObjectProperty<>();
-    rowChange = new SimpleObjectProperty<>();
-    this.columns = columns;
-    height = -1;
-    for (SpecificationColumn<C> col : this.columns.values()) {
-      if (height == -1) height = col.getNumberOfCells();
-      if (height != col.getNumberOfCells()) throw new IllegalArgumentException("Inconsistent " +
-          "column heights: Not all columns have height " + height);
-    }
+  public SpecificationTable(List<SpecificationColumn<C>> columns, List<D> durations) {
+    this.columns = FXCollections.observableArrayList(columns);
+    this.columns.addListener(new ColumnsChangedListener());
+    initHeight();
+    this.rows = FXCollections.observableArrayList(makeRowList(columns));
+    this.rows.addListener(new RowsChangedListener());
     this.durations = FXCollections.observableArrayList(durations);
   }
 
-  public enum Change {
-    ADD,
-    REMOVE
-  }
-
-  public static class ColumnChangeInfo<C> {
-    public final SpecificationColumn<C> column;
-    public final String columnId;
-    public final Change changeType;
-
-    public ColumnChangeInfo(SpecificationColumn<C> column, String columnId, Change changeType) {
-      this.column = column;
-      this.columnId = columnId;
-      this.changeType = changeType;
-    }
-  }
-
-  public static class RowChangeInfo<C> {
-    public final SpecificationRow<C> row;
-    public final int rowNum;
-    public final Change changeType;
-
-    public RowChangeInfo(SpecificationRow<C> row, int rowNum, Change changeType) {
-      this.row = row;
-      this.rowNum = rowNum;
-      this.changeType = changeType;
+  protected void initHeight() {
+    height = 0;
+    for (SpecificationColumn<C> col : this.columns) {
+      if (height == 0) height = col.getCells().size();
+      if (height != col.getCells().size()) throw new IllegalArgumentException("Inconsistent " +
+          "column heights: Not all columns have height " + height);
     }
   }
 
@@ -69,114 +42,137 @@ public class SpecificationTable<C, D> {
     return height;
   }
 
-  public C getCell(int row, String columnId) {
-    SpecificationColumn<C> specColumn = columns.get(columnId);
-    if (specColumn == null) {
-      throw new NoSuchElementException("No such table column: " + columnId);
-    }
-    return specColumn.getCellForRow(row);
+  public ObservableList<SpecificationColumn<C>> getColumns() {
+    return columns;
   }
 
-  public SpecificationColumn<C> getColumn(String columnId) {
-    SpecificationColumn<C> specColumn = columns.get(columnId);
-    if (specColumn == null) {
-      throw new NoSuchElementException("No such table column: " + columnId);
-    }
-    return specColumn;
-  }
-
-  public void addColumn(String columnId, SpecificationColumn<C> column) {
-    if (columns.containsKey(columnId)) {
-      throw new IllegalArgumentException("A column with the name " + columnId + " already exists!");
-    } else if (column.getNumberOfCells() != height) {
-      throw new IllegalArgumentException("Column does not have height " + height);
-    }
-    columns.put(columnId, column);
-    columnChange.set(new ColumnChangeInfo<C>(column, columnId, Change.ADD));
-  }
-
-  public void removeColumn(String columnId) {
-    if (!columns.containsKey(columnId)) {
-      throw new NoSuchElementException("No such table column: " + columnId);
-    }
-    SpecificationColumn<C> column = columns.remove(columnId);
-    columnChange.set(new ColumnChangeInfo<C>(column, columnId, Change.REMOVE));
-  }
-
-  public SpecificationRow<C> getRow(int rowNum) {
-    Map<String, C> cells = new HashMap<String, C>();
-    for (String columnId : columns.keySet()) {
-      cells.put(columnId, columns.get(columnId).getCellForRow(rowNum));
-    }
-    return new SpecificationRow<C>(cells);
-  }
-
-  public void addRow(int rowNum, SpecificationRow<C> row) {
-    // Insert a cell into each column
-    for (String columnId : columns.keySet()) {
-      C newCell = row.getCellForVariable(columnId);
-      if (newCell == null) {
-        throw new NoSuchElementException("Cannot add row: IO variable " + columnId + " does not exist");
-      }
-      columns.get(columnId).insertCell(rowNum, newCell);
-    }
-    height += 1;
-    rowChange.setValue(new RowChangeInfo<C>(row, rowNum, Change.ADD));
-  }
-
-  /**
-   * Convenience method to add a duration along with a row.
-   * @param rowNum
-   * @param row
-   * @param duration
-   */
-  public void addRow(int rowNum, SpecificationRow<C> row, D duration) {
-    addRow(rowNum, row);
-    durations.add(rowNum, duration);
-    height += 1;
-  }
-
-  /**
-   * NB: Does not remove a possible duration for that row
-   * @param rowNum
-   */
-  public void removeRow(int rowNum) {
-    /* Remove the cell from each column */
-    HashMap<String, C> removedCells = new HashMap<>();
-    for (String columnId : columns.keySet()) {
-      SpecificationColumn<C> column = columns.get(columnId);
-      C removedCell = column.removeCell(rowNum);
-      removedCells.put(columnId, removedCell);
-    }
-    rowChange.setValue(new RowChangeInfo<C>(new SpecificationRow<C>(removedCells), rowNum, Change.REMOVE));
-    height -= 1;
+  public ObservableList<SpecificationRow<C>> getRows() {
+    return rows;
   }
 
   public ObservableList<D> getDurations() {
     return durations;
   }
 
-  public RowChangeInfo getRowChange() {
-    return rowChange.get();
+  protected class ColumnsChangedListener implements
+  ListChangeListener<SpecificationColumn<C>> {
+
+    @Override
+    public void onChanged(Change<? extends SpecificationColumn<C>> change) {
+      if (change.wasAdded()) {
+        onColumnAdded(change.getAddedSubList());
+      }
+      if (change.wasRemoved()) {
+        onColumnRemoved(change.getRemoved());
+      }
+    }
   }
 
-  public ObjectProperty<RowChangeInfo<C>> rowChangeProperty() {
-    return rowChange;
+  protected class RowsChangedListener implements ListChangeListener<SpecificationRow<C>> {
+    @Override
+    public void onChanged(Change<? extends SpecificationRow<C>> change) {
+        if (change.wasPermutated()) {
+          onRowOrderChanged();
+        }
+        if (change.wasAdded()) {
+          onRowAdded(change.getAddedSubList());
+        }
+        if (change.wasRemoved()) {
+          onRowRemoved(change.getRemoved());
+        }
+    }
   }
 
-  public void setRowChange(RowChangeInfo rowChange) {
-    this.rowChange.set(rowChange);
+  /**
+   * Add one or more cells to each row if one or more columns were added.
+   * @param added
+   */
+  private void onColumnAdded(List<? extends SpecificationColumn<C>> added) {
+    for (SpecificationColumn addedCol : added) {
+      if (addedCol.getCells().size() != height) {
+        throw new IllegalStateException("Illegal height for column " + addedCol.getSpecIoVariable
+            ().getName());
+      }
+      for (SpecificationColumn existingCol : columns) {
+        if (addedCol.getSpecIoVariable().getName().equals(existingCol.getSpecIoVariable().getName
+            ())) {
+          throw new IllegalStateException("A column for variable " + addedCol.getSpecIoVariable()
+              .getName() + " already exists");
+        }
+      }
+    }
+    for (SpecificationColumn addedCol : added) {
+      for (int i = 0; i < rows.size(); i++) {
+        C addedCell = (C) addedCol.getCells().get(i);
+        rows.get(i).getCells().put(addedCol.getSpecIoVariable().getName(), addedCell);
+      }
+    }
   }
 
-  public ColumnChangeInfo getColumnChange() {
-    return columnChange.get();
+  /**
+   * Remove the last cell(s) from each row if one or more columns were removed.
+   * @param removed
+   */
+  private void onColumnRemoved(List<? extends SpecificationColumn<C>> removed) {
+    for (SpecificationColumn removedCol : removed) {
+      for (int i = 0; i < rows.size(); i++) {
+        C removedCell = (C) removedCol.getCells().get(i);
+        rows.get(i).getCells().remove(removedCol.getSpecIoVariable().getName(), removedCell);
+      }
+    }
   }
 
-  public ObjectProperty<ColumnChangeInfo<C>> columnChangeProperty() {
-    return columnChange;
+  /**
+   * Add one or more cells to each column if one or more rows were added.
+   * @param added
+   */
+  private void onRowAdded(List<? extends SpecificationRow<C>> added) {
+    for (int i = 0; i < added.size(); i++) {
+      if (added.get(i).getCells().size() != columns.size()) {
+        throw new IllegalStateException("Illegal width for row " + i);
+      }
+    }
+    for (SpecificationRow addedRow : added) {
+      for (SpecificationColumn col : columns) {
+        C addedCell = (C) addedRow.getCells().get(col.getSpecIoVariable().getName());
+        col.getCells().add(addedCell);
+      }
+    }
   }
 
-  public void setColumnChange(ColumnChangeInfo columnChange) {
-    this.columnChange.set(columnChange);
+  /**
+   * Remove the last cell(s) from all columns if one or more rows were removed.
+   * @param removed
+   */
+  private void onRowRemoved(List<? extends SpecificationRow<C>> removed) {
+    for (SpecificationRow removedRow : removed) {
+      for (SpecificationColumn col : columns) {
+        C removedCell = (C) removedRow.getCells().get(col.getSpecIoVariable().getName());
+        col.getCells().remove(removedCell);
+      }
+    }
+  }
+
+  /**
+   * Adapt the order of the cells in a column if the order of the rows changed.
+   */
+  private void onRowOrderChanged() {
+    for (SpecificationColumn col : columns) {
+      for (int i = 0; i < rows.size(); i++) {
+        col.getCells().set(i, rows.get(i).getCells().get(col.getSpecIoVariable().getName()));
+      }
+    }
+  }
+
+  protected List<SpecificationRow<C>> makeRowList(List<SpecificationColumn<C>> columns) {
+    List<SpecificationRow<C>> rowList = new ArrayList<>();
+    for (int i = 0; i < height; i++) {
+      Map<String, C> cellMap = new HashMap<String, C>();
+      for (SpecificationColumn<C> col : this.columns) {
+        cellMap.put(col.getSpecIoVariable().getName(), col.getCells().get(i));
+      }
+      rowList.add(new SpecificationRow<C>(cellMap));
+    }
+    return rowList;
   }
 }

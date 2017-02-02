@@ -13,10 +13,10 @@ public class ConcreteSpecification extends SpecificationTable<ConcreteCell, Conc
   private final boolean isCounterExample;
 
   public ConcreteSpecification(boolean isCounterExample) {
-    this(new HashMap<>(), new ArrayList<>(), isCounterExample);
+    this(new ArrayList<>(), new ArrayList<>(), isCounterExample);
   }
 
-  public ConcreteSpecification(Map<String, SpecificationColumn<ConcreteCell>> columns,
+  public ConcreteSpecification(List<SpecificationColumn<ConcreteCell>> columns,
                                List<ConcreteDuration> durations, boolean isCounterExample) {
     super(columns, durations);
     this.isCounterExample = isCounterExample;
@@ -34,8 +34,17 @@ public class ConcreteSpecification extends SpecificationTable<ConcreteCell, Conc
     int startIndex = durations.get(constraintRow).getBeginCycle();
     int endIndex = durations.get(constraintRow).getEndCycle();
     ArrayList<ConcreteCell> concreteCells = new ArrayList<>();
+    SpecificationColumn matchingColumn = null;
+    for (SpecificationColumn col : columns) {
+      if (col.getSpecIoVariable().getName().equals(column)) {
+        matchingColumn = col;
+      }
+    }
+    if (matchingColumn == null) {
+      throw new IllegalArgumentException("No such column: " + column);
+    }
     for (int i = startIndex; i < endIndex; i++) {
-      concreteCells.add(getCell(i, column));
+      concreteCells.add((ConcreteCell) matchingColumn.getCells().get(i));
     }
     return concreteCells;
   }

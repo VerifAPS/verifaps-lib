@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
  * @author Benjamin Alt
  */
 public class ConstraintSpecificationTest {
-
+/*
   private ConstraintSpecification spec;
   private ValidSpecification validSpec;
 
@@ -83,10 +83,6 @@ public class ConstraintSpecificationTest {
     assertEquals(3, spec.getColumn("VariableE").getNumberOfCells());
   }
 
-  /**
-   * Test if the listeners that are registered on the specIoVariables and cells in the constructor
-   * actually trigger the creation of a ValidSpecification on cell and IoVar modifications.
-   */
   @Test
   public void testConstructorListeners() {
     validSpec = null;
@@ -215,5 +211,5 @@ public class ConstraintSpecificationTest {
       }
     });
   }
-
+*/
 }
