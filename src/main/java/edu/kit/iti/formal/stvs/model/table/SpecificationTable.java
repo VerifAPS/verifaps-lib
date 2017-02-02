@@ -22,10 +22,10 @@ public class SpecificationTable<C extends StringReadable, D> {
 
   public SpecificationTable(List<SpecificationColumn<C>> columns, List<D> durations) {
     this.columns = FXCollections.observableArrayList(columns);
-    this.columns.addListener(new ColumnsChangedListener());
+    this.columns.addListener(this::onColumnChange);
     initHeight();
     this.rows = FXCollections.observableArrayList(makeRowList(columns));
-    this.rows.addListener(new RowsChangedListener());
+    this.rows.addListener(this::onRowChange);
     this.durations = FXCollections.observableArrayList(durations);
   }
 
@@ -54,32 +54,24 @@ public class SpecificationTable<C extends StringReadable, D> {
     return durations;
   }
 
-  protected class ColumnsChangedListener implements
-  ListChangeListener<SpecificationColumn<C>> {
-
-    @Override
-    public void onChanged(Change<? extends SpecificationColumn<C>> change) {
-      if (change.wasAdded()) {
-        onColumnAdded(change.getAddedSubList());
-      }
-      if (change.wasRemoved()) {
-        onColumnRemoved(change.getRemoved());
-      }
+  protected void onColumnChange(ListChangeListener.Change<? extends SpecificationColumn<C>> change) {
+    if (change.wasAdded()) {
+      onColumnAdded(change.getAddedSubList());
+    }
+    if (change.wasRemoved()) {
+      onColumnRemoved(change.getRemoved());
     }
   }
 
-  protected class RowsChangedListener implements ListChangeListener<SpecificationRow<C>> {
-    @Override
-    public void onChanged(Change<? extends SpecificationRow<C>> change) {
-        if (change.wasPermutated()) {
-          onRowOrderChanged();
-        }
-        if (change.wasAdded()) {
-          onRowAdded(change.getAddedSubList());
-        }
-        if (change.wasRemoved()) {
-          onRowRemoved(change.getRemoved());
-        }
+  protected void onRowChange(ListChangeListener.Change<? extends SpecificationRow<C>> change) {
+    if (change.wasPermutated()) {
+      onRowOrderChanged();
+    }
+    if (change.wasAdded()) {
+      onRowAdded(change.getAddedSubList());
+    }
+    if (change.wasRemoved()) {
+      onRowRemoved(change.getRemoved());
     }
   }
 
@@ -93,7 +85,7 @@ public class SpecificationTable<C extends StringReadable, D> {
         throw new IllegalStateException("Illegal height for column " + addedCol.getSpecIoVariable
             ().getName());
       }
-      for (SpecificationColumn existingCol : columns) {
+      for (SpecificationColumn<C> existingCol : columns) {
         if (addedCol.getSpecIoVariable().getName().equals(existingCol.getSpecIoVariable().getName
             ())) {
           throw new IllegalStateException("A column for variable " + addedCol.getSpecIoVariable()
@@ -101,9 +93,9 @@ public class SpecificationTable<C extends StringReadable, D> {
         }
       }
     }
-    for (SpecificationColumn addedCol : added) {
+    for (SpecificationColumn<C> addedCol : added) {
       for (int i = 0; i < rows.size(); i++) {
-        C addedCell = (C) addedCol.getCells().get(i);
+        C addedCell = addedCol.getCells().get(i);
         rows.get(i).getCells().put(addedCol.getSpecIoVariable().getName(), addedCell);
       }
     }
@@ -114,9 +106,9 @@ public class SpecificationTable<C extends StringReadable, D> {
    * @param removed
    */
   private void onColumnRemoved(List<? extends SpecificationColumn<C>> removed) {
-    for (SpecificationColumn removedCol : removed) {
+    for (SpecificationColumn<C> removedCol : removed) {
       for (int i = 0; i < rows.size(); i++) {
-        C removedCell = (C) removedCol.getCells().get(i);
+        C removedCell = removedCol.getCells().get(i);
         rows.get(i).getCells().remove(removedCol.getSpecIoVariable().getName(), removedCell);
       }
     }
@@ -132,9 +124,9 @@ public class SpecificationTable<C extends StringReadable, D> {
         throw new IllegalStateException("Illegal width for row " + i);
       }
     }
-    for (SpecificationRow addedRow : added) {
-      for (SpecificationColumn col : columns) {
-        C addedCell = (C) addedRow.getCells().get(col.getSpecIoVariable().getName());
+    for (SpecificationRow<C> addedRow : added) {
+      for (SpecificationColumn<C> col : columns) {
+        C addedCell = addedRow.getCells().get(col.getSpecIoVariable().getName());
         col.getCells().add(addedCell);
       }
     }
@@ -142,12 +134,11 @@ public class SpecificationTable<C extends StringReadable, D> {
 
   /**
    * Remove the last cell(s) from all columns if one or more rows were removed.
-   * @param removed
    */
   private void onRowRemoved(List<? extends SpecificationRow<C>> removed) {
-    for (SpecificationRow removedRow : removed) {
-      for (SpecificationColumn col : columns) {
-        C removedCell = (C) removedRow.getCells().get(col.getSpecIoVariable().getName());
+    for (SpecificationRow<C> removedRow : removed) {
+      for (SpecificationColumn<C> col : columns) {
+        C removedCell = removedRow.getCells().get(col.getSpecIoVariable().getName());
         col.getCells().remove(removedCell);
       }
     }
@@ -157,7 +148,7 @@ public class SpecificationTable<C extends StringReadable, D> {
    * Adapt the order of the cells in a column if the order of the rows changed.
    */
   private void onRowOrderChanged() {
-    for (SpecificationColumn col : columns) {
+    for (SpecificationColumn<C> col : columns) {
       for (int i = 0; i < rows.size(); i++) {
         col.getCells().set(i, rows.get(i).getCells().get(col.getSpecIoVariable().getName()));
       }
@@ -171,7 +162,7 @@ public class SpecificationTable<C extends StringReadable, D> {
       for (SpecificationColumn<C> col : this.columns) {
         cellMap.put(col.getSpecIoVariable().getName(), col.getCells().get(i));
       }
-      rowList.add(new SpecificationRow<C>(cellMap));
+      rowList.add(new SpecificationRow<>(cellMap));
     }
     return rowList;
   }
