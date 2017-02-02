@@ -46,9 +46,11 @@ public class VariableCollectionController implements Controller {
       {
         this.setEditable(true);
       }
+
       @Override
       public void updateItem(FreeVariable freeVariable, boolean empty) {
         super.updateItem(freeVariable, empty);
+
         if (empty) {
           this.setGraphic(null);
         } else {
