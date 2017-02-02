@@ -33,7 +33,7 @@ public class Code {
    * creates a Dummy-Codefile
    */
   public Code() {
-    this("New Code", "");
+    this("", "");
   }
 
   public Code(String filename, String sourcecode) {
@@ -78,5 +78,9 @@ public class Code {
 
   public String getFilename() {
     return filename.get();
+  }
+
+  public void setFilename(String filename) {
+    this.filename.set(filename);
   }
 }

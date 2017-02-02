@@ -162,6 +162,18 @@ public class StvsMenuBarController implements Controller {
 
   private void saveCode(ActionEvent t) {
     Code code = rootModel.get().getScenario().getCode();
+
+    if(code.getFilename().isEmpty()) {
+      FileChooser fileChooser = new FileChooser();
+      fileChooser.setTitle("Select the file");
+      fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
+      File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
+      if (chosenFile != null) {
+        code.setFilename(chosenFile.getAbsolutePath());
+      } else {
+        return;
+      }
+    }
     try {
       ExporterFacade.exportCode(code);
     } catch (IOException e) {

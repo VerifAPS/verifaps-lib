@@ -37,8 +37,8 @@ public class StvsMenuBar extends MenuBar {
 
     //create menu-items
     open = new MenuItem("Open");
-    openOther = new Menu("Open ...");
     open.setAccelerator(KeyCombination.keyCombination("Ctrl+o"));
+    openOther = new Menu("Open ...");
     openSpec = new MenuItem("Open Specification");
     openCode = new MenuItem("Open Code");
     openSession = new MenuItem("Open Session");
@@ -48,7 +48,7 @@ public class StvsMenuBar extends MenuBar {
     saveSpec = new MenuItem("Save Specification");
 
     saveAll = new MenuItem("Save all");
-    saveAll.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+s"));
+    saveAll.setAccelerator(KeyCombination.keyCombination("Ctrl+s"));
 
     config = new MenuItem("Configuration");
     config.setAccelerator(KeyCombination.keyCombination("Ctrl+,"));
