@@ -16,4 +16,13 @@ public class SyntaxError {
   public Token getToken() {
     return token;
   }
+
+  public String toString() {
+    return "SyntaxError(" + token + ")";
+  }
+
+  public boolean isSameToken(Token token) {
+    return token.getStartIndex() == this.token.getStartIndex() &&
+        token.getText().equals(this.token.getText());
+  }
 }

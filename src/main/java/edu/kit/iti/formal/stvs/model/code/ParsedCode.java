@@ -172,4 +172,5 @@ public class ParsedCode {
   public Set<Type> getDefinedTypes() {
     return definedTypes;
   }
+
 }

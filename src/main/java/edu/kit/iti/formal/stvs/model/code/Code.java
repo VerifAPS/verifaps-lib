@@ -60,7 +60,7 @@ public class Code {
     return sourceCodeProperty.get();
   }
 
-  public List<? extends SyntaxError> getSyntaxErrors() {
+  public List<SyntaxError> getSyntaxErrors() {
     return syntaxErrors;
   }
 

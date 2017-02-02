@@ -4,6 +4,7 @@ import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.code.FoldableCodeBlock;
 import edu.kit.iti.formal.stvs.model.code.ParsedCode;
+import edu.kit.iti.formal.stvs.model.code.SyntaxError;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.concurrent.Task;
@@ -13,10 +14,7 @@ import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
 
 import java.time.Duration;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -86,14 +84,22 @@ public class EditorPaneController implements Controller {
     tokens.forEach(token ->
       // replaceAll is a work-around for a bug when ANTLR has a
       // different character count than this CodeArea.
-      spansBuilder.add(getStyleClassesFor(token),
+      spansBuilder.add(getStyleClassesFor(token, code.getSyntaxErrors()),
           token.getText().replaceAll("\\r", "").length())
     );
     return spansBuilder.create();
   }
 
+  private Collection<String> getStyleClassesFor(Token token, List<SyntaxError> syntaxErrors) {
+    List<String> classes = getHightlightingClass(token);
+    if (syntaxErrors.stream().anyMatch(syntaxError -> syntaxError.isSameToken(token))) {
+      System.out.println("Token with error: " + token.getText());
+      classes.add("syntax-error");
+    }
+    return classes;
+  }
 
-  private Collection<String> getStyleClassesFor(Token token) {
+  private List<String> getHightlightingClass(Token token) {
     // TODO: Add more colours (styles) to tokens
     switch (token.getType()) {
       case IEC61131Lexer.TYPE:
@@ -106,26 +112,29 @@ public class EditorPaneController implements Controller {
       case IEC61131Lexer.END_FUNCTION_BLOCK:
       case IEC61131Lexer.CASE:
       case IEC61131Lexer.END_CASE:
-        return Collections.singleton("keyword");
+        return listOf("keyword");
       case IEC61131Lexer.INTEGER_LITERAL:
-        return Collections.singleton("number");
+        return listOf("number");
       case IEC61131Lexer.STRING_LITERAL:
-        return Collections.singleton("string");
+        return listOf("string");
       case IEC61131Lexer.VAR:
       case IEC61131Lexer.VAR_INPUT:
       case IEC61131Lexer.VAR_IN_OUT:
       case IEC61131Lexer.VAR_OUTPUT:
       case IEC61131Lexer.END_VAR:
-        return Collections.singleton("vardef");
+        return listOf("vardef");
       default:
-        if (code.getSyntaxErrors().contains(token)) {
-          return Collections.singleton("syntaxErrr");
-        }
-        else {
-          return Collections.emptyList();
-        }
+          return listOf();
       }
     }
+
+  private <E> List<E> listOf(E... elements) {
+    ArrayList<E> list = new ArrayList<>();
+    for (E element : elements) {
+      list.add(element);
+    }
+    return list;
+  }
 
   private void handleTextChange(StyleSpans<Collection<String>> highlighting) {
     code.updateSourcecode(view.getCodeArea().getText());

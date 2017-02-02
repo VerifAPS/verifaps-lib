@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * Created by Lukas on 30.01.2017.
  */
 public class SyntaxErrorListener implements ANTLRErrorListener {
-  private List<SyntaxError> syntaxErrors;
+  private List<SyntaxError> syntaxErrors = new ArrayList<>();
 
   @Override
   public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
