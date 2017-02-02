@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
  */
 public class SpecificationRow<C> {
 
-  private final Map<String, C> cells;
+  protected final Map<String, C> cells;
 
   public SpecificationRow(Map<String, C> cells) {
     this.cells = cells;

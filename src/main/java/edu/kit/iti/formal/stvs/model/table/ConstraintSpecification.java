@@ -290,4 +290,5 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
       onSpecificationChanged();
     }
   }
+
 }

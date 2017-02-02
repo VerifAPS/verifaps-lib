@@ -5,6 +5,8 @@ import edu.kit.iti.formal.stvs.logic.io.verification.VerificationImporter;
 import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.function.Consumer;
 
@@ -33,7 +35,8 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
 
   @Override
   public OptionalProperty<VerificationResult> getVerificationResultProperty() {
-    return null;
+    // TODO: write full implementation. This is just a pseudo-implementation!!
+    return new OptionalProperty<VerificationResult>(new SimpleObjectProperty<>());
   }
 
   @Override

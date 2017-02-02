@@ -6,7 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 
-public class TableColumn extends VBox implements Lockable {
+public class SpecificationTableColumn extends VBox implements Lockable {
   private ColumnHeader colHead;
   private BooleanProperty editableProperty;
 

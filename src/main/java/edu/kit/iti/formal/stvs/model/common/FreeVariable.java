@@ -57,7 +57,25 @@ public class FreeVariable {
    * @param name New name for the free variable
    */
   public void setName(String name) {
+    if (!freevarNameValid(name)) {
+      throw new IllegalArgumentException("Free Variable name is not valid: " + name);
+    }
     this.name.set(name);
+  }
+
+  private boolean freevarNameValid(String name) {
+    if (name.isEmpty()) {
+      return false;
+    }
+    if (!Character.isJavaIdentifierStart(name.charAt(0))) {
+      return false;
+    }
+    for (int i = 1; i < name.length(); i++) {
+      if (!Character.isJavaIdentifierPart(name.charAt(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public Type getType() {

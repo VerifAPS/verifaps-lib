@@ -39,8 +39,4 @@ public class ConcreteSpecification extends SpecificationTable<ConcreteCell, Conc
     }
     return concreteCells;
   }
-
-  public int getNumberOfDurations() {
-    return durations.size();
-  }
 }
