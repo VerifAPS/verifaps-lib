@@ -39,13 +39,28 @@ public class ConfigDialogPane extends DialogPane {
     grid.setVgap(10);
     grid.setPadding(new Insets(20, 150, 10, 10));
 
+    grid.add(new Label("Verification Timeout"), 0, 0);
     grid.add(verificationTimeout, 1, 0);
+
+    grid.add(new Label("Simulation Timeout"), 0, 1);
     grid.add(simulationTimeout, 1, 1);
+
+    grid.add(new Label("Windowheight"), 0, 2);
     grid.add(windowHeight, 1, 2);
+
+    grid.add(new Label("Windowwidth"), 0, 3);
     grid.add(windowWidth, 1, 3);
+
+    grid.add(new Label("Editor-Fontsize"), 0, 4);
     grid.add(editorFontSize, 1, 4);
+
+    grid.add(new Label("Editor-Fontfamily"), 0, 5);
     grid.add(editorFontFamily, 1, 5);
+
+    grid.add(new Label("Show Linenumbers"), 0, 6);
     grid.add(showLineNumbers, 1, 6);
+
+    grid.add(new Label("UI-Language"), 0, 7);
     grid.add(uiLanguage, 1, 7);
 
     this.setContent(grid);
