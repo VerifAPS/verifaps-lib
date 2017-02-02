@@ -52,11 +52,8 @@ public class StvsMenuBarController implements Controller {
   }
 
   private void openConfigDialog(ActionEvent t) {
-    ConfigDialogManager manager = new ConfigDialogManager(rootModel.get().getGlobalConfig());
-    Optional<GlobalConfig> newConfig = manager.showAndWait();
-    newConfig.ifPresent(config -> {
-      //rootModel.getGlobalConfig() = config;
-    });
+    ConfigDialogManager dialogManager = new ConfigDialogManager(rootModel.get().getGlobalConfig());
+
   }
 
   private void openFile(ActionEvent t) {
@@ -109,7 +106,7 @@ public class StvsMenuBarController implements Controller {
   private void saveSpec(ActionEvent t) {
     // Todo: implement
 
-    HybridSpecification spec = null; // get the active tab's hybrid-specification
+    HybridSpecification spec = null; // TODO: get the active tab's hybrid-specification
   }
 
 

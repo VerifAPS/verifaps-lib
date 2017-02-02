@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.view.spec.menu;
+package edu.kit.iti.formal.stvs.view.menu;
 
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
@@ -11,6 +11,7 @@ import edu.kit.iti.formal.stvs.view.editor.EditorPaneController;
 import edu.kit.iti.formal.stvs.view.menu.StvsMenuBarController;
 import javafx.application.Application;
 import javafx.beans.binding.ListBinding;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
@@ -37,7 +38,8 @@ public class StvsMenuBarTest {
 
     StvsRootModel rootModel = new StvsRootModel();
 
-    StvsMenuBarController menuBarController = new StvsMenuBarController(rootModel);
+    StvsMenuBarController menuBarController = new StvsMenuBarController(new
+        SimpleObjectProperty<>(rootModel));
     ((VBox) scene.getRoot()).getChildren().addAll(menuBarController.getView());
 
     return scene;
