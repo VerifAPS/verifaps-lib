@@ -79,7 +79,6 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
     CellExpressionParser parser = new CellExpressionParser(tokens);
     parser.removeErrorListeners();
     parser.addErrorListener(new ThrowingErrorListener());
-    parser.addErrorListener(new SyntaxErrorListener());
     try {
       return this.visit(parser.cell());
     } catch (ParseRuntimeException runtimeException) {

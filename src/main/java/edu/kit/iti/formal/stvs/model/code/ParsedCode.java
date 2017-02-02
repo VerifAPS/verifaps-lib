@@ -119,6 +119,7 @@ public class ParsedCode {
 
   public static void parseCode(String input,
                                Consumer<List<? extends Token>> tokenListener,
+                               Consumer<List<SyntaxError>> syntaxErrors,
                                Consumer<ParsedCode> parsedCodeListener) {
     try {
       IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(input));
@@ -126,6 +127,10 @@ public class ParsedCode {
       lexer.reset();
 
       IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
+      SyntaxErrorListener syntaxErrorListener = new SyntaxErrorListener();
+      parser.addErrorListener(syntaxErrorListener);
+      syntaxErrors.accept(syntaxErrorListener.getSyntaxErrors());
+
       TopLevelElements ast = new TopLevelElements(parser.start().ast);
 
       // Find types in parsed code

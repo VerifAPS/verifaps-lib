@@ -92,6 +92,7 @@ public class EditorPaneController implements Controller {
     return spansBuilder.create();
   }
 
+
   private Collection<String> getStyleClassesFor(Token token) {
     // TODO: Add more colours (styles) to tokens
     switch (token.getType()) {
@@ -117,9 +118,14 @@ public class EditorPaneController implements Controller {
       case IEC61131Lexer.END_VAR:
         return Collections.singleton("vardef");
       default:
-        return Collections.emptyList();
+        if (code.getSyntaxErrors().contains(token)) {
+          return Collections.singleton("syntaxErrr");
+        }
+        else {
+          return Collections.emptyList();
+        }
+      }
     }
-  }
 
   private void handleTextChange(StyleSpans<Collection<String>> highlighting) {
     code.updateSourcecode(view.getCodeArea().getText());

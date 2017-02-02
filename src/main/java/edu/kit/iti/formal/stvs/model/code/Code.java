@@ -24,10 +24,10 @@ public class Code {
    * last valid parsed Code
    */
   private StringProperty filename;
-  private List<RecognitionException> syntaxErrors;
   private StringProperty sourceCodeProperty;
   private NullableProperty<ParsedCode> parsedCode;
   private List<? extends Token> tokens;
+  private List<SyntaxError> syntaxErrors;
 
   /**
    * creates a Dummy-Codefile
@@ -47,6 +47,7 @@ public class Code {
   private void invalidate() {
     ParsedCode.parseCode(sourceCodeProperty.get(),
         tokens -> this.tokens = tokens,
+        syntaxErrors -> this.syntaxErrors = syntaxErrors,
         parsedCode -> this.parsedCode.set(parsedCode));
   }
 
@@ -59,7 +60,7 @@ public class Code {
     return sourceCodeProperty.get();
   }
 
-  public List<RecognitionException> getSyntaxErrors() {
+  public List<? extends SyntaxError> getSyntaxErrors() {
     return syntaxErrors;
   }
 
