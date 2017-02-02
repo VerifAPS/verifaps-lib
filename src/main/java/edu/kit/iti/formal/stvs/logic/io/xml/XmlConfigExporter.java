@@ -5,6 +5,9 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.OutputStream;
 import java.math.BigInteger;
 
@@ -36,9 +39,13 @@ public class XmlConfigExporter extends XmlExporter<GlobalConfig> {
     return marshalToNode(element);
   }
 
-  public static void main(String[] args) throws ExportException {
+  public static void main(String[] args) throws ExportException, TransformerException {
     XmlConfigExporter exporter = new XmlConfigExporter();
-    OutputStream out = exporter.export(new GlobalConfig());
-    System.out.println(out.toString());
+    Node node = exporter.exportToXmlNode(new GlobalConfig());
+    Transformer transformer = TransformerFactory.newInstance().newTransformer();
+    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+    DOMSource source = new DOMSource(node);
+    StreamResult console = new StreamResult(System.out);
+    transformer.transform(source, console);
   }
 }

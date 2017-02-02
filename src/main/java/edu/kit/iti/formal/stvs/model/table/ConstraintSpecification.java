@@ -8,13 +8,21 @@ import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionExc
 import edu.kit.iti.formal.stvs.model.table.problems.*;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
 import edu.kit.iti.formal.stvs.model.expressions.parser.IntervalParser;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Benjamin Alt
@@ -39,8 +47,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
    * @param freeVariableSet
    */
   public ConstraintSpecification(Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet) {
-    this(new HashMap<String, SpecificationColumn<ConstraintCell>>(), new HashMap<Integer,
-        ConstraintDuration>(), typeContext, ioVariables, freeVariableSet);
+    this(new HashMap<>(), new ArrayList<>(), typeContext, ioVariables, freeVariableSet);
   }
 
   /**
@@ -52,7 +59,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
    * @param freeVariableSet
    */
   public ConstraintSpecification(Map<String, SpecificationColumn<ConstraintCell>> columns,
-                                 Map<Integer,ConstraintDuration> durations,
+                                 List<ConstraintDuration> durations,
                                  Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet) {
     super(columns, durations);
     specIoVariables = new HashSet<>();
@@ -66,14 +73,15 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
         cell.stringRepresentationProperty().addListener(new SpecificationChangedListener<String>());
       }
     }
-    for (ConstraintDuration duration : durations.values()) {
-      duration.stringRepresentationProperty().addListener(new SpecificationChangedListener<>());
-    }
+    this.durations = FXCollections.observableArrayList(
+        (ConstraintDuration tp) -> new Observable[]{tp.stringRepresentationProperty()});
+    this.durations.addAll(durations);
+    this.durations.addListener(new SpecificationChangedListListener<>());
     this.typeContext = typeContext;
     this.freeVariableSet = freeVariableSet;
     this.codeIoVariables = ioVariables;
     this.freeVariableSet = freeVariableSet;
-    this.problems = new SimpleObjectProperty<List<SpecProblem>>();
+    this.problems = new SimpleObjectProperty<>();
     this.validSpecification = new OptionalProperty<>(new SimpleObjectProperty<>());
     onSpecificationChanged();
   }
@@ -82,7 +90,11 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
       if (specIoVariables.contains(variable)) {
         throw new IllegalArgumentException("Column for " + variable.getName() + " already exists");
       }
-      addColumn(variable.getName(), new SpecificationColumn<ConstraintCell>(variable, new ArrayList<ConstraintCell>(), new ColumnConfig()));
+      List<ConstraintCell> cells = new ArrayList<>();
+      for (int i = 0; i < getHeight(); i++) {
+        cells.add(new ConstraintCell(""));
+      }
+      addColumn(variable.getName(), new SpecificationColumn<>(variable, cells, new ColumnConfig()));
       specIoVariables.add(variable);
   }
 
@@ -195,12 +207,6 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     onSpecificationChanged();
   }
 
-  public void setDuration(int rowNum, ConstraintDuration duration) {
-    super.setDuration(rowNum, duration);
-    duration.stringRepresentationProperty().addListener(new SpecificationChangedListener<>());
-    onSpecificationChanged();
-  }
-
   /**
    * Called when the specification changed. Try to create a new ValidSpecification (parsed and type-checked) if possible;
    * record all problems encountered in doing so. If parsing and type-checking successful, sets the optional ValidSpecification.
@@ -234,12 +240,12 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
       parsedColumns.put(columnId, new SpecificationColumn<>(rawColumn.getSpecIoVariable(), parsedCells, rawColumn.getConfig()));
     }
     // Parse durations
-    Map<Integer,LowerBoundedInterval> parsedDurations = new HashMap<>();
-    for(int i : durations.get().keySet()) {
+    List<LowerBoundedInterval> parsedDurations = new ArrayList<>();
+    for(int rownum = 0; rownum < durations.size(); rownum++) {
       try {
-        parsedDurations.put(i, IntervalParser.parse(durations.get().get(i).getAsString()));
+        parsedDurations.add(IntervalParser.parse(durations.get(rownum).getAsString()));
       } catch (ParseException e) {
-        problemsFound.add(new DurationProblem(e.getParseErrorMessage(), i));
+        problemsFound.add(new DurationProblem(e.getParseErrorMessage(), rownum));
       }
     }
     // Are there invalid IO variables? (Is there a specIoVariable that is not a codeIoVariable?)
@@ -269,15 +275,12 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     }
   }
 
-  private class SpecificationChangedListener<T> implements ChangeListener<T> {
+  private class SpecificationChangedListListener<T> implements ListChangeListener<T> {
 
     @Override
-    public void changed(ObservableValue<? extends T> observableValue, T oldValue, T newValue) {
+    public void onChanged(Change<? extends T> change) {
       onSpecificationChanged();
     }
   }
 
-  public int getHeight() {
-    return durations.get().size();
-  }
 }

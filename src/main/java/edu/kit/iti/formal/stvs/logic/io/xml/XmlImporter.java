@@ -39,7 +39,9 @@ public abstract class XmlImporter<T> implements Importer<T> {
       validateAgainstXSD(new ByteArrayInputStream(byteArray));
       IOUtils.copy(new ByteArrayInputStream(byteArray), writer, INPUT_ENCODING);
       String inputString = writer.toString();
-      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      dbf.setNamespaceAware(true);
+      Document doc = dbf.newDocumentBuilder()
           .parse(new InputSource(new StringReader(inputString)));
       return doImportFromXmlNode(doc.getDocumentElement());
     } catch (SAXException | IOException | ParserConfigurationException | URISyntaxException e) {

@@ -37,10 +37,8 @@ public class ConcreteSpecificationTest {
     counterexampleColumns.put("VariableB", new SpecificationColumn<>(variableB, concreteCellsB, new ColumnConfig()));
     counterexampleColumns.put("VariableC", new SpecificationColumn<>(variableC, concreteCellsC, new ColumnConfig()));
     counterexampleColumns.put("VariableD", new SpecificationColumn<>(variableD, concreteCellsD, new ColumnConfig()));
-    Map<Integer, ConcreteDuration> counterexampleDurations = new HashMap<>();
-    counterexampleDurations.put(0, new ConcreteDuration(0, 1));
-    counterexampleDurations.put(1, new ConcreteDuration(1, 2));
-    counterexampleDurations.put(3, new ConcreteDuration(3, 1));
+    List<ConcreteDuration> counterexampleDurations = Arrays.asList(new ConcreteDuration(0, 1),
+        new ConcreteDuration(1, 2), new ConcreteDuration(3, 1));
     concreteSpec = new ConcreteSpecification(counterexampleColumns, counterexampleDurations, true);
   }
 

@@ -5,6 +5,7 @@ import edu.kit.iti.formal.stvs.model.expressions.Expression;
 import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,7 +17,8 @@ public class ValidSpecification extends SpecificationTable<Expression, LowerBoun
   private final Set<Type> typeContext;
   private FreeVariableSet freeVariableSet;
 
-  public ValidSpecification(Map<String, SpecificationColumn<Expression>> columns, Map<Integer,LowerBoundedInterval> durations,
+  public ValidSpecification(Map<String, SpecificationColumn<Expression>> columns,
+                            List<LowerBoundedInterval> durations,
                             Set<Type> typeContext, FreeVariableSet freeVariableSet) {
     super(columns, durations);
     this.typeContext = typeContext;
