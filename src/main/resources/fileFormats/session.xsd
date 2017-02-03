@@ -31,20 +31,21 @@
     <attribute name="readOnly" type="boolean" use="required"></attribute>
   </complexType>
 
-  <element name="session">
-    <complexType>
-      <sequence minOccurs="1" maxOccurs="1">
-        <element name="code" type="tns:Code"></element>
-        <element name="tabs">
-          <complexType>
-            <sequence minOccurs="1" maxOccurs="unbounded">
-              <element name="tab" type="tns:Tab"></element>
-            </sequence>
-          </complexType>
-        </element>
-        <element name="config" type="tns:Config" minOccurs="1" maxOccurs="1"></element>
-          <element name="history" type="tns:History" minOccurs="1" maxOccurs="1"></element>
-      </sequence>
-    </complexType>
+  <complexType name="Session">
+    <sequence minOccurs="1" maxOccurs="1">
+      <element name="code" type="tns:Code"></element>
+      <element name="tabs">
+        <complexType>
+          <sequence minOccurs="1" maxOccurs="unbounded">
+            <element name="tab" type="tns:Tab"></element>
+          </sequence>
+        </complexType>
+      </element>
+      <element name="config" type="tns:Config" minOccurs="1" maxOccurs="1"></element>
+      <element name="history" type="tns:History" minOccurs="1" maxOccurs="1"></element>
+    </sequence>
+  </complexType>
+
+  <element name="session" type="tns:Session">
   </element>
 </schema>
