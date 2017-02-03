@@ -30,7 +30,7 @@ public class ConcreteSpecification extends SpecificationTable<ConcreteCell, Conc
    * A row in a ConcreteSpecification is not the same as a row in a ConstraintSpecification.
    * This function does the mapping between the two.
    */
-  public List<ConcreteCell> getConcreteValuesForConstraint(String column, int constraintRow) {
+  public List<ConcreteCell> getConcreteValuesForConstraintRow(String column, int constraintRow) {
     int startIndex = durations.get(constraintRow).getBeginCycle();
     int endIndex = durations.get(constraintRow).getEndCycle();
     ArrayList<ConcreteCell> concreteCells = new ArrayList<>();

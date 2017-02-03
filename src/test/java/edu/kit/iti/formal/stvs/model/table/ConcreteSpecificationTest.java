@@ -8,10 +8,7 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -21,7 +18,7 @@ import static junit.framework.TestCase.assertEquals;
 public class ConcreteSpecificationTest {
 
   private ConcreteSpecification concreteSpec;
-/*
+
   @Before
   public void setUp() {
     SpecIoVariable variableA = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableA");
@@ -32,11 +29,11 @@ public class ConcreteSpecificationTest {
     List<ConcreteCell> concreteCellsB = Arrays.asList(new ConcreteCell(new ValueInt(-2)), new ConcreteCell(new ValueInt(3)), new ConcreteCell(new ValueInt(5)), new ConcreteCell(new ValueInt(1)));
     List<ConcreteCell> concreteCellsC = Arrays.asList(new ConcreteCell(new ValueInt(-10)), new ConcreteCell(new ValueInt(1)), new ConcreteCell(new ValueInt(100)), new ConcreteCell(new ValueInt(4)));
     List<ConcreteCell> concreteCellsD = Arrays.asList(new ConcreteCell(new ValueInt(20)), new ConcreteCell(new ValueInt(1)), new ConcreteCell(new ValueInt(-3)), new ConcreteCell(new ValueInt(3)));
-    HashMap<String, SpecificationColumn<ConcreteCell>> counterexampleColumns = new HashMap<>();
-    counterexampleColumns.put("VariableA", new SpecificationColumn<>(variableA, concreteCellsA, new ColumnConfig()));
-    counterexampleColumns.put("VariableB", new SpecificationColumn<>(variableB, concreteCellsB, new ColumnConfig()));
-    counterexampleColumns.put("VariableC", new SpecificationColumn<>(variableC, concreteCellsC, new ColumnConfig()));
-    counterexampleColumns.put("VariableD", new SpecificationColumn<>(variableD, concreteCellsD, new ColumnConfig()));
+    List<SpecificationColumn<ConcreteCell>> counterexampleColumns = new ArrayList<>();
+    counterexampleColumns.add(new SpecificationColumn<>(variableA, concreteCellsA, new ColumnConfig()));
+    counterexampleColumns.add(new SpecificationColumn<>(variableB, concreteCellsB, new ColumnConfig()));
+    counterexampleColumns.add(new SpecificationColumn<>(variableC, concreteCellsC, new ColumnConfig()));
+    counterexampleColumns.add(new SpecificationColumn<>(variableD, concreteCellsD, new ColumnConfig()));
     List<ConcreteDuration> counterexampleDurations = Arrays.asList(new ConcreteDuration(0, 1),
         new ConcreteDuration(1, 2), new ConcreteDuration(3, 1));
     concreteSpec = new ConcreteSpecification(counterexampleColumns, counterexampleDurations, true);
@@ -46,6 +43,6 @@ public class ConcreteSpecificationTest {
   public void testConcreteValuesForConstraint() {
     List<ConcreteCell> expectedCells = Arrays.asList(new ConcreteCell(new ValueInt(3)), new
         ConcreteCell(new ValueInt(5)));
-    assertEquals(expectedCells, concreteSpec.getConcreteValuesForConstraint("VariableB", 1));
-  }*/
+    assertEquals(expectedCells, concreteSpec.getConcreteValuesForConstraintRow("VariableB", 1));
+  }
 }
