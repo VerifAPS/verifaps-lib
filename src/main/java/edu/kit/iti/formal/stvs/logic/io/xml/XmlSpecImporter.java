@@ -13,11 +13,8 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
 import edu.kit.iti.formal.stvs.model.expressions.*;
-import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
-import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
-import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
-import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
-import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
+import edu.kit.iti.formal.stvs.model.table.*;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -39,16 +36,22 @@ import static com.sun.org.apache.xalan.internal.xsltc.compiler.sym.Literal;
  */
 public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
 
+  private Unmarshaller unmarshaller;
+
+  public XmlSpecImporter() throws ImportException {
+    try {
+      JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+      unmarshaller = jaxbContext.createUnmarshaller();
+    } catch (JAXBException e) {
+      throw new ImportException(e);
+    }
+  }
+
   @Override
   public ConstraintSpecification doImportFromXmlNode(Node source) throws ImportException {
     try {
-
-      JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-      SpecificationTable importedSpec = ((JAXBElement<SpecificationTable>) jaxbUnmarshaller
+      SpecificationTable importedSpec = ((JAXBElement<SpecificationTable>) unmarshaller
           .unmarshal(source)).getValue();
-      edu.kit.iti.formal.stvs.logic.io.xml.ObjectFactory stvsFactory = new edu.kit.iti.formal
-          .stvs.logic.io.xml.ObjectFactory();
 
       TestTable testTable = importedSpec.getTestTable();
       AdditionalInfo additionalInfo = importedSpec.getAdditionalInfo();
@@ -57,12 +60,86 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
       Set<Type> typeContext = importTypeContext(additionalInfo);
       FreeVariableSet freeVariables = importFreeVariableSet(testTable, additionalInfo);
       List<SpecIoVariable> ioVariables = importIoVariables(testTable, additionalInfo);
-      ConstraintSpecification constraintSpec = importConstraintSpec(typeContext, freeVariables,
+      return importConstraintSpec(typeContext, freeVariables,
           ioVariables, testTable, additionalInfo, displayInfo);
-      return constraintSpec;
     } catch (JAXBException  e) {
       throw new ImportException(e);
     }
+  }
+
+  public ConcreteSpecification doImportConcreteFromXmlNode(Node source) throws ImportException {
+    try {
+      SpecificationTable importedSpec = ((JAXBElement<SpecificationTable>) unmarshaller
+          .unmarshal(source)).getValue();
+
+      TestTable testTable = importedSpec.getTestTable();
+      AdditionalInfo additionalInfo = importedSpec.getAdditionalInfo();
+      DisplayInfo displayInfo = importedSpec.getDisplayInfo();
+
+      return importConcreteSpec(importedSpec, testTable, additionalInfo,
+          displayInfo);
+
+    } catch (JAXBException  e) {
+      throw new ImportException(e);
+    }
+  }
+
+  private ConcreteSpecification importConcreteSpec(SpecificationTable importedSpec, TestTable testTable, AdditionalInfo additionalInfo, DisplayInfo displayInfo) throws ImportException {
+    if (!importedSpec.isIsConcrete()) {
+      throw new ImportException("Cannot import a ConcreteSpecification from a specification not " +
+          "declared as concrete");
+    }
+    ConcreteSpecification concreteSpec = new ConcreteSpecification(importedSpec.isIsCounterExample());
+    for (SpecIoVariable ioVar : importIoVariables(testTable, additionalInfo)) {
+      concreteSpec.getColumns().add(new SpecificationColumn<>(ioVar, new ArrayList<>(), new
+          ColumnConfig()));
+    }
+
+    List<Object> steps = testTable.getSteps().getBlockOrStep();
+    for (int i = 0; i < steps.size(); i++) {
+      if (steps.get(i) instanceof Step) {
+        Step step = (Step) steps.get(i);
+        concreteSpec.getDurations().add(new ConstraintDuration(step.getDuration()));
+        Map<String, ConstraintCell> rowCells = new HashMap<>();
+        List<String> cellEntries = step.getCell();
+        for (int j = 0; j < cellEntries.size(); j++) {
+          SpecIoVariable variable = ioVariables.get(j);
+          rowCells.put(variable.getName(), new ConstraintCell(cellEntries.get(i)));
+        }
+        constraintSpec.getRows().add(i, new SpecificationRow<>(rowCells));
+      }
+    }
+
+    // Display info
+    for (DisplayInfo.IoVariables.VariableIdentifier variableId : displayInfo.getIoVariables()
+        .getVariableIdentifier()) {
+      for (SpecificationColumn<ConstraintCell> col : constraintSpec.getColumns()) {
+        if (col.getSpecIoVariable().getName().equals(variableId.getName())) {
+          col.getConfig().setWidth(variableId.getColWidth().intValue());
+        }
+      }
+    }
+
+    // Additional info
+    for (AdditionalInfo.IoVariables.VariableIdentifier variableId : additionalInfo.getIoVariables
+        ().getVariableIdentifier()) {
+      for (SpecificationColumn<ConstraintCell> col : constraintSpec.getColumns()) {
+        if (col.getSpecIoVariable().getName().equals(variableId.getName())) {
+          col.setComment(variableId.getComment());
+        }
+      }
+    }
+    for (AdditionalInfo.Rows.Row row : additionalInfo.getRows().getRow()) {
+      SpecificationRow<ConstraintCell> concernedRow = constraintSpec.getRows().get(Integer.parseInt
+          (row.getId()));
+      concernedRow.setComment(row.getComment());
+      for (AdditionalInfo.Rows.Row.VariableIdentifier variableId : row.getVariableIdentifier()) {
+        concernedRow.getCells().get(variableId.getName()).setComment(variableId.getComment());
+      }
+    }
+    constraintSpec.setComment(additionalInfo.getTable().getComment());
+
+    return constraintSpec;
   }
 
   private ConstraintSpecification importConstraintSpec(Set<Type> typeContext,

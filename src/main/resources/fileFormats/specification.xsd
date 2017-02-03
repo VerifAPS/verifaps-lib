@@ -115,6 +115,8 @@
     <element name="display-info" type="tns:DisplayInfo" minOccurs="0" maxOccurs="1"></element>
     <element name="additional-info" type="tns:AdditionalInfo" minOccurs="0" maxOccurs="1"></element>
    </sequence>
+   <attribute name="isConcrete" type="boolean" use="required"></attribute>
+   <attribute name="isCounterExample" type="boolean" use="optional" default="false"></attribute>
  </complexType>
 
  <element name="specification" type="tns:SpecificationTable"></element>

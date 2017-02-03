@@ -2,7 +2,8 @@
 
 <specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://formal.iti.kit.edu/stvs/logic/io/xml specification.xsd">
+           xsi:schemaLocation="http://formal.iti.kit.edu/stvs/logic/io/xml specification.xsd"
+            isConcrete="false">
     <test-table version="1.0">
         <variables>
             <variable io="input" name="A" data-type="INT"></variable>
