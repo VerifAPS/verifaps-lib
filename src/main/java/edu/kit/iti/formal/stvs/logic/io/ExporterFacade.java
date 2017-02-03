@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import edu.kit.iti.formal.stvs.logic.io.verification.VerificationExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionExporter;
