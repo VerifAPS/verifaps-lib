@@ -1,14 +1,9 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
-import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ZoomEvent;
 import javafx.scene.shape.Line;
 
 /**
@@ -24,14 +19,34 @@ public class TimingDiagramView extends XYChart<Number, Number> {
   private NumberAxis xAxis;
   private NumberAxis yAxis;
 
-  public TimingDiagramView() {
+  public TimingDiagramView(NumberAxis commonXAxis) {
     super(new NumberAxis(0.666, 10.666, 1), new NumberAxis(0, 10, 1));
     xAxis = (NumberAxis) getXAxis();
     yAxis = (NumberAxis) getYAxis();
-    //xAxis.setOpacity(0);
-    //xAxis.setMinorTickVisible(false);
-    //xAxis.setTickLabelsVisible(false);
+    xAxis.setOpacity(0);
+    xAxis.setMinorTickVisible(false);
+    xAxis.setTickLabelsVisible(false);
     yAxis.setMinorTickVisible(false);
+    //yAxis.setPrefWidth(40);
+    yAxis.setMaxWidth(0);
+    yAxis.setMinorTickVisible(false);
+    yAxis.setTickLabelsVisible(false);
+    yAxis.setMinorTickVisible(false);
+    yAxis.setTickLength(0);
+
+    this.getStylesheets().add(
+        TimingDiagramView.class.getResource("style.css").toExternalForm()
+    );
+    xAxis.lowerBoundProperty().bind(commonXAxis.lowerBoundProperty());
+    xAxis.upperBoundProperty().bind(commonXAxis.upperBoundProperty());
+    /*commonXAxis.lowerBoundProperty().addListener(change -> {
+      xAxis.setLowerBound(-100);
+      System.out.println("change1");
+    });
+    commonXAxis.upperBoundProperty().addListener(change -> {
+      xAxis.setLowerBound(-100);
+      System.out.println("change2");
+    });*/
   }
 
  /* private static Axis<Number> createIntegerAxis() {

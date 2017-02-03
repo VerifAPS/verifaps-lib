@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.layout.Pane;
 import org.junit.Test;
 
@@ -16,7 +17,7 @@ public class TimingDiagramViewTest {
   }
 
   private Scene simpleScene() {
-    TimingDiagramController controller = new TimingDiagramController();
+    TimingDiagramController controller = new TimingDiagramController(new NumberAxis());
     Pane pane = new Pane();
     pane.getChildren().add(controller.getView());
     Scene scene = new Scene(pane, 800, 600);
