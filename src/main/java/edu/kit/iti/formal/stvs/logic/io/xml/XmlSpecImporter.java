@@ -1,9 +1,5 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
-import edu.kit.iti.formal.exteta_1.Step;
-import edu.kit.iti.formal.exteta_1.TestTable;
-import edu.kit.iti.formal.exteta_1.Variable;
-import edu.kit.iti.formal.exteta_1.VariableIdentifier;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
@@ -92,7 +88,7 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
     int currentCycle = 0;
     for (int i = 0; i < rows.getRow().size(); i++) {
       Rows.Row row = rows.getRow().get(i);
-      int currentDuration = Integer.parseInt(row.getDuration());
+      int currentDuration = Integer.parseInt(row.getDuration().getValue());
       concreteSpec.getDurations().add(new ConcreteDuration(currentCycle, currentDuration));
       Map<String,ConcreteCell> cellsMap = new HashMap<>();
       for (int j = 0; j < row.getCell().size(); j++){
@@ -136,7 +132,9 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
     Rows rows = importedSpec.getRows();
     for (int i = 0; i < rows.getRow().size(); i++) {
       Rows.Row row = rows.getRow().get(i);
-      constraintSpec.getDurations().add(new ConstraintDuration(row.getDuration()));
+      ConstraintDuration newDuration = new ConstraintDuration(row.getDuration().getValue());
+      newDuration.setComment(row.getDuration().getComment());
+      constraintSpec.getDurations().add(newDuration);
       Map<String,ConstraintCell> cellsMap = new HashMap<>();
       for (Rows.Row.Cell cell : row.getCell()) {
         ConstraintCell constraintCell = new ConstraintCell(cell.getValue());

@@ -28,6 +28,15 @@
       <element name="row" minOccurs="0" maxOccurs="unbounded">
         <complexType>
           <sequence>
+            <element name="duration" minOccurs="1" maxOccurs="1">
+              <complexType>
+                <simpleContent>
+                  <extension base="string">
+                    <attribute name="comment" type="string" use="optional"></attribute>
+                  </extension>
+                </simpleContent>
+              </complexType>
+            </element>
             <choice>
               <sequence>
                 <element name="cell" minOccurs="1" maxOccurs="unbounded">
@@ -53,7 +62,6 @@
              </choice>
           </sequence>
           <attribute name="comment" type="string" use="optional"></attribute>
-          <attribute name="duration" type="string" use="required"></attribute>
         </complexType>
       </element>
     </sequence>

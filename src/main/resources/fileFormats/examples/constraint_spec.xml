@@ -14,13 +14,15 @@
         <freeVariable name="p" data-type="INT" default="3"></freeVariable>
     </variables>
     <rows>
-        <row duration="[5,-]"><!-- Hier ist die Reihenfolge der Cells wichtig! -->
+        <row><!-- Hier ist die Reihenfolge der Cells wichtig! -->
+            <duration comment="I am a duration comment!">[1,5]</duration>
             <cell comment="I am a cell comment!">5</cell>
             <cell>FALSE</cell>
             <cell>A+2</cell>
             <cell comment="I am another cell comment!">literalOne</cell>
         </row>
-        <row duration="[1,1]" comment="I am a row comment!">
+        <row comment="I am a row comment!">
+            <duration>[1,1]</duration>
             <cell>C[-1]</cell>
             <cell>!B[-1]</cell>
             <cell>A</cell>

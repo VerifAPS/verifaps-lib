@@ -112,7 +112,6 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
   @Override
   protected String getXSDFilePath() throws URISyntaxException {
     File xsdFile = new File(this.getClass().getResource("/fileFormats/session.xsd").toURI());
-
     return xsdFile.getAbsolutePath();
   }
 }

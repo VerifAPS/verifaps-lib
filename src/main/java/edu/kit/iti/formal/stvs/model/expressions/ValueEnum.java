@@ -62,6 +62,11 @@ public class ValueEnum implements Value {
     return enumType;
   }
 
+  @Override
+  public String getValueString() {
+    return enumValue;
+  }
+
   public String getEnumValue() {
     return enumValue;
   }
