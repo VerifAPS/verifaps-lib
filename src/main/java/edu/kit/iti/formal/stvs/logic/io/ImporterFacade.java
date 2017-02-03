@@ -18,8 +18,6 @@ import java.util.function.Consumer;
  */
 public class ImporterFacade {
 
-
-
   public enum ImportFormat {
     XML,
     GETETA
