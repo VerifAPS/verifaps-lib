@@ -25,7 +25,7 @@ public class XmlConfigImporterTest {
   @Test
   public void testDoImport() throws Exception {
     FileInputStream inputStream = new FileInputStream(new File
-        (XmlConfigImporter.class.getResource("/fileFormats/example_config.xml").toURI()));
+        (XmlConfigImporter.class.getResource("/fileFormats/examples/config.xml").toURI()));
     GlobalConfig config = importer.doImport(inputStream);
     assertEquals("EN", config.getUiLanguage());
     assertEquals(800, config.getWindowWidth());

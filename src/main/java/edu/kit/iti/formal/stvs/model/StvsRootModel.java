@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Benjamin Alt
@@ -43,9 +44,9 @@ public class StvsRootModel {
    * @param scenario
    * @param workingdir working-directory that should be used (e.g. for opening and saving)
    */
-  public StvsRootModel(ObservableList<HybridSpecification> hybridSpecifications, GlobalConfig globalConfig,
+  public StvsRootModel(List<HybridSpecification> hybridSpecifications, GlobalConfig globalConfig,
                        History history, VerificationScenario scenario, File workingdir) {
-    this.hybridSpecifications = hybridSpecifications;
+    this.hybridSpecifications = FXCollections.observableArrayList(hybridSpecifications);
     this.globalConfig = globalConfig;
     this.history = history;
     this.scenario = scenario;

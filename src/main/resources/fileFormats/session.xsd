@@ -9,16 +9,19 @@
 
   <complexType name="Code">
     <sequence>
-      <element name="filename" type="string" minOccurs="0" maxOccurs="1"></element>
       <element name="plaintext" type="string" minOccurs="1" maxOccurs="1"></element>
     </sequence>
   </complexType>
 
   <complexType name="Tab">
-    <choice>
-      <element name="specification" type="tns:SpecificationTable"></element>
-      <element name="specificationInstance" type="tns:SpecificationTable"></element>
-    </choice>
+    <sequence>
+      <annotation>
+        <documentation>A tab must contain at least 1 specification; it may contain
+          two (in the case of a hybridspecification)</documentation>
+      </annotation>
+      <element name="specification" type="tns:SpecificationTable" minOccurs="1"
+               maxOccurs="2"></element>
+    </sequence>
     <attribute name="id" type="nonNegativeInteger" use="required"></attribute>
     <attribute name="open" type="boolean" use="required">
       <annotation>

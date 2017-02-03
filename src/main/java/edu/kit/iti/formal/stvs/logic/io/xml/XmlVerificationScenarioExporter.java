@@ -4,7 +4,8 @@ import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import org.w3c.dom.Node;
 
 /**
- * Created by bal on 11.01.17.
+ * @author Benjamin Alt
+ * TODO: Do we change VerificationScenario?
  */
 public class XmlVerificationScenarioExporter extends XmlExporter<VerificationScenario> {
   @Override
