@@ -27,4 +27,20 @@ public class TestUtils {
       throw new AssertionError(error);
     }
   }
+
+  public static void rethrowThreadUncheckedExceptions(Runnable runnable) throws Throwable {
+    final Throwable[] throwable = new Throwable[1];
+    Thread.UncaughtExceptionHandler exceptionHandlerBefore = Thread.currentThread().getUncaughtExceptionHandler();
+    Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+      @Override
+      public void uncaughtException(Thread t, Throwable e) {
+        throwable[0] = e;
+      }
+    });
+    runnable.run();
+    Thread.currentThread().setUncaughtExceptionHandler(exceptionHandlerBefore);
+    if (throwable[0] != null) {
+      throw throwable[0];
+    }
+  }
 }

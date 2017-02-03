@@ -1,10 +1,13 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * @author Benjamin Alt
@@ -54,24 +57,46 @@ public class SpecificationTable<C, D> {
     return durations;
   }
 
+  public SpecificationColumn<C> getColumnByName(String specIoVarName) {
+    return columns.stream()
+        .filter(column -> column.getSpecIoVariable().getName().equals(specIoVarName))
+        .findFirst()
+        .orElseThrow(() ->
+            new NoSuchElementException("Column with name \"" + specIoVarName + "\" can't be found."));
+  }
+
+  public SpecificationColumn<C> removeColumnByName(String specIoVarName) {
+    SpecificationColumn<C> column = getColumnByName(specIoVarName);
+    getColumns().remove(column);
+    return column;
+  }
+
+  public List<SpecIoVariable> getSpecIoVariables() {
+    return columns.stream().map(SpecificationColumn::getSpecIoVariable).collect(Collectors.toList());
+  }
+
   protected void onColumnChange(ListChangeListener.Change<? extends SpecificationColumn<C>> change) {
-    if (change.wasAdded()) {
-      onColumnAdded(change.getAddedSubList());
-    }
-    if (change.wasRemoved()) {
-      onColumnRemoved(change.getRemoved());
+    while (change.next()) {
+      if (change.wasAdded()) {
+        onColumnAdded(change.getAddedSubList());
+      }
+      if (change.wasRemoved()) {
+        onColumnRemoved(change.getRemoved());
+      }
     }
   }
 
   protected void onRowChange(ListChangeListener.Change<? extends SpecificationRow<C>> change) {
-    if (change.wasPermutated()) {
-      onRowOrderChanged();
-    }
-    if (change.wasAdded()) {
-      onRowAdded(change.getAddedSubList());
-    }
-    if (change.wasRemoved()) {
-      onRowRemoved(change.getRemoved());
+    while (change.next()) {
+      if (change.wasPermutated()) {
+        onRowOrderChanged();
+      }
+      if (change.wasAdded()) {
+        onRowAdded(change.getAddedSubList());
+      }
+      if (change.wasRemoved()) {
+        onRowRemoved(change.getRemoved());
+      }
     }
   }
 
@@ -82,15 +107,14 @@ public class SpecificationTable<C, D> {
   private void onColumnAdded(List<? extends SpecificationColumn<C>> added) {
     for (SpecificationColumn addedCol : added) {
       if (addedCol.getCells().size() != height) {
-        throw new IllegalStateException("Illegal height for column " + addedCol.getSpecIoVariable
+        throw new IllegalArgumentException("Illegal height for column " + addedCol.getSpecIoVariable
             ().getName());
       }
-      for (SpecificationColumn<C> existingCol : columns) {
-        if (addedCol.getSpecIoVariable().getName().equals(existingCol.getSpecIoVariable().getName
-            ())) {
-          throw new IllegalStateException("A column for variable " + addedCol.getSpecIoVariable()
-              .getName() + " already exists");
-        }
+      // The column is already added, so we have to test that it is duplicated
+      if (columnPredicatePresentAtLeastTwice(
+          column -> column.getSpecIoVariable().getName().equals(addedCol.getSpecIoVariable().getName()))) {
+        throw new IllegalArgumentException("A column for variable " + addedCol.getSpecIoVariable()
+            .getName() + " already exists");
       }
     }
     for (SpecificationColumn<C> addedCol : added) {
@@ -99,6 +123,10 @@ public class SpecificationTable<C, D> {
         rows.get(i).getCells().put(addedCol.getSpecIoVariable().getName(), addedCell);
       }
     }
+  }
+
+  private boolean columnPredicatePresentAtLeastTwice(Predicate<SpecificationColumn<C>> columnPredicate) {
+    return columns.stream().filter(columnPredicate).count() >= 2;
   }
 
   /**
