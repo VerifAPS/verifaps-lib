@@ -41,7 +41,7 @@ public abstract class XmlExporter<F> implements Exporter<F> {
     }
   }
 
-  protected Node marshalToNode(JAXBElement element) throws ExportException {
+  protected static Node marshalToNode(JAXBElement element) throws ExportException {
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();

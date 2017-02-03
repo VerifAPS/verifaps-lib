@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
-import edu.kit.iti.formal.exteta_1.ConstraintVariable;
 import edu.kit.iti.formal.exteta_1.Step;
 import edu.kit.iti.formal.exteta_1.TestTable;
 import edu.kit.iti.formal.exteta_1.Variable;
@@ -21,15 +20,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.w3c.dom.Node;
+import java.util.*;
 
-import static com.sun.org.apache.xalan.internal.xsltc.compiler.sym.Literal;
+import org.w3c.dom.Node;
 
 /**
  * @author Benjamin Alt
@@ -37,6 +30,7 @@ import static com.sun.org.apache.xalan.internal.xsltc.compiler.sym.Literal;
 public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
 
   private Unmarshaller unmarshaller;
+  private Set<Type> typeContext;
 
   public XmlSpecImporter() throws ImportException {
     try {
@@ -53,15 +47,10 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
       SpecificationTable importedSpec = ((JAXBElement<SpecificationTable>) unmarshaller
           .unmarshal(source)).getValue();
 
-      TestTable testTable = importedSpec.getTestTable();
-      AdditionalInfo additionalInfo = importedSpec.getAdditionalInfo();
-      DisplayInfo displayInfo = importedSpec.getDisplayInfo();
-
-      Set<Type> typeContext = importTypeContext(additionalInfo);
-      FreeVariableSet freeVariables = importFreeVariableSet(testTable, additionalInfo);
-      List<SpecIoVariable> ioVariables = importIoVariables(testTable, additionalInfo);
-      return importConstraintSpec(typeContext, freeVariables,
-          ioVariables, testTable, additionalInfo, displayInfo);
+      Set<Type> typeContext = importTypeContext(importedSpec.getEnumTypes());
+      FreeVariableSet freeVariables = importFreeVariableSet(importedSpec.getVariables(), typeContext);
+      List<SpecIoVariable> ioVariables = importIoVariables(importedSpec.getVariables(), typeContext);
+      return importConstraintSpec(typeContext, freeVariables, ioVariables, importedSpec);
     } catch (JAXBException  e) {
       throw new ImportException(e);
     }
@@ -72,241 +61,163 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
       SpecificationTable importedSpec = ((JAXBElement<SpecificationTable>) unmarshaller
           .unmarshal(source)).getValue();
 
-      TestTable testTable = importedSpec.getTestTable();
-      AdditionalInfo additionalInfo = importedSpec.getAdditionalInfo();
-      DisplayInfo displayInfo = importedSpec.getDisplayInfo();
-
-      return importConcreteSpec(importedSpec, testTable, additionalInfo,
-          displayInfo);
-
+      Set<Type> typeContext = importTypeContext(importedSpec.getEnumTypes());
+      List<SpecIoVariable> ioVariables = importIoVariables(importedSpec.getVariables(), typeContext);
+      return importConcreteSpec(typeContext, ioVariables, importedSpec);
     } catch (JAXBException  e) {
       throw new ImportException(e);
     }
   }
 
-  private ConcreteSpecification importConcreteSpec(SpecificationTable importedSpec, TestTable testTable, AdditionalInfo additionalInfo, DisplayInfo displayInfo) throws ImportException {
+  private ConcreteSpecification importConcreteSpec(Set<Type> typeContext, List<SpecIoVariable>
+      ioVariables, SpecificationTable importedSpec) throws
+      ImportException {
     if (!importedSpec.isIsConcrete()) {
       throw new ImportException("Cannot import a ConcreteSpecification from a specification not " +
           "declared as concrete");
     }
     ConcreteSpecification concreteSpec = new ConcreteSpecification(importedSpec.isIsCounterExample());
-    for (SpecIoVariable ioVar : importIoVariables(testTable, additionalInfo)) {
-      concreteSpec.getColumns().add(new SpecificationColumn<>(ioVar, new ArrayList<>(), new
-          ColumnConfig()));
+
+    // Add a column for each ioVariable
+    Variables variables = importedSpec.getVariables();
+    for (int i = 0; i < variables.getIoVariable().size(); i++) {
+      Variables.IoVariable ioVar = variables.getIoVariable().get(i);
+      int colWidth = ioVar.getColwidth().intValue();
+      concreteSpec.getColumns().add(new SpecificationColumn<>(ioVariables.get(i), new
+          ArrayList<>(), new ColumnConfig(colWidth)));
     }
 
-    List<Object> steps = testTable.getSteps().getBlockOrStep();
-    for (int i = 0; i < steps.size(); i++) {
-      if (steps.get(i) instanceof Step) {
-        Step step = (Step) steps.get(i);
-        concreteSpec.getDurations().add(new ConstraintDuration(step.getDuration()));
-        Map<String, ConstraintCell> rowCells = new HashMap<>();
-        List<String> cellEntries = step.getCell();
-        for (int j = 0; j < cellEntries.size(); j++) {
-          SpecIoVariable variable = ioVariables.get(j);
-          rowCells.put(variable.getName(), new ConstraintCell(cellEntries.get(i)));
-        }
-        constraintSpec.getRows().add(i, new SpecificationRow<>(rowCells));
-      }
-    }
-
-    // Display info
-    for (DisplayInfo.IoVariables.VariableIdentifier variableId : displayInfo.getIoVariables()
-        .getVariableIdentifier()) {
-      for (SpecificationColumn<ConstraintCell> col : constraintSpec.getColumns()) {
-        if (col.getSpecIoVariable().getName().equals(variableId.getName())) {
-          col.getConfig().setWidth(variableId.getColWidth().intValue());
-        }
-      }
-    }
-
-    // Additional info
-    for (AdditionalInfo.IoVariables.VariableIdentifier variableId : additionalInfo.getIoVariables
-        ().getVariableIdentifier()) {
-      for (SpecificationColumn<ConstraintCell> col : constraintSpec.getColumns()) {
-        if (col.getSpecIoVariable().getName().equals(variableId.getName())) {
-          col.setComment(variableId.getComment());
+    // Add the rows
+    Rows rows = importedSpec.getRows();
+    int currentCycle = 0;
+    for (int i = 0; i < rows.getRow().size(); i++) {
+      Rows.Row row = rows.getRow().get(i);
+      int currentDuration = Integer.parseInt(row.getDuration());
+      concreteSpec.getDurations().add(new ConcreteDuration(currentCycle, currentDuration));
+      Map<String,ConcreteCell> cellsMap = new HashMap<>();
+      for (int j = 0; j < row.getCell().size(); j++){
+        Rows.Row.Cell cell = row.getCell().get(j);
+        Type cellType = ioVariables.get(i).getType();
+        Optional<Value> val = cellType.parseLiteral(cell.getValue());
+        if (val.isPresent()) {
+          ConcreteCell concreteCell = new ConcreteCell(val.get());
+          cellsMap.put(ioVariables.get(i).getName(), concreteCell);
+        } else {
+          throw new ImportException("Could not parse concrete value " + cell.getValue());
         }
       }
-    }
-    for (AdditionalInfo.Rows.Row row : additionalInfo.getRows().getRow()) {
-      SpecificationRow<ConstraintCell> concernedRow = constraintSpec.getRows().get(Integer.parseInt
-          (row.getId()));
-      concernedRow.setComment(row.getComment());
-      for (AdditionalInfo.Rows.Row.VariableIdentifier variableId : row.getVariableIdentifier()) {
-        concernedRow.getCells().get(variableId.getName()).setComment(variableId.getComment());
+      if (cellsMap.size() != ioVariables.size()) {
+        throw new ImportException("Row too short: Do not have a cell for each IOVariable");
       }
+      concreteSpec.getRows().add(new SpecificationRow<>(cellsMap));
+      currentCycle += currentDuration;
     }
-    constraintSpec.setComment(additionalInfo.getTable().getComment());
-
-    return constraintSpec;
+    return concreteSpec;
   }
 
   private ConstraintSpecification importConstraintSpec(Set<Type> typeContext,
                                                        FreeVariableSet freeVariables,
                                                        List<SpecIoVariable> ioVariables,
-                                                       TestTable testTable,
-                                                       AdditionalInfo additionalInfo,
-                                                       DisplayInfo displayInfo) {
+                                                       SpecificationTable importedSpec) throws
+      ImportException {
     ConstraintSpecification constraintSpec = new ConstraintSpecification
         (typeContext, new HashSet<>(), freeVariables);
-    for (SpecIoVariable ioVar : ioVariables) {
-      constraintSpec.getColumns().add(new SpecificationColumn<>(ioVar, new ArrayList<>(), new
-          ColumnConfig()));
+
+    // Add a column for each ioVariable
+    Variables variables = importedSpec.getVariables();
+    for (int i = 0; i < variables.getIoVariable().size(); i++) {
+      Variables.IoVariable ioVar = variables.getIoVariable().get(i);
+      int colWidth = ioVar.getColwidth().intValue();
+      constraintSpec.getColumns().add(new SpecificationColumn<>(ioVariables.get(i), new
+          ArrayList<>(), new ColumnConfig(colWidth)));
     }
 
-    List<Object> steps = testTable.getSteps().getBlockOrStep();
-    for (int i = 0; i < steps.size(); i++) {
-      if (steps.get(i) instanceof Step) {
-        Step step = (Step) steps.get(i);
-        constraintSpec.getDurations().add(new ConstraintDuration(step.getDuration()));
-        Map<String, ConstraintCell> rowCells = new HashMap<>();
-        List<String> cellEntries = step.getCell();
-        for (int j = 0; j < cellEntries.size(); j++) {
-          SpecIoVariable variable = ioVariables.get(j);
-          rowCells.put(variable.getName(), new ConstraintCell(cellEntries.get(i)));
-        }
-        constraintSpec.getRows().add(i, new SpecificationRow<>(rowCells));
+    // Add the rows
+    Rows rows = importedSpec.getRows();
+    for (int i = 0; i < rows.getRow().size(); i++) {
+      Rows.Row row = rows.getRow().get(i);
+      constraintSpec.getDurations().add(new ConstraintDuration(row.getDuration()));
+      Map<String,ConstraintCell> cellsMap = new HashMap<>();
+      for (Rows.Row.Cell cell : row.getCell()) {
+        ConstraintCell constraintCell = new ConstraintCell(cell.getValue());
+        constraintCell.setComment(cell.getComment());
+        cellsMap.put(ioVariables.get(i).getName(), constraintCell);
       }
+      if (cellsMap.size() != ioVariables.size()) {
+        throw new ImportException("Row too short: Do not have a cell for each IOVariable");
+      }
+      constraintSpec.getRows().add(new SpecificationRow<>(cellsMap));
     }
 
-    // Display info
-    for (DisplayInfo.IoVariables.VariableIdentifier variableId : displayInfo.getIoVariables()
-        .getVariableIdentifier()) {
-      for (SpecificationColumn<ConstraintCell> col : constraintSpec.getColumns()) {
-        if (col.getSpecIoVariable().getName().equals(variableId.getName())) {
-          col.getConfig().setWidth(variableId.getColWidth().intValue());
-        }
-      }
-    }
-
-    // Additional info
-    for (AdditionalInfo.IoVariables.VariableIdentifier variableId : additionalInfo.getIoVariables
-        ().getVariableIdentifier()) {
-      for (SpecificationColumn<ConstraintCell> col : constraintSpec.getColumns()) {
-        if (col.getSpecIoVariable().getName().equals(variableId.getName())) {
-          col.setComment(variableId.getComment());
-        }
-      }
-    }
-    for (AdditionalInfo.Rows.Row row : additionalInfo.getRows().getRow()) {
-      SpecificationRow<ConstraintCell> concernedRow = constraintSpec.getRows().get(Integer.parseInt
-          (row.getId()));
-      concernedRow.setComment(row.getComment());
-      for (AdditionalInfo.Rows.Row.VariableIdentifier variableId : row.getVariableIdentifier()) {
-        concernedRow.getCells().get(variableId.getName()).setComment(variableId.getComment());
-      }
-    }
-    constraintSpec.setComment(additionalInfo.getTable().getComment());
-
+    constraintSpec.setComment(importedSpec.getComment());
     return constraintSpec;
   }
 
-  private Set<Type> importTypeContext(AdditionalInfo additionalInfo) throws ImportException {
+  private Set<Type> importTypeContext(EnumTypes enumTypes) throws ImportException {
     Set<Type> typeContext = new HashSet<>();
     // Type context are user-defined enums + int + bool
     typeContext.add(TypeInt.INT);
     typeContext.add(TypeBool.BOOL);
-    for (AdditionalInfo.IoVariables.VariableIdentifier variableId : additionalInfo.getIoVariables
-        ().getVariableIdentifier()) {
-      Type enumType = getEnumType(additionalInfo, variableId.getName());
-        typeContext.add(enumType);
+    for (EnumTypes.Enum enumT : enumTypes.getEnum()) {
+      List<String> literals = enumT.getLiteral();
+      typeContext.add(TypeFactory.enumOfName(enumT.getName(), literals.toArray(new
+          String[literals.size()])));
     }
     return typeContext;
   }
 
-  private List<SpecIoVariable> importIoVariables(TestTable testTable, AdditionalInfo additionalInfo) throws
+  private List<SpecIoVariable> importIoVariables(Variables variables, Set<Type> typeContext)
+      throws
       ImportException {
     List<SpecIoVariable> ioVariables = new ArrayList<>();
-    List<Variable> variables = testTable.getVariables().getVariableOrConstraint();
-    for (Variable variable : variables) {
-      if (variable instanceof VariableIdentifier) {
-        Type type = getVariableType(additionalInfo, variable);
-        String name = variable.getName();
-        String category = ((VariableIdentifier) variable).getIo();
-        if (category.equals("input")) {
-          ioVariables.add(new SpecIoVariable(VariableCategory.INPUT, type, name));
-        } else if (category.equals("output")) {
-          ioVariables.add(new SpecIoVariable(VariableCategory.OUTPUT, type, name));
-        } else {
-          throw new ImportException("Illegal variable category: " + category);
+    for (Variables.IoVariable variable : variables.getIoVariable()) {
+      boolean typeFound = false;
+      for (Type type : typeContext) {
+        if (type.getTypeName().equals(variable.getDataType())) {
+          typeFound = true;
+          if (variable.getIo().equals("input")) {
+            ioVariables.add(new SpecIoVariable(VariableCategory.INPUT, type, variable.getName()));
+          } else if (variable.getIo().equals("output")) {
+            ioVariables.add(new SpecIoVariable(VariableCategory.OUTPUT, type, variable.getName()));
+          } else {
+            throw new ImportException("Illegal variable category: " + variable.getIo());
+          }
+          break;
         }
+      }
+      if (!typeFound) {
+        throw new ImportException("Type " + variable.getDataType() + " not found for free " +
+            "variable " + variable.getName());
       }
     }
     return ioVariables;
   }
 
-  private Type getVariableType(AdditionalInfo additionalInfo, Variable variable) throws ImportException {
-    Type type = getVariableType(additionalInfo, variable);
-    String typeString = variable.getDataType().value();
-    if (typeString.equals("INT")) {
-      return TypeInt.INT;
-    } else if (typeString.equals("BOOLEAN")) {
-      return TypeBool.BOOL;
-    } else if (typeString.equals("ENUM")) {
-      return getEnumType(additionalInfo, variable.getName());
-    } else {
-      throw new ImportException("Unsupported type: " + typeString);
-    }
-  }
-
-  private Type getEnumType(AdditionalInfo additionalInfo, String variableName) throws ImportException {
-    for (AdditionalInfo.IoVariables.VariableIdentifier variableId : additionalInfo.getIoVariables
-        ().getVariableIdentifier()) {
-      if (variableId.getName().equals(variableName)) {
-        String enumName = variableId.getEnumType();
-        if (enumName != null) {
-          List<String> literals = new ArrayList<>();
-          boolean found = false;
-          for (AdditionalInfo.Enums.Enum enumT : additionalInfo.getEnums().getEnum()) {
-            if (enumT.getName().equals(enumName)) {
-              found = true;
-              literals = enumT.getLiteral();
-            }
-          }
-          if (!found) {
-            throw new ImportException("Enum type " + enumName + "not declared in " +
-                "'enums' section of AdditionalInfo");
-          }
-          return TypeFactory.enumOfName(enumName, literals.toArray(new String[literals
-              .size()]));
-        }
-      }
-    }
-    throw new ImportException("Enum type not declared for variable " + variableName);
-  }
-
-  private FreeVariableSet importFreeVariableSet(TestTable testTable, AdditionalInfo
-      additionalInfo) throws ImportException {
+  private FreeVariableSet importFreeVariableSet(Variables variables, Set<Type> typeContext) throws ImportException {
     try {
-      List<FreeVariable> freeVariables = new ArrayList<>();
-      List<AdditionalInfo.ConstraintVariables.ConstraintVariable>
-          additionalInfoConstraintVars = additionalInfo
-          .getConstraintVariables().getConstraintVariable();
-      List<Variable> variables = testTable.getVariables().getVariableOrConstraint();
-      for (Variable variable : variables) {
-        if (variable instanceof ConstraintVariable) {
-          String constraintVarName = variable.getName();
-          String constraintVarTypeString = variable.getDataType().value();
-          Type constraintVarType = getVariableType(additionalInfo, variable);
-          FreeVariable freeVar = new FreeVariable(constraintVarName, constraintVarType);
-          // Find out the default value
-          for (AdditionalInfo.ConstraintVariables.ConstraintVariable cv :
-              additionalInfoConstraintVars) {
-            if (cv.getName().equals(constraintVarName)) {
-              if (constraintVarType.equals(TypeInt.INT)) {
-                freeVar.setDefaultValue(new ValueInt(Integer.parseInt(cv.getDefaultValue())));
-              } else if (constraintVarType.equals(TypeBool.BOOL)) {
-                ValueBool valueBool = Boolean.parseBoolean(cv.getDefaultValue()) ? ValueBool.TRUE
-                    : ValueBool.FALSE;
-                freeVar.setDefaultValue(valueBool);
+      List<FreeVariable> freeVariableSet = new ArrayList<>();
+      for (Variables.FreeVariable freeVar : variables.getFreeVariable()) {
+        boolean typeFound = false;
+        String typeString = freeVar.getDataType();
+        for (Type type : typeContext) {
+          if (type.getTypeName().equals(typeString)) {
+            typeFound = true;
+            FreeVariable freeVariable = new FreeVariable(freeVar.getName(), type);
+            if (freeVar.getDefault() != null) {
+              Optional<Value> val = type.parseLiteral(freeVar.getDefault());
+              if (val.isPresent()) {
+                freeVariable.setDefaultValue(val.get());
               }
             }
+            freeVariableSet.add(freeVariable);
           }
-          freeVariables.add(freeVar);
+          if (!typeFound) {
+            throw new ImportException("Type " + freeVar.getDataType() + " not found for free " +
+                "variable " + freeVar.getName());
+          }
         }
       }
-      return new FreeVariableSet(freeVariables);
+      return new FreeVariableSet(freeVariableSet);
     } catch (IllegalValueTypeException e) {
       throw new ImportException(e);
     }
@@ -315,7 +226,7 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
   @Override
   protected String getXSDFilePath() throws URISyntaxException {
     File xsdFile = new File
-        (this.getClass().getResource("/fileFormats/config.xsd").toURI());
+        (this.getClass().getResource("/fileFormats/specification.xsd").toURI());
     return xsdFile.getAbsolutePath();
   }
 }

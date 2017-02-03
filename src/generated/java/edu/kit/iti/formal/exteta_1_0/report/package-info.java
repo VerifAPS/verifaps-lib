@@ -5,5 +5,5 @@
 // Generated on: 2017.02.03 at 02:29:52 PM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://formal.iti.kit.edu/stvs/logic/io/xml", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package edu.kit.iti.formal.stvs.logic.io.xml;
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://formal.iti.kit.edu/exteta-1.0/report/")
+package edu.kit.iti.formal.exteta_1_0.report;
