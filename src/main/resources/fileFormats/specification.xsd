@@ -17,30 +17,8 @@
         <complexType>
          <sequence>
           <element name="colWidth" type="positiveInteger" minOccurs="0" maxOccurs="1"></element>
-          <element name="comment" type="string" minOccurs="0" maxOccurs="1"></element>
          </sequence>
          <attribute name="name" type="string" use="required"></attribute>
-        </complexType>
-       </element>
-      </sequence>
-     </complexType>
-    </element>
-    <element name="table" minOccurs="0" maxOccurs="1">
-     <complexType>
-      <sequence>
-       <element name="comment" type="string" minOccurs="0" maxOccurs="1"></element>
-      </sequence>
-     </complexType>
-    </element>
-    <element name="rows" minOccurs="0" maxOccurs="1">
-     <complexType>
-      <sequence>
-       <element name="row" minOccurs="0" maxOccurs="unbounded">
-        <complexType>
-         <sequence>
-          <element name="comment" type="string" minOccurs="0" maxOccurs="1"></element>
-         </sequence>
-         <attribute name="id" use="required"></attribute>
         </complexType>
        </element>
       </sequence>
@@ -75,6 +53,8 @@
         <complexType>
          <sequence>
           <element name="annotation" type="string" minOccurs="0" maxOccurs="1"></element>
+           <element name="comment" type="string" minOccurs="0" maxOccurs="1"></element>
+           <element name="enumType" type="string" minOccurs="0" maxOccurs="1"></element>
          </sequence>
          <attribute name="name" type="string" use="required"></attribute>
         </complexType>
@@ -82,12 +62,55 @@
       </sequence>
      </complexType>
     </element>
+     <element name="table" minOccurs="0" maxOccurs="1">
+       <complexType>
+         <sequence>
+           <element name="comment" type="string" minOccurs="0" maxOccurs="1"></element>
+         </sequence>
+       </complexType>
+     </element>
+     <element name="rows" minOccurs="0" maxOccurs="1">
+       <complexType>
+         <sequence>
+           <element name="row" minOccurs="0" maxOccurs="unbounded">
+             <complexType>
+               <sequence>
+                 <element name="comment" type="string" minOccurs="0" maxOccurs="1"></element>
+                 <element name="variableIdentifier" minOccurs="0" maxOccurs="unbounded">
+                   <complexType>
+                     <sequence>
+                       <element name="comment" type="string" minOccurs="0" maxOccurs="1"/>
+                       <element name="annotation" type="string" minOccurs="0" maxOccurs="1"/>
+                     </sequence>
+                     <attribute name="name" type="string" use="required"></attribute>
+                   </complexType>
+                 </element>
+               </sequence>
+               <attribute name="id" use="required"></attribute>
+             </complexType>
+           </element>
+         </sequence>
+       </complexType>
+     </element>
+     <element name="enums" minOccurs="0" maxOccurs="1">
+       <complexType>
+         <sequence>
+           <element name="enum" minOccurs="1" maxOccurs="unbounded">
+             <complexType>
+               <sequence>
+                 <element name="literal" type="string" minOccurs="1" maxOccurs="unbounded"></element>
+               </sequence>
+               <attribute name="name"></attribute>
+             </complexType>
+           </element>
+         </sequence>
+       </complexType>
+     </element>
    </sequence>
  </complexType>
 
  <complexType name="SpecificationTable">
    <sequence>
-    <element name="filename" type="string" minOccurs="0" maxOccurs="1"></element>
     <element name="test-table" type="exteta:testTable" minOccurs="1" maxOccurs="1"></element>
     <element name="display-info" type="tns:DisplayInfo" minOccurs="0" maxOccurs="1"></element>
     <element name="additional-info" type="tns:AdditionalInfo" minOccurs="0" maxOccurs="1"></element>

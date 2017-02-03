@@ -5,13 +5,11 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://formal.iti.kit.edu/stvs/logic/io/xml session.xsd">
  <code>
-   <filename>/path/to/codefile.st</filename>
    <plaintext>I am some ST code!</plaintext>
  </code>
  <tabs>
    <tab id="0" open="false" readOnly="false">
      <specification>
-       <filename>/path/to/exampleSpec.xml</filename> <!-- This is useful for session import/export, because one knows which tab corresponds to which file (if any) -->
        <test-table version="1.0">
          <variables>
            <variable io="input" name="A" data-type="INT"></variable>

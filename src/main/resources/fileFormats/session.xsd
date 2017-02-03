@@ -9,7 +9,6 @@
 
   <complexType name="Code">
     <sequence>
-      <element name="filename" type="string" minOccurs="0" maxOccurs="1"></element>
       <element name="plaintext" type="string" minOccurs="1" maxOccurs="1"></element>
     </sequence>
   </complexType>
