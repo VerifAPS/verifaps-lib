@@ -10,6 +10,7 @@ import java.util.Map;
  */
 public class ConcreteSpecification extends SpecificationTable<ConcreteCell, ConcreteDuration> {
 
+  /* TODO: Fix
   private final boolean isCounterExample;
 
   public ConcreteSpecification(boolean isCounterExample) {
@@ -29,7 +30,7 @@ public class ConcreteSpecification extends SpecificationTable<ConcreteCell, Conc
   /**
    * A row in a ConcreteSpecification is not the same as a row in a ConstraintSpecification.
    * This function does the mapping between the two.
-   */
+   *
   public List<ConcreteCell> getConcreteValuesForConstraintRow(String column, int constraintRow) {
     int startIndex = durations.get(constraintRow).getBeginCycle();
     int endIndex = durations.get(constraintRow).getEndCycle();
@@ -48,4 +49,6 @@ public class ConcreteSpecification extends SpecificationTable<ConcreteCell, Conc
     }
     return concreteCells;
   }
+
+  */
 }

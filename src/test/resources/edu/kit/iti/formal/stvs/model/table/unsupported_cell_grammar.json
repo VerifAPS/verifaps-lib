@@ -1,0 +1,24 @@
+{
+  "freevariables":[
+    { "name":"c", "type":"INT" }
+  ],
+  "variables":[
+    { "iotype":"INPUT", "name":"Counter", "type":"INT" },
+    { "iotype":"OUTPUT", "name":"Active", "type":"BOOL" }
+  ],
+
+  "expected_problems":[
+    "CellUnsupportedExpressionProblem"
+  ],
+
+  "rows":[
+    "  0                                      | TRUE",
+    "> 10                                     | TRUE",
+    "if :: c < 5 -> FALSE :: c >= 5-> TRUE fi | FALSE",
+    "function(c, 4)                           | FALSE"
+  ],
+  "durations":[
+    "[10,-]",
+    "1"
+  ]
+}

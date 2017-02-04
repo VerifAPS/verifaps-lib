@@ -112,7 +112,7 @@ public class TestExpressionParser {
 
   @Test
   public void testUnaryOperators() throws ParseException, UnsupportedExpressionException {
-    // parens enforce a "expression" rule (not single-sided or constant or blah)
+    // parens enforce an "expression" rule (not single-sided or constant or blah)
     assertParseExpressionEqual("(- (2))", SimpleExpressions.negate(SimpleExpressions.literal(2)));
     assertParseExpressionEqual("(!TRUE)", SimpleExpressions.not(SimpleExpressions.literal(true)));
     assertParseExpressionEqual("(NOT TRUE)", SimpleExpressions.not(SimpleExpressions.literal(true)));

@@ -19,10 +19,8 @@ public class ValidSpecification extends SpecificationTable<Expression, LowerBoun
   private final ObservableSet<Type> typeContext;
   private FreeVariableSet freeVariableSet;
 
-  public ValidSpecification(List<SpecificationColumn<Expression>> columns,
-                            List<LowerBoundedInterval> durations,
-                            ObservableSet<Type> typeContext, FreeVariableSet freeVariableSet) {
-    super(columns, durations);
+  public ValidSpecification(ObservableSet<Type> typeContext, FreeVariableSet freeVariableSet) {
+    super();
     this.typeContext = typeContext;
     this.freeVariableSet = freeVariableSet;
   }
