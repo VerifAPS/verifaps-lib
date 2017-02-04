@@ -4,32 +4,20 @@ import edu.kit.iti.formal.stvs.model.common.*;
 import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
-import edu.kit.iti.formal.stvs.model.table.problems.TypeErrorProblem;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
-import edu.kit.iti.formal.stvs.model.table.problems.DurationProblem;
-import edu.kit.iti.formal.stvs.model.table.problems.ParseErrorProblem;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import org.junit.Before;
-import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.*;
 
 /**
  * @author Benjamin Alt
  */
 public class ConstraintSpecificationTest {
-/*
   private ConstraintSpecification spec;
   private ValidSpecification validSpec;
 
@@ -64,11 +52,11 @@ public class ConstraintSpecificationTest {
     codeIoVariables.add(new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableB"));
     codeIoVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableC"));
     codeIoVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableD"));
-    spec = new ConstraintSpecification(columns, durations, typeContext, codeIoVariables, freeVariableSet);
+    //spec = new ConstraintSpecification(columns, durations, typeContext, codeIoVariables, freeVariableSet);
     validSpec = spec.getValidSpecification();
-    setValidSpecListener(spec);
+    //setValidSpecListener(spec);
   }
-
+/*
   @Test
   public void testAddEmptyColumn() {
     SpecIoVariable variable = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableE");
@@ -99,25 +87,25 @@ public class ConstraintSpecificationTest {
   public void testSyntaxErrorHandling() throws IllegalValueTypeException {
     spec.getColumn("VariableA").getCellForRow(2).setFromString("100");
     assertNotNull(validSpec);
-    assertEquals(0, spec.getProblems().size());
+    assertEquals(0, spec.getCellProblems().size());
     spec.getColumn("VariableA").getCellForRow(2).setFromString("bogus");
     assertNull(validSpec);
-    assertEquals(1, spec.getProblems().size());
+    assertEquals(1, spec.getCellProblems().size());
     spec.getColumn("VariableB").getCellForRow(2).setFromString("more bogus");
     assertNull(validSpec);
-    assertEquals(2, spec.getProblems().size());
-    assertThat(spec.getProblems().get(0), instanceOf(ParseErrorProblem.class));
+    assertEquals(2, spec.getCellProblems().size());
+    assertThat(spec.getCellProblems().get(0), instanceOf(CellParseProblem.class));
   }
 
   @Test
   public void testTypeErrorHandling() {
     spec.getColumn("VariableA").getCellForRow(2).setFromString("100");
     assertNotNull(validSpec);
-    assertEquals(0, spec.getProblems().size());
+    assertEquals(0, spec.getCellProblems().size());
     spec.getColumn("VariableB").getSpecIoVariable().setType(TypeBool.BOOL);
     assertNull(validSpec);
-    assertNotEquals(0, spec.getProblems().size());
-    assertThat(spec.getProblems().get(0), instanceOf(TypeErrorProblem.class));
+    assertNotEquals(0, spec.getCellProblems().size());
+    assertThat(spec.getCellProblems().get(0), instanceOf(CellTypeProblem.class));
   }
 
   @Test
@@ -126,8 +114,8 @@ public class ConstraintSpecificationTest {
     assertNotNull(validSpec);
     spec.getDurations().get(2).setFromString("bogus duration");
     assertNull(validSpec);
-    assertNotEquals(0, spec.getProblems().size());
-    assertThat(spec.getProblems().get(0), instanceOf(DurationProblem.class));
+    assertNotEquals(0, spec.getCellProblems().size());
+    assertThat(spec.getCellProblems().get(0), instanceOf(DurationParseProblem.class));
   }
 
   @Test

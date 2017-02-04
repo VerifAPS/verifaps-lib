@@ -1,19 +1,23 @@
 package edu.kit.iti.formal.stvs.model.table.problems;
 
-import java.util.function.Function;
+import edu.kit.iti.formal.stvs.model.common.Selection;
 
-/**
- * @author Benjamin Alt
- */
-public abstract class SpecProblem {
+public abstract class SpecProblem extends Exception {
 
+  private final String errorMessage;
+  private final Selection location;
 
-  public abstract <R> R match(
-      Function<TypeErrorProblem, R> matchTypeError,
-      Function<InvalidIoVarProblem, R> matchInvalidIoVar,
-      Function<CyclicDependencyProblem, R> matchCyclicDependency,
-      Function<ParseErrorProblem, R> matchParseError,
-      Function<DurationProblem, R> matchDurationProblem);
+  public SpecProblem(String errorMessage, Selection location) {
+    super(errorMessage);
+    this.errorMessage = errorMessage;
+    this.location = location;
+  }
 
-  public abstract String getErrorMessage();
+  public String getErrorMessage() {
+    return this.errorMessage;
+  }
+
+  public Selection getLocation() {
+    return location;
+  }
 }

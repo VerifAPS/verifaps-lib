@@ -1,88 +1,57 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.stvs.model.common.*;
-import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
+import edu.kit.iti.formal.stvs.model.common.NullableProperty;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.*;
+import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
+import edu.kit.iti.formal.stvs.model.expressions.parser.IntervalParser;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
 import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 import edu.kit.iti.formal.stvs.model.table.problems.*;
-import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
-import edu.kit.iti.formal.stvs.model.expressions.parser.IntervalParser;
-import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Benjamin Alt
  */
 public class ConstraintSpecification extends SpecificationTable<ConstraintCell, ConstraintDuration> implements Commentable {
 
-  private ObjectProperty<List<SpecProblem>> problems;
-  private ObservableSet<Type> typeContext;
-  private ObservableSet<CodeIoVariable> codeIoVariables;
+  private final ObjectProperty<List<SpecProblem>> problems;
+  private final ObservableSet<Type> typeContext;
+  private final ObservableSet<CodeIoVariable> codeIoVariables;
   private final FreeVariableSet freeVariableSet;
-  private StringProperty comment;
+  private final StringProperty comment;
+  private final Map<ConstraintCell, CellChangeListener> registeredCellListeners;
+  private final NullableProperty<ValidSpecification> validSpecification;
 
-  private OptionalProperty<ValidSpecification> validSpecification;
+  public ConstraintSpecification(ObservableSet<Type> typeContext,
+                                 ObservableSet<CodeIoVariable> ioVariables,
+                                 FreeVariableSet freeVariableSet) {
+    super();
 
-  /**
-   * @param typeContext
-   * @param ioVariables
-   * @param freeVariableSet
-   */
-  public ConstraintSpecification(Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet) {
-    this(new ArrayList<>(), new ArrayList<>(), typeContext, ioVariables, freeVariableSet);
-  }
-
-  /**
-   * Constructor with full parameters.
-   * @param columns
-   * @param durations
-   * @param typeContext
-   * @param ioVariables
-   * @param freeVariableSet
-   */
-  public ConstraintSpecification(List<SpecificationColumn<ConstraintCell>> columns,
-                                 List<ConstraintDuration> durations,
-                                 Set<Type> typeContext, Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet) {
-    this.columns = FXCollections.observableArrayList(
-        (SpecificationColumn<ConstraintCell> column) -> new Observable[]{column.getSpecIoVariable
-            ().categoryProperty(), column.getSpecIoVariable().typeProperty(), column
-            .getSpecIoVariable().nameProperty(), column.getCells()});
-    this.columns.addAll(columns);
-    this.columns.addListener(this::onColumnChange);
-    this.columns.addListener(
-        (ListChangeListener.Change<? extends SpecificationColumn<ConstraintCell>> c) ->
-        onSpecificationChanged());
-    initHeight();
-    this.rows = FXCollections.observableArrayList(makeRowList(columns));
-    this.rows.addListener(this::onRowChange);
-
-    this.durations = FXCollections.observableArrayList(
-        (ConstraintDuration tp) -> new Observable[]{tp.stringRepresentationProperty()});
-    this.durations.addAll(durations);
-    this.durations.addListener(
-        (ListChangeListener.Change<? extends ConstraintDuration> c) ->
-        onSpecificationChanged());
-    this.typeContext = FXCollections.observableSet(typeContext);
+    this.typeContext = typeContext;
+    this.codeIoVariables = ioVariables;
     this.freeVariableSet = freeVariableSet;
-    this.codeIoVariables = FXCollections.observableSet(ioVariables);
-    this.problems = new SimpleObjectProperty<>();
-    this.validSpecification = new OptionalProperty<>(new SimpleObjectProperty<>());
-    onSpecificationChanged();
+
+    this.problems = new SimpleObjectProperty<>(new ArrayList<>());
+
+    this.comment = new SimpleStringProperty("");
+
+    this.validSpecification = new NullableProperty<>();
+
+    this.registeredCellListeners = new HashMap<>();
   }
 
   public ObservableSet<Type> getTypeContext() {
@@ -97,24 +66,12 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     return codeIoVariables;
   }
 
-  public ValidSpecification getValidSpecification() {
-    return validSpecification.get();
-  }
-
-  public OptionalProperty<ValidSpecification> validSpecificationProperty() {
+  public NullableProperty<ValidSpecification> validSpecificationProperty() {
     return validSpecification;
   }
 
-  public List<SpecProblem> getProblems() {
-    return problems.get();
-  }
-
-  public ObjectProperty<List<SpecProblem>> problemsProperty() {
-    return problems;
-  }
-
-  public void setProblems(List<SpecProblem> problems) {
-    this.problems.set(problems);
+  public ValidSpecification getValidSpecification() {
+    return validSpecification.get();
   }
 
   @Override
@@ -132,74 +89,165 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     return comment;
   }
 
-  /**
-   * Called when the specification changed. Try to create a new ValidSpecification (parsed and type-checked) if possible;
-   * record all problems encountered in doing so. If parsing and type-checking successful, sets the optional ValidSpecification.
-   */
   private void onSpecificationChanged() {
-    ArrayList<SpecProblem> problemsFound = new ArrayList<>();
-    // Parse and type-check cells
-    List<SpecificationColumn<Expression>> parsedColumns = new ArrayList<>();
-    HashMap<String, Type> typeCheckerTypeContext = new HashMap<>(freeVariableSet.getVariableContext());
-    for (SpecificationColumn column : columns) {
-      typeCheckerTypeContext.put(column.getSpecIoVariable().getName(), column.getSpecIoVariable().getType());
-    }
-    TypeChecker typeChecker = new TypeChecker(typeCheckerTypeContext);
-    for (SpecificationColumn column : columns) {
-      SpecificationColumn<ConstraintCell> rawColumn = column;
-      String columnId = column.getSpecIoVariable().getName();
-      ArrayList<Expression> parsedCells = new ArrayList<Expression>();
-      List<ConstraintCell> rawCells = rawColumn.getCells();
-      ExpressionParser parser = new ExpressionParser(columnId);
-      for (int rowNum = 0; rowNum < rawCells.size(); rowNum++) {
+    ValidSpecification spec = new ValidSpecification(
+        new ArrayList<>(),
+        new ArrayList<>(),
+        typeContext,
+        freeVariableSet);
+
+    List<SpecProblem> specProblems = new ArrayList<>();
+
+    boolean specValid = true;
+
+    for (SpecificationColumn<ConstraintCell> column : columns) {
+      List<Expression> expressionsForColumn = new ArrayList<>();
+
+      // Check cells for problems
+      for (int row = 0; row < column.getCells().size(); row++) {
         try {
-          Expression parsedExpression = parser.parseExpression(rawCells.get(rowNum).getAsString());
-          parsedCells.add(parsedExpression);
-          typeChecker.typeCheck(parsedExpression);
-        } catch (ParseException | UnsupportedExpressionException e) {
-          problemsFound.add(new ParseErrorProblem(e.getMessage(), rawColumn.getSpecIoVariable(), rowNum));
-          // Do not break, as all cells must be parsed in order for all specProblems to be found
-        } catch (TypeCheckException e) {
-          problemsFound.add(new TypeErrorProblem("Type error in column " + columnId + ", row " +
-              rowNum, rawColumn.getSpecIoVariable(), rowNum, e));
+          expressionsForColumn.add(expressionOrProblemForCell(
+              column.getSpecIoVariable().getName(),
+              row,
+              column.getCells().get(row)));
+        } catch (CellProblem problem) {
+          specProblems.add(problem);
+          expressionsForColumn.add(null);
+          specValid = false;
         }
       }
-      parsedColumns.add(new SpecificationColumn<>(rawColumn.getSpecIoVariable(), parsedCells, rawColumn.getConfig()));
+
+      SpecIoVariable ioVariable = column.getSpecIoVariable();
+
+      // Check column header for problem
+      InvalidIoVarProblem.checkForProblem(ioVariable, codeIoVariables)
+          .ifPresent(specProblems::add);
+
+      SpecificationColumn<Expression> validColumn =
+          new SpecificationColumn<>(ioVariable, expressionsForColumn, column.getConfig());
+
+      spec.getColumns().add(validColumn);
     }
-    // Parse durations
-    List<LowerBoundedInterval> parsedDurations = new ArrayList<>();
-    for(int rownum = 0; rownum < durations.size(); rownum++) {
+
+    for (int row = 0; row < durations.size(); row++) {
       try {
-        parsedDurations.add(IntervalParser.parse(durations.get(rownum).getAsString()));
-      } catch (ParseException e) {
-        problemsFound.add(new DurationProblem(e.getParseErrorMessage(), rownum));
+        spec.getDurations().add(lowerBoundedIntervalOrProblemForDuration(
+            row,
+            durations.get(row)));
+      } catch (DurationProblem problem) {
+        specProblems.add(problem);
+        specValid = false;
       }
     }
-    // Are there invalid IO variables? (Is there a specIoVariable that is not a codeIoVariable?)
-    for (SpecificationColumn column : columns) {
-      boolean found = false;
-      for (CodeIoVariable codeIoVariable : codeIoVariables) {
-        if (codeIoVariable.matches(column.getSpecIoVariable())) {
-          found = true;
-        }
-      }
-      if (!found) {
-        problemsFound.add(new InvalidIoVarProblem(column.getSpecIoVariable()));
-      }
-    }
-    // Create the new ValidSpecification
-    setProblems(problemsFound);
-    boolean validSpecificationPossible = true;
-    for (SpecProblem specProblem : problemsFound) {
-      if (specProblem instanceof DurationProblem || specProblem instanceof TypeErrorProblem || specProblem instanceof ParseErrorProblem) {
-        validSpecificationPossible = false;
-      }
-    }
-    if (validSpecificationPossible) {
-      validSpecification.set(new ValidSpecification(parsedColumns, parsedDurations, typeContext, freeVariableSet));
+
+    if (specValid) {
+      validSpecification.set(spec);
     } else {
-      validSpecification.clear();
+      validSpecification.set(null);
     }
   }
 
+  private LowerBoundedInterval lowerBoundedIntervalOrProblemForDuration(int row, ConstraintDuration duration)
+      throws DurationProblem {
+    try {
+      return IntervalParser.parse(duration.getAsString());
+    } catch (ParseException parseException) {
+      throw new DurationParseProblem(parseException, row);
+    }
+  }
+
+  private Expression expressionOrProblemForCell(String columnId, int row, ConstraintCell cell)
+      throws CellProblem {
+    try {
+      return createValidExpressionFromCell(columnId, cell);
+    } catch (TypeCheckException typeCheckException) {
+      throw new CellTypeProblem(typeCheckException, columnId, row);
+    } catch (ParseException parseException) {
+      throw new CellParseProblem(parseException, columnId, row);
+    } catch (UnsupportedExpressionException unsupportedException) {
+      throw new CellUnsupportedExpressionProblem(unsupportedException, columnId, row);
+    }
+  }
+
+  protected Expression createValidExpressionFromCell(String columnId, ConstraintCell cell)
+      throws TypeCheckException, ParseException, UnsupportedExpressionException {
+    // First try to parse the expression:
+    ExpressionParser parser = new ExpressionParser(columnId, typeContext);
+    Expression expression = parser.parseExpression(cell.getAsString());
+
+    HashMap<String, Type> allTypes = new HashMap<>();
+    allTypes.putAll(freeVariableSet.getVariableContext());
+    // Use SpecIoVariable for type checking cells, not CodeIoVariable
+    // that way, it's possible for the user to write his/her spec without
+    // having written code (and getting sensible type errors)
+    columns.forEach(column -> allTypes.put(
+        column.getSpecIoVariable().getName(),
+        column.getSpecIoVariable().getType()));
+    TypeChecker typeChecker = new TypeChecker(allTypes);
+    Type type = typeChecker.typeCheck(expression);
+    if (type.checksAgainst(TypeBool.BOOL)) {
+      return expression;
+    } else {
+      throw new TypeCheckException(expression,
+          "The cell expression must evaluate to a boolean, instead it evaluates to: " + type.getTypeName());
+    }
+  }
+
+  @Override
+  protected void onColumnAdded(List<? extends SpecificationColumn<ConstraintCell>> added) {
+    super.onColumnAdded(added);
+
+    for (SpecificationColumn<ConstraintCell> column : added) {
+      column.getCells().forEach(this::subscribeCell);
+    }
+  }
+
+  @Override
+  protected void onColumnRemoved(List<? extends SpecificationColumn<ConstraintCell>> removed) {
+    super.onColumnRemoved(removed);
+
+    for (SpecificationColumn<ConstraintCell> column : removed) {
+      column.getCells().forEach(this::unsubscribeCell);
+    }
+    onSpecificationChanged();
+  }
+
+  @Override
+  protected void onRowAdded(List<? extends SpecificationRow<ConstraintCell>> added) {
+    super.onRowAdded(added);
+
+    for (SpecificationRow<ConstraintCell> row : added) {
+      row.getCells().values().forEach(this::subscribeCell);
+    }
+    onSpecificationChanged();
+  }
+
+  @Override
+  protected void onRowRemoved(List<? extends SpecificationRow<ConstraintCell>> removed) {
+    super.onRowRemoved(removed);
+    for (SpecificationRow<ConstraintCell> row : removed) {
+      for (ConstraintCell cell : row.getCells().values()) {
+        unsubscribeCell(cell);
+      }
+    }
+    onSpecificationChanged();
+  }
+
+  private void subscribeCell(ConstraintCell cell) {
+    CellChangeListener listener = new CellChangeListener();
+    cell.stringRepresentationProperty().addListener(listener);
+    registeredCellListeners.put(cell, listener);
+  }
+
+  private void unsubscribeCell(ConstraintCell cell) {
+    CellChangeListener listener = registeredCellListeners.remove(cell);
+    cell.stringRepresentationProperty().removeListener(listener);
+  }
+
+  private class CellChangeListener implements ChangeListener<String> {
+    @Override
+    public void changed(ObservableValue<? extends String> obs, String old, String newV) {
+      ConstraintSpecification.this.onSpecificationChanged();
+    }
+  }
 }

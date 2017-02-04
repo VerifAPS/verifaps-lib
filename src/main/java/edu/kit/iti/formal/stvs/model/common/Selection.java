@@ -20,6 +20,16 @@ public class Selection {
     this.row = new OptionalPropertyBase<>(new SimpleIntegerProperty(row));
   }
 
+  public Selection(String column) {
+    this.column = new OptionalPropertyBase<>(new SimpleStringProperty(column));
+    this.row = OptionalPropertyBase.ofNull(new SimpleIntegerProperty());
+  }
+
+  public Selection(int row) {
+    this.column = OptionalPropertyBase.ofNull(new SimpleStringProperty());
+    this.row = new OptionalPropertyBase<>(new SimpleIntegerProperty(row));
+  }
+
   public Selection() {
     this.column = OptionalPropertyBase.ofNull(new SimpleStringProperty());
     this.row = OptionalPropertyBase.ofNull(new SimpleIntegerProperty());

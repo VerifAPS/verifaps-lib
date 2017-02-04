@@ -35,9 +35,13 @@ public class SpecificationTable<C, D> {
   protected void initHeight() {
     height = 0;
     for (SpecificationColumn<C> col : this.columns) {
-      if (height == 0) height = col.getCells().size();
-      if (height != col.getCells().size()) throw new IllegalArgumentException("Inconsistent " +
-          "column heights: Not all columns have height " + height);
+      if (height == 0) {
+        height = col.getCells().size();
+      }
+      if (height != col.getCells().size()) {
+        throw new IllegalArgumentException("Inconsistent "
+            + "column heights: Not all columns have height " + height);
+      }
     }
   }
 
@@ -104,7 +108,7 @@ public class SpecificationTable<C, D> {
    * Add one or more cells to each row if one or more columns were added.
    * @param added
    */
-  private void onColumnAdded(List<? extends SpecificationColumn<C>> added) {
+  protected void onColumnAdded(List<? extends SpecificationColumn<C>> added) {
     for (SpecificationColumn addedCol : added) {
       if (addedCol.getCells().size() != height) {
         throw new IllegalArgumentException("Illegal height for column " + addedCol.getSpecIoVariable
@@ -133,7 +137,7 @@ public class SpecificationTable<C, D> {
    * Remove the last cell(s) from each row if one or more columns were removed.
    * @param removed
    */
-  private void onColumnRemoved(List<? extends SpecificationColumn<C>> removed) {
+  protected void onColumnRemoved(List<? extends SpecificationColumn<C>> removed) {
     for (SpecificationColumn<C> removedCol : removed) {
       for (int i = 0; i < rows.size(); i++) {
         C removedCell = removedCol.getCells().get(i);
@@ -146,7 +150,7 @@ public class SpecificationTable<C, D> {
    * Add one or more cells to each column if one or more rows were added.
    * @param added
    */
-  private void onRowAdded(List<? extends SpecificationRow<C>> added) {
+  protected void onRowAdded(List<? extends SpecificationRow<C>> added) {
     for (int i = 0; i < added.size(); i++) {
       if (added.get(i).getCells().size() != columns.size()) {
         throw new IllegalStateException("Illegal width for row " + i);
@@ -163,7 +167,7 @@ public class SpecificationTable<C, D> {
   /**
    * Remove the last cell(s) from all columns if one or more rows were removed.
    */
-  private void onRowRemoved(List<? extends SpecificationRow<C>> removed) {
+  protected void onRowRemoved(List<? extends SpecificationRow<C>> removed) {
     for (SpecificationRow<C> removedRow : removed) {
       for (SpecificationColumn<C> col : columns) {
         C removedCell = removedRow.getCells().get(col.getSpecIoVariable().getName());

@@ -1,14 +1,11 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import edu.kit.iti.formal.stvs.model.common.*;
 import edu.kit.iti.formal.stvs.view.spec.table.TablePaneController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.logic.specification.BacktrackSpecificationConcretizer;
 import edu.kit.iti.formal.stvs.logic.specification.ConcretizerContext;
 import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
-import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
-import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
-import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
-import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 
 import java.util.*;
@@ -16,6 +13,7 @@ import java.util.*;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableSet;
 
 /**
  * A ConstraintSpecification which also has an associated counterexample (ConcreteSpecification),
@@ -43,31 +41,15 @@ public class HybridSpecification extends ConstraintSpecification {
 
   /**
    * Constructor for an "empty" HybridSpecification that contains no cells.
-   * @param typeContext The type context (which types exist?)
    * @param ioVariables The IO variables declared in the code
    * @param freeVariableSet The set of declared free variables
    * @param editable Is this HybridSpecification supposed to be editable?
    */
-  public HybridSpecification(Set<Type> typeContext, Set<CodeIoVariable> ioVariables,
-                             FreeVariableSet freeVariableSet, boolean editable) {
-    this(new ArrayList<>(), new ArrayList<>(),
-        typeContext, ioVariables, freeVariableSet, editable);
-  }
-
-  /**
-   * Constructor for a HybridSpecification that already contains some cells.
-   * @param columns The columns of the specification
-   * @param durations The durations for the specification
-   * @param typeContext The type context (which types exist?)
-   * @param ioVariables The IO variables declared in the code
-   * @param freeVariableSet The set of declared free variables
-   * @param editable Is this HybridSpecification supposed to be editable?
-   */
-  public HybridSpecification(List<SpecificationColumn<ConstraintCell>> columns,
-                             List<ConstraintDuration> durations, Set<Type> typeContext,
-                             Set<CodeIoVariable> ioVariables, FreeVariableSet freeVariableSet,
+  public HybridSpecification(ObservableSet<Type> typeContext,
+                             ObservableSet<CodeIoVariable> ioVariables,
+                             FreeVariableSet freeVariableSet,
                              boolean editable) {
-    super(columns, durations, typeContext, ioVariables, freeVariableSet);
+    super(typeContext, ioVariables, freeVariableSet);
     this.editable = editable;
     this.selection = new Selection();
     concreteInstance = new OptionalProperty<>(new SimpleObjectProperty<>());

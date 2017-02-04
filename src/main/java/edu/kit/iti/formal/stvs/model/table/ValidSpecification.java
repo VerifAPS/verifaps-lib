@@ -4,6 +4,8 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.expressions.Expression;
 import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 
 import java.util.List;
 import java.util.Map;
@@ -14,12 +16,12 @@ import java.util.Set;
  */
 public class ValidSpecification extends SpecificationTable<Expression, LowerBoundedInterval> {
 
-  private final Set<Type> typeContext;
+  private final ObservableSet<Type> typeContext;
   private FreeVariableSet freeVariableSet;
 
   public ValidSpecification(List<SpecificationColumn<Expression>> columns,
                             List<LowerBoundedInterval> durations,
-                            Set<Type> typeContext, FreeVariableSet freeVariableSet) {
+                            ObservableSet<Type> typeContext, FreeVariableSet freeVariableSet) {
     super(columns, durations);
     this.typeContext = typeContext;
     this.freeVariableSet = freeVariableSet;
