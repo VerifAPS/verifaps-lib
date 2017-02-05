@@ -10,17 +10,20 @@ import java.util.Map;
  */
 public class ConcreteSpecification extends SpecificationTable<ConcreteCell, ConcreteDuration> {
 
-  /* TODO: Fix
   private final boolean isCounterExample;
 
   public ConcreteSpecification(boolean isCounterExample) {
     this(new ArrayList<>(), new ArrayList<>(), isCounterExample);
   }
 
-  public ConcreteSpecification(List<SpecificationColumn<ConcreteCell>> columns,
-                               List<ConcreteDuration> durations, boolean isCounterExample) {
-    super(columns, durations);
+  public ConcreteSpecification(List<SpecificationRow<ConcreteCell>> rows,
+                               List<ConcreteDuration> durations,
+                               boolean isCounterExample) {
+    super();
     this.isCounterExample = isCounterExample;
+
+    getRows().addAll(rows);
+    getDurations().addAll(durations);
   }
 
   public boolean isCounterExample() {
@@ -30,25 +33,18 @@ public class ConcreteSpecification extends SpecificationTable<ConcreteCell, Conc
   /**
    * A row in a ConcreteSpecification is not the same as a row in a ConstraintSpecification.
    * This function does the mapping between the two.
-   *
+   */
   public List<ConcreteCell> getConcreteValuesForConstraintRow(String column, int constraintRow) {
     int startIndex = durations.get(constraintRow).getBeginCycle();
     int endIndex = durations.get(constraintRow).getEndCycle();
+
     ArrayList<ConcreteCell> concreteCells = new ArrayList<>();
-    SpecificationColumn matchingColumn = null;
-    for (SpecificationColumn col : columns) {
-      if (col.getSpecIoVariable().getName().equals(column)) {
-        matchingColumn = col;
-      }
-    }
-    if (matchingColumn == null) {
-      throw new IllegalArgumentException("No such column: " + column);
-    }
+    SpecificationColumn<ConcreteCell> concreteColumn = getColumnByName(column);
+
     for (int i = startIndex; i < endIndex; i++) {
-      concreteCells.add((ConcreteCell) matchingColumn.getCells().get(i));
+      concreteCells.add(concreteColumn.getCells().get(i));
     }
     return concreteCells;
   }
 
-  */
 }

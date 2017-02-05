@@ -58,6 +58,15 @@ public class HybridSpecification extends ConstraintSpecification {
     concretizer.concreteSpecProperty().addListener((observable, oldValue, newValue) -> onConcreteSpecificationChanged());
   }
 
+  public HybridSpecification(ConstraintSpecification sourceSpec, boolean editable) {
+    this(sourceSpec.getTypeContext(),
+        sourceSpec.getCodeIoVariables(),
+        sourceSpec.getFreeVariableSet(),
+        editable);
+    getSpecIoVariables().addAll(sourceSpec.getSpecIoVariables());
+    getRows().addAll(sourceSpec.getRows());
+  }
+
   public ConcreteSpecification getCounterExample() {
     return counterExample;
   }
