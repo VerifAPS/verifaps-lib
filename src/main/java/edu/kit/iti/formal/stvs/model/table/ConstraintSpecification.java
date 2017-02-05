@@ -18,6 +18,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableSet;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -300,6 +301,25 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     private void unsubscribeCell(ConstraintDuration constraintDuration) {
       constraintDuration.stringRepresentationProperty().removeListener(listener);
     }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof ConstraintSpecification))
+      return false;
+    if (obj == this)
+      return true;
+
+    ConstraintSpecification rhs = (ConstraintSpecification) obj;
+    return new EqualsBuilder().
+            appendSuper(super.equals(obj)).
+            append(getProblems(), rhs.getProblems()).
+            append(getTypeContext(), rhs.getTypeContext()).
+            append(getCodeIoVariables(), rhs.getCodeIoVariables()).
+            append(getFreeVariableSet(), rhs.getFreeVariableSet()).
+            append(getComment(), rhs.getComment()).
+            append(getValidSpecification(), rhs.getValidSpecification()).
+            isEquals();
   }
 
 }

@@ -2,7 +2,7 @@ package edu.kit.iti.formal.stvs.logic.io;
 
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionExporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlSpecExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaExporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
@@ -26,7 +26,7 @@ public class ExporterFacade {
   public static ByteArrayOutputStream exportSpec(ConstraintSpecification spec, ExportFormat format) throws ExportException {
     switch(format) {
       case XML:
-        return new XmlSpecExporter().export(spec);
+        return new XmlConstraintSpecExporter().export(spec);
       case GETETA:
         return new GeTeTaExporter().export(spec);
       default:

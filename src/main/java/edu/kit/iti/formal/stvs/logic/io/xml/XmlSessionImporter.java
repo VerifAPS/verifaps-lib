@@ -4,7 +4,6 @@ import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
-import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
@@ -15,7 +14,6 @@ import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -30,12 +28,14 @@ import org.w3c.dom.Node;
  */
 public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
 
-  private XmlSpecImporter specImporter;
+  private XmlConstraintSpecImporter constraintSpecImporter;
+  private XmlConcreteSpecImporter concreteSpecImporter;
   private XmlConfigImporter configImporter;
   private ObjectFactory objectFactory;
 
   public XmlSessionImporter() throws ImportException {
-    specImporter = new XmlSpecImporter();
+    constraintSpecImporter = new XmlConstraintSpecImporter();
+    concreteSpecImporter = new XmlConcreteSpecImporter();
     configImporter = new XmlConfigImporter();
     objectFactory = new ObjectFactory();
 
@@ -83,7 +83,7 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
           boolean hasAbstract = false;
           JAXBElement<SpecificationTable> element = objectFactory.createSpecification(specTable);
           if (!specTable.isIsConcrete()) {
-            ConstraintSpecification constraintSpec = specImporter.doImportFromXmlNode
+            ConstraintSpecification constraintSpec = constraintSpecImporter.doImportFromXmlNode
                 (XmlExporter.marshalToNode(element));
             hybridSpec.getSpecIoVariables().addAll(constraintSpec.getSpecIoVariables());
             hybridSpec.getRows().addAll(constraintSpec.getRows());
@@ -93,7 +93,7 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
                 .getFreeVariableSet().getVariableSet());
             hasAbstract = true;
           } else {
-            ConcreteSpecification concreteSpec = specImporter.doImportConcreteFromXmlNode
+            ConcreteSpecification concreteSpec = concreteSpecImporter.doImportFromXmlNode
                 (XmlExporter.marshalToNode(element));
             if (concreteSpec.isCounterExample()) {
               hybridSpec.setCounterExample(concreteSpec);

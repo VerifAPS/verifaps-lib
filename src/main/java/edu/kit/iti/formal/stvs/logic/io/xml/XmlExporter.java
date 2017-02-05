@@ -30,7 +30,7 @@ public abstract class XmlExporter<F> implements Exporter<F> {
     StringWriter writer = new StringWriter();
     try {
       Transformer transformer = TransformerFactory.newInstance().newTransformer();
-      transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.transform(new DOMSource(xmlNode), new StreamResult(writer));
       String xmlString = writer.toString();
       ByteArrayOutputStream stream = new ByteArrayOutputStream();

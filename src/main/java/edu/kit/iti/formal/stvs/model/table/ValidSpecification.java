@@ -24,4 +24,24 @@ public class ValidSpecification extends SpecificationTable<Expression, LowerBoun
     this.typeContext = typeContext;
     this.freeVariableSet = freeVariableSet;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+
+    ValidSpecification that = (ValidSpecification) o;
+
+    if (typeContext != null ? !typeContext.equals(that.typeContext) : that.typeContext != null)
+      return false;
+    return freeVariableSet != null ? freeVariableSet.equals(that.freeVariableSet) : that.freeVariableSet == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = typeContext != null ? typeContext.hashCode() : 0;
+    result = 31 * result + (freeVariableSet != null ? freeVariableSet.hashCode() : 0);
+    return result;
+  }
 }

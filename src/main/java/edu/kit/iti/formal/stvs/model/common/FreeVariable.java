@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.model.common;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 import javafx.beans.property.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
  * Created by csicar on 10.01.17.
@@ -129,5 +130,18 @@ public class FreeVariable implements Variable {
         + ", type=" + type.get()
         + ", defaultValue=" + defaultValue.get()
         + '}';
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof FreeVariable)) return false;
+    if (obj == this) return true;
+
+    FreeVariable rhs = (FreeVariable) obj;
+    return new EqualsBuilder().
+            append(name.get(), rhs.name.get()).
+            append(type.get(), rhs.type.get()).
+            append(defaultValue.get(), rhs.defaultValue.get()).
+            isEquals();
   }
 }

@@ -7,11 +7,9 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
-import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
 
@@ -28,7 +26,7 @@ public class ImporterFacade {
   public static ConstraintSpecification importSpec(InputStream input, ImportFormat format) throws ImportException {
     switch (format) {
       case XML:
-        return new XmlSpecImporter().doImport(input);
+        return new XmlConstraintSpecImporter().doImport(input);
       default:
         throw new ImportException("Unsupported import format");
     }
@@ -42,7 +40,7 @@ public class ImporterFacade {
   public static HybridSpecification importHybridSpec(InputStream input, ImportFormat format) throws ImportException {
     switch (format) {
       case XML:
-        ConstraintSpecification constraintSpec = new XmlSpecImporter().doImport(input);
+        ConstraintSpecification constraintSpec = new XmlConstraintSpecImporter().doImport(input);
         return new HybridSpecification(constraintSpec, true);
       default:
         throw new ImportException("Unsupported import format");
