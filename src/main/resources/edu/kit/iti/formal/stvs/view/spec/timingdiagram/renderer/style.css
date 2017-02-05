@@ -1,5 +1,8 @@
 .chart {
     -fx-padding: 0px;
+    -fx-alternative-column-fill-visible: true;
+    -fx-vertical-grid-lines-visible: false;
+    -fx-vertical-zero-line-visible: false;
 }
 .chart-content {
     -fx-padding: 0px;
@@ -17,9 +20,17 @@
     -fx-minor-tick-visible: false;
     -fx-tick-mark-visible: false;
     -fx-pref-height: 0;
-    -fx-pref-width: 0;
+    -fx-scale-x: 0;
+    -fx-padding: 0;
+    -fx-label-padding: 0;
     -fx-minor-tick-length: 0;
+    -fx-show-tick-labels: false;
+    -fx-show-tick-marks: false;
     -fx-tick-labels-visible: false;
+    -fx-graphic-text-gap: 0;
+}
+.axis.zeroWidth{
+    -fx-pref-width: 0;
 }
 
 .chart-alternative-column-fill {

@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.chart.Axis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Tooltip;
@@ -20,7 +21,7 @@ import javafx.scene.transform.Transform;
 /**
  * Created by csicar on 09.01.17.
  */
-public class TimingDiagramView extends XYChart<Number, Number> {
+public class TimingDiagramView<A> extends XYChart<Number, A> {
   /**
    * Constructs a XYChart given the two axes. The initial content for the chart
    * plot background and plot area that includes vertical and horizontal grid
@@ -28,8 +29,7 @@ public class TimingDiagramView extends XYChart<Number, Number> {
    */
 
   private NumberAxis xAxis;
-  private NumberAxis yAxis;
-  private NumberAxis externalYAxis;
+  private Axis<A> yAxis;
 
   private ObservableList<Line> horizontalLines = FXCollections.observableArrayList();
   private ObservableList<Line> verticalLines = FXCollections.observableArrayList();
@@ -38,71 +38,33 @@ public class TimingDiagramView extends XYChart<Number, Number> {
   private Pane dataPane = new Pane();
   private Pane cycleSelectionPane = new Pane();
 
-  public TimingDiagramView(NumberAxis commonXAxis, NumberAxis externalYAxis) {
-    super(new NumberAxis(0.666, 10.666, 1), new NumberAxis(0, 10, 1));
-    this.externalYAxis = externalYAxis;
-    xAxis = (NumberAxis) getXAxis();
-    yAxis = (NumberAxis) getYAxis();
+  public TimingDiagramView(NumberAxis xAxis, Axis<A> yAxis) {
+    super(xAxis, yAxis);
+    this.xAxis = xAxis;
+    this.yAxis = yAxis;
     setTitle("lol");
 
     Node chartContent = lookup(".chart-content");
-    chartContent.layoutBoundsProperty().addListener(change -> {
-      updateAxisExternalPosition();
-    });
 
     getPlotChildren().addAll(
         cycleSelectionPane,
         dataPane
     );
 
-    externalYAxis.prefHeightProperty().bind(yAxis.heightProperty());
-    externalYAxis.upperBoundProperty().bind(yAxis.upperBoundProperty());
-    externalYAxis.lowerBoundProperty().bind(yAxis.lowerBoundProperty());
-
     this.getStylesheets().add(
         TimingDiagramView.class.getResource("style.css").toExternalForm()
     );
-    xAxis.lowerBoundProperty().bind(commonXAxis.lowerBoundProperty());
-    xAxis.upperBoundProperty().bind(commonXAxis.upperBoundProperty());
 
-    ObservableList<Series<Number, Number>> seriesObservableList = FXCollections.observableArrayList();
+    ObservableList<Series<Number, A>> seriesObservableList = FXCollections.observableArrayList();
     setData(seriesObservableList);
     seriesObservableList.addListener((InvalidationListener) change -> {
       Platform.runLater(TimingDiagramView.this::requestRelayout);
     });
-    setAlternativeColumnFillVisible(true);
-    setVerticalGridLinesVisible(false);
-    setVerticalZeroLineVisible(false);
-
   }
 
   public void requestRelayout() {
     requestLayout();
     requestChartLayout();
-    updateAxisExternalPosition();
-  }
-
-  private void updateAxisExternalPosition() {
-    Transform transformation = calculateTransformRelativeTo(this.getParent(), yAxis);
-    double yAxisPosition = transformation.transform(yAxis.getLayoutBounds()).getMinY();
-    externalYAxis.layoutYProperty().set(yAxisPosition);
-  }
-
-  /**
-   * @param rootOfCalculation Any node in a scene graph
-   * @param child A direct/indirect child of rootOfCalculation
-   * @return A Transformation between coordinates of child and rootOfCalculation
-   */
-  private static Transform calculateTransformRelativeTo(Node rootOfCalculation, Node child){
-    if(child.getScene() == null){
-      throw new IllegalStateException("Child is not displayed in any scene currently.");
-    }
-    if(child.getParent() == null){
-      throw new IllegalStateException("rootOfCalculation is not in the scenegraph between root node and child.");
-    }
-    if(child == rootOfCalculation) return new Affine();
-    Transform parentTransform = calculateTransformRelativeTo(rootOfCalculation, child.getParent());
-    return child.getLocalToParentTransform().createConcatenation(parentTransform);
   }
 
   /**
@@ -137,7 +99,7 @@ public class TimingDiagramView extends XYChart<Number, Number> {
       Line verticalLine = new Line();
       dataPane.getChildren().add(verticalLine);
       verticalLines.add(verticalLine);
-      updateYRange();
+      //updateYRange();
     }
   }
 
@@ -150,7 +112,7 @@ public class TimingDiagramView extends XYChart<Number, Number> {
    * @param series The series the item was removed from
    */
   @Override
-  protected void dataItemRemoved(Data<Number, Number> item, Series<Number, Number> series) {
+  protected void dataItemRemoved(Data<Number, A> item, Series<Number, A> series) {
     ObservableList<Node> plotChildren = getPlotChildren();
     removeDataItemFromDisplay(series, item);
     dataPane.getChildren().remove(horizontalLines.remove(0));
@@ -158,7 +120,7 @@ public class TimingDiagramView extends XYChart<Number, Number> {
     if (series.getData().size() > 0) {
       dataPane.getChildren().remove(verticalLines.remove(0));
     }
-    updateYRange();
+    //updateYRange();
   }
 
   /**
@@ -181,7 +143,7 @@ public class TimingDiagramView extends XYChart<Number, Number> {
    * @param seriesIndex The index of the new series
    */
   @Override
-  protected void seriesAdded(Series<Number, Number> series, int seriesIndex) {
+  protected void seriesAdded(Series<Number, A> series, int seriesIndex) {
     for (int i = 0; i < series.getData().size(); i++) {
       dataItemAdded(series, i, (Data) series.getData().get(i));
     }
@@ -195,7 +157,7 @@ public class TimingDiagramView extends XYChart<Number, Number> {
    * @param series The series that has been removed
    */
   @Override
-  protected void seriesRemoved(Series<Number, Number> series) {
+  protected void seriesRemoved(Series<Number, A> series) {
     for (int i = 0; i < series.getData().size(); i++) {
       dataItemRemoved(series.getData().get(i), series);
     }
@@ -209,7 +171,7 @@ public class TimingDiagramView extends XYChart<Number, Number> {
   @Override
   protected void layoutPlotChildren() {
     getData().forEach(series -> {
-      ObservableList<Data<Number, Number>> cyclesData = series.getData();
+      ObservableList<Data<Number, A>> cyclesData = series.getData();
       for (int i = 0; i < cyclesData.size(); i++) {
         Line horizontalLine = horizontalLines.get(i);
         horizontalLine.setStartX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue()));
@@ -235,7 +197,7 @@ public class TimingDiagramView extends XYChart<Number, Number> {
     });
   }
 
-  private void updateYRange() {
+  /*private void updateYRange() {
     if (getData() == null) return;
     int minY = getData().stream()
         .flatMap(series -> series.getData().stream())
@@ -251,13 +213,13 @@ public class TimingDiagramView extends XYChart<Number, Number> {
         .orElse(10);
     yAxis.setLowerBound(minY - 1);
     yAxis.setUpperBound(maxY + 1);
-  }
+  }*/
 
   public NumberAxis getxAxis() {
     return xAxis;
   }
 
-  public NumberAxis getyAxis() {
+  public Axis<A> getyAxis() {
     return yAxis;
   }
 }

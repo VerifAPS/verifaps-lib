@@ -1,16 +1,24 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
+import edu.kit.iti.formal.stvs.model.expressions.TypeFactory;
+import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramController;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.geometry.Side;
+import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+
+import java.util.Arrays;
 
 /**
  * Created by csicar on 09.01.17.
@@ -42,15 +50,16 @@ public class TimingDiagramCollectionController implements Controller {
   //TODO: Delete later when constructor parameters are implemented
   public TimingDiagramCollectionController(){
     view = new TimingDiagramCollectionView();
-    addTimingDiagram();
-    addTimingDiagram();
+    addIntegerTimingDiagram();
+    addIntegerTimingDiagram();
+    addEnumTimingDiagram();
     view.onMouseDraggedProperty().setValue(this::mouseDraggedHandler);
     view.onMousePressedProperty().setValue(this::mousePressedHandler);
 
     //view.getDiagramContainer().getChildren()
   }
 
-  private void addTimingDiagram(){
+  private void addIntegerTimingDiagram(){
     NumberAxis yAxis = new NumberAxis(0,10,1);
     yAxis.setSide(Side.LEFT);
     yAxis.setPrefHeight(300);
@@ -58,6 +67,25 @@ public class TimingDiagramCollectionController implements Controller {
     view.getDiagramContainer().getChildren().add(timingDiagramController.getView());
     view.getyAxisContainer().getChildren().add(yAxis);
     AnchorPane.setRightAnchor(yAxis, 0.0);
+  }
+
+  private void addEnumTimingDiagram(){
+    TypeEnum typeEnum = TypeFactory.enumOfName("Woerter", "Lol", "Test", "Super");
+    ObservableList<String> categories = FXCollections.observableArrayList();
+    typeEnum.getValues().stream()
+        .map(ValueEnum::getEnumValue)
+        .forEach(categories::add);
+    CategoryAxis categoryAxis = new CategoryAxis(categories);
+    categoryAxis.setSide(Side.LEFT);
+    categoryAxis.setPrefHeight(300);
+    //Todo: Find out why this fixes everything (axis positioning) and find a more robust solution:
+    categoryAxis.setPrefWidth(22);
+    categoryAxis.setAutoRanging(true);
+    //categoryAxis.invalidateRange(categories);
+    TimingDiagramController timingDiagramController = new TimingDiagramController(view.getxAxis(), categoryAxis);
+    view.getDiagramContainer().getChildren().add(timingDiagramController.getView());
+    view.getyAxisContainer().getChildren().add(categoryAxis);
+    AnchorPane.setRightAnchor(categoryAxis, 0.0);
   }
 
   private void mouseDraggedHandler(MouseEvent event) {
