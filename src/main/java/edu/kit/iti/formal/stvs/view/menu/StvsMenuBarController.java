@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.view.menu;
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
+import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
@@ -61,9 +62,7 @@ public class StvsMenuBarController implements Controller {
       return;
     }
     try {
-      Code code = ImporterFacade.importStCode(chosenFile, ImporterFacade
-          .ImportFormat
-          .XML);
+      Code code = ImporterFacade.importStCode(chosenFile);
       this.rootModel.get().getScenario().setCode(code);
     } catch (IOException e) {
       new ErrorMessageDialog(e);
@@ -80,11 +79,11 @@ public class StvsMenuBarController implements Controller {
       return;
     }
     try {
-      StvsRootModel model = ImporterFacade.importSession(chosenFile, ImporterFacade
-          .ImportFormat
-          .XML);
+      StvsRootModel model = ImporterFacade.importSession(
+          chosenFile, ImporterFacade.ImportFormat.XML);
       this.rootModel.set(model);
-    } catch (IOException e) {
+    } catch (IOException | ImportException e) {
+      // TODO: Better visual for ImportException
       new ErrorMessageDialog(e);
     }
   }
@@ -105,7 +104,8 @@ public class StvsMenuBarController implements Controller {
               .XML);
        this.rootModel.get().getHybridSpecifications().add(spec);
 
-    } catch (IOException e) {
+    } catch (IOException | ImportException e) {
+      // TODO: Show better message for import exception
       new ErrorMessageDialog(e);
     }
   }

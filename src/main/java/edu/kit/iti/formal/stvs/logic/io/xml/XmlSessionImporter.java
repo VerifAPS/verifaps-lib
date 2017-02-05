@@ -21,6 +21,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+import javafx.collections.FXCollections;
 import org.w3c.dom.Node;
 
 /**
@@ -72,15 +74,19 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
       List<HybridSpecification> hybridSpecs = new ArrayList<>();
       for (Tab tab : importedSession.getTabs().getTab()) {
         // Each tab corresponds to a hybridSpecification
-        HybridSpecification hybridSpec = new HybridSpecification(new HashSet<>(),
-            new HashSet<CodeIoVariable>(), new FreeVariableSet(), !tab.isReadOnly());
+        HybridSpecification hybridSpec = new HybridSpecification(
+            FXCollections.observableSet(),
+            FXCollections.observableSet(),
+            new FreeVariableSet(),
+            !tab.isReadOnly());
         for (SpecificationTable specTable : tab.getSpecification()) {
           boolean hasAbstract = false;
           JAXBElement<SpecificationTable> element = objectFactory.createSpecification(specTable);
           if (!specTable.isIsConcrete()) {
             ConstraintSpecification constraintSpec = specImporter.doImportFromXmlNode
                 (XmlExporter.marshalToNode(element));
-            hybridSpec.getColumns().addAll(constraintSpec.getColumns());
+            hybridSpec.getSpecIoVariables().addAll(constraintSpec.getSpecIoVariables());
+            hybridSpec.getRows().addAll(constraintSpec.getRows());
             hybridSpec.getTypeContext().addAll(constraintSpec.getTypeContext());
             hybridSpec.getCodeIoVariables().addAll(constraintSpec.getCodeIoVariables());
             hybridSpec.getFreeVariableSet().getVariableSet().addAll(constraintSpec

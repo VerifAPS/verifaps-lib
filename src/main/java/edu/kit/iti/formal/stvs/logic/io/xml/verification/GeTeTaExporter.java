@@ -54,8 +54,8 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
       SpecificationRow<ConstraintCell> row = rows.get(i);
       Step step = objectFactory.createStep();
       step.setDuration(durations.get(i).getAsString());
-      for (SpecificationColumn<ConstraintCell> col : source.getColumns()) {
-        String variable = col.getSpecIoVariable().getName();
+      for (SpecIoVariable specIoVariable : source.getSpecIoVariables()) {
+        String variable = specIoVariable.getName();
         ConstraintCell cell = row.getCells().get(variable);
         step.getCell().add(cell.getAsString());
       }
@@ -66,9 +66,8 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
 
   private Variables makeVariables(ConstraintSpecification source) {
     Variables variables = objectFactory.createVariables();
-    for (SpecificationColumn<ConstraintCell> col : source.getColumns()) {
+    for (SpecIoVariable ioVariable : source.getSpecIoVariables()) {
       IoVariable exportedVariable = objectFactory.createIoVariable();
-      SpecIoVariable ioVariable = col.getSpecIoVariable();
       exportedVariable.setName(ioVariable.getName());
       exportedVariable.setDataType(getDataType(ioVariable));
       if (ioVariable.getCategory() == VariableCategory.INPUT) {

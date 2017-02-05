@@ -18,6 +18,7 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.*;
 
+import javafx.collections.FXCollections;
 import org.w3c.dom.Node;
 
 /**
@@ -79,8 +80,9 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
     for (int i = 0; i < variables.getIoVariable().size(); i++) {
       Variables.IoVariable ioVar = variables.getIoVariable().get(i);
       int colWidth = ioVar.getColwidth().intValue();
-      concreteSpec.getColumns().add(new SpecificationColumn<>(ioVariables.get(i), new
-          ArrayList<>(), new ColumnConfig(colWidth)));
+      SpecIoVariable specIoVariable = ioVariables.get(i);
+      specIoVariable.getColumnConfig().setWidth(colWidth);
+      concreteSpec.getSpecIoVariables().add(specIoVariable);
     }
 
     // Add the rows
@@ -116,16 +118,17 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
                                                        List<SpecIoVariable> ioVariables,
                                                        SpecificationTable importedSpec) throws
       ImportException {
-    ConstraintSpecification constraintSpec = new ConstraintSpecification
-        (typeContext, new HashSet<>(), freeVariables);
+    ConstraintSpecification constraintSpec = new ConstraintSpecification(
+        FXCollections.observableSet(typeContext), FXCollections.observableSet(), freeVariables);
 
     // Add a column for each ioVariable
     Variables variables = importedSpec.getVariables();
     for (int i = 0; i < variables.getIoVariable().size(); i++) {
       Variables.IoVariable ioVar = variables.getIoVariable().get(i);
       int colWidth = ioVar.getColwidth().intValue();
-      constraintSpec.getColumns().add(new SpecificationColumn<>(ioVariables.get(i), new
-          ArrayList<>(), new ColumnConfig(colWidth)));
+      SpecIoVariable specIoVariable = ioVariables.get(i);
+      specIoVariable.getColumnConfig().setWidth(colWidth);
+      constraintSpec.getSpecIoVariables().add(specIoVariable);
     }
 
     // Add the rows
@@ -169,23 +172,19 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
       ImportException {
     List<SpecIoVariable> ioVariables = new ArrayList<>();
     for (Variables.IoVariable variable : variables.getIoVariable()) {
-      boolean typeFound = false;
-      for (Type type : typeContext) {
-        if (type.getTypeName().equals(variable.getDataType())) {
-          typeFound = true;
-          if (variable.getIo().equals("input")) {
-            ioVariables.add(new SpecIoVariable(VariableCategory.INPUT, type, variable.getName()));
-          } else if (variable.getIo().equals("output")) {
-            ioVariables.add(new SpecIoVariable(VariableCategory.OUTPUT, type, variable.getName()));
-          } else {
-            throw new ImportException("Illegal variable category: " + variable.getIo());
-          }
-          break;
-        }
-      }
-      if (!typeFound) {
-        throw new ImportException("Type " + variable.getDataType() + " not found for free " +
-            "variable " + variable.getName());
+      Type type = typeContext.stream()
+          .filter(testType -> testType.getTypeName().equals(variable.getDataType()))
+          .findAny()
+          .orElseThrow(() ->
+              new ImportException(
+                  "Type " + variable.getDataType() + " not found for free "
+                  + "variable " + variable.getName()));
+
+      try {
+        VariableCategory category = VariableCategory.valueOf(variable.getIo().toUpperCase());
+        ioVariables.add(new SpecIoVariable(category, type, variable.getName()));
+      } catch (IllegalArgumentException argExc) {
+        throw new ImportException("Illegal variable category: " + variable.getIo());
       }
     }
     return ioVariables;

@@ -43,9 +43,7 @@ public class ImporterFacade {
     switch (format) {
       case XML:
         ConstraintSpecification constraintSpec = new XmlSpecImporter().doImport(input);
-        return new HybridSpecification(constraintSpec.getColumns(), constraintSpec.getDurations()
-            , constraintSpec.getTypeContext(), constraintSpec.getCodeIoVariables(),
-            constraintSpec.getFreeVariableSet(), true);
+        return new HybridSpecification(constraintSpec, true);
       default:
         throw new ImportException("Unsupported import format");
     }

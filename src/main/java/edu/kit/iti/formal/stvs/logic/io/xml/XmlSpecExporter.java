@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
@@ -62,7 +63,8 @@ public class XmlSpecExporter extends XmlExporter<ConstraintSpecification> {
       for (int j = currentCycle; j < currentCycle + currentDuration; j++) {
         // This now corresponds to a cycle
         Rows.Row.Cycle cycle = objectFactory.createRowsRowCycle();
-        for (SpecificationColumn<ConcreteCell> col : concreteSpec.getColumns()) {
+        for (SpecIoVariable ioVar : concreteSpec.getSpecIoVariables()) {
+          SpecificationColumn<ConcreteCell> col = concreteSpec.getColumnByName(ioVar.getName());
           ConcreteCell cell = col.getCells().get(i);
           cycle.getCell().add(cell.getValue().getValueString());
         }
@@ -97,9 +99,8 @@ public class XmlSpecExporter extends XmlExporter<ConstraintSpecification> {
 
   private EnumTypes makeEnumTypes(SpecificationTable<?,?> specTable) {
     EnumTypes enumTypes = objectFactory.createEnumTypes();
-    for (int i = 0; i < specTable.getColumns().size(); i++) {
-      SpecificationColumn<?> col = specTable.getColumns().get(i);
-      Type type = col.getSpecIoVariable().getType();
+    for (SpecIoVariable ioVar : specTable.getSpecIoVariables()) {
+      Type type = ioVar.getType();
       if (type instanceof TypeEnum) {
         EnumTypes.Enum exportEnumType = objectFactory.createEnumTypesEnum();
         exportEnumType.setName(type.getTypeName());
@@ -134,17 +135,13 @@ public class XmlSpecExporter extends XmlExporter<ConstraintSpecification> {
 
   private List<Variables.IoVariable> makeIoVariables(SpecificationTable<?,?> specTable) {
     List<Variables.IoVariable> variables = new ArrayList<>();
-    for (SpecificationColumn col : specTable.getColumns()) {
+    for (SpecIoVariable specIoVariable : specTable.getSpecIoVariables()) {
       Variables.IoVariable ioVar = objectFactory.createVariablesIoVariable();
-      //ioVar.setComment(col.getComment()); //TODO column not commentable yet
-      ioVar.setColwidth(BigInteger.valueOf(col.getConfig().getWidth()));
-      ioVar.setDataType(col.getSpecIoVariable().getType().getTypeName());
-      if (col.getSpecIoVariable().getCategory() == VariableCategory.INPUT) {
-        ioVar.setIo("input");
-      } else {
-        ioVar.setIo("output");
-      }
-      ioVar.setName(col.getSpecIoVariable().getName());
+      ioVar.setComment(ioVar.getComment());
+      ioVar.setColwidth(BigInteger.valueOf(specIoVariable.getColumnConfig().getWidth()));
+      ioVar.setDataType(specIoVariable.getType().getTypeName());
+      ioVar.setIo(specIoVariable.getCategory().toString().toLowerCase());
+      ioVar.setName(specIoVariable.getName());
       variables.add(ioVar);
     }
     return variables;
