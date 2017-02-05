@@ -13,6 +13,15 @@
     -fx-padding: 0;
 }
 
+.axis{
+    -fx-minor-tick-visible: false;
+    -fx-tick-mark-visible: false;
+    -fx-pref-height: 0;
+    -fx-pref-width: 0;
+    -fx-minor-tick-length: 0;
+    -fx-tick-labels-visible: false;
+}
+
 .chart-alternative-column-fill {
     -fx-fill: #EEE;
     -fx-stroke: transparent;

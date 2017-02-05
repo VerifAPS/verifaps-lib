@@ -14,6 +14,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.transform.Affine;
+import javafx.scene.transform.Transform;
 
 /**
  * Created by csicar on 09.01.17.
@@ -43,17 +45,6 @@ public class TimingDiagramView extends XYChart<Number, Number> {
     yAxis = (NumberAxis) getYAxis();
     setTitle("lol");
 
-    xAxis.setAutoRanging(false);
-    xAxis.setMinorTickVisible(false);
-    xAxis.setTickMarkVisible(false);
-    xAxis.setTickLabelsVisible(false);
-    xAxis.setPrefSize(0, 0);
-    yAxis.setAutoRanging(false);
-    yAxis.setMinorTickVisible(false);
-    yAxis.setTickMarkVisible(false);
-    yAxis.setTickLabelsVisible(false);
-    yAxis.setPrefSize(0, 0);
-
     Node chartContent = lookup(".chart-content");
     chartContent.layoutBoundsProperty().addListener(change -> {
       updateAxisExternalPosition();
@@ -64,12 +55,7 @@ public class TimingDiagramView extends XYChart<Number, Number> {
         dataPane
     );
 
-    /*this.layoutBoundsProperty().addListener(change -> {
-      Bounds bounds = TimingDiagramView.this.localToParent(TimingDiagramView.this.getLayoutBounds());
-      externalYAxis.layoutYProperty().set(bounds.getMaxY() - yAxis.heightProperty().get());
-    });*/
     externalYAxis.prefHeightProperty().bind(yAxis.heightProperty());
-    //externalYAxis.layoutYProperty().bind(this.layoutYProperty());
     externalYAxis.upperBoundProperty().bind(yAxis.upperBoundProperty());
     externalYAxis.lowerBoundProperty().bind(yAxis.lowerBoundProperty());
 
@@ -97,9 +83,26 @@ public class TimingDiagramView extends XYChart<Number, Number> {
   }
 
   private void updateAxisExternalPosition() {
-    Node chartContent = lookup(".chart-content");
-    Bounds bounds = TimingDiagramView.this.localToParent(chartContent.localToParent(chartContent.layoutBoundsProperty().get()));
-    externalYAxis.layoutYProperty().set(bounds.getMinY());
+    Transform transformation = calculateTransformRelativeTo(this.getParent(), yAxis);
+    double yAxisPosition = transformation.transform(yAxis.getLayoutBounds()).getMinY();
+    externalYAxis.layoutYProperty().set(yAxisPosition);
+  }
+
+  /**
+   * @param rootOfCalculation Any node in a scene graph
+   * @param child A direct/indirect child of rootOfCalculation
+   * @return A Transformation between coordinates of child and rootOfCalculation
+   */
+  private static Transform calculateTransformRelativeTo(Node rootOfCalculation, Node child){
+    if(child.getScene() == null){
+      throw new IllegalStateException("Child is not displayed in any scene currently.");
+    }
+    if(child.getParent() == null){
+      throw new IllegalStateException("rootOfCalculation is not in the scenegraph between root node and child.");
+    }
+    if(child == rootOfCalculation) return new Affine();
+    Transform parentTransform = calculateTransformRelativeTo(rootOfCalculation, child.getParent());
+    return child.getLocalToParentTransform().createConcatenation(parentTransform);
   }
 
   /**
