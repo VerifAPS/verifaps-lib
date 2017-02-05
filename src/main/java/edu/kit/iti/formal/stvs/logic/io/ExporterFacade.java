@@ -1,9 +1,9 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import edu.kit.iti.formal.stvs.logic.io.xml.verification.VerificationExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlSpecExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaExporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
@@ -28,7 +28,7 @@ public class ExporterFacade {
       case XML:
         return new XmlSpecExporter().export(spec);
       case GETETA:
-        return new VerificationExporter().export(spec);
+        return new GeTeTaExporter().export(spec);
       default:
         throw new ExportException("Unsupported export format");
     }
