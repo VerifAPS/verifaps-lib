@@ -1,11 +1,10 @@
 package edu.kit.iti.formal.stvs.logic.verification;
 
-import edu.kit.iti.formal.stvs.logic.io.verification.VerificationExporter;
-import edu.kit.iti.formal.stvs.logic.io.verification.VerificationImporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
 import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.function.Consumer;
@@ -15,8 +14,8 @@ import java.util.function.Consumer;
  * Handles communication with the ExTeTa verification engine
  */
 public class GeTeTaVerificationEngine implements VerificationEngine {
-  private VerificationExporter exporter;
-  private VerificationImporter importer;
+  private GeTeTaExporter exporter;
+  private GeTeTaImporter importer;
   private VerificationResult result;
   private Consumer<VerificationResult> verificationFinishedListener;
   //private ExTeTa exteta;

@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 
 /**
  * @author Benjamin Alt
  */
 public interface Exporter<F> {
-  public OutputStream export(F source) throws ExportException;
+  public ByteArrayOutputStream export(F source) throws ExportException;
 }

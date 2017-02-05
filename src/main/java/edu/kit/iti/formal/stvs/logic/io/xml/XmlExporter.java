@@ -17,7 +17,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 
 /**
@@ -25,7 +25,7 @@ import java.io.StringWriter;
  */
 public abstract class XmlExporter<F> implements Exporter<F> {
 
-  public OutputStream export(F source) throws ExportException {
+  public ByteArrayOutputStream export(F source) throws ExportException {
     Node xmlNode = exportToXmlNode(source);
     StringWriter writer = new StringWriter();
     try {
@@ -41,7 +41,7 @@ public abstract class XmlExporter<F> implements Exporter<F> {
     }
   }
 
-  protected Node marshalToNode(JAXBElement element) throws ExportException {
+  protected static Node marshalToNode(JAXBElement element) throws ExportException {
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();

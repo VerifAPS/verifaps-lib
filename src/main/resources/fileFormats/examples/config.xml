@@ -2,7 +2,7 @@
 
 <config xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://formal.iti.kit.edu/stvs/logic/io/xml config.xsd">
+           xsi:schemaLocation="http://formal.iti.kit.edu/stvs/logic/io/xml ../config.xsd">
   <general>
     <uiLanguage>EN</uiLanguage>
     <windowSize>

@@ -41,6 +41,15 @@ public class ValueBool implements Value {
     return TypeBool.BOOL;
   }
 
+  @Override
+  public String getValueString() {
+    if (getValue()) {
+      return "TRUE";
+    } else {
+      return "FALSE";
+    }
+  }
+
   public String toString() {
     return "ValueBool(" + value + ")";
   }

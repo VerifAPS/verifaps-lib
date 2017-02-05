@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
+import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
@@ -145,7 +146,7 @@ public class StvsMenuBarController implements Controller {
       try {
         ExporterFacade.exportSession(rootModel.get(), ExporterFacade.ExportFormat
             .XML, chosenFile);
-      } catch (IOException e) {
+      } catch (IOException | ExportException e) {
         new ErrorMessageDialog(e);
       }
     }

@@ -30,4 +30,8 @@ public interface Value {
    */
   Type getType();
 
+  /**
+   * @return a String representation of the represented value
+   */
+  String getValueString();
 }
