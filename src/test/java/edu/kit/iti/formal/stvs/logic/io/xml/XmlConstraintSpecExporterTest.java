@@ -8,7 +8,6 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.*;
-import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import org.junit.Before;
@@ -20,7 +19,7 @@ import java.io.IOException;
 import static org.junit.Assert.*;
 
 /**
- * Created by bal on 05.02.17.
+ * @author Benjamin Alt
  */
 public class XmlConstraintSpecExporterTest {
 

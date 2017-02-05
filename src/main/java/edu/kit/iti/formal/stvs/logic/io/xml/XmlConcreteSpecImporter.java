@@ -63,6 +63,11 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
     }
     ConcreteSpecification concreteSpec = new ConcreteSpecification(importedSpec.isIsCounterExample());
 
+    // Add the specIoVariables (column headers)
+    for (SpecIoVariable specIoVariable : ioVariables) {
+      concreteSpec.getSpecIoVariables().add(specIoVariable);
+    }
+
     // Add the rows
     Rows rows = importedSpec.getRows();
     int currentCycle = 0;
@@ -70,22 +75,25 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
       Rows.Row row = rows.getRow().get(i);
       int currentDuration = Integer.parseInt(row.getDuration().getValue());
       concreteSpec.getDurations().add(new ConcreteDuration(currentCycle, currentDuration));
-      Map<String,ConcreteCell> cellsMap = new HashMap<>();
-      for (int j = 0; j < row.getCell().size(); j++){
-        Rows.Row.Cell cell = row.getCell().get(j);
-        Type cellType = ioVariables.get(i).getType();
-        Optional<Value> val = cellType.parseLiteral(cell.getValue());
-        if (val.isPresent()) {
-          ConcreteCell concreteCell = new ConcreteCell(val.get());
-          cellsMap.put(ioVariables.get(i).getName(), concreteCell);
-        } else {
-          throw new ImportException("Could not parse concrete value " + cell.getValue());
+      for (int j = 0; j < row.getCycle().size(); j++){
+        Map<String,ConcreteCell> cellsMap = new HashMap<>();
+        Rows.Row.Cycle cycle = row.getCycle().get(j);
+        for (int k = 0; k < ioVariables.size(); k++) {
+          String cell = cycle.getCell().get(k);
+          Type cellType = ioVariables.get(k).getType();
+          Optional<Value> val = cellType.parseLiteral(cell);
+          if (val.isPresent()) {
+            ConcreteCell concreteCell = new ConcreteCell(val.get());
+            cellsMap.put(ioVariables.get(k).getName(), concreteCell);
+          } else {
+            throw new ImportException("Could not parse concrete value " + cell);
+          }
         }
+        if (cellsMap.size() != ioVariables.size()) {
+          throw new ImportException("Row too short: Do not have a cell for each IOVariable");
+        }
+        concreteSpec.getRows().add(new SpecificationRow<>(cellsMap));
       }
-      if (cellsMap.size() != ioVariables.size()) {
-        throw new ImportException("Row too short: Do not have a cell for each IOVariable");
-      }
-      concreteSpec.getRows().add(new SpecificationRow<>(cellsMap));
       currentCycle += currentDuration;
     }
     return concreteSpec;

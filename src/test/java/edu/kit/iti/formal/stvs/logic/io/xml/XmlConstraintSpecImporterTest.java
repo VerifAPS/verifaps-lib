@@ -3,8 +3,6 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 import com.google.gson.JsonElement;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
-import edu.kit.iti.formal.stvs.model.common.VariableCategory;
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
@@ -22,7 +20,7 @@ import java.io.FileInputStream;
 import static junit.framework.TestCase.assertEquals;
 
 /**
- * Created by bal on 05.02.17.
+ * @author Benjamin Alt
  */
 public class XmlConstraintSpecImporterTest {
 
@@ -41,17 +39,13 @@ public class XmlConstraintSpecImporterTest {
     JsonElement testjson = TableUtil.jsonFromResource("valid_table.json",
         ConstraintSpecificationTest.class);
 
-    ObservableSet<CodeIoVariable> codeIoVariables = FXCollections.observableSet(
-        new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "Counter"),
-        new CodeIoVariable(VariableCategory.OUTPUT, TypeBool.BOOL, "Active")
-    );
+    ObservableSet<CodeIoVariable> codeIoVariables = FXCollections.observableSet();
 
     ObservableSet<Type> typeContext = FXCollections.observableSet(TypeInt.INT, TypeBool.BOOL);
 
     ConstraintSpecification expectedSpec =
         TableUtil.constraintTableFromJson(typeContext, codeIoVariables, testjson);
     assertEquals(expectedSpec, importedSpec);
-
   }
 
 }

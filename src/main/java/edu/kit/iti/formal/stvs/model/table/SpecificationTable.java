@@ -94,7 +94,7 @@ public class SpecificationTable<C, D> {
   }
 
   /**
-   * Get the SpecIoVariables for this column, i.e. the column headers.
+   * Get the SpecIoVariables for this table, i.e. the column headers.
    *
    * <p>You should <strong>not mutate</strong> this list. For adding new
    * columns, use addColumn</p>

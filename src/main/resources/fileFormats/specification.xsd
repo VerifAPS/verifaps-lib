@@ -69,7 +69,7 @@
 
   <complexType name="EnumTypes">
   <sequence>
-    <element name="enum" minOccurs="1" maxOccurs="unbounded">
+    <element name="enum" minOccurs="0" maxOccurs="unbounded">
       <complexType>
         <sequence>
           <element name="literal" type="string" minOccurs="1" maxOccurs="unbounded"></element>

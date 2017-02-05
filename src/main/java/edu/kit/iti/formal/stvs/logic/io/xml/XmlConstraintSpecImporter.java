@@ -61,6 +61,11 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
     ConstraintSpecification constraintSpec = new ConstraintSpecification(
         FXCollections.observableSet(typeContext), FXCollections.observableSet(), freeVariables);
 
+    // Add the specIoVariables (column headers)
+    for (SpecIoVariable specIoVariable : ioVariables) {
+      constraintSpec.getSpecIoVariables().add(specIoVariable);
+    }
+
     // Add the rows
     Rows rows = importedSpec.getRows();
     for (int i = 0; i < rows.getRow().size(); i++) {
@@ -69,10 +74,11 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
       newDuration.setComment(row.getDuration().getComment());
       constraintSpec.getDurations().add(newDuration);
       Map<String,ConstraintCell> cellsMap = new HashMap<>();
-      for (Rows.Row.Cell cell : row.getCell()) {
+      for (int j = 0; j < row.getCell().size(); j++) {
+        Rows.Row.Cell cell = row.getCell().get(j);
         ConstraintCell constraintCell = new ConstraintCell(cell.getValue());
         constraintCell.setComment(cell.getComment());
-        cellsMap.put(ioVariables.get(i).getName(), constraintCell);
+        cellsMap.put(ioVariables.get(j).getName(), constraintCell);
       }
       if (cellsMap.size() != ioVariables.size()) {
         throw new ImportException("Row too short: Do not have a cell for each IOVariable");
@@ -139,10 +145,10 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
             }
             freeVariableSet.add(freeVariable);
           }
-          if (!typeFound) {
-            throw new ImportException("Type " + freeVar.getDataType() + " not found for free " +
-                "variable " + freeVar.getName());
-          }
+        }
+        if (!typeFound) {
+          throw new ImportException("Type " + freeVar.getDataType() + " not found for free " +
+              "variable " + freeVar.getName());
         }
       }
       return new FreeVariableSet(freeVariableSet);
