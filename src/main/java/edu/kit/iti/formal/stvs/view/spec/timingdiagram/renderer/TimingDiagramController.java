@@ -76,7 +76,7 @@ public class TimingDiagramController implements Controller {
     Stream.of(
         new XYChart.Data<Number, String>(0, "Test"),
         new XYChart.Data<Number, String>(1, "Lol"),
-        new XYChart.Data<Number, String>(2, "Super"),
+        new XYChart.Data<Number, String>(2, "Superrrrrrrrrrrrrrrrrrrr"),
         new XYChart.Data<Number, String>(3, "Lol"),
         new XYChart.Data<Number, String>(4, "Test")
     ).forEach(data -> cycleValueSeries.getData().add(data));

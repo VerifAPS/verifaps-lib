@@ -61,6 +61,7 @@ public class TimingDiagramCollectionController implements Controller {
 
   private void addIntegerTimingDiagram(){
     NumberAxis yAxis = new NumberAxis(0,10,1);
+    yAxis.setPrefWidth(30);
     yAxis.setSide(Side.LEFT);
     yAxis.setPrefHeight(300);
     TimingDiagramController timingDiagramController = new TimingDiagramController(view.getxAxis(), yAxis);
@@ -70,7 +71,7 @@ public class TimingDiagramCollectionController implements Controller {
   }
 
   private void addEnumTimingDiagram(){
-    TypeEnum typeEnum = TypeFactory.enumOfName("Woerter", "Lol", "Test", "Super");
+    TypeEnum typeEnum = TypeFactory.enumOfName("Woerter", "Lol", "Test", "Superrrrrrrrrrrrrrrrrrrr");
     ObservableList<String> categories = FXCollections.observableArrayList();
     typeEnum.getValues().stream()
         .map(ValueEnum::getEnumValue)
@@ -78,8 +79,7 @@ public class TimingDiagramCollectionController implements Controller {
     CategoryAxis categoryAxis = new CategoryAxis(categories);
     categoryAxis.setSide(Side.LEFT);
     categoryAxis.setPrefHeight(300);
-    //Todo: Find out why this fixes everything (axis positioning) and find a more robust solution:
-    categoryAxis.setPrefWidth(22);
+    categoryAxis.setPrefWidth(30);
     categoryAxis.setAutoRanging(true);
     //categoryAxis.invalidateRange(categories);
     TimingDiagramController timingDiagramController = new TimingDiagramController(view.getxAxis(), categoryAxis);
