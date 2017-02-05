@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
@@ -27,8 +28,8 @@ public class TimingDiagramController implements Controller {
   }
 
   //TODO: delete when constructor parameters are complete
-  public TimingDiagramController(NumberAxis commonXAxis){
-    view = new TimingDiagramView(commonXAxis);
+  public TimingDiagramController(NumberAxis commonXAxis, NumberAxis externalYAxis){
+    view = new TimingDiagramView(commonXAxis, externalYAxis);
     XYChart.Series<Number, Number> cycleValueSeries = new XYChart.Series<>();
     Stream.of(
         new XYChart.Data<Number, Number>(0, 2),
@@ -39,7 +40,7 @@ public class TimingDiagramController implements Controller {
     ).forEach(data -> cycleValueSeries.getData().add(data));
     ObservableList<XYChart.Series<Number, Number>> data = FXCollections.observableArrayList();
     data.add(cycleValueSeries);
-    view.setData(data);
+    view.getData().addAll(data);
   }
 
   /**

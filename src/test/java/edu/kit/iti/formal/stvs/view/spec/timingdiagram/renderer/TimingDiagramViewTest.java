@@ -17,7 +17,7 @@ public class TimingDiagramViewTest {
   }
 
   private Scene simpleScene() {
-    TimingDiagramController controller = new TimingDiagramController(new NumberAxis());
+    TimingDiagramController controller = new TimingDiagramController(new NumberAxis(),new NumberAxis());
     Pane pane = new Pane();
     pane.getChildren().add(controller.getView());
     Scene scene = new Scene(pane, 800, 600);

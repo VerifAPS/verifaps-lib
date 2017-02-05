@@ -1,10 +1,19 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
+import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 
 /**
  * Created by csicar on 09.01.17.
@@ -18,44 +27,80 @@ public class TimingDiagramView extends XYChart<Number, Number> {
 
   private NumberAxis xAxis;
   private NumberAxis yAxis;
+  private NumberAxis externalYAxis;
 
-  public TimingDiagramView(NumberAxis commonXAxis) {
+  private ObservableList<Line> horizontalLines = FXCollections.observableArrayList();
+  private ObservableList<Line> verticalLines = FXCollections.observableArrayList();
+  private ObservableList<Rectangle> cycleSelection = FXCollections.observableArrayList();
+
+  private Pane dataPane = new Pane();
+  private Pane cycleSelectionPane = new Pane();
+
+  public TimingDiagramView(NumberAxis commonXAxis, NumberAxis externalYAxis) {
     super(new NumberAxis(0.666, 10.666, 1), new NumberAxis(0, 10, 1));
+    this.externalYAxis = externalYAxis;
     xAxis = (NumberAxis) getXAxis();
     yAxis = (NumberAxis) getYAxis();
-    xAxis.setOpacity(0);
+    setTitle("lol");
+
+    xAxis.setAutoRanging(false);
     xAxis.setMinorTickVisible(false);
+    xAxis.setTickMarkVisible(false);
     xAxis.setTickLabelsVisible(false);
+    xAxis.setPrefSize(0, 0);
+    yAxis.setAutoRanging(false);
     yAxis.setMinorTickVisible(false);
-    //yAxis.setPrefWidth(40);
-    yAxis.setMaxWidth(0);
-    yAxis.setMinorTickVisible(false);
+    yAxis.setTickMarkVisible(false);
     yAxis.setTickLabelsVisible(false);
-    yAxis.setMinorTickVisible(false);
-    yAxis.setTickLength(0);
+    yAxis.setPrefSize(0, 0);
+
+    Node chartContent = lookup(".chart-content");
+    chartContent.layoutBoundsProperty().addListener(change -> {
+      updateAxisExternalPosition();
+    });
+
+    getPlotChildren().addAll(
+        cycleSelectionPane,
+        dataPane
+    );
+
+    /*this.layoutBoundsProperty().addListener(change -> {
+      Bounds bounds = TimingDiagramView.this.localToParent(TimingDiagramView.this.getLayoutBounds());
+      externalYAxis.layoutYProperty().set(bounds.getMaxY() - yAxis.heightProperty().get());
+    });*/
+    externalYAxis.prefHeightProperty().bind(yAxis.heightProperty());
+    //externalYAxis.layoutYProperty().bind(this.layoutYProperty());
+    externalYAxis.upperBoundProperty().bind(yAxis.upperBoundProperty());
+    externalYAxis.lowerBoundProperty().bind(yAxis.lowerBoundProperty());
 
     this.getStylesheets().add(
         TimingDiagramView.class.getResource("style.css").toExternalForm()
     );
     xAxis.lowerBoundProperty().bind(commonXAxis.lowerBoundProperty());
     xAxis.upperBoundProperty().bind(commonXAxis.upperBoundProperty());
-    /*commonXAxis.lowerBoundProperty().addListener(change -> {
-      xAxis.setLowerBound(-100);
-      System.out.println("change1");
+
+    ObservableList<Series<Number, Number>> seriesObservableList = FXCollections.observableArrayList();
+    setData(seriesObservableList);
+    seriesObservableList.addListener((InvalidationListener) change -> {
+      Platform.runLater(TimingDiagramView.this::requestRelayout);
     });
-    commonXAxis.upperBoundProperty().addListener(change -> {
-      xAxis.setLowerBound(-100);
-      System.out.println("change2");
-    });*/
+    setAlternativeColumnFillVisible(true);
+    setVerticalGridLinesVisible(false);
+    setVerticalZeroLineVisible(false);
+
   }
 
- /* private static Axis<Number> createIntegerAxis() {
-    NumberAxis axis = new NumberAxis(0, 10, 1);
-    //axis.upperBoundProperty()
-    axis.setMinorTickCount(1);
-    axis.setMinorTickVisible(false);
-    return axis;
-  }*/
+  public void requestRelayout() {
+    requestLayout();
+    requestChartLayout();
+    updateAxisExternalPosition();
+  }
+
+  private void updateAxisExternalPosition() {
+    Node chartContent = lookup(".chart-content");
+    Bounds bounds = TimingDiagramView.this.localToParent(chartContent.localToParent(chartContent.layoutBoundsProperty().get()));
+    externalYAxis.layoutYProperty().set(bounds.getMinY());
+  }
 
   /**
    * Called when a data item has been added to a series. This is where implementations of XYChart can create/add new
@@ -68,9 +113,29 @@ public class TimingDiagramView extends XYChart<Number, Number> {
    */
   @Override
   protected void dataItemAdded(Series series, int itemIndex, Data item) {
-    ObservableList<Node> plotChildren = getPlotChildren();
-    plotChildren.add(new Line());
-    updateYRange();
+    Line horizontalLine = new Line();
+    dataPane.getChildren().add(horizontalLine);
+    dataPane.setMouseTransparent(true);
+    horizontalLines.add(horizontalLine);
+    Rectangle cycleSelectionRectangle = new Rectangle();
+    cycleSelectionRectangle.setOnMouseEntered(event -> {
+      cycleSelectionRectangle.setOpacity(1);
+    });
+    cycleSelectionRectangle.setOnMouseExited(event -> {
+      cycleSelectionRectangle.setOpacity(0);
+    });
+    Tooltip tooltip = new Tooltip(item.getYValue().toString());
+    Tooltip.install(cycleSelectionRectangle, tooltip);
+    cycleSelectionRectangle.setFill(Color.LIGHTCYAN);
+    cycleSelectionRectangle.setOpacity(0);
+    cycleSelection.add(cycleSelectionRectangle);
+    cycleSelectionPane.getChildren().add(cycleSelectionRectangle);
+    if (itemIndex > 0) {
+      Line verticalLine = new Line();
+      dataPane.getChildren().add(verticalLine);
+      verticalLines.add(verticalLine);
+      updateYRange();
+    }
   }
 
   /**
@@ -85,7 +150,11 @@ public class TimingDiagramView extends XYChart<Number, Number> {
   protected void dataItemRemoved(Data<Number, Number> item, Series<Number, Number> series) {
     ObservableList<Node> plotChildren = getPlotChildren();
     removeDataItemFromDisplay(series, item);
-    plotChildren.remove(0);
+    dataPane.getChildren().remove(horizontalLines.remove(0));
+    cycleSelectionPane.getChildren().remove(cycleSelection.remove(0));
+    if (series.getData().size() > 0) {
+      dataPane.getChildren().remove(verticalLines.remove(0));
+    }
     updateYRange();
   }
 
@@ -136,17 +205,29 @@ public class TimingDiagramView extends XYChart<Number, Number> {
    */
   @Override
   protected void layoutPlotChildren() {
-    ObservableList<Node> plotChildren = getPlotChildren();
-    ObservableList<Series<Number, Number>> data = getData();
     getData().forEach(series -> {
       ObservableList<Data<Number, Number>> cyclesData = series.getData();
       for (int i = 0; i < cyclesData.size(); i++) {
-        Line line = (Line) plotChildren.get(i);
-        //line.setStartX(getXAxis().getDisplayPosition(dataPoints.get(i - 1).getXValue()));
-        line.setStartX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue()));
-        line.setEndX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue().intValue() + 1));
-        line.setStartY(getYAxis().getDisplayPosition(cyclesData.get(i).getYValue()));
-        line.setEndY(getYAxis().getDisplayPosition(cyclesData.get(i).getYValue()));
+        Line horizontalLine = horizontalLines.get(i);
+        horizontalLine.setStartX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue()));
+        horizontalLine.setEndX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue().intValue() + 1));
+        horizontalLine.setStartY(getYAxis().getDisplayPosition(cyclesData.get(i).getYValue()));
+        horizontalLine.setEndY(getYAxis().getDisplayPosition(cyclesData.get(i).getYValue()));
+        if (i < cyclesData.size() - 1) {
+          Line verticalLine = verticalLines.get(i);
+          verticalLine.setStartX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue().intValue() + 1));
+          verticalLine.setEndX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue().intValue() + 1));
+          verticalLine.setStartY(getYAxis().getDisplayPosition(cyclesData.get(i).getYValue()));
+          verticalLine.setEndY(getYAxis().getDisplayPosition(cyclesData.get(i + 1).getYValue()));
+        }
+
+        Rectangle cycleSelectionRectangle = cycleSelection.get(i);
+        cycleSelectionRectangle.setX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue()));
+        cycleSelectionRectangle.setWidth(
+            getXAxis().getDisplayPosition(cyclesData.get(i).getXValue().intValue() + 1) -
+                getXAxis().getDisplayPosition(cyclesData.get(i).getXValue())
+        );
+        cycleSelectionRectangle.setHeight(getYAxis().getHeight());
       }
     });
   }

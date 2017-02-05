@@ -4,3 +4,17 @@
 .chart-content {
     -fx-padding: 0px;
 }
+.axis:top > .axis-label,
+.axis:left > .axis-label {
+    -fx-padding: 0;
+}
+.axis:bottom > .axis-label,
+.axis:right > .axis-label {
+    -fx-padding: 0;
+}
+
+.chart-alternative-column-fill {
+    -fx-fill: #EEE;
+    -fx-stroke: transparent;
+    -fx-stroke-width: 0;
+}
