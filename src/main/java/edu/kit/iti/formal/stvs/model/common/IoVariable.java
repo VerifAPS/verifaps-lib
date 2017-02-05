@@ -5,7 +5,7 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 /**
  * Created by csicar on 11.01.17.
  */
-public abstract class IoVariable {
+public abstract class IoVariable implements Variable {
 
 
   public abstract VariableCategory getCategory();

@@ -1,11 +1,10 @@
 package edu.kit.iti.formal.stvs.logic.verification;
 
-import edu.kit.iti.formal.stvs.logic.io.verification.VerificationExporter;
-import edu.kit.iti.formal.stvs.logic.io.verification.VerificationImporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.verification.VerificationExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.verification.VerificationImporter;
 import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.function.Consumer;

@@ -1,13 +1,12 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import edu.kit.iti.formal.stvs.logic.io.verification.VerificationExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.verification.VerificationExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlSpecExporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
-import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 

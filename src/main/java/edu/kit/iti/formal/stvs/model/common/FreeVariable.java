@@ -7,7 +7,7 @@ import javafx.beans.property.*;
 /**
  * Created by csicar on 10.01.17.
  */
-public class FreeVariable {
+public class FreeVariable implements Variable {
   private final StringProperty name;
   private final ObjectProperty<Type> type;
   private final ObjectProperty<Value> defaultValue;
