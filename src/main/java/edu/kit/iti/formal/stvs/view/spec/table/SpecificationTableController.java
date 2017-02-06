@@ -1,10 +1,18 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
-import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import edu.kit.iti.formal.stvs.model.table.*;
+import edu.kit.iti.formal.stvs.util.MapUtil;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.ClipboardContent;
@@ -12,7 +20,13 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Created by Philipp on 01.02.2017.
@@ -21,18 +35,22 @@ public class SpecificationTableController implements Controller {
 
   private static final DataFormat SERIALIZED_MIME_TYPE = new DataFormat("application/x-java-serialized-object");
 
-  private final TableView<HybridRowModel> tableView;
+  private final TableView<SynchronizedRow> tableView;
+  private final HybridSpecification tableData;
 
-  private final ObservableList<HybridRowModel> data = FXCollections.observableArrayList();
-  private final TableColumn<HybridRowModel, String> inputColumn;
-  private final TableColumn<HybridRowModel, String> outputColumn;
-  private final TableColumn<HybridRowModel, String> durations;
+  private final ObservableList<SynchronizedRow> data = FXCollections.observableArrayList();
+  private final TableColumn<SynchronizedRow, String> inputColumn;
+  private final TableColumn<SynchronizedRow, String> outputColumn;
+  private final TableColumn<SynchronizedRow, String> durations;
 
-  public SpecificationTableController() {
+  public SpecificationTableController(ObservableSet<Type> typeContext,
+                                      ObservableSet<CodeIoVariable> codeIoVariables,
+                                      FreeVariableSet freeVariableSet) {
     this.tableView = new TableView<>();
+    this.tableData = new HybridSpecification(typeContext, codeIoVariables, freeVariableSet, true);
     this.inputColumn = new TableColumn<>("Input");
     this.outputColumn = new TableColumn<>("Output");
-    this.durations = createColumn("Duration", HybridRowModel::getDuration);
+    this.durations = createColumn("Duration", SynchronizedRow::getDuration);
 
     inputColumn.setContextMenu(createColumnContextMenu(VariableCategory.INPUT));
     outputColumn.setContextMenu(createColumnContextMenu(VariableCategory.OUTPUT));
@@ -44,7 +62,30 @@ public class SpecificationTableController implements Controller {
     tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableView.setRowFactory(this::rowFactory);
 
+    data.addListener(this::onDataRowChanged);
+
     createTableContextMenu();
+  }
+
+  private void onDataRowChanged(ListChangeListener.Change<? extends SynchronizedRow> change) {
+    while (change.next()) {
+      if (change.wasAdded()) {
+        List<SpecificationRow<ConstraintCell>> rowsToBeAdded = new ArrayList<>();
+        List<ConstraintDuration> durationsToBeAdded = new ArrayList<>();
+        for (SynchronizedRow row : change.getAddedSubList()) {
+          Map<String, ConstraintCell> cells = MapUtil.mapValues(row.getCells(), HybridCellModel::getCell);
+          SpecificationRow<ConstraintCell> rowToBeAdded = new SpecificationRow<>(cells);
+          rowToBeAdded.commentProperty().bindBidirectional(row.commentProperty());
+          rowsToBeAdded.add(rowToBeAdded);
+          durationsToBeAdded.add(row.getDuration().getCell());
+        }
+        tableData.getRows().addAll(change.getFrom(), rowsToBeAdded);
+        tableData.getDurations().addAll(change.getFrom(), durationsToBeAdded);
+      }
+      if (change.wasRemoved()) {
+        tableData.getRows().remove(change.getFrom(), change.getTo());
+      }
+    }
   }
 
   private void createTableContextMenu() {
@@ -52,24 +93,21 @@ public class SpecificationTableController implements Controller {
     MenuItem deleteRow = new MenuItem("Delete Row");
     insertRow.setOnAction(event -> {
       int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
-      tableView.getItems().add(selectedIndex + 1, createEmptyRow());
+      addEmptyRow(selectedIndex + 1);
     });
     deleteRow.setOnAction(event ->
-      tableView.getItems().removeAll(tableView.getSelectionModel().getSelectedItems()));
+      data.removeAll(tableView.getSelectionModel().getSelectedItems()));
     ContextMenu globalCM = new ContextMenu(insertRow, deleteRow);
 
     tableView.setContextMenu(globalCM);
   }
 
-  private HybridRowModel createEmptyRow() {
-    HybridRowModel row = new HybridRowModel("-");
-    inputColumn.getColumns().forEach(hybridRowModelTableColumn ->
-      row.add(hybridRowModelTableColumn.getText(), "-")
-    );
-    outputColumn.getColumns().forEach(hybridRowModelTableColumn ->
-        row.add(hybridRowModelTableColumn.getText(), "-")
-    );
-    return row;
+  public void addEmptyRow(int index) {
+    Map<String, ConstraintCell> wildcardCells = new HashMap<>();
+    tableData.getSpecIoVariables().forEach(specIoVariable ->
+        wildcardCells.put(specIoVariable.getName(), new ConstraintCell("-")));
+    SpecificationRow<ConstraintCell> wildcardRow = new SpecificationRow<>(wildcardCells);
+    data.add(index, new SynchronizedRow(wildcardRow, new ConstraintDuration("-")));
   }
 
   private ContextMenu createColumnContextMenu(VariableCategory category) {
@@ -80,10 +118,10 @@ public class SpecificationTableController implements Controller {
     return menu;
   }
 
-  private TableColumn<HybridRowModel, String> createColumn(
+  private TableColumn<SynchronizedRow, String> createColumn(
       String colName,
-      final Function<HybridRowModel, HybridCellModel> extractCellFromRow) {
-    TableColumn<HybridRowModel, String> column = new TableColumn<>(colName);
+      final Function<SynchronizedRow, HybridCellModel> extractCellFromRow) {
+    TableColumn<SynchronizedRow, String> column = new TableColumn<>(colName);
     column.setSortable(false);
     column.setEditable(true);
     column.setPrefWidth(100);
@@ -96,7 +134,7 @@ public class SpecificationTableController implements Controller {
     return column;
   }
 
-  private TableColumn<HybridRowModel, String> getColumnFromCategory(VariableCategory category) {
+  private TableColumn<SynchronizedRow, String> getColumnFromCategory(VariableCategory category) {
     switch (category) {
       case INPUT:
         return inputColumn;
@@ -108,32 +146,38 @@ public class SpecificationTableController implements Controller {
   }
 
   public void addColumn(VariableCategory category, String columnHeader) {
-    TableColumn<HybridRowModel, String> column = getColumnFromCategory(category);
-    addNewColumnToCategory(column, columnHeader);
-    final HybridCellModel dontcare = new HybridCellModel(new ConstraintDuration("-"));
-    data.forEach(hybridRowModel -> hybridRowModel.put(columnHeader, dontcare));
+    // Add column to view:
+    TableColumn<SynchronizedRow, String> viewColumn = getColumnFromCategory(category);
+    addNewColumnToCategory(viewColumn, columnHeader);
+
+    // Add column to model:
+    SpecIoVariable specIoVariable = new SpecIoVariable(category, TypeInt.INT, columnHeader);
+    if (data.isEmpty()) {
+      tableData.getSpecIoVariables().add(specIoVariable);
+    } else {
+      SpecificationColumn<ConstraintCell> dataColumn = new SpecificationColumn<>(
+          data.stream().map(row -> new ConstraintCell("-")).collect(Collectors.toList()));
+      tableData.addColumn(specIoVariable, dataColumn);
+    }
   }
 
-  public void addRow(HybridRowModel row) {
-    data.add(row);
-  }
-
-  private void addNewColumnToCategory(TableColumn<HybridRowModel, String> column, final String columnName) {
+  private void addNewColumnToCategory(TableColumn<SynchronizedRow, String> column, final String columnName) {
     column.getColumns().add(
         createColumn(
             columnName,
-            hybridRowModel -> hybridRowModel.getCells().get(columnName))
+            synchronizedRow -> synchronizedRow.getCells().get(columnName))
     );
   }
 
   // from: http://stackoverflow.com/questions/28603224/sort-tableview-with-drag-and-drop-rows
   // TODO: Have fun? Implement dragging multiple rows, from one program to another, etc.
-  private TableRow<HybridRowModel> rowFactory(TableView<HybridRowModel> tableView) {
-    TableRow<HybridRowModel> row = new TableRow<>();
+  private TableRow<SynchronizedRow> rowFactory(TableView<SynchronizedRow> tableView) {
+    TableRow<SynchronizedRow> row = new TableRow<>();
 
     row.setOnDragDetected(event -> {
-      if (! row.isEmpty()) {
+      if (!row.isEmpty()) {
         Integer index = row.getIndex();
+        tableView.getSelectionModel().clearAndSelect(index);
         Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
         db.setDragView(row.snapshot(null, null));
         ClipboardContent cc = new ClipboardContent();
@@ -157,7 +201,7 @@ public class SpecificationTableController implements Controller {
       Dragboard db = event.getDragboard();
       if (db.hasContent(SERIALIZED_MIME_TYPE)) {
         int draggedIndex = (Integer) db.getContent(SERIALIZED_MIME_TYPE);
-        HybridRowModel draggedRow = tableView.getItems().remove(draggedIndex);
+        SynchronizedRow draggedRow = tableView.getItems().remove(draggedIndex);
 
         int dropIndex ;
 
@@ -181,5 +225,9 @@ public class SpecificationTableController implements Controller {
   @Override
   public TableView getView() {
     return tableView;
+  }
+
+  public HybridSpecification getData() {
+    return tableData;
   }
 }

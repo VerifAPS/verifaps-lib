@@ -58,4 +58,8 @@ public class ConstraintCell implements CellOperationProvider {
         append(comment.get(), other.comment.get()).
         isEquals();
   }
+
+  public String toString() {
+    return "ConstraintCell(" + getAsString() + ", comment: " + getComment() + ")";
+  }
 }
