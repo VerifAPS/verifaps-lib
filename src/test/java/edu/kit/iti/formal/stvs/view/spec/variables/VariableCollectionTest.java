@@ -31,7 +31,10 @@ public class VariableCollectionTest {
 
   private List<Node> variableViewScene() {
     ObservableList<Type> types = FXCollections.observableArrayList(TypeInt.INT, TypeBool.BOOL);
-    ObservableList<FreeVariable> vars = FXCollections.observableArrayList();
+    ObservableList<FreeVariable> vars = FXCollections.observableArrayList(
+        new FreeVariable("blah", TypeInt.INT),
+        new FreeVariable("xyz", TypeBool.BOOL)
+    );
     FreeVariableSet set = new FreeVariableSet(vars);
 
     VariableCollectionController controller = new VariableCollectionController(types, set);
