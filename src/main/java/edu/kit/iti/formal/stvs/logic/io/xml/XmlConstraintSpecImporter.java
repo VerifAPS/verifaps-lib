@@ -24,12 +24,12 @@ import org.w3c.dom.Node;
 /**
  * @author Benjamin Alt
  */
-public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
+public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecification> {
 
   private Unmarshaller unmarshaller;
   private Set<Type> typeContext;
 
-  public XmlSpecImporter() throws ImportException {
+  public XmlConstraintSpecImporter() throws ImportException {
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
       unmarshaller = jaxbContext.createUnmarshaller();
@@ -53,66 +53,6 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
     }
   }
 
-  public ConcreteSpecification doImportConcreteFromXmlNode(Node source) throws ImportException {
-    try {
-      SpecificationTable importedSpec = ((JAXBElement<SpecificationTable>) unmarshaller
-          .unmarshal(source)).getValue();
-
-      Set<Type> typeContext = importTypeContext(importedSpec.getEnumTypes());
-      List<SpecIoVariable> ioVariables = importIoVariables(importedSpec.getVariables(), typeContext);
-      return importConcreteSpec(typeContext, ioVariables, importedSpec);
-    } catch (JAXBException  e) {
-      throw new ImportException(e);
-    }
-  }
-
-  private ConcreteSpecification importConcreteSpec(Set<Type> typeContext, List<SpecIoVariable>
-      ioVariables, SpecificationTable importedSpec) throws
-      ImportException {
-    if (!importedSpec.isIsConcrete()) {
-      throw new ImportException("Cannot import a ConcreteSpecification from a specification not " +
-          "declared as concrete");
-    }
-    ConcreteSpecification concreteSpec = new ConcreteSpecification(importedSpec.isIsCounterExample());
-
-    // Add a column for each ioVariable
-    Variables variables = importedSpec.getVariables();
-    for (int i = 0; i < variables.getIoVariable().size(); i++) {
-      Variables.IoVariable ioVar = variables.getIoVariable().get(i);
-      int colWidth = ioVar.getColwidth().intValue();
-      SpecIoVariable specIoVariable = ioVariables.get(i);
-      specIoVariable.getColumnConfig().setWidth(colWidth);
-      concreteSpec.getSpecIoVariables().add(specIoVariable);
-    }
-
-    // Add the rows
-    Rows rows = importedSpec.getRows();
-    int currentCycle = 0;
-    for (int i = 0; i < rows.getRow().size(); i++) {
-      Rows.Row row = rows.getRow().get(i);
-      int currentDuration = Integer.parseInt(row.getDuration().getValue());
-      concreteSpec.getDurations().add(new ConcreteDuration(currentCycle, currentDuration));
-      Map<String,ConcreteCell> cellsMap = new HashMap<>();
-      for (int j = 0; j < row.getCell().size(); j++){
-        Rows.Row.Cell cell = row.getCell().get(j);
-        Type cellType = ioVariables.get(i).getType();
-        Optional<Value> val = cellType.parseLiteral(cell.getValue());
-        if (val.isPresent()) {
-          ConcreteCell concreteCell = new ConcreteCell(val.get());
-          cellsMap.put(ioVariables.get(i).getName(), concreteCell);
-        } else {
-          throw new ImportException("Could not parse concrete value " + cell.getValue());
-        }
-      }
-      if (cellsMap.size() != ioVariables.size()) {
-        throw new ImportException("Row too short: Do not have a cell for each IOVariable");
-      }
-      concreteSpec.getRows().add(new SpecificationRow<>(cellsMap));
-      currentCycle += currentDuration;
-    }
-    return concreteSpec;
-  }
-
   private ConstraintSpecification importConstraintSpec(Set<Type> typeContext,
                                                        FreeVariableSet freeVariables,
                                                        List<SpecIoVariable> ioVariables,
@@ -121,13 +61,8 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
     ConstraintSpecification constraintSpec = new ConstraintSpecification(
         FXCollections.observableSet(typeContext), FXCollections.observableSet(), freeVariables);
 
-    // Add a column for each ioVariable
-    Variables variables = importedSpec.getVariables();
-    for (int i = 0; i < variables.getIoVariable().size(); i++) {
-      Variables.IoVariable ioVar = variables.getIoVariable().get(i);
-      int colWidth = ioVar.getColwidth().intValue();
-      SpecIoVariable specIoVariable = ioVariables.get(i);
-      specIoVariable.getColumnConfig().setWidth(colWidth);
+    // Add the specIoVariables (column headers)
+    for (SpecIoVariable specIoVariable : ioVariables) {
       constraintSpec.getSpecIoVariables().add(specIoVariable);
     }
 
@@ -139,10 +74,11 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
       newDuration.setComment(row.getDuration().getComment());
       constraintSpec.getDurations().add(newDuration);
       Map<String,ConstraintCell> cellsMap = new HashMap<>();
-      for (Rows.Row.Cell cell : row.getCell()) {
+      for (int j = 0; j < row.getCell().size(); j++) {
+        Rows.Row.Cell cell = row.getCell().get(j);
         ConstraintCell constraintCell = new ConstraintCell(cell.getValue());
         constraintCell.setComment(cell.getComment());
-        cellsMap.put(ioVariables.get(i).getName(), constraintCell);
+        cellsMap.put(ioVariables.get(j).getName(), constraintCell);
       }
       if (cellsMap.size() != ioVariables.size()) {
         throw new ImportException("Row too short: Do not have a cell for each IOVariable");
@@ -154,7 +90,7 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
     return constraintSpec;
   }
 
-  private Set<Type> importTypeContext(EnumTypes enumTypes) throws ImportException {
+  protected Set<Type> importTypeContext(EnumTypes enumTypes) throws ImportException {
     Set<Type> typeContext = new HashSet<>();
     // Type context are user-defined enums + int + bool
     typeContext.add(TypeInt.INT);
@@ -167,7 +103,7 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
     return typeContext;
   }
 
-  private List<SpecIoVariable> importIoVariables(Variables variables, Set<Type> typeContext)
+  protected List<SpecIoVariable> importIoVariables(Variables variables, Set<Type> typeContext)
       throws
       ImportException {
     List<SpecIoVariable> ioVariables = new ArrayList<>();
@@ -190,7 +126,8 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
     return ioVariables;
   }
 
-  private FreeVariableSet importFreeVariableSet(Variables variables, Set<Type> typeContext) throws ImportException {
+  private FreeVariableSet importFreeVariableSet(Variables variables, Set<Type> typeContext)
+      throws ImportException {
     try {
       List<FreeVariable> freeVariableSet = new ArrayList<>();
       for (Variables.FreeVariable freeVar : variables.getFreeVariable()) {
@@ -208,10 +145,10 @@ public class XmlSpecImporter extends XmlImporter<ConstraintSpecification> {
             }
             freeVariableSet.add(freeVariable);
           }
-          if (!typeFound) {
-            throw new ImportException("Type " + freeVar.getDataType() + " not found for free " +
-                "variable " + freeVar.getName());
-          }
+        }
+        if (!typeFound) {
+          throw new ImportException("Type " + freeVar.getDataType() + " not found for free " +
+              "variable " + freeVar.getName());
         }
       }
       return new FreeVariableSet(freeVariableSet);

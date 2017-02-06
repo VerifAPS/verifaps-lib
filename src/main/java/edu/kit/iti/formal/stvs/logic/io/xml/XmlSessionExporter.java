@@ -16,12 +16,14 @@ import java.math.BigInteger;
  */
 public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
   private XmlConfigExporter configExporter;
-  private XmlSpecExporter specExporter;
+  private XmlConstraintSpecExporter constraintSpecExporter;
+  private XmlConcreteSpecExporter concreteSpecExporter;
   private ObjectFactory objectFactory;
 
   public XmlSessionExporter() {
     configExporter = new XmlConfigExporter();
-    specExporter = new XmlSpecExporter();
+    constraintSpecExporter = new XmlConstraintSpecExporter();
+    concreteSpecExporter = new XmlConcreteSpecExporter();
     objectFactory = new ObjectFactory();
   }
 
@@ -76,14 +78,15 @@ public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
         tab.setId(BigInteger.valueOf(i));
         tab.setReadOnly(!hybridSpec.isEditable());
         tab.setOpen(false); // TODO: Should we delete this from XSD?
-        Node constraintSpecNode = specExporter.exportToXmlNode(hybridSpec);
+        Node constraintSpecNode = constraintSpecExporter.exportToXmlNode(hybridSpec);
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         SpecificationTable constraintSpec = ((JAXBElement<SpecificationTable>) jaxbUnmarshaller
             .unmarshal(constraintSpecNode)).getValue();
         tab.getSpecification().add(constraintSpec);
         if (hybridSpec.getConcreteInstance() != null) {
-          Node concreteSpecNode = specExporter.exportToXmlNode(hybridSpec.getConcreteInstance());
+          Node concreteSpecNode = concreteSpecExporter.exportToXmlNode(hybridSpec
+              .getConcreteInstance());
           SpecificationTable concreteSpec = ((JAXBElement<SpecificationTable>) jaxbUnmarshaller
               .unmarshal(concreteSpecNode)).getValue();
           tab.getSpecification().add(concreteSpec);

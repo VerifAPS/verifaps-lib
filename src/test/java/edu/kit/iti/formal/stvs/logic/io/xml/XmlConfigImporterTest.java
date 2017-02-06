@@ -37,10 +37,19 @@ public class XmlConfigImporterTest {
     assertEquals(true, config.getShowLineNumbers());
   }
 
+  @Test
+  public void testDoImportDefault() throws Exception {
+    FileInputStream inputStream = new FileInputStream(new File
+        (this.getClass().getResource("config_valid_default.xml").toURI()));
+    GlobalConfig actualConfig = importer.doImport(inputStream);
+    GlobalConfig expectedConfig = new GlobalConfig();
+    assertEquals(expectedConfig, actualConfig);
+  }
+
   @Test(expected=ImportException.class)
   public void testDoInvalidImport() throws Exception {
     FileInputStream inputStream = new FileInputStream(new File
-        (this.getClass().getResource("example_config_invalid_1.xml").toURI()));
+        (this.getClass().getResource("config_invalid_1.xml").toURI()));
     GlobalConfig config = importer.doImport(inputStream);
   }
 }

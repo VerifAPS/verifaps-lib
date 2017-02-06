@@ -47,4 +47,19 @@ public class ConcreteSpecification extends SpecificationTable<ConcreteCell, Conc
     return concreteCells;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+
+    ConcreteSpecification that = (ConcreteSpecification) o;
+
+    return isCounterExample() == that.isCounterExample();
+  }
+
+  @Override
+  public int hashCode() {
+    return (isCounterExample() ? 1 : 0);
+  }
 }

@@ -20,11 +20,11 @@ import java.util.List;
 /**
  * @author Benjamin Alt
  */
-public class XmlSpecExporter extends XmlExporter<ConstraintSpecification> {
+public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecification> {
 
   private ObjectFactory objectFactory;
 
-  public XmlSpecExporter() {
+  public XmlConstraintSpecExporter() {
     objectFactory = new ObjectFactory();
   }
 
@@ -40,42 +40,6 @@ public class XmlSpecExporter extends XmlExporter<ConstraintSpecification> {
     return marshalToNode(element);
   }
 
-  public Node exportToXmlNode(ConcreteSpecification source) throws ExportException {
-    edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable specTable = objectFactory.createSpecificationTable();
-    specTable.setVariables(makeVariables(source));
-    specTable.setEnumTypes(makeEnumTypes(source));
-    specTable.setRows(makeRows(source));
-    specTable.setIsConcrete(true);
-    JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable> element = objectFactory.createSpecification(specTable);
-    return marshalToNode(element);
-  }
-
-
-  private Rows makeRows(ConcreteSpecification concreteSpec) {
-    Rows rows = objectFactory.createRows();
-    int currentCycle = 0;
-    for (int i = 0; i < concreteSpec.getDurations().size(); i++) {;
-      Rows.Row exportRow = objectFactory.createRowsRow();
-      Rows.Row.Duration duration = objectFactory.createRowsRowDuration();
-      int currentDuration = concreteSpec.getDurations().get(i).getDuration();
-      duration.setValue(Integer.toString(currentDuration));
-      exportRow.setDuration(duration);
-      for (int j = currentCycle; j < currentCycle + currentDuration; j++) {
-        // This now corresponds to a cycle
-        Rows.Row.Cycle cycle = objectFactory.createRowsRowCycle();
-        for (SpecIoVariable ioVar : concreteSpec.getSpecIoVariables()) {
-          SpecificationColumn<ConcreteCell> col = concreteSpec.getColumnByName(ioVar.getName());
-          ConcreteCell cell = col.getCells().get(i);
-          cycle.getCell().add(cell.getValue().getValueString());
-        }
-        exportRow.getCycle().add(cycle);
-      }
-      rows.getRow().add(exportRow);
-      currentCycle += concreteSpec.getDurations().get(i).getDuration();
-    }
-    return rows;
-  }
-
   private Rows makeRows(ConstraintSpecification constraintSpec) {
     Rows rows = objectFactory.createRows();
     for (int i = 0; i < constraintSpec.getRows().size(); i++) {
@@ -86,7 +50,8 @@ public class XmlSpecExporter extends XmlExporter<ConstraintSpecification> {
       duration.setValue(constraintSpec.getDurations().get(i).getAsString());
       duration.setComment(constraintSpec.getDurations().get(i).getComment());
       exportRow.setDuration(duration);
-      for (ConstraintCell cell : row.getCells().values()) {
+      for (SpecIoVariable ioVariable : constraintSpec.getSpecIoVariables()) {
+        ConstraintCell cell = row.getCells().get(ioVariable.getName());
         Rows.Row.Cell exportCell = objectFactory.createRowsRowCell();
         exportCell.setComment(cell.getComment());
         exportCell.setValue(cell.getAsString());
@@ -97,7 +62,7 @@ public class XmlSpecExporter extends XmlExporter<ConstraintSpecification> {
     return rows;
   }
 
-  private EnumTypes makeEnumTypes(SpecificationTable<?,?> specTable) {
+  protected EnumTypes makeEnumTypes(SpecificationTable<?, ?> specTable) {
     EnumTypes enumTypes = objectFactory.createEnumTypes();
     for (SpecIoVariable ioVar : specTable.getSpecIoVariables()) {
       Type type = ioVar.getType();
@@ -133,7 +98,7 @@ public class XmlSpecExporter extends XmlExporter<ConstraintSpecification> {
     return variables;
   }
 
-  private List<Variables.IoVariable> makeIoVariables(SpecificationTable<?,?> specTable) {
+  protected List<Variables.IoVariable> makeIoVariables(SpecificationTable<?, ?> specTable) {
     List<Variables.IoVariable> variables = new ArrayList<>();
     for (SpecIoVariable specIoVariable : specTable.getSpecIoVariables()) {
       Variables.IoVariable ioVar = objectFactory.createVariablesIoVariable();

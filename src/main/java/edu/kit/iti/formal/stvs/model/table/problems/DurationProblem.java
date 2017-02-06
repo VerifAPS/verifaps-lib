@@ -17,4 +17,22 @@ public abstract class DurationProblem extends SpecProblem {
   public int getRow() {
     return row;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+
+    DurationProblem that = (DurationProblem) o;
+
+    return getRow() == that.getRow();
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + getRow();
+    return result;
+  }
 }

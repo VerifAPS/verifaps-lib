@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -93,7 +94,7 @@ public class SpecificationTable<C, D> {
   }
 
   /**
-   * Get the SpecIoVariables for this column, i.e. the column headers.
+   * Get the SpecIoVariables for this table, i.e. the column headers.
    *
    * <p>You should <strong>not mutate</strong> this list. For adding new
    * columns, use addColumn</p>
@@ -190,4 +191,18 @@ public class SpecificationTable<C, D> {
   protected void onDurationRemoved(List<? extends D> removed) {
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof SpecificationTable))
+      return false;
+    if (obj == this)
+      return true;
+
+    SpecificationTable rhs = (SpecificationTable) obj;
+    return new EqualsBuilder().
+            append(getSpecIoVariables(), rhs.getSpecIoVariables()).
+            append(getRows(), rhs.getRows()).
+            append(getDurations(), rhs.getDurations()).
+            isEquals();
+  }
 }

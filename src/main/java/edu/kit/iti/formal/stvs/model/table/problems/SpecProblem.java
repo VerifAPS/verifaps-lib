@@ -20,4 +20,23 @@ public abstract class SpecProblem extends Exception {
   public Selection getLocation() {
     return location;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    SpecProblem that = (SpecProblem) o;
+
+    if (getErrorMessage() != null ? !getErrorMessage().equals(that.getErrorMessage()) : that.getErrorMessage() != null)
+      return false;
+    return getLocation() != null ? getLocation().equals(that.getLocation()) : that.getLocation() == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getErrorMessage() != null ? getErrorMessage().hashCode() : 0;
+    result = 31 * result + (getLocation() != null ? getLocation().hashCode() : 0);
+    return result;
+  }
 }

@@ -67,4 +67,25 @@ public class InvalidIoVarProblem extends ColumnProblem {
   public Type getType() {
     return type;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+
+    InvalidIoVarProblem that = (InvalidIoVarProblem) o;
+
+    if (getSpecIoVariable() != null ? !getSpecIoVariable().equals(that.getSpecIoVariable()) : that.getSpecIoVariable() != null)
+      return false;
+    return getType() == that.getType();
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (getSpecIoVariable() != null ? getSpecIoVariable().hashCode() : 0);
+    result = 31 * result + (getType() != null ? getType().hashCode() : 0);
+    return result;
+  }
 }
