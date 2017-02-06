@@ -15,10 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DataFormat;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
+import javafx.scene.input.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,7 +80,7 @@ public class SpecificationTableController implements Controller {
         tableData.getDurations().addAll(change.getFrom(), durationsToBeAdded);
       }
       if (change.wasRemoved()) {
-        tableData.getRows().remove(change.getFrom(), change.getTo());
+        tableData.getRows().remove(change.getFrom(), change.getFrom() + change.getRemovedSize());
       }
     }
   }
@@ -91,10 +88,12 @@ public class SpecificationTableController implements Controller {
   private void createTableContextMenu() {
     MenuItem insertRow = new MenuItem("Insert Row");
     MenuItem deleteRow = new MenuItem("Delete Row");
+    insertRow.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
     insertRow.setOnAction(event -> {
       int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
       addEmptyRow(selectedIndex + 1);
     });
+    deleteRow.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
     deleteRow.setOnAction(event ->
       data.removeAll(tableView.getSelectionModel().getSelectedItems()));
     ContextMenu globalCM = new ContextMenu(insertRow, deleteRow);

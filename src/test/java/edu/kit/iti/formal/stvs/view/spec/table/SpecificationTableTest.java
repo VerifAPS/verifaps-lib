@@ -58,7 +58,7 @@ public class SpecificationTableTest {
 
     updateText(textArea, spec);
 
-    final Button updateButton = new Button("Update");
+    final Button updateButton = new Button("Refresh");
     updateButton.setOnAction(event -> updateText(textArea, spec));
 
     return new VBox(updateButton, textArea);
