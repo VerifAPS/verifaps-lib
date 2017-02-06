@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.view.spec.variables;
 
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.Value;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -15,18 +16,23 @@ public class VariableCollection extends VBox {
   private final TableView<FreeVariable> freeVariableTableView;
   private final TableColumn<FreeVariable, String> nameTableColumn;
   private final TableColumn<FreeVariable, Type> typeTableColumn;
+  private final TableColumn<FreeVariable, Value> defaultValueTableColumn;
   private final Button addFreeVariable;
 
   public VariableCollection() {
     this.overviewLabel = new Label("Free Variables:");
-    this.addFreeVariable = new Button("Add Free Variable");
+    this.addFreeVariable = new Button("Add");
     this.freeVariableTableView = new TableView<>();
     this.nameTableColumn = new TableColumn<>("name");
     this.typeTableColumn = new TableColumn<>("type");
+    this.defaultValueTableColumn = new TableColumn<>("default value");
+
+    nameTableColumn.setPrefWidth(150);
+    typeTableColumn.setPrefWidth(120);
 
     freeVariableTableView.setEditable(true);
     freeVariableTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    freeVariableTableView.getColumns().addAll(nameTableColumn, typeTableColumn);
+    freeVariableTableView.getColumns().addAll(nameTableColumn, typeTableColumn, defaultValueTableColumn);
 
     this.overviewLabel.getStyleClass().addAll("freevar", "overview-label");
     this.addFreeVariable.getStyleClass().addAll("freevar", "add-var-button");
@@ -53,5 +59,9 @@ public class VariableCollection extends VBox {
 
   public TableColumn<FreeVariable, Type> getTypeTableColumn() {
     return typeTableColumn;
+  }
+
+  public TableColumn<FreeVariable, Value> getDefaultValueTableColumn() {
+    return defaultValueTableColumn;
   }
 }

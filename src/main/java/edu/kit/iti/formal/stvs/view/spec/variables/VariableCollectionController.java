@@ -2,8 +2,9 @@ package edu.kit.iti.formal.stvs.view.spec.variables;
 
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
+import edu.kit.iti.formal.stvs.model.common.IllegalValueTypeException;
+import edu.kit.iti.formal.stvs.model.expressions.*;
+import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
@@ -16,6 +17,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.util.StringConverter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by csicar on 10.01.17.
  */
@@ -24,7 +28,7 @@ public class VariableCollectionController implements Controller {
   private ObservableList<Type> codeTypes;
   private FreeVariableSet freeVariableSet;
   private VariableCollection view;
-  private int latestMouseOverRow = 0;
+  // was used for drag n drop: private int latestMouseOverRow = 0;
 
   private ContextMenu contextMenu;
 
@@ -65,25 +69,42 @@ public class VariableCollectionController implements Controller {
 
     view.getNameTableColumn().setCellValueFactory(data -> data.getValue().nameProperty());
     view.getTypeTableColumn().setCellValueFactory(data -> data.getValue().typeProperty());
+    view.getDefaultValueTableColumn().setCellValueFactory(data -> data.getValue().defaultValueProperty());
 
     view.getNameTableColumn().setCellFactory(TextFieldTableCell.forTableColumn());
     view.getTypeTableColumn().setCellFactory(
         ComboBoxTableCell.forTableColumn(createTypeConverter(codeTypes), codeTypes));
+    view.getDefaultValueTableColumn().setCellFactory(
+        TextFieldTableCell.forTableColumn(createDefaultValueConverter(codeTypes)));
 
     view.getNameTableColumn().setOnEditCommit(event -> {
       String proposedName = event.getNewValue();
       // It is illegal to set the variable name to be the same as another existing one
       if (!freeVariableSet.getVariableSet().stream()
           .anyMatch(var -> var.getName().equals(proposedName))) {
-        event.getRowValue().setName(proposedName);
-        event.consume();
+        try {
+          event.getRowValue().setName(proposedName);
+          event.consume();
+        } catch (IllegalArgumentException exception) { // Invalid name
+          // TODO: Provide visual error feedback
+        }
       } else {
-        event.getTableView().refresh();
         // TODO: Provide visual error feedback
       }
+      event.getTableView().refresh();
     });
     view.getTypeTableColumn().setOnEditCommit(event ->
         event.getRowValue().setType(event.getNewValue()));
+    view.getDefaultValueTableColumn().setOnEditCommit(event -> {
+      try {
+        Value toBeSet = event.getNewValue();
+        event.getRowValue().setDefaultValue(toBeSet);
+        event.consume();
+      } catch (IllegalValueTypeException exc) {
+        // TODO: Provide visual error feedback
+      }
+      event.getTableView().refresh();
+    });
 
     // TODO: Maybe fix drag n drop in future
     //configureDragAndDrop(view.getFreeVariableTableView());
@@ -101,6 +122,35 @@ public class VariableCollectionController implements Controller {
             .filter(type -> type.getTypeName().equals(string))
             .findFirst()
             .orElse(null);
+      }
+    };
+  }
+
+  private StringConverter<Value> createDefaultValueConverter(ObservableList<Type> codeTypes) {
+    return new StringConverter<Value>() {
+      @Override
+      public String toString(Value value) {
+        return value == null ? "-" : value.getValueString();
+      }
+
+      @Override
+      public Value fromString(String string) {
+        switch (string) {
+          case "-": return null;
+          default:
+            try {
+              Set<Type> typeContext = new HashSet<>();
+              typeContext.addAll(codeTypes);
+              ExpressionParser parser = new ExpressionParser("", typeContext);
+              Expression parsed = parser.parseExpression(string);
+              BinaryFunctionExpr bin = (BinaryFunctionExpr) parsed;
+              LiteralExpr literal = (LiteralExpr) bin.getSecondArgument();
+              return literal.getValue();
+            } catch (Exception e) {
+              // TODO: Provide visual error feedback
+              return null;
+            }
+        }
       }
     };
   }

@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
+import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.application.Application;
@@ -30,7 +31,11 @@ public class VariableCollectionTest {
   }
 
   private List<Node> variableViewScene() {
-    ObservableList<Type> types = FXCollections.observableArrayList(TypeInt.INT, TypeBool.BOOL);
+    ObservableList<Type> types = FXCollections.observableArrayList(
+        TypeInt.INT,
+        TypeBool.BOOL,
+        new TypeEnum("COLORS", Arrays.asList("red", "green", "blue"))
+    );
     ObservableList<FreeVariable> vars = FXCollections.observableArrayList(
         new FreeVariable("blah", TypeInt.INT),
         new FreeVariable("xyz", TypeBool.BOOL)
