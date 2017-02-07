@@ -18,6 +18,7 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.*;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import org.w3c.dom.Node;
 
@@ -44,7 +45,7 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
       SpecificationTable importedSpec = ((JAXBElement<SpecificationTable>) unmarshaller
           .unmarshal(source)).getValue();
 
-      Set<Type> typeContext = importTypeContext(importedSpec.getEnumTypes());
+      List<Type> typeContext = importTypeContext(importedSpec.getEnumTypes());
       FreeVariableSet freeVariables = importFreeVariableSet(importedSpec.getVariables(), typeContext);
       List<SpecIoVariable> ioVariables = importIoVariables(importedSpec.getVariables(), typeContext);
       return importConstraintSpec(typeContext, freeVariables, ioVariables, importedSpec);
@@ -53,13 +54,15 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
     }
   }
 
-  private ConstraintSpecification importConstraintSpec(Set<Type> typeContext,
+  private ConstraintSpecification importConstraintSpec(List<Type> typeContext,
                                                        FreeVariableSet freeVariables,
                                                        List<SpecIoVariable> ioVariables,
                                                        SpecificationTable importedSpec) throws
       ImportException {
     ConstraintSpecification constraintSpec = new ConstraintSpecification(
-        FXCollections.observableSet(typeContext), FXCollections.observableSet(), freeVariables);
+        new SimpleObjectProperty<>(typeContext),
+        new SimpleObjectProperty<>(new ArrayList<>()),
+        freeVariables);
 
     // Add the specIoVariables (column headers)
     for (SpecIoVariable specIoVariable : ioVariables) {
@@ -90,8 +93,8 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
     return constraintSpec;
   }
 
-  protected Set<Type> importTypeContext(EnumTypes enumTypes) throws ImportException {
-    Set<Type> typeContext = new HashSet<>();
+  protected List<Type> importTypeContext(EnumTypes enumTypes) throws ImportException {
+    List<Type> typeContext = new ArrayList<>();
     // Type context are user-defined enums + int + bool
     typeContext.add(TypeInt.INT);
     typeContext.add(TypeBool.BOOL);
@@ -103,7 +106,7 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
     return typeContext;
   }
 
-  protected List<SpecIoVariable> importIoVariables(Variables variables, Set<Type> typeContext)
+  protected List<SpecIoVariable> importIoVariables(Variables variables, List<Type> typeContext)
       throws
       ImportException {
     List<SpecIoVariable> ioVariables = new ArrayList<>();
@@ -126,7 +129,7 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
     return ioVariables;
   }
 
-  private FreeVariableSet importFreeVariableSet(Variables variables, Set<Type> typeContext)
+  private FreeVariableSet importFreeVariableSet(Variables variables, List<Type> typeContext)
       throws ImportException {
     try {
       List<FreeVariable> freeVariableSet = new ArrayList<>();

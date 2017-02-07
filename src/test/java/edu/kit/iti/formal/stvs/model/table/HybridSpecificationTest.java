@@ -7,6 +7,7 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -27,16 +28,19 @@ public class HybridSpecificationTest {
 
   @Before
   public void setUp() throws IllegalValueTypeException {
-    ObservableSet<Type> typeContext = FXCollections.observableSet(TypeInt.INT, TypeBool.BOOL);
+    List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
 
-    ObservableSet<CodeIoVariable> codeIoVariables = FXCollections.observableSet(
+    List<CodeIoVariable> codeIoVariables = Arrays.asList(
         new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "A"),
         new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "B"),
         new CodeIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "C"),
         new CodeIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "D"));
 
     JsonElement json = TableUtil.jsonFromResource("hybrid_spec.json", HybridSpecificationTest.class);
-    ConstraintSpecification cspec = TableUtil.constraintTableFromJson(typeContext, codeIoVariables, json);
+    ConstraintSpecification cspec = TableUtil.constraintTableFromJson(
+        new SimpleObjectProperty<>(typeContext),
+        new SimpleObjectProperty<>(codeIoVariables),
+        json);
 
     hybridSpec = new HybridSpecification(cspec, true);
     validSpec = hybridSpec.getValidSpecification();

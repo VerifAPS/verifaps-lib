@@ -45,7 +45,7 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
       SpecificationTable importedSpec = ((JAXBElement<SpecificationTable>) unmarshaller
           .unmarshal(source)).getValue();
 
-      Set<Type> typeContext = constraintSpecImporter.importTypeContext(importedSpec.getEnumTypes());
+      List<Type> typeContext = constraintSpecImporter.importTypeContext(importedSpec.getEnumTypes());
       List<SpecIoVariable> ioVariables = constraintSpecImporter.importIoVariables(importedSpec
               .getVariables(), typeContext);
       return importConcreteSpec(typeContext, ioVariables, importedSpec);
@@ -54,7 +54,7 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
     }
   }
 
-  private ConcreteSpecification importConcreteSpec(Set<Type> typeContext, List<SpecIoVariable>
+  private ConcreteSpecification importConcreteSpec(List<Type> typeContext, List<SpecIoVariable>
       ioVariables, SpecificationTable importedSpec) throws
       ImportException {
     if (!importedSpec.isIsConcrete()) {

@@ -9,6 +9,7 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.*;
 import edu.kit.iti.formal.stvs.util.MapUtil;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -40,8 +41,8 @@ public class SpecificationTableController implements Controller {
   private final TableColumn<SynchronizedRow, String> outputColumn;
   private final TableColumn<SynchronizedRow, String> durations;
 
-  public SpecificationTableController(ObservableSet<Type> typeContext,
-                                      ObservableSet<CodeIoVariable> codeIoVariables,
+  public SpecificationTableController(ObjectProperty<List<Type>> typeContext,
+                                      ObjectProperty<List<CodeIoVariable>> codeIoVariables,
                                       FreeVariableSet freeVariableSet) {
     this.tableView = new TableView<>();
     this.tableData = new HybridSpecification(typeContext, codeIoVariables, freeVariableSet, true);
