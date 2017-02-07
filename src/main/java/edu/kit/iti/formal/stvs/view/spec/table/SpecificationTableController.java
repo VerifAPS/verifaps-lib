@@ -23,14 +23,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Created by Philipp on 01.02.2017.
  */
 public class SpecificationTableController implements Controller {
-
-  private static final DataFormat SERIALIZED_MIME_TYPE = new DataFormat("application/x-java-serialized-object");
 
   private final TableView<SynchronizedRow> tableView;
   private final HybridSpecification tableData;
@@ -168,6 +165,8 @@ public class SpecificationTableController implements Controller {
     );
   }
 
+  private static final DataFormat SERIALIZED_MIME_TYPE = new DataFormat("application/x-java-serialized-object");
+
   // from: http://stackoverflow.com/questions/28603224/sort-tableview-with-drag-and-drop-rows
   // TODO: Have fun? Implement dragging multiple rows, from one program to another, etc.
   private TableRow<SynchronizedRow> rowFactory(TableView<SynchronizedRow> tableView) {
@@ -189,7 +188,7 @@ public class SpecificationTableController implements Controller {
     row.setOnDragOver(event -> {
       Dragboard db = event.getDragboard();
       if (db.hasContent(SERIALIZED_MIME_TYPE)) {
-        if (row.getIndex() != ((Integer)db.getContent(SERIALIZED_MIME_TYPE)).intValue()) {
+        if (row.getIndex() != (Integer) db.getContent(SERIALIZED_MIME_TYPE)) {
           event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
           event.consume();
         }
