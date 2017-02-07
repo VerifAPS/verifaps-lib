@@ -11,6 +11,7 @@ import edu.kit.iti.formal.stvs.model.table.*;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,9 +53,9 @@ public class XmlConstraintSpecExporterTest {
             testjson);
 
     ByteArrayOutputStream result = exporter.export(testSpec);
-    String resultString = new String(result.toByteArray(), "utf-8");
-    String expectedString = TestUtils.readFileToString(this.getClass().getResource
-        ("spec_constraint_valid_1.xml").getPath());
+    String resultString = IOUtils.toString(result.toByteArray(), "UTF-8");
+    String expectedString = IOUtils.toString(
+        this.getClass().getResourceAsStream("spec_constraint_valid_1.xml"), "UTF-8");
     assertEquals(TestUtils.removeWhitespace(expectedString),
         TestUtils.removeWhitespace(resultString));
   }

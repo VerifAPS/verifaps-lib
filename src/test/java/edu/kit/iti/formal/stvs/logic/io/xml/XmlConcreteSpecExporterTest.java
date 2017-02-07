@@ -11,6 +11,7 @@ import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
 import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 import edu.kit.iti.formal.stvs.model.table.*;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -67,8 +68,8 @@ public class XmlConcreteSpecExporterTest {
 
     ByteArrayOutputStream result = exporter.export(concreteSpec);
     String resultString = new String(result.toByteArray(), "utf-8");
-    String expectedString = TestUtils.readFileToString(this.getClass().getResource
-        ("spec_concrete_valid_1.xml").getPath());
+    String expectedString = IOUtils.toString(
+        this.getClass().getResourceAsStream("spec_concrete_valid_1.xml"), "UTF-8");
     assertEquals(TestUtils.removeWhitespace(expectedString), TestUtils.removeWhitespace
         (resultString));
   }
@@ -78,8 +79,8 @@ public class XmlConcreteSpecExporterTest {
     ConcreteSpecification concreteSpec = new ConcreteSpecification(false);
     ByteArrayOutputStream result = exporter.export(concreteSpec);
     String resultString = new String(result.toByteArray(), "utf-8");
-    String expectedString = TestUtils.readFileToString(this.getClass().getResource
-        ("spec_concrete_empty.xml").getPath());
+    String expectedString = IOUtils.toString(
+        this.getClass().getResourceAsStream("spec_concrete_empty.xml"), "UTF-8");
     assertEquals(TestUtils.removeWhitespace(expectedString), TestUtils.removeWhitespace(resultString));
   }
 }

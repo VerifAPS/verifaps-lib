@@ -10,11 +10,6 @@ import java.nio.file.Paths;
  * @author Benjamin Alt
  */
 public class TestUtils {
-  public static String readFileToString(String filepath) throws IOException {
-    byte[] encoded = Files.readAllBytes(Paths.get(filepath));
-    return new String(encoded, Charset.defaultCharset());
-  }
-
   public static String removeWhitespace(String input) {
     return input.replaceAll("\\s+", "");
   }

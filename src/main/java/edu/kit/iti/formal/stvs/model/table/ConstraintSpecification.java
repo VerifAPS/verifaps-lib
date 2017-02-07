@@ -309,22 +309,25 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof ConstraintSpecification))
-      return false;
-    if (obj == this)
-      return true;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
 
-    ConstraintSpecification rhs = (ConstraintSpecification) obj;
-    return new EqualsBuilder().
-            appendSuper(super.equals(obj)).
-            append(getProblems(), rhs.getProblems()).
-            append(getTypeContext(), rhs.getTypeContext()).
-            append(getCodeIoVariables(), rhs.getCodeIoVariables()).
-            append(getFreeVariableSet(), rhs.getFreeVariableSet()).
-            append(getComment(), rhs.getComment()).
-            append(getValidSpecification(), rhs.getValidSpecification()).
-            isEquals();
+    ConstraintSpecification that = (ConstraintSpecification) o;
+
+    if (problems != null ? !problems.get().equals(that.problems.get()) : that.problems != null) return false;
+    if (freeVariableSet != null ? !freeVariableSet.equals(that.freeVariableSet) : that.freeVariableSet != null)
+      return false;
+    return comment != null ? comment.get().equals(that.comment.get()) : that.comment == null;
+
   }
 
+  @Override
+  public int hashCode() {
+    int result = problems != null ? problems.hashCode() : 0;
+    result = 31 * result + (freeVariableSet != null ? freeVariableSet.hashCode() : 0);
+    result = 31 * result + (comment != null ? comment.hashCode() : 0);
+    return result;
+  }
 }
