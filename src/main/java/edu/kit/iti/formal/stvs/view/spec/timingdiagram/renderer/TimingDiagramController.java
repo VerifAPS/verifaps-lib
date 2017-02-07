@@ -110,6 +110,7 @@ public class TimingDiagramController implements Controller {
         xPositiveZoomItem,
         xNegativeZoomItem
     );
+    view.setTitle(ioVariable.getName()+ " : " + ioVariable.getType().getTypeName());
   }
 
   private void onXPositiveZoom(ActionEvent actionEvent) {
