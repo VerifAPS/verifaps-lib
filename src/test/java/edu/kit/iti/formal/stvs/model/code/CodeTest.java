@@ -16,9 +16,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static edu.kit.iti.formal.stvs.model.TestUtils.assertCollectionsEqual;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static edu.kit.iti.formal.stvs.model.TestUtils.assertCollectionsEqual;
 
 /**
  * Created by Philipp on 19.01.2017.

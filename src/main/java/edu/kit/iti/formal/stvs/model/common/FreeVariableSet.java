@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -115,5 +116,19 @@ public class FreeVariableSet {
 
   public ObjectProperty<Map<String, Set<FreeVariable>>> problemsProperty() {
     return problems;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof FreeVariableSet))
+      return false;
+    if (obj == this)
+      return true;
+
+    FreeVariableSet rhs = (FreeVariableSet) obj;
+    return new EqualsBuilder().
+            append(variableSet, rhs.variableSet).
+            append(problems.get(), rhs.problems.get()).
+            isEquals();
   }
 }

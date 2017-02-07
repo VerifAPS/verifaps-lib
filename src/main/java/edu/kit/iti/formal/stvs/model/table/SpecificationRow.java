@@ -1,32 +1,68 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
+
 import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 /**
  * @author Benjamin Alt
  */
-public class SpecificationRow<C> {
+public class SpecificationRow<C> implements Commentable {
 
-  protected final Map<String, C> cells;
+  private ObservableMap<String, C> cells;
+  private StringProperty comment;
 
   public SpecificationRow(Map<String, C> cells) {
-    this.cells = cells;
+    this.cells = FXCollections.observableMap(cells);
+    comment = new SimpleStringProperty("");
   }
 
-  public C getCellForVariable(String variable) {
-    C cell = cells.get(variable);
-    if (cell == null) {
-      throw new NoSuchElementException("Cannot get cell for variable " + variable + " : No such variable");
-    }
-    return cell;
+  public ObservableMap<String,C> getCells() {
+    return cells;
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof SpecificationRow)) return false;
-    if (obj == this) return true;
-    SpecificationRow other = (SpecificationRow) obj;
-    return this.cells.equals(other.cells);
+  public void setComment(String comment) {
+    this.comment.set(comment);
+  }
+
+  @Override
+  public String getComment() {
+    return this.comment.get();
+  }
+
+  @Override
+  public StringProperty commentProperty() {
+    return comment;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof SpecificationRow)) return false;
+
+    SpecificationRow<?> that = (SpecificationRow<?>) o;
+
+    if (!cells.equals(that.cells)) return false;
+    return comment != null ? comment.get().equals(that.comment.get()) : that.comment == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = cells.hashCode();
+    result = 31 * result + (comment != null ? comment.hashCode() : 0);
+    return result;
+  }
+
+  public String toString() {
+    String map =
+        String.join(", ",
+            cells.entrySet().stream().map(entry ->
+                entry.getKey() + ": " + entry.getValue()).collect(Collectors.toList()));
+    return "SpecificationRow(comment: " + getComment() + ", " + map + ")";
   }
 }

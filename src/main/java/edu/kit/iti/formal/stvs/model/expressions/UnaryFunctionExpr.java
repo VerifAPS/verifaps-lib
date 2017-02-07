@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
+import javafx.beans.property.ReadOnlyStringProperty;
+
 /**
  * runtime-representation of unary expressions. Examples:
  * <tt>NOT TRUE</tt>, <tt>- 3</tt>.

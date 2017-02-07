@@ -38,14 +38,15 @@ public class EditorTest {
     textArea.getStyleClass().addAll("model-text-area");
     textArea.setEditable(false);
 
-    updateText(textArea, code.getParsedCode());
+    updateText(textArea, code);
     code.parsedCodeProperty().addListener((ob, old, parsedCode) ->
-        updateText(textArea, parsedCode));
+        updateText(textArea, code));
 
     return new StackPane(textArea);
   }
 
-  private void updateText(TextArea textArea, ParsedCode parsedCode) {
+  private void updateText(TextArea textArea, Code code) {
+    ParsedCode parsedCode = code.getParsedCode();
     if (parsedCode != null) {
       StringBuilder output = new StringBuilder();
       output.append("Defined types:\n");
@@ -54,6 +55,8 @@ public class EditorTest {
       output.append("\n");
       output.append("Defined IOVariables:\n");
       parsedCode.getDefinedVariables().forEach(codeIoVariable -> output.append(" - " + codeIoVariable + "\n"));
+      output.append("SyntaxErrors: \n");
+      code.getSyntaxErrors().forEach(syntaxError -> output.append(" - " + syntaxError + "\n"));
       textArea.setText(output.toString());
     }
   }

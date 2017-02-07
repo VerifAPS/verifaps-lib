@@ -1,9 +1,9 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.reactfx.util.LL;
 
 /**
  * @author Benjamin Alt
@@ -57,5 +57,9 @@ public class ConstraintCell implements CellOperationProvider {
         append(stringRepresentation.get(), other.stringRepresentation.get()).
         append(comment.get(), other.comment.get()).
         isEquals();
+  }
+
+  public String toString() {
+    return "ConstraintCell(" + getAsString() + ", comment: " + getComment() + ")";
   }
 }

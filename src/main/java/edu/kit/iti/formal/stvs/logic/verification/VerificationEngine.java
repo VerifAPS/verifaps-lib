@@ -1,13 +1,16 @@
 package edu.kit.iti.formal.stvs.logic.verification;
 
+import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 
-//import edu.kit.iti.formal.automation.testtables; //TODO this doesn't import despite Maven repo
+import java.io.IOException;
 
 /**
  * Strategy for Verification of the VerificationScenario
+ * @author Benjamin Alt
  */
 public interface VerificationEngine {
 
@@ -16,9 +19,10 @@ public interface VerificationEngine {
    *
    * @param scenario scenario that should be checked
    */
-  public void startVerification(VerificationScenario scenario);
+  public void startVerification(VerificationScenario scenario, ConstraintSpecification spec) throws
+      IOException, ExportException;
 
-  public OptionalProperty<VerificationResult> getVerificationResultProperty();
+  public OptionalProperty<VerificationResult> verificationResultProperty();
 
   public VerificationResult getVerificationResult();
 

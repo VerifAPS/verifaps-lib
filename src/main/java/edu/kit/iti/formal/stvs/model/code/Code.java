@@ -3,7 +3,6 @@ package edu.kit.iti.formal.stvs.model.code;
 import java.util.List;
 
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
-import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
@@ -11,6 +10,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
+
+import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -22,16 +24,16 @@ public class Code {
    * last valid parsed Code
    */
   private StringProperty filename;
-  private List<RecognitionException> syntaxErrors;
   private StringProperty sourceCodeProperty;
   private NullableProperty<ParsedCode> parsedCode;
   private List<? extends Token> tokens;
+  private List<SyntaxError> syntaxErrors;
 
   /**
    * creates a Dummy-Codefile
    */
   public Code() {
-    this("New Code", "");
+    this("", "");
   }
 
   public Code(String filename, String sourcecode) {
@@ -45,6 +47,7 @@ public class Code {
   private void invalidate() {
     ParsedCode.parseCode(sourceCodeProperty.get(),
         tokens -> this.tokens = tokens,
+        syntaxErrors -> this.syntaxErrors = syntaxErrors,
         parsedCode -> this.parsedCode.set(parsedCode));
   }
 
@@ -57,7 +60,7 @@ public class Code {
     return sourceCodeProperty.get();
   }
 
-  public List<RecognitionException> getSyntaxErrors() {
+  public List<SyntaxError> getSyntaxErrors() {
     return syntaxErrors;
   }
 
@@ -75,5 +78,9 @@ public class Code {
 
   public String getFilename() {
     return filename.get();
+  }
+
+  public void setFilename(String filename) {
+    this.filename.set(filename);
   }
 }

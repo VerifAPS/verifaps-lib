@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.config;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-
 /**
  * Configuration for table column. Contains GUI-related information about a column
  */
@@ -43,10 +41,17 @@ public class ColumnConfig {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof ColumnConfig)) return false;
-    if (obj == this) return true;
-    ColumnConfig other = (ColumnConfig) obj;
-    return width == other.width;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof ColumnConfig)) return false;
+
+    ColumnConfig that = (ColumnConfig) o;
+
+    return width == that.width;
+  }
+
+  @Override
+  public int hashCode() {
+    return width;
   }
 }

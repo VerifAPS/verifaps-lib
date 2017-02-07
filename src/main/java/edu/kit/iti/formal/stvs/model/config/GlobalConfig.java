@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.config;
 
 import javafx.beans.property.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -143,6 +144,10 @@ public class GlobalConfig {
     this.showLineNumbers.set(showLineNumbers);
   }
 
+  public List<String> getValidLanguages() {
+    return this.validLanguages;
+  }
+
   /**
    * Set the current UI language
    *
@@ -177,4 +182,57 @@ public class GlobalConfig {
     this.windowWidth.set(windowWidth);
   }
 
+  public IntegerProperty verificationTimeoutProperty() {
+    return this.verificationTimeout;
+  }
+
+  public IntegerProperty simulationTimeoutProperty() {
+    return simulationTimeout;
+  }
+
+  public IntegerProperty windowHeightProperty() {
+    return windowHeight;
+  }
+
+  public IntegerProperty windowWidthProperty() {
+    return windowWidth;
+  }
+
+  public IntegerProperty editorFontSizeProperty() {
+    return editorFontSize;
+  }
+
+  public StringProperty editorFontFamilyProperty() {
+    return editorFontFamily;
+  }
+
+  public boolean isShowLineNumbers() {
+    return showLineNumbers.get();
+  }
+
+  public BooleanProperty showLineNumbersProperty() {
+    return showLineNumbers;
+  }
+
+  public StringProperty uiLanguageProperty() {
+    return uiLanguage;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof GlobalConfig)) return false;
+    if (obj == this) return true;
+
+    GlobalConfig rhs = (GlobalConfig) obj;
+    return new EqualsBuilder().
+            append(verificationTimeout.get(), rhs.verificationTimeout.get()).
+            append(simulationTimeout.get(), rhs.simulationTimeout.get()).
+        append(editorFontFamily.get(), rhs.editorFontFamily.get()).
+        append(editorFontSize.get(), rhs.editorFontSize.get()).
+        append(showLineNumbers.get(), rhs.showLineNumbers.get()).
+        append(uiLanguage.get(), rhs.uiLanguage.get()).
+        append(windowHeight.get(), rhs.windowHeight.get()).
+        append(windowWidth.get(), rhs.windowWidth.get()).
+            isEquals();
+  }
 }

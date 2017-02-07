@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.model.expressions.parser;
 
+import edu.kit.iti.formal.stvs.model.code.SyntaxErrorListener;
 import edu.kit.iti.formal.stvs.model.expressions.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;

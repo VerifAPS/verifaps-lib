@@ -5,6 +5,8 @@ import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,7 +17,7 @@ import java.util.List;
  */
 public class StvsRootModel {
 
-  private List<HybridSpecification> hybridSpecifications;
+  private ObservableList<HybridSpecification> hybridSpecifications;
   private GlobalConfig globalConfig;
   private History history;
   private VerificationScenario scenario;
@@ -26,11 +28,12 @@ public class StvsRootModel {
    * and a default config.
    */
   public StvsRootModel() {
-    hybridSpecifications = new ArrayList<>();
-    globalConfig = new GlobalConfig();
-    history = new History();
-    scenario = new VerificationScenario();
-    workingdir = new File(System.getProperty("user.home"));
+    this(
+        FXCollections.observableArrayList(),
+        new GlobalConfig(),
+        new History(),
+        new VerificationScenario(),
+        new File(System.getProperty("user.home")));
   }
 
   /**
@@ -38,19 +41,19 @@ public class StvsRootModel {
    * @param hybridSpecifications
    * @param globalConfig
    * @param history
-   * @param code
+   * @param scenario
    * @param workingdir working-directory that should be used (e.g. for opening and saving)
    */
   public StvsRootModel(List<HybridSpecification> hybridSpecifications, GlobalConfig globalConfig,
-                       History history, Code code, File workingdir) {
-    this.hybridSpecifications = hybridSpecifications;
+                       History history, VerificationScenario scenario, File workingdir) {
+    this.hybridSpecifications = FXCollections.observableArrayList(hybridSpecifications);
     this.globalConfig = globalConfig;
     this.history = history;
-    this.scenario = new VerificationScenario(code);
+    this.scenario = scenario;
     this.workingdir = workingdir;
   }
 
-  public List<HybridSpecification> getHybridSpecifications() {
+  public ObservableList<HybridSpecification> getHybridSpecifications() {
     return hybridSpecifications;
   }
 

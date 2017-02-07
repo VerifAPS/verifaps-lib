@@ -3,14 +3,15 @@ package edu.kit.iti.formal.stvs.model.common;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 import javafx.beans.property.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
  * Created by csicar on 10.01.17.
  */
-public class FreeVariable {
+public class FreeVariable implements Variable {
   private final StringProperty name;
   private final ObjectProperty<Type> type;
-  private final ObjectProperty<Value> defaultValue;
+  private final NullableProperty<Value> defaultValue;
 
   /**
    * Creates a free variable with a name and type.
@@ -22,7 +23,7 @@ public class FreeVariable {
   public FreeVariable(String name, Type type) {
     this.name = new SimpleStringProperty(name);
     this.type = new SimpleObjectProperty<>(type);
-    this.defaultValue = new SimpleObjectProperty<>(type.generateDefaultValue());
+    this.defaultValue = new NullableProperty<>();
   }
 
   /**
@@ -40,7 +41,7 @@ public class FreeVariable {
     if (!defaultValue.getType().checksAgainst(type)) {
       throw new IllegalValueTypeException(defaultValue, type, "DefaultValue has wrong type.");
     }
-    this.defaultValue = new SimpleObjectProperty<>(defaultValue);
+    this.defaultValue = new NullableProperty<>(defaultValue);
   }
 
   public String getName() {
@@ -88,15 +89,14 @@ public class FreeVariable {
 
   /**
    * Sets the type of this variable.
-   * If the current value has a different type, the value is replaced with
-   * {@link Type#generateDefaultValue()}
+   * If the current default value has a different type, it is cleared.
    *
    * @param type New type for the free variable
    */
   public void setType(Type type) {
     this.type.set(type);
-    if (!this.defaultValue.get().getType().checksAgainst(type)) {
-      this.defaultValue.set(type.generateDefaultValue());
+    if (this.defaultValue.get() != null && !this.defaultValue.get().getType().checksAgainst(type)) {
+      this.defaultValue.set(null);
     }
   }
 
@@ -116,7 +116,7 @@ public class FreeVariable {
    *                                   of {@code defaultValue} does not match {@code type}
    */
   public void setDefaultValue(Value defaultValue) throws IllegalValueTypeException {
-    if (!defaultValue.getType().checksAgainst(this.type.get())) {
+    if (defaultValue != null && !defaultValue.getType().checksAgainst(this.type.get())) {
       throw new IllegalValueTypeException(defaultValue, this.type.get(), "Illegal Type:");
     }
     this.defaultValue.set(defaultValue);
@@ -129,5 +129,18 @@ public class FreeVariable {
         + ", type=" + type.get()
         + ", defaultValue=" + defaultValue.get()
         + '}';
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof FreeVariable)) return false;
+    if (obj == this) return true;
+
+    FreeVariable rhs = (FreeVariable) obj;
+    return new EqualsBuilder().
+            append(name.get(), rhs.name.get()).
+            append(type.get(), rhs.type.get()).
+            append(defaultValue.get(), rhs.defaultValue.get()).
+            isEquals();
   }
 }

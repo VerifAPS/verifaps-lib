@@ -1,24 +1,26 @@
 package edu.kit.iti.formal.stvs.model.common;
 
+import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.table.Commentable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
  * Created by csicar on 11.01.17.
  */
-public class SpecIoVariable extends IoVariable {
+public class SpecIoVariable extends IoVariable implements Commentable {
   private StringProperty name;
   private ObjectProperty<Type> type;
   private ObjectProperty<VariableCategory> category;
+  private ColumnConfig columnConfig;
+  private StringProperty comment;
 
   /**
    * Creates a variable that appears in the specification.
-   *
-   * @param category The category of the variable
+   *  @param category The category of the variable
    * @param type     The type of the variable
    * @param name     The name of the Variable
    */
@@ -26,6 +28,8 @@ public class SpecIoVariable extends IoVariable {
     this.category = new SimpleObjectProperty<>(category);
     this.type = new SimpleObjectProperty<>(type);
     this.name = new SimpleStringProperty(name);
+    this.columnConfig = new ColumnConfig();
+    this.comment = new SimpleStringProperty("");
   }
 
   public String getName() {
@@ -62,15 +66,53 @@ public class SpecIoVariable extends IoVariable {
     return category;
   }
 
+  public String toString() {
+    return "SpecIoVariable(" + category.get() + " " + name.get() + " : " + type.get().getTypeName() + ")";
+  }
+
+  public ColumnConfig getColumnConfig() {
+    return columnConfig;
+  }
+
+  public void setColumnConfig(ColumnConfig columnConfig) {
+    this.columnConfig = columnConfig;
+  }
+
   @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof SpecIoVariable)) return false;
-    if (obj == this) return true;
-    SpecIoVariable other = (SpecIoVariable) obj;
-    return new EqualsBuilder().
-        append(name.get(), other.name.get()).
-        append(type.get(), other.type.get()).
-        append(category.get(), other.category.get()).
-        isEquals();
+  public void setComment(String comment) {
+    this.comment.set(comment);
+  }
+
+  @Override
+  public String getComment() {
+    return this.comment.get();
+  }
+
+  @Override
+  public StringProperty commentProperty() {
+    return this.comment;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    SpecIoVariable that = (SpecIoVariable) o;
+
+    if (name != null ? !name.get().equals(that.name.get()) : that.name != null) return false;
+    if (type != null ? !type.get().equals(that.type.get()) : that.type != null) return false;
+    if (category != null ? !category.get().equals(that.category.get()) : that.category != null) return false;
+    return columnConfig != null ? columnConfig.equals(that.columnConfig) : that.columnConfig == null;
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = name != null ? name.hashCode() : 0;
+    result = 31 * result + (type != null ? type.hashCode() : 0);
+    result = 31 * result + (category != null ? category.hashCode() : 0);
+    result = 31 * result + (columnConfig != null ? columnConfig.hashCode() : 0);
+    return result;
   }
 }

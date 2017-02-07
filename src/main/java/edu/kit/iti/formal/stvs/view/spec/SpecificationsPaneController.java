@@ -10,22 +10,25 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TabPane;
 
 public class SpecificationsPaneController implements Controller {
-  public SpecificationsPaneController(ObservableList<HybridSpecification> hybridSpecifications, ObjectProperty<VerificationState> state, GlobalConfig globalConfig) {
-  }
 
   private GlobalConfig globalConfig;
   private ObservableList<HybridSpecification> hybridSpecifications;
-
-  public ObservableList<HybridSpecification> getHybridSpecifications() {
-    return null;
-  }
-
   private TabPane view;
   private ContextMenu contextMenu;
 
+  public SpecificationsPaneController(
+      ObservableList<HybridSpecification> hybridSpecifications,
+      ObjectProperty<VerificationState> state,
+      GlobalConfig globalConfig) {
+    this.view = new TabPane();
+  }
 
   public TabPane getView() {
     return view;
+  }
+
+  public ObservableList<HybridSpecification> getHybridSpecifications() {
+    return null;
   }
 
   private void addTab(HybridSpecification spec) {

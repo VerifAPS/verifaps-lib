@@ -1,0 +1,20 @@
+<test-table xmlns="http://formal.iti.kit.edu/exteta-1.0" version="1.0">
+    <variables>
+        <variable io="input" name="i" data-type="BOOLEAN"/>
+        <variable io="output" name="o" data-type="BOOLEAN"/>
+    </variables>
+    <steps>
+        <step duration="-">
+            <cell>TRUE</cell>
+            <cell>FALSE</cell>
+        </step>
+        <step duration="5">
+            <cell>-</cell>
+            <cell>!o[-1]</cell>
+        </step>
+        <step duration="-">
+            <cell>TRUE</cell>
+            <cell>FALSE</cell>
+        </step>
+     </steps>
+</test-table>

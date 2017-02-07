@@ -3,6 +3,11 @@
     -fx-font-weight: bold;
 }
 
+.syntax-error {
+    -fx-underline: true;
+   //TODO: red underline maybe dotted
+}
+
 .vardef {
     -fx-fill: darkgreen;
     -fx-font-weight: bold;

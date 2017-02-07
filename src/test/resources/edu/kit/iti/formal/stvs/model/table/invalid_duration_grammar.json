@@ -1,0 +1,24 @@
+{
+  "freevariables":[
+    { "name":"c", "type":"INT" }
+  ],
+  "variables":[
+    { "iotype":"INPUT", "name":"Counter", "type":"INT" },
+    { "iotype":"OUTPUT", "name":"Active", "type":"BOOL" }
+  ],
+
+  "expected_problems":[
+    "DurationParseProblem"
+  ],
+
+  "rows":[
+    "  0  | TRUE",
+    "> 10 | TRUE",
+    "  c  | FALSE"
+  ],
+  "durations":[
+    "[10,-]",
+    "1",
+    "c"
+  ]
+}

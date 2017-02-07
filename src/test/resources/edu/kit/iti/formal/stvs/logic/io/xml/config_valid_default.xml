@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><config xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml">
+  <general>
+    <uiLanguage>EN</uiLanguage>
+    <windowSize>
+      <width>800</width>
+      <height>600</height>
+    </windowSize>
+    <verificationTimeout>3600</verificationTimeout>
+    <simulationTimeout>60</simulationTimeout>
+  </general>
+  <editor>
+    <showLineNumbers>true</showLineNumbers>
+    <fontFamily>Courier</fontFamily>
+    <fontSize>12</fontSize>
+  </editor>
+</config>

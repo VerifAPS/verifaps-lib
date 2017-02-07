@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+
+<project xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://formal.iti.kit.edu/stvs/logic/io/xml ../verification_scenario.xsd">
+    <code>
+        <plaintext>I am some ST code!</plaintext>
+    </code>
+    <spec isConcrete="false">
+        <variables>
+            <ioVariable io="input" name="A" data-type="INT" colwidth="10"></ioVariable>
+            <ioVariable io="input" name="B" data-type="BOOL"
+                        comment="I am a column comment!"></ioVariable>
+            <ioVariable io="output" name="C" data-type="INT"></ioVariable>
+            <ioVariable io="output" name="D" data-type="enumD" colwidth="50"
+                        comment="I am another column comment!"></ioVariable>
+            <freeVariable name="p" data-type="INT" default="3"></freeVariable>
+        </variables>
+        <rows>
+            <row><!-- Hier ist die Reihenfolge der Cells wichtig! -->
+                <duration comment="I am a duration comment!">[1,5]</duration>
+                <cell comment="I am a cell comment!">5</cell>
+                <cell>FALSE</cell>
+                <cell>A+2</cell>
+                <cell comment="I am another cell comment!">literalOne</cell>
+            </row>
+            <row comment="I am a row comment!">
+                <duration>[1,1]</duration>
+                <cell>C[-1]</cell>
+                <cell>!B[-1]</cell>
+                <cell>A</cell>
+                <cell>literalTwo</cell>
+            </row>
+        </rows>
+        <enumTypes>
+            <enum name="enumD">
+                <literal>literalOne</literal>
+                <literal>literalTwo</literal>
+            </enum>
+        </enumTypes>
+    </spec>
+    <testResult isConcrete="true" isCounterExample="true">
+        <variables>
+            <ioVariable io="input" name="A" data-type="INT" colwidth="10"></ioVariable>
+            <ioVariable io="input" name="B" data-type="BOOL"
+                        comment="I am a column comment!"></ioVariable>
+            <ioVariable io="output" name    ="C" data-type="INT"></ioVariable>
+            <ioVariable io="output" name="D" data-type="enumD" colwidth="50"
+                        comment="I am another column comment!"></ioVariable>
+            <freeVariable name="p" data-type="INT" default="3"></freeVariable>
+        </variables>
+        <rows>
+            <row>
+                <duration comment="I am a duration comment!">2</duration>
+                <cycle>
+                    <cell>1</cell>
+                    <cell>FALSE</cell>
+                    <cell>3</cell>
+                    <cell>literalOne</cell>
+                </cycle>
+                <cycle>
+                    <cell>4</cell>
+                    <cell>FALSE</cell>
+                    <cell>8</cell>
+                    <cell>literalTwo</cell>
+                </cycle>
+            </row>
+            <row comment="I am a row comment!">
+                <duration>1</duration>
+                <cycle>
+                    <cell>3</cell>
+                    <cell>TRUE</cell>
+                    <cell>1</cell>
+                    <cell>literalTwo</cell>
+                </cycle>
+            </row>
+        </rows>
+        <enumTypes>
+            <enum name="enumD">
+                <literal>literalOne</literal>
+                <literal>literalTwo</literal>
+            </enum>
+        </enumTypes>
+    </testResult>
+</project>

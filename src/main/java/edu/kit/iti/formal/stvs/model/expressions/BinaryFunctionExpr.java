@@ -1,5 +1,8 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 /**
  * The runtime-representation for parsed, binary function expressions.
  * Examples are: +, -, =, AND, OR, etc. Anything that has two arguments.

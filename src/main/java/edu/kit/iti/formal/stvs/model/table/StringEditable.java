@@ -5,7 +5,7 @@ import javafx.beans.property.StringProperty;
 /**
  * @author Benjamin Alt
  */
-public interface StringEditable {
+public interface StringEditable extends StringReadable {
 
   String getAsString();
 

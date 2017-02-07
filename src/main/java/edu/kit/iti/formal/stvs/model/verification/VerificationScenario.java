@@ -1,13 +1,17 @@
 package edu.kit.iti.formal.stvs.model.verification;
 
+import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.verification.GeTeTaVerificationEngine;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.logic.verification.VerificationEngine;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+
+import java.io.IOException;
 
 /**
  * @author Benjamin Alt
@@ -16,35 +20,32 @@ public class VerificationScenario {
   private OptionalProperty<VerificationResult> verificationResult;
   private VerificationEngine verificationEngine;
   private Code code;
-  private VerificationState verificationState;
+  private ObjectProperty<VerificationState> verificationState;
 
   public VerificationScenario() {
-    code = new Code();
-    verificationResult = new OptionalProperty<>(new SimpleObjectProperty<>());
-    verificationEngine = new GeTeTaVerificationEngine();
-    verificationEngine.getVerificationResultProperty().addListener(new
-        VerificationChangedListener());
-    verificationState = VerificationState.NOT_STARTED;
+    this(new Code());
   }
 
   public VerificationScenario(Code code) {
     this.code = code;
-    verificationEngine.getVerificationResultProperty().addListener(new
+    verificationResult = new OptionalProperty<>(new SimpleObjectProperty<>());
+    verificationEngine = new GeTeTaVerificationEngine();
+    verificationEngine.verificationResultProperty().addListener(new
         VerificationChangedListener());
-    verificationState = VerificationState.NOT_STARTED;
+    verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
   }
 
-  public void verify(ConstraintSpecification spec) {
-    verificationEngine.startVerification(this);
-    verificationState = VerificationState.RUNNING;
+  public void verify(ConstraintSpecification spec) throws IOException, ExportException {
+    verificationEngine.startVerification(this, spec);
+    verificationState.set(VerificationState.RUNNING);
   }
 
   public void cancel() {
     verificationEngine.cancelVerification();
-    verificationState = VerificationState.CANCELLED;
+    verificationState.set(VerificationState.CANCELLED);
   }
 
-  public VerificationState getVerificationState() {
+  public ObjectProperty<VerificationState> verificationState() {
     return verificationState;
   }
 
@@ -69,7 +70,7 @@ public class VerificationScenario {
     public void changed(ObservableValue<? extends VerificationResult> observableValue,
         VerificationResult oldResult, VerificationResult newResult) {
       verificationResult.set(newResult);
-      verificationState = VerificationState.FINISHED;
+      verificationState.set(VerificationState.FINISHED);
     }
   }
 }

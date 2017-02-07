@@ -1,10 +1,9 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.model.common.VariableCategory;
-import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
-import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
-import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import com.google.gson.JsonElement;
+import edu.kit.iti.formal.stvs.model.expressions.*;
+import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
+import edu.kit.iti.formal.stvs.view.spec.SpecificationTab;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,35 +16,54 @@ import static junit.framework.TestCase.assertEquals;
 
 /**
  * @author Benjamin Alt
+ * @author Philipp
  */
 public class ConcreteSpecificationTest {
 
   private ConcreteSpecification concreteSpec;
 
   @Before
-  public void setUp() {
-    SpecIoVariable variableA = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableA");
-    SpecIoVariable variableB = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableB");
-    SpecIoVariable variableC = new SpecIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableC");
-    SpecIoVariable variableD = new SpecIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "VariableD");
-    List<ConcreteCell> concreteCellsA = Arrays.asList(new ConcreteCell(new ValueInt(3)), new ConcreteCell(new ValueInt(2)), new ConcreteCell(new ValueInt(4)), new ConcreteCell(new ValueInt(5)));
-    List<ConcreteCell> concreteCellsB = Arrays.asList(new ConcreteCell(new ValueInt(-2)), new ConcreteCell(new ValueInt(3)), new ConcreteCell(new ValueInt(5)), new ConcreteCell(new ValueInt(1)));
-    List<ConcreteCell> concreteCellsC = Arrays.asList(new ConcreteCell(new ValueInt(-10)), new ConcreteCell(new ValueInt(1)), new ConcreteCell(new ValueInt(100)), new ConcreteCell(new ValueInt(4)));
-    List<ConcreteCell> concreteCellsD = Arrays.asList(new ConcreteCell(new ValueInt(20)), new ConcreteCell(new ValueInt(1)), new ConcreteCell(new ValueInt(-3)), new ConcreteCell(new ValueInt(3)));
-    HashMap<String, SpecificationColumn<ConcreteCell>> counterexampleColumns = new HashMap<>();
-    counterexampleColumns.put("VariableA", new SpecificationColumn<>(variableA, concreteCellsA, new ColumnConfig()));
-    counterexampleColumns.put("VariableB", new SpecificationColumn<>(variableB, concreteCellsB, new ColumnConfig()));
-    counterexampleColumns.put("VariableC", new SpecificationColumn<>(variableC, concreteCellsC, new ColumnConfig()));
-    counterexampleColumns.put("VariableD", new SpecificationColumn<>(variableD, concreteCellsD, new ColumnConfig()));
-    List<ConcreteDuration> counterexampleDurations = Arrays.asList(new ConcreteDuration(0, 1),
-        new ConcreteDuration(1, 2), new ConcreteDuration(3, 1));
-    concreteSpec = new ConcreteSpecification(counterexampleColumns, counterexampleDurations, true);
+  public void setUp() throws Exception {
+    JsonElement json = TableUtil.jsonFromResource("concrete_spec.json", ConcreteSpecificationTest.class);
+    SpecificationTable<String, String> stringTable =
+        TableUtil.specificationTableFromJson(json);
+    concreteSpec = new ConcreteSpecification(false);
+
+    concreteSpec.getSpecIoVariables().addAll(stringTable.getSpecIoVariables());
+
+    int currentBeginCycle = 0;
+    for (String durationString : stringTable.getDurations()) {
+      int duration = Integer.parseInt(durationString);
+      concreteSpec.getDurations().add(new ConcreteDuration(currentBeginCycle, duration));
+      currentBeginCycle += duration;
+    }
+
+    ExpressionParser parser = new ExpressionParser("");
+
+    for (SpecificationRow<String> row : stringTable.getRows()) {
+      Map<String, ConcreteCell> cells = new HashMap<>();
+      for (Map.Entry<String, String> stringEntry : row.getCells().entrySet()) {
+        Expression parsedExpr = parser.parseExpression(stringEntry.getValue());
+        // Expressions should be of the form: columnName = 123
+        // So we take the BinExpr apart and extract the Value from the second arg
+        BinaryFunctionExpr binF = (BinaryFunctionExpr) parsedExpr;
+        Value value = ((LiteralExpr) binF.getSecondArgument()).getValue();
+        cells.put(stringEntry.getKey(), new ConcreteCell(value));
+      }
+      concreteSpec.getRows().add(new SpecificationRow<>(cells));
+    }
   }
 
   @Test
   public void testConcreteValuesForConstraint() {
-    List<ConcreteCell> expectedCells = Arrays.asList(new ConcreteCell(new ValueInt(3)), new
-        ConcreteCell(new ValueInt(5)));
-    assertEquals(expectedCells, concreteSpec.getConcreteValuesForConstraint("VariableB", 1));
+    List<ConcreteCell> expectedCells = Arrays.asList(
+        new ConcreteCell(new ValueInt(1)),
+        new ConcreteCell(new ValueInt(2)),
+        new ConcreteCell(new ValueInt(3)),
+        new ConcreteCell(new ValueInt(4))
+    );
+    assertEquals(
+        expectedCells,
+        concreteSpec.getConcreteValuesForConstraintRow("A", 1));
   }
 }

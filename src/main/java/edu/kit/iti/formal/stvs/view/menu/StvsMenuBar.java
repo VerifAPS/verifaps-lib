@@ -17,7 +17,12 @@ public class StvsMenuBar extends MenuBar {
   public Menu view;
   public Menu help;
 
+  public Menu openOther;
+
   public MenuItem open;
+  public MenuItem openSpec;
+  public MenuItem openCode;
+  public MenuItem openSession;
   public MenuItem saveCode;
   public MenuItem saveSpec;
   public MenuItem saveAll;
@@ -33,19 +38,26 @@ public class StvsMenuBar extends MenuBar {
     //create menu-items
     open = new MenuItem("Open");
     open.setAccelerator(KeyCombination.keyCombination("Ctrl+o"));
+    openOther = new Menu("Open ...");
+    openSpec = new MenuItem("Open Specification");
+    openCode = new MenuItem("Open Code");
+    openSession = new MenuItem("Open Session");
+
 
     saveCode = new MenuItem("Save Code");
     saveSpec = new MenuItem("Save Specification");
 
     saveAll = new MenuItem("Save all");
-    saveAll.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+s"));
+    saveAll.setAccelerator(KeyCombination.keyCombination("Ctrl+s"));
 
     config = new MenuItem("Configuration");
     config.setAccelerator(KeyCombination.keyCombination("Ctrl+,"));
 
 
     //add menu-items to
-    file.getItems().addAll(open, saveCode, saveSpec, saveAll, (new SeparatorMenuItem()), config);
+    openOther.getItems().addAll(openSpec, openCode, openSession);
+    file.getItems().addAll(open, openOther, saveCode, saveSpec, saveAll, (new
+        SeparatorMenuItem()), config);
 
     //add menus to itself
     this.getMenus().addAll(file, edit, view, help);

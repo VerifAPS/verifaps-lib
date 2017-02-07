@@ -60,4 +60,9 @@ public class ValueInt implements Value {
   public Type getType() {
     return TypeInt.INT;
   }
+
+  @Override
+  public String getValueString() {
+    return Integer.toString(getValue());
+  }
 }
