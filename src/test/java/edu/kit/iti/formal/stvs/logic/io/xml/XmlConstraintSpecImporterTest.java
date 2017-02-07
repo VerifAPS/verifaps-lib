@@ -9,6 +9,7 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecificationTest;
 import edu.kit.iti.formal.stvs.model.table.TableUtil;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import org.junit.Before;
@@ -16,6 +17,9 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -39,12 +43,15 @@ public class XmlConstraintSpecImporterTest {
     JsonElement testjson = TableUtil.jsonFromResource("valid_table.json",
         ConstraintSpecificationTest.class);
 
-    ObservableSet<CodeIoVariable> codeIoVariables = FXCollections.observableSet();
+    List<CodeIoVariable> codeIoVariables = Collections.emptyList();
 
-    ObservableSet<Type> typeContext = FXCollections.observableSet(TypeInt.INT, TypeBool.BOOL);
+    List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
 
     ConstraintSpecification expectedSpec =
-        TableUtil.constraintTableFromJson(typeContext, codeIoVariables, testjson);
+        TableUtil.constraintTableFromJson(
+            new SimpleObjectProperty<>(typeContext),
+            new SimpleObjectProperty<>(codeIoVariables),
+            testjson);
     assertEquals(expectedSpec, importedSpec);
   }
 

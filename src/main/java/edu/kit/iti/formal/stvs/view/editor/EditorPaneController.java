@@ -116,6 +116,9 @@ public class EditorPaneController implements Controller {
       case IEC61131Lexer.CASE:
       case IEC61131Lexer.END_CASE:
         return listOf("keyword");
+      case IEC61131Lexer.INT:
+      case IEC61131Lexer.BOOL:
+        return listOf("type");
       case IEC61131Lexer.INTEGER_LITERAL:
         return listOf("number");
       case IEC61131Lexer.STRING_LITERAL:

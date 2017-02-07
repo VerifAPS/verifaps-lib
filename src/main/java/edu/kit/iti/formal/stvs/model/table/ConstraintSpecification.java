@@ -20,10 +20,7 @@ import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableSet;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Benjamin Alt
@@ -31,8 +28,8 @@ import java.util.Map;
 public class ConstraintSpecification extends SpecificationTable<ConstraintCell, ConstraintDuration> implements Commentable {
 
   private final ObjectProperty<List<SpecProblem>> problems;
-  private final ObservableSet<Type> typeContext;
-  private final ObservableSet<CodeIoVariable> codeIoVariables;
+  private final ObjectProperty<List<Type>> typeContext;
+  private final ObjectProperty<List<CodeIoVariable>> codeIoVariables;
   private final FreeVariableSet freeVariableSet;
   private final StringProperty comment;
   private final NullableProperty<ValidSpecification> validSpecification;
@@ -40,8 +37,8 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
   private final Map<SpecificationRow<ConstraintCell>, RowChangeListener> registeredRowListeners;
   private final DurationsChangeListener registeredDurationsListener;
 
-  public ConstraintSpecification(ObservableSet<Type> typeContext,
-                                 ObservableSet<CodeIoVariable> ioVariables,
+  public ConstraintSpecification(ObjectProperty<List<Type>> typeContext,
+                                 ObjectProperty<List<CodeIoVariable>> ioVariables,
                                  FreeVariableSet freeVariableSet) {
     super();
 
@@ -60,15 +57,23 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     this.registeredDurationsListener = new DurationsChangeListener();
   }
 
-  public ObservableSet<Type> getTypeContext() {
+  public ObjectProperty<List<Type>> typeContextProperty() {
     return typeContext;
+  }
+
+  public List<Type> getTypeContext() {
+    return typeContext.get();
   }
 
   public FreeVariableSet getFreeVariableSet() {
     return freeVariableSet;
   }
 
-  public ObservableSet<CodeIoVariable> getCodeIoVariables() {
+  public List<CodeIoVariable> getCodeIoVariables() {
+    return codeIoVariables.get();
+  }
+
+  public ObjectProperty<List<CodeIoVariable>> codeIoVariablesProperty() {
     return codeIoVariables;
   }
 
@@ -113,7 +118,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
     for (SpecIoVariable specIoVariable : getSpecIoVariables()) {
       // Check column header for problem
-      InvalidIoVarProblem.checkForProblem(specIoVariable, codeIoVariables)
+      InvalidIoVarProblem.checkForProblem(specIoVariable, codeIoVariables.get())
           .ifPresent(specProblems::add);
     }
 
@@ -183,7 +188,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
   protected Expression createValidExpressionFromCell(String columnId, ConstraintCell cell)
       throws TypeCheckException, ParseException, UnsupportedExpressionException {
     // First try to parse the expression:
-    ExpressionParser parser = new ExpressionParser(columnId, typeContext);
+    ExpressionParser parser = new ExpressionParser(columnId, getTypeContext());
     Expression expression = parser.parseExpression(cell.getAsString());
 
     HashMap<String, Type> allTypes = new HashMap<>();
