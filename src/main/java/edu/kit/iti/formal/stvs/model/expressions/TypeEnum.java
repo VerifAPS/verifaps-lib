@@ -14,6 +14,7 @@ public class TypeEnum implements Type {
 
   private final String enumTypeName;
   private final Map<String, ValueEnum> valueMap;
+  private final List<ValueEnum> valueList;
 
   /**
    * Create a new enum-type. This should only happen, when
@@ -28,8 +29,11 @@ public class TypeEnum implements Type {
   public TypeEnum(String enumTypeName, List<String> values) {
     this.enumTypeName = enumTypeName;
     this.valueMap = new HashMap<>();
+    this.valueList = new ArrayList<>();
     values.forEach((valueName) -> {
-      valueMap.put(valueName, new ValueEnum(valueName, this));
+      ValueEnum valueEnum = new ValueEnum(valueName, this);
+      valueMap.put(valueName, valueEnum);
+      valueList.add(valueEnum);
     });
   }
 
@@ -68,8 +72,8 @@ public class TypeEnum implements Type {
     return valueMap.values().iterator().next();
   }
 
-  public Collection<ValueEnum> getValues() {
-    return valueMap.values();
+  public List<ValueEnum> getValues() {
+    return valueList;
   }
 
   public ValueEnum valueOf(String enumName) {

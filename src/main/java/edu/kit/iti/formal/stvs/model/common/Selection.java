@@ -59,6 +59,11 @@ public class Selection {
     this.row.set(row);
   }
 
+  public void clear(){
+    column.clear();
+    row.clear();
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
