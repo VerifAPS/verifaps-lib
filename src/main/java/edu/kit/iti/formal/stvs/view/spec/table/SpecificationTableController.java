@@ -1,18 +1,31 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
+import edu.kit.iti.formal.stvs.logic.io.xml.Rows;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.*;
+import edu.kit.iti.formal.stvs.model.table.problems.CellProblem;
+import edu.kit.iti.formal.stvs.model.table.problems.DurationProblem;
+import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.util.converter.DefaultStringConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +39,8 @@ import java.util.stream.Collectors;
  */
 public class SpecificationTableController implements Controller {
 
+  private static final String DURATION_COL_USER_DATA = "__ duration column";
+
   private final TableView<SynchronizedRow> tableView;
   private final HybridSpecification hybridSpec;
 
@@ -38,8 +53,8 @@ public class SpecificationTableController implements Controller {
                                       FreeVariableSet freeVariableSet) {
     this.tableView = new TableView<>();
     this.hybridSpec = new HybridSpecification(typeContext, codeIoVariables, freeVariableSet, true);
-    this.durations = createColumn("Duration", SynchronizedRow::getDuration);
-    this.columnContextMenu = createColumnContextMenu();
+    this.durations = createViewColumn(DURATION_COL_USER_DATA, "Duration", SynchronizedRow::getDuration);
+    this.columnContextMenu = createColumnEditingContextMenu();
 
     durations.setContextMenu(columnContextMenu);
     tableView.getColumns().add(durations);
@@ -51,7 +66,51 @@ public class SpecificationTableController implements Controller {
 
     data.addListener(this::onDataRowChanged);
 
-    createTableContextMenu();
+    tableView.setContextMenu(createRowEditingContextMenu());
+
+    tableView.getStylesheets().add(SpecificationTableController.class.getResource("style.css").toExternalForm());
+  }
+
+  private TableCell<SynchronizedRow, String> cellFactory(TableColumn<SynchronizedRow, String> table) {
+    return new TextFieldTableCell<SynchronizedRow, String>(new DefaultStringConverter()) {
+      private final WeakInvalidationListener onProblemChangeListener;
+      private final Paint normalTextFill;
+      {
+        normalTextFill = getTextFill();
+        onProblemChangeListener = new WeakInvalidationListener(observable -> this.onProblemsChanged());
+        hybridSpec.problemsProperty().addListener(onProblemChangeListener);
+        getStyleClass().add("spec-cell");
+      }
+
+      private void onProblemsChanged() {
+        if (!isEmpty()) {
+          List<SpecProblem> problems = hybridSpec.getProblems();
+          for (SpecProblem problem : problems) {
+            if (problem instanceof CellProblem) {
+              CellProblem cellProblem = (CellProblem) problem;
+              String col = cellProblem.getColumn();
+              if (col.equals(getTableColumn().getUserData()) && cellProblem.getRow() == getTableRow().getIndex()) {
+                getStyleClass().remove("spec-cell-problem");
+                getStyleClass().add("spec-cell-problem");
+                setTextFill(Color.RED);
+                return;
+              }
+            } else if (problem instanceof DurationProblem) {
+              DurationProblem durationProblem = (DurationProblem) problem;
+              if (DURATION_COL_USER_DATA.equals(getTableColumn().getUserData()) && durationProblem.getRow() == getTableRow().getIndex()) {
+                getStyleClass().remove("spec-cell-problem");
+                getStyleClass().add("spec-cell-problem");
+                setTextFill(Color.RED);
+                return;
+              }
+            }
+          }
+        }
+        setTextFill(normalTextFill);
+        getStyleClass().remove("spec-cell-problem");
+      }
+
+    };
   }
 
   private void onDataRowChanged(ListChangeListener.Change<? extends SynchronizedRow> change) {
@@ -74,7 +133,7 @@ public class SpecificationTableController implements Controller {
     }
   }
 
-  private void createTableContextMenu() {
+  private ContextMenu createRowEditingContextMenu() {
     MenuItem insertRow = new MenuItem("Insert Row");
     MenuItem deleteRow = new MenuItem("Delete Row");
     insertRow.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
@@ -85,9 +144,18 @@ public class SpecificationTableController implements Controller {
     deleteRow.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
     deleteRow.setOnAction(event ->
       data.removeAll(tableView.getSelectionModel().getSelectedItems()));
-    ContextMenu globalCM = new ContextMenu(insertRow, deleteRow);
+    return new ContextMenu(insertRow, deleteRow);
+  }
 
-    tableView.setContextMenu(globalCM);
+  private ContextMenu createColumnEditingContextMenu() {
+    ContextMenu menu = new ContextMenu();
+    MenuItem addNewColumn = new MenuItem("New Column...");
+    addNewColumn.setOnAction(event ->
+        new IoVariableNameDialog(hybridSpec.typeContextProperty(), hybridSpec.codeIoVariablesProperty())
+          .showAndWait()
+          .ifPresent(this::addNewColumn));
+    menu.getItems().addAll(addNewColumn);
+    return menu;
   }
 
   public void addEmptyRow(int index) {
@@ -98,19 +166,7 @@ public class SpecificationTableController implements Controller {
     data.add(index, new SynchronizedRow(wildcardRow, new ConstraintDuration("-")));
   }
 
-  private ContextMenu createColumnContextMenu() {
-    ContextMenu menu = new ContextMenu();
-    MenuItem addNewColumn = new MenuItem("New Column...");
-    addNewColumn.setOnAction(event -> {
-      new IoVariableNameDialog(hybridSpec.typeContextProperty(), hybridSpec.codeIoVariablesProperty())
-          .showAndWait()
-          .ifPresent(this::addColumn);
-    });
-    menu.getItems().addAll(addNewColumn);
-    return menu;
-  }
-
-  public void addColumn(SpecIoVariable specIoVariable) {
+  public void addNewColumn(SpecIoVariable specIoVariable) {
     // Add column to model:
     if (data.isEmpty()) {
       hybridSpec.getSpecIoVariables().add(specIoVariable);
@@ -121,28 +177,32 @@ public class SpecificationTableController implements Controller {
     }
 
     // Add column to view:
-    addNewColumn(specIoVariable.getName());
+    addColumnToView(specIoVariable);
   }
 
-  private void addNewColumn(final String columnName) {
+  private void addColumnToView(final SpecIoVariable specIoVariable) {
     tableView.getColumns().add(0,
-        createColumn(
-            columnName,
-            synchronizedRow -> synchronizedRow.getCells().get(columnName))
+        createViewColumn(
+            specIoVariable.getName(),
+            specIoVariable.getVarDescriptor(),
+            synchronizedRow -> synchronizedRow.getCells().get(specIoVariable.getName()))
     );
     tableView.refresh();
   }
 
-  private TableColumn<SynchronizedRow, String> createColumn(
+  private TableColumn<SynchronizedRow, String> createViewColumn(
+      String colIndex,
       String colName,
       final Function<SynchronizedRow, HybridCellModel> extractCellFromRow) {
     TableColumn<SynchronizedRow, String> column = new TableColumn<>(colName);
     column.setSortable(false);
     column.setEditable(true);
-    column.setPrefWidth(100);
+    column.setPrefWidth(150);
     column.setContextMenu(columnContextMenu);
+    column.setCellFactory(this::cellFactory);
+    column.setUserData(colIndex);
 
-    column.setCellFactory(TextFieldTableCell.forTableColumn());
+    //column.setCellFactory(TextFieldTableCell.forTableColumn());
     column.setCellValueFactory(rowModelData ->
         extractCellFromRow.apply(rowModelData.getValue())
             .stringRepresentationProperty());
@@ -206,7 +266,7 @@ public class SpecificationTableController implements Controller {
   }
 
   @Override
-  public TableView getView() {
+  public TableView<SynchronizedRow> getView() {
     return tableView;
   }
 

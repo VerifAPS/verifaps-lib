@@ -18,7 +18,7 @@ public class ListTypeConverter {
 
   public static <E> ObservableList<E> makeObservableList(ObjectProperty<List<E>> list) {
     ObservableList<E> observableList = FXCollections.observableList(list.get());
-    list.addListener((observableValue, newList, oldList) -> {
+    list.addListener((observableValue, oldList, newList) -> {
       observableList.clear();
       observableList.addAll(newList);
     });

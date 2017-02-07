@@ -41,9 +41,9 @@ public class SpecificationTableTest {
   private List<Node> simpleTableScene() {
     List<Type> types = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
     List<CodeIoVariable> codeIoVariables = Arrays.asList(
-        new CodeIoVariable(VariableCategory.INPUT, TypeBool.BOOL, "InputA"),
-        new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "InputB"),
-        new CodeIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "OutputA")
+        new CodeIoVariable(VariableCategory.INPUT, TypeBool.BOOL, "A"),
+        new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "B"),
+        new CodeIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "C")
     );
     SpecificationTableController table = new SpecificationTableController(
         new SimpleObjectProperty<>(types),

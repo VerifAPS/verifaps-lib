@@ -14,13 +14,13 @@ public class SynchronizedRow extends SpecificationRow<HybridCellModel<Constraint
   private static Map<String, HybridCellModel<ConstraintCell>> createCellsFromRow(SpecificationRow<ConstraintCell> subscribingRow, ConstraintDuration duration) {
     Map<String, HybridCellModel<ConstraintCell>> cells = new HashMap<>();
     for (Map.Entry<String, ConstraintCell> entry : subscribingRow.getCells().entrySet()) {
-      cells.put(entry.getKey(), bindCell(entry.getValue()));
+      cells.put(entry.getKey(), bindCell(entry.getKey(), entry.getValue()));
     }
     return cells;
   }
 
-  private static <C extends CellOperationProvider> HybridCellModel<C> bindCell(C cell) {
-    return new HybridCellModel<>(cell);
+  private static <C extends CellOperationProvider> HybridCellModel<C> bindCell(String column, C cell) {
+    return new HybridCellModel<>(column, cell);
   }
 
   private final HybridCellModel<ConstraintDuration> durationCell;
@@ -29,7 +29,7 @@ public class SynchronizedRow extends SpecificationRow<HybridCellModel<Constraint
   public SynchronizedRow(SpecificationRow<ConstraintCell> sourceRow, ConstraintDuration duration) {
     super(createCellsFromRow(sourceRow, duration));
     this.sourceRow = sourceRow;
-    this.durationCell = bindCell(duration);
+    this.durationCell = bindCell("Duration", duration);
     // Create bindings to all other stuff
     this.commentProperty().bindBidirectional(sourceRow.commentProperty());
     sourceRow.getCells().addListener(this::onCellChanges);
@@ -37,7 +37,7 @@ public class SynchronizedRow extends SpecificationRow<HybridCellModel<Constraint
 
   protected void onCellChanges(MapChangeListener.Change<? extends String, ? extends ConstraintCell> change) {
     if (change.wasAdded()) {
-      getCells().put(change.getKey(), bindCell(change.getValueAdded()));
+      getCells().put(change.getKey(), bindCell(change.getKey(), change.getValueAdded()));
     }
     if (change.wasRemoved()) {
       getCells().remove(change.getKey());

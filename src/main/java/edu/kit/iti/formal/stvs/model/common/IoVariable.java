@@ -19,4 +19,8 @@ public abstract class IoVariable implements Variable {
         && getType().checksAgainst(other.getType())
         && getCategory() == other.getCategory();
   }
+
+  public String getVarDescriptor() {
+    return getCategory() + " " + getName() + " : " + getType().getTypeName();
+  }
 }
