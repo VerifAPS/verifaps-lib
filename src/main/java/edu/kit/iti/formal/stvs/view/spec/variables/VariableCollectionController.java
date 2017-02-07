@@ -5,7 +5,9 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.IllegalValueTypeException;
 import edu.kit.iti.formal.stvs.model.expressions.*;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
+import edu.kit.iti.formal.stvs.util.ListTypeConverter;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -18,6 +20,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.util.StringConverter;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -25,14 +28,15 @@ import java.util.Set;
  */
 public class VariableCollectionController implements Controller {
 
-  private ObservableList<Type> codeTypes;
+  private ObjectProperty<List<Type>> codeTypes;
   private FreeVariableSet freeVariableSet;
   private VariableCollection view;
   // was used for drag n drop: private int latestMouseOverRow = 0;
 
   private ContextMenu contextMenu;
 
-  public VariableCollectionController(ObservableList<Type> codeTypes, FreeVariableSet freeVariableSet) {
+  public VariableCollectionController(ObjectProperty<List<Type>> codeTypes, FreeVariableSet
+      freeVariableSet) {
     this.codeTypes = codeTypes;
     this.freeVariableSet = freeVariableSet;
 
@@ -71,11 +75,12 @@ public class VariableCollectionController implements Controller {
     view.getTypeTableColumn().setCellValueFactory(data -> data.getValue().typeProperty());
     view.getDefaultValueTableColumn().setCellValueFactory(data -> data.getValue().defaultValueProperty());
 
+    ObservableList<Type> codeTypesList = ListTypeConverter.makeObservableList(codeTypes);
     view.getNameTableColumn().setCellFactory(TextFieldTableCell.forTableColumn());
     view.getTypeTableColumn().setCellFactory(
-        ComboBoxTableCell.forTableColumn(createTypeConverter(codeTypes), codeTypes));
+        ComboBoxTableCell.forTableColumn(createTypeConverter(codeTypesList), codeTypesList));
     view.getDefaultValueTableColumn().setCellFactory(
-        TextFieldTableCell.forTableColumn(createDefaultValueConverter(codeTypes)));
+        TextFieldTableCell.forTableColumn(createDefaultValueConverter(codeTypesList)));
 
     view.getNameTableColumn().setOnEditCommit(event -> {
       String proposedName = event.getNewValue();

@@ -3,12 +3,14 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.scene.Node;
@@ -24,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -37,13 +40,16 @@ public class SpecificationTableTest {
   }
 
   private List<Node> simpleTableScene() {
-    ObservableSet<Type> types = FXCollections.observableSet(TypeInt.INT, TypeBool.BOOL);
-    ObservableSet<CodeIoVariable> codeIoVariables = FXCollections.observableSet();
-    SpecificationTableController table = new SpecificationTableController(types, codeIoVariables, new FreeVariableSet());
-
-    table.addColumn(VariableCategory.INPUT, "A");
-    table.addColumn(VariableCategory.INPUT, "B");
-    table.addColumn(VariableCategory.OUTPUT, "C");
+    List<Type> types = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
+    List<CodeIoVariable> codeIoVariables = Arrays.asList(
+        new CodeIoVariable(VariableCategory.INPUT, TypeBool.BOOL, "InputA"),
+        new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "InputB"),
+        new CodeIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "OutputA")
+    );
+    SpecificationTableController table = new SpecificationTableController(
+        new SimpleObjectProperty<>(types),
+        new SimpleObjectProperty<>(codeIoVariables),
+        new FreeVariableSet());
 
     Pane extractedTablePane = createExtractedTableTextArea(table.getData());
 

@@ -58,7 +58,7 @@ public class ValueEnum implements Value {
   }
 
   @Override
-  public Type getType() {
+  public TypeEnum getType() {
     return enumType;
   }
 

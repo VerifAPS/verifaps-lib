@@ -5,10 +5,7 @@ import edu.kit.iti.formal.stvs.model.expressions.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class parses Expressions using the ANTLR parser generator library.
@@ -39,13 +36,13 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
    *                    an occuring string in an expression is
    *                    an enum-literal.
    */
-  public ExpressionParser(String columnName, Set<Type> typeContext) {
+  public ExpressionParser(String columnName, Collection<Type> typeContext) {
     this.columnName = columnName;
     this.columnAsVariable = new VariableExpr(columnName);
     this.enumValues = computeEnumValuesByName(typeContext);
   }
 
-  private Map<String, ValueEnum> computeEnumValuesByName(Set<Type> typeSet) {
+  private Map<String, ValueEnum> computeEnumValuesByName(Collection<Type> typeSet) {
     Map<String, ValueEnum> byName = new HashMap<>();
     typeSet.stream()
         .map(this::filterEnumType)

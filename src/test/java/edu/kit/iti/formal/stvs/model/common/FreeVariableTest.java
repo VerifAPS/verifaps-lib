@@ -21,7 +21,6 @@ public class FreeVariableTest {
     FreeVariable testVar2 = new FreeVariable("testVar2", TypeInt.INT, new ValueInt(1233));
     assertTrue(testVar1.getType().checksAgainst(TypeBool.BOOL));
     assertEquals("testVar1", testVar1.getName());
-    assertEquals(TypeBool.BOOL.generateDefaultValue(), testVar1.getDefaultValue());
     assertEquals(new ValueInt(1233), testVar2.getDefaultValue());
   }
 
@@ -30,6 +29,7 @@ public class FreeVariableTest {
     //Tests if the value is set to types default value in case of type mismatch
     FreeVariable var = new FreeVariable("testVar2", TypeInt.INT, new ValueInt(1233));
     var.setType(TypeBool.BOOL);
+    var.setDefaultValue(TypeBool.BOOL.generateDefaultValue());
     assertEquals(TypeBool.BOOL, var.getType());
     assertEquals(TypeBool.BOOL.generateDefaultValue(), var.getDefaultValue());
   }
@@ -47,13 +47,14 @@ public class FreeVariableTest {
   }
 
   @Test
-  public void testProperties() {
+  public void testProperties() throws Exception {
     //Test if the defaultValueProperty listener is called if the value is
     // set to types default value in case of type mismatch
     BooleanProperty gotCalled = new SimpleBooleanProperty(false);
     FreeVariable var = new FreeVariable("test1", TypeBool.BOOL);
     var.defaultValueProperty().addListener(value -> gotCalled.set(true));
     var.setType(TypeInt.INT);
+    var.setDefaultValue(TypeInt.INT.generateDefaultValue());
     assertTrue(gotCalled.get());
     assertEquals(TypeInt.INT.generateDefaultValue(), var.getDefaultValue());
   }

@@ -94,11 +94,12 @@ public class EditorPaneController implements Controller {
   }
 
   private Collection<String> getStyleClassesFor(Token token, List<SyntaxError> syntaxErrors) {
-    List<String> classes = getHightlightingClass(token);
+    List<String> classes = new ArrayList<>();
+        //getHightlightingClass(token);
     if (syntaxErrors.stream().anyMatch(syntaxError -> syntaxError.isSameToken(token))) {
-      System.out.println("Token with error: " + token.getText());
       classes.add("syntax-error");
     }
+    classes.addAll(getHightlightingClass(token));
     return classes;
   }
 
@@ -116,6 +117,9 @@ public class EditorPaneController implements Controller {
       case IEC61131Lexer.CASE:
       case IEC61131Lexer.END_CASE:
         return listOf("keyword");
+      case IEC61131Lexer.INT:
+      case IEC61131Lexer.BOOL:
+        return listOf("type");
       case IEC61131Lexer.INTEGER_LITERAL:
         return listOf("number");
       case IEC61131Lexer.STRING_LITERAL:
