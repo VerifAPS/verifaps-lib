@@ -35,6 +35,7 @@ public class JavaFxTest extends Application {
       pane.getItems().addAll(supplierOfViews.get());
 
       Scene scene = new Scene(pane, 800, 600);
+
       scene.getStylesheets().add(JavaFxTest.class.getResource("style.css").toExternalForm());
 
       return scene;

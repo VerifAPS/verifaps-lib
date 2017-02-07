@@ -19,7 +19,7 @@ import java.io.IOException;
 public class VerificationScenario {
   private OptionalProperty<VerificationResult> verificationResult;
   private VerificationEngine verificationEngine;
-  private Code code;
+  private ObjectProperty<Code> code;
   private ObjectProperty<VerificationState> verificationState;
 
   public VerificationScenario() {
@@ -27,7 +27,7 @@ public class VerificationScenario {
   }
 
   public VerificationScenario(Code code) {
-    this.code = code;
+    this.code = new SimpleObjectProperty<>(code);
     verificationResult = new OptionalProperty<>(new SimpleObjectProperty<>());
     verificationEngine = new GeTeTaVerificationEngine();
     verificationEngine.verificationResultProperty().addListener(new
@@ -50,11 +50,16 @@ public class VerificationScenario {
   }
 
   public Code getCode() {
-    return code;
+    return code.get();
   }
 
   public void setCode(Code code) {
-    this.code = code;
+    this.code.set(code);
+
+  }
+
+  public ObjectProperty<Code> codeObjectProperty() {
+    return this.code;
   }
 
   public VerificationResult getVerificationResult() {

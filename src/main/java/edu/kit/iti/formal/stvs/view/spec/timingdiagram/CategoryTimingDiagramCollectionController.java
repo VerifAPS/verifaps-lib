@@ -19,7 +19,7 @@ public abstract class CategoryTimingDiagramCollectionController implements Contr
   private ObservableList<SpecIoVariable> definedVariables;
 
   public CategoryTimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIoVariable> definedVariables, GlobalConfig config, Selection selection) {
-
+    view = new CategoryTimingDiagramCollectionView();
   }
 
   public CategoryTimingDiagramCollectionView getView() {

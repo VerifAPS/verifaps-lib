@@ -80,7 +80,7 @@ public class HybridSpecification extends ConstraintSpecification {
     return selection;
   }
 
-  public boolean isEditable() {
+  public Boolean isEditable() {
     return editable;
   }
 

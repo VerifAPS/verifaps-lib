@@ -1,35 +1,40 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
-import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
+import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
+import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollection;
+import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController;
 import javafx.beans.property.ObjectProperty;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.scene.control.ContextMenu;
 
-public class SpecificationTabController implements Controller {
+import java.util.List;
 
-  private GlobalConfig globalConfig;
+public class SpecificationController implements Controller {
+
   private HybridSpecification spec;
   private ObjectProperty<VerificationState> stateProperty;
   private ContextMenu contextMenu;
+  private SpecificationView view;
+  private VariableCollectionController variableCollectionController;
+  private TimingDiagramCollectionController timingDiagramCollectionController;
 
-  public SpecificationTabController(
+  public SpecificationController(
       HybridSpecification hybridSpecification,
-      ObjectProperty<VerificationState> stateProperty,
-      GlobalConfig globalConfig) {
+      ObjectProperty<List<Type>> codeTypes,
+      ObjectProperty<VerificationState> stateProperty) {
     this.spec = hybridSpecification;
     this.stateProperty = stateProperty;
-    this.globalConfig = globalConfig;
-
+    this.view = new SpecificationView();
+    this.variableCollectionController = new VariableCollectionController(codeTypes,
+        hybridSpecification.getFreeVariableSet());
   }
 
-  public SpecificationTab getView() {
-    return null;
+  public SpecificationView getView() {
+    return view;
   }
 
 

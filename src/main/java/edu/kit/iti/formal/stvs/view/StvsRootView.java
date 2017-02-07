@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.view;
 
 import edu.kit.iti.formal.stvs.view.menu.StvsMenuBar;
 import edu.kit.iti.formal.stvs.view.editor.EditorPane;
+import edu.kit.iti.formal.stvs.view.spec.SpecificationsPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
@@ -12,9 +13,9 @@ import javafx.scene.layout.Pane;
  */
 public class StvsRootView extends SplitPane {
   private EditorPane editor;
-  private TabPane specifications;
+  private SpecificationsPane specifications;
 
-  public StvsRootView(EditorPane editor, TabPane specifications) {
+  public StvsRootView(EditorPane editor, SpecificationsPane specifications) {
     this.editor = editor;
     this.specifications = specifications;
 
@@ -27,15 +28,16 @@ public class StvsRootView extends SplitPane {
     return editor;
   }
 
-  public TabPane getSpecifications() {
+  public SpecificationsPane getSpecifications() {
     return specifications;
   }
 
   public void setEditor(EditorPane editor) {
     this.editor = editor;
+    this.getItems().set(0, editor);
   }
 
-  public void setSpecifications(TabPane specifications) {
+  public void setSpecifications(SpecificationsPane specifications) {
     this.specifications = specifications;
   }
 }
