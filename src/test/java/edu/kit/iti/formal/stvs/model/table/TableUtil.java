@@ -7,6 +7,7 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableSet;
 import org.apache.commons.io.IOUtils;
 
@@ -75,8 +76,8 @@ public class TableUtil {
   }
 
   public static ConstraintSpecification constraintTableFromJson(
-      ObservableSet<Type> typeContext,
-      ObservableSet<CodeIoVariable> codeIoVars,
+      ObjectProperty<List<Type>> typeContext,
+      ObjectProperty<List<CodeIoVariable>> codeIoVars,
       JsonElement element) {
     FreeVariableSet freeVarSet = freeVariableSetFromJson(element);
     SpecificationTable<String, String> parsedTable = specificationTableFromJson(element);
