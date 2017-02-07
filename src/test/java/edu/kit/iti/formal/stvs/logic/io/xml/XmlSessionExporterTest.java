@@ -24,6 +24,7 @@ public class XmlSessionExporterTest {
   public void exportDefault() throws Exception {
     ByteArrayOutputStream result = exporter.export(new StvsRootModel());
     String resultString = new String(result.toByteArray(), "utf-8");
+    System.out.println(resultString);
   }
 
 }

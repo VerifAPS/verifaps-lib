@@ -80,10 +80,13 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
             new SimpleObjectProperty<>(new ArrayList<>()),
             new FreeVariableSet(),
             !tab.isReadOnly());
+        boolean hasAbstract = false;
         for (SpecificationTable specTable : tab.getSpecification()) {
-          boolean hasAbstract = false;
           JAXBElement<SpecificationTable> element = objectFactory.createSpecification(specTable);
           if (!specTable.isIsConcrete()) {
+            if (hasAbstract) {
+              throw new ImportException("Tab may not have more than one abstract specification");
+            }
             ConstraintSpecification constraintSpec = constraintSpecImporter.doImportFromXmlNode
                 (XmlExporter.marshalToNode(element));
             hybridSpec.getSpecIoVariables().addAll(constraintSpec.getSpecIoVariables());
@@ -102,9 +105,9 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
               hybridSpec.setConcreteInstance(concreteSpec);
             }
           }
-          if (!hasAbstract) {
-            throw new ImportException("Tab must have at least one abstract specification");
-          }
+        }
+        if (!hasAbstract) {
+          throw new ImportException("Tab must have at least one abstract specification");
         }
         hybridSpecs.add(hybridSpec);
       }
