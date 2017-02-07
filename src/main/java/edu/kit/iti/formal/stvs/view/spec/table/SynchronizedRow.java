@@ -23,20 +23,16 @@ public class SynchronizedRow extends SpecificationRow<HybridCellModel<Constraint
     return new HybridCellModel<>(cell);
   }
 
-
-
   private final HybridCellModel<ConstraintDuration> durationCell;
+  private final SpecificationRow<ConstraintCell> sourceRow;
 
-  public SynchronizedRow(SpecificationRow<ConstraintCell> subscribingRow, ConstraintDuration duration) {
-    super(createCellsFromRow(subscribingRow, duration));
+  public SynchronizedRow(SpecificationRow<ConstraintCell> sourceRow, ConstraintDuration duration) {
+    super(createCellsFromRow(sourceRow, duration));
+    this.sourceRow = sourceRow;
     this.durationCell = bindCell(duration);
     // Create bindings to all other stuff
-    this.commentProperty().bindBidirectional(subscribingRow.commentProperty());
-    subscribingRow.getCells().addListener(this::onCellChanges);
-  }
-
-  public HybridCellModel<ConstraintDuration> getDuration() {
-    return durationCell;
+    this.commentProperty().bindBidirectional(sourceRow.commentProperty());
+    sourceRow.getCells().addListener(this::onCellChanges);
   }
 
   protected void onCellChanges(MapChangeListener.Change<? extends String, ? extends ConstraintCell> change) {
@@ -46,5 +42,13 @@ public class SynchronizedRow extends SpecificationRow<HybridCellModel<Constraint
     if (change.wasRemoved()) {
       getCells().remove(change.getKey());
     }
+  }
+
+  public HybridCellModel<ConstraintDuration> getDuration() {
+    return durationCell;
+  }
+
+  public SpecificationRow<ConstraintCell> getSourceRow() {
+    return sourceRow;
   }
 }

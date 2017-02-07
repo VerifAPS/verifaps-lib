@@ -5,7 +5,6 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.*;
-import edu.kit.iti.formal.stvs.util.MapUtil;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
@@ -61,8 +60,7 @@ public class SpecificationTableController implements Controller {
         List<SpecificationRow<ConstraintCell>> rowsToBeAdded = new ArrayList<>();
         List<ConstraintDuration> durationsToBeAdded = new ArrayList<>();
         for (SynchronizedRow row : change.getAddedSubList()) {
-          Map<String, ConstraintCell> cells = MapUtil.mapValues(row.getCells(), HybridCellModel::getCell);
-          SpecificationRow<ConstraintCell> rowToBeAdded = new SpecificationRow<>(cells);
+          SpecificationRow<ConstraintCell> rowToBeAdded = row.getSourceRow();
           rowToBeAdded.commentProperty().bindBidirectional(row.commentProperty());
           rowsToBeAdded.add(rowToBeAdded);
           durationsToBeAdded.add(row.getDuration().getCell());
@@ -113,16 +111,17 @@ public class SpecificationTableController implements Controller {
   }
 
   public void addColumn(SpecIoVariable specIoVariable) {
-    // Add column to view:
-    addNewColumn(specIoVariable.getName());
-
     // Add column to model:
-    hybridSpec.getSpecIoVariables().add(specIoVariable);
-    if (!data.isEmpty()) {
+    if (data.isEmpty()) {
+      hybridSpec.getSpecIoVariables().add(specIoVariable);
+    } else {
       SpecificationColumn<ConstraintCell> dataColumn = new SpecificationColumn<>(
           data.stream().map(row -> new ConstraintCell("-")).collect(Collectors.toList()));
       hybridSpec.addColumn(specIoVariable, dataColumn);
     }
+
+    // Add column to view:
+    addNewColumn(specIoVariable.getName());
   }
 
   private void addNewColumn(final String columnName) {
@@ -211,7 +210,7 @@ public class SpecificationTableController implements Controller {
     return tableView;
   }
 
-  public HybridSpecification getData() {
+  public HybridSpecification getHybridSpecification() {
     return hybridSpec;
   }
 }

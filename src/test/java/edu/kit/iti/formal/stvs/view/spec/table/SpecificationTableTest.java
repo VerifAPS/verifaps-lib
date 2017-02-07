@@ -3,7 +3,6 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
@@ -12,7 +11,8 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -26,7 +26,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -51,7 +50,7 @@ public class SpecificationTableTest {
         new SimpleObjectProperty<>(codeIoVariables),
         new FreeVariableSet());
 
-    Pane extractedTablePane = createExtractedTableTextArea(table.getData());
+    Pane extractedTablePane = createExtractedTableTextArea(table.getHybridSpecification());
 
     return Arrays.asList(table.getView(), extractedTablePane);
   }
@@ -82,5 +81,4 @@ public class SpecificationTableTest {
       textArea.setText(writeString.toString());
     }
   }
-
 }

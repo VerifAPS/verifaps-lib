@@ -208,15 +208,15 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   }
 
   /*private void updateYRange() {
-    if (getData() == null) return;
-    int minY = getData().stream()
-        .flatMap(series -> series.getData().stream())
+    if (getHybridSpecification() == null) return;
+    int minY = getHybridSpecification().stream()
+        .flatMap(series -> series.getHybridSpecification().stream())
         .map(Data::getYValue)
         .map(Number::intValue)
         .min(Integer::compare)
         .orElse(0);
-    int maxY = getData().stream()
-        .flatMap(series -> series.getData().stream())
+    int maxY = getHybridSpecification().stream()
+        .flatMap(series -> series.getHybridSpecification().stream())
         .map(Data::getYValue)
         .map(Number::intValue)
         .max(Integer::compare)
