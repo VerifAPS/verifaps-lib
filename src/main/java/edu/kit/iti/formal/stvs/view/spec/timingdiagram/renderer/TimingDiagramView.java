@@ -1,28 +1,26 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
-import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.transform.Affine;
-import javafx.scene.transform.Transform;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by csicar on 09.01.17.
@@ -39,21 +37,25 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
 
   private ObservableList<Line> horizontalLines = FXCollections.observableArrayList();
   private ObservableList<Line> verticalLines = FXCollections.observableArrayList();
+  private ObservableList<Line> durationLines = FXCollections.observableArrayList();
   private ObservableList<Rectangle> cycleSelection = FXCollections.observableArrayList();
   private NullableProperty<Integer> selectedCycle = new NullableProperty<>();
-  private Rectangle selection = new Rectangle();
+  private List<ConcreteDuration> durations = new ArrayList<>();
 
   private Pane dataPane = new Pane();
   private Pane cycleSelectionPane = new Pane();
+  private Pane durationLinesPane = new Pane();
+
+  private ContextMenu contextMenu = new ContextMenu();
 
   public TimingDiagramView(NumberAxis xAxis, Axis<A> yAxis) {
     super(xAxis, yAxis);
     this.xAxis = xAxis;
     this.yAxis = yAxis;
-    setTitle("lol");
 
     getPlotChildren().addAll(
         cycleSelectionPane,
+        durationLinesPane,
         dataPane
     );
 
@@ -87,6 +89,7 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
     Line horizontalLine = new Line();
     dataPane.getChildren().add(horizontalLine);
     dataPane.setMouseTransparent(true);
+    durationLinesPane.setMouseTransparent(true);
     horizontalLines.add(horizontalLine);
     Rectangle cycleSelectionRectangle = new Rectangle();
     cycleSelectionRectangle.setOnMouseEntered(event -> {
@@ -95,13 +98,13 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
     });
     cycleSelectionRectangle.setOnMouseExited(event -> {
       cycleSelectionRectangle.setOpacity(0);
-      if (!selectedCycle.getValue().equals(item.getXValue().intValue())) {
+      if (item.getXValue().intValue() == selectedCycle.get()) {
         selectedCycle.set(null);
       }
     });
     Tooltip tooltip = new Tooltip(item.getYValue().toString());
     Tooltip.install(cycleSelectionRectangle, tooltip);
-    cycleSelectionRectangle.setFill(Color.LIGHTCYAN);
+    cycleSelectionRectangle.getStyleClass().add("cycleSelectionRectangle");
     cycleSelectionRectangle.setOpacity(0);
     cycleSelection.add(cycleSelectionRectangle);
     cycleSelectionPane.getChildren().add(cycleSelectionRectangle);
@@ -204,6 +207,14 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
         );
         cycleSelectionRectangle.setHeight(getYAxis().getHeight());
       }
+
+      for (int i = 0; i < durations.size(); i++) {
+        Line line = durationLines.get(i);
+        ConcreteDuration duration = durations.get(i);
+        line.setStartX(getxAxis().getDisplayPosition(duration.getEndCycle()));
+        line.setEndX(getxAxis().getDisplayPosition(duration.getEndCycle()));
+        line.setEndY(getYAxis().getHeight());
+      }
     });
   }
 
@@ -239,5 +250,24 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
 
   public ReadOnlyObjectProperty<Integer> selectedCycleProperty() {
     return selectedCycle;
+  }
+
+  public void setDurations(List<ConcreteDuration> durations) {
+    this.durations = durations;
+    this.durationLines.setAll(
+        durations.stream()
+            .map(i -> {
+              Line line = new Line();
+              line.getStyleClass().add("durationLine");
+              durationLinesPane.getChildren().add(line);
+              line.setStartY(0);
+              return line;
+            })
+            .collect(Collectors.toList())
+    );
+  }
+
+  public ContextMenu getContextMenu() {
+    return contextMenu;
   }
 }

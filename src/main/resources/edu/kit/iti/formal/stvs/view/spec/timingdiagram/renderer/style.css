@@ -39,3 +39,14 @@
     -fx-stroke: transparent;
     -fx-stroke-width: 0;
 }
+
+.durationLine{
+    -fx-stroke: black;
+    -fx-opacity: 0.1;
+    -fx-stroke-width: 5px;
+}
+
+.cycleSelectionRectangle{
+    -fx-fill: lightyellow;
+    -fx-blend-mode: multiply;
+}
