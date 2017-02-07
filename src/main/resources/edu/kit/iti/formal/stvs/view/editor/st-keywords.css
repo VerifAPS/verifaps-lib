@@ -3,9 +3,16 @@
     -fx-font-weight: bold;
 }
 
+.type {
+    -fx-fill: darkblue;
+    -fx-font-weight: bold;
+}
+
 .syntax-error {
     -fx-underline: true;
-   //TODO: red underline maybe dotted
+    -fx-fill: red;
+    -fx-font-weight: bold;
+   //TODO: optimize
 }
 
 .vardef {

@@ -1,9 +1,6 @@
 package edu.kit.iti.formal.stvs.model.code;
 
-import org.antlr.v4.runtime.ANTLRErrorListener;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 
@@ -22,7 +19,8 @@ public class SyntaxErrorListener implements ANTLRErrorListener {
     // TODO: RecognitionException is null when there are "expected ';'" errors, for example
     // (these errors dont have a token (which makes sense), so we have to come up with a nice
     // way to visualize them in the EditorPane)
-    syntaxErrors.add(new SyntaxError(e.getOffendingToken()));
+   // syntaxErrors.add(new SyntaxError(e.getOffendingToken()));
+    syntaxErrors.add(new SyntaxError(((Token) offendingSymbol)));
   }
 
   public List<SyntaxError> getSyntaxErrors() {

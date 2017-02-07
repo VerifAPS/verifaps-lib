@@ -3,7 +3,7 @@
   <variables>
     <ioVariable colwidth="20" data-type="INT" io="input" name="Counter"/>
     <ioVariable colwidth="20" data-type="BOOL" io="output" name="Active"/>
-    <freeVariable data-type="INT" default="1" name="c"/>
+    <freeVariable data-type="INT" name="c"/>
   </variables>
   <rows>
     <row comment="">

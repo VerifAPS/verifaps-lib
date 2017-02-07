@@ -6,6 +6,7 @@ import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import org.junit.Test;
@@ -50,15 +51,18 @@ public class ConstraintSpecificationTest {
   public void testProblems() {
     JsonElement testjson = TableUtil.jsonFromResource(testfile, ConstraintSpecificationTest.class);
 
-    ObservableSet<CodeIoVariable> codeIoVariables = FXCollections.observableSet(
+    List<CodeIoVariable> codeIoVariables = Arrays.asList(
         new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "Counter"),
         new CodeIoVariable(VariableCategory.OUTPUT, TypeBool.BOOL, "Active")
     );
 
-    ObservableSet<Type> typeContext = FXCollections.observableSet(TypeInt.INT, TypeBool.BOOL);
+    List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
 
     ConstraintSpecification testSpec =
-        TableUtil.constraintTableFromJson(typeContext, codeIoVariables, testjson);
+        TableUtil.constraintTableFromJson(
+            new SimpleObjectProperty<>(typeContext),
+            new SimpleObjectProperty<>(codeIoVariables),
+            testjson);
 
     List<Class<?>> expectedProblems = TableUtil.expectedSpecProblemsFromJson(testjson);
 

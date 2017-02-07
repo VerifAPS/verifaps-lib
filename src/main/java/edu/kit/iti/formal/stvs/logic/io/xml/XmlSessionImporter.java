@@ -20,6 +20,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import org.w3c.dom.Node;
 
@@ -75,14 +76,17 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
       for (Tab tab : importedSession.getTabs().getTab()) {
         // Each tab corresponds to a hybridSpecification
         HybridSpecification hybridSpec = new HybridSpecification(
-            FXCollections.observableSet(),
-            FXCollections.observableSet(),
+            new SimpleObjectProperty<>(new ArrayList<>()), // TODO: Shouldn't this be initialized differently? (philipp)
+            new SimpleObjectProperty<>(new ArrayList<>()),
             new FreeVariableSet(),
             !tab.isReadOnly());
+        boolean hasAbstract = false;
         for (SpecificationTable specTable : tab.getSpecification()) {
-          boolean hasAbstract = false;
           JAXBElement<SpecificationTable> element = objectFactory.createSpecification(specTable);
           if (!specTable.isIsConcrete()) {
+            if (hasAbstract) {
+              throw new ImportException("Tab may not have more than one abstract specification");
+            }
             ConstraintSpecification constraintSpec = constraintSpecImporter.doImportFromXmlNode
                 (XmlExporter.marshalToNode(element));
             hybridSpec.getSpecIoVariables().addAll(constraintSpec.getSpecIoVariables());
@@ -101,9 +105,9 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
               hybridSpec.setConcreteInstance(concreteSpec);
             }
           }
-          if (!hasAbstract) {
-            throw new ImportException("Tab must have at least one abstract specification");
-          }
+        }
+        if (!hasAbstract) {
+          throw new ImportException("Tab must have at least one abstract specification");
         }
         hybridSpecs.add(hybridSpec);
       }

@@ -3,7 +3,6 @@ package edu.kit.iti.formal.stvs.model.table;
 import com.google.gson.JsonElement;
 import edu.kit.iti.formal.stvs.model.expressions.*;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
-import edu.kit.iti.formal.stvs.view.spec.SpecificationTab;
 import org.junit.Before;
 import org.junit.Test;
 

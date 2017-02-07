@@ -10,6 +10,7 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 
 import java.util.*;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -45,8 +46,8 @@ public class HybridSpecification extends ConstraintSpecification {
    * @param freeVariableSet The set of declared free variables
    * @param editable Is this HybridSpecification supposed to be editable?
    */
-  public HybridSpecification(ObservableSet<Type> typeContext,
-                             ObservableSet<CodeIoVariable> ioVariables,
+  public HybridSpecification(ObjectProperty<List<Type>> typeContext,
+                             ObjectProperty<List<CodeIoVariable>> ioVariables,
                              FreeVariableSet freeVariableSet,
                              boolean editable) {
     super(typeContext, ioVariables, freeVariableSet);
@@ -59,8 +60,8 @@ public class HybridSpecification extends ConstraintSpecification {
   }
 
   public HybridSpecification(ConstraintSpecification sourceSpec, boolean editable) {
-    this(sourceSpec.getTypeContext(),
-        sourceSpec.getCodeIoVariables(),
+    this(sourceSpec.typeContextProperty(),
+        sourceSpec.codeIoVariablesProperty(),
         sourceSpec.getFreeVariableSet(),
         editable);
     getSpecIoVariables().addAll(sourceSpec.getSpecIoVariables());
@@ -79,7 +80,7 @@ public class HybridSpecification extends ConstraintSpecification {
     return selection;
   }
 
-  public boolean isEditable() {
+  public Boolean isEditable() {
     return editable;
   }
 
