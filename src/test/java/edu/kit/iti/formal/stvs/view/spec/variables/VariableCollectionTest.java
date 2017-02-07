@@ -8,6 +8,8 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.application.Application;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -30,19 +32,23 @@ public class VariableCollectionTest {
     JavaFxTest.runSplitView(this::variableViewScene);
   }
 
+  private static <T> ObjectProperty<T> op(T t) {
+    return new SimpleObjectProperty<>(t);
+  }
+
   private List<Node> variableViewScene() {
-    ObservableList<Type> types = FXCollections.observableArrayList(
+    List<Type> types = Arrays.asList(
         TypeInt.INT,
         TypeBool.BOOL,
         new TypeEnum("COLORS", Arrays.asList("red", "green", "blue"))
     );
-    ObservableList<FreeVariable> vars = FXCollections.observableArrayList(
+    List<FreeVariable> vars = Arrays.asList(
         new FreeVariable("blah", TypeInt.INT),
         new FreeVariable("xyz", TypeBool.BOOL)
     );
     FreeVariableSet set = new FreeVariableSet(vars);
 
-    VariableCollectionController controller = new VariableCollectionController(types, set);
+    VariableCollectionController controller = new VariableCollectionController(op(types), set);
 
     Pane rightPane = createExtractedVarsTextArea(controller);
 
