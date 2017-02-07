@@ -3,16 +3,22 @@ package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 import edu.kit.iti.formal.stvs.ViewUtils;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.geometry.Side;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.transform.Transform;
 
 import java.util.stream.IntStream;
@@ -27,6 +33,9 @@ public class TimingDiagramController implements Controller {
   private final Axis externalYAxis;
   private final Selection selection;
   private final SpecIoVariable ioVariable;
+  private final ConcreteSpecification concreteSpec;
+  private final NumberAxis commonXAxis;
+  private MouseEvent lastMouseEvent;
 
 
   public TimingDiagramController(NumberAxis commonXAxis, NumberAxis externalYAxis, ConcreteSpecification spec, SpecIoVariable ioVariable, Selection selection){
@@ -34,6 +43,8 @@ public class TimingDiagramController implements Controller {
     this.externalYAxis = externalYAxis;
     this.selection = selection;
     this.ioVariable = ioVariable;
+    this.concreteSpec = spec;
+    this.commonXAxis = commonXAxis;
     NumberAxis xAxis = new NumberAxis(0,0,1);
     NumberAxis yAxis = new NumberAxis();
     TimingDiagramView<Number> view = new TimingDiagramView<>(xAxis,yAxis);
@@ -59,6 +70,8 @@ public class TimingDiagramController implements Controller {
     this.externalYAxis = externalYAxis;
     this.ioVariable = ioVariable;
     this.selection = selection;
+    this.concreteSpec = spec;
+    this.commonXAxis = commonXAxis;
     NumberAxis xAxis = new NumberAxis(0,0,1);
     CategoryAxis yAxis = new CategoryAxis();
     TimingDiagramView<String> view = new TimingDiagramView<>(xAxis, yAxis);
@@ -77,16 +90,63 @@ public class TimingDiagramController implements Controller {
   }
 
   private void initCommon() {
+    view.setDurations(concreteSpec.getDurations());
     view.getyAxis().layoutBoundsProperty().addListener(change -> updateAxisExternalPosition());
     view.selectedCycleProperty().addListener(change -> {
       if(view.selectedCycleProperty().isNotNull().get()){
-        selection.setRow(view.getSelectedCycle());
+        selection.setRow(concreteSpec.cycleToRowNumber(view.getSelectedCycle()));
         selection.setColumn(ioVariable.getName());
       }
       else{
         selection.clear();
       }
     });
+    view.setOnMouseClicked(this::onMouseClicked);
+    MenuItem xPositiveZoomItem = new MenuItem("Zoom X+");
+    xPositiveZoomItem.setOnAction(this::onXPositiveZoom);
+    MenuItem xNegativeZoomItem = new MenuItem("Zoom X-");
+    xNegativeZoomItem.setOnAction(this::onXNegativeZoom);
+    view.getContextMenu().getItems().setAll(
+        xPositiveZoomItem,
+        xNegativeZoomItem
+    );
+  }
+
+  private void onXPositiveZoom(ActionEvent actionEvent) {
+    double interval = commonXAxis.getUpperBound() - commonXAxis.getLowerBound();
+    double newInterval = interval/2;
+    if(newInterval<1) return;
+    double center = commonXAxis.getValueForDisplay(lastMouseEvent.getX()).doubleValue();
+    double newLowerBound = center - newInterval/2;
+    double newUpperBound = center + newInterval/2;
+    if(newLowerBound < 0){
+      newUpperBound += -newLowerBound;
+      newLowerBound = 0;
+    }
+    commonXAxis.setLowerBound(newLowerBound);
+    commonXAxis.setUpperBound(newUpperBound);
+  }
+
+  private void onXNegativeZoom(ActionEvent actionEvent) {
+    double interval = commonXAxis.getUpperBound() - commonXAxis.getLowerBound();
+    double newInterval = interval*2;
+    if(newInterval<1) return;
+    double center = commonXAxis.getValueForDisplay(lastMouseEvent.getX()).doubleValue();
+    double newLowerBound = center - newInterval/2;
+    double newUpperBound = center + newInterval/2;
+    if(newLowerBound < 0){
+      newUpperBound += -newLowerBound;
+      newLowerBound = 0;
+    }
+    commonXAxis.setLowerBound(newLowerBound);
+    commonXAxis.setUpperBound(newUpperBound);
+  }
+
+  private void onMouseClicked(MouseEvent mouseEvent) {
+    if(mouseEvent.getButton() == MouseButton.SECONDARY){
+      this.lastMouseEvent = mouseEvent;
+      view.getContextMenu().show(view, mouseEvent.getScreenX(), mouseEvent.getScreenY());
+    }
   }
 
   private void updateAxisExternalPosition() {

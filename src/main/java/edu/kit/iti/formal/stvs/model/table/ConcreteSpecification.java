@@ -1,9 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Benjamin Alt
@@ -45,6 +43,17 @@ public class ConcreteSpecification extends SpecificationTable<ConcreteCell, Conc
       concreteCells.add(concreteColumn.getCells().get(i));
     }
     return concreteCells;
+  }
+
+  //Finds the row number in the constraint specification for a given cycle
+  public int cycleToRowNumber(int cycle) {
+    ConcreteDuration durationWithCycle = getDurations().stream()
+        .filter(
+            duration -> duration.getBeginCycle() <= cycle && duration.getEndCycle() > cycle
+        )
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("Cycle not found"));
+    return getDurations().indexOf(durationWithCycle);
   }
 
   @Override
