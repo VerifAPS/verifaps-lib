@@ -1,7 +1,13 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
+import edu.kit.iti.formal.stvs.model.common.NullableProperty;
+import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
@@ -34,6 +40,8 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   private ObservableList<Line> horizontalLines = FXCollections.observableArrayList();
   private ObservableList<Line> verticalLines = FXCollections.observableArrayList();
   private ObservableList<Rectangle> cycleSelection = FXCollections.observableArrayList();
+  private NullableProperty<Integer> selectedCycle = new NullableProperty<>();
+  private Rectangle selection = new Rectangle();
 
   private Pane dataPane = new Pane();
   private Pane cycleSelectionPane = new Pane();
@@ -43,8 +51,6 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
     this.xAxis = xAxis;
     this.yAxis = yAxis;
     setTitle("lol");
-
-    Node chartContent = lookup(".chart-content");
 
     getPlotChildren().addAll(
         cycleSelectionPane,
@@ -77,7 +83,7 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
    * @param item      The new data item that was added
    */
   @Override
-  protected void dataItemAdded(Series series, int itemIndex, Data item) {
+  protected void dataItemAdded(Series<Number, A> series, int itemIndex, Data<Number, A> item) {
     Line horizontalLine = new Line();
     dataPane.getChildren().add(horizontalLine);
     dataPane.setMouseTransparent(true);
@@ -85,9 +91,13 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
     Rectangle cycleSelectionRectangle = new Rectangle();
     cycleSelectionRectangle.setOnMouseEntered(event -> {
       cycleSelectionRectangle.setOpacity(1);
+      selectedCycle.setValue(item.getXValue().intValue());
     });
     cycleSelectionRectangle.setOnMouseExited(event -> {
       cycleSelectionRectangle.setOpacity(0);
+      if (!selectedCycle.getValue().equals(item.getXValue().intValue())) {
+        selectedCycle.set(null);
+      }
     });
     Tooltip tooltip = new Tooltip(item.getYValue().toString());
     Tooltip.install(cycleSelectionRectangle, tooltip);
@@ -221,5 +231,13 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
 
   public Axis<A> getyAxis() {
     return yAxis;
+  }
+
+  public Integer getSelectedCycle() {
+    return selectedCycle.get();
+  }
+
+  public ReadOnlyObjectProperty<Integer> selectedCycleProperty() {
+    return selectedCycle;
   }
 }

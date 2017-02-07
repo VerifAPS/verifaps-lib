@@ -1,24 +1,27 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
+import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeFactory;
 import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
+import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.Plotable;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.geometry.Side;
+import javafx.scene.chart.Axis;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-
-import java.util.Arrays;
+import javafx.util.Pair;
 
 /**
  * Created by csicar on 09.01.17.
@@ -30,6 +33,7 @@ public class TimingDiagramCollectionController implements Controller {
   private GlobalConfig globalConfig;
   private ObservableList<SpecIoVariable> definedVariables;
   private TimingDiagramCollectionView view;
+  private Selection selection;
 
   private double startXPosition;
   private double startLowerBound;
@@ -38,54 +42,60 @@ public class TimingDiagramCollectionController implements Controller {
 
   /**
    * creates VariableTimingDiagram for each given Variable
-   *
-   * @param spec
-   * @param globalConfig
    */
   /*public TimingDiagramCollectionController(HybridSpecification spec, ObservableList<SpecIoVariable> definedVariables, GlobalConfig globalConfig) {
 
     this.globalConfig = globalConfig;
   }*/
 
-  //TODO: Delete later when constructor parameters are implemented
-  public TimingDiagramCollectionController(){
+  public TimingDiagramCollectionController(ConcreteSpecification concreteSpec, Selection selection){
+    this.selection = selection;
     view = new TimingDiagramCollectionView();
-    addIntegerTimingDiagram();
-    addIntegerTimingDiagram();
-    addEnumTimingDiagram();
     view.onMouseDraggedProperty().setValue(this::mouseDraggedHandler);
     view.onMousePressedProperty().setValue(this::mousePressedHandler);
-
+    concreteSpec.getSpecIoVariables().forEach(specIoVar -> {
+      Pair<TimingDiagramController, Axis> diagramAxisPair = specIoVar.getType().match(
+          () -> addIntegerTimingDiagram(concreteSpec, specIoVar),
+          () -> addBoolTimingDiagram(concreteSpec, specIoVar),
+          (e) -> addEnumTimingDiagram(concreteSpec, specIoVar, e)
+      );
+      view.getDiagramContainer().getChildren().add(diagramAxisPair.getKey().getView());
+      view.getyAxisContainer().getChildren().add(diagramAxisPair.getValue());
+      AnchorPane.setRightAnchor(diagramAxisPair.getValue(), 0.0);
+    });
     //view.getDiagramContainer().getChildren()
   }
 
-  private void addIntegerTimingDiagram(){
+  private javafx.util.Pair<TimingDiagramController, Axis> addIntegerTimingDiagram(ConcreteSpecification concreteSpec, SpecIoVariable specIoVar){
     NumberAxis yAxis = new NumberAxis(0,10,1);
     yAxis.setPrefWidth(30);
     yAxis.setSide(Side.LEFT);
-    yAxis.setPrefHeight(300);
-    TimingDiagramController timingDiagramController = new TimingDiagramController(view.getxAxis(), yAxis);
-    view.getDiagramContainer().getChildren().add(timingDiagramController.getView());
-    view.getyAxisContainer().getChildren().add(yAxis);
-    AnchorPane.setRightAnchor(yAxis, 0.0);
+    TimingDiagramController timingDiagramController = new TimingDiagramController(view.getxAxis(), yAxis, concreteSpec, specIoVar, selection);
+    return new javafx.util.Pair<>(timingDiagramController, yAxis);
   }
 
-  private void addEnumTimingDiagram(){
-    TypeEnum typeEnum = TypeFactory.enumOfName("Woerter", "Lol", "Test", "Superrrrrrrrrrrrrrrrrrrr");
+  private javafx.util.Pair<TimingDiagramController, Axis> addBoolTimingDiagram(ConcreteSpecification concreteSpec, SpecIoVariable specIoVar){
+    ObservableList<String> categories = FXCollections.observableArrayList();
+    categories.addAll("FALSE", "TRUE");
+    CategoryAxis boolCategoryAxis = new CategoryAxis(categories);
+    boolCategoryAxis.setPrefWidth(30);
+    boolCategoryAxis.setSide(Side.LEFT);
+    boolCategoryAxis.setAutoRanging(true);
+    TimingDiagramController timingDiagramController = new TimingDiagramController(view.getxAxis(), boolCategoryAxis, concreteSpec, specIoVar, selection);
+    return new javafx.util.Pair<>(timingDiagramController, boolCategoryAxis);
+  }
+
+  private Pair<TimingDiagramController, Axis> addEnumTimingDiagram(ConcreteSpecification concreteSpec, SpecIoVariable specIoVar, TypeEnum typeEnum){
     ObservableList<String> categories = FXCollections.observableArrayList();
     typeEnum.getValues().stream()
         .map(ValueEnum::getEnumValue)
         .forEach(categories::add);
     CategoryAxis categoryAxis = new CategoryAxis(categories);
     categoryAxis.setSide(Side.LEFT);
-    categoryAxis.setPrefHeight(300);
     categoryAxis.setPrefWidth(30);
     categoryAxis.setAutoRanging(true);
-    //categoryAxis.invalidateRange(categories);
-    TimingDiagramController timingDiagramController = new TimingDiagramController(view.getxAxis(), categoryAxis);
-    view.getDiagramContainer().getChildren().add(timingDiagramController.getView());
-    view.getyAxisContainer().getChildren().add(categoryAxis);
-    AnchorPane.setRightAnchor(categoryAxis, 0.0);
+    TimingDiagramController timingDiagramController = new TimingDiagramController(view.getxAxis(), categoryAxis, concreteSpec, specIoVar, selection);
+    return new javafx.util.Pair<>(timingDiagramController, categoryAxis);
   }
 
   private void mouseDraggedHandler(MouseEvent event) {
