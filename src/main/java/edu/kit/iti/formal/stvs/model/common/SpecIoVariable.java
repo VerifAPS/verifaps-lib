@@ -115,4 +115,5 @@ public class SpecIoVariable extends IoVariable implements Commentable {
     result = 31 * result + (columnConfig != null ? columnConfig.hashCode() : 0);
     return result;
   }
+
 }

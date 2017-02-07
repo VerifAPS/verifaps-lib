@@ -17,8 +17,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.MapChangeListener;
-import javafx.collections.ObservableSet;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.util.*;
 
@@ -108,7 +106,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     return comment;
   }
 
-  private void onSpecificationChanged() {
+  public void recalculateSpecProblems() {
     ValidSpecification spec = new ValidSpecification(typeContext, freeVariableSet);
     spec.getSpecIoVariables().addAll(getSpecIoVariables());
 
@@ -213,32 +211,37 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     super.onRowAdded(added);
 
     for (SpecificationRow<ConstraintCell> row : added) {
-      registeredRowListeners.put(row, new RowChangeListener(row));
+      RowChangeListener listener = new RowChangeListener(row);
+      row.getCells().addListener(listener);
+      registeredRowListeners.put(row, listener);
     }
-    onSpecificationChanged();
+    recalculateSpecProblems();
   }
 
   @Override
   protected void onRowRemoved(List<? extends SpecificationRow<ConstraintCell>> removed) {
     super.onRowRemoved(removed);
     for (SpecificationRow<ConstraintCell> row : removed) {
-      registeredRowListeners.remove(row);
+      RowChangeListener listener = registeredRowListeners.remove(row);
+      if (listener != null) {
+        row.getCells().removeListener(listener);
+      }
     }
-    onSpecificationChanged();
+    recalculateSpecProblems();
   }
 
   @Override
   protected void onDurationAdded(List<? extends ConstraintDuration> added) {
     super.onDurationAdded(added);
     added.forEach(registeredDurationsListener::subscribeCell);
-    onSpecificationChanged();
+    recalculateSpecProblems();
   }
 
   @Override
   protected void onDurationRemoved(List<? extends ConstraintDuration> removed) {
     super.onDurationRemoved(removed);
     removed.forEach(registeredDurationsListener::unsubscribeCell);
-    onSpecificationChanged();
+    recalculateSpecProblems();
   }
 
   protected int registeredListeners() {
@@ -259,7 +262,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
       @Override
       public void changed(ObservableValue<? extends String> obs, String old, String newV) {
-        ConstraintSpecification.this.onSpecificationChanged();
+        ConstraintSpecification.this.recalculateSpecProblems();
       }
     }
 
@@ -293,7 +296,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     private class DurationCellListener implements ChangeListener<String> {
       @Override
       public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        ConstraintSpecification.this.onSpecificationChanged();
+        ConstraintSpecification.this.recalculateSpecProblems();
       }
     }
 
