@@ -62,8 +62,7 @@ public class SpecificationsPaneController implements Controller {
   }
 
   private SpecificationController addTab(HybridSpecification hybridSpecification, int index) {
-    SpecificationController controller = new SpecificationController(hybridSpecification, typeContext,
-        this.state);
+    SpecificationController controller = new SpecificationController(hybridSpecification, this.state);
     Tab tab = new Tab();
     String editable = hybridSpecification.isEditable() ? "" : "locked";
     tab.setText("Specification " + editable);

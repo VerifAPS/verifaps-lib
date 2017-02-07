@@ -266,7 +266,7 @@ public class SpecificationTableController implements Controller {
   }
 
   @Override
-  public TableView getView() {
+  public TableView<SynchronizedRow> getView() {
     return tableView;
   }
 
