@@ -17,8 +17,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.MapChangeListener;
-import javafx.collections.ObservableSet;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.util.*;
 
@@ -108,7 +106,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     return comment;
   }
 
-  private void onSpecificationChanged() {
+  public void recalculateSpecProblems() {
     ValidSpecification spec = new ValidSpecification(typeContext, freeVariableSet);
     spec.getSpecIoVariables().addAll(getSpecIoVariables());
 
@@ -213,32 +211,37 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     super.onRowAdded(added);
 
     for (SpecificationRow<ConstraintCell> row : added) {
-      registeredRowListeners.put(row, new RowChangeListener(row));
+      RowChangeListener listener = new RowChangeListener(row);
+      row.getCells().addListener(listener);
+      registeredRowListeners.put(row, listener);
     }
-    onSpecificationChanged();
+    recalculateSpecProblems();
   }
 
   @Override
   protected void onRowRemoved(List<? extends SpecificationRow<ConstraintCell>> removed) {
     super.onRowRemoved(removed);
     for (SpecificationRow<ConstraintCell> row : removed) {
-      registeredRowListeners.remove(row);
+      RowChangeListener listener = registeredRowListeners.remove(row);
+      if (listener != null) {
+        row.getCells().removeListener(listener);
+      }
     }
-    onSpecificationChanged();
+    recalculateSpecProblems();
   }
 
   @Override
   protected void onDurationAdded(List<? extends ConstraintDuration> added) {
     super.onDurationAdded(added);
     added.forEach(registeredDurationsListener::subscribeCell);
-    onSpecificationChanged();
+    recalculateSpecProblems();
   }
 
   @Override
   protected void onDurationRemoved(List<? extends ConstraintDuration> removed) {
     super.onDurationRemoved(removed);
     removed.forEach(registeredDurationsListener::unsubscribeCell);
-    onSpecificationChanged();
+    recalculateSpecProblems();
   }
 
   protected int registeredListeners() {
@@ -259,7 +262,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
       @Override
       public void changed(ObservableValue<? extends String> obs, String old, String newV) {
-        ConstraintSpecification.this.onSpecificationChanged();
+        ConstraintSpecification.this.recalculateSpecProblems();
       }
     }
 
@@ -293,7 +296,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     private class DurationCellListener implements ChangeListener<String> {
       @Override
       public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        ConstraintSpecification.this.onSpecificationChanged();
+        ConstraintSpecification.this.recalculateSpecProblems();
       }
     }
 
@@ -309,22 +312,25 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof ConstraintSpecification))
-      return false;
-    if (obj == this)
-      return true;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
 
-    ConstraintSpecification rhs = (ConstraintSpecification) obj;
-    return new EqualsBuilder().
-            appendSuper(super.equals(obj)).
-            append(getProblems(), rhs.getProblems()).
-            append(getTypeContext(), rhs.getTypeContext()).
-            append(getCodeIoVariables(), rhs.getCodeIoVariables()).
-            append(getFreeVariableSet(), rhs.getFreeVariableSet()).
-            append(getComment(), rhs.getComment()).
-            append(getValidSpecification(), rhs.getValidSpecification()).
-            isEquals();
+    ConstraintSpecification that = (ConstraintSpecification) o;
+
+    if (problems != null ? !problems.get().equals(that.problems.get()) : that.problems != null) return false;
+    if (freeVariableSet != null ? !freeVariableSet.equals(that.freeVariableSet) : that.freeVariableSet != null)
+      return false;
+    return comment != null ? comment.get().equals(that.comment.get()) : that.comment == null;
+
   }
 
+  @Override
+  public int hashCode() {
+    int result = problems != null ? problems.hashCode() : 0;
+    result = 31 * result + (freeVariableSet != null ? freeVariableSet.hashCode() : 0);
+    result = 31 * result + (comment != null ? comment.hashCode() : 0);
+    return result;
+  }
 }

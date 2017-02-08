@@ -18,6 +18,7 @@ import java.util.Set;
 
 import static edu.kit.iti.formal.stvs.model.TestUtils.assertCollectionsEqual;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -27,6 +28,7 @@ public class CodeTest {
 
   private final Code code = new Code();
   private final Code enumDefinition = loadCodeFromFile("define_type.st");
+  private final Code invalidCode = loadCodeFromFile("invalidCode.st");
 
   public static Code loadCodeFromFile(String filename) {
     try {
@@ -97,5 +99,10 @@ public class CodeTest {
     assertEquals(1, enumDefinition.getParsedCode().getFoldableCodeBlocks().size());
     assertEquals(5, enumDefinition.getParsedCode().getFoldableCodeBlocks().get(0).getStartLine());
     assertEquals(15, enumDefinition.getParsedCode().getFoldableCodeBlocks().get(0).getEndLine());
+  }
+
+  @Test
+  public void testInvalidCode() {
+    assertNotNull(invalidCode.getSyntaxErrors().size());
   }
 }

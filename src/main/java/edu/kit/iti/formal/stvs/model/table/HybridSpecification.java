@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.model.common.*;
-import edu.kit.iti.formal.stvs.view.spec.table.TablePaneController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.logic.specification.BacktrackSpecificationConcretizer;
 import edu.kit.iti.formal.stvs.logic.specification.ConcretizerContext;
@@ -80,7 +79,7 @@ public class HybridSpecification extends ConstraintSpecification {
     return selection;
   }
 
-  public boolean isEditable() {
+  public Boolean isEditable() {
     return editable;
   }
 

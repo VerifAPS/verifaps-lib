@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 public class IoVariableNamePopupController implements Controller {
   private List<CodeIoVariable> ioVars;
   private StringProperty name;
-  private IoVariableNamePopup ioVariableNamePopup;
+  private IoVariableNameDialog ioVariableNameDialog;
   private GlobalConfig globalConfig;
 
   /**

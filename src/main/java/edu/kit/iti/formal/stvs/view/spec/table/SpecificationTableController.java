@@ -1,22 +1,31 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
+import edu.kit.iti.formal.stvs.logic.io.xml.Rows;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.*;
-import edu.kit.iti.formal.stvs.util.MapUtil;
+import edu.kit.iti.formal.stvs.model.table.problems.CellProblem;
+import edu.kit.iti.formal.stvs.model.table.problems.DurationProblem;
+import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.util.converter.DefaultStringConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,36 +33,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Created by Philipp on 01.02.2017.
  */
 public class SpecificationTableController implements Controller {
 
-  private static final DataFormat SERIALIZED_MIME_TYPE = new DataFormat("application/x-java-serialized-object");
+  private static final String DURATION_COL_USER_DATA = "__ duration column";
 
   private final TableView<SynchronizedRow> tableView;
-  private final HybridSpecification tableData;
+  private final HybridSpecification hybridSpec;
 
   private final ObservableList<SynchronizedRow> data = FXCollections.observableArrayList();
-  private final TableColumn<SynchronizedRow, String> inputColumn;
-  private final TableColumn<SynchronizedRow, String> outputColumn;
   private final TableColumn<SynchronizedRow, String> durations;
+  private final ContextMenu columnContextMenu;
 
   public SpecificationTableController(ObjectProperty<List<Type>> typeContext,
                                       ObjectProperty<List<CodeIoVariable>> codeIoVariables,
                                       FreeVariableSet freeVariableSet) {
     this.tableView = new TableView<>();
-    this.tableData = new HybridSpecification(typeContext, codeIoVariables, freeVariableSet, true);
-    this.inputColumn = new TableColumn<>("Input");
-    this.outputColumn = new TableColumn<>("Output");
-    this.durations = createColumn("Duration", SynchronizedRow::getDuration);
+    this.hybridSpec = new HybridSpecification(typeContext, codeIoVariables, freeVariableSet, true);
+    this.durations = createViewColumn(DURATION_COL_USER_DATA, "Duration", SynchronizedRow::getDuration);
+    this.columnContextMenu = createColumnEditingContextMenu();
 
-    inputColumn.setContextMenu(createColumnContextMenu(VariableCategory.INPUT));
-    outputColumn.setContextMenu(createColumnContextMenu(VariableCategory.OUTPUT));
-
-    tableView.getColumns().addAll(inputColumn, outputColumn, durations);
+    durations.setContextMenu(columnContextMenu);
+    tableView.getColumns().add(durations);
 
     tableView.setItems(data);
     tableView.setEditable(true);
@@ -62,7 +66,51 @@ public class SpecificationTableController implements Controller {
 
     data.addListener(this::onDataRowChanged);
 
-    createTableContextMenu();
+    tableView.setContextMenu(createRowEditingContextMenu());
+
+    tableView.getStylesheets().add(SpecificationTableController.class.getResource("style.css").toExternalForm());
+  }
+
+  private TableCell<SynchronizedRow, String> cellFactory(TableColumn<SynchronizedRow, String> table) {
+    return new TextFieldTableCell<SynchronizedRow, String>(new DefaultStringConverter()) {
+      private final WeakInvalidationListener onProblemChangeListener;
+      private final Paint normalTextFill;
+      {
+        normalTextFill = getTextFill();
+        onProblemChangeListener = new WeakInvalidationListener(observable -> this.onProblemsChanged());
+        hybridSpec.problemsProperty().addListener(onProblemChangeListener);
+        getStyleClass().add("spec-cell");
+      }
+
+      private void onProblemsChanged() {
+        if (!isEmpty()) {
+          List<SpecProblem> problems = hybridSpec.getProblems();
+          for (SpecProblem problem : problems) {
+            if (problem instanceof CellProblem) {
+              CellProblem cellProblem = (CellProblem) problem;
+              String col = cellProblem.getColumn();
+              if (col.equals(getTableColumn().getUserData()) && cellProblem.getRow() == getTableRow().getIndex()) {
+                getStyleClass().remove("spec-cell-problem");
+                getStyleClass().add("spec-cell-problem");
+                setTextFill(Color.RED);
+                return;
+              }
+            } else if (problem instanceof DurationProblem) {
+              DurationProblem durationProblem = (DurationProblem) problem;
+              if (DURATION_COL_USER_DATA.equals(getTableColumn().getUserData()) && durationProblem.getRow() == getTableRow().getIndex()) {
+                getStyleClass().remove("spec-cell-problem");
+                getStyleClass().add("spec-cell-problem");
+                setTextFill(Color.RED);
+                return;
+              }
+            }
+          }
+        }
+        setTextFill(normalTextFill);
+        getStyleClass().remove("spec-cell-problem");
+      }
+
+    };
   }
 
   private void onDataRowChanged(ListChangeListener.Change<? extends SynchronizedRow> change) {
@@ -71,22 +119,21 @@ public class SpecificationTableController implements Controller {
         List<SpecificationRow<ConstraintCell>> rowsToBeAdded = new ArrayList<>();
         List<ConstraintDuration> durationsToBeAdded = new ArrayList<>();
         for (SynchronizedRow row : change.getAddedSubList()) {
-          Map<String, ConstraintCell> cells = MapUtil.mapValues(row.getCells(), HybridCellModel::getCell);
-          SpecificationRow<ConstraintCell> rowToBeAdded = new SpecificationRow<>(cells);
+          SpecificationRow<ConstraintCell> rowToBeAdded = row.getSourceRow();
           rowToBeAdded.commentProperty().bindBidirectional(row.commentProperty());
           rowsToBeAdded.add(rowToBeAdded);
           durationsToBeAdded.add(row.getDuration().getCell());
         }
-        tableData.getRows().addAll(change.getFrom(), rowsToBeAdded);
-        tableData.getDurations().addAll(change.getFrom(), durationsToBeAdded);
+        hybridSpec.getRows().addAll(change.getFrom(), rowsToBeAdded);
+        hybridSpec.getDurations().addAll(change.getFrom(), durationsToBeAdded);
       }
       if (change.wasRemoved()) {
-        tableData.getRows().remove(change.getFrom(), change.getFrom() + change.getRemovedSize());
+        hybridSpec.getRows().remove(change.getFrom(), change.getFrom() + change.getRemovedSize());
       }
     }
   }
 
-  private void createTableContextMenu() {
+  private ContextMenu createRowEditingContextMenu() {
     MenuItem insertRow = new MenuItem("Insert Row");
     MenuItem deleteRow = new MenuItem("Delete Row");
     insertRow.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
@@ -97,36 +144,65 @@ public class SpecificationTableController implements Controller {
     deleteRow.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
     deleteRow.setOnAction(event ->
       data.removeAll(tableView.getSelectionModel().getSelectedItems()));
-    ContextMenu globalCM = new ContextMenu(insertRow, deleteRow);
+    return new ContextMenu(insertRow, deleteRow);
+  }
 
-    tableView.setContextMenu(globalCM);
+  private ContextMenu createColumnEditingContextMenu() {
+    ContextMenu menu = new ContextMenu();
+    MenuItem addNewColumn = new MenuItem("New Column...");
+    addNewColumn.setOnAction(event ->
+        new IoVariableNameDialog(hybridSpec.typeContextProperty(), hybridSpec.codeIoVariablesProperty())
+          .showAndWait()
+          .ifPresent(this::addNewColumn));
+    menu.getItems().addAll(addNewColumn);
+    return menu;
   }
 
   public void addEmptyRow(int index) {
     Map<String, ConstraintCell> wildcardCells = new HashMap<>();
-    tableData.getSpecIoVariables().forEach(specIoVariable ->
+    hybridSpec.getSpecIoVariables().forEach(specIoVariable ->
         wildcardCells.put(specIoVariable.getName(), new ConstraintCell("-")));
     SpecificationRow<ConstraintCell> wildcardRow = new SpecificationRow<>(wildcardCells);
     data.add(index, new SynchronizedRow(wildcardRow, new ConstraintDuration("-")));
   }
 
-  private ContextMenu createColumnContextMenu(VariableCategory category) {
-    ContextMenu menu = new ContextMenu();
-    MenuItem addNewColumn = new MenuItem("New Column...");
-    addNewColumn.setOnAction(event -> addColumn(category, "TODO"));
-    menu.getItems().addAll(addNewColumn);
-    return menu;
+  public void addNewColumn(SpecIoVariable specIoVariable) {
+    // Add column to model:
+    if (data.isEmpty()) {
+      hybridSpec.getSpecIoVariables().add(specIoVariable);
+    } else {
+      SpecificationColumn<ConstraintCell> dataColumn = new SpecificationColumn<>(
+          data.stream().map(row -> new ConstraintCell("-")).collect(Collectors.toList()));
+      hybridSpec.addColumn(specIoVariable, dataColumn);
+    }
+
+    // Add column to view:
+    addColumnToView(specIoVariable);
   }
 
-  private TableColumn<SynchronizedRow, String> createColumn(
+  private void addColumnToView(final SpecIoVariable specIoVariable) {
+    tableView.getColumns().add(0,
+        createViewColumn(
+            specIoVariable.getName(),
+            specIoVariable.getVarDescriptor(),
+            synchronizedRow -> synchronizedRow.getCells().get(specIoVariable.getName()))
+    );
+    tableView.refresh();
+  }
+
+  private TableColumn<SynchronizedRow, String> createViewColumn(
+      String colIndex,
       String colName,
       final Function<SynchronizedRow, HybridCellModel> extractCellFromRow) {
     TableColumn<SynchronizedRow, String> column = new TableColumn<>(colName);
     column.setSortable(false);
     column.setEditable(true);
-    column.setPrefWidth(100);
+    column.setPrefWidth(150);
+    column.setContextMenu(columnContextMenu);
+    column.setCellFactory(this::cellFactory);
+    column.setUserData(colIndex);
 
-    column.setCellFactory(TextFieldTableCell.forTableColumn());
+    //column.setCellFactory(TextFieldTableCell.forTableColumn());
     column.setCellValueFactory(rowModelData ->
         extractCellFromRow.apply(rowModelData.getValue())
             .stringRepresentationProperty());
@@ -134,40 +210,7 @@ public class SpecificationTableController implements Controller {
     return column;
   }
 
-  private TableColumn<SynchronizedRow, String> getColumnFromCategory(VariableCategory category) {
-    switch (category) {
-      case INPUT:
-        return inputColumn;
-      case OUTPUT:
-        return outputColumn;
-      default:
-        throw new IllegalArgumentException("Unkown VariableCategory: " + category);
-    }
-  }
-
-  public void addColumn(VariableCategory category, String columnHeader) {
-    // Add column to view:
-    TableColumn<SynchronizedRow, String> viewColumn = getColumnFromCategory(category);
-    addNewColumnToCategory(viewColumn, columnHeader);
-
-    // Add column to model:
-    SpecIoVariable specIoVariable = new SpecIoVariable(category, TypeInt.INT, columnHeader);
-    if (data.isEmpty()) {
-      tableData.getSpecIoVariables().add(specIoVariable);
-    } else {
-      SpecificationColumn<ConstraintCell> dataColumn = new SpecificationColumn<>(
-          data.stream().map(row -> new ConstraintCell("-")).collect(Collectors.toList()));
-      tableData.addColumn(specIoVariable, dataColumn);
-    }
-  }
-
-  private void addNewColumnToCategory(TableColumn<SynchronizedRow, String> column, final String columnName) {
-    column.getColumns().add(
-        createColumn(
-            columnName,
-            synchronizedRow -> synchronizedRow.getCells().get(columnName))
-    );
-  }
+  private static final DataFormat SERIALIZED_MIME_TYPE = new DataFormat("application/x-java-serialized-object");
 
   // from: http://stackoverflow.com/questions/28603224/sort-tableview-with-drag-and-drop-rows
   // TODO: Have fun? Implement dragging multiple rows, from one program to another, etc.
@@ -190,7 +233,7 @@ public class SpecificationTableController implements Controller {
     row.setOnDragOver(event -> {
       Dragboard db = event.getDragboard();
       if (db.hasContent(SERIALIZED_MIME_TYPE)) {
-        if (row.getIndex() != ((Integer)db.getContent(SERIALIZED_MIME_TYPE)).intValue()) {
+        if (row.getIndex() != (Integer) db.getContent(SERIALIZED_MIME_TYPE)) {
           event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
           event.consume();
         }
@@ -223,11 +266,11 @@ public class SpecificationTableController implements Controller {
   }
 
   @Override
-  public TableView getView() {
+  public TableView<SynchronizedRow> getView() {
     return tableView;
   }
 
-  public HybridSpecification getData() {
-    return tableData;
+  public HybridSpecification getHybridSpecification() {
+    return hybridSpec;
   }
 }

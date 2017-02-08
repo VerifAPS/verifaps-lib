@@ -11,7 +11,8 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -25,7 +26,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,17 +40,17 @@ public class SpecificationTableTest {
 
   private List<Node> simpleTableScene() {
     List<Type> types = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
-    List<CodeIoVariable> codeIoVariables = Collections.emptyList();
+    List<CodeIoVariable> codeIoVariables = Arrays.asList(
+        new CodeIoVariable(VariableCategory.INPUT, TypeBool.BOOL, "A"),
+        new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "B"),
+        new CodeIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "C")
+    );
     SpecificationTableController table = new SpecificationTableController(
         new SimpleObjectProperty<>(types),
         new SimpleObjectProperty<>(codeIoVariables),
         new FreeVariableSet());
 
-    table.addColumn(VariableCategory.INPUT, "A");
-    table.addColumn(VariableCategory.INPUT, "B");
-    table.addColumn(VariableCategory.OUTPUT, "C");
-
-    Pane extractedTablePane = createExtractedTableTextArea(table.getData());
+    Pane extractedTablePane = createExtractedTableTextArea(table.getHybridSpecification());
 
     return Arrays.asList(table.getView(), extractedTablePane);
   }
@@ -81,5 +81,4 @@ public class SpecificationTableTest {
       textArea.setText(writeString.toString());
     }
   }
-
 }

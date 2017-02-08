@@ -23,10 +23,10 @@ import java.util.function.Consumer;
 public class ParsedCode {
 
   private static class TypeDeclarationVisitor extends DefaultVisitor<Void> {
-    private Set<Type> definedTypes;
+    private List<Type> definedTypes;
 
     TypeDeclarationVisitor() {
-      this.definedTypes = new HashSet<>();
+      this.definedTypes = new ArrayList<>();
       this.definedTypes.add(TypeBool.BOOL);
       this.definedTypes.add(TypeInt.INT);
     }
@@ -44,18 +44,18 @@ public class ParsedCode {
       return null;
     }
 
-    public Set<Type> getDefinedTypes() {
+    public List<Type> getDefinedTypes() {
       return definedTypes;
     }
 
   }
 
   private static class VariableVisitor extends DefaultVisitor<Void> {
-    private Set<CodeIoVariable> definedVariables;
+    private List<CodeIoVariable> definedVariables;
     private Map<String, Type> definedTypes;
 
     VariableVisitor(Map<String, Type> definedTypes) {
-      this.definedVariables = new HashSet<>();
+      this.definedVariables = new ArrayList<>();
       this.definedTypes = definedTypes;
     }
 
@@ -83,7 +83,7 @@ public class ParsedCode {
       return null;
     }
 
-    public Set<CodeIoVariable> getDefinedVariables() {
+    public List<CodeIoVariable> getDefinedVariables() {
       return definedVariables;
     }
   }
@@ -108,10 +108,10 @@ public class ParsedCode {
   }
 
   private List<FoldableCodeBlock> foldableCodeBlocks;
-  private Set<CodeIoVariable> definedVariables;
-  private Set<Type> definedTypes;
+  private List<CodeIoVariable> definedVariables;
+  private List<Type> definedTypes;
 
-  public ParsedCode(List<FoldableCodeBlock> foldableCodeBlocks, Set<CodeIoVariable> definedVariables, Set<Type> definedTypes) {
+  public ParsedCode(List<FoldableCodeBlock> foldableCodeBlocks, List<CodeIoVariable> definedVariables, List<Type> definedTypes) {
     this.foldableCodeBlocks = foldableCodeBlocks;
     this.definedVariables = definedVariables;
     this.definedTypes = definedTypes;
@@ -165,11 +165,11 @@ public class ParsedCode {
     return foldableCodeBlocks;
   }
 
-  public Set<CodeIoVariable> getDefinedVariables() {
+  public List<CodeIoVariable> getDefinedVariables() {
     return definedVariables;
   }
 
-  public Set<Type> getDefinedTypes() {
+  public List<Type> getDefinedTypes() {
     return definedTypes;
   }
 
