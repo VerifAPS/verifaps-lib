@@ -38,10 +38,7 @@ public class SpecificationController implements Controller {
     this.variableCollectionController = new VariableCollectionController(
         hybridSpecification.typeContextProperty(),
         hybridSpecification.getFreeVariableSet());
-    this.tableController = new SpecificationTableController(
-        hybridSpecification.typeContextProperty(),
-        hybridSpecification.codeIoVariablesProperty(),
-        hybridSpecification.getFreeVariableSet()); //TODO: Use actual hybridSpecification and take its content
+    this.tableController = new SpecificationTableController(hybridSpecification);
 
     if (getConcreteSpecification() != null) {
       this.timingDiagramCollectionController = new TimingDiagramCollectionController

@@ -48,11 +48,9 @@ public class SpecificationTableController implements Controller {
   private final TableColumn<SynchronizedRow, String> durations;
   private final ContextMenu columnContextMenu;
 
-  public SpecificationTableController(ObjectProperty<List<Type>> typeContext,
-                                      ObjectProperty<List<CodeIoVariable>> codeIoVariables,
-                                      FreeVariableSet freeVariableSet) {
+  public SpecificationTableController(HybridSpecification hybridSpecification) {
     this.tableView = new TableView<>();
-    this.hybridSpec = new HybridSpecification(typeContext, codeIoVariables, freeVariableSet, true);
+    this.hybridSpec = hybridSpecification;
     this.durations = createViewColumn(DURATION_COL_USER_DATA, "Duration", SynchronizedRow::getDuration);
     this.columnContextMenu = createColumnEditingContextMenu();
 
@@ -64,11 +62,18 @@ public class SpecificationTableController implements Controller {
     tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableView.setRowFactory(this::rowFactory);
 
-    data.addListener(this::onDataRowChanged);
 
     tableView.setContextMenu(createRowEditingContextMenu());
 
     tableView.getStylesheets().add(SpecificationTableController.class.getResource("style.css").toExternalForm());
+
+    for (int rowIndex = 0; rowIndex < hybridSpecification.getRows().size(); rowIndex++) {
+      data.add(new SynchronizedRow(
+          hybridSpecification.getRows().get(rowIndex),
+          hybridSpecification.getDurations().get(rowIndex)));
+    }
+
+    data.addListener(this::onDataRowChanged);
   }
 
   private TableCell<SynchronizedRow, String> cellFactory(TableColumn<SynchronizedRow, String> table) {

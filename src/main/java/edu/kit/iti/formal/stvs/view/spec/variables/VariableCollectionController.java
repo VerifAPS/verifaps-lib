@@ -35,8 +35,8 @@ public class VariableCollectionController implements Controller {
 
   private ContextMenu contextMenu;
 
-  public VariableCollectionController(ObjectProperty<List<Type>> codeTypes, FreeVariableSet
-      freeVariableSet) {
+  public VariableCollectionController(ObjectProperty<List<Type>> codeTypes,
+                                      FreeVariableSet freeVariableSet) {
     this.codeTypes = codeTypes;
     this.freeVariableSet = freeVariableSet;
 
