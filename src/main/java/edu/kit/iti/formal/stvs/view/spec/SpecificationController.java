@@ -43,7 +43,7 @@ public class SpecificationController implements Controller {
         hybridSpecification.codeIoVariablesProperty(),
         hybridSpecification.getFreeVariableSet()); //TODO: Use actual hybridSpecification and take its content
 
-    if(getConcreteSpecification() != null) {
+    if (getConcreteSpecification() != null) {
       this.timingDiagramCollectionController = new TimingDiagramCollectionController
           (getConcreteSpecification(), selection);
       view.setDiagram(timingDiagramCollectionController.getView());
