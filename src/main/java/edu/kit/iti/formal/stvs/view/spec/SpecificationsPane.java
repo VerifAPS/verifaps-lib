@@ -22,11 +22,11 @@ public class SpecificationsPane extends AnchorPane {
     AnchorPane.setTopAnchor(tabPane, 5.0);
     AnchorPane.setLeftAnchor(tabPane, 5.0);
     AnchorPane.setRightAnchor(tabPane, 5.0);
+    AnchorPane.setBottomAnchor(tabPane, 5.0);
     AnchorPane.setTopAnchor(addButton, 10.0);
     AnchorPane.setRightAnchor(addButton, 10.0);
 
     this.getChildren().addAll(tabPane, addButton);
-
 
   }
 
