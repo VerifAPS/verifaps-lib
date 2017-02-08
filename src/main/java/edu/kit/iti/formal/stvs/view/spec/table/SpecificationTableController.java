@@ -82,6 +82,19 @@ public class SpecificationTableController implements Controller {
         getStyleClass().add("spec-cell");
       }
 
+      private void configureProblem(SpecProblem problem) {
+        getStyleClass().remove("spec-cell-problem");
+        getStyleClass().add("spec-cell-problem");
+        setTextFill(Color.RED);
+        setTooltip(new Tooltip(problem.getErrorMessage()));
+      }
+
+      private void resetCellVisuals() {
+        setTextFill(normalTextFill);
+        getStyleClass().remove("spec-cell-problem");
+        setTooltip(null);
+      }
+
       private void onProblemsChanged() {
         if (!isEmpty()) {
           List<SpecProblem> problems = hybridSpec.getProblems();
@@ -90,24 +103,19 @@ public class SpecificationTableController implements Controller {
               CellProblem cellProblem = (CellProblem) problem;
               String col = cellProblem.getColumn();
               if (col.equals(getTableColumn().getUserData()) && cellProblem.getRow() == getTableRow().getIndex()) {
-                getStyleClass().remove("spec-cell-problem");
-                getStyleClass().add("spec-cell-problem");
-                setTextFill(Color.RED);
+                configureProblem(problem);
                 return;
               }
             } else if (problem instanceof DurationProblem) {
               DurationProblem durationProblem = (DurationProblem) problem;
               if (DURATION_COL_USER_DATA.equals(getTableColumn().getUserData()) && durationProblem.getRow() == getTableRow().getIndex()) {
-                getStyleClass().remove("spec-cell-problem");
-                getStyleClass().add("spec-cell-problem");
-                setTextFill(Color.RED);
+                configureProblem(problem);
                 return;
               }
             }
           }
         }
-        setTextFill(normalTextFill);
-        getStyleClass().remove("spec-cell-problem");
+        resetCellVisuals();
       }
 
     };
@@ -129,6 +137,7 @@ public class SpecificationTableController implements Controller {
       }
       if (change.wasRemoved()) {
         hybridSpec.getRows().remove(change.getFrom(), change.getFrom() + change.getRemovedSize());
+        hybridSpec.getDurations().remove(change.getFrom(), change.getFrom() + change.getRemovedSize());
       }
     }
   }
