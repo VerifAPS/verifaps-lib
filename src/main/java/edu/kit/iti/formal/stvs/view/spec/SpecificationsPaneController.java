@@ -93,12 +93,4 @@ public class SpecificationsPaneController implements Controller {
   public SpecificationsPane getView() {
     return view;
   }
-
-  public ObservableList<HybridSpecification> getHybridSpecifications() {
-    return null;
-  }
-
-  private void removeTab(int tabIndex) {
-
-  }
 }
