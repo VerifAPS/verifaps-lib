@@ -9,6 +9,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
 public class SpecificationView extends SplitPane implements Lockable {
@@ -19,12 +20,12 @@ public class SpecificationView extends SplitPane implements Lockable {
   private TimingDiagramCollectionView diagram;
   private final StackPane variablesPane;
   private final StackPane tablePane;
-  private final StackPane timingDiagramPane;
+  private final AnchorPane timingDiagramPane;
 
   public SpecificationView() {
     variablesPane = new StackPane();
     tablePane = new StackPane();
-    timingDiagramPane = new StackPane();
+    timingDiagramPane = new AnchorPane();
 
     this.setOrientation(Orientation.VERTICAL);
 
@@ -53,6 +54,10 @@ public class SpecificationView extends SplitPane implements Lockable {
 
     timingDiagramPane.getChildren().clear();
     timingDiagramPane.getChildren().add(diagram);
+    AnchorPane.setLeftAnchor(diagram, 0.0);
+    AnchorPane.setRightAnchor(diagram, 0.0);
+    AnchorPane.setTopAnchor(diagram, 0.0);
+    AnchorPane.setBottomAnchor(diagram, 0.0);
   }
 
   public VariableCollection getVariableCollection() {
