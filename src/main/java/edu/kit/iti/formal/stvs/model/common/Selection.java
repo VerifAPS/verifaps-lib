@@ -1,45 +1,41 @@
 package edu.kit.iti.formal.stvs.model.common;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Created by csicar on 10.01.17.
  */
 public class Selection {
 
-  private OptionalPropertyBase<String, StringProperty> column;
-  private OptionalPropertyBase<Number, IntegerProperty> row;
+  private NullableProperty<String> column;
+  private NullableProperty<Integer>  row;
 
   public Selection(String column, int row) {
-    this.column = new OptionalPropertyBase<>(new SimpleStringProperty(column));
-    this.row = new OptionalPropertyBase<>(new SimpleIntegerProperty(row));
+    this.column = new NullableProperty<>(column);
+    this.row = new NullableProperty<>(row);
   }
 
   public Selection(String column) {
-    this.column = new OptionalPropertyBase<>(new SimpleStringProperty(column));
-    this.row = OptionalPropertyBase.ofNull(new SimpleIntegerProperty());
+    this.column = new NullableProperty<>(column);
+    this.row = new NullableProperty<>();
   }
 
   public Selection(int row) {
-    this.column = OptionalPropertyBase.ofNull(new SimpleStringProperty());
-    this.row = new OptionalPropertyBase<>(new SimpleIntegerProperty(row));
+    this.column = new NullableProperty<>();
+    this.row = new NullableProperty<>(row);
   }
 
   public Selection() {
-    this.column = OptionalPropertyBase.ofNull(new SimpleStringProperty());
-    this.row = OptionalPropertyBase.ofNull(new SimpleIntegerProperty());
+    this.column = new NullableProperty<>();
+    this.row = new NullableProperty<>();
   }
 
-  public String getColumn() {
-    return column.get();
+  public Optional<String> getColumn() {
+    return Optional.ofNullable(column.get());
   }
 
-  public OptionalPropertyBase<String, StringProperty> columnProperty() {
+  public NullableProperty<String> columnProperty() {
     return column;
   }
 
@@ -47,11 +43,11 @@ public class Selection {
     this.column.set(column);
   }
 
-  public int getRow() {
-    return row.get().intValue();
+  public Optional<Integer> getRow() {
+    return Optional.ofNullable(row.get());
   }
 
-  public OptionalPropertyBase<Number, IntegerProperty> rowProperty() {
+  public NullableProperty<Integer> rowProperty() {
     return row;
   }
 
@@ -60,9 +56,10 @@ public class Selection {
   }
 
   public void clear(){
-    column.clear();
-    row.clear();
+    this.row.set(null);
+    this.column.set(null);
   }
+
 
   @Override
   public boolean equals(Object o) {
@@ -71,15 +68,15 @@ public class Selection {
 
     Selection selection = (Selection) o;
 
-    if (getColumn() != null ? !getColumn().equals(selection.getColumn()) : selection.getColumn() != null)
-      return false;
-    return row.get() != null ? row.get().equals(selection.row.get()) : selection.row.get() == null;
+    if (!column.get().equals(selection.column.get())) return false;
+    return row.get().equals(selection.row.get());
+
   }
 
   @Override
   public int hashCode() {
-    int result = getColumn() != null ? getColumn().hashCode() : 0;
-    result = 31 * result + (row.get() != null ? row.get().hashCode() : 0);
+    int result = Objects.hashCode(column.get());
+    result = 31 * result + Objects.hashCode(row.get());
     return result;
   }
 }

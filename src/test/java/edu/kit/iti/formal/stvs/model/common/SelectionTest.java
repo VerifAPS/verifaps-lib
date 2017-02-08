@@ -17,7 +17,7 @@ public class SelectionTest {
     Selection selection = new Selection("fgrfg", 4);
     InvalidationListener listener = i -> wasCalled.set(true);
     selection.columnProperty().addListener(listener);
-    selection.columnProperty().clear();
+    selection.columnProperty().set(null);
     assertTrue(wasCalled.get());
     assertTrue(selection.columnProperty().isNull().get());
 
@@ -25,7 +25,7 @@ public class SelectionTest {
     selection.columnProperty().removeListener(listener);
     selection.setColumn("Test");
     assertFalse(wasCalled.get());
-    assertEquals("Test", selection.getColumn());
+    assertEquals("Test", selection.getColumn().get());
   }
 
   @Test
@@ -33,7 +33,7 @@ public class SelectionTest {
     Selection selection = new Selection();
     assertTrue(selection.rowProperty().isNull().get());
     selection.setRow(5);
-    assertEquals(5, selection.getRow());
-    assertEquals(5, selection.rowProperty().get());
+    assertEquals(5, selection.getRow().get().intValue());
+    assertEquals(5, selection.rowProperty().get().intValue());
   }
 }

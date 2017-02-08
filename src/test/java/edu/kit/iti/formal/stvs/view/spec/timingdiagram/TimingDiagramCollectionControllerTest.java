@@ -55,6 +55,14 @@ public class TimingDiagramCollectionControllerTest {
       TimingDiagramCollectionController controller = new TimingDiagramCollectionController(importedSpec, selection);
 
       TextArea console = new TextArea();
+
+      selection.columnProperty().addListener(change -> {
+        console.appendText("Selection column set to: " + selection.getColumn() + "\n");
+      });
+      selection.rowProperty().addListener(change -> {
+        console.appendText("Selection row set to: " + selection.getRow() + "\n");
+      });
+
       VBox root = new VBox();
       root.getChildren().addAll(controller.getView(), console);
       Scene scene = new Scene(root, 800, 600);

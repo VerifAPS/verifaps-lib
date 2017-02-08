@@ -1,44 +1,48 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
-import edu.kit.iti.formal.stvs.view.spec.table.TablePane;
+import edu.kit.iti.formal.stvs.view.spec.table.SynchronizedRow;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionView;
+import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollection;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableView;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 
 public class SpecificationView extends SplitPane implements Lockable {
-  private VariableView variableView;
-  private TablePane table;
-  private TimingDiagramCollectionView diagram;
+
   private Button startButton;
+  private VariableCollection variableCollection;
+  private TableView<SynchronizedRow> tableView;
+  private TimingDiagramCollectionView diagram;
   private final StackPane variablesPane;
   private final StackPane tablePane;
-  private final StackPane timingDiagramPane;
+  private final AnchorPane timingDiagramPane;
 
   public SpecificationView() {
     variablesPane = new StackPane();
     tablePane = new StackPane();
-    timingDiagramPane = new StackPane();
+    timingDiagramPane = new AnchorPane();
 
     this.setOrientation(Orientation.VERTICAL);
 
     this.getItems().addAll(variablesPane, tablePane, timingDiagramPane);
-    this.setDividerPositions(0.3f, 0.5f, 0.2f);
+    this.setDividerPosition(0, 0.25);
+    this.setDividerPosition(1, 0.5);
   }
 
-  public TablePane getTable() {
-    return table;
+  public TableView<SynchronizedRow> getTable() {
+    return tableView;
   }
 
-  public void setTable(TablePane table) {
-    this.table = table;
+  public void setTable(TableView<SynchronizedRow> table) {
+    this.tableView = table;
+
     tablePane.getChildren().clear();
     tablePane.getChildren().add(table);
-
   }
 
   public TimingDiagramCollectionView getDiagram() {
@@ -50,6 +54,22 @@ public class SpecificationView extends SplitPane implements Lockable {
 
     timingDiagramPane.getChildren().clear();
     timingDiagramPane.getChildren().add(diagram);
+    AnchorPane.setLeftAnchor(diagram, 0.0);
+    AnchorPane.setRightAnchor(diagram, 0.0);
+    AnchorPane.setTopAnchor(diagram, 0.0);
+    AnchorPane.setBottomAnchor(diagram, 0.0);
+  }
+
+  public VariableCollection getVariableCollection() {
+    return variableCollection;
+  }
+
+  public void setVariableCollection(VariableCollection variableCollection) {
+    this.variableCollection = variableCollection;
+
+    variablesPane.getChildren().clear();
+    variablesPane.getChildren().add(this.variableCollection);
+
   }
 
   public Button getStartButton() {
@@ -68,17 +88,5 @@ public class SpecificationView extends SplitPane implements Lockable {
   @Override
   public BooleanProperty getEditableProperty() {
     return null;
-  }
-
-  public VariableView getVariableView() {
-    return variableView;
-  }
-
-  public void setVariableView(VariableView variableView) {
-    this.variableView = variableView;
-
-    variablesPane.getChildren().clear();
-    variablesPane.getChildren().add(variableView);
-
   }
 }

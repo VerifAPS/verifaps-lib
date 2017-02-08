@@ -9,10 +9,12 @@ import javafx.beans.property.StringProperty;
 public class HybridCellModel<C extends CellOperationProvider> implements CellOperationProvider {
 
   private final C cell;
+  private final String column;
   // TODO: private final ObservableList<String> counterExamples
 
-  public HybridCellModel(C cell) {
+  public HybridCellModel(String column, C cell) {
     this.cell = cell;
+    this.column = column;
   }
 
   public C getCell() {
@@ -47,5 +49,9 @@ public class HybridCellModel<C extends CellOperationProvider> implements CellOpe
   @Override
   public StringProperty stringRepresentationProperty() {
     return cell.stringRepresentationProperty();
+  }
+
+  public String getColumn() {
+    return column;
   }
 }
