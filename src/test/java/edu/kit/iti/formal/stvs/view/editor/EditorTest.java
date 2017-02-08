@@ -25,7 +25,7 @@ public class EditorTest {
   }
 
   private List<Node> editorAndModelSplit() {
-    Code code = CodeTest.loadCodeFromFile("invalidCode.st");
+    Code code = CodeTest.loadCodeFromFile("define_type.st");
     EditorPaneController controller = new EditorPaneController(code, new GlobalConfig());
 
     Pane rightPane = createExtractedVarsTextArea(code);

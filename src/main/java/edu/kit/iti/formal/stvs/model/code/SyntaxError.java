@@ -6,23 +6,31 @@ import org.antlr.v4.runtime.Token;
  * Created by Lukas on 02.02.2017.
  */
 public class SyntaxError {
-  private Token token;
+  private int line;
+  private int charPos;
 
-  public SyntaxError(Token token) {
-    this.token = token;
+  public SyntaxError(int line, int charPos) {
+    this.line = line;
+    this.charPos = charPos;
   }
 
 
-  public Token getToken() {
-    return token;
+  public int getLine() {
+    return line;
+  }
+  public int getCharPos() {return charPos;}
+
+  public boolean isToken(Token token) {
+    return (line == token.getLine()) && (charPos == token.getCharPositionInLine());
   }
 
   public String toString() {
-    return "SyntaxError(" + token + ")";
+    return "SyntaxError(" + line + "," + charPos+ ")";
   }
-
+/*
   public boolean isSameToken(Token token) {
     return token.getStartIndex() == this.token.getStartIndex() &&
         token.getText().equals(this.token.getText());
   }
+*/
 }

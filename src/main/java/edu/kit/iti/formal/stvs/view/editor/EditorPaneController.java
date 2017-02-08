@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * Created by csicar on 09.01.17.
@@ -96,7 +97,7 @@ public class EditorPaneController implements Controller {
   private Collection<String> getStyleClassesFor(Token token, List<SyntaxError> syntaxErrors) {
     List<String> classes = new ArrayList<>();
         //getHightlightingClass(token);
-    if (syntaxErrors.stream().anyMatch(syntaxError -> syntaxError.isSameToken(token))) {
+    if (syntaxErrors.stream().anyMatch(syntaxError -> syntaxError.isToken(token))) {
       classes.add("syntax-error");
     }
     classes.addAll(getHightlightingClass(token));
@@ -106,6 +107,8 @@ public class EditorPaneController implements Controller {
   private List<String> getHightlightingClass(Token token) {
     // TODO: Add more colours (styles) to tokens
     switch (token.getType()) {
+      case IEC61131Lexer.PROGRAM:
+      case IEC61131Lexer.END_PROGRAM:
       case IEC61131Lexer.TYPE:
       case IEC61131Lexer.END_TYPE:
       case IEC61131Lexer.IF:
