@@ -29,7 +29,8 @@ public class SpecificationView extends SplitPane implements Lockable {
     this.setOrientation(Orientation.VERTICAL);
 
     this.getItems().addAll(variablesPane, tablePane, timingDiagramPane);
-    this.setDividerPositions(0.3f, 0.5f, 0.2f);
+    this.setDividerPosition(0, 0.25);
+    this.setDividerPosition(1, 0.5);
   }
 
   public TableView<SynchronizedRow> getTable() {
