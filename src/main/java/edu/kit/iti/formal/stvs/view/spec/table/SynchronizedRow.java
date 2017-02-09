@@ -31,8 +31,18 @@ public class SynchronizedRow extends SpecificationRow<HybridCellModel<Constraint
         hybridCell -> new Observable[] { hybridCell.stringRepresentationProperty() });
     this.sourceRow = sourceRow;
     this.durationCell = new HybridCellModel<>("Duration", duration);
+    sourceRow.getCells().addListener(this::onSourceCellsChange);
     // Create bindings to all other stuff
     this.commentProperty().bindBidirectional(sourceRow.commentProperty());
+  }
+
+  private void onSourceCellsChange(MapChangeListener.Change<? extends String, ? extends ConstraintCell> change) {
+    if (change.wasAdded()) {
+      getCells().put(change.getKey(), new HybridCellModel<>(change.getKey(), change.getValueAdded()));
+    }
+    if (change.wasRemoved()) {
+      getCells().put(change.getKey(), new HybridCellModel<>(change.getKey(), change.getValueRemoved()));
+    }
   }
 
   public HybridCellModel<ConstraintDuration> getDuration() {

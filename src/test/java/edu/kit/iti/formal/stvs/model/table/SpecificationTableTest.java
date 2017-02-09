@@ -58,7 +58,7 @@ public class SpecificationTableTest {
 
   @Test
   public void testAddColumn() {
-    int widthBefore = table.getSpecIoVariables().size();
+    int widthBefore = table.getColumnHeaders().size();
 
     SpecIoVariable ioVar = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableE");
 
@@ -67,9 +67,9 @@ public class SpecificationTableTest {
 
     table.addColumn(ioVar, newColumn);
 
-    assertTrue(table.getSpecIoVariables().contains(ioVar));
+    assertTrue(table.getColumnHeaders().contains(ioVar));
     assertEquals(table.getColumnByName("VariableE"), newColumn);
-    assertEquals(table.getSpecIoVariables().size(), widthBefore + 1);
+    assertEquals(table.getColumnHeaders().size(), widthBefore + 1);
   }
 
   @Test(expected = IllegalArgumentException.class)

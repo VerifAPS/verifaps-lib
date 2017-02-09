@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * Created by Philipp on 05.02.2017.
  */
 public class Json {
-
+/*
   private static final Gson GSON = new Gson();
 
   private Json() {
@@ -49,7 +49,7 @@ public class Json {
         .map(freeVariable -> {
           FreeVar var = new FreeVar();
           var.name = freeVariable.getName();
-          var.type = freeVariable.getType().getTypeName();
+          var.type = freeVariable.getValidType().getTypeName();
           return var;
         })
         .collect(Collectors.toList());
@@ -74,4 +74,5 @@ public class Json {
             new IllegalArgumentException("Can't paste free variable with unkown type: "
               + StringEscapeUtils.escapeJava(typeString)));
   }
+  */
 }

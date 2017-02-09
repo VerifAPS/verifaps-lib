@@ -9,7 +9,6 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
-import javafx.collections.ObservableSet;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -80,12 +79,12 @@ public class TableUtil {
       ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> codeIoVars,
       JsonElement element) {
-    FreeVariableSet freeVarSet = freeVariableSetFromJson(element);
+    FreeVariableList freeVarSet = freeVariableSetFromJson(element);
     SpecificationTable<String, String> parsedTable = specificationTableFromJson(element);
 
     ConstraintSpecification spec = new ConstraintSpecification(typeContext, codeIoVars, freeVarSet);
 
-    spec.getSpecIoVariables().addAll(parsedTable.getSpecIoVariables());
+    spec.getColumnHeaders().addAll(parsedTable.getColumnHeaders());
 
     for (SpecificationRow<String> row : parsedTable.getRows()) {
       Map<String, ConstraintCell> cells = new HashMap<>();
@@ -104,13 +103,13 @@ public class TableUtil {
     return spec;
   }
 
-  public static FreeVariableSet freeVariableSetFromJson(JsonElement element) {
-    FreeVariableSet freeVariableSet = new FreeVariableSet();
+  public static FreeVariableList freeVariableSetFromJson(JsonElement element) {
+    FreeVariableList freeVariableList = new FreeVariableList(variables);
     GSON.fromJson(element, JsonFreeVarSet.class).freevariables.stream()
       .map(TableUtil::toFreeVariable)
-    .forEach(freeVar -> freeVariableSet.getVariableSet().add(freeVar));
+    .forEach(freeVar -> freeVariableList.getVariables().add(freeVar));
 
-    return freeVariableSet;
+    return freeVariableList;
   }
 
   private static FreeVariable toFreeVariable(JsonFreeVar jsonFreeVar) {
@@ -124,10 +123,10 @@ public class TableUtil {
   private static SpecificationTable<String, String> specificationTableFromJsonTable(JsonTable table) {
     SpecificationTable<String, String> spec = new SpecificationTable<>(p -> new Observable[0]);
     table.variables.stream().map(TableUtil::toSpecIoVariable).forEach(r ->
-        spec.getSpecIoVariables().add(r));
+        spec.getColumnHeaders().add(r));
 
     table.rows.forEach(row ->
-        spec.getRows().add(toSpecificationRow(row, spec.getSpecIoVariables())));
+        spec.getRows().add(toSpecificationRow(row, spec.getColumnHeaders())));
 
     spec.getDurations().addAll(table.durations);
     return spec;

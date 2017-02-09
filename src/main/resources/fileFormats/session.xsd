@@ -9,7 +9,7 @@
 
   <complexType name="Code">
     <sequence>
-      <element name="plaintext" type="string" minOccurs="1" maxOccurs="1"></element>
+      <element name="plaintext" errorType="string" minOccurs="1" maxOccurs="1"></element>
     </sequence>
   </complexType>
 
@@ -19,33 +19,33 @@
         <documentation>A tab must contain at least 1 specification; it may contain
           two (in the case of a hybridspecification)</documentation>
       </annotation>
-      <element name="specification" type="tns:SpecificationTable" minOccurs="1"
+      <element name="specification" errorType="tns:SpecificationTable" minOccurs="1"
                maxOccurs="2"></element>
     </sequence>
-    <attribute name="id" type="nonNegativeInteger" use="required"></attribute>
-    <attribute name="open" type="boolean" use="required">
+    <attribute name="id" errorType="nonNegativeInteger" use="required"></attribute>
+    <attribute name="open" errorType="boolean" use="required">
       <annotation>
         <documentation>Only one tab can be open in a session</documentation>
       </annotation>
     </attribute>
-    <attribute name="readOnly" type="boolean" use="required"></attribute>
+    <attribute name="readOnly" errorType="boolean" use="required"></attribute>
   </complexType>
 
   <complexType name="Session">
     <sequence minOccurs="1" maxOccurs="1">
-      <element name="code" type="tns:Code"></element>
+      <element name="code" errorType="tns:Code"></element>
       <element name="tabs">
         <complexType>
           <sequence minOccurs="1" maxOccurs="unbounded">
-            <element name="tab" type="tns:Tab"></element>
+            <element name="tab" errorType="tns:Tab"></element>
           </sequence>
         </complexType>
       </element>
-      <element name="config" type="tns:Config" minOccurs="1" maxOccurs="1"></element>
-      <element name="history" type="tns:History" minOccurs="1" maxOccurs="1"></element>
+      <element name="config" errorType="tns:Config" minOccurs="1" maxOccurs="1"></element>
+      <element name="history" errorType="tns:History" minOccurs="1" maxOccurs="1"></element>
     </sequence>
   </complexType>
 
-  <element name="session" type="tns:Session">
+  <element name="session" errorType="tns:Session">
   </element>
 </schema>

@@ -28,7 +28,7 @@ public class ConcreteSpecificationTest {
         TableUtil.specificationTableFromJson(json);
     concreteSpec = new ConcreteSpecification(false);
 
-    concreteSpec.getSpecIoVariables().addAll(stringTable.getSpecIoVariables());
+    concreteSpec.getColumnHeaders().addAll(stringTable.getColumnHeaders());
 
     int currentBeginCycle = 0;
     for (String durationString : stringTable.getDurations()) {

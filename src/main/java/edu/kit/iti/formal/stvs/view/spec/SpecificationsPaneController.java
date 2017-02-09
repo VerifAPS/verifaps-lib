@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
-import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.model.common.FreeVariable;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
@@ -10,11 +10,10 @@ import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +25,7 @@ public class SpecificationsPaneController implements Controller {
   private ContextMenu contextMenu;
   private ObjectProperty<VerificationState> state;
   private ObjectProperty<List<Type>> typeContext;
+  private ObjectProperty<List<CodeIoVariable>> ioVariables;
   private final Map<Tab, SpecificationController> controllers;
 
   public SpecificationsPaneController(
@@ -37,12 +37,12 @@ public class SpecificationsPaneController implements Controller {
     this.state = state;
     this.controllers = new HashMap<>();
     this.typeContext = typeContext;
+    this.ioVariables = ioVariables;
     this.hybridSpecifications = hybridSpecifications;
 
     hybridSpecifications.forEach(this::addTab);
     this.view.onTabAdded(() -> {
-      hybridSpecifications.add(new HybridSpecification(
-          typeContext, ioVariables, new FreeVariableSet(), true));
+      hybridSpecifications.add(new HybridSpecification(new FreeVariableList(new ArrayList<>()), true));
     });
 
     hybridSpecifications.addListener(new ListChangeListener<HybridSpecification>() {
@@ -62,7 +62,8 @@ public class SpecificationsPaneController implements Controller {
   }
 
   private SpecificationController addTab(HybridSpecification hybridSpecification, int index) {
-    SpecificationController controller = new SpecificationController(hybridSpecification, this.state);
+    SpecificationController controller = new SpecificationController(
+        typeContext, ioVariables, hybridSpecification, this.state);
     Tab tab = new Tab();
     String editable = hybridSpecification.isEditable() ? "" : "locked";
     tab.setText("Specification " + editable);

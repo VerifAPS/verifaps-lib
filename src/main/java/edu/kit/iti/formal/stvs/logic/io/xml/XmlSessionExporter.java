@@ -84,9 +84,9 @@ public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
         SpecificationTable constraintSpec = ((JAXBElement<SpecificationTable>) jaxbUnmarshaller
             .unmarshal(constraintSpecNode)).getValue();
         tab.getSpecification().add(constraintSpec);
-        if (hybridSpec.getConcreteInstance() != null) {
+        if (hybridSpec.getConcreteInstance().isPresent()) {
           Node concreteSpecNode = concreteSpecExporter.exportToXmlNode(hybridSpec
-              .getConcreteInstance());
+              .getConcreteInstance().get());
           SpecificationTable concreteSpec = ((JAXBElement<SpecificationTable>) jaxbUnmarshaller
               .unmarshal(concreteSpecNode)).getValue();
           tab.getSpecification().add(concreteSpec);

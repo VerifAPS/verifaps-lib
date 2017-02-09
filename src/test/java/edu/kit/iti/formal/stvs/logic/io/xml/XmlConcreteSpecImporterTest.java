@@ -2,13 +2,10 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import com.google.gson.JsonElement;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
-import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.*;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
 import edu.kit.iti.formal.stvs.model.table.*;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,7 +38,7 @@ public class XmlConcreteSpecImporterTest {
         TableUtil.specificationTableFromJson(json);
     ConcreteSpecification concreteSpec = new ConcreteSpecification(false);
 
-    concreteSpec.getSpecIoVariables().addAll(stringTable.getSpecIoVariables());
+    concreteSpec.getColumnHeaders().addAll(stringTable.getColumnHeaders());
 
     int currentBeginCycle = 0;
     for (String durationString : stringTable.getDurations()) {

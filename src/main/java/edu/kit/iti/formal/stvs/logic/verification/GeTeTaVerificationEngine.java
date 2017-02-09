@@ -2,13 +2,11 @@ package edu.kit.iti.formal.stvs.logic.verification;
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
-import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
-import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
+import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
@@ -22,14 +20,14 @@ import java.io.IOException;
 public class GeTeTaVerificationEngine implements VerificationEngine {
   private GeTeTaImporter importer;
   private Process getetaProcess;
-  private OptionalProperty<VerificationResult> verificationResult;
+  private NullableProperty<VerificationResult> verificationResult;
 
   private final String GETETA_VERSION = "0.2.2-beta";
   private final String GETETA_COMMAND_BASE = "java -jar geteta-" + GETETA_VERSION + ".jar";
 
   public GeTeTaVerificationEngine() {
     importer = new GeTeTaImporter();
-    verificationResult = new OptionalProperty<>(new SimpleObjectProperty<>());
+    verificationResult = new NullableProperty<>();
     getetaProcess = null;
   }
 
@@ -65,7 +63,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     return verificationResult.get();
   }
 
-  public OptionalProperty<VerificationResult> verificationResultProperty() {
+  public NullableProperty<VerificationResult> verificationResultProperty() {
     return verificationResult;
   }
 

@@ -24,6 +24,7 @@ public class SpecificationRow<C> implements Commentable, Observable {
     return param -> new Observable[] { param };
   }
 
+  private final Map<String, C> backingMap;
   private final ObservableMap<String, C> cells;
   private final StringProperty comment;
 
@@ -41,6 +42,7 @@ public class SpecificationRow<C> implements Commentable, Observable {
   }*/
 
   public SpecificationRow(Map<String, C> cells, Callback<C, Observable[]> extractor) {
+    this.backingMap = cells;
     this.cells = FXCollections.observableMap(cells);
     this.cells.addListener(this::cellsMapChanged);
     this.listeners = new ArrayList<>();
@@ -75,6 +77,14 @@ public class SpecificationRow<C> implements Commentable, Observable {
 
   public ObservableMap<String,C> getCells() {
     return cells;
+  }
+
+  protected void putWithoutListenersNotice(String columnId, C cell) {
+    backingMap.put(columnId, cell);
+  }
+
+  protected void invokeListeners() {
+    rowListener.invalidated(cells);
   }
 
   @Override

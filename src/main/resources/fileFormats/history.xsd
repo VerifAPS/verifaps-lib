@@ -2,8 +2,8 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://formal.iti.kit.edu/stvs/logic/io/xml" elementFormDefault="qualified">
   <complexType name="History">
     <sequence>
-      <element name="code" type="string" minOccurs="0" maxOccurs="unbounded"></element>
-      <element name="spec" type="string" minOccurs="0" maxOccurs="unbounded"></element>
+      <element name="code" errorType="string" minOccurs="0" maxOccurs="unbounded"></element>
+      <element name="spec" errorType="string" minOccurs="0" maxOccurs="unbounded"></element>
     </sequence>
   </complexType>
 </schema>

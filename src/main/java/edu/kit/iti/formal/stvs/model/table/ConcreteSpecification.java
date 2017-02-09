@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import javafx.beans.Observable;
 
 import java.util.ArrayList;
@@ -8,7 +9,7 @@ import java.util.List;
 /**
  * @author Benjamin Alt
  */
-public class ConcreteSpecification extends SpecificationTable<ConcreteCell, ConcreteDuration> {
+public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, ConcreteCell, ConcreteDuration> {
 
   private final boolean isCounterExample;
 

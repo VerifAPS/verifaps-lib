@@ -3,7 +3,6 @@ package edu.kit.iti.formal.stvs.view.spec;
 import edu.kit.iti.formal.stvs.view.spec.table.SynchronizedRow;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionView;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollection;
-import edu.kit.iti.formal.stvs.view.spec.variables.VariableView;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;

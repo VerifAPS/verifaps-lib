@@ -17,7 +17,6 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +41,7 @@ public class XmlConcreteSpecExporterTest {
         TableUtil.specificationTableFromJson(json);
     ConcreteSpecification concreteSpec = new ConcreteSpecification(false);
 
-    concreteSpec.getSpecIoVariables().addAll(stringTable.getSpecIoVariables());
+    concreteSpec.getColumnHeaders().addAll(stringTable.getColumnHeaders());
 
     int currentBeginCycle = 0;
     for (String durationString : stringTable.getDurations()) {

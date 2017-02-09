@@ -1,7 +1,9 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConcreteSpecImporter;
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
@@ -14,6 +16,7 @@ import javafx.scene.control.ContextMenu;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.List;
 
 public class SpecificationController implements Controller {
 
@@ -28,6 +31,8 @@ public class SpecificationController implements Controller {
   private  HybridSpecification hybridSpecification;
 
   public SpecificationController(
+      ObjectProperty<List<Type>> typeContext,
+      ObjectProperty<List<CodeIoVariable>> codeIoVariables,
       HybridSpecification hybridSpecification,
       ObjectProperty<VerificationState> stateProperty) {
     this.spec = hybridSpecification;
@@ -36,9 +41,13 @@ public class SpecificationController implements Controller {
     this.view = new SpecificationView();
     this.selection = new Selection();
     this.variableCollectionController = new VariableCollectionController(
-        hybridSpecification.typeContextProperty(),
-        hybridSpecification.getFreeVariableSet());
-    this.tableController = new SpecificationTableController(hybridSpecification);
+        typeContext,
+        hybridSpecification.getFreeVariableList());
+    this.tableController = new SpecificationTableController(
+        typeContext,
+        codeIoVariables,
+        variableCollectionController.getValidator().validFreeVariablesProperty(),
+        hybridSpecification);
 
     if (getConcreteSpecification() != null) {
       this.timingDiagramCollectionController = new TimingDiagramCollectionController
@@ -50,8 +59,8 @@ public class SpecificationController implements Controller {
   }
 
   private ConcreteSpecification getConcreteSpecification() {
-    return hybridSpecification.getConcreteInstance() == null ? hybridSpecification
-        .getConcreteInstance() : hybridSpecification.getConcreteInstance();
+    return hybridSpecification.getCounterExample().orElse(
+        hybridSpecification.getConcreteInstance().orElse(null));
   }
 
   public SpecificationView getView() {

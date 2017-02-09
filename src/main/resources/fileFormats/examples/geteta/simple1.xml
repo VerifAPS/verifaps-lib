@@ -1,7 +1,7 @@
 <test-table xmlns="http://formal.iti.kit.edu/exteta-1.0" version="1.0">
     <variables>
-        <variable io="input" name="i" data-type="BOOLEAN"/>
-        <variable io="output" name="o" data-type="BOOLEAN"/>
+        <variable io="input" name="i" data-errorType="BOOLEAN"/>
+        <variable io="output" name="o" data-errorType="BOOLEAN"/>
     </variables>
     <steps>
         <step duration="-">

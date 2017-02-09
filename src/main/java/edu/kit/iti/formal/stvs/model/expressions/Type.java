@@ -52,7 +52,7 @@ public interface Type {
 
   /**
    * For any <tt>{@link Type} type</tt> the following must be true:
-   * <tt>type.generateDefaultValue().getType().checksAgainst(type)</tt>
+   * <tt>type.generateDefaultValue().getErrorType().checksAgainst(type)</tt>
    * @return a default value of this given type.
    */
   Value generateDefaultValue();

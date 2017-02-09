@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" isConcrete="true">
   <variables>
-    <ioVariable colwidth="20" data-type="INT" io="input" name="A"/>
-    <ioVariable colwidth="20" data-type="BOOL" io="output" name="B"/>
+    <ioVariable colwidth="20" data-errorType="INT" io="input" name="A"/>
+    <ioVariable colwidth="20" data-errorType="BOOL" io="output" name="B"/>
   </variables>
   <rows>
     <row>
