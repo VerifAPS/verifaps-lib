@@ -23,16 +23,13 @@ import java.util.*;
  * Created by csicar on 09.01.17.
  */
 public class StvsRootController implements Controller {
+
   private final StvsRootView view;
   private final StvsRootModel stvsRootModel;
   private final ObjectProperty<List<Type>> types;
   private final ObjectProperty<List<CodeIoVariable>> ioVars;
-  private EditorPaneController editorPaneController;
   private final SpecificationsPaneController specificationsPaneController;
-  /**
-   * Used to sort Types (Enums should be at the bottom)
-   */
-  private final Comparator<Type> typeComparator = null; // TODO this should not be null
+  private EditorPaneController editorPaneController;
 
   public StvsRootController(StvsRootModel rootModel) {
     this.stvsRootModel = rootModel;

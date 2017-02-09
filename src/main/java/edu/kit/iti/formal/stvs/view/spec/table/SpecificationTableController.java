@@ -57,6 +57,8 @@ public class SpecificationTableController implements Controller {
 
     tableView.getStylesheets().add(SpecificationTableController.class.getResource("style.css").toExternalForm());
 
+    hybridSpecification.getSpecIoVariables().forEach(this::addColumnToView);
+
     for (int rowIndex = 0; rowIndex < hybridSpecification.getRows().size(); rowIndex++) {
       data.add(new SynchronizedRow(
           hybridSpecification.getRows().get(rowIndex),
@@ -191,7 +193,7 @@ public class SpecificationTableController implements Controller {
             specIoVariable.getVarDescriptor(),
             synchronizedRow -> synchronizedRow.getCells().get(specIoVariable.getName()))
     );
-    tableView.refresh();
+    tableView.refresh(); // TODO: maybe this is not needed with the new deep observable updates in the model
   }
 
   private TableColumn<SynchronizedRow, String> createViewColumn(

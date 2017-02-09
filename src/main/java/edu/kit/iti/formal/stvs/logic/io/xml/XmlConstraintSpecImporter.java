@@ -86,7 +86,7 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
       if (cellsMap.size() != ioVariables.size()) {
         throw new ImportException("Row too short: Do not have a cell for each IOVariable");
       }
-      constraintSpec.getRows().add(SpecificationRow.createUnobservableRow(cellsMap));
+      constraintSpec.getRows().add(ConstraintSpecification.createRow(cellsMap));
     }
 
     constraintSpec.setComment(importedSpec.getComment());

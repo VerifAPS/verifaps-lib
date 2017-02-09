@@ -6,10 +6,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.util.Callback;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +29,7 @@ public class SpecificationRow<C> implements Commentable, Observable {
 
   private final List<InvalidationListener> listeners;
   private final Callback<C, Observable[]> extractor;
-  private final InvalidationListener cellChange;
+  private final InvalidationListener rowListener;
 
   public static <E> SpecificationRow<E> createUnobservableRow(Map<String, E> cells) {
     return new SpecificationRow<>(cells, p -> new Observable[0]);
@@ -47,9 +45,9 @@ public class SpecificationRow<C> implements Commentable, Observable {
     this.cells.addListener(this::cellsMapChanged);
     this.listeners = new ArrayList<>();
     this.extractor = extractor;
-    cellChange = observable ->
+    rowListener = observable ->
         listeners.forEach(listener -> listener.invalidated(observable));
-    this.cells.addListener(cellChange);
+    this.cells.addListener(rowListener);
     cells.values().forEach(this::subscribeToCell);
     comment = new SimpleStringProperty("");
   }
@@ -65,13 +63,13 @@ public class SpecificationRow<C> implements Commentable, Observable {
 
   private void subscribeToCell(C c) {
     for (Observable observable : extractor.call(c)) {
-      observable.addListener(cellChange);
+      observable.addListener(rowListener);
     }
   }
 
   private void unsubscribeFromCell(C cell) {
     for (Observable observable : extractor.call(cell)) {
-      observable.removeListener(cellChange);
+      observable.removeListener(rowListener);
     }
   }
 

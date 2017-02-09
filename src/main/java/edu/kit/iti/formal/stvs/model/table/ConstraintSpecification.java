@@ -56,6 +56,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     this.validSpecification = new NullableProperty<>();
 
     this.rows.addListener((Observable observable) -> recalculateSpecProblems());
+    this.durations.addListener((Observable observable) -> recalculateSpecProblems());
   }
 
   public ObjectProperty<List<Type>> typeContextProperty() {

@@ -41,8 +41,8 @@ public class SpecificationsPaneController implements Controller {
 
     hybridSpecifications.forEach(this::addTab);
     this.view.onTabAdded(() -> {
-      hybridSpecifications.add(new HybridSpecification(typeContext, ioVariables, new
-          FreeVariableSet(), true));
+      hybridSpecifications.add(new HybridSpecification(
+          typeContext, ioVariables, new FreeVariableSet(), true));
     });
 
     hybridSpecifications.addListener(new ListChangeListener<HybridSpecification>() {
@@ -66,7 +66,6 @@ public class SpecificationsPaneController implements Controller {
     Tab tab = new Tab();
     String editable = hybridSpecification.isEditable() ? "" : "locked";
     tab.setText("Specification " + editable);
-    System.out.println(controller.getView());
     tab.setContent(controller.getView());
     view.getTabs().add(index, tab);
     controllers.put(tab, controller);

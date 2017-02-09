@@ -7,6 +7,7 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableSet;
 import org.apache.commons.io.IOUtils;
@@ -92,7 +93,7 @@ public class TableUtil {
       row.getCells().forEach((columnId, cellString) ->
         cells.put(columnId, new ConstraintCell(cellString)));
 
-      spec.getRows().add(new SpecificationRow<>(cells));
+      spec.getRows().add(ConstraintSpecification.createRow(cells));
     }
 
     spec.getDurations().addAll(
@@ -121,7 +122,7 @@ public class TableUtil {
   }
 
   private static SpecificationTable<String, String> specificationTableFromJsonTable(JsonTable table) {
-    SpecificationTable<String, String> spec = new SpecificationTable<>();
+    SpecificationTable<String, String> spec = new SpecificationTable<>(p -> new Observable[0]);
     table.variables.stream().map(TableUtil::toSpecIoVariable).forEach(r ->
         spec.getSpecIoVariables().add(r));
 
@@ -138,7 +139,7 @@ public class TableUtil {
     for (int i = 0; i < split.length; i++) {
       elems.put(ioVars.get(i).getName(), split[i]);
     }
-    return new SpecificationRow<>(elems);
+    return SpecificationRow.createUnobservableRow(elems);
   }
 
   private static SpecIoVariable toSpecIoVariable(JsonIoVariable iovar) {

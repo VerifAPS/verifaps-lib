@@ -63,7 +63,7 @@ public class XmlConcreteSpecExporterTest {
         Value value = ((LiteralExpr) binF.getSecondArgument()).getValue();
         cells.put(stringEntry.getKey(), new ConcreteCell(value));
       }
-      concreteSpec.getRows().add(new SpecificationRow<>(cells));
+      concreteSpec.getRows().add(SpecificationRow.createUnobservableRow(cells));
     }
 
     ByteArrayOutputStream result = exporter.export(concreteSpec);

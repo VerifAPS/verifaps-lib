@@ -65,6 +65,9 @@ public class ParsedCode {
         //String varName = variableEntry.getKey();
         VariableDeclaration varDecl = variableEntry.getValue();
         Type type = definedTypes.get(varDecl.getDataTypeName());
+        if (type == null) {
+          return; // TODO: Maybe output error instead
+        }
         VariableCategory category;
         switch (varDecl.getType()) {
           case VariableDeclaration.INPUT:

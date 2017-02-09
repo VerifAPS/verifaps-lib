@@ -19,6 +19,9 @@ public class CodeIoVariable extends IoVariable {
    * @param name     The name of the Variable
    */
   public CodeIoVariable(VariableCategory category, Type type, String name) {
+    if (category == null || type == null || name == null) {
+      throw new NullPointerException();
+    }
     this.category = category;
     this.type = type;
     this.name = name;
@@ -49,7 +52,7 @@ public class CodeIoVariable extends IoVariable {
     if (o == null) return false;
     if (!(o instanceof CodeIoVariable)) return false;
     CodeIoVariable other = (CodeIoVariable) o;
-    return category.equals(other.category) && name.equals(other.name) && type.equals(other.type);
+    return equals(other);
   }
 
   public String toString() {

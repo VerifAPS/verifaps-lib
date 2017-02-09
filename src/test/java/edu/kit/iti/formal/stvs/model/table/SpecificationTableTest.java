@@ -121,7 +121,7 @@ public class SpecificationTableTest {
     expectedCells.put("VariableB", "B2");
     expectedCells.put("VariableC", "C2");
     expectedCells.put("VariableD", "D2");
-    assertEquals(new SpecificationRow<>(expectedCells), row);
+    assertEquals(SpecificationRow.createUnobservableRow(expectedCells), row);
   }
 
   @Test(expected=IndexOutOfBoundsException.class)
@@ -136,7 +136,7 @@ public class SpecificationTableTest {
     newCells.put("VariableB", "B4");
     newCells.put("VariableC", "C4");
     newCells.put("VariableD", "D4");
-    SpecificationRow<String> newRow = new SpecificationRow<>(newCells);
+    SpecificationRow<String> newRow = SpecificationRow.createUnobservableRow(newCells);
 
     table.getRows().add(newRow);
 
@@ -151,7 +151,7 @@ public class SpecificationTableTest {
       newCells.put("VariableB", "B4");
       newCells.put("VariableC", "C4");
       newCells.put("VariableX", "D4");
-      SpecificationRow<String> newRow = new SpecificationRow<>(newCells);
+      SpecificationRow<String> newRow = SpecificationRow.createUnobservableRow(newCells);
 
       table.getRows().add(newRow);
     });
@@ -166,7 +166,7 @@ public class SpecificationTableTest {
       newCells.put("VariableC", "C4");
       newCells.put("VariableD", "D4");
       newCells.put("VariableE", "E5");
-      SpecificationRow<String> newRow = new SpecificationRow<>(newCells);
+      SpecificationRow<String> newRow = SpecificationRow.createUnobservableRow(newCells);
 
       table.getRows().add(newRow);
     });
@@ -179,7 +179,7 @@ public class SpecificationTableTest {
     expectedCells.put("VariableB", "B2");
     expectedCells.put("VariableC", "C2");
     expectedCells.put("VariableD", "D2");
-    SpecificationRow<String> expectedRow = new SpecificationRow<>(expectedCells);
+    SpecificationRow<String> expectedRow = SpecificationRow.createUnobservableRow(expectedCells);
 
     SpecificationRow<String> removed = table.getRows().remove(2);
     assertEquals(expectedRow, removed);
