@@ -31,20 +31,8 @@ public class EditorTest {
     EditorPaneController controller = new EditorPaneController(code, new GlobalConfig());
 
     Pane rightPane = createExtractedVarsTextArea(code);
-    SplitPane errorPane = createSyntaxErrorPane(code);
 
     return Arrays.asList(controller.getView(), rightPane);
-  }
-
-
-  private SplitPane createSyntaxErrorPane(Code code) {
-    final TextArea textField = new TextArea();
-    textField.setEditable(false);
-    updateSyntaxErrors(textField, code);
-    code.parsedCodeProperty().addListener((ob, old, parsedCode) -> updateSyntaxErrors(textField, code));
-    SplitPane pane = new SplitPane(textField);
-    pane.orientationProperty().setValue(Orientation.HORIZONTAL);
-    return pane;
   }
 
   private void updateSyntaxErrors(TextArea textField, Code code) {

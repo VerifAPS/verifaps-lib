@@ -7,6 +7,8 @@ import edu.kit.iti.formal.stvs.model.code.ParsedCode;
 import edu.kit.iti.formal.stvs.model.code.SyntaxError;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import org.antlr.v4.runtime.Token;
 import org.fxmisc.richtext.*;
@@ -29,10 +31,12 @@ public class EditorPaneController implements Controller {
   private Code code;
   private GlobalConfig globalConfig;
   private ExecutorService executor;
+  private ObservableList<SyntaxError> syntaxErrors;
 
   public EditorPaneController(Code code, GlobalConfig globalConfig) {
     this.code = code;
-    this.view = new EditorPane(code.getSourcecode());
+    this.syntaxErrors = code.getSyntaxErrorObs();
+    this.view = new EditorPane(code.getSourcecode(), syntaxErrors);
     this.globalConfig = globalConfig;
 
     this.view.getStylesheets().add(
@@ -40,6 +44,7 @@ public class EditorPaneController implements Controller {
     this.executor = Executors.newSingleThreadExecutor();
     configureTextArea();
     handleTextChange(computeHighlighting(code.getSourcecode()));
+
   }
 
   private void configureTextArea() {
@@ -149,6 +154,8 @@ public class EditorPaneController implements Controller {
   private void handleTextChange(StyleSpans<Collection<String>> highlighting) {
     code.updateSourcecode(view.getCodeArea().getText());
     view.setStyleSpans(highlighting);
+    System.out.println(view.getSyntaxErrorListView().getItems());
+
   }
 
   private void handleParsedCodeFoldingBlocks(List<FoldableCodeBlock> foldableCodeBlocks) {

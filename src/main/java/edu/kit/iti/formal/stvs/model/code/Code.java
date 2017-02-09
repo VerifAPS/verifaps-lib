@@ -8,6 +8,8 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 
@@ -28,6 +30,8 @@ public class Code {
   private NullableProperty<ParsedCode> parsedCode;
   private List<? extends Token> tokens;
   private List<SyntaxError> syntaxErrors;
+  private ObservableList<SyntaxError> syntaxErrorObs;
+
 
   /**
    * creates a Dummy-Codefile
@@ -40,6 +44,8 @@ public class Code {
     this.filename = new SimpleStringProperty(filename);
     this.sourceCodeProperty = new SimpleStringProperty(sourcecode);
     this.parsedCode = new NullableProperty<>();
+    syntaxErrorObs = FXCollections.observableArrayList();
+
 
     invalidate();
   }
@@ -49,6 +55,7 @@ public class Code {
         tokens -> this.tokens = tokens,
         syntaxErrors -> this.syntaxErrors = syntaxErrors,
         parsedCode -> this.parsedCode.set(parsedCode));
+    syntaxErrorObs.setAll(syntaxErrors);
   }
 
   public void updateSourcecode(String sourcecode) {
@@ -63,6 +70,8 @@ public class Code {
   public List<SyntaxError> getSyntaxErrors() {
     return syntaxErrors;
   }
+
+  public ObservableList<SyntaxError> getSyntaxErrorObs() { return syntaxErrorObs;}
 
   public ParsedCode getParsedCode() {
     return parsedCode.get();
