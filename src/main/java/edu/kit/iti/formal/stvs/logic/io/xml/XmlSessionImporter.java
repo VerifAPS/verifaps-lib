@@ -74,41 +74,33 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
       // Tabs
       List<HybridSpecification> hybridSpecs = new ArrayList<>();
       for (Tab tab : importedSession.getTabs().getTab()) {
-        // Each tab corresponds to a hybridSpecification
-        HybridSpecification hybridSpec = new HybridSpecification(
-            new SimpleObjectProperty<>(new ArrayList<>()), // TODO: Shouldn't this be initialized differently? (philipp)
-            new SimpleObjectProperty<>(new ArrayList<>()),
-            new FreeVariableSet(),
-            !tab.isReadOnly());
-        boolean hasAbstract = false;
+        HybridSpecification hybridSpec = null;
+        ConcreteSpecification counterExample = null;
+        ConcreteSpecification concreteInstance = null;
         for (SpecificationTable specTable : tab.getSpecification()) {
           JAXBElement<SpecificationTable> element = objectFactory.createSpecification(specTable);
           if (!specTable.isIsConcrete()) {
-            if (hasAbstract) {
+            if (hybridSpec != null) {
               throw new ImportException("Tab may not have more than one abstract specification");
             }
             ConstraintSpecification constraintSpec = constraintSpecImporter.doImportFromXmlNode
                 (XmlExporter.marshalToNode(element));
-            hybridSpec.getSpecIoVariables().addAll(constraintSpec.getSpecIoVariables());
-            hybridSpec.getRows().addAll(constraintSpec.getRows());
-            hybridSpec.getTypeContext().addAll(constraintSpec.getTypeContext());
-            hybridSpec.getCodeIoVariables().addAll(constraintSpec.getCodeIoVariables());
-            hybridSpec.getFreeVariableSet().getVariableSet().addAll(constraintSpec
-                .getFreeVariableSet().getVariableSet());
-            hasAbstract = true;
+            hybridSpec = new HybridSpecification(constraintSpec, !tab.isReadOnly());
           } else {
             ConcreteSpecification concreteSpec = concreteSpecImporter.doImportFromXmlNode
                 (XmlExporter.marshalToNode(element));
             if (concreteSpec.isCounterExample()) {
-              hybridSpec.setCounterExample(concreteSpec);
+              counterExample = concreteSpec;
             } else {
-              hybridSpec.setConcreteInstance(concreteSpec);
+              concreteInstance = concreteSpec;
             }
           }
         }
-        if (!hasAbstract) {
+        if (hybridSpec == null) {
           throw new ImportException("Tab must have at least one abstract specification");
         }
+        hybridSpec.setCounterExample(counterExample);
+        hybridSpec.setConcreteInstance(concreteInstance);
         hybridSpecs.add(hybridSpec);
       }
 

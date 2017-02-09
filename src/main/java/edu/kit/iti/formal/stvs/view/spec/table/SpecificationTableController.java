@@ -48,11 +48,9 @@ public class SpecificationTableController implements Controller {
   private final TableColumn<SynchronizedRow, String> durations;
   private final ContextMenu columnContextMenu;
 
-  public SpecificationTableController(ObjectProperty<List<Type>> typeContext,
-                                      ObjectProperty<List<CodeIoVariable>> codeIoVariables,
-                                      FreeVariableSet freeVariableSet) {
+  public SpecificationTableController(HybridSpecification hybridSpecification) {
     this.tableView = new TableView<>();
-    this.hybridSpec = new HybridSpecification(typeContext, codeIoVariables, freeVariableSet, true);
+    this.hybridSpec = hybridSpecification;
     this.durations = createViewColumn(DURATION_COL_USER_DATA, "Duration", SynchronizedRow::getDuration);
     this.columnContextMenu = createColumnEditingContextMenu();
 
@@ -64,11 +62,18 @@ public class SpecificationTableController implements Controller {
     tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableView.setRowFactory(this::rowFactory);
 
-    data.addListener(this::onDataRowChanged);
 
     tableView.setContextMenu(createRowEditingContextMenu());
 
     tableView.getStylesheets().add(SpecificationTableController.class.getResource("style.css").toExternalForm());
+
+    for (int rowIndex = 0; rowIndex < hybridSpecification.getRows().size(); rowIndex++) {
+      data.add(new SynchronizedRow(
+          hybridSpecification.getRows().get(rowIndex),
+          hybridSpecification.getDurations().get(rowIndex)));
+    }
+
+    data.addListener(this::onDataRowChanged);
   }
 
   private TableCell<SynchronizedRow, String> cellFactory(TableColumn<SynchronizedRow, String> table) {
@@ -82,6 +87,19 @@ public class SpecificationTableController implements Controller {
         getStyleClass().add("spec-cell");
       }
 
+      private void configureProblem(SpecProblem problem) {
+        getStyleClass().remove("spec-cell-problem");
+        getStyleClass().add("spec-cell-problem");
+        setTextFill(Color.RED);
+        setTooltip(new Tooltip(problem.getErrorMessage()));
+      }
+
+      private void resetCellVisuals() {
+        setTextFill(normalTextFill);
+        getStyleClass().remove("spec-cell-problem");
+        setTooltip(null);
+      }
+
       private void onProblemsChanged() {
         if (!isEmpty()) {
           List<SpecProblem> problems = hybridSpec.getProblems();
@@ -90,24 +108,19 @@ public class SpecificationTableController implements Controller {
               CellProblem cellProblem = (CellProblem) problem;
               String col = cellProblem.getColumn();
               if (col.equals(getTableColumn().getUserData()) && cellProblem.getRow() == getTableRow().getIndex()) {
-                getStyleClass().remove("spec-cell-problem");
-                getStyleClass().add("spec-cell-problem");
-                setTextFill(Color.RED);
+                configureProblem(problem);
                 return;
               }
             } else if (problem instanceof DurationProblem) {
               DurationProblem durationProblem = (DurationProblem) problem;
               if (DURATION_COL_USER_DATA.equals(getTableColumn().getUserData()) && durationProblem.getRow() == getTableRow().getIndex()) {
-                getStyleClass().remove("spec-cell-problem");
-                getStyleClass().add("spec-cell-problem");
-                setTextFill(Color.RED);
+                configureProblem(problem);
                 return;
               }
             }
           }
         }
-        setTextFill(normalTextFill);
-        getStyleClass().remove("spec-cell-problem");
+        resetCellVisuals();
       }
 
     };
@@ -129,6 +142,7 @@ public class SpecificationTableController implements Controller {
       }
       if (change.wasRemoved()) {
         hybridSpec.getRows().remove(change.getFrom(), change.getFrom() + change.getRemovedSize());
+        hybridSpec.getDurations().remove(change.getFrom(), change.getFrom() + change.getRemovedSize());
       }
     }
   }

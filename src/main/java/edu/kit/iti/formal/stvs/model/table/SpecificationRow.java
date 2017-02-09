@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
  */
 public class SpecificationRow<C> implements Commentable {
 
-  private ObservableMap<String, C> cells;
-  private StringProperty comment;
+  private final ObservableMap<String, C> cells;
+  private final StringProperty comment;
 
   public SpecificationRow(Map<String, C> cells) {
     this.cells = FXCollections.observableMap(cells);

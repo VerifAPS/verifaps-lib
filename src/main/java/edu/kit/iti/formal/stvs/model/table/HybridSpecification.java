@@ -65,6 +65,7 @@ public class HybridSpecification extends ConstraintSpecification {
         editable);
     getSpecIoVariables().addAll(sourceSpec.getSpecIoVariables());
     getRows().addAll(sourceSpec.getRows());
+    getDurations().addAll(sourceSpec.getDurations());
   }
 
   public ConcreteSpecification getCounterExample() {
