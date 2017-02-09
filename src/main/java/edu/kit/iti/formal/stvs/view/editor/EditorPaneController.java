@@ -95,13 +95,12 @@ public class EditorPaneController implements Controller {
   }
 
   private Collection<String> getStyleClassesFor(Token token, List<SyntaxError> syntaxErrors) {
-    List<String> classes = new ArrayList<>();
         //getHightlightingClass(token);
     if (syntaxErrors.stream().anyMatch(syntaxError -> syntaxError.isToken(token))) {
-      classes.add("syntax-error");
+      return Collections.singletonList("syntax-error");
+    } else {
+      return getHightlightingClass(token);
     }
-    classes.addAll(getHightlightingClass(token));
-    return classes;
   }
 
   private List<String> getHightlightingClass(Token token) {
