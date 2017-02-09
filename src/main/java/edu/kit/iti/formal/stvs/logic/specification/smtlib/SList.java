@@ -83,8 +83,8 @@ public class SList implements SExpr {
   }
 
   public String toString() {
-    return "SList( " + getList().stream().map(Object::toString).collect(Collectors.joining
-        (", "))
+    return "( " + getList().stream().map(Object::toString).collect(Collectors.joining
+        (" "))
         + " )";
   }
 

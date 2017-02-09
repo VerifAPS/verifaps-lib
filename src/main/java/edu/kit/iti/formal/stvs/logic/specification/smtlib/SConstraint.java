@@ -23,14 +23,14 @@ public class SConstraint implements SExpr {
 
   public SConstraint combine(RecSConstraint other) {
     addGlobalConstrains(other.getGlobalConstraints());
-    addVariableDefinitions(other.getVariableDefinitions());
+    addHeaderDefinitions(other.getVariableDefinitions());
     addGlobalConstrains(other.getRecExpression());
     return this;
   }
 
   public SConstraint combine(SConstraint other) {
     addGlobalConstrains(other.getGlobalConstraints());
-    addVariableDefinitions(other.getVariableDefinitions());
+    addHeaderDefinitions(other.getVariableDefinitions());
     return this;
   }
 
@@ -53,11 +53,11 @@ public class SConstraint implements SExpr {
     return this;
   }
 
-  public SConstraint addVariableDefinitions(SExpr ... variableDefinition) {
-    return addVariableDefinitions(Arrays.asList(variableDefinition));
+  public SConstraint addHeaderDefinitions(SExpr ... variableDefinition) {
+    return addHeaderDefinitions(Arrays.asList(variableDefinition));
   }
 
-  public SConstraint addVariableDefinitions(Collection<SExpr> variableDefinitions) {
+  public SConstraint addHeaderDefinitions(Collection<SExpr> variableDefinitions) {
     this.variableDefinitions.addAll(variableDefinitions);
     return this;
   }
@@ -68,5 +68,13 @@ public class SConstraint implements SExpr {
 
   public Set<SExpr> getVariableDefinitions() {
     return variableDefinitions;
+  }
+
+  @Override
+  public String toString() {
+    return "SConstraint{" +
+        "globalConstraints=" + globalConstraints +
+        ", variableDefinitions=" + variableDefinitions +
+        '}';
   }
 }

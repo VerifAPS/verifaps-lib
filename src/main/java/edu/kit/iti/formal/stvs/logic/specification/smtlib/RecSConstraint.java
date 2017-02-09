@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -25,7 +24,7 @@ public class RecSConstraint extends SConstraint {
     this.recExpression = list;
     for (RecSConstraint operand : operands) {
       addGlobalConstrains(operand.getGlobalConstraints());
-      addVariableDefinitions(operand.getVariableDefinitions());
+      addHeaderDefinitions(operand.getVariableDefinitions());
     }
     return this;
   }

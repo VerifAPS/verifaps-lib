@@ -38,8 +38,8 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   private final SpecIoVariable column;
   private final Predicate<Type> isIoVariable;
   private final Function<String, String> getSMTLibVariableName;
-  private final SConstraint sConstraint;
 
+  private final SConstraint sConstraint;
 
   /**
    * Creates a visitor from a type context.
@@ -58,7 +58,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     this.getSMTLibVariableName = getSMTLibVariableTypeName;
 
     String typeName = column.getType().getTypeName();
-    this.sConstraint = new SConstraint().addVariableDefinitions(
+    this.sConstraint = new SConstraint().addHeaderDefinitions(
         new SList(
             "declare-const",
             column.getName() + "_" + row + "_" + iteration,
@@ -69,7 +69,6 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
         )
     );
   }
-
 
 
   @Override
@@ -86,6 +85,8 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     return new SList(name, left, right);
 
   }
+
+
 
   private int[] preventOverflowBounds(int[] bounds) {
     return Arrays.stream(bounds)
@@ -154,5 +155,9 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
       list.addAll("n_"+l);
     }
     return list;
+  }
+
+  public SConstraint getConstraint() {
+    return sConstraint;
   }
 }

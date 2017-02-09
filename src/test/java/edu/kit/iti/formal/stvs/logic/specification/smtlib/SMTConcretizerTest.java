@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.logic.specification;
+package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import org.junit.Test;
 

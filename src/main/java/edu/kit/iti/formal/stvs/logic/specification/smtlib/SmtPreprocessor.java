@@ -32,35 +32,38 @@ public class SmtPreprocessor {
   private final ValidSpecification specification;
   private final Map<String, Type> typeContext;
   private final Predicate<Type> isIoVariable;
+
   private SConstraint sConstrain;
 
-  public SmtPreprocessor(Map<Integer, Integer> maxDurations, List<SpecIoVariable> ioVariables,
-                         ValidSpecification specification, Map<String, Type> typeContext, Predicate<Type> isIoVariable) {
+  public SmtPreprocessor(Map<Integer, Integer> maxDurations,
+                         ValidSpecification specification, Map<String, Type> typeContext) {
     this.maxDurations = maxDurations;
-    this.ioVariables = ioVariables;
+    this.ioVariables = specification.getSpecIoVariables();
     this.specification = specification;
     this.typeContext = typeContext;
-    this.isIoVariable = isIoVariable;
+    this.isIoVariable = ioVariables::contains;
     this.sConstrain = new SConstraint()
-        .addVariableDefinitions(createEnumTypes());
+        .addHeaderDefinitions(createEnumTypes())
+        .addHeaderDefinitions(createFreeVariables());
 
     //Step I, II, IV
     for (SpecIoVariable ioVariable : this.ioVariables) {
       SpecificationColumn<Expression> column = this.specification.getColumnByName(ioVariable.getName());
       for (int z = 0; z < column.getCells().size(); z++ ) {
         Expression expression = column.getCells().get(z);
-        ExpressionConverter converter = new ExpressionConverter(expression, z);
 
         for (int i = 0; i < getMaxDuration(z); i++) {
-          RecSConstraint expressionConstraint = converter.convert(i);
+          SmtConvertExpressionVisitor visitor = new SmtConvertExpressionVisitor(typeContext, z,
+              i, ioVariable, isIoVariable, this::getSMTLibVariableTypeName);
+          SExpr expressionConstraint = expression.takeVisitor(visitor);
           //n_z >= i => ExpressionVisitor(z,i,...)
           this.sConstrain = new RecSConstraint(
               new SList("implies",
                 new SList(">=", "n_" + z, i + ""),
-                expressionConstraint.getRecExpression()
+                expressionConstraint
               ),
-              expressionConstraint.getGlobalConstraints(),
-              expressionConstraint.getVariableDefinitions()
+              visitor.getConstraint().getGlobalConstraints(),
+              visitor.getConstraint().getVariableDefinitions()
           ).combine(this.sConstrain);
         }
       }
@@ -104,8 +107,9 @@ public class SmtPreprocessor {
     }).collect(Collectors.toList());
   }
 
-
   private List<SExpr> createEnumTypes() {
+    
+
     return typeContext.entrySet().stream().map(item -> {
       String typeName = item.getValue().getTypeName();
       List<ValueEnum> valueEnums = item.getValue().match(
@@ -123,6 +127,7 @@ public class SmtPreprocessor {
     }).collect(Collectors.toList());
   }
 
+
   private String getSMTLibVariableTypeName(String typeName) {
     return smtlibTypes.getOrDefault(typeName, typeName);
   }
@@ -139,5 +144,9 @@ public class SmtPreprocessor {
     if(j < 0) return 0;
     // TODO: use globalconfig value for default value
     return maxDurations.getOrDefault(j, 5);
+  }
+
+  public SConstraint getConstrain() {
+    return sConstrain;
   }
 }

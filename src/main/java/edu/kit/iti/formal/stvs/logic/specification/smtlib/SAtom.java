@@ -29,7 +29,7 @@ public class SAtom implements SExpr {
   }
 
   public String toString() {
-    return "SAtom("+string+")";
+    return "<<" + string + ">>";
   }
 
 
