@@ -29,9 +29,8 @@ public class SAtom implements SExpr {
   }
 
   public String toString() {
-    return "<<" + string + ">>";
+    return "\"" + string + "\"";
   }
-
 
   @Override
   public boolean equals(Object o) {
@@ -43,8 +42,14 @@ public class SAtom implements SExpr {
     return string != null ? string.equals(sAtom.string) : sAtom.string == null;
   }
 
+
   @Override
   public int hashCode() {
     return string != null ? string.hashCode() : 0;
+  }
+
+  @Override
+  public String toText() {
+    return string;
   }
 }

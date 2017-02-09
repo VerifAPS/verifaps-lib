@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 import de.tudresden.inf.lat.jsexp.Sexp;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by csicar on 09.02.17.
@@ -44,6 +45,24 @@ public class SConstraint implements SExpr {
     return null;
   }
 
+  public String headerToText() {
+    return getVariableDefinitions().stream()
+        .map(SExpr::toText)
+        .collect(Collectors.joining(" \n "));
+  }
+
+  public String globalConstraintsToText() {
+    return getGlobalConstraints().stream()
+        .map(constr -> new SList("assert", constr))
+        .map(SList::toText)
+        .collect(Collectors.joining(" \n "));
+  }
+
+  @Override
+  public String toText() {
+    return headerToText() + " \n " + globalConstraintsToText();
+  }
+
   public SConstraint addGlobalConstrains(SExpr ... globalConstraint) {
     return addGlobalConstrains(Arrays.asList(globalConstraint));
   }
@@ -72,9 +91,9 @@ public class SConstraint implements SExpr {
 
   @Override
   public String toString() {
-    return "SConstraint{" +
-        "globalConstraints=" + globalConstraints +
-        ", variableDefinitions=" + variableDefinitions +
+    return "SConstraint{\n" +
+        "\tglobalConstraints=" + globalConstraints +
+        ",\n\tvariableDefinitions=" + variableDefinitions +
         '}';
   }
 }

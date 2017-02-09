@@ -18,12 +18,25 @@ import java.util.Set;
 public class ValidSpecification extends SpecificationTable<Expression, LowerBoundedInterval> {
 
   private final ObjectProperty<List<Type>> typeContext;
+
+  public ObjectProperty<List<Type>> typeContextProperty() {
+    return typeContext;
+  }
+
   private FreeVariableSet freeVariableSet;
 
   public ValidSpecification(ObjectProperty<List<Type>> typeContext, FreeVariableSet freeVariableSet) {
     super();
     this.typeContext = typeContext;
     this.freeVariableSet = freeVariableSet;
+  }
+
+  public FreeVariableSet getFreeVariableSet() {
+    return freeVariableSet;
+  }
+
+  public List<Type> getTypeContext() {
+    return typeContext.get();
   }
 
   @Override

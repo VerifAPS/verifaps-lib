@@ -41,13 +41,20 @@ public class SmtPreprocessorTest {
             ())), new FreeVariableSet());
 
     //validSpecification.getRows().addAll(new SpecificationRow<Expression>())
-    SmtPreprocessor preprocessor = new SmtPreprocessor(maxDurations, validSpecification, typeContext);
+    SmtPreprocessor preprocessor = new SmtPreprocessor(maxDurations, validSpecification);
     System.out.println(preprocessor.getConstrain());
   }
 
   @Test
   public void testImported() throws ImportException {
     ValidSpecification spec = ImporterFacade.importSpec(getClass().getResourceAsStream("testSpec.xml"), ImporterFacade.ImportFormat.XML).getValidSpecification();
-    System.out.println(spec.getDurations());
+    Map<Integer, Integer> maxDurations = new HashMap<Integer,
+        Integer>() {{
+      put(0, 2);
+      put(1, 5);
+      put(2, 5);
+    }};
+    SmtPreprocessor preprocessor = new SmtPreprocessor(maxDurations, spec);
+    System.out.println(preprocessor.getConstrain());
   }
 }

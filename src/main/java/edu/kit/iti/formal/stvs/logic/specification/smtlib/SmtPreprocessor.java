@@ -27,17 +27,17 @@ public class SmtPreprocessor {
   private final Map<Integer, Integer> maxDurations;
   private final List<SpecIoVariable> ioVariables;
   private final ValidSpecification specification;
-  private final Map<String, Type> typeContext;
   private final Predicate<Type> isIoVariable;
+  private final Map<String, Type> freeVariablesContext;
 
   private SConstraint sConstrain;
 
   public SmtPreprocessor(Map<Integer, Integer> maxDurations,
-                         ValidSpecification specification, Map<String, Type> typeContext) {
+                         ValidSpecification specification) {
     this.maxDurations = maxDurations;
-    this.ioVariables = specification.getSpecIoVariables();
     this.specification = specification;
-    this.typeContext = typeContext;
+    this.ioVariables = specification.getSpecIoVariables();
+    this.freeVariablesContext = specification.getFreeVariableSet().getVariableContext();
     this.isIoVariable = ioVariables::contains;
     this.sConstrain = new SConstraint()
         .addHeaderDefinitions(createEnumTypes())
@@ -50,7 +50,8 @@ public class SmtPreprocessor {
         Expression expression = column.getCells().get(z);
 
         for (int i = 0; i < getMaxDuration(z); i++) {
-          SmtConvertExpressionVisitor visitor = new SmtConvertExpressionVisitor(typeContext, z,
+          SmtConvertExpressionVisitor visitor = new SmtConvertExpressionVisitor
+              (this::getTypeForVariable, z,
               i, ioVariable, isIoVariable, this::getSMTLibVariableTypeName);
           SExpr expressionConstraint = expression.takeVisitor(visitor);
           //n_z >= i => ExpressionVisitor(z,i,...)
@@ -92,10 +93,19 @@ public class SmtPreprocessor {
         }
       }
     }
+
+  }
+
+  private Type getTypeForVariable(String variableName) {
+    Type type = freeVariablesContext.get(variableName);
+    if(type == null) {
+      type = specification.getSpecIoVariableByName(variableName).getType();
+    }
+    return type;
   }
 
   private List<SExpr> createFreeVariables() {
-    return typeContext.entrySet().stream()
+    return freeVariablesContext.entrySet().stream()
         .filter(item -> !isIoVariable.test(item.getValue()))
         .map(item -> {
       String typeName = item.getValue().getTypeName();
@@ -105,11 +115,12 @@ public class SmtPreprocessor {
   }
 
   private SExpr createEnumTypes() {
+
     List<SExpr> definitions = new LinkedList<>();
 
-    typeContext.entrySet().forEach(item -> {
-      String typeName = item.getValue().getTypeName();
-      Optional<List<ValueEnum>> valueEnums = item.getValue().match(
+    specification.getTypeContext().forEach(item -> {
+      String typeName = item.getTypeName();
+      Optional<List<ValueEnum>> valueEnums = item.match(
           Optional::empty,
           Optional::empty,
           e -> Optional.of(e.getValues())

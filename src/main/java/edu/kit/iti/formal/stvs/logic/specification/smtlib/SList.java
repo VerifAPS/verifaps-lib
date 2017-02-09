@@ -61,6 +61,11 @@ public class SList implements SExpr {
     return exp;
   }
 
+  @Override
+  public String toText() {
+    return " ( " + getList().stream().map(SExpr::toText).collect(Collectors.joining(" ")) + " ) ";
+  }
+
   public SList addAll(SExpr ... sexp) {
     return  addAll(Arrays.asList(sexp));
   }
