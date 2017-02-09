@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
+import edu.kit.iti.formal.stvs.logic.io.ImportException;
+import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Expression;
@@ -9,6 +11,7 @@ import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import javafx.beans.property.SimpleObjectProperty;
 import org.junit.Test;
+import org.reactfx.value.Val;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,5 +43,11 @@ public class SmtPreprocessorTest {
     //validSpecification.getRows().addAll(new SpecificationRow<Expression>())
     SmtPreprocessor preprocessor = new SmtPreprocessor(maxDurations, validSpecification, typeContext);
     System.out.println(preprocessor.getConstrain());
+  }
+
+  @Test
+  public void testImported() throws ImportException {
+    ValidSpecification spec = ImporterFacade.importSpec(getClass().getResourceAsStream("testSpec.xml"), ImporterFacade.ImportFormat.XML).getValidSpecification();
+    System.out.println(spec.getDurations());
   }
 }
