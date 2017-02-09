@@ -29,19 +29,21 @@ public class VerificationScenario {
   public VerificationScenario(Code code) {
     this.code = new SimpleObjectProperty<>(code);
     verificationResult = new OptionalProperty<>(new SimpleObjectProperty<>());
-    verificationEngine = new GeTeTaVerificationEngine();
-    verificationEngine.verificationResultProperty().addListener(new
-        VerificationChangedListener());
-    verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
   }
 
   public void verify(ConstraintSpecification spec) throws IOException, ExportException {
+    verificationEngine = new GeTeTaVerificationEngine(spec.getTypeContext());
+    verificationEngine.verificationResultProperty().addListener(new
+        VerificationChangedListener());
+    verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
     verificationEngine.startVerification(this, spec);
     verificationState.set(VerificationState.RUNNING);
   }
 
   public void cancel() {
-    verificationEngine.cancelVerification();
+    if (verificationEngine != null) {
+      verificationEngine.cancelVerification();
+    }
     verificationState.set(VerificationState.CANCELLED);
   }
 

@@ -58,6 +58,7 @@
                             </sequence>
                         </sequence>
                         <attribute name="counter" type="int"></attribute>
+                        <attribute name="row" type="int"></attribute>
                     </complexType>
                 </element>
             </sequence>
