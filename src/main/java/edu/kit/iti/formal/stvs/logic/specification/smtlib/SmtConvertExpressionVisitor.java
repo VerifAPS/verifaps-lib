@@ -57,7 +57,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   }
 
   private List<SExpr> createEnumTypes() {
-    typeContext.entrySet().stream().map(item -> {
+    return typeContext.entrySet().stream().map(item -> {
       String typeName = item.getValue().getTypeName();
       List<ValueEnum> valueEnums = item.getValue().match(
           LinkedList::new,
@@ -129,10 +129,10 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     }
     Type type = typeContext.get(variableName);
 
-    if(isIoVariable.test(type)) {
-      // Do Rule IV
-      
-      // Do Rule II
+    if (isIoVariable.test(type)) {
+      // Todo: Do Rule IV
+      // Todo: Do Rule II
+      return new SAtom(variableName);
     } else {
       return new SAtom(variableName);
     }

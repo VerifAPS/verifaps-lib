@@ -37,9 +37,9 @@ public class SList implements SExpr {
   }
 
   public SList(String command, SExpr ... sexp) {
-    this.sexp = new LinkedList<>();
-    this.sexp.add(new SAtom(command));
-    this.sexp.addAll(Arrays.asList(sexp));
+    this();
+    addAll(new SAtom(command));
+    addAll(Arrays.asList(sexp));
   }
 
   public SList(Sexp exp) {
@@ -86,5 +86,20 @@ public class SList implements SExpr {
     return "SList( " + getList().stream().map(Object::toString).collect(Collectors.joining
         (", "))
         + " )";
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    SList sList = (SList) o;
+
+    return sexp != null ? sexp.equals(sList.sexp) : sList.sexp == null;
+  }
+
+  @Override
+  public int hashCode() {
+    return sexp != null ? sexp.hashCode() : 0;
   }
 }

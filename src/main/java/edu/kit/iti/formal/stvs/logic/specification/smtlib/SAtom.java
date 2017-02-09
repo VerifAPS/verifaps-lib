@@ -31,4 +31,20 @@ public class SAtom implements SExpr {
   public String toString() {
     return "SAtom("+string+")";
   }
+
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    SAtom sAtom = (SAtom) o;
+
+    return string != null ? string.equals(sAtom.string) : sAtom.string == null;
+  }
+
+  @Override
+  public int hashCode() {
+    return string != null ? string.hashCode() : 0;
+  }
 }

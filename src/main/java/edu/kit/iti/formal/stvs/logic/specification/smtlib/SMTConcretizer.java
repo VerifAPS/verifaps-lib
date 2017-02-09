@@ -15,15 +15,14 @@ import java.util.Arrays;
  * Created by csicar on 08.02.17.
  */
 public class SMTConcretizer implements SpecificationConcretizer {
+  private ValidSpecification validSpecification;
+
   public SMTConcretizer() {
 
   }
 
   @Override
   public ConcretizerContext getContext() {
-    Sexp s = SexpFactory.newNonAtomicSexp();
-    s.add(SexpFactory.newAtomicSexp("ads"));
-
 
     return null;
 
@@ -36,6 +35,7 @@ public class SMTConcretizer implements SpecificationConcretizer {
 
   @Override
   public void createConcreteSpecification(ValidSpecification spec) {
+    this.validSpecification = validSpecification;
 
   }
 
