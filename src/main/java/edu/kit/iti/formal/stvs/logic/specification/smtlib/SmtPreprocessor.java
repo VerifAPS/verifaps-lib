@@ -8,10 +8,7 @@ import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
 import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -107,24 +104,27 @@ public class SmtPreprocessor {
     }).collect(Collectors.toList());
   }
 
-  private List<SExpr> createEnumTypes() {
-    
+  private SExpr createEnumTypes() {
+    List<SExpr> definitions = new LinkedList<>();
 
-    return typeContext.entrySet().stream().map(item -> {
+    typeContext.entrySet().forEach(item -> {
       String typeName = item.getValue().getTypeName();
-      List<ValueEnum> valueEnums = item.getValue().match(
-          LinkedList::new,
-          LinkedList::new,
-          TypeEnum::getValues
+      Optional<List<ValueEnum>> valueEnums = item.getValue().match(
+          Optional::empty,
+          Optional::empty,
+          e -> Optional.of(e.getValues())
       );
-      List<String> arguments = valueEnums.stream().map(ValueEnum::getValueString).collect(Collectors.toList());
+      if(valueEnums.isPresent()) {
+        List<String> arguments = valueEnums.get().stream().map(ValueEnum::getValueString).collect
+            (Collectors.toList());
       /*
       (declare-datatypes () ((Color red green blue)))
        */
-      return new SList("declare-datatypes", new SList(), new SList(
-          (new SList(typeName)).addListElements(arguments)
-      ));
-    }).collect(Collectors.toList());
+        definitions.add(new SList(typeName).addListElements(arguments));
+      }
+
+    });
+    return new SList("declare-datatypes", new SList(), new SList(definitions));
   }
 
 

@@ -2,8 +2,10 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import edu.kit.iti.formal.stvs.model.expressions.Expression;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import javafx.beans.property.SimpleObjectProperty;
 import org.junit.Test;
@@ -34,6 +36,8 @@ public class SmtPreprocessorTest {
     ValidSpecification validSpecification = new ValidSpecification(new SimpleObjectProperty<>
         (typeContext.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList
             ())), new FreeVariableSet());
+
+    //validSpecification.getRows().addAll(new SpecificationRow<Expression>())
     SmtPreprocessor preprocessor = new SmtPreprocessor(maxDurations, validSpecification, typeContext);
     System.out.println(preprocessor.getConstrain());
   }
