@@ -92,8 +92,12 @@ public class SConstraint implements SExpr {
   @Override
   public String toString() {
     return "SConstraint{\n" +
-        "\tglobalConstraints=" + globalConstraints +
-        ",\n\tvariableDefinitions=" + variableDefinitions +
-        '}';
+        "\tglobalConstraints=\n\t\t" + globalConstraints.stream().map(SExpr::toString).collect
+        (Collectors.joining("\n\t\t")) +
+
+        ",\n\n\tvariableDefinitions=\n\t\t" + variableDefinitions.stream().map(SExpr::toString)
+        .collect
+        (Collectors.joining("\n\t\t")) +
+        "\n}";
   }
 }

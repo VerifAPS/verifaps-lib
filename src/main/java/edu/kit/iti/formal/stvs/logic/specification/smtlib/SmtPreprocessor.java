@@ -1,10 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.model.expressions.Expression;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
-import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
+import edu.kit.iti.formal.stvs.model.expressions.*;
 import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 
@@ -91,6 +88,16 @@ public class SmtPreprocessor {
             );
           }
         }
+      }
+    }
+
+    //Step V: upper und lower Bound von Durations festlegen
+    for (int z = 0; z < specification.getDurations().size(); z++ ) {
+      LowerBoundedInterval interval = specification.getDurations().get(z);
+      this.sConstrain.addGlobalConstrains(new SList(">=", "n_" + z, interval.getLowerBound() +
+          ""));
+      if(interval.getUpperBound().isPresent()) {
+        this.sConstrain.addGlobalConstrains(new SList("<=", "n_" + z, interval.getLowerBound() + ""));
       }
     }
 
