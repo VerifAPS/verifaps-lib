@@ -2,11 +2,8 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import edu.kit.iti.formal.stvs.util.ProcessOutputAsyncTask;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -22,6 +19,6 @@ public class Z3Solver {
     PrintStream printStream = new PrintStream(process.getOutputStream());
     printStream.print(smtString);
     printStream.close();
-    new ProcessOutputAsyncTask(process, resultConsumer::accept).start();
+    new ProcessOutputAsyncTask(process, resultConsumer).start();
   }
 }
