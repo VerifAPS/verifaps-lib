@@ -23,7 +23,7 @@ public class ExpressionConverter {
    * @param i iteration of the row (i-th unrolling)
    * @return the to smtlib-sexpr converted expression
    */
-  public SConstrain convert(int i) {
+  public RecSConstraint convert(int i) {
     return null;
   }
 }

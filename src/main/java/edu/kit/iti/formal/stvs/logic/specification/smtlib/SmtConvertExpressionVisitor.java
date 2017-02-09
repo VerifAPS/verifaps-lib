@@ -1,20 +1,19 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
-import edu.kit.iti.formal.automation.datatypes.Int;
-import edu.kit.iti.formal.stvs.logic.specification.choco.ChocoExpressionWrapper;
 import edu.kit.iti.formal.stvs.logic.specification.choco.ChocoModel;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.*;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * This class provides a visitor for an Expression to convert it into a choco model
  */
 public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   //static maps
+
   private static Map<UnaryFunctionExpr.Op, String> smtlibUnaryOperationNames = new HashMap<UnaryFunctionExpr.Op, String>() {{
     put(UnaryFunctionExpr.Op.NOT, "not");
   }};
@@ -34,45 +33,43 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   }};
 
   private final Map<String, Type> typeContext;
-  private final List<SExpr> globalConstraints;
-  private final Integer row;
+  private final int row;
+  private final int iteration;
   private final SpecIoVariable column;
   private final Predicate<Type> isIoVariable;
+  private final Function<String, String> getSMTLibVariableName;
+  private final SConstraint sConstraint;
 
 
   /**
    * Creates a visitor from a type context.
    * The context is needed while visiting because of the logic in choco models
-   *
-   * @param typeContext A Map from variable names to types
+   *  @param typeContext A Map from variable names to types
    * @param row row, that the visitor should convert
+   * @param getSMTLibVariableTypeName
    */
-  public SmtConvertExpressionVisitor(Map<String, Type> typeContext, Integer row, SpecIoVariable
-      column, Predicate<Type> isIoVariable) {
+  public SmtConvertExpressionVisitor(Map<String, Type> typeContext, int row, int
+      iteration, SpecIoVariable column, Predicate<Type> isIoVariable, Function<String, String> getSMTLibVariableTypeName) {
     this.typeContext = typeContext;
-    this.globalConstraints = createEnumTypes();
     this.row = row;
+    this.iteration = iteration;
     this.isIoVariable = isIoVariable;
     this.column = column;
+    this.getSMTLibVariableName = getSMTLibVariableTypeName;
+
+    String typeName = column.getType().getTypeName();
+    this.sConstraint = new SConstraint().addVariableDefinitions(
+        new SList(
+            "declare-const",
+            column.getName() + "_" + row + "_" + iteration,
+            /*try to get type-name for smtlibTypes -> in case of an enum use our naming
+            *(b/c we define it that way in SmtPreprocessor)
+            * */
+            getSMTLibVariableTypeName.apply(typeName)
+        )
+    );
   }
 
-  private List<SExpr> createEnumTypes() {
-    return typeContext.entrySet().stream().map(item -> {
-      String typeName = item.getValue().getTypeName();
-      List<ValueEnum> valueEnums = item.getValue().match(
-          LinkedList::new,
-          LinkedList::new,
-          TypeEnum::getValues
-      );
-      List<String> arguments = valueEnums.stream().map(ValueEnum::getValueString).collect(Collectors.toList());
-      /*
-      (declare-datatypes () ((Color red green blue)))
-       */
-      return new SList("declare-datatypes", new SList(), new SList(
-          (new SList(typeName)).addListElements(arguments)
-      ));
-    }).collect(Collectors.toList());
-  }
 
 
   @Override
@@ -121,7 +118,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   @Override
   public SExpr visitVariable(VariableExpr variableExpr) {
     String variableName = variableExpr.getVariableName();
-    Integer variableReference = variableExpr.getIndex().orElse(0);
+    Integer variableReferenceIndex = variableExpr.getIndex().orElse(0);
 
     //Check if variable is in typeContext
     if (!typeContext.containsKey(variableName)) {
@@ -129,12 +126,33 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     }
     Type type = typeContext.get(variableName);
 
+    // is an IOVariable?
     if (isIoVariable.test(type)) {
-      // Todo: Do Rule IV
-      // Todo: Do Rule II
-      return new SAtom(variableName);
+      // Do Rule I
+      // sum_(i=0...(z-1))(n_i) >= j
+      sConstraint.addGlobalConstrains(
+          new SList(
+              ">=",
+              sumRowIterations(row - 1),
+              new SAtom((iteration - variableReferenceIndex) + "")
+          )
+      );
+      // Do Rule II
+      // A[-v] -> A_z_(i-v)
+      return new SAtom(variableName + "_" + row + "_" + (iteration - variableReferenceIndex));
+
+      //return new SAtom(variableName);
     } else {
       return new SAtom(variableName);
     }
+  }
+
+  private SExpr sumRowIterations(int j) {
+    SList list = new SList().addAll("+");
+
+    for (int l = 0; l <= j; l++) {
+      list.addAll("n_"+l);
+    }
+    return list;
   }
 }
