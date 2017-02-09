@@ -9,6 +9,14 @@ import java.util.Optional;
  * @author Benjamin Alt
  */
 public class LowerBoundedInterval {
+  public int getLowerBound() {
+    return lowerBound;
+  }
+
+  public Optional<Integer> getUpperBound() {
+    return upperBound;
+  }
+
   private int lowerBound;
   private Optional<Integer> upperBound;
 

@@ -32,7 +32,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     put(BinaryFunctionExpr.Op.PLUS, "+");
   }};
 
-  private final Map<String, Type> typeContext;
+  private final Function<String, Type> getTypeForVariable;
   private final int row;
   private final int iteration;
   private final SpecIoVariable column;
@@ -44,13 +44,13 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   /**
    * Creates a visitor from a type context.
    * The context is needed while visiting because of the logic in choco models
-   *  @param typeContext A Map from variable names to types
+   *  @param getTypeForVariable A Map from variable names to types
    * @param row row, that the visitor should convert
    * @param getSMTLibVariableTypeName
    */
-  public SmtConvertExpressionVisitor(Map<String, Type> typeContext, int row, int
+  public SmtConvertExpressionVisitor(Function<String, Type> getTypeForVariable, int row, int
       iteration, SpecIoVariable column, Predicate<Type> isIoVariable, Function<String, String> getSMTLibVariableTypeName) {
-    this.typeContext = typeContext;
+    this.getTypeForVariable = getTypeForVariable;
     this.row = row;
     this.iteration = iteration;
     this.isIoVariable = isIoVariable;
@@ -121,11 +121,11 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     String variableName = variableExpr.getVariableName();
     Integer variableReferenceIndex = variableExpr.getIndex().orElse(0);
 
-    //Check if variable is in typeContext
-    if (!typeContext.containsKey(variableName)) {
-      throw new IllegalStateException("Wrong Context: No variable of name '" + variableName + "' in typeContext");
+    //Check if variable is in getTypeForVariable
+    if (getTypeForVariable.apply(variableName) == null) {
+      throw new IllegalStateException("Wrong Context: No variable of name '" + variableName + "' in getTypeForVariable");
     }
-    Type type = typeContext.get(variableName);
+    Type type = getTypeForVariable.apply(variableName);
 
     // is an IOVariable?
     if (isIoVariable.test(type)) {

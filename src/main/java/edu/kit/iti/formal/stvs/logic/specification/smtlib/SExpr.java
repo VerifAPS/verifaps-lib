@@ -18,6 +18,8 @@ public interface SExpr {
     }
   }
 
+
+
   static SExpr fromSexp(Sexp s) {
     if(s.isAtomic()) {
       return new SAtom(s);
@@ -29,6 +31,12 @@ public interface SExpr {
   boolean isAtom();
 
   Sexp toSexpr();
+
+  /**
+   * SExpression's textual representation
+   * @return string containing the sexpression
+   */
+  String toText();
 
 
 
