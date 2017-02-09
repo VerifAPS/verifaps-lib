@@ -45,11 +45,12 @@ public class SpecificationTableTest {
         new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "B"),
         new CodeIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "C")
     );
-    SpecificationTableController table = new SpecificationTableController(
+    SpecificationTableController table = null;
+    /*new SpecificationTableController(
         new SimpleObjectProperty<>(types),
         new SimpleObjectProperty<>(codeIoVariables),
         new FreeVariableSet());
-
+*/
     Pane extractedTablePane = createExtractedTableTextArea(table.getHybridSpecification());
 
     return Arrays.asList(table.getView(), extractedTablePane);

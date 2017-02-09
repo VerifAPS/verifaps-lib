@@ -83,9 +83,9 @@ public class StvsMenuBarController implements Controller {
           chosenFile, ImporterFacade.ImportFormat.XML);
       model.setWorkingdir(chosenFile.getParentFile());
       this.rootModel.set(model);
-    } catch (IOException | ImportException e) {
+    } catch (IOException | ImportException exception) {
       // TODO: Better visual for ImportException
-      new ErrorMessageDialog(e);
+      new ErrorMessageDialog(exception);
     }
   }
 

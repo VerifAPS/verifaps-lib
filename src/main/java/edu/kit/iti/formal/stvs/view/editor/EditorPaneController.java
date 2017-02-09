@@ -10,6 +10,7 @@ import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.concurrent.Task;
 import org.antlr.v4.runtime.Token;
 import org.fxmisc.richtext.*;
+import org.reactfx.Subscription;
 
 import java.time.Duration;
 import java.util.*;
