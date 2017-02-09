@@ -10,35 +10,40 @@ import edu.kit.iti.formal.stvs.model.expressions.parser.IntervalParser;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
 import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 import edu.kit.iti.formal.stvs.model.table.problems.*;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.MapChangeListener;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Benjamin Alt
  */
 public class ConstraintSpecification extends SpecificationTable<ConstraintCell, ConstraintDuration> implements Commentable {
 
+  public static SpecificationRow<ConstraintCell> createRow(
+      Map<String, ConstraintCell> wildcardCells) {
+    return new SpecificationRow<>(wildcardCells,
+        cell -> new Observable[] { cell.stringRepresentationProperty() });
+  }
+
   private final ObjectProperty<List<SpecProblem>> problems;
   private final ObjectProperty<List<Type>> typeContext;
   private final ObjectProperty<List<CodeIoVariable>> codeIoVariables;
   private final FreeVariableSet freeVariableSet;
   private final StringProperty comment;
-  private final NullableProperty<ValidSpecification> validSpecification;
 
-  private final Map<SpecificationRow<ConstraintCell>, RowChangeListener> registeredRowListeners;
-  private final DurationsChangeListener registeredDurationsListener;
+  private final NullableProperty<ValidSpecification> validSpecification;
 
   public ConstraintSpecification(ObjectProperty<List<Type>> typeContext,
                                  ObjectProperty<List<CodeIoVariable>> ioVariables,
                                  FreeVariableSet freeVariableSet) {
-    super();
+    super(durationCell -> new Observable[] { durationCell.stringRepresentationProperty() });
 
     this.typeContext = typeContext;
     this.codeIoVariables = ioVariables;
@@ -50,9 +55,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
 
     this.validSpecification = new NullableProperty<>();
 
-    this.registeredRowListeners = new HashMap<>();
-
-    this.registeredDurationsListener = new DurationsChangeListener();
+    this.rows.addListener((Observable observable) -> recalculateSpecProblems());
   }
 
   public ObjectProperty<List<Type>> typeContextProperty() {
@@ -139,7 +142,7 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
         }
       }
 
-      spec.getRows().add(new SpecificationRow<>(expressionsForRow));
+      spec.getRows().add(SpecificationRow.createUnobservableRow(expressionsForRow));
     }
 
     for (int durIndex = 0; durIndex < durations.size(); durIndex++) {
@@ -203,111 +206,6 @@ public class ConstraintSpecification extends SpecificationTable<ConstraintCell, 
     } else {
       throw new TypeCheckException(expression,
           "The cell expression must evaluate to a boolean, instead it evaluates to: " + type.getTypeName());
-    }
-  }
-
-  @Override
-  protected void onRowAdded(List<? extends SpecificationRow<ConstraintCell>> added) {
-    super.onRowAdded(added);
-
-    for (SpecificationRow<ConstraintCell> row : added) {
-      RowChangeListener listener = new RowChangeListener(row);
-      row.getCells().addListener(listener);
-      registeredRowListeners.put(row, listener);
-    }
-    recalculateSpecProblems();
-  }
-
-  @Override
-  protected void onRowRemoved(List<? extends SpecificationRow<ConstraintCell>> removed) {
-    super.onRowRemoved(removed);
-    for (SpecificationRow<ConstraintCell> row : removed) {
-      RowChangeListener listener = registeredRowListeners.remove(row);
-      if (listener != null) {
-        row.getCells().removeListener(listener);
-      }
-    }
-    recalculateSpecProblems();
-  }
-
-  @Override
-  protected void onDurationAdded(List<? extends ConstraintDuration> added) {
-    super.onDurationAdded(added);
-    added.forEach(registeredDurationsListener::subscribeCell);
-    recalculateSpecProblems();
-  }
-
-  @Override
-  protected void onDurationRemoved(List<? extends ConstraintDuration> removed) {
-    super.onDurationRemoved(removed);
-    removed.forEach(registeredDurationsListener::unsubscribeCell);
-    recalculateSpecProblems();
-  }
-
-  protected int registeredListeners() {
-    return registeredRowListeners.values().stream()
-        .map(RowChangeListener::registeredListeners)
-        .reduce(0, (a, b) -> a + b);
-  }
-
-  private class RowChangeListener implements MapChangeListener<String, ConstraintCell> {
-
-    private final Map<ConstraintCell, CellChangeListener> registeredCellListeners = new HashMap<>();
-
-    public RowChangeListener(SpecificationRow<ConstraintCell> row) {
-      row.getCells().values().forEach(this::subscribeCell);
-    }
-
-    private class CellChangeListener implements ChangeListener<String> {
-
-      @Override
-      public void changed(ObservableValue<? extends String> obs, String old, String newV) {
-        ConstraintSpecification.this.recalculateSpecProblems();
-      }
-    }
-
-    @Override
-    public void onChanged(Change<? extends String, ? extends ConstraintCell> change) {
-      if (change.wasAdded()) {
-        subscribeCell(change.getValueAdded());
-      }
-      if (change.wasRemoved()) {
-        unsubscribeCell(change.getValueRemoved());
-      }
-    }
-
-    private void subscribeCell(ConstraintCell cell) {
-      CellChangeListener listener = new CellChangeListener();
-      cell.stringRepresentationProperty().addListener(listener);
-      registeredCellListeners.put(cell, listener);
-    }
-
-    private void unsubscribeCell(ConstraintCell cell) {
-      CellChangeListener listener = registeredCellListeners.remove(cell);
-      cell.stringRepresentationProperty().removeListener(listener);
-    }
-
-    protected int registeredListeners() {
-      return registeredRowListeners.size();
-    }
-  }
-
-  private class DurationsChangeListener {
-    private class DurationCellListener implements ChangeListener<String> {
-      @Override
-      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        ConstraintSpecification.this.recalculateSpecProblems();
-      }
-    }
-
-    private final DurationCellListener listener = new DurationCellListener();
-
-    private void subscribeCell(ConstraintDuration constraintDuration) {
-      constraintDuration.stringRepresentationProperty().addListener(listener);
-    }
-
-    private void unsubscribeCell(ConstraintDuration constraintDuration) {
-      constraintDuration.stringRepresentationProperty().removeListener(listener);
     }
   }
 

@@ -1,25 +1,24 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.stvs.model.common.*;
-import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.logic.specification.BacktrackSpecificationConcretizer;
 import edu.kit.iti.formal.stvs.logic.specification.ConcretizerContext;
 import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
+import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
+import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-
-import java.util.*;
-
+import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableSet;
+
+import java.util.List;
 
 /**
  * A ConstraintSpecification which also has an associated counterexample (ConcreteSpecification),
  * concrete instance (ConcreteSpecification) or both.
  * This class is the model on which the
- * {@link TablePaneController}
+ * {@link edu.kit.iti.formal.stvs.view.spec.SpecificationController}
  * and {@link TimingDiagramCollectionController}
  * operate. This class is responsible for triggering the generation of a new concrete instance of a
  * specification whenever one of its {@link ConstraintCell}s or {@link ConstraintDuration}s change

@@ -92,7 +92,7 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
         if (cellsMap.size() != ioVariables.size()) {
           throw new ImportException("Row too short: Do not have a cell for each IOVariable");
         }
-        concreteSpec.getRows().add(new SpecificationRow<>(cellsMap));
+        concreteSpec.getRows().add(SpecificationRow.createUnobservableRow(cellsMap));
       }
       currentCycle += currentDuration;
     }

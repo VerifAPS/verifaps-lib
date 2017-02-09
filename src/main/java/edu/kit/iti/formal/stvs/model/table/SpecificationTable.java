@@ -1,13 +1,17 @@
 package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.util.Callback;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -23,9 +27,9 @@ public class SpecificationTable<C, D> {
   protected ObservableList<SpecificationRow<C>> rows;
   protected ObservableList<D> durations;
 
-  public SpecificationTable() {
-    this.rows = FXCollections.observableArrayList();
-    this.durations = FXCollections.observableArrayList();
+  public SpecificationTable(Callback<D, Observable[]> durationExtractor) {
+    this.rows = FXCollections.observableArrayList(specificationRow -> new Observable[] { specificationRow });
+    this.durations = FXCollections.observableArrayList(durationExtractor);
     this.specIoVariables = FXCollections.observableArrayList();
 
     this.rows.addListener(this::onRowChange);

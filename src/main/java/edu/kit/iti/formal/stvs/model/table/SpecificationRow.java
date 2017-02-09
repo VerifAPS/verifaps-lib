@@ -1,24 +1,78 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.util.Callback;
+import org.omg.CORBA.DynAnyPackage.Invalid;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * @author Benjamin Alt
+ * @author Philipp
  */
-public class SpecificationRow<C> implements Commentable {
+public class SpecificationRow<C> implements Commentable, Observable {
+
+  public static Callback<SpecificationRow, Observable[]> extractor() {
+    return param -> new Observable[] { param };
+  }
 
   private final ObservableMap<String, C> cells;
   private final StringProperty comment;
 
+  private final List<InvalidationListener> listeners;
+  private final Callback<C, Observable[]> extractor;
+  private final InvalidationListener cellChange;
+
+  public static <E> SpecificationRow<E> createUnobservableRow(Map<String, E> cells) {
+    return new SpecificationRow<>(cells, p -> new Observable[0]);
+  }
+
+  /*
   public SpecificationRow(Map<String, C> cells) {
+    this(cells, param -> new Observable[] {});
+  }*/
+
+  public SpecificationRow(Map<String, C> cells, Callback<C, Observable[]> extractor) {
     this.cells = FXCollections.observableMap(cells);
+    this.cells.addListener(this::cellsMapChanged);
+    this.listeners = new ArrayList<>();
+    this.extractor = extractor;
+    cellChange = observable ->
+        listeners.forEach(listener -> listener.invalidated(observable));
+    this.cells.addListener(cellChange);
+    cells.values().forEach(this::subscribeToCell);
     comment = new SimpleStringProperty("");
+  }
+
+  private void cellsMapChanged(MapChangeListener.Change<? extends String, ? extends C> change) {
+    if (change.wasAdded()) {
+      subscribeToCell(change.getValueAdded());
+    }
+    if (change.wasRemoved()) {
+      unsubscribeFromCell(change.getValueRemoved());
+    }
+  }
+
+  private void subscribeToCell(C c) {
+    for (Observable observable : extractor.call(c)) {
+      observable.addListener(cellChange);
+    }
+  }
+
+  private void unsubscribeFromCell(C cell) {
+    for (Observable observable : extractor.call(cell)) {
+      observable.removeListener(cellChange);
+    }
   }
 
   public ObservableMap<String,C> getCells() {
@@ -65,4 +119,15 @@ public class SpecificationRow<C> implements Commentable {
                 entry.getKey() + ": " + entry.getValue()).collect(Collectors.toList()));
     return "SpecificationRow(comment: " + getComment() + ", " + map + ")";
   }
+
+  @Override
+  public void addListener(InvalidationListener listener) {
+    listeners.add(listener);
+  }
+
+  @Override
+  public void removeListener(InvalidationListener listener) {
+    listeners.remove(listener);
+  }
+
 }

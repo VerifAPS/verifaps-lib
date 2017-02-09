@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import javafx.beans.Observable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +19,7 @@ public class ConcreteSpecification extends SpecificationTable<ConcreteCell, Conc
   public ConcreteSpecification(List<SpecificationRow<ConcreteCell>> rows,
                                List<ConcreteDuration> durations,
                                boolean isCounterExample) {
-    super();
+    super(p -> new Observable[0]);
     this.isCounterExample = isCounterExample;
 
     getRows().addAll(rows);
