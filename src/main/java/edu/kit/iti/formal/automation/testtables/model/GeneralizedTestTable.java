@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.testtables.model;
 
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
+import edu.kit.iti.formal.automation.testtables.StateReachability;
 import edu.kit.iti.formal.automation.testtables.io.IOFacade;
 import edu.kit.iti.formal.automation.testtables.model.options.PropertyInitializer;
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions;
@@ -49,6 +50,7 @@ public class GeneralizedTestTable {
     private Region region;
     private TableOptions options = null;
     private String name;
+    private StateReachability reachability;
 
     public TableOptions getOptions() {
         if(options==null) {
@@ -61,6 +63,10 @@ public class GeneralizedTestTable {
     public GeneralizedTestTable setOptions(TableOptions options) {
         this.options = options;
         return this;
+    }
+
+    public StateReachability getReachability() {
+        return new StateReachability(this);
     }
 
     public Map<String, IoVariable> getIoVariables() {

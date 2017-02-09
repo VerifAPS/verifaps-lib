@@ -101,6 +101,13 @@ public class Report {
     }
 
     public static void setCounterExample(Counterexample counterExample) {
-        msg.setCounterexample(counterExample);
+        if(msg.getCounterexample()==null) {
+            msg.setCounterexample(new Message.Counterexample());
+        }
+        msg.getCounterexample().setTrace(counterExample);
+    }
+
+    public static Message getMessage() {
+        return msg;
     }
 }

@@ -172,10 +172,14 @@ public class StateReachability {
      * @param incoming
      * @return
      */
-    public Stream<State> getOutgoing(State incoming) {
+    public Stream<State> getIncoming(State incoming) {
         return reachability.entrySet().stream().map(
                 e -> e.getValue().contains(incoming) ? e.getKey() : null
         ).filter(a -> a != null);
 
+    }
+
+    public Set<State> getOutgoing(State state) {
+        return reachability.get(state);
     }
 }

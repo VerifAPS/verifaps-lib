@@ -94,12 +94,12 @@ public class StatesTransformer implements TableTransformer {
         // define keep predicate
         mt.getDefinitions().put(s.getDefKeep(),
                 SMVFacade.combine(SBinaryOperator.AND,
-                        s.getDefInput(), s.getDefOutput(), clockVariableKeep));
+                        s.getSMVVariable(), s.getDefInput(), s.getDefOutput(), clockVariableKeep));
 
         // define forward predicate
         mt.getDefinitions().put(s.getDefForward(),
                 SMVFacade.combine(SBinaryOperator.AND,
-                        s.getDefInput(), s.getDefOutput(), clockVariableFwd));
+                        s.getSMVVariable(), s.getDefInput(), s.getDefOutput(), clockVariableFwd));
     }
 
     private SVariable introduceClock(State s) {
@@ -146,7 +146,7 @@ public class StatesTransformer implements TableTransformer {
 
     private void addNextAssignments(State inc) {
         // I get actived if one of my outgoing is valid
-        SMVExpr or = reachable.getOutgoing(inc)
+        SMVExpr or = reachable.getIncoming(inc)
                 .map(State::getDefForward)
                 .map(fwd -> (SMVExpr) fwd)
                 .reduce(SMVFacade.reducer(SBinaryOperator.OR))

@@ -36,15 +36,16 @@ import java.util.stream.Stream;
 
 public class NuXMVOutputParser {
     public static final Pattern SKIP_MARKER = Pattern.compile("Trace Type: Counterexample");
-    public static final Pattern SPLIT_MARKER = Pattern.compile("-> (Input|State): (\\d+).(\\d+) <-");
+    public static final Pattern SPLIT_MARKER = Pattern.compile("-> State: (\\d+).(\\d+) <-");
+    public static final Pattern INPUT_MARKER = Pattern.compile("-> Input: (\\d+).(\\d+) <-");
     public static final Pattern NEWLINE = Pattern.compile("\n");
     static final Pattern ASSIGNMENT_SEPERATOR = Pattern.compile("(.*)\\s*=\\s*(.*)");
+
     boolean ceFound = false;
     Counterexample ce;
     boolean invariantHolds;
     boolean errorFound;
     private Stream<String> inputLines;
-    private int currentStepCounter;
     private Counterexample.Step currentStep;
     private List<Assignment> current;
 
@@ -62,10 +63,9 @@ public class NuXMVOutputParser {
 
     public Counterexample run() {
         ce = new Counterexample();
-        currentStepCounter = 1;
         currentStep = new Counterexample.Step();
         current = currentStep.getState();
-        ce.getStep().add(currentStep);
+        //ce.getStep().add(currentStep);
 
         inputLines.map(String::trim)
                 .forEach(this::handle);
@@ -73,12 +73,12 @@ public class NuXMVOutputParser {
         if (ceFound) {
             Report.setErrorLevel("not-verified");
             Report.setCounterExample(ce);
-        }
-
-        if (invariantHolds)
+        } else if (invariantHolds)
             Report.setErrorLevel("verified");
-        if (errorFound)
+        else if (errorFound)
             Report.setErrorLevel("nuxmv-error");
+        else
+            Report.setErrorLevel("unknown");
 
         return ce;
     }
@@ -91,36 +91,28 @@ public class NuXMVOutputParser {
             errorFound = true;
         } else {
             if (ceFound) {
-                if (!opensNewState(line))
-                    assignment(line);
+
+                if (INPUT_MARKER.matcher(line).matches()) {
+                    current = currentStep.getInput();
+                    return;
+                }
+
+                Matcher m = SPLIT_MARKER.matcher(line);
+                if (m.matches()) {
+                    int step = Integer.parseInt(m.group(2));
+                    currentStep = new Counterexample.Step();
+                    ce.getStep().add(currentStep);
+                    current = currentStep.getState();
+                    return;
+                }
+
+                assignment(line);
             } else {
                 ceFound = SKIP_MARKER.matcher(line).matches();
                 invariantHolds = invariantHolds || line.contains("is true");
             }
         }
 
-    }
-
-    private boolean opensNewState(String line) {
-        Matcher m = SPLIT_MARKER.matcher(line);
-        if (m.matches()) {
-            String type = m.group(1);
-            //int ceNum = Integer.parseInt(m.group(2));
-            int step = Integer.parseInt(m.group(3));
-
-            if (step > currentStepCounter) {
-                currentStep = new Counterexample.Step();
-                ce.getStep().add(currentStep);
-            }
-
-            if ("Input".equals(type))
-                current = currentStep.getInput();
-            else
-                current = currentStep.getState();
-            return true;
-        } else {
-            return false;
-        }
     }
 
     private void assignment(String line) {

@@ -5,17 +5,17 @@
     <parent>
         <groupId>edu.kit.iti.formal</groupId>
         <artifactId>verifaps</artifactId>
-        <version>1.2.0</version>
+        <version>1.3.0</version>
     </parent>
 
     <artifactId>geteta</artifactId>
     <!-- Every version upgrade, add a changelog to src/site/index.md -->
-    <version>0.3.0</version>
+    <version>0.4.0</version>
 
     <repositories>
         <repository>
             <id>institute</id>
-            <url>http://formal.iti.kit.edu/maven</url>
+            <url>http://formal.iti.kit.edu/maven2</url>
         </repository>
     </repositories>
 
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>edu.kit.iti.formal</groupId>
             <artifactId>iec61131lang</artifactId>
-            <version>0.1.10</version>
+            <version>0.1.11</version>
         </dependency>
 
         <dependency>
@@ -55,18 +55,6 @@
             <groupId>edu.kit.iti.formal</groupId>
             <artifactId>smv-model</artifactId>
             <version>0.1.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.choco-solver</groupId>
-            <artifactId>choco-solver</artifactId>
-            <version>4.0.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.sosy-lab</groupId>
-            <artifactId>java-smt</artifactId>
-            <version>1.0.1</version>
         </dependency>
     </dependencies>
 
