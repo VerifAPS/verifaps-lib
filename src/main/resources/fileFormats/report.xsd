@@ -57,7 +57,8 @@
                                 </choice>
                             </sequence>
                         </sequence>
-                        <attribute name="counter" errorType="int"></attribute>
+                        <attribute name="counter" type="int"></attribute>
+                        <attribute name="row" type="int"></attribute>
                     </complexType>
                 </element>
             </sequence>
