@@ -1,0 +1,532 @@
+*** This is nuXmv 1.1.1 (compiled on Wed Jun  1 10:18:42 2016)
+*** Copyright (c) 2014-2016, Fondazione Bruno Kessler
+
+*** For more information on nuXmv see https://nuxmv.fbk.eu
+*** or email to <nuxmv@list.fbk.eu>.
+*** Please report bugs at https://nuxmv.fbk.eu/bugs
+*** (click on "Login Anonymously" to access)
+*** Alternatively write to <nuxmv@list.fbk.eu>.
+
+*** This version of nuXmv is linked to NuSMV 2.6.0.
+*** For more information on NuSMV see <http://nusmv.fbk.eu>
+*** or email to <nusmv-users@list.fbk.eu>.
+*** Copyright (C) 2010-2014, Fondazione Bruno Kessler
+
+*** This version of nuXmv is linked to the CUDD library version 2.4.1
+*** Copyright (c) 1995-2004, Regents of the University of Colorado
+
+*** This version of nuXmv is linked to the MiniSat SAT solver. 
+*** See http://minisat.se/MiniSat.html
+*** Copyright (c) 2003-2006, Niklas Een, Niklas Sorensson
+*** Copyright (c) 2007-2010, Niklas Sorensson
+
+*** This version of nuXmv is linked to MathSAT
+*** Copyright (C) 2009-2016 by Fondazione Bruno Kessler
+*** Copyright (C) 2009-2016 by University of Trento
+*** See http://mathsat.fbk.eu
+
+nuXmv > nuXmv > nuXmv > Number of Input Variables: 1
+    1: boolean
+Number of State Variables: 23
+   11: boolean
+    4: unsigned word[4]
+    3: signed word[16]
+    1: unsigned word[2]
+    4: unsigned word[3]
+Number of Frozen Variables: 0
+  i : boolean
+  
+  code.macro : signed word[16]
+  
+  code.micro : signed word[16]
+  
+  code.o : signed word[16]
+  
+  table.s1 : boolean
+  
+  table.s2 : boolean
+  
+  table.clock2 : unsigned word[2]
+  
+  table.s3 : boolean
+  
+  table.clock3 : unsigned word[3]
+  
+  table.s4 : boolean
+  
+  table.clock4 : unsigned word[3]
+  
+  table.s5 : boolean
+  
+  table.clock5 : unsigned word[3]
+  
+  table.s6 : boolean
+  
+  table.clock6 : unsigned word[3]
+  
+  table.s7 : boolean
+  
+  table.clock7 : unsigned word[4]
+  
+  table.s8 : boolean
+  
+  table.clock8 : unsigned word[4]
+  
+  table.s9 : boolean
+  
+  table.clock9 : unsigned word[4]
+  
+  table.s10 : boolean
+  
+  table.clock10 : unsigned word[4]
+  
+  table.ERROR : boolean
+  
+Number of bits: 90 (0 frozen, 1 input, 89 state)
+nuXmv > nuXmv > WARNING: line: 121: case conditions are not exhaustive
+WARNING: line: 121: case conditions are not exhaustive
+WARNING: line: 124: case conditions are not exhaustive
+WARNING: line: 124: case conditions are not exhaustive
+WARNING: line: 124: case conditions are not exhaustive
+WARNING: line: 127: case conditions are not exhaustive
+WARNING: line: 127: case conditions are not exhaustive
+WARNING: line: 127: case conditions are not exhaustive
+WARNING: line: 130: case conditions are not exhaustive
+WARNING: line: 130: case conditions are not exhaustive
+WARNING: line: 130: case conditions are not exhaustive
+WARNING: line: 133: case conditions are not exhaustive
+WARNING: line: 133: case conditions are not exhaustive
+WARNING: line: 133: case conditions are not exhaustive
+WARNING: line: 136: case conditions are not exhaustive
+WARNING: line: 136: case conditions are not exhaustive
+WARNING: line: 136: case conditions are not exhaustive
+WARNING: line: 136: case conditions are not exhaustive
+WARNING: line: 139: case conditions are not exhaustive
+WARNING: line: 139: case conditions are not exhaustive
+WARNING: line: 139: case conditions are not exhaustive
+WARNING: line: 139: case conditions are not exhaustive
+WARNING: line: 142: case conditions are not exhaustive
+WARNING: line: 142: case conditions are not exhaustive
+WARNING: line: 142: case conditions are not exhaustive
+WARNING: line: 142: case conditions are not exhaustive
+WARNING: line: 145: case conditions are not exhaustive
+WARNING: line: 145: case conditions are not exhaustive
+WARNING: line: 145: case conditions are not exhaustive
+WARNING: line: 145: case conditions are not exhaustive
+nuXmv > -- no proof or counterexample found with bound 4
+-- no proof or counterexample found with bound 5
+-- no proof or counterexample found with bound 6
+-- no proof or counterexample found with bound 7
+-- no proof or counterexample found with bound 8
+-- no proof or counterexample found with bound 9
+-- no proof or counterexample found with bound 10
+-- no proof or counterexample found with bound 11
+-- no proof or counterexample found with bound 12
+-- no proof or counterexample found with bound 13
+-- no proof or counterexample found with bound 14
+-- no proof or counterexample found with bound 15
+-- no proof or counterexample found with bound 16
+-- no proof or counterexample found with bound 17
+-- no proof or counterexample found with bound 18
+-- invariant (ERROR -> (((((((((s1 | s2) | s3) | s4) | s5) | s6) | s7) | s8) | s9) | s10)) IN table is false
+-- as demonstrated by the following execution sequence
+Trace Description: IC3 counterexample 
+Trace Type: Counterexample 
+  -> State: 1.1 <-
+    code.micro = 0sd16_1
+    code.macro = 0sd16_1
+    table.clock2 = 0ud2_0
+    table.clock3 = 0ud3_0
+    table.clock4 = 0ud3_0
+    table.clock5 = 0ud3_0
+    table.clock6 = 0ud3_0
+    table.clock7 = 0ud4_0
+    table.clock8 = 0ud4_0
+    table.clock9 = 0ud4_0
+    table.clock10 = 0ud4_0
+    table.s1 = TRUE
+    table.s2 = FALSE
+    table.s3 = FALSE
+    table.s4 = FALSE
+    table.s5 = FALSE
+    table.s6 = FALSE
+    table.s7 = FALSE
+    table.s8 = FALSE
+    table.s9 = FALSE
+    table.s10 = FALSE
+    table.ERROR = FALSE
+    code.o = 0sd16_0
+    table.s9_in = TRUE
+    table.s8_in = TRUE
+    table.s7_in = TRUE
+    table.s6_in = TRUE
+    table.s5_in = TRUE
+    table.s4_in = TRUE
+    table.s3_in = TRUE
+    table.s2_in = TRUE
+    table.s1_in = TRUE
+    table.s10_in = TRUE
+    table.clock9_limit = FALSE
+    table.clock8_limit = FALSE
+    table.clock7_limit = FALSE
+    table.clock6_limit = FALSE
+    table.clock5_limit = FALSE
+    table.clock4_limit = FALSE
+    table.clock3_limit = FALSE
+    table.clock2_limit = FALSE
+    table.clock10_limit = FALSE
+    table.s9_out = FALSE
+    table.s8_out = FALSE
+    table.s7_out = FALSE
+    table.s6_out = FALSE
+    table.s5_out = FALSE
+    table.s4_out = FALSE
+    table.s3_out = FALSE
+    table.s2_out = FALSE
+    table.s1_out = TRUE
+    table.s1_keep = FALSE
+    table.s1_fwd = TRUE
+    table.s10_out = FALSE
+    table.s9_keep = FALSE
+    table.s9_fwd = FALSE
+    table.s8_keep = FALSE
+    table.s8_fwd = FALSE
+    table.s7_keep = FALSE
+    table.s7_fwd = FALSE
+    table.s6_keep = FALSE
+    table.s6_fwd = FALSE
+    table.s5_keep = FALSE
+    table.s5_fwd = FALSE
+    table.s4_keep = FALSE
+    table.s4_fwd = FALSE
+    table.s3_keep = FALSE
+    table.s3_fwd = FALSE
+    table.s2_keep = FALSE
+    table.s2_fwd = FALSE
+    table.s10_keep = FALSE
+    table.s10_fwd = FALSE
+    table.clock9_tic = FALSE
+    table.clock9_rs = TRUE
+    table.clock8_tic = FALSE
+    table.clock8_rs = TRUE
+    table.clock7_tic = FALSE
+    table.clock7_rs = TRUE
+    table.clock6_tic = FALSE
+    table.clock6_rs = TRUE
+    table.clock5_tic = FALSE
+    table.clock5_rs = TRUE
+    table.clock4_tic = FALSE
+    table.clock4_rs = TRUE
+    table.clock3_tic = FALSE
+    table.clock3_rs = TRUE
+    table.clock2_tic = FALSE
+    table.clock2_rs = TRUE
+    table.clock10_tic = FALSE
+    table.clock10_rs = TRUE
+  -> State: 1.2 <-
+    code.micro = 0sd16_2
+    code.macro = 0sd16_2
+    table.s1 = FALSE
+    table.s2 = TRUE
+    code.o = 0sd16_1
+    table.s2_out = TRUE
+    table.s1_out = FALSE
+    table.s1_fwd = FALSE
+    table.s2_keep = TRUE
+    table.clock2_tic = TRUE
+    table.clock2_rs = FALSE
+  -> State: 1.3 <-
+    code.micro = 0sd16_1
+    table.clock2 = 0ud2_1
+    code.o = 0sd16_2
+  -> State: 1.4 <-
+    code.micro = 0sd16_3
+    code.macro = 0sd16_3
+    table.clock2 = 0ud2_2
+    table.s3_out = TRUE
+    table.s2_out = FALSE
+    table.s3_keep = TRUE
+    table.s2_keep = FALSE
+    table.clock3_tic = TRUE
+    table.clock3_rs = FALSE
+    table.clock2_tic = FALSE
+    table.clock2_rs = TRUE
+  -> State: 1.5 <-
+    code.micro = 0sd16_2
+    table.clock2 = 0ud2_0
+    table.clock3 = 0ud3_1
+    table.s2 = FALSE
+    table.s3 = TRUE
+    table.ERROR = TRUE
+    code.o = 0sd16_3
+  -> State: 1.6 <-
+    code.micro = 0sd16_1
+    table.clock3 = 0ud3_2
+    table.ERROR = FALSE
+  -> State: 1.7 <-
+    code.micro = 0sd16_4
+    code.macro = 0sd16_4
+    table.clock3 = 0ud3_3
+    table.s4_out = TRUE
+    table.s3_out = FALSE
+    table.s4_keep = TRUE
+    table.s3_keep = FALSE
+    table.clock4_tic = TRUE
+    table.clock4_rs = FALSE
+    table.clock3_tic = FALSE
+    table.clock3_rs = TRUE
+  -> State: 1.8 <-
+    code.micro = 0sd16_3
+    table.clock3 = 0ud3_0
+    table.clock4 = 0ud3_1
+    table.s3 = FALSE
+    table.s4 = TRUE
+    table.ERROR = TRUE
+    code.o = 0sd16_4
+  -> State: 1.9 <-
+    code.micro = 0sd16_2
+    table.clock4 = 0ud3_2
+    table.ERROR = FALSE
+  -> State: 1.10 <-
+    code.micro = 0sd16_1
+    table.clock4 = 0ud3_3
+  -> State: 1.11 <-
+    code.micro = 0sd16_5
+    code.macro = 0sd16_5
+    table.clock4 = 0ud3_4
+    table.s5_out = TRUE
+    table.s4_out = FALSE
+    table.s5_keep = TRUE
+    table.s4_keep = FALSE
+    table.clock5_tic = TRUE
+    table.clock5_rs = FALSE
+    table.clock4_tic = FALSE
+    table.clock4_rs = TRUE
+  -> State: 1.12 <-
+    code.micro = 0sd16_4
+    table.clock4 = 0ud3_0
+    table.clock5 = 0ud3_1
+    table.s4 = FALSE
+    table.s5 = TRUE
+    table.ERROR = TRUE
+    code.o = 0sd16_5
+  -> State: 1.13 <-
+    code.micro = 0sd16_3
+    table.clock5 = 0ud3_2
+    table.ERROR = FALSE
+  -> State: 1.14 <-
+    code.micro = 0sd16_2
+    table.clock5 = 0ud3_3
+  -> State: 1.15 <-
+    code.micro = 0sd16_1
+    table.clock5 = 0ud3_4
+  -> State: 1.16 <-
+    code.micro = 0sd16_6
+    code.macro = 0sd16_6
+    table.clock5 = 0ud3_5
+    table.s6_out = TRUE
+    table.s5_out = FALSE
+    table.s6_keep = TRUE
+    table.s5_keep = FALSE
+    table.clock6_tic = TRUE
+    table.clock6_rs = FALSE
+    table.clock5_tic = FALSE
+    table.clock5_rs = TRUE
+  -> State: 1.17 <-
+    code.micro = 0sd16_5
+    table.clock5 = 0ud3_0
+    table.clock6 = 0ud3_1
+    table.s5 = FALSE
+    table.s6 = TRUE
+    table.ERROR = TRUE
+    code.o = 0sd16_6
+  -> State: 1.18 <-
+    code.micro = 0sd16_4
+    table.clock6 = 0ud3_2
+    table.ERROR = FALSE
+  -> State: 1.19 <-
+    code.micro = 0sd16_3
+    table.clock6 = 0ud3_3
+  -> State: 1.20 <-
+    code.micro = 0sd16_2
+    table.clock6 = 0ud3_4
+  -> State: 1.21 <-
+    code.micro = 0sd16_1
+    table.clock6 = 0ud3_5
+  -> State: 1.22 <-
+    code.micro = 0sd16_7
+    code.macro = 0sd16_7
+    table.clock6 = 0ud3_6
+    table.s7_out = TRUE
+    table.s6_out = FALSE
+    table.s7_keep = TRUE
+    table.s6_keep = FALSE
+    table.clock7_tic = TRUE
+    table.clock7_rs = FALSE
+    table.clock6_tic = FALSE
+    table.clock6_rs = TRUE
+  -> State: 1.23 <-
+    code.micro = 0sd16_6
+    table.clock6 = 0ud3_0
+    table.clock7 = 0ud4_1
+    table.s6 = FALSE
+    table.s7 = TRUE
+    table.ERROR = TRUE
+    code.o = 0sd16_7
+  -> State: 1.24 <-
+    code.micro = 0sd16_5
+    table.clock7 = 0ud4_2
+    table.ERROR = FALSE
+  -> State: 1.25 <-
+    code.micro = 0sd16_4
+    table.clock7 = 0ud4_3
+  -> State: 1.26 <-
+    code.micro = 0sd16_3
+    table.clock7 = 0ud4_4
+  -> State: 1.27 <-
+    code.micro = 0sd16_2
+    table.clock7 = 0ud4_5
+  -> State: 1.28 <-
+    code.micro = 0sd16_1
+    table.clock7 = 0ud4_6
+  -> State: 1.29 <-
+    code.micro = 0sd16_8
+    code.macro = 0sd16_8
+    table.clock7 = 0ud4_7
+    table.s8_out = TRUE
+    table.s7_out = FALSE
+    table.s8_keep = TRUE
+    table.s7_keep = FALSE
+    table.clock8_tic = TRUE
+    table.clock8_rs = FALSE
+    table.clock7_tic = FALSE
+    table.clock7_rs = TRUE
+  -> State: 1.30 <-
+    code.micro = 0sd16_7
+    table.clock7 = 0ud4_0
+    table.clock8 = 0ud4_1
+    table.s7 = FALSE
+    table.s8 = TRUE
+    table.ERROR = TRUE
+    code.o = 0sd16_8
+  -> State: 1.31 <-
+    code.micro = 0sd16_6
+    table.clock8 = 0ud4_2
+    table.ERROR = FALSE
+  -> State: 1.32 <-
+    code.micro = 0sd16_5
+    table.clock8 = 0ud4_3
+  -> State: 1.33 <-
+    code.micro = 0sd16_4
+    table.clock8 = 0ud4_4
+  -> State: 1.34 <-
+    code.micro = 0sd16_3
+    table.clock8 = 0ud4_5
+  -> State: 1.35 <-
+    code.micro = 0sd16_2
+    table.clock8 = 0ud4_6
+  -> State: 1.36 <-
+    code.micro = 0sd16_1
+    table.clock8 = 0ud4_7
+  -> State: 1.37 <-
+    code.micro = 0sd16_9
+    code.macro = 0sd16_9
+    table.clock8 = 0ud4_8
+    table.s9_out = TRUE
+    table.s8_out = FALSE
+    table.s9_keep = TRUE
+    table.s8_keep = FALSE
+    table.clock9_tic = TRUE
+    table.clock9_rs = FALSE
+    table.clock8_tic = FALSE
+    table.clock8_rs = TRUE
+  -> State: 1.38 <-
+    code.micro = 0sd16_8
+    table.clock8 = 0ud4_0
+    table.clock9 = 0ud4_1
+    table.s8 = FALSE
+    table.s9 = TRUE
+    table.ERROR = TRUE
+    code.o = 0sd16_9
+  -> State: 1.39 <-
+    code.micro = 0sd16_7
+    table.clock9 = 0ud4_2
+    table.ERROR = FALSE
+  -> State: 1.40 <-
+    code.micro = 0sd16_6
+    table.clock9 = 0ud4_3
+  -> State: 1.41 <-
+    code.micro = 0sd16_5
+    table.clock9 = 0ud4_4
+  -> State: 1.42 <-
+    code.micro = 0sd16_4
+    table.clock9 = 0ud4_5
+  -> State: 1.43 <-
+    code.micro = 0sd16_3
+    table.clock9 = 0ud4_6
+  -> State: 1.44 <-
+    code.micro = 0sd16_2
+    table.clock9 = 0ud4_7
+  -> State: 1.45 <-
+    code.micro = 0sd16_1
+    table.clock9 = 0ud4_8
+  -> State: 1.46 <-
+    code.micro = 0sd16_10
+    code.macro = 0sd16_10
+    table.clock9 = 0ud4_9
+    table.s9_out = FALSE
+    table.s10_out = TRUE
+    table.s9_keep = FALSE
+    table.s10_keep = TRUE
+    table.clock9_tic = FALSE
+    table.clock9_rs = TRUE
+    table.clock10_tic = TRUE
+    table.clock10_rs = FALSE
+  -> State: 1.47 <-
+    code.micro = 0sd16_9
+    table.clock9 = 0ud4_0
+    table.clock10 = 0ud4_1
+    table.s9 = FALSE
+    table.s10 = TRUE
+    table.ERROR = TRUE
+    code.o = 0sd16_10
+  -> State: 1.48 <-
+    code.micro = 0sd16_8
+    table.clock10 = 0ud4_2
+    table.ERROR = FALSE
+  -> State: 1.49 <-
+    code.micro = 0sd16_7
+    table.clock10 = 0ud4_3
+  -> State: 1.50 <-
+    code.micro = 0sd16_6
+    table.clock10 = 0ud4_4
+  -> State: 1.51 <-
+    code.micro = 0sd16_5
+    table.clock10 = 0ud4_5
+  -> State: 1.52 <-
+    code.micro = 0sd16_4
+    table.clock10 = 0ud4_6
+  -> State: 1.53 <-
+    code.micro = 0sd16_3
+    table.clock10 = 0ud4_7
+  -> State: 1.54 <-
+    code.micro = 0sd16_2
+    table.clock10 = 0ud4_8
+  -> State: 1.55 <-
+    code.micro = 0sd16_1
+    table.clock10 = 0ud4_9
+  -> State: 1.56 <-
+    code.micro = 0sd16_11
+    code.macro = 0sd16_11
+    table.clock10 = 0ud4_10
+    table.s10_out = FALSE
+    table.s10_keep = FALSE
+    table.clock10_tic = FALSE
+    table.clock10_rs = TRUE
+  -> State: 1.57 <-
+    code.micro = 0sd16_10
+    table.clock10 = 0ud4_0
+    table.s10 = FALSE
+    table.ERROR = TRUE
+    code.o = 0sd16_11
+nuXmv > 
