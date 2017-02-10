@@ -20,7 +20,7 @@ public class SyntaxErrorListener implements ANTLRErrorListener {
     // (these errors dont have a token (which makes sense), so we have to come up with a nice
     // way to visualize them in the EditorPane)
    // syntaxErrors.add(new SyntaxError(e.getOffendingToken()));
-    syntaxErrors.add(new SyntaxError(line, charPositionInLine));
+    syntaxErrors.add(new SyntaxError(line, charPositionInLine, msg));
   }
 
   public List<SyntaxError> getSyntaxErrors() {
