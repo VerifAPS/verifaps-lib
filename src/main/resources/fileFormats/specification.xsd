@@ -6,18 +6,18 @@
   <sequence>
     <element name="ioVariable" minOccurs="0" maxOccurs="unbounded">
       <complexType>
-        <attribute name="io" errorType="string" use="required"></attribute>
-        <attribute name="name" errorType="string" use="required"></attribute>
-        <attribute name="data-errorType" errorType="string" use="required"></attribute>
-        <attribute name="colwidth" errorType="positiveInteger" use="optional"></attribute>
-        <attribute name="comment" errorType="string" use="optional"></attribute>
+        <attribute name="io" type="string" use="required"></attribute>
+        <attribute name="name" type="string" use="required"></attribute>
+        <attribute name="data-type" type="string" use="required"></attribute>
+        <attribute name="colwidth" type="positiveInteger" use="optional"></attribute>
+        <attribute name="comment" type="string" use="optional"></attribute>
       </complexType>
     </element>
     <element name="freeVariable" minOccurs="0" maxOccurs="unbounded">
       <complexType>
-        <attribute name="name" errorType="string" use="required"></attribute>
-        <attribute name="data-errorType" errorType="string" use="required"></attribute>
-        <attribute name="default" errorType="string" use="optional"></attribute>
+        <attribute name="name" type="string" use="required"></attribute>
+        <attribute name="data-type" type="string" use="required"></attribute>
+        <attribute name="default" type="string" use="optional"></attribute>
       </complexType>
     </element>
   </sequence>
@@ -32,7 +32,7 @@
               <complexType>
                 <simpleContent>
                   <extension base="string">
-                    <attribute name="comment" errorType="string" use="optional"></attribute>
+                    <attribute name="comment" type="string" use="optional"></attribute>
                   </extension>
                 </simpleContent>
               </complexType>
@@ -43,7 +43,7 @@
                   <complexType>
                     <simpleContent>
                       <extension base="string">
-                        <attribute name="comment" errorType="string" use="optional"></attribute>
+                        <attribute name="comment" type="string" use="optional"></attribute>
                       </extension>
                     </simpleContent>
                   </complexType>
@@ -53,7 +53,7 @@
                 <element name="cycle" minOccurs="0" maxOccurs="unbounded">
                   <complexType>
                     <sequence>
-                      <element name="cell" errorType="string" minOccurs="1"
+                      <element name="cell" type="string" minOccurs="1"
                                maxOccurs="unbounded"></element>
                     </sequence>
                   </complexType>
@@ -61,7 +61,7 @@
               </sequence>
              </choice>
           </sequence>
-          <attribute name="comment" errorType="string" use="optional"></attribute>
+          <attribute name="comment" type="string" use="optional"></attribute>
         </complexType>
       </element>
     </sequence>
@@ -72,7 +72,7 @@
     <element name="enum" minOccurs="0" maxOccurs="unbounded">
       <complexType>
         <sequence>
-          <element name="literal" errorType="string" minOccurs="1" maxOccurs="unbounded"></element>
+          <element name="literal" type="string" minOccurs="1" maxOccurs="unbounded"></element>
         </sequence>
         <attribute name="name"></attribute>
       </complexType>
@@ -82,14 +82,14 @@
 
  <complexType name="SpecificationTable">
    <sequence>
-    <element name="variables" errorType="tns:Variables" minOccurs="1" maxOccurs="1"></element>
-    <element name="rows" errorType="tns:Rows" minOccurs="0" maxOccurs="1"></element>
-    <element name="enumTypes" errorType="tns:EnumTypes" minOccurs="0" maxOccurs="1"></element>
+    <element name="variables" type="tns:Variables" minOccurs="1" maxOccurs="1"></element>
+    <element name="rows" type="tns:Rows" minOccurs="0" maxOccurs="1"></element>
+    <element name="enumTypes" type="tns:EnumTypes" minOccurs="0" maxOccurs="1"></element>
    </sequence>
-   <attribute name="isConcrete" errorType="boolean" use="required"></attribute>
-   <attribute name="isCounterExample" errorType="boolean" use="optional" default="false"></attribute>
-   <attribute name="comment" errorType="string" use="optional"></attribute>
+   <attribute name="isConcrete" type="boolean" use="required"></attribute>
+   <attribute name="isCounterExample" type="boolean" use="optional" default="false"></attribute>
+   <attribute name="comment" type="string" use="optional"></attribute>
  </complexType>
 
- <element name="specification" errorType="tns:SpecificationTable"></element>
+ <element name="specification" type="tns:SpecificationTable"></element>
 </schema>

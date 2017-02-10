@@ -5,31 +5,31 @@
       <element name="general">
         <complexType>
           <sequence>
-            <element name="uiLanguage" errorType="string" minOccurs="1" maxOccurs="1"></element>
+            <element name="uiLanguage" type="string" minOccurs="1" maxOccurs="1"></element>
             <element name="windowSize" minOccurs="1" maxOccurs="1">
               <complexType>
                 <sequence>
-                  <element name="width" errorType="positiveInteger" minOccurs="1" maxOccurs="1"></element>
-                  <element name="height" errorType="positiveInteger" minOccurs="1" maxOccurs="1"></element>
+                  <element name="width" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
+                  <element name="height" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
                 </sequence>
               </complexType>
             </element>
-            <element name="verificationTimeout" errorType="positiveInteger" minOccurs="1" maxOccurs="1"></element>
-            <element name="simulationTimeout" errorType="positiveInteger" minOccurs="1" maxOccurs="1"></element>
+            <element name="verificationTimeout" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
+            <element name="simulationTimeout" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
           </sequence>
         </complexType>
       </element>
       <element name="editor">
         <complexType>
           <sequence>
-            <element name="showLineNumbers" errorType="boolean" minOccurs="1" maxOccurs="1"></element>
-            <element name="fontFamily" errorType="string" minOccurs="0" maxOccurs="1"></element>
-            <element name="fontSize" errorType="positiveInteger" minOccurs="0" maxOccurs="1"></element>
+            <element name="showLineNumbers" type="boolean" minOccurs="1" maxOccurs="1"></element>
+            <element name="fontFamily" type="string" minOccurs="0" maxOccurs="1"></element>
+            <element name="fontSize" type="positiveInteger" minOccurs="0" maxOccurs="1"></element>
           </sequence>
         </complexType>
       </element>
     </sequence>
   </complexType>
 
-  <element name="config" errorType="tns:Config"></element>
+  <element name="config" type="tns:Config"></element>
 </schema>
