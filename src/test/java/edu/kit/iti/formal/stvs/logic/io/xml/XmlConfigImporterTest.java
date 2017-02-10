@@ -8,7 +8,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileInputStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Benjamin Alt
@@ -25,7 +25,7 @@ public class XmlConfigImporterTest {
   @Test
   public void testDoImport() throws Exception {
     FileInputStream inputStream = new FileInputStream(new File
-        (XmlConfigImporter.class.getResource("/fileFormats/examples/config.xml").toURI()));
+        (XmlConfigImporter.class.getResource("config_valid_nodeps.xml").toURI()));
     GlobalConfig config = importer.doImport(inputStream);
     assertEquals("EN", config.getUiLanguage());
     assertEquals(800, config.getWindowWidth());

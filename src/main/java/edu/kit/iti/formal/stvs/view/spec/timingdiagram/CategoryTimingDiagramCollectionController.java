@@ -1,9 +1,9 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.common.Selection;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;

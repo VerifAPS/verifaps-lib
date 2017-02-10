@@ -18,9 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import static edu.kit.iti.formal.stvs.model.TestUtils.assertCollectionsEqual;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by Philipp on 19.01.2017.
@@ -93,11 +91,11 @@ public class CodeTest {
 
     Type myEnum = new TypeEnum("MY_ENUM", Arrays.asList("possible", "values", "enum"));
     Set<CodeIoVariable> expectedVariables = new HashSet<>();
-    expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, TypeBool.BOOL, "active"));
-    expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "number"));
-    expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, myEnum, "my_enum"));
-    expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, myEnum, "my_output"));
-    expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, TypeBool.BOOL, "seriously"));
+    expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, "BOOL", "active"));
+    expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, "INT", "number"));
+    expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, myEnum.getTypeName(), "my_enum"));
+    expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, myEnum.getTypeName(), "my_output"));
+    expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, "BOOL", "seriously"));
 
     assertCollectionsEqual(expectedVariables, parsed.getDefinedVariables());
   }

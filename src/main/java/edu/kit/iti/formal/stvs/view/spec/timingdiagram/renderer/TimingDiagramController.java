@@ -1,16 +1,13 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
 import edu.kit.iti.formal.stvs.ViewUtils;
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
-import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
-import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.common.Selection;
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.geometry.Side;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -21,8 +18,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.transform.Transform;
 
-import java.util.stream.IntStream;
-
 /**
  * Created by csicar on 09.01.17.
  * Controller for a single TimingDiagramController e.g. for <b>one</b> Variable and over all Timesteps
@@ -32,13 +27,13 @@ public class TimingDiagramController implements Controller {
   private final TimingDiagramView view;
   private final Axis externalYAxis;
   private final Selection selection;
-  private final SpecIoVariable ioVariable;
+  private final ValidIoVariable ioVariable;
   private final ConcreteSpecification concreteSpec;
   private final NumberAxis commonXAxis;
   private MouseEvent lastMouseEvent;
 
 
-  public TimingDiagramController(NumberAxis commonXAxis, NumberAxis externalYAxis, ConcreteSpecification spec, SpecIoVariable ioVariable, Selection selection){
+  public TimingDiagramController(NumberAxis commonXAxis, NumberAxis externalYAxis, ConcreteSpecification spec, ValidIoVariable ioVariable, Selection selection){
     XYChart.Series<Number, Number> seriesData = Plotable.toNumberSeries(spec.getColumnByName(ioVariable.getName()).getCells());
     this.externalYAxis = externalYAxis;
     this.selection = selection;
@@ -65,7 +60,7 @@ public class TimingDiagramController implements Controller {
     initCommon();
   }
 
-  public TimingDiagramController(NumberAxis commonXAxis, CategoryAxis externalYAxis, ConcreteSpecification spec, SpecIoVariable ioVariable, Selection selection){
+  public TimingDiagramController(NumberAxis commonXAxis, CategoryAxis externalYAxis, ConcreteSpecification spec, ValidIoVariable ioVariable, Selection selection){
     XYChart.Series<Number, String> seriesData = Plotable.toStringSeries(spec.getColumnByName(ioVariable.getName()).getCells());
     this.externalYAxis = externalYAxis;
     this.ioVariable = ioVariable;
@@ -110,7 +105,7 @@ public class TimingDiagramController implements Controller {
         xPositiveZoomItem,
         xNegativeZoomItem
     );
-    view.setTitle(ioVariable.getName()+ " : " + ioVariable.getType().getTypeName());
+    view.setTitle(ioVariable.getName()+ " : " + ioVariable.getValidType());
   }
 
   private void onXPositiveZoom(ActionEvent actionEvent) {

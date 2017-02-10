@@ -1,19 +1,12 @@
 package edu.kit.iti.formal.stvs.view;
 
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionImporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionImporterTest;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
-import edu.kit.iti.formal.stvs.view.menu.StvsMenuBarController;
 import javafx.application.Application;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import org.junit.Test;
-
-import java.io.File;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by csicar on 08.02.17.
@@ -32,7 +25,6 @@ public class StvsRootControllerTest {
     try {
        rootModel = ImporterFacade.importSession(importer.getClass()
           .getResourceAsStream("session_valid_1.xml"), ImporterFacade.ImportFormat.XML);
-
     }catch(Exception e) {
       e.printStackTrace();
     }

@@ -2,7 +2,10 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import de.tudresden.inf.lat.jsexp.Sexp;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**

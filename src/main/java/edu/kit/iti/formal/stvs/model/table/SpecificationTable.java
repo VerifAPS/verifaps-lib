@@ -1,36 +1,39 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import edu.kit.iti.formal.stvs.model.common.Named;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.util.Callback;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * @author Benjamin Alt
  * @author Philipp
  */
-public class SpecificationTable<C, D> {
+public class SpecificationTable<H extends Named, C, D> {
 
-  // This is not an ObservableMap, because SpecIoVariable contains the columnHeader string
-  // itself, so if it were an ObservableMap it would duplicate this information (and
-  // one had to synchronize it, listen on the name property of SpecIoVariable, etc)
-  protected ObservableList<SpecIoVariable> specIoVariables;
+  protected ObservableList<H> columnHeaders;
   protected ObservableList<SpecificationRow<C>> rows;
   protected ObservableList<D> durations;
 
-  public SpecificationTable() {
-    this.rows = FXCollections.observableArrayList();
-    this.durations = FXCollections.observableArrayList();
-    this.specIoVariables = FXCollections.observableArrayList();
+  public SpecificationTable(Callback<D, Observable[]> durationExtractor) {
+    this.rows = FXCollections.observableArrayList(
+        specificationRow -> new Observable[] { specificationRow });
+    this.durations = FXCollections.observableArrayList(durationExtractor);
+    this.columnHeaders = FXCollections.observableArrayList();
 
     this.rows.addListener(this::onRowChange);
-    this.specIoVariables.addListener(this::onSpecIoVariableChange);
+    this.columnHeaders.addListener(this::onColumnHeadersChanged);
     this.durations.addListener(this::onDurationChange);
+
   }
 
   public ObservableList<SpecificationRow<C>> getRows() {
@@ -41,17 +44,18 @@ public class SpecificationTable<C, D> {
     return durations;
   }
 
-  public SpecificationColumn<C> getColumnByName(String specIoVarName) {
-    SpecIoVariable specIoVariable = getSpecIoVariableByName(specIoVarName);
+  public SpecificationColumn<C> getColumnByName(String columnHeaderName) {
+    // ensure there is a column header with this name
+    H columnHeader = getColumnHeaderByName(columnHeaderName);
     List<C> cells = rows.stream()
-        .map(row -> row.getCells().get(specIoVarName))
+        .map(row -> row.getCells().get(columnHeader.getName()))
         .collect(Collectors.toList());
     return new SpecificationColumn<>(cells);
   }
 
   public SpecificationColumn<C> removeColumnByName(String specIoVarName) {
     SpecificationColumn<C> column = getColumnByName(specIoVarName);
-    specIoVariables.remove(getSpecIoVariableByName(specIoVarName));
+    columnHeaders.remove(getColumnHeaderByName(specIoVarName));
     for (SpecificationRow<C> row : rows) {
       row.getCells().remove(specIoVarName);
     }
@@ -59,9 +63,9 @@ public class SpecificationTable<C, D> {
     return column;
   }
 
-  public void addColumn(SpecIoVariable ioVariable, SpecificationColumn<C> column) {
+  public void addColumn(H columnHeader, SpecificationColumn<C> column) {
     // throws IllegalArgumentException if a var with same name already exists:
-    specIoVariables.add(ioVariable);
+    columnHeaders.add(columnHeader);
 
     if (rows.size() == 0) {
       throw new IllegalStateException("Cannot add columns to empty table, add rows first "
@@ -75,22 +79,22 @@ public class SpecificationTable<C, D> {
           "Cannot add column with incorrect height " + colHeight + ", expected: " + rows.size());
     }
     for (int row = 0; row < rows.size(); row++) {
-      rows.get(row).getCells().put(ioVariable.getName(), column.getCells().get(row));
+      rows.get(row).getCells().put(columnHeader.getName(), column.getCells().get(row));
     }
     onColumnAdded(column);
   }
 
-  public Optional<SpecIoVariable> getOptionalSpecIoVariableByName(String specIoVarName) {
-    return specIoVariables.stream()
-        .filter(specIoVariable -> specIoVariable.getName().equals(specIoVarName))
+  public Optional<H> getOptionalSpecIoVariableByName(String columnHeaderName) {
+    return columnHeaders.stream()
+        .filter(specIoVariable -> specIoVariable.getName().equals(columnHeaderName))
         .findAny();
   }
 
-  public SpecIoVariable getSpecIoVariableByName(String specIoVarName) {
-    return getOptionalSpecIoVariableByName(specIoVarName)
+  public H getColumnHeaderByName(String columnHeaderName) {
+    return getOptionalSpecIoVariableByName(columnHeaderName)
         .orElseThrow(() ->
             new NoSuchElementException("Column does not exist: "
-                + StringEscapeUtils.escapeJava(specIoVarName)));
+                + StringEscapeUtils.escapeJava(columnHeaderName)));
   }
 
   /**
@@ -100,8 +104,8 @@ public class SpecificationTable<C, D> {
    * columns, use addNewColumn</p>
    * @return the list of SpecIoVariables
    */
-  public ObservableList<SpecIoVariable> getSpecIoVariables() {
-    return this.specIoVariables;
+  public ObservableList<H> getColumnHeaders() {
+    return this.columnHeaders;
   }
 
   protected void onRowChange(ListChangeListener.Change<? extends SpecificationRow<C>> change) {
@@ -118,10 +122,10 @@ public class SpecificationTable<C, D> {
     }
   }
 
-  protected void onSpecIoVariableChange(ListChangeListener.Change<? extends SpecIoVariable> change) {
+  protected void onColumnHeadersChanged(ListChangeListener.Change<? extends H> change) {
     while (change.next()) {
       if (change.wasAdded()) {
-        onSpecIoVariableAdded(change.getAddedSubList());
+        onColumnHeaderAdded(change.getAddedSubList());
       }
       if (change.wasRemoved()) {
         onSpecIoVariableRemoved(change.getRemoved());
@@ -143,10 +147,10 @@ public class SpecificationTable<C, D> {
   protected void onRowAdded(List<? extends SpecificationRow<C>> added) {
     for (SpecificationRow<C> addedRow : added) {
       // Check correctness of added row
-      if (addedRow.getCells().size() != specIoVariables.size()) {
+      if (addedRow.getCells().size() != columnHeaders.size()) {
         throw new IllegalArgumentException("Illegal width for row "
             + StringEscapeUtils.escapeJava(addedRow.toString()) + ", expected width: "
-            + specIoVariables.size());
+            + columnHeaders.size());
       }
       if (!addedRow.getCells().keySet().stream().allMatch(columnId ->
               getOptionalSpecIoVariableByName(columnId).isPresent())) {
@@ -168,12 +172,12 @@ public class SpecificationTable<C, D> {
   protected void onColumnRemoved(SpecificationColumn<C> column) {
   }
 
-  protected void onSpecIoVariableAdded(List<? extends SpecIoVariable> added) {
-    for (SpecIoVariable specIoVariable : added) {
-      String columnId = specIoVariable.getName();
+  protected void onColumnHeaderAdded(List<? extends H> added) {
+    for (H columnHeader : added) {
+      String columnId = columnHeader.getName();
       getOptionalSpecIoVariableByName(columnId)
           .ifPresent(otherVariableWithSameName -> {
-            if (otherVariableWithSameName != specIoVariable) {
+            if (otherVariableWithSameName != columnHeader) {
               throw new IllegalArgumentException(
                   "Cannot add SpecIoVariable that collides with another SpecIoVariable: "
                       + StringEscapeUtils.escapeJava(columnId));
@@ -182,7 +186,7 @@ public class SpecificationTable<C, D> {
     }
   }
 
-  protected void onSpecIoVariableRemoved(List<? extends SpecIoVariable> removed) {
+  protected void onSpecIoVariableRemoved(List<? extends H> removed) {
   }
 
   protected void onDurationAdded(List<? extends D> added) {
@@ -200,9 +204,10 @@ public class SpecificationTable<C, D> {
 
     SpecificationTable rhs = (SpecificationTable) obj;
     return new EqualsBuilder().
-            append(getSpecIoVariables(), rhs.getSpecIoVariables()).
+            append(getColumnHeaders(), rhs.getColumnHeaders()).
             append(getRows(), rhs.getRows()).
             append(getDurations(), rhs.getDurations()).
             isEquals();
   }
+
 }

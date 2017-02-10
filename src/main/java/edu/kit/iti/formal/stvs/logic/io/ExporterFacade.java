@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigExporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaExporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;

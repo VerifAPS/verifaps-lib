@@ -4,8 +4,8 @@ import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
-import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
+import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
@@ -14,11 +14,10 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -55,20 +54,13 @@ public class ParsedCode {
   }
 
   private static class VariableVisitor extends DefaultVisitor<Void> {
-    private List<CodeIoVariable> definedVariables;
-    private Map<String, Type> definedTypes;
-
-    VariableVisitor(Map<String, Type> definedTypes) {
-      this.definedVariables = new ArrayList<>();
-      this.definedTypes = definedTypes;
-    }
+    private List<CodeIoVariable> definedVariables = new ArrayList<>();
 
     @Override
     public Void visit(FunctionDeclaration function) {
       function.getLocalScope().getLocalVariables().entrySet().forEach(variableEntry -> {
         //String varName = variableEntry.getKey();
         VariableDeclaration varDecl = variableEntry.getValue();
-        Type type = definedTypes.get(varDecl.getDataTypeName());
         VariableCategory category;
         switch (varDecl.getType()) {
           case VariableDeclaration.INPUT:
@@ -79,10 +71,10 @@ public class ParsedCode {
             break;
           default:
             // Don't create variables for other types than INPUT or OUTPUT
-            //TODO: recognize INOUT or other variables
+            //TODO: recognize INOUT or other variables (was not specified however)
             return;
         }
-        this.definedVariables.add(new CodeIoVariable(category, type, varDecl.getName()));
+        this.definedVariables.add(new CodeIoVariable(category, varDecl.getDataTypeName(), varDecl.getName()));
       });
       return null;
     }
@@ -145,7 +137,7 @@ public class ParsedCode {
       typeVisitor.getDefinedTypes().forEach(type -> definedTypesByName.put(type.getTypeName(), type));
 
       // Find IoVariables in parsed code
-      VariableVisitor variableVisitor = new VariableVisitor(definedTypesByName);
+      VariableVisitor variableVisitor = new VariableVisitor();
       ast.visit(variableVisitor);
 
       // Find code blocks in parsed code
@@ -163,7 +155,6 @@ public class ParsedCode {
     } catch (Exception exception) {
       exception.printStackTrace();
     }
-
   }
 
   public List<FoldableCodeBlock> getFoldableCodeBlocks() {

@@ -1,20 +1,10 @@
 package edu.kit.iti.formal.stvs.view.spec.variables.clipboard;
 
-import com.google.gson.Gson;
-import edu.kit.iti.formal.stvs.model.common.FreeVariable;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import org.apache.commons.lang3.StringEscapeUtils;
-
-import java.lang.management.ManagementFactory;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * Created by Philipp on 05.02.2017.
  */
 public class Json {
-
+/*
   private static final Gson GSON = new Gson();
 
   private Json() {
@@ -49,7 +39,7 @@ public class Json {
         .map(freeVariable -> {
           FreeVar var = new FreeVar();
           var.name = freeVariable.getName();
-          var.type = freeVariable.getType().getTypeName();
+          var.type = freeVariable.getValidType().getTypeName();
           return var;
         })
         .collect(Collectors.toList());
@@ -74,4 +64,5 @@ public class Json {
             new IllegalArgumentException("Can't paste free variable with unkown type: "
               + StringEscapeUtils.escapeJava(typeString)));
   }
+  */
 }

@@ -3,15 +3,12 @@ package edu.kit.iti.formal.stvs.view.common;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.util.ListTypeConverter;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.util.StringConverter;
 
 import java.util.List;
-import java.util.Observable;
 
 /**
  * Created by Philipp on 07.02.2017.

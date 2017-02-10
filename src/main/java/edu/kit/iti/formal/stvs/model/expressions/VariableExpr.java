@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.common.IoVariable;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * runtime-representation for variables in {@link Expression}s.
@@ -14,6 +15,8 @@ import java.util.Optional;
  * is simply the String name of either of those.
  */
 public class VariableExpr extends Expression {
+
+  public static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[a-zA-Z_][$a-zA-Z0-9_]*");
 
   private final String varName;
   private final Optional<Integer> index;

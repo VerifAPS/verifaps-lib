@@ -6,8 +6,6 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 
-import static org.junit.Assert.*;
-
 /**
  * @author Benjamin Alt
  */
@@ -24,7 +22,6 @@ public class XmlSessionExporterTest {
   public void exportDefault() throws Exception {
     ByteArrayOutputStream result = exporter.export(new StvsRootModel());
     String resultString = new String(result.toByteArray(), "utf-8");
-    System.out.println(resultString);
+    // TODO: AssertEquals
   }
-
 }

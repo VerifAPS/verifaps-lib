@@ -3,9 +3,6 @@ package edu.kit.iti.formal.stvs.view.menu;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-
-import javax.xml.soap.Text;
 
 /**
  * Created by csicar on 11.01.17.

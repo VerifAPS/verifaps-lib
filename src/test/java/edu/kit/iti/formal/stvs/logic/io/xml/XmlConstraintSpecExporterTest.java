@@ -7,10 +7,9 @@ import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
-import edu.kit.iti.formal.stvs.model.table.*;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.model.table.JsonTableParser;
+import edu.kit.iti.formal.stvs.model.table.SpecProblemRecognizerTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +19,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Benjamin Alt
@@ -36,21 +35,18 @@ public class XmlConstraintSpecExporterTest {
 
   @Test
   public void testExportValid1() throws ExportException, IOException {
-    JsonElement testjson = TableUtil.jsonFromResource("valid_table.json",
-        ConstraintSpecificationTest.class);
+    JsonElement testjson = JsonTableParser.jsonFromResource("valid_table.json",
+        SpecProblemRecognizerTest.class);
 
     List<CodeIoVariable> codeIoVariables = Arrays.asList(
-        new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "Counter"),
-        new CodeIoVariable(VariableCategory.OUTPUT, TypeBool.BOOL, "Active")
+        new CodeIoVariable(VariableCategory.INPUT, "INT", "Counter"),
+        new CodeIoVariable(VariableCategory.OUTPUT, "BOOL", "Active")
     );
 
     List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
 
     ConstraintSpecification testSpec =
-        TableUtil.constraintTableFromJson(
-            new SimpleObjectProperty<>(typeContext),
-            new SimpleObjectProperty<>(codeIoVariables),
-            testjson);
+        JsonTableParser.constraintTableFromJson(testjson);
 
     ByteArrayOutputStream result = exporter.export(testSpec);
     String resultString = IOUtils.toString(result.toByteArray(), "UTF-8");

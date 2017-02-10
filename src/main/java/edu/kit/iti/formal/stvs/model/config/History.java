@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.stvs.model.config;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 /**
  * Contains information about recently opened code and spec files

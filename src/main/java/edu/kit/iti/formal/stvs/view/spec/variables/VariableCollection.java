@@ -1,8 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.variables;
 
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.expressions.Value;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -15,8 +13,8 @@ public class VariableCollection extends VBox {
   private final Label overviewLabel;
   private final TableView<FreeVariable> freeVariableTableView;
   private final TableColumn<FreeVariable, String> nameTableColumn;
-  private final TableColumn<FreeVariable, Type> typeTableColumn;
-  private final TableColumn<FreeVariable, Value> defaultValueTableColumn;
+  private final TableColumn<FreeVariable, String> typeTableColumn;
+  private final TableColumn<FreeVariable, String> defaultValueTableColumn;
   private final Button addFreeVariable;
 
   public VariableCollection() {
@@ -57,11 +55,11 @@ public class VariableCollection extends VBox {
     return nameTableColumn;
   }
 
-  public TableColumn<FreeVariable, Type> getTypeTableColumn() {
+  public TableColumn<FreeVariable, String> getTypeTableColumn() {
     return typeTableColumn;
   }
 
-  public TableColumn<FreeVariable, Value> getDefaultValueTableColumn() {
+  public TableColumn<FreeVariable, String> getDefaultValueTableColumn() {
     return defaultValueTableColumn;
   }
 }

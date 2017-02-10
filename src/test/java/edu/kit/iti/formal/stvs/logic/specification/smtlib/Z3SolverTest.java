@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
@@ -13,9 +13,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by leonk on 09.02.2017.
@@ -58,10 +56,10 @@ public class Z3SolverTest {
             //System.out.println(optionalOutput.get());
           }
       );
-      List<SpecIoVariable> specIoVariables = new ArrayList<>();
-      specIoVariables.add(new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "A"));
-      specIoVariables.add(new SpecIoVariable(VariableCategory.OUTPUT, TypeBool.BOOL, "B"));
-      Z3Solver.concretizeVarAssignment(TEST2, specIoVariables, result -> {
+      List<ValidIoVariable> validIoVariables = new ArrayList<>();
+      validIoVariables.add(new ValidIoVariable(VariableCategory.INPUT, "A", TypeInt.INT));
+      validIoVariables.add(new ValidIoVariable(VariableCategory.OUTPUT, "B", TypeBool.BOOL));
+      Z3Solver.concretizeVarAssignment(TEST2, validIoVariables, result -> {
         System.out.println(result);
       });
     } catch (IOException e) {

@@ -1,6 +1,6 @@
 <test-table xmlns="http://formal.iti.kit.edu/exteta-1.0" version="1.0">
     <variables>
-        <variable io="output" name="o" data-type="ENUM"/>
+        <variable io="output" name="o" data-errorType="ENUM"/>
     </variables>
     <steps>
         <step duration="[1,1]"><cell>a</cell></step>

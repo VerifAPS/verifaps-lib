@@ -5,7 +5,10 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.math.BigInteger;
@@ -24,6 +27,7 @@ public class XmlConfigExporter extends XmlExporter<GlobalConfig> {
     general.setSimulationTimeout(new BigInteger(Integer.toString(source.getSimulationTimeout())));
     general.setVerificationTimeout(new BigInteger(Integer.toString(source.getVerificationTimeout()
     )));
+    general.setMaxLineRollout(new BigInteger(Integer.toString(source.getMaxLineRollout())));
     Config.General.WindowSize windowSize = objectFactory.createConfigGeneralWindowSize();
     windowSize.setHeight(new BigInteger(Integer.toString(source.getWindowHeight())));
     windowSize.setWidth(new BigInteger(Integer.toString(source.getWindowWidth())));
@@ -34,6 +38,12 @@ public class XmlConfigExporter extends XmlExporter<GlobalConfig> {
     editor.setFontSize(new BigInteger(Integer.toString(source.getEditorFontSize())));
     editor.setShowLineNumbers(source.getShowLineNumbers());
     config.setEditor(editor);
+    Config.Dependencies deps = objectFactory.createConfigDependencies();
+    deps.setZ3Path(source.getZ3Path());
+    deps.setJavaPath(source.getJavaPath());
+    deps.setNuxmvPath(source.getNuxmvPath());
+    deps.setGetetaPath(source.getGetetaPath());
+    config.setDependencies(deps);
     JAXBElement<Config> element = objectFactory.createConfig(config);
     return marshalToNode(element);
   }

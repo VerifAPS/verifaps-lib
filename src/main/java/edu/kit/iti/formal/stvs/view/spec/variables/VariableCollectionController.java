@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.view.spec.variables;
 
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
-import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
-import edu.kit.iti.formal.stvs.model.common.IllegalValueTypeException;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
 import edu.kit.iti.formal.stvs.model.expressions.*;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
 import edu.kit.iti.formal.stvs.util.ListTypeConverter;
@@ -12,9 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.util.StringConverter;
@@ -29,16 +27,18 @@ import java.util.Set;
 public class VariableCollectionController implements Controller {
 
   private ObjectProperty<List<Type>> codeTypes;
-  private FreeVariableSet freeVariableSet;
+  private FreeVariableList freeVariableList;
+  private FreeVariableListValidator validator;
   private VariableCollection view;
   // was used for drag n drop: private int latestMouseOverRow = 0;
 
   private ContextMenu contextMenu;
 
   public VariableCollectionController(ObjectProperty<List<Type>> codeTypes,
-                                      FreeVariableSet freeVariableSet) {
+                                      FreeVariableList freeVariableList) {
     this.codeTypes = codeTypes;
-    this.freeVariableSet = freeVariableSet;
+    this.freeVariableList = freeVariableList;
+    this.validator = new FreeVariableListValidator(codeTypes, freeVariableList);
 
     this.contextMenu = new ContextMenu();
     this.view = new VariableCollection();
@@ -56,7 +56,7 @@ public class VariableCollectionController implements Controller {
     view.getFreeVariableTableView().setContextMenu(contextMenu);
 
     view.getAddFreeVariable().setOnAction(event -> addFreeVariable());
-    view.getFreeVariableTableView().setItems(freeVariableSet.getVariableSet());
+    view.getFreeVariableTableView().setItems(freeVariableList.getVariables());
 
     /*
     view.getFreeVariableTableView().setRowFactory(param -> {
@@ -77,39 +77,9 @@ public class VariableCollectionController implements Controller {
 
     ObservableList<Type> codeTypesList = ListTypeConverter.makeObservableList(codeTypes);
     view.getNameTableColumn().setCellFactory(TextFieldTableCell.forTableColumn());
-    view.getTypeTableColumn().setCellFactory(
-        ComboBoxTableCell.forTableColumn(createTypeConverter(codeTypesList), codeTypesList));
-    view.getDefaultValueTableColumn().setCellFactory(
-        TextFieldTableCell.forTableColumn(createDefaultValueConverter(codeTypesList)));
-
-    view.getNameTableColumn().setOnEditCommit(event -> {
-      String proposedName = event.getNewValue();
-      // It is illegal to set the variable name to be the same as another existing one
-      if (!freeVariableSet.getVariableSet().stream()
-          .anyMatch(var -> var.getName().equals(proposedName))) {
-        try {
-          event.getRowValue().setName(proposedName);
-          event.consume();
-        } catch (IllegalArgumentException exception) { // Invalid name
-          // TODO: Provide visual error feedback
-        }
-      } else {
-        // TODO: Provide visual error feedback
-      }
-      event.getTableView().refresh();
-    });
-    view.getTypeTableColumn().setOnEditCommit(event ->
-        event.getRowValue().setType(event.getNewValue()));
-    view.getDefaultValueTableColumn().setOnEditCommit(event -> {
-      try {
-        Value toBeSet = event.getNewValue();
-        event.getRowValue().setDefaultValue(toBeSet);
-        event.consume();
-      } catch (IllegalValueTypeException exc) {
-        // TODO: Provide visual error feedback
-      }
-      event.getTableView().refresh();
-    });
+    view.getTypeTableColumn().setCellFactory(TextFieldTableCell.forTableColumn()); // TODO: Make this combo box again!
+    view.getDefaultValueTableColumn().setCellFactory(TextFieldTableCell.forTableColumn());
+    // TODO: Show FreeVariableProblems!!!
 
     // TODO: Maybe fix drag n drop in future
     //configureDragAndDrop(view.getFreeVariableTableView());
@@ -160,22 +130,8 @@ public class VariableCollectionController implements Controller {
     };
   }
 
-  private boolean containsVarWithName(String name) {
-    return freeVariableSet.getVariableSet().stream()
-        .anyMatch(variable -> variable.getName().equals(name));
-  }
-
-  private String findNewName() {
-    int index = 0;
-    final String prefix = "free_variable";
-    while (containsVarWithName(prefix + index)) {
-      index++;
-    }
-    return prefix + index;
-  }
-
   private void addFreeVariable() {
-    FreeVariable freeVariable = new FreeVariable(findNewName(), TypeBool.BOOL);
+    FreeVariable freeVariable = new FreeVariable("", "");
     view.getFreeVariableTableView().getItems().add(freeVariable);
   }
 
@@ -184,13 +140,17 @@ public class VariableCollectionController implements Controller {
     return view;
   }
 
-  public FreeVariableSet getFreeVariableSet() {
-    return freeVariableSet;
+  public FreeVariableList getFreeVariableList() {
+    return freeVariableList;
   }
 
-  private static final DataFormat JSON_MIME_TYPE = new DataFormat("application/json");
+  public FreeVariableListValidator getValidator() {
+    return validator;
+  }
 
   /*
+  private static final DataFormat JSON_MIME_TYPE = new DataFormat("application/json");
+
   private void configureDragAndDrop(TableView<FreeVariable> tableView) {
     tableView.setOnDragDetected(event -> {
       ObservableList<FreeVariable> selected = tableView.getSelectionModel().getSelectedItems();

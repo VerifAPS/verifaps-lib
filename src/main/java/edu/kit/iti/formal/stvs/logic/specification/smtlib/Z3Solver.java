@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import de.tudresden.inf.lat.jsexp.Sexp;
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
@@ -14,12 +14,7 @@ import edu.kit.iti.formal.stvs.util.ProcessOutputAsyncTask;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -63,12 +58,13 @@ public class Z3Solver {
     (check-sat)
     (get-value (A_0_0 B_0_0))
    */
-  public static void concretizeVarAssignment(String smtString, List<SpecIoVariable> specIoVariables, Consumer<Optional<ConcreteSpecification>> resultConsumer) throws IOException {
+  public static void concretizeVarAssignment(String smtString, List<ValidIoVariable> validIoVariables,
+                                             Consumer<Optional<ConcreteSpecification>> resultConsumer) throws IOException {
     concretizeSExpr(smtString, sexpOptional -> {
       Map<Integer, Map<String, String>> rawRows = new HashMap<>();
       Map<Integer, Integer> rawDurations = new HashMap<>();
-      Map<String, Type> typeContext = specIoVariables.stream().collect(Collectors.toMap(
-          SpecIoVariable::getName, SpecIoVariable::getType
+      Map<String, Type> typeContext = validIoVariables.stream().collect(Collectors.toMap(
+          ValidIoVariable::getName, ValidIoVariable::getValidType
       ));
       if (sexpOptional.isPresent()) {
         Sexp sExpr = sexpOptional.get().toSexpr();
@@ -119,10 +115,10 @@ public class Z3Solver {
                 return new AbstractMap.SimpleEntry<>(varName, new ConcreteCell(value));
               })
               .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-          specificationRows.add(i, new SpecificationRow<ConcreteCell>(concreteCellMap));
+          specificationRows.add(i, SpecificationRow.createUnobservableRow(concreteCellMap));
         }
         resultConsumer.accept(Optional.of(
-            new ConcreteSpecification(specIoVariables, specificationRows, durations, false)));
+            new ConcreteSpecification(validIoVariables, specificationRows, durations, false)));
       } else {
         resultConsumer.accept(Optional.empty());
       }

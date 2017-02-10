@@ -4,25 +4,28 @@ import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
-import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
+import edu.kit.iti.formal.stvs.model.code.ParsedCode;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
+import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
+import org.w3c.dom.Node;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import org.w3c.dom.Node;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Benjamin Alt
@@ -30,13 +33,11 @@ import org.w3c.dom.Node;
 public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
 
   private XmlConstraintSpecImporter constraintSpecImporter;
-  private XmlConcreteSpecImporter concreteSpecImporter;
   private XmlConfigImporter configImporter;
   private ObjectFactory objectFactory;
 
   public XmlSessionImporter() throws ImportException {
     constraintSpecImporter = new XmlConstraintSpecImporter();
-    concreteSpecImporter = new XmlConcreteSpecImporter();
     configImporter = new XmlConfigImporter();
     objectFactory = new ObjectFactory();
 
@@ -54,6 +55,13 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
       Code code = new Code();
       code.updateSourcecode(importedSession.getCode().getPlaintext());
       VerificationScenario scenario = new VerificationScenario(code);
+
+      List<Type> typeContext = Optional.ofNullable(code.getParsedCode())
+          .map(ParsedCode::getDefinedTypes)
+          .orElse(Arrays.asList(TypeInt.INT, TypeBool.BOOL));
+
+      // Initialized later, since we need to know the types that are available before we import
+      XmlConcreteSpecImporter concreteSpecImporter = new XmlConcreteSpecImporter(typeContext);
 
       // Config
       GlobalConfig config = new GlobalConfig();

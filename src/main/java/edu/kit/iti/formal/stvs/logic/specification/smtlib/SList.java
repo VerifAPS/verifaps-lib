@@ -2,7 +2,6 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import de.tudresden.inf.lat.jsexp.Sexp;
 import de.tudresden.inf.lat.jsexp.SexpFactory;
-import de.tudresden.inf.lat.jsexp.SexpList;
 
 import java.util.Arrays;
 import java.util.LinkedList;

@@ -8,7 +8,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 /**
@@ -28,7 +27,7 @@ public class StvsMainScene {
     this.menuBarController = new StvsMenuBarController(rootModelProperty);
     rootModelProperty.addListener(this::rootModelChanged);
 
-    this.scene = new Scene(createVBox());
+    this.scene = new Scene(createVBox(), 800, 600);
   }
 
   private VBox createVBox() {

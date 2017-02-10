@@ -2,8 +2,6 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by csicar on 08.02.17.
  */

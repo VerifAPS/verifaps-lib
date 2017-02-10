@@ -6,15 +6,15 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleSpans;
-import org.reactfx.Observable;
 
-import java.time.Duration;
 import java.util.Collection;
-import java.util.Optional;
 
 /**
  * Created by csicar on 09.01.17.
@@ -44,6 +44,8 @@ public class EditorPane extends SplitPane {
     codeArea = new CodeArea(code);
     codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
     syntaxErrorListView = new ListView<>(syntaxErrors);
+    syntaxErrorListView.getStylesheets().add(EditorPane.class.getResource("style.css").toExternalForm());
+    syntaxErrorListView.getStyleClass().addAll("model-text-area");
     syntaxErrorPane  = new AnchorPane(syntaxErrorListView);
     AnchorPane.setBottomAnchor(syntaxErrorListView, 0.0);
     AnchorPane.setTopAnchor(syntaxErrorListView, 0.0);
@@ -51,8 +53,7 @@ public class EditorPane extends SplitPane {
     AnchorPane.setRightAnchor(syntaxErrorListView, 0.0);
     this.getItems().addAll(codeArea, syntaxErrorPane);
     this.setOrientation(Orientation.VERTICAL);
-
-
+    this.setDividerPositions(0.8);
   }
 
   public StringProperty getCodeProperty() {

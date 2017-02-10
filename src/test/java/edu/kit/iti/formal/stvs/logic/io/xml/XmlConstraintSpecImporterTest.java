@@ -7,11 +7,8 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
-import edu.kit.iti.formal.stvs.model.table.ConstraintSpecificationTest;
-import edu.kit.iti.formal.stvs.model.table.TableUtil;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
+import edu.kit.iti.formal.stvs.model.table.JsonTableParser;
+import edu.kit.iti.formal.stvs.model.table.SpecProblemRecognizerTest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,18 +37,15 @@ public class XmlConstraintSpecImporterTest {
     FileInputStream inputStream = new FileInputStream(new File
         (this.getClass().getResource("spec_constraint_valid_1.xml").toURI()));
     ConstraintSpecification importedSpec = importer.doImport(inputStream);
-    JsonElement testjson = TableUtil.jsonFromResource("valid_table.json",
-        ConstraintSpecificationTest.class);
+    JsonElement testjson = JsonTableParser.jsonFromResource("valid_table.json",
+        SpecProblemRecognizerTest.class);
 
     List<CodeIoVariable> codeIoVariables = Collections.emptyList();
 
     List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
 
     ConstraintSpecification expectedSpec =
-        TableUtil.constraintTableFromJson(
-            new SimpleObjectProperty<>(typeContext),
-            new SimpleObjectProperty<>(codeIoVariables),
-            testjson);
+        JsonTableParser.constraintTableFromJson(testjson);
     assertEquals(expectedSpec, importedSpec);
   }
 

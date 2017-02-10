@@ -1,7 +1,12 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.model.expressions.*;
+import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
+import edu.kit.iti.formal.stvs.model.expressions.Expression;
+import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
 import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 
@@ -22,7 +27,7 @@ public class SmtPreprocessor {
   }};
   //      Map<Row, Max. number of cycles for that row>
   private final Map<Integer, Integer> maxDurations;
-  private final List<SpecIoVariable> ioVariables;
+  private final List<ValidIoVariable> ioVariables;
   private final ValidSpecification specification;
   private final Predicate<String> isIoVariable;
   private final Map<String, Type> freeVariablesContext;
@@ -30,12 +35,13 @@ public class SmtPreprocessor {
   private SConstraint sConstrain;
 
   public SmtPreprocessor(Map<Integer, Integer> maxDurations,
-                         ValidSpecification specification) {
+                         ValidSpecification specification, List<ValidFreeVariable> validFreeVariables) {
     this.maxDurations = maxDurations;
     this.specification = specification;
-    this.ioVariables = specification.getSpecIoVariables();
-    this.freeVariablesContext = specification.getFreeVariableSet().getVariableContext();
-    List<String> ioVariableTypes = ioVariables.stream().map(SpecIoVariable::getName).collect
+    this.ioVariables = specification.getColumnHeaders();
+    this.freeVariablesContext = validFreeVariables.stream()
+    .collect(Collectors.toMap(ValidFreeVariable::getName, ValidFreeVariable::getType));
+    List<String> ioVariableTypes = ioVariables.stream().map(ValidIoVariable::getName).collect
         (Collectors
         .toList());
     System.out.println(ioVariableTypes);
@@ -57,7 +63,7 @@ public class SmtPreprocessor {
 
     System.out.println("doing recursive step");
     //Step I, II, IV
-    for (SpecIoVariable ioVariable : this.ioVariables) {
+    for (ValidIoVariable ioVariable : this.ioVariables) {
       SpecificationColumn<Expression> column = this.specification.getColumnByName(ioVariable.getName());
       for (int z = 0; z < column.getCells().size(); z++ ) {
         Expression expression = column.getCells().get(z);
@@ -82,7 +88,7 @@ public class SmtPreprocessor {
 
     System.out.println("Doing step III");
     //Step III neg. Indizes verbinden
-    for (SpecIoVariable ioVariable : this.ioVariables) {
+    for (ValidIoVariable ioVariable : this.ioVariables) {
       SpecificationColumn<Expression> column = this.specification.getColumnByName(ioVariable.getName());
       String variableName = ioVariable.getName();
       for (int z = 0; z < column.getCells().size(); z++ ) {
@@ -112,7 +118,7 @@ public class SmtPreprocessor {
   private Type getTypeForVariable(String variableName) {
     Type type = freeVariablesContext.get(variableName);
     if(type == null) {
-      type = specification.getSpecIoVariableByName(variableName).getType();
+      type = specification.getColumnHeaderByName(variableName).getValidType();
     }
     return type;
   }
@@ -131,9 +137,9 @@ public class SmtPreprocessor {
 
     List<SExpr> definitions = new LinkedList<>();
 
-    specification.getTypeContext().forEach(item -> {
-      String typeName = item.getTypeName();
-      Optional<List<ValueEnum>> valueEnums = item.match(
+    specification.getColumnHeaders().forEach(item -> {
+      String typeName = item.getType();
+      Optional<List<ValueEnum>> valueEnums = item.getValidType().match(
           Optional::empty,
           Optional::empty,
           e -> Optional.of(e.getValues())

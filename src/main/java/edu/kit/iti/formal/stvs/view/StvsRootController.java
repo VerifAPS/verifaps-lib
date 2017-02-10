@@ -11,28 +11,23 @@ import edu.kit.iti.formal.stvs.view.editor.EditorPaneController;
 import edu.kit.iti.formal.stvs.view.spec.SpecificationsPaneController;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleSetProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by csicar on 09.01.17.
  */
 public class StvsRootController implements Controller {
+
   private final StvsRootView view;
   private final StvsRootModel stvsRootModel;
   private final ObjectProperty<List<Type>> types;
   private final ObjectProperty<List<CodeIoVariable>> ioVars;
-  private EditorPaneController editorPaneController;
   private final SpecificationsPaneController specificationsPaneController;
-  /**
-   * Used to sort Types (Enums should be at the bottom)
-   */
-  private final Comparator<Type> typeComparator = null; // TODO this should not be null
+  private EditorPaneController editorPaneController;
 
   public StvsRootController(StvsRootModel rootModel) {
     this.stvsRootModel = rootModel;

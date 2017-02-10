@@ -5,13 +5,13 @@
            xsi:schemaLocation="http://formal.iti.kit.edu/stvs/logic/io/xml ../specification.xsd"
             isConcrete="false" comment="I am a table comment!">
     <variables>
-        <ioVariable io="input" name="A" data-type="INT" colwidth="10"></ioVariable>
-        <ioVariable io="input" name="B" data-type="BOOL"
+        <ioVariable io="input" name="A" data-errorType="INT" colwidth="10"></ioVariable>
+        <ioVariable io="input" name="B" data-errorType="BOOL"
                     comment="I am a column comment!"></ioVariable>
-        <ioVariable io="output" name="C" data-type="INT"></ioVariable>
-        <ioVariable io="output" name="D" data-type="enumD" colwidth="50"
+        <ioVariable io="output" name="C" data-errorType="INT"></ioVariable>
+        <ioVariable io="output" name="D" data-errorType="enumD" colwidth="50"
                     comment="I am another column comment!"></ioVariable>
-        <freeVariable name="p" data-type="INT" default="3"></freeVariable>
+        <freeVariable name="p" data-errorType="INT" default="3"></freeVariable>
     </variables>
     <rows>
         <row><!-- Hier ist die Reihenfolge der Cells wichtig! -->

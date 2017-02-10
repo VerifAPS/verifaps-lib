@@ -1,16 +1,15 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
+import javafx.beans.Observable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Benjamin Alt
  */
-public class ConcreteSpecification extends SpecificationTable<ConcreteCell, ConcreteDuration> {
+public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, ConcreteCell, ConcreteDuration> {
 
   private final boolean isCounterExample;
 
@@ -18,13 +17,13 @@ public class ConcreteSpecification extends SpecificationTable<ConcreteCell, Conc
     this(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), isCounterExample);
   }
 
-  public ConcreteSpecification(List<SpecIoVariable> ioVariables, List<SpecificationRow<ConcreteCell>> rows,
+  public ConcreteSpecification(List<ValidIoVariable> ioVariables, List<SpecificationRow<ConcreteCell>> rows,
                                List<ConcreteDuration> durations,
                                boolean isCounterExample) {
-    super();
+    super(p -> new Observable[0]);
     this.isCounterExample = isCounterExample;
 
-    getSpecIoVariables().setAll(ioVariables);
+    getColumnHeaders().setAll(ioVariables);
     getRows().addAll(rows);
     getDurations().addAll(durations);
   }

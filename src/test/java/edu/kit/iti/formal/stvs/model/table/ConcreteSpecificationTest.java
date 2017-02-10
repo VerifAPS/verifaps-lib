@@ -1,15 +1,13 @@
 package edu.kit.iti.formal.stvs.model.table;
 
 import com.google.gson.JsonElement;
-import edu.kit.iti.formal.stvs.model.expressions.*;
-import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
+import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -23,34 +21,9 @@ public class ConcreteSpecificationTest {
 
   @Before
   public void setUp() throws Exception {
-    JsonElement json = TableUtil.jsonFromResource("concrete_spec.json", ConcreteSpecificationTest.class);
-    SpecificationTable<String, String> stringTable =
-        TableUtil.specificationTableFromJson(json);
-    concreteSpec = new ConcreteSpecification(false);
+    JsonElement json = JsonTableParser.jsonFromResource("concrete_spec.json", ConcreteSpecificationTest.class);
 
-    concreteSpec.getSpecIoVariables().addAll(stringTable.getSpecIoVariables());
-
-    int currentBeginCycle = 0;
-    for (String durationString : stringTable.getDurations()) {
-      int duration = Integer.parseInt(durationString);
-      concreteSpec.getDurations().add(new ConcreteDuration(currentBeginCycle, duration));
-      currentBeginCycle += duration;
-    }
-
-    ExpressionParser parser = new ExpressionParser("");
-
-    for (SpecificationRow<String> row : stringTable.getRows()) {
-      Map<String, ConcreteCell> cells = new HashMap<>();
-      for (Map.Entry<String, String> stringEntry : row.getCells().entrySet()) {
-        Expression parsedExpr = parser.parseExpression(stringEntry.getValue());
-        // Expressions should be of the form: columnName = 123
-        // So we take the BinExpr apart and extract the Value from the second arg
-        BinaryFunctionExpr binF = (BinaryFunctionExpr) parsedExpr;
-        Value value = ((LiteralExpr) binF.getSecondArgument()).getValue();
-        cells.put(stringEntry.getKey(), new ConcreteCell(value));
-      }
-      concreteSpec.getRows().add(new SpecificationRow<>(cells));
-    }
+    concreteSpec = JsonTableParser.concreteTableFromJson(new ArrayList<>(), false, json);
   }
 
   @Test

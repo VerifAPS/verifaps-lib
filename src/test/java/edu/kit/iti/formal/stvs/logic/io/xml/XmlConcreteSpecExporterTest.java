@@ -2,14 +2,12 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import com.google.gson.JsonElement;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
-import edu.kit.iti.formal.stvs.model.expressions.BinaryFunctionExpr;
-import edu.kit.iti.formal.stvs.model.expressions.Expression;
-import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
-import edu.kit.iti.formal.stvs.model.expressions.Value;
-import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
 import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
-import edu.kit.iti.formal.stvs.model.table.*;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecificationTest;
+import edu.kit.iti.formal.stvs.model.table.JsonTableParser;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -17,11 +15,9 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Benjamin Alt
@@ -37,34 +33,11 @@ public class XmlConcreteSpecExporterTest {
 
   @Test
   public void testExportConcreteValid1() throws ExportException, IOException, UnsupportedExpressionException, ParseException {
-    JsonElement json = TableUtil.jsonFromResource("concrete_spec.json", ConcreteSpecificationTest.class);
-    SpecificationTable<String, String> stringTable =
-        TableUtil.specificationTableFromJson(json);
-    ConcreteSpecification concreteSpec = new ConcreteSpecification(false);
-
-    concreteSpec.getSpecIoVariables().addAll(stringTable.getSpecIoVariables());
-
-    int currentBeginCycle = 0;
-    for (String durationString : stringTable.getDurations()) {
-      int duration = Integer.parseInt(durationString);
-      concreteSpec.getDurations().add(new ConcreteDuration(currentBeginCycle, duration));
-      currentBeginCycle += duration;
-    }
-
-    ExpressionParser parser = new ExpressionParser("");
-
-    for (SpecificationRow<String> row : stringTable.getRows()) {
-      Map<String, ConcreteCell> cells = new HashMap<>();
-      for (Map.Entry<String, String> stringEntry : row.getCells().entrySet()) {
-        Expression parsedExpr = parser.parseExpression(stringEntry.getValue());
-        // Expressions should be of the form: columnName = 123
-        // So we take the BinExpr apart and extract the Value from the second arg
-        BinaryFunctionExpr binF = (BinaryFunctionExpr) parsedExpr;
-        Value value = ((LiteralExpr) binF.getSecondArgument()).getValue();
-        cells.put(stringEntry.getKey(), new ConcreteCell(value));
-      }
-      concreteSpec.getRows().add(new SpecificationRow<>(cells));
-    }
+    JsonElement json = JsonTableParser.jsonFromResource("concrete_spec.json", ConcreteSpecificationTest.class);
+    SpecificationTable<SpecIoVariable, String, String> stringTable =
+        JsonTableParser.specificationTableFromJson(json);
+    ConcreteSpecification concreteSpec =
+        JsonTableParser.concreteTableFromJson(Collections.emptyList(), false, json);
 
     ByteArrayOutputStream result = exporter.export(concreteSpec);
     String resultString = new String(result.toByteArray(), "utf-8");

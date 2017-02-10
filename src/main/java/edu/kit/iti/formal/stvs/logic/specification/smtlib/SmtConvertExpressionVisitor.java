@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
-import edu.kit.iti.formal.stvs.logic.specification.choco.ChocoModel;
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.*;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -35,7 +35,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   private final Function<String, Type> getTypeForVariable;
   private final int row;
   private final int iteration;
-  private final SpecIoVariable column;
+  private final ValidIoVariable column;
   private final Predicate<String> isIoVariable;
   private final Function<String, String> getSMTLibVariableName;
 
@@ -49,7 +49,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
    * @param getSMTLibVariableTypeName
    */
   public SmtConvertExpressionVisitor(Function<String, Type> getTypeForVariable, int row, int
-      iteration, SpecIoVariable column, Predicate<String> isIoVariable, Function<String, String>
+      iteration, ValidIoVariable column, Predicate<String> isIoVariable, Function<String, String>
       getSMTLibVariableTypeName) {
     this.getTypeForVariable = getTypeForVariable;
     this.row = row;
@@ -58,7 +58,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     this.column = column;
     this.getSMTLibVariableName = getSMTLibVariableTypeName;
 
-    String typeName = column.getType().getTypeName();
+    String typeName = column.getType();
     this.sConstraint = new SConstraint().addHeaderDefinitions(
         new SList(
             "declare-const",
@@ -82,15 +82,6 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     }
     return new SList(name, left, right);
 
-  }
-
-
-
-  private int[] preventOverflowBounds(int[] bounds) {
-    return Arrays.stream(bounds)
-        .map(bound -> Math.min(bound, ChocoModel.MAX_BOUND))
-        .map(bound -> Math.max(bound, ChocoModel.MIN_BOUND))
-        .toArray();
   }
 
   @Override

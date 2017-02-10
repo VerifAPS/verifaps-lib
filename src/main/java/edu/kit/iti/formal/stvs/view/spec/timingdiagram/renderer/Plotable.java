@@ -1,11 +1,9 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
-import edu.kit.iti.formal.stvs.model.expressions.Value;
 import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
 import javafx.scene.chart.XYChart;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by leonk on 05.02.2017.
