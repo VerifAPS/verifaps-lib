@@ -28,10 +28,8 @@ public class VerificationScenario {
 
   public VerificationScenario(Code code) {
     this.code = new SimpleObjectProperty<>(code);
-<<<<<<< HEAD
+    verificationEngine = new GeTeTaVerificationEngine(code.getParsedCode().getDefinedTypes());
     verificationResult = new NullableProperty<>();
-    verificationEngine = new GeTeTaVerificationEngine(this.code.get().getParsedCode()
-        .getDefinedTypes());
     verificationEngine.verificationResultProperty().addListener(new
         VerificationChangedListener());
     verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
@@ -39,13 +37,6 @@ public class VerificationScenario {
 
   public void verify(ConstraintSpecification spec) throws IOException, ExportException {
     verificationEngine = new GeTeTaVerificationEngine(code.get().getParsedCode().getDefinedTypes());
-=======
-    verificationResult = new OptionalProperty<>(new SimpleObjectProperty<>());
-  }
-
-  public void verify(ConstraintSpecification spec) throws IOException, ExportException {
-    verificationEngine = new GeTeTaVerificationEngine(spec.getTypeContext());
->>>>>>> ad48c3473ce485b294948af61e39552b8a4fea8f
     verificationEngine.verificationResultProperty().addListener(new
         VerificationChangedListener());
     verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
