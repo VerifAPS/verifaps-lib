@@ -25,4 +25,9 @@ public class DuplicateFreeVariableProblem extends FreeVariableProblem {
         + StringEscapeUtils.escapeJava(freeVariableName));
   }
 
+  @Override
+  public String getProblemName() {
+    return "duplicate variable name";
+  }
+
 }

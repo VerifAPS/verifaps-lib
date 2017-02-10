@@ -89,9 +89,7 @@ public class SpecificationTableController implements Controller {
   private TableCell<SynchronizedRow, String> cellFactory(TableColumn<SynchronizedRow, String> table) {
     return new TextFieldTableCell<SynchronizedRow, String>(new DefaultStringConverter()) {
       private final InvalidationListener onProblemChangeListener;
-      private final Paint normalTextFill;
       {
-        normalTextFill = getTextFill();
         onProblemChangeListener = observable -> this.onProblemsChanged();
         problemRecognizer.problemsProperty().addListener(onProblemChangeListener);
         getStyleClass().add("spec-cell");
@@ -101,12 +99,10 @@ public class SpecificationTableController implements Controller {
       private void configureProblem(SpecProblem problem) {
         getStyleClass().remove("spec-cell-problem");
         getStyleClass().add("spec-cell-problem");
-        setTextFill(Color.RED);
         setTooltip(new Tooltip(problem.getErrorMessage()));
       }
 
       private void resetCellVisuals() {
-        setTextFill(normalTextFill);
         getStyleClass().remove("spec-cell-problem");
         setTooltip(null);
       }

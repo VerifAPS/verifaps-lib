@@ -12,6 +12,12 @@ import javafx.scene.layout.VBox;
  */
 public class VariableCollection extends VBox {
 
+  public enum Column {
+    NAME,
+    TYPE,
+    VALUE
+  }
+
   private final Label overviewLabel;
   private final TableView<FreeVariable> freeVariableTableView;
   private final TableColumn<FreeVariable, String> nameTableColumn;
@@ -27,12 +33,19 @@ public class VariableCollection extends VBox {
     this.typeTableColumn = new TableColumn<>("type");
     this.defaultValueTableColumn = new TableColumn<>("default value");
 
+    getStylesheets().add(VariableCollection.class.getResource("style.css").toExternalForm());
+
     nameTableColumn.setPrefWidth(150);
     typeTableColumn.setPrefWidth(120);
 
+    nameTableColumn.setUserData(Column.NAME);
+    typeTableColumn.setUserData(Column.TYPE);
+    defaultValueTableColumn.setUserData(Column.VALUE);
+
     freeVariableTableView.setEditable(true);
     freeVariableTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    freeVariableTableView.getColumns().addAll(nameTableColumn, typeTableColumn, defaultValueTableColumn);
+    freeVariableTableView.getColumns().addAll(
+        nameTableColumn, typeTableColumn, defaultValueTableColumn);
 
     this.overviewLabel.getStyleClass().addAll("freevar", "overview-label");
     this.addFreeVariable.getStyleClass().addAll("freevar", "add-var-button");

@@ -2,28 +2,19 @@
 .freevar.variable-container {
 }
 
-.freevar.typeof-label {
-    -fx-font-family: monospace;
-}
-
-.freevar.name-field {
-    -fx-font-family: monospace;
-}
-
-.freevar.type-combo-box-cell {
-    -fx-font-family: monospace;
-    -fx-font-weight: bold;
-    -fx-fill: darkgreen;
-}
-
-.freevar.remove-button {
-}
-
 /* the v-box for all the variables */
 .freevar.collection {
 }
 
-.freevar.overview-label {
+.freevar.freevar-problem.cell.table-cell {
+    -fx-background-color: #db5751;
+}
+
+.freevar.cell.table-cell {
+    -fx-font-family: monospace;
+}
+
+.freevar.overview-label.label {
     -fx-font-size: 26pt;
     -fx-font-weight: bold;
 }

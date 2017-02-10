@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
  * Created by Philipp on 05.02.2017.
  */
 public class Json {
-/*
   private static final Gson GSON = new Gson();
 
   private Json() {
@@ -22,8 +21,6 @@ public class Json {
 
   public static class FreeVarSelection {
     public List<FreeVar> selected;
-    public String source =
-        ManagementFactory.getRuntimeMXBean().getName();
   }
 
   public static class FreeVar {
@@ -35,13 +32,8 @@ public class Json {
     return GSON.toJson(fromRealFreeVariables(freeVariables), FreeVarSelection.class);
   }
 
-  public static List<FreeVariable> stringToRealFreeVariables(
-      Collection<Type> typeContext, String input) {
-    return toRealFreeVariables(typeContext, GSON.fromJson(input, FreeVarSelection.class));
-  }
-
-  public static String stringToSource(String input) {
-    return GSON.fromJson(input, FreeVarSelection.class).source;
+  public static List<FreeVariable> stringToRealFreeVariables(String input) {
+    return toRealFreeVariables(GSON.fromJson(input, FreeVarSelection.class));
   }
 
   public static FreeVarSelection fromRealFreeVariables(List<FreeVariable> freeVariables) {
@@ -49,7 +41,7 @@ public class Json {
         .map(freeVariable -> {
           FreeVar var = new FreeVar();
           var.name = freeVariable.getName();
-          var.type = freeVariable.getValidType().getTypeName();
+          var.type = freeVariable.getType();
           return var;
         })
         .collect(Collectors.toList());
@@ -58,21 +50,10 @@ public class Json {
     return selection;
   }
 
-  public static List<FreeVariable> toRealFreeVariables(Collection<Type> typeContext, FreeVarSelection selection)
+  public static List<FreeVariable> toRealFreeVariables(FreeVarSelection selection)
       throws IllegalArgumentException {
     return selection.selected.stream()
-        .map(freeVar -> new FreeVariable(freeVar.name, typeFromString(typeContext, freeVar.type)))
+        .map(freeVar -> new FreeVariable(freeVar.name, freeVar.type))
         .collect(Collectors.toList());
   }
-
-  public static Type typeFromString(Collection<Type> typeContext, String typeString)
-      throws IllegalArgumentException {
-    return typeContext.stream()
-        .filter(type -> type.getTypeName().equals(typeString))
-        .findAny()
-        .orElseThrow(() ->
-            new IllegalArgumentException("Can't paste free variable with unkown type: "
-              + StringEscapeUtils.escapeJava(typeString)));
-  }
-  */
 }

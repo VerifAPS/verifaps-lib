@@ -1,6 +1,7 @@
-.spec-cell-problem {
+.spec-cell-problem.spec-cell.cell.table-cell {
+  -fx-background-color: #db463a;
 }
 
-.spec-cell {
+.spec-cell.cell.table-cell {
   -fx-font-family: monospace;
 }

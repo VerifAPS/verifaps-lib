@@ -2,22 +2,31 @@ package edu.kit.iti.formal.stvs.view.spec.variables;
 
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import edu.kit.iti.formal.stvs.model.table.problems.SpecProblemRecognizer;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Philipp on 29.01.2017.
@@ -39,20 +48,19 @@ public class VariableCollectionTest {
         TypeBool.BOOL,
         new TypeEnum("COLORS", Arrays.asList("red", "green", "blue"))
     );
-    List<FreeVariable> vars = Arrays.asList(
-        new FreeVariable("blah", "INT"),
-        new FreeVariable("xyz", "BOOL")
-    );
-    FreeVariableList set = new FreeVariableList(vars);
+    List<FreeVariable> vars = new ArrayList<>();
+    vars.add(new FreeVariable("blah", "INT"));
+    vars.add(new FreeVariable("xyz", "BOOL"));
+    FreeVariableList varlist = new FreeVariableList(vars);
 
-    VariableCollectionController controller = new VariableCollectionController(op(types), set);
+    VariableCollectionController controller = new VariableCollectionController(op(types), varlist);
 
-    Pane rightPane = createExtractedVarsTextArea(controller);
+    Node rightPane = createExtractedVarsTextArea(controller, controller.getValidator());
 
     return Arrays.asList(controller.getView(), rightPane);
   }
 
-  private Pane createExtractedVarsTextArea(VariableCollectionController controller) {
+  private Node createExtractedVarsTextArea(VariableCollectionController controller, FreeVariableListValidator validator) {
     final TextArea textArea = new TextArea();
     textArea.getStyleClass().addAll("model-text-area");
     textArea.setEditable(false);
@@ -63,8 +71,27 @@ public class VariableCollectionTest {
     set.getVariables().addListener((ListChangeListener<? super FreeVariable>) c ->
         updateText(textArea, set.getVariables()));
 
-    return new StackPane(textArea);
+    final TextArea problemsArea = new TextArea();
+    problemsArea.getStyleClass().addAll("model-text-area");
+    textArea.setEditable(false);
+
+    updateProblemsText(problemsArea, validator);
+
+    validator.problemsProperty().addListener((Observable o) -> updateProblemsText(problemsArea, validator));
+
+    SplitPane splitPane = new SplitPane(textArea, problemsArea);
+    splitPane.setOrientation(Orientation.VERTICAL);
+
+    return splitPane;
   }
+
+  private void updateProblemsText(TextArea problemsArea, FreeVariableListValidator validator) {
+    String error = String.join("\n", validator.problemsProperty().get().entrySet().stream().map(
+        entry -> entry.getKey() + " -> " + entry.getValue()
+    ).collect(Collectors.toList()));
+    problemsArea.setText(error);
+  }
+
 
   private void updateText(TextArea textArea, List<FreeVariable> freeVariables) {
     if (freeVariables != null) {

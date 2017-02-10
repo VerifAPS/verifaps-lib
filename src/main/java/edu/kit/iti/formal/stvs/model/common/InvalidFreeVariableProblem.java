@@ -59,4 +59,10 @@ public class InvalidFreeVariableProblem extends FreeVariableProblem {
   protected InvalidFreeVariableProblem(String errorMessage) {
     super(errorMessage);
   }
+
+  @Override
+  public String getProblemName() {
+    return "invalid free variable";
+  }
+
 }

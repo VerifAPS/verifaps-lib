@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -30,6 +31,7 @@ public class FreeVariableListValidator {
     this.problems = new SimpleObjectProperty<>(new HashMap<>());
     this.validVars = new SimpleObjectProperty<>(new ArrayList<>());
 
+    freeVariables.getVariables().addListener((Observable o) -> revalidate());
     revalidate();
   }
 
