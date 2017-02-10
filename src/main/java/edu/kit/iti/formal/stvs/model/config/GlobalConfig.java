@@ -13,14 +13,24 @@ public class GlobalConfig {
 
   private List<String> validLanguages = Arrays.asList("EN");
 
+  // General
   private IntegerProperty verificationTimeout;
   private IntegerProperty simulationTimeout;
   private IntegerProperty windowHeight;
   private IntegerProperty  windowWidth;
+  private StringProperty uiLanguage;
+  private IntegerProperty maxLineRollout;
+
+  // Editor
   private IntegerProperty editorFontSize;
   private StringProperty editorFontFamily;
   private BooleanProperty showLineNumbers;
-  private StringProperty uiLanguage;
+
+  // Dependency paths
+  private StringProperty nuxmvPath;
+  private StringProperty z3Path;
+  private StringProperty javaPath;
+  private StringProperty getetaPath;
 
   /**
    * Default configuration
@@ -31,9 +41,14 @@ public class GlobalConfig {
     windowHeight = new SimpleIntegerProperty(600);
     windowWidth = new SimpleIntegerProperty(800);
     editorFontSize = new SimpleIntegerProperty(12);
+    maxLineRollout = new SimpleIntegerProperty(500);
     editorFontFamily = new SimpleStringProperty("Courier");
     showLineNumbers = new SimpleBooleanProperty(true);
     uiLanguage = new SimpleStringProperty("EN");
+    nuxmvPath = new SimpleStringProperty(System.getProperty("user.home"));
+    javaPath = new SimpleStringProperty(System.getProperty("user.home"));
+    z3Path = new SimpleStringProperty(System.getProperty("user.home"));
+    getetaPath = new SimpleStringProperty(System.getProperty("user.home"));
   }
 
   /**
@@ -234,5 +249,65 @@ public class GlobalConfig {
         append(windowHeight.get(), rhs.windowHeight.get()).
         append(windowWidth.get(), rhs.windowWidth.get()).
             isEquals();
+  }
+
+  public String getNuxmvPath() {
+    return nuxmvPath.get();
+  }
+
+  public StringProperty nuxmvPathProperty() {
+    return nuxmvPath;
+  }
+
+  public void setNuxmvPath(String nuxmvPath) {
+    this.nuxmvPath.set(nuxmvPath);
+  }
+
+  public String getZ3Path() {
+    return z3Path.get();
+  }
+
+  public StringProperty z3PathProperty() {
+    return z3Path;
+  }
+
+  public void setZ3Path(String z3Path) {
+    this.z3Path.set(z3Path);
+  }
+
+  public String getJavaPath() {
+    return javaPath.get();
+  }
+
+  public StringProperty javaPathProperty() {
+    return javaPath;
+  }
+
+  public void setJavaPath(String javaPath) {
+    this.javaPath.set(javaPath);
+  }
+
+  public String getGetetaPath() {
+    return getetaPath.get();
+  }
+
+  public StringProperty getetaPathProperty() {
+    return getetaPath;
+  }
+
+  public void setGetetaPath(String getetaPath) {
+    this.getetaPath.set(getetaPath);
+  }
+
+  public int getMaxLineRollout() {
+    return maxLineRollout.get();
+  }
+
+  public IntegerProperty maxLineRolloutProperty() {
+    return maxLineRollout;
+  }
+
+  public void setMaxLineRollout(int maxLineRollout) {
+    this.maxLineRollout.set(maxLineRollout);
   }
 }
