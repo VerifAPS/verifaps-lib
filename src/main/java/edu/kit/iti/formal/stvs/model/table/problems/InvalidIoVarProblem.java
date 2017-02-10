@@ -29,8 +29,10 @@ public class InvalidIoVarProblem extends ColumnProblem {
         .findAny();
     if (!matchedCodeVar.isPresent()) {
       minorProblemsConsumer.accept(new InvalidIoVarProblem(specIoVariable, ErrorType.NAME_MISMATCH));
-    } else if (!specIoVariable.matches(matchedCodeVar.get())) {
+    } else if (!specIoVariable.getType().equals(matchedCodeVar.get().getType())) {
       minorProblemsConsumer.accept(new InvalidIoVarProblem(specIoVariable, ErrorType.TYPE_MISMATCH));
+    } else if (!specIoVariable.getCategory().equals(matchedCodeVar.get().getCategory())) {
+      minorProblemsConsumer.accept(new InvalidIoVarProblem(specIoVariable, ErrorType.CATEGORY_MISMATCH));
     }
 
     if (!VariableExpr.IDENTIFIER_PATTERN.matcher(specIoVariable.getName()).matches()) {
@@ -44,10 +46,11 @@ public class InvalidIoVarProblem extends ColumnProblem {
 
   private static String createMessageForType(ErrorType errorType) {
     switch (errorType) {
-      case NAME_MISMATCH: return "Column name in table doesn't match column name in code";
-      case TYPE_MISMATCH: return "Column errorType in table doesn't match column name in code";
+      case NAME_MISMATCH: return "Column name in table doesn't match any column name in code";
+      case TYPE_MISMATCH: return "Column type in table doesn't match column type in code";
+      case CATEGORY_MISMATCH: return "Column category in table doesn't match column category in code";
       case NAME_INVALID: return "Column name is not a valid identifier";
-      case TYPE_UNKNOWN: return "Column errorType is not defined";
+      case TYPE_UNKNOWN: return "Column type is not defined";
       default:
         System.err.println("Unhandled error message errorType in InvalidIoVariableProblem: " + errorType);
         return "Column definition invalid";
@@ -59,7 +62,8 @@ public class InvalidIoVarProblem extends ColumnProblem {
     TYPE_UNKNOWN,
 
     NAME_MISMATCH,
-    TYPE_MISMATCH
+    TYPE_MISMATCH,
+    CATEGORY_MISMATCH
   }
 
   private final SpecIoVariable specIoVariable;

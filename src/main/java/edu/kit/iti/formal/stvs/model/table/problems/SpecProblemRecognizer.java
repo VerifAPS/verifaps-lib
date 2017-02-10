@@ -53,6 +53,8 @@ public class SpecProblemRecognizer {
     // two layers above gets notified.
     specification.getRows().addListener(listenToSpecUpdate);
     specification.getDurations().addListener(listenToSpecUpdate);
+
+    recalculateSpecProblems();
   }
 
   public ObjectProperty<List<SpecProblem>> problemsProperty() {

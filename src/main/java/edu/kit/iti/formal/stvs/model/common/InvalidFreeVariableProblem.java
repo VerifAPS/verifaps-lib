@@ -47,24 +47,13 @@ public class InvalidFreeVariableProblem extends FreeVariableProblem {
 
   private static Value tryToGetValidDefaultValue(FreeVariable freeVariable, Type freeVarType, Map<String, Type> typesByName)
       throws InvalidFreeVariableProblem {
-    try {
-      ExpressionParser parser = new ExpressionParser("", typesByName.values());
-      // TODO: lol this makes it possible to define a default value "> 5" and it'll be interpreted as 5
-      // this is stupid though. We should just support arbitrary expressions as default value.
-      BinaryFunctionExpr equalsExpr = (BinaryFunctionExpr) parser.parseExpression(freeVariable.getDefaultValue());
-      LiteralExpr literal = (LiteralExpr) equalsExpr.getSecondArgument();
-      Value literalValue = literal.getValue();
-      if (literalValue.getType().checksAgainst(freeVarType)) {
-        return literalValue;
-      } else {
-        throw new InvalidFreeVariableProblem(
-            "Expected default value type " + StringEscapeUtils.escapeJava(freeVarType.getTypeName()) + ", but got "
-                + StringEscapeUtils.escapeJava(literalValue.getType().getTypeName()));
-      }
-    } catch (ParseException | UnsupportedExpressionException | ClassCastException cause) {
-      throw new InvalidFreeVariableProblem(
-          "Couldn't parse default value: " + StringEscapeUtils.escapeJava(freeVariable.getDefaultValue()));
+    if (freeVariable.getDefaultValue().isEmpty()) {
+      return null;
     }
+    return freeVarType.parseLiteral(freeVariable.getDefaultValue().trim())
+        .orElseThrow(() -> new InvalidFreeVariableProblem(
+            "Couldn't parse default value: "
+                + StringEscapeUtils.escapeJava(freeVariable.getDefaultValue())));
   }
 
   protected InvalidFreeVariableProblem(String errorMessage) {

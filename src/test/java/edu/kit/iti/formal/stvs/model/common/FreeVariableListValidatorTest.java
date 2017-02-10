@@ -5,8 +5,8 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
@@ -16,15 +16,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by philipp on 09.02.17.
  */
-@Parameterized.UseParametersRunnerFactory
+@RunWith(Parameterized.class)
 public class FreeVariableListValidatorTest {
 
-  @Parameters
+  @Parameters(name="expect \"{0}\"")
   public static Object[][] parameters() {
     return new Object[][] {
         { "", Arrays.asList(
@@ -78,6 +79,7 @@ public class FreeVariableListValidatorTest {
 
   public void checkProblems(FreeVariableListValidator validator) {
     if (expectedProblem == "") {
+      validator.problemsProperty().get().values().forEach(System.out::println);
       assertEquals("Number of valid free variables should be equal to number of unvalidated",
           variables.size(),
           validator.validFreeVariablesProperty().get().size());
