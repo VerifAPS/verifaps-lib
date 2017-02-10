@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="" isConcrete="false">
     <variables>
-        <ioVariable colwidth="20" data-type="INT" io="input" name="A"/>
-        <ioVariable colwidth="20" data-type="BOOL" io="output" name="B"/>
+        <ioVariable colwidth="20" data-type="INT" io="input" name="Active"/>
+        <ioVariable colwidth="20" data-type="BOOL" io="output" name="Counter"/>
         <freeVariable data-type="INT" name="c"/>
     </variables>
     <rows>
@@ -19,7 +19,7 @@
         <row comment="">
             <duration>2</duration>
             <cell>  c</cell>
-            <cell>Active[-4]</cell>
+            <cell>Counter[-4]</cell>
         </row>
     </rows>
     <enumTypes/>

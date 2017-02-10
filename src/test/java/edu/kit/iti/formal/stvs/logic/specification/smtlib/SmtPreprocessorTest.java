@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
@@ -11,12 +12,14 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
+import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblemRecognizer;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by csicar on 09.02.17.
@@ -42,6 +45,9 @@ public class SmtPreprocessorTest {
         new SimpleObjectProperty<>(codeIoVariables),
         new ReadOnlyObjectWrapper<>(freeVariables),
         constraintSpec);
+    List<SpecProblem> specProblems = recognizer.problemsProperty().get();
+    specProblems.stream().map(SpecProblem::getErrorMessage).forEach(System.err::println);
+
     return recognizer.getValidSpecification();
   }
 

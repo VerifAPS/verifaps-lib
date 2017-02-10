@@ -42,8 +42,7 @@ public class SmtPreprocessor {
     this.freeVariablesContext = validFreeVariables.stream()
     .collect(Collectors.toMap(ValidFreeVariable::getName, ValidFreeVariable::getType));
     List<String> ioVariableTypes = ioVariables.stream().map(ValidIoVariable::getName).collect
-        (Collectors
-        .toList());
+        (Collectors.toList());
     System.out.println(ioVariableTypes);
     this.isIoVariable = ioVariableTypes::contains;
     this.sConstrain = new SConstraint()
