@@ -3,24 +3,24 @@
         targetNamespace="http://formal.iti.kit.edu/exteta-1.0" elementFormDefault="qualified"
         xmlns="http://www.w3.org/2001/XMLSchema">
 
-    <element name="test-table" errorType="tns:testTable"/>
+    <element name="test-table" type="tns:testTable"/>
 
     <complexType name="testTable">
         <sequence>
-            <element name="variables" errorType="tns:variables" minOccurs="1"
+            <element name="variables" type="tns:variables" minOccurs="1"
                      maxOccurs="1"/>
 
-            <element name="steps" errorType="tns:steps" minOccurs="1"
+            <element name="steps" type="tns:steps" minOccurs="1"
                      maxOccurs="1"/>
 
-            <element name="functions" errorType="string" minOccurs="0"
+            <element name="functions" type="string" minOccurs="0"
                      maxOccurs="1">
             </element>
 
-            <element name="options" errorType="tns:options" minOccurs="0"
+            <element name="options" type="tns:options" minOccurs="0"
                      maxOccurs="1"/>
         </sequence>
-        <attribute name="version" errorType="string" use="required"
+        <attribute name="version" type="string" use="required"
                    fixed="1.0"/>
 
         <attribute name="name" default="TTable" use="optional">
@@ -36,8 +36,8 @@
     <complexType name="variables">
         <sequence minOccurs="1" maxOccurs="unbounded">
             <choice>
-                <element name="variable" errorType="tns:ioVariable"/>
-                <element name="constraint" errorType="tns:constraintVariable"/>
+                <element name="variable" type="tns:ioVariable"/>
+                <element name="constraint" type="tns:constraintVariable"/>
             </choice>
         </sequence>
     </complexType>
@@ -61,21 +61,21 @@
     <complexType name="steps">
         <sequence minOccurs="0" maxOccurs="unbounded">
             <choice>
-                <element name="block" errorType="tns:block"/>
-                <element name="step" errorType="tns:step"/>
+                <element name="block" type="tns:block"/>
+                <element name="step" type="tns:step"/>
             </choice>
         </sequence>
     </complexType>
 
     <complexType name="step">
         <sequence minOccurs="0" maxOccurs="unbounded">
-            <element name="cell" errorType="string"/>
-            <!-- <choice> <element name="const" errorType="tns:cellSimpleValueType" />
-                <element name="capture" errorType="string" /> <element name="expr" errorType="tns:cellExpressionType"
-                /> <element name="dontcare" errorType="tns:cellDontCareType" /> <element name="rel"
-                errorType="tns:cellRelationType" /> </choice> -->
+            <element name="cell" type="string"/>
+            <!-- <choice> <element name="const" type="tns:cellSimpleValueType" />
+                <element name="capture" type="string" /> <element name="expr" type="tns:cellExpressionType"
+                /> <element name="dontcare" type="tns:cellDontCareType" /> <element name="rel"
+                type="tns:cellRelationType" /> </choice> -->
         </sequence>
-        <attribute name="duration" errorType="tns:duration" use="optional" default="[1,1]"/>
+        <attribute name="duration" type="tns:duration" use="optional" default="[1,1]"/>
     </complexType>
 
     <simpleType name="duration">
@@ -117,7 +117,7 @@
     <complexType name="constraintVariable">
         <complexContent>
             <extension base="tns:variable">
-                <attribute name="constraint" errorType="string"/>
+                <attribute name="constraint" type="string"/>
             </extension>
         </complexContent>
     </complexType>
@@ -133,7 +133,7 @@
                             </restriction>
                         </simpleType>
                     </attribute>
-                    <attribute name="value" errorType="string"/>
+                    <attribute name="value" type="string"/>
                 </complexType>
             </element>
         </sequence>
@@ -142,15 +142,15 @@
     <complexType name="block">
         <sequence minOccurs="1" maxOccurs="unbounded">
             <choice>
-                <element name="step" errorType="tns:step"/>
-                <element name="block" errorType="tns:block"/>
+                <element name="step" type="tns:step"/>
+                <element name="block" type="tns:block"/>
             </choice>
         </sequence>
-        <attribute name="duration" errorType="tns:duration"/>
+        <attribute name="duration" type="tns:duration"/>
     </complexType>
 
     <complexType name="variable">
-        <attribute name="name" errorType="string"/>
-        <attribute name="data-errorType" errorType="tns:dataType"/>
+        <attribute name="name" type="string"/>
+        <attribute name="data-type" type="tns:dataType"/>
     </complexType>
 </schema>
