@@ -1,7 +1,11 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Benjamin Alt
@@ -11,15 +15,16 @@ public class ConcreteSpecification extends SpecificationTable<ConcreteCell, Conc
   private final boolean isCounterExample;
 
   public ConcreteSpecification(boolean isCounterExample) {
-    this(new ArrayList<>(), new ArrayList<>(), isCounterExample);
+    this(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), isCounterExample);
   }
 
-  public ConcreteSpecification(List<SpecificationRow<ConcreteCell>> rows,
+  public ConcreteSpecification(List<SpecIoVariable> ioVariables, List<SpecificationRow<ConcreteCell>> rows,
                                List<ConcreteDuration> durations,
                                boolean isCounterExample) {
     super();
     this.isCounterExample = isCounterExample;
 
+    getSpecIoVariables().setAll(ioVariables);
     getRows().addAll(rows);
     getDurations().addAll(durations);
   }
