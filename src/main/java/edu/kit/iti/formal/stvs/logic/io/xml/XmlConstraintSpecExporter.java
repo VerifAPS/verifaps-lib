@@ -75,7 +75,7 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
       Variables.FreeVariable freeVar = objectFactory.createVariablesFreeVariable();
       freeVar.setName(freeVariable.getName());
       freeVar.setDataType(freeVariable.getType());
-      if (freeVariable.getDefaultValue() != null) {
+      if (freeVariable.getDefaultValue() != "") {
         freeVar.setDefault(freeVariable.getDefaultValue());
       }
       variables.getFreeVariable().add(freeVar);

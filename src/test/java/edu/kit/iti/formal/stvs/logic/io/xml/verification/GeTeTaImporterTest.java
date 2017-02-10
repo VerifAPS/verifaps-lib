@@ -29,7 +29,7 @@ public class GeTeTaImporterTest {
     List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
     GeTeTaImporter importer = new GeTeTaImporter(typeContext);
     VerificationResult result = importer.doImport(this.getClass().getResourceAsStream
-        ("report_counterexample_1.xml"));
+        ("report_counterexample_ints_1.xml"));
     assertFalse(result.isSuccessful());
     ConcreteSpecification counterexample = result.getCounterExample();
     assertEquals(1, counterexample.getDurations().size());
