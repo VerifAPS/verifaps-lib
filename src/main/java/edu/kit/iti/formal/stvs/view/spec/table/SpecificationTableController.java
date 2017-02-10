@@ -298,4 +298,8 @@ public class SpecificationTableController implements Controller {
   public HybridSpecification getHybridSpecification() {
     return hybridSpec;
   }
+
+  public SpecProblemRecognizer getSpecProblemRecognizer() {
+    return this.problemRecognizer;
+  }
 }
