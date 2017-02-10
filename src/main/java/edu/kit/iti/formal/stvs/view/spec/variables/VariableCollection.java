@@ -1,11 +1,15 @@
 package edu.kit.iti.formal.stvs.view.spec.variables;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
 /**
  * Created by csicar on 10.01.17.
@@ -21,7 +25,7 @@ public class VariableCollection extends VBox {
 
   public VariableCollection() {
     this.overviewLabel = new Label("Free Variables:");
-    this.addFreeVariable = new Button("Add");
+    this.addFreeVariable = makeAddButton();
     this.freeVariableTableView = new TableView<>();
     this.nameTableColumn = new TableColumn<>("name");
     this.typeTableColumn = new TableColumn<>("type");
@@ -39,6 +43,10 @@ public class VariableCollection extends VBox {
     this.freeVariableTableView.getStyleClass().addAll("freevar", "variable-table-view");
 
     this.getChildren().addAll(overviewLabel, freeVariableTableView, addFreeVariable);
+  }
+
+  private Button makeAddButton() {
+    return GlyphsDude.createIconButton(FontAwesomeIcon.PLUS);
   }
 
   public Button getAddFreeVariable() {
