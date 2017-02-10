@@ -100,7 +100,7 @@ public class VariableCollectionController implements Controller {
         getStyleClass().remove("freevar-problem");
         getStyleClass().add("freevar-problem");
         setTooltip(new Tooltip(tooltip));
-        // TODO: Javafx tables dont update it's cells view from 
+        // TODO: Javafx tables dont update it's cells view from
       }
 
       private void configureUnproblematic() {

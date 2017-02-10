@@ -1,5 +1,6 @@
 .spec-cell-problem.spec-cell.cell.table-cell {
-  -fx-background-color: #db463a;
+  -fx-background-insets: 1 1 1 1;
+  -fx-background-color: #db5751AA;
 }
 
 .spec-cell.cell.table-cell {
