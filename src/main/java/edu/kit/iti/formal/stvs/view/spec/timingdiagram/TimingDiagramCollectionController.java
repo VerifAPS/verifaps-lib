@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
+import edu.kit.iti.formal.stvs.ViewUtils;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
@@ -11,6 +12,8 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.Plotable;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramController;
+import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramView;
+import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.VerticalResizeContainerController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
@@ -19,8 +22,14 @@ import javafx.scene.chart.Axis;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
+import javafx.scene.transform.Transform;
 import javafx.util.Pair;
 
 /**
@@ -59,11 +68,41 @@ public class TimingDiagramCollectionController implements Controller {
           () -> addBoolTimingDiagram(concreteSpec, specIoVar),
           (e) -> addEnumTimingDiagram(concreteSpec, specIoVar, e)
       );
-      view.getDiagramContainer().getChildren().add(diagramAxisPair.getKey().getView());
-      view.getyAxisContainer().getChildren().add(diagramAxisPair.getValue());
+      TimingDiagramView timingDiagramView = diagramAxisPair.getKey().getView();
+      Axis externalYAxis = diagramAxisPair.getValue();
+      VerticalResizeContainerController verticalResizeContainerController = new VerticalResizeContainerController(timingDiagramView);
+
+      /*AnchorPane pane = new AnchorPane();
+      pane.getChildren().add(timingDiagramView);
+      AnchorPane.setLeftAnchor(timingDiagramView, 0.0);
+      AnchorPane.setRightAnchor(timingDiagramView, 0.0);
+      AnchorPane.setTopAnchor(timingDiagramView, 0.0);
+      AnchorPane.setBottomAnchor(timingDiagramView, 0.0);*/
+      this.view.getDiagramContainer().getChildren().add(verticalResizeContainerController.getView());
+      this.view.getyAxisContainer().getChildren().add(externalYAxis);
+      timingDiagramView.getyAxis().layoutBoundsProperty().addListener(
+          change -> updateAxisExternalPosition(timingDiagramView, externalYAxis)
+      );
+      verticalResizeContainerController.getView().layoutYProperty().addListener(
+          change -> updateAxisExternalPosition(timingDiagramView, externalYAxis)
+      );
       AnchorPane.setRightAnchor(diagramAxisPair.getValue(), 0.0);
+
+      Text label = new Text(specIoVar.getName());
+      this.view.getLabelContainer().getChildren().add(label);
+      label.yProperty().bind(
+          diagramAxisPair.getValue().layoutYProperty().add(
+              diagramAxisPair.getValue().heightProperty().divide(2)
+          )
+      );
     });
     //view.getDiagramContainer().getChildren()
+  }
+
+  private void updateAxisExternalPosition(TimingDiagramView timingDiagramView, Axis externalYAxis) {
+    Transform transformation = ViewUtils.calculateTransformRelativeTo(view.getDiagramContainer(), timingDiagramView.getyAxis());
+    double yAxisPosition = transformation.transform(timingDiagramView.getyAxis().getLayoutBounds()).getMinY();
+    externalYAxis.layoutYProperty().set(yAxisPosition);
   }
 
   private javafx.util.Pair<TimingDiagramController, Axis> addIntegerTimingDiagram(ConcreteSpecification concreteSpec, SpecIoVariable specIoVar){
