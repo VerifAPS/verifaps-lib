@@ -10,6 +10,7 @@ import edu.kit.iti.formal.stvs.model.table.problems.DurationProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblemRecognizer;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
@@ -89,11 +90,11 @@ public class SpecificationTableController implements Controller {
 
   private TableCell<SynchronizedRow, String> cellFactory(TableColumn<SynchronizedRow, String> table) {
     return new TextFieldTableCell<SynchronizedRow, String>(new DefaultStringConverter()) {
-      private final WeakInvalidationListener onProblemChangeListener;
+      private final InvalidationListener onProblemChangeListener;
       private final Paint normalTextFill;
       {
         normalTextFill = getTextFill();
-        onProblemChangeListener = new WeakInvalidationListener(observable -> this.onProblemsChanged());
+        onProblemChangeListener = observable -> this.onProblemsChanged();
         problemRecognizer.problemsProperty().addListener(onProblemChangeListener);
         getStyleClass().add("spec-cell");
       }
