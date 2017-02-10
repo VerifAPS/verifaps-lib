@@ -40,6 +40,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   private final static Pattern VARIABLE_DECL_PATTERN = Pattern.compile("\\s*" + IDENTIFIER_RE +
       " : " + IDENTIFIER_RE);
   private final static Pattern CODE_VARIABLE_PATTERN = Pattern.compile("code\\." + IDENTIFIER_RE);
+  private final static Pattern INPUT_VARIABLE_PATTERN = Pattern.compile(IDENTIFIER_RE);
   private final static Pattern INT_VALUE_PATTERN = Pattern.compile("0sd16_-?[0-9]+");
   private final static Pattern BOOL_VALUE_PATTERN = Pattern.compile("(TRUE)|(FALSE)");
 
@@ -100,13 +101,14 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
     int currentDurationCount = 1;
     int lastRowNum = -1;
     List<Counterexample.Step> steps = message.getCounterexample().getTrace().getStep();
-    List<String> rowNums = message.getCounterexample().getRowMappings().getRowMap();
+    List<Integer> rowNums = parseRowMap(message.getCounterexample().getRowMappings().getRowMap()
+        .get(0));
     Map<String, Value> currentValues = new HashMap<>();
     Map<String, VariableCategory> varCategories = new HashMap<>();
     int rowNum = -1;
     for (int i = 0; i < steps.size(); i++) {
       if (i-1 > rowNums.size()) break;
-      if (i > 0) rowNum = Integer.parseInt(rowNums.get(i - 1));
+      if (i > 0) rowNum = rowNums.get(i - 1);
       Counterexample.Step step = steps.get(i);
       for (Assignment state : step.getState()) { // Output vars are initialized here
         String stateString = state.getName().trim();
@@ -148,8 +150,10 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       for (Assignment input : step.getInput()) { // Input vars are initialized here FOR THE NEXT
         // CYCLE
         String varName = input.getName();
-        varCategories.put(varName, VariableCategory.INPUT);
-        processVarAssignment(currentValues, varTypes, input.getName(), input.getValue());
+        if (INPUT_VARIABLE_PATTERN.matcher(varName).matches()) {
+          varCategories.put(varName, VariableCategory.INPUT);
+          processVarAssignment(currentValues, varTypes, input.getName(), input.getValue());
+        }
       }
     }
     ConcreteSpecification concreteSpec = new ConcreteSpecification(true);
@@ -160,6 +164,15 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
     concreteSpec.getRows().addAll(concreteRows);
     concreteSpec.getDurations().addAll(concreteDurations);
     return concreteSpec;
+  }
+
+  private List<Integer> parseRowMap(String rowMapString) {
+    String[] tokens = rowMapString.trim().split(", ");
+    List<Integer> res = new ArrayList<>();
+    for (String token : tokens) {
+      res.add(Integer.parseInt(token));
+    }
+    return res;
   }
 
   @Override
@@ -214,7 +227,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
     GeTeTaImporter importer = new GeTeTaImporter(typeContext);
     VerificationResult result = importer.doImport(new FileInputStream
         ("/home/bal/Projects/kit/pse/stverificationstudio/src/test/resources/edu/kit/iti/formal" +
-            "/stvs/logic/io/xml/verification/report_counterexample_1.xml"));
+            "/stvs/logic/io/xml/verification/report_counterexample_2.xml"));
     System.out.println();
   }
 }
