@@ -11,3 +11,11 @@
 .scroll-pane .corner {
     -fx-background-insets: 0;
 }
+
+.labelContainer{
+    -fx-background-color: lightgray;
+}
+
+/*.diagramContainer{
+    -fx-orientation: vertical;
+}*/

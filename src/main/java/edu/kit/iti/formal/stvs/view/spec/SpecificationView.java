@@ -1,36 +1,57 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.view.spec.table.SynchronizedRow;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionView;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollection;
 import javafx.beans.property.BooleanProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
-public class SpecificationView extends SplitPane implements Lockable {
+public class SpecificationView extends VBox implements Lockable {
 
-  private Button startButton;
+  private Button startVerificationButton;
   private VariableCollection variableCollection;
   private TableView<SynchronizedRow> tableView;
   private TimingDiagramCollectionView diagram;
   private final StackPane variablesPane;
   private final StackPane tablePane;
   private final AnchorPane timingDiagramPane;
+  private final SplitPane splitPane;
 
   public SpecificationView() {
+    splitPane = new SplitPane();
     variablesPane = new StackPane();
     tablePane = new StackPane();
     timingDiagramPane = new AnchorPane();
+    startVerificationButton = makeVerificationButton();
+    this.getChildren().add(startVerificationButton);
+    this.setAlignment(Pos.TOP_RIGHT);
 
-    this.setOrientation(Orientation.VERTICAL);
+    splitPane.setOrientation(Orientation.VERTICAL);
+    splitPane.getItems().addAll(variablesPane, tablePane, timingDiagramPane);
+    splitPane.setDividerPosition(0, 0.25);
+    splitPane.setDividerPosition(1, 0.5);
+    this.getChildren().add(splitPane);
+  }
 
-    this.getItems().addAll(variablesPane, tablePane, timingDiagramPane);
-    this.setDividerPosition(0, 0.25);
-    this.setDividerPosition(1, 0.5);
+  private Button makeVerificationButton() {
+    Text icon = GlyphsDude.createIcon(FontAwesomeIcon.PLAY);
+    icon.setFill(Color.MEDIUMSEAGREEN);
+    return new Button("Verify!", icon);
   }
 
   public TableView<SynchronizedRow> getTable() {
@@ -72,7 +93,7 @@ public class SpecificationView extends SplitPane implements Lockable {
   }
 
   public Button getStartButton() {
-    return startButton;
+    return startVerificationButton;
   }
 
   @Override
@@ -87,5 +108,10 @@ public class SpecificationView extends SplitPane implements Lockable {
   @Override
   public BooleanProperty getEditableProperty() {
     return null;
+  }
+
+  public void onVerificationButtonClicked(ConstraintSpecification constraintSpec) {
+    startVerificationButton.fireEvent(new VerificationStartedEvent(constraintSpec));
+    System.out.println("Bubbling up (delegating!) verification button clicked event");
   }
 }

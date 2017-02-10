@@ -3,7 +3,7 @@
     -fx-alternative-column-fill-visible: true;
     -fx-vertical-grid-lines-visible: false;
     -fx-vertical-zero-line-visible: false;
-    -fx-max-height: 50px;
+    -fx-min-height: 20px;
 }
 .chart-content {
     -fx-padding: 0px;
