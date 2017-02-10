@@ -8,7 +8,7 @@ import java.util.function.IntFunction;
  *
  * <p>In contrast to {@link ValueBool} this is not a singleton, since
  * many different instances can be created at runtime.
- * getType of this value always returns a {@link TypeEnum}.
+ * getErrorType of this value always returns a {@link TypeEnum}.
  */
 public class ValueEnum implements Value {
 

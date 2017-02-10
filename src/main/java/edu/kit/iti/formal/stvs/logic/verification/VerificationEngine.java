@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.verification;
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
-import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
+import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
@@ -22,7 +22,7 @@ public interface VerificationEngine {
   public void startVerification(VerificationScenario scenario, ConstraintSpecification spec) throws
       IOException, ExportException;
 
-  public OptionalProperty<VerificationResult> verificationResultProperty();
+  public NullableProperty<VerificationResult> verificationResultProperty();
 
   public VerificationResult getVerificationResult();
 

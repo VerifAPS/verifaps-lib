@@ -2,13 +2,14 @@ package edu.kit.iti.formal.stvs.model.table;
 
 import com.google.gson.JsonElement;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import edu.kit.iti.formal.stvs.model.table.problems.SpecProblemRecognizer;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -28,7 +29,7 @@ import static org.junit.runners.Parameterized.Parameter;
  * @author Philipp
  */
 @RunWith(Parameterized.class)
-public class ConstraintSpecificationTest {
+public class SpecProblemRecognizerTest {
 
   @Parameters(name="{0}")
   public static Collection<String> testfiles() {
@@ -49,33 +50,41 @@ public class ConstraintSpecificationTest {
 
   @Test
   public void testProblems() {
-    JsonElement testjson = TableUtil.jsonFromResource(testfile, ConstraintSpecificationTest.class);
+    JsonElement testjson = JsonTableParser.jsonFromResource(testfile, SpecProblemRecognizerTest.class);
 
-    List<CodeIoVariable> codeIoVariables = Arrays.asList(
-        new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "Counter"),
-        new CodeIoVariable(VariableCategory.OUTPUT, TypeBool.BOOL, "Active")
-    );
+    List<CodeIoVariable> codeIoVariables = JsonTableParser.codeIoVariablesFromJson(testjson);
 
     List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
 
-    ConstraintSpecification testSpec =
-        TableUtil.constraintTableFromJson(
-            new SimpleObjectProperty<>(typeContext),
-            new SimpleObjectProperty<>(codeIoVariables),
-            testjson);
+    FreeVariableList freeVars = JsonTableParser.freeVariableSetFromJson(testjson);
 
-    List<Class<?>> expectedProblems = TableUtil.expectedSpecProblemsFromJson(testjson);
+    ConstraintSpecification testSpec =
+        JsonTableParser.constraintTableFromJson(testjson);
+
+    FreeVariableListValidator validator = new FreeVariableListValidator(
+        new SimpleObjectProperty<>(typeContext),
+        freeVars
+    );
+
+    SpecProblemRecognizer recognizer = new SpecProblemRecognizer(
+        new SimpleObjectProperty<>(typeContext),
+        new SimpleObjectProperty<>(codeIoVariables),
+        validator.validFreeVariablesProperty(),
+        testSpec
+    );
+
+    List<Class<?>> expectedProblems = JsonTableParser.expectedSpecProblemsFromJson(testjson);
 
     System.out.println("Expecting problems: " + expectedProblems.stream().map(Class::getSimpleName).collect(Collectors.toList()));
 
     System.out.println("Actual Problems: ");
-    testSpec.getProblems().forEach(System.out::println);
+    recognizer.problemsProperty().get().forEach(System.out::println);
 
     assertEquals("Problem list emptiness: ",
         expectedProblems.isEmpty(),
-        testSpec.getProblems().isEmpty());
+        recognizer.problemsProperty().get().isEmpty());
     assertTrue(
         expectedProblems.stream().allMatch(aClass ->
-            testSpec.getProblems().stream().anyMatch(aClass::isInstance)));
+            recognizer.problemsProperty().get().stream().anyMatch(aClass::isInstance)));
   }
 }

@@ -7,6 +7,10 @@ import edu.kit.iti.formal.exteta_1_0.report.ObjectFactory;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlImporter;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+<<<<<<< HEAD
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
+=======
+>>>>>>> ad48c3473ce485b294948af61e39552b8a4fea8f
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.*;
 import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
@@ -17,7 +21,6 @@ import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
@@ -25,7 +28,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import java.util.*;
+<<<<<<< HEAD
+=======
 import java.util.regex.Matcher;
+>>>>>>> ad48c3473ce485b294948af61e39552b8a4fea8f
 import java.util.regex.Pattern;
 
 /**
@@ -34,15 +40,22 @@ import java.util.regex.Pattern;
 public class GeTeTaImporter extends XmlImporter<VerificationResult> {
 
   private final static String RETURN_CODE_SUCCESS = "verified";
-  private final static String RETURN_CODE_NOT_VERIFIED = "counterexample";
+  private final static String RETURN_CODE_NOT_VERIFIED = "not-verified";
   private final static String IDENTIFIER_RE = "[$a-zA-Z0-9_]+";
   private final static Pattern VARIABLES_FOUND_PATTERN = Pattern.compile("[0-9]+ variables " +
       "found");
   private final static Pattern VARIABLE_DECL_PATTERN = Pattern.compile("\\s*" + IDENTIFIER_RE +
       " : " + IDENTIFIER_RE);
   private final static Pattern CODE_VARIABLE_PATTERN = Pattern.compile("code\\." + IDENTIFIER_RE);
+<<<<<<< HEAD
+  private final static Pattern INPUT_VARIABLE_PATTERN = Pattern.compile(IDENTIFIER_RE);
   private final static Pattern INT_VALUE_PATTERN = Pattern.compile("0sd16_-?[0-9]+");
   private final static Pattern BOOL_VALUE_PATTERN = Pattern.compile("(TRUE)|(FALSE)");
+
+=======
+  private final static Pattern INT_VALUE_PATTERN = Pattern.compile("0sd16_-?[0-9]+");
+  private final static Pattern BOOL_VALUE_PATTERN = Pattern.compile("(TRUE)|(FALSE)");
+>>>>>>> ad48c3473ce485b294948af61e39552b8a4fea8f
   private final List<Type> typeContext;
 
   public GeTeTaImporter(List<Type> typeContext) {
@@ -99,11 +112,24 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
     // Parse rows & durations
     int currentDurationCount = 1;
     int lastRowNum = -1;
+<<<<<<< HEAD
+    List<Counterexample.Step> steps = message.getCounterexample().getTrace().getStep();
+    List<Integer> rowNums = parseRowMap(message.getCounterexample().getRowMappings().getRowMap()
+        .get(0));
+    Map<String, Value> currentValues = new HashMap<>();
+    Map<String, VariableCategory> varCategories = new HashMap<>();
+    int rowNum = -1;
+    for (int i = 0; i < steps.size(); i++) {
+      if (i-1 > rowNums.size()) break;
+      if (i > 0) rowNum = rowNums.get(i - 1);
+      Counterexample.Step step = steps.get(i);
+=======
     List<Counterexample.Step> steps = message.getCounterexample().getStep();
     Map<String, Value> currentValues = new HashMap<>();
     Map<String, VariableCategory> varCategories = new HashMap<>();
     for (Counterexample.Step step : steps) {
       int rowNum = step.getRow();
+>>>>>>> ad48c3473ce485b294948af61e39552b8a4fea8f
       for (Assignment state : step.getState()) { // Output vars are initialized here
         String stateString = state.getName().trim();
         if (CODE_VARIABLE_PATTERN.matcher(stateString).matches()) {
@@ -115,6 +141,60 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
         }
       }
 
+<<<<<<< HEAD
+      // Now I can make and add the row!
+      if (rowNum > -1 && rowNum - 1 <= concreteRows.size()) {
+        SpecificationRow<ConcreteCell> row = SpecificationRow.createUnobservableRow(new
+            HashMap<>());
+        if (rowNum - 1< concreteRows.size()) {
+          row = concreteRows.get(rowNum - 1);
+        }
+        for (String varName : currentValues.keySet()) {
+          row.getCells().put(varName, new ConcreteCell(currentValues.get(varName)));
+        }
+        concreteRows.add(rowNum - 1, row);
+      } else if (rowNum != -1) {
+        throw new ImportException("Illegal row number: " + rowNum);
+      }
+
+      if (rowNum > -1) {
+        if (lastRowNum != rowNum) {
+          // Started new row --> make and add new duration
+          concreteDurations.add(new ConcreteDuration(rowNum-1, currentDurationCount));
+          currentDurationCount = 1;
+          lastRowNum = rowNum;
+        } else {
+          currentDurationCount++;
+        }
+      }
+
+      for (Assignment input : step.getInput()) { // Input vars are initialized here FOR THE NEXT
+        // CYCLE
+        String varName = input.getName();
+        if (INPUT_VARIABLE_PATTERN.matcher(varName).matches()) {
+          varCategories.put(varName, VariableCategory.INPUT);
+          processVarAssignment(currentValues, varTypes, input.getName(), input.getValue());
+        }
+      }
+    }
+    ConcreteSpecification concreteSpec = new ConcreteSpecification(true);
+    for (String varName : varNames) {
+      concreteSpec.getColumnHeaders().add(new ValidIoVariable(varCategories.get(varName), varName,
+          varTypes.get(varName)));
+    }
+    concreteSpec.getRows().addAll(concreteRows);
+    concreteSpec.getDurations().addAll(concreteDurations);
+    return concreteSpec;
+  }
+
+  private List<Integer> parseRowMap(String rowMapString) {
+    String[] tokens = rowMapString.trim().split(", ");
+    List<Integer> res = new ArrayList<>();
+    for (String token : tokens) {
+      res.add(Integer.parseInt(token));
+    }
+    return res;
+=======
       for (Assignment input : step.getInput()) {
         String varName = input.getName();
         varCategories.put(varName, VariableCategory.INPUT);
@@ -151,6 +231,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       }
     }
     return new ConcreteSpecification(concreteRows, concreteDurations, true);
+>>>>>>> ad48c3473ce485b294948af61e39552b8a4fea8f
   }
 
   @Override
@@ -205,7 +286,11 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
     GeTeTaImporter importer = new GeTeTaImporter(typeContext);
     VerificationResult result = importer.doImport(new FileInputStream
         ("/home/bal/Projects/kit/pse/stverificationstudio/src/test/resources/edu/kit/iti/formal" +
+<<<<<<< HEAD
+            "/stvs/logic/io/xml/verification/report_counterexample_2.xml"));
+=======
             "/stvs/logic/io/xml/report_counterexample_1.xml"));
+>>>>>>> ad48c3473ce485b294948af61e39552b8a4fea8f
     System.out.println();
   }
 }

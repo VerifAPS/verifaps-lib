@@ -2,13 +2,10 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
+import edu.kit.iti.formal.stvs.model.common.IoVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
-import edu.kit.iti.formal.stvs.model.common.VariableCategory;
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
-import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
 import edu.kit.iti.formal.stvs.model.table.*;
 import org.w3c.dom.Node;
 
@@ -16,6 +13,7 @@ import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Benjamin Alt
@@ -50,7 +48,7 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
       duration.setValue(constraintSpec.getDurations().get(i).getAsString());
       duration.setComment(constraintSpec.getDurations().get(i).getComment());
       exportRow.setDuration(duration);
-      for (SpecIoVariable ioVariable : constraintSpec.getSpecIoVariables()) {
+      for (SpecIoVariable ioVariable : constraintSpec.getColumnHeaders()) {
         ConstraintCell cell = row.getCells().get(ioVariable.getName());
         Rows.Row.Cell exportCell = objectFactory.createRowsRowCell();
         exportCell.setComment(cell.getComment());
@@ -62,55 +60,48 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
     return rows;
   }
 
-  protected EnumTypes makeEnumTypes(SpecificationTable<?, ?> specTable) {
+  protected EnumTypes makeEnumTypes(SpecificationTable<?, ?, ?> specTable) {
     EnumTypes enumTypes = objectFactory.createEnumTypes();
-    for (SpecIoVariable ioVar : specTable.getSpecIoVariables()) {
-      Type type = ioVar.getType();
-      if (type instanceof TypeEnum) {
-        EnumTypes.Enum exportEnumType = objectFactory.createEnumTypesEnum();
-        exportEnumType.setName(type.getTypeName());
-        for (ValueEnum literal : ((TypeEnum) type).getValues()) {
-         exportEnumType.getLiteral().add(literal.getValueString());
-       }
-       enumTypes.getEnum().add(exportEnumType);
-      }
-    }
+    // TODO: Remove EnumTypes from xsd.
     return enumTypes;
   }
 
   private Variables makeVariables(ConstraintSpecification constraintSpec) {
     Variables variables = objectFactory.createVariables();
-    variables.getIoVariable().addAll(makeIoVariables(constraintSpec));
+    variables.getIoVariable().addAll(constraintSpec.getColumnHeaders().stream()
+      .map(this::makeIoVariablesFromSpec).collect(Collectors.toList()));
 
-    for (FreeVariable freeVariable : constraintSpec.getFreeVariableSet().getVariableSet()) {
+    for (FreeVariable freeVariable : constraintSpec.getFreeVariableList().getVariables()) {
       Variables.FreeVariable freeVar = objectFactory.createVariablesFreeVariable();
       freeVar.setName(freeVariable.getName());
-      freeVar.setDataType(freeVariable.getType().getTypeName());
-      if (freeVariable.getDefaultValue() != null) {
-        freeVar.setDefault(freeVariable.getDefaultValue().getValueString());
+      freeVar.setDataType(freeVariable.getType());
+      if (freeVariable.getDefaultValue() != "") {
+        freeVar.setDefault(freeVariable.getDefaultValue());
       }
       variables.getFreeVariable().add(freeVar);
     }
     return variables;
   }
 
-  private Variables makeVariables(ConcreteSpecification concreteSpec) {
+  protected Variables makeVariables(ConcreteSpecification concreteSpec) {
     Variables variables = objectFactory.createVariables();
-    variables.getIoVariable().addAll(makeIoVariables(concreteSpec));
+    variables.getIoVariable().addAll(concreteSpec.getColumnHeaders().stream()
+      .map(this::makeIoVariable).collect(Collectors.toList()));
     return variables;
   }
 
-  protected List<Variables.IoVariable> makeIoVariables(SpecificationTable<?, ?> specTable) {
-    List<Variables.IoVariable> variables = new ArrayList<>();
-    for (SpecIoVariable specIoVariable : specTable.getSpecIoVariables()) {
-      Variables.IoVariable ioVar = objectFactory.createVariablesIoVariable();
-      ioVar.setComment(ioVar.getComment());
-      ioVar.setColwidth(BigInteger.valueOf(specIoVariable.getColumnConfig().getWidth()));
-      ioVar.setDataType(specIoVariable.getType().getTypeName());
-      ioVar.setIo(specIoVariable.getCategory().toString().toLowerCase());
-      ioVar.setName(specIoVariable.getName());
-      variables.add(ioVar);
-    }
-    return variables;
+  private Variables.IoVariable makeIoVariable(IoVariable validIoVariable) {
+    Variables.IoVariable ioVar = objectFactory.createVariablesIoVariable();
+    ioVar.setComment(ioVar.getComment());
+    ioVar.setDataType(validIoVariable.getType());
+    ioVar.setIo(validIoVariable.getCategory().toString().toLowerCase());
+    ioVar.setName(validIoVariable.getName());
+    return ioVar;
+  }
+
+  protected Variables.IoVariable makeIoVariablesFromSpec(SpecIoVariable specIoVariable) {
+    Variables.IoVariable ioVar = makeIoVariable(specIoVariable);
+    ioVar.setColwidth(BigInteger.valueOf(specIoVariable.getColumnConfig().getWidth()));
+    return ioVar;
   }
 }

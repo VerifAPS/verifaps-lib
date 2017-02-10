@@ -2,10 +2,10 @@ package edu.kit.iti.formal.stvs.model.verification;
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.verification.GeTeTaVerificationEngine;
-import edu.kit.iti.formal.stvs.model.code.Code;
-import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
-import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.logic.verification.VerificationEngine;
+import edu.kit.iti.formal.stvs.model.code.Code;
+import edu.kit.iti.formal.stvs.model.common.NullableProperty;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -17,7 +17,7 @@ import java.io.IOException;
  * @author Benjamin Alt
  */
 public class VerificationScenario {
-  private OptionalProperty<VerificationResult> verificationResult;
+  private NullableProperty<VerificationResult> verificationResult;
   private VerificationEngine verificationEngine;
   private ObjectProperty<Code> code;
   private ObjectProperty<VerificationState> verificationState;
@@ -28,11 +28,24 @@ public class VerificationScenario {
 
   public VerificationScenario(Code code) {
     this.code = new SimpleObjectProperty<>(code);
+<<<<<<< HEAD
+    verificationResult = new NullableProperty<>();
+    verificationEngine = new GeTeTaVerificationEngine(this.code.get().getParsedCode()
+        .getDefinedTypes());
+    verificationEngine.verificationResultProperty().addListener(new
+        VerificationChangedListener());
+    verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
+  }
+
+  public void verify(ConstraintSpecification spec) throws IOException, ExportException {
+    verificationEngine = new GeTeTaVerificationEngine(code.get().getParsedCode().getDefinedTypes());
+=======
     verificationResult = new OptionalProperty<>(new SimpleObjectProperty<>());
   }
 
   public void verify(ConstraintSpecification spec) throws IOException, ExportException {
     verificationEngine = new GeTeTaVerificationEngine(spec.getTypeContext());
+>>>>>>> ad48c3473ce485b294948af61e39552b8a4fea8f
     verificationEngine.verificationResultProperty().addListener(new
         VerificationChangedListener());
     verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
@@ -68,7 +81,7 @@ public class VerificationScenario {
     return verificationResult.get();
   }
 
-  public OptionalProperty<VerificationResult> verificationResultProperty() {
+  public NullableProperty<VerificationResult> verificationResultProperty() {
     return verificationResult;
   }
 

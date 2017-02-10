@@ -9,7 +9,7 @@ import java.util.Optional;
 public class Selection {
 
   private NullableProperty<String> column;
-  private NullableProperty<Integer>  row;
+  private NullableProperty<Integer> row;
 
   public Selection(String column, int row) {
     this.column = new NullableProperty<>(column);
@@ -68,8 +68,8 @@ public class Selection {
 
     Selection selection = (Selection) o;
 
-    if (!column.get().equals(selection.column.get())) return false;
-    return row.get().equals(selection.row.get());
+    if (column.get() == null ? selection.column.get() != null : !column.get().equals(selection.column.get())) return false;
+    return row.get() == null ? selection.row.get() == null : row.get().equals(selection.row.get());
 
   }
 

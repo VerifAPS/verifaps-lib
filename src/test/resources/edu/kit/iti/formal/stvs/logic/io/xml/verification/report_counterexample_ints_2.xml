@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://formal.iti.kit.edu/exteta-1.0/report/" returncode="not-verified">
+  <log>
+    <entry time="57" level="debug">read xml file constantprogram.xml</entry>
+    <entry time="188" level="debug">xml file successfully read</entry>
+    <entry time="188" level="info">No options in table file.</entry>
+    <entry time="188" level="info">No functions given in table file.</entry>
+    <entry time="188" level="debug">3 variables found</entry>
+    <entry time="188" level="debug">	 i : INT</entry>
+    <entry time="188" level="debug">	 o : INT</entry>
+    <entry time="188" level="debug">	 c : INT</entry>
+    <entry time="262" level="debug">parsed: 2 to (0sd16_2=i)</entry>
+    <entry time="264" level="debug">parsed: i to (i=o)</entry>
+    <entry time="265" level="debug">parsed: - to TRUE</entry>
+    <entry time="266" level="debug">parsed: 3 to (0sd16_3=i)</entry>
+    <entry time="270" level="debug">parsed: =i+1 to (o=(i+0sd16_1))</entry>
+    <entry time="271" level="debug">parsed: 42 to (0sd16_42=c)</entry>
+    <entry time="375" level="debug">Row 1 can reach: {2}</entry>
+    <entry time="375" level="debug">Row 2 can reach: {}</entry>
+    <entry time="429" level="info">Start '[/opt/nuXmv-1.1.1-Linux/bin/nuXmv, -int, /home/bal/Downloads/constantprogram/modules.smv]'</entry>
+    <entry time="429" level="info">wd: constantprogram</entry>
+    <entry time="429" level="info">Result in constantprogram/log_47.txt</entry>
+    <entry time="485" level="debug">Row 1 can reach: {2}</entry>
+    <entry time="485" level="debug">Row 2 can reach: {}</entry>
+  </log>
+  <counterexample>
+    <trace>
+      <step>
+        <input name="i" value="0sd16_2"/>
+        <input name="table.s2_in" value="FALSE"/>
+        <input name="table.s1_in" value="TRUE"/>
+        <state name="table.s1" value="TRUE"/>
+        <state name="table.s2" value="FALSE"/>
+        <state name="table.ERROR" value="FALSE"/>
+        <state name="code.c" value="0sd16_0"/>
+        <state name="code.o" value="0sd16_0"/>
+        <state name="table.s2_out" value="FALSE"/>
+        <state name="table.s1_out" value="TRUE"/>
+        <state name="table.s2_keep" value="FALSE"/>
+        <state name="table.s2_fwd" value="FALSE"/>
+        <state name="table.s1_keep" value="FALSE"/>
+        <state name="table.s1_fwd" value="TRUE"/>
+      </step>
+      <step>
+        <input name="i" value="0sd16_3"/>
+        <input name="table.s2_in" value="TRUE"/>
+        <input name="table.s1_in" value="FALSE"/>
+        <state name="table.s1" value="FALSE"/>
+        <state name="table.s2" value="TRUE"/>
+        <state name="code.c" value="0sd16_43"/>
+        <state name="code.o" value="0sd16_2"/>
+        <state name="table.s1_fwd" value="FALSE"/>
+      </step>
+      <step>
+        <state name="table.s2" value="FALSE"/>
+        <state name="table.ERROR" value="TRUE"/>
+        <state name="code.o" value="0sd16_3"/>
+      </step>
+    </trace>
+    <row-mappings>
+      <row-map>1, 2</row-map>
+    </row-mappings>
+  </counterexample>
+</ns2:message>

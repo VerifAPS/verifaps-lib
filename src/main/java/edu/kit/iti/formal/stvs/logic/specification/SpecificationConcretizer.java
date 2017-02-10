@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.specification;
 
-import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
+import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 
@@ -27,7 +27,7 @@ public interface SpecificationConcretizer {
    */
   public ConcreteSpecification getConcreteSpec();
 
-  public OptionalProperty<ConcreteSpecification> concreteSpecProperty();
+  public NullableProperty<ConcreteSpecification> concreteSpecProperty();
 
   public void setConcreteSpec(ConcreteSpecification concreteSpec);
 }

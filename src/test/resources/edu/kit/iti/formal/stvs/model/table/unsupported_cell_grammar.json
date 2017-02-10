@@ -1,4 +1,8 @@
 {
+  "codeiovars":[
+    { "kind":"INPUT", "name":"Counter", "type":"INT" },
+    { "kind":"OUTPUT", "name":"Active", "type":"BOOL" }
+  ],
   "freevariables":[
     { "name":"c", "type":"INT" }
   ],

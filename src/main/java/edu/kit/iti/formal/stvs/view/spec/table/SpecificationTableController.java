@@ -1,28 +1,25 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
-import edu.kit.iti.formal.stvs.logic.io.xml.Rows;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
-import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.*;
 import edu.kit.iti.formal.stvs.model.table.problems.CellProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.DurationProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
+import edu.kit.iti.formal.stvs.model.table.problems.SpecProblemRecognizer;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.*;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.util.converter.DefaultStringConverter;
@@ -43,14 +40,24 @@ public class SpecificationTableController implements Controller {
 
   private final TableView<SynchronizedRow> tableView;
   private final HybridSpecification hybridSpec;
+  private final ObjectProperty<List<Type>> typeContext;
+  private final ObjectProperty<List<CodeIoVariable>> codeIoVariables;
+  private final SpecProblemRecognizer problemRecognizer;
 
   private final ObservableList<SynchronizedRow> data = FXCollections.observableArrayList();
   private final TableColumn<SynchronizedRow, String> durations;
   private final ContextMenu columnContextMenu;
 
-  public SpecificationTableController(HybridSpecification hybridSpecification) {
+  public SpecificationTableController(ObjectProperty<List<Type>> typeContext,
+                                      ObjectProperty<List<CodeIoVariable>> codeIoVariables,
+                                      ReadOnlyObjectProperty<List<ValidFreeVariable>> validVariables,
+                                      HybridSpecification hybridSpecification) {
     this.tableView = new TableView<>();
+
+    this.typeContext = typeContext;
+    this.codeIoVariables = codeIoVariables;
     this.hybridSpec = hybridSpecification;
+    this.problemRecognizer = new SpecProblemRecognizer(typeContext, codeIoVariables, validVariables, hybridSpecification);
     this.durations = createViewColumn(DURATION_COL_USER_DATA, "Duration", SynchronizedRow::getDuration);
     this.columnContextMenu = createColumnEditingContextMenu();
 
@@ -67,6 +74,8 @@ public class SpecificationTableController implements Controller {
 
     tableView.getStylesheets().add(SpecificationTableController.class.getResource("style.css").toExternalForm());
 
+    hybridSpecification.getColumnHeaders().forEach(this::addColumnToView);
+
     for (int rowIndex = 0; rowIndex < hybridSpecification.getRows().size(); rowIndex++) {
       data.add(new SynchronizedRow(
           hybridSpecification.getRows().get(rowIndex),
@@ -74,6 +83,8 @@ public class SpecificationTableController implements Controller {
     }
 
     data.addListener(this::onDataRowChanged);
+
+    hybridSpecification.getRows().addListener((Observable o) -> System.out.println("SPEC CHANGE"));
   }
 
   private TableCell<SynchronizedRow, String> cellFactory(TableColumn<SynchronizedRow, String> table) {
@@ -83,7 +94,7 @@ public class SpecificationTableController implements Controller {
       {
         normalTextFill = getTextFill();
         onProblemChangeListener = new WeakInvalidationListener(observable -> this.onProblemsChanged());
-        hybridSpec.problemsProperty().addListener(onProblemChangeListener);
+        problemRecognizer.problemsProperty().addListener(onProblemChangeListener);
         getStyleClass().add("spec-cell");
       }
 
@@ -102,7 +113,7 @@ public class SpecificationTableController implements Controller {
 
       private void onProblemsChanged() {
         if (!isEmpty()) {
-          List<SpecProblem> problems = hybridSpec.getProblems();
+          List<SpecProblem> problems = problemRecognizer.problemsProperty().get();
           for (SpecProblem problem : problems) {
             if (problem instanceof CellProblem) {
               CellProblem cellProblem = (CellProblem) problem;
@@ -165,7 +176,7 @@ public class SpecificationTableController implements Controller {
     ContextMenu menu = new ContextMenu();
     MenuItem addNewColumn = new MenuItem("New Column...");
     addNewColumn.setOnAction(event ->
-        new IoVariableNameDialog(hybridSpec.typeContextProperty(), hybridSpec.codeIoVariablesProperty())
+        new IoVariableNameDialog(typeContext, codeIoVariables)
           .showAndWait()
           .ifPresent(this::addNewColumn));
     menu.getItems().addAll(addNewColumn);
@@ -174,16 +185,16 @@ public class SpecificationTableController implements Controller {
 
   public void addEmptyRow(int index) {
     Map<String, ConstraintCell> wildcardCells = new HashMap<>();
-    hybridSpec.getSpecIoVariables().forEach(specIoVariable ->
+    hybridSpec.getColumnHeaders().forEach(specIoVariable ->
         wildcardCells.put(specIoVariable.getName(), new ConstraintCell("-")));
-    SpecificationRow<ConstraintCell> wildcardRow = new SpecificationRow<>(wildcardCells);
+    SpecificationRow<ConstraintCell> wildcardRow = ConstraintSpecification.createRow(wildcardCells);
     data.add(index, new SynchronizedRow(wildcardRow, new ConstraintDuration("-")));
   }
 
   public void addNewColumn(SpecIoVariable specIoVariable) {
     // Add column to model:
     if (data.isEmpty()) {
-      hybridSpec.getSpecIoVariables().add(specIoVariable);
+      hybridSpec.getColumnHeaders().add(specIoVariable);
     } else {
       SpecificationColumn<ConstraintCell> dataColumn = new SpecificationColumn<>(
           data.stream().map(row -> new ConstraintCell("-")).collect(Collectors.toList()));
@@ -201,7 +212,7 @@ public class SpecificationTableController implements Controller {
             specIoVariable.getVarDescriptor(),
             synchronizedRow -> synchronizedRow.getCells().get(specIoVariable.getName()))
     );
-    tableView.refresh();
+    tableView.refresh(); // TODO: maybe this is not needed with the new deep observable updates in the model
   }
 
   private TableColumn<SynchronizedRow, String> createViewColumn(
@@ -286,5 +297,9 @@ public class SpecificationTableController implements Controller {
 
   public HybridSpecification getHybridSpecification() {
     return hybridSpec;
+  }
+
+  public SpecProblemRecognizer getSpecProblemRecognizer() {
+    return this.problemRecognizer;
   }
 }

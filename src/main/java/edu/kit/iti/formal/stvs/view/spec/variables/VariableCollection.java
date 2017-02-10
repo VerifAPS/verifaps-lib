@@ -15,8 +15,8 @@ public class VariableCollection extends VBox {
   private final Label overviewLabel;
   private final TableView<FreeVariable> freeVariableTableView;
   private final TableColumn<FreeVariable, String> nameTableColumn;
-  private final TableColumn<FreeVariable, Type> typeTableColumn;
-  private final TableColumn<FreeVariable, Value> defaultValueTableColumn;
+  private final TableColumn<FreeVariable, String> typeTableColumn;
+  private final TableColumn<FreeVariable, String> defaultValueTableColumn;
   private final Button addFreeVariable;
 
   public VariableCollection() {
@@ -57,11 +57,11 @@ public class VariableCollection extends VBox {
     return nameTableColumn;
   }
 
-  public TableColumn<FreeVariable, Type> getTypeTableColumn() {
+  public TableColumn<FreeVariable, String> getTypeTableColumn() {
     return typeTableColumn;
   }
 
-  public TableColumn<FreeVariable, Value> getDefaultValueTableColumn() {
+  public TableColumn<FreeVariable, String> getDefaultValueTableColumn() {
     return defaultValueTableColumn;
   }
 }

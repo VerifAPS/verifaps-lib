@@ -2,46 +2,52 @@ package edu.kit.iti.formal.stvs.model.common;
 
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
+import javafx.beans.Observable;
 import javafx.beans.property.*;
+import javafx.util.Callback;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
  * Created by csicar on 10.01.17.
  */
 public class FreeVariable implements Variable {
+
+  public static final Callback<FreeVariable, Observable[]> EXTRACTOR =
+      freeVar -> new Observable[] {
+          freeVar.nameProperty(),
+          freeVar.typeProperty(),
+          freeVar.defaultValueProperty()
+      };
+
+
   private final StringProperty name;
-  private final ObjectProperty<Type> type;
-  private final NullableProperty<Value> defaultValue;
+  private final StringProperty type;
+  private final StringProperty defaultValue;
 
   /**
    * Creates a free variable with a name and type.
    * A default value will be generated through {@link Type#generateDefaultValue()}.
    *
    * @param name Name of the free variable
-   * @param type Type of the free variable
+   * @param type Identifier of the type of the free variable
    */
-  public FreeVariable(String name, Type type) {
+  public FreeVariable(String name, String type) {
     this.name = new SimpleStringProperty(name);
-    this.type = new SimpleObjectProperty<>(type);
-    this.defaultValue = new NullableProperty<>();
+    this.type = new SimpleStringProperty(type);
+    this.defaultValue = new SimpleStringProperty("");
   }
 
   /**
    * Creates a free variable with a name, type and default value.
    *
    * @param name         Name of the free variable
-   * @param type         Type of the free variable
+   * @param type         Identifier of the type of the free variable
    * @param defaultValue Default value of the free variable
-   * @throws IllegalValueTypeException thrown if {@link Type}
-   *                                   of {@code defaultValue} does not match {@code type}
    */
-  public FreeVariable(String name, Type type, Value defaultValue) throws IllegalValueTypeException {
+  public FreeVariable(String name, String type, String defaultValue) {
     this.name = new SimpleStringProperty(name);
-    this.type = new SimpleObjectProperty<>(type);
-    if (!defaultValue.getType().checksAgainst(type)) {
-      throw new IllegalValueTypeException(defaultValue, type, "DefaultValue has wrong type.");
-    }
-    this.defaultValue = new NullableProperty<>(defaultValue);
+    this.type = new SimpleStringProperty(type);
+    this.defaultValue = new SimpleStringProperty(defaultValue);
   }
 
   public String getName() {
@@ -52,73 +58,34 @@ public class FreeVariable implements Variable {
     return name;
   }
 
-  /**
-   * Rename the variable.
-   *
-   * @param name New name for the free variable
-   */
-  public void setName(String name) {
-    if (!freevarNameValid(name)) {
-      throw new IllegalArgumentException("Free Variable name is not valid: " + name);
-    }
-    this.name.set(name);
-  }
-
-  private boolean freevarNameValid(String name) {
-    if (name.isEmpty()) {
-      return false;
-    }
-    if (!Character.isJavaIdentifierStart(name.charAt(0))) {
-      return false;
-    }
-    for (int i = 1; i < name.length(); i++) {
-      if (!Character.isJavaIdentifierPart(name.charAt(i))) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  public Type getType() {
+  public String getType() {
     return type.get();
   }
 
-  public ReadOnlyObjectProperty<Type> typeProperty() {
+  public StringProperty typeProperty() {
     return type;
   }
 
   /**
    * Sets the type of this variable.
-   * If the current default value has a different type, it is cleared.
-   *
-   * @param type New type for the free variable
+   * @param type identifier of the new type for the free variable
    */
-  public void setType(Type type) {
+  public void setType(String type) {
     this.type.set(type);
-    if (this.defaultValue.get() != null && !this.defaultValue.get().getType().checksAgainst(type)) {
-      this.defaultValue.set(null);
-    }
   }
 
-  public Value getDefaultValue() {
+  public String getDefaultValue() {
     return defaultValue.get();
   }
 
-  public ReadOnlyObjectProperty<Value> defaultValueProperty() {
+  public StringProperty defaultValueProperty() {
     return defaultValue;
   }
 
   /**
    * Assigns a new value to the free variable.
-   *
-   * @param defaultValue New default value for the free variable
-   * @throws IllegalValueTypeException thrown if {@link Type}
-   *                                   of {@code defaultValue} does not match {@code type}
    */
-  public void setDefaultValue(Value defaultValue) throws IllegalValueTypeException {
-    if (defaultValue != null && !defaultValue.getType().checksAgainst(this.type.get())) {
-      throw new IllegalValueTypeException(defaultValue, this.type.get(), "Illegal Type:");
-    }
+  public void setDefaultValue(String defaultValue) {
     this.defaultValue.set(defaultValue);
   }
 

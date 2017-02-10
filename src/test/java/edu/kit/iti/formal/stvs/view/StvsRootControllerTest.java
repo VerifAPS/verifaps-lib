@@ -32,7 +32,6 @@ public class StvsRootControllerTest {
     try {
        rootModel = ImporterFacade.importSession(importer.getClass()
           .getResourceAsStream("session_valid_1.xml"), ImporterFacade.ImportFormat.XML);
-
     }catch(Exception e) {
       e.printStackTrace();
     }
