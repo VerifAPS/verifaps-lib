@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.editor;
 
+import edu.kit.iti.formal.automation.st.ast.Top;
 import edu.kit.iti.formal.stvs.model.code.SyntaxError;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
@@ -51,8 +52,7 @@ public class EditorPane extends SplitPane {
     AnchorPane.setRightAnchor(syntaxErrorListView, 0.0);
     this.getItems().addAll(codeArea, syntaxErrorPane);
     this.setOrientation(Orientation.VERTICAL);
-
-
+    this.setDividerPosition(0, 50.0);
   }
 
   public StringProperty getCodeProperty() {
