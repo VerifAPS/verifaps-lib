@@ -66,7 +66,6 @@ public class SpecProblemRecognizer {
   }
 
   private void recalculateSpecProblems() {
-    System.out.println("Spec changed, recalcing stuff");
     ValidSpecification validSpec = new ValidSpecification();
 
     List<SpecProblem> specProblems = new ArrayList<>();

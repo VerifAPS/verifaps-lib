@@ -84,8 +84,6 @@ public class SpecificationTableController implements Controller {
     }
 
     data.addListener(this::onDataRowChanged);
-
-    hybridSpecification.getRows().addListener((Observable o) -> System.out.println("SPEC CHANGE"));
   }
 
   private TableCell<SynchronizedRow, String> cellFactory(TableColumn<SynchronizedRow, String> table) {
@@ -97,6 +95,7 @@ public class SpecificationTableController implements Controller {
         onProblemChangeListener = observable -> this.onProblemsChanged();
         problemRecognizer.problemsProperty().addListener(onProblemChangeListener);
         getStyleClass().add("spec-cell");
+        onProblemsChanged();
       }
 
       private void configureProblem(SpecProblem problem) {
