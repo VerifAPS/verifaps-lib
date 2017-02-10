@@ -19,6 +19,7 @@ public class StvsApplication extends Application {
     primaryStage.setTitle("Structured Text Verification Studio - STVS");
     primaryStage.setScene(mainScene.getScene());
     primaryStage.setOnCloseRequest(event -> System.exit(0));
+    primaryStage.setMaximized(true);
     primaryStage.show();
   }
 }

@@ -9,6 +9,7 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.view.editor.EditorPaneController;
 import edu.kit.iti.formal.stvs.view.spec.SpecificationsPaneController;
+import edu.kit.iti.formal.stvs.view.spec.VerificationStartedEvent;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -51,6 +52,14 @@ public class StvsRootController implements Controller {
     this.view = new StvsRootView(
         editorPaneController.getView(),
         specificationsPaneController.getView());
+
+    view.addEventHandler(VerificationStartedEvent.EVENT_TYPE,
+        this::onVerificationStartRequested);
+  }
+
+  private void onVerificationStartRequested(VerificationStartedEvent event) {
+    System.out.println("Starting verificatioN!!!");
+    //stvsRootModel.getScenario().verify(event.getConstraintSpec());
   }
 
   private List<CodeIoVariable> ioVarsFromCode(ParsedCode parsedCode) {
