@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import de.tudresden.inf.lat.jsexp.Sexp;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
@@ -62,10 +63,13 @@ public class Z3Solver {
     (check-sat)
     (get-value (A_0_0 B_0_0))
    */
-  public static void concretizeVarAssignment(String smtString, Map<String, Type> typeContext, Consumer<Optional<ConcreteSpecification>> resultConsumer) throws IOException {
+  public static void concretizeVarAssignment(String smtString, List<SpecIoVariable> specIoVariables, Consumer<Optional<ConcreteSpecification>> resultConsumer) throws IOException {
     concretizeSExpr(smtString, sexpOptional -> {
       Map<Integer, Map<String, String>> rawRows = new HashMap<>();
       Map<Integer, Integer> rawDurations = new HashMap<>();
+      Map<String, Type> typeContext = specIoVariables.stream().collect(Collectors.toMap(
+          SpecIoVariable::getName, SpecIoVariable::getType
+      ));
       if (sexpOptional.isPresent()) {
         Sexp sExpr = sexpOptional.get().toSexpr();
         sExpr.forEach(varAsign -> {
@@ -118,7 +122,7 @@ public class Z3Solver {
           specificationRows.add(i, new SpecificationRow<ConcreteCell>(concreteCellMap));
         }
         resultConsumer.accept(Optional.of(
-            new ConcreteSpecification(specificationRows, durations, false)));
+            new ConcreteSpecification(specIoVariables, specificationRows, durations, false)));
       } else {
         resultConsumer.accept(Optional.empty());
       }

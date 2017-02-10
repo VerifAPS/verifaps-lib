@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
@@ -10,7 +12,9 @@ import javafx.scene.control.TextArea;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,10 +58,10 @@ public class Z3SolverTest {
             //System.out.println(optionalOutput.get());
           }
       );
-      Map<String, Type> typeContext = new HashMap<>();
-      typeContext.put("A", TypeInt.INT);
-      typeContext.put("B", TypeBool.BOOL);
-      Z3Solver.concretizeVarAssignment(TEST2, typeContext, result -> {
+      List<SpecIoVariable> specIoVariables = new ArrayList<>();
+      specIoVariables.add(new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "A"));
+      specIoVariables.add(new SpecIoVariable(VariableCategory.OUTPUT, TypeBool.BOOL, "B"));
+      Z3Solver.concretizeVarAssignment(TEST2, specIoVariables, result -> {
         System.out.println(result);
       });
     } catch (IOException e) {

@@ -18,8 +18,8 @@ public class SConstraint implements SExpr {
   }
 
   public SConstraint() {
-    this.globalConstraints = new HashSet<>();
-    this.variableDefinitions = new HashSet<>();
+    this.globalConstraints = new LinkedHashSet<>();
+    this.variableDefinitions = new LinkedHashSet<>();
   }
 
   public SConstraint combine(RecSConstraint other) {

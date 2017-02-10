@@ -36,7 +36,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   private final int row;
   private final int iteration;
   private final SpecIoVariable column;
-  private final Predicate<Type> isIoVariable;
+  private final Predicate<String> isIoVariable;
   private final Function<String, String> getSMTLibVariableName;
 
   private final SConstraint sConstraint;
@@ -49,7 +49,8 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
    * @param getSMTLibVariableTypeName
    */
   public SmtConvertExpressionVisitor(Function<String, Type> getTypeForVariable, int row, int
-      iteration, SpecIoVariable column, Predicate<Type> isIoVariable, Function<String, String> getSMTLibVariableTypeName) {
+      iteration, SpecIoVariable column, Predicate<String> isIoVariable, Function<String, String>
+      getSMTLibVariableTypeName) {
     this.getTypeForVariable = getTypeForVariable;
     this.row = row;
     this.iteration = iteration;
@@ -62,9 +63,6 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
         new SList(
             "declare-const",
             column.getName() + "_" + row + "_" + iteration,
-            /*try to get type-name for smtlibTypes -> in case of an enum use our naming
-            *(b/c we define it that way in SmtPreprocessor)
-            * */
             getSMTLibVariableTypeName.apply(typeName)
         )
     );
@@ -128,19 +126,24 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     Type type = getTypeForVariable.apply(variableName);
 
     // is an IOVariable?
-    if (isIoVariable.test(type)) {
+    if (isIoVariable.test(variableName)) {
       // Do Rule I
       // sum_(i=0...(z-1))(n_i) >= j
-      sConstraint.addGlobalConstrains(
-          new SList(
-              ">=",
-              sumRowIterations(row - 1),
-              new SAtom((iteration - variableReferenceIndex) + "")
-          )
-      );
+
+      //does it reference a previous cycle? -> guarantee reference-ability
+      if (variableReferenceIndex < 0) {
+        sConstraint.addGlobalConstrains(
+            new SList(
+                ">=",
+                sumRowIterations(row - 1),
+                new SAtom(-(iteration + variableReferenceIndex) + "")
+            )
+        );
+      }
+
       // Do Rule II
       // A[-v] -> A_z_(i-v)
-      return new SAtom(variableName + "_" + row + "_" + (iteration - variableReferenceIndex));
+      return new SAtom(variableName + "_" + row + "_" + (iteration + variableReferenceIndex));
 
       //return new SAtom(variableName);
     } else {
