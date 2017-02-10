@@ -47,7 +47,7 @@ public class FreeVariable implements Variable {
   public FreeVariable(String name, String type, String defaultValue) {
     this.name = new SimpleStringProperty(name);
     this.type = new SimpleStringProperty(type);
-    this.defaultValue = new SimpleStringProperty(defaultValue);
+    this.defaultValue = new SimpleStringProperty(defaultValue == null ? "" : defaultValue);
   }
 
   public String getName() {
