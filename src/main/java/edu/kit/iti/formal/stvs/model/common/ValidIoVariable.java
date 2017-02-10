@@ -35,4 +35,24 @@ public class ValidIoVariable extends IoVariable {
     return type;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ValidIoVariable that = (ValidIoVariable) o;
+
+    if (getCategory() != that.getCategory()) return false;
+    if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null)
+      return false;
+    return getType() != null ? getType().equals(that.getType()) : that.getType() == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getCategory() != null ? getCategory().hashCode() : 0;
+    result = 31 * result + (getName() != null ? getName().hashCode() : 0);
+    result = 31 * result + (getType() != null ? getType().hashCode() : 0);
+    return result;
+  }
 }

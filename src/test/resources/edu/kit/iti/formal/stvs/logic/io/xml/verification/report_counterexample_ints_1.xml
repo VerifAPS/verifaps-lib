@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:message xmlns:ns2="http://formal.iti.kit.edu/exteta-1.0/report/" returncode="counterexample">
+<ns2:message xmlns:ns2="http://formal.iti.kit.edu/exteta-1.0/report/" returncode="not-verified">
   <log>
     <entry time="69" level="debug">read xml file constantprogram.xml</entry>
     <entry time="201" level="debug">xml file successfully read</entry>

@@ -30,6 +30,8 @@ public class VerificationScenario {
     this.code = new SimpleObjectProperty<>(code);
 <<<<<<< HEAD
     verificationResult = new NullableProperty<>();
+    verificationEngine = new GeTeTaVerificationEngine(this.code.get().getParsedCode()
+        .getDefinedTypes());
     verificationEngine.verificationResultProperty().addListener(new
         VerificationChangedListener());
     verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
