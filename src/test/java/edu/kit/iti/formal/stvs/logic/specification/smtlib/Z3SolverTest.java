@@ -1,7 +1,8 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
-import edu.kit.iti.formal.stvs.util.AsyncTask;
-import edu.kit.iti.formal.stvs.util.ProcessOutputAsyncTask;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
+import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -9,8 +10,8 @@ import javafx.scene.control.TextArea;
 import org.junit.Test;
 
 import java.io.IOException;
-
-import static org.junit.Assert.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by leonk on 09.02.2017.
@@ -20,24 +21,24 @@ public class Z3SolverTest {
   private static String TESTSTRING = "; This example illustrates basic arithmetic and \n" +
       "; uninterpreted functions\n" +
       "\n" +
-      "(declare-fun x () Int)\n" +
-      "(declare-fun y () Int)\n" +
-      "(declare-fun z () Int)\n" +
-      "(assert (>= (* 2 x) (+ y z)))\n" +
-      "(declare-fun f (Int) Int)\n" +
-      "(declare-fun g (Int Int) Int)\n" +
-      "(assert (< (f x) (g x x)))\n" +
-      "(assert (> (f y) (g x x)))\n" +
+      "(declare-fun A_0_0 () Int)\n" +
+      "(declare-fun B_0_0 () Int)\n" +
+      "(declare-fun A_1_0 () Int)\n" +
+
       "(check-sat)\n" +
       "(get-model)\n" +
-      "(push)\n" +
-      "(assert (= x y))\n" +
-      "(check-sat)\n" +
-      "(pop)\n" +
       "(exit)";
 
+  private static String TEST2 = "(declare-const A_0_0 Int)\n" +
+      "(declare-const B_0_0 Bool)\n" +
+      "(declare-const n_0 Int)\n" +
+      "(assert (= A_0_0 10))\n" +
+      "(assert (= n_0 1))\n" +
+      "(check-sat)\n" +
+      "(get-value (A_0_0 B_0_0 n_0))";
+
   @Test
-  public void testTask(){
+  public void testTask() {
     JavaFxTest.setToBeViewed(this::simpleScene);
     Application.launch(JavaFxTest.class);
   }
@@ -48,6 +49,17 @@ public class Z3SolverTest {
       Z3Solver.concretize(TESTSTRING,
           optionalOutput -> root.appendText(optionalOutput.orElse("Something went wrong!"))
       );
+      Z3Solver.concretizeSExpr(TESTSTRING,
+          optionalOutput -> {
+            //System.out.println(optionalOutput.get());
+          }
+      );
+      Map<String, Type> typeContext = new HashMap<>();
+      typeContext.put("A", TypeInt.INT);
+      typeContext.put("B", TypeBool.BOOL);
+      Z3Solver.concretizeVarAssignment(TEST2, typeContext, result -> {
+        System.out.println(result);
+      });
     } catch (IOException e) {
       e.printStackTrace();
     }
