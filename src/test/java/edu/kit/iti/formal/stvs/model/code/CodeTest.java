@@ -8,6 +8,7 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import org.antlr.v4.runtime.Token;
 import org.apache.commons.io.IOUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -51,6 +52,15 @@ public class CodeTest {
     List<? extends Token> tokens = code.getTokens();
     System.out.println(tokens);
     assertTrue(tokens.size() > 0);
+  }
+
+  @Test
+  @Ignore
+  public void testUnicodeChars() {
+    code.updateSourcecode("öüäß");
+    List<? extends Token> tokens = code.getTokens();
+    System.out.println(tokens);
+    assertTrue(!tokens.isEmpty());
   }
 
   @Test

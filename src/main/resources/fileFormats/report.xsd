@@ -59,6 +59,7 @@
         <attribute name="value" type="string"></attribute>
     </complexType>
 
+<<<<<<< HEAD
     <complexType name="counterexample">
         <sequence minOccurs="0" maxOccurs="unbounded">
             <element name="step">
@@ -74,4 +75,26 @@
             </element>
         </sequence>
     </complexType>
+=======
+    <element name="counterexample">
+        <complexType>
+            <sequence minOccurs="0" maxOccurs="unbounded">
+                <element name="step">
+                    <complexType>
+                        <sequence>
+                            <sequence>
+                                <choice>
+                                    <element name="input" type="tns:assignment" minOccurs="0" maxOccurs="unbounded"/>
+                                    <element name="state" type="tns:assignment" minOccurs="0" maxOccurs="unbounded"/>
+                                </choice>
+                            </sequence>
+                        </sequence>
+                        <attribute name="counter" type="int"></attribute>
+                        <attribute name="row" type="int"></attribute>
+                    </complexType>
+                </element>
+            </sequence>
+        </complexType>
+    </element>
+>>>>>>> ad48c3473ce485b294948af61e39552b8a4fea8f
 </schema>

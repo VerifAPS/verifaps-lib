@@ -3,7 +3,11 @@ package edu.kit.iti.formal.stvs.logic.verification;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
+<<<<<<< HEAD
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
+=======
+import edu.kit.iti.formal.stvs.model.common.OptionalProperty;
+>>>>>>> ad48c3473ce485b294948af61e39552b8a4fea8f
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
@@ -29,7 +33,11 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
 
   public GeTeTaVerificationEngine(List<Type> typeContext) {
     importer = new GeTeTaImporter(typeContext);
+<<<<<<< HEAD
     verificationResult = new NullableProperty<>();
+=======
+    verificationResult = new OptionalProperty<>(new SimpleObjectProperty<>());
+>>>>>>> ad48c3473ce485b294948af61e39552b8a4fea8f
     getetaProcess = null;
   }
 
