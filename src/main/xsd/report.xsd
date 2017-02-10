@@ -25,7 +25,7 @@
                     </complexType>
                 </element>
 
-                <element name="counterexample">
+                <element name="counterexample" minOccurs="0">
                     <complexType>
                         <all>
                             <element minOccurs="1" maxOccurs="1" name="trace" type="tns:counterexample"/>
@@ -44,9 +44,9 @@
             <attribute name="returncode">
                 <simpleType>
                     <restriction base="string">
-                        <enumeration value="error"></enumeration>
+                    <!--    <enumeration value="error"></enumeration>
                         <enumeration value="counterexample"></enumeration>
-                        <enumeration value="verified"></enumeration>
+                        <enumeration value="verified"></enumeration> -->
                     </restriction>
                 </simpleType>
             </attribute>

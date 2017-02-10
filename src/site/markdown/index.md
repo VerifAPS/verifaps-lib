@@ -6,7 +6,7 @@ Generalized Test Tables ensures safety in automation software.
 
 These are jar files include all dependencies:
 
-* 0.4.0: [geteta-0.3.0.jar](downloads/geteta-0.4.0.jar)
+* 0.4.0: [geteta-0.4.0-exe.jar](downloads/geteta-0.4.0-exe.jar)
   * Counter examples in the semantic of traces in the test table
 * 0.3.0: [geteta-0.3.0.jar](downloads/geteta-0.3.0.jar)
   * enum support tested and fixed
