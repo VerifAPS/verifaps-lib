@@ -70,7 +70,7 @@ public class SmtPreprocessor {
           //n_z >= i => ExpressionVisitor(z,i,...)
           this.sConstrain = new RecSConstraint(
               new SList("implies",
-                new SList(">=", "n_" + z, i + ""),
+                new SList(">", "n_" + z, i + ""),
                 expressionConstraint
               ),
               visitor.getConstraint().getGlobalConstraints(),
@@ -88,11 +88,11 @@ public class SmtPreprocessor {
       for (int z = 0; z < column.getCells().size(); z++ ) {
         Expression expression = column.getCells().get(z);
 
-        for (int i = 1; i < getMaxDurationSum(z); i++) {
-          for (int k = 0; k < getMaxDuration(z - 1); k++) {
+        for (int i = 1; i <= getMaxDurationSum(z - 1); i++) {
+          for (int k = 0; k <= getMaxDuration(z - 1); k++) {
             // n_(z-1) = k => A_z_i = A_(z-1)_(k-i)
             this.sConstrain.addGlobalConstrains(
-                new SList("implies",
+                new SList("impliesRule3",
                     new SList("=",
                         "n_" + (z - 1),
                         k + ""
