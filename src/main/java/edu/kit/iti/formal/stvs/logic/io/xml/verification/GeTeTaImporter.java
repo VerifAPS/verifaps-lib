@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 public class GeTeTaImporter extends XmlImporter<VerificationResult> {
 
   private final static String RETURN_CODE_SUCCESS = "verified";
-  private final static String RETURN_CODE_NOT_VERIFIED = "counterexample";
+  private final static String RETURN_CODE_NOT_VERIFIED = "not-verified";
   private final static String IDENTIFIER_RE = "[$a-zA-Z0-9_]+";
   private final static Pattern VARIABLES_FOUND_PATTERN = Pattern.compile("[0-9]+ variables " +
       "found");
@@ -139,7 +139,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       if (rowNum > -1) {
         if (lastRowNum != rowNum) {
           // Started new row --> make and add new duration
-          concreteDurations.add(new ConcreteDuration(rowNum, currentDurationCount));
+          concreteDurations.add(new ConcreteDuration(rowNum-1, currentDurationCount));
           currentDurationCount = 1;
           lastRowNum = rowNum;
         } else {

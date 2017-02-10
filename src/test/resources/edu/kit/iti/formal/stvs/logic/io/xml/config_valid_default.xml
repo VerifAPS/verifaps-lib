@@ -7,10 +7,17 @@
     </windowSize>
     <verificationTimeout>3600</verificationTimeout>
     <simulationTimeout>60</simulationTimeout>
+    <maxLineRollout>500</maxLineRollout>
   </general>
   <editor>
     <showLineNumbers>true</showLineNumbers>
     <fontFamily>Courier</fontFamily>
     <fontSize>12</fontSize>
   </editor>
+  <dependencies>
+    <javaPath>/home/bal</javaPath>
+    <z3Path>/home/bal</z3Path>
+    <getetaPath>/home/bal</getetaPath>
+    <nuxmvPath>/home/bal</nuxmvPath>
+  </dependencies>
 </config>

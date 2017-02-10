@@ -28,6 +28,7 @@ public class VerificationScenario {
 
   public VerificationScenario(Code code) {
     this.code = new SimpleObjectProperty<>(code);
+    verificationEngine = new GeTeTaVerificationEngine(code.getParsedCode().getDefinedTypes());
     verificationResult = new NullableProperty<>();
     verificationEngine.verificationResultProperty().addListener(new
         VerificationChangedListener());

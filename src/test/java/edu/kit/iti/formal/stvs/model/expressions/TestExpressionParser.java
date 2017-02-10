@@ -157,4 +157,19 @@ public class TestExpressionParser {
     //assertParseExpressionEqual("red", equal(var(cellName), literalEnum("red", colorsEnum)));
   }
 
+  @Test(expected = ParseException.class)
+  public void testLongIntegerLiteral0() throws UnsupportedExpressionException, ParseException {
+    parser.parseExpression("1324574839294857");
+  }
+
+  @Test(expected = ParseException.class)
+  public void testLongIntegerLiteral1() throws UnsupportedExpressionException, ParseException {
+    parser.parseExpression("" + (Short.MAX_VALUE + 1));
+  }
+
+  @Test(expected = ParseException.class)
+  public void testLongIntegerLiteral2() throws UnsupportedExpressionException, ParseException {
+    parser.parseExpression("" + (Short.MIN_VALUE - 1));
+  }
+
 }
