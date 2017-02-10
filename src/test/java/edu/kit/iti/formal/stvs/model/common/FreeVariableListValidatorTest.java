@@ -71,7 +71,7 @@ public class FreeVariableListValidatorTest {
 
     FreeVariableListValidator validator = new FreeVariableListValidator(
         typeContext,
-        FXCollections.observableList(variables));
+        new FreeVariableList(variables));
 
     checkProblems(validator);
   }

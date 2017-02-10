@@ -24,13 +24,12 @@ public class SpecificationRow<C> implements Commentable, Observable {
     return param -> new Observable[] { param };
   }
 
-  private final Map<String, C> backingMap;
   private final ObservableMap<String, C> cells;
   private final StringProperty comment;
 
   private final List<InvalidationListener> listeners;
   private final Callback<C, Observable[]> extractor;
-  private final InvalidationListener rowListener;
+  private final InvalidationListener listenRowInvalidation;
 
   public static <E> SpecificationRow<E> createUnobservableRow(Map<String, E> cells) {
     return new SpecificationRow<>(cells, p -> new Observable[0]);
@@ -42,16 +41,16 @@ public class SpecificationRow<C> implements Commentable, Observable {
   }*/
 
   public SpecificationRow(Map<String, C> cells, Callback<C, Observable[]> extractor) {
-    this.backingMap = cells;
     this.cells = FXCollections.observableMap(cells);
     this.cells.addListener(this::cellsMapChanged);
     this.listeners = new ArrayList<>();
+    this.comment = new SimpleStringProperty("");
     this.extractor = extractor;
-    rowListener = observable ->
+    listenRowInvalidation = observable ->
         listeners.forEach(listener -> listener.invalidated(observable));
-    this.cells.addListener(rowListener);
+    this.cells.addListener(listenRowInvalidation);
+    comment.addListener(listenRowInvalidation);
     cells.values().forEach(this::subscribeToCell);
-    comment = new SimpleStringProperty("");
   }
 
   private void cellsMapChanged(MapChangeListener.Change<? extends String, ? extends C> change) {
@@ -65,26 +64,18 @@ public class SpecificationRow<C> implements Commentable, Observable {
 
   private void subscribeToCell(C c) {
     for (Observable observable : extractor.call(c)) {
-      observable.addListener(rowListener);
+      observable.addListener(listenRowInvalidation);
     }
   }
 
   private void unsubscribeFromCell(C cell) {
     for (Observable observable : extractor.call(cell)) {
-      observable.removeListener(rowListener);
+      observable.removeListener(listenRowInvalidation);
     }
   }
 
   public ObservableMap<String,C> getCells() {
     return cells;
-  }
-
-  protected void putWithoutListenersNotice(String columnId, C cell) {
-    backingMap.put(columnId, cell);
-  }
-
-  protected void invokeListeners() {
-    rowListener.invalidated(cells);
   }
 
   @Override

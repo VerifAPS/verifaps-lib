@@ -16,14 +16,20 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
   public static SpecificationRow<ConstraintCell> createRow(
       Map<String, ConstraintCell> wildcardCells) {
     return new SpecificationRow<>(wildcardCells,
-        cell -> new Observable[] { cell.stringRepresentationProperty() });
+        cell -> new Observable[] {
+            cell.stringRepresentationProperty(),
+            cell.commentProperty()
+        });
   }
 
   private final StringProperty comment;
   private final FreeVariableList freeVariableList;
 
   public ConstraintSpecification(FreeVariableList freeVariableList) {
-    super(durationCell -> new Observable[] { durationCell.stringRepresentationProperty() });
+    super(durationCell -> new Observable[] {
+        durationCell.stringRepresentationProperty(),
+        durationCell.commentProperty()
+    });
     this.freeVariableList = freeVariableList;
 
     this.comment = new SimpleStringProperty("");

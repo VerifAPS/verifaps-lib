@@ -40,8 +40,8 @@ public class VariableCollectionTest {
         new TypeEnum("COLORS", Arrays.asList("red", "green", "blue"))
     );
     List<FreeVariable> vars = Arrays.asList(
-        new FreeVariable("blah", TypeInt.INT),
-        new FreeVariable("xyz", TypeBool.BOOL)
+        new FreeVariable("blah", "INT"),
+        new FreeVariable("xyz", "BOOL")
     );
     FreeVariableList set = new FreeVariableList(vars);
 

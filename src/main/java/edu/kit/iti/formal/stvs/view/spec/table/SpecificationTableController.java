@@ -10,6 +10,7 @@ import edu.kit.iti.formal.stvs.model.table.problems.DurationProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblemRecognizer;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -82,6 +83,8 @@ public class SpecificationTableController implements Controller {
     }
 
     data.addListener(this::onDataRowChanged);
+
+    hybridSpecification.getRows().addListener((Observable o) -> System.out.println("SPEC CHANGE"));
   }
 
   private TableCell<SynchronizedRow, String> cellFactory(TableColumn<SynchronizedRow, String> table) {

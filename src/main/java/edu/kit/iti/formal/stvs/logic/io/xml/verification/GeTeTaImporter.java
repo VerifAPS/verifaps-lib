@@ -124,7 +124,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       // Now I can make and add the row!
       if (step.getState().size() > 0) {
         if (rowNum > -1 && rowNum <= concreteRows.size()) {
-          SpecificationRow<ConcreteCell> row = new SpecificationRow<>(new HashMap<>());
+          SpecificationRow<ConcreteCell> row = SpecificationRow.createUnobservableRow(new HashMap<>());
           if (rowNum < concreteRows.size()) {
             row = concreteRows.get(rowNum);
           }

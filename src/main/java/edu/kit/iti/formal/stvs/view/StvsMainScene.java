@@ -28,7 +28,7 @@ public class StvsMainScene {
     this.menuBarController = new StvsMenuBarController(rootModelProperty);
     rootModelProperty.addListener(this::rootModelChanged);
 
-    this.scene = new Scene(createVBox());
+    this.scene = new Scene(createVBox(), 800, 600);
   }
 
   private VBox createVBox() {

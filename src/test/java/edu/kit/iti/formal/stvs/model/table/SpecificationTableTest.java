@@ -19,12 +19,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class SpecificationTableTest {
 
-  private SpecificationTable<String, String> table;
+  private SpecificationTable<SpecIoVariable, String, String> table;
 
   @Before
   public void setUp() {
-    JsonElement elem = TableUtil.jsonFromResource("test_table.json", SpecificationTableTest.class);
-    table = TableUtil.specificationTableFromJson(elem);
+    JsonElement elem = JsonTableParser.jsonFromResource("test_table.json", SpecificationTableTest.class);
+    table = JsonTableParser.specificationTableFromJson(elem);
   }
 
   @Test
@@ -60,7 +60,7 @@ public class SpecificationTableTest {
   public void testAddColumn() {
     int widthBefore = table.getColumnHeaders().size();
 
-    SpecIoVariable ioVar = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableE");
+    SpecIoVariable ioVar = new SpecIoVariable(VariableCategory.INPUT, "INT", "VariableE");
 
     SpecificationColumn<String> newColumn =
         new SpecificationColumn<>(Arrays.asList("E0", "E1", "E2", "E3"));
@@ -75,7 +75,7 @@ public class SpecificationTableTest {
   @Test(expected = IllegalArgumentException.class)
   public void testAddExistingColumn() throws Throwable {
     TestUtils.rethrowThreadUncheckedExceptions(() -> {
-      SpecIoVariable ioVar = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableA");
+      SpecIoVariable ioVar = new SpecIoVariable(VariableCategory.INPUT, "INT", "VariableA");
 
       SpecificationColumn<String> newColumn =
           new SpecificationColumn<>(Arrays.asList("E0", "E1", "E2", "E3"));
@@ -87,7 +87,7 @@ public class SpecificationTableTest {
   @Test(expected = IllegalArgumentException.class)
   public void testAddColumnInvalidSize() throws Throwable {
     TestUtils.rethrowThreadUncheckedExceptions(() -> {
-      SpecIoVariable ioVar = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableA");
+      SpecIoVariable ioVar = new SpecIoVariable(VariableCategory.INPUT, "INT", "VariableA");
 
       SpecificationColumn<String> newColumn =
           new SpecificationColumn<>(Arrays.asList("E0", "E1", "E2", "E3", "E4"));

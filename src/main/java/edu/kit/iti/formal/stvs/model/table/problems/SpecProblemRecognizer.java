@@ -64,6 +64,7 @@ public class SpecProblemRecognizer {
   }
 
   private void recalculateSpecProblems() {
+    System.out.println("Spec changed, recalcing stuff");
     ValidSpecification validSpec = new ValidSpecification();
 
     List<SpecProblem> specProblems = new ArrayList<>();
@@ -114,8 +115,11 @@ public class SpecProblemRecognizer {
         }
       }
 
-      if (specificationIsValid) {
+      // Fixes a dumb bug with listeners getting invoked midst column adding
+      if (specificationIsValid && expressionsForRow.size() == validSpec.getColumnHeaders().size()) {
         validSpec.getRows().add(SpecificationRow.createUnobservableRow(expressionsForRow));
+      } else {
+        specificationIsValid = false;
       }
     }
 

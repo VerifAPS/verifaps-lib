@@ -28,7 +28,10 @@ public class SynchronizedRow extends SpecificationRow<HybridCellModel<Constraint
   public SynchronizedRow(SpecificationRow<ConstraintCell> sourceRow, ConstraintDuration duration) {
     super(
         createCellsFromRow(sourceRow),
-        hybridCell -> new Observable[] { hybridCell.stringRepresentationProperty() });
+        hybridCell -> new Observable[] {
+            hybridCell.stringRepresentationProperty(),
+            hybridCell.commentProperty()
+        });
     this.sourceRow = sourceRow;
     this.durationCell = new HybridCellModel<>("Duration", duration);
     sourceRow.getCells().addListener(this::onSourceCellsChange);

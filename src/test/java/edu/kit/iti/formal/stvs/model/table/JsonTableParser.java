@@ -7,21 +7,20 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import edu.kit.iti.formal.stvs.model.table.problems.InvalidIoVarProblem;
+import edu.kit.iti.formal.stvs.util.MapUtil;
 import javafx.beans.Observable;
-import javafx.beans.property.ObjectProperty;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * Created by Philipp on 04.02.2017.
  */
-public class TableUtil {
+public class JsonTableParser {
 
   public static final Gson GSON = new Gson();
 
@@ -31,6 +30,16 @@ public class TableUtil {
 
   public static class JsonFreeVarSet {
     public List<JsonFreeVar> freevariables;
+  }
+
+  public static class JsonCodeIoVar {
+    public String name;
+    public String type;
+    public String kind;
+  }
+
+  public static class JsonCodeIoVars {
+    public List<JsonCodeIoVar> codeiovars;
   }
 
   public static class JsonFreeVar {
@@ -75,14 +84,66 @@ public class TableUtil {
         .collect(Collectors.toList());
   }
 
-  public static ConstraintSpecification constraintTableFromJson(
-      ObjectProperty<List<Type>> typeContext,
-      ObjectProperty<List<CodeIoVariable>> codeIoVars,
-      JsonElement element) {
-    FreeVariableList freeVarSet = freeVariableSetFromJson(element);
-    SpecificationTable<String, String> parsedTable = specificationTableFromJson(element);
+  public static List<CodeIoVariable> codeIoVariablesFromJson(JsonElement elem) {
+    JsonCodeIoVars ioVars = GSON.fromJson(elem, JsonCodeIoVars.class);
+    return ioVars.codeiovars.stream()
+        .map(ioVar -> new CodeIoVariable(VariableCategory.valueOf(ioVar.kind), ioVar.name, ioVar.type))
+        .collect(Collectors.toList());
+  }
 
-    ConstraintSpecification spec = new ConstraintSpecification(typeContext, codeIoVars, freeVarSet);
+  public static ConcreteSpecification concreteTableFromJson(List<Type> types, boolean isCounterExample, JsonElement element) {
+    SpecificationTable<SpecIoVariable, String, String> parsedTable = specificationTableFromJson(element);
+
+    ConcreteSpecification concreteSpec = new ConcreteSpecification(isCounterExample);
+
+    List<Type> typeContext = new ArrayList<>();
+    typeContext.add(TypeInt.INT);
+    typeContext.add(TypeBool.BOOL);
+    typeContext.addAll(types);
+    Map<String, Type> typesByName = typeContext.stream()
+        .collect(Collectors.toMap(Type::getTypeName, Function.identity()));
+
+    for (SpecIoVariable specIoVariable : parsedTable.getColumnHeaders()) {
+      try {
+        ValidIoVariable validIoVariable = InvalidIoVarProblem.tryGetValidIoVariable(
+            specIoVariable,
+            Collections.emptyList(),
+            typesByName,
+            problem -> {} // ignore insignificant problems
+        );
+        concreteSpec.getColumnHeaders().add(validIoVariable);
+      } catch (InvalidIoVarProblem problem) {
+        throw new RuntimeException(problem);
+      }
+    }
+
+    for (int rowIndex = 0; rowIndex < parsedTable.getRows().size(); rowIndex++) {
+      SpecificationRow<String> row = parsedTable.getRows().get(rowIndex);
+      Map<String, ConcreteCell> cells = MapUtil.mapValuesWithKey(row.getCells(),
+          (columnId, cellString) -> new ConcreteCell(
+              concreteSpec.getColumnHeaderByName(columnId).getValidType().parseLiteral(cellString.trim())
+          .orElseThrow(() -> new RuntimeException("Couldnt parse: "
+              + cellString + " of type "
+              + concreteSpec.getColumnHeaderByName(columnId).getValidType().getTypeName()
+              + " in column " + columnId))));
+      concreteSpec.getRows().add(SpecificationRow.createUnobservableRow(cells));
+    }
+
+    int beginCycle = 0;
+    for (String durString : parsedTable.getDurations()) {
+      int duration = Integer.parseInt(durString);
+      concreteSpec.getDurations().add(new ConcreteDuration(beginCycle, duration));
+      beginCycle += duration;
+    }
+
+    return concreteSpec;
+  }
+
+  public static ConstraintSpecification constraintTableFromJson(JsonElement element) {
+    FreeVariableList freeVarSet = freeVariableSetFromJson(element);
+    SpecificationTable<SpecIoVariable, String, String> parsedTable = specificationTableFromJson(element);
+
+    ConstraintSpecification spec = new ConstraintSpecification(freeVarSet);
 
     spec.getColumnHeaders().addAll(parsedTable.getColumnHeaders());
 
@@ -104,25 +165,25 @@ public class TableUtil {
   }
 
   public static FreeVariableList freeVariableSetFromJson(JsonElement element) {
-    FreeVariableList freeVariableList = new FreeVariableList(variables);
+    FreeVariableList freeVariableList = new FreeVariableList(new ArrayList<>());
     GSON.fromJson(element, JsonFreeVarSet.class).freevariables.stream()
-      .map(TableUtil::toFreeVariable)
+      .map(JsonTableParser::toFreeVariable)
     .forEach(freeVar -> freeVariableList.getVariables().add(freeVar));
 
     return freeVariableList;
   }
 
   private static FreeVariable toFreeVariable(JsonFreeVar jsonFreeVar) {
-    return new FreeVariable(jsonFreeVar.name, typeFromString(jsonFreeVar.type));
+    return new FreeVariable(jsonFreeVar.name, jsonFreeVar.type);
   }
 
-  public static SpecificationTable<String, String> specificationTableFromJson(JsonElement element) {
+  public static SpecificationTable<SpecIoVariable, String, String> specificationTableFromJson(JsonElement element) {
     return specificationTableFromJsonTable(GSON.fromJson(element, JsonTable.class));
   }
 
-  private static SpecificationTable<String, String> specificationTableFromJsonTable(JsonTable table) {
-    SpecificationTable<String, String> spec = new SpecificationTable<>(p -> new Observable[0]);
-    table.variables.stream().map(TableUtil::toSpecIoVariable).forEach(r ->
+  private static SpecificationTable<SpecIoVariable, String, String> specificationTableFromJsonTable(JsonTable table) {
+    SpecificationTable<SpecIoVariable, String, String> spec = new SpecificationTable<>(p -> new Observable[0]);
+    table.variables.stream().map(JsonTableParser::toSpecIoVariable).forEach(r ->
         spec.getColumnHeaders().add(r));
 
     table.rows.forEach(row ->
@@ -142,7 +203,7 @@ public class TableUtil {
   }
 
   private static SpecIoVariable toSpecIoVariable(JsonIoVariable iovar) {
-    return new SpecIoVariable(iovar.iotype, typeFromString(iovar.type), iovar.name);
+    return new SpecIoVariable(iovar.iotype, iovar.type, iovar.name);
   }
 
   private static Type typeFromString(String input) {

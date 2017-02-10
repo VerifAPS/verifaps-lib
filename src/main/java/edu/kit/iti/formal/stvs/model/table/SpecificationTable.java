@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.model.common.Named;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -9,9 +10,11 @@ import javafx.util.Callback;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -25,13 +28,15 @@ public class SpecificationTable<H extends Named, C, D> {
   protected ObservableList<D> durations;
 
   public SpecificationTable(Callback<D, Observable[]> durationExtractor) {
-    this.rows = FXCollections.observableArrayList(specificationRow -> new Observable[] { specificationRow });
+    this.rows = FXCollections.observableArrayList(
+        specificationRow -> new Observable[] { specificationRow });
     this.durations = FXCollections.observableArrayList(durationExtractor);
     this.columnHeaders = FXCollections.observableArrayList();
 
     this.rows.addListener(this::onRowChange);
     this.columnHeaders.addListener(this::onColumnHeadersChanged);
     this.durations.addListener(this::onDurationChange);
+
   }
 
   public ObservableList<SpecificationRow<C>> getRows() {
@@ -77,12 +82,8 @@ public class SpecificationTable<H extends Named, C, D> {
           "Cannot add column with incorrect height " + colHeight + ", expected: " + rows.size());
     }
     for (int row = 0; row < rows.size(); row++) {
-      // This fixes a bug, where there is an inconsistent state in the listener for changes in rows,
-      // since it is possible, that listeners on rows are invoked even though this loop is not done.
-      // One might want to have something like adding a cell to each row 'simultaneously'
-      rows.get(row).putWithoutListenersNotice(columnHeader.getName(), column.getCells().get(row));
+      rows.get(row).getCells().put(columnHeader.getName(), column.getCells().get(row));
     }
-    rows.get(0).invokeListeners();
     onColumnAdded(column);
   }
 

@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
@@ -26,8 +27,8 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   private final String GETETA_VERSION = "0.2.2-beta";
   private final String GETETA_COMMAND_BASE = "java -jar geteta-" + GETETA_VERSION + ".jar";
 
-  public GeTeTaVerificationEngine() {
-    importer = new GeTeTaImporter();
+  public GeTeTaVerificationEngine(List<Type> typeContext) {
+    importer = new GeTeTaImporter(typeContext);
     verificationResult = new NullableProperty<>();
     getetaProcess = null;
   }
