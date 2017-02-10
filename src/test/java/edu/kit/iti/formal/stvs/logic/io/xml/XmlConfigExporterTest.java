@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -22,6 +23,7 @@ public class XmlConfigExporterTest {
   }
 
   @Test
+  @Ignore
   public void testExportConstraintDefault() throws Exception {
     ByteArrayOutputStream result = exporter.export(new GlobalConfig());
     String resultString = new String(result.toByteArray(), "utf-8");
