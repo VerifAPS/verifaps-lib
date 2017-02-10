@@ -45,7 +45,7 @@
                 <simpleType>
                     <restriction base="string">
                         <enumeration value="error"></enumeration>
-                        <enumeration value="counterexample"></enumeration>
+                        <enumeration value="not-verified"></enumeration>
                         <enumeration value="verified"></enumeration>
                     </restriction>
                 </simpleType>
