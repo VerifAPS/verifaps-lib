@@ -51,8 +51,8 @@ public class SmtPreprocessorTest {
     Map<Integer, Integer> maxDurations = new HashMap<Integer,
         Integer>() {{
       put(0, 2);
-      put(1, 5);
-      put(2, 5);
+      put(1, 2);
+      put(2, 4);
     }};
     SmtPreprocessor preprocessor = new SmtPreprocessor(maxDurations, spec);
     System.out.println(preprocessor.getConstrain());

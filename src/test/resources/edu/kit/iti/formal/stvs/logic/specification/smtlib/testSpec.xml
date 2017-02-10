@@ -19,7 +19,7 @@
         <row comment="">
             <duration>4</duration>
             <cell>  c</cell>
-            <cell>FALSE</cell>
+            <cell>Active[-4]</cell>
         </row>
     </rows>
     <enumTypes/>

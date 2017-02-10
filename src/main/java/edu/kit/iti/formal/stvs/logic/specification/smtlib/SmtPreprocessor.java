@@ -24,7 +24,7 @@ public class SmtPreprocessor {
   private final Map<Integer, Integer> maxDurations;
   private final List<SpecIoVariable> ioVariables;
   private final ValidSpecification specification;
-  private final Predicate<Type> isIoVariable;
+  private final Predicate<String> isIoVariable;
   private final Map<String, Type> freeVariablesContext;
 
   private SConstraint sConstrain;
@@ -35,11 +35,27 @@ public class SmtPreprocessor {
     this.specification = specification;
     this.ioVariables = specification.getSpecIoVariables();
     this.freeVariablesContext = specification.getFreeVariableSet().getVariableContext();
-    this.isIoVariable = ioVariables::contains;
+    List<String> ioVariableTypes = ioVariables.stream().map(SpecIoVariable::getName).collect
+        (Collectors
+        .toList());
+    System.out.println(ioVariableTypes);
+    this.isIoVariable = ioVariableTypes::contains;
     this.sConstrain = new SConstraint()
         .addHeaderDefinitions(createEnumTypes())
         .addHeaderDefinitions(createFreeVariables());
 
+    System.out.println("Doing Step V");
+    //Step V: upper und lower Bound von Durations festlegen
+    for (int z = 0; z < specification.getDurations().size(); z++ ) {
+      LowerBoundedInterval interval = specification.getDurations().get(z);
+      this.sConstrain.addGlobalConstrains(new SList(">=", "n_" + z, interval.getLowerBound() +
+          ""));
+      if(interval.getUpperBound().isPresent()) {
+        this.sConstrain.addGlobalConstrains(new SList("<=", "n_" + z, interval.getLowerBound() + ""));
+      }
+    }
+
+    System.out.println("doing recursive step");
     //Step I, II, IV
     for (SpecIoVariable ioVariable : this.ioVariables) {
       SpecificationColumn<Expression> column = this.specification.getColumnByName(ioVariable.getName());
@@ -64,6 +80,7 @@ public class SmtPreprocessor {
       }
     }
 
+    System.out.println("Doing step III");
     //Step III neg. Indizes verbinden
     for (SpecIoVariable ioVariable : this.ioVariables) {
       SpecificationColumn<Expression> column = this.specification.getColumnByName(ioVariable.getName());
@@ -71,7 +88,7 @@ public class SmtPreprocessor {
       for (int z = 0; z < column.getCells().size(); z++ ) {
         Expression expression = column.getCells().get(z);
 
-        for (int i = 1; i < getMaxDurationSum(z - 1); i++) {
+        for (int i = 1; i < getMaxDurationSum(z); i++) {
           for (int k = 0; k < getMaxDuration(z - 1); k++) {
             // n_(z-1) = k => A_z_i = A_(z-1)_(k-i)
             this.sConstrain.addGlobalConstrains(
@@ -90,17 +107,6 @@ public class SmtPreprocessor {
         }
       }
     }
-
-    //Step V: upper und lower Bound von Durations festlegen
-    for (int z = 0; z < specification.getDurations().size(); z++ ) {
-      LowerBoundedInterval interval = specification.getDurations().get(z);
-      this.sConstrain.addGlobalConstrains(new SList(">=", "n_" + z, interval.getLowerBound() +
-          ""));
-      if(interval.getUpperBound().isPresent()) {
-        this.sConstrain.addGlobalConstrains(new SList("<=", "n_" + z, interval.getLowerBound() + ""));
-      }
-    }
-
   }
 
   private Type getTypeForVariable(String variableName) {
@@ -113,7 +119,7 @@ public class SmtPreprocessor {
 
   private List<SExpr> createFreeVariables() {
     return freeVariablesContext.entrySet().stream()
-        .filter(item -> !isIoVariable.test(item.getValue()))
+        .filter(item -> !isIoVariable.test(item.getKey()))
         .map(item -> {
       String typeName = item.getValue().getTypeName();
       String variableName = item.getKey();
@@ -136,7 +142,7 @@ public class SmtPreprocessor {
         List<String> arguments = valueEnums.get().stream().map(ValueEnum::getValueString).collect
             (Collectors.toList());
       /*
-      (declare-datatypes () ((Color red green blue)))
+      (declare-datatypes () ((Color red green blue) ...))
        */
         definitions.add(new SList(typeName).addListElements(arguments));
       }
