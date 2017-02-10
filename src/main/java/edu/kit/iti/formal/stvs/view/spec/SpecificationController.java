@@ -11,7 +11,12 @@ import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 
 import java.io.File;
@@ -28,7 +33,7 @@ public class SpecificationController implements Controller {
   private SpecificationTableController tableController;
   private TimingDiagramCollectionController timingDiagramCollectionController;
   private Selection selection;
-  private  HybridSpecification hybridSpecification;
+  private HybridSpecification hybridSpecification;
 
   public SpecificationController(
       ObjectProperty<List<Type>> typeContext,
@@ -38,6 +43,7 @@ public class SpecificationController implements Controller {
     this.spec = hybridSpecification;
     this.hybridSpecification = hybridSpecification;
     this.stateProperty = stateProperty;
+    this.stateProperty.addListener(new VerificationStateChangeListener());
     this.view = new SpecificationView();
     this.selection = new Selection();
     this.variableCollectionController = new VariableCollectionController(
@@ -56,6 +62,7 @@ public class SpecificationController implements Controller {
     }
     view.setVariableCollection(variableCollectionController.getView());
     view.setTable(tableController.getView());
+    view.getStartButton().setOnAction(new VerificationButtonClickedListener());
   }
 
   private ConcreteSpecification getConcreteSpecification() {
@@ -67,4 +74,30 @@ public class SpecificationController implements Controller {
     return view;
   }
 
+  private class VerificationStateChangeListener implements javafx.beans.value.ChangeListener<VerificationState> {
+
+    @Override
+    public void changed(ObservableValue<? extends VerificationState> observableValue,
+                        VerificationState oldState, VerificationState newState) {
+      onVerificationStateChanged(newState);
+    }
+  }
+
+  private void onVerificationStateChanged(VerificationState newState) {
+    switch(newState) {
+      case RUNNING:
+        getView().getStartButton().setDisable(true);
+        break;
+      default:
+        getView().getStartButton().setDisable(false);
+    }
+  }
+
+
+  private class VerificationButtonClickedListener implements EventHandler<ActionEvent> {
+    @Override
+    public void handle(ActionEvent actionEvent) {
+      view.onVerificationButtonClicked(hybridSpecification);
+    }
+  }
 }
