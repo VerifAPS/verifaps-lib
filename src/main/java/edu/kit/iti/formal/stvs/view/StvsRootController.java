@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view;
 
+import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.code.ParsedCode;
@@ -9,6 +10,7 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.view.editor.EditorPaneController;
 import edu.kit.iti.formal.stvs.view.spec.SpecificationsPaneController;
+import edu.kit.iti.formal.stvs.view.spec.VerificationStartedEvent;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleSetProperty;
@@ -17,22 +19,20 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
  * Created by csicar on 09.01.17.
  */
 public class StvsRootController implements Controller {
+
   private final StvsRootView view;
   private final StvsRootModel stvsRootModel;
   private final ObjectProperty<List<Type>> types;
   private final ObjectProperty<List<CodeIoVariable>> ioVars;
-  private EditorPaneController editorPaneController;
   private final SpecificationsPaneController specificationsPaneController;
-  /**
-   * Used to sort Types (Enums should be at the bottom)
-   */
-  private final Comparator<Type> typeComparator = null; // TODO this should not be null
+  private EditorPaneController editorPaneController;
 
   public StvsRootController(StvsRootModel rootModel) {
     this.stvsRootModel = rootModel;
@@ -56,6 +56,14 @@ public class StvsRootController implements Controller {
     this.view = new StvsRootView(
         editorPaneController.getView(),
         specificationsPaneController.getView());
+
+    view.addEventHandler(VerificationStartedEvent.EVENT_TYPE,
+        this::onVerificationStartRequested);
+  }
+
+  private void onVerificationStartRequested(VerificationStartedEvent event) {
+    System.out.println("Starting verificatioN!!!");
+    //stvsRootModel.getScenario().verify(event.getConstraintSpec());
   }
 
   private List<CodeIoVariable> ioVarsFromCode(ParsedCode parsedCode) {

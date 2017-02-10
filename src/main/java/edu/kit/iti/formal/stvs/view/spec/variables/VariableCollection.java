@@ -1,11 +1,15 @@
 package edu.kit.iti.formal.stvs.view.spec.variables;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
 /**
  * Created by csicar on 10.01.17.
@@ -15,13 +19,13 @@ public class VariableCollection extends VBox {
   private final Label overviewLabel;
   private final TableView<FreeVariable> freeVariableTableView;
   private final TableColumn<FreeVariable, String> nameTableColumn;
-  private final TableColumn<FreeVariable, Type> typeTableColumn;
-  private final TableColumn<FreeVariable, Value> defaultValueTableColumn;
+  private final TableColumn<FreeVariable, String> typeTableColumn;
+  private final TableColumn<FreeVariable, String> defaultValueTableColumn;
   private final Button addFreeVariable;
 
   public VariableCollection() {
     this.overviewLabel = new Label("Free Variables:");
-    this.addFreeVariable = new Button("Add");
+    this.addFreeVariable = makeAddButton();
     this.freeVariableTableView = new TableView<>();
     this.nameTableColumn = new TableColumn<>("name");
     this.typeTableColumn = new TableColumn<>("type");
@@ -41,6 +45,10 @@ public class VariableCollection extends VBox {
     this.getChildren().addAll(overviewLabel, freeVariableTableView, addFreeVariable);
   }
 
+  private Button makeAddButton() {
+    return GlyphsDude.createIconButton(FontAwesomeIcon.PLUS);
+  }
+
   public Button getAddFreeVariable() {
     return addFreeVariable;
   }
@@ -57,11 +65,11 @@ public class VariableCollection extends VBox {
     return nameTableColumn;
   }
 
-  public TableColumn<FreeVariable, Type> getTypeTableColumn() {
+  public TableColumn<FreeVariable, String> getTypeTableColumn() {
     return typeTableColumn;
   }
 
-  public TableColumn<FreeVariable, Value> getDefaultValueTableColumn() {
+  public TableColumn<FreeVariable, String> getDefaultValueTableColumn() {
     return defaultValueTableColumn;
   }
 }

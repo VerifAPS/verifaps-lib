@@ -12,21 +12,22 @@ import javafx.beans.property.StringProperty;
  * Created by csicar on 11.01.17.
  */
 public class SpecIoVariable extends IoVariable implements Commentable {
+
   private StringProperty name;
-  private ObjectProperty<Type> type;
+  private StringProperty type;
   private ObjectProperty<VariableCategory> category;
   private ColumnConfig columnConfig;
   private StringProperty comment;
 
   /**
    * Creates a variable that appears in the specification.
-   *  @param category The category of the variable
-   * @param type     The type of the variable
-   * @param name     The name of the Variable
+   * @param category       The category of the variable
+   * @param typeIdentifier The identifier of the type of the variable
+   * @param name           The name of the Variable
    */
-  public SpecIoVariable(VariableCategory category, Type type, String name) {
+  public SpecIoVariable(VariableCategory category, String typeIdentifier, String name) {
     this.category = new SimpleObjectProperty<>(category);
-    this.type = new SimpleObjectProperty<>(type);
+    this.type = new SimpleStringProperty(typeIdentifier);
     this.name = new SimpleStringProperty(name);
     this.columnConfig = new ColumnConfig();
     this.comment = new SimpleStringProperty("");
@@ -45,15 +46,15 @@ public class SpecIoVariable extends IoVariable implements Commentable {
   }
 
   @Override
-  public Type getType() {
+  public String getType() {
     return type.get();
   }
 
-  public ObjectProperty<Type> typeProperty() {
+  public StringProperty typeProperty() {
     return type;
   }
 
-  public void setType(Type type) {
+  public void setType(String type) {
     this.type.set(type);
   }
 
@@ -67,7 +68,7 @@ public class SpecIoVariable extends IoVariable implements Commentable {
   }
 
   public String toString() {
-    return "SpecIoVariable(" + category.get() + " " + name.get() + " : " + type.get().getTypeName() + ")";
+    return "SpecIoVariable(" + category.get() + " " + name.get() + " : " + type.get() + ")";
   }
 
   public ColumnConfig getColumnConfig() {

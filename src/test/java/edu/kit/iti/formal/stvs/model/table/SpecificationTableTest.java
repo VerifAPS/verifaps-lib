@@ -19,12 +19,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class SpecificationTableTest {
 
-  private SpecificationTable<String, String> table;
+  private SpecificationTable<SpecIoVariable, String, String> table;
 
   @Before
   public void setUp() {
-    JsonElement elem = TableUtil.jsonFromResource("test_table.json", SpecificationTableTest.class);
-    table = TableUtil.specificationTableFromJson(elem);
+    JsonElement elem = JsonTableParser.jsonFromResource("test_table.json", SpecificationTableTest.class);
+    table = JsonTableParser.specificationTableFromJson(elem);
   }
 
   @Test
@@ -58,24 +58,24 @@ public class SpecificationTableTest {
 
   @Test
   public void testAddColumn() {
-    int widthBefore = table.getSpecIoVariables().size();
+    int widthBefore = table.getColumnHeaders().size();
 
-    SpecIoVariable ioVar = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableE");
+    SpecIoVariable ioVar = new SpecIoVariable(VariableCategory.INPUT, "INT", "VariableE");
 
     SpecificationColumn<String> newColumn =
         new SpecificationColumn<>(Arrays.asList("E0", "E1", "E2", "E3"));
 
     table.addColumn(ioVar, newColumn);
 
-    assertTrue(table.getSpecIoVariables().contains(ioVar));
+    assertTrue(table.getColumnHeaders().contains(ioVar));
     assertEquals(table.getColumnByName("VariableE"), newColumn);
-    assertEquals(table.getSpecIoVariables().size(), widthBefore + 1);
+    assertEquals(table.getColumnHeaders().size(), widthBefore + 1);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testAddExistingColumn() throws Throwable {
     TestUtils.rethrowThreadUncheckedExceptions(() -> {
-      SpecIoVariable ioVar = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableA");
+      SpecIoVariable ioVar = new SpecIoVariable(VariableCategory.INPUT, "INT", "VariableA");
 
       SpecificationColumn<String> newColumn =
           new SpecificationColumn<>(Arrays.asList("E0", "E1", "E2", "E3"));
@@ -87,7 +87,7 @@ public class SpecificationTableTest {
   @Test(expected = IllegalArgumentException.class)
   public void testAddColumnInvalidSize() throws Throwable {
     TestUtils.rethrowThreadUncheckedExceptions(() -> {
-      SpecIoVariable ioVar = new SpecIoVariable(VariableCategory.INPUT, TypeInt.INT, "VariableA");
+      SpecIoVariable ioVar = new SpecIoVariable(VariableCategory.INPUT, "INT", "VariableA");
 
       SpecificationColumn<String> newColumn =
           new SpecificationColumn<>(Arrays.asList("E0", "E1", "E2", "E3", "E4"));
@@ -121,7 +121,7 @@ public class SpecificationTableTest {
     expectedCells.put("VariableB", "B2");
     expectedCells.put("VariableC", "C2");
     expectedCells.put("VariableD", "D2");
-    assertEquals(new SpecificationRow<>(expectedCells), row);
+    assertEquals(SpecificationRow.createUnobservableRow(expectedCells), row);
   }
 
   @Test(expected=IndexOutOfBoundsException.class)
@@ -136,7 +136,7 @@ public class SpecificationTableTest {
     newCells.put("VariableB", "B4");
     newCells.put("VariableC", "C4");
     newCells.put("VariableD", "D4");
-    SpecificationRow<String> newRow = new SpecificationRow<>(newCells);
+    SpecificationRow<String> newRow = SpecificationRow.createUnobservableRow(newCells);
 
     table.getRows().add(newRow);
 
@@ -151,7 +151,7 @@ public class SpecificationTableTest {
       newCells.put("VariableB", "B4");
       newCells.put("VariableC", "C4");
       newCells.put("VariableX", "D4");
-      SpecificationRow<String> newRow = new SpecificationRow<>(newCells);
+      SpecificationRow<String> newRow = SpecificationRow.createUnobservableRow(newCells);
 
       table.getRows().add(newRow);
     });
@@ -166,7 +166,7 @@ public class SpecificationTableTest {
       newCells.put("VariableC", "C4");
       newCells.put("VariableD", "D4");
       newCells.put("VariableE", "E5");
-      SpecificationRow<String> newRow = new SpecificationRow<>(newCells);
+      SpecificationRow<String> newRow = SpecificationRow.createUnobservableRow(newCells);
 
       table.getRows().add(newRow);
     });
@@ -179,7 +179,7 @@ public class SpecificationTableTest {
     expectedCells.put("VariableB", "B2");
     expectedCells.put("VariableC", "C2");
     expectedCells.put("VariableD", "D2");
-    SpecificationRow<String> expectedRow = new SpecificationRow<>(expectedCells);
+    SpecificationRow<String> expectedRow = SpecificationRow.createUnobservableRow(expectedCells);
 
     SpecificationRow<String> removed = table.getRows().remove(2);
     assertEquals(expectedRow, removed);

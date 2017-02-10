@@ -1,14 +1,14 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
-import edu.kit.iti.formal.stvs.model.common.FreeVariable;
-import edu.kit.iti.formal.stvs.model.common.FreeVariableSet;
-import edu.kit.iti.formal.stvs.model.common.IllegalValueTypeException;
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
-import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
 import edu.kit.iti.formal.stvs.model.expressions.*;
-import edu.kit.iti.formal.stvs.model.table.*;
+import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
+import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
+import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -18,20 +18,16 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.*;
 
-import javafx.collections.FXCollections;
-import org.w3c.dom.Node;
-
 /**
  * @author Benjamin Alt
  */
 public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> {
 
   private Unmarshaller unmarshaller;
-  private Set<Type> typeContext;
-  private XmlConstraintSpecImporter constraintSpecImporter;
+  private List<Type> typeContext;
 
-  public XmlConcreteSpecImporter() throws ImportException {
-    constraintSpecImporter = new XmlConstraintSpecImporter();
+  public XmlConcreteSpecImporter(List<Type> typeContext) throws ImportException {
+    this.typeContext = typeContext;
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
       unmarshaller = jaxbContext.createUnmarshaller();
@@ -45,16 +41,33 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
       SpecificationTable importedSpec = ((JAXBElement<SpecificationTable>) unmarshaller
           .unmarshal(source)).getValue();
 
-      List<Type> typeContext = constraintSpecImporter.importTypeContext(importedSpec.getEnumTypes());
-      List<SpecIoVariable> ioVariables = constraintSpecImporter.importIoVariables(importedSpec
-              .getVariables(), typeContext);
-      return importConcreteSpec(typeContext, ioVariables, importedSpec);
+      List<ValidIoVariable> validIoVariables = importIoVariables(importedSpec
+              .getVariables());
+      return importConcreteSpec(validIoVariables, importedSpec);
     } catch (JAXBException  e) {
       throw new ImportException(e);
     }
   }
 
-  private ConcreteSpecification importConcreteSpec(List<Type> typeContext, List<SpecIoVariable>
+  private List<ValidIoVariable> importIoVariables(Variables variables)
+      throws ImportException {
+    List<ValidIoVariable> ioVariables = new ArrayList<>();
+    for (Variables.IoVariable variable : variables.getIoVariable()) {
+      try {
+        VariableCategory category = VariableCategory.valueOf(variable.getIo().toUpperCase());
+        Type type = typeContext.stream()
+            .filter(t -> t.getTypeName().equals(variable.getDataType()))
+            .findFirst()
+            .orElseThrow(() -> new ImportException("Unknown variable type: " + variable.getDataType()));
+        ioVariables.add(new ValidIoVariable(category, variable.getName(), type));
+      } catch (IllegalArgumentException argExc) { // thrown by VariableCategory.valueOf
+        throw new ImportException("Illegal variable category: " + variable.getIo());
+      }
+    }
+    return ioVariables;
+  }
+
+  private ConcreteSpecification importConcreteSpec(List<ValidIoVariable>
       ioVariables, SpecificationTable importedSpec) throws
       ImportException {
     if (!importedSpec.isIsConcrete()) {
@@ -63,10 +76,8 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
     }
     ConcreteSpecification concreteSpec = new ConcreteSpecification(importedSpec.isIsCounterExample());
 
-    // Add the specIoVariables (column headers)
-    for (SpecIoVariable specIoVariable : ioVariables) {
-      concreteSpec.getSpecIoVariables().add(specIoVariable);
-    }
+    // Add the columnHeaders (column headers)
+    concreteSpec.getColumnHeaders().addAll(ioVariables);
 
     // Add the rows
     Rows rows = importedSpec.getRows();
@@ -80,19 +91,15 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
         Rows.Row.Cycle cycle = row.getCycle().get(j);
         for (int k = 0; k < ioVariables.size(); k++) {
           String cell = cycle.getCell().get(k);
-          Type cellType = ioVariables.get(k).getType();
-          Optional<Value> val = cellType.parseLiteral(cell);
-          if (val.isPresent()) {
-            ConcreteCell concreteCell = new ConcreteCell(val.get());
-            cellsMap.put(ioVariables.get(k).getName(), concreteCell);
-          } else {
-            throw new ImportException("Could not parse concrete value " + cell);
-          }
+          Value val = ioVariables.get(k).getValidType().parseLiteral(cell)
+              .orElseThrow(() -> new ImportException("Illegal value literal: " + cell));
+          ConcreteCell concreteCell = new ConcreteCell(val);
+          cellsMap.put(ioVariables.get(k).getName(), concreteCell);
         }
         if (cellsMap.size() != ioVariables.size()) {
           throw new ImportException("Row too short: Do not have a cell for each IOVariable");
         }
-        concreteSpec.getRows().add(new SpecificationRow<>(cellsMap));
+        concreteSpec.getRows().add(SpecificationRow.createUnobservableRow(cellsMap));
       }
       currentCycle += currentDuration;
     }

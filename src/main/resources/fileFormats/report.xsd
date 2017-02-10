@@ -24,13 +24,28 @@
                         </sequence>
                     </complexType>
                 </element>
-                <element ref="tns:counterexample"/>
+
+                <element name="counterexample">
+                    <complexType>
+                        <all>
+                            <element minOccurs="1" maxOccurs="1" name="trace" type="tns:counterexample"/>
+                            <element minOccurs="0" maxOccurs="1" name="row-mappings">
+                                <complexType>
+                                    <sequence maxOccurs="unbounded" minOccurs="1">
+                                        <element name="row-map" type="string"/>
+                                    </sequence>
+                                </complexType>
+                            </element>
+                        </all>
+                    </complexType>
+                </element>
+
             </sequence>
             <attribute name="returncode">
                 <simpleType>
                     <restriction base="string">
                         <enumeration value="error"></enumeration>
-                        <enumeration value="counterexample"></enumeration>
+                        <enumeration value="not-verified"></enumeration>
                         <enumeration value="verified"></enumeration>
                     </restriction>
                 </simpleType>
@@ -44,24 +59,19 @@
         <attribute name="value" type="string"></attribute>
     </complexType>
 
-    <element name="counterexample">
-        <complexType>
-            <sequence minOccurs="0" maxOccurs="unbounded">
-                <element name="step">
-                    <complexType>
-                        <sequence>
-                            <sequence>
-                                <choice>
-                                    <element name="input" type="tns:assignment" minOccurs="0" maxOccurs="unbounded"/>
-                                    <element name="state" type="tns:assignment" minOccurs="0" maxOccurs="unbounded"/>
-                                </choice>
-                            </sequence>
-                        </sequence>
-                        <attribute name="counter" type="int"></attribute>
-                        <attribute name="row" type="int"></attribute>
-                    </complexType>
-                </element>
-            </sequence>
-        </complexType>
-    </element>
+    <complexType name="counterexample">
+        <sequence minOccurs="0" maxOccurs="unbounded">
+            <element name="step">
+                <complexType>
+                    <sequence>
+                            <element name="input" type="tns:assignment" minOccurs="0"
+                                     maxOccurs="unbounded"/>
+                            <element name="state" type="tns:assignment" minOccurs="0"
+                                     maxOccurs="unbounded"/>
+                    </sequence>
+                    <attribute name="counter" type="int"></attribute>
+                </complexType>
+            </element>
+        </sequence>
+    </complexType>
 </schema>

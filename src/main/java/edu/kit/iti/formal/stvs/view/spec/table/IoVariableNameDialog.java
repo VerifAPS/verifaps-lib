@@ -56,7 +56,7 @@ public class IoVariableNameDialog extends Dialog<SpecIoVariable> {
         if (empty) {
           setText(null);
         } else {
-          setText(item.getCategory() + " " + item.getName() + " : " + item.getType().getTypeName());
+          setText(item.getCategory() + " " + item.getName() + " : " + item.getType());
         }
       }
     };

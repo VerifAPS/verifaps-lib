@@ -1,24 +1,25 @@
 package edu.kit.iti.formal.stvs.model.common;
 
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-
 /**
  * Created by philipp on 09.01.17.
  */
 public class CodeIoVariable extends IoVariable {
 
   private final VariableCategory category;
-  private final Type type;
+  private final String type;
   private final String name;
 
   /**
    * Creates a variable that appears in the code.
    *
    * @param category The category of the variable
-   * @param type     The type of the variable
+   * @param type     The identifier of the type of the variable
    * @param name     The name of the Variable
    */
-  public CodeIoVariable(VariableCategory category, Type type, String name) {
+  public CodeIoVariable(VariableCategory category, String type, String name) {
+    if (category == null || type == null || name == null) {
+      throw new NullPointerException();
+    }
     this.category = category;
     this.type = type;
     this.name = name;
@@ -36,7 +37,7 @@ public class CodeIoVariable extends IoVariable {
   }
 
   @Override
-  public Type getType() {
+  public String getType() {
     return type;
   }
 
@@ -49,7 +50,7 @@ public class CodeIoVariable extends IoVariable {
     if (o == null) return false;
     if (!(o instanceof CodeIoVariable)) return false;
     CodeIoVariable other = (CodeIoVariable) o;
-    return category.equals(other.category) && name.equals(other.name) && type.equals(other.type);
+    return equals(other);
   }
 
   public String toString() {
