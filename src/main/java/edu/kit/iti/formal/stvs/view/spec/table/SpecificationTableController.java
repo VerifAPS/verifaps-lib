@@ -188,12 +188,19 @@ public class SpecificationTableController implements Controller {
   }
 
   private ContextMenu createColumnContextMenu(TableColumn<SynchronizedRow, ?> column) {
+    MenuItem changeColumn = new MenuItem("Change Column...");
     MenuItem removeColumn = new MenuItem("Remove Column");
+    changeColumn.setOnAction(event -> {
+      new IoVariableChangeDialog(
+          hybridSpec.getColumnHeaderByName((String) column.getUserData()),
+          hybridSpec.getColumnHeaders().filtered(var -> !var.getName().equals(column.getUserData())))
+          .showAndWait();
+    });
     removeColumn.setOnAction(event -> {
       tableView.getColumns().remove(column);
       hybridSpec.removeColumnByName((String) column.getUserData());
     });
-    return new ContextMenu(removeColumn);
+    return new ContextMenu(changeColumn, removeColumn);
   }
 
   public void addEmptyRow(int index) {

@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.model.common.Named;
 import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -33,7 +34,6 @@ public class SpecificationTable<H extends Named, C, D> {
     this.rows.addListener(this::onRowChange);
     this.columnHeaders.addListener(this::onColumnHeadersChanged);
     this.durations.addListener(this::onDurationChange);
-
   }
 
   public ObservableList<SpecificationRow<C>> getRows() {
@@ -128,7 +128,7 @@ public class SpecificationTable<H extends Named, C, D> {
         onColumnHeaderAdded(change.getAddedSubList());
       }
       if (change.wasRemoved()) {
-        onSpecIoVariableRemoved(change.getRemoved());
+        onColumnHeaderRemoved(change.getRemoved());
       }
     }
   }
@@ -186,7 +186,7 @@ public class SpecificationTable<H extends Named, C, D> {
     }
   }
 
-  protected void onSpecIoVariableRemoved(List<? extends H> removed) {
+  protected void onColumnHeaderRemoved(List<? extends H> removed) {
   }
 
   protected void onDurationAdded(List<? extends D> added) {

@@ -117,4 +117,7 @@ public class SpecIoVariable extends IoVariable implements Commentable {
     return result;
   }
 
+  public void setCategory(VariableCategory category) {
+    this.category.set(category);
+  }
 }

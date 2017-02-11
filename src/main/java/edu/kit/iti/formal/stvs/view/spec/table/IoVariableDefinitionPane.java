@@ -3,12 +3,17 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 import edu.kit.iti.formal.stvs.model.common.IoVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
+import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+
+import java.util.List;
 
 /**
  * Created by philipp on 11.02.17.
@@ -58,4 +63,23 @@ public class IoVariableDefinitionPane extends GridPane {
     return nameTextField;
   }
 
+  public Boolean isDefinitionInvalid(List<SpecIoVariable> alreadyDefinedVariables) {
+    String chosenName = nameTextField.getText();
+    if (!VariableExpr.IDENTIFIER_PATTERN.matcher(chosenName).matches()) {
+      return true;
+    }
+    return alreadyDefinedVariables.stream().anyMatch(var -> var.getName().equals(chosenName));
+  }
+
+  public BooleanBinding createDefinitionInvalidBinding(List<SpecIoVariable> alreadyDefinedVariables) {
+    return Bindings.createBooleanBinding(
+        () -> isDefinitionInvalid(alreadyDefinedVariables),
+        nameTextField.textProperty());
+  }
+
+  public void applyChangesToVariable(SpecIoVariable variableToChange) {
+    variableToChange.setCategory(categoryComboBox.getValue());
+    variableToChange.setName(nameTextField.getText());
+    variableToChange.setType(typeTextField.getText());
+  }
 }

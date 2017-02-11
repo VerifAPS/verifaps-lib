@@ -5,7 +5,10 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,6 +27,7 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
 
   private final StringProperty comment;
   private final FreeVariableList freeVariableList;
+  private final ChangeListener<String> onSpecIoVariableNameChanged = this::onSpecIoVariableNameChanged;
 
   public ConstraintSpecification(FreeVariableList freeVariableList) {
     super(durationCell -> new Observable[] {
@@ -33,6 +37,38 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
     this.freeVariableList = freeVariableList;
 
     this.comment = new SimpleStringProperty("");
+  }
+
+  @Override
+  protected void onColumnHeaderAdded(List<? extends SpecIoVariable> added) {
+    super.onColumnHeaderAdded(added);
+    added.forEach(this::subscribeToIoVariable);
+  }
+
+  @Override
+  protected void onColumnHeaderRemoved(List<? extends SpecIoVariable> removed) {
+    super.onColumnHeaderRemoved(removed);
+    removed.forEach(this::unsubscribeFromIoVariable);
+  }
+
+  private void subscribeToIoVariable(SpecIoVariable specIoVariable) {
+    specIoVariable.nameProperty().addListener(onSpecIoVariableNameChanged);
+  }
+
+  private void unsubscribeFromIoVariable(SpecIoVariable specIoVariable) {
+    specIoVariable.nameProperty().removeListener(onSpecIoVariableNameChanged);
+  }
+
+  private void onSpecIoVariableNameChanged(
+      ObservableValue<? extends String> obs,
+      String nameBefore,
+      String nameAfter) {
+    for (SpecificationRow<ConstraintCell> row : getRows()) {
+      ConstraintCell entry = row.getCells().get(nameBefore);
+      if (entry != null) {
+        row.getCells().put(nameAfter, entry);
+      }
+    }
   }
 
   @Override

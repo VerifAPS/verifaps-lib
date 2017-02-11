@@ -2,12 +2,8 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
 import edu.kit.iti.formal.stvs.util.ListTypeConverter;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
@@ -22,7 +18,6 @@ public class IoVariableChooserDialog extends Dialog<SpecIoVariable> {
   private final IoVariableDefinitionPane definitionPane;
   private final ListView<CodeIoVariable> ioVariables;
   private final ButtonType createButton = new ButtonType("Create", ButtonBar.ButtonData.OK_DONE);
-  private final BooleanProperty definitionInvalid;
 
   public IoVariableChooserDialog(
       ObjectProperty<List<CodeIoVariable>> codeIoVariables,
@@ -33,7 +28,6 @@ public class IoVariableChooserDialog extends Dialog<SpecIoVariable> {
     this.typeTextField = new TextField();
     this.ioVariables = new ListView<>();
     this.definitionPane = new IoVariableDefinitionPane();
-    this.definitionInvalid = new SimpleBooleanProperty(false);
 
     ioVariables.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     ioVariables.getSelectionModel().selectedItemProperty().addListener(this::onSelectionChanged);
@@ -48,20 +42,8 @@ public class IoVariableChooserDialog extends Dialog<SpecIoVariable> {
     getDialogPane().setContent(box);
     getDialogPane().getButtonTypes().add(createButton);
 
-    definitionInvalid.bind(Bindings.createBooleanBinding(
-        () -> isDefinitionValid(alreadyDefinedVariables),
-        alreadyDefinedVariables,
-        definitionPane.getNameTextField().textProperty()));
-
-    getDialogPane().lookupButton(createButton).disableProperty().bind(definitionInvalid);
-  }
-
-  private Boolean isDefinitionValid(List<SpecIoVariable> alreadyDefinedVariables) {
-    String chosenName = definitionPane.getNameTextField().getText();
-    if (!VariableExpr.IDENTIFIER_PATTERN.matcher(chosenName).matches()) {
-      return true;
-    }
-    return alreadyDefinedVariables.stream().anyMatch(var -> var.getName().equals(chosenName));
+    getDialogPane().lookupButton(createButton).disableProperty()
+        .bind(definitionPane.createDefinitionInvalidBinding(alreadyDefinedVariables));
   }
 
   private ListCell<CodeIoVariable> createCellForListView(ListView<CodeIoVariable> codeIoVariableListView) {
