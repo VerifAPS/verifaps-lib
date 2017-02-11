@@ -112,8 +112,10 @@ public class ExporterFacade {
    * @throws IOException will be thrown, when an error occurs while saving
    */
   public static void exportCode(Code code) throws IOException {
-    File file = new File(code.getFilename());
+    exportCode(code, new File(code.getFilename()));
+  }
 
+  public static void exportCode(Code code, File file) throws IOException {
     BufferedWriter writer = new BufferedWriter(new FileWriter(file));
     writer.write(code.getSourcecode());
     writer.close();

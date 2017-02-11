@@ -112,6 +112,5 @@ public class SpecificationView extends VBox implements Lockable {
 
   public void onVerificationButtonClicked(ConstraintSpecification constraintSpec) {
     startVerificationButton.fireEvent(new VerificationStartedEvent(constraintSpec));
-    System.out.println("Bubbling up (delegating!) verification button clicked event");
   }
 }

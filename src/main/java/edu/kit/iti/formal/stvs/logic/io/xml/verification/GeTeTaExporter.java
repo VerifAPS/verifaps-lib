@@ -1,5 +1,8 @@
 package edu.kit.iti.formal.stvs.logic.io.xml.verification;
 
+import com.sun.xml.bind.marshaller.DataWriter;
+import com.sun.xml.internal.bind.marshaller.CharacterEscapeHandler;
+import com.sun.xml.internal.bind.marshaller.DumbEscapeHandler;
 import edu.kit.iti.formal.exteta_1.ConstraintVariable;
 import edu.kit.iti.formal.exteta_1.DataType;
 import edu.kit.iti.formal.exteta_1.IoVariable;
@@ -9,6 +12,7 @@ import edu.kit.iti.formal.exteta_1.Steps;
 import edu.kit.iti.formal.exteta_1.TestTable;
 import edu.kit.iti.formal.exteta_1.Variables;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
+import edu.kit.iti.formal.stvs.logic.io.Exporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlExporter;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
@@ -17,31 +21,38 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
+
+import java.io.*;
 import java.util.List;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
-import org.w3c.dom.Node;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
 
 
 /**
  * Exporter for communication with the GeTeTa
  * @author Benjamin Alt
  */
-public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
+public class GeTeTaExporter implements Exporter<ConstraintSpecification> {
 
-  private final String DEFAULT_CONSTRAINT = "[-,-]"; // TODO Ask Mr. Weigl: Syntax for no constraint
   private ObjectFactory objectFactory;
 
   public GeTeTaExporter() {
     objectFactory = new ObjectFactory();
   }
 
-  @Override
-  public Node exportToXmlNode(ConstraintSpecification source) throws ExportException {
+  public String exportToXmlString(ConstraintSpecification source) throws ExportException {
     TestTable testTable = objectFactory.createTestTable();
     testTable.setVariables(makeVariables(source));
     testTable.setSteps(makeSteps(source));
     JAXBElement<TestTable> element = objectFactory.createTestTable(testTable);
-    return marshalToNode(element);
+    return marshalToString(element);
   }
 
   private Steps makeSteps(ConstraintSpecification source) {
@@ -80,7 +91,7 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
       ConstraintVariable exportedVariable = objectFactory.createConstraintVariable();
       exportedVariable.setName(freeVariable.getName());
       exportedVariable.setDataType(getDataType(freeVariable));
-      exportedVariable.setConstraint(DEFAULT_CONSTRAINT);
+      exportedVariable.setConstraint(freeVariable.getDefaultValue());
       variables.getVariableOrConstraint().add(exportedVariable);
     }
     return variables;
@@ -94,5 +105,33 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
     } else {
       return DataType.ENUM;
     }
+  }
+
+  protected static String marshalToString(JAXBElement element) throws ExportException {
+    try {
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      DocumentBuilder db = dbf.newDocumentBuilder();
+      Document document = db.newDocument();
+      JAXBContext context = JAXBContext.newInstance("edu.kit.iti.formal.exteta_1");
+      Marshaller marshaller = context.createMarshaller();
+      marshaller.setProperty("jaxb.formatted.output", Boolean.TRUE);
+      marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_ENCODING, "utf-8");
+      StringWriter stringWriter = new StringWriter();
+      PrintWriter printWriter = new PrintWriter(stringWriter);
+      DataWriter dataWriter = new DataWriter(printWriter, "UTF-8", new NoEscapeHandler());
+      marshaller.marshal(element, dataWriter);
+      return stringWriter.toString();
+    } catch (ParserConfigurationException | JAXBException e) {
+      throw new ExportException(e);
+    }
+  }
+
+  @Override
+  public ByteArrayOutputStream export(ConstraintSpecification source) throws ExportException {
+    String res = exportToXmlString(source);
+    byte[] bytes = res.getBytes();
+    ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
+    baos.write(bytes, 0, bytes.length);
+    return baos;
   }
 }

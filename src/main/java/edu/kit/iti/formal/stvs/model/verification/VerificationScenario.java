@@ -28,17 +28,22 @@ public class VerificationScenario {
 
   public VerificationScenario(Code code) {
     this.code = new SimpleObjectProperty<>(code);
-    // TODO: Parsed code might be null!!!
-    verificationEngine = new GeTeTaVerificationEngine(code.getParsedCode().getDefinedTypes());
     verificationResult = new NullableProperty<>();
-    verificationEngine.verificationResultProperty().addListener(new
-        VerificationChangedListener());
     verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
   }
 
-  public void verify(ConstraintSpecification spec) throws IOException, ExportException {
+  public void verify(
+      String getetaFilename,
+      String nuxmvFilename,
+      ConstraintSpecification spec) throws IOException, ExportException {
     // TODO: Parsed code might be null!!!
-    verificationEngine = new GeTeTaVerificationEngine(code.get().getParsedCode().getDefinedTypes());
+    verificationEngine = new GeTeTaVerificationEngine(
+        getetaFilename,
+        nuxmvFilename,
+        code.get().getParsedCode().getDefinedTypes());
+    verificationEngine.verificationResultProperty().addListener(new
+        VerificationChangedListener());
+    verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
     verificationEngine.startVerification(this, spec);
     verificationState.set(VerificationState.RUNNING);
   }

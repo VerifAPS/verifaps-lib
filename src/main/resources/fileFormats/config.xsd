@@ -38,8 +38,8 @@
           <sequence>
             <element name="javaPath" type="string" minOccurs="0" maxOccurs="1"></element>
             <element name="z3Path" type="string" minOccurs="0" maxOccurs="1"></element>
-            <element name="getetaPath" type="string" minOccurs="0" maxOccurs="1"></element>
-            <element name="nuxmvPath" type="string" minOccurs="0" maxOccurs="1"></element>
+            <element name="getetaFilename" type="string" minOccurs="0" maxOccurs="1"></element>
+            <element name="nuxmvFilename" type="string" minOccurs="0" maxOccurs="1"></element>
           </sequence>
         </complexType>
       </element>
