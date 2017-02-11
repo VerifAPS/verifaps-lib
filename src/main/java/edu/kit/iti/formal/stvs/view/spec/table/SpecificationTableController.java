@@ -39,7 +39,6 @@ public class SpecificationTableController implements Controller {
 
   private final ObservableList<SynchronizedRow> data = FXCollections.observableArrayList();
   private final TableColumn<SynchronizedRow, String> durations;
-  private final ContextMenu columnContextMenu;
 
   public SpecificationTableController(ObjectProperty<List<Type>> typeContext,
                                       ObjectProperty<List<CodeIoVariable>> codeIoVariables,
@@ -52,9 +51,7 @@ public class SpecificationTableController implements Controller {
     this.hybridSpec = hybridSpecification;
     this.problemRecognizer = new SpecProblemRecognizer(typeContext, codeIoVariables, validVariables, hybridSpecification);
     this.durations = createViewColumn("Duration", SynchronizedRow::getDuration);
-    this.columnContextMenu = createColumnEditingContextMenu();
 
-    durations.setContextMenu(columnContextMenu);
     tableView.getColumns().add(durations);
 
     tableView.setItems(data);
@@ -63,7 +60,7 @@ public class SpecificationTableController implements Controller {
     tableView.setRowFactory(this::rowFactory);
 
 
-    tableView.setContextMenu(createRowEditingContextMenu());
+    tableView.setContextMenu(createContextMenu());
 
     tableView.getStylesheets().add(SpecificationTableController.class.getResource("style.css").toExternalForm());
 
@@ -171,9 +168,10 @@ public class SpecificationTableController implements Controller {
     }
   }
 
-  private ContextMenu createRowEditingContextMenu() {
+  private ContextMenu createContextMenu() {
     MenuItem insertRow = new MenuItem("Insert Row");
     MenuItem deleteRow = new MenuItem("Delete Row");
+    MenuItem addNewColumn = new MenuItem("New Column...");
     insertRow.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
     insertRow.setOnAction(event -> {
       int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
@@ -182,18 +180,20 @@ public class SpecificationTableController implements Controller {
     deleteRow.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
     deleteRow.setOnAction(event ->
       data.removeAll(tableView.getSelectionModel().getSelectedItems()));
-    return new ContextMenu(insertRow, deleteRow);
+    addNewColumn.setOnAction(event ->
+        new IoVariableChooserDialog(codeIoVariables, hybridSpec.getColumnHeaders())
+            .showAndWait()
+            .ifPresent(this::addNewColumn));
+    return new ContextMenu(insertRow, deleteRow, addNewColumn);
   }
 
-  private ContextMenu createColumnEditingContextMenu() {
-    ContextMenu menu = new ContextMenu();
-    MenuItem addNewColumn = new MenuItem("New Column...");
-    addNewColumn.setOnAction(event ->
-        new IoVariableNameDialog(typeContext, codeIoVariables)
-          .showAndWait()
-          .ifPresent(this::addNewColumn));
-    menu.getItems().addAll(addNewColumn);
-    return menu;
+  private ContextMenu createColumnContextMenu(TableColumn<SynchronizedRow, ?> column) {
+    MenuItem removeColumn = new MenuItem("Remove Column");
+    removeColumn.setOnAction(event -> {
+      tableView.getColumns().remove(column);
+      hybridSpec.removeColumnByName((String) column.getUserData());
+    });
+    return new ContextMenu(removeColumn);
   }
 
   public void addEmptyRow(int index) {
@@ -228,9 +228,12 @@ public class SpecificationTableController implements Controller {
         (Observable o) -> column.setUserData(specIoVariable.getName()));
     column.setText("");
     column.setGraphic(new ColumnHeader(specIoVariable));
+    // TODO: changes to prefwidth need to be saved
+    // FIXME: column widths are not taken from the session
+    column.setPrefWidth(specIoVariable.getColumnConfig().getWidth());
+    column.setContextMenu(createColumnContextMenu(column));
 
-    tableView.getColumns().add(0, column);
-    tableView.refresh(); // TODO: maybe this is not needed with the new deep observable updates in the model
+    tableView.getColumns().add(tableView.getColumns().size()-1, column);
   }
 
   private TableColumn<SynchronizedRow, String> createViewColumn(
@@ -240,7 +243,6 @@ public class SpecificationTableController implements Controller {
     column.setSortable(false);
     column.setEditable(true);
     column.setPrefWidth(100);
-    column.setContextMenu(columnContextMenu);
     column.setCellFactory(this::cellFactory);
 
     column.setCellValueFactory(rowModelData ->
