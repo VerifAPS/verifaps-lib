@@ -26,12 +26,12 @@ import edu.kit.iti.formal.automation.SymbExFacade;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.testtables.builder.TableTransformation;
 import edu.kit.iti.formal.automation.testtables.exception.GetetaException;
-import edu.kit.iti.formal.automation.testtables.exception.IllegalExpressionException;
 import edu.kit.iti.formal.automation.testtables.io.Report;
 import edu.kit.iti.formal.automation.testtables.model.CounterExampleAnalyzer;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.options.Mode;
 import edu.kit.iti.formal.smv.ast.SMVModule;
+import edu.kit.iti.formal.smv.ast.SMVType;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -101,9 +101,10 @@ public class ExTeTa {
 
 
         //
-        TableTransformation tt = new TableTransformation(table);
-        SMVModule modTable = tt.transform();
         SMVModule modCode = SymbExFacade.evaluateProgram(code);
+        SMVType superEnumType = Facade.createSuperEnum(code);
+        TableTransformation tt = new TableTransformation(table, superEnumType);
+        SMVModule modTable = tt.transform();
         SMVModule mainModule = Facade.glue(modTable, modCode, table.getOptions());
 
         List<SMVModule> modules = new LinkedList<>();

@@ -10,7 +10,7 @@
 
     <artifactId>geteta</artifactId>
     <!-- Every version upgrade, add a changelog to src/site/index.md -->
-    <version>0.4.0</version>
+    <version>0.4.1</version>
 
     <repositories>
         <repository>

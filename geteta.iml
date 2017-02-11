@@ -20,6 +20,7 @@
       <excludeFolder url="file://$MODULE_DIR$/target/site" />
       <excludeFolder url="file://$MODULE_DIR$/target/surefire" />
       <excludeFolder url="file://$MODULE_DIR$/target/surefire-reports" />
+      <excludeFolder url="file://$MODULE_DIR$/target/taglist" />
       <excludeFolder url="file://$MODULE_DIR$/target/test" />
     </content>
     <orderEntry type="inheritedJdk" />

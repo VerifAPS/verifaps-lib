@@ -23,13 +23,18 @@ package edu.kit.iti.formal.automation.testtables;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
+import edu.kit.iti.formal.automation.st.ast.CaseStatement;
+import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.testtables.io.TableReader;
 import edu.kit.iti.formal.automation.testtables.io.xmv.NuXMVAdapter;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.SReference;
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions;
+import edu.kit.iti.formal.smv.SMVAstVisitor;
 import edu.kit.iti.formal.smv.ast.SMVModule;
+import edu.kit.iti.formal.smv.ast.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
 import org.apache.commons.io.IOUtils;
 
@@ -37,6 +42,7 @@ import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -69,7 +75,7 @@ public class Facade {
     }
 
     public static boolean runNuXMV(String tableFilename, SMVModule... modules) {
-       return runNuXMV(tableFilename, Arrays.asList(modules));
+        return runNuXMV(tableFilename, Arrays.asList(modules));
     }
 
     public static String getHistoryName(SVariable variable, int cycles) {
@@ -84,5 +90,25 @@ public class Facade {
         NuXMVAdapter adapter = new NuXMVAdapter(new File(tableFilename), modules);
         adapter.run();
         return adapter.isVerified();
+    }
+
+    public static SMVType createSuperEnum(TopLevelElements code) {
+        SuperEnumCreator sec = new SuperEnumCreator();
+        code.visit(sec);
+        return sec.getType();
+    }
+
+    private static class SuperEnumCreator extends AstVisitor<Void> {
+        private SMVType.EnumType type = new SMVType.EnumType(new ArrayList<>());
+
+        public SMVType getType() {
+            return type;
+        }
+
+        @Override
+        public Void visit(EnumerationTypeDeclaration etd) {
+            type.getValues().addAll(etd.getAllowedValues());
+            return null;
+        }
     }
 }

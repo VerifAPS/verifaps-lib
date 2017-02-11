@@ -25,6 +25,7 @@ package edu.kit.iti.formal.automation.testtables.builder;
 import edu.kit.iti.formal.automation.testtables.io.IOFacade;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.schema.ConstraintVariable;
+import edu.kit.iti.formal.automation.testtables.schema.DataType;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SVariable;
 
@@ -38,6 +39,9 @@ public class ConstraintVariableTransformer implements TableTransformer {
         SMVModule mt= tt.getTableModule();
         for (ConstraintVariable cv : gtt.getConstraintVariable().values()) {
             SVariable var = gtt.getSMVVariable(cv.getName());
+            if(cv.getDataType()== DataType.ENUM) {
+                var.setDatatype(tt.getSuperEnumType());
+            }
             mt.getFrozenVars().add(var);
             mt.getInit().add(IOFacade.parseCellExpression(cv.getConstraint(), var, gtt));
             //TODO add invar for each frozenvar

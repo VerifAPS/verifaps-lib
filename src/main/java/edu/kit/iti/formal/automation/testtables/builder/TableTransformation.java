@@ -39,10 +39,12 @@ public class TableTransformation {
     private TableModule mt = new TableModule();
     private SVariable errorState = new SVariable("ERROR", SMVType.BOOLEAN);
     private List<SMVModule> helper = new LinkedList<>();
+    private SMVType superEnumType;
 
-    public TableTransformation(GeneralizedTestTable table) {
+    public TableTransformation(GeneralizedTestTable table, SMVType superEnumType) {
         this.gtt = table;
         reachable = new StateReachability(table);
+        this.superEnumType = superEnumType;
         init();
     }
 
@@ -90,5 +92,9 @@ public class TableTransformation {
 
     public SVariable getErrorState() {
         return errorState;
+    }
+
+    public SMVType getSuperEnumType() {
+        return superEnumType;
     }
 }
