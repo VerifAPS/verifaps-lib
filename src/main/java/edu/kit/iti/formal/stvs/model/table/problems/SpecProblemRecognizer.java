@@ -54,6 +54,9 @@ public class SpecProblemRecognizer {
     specification.getRows().addListener(listenToSpecUpdate);
     specification.getDurations().addListener(listenToSpecUpdate);
 
+    typeContext.addListener(listenToSpecUpdate);
+    codeIoVariables.addListener(listenToSpecUpdate);
+
     recalculateSpecProblems();
   }
 

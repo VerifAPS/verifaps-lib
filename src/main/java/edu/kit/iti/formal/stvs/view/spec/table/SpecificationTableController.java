@@ -101,7 +101,6 @@ public class SpecificationTableController implements Controller {
         columnHeader.configureProblems(problemsForColumn);
       }
     }
-    tableView.refresh();
   }
 
   private TableCell<SynchronizedRow, String> cellFactory(TableColumn<SynchronizedRow, String> table) {
