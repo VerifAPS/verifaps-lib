@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.model.common.Named;
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -10,11 +9,9 @@ import javafx.util.Callback;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -87,14 +84,14 @@ public class SpecificationTable<H extends Named, C, D> {
     onColumnAdded(column);
   }
 
-  public Optional<H> getOptionalSpecIoVariableByName(String columnHeaderName) {
+  public Optional<H> getOptionalColumnHeaderByName(String columnHeaderName) {
     return columnHeaders.stream()
         .filter(specIoVariable -> specIoVariable.getName().equals(columnHeaderName))
         .findAny();
   }
 
   public H getColumnHeaderByName(String columnHeaderName) {
-    return getOptionalSpecIoVariableByName(columnHeaderName)
+    return getOptionalColumnHeaderByName(columnHeaderName)
         .orElseThrow(() ->
             new NoSuchElementException("Column does not exist: "
                 + StringEscapeUtils.escapeJava(columnHeaderName)));
@@ -156,7 +153,7 @@ public class SpecificationTable<H extends Named, C, D> {
             + columnHeaders.size());
       }
       if (!addedRow.getCells().keySet().stream().allMatch(columnId ->
-              getOptionalSpecIoVariableByName(columnId).isPresent())) {
+              getOptionalColumnHeaderByName(columnId).isPresent())) {
         throw new IllegalArgumentException("Added row contains unknown IoVariable: "
             + StringEscapeUtils.escapeJava(addedRow.toString()));
       }
@@ -178,7 +175,7 @@ public class SpecificationTable<H extends Named, C, D> {
   protected void onColumnHeaderAdded(List<? extends H> added) {
     for (H columnHeader : added) {
       String columnId = columnHeader.getName();
-      getOptionalSpecIoVariableByName(columnId)
+      getOptionalColumnHeaderByName(columnId)
           .ifPresent(otherVariableWithSameName -> {
             if (otherVariableWithSameName != columnHeader) {
               throw new IllegalArgumentException(
