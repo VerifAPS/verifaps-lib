@@ -92,41 +92,52 @@ public class SmtEncoderTest {
 
     System.out.println(output);
     testWithStatements(constraints,
-        "(implies (> n_2 4) (= A_2_4 A_2_0))",
+        "(implies (> n_2 4) (= |A_2_4| |A_2_0|))",
 
-        "(implies (> n_2 3) (= A_2_3 A_2_-1))",
-        "(implies (= n_1 1) (= A_2_-1 A_1_0))",
+        "(implies (> n_2 3) (= |A_2_3| |A_2_-1|))",
+        "(implies (= n_1 1) (= |A_2_-1| |A_1_0|))",
 
-        "(implies (> n_2 2) (= A_2_2 A_2_-2))",
-        "(implies (= n_1 1) (= A_2_-2 A_1_-1))",
-        "(implies (= n_0 3) (= A_1_-1 A_0_2))",
+        "(implies (> n_2 2) (= |A_2_2| |A_2_-2|))",
+        "(implies (= n_1 1) (= |A_2_-2| |A_1_-1|))",
+        "(implies (= n_0 3) (= |A_1_-1| |A_0_2|))",
 
-        "(implies (> n_2 1) (= A_2_1 A_2_-3))",
-        "(implies (= n_1 1) (= A_2_-3 A_1_-2))",
-        "(implies (= n_0 3) (= A_1_-2 A_0_1))",
+        "(implies (> n_2 1) (= |A_2_1| |A_2_-3|))",
+        "(implies (= n_1 1) (= |A_2_-3| |A_1_-2|))",
+        "(implies (= n_0 3) (= |A_1_-2| |A_0_1|))",
 
-        "(implies (> n_2 0) (= A_2_0 A_2_-4))",
-        "(implies (= n_1 1) (= A_2_-4 A_1_-3))",
-        "(implies (= n_0 3) (= A_1_-3 A_0_0))");
+        "(implies (> n_2 0) (= |A_2_0| |A_2_-4|))",
+        "(implies (= n_1 1) (= |A_2_-4| |A_1_-3|))",
+        "(implies (= n_0 3) (= |A_1_-3| |A_0_0|))");
 
     testWithStatements(constraints,
-        "(implies (> n_2 4) (= A_2_4 A_2_0))",
+        "(implies (> n_2 4) (= |A_2_4| |A_2_0|))",
 
-        "(implies (> n_2 3) (= A_2_3 A_2_-1))",
-        "(implies (= n_1 2) (= A_2_-1 A_1_1))",
+        "(implies (> n_2 3) (= |A_2_3| |A_2_-1|))",
+        "(implies (= n_1 2) (= |A_2_-1| |A_1_1|))",
 
-        "(implies (> n_2 2) (= A_2_2 A_2_-2))",
-        "(implies (= n_1 2) (= A_2_-2 A_1_0))",
+        "(implies (> n_2 2) (= |A_2_2| |A_2_-2|))",
+        "(implies (= n_1 2) (= |A_2_-2| |A_1_0|))",
 
-        "(implies (> n_2 1) (= A_2_1 A_2_-3))",
-        "(implies (= n_1 2) (= A_2_-3 A_1_-1))",
-        "(implies (= n_0 3) (= A_1_-1 A_0_2))",
+        "(implies (> n_2 1) (= |A_2_1| |A_2_-3|))",
+        "(implies (= n_1 2) (= |A_2_-3| |A_1_-1|))",
+        "(implies (= n_0 3) (= |A_1_-1| |A_0_2|))",
 
 
-        "(implies (> n_2 0) (= A_2_0 A_2_-4))",
-        "(implies (= n_1 2) (= A_2_-4 A_1_-2))",
-        "(implies (= n_0 3) (= A_1_-2 A_0_1))"
+        "(implies (> n_2 0) (= |A_2_0| |A_2_-4|))",
+        "(implies (= n_1 2) (= |A_2_-4| |A_1_-2|))",
+        "(implies (= n_0 3) (= |A_1_-2| |A_0_1|))"
         );
+
+    testWithStatements(constraints,
+        "(>= n_0 3)",
+        "(<= n_0 3)",
+
+        "(>= n_1 1)",
+        "(<= n_1 5)",
+
+        "(>= n_2 1)",
+        "(<= n_2 5)"
+    );
   }
 
   private void testWithStatements(Set<SExpr> constraints,String ... s) {
@@ -142,7 +153,6 @@ public class SmtEncoderTest {
                 (statement))
         .collect(Collectors.toList());
 
-    System.out.println(constraints);
     assertEquals("no statements should be missing", new ArrayList<SExpr>(), missingStatements);
   }
 

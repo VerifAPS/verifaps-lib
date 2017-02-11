@@ -53,10 +53,13 @@ public class SmtEncoder {
     //Step V: upper und lower Bound von Durations festlegen
     for (int z = 0; z < specification.getDurations().size(); z++ ) {
       LowerBoundedInterval interval = specification.getDurations().get(z);
+      //n_z >= lowerBound_z
       this.sConstrain.addGlobalConstrains(new SList(">=", "n_" + z, interval.getLowerBound() +
           ""));
+      //n_z <= upperBound_z
       if(interval.getUpperBound().isPresent()) {
-        this.sConstrain.addGlobalConstrains(new SList("<=", "n_" + z, interval.getLowerBound() + ""));
+        this.sConstrain.addGlobalConstrains(new SList("<=", "n_" + z, interval.getUpperBound().get()
+            + ""));
       }
     }
 
@@ -103,8 +106,8 @@ public class SmtEncoder {
                         k + ""
                     ),
                     new SList("=",
-                        variableName + "_" + z + "_" + (-i),
-                        variableName + "_" + (z - 1) + "_" + (k - i)
+                        "|" + variableName + "_" + z + "_" + (-i) + "|",
+                        "|" + variableName + "_" + (z - 1) + "_" + (k - i) + "|"
                     )
                 )
             );
@@ -128,7 +131,8 @@ public class SmtEncoder {
         .map(item -> {
       String typeName = item.getValue().getTypeName();
       String variableName = item.getKey();
-      return new SList("declare-const", variableName, getSMTLibVariableTypeName(typeName));
+      return new SList("declare-const", "|" + variableName + "|", getSMTLibVariableTypeName
+          (typeName));
     }).collect(Collectors.toList());
   }
 
@@ -143,7 +147,7 @@ public class SmtEncoder {
           Optional::empty,
           e -> Optional.of(e.getValues())
       );
-      if(valueEnums.isPresent()) {
+      if (valueEnums.isPresent()) {
         List<String> arguments = valueEnums.get().stream().map(ValueEnum::getValueString).collect
             (Collectors.toList());
       /*
@@ -168,10 +172,6 @@ public class SmtEncoder {
     }
 
     return sum;
-  }
-
-  private Expression getEntry(Integer row, SpecIoVariable ioVariable) {
-    return null; //TODO: implement
   }
 
   private Integer getMaxDuration(int j) {

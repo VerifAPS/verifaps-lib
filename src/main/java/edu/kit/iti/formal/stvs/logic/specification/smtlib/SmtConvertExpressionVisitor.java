@@ -62,7 +62,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     this.sConstraint = new SConstraint().addHeaderDefinitions(
         new SList(
             "declare-const",
-            column.getName() + "_" + row + "_" + iteration,
+            "|" + column.getName() + "_" + row + "_" + iteration + "|",
             getSMTLibVariableTypeName.apply(typeName)
         )
     );
@@ -134,11 +134,12 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
 
       // Do Rule II
       // A[-v] -> A_z_(i-v)
-      return new SAtom(variableName + "_" + row + "_" + (iteration + variableReferenceIndex));
+      return new SAtom("|" + variableName + "_" + row + "_" + (iteration +
+          variableReferenceIndex) + "|");
 
       //return new SAtom(variableName);
     } else {
-      return new SAtom(variableName);
+      return new SAtom("|" + variableName + "|");
     }
   }
 
@@ -146,7 +147,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     SList list = new SList().addAll("+");
 
     for (int l = 0; l <= j; l++) {
-      list.addAll("n_"+l);
+      list.addAll("n_" + l);
     }
     return list;
   }
