@@ -27,10 +27,10 @@ public class GlobalConfig {
   private BooleanProperty showLineNumbers;
 
   // Dependency paths
-  private StringProperty nuxmvPath;
+  private StringProperty nuxmvFilename;
   private StringProperty z3Path;
   private StringProperty javaPath;
-  private StringProperty getetaPath;
+  private StringProperty getetaFilename;
 
   /**
    * Default configuration
@@ -45,10 +45,10 @@ public class GlobalConfig {
     editorFontFamily = new SimpleStringProperty("Courier");
     showLineNumbers = new SimpleBooleanProperty(true);
     uiLanguage = new SimpleStringProperty("EN");
-    nuxmvPath = new SimpleStringProperty(System.getProperty("user.home"));
+    nuxmvFilename = new SimpleStringProperty(System.getProperty("user.home"));
     javaPath = new SimpleStringProperty(System.getProperty("user.home"));
     z3Path = new SimpleStringProperty(System.getProperty("user.home"));
-    getetaPath = new SimpleStringProperty(System.getProperty("user.home"));
+    getetaFilename = new SimpleStringProperty(System.getProperty("user.home"));
   }
 
   /**
@@ -251,16 +251,16 @@ public class GlobalConfig {
             isEquals();
   }
 
-  public String getNuxmvPath() {
-    return nuxmvPath.get();
+  public String getNuxmvFilename() {
+    return nuxmvFilename.get();
   }
 
-  public StringProperty nuxmvPathProperty() {
-    return nuxmvPath;
+  public StringProperty nuxmvFilenameProperty() {
+    return nuxmvFilename;
   }
 
-  public void setNuxmvPath(String nuxmvPath) {
-    this.nuxmvPath.set(nuxmvPath);
+  public void setNuxmvFilename(String nuxmvFilename) {
+    this.nuxmvFilename.set(nuxmvFilename);
   }
 
   public String getZ3Path() {
@@ -287,16 +287,16 @@ public class GlobalConfig {
     this.javaPath.set(javaPath);
   }
 
-  public String getGetetaPath() {
-    return getetaPath.get();
+  public String getGetetaFilename() {
+    return getetaFilename.get();
   }
 
-  public StringProperty getetaPathProperty() {
-    return getetaPath;
+  public StringProperty getetaFilenameProperty() {
+    return getetaFilename;
   }
 
-  public void setGetetaPath(String getetaPath) {
-    this.getetaPath.set(getetaPath);
+  public void setGetetaFilename(String getetaFilename) {
+    this.getetaFilename.set(getetaFilename);
   }
 
   public int getMaxLineRollout() {

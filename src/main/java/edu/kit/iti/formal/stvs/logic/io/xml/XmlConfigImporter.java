@@ -56,14 +56,14 @@ public class XmlConfigImporter extends XmlImporter<GlobalConfig> {
       }
       Config.Dependencies deps = importedConfig.getDependencies();
       if (deps != null) {
-        if (deps.getGetetaPath() != null) {
-          config.setGetetaPath(deps.getGetetaPath());
+        if (deps.getGetetaFilename() != null) {
+          config.setGetetaFilename(deps.getGetetaFilename());
         }
         if (deps.getJavaPath() != null) {
           config.setJavaPath(deps.getJavaPath());
         }
-        if (deps.getNuxmvPath() != null) {
-          config.setNuxmvPath(deps.getNuxmvPath());
+        if (deps.getNuxmvFilename() != null) {
+          config.setNuxmvFilename(deps.getNuxmvFilename());
         }
         if (deps.getZ3Path() != null) {
           config.setZ3Path(deps.getZ3Path());

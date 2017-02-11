@@ -61,6 +61,10 @@ public class StvsRootModel {
     return globalConfig;
   }
 
+  public void setGlobalConfig(GlobalConfig globalConfig) {
+    this.globalConfig = globalConfig;
+  }
+
   public History getHistory() {
     return history;
   }

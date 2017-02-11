@@ -19,7 +19,8 @@ public interface VerificationEngine {
    *
    * @param scenario scenario that should be checked
    */
-  public void startVerification(VerificationScenario scenario, ConstraintSpecification spec) throws
+  public void startVerification(VerificationScenario scenario,
+                                ConstraintSpecification spec) throws
       IOException, ExportException;
 
   public NullableProperty<VerificationResult> verificationResultProperty();

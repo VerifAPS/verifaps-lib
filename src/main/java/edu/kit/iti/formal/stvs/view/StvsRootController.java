@@ -62,8 +62,13 @@ public class StvsRootController implements Controller {
   }
 
   private void onVerificationStartRequested(VerificationStartedEvent event) {
-    System.out.println("Starting verificatioN!!!");
-    //stvsRootModel.getScenario().verify(event.getConstraintSpec());
+    try {
+      stvsRootModel.getScenario().verify(stvsRootModel.getGlobalConfig().getGetetaFilename(),
+          stvsRootModel.getGlobalConfig().getNuxmvFilename(),
+          event.getConstraintSpec());
+    } catch (ExportException | IOException e) {
+      e.printStackTrace();
+    }
   }
 
   private List<CodeIoVariable> ioVarsFromCode(ParsedCode parsedCode) {

@@ -28,15 +28,16 @@ public class VerificationScenario {
 
   public VerificationScenario(Code code) {
     this.code = new SimpleObjectProperty<>(code);
-    verificationEngine = new GeTeTaVerificationEngine(code.getParsedCode().getDefinedTypes());
     verificationResult = new NullableProperty<>();
-    verificationEngine.verificationResultProperty().addListener(new
-        VerificationChangedListener());
     verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
   }
 
-  public void verify(ConstraintSpecification spec) throws IOException, ExportException {
-    verificationEngine = new GeTeTaVerificationEngine(code.get().getParsedCode().getDefinedTypes());
+  public void verify(String getetaFilename, String nuxmvFilename, ConstraintSpecification spec)
+      throws IOException,
+      ExportException {
+    verificationEngine = new GeTeTaVerificationEngine(getetaFilename, nuxmvFilename, code.get()
+        .getParsedCode()
+        .getDefinedTypes());
     verificationEngine.verificationResultProperty().addListener(new
         VerificationChangedListener());
     verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
