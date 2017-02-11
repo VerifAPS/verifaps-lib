@@ -1,22 +1,20 @@
 package edu.kit.iti.formal.stvs.view.editor;
 
-import edu.kit.iti.formal.automation.st.ast.Top;
 import edu.kit.iti.formal.stvs.model.code.SyntaxError;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.*;
-import javafx.util.StringConverter;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleSpans;
-import org.reactfx.Observable;
 
-import java.time.Duration;
 import java.util.Collection;
-import java.util.Optional;
 
 /**
  * Created by csicar on 09.01.17.

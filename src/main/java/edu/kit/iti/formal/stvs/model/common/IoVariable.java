@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.common;
 
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-
 /**
  * Created by csicar on 11.01.17.
  */

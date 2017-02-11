@@ -1,7 +1,8 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
-import edu.kit.iti.formal.stvs.model.table.*;
-import edu.kit.iti.formal.stvs.util.MapUtil;
+import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
+import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
+import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import javafx.beans.Observable;
 import javafx.collections.MapChangeListener;
 

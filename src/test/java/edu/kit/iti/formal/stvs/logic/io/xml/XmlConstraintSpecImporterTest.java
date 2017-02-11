@@ -7,9 +7,8 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
-import edu.kit.iti.formal.stvs.model.table.SpecProblemRecognizerTest;
 import edu.kit.iti.formal.stvs.model.table.JsonTableParser;
-import javafx.beans.property.SimpleObjectProperty;
+import edu.kit.iti.formal.stvs.model.table.SpecProblemRecognizerTest;
 import org.junit.Before;
 import org.junit.Test;
 

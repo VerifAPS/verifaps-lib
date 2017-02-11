@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.model;
 
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * Created by Philipp on 20.01.2017.

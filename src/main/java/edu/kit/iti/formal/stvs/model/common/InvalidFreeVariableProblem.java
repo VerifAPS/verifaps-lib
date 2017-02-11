@@ -1,9 +1,8 @@
 package edu.kit.iti.formal.stvs.model.common;
 
-import edu.kit.iti.formal.stvs.model.expressions.*;
-import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
-import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
-import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.Value;
+import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.Map;

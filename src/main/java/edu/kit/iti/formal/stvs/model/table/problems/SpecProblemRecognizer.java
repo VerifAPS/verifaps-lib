@@ -186,4 +186,12 @@ public class SpecProblemRecognizer {
     }
   }
 
+  public ValidSpecification getValidSpecification() {
+    return validSpecification.get();
+  }
+
+  public NullableProperty<ValidSpecification> validSpecificationProperty() {
+    return validSpecification;
+  }
+
 }

@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
 /**
