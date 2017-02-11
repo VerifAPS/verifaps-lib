@@ -5,14 +5,10 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.*;
-import edu.kit.iti.formal.stvs.model.table.problems.CellProblem;
-import edu.kit.iti.formal.stvs.model.table.problems.DurationProblem;
-import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
-import edu.kit.iti.formal.stvs.model.table.problems.SpecProblemRecognizer;
+import edu.kit.iti.formal.stvs.model.table.problems.*;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
@@ -21,8 +17,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.*;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.util.converter.DefaultStringConverter;
 
 import java.util.ArrayList;
@@ -36,8 +30,6 @@ import java.util.stream.Collectors;
  * Created by Philipp on 01.02.2017.
  */
 public class SpecificationTableController implements Controller {
-
-  private static final String DURATION_COL_USER_DATA = "__ duration column";
 
   private final TableView<SynchronizedRow> tableView;
   private final HybridSpecification hybridSpec;
@@ -59,7 +51,7 @@ public class SpecificationTableController implements Controller {
     this.codeIoVariables = codeIoVariables;
     this.hybridSpec = hybridSpecification;
     this.problemRecognizer = new SpecProblemRecognizer(typeContext, codeIoVariables, validVariables, hybridSpecification);
-    this.durations = createViewColumn(DURATION_COL_USER_DATA, "Duration", SynchronizedRow::getDuration);
+    this.durations = createViewColumn("Duration", SynchronizedRow::getDuration);
     this.columnContextMenu = createColumnEditingContextMenu();
 
     durations.setContextMenu(columnContextMenu);
@@ -84,6 +76,32 @@ public class SpecificationTableController implements Controller {
     }
 
     data.addListener(this::onDataRowChanged);
+    problemRecognizer.problemsProperty().addListener((Observable o) -> onProblemsChange());
+  }
+
+  private void onProblemsChange() {
+    List<ColumnProblem> columnProblems =
+        problemRecognizer.problemsProperty().get().stream()
+        .filter(problem -> problem instanceof ColumnProblem)
+        .map(problem -> (ColumnProblem) problem)
+        .collect(Collectors.toList());
+    for (TableColumn<SynchronizedRow, ?> column : tableView.getColumns()) {
+      if (column.getUserData() == null) {
+        continue;
+      }
+      List<ColumnProblem> problemsForColumn = columnProblems.stream()
+          .filter(problem -> problem.getColumn().equals(column.getUserData()))
+          .collect(Collectors.toList());
+
+      ColumnHeader columnHeader = (ColumnHeader) column.getGraphic();
+
+      if (problemsForColumn.isEmpty()) {
+        columnHeader.resetProblem();
+      } else {
+        columnHeader.configureProblems(problemsForColumn);
+      }
+    }
+    tableView.refresh();
   }
 
   private TableCell<SynchronizedRow, String> cellFactory(TableColumn<SynchronizedRow, String> table) {
@@ -120,7 +138,7 @@ public class SpecificationTableController implements Controller {
               }
             } else if (problem instanceof DurationProblem) {
               DurationProblem durationProblem = (DurationProblem) problem;
-              if (DURATION_COL_USER_DATA.equals(getTableColumn().getUserData()) && durationProblem.getRow() == getTableRow().getIndex()) {
+              if (getTableColumn().getUserData() == null && durationProblem.getRow() == getTableRow().getIndex()) {
                 configureProblem(problem);
                 return;
               }
@@ -202,28 +220,30 @@ public class SpecificationTableController implements Controller {
   }
 
   private void addColumnToView(final SpecIoVariable specIoVariable) {
-    tableView.getColumns().add(0,
-        createViewColumn(
-            specIoVariable.getName(),
-            specIoVariable.getVarDescriptor(),
-            synchronizedRow -> synchronizedRow.getCells().get(specIoVariable.getName()))
-    );
+    TableColumn<SynchronizedRow, String> column = createViewColumn(
+        specIoVariable.getName(),
+        synchronizedRow -> synchronizedRow.getCells().get(specIoVariable.getName()));
+
+    column.setUserData(specIoVariable.getName());
+    specIoVariable.nameProperty().addListener(
+        (Observable o) -> column.setUserData(specIoVariable.getName()));
+    column.setText("");
+    column.setGraphic(new ColumnHeader(specIoVariable));
+
+    tableView.getColumns().add(0, column);
     tableView.refresh(); // TODO: maybe this is not needed with the new deep observable updates in the model
   }
 
   private TableColumn<SynchronizedRow, String> createViewColumn(
-      String colIndex,
       String colName,
       final Function<SynchronizedRow, HybridCellModel> extractCellFromRow) {
     TableColumn<SynchronizedRow, String> column = new TableColumn<>(colName);
     column.setSortable(false);
     column.setEditable(true);
-    column.setPrefWidth(150);
+    column.setPrefWidth(100);
     column.setContextMenu(columnContextMenu);
     column.setCellFactory(this::cellFactory);
-    column.setUserData(colIndex);
 
-    //column.setCellFactory(TextFieldTableCell.forTableColumn());
     column.setCellValueFactory(rowModelData ->
         extractCellFromRow.apply(rowModelData.getValue())
             .stringRepresentationProperty());

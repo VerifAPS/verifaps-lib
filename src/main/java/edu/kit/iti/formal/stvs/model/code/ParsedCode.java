@@ -58,8 +58,8 @@ public class ParsedCode {
     private List<CodeIoVariable> definedVariables = new ArrayList<>();
 
     @Override
-    public Void visit(FunctionDeclaration function) {
-      function.getLocalScope().getLocalVariables().entrySet().forEach(variableEntry -> {
+    public Void visit(ProgramDeclaration program) {
+      program.getLocalScope().getLocalVariables().entrySet().forEach(variableEntry -> {
         //String varName = variableEntry.getKey();
         VariableDeclaration varDecl = variableEntry.getValue();
         VariableCategory category;

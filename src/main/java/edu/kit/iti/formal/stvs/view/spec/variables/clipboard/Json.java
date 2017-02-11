@@ -2,11 +2,7 @@ package edu.kit.iti.formal.stvs.view.spec.variables.clipboard;
 
 import com.google.gson.Gson;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import org.apache.commons.lang3.StringEscapeUtils;
 
-import java.lang.management.ManagementFactory;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +22,7 @@ public class Json {
   public static class FreeVar {
     public String name;
     public String type;
+    public String defaultval;
   }
 
   public static String stringFromRealFreeVariables(List<FreeVariable> freeVariables) {
@@ -42,6 +39,7 @@ public class Json {
           FreeVar var = new FreeVar();
           var.name = freeVariable.getName();
           var.type = freeVariable.getType();
+          var.defaultval = freeVariable.getDefaultValue();
           return var;
         })
         .collect(Collectors.toList());
@@ -53,7 +51,7 @@ public class Json {
   public static List<FreeVariable> toRealFreeVariables(FreeVarSelection selection)
       throws IllegalArgumentException {
     return selection.selected.stream()
-        .map(freeVar -> new FreeVariable(freeVar.name, freeVar.type))
+        .map(freeVar -> new FreeVariable(freeVar.name, freeVar.type, freeVar.defaultval))
         .collect(Collectors.toList());
   }
 }
