@@ -1,10 +1,11 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.util.AsyncTask;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -14,6 +15,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by leonk on 09.02.2017.
@@ -47,24 +49,22 @@ public class Z3SolverTest {
 
   private Scene simpleScene() {
     TextArea root = new TextArea();
-    try {
-      Z3Solver.concretize(TESTSTRING,
-          optionalOutput -> root.appendText(optionalOutput.orElse("Something went wrong!"))
-      );
-      Z3Solver.concretizeSExpr(TESTSTRING,
-          optionalOutput -> {
-            //System.out.println(optionalOutput.get());
+    List<ValidIoVariable> validIoVariables = new ArrayList<>();
+    validIoVariables.add(new ValidIoVariable(VariableCategory.INPUT, "A", TypeInt.INT));
+    validIoVariables.add(new ValidIoVariable(VariableCategory.OUTPUT, "B", TypeBool.BOOL));
+    AsyncTask<Optional<ConcreteSpecification>> asysncTask = new AsyncTask<>(
+        () -> {
+          Optional<ConcreteSpecification> concrete = Optional.empty();
+          try {
+            concrete = Z3Solver.concretizeVarAssignment(TEST2, validIoVariables);
+          } catch (IOException e) {
+            e.printStackTrace();
           }
-      );
-      List<ValidIoVariable> validIoVariables = new ArrayList<>();
-      validIoVariables.add(new ValidIoVariable(VariableCategory.INPUT, "A", TypeInt.INT));
-      validIoVariables.add(new ValidIoVariable(VariableCategory.OUTPUT, "B", TypeBool.BOOL));
-      Z3Solver.concretizeVarAssignment(TEST2, validIoVariables, result -> {
-        System.out.println(result);
-      });
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+          return concrete;
+        },
+        (optionalConcreteSpec) -> System.out.println(optionalConcreteSpec)
+    );
+    asysncTask.run();
     return new Scene(root, 800, 600);
   }
 }

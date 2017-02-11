@@ -22,16 +22,7 @@ public class AsyncTaskTest {
     TextArea root = new TextArea();
     AsyncTask<String> stringAsyncTask = new AsyncTask<>(() -> "TEST\n", root::appendText);
     stringAsyncTask.start();
-    try {
-      Process whoami = new ProcessBuilder("whoami").start();
-      ProcessOutputAsyncTask outputAsyncTask = new ProcessOutputAsyncTask(whoami,
-          output -> root.appendText(output.orElse("Problem with executing process."))
-      );
-      outputAsyncTask.start();
-      root.appendText("Thread magic!"+"\n");
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    root.appendText("Thread magic!"+"\n");
     return new Scene(root, 800, 600);
   }
 }

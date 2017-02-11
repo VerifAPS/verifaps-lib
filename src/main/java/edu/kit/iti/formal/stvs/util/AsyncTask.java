@@ -10,17 +10,17 @@ import java.util.function.Supplier;
  */
 public class AsyncTask<T> extends Thread{
   private final Supplier<T> runAsnc;
-  private final Consumer<T> runOnPlatform;
+  private final Consumer<T> runLater;
 
-  public AsyncTask(Supplier<T> runAsnc, Consumer<T> runOnPlatform){
+  public AsyncTask(Supplier<T> runAsnc, Consumer<T> runLater){
     super();
     this.runAsnc = runAsnc;
-    this.runOnPlatform = runOnPlatform;
+    this.runLater = runLater;
   }
 
   @Override
   public void run(){
     T result = runAsnc.get();
-    Platform.runLater(() -> runOnPlatform.accept(result));
+    Platform.runLater(() -> runLater.accept(result));
   }
 }
