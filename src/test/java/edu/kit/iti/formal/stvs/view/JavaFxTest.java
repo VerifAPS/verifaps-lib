@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.view;
 
 import javafx.application.Application;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;

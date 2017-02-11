@@ -24,15 +24,51 @@ public class XmlConfigImporter extends XmlImporter<GlobalConfig> {
       Config importedConfig = ((JAXBElement<Config>) jaxbUnmarshaller.unmarshal(source)).getValue();
       GlobalConfig config = new GlobalConfig();
       Config.General general = importedConfig.getGeneral();
+      if (general != null) {
+        if (general.getUiLanguage() != null) {
+          config.setUiLanguage(general.getUiLanguage());
+        }
+        if (general.getSimulationTimeout() != null) {
+          config.setSimulationTimeout(general.getSimulationTimeout().intValue());
+        }
+        if (general.getVerificationTimeout() != null) {
+          config.setVerificationTimeout(general.getVerificationTimeout().intValue());
+        }
+        if (general.getWindowSize().getHeight() != null) {
+          config.setWindowHeight(general.getWindowSize().getHeight().intValue());
+        }
+        if (general.getWindowSize().getWidth() != null) {
+          config.setWindowWidth(general.getWindowSize().getWidth().intValue());
+        }
+        if (general.getMaxLineRollout() != null) {
+          config.setMaxLineRollout(general.getMaxLineRollout().intValue());
+        }
+      }
       Config.Editor editor = importedConfig.getEditor();
-      config.setUiLanguage(general.getUiLanguage());
-      config.setSimulationTimeout(general.getSimulationTimeout().intValue());
-      config.setVerificationTimeout(general.getVerificationTimeout().intValue());
-      config.setWindowHeight(general.getWindowSize().getHeight().intValue());
-      config.setWindowWidth(general.getWindowSize().getWidth().intValue());
-      config.setEditorFontSize(editor.getFontSize().intValue());
-      config.setEditorFontFamily(editor.getFontFamily());
-      config.setShowLineNumbers(editor.isShowLineNumbers());
+      if (editor != null) {
+        if (editor.getFontSize() != null) {
+          config.setEditorFontSize(editor.getFontSize().intValue());
+        }
+        if (editor.getFontFamily() != null) {
+          config.setEditorFontFamily(editor.getFontFamily());
+        }
+        config.setShowLineNumbers(editor.isShowLineNumbers());
+      }
+      Config.Dependencies deps = importedConfig.getDependencies();
+      if (deps != null) {
+        if (deps.getGetetaPath() != null) {
+          config.setGetetaPath(deps.getGetetaPath());
+        }
+        if (deps.getJavaPath() != null) {
+          config.setJavaPath(deps.getJavaPath());
+        }
+        if (deps.getNuxmvPath() != null) {
+          config.setNuxmvPath(deps.getNuxmvPath());
+        }
+        if (deps.getZ3Path() != null) {
+          config.setZ3Path(deps.getZ3Path());
+        }
+      }
       return config;
     } catch (JAXBException e) {
       throw new ImportException(e);

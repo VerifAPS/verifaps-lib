@@ -5,7 +5,9 @@ import edu.kit.iti.formal.stvs.model.code.CodeTest;
 import edu.kit.iti.formal.stvs.model.code.ParsedCode;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -25,12 +27,19 @@ public class EditorTest {
   }
 
   private List<Node> editorAndModelSplit() {
-    Code code = CodeTest.loadCodeFromFile("invalidCode.st");
+    Code code = CodeTest.loadCodeFromFile("define_type.st");
     EditorPaneController controller = new EditorPaneController(code, new GlobalConfig());
 
     Pane rightPane = createExtractedVarsTextArea(code);
 
     return Arrays.asList(controller.getView(), rightPane);
+  }
+
+  private void updateSyntaxErrors(TextArea textField, Code code) {
+    StringBuilder output = new StringBuilder();
+    output.append("Syntax-Errors:\n");
+    code.getSyntaxErrors().forEach(error -> output.append(" - " + error + "\n"));
+    textField.setText(output.toString());
   }
 
   private Pane createExtractedVarsTextArea(Code code) {

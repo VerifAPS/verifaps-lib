@@ -7,6 +7,8 @@ import edu.kit.iti.formal.stvs.model.code.ParsedCode;
 import edu.kit.iti.formal.stvs.model.code.SyntaxError;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import org.antlr.v4.runtime.Token;
 import org.fxmisc.richtext.*;
@@ -16,6 +18,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * Created by csicar on 09.01.17.
@@ -28,10 +31,12 @@ public class EditorPaneController implements Controller {
   private Code code;
   private GlobalConfig globalConfig;
   private ExecutorService executor;
+  private ObservableList<SyntaxError> syntaxErrors;
 
   public EditorPaneController(Code code, GlobalConfig globalConfig) {
     this.code = code;
-    this.view = new EditorPane(code.getSourcecode());
+    this.syntaxErrors = code.getSyntaxErrorObs();
+    this.view = new EditorPane(code.getSourcecode(), syntaxErrors);
     this.globalConfig = globalConfig;
 
     this.view.getStylesheets().add(
@@ -39,6 +44,7 @@ public class EditorPaneController implements Controller {
     this.executor = Executors.newSingleThreadExecutor();
     configureTextArea();
     handleTextChange(computeHighlighting(code.getSourcecode()));
+
   }
 
   private void configureTextArea() {
@@ -95,18 +101,19 @@ public class EditorPaneController implements Controller {
   }
 
   private Collection<String> getStyleClassesFor(Token token, List<SyntaxError> syntaxErrors) {
-    List<String> classes = new ArrayList<>();
         //getHightlightingClass(token);
-    if (syntaxErrors.stream().anyMatch(syntaxError -> syntaxError.isSameToken(token))) {
-      classes.add("syntax-error");
+    if (syntaxErrors.stream().anyMatch(syntaxError -> syntaxError.isToken(token))) {
+      return Collections.singletonList("syntax-error");
+    } else {
+      return getHightlightingClass(token);
     }
-    classes.addAll(getHightlightingClass(token));
-    return classes;
   }
 
   private List<String> getHightlightingClass(Token token) {
     // TODO: Add more colours (styles) to tokens
     switch (token.getType()) {
+      case IEC61131Lexer.PROGRAM:
+      case IEC61131Lexer.END_PROGRAM:
       case IEC61131Lexer.TYPE:
       case IEC61131Lexer.END_TYPE:
       case IEC61131Lexer.IF:
@@ -147,6 +154,8 @@ public class EditorPaneController implements Controller {
   private void handleTextChange(StyleSpans<Collection<String>> highlighting) {
     code.updateSourcecode(view.getCodeArea().getText());
     view.setStyleSpans(highlighting);
+    System.out.println(view.getSyntaxErrorListView().getItems());
+
   }
 
   private void handleParsedCodeFoldingBlocks(List<FoldableCodeBlock> foldableCodeBlocks) {

@@ -184,7 +184,15 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
     // I have to trust ANTLR to not have any other values here... :/
     switch (ctx.a.getType()) {
       case CellExpressionLexer.INTEGER:
-        return new ValueInt(Integer.parseInt(ctx.getText()));
+        ParseException tooLongExpression = new ParseException(
+            ctx.a.getLine(), ctx.a.getCharPositionInLine(),
+            "Integer value is too big: " + ctx.a.getText());
+        try {
+          int parsedInt = (int) Short.parseShort(ctx.getText());
+          return new ValueInt(parsedInt);
+        } catch (NumberFormatException nfe) {
+          throw new ParseRuntimeException(tooLongExpression);
+        }
       case CellExpressionLexer.T:
         return ValueBool.TRUE;
       case CellExpressionLexer.F:

@@ -14,6 +14,10 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -115,12 +119,13 @@ public class ParsedCode {
                                Consumer<List<SyntaxError>> syntaxErrors,
                                Consumer<ParsedCode> parsedCodeListener) {
     try {
+      SyntaxErrorListener syntaxErrorListener = new SyntaxErrorListener();
       IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(input));
+      lexer.addErrorListener(syntaxErrorListener);
       tokenListener.accept(lexer.getAllTokens());
       lexer.reset();
 
       IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
-      SyntaxErrorListener syntaxErrorListener = new SyntaxErrorListener();
       parser.addErrorListener(syntaxErrorListener);
       syntaxErrors.accept(syntaxErrorListener.getSyntaxErrors());
 

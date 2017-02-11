@@ -1,13 +1,18 @@
 package edu.kit.iti.formal.stvs.view.editor;
 
+import edu.kit.iti.formal.automation.st.ast.Top;
+import edu.kit.iti.formal.stvs.model.code.SyntaxError;
 import javafx.beans.property.StringProperty;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.collections.ObservableList;
+import javafx.geometry.Orientation;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SplitPane;
+import javafx.scene.layout.*;
+import javafx.util.StringConverter;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleSpans;
+import org.reactfx.Observable;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -16,7 +21,7 @@ import java.util.Optional;
 /**
  * Created by csicar on 09.01.17.
  */
-public class EditorPane extends StackPane {
+public class EditorPane extends SplitPane {
 
   /**
    * Contains ButtonList and CodeArea
@@ -24,12 +29,33 @@ public class EditorPane extends StackPane {
   private HBox horizontalBox;
   private CodeArea codeArea;
   private VBox buttonList;
+  private ListView<SyntaxError> syntaxErrorListView;
 
-  public EditorPane(String code) {
+  public Pane getSyntaxErrorPane() {
+    return syntaxErrorPane;
+  }
+
+  private Pane syntaxErrorPane;
+
+  public ListView<SyntaxError> getSyntaxErrorListView() {
+    return syntaxErrorListView;
+  }
+
+  public EditorPane(String code, ObservableList<SyntaxError> syntaxErrors) {
     super();
     codeArea = new CodeArea(code);
     codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
-    super.getChildren().addAll(codeArea);
+    syntaxErrorListView = new ListView<>(syntaxErrors);
+    syntaxErrorListView.getStylesheets().add(EditorPane.class.getResource("style.css").toExternalForm());
+    syntaxErrorListView.getStyleClass().addAll("model-text-area");
+    syntaxErrorPane  = new AnchorPane(syntaxErrorListView);
+    AnchorPane.setBottomAnchor(syntaxErrorListView, 0.0);
+    AnchorPane.setTopAnchor(syntaxErrorListView, 0.0);
+    AnchorPane.setLeftAnchor(syntaxErrorListView, 0.0);
+    AnchorPane.setRightAnchor(syntaxErrorListView, 0.0);
+    this.getItems().addAll(codeArea, syntaxErrorPane);
+    this.setOrientation(Orientation.VERTICAL);
+    this.setDividerPositions(0.8);
   }
 
   public StringProperty getCodeProperty() {

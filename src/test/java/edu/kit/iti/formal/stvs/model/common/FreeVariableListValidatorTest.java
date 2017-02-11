@@ -78,7 +78,7 @@ public class FreeVariableListValidatorTest {
   }
 
   public void checkProblems(FreeVariableListValidator validator) {
-    if (expectedProblem == "") {
+    if (expectedProblem.isEmpty()) {
       validator.problemsProperty().get().values().forEach(System.out::println);
       assertEquals("Number of valid free variables should be equal to number of unvalidated",
           variables.size(),

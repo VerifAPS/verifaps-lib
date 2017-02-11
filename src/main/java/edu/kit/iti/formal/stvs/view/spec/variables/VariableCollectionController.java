@@ -3,26 +3,28 @@ package edu.kit.iti.formal.stvs.view.spec.variables;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableProblem;
 import edu.kit.iti.formal.stvs.model.expressions.*;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
 import edu.kit.iti.formal.stvs.util.ListTypeConverter;
 import edu.kit.iti.formal.stvs.view.Controller;
+import edu.kit.iti.formal.stvs.view.spec.variables.clipboard.Json;
+import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.ComboBoxTableCell;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.DataFormat;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.*;
 import javafx.util.StringConverter;
+import javafx.util.converter.DefaultStringConverter;
 
+import java.lang.management.ManagementFactory;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by csicar on 10.01.17.
@@ -33,7 +35,6 @@ public class VariableCollectionController implements Controller {
   private FreeVariableList freeVariableList;
   private FreeVariableListValidator validator;
   private VariableCollection view;
-  // was used for drag n drop: private int latestMouseOverRow = 0;
 
   private ContextMenu contextMenu;
 
@@ -58,84 +59,20 @@ public class VariableCollectionController implements Controller {
 
     view.getFreeVariableTableView().setContextMenu(contextMenu);
 
-    view.getAddFreeVariable().setOnAction(event -> addFreeVariable());
-    view.getFreeVariableTableView().setItems(freeVariableList.getVariables());
+    view.getAddFreeVariable().setOnAction(event ->
+        freeVariableList.getVariables().add(new FreeVariable("variable", "BOOL")));
 
-    /*
-    view.getFreeVariableTableView().setRowFactory(param -> {
-      TableRow<FreeVariable> row = new TableRow<>();
-      row.setOnMouseEntered(event -> {
-        if (!row.isEmpty()) {
-          System.out.println("Mouse over: " + row.getIndex());
-          latestMouseOverRow = row.getIndex();
-        }
-      });
-      return row;
-    });
-    */
+    view.getFreeVariableTableView().setRowFactory(this::rowFactory);
 
     view.getNameTableColumn().setCellValueFactory(data -> data.getValue().nameProperty());
     view.getTypeTableColumn().setCellValueFactory(data -> data.getValue().typeProperty());
     view.getDefaultValueTableColumn().setCellValueFactory(data -> data.getValue().defaultValueProperty());
 
-    ObservableList<Type> codeTypesList = ListTypeConverter.makeObservableList(codeTypes);
-    view.getNameTableColumn().setCellFactory(TextFieldTableCell.forTableColumn());
-    view.getTypeTableColumn().setCellFactory(TextFieldTableCell.forTableColumn()); // TODO: Make this combo box again!
-    view.getDefaultValueTableColumn().setCellFactory(TextFieldTableCell.forTableColumn());
-    // TODO: Show FreeVariableProblems!!!
+    view.getNameTableColumn().setCellFactory(this::cellFactory);
+    view.getTypeTableColumn().setCellFactory(this::cellFactory); // TODO: Make this combo box again!
+    view.getDefaultValueTableColumn().setCellFactory(this::cellFactory);
 
-    // TODO: Maybe fix drag n drop in future
-    //configureDragAndDrop(view.getFreeVariableTableView());
-  }
-
-  private StringConverter<Type> createTypeConverter(ObservableList<Type> codeTypes) {
-    return new StringConverter<Type>() {
-      @Override
-      public String toString(Type type) {
-        return type.getTypeName();
-      }
-      @Override
-      public Type fromString(String string) {
-        return codeTypes.stream()
-            .filter(type -> type.getTypeName().equals(string))
-            .findFirst()
-            .orElse(null);
-      }
-    };
-  }
-
-  private StringConverter<Value> createDefaultValueConverter(ObservableList<Type> codeTypes) {
-    return new StringConverter<Value>() {
-      @Override
-      public String toString(Value value) {
-        return value == null ? "-" : value.getValueString();
-      }
-
-      @Override
-      public Value fromString(String string) {
-        switch (string) {
-          case "-": return null;
-          default:
-            try {
-              Set<Type> typeContext = new HashSet<>();
-              typeContext.addAll(codeTypes);
-              ExpressionParser parser = new ExpressionParser("", typeContext);
-              Expression parsed = parser.parseExpression(string);
-              BinaryFunctionExpr bin = (BinaryFunctionExpr) parsed;
-              LiteralExpr literal = (LiteralExpr) bin.getSecondArgument();
-              return literal.getValue();
-            } catch (Exception e) {
-              // TODO: Provide visual error feedback
-              return null;
-            }
-        }
-      }
-    };
-  }
-
-  private void addFreeVariable() {
-    FreeVariable freeVariable = new FreeVariable("", "");
-    view.getFreeVariableTableView().getItems().add(freeVariable);
+    view.getFreeVariableTableView().setItems(freeVariableList.getVariables());
   }
 
   @Override
@@ -151,11 +88,50 @@ public class VariableCollectionController implements Controller {
     return validator;
   }
 
-  /*
+  private TableCell<FreeVariable, String> cellFactory(TableColumn<FreeVariable, String> tableColumn) {
+    return new TextFieldTableCell<FreeVariable, String>(new DefaultStringConverter()) {
+      {
+        validator.problemsProperty().addListener((Observable o) -> onProblemsChanged());
+        getStyleClass().add("freevar");
+        onProblemsChanged();
+      }
+
+      private void configureProblematic(String tooltip) {
+        getStyleClass().remove("freevar-problem");
+        getStyleClass().add("freevar-problem");
+        setTooltip(new Tooltip(tooltip));
+        // TODO: Javafx tables dont update it's cells view from
+      }
+
+      private void configureUnproblematic() {
+        getStyleClass().remove("freevar-problem");
+        setTooltip(null);
+      }
+
+      private void onProblemsChanged() {
+        if (!isEmpty()) {
+          List<FreeVariableProblem> problems = validator.problemsProperty().get()
+              .getOrDefault(getTableRow().getItem(), Collections.emptyList());
+          if (problems.isEmpty()) {
+            configureUnproblematic();
+          } else {
+            configureProblematic(String.join("\n\n",
+                problems.stream().map(FreeVariableProblem::getGUIMessage)
+                    .collect(Collectors.toList())));
+          }
+        }
+      }
+    };
+  }
+
   private static final DataFormat JSON_MIME_TYPE = new DataFormat("application/json");
 
-  private void configureDragAndDrop(TableView<FreeVariable> tableView) {
-    tableView.setOnDragDetected(event -> {
+  private TableRow<FreeVariable> rowFactory(TableView<FreeVariable> tableView) {
+    TableRow<FreeVariable> row = new TableRow<>();
+
+    // TODO: Drag n drop does not work
+
+    row.setOnDragDetected(event -> {
       ObservableList<FreeVariable> selected = tableView.getSelectionModel().getSelectedItems();
       if (!selected.isEmpty()) {
         String serializedSelection = Json.stringFromRealFreeVariables(selected);
@@ -169,7 +145,7 @@ public class VariableCollectionController implements Controller {
       }
     });
 
-    tableView.setOnDragOver(event -> {
+    row.setOnDragOver(event -> {
       Dragboard db = event.getDragboard();
       if (db.hasContent(JSON_MIME_TYPE)) {
         event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
@@ -177,31 +153,30 @@ public class VariableCollectionController implements Controller {
       }
     });
 
-    tableView.setOnDragDropped(event -> {
+    row.setOnDragDropped(event -> {
       Dragboard db = event.getDragboard();
       if (db.hasContent(JSON_MIME_TYPE)) {
         String dragboardContent = db.getContent(JSON_MIME_TYPE).toString();
-
         List<FreeVariable> droppedVariables =
-            Json.stringToRealFreeVariables(codeTypes, dragboardContent);
-        String source = Json.stringToSource(dragboardContent);
+            Json.stringToRealFreeVariables(dragboardContent);
 
-        if (ManagementFactory.getRuntimeMXBean().getName().equals(source)) {
-          tableView.getItems().removeIf(freeVariable ->
-            droppedVariables.stream()
-                .anyMatch(var -> var.getName().equals(freeVariable.getName())));
-        }
-        tableView.getItems().addAll(latestMouseOverRow, droppedVariables);
+        // TODO: Multiple variables with same name get deleted
+        tableView.getItems().removeIf(freeVariable ->
+          droppedVariables.stream()
+              .anyMatch(var -> var.getName().equals(freeVariable.getName())));
+
+        int dropIndex = row.getIndex();
+        tableView.getItems().addAll(Math.min(dropIndex, tableView.getItems().size()), droppedVariables);
 
         tableView.getSelectionModel().clearSelection();
         tableView.getSelectionModel().selectRange(
-            latestMouseOverRow, latestMouseOverRow + droppedVariables.size());
+            dropIndex, dropIndex + droppedVariables.size());
 
         event.setDropCompleted(true);
         event.consume();
       }
     });
+    return row;
   }
-  */
 
 }

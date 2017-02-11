@@ -55,7 +55,7 @@ public class TimingDiagramController implements Controller {
     xAxis.upperBoundProperty().bind(commonXAxis.upperBoundProperty());
     yAxis.getStyleClass().add("zeroWidth");
 
-    yAxis.layoutBoundsProperty().addListener(change -> updateAxisExternalPosition());
+    //yAxis.layoutBoundsProperty().addListener(change -> updateAxisExternalPosition());
 
     initCommon();
   }
@@ -86,7 +86,7 @@ public class TimingDiagramController implements Controller {
 
   private void initCommon() {
     view.setDurations(concreteSpec.getDurations());
-    view.getyAxis().layoutBoundsProperty().addListener(change -> updateAxisExternalPosition());
+    //view.getyAxis().layoutBoundsProperty().addListener(change -> updateAxisExternalPosition());
     view.selectedCycleProperty().addListener(change -> {
       if(view.selectedCycleProperty().isNotNull().get()){
         selection.setRow(concreteSpec.cycleToRowNumber(view.getSelectedCycle()));
@@ -105,7 +105,7 @@ public class TimingDiagramController implements Controller {
         xPositiveZoomItem,
         xNegativeZoomItem
     );
-    view.setTitle(ioVariable.getName()+ " : " + ioVariable.getValidType());
+    //view.setTitle(ioVariable.getName()+ " : " + ioVariable.getType().getTypeName());
   }
 
   private void onXPositiveZoom(ActionEvent actionEvent) {
@@ -145,11 +145,11 @@ public class TimingDiagramController implements Controller {
     }
   }
 
-  private void updateAxisExternalPosition() {
-    Transform transformation = ViewUtils.calculateTransformRelativeTo(view.getParent(), view.getyAxis());
+  /*private void updateAxisExternalPosition() {
+    Transform transformation = ViewUtils.calculateTransformRelativeTo(view.getParent().getParent().getParent(), view.getyAxis());
     double yAxisPosition = transformation.transform(view.getyAxis().getLayoutBounds()).getMinY();
     externalYAxis.layoutYProperty().set(yAxisPosition);
-  }
+  }*/
 
   public TimingDiagramView getView() {
     return view;

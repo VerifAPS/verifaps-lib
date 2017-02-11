@@ -14,4 +14,11 @@ public abstract class FreeVariableProblem extends Exception {
   public String getErrorMessage() {
     return errorMessage;
   }
+
+  public String getGUIMessage() {
+    return getProblemName() + ": " + getErrorMessage();
+  }
+
+  public abstract String getProblemName();
+
 }
