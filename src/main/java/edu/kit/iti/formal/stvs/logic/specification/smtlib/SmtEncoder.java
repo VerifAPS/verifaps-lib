@@ -162,7 +162,12 @@ public class SmtEncoder {
   }
 
   private int getMaxDurationSum(int z) {
-    return IntStream.range(0, z).map(this::getMaxDuration).sum();
+    int sum = 0;
+    for (int i = 0; i <= z; i++) {
+      sum += getMaxDuration(i);
+    }
+
+    return sum;
   }
 
   private Expression getEntry(Integer row, SpecIoVariable ioVariable) {

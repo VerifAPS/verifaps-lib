@@ -59,6 +59,7 @@ public class SmtEncoderTest {
   }
 
   @Test
+  @Ignore
   public void testImported() throws ImportException {
 
     ValidSpecification spec = importSpec("testSpec.xml");
@@ -80,7 +81,7 @@ public class SmtEncoderTest {
     ValidSpecification spec = importSpec("simpleBackwardsReferenceTestSpec.xml");
     Map<Integer, Integer> maxDurations = new HashMap<Integer,
         Integer>() {{
-      put(0, 2);
+      put(0, 3);
       put(1, 5);
       put(2, 5);
     }};
@@ -90,9 +91,6 @@ public class SmtEncoderTest {
     testForBigN(output.getGlobalConstraints());
 
     System.out.println(output);
-    PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
-    writer.println(output);
-    writer.close();
 
   }
 
@@ -100,8 +98,16 @@ public class SmtEncoderTest {
     List<SExpr> statements = Stream.of(
         "(implies (> n_2 4) (= A_2_4 A_2_0))",
         "(implies (> n_2 3) (= A_2_3 A_2_-1))",
+          "(implies (= n_1 1) (= A_2_-1 A_1_0))",
         "(implies (> n_2 2) (= A_2_2 A_2_-2))",
-          "(implies (= n_1 1) (= A_2_-2 A_1_0))"
+          "(implies (= n_1 1) (= A_2_-2 A_1_-1))",
+            "(implies (= n_0 3) (= A_1_-1 A_0_2))",
+        "(implies (> n_2 1) (= A_2_1 A_2_-3))",
+          "(implies (= n_1 1) (= A_2_-3 A_1_-2))",
+            "(implies (= n_0 3) (= A_1_-2 A_0_1))",
+        "(implies (> n_2 0) (= A_2_0 A_2_-4))",
+          "(implies (= n_1 1) (= A_2_-4 A_1_-3))",
+            "(implies (= n_0 3) (= A_1_-3 A_0_0))"
     ).map(SExpr::fromString).collect(Collectors.toList());
 
     List<SExpr> missingStatements = statements.stream().filter
