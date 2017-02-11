@@ -66,4 +66,8 @@ test {
         includeTestsMatching "edu.kit.iti.formal.stvs.model.*"
         includeTestsMatching "edu.kit.iti.formal.stvs.logic.*"
     }
+
+    testLogging {
+        showStandardStreams = true
+    }
 }

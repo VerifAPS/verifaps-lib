@@ -2,10 +2,8 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import de.tudresden.inf.lat.jsexp.Sexp;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -66,6 +64,18 @@ public class SConstraint implements SExpr {
     return headerToText() + " \n " + globalConstraintsToText();
   }
 
+  @Override
+  public <E> E visit(Function<? super SExpr, E> visitor) {
+    return visitor.apply(this);
+  }
+
+  @Override
+  public <E> List<E> visitChildren(Function<? super SExpr, E> visitor) {
+    List<E> result = globalConstraints.stream().map(visitor::apply).collect(Collectors.toList());
+    result.addAll(variableDefinitions.stream().map(visitor::apply).collect(Collectors.toList()));
+    return result;
+  }
+
   public SConstraint addGlobalConstrains(SExpr ... globalConstraint) {
     return addGlobalConstrains(Arrays.asList(globalConstraint));
   }
@@ -102,5 +112,24 @@ public class SConstraint implements SExpr {
         .collect
         (Collectors.joining("\n\t\t")) +
         "\n}";
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    SConstraint that = (SConstraint) o;
+
+    if (globalConstraints != null ? !globalConstraints.equals(that.globalConstraints) : that.globalConstraints != null)
+      return false;
+    return variableDefinitions != null ? variableDefinitions.equals(that.variableDefinitions) : that.variableDefinitions == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = globalConstraints != null ? globalConstraints.hashCode() : 0;
+    result = 31 * result + (variableDefinitions != null ? variableDefinitions.hashCode() : 0);
+    return result;
   }
 }

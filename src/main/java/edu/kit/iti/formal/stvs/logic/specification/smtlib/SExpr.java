@@ -4,6 +4,9 @@ import de.tudresden.inf.lat.jsexp.Sexp;
 import de.tudresden.inf.lat.jsexp.SexpFactory;
 import de.tudresden.inf.lat.jsexp.SexpParserException;
 
+import java.util.List;
+import java.util.function.Function;
+
 /**
  * Created by csicar on 08.02.17.
  */
@@ -38,7 +41,19 @@ public interface SExpr {
    */
   String toText();
 
+  /**
+   * does the SExpr contain the given sexpr?
+   * @param expr expression to check for
+   * @return true, if SExpr is contained
+   */
+  default boolean contains(SExpr expr) {
+    return this.visit(c ->
+        c.equals(expr) || c.visitChildren(this::contains).stream().anyMatch(e
+        -> true));
+  }
 
+  <E> E visit(Function<? super SExpr, E> visitor);
 
+  <E> List<E> visitChildren(Function<? super SExpr, E> visitor);
 
 }

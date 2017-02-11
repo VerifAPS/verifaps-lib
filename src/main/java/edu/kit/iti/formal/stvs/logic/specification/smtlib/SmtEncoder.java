@@ -18,7 +18,7 @@ import java.util.stream.IntStream;
 /**
  * Created by csicar on 09.02.17.
  */
-public class SmtPreprocessor {
+public class SmtEncoder {
 
   private static Map<String, String> smtlibTypes = new HashMap<String,
       String>() {{
@@ -34,8 +34,8 @@ public class SmtPreprocessor {
 
   private SConstraint sConstrain;
 
-  public SmtPreprocessor(Map<Integer, Integer> maxDurations,
-                         ValidSpecification specification, List<ValidFreeVariable> validFreeVariables) {
+  public SmtEncoder(Map<Integer, Integer> maxDurations,
+                    ValidSpecification specification, List<ValidFreeVariable> validFreeVariables) {
     this.maxDurations = maxDurations;
     this.specification = specification;
     this.ioVariables = specification.getColumnHeaders();
@@ -97,7 +97,7 @@ public class SmtPreprocessor {
           for (int k = 0; k <= getMaxDuration(z - 1); k++) {
             // n_(z-1) = k => A_z_i = A_(z-1)_(k-i)
             this.sConstrain.addGlobalConstrains(
-                new SList("impliesRule3",
+                new SList("implies",
                     new SList("=",
                         "n_" + (z - 1),
                         k + ""

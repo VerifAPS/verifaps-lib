@@ -3,6 +3,10 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 import de.tudresden.inf.lat.jsexp.Sexp;
 import de.tudresden.inf.lat.jsexp.SexpFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+
 /**
  * Created by csicar on 08.02.17.
  */
@@ -51,5 +55,15 @@ public class SAtom implements SExpr {
   @Override
   public String toText() {
     return string;
+  }
+
+  @Override
+  public <E> E visit(Function<? super SExpr, E> visitor) {
+    return visitor.apply(this);
+  }
+
+  @Override
+  public <E> List<E> visitChildren(Function<? super SExpr, E> visitor) {
+    return new ArrayList<>();
   }
 }

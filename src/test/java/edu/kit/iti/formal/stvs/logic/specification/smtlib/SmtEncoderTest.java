@@ -4,7 +4,6 @@ import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
@@ -17,14 +16,22 @@ import edu.kit.iti.formal.stvs.model.table.problems.SpecProblemRecognizer;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import org.junit.Test;
+import org.junit.*;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.junit.Assert.*;
 
 /**
  * Created by csicar on 09.02.17.
  */
-public class SmtPreprocessorTest {
+public class SmtEncoderTest {
   private List<ValidFreeVariable> freeVariables;
 
   private ValidSpecification importSpec(String name) throws
@@ -63,11 +70,50 @@ public class SmtPreprocessorTest {
       put(2, 2);
     }};
 
-    SmtPreprocessor preprocessor = new SmtPreprocessor(maxDurations, spec, freeVariables);
+    SmtEncoder preprocessor = new SmtEncoder(maxDurations, spec, freeVariables);
     System.out.println(preprocessor.getConstrain());
   }
 
-  public void testSimpleExample() throws ImportException {
+
+  @Test
+  public void testSimpleExample() throws ImportException, IOException {
+    ValidSpecification spec = importSpec("simpleBackwardsReferenceTestSpec.xml");
+    Map<Integer, Integer> maxDurations = new HashMap<Integer,
+        Integer>() {{
+      put(0, 2);
+      put(1, 5);
+      put(2, 5);
+    }};
+
+    SmtEncoder smtEncoder = new SmtEncoder(maxDurations, spec, freeVariables);
+    SConstraint output = smtEncoder.getConstrain();
+    testForBigN(output.getGlobalConstraints());
+
+    System.out.println(output);
+    PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
+    writer.println(output);
+    writer.close();
+
+  }
+
+  private void testForBigN(Set<SExpr> constraints) {
+    List<SExpr> statements = Stream.of(
+        "(implies (> n_2 4) (= A_2_4 A_2_0))",
+        "(implies (> n_2 3) (= A_2_3 A_2_-1))",
+        "(implies (> n_2 2) (= A_2_2 A_2_-2))",
+          "(implies (= n_1 1) (= A_2_-2 A_1_0))"
+    ).map(SExpr::fromString).collect(Collectors.toList());
+
+    List<SExpr> missingStatements = statements.stream().filter
+        (statement
+            -> !constraints
+            .contains
+                (statement))
+        .collect(Collectors.toList());
+
+    System.out.println(constraints);
+    assertEquals("no statements should be missing", new ArrayList<SExpr>(), missingStatements);
+
 
   }
 }
