@@ -4,11 +4,12 @@ import com.google.gson.JsonElement;
 import edu.kit.iti.formal.stvs.model.TestUtils;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
-import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

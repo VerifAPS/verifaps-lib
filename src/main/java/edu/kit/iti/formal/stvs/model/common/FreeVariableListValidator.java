@@ -32,6 +32,7 @@ public class FreeVariableListValidator {
     this.validVars = new SimpleObjectProperty<>(new ArrayList<>());
 
     freeVariables.getVariables().addListener((Observable o) -> revalidate());
+    typeContext.addListener((Observable o) -> revalidate());
     revalidate();
   }
 

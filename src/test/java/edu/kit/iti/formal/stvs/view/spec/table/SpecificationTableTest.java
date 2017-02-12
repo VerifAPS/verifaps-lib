@@ -1,7 +1,10 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
-import edu.kit.iti.formal.stvs.model.common.*;
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
+import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;

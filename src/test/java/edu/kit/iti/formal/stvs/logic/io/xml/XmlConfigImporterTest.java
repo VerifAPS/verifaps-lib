@@ -8,7 +8,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileInputStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Benjamin Alt

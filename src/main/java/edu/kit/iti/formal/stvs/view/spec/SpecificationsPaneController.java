@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
-import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;

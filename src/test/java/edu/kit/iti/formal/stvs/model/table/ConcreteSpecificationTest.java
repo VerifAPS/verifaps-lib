@@ -1,12 +1,13 @@
 package edu.kit.iti.formal.stvs.model.table;
 
 import com.google.gson.JsonElement;
-import edu.kit.iti.formal.stvs.model.expressions.*;
-import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
+import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 

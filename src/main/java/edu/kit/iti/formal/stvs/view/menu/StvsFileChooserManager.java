@@ -1,10 +1,6 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventDispatchChain;
-import javafx.event.EventHandler;
-import javafx.event.EventTarget;
 import javafx.scene.Node;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;

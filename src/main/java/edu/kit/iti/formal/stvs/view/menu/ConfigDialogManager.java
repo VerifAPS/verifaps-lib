@@ -2,7 +2,6 @@ package edu.kit.iti.formal.stvs.view.menu;
 
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -12,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.stage.Stage;
-import javafx.util.converter.NumberStringConverter;
 
 /**
  * Created by csicar on 11.01.17.

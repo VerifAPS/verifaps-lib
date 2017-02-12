@@ -2,37 +2,32 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.model.common.VariableCategory;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.util.ListTypeConverter;
-import edu.kit.iti.formal.stvs.view.common.TypeComboBox;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.scene.Node;
+import javafx.collections.ObservableList;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
 
-import static javafx.scene.control.ButtonType.CANCEL;
-
-public class IoVariableNameDialog extends Dialog<SpecIoVariable> {
+public class IoVariableChooserDialog extends Dialog<SpecIoVariable> {
 
   private final TextField nameTextField;
-  private final TypeComboBox typeComboBox;
+  private final TextField typeTextField;
+  private final IoVariableDefinitionPane definitionPane;
   private final ListView<CodeIoVariable> ioVariables;
   private final ButtonType createButton = new ButtonType("Create", ButtonBar.ButtonData.OK_DONE);
 
-  public IoVariableNameDialog(ObjectProperty<List<Type>> typeContext,
-                              ObjectProperty<List<CodeIoVariable>> codeIoVariables) {
+  public IoVariableChooserDialog(
+      ObjectProperty<List<CodeIoVariable>> codeIoVariables,
+      ObservableList<SpecIoVariable> alreadyDefinedVariables) {
     super();
+
     this.nameTextField = new TextField();
-    // TODO: Update observable list of types (and of codeIoVariables)
-    this.typeComboBox = new TypeComboBox(typeContext);
+    this.typeTextField = new TextField();
     this.ioVariables = new ListView<>();
+    this.definitionPane = new IoVariableDefinitionPane();
 
     ioVariables.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     ioVariables.getSelectionModel().selectedItemProperty().addListener(this::onSelectionChanged);
@@ -42,10 +37,13 @@ public class IoVariableNameDialog extends Dialog<SpecIoVariable> {
 
     setResultConverter(this::convertResult);
 
-    getDialogPane().setContent(createContent());
+    VBox box = new VBox(definitionPane, ioVariables);
+    box.setSpacing(10);
+    getDialogPane().setContent(box);
     getDialogPane().getButtonTypes().add(createButton);
 
-    updateButtonState(ioVariables.getSelectionModel().getSelectedItem());
+    getDialogPane().lookupButton(createButton).disableProperty()
+        .bind(definitionPane.createDefinitionInvalidBinding(alreadyDefinedVariables));
   }
 
   private ListCell<CodeIoVariable> createCellForListView(ListView<CodeIoVariable> codeIoVariableListView) {
@@ -63,21 +61,13 @@ public class IoVariableNameDialog extends Dialog<SpecIoVariable> {
   }
 
   private void onSelectionChanged(ObservableValue<? extends CodeIoVariable> obs, CodeIoVariable old, CodeIoVariable value) {
-    updateButtonState(value);
-  }
-
-  private void updateButtonState(CodeIoVariable selectedValue) {
-    getDialogPane().lookupButton(createButton).setDisable(selectedValue == null);
-  }
-
-  private Node createContent() {
-    return ioVariables; // TODO: Add gui for adding new variables
+    definitionPane.setFromIoVariable(value);
   }
 
   private SpecIoVariable convertResult(ButtonType buttonType) {
-    CodeIoVariable selected = ioVariables.getSelectionModel().getSelectedItem();
-    if (selected != null && buttonType == createButton) {
-      return new SpecIoVariable(selected.getCategory(), selected.getType(), selected.getName());
+    SpecIoVariable defined = definitionPane.getDefinedVariable();
+    if (defined != null && buttonType == createButton) {
+      return defined;
     } else {
       return null;
     }

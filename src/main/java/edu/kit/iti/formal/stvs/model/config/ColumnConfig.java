@@ -10,7 +10,7 @@ public class ColumnConfig {
    * Default ColumnConfig
    */
   public ColumnConfig() {
-    width = 20;
+    width = 100;
   }
 
   /**

@@ -4,15 +4,12 @@ import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.common.IoVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
-import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import edu.kit.iti.formal.stvs.model.table.*;
+import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**

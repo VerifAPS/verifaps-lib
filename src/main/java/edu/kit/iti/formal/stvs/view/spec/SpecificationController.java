@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConcreteSpecImporter;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
@@ -19,8 +18,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.List;
 
 public class SpecificationController implements Controller {

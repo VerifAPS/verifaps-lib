@@ -14,15 +14,16 @@ public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, C
   private final boolean isCounterExample;
 
   public ConcreteSpecification(boolean isCounterExample) {
-    this(new ArrayList<>(), new ArrayList<>(), isCounterExample);
+    this(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), isCounterExample);
   }
 
-  public ConcreteSpecification(List<SpecificationRow<ConcreteCell>> rows,
+  public ConcreteSpecification(List<ValidIoVariable> ioVariables, List<SpecificationRow<ConcreteCell>> rows,
                                List<ConcreteDuration> durations,
                                boolean isCounterExample) {
     super(p -> new Observable[0]);
     this.isCounterExample = isCounterExample;
 
+    getColumnHeaders().setAll(ioVariables);
     getRows().addAll(rows);
     getDurations().addAll(durations);
   }

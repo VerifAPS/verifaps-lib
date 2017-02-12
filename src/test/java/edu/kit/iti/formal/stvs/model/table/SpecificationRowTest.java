@@ -6,16 +6,12 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Callback;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 /**
  * @author Benjamin Alt

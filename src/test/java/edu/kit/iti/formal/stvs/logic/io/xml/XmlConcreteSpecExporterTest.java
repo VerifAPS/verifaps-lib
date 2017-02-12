@@ -3,14 +3,11 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 import com.google.gson.JsonElement;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.model.expressions.BinaryFunctionExpr;
-import edu.kit.iti.formal.stvs.model.expressions.Expression;
-import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
-import edu.kit.iti.formal.stvs.model.expressions.Value;
-import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
 import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
-import edu.kit.iti.formal.stvs.model.table.*;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecificationTest;
+import edu.kit.iti.formal.stvs.model.table.JsonTableParser;
 import edu.kit.iti.formal.stvs.model.table.SpecificationTable;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -19,10 +16,8 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Benjamin Alt

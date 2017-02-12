@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 import edu.kit.iti.formal.stvs.model.config.ColumnConfig;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.Commentable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -117,4 +116,7 @@ public class SpecIoVariable extends IoVariable implements Commentable {
     return result;
   }
 
+  public void setCategory(VariableCategory category) {
+    this.category.set(category);
+  }
 }

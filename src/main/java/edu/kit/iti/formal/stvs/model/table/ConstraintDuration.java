@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;

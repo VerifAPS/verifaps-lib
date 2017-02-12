@@ -13,7 +13,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.stage.FileChooser;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by csicar on 10.01.17.

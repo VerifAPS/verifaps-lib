@@ -1,12 +1,8 @@
 package edu.kit.iti.formal.stvs.view;
 
-import edu.kit.iti.formal.stvs.view.menu.StvsMenuBar;
 import edu.kit.iti.formal.stvs.view.editor.EditorPane;
 import edu.kit.iti.formal.stvs.view.spec.SpecificationsPane;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.TabPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 
 /**
  * Created by csicar on 09.01.17.

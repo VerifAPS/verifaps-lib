@@ -5,14 +5,10 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.*;
-import edu.kit.iti.formal.stvs.model.table.problems.CellProblem;
-import edu.kit.iti.formal.stvs.model.table.problems.DurationProblem;
-import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
-import edu.kit.iti.formal.stvs.model.table.problems.SpecProblemRecognizer;
+import edu.kit.iti.formal.stvs.model.table.problems.*;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
@@ -21,8 +17,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.*;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.util.converter.DefaultStringConverter;
 
 import java.util.ArrayList;
@@ -37,8 +31,6 @@ import java.util.stream.Collectors;
  */
 public class SpecificationTableController implements Controller {
 
-  private static final String DURATION_COL_USER_DATA = "__ duration column";
-
   private final TableView<SynchronizedRow> tableView;
   private final HybridSpecification hybridSpec;
   private final ObjectProperty<List<Type>> typeContext;
@@ -47,7 +39,6 @@ public class SpecificationTableController implements Controller {
 
   private final ObservableList<SynchronizedRow> data = FXCollections.observableArrayList();
   private final TableColumn<SynchronizedRow, String> durations;
-  private final ContextMenu columnContextMenu;
 
   public SpecificationTableController(ObjectProperty<List<Type>> typeContext,
                                       ObjectProperty<List<CodeIoVariable>> codeIoVariables,
@@ -59,10 +50,8 @@ public class SpecificationTableController implements Controller {
     this.codeIoVariables = codeIoVariables;
     this.hybridSpec = hybridSpecification;
     this.problemRecognizer = new SpecProblemRecognizer(typeContext, codeIoVariables, validVariables, hybridSpecification);
-    this.durations = createViewColumn(DURATION_COL_USER_DATA, "Duration", SynchronizedRow::getDuration);
-    this.columnContextMenu = createColumnEditingContextMenu();
+    this.durations = createViewColumn("Duration", SynchronizedRow::getDuration);
 
-    durations.setContextMenu(columnContextMenu);
     tableView.getColumns().add(durations);
 
     tableView.setItems(data);
@@ -71,7 +60,7 @@ public class SpecificationTableController implements Controller {
     tableView.setRowFactory(this::rowFactory);
 
 
-    tableView.setContextMenu(createRowEditingContextMenu());
+    tableView.setContextMenu(createContextMenu());
 
     tableView.getStylesheets().add(SpecificationTableController.class.getResource("style.css").toExternalForm());
 
@@ -84,6 +73,31 @@ public class SpecificationTableController implements Controller {
     }
 
     data.addListener(this::onDataRowChanged);
+    problemRecognizer.problemsProperty().addListener((Observable o) -> onProblemsChange());
+  }
+
+  private void onProblemsChange() {
+    List<ColumnProblem> columnProblems =
+        problemRecognizer.problemsProperty().get().stream()
+        .filter(problem -> problem instanceof ColumnProblem)
+        .map(problem -> (ColumnProblem) problem)
+        .collect(Collectors.toList());
+    for (TableColumn<SynchronizedRow, ?> column : tableView.getColumns()) {
+      if (column.getUserData() == null) {
+        continue;
+      }
+      List<ColumnProblem> problemsForColumn = columnProblems.stream()
+          .filter(problem -> problem.getColumn().equals(column.getUserData()))
+          .collect(Collectors.toList());
+
+      ColumnHeader columnHeader = (ColumnHeader) column.getGraphic();
+
+      if (problemsForColumn.isEmpty()) {
+        columnHeader.resetProblem();
+      } else {
+        columnHeader.configureProblems(problemsForColumn);
+      }
+    }
   }
 
   private TableCell<SynchronizedRow, String> cellFactory(TableColumn<SynchronizedRow, String> table) {
@@ -120,7 +134,7 @@ public class SpecificationTableController implements Controller {
               }
             } else if (problem instanceof DurationProblem) {
               DurationProblem durationProblem = (DurationProblem) problem;
-              if (DURATION_COL_USER_DATA.equals(getTableColumn().getUserData()) && durationProblem.getRow() == getTableRow().getIndex()) {
+              if (getTableColumn().getUserData() == null && durationProblem.getRow() == getTableRow().getIndex()) {
                 configureProblem(problem);
                 return;
               }
@@ -154,9 +168,10 @@ public class SpecificationTableController implements Controller {
     }
   }
 
-  private ContextMenu createRowEditingContextMenu() {
+  private ContextMenu createContextMenu() {
     MenuItem insertRow = new MenuItem("Insert Row");
     MenuItem deleteRow = new MenuItem("Delete Row");
+    MenuItem addNewColumn = new MenuItem("New Column...");
     insertRow.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
     insertRow.setOnAction(event -> {
       int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
@@ -165,18 +180,27 @@ public class SpecificationTableController implements Controller {
     deleteRow.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
     deleteRow.setOnAction(event ->
       data.removeAll(tableView.getSelectionModel().getSelectedItems()));
-    return new ContextMenu(insertRow, deleteRow);
+    addNewColumn.setOnAction(event ->
+        new IoVariableChooserDialog(codeIoVariables, hybridSpec.getColumnHeaders())
+            .showAndWait()
+            .ifPresent(this::addNewColumn));
+    return new ContextMenu(insertRow, deleteRow, addNewColumn);
   }
 
-  private ContextMenu createColumnEditingContextMenu() {
-    ContextMenu menu = new ContextMenu();
-    MenuItem addNewColumn = new MenuItem("New Column...");
-    addNewColumn.setOnAction(event ->
-        new IoVariableNameDialog(typeContext, codeIoVariables)
-          .showAndWait()
-          .ifPresent(this::addNewColumn));
-    menu.getItems().addAll(addNewColumn);
-    return menu;
+  private ContextMenu createColumnContextMenu(TableColumn<SynchronizedRow, ?> column) {
+    MenuItem changeColumn = new MenuItem("Change Column...");
+    MenuItem removeColumn = new MenuItem("Remove Column");
+    changeColumn.setOnAction(event -> {
+      new IoVariableChangeDialog(
+          hybridSpec.getColumnHeaderByName((String) column.getUserData()),
+          hybridSpec.getColumnHeaders().filtered(var -> !var.getName().equals(column.getUserData())))
+          .showAndWait();
+    });
+    removeColumn.setOnAction(event -> {
+      tableView.getColumns().remove(column);
+      hybridSpec.removeColumnByName((String) column.getUserData());
+    });
+    return new ContextMenu(changeColumn, removeColumn);
   }
 
   public void addEmptyRow(int index) {
@@ -202,28 +226,32 @@ public class SpecificationTableController implements Controller {
   }
 
   private void addColumnToView(final SpecIoVariable specIoVariable) {
-    tableView.getColumns().add(0,
-        createViewColumn(
-            specIoVariable.getName(),
-            specIoVariable.getVarDescriptor(),
-            synchronizedRow -> synchronizedRow.getCells().get(specIoVariable.getName()))
-    );
-    tableView.refresh(); // TODO: maybe this is not needed with the new deep observable updates in the model
+    TableColumn<SynchronizedRow, String> column = createViewColumn(
+        specIoVariable.getName(),
+        synchronizedRow -> synchronizedRow.getCells().get(specIoVariable.getName()));
+
+    column.setUserData(specIoVariable.getName());
+    specIoVariable.nameProperty().addListener(
+        (Observable o) -> column.setUserData(specIoVariable.getName()));
+    column.setText("");
+    column.setGraphic(new ColumnHeader(specIoVariable));
+    // TODO: changes to prefwidth need to be saved
+    // FIXME: column widths are not taken from the session
+    column.setPrefWidth(specIoVariable.getColumnConfig().getWidth());
+    column.setContextMenu(createColumnContextMenu(column));
+
+    tableView.getColumns().add(tableView.getColumns().size()-1, column);
   }
 
   private TableColumn<SynchronizedRow, String> createViewColumn(
-      String colIndex,
       String colName,
       final Function<SynchronizedRow, HybridCellModel> extractCellFromRow) {
     TableColumn<SynchronizedRow, String> column = new TableColumn<>(colName);
     column.setSortable(false);
     column.setEditable(true);
-    column.setPrefWidth(150);
-    column.setContextMenu(columnContextMenu);
+    column.setPrefWidth(100);
     column.setCellFactory(this::cellFactory);
-    column.setUserData(colIndex);
 
-    //column.setCellFactory(TextFieldTableCell.forTableColumn());
     column.setCellValueFactory(rowModelData ->
         extractCellFromRow.apply(rowModelData.getValue())
             .stringRepresentationProperty());

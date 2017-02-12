@@ -6,3 +6,45 @@
 .spec-cell.cell.table-cell {
   -fx-font-family: monospace;
 }
+
+.spec-column-problem.spec-column-header {
+  -fx-background-color: #db5751AA;
+}
+
+.spec-column-header {
+  -fx-background-insets: 1 1 1 1;
+  -fx-padding: 2px;
+  -fx-text-alignment: center;
+}
+
+.spec-column-header.category-label.label.output {
+  -fx-text-fill: darkblue;
+}
+
+.spec-column-header.category-label.label.input {
+  -fx-text-fill: darkgreen;
+}
+
+.spec-column-header.category-label.label {
+  -fx-text-alignment: center;
+  -fx-font-family: monospace;
+  -fx-font-weight: normal;
+  -fx-font-size: 8pt;
+}
+
+.spec-column-header.name-label.label {
+  -fx-text-alignment: center;
+  -fx-font-family: monospace;
+}
+
+.spec-column-header.type-label.label {
+  -fx-text-alignment: center;
+  -fx-font-family: monospace;
+  -fx-text-fill: darkblue;
+}
+
+.spec-column-header.problem-tooltip {
+  -fx-font-family: monospace;
+  -fx-font-weight: normal;
+  -fx-padding: 8px;
+}

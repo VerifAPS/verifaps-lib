@@ -33,12 +33,15 @@ public class VerificationScenario {
     verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
   }
 
-  public void verify(String getetaFilename, String nuxmvFilename, ConstraintSpecification spec)
-      throws IOException,
-      ExportException, VerificationException {
-    verificationEngine = new GeTeTaVerificationEngine(getetaFilename, nuxmvFilename, code.get()
-        .getParsedCode()
-        .getDefinedTypes());
+  public void verify(
+      String getetaFilename,
+      String nuxmvFilename,
+      ConstraintSpecification spec) throws IOException, ExportException {
+    // TODO: Parsed code might be null!!!
+    verificationEngine = new GeTeTaVerificationEngine(
+        getetaFilename,
+        nuxmvFilename,
+        code.get().getParsedCode().getDefinedTypes());
     verificationEngine.verificationResultProperty().addListener(new
         VerificationChangedListener());
     verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);

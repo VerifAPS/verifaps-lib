@@ -1,8 +1,5 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
-import java.util.Arrays;
-import java.util.Optional;
-
 /**
  * Created by philipp on 17.01.17.
  */

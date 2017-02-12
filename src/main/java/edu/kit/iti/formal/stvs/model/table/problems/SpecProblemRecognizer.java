@@ -54,6 +54,9 @@ public class SpecProblemRecognizer {
     specification.getRows().addListener(listenToSpecUpdate);
     specification.getDurations().addListener(listenToSpecUpdate);
 
+    typeContext.addListener(listenToSpecUpdate);
+    codeIoVariables.addListener(listenToSpecUpdate);
+
     recalculateSpecProblems();
   }
 
@@ -181,6 +184,14 @@ public class SpecProblemRecognizer {
       throw new TypeCheckException(expression,
           "The cell expression must evaluate to a boolean, instead it evaluates to: " + type.getTypeName());
     }
+  }
+
+  public ValidSpecification getValidSpecification() {
+    return validSpecification.get();
+  }
+
+  public NullableProperty<ValidSpecification> validSpecificationProperty() {
+    return validSpecification;
   }
 
 }

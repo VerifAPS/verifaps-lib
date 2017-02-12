@@ -1,9 +1,9 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
 import edu.kit.iti.formal.stvs.ViewUtils;
+import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
-import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

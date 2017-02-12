@@ -6,8 +6,6 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 
-import static org.junit.Assert.*;
-
 /**
  * @author Benjamin Alt
  */

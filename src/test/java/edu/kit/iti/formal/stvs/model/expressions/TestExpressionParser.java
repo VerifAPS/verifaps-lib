@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
-import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
+import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 import org.junit.Test;
 
 import java.util.*;

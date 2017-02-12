@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;

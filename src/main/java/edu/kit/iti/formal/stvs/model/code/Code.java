@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.model.code;
 import java.util.List;
 
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
+import javafx.application.Platform;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
@@ -55,7 +56,7 @@ public class Code {
         tokens -> this.tokens = tokens,
         syntaxErrors -> this.syntaxErrors = syntaxErrors,
         parsedCode -> this.parsedCode.set(parsedCode));
-    syntaxErrorObs.setAll(syntaxErrors);
+    Platform.runLater(() -> syntaxErrorObs.setAll(syntaxErrors));
   }
 
   public void updateSourcecode(String sourcecode) {

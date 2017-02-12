@@ -18,9 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import static edu.kit.iti.formal.stvs.model.TestUtils.assertCollectionsEqual;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by Philipp on 19.01.2017.
