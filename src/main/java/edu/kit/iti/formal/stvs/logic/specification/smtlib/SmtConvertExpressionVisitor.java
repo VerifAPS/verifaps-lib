@@ -1,7 +1,13 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
-import edu.kit.iti.formal.stvs.model.expressions.*;
+import edu.kit.iti.formal.stvs.model.expressions.BinaryFunctionExpr;
+import edu.kit.iti.formal.stvs.model.expressions.ExpressionVisitor;
+import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.UnaryFunctionExpr;
+import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
+import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,13 +50,14 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   /**
    * Creates a visitor from a type context.
    * The context is needed while visiting because of the logic in choco models
-   *  @param getTypeForVariable A Map from variable names to types
-   * @param row row, that the visitor should convert
+   *
+   * @param getTypeForVariable        A Map from variable names to types
+   * @param row                       row, that the visitor should convert
    * @param getSMTLibVariableTypeName
    */
   public SmtConvertExpressionVisitor(Function<String, Type> getTypeForVariable, int row, int
       iteration, ValidIoVariable column, Predicate<String> isIoVariable, Function<String, String>
-      getSMTLibVariableTypeName) {
+                                         getSMTLibVariableTypeName) {
     this.getTypeForVariable = getTypeForVariable;
     this.row = row;
     this.iteration = iteration;
@@ -102,7 +109,12 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
 
   @Override
   public SExpr visitLiteral(LiteralExpr literalExpr) {
-    return new SAtom(literalExpr.getValue().getValueString());
+    String literalAsString = literalExpr.getValue().match(
+        String::valueOf,
+        bool -> bool ? "true" : "false",
+        ValueEnum::getEnumValue //TODO: Enum Encoding
+    );
+    return new SAtom(literalAsString);
   }
 
   @Override
