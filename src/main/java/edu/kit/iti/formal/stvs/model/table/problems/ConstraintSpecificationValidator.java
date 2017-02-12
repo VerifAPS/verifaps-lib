@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 /**
  * Created by philipp on 09.02.17.
  */
-public class SpecProblemRecognizer {
+public class ConstraintSpecificationValidator {
 
   private final ObjectProperty<List<SpecProblem>> problems;
   private final ObjectProperty<List<Type>> typeContext;
@@ -35,7 +35,7 @@ public class SpecProblemRecognizer {
 
   private final InvalidationListener listenToSpecUpdate = this::onSpecUpdated;
 
-  public SpecProblemRecognizer(
+  public ConstraintSpecificationValidator(
       ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> codeIoVariables,
       ReadOnlyObjectProperty<List<ValidFreeVariable>> validFreeVariables,
