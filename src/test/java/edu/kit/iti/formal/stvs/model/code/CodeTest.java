@@ -101,7 +101,7 @@ public class CodeTest {
   }
 
   @Test
-  public void testParsedCCodeBlocks() {
+  public void testParsedCodeBlocks() {
     FoldableCodeBlock expectedBlock = new FoldableCodeBlock(5, 15);
     assertEquals(expectedBlock, enumDefinition.getParsedCode().getFoldableCodeBlocks().get(0));
     assertEquals(1, enumDefinition.getParsedCode().getFoldableCodeBlocks().size());

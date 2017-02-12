@@ -117,7 +117,7 @@ public class Z3Solver {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         specificationRows.add(i, SpecificationRow.createUnobservableRow(concreteCellMap));
       }
-       return Optional.of(
+      return Optional.of(
           new ConcreteSpecification(validIoVariables, specificationRows, durations, false));
     }
     return Optional.empty();

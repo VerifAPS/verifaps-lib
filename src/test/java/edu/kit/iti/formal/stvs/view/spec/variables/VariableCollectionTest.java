@@ -7,7 +7,6 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
-import edu.kit.iti.formal.stvs.model.table.problems.SpecProblemRecognizer;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -17,10 +16,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import org.junit.Test;
 
 import java.util.ArrayList;
