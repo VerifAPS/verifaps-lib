@@ -91,11 +91,11 @@ public class CodeTest {
 
     Type myEnum = new TypeEnum("MY_ENUM", Arrays.asList("possible", "values", "enum"));
     Set<CodeIoVariable> expectedVariables = new HashSet<>();
-    expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, "BOOL", "active"));
-    expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, "INT", "number"));
-    expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, myEnum.getTypeName(), "my_enum"));
-    expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, myEnum.getTypeName(), "my_output"));
-    expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, "BOOL", "seriously"));
+    expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, "BOOL", "active", startIndex, endIndex));
+    expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, "INT", "number", startIndex, endIndex));
+    expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, myEnum.getTypeName(), "my_enum", startIndex, endIndex));
+    expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, myEnum.getTypeName(), "my_output", startIndex, endIndex));
+    expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, "BOOL", "seriously", startIndex, endIndex));
 
     assertCollectionsEqual(expectedVariables, parsed.getDefinedVariables());
   }
