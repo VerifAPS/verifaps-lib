@@ -3,17 +3,20 @@ package edu.kit.iti.formal.stvs.logic.io;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigImporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecImporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionImporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlVerificationScenarioImporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
+import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -64,6 +67,16 @@ public class ImporterFacade {
     }
   }
 
+  public static VerificationResult importVerificationResult(InputStream input, ImportFormat
+      format, List<Type> typeContext) throws ImportException {
+    switch (format) {
+      case GETETA:
+        return new GeTeTaImporter(typeContext).doImport(input);
+      default:
+        throw new ImportException("Unsupported import format");
+    }
+  }
+
   public static GlobalConfig importConfig(File file, ImportFormat format) throws FileNotFoundException, ImportException {
     return importConfig(new FileInputStream(file), format);
   }
@@ -80,21 +93,6 @@ public class ImporterFacade {
   public static StvsRootModel importSession(File file, ImportFormat format) throws IOException, ImportException {
     return importSession(new FileInputStream(file), format);
   }
-
-  public static VerificationScenario importVerificationScenario(InputStream input, ImportFormat format) throws ImportException {
-    switch (format) {
-      case XML:
-        return new XmlVerificationScenarioImporter().doImport(input);
-      default:
-        throw new ImportException("Unsupported import format");
-    }
-  }
-
-  public static VerificationScenario importVerificationScenario(File file, ImportFormat format)
-      throws IOException, ImportException {
-    return importVerificationScenario(new FileInputStream(file), format);
-  }
-
 
   public static Code importStCode(File chosenFile) throws IOException {
     String plaintext = new String(Files.readAllBytes(Paths.get(chosenFile.getAbsolutePath())));
