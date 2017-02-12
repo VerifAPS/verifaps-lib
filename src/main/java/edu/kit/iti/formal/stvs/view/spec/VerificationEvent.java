@@ -8,17 +8,26 @@ import javafx.event.EventType;
 /**
  * @author Benjamin Alt
  */
-public class VerificationStartedEvent extends Event {
+public class VerificationEvent extends Event {
   private final ConstraintSpecification constraintSpec;
-  public static final EventType<VerificationStartedEvent> EVENT_TYPE = new EventType
-      ("Verification Started");
+  private final Type type;
 
-  public VerificationStartedEvent(ConstraintSpecification constraintSpec) {
+  public static final EventType<VerificationEvent> EVENT_TYPE = new EventType
+      ("Verification Event");
+
+  public VerificationEvent(ConstraintSpecification constraintSpec, Type type) {
     super(EVENT_TYPE);
     this.constraintSpec = constraintSpec;
+    this.type = type;
   }
 
   public ConstraintSpecification getConstraintSpec() {
     return constraintSpec;
   }
+
+  public Type getType() {
+    return type;
+  }
+
+  public enum Type { START, STOP }
 }

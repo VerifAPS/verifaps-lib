@@ -83,10 +83,10 @@ public class SpecificationController implements Controller {
   private void onVerificationStateChanged(VerificationState newState) {
     switch(newState) {
       case RUNNING:
-        getView().getStartButton().setDisable(true);
+        getView().setVerificationButtonStop();
         break;
       default:
-        getView().getStartButton().setDisable(false);
+        getView().setVerificationButtonPlay();
     }
   }
 
@@ -94,7 +94,13 @@ public class SpecificationController implements Controller {
   private class VerificationButtonClickedListener implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent actionEvent) {
-      view.onVerificationButtonClicked(hybridSpecification);
+      switch(stateProperty.get()) {
+        case RUNNING:
+          view.onVerificationButtonClicked(hybridSpecification, VerificationEvent.Type.STOP);
+          break;
+        default:
+          view.onVerificationButtonClicked(hybridSpecification, VerificationEvent.Type.START);
+      }
     }
   }
 }
