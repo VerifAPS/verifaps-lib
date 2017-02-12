@@ -3,9 +3,11 @@ package edu.kit.iti.formal.stvs.view.editor;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.code.FoldableCodeBlock;
+import edu.kit.iti.formal.stvs.model.code.ParsedCode;
 import edu.kit.iti.formal.stvs.model.code.SyntaxError;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import org.antlr.v4.runtime.Token;
@@ -29,12 +31,10 @@ public class EditorPaneController implements Controller {
   private Code code;
   private GlobalConfig globalConfig;
   private ExecutorService executor;
-  private ObservableList<SyntaxError> syntaxErrors;
 
   public EditorPaneController(Code code, GlobalConfig globalConfig) {
     this.code = code;
-    this.syntaxErrors = code.getSyntaxErrorObs();
-    this.view = new EditorPane(code.getSourcecode(), syntaxErrors);
+    this.view = new EditorPane(code.getSourcecode(), code.syntaxErrorsProperty());
     this.globalConfig = globalConfig;
 
     this.view.getStylesheets().add(
@@ -42,7 +42,6 @@ public class EditorPaneController implements Controller {
     this.executor = Executors.newSingleThreadExecutor();
     configureTextArea();
     handleTextChange(computeHighlighting(code.getSourcecode()));
-
   }
 
   private void configureTextArea() {
@@ -78,8 +77,20 @@ public class EditorPaneController implements Controller {
   }
 
   private StyleSpans<Collection<String>> computeHighlighting(String sourcecode) {
-    code.updateSourcecode(sourcecode);
-    List<? extends Token> tokens = code.getTokens();
+    List<Token> tokens = new ArrayList<>();
+    List<SyntaxError> syntaxErrors = new ArrayList<>();
+
+    // Short-circuit setting parsed code properties on code, since we're in another thread.
+    ParsedCode.parseCode(sourcecode,
+        newTokens -> {
+          tokens.addAll(newTokens);
+          Platform.runLater(() -> code.tokensProperty().setAll(newTokens));
+        },
+        synErrs -> {
+          syntaxErrors.addAll(synErrs);
+          Platform.runLater(() -> code.syntaxErrorsProperty().setAll(synErrs));
+        },
+        parsedCode -> Platform.runLater(() -> code.parsedCodeProperty().set(parsedCode)));
 
     StyleSpansBuilder<Collection<String>> spansBuilder
         = new StyleSpansBuilder<>();
@@ -92,7 +103,7 @@ public class EditorPaneController implements Controller {
     tokens.forEach(token ->
       // replaceAll is a work-around for a bug when ANTLR has a
       // different character count than this CodeArea.
-      spansBuilder.add(getStyleClassesFor(token, code.getSyntaxErrors()),
+      spansBuilder.add(getStyleClassesFor(token, syntaxErrors),
           token.getText().replaceAll("\\r", "").length())
     );
     return spansBuilder.create();
@@ -150,10 +161,7 @@ public class EditorPaneController implements Controller {
   }
 
   private void handleTextChange(StyleSpans<Collection<String>> highlighting) {
-    code.updateSourcecode(view.getCodeArea().getText());
     view.setStyleSpans(highlighting);
-    System.out.println(view.getSyntaxErrorListView().getItems());
-
   }
 
   private void handleParsedCodeFoldingBlocks(List<FoldableCodeBlock> foldableCodeBlocks) {

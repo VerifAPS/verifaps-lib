@@ -10,7 +10,7 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
-import edu.kit.iti.formal.stvs.model.table.problems.SpecProblemRecognizer;
+import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -47,9 +47,9 @@ public class SpecificationTableTest {
   private List<Node> simpleTableScene() {
     List<Type> types = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
     List<CodeIoVariable> codevars = Arrays.asList(
-        new CodeIoVariable(VariableCategory.INPUT, "BOOL", "A", startIndex, endIndex),
-        new CodeIoVariable(VariableCategory.INPUT, "INT", "B", startIndex, endIndex),
-        new CodeIoVariable(VariableCategory.OUTPUT, "INT", "C", startIndex, endIndex)
+        new CodeIoVariable(VariableCategory.INPUT, "BOOL", "A"),
+        new CodeIoVariable(VariableCategory.INPUT, "INT", "B"),
+        new CodeIoVariable(VariableCategory.OUTPUT, "INT", "C")
     );
     ObjectProperty<List<Type>> typeContext = new SimpleObjectProperty<>(types);
     ObjectProperty<List<CodeIoVariable>> codeIoVariables = new SimpleObjectProperty<>(codevars);
@@ -69,7 +69,7 @@ public class SpecificationTableTest {
     return Arrays.asList(table.getView(), extractedTablePane);
   }
 
-  private Pane createExtractedTableTextArea(ConstraintSpecification spec, SpecProblemRecognizer recognizer) {
+  private Pane createExtractedTableTextArea(ConstraintSpecification spec, ConstraintSpecificationValidator recognizer) {
     final TextArea textArea = new TextArea();
     textArea.getStyleClass().addAll("model-text-area");
     textArea.setEditable(false);
@@ -93,7 +93,7 @@ public class SpecificationTableTest {
     return new VBox(updateButton, splitPane);
   }
 
-  private void updateProblemsText(TextArea problemsArea, SpecProblemRecognizer recognizer) {
+  private void updateProblemsText(TextArea problemsArea, ConstraintSpecificationValidator recognizer) {
     String error = String.join("\n", recognizer.problemsProperty().get().stream().map(
         specProblem -> specProblem.getClass().getSimpleName() + ": " + specProblem.getErrorMessage()
     ).collect(Collectors.toList()));

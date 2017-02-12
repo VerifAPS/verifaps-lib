@@ -16,6 +16,7 @@ import org.antlr.v4.runtime.Token;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 
 /**
@@ -23,15 +24,14 @@ import java.util.Optional;
  */
 public class Code {
 
+  private final StringProperty filename;
+  private final StringProperty sourceCodeProperty;
   /**
    * last valid parsed Code
    */
-  private StringProperty filename;
-  private StringProperty sourceCodeProperty;
-  private NullableProperty<ParsedCode> parsedCode;
-  private List<? extends Token> tokens;
-  private List<SyntaxError> syntaxErrors;
-  private ObservableList<SyntaxError> syntaxErrorObs;
+  private final NullableProperty<ParsedCode> parsedCode;
+  private final ObservableList<Token> tokens;
+  private final ObservableList<SyntaxError> syntaxErrors;
 
 
   /**
@@ -45,20 +45,24 @@ public class Code {
     this.filename = new SimpleStringProperty(filename);
     this.sourceCodeProperty = new SimpleStringProperty(sourcecode);
     this.parsedCode = new NullableProperty<>();
-    syntaxErrorObs = FXCollections.observableArrayList();
-
-
+    this.tokens = FXCollections.observableArrayList();
+    this.syntaxErrors = FXCollections.observableArrayList();
     invalidate();
   }
 
   private void invalidate() {
     ParsedCode.parseCode(sourceCodeProperty.get(),
-        tokens -> this.tokens = tokens,
-        syntaxErrors -> this.syntaxErrors = syntaxErrors,
-        parsedCode -> this.parsedCode.set(parsedCode));
-    Platform.runLater(() -> syntaxErrorObs.setAll(syntaxErrors));
+        this.tokens::setAll,
+        this.syntaxErrors::setAll,
+        this.parsedCode::set);
   }
 
+  /**
+   * Updates tokens, syntaxerrors, and the parsed code synchronously
+   * from the given sourcecode.
+   *
+   * @param sourcecode the new sourcecode of the code
+   */
   public void updateSourcecode(String sourcecode) {
     sourceCodeProperty.setValue(sourcecode);
     invalidate();
@@ -68,11 +72,9 @@ public class Code {
     return sourceCodeProperty.get();
   }
 
-  public List<SyntaxError> getSyntaxErrors() {
+  public ObservableList<SyntaxError> syntaxErrorsProperty() {
     return syntaxErrors;
   }
-
-  public ObservableList<SyntaxError> getSyntaxErrorObs() { return syntaxErrorObs;}
 
   public ParsedCode getParsedCode() {
     return parsedCode.get();
@@ -82,7 +84,11 @@ public class Code {
     return parsedCode;
   }
 
-  public List<? extends Token> getTokens() {
+  public List<Token> getTokens() {
+    return tokens;
+  }
+
+  public ObservableList<Token> tokensProperty() {
     return tokens;
   }
 
@@ -92,5 +98,9 @@ public class Code {
 
   public void setFilename(String filename) {
     this.filename.set(filename);
+  }
+
+  public List<SyntaxError> getSyntaxErrors() {
+    return syntaxErrors;
   }
 }

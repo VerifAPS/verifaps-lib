@@ -1,19 +1,9 @@
 package edu.kit.iti.formal.stvs.logic.io.xml.verification;
 
 import com.sun.xml.bind.marshaller.DataWriter;
-import com.sun.xml.internal.bind.marshaller.CharacterEscapeHandler;
-import com.sun.xml.internal.bind.marshaller.DumbEscapeHandler;
-import edu.kit.iti.formal.exteta_1.ConstraintVariable;
-import edu.kit.iti.formal.exteta_1.DataType;
-import edu.kit.iti.formal.exteta_1.IoVariable;
-import edu.kit.iti.formal.exteta_1.ObjectFactory;
-import edu.kit.iti.formal.exteta_1.Step;
-import edu.kit.iti.formal.exteta_1.Steps;
-import edu.kit.iti.formal.exteta_1.TestTable;
-import edu.kit.iti.formal.exteta_1.Variables;
+import edu.kit.iti.formal.exteta_1.*;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.Exporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlExporter;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
@@ -21,9 +11,8 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
+import org.w3c.dom.Document;
 
-import java.io.*;
-import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -31,8 +20,10 @@ import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.List;
 
 
 /**

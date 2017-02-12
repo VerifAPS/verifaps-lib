@@ -9,7 +9,7 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.JsonTableParser;
-import edu.kit.iti.formal.stvs.model.table.SpecProblemRecognizerTest;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecificationValidatorTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,11 +36,11 @@ public class XmlConstraintSpecExporterTest {
   @Test
   public void testExportValid1() throws ExportException, IOException {
     JsonElement testjson = JsonTableParser.jsonFromResource("valid_table.json",
-        SpecProblemRecognizerTest.class);
+        ConstraintSpecificationValidatorTest.class);
 
     List<CodeIoVariable> codeIoVariables = Arrays.asList(
-        new CodeIoVariable(VariableCategory.INPUT, "INT", "Counter", startIndex, endIndex),
-        new CodeIoVariable(VariableCategory.OUTPUT, "BOOL", "Active", startIndex, endIndex)
+        new CodeIoVariable(VariableCategory.INPUT, "INT", "Counter"),
+        new CodeIoVariable(VariableCategory.OUTPUT, "BOOL", "Active")
     );
 
     List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL);

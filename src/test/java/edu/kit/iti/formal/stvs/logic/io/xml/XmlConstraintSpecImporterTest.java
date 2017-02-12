@@ -8,7 +8,7 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.JsonTableParser;
-import edu.kit.iti.formal.stvs.model.table.SpecProblemRecognizerTest;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecificationValidatorTest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ public class XmlConstraintSpecImporterTest {
         (this.getClass().getResource("spec_constraint_valid_1.xml").toURI()));
     ConstraintSpecification importedSpec = importer.doImport(inputStream);
     JsonElement testjson = JsonTableParser.jsonFromResource("valid_table.json",
-        SpecProblemRecognizerTest.class);
+        ConstraintSpecificationValidatorTest.class);
 
     List<CodeIoVariable> codeIoVariables = Collections.emptyList();
 
