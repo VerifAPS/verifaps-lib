@@ -6,6 +6,7 @@ import edu.kit.iti.formal.stvs.model.code.FoldableCodeBlock;
 import edu.kit.iti.formal.stvs.model.code.SyntaxError;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import org.antlr.v4.runtime.Token;
@@ -78,7 +79,8 @@ public class EditorPaneController implements Controller {
   }
 
   private StyleSpans<Collection<String>> computeHighlighting(String sourcecode) {
-    code.updateSourcecode(sourcecode);
+    code.updateSourcecodeAsync(sourcecode,
+        syntaxErrs -> Platform.runLater(() -> code.getSyntaxErrorObs().setAll(syntaxErrs)));
     List<? extends Token> tokens = code.getTokens();
 
     StyleSpansBuilder<Collection<String>> spansBuilder

@@ -16,6 +16,7 @@ import org.antlr.v4.runtime.Token;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 
 /**
@@ -56,12 +57,21 @@ public class Code {
         tokens -> this.tokens = tokens,
         syntaxErrors -> this.syntaxErrors = syntaxErrors,
         parsedCode -> this.parsedCode.set(parsedCode));
-    Platform.runLater(() -> syntaxErrorObs.setAll(syntaxErrors));
+    syntaxErrorObs.setAll(syntaxErrors);
   }
 
   public void updateSourcecode(String sourcecode) {
     sourceCodeProperty.setValue(sourcecode);
     invalidate();
+  }
+
+  public void updateSourcecodeAsync(String sourcecode, Consumer<List<SyntaxError>> onSyntaxErrors) {
+    sourceCodeProperty.set(sourcecode);
+    ParsedCode.parseCode(sourceCodeProperty.get(),
+        tokens -> this.tokens = tokens,
+        syntaxErrors -> this.syntaxErrors = syntaxErrors,
+        parsedCode -> this.parsedCode.set(parsedCode));
+    onSyntaxErrors.accept(syntaxErrors);
   }
 
   public String getSourcecode() {
