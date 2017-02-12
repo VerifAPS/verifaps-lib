@@ -39,8 +39,8 @@ public class XmlConstraintSpecExporterTest {
         SpecProblemRecognizerTest.class);
 
     List<CodeIoVariable> codeIoVariables = Arrays.asList(
-        new CodeIoVariable(VariableCategory.INPUT, "INT", "Counter", startIndex, endIndex),
-        new CodeIoVariable(VariableCategory.OUTPUT, "BOOL", "Active", startIndex, endIndex)
+        new CodeIoVariable(VariableCategory.INPUT, "INT", "Counter"),
+        new CodeIoVariable(VariableCategory.OUTPUT, "BOOL", "Active")
     );
 
     List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL);

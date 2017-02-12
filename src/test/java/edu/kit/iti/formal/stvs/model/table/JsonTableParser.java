@@ -87,7 +87,7 @@ public class JsonTableParser {
   public static List<CodeIoVariable> codeIoVariablesFromJson(JsonElement elem) {
     JsonCodeIoVars ioVars = GSON.fromJson(elem, JsonCodeIoVars.class);
     return ioVars.codeiovars.stream()
-        .map(ioVar -> new CodeIoVariable(VariableCategory.valueOf(ioVar.kind), ioVar.type, ioVar.name, startIndex, endIndex))
+        .map(ioVar -> new CodeIoVariable(VariableCategory.valueOf(ioVar.kind), ioVar.type, ioVar.name))
         .collect(Collectors.toList());
   }
 
