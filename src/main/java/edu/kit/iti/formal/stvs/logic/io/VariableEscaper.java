@@ -63,7 +63,9 @@ public class VariableEscaper {
   }
 
   public static String unescapeName(String varName) {
-    int varStartIndex = varName.indexOf("_");
-    return varName.substring(varStartIndex + 1);
+    if (varName.startsWith("var_")) {
+      return varName.substring(4);
+    }
+    return varName;
   }
 }
