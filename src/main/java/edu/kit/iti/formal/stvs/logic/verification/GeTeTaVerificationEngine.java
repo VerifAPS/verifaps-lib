@@ -9,12 +9,15 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 /**
@@ -68,7 +71,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     // Find out when process finishes to set verification result property
     ProcessExitDetector exitDetector = new ProcessExitDetector(getetaProcess);
     exitDetector.processFinishedProperty().addListener(new VerificationDoneListener());
-    exitDetector.start();
+    Platform.runLater(exitDetector);
   }
 
   @Override
@@ -101,12 +104,32 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   private void onVerificationDone() {
     assert getetaProcess != null;
     System.out.println("Verification done!");
+    File logFile;
+    String processOutput;
     try {
-      System.out.println(IOUtils.toString(getetaProcess.getInputStream(), "utf-8"));
-      verificationResult.set(importer.doImport(getetaProcess.getInputStream()));
-    } catch (ImportException | IOException e) {
+      logFile = File.createTempFile("log-verification-", ".xml");
+      processOutput = IOUtils.toString(getetaProcess.getInputStream(), "utf-8");
+    } catch (IOException e) {
       e.printStackTrace();
       verificationResult.set(null);
+      return;
+    }
+
+    try {
+      verificationResult.set(importer.doImport(getetaProcess.getInputStream()));
+    } catch (ImportException e) {
+      PrintWriter writer;
+      String logFilePath = logFile.getAbsolutePath();
+      try {
+        writer = new PrintWriter(logFilePath);
+      } catch (FileNotFoundException e1) {
+        e1.printStackTrace();
+        verificationResult.set(null);
+        return;
+      }
+      writer.println(processOutput);
+      writer.close();
+      verificationResult.set(new VerificationResult(VerificationResult.Status.ERROR, logFilePath));
     }
   }
 }

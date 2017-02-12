@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs;
 
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 
@@ -31,7 +32,7 @@ public class ViewUtils {
     Alert alert = new Alert(type);
     alert.setTitle(title);
     alert.setHeaderText(headerText);
-    alert.setContentText(contentText);
+    alert.getDialogPane().setContent( new Label(contentText));
     alert.showAndWait();
   }
 }
