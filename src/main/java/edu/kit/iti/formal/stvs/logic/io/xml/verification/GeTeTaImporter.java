@@ -68,12 +68,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       Message importedMessage = (Message) jaxbUnmarshaller.unmarshal(source);
-      switch(importedMessage.getReturncode()) {
-        case RETURN_CODE_NOT_VERIFIED:
-          return new VerificationResult(parseCounterexample(importedMessage));
-        default:
-          return makeVerificationResult(source, importedMessage);
-      }
+      return makeVerificationResult(source, importedMessage);
     } catch (JAXBException e) {
       throw new ImportException(e);
     }
@@ -81,11 +76,10 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
 
   private VerificationResult makeVerificationResult(Node source, Message importedMessage) throws ImportException {
     try {
-
       /* Write log to file */
       File logFile = File.createTempFile("log-verification-", ".xml");
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
-      Transformer transformer = null;
+      Transformer transformer = transformerFactory.newTransformer();
       DOMSource domSource = new DOMSource(source);
       StreamResult result = new StreamResult(logFile);
       transformer.transform(domSource, result);
@@ -95,6 +89,8 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       switch (importedMessage.getReturncode()) {
         case RETURN_CODE_SUCCESS:
           return new VerificationResult(VerificationResult.Status.VERIFIED, logFilePath);
+        case RETURN_CODE_NOT_VERIFIED:
+          return new VerificationResult(parseCounterexample(importedMessage), logFilePath);
         case RETURN_CODE_ERROR:
           return new VerificationResult(VerificationResult.Status.ERROR, logFilePath);
         case RETURN_CODE_FATAL:

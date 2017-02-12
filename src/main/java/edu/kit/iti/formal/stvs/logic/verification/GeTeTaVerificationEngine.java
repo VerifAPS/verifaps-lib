@@ -14,10 +14,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -114,9 +111,11 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
       verificationResult.set(null);
       return;
     }
-
+    // Preprocess output (remove anything before the XML)
+    String cleanedProcessOutput = cleanProcessOutput(processOutput);
     try {
-      verificationResult.set(importer.doImport(getetaProcess.getInputStream()));
+      verificationResult.set(importer.doImport(new ByteArrayInputStream(cleanedProcessOutput
+          .getBytes())));
     } catch (ImportException e) {
       PrintWriter writer;
       String logFilePath = logFile.getAbsolutePath();
@@ -131,5 +130,10 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
       writer.close();
       verificationResult.set(new VerificationResult(VerificationResult.Status.ERROR, logFilePath));
     }
+  }
+
+  private String cleanProcessOutput(String processOutput) {
+    int xmlStartIndex = processOutput.indexOf("<");
+    return processOutput.substring(xmlStartIndex);
   }
 }
