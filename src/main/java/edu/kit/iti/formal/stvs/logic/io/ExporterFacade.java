@@ -87,27 +87,6 @@ public class ExporterFacade {
     writeToFile(exportSession(session, format), file);
   }
 
-  public static ByteArrayOutputStream exportVerificationScenario(VerificationScenario scenario,
-                                                ExportFormat format) throws ExportException {
-    switch(format) {
-      case XML:
-        throw new UnsupportedOperationException("Not yet implemented");
-      default:
-        throw new ExportException("Unsupported export format");
-    }
-  }
-
-  /**
-   * exports verificationscenario to a given file
-   * @param verificationScenario verification scenario that should be exported
-   * @param format format to use (can be found in ExporterFascade.ExportFormat)
-   * @param file file to write to
-   */
-  public static void exportVerificationScenario(VerificationScenario verificationScenario,
-                                                ExportFormat format, File file) throws IOException, ExportException {
-    writeToFile(exportVerificationScenario(verificationScenario, format), file);
-  }
-
   /**
    * exports code to the file specified in code-model
    * @param code Code to export

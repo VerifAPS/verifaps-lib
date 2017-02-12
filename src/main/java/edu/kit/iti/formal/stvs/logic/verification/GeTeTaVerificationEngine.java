@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.logic.verification;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
+import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
@@ -22,18 +23,18 @@ import java.util.List;
  * Handles communication with the GeTeTa verification engine
  */
 public class GeTeTaVerificationEngine implements VerificationEngine {
-  private GeTeTaImporter importer;
   private Process getetaProcess;
   private NullableProperty<VerificationResult> verificationResult;
   private String getetaFilename;
   private String nuxmvFilename;
+  private List<Type> typeContext;
 
   public GeTeTaVerificationEngine(String getetaFilename, String nuxmvFilename, List<Type> typeContext) throws VerificationException {
-    importer = new GeTeTaImporter(typeContext);
     verificationResult = new NullableProperty<>();
     getetaProcess = null;
     this.getetaFilename = getetaFilename;
     this.nuxmvFilename = nuxmvFilename;
+    this.typeContext = typeContext;
     /* Check filenames */
     File getetaFile = new File(getetaFilename);
     File nuxmvFile = new File(nuxmvFilename);
@@ -119,8 +120,8 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     // Preprocess output (remove anything before the XML)
     String cleanedProcessOutput = cleanProcessOutput(processOutput);
     try {
-      verificationResult.set(importer.doImport(new ByteArrayInputStream(cleanedProcessOutput
-          .getBytes())));
+      verificationResult.set(ImporterFacade.importVerificationResult(new ByteArrayInputStream(cleanedProcessOutput
+          .getBytes()), ImporterFacade.ImportFormat.GETETA, typeContext));
     } catch (ImportException e) {
       PrintWriter writer;
       String logFilePath = logFile.getAbsolutePath();
