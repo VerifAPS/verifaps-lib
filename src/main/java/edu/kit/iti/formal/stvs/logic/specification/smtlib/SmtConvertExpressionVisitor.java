@@ -22,20 +22,21 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
 
   private static Map<UnaryFunctionExpr.Op, String> smtlibUnaryOperationNames = new HashMap<UnaryFunctionExpr.Op, String>() {{
     put(UnaryFunctionExpr.Op.NOT, "not");
+    put(UnaryFunctionExpr.Op.UNARY_MINUS, "bvneg");
   }};
   private static Map<BinaryFunctionExpr.Op, String> smtlibBinOperationNames = new HashMap<BinaryFunctionExpr
       .Op, String>() {{
     put(BinaryFunctionExpr.Op.AND, "and");
     put(BinaryFunctionExpr.Op.OR, "or");
-    put(BinaryFunctionExpr.Op.DIVISION, "/");
-    put(BinaryFunctionExpr.Op.MULTIPLICATION, "*");
+    put(BinaryFunctionExpr.Op.DIVISION, "bvsrem");
+    put(BinaryFunctionExpr.Op.MULTIPLICATION, "bvmul");
     put(BinaryFunctionExpr.Op.EQUALS, "=");
-    put(BinaryFunctionExpr.Op.GREATER_EQUALS, ">=");
-    put(BinaryFunctionExpr.Op.LESS_EQUALS, "<=");
-    put(BinaryFunctionExpr.Op.LESS_THAN, "<");
-    put(BinaryFunctionExpr.Op.GREATER_THAN, ">");
-    put(BinaryFunctionExpr.Op.MINUS, "-");
-    put(BinaryFunctionExpr.Op.PLUS, "+");
+    put(BinaryFunctionExpr.Op.GREATER_EQUALS, "bvsge");
+    put(BinaryFunctionExpr.Op.LESS_EQUALS, "bvsle");
+    put(BinaryFunctionExpr.Op.LESS_THAN, "bvslt");
+    put(BinaryFunctionExpr.Op.GREATER_THAN, "bvsgt");
+    put(BinaryFunctionExpr.Op.MINUS, "bvsub");
+    put(BinaryFunctionExpr.Op.PLUS, "bvadd");
   }};
 
   private final Function<String, Type> getTypeForVariable;
@@ -110,12 +111,16 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   @Override
   public SExpr visitLiteral(LiteralExpr literalExpr) {
     String literalAsString = literalExpr.getValue().match(
-        String::valueOf,
+        integer -> BitvectorUtils.hexFromInt(integer, 4),
         bool -> bool ? "true" : "false",
         ValueEnum::getEnumValue //TODO: Enum Encoding
     );
     return new SAtom(literalAsString);
   }
+
+  /*private String integerLiteralAsBitVector(int integer, int length){
+
+  }*/
 
   @Override
   public SExpr visitVariable(VariableExpr variableExpr) {

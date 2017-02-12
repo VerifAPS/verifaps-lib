@@ -24,7 +24,7 @@ public class SmtEncoder {
 
   private static Map<String, String> smtlibTypes = new HashMap<String,
       String>() {{
-    put("INT", "Int");
+    put("INT", "(_ BitVec 16)");
     put("BOOL", "Bool");
   }};
   //      Map<Row, Max. number of cycles for that row>

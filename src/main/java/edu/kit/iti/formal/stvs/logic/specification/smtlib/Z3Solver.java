@@ -123,7 +123,7 @@ public class Z3Solver {
               return;
             }
             Value value = validIoVariable.getValidType().match(
-                () -> new ValueInt(Integer.valueOf(solvedValue)),
+                () -> new ValueInt(BitvectorUtils.intFromHex(solvedValue)),
                 () -> solvedValue.equals("true") ? ValueBool.TRUE : ValueBool.FALSE,
                 TypeEnum::generateDefaultValue //TODO: Enum-Magic
             );
