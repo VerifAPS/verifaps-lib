@@ -1,6 +1,8 @@
 package edu.kit.iti.formal.stvs.view;
 
+import edu.kit.iti.formal.stvs.ViewUtils;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
+import edu.kit.iti.formal.stvs.logic.verification.VerificationException;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.code.ParsedCode;
@@ -18,12 +20,14 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
+import javafx.scene.control.Alert;
 
 import java.io.IOException;
 import java.util.*;
 
 /**
- * Created by csicar on 09.01.17.
+ * @author Carsten Csiky
+ * @author Benjamin Alt
  */
 public class StvsRootController implements Controller {
 
@@ -52,6 +56,7 @@ public class StvsRootController implements Controller {
 
     this.stvsRootModel.getScenario().codeObjectProperty().addListener(this::onCodeChange);
     this.stvsRootModel.getScenario().getCode().parsedCodeProperty().addListener(this::parsedCodeChange);
+    this.stvsRootModel.getScenario().ver
 
     this.view = new StvsRootView(
         editorPaneController.getView(),
@@ -67,7 +72,19 @@ public class StvsRootController implements Controller {
           stvsRootModel.getGlobalConfig().getNuxmvFilename(),
           event.getConstraintSpec());
     } catch (ExportException | IOException e) {
-      e.printStackTrace();
+      ViewUtils.showDialog(Alert.AlertType.ERROR, "Export error", "An error occurred during " +
+          "export of the specification:\n" + e.getMessage(), e.getStackTrace().toString());
+    } catch (VerificationException e) {
+      switch (e.getReason()) {
+        case GETETA_NOT_FOUND:
+          ViewUtils.showDialog(Alert.AlertType.ERROR, "GeTeTa executable not found",
+              "GeTeTa executable not found", "The GeTeTa executable could not be found.");
+          break;
+        case NUXMV_NOT_FOUND:
+          ViewUtils.showDialog(Alert.AlertType.ERROR, "NuXmv executable not found",
+              "NuXmv executable not found", "The NuXmv executable could not be found.");
+          break;
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs;
 
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 
@@ -23,5 +24,14 @@ public class ViewUtils {
     if(child == rootOfCalculation) return new Affine();
     Transform parentTransform = calculateTransformRelativeTo(rootOfCalculation, child.getParent());
     return child.getLocalToParentTransform().createConcatenation(parentTransform);
+  }
+
+  public static void showDialog(Alert.AlertType type, String title, String headerText, String
+      contentText) {
+    Alert alert = new Alert(type);
+    alert.setTitle(title);
+    alert.setHeaderText(headerText);
+    alert.setContentText(contentText);
+    alert.showAndWait();
   }
 }

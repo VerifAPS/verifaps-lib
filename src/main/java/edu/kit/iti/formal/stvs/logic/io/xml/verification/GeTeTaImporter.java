@@ -20,9 +20,16 @@ import org.w3c.dom.Node;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -32,8 +39,13 @@ import java.util.regex.Pattern;
  */
 public class GeTeTaImporter extends XmlImporter<VerificationResult> {
 
+  /* GeTeTa return codes */
   private final static String RETURN_CODE_SUCCESS = "verified";
   private final static String RETURN_CODE_NOT_VERIFIED = "not-verified";
+  private final static String RETURN_CODE_FATAL = "fatal-error";
+  private final static String RETURN_CODE_ERROR = "error";
+
+  /* Regular expressions */
   private final static String IDENTIFIER_RE = "[$a-zA-Z0-9_]+";
   private final static Pattern VARIABLES_FOUND_PATTERN = Pattern.compile("[0-9]+ variables " +
       "found");
@@ -56,14 +68,41 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       Message importedMessage = (Message) jaxbUnmarshaller.unmarshal(source);
-      if (importedMessage.getReturncode().equals(RETURN_CODE_SUCCESS)) {
-        return new VerificationResult();
-      } else if (importedMessage.getReturncode().equals(RETURN_CODE_NOT_VERIFIED)) {
-        return new VerificationResult(parseCounterexample(importedMessage));
-      } else {
-        throw new ImportException("There was an error in the GeTeTa verification engine");
+      switch(importedMessage.getReturncode()) {
+        case RETURN_CODE_NOT_VERIFIED:
+          return new VerificationResult(parseCounterexample(importedMessage));
+        default:
+          return makeVerificationResult(source, importedMessage);
       }
     } catch (JAXBException e) {
+      throw new ImportException(e);
+    }
+  }
+
+  private VerificationResult makeVerificationResult(Node source, Message importedMessage) throws ImportException {
+    try {
+
+      /* Write log to file */
+      File logFile = File.createTempFile("log-verification-", ".xml");
+      TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      Transformer transformer = null;
+      DOMSource domSource = new DOMSource(source);
+      StreamResult result = new StreamResult(logFile);
+      transformer.transform(domSource, result);
+
+      /* Return appropriate VerificationResult */
+      String logFilePath = logFile.getAbsolutePath();
+      switch (importedMessage.getReturncode()) {
+        case RETURN_CODE_SUCCESS:
+          return new VerificationResult(VerificationResult.Status.VERIFIED, logFilePath);
+        case RETURN_CODE_ERROR:
+          return new VerificationResult(VerificationResult.Status.ERROR, logFilePath);
+        case RETURN_CODE_FATAL:
+          return new VerificationResult(VerificationResult.Status.FATAL, logFilePath);
+        default:
+          return new VerificationResult(VerificationResult.Status.UNKNOWN, logFilePath);
+      }
+    } catch (TransformerException | IOException e) {
       throw new ImportException(e);
     }
   }

@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.model.verification;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.verification.GeTeTaVerificationEngine;
 import edu.kit.iti.formal.stvs.logic.verification.VerificationEngine;
+import edu.kit.iti.formal.stvs.logic.verification.VerificationException;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
@@ -34,7 +35,7 @@ public class VerificationScenario {
 
   public void verify(String getetaFilename, String nuxmvFilename, ConstraintSpecification spec)
       throws IOException,
-      ExportException {
+      ExportException, VerificationException {
     verificationEngine = new GeTeTaVerificationEngine(getetaFilename, nuxmvFilename, code.get()
         .getParsedCode()
         .getDefinedTypes());

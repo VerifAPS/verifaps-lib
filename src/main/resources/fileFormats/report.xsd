@@ -41,14 +41,7 @@
                 </element>
 
             </sequence>
-            <attribute name="returncode">
-                <simpleType>
-                    <restriction base="string">
-                        <enumeration value="error"></enumeration>
-                        <enumeration value="not-verified"></enumeration>
-                        <enumeration value="verified"></enumeration>
-                    </restriction>
-                </simpleType>
+            <attribute name="returncode" type="string">
             </attribute>
         </complexType>
     </element>

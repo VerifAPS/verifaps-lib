@@ -8,13 +8,15 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 public class VerificationResult {
 
   private ConcreteSpecification counterexample;
-  private boolean successful;
+  private Status status;
+  private String logFilePath;
 
   /**
-   * Construct a new VerificationResult for a successful verification.
+   * Construct a new VerificationResult for a verification without counterexample.
    */
-  public VerificationResult() {
-    successful = true;
+  public VerificationResult(Status status, String logFilePath) {
+    this.status = status;
+    this.logFilePath = logFilePath;
   }
 
   /**
@@ -23,14 +25,24 @@ public class VerificationResult {
    */
   public VerificationResult(ConcreteSpecification counterexample) {
     this.counterexample = counterexample;
-    successful = false;
+    this.status = Status.COUNTEREXAMPLE;
   }
 
   public boolean isSuccessful() {
-    return successful;
+    return status == Status.COUNTEREXAMPLE;
+  }
+
+  public Status getStatus() {
+    return status;
   }
 
   public ConcreteSpecification getCounterExample() {
     return counterexample;
   }
+
+  public String getLogFilePath() {
+    return logFilePath;
+  }
+
+  public enum Status { VERIFIED, COUNTEREXAMPLE, UNKNOWN, ERROR, FATAL }
 }

@@ -28,12 +28,21 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   private String getetaFilename;
   private String nuxmvFilename;
 
-  public GeTeTaVerificationEngine(String getetaFilename, String nuxmvFilename, List<Type> typeContext) {
+  public GeTeTaVerificationEngine(String getetaFilename, String nuxmvFilename, List<Type> typeContext) throws VerificationException {
     importer = new GeTeTaImporter(typeContext);
     verificationResult = new NullableProperty<>();
     getetaProcess = null;
     this.getetaFilename = getetaFilename;
     this.nuxmvFilename = nuxmvFilename;
+    /* Check filenames */
+    File getetaFile = new File(getetaFilename);
+    File nuxmvFile = new File(nuxmvFilename);
+    if (!getetaFile.exists() || getetaFile.isDirectory()) {
+      throw new VerificationException(VerificationException.Reason.GETETA_NOT_FOUND);
+    }
+    if (!nuxmvFile.exists() || nuxmvFile.isDirectory()) {
+      throw new VerificationException(VerificationException.Reason.NUXMV_NOT_FOUND);
+    }
   }
 
   @Override
