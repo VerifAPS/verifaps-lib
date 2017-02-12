@@ -60,8 +60,11 @@ public class SmtEncoder {
           ""));
       //n_z <= upperBound_z
       if (interval.getUpperBound().isPresent()) {
-        this.sConstrain.addGlobalConstrains(new SList("<=", "n_" + z, interval.getUpperBound().get()
-            + ""));
+        this.sConstrain.addGlobalConstrains(new SList("<=", "n_" + z,
+            Math.min(interval.getUpperBound().get(), getMaxDuration(z)) + ""));
+      } else {
+        this.sConstrain.addGlobalConstrains(new SList("<=", "n_" + z,
+            getMaxDuration(z) + ""));
       }
     }
 
