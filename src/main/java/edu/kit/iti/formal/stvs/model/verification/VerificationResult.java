@@ -30,7 +30,7 @@ public class VerificationResult {
   }
 
   public boolean isSuccessful() {
-    return status == Status.COUNTEREXAMPLE;
+    return status == Status.VERIFIED;
   }
 
   public Status getStatus() {
