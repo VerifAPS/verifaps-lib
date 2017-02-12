@@ -55,7 +55,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     File tempSpecFile = File.createTempFile("verification-spec", ".xml");
     File tempCodeFile = File.createTempFile("verification-code", ".st");
     ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.GETETA, tempSpecFile);
-    ExporterFacade.exportCode(scenario.getCode(), tempCodeFile);
+    ExporterFacade.exportCode(scenario.getCode(), tempCodeFile, true);
     // Start verification engine in new child process
     String getetaCommand = "java -jar " + getetaFilename + " -c " + tempCodeFile.getAbsolutePath() + " -t " +
         tempSpecFile.getAbsolutePath() + " -x";
@@ -68,7 +68,12 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     // Find out when process finishes to set verification result property
     ProcessExitDetector exitDetector = new ProcessExitDetector(getetaProcess);
     exitDetector.processFinishedProperty().addListener(new VerificationDoneListener());
-    Platform.runLater(exitDetector);
+    try {
+      Platform.runLater(exitDetector);
+    } catch (IllegalStateException e) {
+      // We are not in a JavaFX environment
+      exitDetector.start();
+    }
   }
 
   @Override

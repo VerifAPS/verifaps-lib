@@ -4,6 +4,8 @@ import com.sun.xml.bind.marshaller.DataWriter;
 import edu.kit.iti.formal.exteta_1.*;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.Exporter;
+import edu.kit.iti.formal.stvs.logic.io.VariableEscaper;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlExporter;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
@@ -13,6 +15,11 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import org.w3c.dom.Document;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -31,7 +38,6 @@ import java.util.List;
  * @author Benjamin Alt
  */
 public class GeTeTaExporter implements Exporter<ConstraintSpecification> {
-
   private ObjectFactory objectFactory;
 
   public GeTeTaExporter() {
@@ -58,7 +64,7 @@ public class GeTeTaExporter implements Exporter<ConstraintSpecification> {
       for (SpecIoVariable specIoVariable : source.getColumnHeaders()) {
         String variable = specIoVariable.getName();
         ConstraintCell cell = row.getCells().get(variable);
-        step.getCell().add(cell.getAsString());
+        step.getCell().add(VariableEscaper.escapeCellExpression(cell.getAsString()));
       }
       steps.getBlockOrStep().add(step);
     }
@@ -69,7 +75,7 @@ public class GeTeTaExporter implements Exporter<ConstraintSpecification> {
     Variables variables = objectFactory.createVariables();
     for (SpecIoVariable ioVariable : source.getColumnHeaders()) {
       IoVariable exportedVariable = objectFactory.createIoVariable();
-      exportedVariable.setName(ioVariable.getName());
+      exportedVariable.setName(VariableEscaper.escapeName(ioVariable.getName()));
       exportedVariable.setDataType(getDataType(ioVariable));
       if (ioVariable.getCategory() == VariableCategory.INPUT) {
         exportedVariable.setIo("input");
@@ -80,7 +86,7 @@ public class GeTeTaExporter implements Exporter<ConstraintSpecification> {
     }
     for (FreeVariable freeVariable : source.getFreeVariableList().getVariables()) {
       ConstraintVariable exportedVariable = objectFactory.createConstraintVariable();
-      exportedVariable.setName(freeVariable.getName());
+      exportedVariable.setName(VariableEscaper.escapeName(freeVariable.getName()));
       exportedVariable.setDataType(getDataType(freeVariable));
       exportedVariable.setConstraint(freeVariable.getDefaultValue());
       variables.getVariableOrConstraint().add(exportedVariable);
