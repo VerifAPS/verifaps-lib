@@ -37,7 +37,8 @@ public class SpecificationView extends VBox implements Lockable {
     variablesPane = new StackPane();
     tablePane = new StackPane();
     timingDiagramPane = new AnchorPane();
-    startVerificationButton = makeVerificationButton();
+    startVerificationButton = new Button();
+    setVerificationButtonPlay();
     this.getChildren().add(startVerificationButton);
     this.setAlignment(Pos.TOP_RIGHT);
 
@@ -48,10 +49,18 @@ public class SpecificationView extends VBox implements Lockable {
     this.getChildren().add(splitPane);
   }
 
-  private Button makeVerificationButton() {
+  public void setVerificationButtonPlay() {
     Text icon = GlyphsDude.createIcon(FontAwesomeIcon.PLAY);
     icon.setFill(Color.MEDIUMSEAGREEN);
-    return new Button("Verify!", icon);
+    startVerificationButton.setText("Verify");
+    startVerificationButton.setGraphic(icon);
+  }
+
+  public void setVerificationButtonStop() {
+    Text icon = GlyphsDude.createIcon(FontAwesomeIcon.STOP);
+    icon.setFill(Color.INDIANRED);
+    startVerificationButton.setText("Stop Verification");
+    startVerificationButton.setGraphic(icon);
   }
 
   public TableView<SynchronizedRow> getTable() {
@@ -110,7 +119,9 @@ public class SpecificationView extends VBox implements Lockable {
     return null;
   }
 
-  public void onVerificationButtonClicked(ConstraintSpecification constraintSpec) {
-    startVerificationButton.fireEvent(new VerificationStartedEvent(constraintSpec));
+  public void onVerificationButtonClicked(ConstraintSpecification constraintSpec,
+                                          VerificationEvent.Type type) {
+
+    startVerificationButton.fireEvent(new VerificationEvent(constraintSpec, type));
   }
 }

@@ -169,7 +169,7 @@ public class StvsMenuBarController implements Controller {
       }
     }
     try {
-      ExporterFacade.exportCode(code);
+      ExporterFacade.exportCode(code, false);
     } catch (IOException e) {
       new ErrorMessageDialog(e);
     }

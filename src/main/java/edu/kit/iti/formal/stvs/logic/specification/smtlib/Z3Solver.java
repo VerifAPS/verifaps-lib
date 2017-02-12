@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 import de.tudresden.inf.lat.jsexp.Sexp;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
 import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
@@ -14,7 +15,6 @@ import edu.kit.iti.formal.stvs.util.ProcessOutputHandler;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,10 +69,11 @@ public class Z3Solver {
     if (sexpOptional.isPresent()) {
       Sexp sExpr = sexpOptional.get().toSexpr();
       sExpr.forEach(varAsign -> {
-        String[] varSplit = varAsign.get(0).toIndentedString().split("_");
-        if (varAsign.get(0).toIndentedString().matches("n_\\d+")) {
+        if (varAsign.getLength() == 0 || !varAsign.get(0).toIndentedString().equals("define-fun")) return;
+        String[] varSplit = varAsign.get(1).toIndentedString().split("_");
+        if (varAsign.get(1).toIndentedString().matches("n_\\d+")) {
           //is duration
-          rawDurations.put(Integer.valueOf(varSplit[1]), Integer.valueOf(varAsign.get(1).toIndentedString()));
+          rawDurations.put(Integer.valueOf(varSplit[1]), Integer.valueOf(varAsign.get(4).toIndentedString()));
         }
       });
 
@@ -86,40 +87,63 @@ public class Z3Solver {
       }
 
       sExpr.forEach(varAsign -> {
-        String[] varSplit = varAsign.get(0).toIndentedString().split("_");
-        if (varAsign.get(0).toIndentedString().matches(".*?_\\d+_\\d+")) {
+        if (varAsign.getLength() == 0 || !varAsign.get(0).toIndentedString().equals("define-fun")) return;
+        String[] varSplit = varAsign.get(1).toIndentedString().split("_");
+        if (varAsign.get(1).toIndentedString().matches(".*?_\\d+_\\d+")) {
           //is variable
-          int rowNumber = Integer.valueOf(varSplit[1]) + Integer.valueOf(varSplit[2]);
+          int cycleCount = Integer.valueOf(varSplit[2]);
           //ignore variables if iteration > n_z
-          if (rowNumber > durations.get(Integer.valueOf(varSplit[1])).getEndCycle()) {
+          int nz = Integer.valueOf(varSplit[1]);
+          ConcreteDuration concreteDuration = durations.get(nz);
+          if (cycleCount >= concreteDuration.getDuration()) {
             return;
           }
-          rawRows.putIfAbsent(rowNumber, new HashMap<>());
-          rawRows.get(rowNumber).put(varSplit[0], varAsign.get(1).toIndentedString());
+          int absoluteIndex = concreteDuration.getBeginCycle() + cycleCount;
+          rawRows.putIfAbsent(absoluteIndex, new HashMap<>());
+          rawRows.get(absoluteIndex).put(varSplit[0], varAsign.get(4).toIndentedString());
         }
       });
 
       //convert raw rows into specificationRows
       List<SpecificationRow<ConcreteCell>> specificationRows = new ArrayList<>();
-      for (int i = 0; i < rawRows.size(); i++) {
-        Map<String, ConcreteCell> concreteCellMap = rawRows.get(i).entrySet().stream()
-            .map(rowEntry -> {
-              String varName = rowEntry.getKey();
-              String valueString = rowEntry.getValue();
-              Type type = typeContext.get(varName);
-              Value value = type.match(
-                  () -> new ValueInt(Integer.valueOf(valueString)), //Integer
-                  () -> valueString.equals("true") ? ValueBool.TRUE : ValueBool.FALSE, //Boolean
-                  (typeEnum) -> typeEnum.valueOf(valueString) //Enum TODO: Check if this is correct
-              );
-              return new AbstractMap.SimpleEntry<>(varName, new ConcreteCell(value));
-            })
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        specificationRows.add(i, SpecificationRow.createUnobservableRow(concreteCellMap));
-      }
+      durations.forEach(duration -> {
+        for (int cycle = 0; cycle < duration.getDuration(); cycle++) {
+          Map<String, String> rawRow = rawRows.get(duration.getBeginCycle() + cycle);
+          Map<String, ConcreteCell> newRow = new HashMap<>();
+          validIoVariables.forEach(validIoVariable -> {
+            if (rawRow == null) {
+              newRow.put(validIoVariable.getName(),
+                  new ConcreteCell(validIoVariable.getValidType().generateDefaultValue()));
+              return;
+            }
+            String solvedValue = rawRow.get(validIoVariable.getName());
+            if (solvedValue == null) {
+              newRow.put(validIoVariable.getName(),
+                  new ConcreteCell(validIoVariable.getValidType().generateDefaultValue()));
+              return;
+            }
+            Value value = validIoVariable.getValidType().match(
+                () -> new ValueInt(BitvectorUtils.intFromHex(solvedValue)),
+                () -> solvedValue.equals("true") ? ValueBool.TRUE : ValueBool.FALSE,
+                TypeEnum::generateDefaultValue //TODO: Enum-Magic
+            );
+            newRow.put(validIoVariable.getName(), new ConcreteCell(value));
+          });
+          specificationRows.add(SpecificationRow.createUnobservableRow(newRow));
+        }
+      });
       return Optional.of(
           new ConcreteSpecification(validIoVariables, specificationRows, durations, false));
     }
     return Optional.empty();
+  }
+
+  public static Optional<ConcreteSpecification> concretizeSConstraint(SConstraint sConstraint, List<ValidIoVariable> validIoVariables)
+      throws IOException {
+    String constraintString = sConstraint.globalConstraintsToText();
+    String headerString = sConstraint.headerToText();
+    String commands = "(check-sat)\n(get-model)";
+    String z3Input = headerString + "\n" + constraintString + "\n" + commands;
+    return concretizeVarAssignment(z3Input, validIoVariables);
   }
 }

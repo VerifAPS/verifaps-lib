@@ -49,4 +49,11 @@ public class XmlConstraintSpecImporterTest {
     assertEquals(expectedSpec, importedSpec);
   }
 
+  @Test
+  public void testDoImportValidEnum1() throws Exception {
+    FileInputStream inputStream = new FileInputStream(new File
+        (this.getClass().getResource("spec_constraint_valid_enum_1.xml").toURI()));
+    ConstraintSpecification importedSpec = importer.doImport(inputStream);
+    System.out.println();
+  }
 }

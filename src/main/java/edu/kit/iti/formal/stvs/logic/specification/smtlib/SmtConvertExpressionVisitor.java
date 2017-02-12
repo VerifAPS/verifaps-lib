@@ -1,7 +1,13 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
-import edu.kit.iti.formal.stvs.model.expressions.*;
+import edu.kit.iti.formal.stvs.model.expressions.BinaryFunctionExpr;
+import edu.kit.iti.formal.stvs.model.expressions.ExpressionVisitor;
+import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.UnaryFunctionExpr;
+import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
+import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,20 +22,21 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
 
   private static Map<UnaryFunctionExpr.Op, String> smtlibUnaryOperationNames = new HashMap<UnaryFunctionExpr.Op, String>() {{
     put(UnaryFunctionExpr.Op.NOT, "not");
+    put(UnaryFunctionExpr.Op.UNARY_MINUS, "bvneg");
   }};
   private static Map<BinaryFunctionExpr.Op, String> smtlibBinOperationNames = new HashMap<BinaryFunctionExpr
       .Op, String>() {{
     put(BinaryFunctionExpr.Op.AND, "and");
     put(BinaryFunctionExpr.Op.OR, "or");
-    put(BinaryFunctionExpr.Op.DIVISION, "/");
-    put(BinaryFunctionExpr.Op.MULTIPLICATION, "*");
+    put(BinaryFunctionExpr.Op.DIVISION, "bvsrem");
+    put(BinaryFunctionExpr.Op.MULTIPLICATION, "bvmul");
     put(BinaryFunctionExpr.Op.EQUALS, "=");
-    put(BinaryFunctionExpr.Op.GREATER_EQUALS, ">=");
-    put(BinaryFunctionExpr.Op.LESS_EQUALS, "<=");
-    put(BinaryFunctionExpr.Op.LESS_THAN, "<");
-    put(BinaryFunctionExpr.Op.GREATER_THAN, ">");
-    put(BinaryFunctionExpr.Op.MINUS, "-");
-    put(BinaryFunctionExpr.Op.PLUS, "+");
+    put(BinaryFunctionExpr.Op.GREATER_EQUALS, "bvsge");
+    put(BinaryFunctionExpr.Op.LESS_EQUALS, "bvsle");
+    put(BinaryFunctionExpr.Op.LESS_THAN, "bvslt");
+    put(BinaryFunctionExpr.Op.GREATER_THAN, "bvsgt");
+    put(BinaryFunctionExpr.Op.MINUS, "bvsub");
+    put(BinaryFunctionExpr.Op.PLUS, "bvadd");
   }};
 
   private final Function<String, Type> getTypeForVariable;
@@ -44,13 +51,14 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   /**
    * Creates a visitor from a type context.
    * The context is needed while visiting because of the logic in choco models
-   *  @param getTypeForVariable A Map from variable names to types
-   * @param row row, that the visitor should convert
+   *
+   * @param getTypeForVariable        A Map from variable names to types
+   * @param row                       row, that the visitor should convert
    * @param getSMTLibVariableTypeName
    */
   public SmtConvertExpressionVisitor(Function<String, Type> getTypeForVariable, int row, int
       iteration, ValidIoVariable column, Predicate<String> isIoVariable, Function<String, String>
-      getSMTLibVariableTypeName) {
+                                         getSMTLibVariableTypeName) {
     this.getTypeForVariable = getTypeForVariable;
     this.row = row;
     this.iteration = iteration;
@@ -102,8 +110,17 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
 
   @Override
   public SExpr visitLiteral(LiteralExpr literalExpr) {
-    return new SAtom(literalExpr.getValue().getValueString());
+    String literalAsString = literalExpr.getValue().match(
+        integer -> BitvectorUtils.hexFromInt(integer, 4),
+        bool -> bool ? "true" : "false",
+        ValueEnum::getEnumValue //TODO: Enum Encoding
+    );
+    return new SAtom(literalAsString);
   }
+
+  /*private String integerLiteralAsBitVector(int integer, int length){
+
+  }*/
 
   @Override
   public SExpr visitVariable(VariableExpr variableExpr) {
