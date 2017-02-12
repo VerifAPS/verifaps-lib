@@ -12,19 +12,15 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
-import edu.kit.iti.formal.stvs.model.table.problems.SpecProblemRecognizer;
+import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import org.junit.Test;
 import org.junit.*;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 
@@ -47,7 +43,7 @@ public class SmtEncoderTest {
         .getFreeVariableList());
     List<ValidFreeVariable> freeVariables = freeVariableListValidator.validFreeVariablesProperty().get();
     this.freeVariables = freeVariables;
-    SpecProblemRecognizer recognizer = new SpecProblemRecognizer(
+    ConstraintSpecificationValidator recognizer = new ConstraintSpecificationValidator(
         new SimpleObjectProperty<>(typeContext),
         new SimpleObjectProperty<>(codeIoVariables),
         new ReadOnlyObjectWrapper<>(freeVariables),

@@ -7,7 +7,7 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
-import edu.kit.iti.formal.stvs.model.table.problems.SpecProblemRecognizer;
+import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import javafx.beans.property.SimpleObjectProperty;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +28,7 @@ import static org.junit.runners.Parameterized.Parameter;
  * @author Philipp
  */
 @RunWith(Parameterized.class)
-public class SpecProblemRecognizerTest {
+public class ConstraintSpecificationValidatorTest {
 
   @Parameters(name="{0}")
   public static Collection<String> testfiles() {
@@ -49,7 +49,7 @@ public class SpecProblemRecognizerTest {
 
   @Test
   public void testProblems() {
-    JsonElement testjson = JsonTableParser.jsonFromResource(testfile, SpecProblemRecognizerTest.class);
+    JsonElement testjson = JsonTableParser.jsonFromResource(testfile, ConstraintSpecificationValidatorTest.class);
 
     List<CodeIoVariable> codeIoVariables = JsonTableParser.codeIoVariablesFromJson(testjson);
 
@@ -65,7 +65,7 @@ public class SpecProblemRecognizerTest {
         freeVars
     );
 
-    SpecProblemRecognizer recognizer = new SpecProblemRecognizer(
+    ConstraintSpecificationValidator recognizer = new ConstraintSpecificationValidator(
         new SimpleObjectProperty<>(typeContext),
         new SimpleObjectProperty<>(codeIoVariables),
         validator.validFreeVariablesProperty(),

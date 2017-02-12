@@ -35,7 +35,7 @@ public class SpecificationTableController implements Controller {
   private final HybridSpecification hybridSpec;
   private final ObjectProperty<List<Type>> typeContext;
   private final ObjectProperty<List<CodeIoVariable>> codeIoVariables;
-  private final SpecProblemRecognizer problemRecognizer;
+  private final ConstraintSpecificationValidator problemRecognizer;
 
   private final ObservableList<SynchronizedRow> data = FXCollections.observableArrayList();
   private final TableColumn<SynchronizedRow, String> durations;
@@ -49,7 +49,7 @@ public class SpecificationTableController implements Controller {
     this.typeContext = typeContext;
     this.codeIoVariables = codeIoVariables;
     this.hybridSpec = hybridSpecification;
-    this.problemRecognizer = new SpecProblemRecognizer(typeContext, codeIoVariables, validVariables, hybridSpecification);
+    this.problemRecognizer = new ConstraintSpecificationValidator(typeContext, codeIoVariables, validVariables, hybridSpecification);
     this.durations = createViewColumn("Duration", SynchronizedRow::getDuration);
 
     tableView.getColumns().add(durations);
@@ -323,7 +323,7 @@ public class SpecificationTableController implements Controller {
     return hybridSpec;
   }
 
-  public SpecProblemRecognizer getSpecProblemRecognizer() {
+  public ConstraintSpecificationValidator getSpecProblemRecognizer() {
     return this.problemRecognizer;
   }
 }

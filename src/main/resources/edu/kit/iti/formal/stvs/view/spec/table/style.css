@@ -18,7 +18,7 @@
 }
 
 .spec-column-header.category-label.label.output {
-  -fx-text-fill: darkblue;
+  -fx-text-fill: purple;
 }
 
 .spec-column-header.category-label.label.input {

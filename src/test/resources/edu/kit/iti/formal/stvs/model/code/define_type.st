@@ -2,7 +2,7 @@ TYPE
     MY_ENUM : (possible, values, enum);
 END_TYPE
 
-FUNCTION MY_STH : BOOL
+PROGRAM my_sth
     VAR_INPUT
         active : BOOL;
         number : INT;
@@ -12,4 +12,4 @@ FUNCTION MY_STH : BOOL
         my_output : MY_ENUM;
         seriously : BOOL;
     END_VAR
-END_FUNCTION
+END_PROGRAM

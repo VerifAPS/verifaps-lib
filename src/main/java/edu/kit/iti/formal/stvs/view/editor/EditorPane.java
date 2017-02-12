@@ -7,7 +7,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.fxmisc.richtext.CodeArea;
@@ -24,27 +23,18 @@ public class EditorPane extends SplitPane {
   /**
    * Contains ButtonList and CodeArea
    */
-  private HBox horizontalBox;
   private CodeArea codeArea;
-  private VBox buttonList;
   private ListView<SyntaxError> syntaxErrorListView;
-
-  public Pane getSyntaxErrorPane() {
-    return syntaxErrorPane;
-  }
 
   private Pane syntaxErrorPane;
 
-  public ListView<SyntaxError> getSyntaxErrorListView() {
-    return syntaxErrorListView;
-  }
-
   public EditorPane(String code, ObservableList<SyntaxError> syntaxErrors) {
     super();
+    this.getStylesheets().add(EditorPane.class.getResource("style.css").toExternalForm());
+
     codeArea = new CodeArea(code);
     codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
     syntaxErrorListView = new ListView<>(syntaxErrors);
-    syntaxErrorListView.getStylesheets().add(EditorPane.class.getResource("style.css").toExternalForm());
     syntaxErrorListView.getStyleClass().addAll("model-text-area");
     syntaxErrorPane  = new AnchorPane(syntaxErrorListView);
     AnchorPane.setBottomAnchor(syntaxErrorListView, 0.0);
@@ -54,6 +44,14 @@ public class EditorPane extends SplitPane {
     this.getItems().addAll(codeArea, syntaxErrorPane);
     this.setOrientation(Orientation.VERTICAL);
     this.setDividerPositions(0.8);
+  }
+
+  public ListView<SyntaxError> getSyntaxErrorListView() {
+    return syntaxErrorListView;
+  }
+
+  public Pane getSyntaxErrorPane() {
+    return syntaxErrorPane;
   }
 
   public StringProperty getCodeProperty() {
@@ -75,9 +73,5 @@ public class EditorPane extends SplitPane {
 
   public CodeArea getCodeArea() {
     return codeArea;
-  }
-
-  public VBox getButtonList() {
-    return buttonList;
   }
 }

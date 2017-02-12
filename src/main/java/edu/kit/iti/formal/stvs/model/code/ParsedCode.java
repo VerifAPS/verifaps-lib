@@ -91,10 +91,21 @@ public class ParsedCode {
       this.foldableCodeBlocks = new ArrayList<>();
     }
 
+    private void addBlock(Top topElement) {
+      foldableCodeBlocks.add(new FoldableCodeBlock(
+          topElement.getStartPosition().getLineNumber(),
+          topElement.getEndPosition().getLineNumber()));
+    }
+
     @Override
     public Void visit(FunctionDeclaration function) {
-      FoldableCodeBlock newBlock = new FoldableCodeBlock(function.getStartPosition().getLineNumber(), function.getEndPosition().getLineNumber());
-      this.foldableCodeBlocks.add(newBlock);
+      addBlock(function);
+      return null;
+    }
+
+    @Override
+    public Void visit(ProgramDeclaration program) {
+      addBlock(program);
       return null;
     }
 
@@ -115,20 +126,23 @@ public class ParsedCode {
 
   public static void parseCode(String input,
                                Consumer<List<? extends Token>> tokenListener,
-                               Consumer<List<SyntaxError>> syntaxErrors,
+                               Consumer<List<SyntaxError>> syntaxErrorsListener,
                                Consumer<ParsedCode> parsedCodeListener) {
     try {
       SyntaxErrorListener syntaxErrorListener = new SyntaxErrorListener();
       IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(input));
+      lexer.removeErrorListeners();
       lexer.addErrorListener(syntaxErrorListener);
       tokenListener.accept(lexer.getAllTokens());
       lexer.reset();
 
       IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
+      parser.removeErrorListeners();
       parser.addErrorListener(syntaxErrorListener);
-      syntaxErrors.accept(syntaxErrorListener.getSyntaxErrors());
 
       TopLevelElements ast = new TopLevelElements(parser.start().ast);
+
+      syntaxErrorsListener.accept(syntaxErrorListener.getSyntaxErrors());
 
       // Find types in parsed code
       TypeDeclarationVisitor typeVisitor = new TypeDeclarationVisitor();
