@@ -5,6 +5,7 @@ import edu.kit.iti.formal.exteta_1_0.report.Counterexample;
 import edu.kit.iti.formal.exteta_1_0.report.Message;
 import edu.kit.iti.formal.exteta_1_0.report.ObjectFactory;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
+import edu.kit.iti.formal.stvs.logic.io.VariableEscaper;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlImporter;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
@@ -68,12 +69,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       Message importedMessage = (Message) jaxbUnmarshaller.unmarshal(source);
-      switch(importedMessage.getReturncode()) {
-        case RETURN_CODE_NOT_VERIFIED:
-          return new VerificationResult(parseCounterexample(importedMessage));
-        default:
-          return makeVerificationResult(source, importedMessage);
-      }
+      return makeVerificationResult(source, importedMessage);
     } catch (JAXBException e) {
       throw new ImportException(e);
     }
@@ -81,11 +77,10 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
 
   private VerificationResult makeVerificationResult(Node source, Message importedMessage) throws ImportException {
     try {
-
       /* Write log to file */
       File logFile = File.createTempFile("log-verification-", ".xml");
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
-      Transformer transformer = null;
+      Transformer transformer = transformerFactory.newTransformer();
       DOMSource domSource = new DOMSource(source);
       StreamResult result = new StreamResult(logFile);
       transformer.transform(domSource, result);
@@ -95,6 +90,8 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       switch (importedMessage.getReturncode()) {
         case RETURN_CODE_SUCCESS:
           return new VerificationResult(VerificationResult.Status.VERIFIED, logFilePath);
+        case RETURN_CODE_NOT_VERIFIED:
+          return new VerificationResult(parseCounterexample(importedMessage), logFilePath);
         case RETURN_CODE_ERROR:
           return new VerificationResult(VerificationResult.Status.ERROR, logFilePath);
         case RETURN_CODE_FATAL:
@@ -129,7 +126,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
           entryString = entryString.replaceAll("\\s+", "");
           int colonIndex = entryString.indexOf(":");
           String varName = entryString.substring(0, colonIndex);
-          varNames.add(varName);
+          varNames.add(VariableEscaper.unescapeName(varName));
           entryString = entries.get(++i).getValue();
         }
         break;
@@ -153,9 +150,10 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
         String stateString = state.getName().trim();
         if (CODE_VARIABLE_PATTERN.matcher(stateString).matches()) {
           int periodIndex = stateString.indexOf(".");
-          String varName = stateString.substring(periodIndex + 1, stateString.length());
+          String varName = VariableEscaper.unescapeName(stateString.substring(periodIndex + 1, stateString.length
+              ()));
           varCategories.put(varName, VariableCategory.OUTPUT);
-          String varValue = state.getValue();
+          String varValue = VariableEscaper.unescapeName(state.getValue());
           processVarAssignment(currentValues, varTypes, varName, varValue);
         }
       }
@@ -188,10 +186,11 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
 
       for (Assignment input : step.getInput()) { // Input vars are initialized here FOR THE NEXT
         // CYCLE
-        String varName = input.getName();
+        String varName = VariableEscaper.unescapeName(input.getName());
         if (INPUT_VARIABLE_PATTERN.matcher(varName).matches()) {
           varCategories.put(varName, VariableCategory.INPUT);
-          processVarAssignment(currentValues, varTypes, input.getName(), input.getValue());
+          processVarAssignment(currentValues, varTypes, varName, VariableEscaper.unescapeName
+              (input.getValue()));
         }
       }
     }
@@ -222,8 +221,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   }
 
   private void processVarAssignment(Map<String,Value> currentValues, Map<String,Type> varTypes,
-                                  String varName,
-                    String varValue) throws ImportException {
+                                  String varName, String varValue) throws ImportException {
     if (INT_VALUE_PATTERN.matcher(varValue).matches()) {
       int underlineIndex = varValue.indexOf("_");
       int intVal = Integer.parseInt(varValue.substring(underlineIndex + 1, varValue.length
@@ -254,7 +252,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       }
       Optional<Value> enumVal = varTypes.get(varName).parseLiteral(varValue);
       if (!enumVal.isPresent()) {
-        throw new ImportException("Illegal literal " + varValue + "for enum type " +
+        throw new ImportException("Illegal literal " + varValue + " for enum type " +
             varTypes.get(varName).getTypeName());
       }
       currentValues.put(varName, enumVal.get());

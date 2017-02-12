@@ -14,10 +14,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -58,7 +55,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     File tempSpecFile = File.createTempFile("verification-spec", ".xml");
     File tempCodeFile = File.createTempFile("verification-code", ".st");
     ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.GETETA, tempSpecFile);
-    ExporterFacade.exportCode(scenario.getCode(), tempCodeFile);
+    ExporterFacade.exportCode(scenario.getCode(), tempCodeFile, true);
     // Start verification engine in new child process
     String getetaCommand = "java -jar " + getetaFilename + " -c " + tempCodeFile.getAbsolutePath() + " -t " +
         tempSpecFile.getAbsolutePath() + " -x";
@@ -71,7 +68,12 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     // Find out when process finishes to set verification result property
     ProcessExitDetector exitDetector = new ProcessExitDetector(getetaProcess);
     exitDetector.processFinishedProperty().addListener(new VerificationDoneListener());
-    Platform.runLater(exitDetector);
+    try {
+      Platform.runLater(exitDetector);
+    } catch (IllegalStateException e) {
+      // We are not in a JavaFX environment
+      exitDetector.start();
+    }
   }
 
   @Override
@@ -114,9 +116,11 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
       verificationResult.set(null);
       return;
     }
-
+    // Preprocess output (remove anything before the XML)
+    String cleanedProcessOutput = cleanProcessOutput(processOutput);
     try {
-      verificationResult.set(importer.doImport(getetaProcess.getInputStream()));
+      verificationResult.set(importer.doImport(new ByteArrayInputStream(cleanedProcessOutput
+          .getBytes())));
     } catch (ImportException e) {
       PrintWriter writer;
       String logFilePath = logFile.getAbsolutePath();
@@ -131,5 +135,10 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
       writer.close();
       verificationResult.set(new VerificationResult(VerificationResult.Status.ERROR, logFilePath));
     }
+  }
+
+  private String cleanProcessOutput(String processOutput) {
+    int xmlStartIndex = processOutput.indexOf("<");
+    return processOutput.substring(xmlStartIndex);
   }
 }
