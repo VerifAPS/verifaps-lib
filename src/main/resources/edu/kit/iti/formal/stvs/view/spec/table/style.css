@@ -4,7 +4,12 @@
 }
 
 .spec-cell.cell.table-cell {
+  -fx-content-display: bottom;
   -fx-font-family: monospace;
+}
+
+.spec-counterexample.label {
+  -fx-text-fill: red;
 }
 
 .spec-column-problem.spec-column-header {

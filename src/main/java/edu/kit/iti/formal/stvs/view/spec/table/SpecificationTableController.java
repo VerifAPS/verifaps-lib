@@ -7,17 +7,15 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.*;
 import edu.kit.iti.formal.stvs.model.table.problems.*;
 import edu.kit.iti.formal.stvs.view.Controller;
-import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.*;
-import javafx.util.converter.DefaultStringConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +33,7 @@ public class SpecificationTableController implements Controller {
   private final HybridSpecification hybridSpec;
   private final ObjectProperty<List<Type>> typeContext;
   private final ObjectProperty<List<CodeIoVariable>> codeIoVariables;
-  private final ConstraintSpecificationValidator problemRecognizer;
+  private final ConstraintSpecificationValidator validator;
 
   private final ObservableList<SynchronizedRow> data = FXCollections.observableArrayList();
   private final TableColumn<SynchronizedRow, String> durations;
@@ -49,16 +47,15 @@ public class SpecificationTableController implements Controller {
     this.typeContext = typeContext;
     this.codeIoVariables = codeIoVariables;
     this.hybridSpec = hybridSpecification;
-    this.problemRecognizer = new ConstraintSpecificationValidator(typeContext, codeIoVariables, validVariables, hybridSpecification);
+    this.validator = new ConstraintSpecificationValidator(typeContext, codeIoVariables, validVariables, hybridSpecification);
     this.durations = createViewColumn("Duration", SynchronizedRow::getDuration);
 
     tableView.getColumns().add(durations);
 
     tableView.setItems(data);
-    tableView.setEditable(true);
+    tableView.setEditable(hybridSpecification.isEditable());
     tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableView.setRowFactory(this::rowFactory);
-
 
     tableView.setContextMenu(createContextMenu());
 
@@ -67,18 +64,27 @@ public class SpecificationTableController implements Controller {
     hybridSpecification.getColumnHeaders().forEach(this::addColumnToView);
 
     for (int rowIndex = 0; rowIndex < hybridSpecification.getRows().size(); rowIndex++) {
-      data.add(new SynchronizedRow(
+      SynchronizedRow row = new SynchronizedRow(
           hybridSpecification.getRows().get(rowIndex),
-          hybridSpecification.getDurations().get(rowIndex)));
+          hybridSpecification.getDurations().get(rowIndex));
+      row.updateCounterExampleCells(rowIndex, hybridSpecification.getCounterExample());
+      data.add(row);
     }
 
     data.addListener(this::onDataRowChanged);
-    problemRecognizer.problemsProperty().addListener((Observable o) -> onProblemsChange());
+    validator.problemsProperty().addListener((Observable o) -> onProblemsChange());
+    hybridSpec.counterExampleProperty().addListener(observable -> onCounterExampleChanged());
+  }
+
+  private void onCounterExampleChanged() {
+    for (int rowIndex = 0; rowIndex < hybridSpec.getRows().size(); rowIndex++) {
+      data.get(rowIndex).updateCounterExampleCells(rowIndex, hybridSpec.getCounterExample());
+    }
   }
 
   private void onProblemsChange() {
     List<ColumnProblem> columnProblems =
-        problemRecognizer.problemsProperty().get().stream()
+        validator.problemsProperty().get().stream()
         .filter(problem -> problem instanceof ColumnProblem)
         .map(problem -> (ColumnProblem) problem)
         .collect(Collectors.toList());
@@ -101,50 +107,7 @@ public class SpecificationTableController implements Controller {
   }
 
   private TableCell<SynchronizedRow, String> cellFactory(TableColumn<SynchronizedRow, String> table) {
-    return new TextFieldTableCell<SynchronizedRow, String>(new DefaultStringConverter()) {
-      private final InvalidationListener onProblemChangeListener;
-      {
-        onProblemChangeListener = observable -> this.onProblemsChanged();
-        problemRecognizer.problemsProperty().addListener(onProblemChangeListener);
-        getStyleClass().add("spec-cell");
-        onProblemsChanged();
-      }
-
-      private void configureProblem(SpecProblem problem) {
-        getStyleClass().remove("spec-cell-problem");
-        getStyleClass().add("spec-cell-problem");
-        setTooltip(new Tooltip(problem.getErrorMessage()));
-      }
-
-      private void resetCellVisuals() {
-        getStyleClass().remove("spec-cell-problem");
-        setTooltip(null);
-      }
-
-      private void onProblemsChanged() {
-        if (!isEmpty()) {
-          List<SpecProblem> problems = problemRecognizer.problemsProperty().get();
-          for (SpecProblem problem : problems) {
-            if (problem instanceof CellProblem) {
-              CellProblem cellProblem = (CellProblem) problem;
-              String col = cellProblem.getColumn();
-              if (col.equals(getTableColumn().getUserData()) && cellProblem.getRow() == getTableRow().getIndex()) {
-                configureProblem(problem);
-                return;
-              }
-            } else if (problem instanceof DurationProblem) {
-              DurationProblem durationProblem = (DurationProblem) problem;
-              if (getTableColumn().getUserData() == null && durationProblem.getRow() == getTableRow().getIndex()) {
-                configureProblem(problem);
-                return;
-              }
-            }
-          }
-        }
-        resetCellVisuals();
-      }
-
-    };
+    return new SpecificationTableCell(validator);
   }
 
   private void onDataRowChanged(ListChangeListener.Change<? extends SynchronizedRow> change) {
@@ -184,6 +147,9 @@ public class SpecificationTableController implements Controller {
         new IoVariableChooserDialog(codeIoVariables, hybridSpec.getColumnHeaders())
             .showAndWait()
             .ifPresent(this::addNewColumn));
+    insertRow.disableProperty().bind(Bindings.not(tableView.editableProperty()));
+    deleteRow.disableProperty().bind(Bindings.not(tableView.editableProperty()));
+    addNewColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
     return new ContextMenu(insertRow, deleteRow, addNewColumn);
   }
 
@@ -200,6 +166,8 @@ public class SpecificationTableController implements Controller {
       tableView.getColumns().remove(column);
       hybridSpec.removeColumnByName((String) column.getUserData());
     });
+    changeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
+    removeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
     return new ContextMenu(changeColumn, removeColumn);
   }
 
@@ -282,7 +250,7 @@ public class SpecificationTableController implements Controller {
     row.setOnDragOver(event -> {
       Dragboard db = event.getDragboard();
       if (db.hasContent(SERIALIZED_MIME_TYPE)) {
-        if (row.getIndex() != (Integer) db.getContent(SERIALIZED_MIME_TYPE)) {
+        if (tableView.isEditable() && row.getIndex() != (Integer) db.getContent(SERIALIZED_MIME_TYPE)) {
           event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
           event.consume();
         }
@@ -324,6 +292,6 @@ public class SpecificationTableController implements Controller {
   }
 
   public ConstraintSpecificationValidator getSpecProblemRecognizer() {
-    return this.problemRecognizer;
+    return this.validator;
   }
 }

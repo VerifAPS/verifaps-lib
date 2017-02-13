@@ -3,9 +3,7 @@ package edu.kit.iti.formal.stvs;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecImporter;
-import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
-import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
-import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
+import edu.kit.iti.formal.stvs.model.common.*;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
@@ -23,6 +21,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by bal on 10.02.17.
@@ -58,11 +57,8 @@ public class TestUtils {
       List<Type> typeContext) {
     try {
       ConstraintSpecification constraintSpec = ImporterFacade.importSpec(source, ImporterFacade.ImportFormat.XML);
-      FreeVariableListValidator freevarValidator = new FreeVariableListValidator(
-          new SimpleObjectProperty<>(typeContext),
-          constraintSpec.getFreeVariableList()
-      );
-      List<ValidFreeVariable> validFreeVariables = freevarValidator.validFreeVariablesProperty().get();
+      List<ValidFreeVariable> validFreeVariables = importValidFreeVariables(
+          constraintSpec.getFreeVariableList(), typeContext);
       ConstraintSpecificationValidator validator = new ConstraintSpecificationValidator(
           new SimpleObjectProperty<>(typeContext),
           new SimpleObjectProperty<>(new ArrayList<>()),
@@ -79,5 +75,37 @@ public class TestUtils {
     } catch (ImportException cause) {
       throw new RuntimeException(cause);
     }
+  }
+
+  public static List<ValidFreeVariable> importValidFreeVariables(InputStream source, TypeEnum... enumTypes) {
+    List<Type> typeContext = new ArrayList<>();
+    typeContext.add(TypeInt.INT);
+    typeContext.add(TypeBool.BOOL);
+    for (TypeEnum enumType : enumTypes) {
+      typeContext.add(enumType);
+    }
+    try {
+      return importValidFreeVariables(
+          ImporterFacade.importSpec(source, ImporterFacade.ImportFormat.XML).getFreeVariableList(),
+          typeContext);
+    } catch (ImportException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
+  public static List<ValidFreeVariable> importValidFreeVariables(FreeVariableList freeVariableList, List<Type> typeContext) {
+    FreeVariableListValidator validator = new FreeVariableListValidator(
+        new SimpleObjectProperty<>(typeContext), freeVariableList);
+    if (!validator.problemsProperty().get().isEmpty()) {
+      System.err.println("Could not validate free variables:");
+      validator.problemsProperty().get().entrySet().stream()
+          .map(entry -> entry.getKey() + " -> "
+              + entry.getValue().stream()
+              .map(FreeVariableProblem::getGUIMessage)
+              .collect(Collectors.toList()))
+          .forEach(System.err::println);
+      throw new RuntimeException("Couldn't validate");
+    }
+    return validator.validFreeVariablesProperty().get();
   }
 }

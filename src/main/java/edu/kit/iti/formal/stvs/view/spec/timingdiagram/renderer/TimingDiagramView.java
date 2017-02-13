@@ -52,6 +52,8 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
     this.xAxis = xAxis;
     this.yAxis = yAxis;
 
+    setPrefHeight(80);
+
     getPlotChildren().addAll(
         cycleSelectionPane,
         durationLinesPane,

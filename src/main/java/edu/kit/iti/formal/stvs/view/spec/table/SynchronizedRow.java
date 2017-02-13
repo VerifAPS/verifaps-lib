@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
+import edu.kit.iti.formal.stvs.model.common.NullableProperty;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
@@ -7,7 +9,10 @@ import javafx.beans.Observable;
 import javafx.collections.MapChangeListener;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by Philipp on 01.02.2017.
@@ -18,7 +23,9 @@ public class SynchronizedRow extends SpecificationRow<HybridCellModel<Constraint
       SpecificationRow<ConstraintCell> subscribingRow) {
     Map<String, HybridCellModel<ConstraintCell>> cells = new HashMap<>();
     for (Map.Entry<String, ConstraintCell> entry : subscribingRow.getCells().entrySet()) {
-      cells.put(entry.getKey(), new HybridCellModel<>(entry.getKey(), entry.getValue()));
+      HybridCellModel<ConstraintCell> hybridCell =
+          new HybridCellModel<>(entry.getKey(), entry.getValue());
+      cells.put(entry.getKey(), hybridCell);
     }
     return cells;
   }
@@ -26,12 +33,15 @@ public class SynchronizedRow extends SpecificationRow<HybridCellModel<Constraint
   private final HybridCellModel<ConstraintDuration> durationCell;
   private final SpecificationRow<ConstraintCell> sourceRow;
 
-  public SynchronizedRow(SpecificationRow<ConstraintCell> sourceRow, ConstraintDuration duration) {
+  public SynchronizedRow(
+      SpecificationRow<ConstraintCell> sourceRow,
+      ConstraintDuration duration) {
     super(
         createCellsFromRow(sourceRow),
         hybridCell -> new Observable[] {
             hybridCell.stringRepresentationProperty(),
-            hybridCell.commentProperty()
+            hybridCell.commentProperty(),
+            hybridCell.counterExamplesProperty()
         });
     this.sourceRow = sourceRow;
     this.durationCell = new HybridCellModel<>("Duration", duration);
@@ -55,5 +65,22 @@ public class SynchronizedRow extends SpecificationRow<HybridCellModel<Constraint
 
   public SpecificationRow<ConstraintCell> getSourceRow() {
     return sourceRow;
+  }
+
+  public void updateCounterExampleCells(int rowIndex, Optional<ConcreteSpecification> counterExample) {
+    if (counterExample.isPresent()) {
+      for (Map.Entry<String, HybridCellModel<ConstraintCell>> entry : getCells().entrySet()) {
+        entry.getValue().counterExamplesProperty().setAll(createCounterExampleCells(entry.getKey(), rowIndex, counterExample.get()));
+      }
+      durationCell.counterExamplesProperty().setAll(counterExample.get().getDurations().get(rowIndex).getDuration() + "");
+    } else {
+      durationCell.clearCounterExample();
+    }
+  }
+
+  public List<String> createCounterExampleCells(String columnId, int rowIndex, ConcreteSpecification counterExample) {
+    return counterExample.getConcreteValuesForConstraintRow(columnId, rowIndex).stream()
+        .map(cell -> cell.getValue().getValueString())
+        .collect(Collectors.toList());
   }
 }

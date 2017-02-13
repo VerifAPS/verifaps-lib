@@ -15,6 +15,7 @@ import javafx.scene.layout.VBox;
 import org.junit.Test;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,17 +35,22 @@ public class StvsRootControllerTest {
   }
 
   @Test
+  public void superSimpleTestcase() {
+    JavaFxTest.runView(() -> simpleScene("session_super_simple_testcase.xml"));
+  }
+
+  @Test
   public void javaFxTest() {
-    JavaFxTest.setToBeViewed(this::simpleScene);
+    JavaFxTest.setToBeViewed(() -> simpleScene("session_valid_2.xml"));
     Application.launch(JavaFxTest.class);
   }
 
-  private Scene simpleScene() {
+  private Scene simpleScene(String sessionfile) {
     Scene scene = new Scene(new VBox(), 400, 350);
     StvsRootModel rootModel = new StvsRootModel();
     try {
        rootModel = ImporterFacade.importSession(XmlSessionImporterTest.class
-          .getResourceAsStream("session_valid_1.xml"), ImporterFacade.ImportFormat.XML);
+          .getResourceAsStream(sessionfile), ImporterFacade.ImportFormat.XML);
     }catch(Exception e) {
       e.printStackTrace();
     }
