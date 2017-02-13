@@ -2,8 +2,8 @@
   <general>
     <uiLanguage>EN</uiLanguage>
     <windowSize>
-      <width>800</width>
-      <height>600</height>
+      <width>1000</width>
+      <height>900</height>
     </windowSize>
     <verificationTimeout>3600</verificationTimeout>
     <simulationTimeout>60</simulationTimeout>

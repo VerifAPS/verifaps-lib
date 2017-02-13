@@ -46,7 +46,6 @@ public class StvsRootControllerTest {
   }
 
   private Scene simpleScene(String sessionfile) {
-    Scene scene = new Scene(new VBox(), 400, 350);
     StvsRootModel rootModel = new StvsRootModel();
     try {
        rootModel = ImporterFacade.importSession(XmlSessionImporterTest.class
@@ -67,11 +66,9 @@ public class StvsRootControllerTest {
       rootModel.setGlobalConfig(userConfig);
     }
 
-    StvsRootController rootController = new StvsRootController(rootModel);
+    StvsMainScene scene = new StvsMainScene(rootModel);
 
-    ((VBox) scene.getRoot()).getChildren().addAll(rootController.getView());
-
-    return scene;
+    return scene.getScene();
   }
 
 }

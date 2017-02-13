@@ -11,7 +11,7 @@ import javafx.beans.Observable;
 public class ValidSpecification extends SpecificationTable<ValidIoVariable, Expression, LowerBoundedInterval> {
 
   public ValidSpecification() {
-    super(p -> new Observable[0]);
+    super(p -> new Observable[0], p -> new Observable[0]);
   }
 
 }

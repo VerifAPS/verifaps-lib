@@ -25,11 +25,13 @@ public class SpecificationTable<H extends Named, C, D> {
   protected ObservableList<SpecificationRow<C>> rows;
   protected ObservableList<D> durations;
 
-  public SpecificationTable(Callback<D, Observable[]> durationExtractor) {
+  public SpecificationTable(
+      Callback<H, Observable[]> columnHeaderExtractor,
+      Callback<D, Observable[]> durationExtractor) {
     this.rows = FXCollections.observableArrayList(
         specificationRow -> new Observable[] { specificationRow });
     this.durations = FXCollections.observableArrayList(durationExtractor);
-    this.columnHeaders = FXCollections.observableArrayList();
+    this.columnHeaders = FXCollections.observableArrayList(columnHeaderExtractor);
 
     this.rows.addListener(this::onRowChange);
     this.columnHeaders.addListener(this::onColumnHeadersChanged);

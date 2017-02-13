@@ -291,7 +291,7 @@ public class SpecificationTableController implements Controller {
     return hybridSpec;
   }
 
-  public ConstraintSpecificationValidator getSpecProblemRecognizer() {
+  public ConstraintSpecificationValidator getValidator() {
     return this.validator;
   }
 }

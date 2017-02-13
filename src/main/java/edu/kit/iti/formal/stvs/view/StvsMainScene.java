@@ -22,12 +22,16 @@ public class StvsMainScene {
   private final Scene scene;
 
   public StvsMainScene() {
-    this.rootModelProperty = new SimpleObjectProperty<>(new StvsRootModel());
+    this(new StvsRootModel());
+  }
+
+  public StvsMainScene(StvsRootModel rootModel) {
+    this.rootModelProperty = new SimpleObjectProperty<>(rootModel);
     this.rootController = new StvsRootController(rootModelProperty.get());
     this.menuBarController = new StvsMenuBarController(rootModelProperty);
     rootModelProperty.addListener(this::rootModelChanged);
 
-    this.scene = new Scene(createVBox(), 1800, 900);
+    this.scene = new Scene(createVBox(), rootModel.getGlobalConfig().getWindowWidth(), rootModel.getGlobalConfig().getWindowHeight());
   }
 
   private VBox createVBox() {
