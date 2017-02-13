@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecImporter;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
@@ -49,19 +50,23 @@ public class TestUtils {
     for (TypeEnum enumType : enumTypes) {
       typeContext.add(enumType);
     }
-    return importValidSpec(source, typeContext, Collections.emptyList());
+    return importValidSpec(source, typeContext);
   }
 
   public static ValidSpecification importValidSpec(
       InputStream source,
-      List<Type> typeContext,
-      List<ValidFreeVariable> freeVariables) {
+      List<Type> typeContext) {
     try {
       ConstraintSpecification constraintSpec = ImporterFacade.importSpec(source, ImporterFacade.ImportFormat.XML);
+      FreeVariableListValidator freevarValidator = new FreeVariableListValidator(
+          new SimpleObjectProperty<>(typeContext),
+          constraintSpec.getFreeVariableList()
+      );
+      List<ValidFreeVariable> validFreeVariables = freevarValidator.validFreeVariablesProperty().get();
       ConstraintSpecificationValidator validator = new ConstraintSpecificationValidator(
           new SimpleObjectProperty<>(typeContext),
           new SimpleObjectProperty<>(new ArrayList<>()),
-          new SimpleObjectProperty<>(freeVariables),
+          new SimpleObjectProperty<>(validFreeVariables),
           constraintSpec
       );
       ValidSpecification validSpec = validator.getValidSpecification();
