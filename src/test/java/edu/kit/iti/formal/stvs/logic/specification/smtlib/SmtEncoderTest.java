@@ -33,7 +33,6 @@ import static org.junit.Assert.*;
 public class SmtEncoderTest {
 
   @Test
-  @Ignore
   public void testImported() throws ImportException {
     Supplier<InputStream> sourceFile = () ->
         SmtEncoderTest.class.getResourceAsStream("testSpec.xml");

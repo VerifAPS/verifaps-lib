@@ -41,7 +41,7 @@ public class GlobalConfig {
     windowHeight = new SimpleIntegerProperty(600);
     windowWidth = new SimpleIntegerProperty(800);
     editorFontSize = new SimpleIntegerProperty(12);
-    maxLineRollout = new SimpleIntegerProperty(500);
+    maxLineRollout = new SimpleIntegerProperty(50);
     editorFontFamily = new SimpleStringProperty("Courier");
     showLineNumbers = new SimpleBooleanProperty(true);
     uiLanguage = new SimpleStringProperty("EN");

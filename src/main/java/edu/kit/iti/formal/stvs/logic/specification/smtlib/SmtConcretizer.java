@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 /**
  * Created by csicar on 08.02.17.
  */
-public class SMTConcretizer implements SpecificationConcretizer {
+public class SmtConcretizer implements SpecificationConcretizer {
   private ValidSpecification validSpecification;
   private GlobalConfig config;
   private Optional<ConcreteSpecification> concreteSpecification;
@@ -23,7 +23,7 @@ public class SMTConcretizer implements SpecificationConcretizer {
   private List<Consumer<SpecificationConcretizerState>> eventListeners;
   private SpecificationConcretizerState concretizerState;
 
-  public SMTConcretizer(ValidSpecification validSpecification, GlobalConfig config,
+  public SmtConcretizer(ValidSpecification validSpecification, GlobalConfig config,
                         List<ValidFreeVariable> freeVariables) {
     this.validSpecification = validSpecification;
     this.config = config;

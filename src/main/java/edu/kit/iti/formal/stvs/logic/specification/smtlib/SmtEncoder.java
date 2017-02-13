@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
+import edu.kit.iti.formal.automation.datatypes.Int;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Expression;
@@ -181,7 +182,13 @@ public class SmtEncoder {
 
   private Integer getMaxDuration(int j) {
     if (j < 0) return 0;
-    return maxDurations.apply(j);
+    Optional<Integer> interval = specification.getDurations().get(j).getUpperBound();
+
+    if(interval.isPresent()) {
+      return Math.min(maxDurations.apply(j), interval.get());
+    } else {
+      return maxDurations.apply(j);
+    }
   }
 
   public SConstraint getConstrain() {
