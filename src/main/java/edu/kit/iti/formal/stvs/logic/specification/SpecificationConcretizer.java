@@ -3,6 +3,11 @@ package edu.kit.iti.formal.stvs.logic.specification;
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
+import javafx.beans.property.ObjectProperty;
+
+import java.io.IOException;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 
 /**
@@ -10,25 +15,16 @@ import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
  */
 public interface SpecificationConcretizer {
 
-  public ConcretizerContext getContext();
-
-  public void setContext(ConcretizerContext context);
+  Optional<ConcreteSpecification> calculateConcreteSpecification() throws IOException;
 
   /**
-   * Launch a new simulation after a specification change, unless one is already running
-   *
-   * @param spec The changed spec
+   * returns the previously calculated concretespecification
+   * ! calling this method without successfully calculating a concrete specification first will
+   * <i>always</i> return Optional.empty()
+   * @return the concretized specification, if available
    */
-  public void createConcreteSpecification(ValidSpecification spec);
+  Optional<ConcreteSpecification> getConcreteSpecification();
 
-  /**
-   * Get the current concrete specification.
-   * @return The concrete specification or null if no concrete specification exists.
-   */
-  public ConcreteSpecification getConcreteSpec();
-
-  public NullableProperty<ConcreteSpecification> concreteSpecProperty();
-
-  public void setConcreteSpec(ConcreteSpecification concreteSpec);
+  void addEventListener(Consumer<SpecificationConcretizerState> eventListener);
 }
 
