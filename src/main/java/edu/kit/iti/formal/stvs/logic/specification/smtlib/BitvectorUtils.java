@@ -19,7 +19,7 @@ public class BitvectorUtils {
     return "#x" + result;
   }
 
-  public static int intFromHex(String hex) {
+  public static int intFromHex(String hex, boolean signed) {
     if (hex == null || !hex.matches("\\#x[a-fA-F0-9]+"))
       throw new IllegalArgumentException("hex does not match expected format");
     hex = hex.substring(2);
@@ -29,7 +29,7 @@ public class BitvectorUtils {
       result += Integer.parseInt(hex.charAt(i) + "", 16);
     }
     int full = ((int) Math.pow(16, hex.length()));
-    if (result >= full / 2) result = -(full - result);
+    if (result >= full / 2 && signed) result = -(full - result);
     return result;
   }
 }

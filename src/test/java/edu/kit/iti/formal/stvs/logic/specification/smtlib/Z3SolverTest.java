@@ -108,7 +108,6 @@ public class Z3SolverTest {
   }
 
   @Test
-  @Ignore//Needs correct enum limits
   public void testImported2() throws ImportException, IOException {
 
     ValidSpecification spec = importSpec("spec_constraint_valid_enum_1.xml");

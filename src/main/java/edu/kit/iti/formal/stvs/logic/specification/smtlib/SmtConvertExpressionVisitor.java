@@ -160,9 +160,9 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
       if (variableReferenceIndex < 0) {
         sConstraint.addGlobalConstrains(
             new SList(
-                ">=",
+                "bvuge",
                 sumRowIterations(row - 1),
-                new SAtom(-(iteration + variableReferenceIndex) + "")
+                new SAtom(BitvectorUtils.hexFromInt(Math.max(0, -(iteration + variableReferenceIndex)),4))
             )
         );
       }
@@ -179,7 +179,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   }
 
   private SExpr sumRowIterations(int j) {
-    SList list = new SList().addAll("+");
+    SList list = new SList().addAll("bvadd");
 
     for (int l = 0; l <= j; l++) {
       list.addAll("n_" + l);

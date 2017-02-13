@@ -64,7 +64,7 @@ public class Z3Solver {
         String[] varSplit = varAsign.get(1).toIndentedString().split("_");
         if (varAsign.get(1).toIndentedString().matches("n_\\d+")) {
           //is duration
-          rawDurations.put(Integer.valueOf(varSplit[1]), Integer.valueOf(varAsign.get(4).toIndentedString()));
+          rawDurations.put(Integer.valueOf(varSplit[1]), BitvectorUtils.intFromHex(varAsign.get(4).toIndentedString(), false));
         }
       });
 
@@ -114,9 +114,9 @@ public class Z3Solver {
               return;
             }
             Value value = validIoVariable.getValidType().match(
-                () -> new ValueInt(BitvectorUtils.intFromHex(solvedValue)),
+                () -> new ValueInt(BitvectorUtils.intFromHex(solvedValue, true)),
                 () -> solvedValue.equals("true") ? ValueBool.TRUE : ValueBool.FALSE,
-                typeEnum -> typeEnum.getValues().get(BitvectorUtils.intFromHex(solvedValue))
+                typeEnum -> typeEnum.getValues().get(BitvectorUtils.intFromHex(solvedValue, false))
             );
             newRow.put(validIoVariable.getName(), new ConcreteCell(value));
           });
