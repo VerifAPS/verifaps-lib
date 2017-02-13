@@ -76,17 +76,17 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
             getSMTLibVariableTypeName.apply(column.getValidType())
         )
     );
-    /*
-    I tried to limit bitvector enums, but z3 hangs if I do so
+
+    //Constrain enum bitvectors to their valid range
     column.getValidType().match(
         () -> null,
         () -> null,
         enumeration -> {
-          this.sConstraint.addGlobalConstrains(new SList("bvsge", name, "0"));
-          this.sConstraint.addGlobalConstrains(new SList("bvslt", name, enumeration.getValues().size() + ""));
+          this.sConstraint.addGlobalConstrains(new SList("bvsge", name, BitvectorUtils.hexFromInt(0, 4)));
+          this.sConstraint.addGlobalConstrains(new SList("bvslt", name, BitvectorUtils.hexFromInt(enumeration.getValues().size(), 4)));
           return null;
         }
-    );*/
+    );
   }
 
 
