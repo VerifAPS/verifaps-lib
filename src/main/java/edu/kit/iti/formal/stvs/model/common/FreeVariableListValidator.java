@@ -2,14 +2,9 @@ package edu.kit.iti.formal.stvs.model.common;
 
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import javafx.beans.Observable;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -23,6 +18,7 @@ public class FreeVariableListValidator {
 
   private final ObjectProperty<Map<FreeVariable, List<FreeVariableProblem>>> problems;
   private final ObjectProperty<List<ValidFreeVariable>> validVars;
+  private final BooleanProperty valid;
 
   public FreeVariableListValidator(ObjectProperty<List<Type>> typeContext, FreeVariableList freeVariables) {
     this.typeContext = typeContext;
@@ -30,6 +26,7 @@ public class FreeVariableListValidator {
 
     this.problems = new SimpleObjectProperty<>(new HashMap<>());
     this.validVars = new SimpleObjectProperty<>(new ArrayList<>());
+    this.valid = new SimpleBooleanProperty(false);
 
     freeVariables.getVariables().addListener((Observable o) -> revalidate());
     typeContext.addListener((Observable o) -> revalidate());
@@ -45,18 +42,21 @@ public class FreeVariableListValidator {
     List<ValidFreeVariable> validated = new ArrayList<>();
 
     freeVariables.getVariables().forEach(freeVariable -> {
-      DuplicateFreeVariableProblem.checkForDuplicates(freeVariable, freeVariables.getVariables())
-          .ifPresent(problem -> insertProblem(problems, freeVariable, problem));
-
-      try {
-        validated.add(InvalidFreeVariableProblem.tryToConvertToValid(freeVariable, typesByName));
-      } catch (InvalidFreeVariableProblem problem) {
-        insertProblem(problems, freeVariable, problem);
+      Optional<DuplicateFreeVariableProblem> optionalDuplicateProblem =
+          DuplicateFreeVariableProblem.checkForDuplicates(freeVariable, freeVariables.getVariables());
+      optionalDuplicateProblem.ifPresent(problem -> insertProblem(problems, freeVariable, problem));
+      if (!optionalDuplicateProblem.isPresent()) {
+        try {
+          validated.add(InvalidFreeVariableProblem.tryToConvertToValid(freeVariable, typesByName));
+        } catch (InvalidFreeVariableProblem problem) {
+          insertProblem(problems, freeVariable, problem);
+        }
       }
     });
 
     validVars.set(validated);
     this.problems.set(problems);
+    valid.set(problems.size() == 0);
   }
 
   private <K, V> void insertProblem(Map<K, List<V>> map, K key, V item) {
@@ -68,6 +68,10 @@ public class FreeVariableListValidator {
     } else {
       items.add(item);
     }
+  }
+
+  public ReadOnlyBooleanProperty validProperty() {
+    return valid;
   }
 
   public ReadOnlyObjectProperty<Map<FreeVariable, List<FreeVariableProblem>>> problemsProperty() {

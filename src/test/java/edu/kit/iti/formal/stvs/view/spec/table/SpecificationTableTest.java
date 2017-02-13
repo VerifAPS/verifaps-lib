@@ -64,7 +64,7 @@ public class SpecificationTableTest {
         new HybridSpecification(freeVariableList, true));
     Pane extractedTablePane = createExtractedTableTextArea(
         table.getHybridSpecification(),
-        table.getSpecProblemRecognizer());
+        table.getValidator());
 
     return Arrays.asList(table.getView(), extractedTablePane);
   }

@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
+import edu.kit.iti.formal.automation.datatypes.Int;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Expression;
@@ -14,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -22,7 +24,7 @@ import java.util.stream.Collectors;
  */
 public class SmtEncoder {
   //      Map<Row, Max. number of cycles for that row>
-  private final Map<Integer, Integer> maxDurations;
+  private final Function<Integer, Integer> maxDurations;
   private final List<ValidIoVariable> ioVariables;
   private final ValidSpecification specification;
   private final Predicate<String> isIoVariable;
@@ -30,7 +32,13 @@ public class SmtEncoder {
 
   private SConstraint sConstrain;
 
-  public SmtEncoder(Map<Integer, Integer> maxDurations,
+  public SmtEncoder(Map<Integer, Integer> maxDuration, ValidSpecification specification,
+                    List<ValidFreeVariable> validFreeVariables) {
+    // TODO: use globalconfig value for default value
+    this((pos) -> maxDuration.getOrDefault(pos, 50), specification, validFreeVariables);
+  }
+
+  public SmtEncoder(Function<Integer, Integer> maxDurations,
                     ValidSpecification specification, List<ValidFreeVariable> validFreeVariables) {
     this.maxDurations = maxDurations;
     this.specification = specification;
@@ -174,8 +182,13 @@ public class SmtEncoder {
 
   private Integer getMaxDuration(int j) {
     if (j < 0) return 0;
-    // TODO: use globalconfig value for default value
-    return maxDurations.getOrDefault(j, 5);
+    Optional<Integer> interval = specification.getDurations().get(j).getUpperBound();
+
+    if(interval.isPresent()) {
+      return Math.min(maxDurations.apply(j), interval.get());
+    } else {
+      return maxDurations.apply(j);
+    }
   }
 
   public SConstraint getConstrain() {

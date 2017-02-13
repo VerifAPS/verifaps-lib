@@ -1,21 +1,29 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
+import edu.kit.iti.formal.stvs.view.common.FileSelectionField;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+
+import javax.xml.soap.Text;
 
 /**
  * Created by csicar on 11.01.17.
  */
 public class ConfigDialogPane extends DialogPane {
-  public TextField verificationTimeout;
-  public TextField simulationTimeout;
-  public TextField windowHeight;
-  public TextField windowWidth;
-  public TextField editorFontSize;
-  public TextField editorFontFamily;
-  public CheckBox showLineNumbers;
-  public ComboBox<String> uiLanguage;
+  public final FileSelectionField nuxmvFilename;
+  public final FileSelectionField z3Path;
+  public final FileSelectionField javaPath;
+  public final FileSelectionField getetaFilename;
+  public final TextField maxLineRollout;
+  public final TextField verificationTimeout;
+  public final TextField simulationTimeout;
+  public final TextField windowHeight;
+  public final TextField windowWidth;
+  public final TextField editorFontSize;
+  public final TextField editorFontFamily;
+  public final CheckBox showLineNumbers;
+  public final ComboBox<String> uiLanguage;
 
 
   public ConfigDialogPane() {
@@ -27,6 +35,12 @@ public class ConfigDialogPane extends DialogPane {
     editorFontFamily = new TextField();
     showLineNumbers = new CheckBox();
     uiLanguage = new ComboBox<>();
+    nuxmvFilename = new FileSelectionField();
+    z3Path = new FileSelectionField();
+    javaPath = new FileSelectionField();
+    getetaFilename = new FileSelectionField();
+    maxLineRollout = new TextField();
+
 
     this.getButtonTypes().addAll( ButtonType.OK, ButtonType.CANCEL);
 
@@ -60,6 +74,25 @@ public class ConfigDialogPane extends DialogPane {
     grid.add(new Label("UI-Language"), 0, 7);
     grid.add(uiLanguage, 1, 7);
 
+
+    grid.add(new Label("nuxmvFilename"), 0, 8);
+    grid.add(nuxmvFilename, 1, 8);
+
+
+    grid.add(new Label("z3Path"), 0, 9);
+    grid.add(z3Path, 1, 9);
+
+
+    grid.add(new Label("javaPath"), 0, 10);
+    grid.add(javaPath, 1, 10);
+
+
+    grid.add(new Label("getetaFilename"), 0, 11);
+    grid.add(getetaFilename, 1, 11);
+
+
+    grid.add(new Label("maxLineRollout"), 0, 12);
+    grid.add(maxLineRollout, 1, 12);
     this.setContent(grid);
   }
 }

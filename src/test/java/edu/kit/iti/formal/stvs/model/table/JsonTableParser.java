@@ -182,7 +182,7 @@ public class JsonTableParser {
   }
 
   private static SpecificationTable<SpecIoVariable, String, String> specificationTableFromJsonTable(JsonTable table) {
-    SpecificationTable<SpecIoVariable, String, String> spec = new SpecificationTable<>(p -> new Observable[0]);
+    SpecificationTable<SpecIoVariable, String, String> spec = new SpecificationTable<>(p -> new Observable[0], p -> new Observable[0]);
     table.variables.stream().map(JsonTableParser::toSpecIoVariable).forEach(r ->
         spec.getColumnHeaders().add(r));
 

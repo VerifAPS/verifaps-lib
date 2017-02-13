@@ -30,10 +30,16 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
   private final ChangeListener<String> onSpecIoVariableNameChanged = this::onSpecIoVariableNameChanged;
 
   public ConstraintSpecification(FreeVariableList freeVariableList) {
-    super(durationCell -> new Observable[] {
-        durationCell.stringRepresentationProperty(),
-        durationCell.commentProperty()
-    });
+    super(
+        columnHeader -> new Observable[] {
+            columnHeader.nameProperty(),
+            columnHeader.typeProperty(),
+            columnHeader.categoryProperty()
+        },
+        durationCell -> new Observable[] {
+            durationCell.stringRepresentationProperty(),
+            durationCell.commentProperty()
+        });
     this.freeVariableList = freeVariableList;
 
     this.comment = new SimpleStringProperty("");

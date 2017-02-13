@@ -9,9 +9,7 @@ import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionExc
 import edu.kit.iti.formal.stvs.model.table.*;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +28,7 @@ public class ConstraintSpecificationValidator {
   private final ObjectProperty<List<CodeIoVariable>> codeIoVariables;
   private final ReadOnlyObjectProperty<List<ValidFreeVariable>> validFreeVariables;
   private final ConstraintSpecification specification;
+  private final BooleanProperty valid;
 
   private final NullableProperty<ValidSpecification> validSpecification;
 
@@ -47,15 +46,18 @@ public class ConstraintSpecificationValidator {
 
     this.problems = new SimpleObjectProperty<>(new ArrayList<>());
     this.validSpecification = new NullableProperty<>();
+    this.valid = new SimpleBooleanProperty(false);
 
     // All these ObservableLists invoke the InvalidationListeners on deep updates
     // So if only a cell in the Specification changes, the change listener on the ObservableList
     // two layers above gets notified.
     specification.getRows().addListener(listenToSpecUpdate);
     specification.getDurations().addListener(listenToSpecUpdate);
+    specification.getColumnHeaders().addListener(listenToSpecUpdate);
 
     typeContext.addListener(listenToSpecUpdate);
     codeIoVariables.addListener(listenToSpecUpdate);
+    validFreeVariables.addListener(listenToSpecUpdate);
 
     recalculateSpecProblems();
   }
@@ -147,6 +149,7 @@ public class ConstraintSpecificationValidator {
     } else {
       validSpecification.set(null);
     }
+    valid.set(specProblems.isEmpty());
   }
 
   private LowerBoundedInterval lowerBoundedIntervalOrProblemForDuration(int row, ConstraintDuration duration)
@@ -184,6 +187,10 @@ public class ConstraintSpecificationValidator {
       throw new TypeCheckException(expression,
           "The cell expression must evaluate to a boolean, instead it evaluates to: " + type.getTypeName());
     }
+  }
+
+  public ReadOnlyBooleanProperty validProperty() {
+    return valid;
   }
 
   public ValidSpecification getValidSpecification() {
