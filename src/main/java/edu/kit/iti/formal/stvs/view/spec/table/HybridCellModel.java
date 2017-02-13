@@ -2,6 +2,8 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.table.CellOperationProvider;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  * Created by Philipp on 01.02.2017.
@@ -10,11 +12,12 @@ public class HybridCellModel<C extends CellOperationProvider> implements CellOpe
 
   private final C cell;
   private final String column;
-  // TODO: private final ObservableList<String> counterExamples
+  private final ObservableList<String> counterExamples;
 
   public HybridCellModel(String column, C cell) {
     this.cell = cell;
     this.column = column;
+    this.counterExamples = FXCollections.observableArrayList();
   }
 
   public C getCell() {
@@ -53,5 +56,13 @@ public class HybridCellModel<C extends CellOperationProvider> implements CellOpe
 
   public String getColumn() {
     return column;
+  }
+
+  public void clearCounterExample() {
+    counterExamples.setAll();
+  }
+
+  public ObservableList<String> counterExamplesProperty() {
+    return counterExamples;
   }
 }

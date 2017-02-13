@@ -15,6 +15,7 @@ import javafx.scene.layout.VBox;
 import org.junit.Test;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class StvsRootControllerTest {
     StvsRootModel rootModel = new StvsRootModel();
     try {
        rootModel = ImporterFacade.importSession(XmlSessionImporterTest.class
-          .getResourceAsStream("session_valid_1.xml"), ImporterFacade.ImportFormat.XML);
+          .getResourceAsStream("session_valid_2.xml"), ImporterFacade.ImportFormat.XML);
     }catch(Exception e) {
       e.printStackTrace();
     }
