@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
+import edu.kit.iti.formal.stvs.TestUtils;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
@@ -19,7 +20,9 @@ import org.junit.Test;
 import org.junit.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -28,37 +31,15 @@ import static org.junit.Assert.*;
  * Created by csicar on 09.02.17.
  */
 public class SmtEncoderTest {
-  private List<ValidFreeVariable> freeVariables;
-
-  private ValidSpecification importSpec(String name) throws
-      ImportException {
-    List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL, new TypeEnum("colors",
-        Arrays.asList("red", "green", "blue")));
-    List<CodeIoVariable> codeIoVariables = new LinkedList<>();
-
-    ConstraintSpecification constraintSpec = ImporterFacade.importSpec(getClass().getResourceAsStream(name), ImporterFacade
-        .ImportFormat.XML);
-    FreeVariableListValidator freeVariableListValidator = new FreeVariableListValidator(new
-        SimpleObjectProperty<>(typeContext), constraintSpec
-        .getFreeVariableList());
-    List<ValidFreeVariable> freeVariables = freeVariableListValidator.validFreeVariablesProperty().get();
-    this.freeVariables = freeVariables;
-    ConstraintSpecificationValidator recognizer = new ConstraintSpecificationValidator(
-        new SimpleObjectProperty<>(typeContext),
-        new SimpleObjectProperty<>(codeIoVariables),
-        new ReadOnlyObjectWrapper<>(freeVariables),
-        constraintSpec);
-    List<SpecProblem> specProblems = recognizer.problemsProperty().get();
-    specProblems.stream().map(SpecProblem::getErrorMessage).forEach(System.err::println);
-
-    return recognizer.getValidSpecification();
-  }
 
   @Test
   @Ignore
   public void testImported() throws ImportException {
+    Supplier<InputStream> sourceFile = () ->
+        SmtEncoderTest.class.getResourceAsStream("testSpec.xml");
 
-    ValidSpecification spec = importSpec("testSpec.xml");
+    ValidSpecification spec = TestUtils.importValidSpec(sourceFile.get());
+    List<ValidFreeVariable> freeVariables = TestUtils.importValidFreeVariables(sourceFile.get());
 
     Map<Integer, Integer> maxDurations = new HashMap<Integer,
         Integer>() {{
@@ -74,7 +55,12 @@ public class SmtEncoderTest {
 
   @Test
   public void testSimpleExample() throws ImportException, IOException {
-    ValidSpecification spec = importSpec("simpleBackwardsReferenceTestSpec.xml");
+    Supplier<InputStream> sourceFile = () -> SmtEncoderTest.class.getResourceAsStream(
+        "simpleBackwardsReferenceTestSpec.xml");
+
+    ValidSpecification spec = TestUtils.importValidSpec(sourceFile.get());
+    List<ValidFreeVariable> freeVariables = TestUtils.importValidFreeVariables(sourceFile.get());
+
     Map<Integer, Integer> maxDurations = new HashMap<Integer,
         Integer>() {{
       put(0, 3);
