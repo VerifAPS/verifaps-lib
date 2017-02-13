@@ -21,12 +21,6 @@ import java.util.stream.Collectors;
  * Created by csicar on 09.02.17.
  */
 public class SmtEncoder {
-
-  private static Map<String, String> smtlibTypes = new HashMap<String,
-      String>() {{
-    put("INT", "(_ BitVec 16)");
-    put("BOOL", "Bool");
-  }};
   //      Map<Row, Max. number of cycles for that row>
   private final Map<Integer, Integer> maxDurations;
   private final List<ValidIoVariable> ioVariables;
@@ -48,7 +42,6 @@ public class SmtEncoder {
     System.out.println(ioVariableTypes);
     this.isIoVariable = ioVariableTypes::contains;
     this.sConstrain = new SConstraint()
-        .addHeaderDefinitions(createEnumTypes())
         .addHeaderDefinitions(createFreeVariables());
 
     System.out.println("Doing Step V");
@@ -128,7 +121,7 @@ public class SmtEncoder {
             this.sConstrain.addHeaderDefinitions(
                 new SList(
                     "declare-const",
-                    "|" + variableName + "_" + (z - 1) + "_" + (k - i) + "|", getSMTLibVariableTypeName(ioVariable.getType())
+                    "|" + variableName + "_" + (z - 1) + "_" + (k - i) + "|", getSMTLibVariableTypeName(ioVariable.getValidType())
                 )
             );
           }
@@ -136,7 +129,7 @@ public class SmtEncoder {
           this.sConstrain.addHeaderDefinitions(
               new SList(
                   "declare-const",
-                  "|" + variableName + "_" + z + "_" + (-i) + "|", getSMTLibVariableTypeName(ioVariable.getType())
+                  "|" + variableName + "_" + z + "_" + (-i) + "|", getSMTLibVariableTypeName(ioVariable.getValidType())
               )
           );
         }
@@ -156,40 +149,18 @@ public class SmtEncoder {
     return freeVariablesContext.entrySet().stream()
         .filter(item -> !isIoVariable.test(item.getKey()))
         .map(item -> {
-          String typeName = item.getValue().getTypeName();
+          Type type = item.getValue();
           String variableName = item.getKey();
-          return new SList("declare-const", "|" + variableName + "|", getSMTLibVariableTypeName
-              (typeName));
+          return new SList("declare-const", "|" + variableName + "|", getSMTLibVariableTypeName(type));
         }).collect(Collectors.toList());
   }
 
-  private SExpr createEnumTypes() {
-
-    List<SExpr> definitions = new LinkedList<>();
-
-    specification.getColumnHeaders().forEach(item -> {
-      String typeName = item.getType();
-      Optional<List<ValueEnum>> valueEnums = item.getValidType().match(
-          Optional::empty,
-          Optional::empty,
-          e -> Optional.of(e.getValues())
-      );
-      if (valueEnums.isPresent()) {
-        List<String> arguments = valueEnums.get().stream().map(ValueEnum::getValueString).collect
-            (Collectors.toList());
-      /*
-      (declare-datatypes () ((Color red green blue) ...))
-       */
-        definitions.add(new SList(typeName).addListElements(arguments));
-      }
-
-    });
-    return new SList("declare-datatypes", new SList(), new SList(definitions));
-  }
-
-
-  private String getSMTLibVariableTypeName(String typeName) {
-    return smtlibTypes.getOrDefault(typeName, typeName);
+  private String getSMTLibVariableTypeName(Type type) {
+    return type.match(
+        () -> "(_ BitVec 16)",
+        () -> "Bool",
+        e -> "(_ BitVec 16)"
+    );
   }
 
   private int getMaxDurationSum(int z) {

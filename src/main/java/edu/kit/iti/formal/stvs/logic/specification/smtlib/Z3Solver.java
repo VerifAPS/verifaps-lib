@@ -49,15 +49,6 @@ public class Z3Solver {
     return Optional.empty();
   }
 
-  /*
-    expects a smt string with get-value for each variable at the end
-    e.g.
-    (declare-const A_0_0 Int)
-    (declare-const B_0_0 Int)
-    (assert (= A_0_0 10))
-    (check-sat)
-    (get-value (A_0_0 B_0_0))
-   */
   public static Optional<ConcreteSpecification> concretizeVarAssignment(String smtString, List<ValidIoVariable> validIoVariables)
       throws IOException {
     Optional<SExpr> sexpOptional = concretizeSExpr(smtString);
@@ -125,7 +116,7 @@ public class Z3Solver {
             Value value = validIoVariable.getValidType().match(
                 () -> new ValueInt(BitvectorUtils.intFromHex(solvedValue)),
                 () -> solvedValue.equals("true") ? ValueBool.TRUE : ValueBool.FALSE,
-                TypeEnum::generateDefaultValue //TODO: Enum-Magic
+                typeEnum -> typeEnum.getValues().get(BitvectorUtils.intFromHex(solvedValue))
             );
             newRow.put(validIoVariable.getName(), new ConcreteCell(value));
           });

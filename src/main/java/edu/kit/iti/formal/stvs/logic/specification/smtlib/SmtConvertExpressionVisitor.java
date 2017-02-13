@@ -6,7 +6,6 @@ import edu.kit.iti.formal.stvs.model.expressions.ExpressionVisitor;
 import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.UnaryFunctionExpr;
-import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
 import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
 
 import java.util.HashMap;
@@ -28,6 +27,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
       .Op, String>() {{
     put(BinaryFunctionExpr.Op.AND, "and");
     put(BinaryFunctionExpr.Op.OR, "or");
+    put(BinaryFunctionExpr.Op.XOR, "xor");
     put(BinaryFunctionExpr.Op.DIVISION, "bvsrem");
     put(BinaryFunctionExpr.Op.MULTIPLICATION, "bvmul");
     put(BinaryFunctionExpr.Op.EQUALS, "=");
@@ -37,6 +37,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     put(BinaryFunctionExpr.Op.GREATER_THAN, "bvsgt");
     put(BinaryFunctionExpr.Op.MINUS, "bvsub");
     put(BinaryFunctionExpr.Op.PLUS, "bvadd");
+    put(BinaryFunctionExpr.Op.MODULO, "bvsrem");
   }};
 
   private final Function<String, Type> getTypeForVariable;
@@ -44,7 +45,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   private final int iteration;
   private final ValidIoVariable column;
   private final Predicate<String> isIoVariable;
-  private final Function<String, String> getSMTLibVariableName;
+  private final Function<Type, String> getSMTLibVariableName;
 
   private final SConstraint sConstraint;
 
@@ -57,7 +58,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
    * @param getSMTLibVariableTypeName
    */
   public SmtConvertExpressionVisitor(Function<String, Type> getTypeForVariable, int row, int
-      iteration, ValidIoVariable column, Predicate<String> isIoVariable, Function<String, String>
+      iteration, ValidIoVariable column, Predicate<String> isIoVariable, Function<Type, String>
                                          getSMTLibVariableTypeName) {
     this.getTypeForVariable = getTypeForVariable;
     this.row = row;
@@ -66,14 +67,26 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     this.column = column;
     this.getSMTLibVariableName = getSMTLibVariableTypeName;
 
-    String typeName = column.getType();
+    String name = "|" + column.getName() + "_" + row + "_" + iteration + "|";
+
     this.sConstraint = new SConstraint().addHeaderDefinitions(
         new SList(
             "declare-const",
-            "|" + column.getName() + "_" + row + "_" + iteration + "|",
-            getSMTLibVariableTypeName.apply(typeName)
+            name,
+            getSMTLibVariableTypeName.apply(column.getValidType())
         )
     );
+    /*
+    I tried to limit bitvector enums, but z3 hangs if I do so
+    column.getValidType().match(
+        () -> null,
+        () -> null,
+        enumeration -> {
+          this.sConstraint.addGlobalConstrains(new SList("bvsge", name, "0"));
+          this.sConstraint.addGlobalConstrains(new SList("bvslt", name, enumeration.getValues().size() + ""));
+          return null;
+        }
+    );*/
   }
 
 
@@ -83,13 +96,18 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
         .this);
     SExpr right = binaryFunctionExpr.getSecondArgument().takeVisitor
         (SmtConvertExpressionVisitor.this);
-    String name = smtlibBinOperationNames.get(binaryFunctionExpr.getOperation());
-    if (name == null) {
-      throw new IllegalArgumentException("Operation " + binaryFunctionExpr.getOperation() + " is "
-          + "not supported");
-    }
-    return new SList(name, left, right);
 
+    switch (binaryFunctionExpr.getOperation()) {
+      case NOT_EQUALS:
+        return new SList("not", new SList("=", left, right));
+      default:
+        String name = smtlibBinOperationNames.get(binaryFunctionExpr.getOperation());
+        if (name == null) {
+          throw new IllegalArgumentException("Operation " + binaryFunctionExpr.getOperation() + " is "
+              + "not supported");
+        }
+        return new SList(name, left, right);
+    }
   }
 
   @Override
@@ -113,7 +131,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     String literalAsString = literalExpr.getValue().match(
         integer -> BitvectorUtils.hexFromInt(integer, 4),
         bool -> bool ? "true" : "false",
-        ValueEnum::getEnumValue //TODO: Enum Encoding
+        enumeration -> BitvectorUtils.hexFromInt(enumeration.getType().getValues().indexOf(enumeration), 4)
     );
     return new SAtom(literalAsString);
   }

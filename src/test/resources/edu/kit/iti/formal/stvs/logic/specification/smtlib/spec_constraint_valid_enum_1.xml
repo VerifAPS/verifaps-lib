@@ -11,19 +11,19 @@
       <duration>[10,-]</duration>
       <cell>  0</cell>
       <cell>TRUE</cell>
-      <cell>red</cell>
+      <cell>blue</cell>
     </row>
     <row comment="">
       <duration>1</duration>
       <cell>&gt; 10</cell>
       <cell>TRUE</cell>
-      <cell>red</cell>
+      <cell>!= lala[-1]</cell>
     </row>
     <row comment="">
       <duration>4</duration>
       <cell>  c</cell>
       <cell>FALSE</cell>
-      <cell>red</cell>
+      <cell>green</cell>
     </row>
   </rows>
 </specification>
