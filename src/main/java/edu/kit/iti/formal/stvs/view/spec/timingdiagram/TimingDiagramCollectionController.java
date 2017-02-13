@@ -13,6 +13,9 @@ import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramView;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.VerticalResizeContainerController;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
@@ -32,11 +35,13 @@ import javafx.util.Pair;
  * gets created by SpecificationTabController; is toplevel class for timingdiagram-package
  */
 public class TimingDiagramCollectionController implements Controller {
+  private final int totalCycleCount;
   private HybridSpecification spec;
   private GlobalConfig globalConfig;
   private ObservableList<SpecIoVariable> definedVariables;
   private TimingDiagramCollectionView view;
   private Selection selection;
+  private DoubleProperty visibleRange = new SimpleDoubleProperty();
 
   private double startXPosition;
   private double startLowerBound;
@@ -52,6 +57,7 @@ public class TimingDiagramCollectionController implements Controller {
   }*/
   public TimingDiagramCollectionController(ConcreteSpecification concreteSpec, Selection selection) {
     this.selection = selection;
+    this.totalCycleCount = concreteSpec.getRows().size();
     view = new TimingDiagramCollectionView();
     view.onMouseDraggedProperty().setValue(this::mouseDraggedHandler);
     view.onMousePressedProperty().setValue(this::mousePressedHandler);
@@ -65,12 +71,6 @@ public class TimingDiagramCollectionController implements Controller {
       Axis externalYAxis = diagramAxisPair.getValue();
       VerticalResizeContainerController verticalResizeContainerController = new VerticalResizeContainerController(timingDiagramView);
 
-      /*AnchorPane pane = new AnchorPane();
-      pane.getChildren().add(timingDiagramView);
-      AnchorPane.setLeftAnchor(timingDiagramView, 0.0);
-      AnchorPane.setRightAnchor(timingDiagramView, 0.0);
-      AnchorPane.setTopAnchor(timingDiagramView, 0.0);
-      AnchorPane.setBottomAnchor(timingDiagramView, 0.0);*/
       this.view.getDiagramContainer().getChildren().add(verticalResizeContainerController.getView());
       this.view.getyAxisContainer().getChildren().add(externalYAxis);
       timingDiagramView.getyAxis().layoutBoundsProperty().addListener(
@@ -89,7 +89,21 @@ public class TimingDiagramCollectionController implements Controller {
           )
       );
     });
-    //view.getDiagramContainer().getChildren()
+    view.getxScrollBar().setMin(0);
+    visibleRange.bind(view.getxAxis().upperBoundProperty()
+        .subtract(view.getxAxis().lowerBoundProperty()));
+    view.getxScrollBar().maxProperty().bind(visibleRange.multiply(-1).add(totalCycleCount));
+
+    view.getxAxis().lowerBoundProperty().addListener(change -> {
+      view.getxScrollBar().setValue(view.getxAxis().getLowerBound());
+    });
+
+    view.getxScrollBar().valueProperty().addListener(change -> {
+      System.out.println(view.getxScrollBar().getValue() + visibleRange.get());
+      view.getxAxis().setUpperBound(view.getxScrollBar().getValue() + visibleRange.get());
+      view.getxAxis().setLowerBound(view.getxScrollBar().getValue());
+    });
+
   }
 
   private void updateAxisExternalPosition(TimingDiagramView timingDiagramView, Axis externalYAxis) {
@@ -138,8 +152,8 @@ public class TimingDiagramCollectionController implements Controller {
     if (startLowerBound - deltaAsAxis < 0) {
       deltaAsAxis = startLowerBound;
     }
-    getView().getxAxis().setLowerBound(startLowerBound - deltaAsAxis);
-    getView().getxAxis().setUpperBound(startUpperBound - deltaAsAxis);
+    getView().getxAxis().setLowerBound(Math.min(startLowerBound - deltaAsAxis, totalCycleCount - visibleRange.get()));
+    getView().getxAxis().setUpperBound(Math.min(startUpperBound - deltaAsAxis, totalCycleCount));
     //System.out.println(point2D);
   }
 

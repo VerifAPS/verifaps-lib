@@ -4,6 +4,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.AnchorPane;
@@ -22,10 +23,11 @@ public class TimingDiagramCollectionView extends VBox {
   private SplitPane axisDiagramContainer = new SplitPane();
   private Pane globalAxisContainer = new Pane();
   private NumberAxis xAxis = new NumberAxis(0, 10, 1);
+  private ScrollBar xScrollBar = new ScrollBar();
 
   public TimingDiagramCollectionView() {
     super();
-    getChildren().addAll(scrollPane, globalAxisContainer);
+    getChildren().addAll(scrollPane, globalAxisContainer, xScrollBar);
     globalAxisContainer.getChildren().add(xAxis);
     setPadding(new Insets(0, 10, 0, 10));
     yAxisStickRightContainer.getChildren().addAll(yAxisContainer, labelContainer);
@@ -73,5 +75,9 @@ public class TimingDiagramCollectionView extends VBox {
 
   public Pane getLabelContainer() {
     return labelContainer;
+  }
+
+  public ScrollBar getxScrollBar() {
+    return xScrollBar;
   }
 }

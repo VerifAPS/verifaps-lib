@@ -31,7 +31,7 @@ public class TimingDiagramCollectionControllerTest {
     try {
       XmlConcreteSpecImporter importer = new XmlConcreteSpecImporter(Arrays.asList(TypeInt.INT, TypeBool.BOOL));
       FileInputStream inputStream = new FileInputStream(new File
-          (XmlConcreteSpecImporter.class.getResource("spec_concrete_valid_1.xml").toURI()));
+          (TimingDiagramCollectionControllerTest.class.getResource("spec_concrete_valid_1.xml").toURI()));
       ConcreteSpecification importedSpec = importer.doImport(inputStream);
 
       Selection selection = new Selection();
