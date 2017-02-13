@@ -10,9 +10,10 @@ import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -31,6 +32,7 @@ public class SpecificationController implements Controller {
   private TimingDiagramCollectionController timingDiagramCollectionController;
   private Selection selection;
   private HybridSpecification hybridSpecification;
+  private BooleanProperty specificationInvalid;
 
   public SpecificationController(
       ObjectProperty<List<Type>> typeContext,
@@ -51,15 +53,21 @@ public class SpecificationController implements Controller {
         codeIoVariables,
         variableCollectionController.getValidator().validFreeVariablesProperty(),
         hybridSpecification);
+    this.specificationInvalid = new SimpleBooleanProperty(true);
+    specificationInvalid.bind(Bindings.or(
+        Bindings.not(variableCollectionController.getValidator().validProperty()),
+        Bindings.not(tableController.getValidator().validProperty())));
 
     if (getConcreteSpecification() != null) {
       this.timingDiagramCollectionController = new TimingDiagramCollectionController
           (getConcreteSpecification(), selection);
       view.setDiagram(timingDiagramCollectionController.getView());
     }
+
     view.setVariableCollection(variableCollectionController.getView());
     view.setTable(tableController.getView());
     view.getStartButton().setOnAction(new VerificationButtonClickedListener());
+    view.getStartButton().disableProperty().bind(specificationInvalid);
   }
 
   private ConcreteSpecification getConcreteSpecification() {
