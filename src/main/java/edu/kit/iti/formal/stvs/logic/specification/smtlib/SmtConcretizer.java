@@ -8,6 +8,7 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -16,11 +17,11 @@ import java.util.function.Consumer;
  * Created by csicar on 08.02.17.
  */
 public class SmtConcretizer implements SpecificationConcretizer {
-  private ValidSpecification validSpecification;
-  private GlobalConfig config;
+  private final ValidSpecification validSpecification;
+  private final GlobalConfig config;
   private Optional<ConcreteSpecification> concreteSpecification;
-  private SmtEncoder encoder;
-  private List<Consumer<SpecificationConcretizerState>> eventListeners;
+  private final SmtEncoder encoder;
+  private final List<Consumer<SpecificationConcretizerState>> eventListeners;
   private SpecificationConcretizerState concretizerState;
 
   public SmtConcretizer(ValidSpecification validSpecification, GlobalConfig config,
@@ -31,6 +32,7 @@ public class SmtConcretizer implements SpecificationConcretizer {
         freeVariables);
     this.concreteSpecification = Optional.empty();
     this.concretizerState = SpecificationConcretizerState.IDLE;
+    this.eventListeners = new ArrayList<>();
 
   }
 

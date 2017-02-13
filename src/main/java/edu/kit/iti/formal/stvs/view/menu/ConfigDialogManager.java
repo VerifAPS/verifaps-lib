@@ -54,6 +54,11 @@ public class ConfigDialogManager implements Controller {
     bind(view.editorFontSize.textProperty(),      config.editorFontSizeProperty());
     bind(view.showLineNumbers.selectedProperty(), config.showLineNumbersProperty());
     bind(view.uiLanguage.valueProperty(),         config.uiLanguageProperty());
+    bind(view.maxLineRollout.textProperty(),      config.maxLineRolloutProperty());
+    bind(view.nuxmvFilename.textProperty(),       config.nuxmvFilenameProperty());
+    bind(view.z3Path.textProperty(),              config.z3PathProperty());
+    bind(view.javaPath.textProperty(),            config.javaPathProperty());
+    bind(view.getetaFilename.textProperty(),      config.getetaFilenameProperty());
 
     dialog.setDialogPane(view);
     dialog.setResultConverter(buttonType -> {
@@ -68,6 +73,11 @@ public class ConfigDialogManager implements Controller {
       config.setUiLanguage(view.uiLanguage.valueProperty().get());
       config.setWindowHeight(Integer.valueOf(view.windowHeight.getText()));
       config.setWindowWidth(Integer.valueOf(view.windowWidth.getText()));
+      config.setMaxLineRollout(Integer.valueOf(view.maxLineRollout.getText()));
+      config.setNuxmvFilename(view.nuxmvFilename.getText());
+      config.setZ3Path(view.z3Path.getText());
+      config.setJavaPath(view.javaPath.getText());
+      config.setGetetaFilename(view.getetaFilename.getText());
       return config;
     });
     dialog.showAndWait();
