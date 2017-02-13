@@ -23,6 +23,7 @@ import javafx.geometry.Side;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
@@ -89,21 +90,26 @@ public class TimingDiagramCollectionController implements Controller {
           )
       );
     });
-    view.getxScrollBar().setMin(0);
-    visibleRange.bind(view.getxAxis().upperBoundProperty()
-        .subtract(view.getxAxis().lowerBoundProperty()));
-    view.getxScrollBar().maxProperty().bind(visibleRange.multiply(-1).add(totalCycleCount));
+    initxScrollbar();
 
-    view.getxAxis().lowerBoundProperty().addListener(change -> {
-      view.getxScrollBar().setValue(view.getxAxis().getLowerBound());
+  }
+
+  private void initxScrollbar() {
+    ScrollBar scrollBar = view.getxScrollBar();
+    NumberAxis globalxAxis = view.getxAxis();
+    scrollBar.setMin(0);
+    visibleRange.bind(globalxAxis.upperBoundProperty()
+        .subtract(globalxAxis.lowerBoundProperty()));
+    scrollBar.maxProperty().bind(visibleRange.multiply(-1).add(totalCycleCount));
+
+    globalxAxis.lowerBoundProperty().addListener(change -> {
+      scrollBar.setValue(globalxAxis.getLowerBound());
     });
 
-    view.getxScrollBar().valueProperty().addListener(change -> {
-      System.out.println(view.getxScrollBar().getValue() + visibleRange.get());
-      view.getxAxis().setUpperBound(view.getxScrollBar().getValue() + visibleRange.get());
-      view.getxAxis().setLowerBound(view.getxScrollBar().getValue());
+    scrollBar.valueProperty().addListener(change -> {
+      globalxAxis.setUpperBound(scrollBar.getValue() + visibleRange.get());
+      globalxAxis.setLowerBound(scrollBar.getValue());
     });
-
   }
 
   private void updateAxisExternalPosition(TimingDiagramView timingDiagramView, Axis externalYAxis) {

@@ -135,7 +135,7 @@ public class TimingDiagramController implements Controller {
       newLowerBound = 0;
     }
     commonXAxis.setLowerBound(newLowerBound);
-    commonXAxis.setUpperBound(newUpperBound);
+    commonXAxis.setUpperBound(Math.min(newUpperBound, concreteSpec.getRows().size()));
   }
 
   private void onMouseClicked(MouseEvent mouseEvent) {
