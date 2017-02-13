@@ -72,7 +72,7 @@ public class SpecificationsPaneController implements Controller {
     return controller;
   }
 
-  private SpecificationController addTab(HybridSpecification hybridSpecification) {
+  public SpecificationController addTab(HybridSpecification hybridSpecification) {
     return addTab(hybridSpecification, 0);
   }
 

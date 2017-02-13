@@ -137,14 +137,13 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
     int currentDurationCount = 1;
     int lastRowNum = -1;
     List<Counterexample.Step> steps = message.getCounterexample().getTrace().getStep();
-    List<Integer> rowNums = parseRowMap(message.getCounterexample().getRowMappings().getRowMap()
-        .get(0));
+    List<String> rowMap = message.getCounterexample().getRowMappings().getRowMap();
+    List<Integer> rowNums = parseRowMap(rowMap.get(rowMap.size()-1));
     Map<String, Value> currentValues = new HashMap<>();
     Map<String, VariableCategory> varCategories = new HashMap<>();
-    int rowNum = -1;
+    int cycleNum = -1;
     for (int i = 0; i < steps.size(); i++) {
-      if (i-1 > rowNums.size()) break;
-      if (i > 0) rowNum = rowNums.get(i - 1);
+      if (i-1 > rowNums.size()) break; // Make sure I terminate after right # of cycles
       Counterexample.Step step = steps.get(i);
       for (Assignment state : step.getState()) { // Output vars are initialized here
         String stateString = state.getName().trim();
@@ -159,29 +158,13 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       }
 
       // Now I can make and add the row!
-      if (rowNum > -1 && rowNum - 1 <= concreteRows.size()) {
+      if (cycleNum > -1) {
         SpecificationRow<ConcreteCell> row = SpecificationRow.createUnobservableRow(new
             HashMap<>());
-        if (rowNum - 1< concreteRows.size()) {
-          row = concreteRows.get(rowNum - 1);
-        }
         for (String varName : currentValues.keySet()) {
           row.getCells().put(varName, new ConcreteCell(currentValues.get(varName)));
         }
-        concreteRows.add(rowNum - 1, row);
-      } else if (rowNum != -1) {
-        throw new ImportException("Illegal row number: " + rowNum);
-      }
-
-      if (rowNum > -1) {
-        if (lastRowNum != rowNum) {
-          // Started new row --> make and add new duration
-          concreteDurations.add(new ConcreteDuration(rowNum-1, currentDurationCount));
-          currentDurationCount = 1;
-          lastRowNum = rowNum;
-        } else {
-          currentDurationCount++;
-        }
+        concreteRows.add(row);
       }
 
       for (Assignment input : step.getInput()) { // Input vars are initialized here FOR THE NEXT
@@ -193,7 +176,25 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
               (input.getValue()));
         }
       }
+      cycleNum++;
     }
+
+    // Parse durations
+    int currentDuration = 0;
+    int oldRowNum = 1;
+    int cycle = 0;
+    while (cycle < rowNums.size()) {
+      int rowNum = rowNums.get(cycle);
+      if (rowNum != oldRowNum) {
+        concreteDurations.add(new ConcreteDuration(cycle - currentDuration, currentDuration));
+        oldRowNum = rowNum;
+        currentDuration = 0;
+      }
+      currentDuration++;
+      cycle++;
+    }
+    concreteDurations.add(new ConcreteDuration(cycle - currentDuration, currentDuration));
+
     ConcreteSpecification concreteSpec = new ConcreteSpecification(true);
     for (String varName : varNames) {
       concreteSpec.getColumnHeaders().add(new ValidIoVariable(varCategories.get(varName), varName,
