@@ -38,7 +38,7 @@ END_PROGRAM</plaintext>
          <row><!-- Hier ist die Reihenfolge der Cells wichtig! -->
            <duration comment="I am a duration comment!">[1,5]</duration>
            <cell comment="I am a cell comment!">5</cell>
-           <cell>FALSE</cell>
+           <cell>TRUE</cell>
            <cell>&gt; A+2</cell>
            <cell comment="I am another cell comment!">literalOne</cell>
          </row>
