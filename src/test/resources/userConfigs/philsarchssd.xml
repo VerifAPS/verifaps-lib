@@ -17,7 +17,7 @@
   <dependencies>
     <javaPath>/usr/bin</javaPath>
     <z3Path>/usr/bin/z3</z3Path>
-    <getetaFilename>../geteta-0.4.0-exe.jar</getetaFilename>
-    <nuxmvFilename>../nuXmv</nuxmvFilename>
+    <getetaFilename>/home/philipp/program/PSE/geteta-0.4.0-exe.jar</getetaFilename>
+    <nuxmvFilename>/home/philipp/program/PSE/nuXmv</nuxmvFilename>
   </dependencies>
 </config>
