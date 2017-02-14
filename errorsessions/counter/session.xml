@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><session xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml">
+<code>
+<plaintext>PROGRAM counter
+  VAR
+    n0 : INT := 0;
+    n1 : INT := 1;
+  END_VAR
+  VAR_OUTPUT
+    num : INT;
+  END_VAR
+
+  num := n0 + n1;
+  n0 := n1;
+  n1 := num;
+END_PROGRAM</plaintext>
+</code>
+<tabs>
+<tab id="0" open="false" readOnly="false">
+<specification comment="" isConcrete="false">
+<variables>
+<ioVariable colwidth="100" data-type="INT" io="output" name="num"/>
+</variables>
+<rows>
+<row comment="">
+<duration comment="I am a duration comment!">1</duration>
+<cell>1</cell>
+</row>
+<row comment="">
+<duration>10</duration>
+<cell>= num[-1] + num[-2]</cell>
+</row>
+</rows>
+<enumTypes/>
+</specification>
+</tab>
+</tabs>
+<config>
+<general>
+<uiLanguage>EN</uiLanguage>
+<windowSize>
+<width>1000</width>
+<height>900</height>
+</windowSize>
+<verificationTimeout>3600</verificationTimeout>
+<simulationTimeout>60</simulationTimeout>
+<maxLineRollout>500</maxLineRollout>
+</general>
+<editor>
+<showLineNumbers>true</showLineNumbers>
+<fontFamily>Courier</fontFamily>
+<fontSize>12</fontSize>
+</editor>
+<dependencies>
+<javaPath>/usr/bin</javaPath>
+<z3Path>/usr/bin/z3</z3Path>
+<getetaFilename>/home/philipp/program/PSE/geteta-0.4.0-exe.jar</getetaFilename>
+<nuxmvFilename>/home/philipp/program/PSE/nuXmv</nuxmvFilename>
+</dependencies>
+</config>
+<history>
+<code>/path/to/someCode.st</code>
+<spec>/path/to/someSpec.xml</spec>
+<spec>/path/to/anotherSpec.xml</spec>
+</history>
+</session>
