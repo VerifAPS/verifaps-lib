@@ -37,7 +37,6 @@ public class EditorPane extends SplitPane {
     this.getStylesheets().add(EditorPane.class.getResource("style.css").toExternalForm());
 
     codeArea = new CodeArea(code);
-    System.out.println("Setting line numbers to " + showLineNumbers);
     if (showLineNumbers) {
       codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
     }
