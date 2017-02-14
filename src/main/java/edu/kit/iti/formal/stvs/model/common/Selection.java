@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.model.common;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 /**
  * Created by csicar on 10.01.17.
@@ -10,6 +11,8 @@ public class Selection {
 
   private NullableProperty<String> column;
   private NullableProperty<Integer> row;
+  private BiConsumer<String, Integer> clickListener = (s, i) -> {
+  };
 
   public Selection(String column, int row) {
     this.column = new NullableProperty<>(column);
@@ -29,6 +32,14 @@ public class Selection {
   public Selection() {
     this.column = new NullableProperty<>();
     this.row = new NullableProperty<>();
+  }
+
+  public void setOnCellClickListener(BiConsumer<String, Integer> consumer) {
+    this.clickListener = consumer;
+  }
+
+  public void fireClickEvent(String column, int row) {
+    clickListener.accept(column, row);
   }
 
   public Optional<String> getColumn() {
@@ -55,7 +66,7 @@ public class Selection {
     this.row.set(row);
   }
 
-  public void clear(){
+  public void clear() {
     this.row.set(null);
     this.column.set(null);
   }
@@ -68,7 +79,8 @@ public class Selection {
 
     Selection selection = (Selection) o;
 
-    if (column.get() == null ? selection.column.get() != null : !column.get().equals(selection.column.get())) return false;
+    if (column.get() == null ? selection.column.get() != null : !column.get().equals(selection.column.get()))
+      return false;
     return row.get() == null ? selection.row.get() == null : row.get().equals(selection.row.get());
 
   }

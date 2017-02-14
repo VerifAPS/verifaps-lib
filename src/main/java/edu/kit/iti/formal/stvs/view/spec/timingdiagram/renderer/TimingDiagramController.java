@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
-import edu.kit.iti.formal.stvs.ViewUtils;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
@@ -16,7 +15,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.transform.Transform;
+import javafx.scene.shape.Rectangle;
 
 /**
  * Created by csicar on 09.01.17.
@@ -24,7 +23,7 @@ import javafx.scene.transform.Transform;
  */
 public class TimingDiagramController implements Controller {
   private ContextMenu contextMenu;
-  private final TimingDiagramView view;
+  private final TimingDiagramView<?> view;
   private final Axis externalYAxis;
   private final Selection selection;
   private final ValidIoVariable ioVariable;
@@ -33,16 +32,16 @@ public class TimingDiagramController implements Controller {
   private MouseEvent lastMouseEvent;
 
 
-  public TimingDiagramController(NumberAxis commonXAxis, NumberAxis externalYAxis, ConcreteSpecification spec, ValidIoVariable ioVariable, Selection selection){
+  public TimingDiagramController(NumberAxis commonXAxis, NumberAxis externalYAxis, ConcreteSpecification spec, ValidIoVariable ioVariable, Selection selection) {
     XYChart.Series<Number, Number> seriesData = Plotable.toNumberSeries(spec.getColumnByName(ioVariable.getName()).getCells());
     this.externalYAxis = externalYAxis;
     this.selection = selection;
     this.ioVariable = ioVariable;
     this.concreteSpec = spec;
     this.commonXAxis = commonXAxis;
-    NumberAxis xAxis = new NumberAxis(0,0,1);
+    NumberAxis xAxis = new NumberAxis(0, 0, 1);
     NumberAxis yAxis = new NumberAxis();
-    TimingDiagramView<Number> view = new TimingDiagramView<>(xAxis,yAxis);
+    TimingDiagramView<Number> view = new TimingDiagramView<>(xAxis, yAxis);
     this.view = view;
     ObservableList<XYChart.Series<Number, Number>> data = FXCollections.observableArrayList();
     data.add(seriesData);
@@ -60,14 +59,14 @@ public class TimingDiagramController implements Controller {
     initCommon();
   }
 
-  public TimingDiagramController(NumberAxis commonXAxis, CategoryAxis externalYAxis, ConcreteSpecification spec, ValidIoVariable ioVariable, Selection selection){
+  public TimingDiagramController(NumberAxis commonXAxis, CategoryAxis externalYAxis, ConcreteSpecification spec, ValidIoVariable ioVariable, Selection selection) {
     XYChart.Series<Number, String> seriesData = Plotable.toStringSeries(spec.getColumnByName(ioVariable.getName()).getCells());
     this.externalYAxis = externalYAxis;
     this.ioVariable = ioVariable;
     this.selection = selection;
     this.concreteSpec = spec;
     this.commonXAxis = commonXAxis;
-    NumberAxis xAxis = new NumberAxis(0,0,1);
+    NumberAxis xAxis = new NumberAxis(0, 0, 1);
     CategoryAxis yAxis = new CategoryAxis();
     TimingDiagramView<String> view = new TimingDiagramView<>(xAxis, yAxis);
     this.view = view;
@@ -87,15 +86,6 @@ public class TimingDiagramController implements Controller {
   private void initCommon() {
     view.setDurations(concreteSpec.getDurations());
     //view.getyAxis().layoutBoundsProperty().addListener(change -> updateAxisExternalPosition());
-    view.selectedCycleProperty().addListener(change -> {
-      if(view.selectedCycleProperty().isNotNull().get()){
-        selection.setRow(concreteSpec.cycleToRowNumber(view.getSelectedCycle()));
-        selection.setColumn(ioVariable.getName());
-      }
-      else{
-        selection.clear();
-      }
-    });
     view.setOnMouseClicked(this::onMouseClicked);
     MenuItem xPositiveZoomItem = new MenuItem("Zoom X+");
     xPositiveZoomItem.setOnAction(this::onXPositiveZoom);
@@ -105,17 +95,35 @@ public class TimingDiagramController implements Controller {
         xPositiveZoomItem,
         xNegativeZoomItem
     );
-    //view.setTitle(ioVariable.getName()+ " : " + ioVariable.getType().getTypeName());
+    ObservableList<Rectangle> cycleSelectionRectangles = view.getCycleSelectionRectangles();
+    for (int i = 0; i < cycleSelectionRectangles.size(); i++) {
+      Rectangle cycleSelectionRectangle = cycleSelectionRectangles.get(i);
+      int finalCycleIndex = i;
+      cycleSelectionRectangle.setOnMouseEntered(event -> {
+        cycleSelectionRectangle.setOpacity(1);
+        selection.setRow(concreteSpec.cycleToRowNumber(finalCycleIndex));
+        selection.setColumn(ioVariable.getName());
+      });
+      cycleSelectionRectangle.setOnMouseExited(event -> {
+        cycleSelectionRectangle.setOpacity(0);
+        selection.clear();
+      });
+      cycleSelectionRectangle.setOnMouseClicked(event -> {
+        if (event.getButton() == MouseButton.PRIMARY) {
+          selection.fireClickEvent(ioVariable.getName(), concreteSpec.cycleToRowNumber(finalCycleIndex));
+        }
+      });
+    }
   }
 
   private void onXPositiveZoom(ActionEvent actionEvent) {
     double interval = commonXAxis.getUpperBound() - commonXAxis.getLowerBound();
-    double newInterval = interval/2;
-    if(newInterval<1) return;
+    double newInterval = interval / 2;
+    if (newInterval < 1) return;
     double center = commonXAxis.getValueForDisplay(lastMouseEvent.getX()).doubleValue();
-    double newLowerBound = center - newInterval/2;
-    double newUpperBound = center + newInterval/2;
-    if(newLowerBound < 0){
+    double newLowerBound = center - newInterval / 2;
+    double newUpperBound = center + newInterval / 2;
+    if (newLowerBound < 0) {
       newUpperBound += -newLowerBound;
       newLowerBound = 0;
     }
@@ -125,12 +133,12 @@ public class TimingDiagramController implements Controller {
 
   private void onXNegativeZoom(ActionEvent actionEvent) {
     double interval = commonXAxis.getUpperBound() - commonXAxis.getLowerBound();
-    double newInterval = interval*2;
-    if(newInterval<1) return;
+    double newInterval = interval * 2;
+    if (newInterval < 1) return;
     double center = commonXAxis.getValueForDisplay(lastMouseEvent.getX()).doubleValue();
-    double newLowerBound = center - newInterval/2;
-    double newUpperBound = center + newInterval/2;
-    if(newLowerBound < 0){
+    double newLowerBound = center - newInterval / 2;
+    double newUpperBound = center + newInterval / 2;
+    if (newLowerBound < 0) {
       newUpperBound += -newLowerBound;
       newLowerBound = 0;
     }
@@ -139,7 +147,7 @@ public class TimingDiagramController implements Controller {
   }
 
   private void onMouseClicked(MouseEvent mouseEvent) {
-    if(mouseEvent.getButton() == MouseButton.SECONDARY){
+    if (mouseEvent.getButton() == MouseButton.SECONDARY) {
       this.lastMouseEvent = mouseEvent;
       view.getContextMenu().show(view, mouseEvent.getScreenX(), mouseEvent.getScreenY());
     }
