@@ -26,7 +26,6 @@ public class SpecificationsPane extends AnchorPane {
     AnchorPane.setRightAnchor(addButton, 10.0);
 
     this.getChildren().addAll(tabPane, addButton);
-
   }
 
   public ObservableList<Tab> getTabs() {

@@ -57,19 +57,17 @@ public class Code {
         this.parsedCode::set);
   }
 
-  /**
-   * Updates tokens, syntaxerrors, and the parsed code synchronously
-   * from the given sourcecode.
-   *
-   * @param sourcecode the new sourcecode of the code
-   */
   public void updateSourcecode(String sourcecode) {
-    sourceCodeProperty.setValue(sourcecode);
+    sourceCodeProperty.set(sourcecode);
     invalidate();
   }
 
   public String getSourcecode() {
     return sourceCodeProperty.get();
+  }
+
+  public StringProperty sourcecodeProperty() {
+    return sourceCodeProperty;
   }
 
   public ObservableList<SyntaxError> syntaxErrorsProperty() {

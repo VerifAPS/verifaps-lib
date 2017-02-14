@@ -92,7 +92,7 @@ public class ColumnHeader extends VBox {
     Tooltip.install(this, problemTooltip);
   }
 
-  public void resetProblem() {
+  public void resetProblems() {
     this.getStyleClass().remove("spec-column-problem");
     Tooltip.uninstall(this, problemTooltip);
   }

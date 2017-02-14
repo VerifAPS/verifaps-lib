@@ -10,6 +10,7 @@ import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.view.editor.EditorPaneController;
 import edu.kit.iti.formal.stvs.view.spec.SpecificationsPaneController;
@@ -150,6 +151,12 @@ public class StvsRootController implements Controller {
       case COUNTEREXAMPLE:
         ViewUtils.showDialog(Alert.AlertType.INFORMATION, "Counterexample available",
             "Counterexample available", alertBody);
+        // Show read-only copy of spec with counterexample in a new tab
+        assert stvsRootModel.getScenario().getCurrentSpec() != null;
+        HybridSpecification readOnlySpec = new HybridSpecification(stvsRootModel.getScenario()
+            .getCurrentSpec(), false);
+        readOnlySpec.setCounterExample(res.getCounterExample());
+        specificationsPaneController.addTab(readOnlySpec);
         break;
       case VERIFIED:
         ViewUtils.showDialog(Alert.AlertType.INFORMATION, "Verification successful",

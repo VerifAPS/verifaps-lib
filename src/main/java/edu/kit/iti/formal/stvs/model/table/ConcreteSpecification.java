@@ -4,7 +4,9 @@ import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import javafx.beans.Observable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Benjamin Alt
@@ -37,6 +39,11 @@ public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, C
    * This function does the mapping between the two.
    */
   public List<ConcreteCell> getConcreteValuesForConstraintRow(String column, int constraintRow) {
+    // Counterexamples stop after first mismatch
+    // So we possibly don't have as many counterexample rows as constraint rows.
+    if (constraintRow >= durations.size()) {
+      return Collections.emptyList();
+    }
     int startIndex = durations.get(constraintRow).getBeginCycle();
     int endIndex = durations.get(constraintRow).getEndCycle();
 
@@ -47,6 +54,13 @@ public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, C
       concreteCells.add(concreteColumn.getCells().get(i));
     }
     return concreteCells;
+  }
+
+  public Optional<ConcreteDuration> getConcreteDurationForConstraintRow(int constraintRow) {
+    if (constraintRow >= durations.size()) {
+      return Optional.empty();
+    }
+    return Optional.of(durations.get(constraintRow));
   }
 
   //Finds the row number in the constraint specification for a given cycle

@@ -27,13 +27,6 @@ import static org.junit.Assert.*;
  */
 public class StvsRootControllerTest {
 
-  private static final Map<String, String> getetaFilenames;
-  static
-  {
-    getetaFilenames = new HashMap<String, String>();
-    getetaFilenames.put("bal", "/home/bal/Downloads/geteta-0.4.0-exe.jar");
-  }
-
   @Test
   public void superSimpleTestcase() {
     JavaFxTest.runView(() -> simpleScene("session_super_simple_testcase.xml"));
@@ -50,7 +43,7 @@ public class StvsRootControllerTest {
     try {
        rootModel = ImporterFacade.importSession(XmlSessionImporterTest.class
           .getResourceAsStream(sessionfile), ImporterFacade.ImportFormat.XML);
-    }catch(Exception e) {
+    } catch(Exception e) {
       e.printStackTrace();
     }
 

@@ -57,15 +57,15 @@ public class SmtEncoder {
     for (int z = 0; z < specification.getDurations().size(); z++) {
       LowerBoundedInterval interval = specification.getDurations().get(z);
       //n_z >= lowerBound_z
-      this.sConstrain.addGlobalConstrains(new SList(">=", "n_" + z, interval.getLowerBound() +
+      this.sConstrain.addGlobalConstrains(new SList("bvuge", "n_" + z, BitvectorUtils.hexFromInt(interval.getLowerBound(), 4) +
           ""));
       //n_z <= upperBound_z
       if (interval.getUpperBound().isPresent()) {
-        this.sConstrain.addGlobalConstrains(new SList("<=", "n_" + z,
-            Math.min(interval.getUpperBound().get(), getMaxDuration(z)) + ""));
+        this.sConstrain.addGlobalConstrains(new SList("bvule", "n_" + z,
+            BitvectorUtils.hexFromInt(Math.min(interval.getUpperBound().get(), getMaxDuration(z)), 4)));
       } else {
-        this.sConstrain.addGlobalConstrains(new SList("<=", "n_" + z,
-            getMaxDuration(z) + ""));
+        this.sConstrain.addGlobalConstrains(new SList("bvule", "n_" + z,
+            BitvectorUtils.hexFromInt(getMaxDuration(z), 4)));
       }
     }
 
@@ -84,7 +84,7 @@ public class SmtEncoder {
           //n_z >= i => ExpressionVisitor(z,i,...)
           this.sConstrain = new RecSConstraint(
               new SList("implies",
-                  new SList(">", "n_" + z, i + ""),
+                  new SList("bvuge", "n_" + z, BitvectorUtils.hexFromInt(i,4)),
                   expressionConstraint
               ),
               visitor.getConstraint().getGlobalConstraints(),
@@ -106,7 +106,7 @@ public class SmtEncoder {
         this.sConstrain.addHeaderDefinitions(new SList(
             "declare-const",
             "n_" + z,
-            "Int"
+            "(_ BitVec 16)"
         ));
         //Iterate over potential backward steps
         for (int i = 1; i <= getMaxDurationSum(z - 1); i++) {
@@ -117,7 +117,7 @@ public class SmtEncoder {
                 new SList("implies",
                     new SList("=",
                         "n_" + (z - 1),
-                        k + ""
+                        BitvectorUtils.hexFromInt(k, 4)
                     ),
                     new SList("=",
                         "|" + variableName + "_" + z + "_" + (-i) + "|",

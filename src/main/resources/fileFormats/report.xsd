@@ -25,7 +25,7 @@
                     </complexType>
                 </element>
 
-                <element name="counterexample">
+                <element name="counterexample" minOccurs="0" maxOccurs="1">
                     <complexType>
                         <all>
                             <element minOccurs="1" maxOccurs="1" name="trace" type="tns:counterexample"/>

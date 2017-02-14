@@ -22,6 +22,7 @@ public class VerificationScenario {
   private VerificationEngine verificationEngine;
   private ObjectProperty<Code> code;
   private ObjectProperty<VerificationState> verificationState;
+  private ConstraintSpecification currentSpec;
 
   public VerificationScenario() {
     this(new Code());
@@ -31,6 +32,7 @@ public class VerificationScenario {
     this.code = new SimpleObjectProperty<>(code);
     verificationResult = new NullableProperty<>();
     verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
+    currentSpec = null;
   }
 
   public void verify(
@@ -38,6 +40,7 @@ public class VerificationScenario {
       String nuxmvFilename,
       ConstraintSpecification spec) throws IOException, ExportException, VerificationException {
     // TODO: Parsed code might be null!!!
+    currentSpec = spec;
     verificationEngine = new GeTeTaVerificationEngine(
         getetaFilename,
         nuxmvFilename,
@@ -67,6 +70,10 @@ public class VerificationScenario {
   public void setCode(Code code) {
     this.code.set(code);
 
+  }
+
+  public ConstraintSpecification getCurrentSpec() {
+    return currentSpec;
   }
 
   public ObjectProperty<Code> codeObjectProperty() {
