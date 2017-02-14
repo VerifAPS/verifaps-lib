@@ -5,7 +5,8 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.*;
-import edu.kit.iti.formal.stvs.model.table.problems.*;
+import edu.kit.iti.formal.stvs.model.table.problems.ColumnProblem;
+import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -99,7 +100,7 @@ public class SpecificationTableController implements Controller {
       ColumnHeader columnHeader = (ColumnHeader) column.getGraphic();
 
       if (problemsForColumn.isEmpty()) {
-        columnHeader.resetProblem();
+        columnHeader.resetProblems();
       } else {
         columnHeader.configureProblems(problemsForColumn);
       }

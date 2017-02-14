@@ -46,6 +46,7 @@ public class EditorPaneController implements Controller {
 
   private void configureTextArea() {
     CodeArea codeArea = view.getCodeArea();
+    code.sourcecodeProperty().bind(codeArea.textProperty());
     codeArea.richChanges()
         .filter(ch -> !ch.getInserted().equals(ch.getRemoved()))
         .successionEnds(Duration.ofMillis(500))

@@ -1,17 +1,12 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
-import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
-import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
-import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
-import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
+import edu.kit.iti.formal.stvs.model.expressions.Value;
+import edu.kit.iti.formal.stvs.model.table.*;
 import javafx.beans.Observable;
 import javafx.collections.MapChangeListener;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -72,7 +67,12 @@ public class SynchronizedRow extends SpecificationRow<HybridCellModel<Constraint
       for (Map.Entry<String, HybridCellModel<ConstraintCell>> entry : getCells().entrySet()) {
         entry.getValue().counterExamplesProperty().setAll(createCounterExampleCells(entry.getKey(), rowIndex, counterExample.get()));
       }
-      durationCell.counterExamplesProperty().setAll(counterExample.get().getDurations().get(rowIndex).getDuration() + "");
+      durationCell.counterExamplesProperty().setAll(
+          counterExample.get().getConcreteDurationForConstraintRow(rowIndex)
+              .map(ConcreteDuration::getDuration)
+              .map(i -> Integer.toString(i))
+              .map(Collections::singletonList)
+              .orElse(Collections.emptyList()));
     } else {
       durationCell.clearCounterExample();
     }
