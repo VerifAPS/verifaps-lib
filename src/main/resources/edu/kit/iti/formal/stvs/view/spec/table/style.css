@@ -16,6 +16,16 @@
   -fx-background-color: #db5751AA;
 }
 
+/* These are table rows that are highlighted by mouse-over on the timing diagram: */
+.table-row-cell.highlighted {
+  -fx-background-color: #0002; /* almost */
+}
+
+.table-column.highlighted {
+  /* holy shit thats ugly */
+  -fx-background-color: #0002;
+}
+
 .spec-column-header {
   -fx-background-insets: 1 1 1 1;
   -fx-padding: 2px;
