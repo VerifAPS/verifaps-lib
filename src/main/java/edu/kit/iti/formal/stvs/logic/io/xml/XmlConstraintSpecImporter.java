@@ -56,6 +56,7 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
                                                        SpecificationTable importedSpec)
       throws ImportException {
     ConstraintSpecification constraintSpec = new ConstraintSpecification(freeVariables);
+    constraintSpec.setName(importedSpec.getName());
 
     // Add the columnHeaders (column headers)
     for (SpecIoVariable specIoVariable : ioVariables) {
