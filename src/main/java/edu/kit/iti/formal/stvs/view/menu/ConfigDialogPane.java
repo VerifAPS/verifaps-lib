@@ -5,8 +5,6 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
-import javax.xml.soap.Text;
-
 /**
  * Created by csicar on 11.01.17.
  */
@@ -56,42 +54,42 @@ public class ConfigDialogPane extends DialogPane {
     grid.add(new Label("Simulation Timeout"), 0, 1);
     grid.add(simulationTimeout, 1, 1);
 
-    grid.add(new Label("Window-Height"), 0, 2);
+    grid.add(new Label("Window Height"), 0, 2);
     grid.add(windowHeight, 1, 2);
 
-    grid.add(new Label("Window-Width"), 0, 3);
+    grid.add(new Label("Window Width"), 0, 3);
     grid.add(windowWidth, 1, 3);
 
-    grid.add(new Label("Editor-Fontsize"), 0, 4);
+    grid.add(new Label("Editor Fontsize"), 0, 4);
     grid.add(editorFontSize, 1, 4);
 
-    grid.add(new Label("Editor-Fontfamily"), 0, 5);
+    grid.add(new Label("Editor Font Family"), 0, 5);
     grid.add(editorFontFamily, 1, 5);
 
-    grid.add(new Label("Show Linenumbers"), 0, 6);
+    grid.add(new Label("Show Line Numbers"), 0, 6);
     grid.add(showLineNumbers, 1, 6);
 
-    grid.add(new Label("UI-Language"), 0, 7);
+    grid.add(new Label("User Interface Language"), 0, 7);
     grid.add(uiLanguage, 1, 7);
 
 
-    grid.add(new Label("nuxmvFilename"), 0, 8);
+    grid.add(new Label("Path to NuXmv Executable"), 0, 8);
     grid.add(nuxmvFilename, 1, 8);
 
 
-    grid.add(new Label("z3Path"), 0, 9);
+    grid.add(new Label("Path to Z3"), 0, 9);
     grid.add(z3Path, 1, 9);
 
 
-    grid.add(new Label("javaPath"), 0, 10);
+    grid.add(new Label("Path to Java"), 0, 10);
     grid.add(javaPath, 1, 10);
 
 
-    grid.add(new Label("getetaFilename"), 0, 11);
+    grid.add(new Label("Path to GeTeTa"), 0, 11);
     grid.add(getetaFilename, 1, 11);
 
 
-    grid.add(new Label("maxLineRollout"), 0, 12);
+    grid.add(new Label("Maximum Number of Rollouts per Line"), 0, 12);
     grid.add(maxLineRollout, 1, 12);
     this.setContent(grid);
   }
