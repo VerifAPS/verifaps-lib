@@ -54,7 +54,7 @@ public class SpecificationController implements Controller {
     this.stateProperty = stateProperty;
     this.stateProperty.addListener(new VerificationStateChangeListener());
     this.view = new SpecificationView();
-    this.selection = new Selection();
+    this.selection = hybridSpecification.getSelection();
     this.globalConfig = globalConfig;
     this.variableCollectionController = new VariableCollectionController(
         typeContext,

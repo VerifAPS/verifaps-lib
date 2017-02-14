@@ -75,6 +75,16 @@ public class SpecificationTableController implements Controller {
     data.addListener(this::onDataRowChanged);
     validator.problemsProperty().addListener((Observable o) -> onProblemsChange());
     hybridSpec.counterExampleProperty().addListener(observable -> onCounterExampleChanged());
+
+    hybridSpec.getSelection().setOnCellClickListener(this::focusCell);
+  }
+
+  private void focusCell(String columnId, int row) {
+    tableView.edit(row,
+        tableView.getColumns().stream()
+            .filter(column -> columnId.equals(column.getUserData()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Cannot focus unkown column: " + columnId)));
   }
 
   private void onCounterExampleChanged() {
