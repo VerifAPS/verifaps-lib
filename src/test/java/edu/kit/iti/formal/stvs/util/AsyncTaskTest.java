@@ -7,6 +7,7 @@ import javafx.scene.control.TextArea;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by leonk on 09.02.2017.
@@ -20,7 +21,7 @@ public class AsyncTaskTest {
 
   private Scene simpleScene() {
     TextArea root = new TextArea();
-    AsyncTask<String> stringAsyncTask = new AsyncTask<>(() -> "TEST\n", root::appendText);
+    AsyncTask<String> stringAsyncTask = new AsyncTask<>( (isRunning) -> "TEST\n", root::appendText);
     stringAsyncTask.start();
     root.appendText("Thread magic!"+"\n");
     return new Scene(root, 800, 600);

@@ -1,11 +1,12 @@
 package edu.kit.iti.formal.stvs.logic.specification;
 
-import edu.kit.iti.formal.stvs.model.common.NullableProperty;
+import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
-import javafx.beans.property.ObjectProperty;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -15,16 +16,10 @@ import java.util.function.Consumer;
  */
 public interface SpecificationConcretizer {
 
-  Optional<ConcreteSpecification> calculateConcreteSpecification() throws IOException;
-
-  /**
-   * returns the previously calculated concretespecification
-   * ! calling this method without successfully calculating a concrete specification first will
-   * <i>always</i> return Optional.empty()
-   * @return the concretized specification, if available
-   */
-  Optional<ConcreteSpecification> getConcreteSpecification();
-
-  void addEventListener(Consumer<SpecificationConcretizerState> eventListener);
+  void calculateConcreteSpecification(ValidSpecification validSpecification,
+                                      List<ValidFreeVariable> freeVariables,
+                                      Consumer<Optional<ConcreteSpecification>> consumer,
+                                      Consumer<Throwable> exceptionHandler);
+  void terminate();
 }
 

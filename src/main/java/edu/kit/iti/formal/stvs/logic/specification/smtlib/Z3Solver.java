@@ -10,15 +10,15 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
 import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
-import edu.kit.iti.formal.stvs.util.ProcessOutputHandler;
+import edu.kit.iti.formal.stvs.util.ProcessOutputAsyncTask;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -28,48 +28,47 @@ public class Z3Solver {
   //TODO: Better way to call z3 than forcing it to be in PATH
   private static String z3PATH = "z3";
 
-  private static Optional<String> concretize(String smtString) throws IOException {
-    Process process = new ProcessBuilder(z3PATH, "-in").start();
-    PrintStream printStream = new PrintStream(process.getOutputStream());
-    printStream.print(smtString);
-    printStream.close();
-    return ProcessOutputHandler.handle(process);
+  private static ProcessOutputAsyncTask concretize(String smtString, Consumer<Optional<String>> handler) {
+    ProcessBuilder processBuilder = new ProcessBuilder(z3PATH, "-in");
+    return new ProcessOutputAsyncTask(processBuilder, smtString, handler);
   }
 
-  private static Optional<SExpr> concretizeSExpr(String smtString) throws IOException {
-    Optional<String> stringOptional = concretize(smtString);
-    if (stringOptional.isPresent()) {
-      String output = stringOptional.get();
-      if (output.startsWith("sat")) {
-        output = output.substring(output.indexOf('\n') + 1);
-        return Optional.of(SExpr.fromString(output));
+  private static ProcessOutputAsyncTask concretizeSExpr(String smtString, Consumer<Optional<SExpr>> handler) {
+    return concretize(smtString, stringOptional -> {
+      if (stringOptional.isPresent()) {
+        String output = stringOptional.get();
+        if (output.startsWith("sat")) {
+          output = output.substring(output.indexOf('\n') + 1);
+          handler.accept(Optional.of(SExpr.fromString(output)));
+        }
       }
-    }
-    return Optional.empty();
+    });
   }
 
-  private static Optional<ConcreteSpecification> concretizeSmtString(String smtString, List<ValidIoVariable> validIoVariables)
-      throws IOException {
-    Optional<SExpr> sexpOptional = concretizeSExpr(smtString);
-    Map<String, Type> typeContext = validIoVariables.stream().collect(Collectors.toMap(
-        ValidIoVariable::getName, ValidIoVariable::getValidType
-    ));
-    if (sexpOptional.isPresent()) {
-      Sexp sExpr = sexpOptional.get().toSexpr();
-      Map<Integer, Integer> rawDurations = extractRawDurations(sExpr);
-      //convert raw durations into duration list
-      List<ConcreteDuration> durations = buildConcreteDurations(rawDurations);
-      Map<Integer, Map<String, String>> rawRows = extractRawRows(sExpr, durations);
-      //convert raw rows into specificationRows
-      List<SpecificationRow<ConcreteCell>> specificationRows =
-          buildSpecificationRows(validIoVariables, durations, rawRows);
-      return Optional.of(
-          new ConcreteSpecification(validIoVariables, specificationRows, durations, false));
-    }
-    return Optional.empty();
+  private static ProcessOutputAsyncTask concretizeSmtString(String smtString, List<ValidIoVariable> validIoVariables,
+                                                            Consumer<Optional<ConcreteSpecification>> handler) {
+    return concretizeSExpr(smtString, sexpOptional -> {
+      Map<String, Type> typeContext = validIoVariables.stream().collect(Collectors.toMap(
+          ValidIoVariable::getName, ValidIoVariable::getValidType
+      ));
+      if (sexpOptional.isPresent()) {
+        Sexp sExpr = sexpOptional.get().toSexpr();
+        Map<Integer, Integer> rawDurations = extractRawDurations(sExpr);
+        //convert raw durations into duration list
+        List<ConcreteDuration> durations = buildConcreteDurations(rawDurations);
+        Map<Integer, Map<String, String>> rawRows = extractRawRows(sExpr, durations);
+        //convert raw rows into specificationRows
+        List<SpecificationRow<ConcreteCell>> specificationRows =
+            buildSpecificationRows(validIoVariables, durations, rawRows);
+        handler.accept(Optional.of(
+            new ConcreteSpecification(validIoVariables, specificationRows, durations, false)));
+      }
+    });
   }
 
-  private static List<SpecificationRow<ConcreteCell>> buildSpecificationRows(List<ValidIoVariable> validIoVariables, List<ConcreteDuration> durations, Map<Integer, Map<String, String>> rawRows) {
+  private static List<SpecificationRow<ConcreteCell>> buildSpecificationRows(List<ValidIoVariable> validIoVariables,
+                                                                             List<ConcreteDuration> durations,
+                                                                             Map<Integer, Map<String, String>> rawRows) {
     List<SpecificationRow<ConcreteCell>> specificationRows = new ArrayList<>();
     durations.forEach(duration -> {
       for (int cycle = 0; cycle < duration.getDuration(); cycle++) {
@@ -146,12 +145,13 @@ public class Z3Solver {
     return rawDurations;
   }
 
-  public static Optional<ConcreteSpecification> concretizeSConstraint(SConstraint sConstraint, List<ValidIoVariable> validIoVariables)
-      throws IOException {
+  public static ProcessOutputAsyncTask concretizeSConstraint(SConstraint sConstraint,
+                                                             List<ValidIoVariable> validIoVariables,
+                                                             Consumer<Optional<ConcreteSpecification>> handler) {
     String constraintString = sConstraint.globalConstraintsToText();
     String headerString = sConstraint.headerToText();
     String commands = "(check-sat)\n(get-model)";
     String z3Input = headerString + "\n" + constraintString + "\n" + commands;
-    return concretizeSmtString(z3Input, validIoVariables);
+    return concretizeSmtString(z3Input, validIoVariables, handler);
   }
 }

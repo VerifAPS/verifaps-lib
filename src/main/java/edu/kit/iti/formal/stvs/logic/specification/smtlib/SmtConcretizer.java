@@ -1,14 +1,12 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
-import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizerState;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
+import edu.kit.iti.formal.stvs.util.ProcessOutputAsyncTask;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -17,45 +15,31 @@ import java.util.function.Consumer;
  * Created by csicar on 08.02.17.
  */
 public class SmtConcretizer implements SpecificationConcretizer {
-  private final ValidSpecification validSpecification;
   private final GlobalConfig config;
-  private Optional<ConcreteSpecification> concreteSpecification;
-  private final SmtEncoder encoder;
-  private final List<Consumer<SpecificationConcretizerState>> eventListeners;
-  private SpecificationConcretizerState concretizerState;
+  private ProcessOutputAsyncTask task;
 
-  public SmtConcretizer(ValidSpecification validSpecification, GlobalConfig config,
-                        List<ValidFreeVariable> freeVariables) {
-    this.validSpecification = validSpecification;
+  public SmtConcretizer(GlobalConfig config) {
     this.config = config;
-    this.encoder = new SmtEncoder((i) -> config.getMaxLineRollout(), validSpecification,
+  }
+
+  @Override
+  public void calculateConcreteSpecification(ValidSpecification validSpecification,
+                                             List<ValidFreeVariable> freeVariables,
+                                             Consumer<Optional<ConcreteSpecification>> consumer,
+                                             Consumer<Throwable> exceptionHandler) {
+    SmtEncoder encoder = new SmtEncoder((i) -> config.getMaxLineRollout(), validSpecification,
         freeVariables);
-    this.concreteSpecification = Optional.empty();
-    this.concretizerState = SpecificationConcretizerState.IDLE;
-    this.eventListeners = new ArrayList<>();
-
+    this.task = Z3Solver.concretizeSConstraint(encoder.getConstrain(), validSpecification.getColumnHeaders(), consumer);
+    Thread.UncaughtExceptionHandler handler = (t, exception) -> {
+      exceptionHandler.accept(exception);
+    };
+    this.task.setUncaughtExceptionHandler(handler);
+    this.task.start();
   }
 
-  @Override
-  public Optional<ConcreteSpecification> calculateConcreteSpecification() throws IOException {
-    this.concreteSpecification = Z3Solver.concretizeSConstraint(encoder
-        .getConstrain(), validSpecification.getColumnHeaders());
-    this.concretizerState = SpecificationConcretizerState.FINISHED;
-    fireListeners();
-    return this.concreteSpecification;
-  }
-
-  @Override
-  public Optional<ConcreteSpecification> getConcreteSpecification() {
-    return concreteSpecification;
-  }
-
-  private void fireListeners() {
-    eventListeners.forEach(eventListener -> eventListener.accept(this.concretizerState));
-  }
-
-  @Override
-  public void addEventListener(Consumer<SpecificationConcretizerState> eventListener) {
-    eventListeners.add(eventListener);
+  public void terminate() {
+    if (task != null) {
+      task.terminate();
+    }
   }
 }

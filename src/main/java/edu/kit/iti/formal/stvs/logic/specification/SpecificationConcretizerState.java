@@ -5,6 +5,7 @@ package edu.kit.iti.formal.stvs.logic.specification;
  */
 public enum SpecificationConcretizerState {
   RUNNING,
-  FINISHED,
+  SUCCESS,
+  ERROR,
   IDLE,
 }
