@@ -50,7 +50,8 @@ public class StvsRootController implements Controller {
         stvsRootModel.getHybridSpecifications(),
         stvsRootModel.getScenario().verificationState(),
         types,
-        ioVars
+        ioVars,
+        stvsRootModel.getGlobalConfig()
     );
 
     this.stvsRootModel.getScenario().codeObjectProperty().addListener(this::onCodeChange);

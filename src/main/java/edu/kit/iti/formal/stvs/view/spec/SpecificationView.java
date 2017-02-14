@@ -11,6 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableView;
@@ -24,6 +25,9 @@ import javafx.scene.text.Text;
 public class SpecificationView extends VBox implements Lockable {
 
   private Button startVerificationButton;
+
+  private Button startConcretizerButton;
+
   private VariableCollection variableCollection;
   private TableView<SynchronizedRow> tableView;
   private TimingDiagramCollectionView diagram;
@@ -31,16 +35,20 @@ public class SpecificationView extends VBox implements Lockable {
   private final StackPane tablePane;
   private final AnchorPane timingDiagramPane;
   private final SplitPane splitPane;
-
+  private final HBox buttonBox;
   public SpecificationView() {
     splitPane = new SplitPane();
     variablesPane = new StackPane();
     tablePane = new StackPane();
     timingDiagramPane = new AnchorPane();
+    buttonBox = new  HBox();
     startVerificationButton = new Button();
+    startConcretizerButton = new Button();
     setVerificationButtonPlay();
-    this.getChildren().add(startVerificationButton);
-    this.setAlignment(Pos.TOP_RIGHT);
+    setConcretizerButtonStart();
+    this.getChildren().add(buttonBox);
+    buttonBox.getChildren().addAll(startVerificationButton, startConcretizerButton);
+    buttonBox.setAlignment(Pos.TOP_RIGHT);
 
     splitPane.setOrientation(Orientation.VERTICAL);
     splitPane.getItems().addAll(variablesPane, tablePane, timingDiagramPane);
@@ -61,6 +69,20 @@ public class SpecificationView extends VBox implements Lockable {
     icon.setFill(Color.INDIANRED);
     startVerificationButton.setText("Stop Verification");
     startVerificationButton.setGraphic(icon);
+  }
+
+  public void setConcretizerButtonStart() {
+    Text icon = GlyphsDude.createIcon(FontAwesomeIcon.PLAY);
+    icon.setFill(Color.MEDIUMSEAGREEN);
+    startConcretizerButton.setText("Concretize");
+    startConcretizerButton.setGraphic(icon);
+  }
+
+  public void setConcretizerButtonStop() {
+    Text icon = GlyphsDude.createIcon(FontAwesomeIcon.STOP);
+    icon.setFill(Color.INDIANRED);
+    startConcretizerButton.setText("Stop Concretization");
+    startConcretizerButton.setGraphic(icon);
   }
 
   public TableView<SynchronizedRow> getTable() {
@@ -89,6 +111,19 @@ public class SpecificationView extends VBox implements Lockable {
     AnchorPane.setBottomAnchor(diagram, 0.0);
   }
 
+  public void setEmptyDiagram(Node emptyDiagram) {
+    this.diagram = null;
+
+
+    timingDiagramPane.getChildren().clear();
+
+    timingDiagramPane.getChildren().add(emptyDiagram);
+    AnchorPane.setLeftAnchor(emptyDiagram, 0.0);
+    AnchorPane.setRightAnchor(emptyDiagram, 0.0);
+    AnchorPane.setTopAnchor(emptyDiagram, 0.0);
+    AnchorPane.setBottomAnchor(emptyDiagram, 0.0);
+  }
+
   public VariableCollection getVariableCollection() {
     return variableCollection;
   }
@@ -103,6 +138,10 @@ public class SpecificationView extends VBox implements Lockable {
 
   public Button getStartButton() {
     return startVerificationButton;
+  }
+
+  public Button getStartConcretizerButton() {
+    return startConcretizerButton;
   }
 
   @Override
