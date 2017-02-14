@@ -15,14 +15,19 @@ import java.io.StringWriter;
  */
 public class ErrorMessageDialog {
 
+
+  public ErrorMessageDialog(Exception exception) {
+    this(exception, "Exception", "An Exception has occured");
+  }
+
   /**
    * creates a ErrorMessageDialog for a given exception
    * @param exception exception to display
    */
-  public ErrorMessageDialog(Exception exception) {
+  public ErrorMessageDialog(Exception exception, String title, String description) {
     Alert alert = new Alert(Alert.AlertType.ERROR);
-    alert.setTitle("Exception");
-    alert.setHeaderText("An Exception has occurred");
+    alert.setTitle(title);
+    alert.setHeaderText(description);
     alert.setContentText(exception.getMessage());
 
 
