@@ -12,6 +12,7 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -75,6 +76,37 @@ public class SpecificationTableController implements Controller {
     data.addListener(this::onDataRowChanged);
     validator.problemsProperty().addListener((Observable o) -> onProblemsChange());
     hybridSpec.counterExampleProperty().addListener(observable -> onCounterExampleChanged());
+
+    hybridSpec.getSelection().setOnCellClickListener(this::focusCell);
+    hybridSpec.getSelection().columnProperty().addListener(this::onColumnSelectionChanged);
+  }
+
+  private void onColumnSelectionChanged(ObservableValue<? extends String> obs, String before, String columnNow) {
+    if (before != null) {
+      tableView.getColumns().stream()
+          .filter(column -> before.equals(column.getUserData()))
+          .findFirst()
+          .ifPresent(column -> {
+            column.getStyleClass().remove("highlighted");
+          });
+    }
+    if (columnNow != null) {
+      tableView.getColumns().stream()
+          .filter(column -> columnNow.equals(column.getUserData()))
+          .findFirst()
+          .ifPresent(column -> {
+            column.getStyleClass().add("highlighted");
+            tableView.scrollToColumn(column);
+          });
+    }
+  }
+
+  private void focusCell(String columnId, int row) {
+    tableView.edit(row,
+        tableView.getColumns().stream()
+            .filter(column -> columnId.equals(column.getUserData()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Cannot focus unkown column: " + columnId)));
   }
 
   private void onCounterExampleChanged() {
@@ -233,7 +265,21 @@ public class SpecificationTableController implements Controller {
   // from: http://stackoverflow.com/questions/28603224/sort-tableview-with-drag-and-drop-rows
   // TODO: Have fun? Implement dragging multiple rows, from one program to another, etc.
   private TableRow<SynchronizedRow> rowFactory(TableView<SynchronizedRow> tableView) {
-    TableRow<SynchronizedRow> row = new TableRow<>();
+    TableRow<SynchronizedRow> row = new TableRow<SynchronizedRow>() {
+      {
+        hybridSpec.getSelection().rowProperty().addListener(this::rowSelectionChanged);
+      }
+
+      private void rowSelectionChanged(ObservableValue<? extends Integer> obs, Integer before, Integer now) {
+        if (before != null && getIndex() == before) {
+          getStyleClass().remove ("highlighted");
+        }
+        if (now != null && getIndex() == now) {
+          getStyleClass().add("highlighted");
+          tableView.scrollTo(getIndex());
+        }
+      }
+    };
 
     row.setOnDragDetected(event -> {
       if (!row.isEmpty()) {

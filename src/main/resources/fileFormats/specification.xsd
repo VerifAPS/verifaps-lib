@@ -89,6 +89,7 @@
    <attribute name="isConcrete" type="boolean" use="required"></attribute>
    <attribute name="isCounterExample" type="boolean" use="optional" default="false"></attribute>
    <attribute name="comment" type="string" use="optional"></attribute>
+   <attribute name="name" type="string" use="optional" default="Unnamed Specification"></attribute>
  </complexType>
 
  <element name="specification" type="tns:SpecificationTable"></element>

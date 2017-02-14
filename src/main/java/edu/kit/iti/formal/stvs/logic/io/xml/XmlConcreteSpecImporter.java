@@ -79,8 +79,9 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
           "declared as concrete");
     }
     ConcreteSpecification concreteSpec = new ConcreteSpecification(importedSpec.isIsCounterExample());
+    concreteSpec.setName(importedSpec.getName());
 
-    // Add the columnHeaders (column headers)
+    // Add the column headers
     concreteSpec.getColumnHeaders().addAll(ioVariables);
 
     // Add the rows

@@ -8,7 +8,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleSpans;
@@ -29,11 +28,19 @@ public class EditorPane extends SplitPane {
   private Pane syntaxErrorPane;
 
   public EditorPane(String code, ObservableList<SyntaxError> syntaxErrors) {
+    this(code, syntaxErrors, true);
+  }
+
+  public EditorPane(String code, ObservableList<SyntaxError> syntaxErrors, boolean
+      showLineNumbers) {
     super();
     this.getStylesheets().add(EditorPane.class.getResource("style.css").toExternalForm());
 
     codeArea = new CodeArea(code);
-    codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+    System.out.println("Setting line numbers to " + showLineNumbers);
+    if (showLineNumbers) {
+      codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+    }
     syntaxErrorListView = new ListView<>(syntaxErrors);
     syntaxErrorListView.getStyleClass().addAll("model-text-area");
     syntaxErrorPane  = new AnchorPane(syntaxErrorListView);
@@ -66,12 +73,19 @@ public class EditorPane extends SplitPane {
     codeArea = new CodeArea(code);
   }
 
-
   public void setStyleSpans(StyleSpans<Collection<String>> style) {
     codeArea.setStyleSpans(0, style);
   }
 
   public CodeArea getCodeArea() {
     return codeArea;
+  }
+
+  public void setShowLineNumbers(Boolean showLineNumbers) {
+    if (showLineNumbers) {
+      codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+    } else {
+      codeArea.setParagraphGraphicFactory(null);
+    }
   }
 }

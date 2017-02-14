@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
+import edu.kit.iti.formal.stvs.view.spec.variables.clipboard.Json;
 
 import java.util.Optional;
 
@@ -27,12 +28,16 @@ public class HybridSpecification extends ConstraintSpecification {
    */
   private Selection selection;
 
+  public HybridSpecification(FreeVariableList freeVariableList, boolean editable) {
+    this(DEFAULT_NAME, freeVariableList, editable);
+  }
+
   /**
    * Constructor for an "empty" HybridSpecification that contains no cells.
    * @param editable Is this HybridSpecification supposed to be editable?
    */
-  public HybridSpecification(FreeVariableList freeVariableList, boolean editable) {
-    super(freeVariableList);
+  public HybridSpecification(String name, FreeVariableList freeVariableList, boolean editable) {
+    super(name, freeVariableList);
     this.editable = editable;
     this.selection = new Selection();
     this.counterExample = new NullableProperty<>();
@@ -40,7 +45,7 @@ public class HybridSpecification extends ConstraintSpecification {
   }
 
   public HybridSpecification(ConstraintSpecification sourceSpec, boolean editable) {
-    this(sourceSpec.getFreeVariableList(), editable);
+    this(sourceSpec.getName(), sourceSpec.getFreeVariableList(), editable);
     getColumnHeaders().addAll(sourceSpec.getColumnHeaders());
     getRows().addAll(sourceSpec.getRows());
     getDurations().addAll(sourceSpec.getDurations());

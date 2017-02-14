@@ -2,6 +2,8 @@ package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.model.common.Named;
 import javafx.beans.Observable;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -21,13 +23,24 @@ import java.util.stream.Collectors;
  */
 public class SpecificationTable<H extends Named, C, D> {
 
+  protected final static String DEFAULT_NAME = "Unnamed Specification";
+
   protected ObservableList<H> columnHeaders;
   protected ObservableList<SpecificationRow<C>> rows;
   protected ObservableList<D> durations;
+  private StringProperty name;
 
   public SpecificationTable(
       Callback<H, Observable[]> columnHeaderExtractor,
       Callback<D, Observable[]> durationExtractor) {
+    this(DEFAULT_NAME, columnHeaderExtractor, durationExtractor);
+  }
+
+  public SpecificationTable(
+      String name,
+      Callback<H, Observable[]> columnHeaderExtractor,
+      Callback<D, Observable[]> durationExtractor) {
+    this.name = new SimpleStringProperty(name);
     this.rows = FXCollections.observableArrayList(
         specificationRow -> new Observable[] { specificationRow });
     this.durations = FXCollections.observableArrayList(durationExtractor);
@@ -212,4 +225,15 @@ public class SpecificationTable<H extends Named, C, D> {
             isEquals();
   }
 
+  public String getName() {
+    return name.get();
+  }
+
+  public StringProperty nameProperty() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name.set(name);
+  }
 }

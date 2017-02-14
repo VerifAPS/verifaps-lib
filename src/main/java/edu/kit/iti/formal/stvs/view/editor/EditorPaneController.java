@@ -8,6 +8,8 @@ import edu.kit.iti.formal.stvs.model.code.SyntaxError;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import org.antlr.v4.runtime.Token;
@@ -36,7 +38,7 @@ public class EditorPaneController implements Controller {
     this.code = code;
     this.view = new EditorPane(code.getSourcecode(), code.syntaxErrorsProperty());
     this.globalConfig = globalConfig;
-
+    this.globalConfig.showLineNumbersProperty().addListener(new ShowLineNumbersListener());
     this.view.getStylesheets().add(
         EditorPane.class.getResource("st-keywords.css").toExternalForm());
     this.executor = Executors.newSingleThreadExecutor();
@@ -180,5 +182,13 @@ public class EditorPaneController implements Controller {
   @Override
   public EditorPane getView() {
     return view;
+  }
+
+  private class ShowLineNumbersListener implements javafx.beans.value.ChangeListener<Boolean> {
+    @Override
+    public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue,
+                        Boolean newValue) {
+      view.setShowLineNumbers(newValue);
+    }
   }
 }
