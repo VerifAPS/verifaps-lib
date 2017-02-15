@@ -25,15 +25,27 @@ import java.util.stream.Collectors;
  * Created by leonk on 09.02.2017.
  */
 public class Z3Solver {
-  //TODO: Better way to call z3 than forcing it to be in PATH
-  private static String z3PATH = "z3";
 
-  private static ProcessOutputAsyncTask concretize(String smtString, Consumer<Optional<String>> handler) {
-    ProcessBuilder processBuilder = new ProcessBuilder(z3PATH, "-in");
+  private String z3Path;
+
+  public Z3Solver(String z3Path) {
+    this.z3Path = z3Path;
+  }
+
+  public String getZ3Path() {
+    return z3Path;
+  }
+
+  public void setZ3Path(String z3Path) {
+    this.z3Path = z3Path;
+  }
+
+  private ProcessOutputAsyncTask concretize(String smtString, Consumer<Optional<String>> handler) {
+    ProcessBuilder processBuilder = new ProcessBuilder(z3Path, "-in");
     return new ProcessOutputAsyncTask(processBuilder, smtString, handler);
   }
 
-  private static ProcessOutputAsyncTask concretizeSExpr(String smtString, Consumer<Optional<SExpr>> handler) {
+  private ProcessOutputAsyncTask concretizeSExpr(String smtString, Consumer<Optional<SExpr>> handler) {
     return concretize(smtString, stringOptional -> {
       if (stringOptional.isPresent()) {
         String output = stringOptional.get();
@@ -45,7 +57,7 @@ public class Z3Solver {
     });
   }
 
-  private static ProcessOutputAsyncTask concretizeSmtString(String smtString, List<ValidIoVariable> validIoVariables,
+  private ProcessOutputAsyncTask concretizeSmtString(String smtString, List<ValidIoVariable> validIoVariables,
                                                             Consumer<Optional<ConcreteSpecification>> handler) {
     return concretizeSExpr(smtString, sexpOptional -> {
       Map<String, Type> typeContext = validIoVariables.stream().collect(Collectors.toMap(
@@ -66,7 +78,7 @@ public class Z3Solver {
     });
   }
 
-  private static List<SpecificationRow<ConcreteCell>> buildSpecificationRows(List<ValidIoVariable> validIoVariables,
+  private List<SpecificationRow<ConcreteCell>> buildSpecificationRows(List<ValidIoVariable> validIoVariables,
                                                                              List<ConcreteDuration> durations,
                                                                              Map<Integer, Map<String, String>> rawRows) {
     List<SpecificationRow<ConcreteCell>> specificationRows = new ArrayList<>();
@@ -99,7 +111,7 @@ public class Z3Solver {
     return specificationRows;
   }
 
-  private static Map<Integer, Map<String, String>> extractRawRows(Sexp sExpr, List<ConcreteDuration> durations) {
+  private Map<Integer, Map<String, String>> extractRawRows(Sexp sExpr, List<ConcreteDuration> durations) {
     Map<Integer, Map<String, String>> rawRows = new HashMap<>();
     sExpr.forEach(varAsign -> {
       if (varAsign.getLength() == 0 || !varAsign.get(0).toIndentedString().equals("define-fun")) return;
@@ -121,7 +133,7 @@ public class Z3Solver {
     return rawRows;
   }
 
-  private static List<ConcreteDuration> buildConcreteDurations(Map<Integer, Integer> rawDurations) {
+  private List<ConcreteDuration> buildConcreteDurations(Map<Integer, Integer> rawDurations) {
     List<ConcreteDuration> durations = new ArrayList<>();
     int aggregator = 0;
     for (int i = 0; i < rawDurations.size(); i++) {
@@ -132,7 +144,7 @@ public class Z3Solver {
     return durations;
   }
 
-  private static Map<Integer, Integer> extractRawDurations(Sexp sExpr) {
+  private Map<Integer, Integer> extractRawDurations(Sexp sExpr) {
     Map<Integer, Integer> rawDurations = new HashMap<>();
     sExpr.forEach(varAsign -> {
       if (varAsign.getLength() == 0 || !varAsign.get(0).toIndentedString().equals("define-fun")) return;
@@ -145,7 +157,7 @@ public class Z3Solver {
     return rawDurations;
   }
 
-  public static ProcessOutputAsyncTask concretizeSConstraint(SConstraint sConstraint,
+  public ProcessOutputAsyncTask concretizeSConstraint(SConstraint sConstraint,
                                                              List<ValidIoVariable> validIoVariables,
                                                              Consumer<Optional<ConcreteSpecification>> handler) {
     String constraintString = sConstraint.globalConstraintsToText();
