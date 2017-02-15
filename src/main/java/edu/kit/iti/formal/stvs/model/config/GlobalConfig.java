@@ -51,6 +51,22 @@ public class GlobalConfig {
     getetaFilename = new SimpleStringProperty(System.getProperty("user.home"));
   }
 
+  public void setAll(GlobalConfig toBeCopied) {
+    verificationTimeout.set(toBeCopied.getVerificationTimeout());
+    simulationTimeout.set(toBeCopied.getSimulationTimeout());
+    windowHeight.set(toBeCopied.getWindowHeight());
+    windowWidth.set(toBeCopied.getWindowWidth());
+    editorFontSize.set(toBeCopied.getEditorFontSize());
+    maxLineRollout.set(toBeCopied.getMaxLineRollout());
+    editorFontFamily.set(toBeCopied.getEditorFontFamily());
+    showLineNumbers.set(toBeCopied.getShowLineNumbers());
+    uiLanguage.set(toBeCopied.getUiLanguage());
+    nuxmvFilename.set(toBeCopied.getNuxmvFilename());
+    javaPath.set(toBeCopied.getJavaPath());
+    z3Path.set(toBeCopied.getZ3Path());
+    getetaFilename.set(toBeCopied.getGetetaFilename());
+  }
+
   /**
    * Get the current verification timeout
    *
