@@ -7,7 +7,6 @@ import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
-import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
@@ -123,17 +122,14 @@ public class StvsMenuBarController implements Controller {
       return;
     }
     try {
-      ImporterFacade.importFile(chosenFile, (hybridSpecification) -> {
+      ImporterFacade.importFile(chosenFile, rootModel.get().getGlobalConfig(), (hybridSpecification) -> {
         //handle hybridspecification
         rootModel.get().getHybridSpecifications().add(hybridSpecification);
       }, (rootModel) -> {
         //handle rootModel
         this.rootModel.setValue(rootModel);
-      }, (verificationScenario) -> {
-        // handle verification scenario
-        this.rootModel.get().setScenario(verificationScenario);
       });
-    } catch (IOException e) {
+    } catch (IOException|ImportException e) {
       new ErrorMessageDialog(e);
     }
   }
