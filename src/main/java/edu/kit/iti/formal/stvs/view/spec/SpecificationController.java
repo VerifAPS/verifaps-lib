@@ -16,6 +16,7 @@ import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionCo
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -48,6 +49,7 @@ public class SpecificationController implements Controller {
       ObjectProperty<List<CodeIoVariable>> codeIoVariables,
       HybridSpecification hybridSpecification,
       ObjectProperty<VerificationState> stateProperty,
+      BooleanBinding codeInvalid,
       GlobalConfig globalConfig) {
     this.spec = hybridSpecification;
     this.hybridSpecification = hybridSpecification;
@@ -65,9 +67,10 @@ public class SpecificationController implements Controller {
         variableCollectionController.getValidator().validFreeVariablesProperty(),
         hybridSpecification);
     this.specificationInvalid = new SimpleBooleanProperty(true);
-    specificationInvalid.bind(Bindings.or(
-        Bindings.not(variableCollectionController.getValidator().validProperty()),
-        Bindings.not(tableController.getValidator().validProperty())));
+    specificationInvalid.bind(
+        variableCollectionController.getValidator().validProperty().not()
+        .or(tableController.getValidator().validProperty().not())
+        .or(codeInvalid));
 
     //use event trigger to generate timing-diagram, to minimize code-duplication
     onConcreteInstanceChanged(getConcreteSpecification());
@@ -108,7 +111,7 @@ public class SpecificationController implements Controller {
           });
         }, exception -> {
           Platform.runLater(() -> {
-            new ErrorMessageDialog(exception, "Concretization failed", "An Error occurred while "
+            new ErrorMessageDialog(exception, "Concretizing failed", "An Error occurred while "
                 + "concretizing the specification");
           });
         });
