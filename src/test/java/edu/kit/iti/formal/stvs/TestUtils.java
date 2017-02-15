@@ -27,20 +27,6 @@ import java.util.stream.Collectors;
  * Created by bal on 10.02.17.
  */
 public class TestUtils {
-  /**
-   *
-   * @return The user's config or null if config does not exist
-   */
-  public static GlobalConfig getUserConfig() throws UnknownHostException, ImportException {
-    String configFilename = "/userConfigs/" + InetAddress.getLocalHost()
-        .getHostName() + ".xml";
-    InputStream userConfig = TestUtils.class.getResourceAsStream(configFilename);
-    if (userConfig != null) {
-      return ImporterFacade.importConfig(userConfig, ImporterFacade.ImportFormat.XML);
-    } else {
-      return null;
-    }
-  }
 
   public static ValidSpecification importValidSpec(InputStream source, TypeEnum... enumTypes) {
     List<Type> typeContext = new ArrayList<>();

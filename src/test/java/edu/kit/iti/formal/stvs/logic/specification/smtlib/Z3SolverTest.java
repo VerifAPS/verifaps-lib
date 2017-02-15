@@ -14,6 +14,7 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
+import edu.kit.iti.formal.stvs.view.StvsMainScene;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import org.junit.Test;
@@ -28,9 +29,9 @@ import java.util.*;
 public class Z3SolverTest {
 
   private List<ValidFreeVariable> freeVariables;
-  private final Z3Solver solver = new Z3Solver(TestUtils.getUserConfig().getZ3Path());
+  private final Z3Solver solver = new Z3Solver(StvsMainScene.autoloadConfig().getZ3Path());
 
-  public Z3SolverTest() throws ImportException, UnknownHostException {
+  public Z3SolverTest() throws ImportException {
   }
 
   private ValidSpecification importSpec(String name) throws

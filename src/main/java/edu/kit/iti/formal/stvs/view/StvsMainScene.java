@@ -26,8 +26,8 @@ import java.io.IOException;
  */
 public class StvsMainScene {
 
-  private final String AUTOLOAD_CONFIG_FILENAME = "stvs-config.xml";
-  private final String CONFIG_DIRNAME = ".config";
+  private static final String AUTOLOAD_CONFIG_FILENAME = "stvs-config.xml";
+  private static final String CONFIG_DIRNAME = ".config";
   private StvsMenuBarController menuBarController;
   private StvsRootController rootController;
   private ObjectProperty<StvsRootModel> rootModelProperty;
@@ -50,7 +50,7 @@ public class StvsMainScene {
     this.scene = new Scene(createVBox());
   }
 
-  private GlobalConfig autoloadConfig() {
+  public static GlobalConfig autoloadConfig() {
     String userHome = System.getProperty("user.home");
     String configDirPath = userHome + File.separator + CONFIG_DIRNAME;
     File configFile = new File(configDirPath + File.separator + AUTOLOAD_CONFIG_FILENAME);
