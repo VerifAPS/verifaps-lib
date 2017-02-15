@@ -127,8 +127,8 @@ public class ImporterFacade {
    * @param rootModelConsumer     consumer of the file (if the file is a Session)
    */
   public static void importFile(File file, GlobalConfig globalConfig, Consumer<HybridSpecification>
-      specificationConsumer, Consumer<StvsRootModel> rootModelConsumer) throws
-      IOException, ImportException {
+      specificationConsumer, Consumer<StvsRootModel> rootModelConsumer, Consumer<Code> codeConsumer) throws
+      IOException {
     StringWriter writer = new StringWriter();
     byte[] byteArray = IOUtils.toByteArray(new FileInputStream(file));
     IOUtils.copy(new ByteArrayInputStream(byteArray), writer, "utf8");
@@ -143,17 +143,19 @@ public class ImporterFacade {
         switch (rootNode.getNodeName()) {
           case "session":
             rootModelConsumer.accept(importSession(file, ImportFormat.XML, globalConfig));
-            break;
+            return;
           case "specification":
             specificationConsumer.accept(importHybridSpec(file, ImportFormat.XML));
-            break;
+            return;
           default:
-            throw new ImportException("The specified file does not contain expected data.");
+            codeConsumer.accept(importStCode(file));
+            return;
         }
       }
-    } catch (SAXException | ParserConfigurationException e) {
-      throw new ImportException(e);
+    } catch (SAXException | ParserConfigurationException | ImportException e) {
+      //ignore, because it might have been code
     }
+    codeConsumer.accept(importStCode(file));
   }
 
 }
