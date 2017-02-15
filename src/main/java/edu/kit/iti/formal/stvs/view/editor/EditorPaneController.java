@@ -9,9 +9,11 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.scene.text.Font;
 import org.antlr.v4.runtime.Token;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.StyleSpans;
@@ -44,7 +46,18 @@ public class EditorPaneController implements Controller {
     this.executor = Executors.newSingleThreadExecutor();
     configureTextArea();
     handleTextChange(computeHighlighting(code.getSourcecode()));
+    this.globalConfig.editorFontSizeProperty().addListener((observable, oldValue, newValue) -> updateFontSize(newValue.intValue()));
+    this.globalConfig.editorFontFamilyProperty().addListener((observable, oldValue, newValue) -> updateFontFamily(newValue));
   }
+
+  private void updateFontFamily(String fontFamily) {
+    view.getCodeArea().setStyle("-fx-font-family: " + fontFamily + ";" + "-fx-font-size: " + globalConfig.editorFontSizeProperty().get() + "pt;");
+  }
+
+  private void updateFontSize(int size) {
+    view.getCodeArea().setStyle("-fx-font-family: " + globalConfig.editorFontFamilyProperty().get() + ";" + "-fx-font-size: " + size + "pt;");
+  }
+
 
   private void configureTextArea() {
     CodeArea codeArea = view.getCodeArea();
