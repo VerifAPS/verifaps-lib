@@ -1,18 +1,19 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
+import edu.kit.iti.formal.stvs.ViewUtils;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
-import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
 import javafx.beans.property.ObjectProperty;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -121,17 +122,14 @@ public class StvsMenuBarController implements Controller {
       return;
     }
     try {
-      ImporterFacade.importFile(chosenFile, (hybridSpecification) -> {
+      ImporterFacade.importFile(chosenFile, rootModel.get().getGlobalConfig(), (hybridSpecification) -> {
         //handle hybridspecification
         rootModel.get().getHybridSpecifications().add(hybridSpecification);
       }, (rootModel) -> {
         //handle rootModel
         this.rootModel.setValue(rootModel);
-      }, (verificationScenario) -> {
-        // handle verification scenario
-        this.rootModel.get().setScenario(verificationScenario);
       });
-    } catch (IOException e) {
+    } catch (IOException|ImportException e) {
       new ErrorMessageDialog(e);
     }
   }
@@ -176,7 +174,11 @@ public class StvsMenuBarController implements Controller {
   private void saveSpec(ActionEvent t) {
     try {
       ConstraintSpecification spec = rootModel.get().getScenario().getActiveSpec();
-      ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.XML);
+      if (spec == null) { // There is no active specification tab open yet
+        ViewUtils.showDialog(Alert.AlertType.ERROR, "Save Specification", "No Specification available.", "");
+      } else {
+        ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.XML);
+      }
     } catch(ExportException e) {
       new ErrorMessageDialog(e);
     }

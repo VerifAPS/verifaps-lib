@@ -6,6 +6,7 @@ import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
@@ -25,22 +26,17 @@ import java.util.List;
 public class GeTeTaVerificationEngine implements VerificationEngine {
   private Process getetaProcess;
   private NullableProperty<VerificationResult> verificationResult;
-  private String getetaFilename;
-  private String nuxmvFilename;
   private List<Type> typeContext;
+  private GlobalConfig config;
 
-  public GeTeTaVerificationEngine(String getetaFilename, String nuxmvFilename, List<Type> typeContext) throws VerificationException {
+  public GeTeTaVerificationEngine(GlobalConfig config, List<Type> typeContext) throws
+      VerificationException {
     verificationResult = new NullableProperty<>();
     getetaProcess = null;
-    this.getetaFilename = getetaFilename;
-    this.nuxmvFilename = nuxmvFilename;
     this.typeContext = typeContext;
+    this.config = config;
     /* Check filenames */
-    File getetaFile = new File(getetaFilename);
-    File nuxmvFile = new File(nuxmvFilename);
-    if (!getetaFile.exists() || getetaFile.isDirectory()) {
-      throw new VerificationException(VerificationException.Reason.GETETA_NOT_FOUND);
-    }
+    File nuxmvFile = new File(config.getNuxmvFilename());
     if (!nuxmvFile.exists() || nuxmvFile.isDirectory()) {
       throw new VerificationException(VerificationException.Reason.NUXMV_NOT_FOUND);
     }
@@ -57,14 +53,14 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     File tempCodeFile = File.createTempFile("verification-code", ".st");
     ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.GETETA, tempSpecFile);
     ExporterFacade.exportCode(scenario.getCode(), tempCodeFile, true);
+    String getetaCommand = config.getGetetaCommand().replace("${code}", tempCodeFile
+        .getAbsolutePath()).replace("${spec}", tempSpecFile.getAbsolutePath());
     // Start verification engine in new child process
-    String getetaCommand = "java -jar " + getetaFilename + " -c " + tempCodeFile.getAbsolutePath() + " -t " +
-        tempSpecFile.getAbsolutePath() + " -x";
     if (getetaProcess != null) {
       cancelVerification();
     }
     ProcessBuilder processBuilder = new ProcessBuilder(getetaCommand.split(" "));
-    processBuilder.environment().put("NUXMV", nuxmvFilename);
+    processBuilder.environment().put("NUXMV", config.getNuxmvFilename());
     getetaProcess = processBuilder.start();
     // Find out when process finishes to set verification result property
     ProcessExitDetector exitDetector = new ProcessExitDetector(getetaProcess);

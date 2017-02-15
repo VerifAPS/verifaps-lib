@@ -51,8 +51,7 @@ public class TimingDiagramCollectionView extends VBox {
     });
     //diagramContainer.getStyleClass().add("diagramContainer");
     axisDiagramContainer.setDividerPosition(0,0.1);
-    xAxis.setAnimated(false);
-    //xAxis.setMinHeight(30);
+    xAxis.getStyleClass().add("globalXAxis");
     globalAxisContainer.setMinHeight(30);
     scrollPane.getStyleClass().add("noborder-scroll-pane");
     labelContainer.getStyleClass().add("labelContainer");

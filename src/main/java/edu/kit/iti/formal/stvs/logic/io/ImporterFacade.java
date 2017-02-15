@@ -11,9 +11,22 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
-import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
+import org.apache.commons.io.IOUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
-import java.io.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -109,16 +122,38 @@ public class ImporterFacade {
    * imports a file with unknown type
    *
    * @param file                  file to open
+   * @param globalConfig          current global config
    * @param specificationConsumer consumer of the file (if the file is a Specification)
-   * @param rootModelConsumer     consumer of the file (if the file is a rootModel)
-   * @param scenarioConsumer      consumer of the file (if the file is a scenario)
-   * @throws IOException exception while reading a file
+   * @param rootModelConsumer     consumer of the file (if the file is a Session)
    */
-  public static void importFile(File file, Consumer<HybridSpecification>
-      specificationConsumer, Consumer<StvsRootModel> rootModelConsumer,
-                                Consumer<VerificationScenario> scenarioConsumer) throws
-      IOException {
-    // TODO: implement
+  public static void importFile(File file, GlobalConfig globalConfig, Consumer<HybridSpecification>
+      specificationConsumer, Consumer<StvsRootModel> rootModelConsumer) throws
+      IOException, ImportException {
+    StringWriter writer = new StringWriter();
+    byte[] byteArray = IOUtils.toByteArray(new FileInputStream(file));
+    IOUtils.copy(new ByteArrayInputStream(byteArray), writer, "utf8");
+    String inputString = writer.toString();
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    dbf.setNamespaceAware(true);
+    try {
+      Document doc = dbf.newDocumentBuilder()
+          .parse(new InputSource(new StringReader(inputString)));
+      if (doc != null && doc.getFirstChild() != null) {
+        Node rootNode = doc.getFirstChild();
+        switch (rootNode.getNodeName()) {
+          case "session":
+            rootModelConsumer.accept(importSession(file, ImportFormat.XML, globalConfig));
+            break;
+          case "specification":
+            specificationConsumer.accept(importHybridSpec(file, ImportFormat.XML));
+            break;
+          default:
+            throw new ImportException("The specified file does not contain expected data.");
+        }
+      }
+    } catch (SAXException | ParserConfigurationException e) {
+      throw new ImportException(e);
+    }
   }
 
 }

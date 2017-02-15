@@ -40,9 +40,8 @@ public class XmlConfigExporter extends XmlExporter<GlobalConfig> {
     config.setEditor(editor);
     Config.Dependencies deps = objectFactory.createConfigDependencies();
     deps.setZ3Path(source.getZ3Path());
-    deps.setJavaPath(source.getJavaPath());
     deps.setNuxmvFilename(source.getNuxmvFilename());
-    deps.setGetetaFilename(source.getGetetaFilename());
+    deps.setGetetaCommand(source.getGetetaCommand());
     config.setDependencies(deps);
     JAXBElement<Config> element = objectFactory.createConfig(config);
     return marshalToNode(element);
