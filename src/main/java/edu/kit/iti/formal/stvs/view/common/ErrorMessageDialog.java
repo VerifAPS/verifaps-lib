@@ -57,5 +57,7 @@ public class ErrorMessageDialog {
     alert.getDialogPane().setExpandableContent(expContent);
 
     alert.showAndWait();
+    System.err.println(exception.toString());
+    exception.printStackTrace();
   }
 }

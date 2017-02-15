@@ -2,11 +2,13 @@ package edu.kit.iti.formal.stvs.view.menu;
 
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -48,8 +50,6 @@ public class ConfigDialogManager implements Controller {
     view.uiLanguage.setItems(FXCollections.observableList(config.getValidLanguages()));
     bind(view.verificationTimeout.textProperty(), config.verificationTimeoutProperty());
     bind(view.simulationTimeout.textProperty(),   config.simulationTimeoutProperty());
-    bind(view.windowHeight.textProperty(),        config.windowHeightProperty());
-    bind(view.windowWidth.textProperty(),         config.windowWidthProperty());
     bind(view.editorFontFamily.textProperty(),    config.editorFontFamilyProperty());
     bind(view.editorFontSize.textProperty(),      config.editorFontSizeProperty());
     bind(view.showLineNumbers.selectedProperty(), config.showLineNumbersProperty());
@@ -60,20 +60,29 @@ public class ConfigDialogManager implements Controller {
     bind(view.javaPath.textProperty(),            config.javaPathProperty());
     bind(view.getetaFilename.textProperty(),      config.getetaFilenameProperty());
 
+    BooleanBinding dialogValid = view.verificationTimeout.validProperty()
+        .and(view.simulationTimeout.validProperty())
+        .and(view.editorFontSize.validProperty())
+        .and(view.maxLineRollout.validProperty());
+
+    Node button = view.lookupButton(view.okButtonType);
+    button.disableProperty().bind(dialogValid.not());
+
     dialog.setDialogPane(view);
     dialog.setResultConverter(buttonType -> {
-      if (buttonType != ButtonType.OK) {
+      if (buttonType != view.okButtonType) {
+        return null;
+      }
+      if (!dialogValid.get()) {
         return null;
       }
       config.setEditorFontFamily(view.editorFontFamily.getText());
-      config.setEditorFontSize(Integer.valueOf(view.editorFontSize.getText()));
+      config.setEditorFontSize(view.editorFontSize.getInteger().get());
       config.setShowLineNumbers(view.showLineNumbers.isSelected());
-      config.setSimulationTimeout(Integer.valueOf(view.simulationTimeout.getText()));
-      config.setVerificationTimeout(Integer.valueOf(view.verificationTimeout.getText()));
+      config.setSimulationTimeout(view.simulationTimeout.getInteger().get());
+      config.setVerificationTimeout(view.verificationTimeout.getInteger().get());
       config.setUiLanguage(view.uiLanguage.valueProperty().get());
-      config.setWindowHeight(Integer.valueOf(view.windowHeight.getText()));
-      config.setWindowWidth(Integer.valueOf(view.windowWidth.getText()));
-      config.setMaxLineRollout(Integer.valueOf(view.maxLineRollout.getText()));
+      config.setMaxLineRollout(view.maxLineRollout.getInteger().get());
       config.setNuxmvFilename(view.nuxmvFilename.getText());
       config.setZ3Path(view.z3Path.getText());
       config.setJavaPath(view.javaPath.getText());

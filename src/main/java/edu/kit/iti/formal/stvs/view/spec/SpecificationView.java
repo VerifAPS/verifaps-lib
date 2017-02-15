@@ -7,8 +7,6 @@ import edu.kit.iti.formal.stvs.view.spec.table.SynchronizedRow;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionView;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollection;
 import javafx.beans.property.BooleanProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;

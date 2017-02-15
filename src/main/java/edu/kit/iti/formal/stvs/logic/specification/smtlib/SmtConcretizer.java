@@ -17,9 +17,11 @@ import java.util.function.Consumer;
 public class SmtConcretizer implements SpecificationConcretizer {
   private final GlobalConfig config;
   private ProcessOutputAsyncTask task;
+  private Z3Solver z3Solver;
 
   public SmtConcretizer(GlobalConfig config) {
     this.config = config;
+    this.z3Solver = new Z3Solver(config.getZ3Path());
   }
 
   @Override
@@ -29,7 +31,7 @@ public class SmtConcretizer implements SpecificationConcretizer {
                                              Consumer<Throwable> exceptionHandler) {
     SmtEncoder encoder = new SmtEncoder((i) -> config.getMaxLineRollout(), validSpecification,
         freeVariables);
-    this.task = Z3Solver.concretizeSConstraint(encoder.getConstrain(), validSpecification.getColumnHeaders(), consumer);
+    this.task = z3Solver.concretizeSConstraint(encoder.getConstrain(), validSpecification.getColumnHeaders(), consumer);
     Thread.UncaughtExceptionHandler handler = (t, exception) -> {
       exceptionHandler.accept(exception);
     };
