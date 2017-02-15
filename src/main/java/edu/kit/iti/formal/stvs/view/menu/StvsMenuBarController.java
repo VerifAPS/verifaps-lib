@@ -143,7 +143,7 @@ public class StvsMenuBarController implements Controller {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Save session");
     fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
-    File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
+    File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
     if (chosenFile != null) {
       try {
         ExporterFacade.exportSession(rootModel.get(), ExporterFacade.ExportFormat
