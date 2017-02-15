@@ -149,12 +149,12 @@ public class StvsRootController implements Controller {
       ViewUtils.showDialog(Alert.AlertType.ERROR, "Verification Error", "Verification " +
           "result is null", "");
     }
-    String alertBody = "See the log at " + res.getLogFilePath();
+    String alertBody = "See the log at " + res.getLogFilePath() + ".";
     String logFileContents = "";
     try {
       logFileContents = new String(Files.readAllBytes(Paths.get(res.getLogFilePath())), "utf-8");
     } catch (IOException e) {
-      ViewUtils.showDialog(Alert.AlertType.ERROR, "Logging error", "Could not write log file",
+      ViewUtils.showDialog(Alert.AlertType.ERROR, "Logging Error", "Could not write log file",
           "There was an error writing the log file " + res.getLogFilePath(), e.getStackTrace().toString());
       return;
     }
@@ -170,20 +170,20 @@ public class StvsRootController implements Controller {
         specificationsPaneController.addTab(readOnlySpec);
         break;
       case VERIFIED:
-        ViewUtils.showDialog(Alert.AlertType.INFORMATION, "Verification successful",
-            "Verification successful", alertBody, logFileContents);
+        ViewUtils.showDialog(Alert.AlertType.INFORMATION, "Verification Successful",
+            "The verification completed successfully", alertBody, logFileContents);
         break;
       case ERROR:
-        ViewUtils.showDialog(Alert.AlertType.ERROR, "Verification error",
-            "Verification error", alertBody, logFileContents);
+        ViewUtils.showDialog(Alert.AlertType.ERROR, "Verification Error",
+            "An error occurred during verification.", alertBody, logFileContents);
         break;
       case FATAL:
-        ViewUtils.showDialog(Alert.AlertType.ERROR, "Verification error", "Fatal verification " +
-            "error", alertBody, logFileContents);
+        ViewUtils.showDialog(Alert.AlertType.ERROR, "Verification Error", "A fatal " +
+            "error occurred during verification.", alertBody, logFileContents);
         break;
       case UNKNOWN:
-        ViewUtils.showDialog(Alert.AlertType.ERROR, "Unknown error", "Unknown verification " +
-            "error", alertBody, logFileContents);
+        ViewUtils.showDialog(Alert.AlertType.ERROR, "Unknown Error", "An unknown error " +
+            "occurred during verification.", alertBody, logFileContents);
     }
   }
 }

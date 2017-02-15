@@ -5,6 +5,7 @@ import edu.kit.iti.formal.stvs.view.common.IntegerInputField;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 
 /**
  * Created by csicar on 11.01.17.
@@ -42,7 +43,7 @@ public class ConfigDialogPane extends DialogPane {
     GridPane grid = new GridPane();
     grid.setHgap(10);
     grid.setVgap(10);
-    grid.setPadding(new Insets(20, 150, 10, 10));
+    grid.setPadding(new Insets(20, 10, 10, 10));
 
     grid.add(new Label("Verification Timeout"), 0, 0);
     grid.add(verificationTimeout, 1, 0);
@@ -72,8 +73,10 @@ public class ConfigDialogPane extends DialogPane {
 
     grid.add(new Label("GeTeTa Command"), 0, 9);
     grid.add(getetaCommand, 1, 9);
-    grid.add(new Label("Use ${code} and ${spec} for code and specification filename substitution" +
-        "."), 0, 10);
+    Text getetaCommandDescription = new Text("Use ${code} and ${spec} for code and specification" +
+        " filename substitution.");
+    getetaCommandDescription.setStyle("-fx-font-style: italic");
+    grid.add(getetaCommandDescription, 0, 10, 2, 1);
 
     grid.add(new Label("Maximum Number of Rollouts per Line"), 0, 11);
     grid.add(maxLineRollout, 1, 11);

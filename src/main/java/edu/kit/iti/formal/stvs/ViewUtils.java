@@ -3,6 +3,9 @@ package edu.kit.iti.formal.stvs;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 
@@ -32,7 +35,16 @@ public class ViewUtils {
     Alert alert = new Alert(type);
     alert.setTitle(title);
     alert.setHeaderText(headerText);
-    alert.getDialogPane().setContent( new Label(contentText));
+    alert.getDialogPane().setContent( new Label(contentText + "\n"));
+
+    TextArea textArea = new TextArea(expandableContent);
+    textArea.setEditable(false);
+    textArea.setWrapText(true);
+
+    textArea.setMaxWidth(Double.MAX_VALUE);
+    textArea.setMaxHeight(Double.MAX_VALUE);
+
+    alert.getDialogPane().setExpandableContent(textArea);
     alert.showAndWait();
   }
 
