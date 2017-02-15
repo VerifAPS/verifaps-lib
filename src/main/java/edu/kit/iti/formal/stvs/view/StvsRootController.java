@@ -15,9 +15,11 @@ import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.view.editor.EditorPaneController;
 import edu.kit.iti.formal.stvs.view.spec.SpecificationsPaneController;
 import edu.kit.iti.formal.stvs.view.spec.VerificationEvent;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 
 import java.io.IOException;
@@ -47,11 +49,13 @@ public class StvsRootController implements Controller {
 
     this.types = new SimpleObjectProperty<>(typesFromCode(stvsRootModel.getScenario().getCode().getParsedCode()));
     this.ioVars = new SimpleObjectProperty<>(ioVarsFromCode(stvsRootModel.getScenario().getCode().getParsedCode()));
+    ObservableList<?> syntaxErrors = stvsRootModel.getScenario().getCode().syntaxErrorsProperty();
     this.specificationsPaneController = new SpecificationsPaneController(
         stvsRootModel.getHybridSpecifications(),
         stvsRootModel.getScenario().verificationState(),
         types,
         ioVars,
+        Bindings.isEmpty(syntaxErrors).not(),
         stvsRootModel.getGlobalConfig()
     );
 

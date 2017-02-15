@@ -7,6 +7,8 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -28,15 +30,18 @@ public class SpecificationsPaneController implements Controller {
   private ObjectProperty<List<Type>> typeContext;
   private ObjectProperty<List<CodeIoVariable>> ioVariables;
   private final Map<Tab, SpecificationController> controllers;
+  private final BooleanBinding codeInvalid;
 
   public SpecificationsPaneController(
       ObservableList<HybridSpecification> hybridSpecifications,
       ObjectProperty<VerificationState> state,
       ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> ioVariables,
+      BooleanBinding codeInvalid,
       GlobalConfig globalConfig) {
     this.view = new SpecificationsPane();
     this.globalConfig = globalConfig;
+    this.codeInvalid = codeInvalid;
     this.state = state;
     this.controllers = new HashMap<>();
     this.typeContext = typeContext;
@@ -66,7 +71,7 @@ public class SpecificationsPaneController implements Controller {
 
   private SpecificationController addTab(HybridSpecification hybridSpecification, int index) {
     SpecificationController controller = new SpecificationController(
-        typeContext, ioVariables, hybridSpecification, this.state, globalConfig);
+        typeContext, ioVariables, hybridSpecification, this.state, codeInvalid, globalConfig);
     Tab tab = new Tab();
     String editable = hybridSpecification.isEditable() ? "" : " [locked]";
     tab.setText(hybridSpecification.getName() + editable);

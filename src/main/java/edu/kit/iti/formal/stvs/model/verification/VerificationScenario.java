@@ -39,7 +39,6 @@ public class VerificationScenario {
       String getetaFilename,
       String nuxmvFilename,
       ConstraintSpecification spec) throws IOException, ExportException, VerificationException {
-    // TODO: Parsed code might be null!!!
     currentSpec = spec;
     verificationEngine = new GeTeTaVerificationEngine(
         getetaFilename,
