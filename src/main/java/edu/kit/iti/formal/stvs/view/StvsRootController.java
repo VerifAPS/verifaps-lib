@@ -52,7 +52,8 @@ public class StvsRootController implements Controller {
         stvsRootModel.getScenario().verificationState(),
         types,
         ioVars,
-        stvsRootModel.getGlobalConfig()
+        stvsRootModel.getGlobalConfig(),
+        stvsRootModel.getScenario()
     );
 
     this.stvsRootModel.getScenario().codeObjectProperty().addListener(this::onCodeChange);
@@ -154,9 +155,9 @@ public class StvsRootController implements Controller {
         ViewUtils.showDialog(Alert.AlertType.INFORMATION, "Counterexample available",
             "Counterexample available", alertBody);
         // Show read-only copy of spec with counterexample in a new tab
-        assert stvsRootModel.getScenario().getCurrentSpec() != null;
+        assert stvsRootModel.getScenario().getActiveSpec() != null;
         HybridSpecification readOnlySpec = new HybridSpecification(stvsRootModel.getScenario()
-            .getCurrentSpec(), false);
+            .getActiveSpec(), false);
         readOnlySpec.setCounterExample(res.getCounterExample());
         specificationsPaneController.addTab(readOnlySpec);
         break;

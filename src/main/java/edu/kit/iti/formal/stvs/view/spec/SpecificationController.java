@@ -30,7 +30,9 @@ import java.util.List;
 public class SpecificationController implements Controller {
 
   private final GlobalConfig globalConfig;
+
   private HybridSpecification spec;
+
   private ObjectProperty<VerificationState> stateProperty;
   private ContextMenu contextMenu;
   private SpecificationView view;
@@ -41,7 +43,6 @@ public class SpecificationController implements Controller {
   private HybridSpecification hybridSpecification;
   private BooleanProperty specificationInvalid;
   private SpecificationConcretizer concretizer;
-
   public SpecificationController(
       ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> codeIoVariables,
@@ -137,8 +138,8 @@ public class SpecificationController implements Controller {
                         VerificationState oldState, VerificationState newState) {
       onVerificationStateChanged(newState);
     }
-  }
 
+  }
   private void onVerificationStateChanged(VerificationState newState) {
     switch (newState) {
       case RUNNING:
@@ -149,8 +150,9 @@ public class SpecificationController implements Controller {
     }
   }
 
-
   private class VerificationButtonClickedListener implements EventHandler<ActionEvent> {
+
+
     @Override
     public void handle(ActionEvent actionEvent) {
       switch (stateProperty.get()) {
@@ -161,5 +163,8 @@ public class SpecificationController implements Controller {
           view.onVerificationButtonClicked(hybridSpecification, VerificationEvent.Type.START);
       }
     }
+  }
+  public HybridSpecification getSpec() {
+    return spec;
   }
 }

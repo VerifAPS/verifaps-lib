@@ -6,6 +6,8 @@ import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
+import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
@@ -172,9 +174,12 @@ public class StvsMenuBarController implements Controller {
   }
 
   private void saveSpec(ActionEvent t) {
-    // Todo: implement
-
-    HybridSpecification spec = null; // TODO: get the active tab's hybrid-specification
+    try {
+      ConstraintSpecification spec = rootModel.get().getScenario().getActiveSpec();
+      ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.XML);
+    } catch(ExportException e) {
+      new ErrorMessageDialog(e);
+    }
   }
 
 

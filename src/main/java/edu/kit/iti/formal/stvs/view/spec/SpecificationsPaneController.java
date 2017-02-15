@@ -5,8 +5,10 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
+import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -34,7 +36,8 @@ public class SpecificationsPaneController implements Controller {
       ObjectProperty<VerificationState> state,
       ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> ioVariables,
-      GlobalConfig globalConfig) {
+      GlobalConfig globalConfig,
+      VerificationScenario scenario) {
     this.view = new SpecificationsPane();
     this.globalConfig = globalConfig;
     this.state = state;
@@ -48,17 +51,28 @@ public class SpecificationsPaneController implements Controller {
       hybridSpecifications.add(new HybridSpecification(new FreeVariableList(new ArrayList<>()), true));
     });
 
-    hybridSpecifications.addListener(new ListChangeListener<HybridSpecification>() {
-      @Override
-      public void onChanged(Change<? extends HybridSpecification> change) {
-        while(change.next()) {
+    view.getTabPane().getSelectionModel().selectedItemProperty().addListener((obs, old, value)
+        -> {
+      Platform.runLater(() -> {
+        SpecificationController controller = controllers.get(value);
+        if (controller == null) {
+          scenario.setActiveSpec(null);
+        } else {
+          scenario.setActiveSpec(controller.getSpec());
+        }
+        System.out.println(scenario.getActiveSpec());
+      });
 
-          for (HybridSpecification addItem : change.getAddedSubList()) {
-            addTab(addItem);
-          }
-          for (HybridSpecification spec : change.getRemoved()) {
-            removeTab(spec);
-          }
+    });
+
+    hybridSpecifications.addListener((ListChangeListener<HybridSpecification>) change -> {
+      while (change.next()) {
+
+        for (HybridSpecification addItem : change.getAddedSubList()) {
+          addTab(addItem);
+        }
+        for (HybridSpecification spec : change.getRemoved()) {
+          removeTab(spec);
         }
       }
     });
