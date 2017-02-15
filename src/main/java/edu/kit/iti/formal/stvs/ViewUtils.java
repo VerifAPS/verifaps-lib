@@ -28,11 +28,16 @@ public class ViewUtils {
   }
 
   public static void showDialog(Alert.AlertType type, String title, String headerText, String
-      contentText) {
+      contentText, String expandableContent) {
     Alert alert = new Alert(type);
     alert.setTitle(title);
     alert.setHeaderText(headerText);
     alert.getDialogPane().setContent( new Label(contentText));
     alert.showAndWait();
+  }
+
+  public static void showDialog(Alert.AlertType type, String title, String headerText, String
+      contentText) {
+    showDialog(type, title, headerText, contentText, null);
   }
 }
