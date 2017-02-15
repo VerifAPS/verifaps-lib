@@ -15,11 +15,9 @@ import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.view.editor.EditorPaneController;
 import edu.kit.iti.formal.stvs.view.spec.SpecificationsPaneController;
 import edu.kit.iti.formal.stvs.view.spec.VerificationEvent;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 
 import java.io.IOException;
@@ -49,14 +47,13 @@ public class StvsRootController implements Controller {
 
     this.types = new SimpleObjectProperty<>(typesFromCode(stvsRootModel.getScenario().getCode().getParsedCode()));
     this.ioVars = new SimpleObjectProperty<>(ioVarsFromCode(stvsRootModel.getScenario().getCode().getParsedCode()));
-    ObservableList<?> syntaxErrors = stvsRootModel.getScenario().getCode().syntaxErrorsProperty();
     this.specificationsPaneController = new SpecificationsPaneController(
         stvsRootModel.getHybridSpecifications(),
         stvsRootModel.getScenario().verificationState(),
         types,
         ioVars,
-        Bindings.isEmpty(syntaxErrors).not(),
-        stvsRootModel.getGlobalConfig()
+        stvsRootModel.getGlobalConfig(),
+        stvsRootModel.getScenario()
     );
 
     this.stvsRootModel.getScenario().codeObjectProperty().addListener(this::onCodeChange);
@@ -158,9 +155,9 @@ public class StvsRootController implements Controller {
         ViewUtils.showDialog(Alert.AlertType.INFORMATION, "Counterexample available",
             "Counterexample available", alertBody);
         // Show read-only copy of spec with counterexample in a new tab
-        assert stvsRootModel.getScenario().getCurrentSpec() != null;
+        assert stvsRootModel.getScenario().getActiveSpec() != null;
         HybridSpecification readOnlySpec = new HybridSpecification(stvsRootModel.getScenario()
-            .getCurrentSpec(), false);
+            .getActiveSpec(), false);
         readOnlySpec.setCounterExample(res.getCounterExample());
         specificationsPaneController.addTab(readOnlySpec);
         break;

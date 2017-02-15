@@ -22,7 +22,7 @@ public class VerificationScenario {
   private VerificationEngine verificationEngine;
   private ObjectProperty<Code> code;
   private ObjectProperty<VerificationState> verificationState;
-  private ConstraintSpecification currentSpec;
+  private NullableProperty<ConstraintSpecification> activeSpec;
 
   public VerificationScenario() {
     this(new Code());
@@ -32,14 +32,14 @@ public class VerificationScenario {
     this.code = new SimpleObjectProperty<>(code);
     verificationResult = new NullableProperty<>();
     verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
-    currentSpec = null;
+    activeSpec = new NullableProperty<>();
   }
 
   public void verify(
       String getetaFilename,
-      String nuxmvFilename,
+    String nuxmvFilename,
       ConstraintSpecification spec) throws IOException, ExportException, VerificationException {
-    currentSpec = spec;
+    activeSpec.set(spec);
     verificationEngine = new GeTeTaVerificationEngine(
         getetaFilename,
         nuxmvFilename,
@@ -70,8 +70,16 @@ public class VerificationScenario {
 
   }
 
-  public ConstraintSpecification getCurrentSpec() {
-    return currentSpec;
+  public ConstraintSpecification getActiveSpec() {
+    return activeSpec.get();
+  }
+
+  public void setActiveSpec(ConstraintSpecification spec) {
+    activeSpec.set(spec);
+  }
+
+  public NullableProperty<ConstraintSpecification> activeSpecProperty() {
+    return activeSpec;
   }
 
   public ObjectProperty<Code> codeObjectProperty() {
