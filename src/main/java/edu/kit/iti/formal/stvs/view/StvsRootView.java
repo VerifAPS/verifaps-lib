@@ -15,7 +15,6 @@ public class StvsRootView extends SplitPane {
     this.editor = editor;
     this.specifications = specifications;
 
-    this.setStyle("height: 100%;");
 
     this.getItems().addAll(editor, specifications);
   }

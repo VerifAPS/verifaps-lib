@@ -18,12 +18,12 @@ public class SpecificationsPane extends AnchorPane {
     this.addButton = new Button("+");
 
 
-    AnchorPane.setTopAnchor(tabPane, 5.0);
-    AnchorPane.setLeftAnchor(tabPane, 5.0);
-    AnchorPane.setRightAnchor(tabPane, 5.0);
-    AnchorPane.setBottomAnchor(tabPane, 5.0);
-    AnchorPane.setTopAnchor(addButton, 10.0);
-    AnchorPane.setRightAnchor(addButton, 10.0);
+    AnchorPane.setTopAnchor(tabPane, 0.0);
+    AnchorPane.setLeftAnchor(tabPane, 0.0);
+    AnchorPane.setRightAnchor(tabPane, 0.0);
+    AnchorPane.setBottomAnchor(tabPane, 0.0);
+    AnchorPane.setTopAnchor(addButton, 5.0);
+    AnchorPane.setRightAnchor(addButton, 5.0);
 
     this.getChildren().addAll(tabPane, addButton);
   }
