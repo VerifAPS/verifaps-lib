@@ -29,8 +29,6 @@ public class XmlConfigExporter extends XmlExporter<GlobalConfig> {
     )));
     general.setMaxLineRollout(new BigInteger(Integer.toString(source.getMaxLineRollout())));
     Config.General.WindowSize windowSize = objectFactory.createConfigGeneralWindowSize();
-    windowSize.setHeight(new BigInteger(Integer.toString(source.getWindowHeight())));
-    windowSize.setWidth(new BigInteger(Integer.toString(source.getWindowWidth())));
     general.setWindowSize(windowSize);
     config.setGeneral(general);
     Config.Editor editor = objectFactory.createConfigEditor();

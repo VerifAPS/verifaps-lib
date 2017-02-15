@@ -31,7 +31,7 @@ public class StvsMainScene {
     this.menuBarController = new StvsMenuBarController(rootModelProperty);
     rootModelProperty.addListener(this::rootModelChanged);
 
-    this.scene = new Scene(createVBox(), rootModel.getGlobalConfig().getWindowWidth(), rootModel.getGlobalConfig().getWindowHeight());
+    this.scene = new Scene(createVBox());
   }
 
   private VBox createVBox() {
