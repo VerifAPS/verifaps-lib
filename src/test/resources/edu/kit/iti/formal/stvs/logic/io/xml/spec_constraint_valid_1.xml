@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="" isConcrete="false">
+<specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="" isConcrete="false"
+               name="UnnamedSpecification">
   <variables>
     <ioVariable colwidth="100" data-type="INT" io="input" name="Counter"/>
     <ioVariable colwidth="100" data-type="BOOL" io="output" name="Active"/>

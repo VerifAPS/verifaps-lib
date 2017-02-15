@@ -29,8 +29,7 @@ public class GlobalConfig {
   // Dependency paths
   private StringProperty nuxmvFilename;
   private StringProperty z3Path;
-  private StringProperty javaPath;
-  private StringProperty getetaFilename;
+  private StringProperty getetaCommand;
 
   /**
    * Default configuration
@@ -45,10 +44,9 @@ public class GlobalConfig {
     editorFontFamily = new SimpleStringProperty("Courier");
     showLineNumbers = new SimpleBooleanProperty(true);
     uiLanguage = new SimpleStringProperty("EN");
-    nuxmvFilename = new SimpleStringProperty(System.getProperty("user.home"));
-    javaPath = new SimpleStringProperty(System.getProperty("user.home"));
-    z3Path = new SimpleStringProperty(System.getProperty("user.home"));
-    getetaFilename = new SimpleStringProperty(System.getProperty("user.home"));
+    nuxmvFilename = new SimpleStringProperty("[Path to NuXmv Executable]");
+    z3Path = new SimpleStringProperty("[Path to Z3 Executable]");
+    getetaCommand = new SimpleStringProperty("java -jar /path/to/geteta.jar -c ${code} -t ${spec} -x");
   }
 
   public void setAll(GlobalConfig toBeCopied) {
@@ -62,9 +60,8 @@ public class GlobalConfig {
     showLineNumbers.set(toBeCopied.getShowLineNumbers());
     uiLanguage.set(toBeCopied.getUiLanguage());
     nuxmvFilename.set(toBeCopied.getNuxmvFilename());
-    javaPath.set(toBeCopied.getJavaPath());
     z3Path.set(toBeCopied.getZ3Path());
-    getetaFilename.set(toBeCopied.getGetetaFilename());
+    getetaCommand.set(toBeCopied.getGetetaCommand());
   }
 
   /**
@@ -291,28 +288,16 @@ public class GlobalConfig {
     this.z3Path.set(z3Path);
   }
 
-  public String getJavaPath() {
-    return javaPath.get();
+  public String getGetetaCommand() {
+    return getetaCommand.get();
   }
 
-  public StringProperty javaPathProperty() {
-    return javaPath;
+  public StringProperty getetaCommandProperty() {
+    return getetaCommand;
   }
 
-  public void setJavaPath(String javaPath) {
-    this.javaPath.set(javaPath);
-  }
-
-  public String getGetetaFilename() {
-    return getetaFilename.get();
-  }
-
-  public StringProperty getetaFilenameProperty() {
-    return getetaFilename;
-  }
-
-  public void setGetetaFilename(String getetaFilename) {
-    this.getetaFilename.set(getetaFilename);
+  public void setGetetaCommand(String getetaCommand) {
+    this.getetaCommand.set(getetaCommand);
   }
 
   public int getMaxLineRollout() {

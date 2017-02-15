@@ -16,6 +16,7 @@ import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionCo
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -30,7 +31,9 @@ import java.util.List;
 public class SpecificationController implements Controller {
 
   private final GlobalConfig globalConfig;
+
   private HybridSpecification spec;
+
   private ObjectProperty<VerificationState> stateProperty;
   private ContextMenu contextMenu;
   private SpecificationView view;
@@ -41,12 +44,12 @@ public class SpecificationController implements Controller {
   private HybridSpecification hybridSpecification;
   private BooleanProperty specificationInvalid;
   private SpecificationConcretizer concretizer;
-
   public SpecificationController(
       ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> codeIoVariables,
       HybridSpecification hybridSpecification,
       ObjectProperty<VerificationState> stateProperty,
+      BooleanBinding codeInvalid,
       GlobalConfig globalConfig) {
     this.spec = hybridSpecification;
     this.hybridSpecification = hybridSpecification;
@@ -64,9 +67,10 @@ public class SpecificationController implements Controller {
         variableCollectionController.getValidator().validFreeVariablesProperty(),
         hybridSpecification);
     this.specificationInvalid = new SimpleBooleanProperty(true);
-    specificationInvalid.bind(Bindings.or(
-        Bindings.not(variableCollectionController.getValidator().validProperty()),
-        Bindings.not(tableController.getValidator().validProperty())));
+    specificationInvalid.bind(
+        variableCollectionController.getValidator().validProperty().not()
+        .or(tableController.getValidator().validProperty().not())
+        .or(codeInvalid));
 
     //use event trigger to generate timing-diagram, to minimize code-duplication
     onConcreteInstanceChanged(getConcreteSpecification());
@@ -107,7 +111,7 @@ public class SpecificationController implements Controller {
           });
         }, exception -> {
           Platform.runLater(() -> {
-            new ErrorMessageDialog(exception, "Concretization failed", "An Error occurred while "
+            new ErrorMessageDialog(exception, "Concretizing failed", "An Error occurred while "
                 + "concretizing the specification");
           });
         });
@@ -137,8 +141,8 @@ public class SpecificationController implements Controller {
                         VerificationState oldState, VerificationState newState) {
       onVerificationStateChanged(newState);
     }
-  }
 
+  }
   private void onVerificationStateChanged(VerificationState newState) {
     switch (newState) {
       case RUNNING:
@@ -149,8 +153,9 @@ public class SpecificationController implements Controller {
     }
   }
 
-
   private class VerificationButtonClickedListener implements EventHandler<ActionEvent> {
+
+
     @Override
     public void handle(ActionEvent actionEvent) {
       switch (stateProperty.get()) {
@@ -161,5 +166,8 @@ public class SpecificationController implements Controller {
           view.onVerificationButtonClicked(hybridSpecification, VerificationEvent.Type.START);
       }
     }
+  }
+  public HybridSpecification getSpec() {
+    return spec;
   }
 }

@@ -52,7 +52,8 @@ public class StvsRootController implements Controller {
         stvsRootModel.getScenario().verificationState(),
         types,
         ioVars,
-        stvsRootModel.getGlobalConfig()
+        stvsRootModel.getGlobalConfig(),
+        stvsRootModel.getScenario()
     );
 
     this.stvsRootModel.getScenario().codeObjectProperty().addListener(this::onCodeChange);
@@ -73,9 +74,8 @@ public class StvsRootController implements Controller {
       case START:
         try {
           System.out.println("Before call to verify");
-          stvsRootModel.getScenario().verify(stvsRootModel.getGlobalConfig().getGetetaFilename(),
-              stvsRootModel.getGlobalConfig().getNuxmvFilename(),
-              event.getConstraintSpec());
+          stvsRootModel.getScenario().verify(stvsRootModel.getGlobalConfig(), event
+              .getConstraintSpec());
           System.out.println("After call to verify");
         } catch (ExportException | IOException e) {
           ViewUtils.showDialog(Alert.AlertType.ERROR, "Export error", "An error occurred during " +
@@ -154,9 +154,9 @@ public class StvsRootController implements Controller {
         ViewUtils.showDialog(Alert.AlertType.INFORMATION, "Counterexample available",
             "Counterexample available", alertBody);
         // Show read-only copy of spec with counterexample in a new tab
-        assert stvsRootModel.getScenario().getCurrentSpec() != null;
+        assert stvsRootModel.getScenario().getActiveSpec() != null;
         HybridSpecification readOnlySpec = new HybridSpecification(stvsRootModel.getScenario()
-            .getCurrentSpec(), false);
+            .getActiveSpec(), false);
         readOnlySpec.setCounterExample(res.getCounterExample());
         specificationsPaneController.addTab(readOnlySpec);
         break;

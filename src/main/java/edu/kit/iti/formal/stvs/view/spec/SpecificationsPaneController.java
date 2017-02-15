@@ -5,8 +5,14 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
+import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
+import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -28,15 +34,18 @@ public class SpecificationsPaneController implements Controller {
   private ObjectProperty<List<Type>> typeContext;
   private ObjectProperty<List<CodeIoVariable>> ioVariables;
   private final Map<Tab, SpecificationController> controllers;
+  private final VerificationScenario scenario;
 
   public SpecificationsPaneController(
       ObservableList<HybridSpecification> hybridSpecifications,
       ObjectProperty<VerificationState> state,
       ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> ioVariables,
-      GlobalConfig globalConfig) {
+      GlobalConfig globalConfig,
+      VerificationScenario scenario) {
     this.view = new SpecificationsPane();
     this.globalConfig = globalConfig;
+    this.scenario = scenario;
     this.state = state;
     this.controllers = new HashMap<>();
     this.typeContext = typeContext;
@@ -48,25 +57,37 @@ public class SpecificationsPaneController implements Controller {
       hybridSpecifications.add(new HybridSpecification(new FreeVariableList(new ArrayList<>()), true));
     });
 
-    hybridSpecifications.addListener(new ListChangeListener<HybridSpecification>() {
-      @Override
-      public void onChanged(Change<? extends HybridSpecification> change) {
-        while(change.next()) {
+    view.getTabPane().getSelectionModel().selectedItemProperty().addListener((obs, old, tab)
+        -> switchActiveTab(tab));
+    switchActiveTab(view.getTabPane().getSelectionModel().getSelectedItem());
 
-          for (HybridSpecification addItem : change.getAddedSubList()) {
-            addTab(addItem);
-          }
-          for (HybridSpecification spec : change.getRemoved()) {
-            removeTab(spec);
-          }
+    hybridSpecifications.addListener((ListChangeListener<HybridSpecification>) change -> {
+      while (change.next()) {
+
+        for (HybridSpecification addItem : change.getAddedSubList()) {
+          addTab(addItem);
+        }
+        for (HybridSpecification spec : change.getRemoved()) {
+          removeTab(spec);
         }
       }
     });
   }
 
+  private void switchActiveTab(Tab tab) {
+    SpecificationController controller = controllers.get(tab);
+    if (controller == null) {
+      scenario.setActiveSpec(null);
+    } else {
+      scenario.setActiveSpec(controller.getSpec());
+    }
+    System.out.println(scenario.getActiveSpec());
+  }
+
   private SpecificationController addTab(HybridSpecification hybridSpecification, int index) {
     SpecificationController controller = new SpecificationController(
-        typeContext, ioVariables, hybridSpecification, this.state, globalConfig);
+        typeContext, ioVariables, hybridSpecification, this.state,
+        Bindings.isEmpty(scenario.getCode().syntaxErrorsProperty()).not(), globalConfig);
     Tab tab = new Tab();
     String editable = hybridSpecification.isEditable() ? "" : " [locked]";
     tab.setText(hybridSpecification.getName() + editable);

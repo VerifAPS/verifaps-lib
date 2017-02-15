@@ -15,9 +15,8 @@
     <fontSize>12</fontSize>
   </editor>
   <dependencies>
-    <javaPath>/home/bal</javaPath>
     <z3Path>/home/bal</z3Path>
-    <getetaFilename>/home/bal</getetaFilename>
+    <getetaCommand>/home/bal</getetaCommand>
     <nuxmvFilename>/home/bal</nuxmvFilename>
   </dependencies>
 </config>
