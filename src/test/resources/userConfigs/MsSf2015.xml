@@ -16,7 +16,7 @@
   </editor>
   <dependencies>
     <javaPath>C:\Program Files\Java\jre1.8.0_121\bin\</javaPath>
-    <z3Path>C:\Users\Philipp\Downloads\z3-4.3.2-x64-win\z3-4.3.2-x64-win\bin\z3.exe</z3Path>
+    <z3Path>C:\Users\Philipp\Downloads\z3-4.5.0-x64-win\z3-4.5.0-x64-win\bin\z3.exe</z3Path>
     <getetaFilename>C:\Users\Philipp\Downloads\geteta-0.4.0-exe.jar</getetaFilename>
     <nuxmvFilename>C:\Users\Philipp\Downloads\nuXmv-1.1.1-win64\bin\nuXmv.exe</nuxmvFilename>
   </dependencies>

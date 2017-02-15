@@ -1,39 +1,26 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
+import edu.kit.iti.formal.stvs.TestUtils;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
-import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
-import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
-import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
-import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.net.UnknownHostException;
+import java.util.*;
 
 /**
  * Created by leonk on 09.02.2017.
@@ -41,6 +28,10 @@ import static org.junit.Assert.assertTrue;
 public class Z3SolverTest {
 
   private List<ValidFreeVariable> freeVariables;
+  private final Z3Solver solver = new Z3Solver(TestUtils.getUserConfig().getZ3Path());
+
+  public Z3SolverTest() throws ImportException, UnknownHostException {
+  }
 
   private ValidSpecification importSpec(String name) throws
       ImportException {
@@ -80,7 +71,7 @@ public class Z3SolverTest {
 
     SmtEncoder preprocessor = new SmtEncoder(maxDurations, spec, freeVariables);
     //System.out.println(preprocessor.getConstrain());
-    Z3Solver.concretizeSConstraint(preprocessor.getConstrain(), spec.getColumnHeaders(), System.out::println);
+    solver.concretizeSConstraint(preprocessor.getConstrain(), spec.getColumnHeaders(), System.out::println);
   }
 
   @Test
@@ -97,6 +88,6 @@ public class Z3SolverTest {
 
     SmtEncoder preprocessor = new SmtEncoder(maxDurations, spec, freeVariables);
     //System.out.println(preprocessor.getConstrain());
-    Z3Solver.concretizeSConstraint(preprocessor.getConstrain(), spec.getColumnHeaders(), System.out::println);
+    solver.concretizeSConstraint(preprocessor.getConstrain(), spec.getColumnHeaders(), System.out::println);
   }
 }
