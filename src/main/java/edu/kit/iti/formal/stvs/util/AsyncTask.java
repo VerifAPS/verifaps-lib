@@ -1,26 +1,36 @@
 package edu.kit.iti.formal.stvs.util;
 
-import javafx.application.Platform;
-
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 /**
  * Created by leonk on 08.02.2017.
  */
-public class AsyncTask<T> extends Thread{
-  private final Supplier<T> runAsnc;
+public class AsyncTask<T> extends Thread {
+  private final Function<AtomicBoolean, T> runAsnc;
   private final Consumer<T> runLater;
+  private AtomicBoolean isRunning = new AtomicBoolean(false);
 
-  public AsyncTask(Supplier<T> runAsnc, Consumer<T> runLater){
+  public AsyncTask(Function<AtomicBoolean, T> runAsnc, Consumer<T> runLater) {
     super();
     this.runAsnc = runAsnc;
     this.runLater = runLater;
   }
 
+  public void terminate() {
+    isRunning.set(false);
+  }
+
+  public boolean isRunning(){
+    return isRunning.get();
+  }
+
   @Override
-  public void run(){
-    T result = runAsnc.get();
-    Platform.runLater(() -> runLater.accept(result));
+  public void run() {
+    isRunning.set(true);
+    T result = runAsnc.apply(isRunning);
+    runLater.accept(result);
+    isRunning.set(false);
   }
 }

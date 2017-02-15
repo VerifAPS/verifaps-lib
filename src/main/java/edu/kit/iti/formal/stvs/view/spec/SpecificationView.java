@@ -65,6 +65,7 @@ public class SpecificationView extends VBox implements Lockable {
   }
 
   public void setVerificationButtonStop() {
+    System.out.println("setVerificationButtonStop called!");
     Text icon = GlyphsDude.createIcon(FontAwesomeIcon.STOP);
     icon.setFill(Color.INDIANRED);
     startVerificationButton.setText("Stop Verification");
@@ -72,7 +73,7 @@ public class SpecificationView extends VBox implements Lockable {
   }
 
   public void setConcretizerButtonStart() {
-    Text icon = GlyphsDude.createIcon(FontAwesomeIcon.PLAY);
+    Text icon = GlyphsDude.createIcon(FontAwesomeIcon.MAGIC);
     icon.setFill(Color.MEDIUMSEAGREEN);
     startConcretizerButton.setText("Concretize");
     startConcretizerButton.setGraphic(icon);

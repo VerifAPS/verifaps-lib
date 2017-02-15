@@ -72,9 +72,11 @@ public class StvsRootController implements Controller {
     switch(event.getType()) {
       case START:
         try {
+          System.out.println("Before call to verify");
           stvsRootModel.getScenario().verify(stvsRootModel.getGlobalConfig().getGetetaFilename(),
               stvsRootModel.getGlobalConfig().getNuxmvFilename(),
               event.getConstraintSpec());
+          System.out.println("After call to verify");
         } catch (ExportException | IOException e) {
           ViewUtils.showDialog(Alert.AlertType.ERROR, "Export error", "An error occurred during " +
               "export of the specification:\n" + e.getMessage(), e.getStackTrace().toString());

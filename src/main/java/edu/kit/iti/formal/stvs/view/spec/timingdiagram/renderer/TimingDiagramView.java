@@ -37,8 +37,7 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   private ObservableList<Line> horizontalLines = FXCollections.observableArrayList();
   private ObservableList<Line> verticalLines = FXCollections.observableArrayList();
   private ObservableList<Line> durationLines = FXCollections.observableArrayList();
-  private ObservableList<Rectangle> cycleSelection = FXCollections.observableArrayList();
-  private NullableProperty<Integer> selectedCycle = new NullableProperty<>();
+  private ObservableList<Rectangle> cycleSelectionRectangles = FXCollections.observableArrayList();
   private List<ConcreteDuration> durations = new ArrayList<>();
 
   private Pane dataPane = new Pane();
@@ -93,21 +92,11 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
     durationLinesPane.setMouseTransparent(true);
     horizontalLines.add(horizontalLine);
     Rectangle cycleSelectionRectangle = new Rectangle();
-    cycleSelectionRectangle.setOnMouseEntered(event -> {
-      cycleSelectionRectangle.setOpacity(1);
-      selectedCycle.setValue(item.getXValue().intValue());
-    });
-    cycleSelectionRectangle.setOnMouseExited(event -> {
-      cycleSelectionRectangle.setOpacity(0);
-      if (item.getXValue().intValue() == selectedCycle.get()) {
-        selectedCycle.set(null);
-      }
-    });
     Tooltip tooltip = new Tooltip(item.getYValue().toString());
     Tooltip.install(cycleSelectionRectangle, tooltip);
     cycleSelectionRectangle.getStyleClass().add("cycleSelectionRectangle");
     cycleSelectionRectangle.setOpacity(0);
-    cycleSelection.add(cycleSelectionRectangle);
+    cycleSelectionRectangles.add(cycleSelectionRectangle);
     cycleSelectionPane.getChildren().add(cycleSelectionRectangle);
     if (itemIndex > 0) {
       Line verticalLine = new Line();
@@ -130,7 +119,7 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
     ObservableList<Node> plotChildren = getPlotChildren();
     removeDataItemFromDisplay(series, item);
     dataPane.getChildren().remove(horizontalLines.remove(0));
-    cycleSelectionPane.getChildren().remove(cycleSelection.remove(0));
+    cycleSelectionPane.getChildren().remove(cycleSelectionRectangles.remove(0));
     if (series.getData().size() > 0) {
       dataPane.getChildren().remove(verticalLines.remove(0));
     }
@@ -200,7 +189,7 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
           verticalLine.setEndY(getYAxis().getDisplayPosition(cyclesData.get(i + 1).getYValue()));
         }
 
-        Rectangle cycleSelectionRectangle = cycleSelection.get(i);
+        Rectangle cycleSelectionRectangle = cycleSelectionRectangles.get(i);
         cycleSelectionRectangle.setX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue()));
         cycleSelectionRectangle.setWidth(
             getXAxis().getDisplayPosition(cyclesData.get(i).getXValue().intValue() + 1) -
@@ -245,14 +234,6 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
     return yAxis;
   }
 
-  public Integer getSelectedCycle() {
-    return selectedCycle.get();
-  }
-
-  public ReadOnlyObjectProperty<Integer> selectedCycleProperty() {
-    return selectedCycle;
-  }
-
   public void setDurations(List<ConcreteDuration> durations) {
     this.durations = durations;
     this.durationLines.setAll(
@@ -270,5 +251,9 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
 
   public ContextMenu getContextMenu() {
     return contextMenu;
+  }
+
+  public ObservableList<Rectangle> getCycleSelectionRectangles() {
+    return cycleSelectionRectangles;
   }
 }

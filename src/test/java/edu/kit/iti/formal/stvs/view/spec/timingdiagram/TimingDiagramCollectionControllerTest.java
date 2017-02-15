@@ -45,6 +45,9 @@ public class TimingDiagramCollectionControllerTest {
       selection.rowProperty().addListener(change -> {
         console.appendText("Selection row set to: " + selection.getRow() + "\n");
       });
+      selection.setOnCellClickListener((col, cycle) -> {
+        console.appendText("Clicked on " + col + " " + cycle);
+      });
 
       VBox root = new VBox();
       root.getChildren().addAll(controller.getView(), console);

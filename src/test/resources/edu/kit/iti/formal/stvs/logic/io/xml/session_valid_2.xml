@@ -24,7 +24,7 @@ END_PROGRAM</plaintext>
  </code>
  <tabs>
    <tab id="0" open="false" readOnly="false">
-     <specification isConcrete="false" comment="I am a table comment!">
+     <specification name="SpecWithAName" isConcrete="false" comment="I am a table comment!">
        <variables>
          <ioVariable io="input" name="A" data-type="INT" colwidth="10"></ioVariable>
          <ioVariable io="input" name="B" data-type="BOOL"

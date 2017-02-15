@@ -80,8 +80,7 @@ public class Z3SolverTest {
 
     SmtEncoder preprocessor = new SmtEncoder(maxDurations, spec, freeVariables);
     //System.out.println(preprocessor.getConstrain());
-    Optional<ConcreteSpecification> concreteSpecification = Z3Solver.concretizeSConstraint(preprocessor.getConstrain(), spec.getColumnHeaders());
-    System.out.println(concreteSpecification);
+    Z3Solver.concretizeSConstraint(preprocessor.getConstrain(), spec.getColumnHeaders(), System.out::println);
   }
 
   @Test
@@ -98,7 +97,6 @@ public class Z3SolverTest {
 
     SmtEncoder preprocessor = new SmtEncoder(maxDurations, spec, freeVariables);
     //System.out.println(preprocessor.getConstrain());
-    Optional<ConcreteSpecification> concreteSpecification = Z3Solver.concretizeSConstraint(preprocessor.getConstrain(), spec.getColumnHeaders());
-    System.out.println(concreteSpecification);
+    Z3Solver.concretizeSConstraint(preprocessor.getConstrain(), spec.getColumnHeaders(), System.out::println);
   }
 }

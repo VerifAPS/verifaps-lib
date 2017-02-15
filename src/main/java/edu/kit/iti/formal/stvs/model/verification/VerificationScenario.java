@@ -47,9 +47,8 @@ public class VerificationScenario {
         code.get().getParsedCode().getDefinedTypes());
     verificationEngine.verificationResultProperty().addListener(new
         VerificationChangedListener());
-    verificationState = new SimpleObjectProperty<>(VerificationState.NOT_STARTED);
+    verificationState.setValue(VerificationState.RUNNING);
     verificationEngine.startVerification(this, spec);
-    verificationState.set(VerificationState.RUNNING);
   }
 
   public void cancel() {

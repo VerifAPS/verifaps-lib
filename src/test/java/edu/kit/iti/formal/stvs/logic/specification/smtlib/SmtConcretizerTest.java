@@ -65,10 +65,9 @@ public class SmtConcretizerTest {
       put(2, 2);
     }};
 
-    SmtConcretizer concretizer = new SmtConcretizer(spec, new GlobalConfig(), freeVariables);
-    Optional<ConcreteSpecification> concreteSpecification = concretizer
-        .calculateConcreteSpecification();
-    System.out.println(concreteSpecification);
+    SmtConcretizer concretizer = new SmtConcretizer(new GlobalConfig());
+    concretizer
+        .calculateConcreteSpecification(spec, freeVariables, System.out::println, Throwable::printStackTrace);
   }
 
 }

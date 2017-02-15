@@ -69,12 +69,8 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     // Find out when process finishes to set verification result property
     ProcessExitDetector exitDetector = new ProcessExitDetector(getetaProcess);
     exitDetector.processFinishedProperty().addListener(new VerificationDoneListener());
-    try {
-      Platform.runLater(exitDetector);
-    } catch (IllegalStateException e) {
-      // We are not in a JavaFX environment
-      exitDetector.start();
-    }
+    // Starts the verification process in another thread
+    exitDetector.start();
   }
 
   @Override
@@ -105,7 +101,9 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   }
 
   private void onVerificationDone() {
-    assert getetaProcess != null;
+    if (getetaProcess == null) { // Verification was cancelled
+      return;
+    }
     System.out.println("Verification done!");
     File logFile;
     String processOutput;
@@ -119,9 +117,10 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     }
     // Preprocess output (remove anything before the XML)
     String cleanedProcessOutput = cleanProcessOutput(processOutput);
+    VerificationResult result;
     try {
-      verificationResult.set(ImporterFacade.importVerificationResult(new ByteArrayInputStream(cleanedProcessOutput
-          .getBytes()), ImporterFacade.ImportFormat.GETETA, typeContext));
+      result = ImporterFacade.importVerificationResult(new ByteArrayInputStream(cleanedProcessOutput
+          .getBytes()), ImporterFacade.ImportFormat.GETETA, typeContext);
     } catch (ImportException e) {
       PrintWriter writer;
       String logFilePath = logFile.getAbsolutePath();
@@ -129,13 +128,16 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
         writer = new PrintWriter(logFilePath);
       } catch (FileNotFoundException e1) {
         e1.printStackTrace();
-        verificationResult.set(null);
+        result = null;
         return;
       }
       writer.println(processOutput);
       writer.close();
-      verificationResult.set(new VerificationResult(VerificationResult.Status.ERROR, logFilePath));
+      result = new VerificationResult(VerificationResult.Status.ERROR, logFilePath);
     }
+    // set the verification result back in the javafx thread:
+    VerificationResult finalResult = result; // have to do this because of lambda restrictions...
+    Platform.runLater(() -> verificationResult.set(finalResult));
   }
 
   private String cleanProcessOutput(String processOutput) {

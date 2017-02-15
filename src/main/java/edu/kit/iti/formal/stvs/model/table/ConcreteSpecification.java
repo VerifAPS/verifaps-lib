@@ -22,7 +22,14 @@ public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, C
   public ConcreteSpecification(List<ValidIoVariable> ioVariables, List<SpecificationRow<ConcreteCell>> rows,
                                List<ConcreteDuration> durations,
                                boolean isCounterExample) {
-    super(p -> new Observable[0], p -> new Observable[0]);
+    this(DEFAULT_NAME, ioVariables, rows, durations, isCounterExample);
+  }
+
+  public ConcreteSpecification(String name, List<ValidIoVariable> ioVariables,
+                               List<SpecificationRow<ConcreteCell>> rows,
+                               List<ConcreteDuration> durations,
+                               boolean isCounterExample) {
+    super(name, p -> new Observable[0], p -> new Observable[0]);
     this.isCounterExample = isCounterExample;
 
     getColumnHeaders().setAll(ioVariables);

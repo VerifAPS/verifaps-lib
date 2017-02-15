@@ -50,7 +50,7 @@ public class StvsMenuBar extends MenuBar {
     saveAll = new MenuItem("Save all");
     saveAll.setAccelerator(KeyCombination.keyCombination("Ctrl+s"));
 
-    config = new MenuItem("Configuration");
+    config = new MenuItem("Preferences");
     config.setAccelerator(KeyCombination.keyCombination("Ctrl+,"));
 
 

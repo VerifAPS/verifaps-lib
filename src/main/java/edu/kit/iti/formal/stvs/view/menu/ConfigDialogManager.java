@@ -42,7 +42,7 @@ public class ConfigDialogManager implements Controller {
     this.view = new ConfigDialogPane();
     this.stage = new Stage();
     Dialog<GlobalConfig> dialog = new Dialog<>();
-    dialog.setTitle("Configuration");
+    dialog.setTitle("Preferences");
     view = new ConfigDialogPane();
     //set initial values
     view.uiLanguage.setItems(FXCollections.observableList(config.getValidLanguages()));

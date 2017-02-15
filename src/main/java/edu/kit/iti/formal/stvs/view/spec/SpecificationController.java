@@ -14,6 +14,7 @@ import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
 import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -24,9 +25,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 public class SpecificationController implements Controller {
 
@@ -54,7 +53,7 @@ public class SpecificationController implements Controller {
     this.stateProperty = stateProperty;
     this.stateProperty.addListener(new VerificationStateChangeListener());
     this.view = new SpecificationView();
-    this.selection = new Selection();
+    this.selection = hybridSpecification.getSelection();
     this.globalConfig = globalConfig;
     this.variableCollectionController = new VariableCollectionController(
         typeContext,
@@ -77,7 +76,7 @@ public class SpecificationController implements Controller {
     view.getStartButton().setOnAction(new VerificationButtonClickedListener());
     view.getStartButton().disableProperty().bind(specificationInvalid);
 
-    view.getStartConcretizerButton().setOnAction(this::concretizerStateChange);
+    view.getStartConcretizerButton().setOnAction(this::startConretizer);
 
     hybridSpecification.concreteInstanceProperty().addListener((observable, old, newVal)
         -> this.onConcreteInstanceChanged(newVal));
@@ -94,27 +93,31 @@ public class SpecificationController implements Controller {
     }
   }
 
-  private void concretizerStateChange(ActionEvent actionEvent) {
-    if (concretizer == null) {
-      if (!specificationInvalid.get()) {
-        concretizer = new SmtConcretizer(tableController.getValidator().getValidSpecification(),
-            globalConfig, variableCollectionController.getValidator().validFreeVariablesProperty
-            ().get());
+  private void startConretizer(ActionEvent actionEvent) {
+    view.setConcretizerButtonStop();
+    view.getStartConcretizerButton().setOnAction(this::stopConcretizer);
+    this.concretizer = new SmtConcretizer(globalConfig);
+    concretizer.calculateConcreteSpecification(tableController.getValidator().getValidSpecification(),
+        variableCollectionController.getValidator().validFreeVariablesProperty().get(),
+        optionalSpec -> {
+          Platform.runLater(() -> {
+            optionalSpec.ifPresent(spec -> hybridSpecification.setConcreteInstance(spec));
+            view.setConcretizerButtonStart();
+            view.getStartConcretizerButton().setOnAction(this::startConretizer);
+          });
+        }, exception -> {
+          Platform.runLater(() -> {
+            new ErrorMessageDialog(exception, "Concretization failed", "An Error occurred while "
+                + "concretizing the specification");
+          });
+        });
+  }
 
-        try {
-          Optional<ConcreteSpecification> concreteSpecification = concretizer.calculateConcreteSpecification();
-          view.setConcretizerButtonStop();
-          if(concreteSpecification.isPresent()) {
-            hybridSpecification.setConcreteInstance(concreteSpecification.get());
-            System.out.println(concreteSpecification);
-          }
-          view.setConcretizerButtonStart();
-
-        } catch (IOException e) {
-          new ErrorMessageDialog(e, "Concretization failed", "An Error occurred while " +
-              "concretizing the specification");
-        }
-      }
+  private void stopConcretizer(ActionEvent actionEvent) {
+    view.setConcretizerButtonStart();
+    view.getStartConcretizerButton().setOnAction(this::startConretizer);
+    if(this.concretizer != null){
+      this.concretizer.terminate();
     }
   }
 
@@ -137,7 +140,7 @@ public class SpecificationController implements Controller {
   }
 
   private void onVerificationStateChanged(VerificationState newState) {
-    switch(newState) {
+    switch (newState) {
       case RUNNING:
         getView().setVerificationButtonStop();
         break;
@@ -150,7 +153,7 @@ public class SpecificationController implements Controller {
   private class VerificationButtonClickedListener implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent actionEvent) {
-      switch(stateProperty.get()) {
+      switch (stateProperty.get()) {
         case RUNNING:
           view.onVerificationButtonClicked(hybridSpecification, VerificationEvent.Type.STOP);
           break;
