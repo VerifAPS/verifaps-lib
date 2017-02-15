@@ -16,6 +16,7 @@
     -fx-background-color: lightgray;
 }
 
-/*.diagramContainer{
-    -fx-orientation: vertical;
-}*/
+.globalXAxis{
+    -fx-animated: false;
+    -fx-minor-tick-visible: false;
+}
