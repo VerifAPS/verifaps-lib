@@ -28,6 +28,8 @@ public class XmlConfigImporterTest {
         (XmlConfigImporter.class.getResource("config_valid_nodeps.xml").toURI()));
     GlobalConfig config = importer.doImport(inputStream);
     assertEquals("EN", config.getUiLanguage());
+    assertEquals(800, config.getWindowWidth());
+    assertEquals(500, config.getWindowHeight());
     assertEquals(100, config.getVerificationTimeout());
     assertEquals(100, config.getSimulationTimeout());
     assertEquals("Comic Sans", config.getEditorFontFamily());
