@@ -43,7 +43,7 @@ public class StvsMainScene {
     this.rootController = new StvsRootController(rootModelProperty.get());
     this.menuBarController = new StvsMenuBarController(rootModelProperty);
 
-    this.rootModelProperty.get().setGlobalConfig(autoloadConfig());
+    this.rootModelProperty.get().getGlobalConfig().setAll(autoloadConfig());
 
     rootModelProperty.addListener(this::rootModelChanged);
 
