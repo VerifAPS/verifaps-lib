@@ -85,7 +85,6 @@ public class StvsMenuBarController implements Controller {
       model.setWorkingdir(chosenFile.getParentFile());
       this.rootModel.set(model);
     } catch (IOException | ImportException exception) {
-      // TODO: Better visual for ImportException
       new ErrorMessageDialog(exception);
     }
   }
@@ -101,13 +100,10 @@ public class StvsMenuBarController implements Controller {
     }
     try {
        HybridSpecification spec = ImporterFacade.importHybridSpec(chosenFile,
-          ImporterFacade
-              .ImportFormat
-              .XML);
+          ImporterFacade.ImportFormat.XML);
        this.rootModel.get().getHybridSpecifications().add(spec);
 
     } catch (IOException | ImportException e) {
-      // TODO: Show better message for import exception
       new ErrorMessageDialog(e);
     }
   }
@@ -157,7 +153,7 @@ public class StvsMenuBarController implements Controller {
   private void saveCode(ActionEvent t) {
     Code code = rootModel.get().getScenario().getCode();
 
-    if(code.getFilename().isEmpty()) {
+    if (code.getFilename().isEmpty()) {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Select the file");
       fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
