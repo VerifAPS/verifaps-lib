@@ -138,7 +138,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
     int lastRowNum = -1;
     List<Counterexample.Step> steps = message.getCounterexample().getTrace().getStep();
     List<String> rowMap = message.getCounterexample().getRowMappings().getRowMap();
-    List<Integer> rowNums = parseRowMap(rowMap.get(rowMap.size()-1));
+    List<Integer> rowNums = parseRowMap(rowMap.get(0));
     Map<String, Value> currentValues = new HashMap<>();
     Map<String, VariableCategory> varCategories = new HashMap<>();
     int cycleNum = -1;
@@ -157,7 +157,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
         }
       }
 
-      // Now I can make and add the row!
+      // Now I can make and add the row
       if (cycleNum > -1) {
         SpecificationRow<ConcreteCell> row = SpecificationRow.createUnobservableRow(new
             HashMap<>());

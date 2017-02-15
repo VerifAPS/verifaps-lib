@@ -21,6 +21,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Alert;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -73,10 +76,8 @@ public class StvsRootController implements Controller {
     switch(event.getType()) {
       case START:
         try {
-          System.out.println("Before call to verify");
           stvsRootModel.getScenario().verify(stvsRootModel.getGlobalConfig(), event
               .getConstraintSpec());
-          System.out.println("After call to verify");
         } catch (ExportException | IOException e) {
           ViewUtils.showDialog(Alert.AlertType.ERROR, "Export error", "An error occurred during " +
               "export of the specification:\n" + e.getMessage(), e.getStackTrace().toString());
@@ -145,14 +146,22 @@ public class StvsRootController implements Controller {
     VerificationResult res = stvsRootModel.getScenario().getVerificationResult();
     // Inform the user about the verification result
     if (res == null) {
-      ViewUtils.showDialog(Alert.AlertType.ERROR, "Verification error", "Verification " +
+      ViewUtils.showDialog(Alert.AlertType.ERROR, "Verification Error", "Verification " +
           "result is null", "");
     }
-    String alertBody = "See the log at " + res.getLogFilePath();
+    String alertBody = "See the log at " + res.getLogFilePath() + ".";
+    String logFileContents = "";
+    try {
+      logFileContents = new String(Files.readAllBytes(Paths.get(res.getLogFilePath())), "utf-8");
+    } catch (IOException e) {
+      ViewUtils.showDialog(Alert.AlertType.ERROR, "Logging Error", "Could not write log file",
+          "There was an error writing the log file " + res.getLogFilePath(), e.getStackTrace().toString());
+      return;
+    }
     switch (res.getStatus()) {
       case COUNTEREXAMPLE:
-        ViewUtils.showDialog(Alert.AlertType.INFORMATION, "Counterexample available",
-            "Counterexample available", alertBody);
+        ViewUtils.showDialog(Alert.AlertType.INFORMATION, "Counterexample Available",
+            "A Counterexample Is Available", alertBody, logFileContents);
         // Show read-only copy of spec with counterexample in a new tab
         assert stvsRootModel.getScenario().getActiveSpec() != null;
         HybridSpecification readOnlySpec = new HybridSpecification(stvsRootModel.getScenario()
@@ -161,22 +170,20 @@ public class StvsRootController implements Controller {
         specificationsPaneController.addTab(readOnlySpec);
         break;
       case VERIFIED:
-        ViewUtils.showDialog(Alert.AlertType.INFORMATION, "Verification successful",
-            "Verification successful", alertBody);
+        ViewUtils.showDialog(Alert.AlertType.INFORMATION, "Verification Successful",
+            "The verification completed successfully", alertBody, logFileContents);
         break;
       case ERROR:
-        ViewUtils.showDialog(Alert.AlertType.ERROR, "Verification error",
-            "Verification error", alertBody);
+        ViewUtils.showDialog(Alert.AlertType.ERROR, "Verification Error",
+            "An error occurred during verification.", alertBody, logFileContents);
         break;
       case FATAL:
-        ViewUtils.showDialog(Alert.AlertType.ERROR, "Verification error", "Fatal verification " +
-            "error", alertBody);
+        ViewUtils.showDialog(Alert.AlertType.ERROR, "Verification Error", "A fatal " +
+            "error occurred during verification.", alertBody, logFileContents);
         break;
       case UNKNOWN:
-        ViewUtils.showDialog(Alert.AlertType.ERROR, "Unknown error", "Unknown verification " +
-            "error", alertBody);
+        ViewUtils.showDialog(Alert.AlertType.ERROR, "Unknown Error", "An unknown error " +
+            "occurred during verification.", alertBody, logFileContents);
     }
-
-    // TODO: Change the verification buttons to "play" again
   }
 }
