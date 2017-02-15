@@ -16,6 +16,8 @@ public class GlobalConfig {
   // General
   private IntegerProperty verificationTimeout;
   private IntegerProperty simulationTimeout;
+  private IntegerProperty windowHeight;
+  private IntegerProperty  windowWidth;
   private StringProperty uiLanguage;
   private IntegerProperty maxLineRollout;
 
@@ -36,6 +38,8 @@ public class GlobalConfig {
   public GlobalConfig() {
     verificationTimeout = new SimpleIntegerProperty(3600);
     simulationTimeout = new SimpleIntegerProperty(60);
+    windowHeight = new SimpleIntegerProperty(600);
+    windowWidth = new SimpleIntegerProperty(800);
     editorFontSize = new SimpleIntegerProperty(12);
     maxLineRollout = new SimpleIntegerProperty(50);
     editorFontFamily = new SimpleStringProperty("Courier");
@@ -171,9 +175,27 @@ public class GlobalConfig {
     this.uiLanguage.set(uiLanguage);
   }
 
+  public int getWindowHeight() {
+    return windowHeight.get();
+  }
 
+  public void setWindowHeight(int windowHeight) {
+    if (windowHeight <= 0) {
+      throw new IllegalArgumentException("Illegal window height: " + windowHeight);
+    }
+    this.windowHeight.set(windowHeight);
+  }
 
+  public int getWindowWidth() {
+    return windowWidth.get();
+  }
 
+  public void setWindowWidth(int windowWidth) {
+    if (windowWidth <= 0) {
+      throw new IllegalArgumentException("Illegal window width: " + windowWidth);
+    }
+    this.windowWidth.set(windowWidth);
+  }
 
   public IntegerProperty verificationTimeoutProperty() {
     return this.verificationTimeout;
@@ -183,7 +205,13 @@ public class GlobalConfig {
     return simulationTimeout;
   }
 
+  public IntegerProperty windowHeightProperty() {
+    return windowHeight;
+  }
 
+  public IntegerProperty windowWidthProperty() {
+    return windowWidth;
+  }
 
   public IntegerProperty editorFontSizeProperty() {
     return editorFontSize;
@@ -218,6 +246,8 @@ public class GlobalConfig {
         append(editorFontSize.get(), rhs.editorFontSize.get()).
         append(showLineNumbers.get(), rhs.showLineNumbers.get()).
         append(uiLanguage.get(), rhs.uiLanguage.get()).
+        append(windowHeight.get(), rhs.windowHeight.get()).
+        append(windowWidth.get(), rhs.windowWidth.get()).
             isEquals();
   }
 
