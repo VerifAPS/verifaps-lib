@@ -42,21 +42,9 @@ public class StvsRootControllerTest {
     StvsRootModel rootModel = new StvsRootModel();
     try {
        rootModel = ImporterFacade.importSession(XmlSessionImporterTest.class
-          .getResourceAsStream(sessionfile), ImporterFacade.ImportFormat.XML);
+          .getResourceAsStream(sessionfile), ImporterFacade.ImportFormat.XML, new GlobalConfig());
     } catch(Exception e) {
       e.printStackTrace();
-    }
-
-    GlobalConfig userConfig = null;
-    try {
-      userConfig = TestUtils.getUserConfig();
-    } catch (UnknownHostException e) {
-      e.printStackTrace();
-    } catch (ImportException e) {
-      e.printStackTrace();
-    }
-    if (userConfig != null) {
-      rootModel.setGlobalConfig(userConfig);
     }
 
     StvsMainScene scene = new StvsMainScene(rootModel);

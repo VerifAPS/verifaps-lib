@@ -50,7 +50,7 @@ public class TimingDiagramCollectionView extends VBox {
       xAxis.layoutXProperty().setValue(diagram.getMinX() - axisContainer.getMinX());
     });
     //diagramContainer.getStyleClass().add("diagramContainer");
-    axisDiagramContainer.setDividerPosition(0,0);
+    axisDiagramContainer.setDividerPosition(0,0.1);
     xAxis.setAnimated(false);
     //xAxis.setMinHeight(30);
     globalAxisContainer.setMinHeight(30);
