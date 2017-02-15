@@ -34,6 +34,12 @@ public class XmlConfigImporter extends XmlImporter<GlobalConfig> {
         if (general.getVerificationTimeout() != null) {
           config.setVerificationTimeout(general.getVerificationTimeout().intValue());
         }
+        if (general.getWindowSize().getHeight() != null) {
+          config.setWindowHeight(general.getWindowSize().getHeight().intValue());
+        }
+        if (general.getWindowSize().getWidth() != null) {
+          config.setWindowWidth(general.getWindowSize().getWidth().intValue());
+        }
         if (general.getMaxLineRollout() != null) {
           config.setMaxLineRollout(general.getMaxLineRollout().intValue());
         }
