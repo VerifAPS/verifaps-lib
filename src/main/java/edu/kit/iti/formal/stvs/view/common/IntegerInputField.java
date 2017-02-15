@@ -17,6 +17,7 @@ public class IntegerInputField extends TextField {
     this.textProperty().addListener(this::onInputChange);
     valid = new SimpleBooleanProperty();
     valid.addListener(this::onValidStateChange);
+    this.setStyle("-fx-font-alignment: right");
   }
 
   private void onValidStateChange(ObservableValue<?> observableValue, Boolean old, Boolean

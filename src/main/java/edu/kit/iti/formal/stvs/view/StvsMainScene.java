@@ -47,7 +47,7 @@ public class StvsMainScene {
 
     rootModelProperty.addListener(this::rootModelChanged);
 
-    this.scene = new Scene(createVBox());
+    this.scene = new Scene(createVBox(), rootModel.getGlobalConfig().getWindowWidth(), rootModel.getGlobalConfig().getWindowHeight());
   }
 
   public static GlobalConfig autoloadConfig() {
