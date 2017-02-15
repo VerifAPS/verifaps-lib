@@ -15,13 +15,13 @@ import java.math.BigInteger;
  * @author Benjamin Alt
  */
 public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
-  private XmlConfigExporter configExporter;
+  //private XmlConfigExporter configExporter;
   private XmlConstraintSpecExporter constraintSpecExporter;
   private XmlConcreteSpecExporter concreteSpecExporter;
   private ObjectFactory objectFactory;
 
   public XmlSessionExporter() {
-    configExporter = new XmlConfigExporter();
+    //configExporter = new XmlConfigExporter();
     constraintSpecExporter = new XmlConstraintSpecExporter();
     concreteSpecExporter = new XmlConcreteSpecExporter();
     objectFactory = new ObjectFactory();
@@ -29,32 +29,29 @@ public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
 
   @Override
   public Node exportToXmlNode(StvsRootModel source) throws ExportException {
-    try {
-      Session session = objectFactory.createSession();
+    Session session = objectFactory.createSession();
 
-      // Code
-      Code code = objectFactory.createCode();
-      code.setPlaintext(source.getScenario().getCode().getSourcecode());
-      session.setCode(code);
+    // Code
+    Code code = objectFactory.createCode();
+    code.setPlaintext(source.getScenario().getCode().getSourcecode());
+    session.setCode(code);
 
-      // Config
-      Node configNode = configExporter.exportToXmlNode(source.getGlobalConfig());
-      JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-      Config importedConfig = ((JAXBElement<Config>) jaxbUnmarshaller.unmarshal(configNode))
-          .getValue();
-      session.setConfig(importedConfig);
+    /* Config (optional in xsd, not imported/exported with session right now but separately,
+    as per customer request)
+    Node configNode = configExporter.exportToXmlNode(source.getGlobalConfig());
+    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+    Config importedConfig = ((JAXBElement<Config>) jaxbUnmarshaller.unmarshal(configNode))
+        .getValue();
+    session.setConfig(importedConfig); */
 
-      //History
-      session.setHistory(makeHistory(source));
+    //History
+    session.setHistory(makeHistory(source));
 
-      // Tabs
-      session.setTabs(makeTabs(source));
-      JAXBElement<Session> element = objectFactory.createSession(session);
-      return marshalToNode(element);
-    } catch (JAXBException e) {
-      throw new ExportException(e);
-    }
+    // Tabs
+    session.setTabs(makeTabs(source));
+    JAXBElement<Session> element = objectFactory.createSession(session);
+    return marshalToNode(element);
   }
 
   private History makeHistory(StvsRootModel source) {

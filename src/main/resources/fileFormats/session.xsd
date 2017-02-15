@@ -41,7 +41,9 @@
           </sequence>
         </complexType>
       </element>
-      <element name="config" type="tns:Config" minOccurs="1" maxOccurs="1"></element>
+      <!-- The "config" element is currently not used (i.e. ignored), but remains in XSD for
+      backwards compatibility & future extendability -->
+      <element name="config" type="tns:Config" minOccurs="0" maxOccurs="1"></element>
       <element name="history" type="tns:History" minOccurs="1" maxOccurs="1"></element>
     </sequence>
   </complexType>

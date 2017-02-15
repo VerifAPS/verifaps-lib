@@ -33,14 +33,15 @@ import java.util.Optional;
 public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
 
   private XmlConstraintSpecImporter constraintSpecImporter;
-  private XmlConfigImporter configImporter;
+  // private XmlConfigImporter configImporter;
   private ObjectFactory objectFactory;
+  private GlobalConfig currentConfig;
 
-  public XmlSessionImporter() throws ImportException {
+  public XmlSessionImporter(GlobalConfig currentConfig) throws ImportException {
     constraintSpecImporter = new XmlConstraintSpecImporter();
-    configImporter = new XmlConfigImporter();
-    objectFactory = new ObjectFactory();
-
+    //configImporter = new XmlConfigImporter();
+    this.objectFactory = new ObjectFactory();
+    this.currentConfig = currentConfig;
   }
 
   @Override
@@ -63,12 +64,13 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
       // Initialized later, since we need to know the types that are available before we import
       XmlConcreteSpecImporter concreteSpecImporter = new XmlConcreteSpecImporter(typeContext);
 
-      // Config
+      /* Config (optional in xsd, not imported/exported with session right now but separately,
+      as per customer request)
       GlobalConfig config = new GlobalConfig();
       if (importedSession.getConfig() != null) {
         JAXBElement<Config> element = objectFactory.createConfig(importedSession.getConfig());
         config = configImporter.doImportFromXmlNode(XmlExporter.marshalToNode(element));
-      }
+      } */
 
       // History
       History history = new History();
@@ -112,7 +114,7 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
         hybridSpecs.add(hybridSpec);
       }
 
-      return new StvsRootModel(hybridSpecs, config, history, scenario, new File(System
+      return new StvsRootModel(hybridSpecs, currentConfig, history, scenario, new File(System
           .getProperty("user.home")));
     } catch (JAXBException | ExportException e) {
       throw new ImportException(e);
