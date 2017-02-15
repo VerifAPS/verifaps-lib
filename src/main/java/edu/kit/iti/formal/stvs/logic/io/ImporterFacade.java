@@ -81,17 +81,22 @@ public class ImporterFacade {
     return importConfig(new FileInputStream(file), format);
   }
 
-  public static StvsRootModel importSession(InputStream input, ImportFormat format) throws ImportException {
+  public static StvsRootModel importSession(InputStream input, ImportFormat format, GlobalConfig
+      currentConfig) throws ImportException {
     switch (format) {
       case XML:
-        return new XmlSessionImporter().doImport(input);
+        return new XmlSessionImporter(currentConfig).doImport(input);
       default:
         throw new ImportException("Unsupported import format");
     }
   }
 
-  public static StvsRootModel importSession(File file, ImportFormat format) throws IOException, ImportException {
-    return importSession(new FileInputStream(file), format);
+  public static StvsRootModel importSession(File file, ImportFormat format, GlobalConfig
+      currentConfig)
+      throws
+      IOException,
+      ImportException {
+    return importSession(new FileInputStream(file), format, currentConfig);
   }
 
   public static Code importStCode(File chosenFile) throws IOException {

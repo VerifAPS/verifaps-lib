@@ -37,9 +37,6 @@ import javafx.util.Pair;
  */
 public class TimingDiagramCollectionController implements Controller {
   private final int totalCycleCount;
-  private HybridSpecification spec;
-  private GlobalConfig globalConfig;
-  private ObservableList<SpecIoVariable> definedVariables;
   private TimingDiagramCollectionView view;
   private Selection selection;
   private DoubleProperty visibleRange = new SimpleDoubleProperty();
@@ -158,8 +155,8 @@ public class TimingDiagramCollectionController implements Controller {
     if (startLowerBound - deltaAsAxis < 0) {
       deltaAsAxis = startLowerBound;
     }
-    getView().getxAxis().setLowerBound(Math.min(startLowerBound - deltaAsAxis, totalCycleCount - visibleRange.get()));
-    getView().getxAxis().setUpperBound(Math.min(startUpperBound - deltaAsAxis, totalCycleCount));
+    getView().getxAxis().setLowerBound(Math.max(startLowerBound - deltaAsAxis, 0));
+    getView().getxAxis().setUpperBound(Math.max(startUpperBound - deltaAsAxis, visibleRange.get()));
     //System.out.println(point2D);
   }
 

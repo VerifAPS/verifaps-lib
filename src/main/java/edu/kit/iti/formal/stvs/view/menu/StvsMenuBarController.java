@@ -81,7 +81,7 @@ public class StvsMenuBarController implements Controller {
     }
     try {
       StvsRootModel model = ImporterFacade.importSession(
-          chosenFile, ImporterFacade.ImportFormat.XML);
+          chosenFile, ImporterFacade.ImportFormat.XML, rootModel.get().getGlobalConfig());
       model.setWorkingdir(chosenFile.getParentFile());
       this.rootModel.set(model);
     } catch (IOException | ImportException exception) {
