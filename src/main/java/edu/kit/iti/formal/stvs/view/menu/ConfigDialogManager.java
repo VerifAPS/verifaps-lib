@@ -57,8 +57,7 @@ public class ConfigDialogManager implements Controller {
     bind(view.maxLineRollout.textProperty(),      config.maxLineRolloutProperty());
     bind(view.nuxmvFilename.textProperty(),       config.nuxmvFilenameProperty());
     bind(view.z3Path.textProperty(),              config.z3PathProperty());
-    bind(view.javaPath.textProperty(),            config.javaPathProperty());
-    bind(view.getetaFilename.textProperty(),      config.getetaFilenameProperty());
+    bind(view.getetaCommand.textProperty(),       config.getetaCommandProperty());
 
     BooleanBinding dialogValid = view.verificationTimeout.validProperty()
         .and(view.simulationTimeout.validProperty())
@@ -85,8 +84,7 @@ public class ConfigDialogManager implements Controller {
       config.setMaxLineRollout(view.maxLineRollout.getInteger().get());
       config.setNuxmvFilename(view.nuxmvFilename.getText());
       config.setZ3Path(view.z3Path.getText());
-      config.setJavaPath(view.javaPath.getText());
-      config.setGetetaFilename(view.getetaFilename.getText());
+      config.setGetetaCommand(view.getetaCommand.getText());
       return config;
     });
     dialog.showAndWait();

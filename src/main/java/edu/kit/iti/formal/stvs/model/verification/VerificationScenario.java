@@ -6,7 +6,7 @@ import edu.kit.iti.formal.stvs.logic.verification.VerificationEngine;
 import edu.kit.iti.formal.stvs.logic.verification.VerificationException;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
-import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -36,16 +36,10 @@ public class VerificationScenario {
     activeSpec = new NullableProperty<>();
   }
 
-  public void verify(
-      String getetaFilename,
-    String nuxmvFilename,
-      ConstraintSpecification spec) throws IOException, ExportException, VerificationException {
+  public void verify(GlobalConfig config, ConstraintSpecification spec) throws IOException, ExportException, VerificationException {
     // TODO: Parsed code might be null!!!
     activeSpec.set(spec);
-    verificationEngine = new GeTeTaVerificationEngine(
-        getetaFilename,
-        nuxmvFilename,
-        code.get().getParsedCode().getDefinedTypes());
+    verificationEngine = new GeTeTaVerificationEngine(config, code.get().getParsedCode().getDefinedTypes());
     verificationEngine.verificationResultProperty().addListener(new
         VerificationChangedListener());
     verificationState.setValue(VerificationState.RUNNING);

@@ -12,8 +12,7 @@ import javafx.scene.layout.GridPane;
 public class ConfigDialogPane extends DialogPane {
   public final FileSelectionField nuxmvFilename;
   public final FileSelectionField z3Path;
-  public final FileSelectionField javaPath;
-  public final FileSelectionField getetaFilename;
+  public final TextField getetaCommand;
   public final IntegerInputField maxLineRollout;
   public final IntegerInputField verificationTimeout;
   public final IntegerInputField simulationTimeout;
@@ -32,8 +31,7 @@ public class ConfigDialogPane extends DialogPane {
     uiLanguage = new ComboBox<>();
     nuxmvFilename = new FileSelectionField();
     z3Path = new FileSelectionField();
-    javaPath = new FileSelectionField();
-    getetaFilename = new FileSelectionField();
+    getetaCommand = new TextField();
     maxLineRollout = new IntegerInputField();
     okButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
 
@@ -72,17 +70,13 @@ public class ConfigDialogPane extends DialogPane {
     grid.add(new Label("Path to Z3"), 0, 7);
     grid.add(z3Path, 1, 7);
 
+    grid.add(new Label("GeTeTa Command"), 0, 9);
+    grid.add(getetaCommand, 1, 9);
+    grid.add(new Label("Use ${code} and ${spec} for code and specification filename substitution" +
+        "."), 0, 10);
 
-    grid.add(new Label("Path to Java"), 0, 8);
-    grid.add(javaPath, 1, 8);
-
-
-    grid.add(new Label("Path to GeTeTa"), 0, 9);
-    grid.add(getetaFilename, 1, 9);
-
-
-    grid.add(new Label("Maximum Number of Rollouts per Line"), 0, 10);
-    grid.add(maxLineRollout, 1, 10);
+    grid.add(new Label("Maximum Number of Rollouts per Line"), 0, 11);
+    grid.add(maxLineRollout, 1, 11);
     this.setContent(grid);
   }
 }
