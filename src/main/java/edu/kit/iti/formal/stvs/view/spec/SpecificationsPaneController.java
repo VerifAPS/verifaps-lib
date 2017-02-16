@@ -102,7 +102,7 @@ public class SpecificationsPaneController implements Controller {
         typeContext, ioVariables, hybridSpecification, this.state,
         Bindings.isEmpty(scenario.getCode().syntaxErrorsProperty()).not(), globalConfig);
     Tab tab = new Tab();
-    tab.setText(hybridSpecification.getName());
+    tab.textProperty().bind(hybridSpecification.nameProperty());
     tab.setContent(controller.getView());
     if (hybridSpecification.isEditable()) {
       tab.setGraphic(GlyphsDude.createIcon(FontAwesomeIcon.EDIT));
