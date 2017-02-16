@@ -51,7 +51,7 @@ public class StvsMenuBar extends MenuBar {
     saveSpec = new MenuItem("Save Specification");
 
     saveSessionAs = new MenuItem("Save Session As");
-    saveSessionAs.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+s"));
+    saveSessionAs.setAccelerator(KeyCombination.keyCombination("Shift+Ctrl+s"));
 
     saveAll = new MenuItem("Save Session");
     saveAll.setAccelerator(KeyCombination.keyCombination("Ctrl+s"));

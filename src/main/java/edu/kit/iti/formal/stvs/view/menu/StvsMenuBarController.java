@@ -61,7 +61,7 @@ public class StvsMenuBarController implements Controller {
     fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
     if (chosenFile != null) {
-      handleSaveAll();
+      handleSaveAll(chosenFile);
       rootModel.get().setWorkingdir(chosenFile);
     }
   }
@@ -108,6 +108,7 @@ public class StvsMenuBarController implements Controller {
       StvsRootModel model = ImporterFacade.importSession(
           chosenFile, ImporterFacade.ImportFormat.XML, rootModel.get().getGlobalConfig());
       model.setWorkingdir(chosenFile.getParentFile());
+      model.setFilename(chosenFile.getName());
       this.rootModel.set(model);
     } catch (IOException | ImportException exception) {
       new ErrorMessageDialog(exception);
@@ -161,13 +162,28 @@ public class StvsMenuBarController implements Controller {
 
 
   private void saveAll(ActionEvent t) {
-    handleSaveAll();
+    if (this.rootModel.get().getFilename().isEmpty()) {
+      FileChooser fileChooser = new FileChooser();
+      fileChooser.setTitle("Save session");
+      fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
+      File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
+      if (chosenFile != null) {
+        handleSaveAll(chosenFile);
+      }
+    }
+    else {
+      handleSaveAll(new File(
+          this.rootModel.get().getWorkingdir(),
+          this.rootModel.get().getFilename()));
+    }
   }
 
-  private void handleSaveAll() {
-    try {
+  private void handleSaveAll(File path) {
+      try {
+      rootModel.get().setWorkingdir(path.getParentFile());
+      rootModel.get().setFilename(path.getName());
       ExporterFacade.exportSession(rootModel.get(), ExporterFacade.ExportFormat
-          .XML, rootModel.get().getWorkingdir());
+          .XML, path);
     } catch (IOException | ExportException e) {
       new ErrorMessageDialog(e);
     }
