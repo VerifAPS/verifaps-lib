@@ -11,9 +11,13 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.MenuItem;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -40,6 +44,10 @@ public class StvsMenuBarController implements Controller {
     //create view
     this.view = new StvsMenuBar();
 
+    rootModel.get().getHistory().getFilenames().addListener(new HistoryFilenamesChangeListener());
+    // Fill history menu
+    updateHistoryMenu();
+
     //add listener
     view.newCode.setOnAction(this::createNewCode);
     view.newSpec.setOnAction(this::createNewSpec);
@@ -52,7 +60,34 @@ public class StvsMenuBarController implements Controller {
     view.saveCode.setOnAction(this::saveCode);
     view.saveSpec.setOnAction(this::saveSpec);
     view.config.setOnAction(this::openConfigDialog);
+  }
 
+  private void updateHistoryMenu() {
+    view.openRecentItems.clear();
+    for (String filename : rootModel.get().getHistory().getFilenames()) {
+        MenuItem newItem = new MenuItem(filename);
+        newItem.setOnAction((actionEvent -> {
+        try {
+          ImporterFacade.importFile(new File(filename), rootModel
+              .get().getGlobalConfig(), rootModel.get().getHistory(), (hybridSpecification) -> {
+            //handle hybridspecification
+            rootModel.get().getHybridSpecifications().add(hybridSpecification);
+          }, (rootModel) -> {
+            //handle rootModel
+            this.rootModel.setValue(rootModel);
+          }, (code -> {
+            // handle code
+            this.rootModel.get().getScenario().setCode(code);
+          }));
+        } catch (IOException | ImportException e) {
+          ViewUtils.showDialog(Alert.AlertType.ERROR, "File Open Error", "An error occurred " +
+              "while opening a file.", "The file " + filename + " could not be opened.", e.getMessage());
+        }
+      }));
+      view.openRecentItems.add(newItem);
+    }
+    view.openRecent.getItems().clear();
+    view.openRecent.getItems().addAll(view.openRecentItems);
   }
 
   private void saveSessionAs(ActionEvent actionEvent) {
@@ -80,7 +115,7 @@ public class StvsMenuBarController implements Controller {
 
   private void openCode(ActionEvent t) {
     FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Open an st-file");
+    fileChooser.setTitle("Open a Structured-Text File");
     fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
 
@@ -90,6 +125,7 @@ public class StvsMenuBarController implements Controller {
     try {
       Code code = ImporterFacade.importStCode(chosenFile);
       this.rootModel.get().getScenario().setCode(code);
+      this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
     } catch (IOException e) {
       new ErrorMessageDialog(e);
     }
@@ -97,7 +133,7 @@ public class StvsMenuBarController implements Controller {
 
   private void openSession(ActionEvent t) {
     FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Open a session");
+    fileChooser.setTitle("Open a Session");
     fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
 
@@ -106,10 +142,12 @@ public class StvsMenuBarController implements Controller {
     }
     try {
       StvsRootModel model = ImporterFacade.importSession(
-          chosenFile, ImporterFacade.ImportFormat.XML, rootModel.get().getGlobalConfig());
+          chosenFile, ImporterFacade.ImportFormat.XML, rootModel.get().getGlobalConfig(),
+          rootModel.get().getHistory());
       model.setWorkingdir(chosenFile.getParentFile());
       model.setFilename(chosenFile.getName());
       this.rootModel.set(model);
+      this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
     } catch (IOException | ImportException exception) {
       new ErrorMessageDialog(exception);
     }
@@ -117,7 +155,7 @@ public class StvsMenuBarController implements Controller {
 
   private void openSpec(ActionEvent t) {
     FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Open a specification-file");
+    fileChooser.setTitle("Open a Specification File");
     fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
 
@@ -127,8 +165,8 @@ public class StvsMenuBarController implements Controller {
     try {
       HybridSpecification spec = ImporterFacade.importHybridSpec(chosenFile,
           ImporterFacade.ImportFormat.XML);
-      this.rootModel.get().getHybridSpecifications().add(spec);
-
+       this.rootModel.get().getHybridSpecifications().add(spec);
+       this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
     } catch (IOException | ImportException e) {
       new ErrorMessageDialog(e);
     }
@@ -145,7 +183,8 @@ public class StvsMenuBarController implements Controller {
       return;
     }
     try {
-      ImporterFacade.importFile(chosenFile, rootModel.get().getGlobalConfig(), (hybridSpecification) -> {
+      ImporterFacade.importFile(chosenFile, rootModel.get().getGlobalConfig(), rootModel.get()
+          .getHistory(), (hybridSpecification) -> {
         //handle hybridspecification
         rootModel.get().getHybridSpecifications().add(hybridSpecification);
       }, (rootModel) -> {
@@ -155,7 +194,7 @@ public class StvsMenuBarController implements Controller {
         //handle code
         this.rootModel.get().getScenario().setCode(code);
       }));
-    } catch (IOException e) {
+    } catch (IOException | ImportException e) {
       new ErrorMessageDialog(e);
     }
   }
@@ -227,5 +266,13 @@ public class StvsMenuBarController implements Controller {
   @Override
   public StvsMenuBar getView() {
     return view;
+  }
+
+  private class HistoryFilenamesChangeListener implements javafx.collections.ListChangeListener<String> {
+
+    @Override
+    public void onChanged(Change<? extends String> change) {
+      updateHistoryMenu();
+    }
   }
 }

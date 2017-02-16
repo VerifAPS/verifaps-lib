@@ -45,8 +45,8 @@ public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
         .getValue();
     session.setConfig(importedConfig); */
 
-    //History
-    session.setHistory(makeHistory(source));
+    /* History (optional in xsd, not imported/exported with session right now but separately
+    session.setHistory(makeHistory(source)); */
 
     // Tabs
     session.setTabs(makeTabs(source));
@@ -54,6 +54,7 @@ public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
     return marshalToNode(element);
   }
 
+  /*
   private History makeHistory(StvsRootModel source) {
     History exportedHistory = objectFactory.createHistory();
     for (String codeFile : source.getHistory().getCodeFiles()) {
@@ -63,7 +64,7 @@ public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
       exportedHistory.getSpec().add(specFile);
     }
     return exportedHistory;
-  }
+  }*/
 
   private Session.Tabs makeTabs(StvsRootModel source) throws ExportException {
     try {

@@ -107,7 +107,7 @@ public class SpecificationController implements Controller {
 
   private void onConcreteInstanceChanged(ConcreteSpecification newVal) {
     if (getConcreteSpecification() == null) {
-      view.setEmptyDiagram(new Label("no timing-diagram available"));
+      view.setEmptyDiagram(new Label("No timing diagram available."));
     } else {
       this.timingDiagramCollectionController = new TimingDiagramCollectionController(
           getConcreteSpecification(), selection);
@@ -137,8 +137,8 @@ public class SpecificationController implements Controller {
           });
         }, exception -> {
           Platform.runLater(() -> {
-            new ErrorMessageDialog(exception, "Concretizing failed", "An Error occurred while "
-                + "concretizing the specification");
+            new ErrorMessageDialog(exception, "Concretization Failed", "An error occurred while "
+                + "concretizing the specification.");
           });
         });
   }
