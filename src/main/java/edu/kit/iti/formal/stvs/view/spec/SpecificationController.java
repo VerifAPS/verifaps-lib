@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
+import edu.kit.iti.formal.stvs.ViewUtils;
 import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
 import edu.kit.iti.formal.stvs.logic.specification.smtlib.SmtConcretizer;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
@@ -23,6 +24,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 
@@ -107,7 +109,14 @@ public class SpecificationController implements Controller {
         variableCollectionController.getValidator().validFreeVariablesProperty().get(),
         optionalSpec -> {
           Platform.runLater(() -> {
-            optionalSpec.ifPresent(spec -> hybridSpecification.setConcreteInstance(spec));
+            if(optionalSpec.isPresent()){
+              hybridSpecification.setConcreteInstance(optionalSpec.get());
+            }
+            else{
+              ViewUtils.showDialog(Alert.AlertType.WARNING, "Concretizer warning",
+                  "No concrete instance found",
+                  "The Solver could not produce a concrete example with the given table.");
+            }
             view.setConcretizerButtonStart();
             view.getStartConcretizerButton().setOnAction(this::startConretizer);
           });
