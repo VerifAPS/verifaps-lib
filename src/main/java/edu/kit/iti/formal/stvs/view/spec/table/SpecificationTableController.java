@@ -174,6 +174,7 @@ public class SpecificationTableController implements Controller {
     MenuItem insertRow = new MenuItem("Insert Row");
     MenuItem deleteRow = new MenuItem("Delete Row");
     MenuItem addNewColumn = new MenuItem("New Column...");
+    MenuItem comment = new MenuItem("Comment ...");
     insertRow.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
     insertRow.setOnAction(event -> {
       int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
@@ -186,10 +187,16 @@ public class SpecificationTableController implements Controller {
         new IoVariableChooserDialog(codeIoVariables, hybridSpec.getColumnHeaders())
             .showAndWait()
             .ifPresent(this::addNewColumn));
+    comment.setOnAction(event -> {
+      int index = tableView.getSelectionModel().getSelectedIndex();
+      CommentPopupManager popupController = new CommentPopupManager(hybridSpec.getRows().get
+          (index), hybridSpec.isEditable(), config);
+    });
+    comment.setAccelerator(KeyCodeCombination.keyCombination("Ctrl+k"));
     insertRow.disableProperty().bind(Bindings.not(tableView.editableProperty()));
     deleteRow.disableProperty().bind(Bindings.not(tableView.editableProperty()));
     addNewColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
-    return new ContextMenu(insertRow, deleteRow, addNewColumn);
+    return new ContextMenu(insertRow, deleteRow, addNewColumn, comment);
   }
 
   private ContextMenu createColumnContextMenu(TableColumn<SynchronizedRow, ?> column) {
