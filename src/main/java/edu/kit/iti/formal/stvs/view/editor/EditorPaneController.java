@@ -13,6 +13,9 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.text.Font;
 import org.antlr.v4.runtime.Token;
 import org.fxmisc.richtext.CodeArea;
@@ -45,6 +48,7 @@ public class EditorPaneController implements Controller {
         EditorPane.class.getResource("st-keywords.css").toExternalForm());
     this.executor = Executors.newSingleThreadExecutor();
     configureTextArea();
+    setupContextMenu();
     handleTextChange(computeHighlighting(code.getSourcecode()));
     this.globalConfig.editorFontSizeProperty().addListener((observable, oldValue, newValue) -> updateFontSize(newValue.intValue()));
     this.globalConfig.editorFontFamilyProperty().addListener((observable, oldValue, newValue) -> updateFontFamily(newValue));
@@ -60,6 +64,27 @@ public class EditorPaneController implements Controller {
     view.getCodeArea().setStyle("-fx-font-family: " +
         globalConfig.editorFontFamilyProperty().get() +
         ";" + "-fx-font-size: " + size + "pt;");
+  }
+
+  private void setupContextMenu() {
+    ContextMenu menu = new ContextMenu();
+
+    MenuItem paste = new MenuItem("Paste");
+    MenuItem copy = new MenuItem("Copy");
+    MenuItem cut = new MenuItem("Cut");
+
+    CodeArea codeArea = view.getCodeArea();
+
+    paste.setOnAction((t) -> codeArea.paste());
+    copy.setOnAction((t) -> codeArea.copy());
+    cut.setOnAction((t) -> codeArea.cut());
+
+    menu.getItems().addAll(
+        paste,
+        copy,
+        cut
+    );
+    this.view.setContextMenu(menu);
   }
 
 
