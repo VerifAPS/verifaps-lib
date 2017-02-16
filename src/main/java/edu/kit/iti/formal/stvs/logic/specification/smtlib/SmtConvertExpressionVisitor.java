@@ -154,11 +154,11 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     // is an IOVariable?
     if (isIoVariable.test(variableName)) {
       // Do Rule I
-      // sum_(i=0...(z-1))(n_i) >= j
 
       //does it reference a previous cycle? -> guarantee reference-ability
       if (variableReferenceIndex < 0) {
         sConstraint.addGlobalConstrains(
+            // sum(z-1) >= max(0, alpha - i)
             new SList(
                 "bvuge",
                 sumRowIterations(row - 1),
