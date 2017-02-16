@@ -93,7 +93,6 @@ public class SpecificationsPaneController implements Controller {
     } else {
       scenario.setActiveSpec(controller.getSpec());
     }
-    System.out.println(scenario.getActiveSpec());
   }
 
   private SpecificationController addTab(HybridSpecification hybridSpecification, int index) {
@@ -106,6 +105,7 @@ public class SpecificationsPaneController implements Controller {
     tab.setContent(controller.getView());
     view.getTabs().add(index, tab);
     controllers.put(tab, controller);
+    view.getTabPane().getSelectionModel().select(tab);
     return controller;
   }
 
