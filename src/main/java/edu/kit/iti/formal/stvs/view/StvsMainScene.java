@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.view;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.menu.StvsMenuBarController;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -36,6 +37,8 @@ public class StvsMainScene {
     rootModelProperty.addListener(this::rootModelChanged);
 
     this.scene = new Scene(createVBox(), rootModel.getGlobalConfig().getWindowWidth(), rootModel.getGlobalConfig().getWindowHeight());
+    rootModel.getGlobalConfig().windowWidthProperty().bind(scene.widthProperty());
+    rootModel.getGlobalConfig().windowHeightProperty().bind(scene.heightProperty());
   }
 
   private VBox createVBox() {
@@ -71,5 +74,9 @@ public class StvsMainScene {
     if (stvsRootModel != null) {
       stvsRootModel.getGlobalConfig().autosaveConfig();
     }
+  }
+
+  public BooleanProperty shouldBeMaximizedProperty() {
+    return rootModelProperty.get().getGlobalConfig().windowMaximizedProperty();
   }
 }

@@ -89,6 +89,8 @@ public class SpecificationTableCell extends TextFieldTableCell<SynchronizedRow, 
   }
 
   private HybridCellModel<?> getCellModel() {
+    // Null hell
+    if (getTableRow() == null) return null;
     SynchronizedRow row = (SynchronizedRow) getTableRow().getItem();
     if (row == null) return null;
     String columnId = (String) getTableColumn().getUserData();
