@@ -50,3 +50,11 @@
     -fx-fill: lightyellow;
     -fx-blend-mode: multiply;
 }
+
+.valueLine{
+    -fx-stroke: steelblue;
+}
+
+.counterexample .valueLine{
+    -fx-stroke: red;
+}
