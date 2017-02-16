@@ -45,34 +45,8 @@ PROGRAM PedestrianTrafficLight
 END_PROGRAM</plaintext>
 </code>
 <tabs>
-<tab id="0" open="false" readOnly="false">
-<specification comment="" isConcrete="false" name="Unnamed Specification">
-<variables>
-<ioVariable colwidth="100" data-type="INT" io="output" name="counter"/>
-</variables>
-<rows>
-<row comment="">
-<duration>1</duration>
-<cell>-</cell>
-</row>
-</rows>
-<enumTypes/>
-</specification>
-</tab>
-<tab id="1" open="false" readOnly="false">
-<specification comment="" isConcrete="false" name="Unnamed Specification">
-<variables>
-<ioVariable colwidth="100" data-type="BOOL" io="input" name="pedestrianButtonPressed"/>
-<ioVariable colwidth="100" data-type="TrafficLight" io="output" name="lightStateCar"/>
-<ioVariable colwidth="100" data-type="TrafficLight" io="output" name="lightStatePedestrian"/>
-<ioVariable colwidth="100" data-type="INT" io="output" name="counter"/>
-</variables>
-<rows/>
-<enumTypes/>
-</specification>
-</tab>
 <tab id="2" open="false" readOnly="false">
-<specification comment="" isConcrete="false" name="Unnamed Specification">
+<specification comment="" isConcrete="false" name="CylceSpec">
 <variables>
 <ioVariable colwidth="155" data-type="BOOL" io="input" name="pedBtnPress"/>
 <ioVariable colwidth="189" data-type="BOOL" io="output" name="carLight"/>
@@ -126,28 +100,8 @@ END_PROGRAM</plaintext>
 <enumTypes/>
 </specification>
 </tab>
-<tab id="3" open="false" readOnly="false">
-<specification comment="" isConcrete="false" name="Unnamed Specification">
-<variables>
-<ioVariable colwidth="100" data-type="BOOL" io="input" name="pedBtnPress"/>
-<ioVariable colwidth="290" data-type="TrafficLight" io="output" name="carLight"/>
-<ioVariable colwidth="302" data-type="TrafficLight" io="output" name="pedLight"/>
-<ioVariable colwidth="100" data-type="INT" io="output" name="counter"/>
-</variables>
-<rows>
-<row comment="">
-<duration>1</duration>
-<cell>-</cell>
-<cell>carLight = Red | carLight != pedLight</cell>
-<cell>pedLight = Red | pedLight != carLight</cell>
-<cell>-</cell>
-</row>
-</rows>
-<enumTypes/>
-</specification>
-</tab>
 <tab id="4" open="false" readOnly="false">
-<specification comment="" isConcrete="false" name="Unnamed Specification">
+<specification comment="" isConcrete="false" name="NoCollisionSpec">
 <variables>
 <ioVariable colwidth="170" data-type="BOOL" io="input" name="pedBtnPress"/>
 <ioVariable colwidth="328" data-type="BOOL" io="output" name="carLight"/>

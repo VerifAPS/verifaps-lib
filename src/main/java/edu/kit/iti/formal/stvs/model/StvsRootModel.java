@@ -1,19 +1,26 @@
 package edu.kit.iti.formal.stvs.model;
 
+import edu.kit.iti.formal.stvs.logic.io.ExportException;
+import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
+import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import jdk.nashorn.internal.objects.Global;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
  * @author Benjamin Alt
  */
 public class StvsRootModel {
+
+  private static final String AUTOLOAD_SESSION_FILENAME = "stvs-session.xml";
 
   private ObservableList<HybridSpecification> hybridSpecifications;
   private GlobalConfig globalConfig;
@@ -98,5 +105,25 @@ public class StvsRootModel {
     this.filename = filename;
   }
 
+  public static StvsRootModel autoloadSession() {
+    File sessionFile = new File(GlobalConfig.CONFIG_DIRPATH + File.separator +
+        AUTOLOAD_SESSION_FILENAME);
+    try {
+      return ImporterFacade.importSession(sessionFile, ImporterFacade.ImportFormat.XML, new
+          GlobalConfig(), new History());
+    } catch (Exception e) {
+      return new StvsRootModel();
+    }
+  }
+
+  public void autosaveSession() throws IOException, ExportException {
+    File configDir = new File(GlobalConfig.CONFIG_DIRPATH);
+    if (!configDir.isDirectory() || !configDir.exists()) {
+      configDir.mkdirs();
+    }
+    File sessionFile = new File(GlobalConfig.CONFIG_DIRPATH + File.separator +
+        AUTOLOAD_SESSION_FILENAME);
+    ExporterFacade.exportSession(this, ExporterFacade.ExportFormat.XML, sessionFile);
+  }
 
 }

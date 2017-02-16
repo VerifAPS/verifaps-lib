@@ -63,37 +63,44 @@ public class TimingDiagramCollectionController implements Controller {
     view.getOutdatedLabel().managedProperty().bind(activated.not());
 
     concreteSpec.getColumnHeaders().forEach(validIoVariable -> {
-      Pair<TimingDiagramController, Axis> diagramAxisPair = validIoVariable.getValidType().match(
-          () -> addIntegerTimingDiagram(concreteSpec, validIoVariable),
-          () -> addBoolTimingDiagram(concreteSpec, validIoVariable),
-          (e) -> addEnumTimingDiagram(concreteSpec, validIoVariable, e)
-      );
-      TimingDiagramView timingDiagramView = diagramAxisPair.getKey().getView();
-
-      Axis externalYAxis = diagramAxisPair.getValue();
-      VerticalResizeContainerController verticalResizeContainerController = new VerticalResizeContainerController(timingDiagramView);
-
-      this.view.getDiagramContainer().getChildren().add(verticalResizeContainerController.getView());
-      this.view.getyAxisContainer().getChildren().add(externalYAxis);
-      timingDiagramView.getyAxis().layoutBoundsProperty().addListener(
-          change -> updateAxisExternalPosition(timingDiagramView, externalYAxis)
-      );
-      verticalResizeContainerController.getView().layoutYProperty().addListener(
-          change -> updateAxisExternalPosition(timingDiagramView, externalYAxis)
-      );
-      AnchorPane.setRightAnchor(diagramAxisPair.getValue(), 0.0);
-
-      Label label = new Label(validIoVariable.getName());
-      label.getStyleClass().add(validIoVariable.getCategory().name().toLowerCase());
-      this.view.getLabelContainer().getChildren().add(label);
-      label.layoutYProperty().bind(
-          diagramAxisPair.getValue().layoutYProperty().add(
-              diagramAxisPair.getValue().heightProperty().divide(2)
-          ).subtract(label.heightProperty().divide(2))
-      );
+      createTimingDiagram(concreteSpec, validIoVariable);
     });
     view.getxAxis().setUpperBound(concreteSpec.getRows().size());
     initxScrollbar();
+  }
+
+  private void createTimingDiagram(ConcreteSpecification concreteSpec, ValidIoVariable validIoVariable) {
+    Pair<TimingDiagramController, Axis> diagramAxisPair = validIoVariable.getValidType().match(
+        () -> addIntegerTimingDiagram(concreteSpec, validIoVariable),
+        () -> addBoolTimingDiagram(concreteSpec, validIoVariable),
+        (e) -> addEnumTimingDiagram(concreteSpec, validIoVariable, e)
+    );
+    TimingDiagramView timingDiagramView = diagramAxisPair.getKey().getView();
+
+    if (concreteSpec.isCounterExample()) {
+      timingDiagramView.getStyleClass().add("counterexample");
+    }
+    Axis externalYAxis = diagramAxisPair.getValue();
+    VerticalResizeContainerController verticalResizeContainerController = new VerticalResizeContainerController(timingDiagramView);
+
+    this.view.getDiagramContainer().getChildren().add(verticalResizeContainerController.getView());
+    this.view.getyAxisContainer().getChildren().add(externalYAxis);
+    timingDiagramView.getyAxis().layoutBoundsProperty().addListener(
+        change -> updateAxisExternalPosition(timingDiagramView, externalYAxis)
+    );
+    verticalResizeContainerController.getView().layoutYProperty().addListener(
+        change -> updateAxisExternalPosition(timingDiagramView, externalYAxis)
+    );
+    AnchorPane.setRightAnchor(diagramAxisPair.getValue(), 0.0);
+
+    Label label = new Label(validIoVariable.getName());
+    label.getStyleClass().add(validIoVariable.getCategory().name().toLowerCase());
+    this.view.getLabelContainer().getChildren().add(label);
+    label.layoutYProperty().bind(
+        diagramAxisPair.getValue().layoutYProperty().add(
+            diagramAxisPair.getValue().heightProperty().divide(2)
+        ).subtract(label.heightProperty().divide(2))
+    );
   }
 
   private void initxScrollbar() {
