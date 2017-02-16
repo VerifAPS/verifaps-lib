@@ -47,7 +47,7 @@ public class StvsMenuBar extends MenuBar {
     saveCode = new MenuItem("Save Code");
     saveSpec = new MenuItem("Save Specification");
 
-    saveAll = new MenuItem("Save all");
+    saveAll = new MenuItem("Save Session");
     saveAll.setAccelerator(KeyCombination.keyCombination("Ctrl+s"));
 
     config = new MenuItem("Preferences");

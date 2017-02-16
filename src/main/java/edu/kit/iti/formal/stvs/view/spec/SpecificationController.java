@@ -44,6 +44,7 @@ public class SpecificationController implements Controller {
   private HybridSpecification hybridSpecification;
   private BooleanProperty specificationInvalid;
   private SpecificationConcretizer concretizer;
+
   public SpecificationController(
       ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> codeIoVariables,
@@ -90,8 +91,8 @@ public class SpecificationController implements Controller {
     if (getConcreteSpecification() == null) {
       view.setEmptyDiagram(new Label("no timing-diagram available"));
     } else {
-      this.timingDiagramCollectionController = new TimingDiagramCollectionController
-          (getConcreteSpecification(), selection);
+      this.timingDiagramCollectionController = new TimingDiagramCollectionController(
+          getConcreteSpecification(), selection);
       view.setDiagram(timingDiagramCollectionController.getView());
 
     }
@@ -120,7 +121,7 @@ public class SpecificationController implements Controller {
   private void stopConcretizer(ActionEvent actionEvent) {
     view.setConcretizerButtonStart();
     view.getStartConcretizerButton().setOnAction(this::startConretizer);
-    if(this.concretizer != null){
+    if (this.concretizer != null) {
       this.concretizer.terminate();
     }
   }
