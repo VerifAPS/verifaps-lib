@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs;
+package edu.kit.iti.formal.stvs.view;
 
 import javafx.scene.Node;
 import javafx.scene.control.Alert;

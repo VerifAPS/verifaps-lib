@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
-import edu.kit.iti.formal.stvs.ViewUtils;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
@@ -11,10 +11,7 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
-import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.MenuItem;
@@ -79,6 +76,7 @@ public class StvsMenuBarController implements Controller {
             // handle code
             this.rootModel.get().getScenario().setCode(code);
           }));
+          this.rootModel.get().getHistory().addFilename(filename);
         } catch (IOException | ImportException e) {
           ViewUtils.showDialog(Alert.AlertType.ERROR, "File Open Error", "An error occurred " +
               "while opening a file.", "The file " + filename + " could not be opened.", e.getMessage());

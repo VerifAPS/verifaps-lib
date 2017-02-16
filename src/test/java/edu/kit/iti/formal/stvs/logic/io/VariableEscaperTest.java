@@ -22,6 +22,9 @@ public class VariableEscaperTest {
     expressions.put("=TRUE", "=TRUE");
     expressions.put("lala != TRUE, lalala = FALSE", "var_lala != TRUE, var_lalala = FALSE");
     expressions.put("lala[-2]+lalala[-1]", "var_lala[-2]+var_lalala[-1]");
+    expressions.put("lalala AND lalala", "var_lalala AND var_lalala");
+    expressions.put("ANDiamavariable AND iANDamORaVariable", "var_ANDiamavariable AND " +
+        "var_iANDamORaVariable");
     for (String expr : expressions.keySet()) {
       String res = VariableEscaper.escapeCellExpression(expr);
       assertEquals(expressions.get(expr), res);

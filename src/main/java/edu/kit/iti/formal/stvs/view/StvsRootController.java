@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view;
 
-import edu.kit.iti.formal.stvs.ViewUtils;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.verification.VerificationException;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
@@ -21,7 +20,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Alert;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;

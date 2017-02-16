@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.view.editor;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.code.FoldableCodeBlock;
@@ -16,6 +18,7 @@ import javafx.concurrent.Task;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.text.Font;
 import org.antlr.v4.runtime.Token;
 import org.fxmisc.richtext.CodeArea;
@@ -66,23 +69,30 @@ public class EditorPaneController implements Controller {
         ";" + "-fx-font-size: " + size + "pt;");
   }
 
+  private MenuItem createMenuItem(String name, Runnable action, FontAwesomeIcon icon) {
+    MenuItem item = createMenuItem(name, action);
+    item.setGraphic(GlyphsDude.createIcon(icon));
+    return item;
+  }
+
+  private MenuItem createMenuItem(String name, Runnable action) {
+    MenuItem item = new MenuItem(name);
+    item.setOnAction(t -> action.run());
+    return item;
+  }
+
   private void setupContextMenu() {
-    ContextMenu menu = new ContextMenu();
-
-    MenuItem paste = new MenuItem("Paste");
-    MenuItem copy = new MenuItem("Copy");
-    MenuItem cut = new MenuItem("Cut");
-
     CodeArea codeArea = view.getCodeArea();
 
-    paste.setOnAction((t) -> codeArea.paste());
-    copy.setOnAction((t) -> codeArea.copy());
-    cut.setOnAction((t) -> codeArea.cut());
-
+    ContextMenu menu = new ContextMenu();
     menu.getItems().addAll(
-        paste,
-        copy,
-        cut
+        createMenuItem("Undo", codeArea::undo, FontAwesomeIcon.UNDO),
+        createMenuItem("Redo", codeArea::redo),
+        new SeparatorMenuItem(),
+        createMenuItem("Paste", codeArea::paste, FontAwesomeIcon.PASTE),
+        createMenuItem("Copy", codeArea::copy, FontAwesomeIcon.COPY),
+        createMenuItem("Cut", codeArea::cut, FontAwesomeIcon.CUT),
+        createMenuItem("Select All", codeArea::selectAll)
     );
     this.view.setContextMenu(menu);
   }

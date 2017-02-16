@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view;
 
-import edu.kit.iti.formal.stvs.ViewUtils;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
@@ -31,7 +30,7 @@ public class StvsMainScene {
   private final Scene scene;
 
   public StvsMainScene() {
-    this(new StvsRootModel());
+    this(StvsRootModel.autoloadSession());
   }
 
   public StvsMainScene(StvsRootModel rootModel) {
@@ -83,6 +82,7 @@ public class StvsMainScene {
       try {
         stvsRootModel.getGlobalConfig().autosaveConfig();
         stvsRootModel.getHistory().autosaveHistory();
+        stvsRootModel.autosaveSession();
       } catch (IOException | ExportException | JAXBException e) {
         ViewUtils.showDialog(Alert.AlertType.ERROR, "Autosave error", "Error saving the current" +
             " configuration", "The current configuration could not be saved.", e.getMessage());

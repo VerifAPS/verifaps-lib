@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
-import edu.kit.iti.formal.stvs.ViewUtils;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
