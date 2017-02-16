@@ -161,7 +161,7 @@ public class ImporterFacade {
           case "session":
             rootModelConsumer.accept(importSession(file, ImportFormat.XML, globalConfig,
                 currentHistory));
-            break;
+            return;
           case "specification":
             specificationConsumer.accept(importHybridSpec(file, ImportFormat.XML));
             return;
