@@ -106,9 +106,7 @@ public class SmtEncoderTest {
     System.out.println(output.toString());
     System.out.println(output.toText());
 
-    testWithStatements(definitions, "(= |p| #x000F)");
-    testWithStatements(definitions, "(= |q| #x0001)");
-    testWithStatements(definitions, "(= |r| true)");
+    testWithStatements(definitions, "(assert (= |freevar| #x0000))");
 
   }
 
