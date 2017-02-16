@@ -59,7 +59,7 @@ public class StvsMenuBarController implements Controller {
   }
 
   private void createNewCode(ActionEvent actionEvent) {
-    this.rootModel.get().getScenario().setCode(new Code("untitled", ""));
+    this.rootModel.get().getScenario().setCode(new Code());
   }
 
   private void openConfigDialog(ActionEvent t) {
