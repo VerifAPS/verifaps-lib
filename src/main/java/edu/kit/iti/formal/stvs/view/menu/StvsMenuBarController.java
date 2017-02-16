@@ -41,6 +41,8 @@ public class StvsMenuBarController implements Controller {
     this.view = new StvsMenuBar();
 
     //add listener
+    view.newCode.setOnAction(this::createNewCode);
+    view.newSpec.setOnAction(this::createNewSpec);
     view.open.setOnAction(this::openFile);
     view.openSession.setOnAction(this::openSession);
     view.openCode.setOnAction(this::openCode);
@@ -50,6 +52,14 @@ public class StvsMenuBarController implements Controller {
     view.saveSpec.setOnAction(this::saveSpec);
     view.config.setOnAction(this::openConfigDialog);
 
+  }
+
+  private void createNewSpec(ActionEvent actionEvent) {
+    //TODO
+  }
+
+  private void createNewCode(ActionEvent actionEvent) {
+    this.rootModel.get().getScenario().setCode(new Code());
   }
 
   private void openConfigDialog(ActionEvent t) {
