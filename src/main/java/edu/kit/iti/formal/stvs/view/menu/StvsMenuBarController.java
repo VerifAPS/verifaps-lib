@@ -48,10 +48,22 @@ public class StvsMenuBarController implements Controller {
     view.openCode.setOnAction(this::openCode);
     view.openSpec.setOnAction(this::openSpec);
     view.saveAll.setOnAction(this::saveAll);
+    view.saveSessionAs.setOnAction(this::saveSessionAs);
     view.saveCode.setOnAction(this::saveCode);
     view.saveSpec.setOnAction(this::saveSpec);
     view.config.setOnAction(this::openConfigDialog);
 
+  }
+
+  private void saveSessionAs(ActionEvent actionEvent) {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Save session");
+    fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
+    File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
+    if (chosenFile != null) {
+      handleSaveAll();
+      rootModel.get().setWorkingdir(chosenFile);
+    }
   }
 
   private void createNewSpec(ActionEvent actionEvent) {
@@ -149,17 +161,15 @@ public class StvsMenuBarController implements Controller {
 
 
   private void saveAll(ActionEvent t) {
-    FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Save session");
-    fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
-    File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
-    if (chosenFile != null) {
-      try {
-        ExporterFacade.exportSession(rootModel.get(), ExporterFacade.ExportFormat
-            .XML, chosenFile);
-      } catch (IOException | ExportException e) {
-        new ErrorMessageDialog(e);
-      }
+    handleSaveAll();
+  }
+
+  private void handleSaveAll() {
+    try {
+      ExporterFacade.exportSession(rootModel.get(), ExporterFacade.ExportFormat
+          .XML, rootModel.get().getWorkingdir());
+    } catch (IOException | ExportException e) {
+      new ErrorMessageDialog(e);
     }
   }
 

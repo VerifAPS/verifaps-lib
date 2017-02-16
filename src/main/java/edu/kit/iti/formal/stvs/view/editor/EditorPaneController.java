@@ -51,11 +51,15 @@ public class EditorPaneController implements Controller {
   }
 
   private void updateFontFamily(String fontFamily) {
-    view.getCodeArea().setStyle("-fx-font-family: " + fontFamily + ";" + "-fx-font-size: " + globalConfig.editorFontSizeProperty().get() + "pt;");
+    view.getCodeArea().setStyle("-fx-font-family: " +
+        fontFamily + ";" + "-fx-font-size: " +
+        globalConfig.editorFontSizeProperty().get() + "pt;");
   }
 
   private void updateFontSize(int size) {
-    view.getCodeArea().setStyle("-fx-font-family: " + globalConfig.editorFontFamilyProperty().get() + ";" + "-fx-font-size: " + size + "pt;");
+    view.getCodeArea().setStyle("-fx-font-family: " +
+        globalConfig.editorFontFamilyProperty().get() +
+        ";" + "-fx-font-size: " + size + "pt;");
   }
 
 
