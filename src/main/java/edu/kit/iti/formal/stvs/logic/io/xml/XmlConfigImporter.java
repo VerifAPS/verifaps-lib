@@ -40,6 +40,7 @@ public class XmlConfigImporter extends XmlImporter<GlobalConfig> {
         if (general.getWindowSize().getWidth() != null) {
           config.setWindowWidth(general.getWindowSize().getWidth().intValue());
         }
+        config.setWindowMaximized(general.getWindowSize().isMaximized());
         if (general.getMaxLineRollout() != null) {
           config.setMaxLineRollout(general.getMaxLineRollout().intValue());
         }
