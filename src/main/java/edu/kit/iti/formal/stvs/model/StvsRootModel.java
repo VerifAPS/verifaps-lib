@@ -21,6 +21,8 @@ public class StvsRootModel {
   private VerificationScenario scenario;
   private File workingdir;
 
+  private String filename;
+
   /**
    * Create a new empty StvsRootModel with no specifications or verification, an empty history
    * and a default config.
@@ -31,7 +33,8 @@ public class StvsRootModel {
         new GlobalConfig(),
         new History(),
         new VerificationScenario(),
-        new File(System.getProperty("user.home")));
+        new File(System.getProperty("user.home")),
+        "");
   }
 
   /**
@@ -41,14 +44,17 @@ public class StvsRootModel {
    * @param history
    * @param scenario
    * @param workingdir working-directory that should be used (e.g. for opening and saving)
+   * @param filename filename of stvsrootmodel
    */
   public StvsRootModel(List<HybridSpecification> hybridSpecifications, GlobalConfig globalConfig,
-                       History history, VerificationScenario scenario, File workingdir) {
+                       History history, VerificationScenario scenario, File workingdir, String
+                           filename) {
     this.hybridSpecifications = FXCollections.observableArrayList(hybridSpecifications);
     this.globalConfig = globalConfig;
     this.history = history;
     this.scenario = scenario;
     this.workingdir = workingdir;
+    this.filename = filename;
   }
 
   public ObservableList<HybridSpecification> getHybridSpecifications() {
@@ -82,6 +88,14 @@ public class StvsRootModel {
 
   public void setWorkingdir(File workingdir) {
     this.workingdir = workingdir;
+  }
+
+  public String getFilename() {
+    return filename;
+  }
+
+  public void setFilename(String filename) {
+    this.filename = filename;
   }
 
 

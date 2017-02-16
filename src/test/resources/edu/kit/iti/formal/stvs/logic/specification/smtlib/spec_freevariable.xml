@@ -2,7 +2,7 @@
 <specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="" isConcrete="false">
 <variables>
     <ioVariable io="output" name="C" data-type="INT"></ioVariable>
-    <freeVariable name="p" data-type="INT" default="333"></freeVariable>
+    <freeVariable name="p" data-type="INT" default="15"></freeVariable>
     <freeVariable name="q" data-type="Color" default="green"></freeVariable>
     <freeVariable name="r" data-type="BOOL" default="true"></freeVariable>
 </variables>

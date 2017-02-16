@@ -80,9 +80,33 @@ public class SmtEncoderTest {
 
     System.out.println(output.toString());
 
-    testWithStatements(definitions, "(= |p| 333)");
-    testWithStatements(definitions, "(= |q| 1)");
-    testWithStatements(definitions, "(= |r| TRUE)");
+    testWithStatements(definitions, "(= |p| #x000F)");
+    testWithStatements(definitions, "(= |q| #x0001)");
+    testWithStatements(definitions, "(= |r| true)");
+
+  }
+
+  @Test
+  public void testFreeVariablesDefaultValueSimple() {
+    Supplier<InputStream> sourceFile = () -> SmtEncoderTest.class.getResourceAsStream(
+        "spec_freevars.xml");
+
+    ValidSpecification spec = TestUtils.importValidSpec(sourceFile.get());
+    List<ValidFreeVariable> freeVariables = TestUtils.importValidFreeVariables(sourceFile.get());
+
+    int maxDuration = 50;
+
+
+
+    SmtEncoder smtEncoder = new SmtEncoder((i) -> maxDuration, spec, freeVariables);
+    SConstraint output = smtEncoder.getConstrain();
+    Set<SExpr> constraints = output.getGlobalConstraints();
+    Set<SExpr> definitions = output.getVariableDefinitions();
+
+    System.out.println(output.toString());
+    System.out.println(output.toText());
+
+    testWithStatements(definitions, "(assert (= |freevar| #x0000))");
 
   }
 

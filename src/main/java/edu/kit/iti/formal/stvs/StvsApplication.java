@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs;
 
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.StvsMainScene;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -23,7 +22,8 @@ public class StvsApplication extends Application {
     mainScene = new StvsMainScene();
     primaryStage.setTitle("Structured Text Verification Studio - STVS");
     primaryStage.setScene(mainScene.getScene());
-    primaryStage.setMaximized(true);
+    primaryStage.setMaximized(mainScene.shouldBeMaximizedProperty().get());
+    mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty());
     primaryStage.show();
   }
 

@@ -23,6 +23,7 @@ public class GlobalConfig {
   // General
   private IntegerProperty verificationTimeout;
   private IntegerProperty simulationTimeout;
+  private BooleanProperty windowMaximized;
   private IntegerProperty windowHeight;
   private IntegerProperty  windowWidth;
   private StringProperty uiLanguage;
@@ -44,6 +45,7 @@ public class GlobalConfig {
   public GlobalConfig() {
     verificationTimeout = new SimpleIntegerProperty(3600);
     simulationTimeout = new SimpleIntegerProperty(60);
+    windowMaximized = new SimpleBooleanProperty(true);
     windowHeight = new SimpleIntegerProperty(600);
     windowWidth = new SimpleIntegerProperty(800);
     editorFontSize = new SimpleIntegerProperty(12);
@@ -88,6 +90,7 @@ public class GlobalConfig {
   public void setAll(GlobalConfig toBeCopied) {
     verificationTimeout.set(toBeCopied.getVerificationTimeout());
     simulationTimeout.set(toBeCopied.getSimulationTimeout());
+    windowMaximized.set(toBeCopied.isWindowMaximized());
     windowHeight.set(toBeCopied.getWindowHeight());
     windowWidth.set(toBeCopied.getWindowWidth());
     editorFontSize.set(toBeCopied.getEditorFontSize());
@@ -346,5 +349,17 @@ public class GlobalConfig {
 
   public void setMaxLineRollout(int maxLineRollout) {
     this.maxLineRollout.set(maxLineRollout);
+  }
+
+  public boolean isWindowMaximized() {
+    return windowMaximized.get();
+  }
+
+  public BooleanProperty windowMaximizedProperty() {
+    return windowMaximized;
+  }
+
+  public void setWindowMaximized(boolean windowMaximized) {
+    this.windowMaximized.set(windowMaximized);
   }
 }
