@@ -71,7 +71,7 @@ public class SpecificationView extends VBox implements Lockable {
   }
 
   public void setConcretizerButtonStart() {
-    Text icon = GlyphsDude.createIcon(FontAwesomeIcon.MAGIC);
+    Text icon = GlyphsDude.createIcon(FontAwesomeIcon.LINE_CHART);
     icon.setFill(Color.MEDIUMSEAGREEN);
     startConcretizerButton.setText("Concretize");
     startConcretizerButton.setGraphic(icon);

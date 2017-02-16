@@ -31,9 +31,9 @@ public class VariableCollection extends VBox {
     this.overviewLabel = new Label("Free Variables:");
     this.addFreeVariable = makeAddButton();
     this.freeVariableTableView = new TableView<>();
-    this.nameTableColumn = new TableColumn<>("name");
-    this.typeTableColumn = new TableColumn<>("type");
-    this.defaultValueTableColumn = new TableColumn<>("default value");
+    this.nameTableColumn = new TableColumn<>("Name");
+    this.typeTableColumn = new TableColumn<>("Type");
+    this.defaultValueTableColumn = new TableColumn<>("Default Value");
 
     getStylesheets().add(VariableCollection.class.getResource("style.css").toExternalForm());
 
