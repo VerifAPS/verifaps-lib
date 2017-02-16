@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs;
 
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.StvsMainScene;
 import javafx.application.Application;
 import javafx.application.Platform;

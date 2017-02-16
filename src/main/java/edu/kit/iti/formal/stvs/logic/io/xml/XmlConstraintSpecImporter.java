@@ -94,7 +94,9 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
       try {
         VariableCategory category = VariableCategory.valueOf(variable.getIo().toUpperCase());
         SpecIoVariable specIoVariable = new SpecIoVariable(category, variable.getDataType(), variable.getName());
-        specIoVariable.getColumnConfig().setWidth(variable.getColwidth().doubleValue());
+        if (variable.getColwidth() != null) {
+          specIoVariable.getColumnConfig().setWidth(variable.getColwidth().doubleValue());
+        }
         ioVariables.add(specIoVariable);
       } catch (IllegalArgumentException argExc) { // thrown by VariableCategory.valueOf
         throw new ImportException("Illegal variable category: " + variable.getIo());
