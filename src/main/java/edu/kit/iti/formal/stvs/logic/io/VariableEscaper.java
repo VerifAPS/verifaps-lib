@@ -2,6 +2,9 @@ package edu.kit.iti.formal.stvs.logic.io;
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.stvs.model.code.Code;
+import edu.kit.iti.formal.stvs.model.expressions.parser.CellExpressionLexer;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 
@@ -22,32 +25,21 @@ public class VariableEscaper {
   }
 
   public static String escapeCellExpression(String expr) {
-    String currentBuf = "";
-    String lastMatch = "";
-    String outBuf = "";
-    for (int i = 0; i < expr.length(); i++) {
-      char c = expr.charAt(i);
-      currentBuf += c;
-      if (!IDENTIFIER_PATTERN.matcher(currentBuf).matches()) {
-        if (currentBuf.length() > 1) {
-          // I have either a valid identifier plus an operator or TRUE or FALSE in the buffer
-          if (currentBuf.equals("TRUE") || currentBuf.equals("FALSE")) {
-            outBuf += currentBuf;
-          } else {
-            outBuf += currentBuf.replaceAll(IDENTIFIER_PATTERN.toString(), escapeName(lastMatch));
-          }
-        } else {
-          outBuf += currentBuf;
-        }
-        currentBuf = "";
-      } else {
-        lastMatch = currentBuf;
-        if(i == expr.length()-1) {
-          outBuf += currentBuf.replaceAll(IDENTIFIER_PATTERN.toString(), escapeName(lastMatch));
-        }
+    CharStream charStream = new ANTLRInputStream(expr);
+    CellExpressionLexer lexer = new CellExpressionLexer(charStream);
+    String result = expr;
+    int currentOffset = 0;
+    for (Token token : lexer.getAllTokens()) {
+      if (token.getType() == CellExpressionLexer.IDENTIFIER) {
+        int begin = token.getStartIndex() + currentOffset;
+        int end = token.getStopIndex() + currentOffset;
+        String before = result.substring(0, begin);
+        String after = result.substring(end + 1, result.length());
+        result = before + "var_" + token.getText() + after;
+        currentOffset += 4; // 4 <-- length of "var_"
       }
     }
-    return outBuf;
+    return result;
   }
 
   public static String escapeCode(Code code) {

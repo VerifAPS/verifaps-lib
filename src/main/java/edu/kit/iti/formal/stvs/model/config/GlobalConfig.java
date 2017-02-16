@@ -1,11 +1,9 @@
 package edu.kit.iti.formal.stvs.model.config;
 
-import edu.kit.iti.formal.stvs.ViewUtils;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import javafx.beans.property.*;
-import javafx.scene.control.Alert;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.io.File;

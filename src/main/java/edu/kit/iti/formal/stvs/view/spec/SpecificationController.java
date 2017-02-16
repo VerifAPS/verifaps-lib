@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
-import edu.kit.iti.formal.stvs.ViewUtils;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
 import edu.kit.iti.formal.stvs.logic.specification.smtlib.SmtConcretizer;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;

@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view;
 
-import edu.kit.iti.formal.stvs.ViewUtils;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
