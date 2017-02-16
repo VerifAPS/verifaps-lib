@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -22,6 +23,7 @@ import javafx.scene.shape.Rectangle;
  * Controller for a single TimingDiagramController e.g. for <b>one</b> Variable and over all Timesteps
  */
 public class TimingDiagramController implements Controller {
+  private final BooleanProperty activated;
   private ContextMenu contextMenu;
   private final TimingDiagramView<?> view;
   private final Axis externalYAxis;
@@ -32,7 +34,8 @@ public class TimingDiagramController implements Controller {
   private MouseEvent lastMouseEvent;
 
 
-  public TimingDiagramController(NumberAxis commonXAxis, NumberAxis externalYAxis, ConcreteSpecification spec, ValidIoVariable ioVariable, Selection selection) {
+  public TimingDiagramController(NumberAxis commonXAxis, NumberAxis externalYAxis, ConcreteSpecification spec, ValidIoVariable ioVariable, Selection selection, BooleanProperty activated) {
+    this.activated = activated;
     XYChart.Series<Number, Number> seriesData = Plotable.toNumberSeries(spec.getColumnByName(ioVariable.getName()).getCells());
     this.externalYAxis = externalYAxis;
     this.selection = selection;
@@ -59,7 +62,8 @@ public class TimingDiagramController implements Controller {
     initCommon();
   }
 
-  public TimingDiagramController(NumberAxis commonXAxis, CategoryAxis externalYAxis, ConcreteSpecification spec, ValidIoVariable ioVariable, Selection selection) {
+  public TimingDiagramController(NumberAxis commonXAxis, CategoryAxis externalYAxis, ConcreteSpecification spec, ValidIoVariable ioVariable, Selection selection, BooleanProperty activated) {
+    this.activated = activated;
     XYChart.Series<Number, String> seriesData = Plotable.toStringSeries(spec.getColumnByName(ioVariable.getName()).getCells());
     this.externalYAxis = externalYAxis;
     this.ioVariable = ioVariable;
@@ -100,13 +104,17 @@ public class TimingDiagramController implements Controller {
       Rectangle cycleSelectionRectangle = cycleSelectionRectangles.get(i);
       int finalCycleIndex = i;
       cycleSelectionRectangle.setOnMouseEntered(event -> {
-        cycleSelectionRectangle.setOpacity(1);
-        selection.setRow(concreteSpec.cycleToRowNumber(finalCycleIndex));
-        selection.setColumn(ioVariable.getName());
+        if(activated.get()) {
+          cycleSelectionRectangle.setOpacity(1);
+          selection.setRow(concreteSpec.cycleToRowNumber(finalCycleIndex));
+          selection.setColumn(ioVariable.getName());
+        }
       });
       cycleSelectionRectangle.setOnMouseExited(event -> {
-        cycleSelectionRectangle.setOpacity(0);
-        selection.clear();
+        if(activated.get()) {
+          cycleSelectionRectangle.setOpacity(0);
+          selection.clear();
+        }
       });
       cycleSelectionRectangle.setOnMouseClicked(event -> {
         if (event.getButton() == MouseButton.PRIMARY) {

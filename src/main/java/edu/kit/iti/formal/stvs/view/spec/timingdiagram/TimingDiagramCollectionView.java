@@ -2,8 +2,8 @@ package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
@@ -24,10 +24,14 @@ public class TimingDiagramCollectionView extends VBox {
   private Pane globalAxisContainer = new Pane();
   private NumberAxis xAxis = new NumberAxis(0, 10, 1);
   private ScrollBar xScrollBar = new ScrollBar();
+  private final Label outdatedLabel;
 
   public TimingDiagramCollectionView() {
     super();
-    getChildren().addAll(scrollPane, globalAxisContainer, xScrollBar);
+    getStyleClass().add("collectionView");
+    outdatedLabel = new Label("OUTDATED");
+    outdatedLabel.getStyleClass().add("outdatedLabel");
+    getChildren().addAll(outdatedLabel, scrollPane, globalAxisContainer, xScrollBar);
     globalAxisContainer.getChildren().add(xAxis);
     setPadding(new Insets(0, 10, 0, 10));
     yAxisStickRightContainer.getChildren().addAll(yAxisContainer, labelContainer);
@@ -78,5 +82,9 @@ public class TimingDiagramCollectionView extends VBox {
 
   public ScrollBar getxScrollBar() {
     return xScrollBar;
+  }
+
+  public Label getOutdatedLabel() {
+    return outdatedLabel;
   }
 }

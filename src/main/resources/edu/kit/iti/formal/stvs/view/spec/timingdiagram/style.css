@@ -28,3 +28,12 @@
 .labelContainer .input{
     -fx-text-fill: darkgreen;
 }
+
+.outdatedLabel{
+    -fx-text-alignment: center;
+    -fx-text-fill: red;
+}
+
+.collectionView{
+    -fx-alignment: top-center;
+}
