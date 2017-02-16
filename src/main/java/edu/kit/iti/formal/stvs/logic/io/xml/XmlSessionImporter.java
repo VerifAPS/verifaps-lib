@@ -32,13 +32,11 @@ import java.util.Optional;
  */
 public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
 
-  private XmlConstraintSpecImporter constraintSpecImporter;
   // private XmlConfigImporter configImporter;
   private ObjectFactory objectFactory;
   private GlobalConfig currentConfig;
 
   public XmlSessionImporter(GlobalConfig currentConfig) throws ImportException {
-    constraintSpecImporter = new XmlConstraintSpecImporter();
     //configImporter = new XmlConfigImporter();
     this.objectFactory = new ObjectFactory();
     this.currentConfig = currentConfig;
@@ -63,6 +61,7 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
 
       // Initialized later, since we need to know the types that are available before we import
       XmlConcreteSpecImporter concreteSpecImporter = new XmlConcreteSpecImporter(typeContext);
+      XmlConstraintSpecImporter constraintSpecImporter = new XmlConstraintSpecImporter();
 
       /* Config (optional in xsd, not imported/exported with session right now but separately,
       as per customer request)
