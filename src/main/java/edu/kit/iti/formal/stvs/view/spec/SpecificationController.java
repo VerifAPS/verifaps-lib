@@ -63,6 +63,7 @@ public class SpecificationController implements Controller {
         typeContext,
         hybridSpecification.getFreeVariableList());
     this.tableController = new SpecificationTableController(
+        globalConfig,
         typeContext,
         codeIoVariables,
         variableCollectionController.getValidator().validFreeVariablesProperty(),

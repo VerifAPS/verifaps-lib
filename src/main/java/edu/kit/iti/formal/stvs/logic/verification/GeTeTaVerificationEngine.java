@@ -124,7 +124,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
         writer = new PrintWriter(logFilePath);
       } catch (FileNotFoundException e1) {
         e1.printStackTrace();
-        result = null;
+        result = null; // Just to be explicit
         return;
       }
       writer.println(processOutput);

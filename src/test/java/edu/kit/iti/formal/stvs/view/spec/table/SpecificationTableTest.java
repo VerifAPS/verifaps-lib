@@ -5,6 +5,7 @@ import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
@@ -58,6 +59,7 @@ public class SpecificationTableTest {
 
     FreeVariableListValidator freevarValidator = new FreeVariableListValidator(typeContext, freeVariableList);
     SpecificationTableController table = new SpecificationTableController(
+        new GlobalConfig(),
         typeContext,
         codeIoVariables,
         freevarValidator.validFreeVariablesProperty(),

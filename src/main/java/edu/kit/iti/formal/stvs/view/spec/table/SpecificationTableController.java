@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.*;
 import edu.kit.iti.formal.stvs.model.table.problems.ColumnProblem;
@@ -39,11 +40,14 @@ public class SpecificationTableController implements Controller {
 
   private final ObservableList<SynchronizedRow> data = FXCollections.observableArrayList();
   private final TableColumn<SynchronizedRow, String> durations;
+  private final GlobalConfig config;
 
-  public SpecificationTableController(ObjectProperty<List<Type>> typeContext,
+  public SpecificationTableController(GlobalConfig config,
+                                      ObjectProperty<List<Type>> typeContext,
                                       ObjectProperty<List<CodeIoVariable>> codeIoVariables,
                                       ReadOnlyObjectProperty<List<ValidFreeVariable>> validVariables,
                                       HybridSpecification hybridSpecification) {
+    this.config = config;
     this.tableView = new TableView<>();
 
     this.typeContext = typeContext;
@@ -51,6 +55,8 @@ public class SpecificationTableController implements Controller {
     this.hybridSpec = hybridSpecification;
     this.validator = new ConstraintSpecificationValidator(typeContext, codeIoVariables, validVariables, hybridSpecification);
     this.durations = createViewColumn("Duration", SynchronizedRow::getDuration);
+
+    tableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
     tableView.getColumns().add(durations);
 
@@ -236,17 +242,17 @@ public class SpecificationTableController implements Controller {
         (Observable o) -> column.setUserData(specIoVariable.getName()));
     column.setText("");
     column.setGraphic(new ColumnHeader(specIoVariable));
-    // TODO: changes to prefwidth need to be saved
-    // FIXME: column widths are not taken from the session
     column.setPrefWidth(specIoVariable.getColumnConfig().getWidth());
+    column.widthProperty().addListener((obs, old, newVal) ->
+        specIoVariable.getColumnConfig().setWidth(newVal.doubleValue()));
     column.setContextMenu(createColumnContextMenu(column));
 
-    tableView.getColumns().add(tableView.getColumns().size()-1, column);
+    tableView.getColumns().add(tableView.getColumns().size() - 1, column);
   }
 
   private TableColumn<SynchronizedRow, String> createViewColumn(
       String colName,
-      final Function<SynchronizedRow, HybridCellModel> extractCellFromRow) {
+      final Function<SynchronizedRow, HybridCellModel<?>> extractCellFromRow) {
     TableColumn<SynchronizedRow, String> column = new TableColumn<>(colName);
     column.setSortable(false);
     column.setEditable(true);
