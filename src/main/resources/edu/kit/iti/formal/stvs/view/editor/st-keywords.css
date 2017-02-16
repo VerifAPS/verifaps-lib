@@ -20,6 +20,11 @@
     -fx-font-weight: bold;
 }
 
+.operation {
+    -fx-fill: orange;
+    -fx-font-weight: bold;
+}
+
 .semicolon {
     -fx-font-weight: bold;
 }

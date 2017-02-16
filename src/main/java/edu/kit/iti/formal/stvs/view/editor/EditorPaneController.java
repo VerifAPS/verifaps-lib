@@ -137,6 +137,9 @@ public class EditorPaneController implements Controller {
   private List<String> getHightlightingClass(Token token) {
     // TODO: Add more colours (styles) to tokens
     switch (token.getType()) {
+      case IEC61131Lexer.ELSEIF:
+      case IEC61131Lexer.THEN:
+      case IEC61131Lexer.OF:
       case IEC61131Lexer.PROGRAM:
       case IEC61131Lexer.END_PROGRAM:
       case IEC61131Lexer.TYPE:
@@ -163,6 +166,15 @@ public class EditorPaneController implements Controller {
       case IEC61131Lexer.VAR_OUTPUT:
       case IEC61131Lexer.END_VAR:
         return listOf("vardef");
+      case IEC61131Lexer.AND:
+      case IEC61131Lexer.NOT:
+      case IEC61131Lexer.OR:
+      case IEC61131Lexer.MINUS:
+      case IEC61131Lexer.PLUS:
+      case IEC61131Lexer.MULT:
+      case IEC61131Lexer.DIV:
+      case IEC61131Lexer.MOD:
+        return listOf("operation");
       default:
           return listOf();
       }

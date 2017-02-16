@@ -21,7 +21,7 @@ public class SmtConcretizer implements SpecificationConcretizer {
 
   public SmtConcretizer(GlobalConfig config) {
     this.config = config;
-    this.z3Solver = new Z3Solver(config.getZ3Path());
+    this.z3Solver = new Z3Solver(config);
   }
 
   @Override

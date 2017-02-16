@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import de.tudresden.inf.lat.jsexp.Sexp;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
@@ -12,7 +13,6 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import edu.kit.iti.formal.stvs.util.ProcessOutputAsyncTask;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,10 +26,12 @@ import java.util.stream.Collectors;
  */
 public class Z3Solver {
 
+  private final int timeout;
   private String z3Path;
 
-  public Z3Solver(String z3Path) {
-    this.z3Path = z3Path;
+  public Z3Solver(GlobalConfig config) {
+    this.z3Path = config.getZ3Path();
+    this.timeout = config.getSimulationTimeout();
   }
 
   public String getZ3Path() {
@@ -41,7 +43,7 @@ public class Z3Solver {
   }
 
   private ProcessOutputAsyncTask concretize(String smtString, Consumer<Optional<String>> handler) {
-    ProcessBuilder processBuilder = new ProcessBuilder(z3Path, "-in");
+    ProcessBuilder processBuilder = new ProcessBuilder(z3Path, "-in", "-smt2", "-T:" + timeout);
     return new ProcessOutputAsyncTask(processBuilder, smtString, handler);
   }
 
@@ -58,7 +60,7 @@ public class Z3Solver {
   }
 
   private ProcessOutputAsyncTask concretizeSmtString(String smtString, List<ValidIoVariable> validIoVariables,
-                                                            Consumer<Optional<ConcreteSpecification>> handler) {
+                                                     Consumer<Optional<ConcreteSpecification>> handler) {
     return concretizeSExpr(smtString, sexpOptional -> {
       Map<String, Type> typeContext = validIoVariables.stream().collect(Collectors.toMap(
           ValidIoVariable::getName, ValidIoVariable::getValidType
@@ -79,8 +81,8 @@ public class Z3Solver {
   }
 
   private List<SpecificationRow<ConcreteCell>> buildSpecificationRows(List<ValidIoVariable> validIoVariables,
-                                                                             List<ConcreteDuration> durations,
-                                                                             Map<Integer, Map<String, String>> rawRows) {
+                                                                      List<ConcreteDuration> durations,
+                                                                      Map<Integer, Map<String, String>> rawRows) {
     List<SpecificationRow<ConcreteCell>> specificationRows = new ArrayList<>();
     durations.forEach(duration -> {
       for (int cycle = 0; cycle < duration.getDuration(); cycle++) {
@@ -158,8 +160,8 @@ public class Z3Solver {
   }
 
   public ProcessOutputAsyncTask concretizeSConstraint(SConstraint sConstraint,
-                                                             List<ValidIoVariable> validIoVariables,
-                                                             Consumer<Optional<ConcreteSpecification>> handler) {
+                                                      List<ValidIoVariable> validIoVariables,
+                                                      Consumer<Optional<ConcreteSpecification>> handler) {
     String constraintString = sConstraint.globalConstraintsToText();
     String headerString = sConstraint.headerToText();
     String commands = "(check-sat)\n(get-model)";
