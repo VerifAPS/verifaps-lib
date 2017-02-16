@@ -6,6 +6,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Created by csicar on 10.01.17.
@@ -18,6 +21,8 @@ public class StvsMenuBar extends MenuBar {
   public Menu help;
 
   public Menu openOther;
+  public Menu openRecent;
+  public List<MenuItem> openRecentItems;
 
   public MenuItem open;
   public MenuItem openSpec;
@@ -45,7 +50,8 @@ public class StvsMenuBar extends MenuBar {
     openSpec = new MenuItem("Open Specification");
     openCode = new MenuItem("Open Code");
     openSession = new MenuItem("Open Session");
-
+    openRecent = new Menu("Open Recent...");
+    openRecentItems = new ArrayList<>();
 
     saveCode = new MenuItem("Save Code");
     saveSpec = new MenuItem("Save Specification");
@@ -63,7 +69,7 @@ public class StvsMenuBar extends MenuBar {
     newSpec = new MenuItem("New Specification");
     //add menu-items to
     openOther.getItems().addAll(openSpec, openCode, openSession);
-    file.getItems().addAll(newCode, newSpec, open, openOther, saveCode, saveSpec, saveAll, saveSessionAs, (new
+    file.getItems().addAll(newCode, newSpec, open, openOther, openRecent, saveCode, saveSpec, saveAll, saveSessionAs, (new
         SeparatorMenuItem()), config);
 
     //add menus to itself

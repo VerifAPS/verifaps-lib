@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.config;
 
 import edu.kit.iti.formal.stvs.ViewUtils;
+import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import javafx.beans.property.*;
@@ -8,6 +9,7 @@ import javafx.scene.control.Alert;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -69,7 +71,7 @@ public class GlobalConfig {
     }
   }
 
-  public void autosaveConfig() {
+  public void autosaveConfig() throws IOException, ExportException {
     String userHome = System.getProperty("user.home");
     String configDirPath = userHome + File.separator + CONFIG_DIRNAME;
     File configDir = new File(configDirPath);
@@ -77,14 +79,7 @@ public class GlobalConfig {
       configDir.mkdirs();
     }
     File configFile = new File(configDirPath + File.separator + AUTOLOAD_CONFIG_FILENAME);
-    try {
-      ExporterFacade.exportConfig(this, ExporterFacade
-          .ExportFormat.XML, configFile);
-    } catch (Exception e) {
-      ViewUtils.showDialog(Alert.AlertType.ERROR, "Autosave Error", "Error saving the " +
-          "configuration file", "The current configuration cannot be saved. Please check access " +
-          "permissions for " + configDirPath + ".");
-    }
+    ExporterFacade.exportConfig(this, ExporterFacade.ExportFormat.XML, configFile);
   }
 
   public void setAll(GlobalConfig toBeCopied) {

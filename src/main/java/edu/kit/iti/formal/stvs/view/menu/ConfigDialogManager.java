@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
+import edu.kit.iti.formal.stvs.ViewUtils;
+import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.binding.BooleanBinding;
@@ -10,9 +12,12 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 /**
  * Created by csicar on 11.01.17.
@@ -85,7 +90,12 @@ public class ConfigDialogManager implements Controller {
       config.setNuxmvFilename(view.nuxmvFilename.getText());
       config.setZ3Path(view.z3Path.getText());
       config.setGetetaCommand(view.getetaCommand.getText());
-      config.autosaveConfig();
+      try {
+        config.autosaveConfig();
+      } catch (IOException | ExportException e) {
+        ViewUtils.showDialog(Alert.AlertType.ERROR, "Autosave error", "Error saving the current" +
+            " configuration", "The current configuration could not be saved.", e.getMessage());
+      }
       return config;
     });
     dialog.showAndWait();

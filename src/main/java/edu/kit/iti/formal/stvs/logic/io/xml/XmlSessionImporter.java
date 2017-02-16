@@ -32,14 +32,19 @@ import java.util.Optional;
  */
 public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
 
+  private XmlConstraintSpecImporter constraintSpecImporter;
   // private XmlConfigImporter configImporter;
   private ObjectFactory objectFactory;
   private GlobalConfig currentConfig;
+  private History currentHistory;
 
-  public XmlSessionImporter(GlobalConfig currentConfig) throws ImportException {
+  public XmlSessionImporter(GlobalConfig currentConfig, History currentHistory) throws
+      ImportException {
+    constraintSpecImporter = new XmlConstraintSpecImporter();
     //configImporter = new XmlConfigImporter();
     this.objectFactory = new ObjectFactory();
     this.currentConfig = currentConfig;
+    this.currentHistory = currentHistory;
   }
 
   @Override
@@ -61,7 +66,6 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
 
       // Initialized later, since we need to know the types that are available before we import
       XmlConcreteSpecImporter concreteSpecImporter = new XmlConcreteSpecImporter(typeContext);
-      XmlConstraintSpecImporter constraintSpecImporter = new XmlConstraintSpecImporter();
 
       /* Config (optional in xsd, not imported/exported with session right now but separately,
       as per customer request)
@@ -71,14 +75,14 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
         config = configImporter.doImportFromXmlNode(XmlExporter.marshalToNode(element));
       } */
 
-      // History
+      /* History (optional in xsd, not imported/exported with session right now but separately
       History history = new History();
       for (String codeFile : importedSession.getHistory().getCode()) {
         history.addCodeFile(codeFile);
       }
       for (String specFile : importedSession.getHistory().getSpec()) {
         history.addSpecFile(specFile);
-      }
+      } */
 
       // Tabs
       List<HybridSpecification> hybridSpecs = new ArrayList<>();
@@ -113,8 +117,8 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
         hybridSpecs.add(hybridSpec);
       }
 
-      return new StvsRootModel(hybridSpecs, currentConfig, history, scenario, new File(System
-          .getProperty("user.home")), ""); // TODO: better file selection
+      return new StvsRootModel(hybridSpecs, currentConfig, currentHistory, scenario, new File(System
+          .getProperty("user.home")), "");
     } catch (JAXBException | ExportException e) {
       throw new ImportException(e);
     }

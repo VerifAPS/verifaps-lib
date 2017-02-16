@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
+import edu.kit.iti.formal.stvs.logic.io.xml.ObjectFactory;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionExporter;
@@ -7,10 +8,14 @@ import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaExporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import org.antlr.v4.runtime.Token;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.util.List;
 
@@ -101,6 +106,26 @@ public class ExporterFacade {
     if (escapeVariables) writer.write(VariableEscaper.escapeCode(code));
     else writer.write(code.getSourcecode());
     writer.close();
+  }
+
+  public static void exportHistory(History history, ExportFormat format, File file)
+      throws ExportException, JAXBException, IOException {
+    switch (format) {
+      case XML:
+        edu.kit.iti.formal.stvs.logic.io.xml.History exportHistory = new ObjectFactory()
+            .createHistory();
+        for (String filename : history.getFilenames()) {
+          exportHistory.getFilename().add(filename);
+        }
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        JAXBContext context = JAXBContext.newInstance("edu.kit.iti.formal.stvs.logic.io.xml");
+        JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.History> element = new ObjectFactory().createHistory(exportHistory);
+        context.createMarshaller().marshal(element, bos);
+        writeToFile(bos, file);
+        break;
+      default:
+        throw new ExportException("Unsupported export format");
+    }
   }
 
   /**
