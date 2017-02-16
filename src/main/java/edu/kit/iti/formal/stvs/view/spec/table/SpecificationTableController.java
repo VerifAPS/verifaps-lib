@@ -215,7 +215,7 @@ public class SpecificationTableController implements Controller {
     hybridSpec.getColumnHeaders().forEach(specIoVariable ->
         wildcardCells.put(specIoVariable.getName(), new ConstraintCell("-")));
     SpecificationRow<ConstraintCell> wildcardRow = ConstraintSpecification.createRow(wildcardCells);
-    data.add(index, new SynchronizedRow(wildcardRow, new ConstraintDuration("-")));
+    data.add(index, new SynchronizedRow(wildcardRow, new ConstraintDuration("1")));
   }
 
   public void addNewColumn(SpecIoVariable specIoVariable) {

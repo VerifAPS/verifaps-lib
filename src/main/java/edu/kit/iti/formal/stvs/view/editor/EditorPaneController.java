@@ -152,6 +152,7 @@ public class EditorPaneController implements Controller {
       case IEC61131Lexer.END_FUNCTION_BLOCK:
       case IEC61131Lexer.CASE:
       case IEC61131Lexer.END_CASE:
+      case IEC61131Lexer.ELSE:
         return listOf("keyword");
       case IEC61131Lexer.INT:
       case IEC61131Lexer.BOOL:
@@ -169,10 +170,6 @@ public class EditorPaneController implements Controller {
       case IEC61131Lexer.AND:
       case IEC61131Lexer.NOT:
       case IEC61131Lexer.OR:
-      case IEC61131Lexer.MINUS:
-      case IEC61131Lexer.PLUS:
-      case IEC61131Lexer.MULT:
-      case IEC61131Lexer.DIV:
       case IEC61131Lexer.MOD:
         return listOf("operation");
       default:

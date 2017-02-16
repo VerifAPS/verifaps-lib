@@ -37,8 +37,10 @@ public class VariableCollection extends VBox {
 
     getStylesheets().add(VariableCollection.class.getResource("style.css").toExternalForm());
 
-    nameTableColumn.setPrefWidth(150);
-    typeTableColumn.setPrefWidth(120);
+    nameTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
+    typeTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
+    defaultValueTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.2));
+
 
     nameTableColumn.setUserData(Column.NAME);
     typeTableColumn.setUserData(Column.TYPE);

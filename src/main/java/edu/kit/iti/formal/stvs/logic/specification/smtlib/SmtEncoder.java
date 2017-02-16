@@ -29,6 +29,7 @@ public class SmtEncoder {
   private final ValidSpecification specification;
   private final Predicate<String> isIoVariable;
   private final Map<String, Type> freeVariablesContext;
+  private final List<ValidFreeVariable> validFreeVariables;
 
   private SConstraint sConstrain;
 
@@ -43,14 +44,17 @@ public class SmtEncoder {
     this.maxDurations = maxDurations;
     this.specification = specification;
     this.ioVariables = specification.getColumnHeaders();
+    this.validFreeVariables = validFreeVariables;
     this.freeVariablesContext = validFreeVariables.stream()
         .collect(Collectors.toMap(ValidFreeVariable::getName, ValidFreeVariable::getType));
     List<String> ioVariableTypes = ioVariables.stream().map(ValidIoVariable::getName).collect
         (Collectors.toList());
-    System.out.println(ioVariableTypes);
+
     this.isIoVariable = ioVariableTypes::contains;
+    System.out.println(setFreeVariablesDefaultValues());
     this.sConstrain = new SConstraint()
-        .addHeaderDefinitions(createFreeVariables());
+        .addHeaderDefinitions(createFreeVariables())
+        .addHeaderDefinitions(setFreeVariablesDefaultValues());
 
     System.out.println("Doing Step V");
     //Step V: upper und lower Bound von Durations festlegen
@@ -143,6 +147,21 @@ public class SmtEncoder {
         }
       }
     }
+  }
+
+  private List<SExpr> setFreeVariablesDefaultValues() {
+    return validFreeVariables.stream()
+        .filter(variable -> variable.getDefaultValue() != null)
+        .map(variable -> {
+      String name = variable.getName();
+      String defaultValue = variable.getDefaultValue().getValueString();
+      return variable.getType().match(
+          () -> new SList("=", "|" + variable.getName() + "|", defaultValue),
+          () -> new SList("=", "|" + variable.getName() + "|", defaultValue),
+          enumeration -> new SList("=", "|" + variable.getName() + "|", enumeration.getValues()
+              .indexOf(variable.getDefaultValue()) + "")
+      );
+    }).collect(Collectors.toList());
   }
 
   private Type getTypeForVariable(String variableName) {

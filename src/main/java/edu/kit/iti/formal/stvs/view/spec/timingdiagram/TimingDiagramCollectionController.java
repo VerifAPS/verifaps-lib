@@ -2,18 +2,14 @@ package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
 import edu.kit.iti.formal.stvs.ViewUtils;
 import edu.kit.iti.formal.stvs.model.common.Selection;
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
-import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramView;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.VerticalResizeContainerController;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
@@ -23,6 +19,7 @@ import javafx.geometry.Side;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -79,12 +76,13 @@ public class TimingDiagramCollectionController implements Controller {
       );
       AnchorPane.setRightAnchor(diagramAxisPair.getValue(), 0.0);
 
-      Text label = new Text(validIoVariable.getName());
+      Label label = new Label(validIoVariable.getName());
+      label.getStyleClass().add(validIoVariable.getCategory().name().toLowerCase());
       this.view.getLabelContainer().getChildren().add(label);
-      label.yProperty().bind(
+      label.layoutYProperty().bind(
           diagramAxisPair.getValue().layoutYProperty().add(
               diagramAxisPair.getValue().heightProperty().divide(2)
-          )
+          ).subtract(label.heightProperty().divide(2))
       );
     });
     initxScrollbar();
