@@ -166,7 +166,7 @@ public class SmtEncoder {
               "|" + variable.getName() + "|",
               BitvectorUtils.hexFromInt(enumVal.getType().getValues().indexOf(enumVal), 4))
       );
-    }).collect(Collectors.toList());
+    }).map(sexpr -> new SList("assert", sexpr)).collect(Collectors.toList());
   }
 
   private Type getTypeForVariable(String variableName) {
