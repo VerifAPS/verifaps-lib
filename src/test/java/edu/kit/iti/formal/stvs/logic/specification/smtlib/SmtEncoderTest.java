@@ -80,9 +80,9 @@ public class SmtEncoderTest {
 
     System.out.println(output.toString());
 
-    testWithStatements(definitions, "(= |p| 333)");
-    testWithStatements(definitions, "(= |q| 1)");
-    testWithStatements(definitions, "(= |r| TRUE)");
+    testWithStatements(definitions, "(= |p| #x000F)");
+    testWithStatements(definitions, "(= |q| #x0001)");
+    testWithStatements(definitions, "(= |r| true)");
 
   }
 

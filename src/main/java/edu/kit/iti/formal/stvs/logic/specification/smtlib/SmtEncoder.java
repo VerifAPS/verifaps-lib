@@ -3,10 +3,7 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 import edu.kit.iti.formal.automation.datatypes.Int;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
-import edu.kit.iti.formal.stvs.model.expressions.Expression;
-import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
+import edu.kit.iti.formal.stvs.model.expressions.*;
 import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 
@@ -154,12 +151,20 @@ public class SmtEncoder {
         .filter(variable -> variable.getDefaultValue() != null)
         .map(variable -> {
       String name = variable.getName();
-      String defaultValue = variable.getDefaultValue().getValueString();
-      return variable.getType().match(
-          () -> new SList("=", "|" + variable.getName() + "|", defaultValue),
-          () -> new SList("=", "|" + variable.getName() + "|", defaultValue),
-          enumeration -> new SList("=", "|" + variable.getName() + "|", enumeration.getValues()
-              .indexOf(variable.getDefaultValue()) + "")
+      Value defaultValue = variable.getDefaultValue();
+      return defaultValue.match(
+          (integerVal) -> new SList(
+              "=",
+              "|" + variable.getName() + "|",
+              BitvectorUtils.hexFromInt(integerVal, 4)),
+          (boolVal) -> new SList(
+              "=",
+              "|" + variable.getName() + "|",
+              boolVal ? "true" : "false"),
+          enumVal -> new SList(
+              "=",
+              "|" + variable.getName() + "|",
+              BitvectorUtils.hexFromInt(enumVal.getType().getValues().indexOf(enumVal), 4))
       );
     }).collect(Collectors.toList());
   }
