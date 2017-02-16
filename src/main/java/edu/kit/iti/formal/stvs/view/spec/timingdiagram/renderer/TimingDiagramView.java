@@ -87,6 +87,7 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   @Override
   protected void dataItemAdded(Series<Number, A> series, int itemIndex, Data<Number, A> item) {
     Line horizontalLine = new Line();
+    horizontalLine.getStyleClass().add("valueLine");
     dataPane.getChildren().add(horizontalLine);
     dataPane.setMouseTransparent(true);
     durationLinesPane.setMouseTransparent(true);
@@ -100,6 +101,7 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
     cycleSelectionPane.getChildren().add(cycleSelectionRectangle);
     if (itemIndex > 0) {
       Line verticalLine = new Line();
+      verticalLine.getStyleClass().add("valueLine");
       dataPane.getChildren().add(verticalLine);
       verticalLines.add(verticalLine);
       //updateYRange();
