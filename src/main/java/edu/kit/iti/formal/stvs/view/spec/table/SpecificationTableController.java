@@ -97,6 +97,8 @@ public class SpecificationTableController implements Controller {
           });
     }
     if (columnNow != null) {
+      // If we don't clear, the gray selection could be confused with the highlighting
+      tableView.getSelectionModel().clearSelection();
       tableView.getColumns().stream()
           .filter(column -> columnNow.equals(column.getUserData()))
           .findFirst()
