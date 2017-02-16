@@ -24,9 +24,11 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
 
 import java.util.List;
 
@@ -107,7 +109,7 @@ public class SpecificationController implements Controller {
 
   private void onConcreteInstanceChanged(ConcreteSpecification newVal) {
     if (getConcreteSpecification() == null) {
-      view.setEmptyDiagram(new Label("No timing diagram available."));
+      view.setEmptyDiagram();
     } else {
       this.timingDiagramCollectionController = new TimingDiagramCollectionController(
           getConcreteSpecification(), selection);

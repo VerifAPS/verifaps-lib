@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.common.IoVariable;
@@ -100,9 +102,13 @@ public class SpecificationsPaneController implements Controller {
         typeContext, ioVariables, hybridSpecification, this.state,
         Bindings.isEmpty(scenario.getCode().syntaxErrorsProperty()).not(), globalConfig);
     Tab tab = new Tab();
-    String editable = hybridSpecification.isEditable() ? "" : " [locked]";
-    tab.setText(hybridSpecification.getName() + editable);
+    tab.setText(hybridSpecification.getName());
     tab.setContent(controller.getView());
+    if (hybridSpecification.isEditable()) {
+      tab.setGraphic(GlyphsDude.createIcon(FontAwesomeIcon.EDIT));
+    } else {
+      tab.setGraphic(GlyphsDude.createIcon(FontAwesomeIcon.LOCK));
+    }
     view.getTabs().add(index, tab);
     controllers.put(tab, controller);
     view.getTabPane().getSelectionModel().select(tab);
