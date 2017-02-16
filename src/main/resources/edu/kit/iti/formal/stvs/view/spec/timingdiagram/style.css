@@ -31,7 +31,16 @@
 
 .outdatedLabel{
     -fx-text-alignment: center;
-    -fx-text-fill: red;
+    -fx-text-fill: orangered;
+}
+
+.outdatedIcon{
+    -fx-fill: orangered;
+}
+
+.outdatedMessage{
+    -fx-alignment: center;
+
 }
 
 .collectionView{
