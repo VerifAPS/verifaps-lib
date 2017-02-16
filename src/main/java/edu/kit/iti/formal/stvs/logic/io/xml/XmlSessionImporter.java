@@ -115,7 +115,7 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
       }
 
       return new StvsRootModel(hybridSpecs, currentConfig, history, scenario, new File(System
-          .getProperty("user.home")));
+          .getProperty("user.home")), ""); // TODO: better file selection
     } catch (JAXBException | ExportException e) {
       throw new ImportException(e);
     }
