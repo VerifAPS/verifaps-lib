@@ -49,12 +49,12 @@ public class Z3Solver {
 
   private ProcessOutputAsyncTask concretizeSExpr(String smtString, Consumer<Optional<SExpr>> handler) {
     return concretize(smtString, stringOptional -> {
-      if (stringOptional.isPresent()) {
+      if (stringOptional.isPresent() && stringOptional.get().startsWith("sat")) {
         String output = stringOptional.get();
-        if (output.startsWith("sat")) {
-          output = output.substring(output.indexOf('\n') + 1);
-          handler.accept(Optional.of(SExpr.fromString(output)));
-        }
+        output = output.substring(output.indexOf('\n') + 1);
+        handler.accept(Optional.of(SExpr.fromString(output)));
+      } else {
+        handler.accept(Optional.empty());
       }
     });
   }
@@ -76,6 +76,8 @@ public class Z3Solver {
             buildSpecificationRows(validIoVariables, durations, rawRows);
         handler.accept(Optional.of(
             new ConcreteSpecification(validIoVariables, specificationRows, durations, false)));
+      } else {
+        handler.accept(Optional.empty());
       }
     });
   }
