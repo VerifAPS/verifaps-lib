@@ -29,7 +29,7 @@ import java.util.*;
 public class Z3SolverTest {
 
   private List<ValidFreeVariable> freeVariables;
-  private final Z3Solver solver = new Z3Solver(StvsMainScene.autoloadConfig().getZ3Path());
+  private final Z3Solver solver = new Z3Solver(StvsMainScene.autoloadConfig());
 
   public Z3SolverTest() throws ImportException {
   }
