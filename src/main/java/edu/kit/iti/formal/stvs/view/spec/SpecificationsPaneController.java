@@ -2,9 +2,13 @@ package edu.kit.iti.formal.stvs.view.spec;
 
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
+import edu.kit.iti.formal.stvs.model.common.IoVariable;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
+import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
@@ -54,7 +58,15 @@ public class SpecificationsPaneController implements Controller {
 
     hybridSpecifications.forEach(this::addTab);
     this.view.onTabAdded(() -> {
-      hybridSpecifications.add(new HybridSpecification(new FreeVariableList(new ArrayList<>()), true));
+      HybridSpecification hybridSpecification = new HybridSpecification(
+          new FreeVariableList(new ArrayList<>()), true);
+      for (CodeIoVariable ioVariable : ioVariables.get()) {
+        SpecIoVariable specIoVariable = new SpecIoVariable(ioVariable.getCategory(), ioVariable
+            .getType(), ioVariable.getName());
+        hybridSpecification.getColumnHeaders().add(specIoVariable);
+      }
+      hybridSpecifications.add(hybridSpecification);
+
     });
 
     view.getTabPane().getSelectionModel().selectedItemProperty().addListener((obs, old, tab)
