@@ -20,3 +20,11 @@
     -fx-animated: false;
     -fx-minor-tick-visible: false;
 }
+
+.labelContainer .output{
+    -fx-text-fill: purple;
+}
+
+.labelContainer .input{
+    -fx-text-fill: darkgreen;
+}
