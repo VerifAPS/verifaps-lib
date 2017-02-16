@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="UTF-8"?><session xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml">
+<code>
+<plaintext>PROGRAM PedestrianTrafficLight
+
+  VAR_INPUT
+    pedBtnPress : BOOL;
+  END_VAR
+  
+  VAR_OUTPUT
+    carLight : BOOL;
+    pedLight : BOOL;
+    counter  : INT;
+  END_VAR
+
+  VAR
+    buttonPressedBefore : BOOL;
+  END_VAR
+
+  IF (NOT buttonPressedBefore) AND pedBtnPress THEN
+    carLight := FALSE;
+  END_IF
+
+  IF counter = 10 THEN
+    pedLight := TRUE;
+  ELSIF counter = 40 THEN
+    pedLight := FALSE;
+  ELSIF counter = 50 THEN
+    carLight := TRUE;
+  END_IF
+
+  IF (carLight = FALSE) OR (pedLight = FALSE) THEN
+    counter := counter + 1;
+  ELSE
+    counter := 0;
+  END_IF
+  
+  buttonPressedBefore := pedBtnPress;
+
+END_PROGRAM</plaintext>
+</code>
+<tabs>
+<tab id="0" open="false" readOnly="false">
+<specification comment="" isConcrete="false" name="Unnamed Specification">
+<variables>
+<ioVariable colwidth="100" data-type="INT" io="output" name="counter"/>
+</variables>
+<rows>
+<row comment="">
+<duration>1</duration>
+<cell>-</cell>
+</row>
+</rows>
+<enumTypes/>
+</specification>
+</tab>
+<tab id="1" open="false" readOnly="false">
+<specification comment="" isConcrete="false" name="Unnamed Specification">
+<variables>
+<ioVariable colwidth="100" data-type="BOOL" io="input" name="pedestrianButtonPressed"/>
+<ioVariable colwidth="100" data-type="TrafficLight" io="output" name="lightStateCar"/>
+<ioVariable colwidth="100" data-type="TrafficLight" io="output" name="lightStatePedestrian"/>
+<ioVariable colwidth="100" data-type="INT" io="output" name="counter"/>
+</variables>
+<rows/>
+<enumTypes/>
+</specification>
+</tab>
+<tab id="2" open="false" readOnly="false">
+<specification comment="" isConcrete="false" name="Unnamed Specification">
+<variables>
+<ioVariable colwidth="155" data-type="BOOL" io="input" name="pedBtnPress"/>
+<ioVariable colwidth="189" data-type="BOOL" io="output" name="carLight"/>
+<ioVariable colwidth="192" data-type="BOOL" io="output" name="pedLight"/>
+<ioVariable colwidth="118" data-type="INT" io="output" name="counter"/>
+</variables>
+<rows>
+<row comment="">
+<duration>[1,10]</duration>
+<cell>FALSE</cell>
+<cell>TRUE</cell>
+<cell>FALSE</cell>
+<cell>0</cell>
+</row>
+<row comment="">
+<duration>1</duration>
+<cell>TRUE</cell>
+<cell>FALSE</cell>
+<cell>FALSE</cell>
+<cell>= counter[-1]+1</cell>
+</row>
+<row comment="">
+<duration>[8,9]</duration>
+<cell>-</cell>
+<cell>FALSE</cell>
+<cell>FALSE</cell>
+<cell>= counter[-1]+1</cell>
+</row>
+<row comment="">
+<duration>[29,30]</duration>
+<cell>-</cell>
+<cell>FALSE</cell>
+<cell>TRUE</cell>
+<cell>= counter[-1]+1</cell>
+</row>
+<row comment="">
+<duration>[9,10]</duration>
+<cell>-</cell>
+<cell>FALSE</cell>
+<cell>FALSE</cell>
+<cell>= counter[-1]+1</cell>
+</row>
+<row comment="">
+<duration>1</duration>
+<cell>-</cell>
+<cell>TRUE</cell>
+<cell>FALSE</cell>
+<cell>0</cell>
+</row>
+</rows>
+<enumTypes/>
+</specification>
+<specification isConcrete="true" name="Unnamed Specification">
+<variables>
+<ioVariable data-type="BOOL" io="input" name="pedBtnPress"/>
+<ioVariable data-type="TrafficLight" io="output" name="carLight"/>
+<ioVariable data-type="TrafficLight" io="output" name="pedLight"/>
+<ioVariable data-type="INT" io="output" name="counter"/>
+</variables>
+<rows>
+<row>
+<duration>10</duration>
+<cycle>
+<cell>FALSE</cell>
+<cell>Green</cell>
+<cell>Red</cell>
+<cell>0</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Green</cell>
+<cell>Red</cell>
+<cell>0</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Green</cell>
+<cell>Red</cell>
+<cell>0</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Green</cell>
+<cell>Red</cell>
+<cell>0</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Green</cell>
+<cell>Red</cell>
+<cell>0</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Green</cell>
+<cell>Red</cell>
+<cell>0</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Green</cell>
+<cell>Red</cell>
+<cell>0</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Green</cell>
+<cell>Red</cell>
+<cell>0</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Green</cell>
+<cell>Red</cell>
+<cell>0</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Green</cell>
+<cell>Red</cell>
+<cell>0</cell>
+</cycle>
+</row>
+<row>
+<duration>1</duration>
+<cycle>
+<cell>TRUE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>1</cell>
+</cycle>
+</row>
+<row>
+<duration>9</duration>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>2</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>3</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>4</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>5</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>6</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>7</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>8</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>9</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>10</cell>
+</cycle>
+</row>
+<row>
+<duration>30</duration>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>11</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>12</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>13</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>14</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>15</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>16</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>17</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>18</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>19</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>20</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>21</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>22</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>23</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>24</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>25</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>26</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>27</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>28</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>29</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>30</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>31</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>32</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>33</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>34</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>35</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>36</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>37</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>38</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>39</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>40</cell>
+</cycle>
+</row>
+<row>
+<duration>10</duration>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>41</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>42</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>43</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>44</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>45</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>46</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>47</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>48</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>49</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>50</cell>
+</cycle>
+</row>
+<row>
+<duration>1</duration>
+<cycle>
+<cell>FALSE</cell>
+<cell>Green</cell>
+<cell>Red</cell>
+<cell>0</cell>
+</cycle>
+</row>
+</rows>
+<enumTypes/>
+</specification>
+</tab>
+<tab id="3" open="false" readOnly="false">
+<specification comment="" isConcrete="false" name="Unnamed Specification">
+<variables>
+<ioVariable colwidth="100" data-type="BOOL" io="input" name="pedBtnPress"/>
+<ioVariable colwidth="290" data-type="TrafficLight" io="output" name="carLight"/>
+<ioVariable colwidth="302" data-type="TrafficLight" io="output" name="pedLight"/>
+<ioVariable colwidth="100" data-type="INT" io="output" name="counter"/>
+</variables>
+<rows>
+<row comment="">
+<duration>1</duration>
+<cell>-</cell>
+<cell>carLight = Red | carLight != pedLight</cell>
+<cell>pedLight = Red | pedLight != carLight</cell>
+<cell>-</cell>
+</row>
+</rows>
+<enumTypes/>
+</specification>
+<specification isConcrete="true" name="Unnamed Specification">
+<variables>
+<ioVariable data-type="BOOL" io="input" name="pedBtnPress"/>
+<ioVariable data-type="TrafficLight" io="output" name="carLight"/>
+<ioVariable data-type="TrafficLight" io="output" name="pedLight"/>
+<ioVariable data-type="INT" io="output" name="counter"/>
+</variables>
+<rows>
+<row>
+<duration>12</duration>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>1</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>1</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>1</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>1</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>1</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>1</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>1</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>1</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>1</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>1</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>1</cell>
+</cycle>
+<cycle>
+<cell>FALSE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>1</cell>
+</cycle>
+</row>
+</rows>
+<enumTypes/>
+</specification>
+</tab>
+<tab id="4" open="false" readOnly="false">
+<specification comment="" isConcrete="false" name="Unnamed Specification">
+<variables>
+<ioVariable colwidth="170" data-type="BOOL" io="input" name="pedBtnPress"/>
+<ioVariable colwidth="295" data-type="BOOL" io="output" name="carLight"/>
+<ioVariable colwidth="223" data-type="BOOL" io="output" name="pedLight"/>
+<ioVariable colwidth="100" data-type="INT" io="output" name="counter"/>
+</variables>
+<rows>
+<row comment="">
+<duration>2</duration>
+<cell>TRUE</cell>
+<cell>carLight = FALSE | pedLight != carLight</cell>
+<cell>pedLight = FALSE | pedLight != carLight</cell>
+<cell>-</cell>
+</row>
+</rows>
+<enumTypes/>
+</specification>
+</tab>
+</tabs>
+<history/>
+</session>
