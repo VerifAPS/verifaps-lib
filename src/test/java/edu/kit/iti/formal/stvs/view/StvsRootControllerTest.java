@@ -33,6 +33,11 @@ public class StvsRootControllerTest {
   }
 
   @Test
+  public void testDemo() {
+    JavaFxTest.runView(() -> simpleScene("demo_session.xml"));
+  }
+
+  @Test
   public void javaFxTest() {
     JavaFxTest.setToBeViewed(() -> simpleScene("session_valid_2.xml"));
     Application.launch(JavaFxTest.class);

@@ -99,7 +99,7 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
 
   protected Variables.IoVariable makeIoVariablesFromSpec(SpecIoVariable specIoVariable) {
     Variables.IoVariable ioVar = makeIoVariable(specIoVariable);
-    ioVar.setColwidth(BigInteger.valueOf(specIoVariable.getColumnConfig().getWidth()));
+    ioVar.setColwidth(BigInteger.valueOf((long) specIoVariable.getColumnConfig().getWidth()));
     return ioVar;
   }
 }
