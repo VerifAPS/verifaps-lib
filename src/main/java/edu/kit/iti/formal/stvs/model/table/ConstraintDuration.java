@@ -52,9 +52,9 @@ public class ConstraintDuration implements CellOperationProvider {
     if (!(obj instanceof ConstraintDuration)) return false;
     if (obj == this) return true;
     ConstraintDuration other = (ConstraintDuration) obj;
-    return new EqualsBuilder().
-        append(stringRepresentation.get(), other.stringRepresentation.get()).
-        append(comment.get(), other.comment.get()).
-        isEquals();
+    return new EqualsBuilder()
+        .append(stringRepresentation.get(), other.stringRepresentation.get())
+        .append(comment.get(), other.comment.get())
+        .isEquals();
   }
 }
