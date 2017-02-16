@@ -80,8 +80,10 @@ public class SpecificationController implements Controller {
     onConcreteInstanceChanged(getConcreteSpecification());
 
     view.setVariableCollection(variableCollectionController.getView());
+    view.getVariableCollection().getFreeVariableTableView().setEditable(this.hybridSpecification
+        .isEditable());
     view.setTable(tableController.getView());
-    view.getStartButton().setOnAction(new VerificationButtonClickedListener());
+    view.getStartButton().setOnAction(this::onVerificationButtonClicked);
     view.getStartButton().disableProperty().bind(specificationInvalid);
 
     view.getStartConcretizerButton().setOnAction(this::startConretizer);
@@ -180,18 +182,13 @@ public class SpecificationController implements Controller {
     }
   }
 
-  private class VerificationButtonClickedListener implements EventHandler<ActionEvent> {
-
-
-    @Override
-    public void handle(ActionEvent actionEvent) {
-      switch (stateProperty.get()) {
-        case RUNNING:
-          view.onVerificationButtonClicked(hybridSpecification, VerificationEvent.Type.STOP);
-          break;
-        default:
-          view.onVerificationButtonClicked(hybridSpecification, VerificationEvent.Type.START);
-      }
+  private void onVerificationButtonClicked(ActionEvent actionEvent) {
+    switch (stateProperty.get()) {
+      case RUNNING:
+        view.onVerificationButtonClicked(hybridSpecification, VerificationEvent.Type.STOP);
+        break;
+      default:
+        view.onVerificationButtonClicked(hybridSpecification, VerificationEvent.Type.START);
     }
   }
 
