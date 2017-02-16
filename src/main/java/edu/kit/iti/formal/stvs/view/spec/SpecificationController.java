@@ -87,6 +87,7 @@ public class SpecificationController implements Controller {
     view.setTable(tableController.getView());
     view.getStartButton().setOnAction(this::onVerificationButtonClicked);
     view.getStartButton().disableProperty().bind(specificationInvalid);
+    view.getStartConcretizerButton().disableProperty().bind(specificationInvalid);
 
     view.getStartConcretizerButton().setOnAction(this::startConretizer);
 
