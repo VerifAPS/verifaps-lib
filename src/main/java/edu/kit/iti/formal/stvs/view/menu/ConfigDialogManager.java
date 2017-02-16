@@ -85,6 +85,7 @@ public class ConfigDialogManager implements Controller {
       config.setNuxmvFilename(view.nuxmvFilename.getText());
       config.setZ3Path(view.z3Path.getText());
       config.setGetetaCommand(view.getetaCommand.getText());
+      config.autosaveConfig();
       return config;
     });
     dialog.showAndWait();
