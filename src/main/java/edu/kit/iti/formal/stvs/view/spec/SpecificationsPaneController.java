@@ -4,24 +4,18 @@ import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
-import edu.kit.iti.formal.stvs.model.common.IoVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
-import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
-import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.BooleanProperty;
-import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tab;
 
@@ -29,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SpecificationsPaneController implements Controller {
 
@@ -72,8 +67,8 @@ public class SpecificationsPaneController implements Controller {
     });
 
     view.getTabPane().getSelectionModel().selectedItemProperty().addListener((obs, old, tab)
-        -> switchActiveTab(tab));
-    switchActiveTab(view.getTabPane().getSelectionModel().getSelectedItem());
+        -> onSwitchActiveTab(tab));
+    onSwitchActiveTab(view.getTabPane().getSelectionModel().getSelectedItem());
 
     hybridSpecifications.addListener((ListChangeListener<HybridSpecification>) change -> {
       while (change.next()) {
@@ -88,7 +83,13 @@ public class SpecificationsPaneController implements Controller {
     });
   }
 
-  private void switchActiveTab(Tab tab) {
+  private void onTabClosed(Event event, Tab tab) {
+    int indexToDelete = view.getTabPane().getTabs().indexOf(tab);
+    hybridSpecifications.remove(indexToDelete);
+  }
+
+
+  private void onSwitchActiveTab(Tab tab) {
     SpecificationController controller = controllers.get(tab);
     if (controller == null) {
       scenario.setActiveSpec(null);
@@ -102,6 +103,7 @@ public class SpecificationsPaneController implements Controller {
         typeContext, ioVariables, hybridSpecification, this.state,
         Bindings.isEmpty(scenario.getCode().syntaxErrorsProperty()).not(), globalConfig);
     Tab tab = new Tab();
+    tab.setOnClosed(e -> onTabClosed(e, tab));
     tab.textProperty().bind(hybridSpecification.nameProperty());
     tab.setContent(controller.getView());
     if (hybridSpecification.isEditable()) {
