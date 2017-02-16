@@ -28,7 +28,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     put(BinaryFunctionExpr.Op.AND, "and");
     put(BinaryFunctionExpr.Op.OR, "or");
     put(BinaryFunctionExpr.Op.XOR, "xor");
-    put(BinaryFunctionExpr.Op.DIVISION, "bvsrem");
+    put(BinaryFunctionExpr.Op.DIVISION, "bvsdiv");
     put(BinaryFunctionExpr.Op.MULTIPLICATION, "bvmul");
     put(BinaryFunctionExpr.Op.EQUALS, "=");
     put(BinaryFunctionExpr.Op.GREATER_EQUALS, "bvsge");
@@ -37,7 +37,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     put(BinaryFunctionExpr.Op.GREATER_THAN, "bvsgt");
     put(BinaryFunctionExpr.Op.MINUS, "bvsub");
     put(BinaryFunctionExpr.Op.PLUS, "bvadd");
-    put(BinaryFunctionExpr.Op.MODULO, "bvsrem");
+    put(BinaryFunctionExpr.Op.MODULO, "bvsmod");
   }};
 
   private final Function<String, Type> getTypeForVariable;
