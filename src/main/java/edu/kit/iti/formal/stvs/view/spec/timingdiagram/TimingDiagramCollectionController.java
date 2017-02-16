@@ -92,7 +92,7 @@ public class TimingDiagramCollectionController implements Controller {
           ).subtract(label.heightProperty().divide(2))
       );
     });
-
+    view.getxAxis().setUpperBound(concreteSpec.getRows().size());
     initxScrollbar();
   }
 
