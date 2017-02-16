@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.view.common;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
 import javafx.scene.control.TextField;
 
 import java.util.Optional;
@@ -17,7 +18,7 @@ public class IntegerInputField extends TextField {
     this.textProperty().addListener(this::onInputChange);
     valid = new SimpleBooleanProperty();
     valid.addListener(this::onValidStateChange);
-    this.setStyle("-fx-font-alignment: right");
+    this.alignmentProperty().setValue(Pos.CENTER_RIGHT);
   }
 
   private void onValidStateChange(ObservableValue<?> observableValue, Boolean old, Boolean
