@@ -33,6 +33,60 @@ import static org.junit.Assert.*;
 public class SmtEncoderTest {
 
   @Test
+  public void testMjSmallerDuration() {
+    Supplier<InputStream> sourceFile = () -> SmtEncoderTest.class.getResourceAsStream(
+        "spec_constant.xml");
+
+    ValidSpecification spec = TestUtils.importValidSpec(sourceFile.get());
+    List<ValidFreeVariable> freeVariables = TestUtils.importValidFreeVariables(sourceFile.get());
+
+    int maxDuration = 3;
+
+    SmtEncoder smtEncoder = new SmtEncoder((i) -> maxDuration, spec, freeVariables);
+    SConstraint output = smtEncoder.getConstrain();
+    Set<SExpr> constraints = output.getGlobalConstraints();
+
+    System.out.println(output.toString());
+
+    testWithStatements(constraints,
+        "( bvuge n_0 #x0005 )",
+        " ( bvule n_0 #x0003 )  ",
+        "( implies  ( bvuge n_0 #x0000 )   ( = |C_0_0| #x002A )  )",
+        " ( implies  ( bvuge n_0 #x0001 )   ( = |C_0_1| #x002A )  )",
+        "( implies  ( bvuge n_0 #x0002 )   ( = |C_0_2| #x002A )  )");
+
+  }
+
+  @Test
+  public void testFreeVariablesDefaultValue() {
+    Supplier<InputStream> sourceFile = () -> SmtEncoderTest.class.getResourceAsStream(
+        "spec_freevariable.xml");
+
+    ValidSpecification spec = TestUtils.importValidSpec(sourceFile.get(), new TypeEnum(
+        "Color",
+        Arrays.asList("red", "green", "blue")));
+    List<ValidFreeVariable> freeVariables = TestUtils.importValidFreeVariables(sourceFile.get(),
+        new TypeEnum("Color",
+            Arrays.asList("red", "green", "blue")));
+
+    int maxDuration = 50;
+
+
+
+    SmtEncoder smtEncoder = new SmtEncoder((i) -> maxDuration, spec, freeVariables);
+    SConstraint output = smtEncoder.getConstrain();
+    Set<SExpr> constraints = output.getGlobalConstraints();
+    Set<SExpr> definitions = output.getVariableDefinitions();
+
+    System.out.println(output.toString());
+
+    testWithStatements(definitions, "(= |p| 333)");
+    testWithStatements(definitions, "(= |q| 1)");
+    testWithStatements(definitions, "(= |r| TRUE)");
+
+  }
+
+  @Test
   public void testImported() throws ImportException {
     Supplier<InputStream> sourceFile = () ->
         SmtEncoderTest.class.getResourceAsStream("testSpec.xml");
@@ -72,6 +126,8 @@ public class SmtEncoderTest {
     Set<SExpr> constraints = output.getGlobalConstraints();
 
     System.out.println(output);
+
+
     testWithStatements(constraints,
         "(implies (> n_2 4) (= |A_2_4| |A_2_0|))",
 
