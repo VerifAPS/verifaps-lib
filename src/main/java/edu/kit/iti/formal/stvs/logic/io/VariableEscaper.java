@@ -15,11 +15,6 @@ import java.util.regex.Pattern;
  */
 public class VariableEscaper {
 
-  private final static String IDENTIFIER_RE = "[$a-zA-Z0-9_]+";
-  private final static Pattern IDENTIFIER_PATTERN = Pattern.compile("(?!TRUE)(?!FALSE)" +
-      "(?!-?[0-9]+)" +
-      IDENTIFIER_RE);
-
   public static String escapeName(String name) {
     return "var_" + name;
   }

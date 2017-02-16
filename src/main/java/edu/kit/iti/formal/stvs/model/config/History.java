@@ -19,8 +19,6 @@ import java.util.Collection;
 public class History {
 
   private static final String AUTOLOAD_HISTORY_FILENAME = "stvs-history.xml";
-  private static final String CONFIG_DIRPATH = System.getProperty("user.home") + File.separator +
-      ".config";
   public static final int HISTORY_DEPTH = 15;
 
 
@@ -66,7 +64,8 @@ public class History {
   }
 
   public static History autoloadHistory() {
-    File historyFile = new File(CONFIG_DIRPATH + File.separator + AUTOLOAD_HISTORY_FILENAME);
+    File historyFile = new File(GlobalConfig.CONFIG_DIRPATH + File.separator +
+        AUTOLOAD_HISTORY_FILENAME);
     try {
       return ImporterFacade.importHistory(historyFile, ImporterFacade.ImportFormat.XML);
     } catch (JAXBException | ImportException e) {
@@ -76,11 +75,12 @@ public class History {
 
 
   public void autosaveHistory() throws IOException, JAXBException, ExportException {
-    File configDir = new File(CONFIG_DIRPATH);
+    File configDir = new File(GlobalConfig.CONFIG_DIRPATH);
     if (!configDir.isDirectory() || !configDir.exists()) {
       configDir.mkdirs();
     }
-    File historyFile = new File(CONFIG_DIRPATH + File.separator + AUTOLOAD_HISTORY_FILENAME);
+    File historyFile = new File(GlobalConfig.CONFIG_DIRPATH + File.separator +
+        AUTOLOAD_HISTORY_FILENAME);
     ExporterFacade.exportHistory(this, ExporterFacade.ExportFormat.XML, historyFile);
   }
 

@@ -17,7 +17,8 @@ import java.util.List;
 public class GlobalConfig {
 
   private static final String AUTOLOAD_CONFIG_FILENAME = "stvs-config.xml";
-  private static final String CONFIG_DIRNAME = ".config";
+  public static final String CONFIG_DIRPATH = System.getProperty("user.home") + File.separator +
+      ".config";
   private List<String> validLanguages = Arrays.asList("EN");
 
   // General
@@ -59,9 +60,7 @@ public class GlobalConfig {
   }
 
   public static GlobalConfig autoloadConfig() {
-    String userHome = System.getProperty("user.home");
-    String configDirPath = userHome + File.separator + CONFIG_DIRNAME;
-    File configFile = new File(configDirPath + File.separator + AUTOLOAD_CONFIG_FILENAME);
+    File configFile = new File(CONFIG_DIRPATH + File.separator + AUTOLOAD_CONFIG_FILENAME);
     try {
         return ImporterFacade.importConfig(configFile, ImporterFacade.ImportFormat.XML);
     } catch (Exception e) {
@@ -70,13 +69,11 @@ public class GlobalConfig {
   }
 
   public void autosaveConfig() throws IOException, ExportException {
-    String userHome = System.getProperty("user.home");
-    String configDirPath = userHome + File.separator + CONFIG_DIRNAME;
-    File configDir = new File(configDirPath);
+    File configDir = new File(CONFIG_DIRPATH);
     if (!configDir.isDirectory() || !configDir.exists()) {
       configDir.mkdirs();
     }
-    File configFile = new File(configDirPath + File.separator + AUTOLOAD_CONFIG_FILENAME);
+    File configFile = new File(CONFIG_DIRPATH + File.separator + AUTOLOAD_CONFIG_FILENAME);
     ExporterFacade.exportConfig(this, ExporterFacade.ExportFormat.XML, configFile);
   }
 
