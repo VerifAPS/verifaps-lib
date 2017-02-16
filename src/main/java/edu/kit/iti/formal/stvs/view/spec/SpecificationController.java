@@ -16,7 +16,6 @@ import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -72,8 +71,8 @@ public class SpecificationController implements Controller {
     this.specificationInvalid = new SimpleBooleanProperty(true);
     specificationInvalid.bind(
         variableCollectionController.getValidator().validProperty().not()
-        .or(tableController.getValidator().validProperty().not())
-        .or(codeInvalid));
+            .or(tableController.getValidator().validProperty().not())
+            .or(codeInvalid));
 
     //use event trigger to generate timing-diagram, to minimize code-duplication
     onConcreteInstanceChanged(getConcreteSpecification());
@@ -108,10 +107,9 @@ public class SpecificationController implements Controller {
         variableCollectionController.getValidator().validFreeVariablesProperty().get(),
         optionalSpec -> {
           Platform.runLater(() -> {
-            if(optionalSpec.isPresent()){
+            if (optionalSpec.isPresent()) {
               hybridSpecification.setConcreteInstance(optionalSpec.get());
-            }
-            else{
+            } else {
               ViewUtils.showDialog(Alert.AlertType.WARNING, "Concretizer warning",
                   "No concrete instance found",
                   "The Solver could not produce a concrete example with the given table.");
@@ -153,6 +151,7 @@ public class SpecificationController implements Controller {
     }
 
   }
+
   private void onVerificationStateChanged(VerificationState newState) {
     switch (newState) {
       case RUNNING:
@@ -177,6 +176,7 @@ public class SpecificationController implements Controller {
       }
     }
   }
+
   public HybridSpecification getSpec() {
     return spec;
   }
