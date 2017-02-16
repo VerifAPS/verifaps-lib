@@ -21,6 +21,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
@@ -87,6 +88,21 @@ public class SpecificationController implements Controller {
 
     hybridSpecification.concreteInstanceProperty().addListener((observable, old, newVal)
         -> this.onConcreteInstanceChanged(newVal));
+    registerTimingDiagramDeactivationHandler();
+  }
+
+  private void registerTimingDiagramDeactivationHandler() {
+    hybridSpecification.getDurations().addListener(this::specChanged);
+    hybridSpecification.getColumnHeaders().addListener(this::specChanged);
+    hybridSpecification.getRows().addListener(this::specChanged);
+    hybridSpecification.getFreeVariableList().getVariables().addListener(this::specChanged);
+    hybridSpecification.setConcreteInstance(null);
+  }
+
+  private void specChanged(ListChangeListener.Change change){
+    if(timingDiagramCollectionController != null){
+      timingDiagramCollectionController.setActivated(false);
+    }
   }
 
   private void onConcreteInstanceChanged(ConcreteSpecification newVal) {
@@ -110,6 +126,7 @@ public class SpecificationController implements Controller {
           Platform.runLater(() -> {
             if (optionalSpec.isPresent()) {
               hybridSpecification.setConcreteInstance(optionalSpec.get());
+              timingDiagramCollectionController.setActivated(true);
             } else {
               ViewUtils.showDialog(Alert.AlertType.WARNING, "Concretizer warning",
                   "No concrete instance found",

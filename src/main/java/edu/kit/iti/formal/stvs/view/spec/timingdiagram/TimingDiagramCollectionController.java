@@ -10,7 +10,9 @@ import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramView;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.VerticalResizeContainerController;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,7 +25,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
 import javafx.scene.transform.Transform;
 import javafx.util.Pair;
 
@@ -42,6 +43,7 @@ public class TimingDiagramCollectionController implements Controller {
   private double startLowerBound;
   private double startUpperBound;
   private double screenDistanceToAxisRatio;
+  private BooleanProperty activated = new SimpleBooleanProperty(true);
 
   /**
    * creates VariableTimingDiagram for each given Variable
@@ -56,6 +58,10 @@ public class TimingDiagramCollectionController implements Controller {
     view = new TimingDiagramCollectionView();
     view.onMouseDraggedProperty().setValue(this::mouseDraggedHandler);
     view.onMousePressedProperty().setValue(this::mousePressedHandler);
+
+    view.getOutdatedLabel().visibleProperty().bind(activated.not());
+    view.getOutdatedLabel().managedProperty().bind(activated.not());
+
     concreteSpec.getColumnHeaders().forEach(validIoVariable -> {
       Pair<TimingDiagramController, Axis> diagramAxisPair = validIoVariable.getValidType().match(
           () -> addIntegerTimingDiagram(concreteSpec, validIoVariable),
@@ -63,6 +69,7 @@ public class TimingDiagramCollectionController implements Controller {
           (e) -> addEnumTimingDiagram(concreteSpec, validIoVariable, e)
       );
       TimingDiagramView timingDiagramView = diagramAxisPair.getKey().getView();
+
       Axis externalYAxis = diagramAxisPair.getValue();
       VerticalResizeContainerController verticalResizeContainerController = new VerticalResizeContainerController(timingDiagramView);
 
@@ -85,8 +92,8 @@ public class TimingDiagramCollectionController implements Controller {
           ).subtract(label.heightProperty().divide(2))
       );
     });
-    initxScrollbar();
 
+    initxScrollbar();
   }
 
   private void initxScrollbar() {
@@ -117,7 +124,7 @@ public class TimingDiagramCollectionController implements Controller {
     NumberAxis yAxis = new NumberAxis(0, 10, 1);
     yAxis.setPrefWidth(30);
     yAxis.setSide(Side.LEFT);
-    TimingDiagramController timingDiagramController = new TimingDiagramController(view.getxAxis(), yAxis, concreteSpec, specIoVar, selection);
+    TimingDiagramController timingDiagramController = new TimingDiagramController(view.getxAxis(), yAxis, concreteSpec, specIoVar, selection, activated);
     return new javafx.util.Pair<>(timingDiagramController, yAxis);
   }
 
@@ -128,7 +135,7 @@ public class TimingDiagramCollectionController implements Controller {
     boolCategoryAxis.setPrefWidth(30);
     boolCategoryAxis.setSide(Side.LEFT);
     boolCategoryAxis.setAutoRanging(true);
-    TimingDiagramController timingDiagramController = new TimingDiagramController(view.getxAxis(), boolCategoryAxis, concreteSpec, specIoVar, selection);
+    TimingDiagramController timingDiagramController = new TimingDiagramController(view.getxAxis(), boolCategoryAxis, concreteSpec, specIoVar, selection, activated);
     return new javafx.util.Pair<>(timingDiagramController, boolCategoryAxis);
   }
 
@@ -141,7 +148,7 @@ public class TimingDiagramCollectionController implements Controller {
     categoryAxis.setSide(Side.LEFT);
     categoryAxis.setPrefWidth(30);
     categoryAxis.setAutoRanging(true);
-    TimingDiagramController timingDiagramController = new TimingDiagramController(view.getxAxis(), categoryAxis, concreteSpec, specIoVar, selection);
+    TimingDiagramController timingDiagramController = new TimingDiagramController(view.getxAxis(), categoryAxis, concreteSpec, specIoVar, selection, activated);
     return new javafx.util.Pair<>(timingDiagramController, categoryAxis);
   }
 
@@ -173,4 +180,15 @@ public class TimingDiagramCollectionController implements Controller {
     return view;
   }
 
+  public boolean isActivated() {
+    return activated.get();
+  }
+
+  public BooleanProperty activatedProperty() {
+    return activated;
+  }
+
+  public void setActivated(boolean activated) {
+    this.activated.set(activated);
+  }
 }
