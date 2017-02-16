@@ -28,6 +28,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   private NullableProperty<VerificationResult> verificationResult;
   private List<Type> typeContext;
   private GlobalConfig config;
+  private File getetaOutputFile;
 
   public GeTeTaVerificationEngine(GlobalConfig config, List<Type> typeContext) throws
       VerificationException {
@@ -61,10 +62,12 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     }
     ProcessBuilder processBuilder = new ProcessBuilder(getetaCommand.split(" "));
     processBuilder.environment().put("NUXMV", config.getNuxmvFilename());
+    getetaOutputFile = File.createTempFile("verification-result", ".log");
+    processBuilder.redirectOutput(getetaOutputFile);
     getetaProcess = processBuilder.start();
     // Find out when process finishes to set verification result property
     ProcessExitDetector exitDetector = new ProcessExitDetector(getetaProcess);
-    exitDetector.processFinishedProperty().addListener(new VerificationDoneListener());
+    exitDetector.processFinishedProperty().addListener(observable -> onVerificationDone());
     // Starts the verification process in another thread
     exitDetector.start();
   }
@@ -88,14 +91,6 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     return verificationResult;
   }
 
-  private class VerificationDoneListener implements ChangeListener<Boolean> {
-    @Override
-    public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue,
-                        Boolean newValue) {
-      onVerificationDone();
-    }
-  }
-
   private void onVerificationDone() {
     if (getetaProcess == null) { // Verification was cancelled
       return;
@@ -105,7 +100,8 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     String processOutput;
     try {
       logFile = File.createTempFile("log-verification-", ".xml");
-      processOutput = IOUtils.toString(getetaProcess.getInputStream(), "utf-8");
+      processOutput = IOUtils.toString(new FileInputStream(getetaOutputFile), "utf-8");
+      getetaOutputFile.delete();
     } catch (IOException e) {
       e.printStackTrace();
       verificationResult.set(null);
