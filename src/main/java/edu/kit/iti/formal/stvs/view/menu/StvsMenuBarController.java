@@ -102,9 +102,9 @@ public class StvsMenuBarController implements Controller {
       return;
     }
     try {
-       HybridSpecification spec = ImporterFacade.importHybridSpec(chosenFile,
+      HybridSpecification spec = ImporterFacade.importHybridSpec(chosenFile,
           ImporterFacade.ImportFormat.XML);
-       this.rootModel.get().getHybridSpecifications().add(spec);
+      this.rootModel.get().getHybridSpecifications().add(spec);
 
     } catch (IOException | ImportException e) {
       new ErrorMessageDialog(e);
@@ -128,8 +128,11 @@ public class StvsMenuBarController implements Controller {
       }, (rootModel) -> {
         //handle rootModel
         this.rootModel.setValue(rootModel);
-      });
-    } catch (IOException|ImportException e) {
+      }, (code -> {
+        //handle code
+        this.rootModel.get().getScenario().setCode(code);
+      }));
+    } catch (IOException e) {
       new ErrorMessageDialog(e);
     }
   }
@@ -179,7 +182,7 @@ public class StvsMenuBarController implements Controller {
       } else {
         ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.XML);
       }
-    } catch(ExportException e) {
+    } catch (ExportException e) {
       new ErrorMessageDialog(e);
     }
   }
