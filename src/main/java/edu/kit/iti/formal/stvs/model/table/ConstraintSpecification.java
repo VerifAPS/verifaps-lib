@@ -14,7 +14,8 @@ import java.util.Map;
 /**
  * @author Benjamin Alt
  */
-public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, ConstraintCell, ConstraintDuration> implements Commentable {
+public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, ConstraintCell,
+    ConstraintDuration> implements Commentable {
 
   public static SpecificationRow<ConstraintCell> createRow(
       Map<String, ConstraintCell> wildcardCells) {
