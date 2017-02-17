@@ -63,3 +63,7 @@
   -fx-font-weight: normal;
   -fx-padding: 8px;
 }
+
+.spec-header {
+  -fx-font-weight: bold;
+}

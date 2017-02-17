@@ -19,6 +19,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
+import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
  */
 public class SpecificationTableController implements Controller {
 
+  private final SpecificationTableView view;
   private final TableView<SynchronizedRow> tableView;
   private final HybridSpecification hybridSpec;
   private final ObjectProperty<List<Type>> typeContext;
@@ -67,7 +69,8 @@ public class SpecificationTableController implements Controller {
 
     tableView.setContextMenu(createContextMenu());
 
-    tableView.getStylesheets().add(SpecificationTableController.class.getResource("style.css").toExternalForm());
+
+    this.view = new SpecificationTableView(tableView);
 
     hybridSpecification.getColumnHeaders().forEach(this::addColumnToView);
 
@@ -352,8 +355,8 @@ public class SpecificationTableController implements Controller {
   }
 
   @Override
-  public TableView<SynchronizedRow> getView() {
-    return tableView;
+  public SpecificationTableView getView() {
+    return view;
   }
 
   public HybridSpecification getHybridSpecification() {
