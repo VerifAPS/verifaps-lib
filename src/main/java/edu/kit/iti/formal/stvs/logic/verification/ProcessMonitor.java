@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Detects when a process is finished and invokes the associated listeners.
  */
-public class ProcessExitDetector extends Thread {
+public class ProcessMonitor extends Thread {
 
   /** The process for which we have to detect the end. */
   private Process process;
@@ -25,7 +25,7 @@ public class ProcessExitDetector extends Thread {
    * Starts the detection for the given process
    * @param process the process for which we have to detect when it is finished
    */
-  public ProcessExitDetector(Process process, int timeout) {
+  public ProcessMonitor(Process process, int timeout) {
     try {
       // test if the process is finished
       process.exitValue();

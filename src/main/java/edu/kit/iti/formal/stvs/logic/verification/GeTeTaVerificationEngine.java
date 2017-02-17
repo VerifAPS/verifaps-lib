@@ -4,7 +4,6 @@ import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
-import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
@@ -12,13 +11,10 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Benjamin Alt
@@ -30,7 +26,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   private List<Type> typeContext;
   private GlobalConfig config;
   private File getetaOutputFile;
-  private ProcessExitDetector exitDetector;
+  private ProcessMonitor processMonitor;
 
   public GeTeTaVerificationEngine(GlobalConfig config, List<Type> typeContext) throws
       VerificationException {
@@ -68,10 +64,10 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     processBuilder.redirectOutput(getetaOutputFile);
     getetaProcess = processBuilder.start();
     // Find out when process finishes to set verification result property
-    exitDetector = new ProcessExitDetector(getetaProcess, config.getVerificationTimeout());
-    exitDetector.processFinishedProperty().addListener(observable -> onVerificationDone());
+    processMonitor = new ProcessMonitor(getetaProcess, config.getVerificationTimeout());
+    processMonitor.processFinishedProperty().addListener(observable -> onVerificationDone());
     // Starts the verification process in another thread
-    exitDetector.start();
+    processMonitor.start();
   }
 
   @Override
@@ -114,7 +110,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     VerificationResult result;
     // Set the verification result depending on the GeTeTa output
     try {
-      if (exitDetector.isAborted()) {
+      if (processMonitor.isAborted()) {
         result = makeErrorResult(processOutput, logFile, VerificationResult.Status.TIMEOUT);
       } else {
         result = ImporterFacade.importVerificationResult(new ByteArrayInputStream(cleanedProcessOutput
