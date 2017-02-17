@@ -60,8 +60,7 @@ public class StvsRootController implements Controller {
 
     this.stvsRootModel.getScenario().codeObjectProperty().addListener(this::onCodeChange);
     this.stvsRootModel.getScenario().getCode().parsedCodeProperty().addListener(this::parsedCodeChange);
-    this.stvsRootModel.getScenario().verificationResultProperty().addListener(new
-        VerificationResultListener());
+    this.stvsRootModel.getScenario().verificationResultProperty().addListener(this::onVerificationResultChange);
 
     this.view = new StvsRootView(
         editorPaneController.getView(),
@@ -131,18 +130,8 @@ public class StvsRootController implements Controller {
     }
   }
 
-  private class VerificationResultListener implements
-      javafx.beans.value.ChangeListener<edu.kit.iti.formal.stvs.model.verification.VerificationResult> {
-
-    @Override
-    public void changed(ObservableValue<? extends VerificationResult> observableValue,
-                        VerificationResult oldResult, VerificationResult newResult) {
-      onVerificationResultChanged();
-    }
-  }
-
-  private void onVerificationResultChanged() {
-    VerificationResult res = stvsRootModel.getScenario().getVerificationResult();
+  private void onVerificationResultChange(ObservableValue<? extends VerificationResult> o,
+                                           VerificationResult old, VerificationResult res) {
     // Inform the user about the verification result
     if (res == null) {
       ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Verification Error", "Verification " +
@@ -154,13 +143,14 @@ public class StvsRootController implements Controller {
       logFileContents = new String(Files.readAllBytes(Paths.get(res.getLogFilePath())), "utf-8");
     } catch (IOException e) {
       ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Logging Error", "Could not write log file",
-          "There was an error writing the log file " + res.getLogFilePath(), e.getStackTrace().toString());
+          "There was an error writing the log file: " + res.getLogFilePath(), e.getStackTrace()
+              .toString());
       return;
     }
     switch (res.getStatus()) {
       case COUNTEREXAMPLE:
         ErrorMessageDialog.createMessageDialog(Alert.AlertType.INFORMATION, "Counterexample Available",
-            "A Counterexample Is Available", alertBody, logFileContents);
+            "A counterexample is available", alertBody, logFileContents);
         // Show read-only copy of spec with counterexample in a new tab
         assert stvsRootModel.getScenario().getActiveSpec() != null;
         HybridSpecification readOnlySpec = new HybridSpecification(stvsRootModel.getScenario()
@@ -170,7 +160,12 @@ public class StvsRootController implements Controller {
         break;
       case VERIFIED:
         ErrorMessageDialog.createMessageDialog(Alert.AlertType.INFORMATION, "Verification Successful",
-            "The verification completed successfully", alertBody, logFileContents);
+            "The verification completed successfully.", alertBody, logFileContents);
+        break;
+      case TIMEOUT:
+        ErrorMessageDialog.createMessageDialog(Alert.AlertType.WARNING, "Verification Timeout",
+            "The verification timed out.", "Current timeout: " + stvsRootModel.getGlobalConfig()
+                .getVerificationTimeout() + " seconds");
         break;
       case ERROR:
         ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Verification Error",

@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Benjamin Alt
@@ -29,6 +30,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   private List<Type> typeContext;
   private GlobalConfig config;
   private File getetaOutputFile;
+  private ProcessExitDetector exitDetector;
 
   public GeTeTaVerificationEngine(GlobalConfig config, List<Type> typeContext) throws
       VerificationException {
@@ -66,7 +68,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     processBuilder.redirectOutput(getetaOutputFile);
     getetaProcess = processBuilder.start();
     // Find out when process finishes to set verification result property
-    ProcessExitDetector exitDetector = new ProcessExitDetector(getetaProcess);
+    exitDetector = new ProcessExitDetector(getetaProcess, config.getVerificationTimeout());
     exitDetector.processFinishedProperty().addListener(observable -> onVerificationDone());
     // Starts the verification process in another thread
     exitDetector.start();
@@ -110,30 +112,42 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     // Preprocess output (remove anything before the XML)
     String cleanedProcessOutput = cleanProcessOutput(processOutput);
     VerificationResult result;
+    // Set the verification result depending on the GeTeTa output
     try {
-      result = ImporterFacade.importVerificationResult(new ByteArrayInputStream(cleanedProcessOutput
-          .getBytes()), ImporterFacade.ImportFormat.GETETA, typeContext);
-    } catch (ImportException e) {
-      PrintWriter writer;
-      String logFilePath = logFile.getAbsolutePath();
-      try {
-        writer = new PrintWriter(logFilePath);
-      } catch (FileNotFoundException e1) {
-        e1.printStackTrace();
-        result = null; // Just to be explicit
-        return;
+      if (exitDetector.isAborted()) {
+        result = makeErrorResult(processOutput, logFile, VerificationResult.Status.TIMEOUT);
+      } else {
+        result = ImporterFacade.importVerificationResult(new ByteArrayInputStream(cleanedProcessOutput
+            .getBytes()), ImporterFacade.ImportFormat.GETETA, typeContext);
       }
-      writer.println(processOutput);
-      writer.close();
-      result = new VerificationResult(VerificationResult.Status.ERROR, logFilePath);
+    } catch (ImportException e) {
+      result = makeErrorResult(processOutput, logFile, VerificationResult.Status.ERROR);
     }
     // set the verification result back in the javafx thread:
     VerificationResult finalResult = result; // have to do this because of lambda restrictions...
     Platform.runLater(() -> verificationResult.set(finalResult));
   }
 
+  private VerificationResult makeErrorResult(String processOutput, File logFile, VerificationResult.Status
+      errorStatus) {
+    PrintWriter writer;
+    String logFilePath = logFile.getAbsolutePath();
+    try {
+      writer = new PrintWriter(logFilePath);
+    } catch (FileNotFoundException e1) {
+      e1.printStackTrace();
+      return null;
+    }
+    writer.println(processOutput);
+    writer.close();
+    return new VerificationResult(errorStatus, logFilePath);
+  }
+
   private String cleanProcessOutput(String processOutput) {
     int xmlStartIndex = processOutput.indexOf("<");
-    return processOutput.substring(xmlStartIndex);
+    if (xmlStartIndex >= 0) {
+      return processOutput.substring(xmlStartIndex);
+    }
+    return processOutput;
   }
 }

@@ -54,7 +54,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       " : " + IDENTIFIER_RE);
   private final static Pattern CODE_VARIABLE_PATTERN = Pattern.compile("code\\." + IDENTIFIER_RE);
   private final static Pattern INPUT_VARIABLE_PATTERN = Pattern.compile(IDENTIFIER_RE);
-  private final static Pattern INT_VALUE_PATTERN = Pattern.compile("0sd16_-?[0-9]+");
+  private final static Pattern INT_VALUE_PATTERN = Pattern.compile("-?0sd16_-?[0-9]+");
   private final static Pattern BOOL_VALUE_PATTERN = Pattern.compile("(TRUE)|(FALSE)");
 
   private final List<Type> typeContext;

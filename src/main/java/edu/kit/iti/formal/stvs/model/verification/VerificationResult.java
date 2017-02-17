@@ -3,8 +3,8 @@ package edu.kit.iti.formal.stvs.model.verification;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 
 /**
- * The result of a verification (the model equivalent of the output of a verification engine
- * (such as GeTeTa).
+ * The result of a verification (created by a
+ * {@link edu.kit.iti.formal.stvs.logic.verification.VerificationEngine}).
  * @author Benjamin Alt
  */
 public class VerificationResult {
@@ -49,5 +49,5 @@ public class VerificationResult {
     return logFilePath;
   }
 
-  public enum Status { VERIFIED, COUNTEREXAMPLE, UNKNOWN, ERROR, FATAL }
+  public enum Status { VERIFIED, COUNTEREXAMPLE, UNKNOWN, TIMEOUT, ERROR, FATAL }
 }

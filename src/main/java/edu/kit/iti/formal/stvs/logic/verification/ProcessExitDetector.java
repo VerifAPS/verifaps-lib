@@ -8,6 +8,8 @@ package edu.kit.iti.formal.stvs.logic.verification;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Detects when a process is finished and invokes the associated listeners.
  */
@@ -16,11 +18,14 @@ public class ProcessExitDetector extends Thread {
   /** The process for which we have to detect the end. */
   private Process process;
   private BooleanProperty processFinished;
+  private int timeout;
+  private boolean aborted;
+
   /**
    * Starts the detection for the given process
    * @param process the process for which we have to detect when it is finished
    */
-  public ProcessExitDetector(Process process) {
+  public ProcessExitDetector(Process process, int timeout) {
     try {
       // test if the process is finished
       process.exitValue();
@@ -28,6 +33,7 @@ public class ProcessExitDetector extends Thread {
     } catch (IllegalThreadStateException exc) {
       this.process = process;
       this.processFinished = new SimpleBooleanProperty(false);
+      this.timeout = timeout;
     }
   }
 
@@ -37,9 +43,14 @@ public class ProcessExitDetector extends Thread {
   }
 
   public void run() {
+    aborted = false;
     try {
       // wait for the process to finish
-      process.waitFor();
+      if (!process.waitFor(timeout, TimeUnit.SECONDS)) {
+        process.destroy();
+        System.out.println("Aborted");
+        aborted = true;
+      }
       processFinished.set(true);
     } catch (InterruptedException e) {
     }
@@ -51,5 +62,9 @@ public class ProcessExitDetector extends Thread {
 
   public BooleanProperty processFinishedProperty() {
     return processFinished;
+  }
+
+  public boolean isAborted() {
+    return aborted;
   }
 }
