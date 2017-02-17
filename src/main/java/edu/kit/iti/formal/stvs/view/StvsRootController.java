@@ -29,7 +29,6 @@ import java.util.List;
 
 /**
  * @author Carsten Csiky
- * @author Benjamin Alt
  */
 public class StvsRootController implements Controller {
 

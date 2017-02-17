@@ -15,6 +15,7 @@ import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController;
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -55,7 +56,7 @@ public class SpecificationController implements Controller {
     this.spec = hybridSpecification;
     this.hybridSpecification = hybridSpecification;
     this.stateProperty = stateProperty;
-    this.stateProperty.addListener(new VerificationStateChangeListener());
+    this.stateProperty.addListener(this::onVerificationStateChanged);
     this.view = new SpecificationView();
     this.selection = hybridSpecification.getSelection();
     this.globalConfig = globalConfig;
@@ -90,6 +91,17 @@ public class SpecificationController implements Controller {
     hybridSpecification.concreteInstanceProperty().addListener((observable, old, newVal)
         -> this.onConcreteInstanceChanged(newVal));
     registerTimingDiagramDeactivationHandler();
+  }
+
+  private void onVerificationStateChanged(ObservableValue<? extends VerificationState> observableValue,
+                                          VerificationState oldState, VerificationState newState) {
+    switch (newState) {
+      case RUNNING:
+        getView().setVerificationButtonStop();
+        break;
+      default:
+        getView().setVerificationButtonPlay();
+    }
   }
 
   private void registerTimingDiagramDeactivationHandler() {
@@ -159,26 +171,6 @@ public class SpecificationController implements Controller {
 
   public SpecificationView getView() {
     return view;
-  }
-
-  private class VerificationStateChangeListener implements javafx.beans.value.ChangeListener<VerificationState> {
-
-    @Override
-    public void changed(ObservableValue<? extends VerificationState> observableValue,
-                        VerificationState oldState, VerificationState newState) {
-      onVerificationStateChanged(newState);
-    }
-
-  }
-
-  private void onVerificationStateChanged(VerificationState newState) {
-    switch (newState) {
-      case RUNNING:
-        getView().setVerificationButtonStop();
-        break;
-      default:
-        getView().setVerificationButtonPlay();
-    }
   }
 
   private void onVerificationButtonClicked(ActionEvent actionEvent) {
