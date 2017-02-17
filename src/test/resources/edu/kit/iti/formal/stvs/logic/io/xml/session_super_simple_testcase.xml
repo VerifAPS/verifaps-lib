@@ -44,8 +44,8 @@ END_PROGRAM</plaintext>
   </editor>
  </config>
   <history>
-    <code>/path/to/someCode.st</code>
-    <spec>/path/to/someSpec.xml</spec>
-    <spec>/path/to/anotherSpec.xml</spec>
+    <filename>/path/to/someCode.st</filename>
+    <filename>/path/to/someSpec.xml</filename>
+    <filename>/path/to/anotherSpec.xml</filename>
   </history>
 </session>

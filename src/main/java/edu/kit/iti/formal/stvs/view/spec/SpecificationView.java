@@ -7,16 +7,15 @@ import edu.kit.iti.formal.stvs.view.spec.table.SynchronizedRow;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionView;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollection;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
@@ -53,6 +52,8 @@ public class SpecificationView extends VBox implements Lockable {
     splitPane.setDividerPosition(0, 0.25);
     splitPane.setDividerPosition(1, 0.5);
     this.getChildren().add(splitPane);
+    splitPane.setPrefHeight(Integer.MAX_VALUE);
+
   }
 
   public void setVerificationButtonPlay() {
@@ -63,7 +64,6 @@ public class SpecificationView extends VBox implements Lockable {
   }
 
   public void setVerificationButtonStop() {
-    System.out.println("setVerificationButtonStop called!");
     Text icon = GlyphsDude.createIcon(FontAwesomeIcon.STOP);
     icon.setFill(Color.INDIANRED);
     startVerificationButton.setText("Stop Verification");
@@ -110,9 +110,18 @@ public class SpecificationView extends VBox implements Lockable {
     AnchorPane.setBottomAnchor(diagram, 0.0);
   }
 
+  public void setEmptyDiagram() {
+
+    GridPane pane = new GridPane();
+    pane.setAlignment(Pos.CENTER);
+    pane.setHgap(10);
+    pane.setVgap(10);
+    pane.add(new Label("No timing diagram available."), 0, 0);
+    setEmptyDiagram(pane);
+  }
+
   public void setEmptyDiagram(Node emptyDiagram) {
     this.diagram = null;
-
 
     timingDiagramPane.getChildren().clear();
 

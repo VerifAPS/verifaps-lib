@@ -7,6 +7,7 @@ import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionImporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionImporterTest;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.view.menu.StvsMenuBarController;
 import javafx.application.Application;
 import javafx.beans.property.SimpleObjectProperty;
@@ -47,7 +48,8 @@ public class StvsRootControllerTest {
     StvsRootModel rootModel = new StvsRootModel();
     try {
        rootModel = ImporterFacade.importSession(XmlSessionImporterTest.class
-          .getResourceAsStream(sessionfile), ImporterFacade.ImportFormat.XML, new GlobalConfig());
+          .getResourceAsStream(sessionfile), ImporterFacade.ImportFormat.XML, new GlobalConfig(),
+           new History());
     } catch(Exception e) {
       e.printStackTrace();
     }

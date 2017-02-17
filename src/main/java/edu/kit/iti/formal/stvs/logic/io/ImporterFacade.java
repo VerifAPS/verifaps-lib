@@ -7,6 +7,7 @@ import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
@@ -17,6 +18,9 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
@@ -95,21 +99,21 @@ public class ImporterFacade {
   }
 
   public static StvsRootModel importSession(InputStream input, ImportFormat format, GlobalConfig
-      currentConfig) throws ImportException {
+      currentConfig, History currentHistory) throws ImportException {
     switch (format) {
       case XML:
-        return new XmlSessionImporter(currentConfig).doImport(input);
+        return new XmlSessionImporter(currentConfig, currentHistory).doImport(input);
       default:
         throw new ImportException("Unsupported import format");
     }
   }
 
   public static StvsRootModel importSession(File file, ImportFormat format, GlobalConfig
-      currentConfig)
+      currentConfig, History currentHistory)
       throws
       IOException,
       ImportException {
-    return importSession(new FileInputStream(file), format, currentConfig);
+    return importSession(new FileInputStream(file), format, currentConfig, currentHistory);
   }
 
   public static Code importStCode(File chosenFile) throws IOException {
@@ -117,6 +121,18 @@ public class ImporterFacade {
     return new Code(chosenFile.getAbsolutePath(), plaintext);
   }
 
+  public static History importHistory(File chosenFile, ImportFormat format) throws JAXBException, ImportException {
+    switch (format) {
+      case XML:
+        JAXBContext context = JAXBContext.newInstance("edu.kit.iti.formal.stvs.logic.io.xml");
+        JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.History> element =
+            (JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.History>) context.createUnmarshaller()
+                .unmarshal(chosenFile);
+        return new History(element.getValue().getFilename());
+      default:
+        throw new ImportException("Unsupported import format");
+    }
+  }
 
   /**
    * imports a file with unknown type
@@ -126,9 +142,10 @@ public class ImporterFacade {
    * @param specificationConsumer consumer of the file (if the file is a Specification)
    * @param rootModelConsumer     consumer of the file (if the file is a Session)
    */
-  public static void importFile(File file, GlobalConfig globalConfig, Consumer<HybridSpecification>
-      specificationConsumer, Consumer<StvsRootModel> rootModelConsumer, Consumer<Code> codeConsumer) throws
-      IOException {
+  public static void importFile(File file, GlobalConfig globalConfig, History currentHistory,
+                                Consumer<HybridSpecification> specificationConsumer,
+                                Consumer<StvsRootModel> rootModelConsumer, Consumer<Code> codeConsumer)
+      throws IOException, ImportException {
     StringWriter writer = new StringWriter();
     byte[] byteArray = IOUtils.toByteArray(new FileInputStream(file));
     IOUtils.copy(new ByteArrayInputStream(byteArray), writer, "utf8");
@@ -142,7 +159,8 @@ public class ImporterFacade {
         Node rootNode = doc.getFirstChild();
         switch (rootNode.getNodeName()) {
           case "session":
-            rootModelConsumer.accept(importSession(file, ImportFormat.XML, globalConfig));
+            rootModelConsumer.accept(importSession(file, ImportFormat.XML, globalConfig,
+                currentHistory));
             return;
           case "specification":
             specificationConsumer.accept(importHybridSpec(file, ImportFormat.XML));

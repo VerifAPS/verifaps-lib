@@ -16,8 +16,6 @@ public class SpecificationsPane extends AnchorPane {
   public SpecificationsPane() {
     this.tabPane = new TabPane();
     this.addButton = new Button("+");
-    addButton.setStyle("-fx-background-radius: ");
-
 
     AnchorPane.setTopAnchor(tabPane, 0.0);
     AnchorPane.setLeftAnchor(tabPane, 0.0);

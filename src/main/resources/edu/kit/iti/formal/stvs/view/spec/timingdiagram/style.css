@@ -28,3 +28,21 @@
 .labelContainer .input{
     -fx-text-fill: darkgreen;
 }
+
+.outdatedLabel{
+    -fx-text-alignment: center;
+    -fx-text-fill: orangered;
+}
+
+.outdatedIcon{
+    -fx-fill: orangered;
+}
+
+.outdatedMessage{
+    -fx-alignment: center;
+
+}
+
+.collectionView{
+    -fx-alignment: top-center;
+}

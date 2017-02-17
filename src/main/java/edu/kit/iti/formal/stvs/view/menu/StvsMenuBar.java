@@ -6,6 +6,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Created by csicar on 10.01.17.
@@ -18,6 +21,8 @@ public class StvsMenuBar extends MenuBar {
   public Menu help;
 
   public Menu openOther;
+  public Menu openRecent;
+  public List<MenuItem> openRecentItems;
 
   public MenuItem open;
   public MenuItem openSpec;
@@ -30,6 +35,7 @@ public class StvsMenuBar extends MenuBar {
   public MenuItem newCode;
   public MenuItem newSpec;
   public MenuItem saveSessionAs;
+  public MenuItem about;
 
   public StvsMenuBar() {
     //create top-level menus
@@ -45,7 +51,8 @@ public class StvsMenuBar extends MenuBar {
     openSpec = new MenuItem("Open Specification");
     openCode = new MenuItem("Open Code");
     openSession = new MenuItem("Open Session");
-
+    openRecent = new Menu("Open Recent...");
+    openRecentItems = new ArrayList<>();
 
     saveCode = new MenuItem("Save Code");
     saveSpec = new MenuItem("Save Specification");
@@ -59,12 +66,25 @@ public class StvsMenuBar extends MenuBar {
     config = new MenuItem("Preferences");
     config.setAccelerator(KeyCombination.keyCombination("Ctrl+,"));
 
+
     newCode = new MenuItem("New Code");
     newSpec = new MenuItem("New Specification");
+
+    about = new MenuItem("About");
     //add menu-items to
     openOther.getItems().addAll(openSpec, openCode, openSession);
-    file.getItems().addAll(newCode, newSpec, open, openOther, saveCode, saveSpec, saveAll, saveSessionAs, (new
-        SeparatorMenuItem()), config);
+    file.getItems().addAll(
+        newCode, newSpec, open, openOther, openRecent, (new SeparatorMenuItem()),
+        saveCode, saveSpec, saveAll, saveSessionAs
+    );
+
+    edit.getItems().addAll(
+        config
+    );
+
+    help.getItems().addAll(
+        about
+    );
 
     //add menus to itself
     this.getMenus().addAll(file, edit, view, help);

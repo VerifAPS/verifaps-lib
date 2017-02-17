@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
-import edu.kit.iti.formal.stvs.ViewUtils;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
 import edu.kit.iti.formal.stvs.logic.specification.smtlib.SmtConcretizer;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
@@ -16,17 +16,19 @@ import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
 
 import java.util.List;
 
@@ -73,26 +75,44 @@ public class SpecificationController implements Controller {
     this.specificationInvalid = new SimpleBooleanProperty(true);
     specificationInvalid.bind(
         variableCollectionController.getValidator().validProperty().not()
-        .or(tableController.getValidator().validProperty().not())
-        .or(codeInvalid));
+            .or(tableController.getValidator().validProperty().not())
+            .or(codeInvalid));
 
     //use event trigger to generate timing-diagram, to minimize code-duplication
     onConcreteInstanceChanged(getConcreteSpecification());
 
     view.setVariableCollection(variableCollectionController.getView());
+    view.getVariableCollection().getFreeVariableTableView().setEditable(this.hybridSpecification
+        .isEditable());
     view.setTable(tableController.getView());
-    view.getStartButton().setOnAction(new VerificationButtonClickedListener());
+    view.getStartButton().setOnAction(this::onVerificationButtonClicked);
     view.getStartButton().disableProperty().bind(specificationInvalid);
+    view.getStartConcretizerButton().disableProperty().bind(specificationInvalid);
 
     view.getStartConcretizerButton().setOnAction(this::startConretizer);
 
     hybridSpecification.concreteInstanceProperty().addListener((observable, old, newVal)
         -> this.onConcreteInstanceChanged(newVal));
+    registerTimingDiagramDeactivationHandler();
+  }
+
+  private void registerTimingDiagramDeactivationHandler() {
+    hybridSpecification.getDurations().addListener(this::specChanged);
+    hybridSpecification.getColumnHeaders().addListener(this::specChanged);
+    hybridSpecification.getRows().addListener(this::specChanged);
+    hybridSpecification.getFreeVariableList().getVariables().addListener(this::specChanged);
+    hybridSpecification.setConcreteInstance(null);
+  }
+
+  private void specChanged(ListChangeListener.Change change){
+    if(timingDiagramCollectionController != null){
+      timingDiagramCollectionController.setActivated(false);
+    }
   }
 
   private void onConcreteInstanceChanged(ConcreteSpecification newVal) {
     if (getConcreteSpecification() == null) {
-      view.setEmptyDiagram(new Label("no timing-diagram available"));
+      view.setEmptyDiagram();
     } else {
       this.timingDiagramCollectionController = new TimingDiagramCollectionController(
           getConcreteSpecification(), selection);
@@ -109,10 +129,10 @@ public class SpecificationController implements Controller {
         variableCollectionController.getValidator().validFreeVariablesProperty().get(),
         optionalSpec -> {
           Platform.runLater(() -> {
-            if(optionalSpec.isPresent()){
+            if (optionalSpec.isPresent()) {
               hybridSpecification.setConcreteInstance(optionalSpec.get());
-            }
-            else{
+              timingDiagramCollectionController.setActivated(true);
+            } else {
               ViewUtils.showDialog(Alert.AlertType.WARNING, "Concretizer warning",
                   "No concrete instance found",
                   "The Solver could not produce a concrete example with the given table.");
@@ -122,8 +142,8 @@ public class SpecificationController implements Controller {
           });
         }, exception -> {
           Platform.runLater(() -> {
-            new ErrorMessageDialog(exception, "Concretizing failed", "An Error occurred while "
-                + "concretizing the specification");
+            new ErrorMessageDialog(exception, "Concretization Failed", "An error occurred while "
+                + "concretizing the specification.");
           });
         });
   }
@@ -154,6 +174,7 @@ public class SpecificationController implements Controller {
     }
 
   }
+
   private void onVerificationStateChanged(VerificationState newState) {
     switch (newState) {
       case RUNNING:
@@ -164,20 +185,16 @@ public class SpecificationController implements Controller {
     }
   }
 
-  private class VerificationButtonClickedListener implements EventHandler<ActionEvent> {
-
-
-    @Override
-    public void handle(ActionEvent actionEvent) {
-      switch (stateProperty.get()) {
-        case RUNNING:
-          view.onVerificationButtonClicked(hybridSpecification, VerificationEvent.Type.STOP);
-          break;
-        default:
-          view.onVerificationButtonClicked(hybridSpecification, VerificationEvent.Type.START);
-      }
+  private void onVerificationButtonClicked(ActionEvent actionEvent) {
+    switch (stateProperty.get()) {
+      case RUNNING:
+        view.onVerificationButtonClicked(hybridSpecification, VerificationEvent.Type.STOP);
+        break;
+      default:
+        view.onVerificationButtonClicked(hybridSpecification, VerificationEvent.Type.START);
     }
   }
+
   public HybridSpecification getSpec() {
     return spec;
   }

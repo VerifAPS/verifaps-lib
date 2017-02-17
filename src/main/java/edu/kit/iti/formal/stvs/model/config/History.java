@@ -1,74 +1,92 @@
 package edu.kit.iti.formal.stvs.model.config;
 
-import org.apache.commons.collections4.queue.CircularFifoQueue;
+import edu.kit.iti.formal.stvs.logic.io.ExportException;
+import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
+import edu.kit.iti.formal.stvs.logic.io.ImportException;
+import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-import java.util.Arrays;
+import javax.xml.bind.JAXBException;
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Contains information about recently opened code and spec files
+ * @author Benjamin Alt
  */
 public class History {
-  private CircularFifoQueue<String> codeFiles;
-  private CircularFifoQueue<String> specFiles;
 
-  public static final int HISTORY_DEPTH = 10;
+  private static final String AUTOLOAD_HISTORY_FILENAME = "stvs-history.xml";
+  public static final int HISTORY_DEPTH = 15;
+
+
+  private ObservableList<String> filenames;
 
   public History() {
-    codeFiles = new CircularFifoQueue<String>(HISTORY_DEPTH);
-    specFiles = new CircularFifoQueue<String>(HISTORY_DEPTH);
+    filenames = FXCollections.observableArrayList();
   }
 
-  public History(Collection<String> codeFiles, Collection<String> specFiles) {
-    if (codeFiles.size() > HISTORY_DEPTH || specFiles.size() > HISTORY_DEPTH) {
+  public History(Collection<String> filenames) {
+    this();
+    if (filenames.size() > HISTORY_DEPTH) {
       // Don't silently cut off the part of the input collection that doesn't fit
       throw new IllegalArgumentException("List of filenames exceeds history size");
     }
-    this.codeFiles = new CircularFifoQueue<String>(HISTORY_DEPTH);
-    this.specFiles = new CircularFifoQueue<String>(HISTORY_DEPTH);
+    this.filenames.addAll(filenames);
+  }
 
-    for (String codeFilePath : codeFiles) {
-      this.codeFiles.add(codeFilePath);
+  /**
+   * Get the current file history.
+   * @return An ObservableList with the most recently opened filenames.
+   */
+  public ObservableList<String> getFilenames() {
+    return filenames;
+  }
+
+  /**
+   * Add a filename to the history
+   * @param filename
+   */
+  public void addFilename(String filename) {
+    // Prevent entries from being added twice --> remove and add to the end ("most recent")
+    if (filenames.contains(filename)) {
+      filenames.remove(filename);
     }
-    for (String specFilePath : specFiles) {
-      this.specFiles.add(specFilePath);
+    // Prevent filenames from getting larger than HISTORY_DEPTH
+    if (filenames.size() == HISTORY_DEPTH) {
+      for (int i = 0; i < filenames.size() - 1; i++) {
+        filenames.set(i, filenames.get(i+1));
+      }
+    }
+    filenames.add(filename);
+  }
+
+  public static History autoloadHistory() {
+    File historyFile = new File(GlobalConfig.CONFIG_DIRPATH + File.separator +
+        AUTOLOAD_HISTORY_FILENAME);
+    try {
+      return ImporterFacade.importHistory(historyFile, ImporterFacade.ImportFormat.XML);
+    } catch (JAXBException | ImportException e) {
+      return new History();
     }
   }
 
-  /**
-   * Get the code file history
-   *
-   * @return A collection of filepaths of code files
-   */
-  public List<String> getCodeFiles() {
-    return Arrays.asList(codeFiles.toArray(new String[0]));
+
+  public void autosaveHistory() throws IOException, JAXBException, ExportException {
+    File configDir = new File(GlobalConfig.CONFIG_DIRPATH);
+    if (!configDir.isDirectory() || !configDir.exists()) {
+      configDir.mkdirs();
+    }
+    File historyFile = new File(GlobalConfig.CONFIG_DIRPATH + File.separator +
+        AUTOLOAD_HISTORY_FILENAME);
+    ExporterFacade.exportHistory(this, ExporterFacade.ExportFormat.XML, historyFile);
   }
 
-  /**
-   * Get the spec file history
-   *
-   * @return A collection of filepaths of spec files
-   */
-  public List<String> getSpecFiles() {
-    return Arrays.asList(specFiles.toArray(new String[0]));
-  }
-
-  /**
-   * Add the path to an opened code file to the history
-   *
-   * @param filename The path to the opened code file
-   */
-  public void addCodeFile(String filename) {
-    codeFiles.add(filename);
-  }
-
-  /**
-   * Add the path to an opened spec file to the history
-   *
-   * @param filename The path to the opened spec file
-   */
-  public void addSpecFile(String filename) {
-    specFiles.add(filename);
+  public void setAll(History history) {
+    for (String filename : history.getFilenames()) {
+      addFilename(filename);
+    }
   }
 }

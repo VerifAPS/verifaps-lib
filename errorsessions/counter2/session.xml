@@ -55,7 +55,6 @@ END_PROGRAM</plaintext>
 <fontSize>12</fontSize>
 </editor>
 <dependencies>
-<javaPath>/usr/bin</javaPath>
 <z3Path>/usr/bin/z3</z3Path>
 <getetaCommand>java -jar /home/philipp/program/PSE/geteta-0.4.0-exe.jar -c
   ${code} -t ${spec} -x</getetaCommand>

@@ -22,29 +22,24 @@ public class HistoryTest {
 
   @Test
   public void testBufferSize() {
-    assertEquals(0, history.getCodeFiles().size());
-    assertEquals(0, history.getSpecFiles().size());
+    assertEquals(0, history.getFilenames().size());
     for (int i = 0; i < history.HISTORY_DEPTH * 2; i++) {
-      history.addCodeFile("codePath" + i);
-      history.addSpecFile("specPath" + i);
+      history.addFilename("filePath" + i);
     }
-    assertEquals(history.getCodeFiles().size(), history.HISTORY_DEPTH);
-    assertEquals(history.getSpecFiles().size(), history.HISTORY_DEPTH);
+    assertEquals(history.getFilenames().size(), history.HISTORY_DEPTH);
   }
 
   @Test
   public void testCopyConstructor() {
-    ArrayList<String> codePaths = new ArrayList<String>();
-    codePaths.add("CodeOne");
-    codePaths.add("CodeTwo");
-    HashSet<String> specPaths = new HashSet<String>();
-    specPaths.add("SpecOne");
-    history = new History(codePaths, specPaths);
-    List<String> codePathsAfter = history.getCodeFiles();
-    List<String> specPathsAfter = history.getSpecFiles();
-    assertEquals(codePathsAfter.get(0), "CodeOne");
-    assertEquals(codePathsAfter.get(1), "CodeTwo");
-    assertEquals(specPathsAfter.get(0), "SpecOne");
+    ArrayList<String> filePaths = new ArrayList<String>();
+    filePaths.add("CodeOne");
+    filePaths.add("CodeTwo");
+    filePaths.add("SpecOne");
+    history = new History(filePaths);
+    List<String> filePathsAfter = history.getFilenames();
+    assertEquals(filePathsAfter.get(0), "CodeOne");
+    assertEquals(filePathsAfter.get(1), "CodeTwo");
+    assertEquals(filePathsAfter.get(2), "SpecOne");
   }
 
   @Test(expected=IllegalArgumentException.class)
@@ -53,20 +48,12 @@ public class HistoryTest {
     for (int i = 0; i < history.HISTORY_DEPTH * 2; i++) {
       codePaths.add("SomeCode" + i);
     }
-    HashSet<String> specPaths = new HashSet<String>();
-    specPaths.add("SpecOne");
-    history = new History(codePaths, specPaths);
+    history = new History(codePaths);
   }
 
   @Test
-  public void testAddSpec() {
-    history.addSpecFile("someSpec");
-    assertEquals(history.getSpecFiles().get(0), "someSpec");
-  }
-
-  @Test
-  public void testAddCode() {
-    history.addCodeFile("someCode");
-    assertEquals(history.getCodeFiles().get(0), "someCode");
+  public void testAddSFilename() {
+    history.addFilename("someSpec");
+    assertEquals(history.getFilenames().get(0), "someSpec");
   }
 }

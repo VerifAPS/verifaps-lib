@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><session xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml">
+<code>
+<plaintext>TYPE
+  TrafficLight : (Red, Green);
+END_TYPE
+
+PROGRAM PedestrianTrafficLight
+
+  VAR_INPUT
+    pedBtnPress : BOOL := FALSE;
+  END_VAR
+  
+  VAR_OUTPUT
+    carLight : BOOL := TRUE;
+    pedLight : BOOL := FALSE;
+    counter  : INT  := 0;
+  END_VAR
+
+  VAR
+    buttonPressedBefore : BOOL;
+    green : BOOL := TRUE;
+    red   : BOOL := FALSE;
+  END_VAR
+
+  IF (NOT buttonPressedBefore) AND pedBtnPress THEN
+    carLight := red;
+  END_IF
+
+  IF counter = 10 THEN
+    pedLight := green;
+  ELSIF counter = 40 THEN
+    pedLight := red;
+  ELSIF counter = 50 THEN
+    carLight := green;
+  END_IF
+
+  IF carLight = red THEN
+    counter := counter + 1;
+  ELSE
+    counter := 0;
+  END_IF
+  
+  buttonPressedBefore := pedBtnPress;
+
+END_PROGRAM</plaintext>
+</code>
+<tabs>
+<tab id="2" open="false" readOnly="false">
+<specification comment="" isConcrete="false" name="CylceSpec">
+<variables>
+<ioVariable colwidth="155" data-type="BOOL" io="input" name="pedBtnPress"/>
+<ioVariable colwidth="189" data-type="BOOL" io="output" name="carLight"/>
+<ioVariable colwidth="192" data-type="BOOL" io="output" name="pedLight"/>
+<ioVariable colwidth="138" data-type="INT" io="output" name="counter"/>
+</variables>
+<rows>
+<row comment="">
+<duration>3</duration>
+<cell>FALSE</cell>
+<cell>TRUE</cell>
+<cell>FALSE</cell>
+<cell>0</cell>
+</row>
+<row comment="">
+<duration>1</duration>
+<cell>TRUE</cell>
+<cell>FALSE</cell>
+<cell>FALSE</cell>
+<cell>= counter[-1]+1</cell>
+</row>
+<row comment="">
+<duration>9</duration>
+<cell>-</cell>
+<cell>FALSE</cell>
+<cell>FALSE</cell>
+<cell>= counter[-1]+1</cell>
+</row>
+<row comment="">
+<duration>29</duration>
+<cell>-</cell>
+<cell>FALSE</cell>
+<cell>TRUE</cell>
+<cell>= counter[-1]+1</cell>
+</row>
+<row comment="">
+<duration>10</duration>
+<cell>-</cell>
+<cell>FALSE</cell>
+<cell>FALSE</cell>
+<cell>= counter[-1]+1</cell>
+</row>
+<row comment="">
+<duration>1</duration>
+<cell>-</cell>
+<cell>TRUE</cell>
+<cell>FALSE</cell>
+<cell>0</cell>
+</row>
+</rows>
+<enumTypes/>
+</specification>
+</tab>
+<tab id="4" open="false" readOnly="false">
+<specification comment="" isConcrete="false" name="NoCollisionSpec">
+<variables>
+<ioVariable colwidth="170" data-type="BOOL" io="input" name="pedBtnPress"/>
+<ioVariable colwidth="328" data-type="BOOL" io="output" name="carLight"/>
+<ioVariable colwidth="332" data-type="BOOL" io="output" name="pedLight"/>
+<ioVariable colwidth="100" data-type="INT" io="output" name="counter"/>
+</variables>
+<rows>
+<row comment="">
+<duration>[0,100]</duration>
+<cell>-</cell>
+<cell>carLight = FALSE | pedLight != carLight</cell>
+<cell>pedLight = FALSE | pedLight != carLight</cell>
+<cell>-</cell>
+</row>
+</rows>
+<enumTypes/>
+</specification>
+</tab>
+</tabs>
+<history/>
+</session>

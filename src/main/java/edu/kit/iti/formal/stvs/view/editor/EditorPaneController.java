@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.view.editor;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.code.FoldableCodeBlock;
@@ -13,6 +15,10 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.text.Font;
 import org.antlr.v4.runtime.Token;
 import org.fxmisc.richtext.CodeArea;
@@ -45,6 +51,7 @@ public class EditorPaneController implements Controller {
         EditorPane.class.getResource("st-keywords.css").toExternalForm());
     this.executor = Executors.newSingleThreadExecutor();
     configureTextArea();
+    setupContextMenu();
     handleTextChange(computeHighlighting(code.getSourcecode()));
     this.globalConfig.editorFontSizeProperty().addListener((observable, oldValue, newValue) -> updateFontSize(newValue.intValue()));
     this.globalConfig.editorFontFamilyProperty().addListener((observable, oldValue, newValue) -> updateFontFamily(newValue));
@@ -60,6 +67,34 @@ public class EditorPaneController implements Controller {
     view.getCodeArea().setStyle("-fx-font-family: " +
         globalConfig.editorFontFamilyProperty().get() +
         ";" + "-fx-font-size: " + size + "pt;");
+  }
+
+  private MenuItem createMenuItem(String name, Runnable action, FontAwesomeIcon icon) {
+    MenuItem item = createMenuItem(name, action);
+    item.setGraphic(GlyphsDude.createIcon(icon));
+    return item;
+  }
+
+  private MenuItem createMenuItem(String name, Runnable action) {
+    MenuItem item = new MenuItem(name);
+    item.setOnAction(t -> action.run());
+    return item;
+  }
+
+  private void setupContextMenu() {
+    CodeArea codeArea = view.getCodeArea();
+
+    ContextMenu menu = new ContextMenu();
+    menu.getItems().addAll(
+        createMenuItem("Undo", codeArea::undo, FontAwesomeIcon.UNDO),
+        createMenuItem("Redo", codeArea::redo),
+        new SeparatorMenuItem(),
+        createMenuItem("Paste", codeArea::paste, FontAwesomeIcon.PASTE),
+        createMenuItem("Copy", codeArea::copy, FontAwesomeIcon.COPY),
+        createMenuItem("Cut", codeArea::cut, FontAwesomeIcon.CUT),
+        createMenuItem("Select All", codeArea::selectAll)
+    );
+    this.view.setContextMenu(menu);
   }
 
 
