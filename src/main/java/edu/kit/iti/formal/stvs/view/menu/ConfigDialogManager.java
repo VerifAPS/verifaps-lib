@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
+import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -92,7 +93,7 @@ public class ConfigDialogManager implements Controller {
       try {
         config.autosaveConfig();
       } catch (IOException | ExportException e) {
-        ViewUtils.showDialog(Alert.AlertType.ERROR, "Autosave error", "Error saving the current" +
+        ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Autosave error", "Error saving the current" +
             " configuration", "The current configuration could not be saved.", e.getMessage());
       }
       return config;
