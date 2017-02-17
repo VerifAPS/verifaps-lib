@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  */
 public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecification> {
 
-  private ObjectFactory objectFactory;
+  private static ObjectFactory objectFactory;
 
   public XmlConstraintSpecExporter() {
     objectFactory = new ObjectFactory();
@@ -28,7 +28,6 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
     edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable specTable = objectFactory.createSpecificationTable();
     specTable.setVariables(makeVariables(source));
     specTable.setRows(makeRows(source));
-    specTable.setEnumTypes(makeEnumTypes(source));
     specTable.setComment(source.getComment());
     specTable.setIsConcrete(false);
     specTable.setName(source.getName());
@@ -58,12 +57,6 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
     return rows;
   }
 
-  protected EnumTypes makeEnumTypes(SpecificationTable<?, ?, ?> specTable) {
-    EnumTypes enumTypes = objectFactory.createEnumTypes();
-    // TODO: Remove EnumTypes from xsd.
-    return enumTypes;
-  }
-
   private Variables makeVariables(ConstraintSpecification constraintSpec) {
     Variables variables = objectFactory.createVariables();
     variables.getIoVariable().addAll(constraintSpec.getColumnHeaders().stream()
@@ -81,14 +74,7 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
     return variables;
   }
 
-  protected Variables makeVariables(ConcreteSpecification concreteSpec) {
-    Variables variables = objectFactory.createVariables();
-    variables.getIoVariable().addAll(concreteSpec.getColumnHeaders().stream()
-      .map(this::makeIoVariable).collect(Collectors.toList()));
-    return variables;
-  }
-
-  private Variables.IoVariable makeIoVariable(IoVariable validIoVariable) {
+  protected static  Variables.IoVariable makeIoVariable(IoVariable validIoVariable) {
     Variables.IoVariable ioVar = objectFactory.createVariablesIoVariable();
     ioVar.setComment(ioVar.getComment());
     ioVar.setDataType(validIoVariable.getType());

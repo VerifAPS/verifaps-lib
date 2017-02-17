@@ -5,6 +5,9 @@ import javafx.beans.property.StringProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
+ * A cell containing constraint expression (for the syntax, see
+ * https://git.scc.kit.edu/peese/stverificationstudio/issues/25). The cells in a
+ * {@link ConstraintSpecification} are of this type.
  * @author Benjamin Alt
  */
 public class ConstraintCell implements CellOperationProvider {
@@ -12,6 +15,11 @@ public class ConstraintCell implements CellOperationProvider {
   private StringProperty stringRepresentation;
   private StringProperty comment;
 
+  /**
+   * Construct a new ConstraintCell from a string representation of its contents (i.e. of a
+   * constraint expression).
+   * @param stringRepresentation The string representation of a constraint expression
+   */
   public ConstraintCell(String stringRepresentation) {
     this.stringRepresentation = new SimpleStringProperty(stringRepresentation);
     this.comment = new SimpleStringProperty();
