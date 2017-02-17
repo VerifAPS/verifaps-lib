@@ -57,7 +57,7 @@ public class StvsMenuBarController implements Controller {
 
   private void saveSessionAs(ActionEvent actionEvent) {
     FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Save session");
+    fileChooser.setTitle("Save Session As");
     fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
     if (chosenFile != null) {
@@ -80,7 +80,7 @@ public class StvsMenuBarController implements Controller {
 
   private void openCode(ActionEvent t) {
     FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Open an st-file");
+    fileChooser.setTitle("Open A ST-File");
     fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
 
@@ -97,7 +97,7 @@ public class StvsMenuBarController implements Controller {
 
   private void openSession(ActionEvent t) {
     FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Open a session");
+    fileChooser.setTitle("Open A Session");
     fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
 
@@ -117,7 +117,7 @@ public class StvsMenuBarController implements Controller {
 
   private void openSpec(ActionEvent t) {
     FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Open a specification-file");
+    fileChooser.setTitle("Open A Specification-File");
     fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
 
@@ -164,7 +164,7 @@ public class StvsMenuBarController implements Controller {
   private void saveAll(ActionEvent t) {
     if (this.rootModel.get().getFilename().isEmpty()) {
       FileChooser fileChooser = new FileChooser();
-      fileChooser.setTitle("Save session");
+      fileChooser.setTitle("Save Session");
       fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
       File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
       if (chosenFile != null) {
@@ -194,7 +194,7 @@ public class StvsMenuBarController implements Controller {
 
     if (code.getFilename().isEmpty()) {
       FileChooser fileChooser = new FileChooser();
-      fileChooser.setTitle("Select the file");
+      fileChooser.setTitle("Select The File");
       fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
       File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
       if (chosenFile != null) {
