@@ -1,10 +1,9 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
-import edu.kit.iti.formal.stvs.model.common.NullableProperty;
-import edu.kit.iti.formal.stvs.model.common.Selection;
+import edu.kit.iti.formal.stvs.model.common.*;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.view.spec.variables.clipboard.Json;
+import javafx.collections.ObservableList;
 
 import java.util.Optional;
 
@@ -56,7 +55,13 @@ public class HybridSpecification extends ConstraintSpecification {
   }
 
   public void setCounterExample(ConcreteSpecification counterExample) {
-    this.counterExample.set(counterExample);
+    if (counterExample != null) {
+      if (!columnHeadersMatch(counterExample.columnHeaders)) {
+        throw new IllegalArgumentException("The column headers of the concrete instance are not " +
+            "compatible with this hybrid specification");
+      }
+      this.counterExample.set(counterExample);
+    }
   }
 
   public Selection getSelection() {
@@ -80,7 +85,25 @@ public class HybridSpecification extends ConstraintSpecification {
   }
 
   public void setConcreteInstance(ConcreteSpecification concreteInstance) {
-    this.concreteInstance.set(concreteInstance);
+    if (concreteInstance != null) {
+      if (!columnHeadersMatch(concreteInstance.columnHeaders)) {
+        throw new IllegalArgumentException("The column headers of the concrete instance are not " +
+            "compatible with this hybrid specification");
+      }
+      // Concrete specification columns may be "shorter" (have less rows) than hybrid spec (i.e. for
+      // some counterexamples), so cannot check rows
+      this.concreteInstance.set(concreteInstance);
+    }
+  }
+
+  private boolean columnHeadersMatch(ObservableList<ValidIoVariable> columnHeaders) {
+    if (this.columnHeaders.size() != columnHeaders.size()) {
+      return false;
+    }
+    for (int i = 0; i < this.columnHeaders.size(); i++) {
+      if (!this.columnHeaders.get(i).matches(columnHeaders.get(i))) return false;
+    }
+    return true;
   }
 
   public void removeConcreteInstance() {
