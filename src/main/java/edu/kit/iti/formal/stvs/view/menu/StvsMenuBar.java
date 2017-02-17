@@ -35,6 +35,7 @@ public class StvsMenuBar extends MenuBar {
   public MenuItem newCode;
   public MenuItem newSpec;
   public MenuItem saveSessionAs;
+  public MenuItem about;
 
   public StvsMenuBar() {
     //create top-level menus
@@ -65,12 +66,25 @@ public class StvsMenuBar extends MenuBar {
     config = new MenuItem("Preferences");
     config.setAccelerator(KeyCombination.keyCombination("Ctrl+,"));
 
+
     newCode = new MenuItem("New Code");
     newSpec = new MenuItem("New Specification");
+
+    about = new MenuItem("About");
     //add menu-items to
     openOther.getItems().addAll(openSpec, openCode, openSession);
-    file.getItems().addAll(newCode, newSpec, open, openOther, openRecent, saveCode, saveSpec, saveAll, saveSessionAs, (new
-        SeparatorMenuItem()), config);
+    file.getItems().addAll(
+        newCode, newSpec, open, openOther, openRecent, (new SeparatorMenuItem()),
+        saveCode, saveSpec, saveAll, saveSessionAs
+    );
+
+    edit.getItems().addAll(
+        config
+    );
+
+    help.getItems().addAll(
+        about
+    );
 
     //add menus to itself
     this.getMenus().addAll(file, edit, view, help);

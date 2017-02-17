@@ -59,8 +59,8 @@ public class TimingDiagramCollectionController implements Controller {
     view.onMouseDraggedProperty().setValue(this::mouseDraggedHandler);
     view.onMousePressedProperty().setValue(this::mousePressedHandler);
 
-    view.getOutdatedLabel().visibleProperty().bind(activated.not());
-    view.getOutdatedLabel().managedProperty().bind(activated.not());
+    view.getOutdatedMessage().visibleProperty().bind(activated.not());
+    view.getOutdatedMessage().managedProperty().bind(activated.not());
 
     concreteSpec.getColumnHeaders().forEach(validIoVariable -> {
       createTimingDiagram(concreteSpec, validIoVariable);

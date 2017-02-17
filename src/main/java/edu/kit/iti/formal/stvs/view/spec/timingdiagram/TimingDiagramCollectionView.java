@@ -1,13 +1,17 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
@@ -25,13 +29,21 @@ public class TimingDiagramCollectionView extends VBox {
   private NumberAxis xAxis = new NumberAxis(0, 10, 1);
   private ScrollBar xScrollBar = new ScrollBar();
   private final Label outdatedLabel;
+  private final HBox outdatedMessage;
 
   public TimingDiagramCollectionView() {
     super();
     getStyleClass().add("collectionView");
-    outdatedLabel = new Label("OUTDATED");
+    outdatedLabel = new Label("This Timing-Diagram is outdated.");
     outdatedLabel.getStyleClass().add("outdatedLabel");
-    getChildren().addAll(outdatedLabel, scrollPane, globalAxisContainer, xScrollBar);
+    Node outdatedIcon = GlyphsDude.createIcon(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
+    outdatedIcon.getStyleClass().add("outdatedIcon");
+    outdatedMessage = new HBox(
+        outdatedIcon,
+        outdatedLabel);
+    outdatedMessage.getStyleClass().add("outdatedMessage");
+
+    getChildren().addAll(outdatedMessage, scrollPane, globalAxisContainer, xScrollBar);
     globalAxisContainer.getChildren().add(xAxis);
     setPadding(new Insets(0, 10, 0, 10));
     yAxisStickRightContainer.getChildren().addAll(yAxisContainer, labelContainer);
@@ -84,7 +96,7 @@ public class TimingDiagramCollectionView extends VBox {
     return xScrollBar;
   }
 
-  public Label getOutdatedLabel() {
-    return outdatedLabel;
+  public HBox getOutdatedMessage() {
+    return outdatedMessage;
   }
 }

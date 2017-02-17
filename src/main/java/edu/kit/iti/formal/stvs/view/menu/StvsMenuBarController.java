@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
-import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
@@ -10,10 +9,12 @@ import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
 import javafx.beans.property.ObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.MenuItem;
 import javafx.stage.FileChooser;
 
@@ -57,6 +58,7 @@ public class StvsMenuBarController implements Controller {
     view.saveCode.setOnAction(this::saveCode);
     view.saveSpec.setOnAction(this::saveSpec);
     view.config.setOnAction(this::openConfigDialog);
+    view.about.setOnAction(this::openAboutDialog);
   }
 
   private void updateHistoryMenu() {
@@ -109,6 +111,15 @@ public class StvsMenuBarController implements Controller {
 
   private void openConfigDialog(ActionEvent t) {
     ConfigDialogManager dialogManager = new ConfigDialogManager(rootModel.get().getGlobalConfig());
+  }
+
+  private void openAboutDialog(ActionEvent actionEvent) {
+    Dialog dialog = new Dialog();
+    AboutDialogPane pane = new AboutDialogPane();
+    dialog.setTitle("About");
+    dialog.setDialogPane(pane);
+
+    dialog.showAndWait();
   }
 
   private void openCode(ActionEvent t) {
