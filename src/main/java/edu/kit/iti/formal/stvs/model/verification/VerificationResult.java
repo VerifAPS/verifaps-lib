@@ -3,6 +3,8 @@ package edu.kit.iti.formal.stvs.model.verification;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 
 /**
+ * The result of a verification (the model equivalent of the output of a verification engine
+ * (such as GeTeTa).
  * @author Benjamin Alt
  */
 public class VerificationResult {
@@ -13,6 +15,8 @@ public class VerificationResult {
 
   /**
    * Construct a new VerificationResult for a verification without counterexample.
+   * @param status The status of the verification (i.e. verified, counterexample, error, ...)
+   * @param logFilePath The path to the log file (the original output of the verification engine)
    */
   public VerificationResult(Status status, String logFilePath) {
     this.status = status;
@@ -20,9 +24,9 @@ public class VerificationResult {
   }
 
   /**
-   * Construct a new VerificationResult with a counterexample for an unsuccessful verification
-   * @param counterexample
-   * @param logFilePath
+   * Construct a new VerificationResult with a counterexample for an unsuccessful verification.
+   * @param counterexample The counterexample
+   * @param logFilePath The path to the log file (the original output of the verification engine)
    */
   public VerificationResult(ConcreteSpecification counterexample, String logFilePath) {
     this(Status.COUNTEREXAMPLE, logFilePath);
