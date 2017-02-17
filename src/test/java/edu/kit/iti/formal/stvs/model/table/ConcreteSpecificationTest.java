@@ -36,6 +36,6 @@ public class ConcreteSpecificationTest {
     );
     assertEquals(
         expectedCells,
-        concreteSpec.getConcreteValuesForConstraintRow("A", 1));
+        concreteSpec.getConcreteValuesForConstraintCell("A", 1));
   }
 }

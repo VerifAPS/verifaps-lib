@@ -8,8 +8,8 @@ import javafx.collections.ObservableList;
 import java.util.Optional;
 
 /**
- * A ConstraintSpecification which also has an associated counterexample (ConcreteSpecification),
- * concrete instance (ConcreteSpecification) or both.
+ * A {@link ConstraintSpecification} which also has an associated counterexample
+ * (a {@link ConcreteSpecification}), a concrete instance ({@link ConcreteSpecification}) or both.
  * This class is the model on which the
  * {@link edu.kit.iti.formal.stvs.view.spec.SpecificationController}
  * and {@link TimingDiagramCollectionController} operate.
@@ -22,8 +22,8 @@ public class HybridSpecification extends ConstraintSpecification {
   private final boolean editable;
 
   /**
-   * Selection for Spec to Timing-Diagram synchronisation.
-   * Should be created <b>once</b> on creation of this class
+   * Stores which cell in the table is currently highlighted in the view. This is saved here in
+   * order to allow the table and timing diagram
    */
   private Selection selection;
 

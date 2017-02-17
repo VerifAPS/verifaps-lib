@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
+import edu.kit.iti.formal.stvs.model.common.IoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
@@ -8,6 +9,7 @@ import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
 import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBElement;
+import java.util.stream.Collectors;
 
 /**
  * @author Benjamin Alt
@@ -24,8 +26,7 @@ public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> 
 
   public Node exportToXmlNode(ConcreteSpecification source) throws ExportException {
     edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable specTable = objectFactory.createSpecificationTable();
-    specTable.setVariables(constraintSpecExporter.makeVariables(source));
-    specTable.setEnumTypes(constraintSpecExporter.makeEnumTypes(source));
+    specTable.setVariables(makeVariables(source));
     specTable.setRows(makeRows(source));
     specTable.setIsConcrete(true);
     specTable.setName(source.getName());
@@ -59,4 +60,11 @@ public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> 
     return rows;
   }
 
+
+  protected Variables makeVariables(ConcreteSpecification concreteSpec) {
+    Variables variables = objectFactory.createVariables();
+    variables.getIoVariable().addAll(concreteSpec.getColumnHeaders().stream()
+        .map(XmlConstraintSpecExporter::makeIoVariable).collect(Collectors.toList()));
+    return variables;
+  }
 }

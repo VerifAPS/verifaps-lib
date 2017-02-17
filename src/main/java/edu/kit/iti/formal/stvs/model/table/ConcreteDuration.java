@@ -3,6 +3,8 @@ package edu.kit.iti.formal.stvs.model.table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
+ * A concrete duration. A ConcreteDuration is localized in time, i.e. it is aware of the cycle in
+ * which it begins.
  * @author Benjamin Alt
  */
 public class ConcreteDuration {
@@ -10,6 +12,11 @@ public class ConcreteDuration {
   private int duration;
   private int beginCycle;
 
+  /**
+   * Construct a new concrete duration.
+   * @param beginCycle The cycle in which this duration begins
+   * @param duration The duration
+   */
   public ConcreteDuration(int beginCycle, int duration) {
     this.beginCycle = beginCycle;
     this.duration = duration;
