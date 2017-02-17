@@ -15,31 +15,39 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * A row in a specification table (see {@link SpecificationTable}). The generic type parameter C
+ * is the type of the cells.
  * @author Benjamin Alt
- * @author Philipp
  */
 public class SpecificationRow<C> implements Commentable, Observable {
 
-  public static Callback<SpecificationRow, Observable[]> extractor() {
-    return param -> new Observable[] { param };
-  }
-
   private final ObservableMap<String, C> cells;
   private final StringProperty comment;
-
   private final List<InvalidationListener> listeners;
   private final Callback<C, Observable[]> extractor;
   private final InvalidationListener listenRowInvalidation;
 
+  /**
+   * Create a row which is not observable. This is the case for rows in
+   * {@link ConcreteSpecification}s and implemented via an empty extractor.
+   * @param cells The cells of the unobservable row
+   * @param <E> The type of the cells in the unobservable row
+   * @return The created unobservable row
+   */
   public static <E> SpecificationRow<E> createUnobservableRow(Map<String, E> cells) {
     return new SpecificationRow<>(cells, p -> new Observable[0]);
   }
 
-  /*
-  public SpecificationRow(Map<String, C> cells) {
-    this(cells, param -> new Observable[] {});
-  }*/
-
+  /**
+   * Create a SpecificationRow from a given number of cells and an extractor. The extractor is
+   * required for "deep observing", i.e. the registering of change listeners on the contents of
+   * an observable collection (here, the collection of cells - to fire change events not only
+   * when cells are added or removed, but also when properties in the cells change). For more
+   * information on extractors, see https://docs.oracle
+   * .com/javase/8/javafx/api/javafx/collections/FXCollections.html.
+   * @param cells The initial cells of the row
+   * @param extractor The extractor to be used for deep observing on the cells
+   */
   public SpecificationRow(Map<String, C> cells, Callback<C, Observable[]> extractor) {
     this.cells = FXCollections.observableMap(cells);
     this.cells.addListener(this::cellsMapChanged);
@@ -53,6 +61,10 @@ public class SpecificationRow<C> implements Commentable, Observable {
     cells.values().forEach(this::subscribeToCell);
   }
 
+  /**
+   * Called when cells were added or removed to this row.
+   * @param change The change event
+   */
   private void cellsMapChanged(MapChangeListener.Change<? extends String, ? extends C> change) {
     if (change.wasAdded()) {
       subscribeToCell(change.getValueAdded());
@@ -62,12 +74,21 @@ public class SpecificationRow<C> implements Commentable, Observable {
     }
   }
 
+
+  /**
+   * Add an InvalidationListener to a certain cell.
+   * @param c The cell to add a listener to
+   */
   private void subscribeToCell(C c) {
     for (Observable observable : extractor.call(c)) {
       observable.addListener(listenRowInvalidation);
     }
   }
 
+  /**
+   * Remove an InvalidationListener from a certain cell
+   * @param cell The cell to remove the listener from
+   */
   private void unsubscribeFromCell(C cell) {
     for (Observable observable : extractor.call(cell)) {
       observable.removeListener(listenRowInvalidation);

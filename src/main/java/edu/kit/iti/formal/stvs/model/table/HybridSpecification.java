@@ -23,17 +23,24 @@ public class HybridSpecification extends ConstraintSpecification {
 
   /**
    * Stores which cell in the table is currently highlighted in the view. This is saved here in
-   * order to allow the table and timing diagram
+   * order to allow the table and timing diagram to share the same reference.
    */
   private Selection selection;
 
+  /**
+   * Create a new, empty hybrid specification with a default name from a list of free variables.
+   * @param freeVariableList A list of initial free variables
+   * @param editable True if this hybridSpecification is editable, false otherwise
+   */
   public HybridSpecification(FreeVariableList freeVariableList, boolean editable) {
     this(DEFAULT_NAME, freeVariableList, editable);
   }
 
   /**
-   * Constructor for an "empty" HybridSpecification that contains no cells.
-   * @param editable Is this HybridSpecification supposed to be editable?
+   * Create a new, empty hybrid specification with a given name and a list of free variables.
+   * @param name The name of the HybridSpecification
+   * @param freeVariableList A list of initial free variables
+   * @param editable True if this HybridSpecification is editable, false otherwise
    */
   public HybridSpecification(String name, FreeVariableList freeVariableList, boolean editable) {
     super(name, freeVariableList);
@@ -43,6 +50,11 @@ public class HybridSpecification extends ConstraintSpecification {
     this.concreteInstance = new NullableProperty<>();
   }
 
+  /**
+   * Create a HybridSpecification from a {@link ConstraintSpecification}.
+   * @param sourceSpec The original {@link ConstraintSpecification}
+   * @param editable True if this HybridSpecification is editable, false otherwise
+   */
   public HybridSpecification(ConstraintSpecification sourceSpec, boolean editable) {
     this(sourceSpec.getName(), sourceSpec.getFreeVariableList(), editable);
     getColumnHeaders().addAll(sourceSpec.getColumnHeaders());
@@ -54,7 +66,7 @@ public class HybridSpecification extends ConstraintSpecification {
     return Optional.ofNullable(counterExample.get());
   }
 
-  public void setCounterExample(ConcreteSpecification counterExample) {
+    public void setCounterExample(ConcreteSpecification counterExample) {
     if (counterExample != null) {
       if (!columnHeadersMatch(counterExample.columnHeaders)) {
         throw new IllegalArgumentException("The column headers of the concrete instance are not " +
@@ -90,8 +102,6 @@ public class HybridSpecification extends ConstraintSpecification {
         throw new IllegalArgumentException("The column headers of the concrete instance are not " +
             "compatible with this hybrid specification");
       }
-      // Concrete specification columns may be "shorter" (have less rows) than hybrid spec (i.e. for
-      // some counterexamples), so cannot check rows
       this.concreteInstance.set(concreteInstance);
     }
   }

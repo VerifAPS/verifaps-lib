@@ -6,6 +6,8 @@ import javafx.beans.property.StringProperty;
 import java.util.List;
 
 /**
+ * A column in a specification (see {@link SpecificationTable}). The generic type parameter C is
+ * the type of the cells.
  * @author Benjamin Alt
  */
 public class SpecificationColumn<C> implements Commentable {
@@ -13,6 +15,10 @@ public class SpecificationColumn<C> implements Commentable {
   private List<C> cells;
   private StringProperty comment;
 
+  /**
+   * Create a new SpecificationColumn fro a list of cells.
+   * @param cells The cells for this column.
+   */
   public SpecificationColumn(List<C> cells) {
     this.cells = cells;
     this.comment = new SimpleStringProperty("");
