@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class SpecificationsPaneController implements Controller {
 
@@ -77,15 +76,19 @@ public class SpecificationsPaneController implements Controller {
           addTab(addItem);
         }
         for (HybridSpecification spec : change.getRemoved()) {
-          removeTab(spec);
+          removeTab(change.getFrom());
         }
       }
     });
   }
 
-  private void onTabClosed(Event event, Tab tab) {
+  private void onTabCloseRequest(Event event, Tab tab) {
     int indexToDelete = view.getTabPane().getTabs().indexOf(tab);
+    if (indexToDelete < 0) {
+      return;
+    }
     hybridSpecifications.remove(indexToDelete);
+
   }
 
 
@@ -103,7 +106,7 @@ public class SpecificationsPaneController implements Controller {
         typeContext, ioVariables, hybridSpecification, this.state,
         Bindings.isEmpty(scenario.getCode().syntaxErrorsProperty()).not(), globalConfig);
     Tab tab = new Tab();
-    tab.setOnClosed(e -> onTabClosed(e, tab));
+    tab.setOnCloseRequest(e -> onTabCloseRequest(e, tab));
     tab.textProperty().bind(hybridSpecification.nameProperty());
     tab.setContent(controller.getView());
     if (hybridSpecification.isEditable()) {
@@ -122,14 +125,10 @@ public class SpecificationsPaneController implements Controller {
   }
 
 
-  private void removeTab(HybridSpecification specification) {
-    view.getTabs().removeIf(tab -> {
-      if (controllers.get(tab) != null) {
-        SpecificationController removedController = controllers.remove(tab);
-        return true; //yeah... I know
-      }
-      return false;
-    });
+  private void removeTab(int index) {
+    Tab removeTab = view.getTabs().get(index);
+    controllers.remove(removeTab);
+    view.getTabs().remove(index);
   }
 
 
