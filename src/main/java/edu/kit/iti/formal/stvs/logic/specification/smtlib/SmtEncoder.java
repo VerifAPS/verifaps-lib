@@ -48,12 +48,10 @@ public class SmtEncoder {
         (Collectors.toList());
 
     this.isIoVariable = ioVariableTypes::contains;
-    System.out.println(setFreeVariablesDefaultValues());
     this.sConstrain = new SConstraint()
         .addHeaderDefinitions(createFreeVariables())
         .addHeaderDefinitions(setFreeVariablesDefaultValues());
 
-    System.out.println("Doing Step V");
     //Step V: upper und lower Bound von Durations festlegen
     for (int z = 0; z < specification.getDurations().size(); z++) {
       LowerBoundedInterval interval = specification.getDurations().get(z);
@@ -70,7 +68,6 @@ public class SmtEncoder {
       }
     }
 
-    System.out.println("doing recursive step");
     //Step I, II, IV
     for (ValidIoVariable ioVariable : this.ioVariables) {
       SpecificationColumn<Expression> column = this.specification.getColumnByName(ioVariable.getName());
@@ -95,7 +92,6 @@ public class SmtEncoder {
       }
     }
 
-    System.out.println("Doing step III");
     //Step III neg. Indizes verbinden
     for (ValidIoVariable ioVariable : this.ioVariables) {
       SpecificationColumn<Expression> column = this.specification.getColumnByName(ioVariable.getName());
