@@ -204,6 +204,8 @@ public class SpecificationTableController implements Controller {
   private ContextMenu createColumnContextMenu(TableColumn<SynchronizedRow, ?> column) {
     MenuItem changeColumn = new MenuItem("Change Column...");
     MenuItem removeColumn = new MenuItem("Remove Column");
+    MenuItem commentColumn = new MenuItem("Comment ...");
+    commentColumn.setAccelerator(KeyCombination.keyCombination("Ctrl+k"));
     changeColumn.setOnAction(event -> {
       new IoVariableChangeDialog(
           hybridSpec.getColumnHeaderByName((String) column.getUserData()),
@@ -214,9 +216,14 @@ public class SpecificationTableController implements Controller {
       tableView.getColumns().remove(column);
       hybridSpec.removeColumnByName((String) column.getUserData());
     });
+    commentColumn.setOnAction(event -> {
+      String specIoVariableName = (String) column.getUserData();
+      SpecIoVariable commentable = hybridSpec.getColumnHeaderByName(specIoVariableName);
+      new CommentPopupManager(commentable, tableView.isEditable(), config);
+    });
     changeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
     removeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
-    return new ContextMenu(changeColumn, removeColumn);
+    return new ContextMenu(changeColumn, removeColumn, commentColumn);
   }
 
   public void addEmptyRow(int index) {
