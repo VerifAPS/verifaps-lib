@@ -8,13 +8,20 @@ import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 
 /**
- * Created by leonk on 09.02.2017.
+ * Controller for {@link VerticalResizeContainerView}
+ *
+ * @author Leon Kaucher
  */
 public class VerticalResizeContainerController implements Controller {
   VerticalResizeContainerView view = new VerticalResizeContainerView();
   private DoubleProperty mouseYStart = new SimpleDoubleProperty(0);
   private DoubleProperty cacheSize = new SimpleDoubleProperty(0);
 
+  /**
+   * Creates a simple wrapper that enables one to vertically resize the given Node.
+   *
+   * @param wrap Node that should be wrapped
+   */
   public VerticalResizeContainerController(Node wrap) {
     view.getContent().getChildren().add(wrap);
     AnchorPane.setLeftAnchor(wrap, 0.0);

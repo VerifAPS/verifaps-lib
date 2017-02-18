@@ -6,21 +6,23 @@ import javafx.scene.chart.XYChart;
 import java.util.List;
 
 /**
- * Created by leonk on 05.02.2017.
+ * Converts lists of {@link ConcreteCell ConcreteCells} to {@link javafx.scene.chart.XYChart.Series}
+ *
+ * @author Leon Kaucher
  */
 public class Plotable {
-  public static XYChart.Series<Number, String> toStringSeries(List<ConcreteCell> concreteCells){
+  public static XYChart.Series<Number, String> toStringSeries(List<ConcreteCell> concreteCells) {
     XYChart.Series<Number, String> dataSeries = new XYChart.Series<>();
-    for(int i = 0; i<concreteCells.size(); i++){
+    for (int i = 0; i < concreteCells.size(); i++) {
       String cellAsString = concreteCells.get(i).getValue().getValueString();
       dataSeries.getData().add(new XYChart.Data<>(i, cellAsString));
     }
     return dataSeries;
   }
 
-  public static XYChart.Series<Number, Number> toNumberSeries(List<ConcreteCell> concreteCells){
+  public static XYChart.Series<Number, Number> toNumberSeries(List<ConcreteCell> concreteCells) {
     XYChart.Series<Number, Number> dataSeries = new XYChart.Series<>();
-    for(int i = 0; i<concreteCells.size(); i++){
+    for (int i = 0; i < concreteCells.size(); i++) {
       Number cellAsNumber = concreteCells.get(i).getValue().match(
           integer -> integer,
           bool -> bool ? 1 : 0,

@@ -16,24 +16,32 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 /**
- * Created by csicar on 09.01.17.
+ * Represents the view for the collection of multiple timing diagrams.
+ *
+ * @author Leon Kaucher
+ * @author Carsten Csiky
  */
 public class TimingDiagramCollectionView extends VBox {
-  private ScrollPane scrollPane = new ScrollPane();
-  private VBox diagramContainer = new VBox();
-  private Pane yAxisContainer = new Pane();
-  private AnchorPane yAxisStickRightContainer = new AnchorPane();
-  private Pane labelContainer = new Pane();
-  private SplitPane axisDiagramContainer = new SplitPane();
-  private Pane globalAxisContainer = new Pane();
+  private ScrollPane scrollPane = new ScrollPane(); //Container that holds the axisDiagramContainer
+  private VBox diagramContainer = new VBox(); //Container that holds the diagrams
+  private Pane yAxisContainer = new Pane(); //Container that holds yAxis for each diagram
+  private AnchorPane yAxisStickRightContainer = new AnchorPane(); //Container that holds the yAxisContainer and labelContainer
+  private Pane labelContainer = new Pane(); //Container that holds titles for each diagram
+  private SplitPane axisDiagramContainer = new SplitPane(); //Container that holds yAxisStickRightContainer and diagramContainer
+  private Pane globalAxisContainer = new Pane(); //Container that holds the global xAxis
   private NumberAxis xAxis = new NumberAxis(0, 10, 1);
   private ScrollBar xScrollBar = new ScrollBar();
   private final Label outdatedLabel;
   private final HBox outdatedMessage;
 
+  /**
+   * Creates a View that holds all containers for multiple {@link TimingDiagramCollectionView TimingDiagrams}.
+   * It holds a container for variable titles and y Axis which can be pulled out on the left.
+   */
   public TimingDiagramCollectionView() {
     super();
     getStyleClass().add("collectionView");
+    //Create the message at the top of all diagrams, that is visible when the diagram is outdated
     outdatedLabel = new Label("This Timing-Diagram is outdated.");
     outdatedLabel.getStyleClass().add("outdatedLabel");
     Node outdatedIcon = GlyphsDude.createIcon(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
@@ -44,6 +52,7 @@ public class TimingDiagramCollectionView extends VBox {
     outdatedMessage.getStyleClass().add("outdatedMessage");
 
     getChildren().addAll(outdatedMessage, scrollPane, globalAxisContainer, xScrollBar);
+
     globalAxisContainer.getChildren().add(xAxis);
     setPadding(new Insets(0, 10, 0, 10));
     yAxisStickRightContainer.getChildren().addAll(yAxisContainer, labelContainer);
@@ -55,20 +64,15 @@ public class TimingDiagramCollectionView extends VBox {
     axisDiagramContainer.getItems().addAll(yAxisStickRightContainer, diagramContainer);
     scrollPane.setContent(axisDiagramContainer);
     scrollPane.setFitToWidth(true);
-    /*diagramContainer.widthProperty().addListener(change -> {
-      Bounds viewportBounds = scrollPane.getViewportBounds();
-      xAxis.setPrefWidth(viewportBounds.getWidth()-40);
-    });*/
-    xAxis.prefWidthProperty().bind(diagramContainer.widthProperty());
+    //Positions the xAxis so it always aligns with the diagrams
     diagramContainer.layoutBoundsProperty().addListener(change -> {
       Bounds diagram = diagramContainer.localToScene(diagramContainer.getLayoutBounds());
       Bounds axisContainer = globalAxisContainer.localToScene(globalAxisContainer.getLayoutBounds());
       xAxis.layoutXProperty().setValue(diagram.getMinX() - axisContainer.getMinX());
     });
-    //diagramContainer.getStyleClass().add("diagramContainer");
-    axisDiagramContainer.setDividerPosition(0,0.1);
     xAxis.getStyleClass().add("globalXAxis");
-    globalAxisContainer.setMinHeight(30);
+    xAxis.prefWidthProperty().bind(diagramContainer.widthProperty());
+    axisDiagramContainer.setDividerPosition(0, 0.1);
     scrollPane.getStyleClass().add("noborder-scroll-pane");
     labelContainer.getStyleClass().add("labelContainer");
     this.getStylesheets().add(
