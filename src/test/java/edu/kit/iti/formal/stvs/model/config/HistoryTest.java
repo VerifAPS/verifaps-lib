@@ -23,10 +23,10 @@ public class HistoryTest {
   @Test
   public void testBufferSize() {
     assertEquals(0, history.getFilenames().size());
-    for (int i = 0; i < history.HISTORY_DEPTH * 2; i++) {
+    for (int i = 0; i < History.HISTORY_DEPTH * 2; i++) {
       history.addFilename("filePath" + i);
     }
-    assertEquals(history.getFilenames().size(), history.HISTORY_DEPTH);
+    assertEquals(History.HISTORY_DEPTH, history.getFilenames().size());
   }
 
   @Test
@@ -42,10 +42,10 @@ public class HistoryTest {
     assertEquals(filePathsAfter.get(2), "SpecOne");
   }
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testCopyConstructorException() {
     ArrayList<String> codePaths = new ArrayList<String>();
-    for (int i = 0; i < history.HISTORY_DEPTH * 2; i++) {
+    for (int i = 0; i < History.HISTORY_DEPTH * 2; i++) {
       codePaths.add("SomeCode" + i);
     }
     history = new History(codePaths);
