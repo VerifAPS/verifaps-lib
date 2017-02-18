@@ -10,6 +10,8 @@ import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramView;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.VerticalResizeContainerController;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -114,6 +116,9 @@ public class TimingDiagramCollectionController implements Controller {
     globalxAxis.lowerBoundProperty().addListener(change -> {
       scrollBar.setValue(globalxAxis.getLowerBound());
     });
+
+    //I don't know, why it need to be divided by 2 but it seems to work very good this way
+    scrollBar.visibleAmountProperty().bind(visibleRange.divide(2));
 
     scrollBar.valueProperty().addListener(change -> {
       globalxAxis.setUpperBound(scrollBar.getValue() + visibleRange.get());
