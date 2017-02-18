@@ -29,7 +29,7 @@ public class VariableCollection extends VBox {
 
   public VariableCollection() {
     this.overviewLabel = new Label("Free Variables:");
-    this.addFreeVariable = makeAddButton();
+    this.addFreeVariable = new Button("+");
     this.freeVariableTableView = new TableView<>();
     this.nameTableColumn = new TableColumn<>("Name");
     this.typeTableColumn = new TableColumn<>("Type");
@@ -56,10 +56,6 @@ public class VariableCollection extends VBox {
     this.freeVariableTableView.getStyleClass().addAll("freevar", "variable-table-view");
 
     this.getChildren().addAll(overviewLabel, freeVariableTableView, addFreeVariable);
-  }
-
-  private Button makeAddButton() {
-    return GlyphsDude.createIconButton(FontAwesomeIcon.PLUS);
   }
 
   public Button getAddFreeVariable() {

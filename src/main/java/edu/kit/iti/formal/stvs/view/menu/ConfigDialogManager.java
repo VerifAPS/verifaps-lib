@@ -60,8 +60,8 @@ public class ConfigDialogManager implements Controller {
     bind(view.showLineNumbers.selectedProperty(), config.showLineNumbersProperty());
     bind(view.uiLanguage.valueProperty(),         config.uiLanguageProperty());
     bind(view.maxLineRollout.textProperty(),      config.maxLineRolloutProperty());
-    bind(view.nuxmvFilename.textProperty(),       config.nuxmvFilenameProperty());
-    bind(view.z3Path.textProperty(),              config.z3PathProperty());
+    bind(view.nuxmvFilename.getTextField().textProperty(),       config.nuxmvFilenameProperty());
+    bind(view.z3Path.getTextField().textProperty(),              config.z3PathProperty());
     bind(view.getetaCommand.textProperty(),       config.getetaCommandProperty());
 
     BooleanBinding dialogValid = view.verificationTimeout.validProperty()
@@ -87,8 +87,8 @@ public class ConfigDialogManager implements Controller {
       config.setVerificationTimeout(view.verificationTimeout.getInteger().get());
       config.setUiLanguage(view.uiLanguage.valueProperty().get());
       config.setMaxLineRollout(view.maxLineRollout.getInteger().get());
-      config.setNuxmvFilename(view.nuxmvFilename.getText());
-      config.setZ3Path(view.z3Path.getText());
+      config.setNuxmvFilename(view.nuxmvFilename.getTextField().getText());
+      config.setZ3Path(view.z3Path.getTextField().getText());
       config.setGetetaCommand(view.getetaCommand.getText());
       try {
         config.autosaveConfig();
