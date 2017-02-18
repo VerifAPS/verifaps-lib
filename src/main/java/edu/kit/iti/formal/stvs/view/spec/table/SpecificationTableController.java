@@ -114,7 +114,7 @@ public class SpecificationTableController implements Controller {
         tableView.getColumns().stream()
             .filter(column -> columnId.equals(column.getUserData()))
             .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Cannot focus unkown column: " + columnId)));
+            .orElseThrow(() -> new IllegalArgumentException("Cannot focus unknown column: " + columnId)));
   }
 
   private void onCounterExampleChanged() {
@@ -147,7 +147,7 @@ public class SpecificationTableController implements Controller {
     }
   }
 
-  private TableCell<SynchronizedRow, String> cellFactory(TableColumn<SynchronizedRow, String> table) {
+  private SpecificationTableCell cellFactory(TableColumn<SynchronizedRow, String> table) {
     return new SpecificationTableCell(validator);
   }
 
