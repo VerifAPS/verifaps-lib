@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
+import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -59,8 +60,8 @@ public class ConfigDialogManager implements Controller {
     bind(view.showLineNumbers.selectedProperty(), config.showLineNumbersProperty());
     bind(view.uiLanguage.valueProperty(),         config.uiLanguageProperty());
     bind(view.maxLineRollout.textProperty(),      config.maxLineRolloutProperty());
-    bind(view.nuxmvFilename.textProperty(),       config.nuxmvFilenameProperty());
-    bind(view.z3Path.textProperty(),              config.z3PathProperty());
+    bind(view.nuxmvFilename.getTextField().textProperty(),       config.nuxmvFilenameProperty());
+    bind(view.z3Path.getTextField().textProperty(),              config.z3PathProperty());
     bind(view.getetaCommand.textProperty(),       config.getetaCommandProperty());
 
     BooleanBinding dialogValid = view.verificationTimeout.validProperty()
@@ -86,13 +87,13 @@ public class ConfigDialogManager implements Controller {
       config.setVerificationTimeout(view.verificationTimeout.getInteger().get());
       config.setUiLanguage(view.uiLanguage.valueProperty().get());
       config.setMaxLineRollout(view.maxLineRollout.getInteger().get());
-      config.setNuxmvFilename(view.nuxmvFilename.getText());
-      config.setZ3Path(view.z3Path.getText());
+      config.setNuxmvFilename(view.nuxmvFilename.getTextField().getText());
+      config.setZ3Path(view.z3Path.getTextField().getText());
       config.setGetetaCommand(view.getetaCommand.getText());
       try {
         config.autosaveConfig();
       } catch (IOException | ExportException e) {
-        ViewUtils.showDialog(Alert.AlertType.ERROR, "Autosave error", "Error saving the current" +
+        ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Autosave error", "Error saving the current" +
             " configuration", "The current configuration could not be saved.", e.getMessage());
       }
       return config;

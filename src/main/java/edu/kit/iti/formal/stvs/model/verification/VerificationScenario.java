@@ -16,6 +16,9 @@ import javafx.beans.value.ObservableValue;
 import java.io.IOException;
 
 /**
+ * The main model object for orchestrating a verification. Has a reference to the currently
+ * loaded {@link Code}, uses a {@link VerificationEngine} from the logic package to verify it
+ * against a {@link ConstraintSpecification} and provides access to the {@link VerificationResult}.
  * @author Benjamin Alt
  */
 public class VerificationScenario {
@@ -25,10 +28,17 @@ public class VerificationScenario {
   private ObjectProperty<VerificationState> verificationState;
   private NullableProperty<ConstraintSpecification> activeSpec;
 
+  /**
+   * Constructs an empty VerificationScenario (with an empty code).
+   */
   public VerificationScenario() {
     this(new Code());
   }
 
+  /**
+   * Constructs a VerificationScenario from a given {@link Code}.
+   * @param code The initial code
+   */
   public VerificationScenario(Code code) {
     this.code = new SimpleObjectProperty<>(code);
     verificationResult = new NullableProperty<>();
@@ -36,8 +46,17 @@ public class VerificationScenario {
     activeSpec = new NullableProperty<>();
   }
 
+  /**
+   * Starts a verification of the current {@link Code} against a given
+   * {@link ConstraintSpecification}.
+   * @param config The config to take into account (i.e. for verification timeouts, paths to
+   *               dependencies etc.)
+   * @param spec The specification to be verified
+   * @throws IOException
+   * @throws ExportException
+   * @throws VerificationException
+   */
   public void verify(GlobalConfig config, ConstraintSpecification spec) throws IOException, ExportException, VerificationException {
-    // TODO: Parsed code might be null!!!
     activeSpec.set(spec);
     verificationEngine = new GeTeTaVerificationEngine(config, code.get().getParsedCode().getDefinedTypes());
     verificationEngine.verificationResultProperty().addListener(new
@@ -46,6 +65,9 @@ public class VerificationScenario {
     verificationEngine.startVerification(this, spec);
   }
 
+  /**
+   * Stops a currently running verification.
+   */
   public void cancel() {
     if (verificationEngine != null) {
       verificationEngine.cancelVerification();

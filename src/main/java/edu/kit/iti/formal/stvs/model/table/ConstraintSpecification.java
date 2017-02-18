@@ -12,14 +12,22 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * A specification the cell contents and durations of which are specified by constraints rather
+ * than concrete values. This corresponds to a "generalized test table".
  * @author Benjamin Alt
  */
 public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, ConstraintCell,
     ConstraintDuration> implements Commentable {
 
+  /**
+   * Construct a new specification row containing ConstraintCells.
+   * @param initialCells The initial cells, a Map from column identifier to ConstraintCell, with
+   *                     which to fill the new row
+   * @return A SpecificationRow containing the given ConstraintCells
+   */
   public static SpecificationRow<ConstraintCell> createRow(
-      Map<String, ConstraintCell> wildcardCells) {
-    return new SpecificationRow<>(wildcardCells,
+      Map<String, ConstraintCell> initialCells) {
+    return new SpecificationRow<>(initialCells,
         cell -> new Observable[] {
             cell.stringRepresentationProperty(),
             cell.commentProperty()
@@ -30,10 +38,21 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
   private final FreeVariableList freeVariableList;
   private final ChangeListener<String> onSpecIoVariableNameChanged = this::onSpecIoVariableNameChanged;
 
+  /**
+   * Construct a new, empty ConstraintSpecification with a default name from an initial list of
+   * free variables.
+   * @param freeVariableList The initial list of free variables
+   */
   public ConstraintSpecification(FreeVariableList freeVariableList) {
     this(DEFAULT_NAME, freeVariableList);
   }
 
+  /**
+   * Construct a new, empty ConstraintSpecification with a given name and an initial list of free
+   * variables.
+   * @param name The name of the ConstraintSpecification
+   * @param freeVariableList The list of free variables
+   */
   public ConstraintSpecification(String name, FreeVariableList freeVariableList) {
     super(
         name,
@@ -63,10 +82,18 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
     removed.forEach(this::unsubscribeFromIoVariable);
   }
 
+  /**
+   * Add a listener for name changes to a given {@SpecIoVariable}.
+   * @param specIoVariable The SpecIoVariable to add a name change listener to
+   */
   private void subscribeToIoVariable(SpecIoVariable specIoVariable) {
     specIoVariable.nameProperty().addListener(onSpecIoVariableNameChanged);
   }
 
+  /**
+   * Remove a listener for name changes from a given {@SpecIoVariable}.
+   * @param specIoVariable The SpecIoVariable to remove a listener from
+   */
   private void unsubscribeFromIoVariable(SpecIoVariable specIoVariable) {
     specIoVariable.nameProperty().removeListener(onSpecIoVariableNameChanged);
   }

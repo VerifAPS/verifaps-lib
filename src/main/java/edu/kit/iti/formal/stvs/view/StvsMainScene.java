@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
+import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
 import edu.kit.iti.formal.stvs.view.menu.StvsMenuBarController;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -84,7 +85,7 @@ public class StvsMainScene {
         stvsRootModel.getHistory().autosaveHistory();
         stvsRootModel.autosaveSession();
       } catch (IOException | ExportException | JAXBException e) {
-        ViewUtils.showDialog(Alert.AlertType.ERROR, "Autosave error", "Error saving the current" +
+        ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Autosave error", "Error saving the current" +
             " configuration", "The current configuration could not be saved.", e.getMessage());
       }
     }

@@ -11,6 +11,7 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
+import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
 import edu.kit.iti.formal.stvs.view.editor.EditorPaneController;
 import edu.kit.iti.formal.stvs.view.spec.SpecificationsPaneController;
 import edu.kit.iti.formal.stvs.view.spec.VerificationEvent;
@@ -28,7 +29,6 @@ import java.util.List;
 
 /**
  * @author Carsten Csiky
- * @author Benjamin Alt
  */
 public class StvsRootController implements Controller {
 
@@ -59,8 +59,7 @@ public class StvsRootController implements Controller {
 
     this.stvsRootModel.getScenario().codeObjectProperty().addListener(this::onCodeChange);
     this.stvsRootModel.getScenario().getCode().parsedCodeProperty().addListener(this::parsedCodeChange);
-    this.stvsRootModel.getScenario().verificationResultProperty().addListener(new
-        VerificationResultListener());
+    this.stvsRootModel.getScenario().verificationResultProperty().addListener(this::onVerificationResultChange);
 
     this.view = new StvsRootView(
         editorPaneController.getView(),
@@ -77,16 +76,16 @@ public class StvsRootController implements Controller {
           stvsRootModel.getScenario().verify(stvsRootModel.getGlobalConfig(), event
               .getConstraintSpec());
         } catch (ExportException | IOException e) {
-          ViewUtils.showDialog(Alert.AlertType.ERROR, "Export error", "An error occurred during " +
+          ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Export error", "An error occurred during " +
               "export of the specification:\n" + e.getMessage(), e.getStackTrace().toString());
         } catch (VerificationException e) {
           switch (e.getReason()) {
             case GETETA_NOT_FOUND:
-              ViewUtils.showDialog(Alert.AlertType.ERROR, "GeTeTa executable not found",
+              ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "GeTeTa executable not found",
                   "GeTeTa executable not found", "The GeTeTa executable could not be found.");
               break;
             case NUXMV_NOT_FOUND:
-              ViewUtils.showDialog(Alert.AlertType.ERROR, "NuXmv executable not found",
+              ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "NuXmv executable not found",
                   "NuXmv executable not found", "The NuXmv executable could not be found.");
               break;
           }
@@ -94,7 +93,7 @@ public class StvsRootController implements Controller {
         break;
       case STOP:
         stvsRootModel.getScenario().cancel();
-        ViewUtils.showDialog(Alert.AlertType.INFORMATION, "Verification cancelled",
+        ErrorMessageDialog.createMessageDialog(Alert.AlertType.INFORMATION, "Verification cancelled",
             "Verification cancelled", "");
     }
   }
@@ -130,21 +129,11 @@ public class StvsRootController implements Controller {
     }
   }
 
-  private class VerificationResultListener implements
-      javafx.beans.value.ChangeListener<edu.kit.iti.formal.stvs.model.verification.VerificationResult> {
-
-    @Override
-    public void changed(ObservableValue<? extends VerificationResult> observableValue,
-                        VerificationResult oldResult, VerificationResult newResult) {
-      onVerificationResultChanged();
-    }
-  }
-
-  private void onVerificationResultChanged() {
-    VerificationResult res = stvsRootModel.getScenario().getVerificationResult();
+  private void onVerificationResultChange(ObservableValue<? extends VerificationResult> o,
+                                           VerificationResult old, VerificationResult res) {
     // Inform the user about the verification result
     if (res == null) {
-      ViewUtils.showDialog(Alert.AlertType.ERROR, "Verification Error", "Verification " +
+      ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Verification Error", "Verification " +
           "result is null", "");
     }
     String alertBody = "See the log at " + res.getLogFilePath() + ".";
@@ -152,14 +141,15 @@ public class StvsRootController implements Controller {
     try {
       logFileContents = new String(Files.readAllBytes(Paths.get(res.getLogFilePath())), "utf-8");
     } catch (IOException e) {
-      ViewUtils.showDialog(Alert.AlertType.ERROR, "Logging Error", "Could not write log file",
-          "There was an error writing the log file " + res.getLogFilePath(), e.getStackTrace().toString());
+      ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Logging Error", "Could not write log file",
+          "There was an error writing the log file: " + res.getLogFilePath(), e.getStackTrace()
+              .toString());
       return;
     }
     switch (res.getStatus()) {
       case COUNTEREXAMPLE:
-        ViewUtils.showDialog(Alert.AlertType.INFORMATION, "Counterexample Available",
-            "A Counterexample Is Available", alertBody, logFileContents);
+        ErrorMessageDialog.createMessageDialog(Alert.AlertType.INFORMATION, "Counterexample Available",
+            "A counterexample is available", alertBody, logFileContents);
         // Show read-only copy of spec with counterexample in a new tab
         assert stvsRootModel.getScenario().getActiveSpec() != null;
         HybridSpecification readOnlySpec = new HybridSpecification(stvsRootModel.getScenario()
@@ -168,20 +158,25 @@ public class StvsRootController implements Controller {
         specificationsPaneController.addTab(readOnlySpec);
         break;
       case VERIFIED:
-        ViewUtils.showDialog(Alert.AlertType.INFORMATION, "Verification Successful",
-            "The verification completed successfully", alertBody, logFileContents);
+        ErrorMessageDialog.createMessageDialog(Alert.AlertType.INFORMATION, "Verification Successful",
+            "The verification completed successfully.", alertBody, logFileContents);
+        break;
+      case TIMEOUT:
+        ErrorMessageDialog.createMessageDialog(Alert.AlertType.WARNING, "Verification Timeout",
+            "The verification timed out.", "Current timeout: " + stvsRootModel.getGlobalConfig()
+                .getVerificationTimeout() + " seconds");
         break;
       case ERROR:
-        ViewUtils.showDialog(Alert.AlertType.ERROR, "Verification Error",
+        ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Verification Error",
             "An error occurred during verification.", alertBody, logFileContents);
         break;
       case FATAL:
-        ViewUtils.showDialog(Alert.AlertType.ERROR, "Verification Error", "A fatal " +
+        ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Verification Error", "A fatal " +
             "error occurred during verification.", alertBody, logFileContents);
         break;
       case UNKNOWN:
-        ViewUtils.showDialog(Alert.AlertType.ERROR, "Unknown Error", "An unknown error " +
-            "occurred during verification.", alertBody, logFileContents);
+        ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Unknown Error", "The " +
+            "verification engine returned with exit code \"unknown\".", alertBody, logFileContents);
     }
   }
 }

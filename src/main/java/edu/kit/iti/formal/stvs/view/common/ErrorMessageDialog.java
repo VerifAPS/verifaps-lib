@@ -16,30 +16,21 @@ import java.io.StringWriter;
 public class ErrorMessageDialog {
 
 
-  public ErrorMessageDialog(Throwable exception) {
-    this(exception, "Exception", "An Exception has occured");
+  public static void createErrorMessageDialog(Throwable exception) {
+    createErrorMessageDialog(exception, "Exception", "An Exception has occured");
   }
 
-  /**
-   * creates a ErrorMessageDialog for a given exception
-   * @param exception exception to display
-   */
-  public ErrorMessageDialog(Throwable exception, String title, String description) {
-    Alert alert = new Alert(Alert.AlertType.ERROR);
+  public static void createMessageDialog(Alert.AlertType type, String title, String description, String
+      contentText, String expandableContent) {
+
+    Alert alert = new Alert(type);
     alert.setTitle(title);
     alert.setHeaderText(description);
-    alert.setContentText(exception.getMessage());
+    alert.setContentText(contentText);
 
 
-    // Create expandable Exception.
-    StringWriter sw = new StringWriter();
-    PrintWriter pw = new PrintWriter(sw);
-    exception.printStackTrace(pw);
-    String exceptionText = sw.toString();
 
-    Label label = new Label("The exception stacktrace was:");
-
-    TextArea textArea = new TextArea(exceptionText);
+    TextArea textArea = new TextArea(expandableContent);
     textArea.setEditable(false);
     textArea.setWrapText(true);
 
@@ -50,14 +41,45 @@ public class ErrorMessageDialog {
 
     GridPane expContent = new GridPane();
     expContent.setMaxWidth(Double.MAX_VALUE);
-    expContent.add(label, 0, 0);
+    if (type.equals(Alert.AlertType.ERROR) && expandableContent != null) {
+      Label label = new Label("The exception stacktrace was:");
+      expContent.add(label, 0, 0);
+    }
     expContent.add(textArea, 0, 1);
 
     // Set expandable Exception into the dialog pane.
     alert.getDialogPane().setExpandableContent(expContent);
 
     alert.showAndWait();
-    System.err.println(exception.toString());
-    exception.printStackTrace();
+    if (type.equals(Alert.AlertType.ERROR) && expandableContent != null) {
+      System.err.println(contentText);
+      System.err.println(expandableContent);
+    }
+
+  }
+
+  public static void createMessageDialog(Alert.AlertType type, String title, String headerText, String
+      contentText) {
+    createMessageDialog(type, title, headerText, contentText, null);
+  }
+
+  /**
+   * creates a ErrorMessageDialog for a given exception
+   * @param exception exception to display
+   */
+
+
+
+  public static void createErrorMessageDialog(Throwable exception, String title, String description) {
+
+    // Create expandable Exception.
+    StringWriter sw = new StringWriter();
+    PrintWriter pw = new PrintWriter(sw);
+    exception.printStackTrace(pw);
+    String exceptionText = sw.toString();
+
+    createMessageDialog(Alert.AlertType.ERROR, title, description, exception.getMessage(), exceptionText);
+
+
   }
 }

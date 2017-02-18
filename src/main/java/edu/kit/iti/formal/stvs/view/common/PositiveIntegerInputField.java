@@ -11,10 +11,10 @@ import java.util.Optional;
 /**
  * Created by csicar on 15.02.17.
  */
-public class IntegerInputField extends TextField {
+public class PositiveIntegerInputField extends TextField {
   private BooleanProperty valid;
 
-  public IntegerInputField() {
+  public PositiveIntegerInputField() {
     this.textProperty().addListener(this::onInputChange);
     valid = new SimpleBooleanProperty();
     valid.addListener(this::onValidStateChange);
@@ -31,13 +31,13 @@ public class IntegerInputField extends TextField {
   }
 
   private void onInputChange(ObservableValue<?> observableValue, String old, String newValue) {
-    valid.set(getText().trim().matches("-?[0-9]+"));
+    valid.set(getText().trim().matches("(?!0)[0-9]+"));
   }
 
   /**
    * get inputfield value as an integer
    * if no integer representation is available Optional.empty() will be returned
-   * @return value as an interger
+   * @return value as an integer
    */
   public Optional<Integer> getInteger() {
     if (valid.get()) {

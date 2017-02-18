@@ -2,12 +2,15 @@ package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
+import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
+import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.geometry.Side;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -17,16 +20,19 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
- * Created by csicar on 09.01.17.
- * Controller for a single TimingDiagramController e.g. for <b>one</b> Variable and over all Timesteps
+ * Controller for a single {@link TimingDiagramView} that covers all cycles of <b>one</b>
+ * {@link ValidIoVariable} in a {@link ConcreteSpecification}
+ *
+ * @author Leon Kaucher
  */
 public class TimingDiagramController implements Controller {
   private final BooleanProperty activated;
   private ContextMenu contextMenu;
   private final TimingDiagramView<?> view;
-  private final Axis externalYAxis;
   private final Selection selection;
   private final ValidIoVariable ioVariable;
   private final ConcreteSpecification concreteSpec;
@@ -34,10 +40,19 @@ public class TimingDiagramController implements Controller {
   private MouseEvent lastMouseEvent;
 
 
+  /**
+   * Instantiates a new Timing diagram controller with a number xAxis.
+   *
+   * @param commonXAxis   the common x axis
+   * @param externalYAxis the external y axis
+   * @param spec          the specification
+   * @param ioVariable    the io variable
+   * @param selection     the selection that should be updated
+   * @param activated     property that indicates if the selection should be updated
+   */
   public TimingDiagramController(NumberAxis commonXAxis, NumberAxis externalYAxis, ConcreteSpecification spec, ValidIoVariable ioVariable, Selection selection, BooleanProperty activated) {
     this.activated = activated;
     XYChart.Series<Number, Number> seriesData = Plotable.toNumberSeries(spec.getColumnByName(ioVariable.getName()).getCells());
-    this.externalYAxis = externalYAxis;
     this.selection = selection;
     this.ioVariable = ioVariable;
     this.concreteSpec = spec;
@@ -57,15 +72,22 @@ public class TimingDiagramController implements Controller {
     xAxis.upperBoundProperty().bind(commonXAxis.upperBoundProperty());
     yAxis.getStyleClass().add("zeroWidth");
 
-    //yAxis.layoutBoundsProperty().addListener(change -> updateAxisExternalPosition());
-
     initCommon();
   }
 
+  /**
+   * Instantiates a new Timing diagram controller with a category xAxis.
+   *
+   * @param commonXAxis   the common x axis
+   * @param externalYAxis the external y axis
+   * @param spec          the specification
+   * @param ioVariable    the io variable
+   * @param selection     the selection that should be updated
+   * @param activated     property that indicates if the selection should be updated
+   */
   public TimingDiagramController(NumberAxis commonXAxis, CategoryAxis externalYAxis, ConcreteSpecification spec, ValidIoVariable ioVariable, Selection selection, BooleanProperty activated) {
     this.activated = activated;
     XYChart.Series<Number, String> seriesData = Plotable.toStringSeries(spec.getColumnByName(ioVariable.getName()).getCells());
-    this.externalYAxis = externalYAxis;
     this.ioVariable = ioVariable;
     this.selection = selection;
     this.concreteSpec = spec;
@@ -87,6 +109,78 @@ public class TimingDiagramController implements Controller {
     initCommon();
   }
 
+  /**
+   * Generates an integer timing diagram
+   *
+   * @param concreteSpec the concrete specification which should be used to extract the needed information
+   * @param specIoVar    the variable for which a diagram should be generated
+   * @return A {@link Pair} which holds a {@link TimingDiagramController} and a {@link NumberAxis}
+   */
+  public static Pair<TimingDiagramController, Axis> createIntegerTimingDiagram(ConcreteSpecification concreteSpec,
+                                                                               ValidIoVariable specIoVar,
+                                                                               NumberAxis globalXAxis,
+                                                                               Selection selection,
+                                                                               BooleanProperty activated) {
+    NumberAxis yAxis = new NumberAxis(0, 10, 1);
+    yAxis.setPrefWidth(30);
+    yAxis.setSide(Side.LEFT);
+    TimingDiagramController timingDiagramController =
+        new TimingDiagramController(globalXAxis, yAxis, concreteSpec, specIoVar, selection, activated);
+    return new ImmutablePair<>(timingDiagramController, yAxis);
+  }
+
+  /**
+   * Generates a boolean timing diagram
+   *
+   * @param concreteSpec the concrete specification which should be used to extract the needed information
+   * @param specIoVar    the variable for which a diagram should be generated
+   * @return A {@link Pair} which holds a {@link TimingDiagramController} and a {@link CategoryAxis}
+   */
+  public static Pair<TimingDiagramController, Axis> createBoolTimingDiagram(ConcreteSpecification concreteSpec,
+                                                                            ValidIoVariable specIoVar,
+                                                                            NumberAxis globalXAxis,
+                                                                            Selection selection,
+                                                                            BooleanProperty activated) {
+    ObservableList<String> categories = FXCollections.observableArrayList();
+    categories.addAll("FALSE", "TRUE");
+    CategoryAxis boolCategoryAxis = new CategoryAxis(categories);
+    boolCategoryAxis.setPrefWidth(30);
+    boolCategoryAxis.setSide(Side.LEFT);
+    boolCategoryAxis.setAutoRanging(true);
+    TimingDiagramController timingDiagramController =
+        new TimingDiagramController(globalXAxis, boolCategoryAxis, concreteSpec, specIoVar, selection, activated);
+    return new ImmutablePair<>(timingDiagramController, boolCategoryAxis);
+  }
+
+  /**
+   * Generates an enum timing diagram
+   *
+   * @param concreteSpec the concrete specification which should be used to extract the needed information
+   * @param specIoVar    the variable for which a diagram should be generated
+   * @return A {@link Pair} which holds a {@link TimingDiagramController} and a {@link CategoryAxis}
+   */
+  public static Pair<TimingDiagramController, Axis> createEnumTimingDiagram(ConcreteSpecification concreteSpec,
+                                                                            ValidIoVariable specIoVar,
+                                                                            TypeEnum typeEnum,
+                                                                            NumberAxis globalXAxis,
+                                                                            Selection selection,
+                                                                            BooleanProperty activated) {
+    ObservableList<String> categories = FXCollections.observableArrayList();
+    typeEnum.getValues().stream()
+        .map(ValueEnum::getEnumValue)
+        .forEach(categories::add);
+    CategoryAxis categoryAxis = new CategoryAxis(categories);
+    categoryAxis.setSide(Side.LEFT);
+    categoryAxis.setPrefWidth(30);
+    categoryAxis.setAutoRanging(true);
+    TimingDiagramController timingDiagramController =
+        new TimingDiagramController(globalXAxis, categoryAxis, concreteSpec, specIoVar, selection, activated);
+    return new ImmutablePair<>(timingDiagramController, categoryAxis);
+  }
+
+  /**
+   * Create mouse events and context menu entries
+   */
   private void initCommon() {
     view.setDurations(concreteSpec.getDurations());
     //view.getyAxis().layoutBoundsProperty().addListener(change -> updateAxisExternalPosition());
@@ -104,14 +198,14 @@ public class TimingDiagramController implements Controller {
       Rectangle cycleSelectionRectangle = cycleSelectionRectangles.get(i);
       int finalCycleIndex = i;
       cycleSelectionRectangle.setOnMouseEntered(event -> {
-        if(activated.get()) {
+        if (activated.get()) {
           cycleSelectionRectangle.setOpacity(1);
           selection.setRow(concreteSpec.cycleToRowNumber(finalCycleIndex));
           selection.setColumn(ioVariable.getName());
         }
       });
       cycleSelectionRectangle.setOnMouseExited(event -> {
-        if(activated.get()) {
+        if (activated.get()) {
           cycleSelectionRectangle.setOpacity(0);
           selection.clear();
         }

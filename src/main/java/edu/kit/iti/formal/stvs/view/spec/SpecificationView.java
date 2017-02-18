@@ -3,11 +3,11 @@ package edu.kit.iti.formal.stvs.view.spec;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableView;
 import edu.kit.iti.formal.stvs.view.spec.table.SynchronizedRow;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionView;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollection;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -26,13 +26,14 @@ public class SpecificationView extends VBox implements Lockable {
   private Button startConcretizerButton;
 
   private VariableCollection variableCollection;
-  private TableView<SynchronizedRow> tableView;
+  private SpecificationTableView tableView;
   private TimingDiagramCollectionView diagram;
   private final StackPane variablesPane;
   private final StackPane tablePane;
   private final AnchorPane timingDiagramPane;
   private final SplitPane splitPane;
   private final HBox buttonBox;
+
   public SpecificationView() {
     splitPane = new SplitPane();
     variablesPane = new StackPane();
@@ -85,14 +86,14 @@ public class SpecificationView extends VBox implements Lockable {
   }
 
   public TableView<SynchronizedRow> getTable() {
-    return tableView;
+    return tableView.getTableView();
   }
 
-  public void setTable(TableView<SynchronizedRow> table) {
-    this.tableView = table;
+  public void setTable(SpecificationTableView tableView) {
+    this.tableView = tableView;
 
     tablePane.getChildren().clear();
-    tablePane.getChildren().add(table);
+    tablePane.getChildren().add(tableView);
   }
 
   public TimingDiagramCollectionView getDiagram() {

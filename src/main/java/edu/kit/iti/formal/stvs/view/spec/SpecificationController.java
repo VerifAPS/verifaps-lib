@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
-import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
 import edu.kit.iti.formal.stvs.logic.specification.smtlib.SmtConcretizer;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
@@ -16,6 +15,7 @@ import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController;
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -23,14 +23,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
 
 import java.util.List;
+
 
 public class SpecificationController implements Controller {
 
@@ -59,7 +56,7 @@ public class SpecificationController implements Controller {
     this.spec = hybridSpecification;
     this.hybridSpecification = hybridSpecification;
     this.stateProperty = stateProperty;
-    this.stateProperty.addListener(new VerificationStateChangeListener());
+    this.stateProperty.addListener(this::onVerificationStateChanged);
     this.view = new SpecificationView();
     this.selection = hybridSpecification.getSelection();
     this.globalConfig = globalConfig;
@@ -94,6 +91,17 @@ public class SpecificationController implements Controller {
     hybridSpecification.concreteInstanceProperty().addListener((observable, old, newVal)
         -> this.onConcreteInstanceChanged(newVal));
     registerTimingDiagramDeactivationHandler();
+  }
+
+  private void onVerificationStateChanged(ObservableValue<? extends VerificationState> observableValue,
+                                          VerificationState oldState, VerificationState newState) {
+    switch (newState) {
+      case RUNNING:
+        getView().setVerificationButtonStop();
+        break;
+      default:
+        getView().setVerificationButtonPlay();
+    }
   }
 
   private void registerTimingDiagramDeactivationHandler() {
@@ -133,7 +141,7 @@ public class SpecificationController implements Controller {
               hybridSpecification.setConcreteInstance(optionalSpec.get());
               timingDiagramCollectionController.setActivated(true);
             } else {
-              ViewUtils.showDialog(Alert.AlertType.WARNING, "Concretizer warning",
+              ErrorMessageDialog.createMessageDialog(Alert.AlertType.WARNING, "Concretizer warning",
                   "No concrete instance found",
                   "The Solver could not produce a concrete example with the given table.");
             }
@@ -142,7 +150,7 @@ public class SpecificationController implements Controller {
           });
         }, exception -> {
           Platform.runLater(() -> {
-            new ErrorMessageDialog(exception, "Concretization Failed", "An error occurred while "
+            ErrorMessageDialog.createErrorMessageDialog(exception, "Concretization Failed", "An error occurred while "
                 + "concretizing the specification.");
           });
         });
@@ -163,26 +171,6 @@ public class SpecificationController implements Controller {
 
   public SpecificationView getView() {
     return view;
-  }
-
-  private class VerificationStateChangeListener implements javafx.beans.value.ChangeListener<VerificationState> {
-
-    @Override
-    public void changed(ObservableValue<? extends VerificationState> observableValue,
-                        VerificationState oldState, VerificationState newState) {
-      onVerificationStateChanged(newState);
-    }
-
-  }
-
-  private void onVerificationStateChanged(VerificationState newState) {
-    switch (newState) {
-      case RUNNING:
-        getView().setVerificationButtonStop();
-        break;
-      default:
-        getView().setVerificationButtonPlay();
-    }
   }
 
   private void onVerificationButtonClicked(ActionEvent actionEvent) {

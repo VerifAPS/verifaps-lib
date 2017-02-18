@@ -1,13 +1,10 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
-import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -22,14 +19,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Created by csicar on 09.01.17.
+ * A TimingDiagram which displays a series of values as a line chart.
+ *
+ * @author Leon Kaucher
  */
 public class TimingDiagramView<A> extends XYChart<Number, A> {
-  /**
-   * Constructs a XYChart given the two axes. The initial content for the chart
-   * plot background and plot area that includes vertical and horizontal grid
-   * lines and fills, are added.
-   */
 
   private NumberAxis xAxis;
   private Axis<A> yAxis;
@@ -46,6 +40,12 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
 
   private ContextMenu contextMenu = new ContextMenu();
 
+  /**
+   * Instantiates a new Timing diagram view.
+   *
+   * @param xAxis the x axis
+   * @param yAxis the y axis
+   */
   public TimingDiagramView(NumberAxis xAxis, Axis<A> yAxis) {
     super(xAxis, yAxis);
     this.xAxis = xAxis;
@@ -76,9 +76,18 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   }
 
   /**
+   * <b>copied from super and modified</b>
+   * <p>
    * Called when a data item has been added to a series. This is where implementations of XYChart can create/add new
-   * nodes to getPlotChildren to represent this data item. They also may animate that data add with a fade in or
-   * similar if animated = true.
+   * nodes to getPlotChildren to represent this data item.
+   * <p>
+   * The following nodes are created here:
+   * <ul>
+   * <li>Horizontal lines for values</li>
+   * <li>Vertical lines to connect values</li>
+   * <li>Rectangles to perform selections and highlighting</li>
+   * <li>Tooltips to show the value of a specific item</li>
+   * </ul>
    *
    * @param series    The series the data item was added to
    * @param itemIndex The index of the new item within the series
@@ -109,40 +118,40 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   }
 
   /**
-   * Called when a data item has been removed from data model but it is still visible on the chart. Its still visible
-   * so that you can handle animation for removing it in this method. After you are done animating the data item you
-   * must call removeDataItemFromDisplay() to remove the items node from being displayed on the chart.
+   * <b>copied from super and modified</b>
+   * <p>
+   * removes an item from the chart
    *
    * @param item   The item that has been removed from the series
    * @param series The series the item was removed from
    */
   @Override
   protected void dataItemRemoved(Data<Number, A> item, Series<Number, A> series) {
-    ObservableList<Node> plotChildren = getPlotChildren();
     removeDataItemFromDisplay(series, item);
     dataPane.getChildren().remove(horizontalLines.remove(0));
     cycleSelectionPane.getChildren().remove(cycleSelectionRectangles.remove(0));
     if (series.getData().size() > 0) {
       dataPane.getChildren().remove(verticalLines.remove(0));
     }
-    //updateYRange();
   }
 
   /**
+   * <b>copied from super/b>
+   * <p>
    * Called when a data item has changed, ie its xValue, yValue or extraValue has changed.
    *
    * @param item The data item who was changed
    */
   @Override
   protected void dataItemChanged(Data item) {
-
+    layoutPlotChildren();
   }
 
   /**
-   * A series has been added to the charts data model. This is where implementations of XYChart can create/add new
-   * nodes to getPlotChildren to represent this series. Also you have to handle adding any data items that are
-   * already in the series. You may simply call dataItemAdded() for each one or provide some different animation for
-   * a whole series being added.
+   * <b>copied from super and modified</b>
+   * <p>
+   * A series has been added to the charts data model.
+   * This simply calls {@link TimingDiagramView#dataItemAdded(Series, int, Data)} for each entry in the series
    *
    * @param series      The series that has been added
    * @param seriesIndex The index of the new series
@@ -155,9 +164,9 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   }
 
   /**
-   * A series has been removed from the data model but it is still visible on the chart. Its still visible
-   * so that you can handle animation for removing it in this method. After you are done animating the data item you
-   * must call removeSeriesFromDisplay() to remove the series from the display list.
+   * <b>copied from super and modified</b>
+   * <p>
+   * This simply calls {@link TimingDiagramView#dataItemRemoved(Data, Series)} for each entry in the series
    *
    * @param series The series that has been removed
    */
@@ -169,9 +178,9 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   }
 
   /**
-   * Called to update and layout the plot children. This should include all work to updates nodes representing
-   * the plot on top of the axis and grid lines etc. The origin is the top left of the plot area, the plot area with
-   * can be got by getting the width of the x axis and its height from the height of the y axis.
+   * <b>copied from super and modified</b>
+   * <p>
+   * Called to update and layout the plot children.
    */
   @Override
   protected void layoutPlotChildren() {
@@ -210,24 +219,6 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
     });
   }
 
-  /*private void updateYRange() {
-    if (getHybridSpecification() == null) return;
-    int minY = getHybridSpecification().stream()
-        .flatMap(series -> series.getHybridSpecification().stream())
-        .map(Data::getYValue)
-        .map(Number::intValue)
-        .min(Integer::compare)
-        .orElse(0);
-    int maxY = getHybridSpecification().stream()
-        .flatMap(series -> series.getHybridSpecification().stream())
-        .map(Data::getYValue)
-        .map(Number::intValue)
-        .max(Integer::compare)
-        .orElse(10);
-    yAxis.setLowerBound(minY - 1);
-    yAxis.setUpperBound(maxY + 1);
-  }*/
-
   public NumberAxis getxAxis() {
     return xAxis;
   }
@@ -236,6 +227,12 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
     return yAxis;
   }
 
+  /**
+   * Sets durations.
+   * This updates the lines that indicates a new row in the specification.
+   *
+   * @param durations the durations
+   */
   public void setDurations(List<ConcreteDuration> durations) {
     this.durations = durations;
     this.durationLines.setAll(

@@ -1,19 +1,14 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
-import javafx.geometry.Insets;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 
 /**
- * Created by leonk on 09.02.2017.
+ * Creates a Container for resizing through a horizontal bar.
+ *
+ * @author Leon Kaucher
  */
 public class VerticalResizeContainerView extends AnchorPane {
   private VBox container = new VBox();

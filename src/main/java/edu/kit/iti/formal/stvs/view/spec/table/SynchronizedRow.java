@@ -79,7 +79,7 @@ public class SynchronizedRow extends SpecificationRow<HybridCellModel<Constraint
   }
 
   public List<String> createCounterExampleCells(String columnId, int rowIndex, ConcreteSpecification counterExample) {
-    return counterExample.getConcreteValuesForConstraintRow(columnId, rowIndex).stream()
+    return counterExample.getConcreteValuesForConstraintCell(columnId, rowIndex).stream()
         .map(cell -> cell.getValue().getValueString())
         .collect(Collectors.toList());
   }

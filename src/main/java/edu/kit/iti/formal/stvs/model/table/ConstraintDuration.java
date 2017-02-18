@@ -5,6 +5,8 @@ import javafx.beans.property.StringProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
+ * An abstract duration given by a constraint rather than a concrete value. For the grammar of
+ * constraint durations, see https://git.scc.kit.edu/peese/stverificationstudio/issues/25.
  * @author Benjamin Alt
  */
 public class ConstraintDuration implements CellOperationProvider {
@@ -12,6 +14,11 @@ public class ConstraintDuration implements CellOperationProvider {
   private StringProperty stringRepresentation;
   private StringProperty comment;
 
+  /**
+   * Construct a new ConstraintDuration from its string representation (i.e. the constraint as
+   * string).
+   * @param stringRepresentation A string representation of the constraint duration
+   */
   public ConstraintDuration(String stringRepresentation) {
     this.comment = new SimpleStringProperty();
     this.stringRepresentation = new SimpleStringProperty(stringRepresentation);

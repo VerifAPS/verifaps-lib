@@ -9,7 +9,6 @@ import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
-import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
 import javafx.beans.property.ObjectProperty;
 import javafx.event.ActionEvent;
@@ -20,6 +19,7 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
+
 
 /**
  * Created by csicar on 10.01.17.
@@ -80,7 +80,7 @@ public class StvsMenuBarController implements Controller {
           }));
           this.rootModel.get().getHistory().addFilename(filename);
         } catch (IOException | ImportException e) {
-          ViewUtils.showDialog(Alert.AlertType.ERROR, "File Open Error", "An error occurred " +
+          ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "File Open Error", "An error occurred " +
               "while opening a file.", "The file " + filename + " could not be opened.", e.getMessage());
         }
       }));
@@ -92,7 +92,7 @@ public class StvsMenuBarController implements Controller {
 
   private void saveSessionAs(ActionEvent actionEvent) {
     FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Save session");
+    fileChooser.setTitle("Save Session As");
     fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
     if (chosenFile != null) {
@@ -124,7 +124,7 @@ public class StvsMenuBarController implements Controller {
 
   private void openCode(ActionEvent t) {
     FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Open a Structured-Text File");
+    fileChooser.setTitle("Open A ST-File");
     fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
 
@@ -136,13 +136,13 @@ public class StvsMenuBarController implements Controller {
       this.rootModel.get().getScenario().setCode(code);
       this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
     } catch (IOException e) {
-      new ErrorMessageDialog(e);
+      ErrorMessageDialog.createErrorMessageDialog(e);
     }
   }
 
   private void openSession(ActionEvent t) {
     FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Open a Session");
+    fileChooser.setTitle("Open A Session");
     fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
 
@@ -158,13 +158,13 @@ public class StvsMenuBarController implements Controller {
       this.rootModel.set(model);
       this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
     } catch (IOException | ImportException exception) {
-      new ErrorMessageDialog(exception);
+      ErrorMessageDialog.createErrorMessageDialog(exception);
     }
   }
 
   private void openSpec(ActionEvent t) {
     FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Open a Specification File");
+    fileChooser.setTitle("Open A Specification-File");
     fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
 
@@ -177,7 +177,7 @@ public class StvsMenuBarController implements Controller {
        this.rootModel.get().getHybridSpecifications().add(spec);
        this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
     } catch (IOException | ImportException e) {
-      new ErrorMessageDialog(e);
+      ErrorMessageDialog.createErrorMessageDialog(e);
     }
   }
 
@@ -198,13 +198,15 @@ public class StvsMenuBarController implements Controller {
         rootModel.get().getHybridSpecifications().add(hybridSpecification);
       }, (rootModel) -> {
         //handle rootModel
+        rootModel.setWorkingdir(chosenFile.getParentFile());
+        rootModel.setFilename(chosenFile.getName());
         this.rootModel.setValue(rootModel);
       }, (code -> {
         //handle code
         this.rootModel.get().getScenario().setCode(code);
       }));
     } catch (IOException | ImportException e) {
-      new ErrorMessageDialog(e);
+      ErrorMessageDialog.createErrorMessageDialog(e);
     }
   }
 
@@ -212,7 +214,7 @@ public class StvsMenuBarController implements Controller {
   private void saveAll(ActionEvent t) {
     if (this.rootModel.get().getFilename().isEmpty()) {
       FileChooser fileChooser = new FileChooser();
-      fileChooser.setTitle("Save session");
+      fileChooser.setTitle("Save Session");
       fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
       File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
       if (chosenFile != null) {
@@ -233,7 +235,7 @@ public class StvsMenuBarController implements Controller {
       ExporterFacade.exportSession(rootModel.get(), ExporterFacade.ExportFormat
           .XML, path);
     } catch (IOException | ExportException e) {
-      new ErrorMessageDialog(e);
+        ErrorMessageDialog.createErrorMessageDialog(e);
     }
   }
 
@@ -242,7 +244,7 @@ public class StvsMenuBarController implements Controller {
 
     if (code.getFilename().isEmpty()) {
       FileChooser fileChooser = new FileChooser();
-      fileChooser.setTitle("Select the file");
+      fileChooser.setTitle("Select The File");
       fileChooser.setInitialDirectory(rootModel.get().getWorkingdir());
       File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
       if (chosenFile != null) {
@@ -254,7 +256,7 @@ public class StvsMenuBarController implements Controller {
     try {
       ExporterFacade.exportCode(code, false);
     } catch (IOException e) {
-      new ErrorMessageDialog(e);
+      ErrorMessageDialog.createErrorMessageDialog(e);
     }
   }
 
@@ -262,12 +264,12 @@ public class StvsMenuBarController implements Controller {
     try {
       ConstraintSpecification spec = rootModel.get().getScenario().getActiveSpec();
       if (spec == null) { // There is no active specification tab open yet
-        ViewUtils.showDialog(Alert.AlertType.ERROR, "Save Specification", "No Specification available.", "");
+        ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Save Specification", "No Specification available.", "");
       } else {
         ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.XML);
       }
     } catch (ExportException e) {
-      new ErrorMessageDialog(e);
+      ErrorMessageDialog.createErrorMessageDialog(e);
     }
   }
 
