@@ -198,6 +198,8 @@ public class StvsMenuBarController implements Controller {
         rootModel.get().getHybridSpecifications().add(hybridSpecification);
       }, (rootModel) -> {
         //handle rootModel
+        rootModel.setWorkingdir(chosenFile.getParentFile());
+        rootModel.setFilename(chosenFile.getName());
         this.rootModel.setValue(rootModel);
       }, (code -> {
         //handle code

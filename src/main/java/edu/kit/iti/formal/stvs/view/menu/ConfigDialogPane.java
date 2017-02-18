@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
 import edu.kit.iti.formal.stvs.view.common.FileSelectionField;
-import edu.kit.iti.formal.stvs.view.common.IntegerInputField;
+import edu.kit.iti.formal.stvs.view.common.PositiveIntegerInputField;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -14,26 +14,26 @@ public class ConfigDialogPane extends DialogPane {
   public final FileSelectionField nuxmvFilename;
   public final FileSelectionField z3Path;
   public final TextField getetaCommand;
-  public final IntegerInputField maxLineRollout;
-  public final IntegerInputField verificationTimeout;
-  public final IntegerInputField simulationTimeout;
-  public final IntegerInputField editorFontSize;
+  public final PositiveIntegerInputField maxLineRollout;
+  public final PositiveIntegerInputField verificationTimeout;
+  public final PositiveIntegerInputField simulationTimeout;
+  public final PositiveIntegerInputField editorFontSize;
   public final TextField editorFontFamily;
   public final CheckBox showLineNumbers;
   public final ComboBox<String> uiLanguage;
   public final ButtonType okButtonType;
 
   public ConfigDialogPane() {
-    verificationTimeout = new IntegerInputField();
-    simulationTimeout = new IntegerInputField();
-    editorFontSize = new IntegerInputField();
+    verificationTimeout = new PositiveIntegerInputField();
+    simulationTimeout = new PositiveIntegerInputField();
+    editorFontSize = new PositiveIntegerInputField();
     editorFontFamily = new TextField();
     showLineNumbers = new CheckBox();
     uiLanguage = new ComboBox<>();
     nuxmvFilename = new FileSelectionField();
     z3Path = new FileSelectionField();
     getetaCommand = new TextField();
-    maxLineRollout = new IntegerInputField();
+    maxLineRollout = new PositiveIntegerInputField();
     okButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
 
 

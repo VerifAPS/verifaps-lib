@@ -12,13 +12,19 @@
     -fx-background-insets: 0;
 }
 
-.labelContainer{
-    -fx-background-color: lightgray;
+.labelContainer {
+    /*-fx-background-color: lightgrey;*/
 }
 
 .globalXAxis{
     -fx-animated: false;
     -fx-minor-tick-visible: false;
+}
+
+.labelContainer * {
+    -fx-font-family: monospace;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 0 10;
 }
 
 .labelContainer .output{

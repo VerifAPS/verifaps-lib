@@ -19,6 +19,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
+import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
  */
 public class SpecificationTableController implements Controller {
 
+  private final SpecificationTableView view;
   private final TableView<SynchronizedRow> tableView;
   private final HybridSpecification hybridSpec;
   private final ObjectProperty<List<Type>> typeContext;
@@ -67,7 +69,10 @@ public class SpecificationTableController implements Controller {
 
     tableView.setContextMenu(createContextMenu());
 
-    tableView.getStylesheets().add(SpecificationTableController.class.getResource("style.css").toExternalForm());
+
+    this.view = new SpecificationTableView(tableView);
+
+    view.getHeader().setContextMenu(createTopLevelContextMenu());
 
     hybridSpecification.getColumnHeaders().forEach(this::addColumnToView);
 
@@ -172,6 +177,15 @@ public class SpecificationTableController implements Controller {
     }
   }
 
+  private ContextMenu createTopLevelContextMenu() {
+    MenuItem comment = new MenuItem("Comment ...");
+    comment.setAccelerator(KeyCombination.keyCombination("Ctrl+k"));
+    comment.setOnAction(event -> {
+      new CommentPopupManager(hybridSpec, hybridSpec.isEditable(), config);
+    });
+    return new ContextMenu(comment);
+  }
+
   private ContextMenu createContextMenu() {
     MenuItem insertRow = new MenuItem("Insert Row");
     MenuItem deleteRow = new MenuItem("Delete Row");
@@ -204,6 +218,8 @@ public class SpecificationTableController implements Controller {
   private ContextMenu createColumnContextMenu(TableColumn<SynchronizedRow, ?> column) {
     MenuItem changeColumn = new MenuItem("Change Column...");
     MenuItem removeColumn = new MenuItem("Remove Column");
+    MenuItem commentColumn = new MenuItem("Comment ...");
+    commentColumn.setAccelerator(KeyCombination.keyCombination("Ctrl+k"));
     changeColumn.setOnAction(event -> {
       new IoVariableChangeDialog(
           hybridSpec.getColumnHeaderByName((String) column.getUserData()),
@@ -214,9 +230,14 @@ public class SpecificationTableController implements Controller {
       tableView.getColumns().remove(column);
       hybridSpec.removeColumnByName((String) column.getUserData());
     });
+    commentColumn.setOnAction(event -> {
+      String specIoVariableName = (String) column.getUserData();
+      SpecIoVariable commentable = hybridSpec.getColumnHeaderByName(specIoVariableName);
+      new CommentPopupManager(commentable, tableView.isEditable(), config);
+    });
     changeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
     removeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
-    return new ContextMenu(changeColumn, removeColumn);
+    return new ContextMenu(changeColumn, removeColumn, commentColumn);
   }
 
   public void addEmptyRow(int index) {
@@ -345,8 +366,8 @@ public class SpecificationTableController implements Controller {
   }
 
   @Override
-  public TableView<SynchronizedRow> getView() {
-    return tableView;
+  public SpecificationTableView getView() {
+    return view;
   }
 
   public HybridSpecification getHybridSpecification() {
