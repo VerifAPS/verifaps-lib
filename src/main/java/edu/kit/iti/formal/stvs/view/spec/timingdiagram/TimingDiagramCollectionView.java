@@ -45,7 +45,7 @@ public class TimingDiagramCollectionView extends VBox {
 
     getChildren().addAll(outdatedMessage, scrollPane, globalAxisContainer, xScrollBar);
     globalAxisContainer.getChildren().add(xAxis);
-    setPadding(new Insets(0, 10, 0, 10));
+    setPadding(new Insets(0, 0, 0, 0));
     yAxisStickRightContainer.getChildren().addAll(yAxisContainer, labelContainer);
     yAxisStickRightContainer.setMinWidth(0);
     AnchorPane.setRightAnchor(yAxisContainer, 0.0);
