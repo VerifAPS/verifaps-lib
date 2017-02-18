@@ -72,6 +72,8 @@ public class SpecificationTableController implements Controller {
 
     this.view = new SpecificationTableView(tableView);
 
+    view.getHeader().setContextMenu(createTopLevelContextMenu());
+
     hybridSpecification.getColumnHeaders().forEach(this::addColumnToView);
 
     for (int rowIndex = 0; rowIndex < hybridSpecification.getRows().size(); rowIndex++) {
@@ -173,6 +175,15 @@ public class SpecificationTableController implements Controller {
         hybridSpec.getDurations().remove(change.getFrom(), change.getFrom() + change.getRemovedSize());
       }
     }
+  }
+
+  private ContextMenu createTopLevelContextMenu() {
+    MenuItem comment = new MenuItem("Comment ...");
+    comment.setAccelerator(KeyCombination.keyCombination("Ctrl+k"));
+    comment.setOnAction(event -> {
+      new CommentPopupManager(hybridSpec, hybridSpec.isEditable(), config);
+    });
+    return new ContextMenu(comment);
   }
 
   private ContextMenu createContextMenu() {
