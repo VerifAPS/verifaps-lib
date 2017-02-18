@@ -70,7 +70,7 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
     });
   }
 
-  public void requestRelayout() {
+  private void requestRelayout() {
     requestLayout();
     requestChartLayout();
   }
