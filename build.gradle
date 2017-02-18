@@ -59,7 +59,7 @@ dependencies {
 
 jar {
     manifest {
-        mainClassName = "edu.kit.iti.formal.stvs.STVSApplication"
+        mainClassName = "edu.kit.iti.formal.stvs.StvsApplication"
     }
 }
 

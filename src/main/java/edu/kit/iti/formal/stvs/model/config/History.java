@@ -55,10 +55,9 @@ public class History {
       filenames.remove(filename);
     }
     // Prevent filenames from getting larger than HISTORY_DEPTH
-    if (filenames.size() == HISTORY_DEPTH) {
-      for (int i = 0; i < filenames.size() - 1; i++) {
-        filenames.set(i, filenames.get(i+1));
-      }
+    int excess = filenames.size() - HISTORY_DEPTH + 1;
+    if (excess > 0) {
+      filenames.remove(0, excess);
     }
     filenames.add(filename);
   }
