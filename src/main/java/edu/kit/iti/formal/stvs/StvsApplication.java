@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs;
 import edu.kit.iti.formal.stvs.view.StvsMainScene;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
@@ -24,6 +25,8 @@ public class StvsApplication extends Application {
     primaryStage.setScene(mainScene.getScene());
     primaryStage.setMaximized(mainScene.shouldBeMaximizedProperty().get());
     mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty());
+    primaryStage.getIcons().add(new Image(StvsApplication.class
+        .getResourceAsStream("clipboard.png")));
     primaryStage.show();
   }
 

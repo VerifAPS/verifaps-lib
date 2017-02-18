@@ -175,8 +175,8 @@ public class StvsRootController implements Controller {
             "error occurred during verification.", alertBody, logFileContents);
         break;
       case UNKNOWN:
-        ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Unknown Error", "An unknown error " +
-            "occurred during verification.", alertBody, logFileContents);
+        ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Unknown Error", "The " +
+            "verification engine returned with exit code \"unknown\".", alertBody, logFileContents);
     }
   }
 }

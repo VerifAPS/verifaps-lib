@@ -11,7 +11,8 @@ import javafx.stage.FileChooser;
 import java.io.File;
 
 /**
- * Created by csicar on 13.02.17.
+ * A text field with a button for choosing a file and displaying their path.
+ * @author Benjamin Alt
  */
 public class FileSelectionField extends HBox {
   private TextField textField;
