@@ -25,7 +25,7 @@ public class SpecificationTable<H extends Named, C, D> {
 
   protected final static String DEFAULT_NAME = "Unnamed Specification";
 
-  protected ObservableList<H> columnHeaders;
+  protected ObservableList<H>     columnHeaders;
   protected ObservableList<SpecificationRow<C>> rows;
   protected ObservableList<D> durations;
   private StringProperty name;
