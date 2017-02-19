@@ -18,6 +18,7 @@ import javafx.beans.property.SimpleStringProperty;
  *
  * <p>The only ability all Expressions currently share is
  * getting visited.
+ * @author Philipp
  */
 public abstract class Expression implements StringReadable {
 

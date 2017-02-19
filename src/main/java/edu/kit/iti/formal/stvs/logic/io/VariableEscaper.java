@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 /**
  * Created by bal on 12.02.17.
+ * @author Benjamin Alt
  */
 public class VariableEscaper {
 

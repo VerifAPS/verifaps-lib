@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.model.common;
 
 /**
  * Created by csicar on 11.01.17.
+ * @author Benjamin Alt
  */
 public abstract class IoVariable implements Variable {
 

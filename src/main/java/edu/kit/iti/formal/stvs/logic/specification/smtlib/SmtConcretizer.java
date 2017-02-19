@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 
 /**
  * Created by csicar on 08.02.17.
+ * @author Leon Kaucher
  */
 public class SmtConcretizer implements SpecificationConcretizer {
   private final GlobalConfig config;

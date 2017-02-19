@@ -9,6 +9,7 @@ import java.util.Map;
 
 /**
  * Created by philipp on 09.02.17.
+ * @author Philipp
  */
 public class InvalidFreeVariableProblem extends FreeVariableProblem {
 

@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 
 /**
  * This class provides a visitor for an Expression to convert it into a z3 model
- *
+ * @author Carsten Csiky
  */
  //Does Rule (1)
 public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {

@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.model.expressions;
 /**
  * The runtime-representation for parsed, binary function expressions.
  * Examples are: +, -, =, AND, OR, etc. Anything that has two arguments.
+ * @author Philipp
  */
 public class BinaryFunctionExpr extends Expression {
 

@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by csicar on 08.02.17.
+ * @author Carsten Csiky
  */
 public class SList implements SExpr {
   private List<SExpr> sexp;

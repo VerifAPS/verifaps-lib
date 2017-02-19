@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 /**
  * Created by csicar on 08.02.17.
+ * @author
  */
 public interface SExpr {
 

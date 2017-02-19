@@ -5,6 +5,9 @@ import com.sun.xml.bind.marshaller.CharacterEscapeHandler;
 import java.io.IOException;
 import java.io.Writer;
 
+/**
+ * @author Benjamin Alt
+ */
 public class NoEscapeHandler implements CharacterEscapeHandler {
 
   public void escape(char[] buf, int start, int len, boolean isAttValue,

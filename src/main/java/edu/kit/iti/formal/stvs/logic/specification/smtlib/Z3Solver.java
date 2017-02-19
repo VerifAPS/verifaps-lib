@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by leonk on 09.02.2017.
+ * @author Leon Kaucher
  */
 public class Z3Solver {
 

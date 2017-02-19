@@ -13,6 +13,7 @@ import java.util.List;
 
 /**
  * Created by Lukas on 30.01.2017.
+ * @author Lukas Fritsch
  */
 public class SyntaxErrorListener implements ANTLRErrorListener {
   private List<SyntaxError> syntaxErrors = new ArrayList<>();
