@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 
 /**
  * Created by csicar on 09.01.17.
+ * @author  Philipp
  */
 public class Code {
 

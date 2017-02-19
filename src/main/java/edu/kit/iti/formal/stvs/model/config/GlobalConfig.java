@@ -13,6 +13,7 @@ import java.util.List;
 
 /**
  * Contains global configuration specified by the user
+ * @author Benjamin Alt
  */
 public class GlobalConfig {
 

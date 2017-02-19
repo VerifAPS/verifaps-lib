@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by csicar on 09.02.17.
+ * @author Carsten Csiky
  */
 public class SConstraint implements SExpr {
   private final Set<SExpr> globalConstraints;

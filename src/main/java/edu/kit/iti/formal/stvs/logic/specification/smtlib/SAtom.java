@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 /**
  * Created by csicar on 08.02.17.
+ * @author Carsten Csiky
  */
 public class SAtom implements SExpr {
   private String string;

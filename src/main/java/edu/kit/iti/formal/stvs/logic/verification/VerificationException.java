@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.logic.verification;
 
 /**
  * Created by bal on 11.02.17.
+ * @author Benjamin Alt
  */
 public class VerificationException extends Exception {
 

@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.Token;
 
 /**
  * Created by Lukas on 02.02.2017.
+ * @author Lukas Fritsch
  */
 public class    SyntaxError {
   private int line;

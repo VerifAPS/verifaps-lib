@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by philipp on 09.02.17.
+ * @author Philipp
  */
 public class FreeVariableListValidator {
 

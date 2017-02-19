@@ -9,6 +9,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
  * Created by csicar on 10.01.17.
+ * @author Philipp
  */
 public class FreeVariable implements Variable {
 

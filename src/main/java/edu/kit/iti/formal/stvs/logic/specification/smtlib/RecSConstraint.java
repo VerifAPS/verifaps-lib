@@ -4,6 +4,7 @@ import java.util.Set;
 
 /**
  * Created by csicar on 09.02.17.
+ * @author Carsten Csiky
  */
 public class RecSConstraint extends SConstraint {
   private SExpr recExpression;

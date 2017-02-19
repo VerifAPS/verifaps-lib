@@ -6,6 +6,7 @@ import java.util.function.BiConsumer;
 
 /**
  * Created by csicar on 10.01.17.
+ * @author Leon Kaucher
  */
 public class Selection {
 
