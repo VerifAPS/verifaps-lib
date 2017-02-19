@@ -5,7 +5,7 @@ import org.antlr.v4.runtime.Token;
 /**
  * Created by Lukas on 02.02.2017.
  */
-public class SyntaxError {
+public class    SyntaxError {
   private int line;
   private int charPos;
   private String message;

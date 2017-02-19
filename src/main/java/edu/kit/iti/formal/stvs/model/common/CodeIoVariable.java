@@ -24,7 +24,6 @@ public class CodeIoVariable extends IoVariable {
     this.name = name;
   }
 
-
   @Override
   public VariableCategory getCategory() {
     return category;
