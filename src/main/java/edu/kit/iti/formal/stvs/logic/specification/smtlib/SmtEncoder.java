@@ -52,7 +52,7 @@ public class SmtEncoder {
         .addHeaderDefinitions(createFreeVariables())
         .addHeaderDefinitions(setFreeVariablesDefaultValues());
 
-    //Step V: upper und lower Bound von Durations festlegen
+    //Step (2): upper und lower Bound von Durations festlegen
     for (int z = 0; z < specification.getDurations().size(); z++) {
       LowerBoundedInterval interval = specification.getDurations().get(z);
       //n_z >= lowerBound_z
@@ -68,7 +68,7 @@ public class SmtEncoder {
       }
     }
 
-    //Step I, II, IV
+    //Step (5)
     for (ValidIoVariable ioVariable : this.ioVariables) {
       SpecificationColumn<Expression> column = this.specification.getColumnByName(ioVariable.getName());
       for (int z = 0; z < column.getCells().size(); z++) {
@@ -92,7 +92,7 @@ public class SmtEncoder {
       }
     }
 
-    //Step III neg. Indizes verbinden
+    //Step 4 neg. Indizes verbinden
     for (ValidIoVariable ioVariable : this.ioVariables) {
       SpecificationColumn<Expression> column = this.specification.getColumnByName(ioVariable.getName());
       String variableName = ioVariable.getName();

@@ -14,8 +14,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * This class provides a visitor for an Expression to convert it into a choco model
+ * This class provides a visitor for an Expression to convert it into a z3 model
+ *
  */
+ //Does Rule (1)
 public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   //static maps
 
@@ -153,7 +155,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
 
     // is an IOVariable?
     if (isIoVariable.test(variableName)) {
-      // Do Rule I
+      // Do Rule (3)
 
       //does it reference a previous cycle? -> guarantee reference-ability
       if (variableReferenceIndex < 0) {
@@ -167,7 +169,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
         );
       }
 
-      // Do Rule II
+      // Do Rule part of Rule (I)
       // A[-v] -> A_z_(i-v)
       return new SAtom("|" + variableName + "_" + row + "_" + (iteration +
           variableReferenceIndex) + "|");
