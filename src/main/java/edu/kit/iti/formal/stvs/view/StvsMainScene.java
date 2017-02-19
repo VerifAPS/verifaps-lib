@@ -21,6 +21,7 @@ import java.io.IOException;
 
 /**
  * Created by csicar on 09.01.17.
+ * @author Lukas Fritsch
  */
 public class StvsMainScene {
 

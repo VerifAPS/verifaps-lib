@@ -17,6 +17,7 @@ import java.util.Collection;
 
 /**
  * Created by csicar on 09.01.17.
+ * @author Lukas Fritsch
  */
 public class EditorPane extends SplitPane {
 

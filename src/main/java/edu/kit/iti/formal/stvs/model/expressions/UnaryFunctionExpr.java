@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.model.expressions;
 /**
  * runtime-representation of unary expressions. Examples:
  * <tt>NOT TRUE</tt>, <tt>- 3</tt>.
+ * @author Philipp
  */
 public class UnaryFunctionExpr extends Expression {
 

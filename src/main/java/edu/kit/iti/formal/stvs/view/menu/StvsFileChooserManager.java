@@ -10,6 +10,7 @@ import java.util.Optional;
 
 /**
  * Created by csicar on 30.01.17.
+ * @author Carsten Csiky
  */
 public class StvsFileChooserManager {
   private FileChooser fileChooser;

@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by csicar on 10.01.17.
+ * @author Philipp
  */
 public class VariableCollectionController implements Controller {
 

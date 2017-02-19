@@ -11,6 +11,9 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 
+/**
+ * @author Philipp
+ */
 public class IoVariableChooserDialog extends Dialog<SpecIoVariable> {
 
   private final TextField nameTextField;

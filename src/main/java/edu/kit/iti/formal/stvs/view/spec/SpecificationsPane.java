@@ -8,6 +8,7 @@ import javafx.scene.layout.AnchorPane;
 
 /**
  * Created by csicar on 07.02.17.
+ * @author Carsten Csiky
  */
 public class SpecificationsPane extends AnchorPane {
   private TabPane tabPane;

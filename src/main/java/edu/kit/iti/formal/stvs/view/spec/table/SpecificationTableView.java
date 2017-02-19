@@ -6,6 +6,7 @@ import javafx.scene.layout.VBox;
 
 /**
  * Created by csicar on 18.02.17.
+ * @author Carsten Csiky
  */
 public class SpecificationTableView extends VBox {
   private Label header;

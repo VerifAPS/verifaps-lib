@@ -9,6 +9,7 @@ import javafx.scene.text.Text;
 
 /**
  * Created by csicar on 11.01.17.
+ * @author Carsten Csiky
  */
 public class ConfigDialogPane extends DialogPane {
   public final FileSelectionField nuxmvFilename;

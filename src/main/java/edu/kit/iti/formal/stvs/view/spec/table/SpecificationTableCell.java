@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by philipp on 13.02.17.
+ * @author Philipp
  */
 public class SpecificationTableCell extends TextFieldTableCell<SynchronizedRow, String> {
 

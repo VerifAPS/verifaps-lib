@@ -10,6 +10,7 @@ import java.util.Optional;
 
 /**
  * Created by csicar on 15.02.17.
+ * @author Carsten Csiky
  */
 public class PositiveIntegerInputField extends TextField {
   private BooleanProperty valid;

@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Carsten Csiky
+ */
 public class SpecificationsPaneController implements Controller {
 
   private final GlobalConfig globalConfig;

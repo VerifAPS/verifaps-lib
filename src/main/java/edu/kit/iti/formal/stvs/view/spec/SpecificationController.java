@@ -28,7 +28,9 @@ import javafx.scene.control.ContextMenu;
 
 import java.util.List;
 
-
+/*
+ * @author Carsten Csiky
+ */
 public class SpecificationController implements Controller {
 
   private final GlobalConfig globalConfig;

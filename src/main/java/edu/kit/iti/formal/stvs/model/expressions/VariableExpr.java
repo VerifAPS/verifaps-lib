@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
  * {@link FreeVariable}
  * or an {@link IoVariable}, it
  * is simply the String name of either of those.
+ * @author Philipp
  */
 public class VariableExpr extends Expression {
 

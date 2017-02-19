@@ -12,6 +12,7 @@ import java.util.BitSet;
 /**
  * A {@link ThrowingErrorListener} that throws {@link ParseRuntimeException}s on
  * every syntaxError.
+ * @author Philipp
  */
 public class ThrowingErrorListener implements ANTLRErrorListener {
   @Override

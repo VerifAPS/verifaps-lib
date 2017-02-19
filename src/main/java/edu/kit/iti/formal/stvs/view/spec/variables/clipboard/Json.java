@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by Philipp on 05.02.2017.
+ * @author Philipp
  */
 public class Json {
   private static final Gson GSON = new Gson();

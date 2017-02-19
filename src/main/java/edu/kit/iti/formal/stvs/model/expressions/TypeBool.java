@@ -8,6 +8,7 @@ import java.util.function.Supplier;
  * runtime-representation for boolean types.
  *
  * This is a singleton since this class does not have any state.
+ * @author Philipp
  */
 public class TypeBool implements Type {
 

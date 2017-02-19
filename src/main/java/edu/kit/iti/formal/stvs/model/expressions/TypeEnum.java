@@ -9,6 +9,7 @@ import java.util.function.Supplier;
  *
  * This is (in contrast to {@link TypeInt} or {@link TypeBool}) NOT a
  * singleton, since different instances of this can be created at runtime.
+ * @author Philipp
  */
 public class TypeEnum implements Type {
 

@@ -10,6 +10,9 @@ import javafx.scene.layout.Pane;
 
 import java.util.Optional;
 
+/**
+ * @author Carsten Csiky
+ */
 public class CommentPopupManager {
   private boolean editable;
   private StringProperty comment;

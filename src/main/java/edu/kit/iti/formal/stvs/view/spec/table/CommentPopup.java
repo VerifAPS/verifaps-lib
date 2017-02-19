@@ -14,6 +14,9 @@ import javafx.scene.text.Text;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Popup;
 
+/**
+ * @author Carsten Csiky
+ */
 public class CommentPopup extends Dialog<String> implements Lockable {
   private TextArea commentField;
   private String commentContent;

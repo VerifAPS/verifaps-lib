@@ -19,6 +19,7 @@ import java.util.Collection;
 
 /**
  * Created by philipp on 11.02.17.
+ * @author Philipp
  */
 public class ColumnHeader extends VBox {
 

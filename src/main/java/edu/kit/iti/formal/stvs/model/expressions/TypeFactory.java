@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 /**
  * Helper class for quickly creating values of {@link TypeEnum}.
+ * @author Philipp
  */
 public class TypeFactory {
 

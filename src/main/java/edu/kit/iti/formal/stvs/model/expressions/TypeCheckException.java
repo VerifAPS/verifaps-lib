@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.model.expressions;
 /**
  * An Exception for type errors. Occurs when one wants to parse an
  * {@link Expression} like <tt>2 AND TRUE</tt> or <tt>42 = FALSE</tt>.
+ * @author Philipp
  */
 public class TypeCheckException extends Exception {
   private static final long serialVersionUID = 1L;

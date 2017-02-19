@@ -21,6 +21,7 @@ import java.io.IOException;
 
 /**
  * Created by csicar on 11.01.17.
+ * @author Carsten Csiky
  */
 public class ConfigDialogManager implements Controller {
   private GlobalConfig config;

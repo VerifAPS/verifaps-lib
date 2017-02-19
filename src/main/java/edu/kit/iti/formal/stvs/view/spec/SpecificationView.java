@@ -19,6 +19,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+/**
+ * @author Carsten Csiky
+ */
 public class SpecificationView extends VBox implements Lockable {
 
   private Button startVerificationButton;

@@ -11,6 +11,7 @@ import javafx.scene.text.Text;
 
 /**
  * Created by csicar on 10.01.17.
+ * @author Philipp
  */
 public class VariableCollection extends VBox {
 

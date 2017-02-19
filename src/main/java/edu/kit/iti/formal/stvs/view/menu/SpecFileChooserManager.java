@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 
 /**
  * Created by csicar on 10.01.17.
+ * @author Carsten Csiky
  */
 public class SpecFileChooserManager {
   private GlobalConfig globalConfig;

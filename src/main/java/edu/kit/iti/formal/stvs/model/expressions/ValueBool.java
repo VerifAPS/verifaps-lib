@@ -8,6 +8,7 @@ import java.util.function.IntFunction;
  *
  * This is a singleton with two instances, TRUE and FALSE, since there
  * is no state to the values.
+ * @author Philipp
  */
 public class ValueBool implements Value {
 

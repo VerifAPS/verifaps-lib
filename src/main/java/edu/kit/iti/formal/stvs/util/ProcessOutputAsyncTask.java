@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 /**
  * Created by leonk on 08.02.2017.
+ * @author Leon Kaucher
  */
 public class ProcessOutputAsyncTask extends AsyncTask<Optional<String>> {
   public ProcessOutputAsyncTask(ProcessBuilder processBuilder, String input, Consumer<Optional<String>> runLater) {

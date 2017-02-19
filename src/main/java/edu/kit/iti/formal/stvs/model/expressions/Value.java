@@ -6,6 +6,7 @@ import java.util.function.IntFunction;
 /**
  * The common interface for values of Expressions.
  * Values are visitable and have a type.
+ * @author Philipp
  */
 public interface Value {
 

@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * Created by csicar on 07.02.17.
+ * @author Carsten Csiky
  */
 public class ListTypeConverter {
 

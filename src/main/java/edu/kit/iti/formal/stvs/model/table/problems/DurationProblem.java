@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.model.common.Selection;
 
 /**
  * Created by Philipp on 03.02.2017.
+ * @author Philipp
  */
 public abstract class DurationProblem extends SpecProblem {
 

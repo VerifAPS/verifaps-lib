@@ -8,6 +8,7 @@ import java.util.function.IntFunction;
  *
  * <p>This is not a singleton (in contrast to {@link ValueBool}), since
  * many different instances can be created at runtime.
+ * @author Philipp
  */
 public class ValueInt implements Value {
 

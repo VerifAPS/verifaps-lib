@@ -7,6 +7,7 @@ import java.util.Map;
  *
  * If an ill-typed expression is encountered, this class produces a
  * {@link TypeCheckException}.
+ * @author Philipp
  */
 public class TypeChecker implements ExpressionVisitor<Type> {
 

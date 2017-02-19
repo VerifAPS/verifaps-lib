@@ -12,6 +12,7 @@ import java.util.List;
 
 /**
  * Created by csicar on 10.01.17.
+ * @author Carsten Csiky
  */
 public class StvsMenuBar extends MenuBar {
 

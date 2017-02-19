@@ -2,6 +2,9 @@ package edu.kit.iti.formal.stvs.model.table.problems;
 
 import edu.kit.iti.formal.stvs.model.common.Selection;
 
+/*
+ * @author Philipp
+ */
 public abstract class SpecProblem extends Exception {
 
   private final String errorMessage;

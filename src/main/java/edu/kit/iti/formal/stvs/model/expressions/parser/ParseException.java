@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.model.expressions.parser;
 
 /**
  * An Exception for parsing errors.
+ * @author Philipp
  */
 public class ParseException extends Exception {
 

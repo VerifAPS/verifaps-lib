@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 /**
  * The super-interface for all Types.
+ * @author Philipp
  */
 public interface Type {
 

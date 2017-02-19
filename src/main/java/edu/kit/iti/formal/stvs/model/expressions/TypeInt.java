@@ -8,6 +8,7 @@ import java.util.function.Supplier;
  * runtime-representation for int types.
  *
  * <p>This class is a singleton, since it does not hold any state at all.
+ * @author Philipp
  */
 public class TypeInt implements Type {
 

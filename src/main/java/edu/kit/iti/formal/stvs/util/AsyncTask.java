@@ -6,6 +6,7 @@ import java.util.function.Function;
 
 /**
  * Created by leonk on 08.02.2017.
+ * @author Leon Kaucher
  */
 public class AsyncTask<T> extends Thread {
   private final Function<AtomicBoolean, T> runAsnc;

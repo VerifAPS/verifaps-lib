@@ -12,6 +12,7 @@ import java.io.StringWriter;
 /**
  * Created by csicar on 01.02.17.
  * wrapper for javafx-alert as a way to display error-messages to the user
+ * @author Carsten Csiky
  */
 public class ErrorMessageDialog {
 

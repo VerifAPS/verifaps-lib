@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 
 /**
  * Created by Philipp on 01.02.2017.
+ * @author Philipp
  */
 public class HybridCellModel<C extends CellOperationProvider> implements CellOperationProvider {
 

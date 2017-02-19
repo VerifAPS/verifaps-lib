@@ -9,6 +9,7 @@ import java.util.*;
 /**
  * This class parses Expressions using the ANTLR parser generator library.
  * The resulting Expression format is an {@link Expression}.
+ * @author Philipp
  */
 public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 

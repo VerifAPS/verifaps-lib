@@ -25,6 +25,7 @@ import java.io.IOException;
  * Created by csicar on 10.01.17.
  * Controller for the MenuBar at the top of the window
  * does just fire to the root controller
+ * @author Carsten Csiky
  */
 public class StvsMenuBarController implements Controller {
   private StvsMenuBar view;

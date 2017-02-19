@@ -7,6 +7,7 @@ import javafx.scene.layout.VBox;
 
 /**
  * Created by csicar on 16.02.17.
+ * @author Carsten Csiky
  */
 public class AboutDialogPane extends DialogPane {
 

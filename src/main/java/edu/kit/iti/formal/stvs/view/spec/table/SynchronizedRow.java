@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by Philipp on 01.02.2017.
+ * @author Philipp
  */
 public class SynchronizedRow extends SpecificationRow<HybridCellModel<ConstraintCell>> {
 

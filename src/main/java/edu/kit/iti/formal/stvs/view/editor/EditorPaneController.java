@@ -35,6 +35,7 @@ import java.util.concurrent.Executors;
  * <p>
  * Some parts are inspired by examples of the used library:
  * https://github.com/TomasMikula/RichTextFX/blob/a098da6309a0f624052fd1d4d6f5079dd6265fbe/richtextfx-demos/src/main/java/org/fxmisc/richtext/demo/JavaKeywords.java
+ * @author Lukas Fritsch
  */
 public class EditorPaneController implements Controller {
   private EditorPane view;

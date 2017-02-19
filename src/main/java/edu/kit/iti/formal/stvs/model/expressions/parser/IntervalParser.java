@@ -10,6 +10,7 @@ import java.util.Optional;
  * defined by the ANTLR grammar in antlr/CellExpression.g4.
  * This parser does not need any context information and does not capture state
  * and thus is a singleton.
+ * @author Philipp
  */
 public class IntervalParser extends CellExpressionBaseVisitor<LowerBoundedInterval> {
 

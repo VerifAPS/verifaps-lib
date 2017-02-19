@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 
 /**
  * Created by csicar on 09.01.17.
+ * @author Benjamin Alt
  */
 public class StvsApplication extends Application {
 
