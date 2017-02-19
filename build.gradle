@@ -12,18 +12,10 @@ apply plugin: 'application'
 compileJava.options.encoding = 'UTF-8'
 
 sourceSets {
-    generated{
-        java.srcDir "${buildDir}/generated/"
-    }
-
     main {
-        compileClasspath += generated.output
-        runtimeClasspath += generated.output
-    }
-
-    test {
-        compileClasspath += generated.output
-        runtimeClasspath += generated.output
+        java {
+            srcDirs =  ['src/main/java', 'src/generated/java']
+        }
     }
 }
 
