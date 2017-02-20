@@ -516,6 +516,41 @@ returns [ FunctionBlockDeclaration ast = new FunctionBlockDeclaration()]
 ;
 
 
+class_declaration
+returns [ ClassDeclaration ast = new ClassDeclaration()]
+:
+	(FUNCTION_BLOCK|INTERFACE) name=IDENTIFIER
+	(EXTENDS sp=IDENTIFIER)?
+
+	var_decls[$ast.getLocalScope().builder()]
+
+	methods { $ast.setMethods($methods.ast); }
+
+	body = statement_list
+
+	(END_FUNCTION_BLOCK|END_INTERFACE)
+	{ $ast.setBlockName($name.text);
+      Utils.setPosition($ast, $FUNCTION_BLOCK, $END_FUNCTION_BLOCK);}
+
+;
+
+methods
+returns [List<MethodDeclaration> ast = new ArrayList<>() ]
+:
+    (method { $ast.add($method.ast); })+
+;
+
+method
+returns [MethodDeclaration ast = new MethodDeclaration()]
+:
+
+    (PUBLIC|PRIVATE)?
+    METHOD
+    var_decls[$ast.getLocalScope().builder()]
+    statement_list {$ast.setBody($statement_list.ast);}
+    END_METHOD
+;
+
 program_declaration
 returns [ ProgramDeclaration ast = new ProgramDeclaration()]
 :

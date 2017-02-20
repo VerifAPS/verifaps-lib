@@ -46,262 +46,351 @@ public class DefaultVisitor<T> implements Visitor<T> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(Location location) {
         return defaultVisit(location);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(ArrayInitialization initializations) {
         return defaultVisit(initializations);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(ArrayTypeDeclaration arrayTypeDeclaration) {
         return defaultVisit(arrayTypeDeclaration);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(AssignmentStatement assignmentStatement) {
         return defaultVisit(assignmentStatement);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(ExitStatement exitStatement) {
         return defaultVisit(exitStatement);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(CaseConditions.Range range) {
         return defaultVisit(range);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(CaseConditions.IntegerCondition integerCondition) {
         return defaultVisit(integerCondition);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(CaseConditions.Enumeration enumeration) {
         return defaultVisit(enumeration);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(BinaryExpression binaryExpression) {
         return defaultVisit(binaryExpression);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(ConfigurationDeclaration configurationDeclaration) {
         return defaultVisit(configurationDeclaration);
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(EnumerationTypeDeclaration enumerationTypeDeclaration) {
         return defaultVisit(enumerationTypeDeclaration);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(RepeatStatement repeatStatement) {
         return defaultVisit(repeatStatement);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(WhileStatement whileStatement) {
         return defaultVisit(whileStatement);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(UnaryExpression unaryExpression) {
         return defaultVisit(unaryExpression);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(TypeDeclarations typeDeclarations) {
         return defaultVisit(typeDeclarations);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(CaseStatement caseStatement) {
         return defaultVisit(caseStatement);
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(StatementList statements) {
         return defaultVisit(statements);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(ProgramDeclaration programDeclaration) {
         return defaultVisit(programDeclaration);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(ScalarValue<? extends Any, ?> tsScalarValue) {
         return defaultVisit(tsScalarValue);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(ExpressionList expressions) {
         return defaultVisit(expressions);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(FunctionDeclaration functionDeclaration) {
         return defaultVisit(functionDeclaration);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(FunctionCall functionCall) {
         return defaultVisit(functionCall);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(ForStatement forStatement) {
         return defaultVisit(forStatement);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(ResourceDeclaration resourceDeclaration) {
         return defaultVisit(resourceDeclaration);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(FunctionBlockDeclaration functionBlockDeclaration) {
         return defaultVisit(functionBlockDeclaration);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(ReturnStatement returnStatement) {
         return defaultVisit(returnStatement);
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(IfStatement ifStatement) {
         return defaultVisit(ifStatement);
     }
 
     /**
-     * <p>visit.</p>
-     *
-     * @param guardedStatement a {@link edu.kit.iti.formal.automation.st.ast.GuardedStatement} object.
-     * @return a T object.
+     * {@inheritDoc}
      */
     public T visit(GuardedStatement guardedStatement) {
         return defaultVisit(guardedStatement);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(FunctionCallStatement functionCallStatement) {
         return defaultVisit(functionCallStatement);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(CaseStatement.Case aCase) {
         return defaultVisit(aCase);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(StringTypeDeclaration stringTypeDeclaration) {
         return defaultVisit(stringTypeDeclaration);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(StructureTypeDeclaration structureTypeDeclaration) {
         return defaultVisit(structureTypeDeclaration);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(SubRangeTypeDeclaration subRangeTypeDeclaration) {
         return defaultVisit(subRangeTypeDeclaration);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(SimpleTypeDeclaration simpleTypeDeclaration) {
         return defaultVisit(simpleTypeDeclaration);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(LocalScope localScope) {
         return defaultVisit(localScope);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(VariableDeclaration variableDeclaration) {
         return defaultVisit(variableDeclaration);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(CommentStatement commentStatement) {
         return defaultVisit(commentStatement);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(StructureInitialization structureInitialization) {
         return defaultVisit(structureInitialization);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(Deref deref) {
         return defaultVisit(deref);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(SymbolicReference symbolicReference) {
         return defaultVisit(symbolicReference);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(PointerTypeDeclaration ptd) {
         return defaultVisit(ptd);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(IdentifierInitializer init) {
         return defaultVisit(init);
+    }
+
+    @Override
+    public T visit(ClassDeclaration clazz) {
+        return defaultVisit(clazz);
+    }
+
+    @Override
+    public T visit(MethodDeclaration method) {
+        return defaultVisit(method);
     }
 }

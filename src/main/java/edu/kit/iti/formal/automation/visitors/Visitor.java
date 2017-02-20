@@ -374,4 +374,9 @@ public interface Visitor<T> {
      * @return a T object.
      */
     T visit(IdentifierInitializer init);
+
+
+    T visit(ClassDeclaration clazz);
+
+    T visit(MethodDeclaration method);
 }
