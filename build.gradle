@@ -12,6 +12,7 @@ plugins {
 }
 
 apply plugin: 'application'
+apply plugin: "jacoco"
 
 compileJava.options.encoding = 'UTF-8'
 
@@ -79,5 +80,10 @@ test {
 
     testLogging {
         showStandardStreams = true
+    }
+    jacoco {
+        append = false
+        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+        classDumpFile = file("$buildDir/jacoco/classpathdumps")
     }
 }
