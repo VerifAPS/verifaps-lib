@@ -80,9 +80,9 @@ public class SmtEncoderTest {
 
     System.out.println(output.toString());
 
-    testWithStatements(definitions, "(= |p| #x000F)");
-    testWithStatements(definitions, "(= |q| #x0001)");
-    testWithStatements(definitions, "(= |r| true)");
+    testWithStatements(definitions, "(assert (= |p| #x000F))");
+    testWithStatements(definitions, "(assert (= |q| #x0001))");
+    testWithStatements(definitions, "(assert (= |r| true))");
 
   }
 
@@ -153,51 +153,51 @@ public class SmtEncoderTest {
 
 
     testWithStatements(constraints,
-        "(implies (> n_2 4) (= |A_2_4| |A_2_0|))",
+        "(implies (bvuge n_2  #x0004) (= |A_2_4| |A_2_0|))",
 
-        "(implies (> n_2 3) (= |A_2_3| |A_2_-1|))",
-        "(implies (= n_1 1) (= |A_2_-1| |A_1_0|))",
+        "(implies (bvuge n_2  #x0003) (= |A_2_3| |A_2_-1|))",
+        "(implies (= n_1  #x0001) (= |A_2_-1| |A_1_0|))",
 
-        "(implies (> n_2 2) (= |A_2_2| |A_2_-2|))",
-        "(implies (= n_1 1) (= |A_2_-2| |A_1_-1|))",
-        "(implies (= n_0 3) (= |A_1_-1| |A_0_2|))",
+        "(implies (bvuge n_2  #x0002) (= |A_2_2| |A_2_-2|))",
+        "(implies (= n_1  #x0001) (= |A_2_-2| |A_1_-1|))",
+        "(implies (= n_0  #x0003) (= |A_1_-1| |A_0_2|))",
 
-        "(implies (> n_2 1) (= |A_2_1| |A_2_-3|))",
-        "(implies (= n_1 1) (= |A_2_-3| |A_1_-2|))",
-        "(implies (= n_0 3) (= |A_1_-2| |A_0_1|))",
+        "(implies (bvuge n_2  #x0001) (= |A_2_1| |A_2_-3|))",
+        "(implies (= n_1  #x0001) (= |A_2_-3| |A_1_-2|))",
+        "(implies (= n_0  #x0003) (= |A_1_-2| |A_0_1|))",
 
-        "(implies (> n_2 0) (= |A_2_0| |A_2_-4|))",
-        "(implies (= n_1 1) (= |A_2_-4| |A_1_-3|))",
-        "(implies (= n_0 3) (= |A_1_-3| |A_0_0|))");
+        "(implies (bvuge n_2  #x0000) (= |A_2_0| |A_2_-4|))",
+        "(implies (= n_1  #x0001) (= |A_2_-4| |A_1_-3|))",
+        "(implies (= n_0  #x0003) (= |A_1_-3| |A_0_0|))");
 
     testWithStatements(constraints,
-        "(implies (> n_2 4) (= |A_2_4| |A_2_0|))",
+        "(implies (bvuge n_2  #x0004) (= |A_2_4| |A_2_0|))",
 
-        "(implies (> n_2 3) (= |A_2_3| |A_2_-1|))",
-        "(implies (= n_1 2) (= |A_2_-1| |A_1_1|))",
+        "(implies (bvuge n_2  #x0003) (= |A_2_3| |A_2_-1|))",
+        "(implies (= n_1  #x0002) (= |A_2_-1| |A_1_1|))",
 
-        "(implies (> n_2 2) (= |A_2_2| |A_2_-2|))",
-        "(implies (= n_1 2) (= |A_2_-2| |A_1_0|))",
+        "(implies (bvuge n_2  #x0002) (= |A_2_2| |A_2_-2|))",
+        "(implies (= n_1  #x0002) (= |A_2_-2| |A_1_0|))",
 
-        "(implies (> n_2 1) (= |A_2_1| |A_2_-3|))",
-        "(implies (= n_1 2) (= |A_2_-3| |A_1_-1|))",
-        "(implies (= n_0 3) (= |A_1_-1| |A_0_2|))",
+        "(implies (bvuge n_2  #x0001) (= |A_2_1| |A_2_-3|))",
+        "(implies (= n_1  #x0002) (= |A_2_-3| |A_1_-1|))",
+        "(implies (= n_0  #x0003) (= |A_1_-1| |A_0_2|))",
 
 
-        "(implies (> n_2 0) (= |A_2_0| |A_2_-4|))",
-        "(implies (= n_1 2) (= |A_2_-4| |A_1_-2|))",
-        "(implies (= n_0 3) (= |A_1_-2| |A_0_1|))"
+        "(implies (bvuge n_2  #x0000) (= |A_2_0| |A_2_-4|))",
+        "(implies (= n_1  #x0002) (= |A_2_-4| |A_1_-2|))",
+        "(implies (= n_0  #x0003) (= |A_1_-2| |A_0_1|))"
         );
 
     testWithStatements(constraints,
-        "(>= n_0 3)",
-        "(<= n_0 3)",
+        "(bvuge n_0  #x0003)",
+        "(bvule n_0  #x0003)",
 
-        "(>= n_1 1)",
-        "(<= n_1 5)",
+        "(bvuge n_1  #x0001)",
+        "(bvule n_1  #x0005)",
 
-        "(>= n_2 1)",
-        "(<= n_2 5)"
+        "(bvuge n_2  #x0001)",
+        "(bvule n_2  #x0005)"
     );
   }
 
