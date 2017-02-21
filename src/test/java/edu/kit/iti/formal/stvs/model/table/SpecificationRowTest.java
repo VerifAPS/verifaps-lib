@@ -6,12 +6,15 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Callback;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * @author Benjamin Alt
@@ -24,14 +27,15 @@ public class SpecificationRowTest {
   }
 
   private final StringProperty toBeChanged = new SimpleStringProperty("");
-  private final SpecificationRow<StringProperty> specRow =
-      new SpecificationRow<>(new HashMap<>(), identityExtractor());
+  private SpecificationRow<StringProperty> specRow;
+  private int listenerCalls;
 
-  public SpecificationRowTest() {
+  @Before
+  public void setUp() {
+    specRow = new SpecificationRow<>(new HashMap<>(), identityExtractor());
     specRow.getCells().put("abc", toBeChanged);
+    listenerCalls = 0;
   }
-
-  private int listenerCalls = 0;
 
   @Test
   public void testInvalidationListener() {
@@ -68,5 +72,38 @@ public class SpecificationRowTest {
 
     toBeAddedChangedRemoved.set("SHOULD NOT FIRE EVENT");
     assertEquals("listener calls after changing cell that was removed", 4, listenerCalls);
+  }
+
+  @Test
+  public void testUnobservableRow() {
+    Map<String, StringProperty> cells = new HashMap<>();
+    cells.put("abc", toBeChanged);
+    SpecificationRow unobservable = SpecificationRow.createUnobservableRow(cells);
+    unobservable.addListener(observable -> listenerCalls++);
+    assertEquals("listener calls before change", 0, listenerCalls);
+    toBeChanged.set("XYZ");
+    assertEquals("listener calls after change", 0, listenerCalls);
+    cells.put("def", new SimpleStringProperty("test"));
+    assertEquals("listener calls after add", 0, listenerCalls);
+  }
+
+  @Test
+  public void testEquals() {
+    SpecificationRow otherRow = new SpecificationRow<>(new HashMap<>(), identityExtractor());
+    otherRow.getCells().put("abc", toBeChanged);
+    assertEquals(otherRow, specRow);
+    assertEquals(specRow, specRow);
+    otherRow.getCells().put("abc", new SimpleStringProperty("something else"));
+    assertNotEquals(otherRow, specRow);
+    assertNotEquals(specRow, null);
+  }
+
+  @Test
+  public void testHashCode() {
+    SpecificationRow otherRow = new SpecificationRow<>(new HashMap<>(), identityExtractor());
+    otherRow.getCells().put("abc", toBeChanged);
+    assertEquals(otherRow.hashCode(), specRow.hashCode());
+    otherRow.getCells().put("abd", new SimpleStringProperty("something else"));
+    assertNotEquals(otherRow.hashCode(), specRow.hashCode());
   }
 }

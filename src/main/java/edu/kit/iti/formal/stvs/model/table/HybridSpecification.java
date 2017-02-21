@@ -66,7 +66,7 @@ public class HybridSpecification extends ConstraintSpecification {
     return Optional.ofNullable(counterExample.get());
   }
 
-    public void setCounterExample(ConcreteSpecification counterExample) {
+  public void setCounterExample(ConcreteSpecification counterExample) {
     if (counterExample != null) {
       if (!columnHeadersMatch(counterExample.columnHeaders)) {
         throw new IllegalArgumentException("The column headers of the concrete instance are not " +

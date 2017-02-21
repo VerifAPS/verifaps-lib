@@ -38,7 +38,7 @@ public class Z3SolverTest {
         Arrays.asList("red", "green", "blue")));
     List<CodeIoVariable> codeIoVariables = new LinkedList<>();
 
-    ConstraintSpecification constraintSpec = ImporterFacade.importSpec(getClass().getResourceAsStream(name), ImporterFacade
+    ConstraintSpecification constraintSpec = ImporterFacade.importConstraintSpec(getClass().getResourceAsStream(name), ImporterFacade
         .ImportFormat.XML);
     FreeVariableListValidator freeVariableListValidator = new FreeVariableListValidator(new
         SimpleObjectProperty<>(typeContext), constraintSpec
