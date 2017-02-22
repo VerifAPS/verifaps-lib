@@ -14,6 +14,7 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -37,19 +38,11 @@ import java.util.List;
  * Exporter for communication with the GeTeTa
  * @author Benjamin Alt
  */
-public class GeTeTaExporter implements Exporter<ConstraintSpecification> {
+public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
   private ObjectFactory objectFactory;
 
   public GeTeTaExporter() {
     objectFactory = new ObjectFactory();
-  }
-
-  public String exportToXmlString(ConstraintSpecification source) throws ExportException {
-    TestTable testTable = objectFactory.createTestTable();
-    testTable.setVariables(makeVariables(source));
-    testTable.setSteps(makeSteps(source));
-    JAXBElement<TestTable> element = objectFactory.createTestTable(testTable);
-    return marshalToString(element);
   }
 
   private Steps makeSteps(ConstraintSpecification source) {
@@ -104,31 +97,12 @@ public class GeTeTaExporter implements Exporter<ConstraintSpecification> {
     }
   }
 
-  protected static String marshalToString(JAXBElement element) throws ExportException {
-    try {
-      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      DocumentBuilder db = dbf.newDocumentBuilder();
-      Document document = db.newDocument();
-      JAXBContext context = JAXBContext.newInstance("edu.kit.iti.formal.exteta_1");
-      Marshaller marshaller = context.createMarshaller();
-      marshaller.setProperty("jaxb.formatted.output", Boolean.TRUE);
-      marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_ENCODING, "utf-8");
-      StringWriter stringWriter = new StringWriter();
-      PrintWriter printWriter = new PrintWriter(stringWriter);
-      DataWriter dataWriter = new DataWriter(printWriter, "UTF-8", new NoEscapeHandler());
-      marshaller.marshal(element, dataWriter);
-      return stringWriter.toString();
-    } catch (ParserConfigurationException | JAXBException e) {
-      throw new ExportException(e);
-    }
-  }
-
   @Override
-  public ByteArrayOutputStream export(ConstraintSpecification source) throws ExportException {
-    String res = exportToXmlString(source);
-    byte[] bytes = res.getBytes();
-    ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
-    baos.write(bytes, 0, bytes.length);
-    return baos;
+  public Node exportToXmlNode(ConstraintSpecification source) throws ExportException {
+    TestTable testTable = objectFactory.createTestTable();
+    testTable.setVariables(makeVariables(source));
+    testTable.setSteps(makeSteps(source));
+    JAXBElement<TestTable> element = objectFactory.createTestTable(testTable);
+    return marshalToNode(element, "edu.kit.iti.formal.exteta_1");
   }
 }

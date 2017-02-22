@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><session xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml">
+<code>
+<plaintext>PROGRAM constantprogram
+  VAR_INPUT
+    A : INT;
+    B : BOOL;
+  END_VAR
+
+  VAR_OUTPUT
+    C : INT;
+    D : BOOL;
+  END_VAR
+
+  C := 52;
+END_PROGRAM
+</plaintext>
+</code>
+<tabs>
+<tab id="0" open="false" readOnly="true">
+<specification comment="" isConcrete="false" name="Unnamed Specification">
+<variables>
+<ioVariable colwidth="151" data-type="INT" io="input" name="R"/>
+<ioVariable colwidth="100" data-type="BOOL" io="input" name="B"/>
+<ioVariable colwidth="100" data-type="INT" io="output" name="C"/>
+<ioVariable colwidth="50" data-type="enumD" io="output" name="D"/>
+<freeVariable data-type="INT" default="3" name="p"/>
+</variables>
+<rows>
+<row comment="">
+<duration comment="I am a duration comment!">[1,5]</duration>
+<cell comment="I am a cell comment!">5</cell>
+<cell>FALSE</cell>
+<cell>&gt; R+2</cell>
+<cell comment="I am another cell comment!">literalOne</cell>
+</row>
+<row comment="">
+<duration>[1,1]</duration>
+<cell>C[-1]</cell>
+<cell>!B[-1]</cell>
+<cell>R</cell>
+<cell>literalTwo</cell>
+</row>
+</rows>
+</specification>
+</tab>
+</tabs>
+</session>
