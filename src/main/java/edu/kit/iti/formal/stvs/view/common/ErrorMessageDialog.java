@@ -29,8 +29,6 @@ public class ErrorMessageDialog {
     alert.setHeaderText(description);
     alert.setContentText(contentText);
 
-
-
     TextArea textArea = new TextArea(expandableContent);
     textArea.setEditable(false);
     textArea.setWrapText(true);
