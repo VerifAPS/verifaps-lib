@@ -1,0 +1,66 @@
+<h1>Geteta</h1>
+
+<p>
+    Generalized Test Tables ensures safety in automation software.
+</p>
+
+<h2>Download</h2>
+
+<p>These are jar files include all dependencies:</p>
+
+<ul>
+
+    <li>0.4.0: [geteta-0.4.0-exe.jar](downloads/geteta-0.4.0-exe.jar)</li>
+    <ul>
+        <li>
+            Counter examples in the semantic of traces in the test table
+        </li>
+    </ul>
+    <li> 0.3.0: [geteta-0.3.0.jar](downloads/geteta-0.3.0.jar)
+        <ul>
+            <li>
+                enum support tested and fixed
+            </li>
+        </ul>
+    <li> 0.2.2-beta: [geteta-0.2.2-beta.jar](downloads/geteta-0.2.2-beta.jar)
+        <ul>
+            <li>better nuxmv output parser</li>
+        </ul>
+    </li>
+    <li> 0.2.1-beta: [geteta-0.2.1-beta.jar](downloads/geteta-0.2.1-beta.jar)
+        <ul>
+            <li> Internal changes</li>
+        </ul>
+    </li>
+    <li> 0.2.0: [geteta-0.2.0.jar](downloads/geteta-0.2.0.jar)</li>
+</ul>
+
+<h3>From Source</h3>
+
+<code><pre>
+$ git clone https://github.com/VerifAPS/geteta.git
+$ mvn package
+</pre>
+</code>
+
+<h2>Getting started</h2>
+
+Ensure, that you have installed <a href="http://nuxmv.fbk.eu">nuXmv</a>.
+You need to set the <code>NUXMV</code> environment variable to the nuXmv executable.
+
+<code><pre>
+export NUXMV=/home/weigl/work/nuXmv-1.1.1-Linux/bin/nuXmv
+</pre>
+</code>
+
+After this, you can call geteta with:
+
+<code><pre>
+java -jar geteta-${project.version}.jar -c program.st -t testtable.xml [-x]
+</pre>
+</code>
+
+With <code>-x</code> , geteta writes the output in an XML format.
+
+<a href="intro.html">More information about test table format</a>
+

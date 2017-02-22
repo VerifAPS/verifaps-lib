@@ -117,7 +117,7 @@
     <complexType name="constraintVariable">
         <complexContent>
             <extension base="tns:variable">
-                <attribute name="constraint" type="string"/>
+                <attribute name="constraint" type="string" default="-"/>
             </extension>
         </complexContent>
     </complexType>

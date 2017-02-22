@@ -23,7 +23,6 @@ package edu.kit.iti.formal.automation.testtables.io;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.testtables.ExTeTa;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.Region;
 import edu.kit.iti.formal.automation.testtables.model.State;
@@ -146,8 +145,7 @@ public class TableReader {
 
             if (o instanceof ConstraintVariable) {
                 ConstraintVariable v = (ConstraintVariable) o;
-                if (ExTeTa.DEBUG)
-                    System.out.format("\t %s : %s", v.getName(), v.getDataType());
+                Report.debug("\t %s : %s", v.getName(), v.getDataType());
                 gtt.add(v);
             }
         }

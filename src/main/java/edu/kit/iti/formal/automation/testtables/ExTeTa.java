@@ -114,7 +114,7 @@ public class ExTeTa {
         modules.addAll(tt.getHelperModules());
         boolean b = Facade.runNuXMV(tableFilename, modules);
 
-        if (!b) {
+        if (Report.getMessage().getCounterexample() != null) {
             CounterExampleAnalyzer cea = new CounterExampleAnalyzer(table,
                     Report.getMessage());
             cea.run();

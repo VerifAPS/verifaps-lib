@@ -54,6 +54,7 @@ public final class IOFacade {
 
     public static SMVExpr parseCellExpression(String cell, SVariable column, GeneralizedTestTable vars) {
         try {
+            assert cell != null;
             CellExpressionParser.CellContext p = createParser(cell).cell();
             ExprVisitor ev = new ExprVisitor(column, vars);
             SMVExpr expr = p.accept(ev);

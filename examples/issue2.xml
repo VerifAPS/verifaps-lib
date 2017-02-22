@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<test-table xmlns="http://formal.iti.kit.edu/exteta-1.0">
+    <variables>
+        <variable io="input" name="var_A" data-type="INT"/>
+        <variable io="input" name="var_B" data-type="BOOLEAN"/>
+        <variable io="output" name="var_C" data-type="INT"/>
+        <variable io="output" name="var_D" data-type="ENUM"/>
+        <constraint constraint="var_literalOne" name="var_someFreeVar" data-type="ENUM"/>
+    </variables>
+    <steps>
+        <step duration="1">
+            <cell>-</cell>
+            <cell>=FALSE</cell>
+            <cell>-</cell>
+            <cell>var_someFreeVar</cell>
+        </step>
+    </steps>
+</test-table>
