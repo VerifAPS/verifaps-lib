@@ -16,7 +16,13 @@ import java.util.regex.Pattern;
  */
 public class VariableEscaper {
 
+  private static final Pattern NUMBER_PATTERN = Pattern.compile("-?[0-9]+");
+  private static final Pattern BOOL_PATTERN = Pattern.compile("(TRUE)|(FALSE)");
+
   public static String escapeName(String name) {
+    if (NUMBER_PATTERN.matcher(name).matches() || BOOL_PATTERN.matcher(name).matches()) {
+      return name;
+    }
     return "var_" + name;
   }
 
