@@ -1,26 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><session xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml">
-<code>
-<plaintext>TYPE
-  enumD : (literalOne, literalTwo);
-END_TYPE
-
-PROGRAM constantprogram
-  VAR_INPUT
-    A : INT;
-    B : BOOL;
-  END_VAR
-
-  VAR_OUTPUT
-    C : INT;
-    D : enumD;
-  END_VAR
-
-  C := 52;
-END_PROGRAM</plaintext>
-</code>
-<tabs>
-<tab id="0" open="false" readOnly="false">
-<specification comment="" isConcrete="false" name="Unnamed Specification">
+<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="" isConcrete="false" name="Unnamed Specification">
 <variables>
 <ioVariable colwidth="100" data-type="INT" io="input" name="A"/>
 <ioVariable colwidth="100" data-type="BOOL" io="input" name="B"/>
@@ -53,6 +31,3 @@ END_PROGRAM</plaintext>
 </row>
 </rows>
 </specification>
-</tab>
-</tabs>
-</session>
