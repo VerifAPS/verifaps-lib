@@ -6,6 +6,8 @@ import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
+import edu.kit.iti.formal.stvs.model.common.FreeVariable;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
@@ -20,6 +22,8 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.*;
 
@@ -105,7 +109,8 @@ public class StvsMenuBarController implements Controller {
   }
 
   private void createNewSpec(ActionEvent actionEvent) {
-    //TODO
+    this.rootModel.get().getHybridSpecifications().add(new HybridSpecification(
+        new FreeVariableList(), true));
   }
 
   private void createNewCode(ActionEvent actionEvent) {
