@@ -88,7 +88,7 @@ public class GeTeTaExporter implements Exporter<ConstraintSpecification> {
       ConstraintVariable exportedVariable = objectFactory.createConstraintVariable();
       exportedVariable.setName(VariableEscaper.escapeName(freeVariable.getName()));
       exportedVariable.setDataType(getDataType(freeVariable));
-      exportedVariable.setConstraint(freeVariable.getDefaultValue());
+      exportedVariable.setConstraint(VariableEscaper.escapeName(freeVariable.getDefaultValue()));
       variables.getVariableOrConstraint().add(exportedVariable);
     }
     return variables;
