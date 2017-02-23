@@ -21,6 +21,7 @@ public class FreeVariableListValidator {
   private final ObjectProperty<List<ValidFreeVariable>> validVars;
   private final BooleanProperty valid;
 
+
   public FreeVariableListValidator(ObjectProperty<List<Type>> typeContext, FreeVariableList freeVariables) {
     this.typeContext = typeContext;
     this.freeVariables = freeVariables;

@@ -32,7 +32,6 @@ import java.util.concurrent.Executors;
 
 /**
  * Created by csicar on 09.01.17.
- * <p>
  * Some parts are inspired by examples of the used library:
  * https://github.com/TomasMikula/RichTextFX/blob/a098da6309a0f624052fd1d4d6f5079dd6265fbe/richtextfx-demos/src/main/java/org/fxmisc/richtext/demo/JavaKeywords.java
  * @author Lukas Fritsch
@@ -43,6 +42,11 @@ public class EditorPaneController implements Controller {
   private GlobalConfig globalConfig;
   private ExecutorService executor;
 
+  /**
+   * creates the controller for the editorpane
+   * @param code the codefile which is to show
+   * @param globalConfig the global configuration (for font size or style)
+   */
   public EditorPaneController(Code code, GlobalConfig globalConfig) {
     this.code = code;
     this.view = new EditorPane(code.getSourcecode(), code.syntaxErrorsProperty());
@@ -59,15 +63,15 @@ public class EditorPaneController implements Controller {
   }
 
   private void updateFontFamily(String fontFamily) {
-    view.getCodeArea().setStyle("-fx-font-family: " +
-        fontFamily + ";" + "-fx-font-size: " +
-        globalConfig.editorFontSizeProperty().get() + "pt;");
+    view.getCodeArea().setStyle("-fx-font-family: "
+        + fontFamily + ";" + "-fx-font-size: "
+        + globalConfig.editorFontSizeProperty().get() + "pt;");
   }
 
   private void updateFontSize(int size) {
-    view.getCodeArea().setStyle("-fx-font-family: " +
-        globalConfig.editorFontFamilyProperty().get() +
-        ";" + "-fx-font-size: " + size + "pt;");
+    view.getCodeArea().setStyle("-fx-font-family: "
+        + globalConfig.editorFontFamilyProperty().get()
+        + ";" + "-fx-font-size: " + size + "pt;");
   }
 
   private MenuItem createMenuItem(String name, Runnable action, FontAwesomeIcon icon) {
@@ -109,7 +113,7 @@ public class EditorPaneController implements Controller {
         .supplyTask(this::computeHighlightingAsync)
         .awaitLatest(codeArea.richChanges())
         .filterMap(t -> {
-          if(t.isSuccess()) {
+          if (t.isSuccess()) {
             return Optional.of(t.get());
           } else {
             t.getFailure().printStackTrace();

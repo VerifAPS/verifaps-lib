@@ -6,16 +6,14 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import javafx.beans.property.SimpleStringProperty;
 import org.antlr.v4.runtime.Token;
 import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static edu.kit.iti.formal.stvs.model.TestUtils.assertCollectionsEqual;
 import static org.junit.Assert.*;
@@ -25,9 +23,13 @@ import static org.junit.Assert.*;
  */
 public class CodeTest {
 
+
   private final Code code = new Code();
   private final Code enumDefinition = loadCodeFromFile("define_type.st");
   private final Code invalidCode = loadCodeFromFile("invalidCode.st");
+  private final Code simpleCode = new Code("simpleCode.st", "simple sourcecode");
+  private final Code simpleCorrectCode = loadCodeFromFile("simpleCorrectCode.st");
+
 
   public static Code loadCodeFromFile(String filename) {
     try {
@@ -113,4 +115,5 @@ public class CodeTest {
   public void testInvalidCode() {
     assertNotNull(invalidCode.getSyntaxErrors().size());
   }
+
 }

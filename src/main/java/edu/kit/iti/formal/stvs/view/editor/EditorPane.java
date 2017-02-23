@@ -82,6 +82,10 @@ public class EditorPane extends SplitPane {
     return codeArea;
   }
 
+  /**
+   * shows / hides linenumbers (as in the global config specified)
+   * @param showLineNumbers line numbers to show or not
+   */
   public void setShowLineNumbers(Boolean showLineNumbers) {
     if (showLineNumbers) {
       codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));

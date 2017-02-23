@@ -13,6 +13,7 @@ import java.util.List;
 
 /**
  * Created by Lukas on 30.01.2017.
+ *
  * @author Lukas Fritsch
  */
 public class SyntaxErrorListener implements ANTLRErrorListener {
@@ -23,7 +24,7 @@ public class SyntaxErrorListener implements ANTLRErrorListener {
     // TODO: RecognitionException is null when there are "expected ';'" errors, for example
     // (these errors dont have a token (which makes sense), so we have to come up with a nice
     // way to visualize them in the EditorPane)
-   // syntaxErrors.add(new SyntaxError(e.getOffendingToken()));
+    // syntaxErrors.add(new SyntaxError(e.getOffendingToken()));
     syntaxErrors.add(new SyntaxError(line, charPositionInLine, msg));
   }
 
@@ -44,6 +45,5 @@ public class SyntaxErrorListener implements ANTLRErrorListener {
 
   @Override
   public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs) {
-
   }
 }

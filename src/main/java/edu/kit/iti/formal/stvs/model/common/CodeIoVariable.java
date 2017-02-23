@@ -41,14 +41,21 @@ public class CodeIoVariable extends IoVariable {
   }
 
   public boolean equals(CodeIoVariable other) {
+    if (other == null) {
+      return false;
+    }
     return type.equals(other.type) && name.equals(other.name) && category.equals(other.category);
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (o == null) return false;
-    if (!(o instanceof CodeIoVariable)) return false;
-    CodeIoVariable other = (CodeIoVariable) o;
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof CodeIoVariable)) {
+      return false;
+    }
+    CodeIoVariable other = (CodeIoVariable) obj;
     return equals(other);
   }
 

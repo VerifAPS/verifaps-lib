@@ -10,18 +10,18 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Token;
 
 /**
  * Created by philipp on 09.01.17.
+ *
  * @author Lukas Fritsch
  */
 public class ParsedCode {
@@ -110,7 +110,7 @@ public class ParsedCode {
       return null;
     }
 
-    public List<FoldableCodeBlock> getFoldableCodeBlocks() {
+    List<FoldableCodeBlock> getFoldableCodeBlocks() {
       return this.foldableCodeBlocks;
     }
   }
@@ -125,6 +125,13 @@ public class ParsedCode {
     this.definedTypes = definedTypes;
   }
 
+  /**
+   *
+   * @param input the code to parse
+   * @param tokenListener
+   * @param syntaxErrorsListener
+   * @param parsedCodeListener
+   */
   public static void parseCode(String input,
                                Consumer<List<? extends Token>> tokenListener,
                                Consumer<List<SyntaxError>> syntaxErrorsListener,
@@ -183,5 +190,6 @@ public class ParsedCode {
   public List<Type> getDefinedTypes() {
     return definedTypes;
   }
+
 
 }

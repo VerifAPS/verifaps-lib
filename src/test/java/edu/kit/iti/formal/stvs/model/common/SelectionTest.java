@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
  */
 public class SelectionTest {
   @Test
-  public void testClearColumnListenerSelection(){
+  public void testClearColumnListenerSelection() {
     BooleanProperty wasCalled = new SimpleBooleanProperty(false);
     Selection selection = new Selection("fgrfg", 4);
     InvalidationListener listener = i -> wasCalled.set(true);
@@ -29,7 +29,7 @@ public class SelectionTest {
   }
 
   @Test
-  public void testSetRow(){
+  public void testSetRow() {
     Selection selection = new Selection();
     assertTrue(selection.rowProperty().isNull().get());
     selection.setRow(5);
