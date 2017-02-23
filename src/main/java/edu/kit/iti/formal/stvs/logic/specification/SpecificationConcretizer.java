@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.logic.specification.smtlib.OptionalConcreteSpecif
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
+import edu.kit.iti.formal.stvs.util.ThrowableHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ public interface SpecificationConcretizer {
   void calculateConcreteSpecification(ValidSpecification validSpecification,
                                       List<ValidFreeVariable> freeVariables,
                                       OptionalConcreteSpecificationHandler handler,
-                                      Consumer<Throwable> exceptionHandler);
+                                      ThrowableHandler exceptionHandler);
   void terminate();
 }
 

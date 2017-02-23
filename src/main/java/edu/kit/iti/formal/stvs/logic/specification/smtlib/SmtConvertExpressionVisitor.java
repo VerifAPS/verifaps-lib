@@ -5,7 +5,9 @@ import edu.kit.iti.formal.stvs.model.expressions.BinaryFunctionExpr;
 import edu.kit.iti.formal.stvs.model.expressions.ExpressionVisitor;
 import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.UnaryFunctionExpr;
+import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
 import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
 
 import java.util.HashMap;
@@ -84,11 +86,21 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
         () -> null,
         () -> null,
         enumeration -> {
-          this.sConstraint.addGlobalConstrains(new SList("bvsge", name, BitvectorUtils.hexFromInt(0, 4)));
-          this.sConstraint.addGlobalConstrains(new SList("bvslt", name, BitvectorUtils.hexFromInt(enumeration.getValues().size(), 4)));
+          addEnumBitvectorConstraints(name, enumeration);
           return null;
         }
     );
+  }
+
+  /**
+   * Adds constraints to enum variables to limit the range of their representing bitvector
+   *
+   * @param name Name of solver variable
+   * @param enumeration Type of enumeration
+   */
+  private void addEnumBitvectorConstraints(String name, TypeEnum enumeration) {
+    this.sConstraint.addGlobalConstrains(new SList("bvsge", name, BitvectorUtils.hexFromInt(0, 4)));
+    this.sConstraint.addGlobalConstrains(new SList("bvslt", name, BitvectorUtils.hexFromInt(enumeration.getValues().size(), 4)));
   }
 
 
@@ -133,9 +145,13 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     String literalAsString = literalExpr.getValue().match(
         integer -> BitvectorUtils.hexFromInt(integer, 4),
         bool -> bool ? "true" : "false",
-        enumeration -> BitvectorUtils.hexFromInt(enumeration.getType().getValues().indexOf(enumeration), 4)
+        this::getEnumValueAsBitvector
     );
     return new SAtom(literalAsString);
+  }
+
+  private String getEnumValueAsBitvector(ValueEnum enumeration) {
+    return BitvectorUtils.hexFromInt(enumeration.getType().getValues().indexOf(enumeration), 4);
   }
 
   /*private String integerLiteralAsBitVector(int integer, int length){

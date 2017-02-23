@@ -35,6 +35,105 @@ public class Z3Solver {
     this.timeout = config.getSimulationTimeout();
   }
 
+  private static ConcreteSpecification buildConcreteSpecFromSExp(Sexp sExpr, List<ValidIoVariable> validIoVariables){
+    Map<String, Type> typeContext = validIoVariables.stream().collect(Collectors.toMap(
+        ValidIoVariable::getName, ValidIoVariable::getValidType
+    ));
+    Map<Integer, Integer> rawDurations = extractRawDurations(sExpr);
+    //convert raw durations into duration list
+    List<ConcreteDuration> durations = buildConcreteDurations(rawDurations);
+    Map<Integer, Map<String, String>> rawRows = extractRawRows(sExpr, durations);
+    //convert raw rows into specificationRows
+    List<SpecificationRow<ConcreteCell>> specificationRows =
+        buildSpecificationRows(validIoVariables, durations, rawRows);
+    return new ConcreteSpecification(validIoVariables, specificationRows, durations, false);
+  }
+
+  private static List<SpecificationRow<ConcreteCell>> buildSpecificationRows(List<ValidIoVariable> validIoVariables,
+                                                                      List<ConcreteDuration> durations,
+                                                                      Map<Integer, Map<String, String>> rawRows) {
+    List<SpecificationRow<ConcreteCell>> specificationRows = new ArrayList<>();
+    durations.forEach(duration -> buildSpecificationRow(validIoVariables, rawRows, specificationRows, duration));
+    return specificationRows;
+  }
+
+  private static void buildSpecificationRow(List<ValidIoVariable> validIoVariables, Map<Integer, Map<String, String>> rawRows, List<SpecificationRow<ConcreteCell>> specificationRows, ConcreteDuration duration) {
+    for (int cycle = 0; cycle < duration.getDuration(); cycle++) {
+      Map<String, String> rawRow = rawRows.get(duration.getBeginCycle() + cycle);
+      Map<String, ConcreteCell> newRow = new HashMap<>();
+      validIoVariables.forEach(validIoVariable -> {
+        if (rawRow == null) {
+          newRow.put(validIoVariable.getName(),
+              new ConcreteCell(validIoVariable.getValidType().generateDefaultValue()));
+          return;
+        }
+        String solvedValue = rawRow.get(validIoVariable.getName());
+        if (solvedValue == null) {
+          newRow.put(validIoVariable.getName(),
+              new ConcreteCell(validIoVariable.getValidType().generateDefaultValue()));
+          return;
+        }
+        Value value = validIoVariable.getValidType().match(
+            () -> new ValueInt(BitvectorUtils.intFromHex(solvedValue, true)),
+            () -> solvedValue.equals("true") ? ValueBool.TRUE : ValueBool.FALSE,
+            typeEnum -> typeEnum.getValues().get(BitvectorUtils.intFromHex(solvedValue, false))
+        );
+        newRow.put(validIoVariable.getName(), new ConcreteCell(value));
+      });
+      specificationRows.add(SpecificationRow.createUnobservableRow(newRow));
+    }
+  }
+
+  private static List<ConcreteDuration> buildConcreteDurations(Map<Integer, Integer> rawDurations) {
+    List<ConcreteDuration> durations = new ArrayList<>();
+    int aggregator = 0;
+    for (int i = 0; i < rawDurations.size(); i++) {
+      Integer duration = rawDurations.get(i);
+      durations.add(i, new ConcreteDuration(aggregator, duration));
+      aggregator += duration;
+    }
+    return durations;
+  }
+
+  private static Map<Integer, Map<String, String>> extractRawRows(Sexp sExpr, List<ConcreteDuration> durations) {
+    Map<Integer, Map<String, String>> rawRows = new HashMap<>();
+    sExpr.forEach(varAsign -> addRowToMap(durations, rawRows, varAsign));
+    return rawRows;
+  }
+
+  private static void addRowToMap(List<ConcreteDuration> durations, Map<Integer, Map<String, String>> rawRows, Sexp varAsign) {
+    if (varAsign.getLength() == 0 || !varAsign.get(0).toIndentedString().equals("define-fun")) return;
+    String[] varSplit = varAsign.get(1).toIndentedString().split("_");
+    if (varAsign.get(1).toIndentedString().matches(".*?_\\d+_\\d+")) {
+      //is variable
+      int cycleCount = Integer.valueOf(varSplit[2]);
+      //ignore variables if iteration > n_z
+      int nz = Integer.valueOf(varSplit[1]);
+      ConcreteDuration concreteDuration = durations.get(nz);
+      if (cycleCount >= concreteDuration.getDuration()) {
+        return;
+      }
+      int absoluteIndex = concreteDuration.getBeginCycle() + cycleCount;
+      rawRows.putIfAbsent(absoluteIndex, new HashMap<>());
+      rawRows.get(absoluteIndex).put(varSplit[0], varAsign.get(4).toIndentedString());
+    }
+  }
+
+  private static Map<Integer, Integer> extractRawDurations(Sexp sExpr) {
+    Map<Integer, Integer> rawDurations = new HashMap<>();
+    sExpr.forEach(varAsign -> addDurationToMap(rawDurations, varAsign));
+    return rawDurations;
+  }
+
+  private static void addDurationToMap(Map<Integer, Integer> rawDurations, Sexp varAsign) {
+    if (varAsign.getLength() == 0 || !varAsign.get(0).toIndentedString().equals("define-fun")) return;
+    String[] varSplit = varAsign.get(1).toIndentedString().split("_");
+    if (varAsign.get(1).toIndentedString().matches("n_\\d+")) {
+      //is duration
+      rawDurations.put(Integer.valueOf(varSplit[1]), BitvectorUtils.intFromHex(varAsign.get(4).toIndentedString(), false));
+    }
+  }
+
   public String getZ3Path() {
     return z3Path;
   }
@@ -82,98 +181,5 @@ public class Z3Solver {
       return Optional.of(buildConcreteSpecFromSExp(sexpOptional.get().toSexpr(), validIoVariables));
     }
     return Optional.empty();
-  }
-
-  private static ConcreteSpecification buildConcreteSpecFromSExp(Sexp sExpr, List<ValidIoVariable> validIoVariables){
-    Map<String, Type> typeContext = validIoVariables.stream().collect(Collectors.toMap(
-        ValidIoVariable::getName, ValidIoVariable::getValidType
-    ));
-    Map<Integer, Integer> rawDurations = extractRawDurations(sExpr);
-    //convert raw durations into duration list
-    List<ConcreteDuration> durations = buildConcreteDurations(rawDurations);
-    Map<Integer, Map<String, String>> rawRows = extractRawRows(sExpr, durations);
-    //convert raw rows into specificationRows
-    List<SpecificationRow<ConcreteCell>> specificationRows =
-        buildSpecificationRows(validIoVariables, durations, rawRows);
-    return new ConcreteSpecification(validIoVariables, specificationRows, durations, false);
-  }
-
-  private static List<SpecificationRow<ConcreteCell>> buildSpecificationRows(List<ValidIoVariable> validIoVariables,
-                                                                      List<ConcreteDuration> durations,
-                                                                      Map<Integer, Map<String, String>> rawRows) {
-    List<SpecificationRow<ConcreteCell>> specificationRows = new ArrayList<>();
-    durations.forEach(duration -> {
-      for (int cycle = 0; cycle < duration.getDuration(); cycle++) {
-        Map<String, String> rawRow = rawRows.get(duration.getBeginCycle() + cycle);
-        Map<String, ConcreteCell> newRow = new HashMap<>();
-        validIoVariables.forEach(validIoVariable -> {
-          if (rawRow == null) {
-            newRow.put(validIoVariable.getName(),
-                new ConcreteCell(validIoVariable.getValidType().generateDefaultValue()));
-            return;
-          }
-          String solvedValue = rawRow.get(validIoVariable.getName());
-          if (solvedValue == null) {
-            newRow.put(validIoVariable.getName(),
-                new ConcreteCell(validIoVariable.getValidType().generateDefaultValue()));
-            return;
-          }
-          Value value = validIoVariable.getValidType().match(
-              () -> new ValueInt(BitvectorUtils.intFromHex(solvedValue, true)),
-              () -> solvedValue.equals("true") ? ValueBool.TRUE : ValueBool.FALSE,
-              typeEnum -> typeEnum.getValues().get(BitvectorUtils.intFromHex(solvedValue, false))
-          );
-          newRow.put(validIoVariable.getName(), new ConcreteCell(value));
-        });
-        specificationRows.add(SpecificationRow.createUnobservableRow(newRow));
-      }
-    });
-    return specificationRows;
-  }
-
-  private static List<ConcreteDuration> buildConcreteDurations(Map<Integer, Integer> rawDurations) {
-    List<ConcreteDuration> durations = new ArrayList<>();
-    int aggregator = 0;
-    for (int i = 0; i < rawDurations.size(); i++) {
-      Integer duration = rawDurations.get(i);
-      durations.add(i, new ConcreteDuration(aggregator, duration));
-      aggregator += duration;
-    }
-    return durations;
-  }
-
-  private static Map<Integer, Map<String, String>> extractRawRows(Sexp sExpr, List<ConcreteDuration> durations) {
-    Map<Integer, Map<String, String>> rawRows = new HashMap<>();
-    sExpr.forEach(varAsign -> {
-      if (varAsign.getLength() == 0 || !varAsign.get(0).toIndentedString().equals("define-fun")) return;
-      String[] varSplit = varAsign.get(1).toIndentedString().split("_");
-      if (varAsign.get(1).toIndentedString().matches(".*?_\\d+_\\d+")) {
-        //is variable
-        int cycleCount = Integer.valueOf(varSplit[2]);
-        //ignore variables if iteration > n_z
-        int nz = Integer.valueOf(varSplit[1]);
-        ConcreteDuration concreteDuration = durations.get(nz);
-        if (cycleCount >= concreteDuration.getDuration()) {
-          return;
-        }
-        int absoluteIndex = concreteDuration.getBeginCycle() + cycleCount;
-        rawRows.putIfAbsent(absoluteIndex, new HashMap<>());
-        rawRows.get(absoluteIndex).put(varSplit[0], varAsign.get(4).toIndentedString());
-      }
-    });
-    return rawRows;
-  }
-
-  private static Map<Integer, Integer> extractRawDurations(Sexp sExpr) {
-    Map<Integer, Integer> rawDurations = new HashMap<>();
-    sExpr.forEach(varAsign -> {
-      if (varAsign.getLength() == 0 || !varAsign.get(0).toIndentedString().equals("define-fun")) return;
-      String[] varSplit = varAsign.get(1).toIndentedString().split("_");
-      if (varAsign.get(1).toIndentedString().matches("n_\\d+")) {
-        //is duration
-        rawDurations.put(Integer.valueOf(varSplit[1]), BitvectorUtils.intFromHex(varAsign.get(4).toIndentedString(), false));
-      }
-    });
-    return rawDurations;
   }
 }
