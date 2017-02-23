@@ -25,6 +25,7 @@ import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 
 import java.util.List;
 
@@ -83,6 +84,11 @@ public class SpecificationController implements Controller {
     view.setVariableCollection(variableCollectionController.getView());
     view.getVariableCollection().getFreeVariableTableView().setEditable(this.hybridSpecification
         .isEditable());
+    List<MenuItem> freeVarMenuItems = view.getVariableCollection().getFreeVariableTableView()
+        .getContextMenu().getItems();
+    for (MenuItem menuItem : freeVarMenuItems) {
+      menuItem.setDisable(!this.hybridSpecification.isEditable());
+    }
     view.setTable(tableController.getView());
     view.getStartButton().setOnAction(this::onVerificationButtonClicked);
     view.getStartButton().disableProperty().bind(specificationInvalid);

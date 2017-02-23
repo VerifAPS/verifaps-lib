@@ -26,11 +26,9 @@ public class VariableCollection extends VBox {
   private final TableColumn<FreeVariable, String> nameTableColumn;
   private final TableColumn<FreeVariable, String> typeTableColumn;
   private final TableColumn<FreeVariable, String> defaultValueTableColumn;
-  private final Button addFreeVariable;
 
   public VariableCollection() {
     this.overviewLabel = new Label("Free Variables:");
-    this.addFreeVariable = new Button("+");
     this.freeVariableTableView = new TableView<>();
     this.nameTableColumn = new TableColumn<>("Name");
     this.typeTableColumn = new TableColumn<>("Type");
@@ -53,14 +51,9 @@ public class VariableCollection extends VBox {
         nameTableColumn, typeTableColumn, defaultValueTableColumn);
 
     this.overviewLabel.getStyleClass().addAll("freevar", "overview-label");
-    this.addFreeVariable.getStyleClass().addAll("freevar", "add-var-button");
     this.freeVariableTableView.getStyleClass().addAll("freevar", "variable-table-view");
 
-    this.getChildren().addAll(overviewLabel, freeVariableTableView, addFreeVariable);
-  }
-
-  public Button getAddFreeVariable() {
-    return addFreeVariable;
+    this.getChildren().addAll(overviewLabel, freeVariableTableView);
   }
 
   public TableView<FreeVariable> getFreeVariableTableView() {
