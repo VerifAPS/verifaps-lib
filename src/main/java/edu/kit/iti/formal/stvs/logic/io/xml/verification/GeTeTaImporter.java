@@ -161,7 +161,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       if (cycleNum > -1) {
         SpecificationRow<ConcreteCell> row = SpecificationRow.createUnobservableRow(new
             HashMap<>());
-        for (String varName : currentValues.keySet()) {
+        for (String varName : varNames) {
           row.getCells().put(varName, new ConcreteCell(currentValues.get(varName)));
         }
         concreteRows.add(row);
