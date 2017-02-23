@@ -162,7 +162,9 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
         SpecificationRow<ConcreteCell> row = SpecificationRow.createUnobservableRow(new
             HashMap<>());
         for (String varName : varNames) {
-          row.getCells().put(varName, new ConcreteCell(currentValues.get(varName)));
+          if (currentValues.containsKey(varName)) {
+            row.getCells().put(varName, new ConcreteCell(currentValues.get(varName)));
+          }
         }
         concreteRows.add(row);
       }
@@ -197,8 +199,10 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
 
     ConcreteSpecification concreteSpec = new ConcreteSpecification(true);
     for (String varName : varNames) {
-      concreteSpec.getColumnHeaders().add(new ValidIoVariable(varCategories.get(varName), varName,
-          varTypes.get(varName)));
+      if (currentValues.containsKey(varName)) {
+        concreteSpec.getColumnHeaders().add(new ValidIoVariable(varCategories.get(varName), varName,
+            varTypes.get(varName)));
+      }
     }
     concreteSpec.getRows().addAll(concreteRows);
     concreteSpec.getDurations().addAll(concreteDurations);

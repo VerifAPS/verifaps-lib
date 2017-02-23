@@ -1,54 +1,56 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:message xmlns:ns2="http://formal.iti.kit.edu/exteta-1.0/report/" returncode="not-verified">
   <log>
-    <entry time="75" level="debug">read xml file /tmp/verification-spec8119937290772500666.xml</entry>
-    <entry time="215" level="debug">xml file successfully read</entry>
-    <entry time="215" level="info">No options in table file.</entry>
-    <entry time="215" level="info">No functions given in table file.</entry>
-    <entry time="215" level="debug">4 variables found</entry>
-    <entry time="215" level="debug">	 var_pedBtnPress : BOOLEAN</entry>
-    <entry time="215" level="debug">	 var_carLight : BOOLEAN</entry>
-    <entry time="215" level="debug">	 var_pedLight : BOOLEAN</entry>
-    <entry time="215" level="debug">	 var_counter : INT</entry>
-    <entry time="293" level="debug">parsed: FALSE to (FALSE=var_pedBtnPress)</entry>
-    <entry time="294" level="debug">parsed: TRUE to (TRUE=var_carLight)</entry>
-    <entry time="295" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
-    <entry time="296" level="debug">parsed: 0 to (0sd16_0=var_counter)</entry>
-    <entry time="297" level="debug">parsed: TRUE to (TRUE=var_pedBtnPress)</entry>
-    <entry time="298" level="debug">parsed: FALSE to (FALSE=var_carLight)</entry>
-    <entry time="298" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
-    <entry time="303" level="debug">parsed: = var_counter[-1]+1 to (var_counter=(var_counter__history._$1+0sd16_1))</entry>
-    <entry time="304" level="debug">parsed: - to TRUE</entry>
-    <entry time="305" level="debug">parsed: FALSE to (FALSE=var_carLight)</entry>
-    <entry time="305" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
-    <entry time="305" level="debug">parsed: = var_counter[-1]+1 to (var_counter=(var_counter__history._$1+0sd16_1))</entry>
-    <entry time="306" level="debug">parsed: - to TRUE</entry>
-    <entry time="306" level="debug">parsed: FALSE to (FALSE=var_carLight)</entry>
-    <entry time="307" level="debug">parsed: TRUE to (TRUE=var_pedLight)</entry>
-    <entry time="307" level="debug">parsed: = var_counter[-1]+1 to (var_counter=(var_counter__history._$1+0sd16_1))</entry>
-    <entry time="307" level="debug">parsed: - to TRUE</entry>
-    <entry time="308" level="debug">parsed: FALSE to (FALSE=var_carLight)</entry>
-    <entry time="308" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
-    <entry time="309" level="debug">parsed: = var_counter[-1]+1 to (var_counter=(var_counter__history._$1+0sd16_1))</entry>
-    <entry time="309" level="debug">parsed: - to TRUE</entry>
-    <entry time="310" level="debug">parsed: TRUE to (TRUE=var_carLight)</entry>
-    <entry time="310" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
-    <entry time="311" level="debug">parsed: 0 to (0sd16_0=var_counter)</entry>
-    <entry time="460" level="debug">Row 1 can reach: {2}</entry>
-    <entry time="460" level="debug">Row 2 can reach: {3}</entry>
-    <entry time="460" level="debug">Row 3 can reach: {4}</entry>
-    <entry time="460" level="debug">Row 4 can reach: {5}</entry>
-    <entry time="461" level="debug">Row 5 can reach: {6}</entry>
-    <entry time="461" level="debug">Row 6 can reach: {}</entry>
-    <entry time="505" level="info">Start '[/opt/nuXmv-1.1.1-Linux/bin/nuXmv, -int, /tmp/verification-spec8119937290772500666/modules.smv]'</entry>
-    <entry time="505" level="info">wd: /tmp/verification-spec8119937290772500666</entry>
-    <entry time="505" level="info">Result in /tmp/verification-spec8119937290772500666/log_45.txt</entry>
-    <entry time="750" level="debug">Row 1 can reach: {2}</entry>
-    <entry time="750" level="debug">Row 2 can reach: {3}</entry>
-    <entry time="750" level="debug">Row 3 can reach: {4}</entry>
-    <entry time="750" level="debug">Row 4 can reach: {5}</entry>
-    <entry time="750" level="debug">Row 5 can reach: {6}</entry>
-    <entry time="750" level="debug">Row 6 can reach: {}</entry>
+    <entry time="67" level="debug">read xml file /tmp/verification-spec3414723945132987623.xml</entry>
+    <entry time="246" level="debug">xml file successfully read</entry>
+    <entry time="246" level="info">No options in table file.</entry>
+    <entry time="246" level="info">No functions given in table file.</entry>
+    <entry time="246" level="debug">5 variables found</entry>
+    <entry time="247" level="debug">	 var_pedBtnPress : BOOLEAN</entry>
+    <entry time="247" level="debug">	 var_carLight : BOOLEAN</entry>
+    <entry time="247" level="debug">	 var_pedLight : BOOLEAN</entry>
+    <entry time="247" level="debug">	 var_counter : INT</entry>
+    <entry time="247" level="debug">	 var_bogus : BOOLEAN</entry>
+    <entry time="323" level="debug">parsed: FALSE to (FALSE=var_pedBtnPress)</entry>
+    <entry time="324" level="debug">parsed: TRUE to (TRUE=var_carLight)</entry>
+    <entry time="324" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
+    <entry time="326" level="debug">parsed: 0 to (0sd16_0=var_counter)</entry>
+    <entry time="327" level="debug">parsed: TRUE to (TRUE=var_pedBtnPress)</entry>
+    <entry time="327" level="debug">parsed: FALSE to (FALSE=var_carLight)</entry>
+    <entry time="328" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
+    <entry time="340" level="debug">parsed: = var_counter[-1]+1 to (var_counter=(var_counter__history._$1+0sd16_1))</entry>
+    <entry time="341" level="debug">parsed: - to TRUE</entry>
+    <entry time="341" level="debug">parsed: FALSE to (FALSE=var_carLight)</entry>
+    <entry time="342" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
+    <entry time="342" level="debug">parsed: = var_counter[-1]+1 to (var_counter=(var_counter__history._$1+0sd16_1))</entry>
+    <entry time="343" level="debug">parsed: - to TRUE</entry>
+    <entry time="345" level="debug">parsed: FALSE to (FALSE=var_carLight)</entry>
+    <entry time="345" level="debug">parsed: TRUE to (TRUE=var_pedLight)</entry>
+    <entry time="347" level="debug">parsed: = var_counter[-1]+1 to (var_counter=(var_counter__history._$1+0sd16_1))</entry>
+    <entry time="347" level="debug">parsed: - to TRUE</entry>
+    <entry time="348" level="debug">parsed: FALSE to (FALSE=var_carLight)</entry>
+    <entry time="349" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
+    <entry time="349" level="debug">parsed: = var_counter[-1]+1 to (var_counter=(var_counter__history._$1+0sd16_1))</entry>
+    <entry time="350" level="debug">parsed: - to TRUE</entry>
+    <entry time="350" level="debug">parsed: TRUE to (TRUE=var_carLight)</entry>
+    <entry time="351" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
+    <entry time="351" level="debug">parsed: 0 to (0sd16_0=var_counter)</entry>
+    <entry time="526" level="debug">Row 1 can reach: {2}</entry>
+    <entry time="526" level="debug">Row 2 can reach: {3}</entry>
+    <entry time="526" level="debug">Row 3 can reach: {4}</entry>
+    <entry time="527" level="debug">Row 4 can reach: {5}</entry>
+    <entry time="527" level="debug">Row 5 can reach: {6}</entry>
+    <entry time="527" level="debug">Row 6 can reach: {}</entry>
+    <entry time="559" level="debug">parsed: - to TRUE</entry>
+    <entry time="581" level="info">Start '[/opt/nuXmv-1.1.1-Linux/bin/nuXmv, -int, /tmp/verification-spec3414723945132987623/modules.smv]'</entry>
+    <entry time="581" level="info">wd: /tmp/verification-spec3414723945132987623</entry>
+    <entry time="581" level="info">Result in /tmp/verification-spec3414723945132987623/log_90.txt</entry>
+    <entry time="861" level="debug">Row 1 can reach: {2}</entry>
+    <entry time="861" level="debug">Row 2 can reach: {3}</entry>
+    <entry time="861" level="debug">Row 3 can reach: {4}</entry>
+    <entry time="861" level="debug">Row 4 can reach: {5}</entry>
+    <entry time="861" level="debug">Row 5 can reach: {6}</entry>
+    <entry time="861" level="debug">Row 6 can reach: {}</entry>
   </log>
   <counterexample>
     <trace>
@@ -56,6 +58,7 @@
         <input name="var_pedBtnPress" value="FALSE"/>
         <input name="table.s2_in" value="FALSE"/>
         <input name="table.s1_in" value="TRUE"/>
+        <state name="table.var_bogus" value="FALSE"/>
         <state name="code.var_counter" value="0sd16_0"/>
         <state name="code.var_buttonPressedBefore" value="FALSE"/>
         <state name="code.var_red" value="FALSE"/>
