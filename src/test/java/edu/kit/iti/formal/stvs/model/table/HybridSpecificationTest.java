@@ -1,54 +1,68 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import edu.kit.iti.formal.stvs.logic.io.ImportException;
+import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlConcreteSpecImporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecImporter;
+import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
+import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Benjamin Alt
  */
 public class HybridSpecificationTest {
   private HybridSpecification hybridSpec;
   private ValidSpecification validSpec;
-
-  /* TODO: Write test
+  private ConcreteSpecification concreteInstance;
 
   @Before
-  public void setUp() throws IllegalValueTypeException {
-    List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
-
-    List<CodeIoVariable> codeIoVariables = Arrays.asList(
-        new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "A"),
-        new CodeIoVariable(VariableCategory.INPUT, TypeInt.INT, "B"),
-        new CodeIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "C"),
-        new CodeIoVariable(VariableCategory.OUTPUT, TypeInt.INT, "D"));
-
-    JsonElement json = JsonTableParser.jsonFromResource("hybrid_spec.json", HybridSpecificationTest.class);
-    ConstraintSpecification cspec = JsonTableParser.constraintTableFromJson(
-        new SimpleObjectProperty<>(typeContext),
-        new SimpleObjectProperty<>(codeIoVariables),
-        json);
-
-    hybridSpec = new HybridSpecification(cspec, true);
-    validSpec = hybridSpec.getValidSpecification();
-    setValidSpecListener(hybridSpec);
-
-    /*
-    List<ConcreteCell> concreteCellsA = Arrays.asList(new ConcreteCell(new ValueInt(3)), new ConcreteCell(new ValueInt(2)), new ConcreteCell(new ValueInt(4)), new ConcreteCell(new ValueInt(5)));
-    List<ConcreteCell> concreteCellsB = Arrays.asList(new ConcreteCell(new ValueInt(-2)), new ConcreteCell(new ValueInt(3)), new ConcreteCell(new ValueInt(5)), new ConcreteCell(new ValueInt(1)));
-    List<ConcreteCell> concreteCellsC = Arrays.asList(new ConcreteCell(new ValueInt(-10)), new ConcreteCell(new ValueInt(1)), new ConcreteCell(new ValueInt(100)), new ConcreteCell(new ValueInt(4)));
-    List<ConcreteCell> concreteCellsD = Arrays.asList(new ConcreteCell(new ValueInt(20)), new ConcreteCell(new ValueInt(1)), new ConcreteCell(new ValueInt(-3)), new ConcreteCell(new ValueInt(3)));
-    HashMap<String, SpecificationColumn<ConcreteCell>> counterexampleColumns = new HashMap<>();
-    counterexampleColumns.put("VariableA", new SpecificationColumn<>(variableA, concreteCellsA, new ColumnConfig()));
-    counterexampleColumns.put("VariableB", new SpecificationColumn<>(variableB, concreteCellsB, new ColumnConfig()));
-    counterexampleColumns.put("VariableC", new SpecificationColumn<>(variableC, concreteCellsC, new ColumnConfig()));
-    counterexampleColumns.put("VariableD", new SpecificationColumn<>(variableD, concreteCellsD, new ColumnConfig()));
-    List<ConcreteDuration> counterexampleDurations = Arrays.asList(new ConcreteDuration(0, 1),
-        new ConcreteDuration(1, 2), new ConcreteDuration(3, 1));
-    ConcreteSpecification counterexample = new ConcreteSpecification(counterexampleColumns, counterexampleDurations, true);
-    hybridSpec.setCounterExample(counterexample);
+  public void setUp() throws ImportException {
+    hybridSpec = ImporterFacade.importHybridSpec(XmlConstraintSpecImporter.class
+        .getResourceAsStream("spec_constraint_valid_1.xml"), ImporterFacade.ImportFormat.XML);
+    concreteInstance = ImporterFacade.importConcreteSpec
+        (XmlConcreteSpecImporter.class.getResourceAsStream("spec_concrete_valid_1.xml"),
+            ImporterFacade.ImportFormat.XML, Arrays.asList(TypeInt.INT, TypeBool.BOOL));
   }
 
-
-  private void setValidSpecListener(ConstraintSpecification theSpec) {
-    theSpec.validSpecificationProperty().addListener(
-        (observableValue, oldValue, newValue) -> validSpec = newValue);
+  @Test
+  public void testGetCounterExample() {
+    assertEquals(Optional.empty(), hybridSpec.getCounterExample());
   }
-  */
+
+  @Test
+  public void testGetSetConcreteInstance() {
+    assertEquals(Optional.empty(), hybridSpec.getConcreteInstance());
+    hybridSpec.setConcreteInstance(concreteInstance);
+    assertEquals(Optional.of(concreteInstance), hybridSpec.getConcreteInstance());
+  }
+
+  @Test (expected = IllegalArgumentException.class)
+  public void testSetConcreteInstanceInvalid() throws ImportException {
+    ConcreteSpecification badConcreteSpec = ImporterFacade.importConcreteSpec
+        (XmlConcreteSpecImporter.class.getResourceAsStream("spec_concrete_empty.xml"),
+            ImporterFacade.ImportFormat.XML, Arrays.asList(TypeInt.INT, TypeBool.BOOL));
+    hybridSpec.setConcreteInstance(badConcreteSpec);
+  }
+
+  @Test
+  public void testIsEditable() {
+    assertTrue(hybridSpec.isEditable());
+  }
+
+  @Test
+  public void testRemoveConcreteInstance() {
+    hybridSpec.setConcreteInstance(concreteInstance);
+    assertNotNull(hybridSpec.getConcreteInstance());
+    hybridSpec.removeConcreteInstance();
+    assertNotNull(hybridSpec.getConcreteInstance());
+  }
 }

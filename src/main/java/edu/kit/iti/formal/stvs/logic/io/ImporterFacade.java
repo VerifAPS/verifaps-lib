@@ -1,14 +1,14 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigImporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecImporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionImporter;
+import com.sun.xml.bind.v2.schemagen.xmlschema.Import;
+import edu.kit.iti.formal.stvs.logic.io.xml.*;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
@@ -46,7 +46,8 @@ public class ImporterFacade {
     GETETA
   }
 
-  public static ConstraintSpecification importSpec(InputStream input, ImportFormat format) throws ImportException {
+  public static ConstraintSpecification importConstraintSpec(InputStream input, ImportFormat
+      format) throws ImportException {
     switch (format) {
       case XML:
         return new XmlConstraintSpecImporter().doImport(input);
@@ -55,9 +56,25 @@ public class ImporterFacade {
     }
   }
 
-  public static ConstraintSpecification importSpec(File file, ImportFormat format) throws
+  public static ConstraintSpecification importConstraintSpec(File file, ImportFormat format) throws
       IOException, ImportException {
-    return importSpec(new FileInputStream(file), format);
+    return importConstraintSpec(new FileInputStream(file), format);
+  }
+
+  public static ConcreteSpecification importConcreteSpec(InputStream input, ImportFormat format,
+                                                         List<Type> typeContext) throws ImportException {
+    switch (format) {
+      case XML:
+        return new XmlConcreteSpecImporter(typeContext).doImport(input);
+      default:
+        throw new ImportException("Unsupported import format");
+    }
+  }
+
+  public static ConcreteSpecification importConcreteSpec(File file, ImportFormat format,
+                                                         List<Type> typeContext) throws
+      IOException, ImportException {
+    return importConcreteSpec(new FileInputStream(file), format, typeContext);
   }
 
   public static HybridSpecification importHybridSpec(InputStream input, ImportFormat format) throws ImportException {

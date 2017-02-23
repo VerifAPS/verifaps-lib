@@ -1,13 +1,12 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
+import java.util.ArrayList;
+import java.util.List;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -72,23 +71,21 @@ public class StvsMenuBar extends MenuBar {
     newSpec = new MenuItem("New Specification");
 
     about = new MenuItem("About");
-    //add menu-items to
+
+    // Add menu items to "open other" menu
     openOther.getItems().addAll(openSpec, openCode, openSession);
+
+    // Add menu items to "file" menu
     file.getItems().addAll(
         newCode, newSpec, open, openOther, openRecent, (new SeparatorMenuItem()),
         saveCode, saveSpec, saveAll, saveSessionAs
     );
 
-    edit.getItems().addAll(
-        config
-    );
+    edit.getItems().addAll(config);
 
-    help.getItems().addAll(
-        about
-    );
+    help.getItems().addAll(about);
 
-    //add menus to itself
+    // Add menus to menubar
     this.getMenus().addAll(file, edit, view, help);
   }
-
 }

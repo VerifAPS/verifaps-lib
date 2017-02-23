@@ -49,41 +49,56 @@ public class Z3Solver {
   }
 
   private ProcessOutputAsyncTask concretizeSExpr(String smtString, Consumer<Optional<SExpr>> handler) {
-    return concretize(smtString, stringOptional -> {
-      if (stringOptional.isPresent() && stringOptional.get().startsWith("sat")) {
-        String output = stringOptional.get();
-        output = output.substring(output.indexOf('\n') + 1);
-        handler.accept(Optional.of(SExpr.fromString(output)));
-      } else {
-        handler.accept(Optional.empty());
-      }
-    });
+    return concretize(smtString, stringOptional -> handler.accept(optionalSolverOutputToSexp(stringOptional)));
   }
 
   private ProcessOutputAsyncTask concretizeSmtString(String smtString, List<ValidIoVariable> validIoVariables,
-                                                     Consumer<Optional<ConcreteSpecification>> handler) {
-    return concretizeSExpr(smtString, sexpOptional -> {
-      Map<String, Type> typeContext = validIoVariables.stream().collect(Collectors.toMap(
-          ValidIoVariable::getName, ValidIoVariable::getValidType
-      ));
-      if (sexpOptional.isPresent()) {
-        Sexp sExpr = sexpOptional.get().toSexpr();
-        Map<Integer, Integer> rawDurations = extractRawDurations(sExpr);
-        //convert raw durations into duration list
-        List<ConcreteDuration> durations = buildConcreteDurations(rawDurations);
-        Map<Integer, Map<String, String>> rawRows = extractRawRows(sExpr, durations);
-        //convert raw rows into specificationRows
-        List<SpecificationRow<ConcreteCell>> specificationRows =
-            buildSpecificationRows(validIoVariables, durations, rawRows);
-        handler.accept(Optional.of(
-            new ConcreteSpecification(validIoVariables, specificationRows, durations, false)));
-      } else {
-        handler.accept(Optional.empty());
-      }
-    });
+                                                     OptionalConcreteSpecificationHandler handler) {
+    return concretizeSExpr(smtString, sexpOptional ->
+        handler.accept(optionalSpecFromOptionalSExp(validIoVariables, sexpOptional)));
   }
 
-  private List<SpecificationRow<ConcreteCell>> buildSpecificationRows(List<ValidIoVariable> validIoVariables,
+  public ProcessOutputAsyncTask concretizeSConstraint(SConstraint sConstraint,
+                                                      List<ValidIoVariable> validIoVariables,
+                                                      OptionalConcreteSpecificationHandler handler) {
+    String constraintString = sConstraint.globalConstraintsToText();
+    String headerString = sConstraint.headerToText();
+    String commands = "(check-sat)\n(get-model)";
+    String z3Input = headerString + "\n" + constraintString + "\n" + commands;
+    return concretizeSmtString(z3Input, validIoVariables, handler);
+  }
+
+  private Optional<SExpr> optionalSolverOutputToSexp(Optional<String> stringOptional) {
+    if (stringOptional.isPresent() && stringOptional.get().startsWith("sat")) {
+      String output = stringOptional.get();
+      output = output.substring(output.indexOf('\n') + 1);
+       return (Optional.of(SExpr.fromString(output)));
+    }
+    return Optional.empty();
+  }
+
+  private Optional<ConcreteSpecification> optionalSpecFromOptionalSExp(List<ValidIoVariable> validIoVariables, Optional<SExpr> sexpOptional) {
+    if (sexpOptional.isPresent()) {
+      return Optional.of(buildConcreteSpecFromSExp(sexpOptional.get().toSexpr(), validIoVariables));
+    }
+    return Optional.empty();
+  }
+
+  private static ConcreteSpecification buildConcreteSpecFromSExp(Sexp sExpr, List<ValidIoVariable> validIoVariables){
+    Map<String, Type> typeContext = validIoVariables.stream().collect(Collectors.toMap(
+        ValidIoVariable::getName, ValidIoVariable::getValidType
+    ));
+    Map<Integer, Integer> rawDurations = extractRawDurations(sExpr);
+    //convert raw durations into duration list
+    List<ConcreteDuration> durations = buildConcreteDurations(rawDurations);
+    Map<Integer, Map<String, String>> rawRows = extractRawRows(sExpr, durations);
+    //convert raw rows into specificationRows
+    List<SpecificationRow<ConcreteCell>> specificationRows =
+        buildSpecificationRows(validIoVariables, durations, rawRows);
+    return new ConcreteSpecification(validIoVariables, specificationRows, durations, false);
+  }
+
+  private static List<SpecificationRow<ConcreteCell>> buildSpecificationRows(List<ValidIoVariable> validIoVariables,
                                                                       List<ConcreteDuration> durations,
                                                                       Map<Integer, Map<String, String>> rawRows) {
     List<SpecificationRow<ConcreteCell>> specificationRows = new ArrayList<>();
@@ -116,7 +131,18 @@ public class Z3Solver {
     return specificationRows;
   }
 
-  private Map<Integer, Map<String, String>> extractRawRows(Sexp sExpr, List<ConcreteDuration> durations) {
+  private static List<ConcreteDuration> buildConcreteDurations(Map<Integer, Integer> rawDurations) {
+    List<ConcreteDuration> durations = new ArrayList<>();
+    int aggregator = 0;
+    for (int i = 0; i < rawDurations.size(); i++) {
+      Integer duration = rawDurations.get(i);
+      durations.add(i, new ConcreteDuration(aggregator, duration));
+      aggregator += duration;
+    }
+    return durations;
+  }
+
+  private static Map<Integer, Map<String, String>> extractRawRows(Sexp sExpr, List<ConcreteDuration> durations) {
     Map<Integer, Map<String, String>> rawRows = new HashMap<>();
     sExpr.forEach(varAsign -> {
       if (varAsign.getLength() == 0 || !varAsign.get(0).toIndentedString().equals("define-fun")) return;
@@ -138,18 +164,7 @@ public class Z3Solver {
     return rawRows;
   }
 
-  private List<ConcreteDuration> buildConcreteDurations(Map<Integer, Integer> rawDurations) {
-    List<ConcreteDuration> durations = new ArrayList<>();
-    int aggregator = 0;
-    for (int i = 0; i < rawDurations.size(); i++) {
-      Integer duration = rawDurations.get(i);
-      durations.add(i, new ConcreteDuration(aggregator, duration));
-      aggregator += duration;
-    }
-    return durations;
-  }
-
-  private Map<Integer, Integer> extractRawDurations(Sexp sExpr) {
+  private static Map<Integer, Integer> extractRawDurations(Sexp sExpr) {
     Map<Integer, Integer> rawDurations = new HashMap<>();
     sExpr.forEach(varAsign -> {
       if (varAsign.getLength() == 0 || !varAsign.get(0).toIndentedString().equals("define-fun")) return;
@@ -160,15 +175,5 @@ public class Z3Solver {
       }
     });
     return rawDurations;
-  }
-
-  public ProcessOutputAsyncTask concretizeSConstraint(SConstraint sConstraint,
-                                                      List<ValidIoVariable> validIoVariables,
-                                                      Consumer<Optional<ConcreteSpecification>> handler) {
-    String constraintString = sConstraint.globalConstraintsToText();
-    String headerString = sConstraint.headerToText();
-    String commands = "(check-sat)\n(get-model)";
-    String z3Input = headerString + "\n" + constraintString + "\n" + commands;
-    return concretizeSmtString(z3Input, validIoVariables, handler);
   }
 }

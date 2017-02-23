@@ -44,12 +44,13 @@ public abstract class XmlExporter<F> implements Exporter<F> {
     }
   }
 
-  protected static Node marshalToNode(JAXBElement element) throws ExportException {
+  protected static Node marshalToNode(JAXBElement element, String namespace) throws
+      ExportException {
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();
       Document document = db.newDocument();
-      JAXBContext context = JAXBContext.newInstance("edu.kit.iti.formal.stvs.logic.io.xml");
+      JAXBContext context = JAXBContext.newInstance(namespace);
       Marshaller marshaller = context.createMarshaller();
       marshaller.setProperty("jaxb.formatted.output", Boolean.TRUE);
       marshaller.marshal(element, document);

@@ -32,7 +32,7 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
     specTable.setIsConcrete(false);
     specTable.setName(source.getName());
     JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable> element = objectFactory.createSpecification(specTable);
-    return marshalToNode(element);
+    return marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml");
   }
 
   private Rows makeRows(ConstraintSpecification constraintSpec) {

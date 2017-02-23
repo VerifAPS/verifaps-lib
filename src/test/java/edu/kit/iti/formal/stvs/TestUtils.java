@@ -42,7 +42,7 @@ public class TestUtils {
       InputStream source,
       List<Type> typeContext) {
     try {
-      ConstraintSpecification constraintSpec = ImporterFacade.importSpec(source, ImporterFacade.ImportFormat.XML);
+      ConstraintSpecification constraintSpec = ImporterFacade.importConstraintSpec(source, ImporterFacade.ImportFormat.XML);
       List<ValidFreeVariable> validFreeVariables = importValidFreeVariables(
           constraintSpec.getFreeVariableList(), typeContext);
       ConstraintSpecificationValidator validator = new ConstraintSpecificationValidator(
@@ -72,7 +72,7 @@ public class TestUtils {
     }
     try {
       return importValidFreeVariables(
-          ImporterFacade.importSpec(source, ImporterFacade.ImportFormat.XML).getFreeVariableList(),
+          ImporterFacade.importConstraintSpec(source, ImporterFacade.ImportFormat.XML).getFreeVariableList(),
           typeContext);
     } catch (ImportException ex) {
       throw new RuntimeException(ex);

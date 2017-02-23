@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.model.common;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,6 +13,10 @@ import java.util.List;
 public class FreeVariableList {
 
   private final ObservableList<FreeVariable> variables;
+
+  public FreeVariableList() {
+    this(new ArrayList<>());
+  }
 
   public FreeVariableList(List<FreeVariable> variables) {
     this.variables = FXCollections.observableList(variables, FreeVariable.EXTRACTOR);

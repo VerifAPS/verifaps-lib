@@ -31,7 +31,7 @@ public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> 
     specTable.setIsConcrete(true);
     specTable.setName(source.getName());
     JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable> element = objectFactory.createSpecification(specTable);
-    return marshalToNode(element);
+    return marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml");
   }
 
 

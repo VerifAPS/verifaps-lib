@@ -18,6 +18,12 @@ public class ConcreteDuration {
    * @param duration The duration
    */
   public ConcreteDuration(int beginCycle, int duration) {
+    if (beginCycle < 0) {
+      throw new IllegalArgumentException("BeginCycle must be nonnegative");
+    }
+    if (duration < 0) {
+      throw new IllegalArgumentException("Duration must me nonnegative");
+    }
     this.beginCycle = beginCycle;
     this.duration = duration;
   }

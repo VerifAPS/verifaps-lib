@@ -82,9 +82,7 @@ public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, C
   public List<ConcreteCell> getConcreteValuesForConstraintCell(String column, int constraintRow) {
     // Counterexamples stop after first mismatch
     // So we possibly don't have as many counterexample rows as constraint rows.
-    if (constraintRow >= durations.size()) {
-      return Collections.emptyList();
-    }
+    if (constraintRow >= durations.size()) return Collections.emptyList();
     int startIndex = durations.get(constraintRow).getBeginCycle();
     int endIndex = durations.get(constraintRow).getEndCycle();
 
@@ -136,10 +134,5 @@ public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, C
     ConcreteSpecification that = (ConcreteSpecification) o;
 
     return isCounterExample() == that.isCounterExample();
-  }
-
-  @Override
-  public int hashCode() {
-    return (isCounterExample() ? 1 : 0);
   }
 }

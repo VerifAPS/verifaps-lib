@@ -127,8 +127,10 @@ public class SpecificationRow<C> implements Commentable, Observable {
 
   @Override
   public int hashCode() {
-    int result = cells.hashCode();
-    result = 31 * result + (comment != null ? comment.hashCode() : 0);
+    int result = getCells() != null ? getCells().hashCode() : 0;
+    result = 31 * result + (getComment() != null ? getComment().hashCode() : 0);
+    result = 31 * result + (listeners != null ? listeners.hashCode() : 0);
+    result = 31 * result + (extractor != null ? extractor.hashCode() : 0);
     return result;
   }
 

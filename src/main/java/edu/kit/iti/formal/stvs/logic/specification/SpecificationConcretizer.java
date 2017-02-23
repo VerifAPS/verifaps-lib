@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.specification;
 
+import edu.kit.iti.formal.stvs.logic.specification.smtlib.OptionalConcreteSpecificationHandler;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
@@ -18,7 +19,7 @@ public interface SpecificationConcretizer {
 
   void calculateConcreteSpecification(ValidSpecification validSpecification,
                                       List<ValidFreeVariable> freeVariables,
-                                      Consumer<Optional<ConcreteSpecification>> consumer,
+                                      OptionalConcreteSpecificationHandler handler,
                                       Consumer<Throwable> exceptionHandler);
   void terminate();
 }

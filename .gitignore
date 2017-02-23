@@ -1,10 +1,11 @@
 ## Manual STVS gitignore rules
 /bin/
-.*
+
 /.idea/
 /out/
 *.iml
 /build/
+/buildtmp/
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
