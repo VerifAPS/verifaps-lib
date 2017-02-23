@@ -10,16 +10,29 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
+import edu.kit.iti.formal.stvs.util.ProcessOutputAsyncTask;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by leonk on 09.02.2017.
@@ -57,7 +70,7 @@ public class Z3SolverTest {
   }
 
   @Test
-  public void testImported() throws ImportException, IOException {
+  public void testImported() throws ImportException, IOException, InterruptedException {
 
     ValidSpecification spec = importSpec("testSpec.xml");
 
@@ -67,26 +80,21 @@ public class Z3SolverTest {
       put(1, 1);
       put(2, 2);
     }};
-
     SmtEncoder preprocessor = new SmtEncoder(maxDurations, spec, freeVariables);
-    //System.out.println(preprocessor.getConstrain());
-    solver.concretizeSConstraint(preprocessor.getConstrain(), spec.getColumnHeaders(), System.out::println);
-  }
+    AtomicBoolean outputProcessed = new AtomicBoolean(false);
 
-  @Test
-  public void testImported2() throws ImportException, IOException {
-
-    ValidSpecification spec = importSpec("spec_constraint_valid_enum_1.xml");
-
-    Map<Integer, Integer> maxDurations = new HashMap<Integer,
-        Integer>() {{
-      put(0, 20);
-      put(1, 20);
-      put(2, 20);
-    }};
-
-    SmtEncoder preprocessor = new SmtEncoder(maxDurations, spec, freeVariables);
-    //System.out.println(preprocessor.getConstrain());
-    solver.concretizeSConstraint(preprocessor.getConstrain(), spec.getColumnHeaders(), System.out::println);
+    ProcessOutputAsyncTask processOutputAsyncTask = solver.concretizeSConstraint(preprocessor.getConstrain(),
+        spec.getColumnHeaders(), optionalSpec -> {
+          ConcreteSpecification concreteSpecification = optionalSpec.get();
+          assertNotNull(concreteSpecification);
+          ObservableList<ConcreteDuration> durations = concreteSpecification.getDurations();
+          assertTrue(durations.get(0).getDuration() >= 5 && durations.get(0).getDuration() <= 7);
+          assertEquals(1, durations.get(1).getDuration());
+          assertEquals(2, durations.get(2).getDuration());
+          outputProcessed.set(true);
+        });
+    processOutputAsyncTask.start();
+    processOutputAsyncTask.join();
+    assertTrue(outputProcessed.get());
   }
 }

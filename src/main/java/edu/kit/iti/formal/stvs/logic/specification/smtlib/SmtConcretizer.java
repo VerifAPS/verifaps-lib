@@ -28,7 +28,7 @@ public class SmtConcretizer implements SpecificationConcretizer {
   @Override
   public void calculateConcreteSpecification(ValidSpecification validSpecification,
                                              List<ValidFreeVariable> freeVariables,
-                                             Consumer<Optional<ConcreteSpecification>> consumer,
+                                             OptionalConcreteSpecificationHandler consumer,
                                              Consumer<Throwable> exceptionHandler) {
     SmtEncoder encoder = new SmtEncoder((i) -> config.getMaxLineRollout(), validSpecification,
         freeVariables);
