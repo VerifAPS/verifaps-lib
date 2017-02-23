@@ -129,6 +129,12 @@ public class NuXMVProcess implements Runnable {
             Report.info("Result in %s", outputFile);
 
             Process p = pb.start();
+
+            // destroy the sub-process, if geteta is killed.
+            Runtime.getRuntime().addShutdownHook(
+                    new Thread(() -> {
+                        if (p.isAlive()) p.destroyForcibly();
+                    }));
             p.waitFor();
             NuXMVOutputParser parser = new NuXMVOutputParser(outputFile);
             Counterexample ce = parser.run();
@@ -136,7 +142,7 @@ public class NuXMVProcess implements Runnable {
         } catch (IOException e) {
             Report.error("Error in running nuxmv: %s", e.getMessage());
             Report.error("Command line are: %s", Arrays.toString(commands));
-            Report.setErrorLevel("error"); //TODO more detail in error level?
+            Report.setErrorLevel("io-error"); //TODO more detail in error level?
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -157,6 +163,3 @@ public class NuXMVProcess implements Runnable {
     }
 
 }
-
-//file /home/weigl/work/verifaps/exteta/src/test/resources/success.smv: line 9: at token "": syntax error
-

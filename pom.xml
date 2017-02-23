@@ -9,8 +9,8 @@
     </parent>
 
     <artifactId>geteta</artifactId>
-    <!-- Every version upgrade, add a changelog to src/site/index.html -->
-    <version>0.4.1</version>
+    <!-- Every version upgrade, add a changelog to src/site/index.xhtml -->
+    <version>0.4.2</version>
 
     <repositories>
         <repository>
