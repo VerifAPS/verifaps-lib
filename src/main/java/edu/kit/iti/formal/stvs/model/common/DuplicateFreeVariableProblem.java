@@ -14,11 +14,17 @@ public class DuplicateFreeVariableProblem extends FreeVariableProblem {
   public static Optional<DuplicateFreeVariableProblem> checkForDuplicates(
       FreeVariable freeVariable, Collection<FreeVariable> allVariables) {
     String varName = freeVariable.getName();
-    if (allVariables.stream().filter(otherVar -> otherVar.getName().equals(varName)).count() > 1) {
+    if (isVariableNameAlreadyInCollection(allVariables, varName)) {
       return Optional.of(new DuplicateFreeVariableProblem(varName));
     } else {
       return Optional.empty();
     }
+  }
+
+  private static boolean isVariableNameAlreadyInCollection(Collection<FreeVariable> allVariables, String varName) {
+    return allVariables.stream()
+        .filter(otherVar -> otherVar.getName().equals(varName))
+        .count() > 1;
   }
 
   private DuplicateFreeVariableProblem(String freeVariableName) {
