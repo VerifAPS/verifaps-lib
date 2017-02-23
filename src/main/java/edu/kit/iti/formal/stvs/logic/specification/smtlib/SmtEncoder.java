@@ -2,14 +2,16 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
-import edu.kit.iti.formal.stvs.model.expressions.*;
+import edu.kit.iti.formal.stvs.model.expressions.Expression;
+import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.Value;
 import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;

@@ -2,8 +2,11 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import de.tudresden.inf.lat.jsexp.Sexp;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -66,14 +69,14 @@ public class SConstraint implements SExpr {
   }
 
   @Override
-  public <E> E visit(Function<? super SExpr, E> visitor) {
-    return visitor.apply(this);
+  public <E> E visit(SExprVisitor<E> visitor) {
+    return visitor.visit(this);
   }
 
   @Override
-  public <E> List<E> visitChildren(Function<? super SExpr, E> visitor) {
-    List<E> result = globalConstraints.stream().map(visitor::apply).collect(Collectors.toList());
-    result.addAll(variableDefinitions.stream().map(visitor::apply).collect(Collectors.toList()));
+  public <E> List<E> visitChildren(SExprVisitor<E> visitor) {
+    List<E> result = globalConstraints.stream().map(visitor::visit).collect(Collectors.toList());
+    result.addAll(variableDefinitions.stream().map(visitor::visit).collect(Collectors.toList()));
     return result;
   }
 

@@ -6,7 +6,6 @@ import de.tudresden.inf.lat.jsexp.SexpFactory;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -75,13 +74,13 @@ public class SList implements SExpr {
 
 
   @Override
-  public <E> E visit(Function<? super SExpr, E> visitor) {
-    return visitor.apply(this);
+  public <E> E visit(SExprVisitor<E> visitor) {
+    return visitor.visit(this);
   }
 
   @Override
-  public <E> List<E> visitChildren(Function<? super SExpr, E> visitor) {
-    return getList().stream().map(visitor::apply).collect(Collectors.toList());
+  public <E> List<E> visitChildren(SExprVisitor<E> visitor) {
+    return getList().stream().map(visitor::visit).collect(Collectors.toList());
   }
 
   public SList addAll(SExpr ... sexp) {
