@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
+import edu.kit.iti.formal.stvs.model.table.HybridRow;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
@@ -10,10 +11,10 @@ import javafx.scene.layout.VBox;
  */
 public class SpecificationTableView extends VBox {
   private Label header;
-  private TableView<SynchronizedRow> tableView;
+  private TableView<HybridRow> tableView;
 
 
-  public SpecificationTableView(Label header, TableView<SynchronizedRow> tableView) {
+  public SpecificationTableView(Label header, TableView<HybridRow> tableView) {
     this.getStylesheets().add(SpecificationTableController.class.getResource("style.css")
         .toExternalForm());
 
@@ -23,7 +24,7 @@ public class SpecificationTableView extends VBox {
     this.getChildren().addAll(header, tableView);
   }
 
-  public SpecificationTableView(TableView<SynchronizedRow> tableView) {
+  public SpecificationTableView(TableView<HybridRow> tableView) {
     this(new Label("Specification-Table:"), tableView);
   }
 
@@ -31,7 +32,7 @@ public class SpecificationTableView extends VBox {
     return header;
   }
 
-  public TableView<SynchronizedRow> getTableView() {
+  public TableView<HybridRow> getTableView() {
     return tableView;
   }
 }

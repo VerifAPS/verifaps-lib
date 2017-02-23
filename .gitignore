@@ -7,6 +7,10 @@
 /build/
 /buildtmp/
 
+/.classpath
+/.project
+/.settings/
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof

@@ -1,6 +1,5 @@
-package edu.kit.iti.formal.stvs.view.spec.table;
+package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.stvs.model.table.CellOperationProvider;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,13 +8,13 @@ import javafx.collections.ObservableList;
  * Created by Philipp on 01.02.2017.
  * @author Philipp
  */
-public class HybridCellModel<C extends CellOperationProvider> implements CellOperationProvider {
+public class HybridCell<C extends CellOperationProvider> implements CellOperationProvider {
 
   private final C cell;
   private final String column;
   private final ObservableList<String> counterExamples;
 
-  public HybridCellModel(String column, C cell) {
+  public HybridCell(String column, C cell) {
     this.cell = cell;
     this.column = column;
     this.counterExamples = FXCollections.observableArrayList();
