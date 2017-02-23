@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -62,22 +63,23 @@ public class ParsedCode {
       program.getLocalScope().getLocalVariables().entrySet().forEach(variableEntry -> {
         //String varName = variableEntry.getKey();
         VariableDeclaration varDecl = variableEntry.getValue();
-        VariableCategory category;
-        switch (varDecl.getType()) {
-          case VariableDeclaration.INPUT:
-            category = VariableCategory.INPUT;
-            break;
-          case VariableDeclaration.OUTPUT:
-            category = VariableCategory.OUTPUT;
-            break;
-          default:
-            // Don't create variables for other types than INPUT or OUTPUT
-            //TODO: recognize INOUT or other variables (was not specified however)
-            return;
+        Optional<VariableCategory> category = getCategoryFromDeclaration(varDecl);
+        if(category.isPresent()){
+          this.definedVariables.add(new CodeIoVariable(category.get(), varDecl.getDataTypeName(), varDecl.getName()));
         }
-        this.definedVariables.add(new CodeIoVariable(category, varDecl.getDataTypeName(), varDecl.getName()));
       });
       return null;
+    }
+
+    private Optional<VariableCategory> getCategoryFromDeclaration(VariableDeclaration varDecl) {
+      switch (varDecl.getType()) {
+        case VariableDeclaration.INPUT:
+          return Optional.of(VariableCategory.INPUT);
+        case VariableDeclaration.OUTPUT:
+          return Optional.of(VariableCategory.OUTPUT);
+        default:
+          return Optional.empty();
+      }
     }
 
     public List<CodeIoVariable> getDefinedVariables() {
