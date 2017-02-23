@@ -23,6 +23,7 @@ import javafx.collections.ObservableList;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -74,11 +75,10 @@ public class Z3SolverTest {
 
     ValidSpecification spec = importSpec("testSpec.xml");
 
-    Map<Integer, Integer> maxDurations = new HashMap<Integer,
-        Integer>() {{
-      put(0, 7);
-      put(1, 1);
-      put(2, 2);
+    List<Integer> maxDurations = new ArrayList<Integer>() {{
+      add(7);
+      add(1);
+      add(2);
     }};
     SmtEncoder preprocessor = new SmtEncoder(maxDurations, spec, freeVariables);
     AtomicBoolean outputProcessed = new AtomicBoolean(false);

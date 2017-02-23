@@ -42,7 +42,7 @@ public class SmtEncoderTest {
 
     int maxDuration = 3;
 
-    SmtEncoder smtEncoder = new SmtEncoder((i) -> maxDuration, spec, freeVariables);
+    SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
     SConstraint output = smtEncoder.getConstrain();
     Set<SExpr> constraints = output.getGlobalConstraints();
 
@@ -73,7 +73,7 @@ public class SmtEncoderTest {
 
 
 
-    SmtEncoder smtEncoder = new SmtEncoder((i) -> maxDuration, spec, freeVariables);
+    SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
     SConstraint output = smtEncoder.getConstrain();
     Set<SExpr> constraints = output.getGlobalConstraints();
     Set<SExpr> definitions = output.getVariableDefinitions();
@@ -98,7 +98,7 @@ public class SmtEncoderTest {
 
 
 
-    SmtEncoder smtEncoder = new SmtEncoder((i) -> maxDuration, spec, freeVariables);
+    SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
     SConstraint output = smtEncoder.getConstrain();
     Set<SExpr> constraints = output.getGlobalConstraints();
     Set<SExpr> definitions = output.getVariableDefinitions();
@@ -118,11 +118,10 @@ public class SmtEncoderTest {
     ValidSpecification spec = TestUtils.importValidSpec(sourceFile.get());
     List<ValidFreeVariable> freeVariables = TestUtils.importValidFreeVariables(sourceFile.get());
 
-    Map<Integer, Integer> maxDurations = new HashMap<Integer,
-        Integer>() {{
-      put(0, 7);
-      put(1, 1);
-      put(2, 2);
+    List<Integer> maxDurations = new ArrayList<Integer>() {{
+      add(7);
+      add(1);
+      add(2);
     }};
 
     SmtEncoder preprocessor = new SmtEncoder(maxDurations, spec, freeVariables);
@@ -138,11 +137,10 @@ public class SmtEncoderTest {
     ValidSpecification spec = TestUtils.importValidSpec(sourceFile.get());
     List<ValidFreeVariable> freeVariables = TestUtils.importValidFreeVariables(sourceFile.get());
 
-    Map<Integer, Integer> maxDurations = new HashMap<Integer,
-        Integer>() {{
-      put(0, 3);
-      put(1, 5);
-      put(2, 5);
+    List<Integer> maxDurations = new ArrayList<Integer>() {{
+      add(3);
+      add(5);
+      add(5);
     }};
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDurations, spec, freeVariables);
