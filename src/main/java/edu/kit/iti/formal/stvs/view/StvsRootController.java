@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.view;
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
@@ -164,8 +165,8 @@ public class StvsRootController implements Controller {
               "A counterexample is available.", alertBody, logFileContents).showAndWait();
           // Show read-only copy of spec with counterexample in a new tab
           assert stvsRootModel.getScenario().getActiveSpec() != null;
-          HybridSpecification readOnlySpec = new HybridSpecification(stvsRootModel.getScenario()
-              .getActiveSpec(), false);
+          HybridSpecification readOnlySpec = new HybridSpecification(new ConstraintSpecification(stvsRootModel
+              .getScenario().getActiveSpec()), false);
           readOnlySpec.setCounterExample(res.getCounterExample());
           specificationsPaneController.addTab(readOnlySpec);
           break;

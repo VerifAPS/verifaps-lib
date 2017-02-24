@@ -33,6 +33,10 @@ public class SpecIoVariable extends IoVariable implements Commentable {
     this.comment = new SimpleStringProperty("");
   }
 
+  public SpecIoVariable(SpecIoVariable specIoVariable) {
+    this(specIoVariable.getCategory(), specIoVariable.getType(), specIoVariable.getName());
+  }
+
   public String getName() {
     return name.get();
   }

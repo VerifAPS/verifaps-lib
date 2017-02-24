@@ -22,6 +22,14 @@ public class FreeVariableList {
     this.variables = FXCollections.observableList(variables, FreeVariable.EXTRACTOR);
   }
 
+  public FreeVariableList(FreeVariableList freeVariableList) {
+    List<FreeVariable> clonedVariables = new ArrayList<>();
+    for (FreeVariable freeVar : freeVariableList.getVariables()) {
+      clonedVariables.add(new FreeVariable(freeVar));
+    }
+    this.variables = FXCollections.observableList(clonedVariables, FreeVariable.EXTRACTOR);
+  }
+
   public ObservableList<FreeVariable> getVariables() {
     return variables;
   }

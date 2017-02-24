@@ -154,4 +154,7 @@ public class SpecificationRow<C> implements Commentable, Observable {
     listeners.remove(listener);
   }
 
+  public Callback<C,Observable[]> getExtractor() {
+    return extractor;
+  }
 }

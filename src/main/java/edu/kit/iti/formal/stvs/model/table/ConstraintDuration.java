@@ -24,6 +24,11 @@ public class ConstraintDuration implements CellOperationProvider {
     this.stringRepresentation = new SimpleStringProperty(stringRepresentation);
   }
 
+  public ConstraintDuration(ConstraintDuration sourceDuration) {
+    this(sourceDuration.getAsString());
+    setComment(sourceDuration.getComment());
+  }
+
   @Override
   public String getAsString() {
     return this.stringRepresentation.get();

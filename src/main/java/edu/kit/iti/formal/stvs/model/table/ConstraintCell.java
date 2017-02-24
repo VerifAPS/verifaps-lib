@@ -25,6 +25,11 @@ public class ConstraintCell implements CellOperationProvider {
     this.comment = new SimpleStringProperty();
   }
 
+  public ConstraintCell(ConstraintCell constraintCell) {
+    this(constraintCell.getAsString());
+    this.setComment(constraintCell.getComment());
+  }
+
   @Override
   public String getAsString() {
     return stringRepresentation.get();

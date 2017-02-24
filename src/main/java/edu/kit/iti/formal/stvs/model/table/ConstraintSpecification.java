@@ -8,6 +8,7 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,6 +69,31 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
     this.freeVariableList = freeVariableList;
 
     this.comment = new SimpleStringProperty("");
+  }
+
+  /**
+   * Copy constructor. Creates a deep copy of another ConstraintSpecification.
+   * @param sourceSpec The ConstraintSpecification to copy
+   */
+  public ConstraintSpecification(ConstraintSpecification sourceSpec) {
+    this(sourceSpec.getName(), new FreeVariableList(sourceSpec.getFreeVariableList()));
+    this.setComment(sourceSpec.getComment());
+    for (SpecIoVariable specIoVariable : sourceSpec.getColumnHeaders()) {
+      this.getColumnHeaders().add(new SpecIoVariable(specIoVariable));
+    }
+    for (SpecificationRow<ConstraintCell> row : sourceSpec.getRows()) {
+      Map<String, ConstraintCell> clonedCells = new HashMap<>();
+      for (String colHeader : row.getCells().keySet()) {
+        clonedCells.put(colHeader, new ConstraintCell(row.getCells().get(colHeader)));
+      }
+      SpecificationRow<ConstraintCell> clonedRow = new SpecificationRow<>(clonedCells, row
+          .getExtractor());
+      clonedRow.setComment(row.getComment());
+      getRows().add(row);
+    }
+    for (ConstraintDuration sourceDuration : sourceSpec.getDurations()) {
+      getDurations().add(new ConstraintDuration(sourceDuration));
+    }
   }
 
   @Override
