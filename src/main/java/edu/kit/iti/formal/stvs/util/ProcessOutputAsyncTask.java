@@ -6,19 +6,17 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Created by leonk on 08.02.2017.
  * @author Leon Kaucher
  */
 public class ProcessOutputAsyncTask extends AsyncTask<Optional<String>> {
-  public ProcessOutputAsyncTask(ProcessBuilder processBuilder, String input, Consumer<Optional<String>> runLater) {
+  public ProcessOutputAsyncTask(ProcessBuilder processBuilder, String input, AsyncTaskCompletedHandler runLater) {
     super(createProcessHandler(processBuilder, input), runLater);
   }
 
-  private static Function<AtomicBoolean, Optional<String>> createProcessHandler(ProcessBuilder processBuilder, String input) {
+  private static AsyncRunner<Optional<String>> createProcessHandler(ProcessBuilder processBuilder, String input) {
     //The new line chars are all transformed into a single \n
     return (isRunning) -> runProcessWhileThreadRunning(processBuilder, input, isRunning);
   }
