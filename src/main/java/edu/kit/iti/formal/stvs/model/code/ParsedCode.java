@@ -62,8 +62,9 @@ public class ParsedCode {
         //String varName = variableEntry.getKey();
         VariableDeclaration varDecl = variableEntry.getValue();
         Optional<VariableCategory> category = getCategoryFromDeclaration(varDecl);
-        if(category.isPresent()){
-          this.definedVariables.add(new CodeIoVariable(category.get(), varDecl.getDataTypeName(), varDecl.getName()));
+        Optional<String> dataTypeName = Optional.ofNullable(varDecl.getDataTypeName());
+        if(category.isPresent() && dataTypeName.isPresent()){
+          this.definedVariables.add(new CodeIoVariable(category.get(), dataTypeName.get(), varDecl.getName()));
         }
       });
       return null;
