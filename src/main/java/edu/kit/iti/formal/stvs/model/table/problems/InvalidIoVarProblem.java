@@ -9,7 +9,6 @@ import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * @author Benjamin Alt
@@ -21,18 +20,18 @@ public class InvalidIoVarProblem extends ColumnProblem {
       SpecIoVariable specIoVariable,
       Collection<CodeIoVariable> codeIoVariables,
       Map<String, Type> typesByName,
-      Consumer<InvalidIoVarProblem> minorProblemsConsumer)
+      MinorProblemsHandler minorProblemsHandler)
       throws InvalidIoVarProblem {
 
     Optional<CodeIoVariable> matchedCodeVar = codeIoVariables.stream()
         .filter(ioVar -> ioVar.getName().equals(specIoVariable.getName()))
         .findAny();
     if (!matchedCodeVar.isPresent()) {
-      minorProblemsConsumer.accept(new InvalidIoVarProblem(specIoVariable, ErrorType.NAME_MISMATCH));
+      minorProblemsHandler.handle(new InvalidIoVarProblem(specIoVariable, ErrorType.NAME_MISMATCH));
     } else if (!specIoVariable.getType().equals(matchedCodeVar.get().getType())) {
-      minorProblemsConsumer.accept(new InvalidIoVarProblem(specIoVariable, ErrorType.TYPE_MISMATCH));
+      minorProblemsHandler.handle(new InvalidIoVarProblem(specIoVariable, ErrorType.TYPE_MISMATCH));
     } else if (!specIoVariable.getCategory().equals(matchedCodeVar.get().getCategory())) {
-      minorProblemsConsumer.accept(new InvalidIoVarProblem(specIoVariable, ErrorType.CATEGORY_MISMATCH));
+      minorProblemsHandler.handle(new InvalidIoVarProblem(specIoVariable, ErrorType.CATEGORY_MISMATCH));
     }
 
     if (!VariableExpr.IDENTIFIER_PATTERN.matcher(specIoVariable.getName()).matches()) {
