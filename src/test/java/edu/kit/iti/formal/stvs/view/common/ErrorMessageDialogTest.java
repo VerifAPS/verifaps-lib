@@ -10,6 +10,6 @@ public class ErrorMessageDialogTest extends Application {
 
   @Override
   public void start(Stage stage) throws Exception {
-    ErrorMessageDialog.createErrorMessageDialog(new Exception("Test"));
+    AlertFactory.createAlert(new Exception("Test"));
   }
 }

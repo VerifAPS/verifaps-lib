@@ -10,12 +10,11 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
 import edu.kit.iti.formal.stvs.view.Controller;
-import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
+import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController;
 import javafx.application.Platform;
-import javafx.beans.Observable;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -149,7 +148,7 @@ public class SpecificationController implements Controller {
               hybridSpecification.setConcreteInstance(optionalSpec.get());
               timingDiagramCollectionController.setActivated(true);
             } else {
-              ErrorMessageDialog.createMessageDialog(Alert.AlertType.WARNING, "Concretizer warning",
+              AlertFactory.createAlert(Alert.AlertType.WARNING, "Concretizer warning",
                   "No concrete instance found",
                   "The Solver could not produce a concrete example with the given table.");
             }
@@ -158,7 +157,7 @@ public class SpecificationController implements Controller {
           });
         }, exception -> {
           Platform.runLater(() -> {
-            ErrorMessageDialog.createErrorMessageDialog(exception, "Concretization Failed", "An error occurred while "
+            AlertFactory.createAlert(exception, "Concretization Failed", "An error occurred while "
                 + "concretizing the specification.");
           });
         });
