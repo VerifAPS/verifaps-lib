@@ -89,7 +89,7 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
       SpecificationRow<ConstraintCell> clonedRow = new SpecificationRow<>(clonedCells, row
           .getExtractor());
       clonedRow.setComment(row.getComment());
-      getRows().add(row);
+      getRows().add(clonedRow);
     }
     for (ConstraintDuration sourceDuration : sourceSpec.getDurations()) {
       getDurations().add(new ConstraintDuration(sourceDuration));
