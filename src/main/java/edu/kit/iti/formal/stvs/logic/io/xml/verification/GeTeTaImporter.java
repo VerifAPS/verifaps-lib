@@ -15,6 +15,7 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
 import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
+import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import org.w3c.dom.Node;
 
@@ -89,15 +90,12 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       String logFilePath = logFile.getAbsolutePath();
       switch (importedMessage.getReturncode()) {
         case RETURN_CODE_SUCCESS:
-          return new VerificationResult(VerificationResult.Status.VERIFIED, logFilePath);
+          return new VerificationResult(VerificationResult.Status.VERIFIED, logFile, null);
         case RETURN_CODE_NOT_VERIFIED:
-          return new VerificationResult(parseCounterexample(importedMessage), logFilePath);
-        case RETURN_CODE_ERROR:
-          return new VerificationResult(VerificationResult.Status.ERROR, logFilePath);
-        case RETURN_CODE_FATAL:
-          return new VerificationResult(VerificationResult.Status.FATAL, logFilePath);
+          return new VerificationResult(parseCounterexample(importedMessage), logFile);
         default:
-          return new VerificationResult(VerificationResult.Status.UNKNOWN, logFilePath);
+          VerificationError error = new VerificationError(VerificationError.Reason.ERROR);
+          return new VerificationResult(VerificationResult.Status.ERROR, logFile, error);
       }
     } catch (TransformerException | IOException e) {
       throw new ImportException(e);

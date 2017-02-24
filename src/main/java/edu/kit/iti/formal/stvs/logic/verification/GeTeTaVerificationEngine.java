@@ -8,6 +8,7 @@ import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import javafx.application.Platform;
@@ -29,7 +30,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   private ProcessMonitor processMonitor;
 
   public GeTeTaVerificationEngine(GlobalConfig config, List<Type> typeContext) throws
-      VerificationException {
+      VerificationError {
     verificationResult = new NullableProperty<>();
     getetaProcess = null;
     this.typeContext = typeContext;
@@ -37,15 +38,14 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     /* Check filenames */
     File nuxmvFile = new File(config.getNuxmvFilename());
     if (!nuxmvFile.exists() || nuxmvFile.isDirectory()) {
-      throw new VerificationException(VerificationException.Reason.NUXMV_NOT_FOUND);
+      throw new VerificationError(VerificationError.Reason.NUXMV_NOT_FOUND);
     }
   }
 
   @Override
   public void startVerification(VerificationScenario scenario,
                                 ConstraintSpecification spec) throws
-      IOException, ExportException
-  {
+      IOException, ExportException, VerificationError {
     System.out.println("Starting verification...");
     // Write ConstraintSpecification and Code to temporary files
     File tempSpecFile = File.createTempFile("verification-spec", ".xml");
@@ -64,19 +64,21 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     processBuilder.redirectOutput(getetaOutputFile);
     getetaProcess = processBuilder.start();
     // Find out when process finishes to set verification result property
-    processMonitor = new ProcessMonitor(getetaProcess, config.getVerificationTimeout());
-    processMonitor.processFinishedProperty().addListener(observable -> onVerificationDone());
-    // Starts the verification process in another thread
-    processMonitor.start();
+    try {
+      processMonitor = new ProcessMonitor(getetaProcess, config.getVerificationTimeout());
+      processMonitor.processFinishedProperty().addListener(observable -> onVerificationDone());
+      // Starts the verification process in another thread
+      processMonitor.start();
+    } catch (IllegalArgumentException e) {
+      throw new VerificationError(VerificationError.Reason.VERIFICATION_LAUNCH_ERROR);
+    }
   }
 
   @Override
   public void cancelVerification() {
-    System.out.println("Cancelling verification...");
     if (getetaProcess != null) {
       getetaProcess.destroy();
       getetaProcess = null;
-      System.out.println("Verification cancelled.");
     }
   }
 
@@ -93,50 +95,37 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     if (getetaProcess == null) { // Verification was cancelled
       return;
     }
-    System.out.println("Verification done!");
-    File logFile;
-    String processOutput;
-    try {
-      logFile = File.createTempFile("log-verification-", ".xml");
-      processOutput = IOUtils.toString(new FileInputStream(getetaOutputFile), "utf-8");
-      getetaOutputFile.delete();
-    } catch (IOException e) {
-      e.printStackTrace();
-      verificationResult.set(null);
-      return;
-    }
-    // Preprocess output (remove anything before the XML)
-    String cleanedProcessOutput = cleanProcessOutput(processOutput);
     VerificationResult result;
-    // Set the verification result depending on the GeTeTa output
+    File logFile = null;
     try {
+      String processOutput = IOUtils.toString(new FileInputStream(getetaOutputFile), "utf-8");
+      logFile = writeLogFile(processOutput);
+      String cleanedProcessOutput = cleanProcessOutput(processOutput);
+      // Set the verification result depending on the GeTeTa output
       if (processMonitor.isAborted()) {
-        result = makeErrorResult(processOutput, logFile, VerificationResult.Status.TIMEOUT);
+        VerificationError error = new VerificationError(VerificationError.Reason.TIMEOUT);
+        result = new VerificationResult(VerificationResult.Status.ERROR, logFile, error);
       } else {
         result = ImporterFacade.importVerificationResult(new ByteArrayInputStream(cleanedProcessOutput
             .getBytes()), ImporterFacade.ImportFormat.GETETA, typeContext);
       }
-    } catch (ImportException e) {
-      result = makeErrorResult(processOutput, logFile, VerificationResult.Status.ERROR);
+    } catch (IOException | ImportException e) {
+      VerificationError error = new VerificationError(e);
+      result = new VerificationResult(VerificationResult.Status.ERROR, logFile, error);
     }
     // set the verification result back in the javafx thread:
     VerificationResult finalResult = result; // have to do this because of lambda restrictions...
     Platform.runLater(() -> verificationResult.set(finalResult));
   }
 
-  private VerificationResult makeErrorResult(String processOutput, File logFile, VerificationResult.Status
-      errorStatus) {
-    PrintWriter writer;
+  private File writeLogFile(String processOutput) throws IOException {
+    File logFile = File.createTempFile("log-verification-", ".xml");
+    getetaOutputFile.delete();
     String logFilePath = logFile.getAbsolutePath();
-    try {
-      writer = new PrintWriter(logFilePath);
-    } catch (FileNotFoundException e1) {
-      e1.printStackTrace();
-      return null;
-    }
+    PrintWriter writer = new PrintWriter(logFilePath);
     writer.println(processOutput);
     writer.close();
-    return new VerificationResult(errorStatus, logFilePath);
+    return logFile;
   }
 
   private String cleanProcessOutput(String processOutput) {
