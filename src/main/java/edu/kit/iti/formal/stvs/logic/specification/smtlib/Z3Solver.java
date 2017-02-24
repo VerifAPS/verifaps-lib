@@ -11,6 +11,7 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
 import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
+import edu.kit.iti.formal.stvs.util.AsyncTaskCompletedHandler;
 import edu.kit.iti.formal.stvs.util.ProcessOutputAsyncTask;
 
 import java.util.ArrayList;
@@ -142,7 +143,7 @@ public class Z3Solver {
     this.z3Path = z3Path;
   }
 
-  private ProcessOutputAsyncTask concretize(String smtString, Consumer<Optional<String>> handler) {
+  private ProcessOutputAsyncTask concretize(String smtString, AsyncTaskCompletedHandler<Optional<String>> handler) {
     ProcessBuilder processBuilder = new ProcessBuilder(z3Path, "-in", "-smt2", "-T:" + timeout);
     return new ProcessOutputAsyncTask(processBuilder, smtString, handler);
   }
