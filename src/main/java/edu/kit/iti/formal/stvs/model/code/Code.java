@@ -1,22 +1,13 @@
 package edu.kit.iti.formal.stvs.model.code;
 
-import java.util.List;
-
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
-import javafx.application.Platform;
-import javafx.beans.binding.Binding;
-import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
 
 
 /**

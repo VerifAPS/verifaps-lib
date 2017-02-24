@@ -12,14 +12,12 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * Created by philipp on 09.01.17.
@@ -128,15 +126,15 @@ public class ParsedCode {
   }
 
   public static void parseCode(String input,
-                               Consumer<List<? extends Token>> tokenListener,
-                               Consumer<List<SyntaxError>> syntaxErrorsListener,
-                               Consumer<ParsedCode> parsedCodeListener) {
+                               ParsedTokenHandler parsedTokenHandler,
+                               ParsedSyntaxErrorHandler syntaxErrorsListener,
+                               ParsedCodeHandler parsedCodeListener) {
     try {
       SyntaxErrorListener syntaxErrorListener = new SyntaxErrorListener();
       IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(input));
       lexer.removeErrorListeners();
       lexer.addErrorListener(syntaxErrorListener);
-      tokenListener.accept(lexer.getAllTokens());
+      parsedTokenHandler.accept(lexer.getAllTokens());
       lexer.reset();
 
       IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
