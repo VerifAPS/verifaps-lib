@@ -7,6 +7,7 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
@@ -15,9 +16,9 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Tab;
+import javafx.scene.control.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,7 +95,6 @@ public class SpecificationsPaneController implements Controller {
 
   }
 
-
   private void onSwitchActiveTab(Tab tab) {
     SpecificationController controller = controllers.get(tab);
     if (controller == null) {
@@ -110,6 +110,9 @@ public class SpecificationsPaneController implements Controller {
         Bindings.isEmpty(scenario.getCode().syntaxErrorsProperty()).not(), globalConfig);
     Tab tab = new Tab();
     tab.setOnCloseRequest(e -> onTabCloseRequest(e, tab));
+    if (hybridSpecification.isEditable()) {
+      tab.setContextMenu(createTabContextMenu());
+    }
     tab.textProperty().bind(hybridSpecification.nameProperty());
     tab.setContent(controller.getView());
     if (hybridSpecification.isEditable()) {
@@ -121,6 +124,24 @@ public class SpecificationsPaneController implements Controller {
     controllers.put(tab, controller);
     view.getTabPane().getSelectionModel().select(tab);
     return controller;
+  }
+
+  private void onTabSetName(ActionEvent actionEvent) {
+    Tab activeTab = view.getTabPane().getSelectionModel().getSelectedItem();
+    ConstraintSpecification activeSpec = controllers.get(activeTab).getSpec();
+    TextInputDialog textInputDialog = new TextInputDialog(activeSpec.getName());
+    textInputDialog.setHeaderText("Set Specification Name");
+    textInputDialog.setTitle("Specification Name");
+    textInputDialog.showAndWait();
+    activeSpec.setName(textInputDialog.getResult());
+  }
+
+  private ContextMenu createTabContextMenu() {
+    ContextMenu contextMenu = new ContextMenu();
+    MenuItem setNameItem = new MenuItem("Rename");
+    setNameItem.setOnAction(this::onTabSetName);
+    contextMenu.getItems().add(setNameItem);
+    return contextMenu;
   }
 
   public SpecificationController addTab(HybridSpecification hybridSpecification) {
