@@ -1,8 +1,5 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
-import java.util.function.Function;
-import java.util.function.IntFunction;
-
 /**
  * runtime-representation for integer values of {@link Expression}s.
  *
@@ -23,10 +20,10 @@ public class ValueInt implements Value {
 
   @Override
   public <R> R match(
-      IntFunction<R> matchInt,
-      Function<Boolean, R> matchBoolean,
-      Function<ValueEnum, R> matchEnum) {
-    return matchInt.apply(value);
+      ValueIntegerHandler<R> matchInt,
+      ValueBooleanHandler<R> matchBoolean,
+      ValueEnumHandler<R> matchEnum) {
+    return matchInt.handle(value);
   }
 
   public int getValue() {

@@ -1,8 +1,5 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
-import java.util.function.Function;
-import java.util.function.IntFunction;
-
 /**
  * The common interface for values of Expressions.
  * Values are visitable and have a type.
@@ -20,9 +17,9 @@ public interface Value {
    * @return the return value of the visitor function called
    */
   <R> R match(
-      IntFunction<R> matchInt,
-      Function<Boolean, R> matchBoolean,
-      Function<ValueEnum, R> matchEnum
+      ValueIntegerHandler<R> matchInt,
+      ValueBooleanHandler<R> matchBoolean,
+      ValueEnumHandler<R> matchEnum
   );
 
   /**

@@ -1,8 +1,5 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
-import java.util.function.Function;
-import java.util.function.IntFunction;
-
 /**
  * runtime-representation for boolean values of {@link Expression}s.
  *
@@ -27,10 +24,10 @@ public class ValueBool implements Value {
 
   @Override
   public <R> R match(
-      IntFunction<R> matchInt,
-      Function<Boolean, R> matchBoolean,
-      Function<ValueEnum, R> matchEnum) {
-    return matchBoolean.apply(value);
+      ValueIntegerHandler<R> matchInt,
+      ValueBooleanHandler<R> matchBoolean,
+      ValueEnumHandler<R> matchEnum) {
+    return matchBoolean.handle(value);
   }
 
   public boolean getValue() {

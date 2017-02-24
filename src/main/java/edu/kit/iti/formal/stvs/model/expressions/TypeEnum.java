@@ -1,8 +1,10 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * runtime-representation for enum types.
@@ -40,10 +42,10 @@ public class TypeEnum implements Type {
 
   @Override
   public <R> R match(
-      Supplier<R> matchIntType,
-      Supplier<R> matchBoolType,
-      Function<TypeEnum, R> matchEnumType) {
-    return matchEnumType.apply(this);
+      TypeIntegerHandler<R> matchIntType,
+      TypeBooleanHandler<R> matchBoolType,
+      TypeEnumHandler<R> matchEnumType) {
+    return matchEnumType.handle(this);
   }
 
   @Override
