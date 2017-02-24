@@ -82,6 +82,7 @@ public class StvsRootController implements Controller {
         } catch (ExportException | IOException | VerificationError e) {
           AlertFactory.createAlert(e, "Verification Error", "The verification " +
               "could not be started.").showAndWait();
+          stvsRootModel.getScenario().cancel();
         }
         break;
       case STOP:
