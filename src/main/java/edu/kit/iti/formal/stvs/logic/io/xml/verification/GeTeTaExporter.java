@@ -1,9 +1,14 @@
 package edu.kit.iti.formal.stvs.logic.io.xml.verification;
 
-import com.sun.xml.bind.marshaller.DataWriter;
-import edu.kit.iti.formal.exteta_1.*;
+import edu.kit.iti.formal.exteta_1.ConstraintVariable;
+import edu.kit.iti.formal.exteta_1.DataType;
+import edu.kit.iti.formal.exteta_1.IoVariable;
+import edu.kit.iti.formal.exteta_1.ObjectFactory;
+import edu.kit.iti.formal.exteta_1.Step;
+import edu.kit.iti.formal.exteta_1.Steps;
+import edu.kit.iti.formal.exteta_1.TestTable;
+import edu.kit.iti.formal.exteta_1.Variables;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
-import edu.kit.iti.formal.stvs.logic.io.Exporter;
 import edu.kit.iti.formal.stvs.logic.io.VariableEscaper;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlExporter;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
@@ -13,29 +18,14 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.List;
 
 
 /**
- * Exporter for communication with the GeTeTa
+ * Exporter for communication with the GeTeTa.
  * @author Benjamin Alt
  */
 public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
@@ -45,6 +35,12 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
     objectFactory = new ObjectFactory();
   }
 
+  /**
+   * Creates {@link Steps} that correspond to the rows in the given {@link ConstraintSpecification}.
+   *
+   * @param source The specification from which the steps should be taken
+   * @return Steps object ready to be used in a {@link TestTable}
+   */
   private Steps makeSteps(ConstraintSpecification source) {
     Steps steps = objectFactory.createSteps();
     // A step corresponds to a row in a ConstraintSpecification
@@ -64,19 +60,29 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
     return steps;
   }
 
+  /**
+   * Creates {@link Variables} from all variables present in the given
+   * {@link ConstraintSpecification}.
+   *
+   * @param source The specification from which the variables should be taken
+   * @return Variables object ready to be used in a {@link TestTable}
+   */
   private Variables makeVariables(ConstraintSpecification source) {
     Variables variables = objectFactory.createVariables();
-    for (SpecIoVariable ioVariable : source.getColumnHeaders()) {
-      IoVariable exportedVariable = objectFactory.createIoVariable();
-      exportedVariable.setName(VariableEscaper.escapeName(ioVariable.getName()));
-      exportedVariable.setDataType(getDataType(ioVariable));
-      if (ioVariable.getCategory() == VariableCategory.INPUT) {
-        exportedVariable.setIo("input");
-      } else {
-        exportedVariable.setIo("output");
-      }
-      variables.getVariableOrConstraint().add(exportedVariable);
-    }
+    variables.getVariableOrConstraint().addAll(makeIoVariables(source).getVariableOrConstraint());
+    variables.getVariableOrConstraint().addAll(makeFreeVariables(source).getVariableOrConstraint());
+    return variables;
+  }
+
+  /**
+   * Creates {@link Variables} from the {@link FreeVariable FreeVariables}
+   * present in the given {@link ConstraintSpecification}.
+   *
+   * @param source The specification from which the variables should be taken
+   * @return Variables object
+   */
+  private Variables makeFreeVariables(ConstraintSpecification source) {
+    Variables variables = objectFactory.createVariables();
     for (FreeVariable freeVariable : source.getFreeVariableList().getVariables()) {
       ConstraintVariable exportedVariable = objectFactory.createConstraintVariable();
       exportedVariable.setName(VariableEscaper.escapeName(freeVariable.getName()));
@@ -91,6 +97,35 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
     return variables;
   }
 
+  /**
+   * Creates {@link Variables} from the {@link SpecIoVariable} present
+   * in the given {@link ConstraintSpecification}.
+   *
+   * @param source The specification from which the variables should be taken
+   * @return Variables object
+   */
+  private Variables makeIoVariables(ConstraintSpecification source) {
+    Variables variables = objectFactory.createVariables();
+    for (SpecIoVariable ioVariable : source.getColumnHeaders()) {
+      IoVariable exportedVariable = objectFactory.createIoVariable();
+      exportedVariable.setName(VariableEscaper.escapeName(ioVariable.getName()));
+      exportedVariable.setDataType(getDataType(ioVariable));
+      if (ioVariable.getCategory() == VariableCategory.INPUT) {
+        exportedVariable.setIo("input");
+      } else {
+        exportedVariable.setIo("output");
+      }
+      variables.getVariableOrConstraint().add(exportedVariable);
+    }
+    return variables;
+  }
+
+  /**
+   * Get {@link DataType} of a variable from STVS.
+   *
+   * @param variable Variable from which the @link DataType} should be determined
+   * @return the determined @link DataType} of the {@code variable}
+   */
   private DataType getDataType(edu.kit.iti.formal.stvs.model.common.Variable variable) {
     if (variable.getType().equals("INT")) {
       return DataType.INT;
@@ -101,6 +136,14 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
     }
   }
 
+  /**
+   * Converts a given {@link ConstraintSpecification} into a XML node
+   * that is compatible with the GeTeTa verification engine.
+   *
+   * @param source The specification that shoul be converted
+   * @return XML Node representing the specification
+   * @throws ExportException marshalling was not successful
+   */
   @Override
   public Node exportToXmlNode(ConstraintSpecification source) throws ExportException {
     TestTable testTable = objectFactory.createTestTable();
