@@ -12,7 +12,6 @@ import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -24,12 +23,12 @@ public class SmtEncoder {
   //      Map<Row, Max. number of cycles for that row>
   private final List<ValidIoVariable> ioVariables;
   private final ValidSpecification specification;
-  private final Predicate<String> isIoVariable;
   private final Map<String, Type> freeVariablesContext;
   private final List<ValidFreeVariable> validFreeVariables;
   private final List<Integer> maxDurations;
+  private final List<String> ioVariableTypes;
 
-  private SConstraint sConstrain;
+  private SConstraint sConstraint;
 
   /**
    * Creates an encoder for a specification.
@@ -70,11 +69,10 @@ public class SmtEncoder {
     this.validFreeVariables = validFreeVariables;
     this.freeVariablesContext = validFreeVariables.stream()
         .collect(Collectors.toMap(ValidFreeVariable::getName, ValidFreeVariable::getType));
-    List<String> ioVariableTypes = ioVariables.stream().map(ValidIoVariable::getName).collect
+    this.ioVariableTypes = ioVariables.stream().map(ValidIoVariable::getName).collect
         (Collectors.toList());
 
-    this.isIoVariable = ioVariableTypes::contains;
-    this.sConstrain = new SConstraint()
+    this.sConstraint = new SConstraint()
         .addHeaderDefinitions(createFreeVariables())
         .addHeaderDefinitions(setFreeVariablesDefaultValues());
 
@@ -82,14 +80,14 @@ public class SmtEncoder {
     for (int z = 0; z < specification.getDurations().size(); z++) {
       LowerBoundedInterval interval = specification.getDurations().get(z);
       //n_z >= lowerBound_z
-      this.sConstrain.addGlobalConstrains(new SList("bvuge", "n_" + z, BitvectorUtils.hexFromInt(interval.getLowerBound(), 4) +
+      this.sConstraint.addGlobalConstrains(new SList("bvuge", "n_" + z, BitvectorUtils.hexFromInt(interval.getLowerBound(), 4) +
           ""));
       //n_z <= upperBound_z
       if (interval.getUpperBound().isPresent()) {
-        this.sConstrain.addGlobalConstrains(new SList("bvule", "n_" + z,
+        this.sConstraint.addGlobalConstrains(new SList("bvule", "n_" + z,
             BitvectorUtils.hexFromInt(Math.min(interval.getUpperBound().get(), getMaxDuration(z)), 4)));
       } else {
-        this.sConstrain.addGlobalConstrains(new SList("bvule", "n_" + z,
+        this.sConstraint.addGlobalConstrains(new SList("bvule", "n_" + z,
             BitvectorUtils.hexFromInt(getMaxDuration(z), 4)));
       }
     }
@@ -102,18 +100,18 @@ public class SmtEncoder {
 
         for (int i = 0; i < getMaxDuration(z); i++) {
           SmtConvertExpressionVisitor visitor = new SmtConvertExpressionVisitor
-              (this::getTypeForVariable, z,
-                  i, ioVariable, isIoVariable, SmtEncoder::getSMTLibVariableTypeName);
+              (this, z,
+                  i, ioVariable);
           SExpr expressionConstraint = expression.takeVisitor(visitor);
           //n_z >= i => ExpressionVisitor(z,i,...)
-          this.sConstrain = new RecSConstraint(
+          this.sConstraint = new RecSConstraint(
               new SList("implies",
                   new SList("bvuge", "n_" + z, BitvectorUtils.hexFromInt(i,4)),
                   expressionConstraint
               ),
               visitor.getConstraint().getGlobalConstraints(),
               visitor.getConstraint().getVariableDefinitions()
-          ).combine(this.sConstrain);
+          ).combine(this.sConstraint);
         }
       }
     }
@@ -126,7 +124,7 @@ public class SmtEncoder {
       for (int z = 0; z < column.getCells().size(); z++) {
         Expression expression = column.getCells().get(z);
         //Add n_x to const declaration
-        this.sConstrain.addHeaderDefinitions(new SList(
+        this.sConstraint.addHeaderDefinitions(new SList(
             "declare-const",
             "n_" + z,
             "(_ BitVec 16)"
@@ -136,7 +134,7 @@ public class SmtEncoder {
           //Iterate over possible cycles in last row
           for (int k = 0; k <= getMaxDuration(z - 1); k++) {
             // n_(z-1) = k => A_z_i = A_(z-1)_(k-i)
-            this.sConstrain.addGlobalConstrains(
+            this.sConstraint.addGlobalConstrains(
                 new SList("implies",
                     new SList("=",
                         "n_" + (z - 1),
@@ -149,7 +147,7 @@ public class SmtEncoder {
                 )
             );
             //Add backward reference to const declaration
-            this.sConstrain.addHeaderDefinitions(
+            this.sConstraint.addHeaderDefinitions(
                 new SList(
                     "declare-const",
                     "|" + variableName + "_" + (z - 1) + "_" + (k - i) + "|", getSMTLibVariableTypeName(ioVariable.getValidType())
@@ -157,7 +155,7 @@ public class SmtEncoder {
             );
           }
           //Add backward reference to const declaration
-          this.sConstrain.addHeaderDefinitions(
+          this.sConstraint.addHeaderDefinitions(
               new SList(
                   "declare-const",
                   "|" + variableName + "_" + z + "_" + (-i) + "|", getSMTLibVariableTypeName(ioVariable.getValidType())
@@ -166,6 +164,10 @@ public class SmtEncoder {
         }
       }
     }
+  }
+
+  protected boolean isIoVariable(String name){
+    return ioVariableTypes.contains(name);
   }
 
   private List<SExpr> setFreeVariablesDefaultValues() {
@@ -201,7 +203,7 @@ public class SmtEncoder {
     );
   }
 
-  private Type getTypeForVariable(String variableName) {
+  protected Type getTypeForVariable(String variableName) {
     Type type = freeVariablesContext.get(variableName);
     if (type == null) {
       type = specification.getColumnHeaderByName(variableName).getValidType();
@@ -211,7 +213,7 @@ public class SmtEncoder {
 
   private List<SExpr> createFreeVariables() {
     return freeVariablesContext.entrySet().stream()
-        .filter(item -> !isIoVariable.test(item.getKey()))
+        .filter(item -> !isIoVariable(item.getKey()))
         .map(item -> getDeclarationForVariable(item.getValue(), item.getKey())).collect(Collectors.toList());
   }
 
@@ -219,7 +221,7 @@ public class SmtEncoder {
     return new SList("declare-const", "|" + variableName + "|", getSMTLibVariableTypeName(type));
   }
 
-  private static String getSMTLibVariableTypeName(Type type) {
+  protected static String getSMTLibVariableTypeName(Type type) {
     return type.match(
         () -> "(_ BitVec 16)",
         () -> "Bool",
@@ -247,7 +249,7 @@ public class SmtEncoder {
     }
   }
 
-  public SConstraint getConstrain() {
-    return sConstrain;
+  public SConstraint getConstraint() {
+    return sConstraint;
   }
 }

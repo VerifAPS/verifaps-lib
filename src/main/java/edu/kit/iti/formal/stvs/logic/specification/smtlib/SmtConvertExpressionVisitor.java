@@ -12,8 +12,6 @@ import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * This class provides a visitor for an Expression to convert it into a z3 model
@@ -44,32 +42,27 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     put(BinaryFunctionExpr.Op.MODULO, "bvsmod");
   }};
 
-  private final Function<String, Type> getTypeForVariable;
+  private final SmtEncoder smtEncoder;
   private final int row;
   private final int iteration;
   private final ValidIoVariable column;
-  private final Predicate<String> isIoVariable;
-  private final Function<Type, String> getSMTLibVariableName;
 
   private final SConstraint sConstraint;
 
   /**
-   * Creates a visitor from a type context.
-   * The context is needed while visiting because of the logic in choco models
+   * Creates a visitor to convert an expression to a set of constraints.
    *
-   * @param getTypeForVariable        A Map from variable names to types
-   * @param row                       row, that the visitor should convert
-   * @param getSMTLibVariableTypeName
+   * @param smtEncoder encoder that holds additional information about the expression that should be parsed
+   * @param row row, that holds the cell the visitor should convert
+   * @param iteration current iteration
+   * @param column column, that holds the cell the visitor should convert
    */
-  public SmtConvertExpressionVisitor(Function<String, Type> getTypeForVariable, int row, int
-      iteration, ValidIoVariable column, Predicate<String> isIoVariable, Function<Type, String>
-                                         getSMTLibVariableTypeName) {
-    this.getTypeForVariable = getTypeForVariable;
+  public SmtConvertExpressionVisitor(SmtEncoder smtEncoder, int row, int
+      iteration, ValidIoVariable column) {
+    this.smtEncoder = smtEncoder;
     this.row = row;
     this.iteration = iteration;
-    this.isIoVariable = isIoVariable;
     this.column = column;
-    this.getSMTLibVariableName = getSMTLibVariableTypeName;
 
     String name = "|" + column.getName() + "_" + row + "_" + iteration + "|";
 
@@ -77,7 +70,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
         new SList(
             "declare-const",
             name,
-            getSMTLibVariableTypeName.apply(column.getValidType())
+            SmtEncoder.getSMTLibVariableTypeName(column.getValidType())
         )
     );
 
@@ -164,13 +157,13 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     Integer variableReferenceIndex = variableExpr.getIndex().orElse(0);
 
     //Check if variable is in getTypeForVariable
-    if (getTypeForVariable.apply(variableName) == null) {
+    if (smtEncoder.getTypeForVariable(variableName) == null) {
       throw new IllegalStateException("Wrong Context: No variable of name '" + variableName + "' in getTypeForVariable");
     }
-    Type type = getTypeForVariable.apply(variableName);
+    Type type = smtEncoder.getTypeForVariable(variableName);
 
     // is an IOVariable?
-    if (isIoVariable.test(variableName)) {
+    if (smtEncoder.isIoVariable(variableName)) {
       // Do Rule (3)
 
       //does it reference a previous cycle? -> guarantee reference-ability

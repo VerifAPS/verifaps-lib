@@ -25,10 +25,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.assertEquals;
@@ -83,7 +81,7 @@ public class Z3SolverTest {
     SmtEncoder preprocessor = new SmtEncoder(maxDurations, spec, freeVariables);
     AtomicBoolean outputProcessed = new AtomicBoolean(false);
 
-    ProcessOutputAsyncTask processOutputAsyncTask = solver.concretizeSConstraint(preprocessor.getConstrain(),
+    ProcessOutputAsyncTask processOutputAsyncTask = solver.concretizeSConstraint(preprocessor.getConstraint(),
         spec.getColumnHeaders(), optionalSpec -> {
           ConcreteSpecification concreteSpecification = optionalSpec.get();
           assertNotNull(concreteSpecification);

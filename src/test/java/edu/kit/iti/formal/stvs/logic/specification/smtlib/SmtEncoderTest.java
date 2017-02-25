@@ -2,22 +2,10 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import edu.kit.iti.formal.stvs.TestUtils;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
-import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
-import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
-import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
-import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
-import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
-import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
-import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleObjectProperty;
 import org.junit.Test;
-import org.junit.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +31,7 @@ public class SmtEncoderTest {
     int maxDuration = 3;
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
-    SConstraint output = smtEncoder.getConstrain();
+    SConstraint output = smtEncoder.getConstraint();
     Set<SExpr> constraints = output.getGlobalConstraints();
 
     System.out.println(output.toString());
@@ -74,7 +62,7 @@ public class SmtEncoderTest {
 
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
-    SConstraint output = smtEncoder.getConstrain();
+    SConstraint output = smtEncoder.getConstraint();
     Set<SExpr> constraints = output.getGlobalConstraints();
     Set<SExpr> definitions = output.getVariableDefinitions();
 
@@ -99,7 +87,7 @@ public class SmtEncoderTest {
 
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
-    SConstraint output = smtEncoder.getConstrain();
+    SConstraint output = smtEncoder.getConstraint();
     Set<SExpr> constraints = output.getGlobalConstraints();
     Set<SExpr> definitions = output.getVariableDefinitions();
 
@@ -125,7 +113,7 @@ public class SmtEncoderTest {
     }};
 
     SmtEncoder preprocessor = new SmtEncoder(maxDurations, spec, freeVariables);
-    System.out.println(preprocessor.getConstrain());
+    System.out.println(preprocessor.getConstraint());
   }
 
 
@@ -144,7 +132,7 @@ public class SmtEncoderTest {
     }};
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDurations, spec, freeVariables);
-    SConstraint output = smtEncoder.getConstrain();
+    SConstraint output = smtEncoder.getConstraint();
     Set<SExpr> constraints = output.getGlobalConstraints();
 
     System.out.println(output);
