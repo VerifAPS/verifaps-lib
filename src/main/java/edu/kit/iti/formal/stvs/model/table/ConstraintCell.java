@@ -25,6 +25,10 @@ public class ConstraintCell implements CellOperationProvider {
     this.comment = new SimpleStringProperty();
   }
 
+  /**
+   * Copy constructor; performs a deep copy of a given ConstraintCell.
+   * @param constraintCell The ConstraintCell to copy
+   */
   public ConstraintCell(ConstraintCell constraintCell) {
     this(constraintCell.getAsString());
     this.setComment(constraintCell.getComment());
