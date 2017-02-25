@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(Parameterized.class)
 public class FreeVariableListValidatorTest {
 
-  @Parameters(name="expect \"{0}\"")
+  @Parameters(name = "expect \"{0}\"")
   public static Object[][] parameters() {
     return new Object[][] {
         { "", Arrays.asList(

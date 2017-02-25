@@ -74,14 +74,19 @@ public class Selection {
 
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    Selection selection = (Selection) o;
-
-    if (column.get() == null ? selection.column.get() != null : !column.get().equals(selection.column.get()))
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
+    }
+
+    Selection selection = (Selection) obj;
+    if (column.get() == null ? selection.column.get() != null
+        : !column.get().equals(selection.column.get())) {
+      return false;
+    }
     return row.get() == null ? selection.row.get() == null : row.get().equals(selection.row.get());
 
   }

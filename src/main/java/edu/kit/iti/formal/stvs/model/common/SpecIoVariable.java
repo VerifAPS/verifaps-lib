@@ -95,15 +95,25 @@ public class SpecIoVariable extends IoVariable implements Commentable {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
 
-    SpecIoVariable that = (SpecIoVariable) o;
+    SpecIoVariable that = (SpecIoVariable) obj;
 
-    if (name != null ? !name.get().equals(that.name.get()) : that.name != null) return false;
-    if (type != null ? !type.get().equals(that.type.get()) : that.type != null) return false;
-    if (category != null ? !category.get().equals(that.category.get()) : that.category != null) return false;
+    if (name != null ? !name.get().equals(that.name.get()) : that.name != null) {
+      return false;
+    }
+    if (type != null ? !type.get().equals(that.type.get()) : that.type != null) {
+      return false;
+    }
+    if (category != null ? !category.get().equals(that.category.get()) : that.category != null) {
+      return false;
+    }
     return columnConfig != null ? columnConfig.equals(that.columnConfig) : that.columnConfig == null;
 
   }

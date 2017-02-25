@@ -37,13 +37,19 @@ public class ValidIoVariable extends IoVariable {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
 
-    ValidIoVariable that = (ValidIoVariable) o;
+    ValidIoVariable that = (ValidIoVariable) obj;
 
-    if (getCategory() != that.getCategory()) return false;
+    if (getCategory() != that.getCategory()) {
+      return false;
+    }
     if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null)
       return false;
     return getType() != null ? getType().equals(that.getType()) : that.getType() == null;

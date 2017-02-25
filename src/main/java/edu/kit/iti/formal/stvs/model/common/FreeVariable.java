@@ -105,10 +105,10 @@ public class FreeVariable implements Variable {
     if (obj == this) return true;
 
     FreeVariable rhs = (FreeVariable) obj;
-    return new EqualsBuilder().
-            append(name.get(), rhs.name.get()).
-            append(type.get(), rhs.type.get()).
-            append(defaultValue.get(), rhs.defaultValue.get()).
-            isEquals();
+    return new EqualsBuilder()
+        .append(name.get(), rhs.name.get())
+        .append(type.get(), rhs.type.get())
+        .append(defaultValue.get(), rhs.defaultValue.get())
+        .isEquals();
   }
 }
