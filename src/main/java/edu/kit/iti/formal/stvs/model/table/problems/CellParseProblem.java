@@ -1,6 +1,14 @@
 package edu.kit.iti.formal.stvs.model.table.problems;
 
+import edu.kit.iti.formal.stvs.model.expressions.Expression;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.TypeCheckException;
+import edu.kit.iti.formal.stvs.model.expressions.TypeChecker;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
+import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
+import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
+
+import java.util.List;
 
 /**
  * @author Benjamin Alt
@@ -8,6 +16,19 @@ import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
 public class CellParseProblem extends CellProblem {
 
   private final ParseException exception;
+
+  public static Expression expressionOrProblemForCell(List<Type> typeContext, TypeChecker typeChecker, String columnId, int row, ConstraintCell cell)
+      throws CellProblem {
+    try {
+      return CellTypeProblem.createValidExpressionFromCell(typeContext, typeChecker, columnId, cell);
+    } catch (TypeCheckException typeCheckException) {
+      throw new CellTypeProblem(typeCheckException, columnId, row);
+    } catch (ParseException parseException) {
+      throw new CellParseProblem(parseException, columnId, row);
+    } catch (UnsupportedExpressionException unsupportedException) {
+      throw new CellUnsupportedExpressionProblem(unsupportedException, columnId, row);
+    }
+  }
 
   private static String createErrorMessage(ParseException exception) {
     return exception.getMessage();

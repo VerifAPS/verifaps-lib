@@ -3,7 +3,6 @@ package edu.kit.iti.formal.stvs.model.table.problems;
 import edu.kit.iti.formal.stvs.model.common.*;
 import edu.kit.iti.formal.stvs.model.expressions.*;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
-import edu.kit.iti.formal.stvs.model.expressions.parser.IntervalParser;
 import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
 import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 import edu.kit.iti.formal.stvs.model.table.*;
@@ -115,7 +114,9 @@ public class ConstraintSpecificationValidator {
         ConstraintCell cell = mapEntry.getValue();
 
         try {
-          expressionsForRow.put(columnId, expressionOrProblemForCell(typeChecker, columnId, rowIndex, cell));
+          expressionsForRow.put(columnId,
+              CellParseProblem.expressionOrProblemForCell(
+                  typeContext.get(), typeChecker, columnId, rowIndex, cell));
         } catch (CellProblem problem) {
           specProblems.add(problem);
           specificationIsValid = false;
@@ -133,7 +134,7 @@ public class ConstraintSpecificationValidator {
     for (int durIndex = 0; durIndex < specification.getDurations().size(); durIndex++) {
       try {
         LowerBoundedInterval interval =
-            lowerBoundedIntervalOrProblemForDuration(durIndex, specification.getDurations().get(durIndex));
+            DurationProblem.tryParseDuration(durIndex, specification.getDurations().get(durIndex));
         if (specificationIsValid) {
           validSpec.getDurations().add(interval);
         }
@@ -151,43 +152,6 @@ public class ConstraintSpecificationValidator {
       validSpecification.set(null);
     }
     valid.set(specProblems.isEmpty());
-  }
-
-  private LowerBoundedInterval lowerBoundedIntervalOrProblemForDuration(int row, ConstraintDuration duration)
-      throws DurationProblem {
-    try {
-      return IntervalParser.parse(duration.getAsString());
-    } catch (ParseException parseException) {
-      throw new DurationParseProblem(parseException, row);
-    }
-  }
-
-  private Expression expressionOrProblemForCell(TypeChecker typeChecker, String columnId, int row, ConstraintCell cell)
-      throws CellProblem {
-    try {
-      return createValidExpressionFromCell(typeChecker, columnId, cell);
-    } catch (TypeCheckException typeCheckException) {
-      throw new CellTypeProblem(typeCheckException, columnId, row);
-    } catch (ParseException parseException) {
-      throw new CellParseProblem(parseException, columnId, row);
-    } catch (UnsupportedExpressionException unsupportedException) {
-      throw new CellUnsupportedExpressionProblem(unsupportedException, columnId, row);
-    }
-  }
-
-  protected Expression createValidExpressionFromCell(TypeChecker typeChecker, String columnId, ConstraintCell cell)
-      throws TypeCheckException, ParseException, UnsupportedExpressionException {
-    // First try to parse the expression:
-    ExpressionParser parser = new ExpressionParser(columnId, typeContext.get());
-    Expression expression = parser.parseExpression(cell.getAsString());
-
-    Type type = typeChecker.typeCheck(expression);
-    if (type.checksAgainst(TypeBool.BOOL)) {
-      return expression;
-    } else {
-      throw new TypeCheckException(expression,
-          "The cell expression must evaluate to a boolean, instead it evaluates to: " + type.getTypeName());
-    }
   }
 
   public ReadOnlyBooleanProperty validProperty() {

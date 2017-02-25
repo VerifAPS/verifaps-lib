@@ -5,6 +5,7 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
+import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import java.util.Collection;
 import java.util.Map;
@@ -23,24 +24,46 @@ public class InvalidIoVarProblem extends ColumnProblem {
       MinorProblemsHandler minorProblemsHandler)
       throws InvalidIoVarProblem {
 
-    Optional<CodeIoVariable> matchedCodeVar = codeIoVariables.stream()
-        .filter(ioVar -> ioVar.getName().equals(specIoVariable.getName()))
-        .findAny();
-    if (!matchedCodeVar.isPresent()) {
-      minorProblemsHandler.handle(new InvalidIoVarProblem(specIoVariable, ErrorType.NAME_MISMATCH));
-    } else if (!specIoVariable.getType().equals(matchedCodeVar.get().getType())) {
-      minorProblemsHandler.handle(new InvalidIoVarProblem(specIoVariable, ErrorType.TYPE_MISMATCH));
-    } else if (!specIoVariable.getCategory().equals(matchedCodeVar.get().getCategory())) {
-      minorProblemsHandler.handle(new InvalidIoVarProblem(specIoVariable, ErrorType.CATEGORY_MISMATCH));
-    }
+    String name = tryGetValidName(specIoVariable, codeIoVariables, minorProblemsHandler);
+    Type type = tryGetValidType(specIoVariable, typesByName, codeIoVariables, minorProblemsHandler);
 
-    if (!VariableExpr.IDENTIFIER_PATTERN.matcher(specIoVariable.getName()).matches()) {
-      throw new InvalidIoVarProblem(specIoVariable, ErrorType.NAME_INVALID);
-    }
-    Type type = Optional.ofNullable(typesByName.get(specIoVariable.getType()))
-        .orElseThrow(() -> new InvalidIoVarProblem(specIoVariable, ErrorType.TYPE_UNKNOWN));
+    return new ValidIoVariable(specIoVariable.getCategory(), name, type);
+  }
 
-    return new ValidIoVariable(specIoVariable.getCategory(), specIoVariable.getName(), type);
+  private static Type tryGetValidType(
+      SpecIoVariable specIoVariable,
+      Map<String, Type> typesByName,
+      Collection<CodeIoVariable> codeIoVariables,
+      MinorProblemsHandler minorProblemsHandler)
+      throws InvalidIoVarProblem {
+    Type type = typesByName.get(specIoVariable.getType());
+    if (type == null) {
+      throw new InvalidIoVarProblem(specIoVariable, ErrorType.TYPE_UNKNOWN);
+    }
+    codeIoVariables.stream()
+        .filter(codeIoVariable -> codeIoVariable.getName().equals(specIoVariable.getName()))
+        .findAny().ifPresent(codeIoVariable -> {
+      if (!codeIoVariable.getType().equals(specIoVariable.getType())) {
+        minorProblemsHandler.handle(
+            new InvalidIoVarProblem(specIoVariable, ErrorType.TYPE_MISMATCH));
+      }
+    });
+    return type;
+  }
+
+  private static String tryGetValidName(
+      SpecIoVariable ioVar,
+      Collection<CodeIoVariable> codeIoVariables,
+      MinorProblemsHandler minorProblemsHandler)
+      throws InvalidIoVarProblem {
+    if (!VariableExpr.IDENTIFIER_PATTERN.matcher(ioVar.getName()).matches()) {
+      throw new InvalidIoVarProblem(ioVar, ErrorType.NAME_INVALID);
+    }
+    if (!codeIoVariables.stream().anyMatch(codeIoVar -> codeIoVar.getName().equals(ioVar.getName()))) {
+      minorProblemsHandler.handle(
+          new InvalidIoVarProblem(ioVar, ErrorType.NAME_MISMATCH));
+    }
+    return ioVar.getName();
   }
 
   private static String createMessageForType(ErrorType errorType) {

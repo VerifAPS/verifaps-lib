@@ -1,12 +1,25 @@
 package edu.kit.iti.formal.stvs.model.table.problems;
 
 import edu.kit.iti.formal.stvs.model.common.Selection;
+import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval;
+import edu.kit.iti.formal.stvs.model.expressions.parser.IntervalParser;
+import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
+import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 
 /**
  * Created by Philipp on 03.02.2017.
  * @author Philipp
  */
 public abstract class DurationProblem extends SpecProblem {
+
+  public static LowerBoundedInterval tryParseDuration(int row, ConstraintDuration duration)
+      throws DurationProblem {
+    try {
+      return IntervalParser.parse(duration.getAsString());
+    } catch (ParseException parseException) {
+      throw new DurationParseProblem(parseException, row);
+    }
+  }
 
   private final int row;
 
