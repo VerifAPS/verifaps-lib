@@ -132,6 +132,7 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
       ConstraintCell entry = row.getCells().get(nameBefore);
       if (entry != null) {
         row.getCells().put(nameAfter, entry);
+        row.getCells().remove(nameBefore);
       }
     }
   }
@@ -154,17 +155,22 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof ConstraintSpecification)) return false;
+    if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
     ConstraintSpecification that = (ConstraintSpecification) o;
 
-    return comment != null ? comment.get().equals(that.comment.get()) : that.comment == null;
+    if (getComment() != null ? !getComment().equals(that.getComment()) : that.getComment() != null)
+      return false;
+    return getFreeVariableList() != null ? getFreeVariableList().equals(that.getFreeVariableList()) : that.getFreeVariableList() == null;
   }
 
   @Override
   public int hashCode() {
-    return comment != null ? comment.hashCode() ^ super.hashCode() : super.hashCode();
+    int result = super.hashCode();
+    result = 31 * result + (getComment() != null ? getComment().hashCode() : 0);
+    result = 31 * result + (getFreeVariableList() != null ? getFreeVariableList().hashCode() : 0);
+    return result;
   }
 
   public FreeVariableList getFreeVariableList() {
