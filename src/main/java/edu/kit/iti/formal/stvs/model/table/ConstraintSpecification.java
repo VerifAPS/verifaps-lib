@@ -8,6 +8,7 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,6 +71,31 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
     this.comment = new SimpleStringProperty("");
   }
 
+  /**
+   * Copy constructor. Creates a deep copy of another ConstraintSpecification.
+   * @param sourceSpec The ConstraintSpecification to copy
+   */
+  public ConstraintSpecification(ConstraintSpecification sourceSpec) {
+    this(sourceSpec.getName(), new FreeVariableList(sourceSpec.getFreeVariableList()));
+    this.setComment(sourceSpec.getComment());
+    for (SpecIoVariable specIoVariable : sourceSpec.getColumnHeaders()) {
+      this.getColumnHeaders().add(new SpecIoVariable(specIoVariable));
+    }
+    for (SpecificationRow<ConstraintCell> row : sourceSpec.getRows()) {
+      Map<String, ConstraintCell> clonedCells = new HashMap<>();
+      for (String colHeader : row.getCells().keySet()) {
+        clonedCells.put(colHeader, new ConstraintCell(row.getCells().get(colHeader)));
+      }
+      SpecificationRow<ConstraintCell> clonedRow = new SpecificationRow<>(clonedCells, row
+          .getExtractor());
+      clonedRow.setComment(row.getComment());
+      getRows().add(clonedRow);
+    }
+    for (ConstraintDuration sourceDuration : sourceSpec.getDurations()) {
+      getDurations().add(new ConstraintDuration(sourceDuration));
+    }
+  }
+
   @Override
   protected void onColumnHeaderAdded(List<? extends SpecIoVariable> added) {
     super.onColumnHeaderAdded(added);
@@ -106,6 +132,7 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
       ConstraintCell entry = row.getCells().get(nameBefore);
       if (entry != null) {
         row.getCells().put(nameAfter, entry);
+        row.getCells().remove(nameBefore);
       }
     }
   }
@@ -128,17 +155,22 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof ConstraintSpecification)) return false;
+    if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
     ConstraintSpecification that = (ConstraintSpecification) o;
 
-    return comment != null ? comment.get().equals(that.comment.get()) : that.comment == null;
+    if (getComment() != null ? !getComment().equals(that.getComment()) : that.getComment() != null)
+      return false;
+    return getFreeVariableList() != null ? getFreeVariableList().equals(that.getFreeVariableList()) : that.getFreeVariableList() == null;
   }
 
   @Override
   public int hashCode() {
-    return comment != null ? comment.hashCode() ^ super.hashCode() : super.hashCode();
+    int result = super.hashCode();
+    result = 31 * result + (getComment() != null ? getComment().hashCode() : 0);
+    result = 31 * result + (getFreeVariableList() != null ? getFreeVariableList().hashCode() : 0);
+    return result;
   }
 
   public FreeVariableList getFreeVariableList() {

@@ -3,8 +3,8 @@ package edu.kit.iti.formal.stvs.view.spec;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.model.table.HybridRow;
 import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableView;
-import edu.kit.iti.formal.stvs.view.spec.table.SynchronizedRow;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionView;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollection;
 import javafx.beans.property.BooleanProperty;
@@ -88,7 +88,7 @@ public class SpecificationView extends VBox implements Lockable {
     startConcretizerButton.setGraphic(icon);
   }
 
-  public TableView<SynchronizedRow> getTable() {
+  public TableView<HybridRow> getTable() {
     return tableView.getTableView();
   }
 

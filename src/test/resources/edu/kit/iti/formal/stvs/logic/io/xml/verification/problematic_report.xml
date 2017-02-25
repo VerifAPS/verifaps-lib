@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://formal.iti.kit.edu/exteta-1.0/report/" returncode="not-verified">
+  <log>
+    <entry time="67" level="debug">read xml file /tmp/verification-spec3414723945132987623.xml</entry>
+    <entry time="246" level="debug">xml file successfully read</entry>
+    <entry time="246" level="info">No options in table file.</entry>
+    <entry time="246" level="info">No functions given in table file.</entry>
+    <entry time="246" level="debug">5 variables found</entry>
+    <entry time="247" level="debug">	 var_pedBtnPress : BOOLEAN</entry>
+    <entry time="247" level="debug">	 var_carLight : BOOLEAN</entry>
+    <entry time="247" level="debug">	 var_pedLight : BOOLEAN</entry>
+    <entry time="247" level="debug">	 var_counter : INT</entry>
+    <entry time="247" level="debug">	 var_bogus : BOOLEAN</entry>
+    <entry time="323" level="debug">parsed: FALSE to (FALSE=var_pedBtnPress)</entry>
+    <entry time="324" level="debug">parsed: TRUE to (TRUE=var_carLight)</entry>
+    <entry time="324" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
+    <entry time="326" level="debug">parsed: 0 to (0sd16_0=var_counter)</entry>
+    <entry time="327" level="debug">parsed: TRUE to (TRUE=var_pedBtnPress)</entry>
+    <entry time="327" level="debug">parsed: FALSE to (FALSE=var_carLight)</entry>
+    <entry time="328" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
+    <entry time="340" level="debug">parsed: = var_counter[-1]+1 to (var_counter=(var_counter__history._$1+0sd16_1))</entry>
+    <entry time="341" level="debug">parsed: - to TRUE</entry>
+    <entry time="341" level="debug">parsed: FALSE to (FALSE=var_carLight)</entry>
+    <entry time="342" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
+    <entry time="342" level="debug">parsed: = var_counter[-1]+1 to (var_counter=(var_counter__history._$1+0sd16_1))</entry>
+    <entry time="343" level="debug">parsed: - to TRUE</entry>
+    <entry time="345" level="debug">parsed: FALSE to (FALSE=var_carLight)</entry>
+    <entry time="345" level="debug">parsed: TRUE to (TRUE=var_pedLight)</entry>
+    <entry time="347" level="debug">parsed: = var_counter[-1]+1 to (var_counter=(var_counter__history._$1+0sd16_1))</entry>
+    <entry time="347" level="debug">parsed: - to TRUE</entry>
+    <entry time="348" level="debug">parsed: FALSE to (FALSE=var_carLight)</entry>
+    <entry time="349" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
+    <entry time="349" level="debug">parsed: = var_counter[-1]+1 to (var_counter=(var_counter__history._$1+0sd16_1))</entry>
+    <entry time="350" level="debug">parsed: - to TRUE</entry>
+    <entry time="350" level="debug">parsed: TRUE to (TRUE=var_carLight)</entry>
+    <entry time="351" level="debug">parsed: FALSE to (FALSE=var_pedLight)</entry>
+    <entry time="351" level="debug">parsed: 0 to (0sd16_0=var_counter)</entry>
+    <entry time="526" level="debug">Row 1 can reach: {2}</entry>
+    <entry time="526" level="debug">Row 2 can reach: {3}</entry>
+    <entry time="526" level="debug">Row 3 can reach: {4}</entry>
+    <entry time="527" level="debug">Row 4 can reach: {5}</entry>
+    <entry time="527" level="debug">Row 5 can reach: {6}</entry>
+    <entry time="527" level="debug">Row 6 can reach: {}</entry>
+    <entry time="559" level="debug">parsed: - to TRUE</entry>
+    <entry time="581" level="info">Start '[/opt/nuXmv-1.1.1-Linux/bin/nuXmv, -int, /tmp/verification-spec3414723945132987623/modules.smv]'</entry>
+    <entry time="581" level="info">wd: /tmp/verification-spec3414723945132987623</entry>
+    <entry time="581" level="info">Result in /tmp/verification-spec3414723945132987623/log_90.txt</entry>
+    <entry time="861" level="debug">Row 1 can reach: {2}</entry>
+    <entry time="861" level="debug">Row 2 can reach: {3}</entry>
+    <entry time="861" level="debug">Row 3 can reach: {4}</entry>
+    <entry time="861" level="debug">Row 4 can reach: {5}</entry>
+    <entry time="861" level="debug">Row 5 can reach: {6}</entry>
+    <entry time="861" level="debug">Row 6 can reach: {}</entry>
+  </log>
+  <counterexample>
+    <trace>
+      <step>
+        <input name="var_pedBtnPress" value="FALSE"/>
+        <input name="table.s2_in" value="FALSE"/>
+        <input name="table.s1_in" value="TRUE"/>
+        <state name="table.var_bogus" value="FALSE"/>
+        <state name="code.var_counter" value="0sd16_0"/>
+        <state name="code.var_buttonPressedBefore" value="FALSE"/>
+        <state name="code.var_red" value="FALSE"/>
+        <state name="code.var_carLight" value="TRUE"/>
+        <state name="code.var_green" value="TRUE"/>
+        <state name="table.s1" value="TRUE"/>
+        <state name="table.clock1" value="0ud3_0"/>
+        <state name="table.s2" value="FALSE"/>
+        <state name="table.var_counter__history._$1" value="-0sd16_32733"/>
+        <state name="table.s3" value="FALSE"/>
+        <state name="table.clock3" value="0ud4_0"/>
+        <state name="table.s4" value="FALSE"/>
+        <state name="table.s5" value="FALSE"/>
+        <state name="table.s6" value="FALSE"/>
+        <state name="code.var_pedLight" value="FALSE"/>
+        <state name="table.clock4" value="0ud5_0"/>
+        <state name="table.clock5" value="0ud4_0"/>
+        <state name="table.ERROR" value="FALSE"/>
+        <state name="table.s6_in" value="TRUE"/>
+        <state name="table.s5_in" value="TRUE"/>
+        <state name="table.s4_in" value="TRUE"/>
+        <state name="table.s3_in" value="TRUE"/>
+        <state name="table.clock5_limit" value="FALSE"/>
+        <state name="table.clock4_limit" value="FALSE"/>
+        <state name="table.clock3_limit" value="FALSE"/>
+        <state name="table.clock1_limit" value="FALSE"/>
+        <state name="table.s6_out" value="TRUE"/>
+        <state name="table.s1_out" value="TRUE"/>
+        <state name="table.s6_keep" value="FALSE"/>
+        <state name="table.s6_fwd" value="FALSE"/>
+        <state name="table.s5_out" value="FALSE"/>
+        <state name="table.s5_keep" value="FALSE"/>
+        <state name="table.s5_fwd" value="FALSE"/>
+        <state name="table.s4_out" value="FALSE"/>
+        <state name="table.s4_keep" value="FALSE"/>
+        <state name="table.s4_fwd" value="FALSE"/>
+        <state name="table.s3_out" value="FALSE"/>
+        <state name="table.s3_keep" value="FALSE"/>
+        <state name="table.s3_fwd" value="FALSE"/>
+        <state name="table.s2_out" value="FALSE"/>
+        <state name="table.clock5_tic" value="FALSE"/>
+        <state name="table.clock5_rs" value="TRUE"/>
+        <state name="table.clock4_tic" value="FALSE"/>
+        <state name="table.clock4_rs" value="TRUE"/>
+        <state name="table.clock3_tic" value="FALSE"/>
+        <state name="table.clock3_rs" value="TRUE"/>
+        <state name="table.s2_keep" value="FALSE"/>
+        <state name="table.s2_fwd" value="FALSE"/>
+        <state name="table.s1_keep" value="TRUE"/>
+        <state name="table.s1_fwd" value="FALSE"/>
+        <state name="table.clock1_tic" value="TRUE"/>
+        <state name="table.clock1_rs" value="FALSE"/>
+      </step>
+      <step>
+        <state name="table.clock1" value="0ud3_1"/>
+        <state name="table.var_counter__history._$1" value="0sd16_0"/>
+      </step>
+      <step>
+        <state name="table.clock1" value="0ud3_2"/>
+      </step>
+      <step>
+        <state name="table.clock1" value="0ud3_3"/>
+        <state name="table.s1_keep" value="FALSE"/>
+        <state name="table.s1_fwd" value="TRUE"/>
+        <state name="table.clock1_tic" value="FALSE"/>
+        <state name="table.clock1_rs" value="TRUE"/>
+      </step>
+      <step>
+        <input name="var_pedBtnPress" value="TRUE"/>
+        <input name="table.s2_in" value="TRUE"/>
+        <input name="table.s1_in" value="FALSE"/>
+        <state name="table.s1" value="FALSE"/>
+        <state name="table.clock1" value="0ud3_0"/>
+        <state name="table.s2" value="TRUE"/>
+        <state name="table.s6_out" value="FALSE"/>
+        <state name="table.s1_out" value="FALSE"/>
+        <state name="table.s5_out" value="TRUE"/>
+        <state name="table.s3_out" value="TRUE"/>
+        <state name="table.s2_out" value="TRUE"/>
+        <state name="table.s2_fwd" value="TRUE"/>
+        <state name="table.s1_fwd" value="FALSE"/>
+      </step>
+      <step>
+        <input name="var_pedBtnPress" value="FALSE"/>
+        <input name="table.s2_in" value="FALSE"/>
+        <input name="table.s1_in" value="TRUE"/>
+        <state name="code.var_counter" value="0sd16_1"/>
+        <state name="code.var_buttonPressedBefore" value="TRUE"/>
+        <state name="code.var_carLight" value="FALSE"/>
+        <state name="table.s2" value="FALSE"/>
+        <state name="table.var_counter__history._$1" value="0sd16_1"/>
+        <state name="table.s3" value="TRUE"/>
+        <state name="table.s3_keep" value="TRUE"/>
+        <state name="table.clock3_tic" value="TRUE"/>
+        <state name="table.clock3_rs" value="FALSE"/>
+        <state name="table.s2_fwd" value="FALSE"/>
+      </step>
+      <step>
+        <state name="code.var_counter" value="0sd16_2"/>
+        <state name="code.var_buttonPressedBefore" value="FALSE"/>
+        <state name="table.var_counter__history._$1" value="0sd16_2"/>
+        <state name="table.clock3" value="0ud4_1"/>
+      </step>
+      <step>
+        <state name="code.var_counter" value="0sd16_3"/>
+        <state name="table.var_counter__history._$1" value="0sd16_3"/>
+        <state name="table.clock3" value="0ud4_2"/>
+      </step>
+      <step>
+        <state name="code.var_counter" value="0sd16_4"/>
+        <state name="table.var_counter__history._$1" value="0sd16_4"/>
+        <state name="table.clock3" value="0ud4_3"/>
+      </step>
+      <step>
+        <state name="code.var_counter" value="0sd16_5"/>
+        <state name="table.var_counter__history._$1" value="0sd16_5"/>
+        <state name="table.clock3" value="0ud4_4"/>
+      </step>
+      <step>
+        <state name="code.var_counter" value="0sd16_6"/>
+        <state name="table.var_counter__history._$1" value="0sd16_6"/>
+        <state name="table.clock3" value="0ud4_5"/>
+      </step>
+      <step>
+        <state name="code.var_counter" value="0sd16_7"/>
+        <state name="table.var_counter__history._$1" value="0sd16_7"/>
+        <state name="table.clock3" value="0ud4_6"/>
+      </step>
+      <step>
+        <state name="code.var_counter" value="0sd16_8"/>
+        <state name="table.var_counter__history._$1" value="0sd16_8"/>
+        <state name="table.clock3" value="0ud4_7"/>
+      </step>
+      <step>
+        <state name="code.var_counter" value="0sd16_9"/>
+        <state name="table.var_counter__history._$1" value="0sd16_9"/>
+        <state name="table.clock3" value="0ud4_8"/>
+      </step>
+      <step>
+        <state name="code.var_counter" value="0sd16_10"/>
+        <state name="table.var_counter__history._$1" value="0sd16_10"/>
+        <state name="table.clock3" value="0ud4_9"/>
+        <state name="table.s5_out" value="FALSE"/>
+        <state name="table.s4_out" value="TRUE"/>
+        <state name="table.s3_out" value="FALSE"/>
+        <state name="table.s3_keep" value="FALSE"/>
+        <state name="table.s2_out" value="FALSE"/>
+        <state name="table.clock3_tic" value="FALSE"/>
+        <state name="table.clock3_rs" value="TRUE"/>
+      </step>
+      <step>
+        <state name="code.var_counter" value="0sd16_11"/>
+        <state name="table.var_counter__history._$1" value="0sd16_11"/>
+        <state name="table.s3" value="FALSE"/>
+        <state name="table.clock3" value="0ud4_0"/>
+        <state name="code.var_pedLight" value="TRUE"/>
+        <state name="table.ERROR" value="TRUE"/>
+      </step>
+    </trace>
+    <row-mappings>
+      <row-map>1, 1, 1, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3</row-map>
+    </row-mappings>
+  </counterexample>
+</ns2:message>

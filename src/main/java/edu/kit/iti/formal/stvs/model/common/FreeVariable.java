@@ -51,6 +51,10 @@ public class FreeVariable implements Variable {
     this.defaultValue = new SimpleStringProperty(defaultValue == null ? "" : defaultValue);
   }
 
+  public FreeVariable(FreeVariable freeVar) {
+    this(freeVar.getName(), freeVar.getType(), freeVar.getDefaultValue());
+  }
+
   public String getName() {
     return name.get();
   }
@@ -100,15 +104,24 @@ public class FreeVariable implements Variable {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof FreeVariable)) return false;
-    if (obj == this) return true;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
 
-    FreeVariable rhs = (FreeVariable) obj;
-    return new EqualsBuilder()
-        .append(name.get(), rhs.name.get())
-        .append(type.get(), rhs.type.get())
-        .append(defaultValue.get(), rhs.defaultValue.get())
-        .isEquals();
+    FreeVariable that = (FreeVariable) o;
+
+    if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null)
+      return false;
+    if (getType() != null ? !getType().equals(that.getType()) : that.getType() != null)
+      return false;
+    return getDefaultValue() != null ? getDefaultValue().equals(that.getDefaultValue()) : that.getDefaultValue() == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getName() != null ? getName().hashCode() : 0;
+    result = 31 * result + (getType() != null ? getType().hashCode() : 0);
+    result = 31 * result + (getDefaultValue() != null ? getDefaultValue().hashCode() : 0);
+    return result;
   }
 }

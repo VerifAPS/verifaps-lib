@@ -1,29 +1,25 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
-import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
-import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
+import edu.kit.iti.formal.stvs.model.table.HybridCell;
+import edu.kit.iti.formal.stvs.model.table.HybridRow;
 import edu.kit.iti.formal.stvs.model.table.problems.CellProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.model.table.problems.DurationProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.DefaultStringConverter;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * Created by philipp on 13.02.17.
  * @author Philipp
  */
-public class SpecificationTableCell extends TextFieldTableCell<SynchronizedRow, String> {
+public class SpecificationTableCell extends TextFieldTableCell<HybridRow, String> {
 
   private final ConstraintSpecificationValidator validator;
 
@@ -89,10 +85,10 @@ public class SpecificationTableCell extends TextFieldTableCell<SynchronizedRow, 
     resetCellVisuals();
   }
 
-  private HybridCellModel<?> getCellModel() {
+  private HybridCell<?> getCellModel() {
     // Null hell
     if (getTableRow() == null) return null;
-    SynchronizedRow row = (SynchronizedRow) getTableRow().getItem();
+    HybridRow row = (HybridRow) getTableRow().getItem();
     if (row == null) return null;
     String columnId = (String) getTableColumn().getUserData();
     if (columnId != null) {

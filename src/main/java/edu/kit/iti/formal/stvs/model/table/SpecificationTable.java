@@ -211,18 +211,28 @@ public class SpecificationTable<H extends Named, C, D> {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof SpecificationTable))
-      return false;
-    if (obj == this)
-      return true;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
 
-    SpecificationTable rhs = (SpecificationTable) obj;
-    return new EqualsBuilder().
-            append(getColumnHeaders(), rhs.getColumnHeaders()).
-            append(getRows(), rhs.getRows()).
-            append(getDurations(), rhs.getDurations()).
-            isEquals();
+    SpecificationTable<?, ?, ?> that = (SpecificationTable<?, ?, ?>) o;
+
+    if (getColumnHeaders() != null ? !getColumnHeaders().equals(that.getColumnHeaders()) : that.getColumnHeaders() != null)
+      return false;
+    if (getRows() != null ? !getRows().equals(that.getRows()) : that.getRows() != null)
+      return false;
+    if (getDurations() != null ? !getDurations().equals(that.getDurations()) : that.getDurations() != null)
+      return false;
+    return getName() != null ? getName().equals(that.getName()) : that.getName() == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getColumnHeaders() != null ? getColumnHeaders().hashCode() : 0;
+    result = 31 * result + (getRows() != null ? getRows().hashCode() : 0);
+    result = 31 * result + (getDurations() != null ? getDurations().hashCode() : 0);
+    result = 31 * result + (getName() != null ? getName().hashCode() : 0);
+    return result;
   }
 
   public String getName() {

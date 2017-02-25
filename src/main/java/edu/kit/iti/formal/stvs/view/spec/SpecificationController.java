@@ -10,12 +10,11 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
 import edu.kit.iti.formal.stvs.view.Controller;
-import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
+import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController;
 import javafx.application.Platform;
-import javafx.beans.Observable;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -25,6 +24,7 @@ import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 
 import java.util.List;
 
@@ -83,6 +83,11 @@ public class SpecificationController implements Controller {
     view.setVariableCollection(variableCollectionController.getView());
     view.getVariableCollection().getFreeVariableTableView().setEditable(this.hybridSpecification
         .isEditable());
+    List<MenuItem> freeVarMenuItems = view.getVariableCollection().getFreeVariableTableView()
+        .getContextMenu().getItems();
+    for (MenuItem menuItem : freeVarMenuItems) {
+      menuItem.setDisable(!this.hybridSpecification.isEditable());
+    }
     view.setTable(tableController.getView());
     view.getStartButton().setOnAction(this::onVerificationButtonClicked);
     view.getStartButton().disableProperty().bind(specificationInvalid);
@@ -143,7 +148,7 @@ public class SpecificationController implements Controller {
               hybridSpecification.setConcreteInstance(optionalSpec.get());
               timingDiagramCollectionController.setActivated(true);
             } else {
-              ErrorMessageDialog.createMessageDialog(Alert.AlertType.WARNING, "Concretizer warning",
+              AlertFactory.createAlert(Alert.AlertType.WARNING, "Concretizer warning",
                   "No concrete instance found",
                   "The Solver could not produce a concrete example with the given table.");
             }
@@ -152,7 +157,7 @@ public class SpecificationController implements Controller {
           });
         }, exception -> {
           Platform.runLater(() -> {
-            ErrorMessageDialog.createErrorMessageDialog(exception, "Concretization Failed", "An error occurred while "
+            AlertFactory.createAlert(exception, "Concretization Failed", "An error occurred while "
                 + "concretizing the specification.");
           });
         });

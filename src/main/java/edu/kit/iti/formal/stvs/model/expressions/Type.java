@@ -1,8 +1,6 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * The super-interface for all Types.
@@ -19,9 +17,9 @@ public interface Type {
    * @return the return value of the visitor
    */
   <R> R match(
-      Supplier<R> matchIntType,
-      Supplier<R> matchBoolType,
-      Function<TypeEnum, R> matchEnumType);
+      TypeIntegerHandler<R> matchIntType,
+      TypeBooleanHandler<R> matchBoolType,
+      TypeEnumHandler<R> matchEnumType);
 
   /**
    * Finds out whether this type checks against another type, which means

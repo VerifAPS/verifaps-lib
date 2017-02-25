@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import com.sun.xml.bind.v2.schemagen.xmlschema.Import;
 import edu.kit.iti.formal.stvs.logic.io.xml.*;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
@@ -34,7 +33,6 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * @author Benjamin Alt
@@ -156,12 +154,12 @@ public class ImporterFacade {
    *
    * @param file                  file to open
    * @param globalConfig          current global config
-   * @param specificationConsumer consumer of the file (if the file is a Specification)
-   * @param rootModelConsumer     consumer of the file (if the file is a Session)
+   * @param importHybridSpecificationHandler consumer of the file (if the file is a Specification)
+   * @param importStvsRootModelHandler     consumer of the file (if the file is a Session)
    */
   public static void importFile(File file, GlobalConfig globalConfig, History currentHistory,
-                                Consumer<HybridSpecification> specificationConsumer,
-                                Consumer<StvsRootModel> rootModelConsumer, Consumer<Code> codeConsumer)
+                                ImportHybridSpecificationHandler importHybridSpecificationHandler,
+                                ImportStvsRootModelHandler importStvsRootModelHandler, ImportCodeHandler codeConsumer)
       throws IOException, ImportException {
     StringWriter writer = new StringWriter();
     byte[] byteArray = IOUtils.toByteArray(new FileInputStream(file));
@@ -176,11 +174,11 @@ public class ImporterFacade {
         Node rootNode = doc.getFirstChild();
         switch (rootNode.getNodeName()) {
           case "session":
-            rootModelConsumer.accept(importSession(file, ImportFormat.XML, globalConfig,
+            importStvsRootModelHandler.accept(importSession(file, ImportFormat.XML, globalConfig,
                 currentHistory));
             return;
           case "specification":
-            specificationConsumer.accept(importHybridSpec(file, ImportFormat.XML));
+            importHybridSpecificationHandler.accept(importHybridSpec(file, ImportFormat.XML));
             return;
           default:
             codeConsumer.accept(importStCode(file));

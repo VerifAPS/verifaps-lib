@@ -5,25 +5,19 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableProblem;
 import edu.kit.iti.formal.stvs.model.expressions.*;
-import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
-import edu.kit.iti.formal.stvs.util.ListTypeConverter;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.variables.clipboard.Json;
-import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.*;
-import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
 
-import java.lang.management.ManagementFactory;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -47,21 +41,21 @@ public class VariableCollectionController implements Controller {
 
     this.contextMenu = new ContextMenu();
     this.view = new VariableCollection();
+
+    /* Set up context menu */
     this.contextMenu = new ContextMenu();
 
-    MenuItem delete = new MenuItem("Delete");
-    delete.setOnAction(event -> {
-      TableView<FreeVariable> tableView = view.getFreeVariableTableView();
-      tableView.getItems().removeAll(tableView.getSelectionModel().getSelectedItems());
-      tableView.getSelectionModel().clearSelection();
-    });
-    delete.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
-    contextMenu.getItems().add(delete);
+    MenuItem menuItemAdd = new MenuItem("Add Variable");
+    menuItemAdd.setOnAction(this::onAddVariableClicked);
+    menuItemAdd.setAccelerator(new KeyCodeCombination(KeyCode.ADD));
+    contextMenu.getItems().add(menuItemAdd);
+
+    MenuItem menuItemDelete = new MenuItem("Delete Variable");
+    menuItemDelete.setOnAction(this::onDeleteVariableClicked);
+    menuItemDelete.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
+    contextMenu.getItems().add(menuItemDelete);
 
     view.getFreeVariableTableView().setContextMenu(contextMenu);
-
-    view.getAddFreeVariable().setOnAction(event ->
-        freeVariableList.getVariables().add(new FreeVariable("variable", "BOOL")));
 
     view.getFreeVariableTableView().setRowFactory(this::rowFactory);
 
@@ -74,6 +68,16 @@ public class VariableCollectionController implements Controller {
     view.getDefaultValueTableColumn().setCellFactory(this::cellFactory);
 
     view.getFreeVariableTableView().setItems(freeVariableList.getVariables());
+  }
+
+  private void onDeleteVariableClicked(ActionEvent actionEvent) {
+    TableView<FreeVariable> tableView = view.getFreeVariableTableView();
+    tableView.getItems().removeAll(tableView.getSelectionModel().getSelectedItems());
+    tableView.getSelectionModel().clearSelection();
+  }
+
+  private void onAddVariableClicked(ActionEvent actionEvent) {
+    freeVariableList.getVariables().add(new FreeVariable("variable", "BOOL"));
   }
 
   @Override

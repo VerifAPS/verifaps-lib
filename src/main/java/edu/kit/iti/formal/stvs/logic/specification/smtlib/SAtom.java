@@ -5,7 +5,6 @@ import de.tudresden.inf.lat.jsexp.SexpFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Created by csicar on 08.02.17.
@@ -59,12 +58,12 @@ public class SAtom implements SExpr {
   }
 
   @Override
-  public <E> E visit(Function<? super SExpr, E> visitor) {
-    return visitor.apply(this);
+  public <E> E visit(SExprVisitor<E> visitor) {
+    return visitor.visit(this);
   }
 
   @Override
-  public <E> List<E> visitChildren(Function<? super SExpr, E> visitor) {
+  public <E> List<E> visitChildren(SExprVisitor<E> visitor) {
     return new ArrayList<>();
   }
 }

@@ -2,7 +2,6 @@ package edu.kit.iti.formal.stvs.model.common;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 
 /**
  * Created by csicar on 10.01.17.
@@ -12,7 +11,7 @@ public class Selection {
 
   private NullableProperty<String> column;
   private NullableProperty<Integer> row;
-  private BiConsumer<String, Integer> clickListener = (s, i) -> {
+  private SelectionClickListener clickListener = (s, i) -> {
   };
 
   public Selection(String column, int row) {
@@ -35,12 +34,12 @@ public class Selection {
     this.row = new NullableProperty<>();
   }
 
-  public void setOnCellClickListener(BiConsumer<String, Integer> consumer) {
-    this.clickListener = consumer;
+  public void setOnCellClickListener(SelectionClickListener listener) {
+    this.clickListener = listener;
   }
 
   public void fireClickEvent(String column, int row) {
-    clickListener.accept(column, row);
+    clickListener.clicked(column, row);
   }
 
   public Optional<String> getColumn() {

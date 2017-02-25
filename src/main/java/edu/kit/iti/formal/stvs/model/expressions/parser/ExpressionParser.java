@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.model.expressions.parser;
 import edu.kit.iti.formal.stvs.model.expressions.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.*;
 
@@ -167,13 +168,15 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 
   private Optional<Integer> parseArrayIndex(CellExpressionParser.VariableContext ctx) {
     return Optional.ofNullable(ctx.INTEGER())
-        .map(node -> {
-          int index = Integer.valueOf(node.getText());
-          if (index > 0) {
-            throw new UnsupportedExpressionRuntimeException("Positive Variable Index");
-          }
-          return index;
-        });
+        .map(ExpressionParser::getArrayIndex);
+  }
+
+  private static Integer getArrayIndex(TerminalNode node) {
+    int index = Integer.valueOf(node.getText());
+    if (index > 0) {
+      throw new UnsupportedExpressionRuntimeException("Positive Variable Index");
+    }
+    return index;
   }
 
   private String parseIdentifier(CellExpressionParser.VariableContext ctx) {

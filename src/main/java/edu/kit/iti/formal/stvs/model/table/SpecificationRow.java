@@ -25,7 +25,6 @@ public class SpecificationRow<C> implements Commentable, Observable {
   private final StringProperty comment;
   private final List<InvalidationListener> listeners;
   private final Callback<C, Observable[]> extractor;
-  private final InvalidationListener listenRowInvalidation;
 
   /**
    * Create a row which is not observable. This is the case for rows in
@@ -54,11 +53,14 @@ public class SpecificationRow<C> implements Commentable, Observable {
     this.listeners = new ArrayList<>();
     this.comment = new SimpleStringProperty("");
     this.extractor = extractor;
-    listenRowInvalidation = observable ->
-        listeners.forEach(listener -> listener.invalidated(observable));
-    this.cells.addListener(listenRowInvalidation);
-    comment.addListener(listenRowInvalidation);
+
+    this.cells.addListener(this::listenRowInvalidation);
+    comment.addListener(this::listenRowInvalidation);
     cells.values().forEach(this::subscribeToCell);
+  }
+
+  private void listenRowInvalidation(Observable observable){
+    listeners.forEach(listener -> listener.invalidated(observable));
   }
 
   /**
@@ -81,7 +83,7 @@ public class SpecificationRow<C> implements Commentable, Observable {
    */
   private void subscribeToCell(C c) {
     for (Observable observable : extractor.call(c)) {
-      observable.addListener(listenRowInvalidation);
+      observable.addListener(this::listenRowInvalidation);
     }
   }
 
@@ -91,7 +93,7 @@ public class SpecificationRow<C> implements Commentable, Observable {
    */
   private void unsubscribeFromCell(C cell) {
     for (Observable observable : extractor.call(cell)) {
-      observable.removeListener(listenRowInvalidation);
+      observable.removeListener(this::listenRowInvalidation);
     }
   }
 
@@ -152,4 +154,7 @@ public class SpecificationRow<C> implements Commentable, Observable {
     listeners.remove(listener);
   }
 
+  public Callback<C,Observable[]> getExtractor() {
+    return extractor;
+  }
 }

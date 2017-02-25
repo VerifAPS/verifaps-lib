@@ -1,8 +1,5 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
-import java.util.function.Function;
-import java.util.function.IntFunction;
-
 /**
  * runtime-representation for enum values of {@link Expression}s.
  *
@@ -29,10 +26,10 @@ public class ValueEnum implements Value {
 
   @Override
   public <R> R match(
-      IntFunction<R> matchInt,
-      Function<Boolean, R> matchBoolean,
-      Function<ValueEnum, R> matchEnum) {
-    return matchEnum.apply(this);
+      ValueIntegerHandler<R> matchInt,
+      ValueBooleanHandler<R> matchBoolean,
+      ValueEnumHandler<R> matchEnum) {
+    return matchEnum.handle(this);
   }
 
   public boolean equals(ValueEnum other) {

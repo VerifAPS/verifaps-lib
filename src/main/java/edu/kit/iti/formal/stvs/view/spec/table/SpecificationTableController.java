@@ -14,14 +14,9 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
-import javafx.scene.layout.VBox;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,14 +30,13 @@ import java.util.stream.Collectors;
 public class SpecificationTableController implements Controller {
 
   private final SpecificationTableView view;
-  private final TableView<SynchronizedRow> tableView;
+  private final TableView<HybridRow> tableView;
   private final HybridSpecification hybridSpec;
   private final ObjectProperty<List<Type>> typeContext;
   private final ObjectProperty<List<CodeIoVariable>> codeIoVariables;
   private final ConstraintSpecificationValidator validator;
 
-  private final ObservableList<SynchronizedRow> data = FXCollections.observableArrayList();
-  private final TableColumn<SynchronizedRow, String> durations;
+  private final TableColumn<HybridRow, String> durations;
   private final GlobalConfig config;
 
   public SpecificationTableController(GlobalConfig config,
@@ -57,13 +51,12 @@ public class SpecificationTableController implements Controller {
     this.codeIoVariables = codeIoVariables;
     this.hybridSpec = hybridSpecification;
     this.validator = new ConstraintSpecificationValidator(typeContext, codeIoVariables, validVariables, hybridSpecification);
-    this.durations = createViewColumn("Duration", SynchronizedRow::getDuration);
+    this.durations = createViewColumn("Duration", HybridRow::getDuration);
 
     tableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
     tableView.getColumns().add(durations);
 
-    tableView.setItems(data);
     tableView.setEditable(hybridSpecification.isEditable());
     tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableView.setRowFactory(this::rowFactory);
@@ -77,20 +70,12 @@ public class SpecificationTableController implements Controller {
 
     hybridSpecification.getColumnHeaders().forEach(this::addColumnToView);
 
-    for (int rowIndex = 0; rowIndex < hybridSpecification.getRows().size(); rowIndex++) {
-      SynchronizedRow row = new SynchronizedRow(
-          hybridSpecification.getRows().get(rowIndex),
-          hybridSpecification.getDurations().get(rowIndex));
-      row.updateCounterExampleCells(rowIndex, hybridSpecification.getCounterExample());
-      data.add(row);
-    }
-
-    data.addListener(this::onDataRowChanged);
     validator.problemsProperty().addListener((Observable o) -> onProblemsChange());
-    hybridSpec.counterExampleProperty().addListener(observable -> onCounterExampleChanged());
 
     hybridSpec.getSelection().setOnCellClickListener(this::focusCell);
     hybridSpec.getSelection().columnProperty().addListener(this::onColumnSelectionChanged);
+
+    tableView.setItems(hybridSpec.getHybridRows());
   }
 
   private void onColumnSelectionChanged(ObservableValue<? extends String> obs, String before, String columnNow) {
@@ -123,19 +108,13 @@ public class SpecificationTableController implements Controller {
             .orElseThrow(() -> new IllegalArgumentException("Cannot focus unknown column: " + columnId)));
   }
 
-  private void onCounterExampleChanged() {
-    for (int rowIndex = 0; rowIndex < hybridSpec.getRows().size(); rowIndex++) {
-      data.get(rowIndex).updateCounterExampleCells(rowIndex, hybridSpec.getCounterExample());
-    }
-  }
-
   private void onProblemsChange() {
     List<ColumnProblem> columnProblems =
         validator.problemsProperty().get().stream()
         .filter(problem -> problem instanceof ColumnProblem)
         .map(problem -> (ColumnProblem) problem)
         .collect(Collectors.toList());
-    for (TableColumn<SynchronizedRow, ?> column : tableView.getColumns()) {
+    for (TableColumn<HybridRow, ?> column : tableView.getColumns()) {
       if (column.getUserData() == null) {
         continue;
       }
@@ -153,29 +132,8 @@ public class SpecificationTableController implements Controller {
     }
   }
 
-  private SpecificationTableCell cellFactory(TableColumn<SynchronizedRow, String> table) {
+  private SpecificationTableCell cellFactory(TableColumn<HybridRow, String> table) {
     return new SpecificationTableCell(validator);
-  }
-
-  private void onDataRowChanged(ListChangeListener.Change<? extends SynchronizedRow> change) {
-    while (change.next()) {
-      if (change.wasAdded()) {
-        List<SpecificationRow<ConstraintCell>> rowsToBeAdded = new ArrayList<>();
-        List<ConstraintDuration> durationsToBeAdded = new ArrayList<>();
-        for (SynchronizedRow row : change.getAddedSubList()) {
-          SpecificationRow<ConstraintCell> rowToBeAdded = row.getSourceRow();
-          rowToBeAdded.commentProperty().bindBidirectional(row.commentProperty());
-          rowsToBeAdded.add(rowToBeAdded);
-          durationsToBeAdded.add(row.getDuration().getCell());
-        }
-        hybridSpec.getRows().addAll(change.getFrom(), rowsToBeAdded);
-        hybridSpec.getDurations().addAll(change.getFrom(), durationsToBeAdded);
-      }
-      if (change.wasRemoved()) {
-        hybridSpec.getRows().remove(change.getFrom(), change.getFrom() + change.getRemovedSize());
-        hybridSpec.getDurations().remove(change.getFrom(), change.getFrom() + change.getRemovedSize());
-      }
-    }
   }
 
   private ContextMenu createTopLevelContextMenu() {
@@ -199,7 +157,7 @@ public class SpecificationTableController implements Controller {
     });
     deleteRow.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
     deleteRow.setOnAction(event ->
-      data.removeAll(tableView.getSelectionModel().getSelectedItems()));
+      hybridSpec.getHybridRows().removeAll(tableView.getSelectionModel().getSelectedItems()));
     addNewColumn.setOnAction(event ->
         new IoVariableChooserDialog(codeIoVariables, hybridSpec.getColumnHeaders())
             .showAndWait()
@@ -216,7 +174,7 @@ public class SpecificationTableController implements Controller {
     return new ContextMenu(insertRow, deleteRow, addNewColumn, comment);
   }
 
-  private ContextMenu createColumnContextMenu(TableColumn<SynchronizedRow, ?> column) {
+  private ContextMenu createColumnContextMenu(TableColumn<HybridRow, ?> column) {
     MenuItem changeColumn = new MenuItem("Change Column...");
     MenuItem removeColumn = new MenuItem("Remove Column");
     MenuItem commentColumn = new MenuItem("Comment ...");
@@ -246,16 +204,17 @@ public class SpecificationTableController implements Controller {
     hybridSpec.getColumnHeaders().forEach(specIoVariable ->
         wildcardCells.put(specIoVariable.getName(), new ConstraintCell("-")));
     SpecificationRow<ConstraintCell> wildcardRow = ConstraintSpecification.createRow(wildcardCells);
-    data.add(index, new SynchronizedRow(wildcardRow, new ConstraintDuration("1")));
+    hybridSpec.getHybridRows().add(index, new HybridRow(wildcardRow, new ConstraintDuration("1")));
   }
 
   public void addNewColumn(SpecIoVariable specIoVariable) {
     // Add column to model:
-    if (data.isEmpty()) {
+    if (hybridSpec.getHybridRows().isEmpty()) {
       hybridSpec.getColumnHeaders().add(specIoVariable);
     } else {
       SpecificationColumn<ConstraintCell> dataColumn = new SpecificationColumn<>(
-          data.stream().map(row -> new ConstraintCell("-")).collect(Collectors.toList()));
+          hybridSpec.getHybridRows().stream()
+              .map(row -> new ConstraintCell("-")).collect(Collectors.toList()));
       hybridSpec.addColumn(specIoVariable, dataColumn);
     }
 
@@ -264,9 +223,9 @@ public class SpecificationTableController implements Controller {
   }
 
   private void addColumnToView(final SpecIoVariable specIoVariable) {
-    TableColumn<SynchronizedRow, String> column = createViewColumn(
+    TableColumn<HybridRow, String> column = createViewColumn(
         specIoVariable.getName(),
-        synchronizedRow -> synchronizedRow.getCells().get(specIoVariable.getName()));
+        hybridRow -> hybridRow.getCells().get(specIoVariable.getName()));
 
     column.setUserData(specIoVariable.getName());
     specIoVariable.nameProperty().addListener(
@@ -281,10 +240,10 @@ public class SpecificationTableController implements Controller {
     tableView.getColumns().add(tableView.getColumns().size() - 1, column);
   }
 
-  private TableColumn<SynchronizedRow, String> createViewColumn(
+  private TableColumn<HybridRow, String> createViewColumn(
       String colName,
-      final Function<SynchronizedRow, HybridCellModel<?>> extractCellFromRow) {
-    TableColumn<SynchronizedRow, String> column = new TableColumn<>(colName);
+      final Function<HybridRow, HybridCell<?>> extractCellFromRow) {
+    TableColumn<HybridRow, String> column = new TableColumn<>(colName);
     column.setSortable(false);
     column.setEditable(true);
     column.setPrefWidth(100);
@@ -301,8 +260,8 @@ public class SpecificationTableController implements Controller {
 
   // from: http://stackoverflow.com/questions/28603224/sort-tableview-with-drag-and-drop-rows
   // TODO: Have fun? Implement dragging multiple rows, from one program to another, etc.
-  private TableRow<SynchronizedRow> rowFactory(TableView<SynchronizedRow> tableView) {
-    TableRow<SynchronizedRow> row = new TableRow<SynchronizedRow>() {
+  private TableRow<HybridRow> rowFactory(TableView<HybridRow> tableView) {
+    TableRow<HybridRow> row = new TableRow<HybridRow>() {
       {
         hybridSpec.getSelection().rowProperty().addListener(this::rowSelectionChanged);
       }
@@ -345,7 +304,7 @@ public class SpecificationTableController implements Controller {
       Dragboard db = event.getDragboard();
       if (db.hasContent(SERIALIZED_MIME_TYPE)) {
         int draggedIndex = (Integer) db.getContent(SERIALIZED_MIME_TYPE);
-        SynchronizedRow draggedRow = tableView.getItems().remove(draggedIndex);
+        HybridRow draggedRow = tableView.getItems().remove(draggedIndex);
 
         int dropIndex ;
 

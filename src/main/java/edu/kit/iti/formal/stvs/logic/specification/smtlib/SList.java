@@ -6,11 +6,10 @@ import de.tudresden.inf.lat.jsexp.SexpFactory;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Created by csicar on 08.02.17.
+ * Represents a S-Expression of form ( expr_1 expr_2 expr_3 ... expr_n)
  * @author Carsten Csiky
  */
 public class SList implements SExpr {
@@ -45,9 +44,15 @@ public class SList implements SExpr {
 
   public SList(Sexp exp) {
     sexp = new LinkedList<>();
-    exp.forEach((sitem) -> {
-      sexp.add(SExpr.fromSexp(sitem));
-    });
+    exp.forEach(this::addSexp);
+  }
+
+  private static void addItemToSexp(Sexp exp, SExpr sitem) {
+    exp.add(sitem.toSexpr());
+  }
+
+  private void addSexp(Sexp sitem) {
+    sexp.add(SExpr.fromSexp(sitem));
   }
 
   @Override
@@ -58,7 +63,7 @@ public class SList implements SExpr {
   @Override
   public Sexp toSexpr() {
     Sexp exp = SexpFactory.newNonAtomicSexp();
-    sexp.forEach((sitem) -> exp.add(sitem.toSexpr()));
+    sexp.forEach((sitem) -> addItemToSexp(exp, sitem));
     return exp;
   }
 
@@ -69,13 +74,13 @@ public class SList implements SExpr {
 
 
   @Override
-  public <E> E visit(Function<? super SExpr, E> visitor) {
-    return visitor.apply(this);
+  public <E> E visit(SExprVisitor<E> visitor) {
+    return visitor.visit(this);
   }
 
   @Override
-  public <E> List<E> visitChildren(Function<? super SExpr, E> visitor) {
-    return getList().stream().map(visitor::apply).collect(Collectors.toList());
+  public <E> List<E> visitChildren(SExprVisitor<E> visitor) {
+    return getList().stream().map(visitor::visit).collect(Collectors.toList());
   }
 
   public SList addAll(SExpr ... sexp) {

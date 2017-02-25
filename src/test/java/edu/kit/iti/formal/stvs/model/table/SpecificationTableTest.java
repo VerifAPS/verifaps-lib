@@ -2,16 +2,19 @@ package edu.kit.iti.formal.stvs.model.table;
 
 import com.google.gson.JsonElement;
 import edu.kit.iti.formal.stvs.model.TestUtils;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -173,6 +176,14 @@ public class SpecificationTableTest {
     });
   }
 
+  @Test(expected=IllegalStateException.class)
+  public void testAddColumnToEmptyTable()
+  {
+    SpecificationTable emptyTable = new ConstraintSpecification(new FreeVariableList());
+    SpecificationColumn column = new SpecificationColumn(new ArrayList());
+    emptyTable.addColumn(new SpecIoVariable(VariableCategory.INPUT, "INT", "A"), column);
+  }
+
   @Test
   public void testRemoveRow() {
     HashMap<String, String> expectedCells = new HashMap<>();
@@ -192,5 +203,15 @@ public class SpecificationTableTest {
     String dur2 = table.getDurations().get(2);
     assertEquals("2", dur0);
     assertEquals("10", dur2);
+  }
+
+  @Test
+  public void testEquals() {
+    JsonElement elem = JsonTableParser.jsonFromResource("test_table.json", SpecificationTableTest.class);
+    SpecificationTable identical = JsonTableParser.specificationTableFromJson(elem);
+    assertEquals(table, identical);
+    assertNotEquals(table, null);
+    identical.setName("SomeOtherName");
+    assertNotEquals(table, identical);
   }
 }

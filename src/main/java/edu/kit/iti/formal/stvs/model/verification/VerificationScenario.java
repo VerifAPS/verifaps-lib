@@ -3,7 +3,6 @@ package edu.kit.iti.formal.stvs.model.verification;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.verification.GeTeTaVerificationEngine;
 import edu.kit.iti.formal.stvs.logic.verification.VerificationEngine;
-import edu.kit.iti.formal.stvs.logic.verification.VerificationException;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
@@ -54,9 +53,9 @@ public class VerificationScenario {
    * @param spec The specification to be verified
    * @throws IOException
    * @throws ExportException
-   * @throws VerificationException
+   * @throws VerificationError
    */
-  public void verify(GlobalConfig config, ConstraintSpecification spec) throws IOException, ExportException, VerificationException {
+  public void verify(GlobalConfig config, ConstraintSpecification spec) throws IOException, ExportException, VerificationError {
     activeSpec.set(spec);
     verificationEngine = new GeTeTaVerificationEngine(config, code.get().getParsedCode().getDefinedTypes());
     verificationEngine.verificationResultProperty().addListener(new

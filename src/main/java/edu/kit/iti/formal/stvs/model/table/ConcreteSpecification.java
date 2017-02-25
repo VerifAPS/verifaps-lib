@@ -118,11 +118,15 @@ public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, C
   public int cycleToRowNumber(int cycle) {
     ConcreteDuration durationWithCycle = getDurations().stream()
         .filter(
-            duration -> duration.getBeginCycle() <= cycle && duration.getEndCycle() > cycle
+            duration -> isCycleInDuration(cycle, duration)
         )
         .findFirst()
         .orElseThrow(() -> new IllegalArgumentException("Cycle not found"));
     return getDurations().indexOf(durationWithCycle);
+  }
+
+  private static boolean isCycleInDuration(int cycle, ConcreteDuration duration) {
+    return duration.getBeginCycle() <= cycle && duration.getEndCycle() > cycle;
   }
 
   @Override

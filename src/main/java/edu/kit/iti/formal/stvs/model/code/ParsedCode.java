@@ -10,14 +10,14 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
+import java.util.Optional;
 
 /**
  * Created by philipp on 09.01.17.
@@ -62,22 +62,24 @@ public class ParsedCode {
       program.getLocalScope().getLocalVariables().entrySet().forEach(variableEntry -> {
         //String varName = variableEntry.getKey();
         VariableDeclaration varDecl = variableEntry.getValue();
-        VariableCategory category;
-        switch (varDecl.getType()) {
-          case VariableDeclaration.INPUT:
-            category = VariableCategory.INPUT;
-            break;
-          case VariableDeclaration.OUTPUT:
-            category = VariableCategory.OUTPUT;
-            break;
-          default:
-            // Don't create variables for other types than INPUT or OUTPUT
-            //TODO: recognize INOUT or other variables (was not specified however)
-            return;
+        Optional<VariableCategory> category = getCategoryFromDeclaration(varDecl);
+        Optional<String> dataTypeName = Optional.ofNullable(varDecl.getDataTypeName());
+        if(category.isPresent() && dataTypeName.isPresent()){
+          this.definedVariables.add(new CodeIoVariable(category.get(), dataTypeName.get(), varDecl.getName()));
         }
-        this.definedVariables.add(new CodeIoVariable(category, varDecl.getDataTypeName(), varDecl.getName()));
       });
       return null;
+    }
+
+    private Optional<VariableCategory> getCategoryFromDeclaration(VariableDeclaration varDecl) {
+      switch (varDecl.getType()) {
+        case VariableDeclaration.INPUT:
+          return Optional.of(VariableCategory.INPUT);
+        case VariableDeclaration.OUTPUT:
+          return Optional.of(VariableCategory.OUTPUT);
+        default:
+          return Optional.empty();
+      }
     }
 
     public List<CodeIoVariable> getDefinedVariables() {
@@ -133,15 +135,15 @@ public class ParsedCode {
    * @param parsedCodeListener
    */
   public static void parseCode(String input,
-                               Consumer<List<? extends Token>> tokenListener,
-                               Consumer<List<SyntaxError>> syntaxErrorsListener,
-                               Consumer<ParsedCode> parsedCodeListener) {
+                               ParsedTokenHandler parsedTokenHandler,
+                               ParsedSyntaxErrorHandler syntaxErrorsListener,
+                               ParsedCodeHandler parsedCodeListener) {
     try {
       SyntaxErrorListener syntaxErrorListener = new SyntaxErrorListener();
       IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(input));
       lexer.removeErrorListeners();
       lexer.addErrorListener(syntaxErrorListener);
-      tokenListener.accept(lexer.getAllTokens());
+      parsedTokenHandler.accept(lexer.getAllTokens());
       lexer.reset();
 
       IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));

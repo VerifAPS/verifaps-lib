@@ -1,8 +1,6 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * runtime-representation for boolean types.
@@ -19,10 +17,10 @@ public class TypeBool implements Type {
 
   @Override
   public <R> R match(
-      Supplier<R> matchIntType,
-      Supplier<R> matchBoolType,
-      Function<TypeEnum, R> matchEnumType) {
-    return matchBoolType.get();
+      TypeIntegerHandler<R> matchIntType,
+      TypeBooleanHandler<R> matchBoolType,
+      TypeEnumHandler<R> matchEnumType) {
+    return matchBoolType.handle();
   }
 
   @Override

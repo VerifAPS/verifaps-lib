@@ -1,12 +1,14 @@
 package edu.kit.iti.formal.stvs.model.code;
 
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
-import java.util.List;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.antlr.v4.runtime.Token;
+
+import java.util.List;
+
 
 /**
  * Created by csicar on 09.01.17.

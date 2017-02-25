@@ -6,12 +6,11 @@ import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
-import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
-import edu.kit.iti.formal.stvs.view.common.ErrorMessageDialog;
+import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.common.FileChooserFactory;
 import javafx.beans.property.ObjectProperty;
 import javafx.event.ActionEvent;
@@ -22,8 +21,6 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.*;
 
@@ -88,7 +85,7 @@ public class StvsMenuBarController implements Controller {
           }));
           this.rootModel.get().getHistory().addFilename(filename);
         } catch (IOException | ImportException e) {
-          ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "File Open Error", "An error occurred " +
+          AlertFactory.createAlert(Alert.AlertType.ERROR, "File Open Error", "An error occurred " +
               "while opening a file.", "The file " + filename + " could not be opened.", e.getMessage());
         }
       }));
@@ -142,7 +139,7 @@ public class StvsMenuBarController implements Controller {
       this.rootModel.get().getScenario().setCode(code);
       this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
     } catch (IOException e) {
-      ErrorMessageDialog.createErrorMessageDialog(e);
+      AlertFactory.createAlert(e);
     }
   }
 
@@ -163,7 +160,7 @@ public class StvsMenuBarController implements Controller {
       this.rootModel.set(model);
       this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
     } catch (IOException | ImportException exception) {
-      ErrorMessageDialog.createErrorMessageDialog(exception);
+      AlertFactory.createAlert(exception);
     }
   }
 
@@ -180,7 +177,7 @@ public class StvsMenuBarController implements Controller {
        this.rootModel.get().getHybridSpecifications().add(spec);
        this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
     } catch (IOException | ImportException e) {
-      ErrorMessageDialog.createErrorMessageDialog(e);
+      AlertFactory.createAlert(e);
     }
   }
 
@@ -207,7 +204,7 @@ public class StvsMenuBarController implements Controller {
         this.rootModel.get().getScenario().setCode(code);
       }));
     } catch (IOException | ImportException e) {
-      ErrorMessageDialog.createErrorMessageDialog(e);
+      AlertFactory.createAlert(e);
     }
   }
 
@@ -232,7 +229,7 @@ public class StvsMenuBarController implements Controller {
       rootModel.get().setFilename(path.getName());
       ExporterFacade.exportSession(rootModel.get(), ExporterFacade.ExportFormat.XML, path);
     } catch (IOException | ExportException exception) {
-      ErrorMessageDialog.createErrorMessageDialog(exception);
+      AlertFactory.createAlert(exception);
     }
   }
 
@@ -252,7 +249,7 @@ public class StvsMenuBarController implements Controller {
     try {
       ExporterFacade.exportCode(code, false);
     } catch (IOException e) {
-      ErrorMessageDialog.createErrorMessageDialog(e);
+      AlertFactory.createAlert(e);
     }
   }
 
@@ -260,7 +257,7 @@ public class StvsMenuBarController implements Controller {
     try {
       ConstraintSpecification spec = rootModel.get().getScenario().getActiveSpec();
       if (spec == null) { // There is no active specification tab open yet
-        ErrorMessageDialog.createMessageDialog(Alert.AlertType.ERROR, "Save Specification",
+        AlertFactory.createAlert(Alert.AlertType.ERROR, "Save Specification",
             "No specification available.", "");
       } else {
         FileChooser fileChooser = FileChooserFactory.createSaveFileChooser(SPECIFICATION,
@@ -269,7 +266,7 @@ public class StvsMenuBarController implements Controller {
         ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.XML, specFile);
       }
     } catch (ExportException | IOException e) {
-      ErrorMessageDialog.createErrorMessageDialog(e);
+      AlertFactory.createAlert(e);
     }
   }
 
