@@ -31,9 +31,8 @@ public class XmlConcreteSpecImporterTest {
   
   @Test
   public void testDoImportValid1() throws Exception {
-    FileInputStream inputStream = new FileInputStream(new File
-        (this.getClass().getResource("spec_concrete_valid_1.xml").toURI()));
-    ConcreteSpecification importedSpec = importer.doImport(inputStream);
+    ConcreteSpecification importedSpec = importer.doImport(
+        getClass().getResourceAsStream("spec_concrete_valid_1.xml"));
     JsonElement json = JsonTableParser.jsonFromResource("concrete_spec.json", ConcreteSpecificationTest.class);
     ConcreteSpecification concreteSpec =
         JsonTableParser.concreteTableFromJson(Collections.emptyList(), false, json);

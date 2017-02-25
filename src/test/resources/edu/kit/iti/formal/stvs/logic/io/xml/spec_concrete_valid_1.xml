@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" isConcrete="true" name="UnnamedSpecification">
+<specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" isConcrete="true" name="Unnamed Specification">
   <variables>
     <ioVariable data-type="INT" io="input" name="A"/>
     <ioVariable data-type="BOOL" io="output" name="B"/>
