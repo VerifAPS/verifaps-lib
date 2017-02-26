@@ -115,7 +115,11 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     }
     // set the verification result back in the javafx thread:
     VerificationResult finalResult = result; // have to do this because of lambda restrictions...
-    Platform.runLater(() -> verificationResult.set(finalResult));
+    try {
+      Platform.runLater(() -> verificationResult.set(finalResult));
+    } catch (IllegalStateException e) {
+      verificationResult.set(finalResult);
+    }
   }
 
   private File writeLogFile(String processOutput) throws IOException {

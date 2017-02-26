@@ -165,9 +165,10 @@ public class StvsRootController implements Controller {
               "A counterexample is available.", alertBody, logFileContents).showAndWait();
           // Show read-only copy of spec with counterexample in a new tab
           assert stvsRootModel.getScenario().getActiveSpec() != null;
+          assert res.getCounterExample().isPresent();
           HybridSpecification readOnlySpec = new HybridSpecification(new ConstraintSpecification(stvsRootModel
               .getScenario().getActiveSpec()), false);
-          readOnlySpec.setCounterExample(res.getCounterExample());
+          readOnlySpec.setCounterExample(res.getCounterExample().get());
           specificationsPaneController.addTab(readOnlySpec);
           break;
 

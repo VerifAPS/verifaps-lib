@@ -4,11 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Errors related to the verification process. These are used
+ * Errors related to the verification process.
  * @author Benjamin Alt
  */
 public class VerificationError extends Exception {
 
+  /* Error messages for the different error reasons */
   private static final Map<Reason, String> errorMessages;
   static {
     errorMessages = new HashMap<>();
@@ -24,16 +25,30 @@ public class VerificationError extends Exception {
 
   private Reason reason;
 
+  /**
+   * Construct a new VerificationError for a specific reason.
+   * @param reason The reason for the VerificationError
+   */
   public VerificationError(Reason reason) {
     this.reason = reason;
   }
 
-  public VerificationError (Exception e) {
+  /**
+   * Construct a new VerificationError from an Exception (which was thrown while
+   * launching/managing the verification. These will typically not come from the verification
+   * engine itself).
+   * @param e The exception to construct a VerificationError from
+   */
+  public VerificationError(Exception e) {
     this.reason = Reason.EXCEPTION;
     this.setStackTrace(e.getStackTrace());
     errorMessages.put(Reason.EXCEPTION, e.getMessage());
   }
 
+  /**
+   * Get the reason for this VerificationError.
+   * @return The reason for this VerificationError
+   */
   public Reason getReason() {
     return reason;
   }

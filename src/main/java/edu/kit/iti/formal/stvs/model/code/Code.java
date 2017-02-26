@@ -101,4 +101,33 @@ public class Code {
   public List<SyntaxError> getSyntaxErrors() {
     return syntaxErrors;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Code code = (Code) o;
+
+    if (getFilename() != null ? !getFilename().equals(code.getFilename()) : code.getFilename() != null)
+      return false;
+    if (getSourcecode() != null ? !getSourcecode().equals(code.getSourcecode()) : code
+        .sourceCodeProperty != null)
+      return false;
+    if (getParsedCode() != null ? !getParsedCode().equals(code.getParsedCode()) : code.getParsedCode() != null)
+      return false;
+    if (getTokens() != null ? !getTokens().equals(code.getTokens()) : code.getTokens() != null)
+      return false;
+    /* ANTLR SyntaxError does not implement equals() properly
+    return getSyntaxErrors() != null ? getSyntaxErrors().equals(code.getSyntaxErrors()) : code
+    .getSyntaxErrors() == null; */
+    if (getSyntaxErrors().size() != code.getSyntaxErrors().size()) return false;
+    for (int i = 0; i < getSyntaxErrors().size(); i++) {
+      if (!getSyntaxErrors().get(i).getMessage().equals(code.getSyntaxErrors().get(i).getMessage
+          ())) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

@@ -130,7 +130,7 @@ public class ParsedCode {
   /**
    *
    * @param input the code to parse
-   * @param tokenListener
+   * @param parsedTokenHandler
    * @param syntaxErrorsListener
    * @param parsedCodeListener
    */
@@ -193,5 +193,17 @@ public class ParsedCode {
     return definedTypes;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
 
+    ParsedCode that = (ParsedCode) o;
+
+    if (getFoldableCodeBlocks() != null ? !getFoldableCodeBlocks().equals(that.getFoldableCodeBlocks()) : that.getFoldableCodeBlocks() != null)
+      return false;
+    if (getDefinedVariables() != null ? !getDefinedVariables().equals(that.getDefinedVariables()) : that.getDefinedVariables() != null)
+      return false;
+    return getDefinedTypes() != null ? getDefinedTypes().equals(that.getDefinedTypes()) : that.getDefinedTypes() == null;
+  }
 }
