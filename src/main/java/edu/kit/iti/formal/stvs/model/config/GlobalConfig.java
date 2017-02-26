@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class GlobalConfig {
 
-  private static final String AUTOLOAD_CONFIG_FILENAME = "stvs-config.xml";
+  protected static final String AUTOLOAD_CONFIG_FILENAME = "stvs-config.xml";
   public static final String CONFIG_DIRPATH = System.getProperty("user.home") + File.separator +
       ".config";
   private List<String> validLanguages = Arrays.asList("EN");
@@ -78,6 +78,12 @@ public class GlobalConfig {
     ExporterFacade.exportConfig(this, ExporterFacade.ExportFormat.XML, configFile);
   }
 
+  /**
+   * Replaces the contents of this GlobalConfig instance with those of a given GlobalConfig.
+   * Preferred over a copy constructor because this method keeps listeners registered on the
+   * properties, which will be notified about the changes.
+   * @param toBeCopied The GlobalConfig the contents of which will be copied
+   */
   public void setAll(GlobalConfig toBeCopied) {
     verificationTimeout.set(toBeCopied.getVerificationTimeout());
     simulationTimeout.set(toBeCopied.getSimulationTimeout());
@@ -276,24 +282,6 @@ public class GlobalConfig {
     return uiLanguage;
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof GlobalConfig)) return false;
-    if (obj == this) return true;
-
-    GlobalConfig rhs = (GlobalConfig) obj;
-    return new EqualsBuilder().
-            append(verificationTimeout.get(), rhs.verificationTimeout.get()).
-            append(simulationTimeout.get(), rhs.simulationTimeout.get()).
-        append(editorFontFamily.get(), rhs.editorFontFamily.get()).
-        append(editorFontSize.get(), rhs.editorFontSize.get()).
-        append(showLineNumbers.get(), rhs.showLineNumbers.get()).
-        append(uiLanguage.get(), rhs.uiLanguage.get()).
-        append(windowHeight.get(), rhs.windowHeight.get()).
-        append(windowWidth.get(), rhs.windowWidth.get()).
-            isEquals();
-  }
-
   public String getNuxmvFilename() {
     return nuxmvFilename.get();
   }
@@ -352,5 +340,58 @@ public class GlobalConfig {
 
   public void setWindowMaximized(boolean windowMaximized) {
     this.windowMaximized.set(windowMaximized);
+  }
+
+  /**
+   * Tests whether two GlobalConfigs are equal. Ignores listeners registered on the properties
+   * (i.e. considers only property contents).
+   * @param o The Object to be tested for equality
+   * @return Whether this instance and o are equal
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    GlobalConfig that = (GlobalConfig) o;
+
+    if (getValidLanguages() != null ? !getValidLanguages().equals(that.getValidLanguages()) : that.getValidLanguages() != null)
+      return false;
+    if (!(getVerificationTimeout() == that.getVerificationTimeout())) return false;
+    if (!(getSimulationTimeout() == that.getSimulationTimeout())) return false;
+    if (!(isWindowMaximized() == that.isWindowMaximized())) return false;
+    if (!(getWindowHeight() == that.getWindowHeight())) return false;
+    if (!(getWindowWidth() == that.getWindowWidth())) return false;
+    if (getUiLanguage() != null ? !getUiLanguage().equals(that.getUiLanguage()) : that.getUiLanguage() != null)
+      return false;
+    if (!(getMaxLineRollout() == that.getMaxLineRollout())) return false;
+    if (!(getEditorFontSize() == that.getEditorFontSize())) return false;
+    if (getEditorFontFamily() != null ? !getEditorFontFamily().equals(that.getEditorFontFamily()) : that.getEditorFontFamily() != null)
+      return false;
+    if (!(isShowLineNumbers() == that.isShowLineNumbers())) return false;
+    if (getNuxmvFilename() != null ? !getNuxmvFilename().equals(that.getNuxmvFilename()) : that.getNuxmvFilename() != null)
+      return false;
+    if (getZ3Path() != null ? !getZ3Path().equals(that.getZ3Path()) : that.getZ3Path() != null)
+      return false;
+    return getGetetaCommand() != null ? getGetetaCommand().equals(that.getGetetaCommand()) : that.getGetetaCommand() == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getValidLanguages() != null ? getValidLanguages().hashCode() : 0;
+    result = 31 * result + getVerificationTimeout();
+    result = 31 * result + getSimulationTimeout();
+    result = 31 * result + (isWindowMaximized() ? 1 : 0);
+    result = 31 * result + getWindowHeight();
+    result = 31 * result + getWindowWidth();
+    result = 31 * result + (getUiLanguage() != null ? getUiLanguage().hashCode() : 0);
+    result = 31 * result + getMaxLineRollout();
+    result = 31 * result + getEditorFontSize();
+    result = 31 * result + (getEditorFontFamily() != null ? getEditorFontFamily().hashCode() : 0);
+    result = 31 * result + (isShowLineNumbers() ? 1 : 0);
+    result = 31 * result + (getNuxmvFilename() != null ? getNuxmvFilename().hashCode() : 0);
+    result = 31 * result + (getZ3Path() != null ? getZ3Path().hashCode() : 0);
+    result = 31 * result + (getGetetaCommand() != null ? getGetetaCommand().hashCode() : 0);
+    return result;
   }
 }

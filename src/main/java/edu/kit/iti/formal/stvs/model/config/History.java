@@ -13,14 +13,13 @@ import java.io.IOException;
 import java.util.Collection;
 
 /**
- * Contains information about recently opened code and spec files
+ * Contains information about recently opened code and spec files.
  * @author Benjamin Alt
  */
 public class History {
 
   private static final String AUTOLOAD_HISTORY_FILENAME = "stvs-history.xml";
   public static final int HISTORY_DEPTH = 15;
-
 
   private ObservableList<String> filenames;
 
@@ -83,9 +82,30 @@ public class History {
     ExporterFacade.exportHistory(this, ExporterFacade.ExportFormat.XML, historyFile);
   }
 
+  /**
+   * Replaces the contents of this history instance with those of a given history.
+   * Preferred over a copy constructor because this method keeps listeners registered on the
+   * properties, which will be notified about the changes.
+   * @param history The history the contents of which will be copied
+   */
   public void setAll(History history) {
     for (String filename : history.getFilenames()) {
       addFilename(filename);
     }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    History history = (History) o;
+
+    return getFilenames() != null ? getFilenames().equals(history.getFilenames()) : history.getFilenames() == null;
+  }
+
+  @Override
+  public int hashCode() {
+    return getFilenames() != null ? getFilenames().hashCode() : 0;
   }
 }

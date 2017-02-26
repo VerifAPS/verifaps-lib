@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * @author Benjamin Alt
@@ -30,7 +31,7 @@ public class HistoryTest {
   }
 
   @Test
-  public void testCopyConstructor() {
+  public void testConstructor() {
     ArrayList<String> filePaths = new ArrayList<String>();
     filePaths.add("CodeOne");
     filePaths.add("CodeTwo");
@@ -43,7 +44,7 @@ public class HistoryTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testCopyConstructorException() {
+  public void testConstructorException() {
     ArrayList<String> codePaths = new ArrayList<String>();
     for (int i = 0; i < History.HISTORY_DEPTH * 2; i++) {
       codePaths.add("SomeCode" + i);
@@ -52,8 +53,45 @@ public class HistoryTest {
   }
 
   @Test
-  public void testAddSFilename() {
+  public void testAddSpecFilename() {
     history.addFilename("someSpec");
     assertEquals(history.getFilenames().get(0), "someSpec");
+  }
+
+  @Test
+  public void testSetAll() {
+    testConstructor();
+    History clone = new History();
+    clone.setAll(history);
+    assertEquals(history, clone);
+  }
+
+  @Test
+  public void testEquals() {
+    testConstructor();
+    ArrayList<String> filePaths = new ArrayList<String>();
+    filePaths.add("CodeOne");
+    filePaths.add("CodeTwo");
+    filePaths.add("SpecOne");
+    History identical = new History(filePaths);
+    assertEquals(history, identical);
+    assertNotEquals(null, history);
+    assertEquals(history, history);
+    identical.getFilenames().add("Another filename!");
+    assertNotEquals(history, identical);
+  }
+
+  @Test
+  public void testHashCode() {
+    testConstructor();
+    ArrayList<String> filePaths = new ArrayList<String>();
+    filePaths.add("CodeOne");
+    filePaths.add("CodeTwo");
+    filePaths.add("SpecOne");
+    History identical = new History(filePaths);
+    assertEquals(history.hashCode(), identical.hashCode());
+    assertEquals(history.hashCode(), history.hashCode());
+    identical.getFilenames().add("Another filename!");
+    assertNotEquals(history.hashCode(), identical.hashCode());
   }
 }

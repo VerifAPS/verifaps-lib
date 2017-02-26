@@ -1,34 +1,36 @@
 package edu.kit.iti.formal.stvs.model.config;
 
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
 
 /**
- * Configuration for table column. Contains GUI-related information about a column
+ * Configuration for table column. Contains GUI-related information about a column.
  * @author Philipp
  */
 public class ColumnConfig {
   private DoubleProperty width;
 
   /**
-   * Default ColumnConfig
+   * Default ColumnConfig.
    */
   public ColumnConfig() {
     width = new SimpleDoubleProperty(100);
   }
 
   /**
-   * Create a new ColumnConfig
+   * Create a new ColumnConfig.
    *
    * @param colwidth The initial column width
    */
   public ColumnConfig(double colwidth) {
+    if (colwidth <= 0) {
+      throw new IllegalArgumentException("Column width must be positive");
+    }
     width = new SimpleDoubleProperty(colwidth);
   }
 
   /**
-   * Get the current column width
+   * Get the current column width.
    *
    * @return The current column width
    */
@@ -37,11 +39,14 @@ public class ColumnConfig {
   }
 
   /**
-   * Set the current column width
+   * Set the current column width.
    *
    * @param width The current column width
    */
   public void setWidth(double width) {
+    if (width <= 0) {
+      throw new IllegalArgumentException("Column width must be positive");
+    }
     this.width.set(width);
   }
 

@@ -28,6 +28,11 @@ import java.util.stream.Collectors;
  */
 public class TestUtils {
 
+  /**
+   * Tolerance for floating-point rounding errors when doing assertEquals() with doubles
+   */
+  public static final double EPSILON = 0.001;
+
   public static ValidSpecification importValidSpec(InputStream source, TypeEnum... enumTypes) {
     List<Type> typeContext = new ArrayList<>();
     typeContext.add(TypeInt.INT);
