@@ -104,7 +104,12 @@ public class VerificationScenarioTest {
         VerificationResult expectedResult = ImporterFacade.importVerificationResult(StvsApplication
             .class.getResourceAsStream("testSets/valid_1/geteta_report_valid_1.xml"), ImporterFacade
             .ImportFormat.GETETA, typeContext);
-        assertEquals(expectedResult, newResult);
+        /* Cannot just assertEquals() with verificationResults, as logFileNames (randomly
+        generated) will be different
+        assertEquals(expectedResult, newResult); */
+        assertEquals(expectedResult.getCounterExample(), newResult.getCounterExample());
+        assertEquals(expectedResult.getStatus(), newResult.getStatus());
+        assertEquals(expectedResult.getVerificationError(), newResult.getVerificationError());
       } catch (ImportException e) {
         throw new AssertionFailedError();
       }

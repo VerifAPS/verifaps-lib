@@ -47,14 +47,6 @@ public class VerificationResult {
   }
 
   /**
-   * Was the verification successful?
-   * @return True if the verification was successful, false otherwise
-   */
-  public boolean isSuccessful() {
-    return status == Status.VERIFIED;
-  }
-
-  /**
    * Get the status of the verification.
    * @return The current verification status
    */
@@ -94,6 +86,8 @@ public class VerificationResult {
     if (counterexample != null ? !counterexample.equals(result.counterexample) : result.counterexample != null)
       return false;
     if (getStatus() != result.getStatus()) return false;
+    if (getLogFile() != null ? !getLogFile().equals(result.getLogFile()) : result.getLogFile() != null)
+      return false;
     return getVerificationError() != null ? getVerificationError().equals(result.getVerificationError()) : result.getVerificationError() == null;
   }
 }
