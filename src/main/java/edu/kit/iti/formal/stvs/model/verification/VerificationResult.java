@@ -38,25 +38,62 @@ public class VerificationResult {
     this.counterexample = counterexample;
   }
 
+  /**
+   * Get the current verification error or an empty Optional if none occurred.
+   * @return The current verification error or an empty Optional if none occurred
+   */
   public Optional<VerificationError> getVerificationError() {
     return Optional.ofNullable(verificationError);
   }
 
+  /**
+   * Was the verification successful?
+   * @return True if the verification was successful, false otherwise
+   */
   public boolean isSuccessful() {
     return status == Status.VERIFIED;
   }
 
+  /**
+   * Get the status of the verification.
+   * @return The current verification status
+   */
   public Status getStatus() {
     return status;
   }
 
-  public ConcreteSpecification getCounterExample() {
-    return counterexample;
+  /**
+   * Get the counterexample or an empty Optional if none is available.
+   * @return The counterexample or an empty Optional if none is available
+   */
+  public Optional<ConcreteSpecification> getCounterExample() {
+    return Optional.ofNullable(counterexample);
   }
 
+  /**
+   * Get the log file or an empty Optional if none is available. This would be the case for some
+   * verification errors (such as IOExceptions).
+   * @return The log file or an empty Optional if none is available
+   */
   public Optional<File> getLogFile() {
     return Optional.ofNullable(logFile);
   }
 
+  /**
+   * The verification status.
+   */
   public enum Status { VERIFIED, COUNTEREXAMPLE, ERROR }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    VerificationResult result = (VerificationResult) o;
+
+    if (counterexample != null ? !counterexample.equals(result.counterexample) : result.counterexample != null)
+      return false;
+    if (getStatus() != result.getStatus()) return false;
+    return getVerificationError() != null ? getVerificationError().equals(result.getVerificationError()) : result.getVerificationError() == null;
+  }
 }
