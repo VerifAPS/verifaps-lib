@@ -5,23 +5,25 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.math.BigInteger;
 
 /**
+ * This class provides the functionality to export a {@link GlobalConfig} object to a xml node.
+ *
  * @author Benjamin Alt
  */
 public class XmlConfigExporter extends XmlExporter<GlobalConfig> {
 
+  /**
+   * Exports a given {@link GlobalConfig} as a XML {@link Node}.
+   *
+   * @param source Global config that should be exported
+   * @return The XML Node representing the global config
+   * @throws ExportException Exception while marshalling
+   */
   @Override
   public Node exportToXmlNode(GlobalConfig source) throws ExportException {
     ObjectFactory objectFactory = new ObjectFactory();
-    Config config = objectFactory.createConfig();
     Config.General general = objectFactory.createConfigGeneral();
     general.setUiLanguage(source.getUiLanguage());
     general.setSimulationTimeout(new BigInteger(Integer.toString(source.getSimulationTimeout())));
@@ -33,6 +35,7 @@ public class XmlConfigExporter extends XmlExporter<GlobalConfig> {
     windowSize.setWidth(new BigInteger(Integer.toString(source.getWindowWidth())));
     windowSize.setMaximized(source.isWindowMaximized());
     general.setWindowSize(windowSize);
+    Config config = objectFactory.createConfig();
     config.setGeneral(general);
     Config.Editor editor = objectFactory.createConfigEditor();
     editor.setFontFamily(source.getEditorFontFamily());
@@ -46,15 +49,5 @@ public class XmlConfigExporter extends XmlExporter<GlobalConfig> {
     config.setDependencies(deps);
     JAXBElement<Config> element = objectFactory.createConfig(config);
     return marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml");
-  }
-
-  public static void main(String[] args) throws ExportException, TransformerException {
-    XmlConfigExporter exporter = new XmlConfigExporter();
-    Node node = exporter.exportToXmlNode(new GlobalConfig());
-    Transformer transformer = TransformerFactory.newInstance().newTransformer();
-    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-    DOMSource source = new DOMSource(node);
-    StreamResult console = new StreamResult(System.out);
-    transformer.transform(source, console);
   }
 }

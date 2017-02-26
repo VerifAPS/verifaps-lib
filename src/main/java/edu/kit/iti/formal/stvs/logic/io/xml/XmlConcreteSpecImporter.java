@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * This class provides the functionality to import concrete specifications from xml nodes.
+ *
  * @author Benjamin Alt
  */
 public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> {
@@ -30,6 +32,14 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
   private Unmarshaller unmarshaller;
   private List<Type> typeContext;
 
+  /**
+   * Creates an Importer.
+   * The {@code typeContext} is later used for assigning the right type to variables
+   * while importing.
+   *
+   * @param typeContext list of types
+   * @throws ImportException Exception while marshalling
+   */
   public XmlConcreteSpecImporter(List<Type> typeContext) throws ImportException {
     this.typeContext = typeContext;
     try {
@@ -40,19 +50,34 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
     }
   }
 
+  /**
+   * Imports a {@link ConcreteSpecification} from a xml {@link Node}.
+   *
+   * @param source Xml node that should be imported
+   * @return Imported specification
+   * @throws ImportException Exception while importing
+   */
   public ConcreteSpecification doImportFromXmlNode(Node source) throws ImportException {
     try {
       SpecificationTable importedSpec = ((JAXBElement<SpecificationTable>) unmarshaller
           .unmarshal(source)).getValue();
 
       List<ValidIoVariable> validIoVariables = importIoVariables(importedSpec
-              .getVariables());
+          .getVariables());
       return importConcreteSpec(validIoVariables, importedSpec);
-    } catch (JAXBException  e) {
+    } catch (JAXBException e) {
       throw new ImportException(e);
     }
   }
 
+  /**
+   * Imports {@link ValidIoVariable ValidIoVariables} from {@link Variables}
+   * under use of the previously specified {@code typeContext}.
+   *
+   * @param variables variables from which should be imported
+   * @return list of valid variables
+   * @throws ImportException exception while importing
+   */
   private List<ValidIoVariable> importIoVariables(Variables variables)
       throws ImportException {
     List<ValidIoVariable> ioVariables = new ArrayList<>();
@@ -62,7 +87,8 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
         Type type = typeContext.stream()
             .filter(t -> t.getTypeName().equals(variable.getDataType()))
             .findFirst()
-            .orElseThrow(() -> new ImportException("Unknown variable type: " + variable.getDataType()));
+            .orElseThrow(() ->
+                new ImportException("Unknown variable type: " + variable.getDataType()));
         ioVariables.add(new ValidIoVariable(category, variable.getName(), type));
       } catch (IllegalArgumentException argExc) { // thrown by VariableCategory.valueOf
         throw new ImportException("Illegal variable category: " + variable.getIo());
@@ -71,14 +97,24 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
     return ioVariables;
   }
 
-  private ConcreteSpecification importConcreteSpec(List<ValidIoVariable>
-      ioVariables, SpecificationTable importedSpec) throws
-      ImportException {
+  /**
+   * Imports a {@link ConcreteSpecification} from a {@link SpecificationTable}.
+   *
+   * @param ioVariables defined variables
+   * @param importedSpec specification table previously imported from xml
+   * @return imported concrete specification
+   * @throws ImportException Exception while importing
+   */
+  private ConcreteSpecification importConcreteSpec(
+      List<ValidIoVariable> ioVariables,
+      SpecificationTable importedSpec)
+      throws ImportException {
     if (!importedSpec.isIsConcrete()) {
-      throw new ImportException("Cannot import a ConcreteSpecification from a specification not " +
-          "declared as concrete");
+      throw new ImportException("Cannot import a ConcreteSpecification from a specification not "
+          + "declared as concrete");
     }
-    ConcreteSpecification concreteSpec = new ConcreteSpecification(importedSpec.isIsCounterExample());
+    ConcreteSpecification concreteSpec =
+        new ConcreteSpecification(importedSpec.isIsCounterExample());
     concreteSpec.setName(importedSpec.getName());
 
     // Add the column headers
@@ -91,30 +127,50 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
       Rows.Row row = rows.getRow().get(i);
       int currentDuration = Integer.parseInt(row.getDuration().getValue());
       concreteSpec.getDurations().add(new ConcreteDuration(currentCycle, currentDuration));
-      for (int j = 0; j < row.getCycle().size(); j++){
-        Map<String,ConcreteCell> cellsMap = new HashMap<>();
-        Rows.Row.Cycle cycle = row.getCycle().get(j);
-        for (int k = 0; k < ioVariables.size(); k++) {
-          String cell = cycle.getCell().get(k);
-          Value val = ioVariables.get(k).getValidType().parseLiteral(cell)
-              .orElseThrow(() -> new ImportException("Illegal value literal: " + cell));
-          ConcreteCell concreteCell = new ConcreteCell(val);
-          cellsMap.put(ioVariables.get(k).getName(), concreteCell);
-        }
-        if (cellsMap.size() != ioVariables.size()) {
-          throw new ImportException("Row too short: Do not have a cell for each IOVariable");
-        }
-        concreteSpec.getRows().add(SpecificationRow.createUnobservableRow(cellsMap));
+      for (int j = 0; j < row.getCycle().size(); j++) {
+        concreteSpec.getRows().add(createSpecificationRowFoCycle(ioVariables, row, j));
       }
       currentCycle += currentDuration;
     }
     return concreteSpec;
   }
 
+  /**
+   * Creates a row that represents a single cycle within a {@code row}.
+   * Note that one {@code row} can map to multiple
+   * {@link SpecificationRow SpecificationRows} and this method only
+   * creates the row with the specified {@code cycleNum}.
+   *
+   * @param ioVariables IO Variables that are present in the specification
+   * @param row Row which holds the information to create a specification row.
+   * @param cycleNum Number of the cycle for which a row should be created
+   * @return Specification row for one cycle
+   * @throws ImportException Mismatch between size of {@code row} and size of
+   * {@code ioVariables}
+   */
+  private SpecificationRow<ConcreteCell> createSpecificationRowFoCycle(
+      List<ValidIoVariable> ioVariables,
+      Rows.Row row, int cycleNum
+  ) throws ImportException {
+    Map<String, ConcreteCell> cellsMap = new HashMap<>();
+    Rows.Row.Cycle cycle = row.getCycle().get(cycleNum);
+    for (int k = 0; k < ioVariables.size(); k++) {
+      String cell = cycle.getCell().get(k);
+      Value val = ioVariables.get(k).getValidType().parseLiteral(cell)
+          .orElseThrow(() -> new ImportException("Illegal value literal: " + cell));
+      ConcreteCell concreteCell = new ConcreteCell(val);
+      cellsMap.put(ioVariables.get(k).getName(), concreteCell);
+    }
+    if (cellsMap.size() != ioVariables.size()) {
+      throw new ImportException("Row too short: Do not have a cell for each IOVariable");
+    }
+    return SpecificationRow.createUnobservableRow(cellsMap);
+  }
+
   @Override
   protected String getXSDFilePath() throws URISyntaxException {
-    File xsdFile = new File
-        (this.getClass().getResource("/fileFormats/specification.xsd").toURI());
+    File xsdFile =
+        new File(this.getClass().getResource("/fileFormats/specification.xsd").toURI());
     return xsdFile.getAbsolutePath();
   }
 }

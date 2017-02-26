@@ -12,10 +12,19 @@ import java.io.File;
 import java.net.URISyntaxException;
 
 /**
+ * This class provides the functionality to import a {@link GlobalConfig} from a xml node.
+ *
  * @author Benjamin Alt
  */
 public class XmlConfigImporter extends XmlImporter<GlobalConfig> {
 
+  /**
+   * Imports a {@link GlobalConfig} from a xml {@link Node}.
+   *
+   * @param source Xml node that should be imported
+   * @return Imported config
+   * @throws ImportException Exception while importing
+   */
   @Override
   public GlobalConfig doImportFromXmlNode(Node source) throws ImportException {
     try {
@@ -77,8 +86,8 @@ public class XmlConfigImporter extends XmlImporter<GlobalConfig> {
 
   @Override
   protected String getXSDFilePath() throws URISyntaxException {
-    File xsdFile = new File
-        (this.getClass().getResource("/fileFormats/config.xsd").toURI());
+    File xsdFile =
+        new File(this.getClass().getResource("/fileFormats/config.xsd").toURI());
     return xsdFile.getAbsolutePath();
   }
 }
