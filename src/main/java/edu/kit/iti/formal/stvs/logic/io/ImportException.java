@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
 /**
- * Created by csicar on 09.01.17.
+ * Indicates that an exception occurred during importing.
  * @author Benjamin Alt
  */
 public class ImportException extends Exception {
