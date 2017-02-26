@@ -12,7 +12,7 @@ import javax.xml.bind.JAXBElement;
 import java.util.stream.Collectors;
 
 /**
- * This class provides the functionality to {@link ConcreteSpecification ConcreteSpecifications}
+ * This class provides the functionality to eport {@link ConcreteSpecification ConcreteSpecifications}
  * to xml nodes.
  * @author Benjamin Alt
  */

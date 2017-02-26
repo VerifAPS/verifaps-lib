@@ -15,7 +15,7 @@ import java.math.BigInteger;
 import java.util.stream.Collectors;
 
 /**
- * This class provides the functionality to {@link ConstraintSpecification ConstraintSpecifications}
+ * This class provides the functionality to export {@link ConstraintSpecification ConstraintSpecifications}
  * to xml nodes.
  *
  * @author Benjamin Alt

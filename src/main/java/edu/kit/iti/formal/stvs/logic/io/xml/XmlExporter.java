@@ -24,10 +24,19 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 /**
+ * Common superclass for all Exporters that export to xml.
+ *
  * @author Benjamin Alt
  */
 public abstract class XmlExporter<F> implements Exporter<F> {
 
+  /**
+   * Exports an Object as xml.
+   *
+   * @param source Ebject to export
+   * @return The output xml is written to this stream
+   * @throws ExportException Exception while exporting
+   */
   public ByteArrayOutputStream export(F source) throws ExportException {
     Node xmlNode = exportToXmlNode(source);
     StringWriter writer = new StringWriter();
@@ -40,10 +49,18 @@ public abstract class XmlExporter<F> implements Exporter<F> {
       stream.write(xmlString.getBytes());
       return stream;
     } catch (TransformerException | IOException e) {
-        throw new ExportException(e);
+      throw new ExportException(e);
     }
   }
 
+  /**
+   * Marshals a {@link JAXBElement} to a xml node.
+   *
+   * @param element   The element that should be marshaled
+   * @param namespace Xml namespace used in the exported node
+   * @return Node representing the input {@code element}
+   * @throws ExportException Exception while exporting
+   */
   protected static Node marshalToNode(JAXBElement element, String namespace) throws
       ExportException {
     try {
@@ -60,5 +77,14 @@ public abstract class XmlExporter<F> implements Exporter<F> {
     }
   }
 
+  /**
+   * Must be implemented by subclasses.
+   * This method must provide the logic to convert the given {@code source} object into
+   * a xml {@link Node}
+   *
+   * @param source Element that should be converted
+   * @return Xml node
+   * @throws ExportException Exception while exporting
+   */
   public abstract Node exportToXmlNode(F source) throws ExportException;
 }
