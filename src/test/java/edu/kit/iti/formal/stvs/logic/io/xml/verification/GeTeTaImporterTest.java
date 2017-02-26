@@ -29,7 +29,7 @@ public class GeTeTaImporterTest {
     VerificationResult result = importer.doImport(this.getClass().getResourceAsStream
         ("report_counterexample_ints_1.xml"));
     assertFalse(result.isSuccessful());
-    ConcreteSpecification counterexample = result.getCounterExample();
+    ConcreteSpecification counterexample = result.getCounterExample().get();
     assertEquals(1, counterexample.getDurations().size());
     assertEquals(1, counterexample.getRows().size());
     assertEquals(new ConcreteDuration(0, 1), counterexample.getDurations().get(0));
