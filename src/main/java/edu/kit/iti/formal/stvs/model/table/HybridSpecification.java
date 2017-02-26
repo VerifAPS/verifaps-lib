@@ -164,4 +164,21 @@ public class HybridSpecification extends ConstraintSpecification {
     concreteInstance.set(null);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+
+    HybridSpecification that = (HybridSpecification) o;
+
+    if (isEditable() != that.isEditable()) return false;
+    if (getCounterExample() != null ? !getCounterExample().equals(that.getCounterExample()) : that.getCounterExample() != null)
+      return false;
+    if (getConcreteInstance() != null ? !getConcreteInstance().equals(that.getConcreteInstance()) : that.getConcreteInstance() != null)
+      return false;
+    if (rowsAsHybrid != null ? !rowsAsHybrid.equals(that.rowsAsHybrid) : that.rowsAsHybrid != null)
+      return false;
+    return getSelection() != null ? getSelection().equals(that.getSelection()) : that.getSelection() == null;
+  }
 }

@@ -17,7 +17,9 @@ public class CellParseProblem extends CellProblem {
 
   private final ParseException exception;
 
-  public static Expression expressionOrProblemForCell(List<Type> typeContext, TypeChecker typeChecker, String columnId, int row, ConstraintCell cell)
+  public static Expression expressionOrProblemForCell(List<Type> typeContext,
+                                                      TypeChecker typeChecker, String columnId,
+                                                      int row, ConstraintCell cell)
       throws CellProblem {
     try {
       return CellTypeProblem.createValidExpressionFromCell(typeContext, typeChecker, columnId, cell);

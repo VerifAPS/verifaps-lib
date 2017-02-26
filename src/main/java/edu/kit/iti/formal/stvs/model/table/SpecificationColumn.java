@@ -55,13 +55,6 @@ public class SpecificationColumn<C> implements Commentable {
 
   }
 
-  @Override
-  public int hashCode() {
-    int result = cells != null ? cells.hashCode() : 0;
-    result = 31 * result + (comment != null ? comment.hashCode() : 0);
-    return result;
-  }
-
   public String toString() {
     return "SpecificationColumn(cells: " + cells + ", comment: " + comment.get() + ")";
   }

@@ -34,4 +34,24 @@ public class ParseException extends Exception {
   public String getParseErrorMessage() {
     return parseErrorMessage;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ParseException that = (ParseException) o;
+
+    if (getLine() != that.getLine()) return false;
+    if (getCharacterInLine() != that.getCharacterInLine()) return false;
+    return getParseErrorMessage() != null ? getParseErrorMessage().equals(that.getParseErrorMessage()) : that.getParseErrorMessage() == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getLine();
+    result = 31 * result + getCharacterInLine();
+    result = 31 * result + (getParseErrorMessage() != null ? getParseErrorMessage().hashCode() : 0);
+    return result;
+  }
 }

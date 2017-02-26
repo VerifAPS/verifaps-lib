@@ -65,4 +65,26 @@ public class HybridCell<C extends CellOperationProvider> implements CellOperatio
   public ObservableList<String> counterExamplesProperty() {
     return counterExamples;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    HybridCell<?> that = (HybridCell<?>) o;
+
+    if (getCell() != null ? !getCell().equals(that.getCell()) : that.getCell() != null)
+      return false;
+    if (getColumn() != null ? !getColumn().equals(that.getColumn()) : that.getColumn() != null)
+      return false;
+    return counterExamples != null ? counterExamples.equals(that.counterExamples) : that.counterExamples == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getCell() != null ? getCell().hashCode() : 0;
+    result = 31 * result + (getColumn() != null ? getColumn().hashCode() : 0);
+    result = 31 * result + (counterExamples != null ? counterExamples.hashCode() : 0);
+    return result;
+  }
 }

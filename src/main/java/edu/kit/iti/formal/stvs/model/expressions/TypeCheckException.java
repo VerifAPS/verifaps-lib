@@ -28,4 +28,13 @@ public class TypeCheckException extends Exception {
     return mistypedExpression;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    TypeCheckException that = (TypeCheckException) o;
+
+    return getMistypedExpression() != null ? getMistypedExpression().equals(that.getMistypedExpression()) : that.getMistypedExpression() == null;
+  }
 }

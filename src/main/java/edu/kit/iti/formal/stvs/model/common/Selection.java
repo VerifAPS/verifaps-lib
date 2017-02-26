@@ -87,7 +87,6 @@ public class Selection {
       return false;
     }
     return row.get() == null ? selection.row.get() == null : row.get().equals(selection.row.get());
-
   }
 
   @Override

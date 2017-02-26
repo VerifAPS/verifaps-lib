@@ -82,4 +82,17 @@ public class HybridRow extends SpecificationRow<HybridCell<ConstraintCell>> {
         .map(cell -> cell.getValue().getValueString())
         .collect(Collectors.toList());
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+
+    HybridRow hybridRow = (HybridRow) o;
+
+    if (durationCell != null ? !durationCell.equals(hybridRow.durationCell) : hybridRow.durationCell != null)
+      return false;
+    return getSourceRow() != null ? getSourceRow().equals(hybridRow.getSourceRow()) : hybridRow.getSourceRow() == null;
+  }
 }
