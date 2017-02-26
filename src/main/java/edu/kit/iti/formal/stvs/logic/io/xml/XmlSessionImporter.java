@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * This class provides the functionality to import whole sessions from xml nodes.
+ *
  * @author Benjamin Alt
  */
 public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
@@ -38,6 +40,15 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
   private GlobalConfig currentConfig;
   private History currentHistory;
 
+  /**
+   * Creates an Importer.
+   * {@code currentConfig} and {@code currentHistory} are
+   * later passed to the new {@link StvsRootModel}.
+   *
+   * @param currentConfig  currently used configuration
+   * @param currentHistory currently used history
+   * @throws ImportException Exception while importing
+   */
   public XmlSessionImporter(GlobalConfig currentConfig, History currentHistory) throws
       ImportException {
     constraintSpecImporter = new XmlConstraintSpecImporter();
@@ -47,6 +58,13 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
     this.currentHistory = currentHistory;
   }
 
+  /**
+   * Imports a {@link StvsRootModel} from {@code source}.
+   *
+   * @param source Node to import
+   * @return imported model
+   * @throws ImportException Exception while importing.
+   */
   @Override
   public StvsRootModel doImportFromXmlNode(Node source) throws ImportException {
     try {
@@ -63,9 +81,6 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
       List<Type> typeContext = Optional.ofNullable(code.getParsedCode())
           .map(ParsedCode::getDefinedTypes)
           .orElse(Arrays.asList(TypeInt.INT, TypeBool.BOOL));
-
-      // Initialized later, since we need to know the types that are available before we import
-      XmlConcreteSpecImporter concreteSpecImporter = new XmlConcreteSpecImporter(typeContext);
 
       /* Config (optional in xsd, not imported/exported with session right now but separately,
       as per customer request)
@@ -85,47 +100,68 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
       } */
 
       // Tabs
-      List<HybridSpecification> hybridSpecs = new ArrayList<>();
-      for (Tab tab : importedSession.getTabs().getTab()) {
-        HybridSpecification hybridSpec = null;
-        ConcreteSpecification counterExample = null;
-        ConcreteSpecification concreteInstance = null;
-        for (SpecificationTable specTable : tab.getSpecification()) {
-          JAXBElement<SpecificationTable> element = objectFactory.createSpecification(specTable);
+      List<HybridSpecification> hybridSpecs = importTabs(importedSession, typeContext);
+
+      return new StvsRootModel(hybridSpecs, currentConfig, currentHistory, scenario, new File(System
+          .getProperty("user.home")), "");
+    } catch (JAXBException e) {
+      throw new ImportException(e);
+    }
+  }
+
+  /**
+   * Imports tabs from {@link Session}.
+   *
+   * @param importedSession session from which tabs should be imported
+   * @param typeContext type context that should be used for the {@link XmlConcreteSpecImporter}
+   * @return list of imported specifications (tabs)
+   * @throws ImportException Exception while importing
+   */
+  private List<HybridSpecification> importTabs(
+      Session importedSession,
+      List<Type> typeContext
+  )throws ImportException {
+    XmlConcreteSpecImporter concreteSpecImporter = new XmlConcreteSpecImporter(typeContext);
+    List<HybridSpecification> hybridSpecs = new ArrayList<>();
+    for (Tab tab : importedSession.getTabs().getTab()) {
+      HybridSpecification hybridSpec = null;
+      ConcreteSpecification counterExample = null;
+      ConcreteSpecification concreteInstance = null;
+      for (SpecificationTable specTable : tab.getSpecification()) {
+        JAXBElement<SpecificationTable> element = objectFactory.createSpecification(specTable);
+        try {
           if (!specTable.isIsConcrete()) {
             if (hybridSpec != null) {
               throw new ImportException("Tab may not have more than one abstract specification");
             }
-            ConstraintSpecification constraintSpec = constraintSpecImporter.doImportFromXmlNode
-                (XmlExporter.marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml"));
+            ConstraintSpecification constraintSpec = constraintSpecImporter.doImportFromXmlNode(
+                XmlExporter.marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml"));
             hybridSpec = new HybridSpecification(constraintSpec, !tab.isReadOnly());
           } else {
-            ConcreteSpecification concreteSpec = concreteSpecImporter.doImportFromXmlNode
-                (XmlExporter.marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml"));
+            ConcreteSpecification concreteSpec = concreteSpecImporter.doImportFromXmlNode(
+                XmlExporter.marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml"));
             if (concreteSpec.isCounterExample()) {
               counterExample = concreteSpec;
             } else {
               concreteInstance = concreteSpec;
             }
           }
+        } catch (ExportException exception) {
+          throw new ImportException(exception);
         }
-        if (hybridSpec == null) {
-          throw new ImportException("Tab must have at least one abstract specification");
-        }
-        hybridSpec.setCounterExample(counterExample);
-        hybridSpec.setConcreteInstance(concreteInstance);
-        hybridSpecs.add(hybridSpec);
       }
-
-      return new StvsRootModel(hybridSpecs, currentConfig, currentHistory, scenario, new File(System
-          .getProperty("user.home")), "");
-    } catch (JAXBException | ExportException e) {
-      throw new ImportException(e);
+      if (hybridSpec == null) {
+        throw new ImportException("Tab must have at least one abstract specification");
+      }
+      hybridSpec.setCounterExample(counterExample);
+      hybridSpec.setConcreteInstance(concreteInstance);
+      hybridSpecs.add(hybridSpec);
     }
+    return hybridSpecs;
   }
 
   @Override
-  protected String getXSDFilePath() throws URISyntaxException {
+  protected String getXsdFilePath() throws URISyntaxException {
     File xsdFile = new File(this.getClass().getResource("/fileFormats/session.xsd").toURI());
     return xsdFile.getAbsolutePath();
   }

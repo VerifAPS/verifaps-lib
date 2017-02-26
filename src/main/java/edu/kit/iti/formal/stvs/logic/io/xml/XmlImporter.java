@@ -19,24 +19,42 @@ import java.io.*;
 import java.net.URISyntaxException;
 
 /**
+ * Common superclass for all Importers that import from xml.
+ *
  * @author Benjamin Alt
  */
 public abstract class XmlImporter<T> implements Importer<T> {
   private static final String INPUT_ENCODING = "utf8";
 
-  private void validateAgainstXSD(InputStream xml) throws SAXException, IOException, URISyntaxException {
+  /**
+   * Checks that the given input matches the definition defined by {@code getXsdFilePath()}.
+   *
+   * @param xml Stream that holds the xml to be validated
+   * @throws SAXException A general xml exception
+   * @throws IOException Error while communicating with IO while validating
+   * @throws URISyntaxException could not parse uri to xsd file
+   */
+  private void validateAgainstXsd(InputStream xml)
+      throws SAXException, IOException, URISyntaxException {
     SchemaFactory factory =
         SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-    Schema schema = factory.newSchema(new File(getXSDFilePath()));
+    Schema schema = factory.newSchema(new File(getXsdFilePath()));
     Validator validator = schema.newValidator();
     validator.validate(new StreamSource(xml));
   }
 
+  /**
+   * Imports an object from a xml input stream.
+   *
+   * @param source Stream that holds the xml to be validated
+   * @return Imported object
+   * @throws ImportException Exception while importing
+   */
   public T doImport(InputStream source) throws ImportException {
     StringWriter writer = new StringWriter();
     try {
       byte[] byteArray = IOUtils.toByteArray(source);
-      validateAgainstXSD(new ByteArrayInputStream(byteArray));
+      validateAgainstXsd(new ByteArrayInputStream(byteArray));
       IOUtils.copy(new ByteArrayInputStream(byteArray), writer, INPUT_ENCODING);
       String inputString = writer.toString();
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -49,7 +67,22 @@ public abstract class XmlImporter<T> implements Importer<T> {
     }
   }
 
+  /**
+   * Must be implemented by subclasses.
+   * This method must provide the logic to convert the given {@code source} {@link Node} into
+   * the corresponding object.
+   * @param source Node to import
+   * @return imported object
+   * @throws ImportException Exception while importing
+   */
   public abstract T doImportFromXmlNode(Node source) throws ImportException;
 
-  protected abstract String getXSDFilePath() throws URISyntaxException;
+  /**
+   * Must be implemented by subclasses.
+   * This method must provide the logic to get the path to the xsd file this
+   * importer should use to check its input against.
+   * @return Path to the xsd
+   * @throws URISyntaxException could not parse uri to xsd file
+   */
+  protected abstract String getXsdFilePath() throws URISyntaxException;
 }

@@ -12,6 +12,10 @@ import javax.xml.bind.Unmarshaller;
 import java.math.BigInteger;
 
 /**
+ * This class provides the functionality to export whole sessions,
+ * code and all specification tabs, to xml.
+ * {@link XmlConstraintSpecExporter} and {@link XmlConcreteSpecExporter} are used to export the
+ * specifications.
  * @author Benjamin Alt
  */
 public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
@@ -20,6 +24,9 @@ public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
   private XmlConcreteSpecExporter concreteSpecExporter;
   private ObjectFactory objectFactory;
 
+  /**
+   * Creates an exporter.
+   */
   public XmlSessionExporter() {
     //configExporter = new XmlConfigExporter();
     constraintSpecExporter = new XmlConstraintSpecExporter();
@@ -27,6 +34,13 @@ public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
     objectFactory = new ObjectFactory();
   }
 
+  /**
+   * Exports a {@link StvsRootModel} to xml.
+   *
+   * @param source Model that should be converted
+   * @return Xml representing the session
+   * @throws ExportException Exception while exporting
+   */
   @Override
   public Node exportToXmlNode(StvsRootModel source) throws ExportException {
     Session session = objectFactory.createSession();
@@ -66,6 +80,14 @@ public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
     return exportedHistory;
   }*/
 
+  /**
+   * Extracts the tabs from the {@link StvsRootModel} and converts them into
+   * {@link Session.Tabs}.
+   *
+   * @param source model to export the tabs from
+   * @return exported tabs
+   * @throws ExportException exception while exporting
+   */
   private Session.Tabs makeTabs(StvsRootModel source) throws ExportException {
     try {
       Session.Tabs tabs = objectFactory.createSessionTabs();

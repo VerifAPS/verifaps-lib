@@ -169,7 +169,7 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
   }
 
   @Override
-  protected String getXSDFilePath() throws URISyntaxException {
+  protected String getXsdFilePath() throws URISyntaxException {
     File xsdFile =
         new File(this.getClass().getResource("/fileFormats/specification.xsd").toURI());
     return xsdFile.getAbsolutePath();

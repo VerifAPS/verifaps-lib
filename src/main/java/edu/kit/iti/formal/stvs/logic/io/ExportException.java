@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
 /**
- * Created by csicar on 09.01.17.
+ * Indicates that an exception occurred during exporting.
  * @author Benjamin Alt
 */
 public class ExportException extends Exception {
