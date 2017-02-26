@@ -4,10 +4,11 @@
     <windowSize>
       <width>800</width>
       <height>600</height>
+      <maximized>true</maximized>
     </windowSize>
     <verificationTimeout>3600</verificationTimeout>
     <simulationTimeout>60</simulationTimeout>
-    <maxLineRollout>500</maxLineRollout>
+    <maxLineRollout>50</maxLineRollout>
   </general>
   <editor>
     <showLineNumbers>true</showLineNumbers>
@@ -15,8 +16,8 @@
     <fontSize>12</fontSize>
   </editor>
   <dependencies>
-    <z3Path>/home/bal</z3Path>
-    <getetaCommand>/home/bal</getetaCommand>
-    <nuxmvFilename>/home/bal</nuxmvFilename>
+    <z3Path>[Path to Z3 Executable]</z3Path>
+    <getetaCommand>java -jar /path/to/geteta.jar -c ${code} -t ${spec} -x</getetaCommand>
+    <nuxmvFilename>[Path to NuXmv Executable]</nuxmvFilename>
   </dependencies>
 </config>

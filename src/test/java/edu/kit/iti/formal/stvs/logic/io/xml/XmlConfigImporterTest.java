@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
+import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import org.junit.Before;
@@ -38,7 +39,8 @@ public class XmlConfigImporterTest {
   @Test
   public void testDoImportDefault() throws Exception {
     FileInputStream inputStream = new FileInputStream(new File
-        (this.getClass().getResource("config_valid_default.xml").toURI()));
+        (this.getClass().getResource("/edu/kit/iti/formal/stvs/logic/io/xml/config_valid_default" +
+            ".xml").toURI()));
     GlobalConfig actualConfig = importer.doImport(inputStream);
     GlobalConfig expectedConfig = new GlobalConfig();
     assertEquals(expectedConfig, actualConfig);
