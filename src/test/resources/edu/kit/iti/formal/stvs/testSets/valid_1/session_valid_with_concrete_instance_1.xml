@@ -53,7 +53,7 @@ END_PROGRAM</plaintext>
 </row>
 </rows>
 </specification>
-<specification isConcrete="true" name="Unnamed Specification">
+<specification isConcrete="true" isCounterExample="false" name="Unnamed Specification">
 <variables>
 <ioVariable data-type="INT" io="input" name="A"/>
 <ioVariable data-type="BOOL" io="input" name="B"/>

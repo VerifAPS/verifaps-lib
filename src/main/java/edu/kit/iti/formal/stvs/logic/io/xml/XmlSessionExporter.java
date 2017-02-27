@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import org.w3c.dom.Node;
 
@@ -97,20 +98,27 @@ public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
         Tab tab = objectFactory.createTab();
         tab.setId(BigInteger.valueOf(i));
         tab.setReadOnly(!hybridSpec.isEditable());
-        tab.setOpen(false); // TODO: Should we delete this from XSD?
+        tab.setOpen(false);
         Node constraintSpecNode = constraintSpecExporter.exportToXmlNode(hybridSpec);
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         SpecificationTable constraintSpec = ((JAXBElement<SpecificationTable>) jaxbUnmarshaller
             .unmarshal(constraintSpecNode)).getValue();
         tab.getSpecification().add(constraintSpec);
+
+        ConcreteSpecification concreteSpecification = null;
         if (hybridSpec.getConcreteInstance().isPresent()) {
-          Node concreteSpecNode = concreteSpecExporter.exportToXmlNode(hybridSpec
-              .getConcreteInstance().get());
+          concreteSpecification = hybridSpec.getConcreteInstance().get();
+        } else if (hybridSpec.getCounterExample().isPresent()) {
+          concreteSpecification = hybridSpec.getCounterExample().get();
+        }
+        if (concreteSpecification != null) {
+          Node concreteSpecNode = concreteSpecExporter.exportToXmlNode(concreteSpecification);
           SpecificationTable concreteSpec = ((JAXBElement<SpecificationTable>) jaxbUnmarshaller
               .unmarshal(concreteSpecNode)).getValue();
           tab.getSpecification().add(concreteSpec);
         }
+
         tabs.getTab().add(tab);
       }
       return tabs;

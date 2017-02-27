@@ -65,6 +65,21 @@ END_PROGRAM</plaintext>
 </row>
 </rows>
 </specification>
+<specification isConcrete="true" isCounterExample="true" name="Unnamed Specification">
+<variables>
+<ioVariable data-type="BOOL" io="input" name="Start_Stop"/>
+<ioVariable data-type="BOOL" io="output" name="ONS_Trig"/>
+</variables>
+<rows>
+<row>
+<duration>1</duration>
+<cycle>
+<cell>TRUE</cell>
+<cell>TRUE</cell>
+</cycle>
+</row>
+</rows>
+</specification>
 </tab>
 </tabs>
 </session>

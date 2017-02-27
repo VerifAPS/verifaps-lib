@@ -41,6 +41,7 @@ public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> 
     specTable.setVariables(makeVariables(source));
     specTable.setRows(makeRows(source));
     specTable.setIsConcrete(true);
+    specTable.setIsCounterExample(source.isCounterExample());
     specTable.setName(source.getName());
     JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable> element =
         objectFactory.createSpecification(specTable);
