@@ -15,18 +15,35 @@ import java.util.stream.Collectors;
 public class SList implements SExpr {
   private List<SExpr> sexp;
 
+  /**
+   * Helper constructor.
+   * @see SList#SList(List)
+   * @param sexp array of {@link SExpr}
+   */
   public SList(SExpr ... sexp) {
     this(Arrays.asList(sexp));
   }
 
+  /**
+   * Creates an instance from a list of {@link SExpr}.
+   * @param sexp list of {@link SExpr}
+   */
   public SList(List<SExpr> sexp) {
     this.sexp = sexp;
   }
 
+  /**
+   * Helper constructor.
+   * Creates a {@link SAtom} for any passed string an calls {@link SList#SList(List)}
+   * @param vals atomic expressions as string
+   */
   public SList(String ... vals) {
     this(Arrays.stream(vals).map(SAtom::new).collect(Collectors.toList()));
   }
 
+  /**
+   * Creates an empty SList.
+   */
   public SList() {
     this(new LinkedList<SExpr>());
   }
@@ -36,12 +53,23 @@ public class SList implements SExpr {
     addAll(command);
   }
 
+  /**
+   * Creates an SList with the first argument interpreted as
+   * atomic expression followed by {@code sexp}.
+   * @param command atomic command expression
+   * @param sexp following expressions
+   */
   public SList(String command, SExpr ... sexp) {
     this();
     addAll(new SAtom(command));
     addAll(Arrays.asList(sexp));
   }
 
+  /**
+   * Creates an instance by using an {@link Sexp} as a base.
+   * Every item in {@code exp} will become an item in this list.
+   * @param exp base expression
+   */
   public SList(Sexp exp) {
     sexp = new LinkedList<>();
     exp.forEach(this::addSexp);
@@ -72,17 +100,6 @@ public class SList implements SExpr {
     return " ( " + getList().stream().map(SExpr::toText).collect(Collectors.joining(" ")) + " ) ";
   }
 
-
-  @Override
-  public <E> E visit(SExprVisitor<E> visitor) {
-    return visitor.visit(this);
-  }
-
-  @Override
-  public <E> List<E> visitChildren(SExprVisitor<E> visitor) {
-    return getList().stream().map(visitor::visit).collect(Collectors.toList());
-  }
-
   public SList addAll(SExpr ... sexp) {
     return  addAll(Arrays.asList(sexp));
   }
@@ -91,33 +108,41 @@ public class SList implements SExpr {
     return addAll(Arrays.stream(values).map(SAtom::new).collect(Collectors.toList()));
   }
 
-  public SList addListElements(List<String> values) {
-    return addAll(values.stream().map(SAtom::new).collect(Collectors.toList()));
+  public SList addAll(List<SExpr> exprs) {
+    this.sexp.addAll(exprs);
+    return this;
   }
 
-  public SList addAll(List<SExpr> sExprs) {
-    this.sexp.addAll(sExprs);
-    return this;
+  public SList addListElements(List<String> values) {
+    return addAll(values.stream().map(SAtom::new).collect(Collectors.toList()));
   }
 
   public List<SExpr> getList() {
     return this.sexp;
   }
 
+  /**
+   * Returns the List as a string
+   * @return string representation: "(item_1 item_2 ... item_n)"
+   */
   public String toString() {
-    return "( " + getList().stream().map(Object::toString).collect(Collectors.joining
-        (" "))
+    return "( " + getList().stream().map(Object::toString).collect(Collectors.joining(
+        " "))
         + " )";
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
-    SList sList = (SList) o;
+    SList list = (SList) o;
 
-    return sexp != null ? sexp.equals(sList.sexp) : sList.sexp == null;
+    return sexp != null ? sexp.equals(list.sexp) : list.sexp == null;
   }
 
   @Override

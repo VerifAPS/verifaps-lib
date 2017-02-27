@@ -18,8 +18,8 @@ import java.io.*;
 import java.util.List;
 
 /**
+ * Handles communication with the GeTeTa verification engine.
  * @author Benjamin Alt
- * Handles communication with the GeTeTa verification engine
  */
 public class GeTeTaVerificationEngine implements VerificationEngine {
   private Process getetaProcess;
@@ -29,6 +29,13 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   private File getetaOutputFile;
   private ProcessMonitor processMonitor;
 
+  /**
+   * Creates an instance based on given {@link GlobalConfig} and {@code typeContext}.
+   * The {@code typeContext} is used later for importing the possible counterexample.
+   * @param config config that should be used
+   * @param typeContext list of types used for importing counterexample
+   * @throws VerificationError nuXmv not found
+   */
   public GeTeTaVerificationEngine(GlobalConfig config, List<Type> typeContext) throws
       VerificationError {
     verificationResult = new NullableProperty<>();
@@ -42,6 +49,15 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     }
   }
 
+  /**
+   * Exports the given {@link VerificationScenario} to temporary files
+   * and starts the GeTeTa verification engine process.
+   * @param scenario scenario that hold the code to be checked
+   * @param spec specification that should be checked
+   * @throws IOException exception while creating process
+   * @throws ExportException exception while exporting
+   * @throws VerificationError exception while verifying
+   */
   @Override
   public void startVerification(VerificationScenario scenario,
                                 ConstraintSpecification spec) throws
@@ -90,6 +106,9 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     return verificationResult;
   }
 
+  /**
+   * handles the output of the GeTeTa verification engine.
+   */
   private void onVerificationDone() {
     if (getetaProcess == null) { // Verification was cancelled
       return;
@@ -105,8 +124,9 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
         VerificationError error = new VerificationError(VerificationError.Reason.TIMEOUT);
         result = new VerificationResult(VerificationResult.Status.ERROR, logFile, error);
       } else {
-        result = ImporterFacade.importVerificationResult(new ByteArrayInputStream(cleanedProcessOutput
-            .getBytes()), ImporterFacade.ImportFormat.GETETA, typeContext);
+        result = ImporterFacade.importVerificationResult(
+            new ByteArrayInputStream(cleanedProcessOutput.getBytes()),
+            ImporterFacade.ImportFormat.GETETA, typeContext);
       }
     } catch (IOException | ImportException e) {
       VerificationError error = new VerificationError(e);

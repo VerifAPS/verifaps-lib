@@ -5,10 +5,10 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import java.util.Optional;
 
 /**
- * Created by leonk on 22.02.2017.
+ * Is notified by the {@link Z3Solver} after concretization.
  */
 @FunctionalInterface
-public interface OptionalConcreteSpecificationHandler{
+public interface OptionalConcreteSpecificationHandler {
   /**
    * Performs this operation on the given concreteSpecification.
    *

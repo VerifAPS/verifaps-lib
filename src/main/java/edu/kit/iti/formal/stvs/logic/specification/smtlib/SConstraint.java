@@ -10,30 +10,39 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Created by csicar on 09.02.17.
+ * Represents sets of constraints and definitions.
+ *
  * @author Carsten Csiky
  */
 public class SConstraint implements SExpr {
   private final Set<SExpr> globalConstraints;
   private final Set<SExpr> variableDefinitions;
 
+  /**
+   * Creates an instance with preset definitions/constraints.
+   *
+   * @param globalConstraints   set of global constraints
+   * @param variableDefinitions set of variable definitions
+   */
   public SConstraint(Set<SExpr> globalConstraints, Set<SExpr> variableDefinitions) {
     this.globalConstraints = globalConstraints;
     this.variableDefinitions = variableDefinitions;
   }
 
+  /**
+   * Creates an instance with empty sets.
+   */
   public SConstraint() {
     this.globalConstraints = new LinkedHashSet<>();
     this.variableDefinitions = new LinkedHashSet<>();
   }
 
-  public SConstraint combine(RecSConstraint other) {
-    addGlobalConstrains(other.getGlobalConstraints());
-    addHeaderDefinitions(other.getVariableDefinitions());
-    addGlobalConstrains(other.getRecExpression());
-    return this;
-  }
-
+  /**
+   * Adds all constraints and definitions of {@code other} to this object.
+   *
+   * @param other object from which the constraints/definitions should be taken
+   * @return this (now with added constraints/definitions)
+   */
   public SConstraint combine(SConstraint other) {
     addGlobalConstrains(other.getGlobalConstraints());
     addHeaderDefinitions(other.getVariableDefinitions());
@@ -50,12 +59,22 @@ public class SConstraint implements SExpr {
     return null;
   }
 
+  /**
+   * Converts all definitions to text compatible with smt definitions.
+   *
+   * @return definitions as string
+   */
   public String headerToText() {
     return getVariableDefinitions().stream()
         .map(SExpr::toText)
         .collect(Collectors.joining(" \n "));
   }
 
+  /**
+   * Converts all global constraints to text compatible with smt.
+   *
+   * @return constraints as string
+   */
   public String globalConstraintsToText() {
     return getGlobalConstraints().stream()
         .map(constr -> new SList("assert", constr))
@@ -68,19 +87,7 @@ public class SConstraint implements SExpr {
     return headerToText() + " \n " + globalConstraintsToText();
   }
 
-  @Override
-  public <E> E visit(SExprVisitor<E> visitor) {
-    return visitor.visit(this);
-  }
-
-  @Override
-  public <E> List<E> visitChildren(SExprVisitor<E> visitor) {
-    List<E> result = globalConstraints.stream().map(visitor::visit).collect(Collectors.toList());
-    result.addAll(variableDefinitions.stream().map(visitor::visit).collect(Collectors.toList()));
-    return result;
-  }
-
-  public SConstraint addGlobalConstrains(SExpr ... globalConstraint) {
+  public SConstraint addGlobalConstrains(SExpr... globalConstraint) {
     return addGlobalConstrains(Arrays.asList(globalConstraint));
   }
 
@@ -89,7 +96,7 @@ public class SConstraint implements SExpr {
     return this;
   }
 
-  public SConstraint addHeaderDefinitions(SExpr ... variableDefinition) {
+  public SConstraint addHeaderDefinitions(SExpr... variableDefinition) {
     return addHeaderDefinitions(Arrays.asList(variableDefinition));
   }
 
@@ -108,26 +115,32 @@ public class SConstraint implements SExpr {
 
   @Override
   public String toString() {
-    return "SConstraint{\n" +
-        "\tglobalConstraints=\n\t\t" + globalConstraints.stream().map(SExpr::toString).collect
-        (Collectors.joining("\n\t\t")) +
-
-        ",\n\n\tvariableDefinitions=\n\t\t" + variableDefinitions.stream().map(SExpr::toString)
-        .collect
-        (Collectors.joining("\n\t\t")) +
-        "\n}";
+    return "SConstraint{\n"
+        + "\tglobalConstraints=\n\t\t" + globalConstraints.stream().map(SExpr::toString).collect(
+            Collectors.joining("\n\t\t"))
+        + ",\n\n\tvariableDefinitions=\n\t\t" + variableDefinitions.stream().map(SExpr::toString)
+        .collect(Collectors.joining("\n\t\t")) + "\n}";
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     SConstraint that = (SConstraint) o;
 
-    if (globalConstraints != null ? !globalConstraints.equals(that.globalConstraints) : that.globalConstraints != null)
+    if (globalConstraints != null
+        ? !globalConstraints.equals(that.globalConstraints)
+        : that.globalConstraints != null) {
       return false;
-    return variableDefinitions != null ? variableDefinitions.equals(that.variableDefinitions) : that.variableDefinitions == null;
+    }
+    return variableDefinitions != null
+        ? variableDefinitions.equals(that.variableDefinitions)
+        : that.variableDefinitions == null;
   }
 
   @Override

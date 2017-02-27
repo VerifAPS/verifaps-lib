@@ -33,11 +33,14 @@ public class ProcessMonitor extends Thread {
     }
   }
 
-  /** @return the process that it is watched by this detector. */
   public Process getProcess() {
     return process;
   }
 
+  /**
+   * runs an external process and wait until {@code timeout}
+   * or until it is interrupted.
+   */
   public void run() {
     aborted = false;
     try {
@@ -48,6 +51,7 @@ public class ProcessMonitor extends Thread {
       }
       processFinished.set(true);
     } catch (InterruptedException e) {
+      //intentionally left empty. Process is destroyed somewhere else
     }
   }
 

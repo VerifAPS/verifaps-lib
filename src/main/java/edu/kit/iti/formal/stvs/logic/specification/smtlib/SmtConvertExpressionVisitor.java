@@ -14,48 +14,55 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This class provides a visitor for an Expression to convert it into a z3 model
+ * This class provides a visitor for an expression to convert it into a smt model.
+ *
  * @author Carsten Csiky
  */
- //Does Rule (1)
 public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   //static maps
 
-  private static Map<UnaryFunctionExpr.Op, String> smtlibUnaryOperationNames = new HashMap<UnaryFunctionExpr.Op, String>() {{
-    put(UnaryFunctionExpr.Op.NOT, "not");
-    put(UnaryFunctionExpr.Op.UNARY_MINUS, "bvneg");
-  }};
-  private static Map<BinaryFunctionExpr.Op, String> smtlibBinOperationNames = new HashMap<BinaryFunctionExpr
-      .Op, String>() {{
-    put(BinaryFunctionExpr.Op.AND, "and");
-    put(BinaryFunctionExpr.Op.OR, "or");
-    put(BinaryFunctionExpr.Op.XOR, "xor");
-    put(BinaryFunctionExpr.Op.DIVISION, "bvsdiv");
-    put(BinaryFunctionExpr.Op.MULTIPLICATION, "bvmul");
-    put(BinaryFunctionExpr.Op.EQUALS, "=");
-    put(BinaryFunctionExpr.Op.GREATER_EQUALS, "bvsge");
-    put(BinaryFunctionExpr.Op.LESS_EQUALS, "bvsle");
-    put(BinaryFunctionExpr.Op.LESS_THAN, "bvslt");
-    put(BinaryFunctionExpr.Op.GREATER_THAN, "bvsgt");
-    put(BinaryFunctionExpr.Op.MINUS, "bvsub");
-    put(BinaryFunctionExpr.Op.PLUS, "bvadd");
-    put(BinaryFunctionExpr.Op.MODULO, "bvsmod");
-  }};
+  private static Map<UnaryFunctionExpr.Op, String> smtlibUnaryOperationNames =
+      new HashMap<UnaryFunctionExpr.Op, String>() {
+        {
+          put(UnaryFunctionExpr.Op.NOT, "not");
+          put(UnaryFunctionExpr.Op.UNARY_MINUS, "bvneg");
+        }
+      };
+  private static Map<BinaryFunctionExpr.Op, String> smtlibBinOperationNames =
+      new HashMap<BinaryFunctionExpr
+          .Op, String>() {
+        {
+          put(BinaryFunctionExpr.Op.AND, "and");
+          put(BinaryFunctionExpr.Op.OR, "or");
+          put(BinaryFunctionExpr.Op.XOR, "xor");
+          put(BinaryFunctionExpr.Op.DIVISION, "bvsdiv");
+          put(BinaryFunctionExpr.Op.MULTIPLICATION, "bvmul");
+          put(BinaryFunctionExpr.Op.EQUALS, "=");
+          put(BinaryFunctionExpr.Op.GREATER_EQUALS, "bvsge");
+          put(BinaryFunctionExpr.Op.LESS_EQUALS, "bvsle");
+          put(BinaryFunctionExpr.Op.LESS_THAN, "bvslt");
+          put(BinaryFunctionExpr.Op.GREATER_THAN, "bvsgt");
+          put(BinaryFunctionExpr.Op.MINUS, "bvsub");
+          put(BinaryFunctionExpr.Op.PLUS, "bvadd");
+          put(BinaryFunctionExpr.Op.MODULO, "bvsmod");
+        }
+      };
 
   private final SmtEncoder smtEncoder;
   private final int row;
   private final int iteration;
   private final ValidIoVariable column;
 
-  private final SConstraint sConstraint;
+  private final SConstraint constraint;
 
   /**
    * Creates a visitor to convert an expression to a set of constraints.
    *
-   * @param smtEncoder encoder that holds additional information about the expression that should be parsed
-   * @param row row, that holds the cell the visitor should convert
-   * @param iteration current iteration
-   * @param column column, that holds the cell the visitor should convert
+   * @param smtEncoder encoder that holds additional information
+   *                   about the expression that should be parsed
+   * @param row        row, that holds the cell the visitor should convert
+   * @param iteration  current iteration
+   * @param column     column, that holds the cell the visitor should convert
    */
   public SmtConvertExpressionVisitor(SmtEncoder smtEncoder, int row, int
       iteration, ValidIoVariable column) {
@@ -66,11 +73,11 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
 
     String name = "|" + column.getName() + "_" + row + "_" + iteration + "|";
 
-    this.sConstraint = new SConstraint().addHeaderDefinitions(
+    this.constraint = new SConstraint().addHeaderDefinitions(
         new SList(
             "declare-const",
             name,
-            SmtEncoder.getSMTLibVariableTypeName(column.getValidType())
+            SmtEncoder.getSmtLibVariableTypeName(column.getValidType())
         )
     );
 
@@ -86,14 +93,16 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   }
 
   /**
-   * Adds constraints to enum variables to limit the range of their representing bitvector
+   * Adds constraints to enum variables to limit the range of their representing bitvector.
    *
-   * @param name Name of solver variable
+   * @param name        Name of solver variable
    * @param enumeration Type of enumeration
    */
   private void addEnumBitvectorConstraints(String name, TypeEnum enumeration) {
-    this.sConstraint.addGlobalConstrains(new SList("bvsge", name, BitvectorUtils.hexFromInt(0, 4)));
-    this.sConstraint.addGlobalConstrains(new SList("bvslt", name, BitvectorUtils.hexFromInt(enumeration.getValues().size(), 4)));
+    this.constraint.addGlobalConstrains(
+        new SList("bvsge", name, BitvectorUtils.hexFromInt(0, 4)));
+    this.constraint.addGlobalConstrains(
+        new SList("bvslt", name, BitvectorUtils.hexFromInt(enumeration.getValues().size(), 4)));
   }
 
 
@@ -101,8 +110,8 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   public SExpr visitBinaryFunction(BinaryFunctionExpr binaryFunctionExpr) {
     SExpr left = binaryFunctionExpr.getFirstArgument().takeVisitor(SmtConvertExpressionVisitor
         .this);
-    SExpr right = binaryFunctionExpr.getSecondArgument().takeVisitor
-        (SmtConvertExpressionVisitor.this);
+    SExpr right = binaryFunctionExpr.getSecondArgument().takeVisitor(
+        SmtConvertExpressionVisitor.this);
 
     switch (binaryFunctionExpr.getOperation()) {
       case NOT_EQUALS:
@@ -110,7 +119,8 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
       default:
         String name = smtlibBinOperationNames.get(binaryFunctionExpr.getOperation());
         if (name == null) {
-          throw new IllegalArgumentException("Operation " + binaryFunctionExpr.getOperation() + " is "
+          throw new IllegalArgumentException("Operation "
+              + binaryFunctionExpr.getOperation() + " is "
               + "not supported");
         }
         return new SList(name, left, right);
@@ -158,7 +168,8 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
 
     //Check if variable is in getTypeForVariable
     if (smtEncoder.getTypeForVariable(variableName) == null) {
-      throw new IllegalStateException("Wrong Context: No variable of name '" + variableName + "' in getTypeForVariable");
+      throw new IllegalStateException(
+          "Wrong Context: No variable of name '" + variableName + "' in getTypeForVariable");
     }
     Type type = smtEncoder.getTypeForVariable(variableName);
 
@@ -168,20 +179,21 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
 
       //does it reference a previous cycle? -> guarantee reference-ability
       if (variableReferenceIndex < 0) {
-        sConstraint.addGlobalConstrains(
+        constraint.addGlobalConstrains(
             // sum(z-1) >= max(0, alpha - i)
             new SList(
                 "bvuge",
                 sumRowIterations(row - 1),
-                new SAtom(BitvectorUtils.hexFromInt(Math.max(0, -(iteration + variableReferenceIndex)),4))
+                new SAtom(BitvectorUtils.hexFromInt(
+                    Math.max(0, -(iteration + variableReferenceIndex)), 4))
             )
         );
       }
 
       // Do Rule part of Rule (I)
       // A[-v] -> A_z_(i-v)
-      return new SAtom("|" + variableName + "_" + row + "_" + (iteration +
-          variableReferenceIndex) + "|");
+      return new SAtom("|" + variableName + "_" + row + "_" + (iteration
+          + variableReferenceIndex) + "|");
 
       //return new SAtom(variableName);
     } else {
@@ -199,6 +211,6 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   }
 
   public SConstraint getConstraint() {
-    return sConstraint;
+    return constraint;
   }
 }

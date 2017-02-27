@@ -7,16 +7,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by csicar on 08.02.17.
+ * Represents an {@link SExpr} that is an atomic element.
  * @author Carsten Csiky
  */
 public class SAtom implements SExpr {
   private String string;
+
+  /**
+   *Creates an atomic expression from string.
+   *
+   * @param string string to represent
+   */
   public SAtom(String string) {
     this.string = string;
   }
 
 
+  /**
+   * Creates an atomic expression from S-Expression.
+   *
+   * @param s Expression
+   */
   public SAtom(Sexp s) {
     this.string = s.toString();
   }
@@ -38,12 +49,16 @@ public class SAtom implements SExpr {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
-    SAtom sAtom = (SAtom) o;
+    SAtom atom = (SAtom) o;
 
-    return string != null ? string.equals(sAtom.string) : sAtom.string == null;
+    return string != null ? string.equals(atom.string) : atom.string == null;
   }
 
 
@@ -57,13 +72,4 @@ public class SAtom implements SExpr {
     return string;
   }
 
-  @Override
-  public <E> E visit(SExprVisitor<E> visitor) {
-    return visitor.visit(this);
-  }
-
-  @Override
-  public <E> List<E> visitChildren(SExprVisitor<E> visitor) {
-    return new ArrayList<>();
-  }
 }

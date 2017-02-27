@@ -4,14 +4,17 @@ import de.tudresden.inf.lat.jsexp.Sexp;
 import de.tudresden.inf.lat.jsexp.SexpFactory;
 import de.tudresden.inf.lat.jsexp.SexpParserException;
 
-import java.util.List;
-
 /**
- * Created by csicar on 08.02.17.
+ * Interface for al S-Expression compatible classes
  * @author
  */
 public interface SExpr {
 
+  /**
+   * Creates an instance from a given string
+   * @param string string to parse
+   * @return instance which is represented by {@code string}
+   */
   static SExpr fromString(String string) {
     try {
       Sexp s = SexpFactory.parse(string);
@@ -22,7 +25,11 @@ public interface SExpr {
   }
 
 
-
+  /**
+   * Creates an instance from a given {@link Sexp}
+   * @param s sexp that should be converted
+   * @return instance which is represented by {@code s}
+   */
   static SExpr fromSexp(Sexp s) {
     if(s.isAtomic()) {
       return new SAtom(s);
@@ -31,29 +38,22 @@ public interface SExpr {
     }
   }
 
+  /**
+   * Returns if instance is atomic.
+   * @return is atomic
+   */
   boolean isAtom();
 
+  /**
+   * Convert to {@link Sexp}.
+   * @return converted expression
+   */
   Sexp toSexpr();
 
   /**
-   * SExpression's textual representation
+   * SExpression's textual representation.
    * @return string containing the sexpression
    */
   String toText();
-
-  /**
-   * does the SExpr contain the given sexpr?
-   * @param expr expression to check for
-   * @return true, if SExpr is contained
-   */
-  default boolean contains(SExpr expr) {
-    return this.visit(c ->
-        c.equals(expr) || c.visitChildren(this::contains).stream().anyMatch(e
-        -> true));
-  }
-
-  <E> E visit(SExprVisitor<E> visitor);
-
-  <E> List<E> visitChildren(SExprVisitor<E> visitor);
 
 }
