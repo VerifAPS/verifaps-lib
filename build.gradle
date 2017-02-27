@@ -74,8 +74,9 @@ jar {
 
 test {
     filter {
-        includeTestsMatching "edu.kit.iti.formal.stvs.model.*"
-        includeTestsMatching "edu.kit.iti.formal.stvs.logic.*"
+        //includeTestsMatching "edu.kit.iti.formal.stvs.model.*"
+        //includeTestsMatching "edu.kit.iti.formal.stvs.logic.*"
+        includeTestsMatching "*Z3SolverTest"
     }
 
     testLogging {
