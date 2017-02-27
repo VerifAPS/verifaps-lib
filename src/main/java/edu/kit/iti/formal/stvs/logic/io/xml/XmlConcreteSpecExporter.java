@@ -12,8 +12,8 @@ import javax.xml.bind.JAXBElement;
 import java.util.stream.Collectors;
 
 /**
- * This class provides the functionality to eport {@link ConcreteSpecification ConcreteSpecifications}
- * to xml nodes.
+ * This class provides the functionality to export
+ * {@link ConcreteSpecification ConcreteSpecifications} to xml nodes.
  * @author Benjamin Alt
  */
 public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> {
