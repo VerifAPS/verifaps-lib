@@ -65,7 +65,7 @@ public class SmtConcretizerTest {
       put(2, 2);
     }};
 
-    SmtConcretizer concretizer = new SmtConcretizer(new GlobalConfig());
+    SmtConcretizer concretizer = new SmtConcretizer(GlobalConfig.autoloadConfig());
     concretizer
         .calculateConcreteSpecification(spec, freeVariables, System.out::println, Throwable::printStackTrace);
   }
