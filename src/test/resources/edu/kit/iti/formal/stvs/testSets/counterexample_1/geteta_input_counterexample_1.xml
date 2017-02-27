@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?><test-table xmlns="http://formal.iti.kit.edu/exteta-1.0">
+  <variables>
+    <variable data-type="BOOLEAN" io="input" name="var_Start_Stop"/>
+    <variable data-type="BOOLEAN" io="output" name="var_ONS_Trig"/>
+    <constraint constraint="-" data-type="INT" name="var_freeVarA"/>
+    <constraint constraint="TRUE" data-type="BOOLEAN" name="var_freeVarB"/>
+  </variables>
+  <steps>
+    <step duration="1">
+      <cell>=TRUE</cell>
+      <cell>=FALSE</cell>
+    </step>
+    <step duration="1">
+      <cell>var_freeVarB</cell>
+      <cell>var_Start_Stop[-1]</cell>
+    </step>
+  </steps>
+</test-table>

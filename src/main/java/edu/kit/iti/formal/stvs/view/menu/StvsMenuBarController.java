@@ -101,7 +101,11 @@ public class StvsMenuBarController implements Controller {
     File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
     if (chosenFile != null) {
       handleSaveAll(chosenFile);
-      rootModel.get().setWorkingdir(chosenFile);
+      if (chosenFile.isDirectory()) {
+        rootModel.get().setWorkingdir(chosenFile);
+      } else {
+        rootModel.get().setWorkingdir(chosenFile.getParentFile());
+      }
     }
   }
 

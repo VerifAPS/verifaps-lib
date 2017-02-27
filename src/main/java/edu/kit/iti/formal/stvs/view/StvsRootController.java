@@ -169,7 +169,7 @@ public class StvsRootController implements Controller {
           HybridSpecification readOnlySpec = new HybridSpecification(new ConstraintSpecification(stvsRootModel
               .getScenario().getActiveSpec()), false);
           readOnlySpec.setCounterExample(res.getCounterExample().get());
-          specificationsPaneController.addTab(readOnlySpec);
+          stvsRootModel.getHybridSpecifications().add(readOnlySpec);
           break;
 
           case VERIFIED:

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><ns2:message xmlns:ns2="http://formal.iti.kit.edu/exteta-1.0/report/" returncode="not-verified">
+  <log>
+    <entry level="debug" time="85">read xml file /tmp/verification-spec272091175678311094.xml</entry>
+    <entry level="debug" time="275">xml file successfully read</entry>
+    <entry level="info" time="275">No options in table file.</entry>
+    <entry level="info" time="275">No functions given in table file.</entry>
+    <entry level="debug" time="276">4 variables found</entry>
+    <entry level="debug" time="276">	 var_Start_Stop : BOOLEAN</entry>
+    <entry level="debug" time="276">	 var_ONS_Trig : BOOLEAN</entry>
+    <entry level="debug" time="276">	 var_freeVarA : INT</entry>
+    <entry level="debug" time="276">	 var_freeVarB : BOOLEAN</entry>
+    <entry level="debug" time="351">parsed: =TRUE to (var_Start_Stop=TRUE)</entry>
+    <entry level="debug" time="352">parsed: =FALSE to (var_ONS_Trig=FALSE)</entry>
+    <entry level="debug" time="356">parsed: var_freeVarB to (var_freeVarB=var_Start_Stop)</entry>
+    <entry level="debug" time="358">parsed: var_Start_Stop[-1] to (var_Start_Stop__history._$1=var_ONS_Trig)</entry>
+    <entry level="debug" time="500">Row 1 can reach: {2}</entry>
+    <entry level="debug" time="500">Row 2 can reach: {}</entry>
+    <entry level="debug" time="531">parsed: TRUE to (TRUE=var_freeVarB)</entry>
+    <entry level="debug" time="532">parsed: - to TRUE</entry>
+    <entry level="info" time="548">Start '[/opt/nuXmv-1.1.1-Linux/bin/nuXmv, -int, /tmp/verification-spec272091175678311094/modules.smv]'</entry>
+    <entry level="info" time="548">wd: /tmp/verification-spec272091175678311094</entry>
+    <entry level="info" time="548">Result in /tmp/verification-spec272091175678311094/log_63.txt</entry>
+    <entry level="debug" time="643">Row 1 can reach: {2}</entry>
+    <entry level="debug" time="643">Row 2 can reach: {}</entry>
+  </log>
+  <counterexample>
+    <trace>
+      <step>
+        <input name="var_Start_Stop" value="TRUE"/>
+        <input name="table.s1_in" value="TRUE"/>
+        <state name="table.var_freeVarB" value="TRUE"/>
+        <state name="table.var_freeVarA" value="0sd16_0"/>
+        <state name="code.var_Rising_ONS" value="FALSE"/>
+        <state name="table.s1" value="TRUE"/>
+        <state name="table.s2" value="FALSE"/>
+        <state name="table.var_Start_Stop__history._$1" value="FALSE"/>
+        <state name="code.var_ONS_Trig" value="FALSE"/>
+        <state name="table.ERROR" value="FALSE"/>
+        <state name="table.s2_in" value="TRUE"/>
+        <state name="table.s1_out" value="FALSE"/>
+        <state name="table.s2_out" value="FALSE"/>
+        <state name="table.s2_keep" value="FALSE"/>
+        <state name="table.s2_fwd" value="FALSE"/>
+        <state name="table.s1_keep" value="FALSE"/>
+        <state name="table.s1_fwd" value="FALSE"/>
+      </step>
+      <step>
+        <state name="code.var_Rising_ONS" value="TRUE"/>
+        <state name="table.s1" value="FALSE"/>
+        <state name="table.var_Start_Stop__history._$1" value="TRUE"/>
+        <state name="code.var_ONS_Trig" value="TRUE"/>
+        <state name="table.ERROR" value="TRUE"/>
+      </step>
+    </trace>
+    <row-mappings>
+      <row-map>1</row-map>
+    </row-mappings>
+  </counterexample>
+</ns2:message>

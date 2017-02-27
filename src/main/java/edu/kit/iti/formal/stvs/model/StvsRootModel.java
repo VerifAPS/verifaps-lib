@@ -85,7 +85,6 @@ public class StvsRootModel {
   }
 
   public void setScenario(VerificationScenario verificationScenario) {
-    // TODO: implement event passing etc.
     this.scenario = verificationScenario;
   }
 

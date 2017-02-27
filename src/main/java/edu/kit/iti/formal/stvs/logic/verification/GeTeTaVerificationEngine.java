@@ -46,7 +46,6 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   public void startVerification(VerificationScenario scenario,
                                 ConstraintSpecification spec) throws
       IOException, ExportException, VerificationError {
-    System.out.println("Starting verification...");
     // Write ConstraintSpecification and Code to temporary files
     File tempSpecFile = File.createTempFile("verification-spec", ".xml");
     File tempCodeFile = File.createTempFile("verification-code", ".st");
