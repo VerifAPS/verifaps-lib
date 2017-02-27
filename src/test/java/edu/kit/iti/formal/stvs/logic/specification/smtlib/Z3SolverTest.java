@@ -38,6 +38,11 @@ import static org.junit.Assert.assertTrue;
  */
 public class Z3SolverTest {
 
+  static {
+    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    System.out.println(System.getProperty("user.home"));
+  }
+
   private List<ValidFreeVariable> freeVariables;
   private final Z3Solver solver = new Z3Solver(GlobalConfig.autoloadConfig());
 
