@@ -12,8 +12,8 @@ import javax.xml.bind.JAXBElement;
 import java.util.stream.Collectors;
 
 /**
- * This class provides the functionality to eport {@link ConcreteSpecification ConcreteSpecifications}
- * to xml nodes.
+ * This class provides the functionality to export
+ * {@link ConcreteSpecification ConcreteSpecifications} to xml nodes.
  * @author Benjamin Alt
  */
 public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> {
@@ -41,6 +41,7 @@ public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> 
     specTable.setVariables(makeVariables(source));
     specTable.setRows(makeRows(source));
     specTable.setIsConcrete(true);
+    specTable.setIsCounterExample(source.isCounterExample());
     specTable.setName(source.getName());
     JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable> element =
         objectFactory.createSpecification(specTable);
