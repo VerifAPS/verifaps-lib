@@ -1,6 +1,8 @@
 package edu.kit.iti.formal.stvs.view;
 
+import edu.kit.iti.formal.stvs.view.editor.EditorPane;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 
@@ -27,6 +29,12 @@ public class ViewUtils {
     }
     Transform parentTransform = calculateTransformRelativeTo(rootOfCalculation, child.getParent());
     return child.getLocalToParentTransform().createConcatenation(parentTransform);
+  }
+
+  public static void setupView(Parent parent) {
+    parent.getStylesheets().add(parent.getClass().getResource("style.css").toExternalForm());
+
+    parent.setId(parent.getClass().getSimpleName());
   }
 
 
