@@ -14,7 +14,11 @@ import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import edu.kit.iti.formal.stvs.util.AsyncTaskCompletedHandler;
 import edu.kit.iti.formal.stvs.util.ProcessOutputAsyncTask;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -259,7 +263,8 @@ public class Z3Solver {
 
   /**
    * Concretizes {@code smtString} using Z3 in an {@link edu.kit.iti.formal.stvs.util.AsyncTask}.
-   * After the task has ended {@code handler} is called with a parsed {@link SExpression} (if present).
+   * After the task has ended {@code handler} is called with
+   * a parsed {@link SExpression} (if present).
    * Returns {@link ProcessOutputAsyncTask} to provide a possibility to terminate the Z3 process.
    *
    * @param smtString string to be solved

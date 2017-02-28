@@ -1,6 +1,13 @@
 package edu.kit.iti.formal.stvs.logic.io.xml.verification;
 
-import edu.kit.iti.formal.exteta_1.*;
+import edu.kit.iti.formal.exteta_1.ConstraintVariable;
+import edu.kit.iti.formal.exteta_1.DataType;
+import edu.kit.iti.formal.exteta_1.IoVariable;
+import edu.kit.iti.formal.exteta_1.ObjectFactory;
+import edu.kit.iti.formal.exteta_1.Step;
+import edu.kit.iti.formal.exteta_1.Steps;
+import edu.kit.iti.formal.exteta_1.TestTable;
+import edu.kit.iti.formal.exteta_1.Variables;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.VariableEscaper;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlExporter;

@@ -41,9 +41,9 @@ public class SmtConcretizer implements SpecificationConcretizer {
    */
   @Override
   public void calculateConcreteSpecification(ValidSpecification validSpecification,
-                                             List<ValidFreeVariable> freeVariables,
-                                             OptionalConcreteSpecificationHandler specificationHandler,
-                                             ThrowableHandler exceptionHandler) {
+                               List<ValidFreeVariable> freeVariables,
+                               OptionalConcreteSpecificationHandler specificationHandler,
+                               ThrowableHandler exceptionHandler) {
     SmtEncoder encoder = new SmtEncoder(config.getMaxLineRollout(), validSpecification,
         freeVariables);
     this.task = z3Solver.concretizeSmtModel(
