@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
  * <p>Is created when the user clicks on 'Help' -> 'About'
  * and shows the name and version information, etc.</p>
  *
- * Created by csicar on 16.02.17.
+ * <p>Created by csicar on 16.02.17.</p>
  *
  * @author Carsten Csiky
  */
