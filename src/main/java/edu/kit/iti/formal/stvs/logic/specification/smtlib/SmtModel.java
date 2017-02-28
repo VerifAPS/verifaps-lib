@@ -115,9 +115,11 @@ public class SmtModel implements SExpression {
   @Override
   public String toString() {
     return "SmtModel{\n"
-        + "\tglobalConstraints=\n\t\t" + globalConstraints.stream().map(SExpression::toString).collect(
+        + "\tglobalConstraints=\n\t\t" + globalConstraints.stream()
+        .map(SExpression::toString).collect(
         Collectors.joining("\n\t\t"))
-        + ",\n\n\tvariableDefinitions=\n\t\t" + variableDefinitions.stream().map(SExpression::toString)
+        + ",\n\n\tvariableDefinitions=\n\t\t" + variableDefinitions.stream()
+        .map(SExpression::toString)
         .collect(Collectors.joining("\n\t\t")) + "\n}";
   }
 

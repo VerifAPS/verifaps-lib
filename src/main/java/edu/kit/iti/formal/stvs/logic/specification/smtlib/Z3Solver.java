@@ -259,7 +259,8 @@ public class Z3Solver {
 
   /**
    * Concretizes {@code smtString} using Z3 in an {@link edu.kit.iti.formal.stvs.util.AsyncTask}.
-   * After the task has ended {@code handler} is called with a parsed {@link SExpression} (if present).
+   * After the task has ended {@code handler} is called with
+   * a parsed {@link SExpression} (if present).
    * Returns {@link ProcessOutputAsyncTask} to provide a possibility to terminate the Z3 process.
    *
    * @param smtString string to be solved

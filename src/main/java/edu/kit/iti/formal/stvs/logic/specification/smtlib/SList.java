@@ -93,7 +93,8 @@ public class SList implements SExpression {
 
   @Override
   public String toText() {
-    return " ( " + getList().stream().map(SExpression::toText).collect(Collectors.joining(" ")) + " ) ";
+    return " ( " + getList().stream()
+        .map(SExpression::toText).collect(Collectors.joining(" ")) + " ) ";
   }
 
   public SList addAll(SExpression... sexp) {

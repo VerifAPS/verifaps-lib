@@ -21,6 +21,9 @@ public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> 
   private ObjectFactory objectFactory;
   private XmlConstraintSpecExporter constraintSpecExporter;
 
+  /**
+   * Creates an instance.
+   */
   public XmlConcreteSpecExporter() {
     objectFactory = new ObjectFactory();
     //TODO: I can't get my head around why this should be here but removing it breaks the static variable in
