@@ -33,7 +33,7 @@ public class GeTeTaImporterTest {
     assertEquals(1, counterexample.getDurations().size());
     assertEquals(1, counterexample.getRows().size());
     assertEquals(new ConcreteDuration(0, 1), counterexample.getDurations().get(0));
-    Map<String,ConcreteCell> expectedRowCells = new HashMap<>();
+    Map<String, ConcreteCell> expectedRowCells = new HashMap<>();
     expectedRowCells.put("i", new ConcreteCell(new ValueInt(0)));
     expectedRowCells.put("o", new ConcreteCell(new ValueInt(0)));
     expectedRowCells.put("c", new ConcreteCell(new ValueInt(43)));

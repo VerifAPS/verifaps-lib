@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.model.common.Selection;
 
 /**
  * Created by Philipp on 03.02.2017.
+ *
  * @author Philipp
  */
 public class CellProblem extends SpecProblem {
@@ -27,13 +28,21 @@ public class CellProblem extends SpecProblem {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
 
     CellProblem that = (CellProblem) o;
 
-    if (getRow() != that.getRow()) return false;
+    if (getRow() != that.getRow()) {
+      return false;
+    }
     return getColumn() != null ? getColumn().equals(that.getColumn()) : that.getColumn() == null;
   }
 

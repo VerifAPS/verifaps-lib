@@ -1,11 +1,11 @@
 package edu.kit.iti.formal.stvs.model.config;
 
 import edu.kit.iti.formal.stvs.TestUtils;
-import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollection;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by bal on 26.02.17.
@@ -28,12 +28,12 @@ public class ColumnConfigTest {
     assertEquals(120, config.getWidth(), TestUtils.EPSILON);
   }
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testIllegalColwidthConstructor() {
     config = new ColumnConfig(0);
   }
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testSetIllegalWidth() {
     config.setWidth(-1);
   }

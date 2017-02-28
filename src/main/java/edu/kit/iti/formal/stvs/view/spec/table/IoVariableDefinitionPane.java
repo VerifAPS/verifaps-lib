@@ -4,7 +4,6 @@ import edu.kit.iti.formal.stvs.model.common.IoVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
@@ -17,6 +16,7 @@ import java.util.List;
 
 /**
  * Created by philipp on 11.02.17.
+ *
  * @author Philipp
  */
 public class IoVariableDefinitionPane extends GridPane {

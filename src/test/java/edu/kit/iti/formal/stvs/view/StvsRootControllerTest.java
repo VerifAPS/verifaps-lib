@@ -1,27 +1,13 @@
 package edu.kit.iti.formal.stvs.view;
 
-import edu.kit.iti.formal.stvs.TestUtils;
-import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionImporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionImporterTest;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
-import edu.kit.iti.formal.stvs.view.menu.StvsMenuBarController;
 import javafx.application.Application;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
 import org.junit.Test;
-
-import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by csicar on 08.02.17.
@@ -47,10 +33,10 @@ public class StvsRootControllerTest {
   private Scene simpleScene(String sessionfile) {
     StvsRootModel rootModel = new StvsRootModel();
     try {
-       rootModel = ImporterFacade.importSession(XmlSessionImporterTest.class
-          .getResourceAsStream(sessionfile), ImporterFacade.ImportFormat.XML, new GlobalConfig(),
-           new History());
-    } catch(Exception e) {
+      rootModel = ImporterFacade.importSession(XmlSessionImporterTest.class
+              .getResourceAsStream(sessionfile), ImporterFacade.ImportFormat.XML, new GlobalConfig(),
+          new History());
+    } catch (Exception e) {
       e.printStackTrace();
     }
 

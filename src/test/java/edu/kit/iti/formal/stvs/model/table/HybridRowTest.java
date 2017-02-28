@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by bal on 25.02.17.
@@ -26,7 +26,7 @@ public class HybridRowTest {
   @Before
   public void setUp() throws Exception {
     constraintSpec = ImporterFacade.importConstraintSpec(StvsApplication
-        .class.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml"),
+            .class.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml"),
         ImporterFacade.ImportFormat.XML);
     hybridRow = new HybridRow(constraintSpec.getRows().get(1), constraintSpec.getDurations().get
         (1));

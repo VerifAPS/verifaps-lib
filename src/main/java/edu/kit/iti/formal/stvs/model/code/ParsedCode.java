@@ -13,18 +13,14 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by philipp on 09.01.17.
  *
  * @author Lukas Fritsch
- *
- *        Represents the formal model of source code (extracted from {@link Code})
+ *         <p>
+ *         Represents the formal model of source code (extracted from {@link Code})
  */
 public class ParsedCode {
 
@@ -126,9 +122,10 @@ public class ParsedCode {
 
   /**
    * Creates a parsed code.
+   *
    * @param foldableCodeBlocks list of codeblocks
-   * @param definedVariables list of all defined variables (in the source code)
-   * @param definedTypes list of all defined types (in the source code)
+   * @param definedVariables   list of all defined variables (in the source code)
+   * @param definedTypes       list of all defined types (in the source code)
    */
   public ParsedCode(List<FoldableCodeBlock> foldableCodeBlocks,
                     List<CodeIoVariable> definedVariables, List<Type> definedTypes) {
@@ -138,9 +135,10 @@ public class ParsedCode {
   }
 
   /**
-   *        Parses a code.
-   * @param input the source code to parse
-   * @param parsedTokenHandler a handler for lexed tokens
+   * Parses a code.
+   *
+   * @param input                the source code to parse
+   * @param parsedTokenHandler   a handler for lexed tokens
    * @param syntaxErrorsListener
    * @param parsedCodeListener
    */

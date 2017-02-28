@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 
 /**
  * Configuration for table column. Contains GUI-related information about a column.
+ *
  * @author Philipp
  */
 public class ColumnConfig {
@@ -52,8 +53,12 @@ public class ColumnConfig {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof ColumnConfig)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ColumnConfig)) {
+      return false;
+    }
 
     ColumnConfig that = (ColumnConfig) o;
 

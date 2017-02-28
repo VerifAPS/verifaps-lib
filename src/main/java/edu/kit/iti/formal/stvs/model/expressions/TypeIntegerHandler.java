@@ -9,6 +9,7 @@ package edu.kit.iti.formal.stvs.model.expressions;
 public interface TypeIntegerHandler<R> {
   /**
    * Must implement a method that gets called by {@link TypeInt#match}
+   *
    * @return Object of type {@code R}
    */
   R handle();

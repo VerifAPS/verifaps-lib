@@ -8,6 +8,7 @@ import java.util.Optional;
 /**
  * The result of a verification (created by a
  * {@link edu.kit.iti.formal.stvs.logic.verification.VerificationEngine}).
+ *
  * @author Benjamin Alt
  */
 public class VerificationResult {
@@ -19,7 +20,8 @@ public class VerificationResult {
 
   /**
    * Construct a new VerificationResult for a verification without counterexample.
-   * @param status The status of the verification (i.e. verified, counterexample, error, ...)
+   *
+   * @param status  The status of the verification (i.e. verified, counterexample, error, ...)
    * @param logFile The log file (the original output of the verification engine)
    */
   public VerificationResult(Status status, File logFile, VerificationError error) {
@@ -30,8 +32,9 @@ public class VerificationResult {
 
   /**
    * Construct a new VerificationResult with a counterexample for an unsuccessful verification.
+   *
    * @param counterexample The counterexample
-   * @param logFile The log file (the original output of the verification engine)
+   * @param logFile        The log file (the original output of the verification engine)
    */
   public VerificationResult(ConcreteSpecification counterexample, File logFile) {
     this(Status.COUNTEREXAMPLE, logFile, null);
@@ -40,6 +43,7 @@ public class VerificationResult {
 
   /**
    * Get the current verification error or an empty Optional if none occurred.
+   *
    * @return The current verification error or an empty Optional if none occurred
    */
   public Optional<VerificationError> getVerificationError() {
@@ -48,6 +52,7 @@ public class VerificationResult {
 
   /**
    * Get the status of the verification.
+   *
    * @return The current verification status
    */
   public Status getStatus() {
@@ -56,6 +61,7 @@ public class VerificationResult {
 
   /**
    * Get the counterexample or an empty Optional if none is available.
+   *
    * @return The counterexample or an empty Optional if none is available
    */
   public Optional<ConcreteSpecification> getCounterExample() {
@@ -65,6 +71,7 @@ public class VerificationResult {
   /**
    * Get the log file or an empty Optional if none is available. This would be the case for some
    * verification errors (such as IOExceptions).
+   *
    * @return The log file or an empty Optional if none is available
    */
   public Optional<File> getLogFile() {
@@ -74,20 +81,30 @@ public class VerificationResult {
   /**
    * The verification status.
    */
-  public enum Status { VERIFIED, COUNTEREXAMPLE, ERROR }
+  public enum Status {
+    VERIFIED, COUNTEREXAMPLE, ERROR
+  }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     VerificationResult result = (VerificationResult) o;
 
-    if (counterexample != null ? !counterexample.equals(result.counterexample) : result.counterexample != null)
+    if (counterexample != null ? !counterexample.equals(result.counterexample) : result.counterexample != null) {
       return false;
-    if (getStatus() != result.getStatus()) return false;
-    if (getLogFile() != null ? !getLogFile().equals(result.getLogFile()) : result.getLogFile() != null)
+    }
+    if (getStatus() != result.getStatus()) {
       return false;
+    }
+    if (getLogFile() != null ? !getLogFile().equals(result.getLogFile()) : result.getLogFile() != null) {
+      return false;
+    }
     return getVerificationError() != null ? getVerificationError().equals(result.getVerificationError()) : result.getVerificationError() == null;
   }
 }

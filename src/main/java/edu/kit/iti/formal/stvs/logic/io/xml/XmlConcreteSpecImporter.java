@@ -100,7 +100,7 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
   /**
    * Imports a {@link ConcreteSpecification} from a {@link SpecificationTable}.
    *
-   * @param ioVariables defined variables
+   * @param ioVariables  defined variables
    * @param importedSpec specification table previously imported from xml
    * @return imported concrete specification
    * @throws ImportException Exception while importing
@@ -142,11 +142,11 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
    * creates the row with the specified {@code cycleNum}.
    *
    * @param ioVariables IO Variables that are present in the specification
-   * @param row Row which holds the information to create a specification row.
-   * @param cycleNum Number of the cycle for which a row should be created
+   * @param row         Row which holds the information to create a specification row.
+   * @param cycleNum    Number of the cycle for which a row should be created
    * @return Specification row for one cycle
    * @throws ImportException Mismatch between size of {@code row} and size of
-   * {@code ioVariables}
+   *                         {@code ioVariables}
    */
   private SpecificationRow<ConcreteCell> createSpecificationRowFoCycle(
       List<ValidIoVariable> ioVariables,

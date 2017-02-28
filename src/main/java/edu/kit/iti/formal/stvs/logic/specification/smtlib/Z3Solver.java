@@ -14,11 +14,7 @@ import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import edu.kit.iti.formal.stvs.util.AsyncTaskCompletedHandler;
 import edu.kit.iti.formal.stvs.util.ProcessOutputAsyncTask;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -292,7 +288,7 @@ public class Z3Solver {
    * This method first generates a {@code smtString} from {@link SmtModel} and adds commands
    * to tell Z3 to solve the model.
    *
-   * @param smtModel      constraint hat holds all information to generate a smtString
+   * @param smtModel         constraint hat holds all information to generate a smtString
    * @param validIoVariables variables that might appear in the solver output
    * @param handler          handles the specification that represents the solver output
    * @return task that can be terminated

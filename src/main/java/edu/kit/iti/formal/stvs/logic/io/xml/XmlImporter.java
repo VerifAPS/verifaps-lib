@@ -30,8 +30,8 @@ public abstract class XmlImporter<T> implements Importer<T> {
    * Checks that the given input matches the definition defined by {@code getXsdFilePath()}.
    *
    * @param xml Stream that holds the xml to be validated
-   * @throws SAXException A general xml exception
-   * @throws IOException Error while communicating with IO while validating
+   * @throws SAXException       A general xml exception
+   * @throws IOException        Error while communicating with IO while validating
    * @throws URISyntaxException could not parse uri to xsd file
    */
   private void validateAgainstXsd(InputStream xml)
@@ -71,6 +71,7 @@ public abstract class XmlImporter<T> implements Importer<T> {
    * Must be implemented by subclasses.
    * This method must provide the logic to convert the given {@code source} {@link Node} into
    * the corresponding object.
+   *
    * @param source Node to import
    * @return imported object
    * @throws ImportException Exception while importing
@@ -81,6 +82,7 @@ public abstract class XmlImporter<T> implements Importer<T> {
    * Must be implemented by subclasses.
    * This method must provide the logic to get the path to the xsd file this
    * importer should use to check its input against.
+   *
    * @return Path to the xsd
    * @throws URISyntaxException could not parse uri to xsd file
    */

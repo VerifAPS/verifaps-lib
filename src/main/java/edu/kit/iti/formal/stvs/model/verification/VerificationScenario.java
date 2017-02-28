@@ -18,6 +18,7 @@ import java.io.IOException;
  * The main model object for orchestrating a verification. Has a reference to the currently
  * loaded {@link Code}, uses a {@link VerificationEngine} from the logic package to verify it
  * against a {@link ConstraintSpecification} and provides access to the {@link VerificationResult}.
+ *
  * @author Benjamin Alt
  */
 public class VerificationScenario {
@@ -36,6 +37,7 @@ public class VerificationScenario {
 
   /**
    * Constructs a VerificationScenario from a given {@link Code}.
+   *
    * @param code The initial code
    */
   public VerificationScenario(Code code) {
@@ -48,9 +50,10 @@ public class VerificationScenario {
   /**
    * Starts a verification of the current {@link Code} against a given
    * {@link ConstraintSpecification}.
+   *
    * @param config The config to take into account (i.e. for verification timeouts, paths to
    *               dependencies etc.)
-   * @param spec The specification to be verified
+   * @param spec   The specification to be verified
    * @throws IOException
    * @throws ExportException
    * @throws VerificationError
@@ -114,7 +117,7 @@ public class VerificationScenario {
   private class VerificationChangedListener implements ChangeListener<VerificationResult> {
     @Override
     public void changed(ObservableValue<? extends VerificationResult> observableValue,
-        VerificationResult oldResult, VerificationResult newResult) {
+                        VerificationResult oldResult, VerificationResult newResult) {
       verificationResult.set(newResult);
       verificationState.set(VerificationState.FINISHED);
     }

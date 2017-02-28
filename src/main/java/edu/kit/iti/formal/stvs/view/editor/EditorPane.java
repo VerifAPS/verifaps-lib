@@ -12,11 +12,11 @@ import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleSpans;
 
-import javax.naming.Context;
 import java.util.Collection;
 
 /**
  * Created by csicar on 09.01.17.
+ *
  * @author Lukas Fritsch
  */
 public class EditorPane extends SplitPane {
@@ -44,7 +44,7 @@ public class EditorPane extends SplitPane {
     }
     syntaxErrorListView = new ListView<>(syntaxErrors);
     syntaxErrorListView.getStyleClass().addAll("model-text-area");
-    syntaxErrorPane  = new AnchorPane(syntaxErrorListView);
+    syntaxErrorPane = new AnchorPane(syntaxErrorListView);
     AnchorPane.setBottomAnchor(syntaxErrorListView, 0.0);
     AnchorPane.setTopAnchor(syntaxErrorListView, 0.0);
     AnchorPane.setLeftAnchor(syntaxErrorListView, 0.0);
@@ -84,6 +84,7 @@ public class EditorPane extends SplitPane {
 
   /**
    * shows / hides linenumbers (as in the global config specified)
+   *
    * @param showLineNumbers line numbers to show or not
    */
   public void setShowLineNumbers(Boolean showLineNumbers) {

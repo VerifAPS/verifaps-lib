@@ -1,13 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io.xml.verification;
 
-import edu.kit.iti.formal.exteta_1.ConstraintVariable;
-import edu.kit.iti.formal.exteta_1.DataType;
-import edu.kit.iti.formal.exteta_1.IoVariable;
-import edu.kit.iti.formal.exteta_1.ObjectFactory;
-import edu.kit.iti.formal.exteta_1.Step;
-import edu.kit.iti.formal.exteta_1.Steps;
-import edu.kit.iti.formal.exteta_1.TestTable;
-import edu.kit.iti.formal.exteta_1.Variables;
+import edu.kit.iti.formal.exteta_1.*;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.VariableEscaper;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlExporter;
@@ -20,12 +13,13 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import org.w3c.dom.Node;
 
-import java.util.List;
 import javax.xml.bind.JAXBElement;
+import java.util.List;
 
 
 /**
  * Exporter for communication with the GeTeTa.
+ *
  * @author Benjamin Alt
  */
 public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {

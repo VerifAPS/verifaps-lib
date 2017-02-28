@@ -7,6 +7,7 @@ import java.util.Optional;
 
 /**
  * Created by philipp on 09.02.17.
+ *
  * @author Philipp
  */
 public class DuplicateFreeVariableProblem extends FreeVariableProblem {

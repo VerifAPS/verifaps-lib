@@ -1,26 +1,43 @@
 {
-  "codeiovars":[
-    { "kind":"INPUT", "name":"Counter", "type":"INT" },
-    { "kind":"OUTPUT", "name":"Active", "type":"BOOL" }
+  "codeiovars": [
+    {
+      "kind": "INPUT",
+      "name": "Counter",
+      "type": "INT"
+    },
+    {
+      "kind": "OUTPUT",
+      "name": "Active",
+      "type": "BOOL"
+    }
   ],
-  "freevariables":[
-    { "name":"c", "type":"INT" }
+  "freevariables": [
+    {
+      "name": "c",
+      "type": "INT"
+    }
   ],
-  "variables":[
-    { "iotype":"INPUT", "name":"Counter", "type":"INT" },
-    { "iotype":"OUTPUT", "name":"Active", "type":"BOOL" }
+  "variables": [
+    {
+      "iotype": "INPUT",
+      "name": "Counter",
+      "type": "INT"
+    },
+    {
+      "iotype": "OUTPUT",
+      "name": "Active",
+      "type": "BOOL"
+    }
   ],
-
-  "expected_problems":[
+  "expected_problems": [
     "CellTypeProblem"
   ],
-
-  "rows":[
+  "rows": [
     "0    | TRUE",
     "> 10 | TRUE",
     "5    | blah"
   ],
-  "durations":[
+  "durations": [
     "[0,-]",
     "1"
   ]

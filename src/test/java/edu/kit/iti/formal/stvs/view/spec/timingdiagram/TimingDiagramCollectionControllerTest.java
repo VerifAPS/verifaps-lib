@@ -22,12 +22,12 @@ import java.util.Arrays;
 public class TimingDiagramCollectionControllerTest {
 
   @Test
-  public void javaFxTest(){
+  public void javaFxTest() {
     JavaFxTest.setToBeViewed(this::simpleScene);
     Application.launch(JavaFxTest.class);
   }
 
-  private Scene simpleScene(){
+  private Scene simpleScene() {
     try {
       XmlConcreteSpecImporter importer = new XmlConcreteSpecImporter(Arrays.asList(TypeInt.INT, TypeBool.BOOL));
       FileInputStream inputStream = new FileInputStream(new File
@@ -54,8 +54,7 @@ public class TimingDiagramCollectionControllerTest {
       Scene scene = new Scene(root, 800, 600);
       //scene.getStylesheets().add(this.getClass().getResource("style.css").toExternalForm());
       return scene;
-    }
-    catch(Exception e){
+    } catch (Exception e) {
       e.printStackTrace();
       return null;
     }

@@ -9,7 +9,6 @@ import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import jdk.nashorn.internal.objects.Global;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,12 +45,13 @@ public class StvsRootModel {
 
   /**
    * Create a new StvsRootModel from the given hybrid specifications, config, history and code.
+   *
    * @param hybridSpecifications
    * @param globalConfig
    * @param history
    * @param scenario
-   * @param workingdir working-directory that should be used (e.g. for opening and saving)
-   * @param filename filename of stvsrootmodel
+   * @param workingdir           working-directory that should be used (e.g. for opening and saving)
+   * @param filename             filename of stvsrootmodel
    */
   public StvsRootModel(List<HybridSpecification> hybridSpecifications, GlobalConfig globalConfig,
                        History history, VerificationScenario scenario, File workingdir, String

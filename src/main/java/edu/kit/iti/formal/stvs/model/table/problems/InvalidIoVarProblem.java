@@ -5,11 +5,9 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author Benjamin Alt
@@ -68,11 +66,16 @@ public class InvalidIoVarProblem extends ColumnProblem {
 
   private static String createMessageForType(ErrorType errorType) {
     switch (errorType) {
-      case NAME_MISMATCH: return "Column name in table doesn't match any column name in code";
-      case TYPE_MISMATCH: return "Column type in table doesn't match column type in code";
-      case CATEGORY_MISMATCH: return "Column category in table doesn't match column category in code";
-      case NAME_INVALID: return "Column name is not a valid identifier";
-      case TYPE_UNKNOWN: return "Column type is not defined";
+      case NAME_MISMATCH:
+        return "Column name in table doesn't match any column name in code";
+      case TYPE_MISMATCH:
+        return "Column type in table doesn't match column type in code";
+      case CATEGORY_MISMATCH:
+        return "Column category in table doesn't match column category in code";
+      case NAME_INVALID:
+        return "Column name is not a valid identifier";
+      case TYPE_UNKNOWN:
+        return "Column type is not defined";
       default:
         System.err.println("Unhandled error message errorType in InvalidIoVariableProblem: " + errorType);
         return "Column definition invalid";
@@ -107,14 +110,21 @@ public class InvalidIoVarProblem extends ColumnProblem {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
 
     InvalidIoVarProblem that = (InvalidIoVarProblem) o;
 
-    if (getSpecIoVariable() != null ? !getSpecIoVariable().equals(that.getSpecIoVariable()) : that.getSpecIoVariable() != null)
+    if (getSpecIoVariable() != null ? !getSpecIoVariable().equals(that.getSpecIoVariable()) : that.getSpecIoVariable() != null) {
       return false;
+    }
     return getErrorType() == that.getErrorType();
   }
 

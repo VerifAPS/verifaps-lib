@@ -1,12 +1,12 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Lukas on 22.02.2017.
+ *
  * @author Lukas
  */
 public class CodeIoVariableTest {

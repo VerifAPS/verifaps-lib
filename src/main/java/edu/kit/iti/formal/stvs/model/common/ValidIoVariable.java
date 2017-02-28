@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 
 /**
  * Created by philipp on 09.02.17.
+ *
  * @author Philipp
  */
 public class ValidIoVariable extends IoVariable {
@@ -50,8 +51,9 @@ public class ValidIoVariable extends IoVariable {
     if (getCategory() != that.getCategory()) {
       return false;
     }
-    if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null)
+    if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) {
       return false;
+    }
     return getType() != null ? getType().equals(that.getType()) : that.getType() == null;
   }
 

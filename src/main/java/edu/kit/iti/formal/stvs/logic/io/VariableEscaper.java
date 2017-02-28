@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 /**
  * This class is used to escape identifiers for the geteta verification engine.
+ *
  * @author Benjamin Alt
  */
 public class VariableEscaper {
@@ -20,6 +21,7 @@ public class VariableEscaper {
 
   /**
    * Prepends "_var" to a {@code name}.
+   *
    * @param name name that should be escaped.
    * @return escaped name
    */
@@ -32,6 +34,7 @@ public class VariableEscaper {
 
   /**
    * Escapes an expression that can be parsed by ANTLR.
+   *
    * @param expr expression to be escaped.
    * @return escaped expression
    */
@@ -55,6 +58,7 @@ public class VariableEscaper {
 
   /**
    * Escapes code by lexing it and treating identifiers accordingly.
+   *
    * @param code code that should be escaped
    * @return escaped code
    */
@@ -72,6 +76,7 @@ public class VariableEscaper {
 
   /**
    * Removes escaping from a name.
+   *
    * @param varName name from which the escaping should be removed.
    * @return unescaped name
    */

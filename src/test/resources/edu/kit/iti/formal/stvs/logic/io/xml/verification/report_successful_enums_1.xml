@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:message xmlns:ns2="http://formal.iti.kit.edu/exteta-1.0/report/" returncode="verified">
-  <log>
-    <entry time="59" level="debug">read xml file input_counterexample_enums_1.xml</entry>
-    <entry time="190" level="debug">xml file successfully read</entry>
-    <entry time="190" level="info">No options in table file.</entry>
-    <entry time="190" level="info">No functions given in table file.</entry>
-    <entry time="190" level="debug">1 variables found</entry>
-    <entry time="191" level="debug">	 o : ENUM</entry>
-    <entry time="264" level="debug">parsed: a to (a=o)</entry>
-    <entry time="265" level="debug">parsed: b to (b=o)</entry>
-    <entry time="266" level="debug">parsed: c to (c=o)</entry>
-    <entry time="395" level="debug">Row 1 can reach: {2}</entry>
-    <entry time="395" level="debug">Row 2 can reach: {3}</entry>
-    <entry time="395" level="debug">Row 3 can reach: {}</entry>
-    <entry time="467" level="info">Start '[/opt/nuXmv-1.1.1-Linux/bin/nuXmv, -int, /home/bal/Projects/kit/pse/stverificationstudio/src/test/resources/edu/kit/iti/formal/stvs/logic/io/xml/verification/input_counterexample_enums_1/modules.smv]'</entry>
-    <entry time="467" level="info">wd: input_counterexample_enums_1</entry>
-    <entry time="467" level="info">Result in input_counterexample_enums_1/log_48.txt</entry>
-  </log>
+    <log>
+        <entry time="59" level="debug">read xml file input_counterexample_enums_1.xml</entry>
+        <entry time="190" level="debug">xml file successfully read</entry>
+        <entry time="190" level="info">No options in table file.</entry>
+        <entry time="190" level="info">No functions given in table file.</entry>
+        <entry time="190" level="debug">1 variables found</entry>
+        <entry time="191" level="debug">o : ENUM</entry>
+        <entry time="264" level="debug">parsed: a to (a=o)</entry>
+        <entry time="265" level="debug">parsed: b to (b=o)</entry>
+        <entry time="266" level="debug">parsed: c to (c=o)</entry>
+        <entry time="395" level="debug">Row 1 can reach: {2}</entry>
+        <entry time="395" level="debug">Row 2 can reach: {3}</entry>
+        <entry time="395" level="debug">Row 3 can reach: {}</entry>
+        <entry time="467" level="info">Start '[/opt/nuXmv-1.1.1-Linux/bin/nuXmv, -int,
+            /home/bal/Projects/kit/pse/stverificationstudio/src/test/resources/edu/kit/iti/formal/stvs/logic/io/xml/verification/input_counterexample_enums_1/modules.smv]'
+        </entry>
+        <entry time="467" level="info">wd: input_counterexample_enums_1</entry>
+        <entry time="467" level="info">Result in input_counterexample_enums_1/log_48.txt</entry>
+    </log>
 </ns2:message>

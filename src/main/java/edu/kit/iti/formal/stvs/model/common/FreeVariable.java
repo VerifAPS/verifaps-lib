@@ -5,10 +5,10 @@ import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.util.Callback;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
  * Created by csicar on 10.01.17.
+ *
  * @author Philipp
  */
 public class FreeVariable implements Variable {
@@ -73,6 +73,7 @@ public class FreeVariable implements Variable {
 
   /**
    * Sets the type of this variable.
+   *
    * @param type identifier of the new type for the free variable
    */
   public void setType(String type) {
@@ -105,15 +106,21 @@ public class FreeVariable implements Variable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     FreeVariable that = (FreeVariable) o;
 
-    if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null)
+    if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) {
       return false;
-    if (getType() != null ? !getType().equals(that.getType()) : that.getType() != null)
+    }
+    if (getType() != null ? !getType().equals(that.getType()) : that.getType() != null) {
       return false;
+    }
     return getDefaultValue() != null ? getDefaultValue().equals(that.getDefaultValue()) : that.getDefaultValue() == null;
   }
 

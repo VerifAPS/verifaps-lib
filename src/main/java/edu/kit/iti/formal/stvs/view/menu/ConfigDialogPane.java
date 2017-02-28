@@ -9,6 +9,7 @@ import javafx.scene.text.Text;
 
 /**
  * Created by csicar on 11.01.17.
+ *
  * @author Carsten Csiky
  */
 public class ConfigDialogPane extends DialogPane {
@@ -38,7 +39,7 @@ public class ConfigDialogPane extends DialogPane {
     okButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
 
 
-    this.getButtonTypes().addAll( okButtonType,  ButtonType.CANCEL);
+    this.getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
 
 
     GridPane grid = new GridPane();

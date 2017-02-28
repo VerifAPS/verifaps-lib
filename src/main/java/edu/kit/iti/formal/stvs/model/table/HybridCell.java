@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 
 /**
  * Created by Philipp on 01.02.2017.
+ *
  * @author Philipp
  */
 public class HybridCell<C extends CellOperationProvider> implements CellOperationProvider {
@@ -68,15 +69,21 @@ public class HybridCell<C extends CellOperationProvider> implements CellOperatio
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     HybridCell<?> that = (HybridCell<?>) o;
 
-    if (getCell() != null ? !getCell().equals(that.getCell()) : that.getCell() != null)
+    if (getCell() != null ? !getCell().equals(that.getCell()) : that.getCell() != null) {
       return false;
-    if (getColumn() != null ? !getColumn().equals(that.getColumn()) : that.getColumn() != null)
+    }
+    if (getColumn() != null ? !getColumn().equals(that.getColumn()) : that.getColumn() != null) {
       return false;
+    }
     return counterExamples != null ? counterExamples.equals(that.counterExamples) : that.counterExamples == null;
   }
 

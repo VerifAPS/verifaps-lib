@@ -5,13 +5,14 @@ import de.tudresden.inf.lat.jsexp.SexpFactory;
 
 /**
  * Represents an {@link SExpression} that is an atomic element.
+ *
  * @author Carsten Csiky
  */
 public class SAtom implements SExpression {
   private String string;
 
   /**
-   *Creates an atomic expression from string.
+   * Creates an atomic expression from string.
    *
    * @param string string to represent
    */

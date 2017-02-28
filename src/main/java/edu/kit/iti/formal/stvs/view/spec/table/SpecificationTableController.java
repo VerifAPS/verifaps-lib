@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by Philipp on 01.02.2017.
+ *
  * @author Philipp
  */
 public class SpecificationTableController implements Controller {
@@ -109,9 +110,9 @@ public class SpecificationTableController implements Controller {
   private void onProblemsChange() {
     List<ColumnProblem> columnProblems =
         validator.problemsProperty().get().stream()
-        .filter(problem -> problem instanceof ColumnProblem)
-        .map(problem -> (ColumnProblem) problem)
-        .collect(Collectors.toList());
+            .filter(problem -> problem instanceof ColumnProblem)
+            .map(problem -> (ColumnProblem) problem)
+            .collect(Collectors.toList());
     for (TableColumn<HybridRow, ?> column : tableView.getColumns()) {
       if (column.getUserData() == null) {
         continue;
@@ -281,7 +282,7 @@ public class SpecificationTableController implements Controller {
 
       private void rowSelectionChanged(ObservableValue<? extends Integer> obs, Integer before, Integer now) {
         if (before != null && getIndex() == before) {
-          getStyleClass().remove ("highlighted");
+          getStyleClass().remove("highlighted");
         }
         if (now != null && getIndex() == now) {
           getStyleClass().add("highlighted");
@@ -319,10 +320,10 @@ public class SpecificationTableController implements Controller {
         int draggedIndex = (Integer) db.getContent(SERIALIZED_MIME_TYPE);
         HybridRow draggedRow = tableView.getItems().remove(draggedIndex);
 
-        int dropIndex ;
+        int dropIndex;
 
         if (row.isEmpty()) {
-          dropIndex = tableView.getItems().size() ;
+          dropIndex = tableView.getItems().size();
         } else {
           dropIndex = row.getIndex();
         }

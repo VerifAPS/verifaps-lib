@@ -4,7 +4,6 @@ import edu.kit.iti.formal.stvs.model.expressions.*;
 import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import org.junit.Before;
 import org.junit.Test;
-import org.omg.CORBA.TypeCodeHolder;
 
 import java.util.Arrays;
 import java.util.HashMap;

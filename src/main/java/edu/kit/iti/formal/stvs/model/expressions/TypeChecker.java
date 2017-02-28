@@ -4,9 +4,10 @@ import java.util.Map;
 
 /**
  * A type checker for {@link Expression}s.
- *
+ * <p>
  * If an ill-typed expression is encountered, this class produces a
  * {@link TypeCheckException}.
+ *
  * @author Philipp
  */
 public class TypeChecker implements ExpressionVisitor<Type> {
@@ -32,7 +33,7 @@ public class TypeChecker implements ExpressionVisitor<Type> {
   /**
    * Since the {@link Expression} AST does not know about the type of a variable
    * (see {@link VariableExpr}), this class needs a type context for variables.
-   *
+   * <p>
    * The type checker does not handle free- or IoVariables differently. Both are
    * reduced to their string representation.
    *
@@ -45,6 +46,7 @@ public class TypeChecker implements ExpressionVisitor<Type> {
   /**
    * Checks the type of an {@link Expression} or throws a {@link TypeCheckException}
    * on an ill-typed expression.
+   *
    * @param expr the expression to be checked
    * @return the type of the expression, iff not ill-typed.
    * @throws TypeCheckException an exception with information about the type

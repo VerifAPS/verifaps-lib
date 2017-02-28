@@ -8,8 +8,6 @@ import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramView;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.VerticalResizeContainerController;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;

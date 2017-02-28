@@ -29,7 +29,7 @@ public class ConcreteSpecificationTest {
   @Before
   public void setUp() throws Exception {
     concreteSpec = ImporterFacade.importConcreteSpec(XmlConcreteSpecImporter.class.
-        getResourceAsStream("spec_concrete_valid_1.xml"), ImporterFacade.ImportFormat.XML,
+            getResourceAsStream("spec_concrete_valid_1.xml"), ImporterFacade.ImportFormat.XML,
         Arrays.asList(TypeInt.INT, TypeBool.BOOL));
   }
 
@@ -55,7 +55,7 @@ public class ConcreteSpecificationTest {
         new ConcreteCell(ValueBool.FALSE),
         new ConcreteCell(ValueBool.FALSE));
     assertEquals(expectedCellsB, concreteSpec.getConcreteValuesForConstraintCell("B", 0));
-    assertEquals(Arrays.asList(), concreteSpec.getConcreteValuesForConstraintCell("A",3));
+    assertEquals(Arrays.asList(), concreteSpec.getConcreteValuesForConstraintCell("A", 3));
   }
 
   @Test

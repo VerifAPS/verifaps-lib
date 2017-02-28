@@ -1,21 +1,24 @@
 package edu.kit.iti.formal.stvs.view.common;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * Factory for creating alerts.
+ *
  * @author Carsten Csiky
  */
 public class AlertFactory {
 
   /**
    * Create an alert for an exception with a default title and description.
+   *
    * @param exception The exception for which the alert should be created
    * @return The created alert
    */
@@ -25,8 +28,9 @@ public class AlertFactory {
 
   /**
    * Create an alert for an exception with a custom title and description.
-   * @param exception The exception for which the alert should be created
-   * @param title The title of the alert
+   *
+   * @param exception   The exception for which the alert should be created
+   * @param title       The title of the alert
    * @param description The description in the alert
    * @return The created alert
    */
@@ -45,10 +49,11 @@ public class AlertFactory {
   /**
    * Create an alert with a given type, title, desciption and content text, but without
    * expandable content.
-   * @param type The type of the alert
-   * @param title The title of the alert
+   *
+   * @param type        The type of the alert
+   * @param title       The title of the alert
    * @param description The description in the alert
-   * @param content The content text for the alert
+   * @param content     The content text for the alert
    * @return The created alert
    */
   public static Alert createAlert(Alert.AlertType type, String title, String description,
@@ -58,10 +63,11 @@ public class AlertFactory {
 
   /**
    * Create an alert with a given type, title, desciption, content text and expandable content.
-   * @param type The type of the alert
-   * @param title The title of the alert
-   * @param description The description in the alert
-   * @param contentText The content text for the alert
+   *
+   * @param type              The type of the alert
+   * @param title             The title of the alert
+   * @param description       The description in the alert
+   * @param contentText       The content text for the alert
    * @param expandableContent The expandable content in the alert. This parameter may be null
    * @return The created alert
    */

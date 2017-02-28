@@ -8,7 +8,7 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
 
-@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
+@SuppressWarnings( {"all", "warnings", "unchecked", "unused", "cast"})
 public class CellExpressionLexer extends Lexer {
   static {
     RuntimeMetaData.checkVersion("4.6", RuntimeMetaData.VERSION);

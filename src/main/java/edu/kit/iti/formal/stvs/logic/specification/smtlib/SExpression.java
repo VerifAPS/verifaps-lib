@@ -6,12 +6,14 @@ import de.tudresden.inf.lat.jsexp.SexpParserException;
 
 /**
  * Interface for al S-Expression compatible classes.
+ *
  * @author
  */
 public interface SExpression {
 
   /**
    * Creates an instance from a given string.
+   *
    * @param string string to parse
    * @return instance which is represented by {@code string}
    */
@@ -27,6 +29,7 @@ public interface SExpression {
 
   /**
    * Creates an instance from a given {@link Sexp}.
+   *
    * @param s sexp that should be converted
    * @return instance which is represented by {@code s}
    */
@@ -40,18 +43,21 @@ public interface SExpression {
 
   /**
    * Returns if instance is atomic.
+   *
    * @return is atomic
    */
   boolean isAtom();
 
   /**
    * Convert to {@link Sexp}.
+   *
    * @return converted expression
    */
   Sexp toSexpr();
 
   /**
    * SExpression's textual representation.
+   *
    * @return string containing the sexpression
    */
   String toText();

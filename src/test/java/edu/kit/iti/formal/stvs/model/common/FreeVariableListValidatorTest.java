@@ -28,31 +28,31 @@ public class FreeVariableListValidatorTest {
   @Parameters(name = "expect \"{0}\"")
   public static Object[][] parameters() {
     return new Object[][] {
-        { "", Arrays.asList(
+        {"", Arrays.asList(
             new FreeVariable("a", "INT"),
             new FreeVariable("b", "BOOL")
         )},
-        { "InvalidFreeVariableProblem" , Arrays.asList(
+        {"InvalidFreeVariableProblem", Arrays.asList(
             new FreeVariable("a xy _%", "INT"),
             new FreeVariable("b", "BOOL")
         )},
-        { "InvalidFreeVariableProblem" , Arrays.asList(
+        {"InvalidFreeVariableProblem", Arrays.asList(
             new FreeVariable("a", "INT"),
             new FreeVariable("b", "BOOLEAN")
         )},
-        { "InvalidFreeVariableProblem" , Arrays.asList(
+        {"InvalidFreeVariableProblem", Arrays.asList(
             new FreeVariable("a", "INT", "asf"),
             new FreeVariable("b", "BOOL")
         )},
-        { "InvalidFreeVariableProblem" , Arrays.asList(
+        {"InvalidFreeVariableProblem", Arrays.asList(
             new FreeVariable("a", "INT", "TRUE"),
             new FreeVariable("b", "BOOL")
         )},
-        { "" , Arrays.asList(
+        {"", Arrays.asList(
             new FreeVariable("a", "INT", "1"),
             new FreeVariable("b", "BOOL", "TRUE")
         )},
-        { "DuplicateFreeVariableProblem", Arrays.asList(
+        {"DuplicateFreeVariableProblem", Arrays.asList(
             new FreeVariable("my_variable", "INT"),
             new FreeVariable("my_variable", "BOOL")
         )}
@@ -96,7 +96,7 @@ public class FreeVariableListValidatorTest {
     System.out.println("Expected problem: " + expectedProblem);
     System.out.println("Actual problems: " + problems.stream().map(
         problem -> problem.getClass().getSimpleName()
-                + "(" + problem.getErrorMessage() + ")").collect(Collectors.toList()));
+            + "(" + problem.getErrorMessage() + ")").collect(Collectors.toList()));
     assertTrue("Problems contain only expected problems", problems.stream()
         .allMatch(problem -> problem.getClass().getSimpleName().equals(expectedProblem)));
   }

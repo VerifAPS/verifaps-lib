@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * Created by philipp on 09.02.17.
+ *
  * @author Philipp
  */
 public class FreeVariableList {
@@ -24,8 +25,12 @@ public class FreeVariableList {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     FreeVariableList that = (FreeVariableList) o;
 

@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 /**
  * An Interface for all Importer-Classes.
+ *
  * @author Benjamin Alt
  */
 public interface Importer<T> {

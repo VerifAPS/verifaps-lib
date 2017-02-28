@@ -50,8 +50,8 @@ public class SmtEncoder {
    * Creates an encoder for a specification.
    * Each row is unrolled at most the number specified in {@code maxDurations}.
    *
-   * @param maxDurations list of maximum durations for each row
-   * @param specification specification to encode
+   * @param maxDurations       list of maximum durations for each row
+   * @param specification      specification to encode
    * @param validFreeVariables free variables that appear in the specification
    */
   public SmtEncoder(List<Integer> maxDurations,
@@ -153,7 +153,7 @@ public class SmtEncoder {
 
         for (int i = 0; i < getMaxDuration(z); i++) {
           SmtConvertExpressionVisitor visitor =
-               new SmtConvertExpressionVisitor(this, z, i, ioVariable);
+              new SmtConvertExpressionVisitor(this, z, i, ioVariable);
           SExpression expressionConstraint = expression.takeVisitor(visitor);
           //n_z >= i => ExpressionVisitor(z,i,...)
           this.constraint = new SmtModel(

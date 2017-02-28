@@ -10,6 +10,7 @@ import java.util.Optional;
  * defined by the ANTLR grammar in antlr/CellExpression.g4.
  * This parser does not need any context information and does not capture state
  * and thus is a singleton.
+ *
  * @author Philipp
  */
 public class IntervalParser extends CellExpressionBaseVisitor<LowerBoundedInterval> {
@@ -19,6 +20,7 @@ public class IntervalParser extends CellExpressionBaseVisitor<LowerBoundedInterv
   /**
    * Parse an interval, for example <tt>[1,-]</tt> or <tt>-</tt> (a wildcard)
    * or <tt>[1,4]</tt>. Only fixed values are allowed, no variables.
+   *
    * @param intervalAsString the string to be parsed.
    * @return a LowerBoundedInterval as the runtime representation of interval strings.
    * @throws ParseException in case the string doesn't fit the given fixed-interval grammar.
@@ -59,7 +61,7 @@ public class IntervalParser extends CellExpressionBaseVisitor<LowerBoundedInterv
         }
         return new LowerBoundedInterval(lowerBound, Optional.of(upperBoundInt));
       }
-    // if the interval string is just a constant, like "6" -> [6,6]
+      // if the interval string is just a constant, like "6" -> [6,6]
     } else if (ctx.c != null) {
       int value = parsePositive(ctx.c);
       return new LowerBoundedInterval(value, Optional.of(value));

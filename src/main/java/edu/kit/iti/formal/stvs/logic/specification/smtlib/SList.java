@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 /**
  * Represents a S-Expression of form ( expr_1 expr_2 expr_3 ... expr_n)
+ *
  * @author Carsten Csiky
  */
 public class SList implements SExpression {
@@ -17,8 +18,9 @@ public class SList implements SExpression {
 
   /**
    * Helper constructor.
-   * @see SList#SList(List)
+   *
    * @param sexp array of {@link SExpression}
+   * @see SList#SList(List)
    */
   public SList(SExpression... sexp) {
     this(Arrays.asList(sexp));
@@ -26,6 +28,7 @@ public class SList implements SExpression {
 
   /**
    * Creates an instance from a list of {@link SExpression}.
+   *
    * @param sexp list of {@link SExpression}
    */
   public SList(List<SExpression> sexp) {
@@ -35,9 +38,10 @@ public class SList implements SExpression {
   /**
    * Helper constructor.
    * Creates a {@link SAtom} for any passed string an calls {@link SList#SList(List)}
+   *
    * @param vals atomic expressions as string
    */
-  public SList(String ... vals) {
+  public SList(String... vals) {
     this(Arrays.stream(vals).map(SAtom::new).collect(Collectors.toList()));
   }
 
@@ -56,8 +60,9 @@ public class SList implements SExpression {
   /**
    * Creates an SList with the first argument interpreted as
    * atomic expression followed by {@code sexp}.
+   *
    * @param command atomic command expression
-   * @param sexp following expressions
+   * @param sexp    following expressions
    */
   public SList(String command, SExpression... sexp) {
     this();
@@ -68,6 +73,7 @@ public class SList implements SExpression {
   /**
    * Creates an instance by using an {@link Sexp} as a base.
    * Every item in {@code exp} will become an item in this list.
+   *
    * @param exp base expression
    */
   public SList(Sexp exp) {
@@ -101,10 +107,10 @@ public class SList implements SExpression {
   }
 
   public SList addAll(SExpression... sexp) {
-    return  addAll(Arrays.asList(sexp));
+    return addAll(Arrays.asList(sexp));
   }
 
-  public SList addAll(String ... values) {
+  public SList addAll(String... values) {
     return addAll(Arrays.stream(values).map(SAtom::new).collect(Collectors.toList()));
   }
 
@@ -123,6 +129,7 @@ public class SList implements SExpression {
 
   /**
    * Returns the List as a string
+   *
    * @return string representation: "(item_1 item_2 ... item_n)"
    */
   public String toString() {

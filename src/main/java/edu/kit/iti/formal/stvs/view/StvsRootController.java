@@ -1,8 +1,6 @@
 package edu.kit.iti.formal.stvs.view;
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
-import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
-import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.code.ParsedCode;
@@ -10,7 +8,9 @@ import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
+import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.editor.EditorPaneController;
@@ -72,10 +72,11 @@ public class StvsRootController implements Controller {
   /**
    * Handles verification events (triggers start or cancel of verification depending on the event
    * type).
+   *
    * @param event The verification event
    */
   private void onVerificationEvent(VerificationEvent event) {
-    switch(event.getType()) {
+    switch (event.getType()) {
       case START:
         try {
           stvsRootModel.getScenario().verify(stvsRootModel.getGlobalConfig(), event
@@ -113,9 +114,10 @@ public class StvsRootController implements Controller {
 
   /**
    * Change handler for the code. Updates the editor on code changes.
+   *
    * @param observableValue The observable value
-   * @param old The code before the change
-   * @param code The code after the change
+   * @param old             The code before the change
+   * @param code            The code after the change
    */
   private void onCodeChange(ObservableValue<? extends Code> observableValue, Code old, Code code) {
     editorPaneController = new EditorPaneController(code, stvsRootModel.getGlobalConfig());
@@ -126,8 +128,9 @@ public class StvsRootController implements Controller {
   /**
    * Change handler for the parsed code. Updates types and IO variables depending on those
    * declared in the new parsed code.
-   * @param o The observable value
-   * @param old The parsed code before the change
+   *
+   * @param o          The observable value
+   * @param old        The parsed code before the change
    * @param parsedCode The parsed code after the change
    */
   private void onParsedCodeChange(ObservableValue<? extends ParsedCode> o, ParsedCode old,
@@ -141,12 +144,13 @@ public class StvsRootController implements Controller {
   /**
    * Change handler for the verification result. Informs the user about the result of a
    * verification and opens counterexamples in a new tab, if a counterexample is available.
-   * @param o The observable value
+   *
+   * @param o   The observable value
    * @param old The verification result before the change
    * @param res The verification result after the change
    */
   private void onVerificationResultChange(ObservableValue<? extends VerificationResult> o,
-                                           VerificationResult old, VerificationResult res) {
+                                          VerificationResult old, VerificationResult res) {
     if (res == null) {
       AlertFactory.createAlert(Alert.AlertType.ERROR, "Verification Error",
           "Verification result is null", "").showAndWait();
@@ -172,12 +176,12 @@ public class StvsRootController implements Controller {
           stvsRootModel.getHybridSpecifications().add(readOnlySpec);
           break;
 
-          case VERIFIED:
+        case VERIFIED:
           AlertFactory.createAlert(Alert.AlertType.INFORMATION, "Verification Successful",
               "The verification completed successfully.", alertBody, logFileContents).showAndWait();
           break;
 
-          default:
+        default:
           AlertFactory.createAlert(res.getVerificationError().get()).showAndWait();
       }
     } catch (IOException e) {

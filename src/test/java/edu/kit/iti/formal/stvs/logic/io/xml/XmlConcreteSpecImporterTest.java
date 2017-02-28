@@ -10,8 +10,6 @@ import edu.kit.iti.formal.stvs.model.table.JsonTableParser;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -28,7 +26,7 @@ public class XmlConcreteSpecImporterTest {
   public void setUp() throws ImportException {
     importer = new XmlConcreteSpecImporter(Arrays.asList(TypeInt.INT, TypeBool.BOOL));
   }
-  
+
   @Test
   public void testDoImportValid1() throws Exception {
     ConcreteSpecification importedSpec = importer.doImport(

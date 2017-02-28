@@ -4,7 +4,7 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableProblem;
-import edu.kit.iti.formal.stvs.model.expressions.*;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.spec.variables.clipboard.Json;
 import javafx.beans.Observable;
@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by csicar on 10.01.17.
+ *
  * @author Philipp
  */
 public class VariableCollectionController implements Controller {
@@ -167,8 +168,8 @@ public class VariableCollectionController implements Controller {
 
         // TODO: Multiple variables with same name get deleted
         tableView.getItems().removeIf(freeVariable ->
-          droppedVariables.stream()
-              .anyMatch(var -> var.getName().equals(freeVariable.getName())));
+            droppedVariables.stream()
+                .anyMatch(var -> var.getName().equals(freeVariable.getName())));
 
         int dropIndex = row.getIndex();
         tableView.getItems().addAll(Math.min(dropIndex, tableView.getItems().size()), droppedVariables);

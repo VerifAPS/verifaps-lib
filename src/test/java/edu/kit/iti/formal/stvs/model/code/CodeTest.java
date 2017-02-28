@@ -6,14 +6,16 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
-import javafx.beans.property.SimpleStringProperty;
 import org.antlr.v4.runtime.Token;
 import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static edu.kit.iti.formal.stvs.model.TestUtils.assertCollectionsEqual;
 import static org.junit.Assert.*;

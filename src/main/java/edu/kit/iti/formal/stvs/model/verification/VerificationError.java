@@ -5,12 +5,14 @@ import java.util.Map;
 
 /**
  * Errors related to the verification process.
+ *
  * @author Benjamin Alt
  */
 public class VerificationError extends Exception {
 
   /* Error messages for the different error reasons */
   private static final Map<Reason, String> errorMessages;
+
   static {
     errorMessages = new HashMap<>();
     errorMessages.put(Reason.VERIFICATION_LAUNCH_ERROR, "The verification could not be launched. " +
@@ -27,6 +29,7 @@ public class VerificationError extends Exception {
 
   /**
    * Construct a new VerificationError for a specific reason.
+   *
    * @param reason The reason for the VerificationError
    */
   public VerificationError(Reason reason) {
@@ -37,6 +40,7 @@ public class VerificationError extends Exception {
    * Construct a new VerificationError from an Exception (which was thrown while
    * launching/managing the verification. These will typically not come from the verification
    * engine itself).
+   *
    * @param e The exception to construct a VerificationError from
    */
   public VerificationError(Exception e) {
@@ -47,6 +51,7 @@ public class VerificationError extends Exception {
 
   /**
    * Get the reason for this VerificationError.
+   *
    * @return The reason for this VerificationError
    */
   public Reason getReason() {
@@ -58,6 +63,8 @@ public class VerificationError extends Exception {
     return errorMessages.get(reason);
   }
 
-  public enum Reason {VERIFICATION_LAUNCH_ERROR, NUXMV_NOT_FOUND, PROCESS_ABORTED, TIMEOUT,
-    ERROR, EXCEPTION, UNKNOWN}
+  public enum Reason {
+    VERIFICATION_LAUNCH_ERROR, NUXMV_NOT_FOUND, PROCESS_ABORTED, TIMEOUT,
+    ERROR, EXCEPTION, UNKNOWN
+  }
 }

@@ -13,9 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Benjamin Alt
@@ -38,12 +36,12 @@ public class SpecificationTableTest {
     assertEquals("A2", table.getColumnByName("VariableA").getCells().get(2));
   }
 
-  @Test(expected=NoSuchElementException.class)
+  @Test(expected = NoSuchElementException.class)
   public void testGetCellNoSuchColumn() {
     table.getColumnByName("VariableE").getCells().get(2);
   }
 
-  @Test(expected=IndexOutOfBoundsException.class)
+  @Test(expected = IndexOutOfBoundsException.class)
   public void testGetCellNoSuchRow() {
     table.getColumnByName("VariableB").getCells().get(4);
   }
@@ -55,7 +53,7 @@ public class SpecificationTableTest {
         table.getColumnByName("VariableA"));
   }
 
-  @Test(expected=NoSuchElementException.class)
+  @Test(expected = NoSuchElementException.class)
   public void testGetColumnNoSuchColumn() {
     table.getColumnByName("E");
   }
@@ -110,7 +108,7 @@ public class SpecificationTableTest {
     assertEquals(expectedColumn, removedColumn);
   }
 
-  @Test(expected=NoSuchElementException.class)
+  @Test(expected = NoSuchElementException.class)
   public void testRemoveColumnActuallyRemoved() {
     String colName = "VariableA";
     table.removeColumnByName(colName);
@@ -128,7 +126,7 @@ public class SpecificationTableTest {
     assertEquals(SpecificationRow.createUnobservableRow(expectedCells), row);
   }
 
-  @Test(expected=IndexOutOfBoundsException.class)
+  @Test(expected = IndexOutOfBoundsException.class)
   public void testGetRowNoSuchRow() {
     table.getRows().get(4);
   }
@@ -176,9 +174,8 @@ public class SpecificationTableTest {
     });
   }
 
-  @Test(expected=IllegalStateException.class)
-  public void testAddColumnToEmptyTable()
-  {
+  @Test(expected = IllegalStateException.class)
+  public void testAddColumnToEmptyTable() {
     SpecificationTable emptyTable = new ConstraintSpecification(new FreeVariableList());
     SpecificationColumn column = new SpecificationColumn(new ArrayList());
     emptyTable.addColumn(new SpecIoVariable(VariableCategory.INPUT, "INT", "A"), column);

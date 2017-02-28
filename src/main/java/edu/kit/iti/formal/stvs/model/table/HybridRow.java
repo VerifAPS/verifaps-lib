@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.stvs.model.table.*;
 import javafx.beans.Observable;
 import javafx.collections.MapChangeListener;
 
@@ -9,6 +8,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by Philipp on 01.02.2017.
+ *
  * @author Philipp
  */
 public class HybridRow extends SpecificationRow<HybridCell<ConstraintCell>> {
@@ -85,14 +85,21 @@ public class HybridRow extends SpecificationRow<HybridCell<ConstraintCell>> {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
 
     HybridRow hybridRow = (HybridRow) o;
 
-    if (durationCell != null ? !durationCell.equals(hybridRow.durationCell) : hybridRow.durationCell != null)
+    if (durationCell != null ? !durationCell.equals(hybridRow.durationCell) : hybridRow.durationCell != null) {
       return false;
+    }
     return getSourceRow() != null ? getSourceRow().equals(hybridRow.getSourceRow()) : hybridRow.getSourceRow() == null;
   }
 }

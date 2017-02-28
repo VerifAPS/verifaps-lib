@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by leonk on 08.02.2017.
+ *
  * @author Leon Kaucher
  */
 public class ProcessOutputAsyncTask extends AsyncTask<Optional<String>> {

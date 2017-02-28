@@ -10,6 +10,7 @@ import java.util.*;
 /**
  * This class parses Expressions using the ANTLR parser generator library.
  * The resulting Expression format is an {@link Expression}.
+ *
  * @author Philipp
  */
 public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
@@ -21,6 +22,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   /**
    * Creates an Expression parser without a type context.
    * That means this parser can't parse enums.
+   *
    * @param columnName name of this column's IoVariable for
    *                   parsing single-sided expressions.
    */
@@ -31,8 +33,8 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   }
 
   /**
-   * @param columnName name of this column's IoVariable for
-   *                   parsing single-sided expressions.
+   * @param columnName  name of this column's IoVariable for
+   *                    parsing single-sided expressions.
    * @param typeContext available types for figuring out whether
    *                    an occuring string in an expression is
    *                    an enum-literal.
@@ -50,9 +52,9 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
         .filter(Optional::isPresent)
         .map(Optional::get) // Filter only the TypeEnums out of there
         .forEach(typeEnum ->
-          typeEnum.getValues().forEach(valueEnum -> // For every possible enum value
-            byName.put(valueEnum.getEnumValue(), valueEnum) // sort it in by name
-          ));
+            typeEnum.getValues().forEach(valueEnum -> // For every possible enum value
+                byName.put(valueEnum.getEnumValue(), valueEnum) // sort it in by name
+            ));
     return byName;
   }
 

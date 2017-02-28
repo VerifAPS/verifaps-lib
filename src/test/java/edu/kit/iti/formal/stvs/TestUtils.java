@@ -2,9 +2,10 @@ package edu.kit.iti.formal.stvs;
 
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecImporter;
-import edu.kit.iti.formal.stvs.model.common.*;
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableProblem;
+import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
@@ -16,10 +17,7 @@ import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 

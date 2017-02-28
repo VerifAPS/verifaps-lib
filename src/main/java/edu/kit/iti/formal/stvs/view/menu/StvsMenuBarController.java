@@ -29,6 +29,7 @@ import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.*;
  * Created by csicar on 10.01.17.
  * Controller for the MenuBar at the top of the window
  * does just fire to the root controller
+ *
  * @author Carsten Csiky
  */
 public class StvsMenuBarController implements Controller {
@@ -69,8 +70,8 @@ public class StvsMenuBarController implements Controller {
   private void updateHistoryMenu() {
     view.openRecentItems.clear();
     for (String filename : rootModel.get().getHistory().getFilenames()) {
-        MenuItem newItem = new MenuItem(filename);
-        newItem.setOnAction((actionEvent -> {
+      MenuItem newItem = new MenuItem(filename);
+      newItem.setOnAction((actionEvent -> {
         try {
           ImporterFacade.importFile(new File(filename), rootModel
               .get().getGlobalConfig(), rootModel.get().getHistory(), (hybridSpecification) -> {
@@ -170,7 +171,7 @@ public class StvsMenuBarController implements Controller {
 
   private void openSpec(ActionEvent t) {
     FileChooser fileChooser = FileChooserFactory.createOpenFileChooser(SPECIFICATION, rootModel
-            .get().getWorkingdir());
+        .get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
     if (chosenFile == null) {
       return;
@@ -178,8 +179,8 @@ public class StvsMenuBarController implements Controller {
     try {
       HybridSpecification spec = ImporterFacade.importHybridSpec(chosenFile,
           ImporterFacade.ImportFormat.XML);
-       this.rootModel.get().getHybridSpecifications().add(spec);
-       this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
+      this.rootModel.get().getHybridSpecifications().add(spec);
+      this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
     } catch (IOException | ImportException e) {
       AlertFactory.createAlert(e);
     }
@@ -221,8 +222,7 @@ public class StvsMenuBarController implements Controller {
       if (chosenFile != null) {
         handleSaveAll(chosenFile);
       }
-    }
-    else {
+    } else {
       handleSaveAll(new File(rootModel.get().getWorkingdir(), rootModel.get().getFilename()));
     }
   }

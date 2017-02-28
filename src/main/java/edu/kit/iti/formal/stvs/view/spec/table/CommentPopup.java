@@ -3,16 +3,11 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 import edu.kit.iti.formal.stvs.view.spec.Lockable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
-import javafx.scene.web.HTMLEditor;
-import javafx.stage.Popup;
 
 /**
  * @author Carsten Csiky

@@ -9,6 +9,7 @@ import java.util.Map;
 /**
  * Factory for creating the appropriate FileChoosers (with the right titles, file extension
  * filters, etc.) for opening and saving files.
+ *
  * @author Benjamin Alt
  */
 public class FileChooserFactory {
@@ -53,7 +54,8 @@ public class FileChooserFactory {
 
   /**
    * Create a new FileChooser for opening files.
-   * @param type The type of file to open
+   *
+   * @param type       The type of file to open
    * @param workingdir The directory the FileChooser opens initially
    * @return An appropriate FileChooser for opening the given type of file
    */
@@ -63,23 +65,25 @@ public class FileChooserFactory {
 
   /**
    * Create a new FileChooser for saving files.
-   * @param type The type of file to save
+   *
+   * @param type       The type of file to save
    * @param workingdir The directory the FileChooser opens initially
    * @return An appropriate FileChooser for saving the given type of file
    */
   public static FileChooser createSaveFileChooser(FileType type, File workingdir) {
-      return createFileChooser(workingdir, "Save " + typeIdentifiers.get(type), filters.get(type));
+    return createFileChooser(workingdir, "Save " + typeIdentifiers.get(type), filters.get(type));
   }
 
   /**
    * Create a new FileChooser with a given working directory, title and extension filter.
+   *
    * @param workingdir The directory the FileChooser opens initially
-   * @param title The FileChooser window title
-   * @param filter The extension filter for the FileChooser
+   * @param title      The FileChooser window title
+   * @param filter     The extension filter for the FileChooser
    * @return A FileChooser with the desired characteristics
    */
   public static FileChooser createFileChooser(File workingdir, String title, FileChooser
-        .ExtensionFilter filter) {
+      .ExtensionFilter filter) {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle(title);
     fileChooser.getExtensionFilters().addAll(filter);

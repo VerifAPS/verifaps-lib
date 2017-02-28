@@ -9,6 +9,7 @@ package edu.kit.iti.formal.stvs.model.expressions;
 public interface ValueIntegerHandler<R> {
   /**
    * Must implement a method that gets called by {@link ValueInt#match}
+   *
    * @param value The value that the matched value represents
    * @return Object of type {@code R}
    */

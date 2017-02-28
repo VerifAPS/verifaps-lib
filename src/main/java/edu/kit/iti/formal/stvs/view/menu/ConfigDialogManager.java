@@ -20,6 +20,7 @@ import java.io.IOException;
 
 /**
  * Created by csicar on 11.01.17.
+ *
  * @author Carsten Csiky
  */
 public class ConfigDialogManager implements Controller {
@@ -54,15 +55,15 @@ public class ConfigDialogManager implements Controller {
     //set initial values
     view.uiLanguage.setItems(FXCollections.observableList(config.getValidLanguages()));
     bind(view.verificationTimeout.textProperty(), config.verificationTimeoutProperty());
-    bind(view.simulationTimeout.textProperty(),   config.simulationTimeoutProperty());
-    bind(view.editorFontFamily.textProperty(),    config.editorFontFamilyProperty());
-    bind(view.editorFontSize.textProperty(),      config.editorFontSizeProperty());
+    bind(view.simulationTimeout.textProperty(), config.simulationTimeoutProperty());
+    bind(view.editorFontFamily.textProperty(), config.editorFontFamilyProperty());
+    bind(view.editorFontSize.textProperty(), config.editorFontSizeProperty());
     bind(view.showLineNumbers.selectedProperty(), config.showLineNumbersProperty());
-    bind(view.uiLanguage.valueProperty(),         config.uiLanguageProperty());
-    bind(view.maxLineRollout.textProperty(),      config.maxLineRolloutProperty());
-    bind(view.nuxmvFilename.getTextField().textProperty(),       config.nuxmvFilenameProperty());
-    bind(view.z3Path.getTextField().textProperty(),              config.z3PathProperty());
-    bind(view.getetaCommand.textProperty(),       config.getetaCommandProperty());
+    bind(view.uiLanguage.valueProperty(), config.uiLanguageProperty());
+    bind(view.maxLineRollout.textProperty(), config.maxLineRolloutProperty());
+    bind(view.nuxmvFilename.getTextField().textProperty(), config.nuxmvFilenameProperty());
+    bind(view.z3Path.getTextField().textProperty(), config.z3PathProperty());
+    bind(view.getetaCommand.textProperty(), config.getetaCommandProperty());
 
     BooleanBinding dialogValid = view.verificationTimeout.validProperty()
         .and(view.simulationTimeout.validProperty())
@@ -100,7 +101,6 @@ public class ConfigDialogManager implements Controller {
     });
     dialog.showAndWait();
   }
-
 
 
   @Override

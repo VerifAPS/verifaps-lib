@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 public class TestIntervalParser {
 
   private static void assertParseEqual(String toBeParsed, String elaborationText, int lower, Integer upper)
-    throws ParseException {
+      throws ParseException {
     assertEquals("Parse " + toBeParsed + elaborationText,
         new LowerBoundedInterval(lower, Optional.ofNullable(upper)),
         IntervalParser.parse(toBeParsed));

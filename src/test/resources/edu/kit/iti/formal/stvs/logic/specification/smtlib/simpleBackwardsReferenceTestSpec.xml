@@ -5,12 +5,12 @@
     </variables>
     <rows>
         <row comment="">
-            <duration> 3 </duration>
-            <cell> - </cell>
+            <duration>3</duration>
+            <cell>-</cell>
         </row>
         <row comment="">
             <duration>[1,5]</duration>
-            <cell> 5 </cell>
+            <cell>5</cell>
         </row>
         <row comment="">
             <duration>[1,5]</duration>

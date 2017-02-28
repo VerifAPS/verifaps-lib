@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by leonk on 08.02.2017.
+ *
  * @author Leon Kaucher
  */
 public class AsyncTask<T> extends Thread {
@@ -21,7 +22,7 @@ public class AsyncTask<T> extends Thread {
     isRunning.set(false);
   }
 
-  public boolean isRunning(){
+  public boolean isRunning() {
     return isRunning.get();
   }
 

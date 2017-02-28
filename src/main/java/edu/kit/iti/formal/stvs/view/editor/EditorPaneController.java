@@ -10,16 +10,11 @@ import edu.kit.iti.formal.stvs.model.code.SyntaxError;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.text.Font;
 import org.antlr.v4.runtime.Token;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.StyleSpans;
@@ -34,6 +29,7 @@ import java.util.concurrent.Executors;
  * Created by csicar on 09.01.17.
  * Some parts are inspired by examples of the used library:
  * https://github.com/TomasMikula/RichTextFX/blob/a098da6309a0f624052fd1d4d6f5079dd6265fbe/richtextfx-demos/src/main/java/org/fxmisc/richtext/demo/JavaKeywords.java
+ *
  * @author Lukas Fritsch
  */
 public class EditorPaneController implements Controller {
@@ -44,7 +40,8 @@ public class EditorPaneController implements Controller {
 
   /**
    * creates the controller for the editorpane
-   * @param code the codefile which is to show
+   *
+   * @param code         the codefile which is to show
    * @param globalConfig the global configuration (for font size or style)
    */
   public EditorPaneController(Code code, GlobalConfig globalConfig) {
@@ -161,16 +158,16 @@ public class EditorPaneController implements Controller {
     }
 
     tokens.forEach(token ->
-      // replaceAll is a work-around for a bug when ANTLR has a
-      // different character count than this CodeArea.
-      spansBuilder.add(getStyleClassesFor(token, syntaxErrors),
-          token.getText().replaceAll("\\r", "").length())
+        // replaceAll is a work-around for a bug when ANTLR has a
+        // different character count than this CodeArea.
+        spansBuilder.add(getStyleClassesFor(token, syntaxErrors),
+            token.getText().replaceAll("\\r", "").length())
     );
     return spansBuilder.create();
   }
 
   private Collection<String> getStyleClassesFor(Token token, List<SyntaxError> syntaxErrors) {
-        //getHightlightingClass(token);
+    //getHightlightingClass(token);
     if (syntaxErrors.stream().anyMatch(syntaxError -> syntaxError.isToken(token))) {
       return Collections.singletonList("syntax-error");
     } else {
@@ -217,9 +214,9 @@ public class EditorPaneController implements Controller {
       case IEC61131Lexer.MOD:
         return listOf("operation");
       default:
-          return listOf();
-      }
+        return listOf();
     }
+  }
 
   private <E> List<E> listOf(E... elements) {
     ArrayList<E> list = new ArrayList<>();

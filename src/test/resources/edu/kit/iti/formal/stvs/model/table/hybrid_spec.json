@@ -1,23 +1,43 @@
 {
-  "freevariables":[
-    { "name":"p", "type":"INT" }
-    { "name":"q", "type":"INT" }
+  "freevariables": [
+    {
+      "name": "p",
+      "type": "INT"
+    }
+    {
+      "name": "q",
+      "type": "INT"
+    }
   ],
-  "variables":[
-    { "iotype":"INPUT", "name":"A", "type":"INT" },
-    { "iotype":"INPUT", "name":"B", "type":"INT" },
-    { "iotype":"OUTPUT", "name":"C", "type":"INT" },
-    { "iotype":"OUTPUT", "name":"D", "type":"INT" }
+  "variables": [
+    {
+      "iotype": "INPUT",
+      "name": "A",
+      "type": "INT"
+    },
+    {
+      "iotype": "INPUT",
+      "name": "B",
+      "type": "INT"
+    },
+    {
+      "iotype": "OUTPUT",
+      "name": "C",
+      "type": "INT"
+    },
+    {
+      "iotype": "OUTPUT",
+      "name": "D",
+      "type": "INT"
+    }
   ],
-
-  "expected_problems":[],
-
-  "rows":[
+  "expected_problems": [],
+  "rows": [
     " - | <3+5 |  - |  -",
     " 3 |   2  |  3 | <=2",
     "<5 |   -  | <5 |  20"
   ],
-  "durations":[
+  "durations": [
     "1",
     "4",
     "5"

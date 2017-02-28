@@ -7,8 +7,8 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
-import edu.kit.iti.formal.stvs.model.table.JsonTableParser;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecificationValidatorTest;
+import edu.kit.iti.formal.stvs.model.table.JsonTableParser;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,7 +31,7 @@ public class XmlConstraintSpecImporterTest {
   public void setUp() throws ImportException {
     importer = new XmlConstraintSpecImporter();
   }
-  
+
   @Test
   public void testDoImportValid1() throws Exception {
     FileInputStream inputStream = new FileInputStream(new File

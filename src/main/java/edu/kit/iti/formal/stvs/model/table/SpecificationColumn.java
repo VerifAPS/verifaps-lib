@@ -8,6 +8,7 @@ import java.util.List;
 /**
  * A column in a specification (see {@link SpecificationTable}). The generic type parameter C is
  * the type of the cells.
+ *
  * @author Benjamin Alt
  */
 public class SpecificationColumn<C> implements Commentable {
@@ -17,6 +18,7 @@ public class SpecificationColumn<C> implements Commentable {
 
   /**
    * Create a new SpecificationColumn fro a list of cells.
+   *
    * @param cells The cells for this column.
    */
   public SpecificationColumn(List<C> cells) {
@@ -45,12 +47,18 @@ public class SpecificationColumn<C> implements Commentable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     SpecificationColumn<?> that = (SpecificationColumn<?>) o;
 
-    if (cells != null ? !cells.equals(that.cells) : that.cells != null) return false;
+    if (cells != null ? !cells.equals(that.cells) : that.cells != null) {
+      return false;
+    }
     return comment != null ? comment.get().equals(that.comment.get()) : that.comment == null;
 
   }

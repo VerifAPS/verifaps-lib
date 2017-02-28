@@ -5,6 +5,7 @@ import java.util.Optional;
 
 /**
  * Created by csicar on 10.01.17.
+ *
  * @author Leon Kaucher
  */
 public class Selection {

@@ -19,6 +19,7 @@ import java.util.List;
 
 /**
  * Handles communication with the GeTeTa verification engine.
+ *
  * @author Benjamin Alt
  */
 public class GeTeTaVerificationEngine implements VerificationEngine {
@@ -32,7 +33,8 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   /**
    * Creates an instance based on given {@link GlobalConfig} and {@code typeContext}.
    * The {@code typeContext} is used later for importing the possible counterexample.
-   * @param config config that should be used
+   *
+   * @param config      config that should be used
    * @param typeContext list of types used for importing counterexample
    * @throws VerificationError nuXmv not found
    */
@@ -52,10 +54,11 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   /**
    * Exports the given {@link VerificationScenario} to temporary files
    * and starts the GeTeTa verification engine process.
+   *
    * @param scenario scenario that hold the code to be checked
-   * @param spec specification that should be checked
-   * @throws IOException exception while creating process
-   * @throws ExportException exception while exporting
+   * @param spec     specification that should be checked
+   * @throws IOException       exception while creating process
+   * @throws ExportException   exception while exporting
    * @throws VerificationError exception while verifying
    */
   @Override

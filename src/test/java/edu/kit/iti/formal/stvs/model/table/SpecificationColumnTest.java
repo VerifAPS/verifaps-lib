@@ -5,7 +5,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by bal on 26.02.17.
@@ -15,12 +16,12 @@ public class SpecificationColumnTest {
 
   @Before
   public void setUp() {
-    column = new SpecificationColumn<>(Arrays.asList(1,2,3,4,5));
+    column = new SpecificationColumn<>(Arrays.asList(1, 2, 3, 4, 5));
   }
 
   @Test
   public void testEquals() throws Exception {
-    SpecificationColumn identical = new SpecificationColumn<>(Arrays.asList(1,2,3,4,5));
+    SpecificationColumn identical = new SpecificationColumn<>(Arrays.asList(1, 2, 3, 4, 5));
     assertEquals(identical, column);
     column.setComment("Comment");
     assertNotEquals(identical, column);

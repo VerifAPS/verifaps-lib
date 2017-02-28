@@ -1,16 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?><ns2:message xmlns:ns2="http://formal.iti.kit.edu/exteta-1.0/report/" returncode="verified">
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:message xmlns:ns2="http://formal.iti.kit.edu/exteta-1.0/report/" returncode="verified">
     <log>
         <entry level="debug" time="71">read xml file /tmp/verification-spec6071353359607728232.xml</entry>
         <entry level="debug" time="212">xml file successfully read</entry>
         <entry level="info" time="212">No options in table file.</entry>
         <entry level="info" time="212">No functions given in table file.</entry>
         <entry level="debug" time="212">6 variables found</entry>
-        <entry level="debug" time="212">	 var_A : INT</entry>
-        <entry level="debug" time="212">	 var_B : BOOLEAN</entry>
-        <entry level="debug" time="213">	 var_C : INT</entry>
-        <entry level="debug" time="213">	 var_D : ENUM</entry>
+        <entry level="debug" time="212">var_A : INT</entry>
+        <entry level="debug" time="212">var_B : BOOLEAN</entry>
+        <entry level="debug" time="213">var_C : INT</entry>
+        <entry level="debug" time="213">var_D : ENUM</entry>
         <entry level="debug" time="294">parsed: var_q to (var_q=var_A)</entry>
-        <entry level="debug" time="299">parsed: = NOT var_p to (var_B=edu.kit.iti.formal.smv.ast.SUnaryExpression@79b4d0f)</entry>
+        <entry level="debug" time="299">parsed: = NOT var_p to
+            (var_B=edu.kit.iti.formal.smv.ast.SUnaryExpression@79b4d0f)
+        </entry>
         <entry level="debug" time="300">parsed: - to TRUE</entry>
         <entry level="debug" time="301">parsed: var_literalOne to (var_literalOne=var_D)</entry>
         <entry level="debug" time="305">parsed: = var_C[-1] - 1 to (var_A=(var_C__history._$1-0sd16_1))</entry>
@@ -26,7 +29,9 @@
         <entry level="debug" time="435">Row 3 can reach: {}</entry>
         <entry level="debug" time="461">parsed: - to TRUE</entry>
         <entry level="debug" time="462">parsed: 42 to (0sd16_42=var_q)</entry>
-        <entry level="info" time="495">Start '[/opt/nuXmv-1.1.1-Linux/bin/nuXmv, -int, /tmp/verification-spec6071353359607728232/modules.smv]'</entry>
+        <entry level="info" time="495">Start '[/opt/nuXmv-1.1.1-Linux/bin/nuXmv, -int,
+            /tmp/verification-spec6071353359607728232/modules.smv]'
+        </entry>
         <entry level="info" time="495">wd: /tmp/verification-spec6071353359607728232</entry>
         <entry level="info" time="495">Result in /tmp/verification-spec6071353359607728232/log_42.txt</entry>
     </log>

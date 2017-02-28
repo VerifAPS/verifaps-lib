@@ -10,6 +10,7 @@ import java.util.Optional;
 
 /**
  * Created by csicar on 15.02.17.
+ *
  * @author Carsten Csiky
  */
 public class PositiveIntegerInputField extends TextField {
@@ -38,6 +39,7 @@ public class PositiveIntegerInputField extends TextField {
   /**
    * get inputfield value as an integer
    * if no integer representation is available Optional.empty() will be returned
+   *
    * @return value as an integer
    */
   public Optional<Integer> getInteger() {

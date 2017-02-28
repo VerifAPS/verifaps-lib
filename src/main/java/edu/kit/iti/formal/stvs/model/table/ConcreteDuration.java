@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 /**
  * A concrete duration. A ConcreteDuration is localized in time, i.e. it is aware of the cycle in
  * which it begins.
+ *
  * @author Benjamin Alt
  */
 public class ConcreteDuration {
@@ -14,8 +15,9 @@ public class ConcreteDuration {
 
   /**
    * Construct a new concrete duration.
+   *
    * @param beginCycle The cycle in which this duration begins
-   * @param duration The duration
+   * @param duration   The duration
    */
   public ConcreteDuration(int beginCycle, int duration) {
     if (beginCycle < 0) {
@@ -46,8 +48,12 @@ public class ConcreteDuration {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof ConcreteDuration)) return false;
-    if (obj == this) return true;
+    if (!(obj instanceof ConcreteDuration)) {
+      return false;
+    }
+    if (obj == this) {
+      return true;
+    }
     ConcreteDuration other = (ConcreteDuration) obj;
     return new EqualsBuilder().
         append(duration, other.duration).

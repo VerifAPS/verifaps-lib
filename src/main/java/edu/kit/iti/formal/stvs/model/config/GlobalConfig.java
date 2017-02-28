@@ -4,7 +4,6 @@ import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import javafx.beans.property.*;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +12,7 @@ import java.util.List;
 
 /**
  * Contains global configuration specified by the user
+ *
  * @author Benjamin Alt
  */
 public class GlobalConfig {
@@ -27,7 +27,7 @@ public class GlobalConfig {
   private IntegerProperty simulationTimeout;
   private BooleanProperty windowMaximized;
   private IntegerProperty windowHeight;
-  private IntegerProperty  windowWidth;
+  private IntegerProperty windowWidth;
   private StringProperty uiLanguage;
   private IntegerProperty maxLineRollout;
 
@@ -63,9 +63,9 @@ public class GlobalConfig {
   public static GlobalConfig autoloadConfig() {
     File configFile = new File(CONFIG_DIRPATH + File.separator + AUTOLOAD_CONFIG_FILENAME);
     try {
-        return ImporterFacade.importConfig(configFile, ImporterFacade.ImportFormat.XML);
+      return ImporterFacade.importConfig(configFile, ImporterFacade.ImportFormat.XML);
     } catch (Exception e) {
-        return new GlobalConfig();
+      return new GlobalConfig();
     }
   }
 
@@ -82,6 +82,7 @@ public class GlobalConfig {
    * Replaces the contents of this GlobalConfig instance with those of a given GlobalConfig.
    * Preferred over a copy constructor because this method keeps listeners registered on the
    * properties, which will be notified about the changes.
+   *
    * @param toBeCopied The GlobalConfig the contents of which will be copied
    */
   public void setAll(GlobalConfig toBeCopied) {
@@ -218,7 +219,7 @@ public class GlobalConfig {
    * @param uiLanguage
    */
   public void setUiLanguage(String uiLanguage) {
-    if (!validLanguages.contains(uiLanguage))  {
+    if (!validLanguages.contains(uiLanguage)) {
       throw new IllegalArgumentException("Input language " + uiLanguage + " is not supported");
     }
     this.uiLanguage.set(uiLanguage);
@@ -345,34 +346,60 @@ public class GlobalConfig {
   /**
    * Tests whether two GlobalConfigs are equal. Ignores listeners registered on the properties
    * (i.e. considers only property contents).
+   *
    * @param o The Object to be tested for equality
    * @return Whether this instance and o are equal
    */
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     GlobalConfig that = (GlobalConfig) o;
 
-    if (getValidLanguages() != null ? !getValidLanguages().equals(that.getValidLanguages()) : that.getValidLanguages() != null)
+    if (getValidLanguages() != null ? !getValidLanguages().equals(that.getValidLanguages()) : that.getValidLanguages() != null) {
       return false;
-    if (!(getVerificationTimeout() == that.getVerificationTimeout())) return false;
-    if (!(getSimulationTimeout() == that.getSimulationTimeout())) return false;
-    if (!(isWindowMaximized() == that.isWindowMaximized())) return false;
-    if (!(getWindowHeight() == that.getWindowHeight())) return false;
-    if (!(getWindowWidth() == that.getWindowWidth())) return false;
-    if (getUiLanguage() != null ? !getUiLanguage().equals(that.getUiLanguage()) : that.getUiLanguage() != null)
+    }
+    if (!(getVerificationTimeout() == that.getVerificationTimeout())) {
       return false;
-    if (!(getMaxLineRollout() == that.getMaxLineRollout())) return false;
-    if (!(getEditorFontSize() == that.getEditorFontSize())) return false;
-    if (getEditorFontFamily() != null ? !getEditorFontFamily().equals(that.getEditorFontFamily()) : that.getEditorFontFamily() != null)
+    }
+    if (!(getSimulationTimeout() == that.getSimulationTimeout())) {
       return false;
-    if (!(isShowLineNumbers() == that.isShowLineNumbers())) return false;
-    if (getNuxmvFilename() != null ? !getNuxmvFilename().equals(that.getNuxmvFilename()) : that.getNuxmvFilename() != null)
+    }
+    if (!(isWindowMaximized() == that.isWindowMaximized())) {
       return false;
-    if (getZ3Path() != null ? !getZ3Path().equals(that.getZ3Path()) : that.getZ3Path() != null)
+    }
+    if (!(getWindowHeight() == that.getWindowHeight())) {
       return false;
+    }
+    if (!(getWindowWidth() == that.getWindowWidth())) {
+      return false;
+    }
+    if (getUiLanguage() != null ? !getUiLanguage().equals(that.getUiLanguage()) : that.getUiLanguage() != null) {
+      return false;
+    }
+    if (!(getMaxLineRollout() == that.getMaxLineRollout())) {
+      return false;
+    }
+    if (!(getEditorFontSize() == that.getEditorFontSize())) {
+      return false;
+    }
+    if (getEditorFontFamily() != null ? !getEditorFontFamily().equals(that.getEditorFontFamily()) : that.getEditorFontFamily() != null) {
+      return false;
+    }
+    if (!(isShowLineNumbers() == that.isShowLineNumbers())) {
+      return false;
+    }
+    if (getNuxmvFilename() != null ? !getNuxmvFilename().equals(that.getNuxmvFilename()) : that.getNuxmvFilename() != null) {
+      return false;
+    }
+    if (getZ3Path() != null ? !getZ3Path().equals(that.getZ3Path()) : that.getZ3Path() != null) {
+      return false;
+    }
     return getGetetaCommand() != null ? getGetetaCommand().equals(that.getGetetaCommand()) : that.getGetetaCommand() == null;
   }
 

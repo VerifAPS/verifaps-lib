@@ -9,12 +9,7 @@ import edu.kit.iti.formal.stvs.logic.io.VariableEscaper;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlImporter;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
-import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
-import edu.kit.iti.formal.stvs.model.expressions.Value;
-import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
-import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
+import edu.kit.iti.formal.stvs.model.expressions.*;
 import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
 import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
@@ -34,11 +29,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**

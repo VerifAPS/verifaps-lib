@@ -6,6 +6,7 @@ import javafx.scene.control.SplitPane;
 
 /**
  * Created by csicar on 09.01.17.
+ *
  * @author Carsten Csiky
  */
 public class StvsRootView extends SplitPane {

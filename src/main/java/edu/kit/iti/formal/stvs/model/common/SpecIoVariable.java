@@ -9,6 +9,7 @@ import javafx.beans.property.StringProperty;
 
 /**
  * Created by csicar on 11.01.17.
+ *
  * @author Philipp
  */
 public class SpecIoVariable extends IoVariable implements Commentable {
@@ -21,6 +22,7 @@ public class SpecIoVariable extends IoVariable implements Commentable {
 
   /**
    * Creates a variable that appears in the specification.
+   *
    * @param category       The category of the variable
    * @param typeIdentifier The identifier of the type of the variable
    * @param name           The name of the Variable

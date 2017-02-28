@@ -1,48 +1,50 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:message xmlns:ns2="http://formal.iti.kit.edu/exteta-1.0/report/" returncode="not-verified">
-  <log>
-    <entry time="69" level="debug">read xml file constantprogram.xml</entry>
-    <entry time="201" level="debug">xml file successfully read</entry>
-    <entry time="201" level="info">No options in table file.</entry>
-    <entry time="201" level="info">No functions given in table file.</entry>
-    <entry time="201" level="debug">3 variables found</entry>
-    <entry time="201" level="debug">	 i : INT</entry>
-    <entry time="201" level="debug">	 o : INT</entry>
-    <entry time="201" level="debug">	 c : INT</entry>
-    <entry time="280" level="debug">parsed: - to TRUE</entry>
-    <entry time="284" level="debug">parsed: i to (i=o)</entry>
-    <entry time="286" level="debug">parsed: 42 to (0sd16_42=c)</entry>
-    <entry time="401" level="debug">Row 1 can reach: {}</entry>
-    <entry time="459" level="info">Start '[/opt/nuXmv-1.1.1-Linux/bin/nuXmv, -int, /home/bal/Downloads/constantprogram/modules.smv]'</entry>
-    <entry time="459" level="info">wd: constantprogram</entry>
-    <entry time="459" level="info">Result in constantprogram/log_10.txt</entry>
-    <entry time="545" level="debug">Row 1 can reach: {}</entry>
-  </log>
-  <counterexample>
-    <trace>
-      <step>
-        <input name="i" value="0sd16_0"/>
-        <state name="table.s1" value="TRUE"/>
-        <state name="table.clock1" value="0ud4_0"/>
-        <state name="table.ERROR" value="FALSE"/>
-        <state name ="code.c" value="0sd16_0"/>
-        <state name="code.o" value="0sd16_0"/>
-        <state name="table.s1_in" value="TRUE"/>
-        <state name="table.clock1_limit" value="FALSE"/>
-        <state name="table.s1_out" value="FALSE"/>
-        <state name="table.s1_keep" value="FALSE"/>
-        <state name="table.s1_fwd" value="FALSE"/>
-        <state name="table.clock1_tic" value="FALSE"/>
-        <state name="table.clock1_rs" value="TRUE"/>
-      </step>
-      <step>
-        <state name="table.s1" value="FALSE"/>
-        <state name="table.ERROR" value="TRUE"/>
-        <state name="code.c" value="0sd16_43"/>
-      </step>
-    </trace>
-    <row-mappings>
-      <row-map>1</row-map>
-    </row-mappings>
-  </counterexample>
+    <log>
+        <entry time="69" level="debug">read xml file constantprogram.xml</entry>
+        <entry time="201" level="debug">xml file successfully read</entry>
+        <entry time="201" level="info">No options in table file.</entry>
+        <entry time="201" level="info">No functions given in table file.</entry>
+        <entry time="201" level="debug">3 variables found</entry>
+        <entry time="201" level="debug">i : INT</entry>
+        <entry time="201" level="debug">o : INT</entry>
+        <entry time="201" level="debug">c : INT</entry>
+        <entry time="280" level="debug">parsed: - to TRUE</entry>
+        <entry time="284" level="debug">parsed: i to (i=o)</entry>
+        <entry time="286" level="debug">parsed: 42 to (0sd16_42=c)</entry>
+        <entry time="401" level="debug">Row 1 can reach: {}</entry>
+        <entry time="459" level="info">Start '[/opt/nuXmv-1.1.1-Linux/bin/nuXmv, -int,
+            /home/bal/Downloads/constantprogram/modules.smv]'
+        </entry>
+        <entry time="459" level="info">wd: constantprogram</entry>
+        <entry time="459" level="info">Result in constantprogram/log_10.txt</entry>
+        <entry time="545" level="debug">Row 1 can reach: {}</entry>
+    </log>
+    <counterexample>
+        <trace>
+            <step>
+                <input name="i" value="0sd16_0"/>
+                <state name="table.s1" value="TRUE"/>
+                <state name="table.clock1" value="0ud4_0"/>
+                <state name="table.ERROR" value="FALSE"/>
+                <state name="code.c" value="0sd16_0"/>
+                <state name="code.o" value="0sd16_0"/>
+                <state name="table.s1_in" value="TRUE"/>
+                <state name="table.clock1_limit" value="FALSE"/>
+                <state name="table.s1_out" value="FALSE"/>
+                <state name="table.s1_keep" value="FALSE"/>
+                <state name="table.s1_fwd" value="FALSE"/>
+                <state name="table.clock1_tic" value="FALSE"/>
+                <state name="table.clock1_rs" value="TRUE"/>
+            </step>
+            <step>
+                <state name="table.s1" value="FALSE"/>
+                <state name="table.ERROR" value="TRUE"/>
+                <state name="code.c" value="0sd16_43"/>
+            </step>
+        </trace>
+        <row-mappings>
+            <row-map>1</row-map>
+        </row-mappings>
+    </counterexample>
 </ns2:message>

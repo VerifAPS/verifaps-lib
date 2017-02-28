@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by philipp on 13.02.17.
+ *
  * @author Philipp
  */
 public class SpecificationTableCell extends TextFieldTableCell<HybridRow, String> {
@@ -41,12 +42,12 @@ public class SpecificationTableCell extends TextFieldTableCell<HybridRow, String
       VBox counterExampleLabels = new VBox();
       counterExampleLabels.getChildren().addAll(
           counterExampleCells.stream()
-          .map(text -> {
-            Label label = new Label(text);
-            label.getStyleClass().add("spec-counterexample");
-            return label;
-          })
-          .collect(Collectors.toList()));
+              .map(text -> {
+                Label label = new Label(text);
+                label.getStyleClass().add("spec-counterexample");
+                return label;
+              })
+              .collect(Collectors.toList()));
       setGraphic(counterExampleLabels);
     }
   }
@@ -87,9 +88,13 @@ public class SpecificationTableCell extends TextFieldTableCell<HybridRow, String
 
   private HybridCell<?> getCellModel() {
     // Null hell
-    if (getTableRow() == null) return null;
+    if (getTableRow() == null) {
+      return null;
+    }
     HybridRow row = (HybridRow) getTableRow().getItem();
-    if (row == null) return null;
+    if (row == null) {
+      return null;
+    }
     String columnId = (String) getTableColumn().getUserData();
     if (columnId != null) {
       return row.getCells().get(columnId);

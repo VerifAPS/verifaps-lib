@@ -1,16 +1,18 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
-import java.util.ArrayList;
-import java.util.List;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Created by csicar on 10.01.17.
+ *
  * @author Carsten Csiky
  */
 public class StvsMenuBar extends MenuBar {

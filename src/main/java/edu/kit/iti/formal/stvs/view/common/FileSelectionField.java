@@ -12,6 +12,7 @@ import java.io.File;
 
 /**
  * A text field with a button for choosing a file and displaying their path.
+ *
  * @author Benjamin Alt
  */
 public class FileSelectionField extends HBox {

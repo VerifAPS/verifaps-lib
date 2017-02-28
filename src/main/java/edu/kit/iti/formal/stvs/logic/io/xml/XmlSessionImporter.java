@@ -113,14 +113,14 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
    * Imports tabs from {@link Session}.
    *
    * @param importedSession session from which tabs should be imported
-   * @param typeContext type context that should be used for the {@link XmlConcreteSpecImporter}
+   * @param typeContext     type context that should be used for the {@link XmlConcreteSpecImporter}
    * @return list of imported specifications (tabs)
    * @throws ImportException Exception while importing
    */
   private List<HybridSpecification> importTabs(
       Session importedSession,
       List<Type> typeContext
-  )throws ImportException {
+  ) throws ImportException {
     XmlConcreteSpecImporter concreteSpecImporter = new XmlConcreteSpecImporter(typeContext);
     List<HybridSpecification> hybridSpecs = new ArrayList<>();
     for (Tab tab : importedSession.getTabs().getTab()) {

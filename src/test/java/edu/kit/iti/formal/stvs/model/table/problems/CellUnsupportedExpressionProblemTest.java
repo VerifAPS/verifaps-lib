@@ -4,7 +4,8 @@ import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionExc
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by bal on 26.02.17.

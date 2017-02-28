@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
  * A cell containing constraint expression (for the syntax, see
  * https://git.scc.kit.edu/peese/stverificationstudio/issues/25). The cells in a
  * {@link ConstraintSpecification} are of this type.
+ *
  * @author Benjamin Alt
  */
 public class ConstraintCell implements CellOperationProvider {
@@ -18,6 +19,7 @@ public class ConstraintCell implements CellOperationProvider {
   /**
    * Construct a new ConstraintCell from a string representation of its contents (i.e. of a
    * constraint expression).
+   *
    * @param stringRepresentation The string representation of a constraint expression
    */
   public ConstraintCell(String stringRepresentation) {
@@ -27,6 +29,7 @@ public class ConstraintCell implements CellOperationProvider {
 
   /**
    * Copy constructor; performs a deep copy of a given ConstraintCell.
+   *
    * @param constraintCell The ConstraintCell to copy
    */
   public ConstraintCell(ConstraintCell constraintCell) {
@@ -66,8 +69,12 @@ public class ConstraintCell implements CellOperationProvider {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof ConstraintCell)) return false;
-    if (obj == this) return true;
+    if (!(obj instanceof ConstraintCell)) {
+      return false;
+    }
+    if (obj == this) {
+      return true;
+    }
     ConstraintCell other = (ConstraintCell) obj;
     return new EqualsBuilder().
         append(stringRepresentation.get(), other.stringRepresentation.get()).

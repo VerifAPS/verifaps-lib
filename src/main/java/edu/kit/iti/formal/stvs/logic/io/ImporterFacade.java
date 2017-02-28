@@ -25,14 +25,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -53,7 +46,7 @@ public class ImporterFacade {
    * Imports a {@link ConstraintSpecification} from an {@link InputStream}
    * using the specified {@link ImportFormat}.
    *
-   * @param input stream from which the specification should be imported.
+   * @param input  stream from which the specification should be imported.
    * @param format format to use for importing
    * @return imported specification
    * @throws ImportException Exception during importing.
@@ -70,10 +63,11 @@ public class ImporterFacade {
 
   /**
    * Imports {@link ConstraintSpecification} from file.
-   * @param file file to import from.
+   *
+   * @param file   file to import from.
    * @param format format to use for importing
    * @return imported specification
-   * @throws IOException Exception while reading file.
+   * @throws IOException     Exception while reading file.
    * @throws ImportException Exception while importing.
    */
   public static ConstraintSpecification importConstraintSpec(File file, ImportFormat format) throws
@@ -85,8 +79,8 @@ public class ImporterFacade {
    * Imports a {@link ConcreteSpecification} from an {@link InputStream}
    * using the specified {@link ImportFormat}.
    *
-   * @param input stream from which to import from
-   * @param format format to use for importing
+   * @param input       stream from which to import from
+   * @param format      format to use for importing
    * @param typeContext context of types used in the specification
    * @return imported specification
    * @throws ImportException exception during importing
@@ -106,11 +100,11 @@ public class ImporterFacade {
   /**
    * Imports {@link ConcreteSpecification} from file.
    *
-   * @param file file to import from.
-   * @param format format to use for importing
+   * @param file        file to import from.
+   * @param format      format to use for importing
    * @param typeContext context of types used in the specification
    * @return imported specification
-   * @throws IOException Exception while reading file.
+   * @throws IOException     Exception while reading file.
    * @throws ImportException Exception while importing.
    */
   public static ConcreteSpecification importConcreteSpec(File file, ImportFormat format,
@@ -123,7 +117,7 @@ public class ImporterFacade {
    * Imports a {@link HybridSpecification} from an {@link InputStream}
    * using the specified {@link ImportFormat}.
    *
-   * @param input stream from which to import from
+   * @param input  stream from which to import from
    * @param format format to use for importing
    * @return imported specification
    * @throws ImportException exception during importing
@@ -144,10 +138,10 @@ public class ImporterFacade {
   /**
    * Imports {@link HybridSpecification} from file.
    *
-   * @param file file to import from.
+   * @param file   file to import from.
    * @param format format to use for importing
    * @return imported specification
-   * @throws IOException Exception while reading file.
+   * @throws IOException     Exception while reading file.
    * @throws ImportException Exception while importing.
    */
   public static HybridSpecification importHybridSpec(File file, ImportFormat format) throws
@@ -159,7 +153,7 @@ public class ImporterFacade {
    * Imports a {@link GlobalConfig} from an {@link InputStream}
    * using the specified {@link ImportFormat}.
    *
-   * @param input stream from which to import from
+   * @param input  stream from which to import from
    * @param format format to use for importing
    * @return imported config
    * @throws ImportException exception during importing
@@ -179,11 +173,11 @@ public class ImporterFacade {
   /**
    * Imports {@link GlobalConfig} from file.
    *
-   * @param file file to import from.
+   * @param file   file to import from.
    * @param format format to use for importing
    * @return imported config
    * @throws FileNotFoundException Exception if file not found.
-   * @throws ImportException Exception while importing.
+   * @throws ImportException       Exception while importing.
    */
   public static GlobalConfig importConfig(
       File file,
@@ -196,7 +190,7 @@ public class ImporterFacade {
    * Imports a {@link VerificationResult} from an {@link InputStream}
    * using the specified {@link ImportFormat}.
    *
-   * @param input stream from which to import from
+   * @param input  stream from which to import from
    * @param format format to use for importing
    * @return imported result
    * @throws ImportException exception during importing
@@ -215,9 +209,9 @@ public class ImporterFacade {
    * Imports a {@link StvsRootModel} from an {@link InputStream}
    * using the specified {@link ImportFormat}.
    *
-   * @param input stream from which to import from
-   * @param format format to use for importing
-   * @param currentConfig config to be used for the model
+   * @param input          stream from which to import from
+   * @param format         format to use for importing
+   * @param currentConfig  config to be used for the model
    * @param currentHistory history to be used for the model
    * @return imported model
    * @throws ImportException exception during importing
@@ -235,12 +229,12 @@ public class ImporterFacade {
   /**
    * Imports {@link StvsRootModel} from file.
    *
-   * @param file file to import from.
-   * @param format format to use for importing
-   * @param currentConfig config to be used for the model
+   * @param file           file to import from.
+   * @param format         format to use for importing
+   * @param currentConfig  config to be used for the model
    * @param currentHistory history to be used for the model
    * @return imported model
-   * @throws IOException Exception while reading file.
+   * @throws IOException     Exception while reading file.
    * @throws ImportException Exception while importing.
    */
   public static StvsRootModel importSession(File file, ImportFormat format, GlobalConfig
@@ -253,6 +247,7 @@ public class ImporterFacade {
 
   /**
    * Import {@link Code} from a file.
+   *
    * @param chosenFile file to import from.
    * @return imported code
    * @throws IOException Exception while reading file
@@ -266,9 +261,9 @@ public class ImporterFacade {
    * Imports {@link History} from file.
    *
    * @param chosenFile file to import from.
-   * @param format format to use for importing
+   * @param format     format to use for importing
    * @return imported history
-   * @throws JAXBException Exception while unmarshalling.
+   * @throws JAXBException   Exception while unmarshalling.
    * @throws ImportException Exception while importing.
    */
   public static History importHistory(

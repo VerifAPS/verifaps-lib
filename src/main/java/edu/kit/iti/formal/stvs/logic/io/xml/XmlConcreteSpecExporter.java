@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
-import edu.kit.iti.formal.stvs.model.common.IoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
@@ -14,6 +13,7 @@ import java.util.stream.Collectors;
 /**
  * This class provides the functionality to export
  * {@link ConcreteSpecification ConcreteSpecifications} to xml nodes.
+ *
  * @author Benjamin Alt
  */
 public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> {

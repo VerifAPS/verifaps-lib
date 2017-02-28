@@ -11,6 +11,7 @@ import java.io.IOException;
 
 /**
  * Strategy for Verification of the VerificationScenario.
+ *
  * @author Benjamin Alt
  */
 public interface VerificationEngine {
@@ -19,9 +20,9 @@ public interface VerificationEngine {
    * Starts a verification in its own thread.
    *
    * @param scenario scenario that hold the code to be checked
-   * @param spec specification that should be checked
-   * @throws IOException exception while creating process
-   * @throws ExportException exception while exporting
+   * @param spec     specification that should be checked
+   * @throws IOException       exception while creating process
+   * @throws ExportException   exception while exporting
    * @throws VerificationError exception while verifying
    */
   public void startVerification(VerificationScenario scenario,

@@ -19,6 +19,7 @@ public class TestUtils {
   }
 
   private static final Map<FileType, String> prefixes;
+
   static {
     prefixes = new HashMap<>();
     prefixes.put(FileType.SESSION, "session");

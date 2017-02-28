@@ -1,17 +1,21 @@
 package edu.kit.iti.formal.stvs.logic.verification;
 
-import java.util.concurrent.TimeUnit;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Detects when a process is finished and invokes the associated listeners.
  * Adapted from https://beradrian.wordpress.com/2008/11/03/detecting-process-exit-in-java/.
+ *
  * @author Benjamin Alt
  */
 public class ProcessMonitor extends Thread {
 
-  /** The process for which we have to detect the end. */
+  /**
+   * The process for which we have to detect the end.
+   */
   private Process process;
   private BooleanProperty processFinished;
   private int timeout;
@@ -19,6 +23,7 @@ public class ProcessMonitor extends Thread {
 
   /**
    * Starts the detection for the given process.
+   *
    * @param process the process for which one would like to detect when it is finished
    */
   public ProcessMonitor(Process process, int timeout) {

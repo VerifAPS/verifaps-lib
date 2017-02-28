@@ -10,7 +10,6 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeFactory;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
-import gnu.trove.map.TObjectByteMap;
 import javafx.beans.value.ObservableValue;
 import junit.framework.AssertionFailedError;
 import org.junit.Before;
@@ -22,7 +21,8 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by bal on 26.02.17.

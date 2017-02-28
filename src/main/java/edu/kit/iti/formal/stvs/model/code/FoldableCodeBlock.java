@@ -25,8 +25,12 @@ public class FoldableCodeBlock {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!(obj instanceof FoldableCodeBlock)) return false;
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof FoldableCodeBlock)) {
+      return false;
+    }
 
     FoldableCodeBlock that = (FoldableCodeBlock) obj;
 

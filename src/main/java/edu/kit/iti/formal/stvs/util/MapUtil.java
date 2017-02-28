@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 /**
  * Created by philipp on 06.02.17.
+ *
  * @author Philipp
  */
 public class MapUtil {

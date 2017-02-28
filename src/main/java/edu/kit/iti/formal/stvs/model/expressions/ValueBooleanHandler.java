@@ -9,6 +9,7 @@ package edu.kit.iti.formal.stvs.model.expressions;
 public interface ValueBooleanHandler<R> {
   /**
    * Must implement a method that gets called by {@link ValueBool#match}
+   *
    * @param value The value that the matched value represents
    * @return Object of type {@code R}
    */

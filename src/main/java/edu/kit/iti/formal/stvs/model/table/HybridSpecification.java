@@ -1,6 +1,9 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.stvs.model.common.*;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
+import edu.kit.iti.formal.stvs.model.common.NullableProperty;
+import edu.kit.iti.formal.stvs.model.common.Selection;
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -16,6 +19,7 @@ import java.util.Optional;
  * This class is the model on which the
  * {@link edu.kit.iti.formal.stvs.view.spec.SpecificationController}
  * and {@link TimingDiagramCollectionController} operate.
+ *
  * @author Benjamin Alt
  */
 public class HybridSpecification extends ConstraintSpecification {
@@ -33,8 +37,9 @@ public class HybridSpecification extends ConstraintSpecification {
 
   /**
    * Create a new, empty hybrid specification with a default name from a list of free variables.
+   *
    * @param freeVariableList A list of initial free variables
-   * @param editable True if this hybridSpecification is editable, false otherwise
+   * @param editable         True if this hybridSpecification is editable, false otherwise
    */
   public HybridSpecification(FreeVariableList freeVariableList, boolean editable) {
     this(DEFAULT_NAME, freeVariableList, editable);
@@ -42,9 +47,10 @@ public class HybridSpecification extends ConstraintSpecification {
 
   /**
    * Create a new, empty hybrid specification with a given name and a list of free variables.
-   * @param name The name of the HybridSpecification
+   *
+   * @param name             The name of the HybridSpecification
    * @param freeVariableList A list of initial free variables
-   * @param editable True if this HybridSpecification is editable, false otherwise
+   * @param editable         True if this HybridSpecification is editable, false otherwise
    */
   public HybridSpecification(String name, FreeVariableList freeVariableList, boolean editable) {
     super(name, freeVariableList);
@@ -59,13 +65,14 @@ public class HybridSpecification extends ConstraintSpecification {
 
   /**
    * Create a HybridSpecification from a {@link ConstraintSpecification}.
+   *
    * @param sourceSpec The original {@link ConstraintSpecification}
-   * @param editable True if this HybridSpecification is editable, false otherwise
+   * @param editable   True if this HybridSpecification is editable, false otherwise
    */
   public HybridSpecification(ConstraintSpecification sourceSpec, boolean editable) {
     this(sourceSpec.getName(), sourceSpec.getFreeVariableList(), editable);
     getColumnHeaders().addAll(sourceSpec.getColumnHeaders());
-    
+
     for (int rowIndex = 0; rowIndex < sourceSpec.getRows().size(); rowIndex++) {
       HybridRow row = new HybridRow(
           sourceSpec.getRows().get(rowIndex),
@@ -155,7 +162,9 @@ public class HybridSpecification extends ConstraintSpecification {
       return false;
     }
     for (int i = 0; i < this.columnHeaders.size(); i++) {
-      if (!this.columnHeaders.get(i).matches(columnHeaders.get(i))) return false;
+      if (!this.columnHeaders.get(i).matches(columnHeaders.get(i))) {
+        return false;
+      }
     }
     return true;
   }
@@ -166,19 +175,30 @@ public class HybridSpecification extends ConstraintSpecification {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
 
     HybridSpecification that = (HybridSpecification) o;
 
-    if (isEditable() != that.isEditable()) return false;
-    if (getCounterExample() != null ? !getCounterExample().equals(that.getCounterExample()) : that.getCounterExample() != null)
+    if (isEditable() != that.isEditable()) {
       return false;
-    if (getConcreteInstance() != null ? !getConcreteInstance().equals(that.getConcreteInstance()) : that.getConcreteInstance() != null)
+    }
+    if (getCounterExample() != null ? !getCounterExample().equals(that.getCounterExample()) : that.getCounterExample() != null) {
       return false;
-    if (rowsAsHybrid != null ? !rowsAsHybrid.equals(that.rowsAsHybrid) : that.rowsAsHybrid != null)
+    }
+    if (getConcreteInstance() != null ? !getConcreteInstance().equals(that.getConcreteInstance()) : that.getConcreteInstance() != null) {
       return false;
+    }
+    if (rowsAsHybrid != null ? !rowsAsHybrid.equals(that.rowsAsHybrid) : that.rowsAsHybrid != null) {
+      return false;
+    }
     return getSelection() != null ? getSelection().equals(that.getSelection()) : that.getSelection() == null;
   }
 }

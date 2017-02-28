@@ -119,8 +119,8 @@ public class SpecificationController implements Controller {
     hybridSpecification.setConcreteInstance(null);
   }
 
-  private void specChanged(ListChangeListener.Change change){
-    if(timingDiagramCollectionController != null){
+  private void specChanged(ListChangeListener.Change change) {
+    if (timingDiagramCollectionController != null) {
       timingDiagramCollectionController.setActivated(false);
     }
   }

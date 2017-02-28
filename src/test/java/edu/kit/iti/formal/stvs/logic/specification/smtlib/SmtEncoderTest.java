@@ -9,11 +9,14 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by csicar on 09.02.17.
@@ -60,7 +63,6 @@ public class SmtEncoderTest {
     int maxDuration = 50;
 
 
-
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
     SmtModel output = smtEncoder.getConstraint();
     Set<SExpression> constraints = output.getGlobalConstraints();
@@ -83,7 +85,6 @@ public class SmtEncoderTest {
     List<ValidFreeVariable> freeVariables = TestUtils.importValidFreeVariables(sourceFile.get());
 
     int maxDuration = 50;
-
 
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
@@ -173,7 +174,7 @@ public class SmtEncoderTest {
         "(implies (bvuge n_2  #x0000) (= |A_2_0| |A_2_-4|))",
         "(implies (= n_1  #x0002) (= |A_2_-4| |A_1_-2|))",
         "(implies (= n_0  #x0003) (= |A_1_-2| |A_0_1|))"
-        );
+    );
 
     testWithStatements(constraints,
         "(bvuge n_0  #x0003)",
@@ -187,11 +188,11 @@ public class SmtEncoderTest {
     );
   }
 
-  private void testWithStatements(Set<SExpression> constraints, String ... s) {
+  private void testWithStatements(Set<SExpression> constraints, String... s) {
     List<SExpression> statements = Arrays.stream(s).map(SExpression::fromString)
         .collect
-        (Collectors
-        .toList());
+            (Collectors
+                .toList());
 
     List<SExpression> missingStatements = statements.stream().filter
         (statement

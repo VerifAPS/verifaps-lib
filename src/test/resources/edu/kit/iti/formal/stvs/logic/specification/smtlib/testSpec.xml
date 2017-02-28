@@ -8,7 +8,7 @@
     <rows>
         <row comment="">
             <duration>[5,-]</duration>
-            <cell>  0</cell>
+            <cell>0</cell>
             <cell>TRUE</cell>
         </row>
         <row comment="">
@@ -18,7 +18,7 @@
         </row>
         <row comment="">
             <duration>2</duration>
-            <cell>  c</cell>
+            <cell>c</cell>
             <cell>Counter[-4]</cell>
         </row>
     </rows>

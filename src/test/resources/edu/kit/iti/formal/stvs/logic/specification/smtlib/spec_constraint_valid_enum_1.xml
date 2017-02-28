@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="" isConcrete="false">
-  <variables>
-    <ioVariable colwidth="100" data-type="INT" io="input" name="Counter"/>
-    <ioVariable colwidth="100" data-type="BOOL" io="output" name="Active"/>
-    <ioVariable data-type="colors" io="output" name="lala"/>
-    <freeVariable data-type="INT" name="c"/>
-  </variables>
-  <rows>
-    <row comment="">
-      <duration>[10,-]</duration>
-      <cell>  0</cell>
-      <cell>TRUE</cell>
-      <cell>blue</cell>
-    </row>
-    <row comment="">
-      <duration>1</duration>
-      <cell>&gt; 10</cell>
-      <cell>TRUE</cell>
-      <cell>!= lala[-1]</cell>
-    </row>
-    <row comment="">
-      <duration>4</duration>
-      <cell>  c</cell>
-      <cell>FALSE</cell>
-      <cell>green</cell>
-    </row>
-  </rows>
+    <variables>
+        <ioVariable colwidth="100" data-type="INT" io="input" name="Counter"/>
+        <ioVariable colwidth="100" data-type="BOOL" io="output" name="Active"/>
+        <ioVariable data-type="colors" io="output" name="lala"/>
+        <freeVariable data-type="INT" name="c"/>
+    </variables>
+    <rows>
+        <row comment="">
+            <duration>[10,-]</duration>
+            <cell>0</cell>
+            <cell>TRUE</cell>
+            <cell>blue</cell>
+        </row>
+        <row comment="">
+            <duration>1</duration>
+            <cell>&gt; 10</cell>
+            <cell>TRUE</cell>
+            <cell>!= lala[-1]</cell>
+        </row>
+        <row comment="">
+            <duration>4</duration>
+            <cell>c</cell>
+            <cell>FALSE</cell>
+            <cell>green</cell>
+        </row>
+    </rows>
 </specification>

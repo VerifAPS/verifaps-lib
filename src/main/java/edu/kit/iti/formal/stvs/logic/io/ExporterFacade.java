@@ -14,12 +14,7 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Facade class for facilitating the export of different objects to different export formats.

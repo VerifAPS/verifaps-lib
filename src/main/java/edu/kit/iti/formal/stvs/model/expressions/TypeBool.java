@@ -4,8 +4,9 @@ import java.util.Optional;
 
 /**
  * runtime-representation for boolean types.
- *
+ * <p>
  * This is a singleton since this class does not have any state.
+ *
  * @author Philipp
  */
 public class TypeBool implements Type {
@@ -38,8 +39,12 @@ public class TypeBool implements Type {
 
   @Override
   public Optional<Value> parseLiteral(String literal) {
-    if ("true".equalsIgnoreCase(literal)) return Optional.of(ValueBool.TRUE);
-    if ("false".equalsIgnoreCase(literal)) return Optional.of(ValueBool.FALSE);
+    if ("true".equalsIgnoreCase(literal)) {
+      return Optional.of(ValueBool.TRUE);
+    }
+    if ("false".equalsIgnoreCase(literal)) {
+      return Optional.of(ValueBool.FALSE);
+    }
     return Optional.empty();
   }
 

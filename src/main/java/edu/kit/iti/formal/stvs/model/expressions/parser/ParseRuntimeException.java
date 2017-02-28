@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.model.expressions.parser;
 
 /**
  * package-local class!
+ *
  * @author Philipp
  */
 class ParseRuntimeException extends RuntimeException {

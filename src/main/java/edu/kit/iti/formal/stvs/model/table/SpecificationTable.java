@@ -4,13 +4,11 @@ import edu.kit.iti.formal.stvs.model.common.Named;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.util.Callback;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,7 +23,7 @@ public class SpecificationTable<H extends Named, C, D> {
 
   protected final static String DEFAULT_NAME = "Unnamed Specification";
 
-  protected ObservableList<H>     columnHeaders;
+  protected ObservableList<H> columnHeaders;
   protected ObservableList<SpecificationRow<C>> rows;
   protected ObservableList<D> durations;
   private StringProperty name;
@@ -42,7 +40,7 @@ public class SpecificationTable<H extends Named, C, D> {
       Callback<D, Observable[]> durationExtractor) {
     this.name = new SimpleStringProperty(name);
     this.rows = FXCollections.observableArrayList(
-        specificationRow -> new Observable[] { specificationRow });
+        specificationRow -> new Observable[] {specificationRow});
     this.durations = FXCollections.observableArrayList(durationExtractor);
     this.columnHeaders = FXCollections.observableArrayList(columnHeaderExtractor);
 
@@ -114,9 +112,10 @@ public class SpecificationTable<H extends Named, C, D> {
 
   /**
    * Get the SpecIoVariables for this table, i.e. the column headers.
-   *
+   * <p>
    * <p>You should <strong>not mutate</strong> this list. For adding new
    * columns, use addNewColumn</p>
+   *
    * @return the list of SpecIoVariables
    */
   public ObservableList<H> getColumnHeaders() {
@@ -168,7 +167,7 @@ public class SpecificationTable<H extends Named, C, D> {
             + columnHeaders.size());
       }
       if (!addedRow.getCells().keySet().stream().allMatch(columnId ->
-              getOptionalColumnHeaderByName(columnId).isPresent())) {
+          getOptionalColumnHeaderByName(columnId).isPresent())) {
         throw new IllegalArgumentException("Added row contains unknown IoVariable: "
             + StringEscapeUtils.escapeJava(addedRow.toString()));
       }
@@ -212,17 +211,24 @@ public class SpecificationTable<H extends Named, C, D> {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     SpecificationTable<?, ?, ?> that = (SpecificationTable<?, ?, ?>) o;
 
-    if (getColumnHeaders() != null ? !getColumnHeaders().equals(that.getColumnHeaders()) : that.getColumnHeaders() != null)
+    if (getColumnHeaders() != null ? !getColumnHeaders().equals(that.getColumnHeaders()) : that.getColumnHeaders() != null) {
       return false;
-    if (getRows() != null ? !getRows().equals(that.getRows()) : that.getRows() != null)
+    }
+    if (getRows() != null ? !getRows().equals(that.getRows()) : that.getRows() != null) {
       return false;
-    if (getDurations() != null ? !getDurations().equals(that.getDurations()) : that.getDurations() != null)
+    }
+    if (getDurations() != null ? !getDurations().equals(that.getDurations()) : that.getDurations() != null) {
       return false;
+    }
     return getName() != null ? getName().equals(that.getName()) : that.getName() == null;
   }
 

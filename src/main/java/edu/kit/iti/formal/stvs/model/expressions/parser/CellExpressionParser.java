@@ -13,7 +13,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.List;
 
-@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
+@SuppressWarnings( {"all", "warnings", "unchecked", "unused", "cast"})
 public class CellExpressionParser extends Parser {
   static {
     RuntimeMetaData.checkVersion("4.6", RuntimeMetaData.VERSION);
@@ -136,19 +136,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterCell(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterCell(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitCell(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitCell(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitCell(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -224,19 +230,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterChunk(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterChunk(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitChunk(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitChunk(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitChunk(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -312,19 +324,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterDontcare(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterDontcare(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitDontcare(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitDontcare(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitDontcare(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -373,19 +391,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterConstant(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterConstant(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitConstant(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitConstant(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitConstant(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -402,7 +426,9 @@ public class CellExpressionParser extends Parser {
         if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T) | (1L << F) | (1L << INTEGER))) != 0))) {
           ((ConstantContext) _localctx).a = (Token) _errHandler.recoverInline(this);
         } else {
-          if (_input.LA(1) == Token.EOF) matchedEOF = true;
+          if (_input.LA(1) == Token.EOF) {
+            matchedEOF = true;
+          }
           _errHandler.reportMatch(this);
           consume();
         }
@@ -439,19 +465,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterSinglesided(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterSinglesided(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitSinglesided(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitSinglesided(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitSinglesided(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -511,19 +543,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterInterval(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterInterval(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitInterval(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitInterval(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitInterval(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -592,20 +630,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener)
+      if (listener instanceof CellExpressionListener) {
         ((CellExpressionListener) listener).enterRelational_operator(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitRelational_operator(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitRelational_operator(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitRelational_operator(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -622,7 +665,9 @@ public class CellExpressionParser extends Parser {
         if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << EQUALS) | (1L << GREATER_EQUALS) | (1L << GREATER_THAN) | (1L << LESS_EQUALS) | (1L << LESS_THAN) | (1L << NOT_EQUALS))) != 0))) {
           ((Relational_operatorContext) _localctx).relOp = (Token) _errHandler.recoverInline(this);
         } else {
-          if (_input.LA(1) == Token.EOF) matchedEOF = true;
+          if (_input.LA(1) == Token.EOF) {
+            matchedEOF = true;
+          }
           _errHandler.reportMatch(this);
           consume();
         }
@@ -672,19 +717,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterMinus(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterMinus(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitMinus(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitMinus(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitMinus(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -705,19 +756,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterNegation(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterNegation(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitNegation(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitNegation(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitNegation(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -742,19 +799,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterParens(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterParens(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitParens(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitParens(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitParens(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -793,19 +856,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterCompare(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterCompare(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitCompare(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitCompare(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitCompare(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -831,19 +900,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterMod(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterMod(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitMod(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitMod(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitMod(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -869,19 +944,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterMult(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterMult(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitMult(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitMult(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitMult(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -896,19 +977,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterBinguardedCommand(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterBinguardedCommand(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitBinguardedCommand(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitBinguardedCommand(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitBinguardedCommand(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -949,19 +1036,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterFunctioncall(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterFunctioncall(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitFunctioncall(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitFunctioncall(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitFunctioncall(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -976,19 +1069,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterBvariable(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterBvariable(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitBvariable(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitBvariable(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitBvariable(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -1014,19 +1113,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterLogicalAnd(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterLogicalAnd(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitLogicalAnd(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitLogicalAnd(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitLogicalAnd(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -1052,19 +1157,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterPlus(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterPlus(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitPlus(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitPlus(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitPlus(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -1090,19 +1201,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterDiv(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterDiv(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitDiv(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitDiv(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitDiv(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -1128,19 +1245,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterInequality(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterInequality(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitInequality(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitInequality(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitInequality(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -1166,19 +1289,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterLogicalXor(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterLogicalXor(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitLogicalXor(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitLogicalXor(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitLogicalXor(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -1193,19 +1322,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterBconstant(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterBconstant(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitBconstant(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitBconstant(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitBconstant(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -1231,19 +1366,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterLogicalOr(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterLogicalOr(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitLogicalOr(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitLogicalOr(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitLogicalOr(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -1269,19 +1410,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterEquality(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterEquality(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitEquality(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitEquality(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitEquality(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -1307,19 +1454,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterSubstract(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterSubstract(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitSubstract(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitSubstract(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitSubstract(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -1436,7 +1589,9 @@ public class CellExpressionParser extends Parser {
         _alt = getInterpreter().adaptivePredict(_input, 5, _ctx);
         while (_alt != 2 && _alt != org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER) {
           if (_alt == 1) {
-            if (_parseListeners != null) triggerExitRuleEvent();
+            if (_parseListeners != null) {
+              triggerExitRuleEvent();
+            }
             _prevctx = _localctx;
             {
               setState(112);
@@ -1447,7 +1602,9 @@ public class CellExpressionParser extends Parser {
                   ((ModContext) _localctx).left = _prevctx;
                   pushNewRecursionContext(_localctx, _startState, RULE_expr);
                   setState(79);
-                  if (!(precpred(_ctx, 15))) throw new FailedPredicateException(this, "precpred(_ctx, 15)");
+                  if (!(precpred(_ctx, 15))) {
+                    throw new FailedPredicateException(this, "precpred(_ctx, 15)");
+                  }
                   setState(80);
                   match(MOD);
                   setState(81);
@@ -1459,7 +1616,9 @@ public class CellExpressionParser extends Parser {
                   ((DivContext) _localctx).left = _prevctx;
                   pushNewRecursionContext(_localctx, _startState, RULE_expr);
                   setState(82);
-                  if (!(precpred(_ctx, 14))) throw new FailedPredicateException(this, "precpred(_ctx, 14)");
+                  if (!(precpred(_ctx, 14))) {
+                    throw new FailedPredicateException(this, "precpred(_ctx, 14)");
+                  }
                   setState(83);
                   match(DIV);
                   setState(84);
@@ -1471,7 +1630,9 @@ public class CellExpressionParser extends Parser {
                   ((MultContext) _localctx).left = _prevctx;
                   pushNewRecursionContext(_localctx, _startState, RULE_expr);
                   setState(85);
-                  if (!(precpred(_ctx, 13))) throw new FailedPredicateException(this, "precpred(_ctx, 13)");
+                  if (!(precpred(_ctx, 13))) {
+                    throw new FailedPredicateException(this, "precpred(_ctx, 13)");
+                  }
                   setState(86);
                   match(MULT);
                   setState(87);
@@ -1483,7 +1644,9 @@ public class CellExpressionParser extends Parser {
                   ((SubstractContext) _localctx).left = _prevctx;
                   pushNewRecursionContext(_localctx, _startState, RULE_expr);
                   setState(88);
-                  if (!(precpred(_ctx, 12))) throw new FailedPredicateException(this, "precpred(_ctx, 12)");
+                  if (!(precpred(_ctx, 12))) {
+                    throw new FailedPredicateException(this, "precpred(_ctx, 12)");
+                  }
                   setState(89);
                   match(MINUS);
                   setState(90);
@@ -1495,7 +1658,9 @@ public class CellExpressionParser extends Parser {
                   ((PlusContext) _localctx).left = _prevctx;
                   pushNewRecursionContext(_localctx, _startState, RULE_expr);
                   setState(91);
-                  if (!(precpred(_ctx, 11))) throw new FailedPredicateException(this, "precpred(_ctx, 11)");
+                  if (!(precpred(_ctx, 11))) {
+                    throw new FailedPredicateException(this, "precpred(_ctx, 11)");
+                  }
                   setState(92);
                   match(PLUS);
                   setState(93);
@@ -1507,14 +1672,18 @@ public class CellExpressionParser extends Parser {
                   ((CompareContext) _localctx).left = _prevctx;
                   pushNewRecursionContext(_localctx, _startState, RULE_expr);
                   setState(94);
-                  if (!(precpred(_ctx, 10))) throw new FailedPredicateException(this, "precpred(_ctx, 10)");
+                  if (!(precpred(_ctx, 10))) {
+                    throw new FailedPredicateException(this, "precpred(_ctx, 10)");
+                  }
                   setState(95);
                   ((CompareContext) _localctx).op = _input.LT(1);
                   _la = _input.LA(1);
                   if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << GREATER_EQUALS) | (1L << GREATER_THAN) | (1L << LESS_EQUALS) | (1L << LESS_THAN))) != 0))) {
                     ((CompareContext) _localctx).op = (Token) _errHandler.recoverInline(this);
                   } else {
-                    if (_input.LA(1) == Token.EOF) matchedEOF = true;
+                    if (_input.LA(1) == Token.EOF) {
+                      matchedEOF = true;
+                    }
                     _errHandler.reportMatch(this);
                     consume();
                   }
@@ -1527,7 +1696,9 @@ public class CellExpressionParser extends Parser {
                   ((EqualityContext) _localctx).left = _prevctx;
                   pushNewRecursionContext(_localctx, _startState, RULE_expr);
                   setState(97);
-                  if (!(precpred(_ctx, 9))) throw new FailedPredicateException(this, "precpred(_ctx, 9)");
+                  if (!(precpred(_ctx, 9))) {
+                    throw new FailedPredicateException(this, "precpred(_ctx, 9)");
+                  }
                   setState(98);
                   match(EQUALS);
                   setState(99);
@@ -1539,7 +1710,9 @@ public class CellExpressionParser extends Parser {
                   ((InequalityContext) _localctx).left = _prevctx;
                   pushNewRecursionContext(_localctx, _startState, RULE_expr);
                   setState(100);
-                  if (!(precpred(_ctx, 8))) throw new FailedPredicateException(this, "precpred(_ctx, 8)");
+                  if (!(precpred(_ctx, 8))) {
+                    throw new FailedPredicateException(this, "precpred(_ctx, 8)");
+                  }
                   setState(101);
                   match(NOT_EQUALS);
                   setState(102);
@@ -1551,7 +1724,9 @@ public class CellExpressionParser extends Parser {
                   ((LogicalAndContext) _localctx).left = _prevctx;
                   pushNewRecursionContext(_localctx, _startState, RULE_expr);
                   setState(103);
-                  if (!(precpred(_ctx, 7))) throw new FailedPredicateException(this, "precpred(_ctx, 7)");
+                  if (!(precpred(_ctx, 7))) {
+                    throw new FailedPredicateException(this, "precpred(_ctx, 7)");
+                  }
                   setState(104);
                   match(AND);
                   setState(105);
@@ -1563,7 +1738,9 @@ public class CellExpressionParser extends Parser {
                   ((LogicalOrContext) _localctx).left = _prevctx;
                   pushNewRecursionContext(_localctx, _startState, RULE_expr);
                   setState(106);
-                  if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
+                  if (!(precpred(_ctx, 6))) {
+                    throw new FailedPredicateException(this, "precpred(_ctx, 6)");
+                  }
                   setState(107);
                   match(OR);
                   setState(108);
@@ -1575,7 +1752,9 @@ public class CellExpressionParser extends Parser {
                   ((LogicalXorContext) _localctx).left = _prevctx;
                   pushNewRecursionContext(_localctx, _startState, RULE_expr);
                   setState(109);
-                  if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
+                  if (!(precpred(_ctx, 5))) {
+                    throw new FailedPredicateException(this, "precpred(_ctx, 5)");
+                  }
                   setState(110);
                   match(XOR);
                   setState(111);
@@ -1628,19 +1807,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterVariable(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterVariable(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitVariable(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitVariable(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitVariable(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -1715,19 +1900,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterGuardedcommand(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterGuardedcommand(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitGuardedcommand(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitGuardedcommand(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitGuardedcommand(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -1813,19 +2004,25 @@ public class CellExpressionParser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).enterFixed_interval(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).enterFixed_interval(this);
+      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof CellExpressionListener) ((CellExpressionListener) listener).exitFixed_interval(this);
+      if (listener instanceof CellExpressionListener) {
+        ((CellExpressionListener) listener).exitFixed_interval(this);
+      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof CellExpressionVisitor)
+      if (visitor instanceof CellExpressionVisitor) {
         return ((CellExpressionVisitor<? extends T>) visitor).visitFixed_interval(this);
-      else return visitor.visitChildren(this);
+      } else {
+        return visitor.visitChildren(this);
+      }
     }
   }
 
@@ -1859,7 +2056,9 @@ public class CellExpressionParser extends Parser {
           if (!(_la == MINUS || _la == INTEGER)) {
             ((Fixed_intervalContext) _localctx).b = (Token) _errHandler.recoverInline(this);
           } else {
-            if (_input.LA(1) == Token.EOF) matchedEOF = true;
+            if (_input.LA(1) == Token.EOF) {
+              matchedEOF = true;
+            }
             _errHandler.reportMatch(this);
             consume();
           }

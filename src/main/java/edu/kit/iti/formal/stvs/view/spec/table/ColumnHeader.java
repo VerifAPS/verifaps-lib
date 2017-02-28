@@ -3,22 +3,19 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.table.problems.ColumnProblem;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.reactfx.value.Var;
 
 import java.util.Collection;
 
 /**
  * Created by philipp on 11.02.17.
+ *
  * @author Philipp
  */
 public class ColumnHeader extends VBox {

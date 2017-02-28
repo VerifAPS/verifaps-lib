@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import com.sun.xml.bind.v2.schemagen.xmlschema.Import;
 import edu.kit.iti.formal.stvs.StvsApplication;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
@@ -18,7 +17,7 @@ public class ConstraintSpecificationTest {
   @Before
   public void setUp() throws ImportException {
     constraintSpec = ImporterFacade.importConstraintSpec(StvsApplication.class
-        .getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml"),
+            .getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml"),
         ImporterFacade.ImportFormat.XML);
   }
 

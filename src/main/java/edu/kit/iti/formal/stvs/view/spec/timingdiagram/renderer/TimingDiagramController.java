@@ -221,7 +221,9 @@ public class TimingDiagramController implements Controller {
   private void onXPositiveZoom(ActionEvent actionEvent) {
     double interval = commonXAxis.getUpperBound() - commonXAxis.getLowerBound();
     double newInterval = interval / 2;
-    if (newInterval < 1) return;
+    if (newInterval < 1) {
+      return;
+    }
     double center = commonXAxis.getValueForDisplay(lastMouseEvent.getX()).doubleValue();
     double newLowerBound = center - newInterval / 2;
     double newUpperBound = center + newInterval / 2;
@@ -236,7 +238,9 @@ public class TimingDiagramController implements Controller {
   private void onXNegativeZoom(ActionEvent actionEvent) {
     double interval = commonXAxis.getUpperBound() - commonXAxis.getLowerBound();
     double newInterval = interval * 2;
-    if (newInterval < 1) return;
+    if (newInterval < 1) {
+      return;
+    }
     double center = commonXAxis.getValueForDisplay(lastMouseEvent.getX()).doubleValue();
     double newLowerBound = center - newInterval / 2;
     double newUpperBound = center + newInterval / 2;

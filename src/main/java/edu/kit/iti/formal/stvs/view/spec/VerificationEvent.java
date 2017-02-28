@@ -29,5 +29,5 @@ public class VerificationEvent extends Event {
     return type;
   }
 
-  public enum Type { START, STOP }
+  public enum Type {START, STOP}
 }

@@ -14,6 +14,7 @@ import java.util.Collection;
 
 /**
  * Contains information about recently opened code and spec files.
+ *
  * @author Benjamin Alt
  */
 public class History {
@@ -38,6 +39,7 @@ public class History {
 
   /**
    * Get the current file history.
+   *
    * @return An ObservableList with the most recently opened filenames.
    */
   public ObservableList<String> getFilenames() {
@@ -46,6 +48,7 @@ public class History {
 
   /**
    * Add a filename to the history
+   *
    * @param filename
    */
   public void addFilename(String filename) {
@@ -86,6 +89,7 @@ public class History {
    * Replaces the contents of this history instance with those of a given history.
    * Preferred over a copy constructor because this method keeps listeners registered on the
    * properties, which will be notified about the changes.
+   *
    * @param history The history the contents of which will be copied
    */
   public void setAll(History history) {
@@ -96,8 +100,12 @@ public class History {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     History history = (History) o;
 

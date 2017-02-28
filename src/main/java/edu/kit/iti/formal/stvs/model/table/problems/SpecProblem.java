@@ -26,13 +26,18 @@ public abstract class SpecProblem extends Exception {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     SpecProblem that = (SpecProblem) o;
 
-    if (getErrorMessage() != null ? !getErrorMessage().equals(that.getErrorMessage()) : that.getErrorMessage() != null)
+    if (getErrorMessage() != null ? !getErrorMessage().equals(that.getErrorMessage()) : that.getErrorMessage() != null) {
       return false;
+    }
     return getLocation() != null ? getLocation().equals(that.getLocation()) : that.getLocation() == null;
   }
 

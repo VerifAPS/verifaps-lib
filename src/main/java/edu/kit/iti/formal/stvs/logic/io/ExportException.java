@@ -2,8 +2,9 @@ package edu.kit.iti.formal.stvs.logic.io;
 
 /**
  * Indicates that an exception occurred during exporting.
+ *
  * @author Benjamin Alt
-*/
+ */
 public class ExportException extends Exception {
   private String message;
   private Exception originalException;

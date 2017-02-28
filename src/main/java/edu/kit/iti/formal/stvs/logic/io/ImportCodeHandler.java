@@ -17,6 +17,7 @@ public interface ImportCodeHandler {
    * {@code ImportCodeHandler}. It is called if {@link Code}
    * is loaded.
    * <p>
+   *
    * @param code Code that was loaded
    */
   void accept(Code code);

@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 
 /**
  * An Interface for all Exporter-Classes.
+ *
  * @author Benjamin Alt
  */
 public interface Exporter<F> {

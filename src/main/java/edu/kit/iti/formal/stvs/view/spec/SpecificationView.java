@@ -42,7 +42,7 @@ public class SpecificationView extends VBox implements Lockable {
     variablesPane = new StackPane();
     tablePane = new StackPane();
     timingDiagramPane = new AnchorPane();
-    buttonBox = new  HBox();
+    buttonBox = new HBox();
     startVerificationButton = new Button();
     startConcretizerButton = new Button();
     setVerificationButtonPlay();

@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 /**
  * A row in a specification table (see {@link SpecificationTable}). The generic type parameter C
  * is the type of the cells.
+ *
  * @author Benjamin Alt
  */
 public class SpecificationRow<C> implements Commentable, Observable {
@@ -29,8 +30,9 @@ public class SpecificationRow<C> implements Commentable, Observable {
   /**
    * Create a row which is not observable. This is the case for rows in
    * {@link ConcreteSpecification}s and implemented via an empty extractor.
+   *
    * @param cells The cells of the unobservable row
-   * @param <E> The type of the cells in the unobservable row
+   * @param <E>   The type of the cells in the unobservable row
    * @return The created unobservable row
    */
   public static <E> SpecificationRow<E> createUnobservableRow(Map<String, E> cells) {
@@ -44,7 +46,8 @@ public class SpecificationRow<C> implements Commentable, Observable {
    * when cells are added or removed, but also when properties in the cells change). For more
    * information on extractors, see https://docs.oracle
    * .com/javase/8/javafx/api/javafx/collections/FXCollections.html.
-   * @param cells The initial cells of the row
+   *
+   * @param cells     The initial cells of the row
    * @param extractor The extractor to be used for deep observing on the cells
    */
   public SpecificationRow(Map<String, C> cells, Callback<C, Observable[]> extractor) {
@@ -59,12 +62,13 @@ public class SpecificationRow<C> implements Commentable, Observable {
     cells.values().forEach(this::subscribeToCell);
   }
 
-  private void listenRowInvalidation(Observable observable){
+  private void listenRowInvalidation(Observable observable) {
     listeners.forEach(listener -> listener.invalidated(observable));
   }
 
   /**
    * Called when cells were added or removed to this row.
+   *
    * @param change The change event
    */
   private void cellsMapChanged(MapChangeListener.Change<? extends String, ? extends C> change) {
@@ -79,6 +83,7 @@ public class SpecificationRow<C> implements Commentable, Observable {
 
   /**
    * Add an InvalidationListener to a certain cell.
+   *
    * @param c The cell to add a listener to
    */
   private void subscribeToCell(C c) {
@@ -89,6 +94,7 @@ public class SpecificationRow<C> implements Commentable, Observable {
 
   /**
    * Remove an InvalidationListener from a certain cell
+   *
    * @param cell The cell to remove the listener from
    */
   private void unsubscribeFromCell(C cell) {
@@ -97,7 +103,7 @@ public class SpecificationRow<C> implements Commentable, Observable {
     }
   }
 
-  public ObservableMap<String,C> getCells() {
+  public ObservableMap<String, C> getCells() {
     return cells;
   }
 
@@ -118,12 +124,18 @@ public class SpecificationRow<C> implements Commentable, Observable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof SpecificationRow)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof SpecificationRow)) {
+      return false;
+    }
 
     SpecificationRow<?> that = (SpecificationRow<?>) o;
 
-    if (!cells.equals(that.cells)) return false;
+    if (!cells.equals(that.cells)) {
+      return false;
+    }
     return comment != null ? comment.get().equals(that.comment.get()) : that.comment == null;
   }
 
@@ -154,7 +166,7 @@ public class SpecificationRow<C> implements Commentable, Observable {
     listeners.remove(listener);
   }
 
-  public Callback<C,Observable[]> getExtractor() {
+  public Callback<C, Observable[]> getExtractor() {
     return extractor;
   }
 }

@@ -6,8 +6,8 @@ import org.antlr.v4.runtime.Token;
  * Created by Lukas on 02.02.2017.
  *
  * @author Lukas Fritsch
- *
- *        Represents a syntax error in code
+ *         <p>
+ *         Represents a syntax error in code
  */
 public class SyntaxError {
   private int line;
