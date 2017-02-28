@@ -98,15 +98,15 @@ public class FreeVariable implements Variable {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
 
-    FreeVariable that = (FreeVariable) o;
+    FreeVariable that = (FreeVariable) obj;
 
     if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) {
       return false;

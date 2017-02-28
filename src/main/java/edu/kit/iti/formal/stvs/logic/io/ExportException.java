@@ -14,9 +14,9 @@ public class ExportException extends Exception {
     originalException = null;
   }
 
-  public ExportException(Exception e) {
-    originalException = e;
-    message = e.getMessage();
+  public ExportException(Exception exception) {
+    originalException = exception;
+    message = exception.getMessage();
   }
 
   public String getMessage() {

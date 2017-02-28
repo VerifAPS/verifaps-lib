@@ -62,16 +62,13 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 
   private Map<String, ValueEnum> computeEnumValuesByName(Collection<Type> typeSet) {
     Map<String, ValueEnum> byName = new HashMap<>();
-    typeSet.stream().map(this::filterEnumType).filter(Optional::isPresent).map(Optional::get) // Filter
-                                                                                              // only
-                                                                                              // the
-                                                                                              // TypeEnums
-                                                                                              // out
-                                                                                              // of
-                                                                                              // there
-        .forEach(typeEnum -> typeEnum.getValues().forEach(valueEnum -> // For every possible enum
-                                                                       // value
-    byName.put(valueEnum.getEnumValue(), valueEnum) // sort it in by name
+    typeSet.stream()
+        .map(this::filterEnumType)
+        .filter(Optional::isPresent)
+        .map(Optional::get) // Filter
+        .forEach(typeEnum -> typeEnum.getValues()
+            .forEach(valueEnum -> // For every possible enum value
+                byName.put(valueEnum.getEnumValue(), valueEnum) // sort it in by name
     ));
     return byName;
   }

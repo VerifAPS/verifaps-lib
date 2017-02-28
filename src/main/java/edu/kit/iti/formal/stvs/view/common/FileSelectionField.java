@@ -20,6 +20,9 @@ import javafx.stage.FileChooser;
 public class FileSelectionField extends HBox {
   private TextField textField;
 
+  /**
+   * Constructor.
+   */
   public FileSelectionField() {
     super();
     setSpacing(10);
@@ -29,7 +32,6 @@ public class FileSelectionField extends HBox {
     getChildren().add(textField);
     getChildren().add(fileSelectButton);
     fileSelectButton.setOnAction(this::onFileSelectButtonClicked);
-
   }
 
   private void onFileSelectButtonClicked(ActionEvent actionEvent) {

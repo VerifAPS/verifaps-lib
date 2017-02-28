@@ -24,15 +24,15 @@ public class FreeVariableList {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
 
-    FreeVariableList that = (FreeVariableList) o;
+    FreeVariableList that = (FreeVariableList) obj;
 
     return getVariables() != null ? getVariables().equals(that.getVariables())
         : that.getVariables() == null;
@@ -43,6 +43,11 @@ public class FreeVariableList {
     return getVariables() != null ? getVariables().hashCode() : 0;
   }
 
+  /**
+   * Copy constructor for deep copies of a {@link FreeVariableList}.
+   *
+   * @param freeVariableList the list to copy
+   */
   public FreeVariableList(FreeVariableList freeVariableList) {
     List<FreeVariable> clonedVariables = new ArrayList<>();
     for (FreeVariable freeVar : freeVariableList.getVariables()) {

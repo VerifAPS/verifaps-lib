@@ -19,7 +19,12 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 /**
- * Created by philipp on 09.02.17.
+ * <p>The validator for the effective model {@link FreeVariableList}. This class provides
+ * automatically updating properties for the formal model
+ * (see {@link #validFreeVariablesProperty()}) and for any
+ * problems encountered while validating (see {@link #problemsProperty()}).</p>
+ *
+ * <p>Created by philipp on 09.02.17.</p>
  *
  * @author Philipp
  */
@@ -32,8 +37,16 @@ public class FreeVariableListValidator {
   private final ObjectProperty<List<ValidFreeVariable>> validVars;
   private final BooleanProperty valid;
 
-
-  public FreeVariableListValidator(ObjectProperty<List<Type>> typeContext,
+  /**
+   * <p>Creates a validator with the given formal type context model for the effective
+   * free variable model.</p>
+   *
+   * @param typeContext the context for validating the free variables and generating the valid
+   *                    free variables
+   * @param freeVariables the free variables model to validate
+   */
+  public FreeVariableListValidator(
+      ObjectProperty<List<Type>> typeContext,
       FreeVariableList freeVariables) {
     this.typeContext = typeContext;
     this.freeVariables = freeVariables;
@@ -47,6 +60,10 @@ public class FreeVariableListValidator {
     revalidate();
   }
 
+  /**
+   * Starts the validation algorithm and updates the {@link #validFreeVariablesProperty()} and
+   * the {@link #problemsProperty()}.
+   */
   public void revalidate() {
     Map<String, Type> typesByName = typeContext.get().stream()
         .collect(Collectors.toMap(Type::getTypeName, Function.identity()));

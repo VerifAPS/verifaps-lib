@@ -130,10 +130,11 @@ public class ConstraintSpecificationValidator {
     for (SpecIoVariable specIoVariable : specification.getColumnHeaders()) {
       // Check column header for problem
       try {
-        ValidIoVariable validIoVariable = InvalidIoVarProblem.tryGetValidIoVariable(specIoVariable,
-            codeIoVariables.get(), typesByName, specProblems::add); // On non-fatal problems (like
-                                                                    // missing matching
-                                                                    // CodeIoVariable)
+        ValidIoVariable validIoVariable = InvalidIoVarProblem.tryGetValidIoVariable(
+            specIoVariable,
+            codeIoVariables.get(),
+            typesByName,
+            specProblems::add); // On non-fatal problems (like missing matching CodeIoVariable)
         variableTypes.put(validIoVariable.getName(), validIoVariable.getValidType());
         if (specificationIsValid) {
           validSpec.getColumnHeaders().add(validIoVariable);

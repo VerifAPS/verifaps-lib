@@ -43,9 +43,9 @@ public class EditorPaneController implements Controller {
   private ExecutorService executor;
 
   /**
-   * creates the controller for the editorpane
+   * <p>Creates the controller for the {@link EditorPane}.</p>
    *
-   * @param code the codefile which is to show
+   * @param code the code file to be shown
    * @param globalConfig the global configuration (for font size or style)
    */
   public EditorPaneController(Code code, GlobalConfig globalConfig) {
@@ -136,13 +136,18 @@ public class EditorPaneController implements Controller {
     List<SyntaxError> syntaxErrors = new ArrayList<>();
 
     // Short-circuit setting parsed code properties on code, since we're in another thread.
-    ParsedCode.parseCode(sourcecode, newTokens -> {
-      tokens.addAll(newTokens);
-      Platform.runLater(() -> code.tokensProperty().setAll(newTokens));
-    }, synErrs -> {
-      syntaxErrors.addAll(synErrs);
-      Platform.runLater(() -> code.syntaxErrorsProperty().setAll(synErrs));
-    }, parsedCode -> Platform.runLater(() -> code.parsedCodeProperty().set(parsedCode)));
+    ParsedCode.parseCode(
+        sourcecode,
+        newTokens -> {
+          tokens.addAll(newTokens);
+          Platform.runLater(() -> code.tokensProperty().setAll(newTokens));
+        },
+        synErrs -> {
+          syntaxErrors.addAll(synErrs);
+          Platform.runLater(() -> code.syntaxErrorsProperty().setAll(synErrs));
+        },
+        parsedCode ->
+            Platform.runLater(() -> code.parsedCodeProperty().set(parsedCode)));
 
     StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
 
@@ -152,10 +157,11 @@ public class EditorPaneController implements Controller {
     }
 
     tokens.forEach(token ->
-    // replaceAll is a work-around for a bug when ANTLR has a
-    // different character count than this CodeArea.
-    spansBuilder.add(getStyleClassesFor(token, syntaxErrors),
-        token.getText().replaceAll("\\r", "").length()));
+        // replaceAll is a work-around for a bug when ANTLR has a
+        // different character count than this CodeArea.
+        spansBuilder.add(
+            getStyleClassesFor(token, syntaxErrors),
+            token.getText().replaceAll("\\r", "").length()));
     return spansBuilder.create();
   }
 
