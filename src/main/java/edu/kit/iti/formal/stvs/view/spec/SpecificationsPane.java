@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
@@ -18,6 +19,8 @@ public class SpecificationsPane extends AnchorPane {
   public SpecificationsPane() {
     this.tabPane = new TabPane();
     this.addButton = new Button("+");
+    ViewUtils.setupId(this);
+
 
     AnchorPane.setTopAnchor(tabPane, 0.0);
     AnchorPane.setLeftAnchor(tabPane, 0.0);

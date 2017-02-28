@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -25,9 +26,8 @@ public class VerticalResizeContainerView extends AnchorPane {
     AnchorPane.setTopAnchor(container, 0.0);
     dragLine.widthProperty().bind(container.widthProperty());
     //AnchorPane.setBottomAnchor(dragLine, 0.0);
-    this.getStylesheets().add(
-        TimingDiagramView.class.getResource("resizeContainer.css").toExternalForm()
-    );
+    ViewUtils.setupView(this, "resizeContainer.css");
+
     this.getStyleClass().add("resizeContainer");
     dragLine.getStyleClass().add("dragLine");
   }

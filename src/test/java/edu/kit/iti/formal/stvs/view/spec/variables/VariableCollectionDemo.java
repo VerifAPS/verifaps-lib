@@ -7,6 +7,7 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import edu.kit.iti.formal.stvs.view.Demo;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -17,6 +18,9 @@ import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import org.junit.Test;
+import org.junit.experimental.categories.Categories;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +30,9 @@ import java.util.stream.Collectors;
 /**
  * Created by Philipp on 29.01.2017.
  */
-public class VariableCollectionTest {
+@RunWith(Categories.class)
+@Category(Demo.class)
+public class VariableCollectionDemo {
 
   @Test
   public void testVariableView() {

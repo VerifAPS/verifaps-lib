@@ -6,6 +6,7 @@ import edu.kit.iti.formal.stvs.model.table.problems.CellProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.model.table.problems.DurationProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -31,6 +32,7 @@ public class SpecificationTableCell extends TextFieldTableCell<HybridRow, String
 
     validator.problemsProperty().addListener(observable -> this.onProblemsChanged());
     getStyleClass().add("spec-cell");
+    ViewUtils.setupId(this);
     onProblemsChanged();
   }
 

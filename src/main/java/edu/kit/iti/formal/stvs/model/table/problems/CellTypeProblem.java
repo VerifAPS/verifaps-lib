@@ -9,10 +9,24 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import java.util.List;
 
 /**
+ * <p>An instance is created when an {@link Expression} in a {@link ConstraintCell} is ill-typed</p>
+ *
  * @author Benjamin Alt
  */
 public class CellTypeProblem extends CellProblem {
 
+  /**
+   * <p>Either the given expression is well-typed and evaluates to a boolean and is returned, or a
+   * {@link CellTypeProblem} is thrown.</p>
+   *
+   * @param typeChecker type checker for checking the type of this cell
+   * @param columnId the column of the expression to check
+   * @param row the row of the expression to check
+   * @param expr the expression to type-check for illness / not evaluating to boolean
+   * @return an expression that <strong>must</strong> evaluate to true
+   * @throws CellTypeProblem a problem if the expression does not evaluate to a boolean
+   *                         or is ill-typed
+   */
   public static Expression tryTypeCheckCellExpression(
       TypeChecker typeChecker, String columnId, int row, Expression expr)
       throws CellTypeProblem {
@@ -47,18 +61,18 @@ public class CellTypeProblem extends CellProblem {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
+    if (!super.equals(obj)) {
       return false;
     }
 
-    CellTypeProblem that = (CellTypeProblem) o;
+    CellTypeProblem that = (CellTypeProblem) obj;
 
     return exception != null ? exception.equals(that.exception) : that.exception == null;
   }

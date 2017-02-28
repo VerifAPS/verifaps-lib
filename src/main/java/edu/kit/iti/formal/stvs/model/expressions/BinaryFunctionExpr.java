@@ -76,10 +76,14 @@ public class BinaryFunctionExpr extends Expression {
     if (operation != that.operation) {
       return false;
     }
-    if (firstArgument != null ? !firstArgument.equals(that.firstArgument) : that.firstArgument != null) {
+    if (firstArgument != null
+        ? !firstArgument.equals(that.firstArgument)
+        : that.firstArgument != null) {
       return false;
     }
-    return secondArgument != null ? secondArgument.equals(that.secondArgument) : that.secondArgument == null;
+    return secondArgument != null
+        ? secondArgument.equals(that.secondArgument)
+        : that.secondArgument == null;
   }
 
   @Override

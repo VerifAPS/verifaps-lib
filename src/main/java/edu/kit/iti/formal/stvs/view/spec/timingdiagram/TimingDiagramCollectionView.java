@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
 
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -75,9 +76,7 @@ public class TimingDiagramCollectionView extends VBox {
     axisDiagramContainer.setDividerPosition(0, 0.1);
     scrollPane.getStyleClass().add("noborder-scroll-pane");
     labelContainer.getStyleClass().add("labelContainer");
-    this.getStylesheets().add(
-        TimingDiagramCollectionView.class.getResource("style.css").toExternalForm()
-    );
+    ViewUtils.setupView(this);
   }
 
   public VBox getDiagramContainer() {

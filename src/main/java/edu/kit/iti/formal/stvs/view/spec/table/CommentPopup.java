@@ -30,8 +30,10 @@ public class CommentPopup extends Dialog<String> implements Lockable {
     grid.setPadding(new Insets(20, 150, 10, 10));
     grid.add(commentField, 0, 0);
 
+
     this.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
     this.getDialogPane().setContent(grid);
+    this.getDialogPane().setId("CommentPopupPane");
 
 
   }

@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
+import edu.kit.iti.formal.stvs.view.Demo;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -9,11 +10,16 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.junit.Test;
+import org.junit.experimental.categories.Categories;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
 
 /**
  * Created by leonk on 10.02.2017.
  */
-public class VerticalResizeContainerControllerTest {
+@RunWith(Categories.class)
+@Category(Demo.class)
+public class VerticalResizeContainerControllerDemo {
 
   @Test
   public void javaFxTest() {

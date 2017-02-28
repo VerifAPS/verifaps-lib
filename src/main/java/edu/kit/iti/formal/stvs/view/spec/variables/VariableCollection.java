@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.view.spec.variables;
 
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
@@ -34,7 +35,7 @@ public class VariableCollection extends VBox {
     this.typeTableColumn = new TableColumn<>("Type");
     this.defaultValueTableColumn = new TableColumn<>("Default Value");
 
-    getStylesheets().add(VariableCollection.class.getResource("style.css").toExternalForm());
+    ViewUtils.setupView(this);
 
     nameTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
     typeTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));

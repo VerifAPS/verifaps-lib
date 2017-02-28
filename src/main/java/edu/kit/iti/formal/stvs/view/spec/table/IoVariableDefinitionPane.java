@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.model.common.IoVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
@@ -48,6 +49,7 @@ public class IoVariableDefinitionPane extends GridPane {
     add(categoryComboBox, 1, 0);
     add(nameTextField, 1, 1);
     add(typeTextField, 1, 2);
+    ViewUtils.setupId(this);
   }
 
   public void setFromIoVariable(IoVariable ioVariable) {

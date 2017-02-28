@@ -37,19 +37,28 @@ public class ViewUtils {
    * @param parent parent that should be setup
    */
   public static void setupView(Parent parent) {
+    setupView(parent, "style.css");
+  }
 
-    parent.getStylesheets().add(parent.getClass().getResource("style.css").toExternalForm());
+  /**
+   * adds the style sheet (located in the same package) to the given parent
+   * and sets the css-id for the parent
+   * @param parent parent that should be setup
+   * @param stylesheet stylesheet's name in the package
+   */
+  public static void setupView(Parent parent, String stylesheet) {
+    parent.getStylesheets().add(parent.getClass().getResource(stylesheet).toExternalForm());
 
     setupId(parent);
   }
+
+
 
   /**
    * sets the css-id for the parent.
    * @param parent parent that should be setup
    */
   public static void setupId(Parent parent) {
-
-
     parent.setId(parent.getClass().getSimpleName());
   }
 
