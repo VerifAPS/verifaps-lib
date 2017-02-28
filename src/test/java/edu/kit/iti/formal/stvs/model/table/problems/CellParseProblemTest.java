@@ -40,7 +40,7 @@ public class CellParseProblemTest {
     TypeChecker typeChecker = new TypeChecker(typeMap);
     ConstraintCell problematicCell = new ConstraintCell("3<<>4");
     try {
-      CellParseProblem.expressionOrProblemForCell(typeContext, typeChecker, "A", 4,
+      ConstraintSpecificationValidator.tryValidateCellExpression(typeContext, typeChecker, "A", 4,
           problematicCell);
     } catch (CellProblem p) {
       assertThat(p, instanceOf(CellParseProblem.class));
