@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.table.problems.ColumnProblem;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
@@ -33,6 +34,7 @@ public class ColumnHeader extends VBox {
     this.columnTypeLabel = new Label(specIoVariable.getType());
     this.typeOfLabel = new Label(" : ");
     this.problemTooltip = new Tooltip("");
+    ViewUtils.setupId(this);
 
     categoryLabel.textProperty().bind(Bindings.convert(specIoVariable.categoryProperty()));
     columnNameLabel.textProperty().bind(specIoVariable.nameProperty());

@@ -4,6 +4,7 @@ import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridRow;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableView;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionView;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollection;
@@ -57,6 +58,8 @@ public class SpecificationView extends VBox implements Lockable {
     splitPane.setDividerPosition(1, 0.5);
     this.getChildren().add(splitPane);
     splitPane.setPrefHeight(Integer.MAX_VALUE);
+    ViewUtils.setupId(this);
+
 
   }
 

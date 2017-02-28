@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.view.common;
 
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -21,6 +22,7 @@ public class FileSelectionField extends HBox {
   public FileSelectionField() {
     super();
     setSpacing(10);
+    ViewUtils.setupId(this);
     textField = new TextField();
     Button fileSelectButton = GlyphsDude.createIconButton(FontAwesomeIcon.FOLDER_OPEN);
     getChildren().add(textField);

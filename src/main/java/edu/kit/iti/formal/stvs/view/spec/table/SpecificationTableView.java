@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.table.HybridRow;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
@@ -16,13 +17,12 @@ public class SpecificationTableView extends VBox {
 
 
   public SpecificationTableView(Label header, TableView<HybridRow> tableView) {
-    this.getStylesheets().add(SpecificationTableController.class.getResource("style.css")
-        .toExternalForm());
-
     this.header = header;
     header.getStyleClass().add("spec-header");
     this.tableView = tableView;
     this.getChildren().addAll(header, tableView);
+    ViewUtils.setupView(this);
+
   }
 
   public SpecificationTableView(TableView<HybridRow> tableView) {

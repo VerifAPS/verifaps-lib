@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.view.common.FileSelectionField;
 import edu.kit.iti.formal.stvs.view.common.PositiveIntegerInputField;
 import javafx.geometry.Insets;
@@ -83,5 +84,7 @@ public class ConfigDialogPane extends DialogPane {
     grid.add(new Label("Maximum Number of Rollouts per Line"), 0, 11);
     grid.add(maxLineRollout, 1, 11);
     this.setContent(grid);
+    ViewUtils.setupId(this);
+
   }
 }

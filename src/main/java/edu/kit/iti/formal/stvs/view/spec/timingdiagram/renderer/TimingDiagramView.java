@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
 import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
@@ -58,10 +59,7 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
         durationLinesPane,
         dataPane
     );
-
-    this.getStylesheets().add(
-        TimingDiagramView.class.getResource("style.css").toExternalForm()
-    );
+    ViewUtils.setupView(this);
 
     ObservableList<Series<Number, A>> seriesObservableList = FXCollections.observableArrayList();
     setData(seriesObservableList);

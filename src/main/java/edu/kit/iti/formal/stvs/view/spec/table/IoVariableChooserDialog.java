@@ -47,6 +47,7 @@ public class IoVariableChooserDialog extends Dialog<SpecIoVariable> {
 
     getDialogPane().lookupButton(createButton).disableProperty()
         .bind(definitionPane.createDefinitionInvalidBinding(alreadyDefinedVariables));
+    getDialogPane().setId("IoVariableChooserDialogPane");
   }
 
   private ListCell<CodeIoVariable> createCellForListView(ListView<CodeIoVariable> codeIoVariableListView) {

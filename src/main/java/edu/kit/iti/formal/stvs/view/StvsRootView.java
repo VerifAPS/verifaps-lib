@@ -16,6 +16,7 @@ public class StvsRootView extends SplitPane {
   public StvsRootView(EditorPane editor, SpecificationsPane specifications) {
     this.editor = editor;
     this.specifications = specifications;
+    ViewUtils.setupId(this);
 
 
     this.getItems().addAll(editor, specifications);

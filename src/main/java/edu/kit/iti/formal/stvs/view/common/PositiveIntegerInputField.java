@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.common;
 
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -21,6 +22,7 @@ public class PositiveIntegerInputField extends TextField {
     valid = new SimpleBooleanProperty();
     valid.addListener(this::onValidStateChange);
     this.alignmentProperty().setValue(Pos.CENTER_RIGHT);
+    ViewUtils.setupId(this);
   }
 
   private void onValidStateChange(ObservableValue<?> observableValue, Boolean old, Boolean

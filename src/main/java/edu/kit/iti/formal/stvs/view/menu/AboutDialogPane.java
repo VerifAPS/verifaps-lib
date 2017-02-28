@@ -21,5 +21,6 @@ public class AboutDialogPane extends DialogPane {
         new Label("Version: 1.0"));
     this.setContent(content);
     this.getButtonTypes().addAll(ButtonType.CLOSE);
+    this.getContent().setId("AboutDialogPane");
   }
 }

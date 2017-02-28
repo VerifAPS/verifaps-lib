@@ -103,6 +103,8 @@ public class AlertFactory {
       System.err.println(expandableContent);
     }
 
+    alert.getDialogPane().setId("AlertDialogPane_" + type.toString());
+
     return alert;
   }
 }
