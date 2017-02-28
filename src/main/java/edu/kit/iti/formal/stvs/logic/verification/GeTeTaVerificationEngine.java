@@ -14,7 +14,11 @@ import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import javafx.application.Platform;
 import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 /**

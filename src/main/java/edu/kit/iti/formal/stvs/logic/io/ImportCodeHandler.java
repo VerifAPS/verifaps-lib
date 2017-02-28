@@ -1,10 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
 import edu.kit.iti.formal.stvs.model.code.Code;
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
-import edu.kit.iti.formal.stvs.model.config.History;
-
-import java.io.File;
 
 /**
  * An {@code ImportCodeHandler} is notified when {@link Code} is loaded by
