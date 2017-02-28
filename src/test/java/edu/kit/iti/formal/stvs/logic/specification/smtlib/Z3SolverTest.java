@@ -81,7 +81,7 @@ public class Z3SolverTest {
     SmtEncoder preprocessor = new SmtEncoder(maxDurations, spec, freeVariables);
     AtomicBoolean outputProcessed = new AtomicBoolean(false);
 
-    ProcessOutputAsyncTask processOutputAsyncTask = solver.concretizeSConstraint(preprocessor.getConstraint(),
+    ProcessOutputAsyncTask processOutputAsyncTask = solver.concretizeSmtModel(preprocessor.getConstraint(),
         spec.getColumnHeaders(), optionalSpec -> {
           ConcreteSpecification concreteSpecification = optionalSpec.get();
           assertNotNull(concreteSpecification);

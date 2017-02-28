@@ -12,23 +12,23 @@ import java.util.stream.Collectors;
  * Represents a S-Expression of form ( expr_1 expr_2 expr_3 ... expr_n)
  * @author Carsten Csiky
  */
-public class SList implements SExpr {
-  private List<SExpr> sexp;
+public class SList implements SExpression {
+  private List<SExpression> sexp;
 
   /**
    * Helper constructor.
    * @see SList#SList(List)
-   * @param sexp array of {@link SExpr}
+   * @param sexp array of {@link SExpression}
    */
-  public SList(SExpr ... sexp) {
+  public SList(SExpression... sexp) {
     this(Arrays.asList(sexp));
   }
 
   /**
-   * Creates an instance from a list of {@link SExpr}.
-   * @param sexp list of {@link SExpr}
+   * Creates an instance from a list of {@link SExpression}.
+   * @param sexp list of {@link SExpression}
    */
-  public SList(List<SExpr> sexp) {
+  public SList(List<SExpression> sexp) {
     this.sexp = sexp;
   }
 
@@ -45,11 +45,11 @@ public class SList implements SExpr {
    * Creates an empty SList.
    */
   public SList() {
-    this(new LinkedList<SExpr>());
+    this(new LinkedList<SExpression>());
   }
 
   public SList(String command) {
-    this(new LinkedList<SExpr>());
+    this(new LinkedList<SExpression>());
     addAll(command);
   }
 
@@ -59,7 +59,7 @@ public class SList implements SExpr {
    * @param command atomic command expression
    * @param sexp following expressions
    */
-  public SList(String command, SExpr ... sexp) {
+  public SList(String command, SExpression... sexp) {
     this();
     addAll(new SAtom(command));
     addAll(Arrays.asList(sexp));
@@ -75,12 +75,12 @@ public class SList implements SExpr {
     exp.forEach(this::addSexp);
   }
 
-  private static void addItemToSexp(Sexp exp, SExpr sitem) {
+  private static void addItemToSexp(Sexp exp, SExpression sitem) {
     exp.add(sitem.toSexpr());
   }
 
   private void addSexp(Sexp sitem) {
-    sexp.add(SExpr.fromSexp(sitem));
+    sexp.add(SExpression.fromSexp(sitem));
   }
 
   @Override
@@ -97,10 +97,10 @@ public class SList implements SExpr {
 
   @Override
   public String toText() {
-    return " ( " + getList().stream().map(SExpr::toText).collect(Collectors.joining(" ")) + " ) ";
+    return " ( " + getList().stream().map(SExpression::toText).collect(Collectors.joining(" ")) + " ) ";
   }
 
-  public SList addAll(SExpr ... sexp) {
+  public SList addAll(SExpression... sexp) {
     return  addAll(Arrays.asList(sexp));
   }
 
@@ -108,7 +108,7 @@ public class SList implements SExpr {
     return addAll(Arrays.stream(values).map(SAtom::new).collect(Collectors.toList()));
   }
 
-  public SList addAll(List<SExpr> exprs) {
+  public SList addAll(List<SExpression> exprs) {
     this.sexp.addAll(exprs);
     return this;
   }
@@ -117,7 +117,7 @@ public class SList implements SExpr {
     return addAll(values.stream().map(SAtom::new).collect(Collectors.toList()));
   }
 
-  public List<SExpr> getList() {
+  public List<SExpression> getList() {
     return this.sexp;
   }
 

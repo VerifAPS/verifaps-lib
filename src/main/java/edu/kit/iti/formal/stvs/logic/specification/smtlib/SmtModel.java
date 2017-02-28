@@ -5,7 +5,6 @@ import de.tudresden.inf.lat.jsexp.Sexp;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,9 +13,9 @@ import java.util.stream.Collectors;
  *
  * @author Carsten Csiky
  */
-public class SConstraint implements SExpr {
-  private final Set<SExpr> globalConstraints;
-  private final Set<SExpr> variableDefinitions;
+public class SmtModel implements SExpression {
+  private final Set<SExpression> globalConstraints;
+  private final Set<SExpression> variableDefinitions;
 
   /**
    * Creates an instance with preset definitions/constraints.
@@ -24,7 +23,7 @@ public class SConstraint implements SExpr {
    * @param globalConstraints   set of global constraints
    * @param variableDefinitions set of variable definitions
    */
-  public SConstraint(Set<SExpr> globalConstraints, Set<SExpr> variableDefinitions) {
+  public SmtModel(Set<SExpression> globalConstraints, Set<SExpression> variableDefinitions) {
     this.globalConstraints = globalConstraints;
     this.variableDefinitions = variableDefinitions;
   }
@@ -32,7 +31,7 @@ public class SConstraint implements SExpr {
   /**
    * Creates an instance with empty sets.
    */
-  public SConstraint() {
+  public SmtModel() {
     this.globalConstraints = new LinkedHashSet<>();
     this.variableDefinitions = new LinkedHashSet<>();
   }
@@ -43,7 +42,7 @@ public class SConstraint implements SExpr {
    * @param other object from which the constraints/definitions should be taken
    * @return this (now with added constraints/definitions)
    */
-  public SConstraint combine(SConstraint other) {
+  public SmtModel combine(SmtModel other) {
     addGlobalConstrains(other.getGlobalConstraints());
     addHeaderDefinitions(other.getVariableDefinitions());
     return this;
@@ -66,7 +65,7 @@ public class SConstraint implements SExpr {
    */
   public String headerToText() {
     return getVariableDefinitions().stream()
-        .map(SExpr::toText)
+        .map(SExpression::toText)
         .collect(Collectors.joining(" \n "));
   }
 
@@ -87,38 +86,38 @@ public class SConstraint implements SExpr {
     return headerToText() + " \n " + globalConstraintsToText();
   }
 
-  public SConstraint addGlobalConstrains(SExpr... globalConstraint) {
+  public SmtModel addGlobalConstrains(SExpression... globalConstraint) {
     return addGlobalConstrains(Arrays.asList(globalConstraint));
   }
 
-  public SConstraint addGlobalConstrains(Collection<SExpr> globalConstraints) {
+  public SmtModel addGlobalConstrains(Collection<SExpression> globalConstraints) {
     this.globalConstraints.addAll(globalConstraints);
     return this;
   }
 
-  public SConstraint addHeaderDefinitions(SExpr... variableDefinition) {
+  public SmtModel addHeaderDefinitions(SExpression... variableDefinition) {
     return addHeaderDefinitions(Arrays.asList(variableDefinition));
   }
 
-  public SConstraint addHeaderDefinitions(Collection<SExpr> variableDefinitions) {
+  public SmtModel addHeaderDefinitions(Collection<SExpression> variableDefinitions) {
     this.variableDefinitions.addAll(variableDefinitions);
     return this;
   }
 
-  public Set<SExpr> getGlobalConstraints() {
+  public Set<SExpression> getGlobalConstraints() {
     return globalConstraints;
   }
 
-  public Set<SExpr> getVariableDefinitions() {
+  public Set<SExpression> getVariableDefinitions() {
     return variableDefinitions;
   }
 
   @Override
   public String toString() {
-    return "SConstraint{\n"
-        + "\tglobalConstraints=\n\t\t" + globalConstraints.stream().map(SExpr::toString).collect(
+    return "SmtModel{\n"
+        + "\tglobalConstraints=\n\t\t" + globalConstraints.stream().map(SExpression::toString).collect(
             Collectors.joining("\n\t\t"))
-        + ",\n\n\tvariableDefinitions=\n\t\t" + variableDefinitions.stream().map(SExpr::toString)
+        + ",\n\n\tvariableDefinitions=\n\t\t" + variableDefinitions.stream().map(SExpression::toString)
         .collect(Collectors.joining("\n\t\t")) + "\n}";
   }
 
@@ -131,7 +130,7 @@ public class SConstraint implements SExpr {
       return false;
     }
 
-    SConstraint that = (SConstraint) o;
+    SmtModel that = (SmtModel) o;
 
     if (globalConstraints != null
         ? !globalConstraints.equals(that.globalConstraints)

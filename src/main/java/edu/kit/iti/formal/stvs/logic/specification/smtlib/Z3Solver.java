@@ -253,7 +253,7 @@ public class Z3Solver {
 
   /**
    * Concretizes {@code smtString} using Z3 in an {@link edu.kit.iti.formal.stvs.util.AsyncTask}.
-   * After the task has ended {@code handler} is called with a parsed {@link SExpr} (if present).
+   * After the task has ended {@code handler} is called with a parsed {@link SExpression} (if present).
    * Returns {@link ProcessOutputAsyncTask} to provide a possibility to terminate the Z3 process.
    *
    * @param smtString string to be solved
@@ -262,7 +262,7 @@ public class Z3Solver {
    */
   private ProcessOutputAsyncTask concretizeSExpr(
       String smtString,
-      Consumer<Optional<SExpr>> handler
+      Consumer<Optional<SExpression>> handler
   ) {
     return concretize(smtString, stringOptional ->
         handler.accept(optionalSolverOutputToSexp(stringOptional)));
@@ -289,39 +289,39 @@ public class Z3Solver {
   }
 
   /**
-   * This method first generates a {@code smtString} from {@link SConstraint} and adds commands
+   * This method first generates a {@code smtString} from {@link SmtModel} and adds commands
    * to tell Z3 to solve the model.
    *
-   * @param sconstraint      constraint hat holds all information to generate a smtString
+   * @param smtModel      constraint hat holds all information to generate a smtString
    * @param validIoVariables variables that might appear in the solver output
    * @param handler          handles the specification that represents the solver output
    * @return task that can be terminated
    * @see Z3Solver#concretizeSmtString(String, List, OptionalConcreteSpecificationHandler)
    */
-  public ProcessOutputAsyncTask concretizeSConstraint(
-      SConstraint sconstraint,
+  public ProcessOutputAsyncTask concretizeSmtModel(
+      SmtModel smtModel,
       List<ValidIoVariable> validIoVariables,
       OptionalConcreteSpecificationHandler handler
   ) {
-    String constraintString = sconstraint.globalConstraintsToText();
-    String headerString = sconstraint.headerToText();
+    String constraintString = smtModel.globalConstraintsToText();
+    String headerString = smtModel.headerToText();
     String commands = "(check-sat)\n(get-model)";
     String z3Input = headerString + "\n" + constraintString + "\n" + commands;
     return concretizeSmtString(z3Input, validIoVariables, handler);
   }
 
-  private Optional<SExpr> optionalSolverOutputToSexp(Optional<String> stringOptional) {
+  private Optional<SExpression> optionalSolverOutputToSexp(Optional<String> stringOptional) {
     if (stringOptional.isPresent() && stringOptional.get().startsWith("sat")) {
       String output = stringOptional.get();
       output = output.substring(output.indexOf('\n') + 1);
-      return (Optional.of(SExpr.fromString(output)));
+      return (Optional.of(SExpression.fromString(output)));
     }
     return Optional.empty();
   }
 
   private Optional<ConcreteSpecification> optionalSpecFromOptionalSExp(
       List<ValidIoVariable> validIoVariables,
-      Optional<SExpr> sexpOptional
+      Optional<SExpression> sexpOptional
   ) {
     if (sexpOptional.isPresent()) {
       return Optional.of(buildConcreteSpecFromSExp(sexpOptional.get().toSexpr(), validIoVariables));
