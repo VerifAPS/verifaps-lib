@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 /**
- * The runtime-representation for parsed, binary function expressions.
- * Examples are: +, -, =, AND, OR, etc. Anything that has two arguments.
+ * The runtime-representation for parsed, binary function expressions. Examples are: +, -, =, AND,
+ * OR, etc. Anything that has two arguments.
  *
  * @author Philipp
  */
@@ -10,24 +10,13 @@ public class BinaryFunctionExpr extends Expression {
 
   public enum Op {
     // (BOOL, BOOL) -> BOOL
-    AND,
-    OR,
-    XOR,
+    AND, OR, XOR,
     // (INT, INT) -> BOOL
-    GREATER_THAN,
-    GREATER_EQUALS,
-    LESS_THAN,
-    LESS_EQUALS,
+    GREATER_THAN, GREATER_EQUALS, LESS_THAN, LESS_EQUALS,
     // (a, a) -> BOOL
-    EQUALS,
-    NOT_EQUALS,
+    EQUALS, NOT_EQUALS,
     // (INT, INT) -> INT
-    PLUS,
-    MINUS,
-    MULTIPLICATION,
-    DIVISION,
-    MODULO,
-    POWER
+    PLUS, MINUS, MULTIPLICATION, DIVISION, MODULO, POWER
   }
 
   private final Op operation;
@@ -35,8 +24,8 @@ public class BinaryFunctionExpr extends Expression {
   private final Expression secondArgument;
 
   /**
-   * @param operation      the {@link Op} that this expression should do with its arguments.
-   * @param firstArgument  the first (or left) argument
+   * @param operation the {@link Op} that this expression should do with its arguments.
+   * @param firstArgument the first (or left) argument
    * @param secondArgument the second (or right) argument
    */
   public BinaryFunctionExpr(Op operation, Expression firstArgument, Expression secondArgument) {
@@ -76,13 +65,11 @@ public class BinaryFunctionExpr extends Expression {
     if (operation != that.operation) {
       return false;
     }
-    if (firstArgument != null
-        ? !firstArgument.equals(that.firstArgument)
+    if (firstArgument != null ? !firstArgument.equals(that.firstArgument)
         : that.firstArgument != null) {
       return false;
     }
-    return secondArgument != null
-        ? secondArgument.equals(that.secondArgument)
+    return secondArgument != null ? secondArgument.equals(that.secondArgument)
         : that.secondArgument == null;
   }
 

@@ -5,14 +5,15 @@ import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
+
+import java.util.stream.Collectors;
+import javax.xml.bind.JAXBElement;
+
 import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBElement;
-import java.util.stream.Collectors;
-
 /**
- * This class provides the functionality to export
- * {@link ConcreteSpecification ConcreteSpecifications} to xml nodes.
+ * This class provides the functionality to export {@link ConcreteSpecification
+ * ConcreteSpecifications} to xml nodes.
  *
  * @author Benjamin Alt
  */
@@ -26,8 +27,9 @@ public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> 
    */
   public XmlConcreteSpecExporter() {
     objectFactory = new ObjectFactory();
-    //TODO: I can't get my head around why this should be here but removing it breaks the static variable in
-    //XmlConstraintSpecExporter. There is something fishy here. I will investigate this later.
+    // TODO: I can't get my head around why this should be here but removing it breaks the static
+    // variable in
+    // XmlConstraintSpecExporter. There is something fishy here. I will investigate this later.
     constraintSpecExporter = new XmlConstraintSpecExporter();
   }
 

@@ -4,13 +4,15 @@ import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import javax.xml.bind.JAXBException;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
 
 /**
  * Contains information about recently opened code and spec files.
@@ -65,8 +67,8 @@ public class History {
   }
 
   public static History autoloadHistory() {
-    File historyFile = new File(GlobalConfig.CONFIG_DIRPATH + File.separator +
-        AUTOLOAD_HISTORY_FILENAME);
+    File historyFile =
+        new File(GlobalConfig.CONFIG_DIRPATH + File.separator + AUTOLOAD_HISTORY_FILENAME);
     try {
       return ImporterFacade.importHistory(historyFile, ImporterFacade.ImportFormat.XML);
     } catch (JAXBException | ImportException e) {
@@ -80,15 +82,15 @@ public class History {
     if (!configDir.isDirectory() || !configDir.exists()) {
       configDir.mkdirs();
     }
-    File historyFile = new File(GlobalConfig.CONFIG_DIRPATH + File.separator +
-        AUTOLOAD_HISTORY_FILENAME);
+    File historyFile =
+        new File(GlobalConfig.CONFIG_DIRPATH + File.separator + AUTOLOAD_HISTORY_FILENAME);
     ExporterFacade.exportHistory(this, ExporterFacade.ExportFormat.XML, historyFile);
   }
 
   /**
-   * Replaces the contents of this history instance with those of a given history.
-   * Preferred over a copy constructor because this method keeps listeners registered on the
-   * properties, which will be notified about the changes.
+   * Replaces the contents of this history instance with those of a given history. Preferred over a
+   * copy constructor because this method keeps listeners registered on the properties, which will
+   * be notified about the changes.
    *
    * @param history The history the contents of which will be copied
    */
@@ -109,7 +111,8 @@ public class History {
 
     History history = (History) o;
 
-    return getFilenames() != null ? getFilenames().equals(history.getFilenames()) : history.getFilenames() == null;
+    return getFilenames() != null ? getFilenames().equals(history.getFilenames())
+        : history.getFilenames() == null;
   }
 
   @Override

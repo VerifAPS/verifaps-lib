@@ -3,12 +3,18 @@ package edu.kit.iti.formal.stvs.model.config;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
-import javafx.beans.property.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
  * Contains global configuration specified by the user
@@ -18,8 +24,8 @@ import java.util.List;
 public class GlobalConfig {
 
   protected static final String AUTOLOAD_CONFIG_FILENAME = "stvs-config.xml";
-  public static final String CONFIG_DIRPATH = System.getProperty("user.home") + File.separator +
-      ".config";
+  public static final String CONFIG_DIRPATH =
+      System.getProperty("user.home") + File.separator + ".config";
   private List<String> validLanguages = Arrays.asList("EN");
 
   // General
@@ -57,7 +63,8 @@ public class GlobalConfig {
     uiLanguage = new SimpleStringProperty("EN");
     nuxmvFilename = new SimpleStringProperty("[Path to NuXmv Executable]");
     z3Path = new SimpleStringProperty("[Path to Z3 Executable]");
-    getetaCommand = new SimpleStringProperty("java -jar /path/to/geteta.jar -c ${code} -t ${spec} -x");
+    getetaCommand =
+        new SimpleStringProperty("java -jar /path/to/geteta.jar -c ${code} -t ${spec} -x");
   }
 
   public static GlobalConfig autoloadConfig() {
@@ -344,8 +351,8 @@ public class GlobalConfig {
   }
 
   /**
-   * Tests whether two GlobalConfigs are equal. Ignores listeners registered on the properties
-   * (i.e. considers only property contents).
+   * Tests whether two GlobalConfigs are equal. Ignores listeners registered on the properties (i.e.
+   * considers only property contents).
    *
    * @param o The Object to be tested for equality
    * @return Whether this instance and o are equal
@@ -361,7 +368,8 @@ public class GlobalConfig {
 
     GlobalConfig that = (GlobalConfig) o;
 
-    if (getValidLanguages() != null ? !getValidLanguages().equals(that.getValidLanguages()) : that.getValidLanguages() != null) {
+    if (getValidLanguages() != null ? !getValidLanguages().equals(that.getValidLanguages())
+        : that.getValidLanguages() != null) {
       return false;
     }
     if (!(getVerificationTimeout() == that.getVerificationTimeout())) {
@@ -379,7 +387,8 @@ public class GlobalConfig {
     if (!(getWindowWidth() == that.getWindowWidth())) {
       return false;
     }
-    if (getUiLanguage() != null ? !getUiLanguage().equals(that.getUiLanguage()) : that.getUiLanguage() != null) {
+    if (getUiLanguage() != null ? !getUiLanguage().equals(that.getUiLanguage())
+        : that.getUiLanguage() != null) {
       return false;
     }
     if (!(getMaxLineRollout() == that.getMaxLineRollout())) {
@@ -388,19 +397,22 @@ public class GlobalConfig {
     if (!(getEditorFontSize() == that.getEditorFontSize())) {
       return false;
     }
-    if (getEditorFontFamily() != null ? !getEditorFontFamily().equals(that.getEditorFontFamily()) : that.getEditorFontFamily() != null) {
+    if (getEditorFontFamily() != null ? !getEditorFontFamily().equals(that.getEditorFontFamily())
+        : that.getEditorFontFamily() != null) {
       return false;
     }
     if (!(isShowLineNumbers() == that.isShowLineNumbers())) {
       return false;
     }
-    if (getNuxmvFilename() != null ? !getNuxmvFilename().equals(that.getNuxmvFilename()) : that.getNuxmvFilename() != null) {
+    if (getNuxmvFilename() != null ? !getNuxmvFilename().equals(that.getNuxmvFilename())
+        : that.getNuxmvFilename() != null) {
       return false;
     }
     if (getZ3Path() != null ? !getZ3Path().equals(that.getZ3Path()) : that.getZ3Path() != null) {
       return false;
     }
-    return getGetetaCommand() != null ? getGetetaCommand().equals(that.getGetetaCommand()) : that.getGetetaCommand() == null;
+    return getGetetaCommand() != null ? getGetetaCommand().equals(that.getGetetaCommand())
+        : that.getGetetaCommand() == null;
   }
 
   @Override

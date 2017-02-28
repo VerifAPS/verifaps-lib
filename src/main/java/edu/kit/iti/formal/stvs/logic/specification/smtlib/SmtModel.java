@@ -20,7 +20,7 @@ public class SmtModel implements SExpression {
   /**
    * Creates an instance with preset definitions/constraints.
    *
-   * @param globalConstraints   set of global constraints
+   * @param globalConstraints set of global constraints
    * @param variableDefinitions set of variable definitions
    */
   public SmtModel(Set<SExpression> globalConstraints, Set<SExpression> variableDefinitions) {
@@ -64,8 +64,7 @@ public class SmtModel implements SExpression {
    * @return definitions as string
    */
   public String headerToText() {
-    return getVariableDefinitions().stream()
-        .map(SExpression::toText)
+    return getVariableDefinitions().stream().map(SExpression::toText)
         .collect(Collectors.joining(" \n "));
   }
 
@@ -75,10 +74,8 @@ public class SmtModel implements SExpression {
    * @return constraints as string
    */
   public String globalConstraintsToText() {
-    return getGlobalConstraints().stream()
-        .map(constr -> new SList("assert", constr))
-        .map(SList::toText)
-        .collect(Collectors.joining(" \n "));
+    return getGlobalConstraints().stream().map(constr -> new SList("assert", constr))
+        .map(SList::toText).collect(Collectors.joining(" \n "));
   }
 
   @Override
@@ -114,13 +111,12 @@ public class SmtModel implements SExpression {
 
   @Override
   public String toString() {
-    return "SmtModel{\n"
-        + "\tglobalConstraints=\n\t\t" + globalConstraints.stream()
-        .map(SExpression::toString).collect(
-        Collectors.joining("\n\t\t"))
+    return "SmtModel{\n" + "\tglobalConstraints=\n\t\t"
+        + globalConstraints.stream().map(SExpression::toString)
+            .collect(Collectors.joining("\n\t\t"))
         + ",\n\n\tvariableDefinitions=\n\t\t" + variableDefinitions.stream()
-        .map(SExpression::toString)
-        .collect(Collectors.joining("\n\t\t")) + "\n}";
+            .map(SExpression::toString).collect(Collectors.joining("\n\t\t"))
+        + "\n}";
   }
 
   @Override
@@ -134,13 +130,11 @@ public class SmtModel implements SExpression {
 
     SmtModel that = (SmtModel) o;
 
-    if (globalConstraints != null
-        ? !globalConstraints.equals(that.globalConstraints)
+    if (globalConstraints != null ? !globalConstraints.equals(that.globalConstraints)
         : that.globalConstraints != null) {
       return false;
     }
-    return variableDefinitions != null
-        ? variableDefinitions.equals(that.variableDefinitions)
+    return variableDefinitions != null ? variableDefinitions.equals(that.variableDefinitions)
         : that.variableDefinitions == null;
   }
 

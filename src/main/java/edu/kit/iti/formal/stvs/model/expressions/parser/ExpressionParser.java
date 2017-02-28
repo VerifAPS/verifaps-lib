@@ -1,15 +1,34 @@
 package edu.kit.iti.formal.stvs.model.expressions.parser;
 
-import edu.kit.iti.formal.stvs.model.expressions.*;
-import org.antlr.v4.runtime.*;
+import edu.kit.iti.formal.stvs.model.expressions.BinaryFunctionExpr;
+import edu.kit.iti.formal.stvs.model.expressions.Expression;
+import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
+import edu.kit.iti.formal.stvs.model.expressions.UnaryFunctionExpr;
+import edu.kit.iti.formal.stvs.model.expressions.Value;
+import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
+import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
+import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
+import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.util.*;
-
 /**
- * This class parses Expressions using the ANTLR parser generator library.
- * The resulting Expression format is an {@link Expression}.
+ * This class parses Expressions using the ANTLR parser generator library. The resulting Expression
+ * format is an {@link Expression}.
  *
  * @author Philipp
  */
@@ -20,11 +39,9 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   private Map<String, ValueEnum> enumValues;
 
   /**
-   * Creates an Expression parser without a type context.
-   * That means this parser can't parse enums.
+   * Creates an Expression parser without a type context. That means this parser can't parse enums.
    *
-   * @param columnName name of this column's IoVariable for
-   *                   parsing single-sided expressions.
+   * @param columnName name of this column's IoVariable for parsing single-sided expressions.
    */
   public ExpressionParser(String columnName) {
     this.columnName = columnName;
@@ -33,11 +50,9 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   }
 
   /**
-   * @param columnName  name of this column's IoVariable for
-   *                    parsing single-sided expressions.
-   * @param typeContext available types for figuring out whether
-   *                    an occuring string in an expression is
-   *                    an enum-literal.
+   * @param columnName name of this column's IoVariable for parsing single-sided expressions.
+   * @param typeContext available types for figuring out whether an occuring string in an expression
+   *        is an enum-literal.
    */
   public ExpressionParser(String columnName, Collection<Type> typeContext) {
     this.columnName = columnName;
@@ -47,32 +62,36 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 
   private Map<String, ValueEnum> computeEnumValuesByName(Collection<Type> typeSet) {
     Map<String, ValueEnum> byName = new HashMap<>();
-    typeSet.stream()
-        .map(this::filterEnumType)
-        .filter(Optional::isPresent)
-        .map(Optional::get) // Filter only the TypeEnums out of there
-        .forEach(typeEnum ->
-            typeEnum.getValues().forEach(valueEnum -> // For every possible enum value
-                byName.put(valueEnum.getEnumValue(), valueEnum) // sort it in by name
-            ));
+    typeSet.stream().map(this::filterEnumType).filter(Optional::isPresent).map(Optional::get) // Filter
+                                                                                              // only
+                                                                                              // the
+                                                                                              // TypeEnums
+                                                                                              // out
+                                                                                              // of
+                                                                                              // there
+        .forEach(typeEnum -> typeEnum.getValues().forEach(valueEnum -> // For every possible enum
+                                                                       // value
+    byName.put(valueEnum.getEnumValue(), valueEnum) // sort it in by name
+    ));
     return byName;
   }
 
   private Optional<TypeEnum> filterEnumType(Type type) {
-    return type.match(
-        Optional::empty, // If its a TypeInt
+    return type.match(Optional::empty, // If its a TypeInt
         Optional::empty, // If its a TypeBool
-        Optional::of     // If its a TypeEnum
+        Optional::of // If its a TypeEnum
     );
   }
 
   /**
    * @param expressionAsString the String to interpret as cell-expression
-   * @return the expression covering the semantics of the given string interpreted as cell-expression.
-   * @throws ParseException                 When parsing could not be successful
+   * @return the expression covering the semantics of the given string interpreted as
+   *         cell-expression.
+   * @throws ParseException When parsing could not be successful
    * @throws UnsupportedExpressionException When unsupported grammar features are reached
    */
-  public Expression parseExpression(String expressionAsString) throws ParseException, UnsupportedExpressionException {
+  public Expression parseExpression(String expressionAsString)
+      throws ParseException, UnsupportedExpressionException {
     CharStream charStream = new ANTLRInputStream(expressionAsString);
     CellExpressionLexer lexer = new CellExpressionLexer(charStream);
     TokenStream tokens = new CommonTokenStream(lexer);
@@ -108,10 +127,9 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 
   @Override
   public Expression visitCell(CellExpressionParser.CellContext ctx) {
-    Optional<Expression> optionalExpression = ctx.chunk().stream()
-        .map(chunkContext -> chunkContext.accept(this))
-        .reduce((e1, e2) ->
-            new BinaryFunctionExpr(BinaryFunctionExpr.Op.AND, e1, e2));
+    Optional<Expression> optionalExpression =
+        ctx.chunk().stream().map(chunkContext -> chunkContext.accept(this))
+            .reduce((e1, e2) -> new BinaryFunctionExpr(BinaryFunctionExpr.Op.AND, e1, e2));
     // We can always .get() this value, since the grammar enforces
     // that at least one chunk exists in a cell.
     return optionalExpression.get();
@@ -149,9 +167,9 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   // A seemingly arbitrary string in a CellExpression can either be an Enum value or a variable...
   private Expression parseOccuringString(CellExpressionParser.VariableContext ctx) {
     return parseArrayIndex(ctx).map(index ->
-        // If it has an index to it, like A[-2], its a variable for sure
-        // (indices don't make sense for enums!)
-        (Expression) new VariableExpr(parseIdentifier(ctx), index)) // really java? really?
+    // If it has an index to it, like A[-2], its a variable for sure
+    // (indices don't make sense for enums!)
+    (Expression) new VariableExpr(parseIdentifier(ctx), index)) // really java? really?
         // Otherwise we still have to find out
         .orElse(maybeParseEnum(ctx));
   }
@@ -169,8 +187,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   }
 
   private Optional<Integer> parseArrayIndex(CellExpressionParser.VariableContext ctx) {
-    return Optional.ofNullable(ctx.INTEGER())
-        .map(ExpressionParser::getArrayIndex);
+    return Optional.ofNullable(ctx.INTEGER()).map(ExpressionParser::getArrayIndex);
   }
 
   private static Integer getArrayIndex(TerminalNode node) {
@@ -189,9 +206,8 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
     // I have to trust ANTLR to not have any other values here... :/
     switch (ctx.a.getType()) {
       case CellExpressionLexer.INTEGER:
-        ParseException tooLongExpression = new ParseException(
-            ctx.a.getLine(), ctx.a.getCharPositionInLine(),
-            "Integer value is too big: " + ctx.a.getText());
+        ParseException tooLongExpression = new ParseException(ctx.a.getLine(),
+            ctx.a.getCharPositionInLine(), "Integer value is too big: " + ctx.a.getText());
         try {
           int parsedInt = (int) Short.parseShort(ctx.getText());
           return new ValueInt(parsedInt);
@@ -247,8 +263,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
       default:
         throw new ParseRuntimeException(
             new ParseException(token.getLine(), token.getCharPositionInLine(),
-                "Unsupported singlesided operation: \"" + token.getType() + "\"")
-        );
+                "Unsupported singlesided operation: \"" + token.getType() + "\""));
     }
   }
 
@@ -339,10 +354,10 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
 
   // Transforms: variable "X", lower "-5", upper "1+2" into "x >= -5 && x <= 1+2" as expression
   private Expression makeInterval(Expression variable, Expression lower, Expression upper) {
-    Expression greaterThanLower = new BinaryFunctionExpr(
-        BinaryFunctionExpr.Op.GREATER_EQUALS, variable, lower);
-    Expression smallerThanUpper = new BinaryFunctionExpr(
-        BinaryFunctionExpr.Op.LESS_EQUALS, variable, upper);
+    Expression greaterThanLower =
+        new BinaryFunctionExpr(BinaryFunctionExpr.Op.GREATER_EQUALS, variable, lower);
+    Expression smallerThanUpper =
+        new BinaryFunctionExpr(BinaryFunctionExpr.Op.LESS_EQUALS, variable, upper);
 
     return new BinaryFunctionExpr(BinaryFunctionExpr.Op.AND, greaterThanLower, smallerThanUpper);
   }

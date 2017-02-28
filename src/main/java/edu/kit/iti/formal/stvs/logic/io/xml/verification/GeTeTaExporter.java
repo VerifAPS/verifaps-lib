@@ -18,10 +18,11 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
-import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBElement;
 import java.util.List;
+import javax.xml.bind.JAXBElement;
+
+import org.w3c.dom.Node;
 
 
 /**
@@ -76,8 +77,8 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
   }
 
   /**
-   * Creates {@link Variables} from the {@link FreeVariable FreeVariables}
-   * present in the given {@link ConstraintSpecification}.
+   * Creates {@link Variables} from the {@link FreeVariable FreeVariables} present in the given
+   * {@link ConstraintSpecification}.
    *
    * @param source The specification from which the variables should be taken
    * @return Variables object
@@ -99,8 +100,8 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
   }
 
   /**
-   * Creates {@link Variables} from the {@link SpecIoVariable} present
-   * in the given {@link ConstraintSpecification}.
+   * Creates {@link Variables} from the {@link SpecIoVariable} present in the given
+   * {@link ConstraintSpecification}.
    *
    * @param source The specification from which the variables should be taken
    * @return Variables object
@@ -138,8 +139,8 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
   }
 
   /**
-   * Converts a given {@link ConstraintSpecification} into a XML node
-   * that is compatible with the GeTeTa verification engine.
+   * Converts a given {@link ConstraintSpecification} into a XML node that is compatible with the
+   * GeTeTa verification engine.
    *
    * @param source The specification that shoul be converted
    * @return XML Node representing the specification

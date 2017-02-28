@@ -9,10 +9,9 @@ import java.util.regex.Pattern;
 /**
  * runtime-representation for variables in {@link Expression}s.
  * <p>
- * <p>At this point it is not known, whether this is a reference to a
- * {@link FreeVariable}
- * or an {@link IoVariable}, it
- * is simply the String name of either of those.
+ * <p>
+ * At this point it is not known, whether this is a reference to a {@link FreeVariable} or an
+ * {@link IoVariable}, it is simply the String name of either of those.
  *
  * @author Philipp
  */
@@ -27,8 +26,8 @@ public class VariableExpr extends Expression {
    * Constructs a new VariableExpr with a backwards reference.
    *
    * @param varName the name as a reference to a variable
-   * @param index   the index of the backwards-reference
-   *                (for expressions like <tt>A[-1]</tt> for example)
+   * @param index the index of the backwards-reference (for expressions like <tt>A[-1]</tt> for
+   *        example)
    */
   public VariableExpr(String varName, int index) {
     this.varName = varName;

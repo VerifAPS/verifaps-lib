@@ -8,16 +8,16 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
-import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.util.stream.Collectors;
+import javax.xml.bind.JAXBElement;
+
+import org.w3c.dom.Node;
 
 /**
- * This class provides the functionality to export
- * {@link ConstraintSpecification ConstraintSpecifications}
- * to xml nodes.
+ * This class provides the functionality to export {@link ConstraintSpecification
+ * ConstraintSpecifications} to xml nodes.
  *
  * @author Benjamin Alt
  */

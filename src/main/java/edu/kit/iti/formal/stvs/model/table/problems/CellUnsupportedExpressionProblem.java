@@ -13,7 +13,8 @@ public class CellUnsupportedExpressionProblem extends CellProblem {
     return exception.getMessage();
   }
 
-  public CellUnsupportedExpressionProblem(UnsupportedExpressionException exception, String column, int row) {
+  public CellUnsupportedExpressionProblem(UnsupportedExpressionException exception, String column,
+      int row) {
     super(createErrorMessage(exception), column, row);
     this.exception = exception;
   }

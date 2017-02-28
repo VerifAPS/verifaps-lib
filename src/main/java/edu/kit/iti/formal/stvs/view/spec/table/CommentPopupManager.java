@@ -2,11 +2,12 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.Commentable;
+
+import java.util.Optional;
+
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-
-import java.util.Optional;
 
 /**
  * @author Carsten Csiky

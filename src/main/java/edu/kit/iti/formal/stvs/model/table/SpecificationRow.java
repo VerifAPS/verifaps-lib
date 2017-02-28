@@ -1,5 +1,10 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
@@ -9,14 +14,9 @@ import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.util.Callback;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 /**
- * A row in a specification table (see {@link SpecificationTable}). The generic type parameter C
- * is the type of the cells.
+ * A row in a specification table (see {@link SpecificationTable}). The generic type parameter C is
+ * the type of the cells.
  *
  * @author Benjamin Alt
  */
@@ -32,7 +32,7 @@ public class SpecificationRow<C> implements Commentable, Observable {
    * {@link ConcreteSpecification}s and implemented via an empty extractor.
    *
    * @param cells The cells of the unobservable row
-   * @param <E>   The type of the cells in the unobservable row
+   * @param <E> The type of the cells in the unobservable row
    * @return The created unobservable row
    */
   public static <E> SpecificationRow<E> createUnobservableRow(Map<String, E> cells) {
@@ -41,13 +41,13 @@ public class SpecificationRow<C> implements Commentable, Observable {
 
   /**
    * Create a SpecificationRow from a given number of cells and an extractor. The extractor is
-   * required for "deep observing", i.e. the registering of change listeners on the contents of
-   * an observable collection (here, the collection of cells - to fire change events not only
-   * when cells are added or removed, but also when properties in the cells change). For more
-   * information on extractors, see https://docs.oracle
+   * required for "deep observing", i.e. the registering of change listeners on the contents of an
+   * observable collection (here, the collection of cells - to fire change events not only when
+   * cells are added or removed, but also when properties in the cells change). For more information
+   * on extractors, see https://docs.oracle
    * .com/javase/8/javafx/api/javafx/collections/FXCollections.html.
    *
-   * @param cells     The initial cells of the row
+   * @param cells The initial cells of the row
    * @param extractor The extractor to be used for deep observing on the cells
    */
   public SpecificationRow(Map<String, C> cells, Callback<C, Observable[]> extractor) {
@@ -149,10 +149,8 @@ public class SpecificationRow<C> implements Commentable, Observable {
   }
 
   public String toString() {
-    String map =
-        String.join(", ",
-            cells.entrySet().stream().map(entry ->
-                entry.getKey() + ": " + entry.getValue()).collect(Collectors.toList()));
+    String map = String.join(", ", cells.entrySet().stream()
+        .map(entry -> entry.getKey() + ": " + entry.getValue()).collect(Collectors.toList()));
     return "SpecificationRow(comment: " + getComment() + ", " + map + ")";
   }
 

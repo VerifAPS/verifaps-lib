@@ -6,6 +6,9 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.menu.StvsMenuBarController;
+
+import java.io.IOException;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -17,7 +20,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import javax.xml.bind.JAXBException;
-import java.io.IOException;
 
 /**
  * Created by csicar on 09.01.17.
@@ -45,7 +47,8 @@ public class StvsMainScene {
 
     rootModelProperty.addListener(this::rootModelChanged);
 
-    this.scene = new Scene(createVBox(), rootModel.getGlobalConfig().getWindowWidth(), rootModel.getGlobalConfig().getWindowHeight());
+    this.scene = new Scene(createVBox(), rootModel.getGlobalConfig().getWindowWidth(),
+        rootModel.getGlobalConfig().getWindowHeight());
 
     rootModel.getGlobalConfig().windowWidthProperty().bind(scene.widthProperty());
     rootModel.getGlobalConfig().windowHeightProperty().bind(scene.heightProperty());
@@ -59,10 +62,8 @@ public class StvsMainScene {
     return vBox;
   }
 
-  private void rootModelChanged(
-      ObservableValue<? extends StvsRootModel> obs,
-      StvsRootModel oldModel,
-      StvsRootModel rootModel) {
+  private void rootModelChanged(ObservableValue<? extends StvsRootModel> obs,
+      StvsRootModel oldModel, StvsRootModel rootModel) {
     this.rootController = new StvsRootController(rootModel);
     scene.setRoot(createVBox());
   }
@@ -87,8 +88,9 @@ public class StvsMainScene {
         stvsRootModel.getHistory().autosaveHistory();
         stvsRootModel.autosaveSession();
       } catch (IOException | ExportException | JAXBException e) {
-        AlertFactory.createAlert(Alert.AlertType.ERROR, "Autosave error", "Error saving the current" +
-            " configuration", "The current configuration could not be saved.", e.getMessage());
+        AlertFactory.createAlert(Alert.AlertType.ERROR, "Autosave error",
+            "Error saving the current" + " configuration",
+            "The current configuration could not be saved.", e.getMessage());
       }
     }
   }

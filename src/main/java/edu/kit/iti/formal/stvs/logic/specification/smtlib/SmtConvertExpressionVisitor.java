@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Carsten Csiky
  */
 public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpression> {
-  //static maps
+  // static maps
 
   private static Map<UnaryFunctionExpr.Op, String> smtlibUnaryOperationNames =
       new HashMap<UnaryFunctionExpr.Op, String>() {
@@ -29,8 +29,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpressio
         }
       };
   private static Map<BinaryFunctionExpr.Op, String> smtlibBinOperationNames =
-      new HashMap<BinaryFunctionExpr
-          .Op, String>() {
+      new HashMap<BinaryFunctionExpr.Op, String>() {
         {
           put(BinaryFunctionExpr.Op.AND, "and");
           put(BinaryFunctionExpr.Op.OR, "or");
@@ -58,14 +57,14 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpressio
   /**
    * Creates a visitor to convert an expression to a set of constraints.
    *
-   * @param smtEncoder encoder that holds additional information
-   *                   about the expression that should be parsed
-   * @param row        row, that holds the cell the visitor should convert
-   * @param iteration  current iteration
-   * @param column     column, that holds the cell the visitor should convert
+   * @param smtEncoder encoder that holds additional information about the expression that should be
+   *        parsed
+   * @param row row, that holds the cell the visitor should convert
+   * @param iteration current iteration
+   * @param column column, that holds the cell the visitor should convert
    */
-  public SmtConvertExpressionVisitor(SmtEncoder smtEncoder, int row, int
-      iteration, ValidIoVariable column) {
+  public SmtConvertExpressionVisitor(SmtEncoder smtEncoder, int row, int iteration,
+      ValidIoVariable column) {
     this.smtEncoder = smtEncoder;
     this.row = row;
     this.iteration = iteration;
@@ -73,34 +72,24 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpressio
 
     String name = "|" + column.getName() + "_" + row + "_" + iteration + "|";
 
-    this.constraint = new SmtModel().addHeaderDefinitions(
-        new SList(
-            "declare-const",
-            name,
-            SmtEncoder.getSmtLibVariableTypeName(column.getValidType())
-        )
-    );
+    this.constraint = new SmtModel().addHeaderDefinitions(new SList("declare-const", name,
+        SmtEncoder.getSmtLibVariableTypeName(column.getValidType())));
 
-    //Constrain enum bitvectors to their valid range
-    column.getValidType().match(
-        () -> null,
-        () -> null,
-        enumeration -> {
-          addEnumBitvectorConstraints(name, enumeration);
-          return null;
-        }
-    );
+    // Constrain enum bitvectors to their valid range
+    column.getValidType().match(() -> null, () -> null, enumeration -> {
+      addEnumBitvectorConstraints(name, enumeration);
+      return null;
+    });
   }
 
   /**
    * Adds constraints to enum variables to limit the range of their representing bitvector.
    *
-   * @param name        Name of solver variable
+   * @param name Name of solver variable
    * @param enumeration Type of enumeration
    */
   private void addEnumBitvectorConstraints(String name, TypeEnum enumeration) {
-    this.constraint.addGlobalConstrains(
-        new SList("bvsge", name, BitvectorUtils.hexFromInt(0, 4)));
+    this.constraint.addGlobalConstrains(new SList("bvsge", name, BitvectorUtils.hexFromInt(0, 4)));
     this.constraint.addGlobalConstrains(
         new SList("bvslt", name, BitvectorUtils.hexFromInt(enumeration.getValues().size(), 4)));
   }
@@ -108,10 +97,10 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpressio
 
   @Override
   public SExpression visitBinaryFunction(BinaryFunctionExpr binaryFunctionExpr) {
-    SExpression left = binaryFunctionExpr.getFirstArgument().takeVisitor(SmtConvertExpressionVisitor
-        .this);
-    SExpression right = binaryFunctionExpr.getSecondArgument().takeVisitor(
-        SmtConvertExpressionVisitor.this);
+    SExpression left =
+        binaryFunctionExpr.getFirstArgument().takeVisitor(SmtConvertExpressionVisitor.this);
+    SExpression right =
+        binaryFunctionExpr.getSecondArgument().takeVisitor(SmtConvertExpressionVisitor.this);
 
     switch (binaryFunctionExpr.getOperation()) {
       case NOT_EQUALS:
@@ -119,9 +108,8 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpressio
       default:
         String name = smtlibBinOperationNames.get(binaryFunctionExpr.getOperation());
         if (name == null) {
-          throw new IllegalArgumentException("Operation "
-              + binaryFunctionExpr.getOperation() + " is "
-              + "not supported");
+          throw new IllegalArgumentException(
+              "Operation " + binaryFunctionExpr.getOperation() + " is " + "not supported");
         }
         return new SList(name, left, right);
     }
@@ -136,8 +124,8 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpressio
       if (unaryFunctionExpr.getOperation() == UnaryFunctionExpr.Op.UNARY_MINUS) {
         return new SList("-", new SAtom("0"), argument);
       } else {
-        throw new IllegalArgumentException("Operation " + unaryFunctionExpr.getOperation() + "is "
-            + "not supported");
+        throw new IllegalArgumentException(
+            "Operation " + unaryFunctionExpr.getOperation() + "is " + "not supported");
       }
     }
     return new SList(name, argument);
@@ -145,11 +133,9 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpressio
 
   @Override
   public SExpression visitLiteral(LiteralExpr literalExpr) {
-    String literalAsString = literalExpr.getValue().match(
-        integer -> BitvectorUtils.hexFromInt(integer, 4),
-        bool -> bool ? "true" : "false",
-        this::getEnumValueAsBitvector
-    );
+    String literalAsString =
+        literalExpr.getValue().match(integer -> BitvectorUtils.hexFromInt(integer, 4),
+            bool -> bool ? "true" : "false", this::getEnumValueAsBitvector);
     return new SAtom(literalAsString);
   }
 
@@ -157,16 +143,18 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpressio
     return BitvectorUtils.hexFromInt(enumeration.getType().getValues().indexOf(enumeration), 4);
   }
 
-  /*private String integerLiteralAsBitVector(int integer, int length){
-
-  }*/
+  /*
+   * private String integerLiteralAsBitVector(int integer, int length){
+   * 
+   * }
+   */
 
   @Override
   public SExpression visitVariable(VariableExpr variableExpr) {
     String variableName = variableExpr.getVariableName();
     Integer variableReferenceIndex = variableExpr.getIndex().orElse(0);
 
-    //Check if variable is in getTypeForVariable
+    // Check if variable is in getTypeForVariable
     if (smtEncoder.getTypeForVariable(variableName) == null) {
       throw new IllegalStateException(
           "Wrong Context: No variable of name '" + variableName + "' in getTypeForVariable");
@@ -177,25 +165,20 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpressio
     if (smtEncoder.isIoVariable(variableName)) {
       // Do Rule (3)
 
-      //does it reference a previous cycle? -> guarantee reference-ability
+      // does it reference a previous cycle? -> guarantee reference-ability
       if (variableReferenceIndex < 0) {
         constraint.addGlobalConstrains(
             // sum(z-1) >= max(0, alpha - i)
-            new SList(
-                "bvuge",
-                sumRowIterations(row - 1),
-                new SAtom(BitvectorUtils.hexFromInt(
-                    Math.max(0, -(iteration + variableReferenceIndex)), 4))
-            )
-        );
+            new SList("bvuge", sumRowIterations(row - 1), new SAtom(
+                BitvectorUtils.hexFromInt(Math.max(0, -(iteration + variableReferenceIndex)), 4))));
       }
 
       // Do Rule part of Rule (I)
       // A[-v] -> A_z_(i-v)
-      return new SAtom("|" + variableName + "_" + row + "_" + (iteration
-          + variableReferenceIndex) + "|");
+      return new SAtom(
+          "|" + variableName + "_" + row + "_" + (iteration + variableReferenceIndex) + "|");
 
-      //return new SAtom(variableName);
+      // return new SAtom(variableName);
     } else {
       return new SAtom("|" + variableName + "|");
     }

@@ -6,18 +6,17 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
  * @author Leon Kaucher
  */
 public class BitvectorUtils {
-  private static final char[] HEX_CHARS = new char[] {'0', '1', '2', '3', '4',
-      '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+  private static final char[] HEX_CHARS =
+      new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
   /**
-   * Convert an integer to its hex representation.
-   * The length specifies the number of output digits.
-   * e.g. a length of 2 lets you convert positive numbers between 0 an 255
-   * or numbers between -128 and 127 to their string representation
-   * Numbers are represented as a hexadecimal two's complement.
+   * Convert an integer to its hex representation. The length specifies the number of output digits.
+   * e.g. a length of 2 lets you convert positive numbers between 0 an 255 or numbers between -128
+   * and 127 to their string representation Numbers are represented as a hexadecimal two's
+   * complement.
    *
    * @param integer arbitrary integer
-   * @param length  Number of digits of output
+   * @param length Number of digits of output
    * @return hex representation with following format: #xABCD...
    */
   public static String hexFromInt(int integer, int length) {
@@ -35,7 +34,7 @@ public class BitvectorUtils {
   /**
    * Converts a hex representation (hexadecimal two's complement) of an integer to an integer.
    *
-   * @param hex    hex representation with following format: #xABCD...
+   * @param hex hex representation with following format: #xABCD...
    * @param signed Defines if {@code hex} should be interpreted signed.
    * @return converted number
    */

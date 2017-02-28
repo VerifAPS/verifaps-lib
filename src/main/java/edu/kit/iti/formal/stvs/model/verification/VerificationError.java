@@ -15,10 +15,10 @@ public class VerificationError extends Exception {
 
   static {
     errorMessages = new HashMap<>();
-    errorMessages.put(Reason.VERIFICATION_LAUNCH_ERROR, "The verification could not be launched. " +
-        "Check the verification engine command in the preferences dialog (Edit -> Preferences)");
-    errorMessages.put(Reason.NUXMV_NOT_FOUND, "The nuXmv executable could not be found. " +
-        "Check the path to the nuXmv executable in the preferences dialog (Edit -> Preferences)");
+    errorMessages.put(Reason.VERIFICATION_LAUNCH_ERROR, "The verification could not be launched. "
+        + "Check the verification engine command in the preferences dialog (Edit -> Preferences)");
+    errorMessages.put(Reason.NUXMV_NOT_FOUND, "The nuXmv executable could not be found. "
+        + "Check the path to the nuXmv executable in the preferences dialog (Edit -> Preferences)");
     errorMessages.put(Reason.PROCESS_ABORTED, "The verification process has been aborted.");
     errorMessages.put(Reason.TIMEOUT, "The verification timed out.");
     errorMessages.put(Reason.ERROR, "An error occurred during verification.");
@@ -37,9 +37,8 @@ public class VerificationError extends Exception {
   }
 
   /**
-   * Construct a new VerificationError from an Exception (which was thrown while
-   * launching/managing the verification. These will typically not come from the verification
-   * engine itself).
+   * Construct a new VerificationError from an Exception (which was thrown while launching/managing
+   * the verification. These will typically not come from the verification engine itself).
    *
    * @param e The exception to construct a VerificationError from
    */
@@ -64,7 +63,6 @@ public class VerificationError extends Exception {
   }
 
   public enum Reason {
-    VERIFICATION_LAUNCH_ERROR, NUXMV_NOT_FOUND, PROCESS_ABORTED, TIMEOUT,
-    ERROR, EXCEPTION, UNKNOWN
+    VERIFICATION_LAUNCH_ERROR, NUXMV_NOT_FOUND, PROCESS_ABORTED, TIMEOUT, ERROR, EXCEPTION, UNKNOWN
   }
 }

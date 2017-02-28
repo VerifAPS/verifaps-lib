@@ -14,8 +14,7 @@ import java.util.stream.Collectors;
 public class Json {
   private static final Gson GSON = new Gson();
 
-  private Json() {
-  }
+  private Json() {}
 
   public static class FreeVarSelection {
     public List<FreeVar> selected;
@@ -36,15 +35,13 @@ public class Json {
   }
 
   public static FreeVarSelection fromRealFreeVariables(List<FreeVariable> freeVariables) {
-    List<FreeVar> vars = freeVariables.stream()
-        .map(freeVariable -> {
-          FreeVar var = new FreeVar();
-          var.name = freeVariable.getName();
-          var.type = freeVariable.getType();
-          var.defaultval = freeVariable.getDefaultValue();
-          return var;
-        })
-        .collect(Collectors.toList());
+    List<FreeVar> vars = freeVariables.stream().map(freeVariable -> {
+      FreeVar var = new FreeVar();
+      var.name = freeVariable.getName();
+      var.type = freeVariable.getType();
+      var.defaultval = freeVariable.getDefaultValue();
+      return var;
+    }).collect(Collectors.toList());
     FreeVarSelection selection = new FreeVarSelection();
     selection.selected = vars;
     return selection;

@@ -25,7 +25,7 @@ public class VerticalResizeContainerView extends AnchorPane {
     AnchorPane.setRightAnchor(container, 0.0);
     AnchorPane.setTopAnchor(container, 0.0);
     dragLine.widthProperty().bind(container.widthProperty());
-    //AnchorPane.setBottomAnchor(dragLine, 0.0);
+    // AnchorPane.setBottomAnchor(dragLine, 0.0);
     ViewUtils.setupView(this, "resizeContainer.css");
 
     this.getStyleClass().add("resizeContainer");

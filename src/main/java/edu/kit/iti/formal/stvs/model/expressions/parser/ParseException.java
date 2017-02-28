@@ -14,8 +14,8 @@ public class ParseException extends Exception {
   /**
    * Any kind of parsing exception for human-readable files.
    *
-   * @param line              the first line the error occured
-   * @param characterInLine   the first character of the character in the line.
+   * @param line the first line the error occured
+   * @param characterInLine the first character of the character in the line.
    * @param parseErrorMessage an error message to provide further information to the user.
    */
   public ParseException(int line, int characterInLine, String parseErrorMessage) {
@@ -54,7 +54,9 @@ public class ParseException extends Exception {
     if (getCharacterInLine() != that.getCharacterInLine()) {
       return false;
     }
-    return getParseErrorMessage() != null ? getParseErrorMessage().equals(that.getParseErrorMessage()) : that.getParseErrorMessage() == null;
+    return getParseErrorMessage() != null
+        ? getParseErrorMessage().equals(that.getParseErrorMessage())
+        : that.getParseErrorMessage() == null;
   }
 
   @Override

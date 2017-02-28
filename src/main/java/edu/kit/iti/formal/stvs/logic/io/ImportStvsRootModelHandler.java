@@ -9,9 +9,8 @@ import edu.kit.iti.formal.stvs.model.StvsRootModel;
 @FunctionalInterface
 public interface ImportStvsRootModelHandler {
   /**
-   * This method needs to be provided by an implementation of
-   * {@code ImportStvsRootModelHandler}. It is called if a {@link StvsRootModel}
-   * is loaded.
+   * This method needs to be provided by an implementation of {@code ImportStvsRootModelHandler}. It
+   * is called if a {@link StvsRootModel} is loaded.
    *
    * @param model StvsRootModel that was loaded
    */

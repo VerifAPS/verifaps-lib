@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.stvs.util;
 
+import java.util.List;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import java.util.List;
 
 /**
  * Created by csicar on 07.02.17.

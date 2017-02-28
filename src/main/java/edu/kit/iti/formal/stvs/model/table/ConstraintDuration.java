@@ -70,10 +70,8 @@ public class ConstraintDuration implements CellOperationProvider {
       return true;
     }
     ConstraintDuration other = (ConstraintDuration) obj;
-    return new EqualsBuilder()
-        .append(stringRepresentation.get(), other.stringRepresentation.get())
-        .append(comment.get(), other.comment.get())
-        .isEquals();
+    return new EqualsBuilder().append(stringRepresentation.get(), other.stringRepresentation.get())
+        .append(comment.get(), other.comment.get()).isEquals();
   }
 
   public String toString() {

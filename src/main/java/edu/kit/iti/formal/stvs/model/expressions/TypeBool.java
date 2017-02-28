@@ -13,23 +13,17 @@ public class TypeBool implements Type {
 
   public static final TypeBool BOOL = new TypeBool();
 
-  private TypeBool() {
-  }
+  private TypeBool() {}
 
   @Override
-  public <R> R match(
-      TypeIntegerHandler<R> matchIntType,
-      TypeBooleanHandler<R> matchBoolType,
+  public <R> R match(TypeIntegerHandler<R> matchIntType, TypeBooleanHandler<R> matchBoolType,
       TypeEnumHandler<R> matchEnumType) {
     return matchBoolType.handle();
   }
 
   @Override
   public boolean checksAgainst(Type other) {
-    return other.match(
-        () -> false,
-        () -> true,
-        (otherEnum) -> false);
+    return other.match(() -> false, () -> true, (otherEnum) -> false);
   }
 
   @Override

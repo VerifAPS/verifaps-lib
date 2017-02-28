@@ -3,9 +3,10 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.Exporter;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringWriter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -19,9 +20,9 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringWriter;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /**
  * Common superclass for all Exporters that export to xml.
@@ -29,6 +30,30 @@ import java.io.StringWriter;
  * @author Benjamin Alt
  */
 public abstract class XmlExporter<F> implements Exporter<F> {
+
+  /**
+   * Marshals a {@link JAXBElement} to a xml node.
+   *
+   * @param element The element that should be marshaled
+   * @param namespace Xml namespace used in the exported node
+   * @return Node representing the input {@code element}
+   * @throws ExportException Exception while exporting
+   */
+  protected static Node marshalToNode(JAXBElement element, String namespace)
+      throws ExportException {
+    try {
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      DocumentBuilder db = dbf.newDocumentBuilder();
+      Document document = db.newDocument();
+      JAXBContext context = JAXBContext.newInstance(namespace);
+      Marshaller marshaller = context.createMarshaller();
+      marshaller.setProperty("jaxb.formatted.output", Boolean.TRUE);
+      marshaller.marshal(element, document);
+      return document.getDocumentElement();
+    } catch (ParserConfigurationException | JAXBException e) {
+      throw new ExportException(e);
+    }
+  }
 
   /**
    * Exports an Object as xml.
@@ -54,33 +79,8 @@ public abstract class XmlExporter<F> implements Exporter<F> {
   }
 
   /**
-   * Marshals a {@link JAXBElement} to a xml node.
-   *
-   * @param element   The element that should be marshaled
-   * @param namespace Xml namespace used in the exported node
-   * @return Node representing the input {@code element}
-   * @throws ExportException Exception while exporting
-   */
-  protected static Node marshalToNode(JAXBElement element, String namespace) throws
-      ExportException {
-    try {
-      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      DocumentBuilder db = dbf.newDocumentBuilder();
-      Document document = db.newDocument();
-      JAXBContext context = JAXBContext.newInstance(namespace);
-      Marshaller marshaller = context.createMarshaller();
-      marshaller.setProperty("jaxb.formatted.output", Boolean.TRUE);
-      marshaller.marshal(element, document);
-      return document.getDocumentElement();
-    } catch (ParserConfigurationException | JAXBException e) {
-      throw new ExportException(e);
-    }
-  }
-
-  /**
-   * Must be implemented by subclasses.
-   * This method must provide the logic to convert the given {@code source} object into
-   * a xml {@link Node}
+   * Must be implemented by subclasses. This method must provide the logic to convert the given
+   * {@code source} object into a xml {@link Node}
    *
    * @param source Element that should be converted
    * @return Xml node

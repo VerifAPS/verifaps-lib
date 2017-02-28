@@ -2,14 +2,15 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
-import org.w3c.dom.Node;
 
+import java.io.File;
+import java.net.URISyntaxException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.net.URISyntaxException;
+
+import org.w3c.dom.Node;
 
 /**
  * This class provides the functionality to import a {@link GlobalConfig} from a xml node.
@@ -86,8 +87,7 @@ public class XmlConfigImporter extends XmlImporter<GlobalConfig> {
 
   @Override
   protected String getXsdFilePath() throws URISyntaxException {
-    File xsdFile =
-        new File(this.getClass().getResource("/fileFormats/config.xsd").toURI());
+    File xsdFile = new File(this.getClass().getResource("/fileFormats/config.xsd").toURI());
     return xsdFile.getAbsolutePath();
   }
 }
