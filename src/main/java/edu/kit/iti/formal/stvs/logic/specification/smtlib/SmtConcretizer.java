@@ -44,7 +44,7 @@ public class SmtConcretizer implements SpecificationConcretizer {
                                      ThrowableHandler exceptionHandler) {
     SmtEncoder encoder = new SmtEncoder(config.getMaxLineRollout(), validSpecification,
         freeVariables);
-    this.task = z3Solver.concretizeSConstraint(
+    this.task = z3Solver.concretizeSmtModel(
         encoder.getConstraint(),
         validSpecification.getColumnHeaders(),
         specificationHandler);

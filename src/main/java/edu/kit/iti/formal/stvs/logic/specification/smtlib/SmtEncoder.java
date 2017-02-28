@@ -29,7 +29,7 @@ public class SmtEncoder {
   private final List<Integer> maxDurations;
   private final List<String> ioVariableTypes;
 
-  private SConstraint constraint;
+  private SmtModel constraint;
 
   /**
    * Creates an encoder for a specification.
@@ -69,7 +69,7 @@ public class SmtEncoder {
     this.ioVariableTypes = ioVariables.stream().map(ValidIoVariable::getName).collect(
         Collectors.toList());
 
-    this.constraint = new SConstraint()
+    this.constraint = new SmtModel()
         .addHeaderDefinitions(createFreeVariables())
         .addHeaderDefinitions(setFreeVariablesDefaultValues());
 
@@ -154,9 +154,9 @@ public class SmtEncoder {
         for (int i = 0; i < getMaxDuration(z); i++) {
           SmtConvertExpressionVisitor visitor =
                new SmtConvertExpressionVisitor(this, z, i, ioVariable);
-          SExpr expressionConstraint = expression.takeVisitor(visitor);
+          SExpression expressionConstraint = expression.takeVisitor(visitor);
           //n_z >= i => ExpressionVisitor(z,i,...)
-          this.constraint = new SConstraint(
+          this.constraint = new SmtModel(
               visitor.getConstraint().getGlobalConstraints(),
               visitor.getConstraint().getVariableDefinitions()).combine(this.constraint);
           this.constraint.addGlobalConstrains(new SList("implies",
@@ -248,7 +248,7 @@ public class SmtEncoder {
     return ioVariableTypes.contains(name);
   }
 
-  private List<SExpr> setFreeVariablesDefaultValues() {
+  private List<SExpression> setFreeVariablesDefaultValues() {
     return validFreeVariables.stream()
         .filter(variable -> variable.getDefaultValue() != null)
         .map(SmtEncoder::getDefaultValueEquality)
@@ -264,7 +264,7 @@ public class SmtEncoder {
     return type;
   }
 
-  private List<SExpr> createFreeVariables() {
+  private List<SExpression> createFreeVariables() {
     return freeVariablesContext.entrySet().stream()
         .filter(item -> !isIoVariable(item.getKey()))
         .map(item ->
@@ -293,7 +293,7 @@ public class SmtEncoder {
     }
   }
 
-  public SConstraint getConstraint() {
+  public SmtModel getConstraint() {
     return constraint;
   }
 }

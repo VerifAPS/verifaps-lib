@@ -18,7 +18,7 @@ import java.util.Map;
  *
  * @author Carsten Csiky
  */
-public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
+public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpression> {
   //static maps
 
   private static Map<UnaryFunctionExpr.Op, String> smtlibUnaryOperationNames =
@@ -53,7 +53,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   private final int iteration;
   private final ValidIoVariable column;
 
-  private final SConstraint constraint;
+  private final SmtModel constraint;
 
   /**
    * Creates a visitor to convert an expression to a set of constraints.
@@ -73,7 +73,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
 
     String name = "|" + column.getName() + "_" + row + "_" + iteration + "|";
 
-    this.constraint = new SConstraint().addHeaderDefinitions(
+    this.constraint = new SmtModel().addHeaderDefinitions(
         new SList(
             "declare-const",
             name,
@@ -107,10 +107,10 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
 
 
   @Override
-  public SExpr visitBinaryFunction(BinaryFunctionExpr binaryFunctionExpr) {
-    SExpr left = binaryFunctionExpr.getFirstArgument().takeVisitor(SmtConvertExpressionVisitor
+  public SExpression visitBinaryFunction(BinaryFunctionExpr binaryFunctionExpr) {
+    SExpression left = binaryFunctionExpr.getFirstArgument().takeVisitor(SmtConvertExpressionVisitor
         .this);
-    SExpr right = binaryFunctionExpr.getSecondArgument().takeVisitor(
+    SExpression right = binaryFunctionExpr.getSecondArgument().takeVisitor(
         SmtConvertExpressionVisitor.this);
 
     switch (binaryFunctionExpr.getOperation()) {
@@ -128,8 +128,8 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   }
 
   @Override
-  public SExpr visitUnaryFunction(UnaryFunctionExpr unaryFunctionExpr) {
-    SExpr argument = unaryFunctionExpr.getArgument().takeVisitor(this);
+  public SExpression visitUnaryFunction(UnaryFunctionExpr unaryFunctionExpr) {
+    SExpression argument = unaryFunctionExpr.getArgument().takeVisitor(this);
     String name = smtlibUnaryOperationNames.get(unaryFunctionExpr.getOperation());
 
     if (name == null) {
@@ -144,7 +144,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   }
 
   @Override
-  public SExpr visitLiteral(LiteralExpr literalExpr) {
+  public SExpression visitLiteral(LiteralExpr literalExpr) {
     String literalAsString = literalExpr.getValue().match(
         integer -> BitvectorUtils.hexFromInt(integer, 4),
         bool -> bool ? "true" : "false",
@@ -162,7 +162,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
   }*/
 
   @Override
-  public SExpr visitVariable(VariableExpr variableExpr) {
+  public SExpression visitVariable(VariableExpr variableExpr) {
     String variableName = variableExpr.getVariableName();
     Integer variableReferenceIndex = variableExpr.getIndex().orElse(0);
 
@@ -201,7 +201,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     }
   }
 
-  private SExpr sumRowIterations(int j) {
+  private SExpression sumRowIterations(int j) {
     SList list = new SList().addAll("bvadd");
 
     for (int l = 0; l <= j; l++) {
@@ -210,7 +210,7 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpr> {
     return list;
   }
 
-  public SConstraint getConstraint() {
+  public SmtModel getConstraint() {
     return constraint;
   }
 }
