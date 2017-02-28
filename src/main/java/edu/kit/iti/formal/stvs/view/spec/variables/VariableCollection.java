@@ -17,7 +17,9 @@ import javafx.scene.layout.VBox;
 public class VariableCollection extends VBox {
 
   public enum Column {
-    NAME, TYPE, VALUE
+    NAME,
+    TYPE,
+    VALUE
   }
 
   private final Label overviewLabel;
@@ -37,8 +39,7 @@ public class VariableCollection extends VBox {
 
     nameTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
     typeTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
-    defaultValueTableColumn.prefWidthProperty()
-        .bind(freeVariableTableView.widthProperty().multiply(0.2));
+    defaultValueTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.2));
 
 
     nameTableColumn.setUserData(Column.NAME);
@@ -47,8 +48,8 @@ public class VariableCollection extends VBox {
 
     freeVariableTableView.setEditable(true);
     freeVariableTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    freeVariableTableView.getColumns().addAll(nameTableColumn, typeTableColumn,
-        defaultValueTableColumn);
+    freeVariableTableView.getColumns().addAll(
+        nameTableColumn, typeTableColumn, defaultValueTableColumn);
 
     this.overviewLabel.getStyleClass().addAll("freevar", "overview-label");
     this.freeVariableTableView.getStyleClass().addAll("freevar", "variable-table-view");

@@ -9,16 +9,6 @@ import edu.kit.iti.formal.stvs.model.code.ParsedCode;
 import edu.kit.iti.formal.stvs.model.code.SyntaxError;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
-
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -30,8 +20,14 @@ import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
 
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
- * Created by csicar on 09.01.17. Some parts are inspired by examples of the used library:
+ * Created by csicar on 09.01.17.
+ * Some parts are inspired by examples of the used library:
  * https://github.com/TomasMikula/RichTextFX/blob/a098da6309a0f624052fd1d4d6f5079dd6265fbe/richtextfx-demos/src/main/java/org/fxmisc/richtext/demo/JavaKeywords.java
  *
  * @author Lukas Fritsch
@@ -45,7 +41,7 @@ public class EditorPaneController implements Controller {
   /**
    * creates the controller for the editorpane
    *
-   * @param code the codefile which is to show
+   * @param code         the codefile which is to show
    * @param globalConfig the global configuration (for font size or style)
    */
   public EditorPaneController(Code code, GlobalConfig globalConfig) {
@@ -53,25 +49,25 @@ public class EditorPaneController implements Controller {
     this.view = new EditorPane(code.getSourcecode(), code.syntaxErrorsProperty());
     this.globalConfig = globalConfig;
     this.globalConfig.showLineNumbersProperty().addListener(new ShowLineNumbersListener());
-    this.view.getStylesheets()
-        .add(EditorPane.class.getResource("st-keywords.css").toExternalForm());
+    this.view.getStylesheets().add(
+        EditorPane.class.getResource("st-keywords.css").toExternalForm());
     this.executor = Executors.newSingleThreadExecutor();
     configureTextArea();
     setupContextMenu();
     handleTextChange(computeHighlighting(code.getSourcecode()));
-    this.globalConfig.editorFontSizeProperty()
-        .addListener((observable, oldValue, newValue) -> updateFontSize(newValue.intValue()));
-    this.globalConfig.editorFontFamilyProperty()
-        .addListener((observable, oldValue, newValue) -> updateFontFamily(newValue));
+    this.globalConfig.editorFontSizeProperty().addListener((observable, oldValue, newValue) -> updateFontSize(newValue.intValue()));
+    this.globalConfig.editorFontFamilyProperty().addListener((observable, oldValue, newValue) -> updateFontFamily(newValue));
   }
 
   private void updateFontFamily(String fontFamily) {
-    view.getCodeArea().setStyle("-fx-font-family: " + fontFamily + ";" + "-fx-font-size: "
+    view.getCodeArea().setStyle("-fx-font-family: "
+        + fontFamily + ";" + "-fx-font-size: "
         + globalConfig.editorFontSizeProperty().get() + "pt;");
   }
 
   private void updateFontSize(int size) {
-    view.getCodeArea().setStyle("-fx-font-family: " + globalConfig.editorFontFamilyProperty().get()
+    view.getCodeArea().setStyle("-fx-font-family: "
+        + globalConfig.editorFontFamilyProperty().get()
         + ";" + "-fx-font-size: " + size + "pt;");
   }
 
@@ -91,12 +87,15 @@ public class EditorPaneController implements Controller {
     CodeArea codeArea = view.getCodeArea();
 
     ContextMenu menu = new ContextMenu();
-    menu.getItems().addAll(createMenuItem("Undo", codeArea::undo, FontAwesomeIcon.UNDO),
-        createMenuItem("Redo", codeArea::redo), new SeparatorMenuItem(),
+    menu.getItems().addAll(
+        createMenuItem("Undo", codeArea::undo, FontAwesomeIcon.UNDO),
+        createMenuItem("Redo", codeArea::redo),
+        new SeparatorMenuItem(),
         createMenuItem("Paste", codeArea::paste, FontAwesomeIcon.PASTE),
         createMenuItem("Copy", codeArea::copy, FontAwesomeIcon.COPY),
         createMenuItem("Cut", codeArea::cut, FontAwesomeIcon.CUT),
-        createMenuItem("Select All", codeArea::selectAll));
+        createMenuItem("Select All", codeArea::selectAll)
+    );
     this.view.setContextMenu(menu);
   }
 
@@ -104,10 +103,12 @@ public class EditorPaneController implements Controller {
   private void configureTextArea() {
     CodeArea codeArea = view.getCodeArea();
     code.sourcecodeProperty().bind(codeArea.textProperty());
-    codeArea.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved()))
+    codeArea.richChanges()
+        .filter(ch -> !ch.getInserted().equals(ch.getRemoved()))
         .successionEnds(Duration.ofMillis(500))
         .hook(collectionRichTextChange -> codeArea.getUndoManager().mark())
-        .supplyTask(this::computeHighlightingAsync).awaitLatest(codeArea.richChanges())
+        .supplyTask(this::computeHighlightingAsync)
+        .awaitLatest(codeArea.richChanges())
         .filterMap(t -> {
           if (t.isSuccess()) {
             return Optional.of(t.get());
@@ -115,7 +116,8 @@ public class EditorPaneController implements Controller {
             t.getFailure().printStackTrace();
             return Optional.empty();
           }
-        }).subscribe(this::handleTextChange);
+        })
+        .subscribe(this::handleTextChange);
   }
 
   private Task<StyleSpans<Collection<String>>> computeHighlightingAsync() {
@@ -136,15 +138,19 @@ public class EditorPaneController implements Controller {
     List<SyntaxError> syntaxErrors = new ArrayList<>();
 
     // Short-circuit setting parsed code properties on code, since we're in another thread.
-    ParsedCode.parseCode(sourcecode, newTokens -> {
-      tokens.addAll(newTokens);
-      Platform.runLater(() -> code.tokensProperty().setAll(newTokens));
-    }, synErrs -> {
-      syntaxErrors.addAll(synErrs);
-      Platform.runLater(() -> code.syntaxErrorsProperty().setAll(synErrs));
-    }, parsedCode -> Platform.runLater(() -> code.parsedCodeProperty().set(parsedCode)));
+    ParsedCode.parseCode(sourcecode,
+        newTokens -> {
+          tokens.addAll(newTokens);
+          Platform.runLater(() -> code.tokensProperty().setAll(newTokens));
+        },
+        synErrs -> {
+          syntaxErrors.addAll(synErrs);
+          Platform.runLater(() -> code.syntaxErrorsProperty().setAll(synErrs));
+        },
+        parsedCode -> Platform.runLater(() -> code.parsedCodeProperty().set(parsedCode)));
 
-    StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+    StyleSpansBuilder<Collection<String>> spansBuilder
+        = new StyleSpansBuilder<>();
 
     if (tokens.isEmpty()) {
       spansBuilder.add(Collections.emptyList(), 0);
@@ -152,15 +158,16 @@ public class EditorPaneController implements Controller {
     }
 
     tokens.forEach(token ->
-    // replaceAll is a work-around for a bug when ANTLR has a
-    // different character count than this CodeArea.
-    spansBuilder.add(getStyleClassesFor(token, syntaxErrors),
-        token.getText().replaceAll("\\r", "").length()));
+        // replaceAll is a work-around for a bug when ANTLR has a
+        // different character count than this CodeArea.
+        spansBuilder.add(getStyleClassesFor(token, syntaxErrors),
+            token.getText().replaceAll("\\r", "").length())
+    );
     return spansBuilder.create();
   }
 
   private Collection<String> getStyleClassesFor(Token token, List<SyntaxError> syntaxErrors) {
-    // getHightlightingClass(token);
+    //getHightlightingClass(token);
     if (syntaxErrors.stream().anyMatch(syntaxError -> syntaxError.isToken(token))) {
       return Collections.singletonList("syntax-error");
     } else {
@@ -228,7 +235,8 @@ public class EditorPaneController implements Controller {
   }
 
   // TODO: Implement this?
-  public void setStylesheet(String url) {}
+  public void setStylesheet(String url) {
+  }
 
   public Code getCode() {
     return this.code;
@@ -242,7 +250,7 @@ public class EditorPaneController implements Controller {
   private class ShowLineNumbersListener implements javafx.beans.value.ChangeListener<Boolean> {
     @Override
     public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue,
-        Boolean newValue) {
+                        Boolean newValue) {
       view.setShowLineNumbers(newValue);
     }
   }

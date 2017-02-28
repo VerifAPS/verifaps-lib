@@ -4,9 +4,6 @@ import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
-
-import java.io.IOException;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -18,6 +15,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Dialog;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 /**
  * Created by csicar on 11.01.17.
@@ -53,7 +52,7 @@ public class ConfigDialogManager implements Controller {
     Dialog<GlobalConfig> dialog = new Dialog<>();
     dialog.setTitle("Preferences");
     view = new ConfigDialogPane();
-    // set initial values
+    //set initial values
     view.uiLanguage.setItems(FXCollections.observableList(config.getValidLanguages()));
     bind(view.verificationTimeout.textProperty(), config.verificationTimeoutProperty());
     bind(view.simulationTimeout.textProperty(), config.simulationTimeoutProperty());
@@ -66,9 +65,10 @@ public class ConfigDialogManager implements Controller {
     bind(view.z3Path.getTextField().textProperty(), config.z3PathProperty());
     bind(view.getetaCommand.textProperty(), config.getetaCommandProperty());
 
-    BooleanBinding dialogValid =
-        view.verificationTimeout.validProperty().and(view.simulationTimeout.validProperty())
-            .and(view.editorFontSize.validProperty()).and(view.maxLineRollout.validProperty());
+    BooleanBinding dialogValid = view.verificationTimeout.validProperty()
+        .and(view.simulationTimeout.validProperty())
+        .and(view.editorFontSize.validProperty())
+        .and(view.maxLineRollout.validProperty());
 
     Node button = view.lookupButton(view.okButtonType);
     button.disableProperty().bind(dialogValid.not());
@@ -94,9 +94,8 @@ public class ConfigDialogManager implements Controller {
       try {
         config.autosaveConfig();
       } catch (IOException | ExportException e) {
-        AlertFactory.createAlert(Alert.AlertType.ERROR, "Autosave error",
-            "Error saving the current" + " configuration",
-            "The current configuration could not be saved.", e.getMessage());
+        AlertFactory.createAlert(Alert.AlertType.ERROR, "Autosave error", "Error saving the current" +
+            " configuration", "The current configuration could not be saved.", e.getMessage());
       }
       return config;
     });

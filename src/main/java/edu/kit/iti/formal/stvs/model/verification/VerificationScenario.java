@@ -7,18 +7,17 @@ import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
-
-import java.io.IOException;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
+import java.io.IOException;
+
 /**
- * The main model object for orchestrating a verification. Has a reference to the currently loaded
- * {@link Code}, uses a {@link VerificationEngine} from the logic package to verify it against a
- * {@link ConstraintSpecification} and provides access to the {@link VerificationResult}.
+ * The main model object for orchestrating a verification. Has a reference to the currently
+ * loaded {@link Code}, uses a {@link VerificationEngine} from the logic package to verify it
+ * against a {@link ConstraintSpecification} and provides access to the {@link VerificationResult}.
  *
  * @author Benjamin Alt
  */
@@ -53,18 +52,17 @@ public class VerificationScenario {
    * {@link ConstraintSpecification}.
    *
    * @param config The config to take into account (i.e. for verification timeouts, paths to
-   *        dependencies etc.)
-   * @param spec The specification to be verified
+   *               dependencies etc.)
+   * @param spec   The specification to be verified
    * @throws IOException
    * @throws ExportException
    * @throws VerificationError
    */
-  public void verify(GlobalConfig config, ConstraintSpecification spec)
-      throws IOException, ExportException, VerificationError {
+  public void verify(GlobalConfig config, ConstraintSpecification spec) throws IOException, ExportException, VerificationError {
     activeSpec.set(spec);
-    verificationEngine =
-        new GeTeTaVerificationEngine(config, code.get().getParsedCode().getDefinedTypes());
-    verificationEngine.verificationResultProperty().addListener(new VerificationChangedListener());
+    verificationEngine = new GeTeTaVerificationEngine(config, code.get().getParsedCode().getDefinedTypes());
+    verificationEngine.verificationResultProperty().addListener(new
+        VerificationChangedListener());
     verificationState.setValue(VerificationState.RUNNING);
     verificationEngine.startVerification(this, spec);
   }
@@ -119,7 +117,7 @@ public class VerificationScenario {
   private class VerificationChangedListener implements ChangeListener<VerificationResult> {
     @Override
     public void changed(ObservableValue<? extends VerificationResult> observableValue,
-        VerificationResult oldResult, VerificationResult newResult) {
+                        VerificationResult oldResult, VerificationResult newResult) {
       verificationResult.set(newResult);
       verificationState.set(VerificationState.FINISHED);
     }

@@ -4,9 +4,6 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.table.problems.ColumnProblem;
 import edu.kit.iti.formal.stvs.view.ViewUtils;
-
-import java.util.Collection;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
@@ -14,6 +11,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
+import java.util.Collection;
 
 /**
  * Created by philipp on 11.02.17.
@@ -60,8 +59,7 @@ public class ColumnHeader extends VBox {
     this.getChildren().addAll(categoryLabel, varDescriptionHbox);
   }
 
-  private void updateInOutClass(ObservableValue<? extends VariableCategory> o,
-      VariableCategory oldCategory, VariableCategory category) {
+  private void updateInOutClass(ObservableValue<? extends VariableCategory> o, VariableCategory oldCategory, VariableCategory category) {
     String old = oldCategory.toString().toLowerCase();
     String newCategory = category.toString().toLowerCase();
     getStyleClass().remove(old);
@@ -86,8 +84,11 @@ public class ColumnHeader extends VBox {
   public void configureProblems(Collection<ColumnProblem> problems) {
     this.getStyleClass().remove("spec-column-problem");
     this.getStyleClass().add("spec-column-problem");
-    problemTooltip.setText(problems.stream().map(ColumnProblem::getErrorMessage)
-        .reduce((left, right) -> left + "\n\n" + right).orElse(""));
+    problemTooltip.setText(
+        problems.stream()
+            .map(ColumnProblem::getErrorMessage)
+            .reduce((left, right) -> left + "\n\n" + right)
+            .orElse(""));
     Tooltip.install(this, problemTooltip);
   }
 

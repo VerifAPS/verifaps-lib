@@ -5,8 +5,7 @@ import java.util.Optional;
 /**
  * runtime-representation for int types.
  * <p>
- * <p>
- * This class is a singleton, since it does not hold any state at all.
+ * <p>This class is a singleton, since it does not hold any state at all.
  *
  * @author Philipp
  */
@@ -14,17 +13,23 @@ public class TypeInt implements Type {
 
   public static final TypeInt INT = new TypeInt();
 
-  private TypeInt() {}
+  private TypeInt() {
+  }
 
   @Override
-  public <R> R match(TypeIntegerHandler<R> matchIntType, TypeBooleanHandler<R> matchBoolType,
+  public <R> R match(
+      TypeIntegerHandler<R> matchIntType,
+      TypeBooleanHandler<R> matchBoolType,
       TypeEnumHandler<R> matchEnumType) {
     return matchIntType.handle();
   }
 
   @Override
   public boolean checksAgainst(Type other) {
-    return other.match(() -> true, () -> false, (otherEnum) -> false);
+    return other.match(
+        () -> true,
+        () -> false,
+        (otherEnum) -> false);
   }
 
   @Override

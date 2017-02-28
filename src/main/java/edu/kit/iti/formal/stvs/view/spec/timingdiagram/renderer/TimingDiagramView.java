@@ -2,11 +2,6 @@ package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
 import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
 import edu.kit.iti.formal.stvs.view.ViewUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
@@ -19,6 +14,10 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A TimingDiagram which displays a series of values as a line chart.
@@ -55,7 +54,11 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
 
     setPrefHeight(80);
 
-    getPlotChildren().addAll(cycleSelectionPane, durationLinesPane, dataPane);
+    getPlotChildren().addAll(
+        cycleSelectionPane,
+        durationLinesPane,
+        dataPane
+    );
     ViewUtils.setupView(this);
 
     ObservableList<Series<Number, A>> seriesObservableList = FXCollections.observableArrayList();
@@ -73,8 +76,8 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   /**
    * <b>copied from super and modified</b>
    * <p>
-   * Called when a data item has been added to a series. This is where implementations of XYChart
-   * can create/add new nodes to getPlotChildren to represent this data item.
+   * Called when a data item has been added to a series. This is where implementations of XYChart can create/add new
+   * nodes to getPlotChildren to represent this data item.
    * <p>
    * The following nodes are created here:
    * <ul>
@@ -84,9 +87,9 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
    * <li>Tooltips to show the value of a specific item</li>
    * </ul>
    *
-   * @param series The series the data item was added to
+   * @param series    The series the data item was added to
    * @param itemIndex The index of the new item within the series
-   * @param item The new data item that was added
+   * @param item      The new data item that was added
    */
   @Override
   protected void dataItemAdded(Series<Number, A> series, int itemIndex, Data<Number, A> item) {
@@ -108,7 +111,7 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
       verticalLine.getStyleClass().add("valueLine");
       dataPane.getChildren().add(verticalLine);
       verticalLines.add(verticalLine);
-      // updateYRange();
+      //updateYRange();
     }
   }
 
@@ -117,7 +120,7 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
    * <p>
    * removes an item from the chart
    *
-   * @param item The item that has been removed from the series
+   * @param item   The item that has been removed from the series
    * @param series The series the item was removed from
    */
   @Override
@@ -145,10 +148,10 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   /**
    * <b>copied from super and modified</b>
    * <p>
-   * A series has been added to the charts data model. This simply calls
-   * {@link TimingDiagramView#dataItemAdded(Series, int, Data)} for each entry in the series
+   * A series has been added to the charts data model.
+   * This simply calls {@link TimingDiagramView#dataItemAdded(Series, int, Data)} for each entry in the series
    *
-   * @param series The series that has been added
+   * @param series      The series that has been added
    * @param seriesIndex The index of the new series
    */
   @Override
@@ -161,8 +164,7 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   /**
    * <b>copied from super and modified</b>
    * <p>
-   * This simply calls {@link TimingDiagramView#dataItemRemoved(Data, Series)} for each entry in the
-   * series
+   * This simply calls {@link TimingDiagramView#dataItemRemoved(Data, Series)} for each entry in the series
    *
    * @param series The series that has been removed
    */
@@ -185,25 +187,23 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
       for (int i = 0; i < cyclesData.size(); i++) {
         Line horizontalLine = horizontalLines.get(i);
         horizontalLine.setStartX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue()));
-        horizontalLine
-            .setEndX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue().intValue() + 1));
+        horizontalLine.setEndX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue().intValue() + 1));
         horizontalLine.setStartY(getYAxis().getDisplayPosition(cyclesData.get(i).getYValue()));
         horizontalLine.setEndY(getYAxis().getDisplayPosition(cyclesData.get(i).getYValue()));
         if (i < cyclesData.size() - 1) {
           Line verticalLine = verticalLines.get(i);
-          verticalLine.setStartX(
-              getXAxis().getDisplayPosition(cyclesData.get(i).getXValue().intValue() + 1));
-          verticalLine
-              .setEndX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue().intValue() + 1));
+          verticalLine.setStartX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue().intValue() + 1));
+          verticalLine.setEndX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue().intValue() + 1));
           verticalLine.setStartY(getYAxis().getDisplayPosition(cyclesData.get(i).getYValue()));
           verticalLine.setEndY(getYAxis().getDisplayPosition(cyclesData.get(i + 1).getYValue()));
         }
 
         Rectangle cycleSelectionRectangle = cycleSelectionRectangles.get(i);
         cycleSelectionRectangle.setX(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue()));
-        cycleSelectionRectangle
-            .setWidth(getXAxis().getDisplayPosition(cyclesData.get(i).getXValue().intValue() + 1)
-                - getXAxis().getDisplayPosition(cyclesData.get(i).getXValue()));
+        cycleSelectionRectangle.setWidth(
+            getXAxis().getDisplayPosition(cyclesData.get(i).getXValue().intValue() + 1) -
+                getXAxis().getDisplayPosition(cyclesData.get(i).getXValue())
+        );
         cycleSelectionRectangle.setHeight(getYAxis().getHeight());
       }
 
@@ -226,19 +226,24 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   }
 
   /**
-   * Sets durations. This updates the lines that indicates a new row in the specification.
+   * Sets durations.
+   * This updates the lines that indicates a new row in the specification.
    *
    * @param durations the durations
    */
   public void setDurations(List<ConcreteDuration> durations) {
     this.durations = durations;
-    this.durationLines.setAll(durations.stream().map(i -> {
-      Line line = new Line();
-      line.getStyleClass().add("durationLine");
-      durationLinesPane.getChildren().add(line);
-      line.setStartY(0);
-      return line;
-    }).collect(Collectors.toList()));
+    this.durationLines.setAll(
+        durations.stream()
+            .map(i -> {
+              Line line = new Line();
+              line.getStyleClass().add("durationLine");
+              durationLinesPane.getChildren().add(line);
+              line.setStartY(0);
+              return line;
+            })
+            .collect(Collectors.toList())
+    );
   }
 
   public ContextMenu getContextMenu() {

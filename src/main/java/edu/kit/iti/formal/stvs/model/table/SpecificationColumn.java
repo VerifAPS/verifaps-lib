@@ -1,13 +1,13 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import java.util.List;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.util.List;
+
 /**
- * A column in a specification (see {@link SpecificationTable}). The generic type parameter C is the
- * type of the cells.
+ * A column in a specification (see {@link SpecificationTable}). The generic type parameter C is
+ * the type of the cells.
  *
  * @author Benjamin Alt
  */

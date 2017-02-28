@@ -15,7 +15,8 @@ public abstract class IoVariable implements Variable {
   public abstract String getType();
 
   public boolean matches(IoVariable other) {
-    return getName().equals(other.getName()) && getType().equals(other.getType())
+    return getName().equals(other.getName())
+        && getType().equals(other.getType())
         && getCategory() == other.getCategory();
   }
 

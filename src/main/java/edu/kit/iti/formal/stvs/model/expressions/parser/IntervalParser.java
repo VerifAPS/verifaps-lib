@@ -1,19 +1,15 @@
 package edu.kit.iti.formal.stvs.model.expressions.parser;
 
 import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval;
+import org.antlr.v4.runtime.*;
 
 import java.util.Optional;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
-
 /**
- * A class for parsing fixed interval expressions like <tt>[1,-]</tt> or <tt>[1,5]</tt>, defined by
- * the ANTLR grammar in antlr/CellExpression.g4. This parser does not need any context information
- * and does not capture state and thus is a singleton.
+ * A class for parsing fixed interval expressions like <tt>[1,-]</tt> or <tt>[1,5]</tt>,
+ * defined by the ANTLR grammar in antlr/CellExpression.g4.
+ * This parser does not need any context information and does not capture state
+ * and thus is a singleton.
  *
  * @author Philipp
  */
@@ -22,8 +18,8 @@ public class IntervalParser extends CellExpressionBaseVisitor<LowerBoundedInterv
   private static final IntervalParser INSTANCE = new IntervalParser();
 
   /**
-   * Parse an interval, for example <tt>[1,-]</tt> or <tt>-</tt> (a wildcard) or <tt>[1,4]</tt>.
-   * Only fixed values are allowed, no variables.
+   * Parse an interval, for example <tt>[1,-]</tt> or <tt>-</tt> (a wildcard)
+   * or <tt>[1,4]</tt>. Only fixed values are allowed, no variables.
    *
    * @param intervalAsString the string to be parsed.
    * @return a LowerBoundedInterval as the runtime representation of interval strings.
@@ -59,8 +55,9 @@ public class IntervalParser extends CellExpressionBaseVisitor<LowerBoundedInterv
       } else {
         int upperBoundInt = parsePositive(ctx.b);
         if (upperBoundInt < lowerBound) {
-          throw new ParseRuntimeException(new ParseException(ctx.b.getLine(),
-              ctx.b.getCharPositionInLine(), "Upper bound is lower than lower bound"));
+          throw new ParseRuntimeException(
+              new ParseException(ctx.b.getLine(), ctx.b.getCharPositionInLine(),
+                  "Upper bound is lower than lower bound"));
         }
         return new LowerBoundedInterval(lowerBound, Optional.of(upperBoundInt));
       }
@@ -76,8 +73,9 @@ public class IntervalParser extends CellExpressionBaseVisitor<LowerBoundedInterv
   private int parsePositive(Token token) {
     int number = Integer.parseInt(token.getText());
     if (number < 0) {
-      throw new ParseRuntimeException(new ParseException(token.getLine(),
-          token.getCharPositionInLine(), "Interval boundary must be positive."));
+      throw new ParseRuntimeException(
+          new ParseException(token.getLine(), token.getCharPositionInLine(),
+              "Interval boundary must be positive."));
     }
     return number;
   }

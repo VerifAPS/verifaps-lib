@@ -1,13 +1,13 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -40,13 +40,13 @@ public class StvsMenuBar extends MenuBar {
   public MenuItem about;
 
   public StvsMenuBar() {
-    // create top-level menus
+    //create top-level menus
     file = new Menu("File");
     edit = new Menu("Edit");
     view = new Menu("View");
     help = new Menu("Help");
 
-    // create menu-items
+    //create menu-items
     open = new MenuItem("Open");
     open.setAccelerator(KeyCombination.keyCombination("Ctrl+o"));
     openOther = new Menu("Open ...");
@@ -78,8 +78,10 @@ public class StvsMenuBar extends MenuBar {
     openOther.getItems().addAll(openSpec, openCode, openSession);
 
     // Add menu items to "file" menu
-    file.getItems().addAll(newCode, newSpec, open, openOther, openRecent, (new SeparatorMenuItem()),
-        saveCode, saveSpec, saveAll, saveSessionAs);
+    file.getItems().addAll(
+        newCode, newSpec, open, openOther, openRecent, (new SeparatorMenuItem()),
+        saveCode, saveSpec, saveAll, saveSessionAs
+    );
 
     edit.getItems().addAll(config);
 

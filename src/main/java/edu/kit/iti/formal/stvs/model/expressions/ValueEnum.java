@@ -3,9 +3,9 @@ package edu.kit.iti.formal.stvs.model.expressions;
 /**
  * runtime-representation for enum values of {@link Expression}s.
  * <p>
- * <p>
- * In contrast to {@link ValueBool} this is not a singleton, since many different instances can be
- * created at runtime. getErrorType of this value always returns a {@link TypeEnum}.
+ * <p>In contrast to {@link ValueBool} this is not a singleton, since
+ * many different instances can be created at runtime.
+ * getErrorType of this value always returns a {@link TypeEnum}.
  *
  * @author Philipp
  */
@@ -15,11 +15,11 @@ public class ValueEnum implements Value {
   private final TypeEnum enumType;
 
   /**
-   * package-local. Generate values from TypeEnum! Construct a new value of given type with given
-   * constructor.
+   * package-local. Generate values from TypeEnum!
+   * Construct a new value of given type with given constructor.
    *
    * @param enumValue enum constructor (for example <tt>red</tt>)
-   * @param enumType enum type (for example <tt>TypeEnum(COLORS, [red, green, blue])</tt>)
+   * @param enumType  enum type (for example <tt>TypeEnum(COLORS, [red, green, blue])</tt>)
    */
   ValueEnum(String enumValue, TypeEnum enumType) {
     this.enumValue = enumValue;
@@ -27,7 +27,9 @@ public class ValueEnum implements Value {
   }
 
   @Override
-  public <R> R match(ValueIntegerHandler<R> matchInt, ValueBooleanHandler<R> matchBoolean,
+  public <R> R match(
+      ValueIntegerHandler<R> matchInt,
+      ValueBooleanHandler<R> matchBoolean,
       ValueEnumHandler<R> matchEnum) {
     return matchEnum.handle(this);
   }

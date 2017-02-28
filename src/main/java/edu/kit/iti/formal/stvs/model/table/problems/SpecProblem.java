@@ -35,12 +35,10 @@ public abstract class SpecProblem extends Exception {
 
     SpecProblem that = (SpecProblem) o;
 
-    if (getErrorMessage() != null ? !getErrorMessage().equals(that.getErrorMessage())
-        : that.getErrorMessage() != null) {
+    if (getErrorMessage() != null ? !getErrorMessage().equals(that.getErrorMessage()) : that.getErrorMessage() != null) {
       return false;
     }
-    return getLocation() != null ? getLocation().equals(that.getLocation())
-        : that.getLocation() == null;
+    return getLocation() != null ? getLocation().equals(that.getLocation()) : that.getLocation() == null;
   }
 
   @Override

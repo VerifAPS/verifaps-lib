@@ -9,8 +9,9 @@ import edu.kit.iti.formal.stvs.model.code.Code;
 @FunctionalInterface
 public interface ImportCodeHandler {
   /**
-   * This method needs to be provided by an implementation of {@code ImportCodeHandler}. It is
-   * called if {@link Code} is loaded.
+   * This method needs to be provided by an implementation of
+   * {@code ImportCodeHandler}. It is called if {@link Code}
+   * is loaded.
    *
    * @param code Code that was loaded
    */

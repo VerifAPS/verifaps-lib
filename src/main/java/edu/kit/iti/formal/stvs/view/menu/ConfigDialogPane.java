@@ -4,13 +4,7 @@ import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.view.common.FileSelectionField;
 import edu.kit.iti.formal.stvs.view.common.PositiveIntegerInputField;
 import javafx.geometry.Insets;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DialogPane;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 
@@ -82,8 +76,8 @@ public class ConfigDialogPane extends DialogPane {
 
     grid.add(new Label("GeTeTa Command"), 0, 9);
     grid.add(getetaCommand, 1, 9);
-    Text getetaCommandDescription =
-        new Text("Use ${code} and ${spec} for code and specification" + " filename substitution.");
+    Text getetaCommandDescription = new Text("Use ${code} and ${spec} for code and specification" +
+        " filename substitution.");
     getetaCommandDescription.setStyle("-fx-font-style: italic");
     grid.add(getetaCommandDescription, 0, 10, 2, 1);
 

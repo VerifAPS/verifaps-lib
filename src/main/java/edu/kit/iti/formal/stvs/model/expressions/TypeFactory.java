@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class TypeFactory {
 
   /**
-   * @param name the name of the enum type
+   * @param name   the name of the enum type
    * @param values the possible values that this enum type has
    * @return an instance of {@link TypeEnum}
    */

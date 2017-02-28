@@ -10,8 +10,8 @@ import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 public interface ImportHybridSpecificationHandler {
   /**
    * This method needs to be provided by an implementation of
-   * {@code ImportHybridSpecificationHandler}. It is called if a {@link HybridSpecification} is
-   * loaded.
+   * {@code ImportHybridSpecificationHandler}. It is called if a {@link HybridSpecification}
+   * is loaded.
    *
    * @param hybridSpecification HybridSpecification that was loaded
    */

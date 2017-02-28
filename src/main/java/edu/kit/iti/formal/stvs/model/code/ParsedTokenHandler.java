@@ -1,13 +1,15 @@
 package edu.kit.iti.formal.stvs.model.code;
 
-import java.util.List;
-
 import org.antlr.v4.runtime.Token;
+
+import java.util.List;
 
 /**
  * A {@code ParsedTokenHandler} gets invoked by
- * {@link ParsedCode#parseCode(String, ParsedTokenHandler, ParsedSyntaxErrorHandler, ParsedCodeHandler)}.
- * to notify about lexed tokens Invariant: All tokens concatinized produce the source code.
+ * {@link ParsedCode#parseCode(String, ParsedTokenHandler,
+ * ParsedSyntaxErrorHandler, ParsedCodeHandler)}.
+ * to notify about lexed tokens
+ * Invariant: All tokens concatinized produce the source code.
  */
 @FunctionalInterface
 public interface ParsedTokenHandler {

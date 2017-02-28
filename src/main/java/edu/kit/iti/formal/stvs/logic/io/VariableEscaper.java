@@ -3,12 +3,11 @@ package edu.kit.iti.formal.stvs.logic.io;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.expressions.parser.CellExpressionLexer;
-
-import java.util.regex.Pattern;
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
+
+import java.util.regex.Pattern;
 
 /**
  * This class is used to escape identifiers for the geteta verification engine.

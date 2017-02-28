@@ -6,5 +6,6 @@ package edu.kit.iti.formal.stvs.model.common;
  * @author Philipp
  */
 public enum VariableCategory {
-  INPUT, OUTPUT
+  INPUT,
+  OUTPUT
 }

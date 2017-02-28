@@ -5,7 +5,8 @@ import java.util.Map;
 /**
  * A type checker for {@link Expression}s.
  * <p>
- * If an ill-typed expression is encountered, this class produces a {@link TypeCheckException}.
+ * If an ill-typed expression is encountered, this class produces a
+ * {@link TypeCheckException}.
  *
  * @author Philipp
  */
@@ -30,11 +31,11 @@ public class TypeChecker implements ExpressionVisitor<Type> {
   private final Map<String, Type> variableTypeContext;
 
   /**
-   * Since the {@link Expression} AST does not know about the type of a variable (see
-   * {@link VariableExpr}), this class needs a type context for variables.
+   * Since the {@link Expression} AST does not know about the type of a variable
+   * (see {@link VariableExpr}), this class needs a type context for variables.
    * <p>
-   * The type checker does not handle free- or IoVariables differently. Both are reduced to their
-   * string representation.
+   * The type checker does not handle free- or IoVariables differently. Both are
+   * reduced to their string representation.
    *
    * @param variableTypeContext a map from variable names to types.
    */
@@ -43,19 +44,20 @@ public class TypeChecker implements ExpressionVisitor<Type> {
   }
 
   /**
-   * Checks the type of an {@link Expression} or throws a {@link TypeCheckException} on an ill-typed
-   * expression.
+   * Checks the type of an {@link Expression} or throws a {@link TypeCheckException}
+   * on an ill-typed expression.
    *
    * @param expr the expression to be checked
    * @return the type of the expression, iff not ill-typed.
-   * @throws TypeCheckException an exception with information about the type error, if an ill-typed
-   *         expression is encountered
+   * @throws TypeCheckException an exception with information about the type
+   *                            error, if an ill-typed expression is encountered
    */
   public Type typeCheck(Expression expr) throws TypeCheckException {
     try {
       return expr.takeVisitor(this);
     } catch (InternalTypeCheckException runtimeException) {
-      throw new TypeCheckException(runtimeException.getMistypedExpression(),
+      throw new TypeCheckException(
+          runtimeException.getMistypedExpression(),
           runtimeException.getMessage());
     }
   }
@@ -111,15 +113,15 @@ public class TypeChecker implements ExpressionVisitor<Type> {
         assertEqualTypes(firstArgType, secondArgType, binaryFunctionExpr);
         return TypeBool.BOOL;
       default:
-        return throwUnkownOperation(binaryFunctionExpr.getOperation().toString(),
-            binaryFunctionExpr);
+        return throwUnkownOperation(binaryFunctionExpr.getOperation().toString(), binaryFunctionExpr);
     }
   }
 
   private void assertTypeEquality(Type expectedType, Type actualType, Expression expr) {
     if (!actualType.checksAgainst(expectedType)) {
-      throw new InternalTypeCheckException(expr, "Expected type \"" + expectedType.getTypeName()
-          + "\"," + "but got \"" + actualType.getTypeName() + "\"");
+      throw new InternalTypeCheckException(expr,
+          "Expected type \"" + expectedType.getTypeName() + "\","
+              + "but got \"" + actualType.getTypeName() + "\"");
     }
   }
 
@@ -145,7 +147,8 @@ public class TypeChecker implements ExpressionVisitor<Type> {
   public Type visitVariable(VariableExpr variableExpr) {
     Type varType = variableTypeContext.get(variableExpr.getVariableName());
     if (varType == null) {
-      throw new InternalTypeCheckException(variableExpr,
+      throw new InternalTypeCheckException(
+          variableExpr,
           "Don't know type of variable: " + variableExpr.getVariableName());
     } else {
       return varType;

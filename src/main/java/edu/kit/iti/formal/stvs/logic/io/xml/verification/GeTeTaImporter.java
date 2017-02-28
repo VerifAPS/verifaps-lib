@@ -21,7 +21,16 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
+import org.w3c.dom.Node;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -31,16 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Node;
 
 /**
  * Provides the functionality to import the output of the GeTeTa verification engine.
@@ -57,10 +56,10 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
 
   /* Regular expressions */
   private static final String IDENTIFIER_RE = "[$a-zA-Z0-9_]+";
-  private static final Pattern VARIABLES_FOUND_PATTERN =
-      Pattern.compile("[0-9]+ variables " + "found");
-  private static final Pattern VARIABLE_DECL_PATTERN =
-      Pattern.compile("\\s*" + IDENTIFIER_RE + " : " + IDENTIFIER_RE);
+  private static final Pattern VARIABLES_FOUND_PATTERN = Pattern.compile("[0-9]+ variables "
+      + "found");
+  private static final Pattern VARIABLE_DECL_PATTERN = Pattern.compile("\\s*" + IDENTIFIER_RE
+      + " : " + IDENTIFIER_RE);
   private static final Pattern CODE_VARIABLE_PATTERN = Pattern.compile("code\\." + IDENTIFIER_RE);
   private static final Pattern INPUT_VARIABLE_PATTERN = Pattern.compile(IDENTIFIER_RE);
   private static final Pattern INT_VALUE_PATTERN = Pattern.compile("-?0sd16_-?[0-9]+");
@@ -99,12 +98,13 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   /**
    * Builds a {@link VerificationResult} from {@link Node}.
    *
-   * @param source the Node from which the result should be imported
+   * @param source          the Node from which the result should be imported
    * @param importedMessage return message from the verification engine
    * @return the imported result
    * @throws ImportException Exception while importing
    */
-  private VerificationResult makeVerificationResult(Node source, Message importedMessage)
+  private VerificationResult makeVerificationResult(Node source,
+                                                    Message importedMessage)
       throws ImportException {
     try {
       /* Write log to file */
@@ -157,7 +157,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
     Map<String, Value> currentValues = new HashMap<>();
     Map<String, VariableCategory> varCategories = new HashMap<>();
     int cycleNum = -1;
-    // iterate over steps to create specification rows
+    //iterate over steps to create specification rows
     for (int i = 0; i < steps.size(); i++) {
       if (i - 1 > rowNums.size()) {
         break; // Make sure I terminate after right # of cycles
@@ -182,8 +182,8 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
     ConcreteSpecification concreteSpec = new ConcreteSpecification(true);
     for (String varName : varNames) {
       if (currentValues.containsKey(varName)) {
-        concreteSpec.getColumnHeaders()
-            .add(new ValidIoVariable(varCategories.get(varName), varName, varTypes.get(varName)));
+        concreteSpec.getColumnHeaders().add(new ValidIoVariable(varCategories.get(varName), varName,
+            varTypes.get(varName)));
       }
     }
     concreteSpec.getRows().addAll(concreteRows);
@@ -217,48 +217,52 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   }
 
   /**
-   * Parses the input variables of one {@link Counterexample.Step} and adds found types, values and
-   * categories to the corresponding map.
+   * Parses the input variables of one {@link Counterexample.Step} and adds
+   * found types, values and categories
+   * to the corresponding map.
    *
-   * @param varTypes map of types
+   * @param varTypes      map of types
    * @param currentValues map of values for one step
    * @param varCategories map of categories
-   * @param step current step
+   * @param step          current step
    * @throws ImportException exception while importing
    */
-  private void processInputVariables(Map<String, Type> varTypes, Map<String, Value> currentValues,
-      Map<String, VariableCategory> varCategories, Counterexample.Step step)
-      throws ImportException {
+  private void processInputVariables(Map<String, Type> varTypes,
+                                     Map<String, Value> currentValues,
+                                     Map<String, VariableCategory> varCategories,
+                                     Counterexample.Step step) throws ImportException {
     for (Assignment input : step.getInput()) { // Input vars are initialized here FOR THE NEXT
       // CYCLE
       String varName = VariableEscaper.unescapeName(input.getName());
       if (INPUT_VARIABLE_PATTERN.matcher(varName).matches()) {
         varCategories.put(varName, VariableCategory.INPUT);
-        processVarAssignment(currentValues, varTypes, varName,
-            VariableEscaper.unescapeName(input.getValue()));
+        processVarAssignment(currentValues, varTypes, varName, VariableEscaper.unescapeName(
+            input.getValue()));
       }
     }
   }
 
   /**
-   * Parses the output variables of one {@link Counterexample.Step} and adds found types, values and
-   * categories to the corresponding map.
+   * Parses the output variables of one {@link Counterexample.Step} and adds
+   * found types, values and categories
+   * to the corresponding map.
    *
-   * @param varTypes map of types
+   * @param varTypes      map of types
    * @param currentValues map of values for one step
    * @param varCategories map of categories
-   * @param step current step
+   * @param step          current step
    * @throws ImportException exception while importing
    */
-  private void processOutputVariables(Map<String, Type> varTypes, Map<String, Value> currentValues,
-      Map<String, VariableCategory> varCategories, Counterexample.Step step)
-      throws ImportException {
+  private void processOutputVariables(Map<String, Type> varTypes,
+                                      Map<String, Value> currentValues,
+                                      Map<String, VariableCategory> varCategories,
+                                      Counterexample.Step step) throws ImportException {
     for (Assignment state : step.getState()) { // Output vars are initialized here
       String stateString = state.getName().trim();
       if (CODE_VARIABLE_PATTERN.matcher(stateString).matches()) {
         int periodIndex = stateString.indexOf(".");
-        String varName = VariableEscaper
-            .unescapeName(stateString.substring(periodIndex + 1, stateString.length()));
+        String varName = VariableEscaper.unescapeName(
+            stateString.substring(periodIndex + 1, stateString.length()));
         varCategories.put(varName, VariableCategory.OUTPUT);
         String varValue = VariableEscaper.unescapeName(state.getValue());
         processVarAssignment(currentValues, varTypes, varName, varValue);
@@ -269,13 +273,15 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   /**
    * Creates a {@link SpecificationRow} for one step.
    *
-   * @param varNames variable names
+   * @param varNames      variable names
    * @param currentValues values for one step
    * @return specification row representing one step
    */
-  private SpecificationRow<ConcreteCell> makeSpecificationRowFromValues(List<String> varNames,
+  private SpecificationRow<ConcreteCell> makeSpecificationRowFromValues(
+      List<String> varNames,
       Map<String, Value> currentValues) {
-    SpecificationRow<ConcreteCell> row = SpecificationRow.createUnobservableRow(new HashMap<>());
+    SpecificationRow<ConcreteCell> row = SpecificationRow.createUnobservableRow(new
+        HashMap<>());
     for (String varName : varNames) {
       if (currentValues.containsKey(varName)) {
         row.getCells().put(varName, new ConcreteCell(currentValues.get(varName)));
@@ -329,28 +335,32 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
 
   @Override
   protected String getXsdFilePath() throws URISyntaxException {
-    File xsdFile = new File(this.getClass().getResource("/fileFormats/report.xsd").toURI());
+    File xsdFile =
+        new File(this.getClass().getResource("/fileFormats/report.xsd").toURI());
     return xsdFile.getAbsolutePath();
   }
 
   /**
-   * Processes an assignment of a single value represented by {@code varValue} to a variable
-   * specified by {@code varName} for one step in the counterexample. The type of the value is
-   * determined by matching {@code varValue} against several regular expressions and,in case of an
-   * enum type, further information is taken from {@code typeContext}. The value is then added to
-   * the {@code currentValues}-Map as a {@link Value}. Found types are added to {@code varTypes}.
+   * Processes an assignment of a single value represented by {@code varValue}  to a variable
+   * specified by {@code varName} for one step in the counterexample.
+   * The type of the value is determined by matching {@code varValue} against
+   * several regular expressions and,in case of an enum type,
+   * further information is taken from {@code typeContext}.
+   * The value is then added to the {@code currentValues}-Map as a {@link Value}.
+   * Found types are added to {@code varTypes}.
    *
    * @param currentValues Represents the values of variables for a step
-   * @param varTypes Map of types
-   * @param varName Name of the variable
-   * @param varValue String representation of theís variable for one step
+   * @param varTypes      Map of types
+   * @param varName       Name of the variable
+   * @param varValue      String representation of theís variable for one step
    * @throws ImportException Illegal literal for enum
    */
   private void processVarAssignment(Map<String, Value> currentValues, Map<String, Type> varTypes,
-      String varName, String varValue) throws ImportException {
+                                    String varName, String varValue) throws ImportException {
     if (INT_VALUE_PATTERN.matcher(varValue).matches()) {
       int underlineIndex = varValue.indexOf("_");
-      int intVal = Integer.parseInt(varValue.substring(underlineIndex + 1, varValue.length()));
+      int intVal = Integer.parseInt(
+          varValue.substring(underlineIndex + 1, varValue.length()));
       currentValues.put(varName, new ValueInt(intVal));
       if (!varTypes.containsKey(varName)) {
         varTypes.put(varName, TypeInt.INT);

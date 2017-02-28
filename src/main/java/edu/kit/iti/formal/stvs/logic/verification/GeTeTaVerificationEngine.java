@@ -11,6 +11,8 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
+import javafx.application.Platform;
+import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -18,9 +20,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-
-import javafx.application.Platform;
-import org.apache.commons.io.IOUtils;
 
 /**
  * Handles communication with the GeTeTa verification engine.
@@ -36,15 +35,15 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   private ProcessMonitor processMonitor;
 
   /**
-   * Creates an instance based on given {@link GlobalConfig} and {@code typeContext}. The
-   * {@code typeContext} is used later for importing the possible counterexample.
+   * Creates an instance based on given {@link GlobalConfig} and {@code typeContext}.
+   * The {@code typeContext} is used later for importing the possible counterexample.
    *
-   * @param config config that should be used
+   * @param config      config that should be used
    * @param typeContext list of types used for importing counterexample
    * @throws VerificationError nuXmv not found
    */
-  public GeTeTaVerificationEngine(GlobalConfig config, List<Type> typeContext)
-      throws VerificationError {
+  public GeTeTaVerificationEngine(GlobalConfig config, List<Type> typeContext) throws
+      VerificationError {
     verificationResult = new NullableProperty<>();
     getetaProcess = null;
     this.typeContext = typeContext;
@@ -57,26 +56,26 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   }
 
   /**
-   * Exports the given {@link VerificationScenario} to temporary files and starts the GeTeTa
-   * verification engine process.
+   * Exports the given {@link VerificationScenario} to temporary files
+   * and starts the GeTeTa verification engine process.
    *
    * @param scenario scenario that hold the code to be checked
-   * @param spec specification that should be checked
-   * @throws IOException exception while creating process
-   * @throws ExportException exception while exporting
+   * @param spec     specification that should be checked
+   * @throws IOException       exception while creating process
+   * @throws ExportException   exception while exporting
    * @throws VerificationError exception while verifying
    */
   @Override
-  public void startVerification(VerificationScenario scenario, ConstraintSpecification spec)
-      throws IOException, ExportException, VerificationError {
+  public void startVerification(VerificationScenario scenario,
+                                ConstraintSpecification spec) throws
+      IOException, ExportException, VerificationError {
     // Write ConstraintSpecification and Code to temporary files
     File tempSpecFile = File.createTempFile("verification-spec", ".xml");
     File tempCodeFile = File.createTempFile("verification-code", ".st");
     ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.GETETA, tempSpecFile);
     ExporterFacade.exportCode(scenario.getCode(), tempCodeFile, true);
-    String getetaCommand =
-        config.getGetetaCommand().replace("${code}", tempCodeFile.getAbsolutePath())
-            .replace("${spec}", tempSpecFile.getAbsolutePath());
+    String getetaCommand = config.getGetetaCommand().replace("${code}", tempCodeFile
+        .getAbsolutePath()).replace("${spec}", tempSpecFile.getAbsolutePath());
     // Start verification engine in new child process
     if (getetaProcess != null) {
       cancelVerification();

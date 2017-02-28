@@ -1,11 +1,10 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-
-import java.util.List;
-
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+
+import java.util.List;
 
 /**
  * Created by philipp on 11.02.17.
@@ -19,12 +18,15 @@ public class IoVariableChangeDialog extends Dialog<Void> {
 
   private final IoVariableDefinitionPane definitionPane;
 
-  public IoVariableChangeDialog(SpecIoVariable variableToChange,
+  public IoVariableChangeDialog(
+      SpecIoVariable variableToChange,
       List<SpecIoVariable> alreadyDefinedVariables) {
     this.variableToChange = variableToChange;
     this.changeButton = new ButtonType("Change");
-    this.definitionPane = new IoVariableDefinitionPane(variableToChange.getCategory(),
-        variableToChange.getName(), variableToChange.getType());
+    this.definitionPane = new IoVariableDefinitionPane(
+        variableToChange.getCategory(),
+        variableToChange.getName(),
+        variableToChange.getType());
 
     setResultConverter(this::convertResult);
 

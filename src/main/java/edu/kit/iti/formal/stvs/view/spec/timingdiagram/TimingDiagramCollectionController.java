@@ -37,15 +37,14 @@ public class TimingDiagramCollectionController implements Controller {
   private BooleanProperty activated = new SimpleBooleanProperty(true);
 
   /**
-   * Creates the controller for a {@link TimingDiagramCollectionView}. This controller uses a given
-   * {@link ConcreteSpecification} to generate a {@link TimingDiagramController} for each
-   * {@link ValidIoVariable} in the specification.
+   * Creates the controller for a {@link TimingDiagramCollectionView}.
+   * This controller uses a given {@link ConcreteSpecification} to generate a
+   * {@link TimingDiagramController} for each {@link ValidIoVariable} in the specification.
    *
    * @param concreteSpec the concrete specification that should be displayed
-   * @param selection the selection that should be used for selecting cycles
+   * @param selection    the selection that should be used for selecting cycles
    */
-  public TimingDiagramCollectionController(ConcreteSpecification concreteSpec,
-      Selection selection) {
+  public TimingDiagramCollectionController(ConcreteSpecification concreteSpec, Selection selection) {
     this.selection = selection;
     this.totalCycleCount = concreteSpec.getRows().size();
     view = new TimingDiagramCollectionView();
@@ -63,30 +62,27 @@ public class TimingDiagramCollectionController implements Controller {
   }
 
   /**
-   * Generates a {@link TimingDiagramController} for a given {@link ValidIoVariable}. The method
-   * adds multiple views to the {@link TimingDiagramCollectionView view} of this controller:
+   * Generates a {@link TimingDiagramController} for a given {@link ValidIoVariable}.
+   * The method adds multiple views to the {@link TimingDiagramCollectionView view} of this controller:
    * <ul>
-   * <li>A {@link TimingDiagramView} wrapped in a
+   * <li>
+   * A {@link TimingDiagramView} wrapped in a
    * {@link edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.VerticalResizeContainerView}
-   * will be added to {@link TimingDiagramCollectionView#diagramContainer}</li>
-   * <li>A {@link Label} (title of the {@link ValidIoVariable}) will be added to
-   * {@link TimingDiagramCollectionView#labelContainer}</li>
+   * will be added to {@link TimingDiagramCollectionView#diagramContainer}
+   * </li>
+   * <li>A {@link Label} (title of the {@link ValidIoVariable}) will be added to {@link TimingDiagramCollectionView#labelContainer}</li>
    * <li>A {@link Axis} will be added to the {@link TimingDiagramCollectionView#yAxisContainer}</li>
    * </ul>
    *
-   * @param concreteSpec the concrete specification which should be used to extract the needed
-   *        information
+   * @param concreteSpec    the concrete specification which should be used to extract the needed information
    * @param validIoVariable the variable for which a diagram should be generated
    */
-  private void createTimingDiagram(ConcreteSpecification concreteSpec,
-      ValidIoVariable validIoVariable) {
+  private void createTimingDiagram(ConcreteSpecification concreteSpec, ValidIoVariable validIoVariable) {
     Pair<TimingDiagramController, Axis> diagramAxisPair = validIoVariable.getValidType().match(
-        () -> TimingDiagramController.createIntegerTimingDiagram(concreteSpec, validIoVariable,
-            view.getxAxis(), selection, activated),
-        () -> TimingDiagramController.createBoolTimingDiagram(concreteSpec, validIoVariable,
-            view.getxAxis(), selection, activated),
-        (e) -> TimingDiagramController.createEnumTimingDiagram(concreteSpec, validIoVariable, e,
-            view.getxAxis(), selection, activated));
+        () -> TimingDiagramController.createIntegerTimingDiagram(concreteSpec, validIoVariable, view.getxAxis(), selection, activated),
+        () -> TimingDiagramController.createBoolTimingDiagram(concreteSpec, validIoVariable, view.getxAxis(), selection, activated),
+        (e) -> TimingDiagramController.createEnumTimingDiagram(concreteSpec, validIoVariable, e, view.getxAxis(), selection, activated)
+    );
     TimingDiagramView timingDiagramView = diagramAxisPair.getLeft().getView();
 
     if (concreteSpec.isCounterExample()) {
@@ -98,18 +94,23 @@ public class TimingDiagramCollectionController implements Controller {
 
     this.view.getDiagramContainer().getChildren().add(verticalResizeContainerController.getView());
     this.view.getyAxisContainer().getChildren().add(externalYAxis);
-    timingDiagramView.getyAxis().layoutBoundsProperty()
-        .addListener(change -> updateAxisExternalPosition(timingDiagramView, externalYAxis));
-    verticalResizeContainerController.getView().layoutYProperty()
-        .addListener(change -> updateAxisExternalPosition(timingDiagramView, externalYAxis));
+    timingDiagramView.getyAxis().layoutBoundsProperty().addListener(
+        change -> updateAxisExternalPosition(timingDiagramView, externalYAxis)
+    );
+    verticalResizeContainerController.getView().layoutYProperty().addListener(
+        change -> updateAxisExternalPosition(timingDiagramView, externalYAxis)
+    );
     AnchorPane.setRightAnchor(externalYAxis, 0.0);
 
     Label label = new Label(validIoVariable.getName());
     label.getStyleClass().add(validIoVariable.getCategory().name().toLowerCase());
     this.view.getLabelContainer().getChildren().add(label);
-    // Ensures that labels are always centered vertically relative to their diagram
-    label.layoutYProperty().bind(externalYAxis.layoutYProperty()
-        .add(externalYAxis.heightProperty().divide(2)).subtract(label.heightProperty().divide(2)));
+    //Ensures that labels are always centered vertically relative to their diagram
+    label.layoutYProperty().bind(
+        externalYAxis.layoutYProperty().add(
+            externalYAxis.heightProperty().divide(2)
+        ).subtract(label.heightProperty().divide(2))
+    );
   }
 
   /**
@@ -120,14 +121,15 @@ public class TimingDiagramCollectionController implements Controller {
     ScrollBar scrollBar = view.getxScrollBar();
     NumberAxis globalxAxis = view.getxAxis();
     scrollBar.setMin(0);
-    visibleRange.bind(globalxAxis.upperBoundProperty().subtract(globalxAxis.lowerBoundProperty()));
+    visibleRange.bind(globalxAxis.upperBoundProperty()
+        .subtract(globalxAxis.lowerBoundProperty()));
     scrollBar.maxProperty().bind(visibleRange.multiply(-1).add(totalCycleCount));
 
     globalxAxis.lowerBoundProperty().addListener(change -> {
       scrollBar.setValue(globalxAxis.getLowerBound());
     });
 
-    // I don't know, why it need to be divided by 2 but it seems to work very good this way
+    //I don't know, why it need to be divided by 2 but it seems to work very good this way
     scrollBar.visibleAmountProperty().bind(visibleRange.divide(2));
 
     scrollBar.valueProperty().addListener(change -> {
@@ -138,17 +140,14 @@ public class TimingDiagramCollectionController implements Controller {
 
   /**
    * This method calculates the position of an y {@link Axis} embedded in a diagram relative to the
-   * {@link TimingDiagramCollectionView#diagramContainer} and updates the position of the external
-   * axis.
+   * {@link TimingDiagramCollectionView#diagramContainer} and updates the position of the external axis.
    *
    * @param timingDiagramView Timing Diagram which holds the y Axis
-   * @param externalYAxis externalYAxis that should be repositioned
+   * @param externalYAxis     externalYAxis that should be repositioned
    */
   private void updateAxisExternalPosition(TimingDiagramView timingDiagramView, Axis externalYAxis) {
-    Transform transformation = ViewUtils.calculateTransformRelativeTo(view.getDiagramContainer(),
-        timingDiagramView.getyAxis());
-    double yAxisPosition =
-        transformation.transform(timingDiagramView.getyAxis().getLayoutBounds()).getMinY();
+    Transform transformation = ViewUtils.calculateTransformRelativeTo(view.getDiagramContainer(), timingDiagramView.getyAxis());
+    double yAxisPosition = transformation.transform(timingDiagramView.getyAxis().getLayoutBounds()).getMinY();
     externalYAxis.layoutYProperty().set(yAxisPosition);
   }
 
@@ -180,10 +179,8 @@ public class TimingDiagramCollectionController implements Controller {
     NumberAxis xAxis = getView().getxAxis();
     double displayForAxis = xAxis.getValueForDisplay(point2D.getX()).doubleValue();
     double displayForAxisPlus100 = xAxis.getValueForDisplay(point2D.getX() + 100).doubleValue();
-    /*
-     * Calculates Ratio between pixel and axis units by taking to different points on the axis and
-     * dividing them by the screen distance
-     */
+    /*Calculates Ratio between pixel and axis units by taking to different points on the axis
+    and dividing them by the screen distance*/
     dragState.screenDistanceToAxisRatio = (displayForAxisPlus100 - displayForAxis) / 100;
     dragState.startXPosition = point2D.getX();
     dragState.startLowerBound = xAxis.getLowerBound();

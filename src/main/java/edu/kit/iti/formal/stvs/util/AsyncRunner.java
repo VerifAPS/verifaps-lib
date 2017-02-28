@@ -3,8 +3,8 @@ package edu.kit.iti.formal.stvs.util;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * This interface represents the action that should be executed while a {@link AsyncTask} is
- * running.
+ * This interface represents the action that should be executed
+ * while a {@link AsyncTask} is running.
  */
 @FunctionalInterface
 public interface AsyncRunner<T> {

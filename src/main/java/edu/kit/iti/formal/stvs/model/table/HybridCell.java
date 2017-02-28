@@ -84,8 +84,7 @@ public class HybridCell<C extends CellOperationProvider> implements CellOperatio
     if (getColumn() != null ? !getColumn().equals(that.getColumn()) : that.getColumn() != null) {
       return false;
     }
-    return counterExamples != null ? counterExamples.equals(that.counterExamples)
-        : that.counterExamples == null;
+    return counterExamples != null ? counterExamples.equals(that.counterExamples) : that.counterExamples == null;
   }
 
   @Override

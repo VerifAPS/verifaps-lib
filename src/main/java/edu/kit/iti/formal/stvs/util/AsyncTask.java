@@ -13,12 +13,12 @@ public class AsyncTask<T> extends Thread {
   private AtomicBoolean isRunning = new AtomicBoolean(false);
 
   /**
-   * <p>
-   * Constructor for an asynchronous task.
-   * </p>
+   * <p>Constructor for an asynchronous task.</p>
    *
-   * @param runAsync The portion of action to be run asynchronously (a functional interface).
-   * @param runLater The portion of the action to be run synchronously with any other AsyncTasks.
+   * @param runAsync The portion of action to be run
+   *                 asynchronously (a functional interface).
+   * @param runLater The portion of the action to be run synchronously with
+   *                 any other AsyncTasks.
    */
   public AsyncTask(AsyncRunner<T> runAsync, AsyncTaskCompletedHandler<T> runLater) {
     super();

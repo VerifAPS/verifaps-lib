@@ -2,9 +2,6 @@ package edu.kit.iti.formal.stvs.view.editor;
 
 import edu.kit.iti.formal.stvs.model.code.SyntaxError;
 import edu.kit.iti.formal.stvs.view.ViewUtils;
-
-import java.util.Collection;
-
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
@@ -15,6 +12,8 @@ import javafx.scene.layout.Pane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleSpans;
+
+import java.util.Collection;
 
 /**
  * Created by csicar on 09.01.17.
@@ -35,8 +34,8 @@ public class EditorPane extends SplitPane {
     this(code, syntaxErrors, true);
   }
 
-  public EditorPane(String code, ObservableList<SyntaxError> syntaxErrors,
-      boolean showLineNumbers) {
+  public EditorPane(String code, ObservableList<SyntaxError> syntaxErrors, boolean
+      showLineNumbers) {
     super();
     ViewUtils.setupView(this);
 

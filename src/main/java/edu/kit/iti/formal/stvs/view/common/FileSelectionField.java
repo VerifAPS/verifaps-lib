@@ -3,14 +3,13 @@ package edu.kit.iti.formal.stvs.view.common;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import edu.kit.iti.formal.stvs.view.ViewUtils;
-
-import java.io.File;
-
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
+
+import java.io.File;
 
 /**
  * A text field with a button for choosing a file and displaying their path.

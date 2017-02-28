@@ -13,8 +13,12 @@ import javafx.util.Callback;
  */
 public class FreeVariable implements Variable {
 
-  public static final Callback<FreeVariable, Observable[]> EXTRACTOR = freeVar -> new Observable[] {
-      freeVar.nameProperty(), freeVar.typeProperty(), freeVar.defaultValueProperty()};
+  public static final Callback<FreeVariable, Observable[]> EXTRACTOR =
+      freeVar -> new Observable[] {
+          freeVar.nameProperty(),
+          freeVar.typeProperty(),
+          freeVar.defaultValueProperty()
+      };
 
 
   private final StringProperty name;
@@ -22,8 +26,8 @@ public class FreeVariable implements Variable {
   private final StringProperty defaultValue;
 
   /**
-   * Creates a free variable with a name and type. A default value will be generated through
-   * {@link Type#generateDefaultValue()}.
+   * Creates a free variable with a name and type.
+   * A default value will be generated through {@link Type#generateDefaultValue()}.
    *
    * @param name Name of the free variable
    * @param type Identifier of the type of the free variable
@@ -37,8 +41,8 @@ public class FreeVariable implements Variable {
   /**
    * Creates a free variable with a name, type and default value.
    *
-   * @param name Name of the free variable
-   * @param type Identifier of the type of the free variable
+   * @param name         Name of the free variable
+   * @param type         Identifier of the type of the free variable
    * @param defaultValue Default value of the free variable
    */
   public FreeVariable(String name, String type, String defaultValue) {
@@ -93,8 +97,11 @@ public class FreeVariable implements Variable {
 
   @Override
   public String toString() {
-    return "FreeVariable{" + "name=" + name.get() + ", type=" + type.get() + ", defaultValue="
-        + defaultValue.get() + '}';
+    return "FreeVariable{"
+        + "name=" + name.get()
+        + ", type=" + type.get()
+        + ", defaultValue=" + defaultValue.get()
+        + '}';
   }
 
   @Override
@@ -114,8 +121,7 @@ public class FreeVariable implements Variable {
     if (getType() != null ? !getType().equals(that.getType()) : that.getType() != null) {
       return false;
     }
-    return getDefaultValue() != null ? getDefaultValue().equals(that.getDefaultValue())
-        : that.getDefaultValue() == null;
+    return getDefaultValue() != null ? getDefaultValue().equals(that.getDefaultValue()) : that.getDefaultValue() == null;
   }
 
   @Override

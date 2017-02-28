@@ -12,12 +12,6 @@ import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
 import edu.kit.iti.formal.stvs.view.Controller;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
@@ -28,6 +22,11 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextInputDialog;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Carsten Csiky
@@ -44,9 +43,12 @@ public class SpecificationsPaneController implements Controller {
   private final Map<Tab, SpecificationController> controllers;
   private final VerificationScenario scenario;
 
-  public SpecificationsPaneController(ObservableList<HybridSpecification> hybridSpecifications,
-      ObjectProperty<VerificationState> state, ObjectProperty<List<Type>> typeContext,
-      ObjectProperty<List<CodeIoVariable>> ioVariables, GlobalConfig globalConfig,
+  public SpecificationsPaneController(
+      ObservableList<HybridSpecification> hybridSpecifications,
+      ObjectProperty<VerificationState> state,
+      ObjectProperty<List<Type>> typeContext,
+      ObjectProperty<List<CodeIoVariable>> ioVariables,
+      GlobalConfig globalConfig,
       VerificationScenario scenario) {
     this.view = new SpecificationsPane();
     this.globalConfig = globalConfig;
@@ -59,19 +61,19 @@ public class SpecificationsPaneController implements Controller {
 
     hybridSpecifications.forEach(this::addTab);
     this.view.onTabAdded(() -> {
-      HybridSpecification hybridSpecification =
-          new HybridSpecification(new FreeVariableList(new ArrayList<>()), true);
+      HybridSpecification hybridSpecification = new HybridSpecification(
+          new FreeVariableList(new ArrayList<>()), true);
       for (CodeIoVariable ioVariable : ioVariables.get()) {
-        SpecIoVariable specIoVariable = new SpecIoVariable(ioVariable.getCategory(),
-            ioVariable.getType(), ioVariable.getName());
+        SpecIoVariable specIoVariable = new SpecIoVariable(ioVariable.getCategory(), ioVariable
+            .getType(), ioVariable.getName());
         hybridSpecification.getColumnHeaders().add(specIoVariable);
       }
       hybridSpecifications.add(hybridSpecification);
 
     });
 
-    view.getTabPane().getSelectionModel().selectedItemProperty()
-        .addListener((obs, old, tab) -> onSwitchActiveTab(tab));
+    view.getTabPane().getSelectionModel().selectedItemProperty().addListener((obs, old, tab)
+        -> onSwitchActiveTab(tab));
     onSwitchActiveTab(view.getTabPane().getSelectionModel().getSelectedItem());
 
     hybridSpecifications.addListener((ListChangeListener<HybridSpecification>) change -> {
@@ -106,9 +108,9 @@ public class SpecificationsPaneController implements Controller {
   }
 
   private SpecificationController addTab(HybridSpecification hybridSpecification, int index) {
-    SpecificationController controller =
-        new SpecificationController(typeContext, ioVariables, hybridSpecification, this.state,
-            Bindings.isEmpty(scenario.getCode().syntaxErrorsProperty()).not(), globalConfig);
+    SpecificationController controller = new SpecificationController(
+        typeContext, ioVariables, hybridSpecification, this.state,
+        Bindings.isEmpty(scenario.getCode().syntaxErrorsProperty()).not(), globalConfig);
     Tab tab = new Tab();
     tab.setOnCloseRequest(e -> onTabCloseRequest(e, tab));
     if (hybridSpecification.isEditable()) {

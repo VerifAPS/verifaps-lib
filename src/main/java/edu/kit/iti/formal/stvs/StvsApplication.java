@@ -27,8 +27,8 @@ public class StvsApplication extends Application {
     primaryStage.setScene(mainScene.getScene());
     primaryStage.setMaximized(mainScene.shouldBeMaximizedProperty().get());
     mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty());
-    primaryStage.getIcons()
-        .add(new Image(StvsApplication.class.getResourceAsStream("clipboard.png")));
+    primaryStage.getIcons().add(new Image(StvsApplication.class
+        .getResourceAsStream("clipboard.png")));
     primaryStage.show();
   }
 

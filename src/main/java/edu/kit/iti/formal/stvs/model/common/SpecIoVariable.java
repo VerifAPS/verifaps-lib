@@ -23,9 +23,9 @@ public class SpecIoVariable extends IoVariable implements Commentable {
   /**
    * Creates a variable that appears in the specification.
    *
-   * @param category The category of the variable
+   * @param category       The category of the variable
    * @param typeIdentifier The identifier of the type of the variable
-   * @param name The name of the Variable
+   * @param name           The name of the Variable
    */
   public SpecIoVariable(VariableCategory category, String typeIdentifier, String name) {
     this.category = new SimpleObjectProperty<>(category);
@@ -120,8 +120,7 @@ public class SpecIoVariable extends IoVariable implements Commentable {
     if (category != null ? !category.get().equals(that.category.get()) : that.category != null) {
       return false;
     }
-    return columnConfig != null ? columnConfig.equals(that.columnConfig)
-        : that.columnConfig == null;
+    return columnConfig != null ? columnConfig.equals(that.columnConfig) : that.columnConfig == null;
 
   }
 
