@@ -76,6 +76,7 @@ jaxb {
     xjc {
         xsdDir "src/main/resources/fileFormats/"
         destinationDir "build/generated-src/jaxb/"
+        args = ["-encoding", "UTF-8"]
     }
 }
 

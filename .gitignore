@@ -6,6 +6,7 @@
 *.iml
 /build/
 /buildtmp/
+/schema/
 
 /.classpath
 /.project

@@ -252,4 +252,29 @@ public class SpecificationTable<H extends Named, C, D> {
   public void setName(String name) {
     this.name.set(name);
   }
+
+  public String toString() {
+    StringBuilder str = new StringBuilder(getClass().getSimpleName());
+    str.append("\nDurations: ");
+    getDurations().stream().map(Object::toString)
+        .forEach(string -> {
+          str.append(string);
+          str.append(',');
+        });
+    str.append("\nColumns: ");
+    getColumnHeaders().stream().map(Object::toString)
+        .forEach(string -> {
+          str.append(string);
+          str.append(',');
+        });
+    str.append("\nRows:\n");
+    getRows().stream().forEachOrdered(row -> {
+      getColumnHeaders().forEach(header -> {
+        str.append(row.getCells().get(header.getName()));
+        str.append(',');
+      });
+      str.append('\n');
+    });
+    return str.toString();
+  }
 }

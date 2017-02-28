@@ -1,7 +1,8 @@
 package edu.kit.iti.formal.stvs.util;
 
 /**
- * This interface represents a handler that gets called after a {@link AsyncTask} has completed its work.
+ * This interface represents a handler that gets called after a {@link AsyncTask}
+ * has completed its work.
  */
 @FunctionalInterface
 public interface AsyncTaskCompletedHandler<T> {

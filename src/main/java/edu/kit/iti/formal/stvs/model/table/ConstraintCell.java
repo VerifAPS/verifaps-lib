@@ -83,7 +83,6 @@ public class ConstraintCell implements CellOperationProvider {
   }
 
   public String toString() {
-    return "ConstraintCell(" + getAsString() + ", comment: " + getComment() + ")";
+    return debuggingString();
   }
-
 }
