@@ -5,12 +5,16 @@ import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.view.Demo;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import org.junit.Test;
+import org.junit.experimental.categories.Categories;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +23,9 @@ import java.util.Arrays;
 /**
  * Created by leonk on 02.02.2017.
  */
-public class TimingDiagramCollectionControllerTest {
+@RunWith(Categories.class)
+@Category(Demo.class)
+public class TimingDiagramCollectionControllerDemo {
 
   @Test
   public void javaFxTest() {
@@ -31,7 +37,7 @@ public class TimingDiagramCollectionControllerTest {
     try {
       XmlConcreteSpecImporter importer = new XmlConcreteSpecImporter(Arrays.asList(TypeInt.INT, TypeBool.BOOL));
       FileInputStream inputStream = new FileInputStream(new File
-          (TimingDiagramCollectionControllerTest.class.getResource("spec_concrete_valid_1.xml").toURI()));
+          (TimingDiagramCollectionControllerDemo.class.getResource("spec_concrete_valid_1.xml").toURI()));
       ConcreteSpecification importedSpec = importer.doImport(inputStream);
 
       Selection selection = new Selection();

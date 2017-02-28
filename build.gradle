@@ -111,6 +111,9 @@ task guiTest(type: Test) {
     filter {
         includeTestsMatching "edu.kit.iti.formal.stvs.view.*"
     }
+    useJUnit {
+        excludeCategories 'edu.kit.iti.formal.stvs.view.Demo'
+    }
     testLogging {
         showStandardStreams = true
     }

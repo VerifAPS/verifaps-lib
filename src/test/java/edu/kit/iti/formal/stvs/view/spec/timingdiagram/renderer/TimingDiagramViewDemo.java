@@ -1,14 +1,20 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
+import edu.kit.iti.formal.stvs.view.Demo;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.scene.Scene;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Categories;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
 
 /**
  * Created by leonk on 02.02.2017.
  */
-public class TimingDiagramViewTest {
+@RunWith(Categories.class)
+@Category(Demo.class)
+public class TimingDiagramViewDemo {
   @Ignore
   @Test
   public void javaFxTest() {

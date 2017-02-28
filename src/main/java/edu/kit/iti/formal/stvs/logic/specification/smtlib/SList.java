@@ -17,16 +17,6 @@ public class SList implements SExpression {
   private List<SExpression> sexp;
 
   /**
-   * Helper constructor.
-   *
-   * @param sexp array of {@link SExpression}
-   * @see SList#SList(List)
-   */
-  public SList(SExpression... sexp) {
-    this(Arrays.asList(sexp));
-  }
-
-  /**
    * Creates an instance from a list of {@link SExpression}.
    *
    * @param sexp list of {@link SExpression}
