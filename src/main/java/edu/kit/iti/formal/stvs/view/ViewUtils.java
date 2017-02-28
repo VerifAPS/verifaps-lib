@@ -1,6 +1,8 @@
 package edu.kit.iti.formal.stvs.view;
 
+import edu.kit.iti.formal.stvs.view.editor.EditorPane;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 
@@ -29,5 +31,26 @@ public class ViewUtils {
     return child.getLocalToParentTransform().createConcatenation(parentTransform);
   }
 
+  /**
+   * adds the style sheet (name "style.css" and located in the same package) to the given parent
+   * and sets the css-id for the parent
+   * @param parent parent that should be setup
+   */
+  public static void setupView(Parent parent) {
+
+    parent.getStylesheets().add(parent.getClass().getResource("style.css").toExternalForm());
+
+    setupId(parent);
+  }
+
+  /**
+   * sets the css-id for the parent.
+   * @param parent parent that should be setup
+   */
+  public static void setupId(Parent parent) {
+
+
+    parent.setId(parent.getClass().getSimpleName());
+  }
 
 }

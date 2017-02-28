@@ -15,11 +15,21 @@ import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.stage.FileChooser;
+import org.mockito.Mockito;
+import org.mockito.stubbing.OngoingStubbing;
+import org.powermock.api.mockito.PowerMockito;
 
+import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Created by bal on 10.02.17.
@@ -96,5 +106,19 @@ public class TestUtils {
       throw new RuntimeException("Couldn't validate");
     }
     return validator.validFreeVariablesProperty().get();
+  }
+
+  public static void mockFiles(URL ... urls) throws Exception {
+    List<File> files = Arrays.stream(urls)
+        .map(URL::getPath)
+        .map(File::new)
+        .collect(Collectors.toList());
+    FileChooser chooser = Mockito.mock(FileChooser.class);
+    OngoingStubbing<File> stub = Mockito.when(chooser.showOpenDialog(any()));
+    for (File file : files) {
+      stub = stub.thenReturn(file);
+    }
+    Mockito.when(chooser.getExtensionFilters()).thenReturn(FXCollections.observableList(new ArrayList<>()));
+    PowerMockito.whenNew(FileChooser.class).withAnyArguments().thenReturn(chooser);
   }
 }
