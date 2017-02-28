@@ -21,7 +21,7 @@ import java.util.List;
 public class CellParseProblem extends CellProblem {
 
   /**
-   * <p>Tries to create an {@link Expression} from the given string and context information</p>
+   * <p>Tries to create an {@link Expression} from the given string and context information.</p>
    *
    * @param typeContext the type context needed for parsing enums
    * @param columnId the column of the cell to check

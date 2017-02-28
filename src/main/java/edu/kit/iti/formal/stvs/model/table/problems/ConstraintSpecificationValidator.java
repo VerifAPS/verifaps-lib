@@ -2,8 +2,6 @@ package edu.kit.iti.formal.stvs.model.table.problems;
 
 import edu.kit.iti.formal.stvs.model.common.*;
 import edu.kit.iti.formal.stvs.model.expressions.*;
-import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
-import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
@@ -20,7 +18,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Created by philipp on 09.02.17.
+ * <p>The validator for {@link ConstraintSpecification}s. It converts these into the formal
+ * model: {@link ValidSpecification}. If there are any problems while converting, then
+ * {@link SpecProblem}s are created.</p>
+ *
+ * <p>This object has observable properties and can therefore be used like any other model
+ * instance in the controllers.</p>
+ *
+ * <p>Created by philipp on 09.02.17.</p>
  *
  * @author Philipp
  */
@@ -37,6 +42,19 @@ public class ConstraintSpecificationValidator {
 
   private final InvalidationListener listenToSpecUpdate = this::onSpecUpdated;
 
+  /**
+   * <p>Creates a validator with given observable models as context information.</p>
+   *
+   * <p>The validator observes changes in any of the given context models. It automatically
+   * updates the validated specification (see {@link #validSpecificationProperty()}) and/or
+   * the problems with the constraint specification (see {@link #problemsProperty()}).</p>
+   *
+   * @param typeContext the extracted types (esp. enums) from the code area
+   * @param codeIoVariables the extracted {@link CodeIoVariable}s from the code area
+   * @param validFreeVariables the most latest validated free variables from the
+   *                           {@link FreeVariableList}.
+   * @param specification the specification to be validated
+   */
   public ConstraintSpecificationValidator(
       ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> codeIoVariables,
@@ -136,7 +154,7 @@ public class ConstraintSpecificationValidator {
     for (int durIndex = 0; durIndex < specification.getDurations().size(); durIndex++) {
       try {
         LowerBoundedInterval interval =
-            DurationProblem.tryParseDuration(durIndex, specification.getDurations().get(durIndex));
+            DurationParseProblem.tryParseDuration(durIndex, specification.getDurations().get(durIndex));
         if (specificationIsValid) {
           validSpec.getDurations().add(interval);
         }
@@ -171,7 +189,8 @@ public class ConstraintSpecificationValidator {
    *                     if the cell is ill-typed ({@link CellTypeProblem}).
    */
   public static Expression tryValidateCellExpression(List<Type> typeContext,
-                                                     TypeChecker typeChecker, String columnId,
+                                                     TypeChecker typeChecker,
+                                                     String columnId,
                                                      int row, ConstraintCell cell)
       throws CellProblem {
     Expression expr = CellParseProblem.tryParseCellExpression(typeContext, columnId, row, cell);

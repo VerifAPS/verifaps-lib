@@ -9,7 +9,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 
 /**
- * Created by csicar on 11.01.17.
+ * <p>The view for a config dialog. Includes numerous text fields, checkboxes and number
+ * text fields that match the fields of a {@link edu.kit.iti.formal.stvs.model.config.GlobalConfig}.
+ * </p>
+ *
+ * <p>Created by csicar on 11.01.17.</p>
  *
  * @author Carsten Csiky
  */
@@ -26,6 +30,13 @@ public class ConfigDialogPane extends DialogPane {
   public final ComboBox<String> uiLanguage;
   public final ButtonType okButtonType;
 
+  /**
+   * <p>Creates the view for a config dialog.</p>
+   *
+   * <p>Text fields and checkboxes have to be initialized from a
+   * {@link edu.kit.iti.formal.stvs.model.config.GlobalConfig} model.
+   * For that, use the {@link ConfigDialogManager}.</p>
+   */
   public ConfigDialogPane() {
     verificationTimeout = new PositiveIntegerInputField();
     simulationTimeout = new PositiveIntegerInputField();

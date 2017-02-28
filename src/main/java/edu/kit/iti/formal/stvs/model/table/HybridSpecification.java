@@ -174,18 +174,18 @@ public class HybridSpecification extends ConstraintSpecification {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
+    if (!super.equals(obj)) {
       return false;
     }
 
-    HybridSpecification that = (HybridSpecification) o;
+    HybridSpecification that = (HybridSpecification) obj;
 
     if (isEditable() != that.isEditable()) {
       return false;

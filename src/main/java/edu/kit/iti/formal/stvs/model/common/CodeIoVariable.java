@@ -42,7 +42,7 @@ public class CodeIoVariable extends IoVariable {
     return type;
   }
 
-  public boolean equals(CodeIoVariable other) {
+  private boolean equals(CodeIoVariable other) {
     if (other == null) {
       return false;
     }

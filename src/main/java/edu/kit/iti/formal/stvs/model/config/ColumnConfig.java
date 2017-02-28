@@ -52,15 +52,15 @@ public class ColumnConfig {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
     }
-    if (!(o instanceof ColumnConfig)) {
+    if (!(obj instanceof ColumnConfig)) {
       return false;
     }
 
-    ColumnConfig that = (ColumnConfig) o;
+    ColumnConfig that = (ColumnConfig) obj;
 
     return width.get() == that.width.get();
   }

@@ -15,7 +15,7 @@ public class CodeIoVariableTest {
   private Object object = new Object();
 
   @Test
-  public void equalsCodeIOVariable() throws Exception {
+  public void equalsCodeIoVariable() throws Exception {
     assertTrue(var1.equals(var2));
   }
 

@@ -55,9 +55,9 @@ public class ConcreteDuration {
       return true;
     }
     ConcreteDuration other = (ConcreteDuration) obj;
-    return new EqualsBuilder().
-        append(duration, other.duration).
-        append(beginCycle, other.beginCycle).
-        isEquals();
+    return new EqualsBuilder()
+        .append(duration, other.duration)
+        .append(beginCycle, other.beginCycle)
+        .isEquals();
   }
 }

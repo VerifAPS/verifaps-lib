@@ -19,7 +19,9 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 /**
- * Created by csicar on 11.01.17.
+ * <p>The manager for the Config dialog view (with its model being the {@link GlobalConfig}).</p>
+ *
+ * <p>Created by csicar on 11.01.17.</p>
  *
  * @author Carsten Csiky
  */
@@ -29,22 +31,11 @@ public class ConfigDialogManager implements Controller {
   private Scene scene;
   private ConfigDialogPane view;
 
-  private void bind(StringProperty stringProperty, IntegerProperty integerProperty) {
-    stringProperty.set(integerProperty.getValue().toString());
-  }
-
-  private void bind(StringProperty stringProperty, StringProperty integerProperty) {
-    stringProperty.set(integerProperty.get());
-  }
-
-  private void bind(BooleanProperty booleanProperty, BooleanProperty booleanProperty2) {
-    booleanProperty.set(booleanProperty2.get());
-  }
-
-  private void bind(ObjectProperty<String> objectProperty, StringProperty stringProperty) {
-    objectProperty.set(stringProperty.get());
-  }
-
+  /**
+   * <p>Creates the manager for the config dialog view. Here the model is bound to the view.</p>
+   *
+   * @param config the model to bind to the view
+   */
   public ConfigDialogManager(GlobalConfig config) {
     this.config = config;
     this.view = new ConfigDialogPane();
@@ -93,13 +84,33 @@ public class ConfigDialogManager implements Controller {
       config.setGetetaCommand(view.getetaCommand.getText());
       try {
         config.autosaveConfig();
-      } catch (IOException | ExportException e) {
-        AlertFactory.createAlert(Alert.AlertType.ERROR, "Autosave error", "Error saving the current" +
-            " configuration", "The current configuration could not be saved.", e.getMessage());
+      } catch (IOException | ExportException exception) {
+        AlertFactory.createAlert(
+            Alert.AlertType.ERROR,
+            "Autosave error",
+            "Error saving the current configuration",
+            "The current configuration could not be saved.",
+            exception.getMessage());
       }
       return config;
     });
     dialog.showAndWait();
+  }
+
+  private void bind(StringProperty stringProperty, IntegerProperty integerProperty) {
+    stringProperty.set(integerProperty.getValue().toString());
+  }
+
+  private void bind(StringProperty stringProperty, StringProperty integerProperty) {
+    stringProperty.set(integerProperty.get());
+  }
+
+  private void bind(BooleanProperty booleanProperty, BooleanProperty booleanProperty2) {
+    booleanProperty.set(booleanProperty2.get());
+  }
+
+  private void bind(ObjectProperty<String> objectProperty, StringProperty stringProperty) {
+    objectProperty.set(stringProperty.get());
   }
 
 

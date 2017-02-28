@@ -9,7 +9,8 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import java.util.List;
 
 /**
- * <p>An instance is created when an {@link Expression} in a {@link ConstraintCell} is ill-typed</p>
+ * <p>An instance is created when an {@link Expression} in a {@link ConstraintCell} is ill-typed.
+ * </p>
  *
  * @author Benjamin Alt
  */

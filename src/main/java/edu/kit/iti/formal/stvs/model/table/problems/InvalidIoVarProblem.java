@@ -109,18 +109,18 @@ public class InvalidIoVarProblem extends ColumnProblem {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
+    if (!super.equals(obj)) {
       return false;
     }
 
-    InvalidIoVarProblem that = (InvalidIoVarProblem) o;
+    InvalidIoVarProblem that = (InvalidIoVarProblem) obj;
 
     if (getSpecIoVariable() != null ? !getSpecIoVariable().equals(that.getSpecIoVariable()) : that.getSpecIoVariable() != null) {
       return false;

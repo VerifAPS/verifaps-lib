@@ -16,24 +16,43 @@ import org.fxmisc.richtext.StyleSpans;
 import java.util.Collection;
 
 /**
- * Created by csicar on 09.01.17.
+ * <p>The view for the left side of our application: The code editor.</p>
+ *
+ * <p>This view contains both the {@link CodeArea} for editing the code and the
+ * {@link ListView} for viewing a list of syntax errors. It itself extends a
+ * {@link SplitPane} for combining these two views.</p>
+ *
+ * <p>Created by csicar on 09.01.17.</p>
  *
  * @author Lukas Fritsch
  */
 public class EditorPane extends SplitPane {
 
-  /**
-   * Contains ButtonList and CodeArea
-   */
   private CodeArea codeArea;
   private ListView<SyntaxError> syntaxErrorListView;
 
   private Pane syntaxErrorPane;
 
+  /**
+   * <p>Creates an EditorPane with the given code as initial source code text.</p>
+   *
+   * <p>This is a default constructor (see {@link #EditorPane(String, ObservableList, boolean)})
+   * for initializing showing of lines to true</p>
+   *
+   * @param code the string to initialize the {@link CodeArea} to
+   * @param syntaxErrors the initial list of {@link SyntaxError}s.
+   */
   public EditorPane(String code, ObservableList<SyntaxError> syntaxErrors) {
     this(code, syntaxErrors, true);
   }
 
+  /**
+   * <p>Creates an editable EditorPane with the given code as initial source code text.</p>
+   *
+   * @param code the string to initialize the {@link CodeArea} to
+   * @param syntaxErrors the initial list of {@link SyntaxError}s.
+   * @param showLineNumbers whether to show line numbers in the {@link CodeArea}
+   */
   public EditorPane(String code, ObservableList<SyntaxError> syntaxErrors, boolean
       showLineNumbers) {
     super();

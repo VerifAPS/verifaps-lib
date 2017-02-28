@@ -39,7 +39,7 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
 
   private final StringProperty comment;
   private final FreeVariableList freeVariableList;
-  private final ChangeListener<String> onSpecIoVariableNameChanged = this::onSpecIoVariableNameChanged;
+  private final ChangeListener<String> onSpecIoVariableNameChanged;
 
   /**
    * Construct a new, empty ConstraintSpecification with a default name from an initial list of
@@ -70,6 +70,7 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
             durationCell.stringRepresentationProperty(),
             durationCell.commentProperty()
         });
+    this.onSpecIoVariableNameChanged = this::onSpecIoVariableNameChanged;
     this.freeVariableList = freeVariableList;
 
     this.comment = new SimpleStringProperty("");
@@ -160,23 +161,27 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
+    if (!super.equals(obj)) {
       return false;
     }
 
-    ConstraintSpecification that = (ConstraintSpecification) o;
+    ConstraintSpecification that = (ConstraintSpecification) obj;
 
-    if (getComment() != null ? !getComment().equals(that.getComment()) : that.getComment() != null) {
+    if (getComment() != null
+        ? !getComment().equals(that.getComment())
+        : that.getComment() != null) {
       return false;
     }
-    return getFreeVariableList() != null ? getFreeVariableList().equals(that.getFreeVariableList()) : that.getFreeVariableList() == null;
+    return getFreeVariableList() != null
+        ? getFreeVariableList().equals(that.getFreeVariableList())
+        : that.getFreeVariableList() == null;
   }
 
   @Override

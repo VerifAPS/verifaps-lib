@@ -26,8 +26,8 @@ public class CellTypeProblemTest {
   @Before
   public void setUp() {
     typeCheckEx = new TypeCheckException(new BinaryFunctionExpr(BinaryFunctionExpr.Op.AND, new
-        LiteralExpr(new ValueInt(2)), new LiteralExpr(ValueBool.TRUE)), "Expected type \"BOOL\"," +
-        "but got \"INT\"");
+        LiteralExpr(new ValueInt(2)), new LiteralExpr(ValueBool.TRUE)), "Expected type \"BOOL\","
+        + "but got \"INT\"");
     problem = new CellTypeProblem(typeCheckEx, "A", 4);
   }
 

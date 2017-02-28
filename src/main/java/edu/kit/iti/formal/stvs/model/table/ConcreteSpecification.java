@@ -9,15 +9,16 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * A concrete instance of a specification (i.e. a specification table with cells containing only
+ * <p>A concrete instance of a specification (i.e. a specification table with cells containing only
  * concrete values and concrete durations). Counterexamples and the results of the concretization
  * of a {@link ConstraintSpecification}
  * (see {@link edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer} are of this
- * type.
+ * type.</p>
  *
  * @author Benjamin Alt
  */
-public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, ConcreteCell, ConcreteDuration> {
+public class ConcreteSpecification
+    extends SpecificationTable<ValidIoVariable, ConcreteCell, ConcreteDuration> {
 
   private final boolean isCounterExample;
 
@@ -36,11 +37,12 @@ public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, C
    *
    * @param ioVariables      The input/output variables defining the columns
    * @param rows             The rows of concrete cells. One cycle corresponds to one row
-   * @param durations        The concrete durations. This list can be shorter than the number of rows,
-   *                         because for a duration of n there will be n rows.
+   * @param durations        The concrete durations. This list can be shorter than the number of
+   *                         rows, because for a duration of n there will be n rows.
    * @param isCounterExample True if this ConcreteSpecification is a counterexample
    */
-  public ConcreteSpecification(List<ValidIoVariable> ioVariables, List<SpecificationRow<ConcreteCell>> rows,
+  public ConcreteSpecification(List<ValidIoVariable> ioVariables,
+                               List<SpecificationRow<ConcreteCell>> rows,
                                List<ConcreteDuration> durations,
                                boolean isCounterExample) {
     this(DEFAULT_NAME, ioVariables, rows, durations, isCounterExample);
@@ -52,8 +54,8 @@ public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, C
    * @param name             The name of this ConcreteSpecification
    * @param ioVariables      The input/output variables defining the columns
    * @param rows             The rows of concrete cells. One cycle corresponds to one row
-   * @param durations        The concrete durations. This list can be shorter than the number of rows,
-   *                         because for a duration of n there will be n rows.
+   * @param durations        The concrete durations. This list can be shorter than the number of
+   *                         rows, because for a duration of n there will be n rows.
    * @param isCounterExample True if this ConcreteSpecification is a counterexample
    */
   public ConcreteSpecification(String name, List<ValidIoVariable> ioVariables,
@@ -78,8 +80,8 @@ public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, C
    * may cover multiple cycles. This function returns the list of concrete values corresponding
    * to a constraint identified by its column and row (as in a ConstraintSpecification).
    *
-   * @param column        The column identifier for the constraint cell (the name of the input/output
-   *                      variable)
+   * @param column        The column identifier for the constraint cell
+   *                      (the name of the input/output variable)
    * @param constraintRow The row of the constraint cell (according to the
    *                      ConstraintSpecification row semantics, see description above)
    * @return The list of concrete cells corresponding to this concrete value
@@ -107,8 +109,8 @@ public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, C
    *
    * @param constraintRow The index of a row in a {@link ConstraintSpecification}
    * @return The concrete duration assigned to the duration expression of the given row. The
-   * Optional return value is empty if there is no such duration (e.g. in a counterexample, where
-   * the error state is reached before the last row of the constraint specification)
+   *         Optional return value is empty if there is no such duration (e.g. in a counterexample, where
+   *         the error state is reached before the last row of the constraint specification)
    */
   public Optional<ConcreteDuration> getConcreteDurationForConstraintRow(int constraintRow) {
     if (constraintRow >= durations.size()) {
@@ -139,18 +141,18 @@ public class ConcreteSpecification extends SpecificationTable<ValidIoVariable, C
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
+    if (!super.equals(obj)) {
       return false;
     }
 
-    ConcreteSpecification that = (ConcreteSpecification) o;
+    ConcreteSpecification that = (ConcreteSpecification) obj;
 
     return isCounterExample() == that.isCounterExample();
   }

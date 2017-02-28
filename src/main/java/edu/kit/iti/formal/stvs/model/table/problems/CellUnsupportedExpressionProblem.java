@@ -3,6 +3,10 @@ package edu.kit.iti.formal.stvs.model.table.problems;
 import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 
 /**
+ * <p>The cell problem analogue to the {@link UnsupportedExpressionException}. Created when
+ * expressions with function calls or if guards or similar are encountered, that have not yet
+ * been implemented.</p>
+ *
  * @author Benjamin Alt
  */
 public class CellUnsupportedExpressionProblem extends CellProblem {
@@ -13,7 +17,15 @@ public class CellUnsupportedExpressionProblem extends CellProblem {
     return exception.getMessage();
   }
 
-  public CellUnsupportedExpressionProblem(UnsupportedExpressionException exception, String column, int row) {
+  /**
+   * <p>Creates the cell problem for an {@link UnsupportedExpressionException}.</p>
+   *
+   * @param exception the exception that caused this cell problem
+   * @param column the column of the cell in the table
+   * @param row the row of the cell in the table
+   */
+  public CellUnsupportedExpressionProblem(
+      UnsupportedExpressionException exception, String column, int row) {
     super(createErrorMessage(exception), column, row);
     this.exception = exception;
   }
