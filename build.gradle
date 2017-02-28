@@ -55,6 +55,11 @@ dependencies {
     jaxb 'javax.xml.bind:jaxb-api:2.2.7'
 
     testCompile "junit:junit:4.12"
+    testCompile "org.testfx:testfx-core:4.0.+"
+    testCompile "org.testfx:testfx-junit:4.0.+"
+    testCompile "org.mockito:mockito-core:2.4.0"
+    testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '1.7.0RC2'
+    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '1.7.0RC2'
 }
 
 System.setProperty('javax.xml.accessExternalSchema', 'file')
@@ -85,5 +90,15 @@ test {
         append = false
         destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
         classDumpFile = file("$buildDir/jacoco/classpathdumps")
+    }
+}
+
+
+task guiTest(type: Test) {
+    filter {
+        includeTestsMatching "edu.kit.iti.formal.stvs.view.*"
+    }
+    testLogging {
+        showStandardStreams = true
     }
 }

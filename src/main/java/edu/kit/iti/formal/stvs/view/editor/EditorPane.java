@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.view.editor;
 
 import edu.kit.iti.formal.stvs.model.code.SyntaxError;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
