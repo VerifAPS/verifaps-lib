@@ -13,13 +13,19 @@ plugins {
 
 apply plugin: 'application'
 apply plugin: "jacoco"
+apply plugin: 'antlr'
 
 compileJava.options.encoding = 'UTF-8'
+compileJava.dependsOn(xjc)
 
 sourceSets {
     main {
         java {
-            srcDirs =  ['src/main/java', 'src/generated/java']
+            srcDirs = [
+                'src/main/java',
+                'build/generated-src/jaxb',
+                'build/generated-src/antlr/main'
+            ]
         }
     }
 }
@@ -34,8 +40,6 @@ repositories {
         url "http://formal.iti.kit.edu/maven2/"
     }
 }
-
-// In this section you declare the dependencies for your production and test code
 dependencies {
     compile 'com.fifesoft:rsyntaxtextarea:2.6.0'
     compile 'org.apache.commons:commons-collections4:4.0'
@@ -50,11 +54,13 @@ dependencies {
     compile group: 'de.jensd', name: 'fontawesomefx', version: '8.9'
     compile group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.2.3-1'
 
+    testCompile "junit:junit:4.12"
+
+    antlr 'org.antlr:antlr4:4.6'
+
     jaxb 'com.sun.xml.bind:jaxb-xjc:2.2.7-b41'
     jaxb 'com.sun.xml.bind:jaxb-impl:2.2.7-b41'
     jaxb 'javax.xml.bind:jaxb-api:2.2.7'
-
-    testCompile "junit:junit:4.12"
 }
 
 System.setProperty('javax.xml.accessExternalSchema', 'file')
@@ -62,8 +68,13 @@ System.setProperty('javax.xml.accessExternalSchema', 'file')
 jaxb {
     xjc {
         xsdDir "src/main/resources/fileFormats/"
-        destinationDir "src/generated/java/"
+        destinationDir "build/generated-src/jaxb/"
     }
+}
+
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += ["-visitor", "-long-messages"]
 }
 
 jar {

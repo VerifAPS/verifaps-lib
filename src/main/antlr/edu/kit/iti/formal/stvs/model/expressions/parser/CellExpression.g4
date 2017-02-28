@@ -1,6 +1,11 @@
 grammar CellExpression;
 
-@header{
+@parser::header{
+package edu.kit.iti.formal.stvs.model.expressions.parser;
+}
+
+@lexer::header{
+package edu.kit.iti.formal.stvs.model.expressions.parser;
 }
 
 cell : chunk (COMMA chunk)*;
