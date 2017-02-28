@@ -25,7 +25,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Controller for a single {@link TimingDiagramView} that covers all cycles of <b>one</b>
- * {@link ValidIoVariable} in a {@link ConcreteSpecification}
+ * {@link ValidIoVariable} in a {@link ConcreteSpecification}.
  *
  * @author Leon Kaucher
  */
@@ -54,26 +54,26 @@ public class TimingDiagramController implements Controller {
       ConcreteSpecification spec, ValidIoVariable ioVariable, Selection selection,
       BooleanProperty activated) {
     this.activated = activated;
-    XYChart.Series<Number, Number> seriesData =
-        Plotable.toNumberSeries(spec.getColumnByName(ioVariable.getName()).getCells());
     this.selection = selection;
     this.ioVariable = ioVariable;
     this.concreteSpec = spec;
     this.commonXAxis = commonXAxis;
-    NumberAxis xAxis = new NumberAxis(0, 0, 1);
-    NumberAxis yAxis = new NumberAxis();
-    TimingDiagramView<Number> view = new TimingDiagramView<>(xAxis, yAxis);
+    NumberAxis xaxis = new NumberAxis(0, 0, 1);
+    NumberAxis yaxis = new NumberAxis();
+    TimingDiagramView<Number> view = new TimingDiagramView<>(xaxis, yaxis);
     this.view = view;
+    XYChart.Series<Number, Number> seriesData =
+        Plotable.toNumberSeries(spec.getColumnByName(ioVariable.getName()).getCells());
     ObservableList<XYChart.Series<Number, Number>> data = FXCollections.observableArrayList();
     data.add(seriesData);
     view.getData().addAll(data);
 
-    externalYAxis.prefHeightProperty().bind(yAxis.heightProperty());
-    externalYAxis.upperBoundProperty().bind(yAxis.upperBoundProperty());
-    externalYAxis.lowerBoundProperty().bind(yAxis.lowerBoundProperty());
-    xAxis.lowerBoundProperty().bind(commonXAxis.lowerBoundProperty());
-    xAxis.upperBoundProperty().bind(commonXAxis.upperBoundProperty());
-    yAxis.getStyleClass().add("zeroWidth");
+    externalYAxis.prefHeightProperty().bind(yaxis.heightProperty());
+    externalYAxis.upperBoundProperty().bind(yaxis.upperBoundProperty());
+    externalYAxis.lowerBoundProperty().bind(yaxis.lowerBoundProperty());
+    xaxis.lowerBoundProperty().bind(commonXAxis.lowerBoundProperty());
+    xaxis.upperBoundProperty().bind(commonXAxis.upperBoundProperty());
+    yaxis.getStyleClass().add("zeroWidth");
 
     initCommon();
   }
@@ -92,31 +92,31 @@ public class TimingDiagramController implements Controller {
       ConcreteSpecification spec, ValidIoVariable ioVariable, Selection selection,
       BooleanProperty activated) {
     this.activated = activated;
-    XYChart.Series<Number, String> seriesData =
-        Plotable.toStringSeries(spec.getColumnByName(ioVariable.getName()).getCells());
     this.ioVariable = ioVariable;
     this.selection = selection;
     this.concreteSpec = spec;
     this.commonXAxis = commonXAxis;
-    NumberAxis xAxis = new NumberAxis(0, 0, 1);
-    CategoryAxis yAxis = new CategoryAxis();
-    TimingDiagramView<String> view = new TimingDiagramView<>(xAxis, yAxis);
+    NumberAxis xaxis = new NumberAxis(0, 0, 1);
+    CategoryAxis yaxis = new CategoryAxis();
+    TimingDiagramView<String> view = new TimingDiagramView<>(xaxis, yaxis);
     this.view = view;
+    XYChart.Series<Number, String> seriesData =
+        Plotable.toStringSeries(spec.getColumnByName(ioVariable.getName()).getCells());
     ObservableList<XYChart.Series<Number, String>> data = FXCollections.observableArrayList();
     data.add(seriesData);
     view.getData().addAll(data);
 
-    externalYAxis.prefHeightProperty().bind(yAxis.heightProperty());
-    yAxis.setAutoRanging(true);
-    yAxis.setCategories(externalYAxis.getCategories());
-    xAxis.lowerBoundProperty().bind(commonXAxis.lowerBoundProperty());
-    xAxis.upperBoundProperty().bind(commonXAxis.upperBoundProperty());
+    externalYAxis.prefHeightProperty().bind(yaxis.heightProperty());
+    yaxis.setAutoRanging(true);
+    yaxis.setCategories(externalYAxis.getCategories());
+    xaxis.lowerBoundProperty().bind(commonXAxis.lowerBoundProperty());
+    xaxis.upperBoundProperty().bind(commonXAxis.upperBoundProperty());
 
     initCommon();
   }
 
   /**
-   * Generates an integer timing diagram
+   * Generates an integer timing diagram.
    *
    * @param concreteSpec the concrete specification which should be used to extract the needed
    *        information
@@ -126,16 +126,16 @@ public class TimingDiagramController implements Controller {
   public static Pair<TimingDiagramController, Axis> createIntegerTimingDiagram(
       ConcreteSpecification concreteSpec, ValidIoVariable specIoVar, NumberAxis globalXAxis,
       Selection selection, BooleanProperty activated) {
-    NumberAxis yAxis = new NumberAxis(0, 10, 1);
-    yAxis.setPrefWidth(30);
-    yAxis.setSide(Side.LEFT);
+    NumberAxis yaxis = new NumberAxis(0, 10, 1);
+    yaxis.setPrefWidth(30);
+    yaxis.setSide(Side.LEFT);
     TimingDiagramController timingDiagramController = new TimingDiagramController(globalXAxis,
-        yAxis, concreteSpec, specIoVar, selection, activated);
-    return new ImmutablePair<>(timingDiagramController, yAxis);
+        yaxis, concreteSpec, specIoVar, selection, activated);
+    return new ImmutablePair<>(timingDiagramController, yaxis);
   }
 
   /**
-   * Generates a boolean timing diagram
+   * Generates a boolean timing diagram.
    *
    * @param concreteSpec the concrete specification which should be used to extract the needed
    *        information
@@ -157,7 +157,7 @@ public class TimingDiagramController implements Controller {
   }
 
   /**
-   * Generates an enum timing diagram
+   * Generates an enum timing diagram.
    *
    * @param concreteSpec the concrete specification which should be used to extract the needed
    *        information
@@ -179,17 +179,17 @@ public class TimingDiagramController implements Controller {
   }
 
   /**
-   * Create mouse events and context menu entries
+   * Create mouse events and context menu entries.
    */
   private void initCommon() {
     view.setDurations(concreteSpec.getDurations());
     // view.getyAxis().layoutBoundsProperty().addListener(change -> updateAxisExternalPosition());
     view.setOnMouseClicked(this::onMouseClicked);
-    MenuItem xPositiveZoomItem = new MenuItem("Zoom X+");
-    xPositiveZoomItem.setOnAction(this::onXPositiveZoom);
-    MenuItem xNegativeZoomItem = new MenuItem("Zoom X-");
-    xNegativeZoomItem.setOnAction(this::onXNegativeZoom);
-    view.getContextMenu().getItems().setAll(xPositiveZoomItem, xNegativeZoomItem);
+    MenuItem xpositiveZoomItem = new MenuItem("Zoom X+");
+    xpositiveZoomItem.setOnAction(this::onXPositiveZoom);
+    MenuItem xnegativeZoomItem = new MenuItem("Zoom X-");
+    xnegativeZoomItem.setOnAction(this::onXNegativeZoom);
+    view.getContextMenu().getItems().setAll(xpositiveZoomItem, xnegativeZoomItem);
     ObservableList<Rectangle> cycleSelectionRectangles = view.getCycleSelectionRectangles();
     for (int i = 0; i < cycleSelectionRectangles.size(); i++) {
       Rectangle cycleSelectionRectangle = cycleSelectionRectangles.get(i);

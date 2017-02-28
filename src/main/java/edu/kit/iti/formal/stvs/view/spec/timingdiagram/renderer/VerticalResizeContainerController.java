@@ -8,7 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 
 /**
- * Controller for {@link VerticalResizeContainerView}
+ * Controller for {@link VerticalResizeContainerView}.
  *
  * @author Leon Kaucher
  */

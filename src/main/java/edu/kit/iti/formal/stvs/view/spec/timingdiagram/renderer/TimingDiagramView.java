@@ -27,8 +27,8 @@ import javafx.scene.shape.Rectangle;
  */
 public class TimingDiagramView<A> extends XYChart<Number, A> {
 
-  private NumberAxis xAxis;
-  private Axis<A> yAxis;
+  private NumberAxis xaxis;
+  private Axis<A> yaxis;
 
   private ObservableList<Line> horizontalLines = FXCollections.observableArrayList();
   private ObservableList<Line> verticalLines = FXCollections.observableArrayList();
@@ -45,13 +45,13 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   /**
    * Instantiates a new Timing diagram view.
    *
-   * @param xAxis the x axis
-   * @param yAxis the y axis
+   * @param xaxis the x axis
+   * @param yaxis the y axis
    */
-  public TimingDiagramView(NumberAxis xAxis, Axis<A> yAxis) {
-    super(xAxis, yAxis);
-    this.xAxis = xAxis;
-    this.yAxis = yAxis;
+  public TimingDiagramView(NumberAxis xaxis, Axis<A> yaxis) {
+    super(xaxis, yaxis);
+    this.xaxis = xaxis;
+    this.yaxis = yaxis;
 
     setPrefHeight(80);
 
@@ -72,11 +72,11 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
 
   /**
    * <b>copied from super and modified</b>
-   * <p>
-   * Called when a data item has been added to a series. This is where implementations of XYChart
+   *
+   * <p>Called when a data item has been added to a series. This is where implementations of XYChart
    * can create/add new nodes to getPlotChildren to represent this data item.
-   * <p>
-   * The following nodes are created here:
+   *
+   * <p>The following nodes are created here:
    * <ul>
    * <li>Horizontal lines for values</li>
    * <li>Vertical lines to connect values</li>
@@ -113,9 +113,9 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   }
 
   /**
-   * <b>copied from super and modified</b>
-   * <p>
-   * removes an item from the chart
+   * <b>copied from super and modified.</b>
+   *
+   * <p>removes an item from the chart
    *
    * @param item The item that has been removed from the series
    * @param series The series the item was removed from
@@ -131,9 +131,9 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   }
 
   /**
-   * <b>copied from super/b>
-   * <p>
-   * Called when a data item has changed, ie its xValue, yValue or extraValue has changed.
+   * <b>copied from super.</b>
+   *
+   * <p>Called when a data item has changed, ie its xValue, yValue or extraValue has changed.
    *
    * @param item The data item who was changed
    */
@@ -144,8 +144,8 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
 
   /**
    * <b>copied from super and modified</b>
-   * <p>
-   * A series has been added to the charts data model. This simply calls
+   *
+   * <p>A series has been added to the charts data model. This simply calls
    * {@link TimingDiagramView#dataItemAdded(Series, int, Data)} for each entry in the series
    *
    * @param series The series that has been added
@@ -159,9 +159,10 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   }
 
   /**
-   * <b>copied from super and modified</b>
-   * <p>
-   * This simply calls {@link TimingDiagramView#dataItemRemoved(Data, Series)} for each entry in the
+   * <b>copied from super and modified.</b>
+   *
+   * <p>This simply calls {@link TimingDiagramView#dataItemRemoved(Data, Series)}
+   * for each entry in the
    * series
    *
    * @param series The series that has been removed
@@ -174,9 +175,9 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   }
 
   /**
-   * <b>copied from super and modified</b>
-   * <p>
-   * Called to update and layout the plot children.
+   * <b>copied from super and modified.</b>
+   *
+   * <p>Called to update and layout the plot children.
    */
   @Override
   protected void layoutPlotChildren() {
@@ -218,11 +219,11 @@ public class TimingDiagramView<A> extends XYChart<Number, A> {
   }
 
   public NumberAxis getxAxis() {
-    return xAxis;
+    return xaxis;
   }
 
   public Axis<A> getyAxis() {
-    return yAxis;
+    return yaxis;
   }
 
   /**
