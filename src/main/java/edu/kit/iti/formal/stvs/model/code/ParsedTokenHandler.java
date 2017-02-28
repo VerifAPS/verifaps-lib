@@ -6,8 +6,10 @@ import java.util.List;
 
 /**
  * A {@code ParsedTokenHandler} gets invoked by
- * {@link ParsedCode#parseCode(String, ParsedTokenHandler, ParsedSyntaxErrorHandler, ParsedCodeHandler)}
+ * {@link ParsedCode#parseCode(String, ParsedTokenHandler,
+ * ParsedSyntaxErrorHandler, ParsedCodeHandler)}.
  * to notify about lexed tokens
+ * Invariant: All tokens concatinized produce the source code.
  */
 @FunctionalInterface
 public interface ParsedTokenHandler {

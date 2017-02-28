@@ -23,6 +23,8 @@ import java.util.Optional;
  * Created by philipp on 09.01.17.
  *
  * @author Lukas Fritsch
+ *
+ *        Represents the formal model of source code (extracted from {@link Code})
  */
 public class ParsedCode {
 
@@ -64,8 +66,9 @@ public class ParsedCode {
         VariableDeclaration varDecl = variableEntry.getValue();
         Optional<VariableCategory> category = getCategoryFromDeclaration(varDecl);
         Optional<String> dataTypeName = Optional.ofNullable(varDecl.getDataTypeName());
-        if(category.isPresent() && dataTypeName.isPresent()){
-          this.definedVariables.add(new CodeIoVariable(category.get(), dataTypeName.get(), varDecl.getName()));
+        if (category.isPresent() && dataTypeName.isPresent()) {
+          this.definedVariables.add(new CodeIoVariable(
+              category.get(), dataTypeName.get(), varDecl.getName()));
         }
       });
       return null;
@@ -121,16 +124,23 @@ public class ParsedCode {
   private List<CodeIoVariable> definedVariables;
   private List<Type> definedTypes;
 
-  public ParsedCode(List<FoldableCodeBlock> foldableCodeBlocks, List<CodeIoVariable> definedVariables, List<Type> definedTypes) {
+  /**
+   * Creates a parsed code.
+   * @param foldableCodeBlocks list of codeblocks
+   * @param definedVariables list of all defined variables (in the source code)
+   * @param definedTypes list of all defined types (in the source code)
+   */
+  public ParsedCode(List<FoldableCodeBlock> foldableCodeBlocks,
+                    List<CodeIoVariable> definedVariables, List<Type> definedTypes) {
     this.foldableCodeBlocks = foldableCodeBlocks;
     this.definedVariables = definedVariables;
     this.definedTypes = definedTypes;
   }
 
   /**
-   *
-   * @param input the code to parse
-   * @param parsedTokenHandler
+   *        Parses a code.
+   * @param input the source code to parse
+   * @param parsedTokenHandler a handler for lexed tokens
    * @param syntaxErrorsListener
    * @param parsedCodeListener
    */
@@ -158,7 +168,8 @@ public class ParsedCode {
       TypeDeclarationVisitor typeVisitor = new TypeDeclarationVisitor();
       ast.visit(typeVisitor);
       Map<String, Type> definedTypesByName = new HashMap<>();
-      typeVisitor.getDefinedTypes().forEach(type -> definedTypesByName.put(type.getTypeName(), type));
+      typeVisitor.getDefinedTypes().forEach(type
+          -> definedTypesByName.put(type.getTypeName(), type));
 
       // Find IoVariables in parsed code
       VariableVisitor variableVisitor = new VariableVisitor();
@@ -194,16 +205,25 @@ public class ParsedCode {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    ParsedCode that = (ParsedCode) o;
-
-    if (getFoldableCodeBlocks() != null ? !getFoldableCodeBlocks().equals(that.getFoldableCodeBlocks()) : that.getFoldableCodeBlocks() != null)
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
-    if (getDefinedVariables() != null ? !getDefinedVariables().equals(that.getDefinedVariables()) : that.getDefinedVariables() != null)
+    }
+
+    ParsedCode that = (ParsedCode) obj;
+
+    if (getFoldableCodeBlocks() != null ? !getFoldableCodeBlocks()
+        .equals(that.getFoldableCodeBlocks()) : that.getFoldableCodeBlocks() != null) {
       return false;
-    return getDefinedTypes() != null ? getDefinedTypes().equals(that.getDefinedTypes()) : that.getDefinedTypes() == null;
+    }
+    if (getDefinedVariables() != null ? !getDefinedVariables()
+        .equals(that.getDefinedVariables()) : that.getDefinedVariables() != null) {
+      return false;
+    }
+    return getDefinedTypes() != null ? getDefinedTypes()
+        .equals(that.getDefinedTypes()) : that.getDefinedTypes() == null;
   }
 }

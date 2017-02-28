@@ -1,20 +1,22 @@
 package edu.kit.iti.formal.stvs.model.code;
 
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
+import java.util.List;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.antlr.v4.runtime.Token;
 
-import java.util.List;
+
 
 
 /**
  * Created by csicar on 09.01.17.
- *
  * @author Lukas
  * @author Philipp
+ *        Represents the effective model of sourcecode.
+ *        Extracts the formal model ({@link ParsedCode}).
  */
 public class Code {
 
@@ -22,7 +24,7 @@ public class Code {
   private final StringProperty sourceCodeProperty;
 
   /**
-   * last valid parsed Code
+   * last valid parsed Code.
    */
   private final NullableProperty<ParsedCode> parsedCode;
   private final ObservableList<Token> tokens;
@@ -30,14 +32,14 @@ public class Code {
 
 
   /**
-   * creates a default codefile
+   * creates a default codefile.
    */
   public Code() {
     this("", "");
   }
 
   /**
-   * creates a codefile which is invalidated
+   * creates a codefile which is invalidated.
    * @param filename name of the codefile
    * @param sourcecode content of the codefile
    */
@@ -103,28 +105,39 @@ public class Code {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    Code code = (Code) o;
-
-    if (getFilename() != null ? !getFilename().equals(code.getFilename()) : code.getFilename() != null)
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
+    }
+
+    Code code = (Code) obj;
+    if (getFilename() != null ? !getFilename()
+        .equals(code.getFilename()) : code.getFilename() != null) {
+      return false;
+    }
     if (getSourcecode() != null ? !getSourcecode().equals(code.getSourcecode()) : code
-        .sourceCodeProperty != null)
+        .sourceCodeProperty != null) {
       return false;
-    if (getParsedCode() != null ? !getParsedCode().equals(code.getParsedCode()) : code.getParsedCode() != null)
+    }
+    if (getParsedCode() != null ? !getParsedCode().equals(code
+        .getParsedCode()) : code.getParsedCode() != null) {
       return false;
-    if (getTokens() != null ? !getTokens().equals(code.getTokens()) : code.getTokens() != null)
+    }
+    if (getTokens() != null ? !getTokens().equals(code.getTokens()) : code.getTokens() != null) {
       return false;
+    }
     /* ANTLR SyntaxError does not implement equals() properly
     return getSyntaxErrors() != null ? getSyntaxErrors().equals(code.getSyntaxErrors()) : code
     .getSyntaxErrors() == null; */
-    if (getSyntaxErrors().size() != code.getSyntaxErrors().size()) return false;
+    if (getSyntaxErrors().size() != code.getSyntaxErrors().size()) {
+      return false;
+    }
     for (int i = 0; i < getSyntaxErrors().size(); i++) {
-      if (!getSyntaxErrors().get(i).getMessage().equals(code.getSyntaxErrors().get(i).getMessage
-          ())) {
+      if (!getSyntaxErrors().get(i).getMessage().equals(code.getSyntaxErrors().get(i)
+          .getMessage())) {
         return false;
       }
     }
