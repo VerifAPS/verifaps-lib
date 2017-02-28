@@ -8,13 +8,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Leon Kaucher
  */
 public class AsyncTask<T> extends Thread {
-  private final AsyncRunner<T> runAsnc;
+  private final AsyncRunner<T> runAsync;
   private final AsyncTaskCompletedHandler<T> runLater;
   private AtomicBoolean isRunning = new AtomicBoolean(false);
 
-  public AsyncTask(AsyncRunner<T> runAsnc, AsyncTaskCompletedHandler<T> runLater) {
+  /**
+   * <p>Constructor for an asynchronous task.</p>
+   *
+   * @param runAsync The portion of action to be run
+   *                 asynchronously (a functional interface).
+   * @param runLater The portion of the action to be run synchronously with
+   *                 any other AsyncTasks.
+   */
+  public AsyncTask(AsyncRunner<T> runAsync, AsyncTaskCompletedHandler<T> runLater) {
     super();
-    this.runAsnc = runAsnc;
+    this.runAsync = runAsync;
     this.runLater = runLater;
   }
 
@@ -29,7 +37,7 @@ public class AsyncTask<T> extends Thread {
   @Override
   public void run() {
     isRunning.set(true);
-    T result = runAsnc.run(isRunning);
+    T result = runAsync.run(isRunning);
     runLater.completedWith(result);
     isRunning.set(false);
   }

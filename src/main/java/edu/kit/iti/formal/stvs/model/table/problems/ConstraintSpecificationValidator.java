@@ -1,10 +1,9 @@
 package edu.kit.iti.formal.stvs.model.table.problems;
 
 import edu.kit.iti.formal.stvs.model.common.*;
-import edu.kit.iti.formal.stvs.model.expressions.Expression;
-import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.expressions.TypeChecker;
+import edu.kit.iti.formal.stvs.model.expressions.*;
+import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
+import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
@@ -118,8 +117,7 @@ public class ConstraintSpecificationValidator {
         ConstraintCell cell = mapEntry.getValue();
 
         try {
-          expressionsForRow.put(columnId,
-              CellParseProblem.expressionOrProblemForCell(
+          expressionsForRow.put(columnId, tryValidateCellExpression(
                   typeContext.get(), typeChecker, columnId, rowIndex, cell));
         } catch (CellProblem problem) {
           specProblems.add(problem);
@@ -156,6 +154,28 @@ public class ConstraintSpecificationValidator {
       validSpecification.set(null);
     }
     valid.set(specProblems.isEmpty());
+  }
+
+  /**
+   * <p>Tries to create an {@link Expression}-AST from the given {@link ConstraintCell} that has the
+   * correct type using context information (for example like a type context).</p>
+   *
+   * @param typeContext the type context to use for parsing the cell (needed for encountering enum
+   *                    values)
+   * @param typeChecker the type checker instance for insuring the correct type
+   * @param columnId the name of the column for parsing single-sided expressions like "> 3"
+   * @param row the row for better error messages
+   * @param cell the cell to be validated
+   * @return the AST as {@link Expression} that is fully type-correct.
+   * @throws CellProblem if the cell could not be parsed ({@link CellParseProblem}) or
+   *                     if the cell is ill-typed ({@link CellTypeProblem}).
+   */
+  public static Expression tryValidateCellExpression(List<Type> typeContext,
+                                                     TypeChecker typeChecker, String columnId,
+                                                     int row, ConstraintCell cell)
+      throws CellProblem {
+    Expression expr = CellParseProblem.tryParseCellExpression(typeContext, columnId, row, cell);
+    return CellTypeProblem.tryTypeCheckCellExpression(typeChecker, columnId, row, expr);
   }
 
   public ReadOnlyBooleanProperty validProperty() {

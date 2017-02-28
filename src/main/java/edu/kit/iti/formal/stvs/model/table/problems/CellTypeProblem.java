@@ -13,18 +13,21 @@ import java.util.List;
  */
 public class CellTypeProblem extends CellProblem {
 
-  public static Expression createValidExpressionFromCell(List<Type> typeContext, TypeChecker typeChecker, String columnId, ConstraintCell cell)
-      throws TypeCheckException, ParseException, UnsupportedExpressionException {
-    // First try to parse the expression:
-    ExpressionParser parser = new ExpressionParser(columnId, typeContext);
-    Expression expression = parser.parseExpression(cell.getAsString());
-
-    Type type = typeChecker.typeCheck(expression);
-    if (type.checksAgainst(TypeBool.BOOL)) {
-      return expression;
-    } else {
-      throw new TypeCheckException(expression,
-          "The cell expression must evaluate to a boolean, instead it evaluates to: " + type.getTypeName());
+  public static Expression tryTypeCheckCellExpression(
+      TypeChecker typeChecker, String columnId, int row, Expression expr)
+      throws CellTypeProblem {
+    try {
+      Type type = typeChecker.typeCheck(expr);
+      if (type.checksAgainst(TypeBool.BOOL)) {
+        return expr;
+      } else {
+        throw new CellTypeProblem(
+            new TypeCheckException(expr, "The cell expression must evaluate to a boolean, "
+                + "instead it evaluates to: " + type.getTypeName()),
+            columnId, row);
+      }
+    } catch (TypeCheckException typeCheckException) {
+      throw new CellTypeProblem(typeCheckException, columnId, row);
     }
   }
 

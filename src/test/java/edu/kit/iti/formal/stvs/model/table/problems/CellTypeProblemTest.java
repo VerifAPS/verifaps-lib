@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.and;
+import static edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.literal;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 
@@ -30,19 +32,18 @@ public class CellTypeProblemTest {
   }
 
   @Test
-  public void createValidExpressionFromCell() throws Exception {
-    List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
+  public void tryTypeCheckCellExpression() throws Exception {
     Map<String, Type> typeMap = new HashMap<>();
     typeMap.put("A", TypeInt.INT);
     typeMap.put("B", TypeBool.BOOL);
     TypeChecker typeChecker = new TypeChecker(typeMap);
-    ConstraintCell problematicCell = new ConstraintCell("2 AND TRUE");
+    Expression problematicCell = and(literal(2), literal(true));
     try {
-      CellTypeProblem.createValidExpressionFromCell(typeContext, typeChecker, "A",
-          problematicCell);
-    } catch (Exception e) {
-      assertThat(e, instanceOf(TypeCheckException.class));
-      assertEquals(typeCheckEx, e);
+      CellTypeProblem.tryTypeCheckCellExpression(
+          typeChecker, "A", 4, problematicCell);
+    } catch (Exception exc) {
+      assertThat(exc, instanceOf(CellTypeProblem.class));
+      assertEquals(problem, exc);
     }
   }
 
