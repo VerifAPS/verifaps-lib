@@ -16,6 +16,8 @@ import edu.kit.iti.formal.stvs.util.ProcessOutputAsyncTask;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class prepares a given SmtString to be solved with z3 and interprets the output.
@@ -25,6 +27,10 @@ import java.util.function.Consumer;
 public class Z3Solver {
 
   private final int timeout;
+  private static final Pattern VAR_PATTERN =
+      Pattern.compile("(?<name>[$a-zA-Z0-9_]+)_(?<row>\\d+)_(?<cycle>\\d+)");
+  private static final Pattern DURATION_PATTERN =
+      Pattern.compile("n_(?<cycleCount>\\d+)");
   private String z3Path;
 
   /**
@@ -151,7 +157,7 @@ public class Z3Solver {
       List<ConcreteDuration> durations
   ) {
     Map<Integer, Map<String, String>> rawRows = new HashMap<>();
-    sexpr.forEach(varAsign -> addRowToMap(durations, rawRows, varAsign));
+    sexpr.forEach(varAssign -> addRowToMap(durations, rawRows, varAssign));
     return rawRows;
   }
 
@@ -162,29 +168,32 @@ public class Z3Solver {
    *
    * @param durations list of concrete durations
    * @param rawRows   mapping from cycle number x variable name to cell expression as string
-   * @param varAsign  solver assignment
+   * @param varAssign  solver assignment
    */
   private static void addRowToMap(
       List<ConcreteDuration> durations,
       Map<Integer, Map<String, String>> rawRows,
-      Sexp varAsign
+      Sexp varAssign
   ) {
-    if (varAsign.getLength() == 0 || !varAsign.get(0).toIndentedString().equals("define-fun")) {
+    if (varAssign.getLength() == 0 || !varAssign.get(0).toIndentedString().equals("define-fun")) {
       return;
     }
-    String[] varSplit = varAsign.get(1).toIndentedString().split("_");
-    if (varAsign.get(1).toIndentedString().matches(".*?_\\d+_\\d+")) {
+    Matcher identifierMatcher = VAR_PATTERN.matcher(varAssign.get(1).toIndentedString());
+    if (identifierMatcher.matches()) {
+      String varName = identifierMatcher.group("name");
+      String row = identifierMatcher.group("row");
+      String cycle = identifierMatcher.group("cycle");
       //is variable
-      int cycleCount = Integer.valueOf(varSplit[2]);
+      int cycleCount = Integer.valueOf(cycle);
       //ignore variables if iteration > n_z
-      int nz = Integer.valueOf(varSplit[1]);
+      int nz = Integer.valueOf(row);
       ConcreteDuration concreteDuration = durations.get(nz);
       if (cycleCount >= concreteDuration.getDuration()) {
         return;
       }
       int absoluteIndex = concreteDuration.getBeginCycle() + cycleCount;
       rawRows.putIfAbsent(absoluteIndex, new HashMap<>());
-      rawRows.get(absoluteIndex).put(varSplit[0], varAsign.get(4).toIndentedString());
+      rawRows.get(absoluteIndex).put(varName, varAssign.get(4).toIndentedString());
     }
   }
 
@@ -199,26 +208,27 @@ public class Z3Solver {
    */
   private static Map<Integer, Integer> extractRawDurations(Sexp sexpr) {
     Map<Integer, Integer> rawDurations = new HashMap<>();
-    sexpr.forEach(varAsign -> addDurationToMap(rawDurations, varAsign));
+    sexpr.forEach(varAssign -> addDurationToMap(rawDurations, varAssign));
     return rawDurations;
   }
 
   /**
-   * Adds a duration from solver output to map if {@code varAsign} has the following format
+   * Adds a duration from solver output to map if {@code varAssign} has the following format
    * (define-fun n_z () (_ BitVec 16) #xXXXX).
    *
    * @param rawDurations raw durations (mapping from ro to duration)
-   * @param varAsign     solver assignment
+   * @param varAssign     solver assignment
    */
-  private static void addDurationToMap(Map<Integer, Integer> rawDurations, Sexp varAsign) {
-    if (varAsign.getLength() == 0 || !varAsign.get(0).toIndentedString().equals("define-fun")) {
+  private static void addDurationToMap(Map<Integer, Integer> rawDurations, Sexp varAssign) {
+    if (varAssign.getLength() == 0 || !varAssign.get(0).toIndentedString().equals("define-fun")) {
       return;
     }
-    String[] varSplit = varAsign.get(1).toIndentedString().split("_");
-    if (varAsign.get(1).toIndentedString().matches("n_\\d+")) {
+    Matcher durationMatcher = DURATION_PATTERN.matcher(varAssign.get(1).toIndentedString());
+    if (durationMatcher.matches()) {
       //is duration
-      rawDurations.put(Integer.valueOf(varSplit[1]),
-          BitvectorUtils.intFromHex(varAsign.get(4).toIndentedString(), false));
+      int cycleCount = Integer.parseInt(durationMatcher.group("cycleCount"));
+      rawDurations.put(cycleCount,
+          BitvectorUtils.intFromHex(varAssign.get(4).toIndentedString(), false));
     }
   }
 
