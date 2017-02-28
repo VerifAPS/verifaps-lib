@@ -3,14 +3,11 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 import de.tudresden.inf.lat.jsexp.Sexp;
 import de.tudresden.inf.lat.jsexp.SexpFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Represents an {@link SExpr} that is an atomic element.
+ * Represents an {@link SExpression} that is an atomic element.
  * @author Carsten Csiky
  */
-public class SAtom implements SExpr {
+public class SAtom implements SExpression {
   private String string;
 
   /**

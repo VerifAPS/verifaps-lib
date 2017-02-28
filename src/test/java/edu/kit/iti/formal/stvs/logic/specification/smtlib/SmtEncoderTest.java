@@ -31,8 +31,8 @@ public class SmtEncoderTest {
     int maxDuration = 3;
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
-    SConstraint output = smtEncoder.getConstraint();
-    Set<SExpr> constraints = output.getGlobalConstraints();
+    SmtModel output = smtEncoder.getConstraint();
+    Set<SExpression> constraints = output.getGlobalConstraints();
 
     System.out.println(output.toString());
 
@@ -62,9 +62,9 @@ public class SmtEncoderTest {
 
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
-    SConstraint output = smtEncoder.getConstraint();
-    Set<SExpr> constraints = output.getGlobalConstraints();
-    Set<SExpr> definitions = output.getVariableDefinitions();
+    SmtModel output = smtEncoder.getConstraint();
+    Set<SExpression> constraints = output.getGlobalConstraints();
+    Set<SExpression> definitions = output.getVariableDefinitions();
 
     System.out.println(output.toString());
 
@@ -87,9 +87,9 @@ public class SmtEncoderTest {
 
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
-    SConstraint output = smtEncoder.getConstraint();
-    Set<SExpr> constraints = output.getGlobalConstraints();
-    Set<SExpr> definitions = output.getVariableDefinitions();
+    SmtModel output = smtEncoder.getConstraint();
+    Set<SExpression> constraints = output.getGlobalConstraints();
+    Set<SExpression> definitions = output.getVariableDefinitions();
 
     System.out.println(output.toString());
     System.out.println(output.toText());
@@ -132,8 +132,8 @@ public class SmtEncoderTest {
     }};
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDurations, spec, freeVariables);
-    SConstraint output = smtEncoder.getConstraint();
-    Set<SExpr> constraints = output.getGlobalConstraints();
+    SmtModel output = smtEncoder.getConstraint();
+    Set<SExpression> constraints = output.getGlobalConstraints();
 
     System.out.println(output);
 
@@ -187,20 +187,20 @@ public class SmtEncoderTest {
     );
   }
 
-  private void testWithStatements(Set<SExpr> constraints,String ... s) {
-    List<SExpr> statements = Arrays.stream(s).map(SExpr::fromString)
+  private void testWithStatements(Set<SExpression> constraints, String ... s) {
+    List<SExpression> statements = Arrays.stream(s).map(SExpression::fromString)
         .collect
         (Collectors
         .toList());
 
-    List<SExpr> missingStatements = statements.stream().filter
+    List<SExpression> missingStatements = statements.stream().filter
         (statement
             -> !constraints
             .contains
                 (statement))
         .collect(Collectors.toList());
 
-    assertEquals("no statements should be missing", new ArrayList<SExpr>(), missingStatements);
+    assertEquals("no statements should be missing", new ArrayList<SExpression>(), missingStatements);
   }
 
 }

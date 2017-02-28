@@ -5,17 +5,17 @@ import de.tudresden.inf.lat.jsexp.SexpFactory;
 import de.tudresden.inf.lat.jsexp.SexpParserException;
 
 /**
- * Interface for al S-Expression compatible classes
+ * Interface for al S-Expression compatible classes.
  * @author
  */
-public interface SExpr {
+public interface SExpression {
 
   /**
-   * Creates an instance from a given string
+   * Creates an instance from a given string.
    * @param string string to parse
    * @return instance which is represented by {@code string}
    */
-  static SExpr fromString(String string) {
+  static SExpression fromString(String string) {
     try {
       Sexp s = SexpFactory.parse(string);
       return fromSexp(s);
@@ -26,12 +26,12 @@ public interface SExpr {
 
 
   /**
-   * Creates an instance from a given {@link Sexp}
+   * Creates an instance from a given {@link Sexp}.
    * @param s sexp that should be converted
    * @return instance which is represented by {@code s}
    */
-  static SExpr fromSexp(Sexp s) {
-    if(s.isAtomic()) {
+  static SExpression fromSexp(Sexp s) {
+    if (s.isAtomic()) {
       return new SAtom(s);
     } else {
       return new SList(s);

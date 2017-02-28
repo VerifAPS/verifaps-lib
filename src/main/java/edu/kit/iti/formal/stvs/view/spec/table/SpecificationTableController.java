@@ -17,9 +17,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -145,6 +143,18 @@ public class SpecificationTableController implements Controller {
     return new ContextMenu(comment);
   }
 
+  private <T> void removeByReference(List<T> toBeRemovedFrom, List<T> toRemove) {
+    for (T referenceToRemove : toRemove) {
+      Iterator<T> iterator = toBeRemovedFrom.iterator();
+      while (iterator.hasNext()) {
+        T iteratedItem = iterator.next();
+        if (iteratedItem == referenceToRemove) {
+          iterator.remove();
+        }
+      }
+    }
+  }
+
   private ContextMenu createContextMenu() {
     MenuItem insertRow = new MenuItem("Insert Row");
     MenuItem deleteRow = new MenuItem("Delete Row");
@@ -156,8 +166,11 @@ public class SpecificationTableController implements Controller {
       addEmptyRow(selectedIndex + 1);
     });
     deleteRow.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
-    deleteRow.setOnAction(event ->
-      hybridSpec.getHybridRows().removeAll(tableView.getSelectionModel().getSelectedItems()));
+    deleteRow.setOnAction(event -> {
+      List<HybridRow> toRemove = new ArrayList<>();
+      toRemove.addAll(tableView.getSelectionModel().getSelectedItems());
+      removeByReference(hybridSpec.getHybridRows(), toRemove);
+    });
     addNewColumn.setOnAction(event ->
         new IoVariableChooserDialog(codeIoVariables, hybridSpec.getColumnHeaders())
             .showAndWait()
