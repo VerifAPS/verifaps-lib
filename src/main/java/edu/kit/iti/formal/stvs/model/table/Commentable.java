@@ -4,9 +4,11 @@ import javafx.beans.property.StringProperty;
 
 
 /**
- * <p>The interface for anything that has a {@link StringProperty} with the intent
- * of being used as a comment (for example tables ({@link SpecificationTable}), cells
- * ({@link ConstraintCell}) or rows ({@link SpecificationRow})).</p>
+ * <p>
+ * The interface for anything that has a {@link StringProperty} with the intent of being used as a
+ * comment (for example tables ({@link SpecificationTable}), cells ({@link ConstraintCell}) or rows
+ * ({@link SpecificationRow})).
+ * </p>
  *
  * @author Benjamin Alt
  */

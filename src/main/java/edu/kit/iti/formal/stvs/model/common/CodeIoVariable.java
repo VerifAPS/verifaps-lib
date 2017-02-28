@@ -15,8 +15,8 @@ public class CodeIoVariable extends IoVariable {
    * Creates a variable that appears in the code.
    *
    * @param category The category of the variable
-   * @param type     The identifier of the type of the variable
-   * @param name     The name of the Variable
+   * @param type The identifier of the type of the variable
+   * @param name The name of the Variable
    */
   public CodeIoVariable(VariableCategory category, String type, String name) {
     if (category == null || type == null || name == null) {

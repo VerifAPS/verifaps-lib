@@ -7,14 +7,15 @@ import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValid
 import edu.kit.iti.formal.stvs.model.table.problems.DurationProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import edu.kit.iti.formal.stvs.view.ViewUtils;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.DefaultStringConverter;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by philipp on 13.02.17.
@@ -25,8 +26,7 @@ public class SpecificationTableCell extends TextFieldTableCell<HybridRow, String
 
   private final ConstraintSpecificationValidator validator;
 
-  public SpecificationTableCell(
-      ConstraintSpecificationValidator validator) {
+  public SpecificationTableCell(ConstraintSpecificationValidator validator) {
     super(new DefaultStringConverter());
     this.validator = validator;
 
@@ -42,14 +42,11 @@ public class SpecificationTableCell extends TextFieldTableCell<HybridRow, String
     if (!empty && getCellModel() != null) {
       List<String> counterExampleCells = getCellModel().counterExamplesProperty();
       VBox counterExampleLabels = new VBox();
-      counterExampleLabels.getChildren().addAll(
-          counterExampleCells.stream()
-              .map(text -> {
-                Label label = new Label(text);
-                label.getStyleClass().add("spec-counterexample");
-                return label;
-              })
-              .collect(Collectors.toList()));
+      counterExampleLabels.getChildren().addAll(counterExampleCells.stream().map(text -> {
+        Label label = new Label(text);
+        label.getStyleClass().add("spec-counterexample");
+        return label;
+      }).collect(Collectors.toList()));
       setGraphic(counterExampleLabels);
     }
   }

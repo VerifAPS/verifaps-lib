@@ -21,7 +21,7 @@ public class VerificationResult {
   /**
    * Construct a new VerificationResult for a verification without counterexample.
    *
-   * @param status  The status of the verification (i.e. verified, counterexample, error, ...)
+   * @param status The status of the verification (i.e. verified, counterexample, error, ...)
    * @param logFile The log file (the original output of the verification engine)
    */
   public VerificationResult(Status status, File logFile, VerificationError error) {
@@ -34,7 +34,7 @@ public class VerificationResult {
    * Construct a new VerificationResult with a counterexample for an unsuccessful verification.
    *
    * @param counterexample The counterexample
-   * @param logFile        The log file (the original output of the verification engine)
+   * @param logFile The log file (the original output of the verification engine)
    */
   public VerificationResult(ConcreteSpecification counterexample, File logFile) {
     this(Status.COUNTEREXAMPLE, logFile, null);
@@ -96,15 +96,19 @@ public class VerificationResult {
 
     VerificationResult result = (VerificationResult) o;
 
-    if (counterexample != null ? !counterexample.equals(result.counterexample) : result.counterexample != null) {
+    if (counterexample != null ? !counterexample.equals(result.counterexample)
+        : result.counterexample != null) {
       return false;
     }
     if (getStatus() != result.getStatus()) {
       return false;
     }
-    if (getLogFile() != null ? !getLogFile().equals(result.getLogFile()) : result.getLogFile() != null) {
+    if (getLogFile() != null ? !getLogFile().equals(result.getLogFile())
+        : result.getLogFile() != null) {
       return false;
     }
-    return getVerificationError() != null ? getVerificationError().equals(result.getVerificationError()) : result.getVerificationError() == null;
+    return getVerificationError() != null
+        ? getVerificationError().equals(result.getVerificationError())
+        : result.getVerificationError() == null;
   }
 }

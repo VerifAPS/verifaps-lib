@@ -17,7 +17,7 @@ public class ConcreteDuration {
    * Construct a new concrete duration.
    *
    * @param beginCycle The cycle in which this duration begins
-   * @param duration   The duration
+   * @param duration The duration
    */
   public ConcreteDuration(int beginCycle, int duration) {
     if (beginCycle < 0) {
@@ -55,9 +55,7 @@ public class ConcreteDuration {
       return true;
     }
     ConcreteDuration other = (ConcreteDuration) obj;
-    return new EqualsBuilder()
-        .append(duration, other.duration)
-        .append(beginCycle, other.beginCycle)
+    return new EqualsBuilder().append(duration, other.duration).append(beginCycle, other.beginCycle)
         .isEquals();
   }
 }

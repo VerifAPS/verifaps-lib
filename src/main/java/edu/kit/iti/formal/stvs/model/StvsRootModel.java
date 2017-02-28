@@ -7,12 +7,13 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  * @author Benjamin Alt
@@ -30,17 +31,12 @@ public class StvsRootModel {
   private String filename;
 
   /**
-   * Create a new empty StvsRootModel with no specifications or verification, an empty history
-   * and a default config.
+   * Create a new empty StvsRootModel with no specifications or verification, an empty history and a
+   * default config.
    */
   public StvsRootModel() {
-    this(
-        FXCollections.observableArrayList(),
-        new GlobalConfig(),
-        new History(),
-        new VerificationScenario(),
-        new File(System.getProperty("user.home")),
-        "");
+    this(FXCollections.observableArrayList(), new GlobalConfig(), new History(),
+        new VerificationScenario(), new File(System.getProperty("user.home")), "");
   }
 
   /**
@@ -50,12 +46,11 @@ public class StvsRootModel {
    * @param globalConfig
    * @param history
    * @param scenario
-   * @param workingdir           working-directory that should be used (e.g. for opening and saving)
-   * @param filename             filename of stvsrootmodel
+   * @param workingdir working-directory that should be used (e.g. for opening and saving)
+   * @param filename filename of stvsrootmodel
    */
   public StvsRootModel(List<HybridSpecification> hybridSpecifications, GlobalConfig globalConfig,
-                       History history, VerificationScenario scenario, File workingdir, String
-                           filename) {
+      History history, VerificationScenario scenario, File workingdir, String filename) {
     this.hybridSpecifications = FXCollections.observableArrayList(hybridSpecifications);
     this.globalConfig = globalConfig;
     this.history = history;
@@ -105,11 +100,11 @@ public class StvsRootModel {
   }
 
   public static StvsRootModel autoloadSession() {
-    File sessionFile = new File(GlobalConfig.CONFIG_DIRPATH + File.separator +
-        AUTOLOAD_SESSION_FILENAME);
+    File sessionFile =
+        new File(GlobalConfig.CONFIG_DIRPATH + File.separator + AUTOLOAD_SESSION_FILENAME);
     try {
-      return ImporterFacade.importSession(sessionFile, ImporterFacade.ImportFormat.XML, new
-          GlobalConfig(), new History());
+      return ImporterFacade.importSession(sessionFile, ImporterFacade.ImportFormat.XML,
+          new GlobalConfig(), new History());
     } catch (Exception e) {
       return new StvsRootModel();
     }
@@ -120,8 +115,8 @@ public class StvsRootModel {
     if (!configDir.isDirectory() || !configDir.exists()) {
       configDir.mkdirs();
     }
-    File sessionFile = new File(GlobalConfig.CONFIG_DIRPATH + File.separator +
-        AUTOLOAD_SESSION_FILENAME);
+    File sessionFile =
+        new File(GlobalConfig.CONFIG_DIRPATH + File.separator + AUTOLOAD_SESSION_FILENAME);
     ExporterFacade.exportSession(this, ExporterFacade.ExportFormat.XML, sessionFile);
   }
 

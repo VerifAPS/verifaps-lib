@@ -2,39 +2,37 @@ package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
- * A specification the cell contents and durations of which are specified by constraints rather
- * than concrete values. This corresponds to a "generalized test table".
+ * A specification the cell contents and durations of which are specified by constraints rather than
+ * concrete values. This corresponds to a "generalized test table".
  *
  * @author Benjamin Alt
  */
-public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, ConstraintCell,
-    ConstraintDuration> implements Commentable {
+public class ConstraintSpecification extends
+    SpecificationTable<SpecIoVariable, ConstraintCell, ConstraintDuration> implements Commentable {
 
   /**
    * Construct a new specification row containing ConstraintCells.
    *
    * @param initialCells The initial cells, a Map from column identifier to ConstraintCell, with
-   *                     which to fill the new row
+   *        which to fill the new row
    * @return A SpecificationRow containing the given ConstraintCells
    */
   public static SpecificationRow<ConstraintCell> createRow(
       Map<String, ConstraintCell> initialCells) {
     return new SpecificationRow<>(initialCells,
-        cell -> new Observable[] {
-            cell.stringRepresentationProperty(),
-            cell.commentProperty()
-        });
+        cell -> new Observable[] {cell.stringRepresentationProperty(), cell.commentProperty()});
   }
 
   private final StringProperty comment;
@@ -42,8 +40,8 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
   private final ChangeListener<String> onSpecIoVariableNameChanged;
 
   /**
-   * Construct a new, empty ConstraintSpecification with a default name from an initial list of
-   * free variables.
+   * Construct a new, empty ConstraintSpecification with a default name from an initial list of free
+   * variables.
    *
    * @param freeVariableList The initial list of free variables
    */
@@ -55,21 +53,15 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
    * Construct a new, empty ConstraintSpecification with a given name and an initial list of free
    * variables.
    *
-   * @param name             The name of the ConstraintSpecification
+   * @param name The name of the ConstraintSpecification
    * @param freeVariableList The list of free variables
    */
   public ConstraintSpecification(String name, FreeVariableList freeVariableList) {
-    super(
-        name,
-        columnHeader -> new Observable[] {
-            columnHeader.nameProperty(),
-            columnHeader.typeProperty(),
-            columnHeader.categoryProperty()
-        },
-        durationCell -> new Observable[] {
-            durationCell.stringRepresentationProperty(),
-            durationCell.commentProperty()
-        });
+    super(name,
+        columnHeader -> new Observable[] {columnHeader.nameProperty(), columnHeader.typeProperty(),
+            columnHeader.categoryProperty()},
+        durationCell -> new Observable[] {durationCell.stringRepresentationProperty(),
+            durationCell.commentProperty()});
     this.onSpecIoVariableNameChanged = this::onSpecIoVariableNameChanged;
     this.freeVariableList = freeVariableList;
 
@@ -92,8 +84,8 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
       for (String colHeader : row.getCells().keySet()) {
         clonedCells.put(colHeader, new ConstraintCell(row.getCells().get(colHeader)));
       }
-      SpecificationRow<ConstraintCell> clonedRow = new SpecificationRow<>(clonedCells, row
-          .getExtractor());
+      SpecificationRow<ConstraintCell> clonedRow =
+          new SpecificationRow<>(clonedCells, row.getExtractor());
       clonedRow.setComment(row.getComment());
       getRows().add(clonedRow);
     }
@@ -132,9 +124,7 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
     specIoVariable.nameProperty().removeListener(onSpecIoVariableNameChanged);
   }
 
-  private void onSpecIoVariableNameChanged(
-      ObservableValue<? extends String> obs,
-      String nameBefore,
+  private void onSpecIoVariableNameChanged(ObservableValue<? extends String> obs, String nameBefore,
       String nameAfter) {
     for (SpecificationRow<ConstraintCell> row : getRows()) {
       ConstraintCell entry = row.getCells().get(nameBefore);
@@ -174,13 +164,11 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
 
     ConstraintSpecification that = (ConstraintSpecification) obj;
 
-    if (getComment() != null
-        ? !getComment().equals(that.getComment())
+    if (getComment() != null ? !getComment().equals(that.getComment())
         : that.getComment() != null) {
       return false;
     }
-    return getFreeVariableList() != null
-        ? getFreeVariableList().equals(that.getFreeVariableList())
+    return getFreeVariableList() != null ? getFreeVariableList().equals(that.getFreeVariableList())
         : that.getFreeVariableList() == null;
   }
 

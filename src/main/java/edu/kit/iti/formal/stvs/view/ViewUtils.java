@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view;
 
-import edu.kit.iti.formal.stvs.view.editor.EditorPane;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.transform.Affine;
@@ -14,7 +13,7 @@ import javafx.scene.transform.Transform;
 public class ViewUtils {
   /**
    * @param rootOfCalculation Any node in a scene graph
-   * @param child             A direct/indirect child of rootOfCalculation
+   * @param child A direct/indirect child of rootOfCalculation
    * @return A Transformation between coordinates of child and rootOfCalculation
    */
   public static Transform calculateTransformRelativeTo(Node rootOfCalculation, Node child) {
@@ -22,7 +21,8 @@ public class ViewUtils {
       throw new IllegalStateException("Child is not displayed in any scene currently.");
     }
     if (child.getParent() == null) {
-      throw new IllegalStateException("rootOfCalculation is not in the scenegraph between root node and child.");
+      throw new IllegalStateException(
+          "rootOfCalculation is not in the scenegraph between root node and child.");
     }
     if (child == rootOfCalculation) {
       return new Affine();
@@ -32,8 +32,9 @@ public class ViewUtils {
   }
 
   /**
-   * adds the style sheet (name "style.css" and located in the same package) to the given parent
-   * and sets the css-id for the parent
+   * adds the style sheet (name "style.css" and located in the same package) to the given parent and
+   * sets the css-id for the parent
+   * 
    * @param parent parent that should be setup
    */
   public static void setupView(Parent parent) {
@@ -41,8 +42,9 @@ public class ViewUtils {
   }
 
   /**
-   * adds the style sheet (located in the same package) to the given parent
-   * and sets the css-id for the parent
+   * adds the style sheet (located in the same package) to the given parent and sets the css-id for
+   * the parent
+   * 
    * @param parent parent that should be setup
    * @param stylesheet stylesheet's name in the package
    */
@@ -56,6 +58,7 @@ public class ViewUtils {
 
   /**
    * sets the css-id for the parent.
+   * 
    * @param parent parent that should be setup
    */
   public static void setupId(Parent parent) {

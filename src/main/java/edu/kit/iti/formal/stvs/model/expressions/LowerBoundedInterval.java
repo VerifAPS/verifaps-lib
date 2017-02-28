@@ -3,8 +3,8 @@ package edu.kit.iti.formal.stvs.model.expressions;
 import java.util.Optional;
 
 /**
- * The runtime representation for intervals that possibly have no
- * upper bound, but have a guaranteed lower bound.
+ * The runtime representation for intervals that possibly have no upper bound, but have a guaranteed
+ * lower bound.
  *
  * @author Benjamin Alt
  */
@@ -56,7 +56,6 @@ public class LowerBoundedInterval {
   @Override
   public String toString() {
     return "LowerBoundedInterval(" + lowerBound + ","
-        + (upperBound.isPresent() ? upperBound.get() : "-")
-        + ")";
+        + (upperBound.isPresent() ? upperBound.get() : "-") + ")";
   }
 }

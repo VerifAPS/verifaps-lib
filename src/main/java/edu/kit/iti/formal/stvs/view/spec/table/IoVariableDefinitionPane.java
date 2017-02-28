@@ -5,6 +5,9 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
 import edu.kit.iti.formal.stvs.view.ViewUtils;
+
+import java.util.List;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
@@ -12,8 +15,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-
-import java.util.List;
 
 /**
  * Created by philipp on 11.02.17.
@@ -30,14 +31,15 @@ public class IoVariableDefinitionPane extends GridPane {
     this(VariableCategory.INPUT, "", "");
   }
 
-  public IoVariableDefinitionPane(VariableCategory initialCategory, String initialName, String initialType) {
+  public IoVariableDefinitionPane(VariableCategory initialCategory, String initialName,
+      String initialType) {
     super();
 
     setVgap(10);
     setHgap(10);
 
-    this.categoryComboBox = new ComboBox<>(FXCollections.observableArrayList(
-        VariableCategory.INPUT, VariableCategory.OUTPUT));
+    this.categoryComboBox = new ComboBox<>(
+        FXCollections.observableArrayList(VariableCategory.INPUT, VariableCategory.OUTPUT));
     this.nameTextField = new TextField(initialName);
     this.typeTextField = new TextField(initialType);
 
@@ -59,7 +61,8 @@ public class IoVariableDefinitionPane extends GridPane {
   }
 
   public SpecIoVariable getDefinedVariable() {
-    return new SpecIoVariable(categoryComboBox.getValue(), typeTextField.getText(), nameTextField.getText());
+    return new SpecIoVariable(categoryComboBox.getValue(), typeTextField.getText(),
+        nameTextField.getText());
   }
 
   public TextField getNameTextField() {
@@ -74,9 +77,9 @@ public class IoVariableDefinitionPane extends GridPane {
     return alreadyDefinedVariables.stream().anyMatch(var -> var.getName().equals(chosenName));
   }
 
-  public BooleanBinding createDefinitionInvalidBinding(List<SpecIoVariable> alreadyDefinedVariables) {
-    return Bindings.createBooleanBinding(
-        () -> isDefinitionInvalid(alreadyDefinedVariables),
+  public BooleanBinding createDefinitionInvalidBinding(
+      List<SpecIoVariable> alreadyDefinedVariables) {
+    return Bindings.createBooleanBinding(() -> isDefinitionInvalid(alreadyDefinedVariables),
         nameTextField.textProperty());
   }
 

@@ -1,12 +1,16 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * runtime-representation for enum types.
  * <p>
- * This is (in contrast to {@link TypeInt} or {@link TypeBool}) NOT a
- * singleton, since different instances of this can be created at runtime.
+ * This is (in contrast to {@link TypeInt} or {@link TypeBool}) NOT a singleton, since different
+ * instances of this can be created at runtime.
  *
  * @author Philipp
  */
@@ -17,15 +21,13 @@ public class TypeEnum implements Type {
   private final List<ValueEnum> valueList;
 
   /**
-   * Create a new enum-type. This should only happen, when
-   * an enum is parsed in st-code.
+   * Create a new enum-type. This should only happen, when an enum is parsed in st-code.
    * <p>
-   * St-code example definition of an enum:
-   * <tt>COLORS : (red, green, blue)</tt>
+   * St-code example definition of an enum: <tt>COLORS : (red, green, blue)</tt>
    *
    * @param enumTypeName the type name (<tt>COLORS</tt> in this example)
-   * @param values       the possible values that this enum can be
-   *                     ([<tt>red</tt>, <tt>green</tt>, <tt>blue</tt>] in this example)
+   * @param values the possible values that this enum can be ([<tt>red</tt>, <tt>green</tt>,
+   *        <tt>blue</tt>] in this example)
    */
   public TypeEnum(String enumTypeName, List<String> values) {
     this.enumTypeName = enumTypeName;
@@ -39,20 +41,15 @@ public class TypeEnum implements Type {
   }
 
   @Override
-  public <R> R match(
-      TypeIntegerHandler<R> matchIntType,
-      TypeBooleanHandler<R> matchBoolType,
+  public <R> R match(TypeIntegerHandler<R> matchIntType, TypeBooleanHandler<R> matchBoolType,
       TypeEnumHandler<R> matchEnumType) {
     return matchEnumType.handle(this);
   }
 
   @Override
   public boolean checksAgainst(Type other) {
-    return other.match(
-        () -> false,
-        () -> false,
-        (otherEnum) -> otherEnum.getTypeName().equals(getTypeName())
-    );
+    return other.match(() -> false, () -> false,
+        (otherEnum) -> otherEnum.getTypeName().equals(getTypeName()));
   }
 
   @Override

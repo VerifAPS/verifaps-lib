@@ -12,20 +12,18 @@ public interface Type {
   /**
    * matches the actual type present. Subclasses call the correct function.
    *
-   * @param matchIntType  in case its a {@link TypeInt}
+   * @param matchIntType in case its a {@link TypeInt}
    * @param matchBoolType in case its a {@link TypeBool}
    * @param matchEnumType in case its a {@link TypeEnum}
-   * @param <R>           the return type of the visitor
+   * @param <R> the return type of the visitor
    * @return the return value of the visitor
    */
-  <R> R match(
-      TypeIntegerHandler<R> matchIntType,
-      TypeBooleanHandler<R> matchBoolType,
+  <R> R match(TypeIntegerHandler<R> matchIntType, TypeBooleanHandler<R> matchBoolType,
       TypeEnumHandler<R> matchEnumType);
 
   /**
-   * Finds out whether this type checks against another type, which means
-   * any value of this type can be used as a value of the other type.
+   * Finds out whether this type checks against another type, which means any value of this type can
+   * be used as a value of the other type.
    * <p>
    * This mostly means type equality or a supertype relation.
    *
@@ -35,19 +33,16 @@ public interface Type {
   boolean checksAgainst(Type other);
 
   /**
-   * Get the type name of this type in a human-readable format
-   * (in contrast to this classes' toString()).
-   * This can be used to show the type in a GUI, for example.
+   * Get the type name of this type in a human-readable format (in contrast to this classes'
+   * toString()). This can be used to show the type in a GUI, for example.
    *
-   * @return a string that should match the type name as it is
-   * usually used in st-code.
+   * @return a string that should match the type name as it is usually used in st-code.
    */
   String getTypeName();
 
   /**
-   * Parse a literal of this type to a value. Can
-   * be used for parsing user-input into TextFields when
-   * the type is known, for example.
+   * Parse a literal of this type to a value. Can be used for parsing user-input into TextFields
+   * when the type is known, for example.
    *
    * @param literal the literal string to parse
    * @return optionally a resulting value

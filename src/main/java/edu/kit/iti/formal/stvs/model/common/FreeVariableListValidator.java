@@ -1,12 +1,22 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import javafx.beans.Observable;
-import javafx.beans.property.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 /**
  * Created by philipp on 09.02.17.
@@ -23,7 +33,8 @@ public class FreeVariableListValidator {
   private final BooleanProperty valid;
 
 
-  public FreeVariableListValidator(ObjectProperty<List<Type>> typeContext, FreeVariableList freeVariables) {
+  public FreeVariableListValidator(ObjectProperty<List<Type>> typeContext,
+      FreeVariableList freeVariables) {
     this.typeContext = typeContext;
     this.freeVariables = freeVariables;
 
@@ -45,8 +56,8 @@ public class FreeVariableListValidator {
     List<ValidFreeVariable> validated = new ArrayList<>();
 
     freeVariables.getVariables().forEach(freeVariable -> {
-      Optional<DuplicateFreeVariableProblem> optionalDuplicateProblem =
-          DuplicateFreeVariableProblem.checkForDuplicates(freeVariable, freeVariables.getVariables());
+      Optional<DuplicateFreeVariableProblem> optionalDuplicateProblem = DuplicateFreeVariableProblem
+          .checkForDuplicates(freeVariable, freeVariables.getVariables());
       optionalDuplicateProblem.ifPresent(problem -> insertProblem(problems, freeVariable, problem));
       if (!optionalDuplicateProblem.isPresent()) {
         try {

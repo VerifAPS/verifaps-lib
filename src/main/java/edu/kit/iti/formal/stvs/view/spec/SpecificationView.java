@@ -16,7 +16,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
@@ -165,8 +169,7 @@ public class SpecificationView extends VBox implements Lockable {
   }
 
   @Override
-  public void setEditable(boolean b) {
-  }
+  public void setEditable(boolean b) {}
 
   @Override
   public BooleanProperty getEditableProperty() {
@@ -174,7 +177,7 @@ public class SpecificationView extends VBox implements Lockable {
   }
 
   public void onVerificationButtonClicked(ConstraintSpecification constraintSpec,
-                                          VerificationEvent.Type type) {
+      VerificationEvent.Type type) {
 
     startVerificationButton.fireEvent(new VerificationEvent(constraintSpec, type));
   }

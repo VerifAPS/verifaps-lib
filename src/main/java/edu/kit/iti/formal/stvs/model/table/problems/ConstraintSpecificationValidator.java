@@ -1,14 +1,19 @@
 package edu.kit.iti.formal.stvs.model.table.problems;
 
-import edu.kit.iti.formal.stvs.model.common.*;
-import edu.kit.iti.formal.stvs.model.expressions.*;
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
+import edu.kit.iti.formal.stvs.model.common.NullableProperty;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
+import edu.kit.iti.formal.stvs.model.expressions.Expression;
+import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval;
+import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.expressions.TypeChecker;
 import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.property.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,15 +22,30 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
 /**
- * <p>The validator for {@link ConstraintSpecification}s. It converts these into the formal
- * model: {@link ValidSpecification}. If there are any problems while converting, then
- * {@link SpecProblem}s are created.</p>
+ * <p>
+ * The validator for {@link ConstraintSpecification}s. It converts these into the formal model:
+ * {@link ValidSpecification}. If there are any problems while converting, then {@link SpecProblem}s
+ * are created.
+ * </p>
  *
- * <p>This object has observable properties and can therefore be used like any other model
- * instance in the controllers.</p>
+ * <p>
+ * This object has observable properties and can therefore be used like any other model instance in
+ * the controllers.
+ * </p>
  *
- * <p>Created by philipp on 09.02.17.</p>
+ * <p>
+ * Created by philipp on 09.02.17.
+ * </p>
  *
  * @author Philipp
  */
@@ -43,20 +63,23 @@ public class ConstraintSpecificationValidator {
   private final InvalidationListener listenToSpecUpdate = this::onSpecUpdated;
 
   /**
-   * <p>Creates a validator with given observable models as context information.</p>
+   * <p>
+   * Creates a validator with given observable models as context information.
+   * </p>
    *
-   * <p>The validator observes changes in any of the given context models. It automatically
-   * updates the validated specification (see {@link #validSpecificationProperty()}) and/or
-   * the problems with the constraint specification (see {@link #problemsProperty()}).</p>
+   * <p>
+   * The validator observes changes in any of the given context models. It automatically updates the
+   * validated specification (see {@link #validSpecificationProperty()}) and/or the problems with
+   * the constraint specification (see {@link #problemsProperty()}).
+   * </p>
    *
    * @param typeContext the extracted types (esp. enums) from the code area
    * @param codeIoVariables the extracted {@link CodeIoVariable}s from the code area
    * @param validFreeVariables the most latest validated free variables from the
-   *                           {@link FreeVariableList}.
+   *        {@link FreeVariableList}.
    * @param specification the specification to be validated
    */
-  public ConstraintSpecificationValidator(
-      ObjectProperty<List<Type>> typeContext,
+  public ConstraintSpecificationValidator(ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> codeIoVariables,
       ReadOnlyObjectProperty<List<ValidFreeVariable>> validFreeVariables,
       ConstraintSpecification specification) {
@@ -107,11 +130,10 @@ public class ConstraintSpecificationValidator {
     for (SpecIoVariable specIoVariable : specification.getColumnHeaders()) {
       // Check column header for problem
       try {
-        ValidIoVariable validIoVariable = InvalidIoVarProblem.tryGetValidIoVariable(
-            specIoVariable,
-            codeIoVariables.get(),
-            typesByName,
-            specProblems::add); // On non-fatal problems (like missing matching CodeIoVariable)
+        ValidIoVariable validIoVariable = InvalidIoVarProblem.tryGetValidIoVariable(specIoVariable,
+            codeIoVariables.get(), typesByName, specProblems::add); // On non-fatal problems (like
+                                                                    // missing matching
+                                                                    // CodeIoVariable)
         variableTypes.put(validIoVariable.getName(), validIoVariable.getValidType());
         if (specificationIsValid) {
           validSpec.getColumnHeaders().add(validIoVariable);
@@ -135,8 +157,8 @@ public class ConstraintSpecificationValidator {
         ConstraintCell cell = mapEntry.getValue();
 
         try {
-          expressionsForRow.put(columnId, tryValidateCellExpression(
-                  typeContext.get(), typeChecker, columnId, rowIndex, cell));
+          expressionsForRow.put(columnId,
+              tryValidateCellExpression(typeContext.get(), typeChecker, columnId, rowIndex, cell));
         } catch (CellProblem problem) {
           specProblems.add(problem);
           specificationIsValid = false;
@@ -153,8 +175,8 @@ public class ConstraintSpecificationValidator {
 
     for (int durIndex = 0; durIndex < specification.getDurations().size(); durIndex++) {
       try {
-        LowerBoundedInterval interval =
-            DurationParseProblem.tryParseDuration(durIndex, specification.getDurations().get(durIndex));
+        LowerBoundedInterval interval = DurationParseProblem.tryParseDuration(durIndex,
+            specification.getDurations().get(durIndex));
         if (specificationIsValid) {
           validSpec.getDurations().add(interval);
         }
@@ -175,24 +197,23 @@ public class ConstraintSpecificationValidator {
   }
 
   /**
-   * <p>Tries to create an {@link Expression}-AST from the given {@link ConstraintCell} that has the
-   * correct type using context information (for example like a type context).</p>
+   * <p>
+   * Tries to create an {@link Expression}-AST from the given {@link ConstraintCell} that has the
+   * correct type using context information (for example like a type context).
+   * </p>
    *
    * @param typeContext the type context to use for parsing the cell (needed for encountering enum
-   *                    values)
+   *        values)
    * @param typeChecker the type checker instance for insuring the correct type
    * @param columnId the name of the column for parsing single-sided expressions like "> 3"
    * @param row the row for better error messages
    * @param cell the cell to be validated
    * @return the AST as {@link Expression} that is fully type-correct.
-   * @throws CellProblem if the cell could not be parsed ({@link CellParseProblem}) or
-   *                     if the cell is ill-typed ({@link CellTypeProblem}).
+   * @throws CellProblem if the cell could not be parsed ({@link CellParseProblem}) or if the cell
+   *         is ill-typed ({@link CellTypeProblem}).
    */
   public static Expression tryValidateCellExpression(List<Type> typeContext,
-                                                     TypeChecker typeChecker,
-                                                     String columnId,
-                                                     int row, ConstraintCell cell)
-      throws CellProblem {
+      TypeChecker typeChecker, String columnId, int row, ConstraintCell cell) throws CellProblem {
     Expression expr = CellParseProblem.tryParseCellExpression(typeContext, columnId, row, cell);
     return CellTypeProblem.tryTypeCheckCellExpression(typeChecker, columnId, row, expr);
   }

@@ -45,7 +45,8 @@ public class VerticalResizeContainerController implements Controller {
       double newSize = cacheSize.get() + (event.getScreenY() - mouseYStart.get());
       view.getContentContainer().setPrefHeight(newSize);
       view.getContent().setPrefHeight(newSize);
-      Platform.runLater(() -> view.getParent().getParent().getParent().getParent().getParent().getParent().requestLayout());
+      Platform.runLater(() -> view.getParent().getParent().getParent().getParent().getParent()
+          .getParent().requestLayout());
     });
   }
 

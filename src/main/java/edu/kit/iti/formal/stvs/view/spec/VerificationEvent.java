@@ -12,8 +12,7 @@ public class VerificationEvent extends Event {
   private final ConstraintSpecification constraintSpec;
   private final Type type;
 
-  public static final EventType<VerificationEvent> EVENT_TYPE = new EventType
-      ("Verification Event");
+  public static final EventType<VerificationEvent> EVENT_TYPE = new EventType("Verification Event");
 
   public VerificationEvent(ConstraintSpecification constraintSpec, Type type) {
     super(EVENT_TYPE);
@@ -29,5 +28,7 @@ public class VerificationEvent extends Event {
     return type;
   }
 
-  public enum Type {START, STOP}
+  public enum Type {
+    START, STOP
+  }
 }

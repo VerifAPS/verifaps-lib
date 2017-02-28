@@ -26,8 +26,8 @@ public class SList implements SExpression {
   }
 
   /**
-   * Helper constructor.
-   * Creates a {@link SAtom} for any passed string an calls {@link SList#SList(List)}
+   * Helper constructor. Creates a {@link SAtom} for any passed string an calls
+   * {@link SList#SList(List)}
    *
    * @param vals atomic expressions as string
    */
@@ -48,11 +48,11 @@ public class SList implements SExpression {
   }
 
   /**
-   * Creates an SList with the first argument interpreted as
-   * atomic expression followed by {@code sexp}.
+   * Creates an SList with the first argument interpreted as atomic expression followed by
+   * {@code sexp}.
    *
    * @param command atomic command expression
-   * @param sexp    following expressions
+   * @param sexp following expressions
    */
   public SList(String command, SExpression... sexp) {
     this();
@@ -61,8 +61,8 @@ public class SList implements SExpression {
   }
 
   /**
-   * Creates an instance by using an {@link Sexp} as a base.
-   * Every item in {@code exp} will become an item in this list.
+   * Creates an instance by using an {@link Sexp} as a base. Every item in {@code exp} will become
+   * an item in this list.
    *
    * @param exp base expression
    */
@@ -93,8 +93,8 @@ public class SList implements SExpression {
 
   @Override
   public String toText() {
-    return " ( " + getList().stream()
-        .map(SExpression::toText).collect(Collectors.joining(" ")) + " ) ";
+    return " ( " + getList().stream().map(SExpression::toText).collect(Collectors.joining(" "))
+        + " ) ";
   }
 
   public SList addAll(SExpression... sexp) {
@@ -124,9 +124,7 @@ public class SList implements SExpression {
    * @return string representation: "(item_1 item_2 ... item_n)"
    */
   public String toString() {
-    return "( " + getList().stream().map(Object::toString).collect(Collectors.joining(
-        " "))
-        + " )";
+    return "( " + getList().stream().map(Object::toString).collect(Collectors.joining(" ")) + " )";
   }
 
   @Override

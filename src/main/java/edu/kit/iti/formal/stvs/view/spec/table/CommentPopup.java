@@ -10,7 +10,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 
 /**
- * <p>The popup dialog for editing comments on table cells, rows or tables as a whole.</p>
+ * <p>
+ * The popup dialog for editing comments on table cells, rows or tables as a whole.
+ * </p>
  *
  * @author Carsten Csiky
  */
@@ -20,8 +22,10 @@ public class CommentPopup extends Dialog<String> implements Lockable {
   private final BooleanProperty editable;
 
   /**
-   * <p>Creates a javafx dialog with a text area for a comment that can be edited,
-   * if this class has not been locked (see {@link Lockable}).</p>
+   * <p>
+   * Creates a javafx dialog with a text area for a comment that can be edited, if this class has
+   * not been locked (see {@link Lockable}).
+   * </p>
    *
    * @param commentContent the initial comment content of the dialog.
    */

@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.stvs.model.common;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  * Created by philipp on 09.02.17.
@@ -34,7 +34,8 @@ public class FreeVariableList {
 
     FreeVariableList that = (FreeVariableList) o;
 
-    return getVariables() != null ? getVariables().equals(that.getVariables()) : that.getVariables() == null;
+    return getVariables() != null ? getVariables().equals(that.getVariables())
+        : that.getVariables() == null;
   }
 
   @Override

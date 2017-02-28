@@ -14,6 +14,9 @@ import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController;
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController;
+
+import java.util.List;
+
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -25,8 +28,6 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-
-import java.util.List;
 
 /*
  * @author Carsten Csiky
@@ -48,12 +49,9 @@ public class SpecificationController implements Controller {
   private BooleanProperty specificationInvalid;
   private SpecificationConcretizer concretizer;
 
-  public SpecificationController(
-      ObjectProperty<List<Type>> typeContext,
-      ObjectProperty<List<CodeIoVariable>> codeIoVariables,
-      HybridSpecification hybridSpecification,
-      ObjectProperty<VerificationState> stateProperty,
-      BooleanBinding codeInvalid,
+  public SpecificationController(ObjectProperty<List<Type>> typeContext,
+      ObjectProperty<List<CodeIoVariable>> codeIoVariables, HybridSpecification hybridSpecification,
+      ObjectProperty<VerificationState> stateProperty, BooleanBinding codeInvalid,
       GlobalConfig globalConfig) {
     this.spec = hybridSpecification;
     this.hybridSpecification = hybridSpecification;
@@ -62,29 +60,23 @@ public class SpecificationController implements Controller {
     this.view = new SpecificationView();
     this.selection = hybridSpecification.getSelection();
     this.globalConfig = globalConfig;
-    this.variableCollectionController = new VariableCollectionController(
-        typeContext,
-        hybridSpecification.getFreeVariableList());
-    this.tableController = new SpecificationTableController(
-        globalConfig,
-        typeContext,
-        codeIoVariables,
-        variableCollectionController.getValidator().validFreeVariablesProperty(),
+    this.variableCollectionController =
+        new VariableCollectionController(typeContext, hybridSpecification.getFreeVariableList());
+    this.tableController = new SpecificationTableController(globalConfig, typeContext,
+        codeIoVariables, variableCollectionController.getValidator().validFreeVariablesProperty(),
         hybridSpecification);
     this.specificationInvalid = new SimpleBooleanProperty(true);
-    specificationInvalid.bind(
-        variableCollectionController.getValidator().validProperty().not()
-            .or(tableController.getValidator().validProperty().not())
-            .or(codeInvalid));
+    specificationInvalid.bind(variableCollectionController.getValidator().validProperty().not()
+        .or(tableController.getValidator().validProperty().not()).or(codeInvalid));
 
-    //use event trigger to generate timing-diagram, to minimize code-duplication
+    // use event trigger to generate timing-diagram, to minimize code-duplication
     onConcreteInstanceChanged(getConcreteSpecification());
 
     view.setVariableCollection(variableCollectionController.getView());
-    view.getVariableCollection().getFreeVariableTableView().setEditable(this.hybridSpecification
-        .isEditable());
-    List<MenuItem> freeVarMenuItems = view.getVariableCollection().getFreeVariableTableView()
-        .getContextMenu().getItems();
+    view.getVariableCollection().getFreeVariableTableView()
+        .setEditable(this.hybridSpecification.isEditable());
+    List<MenuItem> freeVarMenuItems =
+        view.getVariableCollection().getFreeVariableTableView().getContextMenu().getItems();
     for (MenuItem menuItem : freeVarMenuItems) {
       menuItem.setDisable(!this.hybridSpecification.isEditable());
     }
@@ -95,13 +87,14 @@ public class SpecificationController implements Controller {
 
     view.getStartConcretizerButton().setOnAction(this::startConretizer);
 
-    hybridSpecification.concreteInstanceProperty().addListener((observable, old, newVal)
-        -> this.onConcreteInstanceChanged(newVal));
+    hybridSpecification.concreteInstanceProperty()
+        .addListener((observable, old, newVal) -> this.onConcreteInstanceChanged(newVal));
     registerTimingDiagramDeactivationHandler();
   }
 
-  private void onVerificationStateChanged(ObservableValue<? extends VerificationState> observableValue,
-                                          VerificationState oldState, VerificationState newState) {
+  private void onVerificationStateChanged(
+      ObservableValue<? extends VerificationState> observableValue, VerificationState oldState,
+      VerificationState newState) {
     switch (newState) {
       case RUNNING:
         getView().setVerificationButtonStop();
@@ -129,8 +122,8 @@ public class SpecificationController implements Controller {
     if (getConcreteSpecification() == null) {
       view.setEmptyDiagram();
     } else {
-      this.timingDiagramCollectionController = new TimingDiagramCollectionController(
-          getConcreteSpecification(), selection);
+      this.timingDiagramCollectionController =
+          new TimingDiagramCollectionController(getConcreteSpecification(), selection);
       view.setDiagram(timingDiagramCollectionController.getView());
 
     }
@@ -140,7 +133,8 @@ public class SpecificationController implements Controller {
     view.setConcretizerButtonStop();
     view.getStartConcretizerButton().setOnAction(this::stopConcretizer);
     this.concretizer = new SmtConcretizer(globalConfig);
-    concretizer.calculateConcreteSpecification(tableController.getValidator().getValidSpecification(),
+    concretizer.calculateConcreteSpecification(
+        tableController.getValidator().getValidSpecification(),
         variableCollectionController.getValidator().validFreeVariablesProperty().get(),
         optionalSpec -> {
           Platform.runLater(() -> {
@@ -157,8 +151,8 @@ public class SpecificationController implements Controller {
           });
         }, exception -> {
           Platform.runLater(() -> {
-            AlertFactory.createAlert(exception, "Concretization Failed", "An error occurred while "
-                + "concretizing the specification.");
+            AlertFactory.createAlert(exception, "Concretization Failed",
+                "An error occurred while " + "concretizing the specification.");
           });
         });
   }
@@ -172,8 +166,8 @@ public class SpecificationController implements Controller {
   }
 
   private ConcreteSpecification getConcreteSpecification() {
-    return hybridSpecification.getCounterExample().orElse(
-        hybridSpecification.getConcreteInstance().orElse(null));
+    return hybridSpecification.getCounterExample()
+        .orElse(hybridSpecification.getConcreteInstance().orElse(null));
   }
 
   public SpecificationView getView() {

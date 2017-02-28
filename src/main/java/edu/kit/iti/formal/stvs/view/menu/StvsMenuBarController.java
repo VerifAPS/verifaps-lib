@@ -1,5 +1,10 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
+import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.ANY;
+import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.CODE;
+import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.SESSION;
+import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.SPECIFICATION;
+
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
@@ -12,6 +17,10 @@ import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.common.FileChooserFactory;
+
+import java.io.File;
+import java.io.IOException;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
@@ -19,16 +28,10 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.MenuItem;
 import javafx.stage.FileChooser;
 
-import java.io.File;
-import java.io.IOException;
-
-import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.*;
-
 
 /**
- * Created by csicar on 10.01.17.
- * Controller for the MenuBar at the top of the window
- * does just fire to the root controller
+ * Created by csicar on 10.01.17. Controller for the MenuBar at the top of the window does just fire
+ * to the root controller
  *
  * @author Carsten Csiky
  */
@@ -42,17 +45,17 @@ public class StvsMenuBarController implements Controller {
    * @param rootModel the applications root model
    */
   public StvsMenuBarController(ObjectProperty<StvsRootModel> rootModel) {
-    //set own properties
+    // set own properties
     this.rootModel = rootModel;
 
-    //create view
+    // create view
     this.view = new StvsMenuBar();
 
     rootModel.get().getHistory().getFilenames().addListener(new HistoryFilenamesChangeListener());
     // Fill history menu
     updateHistoryMenu();
 
-    //add listener
+    // add listener
     view.newCode.setOnAction(this::createNewCode);
     view.newSpec.setOnAction(this::createNewSpec);
     view.open.setOnAction(this::openFile);
@@ -73,21 +76,22 @@ public class StvsMenuBarController implements Controller {
       MenuItem newItem = new MenuItem(filename);
       newItem.setOnAction((actionEvent -> {
         try {
-          ImporterFacade.importFile(new File(filename), rootModel
-              .get().getGlobalConfig(), rootModel.get().getHistory(), (hybridSpecification) -> {
-            //handle hybridspecification
-            rootModel.get().getHybridSpecifications().add(hybridSpecification);
-          }, (rootModel) -> {
-            //handle rootModel
-            this.rootModel.setValue(rootModel);
-          }, (code -> {
-            // handle code
-            this.rootModel.get().getScenario().setCode(code);
-          }));
+          ImporterFacade.importFile(new File(filename), rootModel.get().getGlobalConfig(),
+              rootModel.get().getHistory(), (hybridSpecification) -> {
+                // handle hybridspecification
+                rootModel.get().getHybridSpecifications().add(hybridSpecification);
+              }, (rootModel) -> {
+                // handle rootModel
+                this.rootModel.setValue(rootModel);
+              }, (code -> {
+                // handle code
+                this.rootModel.get().getScenario().setCode(code);
+              }));
           this.rootModel.get().getHistory().addFilename(filename);
         } catch (IOException | ImportException e) {
-          AlertFactory.createAlert(Alert.AlertType.ERROR, "File Open Error", "An error occurred " +
-              "while opening a file.", "The file " + filename + " could not be opened.", e.getMessage());
+          AlertFactory.createAlert(Alert.AlertType.ERROR, "File Open Error",
+              "An error occurred " + "while opening a file.",
+              "The file " + filename + " could not be opened.", e.getMessage());
         }
       }));
       view.openRecentItems.add(newItem);
@@ -97,8 +101,8 @@ public class StvsMenuBarController implements Controller {
   }
 
   private void saveSessionAs(ActionEvent actionEvent) {
-    FileChooser fileChooser = FileChooserFactory.createSaveFileChooser(SESSION, rootModel.get()
-        .getWorkingdir());
+    FileChooser fileChooser =
+        FileChooserFactory.createSaveFileChooser(SESSION, rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
     if (chosenFile != null) {
       handleSaveAll(chosenFile);
@@ -111,8 +115,8 @@ public class StvsMenuBarController implements Controller {
   }
 
   private void createNewSpec(ActionEvent actionEvent) {
-    this.rootModel.get().getHybridSpecifications().add(new HybridSpecification(
-        new FreeVariableList(), true));
+    this.rootModel.get().getHybridSpecifications()
+        .add(new HybridSpecification(new FreeVariableList(), true));
   }
 
   private void createNewCode(ActionEvent actionEvent) {
@@ -133,8 +137,8 @@ public class StvsMenuBarController implements Controller {
   }
 
   private void openCode(ActionEvent t) {
-    FileChooser fileChooser = FileChooserFactory.createOpenFileChooser(CODE, rootModel.get()
-        .getWorkingdir());
+    FileChooser fileChooser =
+        FileChooserFactory.createOpenFileChooser(CODE, rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
     if (chosenFile == null) {
       return;
@@ -149,17 +153,17 @@ public class StvsMenuBarController implements Controller {
   }
 
   private void openSession(ActionEvent t) {
-    FileChooser fileChooser = FileChooserFactory.createOpenFileChooser(SESSION, rootModel.get()
-        .getWorkingdir());
+    FileChooser fileChooser =
+        FileChooserFactory.createOpenFileChooser(SESSION, rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
 
     if (chosenFile == null) {
       return;
     }
     try {
-      StvsRootModel model = ImporterFacade.importSession(
-          chosenFile, ImporterFacade.ImportFormat.XML, rootModel.get().getGlobalConfig(),
-          rootModel.get().getHistory());
+      StvsRootModel model =
+          ImporterFacade.importSession(chosenFile, ImporterFacade.ImportFormat.XML,
+              rootModel.get().getGlobalConfig(), rootModel.get().getHistory());
       model.setWorkingdir(chosenFile.getParentFile());
       model.setFilename(chosenFile.getName());
       this.rootModel.set(model);
@@ -170,15 +174,15 @@ public class StvsMenuBarController implements Controller {
   }
 
   private void openSpec(ActionEvent t) {
-    FileChooser fileChooser = FileChooserFactory.createOpenFileChooser(SPECIFICATION, rootModel
-        .get().getWorkingdir());
+    FileChooser fileChooser =
+        FileChooserFactory.createOpenFileChooser(SPECIFICATION, rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
     if (chosenFile == null) {
       return;
     }
     try {
-      HybridSpecification spec = ImporterFacade.importHybridSpec(chosenFile,
-          ImporterFacade.ImportFormat.XML);
+      HybridSpecification spec =
+          ImporterFacade.importHybridSpec(chosenFile, ImporterFacade.ImportFormat.XML);
       this.rootModel.get().getHybridSpecifications().add(spec);
       this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
     } catch (IOException | ImportException e) {
@@ -187,27 +191,27 @@ public class StvsMenuBarController implements Controller {
   }
 
   private void openFile(ActionEvent t) {
-    FileChooser fileChooser = FileChooserFactory.createOpenFileChooser(ANY, rootModel.get()
-        .getWorkingdir());
+    FileChooser fileChooser =
+        FileChooserFactory.createOpenFileChooser(ANY, rootModel.get().getWorkingdir());
     File chosenFile = fileChooser.showOpenDialog(view.getScene().getWindow());
 
     if (chosenFile == null) {
       return;
     }
     try {
-      ImporterFacade.importFile(chosenFile, rootModel.get().getGlobalConfig(), rootModel.get()
-          .getHistory(), (hybridSpecification) -> {
-        //handle hybridspecification
-        rootModel.get().getHybridSpecifications().add(hybridSpecification);
-      }, (rootModel) -> {
-        //handle rootModel
-        rootModel.setWorkingdir(chosenFile.getParentFile());
-        rootModel.setFilename(chosenFile.getName());
-        this.rootModel.setValue(rootModel);
-      }, (code -> {
-        //handle code
-        this.rootModel.get().getScenario().setCode(code);
-      }));
+      ImporterFacade.importFile(chosenFile, rootModel.get().getGlobalConfig(),
+          rootModel.get().getHistory(), (hybridSpecification) -> {
+            // handle hybridspecification
+            rootModel.get().getHybridSpecifications().add(hybridSpecification);
+          }, (rootModel) -> {
+            // handle rootModel
+            rootModel.setWorkingdir(chosenFile.getParentFile());
+            rootModel.setFilename(chosenFile.getName());
+            this.rootModel.setValue(rootModel);
+          }, (code -> {
+            // handle code
+            this.rootModel.get().getScenario().setCode(code);
+          }));
     } catch (IOException | ImportException e) {
       AlertFactory.createAlert(e);
     }
@@ -216,8 +220,8 @@ public class StvsMenuBarController implements Controller {
 
   private void saveAll(ActionEvent t) {
     if (this.rootModel.get().getFilename().isEmpty()) {
-      FileChooser fileChooser = FileChooserFactory.createSaveFileChooser(SESSION, rootModel.get()
-          .getWorkingdir());
+      FileChooser fileChooser =
+          FileChooserFactory.createSaveFileChooser(SESSION, rootModel.get().getWorkingdir());
       File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
       if (chosenFile != null) {
         handleSaveAll(chosenFile);
@@ -241,8 +245,8 @@ public class StvsMenuBarController implements Controller {
     // Set the code filename, if no filename set yet
     Code code = rootModel.get().getScenario().getCode();
     if (code.getFilename().isEmpty()) {
-      FileChooser fileChooser = FileChooserFactory.createSaveFileChooser(CODE, rootModel.get()
-          .getWorkingdir());
+      FileChooser fileChooser =
+          FileChooserFactory.createSaveFileChooser(CODE, rootModel.get().getWorkingdir());
       File chosenFile = fileChooser.showSaveDialog(view.getScene().getWindow());
       if (chosenFile == null) {
         return;
@@ -280,7 +284,8 @@ public class StvsMenuBarController implements Controller {
     return view;
   }
 
-  private class HistoryFilenamesChangeListener implements javafx.collections.ListChangeListener<String> {
+  private class HistoryFilenamesChangeListener
+      implements javafx.collections.ListChangeListener<String> {
 
     @Override
     public void onChanged(Change<? extends String> change) {

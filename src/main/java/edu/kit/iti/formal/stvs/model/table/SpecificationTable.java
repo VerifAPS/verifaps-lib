@@ -1,6 +1,12 @@
 package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.model.common.Named;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -9,11 +15,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.util.Callback;
 import org.apache.commons.lang3.StringEscapeUtils;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author Benjamin Alt
@@ -28,19 +29,16 @@ public class SpecificationTable<H extends Named, C, D> {
   protected ObservableList<D> durations;
   private StringProperty name;
 
-  public SpecificationTable(
-      Callback<H, Observable[]> columnHeaderExtractor,
+  public SpecificationTable(Callback<H, Observable[]> columnHeaderExtractor,
       Callback<D, Observable[]> durationExtractor) {
     this(DEFAULT_NAME, columnHeaderExtractor, durationExtractor);
   }
 
-  public SpecificationTable(
-      String name,
-      Callback<H, Observable[]> columnHeaderExtractor,
+  public SpecificationTable(String name, Callback<H, Observable[]> columnHeaderExtractor,
       Callback<D, Observable[]> durationExtractor) {
     this.name = new SimpleStringProperty(name);
-    this.rows = FXCollections.observableArrayList(
-        specificationRow -> new Observable[] {specificationRow});
+    this.rows =
+        FXCollections.observableArrayList(specificationRow -> new Observable[] {specificationRow});
     this.durations = FXCollections.observableArrayList(durationExtractor);
     this.columnHeaders = FXCollections.observableArrayList(columnHeaderExtractor);
 
@@ -60,8 +58,7 @@ public class SpecificationTable<H extends Named, C, D> {
   public SpecificationColumn<C> getColumnByName(String columnHeaderName) {
     // ensure there is a column header with this name
     H columnHeader = getColumnHeaderByName(columnHeaderName);
-    List<C> cells = rows.stream()
-        .map(row -> row.getCells().get(columnHeader.getName()))
+    List<C> cells = rows.stream().map(row -> row.getCells().get(columnHeader.getName()))
         .collect(Collectors.toList());
     return new SpecificationColumn<>(cells);
   }
@@ -99,22 +96,21 @@ public class SpecificationTable<H extends Named, C, D> {
 
   public Optional<H> getOptionalColumnHeaderByName(String columnHeaderName) {
     return columnHeaders.stream()
-        .filter(specIoVariable -> specIoVariable.getName().equals(columnHeaderName))
-        .findAny();
+        .filter(specIoVariable -> specIoVariable.getName().equals(columnHeaderName)).findAny();
   }
 
   public H getColumnHeaderByName(String columnHeaderName) {
     return getOptionalColumnHeaderByName(columnHeaderName)
-        .orElseThrow(() ->
-            new NoSuchElementException("Column does not exist: "
-                + StringEscapeUtils.escapeJava(columnHeaderName)));
+        .orElseThrow(() -> new NoSuchElementException(
+            "Column does not exist: " + StringEscapeUtils.escapeJava(columnHeaderName)));
   }
 
   /**
    * Get the SpecIoVariables for this table, i.e. the column headers.
    * <p>
-   * <p>You should <strong>not mutate</strong> this list. For adding new
-   * columns, use addNewColumn</p>
+   * <p>
+   * You should <strong>not mutate</strong> this list. For adding new columns, use addNewColumn
+   * </p>
    *
    * @return the list of SpecIoVariables
    */
@@ -162,52 +158,44 @@ public class SpecificationTable<H extends Named, C, D> {
     for (SpecificationRow<C> addedRow : added) {
       // Check correctness of added row
       if (addedRow.getCells().size() != columnHeaders.size()) {
-        throw new IllegalArgumentException("Illegal width for row "
-            + StringEscapeUtils.escapeJava(addedRow.toString()) + ", expected width: "
-            + columnHeaders.size());
+        throw new IllegalArgumentException(
+            "Illegal width for row " + StringEscapeUtils.escapeJava(addedRow.toString())
+                + ", expected width: " + columnHeaders.size());
       }
-      if (!addedRow.getCells().keySet().stream().allMatch(columnId ->
-          getOptionalColumnHeaderByName(columnId).isPresent())) {
+      if (!addedRow.getCells().keySet().stream()
+          .allMatch(columnId -> getOptionalColumnHeaderByName(columnId).isPresent())) {
         throw new IllegalArgumentException("Added row contains unknown IoVariable: "
             + StringEscapeUtils.escapeJava(addedRow.toString()));
       }
     }
   }
 
-  protected void onRowRemoved(List<? extends SpecificationRow<C>> removed) {
-  }
+  protected void onRowRemoved(List<? extends SpecificationRow<C>> removed) {}
 
-  protected void onRowOrderChanged() {
-  }
+  protected void onRowOrderChanged() {}
 
-  protected void onColumnAdded(SpecificationColumn<C> column) {
-  }
+  protected void onColumnAdded(SpecificationColumn<C> column) {}
 
-  protected void onColumnRemoved(SpecificationColumn<C> column) {
-  }
+  protected void onColumnRemoved(SpecificationColumn<C> column) {}
 
   protected void onColumnHeaderAdded(List<? extends H> added) {
     for (H columnHeader : added) {
       String columnId = columnHeader.getName();
-      getOptionalColumnHeaderByName(columnId)
-          .ifPresent(otherVariableWithSameName -> {
-            if (otherVariableWithSameName != columnHeader) {
-              throw new IllegalArgumentException(
-                  "Cannot add SpecIoVariable that collides with another SpecIoVariable: "
-                      + StringEscapeUtils.escapeJava(columnId));
-            }
-          });
+      getOptionalColumnHeaderByName(columnId).ifPresent(otherVariableWithSameName -> {
+        if (otherVariableWithSameName != columnHeader) {
+          throw new IllegalArgumentException(
+              "Cannot add SpecIoVariable that collides with another SpecIoVariable: "
+                  + StringEscapeUtils.escapeJava(columnId));
+        }
+      });
     }
   }
 
-  protected void onColumnHeaderRemoved(List<? extends H> removed) {
-  }
+  protected void onColumnHeaderRemoved(List<? extends H> removed) {}
 
-  protected void onDurationAdded(List<? extends D> added) {
-  }
+  protected void onDurationAdded(List<? extends D> added) {}
 
-  protected void onDurationRemoved(List<? extends D> removed) {
-  }
+  protected void onDurationRemoved(List<? extends D> removed) {}
 
   @Override
   public boolean equals(Object o) {
@@ -220,13 +208,15 @@ public class SpecificationTable<H extends Named, C, D> {
 
     SpecificationTable<?, ?, ?> that = (SpecificationTable<?, ?, ?>) o;
 
-    if (getColumnHeaders() != null ? !getColumnHeaders().equals(that.getColumnHeaders()) : that.getColumnHeaders() != null) {
+    if (getColumnHeaders() != null ? !getColumnHeaders().equals(that.getColumnHeaders())
+        : that.getColumnHeaders() != null) {
       return false;
     }
     if (getRows() != null ? !getRows().equals(that.getRows()) : that.getRows() != null) {
       return false;
     }
-    if (getDurations() != null ? !getDurations().equals(that.getDurations()) : that.getDurations() != null) {
+    if (getDurations() != null ? !getDurations().equals(that.getDurations())
+        : that.getDurations() != null) {
       return false;
     }
     return getName() != null ? getName().equals(that.getName()) : that.getName() == null;
@@ -256,17 +246,15 @@ public class SpecificationTable<H extends Named, C, D> {
   public String toString() {
     StringBuilder str = new StringBuilder(getClass().getSimpleName());
     str.append("\nDurations: ");
-    getDurations().stream().map(Object::toString)
-        .forEach(string -> {
-          str.append(string);
-          str.append(',');
-        });
+    getDurations().stream().map(Object::toString).forEach(string -> {
+      str.append(string);
+      str.append(',');
+    });
     str.append("\nColumns: ");
-    getColumnHeaders().stream().map(Object::toString)
-        .forEach(string -> {
-          str.append(string);
-          str.append(',');
-        });
+    getColumnHeaders().stream().map(Object::toString).forEach(string -> {
+      str.append(string);
+      str.append(',');
+    });
     str.append("\nRows:\n");
     getRows().stream().forEachOrdered(row -> {
       getColumnHeaders().forEach(header -> {

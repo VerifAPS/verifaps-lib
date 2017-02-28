@@ -5,21 +5,44 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.table.*;
+import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
+import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.model.table.HybridCell;
+import edu.kit.iti.formal.stvs.model.table.HybridRow;
+import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
+import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
+import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import edu.kit.iti.formal.stvs.model.table.problems.ColumnProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.view.Controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.control.*;
-import javafx.scene.input.*;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.TransferMode;
 
 /**
  * Created by Philipp on 01.02.2017.
@@ -38,18 +61,18 @@ public class SpecificationTableController implements Controller {
   private final TableColumn<HybridRow, String> durations;
   private final GlobalConfig config;
 
-  public SpecificationTableController(GlobalConfig config,
-                                      ObjectProperty<List<Type>> typeContext,
-                                      ObjectProperty<List<CodeIoVariable>> codeIoVariables,
-                                      ReadOnlyObjectProperty<List<ValidFreeVariable>> validVariables,
-                                      HybridSpecification hybridSpecification) {
+  public SpecificationTableController(GlobalConfig config, ObjectProperty<List<Type>> typeContext,
+      ObjectProperty<List<CodeIoVariable>> codeIoVariables,
+      ReadOnlyObjectProperty<List<ValidFreeVariable>> validVariables,
+      HybridSpecification hybridSpecification) {
     this.config = config;
     this.tableView = new TableView<>();
 
     this.typeContext = typeContext;
     this.codeIoVariables = codeIoVariables;
     this.hybridSpec = hybridSpecification;
-    this.validator = new ConstraintSpecificationValidator(typeContext, codeIoVariables, validVariables, hybridSpecification);
+    this.validator = new ConstraintSpecificationValidator(typeContext, codeIoVariables,
+        validVariables, hybridSpecification);
     this.durations = createViewColumn("Duration", HybridRow::getDuration);
 
     tableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
@@ -77,22 +100,19 @@ public class SpecificationTableController implements Controller {
     tableView.setItems(hybridSpec.getHybridRows());
   }
 
-  private void onColumnSelectionChanged(ObservableValue<? extends String> obs, String before, String columnNow) {
+  private void onColumnSelectionChanged(ObservableValue<? extends String> obs, String before,
+      String columnNow) {
     if (before != null) {
-      tableView.getColumns().stream()
-          .filter(column -> before.equals(column.getUserData()))
-          .findFirst()
-          .ifPresent(column -> {
+      tableView.getColumns().stream().filter(column -> before.equals(column.getUserData()))
+          .findFirst().ifPresent(column -> {
             column.getStyleClass().remove("highlighted");
           });
     }
     if (columnNow != null) {
       // If we don't clear, the gray selection could be confused with the highlighting
       tableView.getSelectionModel().clearSelection();
-      tableView.getColumns().stream()
-          .filter(column -> columnNow.equals(column.getUserData()))
-          .findFirst()
-          .ifPresent(column -> {
+      tableView.getColumns().stream().filter(column -> columnNow.equals(column.getUserData()))
+          .findFirst().ifPresent(column -> {
             column.getStyleClass().add("highlighted");
             tableView.scrollToColumn(column);
           });
@@ -101,18 +121,15 @@ public class SpecificationTableController implements Controller {
 
   private void focusCell(String columnId, int row) {
     tableView.edit(row,
-        tableView.getColumns().stream()
-            .filter(column -> columnId.equals(column.getUserData()))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Cannot focus unknown column: " + columnId)));
+        tableView.getColumns().stream().filter(column -> columnId.equals(column.getUserData()))
+            .findFirst().orElseThrow(
+                () -> new IllegalArgumentException("Cannot focus unknown column: " + columnId)));
   }
 
   private void onProblemsChange() {
-    List<ColumnProblem> columnProblems =
-        validator.problemsProperty().get().stream()
-            .filter(problem -> problem instanceof ColumnProblem)
-            .map(problem -> (ColumnProblem) problem)
-            .collect(Collectors.toList());
+    List<ColumnProblem> columnProblems = validator.problemsProperty().get().stream()
+        .filter(problem -> problem instanceof ColumnProblem).map(problem -> (ColumnProblem) problem)
+        .collect(Collectors.toList());
     for (TableColumn<HybridRow, ?> column : tableView.getColumns()) {
       if (column.getUserData() == null) {
         continue;
@@ -172,14 +189,13 @@ public class SpecificationTableController implements Controller {
       toRemove.addAll(tableView.getSelectionModel().getSelectedItems());
       removeByReference(hybridSpec.getHybridRows(), toRemove);
     });
-    addNewColumn.setOnAction(event ->
-        new IoVariableChooserDialog(codeIoVariables, hybridSpec.getColumnHeaders())
-            .showAndWait()
-            .ifPresent(this::addNewColumn));
+    addNewColumn.setOnAction(
+        event -> new IoVariableChooserDialog(codeIoVariables, hybridSpec.getColumnHeaders())
+            .showAndWait().ifPresent(this::addNewColumn));
     comment.setOnAction(event -> {
       int index = tableView.getSelectionModel().getSelectedIndex();
-      CommentPopupManager popupController = new CommentPopupManager(hybridSpec.getRows().get
-          (index), hybridSpec.isEditable(), config);
+      CommentPopupManager popupController =
+          new CommentPopupManager(hybridSpec.getRows().get(index), hybridSpec.isEditable(), config);
     });
     comment.setAccelerator(KeyCodeCombination.keyCombination("Ctrl+k"));
     insertRow.disableProperty().bind(Bindings.not(tableView.editableProperty()));
@@ -194,10 +210,9 @@ public class SpecificationTableController implements Controller {
     MenuItem commentColumn = new MenuItem("Comment ...");
     commentColumn.setAccelerator(KeyCombination.keyCombination("Ctrl+k"));
     changeColumn.setOnAction(event -> {
-      new IoVariableChangeDialog(
-          hybridSpec.getColumnHeaderByName((String) column.getUserData()),
-          hybridSpec.getColumnHeaders().filtered(var -> !var.getName().equals(column.getUserData())))
-          .showAndWait();
+      new IoVariableChangeDialog(hybridSpec.getColumnHeaderByName((String) column.getUserData()),
+          hybridSpec.getColumnHeaders()
+              .filtered(var -> !var.getName().equals(column.getUserData()))).showAndWait();
     });
     removeColumn.setOnAction(event -> {
       tableView.getColumns().remove(column);
@@ -215,8 +230,8 @@ public class SpecificationTableController implements Controller {
 
   public void addEmptyRow(int index) {
     Map<String, ConstraintCell> wildcardCells = new HashMap<>();
-    hybridSpec.getColumnHeaders().forEach(specIoVariable ->
-        wildcardCells.put(specIoVariable.getName(), new ConstraintCell("-")));
+    hybridSpec.getColumnHeaders().forEach(
+        specIoVariable -> wildcardCells.put(specIoVariable.getName(), new ConstraintCell("-")));
     SpecificationRow<ConstraintCell> wildcardRow = ConstraintSpecification.createRow(wildcardCells);
     hybridSpec.getHybridRows().add(index, new HybridRow(wildcardRow, new ConstraintDuration("1")));
   }
@@ -226,8 +241,8 @@ public class SpecificationTableController implements Controller {
     if (hybridSpec.getHybridRows().isEmpty()) {
       hybridSpec.getColumnHeaders().add(specIoVariable);
     } else {
-      SpecificationColumn<ConstraintCell> dataColumn = new SpecificationColumn<>(
-          hybridSpec.getHybridRows().stream()
+      SpecificationColumn<ConstraintCell> dataColumn =
+          new SpecificationColumn<>(hybridSpec.getHybridRows().stream()
               .map(row -> new ConstraintCell("-")).collect(Collectors.toList()));
       hybridSpec.addColumn(specIoVariable, dataColumn);
     }
@@ -237,25 +252,23 @@ public class SpecificationTableController implements Controller {
   }
 
   private void addColumnToView(final SpecIoVariable specIoVariable) {
-    TableColumn<HybridRow, String> column = createViewColumn(
-        specIoVariable.getName(),
+    TableColumn<HybridRow, String> column = createViewColumn(specIoVariable.getName(),
         hybridRow -> hybridRow.getCells().get(specIoVariable.getName()));
 
     column.setUserData(specIoVariable.getName());
-    specIoVariable.nameProperty().addListener(
-        (Observable o) -> column.setUserData(specIoVariable.getName()));
+    specIoVariable.nameProperty()
+        .addListener((Observable o) -> column.setUserData(specIoVariable.getName()));
     column.setText("");
     column.setGraphic(new ColumnHeader(specIoVariable));
     column.setPrefWidth(specIoVariable.getColumnConfig().getWidth());
-    column.widthProperty().addListener((obs, old, newVal) ->
-        specIoVariable.getColumnConfig().setWidth(newVal.doubleValue()));
+    column.widthProperty().addListener(
+        (obs, old, newVal) -> specIoVariable.getColumnConfig().setWidth(newVal.doubleValue()));
     column.setContextMenu(createColumnContextMenu(column));
 
     tableView.getColumns().add(tableView.getColumns().size() - 1, column);
   }
 
-  private TableColumn<HybridRow, String> createViewColumn(
-      String colName,
+  private TableColumn<HybridRow, String> createViewColumn(String colName,
       final Function<HybridRow, HybridCell<?>> extractCellFromRow) {
     TableColumn<HybridRow, String> column = new TableColumn<>(colName);
     column.setSortable(false);
@@ -263,14 +276,14 @@ public class SpecificationTableController implements Controller {
     column.setPrefWidth(100);
     column.setCellFactory(this::cellFactory);
 
-    column.setCellValueFactory(rowModelData ->
-        extractCellFromRow.apply(rowModelData.getValue())
-            .stringRepresentationProperty());
+    column.setCellValueFactory(rowModelData -> extractCellFromRow.apply(rowModelData.getValue())
+        .stringRepresentationProperty());
 
     return column;
   }
 
-  private static final DataFormat SERIALIZED_MIME_TYPE = new DataFormat("application/x-java-serialized-object");
+  private static final DataFormat SERIALIZED_MIME_TYPE =
+      new DataFormat("application/x-java-serialized-object");
 
   // from: http://stackoverflow.com/questions/28603224/sort-tableview-with-drag-and-drop-rows
   // TODO: Have fun? Implement dragging multiple rows, from one program to another, etc.
@@ -280,7 +293,8 @@ public class SpecificationTableController implements Controller {
         hybridSpec.getSelection().rowProperty().addListener(this::rowSelectionChanged);
       }
 
-      private void rowSelectionChanged(ObservableValue<? extends Integer> obs, Integer before, Integer now) {
+      private void rowSelectionChanged(ObservableValue<? extends Integer> obs, Integer before,
+          Integer now) {
         if (before != null && getIndex() == before) {
           getStyleClass().remove("highlighted");
         }
@@ -307,7 +321,8 @@ public class SpecificationTableController implements Controller {
     row.setOnDragOver(event -> {
       Dragboard db = event.getDragboard();
       if (db.hasContent(SERIALIZED_MIME_TYPE)) {
-        if (tableView.isEditable() && row.getIndex() != (Integer) db.getContent(SERIALIZED_MIME_TYPE)) {
+        if (tableView.isEditable()
+            && row.getIndex() != (Integer) db.getContent(SERIALIZED_MIME_TYPE)) {
           event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
           event.consume();
         }

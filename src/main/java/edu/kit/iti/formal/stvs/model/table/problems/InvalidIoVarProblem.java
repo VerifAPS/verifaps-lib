@@ -15,12 +15,9 @@ import java.util.Map;
  */
 public class InvalidIoVarProblem extends ColumnProblem {
 
-  public static ValidIoVariable tryGetValidIoVariable(
-      SpecIoVariable specIoVariable,
-      Collection<CodeIoVariable> codeIoVariables,
-      Map<String, Type> typesByName,
-      MinorProblemsHandler minorProblemsHandler)
-      throws InvalidIoVarProblem {
+  public static ValidIoVariable tryGetValidIoVariable(SpecIoVariable specIoVariable,
+      Collection<CodeIoVariable> codeIoVariables, Map<String, Type> typesByName,
+      MinorProblemsHandler minorProblemsHandler) throws InvalidIoVarProblem {
 
     String name = tryGetValidName(specIoVariable, codeIoVariables, minorProblemsHandler);
     Type type = tryGetValidType(specIoVariable, typesByName, codeIoVariables, minorProblemsHandler);
@@ -28,11 +25,8 @@ public class InvalidIoVarProblem extends ColumnProblem {
     return new ValidIoVariable(specIoVariable.getCategory(), name, type);
   }
 
-  private static Type tryGetValidType(
-      SpecIoVariable specIoVariable,
-      Map<String, Type> typesByName,
-      Collection<CodeIoVariable> codeIoVariables,
-      MinorProblemsHandler minorProblemsHandler)
+  private static Type tryGetValidType(SpecIoVariable specIoVariable, Map<String, Type> typesByName,
+      Collection<CodeIoVariable> codeIoVariables, MinorProblemsHandler minorProblemsHandler)
       throws InvalidIoVarProblem {
     Type type = typesByName.get(specIoVariable.getType());
     if (type == null) {
@@ -41,25 +35,23 @@ public class InvalidIoVarProblem extends ColumnProblem {
     codeIoVariables.stream()
         .filter(codeIoVariable -> codeIoVariable.getName().equals(specIoVariable.getName()))
         .findAny().ifPresent(codeIoVariable -> {
-      if (!codeIoVariable.getType().equals(specIoVariable.getType())) {
-        minorProblemsHandler.handle(
-            new InvalidIoVarProblem(specIoVariable, ErrorType.TYPE_MISMATCH));
-      }
-    });
+          if (!codeIoVariable.getType().equals(specIoVariable.getType())) {
+            minorProblemsHandler
+                .handle(new InvalidIoVarProblem(specIoVariable, ErrorType.TYPE_MISMATCH));
+          }
+        });
     return type;
   }
 
-  private static String tryGetValidName(
-      SpecIoVariable ioVar,
-      Collection<CodeIoVariable> codeIoVariables,
-      MinorProblemsHandler minorProblemsHandler)
+  private static String tryGetValidName(SpecIoVariable ioVar,
+      Collection<CodeIoVariable> codeIoVariables, MinorProblemsHandler minorProblemsHandler)
       throws InvalidIoVarProblem {
     if (!VariableExpr.IDENTIFIER_PATTERN.matcher(ioVar.getName()).matches()) {
       throw new InvalidIoVarProblem(ioVar, ErrorType.NAME_INVALID);
     }
-    if (!codeIoVariables.stream().anyMatch(codeIoVar -> codeIoVar.getName().equals(ioVar.getName()))) {
-      minorProblemsHandler.handle(
-          new InvalidIoVarProblem(ioVar, ErrorType.NAME_MISMATCH));
+    if (!codeIoVariables.stream()
+        .anyMatch(codeIoVar -> codeIoVar.getName().equals(ioVar.getName()))) {
+      minorProblemsHandler.handle(new InvalidIoVarProblem(ioVar, ErrorType.NAME_MISMATCH));
     }
     return ioVar.getName();
   }
@@ -77,18 +69,16 @@ public class InvalidIoVarProblem extends ColumnProblem {
       case TYPE_UNKNOWN:
         return "Column type is not defined";
       default:
-        System.err.println("Unhandled error message errorType in InvalidIoVariableProblem: " + errorType);
+        System.err
+            .println("Unhandled error message errorType in InvalidIoVariableProblem: " + errorType);
         return "Column definition invalid";
     }
   }
 
   public enum ErrorType {
-    NAME_INVALID,
-    TYPE_UNKNOWN,
+    NAME_INVALID, TYPE_UNKNOWN,
 
-    NAME_MISMATCH,
-    TYPE_MISMATCH,
-    CATEGORY_MISMATCH
+    NAME_MISMATCH, TYPE_MISMATCH, CATEGORY_MISMATCH
   }
 
   private final SpecIoVariable specIoVariable;
@@ -122,7 +112,8 @@ public class InvalidIoVarProblem extends ColumnProblem {
 
     InvalidIoVarProblem that = (InvalidIoVarProblem) obj;
 
-    if (getSpecIoVariable() != null ? !getSpecIoVariable().equals(that.getSpecIoVariable()) : that.getSpecIoVariable() != null) {
+    if (getSpecIoVariable() != null ? !getSpecIoVariable().equals(that.getSpecIoVariable())
+        : that.getSpecIoVariable() != null) {
       return false;
     }
     return getErrorType() == that.getErrorType();
