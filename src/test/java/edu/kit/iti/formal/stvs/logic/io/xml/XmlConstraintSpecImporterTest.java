@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -34,15 +35,11 @@ public class XmlConstraintSpecImporterTest {
 
   @Test
   public void testDoImportValid1() throws Exception {
-    FileInputStream inputStream = new FileInputStream(new File
-        (this.getClass().getResource("spec_constraint_valid_1.xml").toURI()));
+    InputStream inputStream = this.getClass()
+        .getResourceAsStream("spec_constraint_valid_1.xml");
     ConstraintSpecification importedSpec = importer.doImport(inputStream);
     JsonElement testjson = JsonTableParser.jsonFromResource("valid_table.json",
         ConstraintSpecificationValidatorTest.class);
-
-    List<CodeIoVariable> codeIoVariables = Collections.emptyList();
-
-    List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
 
     ConstraintSpecification expectedSpec =
         JsonTableParser.constraintTableFromJson(testjson);

@@ -35,7 +35,7 @@ public class ConstraintCellTest {
 
   @Test
   public void testToString() {
-    assertEquals("ConstraintCell(Test, comment: I am a comment!)", constraintCell.toString());
+    assertEquals("Test (comment: \"I am a comment!\")", constraintCell.toString());
   }
 
   @Test

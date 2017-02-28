@@ -198,7 +198,7 @@ public class JsonTableParser {
     String[] split = s.split("\\s*\\|\\s*");
     Map<String, String> elems = new HashMap<>();
     for (int i = 0; i < split.length; i++) {
-      elems.put(ioVars.get(i).getName(), split[i]);
+      elems.put(ioVars.get(i).getName(), split[i].trim());
     }
     return SpecificationRow.createUnobservableRow(elems);
   }
