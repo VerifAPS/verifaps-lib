@@ -112,6 +112,15 @@ public class HybridSpecification extends ConstraintSpecification {
     return Optional.ofNullable(counterExample.get());
   }
 
+  /**
+   * Sets the counterexample for this hybrid specification. This will automatically update
+   * the {@link HybridRow}'s counterexample cells in {@link #getHybridRows()} from the given
+   * counterexample.
+   *
+   * @param counterExample the concrete specification to be shown in-place in the gui
+   * @throws IllegalArgumentException if the given concrete instance's column headers don't match
+   *                                  this specification's column headers
+   */
   public void setCounterExample(ConcreteSpecification counterExample) {
     if (counterExample != null) {
       if (!columnHeadersMatch(counterExample.columnHeaders)) {
@@ -146,6 +155,15 @@ public class HybridSpecification extends ConstraintSpecification {
     return counterExample;
   }
 
+  /**
+   * <p>Set the generated concrete instance for this hybrid specification, that is the
+   * concretized constraint specification. This is concrete instance is then used from
+   * the {@link TimingDiagramCollectionController} to view a timing diagram.</p>
+   *
+   * @param concreteInstance the concretized constraint specification
+   * @throws IllegalArgumentException if the given concrete instance's column headers don't match
+   *                                  this specification's column headers
+   */
   public void setConcreteInstance(ConcreteSpecification concreteInstance) {
     if (concreteInstance != null) {
       if (!columnHeadersMatch(concreteInstance.columnHeaders)) {

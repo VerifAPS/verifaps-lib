@@ -5,7 +5,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 /**
- * <p>The model for a cell (for {@link edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableCell})
+ * <p>The model for a cell (for
+ * {@link edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableCell})
  * that both has an abstract cell model, a {@link CellOperationProvider} (that is, either a
  * {@link ConstraintCell} or {@link ConstraintDuration}), and a list of counterexample
  * strings that should be viewed in-place below these cells.</p>
