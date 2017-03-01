@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?><config xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml">
+<general>
+<uiLanguage>EN</uiLanguage>
+<windowSize>
+<width>1566</width>
+<height>884</height>
+<maximized>false</maximized>
+</windowSize>
+<verificationTimeout>10</verificationTimeout>
+<simulationTimeout>60</simulationTimeout>
+<maxLineRollout>50</maxLineRollout>
+</general>
+<editor>
+<showLineNumbers>false</showLineNumbers>
+<fontFamily>&lt;someXml attribute=test&gt;&lt;/someXml&gt;</fontFamily>
+<fontSize>14</fontSize>
+</editor>
+<dependencies>
+<z3Path>/opt/z3-4.5.0-x64-ubuntu-14.04/bin/z3</z3Path>
+<getetaCommand>                    </getetaCommand>
+<nuxmvFilename>/opt/nuXmv-1.1.1-Linux/bin/nuXmv</nuxmvFilename>
+</dependencies>
+</config>

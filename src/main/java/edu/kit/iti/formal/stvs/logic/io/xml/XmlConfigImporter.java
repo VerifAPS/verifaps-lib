@@ -17,7 +17,7 @@ import org.w3c.dom.Node;
  *
  * @author Benjamin Alt
  */
-public class XmlConfigImporter extends XmlImporter<GlobalConfig> {
+public class  XmlConfigImporter extends XmlImporter<GlobalConfig> {
 
   /**
    * Imports a {@link GlobalConfig} from a xml {@link Node}.
