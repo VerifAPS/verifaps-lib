@@ -18,24 +18,29 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
- * Created by bal on 01.03.17.
+ * @author Benjamin Alt
  */
 public class RandomGenerator {
 
-  private final List<String> BOOLEAN_BINARY_OPS = Arrays.asList("AND", "OR", "XOR");
-  private final List<String> INTEGER_BINARY_OPS = Arrays.asList("/", "*", "-", "+", "MOD");
-  private final List<String> COMPARISON_OPS = Arrays.asList("=", ">", "<", "<=", ">=");
+  private static final List<String> BOOLEAN_BINARY_OPS = Arrays.asList("AND", "OR", "XOR");
+  private static final List<String> INTEGER_BINARY_OPS = Arrays.asList("/", "*", "-", "+", "MOD");
+  private static final List<String> COMPARISON_OPS = Arrays.asList("=", ">", "<", "<=", ">=");
 
-  private final int MAX_IDENTIFIER_LENGTH = 5;
-  private final int MAX_ENUM_LITERALS = 4;
-  private final int MAX_COMMENT_LENGTH = 10;
-  private final int MAX_NAME_LENGTH = 10;
-  private final int MAX_INT = 32767;
+  private static final int MAX_IDENTIFIER_LENGTH = 5;
+  private static final int MAX_ENUM_LITERALS = 4;
+  private static final int MAX_COMMENT_LENGTH = 10;
+  private static final int MAX_NAME_LENGTH = 10;
+  private static final int MAX_INT = 32767;
   private Random random;
   private List<TypeEnum> enumTypes;
 
   public RandomGenerator() {
     random = new Random();
+    enumTypes = new ArrayList<>();
+  }
+
+  public RandomGenerator(long seed) {
+    random = new Random(seed);
     enumTypes = new ArrayList<>();
   }
 
