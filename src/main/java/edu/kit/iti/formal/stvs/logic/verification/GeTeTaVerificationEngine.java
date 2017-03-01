@@ -92,7 +92,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
       processMonitor.processFinishedProperty().addListener(observable -> onVerificationDone());
       // Starts the verification process in another thread
       processMonitor.start();
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException exception) {
       throw new VerificationError(VerificationError.Reason.VERIFICATION_LAUNCH_ERROR);
     }
   }
@@ -136,15 +136,15 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
             new ByteArrayInputStream(cleanedProcessOutput.getBytes()),
             ImporterFacade.ImportFormat.GETETA, typeContext);
       }
-    } catch (IOException | ImportException e) {
-      VerificationError error = new VerificationError(e);
+    } catch (IOException | ImportException exception) {
+      VerificationError error = new VerificationError(exception);
       result = new VerificationResult(VerificationResult.Status.ERROR, logFile, error);
     }
     // set the verification result back in the javafx thread:
     VerificationResult finalResult = result; // have to do this because of lambda restrictions...
     try {
       Platform.runLater(() -> verificationResult.set(finalResult));
-    } catch (IllegalStateException e) {
+    } catch (IllegalStateException exception) {
       verificationResult.set(finalResult);
     }
   }

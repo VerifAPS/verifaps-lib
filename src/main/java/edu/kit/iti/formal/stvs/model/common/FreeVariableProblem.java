@@ -17,7 +17,12 @@ public abstract class FreeVariableProblem extends Exception {
     return errorMessage;
   }
 
-  public String getGUIMessage() {
+  /**
+   * <p>This method can be used for showing text in the gui.</p>
+   *
+   * @return a message suited for a dialog in the view
+   */
+  public String getGuiMessage() {
     return getProblemName() + ": " + getErrorMessage();
   }
 

@@ -136,7 +136,7 @@ public class VariableCollectionController implements Controller {
             configureUnproblematic();
           } else {
             configureProblematic(String.join("\n\n", problems.stream()
-                .map(FreeVariableProblem::getGUIMessage).collect(Collectors.toList())));
+                .map(FreeVariableProblem::getGuiMessage).collect(Collectors.toList())));
           }
         }
       }

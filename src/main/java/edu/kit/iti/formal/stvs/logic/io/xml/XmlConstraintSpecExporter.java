@@ -23,7 +23,7 @@ import org.w3c.dom.Node;
  */
 public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecification> {
 
-  private static ObjectFactory objectFactory;
+  private ObjectFactory objectFactory;
 
   public XmlConstraintSpecExporter() {
     objectFactory = new ObjectFactory();
@@ -107,7 +107,7 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
    * @param validIoVariable Variable from which a {@link Variables.IoVariable} should be generated
    * @return generated {@link Variables.IoVariable}
    */
-  protected static Variables.IoVariable makeIoVariable(IoVariable validIoVariable) {
+  protected Variables.IoVariable makeIoVariable(IoVariable validIoVariable) {
     Variables.IoVariable ioVar = objectFactory.createVariablesIoVariable();
     ioVar.setComment(ioVar.getComment());
     ioVar.setDataType(validIoVariable.getType());
