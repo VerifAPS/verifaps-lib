@@ -30,6 +30,13 @@ public class History {
     filenames = FXCollections.observableArrayList();
   }
 
+  /**
+   * Creates a history of recently opened files from the given collection.
+   * The Collections' size must be less then or equal to {@link #HISTORY_DEPTH}.
+   *
+   * @param filenames the most recently opened files.
+   * @throws IllegalArgumentException if the given collection is bigger than {@link #HISTORY_DEPTH}
+   */
   public History(Collection<String> filenames) {
     this();
     if (filenames.size() > HISTORY_DEPTH) {
@@ -49,9 +56,11 @@ public class History {
   }
 
   /**
-   * Add a filename to the history
+   * Add a filename to the history. If the file already exists inside this history, then
+   * it gets reordered to the front of the history. If it is new and the history is full,
+   * then the least recently opened file is deleted from the history.
    *
-   * @param filename
+   * @param filename the file to store in the recently opened files history
    */
   public void addFilename(String filename) {
     // Prevent entries from being added twice --> remove and add to the end ("most recent")
@@ -66,6 +75,13 @@ public class History {
     filenames.add(filename);
   }
 
+  /**
+   * Loads an xml file from the default history path
+   * {@link GlobalConfig#CONFIG_DIRPATH}/{@link #AUTOLOAD_HISTORY_FILENAME}.
+   * If this file does not exist or could not be read or parsed, a new history is returned.
+   *
+   * @return either the history stored at the default path or a new history
+   */
   public static History autoloadHistory() {
     File historyFile =
         new File(GlobalConfig.CONFIG_DIRPATH + File.separator + AUTOLOAD_HISTORY_FILENAME);
@@ -76,11 +92,20 @@ public class History {
     }
   }
 
-
+  /**
+   * Tries to save this history as xml file to the default history file path
+   * {@link GlobalConfig#CONFIG_DIRPATH}/{@link #AUTOLOAD_HISTORY_FILENAME}.
+   *
+   * @throws IOException if the directories to the default path or the file could not be created
+   * @throws JAXBException if the history could not be exported to xml
+   * @throws ExportException if the history could not be written to the file
+   */
   public void autosaveHistory() throws IOException, JAXBException, ExportException {
     File configDir = new File(GlobalConfig.CONFIG_DIRPATH);
     if (!configDir.isDirectory() || !configDir.exists()) {
-      configDir.mkdirs();
+      if (!configDir.mkdirs()) {
+        throw new IOException("Could not create directory: " + configDir);
+      }
     }
     File historyFile =
         new File(GlobalConfig.CONFIG_DIRPATH + File.separator + AUTOLOAD_HISTORY_FILENAME);
@@ -95,9 +120,7 @@ public class History {
    * @param history The history the contents of which will be copied
    */
   public void setAll(History history) {
-    for (String filename : history.getFilenames()) {
-      addFilename(filename);
-    }
+    history.getFilenames().forEach(this::addFilename);
   }
 
   @Override
