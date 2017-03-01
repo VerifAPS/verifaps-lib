@@ -195,16 +195,9 @@ public class RandomGenerator {
           + ")";
     }
     if (randomInt == 2) {
-      // random comparison op
-      if (random.nextBoolean()) {
         return "(" + randomIntegerExpression(columnHeaders, freeVariableList) + " " +
             randomComparisonOp() + " " + randomIntegerExpression(columnHeaders, freeVariableList)
             + ")";
-      } else {
-        return "(" + randomBooleanExpression(columnHeaders, freeVariableList) + " " +
-            randomComparisonOp() + " " + randomBooleanExpression(columnHeaders, freeVariableList)
-            + ")";
-      }
     }
     if (randomInt == 3) {
       // back reference or variable
