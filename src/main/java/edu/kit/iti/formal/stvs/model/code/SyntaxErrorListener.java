@@ -21,11 +21,11 @@ public class SyntaxErrorListener implements ANTLRErrorListener {
 
   @Override
   public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
-      int charPositionInLine, String msg, RecognitionException e) {
+      int charPositionInLine, String msg, RecognitionException exc) {
     // TODO: RecognitionException is null when there are "expected ';'" errors, for example
     // (these errors dont have a token (which makes sense), so we have to come up with a nice
     // way to visualize them in the EditorPane)
-    // syntaxErrors.add(new SyntaxError(e.getOffendingToken()));
+    // syntaxErrors.add(new SyntaxError(exc.getOffendingToken()));
     syntaxErrors.add(new SyntaxError(line, charPositionInLine, msg));
   }
 

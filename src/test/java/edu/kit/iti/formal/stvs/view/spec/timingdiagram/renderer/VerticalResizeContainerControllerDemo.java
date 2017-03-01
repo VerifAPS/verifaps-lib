@@ -17,7 +17,6 @@ import org.junit.runner.RunWith;
 /**
  * Created by leonk on 10.02.2017.
  */
-@RunWith(Categories.class)
 @Category(Demo.class)
 public class VerticalResizeContainerControllerDemo {
 

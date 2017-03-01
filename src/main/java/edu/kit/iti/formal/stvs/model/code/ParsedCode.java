@@ -30,8 +30,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
  * Created by philipp on 09.01.17.
  *
  * @author Lukas Fritsch
- *         <p>
- *         Represents the formal model of source code (extracted from {@link Code})
+ *          Represents the formal model of source code (extracted from {@link Code})
  */
 public class ParsedCode {
 
@@ -149,8 +148,8 @@ public class ParsedCode {
    *
    * @param input the source code to parse
    * @param parsedTokenHandler a handler for lexed tokens
-   * @param syntaxErrorsListener
-   * @param parsedCodeListener
+   * @param syntaxErrorsListener listener for a list of {@link SyntaxError}s
+   * @param parsedCodeListener listener for parsed code.
    */
   public static void parseCode(String input, ParsedTokenHandler parsedTokenHandler,
       ParsedSyntaxErrorHandler syntaxErrorsListener, ParsedCodeHandler parsedCodeListener) {
