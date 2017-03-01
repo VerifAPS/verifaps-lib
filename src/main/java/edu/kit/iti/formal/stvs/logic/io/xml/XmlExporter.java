@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
-
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.Exporter;
 

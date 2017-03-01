@@ -55,9 +55,9 @@ public class VerificationScenario {
    * @param config The config to take into account (i.e. for verification timeouts, paths to
    *        dependencies etc.)
    * @param spec The specification to be verified
-   * @throws IOException
-   * @throws ExportException
-   * @throws VerificationError
+   * @throws IOException Exception while IO interaction
+   * @throws ExportException Exception while exporting
+   * @throws VerificationError Exception while verification
    */
   public void verify(GlobalConfig config, ConstraintSpecification spec)
       throws IOException, ExportException, VerificationError {
