@@ -32,6 +32,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import static junit.framework.TestCase.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.testfx.api.FxAssert.verifyThat;
 
@@ -80,10 +81,15 @@ public class StvsRootControllerTest extends ApplicationTest {
           "END_PROGRAM");
     });
     clickOn("File").clickOn("Open ...").clickOn("Open Specification");
-    verifyThat("#TimingDiagramView", (TimingDiagramView<?> v) -> {
-      return v.getChildrenUnmodifiable().size() > 1;
-    });
-    System.exit(0);
+    TestUtils.gimmeTime();
+    sleep(5000);
+    //TODO: fix deconstruction
+    //assertEquals(0, lookup("#TimingDiagramView").queryAll().size());
+    clickOn("#EditorPane").rightClickOn().clickOn("Select All");
+    write("VAR_INPUT\n" +
+        "        Start_Stop  : BOOL;\n" +
+        "        ON_OFF      : BOOL;\n" +
+        "    END_VAR");
   }
 
 
