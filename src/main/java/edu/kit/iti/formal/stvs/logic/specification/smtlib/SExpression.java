@@ -17,7 +17,7 @@ public interface SExpression {
    * @param string string to parse
    * @return instance which is represented by {@code string}
    */
-  static SExpression fromText(String string) {
+  static SExpression toSimpleSExpression(String string) {
     try {
       Sexp s = SexpFactory.parse(string);
       return fromSexp(s);
@@ -61,5 +61,11 @@ public interface SExpression {
    * @return string containing the sexpression
    */
   String toText();
+
+  /**
+   * Returns a parsed SExpression from the given text
+   * @return the parsed SExpression
+   */
+  SExpression fromTexasdt(String string);
 
 }

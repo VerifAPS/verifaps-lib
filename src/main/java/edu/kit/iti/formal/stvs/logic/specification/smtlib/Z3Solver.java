@@ -302,7 +302,7 @@ public class Z3Solver {
       System.out.println(stringOptional);
       String output = stringOptional.get();
       output = output.substring(output.indexOf('\n') + 1);
-      return (Optional.of(SExpression.fromText(output)));
+      return (Optional.of(SExpression.toSimpleSExpression(output)));
     }
     return Optional.empty();
   }
