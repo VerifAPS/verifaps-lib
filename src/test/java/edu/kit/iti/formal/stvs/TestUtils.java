@@ -102,7 +102,7 @@ public class TestUtils {
       validator.problemsProperty().get().entrySet().stream()
           .map(entry -> entry.getKey() + " -> "
               + entry.getValue().stream()
-              .map(FreeVariableProblem::getGUIMessage)
+              .map(FreeVariableProblem::getGuiMessage)
               .collect(Collectors.toList()))
           .forEach(System.err::println);
       throw new RuntimeException("Couldn't validate");
