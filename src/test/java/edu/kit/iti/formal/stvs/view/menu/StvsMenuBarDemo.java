@@ -15,7 +15,6 @@ import org.junit.runner.RunWith;
 /**
  * Created by csicar on 30.01.17.
  */
-@RunWith(Categories.class)
 @Category(Demo.class)
 public class StvsMenuBarDemo {
 

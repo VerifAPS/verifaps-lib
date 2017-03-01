@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
 /**
  * Created by csicar on 01.02.17.
  */
-@RunWith(Categories.class)
 @Category(Demo.class)
 public class ErrorMessageDialogDemo extends Application {
 

@@ -42,7 +42,6 @@ import java.util.stream.Collectors;
 /**
  * Created by Philipp on 01.02.2017.
  */
-@RunWith(Categories.class)
 @Category(Demo.class)
 public class SpecificationTableDemo {
 

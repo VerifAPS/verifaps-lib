@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Categories;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +31,6 @@ import java.util.stream.Collectors;
 /**
  * Created by Philipp on 29.01.2017.
  */
-@RunWith(Categories.class)
 @Category(Demo.class)
 public class VariableCollectionDemo {
 
