@@ -103,6 +103,11 @@ test {
         includeTestsMatching "edu.kit.iti.formal.stvs.logic.*"
     }
 
+
+    useJUnit {
+        excludeCategories 'edu.kit.iti.formal.stvs.Performance'
+    }
+
     testLogging {
         showStandardStreams = true
     }
