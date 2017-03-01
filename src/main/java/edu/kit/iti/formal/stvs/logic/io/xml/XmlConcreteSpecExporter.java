@@ -95,7 +95,8 @@ public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> 
   protected Variables makeVariables(ConcreteSpecification concreteSpec) {
     Variables variables = objectFactory.createVariables();
     variables.getIoVariable().addAll(concreteSpec.getColumnHeaders().stream()
-        .map(validIoVar -> constraintSpecExporter.makeIoVariable(validIoVar)).collect(Collectors.toList()));
+        .map(validIoVar ->
+            constraintSpecExporter.makeIoVariable(validIoVar)).collect(Collectors.toList()));
     return variables;
   }
 }
