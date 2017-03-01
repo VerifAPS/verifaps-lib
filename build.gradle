@@ -72,6 +72,12 @@ dependencies {
 
 System.setProperty('javax.xml.accessExternalSchema', 'file')
 
+jacocoTestReport {
+    reports {
+        csv.enabled true
+    }
+}
+
 jaxb {
     xjc {
         xsdDir "src/main/resources/fileFormats/"
