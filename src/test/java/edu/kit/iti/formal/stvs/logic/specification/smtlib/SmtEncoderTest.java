@@ -24,6 +24,41 @@ import static org.junit.Assert.assertEquals;
 public class SmtEncoderTest {
 
   @Test
+  //! Should take about 19min!
+  public void performanceTest() {
+    Supplier<InputStream> sourceFileGetter = () ->
+        SmtEncoderTest.class.getResourceAsStream("spec_long_example.xml");
+    ValidSpecification validSpec = TestUtils.importValidSpec(sourceFileGetter.get());
+
+    List<ValidFreeVariable> freeVariables = TestUtils.importValidFreeVariables(
+        sourceFileGetter.get());
+
+    SmtEncoder smtEncoder = new SmtEncoder(3000, validSpec, freeVariables);
+    SmtModel model = smtEncoder.getConstraint();
+
+    Set<SExpression> constrains = model.getGlobalConstraints();
+    System.out.println(model.toString());
+  }
+
+  @Test
+  //! Takes about 3min!
+  public void performanceSingleVariableTest() {
+    Supplier<InputStream> sourceFileGetter = () ->
+        SmtEncoderTest.class.getResourceAsStream("spec_long_single_variable_example.xml");
+    ValidSpecification validSpec = TestUtils.importValidSpec(sourceFileGetter.get());
+
+    List<ValidFreeVariable> freeVariables = TestUtils.importValidFreeVariables(
+        sourceFileGetter.get());
+
+    SmtEncoder smtEncoder = new SmtEncoder(3000, validSpec, freeVariables);
+    SmtModel model = smtEncoder.getConstraint();
+
+    Set<SExpression> constrains = model.getGlobalConstraints();
+
+    System.out.println(model.toText().length());
+  }
+
+  @Test
   public void testMjSmallerDuration() {
     Supplier<InputStream> sourceFile = () -> SmtEncoderTest.class.getResourceAsStream(
         "spec_constant.xml");

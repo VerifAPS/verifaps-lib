@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="" isConcrete="false">
+    <variables>
+        <ioVariable io="output" name="A1" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A2" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A3" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A4" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A5" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A6" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A7" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A8" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A9" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A10" data-type="INT"></ioVariable>
+    </variables>
+    <rows>
+        <row><!-- Hier ist die Reihenfolge der Cells wichtig! -->
+            <duration comment="I am a duration comment!">1</duration>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+        </row>
+        <row>
+            <duration>3000</duration>
+            <cell>=A1[-1]+1</cell>
+            <cell>=A2[-1]+1</cell>
+            <cell>=A3[-1]+1</cell>
+            <cell>=A4[-1]+1</cell>
+            <cell>=A5[-1]+1</cell>
+            <cell>=A6[-1]+1</cell>
+            <cell>=A7[-1]+1</cell>
+            <cell>=A8[-1]+1</cell>
+            <cell>=A9[-1]+1</cell>
+            <cell>=A10[-1]+1</cell>
+        </row>
+    </rows>
+    <enumTypes/>
+</specification>
