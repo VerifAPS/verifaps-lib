@@ -91,8 +91,8 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       Message importedMessage = (Message) jaxbUnmarshaller.unmarshal(source);
       return makeVerificationResult(source, importedMessage);
-    } catch (JAXBException e) {
-      throw new ImportException(e);
+    } catch (JAXBException exception) {
+      throw new ImportException(exception);
     }
   }
 
@@ -126,8 +126,8 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
           VerificationError error = new VerificationError(VerificationError.Reason.ERROR);
           return new VerificationResult(VerificationResult.Status.ERROR, logFile, error);
       }
-    } catch (TransformerException | IOException e) {
-      throw new ImportException(e);
+    } catch (TransformerException | IOException exception) {
+      throw new ImportException(exception);
     }
   }
 
