@@ -27,9 +27,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.testfx.util.WaitForAsyncUtils.sleep;
 
 /**
  * Created by bal on 10.02.17.
@@ -100,12 +102,16 @@ public class TestUtils {
       validator.problemsProperty().get().entrySet().stream()
           .map(entry -> entry.getKey() + " -> "
               + entry.getValue().stream()
-              .map(FreeVariableProblem::getGUIMessage)
+              .map(FreeVariableProblem::getGuiMessage)
               .collect(Collectors.toList()))
           .forEach(System.err::println);
       throw new RuntimeException("Couldn't validate");
     }
     return validator.validFreeVariablesProperty().get();
+  }
+
+  public static void gimmeTime() {
+    sleep(5, TimeUnit.SECONDS);
   }
 
   public static void mockFiles(URL ... urls) throws Exception {

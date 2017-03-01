@@ -21,7 +21,6 @@ import java.util.List;
 /**
  * Created by Lukas on 20.01.2017.
  */
-@RunWith(Categories.class)
 @Category(Demo.class)
 public class EditorDemo {
 

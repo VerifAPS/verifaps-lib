@@ -29,6 +29,7 @@ public class VariableCollection extends VBox {
   public VariableCollection() {
     this.overviewLabel = new Label("Free Variables:");
     this.freeVariableTableView = new TableView<>();
+    this.freeVariableTableView.setId("VariableCollectionTableView");
     this.nameTableColumn = new TableColumn<>("Name");
     this.typeTableColumn = new TableColumn<>("Type");
     this.defaultValueTableColumn = new TableColumn<>("Default Value");

@@ -23,7 +23,6 @@ import java.util.Arrays;
 /**
  * Created by leonk on 02.02.2017.
  */
-@RunWith(Categories.class)
 @Category(Demo.class)
 public class TimingDiagramCollectionControllerDemo {
 

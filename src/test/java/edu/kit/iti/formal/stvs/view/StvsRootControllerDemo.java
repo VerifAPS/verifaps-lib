@@ -30,7 +30,6 @@ import static org.testfx.api.FxAssert.verifyThat;
 /**
  * Created by csicar on 08.02.17.
  */
-@RunWith(Categories.class)
 @Category(Demo.class)
 public class StvsRootControllerDemo {
 

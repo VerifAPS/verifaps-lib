@@ -10,11 +10,29 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
+ * <p>A problem for when a column is not valid. This problem is generated when the column
+ * variable has no matching {@link CodeIoVariable} or has an unknown / undefined type.</p>
+ *
  * @author Benjamin Alt
  * @author Philipp
  */
 public class InvalidIoVarProblem extends ColumnProblem {
 
+  /**
+   * Tries to get a formal model ({@link ValidIoVariable}) from the given effective model
+   * ({@link SpecIoVariable}).
+   *
+   * @param specIoVariable the effective model of column headers
+   * @param codeIoVariables the io variables that were extracted form the code
+   * @param typesByName the types that were extracted from the code
+   * @param minorProblemsHandler the handler that is invoked, when a minor problem is generated,
+   *                             that is, a problem that does not prevent this method from creating
+   *                             an instance of {@link ValidIoVariable}, for example a mismatch
+   *                             between the given variable and a code io variable
+   * @return the formal model for column headers
+   * @throws InvalidIoVarProblem if there was a fatal error while creating a formal model
+   *                             for column headers (for example the type is not defined in code)
+   */
   public static ValidIoVariable tryGetValidIoVariable(SpecIoVariable specIoVariable,
       Collection<CodeIoVariable> codeIoVariables, Map<String, Type> typesByName,
       MinorProblemsHandler minorProblemsHandler) throws InvalidIoVarProblem {

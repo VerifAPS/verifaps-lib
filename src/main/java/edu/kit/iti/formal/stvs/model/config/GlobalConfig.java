@@ -17,7 +17,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 /**
- * Contains global configuration specified by the user
+ * Contains global configuration specified by the user.
  *
  * @author Benjamin Alt
  */
@@ -48,7 +48,7 @@ public class GlobalConfig {
   private StringProperty getetaCommand;
 
   /**
-   * Default configuration
+   * Creates a default configuration. Paths are set to <tt>[Path to ... Executable]</tt>.
    */
   public GlobalConfig() {
     verificationTimeout = new SimpleIntegerProperty(3600);
@@ -67,15 +67,29 @@ public class GlobalConfig {
         new SimpleStringProperty("java -jar /path/to/geteta.jar -c ${code} -t ${spec} -x");
   }
 
+  /**
+   * If the file at <tt>{@link #CONFIG_DIRPATH}/{@link #AUTOLOAD_CONFIG_FILENAME}</tt> exists,
+   * it tries to load the configuration file. If it fails, it returns a default config
+   * (see {@link #GlobalConfig()}).
+   *
+   * @return the config from the default config file or a fresh default config
+   */
   public static GlobalConfig autoloadConfig() {
     File configFile = new File(CONFIG_DIRPATH + File.separator + AUTOLOAD_CONFIG_FILENAME);
     try {
       return ImporterFacade.importConfig(configFile, ImporterFacade.ImportFormat.XML);
-    } catch (Exception e) {
+    } catch (Exception exception) {
       return new GlobalConfig();
     }
   }
 
+  /**
+   * Tries to save this configuration to the path
+   * <tt>{@link #CONFIG_DIRPATH}/{@link #AUTOLOAD_CONFIG_FILENAME}</tt>.
+   *
+   * @throws IOException if the file could not successfully be created
+   * @throws ExportException if the file could not successfully be written / exported
+   */
   public void autosaveConfig() throws IOException, ExportException {
     File configDir = new File(CONFIG_DIRPATH);
     if (!configDir.isDirectory() || !configDir.exists()) {
@@ -108,64 +122,36 @@ public class GlobalConfig {
     getetaCommand.set(toBeCopied.getGetetaCommand());
   }
 
-  /**
-   * Get the current verification timeout
-   *
-   * @return The current verification timeout
-   */
   public int getVerificationTimeout() {
     return verificationTimeout.get();
   }
 
-  /**
-   * Get the current simulation timeout
-   *
-   * @return The current simulation timeout
-   */
   public int getSimulationTimeout() {
     return simulationTimeout.get();
   }
 
-  /**
-   * Get the current editor font size
-   *
-   * @return The current editor font size
-   */
   public int getEditorFontSize() {
     return editorFontSize.get();
   }
 
-  /**
-   * Get the current editor font family
-   *
-   * @return The current editor font family
-   */
   public String getEditorFontFamily() {
     return editorFontFamily.get();
   }
 
-  /**
-   * Are line numbers to be shown in the editor?
-   *
-   * @return Whether line numbers are to be shown in the editor
-   */
   public boolean getShowLineNumbers() {
     return showLineNumbers.get();
   }
 
-  /**
-   * What is the current UI language?
-   *
-   * @return The current UI language
-   */
   public String getUiLanguage() {
     return uiLanguage.get();
   }
 
   /**
-   * Set the current verification timeout
+   * Set the verification timeout in milliseconds.
+   * It must be a nonzero positive number.
    *
-   * @param verificationTimeout The verification timeout to set
+   * @param verificationTimeout a positive, nonzero integer that is the timeout in milliseconds
+   * @throws IllegalArgumentException if the given integer is negative or zero
    */
   public void setVerificationTimeout(int verificationTimeout) {
     if (verificationTimeout <= 0) {
@@ -175,9 +161,11 @@ public class GlobalConfig {
   }
 
   /**
-   * Set the current simulation timeout
+   * Sets the simulation timeout in millseconds.
+   * It must be nonzero, positive integer.
    *
-   * @param simulationTimeout The simulation timeout to set
+   * @param simulationTimeout a nonzero, positive integer
+   * @throws IllegalArgumentException if the given integer was negative or zero
    */
   public void setSimulationTimeout(int simulationTimeout) {
     if (simulationTimeout <= 0) {
@@ -187,9 +175,10 @@ public class GlobalConfig {
   }
 
   /**
-   * Set the current editor font size
+   * Sets the font size as pt. Must be a nonzero, positive integer.
    *
-   * @param editorFontSize The editor font size to set
+   * @param editorFontSize a nonzero, positive integer
+   * @throws IllegalArgumentException if the given integer was negative or zero
    */
   public void setEditorFontSize(int editorFontSize) {
     if (editorFontSize <= 0) {
@@ -198,20 +187,10 @@ public class GlobalConfig {
     this.editorFontSize.set(editorFontSize);
   }
 
-  /**
-   * Set the current editor font family
-   *
-   * @param editorFontFamily The verification timeout to set
-   */
   public void setEditorFontFamily(String editorFontFamily) {
     this.editorFontFamily.set(editorFontFamily);
   }
 
-  /**
-   * Are line numbers to be shown in the editor?
-   *
-   * @param showLineNumbers Whether line numbers are to be shown in the editor
-   */
   public void setShowLineNumbers(boolean showLineNumbers) {
     this.showLineNumbers.set(showLineNumbers);
   }
@@ -221,9 +200,11 @@ public class GlobalConfig {
   }
 
   /**
-   * Set the current UI language
+   * Set the UI language to the given language. Must be one of
+   * {@link #getValidLanguages()}.
    *
-   * @param uiLanguage
+   * @param uiLanguage the ui language
+   * @throws IllegalArgumentException if the language is not one of {@link #getValidLanguages()}.
    */
   public void setUiLanguage(String uiLanguage) {
     if (!validLanguages.contains(uiLanguage)) {
@@ -236,6 +217,12 @@ public class GlobalConfig {
     return windowHeight.get();
   }
 
+  /**
+   * Set the window height to a nonzero, positive integer (in pixels).
+   *
+   * @param windowHeight a nonzero, positive integer
+   * @throws IllegalArgumentException if the given integer was negative or zero
+   */
   public void setWindowHeight(int windowHeight) {
     if (windowHeight <= 0) {
       throw new IllegalArgumentException("Illegal window height: " + windowHeight);
@@ -247,6 +234,12 @@ public class GlobalConfig {
     return windowWidth.get();
   }
 
+  /**
+   * Set the window width to a nonzero, positive integer (in pixels).
+   *
+   * @param windowWidth a nonzero, positive integer
+   * @throws IllegalArgumentException if the given integer was negative or zero
+   */
   public void setWindowWidth(int windowWidth) {
     if (windowWidth <= 0) {
       throw new IllegalArgumentException("Illegal window width: " + windowWidth);
@@ -354,19 +347,19 @@ public class GlobalConfig {
    * Tests whether two GlobalConfigs are equal. Ignores listeners registered on the properties (i.e.
    * considers only property contents).
    *
-   * @param o The Object to be tested for equality
-   * @return Whether this instance and o are equal
+   * @param obj The Object to be tested for equality
+   * @return Whether this instance and obj are equal
    */
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
 
-    GlobalConfig that = (GlobalConfig) o;
+    GlobalConfig that = (GlobalConfig) obj;
 
     if (getValidLanguages() != null ? !getValidLanguages().equals(that.getValidLanguages())
         : that.getValidLanguages() != null) {

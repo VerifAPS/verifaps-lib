@@ -6,12 +6,17 @@ import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 
 /**
- * Created by leonk on 05.02.2017.
+ * Provides static methods for view operations.
  *
  * @author Benjamin Alt
  */
 public class ViewUtils {
   /**
+   * Calculates the {@link Transform Transformation} from children node coordinates to
+   * parent node coordinates.
+   *
+   * {@code child} must be a direct or indirect child of {@code rootOfCalculation}.
+   *
    * @param rootOfCalculation Any node in a scene graph
    * @param child A direct/indirect child of rootOfCalculation
    * @return A Transformation between coordinates of child and rootOfCalculation
@@ -32,7 +37,7 @@ public class ViewUtils {
   }
 
   /**
-   * adds the style sheet (name "style.css" and located in the same package) to the given parent and
+   * Adds the style sheet (name "style.css" and located in the same package) to the given parent and
    * sets the css-id for the parent
    * 
    * @param parent parent that should be setup
@@ -42,8 +47,8 @@ public class ViewUtils {
   }
 
   /**
-   * adds the style sheet (located in the same package) to the given parent and sets the css-id for
-   * the parent
+   * Adds the style sheet (located in the same package) to the given parent and sets the css-id for
+   * the parent.
    * 
    * @param parent parent that should be setup
    * @param stylesheet stylesheet's name in the package
@@ -57,7 +62,7 @@ public class ViewUtils {
 
 
   /**
-   * sets the css-id for the parent.
+   * Sets the css-id for the parent.
    * 
    * @param parent parent that should be setup
    */

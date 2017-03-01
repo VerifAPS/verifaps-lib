@@ -17,7 +17,7 @@ public interface SExpression {
    * @param string string to parse
    * @return instance which is represented by {@code string}
    */
-  static SExpression fromString(String string) {
+  static SExpression fromText(String string) {
     try {
       Sexp s = SexpFactory.parse(string);
       return fromSexp(s);

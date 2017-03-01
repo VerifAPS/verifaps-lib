@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.Token;
  * Created by Lukas on 02.02.2017.
  *
  * @author Lukas Fritsch
- *         <p>
  *         Represents a syntax error in code
  */
 public class SyntaxError {
@@ -14,6 +13,12 @@ public class SyntaxError {
   private int charPos;
   private String message;
 
+  /**
+   *  creates a syntax error.
+   * @param line the line of the token with the syntax error
+   * @param charPos the char position of the token with the syntax error
+   * @param message the error message
+   */
   public SyntaxError(int line, int charPos, String message) {
     this.line = line;
     this.charPos = charPos;

@@ -14,7 +14,7 @@ public class HybridCellTest {
 
   @Before
   public void setUp() throws Exception {
-    hybridCell = new HybridCell<>("A", new ConstraintCell("3"));
+    hybridCell = new HybridCell<>(new ConstraintCell("3"));
   }
 
   @Test
