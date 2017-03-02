@@ -48,8 +48,8 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
      */
     @Override
     public Object defaultVisit(Visitable visitable) {
-        System.out.println("AstTransform.defaultVisit");
-        System.err.println(("maybe not fully and right supported "
+        System.err.println("AstTransform.defaultVisit");
+        System.err.println(("AstCopyVisitor: Copy command not implemented for "
                 + visitable.getClass()
                 + " from implementation "
                 + getClass()));

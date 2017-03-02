@@ -25,14 +25,18 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
- * Created by weigl on 11.06.14.
+ * <ul>
+ * <li>2: 27.02.2017: added reference attribute</li>
+ * <li>Version 1: 11.06.14</li>
+ * </ul>
  *
  * @author weigl
- * @version $Id: $Id
+ * @version 2
  */
 public class AssignmentStatement extends Statement {
     private Reference variable;
     private Expression expression;
+    private boolean reference;
 
     /**
      * <p>Constructor for AssignmentStatement.</p>
@@ -43,7 +47,7 @@ public class AssignmentStatement extends Statement {
     /**
      * <p>Constructor for AssignmentStatement.</p>
      *
-     * @param variable a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
+     * @param variable   a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
      * @param expression a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
      */
     public AssignmentStatement(Reference variable, Expression expression) {
@@ -52,7 +56,9 @@ public class AssignmentStatement extends Statement {
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
     }
@@ -91,5 +97,14 @@ public class AssignmentStatement extends Statement {
      */
     public void setExpression(Expression expression) {
         this.expression = expression;
+    }
+
+    public boolean isReference() {
+        return reference;
+    }
+
+    public AssignmentStatement setReference(boolean reference) {
+        this.reference = reference;
+        return this;
     }
 }

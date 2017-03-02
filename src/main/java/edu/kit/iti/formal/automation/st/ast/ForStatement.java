@@ -116,7 +116,7 @@ public class ForStatement extends Statement {
     /**
      * <p>Getter for the field <code>step</code>.</p>
      *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
+     * @return a {@link Expression} object or null if not step was given in the source.
      */
     public Expression getStep() {
         return step;
