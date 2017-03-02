@@ -42,7 +42,7 @@
         <dependency>
             <groupId>edu.kit.iti.formal</groupId>
             <artifactId>iec61131lang</artifactId>
-            <version>0.1.11</version>
+            <version>0.1.12</version>
         </dependency>
 
         <dependency>
