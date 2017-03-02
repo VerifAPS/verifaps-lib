@@ -1,6 +1,6 @@
 ## Manual STVS gitignore rules
 /bin/
-
+generated/
 /.idea/
 /out/
 *.iml
