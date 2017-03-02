@@ -1,29 +1,15 @@
 package edu.kit.iti.formal.stvs.view;
 
-import edu.kit.iti.formal.stvs.TestUtils;
+import edu.kit.iti.formal.stvs.Demo;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionImporterTest;
-import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporterTest;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
-import edu.kit.iti.formal.stvs.view.common.FileChooserFactory;
-import edu.kit.iti.formal.stvs.view.editor.EditorPane;
-import edu.kit.iti.formal.stvs.view.menu.StvsMenuBarController;
-import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramView;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.experimental.categories.Categories;
 import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.testfx.framework.junit.ApplicationTest;
 
 import static org.testfx.api.FxAssert.verifyThat;
 

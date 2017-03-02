@@ -5,16 +5,14 @@ import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
-import edu.kit.iti.formal.stvs.view.Demo;
+import edu.kit.iti.formal.stvs.Demo;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import org.junit.Test;
-import org.junit.experimental.categories.Categories;
 import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.io.FileInputStream;

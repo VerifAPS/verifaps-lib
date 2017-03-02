@@ -12,7 +12,7 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
-import edu.kit.iti.formal.stvs.view.Demo;
+import edu.kit.iti.formal.stvs.Demo;
 import edu.kit.iti.formal.stvs.view.JavaFxTest;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -27,9 +27,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.junit.experimental.categories.Categories;
 import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;

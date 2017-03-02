@@ -1,11 +1,9 @@
 package edu.kit.iti.formal.stvs.view.common;
 
-import edu.kit.iti.formal.stvs.view.Demo;
+import edu.kit.iti.formal.stvs.Demo;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import org.junit.experimental.categories.Categories;
 import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
 
 /**
  * Created by csicar on 01.02.17.

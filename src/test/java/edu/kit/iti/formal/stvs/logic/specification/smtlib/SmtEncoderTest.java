@@ -177,7 +177,7 @@ public class SmtEncoderTest {
 
   @Test
   public void testUnsupportedOperation() {
-    
+
   }
 
   @Test(expected = IllegalStateException.class)
