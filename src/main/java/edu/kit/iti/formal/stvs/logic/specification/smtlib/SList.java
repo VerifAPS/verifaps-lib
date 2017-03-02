@@ -4,6 +4,7 @@ import de.tudresden.inf.lat.jsexp.Sexp;
 import de.tudresden.inf.lat.jsexp.SexpFactory;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -105,7 +106,7 @@ public class SList implements SExpression {
     return addAll(Arrays.stream(values).map(SAtom::new).collect(Collectors.toList()));
   }
 
-  public SList addAll(List<SExpression> exprs) {
+  public SList addAll(Collection<SExpression> exprs) {
     this.sexp.addAll(exprs);
     return this;
   }

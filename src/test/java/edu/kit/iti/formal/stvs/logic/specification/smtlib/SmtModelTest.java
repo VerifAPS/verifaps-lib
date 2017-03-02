@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
@@ -208,7 +209,7 @@ public class SmtModelTest {
   @Test
   public void testEmptyConstructor() {
     SmtModel model = new SmtModel();
-    assertEquals(new ArrayList<>(), model.getVariableDefinitions());
+    assertEquals(new HashSet<>(), model.getVariableDefinitions());
     assertEquals(new ArrayList<>(), model.getGlobalConstraints());
   }
 }
