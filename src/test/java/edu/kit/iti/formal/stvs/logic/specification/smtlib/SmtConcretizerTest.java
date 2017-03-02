@@ -16,9 +16,14 @@ import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValid
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Stopwatch;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by csicar on 13.02.17.
@@ -50,6 +55,37 @@ public class SmtConcretizerTest {
     specProblems.stream().map(SpecProblem::getErrorMessage).forEach(System.out::println);
 
     return validator.getValidSpecification();
+  }
+
+  @Rule
+  public Stopwatch stopwatch = new Stopwatch() {
+    @Override
+    public long runtime(TimeUnit unit) {
+      return super.runtime(unit);
+    }
+  };
+
+  @Test
+  //TODO: needs to actually run concretization
+  public void testTermination() throws Exception {
+    ValidSpecification spec = importSpec("testSpec.xml");
+
+    Map<Integer, Integer> maxDurations = new HashMap<Integer,
+        Integer>() {{
+      put(0, 3000);
+      put(1, 1);
+      put(2, 2);
+    }};
+
+    SmtConcretizer concretizer = new SmtConcretizer(GlobalConfig.autoloadConfig());
+    concretizer
+        .calculateConcreteSpecification(spec, freeVariables, System.out::println, Throwable::printStackTrace);
+    long start = stopwatch.runtime(TimeUnit.MILLISECONDS);
+    concretizer.terminate();
+    long end = stopwatch.runtime(TimeUnit.MILLISECONDS);
+    final long maxTime = 5;
+    assertTrue("Except time to terminate to be smaller than "+maxTime+ ", but was"+(end-start),
+       end - start < maxTime);
   }
 
   @Test

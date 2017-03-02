@@ -69,17 +69,16 @@ public class Z3SolverTest {
   @Test
   public void testLongExample() throws Exception {
     ValidSpecification spec = importSpec("spec_long_single_variable_example.xml");
-    SmtEncoder encoder = new SmtEncoder(30, spec, new ArrayList<>());
+    SmtEncoder encoder = new SmtEncoder(3000, spec, new ArrayList<>());
 
-
+    System.out.println(encoder.getConstraint().toText());
     AtomicBoolean outputProcessed = new AtomicBoolean(false);
     ProcessOutputAsyncTask processOutputAsyncTask = solver.concretizeSmtModel(encoder.getConstraint(),
         spec.getColumnHeaders(), optionalSpec -> {
           ConcreteSpecification concreteSpecification = optionalSpec.get();
           outputProcessed.set(true);
         });
-    processOutputAsyncTask.start();
-    processOutputAsyncTask.join();
+    processOutputAsyncTask.run();
     assertTrue(outputProcessed.get());
 
   }

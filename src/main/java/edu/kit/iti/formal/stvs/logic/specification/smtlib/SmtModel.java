@@ -16,7 +16,7 @@ public class SmtModel implements SExpression {
 
   /**
    * Creates an instance with preset definitions/constraints.
-   *
+   * both lists should be modifiable
    * @param globalConstraints set of global constraints
    * @param variableDefinitions set of variable definitions
    */
@@ -52,7 +52,11 @@ public class SmtModel implements SExpression {
 
   @Override
   public Sexp toSexpr() {
-    return null;
+
+    SList equivalentSList = new SList().addAll(getVariableDefinitions());
+    getGlobalConstraints().forEach((constraint) -> equivalentSList.addAll(new SList("assert",
+        constraint)));
+    return equivalentSList.toSexpr();
   }
 
   /**
