@@ -103,8 +103,7 @@ public class SmtConcretizerTest {
     }};
 
     SmtConcretizer concretizer = new SmtConcretizer(GlobalConfig.autoloadConfig());
-    concretizer
-        .calculateConcreteSpecification(spec, freeVariables);
+    concretizer.calculateConcreteSpecification(spec, freeVariables);
   }
 
 }

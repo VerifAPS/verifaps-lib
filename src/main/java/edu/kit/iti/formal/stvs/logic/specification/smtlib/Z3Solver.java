@@ -16,6 +16,7 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -249,6 +250,11 @@ public class Z3Solver {
     ProcessBuilder processBuilder = new ProcessBuilder(z3Path, "-in", "-smt2");
     try {
       Process process = processBuilder.start();
+      /*IOUtils.write(smtString, process.getOutputStream(), "utf-8");
+      process.getOutputStream().close();*/
+      PrintStream printStream = new PrintStream(process.getOutputStream());
+      printStream.print(smtString);
+      printStream.close();
       boolean wasAborted = !process.waitFor(timeout, TimeUnit.SECONDS);
 
       if (wasAborted) {
