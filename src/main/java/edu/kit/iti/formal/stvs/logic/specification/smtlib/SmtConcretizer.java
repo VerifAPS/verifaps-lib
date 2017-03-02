@@ -1,8 +1,10 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
+import edu.kit.iti.formal.stvs.logic.specification.ConcretizationException;
 import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.util.ThrowableHandler;
 
@@ -15,7 +17,6 @@ import java.util.List;
  */
 public class SmtConcretizer implements SpecificationConcretizer {
   private final GlobalConfig config;
-  private ProcessOutputAsyncTask task;
   private Z3Solver z3Solver;
 
   /**
@@ -31,7 +32,7 @@ public class SmtConcretizer implements SpecificationConcretizer {
   /**
    * Delegates the solving task to the Z3-Process and registers handlers for the result and
    * exceptions.
-   *
+   * 
    * @param validSpecification The valid specification that should be conretized
    * @param freeVariables FreeVariables that were used in the {@code validSpecification}
    * @param specificationHandler handles the concrete specification (or an empty
@@ -39,26 +40,11 @@ public class SmtConcretizer implements SpecificationConcretizer {
    * @param exceptionHandler handles exceptions
    */
   @Override
-  public void calculateConcreteSpecification(ValidSpecification validSpecification,
-      List<ValidFreeVariable> freeVariables,
-      OptionalConcreteSpecificationHandler specificationHandler,
-      ThrowableHandler exceptionHandler) {
+  public ConcreteSpecification calculateConcreteSpecification(ValidSpecification validSpecification,
+      List<ValidFreeVariable> freeVariables) throws ConcretizationException {
     SmtEncoder encoder =
         new SmtEncoder(config.getMaxLineRollout(), validSpecification, freeVariables);
-    this.task = z3Solver.concretizeSmtModel(encoder.getConstraint(),
-        validSpecification.getColumnHeaders(), specificationHandler);
-    Thread.UncaughtExceptionHandler handler =
-        (t, exception) -> exceptionHandler.handleThrowable(exception);
-    this.task.setUncaughtExceptionHandler(handler);
-    this.task.start();
-  }
-
-  /**
-   * Terminates the concretization.
-   */
-  public void terminate() {
-    if (task != null) {
-      task.terminate();
-    }
+    return z3Solver.concretizeSmtModel(encoder.getConstraint(),
+        validSpecification.getColumnHeaders());
   }
 }

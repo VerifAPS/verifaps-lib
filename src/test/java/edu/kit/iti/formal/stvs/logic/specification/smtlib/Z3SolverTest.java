@@ -11,15 +11,12 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
-import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
-import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ObservableList;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -76,10 +73,7 @@ public class Z3SolverTest {
     System.out.println(encoder.getConstraint().toText());
     AtomicBoolean outputProcessed = new AtomicBoolean(false);
     ProcessOutputAsyncTask processOutputAsyncTask = solver.concretizeSmtModel(encoder.getConstraint(),
-        spec.getColumnHeaders(), optionalSpec -> {
-          ConcreteSpecification concreteSpecification = optionalSpec.get();
-          outputProcessed.set(true);
-        });
+        spec.getColumnHeaders());
     processOutputAsyncTask.run();
     assertTrue(outputProcessed.get());
 
@@ -99,15 +93,7 @@ public class Z3SolverTest {
     AtomicBoolean outputProcessed = new AtomicBoolean(false);
 
     ProcessOutputAsyncTask processOutputAsyncTask = solver.concretizeSmtModel(preprocessor.getConstraint(),
-        spec.getColumnHeaders(), optionalSpec -> {
-          ConcreteSpecification concreteSpecification = optionalSpec.get();
-          assertNotNull(concreteSpecification);
-          ObservableList<ConcreteDuration> durations = concreteSpecification.getDurations();
-          assertTrue(durations.get(0).getDuration() >= 5 && durations.get(0).getDuration() <= 7);
-          assertEquals(1, durations.get(1).getDuration());
-          assertEquals(2, durations.get(2).getDuration());
-          outputProcessed.set(true);
-        });
+        spec.getColumnHeaders());
     processOutputAsyncTask.start();
     processOutputAsyncTask.join();
     assertTrue(outputProcessed.get());

@@ -161,7 +161,7 @@ public class GlobalConfig {
   }
 
   /**
-   * Sets the simulation timeout in millseconds.
+   * Sets the simulation timeout in seconds.
    * It must be nonzero, positive integer.
    *
    * @param simulationTimeout a nonzero, positive integer

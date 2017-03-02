@@ -1,6 +1,9 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import de.tudresden.inf.lat.jsexp.Sexp;
+import de.tudresden.inf.lat.jsexp.SexpFactory;
+import de.tudresden.inf.lat.jsexp.SexpParserException;
+import edu.kit.iti.formal.stvs.logic.specification.ConcretizationException;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
@@ -11,17 +14,19 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
 import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
-import edu.kit.iti.formal.stvs.util.AsyncTaskCompletedHandler;
-import edu.kit.iti.formal.stvs.util.JavaFxAsyncTask;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * This class prepares a given SmtString to be solved with z3 and interprets the output.
@@ -30,10 +35,10 @@ import java.util.regex.Pattern;
  */
 public class Z3Solver {
 
-  private final int timeout;
   private static final Pattern VAR_PATTERN =
       Pattern.compile("(?<name>[$a-zA-Z0-9_]+)_(?<row>\\d+)_(?<cycle>\\d+)");
   private static final Pattern DURATION_PATTERN = Pattern.compile("n_(?<cycleCount>\\d+)");
+  private final int timeout;
   private String z3Path;
 
   /**
@@ -235,47 +240,28 @@ public class Z3Solver {
    * After the task has ended {@code handler} is called with the output string (if present). Returns
    * {@link ProcessOutputAsyncTask} to provide a possibility to terminate the Z3 process.
    *
-   * @param smtString string to be solved
    * @param handler handles the output string of the solver
-   * @return task that can be terminated
-   */
-  private ProcessOutputAsyncTask concretize(String smtString,
-      AsyncTaskCompletedHandler<Optional<String>> handler) {
-    ProcessBuilder processBuilder = new ProcessBuilder(z3Path, "-in", "-smt2", "-T:" + timeout);
-    return new ProcessOutputAsyncTask(processBuilder, smtString, handler);
-  }
-
-  /**
-   * Concretizes {@code smtString} using Z3 in an {@link JavaFxAsyncTask}.
-   * After the task has ended {@code handler} is called with a parsed {@link SExpression} (if
-   * present). Returns {@link ProcessOutputAsyncTask} to provide a possibility to terminate the Z3
-   * process.
-   *
    * @param smtString string to be solved
-   * @param handler handles the expression that represents the solver output
    * @return task that can be terminated
    */
-  private ProcessOutputAsyncTask concretizeSExpr(String smtString,
-      Consumer<Optional<SExpression>> handler) {
-    return concretize(smtString,
-        stringOptional -> handler.accept(optionalSolverOutputToSexp(stringOptional)));
-  }
+  private ConcreteSpecification concretize(String smtString, List<ValidIoVariable> ioVariables)
+      throws ConcretizationException {
+    ProcessBuilder processBuilder = new ProcessBuilder(z3Path, "-in", "-smt2");
+    try {
+      Process process = processBuilder.start();
+      boolean wasAborted = !process.waitFor(timeout, TimeUnit.SECONDS);
 
-  /**
-   * Concretizes {@code smtString} using Z3 in an {@link JavaFxAsyncTask}.
-   * After the task has ended {@code handler} is called with a {@link ConcreteSpecification} (if
-   * present). Returns {@link ProcessOutputAsyncTask} to provide a possibility to terminate the Z3
-   * process.
-   *
-   * @param smtString string to be solved
-   * @param validIoVariables variables that might appear in the solver output
-   * @param handler handles the specification that represents the solver output
-   * @return task that can be terminated
-   */
-  private ProcessOutputAsyncTask concretizeSmtString(String smtString,
-      List<ValidIoVariable> validIoVariables, OptionalConcreteSpecificationHandler handler) {
-    return concretizeSExpr(smtString, sexpOptional -> handler
-        .accept(optionalSpecFromOptionalSExp(validIoVariables, sexpOptional)));
+      if (wasAborted) {
+        throw new ConcretizationException(
+            "Timeout (" + timeout + "s)" + "reached before concretization ended.");
+      }
+      String z3Result = IOUtils.toString(process.getInputStream(), "utf-8");
+      Sexp expression = solverStringToSexp(z3Result);
+      return buildConcreteSpecFromSExp(expression, ioVariables);
+
+    } catch (IOException | InterruptedException | SexpParserException e) {
+      throw new ConcretizationException(e);
+    }
   }
 
   /**
@@ -284,34 +270,24 @@ public class Z3Solver {
    *
    * @param smtModel constraint hat holds all information to generate a smtString
    * @param validIoVariables variables that might appear in the solver output
-   * @param handler handles the specification that represents the solver output
    * @return task that can be terminated
    * @see Z3Solver#concretizeSmtString(String, List, OptionalConcreteSpecificationHandler)
    */
-  public ProcessOutputAsyncTask concretizeSmtModel(SmtModel smtModel,
-      List<ValidIoVariable> validIoVariables, OptionalConcreteSpecificationHandler handler) {
+  public ConcreteSpecification concretizeSmtModel(SmtModel smtModel,
+      List<ValidIoVariable> validIoVariables) throws ConcretizationException {
     String constraintString = smtModel.globalConstraintsToText();
     String headerString = smtModel.headerToText();
     String commands = "(check-sat)\n(get-model)";
     String z3Input = headerString + "\n" + constraintString + "\n" + commands;
-    return concretizeSmtString(z3Input, validIoVariables, handler);
+    return concretize(z3Input, validIoVariables);
   }
 
-  private Optional<SExpression> optionalSolverOutputToSexp(Optional<String> stringOptional) {
-    if (stringOptional.isPresent() && stringOptional.get().startsWith("sat")) {
-      System.out.println(stringOptional);
-      String output = stringOptional.get();
-      output = output.substring(output.indexOf('\n') + 1);
-      return (Optional.of(SExpression.fromText(output)));
+  private Sexp solverStringToSexp(String z3String)
+      throws ConcretizationException, SexpParserException {
+    if (!z3String.startsWith("sat")) {
+      throw new ConcretizationException("Solver returned status: Unsatisfiable");
     }
-    return Optional.empty();
-  }
-
-  private Optional<ConcreteSpecification> optionalSpecFromOptionalSExp(
-      List<ValidIoVariable> validIoVariables, Optional<SExpression> sexpOptional) {
-    if (sexpOptional.isPresent()) {
-      return Optional.of(buildConcreteSpecFromSExp(sexpOptional.get().toSexpr(), validIoVariables));
-    }
-    return Optional.empty();
+    z3String = z3String.substring(z3String.indexOf('\n') + 1);
+    return (SexpFactory.parse(z3String));
   }
 }
