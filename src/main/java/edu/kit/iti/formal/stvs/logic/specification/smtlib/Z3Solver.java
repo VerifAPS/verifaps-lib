@@ -12,7 +12,7 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import edu.kit.iti.formal.stvs.util.AsyncTaskCompletedHandler;
-import edu.kit.iti.formal.stvs.util.JavaFXAsyncTask;
+import edu.kit.iti.formal.stvs.util.JavaFxAsyncTask;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -231,7 +231,7 @@ public class Z3Solver {
   }
 
   /**
-   * Concretizes {@code smtString} using Z3 in an {@link JavaFXAsyncTask}.
+   * Concretizes {@code smtString} using Z3 in an {@link JavaFxAsyncTask}.
    * After the task has ended {@code handler} is called with the output string (if present). Returns
    * {@link ProcessOutputAsyncTask} to provide a possibility to terminate the Z3 process.
    *
@@ -246,7 +246,7 @@ public class Z3Solver {
   }
 
   /**
-   * Concretizes {@code smtString} using Z3 in an {@link JavaFXAsyncTask}.
+   * Concretizes {@code smtString} using Z3 in an {@link JavaFxAsyncTask}.
    * After the task has ended {@code handler} is called with a parsed {@link SExpression} (if
    * present). Returns {@link ProcessOutputAsyncTask} to provide a possibility to terminate the Z3
    * process.
@@ -262,7 +262,7 @@ public class Z3Solver {
   }
 
   /**
-   * Concretizes {@code smtString} using Z3 in an {@link JavaFXAsyncTask}.
+   * Concretizes {@code smtString} using Z3 in an {@link JavaFxAsyncTask}.
    * After the task has ended {@code handler} is called with a {@link ConcreteSpecification} (if
    * present). Returns {@link ProcessOutputAsyncTask} to provide a possibility to terminate the Z3
    * process.

@@ -10,7 +10,7 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
 import edu.kit.iti.formal.stvs.util.AsyncTaskCompletedHandler;
-import edu.kit.iti.formal.stvs.util.JavaFXAsyncTask;
+import edu.kit.iti.formal.stvs.util.JavaFxAsyncTask;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
@@ -29,7 +29,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 
-/*
+/**
  * @author Carsten Csiky
  */
 public class SpecificationController implements Controller {
@@ -47,8 +47,8 @@ public class SpecificationController implements Controller {
   private Selection selection;
   private HybridSpecification hybridSpecification;
   private BooleanProperty specificationInvalid;
-  private JavaFXAsyncTask<ConcreteSpecification> concretizingTask;
-  private final AsyncTaskCompletedHandler<ConcreteSpecification> concretizationHandler;
+  private JavaFxAsyncTask<ConcreteSpecification> concretizingTask;
+  private final ConcretizationTaskHandler concretizationHandler;
 
   public SpecificationController(ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> codeIoVariables, HybridSpecification hybridSpecification,
@@ -142,7 +142,7 @@ public class SpecificationController implements Controller {
   }
 
   private void startConcretizer(ActionEvent actionEvent) {
-    this.concretizingTask = new JavaFXAsyncTask<>(
+    this.concretizingTask = new JavaFxAsyncTask<>(
         this::runConcretizationSynchronously, this.concretizationHandler);
     concretizingTask.start();
 
