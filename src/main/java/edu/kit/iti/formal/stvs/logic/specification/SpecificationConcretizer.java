@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.logic.specification;
 
 import edu.kit.iti.formal.stvs.logic.specification.smtlib.OptionalConcreteSpecificationHandler;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.util.ThrowableHandler;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public interface SpecificationConcretizer {
 
   /**
+   * TODO: Update
    * Must implement the solving task and registers handlers for the result and exceptions.
    *
    * @param validSpecification The valid specification that should be conretized
@@ -24,13 +26,10 @@ public interface SpecificationConcretizer {
    *        {@link java.util.Optional}) if result not present
    * @param exceptionHandler handles exceptions
    */
-  void calculateConcreteSpecification(ValidSpecification validSpecification,
-      List<ValidFreeVariable> freeVariables,
-      OptionalConcreteSpecificationHandler specificationHandler, ThrowableHandler exceptionHandler);
-
-  /**
-   * Terminates the concretization.
-   */
-  void terminate();
+  ConcreteSpecification calculateConcreteSpecification(
+      ValidSpecification validSpecification,
+      List<ValidFreeVariable> freeVariables)
+      throws ConcretizationException;
+  
 }
 
