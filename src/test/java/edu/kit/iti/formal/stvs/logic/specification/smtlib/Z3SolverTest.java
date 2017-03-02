@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 import edu.kit.iti.formal.stvs.Performance;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
+import edu.kit.iti.formal.stvs.logic.specification.ConcretizationException;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
@@ -11,12 +12,15 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
+import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -71,16 +75,13 @@ public class Z3SolverTest {
     SmtEncoder encoder = new SmtEncoder(3000, spec, new ArrayList<>());
 
     System.out.println(encoder.getConstraint().toText());
-    AtomicBoolean outputProcessed = new AtomicBoolean(false);
-    ProcessOutputAsyncTask processOutputAsyncTask = solver.concretizeSmtModel(encoder.getConstraint(),
-        spec.getColumnHeaders());
-    processOutputAsyncTask.run();
-    assertTrue(outputProcessed.get());
+    ConcreteSpecification concreteSpecification = solver.concretizeSmtModel(encoder.getConstraint(), spec.getColumnHeaders());
+    assertNotNull(concreteSpecification);
 
   }
 
   @Test
-  public void testImported() throws ImportException, IOException, InterruptedException {
+  public void testImported() throws ImportException, IOException, InterruptedException, ConcretizationException {
 
     ValidSpecification spec = importSpec("testSpec.xml");
 
@@ -90,12 +91,11 @@ public class Z3SolverTest {
       add(2);
     }};
     SmtEncoder preprocessor = new SmtEncoder(maxDurations, spec, freeVariables);
-    AtomicBoolean outputProcessed = new AtomicBoolean(false);
-
-    ProcessOutputAsyncTask processOutputAsyncTask = solver.concretizeSmtModel(preprocessor.getConstraint(),
-        spec.getColumnHeaders());
-    processOutputAsyncTask.start();
-    processOutputAsyncTask.join();
-    assertTrue(outputProcessed.get());
+    ConcreteSpecification concretized = solver.concretizeSmtModel(preprocessor.getConstraint(), spec.getColumnHeaders());
+    assertNotNull(concretized);
+    ObservableList<ConcreteDuration> durations = concretized.getDurations();
+    assertTrue(durations.get(0).getDuration() >= 5 && durations.get(0).getDuration() <= 7);
+    assertEquals(1, durations.get(1).getDuration());
+    assertEquals(2, durations.get(2).getDuration());
   }
 }
