@@ -107,6 +107,8 @@ test {
 
     useJUnit {
         excludeCategories 'edu.kit.iti.formal.stvs.Performance'
+        excludeCategories 'edu.kit.iti.formal.stvs.Demo'
+        excludeCategories 'edu.kit.iti.formal.stvs.RandomTest'
     }
 
     testLogging {
@@ -125,7 +127,8 @@ task guiTest(type: Test) {
         includeTestsMatching "edu.kit.iti.formal.stvs.view.*"
     }
     useJUnit {
-        excludeCategories 'edu.kit.iti.formal.stvs.view.Demo'
+        excludeCategories 'edu.kit.iti.formal.stvs.Demo'
+        excludeCategories 'edu.kit.iti.formal.stvs.Performance'
     }
     testLogging {
         showStandardStreams = true

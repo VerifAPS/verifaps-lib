@@ -4,6 +4,7 @@ import de.tudresden.inf.lat.jsexp.Sexp;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Represents sets of constraints and definitions.
@@ -17,8 +18,8 @@ public class SmtModel implements SExpression {
   /**
    * Creates an instance with preset definitions/constraints.
    * both lists should be modifiable
-   * @param globalConstraints set of global constraints
-   * @param variableDefinitions set of variable definitions
+   * @param globalConstraints list of global constraints
+   * @param variableDefinitions list of variable definitions
    */
   public SmtModel(List<SExpression> globalConstraints, List<SExpression> variableDefinitions) {
     this.globalConstraints = globalConstraints;
@@ -65,7 +66,7 @@ public class SmtModel implements SExpression {
    * @return definitions as string
    */
   public String headerToText() {
-    return getVariableDefinitions().stream().map(SExpression::toText)
+    return getDistinctVariableDefinitions().stream().map(SExpression::toText)
         .collect(Collectors.joining(" \n "));
   }
 
@@ -108,6 +109,10 @@ public class SmtModel implements SExpression {
 
   public List<SExpression> getVariableDefinitions() {
     return variableDefinitions;
+  }
+
+  public Set<SExpression> getDistinctVariableDefinitions() {
+    return new LinkedHashSet<>(getVariableDefinitions());
   }
 
   @Override

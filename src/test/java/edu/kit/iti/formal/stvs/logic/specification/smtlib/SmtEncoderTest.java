@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by csicar on 09.02.17.
@@ -59,8 +60,28 @@ public class SmtEncoderTest {
     SmtModel model = smtEncoder.getConstraint();
 
     Collection<SExpression> constrains = model.getGlobalConstraints();
+    Collection<SExpression> header = model.getVariableDefinitions();
     System.out.println(model.toString());
     System.out.println(model.toText().length());
+    System.out.println(header);
+  }
+
+  @Test
+  public void testNoDuplicateDefinition() {
+    Supplier<InputStream> sourceFile = () -> XmlSessionImporterTest.class.getResourceAsStream(
+        "spec_constraint_valid_enum_1.xml");
+
+    ValidSpecification spec = TestUtils.importValidSpec(sourceFile.get(), new TypeEnum("colors",
+        Arrays.asList("red", "green", "blue")));
+    List<ValidFreeVariable> freeVariables = TestUtils.importValidFreeVariables(sourceFile.get());
+
+    int maxDuration = 3;
+
+    SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
+    SmtModel output = smtEncoder.getConstraint();
+    Collection<SExpression> definitions = output.getDistinctVariableDefinitions();
+    Set<SExpression> nonDuplicate = new LinkedHashSet<>(definitions);
+    assertEquals(nonDuplicate, definitions);
   }
 
   @Test
@@ -177,7 +198,7 @@ public class SmtEncoderTest {
 
   @Test
   public void testUnsupportedOperation() {
-    
+
   }
 
   @Test(expected = IllegalStateException.class)
@@ -198,7 +219,7 @@ public class SmtEncoderTest {
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, Collections.emptyList());
     SmtModel output = smtEncoder.getConstraint();
     List<SExpression> constraints = output.getGlobalConstraints();
-    List<SExpression> definitions = output.getVariableDefinitions();
+    Collection<SExpression> definitions = output.getVariableDefinitions();
 
 
 
@@ -258,7 +279,7 @@ public class SmtEncoderTest {
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
     SmtModel output = smtEncoder.getConstraint();
     List<SExpression> constraints = output.getGlobalConstraints();
-    List<SExpression> definitions = output.getVariableDefinitions();
+    Collection<SExpression> definitions = output.getVariableDefinitions();
 
     System.out.println(output.toString());
 
@@ -282,7 +303,7 @@ public class SmtEncoderTest {
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
     SmtModel output = smtEncoder.getConstraint();
     List<SExpression> constraints = output.getGlobalConstraints();
-    List<SExpression> definitions = output.getVariableDefinitions();
+    Collection<SExpression> definitions = output.getVariableDefinitions();
 
     System.out.println(output.toString());
     System.out.println(output.toText());
