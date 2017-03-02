@@ -233,9 +233,6 @@ public class EditorPaneController implements Controller {
 
   }
 
-  // TODO: Implement this?
-  public void setStylesheet(String url) {}
-
   public Code getCode() {
     return this.code;
   }

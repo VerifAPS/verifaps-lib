@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
+import edu.kit.iti.formal.stvs.Performance;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
@@ -21,6 +22,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,19 +69,19 @@ public class Z3SolverTest {
   }
 
   @Test
+  @Category(Performance.class)
   public void testLongExample() throws Exception {
     ValidSpecification spec = importSpec("spec_long_single_variable_example.xml");
-    SmtEncoder encoder = new SmtEncoder(30, spec, new ArrayList<>());
+    SmtEncoder encoder = new SmtEncoder(3000, spec, new ArrayList<>());
 
-
+    System.out.println(encoder.getConstraint().toText());
     AtomicBoolean outputProcessed = new AtomicBoolean(false);
     ProcessOutputAsyncTask processOutputAsyncTask = solver.concretizeSmtModel(encoder.getConstraint(),
         spec.getColumnHeaders(), optionalSpec -> {
           ConcreteSpecification concreteSpecification = optionalSpec.get();
           outputProcessed.set(true);
         });
-    processOutputAsyncTask.start();
-    processOutputAsyncTask.join();
+    processOutputAsyncTask.run();
     assertTrue(outputProcessed.get());
 
   }

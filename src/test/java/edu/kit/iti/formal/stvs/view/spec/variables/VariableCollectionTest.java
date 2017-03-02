@@ -4,8 +4,10 @@ import edu.kit.iti.formal.stvs.TestUtils;
 import javafx.scene.Scene;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.junit.Before;
 import org.junit.Test;
+import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 import org.testfx.service.query.NodeQuery;
 
@@ -28,6 +30,12 @@ public class VariableCollectionTest extends ApplicationTest {
   public void start(Stage stage) throws Exception {
     collection = new VariableCollection();
     stage.setScene(new Scene(collection));
+    stage.initStyle(StageStyle.DECORATED);
     stage.show();
+  }
+
+  @Override
+  public void stop() throws Exception {
+    FxToolkit.hideStage();
   }
 }

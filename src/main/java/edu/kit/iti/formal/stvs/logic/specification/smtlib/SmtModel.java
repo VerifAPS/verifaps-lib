@@ -2,10 +2,7 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import de.tudresden.inf.lat.jsexp.Sexp;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -14,16 +11,16 @@ import java.util.stream.Collectors;
  * @author Carsten Csiky
  */
 public class SmtModel implements SExpression {
-  private final Set<SExpression> globalConstraints;
-  private final Set<SExpression> variableDefinitions;
+  private final List<SExpression> globalConstraints;
+  private final List<SExpression> variableDefinitions;
 
   /**
    * Creates an instance with preset definitions/constraints.
-   *
+   * both lists should be modifiable
    * @param globalConstraints set of global constraints
    * @param variableDefinitions set of variable definitions
    */
-  public SmtModel(Set<SExpression> globalConstraints, Set<SExpression> variableDefinitions) {
+  public SmtModel(List<SExpression> globalConstraints, List<SExpression> variableDefinitions) {
     this.globalConstraints = globalConstraints;
     this.variableDefinitions = variableDefinitions;
   }
@@ -32,8 +29,8 @@ public class SmtModel implements SExpression {
    * Creates an instance with empty sets.
    */
   public SmtModel() {
-    this.globalConstraints = new LinkedHashSet<>();
-    this.variableDefinitions = new LinkedHashSet<>();
+    this.globalConstraints = new ArrayList<>();
+    this.variableDefinitions = new ArrayList<>();
   }
 
   /**
@@ -55,7 +52,11 @@ public class SmtModel implements SExpression {
 
   @Override
   public Sexp toSexpr() {
-    return null;
+
+    SList equivalentSList = new SList().addAll(getVariableDefinitions());
+    getGlobalConstraints().forEach((constraint) -> equivalentSList.addAll(new SList("assert",
+        constraint)));
+    return equivalentSList.toSexpr();
   }
 
   /**
@@ -101,11 +102,11 @@ public class SmtModel implements SExpression {
     return this;
   }
 
-  public Set<SExpression> getGlobalConstraints() {
+  public List<SExpression> getGlobalConstraints() {
     return globalConstraints;
   }
 
-  public Set<SExpression> getVariableDefinitions() {
+  public List<SExpression> getVariableDefinitions() {
     return variableDefinitions;
   }
 

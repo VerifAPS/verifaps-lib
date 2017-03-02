@@ -18,7 +18,7 @@ public class SList implements SExpression {
 
   /**
    * Creates an instance from a list of {@link SExpression}.
-   *
+   * if the passed list must be modifiable for the methods add() and allAll() to work properly
    * @param sexp list of {@link SExpression}
    */
   public SList(List<SExpression> sexp) {

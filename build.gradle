@@ -63,6 +63,7 @@ dependencies {
     jaxb 'javax.xml.bind:jaxb-api:2.2.7'
 
     testCompile "junit:junit:4.12"
+    testCompile group: 'com.googlecode.junit-toolbox', name: 'junit-toolbox', version: '2.2'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit:4.0.+"
     testCompile "org.mockito:mockito-core:2.4.0"
@@ -101,6 +102,11 @@ test {
     filter {
         includeTestsMatching "edu.kit.iti.formal.stvs.model.*"
         includeTestsMatching "edu.kit.iti.formal.stvs.logic.*"
+    }
+
+
+    useJUnit {
+        excludeCategories 'edu.kit.iti.formal.stvs.Performance'
     }
 
     testLogging {

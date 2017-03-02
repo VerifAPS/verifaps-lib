@@ -16,6 +16,7 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.File;
@@ -39,6 +41,7 @@ import static org.testfx.api.FxAssert.verifyThat;
 /**
  * Created by csicar on 08.02.17.
  */
+@Ignore
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({StvsMenuBarController.class, StvsRootController.class, FileChooser.class,
     FileChooserFactory.class})
@@ -81,8 +84,6 @@ public class StvsRootControllerTest extends ApplicationTest {
           "END_PROGRAM");
     });
     clickOn("File").clickOn("Open ...").clickOn("Open Specification");
-    TestUtils.gimmeTime();
-    sleep(5000);
     //TODO: fix deconstruction
     //assertEquals(0, lookup("#TimingDiagramView").queryAll().size());
     clickOn("#EditorPane").rightClickOn().clickOn("Select All");
@@ -96,26 +97,13 @@ public class StvsRootControllerTest extends ApplicationTest {
   @Override
   public void start(Stage stage) throws Exception {
     stage.setScene(simpleScene("session_valid_2.xml"));
+    stage.initStyle(StageStyle.DECORATED);
     stage.show();
 
   }
 
-  @Test
-  @Ignore
-  public void superSimpleTestcase() {
-    JavaFxTest.runView(() -> simpleScene("session_super_simple_testcase.xml"));
-  }
-
-  @Test
-  @Ignore
-  public void testDemo() {
-    JavaFxTest.runView(() -> simpleScene("demo_session.xml"));
-  }
-
-  @Test
-  @Ignore
-  public void javaFxTest() {
-    JavaFxTest.setToBeViewed(() -> simpleScene("session_valid_2.xml"));
-    Application.launch(JavaFxTest.class);
+  @Override
+  public void stop() throws Exception {
+    FxToolkit.hideStage();
   }
 }

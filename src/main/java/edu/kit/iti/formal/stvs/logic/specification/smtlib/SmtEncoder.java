@@ -11,6 +11,7 @@ import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -215,7 +216,11 @@ public class SmtEncoder {
   protected Type getTypeForVariable(String variableName) {
     Type type = freeVariablesContext.get(variableName);
     if (type == null) {
-      type = specification.getColumnHeaderByName(variableName).getValidType();
+      try {
+        type = specification.getColumnHeaderByName(variableName).getValidType();
+      } catch (NoSuchElementException exception) {
+        type = null;
+      }
     }
     return type;
   }

@@ -299,9 +299,10 @@ public class Z3Solver {
 
   private Optional<SExpression> optionalSolverOutputToSexp(Optional<String> stringOptional) {
     if (stringOptional.isPresent() && stringOptional.get().startsWith("sat")) {
+      System.out.println(stringOptional);
       String output = stringOptional.get();
       output = output.substring(output.indexOf('\n') + 1);
-      return (Optional.of(SExpression.fromString(output)));
+      return (Optional.of(SExpression.fromText(output)));
     }
     return Optional.empty();
   }
