@@ -29,8 +29,8 @@ public class SmtModel implements SExpression {
    * Creates an instance with empty sets.
    */
   public SmtModel() {
-    this.globalConstraints = new LinkedList<>();
-    this.variableDefinitions = new LinkedList<>();
+    this.globalConstraints = new ArrayList<>();
+    this.variableDefinitions = new ArrayList<>();
   }
 
   /**
