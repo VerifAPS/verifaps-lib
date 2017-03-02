@@ -867,7 +867,7 @@ returns [ FunctionCall ast = new FunctionCall()]
 param_assignment
 :
 	(
-		id = IDENTIFIER ASSIGN
+		id = IDENTIFIER (ASSIGN)
 	)? expression
 	{
           $functioncall::ast.addInputParameter($id.text, $expression.ast);
@@ -875,8 +875,7 @@ param_assignment
 	| IDENTIFIER ARROW_RIGHT v=variable
 	{
           $functioncall::ast.addOutputParameter($IDENTIFIER.text, $v.ast);
-        }
-
+    }
 ;
 
 statement_list
@@ -906,13 +905,14 @@ returns [ Statement ast]
 
 assignment_statement
 returns [ AssignmentStatement ast ]
+locals [ boolean ref = false; ]
 :
-	a=variable ASSIGN expression SEMICOLON
+	a=variable (RASSIGN|ASSIGN) expression SEMICOLON
 	{
         $ast = new AssignmentStatement($a.ast, $expression.ast);
+        $ast.setReference($RASSIGN != null);
         setPosition($ast, $ctx);
     }
-
 ;
 
 variable
@@ -931,7 +931,7 @@ returns [ SymbolicReference ast = new SymbolicReference() ]
 :
     //x^[a,252]
 	IDENTIFIER
-	(REF       { $ast.derefVar(); })?
+	(REF { $ast.derefVar(); })?
 	(
 		subscript_list
 		{$ast.setSubscripts($subscript_list.ast);}

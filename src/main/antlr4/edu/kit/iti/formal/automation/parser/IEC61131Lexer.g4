@@ -768,6 +768,9 @@ ASSIGN
 	':='
 ;
 
+RASSIGN : 'REF=' ;//| '&=';
+
+
 COMMA
 :
 	','
