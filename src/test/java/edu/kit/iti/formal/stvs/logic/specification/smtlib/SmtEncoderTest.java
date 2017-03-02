@@ -10,6 +10,7 @@ import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.experimental.theories.suppliers.TestedOn;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -176,6 +177,30 @@ public class SmtEncoderTest {
 
   @Test
   public void testUnsupportedOperation() {
+    
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testMismatchingUsedVariablesAndVariableDefinitions() {
+    Supplier<InputStream> sourceFile = () -> SmtEncoderTest.class.getResourceAsStream(
+        "spec_freevariable.xml");
+
+    ValidSpecification spec = TestUtils.importValidSpec(sourceFile.get(), new TypeEnum(
+        "Color",
+        Arrays.asList("red", "green", "blue")));
+    List<ValidFreeVariable> freeVariables = TestUtils.importValidFreeVariables(sourceFile.get(),
+        new TypeEnum("Color",
+            Arrays.asList("red", "green", "blue")));
+
+    int maxDuration = 5;
+
+
+    SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, Collections.emptyList());
+    SmtModel output = smtEncoder.getConstraint();
+    List<SExpression> constraints = output.getGlobalConstraints();
+    List<SExpression> definitions = output.getVariableDefinitions();
+
+
 
   }
 

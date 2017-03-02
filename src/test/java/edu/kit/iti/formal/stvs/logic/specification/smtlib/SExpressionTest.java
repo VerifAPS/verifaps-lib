@@ -65,6 +65,7 @@ public class SExpressionTest {
   @Test
   public void testEquals() {
     assertNotEquals(expression, this);
+    assertEquals(expression, expression);
     assertFalse(expression.equals(null));
   }
 }
