@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
@@ -91,23 +92,59 @@ public class SmtModelTest {
   }
 
   @Test
-  public void addGlobalConstrains() throws Exception {
-
+  public void addGlobalConstrainsAsArguments() throws Exception {
+    simple.addGlobalConstrains(new SAtom("new"), new SAtom("new2"));
+    assertEquals(fromString(
+        "a bb ccc",
+        "d ee fff new new2"
+    ), simple);
+    other.addGlobalConstrains(new SList("newA", new SList("newB", "newC")));
+    assertEquals(fromString(
+        "l o s",
+        "ggg (1 2 3 h) i (newA (newB newC))"
+    ), other);
   }
 
   @Test
-  public void addGlobalConstrains1() throws Exception {
-
+  public void addGlobalConstrainsAsList() throws Exception {
+    simple.addGlobalConstrains(Arrays.asList(new SAtom("new"), new SAtom("new2")));
+    assertEquals(fromString(
+        "a bb ccc",
+        "d ee fff new new2"
+    ), simple);
+    other.addGlobalConstrains(Arrays.asList(new SList("newA", new SList("newB", "newC"))));
+    assertEquals(fromString(
+        "l o s",
+        "ggg (1 2 3 h) i (newA (newB newC))"
+    ), other);
   }
 
   @Test
-  public void addHeaderDefinitions() throws Exception {
-
+  public void addHeaderDefinitionsAsArguments() throws Exception {
+    simple.addHeaderDefinitions(new SAtom("new"), new SAtom("new2"));
+    assertEquals(fromString(
+        "a bb ccc new new2",
+        "d ee fff"
+    ), simple);
+    other.addHeaderDefinitions(new SList("newA", new SList("newB", "newC")));
+    assertEquals(fromString(
+        "l o s (newA (newB newC))",
+        "ggg (1 2 3 h) i"
+    ), other);
   }
 
   @Test
-  public void addHeaderDefinitions1() throws Exception {
-
+  public void addHeaderDefinitionsAsList() throws Exception {
+    simple.addHeaderDefinitions(Arrays.asList(new SAtom("new"), new SAtom("new2")));
+    assertEquals(fromString(
+        "a bb ccc new new2",
+        "d ee fff"
+    ), simple);
+    other.addHeaderDefinitions(Arrays.asList(new SList("newA", new SList("newB", "newC"))));
+    assertEquals(fromString(
+        "l o s (newA (newB newC))",
+        "ggg (1 2 3 h) i"
+    ), other);
   }
 
   @Test
@@ -121,22 +158,57 @@ public class SmtModelTest {
 
   @Test
   public void getVariableDefinitions() throws Exception {
-
+    assertEquals(Arrays.asList(
+        new SAtom("a"),
+        new SAtom("bb"),
+        new SAtom("ccc")
+    ), simple.getVariableDefinitions());
   }
 
   @Test
   public void testToString() throws Exception {
-
+    assertFalse(simple.toString().isEmpty());
   }
 
   @Test
   public void equals() throws Exception {
-
+    SmtModel simpleCompare = fromString(
+        "a bb ccc",
+        "d ee fff"
+    );
+    SmtModel otherCompare = fromString(
+        "l o s",
+        "ggg (1 2 3 h) i"
+    );
+    assertEquals(simpleCompare, simple);
+    assertEquals(otherCompare, other);
+    assertNotEquals(this, simple);
+    assertNotEquals(this, other);
+    assertNotEquals(simple, other);
+    assertNotEquals("", other);
+    assertFalse(simple.equals(null));
+    assertEquals(simple, simple);
   }
 
   @Test
   public void testHashCode() throws Exception {
-
+    SmtModel simpleCompare = fromString(
+        "a bb ccc",
+        "d ee fff"
+    );
+    SmtModel otherCompare = fromString(
+        "l o s",
+        "ggg (1 2 3 h) i"
+    );
+    assertEquals(simpleCompare.hashCode(), simple.hashCode());
+    assertEquals(otherCompare.hashCode(), other.hashCode());
   }
 
+
+  @Test
+  public void testEmptyConstructor() {
+    SmtModel model = new SmtModel();
+    assertEquals(new ArrayList<>(), model.getVariableDefinitions());
+    assertEquals(new ArrayList<>(), model.getGlobalConstraints());
+  }
 }

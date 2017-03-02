@@ -174,6 +174,11 @@ public class SmtEncoderTest {
     assertEquals(1, getMaxDurations.invoke(smtEncoder, 1));
   }
 
+  @Test
+  public void testUnsupportedOperation() {
+
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void testDifferentLengthInputs() {
     Supplier<InputStream> sourceFile = () -> SmtEncoderTest.class.getResourceAsStream(

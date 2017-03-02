@@ -12,5 +12,13 @@
             <duration>1</duration>
             <cell>!= 50</cell>
         </row>
+        <row>
+            <duration>1</duration>
+            <cell>= -C[-1]</cell>
+        </row>
+        <row>
+            <duration>1</duration>
+            <cell>> 7</cell>
+        </row>
     </rows>
 </specification>
