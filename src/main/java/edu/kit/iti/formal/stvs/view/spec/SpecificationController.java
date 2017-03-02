@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
-import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
+import edu.kit.iti.formal.stvs.logic.specification.ConcretizationException;
 import edu.kit.iti.formal.stvs.logic.specification.smtlib.SmtConcretizer;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
@@ -9,6 +9,8 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
+import edu.kit.iti.formal.stvs.util.AsyncTaskCompletedHandler;
+import edu.kit.iti.formal.stvs.util.JavaFXAsyncTask;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
@@ -17,7 +19,6 @@ import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController;
 
 import java.util.List;
 
-import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -25,7 +26,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 
@@ -47,7 +47,8 @@ public class SpecificationController implements Controller {
   private Selection selection;
   private HybridSpecification hybridSpecification;
   private BooleanProperty specificationInvalid;
-  private SpecificationConcretizer concretizer;
+  private JavaFXAsyncTask<ConcreteSpecification> concretizingTask;
+  private final AsyncTaskCompletedHandler<ConcreteSpecification> concretizationHandler;
 
   public SpecificationController(ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> codeIoVariables, HybridSpecification hybridSpecification,
@@ -68,6 +69,7 @@ public class SpecificationController implements Controller {
     this.specificationInvalid = new SimpleBooleanProperty(true);
     specificationInvalid.bind(variableCollectionController.getValidator().validProperty().not()
         .or(tableController.getValidator().validProperty().not()).or(codeInvalid));
+    this.concretizationHandler = new ConcretizationTaskHandler();
 
     // use event trigger to generate timing-diagram, to minimize code-duplication
     onConcreteInstanceChanged(getConcreteSpecification());
@@ -85,7 +87,7 @@ public class SpecificationController implements Controller {
     view.getStartButton().disableProperty().bind(specificationInvalid);
     view.getStartConcretizerButton().disableProperty().bind(specificationInvalid);
 
-    view.getStartConcretizerButton().setOnAction(this::startConretizer);
+    view.getStartConcretizerButton().setOnAction(this::startConcretizer);
 
     hybridSpecification.concreteInstanceProperty()
         .addListener((observable, old, newVal) -> this.onConcreteInstanceChanged(newVal));
@@ -129,40 +131,37 @@ public class SpecificationController implements Controller {
     }
   }
 
-  private void startConretizer(ActionEvent actionEvent) {
+  private void onConcretizationActive() {
     view.setConcretizerButtonStop();
     view.getStartConcretizerButton().setOnAction(this::stopConcretizer);
-    this.concretizer = new SmtConcretizer(globalConfig);
-    concretizer.calculateConcreteSpecification(
+  }
+
+  private void onConcretizationInactive() {
+    view.setConcretizerButtonStart();
+    view.getStartConcretizerButton().setOnAction(this::startConcretizer);
+  }
+
+  private void startConcretizer(ActionEvent actionEvent) {
+    this.concretizingTask = new JavaFXAsyncTask<>(
+        this::runConcretizationSynchronously, this.concretizationHandler);
+    concretizingTask.start();
+
+    onConcretizationActive();
+  }
+
+  private ConcreteSpecification runConcretizationSynchronously()
+      throws ConcretizationException {
+    return new SmtConcretizer(globalConfig).calculateConcreteSpecification(
         tableController.getValidator().getValidSpecification(),
-        variableCollectionController.getValidator().validFreeVariablesProperty().get(),
-        optionalSpec -> {
-          Platform.runLater(() -> {
-            if (optionalSpec.isPresent()) {
-              hybridSpecification.setConcreteInstance(optionalSpec.get());
-              timingDiagramCollectionController.setActivated(true);
-            } else {
-              AlertFactory.createAlert(Alert.AlertType.WARNING, "Concretizer warning",
-                  "No concrete instance found",
-                  "The Solver could not produce a concrete example with the given table.");
-            }
-            view.setConcretizerButtonStart();
-            view.getStartConcretizerButton().setOnAction(this::startConretizer);
-          });
-        }, exception -> {
-          Platform.runLater(() -> {
-            AlertFactory.createAlert(exception, "Concretization Failed",
-                "An error occurred while " + "concretizing the specification.");
-          });
-        });
+        variableCollectionController.getValidator().getValidFreeVariables());
   }
 
   private void stopConcretizer(ActionEvent actionEvent) {
-    view.setConcretizerButtonStart();
-    view.getStartConcretizerButton().setOnAction(this::startConretizer);
-    if (this.concretizer != null) {
-      this.concretizer.terminate();
+    if (concretizingTask != null) {
+      concretizingTask.terminate();
+      concretizingTask = null;
     }
+    onConcretizationInactive();
   }
 
   private ConcreteSpecification getConcreteSpecification() {
@@ -186,5 +185,20 @@ public class SpecificationController implements Controller {
 
   public HybridSpecification getSpec() {
     return spec;
+  }
+
+  private class ConcretizationTaskHandler implements AsyncTaskCompletedHandler<ConcreteSpecification> {
+    @Override
+    public void onSuccess(ConcreteSpecification concreteSpec) {
+      hybridSpecification.setConcreteInstance(concreteSpec);
+      timingDiagramCollectionController.setActivated(true);
+      onConcretizationInactive();
+    }
+
+    @Override
+    public void onException(Exception exception) {
+      AlertFactory.createAlert(exception);
+      onConcretizationInactive();
+    }
   }
 }

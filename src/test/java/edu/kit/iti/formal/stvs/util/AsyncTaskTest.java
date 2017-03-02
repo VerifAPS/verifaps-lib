@@ -18,7 +18,7 @@ public class AsyncTaskTest {
 
   private Scene simpleScene() {
     TextArea root = new TextArea();
-    AsyncTask<String> stringAsyncTask = new AsyncTask<>((isRunning) -> "TEST\n", root::appendText);
+    JavaFXAsyncTask<String> stringAsyncTask = new JavaFXAsyncTask<>((isRunning) -> "TEST\n", root::appendText);
     stringAsyncTask.start();
     root.appendText("Thread magic!" + "\n");
     return new Scene(root, 800, 600);
