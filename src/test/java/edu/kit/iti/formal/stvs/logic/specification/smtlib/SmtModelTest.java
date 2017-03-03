@@ -209,7 +209,7 @@ public class SmtModelTest {
   @Test
   public void testEmptyConstructor() {
     SmtModel model = new SmtModel();
-    assertEquals(new HashSet<>(), model.getVariableDefinitions());
-    assertEquals(new ArrayList<>(), model.getGlobalConstraints());
+    assertTrue(model.getVariableDefinitions().isEmpty());
+    assertTrue(model.getGlobalConstraints().isEmpty());
   }
 }

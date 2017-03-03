@@ -112,4 +112,8 @@ public class FreeVariableListValidator {
   public ReadOnlyObjectProperty<List<ValidFreeVariable>> validFreeVariablesProperty() {
     return validVars;
   }
+
+  public List<ValidFreeVariable> getValidFreeVariables() {
+    return validVars.get();
+  }
 }
