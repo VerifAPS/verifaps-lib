@@ -83,7 +83,9 @@ public class RandomGenerator {
       cells.put(ioVariable.getName(), cell);
     }
     SpecificationRow<ConstraintCell> row = new SpecificationRow<>(cells, p -> new javafx.beans.Observable[0]);
-    row.setComment(randomAlphaNumeric(MAX_COMMENT_LENGTH));
+    if (random.nextBoolean()) {
+      row.setComment(randomAlphaNumeric(MAX_COMMENT_LENGTH));
+    }
     return row;
   }
 
@@ -99,7 +101,11 @@ public class RandomGenerator {
     } else {
       cellString = "-"; // Wildcard with probability 10%
     }
-    return new ConstraintCell(cellString);
+    ConstraintCell cell = new ConstraintCell(cellString);
+    if (random.nextBoolean()) {
+      cell.setComment(randomAlphaNumeric(random.nextInt(MAX_COMMENT_LENGTH)));
+    }
+    return cell;
   }
 
   private String randomAssignment(SpecIoVariable ioVariable, List<SpecIoVariable> columnHeaders, FreeVariableList freeVariableList) {
@@ -336,11 +342,11 @@ public class RandomGenerator {
 
   public static void main(String[] args) throws ExportException, IOException {
     RandomGenerator generator = new RandomGenerator();
-    ConstraintSpecification constraintSpec = generator.randomConstraintSpec(1000, 1000, 10);
+    ConstraintSpecification constraintSpec = generator.randomConstraintSpec(5000, 10, 10);
     ExporterFacade.exportSpec(constraintSpec, ExporterFacade
         .ExportFormat.XML, new File("/home/bal/Projects/kit/pse/stverificationstudio/src/test" +
         "/resources/edu/kit/iti/formal/stvs/logic/io/xml/random" +
-        "/spec_constraint_random_1000_1000_10_1.xml"));
+        "/spec_constraint_random_5000_10_10_1.xml"));
     //System.out.println(baos.toString("utf-8"));
   }
 }

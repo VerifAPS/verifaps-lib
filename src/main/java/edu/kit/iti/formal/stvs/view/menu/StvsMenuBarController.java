@@ -148,7 +148,7 @@ public class StvsMenuBarController implements Controller {
       this.rootModel.get().getScenario().setCode(code);
       this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
     } catch (IOException e) {
-      AlertFactory.createAlert(e);
+      AlertFactory.createAlert(e).showAndWait();
     }
   }
 
@@ -169,7 +169,7 @@ public class StvsMenuBarController implements Controller {
       this.rootModel.set(model);
       this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
     } catch (IOException | ImportException exception) {
-      AlertFactory.createAlert(exception);
+      AlertFactory.createAlert(exception).showAndWait();
     }
   }
 
@@ -186,7 +186,7 @@ public class StvsMenuBarController implements Controller {
       this.rootModel.get().getHybridSpecifications().add(spec);
       this.rootModel.get().getHistory().addFilename(chosenFile.getAbsolutePath());
     } catch (IOException | ImportException e) {
-      AlertFactory.createAlert(e);
+      AlertFactory.createAlert(e).showAndWait();
     }
   }
 
@@ -213,7 +213,7 @@ public class StvsMenuBarController implements Controller {
             this.rootModel.get().getScenario().setCode(code);
           }));
     } catch (IOException | ImportException e) {
-      AlertFactory.createAlert(e);
+      AlertFactory.createAlert(e).showAndWait();
     }
   }
 
@@ -237,7 +237,7 @@ public class StvsMenuBarController implements Controller {
       rootModel.get().setFilename(path.getName());
       ExporterFacade.exportSession(rootModel.get(), ExporterFacade.ExportFormat.XML, path);
     } catch (IOException | ExportException exception) {
-      AlertFactory.createAlert(exception);
+      AlertFactory.createAlert(exception).showAndWait();
     }
   }
 
@@ -257,7 +257,7 @@ public class StvsMenuBarController implements Controller {
     try {
       ExporterFacade.exportCode(code, false);
     } catch (IOException e) {
-      AlertFactory.createAlert(e);
+      AlertFactory.createAlert(e).showAndWait();
     }
   }
 
@@ -274,7 +274,7 @@ public class StvsMenuBarController implements Controller {
         ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.XML, specFile);
       }
     } catch (ExportException | IOException e) {
-      AlertFactory.createAlert(e);
+      AlertFactory.createAlert(e).showAndWait();
     }
   }
 
