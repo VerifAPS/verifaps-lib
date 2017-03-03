@@ -18,9 +18,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.application.Platform;
-import jdk.nashorn.internal.runtime.arrays.ArrayIndex;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -88,7 +88,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     processBuilder.redirectOutput(getetaOutputFile);
     try {
       getetaProcess = processBuilder.start();
-    // Find out when process finishes to set verification result property
+      // Find out when process finishes to set verification result property
       processMonitor = new ProcessMonitor(getetaProcess, config.getVerificationTimeout());
       processMonitor.processFinishedProperty().addListener(observable -> onVerificationDone());
       // Starts the verification process in another thread
@@ -124,22 +124,28 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     }
     VerificationResult result;
     File logFile = null;
-    try {
-      String processOutput = IOUtils.toString(new FileInputStream(getetaOutputFile), "utf-8");
-      logFile = writeLogFile(processOutput);
-      String cleanedProcessOutput = cleanProcessOutput(processOutput);
-      // Set the verification result depending on the GeTeTa output
-      if (processMonitor.isAborted()) {
-        VerificationError error = new VerificationError(VerificationError.Reason.TIMEOUT);
+    Optional<Exception> processError = processMonitor.getError();
+    if (processError.isPresent()) {
+      VerificationError error = new VerificationError(processError.get());
+      result = new VerificationResult(error);
+    } else {
+      try {
+        String processOutput = IOUtils.toString(new FileInputStream(getetaOutputFile), "utf-8");
+        logFile = writeLogFile(processOutput);
+        String cleanedProcessOutput = cleanProcessOutput(processOutput);
+        // Set the verification result depending on the GeTeTa output
+        if (processMonitor.isAborted()) {
+          VerificationError error = new VerificationError(VerificationError.Reason.TIMEOUT);
+          result = new VerificationResult(VerificationResult.Status.ERROR, logFile, error);
+        } else {
+          result = ImporterFacade.importVerificationResult(
+              new ByteArrayInputStream(cleanedProcessOutput.getBytes()),
+              ImporterFacade.ImportFormat.GETETA, typeContext);
+        }
+      } catch (IOException | ImportException exception) {
+        VerificationError error = new VerificationError(exception);
         result = new VerificationResult(VerificationResult.Status.ERROR, logFile, error);
-      } else {
-        result = ImporterFacade.importVerificationResult(
-            new ByteArrayInputStream(cleanedProcessOutput.getBytes()),
-            ImporterFacade.ImportFormat.GETETA, typeContext);
       }
-    } catch (IOException | ImportException exception) {
-      VerificationError error = new VerificationError(exception);
-      result = new VerificationResult(VerificationResult.Status.ERROR, logFile, error);
     }
     // set the verification result back in the javafx thread:
     VerificationResult finalResult = result; // have to do this because of lambda restrictions...

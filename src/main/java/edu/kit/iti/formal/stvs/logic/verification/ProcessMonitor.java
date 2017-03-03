@@ -1,9 +1,12 @@
 package edu.kit.iti.formal.stvs.logic.verification;
 
+import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Detects when a process is finished and invokes the associated listeners. Adapted from
@@ -20,6 +23,7 @@ public class ProcessMonitor extends Thread {
   private BooleanProperty processFinished;
   private int timeout;
   private boolean aborted;
+  private Exception error;
 
   /**
    * Starts the detection for the given process.
@@ -42,6 +46,10 @@ public class ProcessMonitor extends Thread {
     return process;
   }
 
+  public Optional<Exception> getError() {
+    return Optional.ofNullable(error);
+  }
+
   /**
    * runs an external process and wait until {@code timeout} or until it is interrupted.
    */
@@ -53,9 +61,17 @@ public class ProcessMonitor extends Thread {
         process.destroy();
         aborted = true;
       }
+      if (process.exitValue() != 0) {
+        error = new IOException("Process ended with error " + process.exitValue()
+            + " and error output:\n" + IOUtils.toString(process.getErrorStream(), "utf-8"));
+      }
       processFinished.set(true);
     } catch (InterruptedException e) {
       // intentionally left empty. Process is destroyed somewhere else
+    } catch (IOException e) {
+      error = e;
+      e.printStackTrace();
+      processFinished.set(true);
     }
   }
 

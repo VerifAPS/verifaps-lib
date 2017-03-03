@@ -23,11 +23,22 @@ public class VerificationResult {
    *
    * @param status The status of the verification (i.e. verified, counterexample, error, ...)
    * @param logFile The log file (the original output of the verification engine)
+   * @param error Error that indicates what went wrong
    */
   public VerificationResult(Status status, File logFile, VerificationError error) {
     this.status = status;
     this.logFile = logFile;
     this.verificationError = error;
+  }
+
+  /**
+   * Construct a new VerificationResult for a verification without counterexample and if no log is
+   * available.
+   *
+   * @param error Error that indicates what went wrong
+   */
+  public VerificationResult(VerificationError error) {
+    this(Status.ERROR, null, error);
   }
 
   /**
@@ -78,13 +89,6 @@ public class VerificationResult {
     return Optional.ofNullable(logFile);
   }
 
-  /**
-   * The verification status.
-   */
-  public enum Status {
-    VERIFIED, COUNTEREXAMPLE, ERROR
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -110,5 +114,12 @@ public class VerificationResult {
     return getVerificationError() != null
         ? getVerificationError().equals(result.getVerificationError())
         : result.getVerificationError() == null;
+  }
+
+  /**
+   * The verification status.
+   */
+  public enum Status {
+    VERIFIED, COUNTEREXAMPLE, ERROR
   }
 }
