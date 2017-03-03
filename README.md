@@ -48,9 +48,10 @@ $ mvn install
 
 # Changelog 
 
+* 0.1.12
+ * Fix NPE in AstVisitor
 * 0.1.11 
  * Bug fix in `IEC61131Facade.file()`
- * 
 
 # TODO
 
