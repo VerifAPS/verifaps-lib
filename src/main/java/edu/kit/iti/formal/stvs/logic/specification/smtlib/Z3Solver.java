@@ -15,15 +15,16 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -237,53 +238,82 @@ public class Z3Solver {
   }
 
   /**
-   * Concretizes {@code smtString} using Z3 in an {@link JavaFxAsyncTask}.
-   * After the task has ended {@code handler} is called with the output string (if present). Returns
-   * {@link ProcessOutputAsyncTask} to provide a possibility to terminate the Z3 process.
+   * Concretizes {@code smtString} using Z3. After the concretization has ended a
+   * {@link ConcreteSpecification} is returned. If the timeout is reached before the z3 process has
+   * terminated, an Exception is thrown.
    *
-   * @param handler handles the output string of the solver
    * @param smtString string to be solved
-   * @return task that can be terminated
+   * @param ioVariables list of {@link ValidIoVariable} used in the specification.
+   * @return concretized concrete specification
+   * @throws ConcretizationException general concretization problem.
    */
   private ConcreteSpecification concretize(String smtString, List<ValidIoVariable> ioVariables)
       throws ConcretizationException {
     ProcessBuilder processBuilder = new ProcessBuilder(z3Path, "-in", "-smt2");
+    AtomicBoolean wasAborted = new AtomicBoolean(false);
     try {
       Process process = processBuilder.start();
-      /*IOUtils.write(smtString, process.getOutputStream(), "utf-8");
-      process.getOutputStream().close();*/
-      PrintStream printStream = new PrintStream(process.getOutputStream());
-      printStream.print(smtString);
-      printStream.close();
-      boolean wasAborted = !process.waitFor(timeout, TimeUnit.SECONDS);
-
-      if (wasAborted) {
-        throw new ConcretizationException(
-            "Timeout (" + timeout + "s)" + "reached before concretization ended.");
+      IOUtils.write(smtString, process.getOutputStream(), "utf-8");
+      process.getOutputStream().close();
+      /*
+       * Cannot be used due to buffering problems.
+       * 
+       * boolean wasAborted = !process.waitFor(timeout, TimeUnit.SECONDS);
+       * 
+       * if (wasAborted) { process.destroy(); throw new ConcretizationException( "Timeout (" +
+       * timeout + "s)" + "reached before concretization ended."); } String z3Result =
+       * IOUtils.toString(process.getInputStream(), "utf-8");
+       */
+      Timer processKillerTimer = new Timer();
+      TimerTask processKiller = new TimerTask() {
+        @Override
+        public void run() {
+          try {
+            process.getInputStream().close();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+          wasAborted.set(true);
+        }
+      };
+      processKillerTimer.schedule(processKiller, 1000 * timeout);
+      final BufferedReader reader =
+          new BufferedReader(new InputStreamReader(process.getInputStream()));
+      String line;
+      String z3Result = "";
+      while ((line = reader.readLine()) != null && !Thread.currentThread().isInterrupted()) {
+        z3Result += line + "\n";
       }
-      String z3Result = IOUtils.toString(process.getInputStream(), "utf-8");
+      processKillerTimer.cancel();
+      processKillerTimer.purge();
       Sexp expression = solverStringToSexp(z3Result);
       return buildConcreteSpecFromSExp(expression, ioVariables);
 
-    } catch (IOException | InterruptedException | SexpParserException e) {
+    } catch (IOException e) {
+      if (wasAborted.get()) {
+        throw new ConcretizationException("Timeout (" + timeout + "s) reached for concretization!");
+      }
+      throw new ConcretizationException(e);
+    } catch (SexpParserException e) {
       throw new ConcretizationException(e);
     }
   }
 
   /**
    * This method first generates a {@code smtString} from {@link SmtModel} and adds commands to tell
-   * Z3 to solve the model.
+   * Z3 to solve the model. Then it calls {@link Z3Solver#concretize(String, List)}.
    *
    * @param smtModel constraint hat holds all information to generate a smtString
    * @param validIoVariables variables that might appear in the solver output
-   * @return task that can be terminated
-   * @see Z3Solver#concretizeSmtString(String, List, OptionalConcreteSpecificationHandler)
+   * @return concretized concrete specification
+   * @see Z3Solver#concretize(String, List)
+   * @throws ConcretizationException general concretization problem
    */
   public ConcreteSpecification concretizeSmtModel(SmtModel smtModel,
       List<ValidIoVariable> validIoVariables) throws ConcretizationException {
     String constraintString = smtModel.globalConstraintsToText();
     String headerString = smtModel.headerToText();
-    String commands = "(check-sat)\n(get-model)";
+    String commands = "(check-sat)\n(get-model)\n(exit)";
     String z3Input = headerString + "\n" + constraintString + "\n" + commands;
     return concretize(z3Input, validIoVariables);
   }

@@ -39,6 +39,7 @@ import static org.junit.Assert.*;
 public class Z3SolverTest {
 
   private List<ValidFreeVariable> freeVariables;
+
   private final Z3Solver solver = new Z3Solver(GlobalConfig.autoloadConfig());
 
   public Z3SolverTest() throws ImportException {
@@ -71,6 +72,10 @@ public class Z3SolverTest {
   @Test
   @Category(Performance.class)
   public void testLongExample() throws Exception {
+
+    GlobalConfig config = GlobalConfig.autoloadConfig();
+    config.setSimulationTimeout(3600);
+    Z3Solver solver = new Z3Solver(config);
     ValidSpecification spec = importSpec("spec_long_single_variable_example.xml");
     SmtEncoder encoder = new SmtEncoder(3000, spec, new ArrayList<>());
 
@@ -78,6 +83,19 @@ public class Z3SolverTest {
     ConcreteSpecification concreteSpecification = solver.concretizeSmtModel(encoder.getConstraint(), spec.getColumnHeaders());
     assertNotNull(concreteSpecification);
 
+  }
+
+  @Test
+  public void testTooShortTimeout() throws Exception {
+
+    GlobalConfig config = GlobalConfig.autoloadConfig();
+    config.setSimulationTimeout(1);
+    Z3Solver solver = new Z3Solver(config);
+    ValidSpecification spec = importSpec("spec_long_single_variable_example.xml");
+    SmtEncoder encoder = new SmtEncoder(3000, spec, new ArrayList<>());
+
+    System.out.println(encoder.getConstraint().toText());
+    ConcreteSpecification concreteSpecification = solver.concretizeSmtModel(encoder.getConstraint(), spec.getColumnHeaders());
   }
 
   @Test
