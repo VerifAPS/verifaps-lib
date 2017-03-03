@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.util;
 
 /**
- * This interface represents a handler that gets called after a {@link JavaFxAsyncTask} has completed its
+ * This interface represents a handler that gets called after a {@link JavaFxAsyncProcessTask} has completed its
  * work.
  */
 public interface AsyncTaskCompletedHandler<T> {

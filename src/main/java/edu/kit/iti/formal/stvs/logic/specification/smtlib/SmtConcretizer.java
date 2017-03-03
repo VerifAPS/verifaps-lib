@@ -29,6 +29,10 @@ public class SmtConcretizer implements SpecificationConcretizer {
     this.z3Solver = new Z3Solver(config);
   }
 
+  public Process getProcess() {
+    return z3Solver.getProcess();
+  }
+
   /**
    * Delegates the solving task to the Z3-Process and registers handlers for the result and
    * exceptions.

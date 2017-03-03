@@ -42,6 +42,7 @@ public class Z3Solver {
   private static final Pattern DURATION_PATTERN = Pattern.compile("n_(?<cycleCount>\\d+)");
   private final int timeout;
   private String z3Path;
+  private Process process;
 
   /**
    * Creates an instance that can later be used for solving.
@@ -250,33 +251,11 @@ public class Z3Solver {
   private ConcreteSpecification concretize(String smtString, List<ValidIoVariable> ioVariables)
       throws ConcretizationException {
     ProcessBuilder processBuilder = new ProcessBuilder(z3Path, "-in", "-smt2");
-    AtomicBoolean wasAborted = new AtomicBoolean(false);
     try {
       Process process = processBuilder.start();
+      this.process = process;
       IOUtils.write(smtString, process.getOutputStream(), "utf-8");
       process.getOutputStream().close();
-      /*
-       * Cannot be used due to buffering problems.
-       * 
-       * boolean wasAborted = !process.waitFor(timeout, TimeUnit.SECONDS);
-       * 
-       * if (wasAborted) { process.destroy(); throw new ConcretizationException( "Timeout (" +
-       * timeout + "s)" + "reached before concretization ended."); } String z3Result =
-       * IOUtils.toString(process.getInputStream(), "utf-8");
-       */
-      Timer processKillerTimer = new Timer();
-      TimerTask processKiller = new TimerTask() {
-        @Override
-        public void run() {
-          try {
-            process.getInputStream().close();
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-          wasAborted.set(true);
-        }
-      };
-      processKillerTimer.schedule(processKiller, 1000 * timeout);
       final BufferedReader reader =
           new BufferedReader(new InputStreamReader(process.getInputStream()));
       String line;
@@ -284,15 +263,14 @@ public class Z3Solver {
       while ((line = reader.readLine()) != null && !Thread.currentThread().isInterrupted()) {
         z3Result += line + "\n";
       }
-      processKillerTimer.cancel();
-      processKillerTimer.purge();
-      Sexp expression = solverStringToSexp(z3Result);
-      return buildConcreteSpecFromSExp(expression, ioVariables);
-
-    } catch (IOException e) {
-      if (wasAborted.get()) {
-        throw new ConcretizationException("Timeout (" + timeout + "s) reached for concretization!");
+      if (process.exitValue() == 0) {
+        Sexp expression = solverStringToSexp(z3Result);
+        return buildConcreteSpecFromSExp(expression, ioVariables);
+      } else {
+        throw new ConcretizationException("Z3 process failed. Output: \n"
+            + IOUtils.toString(process.getErrorStream(), "utf-8"));
       }
+    } catch (IOException e) {
       throw new ConcretizationException(e);
     } catch (SexpParserException e) {
       throw new ConcretizationException(e);
@@ -325,5 +303,9 @@ public class Z3Solver {
     }
     z3String = z3String.substring(z3String.indexOf('\n') + 1);
     return (SexpFactory.parse(z3String));
+  }
+
+  public Process getProcess() {
+    return process;
   }
 }

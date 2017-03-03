@@ -4,13 +4,16 @@ import edu.kit.iti.formal.stvs.logic.specification.ConcretizationException;
 import edu.kit.iti.formal.stvs.logic.specification.smtlib.SmtConcretizer;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
+import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
+import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
+import edu.kit.iti.formal.stvs.util.AsyncRunner;
 import edu.kit.iti.formal.stvs.util.AsyncTaskCompletedHandler;
-import edu.kit.iti.formal.stvs.util.JavaFxAsyncTask;
+import edu.kit.iti.formal.stvs.util.JavaFxAsyncProcessTask;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
@@ -47,7 +50,7 @@ public class SpecificationController implements Controller {
   private Selection selection;
   private HybridSpecification hybridSpecification;
   private BooleanProperty specificationInvalid;
-  private JavaFxAsyncTask<ConcreteSpecification> concretizingTask;
+  private JavaFxAsyncProcessTask<ConcreteSpecification> concretizingTask;
   private final ConcretizationTaskHandler concretizationHandler;
 
   public SpecificationController(ObjectProperty<List<Type>> typeContext,
@@ -142,18 +145,15 @@ public class SpecificationController implements Controller {
   }
 
   private void startConcretizer(ActionEvent actionEvent) {
-    this.concretizingTask = new JavaFxAsyncTask<>(
-        this::runConcretizationSynchronously, this.concretizationHandler);
+    ConcretizationRunner runner =
+        new ConcretizationRunner(
+            tableController.getValidator().getValidSpecification(),
+            variableCollectionController.getValidator().getValidFreeVariables());
+    this.concretizingTask = new JavaFxAsyncProcessTask<>(
+        globalConfig.getSimulationTimeout(), runner, this.concretizationHandler);
     concretizingTask.start();
 
     onConcretizationActive();
-  }
-
-  private ConcreteSpecification runConcretizationSynchronously()
-      throws ConcretizationException {
-    return new SmtConcretizer(globalConfig).calculateConcreteSpecification(
-        tableController.getValidator().getValidSpecification(),
-        variableCollectionController.getValidator().getValidFreeVariables());
   }
 
   private void stopConcretizer(ActionEvent actionEvent) {
@@ -199,6 +199,29 @@ public class SpecificationController implements Controller {
     public void onException(Exception exception) {
       AlertFactory.createAlert(exception);
       onConcretizationInactive();
+    }
+  }
+
+  private class ConcretizationRunner implements AsyncRunner<ConcreteSpecification> {
+
+    final ValidSpecification specToConcretize;
+    final List<ValidFreeVariable> freeVariables;
+    final SmtConcretizer concretizer;
+
+    private ConcretizationRunner(ValidSpecification specToConcretize, List<ValidFreeVariable> freeVariables) {
+      this.specToConcretize = specToConcretize;
+      this.freeVariables = freeVariables;
+      this.concretizer = new SmtConcretizer(globalConfig);
+    }
+
+    @Override
+    public ConcreteSpecification run() throws Exception {
+      return concretizer.calculateConcreteSpecification(specToConcretize, freeVariables);
+    }
+
+    @Override
+    public Process getProcess() {
+      return concretizer.getProcess();
     }
   }
 }
