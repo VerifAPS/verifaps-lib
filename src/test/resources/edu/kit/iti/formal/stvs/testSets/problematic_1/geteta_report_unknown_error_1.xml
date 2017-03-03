@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><ns2:message xmlns:ns2="http://formal.iti.kit.edu/exteta-1.0/report/" returncode="unknown">
+  <log>
+    <entry level="debug" time="61">read xml file /tmp/verification-spec6589466183628566803.xml</entry>
+    <entry level="debug" time="202">xml file successfully read</entry>
+    <entry level="info" time="202">No options in table file.</entry>
+    <entry level="info" time="202">No functions given in table file.</entry>
+    <entry level="debug" time="202">4 variables found</entry>
+    <entry level="debug" time="202">	 var_I : INT</entry>
+    <entry level="debug" time="202">	 var_J : INT</entry>
+    <entry level="debug" time="202">	 var_SUM : INT</entry>
+    <entry level="debug" time="202">	 var_FLAG : BOOLEAN</entry>
+    <entry level="debug" time="291">parsed: [1,3] to ((0sd16_1&lt;=var_I)&amp;(var_I&lt;=0sd16_3))</entry>
+    <entry level="debug" time="292">parsed: [1,2] to ((0sd16_1&lt;=var_J)&amp;(var_J&lt;=0sd16_2))</entry>
+    <entry level="debug" time="301">parsed: = var_SUM[-1] + var_J to (var_SUM=(var_SUM__history._$1+var_J))</entry>
+    <entry level="debug" time="303">parsed: FALSE to (FALSE=var_FLAG)</entry>
+    <entry level="debug" time="304">parsed: - to TRUE</entry>
+    <entry level="debug" time="305">parsed: - to TRUE</entry>
+    <entry level="debug" time="305">parsed: - to TRUE</entry>
+    <entry level="debug" time="306">parsed: TRUE to (TRUE=var_FLAG)</entry>
+  </log>
+</ns2:message>
