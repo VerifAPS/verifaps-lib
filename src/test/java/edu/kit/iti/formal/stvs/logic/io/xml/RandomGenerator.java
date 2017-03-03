@@ -94,10 +94,8 @@ public class RandomGenerator {
                                               FreeVariableList freeVariableList) {
     String cellString = "";
     int randomInt = random.nextInt(10);
-    if (randomInt < 3) {
+    if (randomInt < 9) {
       cellString = randomAssignment(ioVariable, columnHeaders, freeVariableList);
-    } else if (randomInt < 8) {
-      cellString = randomBooleanExpression(columnHeaders, freeVariableList);
     } else {
       cellString = "-"; // Wildcard with probability 10%
     }
@@ -145,13 +143,13 @@ public class RandomGenerator {
       // random unary expression - there is only one, unary minus
       return "-(" + randomIntegerExpression(columnHeaders, freeVariableList) + ")";
     }
-    if (randomInt == 2) {
+    if (randomInt < 4) {
      // random binary expression
       return "(" + randomIntegerExpression(columnHeaders, freeVariableList) + " " +
           randomIntegerBinaryOp() + " " + randomIntegerExpression(columnHeaders, freeVariableList)
           + ")";
     }
-    if (randomInt == 3) {
+    if (randomInt < 6) {
       // back reference or variable
       List<String> intVariables = new ArrayList<>();
       for (SpecIoVariable var : columnHeaders) {
@@ -167,7 +165,7 @@ public class RandomGenerator {
       }
       return varName;
     }
-    if (randomInt == 4) {
+    if (randomInt < 8) {
       // free variable
       List<String> intVariables = new ArrayList<>();
       for (FreeVariable freeVariable : freeVariableList.getVariables()) {

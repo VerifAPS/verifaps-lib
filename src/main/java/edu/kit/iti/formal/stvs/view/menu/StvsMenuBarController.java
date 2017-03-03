@@ -91,7 +91,7 @@ public class StvsMenuBarController implements Controller {
         } catch (IOException | ImportException e) {
           AlertFactory.createAlert(Alert.AlertType.ERROR, "File Open Error",
               "An error occurred " + "while opening a file.",
-              "The file " + filename + " could not be opened.", e.getMessage());
+              "The file " + filename + " could not be opened.", e.getMessage()).showAndWait();
         }
       }));
       view.openRecentItems.add(newItem);
@@ -266,7 +266,7 @@ public class StvsMenuBarController implements Controller {
       ConstraintSpecification spec = rootModel.get().getScenario().getActiveSpec();
       if (spec == null) { // There is no active specification tab open yet
         AlertFactory.createAlert(Alert.AlertType.ERROR, "Save Specification",
-            "No specification available.", "");
+            "No specification available.", "").showAndWait();
       } else {
         FileChooser fileChooser = FileChooserFactory.createSaveFileChooser(SPECIFICATION,
             rootModel.get().getWorkingdir());

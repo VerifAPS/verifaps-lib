@@ -1,32 +1,32 @@
-<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="c8mTLCHauv72wPgMeBp435gGY12PTVYvtGoPU0Tw5r9cf0cA" isConcrete="false" name="aocrMW72bp5RScWyZiQo0S5pZbltuIjlu">
+<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="kEn1tynNkyk3CJYk2DvqPH6Fpb0oY6oRJh" isConcrete="false" name="4H4QQsAo">
 <variables>
-<ioVariable colwidth="100" data-type="BOOL" io="output" name="H6TOu5fxgnPAuWnE3HrKittKrKZjYSLYn8xIIEYdyUFPgDyiCZ"/>
-<ioVariable colwidth="100" data-type="SxNL0rgVy2tpOFVu1wW" io="input" name="YBt21SyDAdfys0PqQY"/>
-<ioVariable colwidth="100" data-type="INT" io="input" name="r04RTWJQxnKsVFjuPc0fRaBzmUIH9YsMrXj0QdB2"/>
-<ioVariable colwidth="100" data-type="eyHYDON8hko0aJnqDes8YUmDyD3a5l0Em" io="output" name="ILW"/>
-<freeVariable data-type="BOOL" default="FALSE" name="vV8lvoHsDWqFNN4wcdB4uyb7FS9iygiUFAKg2n"/>
+<ioVariable colwidth="100" data-type="INT" io="input" name="KcLRfmtLmYQoFB"/>
+<ioVariable colwidth="100" data-type="dgpymlHjpN" io="input" name="wf43xQnPu1KBtPfJzY81oiwsQ9pfOYTg1EBVyTMJisa"/>
+<ioVariable colwidth="100" data-type="BOOL" io="input" name="k5XLVN385BVBJwCOznij9uH8comLxioeyP2wKd6C0muq49r"/>
+<ioVariable colwidth="100" data-type="BOOL" io="input" name="Wx4WRdl4VIBtImAUcB4qHhzrKFNoacyS9f"/>
+<freeVariable data-type="INT" default="1" name="qk05zHWuu1wtc"/>
 </variables>
 <rows>
-<row comment="FiqW3Pe8vuHPlvlRSv22LNKMqoeCZZghWXXhSOYkp3VSuV6NXk3YuDY1m7K8OWLQc2bDW4r7F6tJm2PkjafYQ3hyOJ1ePInelw5c">
-<duration>[5,12]</duration>
-<cell comment="VyQHtwU09">(TRUE XOR TRUE)</cell>
-<cell>-</cell>
-<cell comment="rqxL7CsYPnKyElbmgnzlkrbDOxWx0Xz7UuYm7z">(H6TOu5fxgnPAuWnE3HrKittKrKZjYSLYn8xIIEYdyUFPgDyiCZ[-6] OR TRUE)</cell>
-<cell>=KuVmLE90I6IWUl7j2AZq</cell>
-</row>
-<row comment="DdyYnI7hEA7m9dPmb8NQFDSdlXvYWxa3siwmJU1gElKEkKv4X7Ofehilh88j3bJAbNih944ukvP5haBvvC3ZCOw2dDhxftmxtc4K">
-<duration>[6,-]</duration>
-<cell comment="oW8brZxZKtXEBK024jEsp">-</cell>
-<cell>-</cell>
-<cell>TRUE</cell>
-<cell>=KuVmLE90I6IWUl7j2AZq</cell>
-</row>
-<row comment="pnCXSQT660KnrRyvbtQ5zPUDgXyg1P0fxzwNft3vWgJjvILIbhsBLdEEZsBgZwy57aTF1zGsr0xhSYiiZShkJ16SKQ8Sqb845wFg">
+<row comment="ZeSCwVTilzzfaBHlQADsnIMYJIIWz7lGfHpIWfdQdlXg0cx1dwSXiGyydIwBDca1n8Idv0zoPdVkJwRmY69inRUEPr1M2Cbezdcr">
 <duration>-</duration>
-<cell comment="">H6TOu5fxgnPAuWnE3HrKittKrKZjYSLYn8xIIEYdyUFPgDyiCZ</cell>
-<cell>=yCmzZEHxa4</cell>
-<cell comment="4wEsJ4YzCouRiPFF85v8IapqNwMMvR3MkfztnlOL1o5wpx0">TRUE</cell>
-<cell comment="4ZW7ZTmqOtkpZxslGKHg5RfAryLOHAeuMvEHYwoaPpAWpXKy2XfIrWtDRcBSieLeKXkXhRf0RFrrDNIT1NHADniueWnnpEzPAB">-</cell>
+<cell>=KcLRfmtLmYQoFB[-2]</cell>
+<cell comment="Y8IGf9PXD2EjlOIPLWzPFWSDq8r35uAfjmnuzCtLus7iMS2joBFmMRTOkDAaj4Ca2XFuQRDLIfWU">=s9wEDwKJ6a1cFP2Vk7Ysn09LpTtfSqPKnHNXzWJfWJJfC</cell>
+<cell>=(11181 &lt;= qk05zHWuu1wtc)</cell>
+<cell>=(TRUE AND FALSE)</cell>
+</row>
+<row comment="">
+<duration>[9,-]</duration>
+<cell comment="4xOmNK4VlQk8YGsHAe2ZInuWvZHItKlsWQHH8NKWqFpqOAir7gh7yLHD7bMJkG">=((KcLRfmtLmYQoFB[-6] * KcLRfmtLmYQoFB[-0]) + KcLRfmtLmYQoFB)</cell>
+<cell>=CxuBfMVVyZ0gn7</cell>
+<cell>=FALSE</cell>
+<cell comment="BUUgsM9Ba0ctdfGMXmiPcozDodgSmYJOaqj7PHMXJGlExZ5xgBNL14sF3ofLZbgCSH74xtI2PFH0BI0RU">-</cell>
+</row>
+<row comment="">
+<duration>[8,-]</duration>
+<cell comment="SFmixnXCwA9H1LmOxeRB0PBQAv1CXDzn5OKMCu93K5IEaekvMShgQ63IUeF4X">=-(23473)</cell>
+<cell comment="nqSQqbOxHteRfCAYTU5QO35duQl6xG8Z7HYzBYkSWCjgMDJm8uZSTxLrdx2oDd5JVn2MNRozSVS1V4oWnZr">=PmvJ0</cell>
+<cell comment="uNlInZuAGYuxoF5z7kkQUpISEjsTPGHsvDk80I4xk3Iclq4G5lNLWNC2lux">=Wx4WRdl4VIBtImAUcB4qHhzrKFNoacyS9f[-8]</cell>
+<cell>=NOT TRUE</cell>
 </row>
 </rows>
 </specification>

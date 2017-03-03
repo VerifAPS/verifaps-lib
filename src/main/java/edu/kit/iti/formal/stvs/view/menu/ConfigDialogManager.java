@@ -93,7 +93,7 @@ public class ConfigDialogManager implements Controller {
       } catch (IOException | ExportException exception) {
         AlertFactory.createAlert(Alert.AlertType.ERROR, "Autosave error",
             "Error saving the current configuration",
-            "The current configuration could not be saved.", exception.getMessage());
+            "The current configuration could not be saved.", exception.getMessage()).showAndWait();
       }
       return config;
     });

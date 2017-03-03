@@ -144,7 +144,7 @@ public class SpecificationController implements Controller {
             } else {
               AlertFactory.createAlert(Alert.AlertType.WARNING, "Concretizer warning",
                   "No concrete instance found",
-                  "The Solver could not produce a concrete example with the given table.");
+                  "The Solver could not produce a concrete example with the given table.").showAndWait();
             }
             view.setConcretizerButtonStart();
             view.getStartConcretizerButton().setOnAction(this::startConretizer);
@@ -152,7 +152,7 @@ public class SpecificationController implements Controller {
         }, exception -> {
           Platform.runLater(() -> {
             AlertFactory.createAlert(exception, "Concretization Failed",
-                "An error occurred while " + "concretizing the specification.");
+                "An error occurred while " + "concretizing the specification.").showAndWait();
           });
         });
   }

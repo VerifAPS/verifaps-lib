@@ -1,32 +1,32 @@
-<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="ZiiW0IsV519JvHlNee4JUWNOeGfaJIqrC3a52" isConcrete="false" name="uRHLlo7hdC">
+<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="ioQXeOmZZjzV1tmxXLKLBUl2QNIXxqRk8" isConcrete="false" name="9S6H0SkMsK7xiNQ9farueLMchccYuQ3Aw0d3vf9prakb">
 <variables>
-<ioVariable colwidth="100" data-type="BOOL" io="input" name="a3rox7VKkqzZTxV5E"/>
-<ioVariable colwidth="100" data-type="BOOL" io="output" name="Z3mJeyxMFpJvhwaPKvw2d22EbBzRkcwhmLL9F8RALg6aeI"/>
-<ioVariable colwidth="100" data-type="INT" io="output" name="pjgkDl55nJz12GdN6cU5Yfh"/>
-<ioVariable colwidth="100" data-type="BOOL" io="output" name="SiZZUJaNFSx7cddRlzrcZSvFW4qJQRlKg"/>
-<freeVariable data-type="UPqRp7SKOTwtMWWCZ" default="ffHWjtrzrtnnQ9xfgfgV777OmOVtvO1B6pk6GbRn" name="BZcnE9fFwnSf"/>
+<ioVariable colwidth="100" data-type="gYgnapeVlSAYmhJREVrIQQiaQduGWkUQPHCwwjzbQe07tGI" io="output" name="m7LA60a6pybjYcXxITYmyC8NAqTzVjvlUEDTN"/>
+<ioVariable colwidth="100" data-type="INT" io="output" name="KneaVWibNjOFaJ2EgYAI5RvxXm"/>
+<ioVariable colwidth="100" data-type="INT" io="input" name="VppScybFGge65qepCEhUH2p6HuWasOXZb7uG"/>
+<ioVariable colwidth="100" data-type="INT" io="input" name="nphl"/>
+<freeVariable data-type="INT" default="1" name="RH257l9Fy4GBk3ISze95LHmu6mZhVCtF49llZVcoBuIOe4"/>
 </variables>
 <rows>
-<row comment="">
-<duration>[6,15]</duration>
-<cell>TRUE</cell>
-<cell>-</cell>
-<cell comment="t23h4xsYR6EbcRj6MUEtwt0GMaft6Ah">(FALSE AND FALSE)</cell>
-<cell>Z3mJeyxMFpJvhwaPKvw2d22EbBzRkcwhmLL9F8RALg6aeI[-9]</cell>
-</row>
-<row comment="">
-<duration>[9,-]</duration>
-<cell comment="iqjSXshzXCGMMGI1D4a4Sz2BTzh6n10iS8CZvR3LKg8pVLyuI6DuBLYGeeLx1ZhTd1KTBT8cy9eMzNe">=((30202 &lt; 23495) AND TRUE)</cell>
-<cell>SiZZUJaNFSx7cddRlzrcZSvFW4qJQRlKg[-7]</cell>
-<cell comment="cVY7lg2gz">FALSE</cell>
-<cell>-</cell>
+<row comment="9X7EN7javIsQIPSMyaOdHwXZ202j5s9cTi4tQAX5kN4wh3xvS5JET8L0lriD07Q1QMXHHx79EpGfwgKh22y0HpY0bHhJTP8s4K6d">
+<duration>[7,-]</duration>
+<cell>=xXFYuaYZGa7sao7B89UZKa</cell>
+<cell>=25628</cell>
+<cell comment="OEIuzOnuP26DmKii21ZfGbh1wihowivjmYMC59D1uDvkaMip5zm0WDfZn0ZJPSjs4vE4jPGEeJMvmqnVUMre5nK">=3738</cell>
+<cell>=VppScybFGge65qepCEhUH2p6HuWasOXZb7uG</cell>
 </row>
 <row comment="">
 <duration>-</duration>
-<cell comment="bKvlcbhaZ7MUBH4KgZHSQZHoLi0wzQ">FALSE</cell>
-<cell comment="OzT3iPhySwqQIyipzlGPFNa0FdZRH3vqJMtIYtdoWaFyV">a3rox7VKkqzZTxV5E[-4]</cell>
-<cell comment="TuiyOVzRfLAMzBACh2w1JibgIa5P7m1iQvcJICV9U9P">TRUE</cell>
-<cell comment="6DJPYGxslIvkFdCXKNidXNZwhbebl3NZmGMsj">(Z3mJeyxMFpJvhwaPKvw2d22EbBzRkcwhmLL9F8RALg6aeI XOR TRUE)</cell>
+<cell comment="1SX4GywwNEFtTZOGpU7ifd6RwOkBv9w5oKkZfuhT9i3QV1Su6jSEB0Z9A4lsxx">=xXFYuaYZGa7sao7B89UZKa</cell>
+<cell>=-(RH257l9Fy4GBk3ISze95LHmu6mZhVCtF49llZVcoBuIOe4)</cell>
+<cell comment="FPbyy6YX8q46ySQMwafiPirLwAQZuUATAzslqquc4MIVaMmYLXtnnaeCoq6HNj">-</cell>
+<cell>=17687</cell>
+</row>
+<row comment="g0Q0m66thfcthrhzOHgT1vC7oJHZ8KQ28MCPrvqZ8dLX7m5zbE9X1LP77moe8zZsmJGw1Pu97xxRzoZM3RSjUCxGUO0RkYQJLdOO">
+<duration>[1,-]</duration>
+<cell comment="CtZFmZaGbXYFRRM57mPRTMuJFf9CUBW5eEuTKh7luhGxv9E0AoGsLGCmGj7AA7R69CgMogR5uaeqye">-</cell>
+<cell>=((RH257l9Fy4GBk3ISze95LHmu6mZhVCtF49llZVcoBuIOe4 * (((RH257l9Fy4GBk3ISze95LHmu6mZhVCtF49llZVcoBuIOe4 * ((KneaVWibNjOFaJ2EgYAI5RvxXm[-0] MOD (-(RH257l9Fy4GBk3ISze95LHmu6mZhVCtF49llZVcoBuIOe4) - (KneaVWibNjOFaJ2EgYAI5RvxXm * nphl[-1]))) * (((25819 * (RH257l9Fy4GBk3ISze95LHmu6mZhVCtF49llZVcoBuIOe4 + nphl)) * KneaVWibNjOFaJ2EgYAI5RvxXm[-7]) / (VppScybFGge65qepCEhUH2p6HuWasOXZb7uG MOD VppScybFGge65qepCEhUH2p6HuWasOXZb7uG[-8])))) / KneaVWibNjOFaJ2EgYAI5RvxXm) - nphl[-9])) MOD 27618)</cell>
+<cell comment="A9t4E7RH8hgzgqjYESbrvSCnTjyDEUWYZ8BQ3Bx5cumd6a6enox2tDR">=-((VppScybFGge65qepCEhUH2p6HuWasOXZb7uG[-8] MOD ((nphl[-6] - (RH257l9Fy4GBk3ISze95LHmu6mZhVCtF49llZVcoBuIOe4 - (15004 MOD (24057 - 18354)))) / RH257l9Fy4GBk3ISze95LHmu6mZhVCtF49llZVcoBuIOe4)))</cell>
+<cell comment="G4iaStJVT9VNkEEmV50PK3RdE5hF49V9WiqEmrv4yJJrGwehPx7UuMFIVkQiKCYSyDx8CQ1XwwiHvhrwgS6t6cRx">=-(nphl)</cell>
 </row>
 </rows>
 </specification>

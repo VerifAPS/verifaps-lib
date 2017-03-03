@@ -1,32 +1,32 @@
-<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="jexHXmpVceDqxX8nwbV085CpBtBQ4j3DTl3gJZPYUEu6S1Ro54ctjTKhhNUbx5Zuw27dXeFyMNUTU0goenZLRQndEZ9wyEAHS" isConcrete="false" name="3BbvwORpIe4BPh7DqDDxxF0GfKTx8H0hHK9E4DM4op">
+<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="mHXzBOd15iWzUDTtqUbdDPITQ0sbAUudOuYWhPRVwcoB6e" isConcrete="false" name="I9">
 <variables>
-<ioVariable colwidth="100" data-type="LZcWMr3MlBECuG" io="output" name="k7jkuU1YFk4GNibaNLdwDog3fV56Z8M1SnlgG7E8RfzSJ"/>
-<ioVariable colwidth="100" data-type="INT" io="input" name="D7UWZy7Ef7PEpoXCNpiUtdnBuoXXBk8dcnx"/>
-<ioVariable colwidth="100" data-type="INT" io="input" name="glJE6DZUWiEbEpcMad6WkfY4rZ021Mb0XgWr6s3"/>
-<ioVariable colwidth="100" data-type="LZcWMr3MlBECuG" io="output" name="Y1wGndZuFzN4"/>
-<freeVariable data-type="LZcWMr3MlBECuG" default="DguXNhGpXjieHUoNR9nnRI2Akj3bWjX0KE3" name="FPbO70joUzIu9v"/>
+<ioVariable colwidth="100" data-type="BOOL" io="input" name="cQSQ2fDlMikqvTo"/>
+<ioVariable colwidth="100" data-type="BOOL" io="output" name="z"/>
+<ioVariable colwidth="100" data-type="x0tj8tGEnogZQ5lwg8e0SGkJsMpsJ8vkbjoTTJq" io="output" name="f0ZI9JTZNCN72qQ"/>
+<ioVariable colwidth="100" data-type="INT" io="output" name="FXZu0gPuDkXxwZdcio46HKyfituA8lZaJ"/>
+<freeVariable data-type="x0tj8tGEnogZQ5lwg8e0SGkJsMpsJ8vkbjoTTJq" default="KpnAiULoVHLx2VlTVf5R1WSeTSVPX" name="IsQqZW57JSzl8SrantmZyDU6ujRQ8VZcQvnM"/>
 </variables>
 <rows>
-<row comment="0YZoRQuTj9QWOhSUx0rTcjcQ0hONWzKC5MoEb5ZQysgsqbc9HKFiOME7siEG4hEkRisRcA0D0FyHeRBhUvb2SXkJ41yfixQ0WCrp">
+<row comment="">
+<duration>[2,3]</duration>
+<cell comment="SSnR6g4dVIzgM0t9Z0n">=TRUE</cell>
+<cell comment="H6dyQcVabRnYLaMk5TGs7NiXfXjjUSi7siUuxgDXrfel0aRP8jCFDhGl">=(FALSE AND FALSE)</cell>
+<cell comment="CMUWfmrEFOnfYyElvilHlvRFG5gFUoB6Z3wwEnMB7">=G1</cell>
+<cell comment="Dx4Ghn9IewZCGv2o7YPPHGkEKmMVlOjHDJY7PZDlMksrApOF4DvOf7Ru1s8RGuxtA8dXjh77bm54iAmMP9pu0eF1Qr6DDD0">=13550</cell>
+</row>
+<row comment="">
 <duration>-</duration>
-<cell comment="Wncte1NVXmbnRLVddkZf8mCsIabwz">-</cell>
-<cell comment="FDl0LaFlvnEWg1bRv98CbLYO5g6ZQndu4wrMHik4DY1lQjdMKEV64gc5NUGJzZsGlJ06ITMfCE0Ck6yAdux">FALSE</cell>
-<cell comment="wEcSZ7wziXQon46TbYI3Vu76lsqi1n2NUXX6ohTqY0oHLosLdYlyYMsBHiSYNn32q31W">-</cell>
-<cell comment="sOwWLKF2Whv">-</cell>
+<cell>=FALSE</cell>
+<cell comment="UgQiaMk070nCtRaLTjsRKMvZhy8jPwn6sgKQ">=TRUE</cell>
+<cell comment="7VlnhHq4wr3PEGGtEApFTOnDgZ8INm9mXD2ezxy5">=xEmxb3CfiGZgSqAUTNF</cell>
+<cell>=17247</cell>
 </row>
-<row comment="">
-<duration>[4,10]</duration>
-<cell>-</cell>
-<cell>=24173</cell>
-<cell>=27472</cell>
-<cell comment="mAhzI6O0bDhKuXA9S8idGS6idJRXUo5ioZ3hDLFbv">NOT FALSE</cell>
-</row>
-<row comment="">
-<duration>[3,9]</duration>
-<cell>NOT FALSE</cell>
-<cell comment="tbQ21wXdzkNEVPo1SnvgNaVSRZdfQTljgamNzhAVoAp98afLEo72K4qYakodvS">=20330</cell>
-<cell comment="Pu5eFJRFsP379EZrSUogDwQPX8YoOL9gziNvaoIZR2EfbuOMrOZdisz9qtDze9WpaKYiwAV4XaL9kYZUL">(TRUE AND FALSE)</cell>
-<cell comment="gO7i412YvrfuDJHXloC5hBwUSQGA9xS05fKBZJJmJchdLK9KNR87w2zkSFUL8fFK5HclxDo4iGvkw0QrfD">FALSE</cell>
+<row comment="xGKy1KtLJFiqf8wD5TSjQM5QsYIEH0kMUg8nl7DH7XTOJ4rv65qBn6gUaI9ahHldHlkv9vlzJvDvJjZUui9dQrKdkvkYElrVGpKL">
+<duration>[4,11]</duration>
+<cell>=(FXZu0gPuDkXxwZdcio46HKyfituA8lZaJ[-1] &lt; 10380)</cell>
+<cell comment="3vMZMmj3RLRo0FioCsOtziIJWC8UceZM7IONs5VvGDcnCoxwRhR6yGCSOLbcMd6jVPoLAm45e5q5iA2EphhUlPBkLgaC">-</cell>
+<cell>=KpnAiULoVHLx2VlTVf5R1WSeTSVPX</cell>
+<cell comment="D96lx3svBCcKdhMvgVPnCxKyjTf7uesGzSWMIHkMnibYSKAMoe7dgB2PZmtX5Whqm7Jv">=-(21202)</cell>
 </row>
 </rows>
 </specification>

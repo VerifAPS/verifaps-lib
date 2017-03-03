@@ -90,7 +90,7 @@ public class StvsMainScene {
       } catch (IOException | ExportException | JAXBException e) {
         AlertFactory.createAlert(Alert.AlertType.ERROR, "Autosave error",
             "Error saving the current" + " configuration",
-            "The current configuration could not be saved.", e.getMessage());
+            "The current configuration could not be saved.", e.getMessage()).showAndWait();
       }
     }
   }

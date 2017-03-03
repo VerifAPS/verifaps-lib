@@ -13,6 +13,6 @@ public class ErrorMessageDialogDemo extends Application {
 
   @Override
   public void start(Stage stage) throws Exception {
-    AlertFactory.createAlert(new Exception("Test"));
+    AlertFactory.createAlert(new Exception("Test")).showAndWait();
   }
 }
