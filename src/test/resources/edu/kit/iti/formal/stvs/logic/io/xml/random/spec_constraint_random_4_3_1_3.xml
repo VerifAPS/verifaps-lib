@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="㣥뙾蛅ᷣ蛞쐉짙铁뜚订䩴ሀ䆧᜶꺩쐾姶䆘突ᅇ钖袸∣ꎝ浢㶗쥫萳" isConcrete="false" name="儾勑朑닥&#161586;ጚꓬ쮷㌾">
+  <variables>
+    <ioVariable colwidth="100" data-type="W7_M$$xp$" io="input" name="S3$RKqSs"/>
+    <ioVariable colwidth="100" data-type="W7_M$$xp$" io="input" name="JN_xaL$cX$t"/>
+    <ioVariable colwidth="100" data-type="INT" io="output" name="_J__$"/>
+    <ioVariable colwidth="100" data-type="BOOL" io="output" name="_d7_"/>
+    <freeVariable data-type="W7_M$$xp$" default="QY__$9$$_" name="o2hiG$_$wR"/>
+  </variables>
+  <rows>
+    <row comment="༔ᱥ篚쮄橭瞑쌴빦㳃恁뉭༳Ṁ蕂禉ầ瞉箍&#107857;怏燓ᬤ呫ꋾϟ&#735262;৚㠴葮ꋗ凲멨墊ꏔ咋∅㵶턓ꙶえ︳듃齴度傳䗡䑝ᇁ츐힉竧뢐獞콡ⴎ喕愧ꈕဿ⽻ⵤ豨첩Ĳ⇅粕锯亁⺯望此紸ï놈拿︮㙓ᶛ냥岷&#148421;峟覃젶">
+      <duration>-</duration>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>=-(20353)</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="‎噰娨&#478294;⹸냟퀞䖲&#117611;◫쫢뻞⍚歫ꎆ憯㢺豹⧿ꔏ䒈衆힪饩梐폮䉁쵄饲꽝ἡ쮓爠嗌돨愗捼엯&#959582;샄퉫揢䍏훑Ʞ輻w㤀㫼լᤇ讨䔿濇䷩⒬숽ៀσ횿轋窖匱ᏬᯚⱫ䆁잋Ὥ퐩൨夌炐⯑巯繼瓿扇㌰ﾎ턜髂㩈︀鶭♲">
+      <duration>[4,-]</duration>
+      <cell>=UfK1UrjC</cell>
+      <cell>(FALSE OR FALSE)</cell>
+      <cell>(TRUE AND TRUE)</cell>
+      <cell>=FALSE</cell>
+    </row>
+    <row comment="㌦嶷잵돞嘼愮ꃊ섰례☏テ壻╜㣊郠콚鞉癨⇞腦屿囩鱃䧄喤░䒶㓴&#66588;真齆Ἑ傓謫鰁︭㛖鹊拍ꪳ㡜썗ൃ໼マ&#121715;ѐ㛝偂ꮑ뙶ᷗ떊갨픜ꄼ᧤묵䫨띎꿆僕㻅蟧넳푇儬颠䞽౛螥嚙琯갇夙嫎能켲ⓐ᯶ࢉ즣鲺﷈꽪쀴呅">
+      <duration>[0,9]</duration>
+      <cell>=UfK1UrjC</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>=FALSE</cell>
+    </row>
+  </rows>
+</specification>

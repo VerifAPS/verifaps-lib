@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import javafx.application.Platform;
+import jdk.nashorn.internal.runtime.arrays.ArrayIndex;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -85,14 +86,14 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     processBuilder.environment().put("NUXMV", config.getNuxmvFilename());
     getetaOutputFile = File.createTempFile("verification-result", ".log");
     processBuilder.redirectOutput(getetaOutputFile);
-    getetaProcess = processBuilder.start();
-    // Find out when process finishes to set verification result property
     try {
+      getetaProcess = processBuilder.start();
+    // Find out when process finishes to set verification result property
       processMonitor = new ProcessMonitor(getetaProcess, config.getVerificationTimeout());
       processMonitor.processFinishedProperty().addListener(observable -> onVerificationDone());
       // Starts the verification process in another thread
       processMonitor.start();
-    } catch (IllegalArgumentException exception) {
+    } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException exception) {
       throw new VerificationError(VerificationError.Reason.VERIFICATION_LAUNCH_ERROR);
     }
   }

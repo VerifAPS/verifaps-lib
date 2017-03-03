@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="磆ज़㎷㜿燝㯛琸䨊㜦ັ⍅ϩᇓ붲㮨￡ㆋ쵥失ऎ蓝亱殲뛤⺑谆벪蓿␎侑ᳳ咱䫍럻䞡猸Ⴀ⮴㦺㘷ᤞ앎ꡟꅱ←ᆯꋃᢕ뵕㽲⡚魗켳㬨쵟吼츛쁀筗洧䱇କ處&#260106;擰㗘뛵&#222330;䓣忩ﱳ텾돝鋼뼼行渃ꛂ뒞哭᫶豔ᡪ녀" isConcrete="false" name="ስ鄔㊵⼢귊།ᨄ䝔肮朅婰໏斅듮ႝ檩頗&#102811;ⷍ⡯饺빹펱㋞鍎⟩⎠쥠䏈嬺蘡峵콕ꆧ橗㿜맭銕诿␴&#181519;">
+  <variables>
+    <ioVariable colwidth="100" data-type="$KI$e3JDg" io="output" name="saF_2J3"/>
+    <ioVariable colwidth="100" data-type="INT" io="input" name="I8U_l__xu_QG_"/>
+    <ioVariable colwidth="100" data-type="BOOL" io="input" name="ygz2aZPQV"/>
+    <ioVariable colwidth="100" data-type="INT" io="output" name="Jshz2$aRagTxuTlb9w3"/>
+    <freeVariable data-type="m$qnG$uNjXB__9" default="d6" name="ViEI69ZIXd_j"/>
+  </variables>
+  <rows>
+    <row comment="ᅾ제䘖겉垐ⓒ艄ぇ扣Ɯጞ蟞䮫驔色㩤釐ꦅ앩ド«썅ꛙř⒂ᒌ꽂僦寎⽙㧟翐堥&#563233;ꪝ厊ᖨԍ鯇&#113384;씹ꭅ틬㊌⊑縎꪿ࡗ慝缋璠ៗ粔贛휫⋴蒈罺ѯ່闲ڡ㈋혦巅ꛝ娢㽚쵻㜠뫩☦佩ӶẎ숦뇏쏑귰̱ቆⰒ텏퐨櫂">
+      <duration>-</duration>
+      <cell>TRUE</cell>
+      <cell>=22016</cell>
+      <cell>=FALSE</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="넱&#70475;妯徱혎퉒Ѵ낏왒㾵㙍ങ⺪䯖埯쭱ㄲ⪻鸟ᨂ䘙笓镮㾺喛⛟퇳列쾩ﶩư量稿뙙&#782352;&#140369;䤊녦䧃ឋ에裝멯煱൶捚먟&#106879;龂쌹ᙃ柺潣懫탄冫㴵霋ᮻ욹Ն렯㩳丙婠㻡퇌◄拆繩慕&#239738;蘆蚊肱ﾴ쯙꠵᮰綵Ꮌ쟩쵀⑲흗垡&#742416;阣">
+      <duration>-</duration>
+      <cell>=E_$H_h2</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>=10223</cell>
+    </row>
+    <row comment="ҩ뾞꧓ຏԮ敾樁맰쌋⪛&#690206;徉颫ᆯ熧풸ƛꏝ嬑騦ﲩｸ䅰㹛軎덅礞䲥䇁蹁糭䆇ᑖ䇑ᓪ㣳팧&#79620;ު摼躣㼊宲㜸⸾岔䃥糒汃㺤麨쭧绀幌敪橶篶﫲C罈嘹ࢯ筎鶆婲ٜ⛽얎ᕿ鏵䤌뱧랼᯵꽌篿躶獢렋䱕꟩컻笯雠뙠⪡쎥">
+      <duration>[2,8]</duration>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+    </row>
+  </rows>
+</specification>

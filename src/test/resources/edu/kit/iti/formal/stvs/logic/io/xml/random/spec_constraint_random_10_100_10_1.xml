@@ -1,0 +1,1326 @@
+<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="鉯ꯋꈭᒸ箼䃧ຈ냴拤ﶸ恪俇ﱳ㨟⿖졞밴꩷앀䂆香ँ胉舝襑铦榝蔩駯䳡ꍳ⒑솽歿꠫鍭让䬌䎋줄眓漝륙퀭冊䰫큪蟬冐駢엿濒臜▋耢蒼틮娹㖤ο韛운璿ჹﵶጝ鿨ޣ&#71901;✳㉉쯬싇퓘ޥȝ힇ᓐ粬" isConcrete="false" name="゙«榆உ닠꿱锤嬪᫁ە솨飼苬蚊⏨⩉ᄠ磮⚃ᗠ᭵蟮犣㘫ᓱ顧Ỳ뀩ᕧ鳩昁퐋扷叢觎૮뱢敷䶌&#131199;⅒">
+  <variables>
+    <ioVariable colwidth="100" data-type="BOOL" io="output" name="G1TI9vL$K4ADv"/>
+    <ioVariable colwidth="100" data-type="K_8b" io="output" name="M_6_$sJ_Bmk"/>
+    <ioVariable colwidth="100" data-type="BOOL" io="output" name="qWie3_u_W_8$o_S"/>
+    <ioVariable colwidth="100" data-type="BOOL" io="output" name="c2GpJ$heZLpJ_f0H"/>
+    <ioVariable colwidth="100" data-type="__Gzgt_x5d" io="output" name="$W5za_z56mL"/>
+    <ioVariable colwidth="100" data-type="QjZjoQm24q6C" io="output" name="N_I1x2$1"/>
+    <ioVariable colwidth="100" data-type="INT" io="input" name="fH58e0HxJ$aLyV"/>
+    <ioVariable colwidth="100" data-type="BOOL" io="output" name="_0vL5$mJVcwGU"/>
+    <ioVariable colwidth="100" data-type="tx54HXo_ckMF$" io="input" name="_1eUY"/>
+    <ioVariable colwidth="100" data-type="INT" io="output" name="EzKy_"/>
+    <freeVariable data-type="K_8b" default="ZcCgQr" name="$v27pn2fF4nZnmS"/>
+    <freeVariable data-type="INT" default="1" name="bok_Hn0wzf7Re$"/>
+    <freeVariable data-type="BOOL" default="FALSE" name="oMRnDy"/>
+    <freeVariable data-type="BOOL" default="FALSE" name="K$_597h12g"/>
+    <freeVariable data-type="INT" default="1" name="fjo_OLs"/>
+    <freeVariable data-type="BOOL" default="FALSE" name="JcwE$DQ$A3X"/>
+    <freeVariable data-type="BOOL" default="FALSE" name="Boi46S7Wp$gTjS"/>
+    <freeVariable data-type="__Gzgt_x5d" default="w6kB" name="dySLJ_"/>
+    <freeVariable data-type="K_8b" default="ZcCgQr" name="Z_SN$P_5GTv9__"/>
+    <freeVariable data-type="INT" default="1" name="xR$FW$z5U"/>
+  </variables>
+  <rows>
+    <row comment="垕뢔ᢽ젢荳⴪䳏஑&#888911;簣퟼뒷ㄘ싒Ჲ矧䇓&#504889;싮⿀ᰈ꯫⏑躰呫뮃턟鈷敷촍䝕⯮棊｟㍢Ꝛ㿭문婺ꂧ烌恅굓␎㕽埱㨱ᅟ⵲ぴඹᓨ钁龥⎈蓻敏借逺퉇⍮즲歯銌ㅈ⼦ꌢ橱滵킡逽㕧볃㤀﷤⼵㞪믔⹙迟&#419858;贔픨⹻篩">
+      <duration>[4,-]</duration>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>=FALSE</cell>
+      <cell>_0vL5$mJVcwGU</cell>
+      <cell>-</cell>
+      <cell>=o0OUu_9$pzmJMYV</cell>
+      <cell>K$_597h12g</cell>
+      <cell>G1TI9vL$K4ADv</cell>
+      <cell>oMRnDy</cell>
+      <cell>TRUE</cell>
+    </row>
+    <row comment="ˬຏ⪃吂様硚윈ᛟ鎌灪᫄ﭫ灅欬䚉蟜蘲﬍糌⥴轻髕튻吩긥쯳⍸㐪阚㛕꩑&#66598;轼䀤뙞瑂뽕㤒機ꭒ꽓霷軗싅挜&#82152;祂벾썥퉷뫑葑䥹魬꽧庂㴹鍉옅ᶀꍜ䖙茝칹육㹣ি䋈⡈쥨跩ꔱ짴&#79819;弙慘儥봍맺襒&#95626;閻㈐黔飷⓱㕮ᗻ帤鏨">
+      <duration>[0,4]</duration>
+      <cell>FALSE</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>=NOT (EzKy_[-9] &gt; 31738)</cell>
+      <cell>=c2GpJ$heZLpJ_f0H</cell>
+      <cell>=iEy2wj</cell>
+      <cell>TRUE</cell>
+      <cell>=-(31530)</cell>
+      <cell>(FALSE OR TRUE)</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="ꉶ뉋닶䎵䘐歲䃌馊輭볌篣콴ไ뒑㸬䴩㌒㱝梶㗨쌆㢮䞺ᢷ䫩㘃਀梚漨⤮ነ왙礦ꖗ闲⃉&#94170;焁઀嫸燺ፗ씈ꂔꨪ䕱꒻嬹᤮茴밦ꙥ僕陧흱཮ꉖ싔奬㳡᭩莝姰쎨潠ᦺᵺ跍䫯ᗪ醤Ꮅ凯䤈磣ᰓ怴㩺䷳Ԭइ㎾峖ᘮꬺ켝隳࿛ᝰ䰜詛⦎朗">
+      <duration>[0,-]</duration>
+      <cell>c2GpJ$heZLpJ_f0H[-5]</cell>
+      <cell>FALSE</cell>
+      <cell>=_0vL5$mJVcwGU[-0]</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>((21872 / fH58e0HxJ$aLyV[-0]) &lt;= 16370)</cell>
+      <cell>=TRUE</cell>
+      <cell>=G$ZRwhEA</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="齺蝗궋帤鐸낯鈄&#136485;෈ퟭ㾳湈Ԙ悗쉓渖櫋镢䛑ὧ껙䝣턴ᐬ鹇곿뿔仼&#89119;曪꿧㕷婽储酏휭替ﾬꯘ䮻枰己뗰碴夺嫿싥秾琼葪耱숊Ⲃ暏究ꒁ睊䪮왗Ӷ態蹒ట뚥爭ട鰵ⱪ쐫ゲ訰즄ࣾ嬠됭ꈪ띟᷍訲煛癫ﮛ㥊⾔锈矯">
+      <duration>[4,11]</duration>
+      <cell>NOT TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>=c2GpJ$heZLpJ_f0H[-3]</cell>
+      <cell>TRUE</cell>
+      <cell>=Q__s</cell>
+      <cell>NOT FALSE</cell>
+      <cell>=8834</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="⭡矒嫂협ṫ❪⋼몀ƕ㪑亗礆냱ꠤ榯鴩叴﫩䚹뷖誵倃绉䢄晥媠츭폟坱靬碯ᾱ᳽綩ꍱ蓚連ꪁ彈塼ᜅ῵훉먗幛륾砧馉眹甽䕋卍꿤턮ၪ菐㑉寺휫터ᡅ櫻⋄폣쉟▄ᶭ뱐掞躚韡⌄㳥뀏脬쏍薇媗䥇Ĝ靤鞚䠲ၭ勒≧끥聢熆">
+      <duration>[9,10]</duration>
+      <cell>FALSE</cell>
+      <cell>TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>TRUE</cell>
+      <cell>NOT (NOT TRUE AND TRUE)</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>oMRnDy</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="믾ꑦ塚臼Ꮅ⧺೚㰲ഐෲ텡̇첥녨崓셹䎉ݚĕഎ홰䋱&#114400;Ȭ犂汄㸯㱵⇐哱덣쳚狽㣿&#150550;ᣨ棇臡坟೓᦭왢㟍㻻휞隋뙚縊ꚇ浜힜✺鐊䴰睭鮾ۇ徧ᖹ䩾眿鵞꒡႗㍉痄礩&#68654;&#82630;屨贙ங䣒膅螰㐾祙柫蘸杶&#824332;兎">
+      <duration>[7,-]</duration>
+      <cell>(11480 &gt;= 28955)</cell>
+      <cell>-</cell>
+      <cell>=FALSE</cell>
+      <cell>=K$_597h12g</cell>
+      <cell>=LJ5fEPUp87cQ6</cell>
+      <cell>NOT (Boi46S7Wp$gTjS OR Boi46S7Wp$gTjS)</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>(EzKy_[-8] &gt; 32183)</cell>
+    </row>
+    <row comment="௰엸븐쫰跑㭒ౝ죑羁&#171337;ᒼ&#490592;♀⬏ퟯᔢ룳儽庁䵏볥⭪売还䫖쭿峉立뎓ㅙ㮛ꈝ弡碿껆㊙⟷䙍&#88182;튵䷓彨⭈⺤ㄷ踋᣼陑俱綖䴀᩸隥眿ᬎ尤蛯⳿晜錜檹ﵵᄅ癶ﲯ⍩禬䯗ᄷ頊︷ᨻ껜듚袼劵뭄늻맿襋擅琟ឝ篷뺝⡖䏑엀ꗄ痹">
+      <duration>[6,-]</duration>
+      <cell>=TRUE</cell>
+      <cell>-</cell>
+      <cell>NOT NOT TRUE</cell>
+      <cell>-</cell>
+      <cell>=B3dMcGoct7$</cell>
+      <cell>=PiGAmVyQ</cell>
+      <cell>=15433</cell>
+      <cell>NOT TRUE</cell>
+      <cell>=hljjnpg6</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="돴퇠鶕맣悑씮瘘鎭㖤杝蹼鋃⇡噷粉옿쳮邆즎療갵늕껏朆狣溺뢲廜ᗌ䱅嫢豛㾂褆즕鄙ͮ⏠隩㌲ໍ㻓⚇朕&#13;Ҹ婗㐘扥鵋阿괞葦伢衺卨칃굆餝朠䊢ඨꌀ꩕⚻ᚓ舢⓺科圩曕騿硻윢ֽ띾⵫뭚⡍쉐ᵪ軙">
+      <duration>-</duration>
+      <cell>c2GpJ$heZLpJ_f0H[-3]</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>=w6kB</cell>
+      <cell>-</cell>
+      <cell>=10117</cell>
+      <cell>FALSE</cell>
+      <cell>=_4_7Lor9fwj</cell>
+      <cell>=25286</cell>
+    </row>
+    <row comment="ᛶ溔澫췮囼꬯咕ꮴꞑ饋颀岬叠&#189929;䜆鄉㰐橵`ㄝ䔂ᔡ꟮밉薪鄕䐃펯⠋〉꣹輙눀훒䈮铨鯨ꍲᵟ쨍粭ꟹ⪨驉ᔎ祮⼉싡֣弆&#195129;䥊曊⚊㊃亮㞗裘盜⑈ꯉᔰ癴蠄籓惘꾆ᦰ흸㨂ѷ璩덽튁禐庪緔&#81112;蚚ナ궩靊潡᫴밥">
+      <duration>-</duration>
+      <cell>-</cell>
+      <cell>=i$6z0v_VTT$4PwAN</cell>
+      <cell>NOT TRUE</cell>
+      <cell>=JcwE$DQ$A3X</cell>
+      <cell>=w6kB</cell>
+      <cell>=A$IG59V$J</cell>
+      <cell>-</cell>
+      <cell>(NOT FALSE OR oMRnDy)</cell>
+      <cell>TRUE</cell>
+      <cell>TRUE</cell>
+    </row>
+    <row comment="櫰뉳쟆鱯࿆ஆ⑺䚝徱衁聤簱鴙㷢圱༉&#161388;㑫㋄럘臸⎿꽞煃&#838752;墇ⴿ뚌Ë뎍한ġ꫞額&#194570;따ⷩ抲縬癅낎倥罖磵斄쬝甓쵪ఊu腌쵭墄⊐阸쳀䶛㳆꥘朳桰꯿ߑꈀꝸ씸&#521274;ˍꭤ砃앖頨㚐綺&#155616;䁅넶섦᜚郘狩虴甃窷맽喧쿳">
+      <duration>[7,-]</duration>
+      <cell>FALSE</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>=NOT FALSE</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>TRUE</cell>
+      <cell>=(TRUE XOR TRUE)</cell>
+      <cell>=hljjnpg6</cell>
+      <cell>TRUE</cell>
+    </row>
+    <row comment="ﮜ滹庍䯨ᎇ绵噗홽ﭼ凔㖱ጼ蟓ₓ룰齵묭옑㉮㞋晹⅐邙⋃ꃬ由햲ͺዲ鷺ਥ좦垜᫯텗ﺣ䶹ଗ鎬멣᯾䟽牂ᦵࠩ贒﵏糓ႀ䟳吠답띚ታ앁톦傠뿵阍푧ꑷ率軀㗓ض奌䷝柊Ƒ⑑먨ꚞ냪⒥烄ꓰ檿㸕굳오鐵ઈ䫳㵶蛊憤饽ޯ霡刕啾">
+      <duration>[6,15]</duration>
+      <cell>=TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>NOT NOT FALSE</cell>
+      <cell>=FALSE</cell>
+      <cell>=iEy2wj</cell>
+      <cell>=o0OUu_9$pzmJMYV</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>=20203</cell>
+    </row>
+    <row comment="슲׶̈ݳ탑⯛璑暱물炖犀Ⴎᡓ騙猸⃦膵몴疠젣䎜䛗厖浢骍ྲྀ᚝䴄段П樑쎒ဇ嘶嗟㒰✰쌚֦䆣ἑⱈ쥰ڊ뀊ᨰ艜潕鶟Αᅒ꩕㤦ू窎鯦ퟹ刍釉쥙ጫ㨢걇쩩鎌恕䥑䦊䥶퉥娯凋ຒ୷鏹ꎳ㰋䄗톛済甽邩蠿࿍눕﫹෴왞">
+      <duration>[3,3]</duration>
+      <cell>=G1TI9vL$K4ADv</cell>
+      <cell>(FALSE XOR NOT NOT (oMRnDy XOR (FALSE AND (fjo_OLs = fH58e0HxJ$aLyV))))</cell>
+      <cell>=oMRnDy</cell>
+      <cell>-</cell>
+      <cell>NOT _0vL5$mJVcwGU[-8]</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>G1TI9vL$K4ADv[-7]</cell>
+      <cell>=l_MRc_cjkQF_zd</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="竕ዠ膳੎罷辆꿕&#217132;宴걫쨼ⓦ迡囨磸ᒜ틤ꧫ僃눬崺ᙬῺ⦳凳뒳蜗⯎ฌ皕癪㋠&#220209;鱻쎯熨ᙝ놋릩慎민뵑᎔鿙뛆䑧ℿ᫯Ⱂۄ☼ﶳ⑿鮌啯曛⇷ي欤䙟⎫ﭷ顏㠺쾪譢눿&#834631;毭紖ᥐ볤＼醌&#749589;젏意ඵ౸">
+      <duration>[8,-]</duration>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>=NOT FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>NOT FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>=21401</cell>
+      <cell>((13155 &gt;= (24311 + (fjo_OLs * 23495))) OR FALSE)</cell>
+      <cell>_0vL5$mJVcwGU[-4]</cell>
+      <cell>=10360</cell>
+    </row>
+    <row comment="ί諯&#955496;秮➺겔㹗찹撼묙尅浔﹏渔뗜ᇟ悮䗐睼餍硢⃠ꍘ췜谳椄ꔟ垎椢ꎄ桐벊혮ꖗȵ㻍䠄㙉렣꼥⍹䰃캊⁞詩ṸꟉﭥℂ藶銭ⅉ⌸䔻聍鎑籵⊇㹾곸﹠뛺聛୲✿ꮯ駷藕幯ﴬ댚蔇褃ꖅ&#215079;ሸ셏㧳䗳ׅ鉭橛ꮤ㱡얂ꁭᆷ띇擡靺셪">
+      <duration>[8,-]</duration>
+      <cell>=TRUE</cell>
+      <cell>c2GpJ$heZLpJ_f0H[-2]</cell>
+      <cell>=TRUE</cell>
+      <cell>-</cell>
+      <cell>=w6kB</cell>
+      <cell>(19019 = xR$FW$z5U)</cell>
+      <cell>FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>=l_MRc_cjkQF_zd</cell>
+      <cell>=21035</cell>
+    </row>
+    <row comment="ꃔ䏛끇ᇲ滧䥅&#143685;㨡อ愄⒈⃉鼰포⏩萄쮆飼府㜻비ᐉꘅ뺯镚槶码שּ䘃컧捹੅吰鉶埇ଳ듅ࡢ각䪺乫㤄ᏸ뒄଱ᢃ뚮㘥싴⧡ꩄ뒙덉膌㜌⿼䷫갓믁兌뷟&#837737;穄ࢲ줎鬣㝡쑮퇔闞ﴓ跅ḽ솎霢ꄁ쿈䷇堝욄ミ鶻࢖路ِ귁">
+      <duration>[5,10]</duration>
+      <cell>Boi46S7Wp$gTjS</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+      <cell>=TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>=A$IG59V$J</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>=G$ZRwhEA</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="﭂쌺緰⽟䱮肧ٟ곦&#86975;٥⦘舅䨝卵꧐⦦썮꭬╙퍴簋꨸ꔶ䷌琸࿢ﶭ촞‏쟚驰⁹擖ϲ術龪쯏响⮤㒼깛꼑霂瘛흔殕洌蠵垪섰&#193324;全凶嶩㋌웳蒺䋛뼣鷑䷓䞴罞됥⤈숝ꌃ뚌ퟤ႗꾜ꋑṠᶘ&#867400;&#514160;㝉纖ᦷ⚎猕틆ᥪﶨ璘ᜑ╇">
+      <duration>[6,10]</duration>
+      <cell>=TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>=NOT JcwE$DQ$A3X</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>TRUE</cell>
+      <cell>=Qmoiw$7a</cell>
+      <cell>=28252</cell>
+      <cell>Boi46S7Wp$gTjS</cell>
+      <cell>FALSE</cell>
+      <cell>=15989</cell>
+    </row>
+    <row comment="毾ࢪQ严ⰽ仼룱舂᥆ഩ袢楻㡲摥觉坁㘑㎌↘ꛯ昝䗎릈䖿㘄苫ﳿ믠㶔䜥餅㴒ꢺ鰧懳癜ᄒ둷鷐⾃ꦣ翛䫭鄹糴࡯鶯嬄晴ᑱ煯玈쇽밁簾媡⮞⺃ꦐⱂ&#174264;䖊㥑ێ⋲謪粰챡㰉&#126459;ᵾ⸚朼㎝⤉멒푈Ꞙ븨菠䋲膟Ͳ溛갥鳟ㄌ㏭纈셪">
+      <duration>[1,7]</duration>
+      <cell>=NOT G1TI9vL$K4ADv[-6]</cell>
+      <cell>=i$6z0v_VTT$4PwAN</cell>
+      <cell>=TRUE</cell>
+      <cell>=TRUE</cell>
+      <cell>G1TI9vL$K4ADv</cell>
+      <cell>-</cell>
+      <cell>(19857 &gt; -(27597))</cell>
+      <cell>=G1TI9vL$K4ADv</cell>
+      <cell>FALSE</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="퀮栫&#143521;ヷѝꃈ&#164238;幌㠒귋洎㥃ᷫ鿉偠嘧纏풮⸆䘵貄詾㿆蛄휈ݡﻱ⌈椔顎醤加꿶᪗ꮠ茝〰텾ሩ졷깭蛂光⇉㛋祉ϐ⩪淙팻翴鈴褄ﴤ켤∽죷퀼ꉔá໙輻劂鿯縳훗敘븽ᘻ╻ꛯℏ蔐﯎䉏쒤ⅰ鲉頴蕱慓䑣&#101126;镮挩皏咙&#150685;⎡篌">
+      <duration>[4,9]</duration>
+      <cell>=FALSE</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+      <cell>(TRUE OR TRUE)</cell>
+      <cell>(oMRnDy OR (30761 &gt; -(fjo_OLs)))</cell>
+      <cell>=PiGAmVyQ</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>=G$ZRwhEA</cell>
+      <cell>TRUE</cell>
+    </row>
+    <row comment="儙浇䓜㓰縏㩘㣺䧦骪&#189556;灾圇窹娔䄎箸茍퐀㔈듞띒䙢ݧオ﷢ҝ蹮清瑵է㺹컋笌㛥蹖渿֒㦙﹗镪˃蟤꒴馷余턱鸪躶⃫䴰傔矠鶶䄛┆᱒卝焴Ⲻ覒䲮饴鍷艈뜱㋗侹洬㗠㉗뮼솄ꐌ&#505893;坎虚탶ꄉ蟚蚆助甓腏Ꙙ댔겶ꢆ砭Ꙭ绍ꗕ਌꺚ᰅ涼">
+      <duration>-</duration>
+      <cell>NOT FALSE</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>(xR$FW$z5U &lt;= 6176)</cell>
+      <cell>FALSE</cell>
+      <cell>NOT (TRUE AND (FALSE OR FALSE))</cell>
+      <cell>TRUE</cell>
+      <cell>=6325</cell>
+      <cell>=FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>=26423</cell>
+    </row>
+    <row comment="ﻁใ髪⯰实喜룝㱭⮟졕쬷⩐匳뛄䖰魨෮牀쯋ኅ荼ꥩ躜鋮鸍솬湲隝✱萑㍞䳢薿Ꮦ뒑ᕨ䑻坁箠᳐陯辉彭譴&#169132;摀⟛Ꮓ鈇决뺂谂뻻珌歴篗묶켂晣뾏䓌웖줾殓뫲酽卂外謶䧦酽浹ᷔ&#129898;컴䚠簹苐良㹠簑侗懟᮵⽮鐅প&#131356;넔兟ઠ">
+      <duration>[7,7]</duration>
+      <cell>Boi46S7Wp$gTjS</cell>
+      <cell>TRUE</cell>
+      <cell>=NOT TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>(((13686 = 19453) OR TRUE) OR TRUE)</cell>
+      <cell>Boi46S7Wp$gTjS</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>=EzKy_[-4]</cell>
+    </row>
+    <row comment="㔤켚窧ə૿ﯵꪶ䶗䈱⎅侇ﹸૠⴍ⽥斉;㼣駬땅䭽鐦矖꭫⃃朄까폔涳績郾ᄖཫ濩ﾖ感&#832620;Ꚑ鎙략셸ₚ໭詸ꄐ筠팣⁙粅&#108442;໶爎녙沘㎌煮屚綎쫕慨툃肰⻄㛷ና캼떅쑣핟瓣ۗ὿쓛곚텪䞐ᔛⱅᵓᮕ粢䐒⛽Ⓑ戭">
+      <duration>[2,3]</duration>
+      <cell>NOT TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>((22754 - 3270) &lt;= 13730)</cell>
+      <cell>=(26570 &lt;= (8534 MOD 22342))</cell>
+      <cell>TRUE</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>=22122</cell>
+      <cell>qWie3_u_W_8$o_S</cell>
+      <cell>(TRUE AND NOT FALSE)</cell>
+      <cell>(((FALSE XOR (-(fH58e0HxJ$aLyV[-4]) &gt; 8002)) OR FALSE) OR (23537 &lt; (15768 MOD (fjo_OLs + bok_Hn0wzf7Re$))))</cell>
+    </row>
+    <row comment="룶&#80073;㾤騤愍珦䙌Ⅳ偧穲둲莝Ɓ￈▉悦벷ﺩ캁艓䭉&#91023;&#161910;꿻뎘ﷰ鮚쀮㯍᧐&#937021;׍噠㾗㓀뇬곬캛嶩긝龠ቻ顃䤔떕柢&#124110;ꗇ銋䣵ꬒ簁匰쮓䬬杙㰵멣⍙郫띫ⵣ얿껔쎮ꍪ猲㊅拑闾뎑᱋㽻鋠䥗뼋쌌맲ꉱ광鐙暙ᵛ">
+      <duration>-</duration>
+      <cell>K$_597h12g</cell>
+      <cell>TRUE</cell>
+      <cell>(21023 = 19481)</cell>
+      <cell>Boi46S7Wp$gTjS</cell>
+      <cell>=y$$</cell>
+      <cell>=PiGAmVyQ</cell>
+      <cell>c2GpJ$heZLpJ_f0H</cell>
+      <cell>NOT TRUE</cell>
+      <cell>NOT _0vL5$mJVcwGU[-7]</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="Ȃ楠穣︼䥊弫擒&#184992;荹䯕헇罜ꂯ犊ὡ鸵슕爷&#119498;쑼䥸敡쾩淘輥蠞퐽椻轶䑋ꋋꔶ뽬韛㫇㗘棰䙾峡⟕셚☄宴㠗帍&#166239;ㆢ刮&#356358;ಋ瀗⚺쯳㎑&#169558;&#104813;㈵ၛ連ꉋ旕짊깂⚵フꉛ&#151563;쎒ᵊ䬫픩䴭륇ሔ괟Ẁﶂ취鸑⦺ض咍逰隞">
+      <duration>[1,10]</duration>
+      <cell>_0vL5$mJVcwGU</cell>
+      <cell>TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>NOT NOT (416 &lt; 24438)</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+      <cell>=FALSE</cell>
+      <cell>-</cell>
+      <cell>=bok_Hn0wzf7Re$</cell>
+    </row>
+    <row comment="옚ᔍ踍⾤笠㙧妖㣴ତʽ푾ᒅ汥갂铍顼婤Ꜳᰱ覛ʻ㠺⬵䯢눽칍袅쵋叮驎ﮁ졟셁ḷ귄⟩澁迱砰ܔᡣ㉺尚㤃腠ꯅᶶ놡憉⭟᧢ᩓ씴㱹䬵&#77042;淼즮ꈺ矞䊘腡ꆥ魒豸﻽흒鄬⑮倛а鎳䕏櫒몋䤬拗⭐丝窅ᅯ焒☀熕㒬慆궒蟣毸즕">
+      <duration>[4,-]</duration>
+      <cell>=G1TI9vL$K4ADv[-0]</cell>
+      <cell>TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>=((TRUE OR FALSE) OR (405 = 2398))</cell>
+      <cell>-</cell>
+      <cell>=A$IG59V$J</cell>
+      <cell>=26324</cell>
+      <cell>=qWie3_u_W_8$o_S</cell>
+      <cell>((((bok_Hn0wzf7Re$ &gt;= 26556) AND FALSE) XOR FALSE) OR TRUE)</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="퐫Ⴈ․脉䈊汶ે暵셞嬝䶴ꢣⲎꁈ뙜ผ豼Ꮓ疶&#829550;䪖石ﻐ竱窳뵅ര䖤⽕⣌Ϯ⋎џ痄㯄亅ᣪṼ갡ⷐ䝐㺓༭ᑯ埋溕畢暜罜⮢Ʒ졫宋௰阕朏컂`糶մ鋷쵯듩撕牲뿞呖Έ饋㗲똜썦촼䓫꼤㘩ꢷ㭏䩳洖橳དྷ켁䷺๨࿄蝒鰉푟夠羀０蜂">
+      <duration>[7,14]</duration>
+      <cell>((13698 &lt; fH58e0HxJ$aLyV[-8]) OR FALSE)</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>NOT FALSE</cell>
+      <cell>Boi46S7Wp$gTjS</cell>
+    </row>
+    <row comment="텮䤰ꀭ㱦⻣虱倗瘏ﭒፘણꚈ샿ꢫద悗&#948244;è긃ﵝ瀠㌑䎺ৌ愖畠놝ㆯ᱀衣នਵ郅㝭줩攽虀ၘᆞ췻Ἁ畱퉣ꛒ憙酭ⶆ婣㛏䃥饭퉂х폸寗侻ᐷふ꽽Ꮜ짽睧愊㒔뱳㐢〫［菫ㅆ䒳렉瘽蚁詤囫飕䡘ﭶ륾Ɯ㎵뽙쳎">
+      <duration>-</duration>
+      <cell>=FALSE</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>FALSE</cell>
+      <cell>=(NOT (FALSE OR TRUE) OR (FALSE OR TRUE))</cell>
+      <cell>G1TI9vL$K4ADv</cell>
+      <cell>=o0OUu_9$pzmJMYV</cell>
+      <cell>NOT TRUE</cell>
+      <cell>=(4861 &lt; bok_Hn0wzf7Re$)</cell>
+      <cell>(fjo_OLs &lt; -(fH58e0HxJ$aLyV))</cell>
+      <cell>JcwE$DQ$A3X</cell>
+    </row>
+    <row comment="誺楪굔縏샖眶眆﵅ჲݦ걇뻂㙾磱磘ᅋ繨鮈⅁睧뷺暱坶嚈׹얲䈕嚘쫒ｙ卢弙臤ﴧ뼀界᠄藮罕䇕蒵ꝶ୷髥롖絸덣鏡꒻䓒ਢ&#154686;꺲鿝宵圏虜荶冾컐袓ꃽ嘛걐䁏䣅㙕쳊봿佱奖꿟簕椤⊐枎抜䷎ໂꑛ솉咛た宅蓶呿冕ꕩ럥ꇯ釽ꯇ텾疡">
+      <duration>[0,-]</duration>
+      <cell>FALSE</cell>
+      <cell>NOT TRUE</cell>
+      <cell>=oMRnDy</cell>
+      <cell>=TRUE</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>=A$IG59V$J</cell>
+      <cell>=-(-(fH58e0HxJ$aLyV[-6]))</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>=32250</cell>
+    </row>
+    <row comment="꯶꿕ထꁛ፝ࣚ嗬ජ篞芄협ﻇ붦쒃㰡&#615502;榇쪉Ọ栴퓑ꤕ㒣쉴뀓쪊餐癴ꑽ䭜ή쇳ᄆ⛮㢘&#648208;&#167501;踄拉ꏓK晉ᝩ묱癫뷿ꙥ䐑Ϯ꒽ﾅꔞ䡑큄㮯司鴯飼返ㆁ묀&#163862;㨙퇞㼳㙁ⓦ鄸篯䙺都ꠏ덙䗷뇁곃ⴿ波Ώ្瀼驨汌肈琀䚄⚷䂇佾">
+      <duration>[8,-]</duration>
+      <cell>qWie3_u_W_8$o_S[-6]</cell>
+      <cell>K$_597h12g</cell>
+      <cell>=JcwE$DQ$A3X</cell>
+      <cell>FALSE</cell>
+      <cell>=VER_j45GuaUCh$o</cell>
+      <cell>TRUE</cell>
+      <cell>=-(14496)</cell>
+      <cell>NOT FALSE</cell>
+      <cell>-</cell>
+      <cell>(FALSE AND TRUE)</cell>
+    </row>
+    <row comment="쾫۪솛゛浥ັ⢔蘲杷邒委쩈㩊磅礏஛溱켳뎋&#130943;䏘ス텯쥺㲗穹糓૊ᠱᰵ圗艃籅秷Ꝥ罷䗸휮墒䰍擯罝⁖鑉魰&#972872;쟏቎묛蕃瑩ܒ箬釪㚑ᑩ⤚鞀犱릋㟊鯎蘝&#182361;䅁邟媒⃶譄㫇컠뿬涀允ߚ굋₫﯀矘盕ǐ᨝䢃뷳">
+      <duration>[2,8]</duration>
+      <cell>oMRnDy</cell>
+      <cell>(-(12101) &gt; 4481)</cell>
+      <cell>=FALSE</cell>
+      <cell>_0vL5$mJVcwGU[-2]</cell>
+      <cell>oMRnDy</cell>
+      <cell>TRUE</cell>
+      <cell>=-(-(-(15175)))</cell>
+      <cell>=TRUE</cell>
+      <cell>=hljjnpg6</cell>
+      <cell>TRUE</cell>
+    </row>
+    <row comment="皓ꨫ⡔献ᱤ嵾․樔ᡗ楶憃ㄓꬒࢩ漀ᗢ佬茣丫椧乾Ốさꎐ嘶驍㿧啧䢡ಲ븵┧៼쓩ᮝ&#105331;眖뉷夬臮䶅銉ꎠ鸕诰嵳䞞룕ᵉ芙轤軛䟉≏⽌簎ꆽꤓ琋矐᱊皾&#168540;祒鮿㟏豬藲䛕垻Ɀ줝换̋ꑟ鹤ꁙҵꠊ呎Ⲣ⟨峳듈科琘">
+      <duration>[4,-]</duration>
+      <cell>FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>Boi46S7Wp$gTjS</cell>
+      <cell>G1TI9vL$K4ADv[-0]</cell>
+      <cell>=VER_j45GuaUCh$o</cell>
+      <cell>FALSE</cell>
+      <cell>=fjo_OLs</cell>
+      <cell>FALSE</cell>
+      <cell>=l_MRc_cjkQF_zd</cell>
+      <cell>=(23806 + EzKy_)</cell>
+    </row>
+    <row comment="螉ꠛ聏㮳䀀㾷屇ﲺ⒝엙ꃗݾ棲Ⅻ哓ꡓ椲塞栓芔撦᧚건뜃&#132196;詜ꬃ럦啪棧嵸籡&#109218;쿥⚲➠谴웇拔绑搂怗驑ֈ捺工ẚ贺⌗立䤵聉㴣찺玢軆㽿ﯹ&#95932;┦됯&#191797;﯊픭ጴ&#616521;啸엧៲밠ዃ庳脫憴畠꾓熮䲲膖ఇ䍀೦﯇">
+      <duration>[6,14]</duration>
+      <cell>=(29495 = 24617)</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>qWie3_u_W_8$o_S[-5]</cell>
+      <cell>=TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>(qWie3_u_W_8$o_S OR NOT (NOT TRUE XOR (TRUE AND (-(fH58e0HxJ$aLyV) &lt; 6250))))</cell>
+      <cell>TRUE</cell>
+      <cell>=TRUE</cell>
+      <cell>_0vL5$mJVcwGU[-5]</cell>
+      <cell>=22802</cell>
+    </row>
+    <row comment="쬢睬讂甄쏭閠¤睿೜犩睭⁊䖡囸雁ⵕ戓阗ﰟ꫍遑P㞓댶焭֜䱚⋑쐽ꪏ䞧ꗕ틇䉊㒉ﯸ쇍쎩鳍覺驠ꊶ䊁萩쥨&#500820;ꈥ⏔톟멘鑌姷忂鸁ᘕ廌踕ൟఙ塥퍻&#157819;砲쳯ࡓ㮫眥潖쿥壋꯯査꾹奛ƞᅜ暰萱붓㓬ꔨ㺔듏၄㹴⍹뇤葀∔걮">
+      <duration>[9,9]</duration>
+      <cell>TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>=w6kB</cell>
+      <cell>FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>G1TI9vL$K4ADv</cell>
+      <cell>NOT JcwE$DQ$A3X</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="䧷貋劍쳨칚藵❿ѕ첂꩔悄僗&#112710;麣⥇킽ص又감㩯瓞ꨈ蒆挖Ꮱ鐳ꕭ㰮櫨䈉蘮ﯔ⑘暗읔ﮚ䩼䔂ֽᗼыᎾ创쥊⺦眖㿒仰㤮Rࣣ鈜럡ꑲꄲ蟞룳擠휝耩꯰뵂跙䰚녏⩜糳퀜䲂熒띏囲ໟ뵻纨챽嶍⭞፲㋵뮠ꀎ">
+      <duration>-</duration>
+      <cell>=TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>=FALSE</cell>
+      <cell>=VER_j45GuaUCh$o</cell>
+      <cell>=PiGAmVyQ</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>=l_MRc_cjkQF_zd</cell>
+      <cell>=3872</cell>
+    </row>
+    <row comment="䕱Ҝ큽㨚ٚ솻艐支ᑡ苒㓻&#868355;뽘禧旧ꍀ垗嵽鬜隅ᤈ㟧깬螹桢ョ膱溲㶝㉵ꔇୃ烞ꉃሃ絋鷸얤鎵㖥殊辰጗豢ᒇ텣錎㕓﫢鱼⋿뢁菚檦掌汶㛲죦䀔Є禰烪ᢸ㊥힗릍药秞琠騨揓衼ᇺ泔棨裬₝뇉꙽㒑ۮ␮䗻⺣⧃演뗓ⷋ䈏᠚ﴴ">
+      <duration>[8,9]</duration>
+      <cell>=(17548 &gt; -(31942))</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>NOT (13703 &lt; -((bok_Hn0wzf7Re$ / 6018)))</cell>
+      <cell>FALSE</cell>
+      <cell>oMRnDy</cell>
+      <cell>FALSE</cell>
+      <cell>NOT oMRnDy</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="㔄㒅जꞚ悦&#299074;記ᡉ縚㮒冈ヵ뉼齤䖎勢觩Ԧ맖䋅⧚楚샦刾⏪ﶙ앦სꔓ᭿❓萓䢽只뚜ܑ༹&#452729;쭭쓽ᶩ䦄㽨毈㫒嵻橮෩⪝밪倢ࠞ᭹㤨塑ꦺ紑沈쇭뗪韗惗쬢荰큢Ԁᇌ䥅壠桷뷷勘玮砉鞒Ḙ譊岍ӻ杮磙亚⅘諸⥢㜚頀嘹">
+      <duration>[0,-]</duration>
+      <cell>=TRUE</cell>
+      <cell>oMRnDy</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>=LJ5fEPUp87cQ6</cell>
+      <cell>NOT K$_597h12g</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>=1292</cell>
+    </row>
+    <row comment="喘颖㧘╄⨌氭캈ﰂ릢섯൐&#899159;ᱯꆝ帾斷ᮂ㨠ﬖ趡ꇣ⫎ᾼૺॡ훻顉춖ꮹ귢勏Ꞇ馞衒썞࢕钗圅&#284711;䈀ﴽ济ￔ豎룱͕⒢ Ⴒ安쾯䚥螎Ṧ刬풄唆휖麚⺞࿅࿗僤ꎢḘʑ鬭཮յ 騳蕤&#132315;솖ᚭ﯀&#285815;㡪㝦﮶&#122281;虓䑠썚ꢜ펒␻">
+      <duration>[0,-]</duration>
+      <cell>=TRUE</cell>
+      <cell>=i$6z0v_VTT$4PwAN</cell>
+      <cell>(15860 = xR$FW$z5U)</cell>
+      <cell>=FALSE</cell>
+      <cell>=VER_j45GuaUCh$o</cell>
+      <cell>-</cell>
+      <cell>oMRnDy</cell>
+      <cell>FALSE</cell>
+      <cell>=G$ZRwhEA</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="싿涔蘨흋齉䧢뚀풸藕앨腐༫ǌ椂褵퐗徻쑍瞁펼犿鼣⡨抶秖䭙&#665611;&#103041;몳竈㼽ᨂ飄ꁴ&#67283;⽻밥태ꊅ甼昒阕韄챳辉젮ハ⯞ⅪᲠ걼䱷㓋ᡷ횟晡렧ꊆ峅曕葯꒬&#189635;ｭ棲廈&#229462;䦭䦟붢㊡璶&#70738;䫖⢶ꒄ멉뀤⎔샔ꌸ놳">
+      <duration>[6,6]</duration>
+      <cell>TRUE</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>(FALSE XOR TRUE)</cell>
+      <cell>=(NOT G1TI9vL$K4ADv AND (-(xR$FW$z5U) &gt;= 5657))</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>K$_597h12g</cell>
+      <cell>-</cell>
+      <cell>=hljjnpg6</cell>
+      <cell>TRUE</cell>
+    </row>
+    <row comment="텀&#588919;ꂁ抔퇀깼ū꙱蜝乂輝䓕ᨩꉘ똬ꩆ骛ꌗⱦ뭥癮䚰䝱&#88260;矆玄뷂ಟＺ磍喱䍛ꨮ磭Ď㛀꧜莱ｍ旵숳᥌軭멜葰&#70994;㋳쇝녉髨몼鬔䒀䁪⁦搩䠶垟㉭愡䖝慿맓콦땠ꨖ뿺䇶줞૎倌㶴도僒盌᤭趘儆&#156419;&#174178;Ỵ슎呴ᬥ璪杍">
+      <duration>[4,7]</duration>
+      <cell>-</cell>
+      <cell>=i$6z0v_VTT$4PwAN</cell>
+      <cell>NOT qWie3_u_W_8$o_S</cell>
+      <cell>=(bok_Hn0wzf7Re$ &gt; 4774)</cell>
+      <cell>NOT (FALSE XOR FALSE)</cell>
+      <cell>NOT TRUE</cell>
+      <cell>-</cell>
+      <cell>(18297 = 5237)</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="ᝏ&#294950;훖杶籱扜ఓ&#122299;㦐罜侅듡쌥㊕범濼ᬚ驱숑슷楗滏孥㉣ꥂ탖柄뽨速櫣ⲧ봗⸵雡﹑峾ϩ⓴떟ϡⰌ홬㒦⦴堵š嘩堢ߔ༣㝷䰔⢤몺좰률턂㋑㪫⭆ꦝ஭⺪㨤贱兑醈忌煼宒⫴氇뿝デ썙➞㢏護鬏䟁৻舣븘粊">
+      <duration>-</duration>
+      <cell>TRUE</cell>
+      <cell>=i$6z0v_VTT$4PwAN</cell>
+      <cell>FALSE</cell>
+      <cell>(FALSE OR FALSE)</cell>
+      <cell>-</cell>
+      <cell>NOT TRUE</cell>
+      <cell>(xR$FW$z5U &gt; fjo_OLs)</cell>
+      <cell>qWie3_u_W_8$o_S</cell>
+      <cell>=hljjnpg6</cell>
+      <cell>(FALSE AND (fjo_OLs &gt; 2988))</cell>
+    </row>
+    <row comment="㄂ﴑਵ룦㝿뭰鱼鼈姬㗫⫻钊圿朑鐖䳢影ꏸ臌်쇶糏ꥣ殆剠잽星䦴슗릈幣賰⍥⥇ㅈ⬜㣣諏❗ꮫ鸄滨ꆀ㗓흡ꪍᮩ儊黫脂榻⮭⌋ᨼ㬽긳溄὞鱄럺鞩凗&#147717;ᐨ㔨윥꿭倏Ꚇ쌓&#352350;࿑귡會㋉ዼ聸侨ఈ&#220175;驻狱">
+      <duration>[1,-]</duration>
+      <cell>((18212 - 4036) &gt; 27547)</cell>
+      <cell>(23599 = 12049)</cell>
+      <cell>=((NOT TRUE AND Boi46S7Wp$gTjS) AND FALSE)</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>=7811</cell>
+      <cell>=FALSE</cell>
+      <cell>=G$ZRwhEA</cell>
+      <cell>TRUE</cell>
+    </row>
+    <row comment="￳ן떑榒뒭㛿둜筸Å膷⥈䖠쵺቙㉸㌃؊꾫㽘ⵎ痩㙹ճᒄឡ璉咓᭫힜쭗䔘ᄢ냰⮫፜矚絨岹됋⡂瀎Ⱕꋜ&#147205;悎&#116400;ꏞ껳횷貞駴◴ȑ&#167617;ￆ흯傶彃逰쎏ଡ਋痢쀜ﻰ畅⸪⢞퓩萛趋ੋࡪ齗ꋖ븲뤉෸鿻놽Ṋḃ㵑썐쯶籯ᑹ">
+      <duration>-</duration>
+      <cell>-</cell>
+      <cell>(FALSE XOR ((30293 + 1312) = 23324))</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>((-(30264) &lt;= fH58e0HxJ$aLyV) OR c2GpJ$heZLpJ_f0H)</cell>
+      <cell>(25701 &lt; 22879)</cell>
+      <cell>-</cell>
+      <cell>=(FALSE AND (G1TI9vL$K4ADv[-2] OR FALSE))</cell>
+      <cell>=l_MRc_cjkQF_zd</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="ꟲ೎㊦∗䢪⣫䀕粭뾅⡜呂焫⭠꟭㠥桬➛侧櫱肋皁⺵莳胭튎趄辦皇逫泴䁦穦ዛ펟陑鏋뛨蔸⦒㱗䰉ﴞ律슑ꀍ쪵ꄶ摑凨湐쫚땻隶颸෗뇧ꤡ䅩╼笯궀또ﴻᬟ应㡅ಳ冂뙾钋桙慨⌜涿錛쵧킹彙忕쭛昻ࡢ禲南᝻㽚⎔">
+      <duration>-</duration>
+      <cell>TRUE</cell>
+      <cell>(-((5039 - EzKy_)) &gt;= 16138)</cell>
+      <cell>=TRUE</cell>
+      <cell>(21387 &lt; 5159)</cell>
+      <cell>(TRUE AND TRUE)</cell>
+      <cell>TRUE</cell>
+      <cell>NOT G1TI9vL$K4ADv[-4]</cell>
+      <cell>=_0vL5$mJVcwGU[-5]</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="㵙鐲챂麩㲂纭屸ʒ稾쒑䠧囘噎㦠枡훠夼掦ᬖ꫚✷៌巁肁砭顢浚쎃⅟뮊䬕㥰딎痝ᩱ붱鎜¬Ჹ㸄粽ᷯʼ❟㏳䁠麟伥军屇㮂&#105930;媳럡揌묋繙ퟡ㣗뺒ꬒ蹁⨖貨䬐䲔肥ꯍ茓농㿴⚚ぼ驙Ꭾ䎮倎쁈詷̃莪ꠦ⨫쮴砎ﳃ覊帳&#596004;釯">
+      <duration>[0,2]</duration>
+      <cell>TRUE</cell>
+      <cell>oMRnDy</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>=y$$</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>(15132 &lt;= 1852)</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+    </row>
+    <row comment="辁郚礔耙ぉ໫겢ቘ卤珨잤勇觺⃓诲탚퉊郯⮅뿇흯濍⏎鞇&#397352;盷էۇ笣䳱ᡕ됈漥&#171112;༺֓壘ᾔ⏸톌꫻&#132478;ᳪ趹㬎ス觊酫쿆䞰ꄭ〸炲䣺刽俧飯☛蕜캝⯄ᢞ痊꠼Ềϖ蠈쑀镑એ恵ᜑ宾䏷&#98018;猦洇㤋&#85088;歙ᾜ鋸娭㤮๐">
+      <duration>[2,-]</duration>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>Boi46S7Wp$gTjS</cell>
+      <cell>TRUE</cell>
+      <cell>=Q__s</cell>
+      <cell>(11806 &lt;= EzKy_[-0])</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>(c2GpJ$heZLpJ_f0H AND (fH58e0HxJ$aLyV[-1] &lt;= 22358))</cell>
+      <cell>=24276</cell>
+    </row>
+    <row comment="谄칁섿甬떪塡⩱&#168352;惪䅢ᙧ럛?ⳕઅ顦ꗿ宣鍈㶟䂂螫ਉﲒ뻾莦೙臼ꘉ镖㯳Ŏꠧ䃰쿮睮貹탳༠垬妒嘨胳䉕뉦踠憮魜苁頗ጪὐԌ읺ᶵ듯铃嗀１&#519294;瞴▏擼流ǔ镍曡ꑓ塜햗듨퓰ᩮ&#145004;睇袝෪ྟﷲ仚ꙴ獺䭜᯸쐨ɘ哲泐㜎㌭ཪ鄊ᴲꕖ券">
+      <duration>[3,9]</duration>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>(fjo_OLs &lt;= 23692)</cell>
+      <cell>NOT G1TI9vL$K4ADv</cell>
+      <cell>TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>=TRUE</cell>
+      <cell>=l_MRc_cjkQF_zd</cell>
+      <cell>c2GpJ$heZLpJ_f0H[-0]</cell>
+    </row>
+    <row comment="꠩㭻뮀୽ᖔ뉚䶤Ꮟ⼏앀繤旸﮻몾׊ḍ跰縈沉⻜⣓饥쳖꿨앁ꕇ쏌苯쪆ᡤ懛鶑먏軓科Ⴇ&#931853;ࢦ莎泔൸즿塹ᱯ뇒ᆆ웞좱ビၛ鿆헄炞旋楕鮲멬㬕뼱산韑౞痄싕᯷梀魧픢⌨湄᭼믜虀湹ꯂᨼ㐹✣퇹쁟풇꟱怫滚">
+      <duration>[3,4]</duration>
+      <cell>FALSE</cell>
+      <cell>c2GpJ$heZLpJ_f0H[-7]</cell>
+      <cell>(fH58e0HxJ$aLyV[-8] &lt;= 7650)</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>(K$_597h12g AND TRUE)</cell>
+      <cell>-</cell>
+      <cell>(bok_Hn0wzf7Re$ &gt;= 22641)</cell>
+      <cell>TRUE</cell>
+      <cell>NOT TRUE</cell>
+    </row>
+    <row comment="ᷬ븢㲨㾏誩荀扱鹡닋퉎픯쭽ᆾ揯狩닲ﺓ귊䖴ⴚꉎ鸚ꠉ륥뇃ﴂ⮆ߘ㧒ᜨ㖜ꢯ籍裘劒姗ﺴڮᅲ튀ᥜ鿸Ꭾꎔ蹡쨈杯흡ﭻ湞䜨烙䊖鵻≺쒘奭䙍˒谹竳꒨꜄̱飂ੵ蹒蜦ｇ茲䜟엦滉䱳䓈Ԙᛩ൶廙慎꒟ᬣ쪕㜼ผ﯆⻨䗉ౖ䫲ӿ">
+      <duration>[2,3]</duration>
+      <cell>K$_597h12g</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>=(((TRUE AND _0vL5$mJVcwGU[-5]) OR Boi46S7Wp$gTjS) AND FALSE)</cell>
+      <cell>qWie3_u_W_8$o_S</cell>
+      <cell>Boi46S7Wp$gTjS</cell>
+      <cell>-</cell>
+      <cell>NOT _0vL5$mJVcwGU[-0]</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>(FALSE OR NOT NOT TRUE)</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="蚩핪获&#112789;넼ЮᏡ䲘䎵崡ꘐ鰜괱唑跎㎁䴍줥鿋簁⸺⁮꧰粟첝풥䛐翱䱞쇎밸졊돈㵽砫田&#454777;䑿撐趵䳻癤᭠惈잠獕쎗౎瞾ॾ슟䥔זּợꇄ腊䉧ㄮ獀氓喋㻌य⺞ᚫ烘舍誢軝扠ꍶ㶅㱐꽤받楬⵮뇼칆ꉸ䍛᠍⊧␑梒⦤&#139723;릨뵮">
+      <duration>[8,-]</duration>
+      <cell>c2GpJ$heZLpJ_f0H</cell>
+      <cell>TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>NOT K$_597h12g</cell>
+      <cell>=wH1$i</cell>
+      <cell>(NOT TRUE OR FALSE)</cell>
+      <cell>(13364 = ((10858 + 25002) MOD 4669))</cell>
+      <cell>=F9_7$9dm6juyojhk9BK</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="ﵦ齔ﲗ맖㐑㹘袵뗯탎&#882772;㧽౤痘퐺ᖔ&#548929;&#841764;吳ࣷ账髒崈⽙絗攧ꄫ梎䫍䛖窋ﮊ⬜ॣ캋딻岋흒囦惐๡窛㌒₲招۞N㴺驣搇롩硧涭䅂㦷蟑嫏虋￷ᥨ鸼캂뫚⡍⡔漕&#151509;֢陎㞍檥侫㈄ᷭ⯱屧欦鹽×艗ꑫ潢䟠朻ਞ㿵貟潦">
+      <duration>[3,-]</duration>
+      <cell>TRUE</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>=wH1$i</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>=G$ZRwhEA</cell>
+      <cell>=1363</cell>
+    </row>
+    <row comment="銻卲儕鮀骾寳꓄ꭠꖾ뇈ᆕͦǄⱋ僾嘜믯⚃૨䑪덜ꐖ極Եತᾮ侟쐟탵砍㓢鰄ᯏ竚㉼֙祕纍桙련ꭄ妃羘ᩰꪋ␤낫膢孾吸匨鱾&#169809;鴢袓桤&#126065;⾝墧ꬁ踅槞譬蓝傪撆ʒᕛ朆뷧ഊ爊❏&#669752;ऌ鰫⎟탘巯㏾嫙걠鈥奵᪙吹뼲㢅⟓糞沞">
+      <duration>-</duration>
+      <cell>NOT (9600 &gt; (32638 * EzKy_))</cell>
+      <cell>NOT TRUE</cell>
+      <cell>=NOT oMRnDy</cell>
+      <cell>qWie3_u_W_8$o_S</cell>
+      <cell>c2GpJ$heZLpJ_f0H[-8]</cell>
+      <cell>((NOT TRUE XOR TRUE) AND NOT FALSE)</cell>
+      <cell>G1TI9vL$K4ADv[-2]</cell>
+      <cell>FALSE</cell>
+      <cell>=hljjnpg6</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="籟嬜늲뭗뜱꽴灮鍟嫩䈶䯲绩&#188272;儣癘渓&#390200;᷿敏몿䱯ள䓮鐖鱳ꡜ똧ᠼዡܨ警鍲윑浛뗝鎂╯᤻Y䵲阠䋇ΐᰱ஡फ़褗妚ᗢ땡⊧Ṉ픃붇恒⟷ƫ吁뀊犞堠ؘఢ뀔ᦙᧀ뢪ᚒ፯㏸鶜ꄌ摴깏줪ﺉ歳忢಑ⶐ賴嚁㻨벐좥姨麙ｲ摛휢ꝷ⡇">
+      <duration>[6,-]</duration>
+      <cell>=FALSE</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>=NOT FALSE</cell>
+      <cell>((12638 &lt;= -(31638)) XOR FALSE)</cell>
+      <cell>(9306 &gt;= 24253)</cell>
+      <cell>-</cell>
+      <cell>(45 &gt; 15028)</cell>
+      <cell>TRUE</cell>
+      <cell>TRUE</cell>
+    </row>
+    <row comment="ੑꖔ&#127297;펳踅☎近訴ὠ㖕頟鷠踛䯁༢Ｄ飻烦퀵淎龢뇘䰺餑ᯋᙡ实錛䇜킌釥랜奭뵘⡳೐&#173506;⁮ݨ䀇⁬栴㶘椂좃&#136720;듏퉆㍇䎑榯묮Ⓒᬡ憥뎭恖㋤蛜鰻ꞑ蔺䘍욆鼋骀닐Ә룲ꀯ䨏뛧藸姾ผ墨쓰፰ᛧ䱞ᙩ殩乒喯&#523307;잋">
+      <duration>[4,-]</duration>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>(30775 &lt;= 30024)</cell>
+      <cell>FALSE</cell>
+      <cell>_0vL5$mJVcwGU[-2]</cell>
+      <cell>=PiGAmVyQ</cell>
+      <cell>FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>=l_MRc_cjkQF_zd</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="ᠧட㒾륨䮊ࣧ標渓↽箝噵ᶭ鹪翔ﮱ뵵雜α䡠䈨衍ᶻ鎷䓾&#193208;&#975978;彏兾蔔猖赤气ꤛ覼킪䫯&#931938;呐픀냒ǃ䝐⧈ꅃⶻ벌丏瘳搛⫺薲츢瓹᯷衐㎐魫㸨&#161858;㈈沿犛뽳ꮍ鬱&#121574;땥틯떜싾Á牱&#125889;嚪ꝭᑽ猪횰ﶍ쯞咢燙﹨釩ࠩ">
+      <duration>-</duration>
+      <cell>=FALSE</cell>
+      <cell>=i$6z0v_VTT$4PwAN</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>=Q__s</cell>
+      <cell>=PiGAmVyQ</cell>
+      <cell>=7923</cell>
+      <cell>FALSE</cell>
+      <cell>=l_MRc_cjkQF_zd</cell>
+      <cell>=EzKy_</cell>
+    </row>
+    <row comment="㉾쓨꼴靨실弙늺ẍᘱ跎༃ꤹ䊮옐᫬꿤匟ᖇ껞曣훼뚳๦ꏀ뽤鏺뤰&#69974;㳕ᾨ䇧甮勲悔隊䝦錭娭㢀⎥䵿釮졩ȩᵟ鎹捱뭆ᎌꆀ瀢윆㪎壇⡬炎꺦&#702504;똬榫聢夡ﻯꁺ堝▴宽ト꓄笃꜔秸咃ᡆꏱ鬿ꎇﯢ碌䗢ꂍ擷쬲Ⓟ饞૴颾医Პ">
+      <duration>-</duration>
+      <cell>TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>=(28782 &lt; (fjo_OLs - xR$FW$z5U))</cell>
+      <cell>(TRUE XOR TRUE)</cell>
+      <cell>K$_597h12g</cell>
+      <cell>(-(2108) &gt;= -((26801 / 10203)))</cell>
+      <cell>=3292</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="㇥ᕹ稉緁欹㞋㾻䱣씒핍첃휁ꍫꔴ窦ﳧ諑찃〜䵲̕墿∌ﳶ䶢&#171310;剠峁ҝ&#277569;藍떲ꬺ䏈豽&#577607;ᰋ땔쇙槡괫鬁✬㬎㏦⹼용懅頽쐾鵷ꯄ㊪妙㪸ṥ⵸颾ŴꙤߴϧ⤓抴娝朆踰쌌ᇭ硝ᮘ돑팏ȳ߬漙ⵋ痼쥡Ǭ收阃㌁蟎ꮑ튚翘ড">
+      <duration>[7,7]</duration>
+      <cell>=(TRUE XOR TRUE)</cell>
+      <cell>-</cell>
+      <cell>=FALSE</cell>
+      <cell>TRUE</cell>
+      <cell>=y$$</cell>
+      <cell>-</cell>
+      <cell>=2074</cell>
+      <cell>FALSE</cell>
+      <cell>(TRUE XOR FALSE)</cell>
+      <cell>=19621</cell>
+    </row>
+    <row comment="轾텁ᇪ칶己&#163897;ﭣﺻ뚓ᢴ謹挐侶涗媵ࠇ鷿쫦腨桞箧⛲蓙犻Ṝ旛璬᠜&#786466;ऍｆ㚢㉆ᅄ&#107740;掵駘ꊸห득웘ꭷ๳祣붡뉢ͺࠀ諳㝂ᝥ芆Ⓩ㇒͉Ӊׄ첏ﰆ솀&#72355;視ഃ雼ۛ鼠눎淍浉္紻ഉ酸ﯩﱛ嗾닡㐳稃胉&#963584;㒁鿙ꮎԭ䫡">
+      <duration>[7,8]</duration>
+      <cell>FALSE</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>=B3dMcGoct7$</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>qWie3_u_W_8$o_S</cell>
+      <cell>=-(28061)</cell>
+    </row>
+    <row comment="ꡠ봴駘鯘刯엖赥﵎඙꒼㾀迼湐놡訮壜飦ᛒ묐㜰㾎␀瑷㱨Ꟶ☄ᰍ멁ࣥ钋陪゚Ⴍ짦幚鿒᧴龣뗛䇝薔슳᠛ⅳꆕﺀ퓀ײַ࿙䍚筍섫䥕゛㔮㻬Ņ㍅㉏堚&#873537;ჷな嵩☐簱・샊槥Ɖ砎롈鸄猝ም੎&#440398;䓶ᢨᅹ릮䰅ⵎ甭쐜莌嵐㊛谜">
+      <duration>[9,13]</duration>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>=qWie3_u_W_8$o_S[-0]</cell>
+      <cell>FALSE</cell>
+      <cell>=VER_j45GuaUCh$o</cell>
+      <cell>-</cell>
+      <cell>(4264 &gt; 8283)</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="ᩱ䟇䰈鍍搒諬踎パ爊㷉ᚘ杆艌痺篾İ㴯&#182230;쟻슶嘱∠局Ἄ◂疂ꘀ檛﫧뫔괐낞陎뜐渄紹뤚჻刜&#453753;쐝벩&#657461;霋䮸䡰ᚑ嶗蓜嗌ᗣ饠嫮ᐟ펔撖&#556146;ώ₻ﮌ䭓䌞삗ㅸæᡧ㔟鎴ᐝ폫矷暧椰륽馜튩⬼&#369759;鄘滐殻⟋ꃓ᝞㥻䟀鷑癀">
+      <duration>[0,9]</duration>
+      <cell>=qWie3_u_W_8$o_S</cell>
+      <cell>(353 &lt; 12151)</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+      <cell>=VER_j45GuaUCh$o</cell>
+      <cell>=o0OUu_9$pzmJMYV</cell>
+      <cell>G1TI9vL$K4ADv</cell>
+      <cell>TRUE</cell>
+      <cell>=l_MRc_cjkQF_zd</cell>
+      <cell>=21959</cell>
+    </row>
+    <row comment="⤘坧ꄭ姡峒实ㅽ⵭擆㸪刣㋧筃寝딧㛼름ꟗ劔箋있쑡௾됢‒疡宭憠뱔昩ꪼ쫬꼌徚뛡ꄜ턇햝笲胻䣥哿杸츈큣彚첖㔱ﾌ쵫䪉ঽ渹䳗㰶㪭‎⦑שׂ祾䊸穹꿍踌瓏⣀呲ﻸꨇ킱풄ᵞ挶䁏콋闉陃་仒է莵脭倪뱶ꨃ">
+      <duration>[5,-]</duration>
+      <cell>=(7626 &lt;= 7335)</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>(FALSE XOR FALSE)</cell>
+      <cell>TRUE</cell>
+      <cell>=PiGAmVyQ</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>TRUE</cell>
+      <cell>=F9_7$9dm6juyojhk9BK</cell>
+      <cell>TRUE</cell>
+    </row>
+    <row comment="铰癰篋኷旚ᚆ埯ᆱ犵ᮀ퇜宍紽᜽謙䃪昿⿾挕숽咥仈隋艾羼樂䤠믚슋燈&#343120;벞꿷礷⻡哃ﱂ鰝༟睙馭䉤䛫萉쑒渔軦&#72370;&#188262;㛡蜏퍂ꌅ璂ᾼ瘙㽢凁ƃ殾ڄ㯱쭭᳸ﳯꏊ齁ᷫꁚᮠⴗ㝵⛳Ū擰͈⺨ꏻⓕ썴碕ָ맠蹨낛ﯓꥀ">
+      <duration>[8,16]</duration>
+      <cell>G1TI9vL$K4ADv[-4]</cell>
+      <cell>FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>G1TI9vL$K4ADv[-9]</cell>
+      <cell>=y$$</cell>
+      <cell>FALSE</cell>
+      <cell>=1751</cell>
+      <cell>TRUE</cell>
+      <cell>=_4_7Lor9fwj</cell>
+      <cell>=1166</cell>
+    </row>
+    <row comment="ꆼ笌輵⣕ꍸ䖤ၷ뾾攩ᐏ㞥覫苓乸칎㣍߅&#691217;&#105536;涛⯒蹁蜰쇑ㆰ翡虗왹鸲&#167328;స虆ᬊ̣ṹ밤䜞Í젂雓첛釥库滋慅鶂牐ᷕ者圏䫆ጂ茾妅즶&#165085;埖㱔溎劘由싕㼏艡⸌㐩➗든궳蔥ꍫ䅽퓒볞뇉∔䇎⢌荥ꮤ쵊聯齶떯ⳏ駅">
+      <duration>-</duration>
+      <cell>FALSE</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>=iEy2wj</cell>
+      <cell>-</cell>
+      <cell>(FALSE XOR (1184 &gt;= fH58e0HxJ$aLyV[-1]))</cell>
+      <cell>(NOT (26313 &lt;= 1189) XOR FALSE)</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="잴붳ᾲꊊﮰ䀨蓘鬬崊㋭䪇೜Đ湝㽅ᶘ꤯቙氋㮻鵭⧳卵굈攈㯀臩囍儴⃎☪翨였&#101686;굺뤻Ʇ✂戞枀恦폭券槡姘毇ఏ綗晇鄬&#145883;እ⟭蠫襁冒ી摠뺪響隸஝뼻ኂ憘ᑺ鱷唺䜾↥肁制鰰工๶檑獋飮꫶ґ雁ಛᗴ挙鑢贁铴퀘ʊ旑ᤖ">
+      <duration>[8,-]</duration>
+      <cell>NOT FALSE</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>(TRUE AND TRUE)</cell>
+      <cell>=(7393 &gt; 29841)</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>(TRUE XOR c2GpJ$heZLpJ_f0H[-4])</cell>
+      <cell>=Boi46S7Wp$gTjS</cell>
+      <cell>FALSE</cell>
+      <cell>=28236</cell>
+    </row>
+    <row comment="&#288821;퐉붽嬯ḅ僮㛆趀욁&#112358;욳䌍趣豁㘝奈亰擦诈蜳栲楥ᔫ嘈켗&#164626;쵱鐄厮퍈愠맩研꽥﷡沱㍿⣭໿輆ͩ㕈䘸㡽풆᭏꧌糽⑸ﴰᤱƷ㪷ᔃᱧᷥ냇篶핖衘䈶ѱ캒氾껍&#164890;ᙥ⚾㚎꘥ﴺ浚뢞෡‣ꗜꄘ箔弰駣ﬅ輸빑蠙㝿쥞">
+      <duration>[3,6]</duration>
+      <cell>=FALSE</cell>
+      <cell>-</cell>
+      <cell>=Boi46S7Wp$gTjS</cell>
+      <cell>(27439 &lt;= (2122 + 30214))</cell>
+      <cell>=B3dMcGoct7$</cell>
+      <cell>=o0OUu_9$pzmJMYV</cell>
+      <cell>=((25451 / 11145) / 31769)</cell>
+      <cell>=FALSE</cell>
+      <cell>TRUE</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="夠덺ꏱ眛빪詔㏱ⲭ璃癠뭷ᦐ莁鰟䝿ꂽ␢ⴃ괰ᾍ骗㉁㘲鿴댂읷ۋ臭⁬㒟ᚍ&#98176;೵︇碛謳㶧쉯聙앫꾻㯸냭᜻항깙獚韴㲆藪対ࠪ᧖ᦽ&#138992;맓ꝯ犍᫭挥幭ꆵぁ䭞ਏ禬㭮礏黙퉈꽨꿸띑ߵ豀좗楗멐虯咭泈ड़">
+      <duration>-</duration>
+      <cell>(FALSE OR FALSE)</cell>
+      <cell>NOT FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>=TRUE</cell>
+      <cell>=LJ5fEPUp87cQ6</cell>
+      <cell>=wH1$i</cell>
+      <cell>-</cell>
+      <cell>=FALSE</cell>
+      <cell>TRUE</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="泂贰⍾썥뤰勤⫽쒉斣ඏꝓ澖畠&#91984;뿸꫶軓㙠㓴꡺膻㔰Ꝿ珜椤믔叽퐪ﴑ疽ꡓ란缣ຉꒂ㼛旰몴襤崐蒟혽䞙鴝닏㫺喫ﵑ묠걆娸絓&#99898;ൺ쭒㢯꨾ᢰʒǓܰ冀휀具媽ɡם΂뚻織⒏䙒쪼☚椵麽摵袚&#156160;㠣᜛㤄黑">
+      <duration>-</duration>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>=w6kB</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+      <cell>K$_597h12g</cell>
+      <cell>c2GpJ$heZLpJ_f0H</cell>
+    </row>
+    <row comment="&#83643;뽠⮦笌䄔庝翨暦ᙑ풟쩘욉譙ഊꅥ㟤䈌내ᄞ뒣업퀫앿ᒯ엁狀츍釶＄ꉊリ&#180068;챝㈑֊繒齣&#85867;㒦蘗縪늓儂犮횸⇦皵ౣ켷䙰귒橩⨈ꊮ爀풆秽髸솣꾘淋畳်뭵⠽뾨ួௗ’뙋湧涩촐혉꯭钯巋㊡㌏崀ݷ힒፴ᄹ଴紼픖">
+      <duration>[5,-]</duration>
+      <cell>=TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>_0vL5$mJVcwGU[-7]</cell>
+      <cell>-</cell>
+      <cell>=iEy2wj</cell>
+      <cell>=PiGAmVyQ</cell>
+      <cell>FALSE</cell>
+      <cell>=(9215 &gt;= 533)</cell>
+      <cell>=G$ZRwhEA</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="膌왒ꋉ쬠瞲赹彜࿙&#976942;ፔ畸㍵㥒઒밾材佉&#799833;廩&#103956;閠뎔ꔭ頁꟣ꋎ⏞ᤫ붬贍讇ῗ&#122382;Ꮀẑ셁Ʝ癦鸆㉝䴨ﷺ울੖⁺䘚❍㣟雸燈ᆔꄶ褨⇜늾䀪穗⮼詡㘭ꞯ꤃ꩽ诋㝙ӳ♎ሿ偎&#154038;䰚嬪ڙꚚ&#115170;䤬ଆ愯ᱽ毻㦡⨸&#91224;늞">
+      <duration>[6,9]</duration>
+      <cell>=FALSE</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>(EzKy_ &gt; 4601)</cell>
+      <cell>TRUE</cell>
+      <cell>=PiGAmVyQ</cell>
+      <cell>(TRUE AND Boi46S7Wp$gTjS)</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>(NOT G1TI9vL$K4ADv[-5] AND c2GpJ$heZLpJ_f0H[-3])</cell>
+    </row>
+    <row comment="큳ꊕ枃駏鶁ᖂ䐩쳀唿잍姎ᡳ넨똏晾&#91732;⇔훝䕱曒&#14;︉釩톛塟㬢괘켧︇牲彮梨㈴ꓺ&#140657;䆫쵹⸮㭟궪䱢詵ៜ弸屾&#609329;Ỷ█薢쵍嗰굈퇹䑮ﭶ꾁鰰뉰濴꫈늇韛借骨权圮縯偗䏐䕔疶&#168051;⩃ẅ⎰ౌ泀꣏㛱㦤㰋핎소冓">
+      <duration>[3,12]</duration>
+      <cell>(16197 = 28750)</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>(-(fjo_OLs) &gt; 19156)</cell>
+      <cell>TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>=-(fH58e0HxJ$aLyV)</cell>
+      <cell>FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="๦䆫⍶ᡖ쥊䒩聘䥴ᮁ퇞엏怕︘톹넪꽱ﱾ囸深唀⤘葌᱅趛欅㞧疩⩴䵤漀餢汋ᅞ薐㑋䒅न面졵ߏ齑哛﹏‟몹ⴻ㱏﹗Ꞩ팄荰歈뵵忿䨩Ꭶ婉豺꒎铝旜ﮟ돼렄톚㪒呞둭榊鵬쯎㱂弁䯴繊쾥짜䉱툠乖ꛤ╦뉵죯屉槤ⲷ㾂ꐝ">
+      <duration>[6,14]</duration>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>=TRUE</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>Boi46S7Wp$gTjS</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+    </row>
+    <row comment="챱檥Ｌ⢫㞌᡹ᬵ鈲熔⟽瀇릈嘎弊⇼刺⩌&#642096;건붝韑㗶ਊ嗼컆쩧둚譙⑲žﺳ揣彡羒㲗֝옘郾唅泤￥ṉ细秶嚳ᣨ⣁特艅깙ꫮ娌吷䝵꒝넦᣻㬁潆뭻혹衳줊㵦&#150310;śᾱ십䑛ཚ뼻첄鈼ℵ眊꜑늁ᆣ唄柞᪺ꆂ轄죙뀲玙&#447524;">
+      <duration>[8,10]</duration>
+      <cell>=TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>=(((7884 &gt; 14658) OR (TRUE XOR TRUE)) AND FALSE)</cell>
+      <cell>=FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>=(_0vL5$mJVcwGU AND K$_597h12g)</cell>
+      <cell>G1TI9vL$K4ADv[-4]</cell>
+      <cell>NOT qWie3_u_W_8$o_S[-2]</cell>
+    </row>
+    <row comment="덤蒡ᐳ顾ᩊꮰ捠摻䷱㘰稭괵ｮ䣎챾㊯甗೤嘲幠䓁쓱澲ꤹؚ▩閜䵊묮㆖줊쳿㗲鈸娺驆Ґ怙㙮뙎沀︃ᗷ㮻戹쿈裐福᛭芤ﱕૈ⿇ⱘ❐䉗⊘碑孔鄥˶婜둑㈘헒⺉๳✉磕∃䭰ⶳ㦡ᓯ砏㨺塂辗력⢡㆚ຟ卑⽣❫ガﳌ揘䊖獊驸囸쪔⺏⭱">
+      <duration>[6,-]</duration>
+      <cell>TRUE</cell>
+      <cell>K$_597h12g</cell>
+      <cell>FALSE</cell>
+      <cell>=TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>=wH1$i</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>NOT NOT TRUE</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="庌负ᅑ⇄ꏼ낈䟰銶籯뀭늤䄩嫎澎쭱啓釕ᡳ繩椭ꦿ抁㲰㉖촣䏃妣鋛뻕ꊭ뺩钑棾ዸ䳋⏨⮺駋욡繅㋍⍃댠짲鸹䇶Ⳬぢ᫃늸ꌻ&#168781;&#862251;߰ⴐ㱞ﰾ黋䜗ퟔ쁑潎&#911406;첈믡➑协෶䓵伄ᵸ啻㞌眉歶蒴䆡霶ᔕ붘മ㬕ﾝ鵊笪텏㉈">
+      <duration>-</duration>
+      <cell>TRUE</cell>
+      <cell>(23605 = (18321 / fH58e0HxJ$aLyV))</cell>
+      <cell>=_0vL5$mJVcwGU</cell>
+      <cell>=TRUE</cell>
+      <cell>=Q__s</cell>
+      <cell>(FALSE XOR c2GpJ$heZLpJ_f0H[-0])</cell>
+      <cell>(-(31934) &lt; 22432)</cell>
+      <cell>=(-(30327) &gt;= fjo_OLs)</cell>
+      <cell>=hljjnpg6</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="辎崰紳턲씧鎥ᅨ풊왨⧳併퐬５仂㋢싱ﴳ劲썒䁛䄣辳쀕&#360460;↍Ɵ水讑嵧舭ꦭ훍츴빀ꦩ謄㴞҃꿔䟫蓩辕鲻簮繄쏷麈좃咗該࡫&#458797;ﾫᾚ㸮Ⳣ曊쏾䄔꾡浑穲⩊훵ﺰ忻ᙢ胮⋒㮷뙉䚬扺ദ粚⾗梖ㅟ術黌&#521330;䠼륷逋슂霱孔">
+      <duration>[1,6]</duration>
+      <cell>=(TRUE XOR TRUE)</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>=TRUE</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>=o0OUu_9$pzmJMYV</cell>
+      <cell>=14356</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+    </row>
+    <row comment="ᔁ䇋除亥ൃ୙㵐⎟ᇧ䌹㪂㎵⚶큲걨鸖쓍ꥦ娑廤往륨楚饘睔㣰⸿⮇餝蹳셅㇌윽淜⬍뿋貙ዼ딘మ／㍺ⱹ﹤&#96472;앭톅嬩麷ض粭혏煥ྡྷ艒Ⴝ谾흕杉咐⊗ꅓ溥徕ꘇꆊ훺憐㨝堀胸鑞◩㐘ꃼ醜䀲뗇꾃柜֣₍协&#968825;ꮞ赹祫瀞ᔲᦝ">
+      <duration>-</duration>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>=FALSE</cell>
+      <cell>K$_597h12g</cell>
+      <cell>=LJ5fEPUp87cQ6</cell>
+      <cell>=wH1$i</cell>
+      <cell>=fH58e0HxJ$aLyV</cell>
+      <cell>=FALSE</cell>
+      <cell>=G$ZRwhEA</cell>
+      <cell>K$_597h12g</cell>
+    </row>
+    <row comment="鄟阊稭닃㭪&#127079;䌪Ⲷ㜺㔳୸螙ᩖ꞉扡닰㟭卺뎟䨛㴪虭♛ᥗ렄躿뺧鬢餏﯅쐓豳ᓏ㯷භⴶ斧⵹밃樻霕戎摃ࡿ䣒ꩂ쏽縀ᢊ&#102347;ᬺ돌㩡ꄊქ⦥ᢡ粸⑦䐅宇ᥛ뛅⎳暼빇੏읠ꩥ쟢殛&#737332;൸郞ꭒ筗住㸊ᝋ丧괉竝嬬㞙旱◮ꓣ氂">
+      <duration>[1,8]</duration>
+      <cell>TRUE</cell>
+      <cell>(8853 &lt; 4863)</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>FALSE</cell>
+      <cell>=_4_7Lor9fwj</cell>
+      <cell>=20798</cell>
+    </row>
+    <row comment="Ⲙኘ鏆䠇鮰澲绰&#367736;寊㍲딏钉ᮙ欈慸╫붪㬣ᝨ㕕ぱ쟭ر꼰蛹羕츣蘿緗끁妷騋㲸ನ谄貸翐䦜᤯䷠&#129596;䫝ꪝ玘冗澡ዲ쫐஁鉴浾䗁⧎怸䑻莜䥜沶졻껸괧鸎ᐇᨮ悘搒ꜽ悯岙㫎薍ꇓӜ䤧萊쫄ﲻ熘﹡㶋ᧃ조&#551979;ퟫ퉾흣挃">
+      <duration>-</duration>
+      <cell>TRUE</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>=TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>(FALSE AND TRUE)</cell>
+      <cell>FALSE</cell>
+      <cell>TRUE</cell>
+      <cell>(20292 &gt; 29142)</cell>
+      <cell>Boi46S7Wp$gTjS</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="螄䶕䯠ર㼬ﬦࣜힶ肚&#135265;돡挢覒眡褄쌔峽생̀⬜&#151725;煛醝都ᓣ貣⢾璓툪퉼髀璹糬ូ싿눣┃ち젢萻趔䄄㏹뻹㉌蝓甚ཆ녤夢ꈡ뜡ꗼ꩔歹穣⤎⿲앱宔켄蹐曲韮⁣觿ب聑鉶䃋䠷亸᰿৆﹮ᰟ㱔檔蟀ధ뚰삑ĥ플鎒䦤挬镝偔Ƅ">
+      <duration>-</duration>
+      <cell>=TRUE</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>=NOT TRUE</cell>
+      <cell>Boi46S7Wp$gTjS</cell>
+      <cell>=PiGAmVyQ</cell>
+      <cell>=486</cell>
+      <cell>((-(13755) + (29004 MOD -(12736))) = 9413)</cell>
+      <cell>=F9_7$9dm6juyojhk9BK</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="婷鮸㼵捋츏㸣ꋋ藿톀퓸ቡ㢅羽ㇴ&#970755;쯧뛸অ戼䈡額厾Ŭ還&#87065;첧젮᙮뉅䛭뮃窕홁橀&#947210;ɧ똹轶&#424057;믿蝵튠龮㰍&#173589;살㗋ジ핐泅夗칅➟忤疽అ鞗羕訍뙛닡弦뾨利됕㬥쟡⌍錪&#187843;槅&#86831;厽颧盱섗㋟屁坨ꯠᇇ瘘咘茎">
+      <duration>-</duration>
+      <cell>=K$_597h12g</cell>
+      <cell>TRUE</cell>
+      <cell>=(TRUE AND (-(xR$FW$z5U) &gt; -(27040)))</cell>
+      <cell>Boi46S7Wp$gTjS</cell>
+      <cell>-</cell>
+      <cell>K$_597h12g</cell>
+      <cell>NOT (26945 &gt;= (9349 * 7025))</cell>
+      <cell>TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>(fjo_OLs &gt; 31140)</cell>
+    </row>
+    <row comment="妯⣱꟮䏺뎀䖅茸ྉ㛊㯙ӌ&#711747;ᗺ멱龙&#948241;픱贱砄璓鉟棚骞䧲쁁疼臘獤ᨉ댨ꝙ⤙첹暍&#552979;썦餥蒊톒鹏쉦蕑灲䇴ꇋ㰓Ἥ颪䦱㫁櫧뽘&#179776;箲㹨ﴟ⇔鷄鰱鶷ꭩ㙟䑴숄㡀硵쮞굣焙꠰簞⤟瞠谲쿠Ჟ甞擄ࠠ쏨ꍉ謠졉">
+      <duration>[6,-]</duration>
+      <cell>oMRnDy</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>-</cell>
+      <cell>NOT TRUE</cell>
+      <cell>(-(xR$FW$z5U) &lt; 6100)</cell>
+      <cell>=A$IG59V$J</cell>
+      <cell>NOT FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>=10851</cell>
+    </row>
+    <row comment="ﶻ౩拞샐Ხ殣霜쇢晴᛭콪钀Ť⵴昘씨寥䉎疉쁲␩볏䨃놀氶诊㘘◨ᷦᴣ媗燶먓閗⟰짼&#846922;墲铂얎䫀嫗꫙䐌湮鵦⼨攗趽议諺㘶㮸뷅庅⧸㗣悳﫲䈽岏㎏舫ꖿ훘ᘑ뜬㳘⃪줄塬༶鱑&#177398;&#108848;徝௶⪧篖댇觨ꉩ&#103142;蓮㮳唆">
+      <duration>-</duration>
+      <cell>TRUE</cell>
+      <cell>(TRUE AND TRUE)</cell>
+      <cell>=(FALSE XOR FALSE)</cell>
+      <cell>=c2GpJ$heZLpJ_f0H[-9]</cell>
+      <cell>TRUE</cell>
+      <cell>=PiGAmVyQ</cell>
+      <cell>=2964</cell>
+      <cell>-</cell>
+      <cell>=l_MRc_cjkQF_zd</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="䵄橒἞侽詏&#434215;℈鰳⧏욆玻ꈐﶜ쫺衐峛䝾Ț魯଱례鼾낢蠟춤ᯋࠓ醻㟐ҡᇇ낗煰碃㸭穪䟝먢﩯Ѳ᝻쬟ី暁簵㐗ﱢ뚉̏仆䙟㑝硹ꪖ옜ﾄ꠬ᇒꢴၷ䷃⿸ꣷ璧聂ϳ穀셭훆檱彑೹퇽联⛩ҫ蒐䷧漾膮욗䚂苠즽담ᑹዩ⸺">
+      <duration>-</duration>
+      <cell>TRUE</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>FALSE</cell>
+      <cell>(EzKy_ &gt; 27543)</cell>
+      <cell>FALSE</cell>
+      <cell>=Qmoiw$7a</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="蘦&#725079;▕ᰆώ쳂梟譇됳侳㭅䪰ꙁ맫້ᵅ鹔庤趣寉딏㹝梧凨稊쵘듼깬黫&#705636;脃仛䞊隷ᚑ㙝죈菙瑦홞䅏ࢣ両榓낼ꋊ쀹&#256054;林痭❴梊ᜃ荊&#174083;ｮ箈렡닁飗✟綇䥼f踦짹Ẅ븪쵟脁룢ꗀ⪰⫅塑㼠붐&#172376;⣅쵿눣虹켼패䉝筥">
+      <duration>-</duration>
+      <cell>-</cell>
+      <cell>qWie3_u_W_8$o_S</cell>
+      <cell>NOT NOT JcwE$DQ$A3X</cell>
+      <cell>Boi46S7Wp$gTjS</cell>
+      <cell>=VER_j45GuaUCh$o</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>=FALSE</cell>
+      <cell>(-(17154) &gt; 18128)</cell>
+      <cell>TRUE</cell>
+    </row>
+    <row comment="ൗФ灗䡡ᆝጃ륚귫ꐒ게❾縒舼&#396367;픃鸆ⴹ茍滐諯ு栂ᦸ蛗斮豧⹒쑐ᓀﯟ㍇翨ꯞ㩥씛ሷ撛둀棙&#774152;Ⴑ꿟㼋⮯&#803873;狧碗者䦢ᶍ⛅谉敏&#977970;펢繃蹲מּ虝퟇料瑔&#175368;ᵌ㲍揋リ袦緡┏鯯묗籀߉谫娿ᘊ寂꥽稁죕䊓尌⟿̷꓈묝蠃">
+      <duration>[4,-]</duration>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>=TRUE</cell>
+      <cell>=VER_j45GuaUCh$o</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>FALSE</cell>
+      <cell>=xR$FW$z5U</cell>
+    </row>
+    <row comment="衘ꨧ⭽ㅃ岞侏嚾ㇽㄮ덕᫡ퟜ琷靋ℯ忒⑒鎁㌈谢즕﬷蓃ꀍኼⵁ緩ᰞ⩅녍尨ꀅ黓㈘誼✯퐻ꓘ嫔嬇࿲ꆘ嵕䨤⟳⇑좽륯䜮았꼴℩大⽷搜삛꟪맥錺ꘜ胊꩒쓐푐ᓚ⃋⻕林乞䤸푓ᔉ싀寨놞&#65572;掕ꢆ擊껌뢻篖⁐&#162452;㧔䄨句">
+      <duration>-</duration>
+      <cell>-</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>=FALSE</cell>
+      <cell>=TRUE</cell>
+      <cell>(27163 &lt; (17783 / 224))</cell>
+      <cell>G1TI9vL$K4ADv</cell>
+      <cell>(15947 &gt; 6456)</cell>
+      <cell>=TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>=9062</cell>
+    </row>
+    <row comment="擐츚ɇ瞹䋮ꗬﺅ응ጕ腃聿呆솢藧뇷샖ꐨ萼ʧ鸴༜叀￶क़紙莩뵒㛮淄嶥̣㱣쉓墴ᩡ萒ﶷ㨨꫋窖湛䋄솽⌱랤慡傐ꥆ䨘쫉敦醰Ꮦ渽螀ὓ唡涻鏕뼌臨띦╨닑ᑱ뫅蓳숑Ṓ깥欠毋ᓬ렢沭⡀휘礅键㌮裂俁ꑳ뼚鳔傡">
+      <duration>[2,-]</duration>
+      <cell>=FALSE</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>(NOT FALSE OR (-((18919 - 19270)) &lt;= -(25937)))</cell>
+      <cell>K$_597h12g</cell>
+      <cell>=VER_j45GuaUCh$o</cell>
+      <cell>-</cell>
+      <cell>=13109</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>=fjo_OLs</cell>
+    </row>
+    <row comment="赨答鋫亘置ᷣ醒罁豛٬ძꜟ퓥듧䵺䰐︺쓚ⶆ걣쵈묦똟꣥ᚔ喦⏻る⍫潶猗&#157642;혍랔㢵埡轉⚌ࠟ孽뱹猃稿䞹걘Տ睔陗늋꿥ꦄ紅릆㯼睑욠뙫鐱ྮ䉟塳້澅炳鏤壺葉㡞鍘充ꢯ굀힉푦晁侎闠쓣㣝⟲㾒殕顃쫧회">
+      <duration>[8,12]</duration>
+      <cell>FALSE</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>=(TRUE XOR FALSE)</cell>
+      <cell>=TRUE</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>(TRUE XOR FALSE)</cell>
+      <cell>=l_MRc_cjkQF_zd</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="᜿ẜ䞮쯠쪴紏薭俍㕐珧᭽ꛦ峗ꅿ띱祐咼䋠攽졻ﮊᨩش&#144761;媏쒻⨗耉୒ﹶ쬕颓縣퉊쨹┕ꎒ呫埨䪵欘쟟᛽黾ݍ孪잣锟೩觫橯蝭ꓔ⦱싸팠볨ꭁ⦀◡ퟻ列⫡뵪&#119902;쨹ᖃ䚄צּ훎䊔欉啚쀃滙簦ㆭ䖀&#730160;⿆腧೐陫붦ꏔ&#440425;ී醀摬&#330756;荌">
+      <duration>[0,-]</duration>
+      <cell>-</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>=TRUE</cell>
+      <cell>c2GpJ$heZLpJ_f0H[-4]</cell>
+      <cell>TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>(26301 = fjo_OLs)</cell>
+      <cell>(2615 &lt;= 23060)</cell>
+    </row>
+    <row comment="謣糞⣣齃&#305215;๫೚⊛惘稢믘퓸㺊Ƃ⓺倫笐뒫胾䆝ᧃ灠㲔嫿￡㐝Ɍ㥣蝵竒혴嬭웼砥谞黱徒縨ꙋ༺蠫簾ꡭ㝋볏㆘ꮃ⳥wࢠᩁ皈䵻㞋ጓ⧒説ᐄ嗆￶﬌ꟼ䋋㹥븟떗ሡ熃雦砹ߖឈ콰邶ళ祾꼕ꪟ굺ၢ饇袱ㅔ謎䙠ﯓ䴘벉㈙ቮ偳">
+      <duration>-</duration>
+      <cell>NOT FALSE</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>=oMRnDy</cell>
+      <cell>(15576 &lt; 3667)</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>(12518 &lt; 3637)</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="巸큀䴛&#249898;폋埰腍齦循싂膩蹝⿔罨ᘔ繹쫞偟瀍鱘儦哃땨좧䖘츪꾌蹊ꃸ攸&#722015;ᐮ疓夤㌪즛&#96402;Ⳑ⫎䁺௡⤲ﰓ㩆䂎Ḧ䰇㦊쪒㗍젮複랍诤㇏凘莝↟竒驻ᘑसᮾ碆벉㛔ᄃ㑿왠〪㌤≵焫輓㴥⨂&#88261;墱苸ﻜ掗⟑毬溯枅㸏곀篓䙦ᅈ">
+      <duration>[7,-]</duration>
+      <cell>=oMRnDy</cell>
+      <cell>TRUE</cell>
+      <cell>TRUE</cell>
+      <cell>=TRUE</cell>
+      <cell>=B3dMcGoct7$</cell>
+      <cell>Boi46S7Wp$gTjS</cell>
+      <cell>TRUE</cell>
+      <cell>(19696 &lt;= bok_Hn0wzf7Re$)</cell>
+      <cell>(oMRnDy XOR (xR$FW$z5U &lt; -(25384)))</cell>
+      <cell>TRUE</cell>
+    </row>
+    <row comment="ꁌ㠺㑈ָ闊&#195815;뢉끯訬沓ᵃ虖뼒ᅘ譢꽲ᗀດ怽납⟫鱈䢗탨쀚햢⦼䂂୲ꐿ&#128145;䗑걛뷂疚ﰩ癮ݡ⢧ᔘ偺뭥堐㘲降&#128489;᥊렱&#80322;묘&#746615;⌢綡⼋뿷ꤔ킅ꥂ&#447522;簆뻓൯㤹᫧萿ꗖ퉪椬룆ʗ긳⮇雬덧껉쿽ဪ香獦蠲忎">
+      <duration>-</duration>
+      <cell>=TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>-</cell>
+      <cell>=(-(26271) * 7242)</cell>
+      <cell>=FALSE</cell>
+      <cell>=hljjnpg6</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="ᄜꎞ׊匢ａॸ겜ꋖ쿾䞷ꅨ⡛锧㷼බ죭Ꜯ㏬盃嶝蕥礠徛鎚䣄葂嚯橲搜荃띭Ƭ퀾㢊⿯鍴綦ꌷ뫢옊᥎禨䵅뚖駵᠐뒽጑┈&#192645;酖ᄤ⽦伍ㅏ氾ፃ&#134221;୧㼓寭쨷鯤鸛㿍⛱䘿焠콹픡⁧暷髿媟⩱ಊ粁풡ꘈ䡶츀猼霹뱖撆慬▤≑쓫䤩">
+      <duration>[1,-]</duration>
+      <cell>TRUE</cell>
+      <cell>=ZcCgQr</cell>
+      <cell>=TRUE</cell>
+      <cell>-</cell>
+      <cell>=w6kB</cell>
+      <cell>=Qmoiw$7a</cell>
+      <cell>(FALSE AND TRUE)</cell>
+      <cell>TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>NOT FALSE</cell>
+    </row>
+    <row comment="띏ꍽꂔ몾겭ᚖ줋읈屮㝚Ⳡ꠶쵄퇮Ǥ鈜ᛥ愺㮺亨飭⼘뽱㠌䆐蓓첀높옟㠓ᙵඑ됹⶙牑穤䓼ስ퓓፷ꑺ乎&#753787;䷉ﲑ腮燃贳ᯅ﹓Ϋ✤ޙ&#139552;ᒰ僒骯촸&#722983;ᾙ瘁ꯡ喸즯㑪樸茳﫿䣴胄지⾙᛻袿趺쉞垆脓鸅讧囨㛍ᩕꇼ쥭벌쵥">
+      <duration>[2,10]</duration>
+      <cell>TRUE</cell>
+      <cell>=i$6z0v_VTT$4PwAN</cell>
+      <cell>(29917 = 27566)</cell>
+      <cell>=(FALSE XOR TRUE)</cell>
+      <cell>(TRUE XOR TRUE)</cell>
+      <cell>-</cell>
+      <cell>=29166</cell>
+      <cell>=(28299 &lt;= 12674)</cell>
+      <cell>=l_MRc_cjkQF_zd</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="ᐼᦪ趷궻泻⪔歎ጪ࿌䦸יִ퇆ℼ鴆˪Ύ붬遴脨똾갇㺪䡴艢憍㭅Ｔ㩏蓁腓و㵶Ϯ술᝱뿿Ἱ汎ꄂꅽ蝍鸏䨤ꍊ쎍㽒칟쎋ꐗ逤⊵&#77670;괪ᕖ弛솝&#948308;፪듉ᳺﺋ𥉉ꘋ톲嗸硅쌇䞥媃嬚튦ᷪ㶤듀⯳嚉駹萖颼嶱浚܁顰閣ݽ淧瑂ꀝ必ﳭ䕲䰗">
+      <duration>[9,-]</duration>
+      <cell>=FALSE</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+      <cell>=(FALSE XOR TRUE)</cell>
+      <cell>-</cell>
+      <cell>FALSE</cell>
+      <cell>=6101</cell>
+      <cell>-</cell>
+      <cell>=G$ZRwhEA</cell>
+      <cell>=(11362 MOD (16703 MOD ((29332 / 27930) + 19534)))</cell>
+    </row>
+    <row comment="ꃋ橍꫌낔橹»ꀧꩼ薫ﲉ䘥製呛ి濂垈箖⼦굪倬&#295983;ὼ僟㺠燐鰚篞듐鐐鬔稄쫶䪺Ֆ烌⠌훩ꩈẇ选턬㍑惇ࡨ殛鮗ת⍍俠貓렒夋ꉺ㖉晑➖깧穗鼷և貐왒♓函䁝&#94557;⊕훰♺ۼ䶒黴꒾褨⸐⼘㙙申쁩鄦㸃뭲풳螲㷛遺㕙葸楒ꨐ뿝蕎">
+      <duration>[3,-]</duration>
+      <cell>=NOT _0vL5$mJVcwGU</cell>
+      <cell>NOT c2GpJ$heZLpJ_f0H</cell>
+      <cell>TRUE</cell>
+      <cell>(fjo_OLs &lt; EzKy_)</cell>
+      <cell>FALSE</cell>
+      <cell>NOT NOT (EzKy_ &gt; fH58e0HxJ$aLyV)</cell>
+      <cell>=3675</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>=4790</cell>
+    </row>
+    <row comment="螕쪽来ം鉽쁕໪闦ﾼ꽏鞘ᘋ똎ബ뭦朇ᕢ윛Ⴛ&#860270;㲈嗺蓹蠔귰얗ဵ멍㞑&#306300;樼겢칁迴먋쿇&#440447;뻦୤午硄㠊旆諞ﴄ䐩烞ঠᖧ喇⭦橍밑䶬巸旉㑞勂᧦憯钿&#93603;᳔⋡䄇㶙&#105436;횟憎罊煖៏ጾ뵯緖뮌㎈岝낁尬傖彃휓ꨵ﷪᭦">
+      <duration>[1,-]</duration>
+      <cell>=K$_597h12g</cell>
+      <cell>-</cell>
+      <cell>=(FALSE AND FALSE)</cell>
+      <cell>(9085 &lt; 13986)</cell>
+      <cell>-</cell>
+      <cell>=o0OUu_9$pzmJMYV</cell>
+      <cell>TRUE</cell>
+      <cell>=FALSE</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="ⷐ狣ర刂뙎ᄯ쯕쐊井冄ꐼᝌ㯰幊辻둊蓈䊑箫殻㫳Ӗ誂&#166179;䅫逘ꎌ鵰詻旾簓笎环혀䀨㴒콹斞籦䏲ځ峡૕ﵪ럩䊒┸甜䎴ﻈ布냊쪉历㨮⨅쿍᧔ીᷦ㫿⻴餉ᕧ&#193284;&#171671;棊泔攨瀗쏦༻肅鿳雫뜚᪨馚携ꝺ菀ᘰʸ蟡牝㸧Ҋ">
+      <duration>[4,-]</duration>
+      <cell>-</cell>
+      <cell>(17187 &gt;= 19723)</cell>
+      <cell>-</cell>
+      <cell>NOT (NOT JcwE$DQ$A3X XOR TRUE)</cell>
+      <cell>=VER_j45GuaUCh$o</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>(JcwE$DQ$A3X OR TRUE)</cell>
+      <cell>FALSE</cell>
+    </row>
+    <row comment="穂紏᳄䩭&#139770;겘⭿簨횦杅픸眾崵靔쪷球巿럷⧍誎둖댫꽌춑ⓧ垼もᣉ襤㪇ኮ偊ῑ휚粃ః꫌뇍&#105137;ㄲ샣ꅑ넁᪃⺄뜁ٞ蝳䶯龎恓೔鼴ഘꍬ㪁脒郎㛎ᬢ젢ﴹ欋ᣣ뒾숧슍㌻礃●力᭝仚ⱆ罿⍋凁㝮ಯ਀鄴꘡⺦幞邵⋆뀈俅퟽঳">
+      <duration>-</duration>
+      <cell>=FALSE</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>=B3dMcGoct7$</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>TRUE</cell>
+      <cell>=qWie3_u_W_8$o_S[-5]</cell>
+      <cell>FALSE</cell>
+      <cell>=19729</cell>
+    </row>
+    <row comment="⠘⸶ሢ䦰ꍼ⑪ⴠϮ论改ꘊ䡙໠䅶ꐐ긽埂ｉ䂥볅徼됦잌㩹䂏୞㈈ぬ䑚潝欪꛾ᇁꭹ଼쉁爤뱫塓萃俾╥秺᥯ꭥ뿇㩘抩魷汮쀛촎◔袄㨨䖫浏糶넸ᆸ쌭䂕ꗣ诧䳵鞚ᙎ氦㕛놼㴶ᓵ헼䪋퀡곃㡢䋜辖䴂㛛狯淯렏韤&#289876;㉡ɸ⪓⇏၍">
+      <duration>-</duration>
+      <cell>oMRnDy</cell>
+      <cell>=i$6z0v_VTT$4PwAN</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>TRUE</cell>
+      <cell>FALSE</cell>
+      <cell>=l_MRc_cjkQF_zd</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="흖鄊댜몓&#101579;鳆择墳๤痒&#127058;断䤁⬝詪ꫳ攒鵘⫹烵品ㇵ⥓嘺ퟣ઱餅赪㶫餹嶝㤅垦䄟㺿턤籂또崰ടÎ뒓項霵퀖㢤㖫᯲旒빻臭ꍠ䦺⁞힂紐꿟薪ȕᖾ㋙ꄉꚢ킺寴掫ԫ&#70312;밻绱⩏䀭푋骮ﴧ쬾紟痽䈎碫揇괶灈">
+      <duration>[3,-]</duration>
+      <cell>=c2GpJ$heZLpJ_f0H</cell>
+      <cell>-</cell>
+      <cell>=FALSE</cell>
+      <cell>-</cell>
+      <cell>=Q__s</cell>
+      <cell>c2GpJ$heZLpJ_f0H[-3]</cell>
+      <cell>FALSE</cell>
+      <cell>=(24508 &lt;= -(10451))</cell>
+      <cell>JcwE$DQ$A3X</cell>
+      <cell>=9622</cell>
+    </row>
+    <row comment="藩༯蹴ಣ슍龙걻첸㛵쒱㝭勡剶셇섌猞캎譭즀뾻ɀᨒ欅&#174832;辮܁€娩！⫊鳷㓮ꄀ쎲䉛蓣댳㐙簘䆤奱ণ&#196279;ꆠý괰꒬鹊䵛뫢捽⒌ㅞ⃻䭹ꜧ疖䫼싣鲧⊭躛긥ﺷ蔨嫜䂤邏⃓텒స&#525389;杼ꕂ㣵乄텡窈动綛훊犁琯戸∻ㅁ往䭷ᦔ굆穚">
+      <duration>[6,-]</duration>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+      <cell>K$_597h12g</cell>
+      <cell>FALSE</cell>
+      <cell>FALSE</cell>
+      <cell>=A$IG59V$J</cell>
+      <cell>=9516</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>-</cell>
+    </row>
+  </rows>
+</specification>

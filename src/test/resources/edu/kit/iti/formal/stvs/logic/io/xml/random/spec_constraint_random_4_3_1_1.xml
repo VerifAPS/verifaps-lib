@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="睿ą" isConcrete="false" name="핔ꩍ&#143152;">
+  <variables>
+    <ioVariable colwidth="100" data-type="QndD" io="output" name="AGv"/>
+    <ioVariable colwidth="100" data-type="BOOL" io="input" name="w_"/>
+    <ioVariable colwidth="100" data-type="BOOL" io="input" name="uZj"/>
+    <ioVariable colwidth="100" data-type="INT" io="output" name="Gv"/>
+    <freeVariable data-type="BOOL" default="FALSE" name="$O"/>
+  </variables>
+  <rows>
+    <row comment="嶺緼☛篥뽘㑘&#444519;륄">
+      <duration>-</duration>
+      <cell>(TRUE OR (4077 = 14104))</cell>
+      <cell>=FALSE</cell>
+      <cell>-</cell>
+      <cell>=4391</cell>
+    </row>
+    <row comment="咿잟ꆮ焅ꉋ䋲깚០왘帣">
+      <duration>[1,2]</duration>
+      <cell>(TRUE AND FALSE)</cell>
+      <cell>((29482 &lt; 3562) AND w_[-1])</cell>
+      <cell>TRUE</cell>
+      <cell>=21118</cell>
+    </row>
+    <row comment="饿镶鿆㖵⓾ᘫ촗꾏腪⫋">
+      <duration>[2,-]</duration>
+      <cell>=KRJ</cell>
+      <cell>(13196 &lt; 18279)</cell>
+      <cell>FALSE</cell>
+      <cell>=4892</cell>
+    </row>
+  </rows>
+</specification>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="⮳ᜉদ氡䙜䫦" isConcrete="false" name="䡹ﴆ">
+  <variables>
+    <ioVariable colwidth="100" data-type="ZzU_" io="output" name="bE"/>
+    <ioVariable colwidth="100" data-type="BOOL" io="input" name="DV6"/>
+    <ioVariable colwidth="100" data-type="INT" io="input" name="ga"/>
+    <ioVariable colwidth="100" data-type="tple7" io="input" name="Qa$C"/>
+    <freeVariable data-type="BOOL" default="FALSE" name="uVm"/>
+  </variables>
+  <rows>
+    <row comment="瀻먰씮㌶⧦趝쇂&#103741;">
+      <duration>[8,-]</duration>
+      <cell>-</cell>
+      <cell>-</cell>
+      <cell>TRUE</cell>
+      <cell>-</cell>
+    </row>
+    <row comment="ꖰ㜾矤ớ恖ꗸ㴠哨制妓">
+      <duration>[9,14]</duration>
+      <cell>=dJE</cell>
+      <cell>=DV6</cell>
+      <cell>TRUE</cell>
+      <cell>=$4</cell>
+    </row>
+    <row comment="跤뙲쾯∵ᰱ퓫諸">
+      <duration>[3,10]</duration>
+      <cell>-</cell>
+      <cell>DV6[-7]</cell>
+      <cell>FALSE</cell>
+      <cell>-</cell>
+    </row>
+  </rows>
+</specification>

@@ -13,8 +13,8 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -26,10 +26,10 @@ public class RandomGenerator {
   private static final List<String> INTEGER_BINARY_OPS = Arrays.asList("/", "*", "-", "+", "MOD");
   private static final List<String> COMPARISON_OPS = Arrays.asList("=", ">", "<", "<=", ">=");
 
-  private static final int MAX_IDENTIFIER_LENGTH = 5;
-  private static final int MAX_ENUM_LITERALS = 4;
-  private static final int MAX_COMMENT_LENGTH = 10;
-  private static final int MAX_NAME_LENGTH = 10;
+  private static final int MAX_IDENTIFIER_LENGTH = 50;
+  private static final int MAX_ENUM_LITERALS = 10;
+  private static final int MAX_COMMENT_LENGTH = 100;
+  private static final int MAX_NAME_LENGTH = 50;
   private static final int MAX_INT = 32767;
   private Random random;
   private List<TypeEnum> enumTypes;
@@ -50,9 +50,8 @@ public class RandomGenerator {
       freeVariableList.getVariables().add(randomFreeVariable(freeVariableList));
     }
     ConstraintSpecification constraintSpec = new ConstraintSpecification(freeVariableList);
-    constraintSpec.setName(RandomStringUtils.random(random.nextInt(MAX_NAME_LENGTH - 1) + 1));
-    constraintSpec.setComment(RandomStringUtils.random(random.nextInt(MAX_COMMENT_LENGTH - 1) +
-        1));
+    constraintSpec.setName(randomAlphaNumeric(random.nextInt(MAX_NAME_LENGTH)));
+    constraintSpec.setComment(randomAlphaNumeric(random.nextInt(MAX_COMMENT_LENGTH)));
     for (int i = 0; i < columns; i++) {
       constraintSpec.getColumnHeaders().add(randomSpecIoVariable(constraintSpec.getColumnHeaders()));
     }
@@ -84,7 +83,7 @@ public class RandomGenerator {
       cells.put(ioVariable.getName(), cell);
     }
     SpecificationRow<ConstraintCell> row = new SpecificationRow<>(cells, p -> new javafx.beans.Observable[0]);
-    row.setComment(RandomStringUtils.random(MAX_COMMENT_LENGTH));
+    row.setComment(randomAlphaNumeric(MAX_COMMENT_LENGTH));
     return row;
   }
 
@@ -317,36 +316,31 @@ public class RandomGenerator {
 
   private String randomIdentifier() {
     StringBuilder id = new StringBuilder();
-    id.append(randomNonNumeric());
-    for (int i = 0; i < random.nextInt(MAX_IDENTIFIER_LENGTH - 1) + 1; i++) {
-      id.append(randomAlphaNumeric());
-    }
+    id.append(randomNonNumeric(1));
+    id.append(randomAlphaNumeric(random.nextInt(MAX_IDENTIFIER_LENGTH)));
     return id.toString();
   }
 
-  private String randomAlphaNumeric() {
+  private String randomAlphaNumeric(int length) {
     int randomInt = random.nextInt(10);
-    if (randomInt < 2) {
-      return RandomStringUtils.randomNumeric(1);
-    }
-    return randomNonNumeric();
+    return RandomStringUtils.random(length, 0, 0, true, true, null, random);
   }
 
-  private String randomNonNumeric() {
-    int randomInt = random.nextInt(10);
-    if (randomInt == 0) {
-      return "$";
+  private String randomNonNumeric(int length) {
+    StringBuilder res = new StringBuilder("");
+    if (length > 0) {
+      res.append(RandomStringUtils.random(length, 0, 0, true, false, null, random));
     }
-    if (randomInt == 1) {
-      return "_";
-    }
-    return RandomStringUtils.randomAlphabetic(1);
+    return res.toString();
   }
 
-  public static void main(String[] args) throws ExportException, UnsupportedEncodingException {
+  public static void main(String[] args) throws ExportException, IOException {
     RandomGenerator generator = new RandomGenerator();
-    ConstraintSpecification constraintSpec = generator.randomConstraintSpec(4, 3, 1);
-    ByteArrayOutputStream baos = ExporterFacade.exportSpec(constraintSpec, ExporterFacade.ExportFormat.XML);
-    System.out.println(baos.toString("utf-8"));
+    ConstraintSpecification constraintSpec = generator.randomConstraintSpec(1000, 1000, 10);
+    ExporterFacade.exportSpec(constraintSpec, ExporterFacade
+        .ExportFormat.XML, new File("/home/bal/Projects/kit/pse/stverificationstudio/src/test" +
+        "/resources/edu/kit/iti/formal/stvs/logic/io/xml/random" +
+        "/spec_constraint_random_1000_1000_10_1.xml"));
+    //System.out.println(baos.toString("utf-8"));
   }
 }

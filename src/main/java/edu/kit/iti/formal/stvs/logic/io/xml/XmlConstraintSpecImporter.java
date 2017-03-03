@@ -92,7 +92,7 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
       ConstraintDuration newDuration = new ConstraintDuration(row.getDuration().getValue());
       newDuration.setComment(row.getDuration().getComment());
       constraintSpec.getDurations().add(newDuration);
-      SpecificationRow<ConstraintCell> row1 = createSpecificationRowFoCycle(ioVariables, row);
+      SpecificationRow<ConstraintCell> row1 = createSpecificationRowForCycle(ioVariables, row);
       constraintSpec.getRows().add(row1);
     }
 
@@ -108,7 +108,7 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
    * @return Specification row
    * @throws ImportException Mismatch between size of {@code row} and size of {@code ioVariables}
    */
-  private SpecificationRow<ConstraintCell> createSpecificationRowFoCycle(
+  private SpecificationRow<ConstraintCell> createSpecificationRowForCycle(
       List<SpecIoVariable> ioVariables, Rows.Row row) throws ImportException {
     Map<String, ConstraintCell> cellsMap = new HashMap<>();
     for (int j = 0; j < row.getCell().size(); j++) {
@@ -120,7 +120,9 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
     if (cellsMap.size() != ioVariables.size()) {
       throw new ImportException("Row too short: Do not have a cell for each IOVariable");
     }
-    return ConstraintSpecification.createRow(cellsMap);
+    SpecificationRow<ConstraintCell> newRow = ConstraintSpecification.createRow(cellsMap);
+    newRow.setComment(row.getComment());
+    return newRow;
   }
 
   /**
@@ -149,7 +151,7 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
   }
 
   /**
-   * mports {@link FreeVariable FreeVariables} from {@link Variables}.
+   * Imports {@link FreeVariable FreeVariables} from {@link Variables}.
    *
    * @param variables variables from which should be imported
    * @return object representing the free variables
