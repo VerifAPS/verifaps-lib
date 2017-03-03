@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.logic.io.xml.roundTripTests;
+package edu.kit.iti.formal.stvs.logic.io.xml.randomTests;
 
 import edu.kit.iti.formal.stvs.RandomTest;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
