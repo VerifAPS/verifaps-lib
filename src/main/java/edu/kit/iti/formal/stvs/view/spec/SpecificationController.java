@@ -29,6 +29,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 
@@ -197,7 +198,8 @@ public class SpecificationController implements Controller {
 
     @Override
     public void onException(Exception exception) {
-      AlertFactory.createAlert(exception);
+      Alert alert = AlertFactory.createAlert(exception);
+      alert.showAndWait();
       onConcretizationInactive();
     }
   }
