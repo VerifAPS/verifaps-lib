@@ -74,6 +74,7 @@ public class TimingDiagramCollectionView extends VBox {
       xaxis.layoutXProperty().setValue(diagram.getMinX() - axisContainer.getMinX());
     });
     xaxis.getStyleClass().add("globalXAxis");
+    globalAxisContainer.getStyleClass().add("globalXAxisContainer");
     xaxis.prefWidthProperty().bind(diagramContainer.widthProperty());
     axisDiagramContainer.setDividerPosition(0, 0.1);
     scrollPane.getStyleClass().add("noborder-scroll-pane");
