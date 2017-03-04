@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.model.table.HybridRow;
 import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 /**
@@ -21,8 +22,8 @@ public class SpecificationTableView extends VBox {
     header.getStyleClass().add("spec-header");
     this.tableView = tableView;
     this.getChildren().addAll(header, tableView);
+    setVgrow(tableView, Priority.ALWAYS);
     ViewUtils.setupView(this);
-
   }
 
   public SpecificationTableView(TableView<HybridRow> tableView) {
