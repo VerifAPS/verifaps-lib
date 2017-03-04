@@ -22,9 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -263,16 +260,14 @@ public class Z3Solver {
       while ((line = reader.readLine()) != null && !Thread.currentThread().isInterrupted()) {
         z3Result += line + "\n";
       }
-      if (process.exitValue() == 0) {
+      String error = IOUtils.toString(process.getErrorStream(), "utf-8");
+      if (process.exitValue() == 0 || error.length() == 0) {
         Sexp expression = solverStringToSexp(z3Result);
         return buildConcreteSpecFromSExp(expression, ioVariables);
       } else {
-        throw new ConcretizationException("Z3 process failed. Output: \n"
-            + IOUtils.toString(process.getErrorStream(), "utf-8"));
+        throw new ConcretizationException("Z3 process failed. Output: \n" + error);
       }
-    } catch (IOException e) {
-      throw new ConcretizationException(e);
-    } catch (SexpParserException e) {
+    } catch (IOException | SexpParserException e) {
       throw new ConcretizationException(e);
     }
   }
