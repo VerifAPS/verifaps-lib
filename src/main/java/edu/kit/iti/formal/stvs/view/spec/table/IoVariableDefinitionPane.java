@@ -71,7 +71,9 @@ public class IoVariableDefinitionPane extends GridPane {
 
   public Boolean isDefinitionInvalid(List<SpecIoVariable> alreadyDefinedVariables) {
     String chosenName = nameTextField.getText();
-    if (!VariableExpr.IDENTIFIER_PATTERN.matcher(chosenName).matches()) {
+    String chosenType = typeTextField.getText();
+    if (!VariableExpr.IDENTIFIER_PATTERN.matcher(chosenName).matches()
+        || !VariableExpr.IDENTIFIER_PATTERN.matcher(chosenType).matches()) {
       return true;
     }
     return alreadyDefinedVariables.stream().anyMatch(var -> var.getName().equals(chosenName));
@@ -80,7 +82,8 @@ public class IoVariableDefinitionPane extends GridPane {
   public BooleanBinding createDefinitionInvalidBinding(
       List<SpecIoVariable> alreadyDefinedVariables) {
     return Bindings.createBooleanBinding(() -> isDefinitionInvalid(alreadyDefinedVariables),
-        nameTextField.textProperty());
+        nameTextField.textProperty(),
+        typeTextField.textProperty());
   }
 
   public void applyChangesToVariable(SpecIoVariable variableToChange) {
