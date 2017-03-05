@@ -20,7 +20,7 @@ import java.util.*;
 /**
  * @author Benjamin Alt
  */
-public class RandomGenerator {
+public class RandomTableGenerator {
 
   private static final List<String> BOOLEAN_BINARY_OPS = Arrays.asList("AND", "OR", "XOR");
   private static final List<String> INTEGER_BINARY_OPS = Arrays.asList("/", "*", "-", "+", "MOD");
@@ -34,12 +34,12 @@ public class RandomGenerator {
   private Random random;
   private List<TypeEnum> enumTypes;
 
-  public RandomGenerator() {
+  public RandomTableGenerator() {
     random = new Random();
     enumTypes = new ArrayList<>();
   }
 
-  public RandomGenerator(long seed) {
+  public RandomTableGenerator(long seed) {
     random = new Random(seed);
     enumTypes = new ArrayList<>();
   }
@@ -339,7 +339,7 @@ public class RandomGenerator {
   }
 
   public static void main(String[] args) throws ExportException, IOException {
-    RandomGenerator generator = new RandomGenerator();
+    RandomTableGenerator generator = new RandomTableGenerator();
     ConstraintSpecification constraintSpec = generator.randomConstraintSpec(5000, 10, 10);
     ExporterFacade.exportSpec(constraintSpec, ExporterFacade
         .ExportFormat.XML, new File("/home/bal/Projects/kit/pse/stverificationstudio/src/test" +
