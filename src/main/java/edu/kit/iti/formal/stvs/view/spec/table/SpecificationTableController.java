@@ -128,7 +128,8 @@ public class SpecificationTableController implements Controller {
 
   private void onProblemsChange() {
     List<ColumnProblem> columnProblems = validator.problemsProperty().get().stream()
-        .filter(problem -> problem instanceof ColumnProblem).map(problem -> (ColumnProblem) problem)
+        .filter(problem -> problem instanceof ColumnProblem)
+        .map(problem -> (ColumnProblem) problem)
         .collect(Collectors.toList());
     for (TableColumn<HybridRow, ?> column : tableView.getColumns()) {
       if (column.getUserData() == null) {

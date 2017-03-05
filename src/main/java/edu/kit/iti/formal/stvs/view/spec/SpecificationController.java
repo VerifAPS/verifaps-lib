@@ -51,6 +51,7 @@ public class SpecificationController implements Controller {
   private Selection selection;
   private HybridSpecification hybridSpecification;
   private BooleanProperty specificationInvalid;
+  private BooleanProperty specificationConcretizable;
   private JavaFxAsyncProcessTask<ConcreteSpecification> concretizingTask;
   private final ConcretizationTaskHandler concretizationHandler;
 
@@ -73,6 +74,9 @@ public class SpecificationController implements Controller {
     this.specificationInvalid = new SimpleBooleanProperty(true);
     specificationInvalid.bind(variableCollectionController.getValidator().validProperty().not()
         .or(tableController.getValidator().validProperty().not()).or(codeInvalid));
+    this.specificationConcretizable = new SimpleBooleanProperty(true);
+    specificationConcretizable.bind(
+        tableController.getValidator().validSpecificationProperty().isNotNull());
     this.concretizationHandler = new ConcretizationTaskHandler();
 
     // use event trigger to generate timing-diagram, to minimize code-duplication
@@ -89,7 +93,7 @@ public class SpecificationController implements Controller {
     view.setTable(tableController.getView());
     view.getStartButton().setOnAction(this::onVerificationButtonClicked);
     view.getStartButton().disableProperty().bind(specificationInvalid);
-    view.getStartConcretizerButton().disableProperty().bind(specificationInvalid);
+    view.getStartConcretizerButton().disableProperty().bind(specificationConcretizable.not());
 
     view.getStartConcretizerButton().setOnAction(this::startConcretizer);
 
