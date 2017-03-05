@@ -5,7 +5,7 @@ import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
-import edu.kit.iti.formal.stvs.logic.io.xml.RandomGenerator;
+import edu.kit.iti.formal.stvs.logic.io.xml.RandomTableGenerator;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -25,11 +25,11 @@ public class XmlConstraintSpecRandomTest {
   private final int MAX_COLUMNS = 100;
   private final int MAX_ROWS = 100;
   private final int MAX_FREE_VARIABLES = 3;
-  private RandomGenerator generator;
+  private RandomTableGenerator generator;
 
   @Before
   public void setUp() {
-    generator = new RandomGenerator(100);
+    generator = new RandomTableGenerator(100);
   }
 
   @Test
