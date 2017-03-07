@@ -29,7 +29,8 @@ import javax.xml.bind.Unmarshaller;
 import org.w3c.dom.Node;
 
 /**
- * This class provides the functionality to import whole sessions from xml nodes.
+ * This class provides the functionality to import whole sessions ({@link StvsRootModel}s) from
+ * xml nodes.
  *
  * @author Benjamin Alt
  */
@@ -81,21 +82,6 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
       List<Type> typeContext = Optional.ofNullable(code.getParsedCode())
           .map(ParsedCode::getDefinedTypes).orElse(Arrays.asList(TypeInt.INT, TypeBool.BOOL));
 
-      /*
-       * Config (optional in xsd, not imported/exported with session right now but separately, as
-       * per customer request) GlobalConfig config = new GlobalConfig(); if
-       * (importedSession.getConfig() != null) { JAXBElement<Config> element =
-       * objectFactory.createConfig(importedSession.getConfig()); config =
-       * configImporter.doImportFromXmlNode(XmlExporter.marshalToNode(element)); }
-       */
-
-      /*
-       * History (optional in xsd, not imported/exported with session right now but separately
-       * History history = new History(); for (String codeFile :
-       * importedSession.getHistory().getCode()) { history.addCodeFile(codeFile); } for (String
-       * specFile : importedSession.getHistory().getSpec()) { history.addSpecFile(specFile); }
-       */
-
       // Tabs
       List<HybridSpecification> hybridSpecs = importTabs(importedSession, typeContext);
 
@@ -130,11 +116,11 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
               throw new ImportException("Tab may not have more than one abstract specification");
             }
             ConstraintSpecification constraintSpec = constraintSpecImporter.doImportFromXmlNode(
-                XmlExporter.marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml"));
+                XmlExporter.marshalToNode(element, XmlExporter.NAMESPACE));
             hybridSpec = new HybridSpecification(constraintSpec, !tab.isReadOnly());
           } else {
             ConcreteSpecification concreteSpec = concreteSpecImporter.doImportFromXmlNode(
-                XmlExporter.marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml"));
+                XmlExporter.marshalToNode(element, XmlExporter.NAMESPACE));
             if (concreteSpec.isCounterExample()) {
               counterExample = concreteSpec;
             } else {

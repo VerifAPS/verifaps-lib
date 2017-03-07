@@ -47,7 +47,7 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
     specTable.setName(source.getName());
     JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable> element =
         objectFactory.createSpecification(specTable);
-    return marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml");
+    return marshalToNode(element, NAMESPACE);
   }
 
   /**

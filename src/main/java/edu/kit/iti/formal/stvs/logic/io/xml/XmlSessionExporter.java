@@ -52,33 +52,11 @@ public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
     code.setPlaintext(source.getScenario().getCode().getSourcecode());
     session.setCode(code);
 
-    /*
-     * Config (optional in xsd, not imported/exported with session right now but separately, as per
-     * customer request) Node configNode = configExporter.exportToXmlNode(source.getGlobalConfig());
-     * JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class); Unmarshaller
-     * jaxbUnmarshaller = jaxbContext.createUnmarshaller(); Config importedConfig =
-     * ((JAXBElement<Config>) jaxbUnmarshaller.unmarshal(configNode)) .getValue();
-     * session.setConfig(importedConfig);
-     */
-
-    /*
-     * History (optional in xsd, not imported/exported with session right now but separately
-     * session.setHistory(makeHistory(source));
-     */
-
     // Tabs
     session.setTabs(makeTabs(source));
     JAXBElement<Session> element = objectFactory.createSession(session);
-    return marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml");
+    return marshalToNode(element, NAMESPACE);
   }
-
-  /*
-   * private History makeHistory(StvsRootModel source) { History exportedHistory =
-   * objectFactory.createHistory(); for (String codeFile : source.getHistory().getCodeFiles()) {
-   * exportedHistory.getCode().add(codeFile); } for (String specFile :
-   * source.getHistory().getSpecFiles()) { exportedHistory.getSpec().add(specFile); } return
-   * exportedHistory; }
-   */
 
   /**
    * Extracts the tabs from the {@link StvsRootModel} and converts them into {@link Session.Tabs}.
@@ -122,8 +100,8 @@ public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
         tabs.getTab().add(tab);
       }
       return tabs;
-    } catch (JAXBException e) {
-      throw new ExportException(e);
+    } catch (JAXBException exception) {
+      throw new ExportException(exception);
     }
   }
 }

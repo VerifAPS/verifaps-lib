@@ -24,13 +24,15 @@ import javax.xml.bind.JAXBElement;
 
 import org.w3c.dom.Node;
 
-
 /**
- * Exporter for communication with the GeTeTa.
+ * Exporter for communication with the GeTeTa verification engine. Provides functionality for
+ * converting {@link ConstraintSpecification}s into an XML format compatible with the GeTeTa
+ * input format.
  *
  * @author Benjamin Alt
  */
 public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
+  private static final String EXTETA_NAMESPACE = "edu.kit.iti.formal.exteta_1";
   private ObjectFactory objectFactory;
 
   public GeTeTaExporter() {
@@ -40,8 +42,8 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
   /**
    * Creates {@link Steps} that correspond to the rows in the given {@link ConstraintSpecification}.
    *
-   * @param source The specification from which the steps should be taken
-   * @return Steps object ready to be used in a {@link TestTable}
+   * @param source The specification for which the steps should be generated
+   * @return Steps object (to be inserted into a {@link TestTable})
    */
   private Steps makeSteps(ConstraintSpecification source) {
     Steps steps = objectFactory.createSteps();
@@ -63,7 +65,7 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
   }
 
   /**
-   * Creates {@link Variables} from all variables present in the given
+   * Creates {@link Variables} from all free and i/o variables present in the given
    * {@link ConstraintSpecification}.
    *
    * @param source The specification from which the variables should be taken
@@ -80,7 +82,7 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
    * Creates {@link Variables} from the {@link FreeVariable FreeVariables} present in the given
    * {@link ConstraintSpecification}.
    *
-   * @param source The specification from which the variables should be taken
+   * @param source The specification from which the variables should be generated
    * @return Variables object
    */
   private Variables makeFreeVariables(ConstraintSpecification source) {
@@ -123,7 +125,7 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
   }
 
   /**
-   * Get {@link DataType} of a variable from STVS.
+   * Create the {@link DataType} for a given variable.
    *
    * @param variable Variable from which the @link DataType} should be determined
    * @return the determined @link DataType} of the {@code variable}
@@ -139,12 +141,12 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
   }
 
   /**
-   * Converts a given {@link ConstraintSpecification} into a XML node that is compatible with the
-   * GeTeTa verification engine.
+   * Converts a given {@link ConstraintSpecification} into an XML node that conforms to the
+   * GeTeTa verification engine input format.
    *
-   * @param source The specification that shoul be converted
+   * @param source The specification that should be converted
    * @return XML Node representing the specification
-   * @throws ExportException marshalling was not successful
+   * @throws ExportException if marshalling was not successful
    */
   @Override
   public Node exportToXmlNode(ConstraintSpecification source) throws ExportException {
@@ -152,6 +154,6 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
     testTable.setVariables(makeVariables(source));
     testTable.setSteps(makeSteps(source));
     JAXBElement<TestTable> element = objectFactory.createTestTable(testTable);
-    return marshalToNode(element, "edu.kit.iti.formal.exteta_1");
+    return marshalToNode(element, EXTETA_NAMESPACE);
   }
 }

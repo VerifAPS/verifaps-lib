@@ -11,7 +11,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
 
 /**
- * This class is used to escape identifiers for the geteta verification engine.
+ * This class is used to escape identifiers for the GeTeTa verification engine.
  *
  * @author Benjamin Alt
  */
@@ -19,6 +19,7 @@ public class VariableEscaper {
 
   private static final Pattern NUMBER_PATTERN = Pattern.compile("-?[0-9]+");
   private static final Pattern BOOL_PATTERN = Pattern.compile("(TRUE)|(FALSE)");
+  private static final String PREFIX = "var_";
 
   /**
    * Prepends "_var" to a {@code name}.
@@ -30,7 +31,7 @@ public class VariableEscaper {
     if (NUMBER_PATTERN.matcher(name).matches() || BOOL_PATTERN.matcher(name).matches()) {
       return name;
     }
-    return "var_" + name;
+    return PREFIX + name;
   }
 
   /**
@@ -50,8 +51,8 @@ public class VariableEscaper {
         int end = token.getStopIndex() + currentOffset;
         String before = result.substring(0, begin);
         String after = result.substring(end + 1, result.length());
-        result = before + "var_" + token.getText() + after;
-        currentOffset += 4; // 4 <-- length of "var_"
+        result = before + PREFIX + token.getText() + after;
+        currentOffset += PREFIX.length();
       }
     }
     return result;
@@ -82,8 +83,8 @@ public class VariableEscaper {
    * @return unescaped name
    */
   public static String unescapeName(String varName) {
-    if (varName.startsWith("var_")) {
-      return varName.substring(4);
+    if (varName.startsWith(PREFIX)) {
+      return varName.substring(PREFIX.length());
     }
     return varName;
   }

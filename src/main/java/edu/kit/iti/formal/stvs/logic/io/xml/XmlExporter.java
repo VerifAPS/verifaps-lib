@@ -30,10 +30,12 @@ import org.w3c.dom.Node;
  */
 public abstract class XmlExporter<F> implements Exporter<F> {
 
+  public static String NAMESPACE = "edu.kit.iti.formal.stvs.logic.io.xml";
+
   /**
    * Exports an Object as xml.
    *
-   * @param source Ebject to export
+   * @param source Object to export
    * @return The output xml is written to this stream
    * @throws ExportException Exception while exporting
    */

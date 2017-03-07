@@ -1,9 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConcreteSpecImporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigImporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecImporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionImporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.*;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
@@ -265,7 +262,7 @@ public class ImporterFacade {
       throws JAXBException, ImportException {
     switch (format) {
       case XML:
-        JAXBContext context = JAXBContext.newInstance("edu.kit.iti.formal.stvs.logic.io.xml");
+        JAXBContext context = JAXBContext.newInstance(XmlExporter.NAMESPACE);
         JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.History> element =
             (JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.History>) context.createUnmarshaller()
                 .unmarshal(chosenFile);

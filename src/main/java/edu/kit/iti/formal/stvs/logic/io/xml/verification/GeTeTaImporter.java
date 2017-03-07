@@ -43,7 +43,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Node;
 
 /**
- * Provides the functionality to import the output of the GeTeTa verification engine.
+ * Provides functionality to import the output of the GeTeTa verification engine.
  *
  * @author Benjamin Alt
  */
@@ -52,8 +52,6 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   /* GeTeTa return codes */
   private static final String RETURN_CODE_SUCCESS = "verified";
   private static final String RETURN_CODE_NOT_VERIFIED = "not-verified";
-  private static final String RETURN_CODE_FATAL = "fatal-error";
-  private static final String RETURN_CODE_ERROR = "error";
 
   /* Regular expressions */
   private static final String IDENTIFIER_RE = "[$a-zA-Z0-9_]+";
@@ -69,7 +67,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   private final List<Type> typeContext;
 
   /**
-   * Creates a new Importer for results after verification.
+   * Creates a new GeTeTaImporter.
    *
    * @param typeContext List of types available in the specification
    */
@@ -78,11 +76,11 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   }
 
   /**
-   * Imports a {@link VerificationResult} from {@link Node}.
+   * Imports a {@link VerificationResult} from an XML {@link Node}.
    *
    * @param source the Node from which the result should be imported
    * @return the imported result
-   * @throws ImportException Exception while importing
+   * @throws ImportException if an error occurs while importing
    */
   @Override
   public VerificationResult doImportFromXmlNode(Node source) throws ImportException {
@@ -97,12 +95,12 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   }
 
   /**
-   * Builds a {@link VerificationResult} from {@link Node}.
+   * Builds a {@link VerificationResult} from a GeTeTa {@link Message}.
    *
-   * @param source the Node from which the result should be imported
-   * @param importedMessage return message from the verification engine
+   * @param source the original top-level XML node of the verification result
+   * @param importedMessage the JAXB-converted GeTeTa {@link Message} object
    * @return the imported result
-   * @throws ImportException Exception while importing
+   * @throws ImportException if an error occurs while importing
    */
   private VerificationResult makeVerificationResult(Node source, Message importedMessage)
       throws ImportException {
@@ -116,7 +114,6 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       transformer.transform(domSource, result);
 
       /* Return appropriate VerificationResult */
-      String logFilePath = logFile.getAbsolutePath();
       switch (importedMessage.getReturncode()) {
         case RETURN_CODE_SUCCESS:
           return new VerificationResult(VerificationResult.Status.VERIFIED, logFile, null);
@@ -132,15 +129,13 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   }
 
   /**
-   * Generates a counterexample from a given message from the GeTeTa verification engine.
+   * Generates a counterexample from a given {@link Message} from the GeTeTa verification engine.
    *
    * @param message Message from the GeTeTa verification engine
    * @return concrete specification that represents the counterexample
    * @throws ImportException exception while importing
    */
   private ConcreteSpecification parseCounterexample(Message message) throws ImportException {
-    List<SpecificationRow<ConcreteCell>> concreteRows = new ArrayList<>();
-
     // Parse variables from counterexample
     Message.Log log = message.getLog();
     // Don't know exact enum types yet --> Map from name to either "INT", "BOOLEAN", "ENUM"
@@ -148,36 +143,19 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
     Map<String, Type> varTypes = new HashMap<>();
     List<String> varNames = getVarNamesFromLog(log);
 
-    // Parse rows & durations
-    int currentDurationCount = 1;
-    int lastRowNum = -1;
-    List<Counterexample.Step> steps = message.getCounterexample().getTrace().getStep();
     List<String> rowMap = message.getCounterexample().getRowMappings().getRowMap();
+    // It does not matter which of the rowMaps to use, so always use the zeroeth
     List<Integer> rowNums = parseRowMap(rowMap.get(0));
     Map<String, Value> currentValues = new HashMap<>();
     Map<String, VariableCategory> varCategories = new HashMap<>();
-    int cycleNum = -1;
-    // iterate over steps to create specification rows
-    for (int i = 0; i < steps.size(); i++) {
-      if (i - 1 > rowNums.size()) {
-        break; // Make sure I terminate after right # of cycles
-      }
-      Counterexample.Step step = steps.get(i);
-      processOutputVariables(varTypes, currentValues, varCategories, step);
 
-      // Now I can make and add the row
-      if (cycleNum > -1) {
-        SpecificationRow<ConcreteCell> row =
-            makeSpecificationRowFromValues(varNames, currentValues);
-        concreteRows.add(row);
-      }
-
-      processInputVariables(varTypes, currentValues, varCategories, step);
-      cycleNum++;
-    }
+    // Parse concrete rows
+    List<Counterexample.Step> steps = message.getCounterexample().getTrace().getStep();
+    List<SpecificationRow<ConcreteCell>> concreteRows = makeConcreteRows(steps, rowNums,
+        varNames, varTypes, currentValues, varCategories);
 
     // Parse durations
-    List<ConcreteDuration> concreteDurations = makeConcreteDuration(rowNums);
+    List<ConcreteDuration> concreteDurations = makeConcreteDurations(rowNums);
 
     ConcreteSpecification concreteSpec = new ConcreteSpecification(true);
     for (String varName : varNames) {
@@ -192,12 +170,53 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   }
 
   /**
-   * Converts a list of beginning cycles of durations into a List of {@link ConcreteDuration}.
+   * Generates a list of concrete specification rows for a given list of
+   * {@link edu.kit.iti.formal.exteta_1_0.report.Counterexample.Step}s.
+   *
+   * @param steps the GeTeTa output {
+   * @link edu.kit.iti.formal.exteta_1_0.report.Counterexample.Step}s to import the rows from
+   * @param rowNums the row mapping (map from cycle number to row number)
+   * @param varNames the names of all declared free and i/o variables
+   * @param varTypes the types of the variables
+   * @param currentValues the current values of the variables
+   * @param varCategories the categories (input/output) of the i/o variables
+   * @return a list containing the rows of the counterexample
+   * @throws ImportException if an error occurs during importing
+   */
+  private List<SpecificationRow<ConcreteCell>> makeConcreteRows(List<Counterexample.Step> steps,
+      List<Integer> rowNums, List<String> varNames, Map<String, Type> varTypes,
+      Map<String, Value> currentValues, Map<String, VariableCategory> varCategories)
+      throws ImportException {
+    List<SpecificationRow<ConcreteCell>> concreteRows = new ArrayList<>();
+    int cycleNum = -1;
+    // iterate over steps to create specification rows
+    for (int i = 0; i < steps.size(); i++) {
+      if (i - 1 > rowNums.size()) {
+        break; // Make sure I terminate after right # of cycles
+      }
+      Counterexample.Step step = steps.get(i);
+      processOutputVariables(varTypes, currentValues, varCategories, step);
+
+      // Now can make and add the row
+      if (cycleNum > -1) {
+        SpecificationRow<ConcreteCell> row =
+            makeSpecificationRowFromValues(varNames, currentValues);
+        concreteRows.add(row);
+      }
+
+      processInputVariables(varTypes, currentValues, varCategories, step);
+      cycleNum++;
+    }
+    return concreteRows;
+  }
+
+  /**
+   * Converts a list of beginning cycles of durations into a List of {@link ConcreteDuration}s.
    *
    * @param rowNums list of beginning cycles of durations
    * @return list of durations
    */
-  private List<ConcreteDuration> makeConcreteDuration(List<Integer> rowNums) {
+  private List<ConcreteDuration> makeConcreteDurations(List<Integer> rowNums) {
     List<ConcreteDuration> concreteDurations = new ArrayList<>();
     int currentDuration = 0;
     int oldRowNum = 1;
@@ -336,15 +355,16 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   /**
    * Processes an assignment of a single value represented by {@code varValue} to a variable
    * specified by {@code varName} for one step in the counterexample. The type of the value is
-   * determined by matching {@code varValue} against several regular expressions and,in case of an
+   * determined by matching {@code varValue} against several regular expressions and, in case of an
    * enum type, further information is taken from {@code typeContext}. The value is then added to
    * the {@code currentValues}-Map as a {@link Value}. Found types are added to {@code varTypes}.
    *
    * @param currentValues Represents the values of variables for a step
    * @param varTypes Map of types
    * @param varName Name of the variable
-   * @param varValue String representation of theís variable for one step
-   * @throws ImportException Illegal literal for enum
+   * @param varValue String representation of this variable for one step
+   * @throws ImportException when an enum literal is assigned to a variable of incompatible enum
+   *         type
    */
   private void processVarAssignment(Map<String, Value> currentValues, Map<String, Type> varTypes,
       String varName, String varValue) throws ImportException {

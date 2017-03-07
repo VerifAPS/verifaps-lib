@@ -1,9 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import edu.kit.iti.formal.stvs.logic.io.xml.ObjectFactory;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigExporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecExporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.*;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaExporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
@@ -179,7 +176,7 @@ public class ExporterFacade {
           exportHistory.getFilename().add(filename);
         }
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        JAXBContext context = JAXBContext.newInstance("edu.kit.iti.formal.stvs.logic.io.xml");
+        JAXBContext context = JAXBContext.newInstance(XmlExporter.NAMESPACE);
         JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.History> element =
             new ObjectFactory().createHistory(exportHistory);
         context.createMarshaller().marshal(element, bos);

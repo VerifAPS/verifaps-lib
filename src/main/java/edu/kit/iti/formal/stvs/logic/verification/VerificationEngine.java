@@ -10,7 +10,7 @@ import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import java.io.IOException;
 
 /**
- * Strategy for Verification of the VerificationScenario.
+ * Strategy for verification of the VerificationScenario.
  *
  * @author Benjamin Alt
  */
@@ -25,15 +25,15 @@ public interface VerificationEngine {
    * @throws ExportException exception while exporting
    * @throws VerificationError exception while verifying
    */
-  public void startVerification(VerificationScenario scenario, ConstraintSpecification spec)
+  void startVerification(VerificationScenario scenario, ConstraintSpecification spec)
       throws IOException, ExportException, VerificationError;
 
-  public NullableProperty<VerificationResult> verificationResultProperty();
+  NullableProperty<VerificationResult> verificationResultProperty();
 
-  public VerificationResult getVerificationResult();
+  VerificationResult getVerificationResult();
 
   /**
-   * cancels a running verification.
+   * Cancels a running verification.
    */
-  public void cancelVerification();
+  void cancelVerification();
 }

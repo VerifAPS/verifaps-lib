@@ -9,7 +9,7 @@ import javax.xml.bind.JAXBElement;
 import org.w3c.dom.Node;
 
 /**
- * This class provides the functionality to export a {@link GlobalConfig} object to a xml node.
+ * This class provides the functionality to export a {@link GlobalConfig} object to an xml node.
  *
  * @author Benjamin Alt
  */
@@ -49,6 +49,6 @@ public class XmlConfigExporter extends XmlExporter<GlobalConfig> {
     deps.setGetetaCommand(source.getGetetaCommand());
     config.setDependencies(deps);
     JAXBElement<Config> element = objectFactory.createConfig(config);
-    return marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml");
+    return marshalToNode(element, NAMESPACE);
   }
 }

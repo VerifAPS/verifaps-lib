@@ -28,8 +28,8 @@ public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> 
   public XmlConcreteSpecExporter() {
     objectFactory = new ObjectFactory();
     // TODO: I can't get my head around why this should be here but removing it breaks the static
-    // variable in
-    // XmlConstraintSpecExporter. There is something fishy here. I will investigate this later.
+    // variable in XmlConstraintSpecExporter. There is something fishy here. I will investigate
+    // this later.
     constraintSpecExporter = new XmlConstraintSpecExporter();
   }
 
@@ -50,7 +50,7 @@ public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> 
     specTable.setName(source.getName());
     JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable> element =
         objectFactory.createSpecification(specTable);
-    return marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml");
+    return marshalToNode(element, NAMESPACE);
   }
 
 

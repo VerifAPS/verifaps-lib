@@ -50,7 +50,8 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     getetaProcess = null;
     this.typeContext = typeContext;
     this.config = config;
-    /* Check filenames */
+
+    /* Check if nuXmv executable exists */
     File nuxmvFile = new File(config.getNuxmvFilename());
     if (!nuxmvFile.exists() || nuxmvFile.isDirectory()) {
       throw new VerificationError(VerificationError.Reason.NUXMV_NOT_FOUND);
@@ -70,6 +71,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   @Override
   public void startVerification(VerificationScenario scenario, ConstraintSpecification spec)
       throws IOException, ExportException, VerificationError {
+
     // Write ConstraintSpecification and Code to temporary files
     File tempSpecFile = File.createTempFile("verification-spec", ".xml");
     File tempCodeFile = File.createTempFile("verification-code", ".st");
@@ -78,6 +80,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     String getetaCommand =
         config.getGetetaCommand().replace("${code}", tempCodeFile.getAbsolutePath())
             .replace("${spec}", tempSpecFile.getAbsolutePath());
+
     // Start verification engine in new child process
     if (getetaProcess != null) {
       cancelVerification();
@@ -116,7 +119,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   }
 
   /**
-   * handles the output of the GeTeTa verification engine.
+   * Handles the output of the GeTeTa verification engine.
    */
   private void onVerificationDone() {
     if (getetaProcess == null) { // Verification was cancelled
@@ -147,7 +150,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
         result = new VerificationResult(VerificationResult.Status.ERROR, logFile, error);
       }
     }
-    // set the verification result back in the javafx thread:
+    // Set the verification result back in the javafx thread:
     VerificationResult finalResult = result; // have to do this because of lambda restrictions...
     try {
       Platform.runLater(() -> verificationResult.set(finalResult));

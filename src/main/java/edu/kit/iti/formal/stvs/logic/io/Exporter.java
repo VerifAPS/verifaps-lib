@@ -3,7 +3,7 @@ package edu.kit.iti.formal.stvs.logic.io;
 import java.io.ByteArrayOutputStream;
 
 /**
- * An Interface for all Exporter-Classes.
+ * Interface for all classes concerned with exporting model objects to some output format.
  *
  * @author Benjamin Alt
  */
