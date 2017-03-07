@@ -103,7 +103,7 @@ public class ConstraintSpecificationValidator {
     codeIoVariables.addListener(listenToSpecUpdate);
     validFreeVariables.addListener(listenToSpecUpdate);
 
-    // recalculateSpecProblems();
+    recalculateSpecProblems();
   }
 
   /**
@@ -143,17 +143,21 @@ public class ConstraintSpecificationValidator {
   public void recalculateSpecProblems() {
     ValidSpecification validSpec = new ValidSpecification();
 
-    List<SpecProblem> specProblems = new ArrayList<>();
+    List<SpecProblem> minorSpecProblems = new ArrayList<>();
+    List<SpecProblem> majorSpecProblems = new ArrayList<>();
 
-    boolean specificationIsValid = true;
+    boolean specificationIsValid;
 
     Map<String, Type> typesByName = typeContext.get().stream()
         .collect(Collectors.toMap(Type::getTypeName, Function.identity()));
 
-    specificationIsValid = areCellsValid(validSpec, specProblems, typesByName);
+    specificationIsValid = areCellsValid(validSpec, minorSpecProblems, majorSpecProblems, typesByName);
 
-    specificationIsValid = areDurationsValid(validSpec, specProblems, specificationIsValid);
+    specificationIsValid = areDurationsValid(validSpec, majorSpecProblems, specificationIsValid);
 
+    ArrayList<SpecProblem> specProblems = new ArrayList<>();
+    specProblems.addAll(minorSpecProblems);
+    specProblems.addAll(majorSpecProblems);
     this.problems.set(specProblems);
 
     if (specificationIsValid) {
@@ -161,7 +165,7 @@ public class ConstraintSpecificationValidator {
     } else {
       validSpecification.set(null);
     }
-    valid.set(specProblems.isEmpty());
+    valid.set(minorSpecProblems.isEmpty());
   }
 
   /**
@@ -170,11 +174,11 @@ public class ConstraintSpecificationValidator {
    * false}. Any found problem is added to {@code specProblems}.
    * 
    * @param validSpec specification that should be checked
-   * @param specProblems List of problems
+   * @param majorSpecProblems List of major problems
    * @param specificationIsValid does the given specification valid seem to be valid?
    * @return returns if durations are valid
    */
-  private boolean areDurationsValid(ValidSpecification validSpec, List<SpecProblem> specProblems,
+  private boolean areDurationsValid(ValidSpecification validSpec, List<SpecProblem> majorSpecProblems,
       boolean specificationIsValid) {
     for (int durIndex = 0; durIndex < specification.getDurations().size(); durIndex++) {
       try {
@@ -184,7 +188,7 @@ public class ConstraintSpecificationValidator {
           validSpec.getDurations().add(interval);
         }
       } catch (DurationProblem problem) {
-        specProblems.add(problem);
+        majorSpecProblems.add(problem);
         specificationIsValid = false;
       }
     }
@@ -192,16 +196,18 @@ public class ConstraintSpecificationValidator {
   }
 
   /**
-   * Calculates if cells are valid. Any found problem is added to {@code specProblems}.
+   * Calculates if cells are valid. Any found problem is added to {@code minorSpecProblems}.
    * 
    * @param validSpec specification that should be checked
-   * @param specProblems List of problems
+   * @param minorSpecProblems List of noticeable problems
+   * @param majorSpecProblems List of fatal problems
    * @param typesByName map of types found in the specification
    * @return returns if cells are valid
    */
-  private boolean areCellsValid(ValidSpecification validSpec, List<SpecProblem> specProblems,
-      Map<String, Type> typesByName) {
-    Map<String, Type> variableTypes = createVariableTypes(validSpec, specProblems, typesByName);
+  private boolean areCellsValid(ValidSpecification validSpec, List<SpecProblem> minorSpecProblems,
+      List<SpecProblem> majorSpecProblems, Map<String, Type> typesByName) {
+    Map<String, Type> variableTypes =
+        createVariableTypes(validSpec, minorSpecProblems, majorSpecProblems, typesByName);
     TypeChecker typeChecker = new TypeChecker(variableTypes);
     boolean specificationIsValid = true;
 
@@ -219,11 +225,11 @@ public class ConstraintSpecificationValidator {
           expressionsForRow.put(columnId,
               tryValidateCellExpression(typeContext.get(), typeChecker, columnId, rowIndex, cell));
         } catch (CellProblem problem) {
-          specProblems.add(problem);
+          majorSpecProblems.add(problem);
         }
       }
 
-      specificationIsValid = specProblems.isEmpty() && specificationIsValid;
+      specificationIsValid = majorSpecProblems.isEmpty() && specificationIsValid;
 
       // Fixes a dumb bug with listeners getting invoked midst column adding
       if (specificationIsValid && expressionsForRow.size() == validSpec.getColumnHeaders().size()) {
@@ -239,12 +245,14 @@ public class ConstraintSpecificationValidator {
    * Extracts variable types from specification. Any found problem is added to {@code specProblems}.
    * 
    * @param validSpec specification that contains the variables
-   * @param specProblems List of problems
-   * @param typesByName map of types found in the specification
-   * @return returns map of variable types
+   * @param minorSpecProblems List of noticeable problems
+   * @param majorSpecProblems List of fatal problems
+   * @param typesByName map of types found in the specification @return returns map of variable
+   *        types
    */
   private Map<String, Type> createVariableTypes(ValidSpecification validSpec,
-      List<SpecProblem> specProblems, Map<String, Type> typesByName) {
+      List<SpecProblem> minorSpecProblems, List<SpecProblem> majorSpecProblems,
+      Map<String, Type> typesByName) {
     Map<String, Type> variableTypes = validFreeVariables.get().stream()
         .collect(Collectors.toMap(ValidFreeVariable::getName, ValidFreeVariable::getType));
 
@@ -252,15 +260,16 @@ public class ConstraintSpecificationValidator {
       // Check column header for problem
       try {
         ValidIoVariable validIoVariable = InvalidIoVarProblem.tryGetValidIoVariable(specIoVariable,
-            codeIoVariables.get(), typesByName, specProblems::add); // On non-fatal problems (like
+            codeIoVariables.get(), typesByName, minorSpecProblems::add); // On non-fatal problems
+                                                                         // (like
         // missing matching
         // CodeIoVariable)
         variableTypes.put(validIoVariable.getName(), validIoVariable.getValidType());
-        if (specProblems.isEmpty()) {
+        if (majorSpecProblems.isEmpty()) {
           validSpec.getColumnHeaders().add(validIoVariable);
         }
       } catch (InvalidIoVarProblem invalidIoVarProblem) { // Fatal problem (like invalid type, etc)
-        specProblems.add(invalidIoVarProblem);
+        majorSpecProblems.add(invalidIoVarProblem);
       }
     }
     return variableTypes;
