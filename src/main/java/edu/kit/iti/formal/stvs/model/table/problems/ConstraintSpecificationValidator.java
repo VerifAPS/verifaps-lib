@@ -103,7 +103,7 @@ public class ConstraintSpecificationValidator {
     codeIoVariables.addListener(listenToSpecUpdate);
     validFreeVariables.addListener(listenToSpecUpdate);
 
-    recalculateSpecProblems();
+    //recalculateSpecProblems();
   }
 
   public ObjectProperty<List<SpecProblem>> problemsProperty() {
@@ -111,6 +111,10 @@ public class ConstraintSpecificationValidator {
   }
 
   private void onSpecUpdated(Observable observable) {
+    recalculateSpecProblems();
+  }
+
+  public void invalidate() {
     recalculateSpecProblems();
   }
 
