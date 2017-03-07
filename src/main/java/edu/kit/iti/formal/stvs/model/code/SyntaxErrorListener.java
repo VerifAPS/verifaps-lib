@@ -12,7 +12,7 @@ import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 
 /**
- * Created by Lukas on 30.01.2017.
+ * A listener for {@link SyntaxError}s in code.
  *
  * @author Lukas Fritsch
  */

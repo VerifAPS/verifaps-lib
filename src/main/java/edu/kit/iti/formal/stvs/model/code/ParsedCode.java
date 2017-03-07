@@ -27,13 +27,14 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 /**
- * Created by philipp on 09.01.17.
- *
+ * Represents the formal model of source code (extracted from {@link Code}).
  * @author Lukas Fritsch
- *          Represents the formal model of source code (extracted from {@link Code})
  */
 public class ParsedCode {
 
+  /**
+   * A visitor for type declarations. Builds a list of types which have been declared in the code.
+   */
   private static class TypeDeclarationVisitor extends DefaultVisitor<Void> {
     private List<Type> definedTypes;
 
@@ -62,6 +63,10 @@ public class ParsedCode {
 
   }
 
+  /**
+   * A visitor which visits a {@link ProgramDeclaration} and builds a list of i/o variables
+   * defined therein.
+   */
   private static class VariableVisitor extends DefaultVisitor<Void> {
     private List<CodeIoVariable> definedVariables = new ArrayList<>();
 
@@ -96,6 +101,10 @@ public class ParsedCode {
     }
   }
 
+  /**
+   * A visitor which visits {@link FunctionDeclaration}s and builds a list of
+   * {@link FoldableCodeBlock}s, where each function declaration corresponds to one block.
+   */
   private static class BlockVisitor extends DefaultVisitor<Void> {
     private List<FoldableCodeBlock> foldableCodeBlocks;
 
@@ -144,7 +153,9 @@ public class ParsedCode {
   }
 
   /**
-   * Parses a code.
+   * Parses a code. The handlers and listeners provided as parameters are called with the results
+   * of the parsing; i.e. the parsedCodeListener is called with the resulting {@link ParsedCode},
+   * the parsedTokenHandler is called with the list of parsed tokens etc.
    *
    * @param input the source code to parse
    * @param parsedTokenHandler a handler for lexed tokens
@@ -153,44 +164,64 @@ public class ParsedCode {
    */
   public static void parseCode(String input, ParsedTokenHandler parsedTokenHandler,
       ParsedSyntaxErrorHandler syntaxErrorsListener, ParsedCodeHandler parsedCodeListener) {
-    try {
-      SyntaxErrorListener syntaxErrorListener = new SyntaxErrorListener();
-      IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(input));
-      lexer.removeErrorListeners();
-      lexer.addErrorListener(syntaxErrorListener);
-      parsedTokenHandler.accept(lexer.getAllTokens());
-      lexer.reset();
+    SyntaxErrorListener syntaxErrorListener = new SyntaxErrorListener();
 
-      IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
-      parser.removeErrorListeners();
-      parser.addErrorListener(syntaxErrorListener);
+    IEC61131Lexer lexer = lex(input, parsedTokenHandler, syntaxErrorListener);
 
-      TopLevelElements ast = new TopLevelElements(parser.start().ast);
+    TopLevelElements ast = parse(new CommonTokenStream(lexer), syntaxErrorListener);
 
-      syntaxErrorsListener.accept(syntaxErrorListener.getSyntaxErrors());
+    syntaxErrorsListener.accept(syntaxErrorListener.getSyntaxErrors());
 
-      // Find types in parsed code
-      TypeDeclarationVisitor typeVisitor = new TypeDeclarationVisitor();
-      ast.visit(typeVisitor);
-      Map<String, Type> definedTypesByName = new HashMap<>();
-      typeVisitor.getDefinedTypes()
-          .forEach(type -> definedTypesByName.put(type.getTypeName(), type));
+    // Find types in parsed code
+    TypeDeclarationVisitor typeVisitor = new TypeDeclarationVisitor();
+    ast.visit(typeVisitor);
+    Map<String, Type> definedTypesByName = new HashMap<>();
+    typeVisitor.getDefinedTypes()
+        .forEach(type -> definedTypesByName.put(type.getTypeName(), type));
 
-      // Find IoVariables in parsed code
-      VariableVisitor variableVisitor = new VariableVisitor();
-      ast.visit(variableVisitor);
+    // Find IoVariables in parsed code
+    VariableVisitor variableVisitor = new VariableVisitor();
+    ast.visit(variableVisitor);
 
-      // Find code blocks in parsed code
-      BlockVisitor blockVisitor = new BlockVisitor();
-      ast.visit(blockVisitor);
-      List<FoldableCodeBlock> foldableCodeBlocks = blockVisitor.getFoldableCodeBlocks();
+    // Find code blocks in parsed code
+    BlockVisitor blockVisitor = new BlockVisitor();
+    ast.visit(blockVisitor);
+    List<FoldableCodeBlock> foldableCodeBlocks = blockVisitor.getFoldableCodeBlocks();
 
-      parsedCodeListener.accept(new ParsedCode(foldableCodeBlocks,
-          variableVisitor.getDefinedVariables(), typeVisitor.getDefinedTypes()));
-      // GOTTA CATCH 'EM ALL! *sings*
-    } catch (Exception exception) {
-      exception.printStackTrace();
-    }
+    parsedCodeListener.accept(new ParsedCode(foldableCodeBlocks,
+        variableVisitor.getDefinedVariables(), typeVisitor.getDefinedTypes()));
+  }
+
+  /**
+   * Parses a token stream.
+   * @param tokenStream The token stream to parse
+   * @param syntaxErrorListener The listener to invoke on syntax errors
+   * @return The AST constructed from the token stream
+   */
+  private static TopLevelElements parse(CommonTokenStream tokenStream, SyntaxErrorListener
+      syntaxErrorListener) {
+    IEC61131Parser parser = new IEC61131Parser(tokenStream);
+    parser.removeErrorListeners();
+    parser.addErrorListener(syntaxErrorListener);
+
+    return new TopLevelElements(parser.start().ast);
+  }
+
+  /**
+   * Lex a given code.
+   * @param input The code to lex
+   * @param parsedTokenHandler Is called with the resulting list of tokens
+   * @param syntaxErrorListener Is given to the lexer (and invoked on syntax errors)
+   * @return The lexer used for lexing
+   */
+  private static IEC61131Lexer lex(String input, ParsedTokenHandler parsedTokenHandler,
+                                   SyntaxErrorListener syntaxErrorListener) {
+    IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(input));
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(syntaxErrorListener);
+    parsedTokenHandler.accept(lexer.getAllTokens());
+    lexer.reset();
+    return lexer;
   }
 
   public List<FoldableCodeBlock> getFoldableCodeBlocks() {

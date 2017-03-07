@@ -3,10 +3,9 @@ package edu.kit.iti.formal.stvs.model.code;
 import org.antlr.v4.runtime.Token;
 
 /**
- * Created by Lukas on 02.02.2017.
+ * Represents a syntax error in code.
  *
  * @author Lukas Fritsch
- *         Represents a syntax error in code
  */
 public class SyntaxError {
   private int line;

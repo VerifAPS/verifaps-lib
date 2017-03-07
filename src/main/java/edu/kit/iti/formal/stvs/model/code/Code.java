@@ -12,11 +12,10 @@ import org.antlr.v4.runtime.Token;
 
 
 /**
- * Created by csicar on 09.01.17.
- *
+ * Represents the effective model of sourcecode. The formal model ({@link ParsedCode}) is
+ * extracted from this.
  * @author Lukas
- * @author Philipp Represents the effective model of sourcecode. Extracts the formal model
- *         ({@link ParsedCode}).
+ * @author Philipp
  */
 public class Code {
 
@@ -32,14 +31,14 @@ public class Code {
 
 
   /**
-   * creates a default codefile.
+   * Creates a default codefile.
    */
   public Code() {
     this("", "");
   }
 
   /**
-   * creates a codefile which is invalidated.
+   * Creates a codefile which is invalidated.
    *
    * @param filename name of the codefile
    * @param sourcecode content of the codefile
