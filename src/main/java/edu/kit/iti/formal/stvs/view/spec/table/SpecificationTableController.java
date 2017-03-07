@@ -93,7 +93,7 @@ public class SpecificationTableController implements Controller {
     hybridSpecification.getColumnHeaders().forEach(this::addColumnToView);
 
     validator.problemsProperty().addListener((Observable o) -> onProblemsChange());
-    validator.invalidate();
+    validator.recalculateSpecProblems();
 
     hybridSpec.getSelection().setOnCellClickListener(this::focusCell);
     hybridSpec.getSelection().columnProperty().addListener(this::onColumnSelectionChanged);

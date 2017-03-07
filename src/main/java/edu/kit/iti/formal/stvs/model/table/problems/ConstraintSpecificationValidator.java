@@ -103,102 +103,7 @@ public class ConstraintSpecificationValidator {
     codeIoVariables.addListener(listenToSpecUpdate);
     validFreeVariables.addListener(listenToSpecUpdate);
 
-    //recalculateSpecProblems();
-  }
-
-  public ObjectProperty<List<SpecProblem>> problemsProperty() {
-    return problems;
-  }
-
-  private void onSpecUpdated(Observable observable) {
-    recalculateSpecProblems();
-  }
-
-  public void invalidate() {
-    recalculateSpecProblems();
-  }
-
-  private void recalculateSpecProblems() {
-    ValidSpecification validSpec = new ValidSpecification();
-
-    List<SpecProblem> specProblems = new ArrayList<>();
-
-    boolean specificationIsValid = true;
-
-    Map<String, Type> variableTypes = validFreeVariables.get().stream()
-        .collect(Collectors.toMap(ValidFreeVariable::getName, ValidFreeVariable::getType));
-
-    Map<String, Type> typesByName = typeContext.get().stream()
-        .collect(Collectors.toMap(Type::getTypeName, Function.identity()));
-
-    for (SpecIoVariable specIoVariable : specification.getColumnHeaders()) {
-      // Check column header for problem
-      try {
-        ValidIoVariable validIoVariable = InvalidIoVarProblem.tryGetValidIoVariable(
-            specIoVariable,
-            codeIoVariables.get(),
-            typesByName,
-            specProblems::add); // On non-fatal problems (like missing matching CodeIoVariable)
-        variableTypes.put(validIoVariable.getName(), validIoVariable.getValidType());
-        if (specificationIsValid) {
-          validSpec.getColumnHeaders().add(validIoVariable);
-        }
-      } catch (InvalidIoVarProblem invalidIoVarProblem) { // Fatal problem (like invalid type, etc)
-        specificationIsValid = false;
-        specProblems.add(invalidIoVarProblem);
-      }
-    }
-
-    TypeChecker typeChecker = new TypeChecker(variableTypes);
-
-    for (int rowIndex = 0; rowIndex < specification.getRows().size(); rowIndex++) {
-      SpecificationRow<ConstraintCell> row = specification.getRows().get(rowIndex);
-
-      Map<String, Expression> expressionsForRow = new HashMap<>();
-
-      // Check cells for problems
-      for (Map.Entry<String, ConstraintCell> mapEntry : row.getCells().entrySet()) {
-        String columnId = mapEntry.getKey();
-        ConstraintCell cell = mapEntry.getValue();
-
-        try {
-          expressionsForRow.put(columnId,
-              tryValidateCellExpression(typeContext.get(), typeChecker, columnId, rowIndex, cell));
-        } catch (CellProblem problem) {
-          specProblems.add(problem);
-          specificationIsValid = false;
-        }
-      }
-
-      // Fixes a dumb bug with listeners getting invoked midst column adding
-      if (specificationIsValid && expressionsForRow.size() == validSpec.getColumnHeaders().size()) {
-        validSpec.getRows().add(SpecificationRow.createUnobservableRow(expressionsForRow));
-      } else {
-        specificationIsValid = false;
-      }
-    }
-
-    for (int durIndex = 0; durIndex < specification.getDurations().size(); durIndex++) {
-      try {
-        LowerBoundedInterval interval = DurationParseProblem.tryParseDuration(durIndex,
-            specification.getDurations().get(durIndex));
-        if (specificationIsValid) {
-          validSpec.getDurations().add(interval);
-        }
-      } catch (DurationProblem problem) {
-        specProblems.add(problem);
-        specificationIsValid = false;
-      }
-    }
-
-    this.problems.set(specProblems);
-
-    if (specificationIsValid) {
-      validSpecification.set(validSpec);
-    } else {
-      validSpecification.set(null);
-    }
-    valid.set(specProblems.isEmpty());
+    // recalculateSpecProblems();
   }
 
   /**
@@ -221,6 +126,144 @@ public class ConstraintSpecificationValidator {
       TypeChecker typeChecker, String columnId, int row, ConstraintCell cell) throws CellProblem {
     Expression expr = CellParseProblem.tryParseCellExpression(typeContext, columnId, row, cell);
     return CellTypeProblem.tryTypeCheckCellExpression(typeChecker, columnId, row, expr);
+  }
+
+  public ObjectProperty<List<SpecProblem>> problemsProperty() {
+    return problems;
+  }
+
+  private void onSpecUpdated(Observable observable) {
+    recalculateSpecProblems();
+  }
+
+
+  /**
+   * Calculates the problems of the specification table.
+   */
+  public void recalculateSpecProblems() {
+    ValidSpecification validSpec = new ValidSpecification();
+
+    List<SpecProblem> specProblems = new ArrayList<>();
+
+    boolean specificationIsValid = true;
+
+    Map<String, Type> typesByName = typeContext.get().stream()
+        .collect(Collectors.toMap(Type::getTypeName, Function.identity()));
+
+    specificationIsValid = areCellsValid(validSpec, specProblems, typesByName);
+
+    specificationIsValid = areDurationsValid(validSpec, specProblems, specificationIsValid);
+
+    this.problems.set(specProblems);
+
+    if (specificationIsValid) {
+      validSpecification.set(validSpec);
+    } else {
+      validSpecification.set(null);
+    }
+    valid.set(specProblems.isEmpty());
+  }
+
+  /**
+   * Calculates if durations are valid. Durations are never valid if the given specification is
+   * invalid. Therefore {@code specificationIsValid == false} => {@code areDurationsValid(...)} ==
+   * false}. Any found problem is added to {@code specProblems}.
+   * 
+   * @param validSpec specification that should be checked
+   * @param specProblems List of problems
+   * @param specificationIsValid does the given specification valid seem to be valid?
+   * @return returns if durations are valid
+   */
+  private boolean areDurationsValid(ValidSpecification validSpec, List<SpecProblem> specProblems,
+      boolean specificationIsValid) {
+    for (int durIndex = 0; durIndex < specification.getDurations().size(); durIndex++) {
+      try {
+        LowerBoundedInterval interval = DurationParseProblem.tryParseDuration(durIndex,
+            specification.getDurations().get(durIndex));
+        if (specificationIsValid) {
+          validSpec.getDurations().add(interval);
+        }
+      } catch (DurationProblem problem) {
+        specProblems.add(problem);
+        specificationIsValid = false;
+      }
+    }
+    return specificationIsValid;
+  }
+
+  /**
+   * Calculates if cells are valid. Any found problem is added to {@code specProblems}.
+   * 
+   * @param validSpec specification that should be checked
+   * @param specProblems List of problems
+   * @param typesByName map of types found in the specification
+   * @return returns if cells are valid
+   */
+  private boolean areCellsValid(ValidSpecification validSpec, List<SpecProblem> specProblems,
+      Map<String, Type> typesByName) {
+    Map<String, Type> variableTypes = createVariableTypes(validSpec, specProblems, typesByName);
+    TypeChecker typeChecker = new TypeChecker(variableTypes);
+    boolean specificationIsValid = true;
+
+    for (int rowIndex = 0; rowIndex < specification.getRows().size(); rowIndex++) {
+      SpecificationRow<ConstraintCell> row = specification.getRows().get(rowIndex);
+
+      Map<String, Expression> expressionsForRow = new HashMap<>();
+
+      // Check cells for problems
+      for (Map.Entry<String, ConstraintCell> mapEntry : row.getCells().entrySet()) {
+        String columnId = mapEntry.getKey();
+        ConstraintCell cell = mapEntry.getValue();
+
+        try {
+          expressionsForRow.put(columnId,
+              tryValidateCellExpression(typeContext.get(), typeChecker, columnId, rowIndex, cell));
+        } catch (CellProblem problem) {
+          specProblems.add(problem);
+        }
+      }
+
+      specificationIsValid = specProblems.isEmpty() && specificationIsValid;
+
+      // Fixes a dumb bug with listeners getting invoked midst column adding
+      if (specificationIsValid && expressionsForRow.size() == validSpec.getColumnHeaders().size()) {
+        validSpec.getRows().add(SpecificationRow.createUnobservableRow(expressionsForRow));
+      } else {
+        specificationIsValid = false;
+      }
+    }
+    return specificationIsValid;
+  }
+
+  /**
+   * Extracts variable types from specification. Any found problem is added to {@code specProblems}.
+   * 
+   * @param validSpec specification that contains the variables
+   * @param specProblems List of problems
+   * @param typesByName map of types found in the specification
+   * @return returns map of variable types
+   */
+  private Map<String, Type> createVariableTypes(ValidSpecification validSpec,
+      List<SpecProblem> specProblems, Map<String, Type> typesByName) {
+    Map<String, Type> variableTypes = validFreeVariables.get().stream()
+        .collect(Collectors.toMap(ValidFreeVariable::getName, ValidFreeVariable::getType));
+
+    for (SpecIoVariable specIoVariable : specification.getColumnHeaders()) {
+      // Check column header for problem
+      try {
+        ValidIoVariable validIoVariable = InvalidIoVarProblem.tryGetValidIoVariable(specIoVariable,
+            codeIoVariables.get(), typesByName, specProblems::add); // On non-fatal problems (like
+        // missing matching
+        // CodeIoVariable)
+        variableTypes.put(validIoVariable.getName(), validIoVariable.getValidType());
+        if (specProblems.isEmpty()) {
+          validSpec.getColumnHeaders().add(validIoVariable);
+        }
+      } catch (InvalidIoVarProblem invalidIoVarProblem) { // Fatal problem (like invalid type, etc)
+        specProblems.add(invalidIoVarProblem);
+      }
+    }
+    return variableTypes;
   }
 
   public ReadOnlyBooleanProperty validProperty() {
