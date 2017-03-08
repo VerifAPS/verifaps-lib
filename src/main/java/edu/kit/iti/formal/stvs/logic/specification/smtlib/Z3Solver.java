@@ -261,11 +261,20 @@ public class Z3Solver {
         z3Result += line + "\n";
       }
       String error = IOUtils.toString(process.getErrorStream(), "utf-8");
-      if (process.exitValue() == 0 || error.length() == 0) {
-        Sexp expression = solverStringToSexp(z3Result);
-        return buildConcreteSpecFromSExp(expression, ioVariables);
-      } else {
-        throw new ConcretizationException("Z3 process failed. Output: \n" + error);
+      if (Thread.currentThread().isInterrupted()) {
+        process.destroyForcibly();
+        throw new ConcretizationException("Interrupted Concretization");
+      }
+      try {
+        int exitValue = process.waitFor();
+        if (exitValue == 0 || error.length() == 0) {
+          Sexp expression = solverStringToSexp(z3Result);
+          return buildConcreteSpecFromSExp(expression, ioVariables);
+        } else {
+          throw new ConcretizationException("Z3 process failed. Output: \n" + error);
+        }
+      } catch (InterruptedException e) {
+        throw new ConcretizationException("Interrupted Concretization");
       }
     } catch (IOException | SexpParserException e) {
       throw new ConcretizationException(e);

@@ -13,6 +13,7 @@ public class ConcretizationException extends Exception {
   }
 
   public ConcretizationException(Exception e) {
+    super(e);
     originalException = e;
     message = e.getMessage();
   }
