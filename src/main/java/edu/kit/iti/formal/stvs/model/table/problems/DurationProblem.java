@@ -7,10 +7,6 @@ import edu.kit.iti.formal.stvs.model.common.Selection;
  * The abstract model for problems that occurred in duration cells.
  * </p>
  *
- * <p>
- * Created by Philipp on 03.02.2017.
- * </p>
- *
  * @author Philipp
  */
 public abstract class DurationProblem extends SpecProblem {

@@ -32,20 +32,12 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 /**
- * <p>
  * The validator for {@link ConstraintSpecification}s. It converts these into the formal model:
  * {@link ValidSpecification}. If there are any problems while converting, then {@link SpecProblem}s
  * are created.
- * </p>
  *
- * <p>
  * This object has observable properties and can therefore be used like any other model instance in
  * the controllers.
- * </p>
- *
- * <p>
- * Created by philipp on 09.02.17.
- * </p>
  *
  * @author Philipp
  */
