@@ -10,7 +10,7 @@
 
     <artifactId>geteta</artifactId>
     <!-- Every version upgrade, add a changelog to src/site/index.xhtml -->
-    <version>0.4.2</version>
+    <version>0.4.3</version>
 
     <repositories>
         <repository>

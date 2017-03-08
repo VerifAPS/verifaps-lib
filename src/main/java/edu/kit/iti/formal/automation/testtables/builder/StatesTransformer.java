@@ -36,6 +36,7 @@ import java.util.List;
  * Created by weigl on 17.12.16.
  */
 public class StatesTransformer implements TableTransformer {
+    private static final int INITIAL_CLOCK_VALUE = 1;
     private TableModule mt;
     private GeneralizedTestTable gtt;
     private StateReachability reachable;
@@ -55,6 +56,7 @@ public class StatesTransformer implements TableTransformer {
 
         SMVExpr clockVariableKeep;
         SMVExpr clockVariableFwd;
+
         if (d.isOneStep()) { // [1,1]
             clockVariableFwd = SLiteral.TRUE;
             clockVariableKeep = SLiteral.FALSE;
@@ -127,13 +129,13 @@ public class StatesTransformer implements TableTransformer {
                         new SLiteral(dt, max)));
 
         // clock assignments
-        SAssignment init = new SAssignment(clockModule, new SLiteral(dt, 0));
+        SAssignment init = new SAssignment(clockModule, new SLiteral(dt, INITIAL_CLOCK_VALUE));
         SAssignment next = new SAssignment(clockModule, SMVFacade.caseexpr(
                 reset, new SLiteral(dt, 0),
                 SMVFacade.combine(SBinaryOperator.AND, inc, limit), clockModule,
                 inc, new SBinaryExpression(clockModule, SBinaryOperator.PLUS,
                         new SLiteral(dt, 1)),
-                SMVFacade.next(s.getSMVVariable()), new SLiteral(dt, 1)
+                SMVFacade.next(s.getSMVVariable()), new SLiteral(dt, INITIAL_CLOCK_VALUE)
         ));
 
         mt.getStateVars().add(clockModule);

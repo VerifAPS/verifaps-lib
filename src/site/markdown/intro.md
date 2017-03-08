@@ -28,7 +28,7 @@ i/o and constraint.
 
 | Name | Description   |
 |------|---------------|
-| name | variable name |
+| identifier | variable identifier |
 | io   | `input` or  `output` |
 | data-type | IEC61131-3 builtin datatype. Currently supported: AnyInt and AnyBit | 
 
@@ -44,7 +44,7 @@ are not visible to the program.
 
 | Name | Description   |
 |------|---------------|
-| name | variable name |
+| identifier | variable identifier |
 | constraint   | a valid cell expression |
 | data-type | IEC61131-3 builtin datatype. Currently supported: AnyInt and AnyBit | 
 
