@@ -39,9 +39,6 @@ public class SmtConcretizer implements SpecificationConcretizer {
    * 
    * @param validSpecification The valid specification that should be conretized
    * @param freeVariables FreeVariables that were used in the {@code validSpecification}
-   * @param specificationHandler handles the concrete specification (or an empty
-   *        {@link java.util.Optional}) if result not present
-   * @param exceptionHandler handles exceptions
    */
   @Override
   public ConcreteSpecification calculateConcreteSpecification(ValidSpecification validSpecification,
