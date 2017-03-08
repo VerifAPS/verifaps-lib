@@ -10,7 +10,7 @@ import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 
 /**
- * A {@link ThrowingErrorListener} that throws {@link ParseRuntimeException}s on every syntaxError.
+ * A {@link ThrowingErrorListener} that throws {@link ParseRuntimeException}s on every syntax error.
  *
  * @author Philipp
  */
@@ -24,18 +24,15 @@ public class ThrowingErrorListener implements ANTLRErrorListener {
   @Override
   public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex,
       boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
-    // we can _prooobably_ just ignore these (parses successfully even though this is invoked.)
   }
 
   @Override
   public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex,
       BitSet conflictingAlts, ATNConfigSet configs) {
-    // same
   }
 
   @Override
   public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex,
       int prediction, ATNConfigSet configs) {
-    // never got this call in all tests.
   }
 }

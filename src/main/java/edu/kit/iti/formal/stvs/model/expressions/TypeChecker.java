@@ -4,7 +4,6 @@ import java.util.Map;
 
 /**
  * A type checker for {@link Expression}s.
- * <p>
  * If an ill-typed expression is encountered, this class produces a {@link TypeCheckException}.
  *
  * @author Philipp

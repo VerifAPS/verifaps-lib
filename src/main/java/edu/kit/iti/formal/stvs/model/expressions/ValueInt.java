@@ -1,9 +1,7 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 /**
- * runtime-representation for integer values of {@link Expression}s.
- * <p>
- * <p>
+ * Runtime-representation for integer values of {@link Expression}s.
  * This is not a singleton (in contrast to {@link ValueBool}), since many different instances can be
  * created at runtime.
  *

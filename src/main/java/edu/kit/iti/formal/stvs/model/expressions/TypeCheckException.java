@@ -12,6 +12,7 @@ public class TypeCheckException extends Exception {
   private final Expression mistypedExpression;
 
   /**
+   * Create a new TypeCheckException.
    * @param mistypedExpression the expression that is ill-typed. This would be the whole expression
    *        (for example <tt>2 AND TRUE</tt>)
    * @param message a message about what went wrong.
@@ -22,6 +23,7 @@ public class TypeCheckException extends Exception {
   }
 
   /**
+   * Get the expression for which this TypeCheckException was thrown.
    * @return the expression that is ill-typed. This would be the whole expression (for example
    *         <tt>2 AND TRUE</tt>)
    */

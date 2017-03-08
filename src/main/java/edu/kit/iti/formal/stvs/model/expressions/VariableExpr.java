@@ -7,11 +7,9 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
- * runtime-representation for variables in {@link Expression}s.
- * <p>
- * <p>
- * At this point it is not known, whether this is a reference to a {@link FreeVariable} or an
- * {@link IoVariable}, it is simply the String name of either of those.
+ * Runtime-representation for variables in {@link Expression}s.
+ * At this point it is not known whether this is a reference to a {@link FreeVariable} or an
+ * {@link IoVariable}; it is simply the String name of either of those.
  *
  * @author Philipp
  */

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * runtime-representation for enum types.
+ * Runtime-representation for enum types.
  * <p>
  * This is (in contrast to {@link TypeInt} or {@link TypeBool}) NOT a singleton, since different
  * instances of this can be created at runtime.
@@ -64,9 +64,6 @@ public class TypeEnum implements Type {
 
   @Override
   public Value generateDefaultValue() {
-    // return first element in the values array
-    // TODO: Handle Enum without any values?
-    // Could such an enum even be represented in ST code?
     return valueMap.values().iterator().next();
   }
 
