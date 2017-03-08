@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 /**
- * Created by philipp on 09.01.17.
+ * An input or output variable declared in the code.
  *
  * @author Philipp
  */
@@ -61,6 +61,7 @@ public class CodeIoVariable extends IoVariable {
     return equals(other);
   }
 
+  @Override
   public String toString() {
     return "CodeIoVariable(" + category + " " + name + " : " + type + ")";
   }

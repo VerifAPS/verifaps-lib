@@ -72,7 +72,7 @@ public class SpecificationTableController implements Controller {
     validator.problemsProperty().addListener((Observable o) -> onProblemsChange());
     validator.recalculateSpecProblems();
 
-    hybridSpec.getSelection().setOnCellClickListener(this::focusCell);
+    hybridSpec.getSelection().setOnTimingDiagramSelectionClickListener(this::focusCell);
     hybridSpec.getSelection().columnProperty().addListener(this::onColumnSelectionChanged);
 
     tableView.setItems(hybridSpec.getHybridRows());

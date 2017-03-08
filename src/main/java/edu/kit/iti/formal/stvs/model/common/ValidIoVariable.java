@@ -1,9 +1,13 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 import edu.kit.iti.formal.stvs.model.expressions.Type;
+import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 
 /**
- * Created by philipp on 09.02.17.
+ * A valid I/O variable. This variable may appear in a {@link ValidSpecification}. Their names
+ * have been checked (conform to valid identifier pattern) and their types are parsed
+ * {@link Type} objects. For the validation logic, see
+ * {@link edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator}.
  *
  * @author Philipp
  */
@@ -13,6 +17,12 @@ public class ValidIoVariable extends IoVariable {
   private final String name;
   private final Type type;
 
+  /**
+   * Create a new ValidIoVariable with a given category, name and type.
+   * @param category The category of this variable
+   * @param name The name of this variable
+   * @param type The type of this variable
+   */
   public ValidIoVariable(VariableCategory category, String name, Type type) {
     this.category = category;
     this.name = name;

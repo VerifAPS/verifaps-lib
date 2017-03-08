@@ -66,7 +66,6 @@ public class SmtConcretizerTest {
     }
   };
 
-  @Ignore
   @Test
   //TODO: needs to actually run concretization
   public void testTermination() throws Exception {

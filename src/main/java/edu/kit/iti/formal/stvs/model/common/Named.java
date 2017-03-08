@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 /**
- * Created by philipp on 09.02.17.
+ * An interface for objects which have a name.
  *
  * @author Philipp
  */

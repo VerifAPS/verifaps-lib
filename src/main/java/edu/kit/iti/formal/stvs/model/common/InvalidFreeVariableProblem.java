@@ -14,8 +14,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
  * identifier, a type that has never been defined or a default value that does not
  * fit the type or is not a valid literal.</p>
  *
- * <p>Created by philipp on 09.02.17.</p>
- *
  * @author Philipp
  */
 public class InvalidFreeVariableProblem extends FreeVariableProblem {
