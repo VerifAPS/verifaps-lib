@@ -28,8 +28,12 @@ public class TypeEnum implements Type {
    * @param enumTypeName the type name (<tt>COLORS</tt> in this example)
    * @param values the possible values that this enum can be ([<tt>red</tt>, <tt>green</tt>,
    *        <tt>blue</tt>] in this example)
+   * @throws IllegalArgumentException if the given list of values is empty
    */
   public TypeEnum(String enumTypeName, List<String> values) {
+    if (values.isEmpty()) {
+      throw new IllegalArgumentException("Cannot create enum \"" + enumTypeName + "\" without any values.");
+    }
     this.enumTypeName = enumTypeName;
     this.valueMap = new HashMap<>();
     this.valueList = new ArrayList<>();

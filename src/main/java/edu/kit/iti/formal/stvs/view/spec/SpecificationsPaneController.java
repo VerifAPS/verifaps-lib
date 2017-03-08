@@ -61,13 +61,13 @@ public class SpecificationsPaneController implements Controller {
     this.view.onTabAdded(() -> {
       HybridSpecification hybridSpecification =
           new HybridSpecification(new FreeVariableList(new ArrayList<>()), true);
+      System.out.println(ioVariables.get());
       for (CodeIoVariable ioVariable : ioVariables.get()) {
         SpecIoVariable specIoVariable = new SpecIoVariable(ioVariable.getCategory(),
             ioVariable.getType(), ioVariable.getName());
         hybridSpecification.getColumnHeaders().add(specIoVariable);
       }
       hybridSpecifications.add(hybridSpecification);
-
     });
 
     view.getTabPane().getSelectionModel().selectedItemProperty()

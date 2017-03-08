@@ -3,6 +3,9 @@ package edu.kit.iti.formal.stvs.model;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
+import edu.kit.iti.formal.stvs.model.code.ParsedCode;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
@@ -120,4 +123,18 @@ public class StvsRootModel {
     ExporterFacade.exportSession(this, ExporterFacade.ExportFormat.XML, sessionFile);
   }
 
+  public void addNewHybridSpec() {
+    HybridSpecification hybridSpec = new HybridSpecification(new FreeVariableList(), true);
+    ParsedCode parsedCode = getScenario().getCode().getParsedCode();
+    if (parsedCode != null) {
+      System.out.println(parsedCode.getDefinedTypes());
+      parsedCode.getDefinedVariables().forEach(codeIoVariable -> {
+        hybridSpec.getColumnHeaders().add(new SpecIoVariable(
+            codeIoVariable.getCategory(),
+            codeIoVariable.getType(),
+            codeIoVariable.getName()));
+      });
+    }
+    getHybridSpecifications().add(hybridSpec);
+  }
 }

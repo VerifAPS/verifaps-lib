@@ -11,7 +11,9 @@ import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
+import edu.kit.iti.formal.stvs.model.code.ParsedCode;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
@@ -115,8 +117,7 @@ public class StvsMenuBarController implements Controller {
   }
 
   private void createNewSpec(ActionEvent actionEvent) {
-    this.rootModel.get().getHybridSpecifications()
-        .add(new HybridSpecification(new FreeVariableList(), true));
+    rootModel.get().addNewHybridSpec();
   }
 
   private void createNewCode(ActionEvent actionEvent) {

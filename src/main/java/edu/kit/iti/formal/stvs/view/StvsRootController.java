@@ -55,7 +55,7 @@ public class StvsRootController implements Controller {
 
     this.stvsRootModel.getScenario().codeObjectProperty().addListener(this::onCodeChange);
     this.stvsRootModel.getScenario().getCode().parsedCodeProperty()
-        .addListener(this::onParsedCodeChange);
+        .addListener((obs, old, parsedCode) -> onParsedCodeChange(parsedCode));
     this.stvsRootModel.getScenario().verificationResultProperty()
         .addListener(this::onVerificationResultChange);
 
@@ -118,20 +118,13 @@ public class StvsRootController implements Controller {
    */
   private void onCodeChange(ObservableValue<? extends Code> observableValue, Code old, Code code) {
     editorPaneController = new EditorPaneController(code, stvsRootModel.getGlobalConfig());
-    code.parsedCodeProperty().addListener(this::onParsedCodeChange);
+    code.parsedCodeProperty().addListener(
+        (obs, last, parsedCode) -> onParsedCodeChange(parsedCode));
     view.setEditor(editorPaneController.getView());
+    onParsedCodeChange(code.parsedCodeProperty().get());
   }
 
-  /**
-   * Change handler for the parsed code. Updates types and IO variables depending on those declared
-   * in the new parsed code.
-   *
-   * @param o The observable value
-   * @param old The parsed code before the change
-   * @param parsedCode The parsed code after the change
-   */
-  private void onParsedCodeChange(ObservableValue<? extends ParsedCode> o, ParsedCode old,
-      ParsedCode parsedCode) {
+  private void onParsedCodeChange(ParsedCode parsedCode) {
     if (parsedCode != null) {
       types.set(typesFromCode(parsedCode));
       ioVars.set(ioVarsFromCode(parsedCode));
