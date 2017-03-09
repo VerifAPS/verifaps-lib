@@ -62,6 +62,9 @@ public class VerificationError extends Exception {
     return errorMessages.get(reason);
   }
 
+  /**
+   * Reasons why a {@link VerificationError} may occur.
+   */
   public enum Reason {
     VERIFICATION_LAUNCH_ERROR, NUXMV_NOT_FOUND, PROCESS_ABORTED, TIMEOUT, ERROR, EXCEPTION, UNKNOWN
   }
