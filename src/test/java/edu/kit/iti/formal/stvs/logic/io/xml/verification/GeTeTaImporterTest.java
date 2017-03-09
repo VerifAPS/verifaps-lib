@@ -45,9 +45,8 @@ public class GeTeTaImporterTest {
   public void testDoImportVerified() throws ImportException {
     List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL, TypeFactory.enumOfName
         ("enumD", "literalOne", "literalTwo"));
-    VerificationResult result = ImporterFacade.importVerificationResult(StvsApplication.class
-        .getResourceAsStream("testSets/valid_1/geteta_report_valid_1.xml"), ImporterFacade
-        .ImportFormat.GETETA, typeContext);
+    VerificationResult result = new GeTeTaImporter(typeContext).doImport(StvsApplication.class
+        .getResourceAsStream("testSets/valid_1/geteta_report_valid_1.xml"));
     assertEquals(VerificationResult.Status.VERIFIED, result.getStatus());
     assertEquals(Optional.empty(), result.getCounterExample());
     assertEquals(Optional.empty(), result.getVerificationError());
