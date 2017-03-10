@@ -22,7 +22,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Created by Philipp on 01.02.2017.
+ * The controller for the {@link SpecificationTableView}. Orchestrates complex user interactions
+ * on the view (such as dragging and dropping of rows, selecting columns and cells etc.) and
+ * trigger updates on the model (the underlying {@link HybridSpecification}).
  *
  * @author Philipp
  */
@@ -38,6 +40,14 @@ public class SpecificationTableController implements Controller {
   private final TableColumn<HybridRow, String> durations;
   private final GlobalConfig config;
 
+  /**
+   * Create a new SpecificationTableController.
+   * @param config A reference to the current {@link GlobalConfig}
+   * @param typeContext A list of the currently defined types
+   * @param codeIoVariables A list of the {@link CodeIoVariable}s defined in the code
+   * @param validVariables A list of the currently defined {@link ValidFreeVariable}s
+   * @param hybridSpecification The {@link HybridSpecification} to display
+   */
   public SpecificationTableController(GlobalConfig config, ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> codeIoVariables,
       ReadOnlyObjectProperty<List<ValidFreeVariable>> validVariables,
@@ -267,8 +277,6 @@ public class SpecificationTableController implements Controller {
   private static final DataFormat SERIALIZED_MIME_TYPE =
       new DataFormat("application/x-java-serialized-object");
 
-  // from: http://stackoverflow.com/questions/28603224/sort-tableview-with-drag-and-drop-rows
-  // TODO: Have fun? Implement dragging multiple rows, from one program to another, etc.
   private TableRow<HybridRow> rowFactory(TableView<HybridRow> tableView) {
     TableRow<HybridRow> row = new TableRow<HybridRow>() {
       {

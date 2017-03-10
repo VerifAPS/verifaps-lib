@@ -89,10 +89,10 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
     Variables variables = objectFactory.createVariables();
     for (FreeVariable freeVariable : source.getFreeVariableList().getVariables()) {
       ConstraintVariable exportedVariable = objectFactory.createConstraintVariable();
-      exportedVariable.setName(VariableEscaper.escapeName(freeVariable.getName()));
+      exportedVariable.setName(VariableEscaper.escapeIdentifier(freeVariable.getName()));
       exportedVariable.setDataType(getDataType(freeVariable));
       if (freeVariable.getDefaultValue().length() > 0) {
-        exportedVariable.setConstraint(VariableEscaper.escapeName(freeVariable.getDefaultValue()));
+        exportedVariable.setConstraint(VariableEscaper.escapeIdentifier(freeVariable.getDefaultValue()));
       } else {
         exportedVariable.setConstraint("-");
       }
@@ -112,7 +112,7 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
     Variables variables = objectFactory.createVariables();
     for (SpecIoVariable ioVariable : source.getColumnHeaders()) {
       IoVariable exportedVariable = objectFactory.createIoVariable();
-      exportedVariable.setName(VariableEscaper.escapeName(ioVariable.getName()));
+      exportedVariable.setName(VariableEscaper.escapeIdentifier(ioVariable.getName()));
       exportedVariable.setDataType(getDataType(ioVariable));
       if (ioVariable.getCategory() == VariableCategory.INPUT) {
         exportedVariable.setIo("input");

@@ -17,7 +17,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
 /**
- * Created by philipp on 11.02.17.
+ * The pane for configuring an i/o variable for use in the specification table view. This pane is
+ * a component of the {@link IoVariableChooserDialog}.
  *
  * @author Philipp
  */

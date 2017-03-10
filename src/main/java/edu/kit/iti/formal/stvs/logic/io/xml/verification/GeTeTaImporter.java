@@ -250,11 +250,11 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       throws ImportException {
     for (Assignment input : step.getInput()) { // Input vars are initialized here FOR THE NEXT
       // CYCLE
-      String varName = VariableEscaper.unescapeName(input.getName());
+      String varName = VariableEscaper.unescapeIdentifier(input.getName());
       if (INPUT_VARIABLE_PATTERN.matcher(varName).matches()) {
         varCategories.put(varName, VariableCategory.INPUT);
         processVarAssignment(currentValues, varTypes, varName,
-            VariableEscaper.unescapeName(input.getValue()));
+            VariableEscaper.unescapeIdentifier(input.getValue()));
       }
     }
   }
@@ -277,9 +277,9 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       if (CODE_VARIABLE_PATTERN.matcher(stateString).matches()) {
         int periodIndex = stateString.indexOf(".");
         String varName = VariableEscaper
-            .unescapeName(stateString.substring(periodIndex + 1, stateString.length()));
+            .unescapeIdentifier(stateString.substring(periodIndex + 1, stateString.length()));
         varCategories.put(varName, VariableCategory.OUTPUT);
-        String varValue = VariableEscaper.unescapeName(state.getValue());
+        String varValue = VariableEscaper.unescapeIdentifier(state.getValue());
         processVarAssignment(currentValues, varTypes, varName, varValue);
       }
     }
@@ -322,7 +322,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
           entryString = entryString.replaceAll("\\s+", "");
           int colonIndex = entryString.indexOf(":");
           String varName = entryString.substring(0, colonIndex);
-          varNames.add(VariableEscaper.unescapeName(varName));
+          varNames.add(VariableEscaper.unescapeIdentifier(varName));
           entryString = entries.get(++i).getValue();
         }
         break;

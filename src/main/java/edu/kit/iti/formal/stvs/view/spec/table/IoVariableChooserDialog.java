@@ -19,6 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 /**
+ * The dialog for configuring new i/o variables (i.e. adding columns) in a specification table.
  * @author Philipp
  */
 public class IoVariableChooserDialog extends Dialog<SpecIoVariable> {

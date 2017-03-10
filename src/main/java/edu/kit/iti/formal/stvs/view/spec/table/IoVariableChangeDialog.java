@@ -9,9 +9,7 @@ import javafx.scene.control.Dialog;
 
 /**
  * <p>The dialog that is opened when a user right-clicks on a column header and clicks on
- * "Change </p>
- *
- * <p>Created by philipp on 11.02.17.</p>
+ * "Change".</p>
  *
  * @author Philipp
  */

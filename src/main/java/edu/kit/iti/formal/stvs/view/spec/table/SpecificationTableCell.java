@@ -18,7 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.converter.DefaultStringConverter;
 
 /**
- * Created by philipp on 13.02.17.
+ * The view for a cell in a specification table.
  *
  * @author Philipp
  */
@@ -26,6 +26,10 @@ public class SpecificationTableCell extends TextFieldTableCell<HybridRow, String
 
   private final ConstraintSpecificationValidator validator;
 
+  /**
+   * Create a new SpecificationTableCell with a given validator.
+   * @param validator The validator for this cell
+   */
   public SpecificationTableCell(ConstraintSpecificationValidator validator) {
     super(new DefaultStringConverter());
     this.validator = validator;

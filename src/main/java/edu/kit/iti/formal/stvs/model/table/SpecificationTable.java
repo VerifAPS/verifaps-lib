@@ -40,8 +40,9 @@ public class SpecificationTable<H extends Named, C, D> {
    * column header and row extractors. These are needed for "deep observing" and are used to
    * indicate to observable collections such as {@link ObservableList} which properties of the
    * items in the collection should cause change events on the collection itself.
-   * @see <a href="http://stackoverflow.com/questions/31687642/callback-and-extractors-for-javafx-observablelist">
-   *   this post</a> on why and how extractors are used.
+   * See also
+   * <a href="http://stackoverflow.com/questions/31687642/callback-and-extractors-for-javafx-observablelist">this post</a>
+   * on why and how extractors are used.
    * @param columnHeaderExtractor The extractor for the column headers
    * @param durationExtractor The extractor for the duration headers
    */
@@ -55,7 +56,8 @@ public class SpecificationTable<H extends Named, C, D> {
    * column header and row extractors. These are needed for "deep observing" and are used to
    * indicate to observable collections such as {@link ObservableList} which properties of the
    * items in the collection should cause change events on the collection itself.
-   * @see <a href="http://stackoverflow.com/questions/31687642/callback-and-extractors-for-javafx-observablelist">
+   * See also
+   * <a href="http://stackoverflow.com/questions/31687642/callback-and-extractors-for-javafx-observablelist">
    *   this post</a> on why and how extractors are used.
    * @param columnHeaderExtractor The extractor for the column headers
    * @param durationExtractor The extractor for the duration headers

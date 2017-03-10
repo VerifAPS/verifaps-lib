@@ -7,7 +7,7 @@ import de.tudresden.inf.lat.jsexp.SexpParserException;
 /**
  * Interface for al S-Expression compatible classes.
  *
- * @author
+ * @author Leon Kaucher
  */
 public interface SExpression {
 

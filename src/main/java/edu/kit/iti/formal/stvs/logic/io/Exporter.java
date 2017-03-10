@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream;
 
 /**
  * Interface for all classes concerned with exporting model objects to some output format.
- *
+ * @param <F> "<u>F</u>rom": Generic type parameter for the source type.
  * @author Benjamin Alt
  */
 public interface Exporter<F> {
