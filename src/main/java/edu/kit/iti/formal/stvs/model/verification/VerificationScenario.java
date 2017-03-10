@@ -10,6 +10,7 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 
 import java.io.IOException;
 
+import edu.kit.iti.formal.stvs.util.ProcessCreationException;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -57,10 +58,9 @@ public class VerificationScenario {
    * @param spec The specification to be verified
    * @throws IOException Exception while IO interaction
    * @throws ExportException Exception while exporting
-   * @throws VerificationError Exception while verification
    */
   public void verify(GlobalConfig config, ConstraintSpecification spec)
-      throws IOException, ExportException, VerificationError {
+      throws IOException, ExportException, ProcessCreationException {
     activeSpec.set(spec);
     verificationEngine =
         new GeTeTaVerificationEngine(config, code.get().getParsedCode().getDefinedTypes());

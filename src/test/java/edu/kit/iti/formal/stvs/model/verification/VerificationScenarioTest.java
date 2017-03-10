@@ -107,9 +107,7 @@ public class VerificationScenarioTest {
         /* Cannot just assertEquals() with verificationResults, as logFileNames (randomly
         generated) will be different
         assertEquals(expectedResult, newResult); */
-        assertEquals(expectedResult.getCounterExample(), newResult.getCounterExample());
-        assertEquals(expectedResult.getStatus(), newResult.getStatus());
-        assertEquals(expectedResult.getVerificationError(), newResult.getVerificationError());
+        assertEquals(expectedResult.getClass(), newResult.getClass());
       } catch (ImportException e) {
         throw new AssertionFailedError();
       }

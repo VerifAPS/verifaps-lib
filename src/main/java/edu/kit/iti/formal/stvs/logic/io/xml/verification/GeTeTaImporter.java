@@ -40,6 +40,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess;
 import org.w3c.dom.Node;
 
 /**
@@ -116,12 +117,12 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       /* Return appropriate VerificationResult */
       switch (importedMessage.getReturncode()) {
         case RETURN_CODE_SUCCESS:
-          return new VerificationResult(VerificationResult.Status.VERIFIED, logFile, null);
+          return new VerificationSuccess(logFile);
         case RETURN_CODE_NOT_VERIFIED:
-          return new VerificationResult(parseCounterexample(importedMessage), logFile);
+          return new edu.kit.iti.formal.stvs.model.verification.Counterexample(
+              parseCounterexample(importedMessage), logFile);
         default:
-          VerificationError error = new VerificationError(VerificationError.Reason.ERROR);
-          return new VerificationResult(VerificationResult.Status.ERROR, logFile, error);
+          return new VerificationError(VerificationError.Reason.ERROR, logFile);
       }
     } catch (TransformerException | IOException exception) {
       throw new ImportException(exception);

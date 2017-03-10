@@ -8,10 +8,8 @@ import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
-import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
-import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
-import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
+import edu.kit.iti.formal.stvs.util.ProcessCreationException;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.editor.EditorPaneController;
 import edu.kit.iti.formal.stvs.view.spec.SpecificationsPaneController;
@@ -26,9 +24,10 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Alert;
-import org.apache.commons.io.FileUtils;
 
 /**
+ * The root controller. Manages the largest-scale view of the application (see
+ * {@link StvsRootView}).
  * @author Carsten Csiky
  */
 public class StvsRootController implements Controller {
@@ -38,6 +37,7 @@ public class StvsRootController implements Controller {
   private final ObjectProperty<List<Type>> types;
   private final ObjectProperty<List<CodeIoVariable>> ioVars;
   private final SpecificationsPaneController specificationsPaneController;
+  private final VerificationResultVisitor verificationResultVisitor;
   private EditorPaneController editorPaneController;
 
   public StvsRootController(StvsRootModel rootModel) {
@@ -62,6 +62,8 @@ public class StvsRootController implements Controller {
     this.view =
         new StvsRootView(editorPaneController.getView(), specificationsPaneController.getView());
 
+    this.verificationResultVisitor = new VerificationResultVisitor(this);
+
     view.addEventHandler(VerificationEvent.EVENT_TYPE, this::onVerificationEvent);
   }
 
@@ -77,7 +79,7 @@ public class StvsRootController implements Controller {
         try {
           stvsRootModel.getScenario().verify(stvsRootModel.getGlobalConfig(),
               event.getConstraintSpec());
-        } catch (ExportException | IOException | VerificationError e) {
+        } catch (ExportException | IOException | ProcessCreationException e) {
           AlertFactory
               .createAlert(e, "Verification Error", "The verification " + "could not be started.")
               .showAndWait();
@@ -150,41 +152,16 @@ public class StvsRootController implements Controller {
       VerificationResult old, VerificationResult res) {
     if (res == null) {
       AlertFactory.createAlert(Alert.AlertType.ERROR, "Verification Error",
-          "Verification result is null", "").showAndWait();
+          "The verification result is null.", "").showAndWait();
     }
-    try {
-      String logFileContents = "";
-      String alertBody = "Verification done.";
-      if (res.getLogFile().isPresent()) {
-        alertBody = " See the log at " + res.getLogFile().get().getAbsolutePath() + ".";
-        logFileContents = FileUtils.readFileToString(res.getLogFile().get(), "utf-8");
-      }
-      switch (res.getStatus()) {
+    res.accept(verificationResultVisitor);
+  }
 
-        case COUNTEREXAMPLE:
-          AlertFactory.createAlert(Alert.AlertType.INFORMATION, "Counterexample Available",
-              "A counterexample is available.", alertBody, logFileContents).showAndWait();
-          // Show read-only copy of spec with counterexample in a new tab
-          assert stvsRootModel.getScenario().getActiveSpec() != null;
-          assert res.getCounterExample().isPresent();
-          HybridSpecification readOnlySpec = new HybridSpecification(
-              new ConstraintSpecification(stvsRootModel.getScenario().getActiveSpec()), false);
-          readOnlySpec.setCounterExample(res.getCounterExample().get());
-          stvsRootModel.getHybridSpecifications().add(readOnlySpec);
-          break;
-
-        case VERIFIED:
-          AlertFactory
-              .createAlert(Alert.AlertType.INFORMATION, "Verification Successful",
-                  "The verification completed successfully.", alertBody, logFileContents)
-              .showAndWait();
-          break;
-
-        default:
-          AlertFactory.createAlert(res.getVerificationError().get()).showAndWait();
-      }
-    } catch (IOException e) {
-      AlertFactory.createAlert(e).showAndWait();
-    }
+  /**
+   * Get the current {@link StvsRootModel} managed by this controller.
+   * @return The root model
+   */
+  public StvsRootModel getRootModel() {
+    return stvsRootModel;
   }
 }

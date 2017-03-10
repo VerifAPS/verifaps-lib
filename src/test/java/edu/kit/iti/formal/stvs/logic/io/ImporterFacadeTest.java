@@ -16,6 +16,7 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.*;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
+import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,6 +31,8 @@ import java.util.Optional;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -130,9 +133,7 @@ public class ImporterFacadeTest {
     VerificationResult result = ImporterFacade.importVerificationResult(StvsApplication.class
         .getResourceAsStream("testSets/valid_1/geteta_report_valid_1.xml"), ImporterFacade
         .ImportFormat.GETETA, typeContext);
-    Assert.assertEquals(VerificationResult.Status.VERIFIED, result.getStatus());
-    Assert.assertEquals(Optional.empty(), result.getCounterExample());
-    Assert.assertEquals(Optional.empty(), result.getVerificationError());
+    assertThat(result, instanceOf(VerificationSuccess.class));
   }
 
   @Test(expected = ImportException.class)
