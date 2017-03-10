@@ -279,6 +279,7 @@ public class ImporterFacade {
    * @param globalConfig current global config
    * @param importHybridSpecificationHandler handler of the file (if the file is a Specification)
    * @param importStvsRootModelHandler handler of the file (if the file is a Session)
+   * @param codeConsumer handler of the file (if the file is a code file)
    */
   public static void importFile(File file, GlobalConfig globalConfig, History currentHistory,
       ImportHybridSpecificationHandler importHybridSpecificationHandler,

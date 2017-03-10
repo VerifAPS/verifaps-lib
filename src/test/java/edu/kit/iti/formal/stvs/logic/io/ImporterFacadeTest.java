@@ -21,9 +21,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,12 +29,17 @@ import java.util.List;
 import java.util.Optional;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.*;
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Benjamin Alt
  */
 public class ImporterFacadeTest {
+
+  private boolean hybridSpecImported = false;
+  private boolean sessionImported = false;
+  private boolean codeImported = false;
 
   @Test
   public void importConstraintSpecFile() throws Exception {
@@ -180,7 +183,53 @@ public class ImporterFacadeTest {
 
   @Test
   public void importFile() throws Exception {
+    File specFile = new File(XmlConstraintSpecImporter.class.getResource("spec_constraint_vali" +
+        "d_1.xml").toURI());
+    File codeFile = new File(StvsApplication.class.getResource("testSets/valid_1/code_valid_1.st")
+        .toURI());
+    File sessionFile = new File(XmlSessionImporter.class.getResource("session_valid_1.xml")
+        .toURI());
+    GlobalConfig testConfig = new GlobalConfig();
+    History testHistory = new History();
+    DummyHybridSpecificationHandler specHandler = new DummyHybridSpecificationHandler();
+    DummyStvsRootModelHandler sessionHandler = new DummyStvsRootModelHandler();
+    DummyCodeHandler codeHandler = new DummyCodeHandler();
+    ImporterFacade.importFile(specFile, testConfig, testHistory, specHandler, sessionHandler,
+        codeHandler);
+    assertTrue(hybridSpecImported);
+    assertFalse(sessionImported);
+    assertFalse(codeImported);
+    hybridSpecImported = false;
+    ImporterFacade.importFile(sessionFile, testConfig, testHistory, specHandler, sessionHandler, codeHandler);
+    assertFalse(hybridSpecImported);
+    assertTrue(sessionImported);
+    assertFalse(codeImported);
+    sessionImported = false;
+    ImporterFacade.importFile(codeFile, testConfig, testHistory, specHandler, sessionHandler, codeHandler);
+    assertFalse(hybridSpecImported);
+    assertFalse(sessionImported);
+    assertTrue(codeImported);
+  }
 
+  private class DummyHybridSpecificationHandler implements ImportHybridSpecificationHandler {
+    @Override
+    public void accept(HybridSpecification hybridSpecification) {
+      hybridSpecImported = true;
+    }
+  }
+
+  private class DummyStvsRootModelHandler implements ImportStvsRootModelHandler {
+    @Override
+    public void accept(StvsRootModel model) {
+      sessionImported = true;
+    }
+  }
+
+  private class DummyCodeHandler implements ImportCodeHandler {
+    @Override
+    public void accept(Code code) {
+      codeImported = true;
+    }
   }
 
 }
