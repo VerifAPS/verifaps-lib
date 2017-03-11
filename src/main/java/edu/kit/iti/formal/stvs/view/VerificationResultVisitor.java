@@ -5,7 +5,6 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.Counterexample;
 import edu.kit.iti.formal.stvs.model.verification.VerificationError;
-import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 
@@ -40,7 +39,6 @@ public class VerificationResultVisitor {
    * @param result Counterexample to visit.
    */
   public void visitCounterexample(Counterexample result) {
-    makeAlertBody(result);
     AlertFactory.createAlert(Alert.AlertType.INFORMATION, "Counterexample Available",
         "A counterexample is available.", alertBody, logFileContents).showAndWait();
     StvsRootModel rootModel = controller.getRootModel();
@@ -50,19 +48,6 @@ public class VerificationResultVisitor {
         new ConstraintSpecification(rootModel.getScenario().getActiveSpec()), false);
     readOnlySpec.setCounterExample(result.getCounterexample());
     rootModel.getHybridSpecifications().add(readOnlySpec);
-  }
-
-  private void makeAlertBody(VerificationResult result) {
-    alertBody = "Verification done.";
-    logFileContents = "";
-    if (result.getLogFile().isPresent()) {
-      alertBody = " See the log at " + result.getLogFile().get().getAbsolutePath() + ".";
-      try {
-        logFileContents = FileUtils.readFileToString(result.getLogFile().get(), "utf-8");
-      } catch (IOException ex) {
-        // Do nothing, don't want to distract from the result
-      }
-    }
   }
 
   /**
@@ -91,7 +76,14 @@ public class VerificationResultVisitor {
    * @param result success to visit
    */
   public void visitVerificationSuccess(VerificationSuccess result) {
-    makeAlertBody(result);
+    if (result.getLogFile().isPresent()) {
+      alertBody = " See the log at " + result.getLogFile().get().getAbsolutePath() + ".";
+      try {
+        logFileContents = FileUtils.readFileToString(result.getLogFile().get(), "utf-8");
+      } catch (IOException ex) {
+        // Do nothing, don't want to distract from the result
+      }
+    }
     AlertFactory.createAlert(Alert.AlertType.INFORMATION, "Verification Successful",
         "The verification completed successfully.", alertBody, logFileContents).showAndWait();
   }
