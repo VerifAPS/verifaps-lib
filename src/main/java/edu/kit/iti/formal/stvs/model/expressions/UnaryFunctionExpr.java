@@ -18,6 +18,8 @@ public class UnaryFunctionExpr extends Expression {
   private final Expression argument;
 
   /**
+   * Creates an instance that represents an unary function.
+   *
    * @param operation the unary operation
    * @param argument the expression to apply the operation to
    */

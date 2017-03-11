@@ -30,6 +30,11 @@ public class IoVariableChooserDialog extends Dialog<SpecIoVariable> {
   private final ListView<CodeIoVariable> ioVariables;
   private final ButtonType createButton = new ButtonType("Create", ButtonBar.ButtonData.OK_DONE);
 
+  /**
+   * Creates an instance of a chooser dialog.
+   * @param codeIoVariables variables that can be found in code
+   * @param alreadyDefinedVariables variables already used in the table
+   */
   public IoVariableChooserDialog(ObjectProperty<List<CodeIoVariable>> codeIoVariables,
       ObservableList<SpecIoVariable> alreadyDefinedVariables) {
     super();

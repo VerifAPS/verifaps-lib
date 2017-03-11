@@ -11,12 +11,17 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
+import edu.kit.iti.formal.stvs.util.ProcessCreationException;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Optional;
 
-import edu.kit.iti.formal.stvs.util.ProcessCreationException;
 import javafx.application.Platform;
 import org.apache.commons.io.IOUtils;
 
@@ -39,7 +44,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
    *
    * @param config config that should be used
    * @param typeContext list of types used for importing counterexample
-   * @throws VerificationError nuXmv not found
+   * @throws FileNotFoundException nuXmv not found
    */
   public GeTeTaVerificationEngine(GlobalConfig config, List<Type> typeContext)
       throws FileNotFoundException {
@@ -51,8 +56,8 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     /* Check if nuXmv executable exists */
     File nuxmvFile = new File(config.getNuxmvFilename());
     if (!nuxmvFile.exists() || nuxmvFile.isDirectory()) {
-      throw new FileNotFoundException("The NuXmv executable " + nuxmvFile.getAbsolutePath() +
-          " could not be found.");
+      throw new FileNotFoundException(
+          "The NuXmv executable " + nuxmvFile.getAbsolutePath() + " could not be found.");
     }
   }
 

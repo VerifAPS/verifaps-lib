@@ -7,10 +7,10 @@ import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.util.ProcessCreationException;
 
 import java.io.IOException;
 
-import edu.kit.iti.formal.stvs.util.ProcessCreationException;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;

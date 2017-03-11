@@ -40,7 +40,7 @@ public class DuplicateFreeVariableProblem extends FreeVariableProblem {
   /**
    * Private constructor: DuplicateFreeVariableProblems can only be created from the static
    * method {@link DuplicateFreeVariableProblem#checkForDuplicates}.
-   * @param freeVariableName
+   * @param freeVariableName the name of the duplicate variable
    */
   private DuplicateFreeVariableProblem(String freeVariableName) {
     super(

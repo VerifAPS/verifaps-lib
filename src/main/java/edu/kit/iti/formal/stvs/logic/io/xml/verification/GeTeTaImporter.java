@@ -21,6 +21,7 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
+import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +41,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess;
 import org.w3c.dom.Node;
 
 /**
@@ -152,8 +152,8 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
 
     // Parse concrete rows
     List<Counterexample.Step> steps = message.getCounterexample().getTrace().getStep();
-    List<SpecificationRow<ConcreteCell>> concreteRows = makeConcreteRows(steps, rowNums,
-        varNames, varTypes, currentValues, varCategories);
+    List<SpecificationRow<ConcreteCell>> concreteRows =
+        makeConcreteRows(steps, rowNums, varNames, varTypes, currentValues, varCategories);
 
     // Parse durations
     List<ConcreteDuration> concreteDurations = makeConcreteDurations(rowNums);

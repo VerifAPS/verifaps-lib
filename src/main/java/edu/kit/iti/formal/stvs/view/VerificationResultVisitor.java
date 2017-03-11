@@ -5,13 +5,13 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.Counterexample;
 import edu.kit.iti.formal.stvs.model.verification.VerificationError;
-import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
-import javafx.scene.control.Alert;
-import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
+
+import javafx.scene.control.Alert;
+import org.apache.commons.io.FileUtils;
 
 /**
  * Handles a verification result on the view side: Shows the appropriate dialogs depending on the
@@ -23,12 +23,21 @@ public class VerificationResultVisitor {
   private String logFileContents;
   private String alertBody;
 
+  /**
+   * Creates an instance of this visitor.
+   * @param controller root controller from which the rootModel is taken
+   */
   public VerificationResultVisitor(StvsRootController controller) {
     this.controller = controller;
     alertBody = "Verification done.";
     logFileContents = "";
   }
 
+  /**
+   * Visits a {@link Counterexample}.
+   * This displays the counterexample in a new tab.
+   * @param result Counterexample to visit.
+   */
   public void visitCounterexample(Counterexample result) {
     AlertFactory.createAlert(Alert.AlertType.INFORMATION, "Counterexample Available",
         "A counterexample is available.", alertBody, logFileContents).showAndWait();
@@ -41,6 +50,11 @@ public class VerificationResultVisitor {
     rootModel.getHybridSpecifications().add(readOnlySpec);
   }
 
+  /**
+   * Visits a {@link VerificationError}.
+   * This displays an appropriate error dialog.
+   * @param result error to visit
+   */
   public void visitVerificationError(VerificationError result) {
     String expandableContent = "";
     if (result.getLogFile().isPresent()) {
@@ -50,11 +64,17 @@ public class VerificationResultVisitor {
         // Do nothing, don't want to distract from the actual error
       }
     }
-    AlertFactory.createAlert(Alert.AlertType.ERROR, "Verification Error",
-        "An error occurred during verification.", result.getMessage(),
-        expandableContent).showAndWait();
+    AlertFactory
+        .createAlert(Alert.AlertType.ERROR, "Verification Error",
+            "An error occurred during verification.", result.getMessage(), expandableContent)
+        .showAndWait();
   }
 
+  /**
+   * Visits a {@link VerificationSuccess}.
+   * This displays an appropriate success dialog.
+   * @param result success to visit
+   */
   public void visitVerificationSuccess(VerificationSuccess result) {
     if (result.getLogFile().isPresent()) {
       alertBody = " See the log at " + result.getLogFile().get().getAbsolutePath() + ".";

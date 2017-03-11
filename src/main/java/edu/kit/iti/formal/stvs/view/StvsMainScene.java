@@ -22,7 +22,7 @@ import javafx.scene.layout.VBox;
 import javax.xml.bind.JAXBException;
 
 /**
- * Created by csicar on 09.01.17.
+ * Main Scene that holds all visible nodes of the program.
  *
  * @author Lukas Fritsch
  */
@@ -38,6 +38,10 @@ public class StvsMainScene {
     this(StvsRootModel.autoloadSession());
   }
 
+  /**
+   * Creates an instance from a root model.
+   * @param rootModel Model that should be represented by this instance.
+   */
   public StvsMainScene(StvsRootModel rootModel) {
     this.rootModelProperty = new SimpleObjectProperty<>(rootModel);
     this.rootController = new StvsRootController(rootModelProperty.get());
@@ -55,11 +59,11 @@ public class StvsMainScene {
   }
 
   private VBox createVBox() {
-    VBox vBox = new VBox();
-    vBox.getChildren().addAll(menuBarController.getView(), rootController.getView());
+    VBox vbox = new VBox();
+    vbox.getChildren().addAll(menuBarController.getView(), rootController.getView());
     VBox.setVgrow(rootController.getView(), Priority.ALWAYS);
 
-    return vBox;
+    return vbox;
   }
 
   private void rootModelChanged(ObservableValue<? extends StvsRootModel> obs,
@@ -80,6 +84,9 @@ public class StvsMainScene {
     return scene;
   }
 
+  /**
+   * Code that should be executed before the scene is destroyed on exit.
+   */
   public void onClose() {
     StvsRootModel stvsRootModel = rootModelProperty.get();
     if (stvsRootModel != null) {

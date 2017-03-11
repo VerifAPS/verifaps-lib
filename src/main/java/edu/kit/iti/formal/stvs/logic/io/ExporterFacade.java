@@ -1,6 +1,10 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import edu.kit.iti.formal.stvs.logic.io.xml.*;
+import edu.kit.iti.formal.stvs.logic.io.xml.ObjectFactory;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaExporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
@@ -8,7 +12,12 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -19,10 +28,6 @@ import javax.xml.bind.JAXBException;
  * @author Benjamin Alt
  */
 public class ExporterFacade {
-
-  public enum ExportFormat {
-    XML, GETETA
-  }
 
   /**
    * Exports a {@link ConstraintSpecification} using the specified {@link ExportFormat}.
@@ -189,8 +194,13 @@ public class ExporterFacade {
    * @param file The file to write to
    * @throws IOException if an error occurred during file I/O
    */
-  private static void writeToFile(ByteArrayOutputStream outputStream, File file) throws IOException {
+  private static void writeToFile(ByteArrayOutputStream outputStream, File file)
+      throws IOException {
     FileOutputStream fostream = new FileOutputStream(file);
     outputStream.writeTo(fostream);
+  }
+
+  public enum ExportFormat {
+    XML, GETETA
   }
 }

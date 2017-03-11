@@ -21,6 +21,8 @@ public class LowerBoundedInterval {
   private Optional<Integer> upperBound;
 
   /**
+   * Creates an instance of an interval.
+   *
    * @param lowerBound the lower bound for this interval
    * @param upperBound the optional upper bound for this interval
    */

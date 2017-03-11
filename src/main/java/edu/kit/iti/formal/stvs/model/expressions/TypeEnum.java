@@ -8,7 +8,6 @@ import java.util.Optional;
 
 /**
  * Runtime-representation for enum types.
- * <p>
  * This is (in contrast to {@link TypeInt} or {@link TypeBool}) NOT a singleton, since different
  * instances of this can be created at runtime.
  *
@@ -22,7 +21,6 @@ public class TypeEnum implements Type {
 
   /**
    * Create a new enum-type. This should only happen, when an enum is parsed in st-code.
-   * <p>
    * St-code example definition of an enum: <tt>COLORS : (red, green, blue)</tt>
    *
    * @param enumTypeName the type name (<tt>COLORS</tt> in this example)
@@ -71,6 +69,11 @@ public class TypeEnum implements Type {
     return valueList;
   }
 
+  /**
+   * Returns a value of this enum that is resolved by name.
+   * @param enumName Name of the value
+   * @return Value identified by the given name
+   */
   public ValueEnum valueOf(String enumName) {
     ValueEnum enumVal = valueMap.get(enumName);
     if (enumVal == null) {

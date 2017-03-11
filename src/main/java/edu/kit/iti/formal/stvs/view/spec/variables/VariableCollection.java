@@ -10,7 +10,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 
 /**
- * Created by csicar on 10.01.17.
+ * This is the view that displays free variables and offers editing them.
  *
  * @author Philipp
  */
@@ -26,6 +26,9 @@ public class VariableCollection extends VBox {
   private final TableColumn<FreeVariable, String> typeTableColumn;
   private final TableColumn<FreeVariable, String> defaultValueTableColumn;
 
+  /**
+   * Creates an instance of this view.
+   */
   public VariableCollection() {
     this.overviewLabel = new Label("Free Variables:");
     this.freeVariableTableView = new TableView<>();

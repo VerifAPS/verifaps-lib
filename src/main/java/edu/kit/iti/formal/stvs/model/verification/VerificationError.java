@@ -72,6 +72,12 @@ public class VerificationError implements VerificationResult {
     errorMessages.put(Reason.EXCEPTION, ex.getMessage());
   }
 
+  /**
+   * Construct a new VerificationError from an Exception with a given log file.
+   *
+   * @param ex The exception to construct a VerificationError from
+   * @param logFile The log file
+   */
   public VerificationError(Exception ex, File logFile) {
     this.reason = Reason.EXCEPTION;
     this.logFile = logFile;

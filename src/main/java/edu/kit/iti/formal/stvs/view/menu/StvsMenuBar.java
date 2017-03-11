@@ -39,6 +39,9 @@ public class StvsMenuBar extends MenuBar {
   public MenuItem saveSessionAs;
   public MenuItem about;
 
+  /**
+   * Menu bar at the top of the window.
+   */
   public StvsMenuBar() {
     // create top-level menus
     file = new Menu("File");

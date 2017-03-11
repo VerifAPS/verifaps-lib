@@ -8,7 +8,7 @@ package edu.kit.iti.formal.stvs.model.expressions;
 @FunctionalInterface
 public interface ValueEnumHandler<R> {
   /**
-   * Must implement a method that gets called by {@link ValueEnum#match}
+   * Must implement a method that gets called by {@link ValueEnum#match}.
    *
    * @param value The value that the matched value represents
    * @return Object of type {@code R}

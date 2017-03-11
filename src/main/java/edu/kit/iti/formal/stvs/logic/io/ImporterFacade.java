@@ -1,6 +1,10 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import edu.kit.iti.formal.stvs.logic.io.xml.*;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlConcreteSpecImporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigImporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecImporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionImporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
@@ -41,10 +45,6 @@ import org.xml.sax.SAXException;
  * @author Benjamin Alt
  */
 public class ImporterFacade {
-
-  public enum ImportFormat {
-    XML, GETETA
-  }
 
   /**
    * Imports a {@link ConstraintSpecification} from an {@link InputStream} using the specified
@@ -312,5 +312,9 @@ public class ImporterFacade {
       // ignore, because it might have been code
     }
     codeConsumer.accept(importStCode(file));
+  }
+
+  public enum ImportFormat {
+    XML, GETETA
   }
 }

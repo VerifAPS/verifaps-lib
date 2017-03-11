@@ -9,7 +9,6 @@ import org.antlr.v4.runtime.Token;
  * {@link ParsedCode#parseCode(String, ParsedTokenHandler,
  * ParsedSyntaxErrorHandler, ParsedCodeHandler)}.
  * to notify about lexed tokens.
- *
  * Invariant: All tokens concatenated (re)produce the source code.
  */
 @FunctionalInterface

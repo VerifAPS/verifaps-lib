@@ -40,6 +40,11 @@ public class StvsRootController implements Controller {
   private final VerificationResultVisitor verificationResultVisitor;
   private EditorPaneController editorPaneController;
 
+  /**
+   * Controller for the {@link StvsRootView}.
+   * Here the main distinction between specification code and menu is made.
+   * @param rootModel model to represent
+   */
   public StvsRootController(StvsRootModel rootModel) {
     this.stvsRootModel = rootModel;
     this.editorPaneController = new EditorPaneController(stvsRootModel.getScenario().getCode(),
@@ -90,6 +95,9 @@ public class StvsRootController implements Controller {
         stvsRootModel.getScenario().cancel();
         AlertFactory.createAlert(Alert.AlertType.INFORMATION, "Verification cancelled",
             "Verification cancelled.", "").showAndWait();
+        break;
+      default:
+        throw new IllegalStateException("Could not handle verification event type.");
     }
   }
 

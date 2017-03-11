@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
  */
 public class SpecificationTable<H extends Named, C, D> {
 
-  protected final static String DEFAULT_NAME = "Unnamed Specification";
+  protected static final String DEFAULT_NAME = "Unnamed Specification";
 
   protected ObservableList<H> columnHeaders;
   protected ObservableList<SpecificationRow<C>> rows;
@@ -168,7 +168,7 @@ public class SpecificationTable<H extends Named, C, D> {
 
   /**
    * Get the SpecIoVariables for this table, i.e. the column headers.
-   * <p>
+   *
    * <p>
    * You should <strong>not mutate</strong> this list. For adding new columns, use
    * {@link SpecificationTable#addColumn(Named, SpecificationColumn)}.

@@ -20,11 +20,13 @@ public interface Value {
       ValueEnumHandler<R> matchEnum);
 
   /**
+   * Should return type of this value.
    * @return the type for this expression. (returns a TypeBool for a ValueInt for example)
    */
   Type getType();
 
   /**
+   * Should return a string representation of this value.
    * @return a String representation of the represented value
    */
   String getValueString();

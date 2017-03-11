@@ -8,7 +8,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
 
 /**
- * Created by csicar on 07.02.17.
+ * This Pane displays a collection of specifications as tabs.
  *
  * @author Carsten Csiky
  */
@@ -16,6 +16,9 @@ public class SpecificationsPane extends AnchorPane {
   private TabPane tabPane;
   private Button addButton;
 
+  /**
+   * Creates an empty instance.
+   */
   public SpecificationsPane() {
     this.tabPane = new TabPane();
     this.addButton = new Button("+");
@@ -44,6 +47,10 @@ public class SpecificationsPane extends AnchorPane {
     return addButton;
   }
 
+  /**
+   * Defines what should be invoked if a tab is added.
+   * @param listener method to invoke
+   */
   public void onTabAdded(Runnable listener) {
     addButton.setOnAction(actionEvent -> {
       listener.run();

@@ -5,43 +5,68 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.table.*;
+import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
+import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.model.table.HybridCell;
+import edu.kit.iti.formal.stvs.model.table.HybridRow;
+import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
+import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
+import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import edu.kit.iti.formal.stvs.model.table.problems.ColumnProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.view.Controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.control.*;
-import javafx.scene.input.*;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.TransferMode;
 
 /**
- * The controller for the {@link SpecificationTableView}. Orchestrates complex user interactions
- * on the view (such as dragging and dropping of rows, selecting columns and cells etc.) and
- * trigger updates on the model (the underlying {@link HybridSpecification}).
+ * The controller for the {@link SpecificationTableView}. Orchestrates complex user interactions on
+ * the view (such as dragging and dropping of rows, selecting columns and cells etc.) and trigger
+ * updates on the model (the underlying {@link HybridSpecification}).
  *
  * @author Philipp
  */
 public class SpecificationTableController implements Controller {
 
+  private static final DataFormat SERIALIZED_MIME_TYPE =
+      new DataFormat("application/x-java-serialized-object");
   private final SpecificationTableView view;
   private final TableView<HybridRow> tableView;
   private final HybridSpecification hybridSpec;
   private final ObjectProperty<List<Type>> typeContext;
   private final ObjectProperty<List<CodeIoVariable>> codeIoVariables;
   private final ConstraintSpecificationValidator validator;
-
   private final TableColumn<HybridRow, String> durations;
   private final GlobalConfig config;
 
   /**
    * Create a new SpecificationTableController.
+   *
    * @param config A reference to the current {@link GlobalConfig}
    * @param typeContext A list of the currently defined types
    * @param codeIoVariables A list of the {@link CodeIoVariable}s defined in the code
@@ -116,8 +141,7 @@ public class SpecificationTableController implements Controller {
 
   private void onProblemsChange() {
     List<ColumnProblem> columnProblems = validator.problemsProperty().get().stream()
-        .filter(problem -> problem instanceof ColumnProblem)
-        .map(problem -> (ColumnProblem) problem)
+        .filter(problem -> problem instanceof ColumnProblem).map(problem -> (ColumnProblem) problem)
         .collect(Collectors.toList());
     for (TableColumn<HybridRow, ?> column : tableView.getColumns()) {
       if (column.getUserData() == null) {
@@ -165,7 +189,6 @@ public class SpecificationTableController implements Controller {
   private ContextMenu createContextMenu() {
     MenuItem insertRow = new MenuItem("Insert Row");
     MenuItem deleteRow = new MenuItem("Delete Row");
-    MenuItem addNewColumn = new MenuItem("New Column...");
     MenuItem comment = new MenuItem("Comment ...");
     insertRow.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
     insertRow.setOnAction(event -> {
@@ -178,6 +201,7 @@ public class SpecificationTableController implements Controller {
       toRemove.addAll(tableView.getSelectionModel().getSelectedItems());
       removeByReference(hybridSpec.getHybridRows(), toRemove);
     });
+    MenuItem addNewColumn = new MenuItem("New Column...");
     addNewColumn.setOnAction(
         event -> new IoVariableChooserDialog(codeIoVariables, hybridSpec.getColumnHeaders())
             .showAndWait().ifPresent(this::addNewColumn));
@@ -220,6 +244,10 @@ public class SpecificationTableController implements Controller {
     return new ContextMenu(changeColumn, removeColumn, commentColumn);
   }
 
+  /**
+   * Adds a new row at the specified index.
+   * @param index Index where the row should be added
+   */
   public void addEmptyRow(int index) {
     Map<String, ConstraintCell> wildcardCells = new HashMap<>();
     hybridSpec.getColumnHeaders().forEach(
@@ -228,6 +256,10 @@ public class SpecificationTableController implements Controller {
     hybridSpec.getHybridRows().add(index, new HybridRow(wildcardRow, new ConstraintDuration("1")));
   }
 
+  /**
+   * Adds a new column for the specified variable.
+   * @param specIoVariable variable for which the column should be added
+   */
   public void addNewColumn(SpecIoVariable specIoVariable) {
     // Add column to model:
     if (hybridSpec.getHybridRows().isEmpty()) {
@@ -273,9 +305,6 @@ public class SpecificationTableController implements Controller {
 
     return column;
   }
-
-  private static final DataFormat SERIALIZED_MIME_TYPE =
-      new DataFormat("application/x-java-serialized-object");
 
   private TableRow<HybridRow> rowFactory(TableView<HybridRow> tableView) {
     TableRow<HybridRow> row = new TableRow<HybridRow>() {
