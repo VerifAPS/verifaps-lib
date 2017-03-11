@@ -32,6 +32,11 @@ public class TypeCheckException extends Exception {
   }
 
   @Override
+  public int hashCode() {
+    return getMistypedExpression() != null ? getMistypedExpression().hashCode() : 0;
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -42,8 +47,7 @@ public class TypeCheckException extends Exception {
 
     TypeCheckException that = (TypeCheckException) o;
 
-    return getMistypedExpression() != null
-        ? getMistypedExpression().equals(that.getMistypedExpression())
-        : that.getMistypedExpression() == null;
+    return getMistypedExpression() != null ? getMistypedExpression().equals(
+        that.getMistypedExpression()) : that.getMistypedExpression() == null;
   }
 }

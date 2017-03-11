@@ -118,4 +118,18 @@ public class CodeTest {
     assertNotNull(invalidCode.getSyntaxErrors().size());
   }
 
+  @Test
+  public void testEquals() {
+    assertEquals(enumDefinition, enumDefinition);
+    assertEquals(loadCodeFromFile("define_type.st"), enumDefinition);
+    assertNotEquals(invalidCode, enumDefinition);
+    assertNotEquals(null, enumDefinition);
+  }
+
+  @Test
+  public void testHashCode() {
+    assertEquals(enumDefinition.hashCode(), enumDefinition.hashCode());
+    assertEquals(loadCodeFromFile("define_type.st").hashCode(), enumDefinition.hashCode());
+    assertNotEquals(invalidCode.hashCode(), enumDefinition.hashCode());
+  }
 }

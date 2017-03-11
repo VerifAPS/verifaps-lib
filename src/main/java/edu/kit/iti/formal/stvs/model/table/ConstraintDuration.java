@@ -63,15 +63,28 @@ public class ConstraintDuration implements CellOperationProvider {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof ConstraintDuration)) {
-      return false;
-    }
-    if (obj == this) {
+    if (this == obj) {
       return true;
     }
-    ConstraintDuration other = (ConstraintDuration) obj;
-    return new EqualsBuilder().append(stringRepresentation.get(), other.stringRepresentation.get())
-        .append(comment.get(), other.comment.get()).isEquals();
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+
+    ConstraintDuration that = (ConstraintDuration) obj;
+
+    if ((getAsString() != null)
+        ? !getAsString().equals(that.getAsString()) : (that.getAsString() != null)) {
+      return false;
+    }
+    return (getComment() != null)
+        ? getComment().equals(that.getComment()) : (that.getComment() == null);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getAsString() != null ? getAsString().hashCode() : 0;
+    result = 31 * result + (getComment() != null ? getComment().hashCode() : 0);
+    return result;
   }
 
   public String toString() {

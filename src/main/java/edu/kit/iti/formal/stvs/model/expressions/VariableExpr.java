@@ -60,8 +60,27 @@ public class VariableExpr extends Expression {
   }
 
   @Override
-  public boolean equals(Object other) {
-    return (other instanceof VariableExpr) && this.equals((VariableExpr) other);
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    VariableExpr that = (VariableExpr) o;
+
+    if (varName != null ? !varName.equals(that.varName) : that.varName != null) {
+      return false;
+    }
+    return getIndex() != null ? getIndex().equals(that.getIndex()) : that.getIndex() == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = varName != null ? varName.hashCode() : 0;
+    result = 31 * result + (getIndex() != null ? getIndex().hashCode() : 0);
+    return result;
   }
 
   public String toString() {
