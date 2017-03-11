@@ -37,7 +37,7 @@ public class StvsRootController implements Controller {
   private final ObjectProperty<List<Type>> types;
   private final ObjectProperty<List<CodeIoVariable>> ioVars;
   private final SpecificationsPaneController specificationsPaneController;
-  private final VerificationResultVisitor verificationResultVisitor;
+  private final VerificationResultHandler verificationResultHandler;
   private EditorPaneController editorPaneController;
 
   /**
@@ -67,7 +67,7 @@ public class StvsRootController implements Controller {
     this.view =
         new StvsRootView(editorPaneController.getView(), specificationsPaneController.getView());
 
-    this.verificationResultVisitor = new VerificationResultVisitor(this);
+    this.verificationResultHandler = new VerificationResultHandler(this);
 
     view.addEventHandler(VerificationEvent.EVENT_TYPE, this::onVerificationEvent);
   }
@@ -155,7 +155,7 @@ public class StvsRootController implements Controller {
       AlertFactory.createAlert(Alert.AlertType.ERROR, "Verification Error",
           "The verification result is null.", "").showAndWait();
     }
-    res.accept(verificationResultVisitor);
+    res.accept(verificationResultHandler);
   }
 
   /**
