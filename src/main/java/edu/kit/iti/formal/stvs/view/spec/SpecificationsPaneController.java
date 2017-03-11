@@ -149,7 +149,9 @@ public class SpecificationsPaneController implements Controller {
     textInputDialog.setHeaderText("Set Specification Name");
     textInputDialog.setTitle("Specification Name");
     textInputDialog.showAndWait();
-    activeSpec.setName(textInputDialog.getResult());
+    if (textInputDialog.getResult() != null) {
+      activeSpec.setName(textInputDialog.getResult());
+    }
   }
 
   private ContextMenu createTabContextMenu() {
