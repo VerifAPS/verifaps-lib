@@ -66,9 +66,7 @@ public class SmtConcretizerTest {
     }
   };
 
-  @Ignore
   @Test
-  //TODO: needs to actually run concretization
   public void testTermination() throws Exception {
     ValidSpecification spec = importSpec("testSpec.xml");
 
@@ -80,10 +78,10 @@ public class SmtConcretizerTest {
     }};
 
     SmtConcretizer concretizer = new SmtConcretizer(GlobalConfig.autoloadConfig());
-    //concretizer
-    //    .calculateConcreteSpecification(spec, freeVariables, System.out::println, Throwable::printStackTrace);
+    concretizer
+        .calculateConcreteSpecification(spec, freeVariables);
     long start = stopwatch.runtime(TimeUnit.MILLISECONDS);
-    //concretizer.terminate();
+    concretizer.getProcess().destroy();
     long end = stopwatch.runtime(TimeUnit.MILLISECONDS);
     final long maxTime = 5;
     assertTrue("Except time to terminate to be smaller than "+maxTime+ ", but was"+(end-start),

@@ -277,6 +277,7 @@ public class Z3Solver {
         throw new ConcretizationException("Interrupted Concretization");
       }
     } catch (IOException | SexpParserException e) {
+      e.printStackTrace();
       throw new ConcretizationException(e);
     }
   }

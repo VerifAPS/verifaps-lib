@@ -157,6 +157,7 @@ public class SpecificationTableController implements Controller {
     MenuItem deleteRow = new MenuItem("Delete Row");
     MenuItem addNewColumn = new MenuItem("New Column...");
     MenuItem comment = new MenuItem("Comment ...");
+
     insertRow.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
     insertRow.setOnAction(event -> {
       int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
