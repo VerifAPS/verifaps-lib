@@ -11,7 +11,7 @@ import javafx.application.Platform;
  *
  * @author Leon Kaucher
  */
-public class JavaFxAsyncProcessTask<T> extends Thread {
+public class JavaFxAsyncTask<T> extends Thread {
   private final AsyncRunner<T> runner;
   private final AsyncTaskCompletedHandler<T> resultHandler;
   private final Timer processTerminatorTask;
@@ -24,8 +24,8 @@ public class JavaFxAsyncProcessTask<T> extends Thread {
    * @param resultHandler The portion of the action to be run synchronously (in javafx's EDT) with
    *        any other AsyncTasks.
    */
-  public JavaFxAsyncProcessTask(int timeout, AsyncRunner<T> runner,
-      AsyncTaskCompletedHandler<T> resultHandler) {
+  public JavaFxAsyncTask(int timeout, AsyncRunner<T> runner,
+                         AsyncTaskCompletedHandler<T> resultHandler) {
     super();
     setDaemon(true);
     this.runner = runner;

@@ -13,7 +13,7 @@ import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
 import edu.kit.iti.formal.stvs.util.AsyncRunner;
 import edu.kit.iti.formal.stvs.util.AsyncTaskCompletedHandler;
-import edu.kit.iti.formal.stvs.util.JavaFxAsyncProcessTask;
+import edu.kit.iti.formal.stvs.util.JavaFxAsyncTask;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
@@ -52,7 +52,7 @@ public class SpecificationController implements Controller {
   private HybridSpecification hybridSpecification;
   private BooleanProperty specificationInvalid;
   private BooleanProperty specificationConcretizable;
-  private JavaFxAsyncProcessTask<ConcreteSpecification> concretizingTask;
+  private JavaFxAsyncTask<ConcreteSpecification> concretizingTask;
 
   /**
    * This creates an instance of the controller.
@@ -162,7 +162,7 @@ public class SpecificationController implements Controller {
     ConcretizationRunner runner =
         new ConcretizationRunner(tableController.getValidator().getValidSpecification(),
             variableCollectionController.getValidator().getValidFreeVariables());
-    this.concretizingTask = new JavaFxAsyncProcessTask<>(globalConfig.getSimulationTimeout(),
+    this.concretizingTask = new JavaFxAsyncTask<>(globalConfig.getSimulationTimeout(),
         runner, this.concretizationHandler);
     concretizingTask.start();
 
