@@ -138,6 +138,13 @@ public class ConcreteSpecification
   }
 
   @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (isCounterExample() ? 1 : 0);
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
