@@ -50,24 +50,31 @@ public class CodeIoVariable extends IoVariable {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    CodeIoVariable that = (CodeIoVariable) o;
+
+    if (getCategory() != that.getCategory()) {
+      return false;
+    }
+    if (getType() != null ? !getType().equals(that.getType()) : that.getType() != null) {
+      return false;
+    }
+    return getName() != null ? getName().equals(that.getName()) : that.getName() == null;
+  }
+
+  @Override
   public int hashCode() {
     int result = getCategory() != null ? getCategory().hashCode() : 0;
     result = 31 * result + (getType() != null ? getType().hashCode() : 0);
     result = 31 * result + (getName() != null ? getName().hashCode() : 0);
     return result;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    CodeIoVariable that = (CodeIoVariable) o;
-
-    if (getCategory() != that.getCategory()) return false;
-    if (getType() != null ? !getType().equals(that.getType()) : that.getType() != null)
-      return false;
-    return getName() != null ? getName().equals(that.getName()) : that.getName() == null;
   }
 
   @Override

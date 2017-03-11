@@ -13,7 +13,14 @@ import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import edu.kit.iti.formal.stvs.util.ProcessCreationException;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
@@ -160,8 +167,8 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     if (!successful) {
       throw new IOException("The GeTeTa output file could not be removed.");
     }
-    PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(
-        logFile), StandardCharsets.UTF_8), true);
+    PrintWriter writer = new PrintWriter(
+        new OutputStreamWriter(new FileOutputStream(logFile), StandardCharsets.UTF_8), true);
     writer.println(processOutput);
     writer.close();
     return logFile;

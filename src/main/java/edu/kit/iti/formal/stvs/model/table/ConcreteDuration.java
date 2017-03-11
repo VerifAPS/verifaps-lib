@@ -48,12 +48,18 @@ public class ConcreteDuration {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     ConcreteDuration duration1 = (ConcreteDuration) o;
 
-    if (getDuration() != duration1.getDuration()) return false;
+    if (getDuration() != duration1.getDuration()) {
+      return false;
+    }
     return getBeginCycle() == duration1.getBeginCycle();
   }
 
