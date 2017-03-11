@@ -10,6 +10,7 @@ public interface AsyncRunner<T> {
    * while running.
    *
    * @return Object of type {@code T} that is computed by this method
+   * @throws Exception exception while running
    */
   T run() throws Exception;
 

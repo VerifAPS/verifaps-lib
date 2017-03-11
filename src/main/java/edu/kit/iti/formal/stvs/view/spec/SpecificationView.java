@@ -161,6 +161,7 @@ public class SpecificationView extends VBox implements Lockable {
 
   /**
    * Displays an arbitrary placeholder node in the timing diagram area.
+   * @param emptyDiagram Node that should be displayed
    */
   public void setEmptyDiagram(Node emptyDiagram) {
     this.diagram = null;
