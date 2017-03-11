@@ -136,15 +136,12 @@ public class ConstraintSpecificationValidator {
     List<SpecProblem> minorSpecProblems = new ArrayList<>();
     List<SpecProblem> majorSpecProblems = new ArrayList<>();
 
-    boolean specificationIsValid;
-
     Map<String, Type> typesByName = typeContext.get().stream()
         .collect(Collectors.toMap(Type::getTypeName, Function.identity()));
 
-    specificationIsValid =
-        areCellsValid(validSpec, minorSpecProblems, majorSpecProblems, typesByName);
+    boolean specificationIsValid = areCellsValid(validSpec, minorSpecProblems, majorSpecProblems, typesByName);
 
-    specificationIsValid = areDurationsValid(validSpec, majorSpecProblems, specificationIsValid);
+    specificationIsValid &= areDurationsValid(validSpec, majorSpecProblems, specificationIsValid);
 
     ArrayList<SpecProblem> specProblems = new ArrayList<>();
     specProblems.addAll(minorSpecProblems);
@@ -156,7 +153,7 @@ public class ConstraintSpecificationValidator {
     } else {
       validSpecification.set(null);
     }
-    valid.set(minorSpecProblems.isEmpty());
+    valid.set(minorSpecProblems.isEmpty() && majorSpecProblems.isEmpty());
   }
 
   /**
