@@ -31,7 +31,6 @@ public class StvsMainScene {
   private StvsMenuBarController menuBarController;
   private StvsRootController rootController;
   private ObjectProperty<StvsRootModel> rootModelProperty;
-  private ContextMenu contextMenu;
   private final Scene scene;
 
   public StvsMainScene() {

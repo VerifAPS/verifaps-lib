@@ -159,7 +159,6 @@ public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpressio
       throw new IllegalStateException(
           "Wrong Context: No variable of name '" + variableName + "' in getTypeForVariable");
     }
-    Type type = smtEncoder.getTypeForVariable(variableName);
 
     // is an IOVariable?
     if (smtEncoder.isIoVariable(variableName)) {

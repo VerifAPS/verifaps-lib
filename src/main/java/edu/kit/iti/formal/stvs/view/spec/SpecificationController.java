@@ -44,7 +44,6 @@ public class SpecificationController implements Controller {
   private final ConcretizationTaskHandler concretizationHandler;
   private HybridSpecification spec;
   private ObjectProperty<VerificationState> stateProperty;
-  private ContextMenu contextMenu;
   private SpecificationView view;
   private VariableCollectionController variableCollectionController;
   private SpecificationTableController tableController;

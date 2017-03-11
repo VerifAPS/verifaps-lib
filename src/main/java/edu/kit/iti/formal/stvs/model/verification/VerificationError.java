@@ -2,8 +2,8 @@ package edu.kit.iti.formal.stvs.model.verification;
 
 import edu.kit.iti.formal.stvs.view.VerificationResultVisitor;
 
-import java.io.File;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -63,9 +63,10 @@ public class VerificationError implements VerificationResult {
     this.reason = Reason.EXCEPTION;
     try {
       logFile = File.createTempFile("verification-exception", "");
-      PrintWriter printWriter = new PrintWriter(logFile);
-      ex.printStackTrace(printWriter);
-    } catch (Exception exception) {
+      PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(logFile),
+          StandardCharsets.UTF_8), true);
+      ex.printStackTrace(writer);
+    } catch (IOException exception) {
       // Do nothing if writing the exception to the log throws an exception
       logFile = null;
     }

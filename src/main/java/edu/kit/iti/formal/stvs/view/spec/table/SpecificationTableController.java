@@ -169,7 +169,7 @@ public class SpecificationTableController implements Controller {
     MenuItem comment = new MenuItem("Comment ...");
     comment.setAccelerator(KeyCombination.keyCombination("Ctrl+k"));
     comment.setOnAction(event -> {
-      new CommentPopupManager(hybridSpec, hybridSpec.isEditable(), config);
+      new CommentPopupManager(hybridSpec, hybridSpec.isEditable());
     });
     return new ContextMenu(comment);
   }
@@ -212,7 +212,7 @@ public class SpecificationTableController implements Controller {
         return;
       }
       CommentPopupManager popupController =
-          new CommentPopupManager(hybridSpec.getRows().get(index), hybridSpec.isEditable(), config);
+          new CommentPopupManager(hybridSpec.getRows().get(index), hybridSpec.isEditable());
     });
     comment.setAccelerator(KeyCodeCombination.keyCombination("Ctrl+k"));
     insertRow.disableProperty().bind(Bindings.not(tableView.editableProperty()));
@@ -238,7 +238,7 @@ public class SpecificationTableController implements Controller {
     commentColumn.setOnAction(event -> {
       String specIoVariableName = (String) column.getUserData();
       SpecIoVariable commentable = hybridSpec.getColumnHeaderByName(specIoVariableName);
-      new CommentPopupManager(commentable, tableView.isEditable(), config);
+      new CommentPopupManager(commentable, tableView.isEditable());
     });
     changeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
     removeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));

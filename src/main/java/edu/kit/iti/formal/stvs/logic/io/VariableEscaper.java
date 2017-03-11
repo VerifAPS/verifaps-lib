@@ -66,15 +66,15 @@ public class VariableEscaper {
    * @return escaped code
    */
   public static String escapeCode(Code code) {
-    String res = "";
+    StringBuilder res = new StringBuilder("");
     for (Token token : code.getTokens()) {
       if (token.getType() == IEC61131Lexer.IDENTIFIER) {
-        res += escapeIdentifier(token.getText());
+        res.append(escapeIdentifier(token.getText()));
       } else {
-        res += token.getText();
+        res.append(token.getText());
       }
     }
-    return res;
+    return res.toString();
   }
 
   /**

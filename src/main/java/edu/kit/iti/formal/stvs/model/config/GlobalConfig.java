@@ -93,7 +93,11 @@ public class GlobalConfig {
   public void autosaveConfig() throws IOException, ExportException {
     File configDir = new File(CONFIG_DIRPATH);
     if (!configDir.isDirectory() || !configDir.exists()) {
-      configDir.mkdirs();
+      boolean successful = configDir.mkdirs();
+      if (!successful) {
+        throw new IOException("The configuration directory " + configDir.getAbsolutePath()
+            + " could not be created.");
+      }
     }
     File configFile = new File(CONFIG_DIRPATH + File.separator + AUTOLOAD_CONFIG_FILENAME);
     ExporterFacade.exportConfig(this, ExporterFacade.ExportFormat.XML, configFile);

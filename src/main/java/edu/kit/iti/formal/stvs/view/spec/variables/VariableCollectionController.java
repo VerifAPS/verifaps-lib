@@ -39,7 +39,6 @@ import javafx.util.converter.DefaultStringConverter;
  */
 public class VariableCollectionController implements Controller {
 
-  private ObjectProperty<List<Type>> codeTypes;
   private FreeVariableList freeVariableList;
   private FreeVariableListValidator validator;
   private VariableCollection view;
@@ -55,7 +54,6 @@ public class VariableCollectionController implements Controller {
    */
   public VariableCollectionController(ObjectProperty<List<Type>> codeTypes,
       FreeVariableList freeVariableList) {
-    this.codeTypes = codeTypes;
     this.freeVariableList = freeVariableList;
     this.validator = new FreeVariableListValidator(codeTypes, freeVariableList);
 

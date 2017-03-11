@@ -245,7 +245,8 @@ public class ImporterFacade {
    * @throws IOException if an error occured while reading the file
    */
   public static Code importStCode(File chosenFile) throws IOException {
-    String plaintext = new String(Files.readAllBytes(Paths.get(chosenFile.getAbsolutePath())));
+    String plaintext = new String(Files.readAllBytes(Paths.get(chosenFile.getAbsolutePath())),
+        "utf-8");
     return new Code(chosenFile.getAbsolutePath(), plaintext);
   }
 

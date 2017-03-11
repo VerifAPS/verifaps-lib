@@ -39,7 +39,6 @@ public class SpecificationsPaneController implements Controller {
   private final GlobalConfig globalConfig;
   private ObservableList<HybridSpecification> hybridSpecifications;
   private SpecificationsPane view;
-  private ContextMenu contextMenu;
   private ObjectProperty<VerificationState> state;
   private ObjectProperty<List<Type>> typeContext;
   private ObjectProperty<List<CodeIoVariable>> ioVariables;

@@ -125,6 +125,7 @@ public class StvsMenuBarController implements Controller {
 
   private void openConfigDialog(ActionEvent t) {
     ConfigDialogManager dialogManager = new ConfigDialogManager(rootModel.get().getGlobalConfig());
+    dialogManager.showAndWait();
   }
 
   private void openAboutDialog(ActionEvent actionEvent) {

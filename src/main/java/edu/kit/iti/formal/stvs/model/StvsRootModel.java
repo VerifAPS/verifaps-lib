@@ -130,7 +130,11 @@ public class StvsRootModel {
   public void autosaveSession() throws IOException, ExportException {
     File configDir = new File(GlobalConfig.CONFIG_DIRPATH);
     if (!configDir.isDirectory() || !configDir.exists()) {
-      configDir.mkdirs();
+      boolean successful = configDir.mkdirs();
+      if (!successful) {
+        throw new IOException("The configuration directory at " + configDir.getAbsolutePath()
+            + " could not be created.");
+      }
     }
     File sessionFile =
         new File(GlobalConfig.CONFIG_DIRPATH + File.separator + AUTOLOAD_SESSION_FILENAME);

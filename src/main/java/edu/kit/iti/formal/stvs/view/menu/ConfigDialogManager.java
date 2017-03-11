@@ -16,6 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.stage.Stage;
 
@@ -32,9 +33,9 @@ import javafx.stage.Stage;
  */
 public class ConfigDialogManager implements Controller {
   private GlobalConfig config;
-  private Stage stage;
-  private Scene scene;
   private ConfigDialogPane view;
+  private Dialog<GlobalConfig> dialog;
+  private BooleanBinding dialogValid;
 
   /**
    * <p>
@@ -46,8 +47,7 @@ public class ConfigDialogManager implements Controller {
   public ConfigDialogManager(GlobalConfig config) {
     this.config = config;
     this.view = new ConfigDialogPane();
-    this.stage = new Stage();
-    Dialog<GlobalConfig> dialog = new Dialog<>();
+    dialog = new Dialog<>();
     dialog.setTitle("Preferences");
     view = new ConfigDialogPane();
     // set initial values
@@ -63,7 +63,7 @@ public class ConfigDialogManager implements Controller {
     bind(view.z3Path.getTextField().textProperty(), config.z3PathProperty());
     bind(view.getetaCommand.textProperty(), config.getetaCommandProperty());
 
-    BooleanBinding dialogValid =
+    dialogValid =
         view.verificationTimeout.validProperty().and(view.simulationTimeout.validProperty())
             .and(view.editorFontSize.validProperty()).and(view.maxLineRollout.validProperty());
 
@@ -71,32 +71,37 @@ public class ConfigDialogManager implements Controller {
     button.disableProperty().bind(dialogValid.not());
 
     dialog.setDialogPane(view);
-    dialog.setResultConverter(buttonType -> {
-      if (buttonType != view.okButtonType) {
-        return null;
-      }
-      if (!dialogValid.get()) {
-        return null;
-      }
-      config.setEditorFontFamily(view.editorFontFamily.getText());
-      config.setEditorFontSize(view.editorFontSize.getInteger().get());
-      config.setShowLineNumbers(view.showLineNumbers.isSelected());
-      config.setSimulationTimeout(view.simulationTimeout.getInteger().get());
-      config.setVerificationTimeout(view.verificationTimeout.getInteger().get());
-      config.setUiLanguage(view.uiLanguage.valueProperty().get());
-      config.setMaxLineRollout(view.maxLineRollout.getInteger().get());
-      config.setNuxmvFilename(view.nuxmvFilename.getTextField().getText());
-      config.setZ3Path(view.z3Path.getTextField().getText());
-      config.setGetetaCommand(view.getetaCommand.getText());
-      try {
-        config.autosaveConfig();
-      } catch (IOException | ExportException exception) {
-        AlertFactory.createAlert(Alert.AlertType.ERROR, "Autosave error",
-            "Error saving the current configuration",
-            "The current configuration could not be saved.", exception.getMessage()).showAndWait();
-      }
-      return config;
-    });
+    dialog.setResultConverter(this::convertResult);
+  }
+
+  private GlobalConfig convertResult(ButtonType buttonType) {
+    if (buttonType != view.okButtonType) {
+      return null;
+    }
+    if (!dialogValid.get()) {
+      return null;
+    }
+    config.setEditorFontFamily(view.editorFontFamily.getText());
+    config.setEditorFontSize(view.editorFontSize.getInteger().get());
+    config.setShowLineNumbers(view.showLineNumbers.isSelected());
+    config.setSimulationTimeout(view.simulationTimeout.getInteger().get());
+    config.setVerificationTimeout(view.verificationTimeout.getInteger().get());
+    config.setUiLanguage(view.uiLanguage.valueProperty().get());
+    config.setMaxLineRollout(view.maxLineRollout.getInteger().get());
+    config.setNuxmvFilename(view.nuxmvFilename.getTextField().getText());
+    config.setZ3Path(view.z3Path.getTextField().getText());
+    config.setGetetaCommand(view.getetaCommand.getText());
+    try {
+      config.autosaveConfig();
+    } catch (IOException | ExportException exception) {
+      AlertFactory.createAlert(Alert.AlertType.ERROR, "Autosave error",
+          "Error saving the current configuration",
+          "The current configuration could not be saved.", exception.getMessage()).showAndWait();
+    }
+    return config;
+  }
+
+  public void showAndWait() {
     dialog.showAndWait();
   }
 

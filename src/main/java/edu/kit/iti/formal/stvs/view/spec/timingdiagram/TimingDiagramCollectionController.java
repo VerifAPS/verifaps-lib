@@ -207,7 +207,7 @@ public class TimingDiagramCollectionController implements Controller {
     this.activated.set(activated);
   }
 
-  private class XAxisDragState {
+  private static class XAxisDragState {
     double startXPosition;
     double startLowerBound;
     double startUpperBound;

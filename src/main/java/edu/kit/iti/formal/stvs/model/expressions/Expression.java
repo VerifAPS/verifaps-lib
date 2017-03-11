@@ -20,8 +20,6 @@ import javafx.beans.property.SimpleStringProperty;
  */
 public abstract class Expression implements StringReadable {
 
-  private ReadOnlyStringProperty stringRepresentation;
-
   /**
    * <p>Find out what subclass of Expression this is by supplying a visitor.</p>
    *

@@ -12,12 +12,8 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -147,7 +143,8 @@ public class ExporterFacade {
    * @throws IOException if an error occurs while saving
    */
   public static void exportCode(Code code, File file, boolean escapeVariables) throws IOException {
-    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),
+        StandardCharsets.UTF_8));
     if (escapeVariables) {
       writer.write(VariableEscaper.escapeCode(code));
     } else {
@@ -194,10 +191,18 @@ public class ExporterFacade {
    * @param file The file to write to
    * @throws IOException if an error occurred during file I/O
    */
-  private static void writeToFile(ByteArrayOutputStream outputStream, File file)
-      throws IOException {
-    FileOutputStream fostream = new FileOutputStream(file);
-    outputStream.writeTo(fostream);
+  private static void writeToFile(ByteArrayOutputStream outputStream, File file) throws
+      IOException {
+    FileOutputStream fostream = null;
+    try {
+      fostream = new FileOutputStream(file);
+      outputStream.writeTo(fostream);
+      fostream.close();
+    } finally { // Ensure that the outputstream is always closed
+      if (fostream != null) {
+        fostream.close();
+      }
+    }
   }
 
   public enum ExportFormat {

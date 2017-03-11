@@ -180,9 +180,9 @@ public class Z3Solver {
       String row = identifierMatcher.group("row");
       String cycle = identifierMatcher.group("cycle");
       // is variable
-      int cycleCount = Integer.valueOf(cycle);
+      int cycleCount = Integer.parseInt(cycle);
       // ignore variables if iteration > n_z
-      int nz = Integer.valueOf(row);
+      int nz = Integer.parseInt(row);
       ConcreteDuration concreteDuration = durations.get(nz);
       if (cycleCount >= concreteDuration.getDuration()) {
         return;
@@ -254,12 +254,13 @@ public class Z3Solver {
       IOUtils.write(smtString, process.getOutputStream(), "utf-8");
       process.getOutputStream().close();
       final BufferedReader reader =
-          new BufferedReader(new InputStreamReader(process.getInputStream()));
+          new BufferedReader(new InputStreamReader(process.getInputStream(), "utf-8"));
       String line;
-      String z3Result = "";
+      StringBuilder z3Result = new StringBuilder("");
       while ((line = reader.readLine()) != null && !Thread.currentThread().isInterrupted()) {
-        z3Result += line + "\n";
+        z3Result.append(line + "\n");
       }
+      reader.close();
       String error = IOUtils.toString(process.getErrorStream(), "utf-8");
       if (Thread.currentThread().isInterrupted()) {
         process.destroyForcibly();
@@ -268,7 +269,7 @@ public class Z3Solver {
       try {
         int exitValue = process.waitFor();
         if (exitValue == 0 || error.length() == 0) {
-          Sexp expression = solverStringToSexp(z3Result);
+          Sexp expression = solverStringToSexp(z3Result.toString());
           return buildConcreteSpecFromSExp(expression, ioVariables);
         } else {
           throw new ConcretizationException("Z3 process failed. Output: \n" + error);
