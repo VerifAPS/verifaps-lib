@@ -19,6 +19,7 @@ public class JavaFxAsyncProcessTask<T> extends Thread {
   /**
    * Constructor for an asynchronous task.
    *
+   * @param timeout time before the runner will be terminated
    * @param runner The portion of action to be run asynchronously (a functional interface).
    * @param resultHandler The portion of the action to be run synchronously (in javafx's EDT) with
    *        any other AsyncTasks.
@@ -45,10 +46,7 @@ public class JavaFxAsyncProcessTask<T> extends Thread {
   public void terminate() {
     processTerminatorTask.cancel();
     this.interrupt();
-    Process runningProcess = runner.getProcess();
-    if (runningProcess != null && runningProcess.isAlive()) {
-      runningProcess.destroy();
-    }
+    runner.terminate();
   }
 
   @Override
