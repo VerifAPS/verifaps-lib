@@ -11,10 +11,12 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
+import edu.kit.iti.formal.stvs.util.ProcessCreationException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -42,10 +44,10 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
    *
    * @param config config that should be used
    * @param typeContext list of types used for importing counterexample
-   * @throws VerificationError nuXmv not found
+   * @throws FileNotFoundException nuXmv not found
    */
   public GeTeTaVerificationEngine(GlobalConfig config, List<Type> typeContext)
-      throws VerificationError {
+      throws FileNotFoundException {
     verificationResult = new NullableProperty<>();
     getetaProcess = null;
     this.typeContext = typeContext;
@@ -54,7 +56,8 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     /* Check if nuXmv executable exists */
     File nuxmvFile = new File(config.getNuxmvFilename());
     if (!nuxmvFile.exists() || nuxmvFile.isDirectory()) {
-      throw new VerificationError(VerificationError.Reason.NUXMV_NOT_FOUND);
+      throw new FileNotFoundException(
+          "The NuXmv executable " + nuxmvFile.getAbsolutePath() + " could not be found.");
     }
   }
 
@@ -66,11 +69,10 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
    * @param spec specification that should be checked
    * @throws IOException exception while creating process
    * @throws ExportException exception while exporting
-   * @throws VerificationError exception while verifying
    */
   @Override
   public void startVerification(VerificationScenario scenario, ConstraintSpecification spec)
-      throws IOException, ExportException, VerificationError {
+      throws IOException, ExportException, ProcessCreationException {
 
     // Write ConstraintSpecification and Code to temporary files
     File tempSpecFile = File.createTempFile("verification-spec", ".xml");
@@ -97,7 +99,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
       // Starts the verification process in another thread
       processMonitor.start();
     } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException exception) {
-      throw new VerificationError(VerificationError.Reason.VERIFICATION_LAUNCH_ERROR);
+      throw new ProcessCreationException("The verification could not be launched");
     }
   }
 
@@ -129,8 +131,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     File logFile = null;
     Optional<Exception> processError = processMonitor.getError();
     if (processError.isPresent()) {
-      VerificationError error = new VerificationError(processError.get());
-      result = new VerificationResult(error);
+      result = new VerificationError(processError.get());
     } else {
       try {
         String processOutput = IOUtils.toString(new FileInputStream(getetaOutputFile), "utf-8");
@@ -138,16 +139,14 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
         String cleanedProcessOutput = cleanProcessOutput(processOutput);
         // Set the verification result depending on the GeTeTa output
         if (processMonitor.isAborted()) {
-          VerificationError error = new VerificationError(VerificationError.Reason.TIMEOUT);
-          result = new VerificationResult(VerificationResult.Status.ERROR, logFile, error);
+          result = new VerificationError(VerificationError.Reason.TIMEOUT, logFile);
         } else {
           result = ImporterFacade.importVerificationResult(
               new ByteArrayInputStream(cleanedProcessOutput.getBytes()),
               ImporterFacade.ImportFormat.GETETA, typeContext);
         }
       } catch (IOException | ImportException exception) {
-        VerificationError error = new VerificationError(exception);
-        result = new VerificationResult(VerificationResult.Status.ERROR, logFile, error);
+        result = new VerificationError(exception, logFile);
       }
     }
     // Set the verification result back in the javafx thread:

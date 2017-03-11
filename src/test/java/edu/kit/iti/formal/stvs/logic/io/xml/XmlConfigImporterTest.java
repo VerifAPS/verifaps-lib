@@ -7,6 +7,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -46,7 +48,7 @@ public class XmlConfigImporterTest {
   }
 
   @Test(expected = ImportException.class)
-  public void testDoInvalidImport() throws Exception {
+  public void testDoImportInvalidData() throws Exception {
     FileInputStream inputStream = new FileInputStream(new File
         (this.getClass().getResource("config_invalid_1.xml").toURI()));
     GlobalConfig config = importer.doImport(inputStream);

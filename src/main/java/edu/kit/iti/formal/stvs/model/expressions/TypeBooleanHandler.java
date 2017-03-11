@@ -8,7 +8,7 @@ package edu.kit.iti.formal.stvs.model.expressions;
 @FunctionalInterface
 public interface TypeBooleanHandler<R> {
   /**
-   * Must implement a method that gets called by {@link TypeBool#match}
+   * Must implement a method that gets called by {@link TypeBool#match}.
    *
    * @return Object of type {@code R}
    */

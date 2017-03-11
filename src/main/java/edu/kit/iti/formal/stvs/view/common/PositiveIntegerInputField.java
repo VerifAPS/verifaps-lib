@@ -11,13 +11,16 @@ import javafx.geometry.Pos;
 import javafx.scene.control.TextField;
 
 /**
- * Created by csicar on 15.02.17.
+ * A Input field that only allows positive integers.
  *
  * @author Carsten Csiky
  */
 public class PositiveIntegerInputField extends TextField {
   private BooleanProperty valid;
 
+  /**
+   * Creates an instances of this positive integer only field.
+   */
   public PositiveIntegerInputField() {
     this.textProperty().addListener(this::onInputChange);
     valid = new SimpleBooleanProperty();

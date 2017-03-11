@@ -69,15 +69,34 @@ public class ConstraintCell implements CellOperationProvider {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof ConstraintCell)) {
-      return false;
-    }
-    if (obj == this) {
+    if (this == obj) {
       return true;
     }
-    ConstraintCell other = (ConstraintCell) obj;
-    return new EqualsBuilder().append(stringRepresentation.get(), other.stringRepresentation.get())
-        .append(comment.get(), other.comment.get()).isEquals();
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+
+    ConstraintCell that = (ConstraintCell) obj;
+
+    if (getAsString() != null) {
+      if (!getAsString().equals(
+          that.getAsString())) {
+        return false;
+      }
+    } else {
+      if ((that.getAsString() != null)) {
+        return false;
+      }
+    }
+    return getComment() != null
+        ? getComment().equals(that.getComment()) : that.getComment() == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getAsString() != null ? getAsString().hashCode() : 0;
+    result = 31 * result + (getComment() != null ? getComment().hashCode() : 0);
+    return result;
   }
 
   public String toString() {

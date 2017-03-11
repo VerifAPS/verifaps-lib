@@ -8,9 +8,7 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeChecker;
 import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 
 /**
- * <p>
  * An instance is created when an {@link Expression} in a {@link ConstraintCell} is ill-typed.
- * </p>
  *
  * @author Benjamin Alt
  */
@@ -53,6 +51,12 @@ public class CellTypeProblem extends CellProblem {
 
   private final TypeCheckException exception;
 
+  /**
+   * Create a new CellTypeProblem for a given {@link TypeCheckException}, a column and a row.
+   * @param exception The underlying exception
+   * @param column The column of the problematic cell
+   * @param row The row of the problematic cell
+   */
   public CellTypeProblem(TypeCheckException exception, String column, int row) {
     super(createErrorMessage(exception), column, row);
     this.exception = exception;

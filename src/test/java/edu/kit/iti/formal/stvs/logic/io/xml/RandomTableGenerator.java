@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
+ * A random generator for syntactically valid {@link ConstraintSpecification}s.
  * @author Benjamin Alt
  */
 public class RandomTableGenerator {
@@ -44,6 +45,13 @@ public class RandomTableGenerator {
     enumTypes = new ArrayList<>();
   }
 
+  /**
+   * Create a new random {@link ConstraintSpecification}.
+   * @param columns The number of columns in the random specification
+   * @param rows The number of rows in the random specification
+   * @param freeVariables The number of free variables in the random specification
+   * @return The random specification
+   */
   public ConstraintSpecification randomConstraintSpec(int columns, int rows, int freeVariables) {
     FreeVariableList freeVariableList = new FreeVariableList();
     for (int i = 0; i < freeVariables; i++) {

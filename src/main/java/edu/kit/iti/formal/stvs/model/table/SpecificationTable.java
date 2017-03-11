@@ -17,23 +17,51 @@ import javafx.util.Callback;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
+ * A specification table.
+ *
+ * @param <H> The column header type
+ * @param <C> The cell type
+ * @param <D> The duration type
+ *
  * @author Benjamin Alt
  * @author Philipp
  */
 public class SpecificationTable<H extends Named, C, D> {
 
-  protected final static String DEFAULT_NAME = "Unnamed Specification";
+  protected static final String DEFAULT_NAME = "Unnamed Specification";
 
   protected ObservableList<H> columnHeaders;
   protected ObservableList<SpecificationRow<C>> rows;
   protected ObservableList<D> durations;
   private StringProperty name;
 
+  /**
+   * Construct a new SpecificationTable with a default name, no rows or columns and the specified
+   * column header and row extractors. These are needed for "deep observing" and are used to
+   * indicate to observable collections such as {@link ObservableList} which properties of the
+   * items in the collection should cause change events on the collection itself.
+   * See also
+   * <a href="http://stackoverflow.com/questions/31687642/callback-and-extractors-for-javafx-observablelist">this post</a>
+   * on why and how extractors are used.
+   * @param columnHeaderExtractor The extractor for the column headers
+   * @param durationExtractor The extractor for the duration headers
+   */
   public SpecificationTable(Callback<H, Observable[]> columnHeaderExtractor,
       Callback<D, Observable[]> durationExtractor) {
     this(DEFAULT_NAME, columnHeaderExtractor, durationExtractor);
   }
 
+  /**
+   * Construct a new SpecificationTable with a given name, no rows or columns and the specified
+   * column header and row extractors. These are needed for "deep observing" and are used to
+   * indicate to observable collections such as {@link ObservableList} which properties of the
+   * items in the collection should cause change events on the collection itself.
+   * See also
+   * <a href="http://stackoverflow.com/questions/31687642/callback-and-extractors-for-javafx-observablelist">
+   *   this post</a> on why and how extractors are used.
+   * @param columnHeaderExtractor The extractor for the column headers
+   * @param durationExtractor The extractor for the duration headers
+   */
   public SpecificationTable(String name, Callback<H, Observable[]> columnHeaderExtractor,
       Callback<D, Observable[]> durationExtractor) {
     this.name = new SimpleStringProperty(name);
@@ -55,24 +83,45 @@ public class SpecificationTable<H extends Named, C, D> {
     return durations;
   }
 
+  /**
+   * Return the column whose header has the given name.
+   * @param columnHeaderName The name of the column header
+   * @return The corresponding column
+   * @throws NoSuchElementException if the column header does not exist
+   */
   public SpecificationColumn<C> getColumnByName(String columnHeaderName) {
-    // ensure there is a column header with this name
     H columnHeader = getColumnHeaderByName(columnHeaderName);
     List<C> cells = rows.stream().map(row -> row.getCells().get(columnHeader.getName()))
         .collect(Collectors.toList());
     return new SpecificationColumn<>(cells);
   }
 
-  public SpecificationColumn<C> removeColumnByName(String specIoVarName) {
-    SpecificationColumn<C> column = getColumnByName(specIoVarName);
-    columnHeaders.remove(getColumnHeaderByName(specIoVarName));
+  /**
+   * Remove and return the column whose header has the given name.
+   * @param columnHeaderName The name of the column header
+   * @return The corresponding column (which was deleted from the table)
+   * @throws NoSuchElementException if the column header does not exist
+   */
+  public SpecificationColumn<C> removeColumnByName(String columnHeaderName) {
+    SpecificationColumn<C> column = getColumnByName(columnHeaderName);
+    columnHeaders.remove(getColumnHeaderByName(columnHeaderName));
     for (SpecificationRow<C> row : rows) {
-      row.getCells().remove(specIoVarName);
+      row.getCells().remove(columnHeaderName);
     }
     onColumnRemoved(column);
     return column;
   }
 
+  /**
+   * Add a column with a given column header to the specification table.
+   * @param columnHeader The column header for the column to be added
+   * @param column The column to add
+   * @throws IllegalArgumentException if the column header already exists in the specification table
+   * @throws IllegalStateException if the table does not have any rows yet. First fill a table by
+   *                               rows, then add columns if necessary/desired.
+   * @throws IllegalArgumentException if the column height does not correspond to the number of
+   *                                  rows already in the table.
+   */
   public void addColumn(H columnHeader, SpecificationColumn<C> column) {
     // throws IllegalArgumentException if a var with same name already exists:
     columnHeaders.add(columnHeader);
@@ -94,11 +143,23 @@ public class SpecificationTable<H extends Named, C, D> {
     onColumnAdded(column);
   }
 
+  /**
+   * Get the column header with a given name.
+   * @param columnHeaderName The name of the column header
+   * @return An {@link Optional} containing the corresponding column header or an
+   *         empty {@link Optional} there is no such header
+   */
   public Optional<H> getOptionalColumnHeaderByName(String columnHeaderName) {
     return columnHeaders.stream()
         .filter(specIoVariable -> specIoVariable.getName().equals(columnHeaderName)).findAny();
   }
 
+  /**
+   * Get the column header with a given name.
+   * @param columnHeaderName The name of the column header
+   * @return The corresponding column header
+   * @throws NoSuchElementException if there is no such column header
+   */
   public H getColumnHeaderByName(String columnHeaderName) {
     return getOptionalColumnHeaderByName(columnHeaderName)
         .orElseThrow(() -> new NoSuchElementException(
@@ -107,9 +168,10 @@ public class SpecificationTable<H extends Named, C, D> {
 
   /**
    * Get the SpecIoVariables for this table, i.e. the column headers.
+   *
    * <p>
-   * <p>
-   * You should <strong>not mutate</strong> this list. For adding new columns, use addNewColumn
+   * You should <strong>not mutate</strong> this list. For adding new columns, use
+   * {@link SpecificationTable#addColumn(Named, SpecificationColumn)}.
    * </p>
    *
    * @return the list of SpecIoVariables
@@ -118,6 +180,11 @@ public class SpecificationTable<H extends Named, C, D> {
     return this.columnHeaders;
   }
 
+  /**
+   * Invoked when the list of row changes.
+   * @param change The {@link javafx.collections.ListChangeListener.Change} object corresponding
+   *               to the list change
+   */
   protected void onRowChange(ListChangeListener.Change<? extends SpecificationRow<C>> change) {
     while (change.next()) {
       if (change.wasPermutated()) {
@@ -132,6 +199,11 @@ public class SpecificationTable<H extends Named, C, D> {
     }
   }
 
+  /**
+   * Invoked when the list of column headers changes.
+   * @param change The {@link javafx.collections.ListChangeListener.Change} object corresponding
+   *               to the list change
+   */
   protected void onColumnHeadersChanged(ListChangeListener.Change<? extends H> change) {
     while (change.next()) {
       if (change.wasAdded()) {
@@ -143,6 +215,11 @@ public class SpecificationTable<H extends Named, C, D> {
     }
   }
 
+  /**
+   * Invoked when the list of durations changes.
+   * @param change The {@link javafx.collections.ListChangeListener.Change} object corresponding
+   *               to the list change
+   */
   protected void onDurationChange(ListChangeListener.Change<? extends D> change) {
     while (change.next()) {
       if (change.wasAdded()) {
@@ -243,6 +320,7 @@ public class SpecificationTable<H extends Named, C, D> {
     this.name.set(name);
   }
 
+  @Override
   public String toString() {
     StringBuilder str = new StringBuilder(getClass().getSimpleName());
     str.append("\nDurations: ");

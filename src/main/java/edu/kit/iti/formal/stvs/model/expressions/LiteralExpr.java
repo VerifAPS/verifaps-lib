@@ -36,6 +36,11 @@ public class LiteralExpr extends Expression {
   }
 
   @Override
+  public int hashCode() {
+    return getValue() != null ? getValue().hashCode() : 0;
+  }
+
+  @Override
   public String toString() {
     return "LiteralExpr(" + value + ")";
   }

@@ -25,23 +25,26 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 /**
+ * This is the view that displays a specification.
+ *
  * @author Carsten Csiky
  */
 public class SpecificationView extends VBox implements Lockable {
 
-  private Button startVerificationButton;
-
-  private Button startConcretizerButton;
-
-  private VariableCollection variableCollection;
-  private SpecificationTableView tableView;
-  private TimingDiagramCollectionView diagram;
   private final StackPane variablesPane;
   private final StackPane tablePane;
   private final AnchorPane timingDiagramPane;
   private final SplitPane splitPane;
   private final HBox buttonBox;
+  private Button startVerificationButton;
+  private Button startConcretizerButton;
+  private VariableCollection variableCollection;
+  private SpecificationTableView tableView;
+  private TimingDiagramCollectionView diagram;
 
+  /**
+   * Creates an instance.
+   */
   public SpecificationView() {
     splitPane = new SplitPane();
     variablesPane = new StackPane();
@@ -67,6 +70,9 @@ public class SpecificationView extends VBox implements Lockable {
 
   }
 
+  /**
+   * Set verification button to a state that signals that the verification can be started.
+   */
   public void setVerificationButtonPlay() {
     Text icon = GlyphsDude.createIcon(FontAwesomeIcon.PLAY);
     icon.setFill(Color.MEDIUMSEAGREEN);
@@ -74,6 +80,9 @@ public class SpecificationView extends VBox implements Lockable {
     startVerificationButton.setGraphic(icon);
   }
 
+  /**
+   * Set verification button to a state that signals that the verification can be stopped.
+   */
   public void setVerificationButtonStop() {
     Text icon = GlyphsDude.createIcon(FontAwesomeIcon.STOP);
     icon.setFill(Color.INDIANRED);
@@ -81,6 +90,9 @@ public class SpecificationView extends VBox implements Lockable {
     startVerificationButton.setGraphic(icon);
   }
 
+  /**
+   * Set concretizer button to a state that signals that the concretizer can be started.
+   */
   public void setConcretizerButtonStart() {
     Text icon = GlyphsDude.createIcon(FontAwesomeIcon.LINE_CHART);
     icon.setFill(Color.MEDIUMSEAGREEN);
@@ -88,6 +100,9 @@ public class SpecificationView extends VBox implements Lockable {
     startConcretizerButton.setGraphic(icon);
   }
 
+  /**
+   * Set concretizer button to a state that signals that the concretizer can be stopped.
+   */
   public void setConcretizerButtonStop() {
     Text icon = GlyphsDude.createIcon(FontAwesomeIcon.STOP);
     icon.setFill(Color.INDIANRED);
@@ -99,6 +114,11 @@ public class SpecificationView extends VBox implements Lockable {
     return tableView.getTableView();
   }
 
+  /**
+   * Sets the child view that displays the table to display the given table.
+   *
+   * @param tableView table to show
+   */
   public void setTable(SpecificationTableView tableView) {
     this.tableView = tableView;
 
@@ -110,6 +130,11 @@ public class SpecificationView extends VBox implements Lockable {
     return diagram;
   }
 
+  /**
+   * Sets the child view that displays the timing diagram to display the given diagram.
+   *
+   * @param diagram diagram to show
+   */
   public void setDiagram(TimingDiagramCollectionView diagram) {
     this.diagram = diagram;
 
@@ -121,6 +146,9 @@ public class SpecificationView extends VBox implements Lockable {
     AnchorPane.setBottomAnchor(diagram, 0.0);
   }
 
+  /**
+   * Displays a placeholder in the timing diagram area.
+   */
   public void setEmptyDiagram() {
 
     GridPane pane = new GridPane();
@@ -131,6 +159,9 @@ public class SpecificationView extends VBox implements Lockable {
     setEmptyDiagram(pane);
   }
 
+  /**
+   * Displays an arbitrary placeholder node in the timing diagram area.
+   */
   public void setEmptyDiagram(Node emptyDiagram) {
     this.diagram = null;
 
@@ -147,6 +178,11 @@ public class SpecificationView extends VBox implements Lockable {
     return variableCollection;
   }
 
+  /**
+   * Sets the child view that displays the free variables to display the given variables collection.
+   *
+   * @param variableCollection Collection to display
+   */
   public void setVariableCollection(VariableCollection variableCollection) {
     this.variableCollection = variableCollection;
 

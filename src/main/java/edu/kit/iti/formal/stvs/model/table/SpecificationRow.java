@@ -93,7 +93,7 @@ public class SpecificationRow<C> implements Commentable, Observable {
   }
 
   /**
-   * Remove an InvalidationListener from a certain cell
+   * Remove an InvalidationListener from a certain cell.
    *
    * @param cell The cell to remove the listener from
    */
@@ -148,6 +148,7 @@ public class SpecificationRow<C> implements Commentable, Observable {
     return result;
   }
 
+  @Override
   public String toString() {
     String map = String.join(", ", cells.entrySet().stream()
         .map(entry -> entry.getKey() + ": " + entry.getValue()).collect(Collectors.toList()));

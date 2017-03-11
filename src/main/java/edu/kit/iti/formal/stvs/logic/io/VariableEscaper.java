@@ -22,16 +22,17 @@ public class VariableEscaper {
   private static final String PREFIX = "var_";
 
   /**
-   * Prepends "_var" to a {@code name}.
+   * Prepends an escaping prefix to a given identifier.
    *
-   * @param name name that should be escaped.
-   * @return escaped name
+   * @param identifier identifier that should be escaped.
+   * @return escaped identifier
    */
-  public static String escapeName(String name) {
-    if (NUMBER_PATTERN.matcher(name).matches() || BOOL_PATTERN.matcher(name).matches()) {
-      return name;
+  public static String escapeIdentifier(String identifier) {
+    if (!NUMBER_PATTERN.matcher(identifier).matches()
+        && !BOOL_PATTERN.matcher(identifier).matches()) {
+      return PREFIX + identifier;
     }
-    return PREFIX + name;
+    return identifier;
   }
 
   /**
@@ -68,7 +69,7 @@ public class VariableEscaper {
     String res = "";
     for (Token token : code.getTokens()) {
       if (token.getType() == IEC61131Lexer.IDENTIFIER) {
-        res += escapeName(token.getText());
+        res += escapeIdentifier(token.getText());
       } else {
         res += token.getText();
       }
@@ -77,12 +78,12 @@ public class VariableEscaper {
   }
 
   /**
-   * Removes escaping from a name.
+   * Removes escaping from an identifier.
    *
-   * @param varName name from which the escaping should be removed.
-   * @return unescaped name
+   * @param varName identifier from which the escaping should be removed.
+   * @return unescaped identifier
    */
-  public static String unescapeName(String varName) {
+  public static String unescapeIdentifier(String varName) {
     if (varName.startsWith(PREFIX)) {
       return varName.substring(PREFIX.length());
     }

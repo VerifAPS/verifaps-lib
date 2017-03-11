@@ -71,7 +71,7 @@ public class TimingDiagramCollectionController implements Controller {
    * will be added to {@link TimingDiagramCollectionView#diagramContainer}</li>
    * <li>A {@link Label} (title of the {@link ValidIoVariable}) will be added to
    * {@link TimingDiagramCollectionView#labelContainer}</li>
-   * <li>A {@link Axis} will be added to the {@link TimingDiagramCollectionView#yAxisContainer}</li>
+   * <li>A {@link Axis} will be added to the {@link TimingDiagramCollectionView#yaxisContainer}</li>
    * </ul>
    *
    * @param concreteSpec the concrete specification which should be used to extract the needed

@@ -4,7 +4,7 @@ import java.io.InputStream;
 
 /**
  * An Interface for all classes concerned with importing model objects from some import format.
- *
+ * @param <T> "<u>T</u>o": Generic type parameter for the target type.
  * @author Benjamin Alt
  */
 public interface Importer<T> {

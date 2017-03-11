@@ -1,11 +1,9 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 /**
- * runtime-representation for enum values of {@link Expression}s.
- * <p>
- * <p>
+ * Runtime-representation for enum values of {@link Expression}s.
  * In contrast to {@link ValueBool} this is not a singleton, since many different instances can be
- * created at runtime. getErrorType of this value always returns a {@link TypeEnum}.
+ * created at runtime. {@link ValueEnum#getType()} of this value always returns a {@link TypeEnum}.
  *
  * @author Philipp
  */

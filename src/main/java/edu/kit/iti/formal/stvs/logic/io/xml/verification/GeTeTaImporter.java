@@ -21,6 +21,7 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
+import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess;
 
 import java.io.File;
 import java.io.IOException;
@@ -116,12 +117,12 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       /* Return appropriate VerificationResult */
       switch (importedMessage.getReturncode()) {
         case RETURN_CODE_SUCCESS:
-          return new VerificationResult(VerificationResult.Status.VERIFIED, logFile, null);
+          return new VerificationSuccess(logFile);
         case RETURN_CODE_NOT_VERIFIED:
-          return new VerificationResult(parseCounterexample(importedMessage), logFile);
+          return new edu.kit.iti.formal.stvs.model.verification.Counterexample(
+              parseCounterexample(importedMessage), logFile);
         default:
-          VerificationError error = new VerificationError(VerificationError.Reason.ERROR);
-          return new VerificationResult(VerificationResult.Status.ERROR, logFile, error);
+          return new VerificationError(VerificationError.Reason.ERROR, logFile);
       }
     } catch (TransformerException | IOException exception) {
       throw new ImportException(exception);
@@ -151,8 +152,8 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
 
     // Parse concrete rows
     List<Counterexample.Step> steps = message.getCounterexample().getTrace().getStep();
-    List<SpecificationRow<ConcreteCell>> concreteRows = makeConcreteRows(steps, rowNums,
-        varNames, varTypes, currentValues, varCategories);
+    List<SpecificationRow<ConcreteCell>> concreteRows =
+        makeConcreteRows(steps, rowNums, varNames, varTypes, currentValues, varCategories);
 
     // Parse durations
     List<ConcreteDuration> concreteDurations = makeConcreteDurations(rowNums);
@@ -250,11 +251,11 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       throws ImportException {
     for (Assignment input : step.getInput()) { // Input vars are initialized here FOR THE NEXT
       // CYCLE
-      String varName = VariableEscaper.unescapeName(input.getName());
+      String varName = VariableEscaper.unescapeIdentifier(input.getName());
       if (INPUT_VARIABLE_PATTERN.matcher(varName).matches()) {
         varCategories.put(varName, VariableCategory.INPUT);
         processVarAssignment(currentValues, varTypes, varName,
-            VariableEscaper.unescapeName(input.getValue()));
+            VariableEscaper.unescapeIdentifier(input.getValue()));
       }
     }
   }
@@ -277,9 +278,9 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       if (CODE_VARIABLE_PATTERN.matcher(stateString).matches()) {
         int periodIndex = stateString.indexOf(".");
         String varName = VariableEscaper
-            .unescapeName(stateString.substring(periodIndex + 1, stateString.length()));
+            .unescapeIdentifier(stateString.substring(periodIndex + 1, stateString.length()));
         varCategories.put(varName, VariableCategory.OUTPUT);
-        String varValue = VariableEscaper.unescapeName(state.getValue());
+        String varValue = VariableEscaper.unescapeIdentifier(state.getValue());
         processVarAssignment(currentValues, varTypes, varName, varValue);
       }
     }
@@ -322,7 +323,7 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
           entryString = entryString.replaceAll("\\s+", "");
           int colonIndex = entryString.indexOf(":");
           String varName = entryString.substring(0, colonIndex);
-          varNames.add(VariableEscaper.unescapeName(varName));
+          varNames.add(VariableEscaper.unescapeIdentifier(varName));
           entryString = entries.get(++i).getValue();
         }
         break;

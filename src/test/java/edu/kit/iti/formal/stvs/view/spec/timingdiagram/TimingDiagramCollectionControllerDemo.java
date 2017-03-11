@@ -48,7 +48,7 @@ public class TimingDiagramCollectionControllerDemo {
       selection.rowProperty().addListener(change -> {
         console.appendText("Selection row set to: " + selection.getRow() + "\n");
       });
-      selection.setOnCellClickListener((col, cycle) -> {
+      selection.setOnTimingDiagramSelectionClickListener((col, cycle) -> {
         console.appendText("Clicked on " + col + " " + cycle);
       });
 

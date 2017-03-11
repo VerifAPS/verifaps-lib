@@ -107,7 +107,7 @@ public class ConstraintSpecification extends
   }
 
   /**
-   * Add a listener for name changes to a given {@SpecIoVariable}.
+   * Add a listener for name changes to a given {@code SpecIoVariable}.
    *
    * @param specIoVariable The SpecIoVariable to add a name change listener to
    */
@@ -116,7 +116,7 @@ public class ConstraintSpecification extends
   }
 
   /**
-   * Remove a listener for name changes from a given {@SpecIoVariable}.
+   * Remove a listener for name changes from a given {@code SpecIoVariable}.
    *
    * @param specIoVariable The SpecIoVariable to remove a listener from
    */

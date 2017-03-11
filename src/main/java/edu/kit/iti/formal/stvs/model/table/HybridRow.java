@@ -18,8 +18,6 @@ import javafx.collections.MapChangeListener;
  * {@link HybridCell}s, so that both the constraint cells as well as counter example
  * values can be stored together in the model.</p>
  *
- * <p>Created by Philipp on 01.02.2017.</p>
- *
  * @author Philipp
  */
 public class HybridRow extends SpecificationRow<HybridCell<ConstraintCell>> {
@@ -107,6 +105,14 @@ public class HybridRow extends SpecificationRow<HybridCell<ConstraintCell>> {
     return counterExample.getConcreteValuesForConstraintCell(columnId, rowIndex).stream()
         .map(cell -> cell.getValue().getValueString())
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (durationCell != null ? durationCell.hashCode() : 0);
+    result = 31 * result + (getSourceRow() != null ? getSourceRow().hashCode() : 0);
+    return result;
   }
 
   @Override

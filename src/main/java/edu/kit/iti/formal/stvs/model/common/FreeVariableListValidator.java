@@ -19,12 +19,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 /**
- * <p>The validator for the effective model {@link FreeVariableList}. This class provides
+ * The validator for the effective model {@link FreeVariableList}. This class provides
  * automatically updating properties for the formal model
  * (see {@link #validFreeVariablesProperty()}) and for any
- * problems encountered while validating (see {@link #problemsProperty()}).</p>
- *
- * <p>Created by philipp on 09.02.17.</p>
+ * problems encountered while validating (see {@link #problemsProperty()}).
  *
  * @author Philipp
  */

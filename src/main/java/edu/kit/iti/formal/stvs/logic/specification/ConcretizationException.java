@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.specification;
 
 /**
- * Created by Philipp on 02.03.2017.
+ * Exception that gets thrown if concretization fails in general.
  */
 public class ConcretizationException extends Exception {
   private String message;
@@ -12,6 +12,11 @@ public class ConcretizationException extends Exception {
     originalException = null;
   }
 
+  /**
+   * Creates an instance by wrapping an existent exception.
+   *
+   * @param e Exception that causes this exception
+   */
   public ConcretizationException(Exception e) {
     super(e);
     originalException = e;

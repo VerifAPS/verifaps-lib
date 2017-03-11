@@ -2,6 +2,8 @@ package edu.kit.iti.formal.stvs.model.common;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -17,6 +19,14 @@ public class CodeIoVariableTest {
   @Test
   public void equalsCodeIoVariable() throws Exception {
     assertTrue(var1.equals(var2));
+    assertNotEquals(new CodeIoVariable(VariableCategory.INPUT, "INT", "var"), var2);
+  }
+
+  @Test
+  public void testHashCode() {
+    assertEquals(var1.hashCode(), var2.hashCode());
+    assertNotEquals(new CodeIoVariable(VariableCategory.INPUT, "INT", "var").hashCode(),
+        var2.hashCode());
   }
 
   @Test

@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.model.table.problems;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 
 /*
+ * A problem concerning a specification table.
  * @author Philipp
  */
 public abstract class SpecProblem extends Exception {
@@ -10,6 +11,11 @@ public abstract class SpecProblem extends Exception {
   private final String errorMessage;
   private final Selection location;
 
+  /**
+   * Create a new SpecProblem with a given error message and for a given location.
+   * @param errorMessage The error message
+   * @param location The location of the problem
+   */
   public SpecProblem(String errorMessage, Selection location) {
     super(errorMessage);
     this.errorMessage = errorMessage;

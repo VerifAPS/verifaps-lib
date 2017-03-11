@@ -1,6 +1,10 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import edu.kit.iti.formal.stvs.logic.io.xml.*;
+import edu.kit.iti.formal.stvs.logic.io.xml.ObjectFactory;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlExporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaExporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
@@ -25,17 +29,13 @@ import javax.xml.bind.JAXBException;
  */
 public class ExporterFacade {
 
-  public enum ExportFormat {
-    XML, GETETA
-  }
-
   /**
    * Exports a {@link ConstraintSpecification} using the specified {@link ExportFormat}.
    *
-   * @param spec Specification that should be exported
-   * @param format Format for exporting
-   * @return The exported object is written to this stream.
-   * @throws ExportException Exception while exporting
+   * @param spec The specification that should be exported
+   * @param format The format for exporting
+   * @return The stream the exported object is written to
+   * @throws ExportException if an error occurred while exporting
    */
   public static ByteArrayOutputStream exportSpec(ConstraintSpecification spec, ExportFormat format)
       throws ExportException {
@@ -52,11 +52,11 @@ public class ExporterFacade {
   /**
    * Exports a {@link ConstraintSpecification} to a given file.
    *
-   * @param spec spec to export
-   * @param format format to use
-   * @param file file to write to
-   * @throws IOException Exception while saving.
-   * @throws ExportException Exception while exporting
+   * @param spec The spec to export
+   * @param format The format to use
+   * @param file The file to write to
+   * @throws IOException if an error occurred while saving
+   * @throws ExportException if an error occurred while exporting
    */
   public static void exportSpec(ConstraintSpecification spec, ExportFormat format, File file)
       throws IOException, ExportException {
@@ -66,10 +66,10 @@ public class ExporterFacade {
   /**
    * Exports a {@link GlobalConfig} using the specified {@link ExportFormat}.
    *
-   * @param config Configuration that should be exported
-   * @param format Format for exporting
-   * @return The exported object is written to this stream.
-   * @throws ExportException Exception while exporting
+   * @param config The configuration that should be exported
+   * @param format The format for exporting
+   * @return The stream the exported object is written to
+   * @throws ExportException if an error occurred while exporting
    */
   public static ByteArrayOutputStream exportConfig(GlobalConfig config, ExportFormat format)
       throws ExportException {
@@ -82,13 +82,13 @@ public class ExporterFacade {
   }
 
   /**
-   * Exports {@link GlobalConfig} to a given file.
+   * Exports a {@link GlobalConfig} to a given file.
    *
-   * @param config config that should be exported
-   * @param format format to use
-   * @param file file to write to
-   * @throws IOException Exception while saving.
-   * @throws ExportException Exception while exporting
+   * @param config The config that should be exported
+   * @param format The format to use
+   * @param file The file to write to
+   * @throws IOException if an error occurred while saving
+   * @throws ExportException if an error occurred while exporting
    */
   public static void exportConfig(GlobalConfig config, ExportFormat format, File file)
       throws IOException, ExportException {
@@ -98,10 +98,10 @@ public class ExporterFacade {
   /**
    * Exports a {@link StvsRootModel} using the specified {@link ExportFormat}.
    *
-   * @param session Root model that should be exported
-   * @param format Format for exporting
-   * @return The exported object is written to this stream.
-   * @throws ExportException Exception while exporting
+   * @param session The root model that should be exported
+   * @param format The format for exporting
+   * @return The stream the exported object is written to
+   * @throws ExportException if an error occurred while exporting
    */
   public static ByteArrayOutputStream exportSession(StvsRootModel session, ExportFormat format)
       throws ExportException {
@@ -114,13 +114,13 @@ public class ExporterFacade {
   }
 
   /**
-   * Exports {@link StvsRootModel} to a given file.
+   * Exports a {@link StvsRootModel} to a given file.
    *
-   * @param session session that should be exported
-   * @param format format to use
-   * @param file file to write to
-   * @throws IOException Exception while saving.
-   * @throws ExportException Exception while exporting
+   * @param session The session that should be exported
+   * @param format The format to use
+   * @param file The file to write to
+   * @throws IOException if an error occurred while saving
+   * @throws ExportException if an error occurred while exporting
    */
   public static void exportSession(StvsRootModel session, ExportFormat format, File file)
       throws IOException, ExportException {
@@ -128,23 +128,23 @@ public class ExporterFacade {
   }
 
   /**
-   * Exports {@link Code} to the file specified in {@link Code#filename}.
+   * Exports a {@link Code} to the file specified in {@link Code#filename}.
    *
-   * @param code Code to export
+   * @param code The code to export
    * @param escapeVariables Specifies if variables should be escaped
-   * @throws IOException will be thrown, when an error occurs while saving
+   * @throws IOException if an error occurs while saving
    */
   public static void exportCode(Code code, boolean escapeVariables) throws IOException {
     exportCode(code, new File(code.getFilename()), escapeVariables);
   }
 
   /**
-   * Exports {@link Code} to a given file.
+   * Exports a {@link Code} to a given file.
    *
-   * @param code code that should be exported
-   * @param file file to write to
+   * @param code The code that should be exported
+   * @param file The file to write to
    * @param escapeVariables Specifies if variables should be escaped
-   * @throws IOException will be thrown, when an error occurs while saving
+   * @throws IOException if an error occurs while saving
    */
   public static void exportCode(Code code, File file, boolean escapeVariables) throws IOException {
     BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -157,14 +157,14 @@ public class ExporterFacade {
   }
 
   /**
-   * Exports {@link History} to a file.
+   * Exports a {@link History} to a file.
    *
-   * @param history Code to export
-   * @param format format to use
-   * @param file file to write ro
-   * @throws IOException Exception while saving.
-   * @throws ExportException Exception while exporting
-   * @throws JAXBException Exception while marshalling.
+   * @param history The history to export
+   * @param format The format to use
+   * @param file The file to write ro
+   * @throws IOException if an error occurred while saving
+   * @throws ExportException if an error occurred while exporting
+   * @throws JAXBException if an error occurred while marshalling
    */
   public static void exportHistory(History history, ExportFormat format, File file)
       throws ExportException, JAXBException, IOException {
@@ -190,12 +190,17 @@ public class ExporterFacade {
   /**
    * Write an OutputStream to a file.
    *
-   * @param outputStream the stream to write to a file
-   * @param file the file to write to
+   * @param outputStream The stream to write to a file
+   * @param file The file to write to
+   * @throws IOException if an error occurred during file I/O
    */
   private static void writeToFile(ByteArrayOutputStream outputStream, File file)
       throws IOException {
     FileOutputStream fostream = new FileOutputStream(file);
     outputStream.writeTo(fostream);
+  }
+
+  public enum ExportFormat {
+    XML, GETETA
   }
 }

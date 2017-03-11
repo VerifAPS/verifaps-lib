@@ -11,8 +11,6 @@ import javafx.collections.ObservableList;
  * {@link ConstraintCell} or {@link ConstraintDuration}), and a list of counterexample
  * strings that should be viewed in-place below these cells.</p>
  *
- * <p>Created by Philipp on 01.02.2017.</p>
- *
  * @author Philipp
  */
 public class HybridCell<C extends CellOperationProvider> implements CellOperationProvider {

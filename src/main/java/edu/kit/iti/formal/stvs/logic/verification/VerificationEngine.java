@@ -6,6 +6,7 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
+import edu.kit.iti.formal.stvs.util.ProcessCreationException;
 
 import java.io.IOException;
 
@@ -23,10 +24,10 @@ public interface VerificationEngine {
    * @param spec specification that should be checked
    * @throws IOException exception while creating process
    * @throws ExportException exception while exporting
-   * @throws VerificationError exception while verifying
+   * @throws ProcessCreationException exception while creating a process for verification
    */
   void startVerification(VerificationScenario scenario, ConstraintSpecification spec)
-      throws IOException, ExportException, VerificationError;
+      throws IOException, ExportException, ProcessCreationException;
 
   NullableProperty<VerificationResult> verificationResultProperty();
 

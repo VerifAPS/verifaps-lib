@@ -3,10 +3,8 @@ package edu.kit.iti.formal.stvs.model.table.problems;
 import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 
 /**
- * <p>
- * The cell problem analogue to the {@link UnsupportedExpressionException}. Created when expressions
- * with function calls or if guards or similar are encountered, that have not yet been implemented.
- * </p>
+ * The cell problem analog to the {@link UnsupportedExpressionException}. Created when expressions
+ * with function calls or if guards or similar are encountered which have not yet been implemented.
  *
  * @author Benjamin Alt
  */
@@ -19,9 +17,7 @@ public class CellUnsupportedExpressionProblem extends CellProblem {
   }
 
   /**
-   * <p>
-   * Creates the cell problem for an {@link UnsupportedExpressionException}.
-   * </p>
+   * Creates the cell problem for an {@link UnsupportedExpressionException}, a column and a row.
    *
    * @param exception the exception that caused this cell problem
    * @param column the column of the cell in the table

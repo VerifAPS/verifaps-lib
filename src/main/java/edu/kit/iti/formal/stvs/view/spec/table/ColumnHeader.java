@@ -21,10 +21,6 @@ import javafx.scene.layout.VBox;
  * model are {@link SpecIoVariable}s.
  * </p>
  *
- * <p>
- * Created by philipp on 11.02.17.
- * </p>
- *
  * @author Philipp
  */
 public class ColumnHeader extends VBox {
