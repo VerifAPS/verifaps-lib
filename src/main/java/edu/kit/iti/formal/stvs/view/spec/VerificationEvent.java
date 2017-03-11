@@ -7,8 +7,8 @@ import javafx.event.EventType;
 
 /**
  * Event that is fired when the verification button is pressed The event is delegated along the
- * scenegraph and is caught in {@link edu.kit.iti.formal.stvs.view.StvsRootController} to start/stop
- * the verification
+ * scene graph and is caught in {@link edu.kit.iti.formal.stvs.view.StvsRootController} to
+ * start/stop the verification.
  *
  * @author Benjamin Alt
  */
@@ -18,7 +18,7 @@ public class VerificationEvent extends Event {
   private final Type type;
 
   /**
-   * creates an event.
+   * Creates a VerificationEvent.
    *
    * @param constraintSpec The spec that
    * @param type type of the event
