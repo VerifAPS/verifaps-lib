@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * <p>
  * A problem that is generated when a ConstraintCell inside a Constraint/HybridSpecification cannot
- * be parsed correctly (i.e. according to the antlr grammar file in <tt>src/main/antlr</tt>)
+ * be parsed correctly (i.e. according to the antlr grammar file in <tt>src/main/antlr</tt>).
  * </p>
  *
  * @author Benjamin Alt
@@ -51,6 +51,12 @@ public class CellParseProblem extends CellProblem {
     return exception.getMessage();
   }
 
+  /**
+   * Create a new CellParseProblem for a given {@link ParseException}, a column and a row.
+   * @param exception The exeption underlying this problem
+   * @param column The column of the problematic cell
+   * @param row The row of the problematic cell
+   */
   public CellParseProblem(ParseException exception, String column, int row) {
     super(createErrorMessage(exception), column, row);
     this.exception = exception;

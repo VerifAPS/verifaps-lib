@@ -26,8 +26,8 @@ import org.w3c.dom.Node;
 
 /**
  * Exporter for communication with the GeTeTa verification engine. Provides functionality for
- * converting {@link ConstraintSpecification}s into an XML format compatible with the GeTeTa
- * input format.
+ * converting {@link ConstraintSpecification}s into an XML format compatible with the GeTeTa input
+ * format.
  *
  * @author Benjamin Alt
  */
@@ -89,10 +89,11 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
     Variables variables = objectFactory.createVariables();
     for (FreeVariable freeVariable : source.getFreeVariableList().getVariables()) {
       ConstraintVariable exportedVariable = objectFactory.createConstraintVariable();
-      exportedVariable.setName(VariableEscaper.escapeName(freeVariable.getName()));
+      exportedVariable.setName(VariableEscaper.escapeIdentifier(freeVariable.getName()));
       exportedVariable.setDataType(getDataType(freeVariable));
       if (freeVariable.getDefaultValue().length() > 0) {
-        exportedVariable.setConstraint(VariableEscaper.escapeName(freeVariable.getDefaultValue()));
+        exportedVariable
+            .setConstraint(VariableEscaper.escapeIdentifier(freeVariable.getDefaultValue()));
       } else {
         exportedVariable.setConstraint("-");
       }
@@ -112,7 +113,7 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
     Variables variables = objectFactory.createVariables();
     for (SpecIoVariable ioVariable : source.getColumnHeaders()) {
       IoVariable exportedVariable = objectFactory.createIoVariable();
-      exportedVariable.setName(VariableEscaper.escapeName(ioVariable.getName()));
+      exportedVariable.setName(VariableEscaper.escapeIdentifier(ioVariable.getName()));
       exportedVariable.setDataType(getDataType(ioVariable));
       if (ioVariable.getCategory() == VariableCategory.INPUT) {
         exportedVariable.setIo("input");
@@ -141,8 +142,8 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
   }
 
   /**
-   * Converts a given {@link ConstraintSpecification} into an XML node that conforms to the
-   * GeTeTa verification engine input format.
+   * Converts a given {@link ConstraintSpecification} into an XML node that conforms to the GeTeTa
+   * verification engine input format.
    *
    * @param source The specification that should be converted
    * @return XML Node representing the specification

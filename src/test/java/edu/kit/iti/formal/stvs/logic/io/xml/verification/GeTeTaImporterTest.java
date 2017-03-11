@@ -8,12 +8,12 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
 import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
-import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
-import edu.kit.iti.formal.stvs.model.verification.VerificationState;
+import edu.kit.iti.formal.stvs.model.verification.*;
 import org.junit.Test;
 
 import java.util.*;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 
 /**
@@ -24,10 +24,11 @@ public class GeTeTaImporterTest {
   public void testDoImportCounterexampleInts() throws Exception {
     List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
     GeTeTaImporter importer = new GeTeTaImporter(typeContext);
-    VerificationResult result = importer.doImport(this.getClass().getResourceAsStream
+    VerificationResult verificationResult = importer.doImport(this.getClass().getResourceAsStream
         ("report_counterexample_ints_1.xml"));
-    assertEquals(result.getStatus(), VerificationResult.Status.COUNTEREXAMPLE);
-    ConcreteSpecification counterexample = result.getCounterExample().get();
+    assertThat(verificationResult, instanceOf(Counterexample.class));
+    Counterexample result = (Counterexample) verificationResult;
+    ConcreteSpecification counterexample = result.getCounterexample();
     assertEquals(1, counterexample.getDurations().size());
     assertEquals(1, counterexample.getRows().size());
     assertEquals(new ConcreteDuration(0, 1), counterexample.getDurations().get(0));
@@ -45,12 +46,9 @@ public class GeTeTaImporterTest {
   public void testDoImportVerified() throws ImportException {
     List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL, TypeFactory.enumOfName
         ("enumD", "literalOne", "literalTwo"));
-    VerificationResult result = ImporterFacade.importVerificationResult(StvsApplication.class
-        .getResourceAsStream("testSets/valid_1/geteta_report_valid_1.xml"), ImporterFacade
-        .ImportFormat.GETETA, typeContext);
-    assertEquals(VerificationResult.Status.VERIFIED, result.getStatus());
-    assertEquals(Optional.empty(), result.getCounterExample());
-    assertEquals(Optional.empty(), result.getVerificationError());
+    VerificationResult result = new GeTeTaImporter(typeContext).doImport(StvsApplication.class
+        .getResourceAsStream("testSets/valid_1/geteta_report_valid_1.xml"));
+    assertThat(result, instanceOf(VerificationSuccess.class));
   }
 
   @Test
@@ -59,10 +57,8 @@ public class GeTeTaImporterTest {
     VerificationResult result = ImporterFacade.importVerificationResult(StvsApplication.class
         .getResourceAsStream("testSets/problematic_1/geteta_report_unknown_error_1.xml"),
         ImporterFacade.ImportFormat.GETETA, typeContext);
-    assertEquals(VerificationResult.Status.ERROR, result.getStatus());
+    assertThat(result, instanceOf(VerificationError.class));
     assertNotEquals(Optional.empty(), result.getLogFile());
-    assertEquals(Optional.empty(), result.getCounterExample());
-    assertEquals(Optional.empty(), result.getCounterExample());
   }
 
   @Test(expected = ImportException.class)

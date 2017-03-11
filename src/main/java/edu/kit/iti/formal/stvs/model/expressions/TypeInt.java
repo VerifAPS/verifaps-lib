@@ -3,9 +3,7 @@ package edu.kit.iti.formal.stvs.model.expressions;
 import java.util.Optional;
 
 /**
- * runtime-representation for int types.
- * <p>
- * <p>
+ * Runtime-representation for int types.
  * This class is a singleton, since it does not hold any state at all.
  *
  * @author Philipp

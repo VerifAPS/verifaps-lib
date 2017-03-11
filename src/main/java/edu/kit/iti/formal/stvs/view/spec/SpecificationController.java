@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
-import edu.kit.iti.formal.stvs.logic.specification.ConcretizationException;
+import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
 import edu.kit.iti.formal.stvs.logic.specification.smtlib.SmtConcretizer;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
@@ -13,7 +13,7 @@ import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
 import edu.kit.iti.formal.stvs.util.AsyncRunner;
 import edu.kit.iti.formal.stvs.util.AsyncTaskCompletedHandler;
-import edu.kit.iti.formal.stvs.util.JavaFxAsyncProcessTask;
+import edu.kit.iti.formal.stvs.util.JavaFxAsyncTask;
 import edu.kit.iti.formal.stvs.view.Controller;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController;
@@ -30,20 +30,20 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 
 /**
+ * This is the controller for the {@link SpecificationView}. It handles most of the view logic that
+ * is invoked by verification/concretizer results.
+ *
  * @author Carsten Csiky
  */
 public class SpecificationController implements Controller {
 
   private final GlobalConfig globalConfig;
-
+  private final ConcretizationTaskHandler concretizationHandler;
   private HybridSpecification spec;
-
   private ObjectProperty<VerificationState> stateProperty;
-  private ContextMenu contextMenu;
   private SpecificationView view;
   private VariableCollectionController variableCollectionController;
   private SpecificationTableController tableController;
@@ -52,9 +52,18 @@ public class SpecificationController implements Controller {
   private HybridSpecification hybridSpecification;
   private BooleanProperty specificationInvalid;
   private BooleanProperty specificationConcretizable;
-  private JavaFxAsyncProcessTask<ConcreteSpecification> concretizingTask;
-  private final ConcretizationTaskHandler concretizationHandler;
+  private JavaFxAsyncTask<ConcreteSpecification> concretizingTask;
 
+  /**
+   * This creates an instance of the controller.
+   *
+   * @param typeContext available types in code
+   * @param codeIoVariables available variables in code
+   * @param hybridSpecification specification that should be represented by this controller
+   * @param stateProperty the state of the verification
+   * @param codeInvalid Tells if the code is valid
+   * @param globalConfig Global config object
+   */
   public SpecificationController(ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> codeIoVariables, HybridSpecification hybridSpecification,
       ObjectProperty<VerificationState> stateProperty, BooleanBinding codeInvalid,
@@ -75,8 +84,8 @@ public class SpecificationController implements Controller {
     specificationInvalid.bind(variableCollectionController.getValidator().validProperty().not()
         .or(tableController.getValidator().validProperty().not()).or(codeInvalid));
     this.specificationConcretizable = new SimpleBooleanProperty(true);
-    specificationConcretizable.bind(
-        tableController.getValidator().validSpecificationProperty().isNotNull());
+    specificationConcretizable
+        .bind(tableController.getValidator().validSpecificationProperty().isNotNull());
     this.concretizationHandler = new ConcretizationTaskHandler();
 
     // use event trigger to generate timing-diagram, to minimize code-duplication
@@ -151,11 +160,10 @@ public class SpecificationController implements Controller {
 
   private void startConcretizer(ActionEvent actionEvent) {
     ConcretizationRunner runner =
-        new ConcretizationRunner(
-            tableController.getValidator().getValidSpecification(),
+        new ConcretizationRunner(tableController.getValidator().getValidSpecification(),
             variableCollectionController.getValidator().getValidFreeVariables());
-    this.concretizingTask = new JavaFxAsyncProcessTask<>(
-        globalConfig.getSimulationTimeout(), runner, this.concretizationHandler);
+    this.concretizingTask = new JavaFxAsyncTask<>(globalConfig.getSimulationTimeout(),
+        runner, this.concretizationHandler);
     concretizingTask.start();
 
     onConcretizationActive();
@@ -192,7 +200,8 @@ public class SpecificationController implements Controller {
     return spec;
   }
 
-  private class ConcretizationTaskHandler implements AsyncTaskCompletedHandler<ConcreteSpecification> {
+  private class ConcretizationTaskHandler
+      implements AsyncTaskCompletedHandler<ConcreteSpecification> {
     @Override
     public void onSuccess(ConcreteSpecification concreteSpec) {
       hybridSpecification.setConcreteInstance(concreteSpec);
@@ -212,9 +221,10 @@ public class SpecificationController implements Controller {
 
     final ValidSpecification specToConcretize;
     final List<ValidFreeVariable> freeVariables;
-    final SmtConcretizer concretizer;
+    final SpecificationConcretizer concretizer;
 
-    private ConcretizationRunner(ValidSpecification specToConcretize, List<ValidFreeVariable> freeVariables) {
+    private ConcretizationRunner(ValidSpecification specToConcretize,
+        List<ValidFreeVariable> freeVariables) {
       this.specToConcretize = specToConcretize;
       this.freeVariables = freeVariables;
       this.concretizer = new SmtConcretizer(globalConfig);
@@ -226,8 +236,8 @@ public class SpecificationController implements Controller {
     }
 
     @Override
-    public Process getProcess() {
-      return concretizer.getProcess();
+    public void terminate() {
+      concretizer.terminate();
     }
   }
 }

@@ -17,7 +17,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
 /**
- * Created by philipp on 11.02.17.
+ * The pane for configuring an i/o variable for use in the specification table view. This pane is
+ * a component of the {@link IoVariableChooserDialog}.
  *
  * @author Philipp
  */
@@ -27,10 +28,19 @@ public class IoVariableDefinitionPane extends GridPane {
   private final TextField nameTextField;
   private final TextField typeTextField;
 
+  /**
+   * Creates an instance for an input variable with empty name/type.
+   */
   public IoVariableDefinitionPane() {
     this(VariableCategory.INPUT, "", "");
   }
 
+  /**
+   * Creates an instance with given default values to display.
+   * @param initialCategory Default category
+   * @param initialName Default name
+   * @param initialType Default type
+   */
   public IoVariableDefinitionPane(VariableCategory initialCategory, String initialName,
       String initialType) {
     super();
@@ -54,12 +64,20 @@ public class IoVariableDefinitionPane extends GridPane {
     ViewUtils.setupId(this);
   }
 
+  /**
+   * Sets the displayed values according to the values in a given variable.
+   * @param ioVariable IO variable that holds the values which should be displayed
+   */
   public void setFromIoVariable(IoVariable ioVariable) {
     this.categoryComboBox.valueProperty().set(ioVariable.getCategory());
     this.nameTextField.setText(ioVariable.getName());
     this.typeTextField.setText(ioVariable.getType());
   }
 
+  /**
+   * Generate a SpecIOVariable from this pane.
+   * @return Generated variable
+   */
   public SpecIoVariable getDefinedVariable() {
     return new SpecIoVariable(categoryComboBox.getValue(), typeTextField.getText(),
         nameTextField.getText());
@@ -69,6 +87,14 @@ public class IoVariableDefinitionPane extends GridPane {
     return nameTextField;
   }
 
+  /**
+   * Returns if the specified SpecIOVariable is invalid.
+   * This includes that the defined name must not be present in
+   * {@code alreadyDefinedVariables} for this function to return false.
+   *
+   * @param alreadyDefinedVariables check against this list if variable name is already present
+   * @return Status if the specification is invalid
+   */
   public Boolean isDefinitionInvalid(List<SpecIoVariable> alreadyDefinedVariables) {
     String chosenName = nameTextField.getText();
     String chosenType = typeTextField.getText();
@@ -79,6 +105,12 @@ public class IoVariableDefinitionPane extends GridPane {
     return alreadyDefinedVariables.stream().anyMatch(var -> var.getName().equals(chosenName));
   }
 
+  /**
+   * Returns a self updating binding to check if the definition is invalid
+   * @param alreadyDefinedVariables check against this list if variable name is already present
+   * @return binding that always represents the return value of
+   *  {@link IoVariableDefinitionPane#isDefinitionInvalid(List)}.
+   */
   public BooleanBinding createDefinitionInvalidBinding(
       List<SpecIoVariable> alreadyDefinedVariables) {
     return Bindings.createBooleanBinding(() -> isDefinitionInvalid(alreadyDefinedVariables),
@@ -86,6 +118,11 @@ public class IoVariableDefinitionPane extends GridPane {
         typeTextField.textProperty());
   }
 
+  /**
+   * Write the made changes to a variable.
+   *
+   * @param variableToChange Variable to write to
+   */
   public void applyChangesToVariable(SpecIoVariable variableToChange) {
     variableToChange.setCategory(categoryComboBox.getValue());
     variableToChange.setName(nameTextField.getText());

@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
- * Created by philipp on 09.02.17.
+ * A {@link FreeVariableProblem} that occurs when two free variables with the same name occur.
  *
  * @author Philipp
  */
@@ -37,6 +37,11 @@ public class DuplicateFreeVariableProblem extends FreeVariableProblem {
     return allVariables.stream().filter(otherVar -> otherVar.getName().equals(varName)).count() > 1;
   }
 
+  /**
+   * Private constructor: DuplicateFreeVariableProblems can only be created from the static
+   * method {@link DuplicateFreeVariableProblem#checkForDuplicates}.
+   * @param freeVariableName the name of the duplicate variable
+   */
   private DuplicateFreeVariableProblem(String freeVariableName) {
     super(
         "More than one free variable with name " + StringEscapeUtils.escapeJava(freeVariableName));

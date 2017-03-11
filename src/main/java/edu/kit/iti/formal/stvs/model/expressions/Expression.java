@@ -7,7 +7,7 @@ import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 /**
- * <p>The abstract super-class for all Expressions.</p>
+ * <p>The abstract super class for all Expressions.</p>
  *
  * <p>This type does not contain all information the source expression string had. That means you
  * can't get back the expression string from this Expression. For example an expression <tt>= 3</tt>
@@ -20,8 +20,6 @@ import javafx.beans.property.SimpleStringProperty;
  */
 public abstract class Expression implements StringReadable {
 
-  private ReadOnlyStringProperty stringRepresentation;
-
   /**
    * <p>Find out what subclass of Expression this is by supplying a visitor.</p>
    *
@@ -32,6 +30,10 @@ public abstract class Expression implements StringReadable {
    */
   public abstract <R> R takeVisitor(ExpressionVisitor<R> visitor);
 
+  /**
+   * Return a string representation of this expression.
+   * @return A string representation of this expression
+   */
   public String getAsString() {
     return toString();
   }

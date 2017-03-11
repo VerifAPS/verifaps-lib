@@ -3,8 +3,7 @@ package edu.kit.iti.formal.stvs.model.expressions;
 import java.util.Optional;
 
 /**
- * runtime-representation for boolean types.
- * <p>
+ * Runtime-representation for boolean types.
  * This is a singleton since this class does not have any state.
  *
  * @author Philipp

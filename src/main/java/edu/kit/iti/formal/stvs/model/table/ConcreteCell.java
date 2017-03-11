@@ -36,6 +36,11 @@ public class ConcreteCell implements StringReadable {
   }
 
   @Override
+  public int hashCode() {
+    return getValue() != null ? getValue().hashCode() : 0;
+  }
+
+  @Override
   public boolean equals(Object obj) {
     if (!(obj instanceof ConcreteCell)) {
       return false;

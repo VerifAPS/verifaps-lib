@@ -2,7 +2,7 @@ package edu.kit.iti.formal.stvs.model.common;
 
 /**
  * {@code SelectionClickListener} gets invoked by {@link Selection} and indicates that the user
- * clicked on a view that represents a cell in the
+ * clicked on a view (such as a region in a timing diagram) that represents a cell in the
  * {@link edu.kit.iti.formal.stvs.model.table.HybridSpecification}.
  */
 @FunctionalInterface

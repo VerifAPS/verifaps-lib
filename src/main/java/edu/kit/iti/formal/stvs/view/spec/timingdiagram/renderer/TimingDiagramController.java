@@ -31,7 +31,6 @@ import org.apache.commons.lang3.tuple.Pair;
  */
 public class TimingDiagramController implements Controller {
   private final BooleanProperty activated;
-  private ContextMenu contextMenu;
   private final TimingDiagramView<?> view;
   private final Selection selection;
   private final ValidIoVariable ioVariable;

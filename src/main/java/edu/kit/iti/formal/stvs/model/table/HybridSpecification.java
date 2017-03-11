@@ -191,6 +191,17 @@ public class HybridSpecification extends ConstraintSpecification {
   }
 
   @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (getCounterExample() != null ? getCounterExample().hashCode() : 0);
+    result = 31 * result + (getConcreteInstance() != null ? getConcreteInstance().hashCode() : 0);
+    result = 31 * result + (isEditable() ? 1 : 0);
+    result = 31 * result + (rowsAsHybrid != null ? rowsAsHybrid.hashCode() : 0);
+    result = 31 * result + (getSelection() != null ? getSelection().hashCode() : 0);
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;

@@ -103,6 +103,12 @@ public class Code {
   }
 
   @Override
+  public int hashCode() {
+    int result = getFilename() != null ? getFilename().hashCode() : 0;
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
@@ -119,26 +125,6 @@ public class Code {
     if (getSourcecode() != null ? !getSourcecode().equals(code.getSourcecode())
         : code.sourceCodeProperty != null) {
       return false;
-    }
-    if (getParsedCode() != null ? !getParsedCode().equals(code.getParsedCode())
-        : code.getParsedCode() != null) {
-      return false;
-    }
-    if (getTokens() != null ? !getTokens().equals(code.getTokens()) : code.getTokens() != null) {
-      return false;
-    }
-    /*
-     * ANTLR SyntaxError does not implement equals() properly return getSyntaxErrors() != null ?
-     * getSyntaxErrors().equals(code.getSyntaxErrors()) : code .getSyntaxErrors() == null;
-     */
-    if (getSyntaxErrors().size() != code.getSyntaxErrors().size()) {
-      return false;
-    }
-    for (int i = 0; i < getSyntaxErrors().size(); i++) {
-      if (!getSyntaxErrors().get(i).getMessage()
-          .equals(code.getSyntaxErrors().get(i).getMessage())) {
-        return false;
-      }
     }
     return true;
   }

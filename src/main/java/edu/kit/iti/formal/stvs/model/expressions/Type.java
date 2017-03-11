@@ -24,7 +24,6 @@ public interface Type {
   /**
    * Finds out whether this type checks against another type, which means any value of this type can
    * be used as a value of the other type.
-   * <p>
    * This mostly means type equality or a supertype relation.
    *
    * @param other the other type ot subsume.

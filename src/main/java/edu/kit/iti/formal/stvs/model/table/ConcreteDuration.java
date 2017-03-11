@@ -47,15 +47,26 @@ public class ConcreteDuration {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof ConcreteDuration)) {
-      return false;
-    }
-    if (obj == this) {
+  public boolean equals(Object o) {
+    if (this == o) {
       return true;
     }
-    ConcreteDuration other = (ConcreteDuration) obj;
-    return new EqualsBuilder().append(duration, other.duration).append(beginCycle, other.beginCycle)
-        .isEquals();
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    ConcreteDuration duration1 = (ConcreteDuration) o;
+
+    if (getDuration() != duration1.getDuration()) {
+      return false;
+    }
+    return getBeginCycle() == duration1.getBeginCycle();
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getDuration();
+    result = 31 * result + getBeginCycle();
+    return result;
   }
 }

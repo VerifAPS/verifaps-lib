@@ -17,10 +17,6 @@ import javafx.scene.control.Dialog;
  * @author Carsten Csiky
  */
 public class CommentPopupManager {
-  private boolean editable;
-  private StringProperty comment;
-  private Dialog dialog;
-  private GlobalConfig globalConfig;
 
   /**
    * <p>
@@ -37,11 +33,8 @@ public class CommentPopupManager {
    * @param commentable the commentable model to be updated.
    * @param editable whether the comment should be editable or only to open a dialog for comment
    *        viewing purposes
-   * @param globalConfig a configuration that might influence the editor's appearence (for example
-   *        font size)
    */
-  public CommentPopupManager(Commentable commentable, boolean editable, GlobalConfig globalConfig) {
-    this.globalConfig = globalConfig;
+  public CommentPopupManager(Commentable commentable, boolean editable) {
     CommentPopup popup = new CommentPopup(commentable.getComment());
     popup.setEditable(editable);
 
@@ -56,9 +49,4 @@ public class CommentPopupManager {
     newValue.ifPresent(commentable::setComment);
 
   }
-
-  public StringProperty getCommentProperty() {
-    return comment;
-  }
-
 }

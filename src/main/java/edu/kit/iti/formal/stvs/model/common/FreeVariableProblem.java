@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 /**
- * Created by philipp on 09.02.17.
+ * A problem concerning {@link FreeVariable}s.
  *
  * @author Philipp
  */
@@ -9,10 +9,18 @@ public abstract class FreeVariableProblem extends Exception {
 
   private final String errorMessage;
 
+  /**
+   * Construct a new FreeVariableProblem with a given error message.
+   * @param errorMessage The error message
+   */
   protected FreeVariableProblem(String errorMessage) {
     this.errorMessage = errorMessage;
   }
 
+  /**
+   * Get the error message of this FreeVariableProblem.
+   * @return The error message
+   */
   public String getErrorMessage() {
     return errorMessage;
   }
@@ -27,5 +35,4 @@ public abstract class FreeVariableProblem extends Exception {
   }
 
   public abstract String getProblemName();
-
 }

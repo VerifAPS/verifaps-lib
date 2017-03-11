@@ -7,15 +7,18 @@ import javafx.beans.property.StringProperty;
 import javafx.util.Callback;
 
 /**
- * Created by csicar on 10.01.17.
- *
+ * A free variable. Free variables have a name, a type and a default value and can occur in
+ * constraint expressions.
  * @author Philipp
  */
 public class FreeVariable implements Variable {
 
+  /**
+   * The default extractor to allow observable collections containing FreeVariables to fire
+   * change events when the properties of a FreeVariable change.
+   */
   public static final Callback<FreeVariable, Observable[]> EXTRACTOR = freeVar -> new Observable[] {
       freeVar.nameProperty(), freeVar.typeProperty(), freeVar.defaultValueProperty()};
-
 
   private final StringProperty name;
   private final StringProperty type;
@@ -47,6 +50,10 @@ public class FreeVariable implements Variable {
     this.defaultValue = new SimpleStringProperty(defaultValue == null ? "" : defaultValue);
   }
 
+  /**
+   * Copy constructor: Makes a deep copy of a given free variable.
+   * @param freeVar The variable to copy
+   */
   public FreeVariable(FreeVariable freeVar) {
     this(freeVar.getName(), freeVar.getType(), freeVar.getDefaultValue());
   }

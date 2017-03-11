@@ -7,14 +7,18 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
- * Created by csicar on 09.01.17.
+ * The entry point to ST Verification Studio.
  *
- * @author Benjamin Alt
+ * @author Leon Kaucher
  */
 public class StvsApplication extends Application {
 
   private StvsMainScene mainScene = new StvsMainScene();
 
+  /**
+   * Launch the application.
+   * @param args The command-line arguments passed to the application
+   */
   public static void main(String[] args) {
     launch(args);
   }

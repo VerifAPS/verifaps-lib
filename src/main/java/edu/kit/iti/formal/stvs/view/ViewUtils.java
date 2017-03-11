@@ -59,8 +59,6 @@ public class ViewUtils {
     setupId(parent);
   }
 
-
-
   /**
    * Sets the css-id for the parent.
    * 

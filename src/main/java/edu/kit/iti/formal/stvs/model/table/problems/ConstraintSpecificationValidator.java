@@ -32,20 +32,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 /**
- * <p>
  * The validator for {@link ConstraintSpecification}s. It converts these into the formal model:
  * {@link ValidSpecification}. If there are any problems while converting, then {@link SpecProblem}s
- * are created.
- * </p>
- *
- * <p>
- * This object has observable properties and can therefore be used like any other model instance in
- * the controllers.
- * </p>
- *
- * <p>
- * Created by philipp on 09.02.17.
- * </p>
+ * are created. This object has observable properties and can therefore be used like any other model
+ * instance in the controllers.
  *
  * @author Philipp
  */
@@ -151,7 +141,8 @@ public class ConstraintSpecificationValidator {
     Map<String, Type> typesByName = typeContext.get().stream()
         .collect(Collectors.toMap(Type::getTypeName, Function.identity()));
 
-    specificationIsValid = areCellsValid(validSpec, minorSpecProblems, majorSpecProblems, typesByName);
+    specificationIsValid =
+        areCellsValid(validSpec, minorSpecProblems, majorSpecProblems, typesByName);
 
     specificationIsValid = areDurationsValid(validSpec, majorSpecProblems, specificationIsValid);
 
@@ -178,8 +169,8 @@ public class ConstraintSpecificationValidator {
    * @param specificationIsValid does the given specification valid seem to be valid?
    * @return returns if durations are valid
    */
-  private boolean areDurationsValid(ValidSpecification validSpec, List<SpecProblem> majorSpecProblems,
-      boolean specificationIsValid) {
+  private boolean areDurationsValid(ValidSpecification validSpec,
+      List<SpecProblem> majorSpecProblems, boolean specificationIsValid) {
     for (int durIndex = 0; durIndex < specification.getDurations().size(); durIndex++) {
       try {
         LowerBoundedInterval interval = DurationParseProblem.tryParseDuration(durIndex,
@@ -259,11 +250,10 @@ public class ConstraintSpecificationValidator {
     for (SpecIoVariable specIoVariable : specification.getColumnHeaders()) {
       // Check column header for problem
       try {
+        // On non-fatal problems (like missing matching CodeIoVariable)
+        // minorSpecProblems::add is called:
         ValidIoVariable validIoVariable = InvalidIoVarProblem.tryGetValidIoVariable(specIoVariable,
-            codeIoVariables.get(), typesByName, minorSpecProblems::add); // On non-fatal problems
-                                                                         // (like
-        // missing matching
-        // CodeIoVariable)
+            codeIoVariables.get(), typesByName, minorSpecProblems::add);
         variableTypes.put(validIoVariable.getName(), validIoVariable.getValidType());
         if (majorSpecProblems.isEmpty()) {
           validSpec.getColumnHeaders().add(validIoVariable);

@@ -7,7 +7,7 @@ package edu.kit.iti.formal.stvs.model.expressions;
 @FunctionalInterface
 public interface TypeIntegerHandler<R> {
   /**
-   * Must implement a method that gets called by {@link TypeInt#match}
+   * Must implement a method that gets called by {@link TypeInt#match}.
    *
    * @return Object of type {@code R}
    */

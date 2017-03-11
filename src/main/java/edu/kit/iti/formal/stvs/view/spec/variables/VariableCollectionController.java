@@ -33,22 +33,27 @@ import javafx.scene.input.TransferMode;
 import javafx.util.converter.DefaultStringConverter;
 
 /**
- * Created by csicar on 10.01.17.
+ * This is a controller for {@link VariableCollection}.
  *
  * @author Philipp
  */
 public class VariableCollectionController implements Controller {
 
-  private ObjectProperty<List<Type>> codeTypes;
   private FreeVariableList freeVariableList;
   private FreeVariableListValidator validator;
   private VariableCollection view;
 
   private ContextMenu contextMenu;
 
+  /**
+   * Creates an instance with a predefined list of variables.
+   * The available types in code must be known for validation purposes.
+   *
+   * @param codeTypes Available code types
+   * @param freeVariableList Predefined free variables
+   */
   public VariableCollectionController(ObjectProperty<List<Type>> codeTypes,
       FreeVariableList freeVariableList) {
-    this.codeTypes = codeTypes;
     this.freeVariableList = freeVariableList;
     this.validator = new FreeVariableListValidator(codeTypes, freeVariableList);
 

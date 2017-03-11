@@ -1,8 +1,7 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 /**
- * runtime-representation for boolean values of {@link Expression}s.
- * <p>
+ * Runtime-representation for boolean values of {@link Expression}s.
  * This is a singleton with two instances, TRUE and FALSE, since there is no state to the values.
  *
  * @author Philipp

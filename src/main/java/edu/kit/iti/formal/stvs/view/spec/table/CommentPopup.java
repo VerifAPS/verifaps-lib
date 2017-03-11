@@ -18,7 +18,6 @@ import javafx.scene.layout.GridPane;
  */
 public class CommentPopup extends Dialog<String> implements Lockable {
   private TextArea commentField;
-  private String commentContent;
   private final BooleanProperty editable;
 
   /**
@@ -33,7 +32,6 @@ public class CommentPopup extends Dialog<String> implements Lockable {
     super();
     this.setTitle("Edit Comment");
     this.setContentText("Comment");
-    this.commentContent = commentContent;
     this.commentField = new TextArea(commentContent);
     editable = new SimpleBooleanProperty();
     GridPane grid = new GridPane();

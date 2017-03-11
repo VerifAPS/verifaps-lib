@@ -235,28 +235,4 @@ public class ParsedCode {
   public List<Type> getDefinedTypes() {
     return definedTypes;
   }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null || getClass() != obj.getClass()) {
-      return false;
-    }
-
-    ParsedCode that = (ParsedCode) obj;
-
-    if (getFoldableCodeBlocks() != null
-        ? !getFoldableCodeBlocks().equals(that.getFoldableCodeBlocks())
-        : that.getFoldableCodeBlocks() != null) {
-      return false;
-    }
-    if (getDefinedVariables() != null ? !getDefinedVariables().equals(that.getDefinedVariables())
-        : that.getDefinedVariables() != null) {
-      return false;
-    }
-    return getDefinedTypes() != null ? getDefinedTypes().equals(that.getDefinedTypes())
-        : that.getDefinedTypes() == null;
-  }
 }

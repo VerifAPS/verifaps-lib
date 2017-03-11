@@ -31,7 +31,7 @@ public class FileChooserFactory {
    */
   private static final Map<FileType, String> typeIdentifiers;
 
-  /**
+  /*
    * Initialize the filters and typeIdentifiers maps.
    */
   static {

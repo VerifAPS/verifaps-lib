@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
  */
 public abstract class XmlExporter<F> implements Exporter<F> {
 
-  public static String NAMESPACE = "edu.kit.iti.formal.stvs.logic.io.xml";
+  public static final String NAMESPACE = "edu.kit.iti.formal.stvs.logic.io.xml";
 
   /**
    * Exports an Object as xml.
@@ -48,7 +48,7 @@ public abstract class XmlExporter<F> implements Exporter<F> {
       transformer.transform(new DOMSource(xmlNode), new StreamResult(writer));
       String xmlString = writer.toString();
       ByteArrayOutputStream stream = new ByteArrayOutputStream();
-      stream.write(xmlString.getBytes());
+      stream.write(xmlString.getBytes("utf-8"));
       return stream;
     } catch (TransformerException | IOException e) {
       throw new ExportException(e);

@@ -122,7 +122,7 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
       int currentDuration = Integer.parseInt(row.getDuration().getValue());
       concreteSpec.getDurations().add(new ConcreteDuration(currentCycle, currentDuration));
       for (int j = 0; j < row.getCycle().size(); j++) {
-        concreteSpec.getRows().add(createSpecificationRowFoCycle(ioVariables, row, j));
+        concreteSpec.getRows().add(createSpecificationRowForCycle(ioVariables, row, j));
       }
       currentCycle += currentDuration;
     }
@@ -140,19 +140,19 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
    * @return Specification row for one cycle
    * @throws ImportException Mismatch between size of {@code row} and size of {@code ioVariables}
    */
-  private SpecificationRow<ConcreteCell> createSpecificationRowFoCycle(
+  private SpecificationRow<ConcreteCell> createSpecificationRowForCycle(
       List<ValidIoVariable> ioVariables, Rows.Row row, int cycleNum) throws ImportException {
     Map<String, ConcreteCell> cellsMap = new HashMap<>();
     Rows.Row.Cycle cycle = row.getCycle().get(cycleNum);
+    if (cycle.getCell().size() != ioVariables.size()) {
+      throw new ImportException("Row too short: Do not have a cell for each IOVariable");
+    }
     for (int k = 0; k < ioVariables.size(); k++) {
       String cell = cycle.getCell().get(k);
       Value val = ioVariables.get(k).getValidType().parseLiteral(cell)
           .orElseThrow(() -> new ImportException("Illegal value literal: " + cell));
       ConcreteCell concreteCell = new ConcreteCell(val);
       cellsMap.put(ioVariables.get(k).getName(), concreteCell);
-    }
-    if (cellsMap.size() != ioVariables.size()) {
-      throw new ImportException("Row too short: Do not have a cell for each IOVariable");
     }
     return SpecificationRow.createUnobservableRow(cellsMap);
   }

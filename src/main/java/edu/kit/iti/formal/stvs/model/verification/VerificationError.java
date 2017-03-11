@@ -1,14 +1,23 @@
 package edu.kit.iti.formal.stvs.model.verification;
 
+import edu.kit.iti.formal.stvs.view.VerificationResultVisitor;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Errors related to the verification process.
  *
  * @author Benjamin Alt
  */
-public class VerificationError extends Exception {
+public class VerificationError implements VerificationResult {
 
   /* Error messages for the different error reasons */
   private static final Map<Reason, String> errorMessages;
@@ -25,7 +34,8 @@ public class VerificationError extends Exception {
     errorMessages.put(Reason.UNKNOWN, "An unknown error occurred during verification.");
   }
 
-  private Reason reason;
+  private final Reason reason;
+  private File logFile;
 
   /**
    * Construct a new VerificationError for a specific reason.
@@ -34,34 +44,74 @@ public class VerificationError extends Exception {
    */
   public VerificationError(Reason reason) {
     this.reason = reason;
+    this.logFile = null;
+  }
+
+  /**
+   * Construct a new VerificationError for a specific reason with a given log file.
+   * 
+   * @param reason The reason for the VerificationError
+   * @param logFile The log file
+   */
+  public VerificationError(Reason reason, File logFile) {
+    this(reason);
+    this.logFile = logFile;
   }
 
   /**
    * Construct a new VerificationError from an Exception (which was thrown while launching/managing
    * the verification. These will typically not come from the verification engine itself).
    *
-   * @param e The exception to construct a VerificationError from
+   * @param ex The exception to construct a VerificationError from
    */
-  public VerificationError(Exception e) {
+  public VerificationError(Exception ex) {
     this.reason = Reason.EXCEPTION;
-    this.setStackTrace(e.getStackTrace());
-    errorMessages.put(Reason.EXCEPTION, e.getMessage());
+    try {
+      logFile = File.createTempFile("verification-exception", "");
+      PrintWriter writer = new PrintWriter(
+          new OutputStreamWriter(new FileOutputStream(logFile), StandardCharsets.UTF_8), true);
+      ex.printStackTrace(writer);
+    } catch (IOException exception) {
+      // Do nothing if writing the exception to the log throws an exception
+      logFile = null;
+    }
+    errorMessages.put(Reason.EXCEPTION, ex.getMessage());
   }
 
   /**
-   * Get the reason for this VerificationError.
+   * Construct a new VerificationError from an Exception with a given log file.
    *
-   * @return The reason for this VerificationError
+   * @param ex The exception to construct a VerificationError from
+   * @param logFile The log file
    */
-  public Reason getReason() {
-    return reason;
+  public VerificationError(Exception ex, File logFile) {
+    this.reason = Reason.EXCEPTION;
+    this.logFile = logFile;
+    errorMessages.put(Reason.EXCEPTION, ex.getMessage());
   }
 
-  @Override
+  /**
+   * Get an error message describing the error.
+   * 
+   * @return An error message describing the error
+   */
   public String getMessage() {
     return errorMessages.get(reason);
   }
 
+  @Override
+  public void accept(VerificationResultVisitor visitor) {
+    visitor.visitVerificationError(this);
+  }
+
+  @Override
+  public Optional<File> getLogFile() {
+    return Optional.ofNullable(logFile);
+  }
+
+  /**
+   * Reasons why a {@link VerificationError} may occur.
+   */
   public enum Reason {
     VERIFICATION_LAUNCH_ERROR, NUXMV_NOT_FOUND, PROCESS_ABORTED, TIMEOUT, ERROR, EXCEPTION, UNKNOWN
   }

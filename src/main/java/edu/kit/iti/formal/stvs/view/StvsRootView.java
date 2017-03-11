@@ -5,7 +5,7 @@ import edu.kit.iti.formal.stvs.view.spec.SpecificationsPane;
 import javafx.scene.control.SplitPane;
 
 /**
- * Created by csicar on 09.01.17.
+ * This view holds the editor and the specifications pane.
  *
  * @author Carsten Csiky
  */
@@ -13,6 +13,12 @@ public class StvsRootView extends SplitPane {
   private EditorPane editor;
   private SpecificationsPane specifications;
 
+  /**
+   * This creates an instance that holds an editor and the specifications pane.
+   *
+   * @param editor Editor to display
+   * @param specifications Pane to display
+   */
   public StvsRootView(EditorPane editor, SpecificationsPane specifications) {
     this.editor = editor;
     this.specifications = specifications;

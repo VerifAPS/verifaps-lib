@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Created by Philipp on 05.02.2017.
+ * This class handles the conversion from a lis of {@link FreeVariable} to JSON and vice versa.
  *
  * @author Philipp
  */
@@ -26,14 +26,29 @@ public class Json {
     public String defaultval;
   }
 
+  /**
+   * Generates JSON from variables.
+   * @param freeVariables variables to convert
+   * @return Stringified JSON version of variables
+   */
   public static String stringFromRealFreeVariables(List<FreeVariable> freeVariables) {
     return GSON.toJson(fromRealFreeVariables(freeVariables), FreeVarSelection.class);
   }
 
+  /**
+   * Generates variables from JSON.
+   * @param input Stringified JSON version of variables
+   * @return restored variables
+   */
   public static List<FreeVariable> stringToRealFreeVariables(String input) {
     return toRealFreeVariables(GSON.fromJson(input, FreeVarSelection.class));
   }
 
+  /**
+   * Generates a stringifyable {@link FreeVarSelection} from a list of {@link FreeVariable}.
+   * @param freeVariables variables to convert
+   * @return converted selection
+   */
   public static FreeVarSelection fromRealFreeVariables(List<FreeVariable> freeVariables) {
     List<FreeVar> vars = freeVariables.stream().map(freeVariable -> {
       FreeVar var = new FreeVar();
@@ -47,8 +62,13 @@ public class Json {
     return selection;
   }
 
-  public static List<FreeVariable> toRealFreeVariables(FreeVarSelection selection)
-      throws IllegalArgumentException {
+  /**
+   * Generates a list of {@link FreeVariable} from the stringifyable class {@link FreeVarSelection}.
+   *
+   * @param selection stringifyable selection
+   * @return list of variables
+   */
+  public static List<FreeVariable> toRealFreeVariables(FreeVarSelection selection) {
     return selection.selected.stream()
         .map(freeVar -> new FreeVariable(freeVar.name, freeVar.type, freeVar.defaultval))
         .collect(Collectors.toList());

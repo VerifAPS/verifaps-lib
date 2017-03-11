@@ -30,6 +30,8 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TextInputDialog;
 
 /**
+ * Controller for {@link SpecificationsPane}. The tab logic is handled here.
+ *
  * @author Carsten Csiky
  */
 public class SpecificationsPaneController implements Controller {
@@ -37,13 +39,22 @@ public class SpecificationsPaneController implements Controller {
   private final GlobalConfig globalConfig;
   private ObservableList<HybridSpecification> hybridSpecifications;
   private SpecificationsPane view;
-  private ContextMenu contextMenu;
   private ObjectProperty<VerificationState> state;
   private ObjectProperty<List<Type>> typeContext;
   private ObjectProperty<List<CodeIoVariable>> ioVariables;
   private final Map<Tab, SpecificationController> controllers;
   private final VerificationScenario scenario;
 
+  /**
+   * Creates an instance of this controller.
+   *
+   * @param hybridSpecifications list of the specifications t display
+   * @param state the state of the verification
+   * @param typeContext  available types in code
+   * @param ioVariables  available variables in code
+   * @param globalConfig Global config object
+   * @param scenario scenario that represents what the verification needs
+   */
   public SpecificationsPaneController(ObservableList<HybridSpecification> hybridSpecifications,
       ObjectProperty<VerificationState> state, ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> ioVariables, GlobalConfig globalConfig,
@@ -106,7 +117,7 @@ public class SpecificationsPaneController implements Controller {
   }
 
   private SpecificationController addTab(HybridSpecification hybridSpecification, int index) {
-    SpecificationController controller =
+    final SpecificationController controller =
         new SpecificationController(typeContext, ioVariables, hybridSpecification, this.state,
             Bindings.isEmpty(scenario.getCode().syntaxErrorsProperty()).not(), globalConfig);
     Tab tab = new Tab();
@@ -127,6 +138,10 @@ public class SpecificationsPaneController implements Controller {
     return controller;
   }
 
+  public SpecificationController addTab(HybridSpecification hybridSpecification) {
+    return addTab(hybridSpecification, 0);
+  }
+
   private void onTabSetName(ActionEvent actionEvent) {
     Tab activeTab = view.getTabPane().getSelectionModel().getSelectedItem();
     ConstraintSpecification activeSpec = controllers.get(activeTab).getSpec();
@@ -134,7 +149,9 @@ public class SpecificationsPaneController implements Controller {
     textInputDialog.setHeaderText("Set Specification Name");
     textInputDialog.setTitle("Specification Name");
     textInputDialog.showAndWait();
-    activeSpec.setName(textInputDialog.getResult());
+    if (textInputDialog.getResult() != null) {
+      activeSpec.setName(textInputDialog.getResult());
+    }
   }
 
   private ContextMenu createTabContextMenu() {
@@ -143,10 +160,6 @@ public class SpecificationsPaneController implements Controller {
     setNameItem.setOnAction(this::onTabSetName);
     contextMenu.getItems().add(setNameItem);
     return contextMenu;
-  }
-
-  public SpecificationController addTab(HybridSpecification hybridSpecification) {
-    return addTab(hybridSpecification, 0);
   }
 
 

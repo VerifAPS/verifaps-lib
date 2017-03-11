@@ -1,31 +1,31 @@
 package edu.kit.iti.formal.stvs.util;
 
-import javafx.application.Platform;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javafx.application.Platform;
+
 /**
- * FIXME: write docs
- * Created by leonk on 08.02.2017.
+ * A Thread that executes an {@link AsyncRunner} and calls a {@link AsyncTaskCompletedHandler} after
+ * completion. The handler is always called within the JavaFX main thread.
  *
  * @author Leon Kaucher
  */
-public class JavaFxAsyncProcessTask<T> extends Thread {
+public class JavaFxAsyncTask<T> extends Thread {
   private final AsyncRunner<T> runner;
   private final AsyncTaskCompletedHandler<T> resultHandler;
   private final Timer processTerminatorTask;
 
   /**
-   * <p>
    * Constructor for an asynchronous task.
-   * </p>
    *
+   * @param timeout time before the runner will be terminated
    * @param runner The portion of action to be run asynchronously (a functional interface).
-   * @param resultHandler The portion of the action to be run synchronously (in javafx's EDT)
-   *                      with any other AsyncTasks.
+   * @param resultHandler The portion of the action to be run synchronously (in javafx's EDT) with
+   *        any other AsyncTasks.
    */
-  public JavaFxAsyncProcessTask(int timeout, AsyncRunner<T> runner, AsyncTaskCompletedHandler<T> resultHandler) {
+  public JavaFxAsyncTask(int timeout, AsyncRunner<T> runner,
+                         AsyncTaskCompletedHandler<T> resultHandler) {
     super();
     setDaemon(true);
     this.runner = runner;
@@ -40,13 +40,13 @@ public class JavaFxAsyncProcessTask<T> extends Thread {
 
   }
 
+  /**
+   * Interrupts this thread and terminates the process that the runner is depending on.
+   */
   public void terminate() {
     processTerminatorTask.cancel();
     this.interrupt();
-    Process runningProcess = runner.getProcess();
-    if (runningProcess != null && runningProcess.isAlive()) {
-      runningProcess.destroy();
-    }
+    runner.terminate();
   }
 
   @Override

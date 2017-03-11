@@ -2,9 +2,13 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import de.tudresden.inf.lat.jsexp.Sexp;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Represents sets of constraints and definitions.
@@ -16,8 +20,8 @@ public class SmtModel implements SExpression {
   private final List<SExpression> variableDefinitions;
 
   /**
-   * Creates an instance with preset definitions/constraints.
-   * both lists should be modifiable
+   * Creates an instance with preset definitions/constraints. both lists should be modifiable
+   * 
    * @param globalConstraints list of global constraints
    * @param variableDefinitions list of variable definitions
    */
@@ -55,8 +59,8 @@ public class SmtModel implements SExpression {
   public Sexp toSexpr() {
 
     SList equivalentSList = new SList().addAll(getVariableDefinitions());
-    getGlobalConstraints().forEach((constraint) -> equivalentSList.addAll(new SList("assert",
-        constraint)));
+    getGlobalConstraints()
+        .forEach((constraint) -> equivalentSList.addAll(new SList("assert", constraint)));
     return equivalentSList.toSexpr();
   }
 

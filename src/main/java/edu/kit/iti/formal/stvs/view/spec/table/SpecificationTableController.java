@@ -45,22 +45,34 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.TransferMode;
 
 /**
- * Created by Philipp on 01.02.2017.
+ * The controller for the {@link SpecificationTableView}. Orchestrates complex user interactions on
+ * the view (such as dragging and dropping of rows, selecting columns and cells etc.) and trigger
+ * updates on the model (the underlying {@link HybridSpecification}).
  *
  * @author Philipp
  */
 public class SpecificationTableController implements Controller {
 
+  private static final DataFormat SERIALIZED_MIME_TYPE =
+      new DataFormat("application/x-java-serialized-object");
   private final SpecificationTableView view;
   private final TableView<HybridRow> tableView;
   private final HybridSpecification hybridSpec;
   private final ObjectProperty<List<Type>> typeContext;
   private final ObjectProperty<List<CodeIoVariable>> codeIoVariables;
   private final ConstraintSpecificationValidator validator;
-
   private final TableColumn<HybridRow, String> durations;
   private final GlobalConfig config;
 
+  /**
+   * Create a new SpecificationTableController.
+   *
+   * @param config A reference to the current {@link GlobalConfig}
+   * @param typeContext A list of the currently defined types
+   * @param codeIoVariables A list of the {@link CodeIoVariable}s defined in the code
+   * @param validVariables A list of the currently defined {@link ValidFreeVariable}s
+   * @param hybridSpecification The {@link HybridSpecification} to display
+   */
   public SpecificationTableController(GlobalConfig config, ObjectProperty<List<Type>> typeContext,
       ObjectProperty<List<CodeIoVariable>> codeIoVariables,
       ReadOnlyObjectProperty<List<ValidFreeVariable>> validVariables,
@@ -95,7 +107,7 @@ public class SpecificationTableController implements Controller {
     validator.problemsProperty().addListener((Observable o) -> onProblemsChange());
     validator.recalculateSpecProblems();
 
-    hybridSpec.getSelection().setOnCellClickListener(this::focusCell);
+    hybridSpec.getSelection().setOnTimingDiagramSelectionClickListener(this::focusCell);
     hybridSpec.getSelection().columnProperty().addListener(this::onColumnSelectionChanged);
 
     tableView.setItems(hybridSpec.getHybridRows());
@@ -129,8 +141,7 @@ public class SpecificationTableController implements Controller {
 
   private void onProblemsChange() {
     List<ColumnProblem> columnProblems = validator.problemsProperty().get().stream()
-        .filter(problem -> problem instanceof ColumnProblem)
-        .map(problem -> (ColumnProblem) problem)
+        .filter(problem -> problem instanceof ColumnProblem).map(problem -> (ColumnProblem) problem)
         .collect(Collectors.toList());
     for (TableColumn<HybridRow, ?> column : tableView.getColumns()) {
       if (column.getUserData() == null) {
@@ -158,7 +169,7 @@ public class SpecificationTableController implements Controller {
     MenuItem comment = new MenuItem("Comment ...");
     comment.setAccelerator(KeyCombination.keyCombination("Ctrl+k"));
     comment.setOnAction(event -> {
-      new CommentPopupManager(hybridSpec, hybridSpec.isEditable(), config);
+      new CommentPopupManager(hybridSpec, hybridSpec.isEditable());
     });
     return new ContextMenu(comment);
   }
@@ -178,8 +189,8 @@ public class SpecificationTableController implements Controller {
   private ContextMenu createContextMenu() {
     MenuItem insertRow = new MenuItem("Insert Row");
     MenuItem deleteRow = new MenuItem("Delete Row");
-    MenuItem addNewColumn = new MenuItem("New Column...");
     MenuItem comment = new MenuItem("Comment ...");
+
     insertRow.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
     insertRow.setOnAction(event -> {
       int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
@@ -191,13 +202,17 @@ public class SpecificationTableController implements Controller {
       toRemove.addAll(tableView.getSelectionModel().getSelectedItems());
       removeByReference(hybridSpec.getHybridRows(), toRemove);
     });
+    MenuItem addNewColumn = new MenuItem("New Column...");
     addNewColumn.setOnAction(
         event -> new IoVariableChooserDialog(codeIoVariables, hybridSpec.getColumnHeaders())
             .showAndWait().ifPresent(this::addNewColumn));
     comment.setOnAction(event -> {
       int index = tableView.getSelectionModel().getSelectedIndex();
+      if (index < 0) {
+        return;
+      }
       CommentPopupManager popupController =
-          new CommentPopupManager(hybridSpec.getRows().get(index), hybridSpec.isEditable(), config);
+          new CommentPopupManager(hybridSpec.getRows().get(index), hybridSpec.isEditable());
     });
     comment.setAccelerator(KeyCodeCombination.keyCombination("Ctrl+k"));
     insertRow.disableProperty().bind(Bindings.not(tableView.editableProperty()));
@@ -223,13 +238,17 @@ public class SpecificationTableController implements Controller {
     commentColumn.setOnAction(event -> {
       String specIoVariableName = (String) column.getUserData();
       SpecIoVariable commentable = hybridSpec.getColumnHeaderByName(specIoVariableName);
-      new CommentPopupManager(commentable, tableView.isEditable(), config);
+      new CommentPopupManager(commentable, tableView.isEditable());
     });
     changeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
     removeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
     return new ContextMenu(changeColumn, removeColumn, commentColumn);
   }
 
+  /**
+   * Adds a new row at the specified index.
+   * @param index Index where the row should be added
+   */
   public void addEmptyRow(int index) {
     Map<String, ConstraintCell> wildcardCells = new HashMap<>();
     hybridSpec.getColumnHeaders().forEach(
@@ -238,6 +257,10 @@ public class SpecificationTableController implements Controller {
     hybridSpec.getHybridRows().add(index, new HybridRow(wildcardRow, new ConstraintDuration("1")));
   }
 
+  /**
+   * Adds a new column for the specified variable.
+   * @param specIoVariable variable for which the column should be added
+   */
   public void addNewColumn(SpecIoVariable specIoVariable) {
     // Add column to model:
     if (hybridSpec.getHybridRows().isEmpty()) {
@@ -284,11 +307,6 @@ public class SpecificationTableController implements Controller {
     return column;
   }
 
-  private static final DataFormat SERIALIZED_MIME_TYPE =
-      new DataFormat("application/x-java-serialized-object");
-
-  // from: http://stackoverflow.com/questions/28603224/sort-tableview-with-drag-and-drop-rows
-  // TODO: Have fun? Implement dragging multiple rows, from one program to another, etc.
   private TableRow<HybridRow> rowFactory(TableView<HybridRow> tableView) {
     TableRow<HybridRow> row = new TableRow<HybridRow>() {
       {
