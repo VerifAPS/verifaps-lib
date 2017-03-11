@@ -81,8 +81,7 @@ public class SpecificationController implements Controller {
         codeIoVariables, variableCollectionController.getValidator().validFreeVariablesProperty(),
         hybridSpecification);
     this.specificationInvalid = new SimpleBooleanProperty(true);
-    specificationInvalid.bind(
-        variableCollectionController.getValidator().validProperty().not()
+    specificationInvalid.bind(variableCollectionController.getValidator().validProperty().not()
         .or(tableController.getValidator().validProperty().not()).or(codeInvalid));
     this.specificationConcretizable = new SimpleBooleanProperty(true);
     specificationConcretizable

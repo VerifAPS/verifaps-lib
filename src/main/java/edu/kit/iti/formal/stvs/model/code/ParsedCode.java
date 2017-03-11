@@ -52,10 +52,8 @@ public class ParsedCode {
 
     @Override
     public Void visit(EnumerationTypeDeclaration enumType) {
-      if (!enumType.getAllowedValues().isEmpty()) {
-        TypeEnum type = new TypeEnum(enumType.getTypeName(), enumType.getAllowedValues());
-        this.definedTypes.add(type);
-      }
+      TypeEnum type = new TypeEnum(enumType.getTypeName(), enumType.getAllowedValues());
+      this.definedTypes.add(type);
       return null;
     }
 
