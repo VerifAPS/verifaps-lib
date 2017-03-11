@@ -91,7 +91,6 @@ public class SpecificationTableCell extends TextFieldTableCell<HybridRow, String
   }
 
   private HybridCell<?> getCellModel() {
-    // Null hell
     if (getTableRow() == null) {
       return null;
     }
