@@ -163,10 +163,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
 
   private File writeLogFile(String processOutput) throws IOException {
     File logFile = File.createTempFile("log-verification-", ".xml");
-    boolean successful = getetaOutputFile.delete();
-    if (!successful) {
-      throw new IOException("The GeTeTa output file could not be removed.");
-    }
+    getetaOutputFile.deleteOnExit();
     PrintWriter writer = new PrintWriter(
         new OutputStreamWriter(new FileOutputStream(logFile), StandardCharsets.UTF_8), true);
     writer.println(processOutput);
