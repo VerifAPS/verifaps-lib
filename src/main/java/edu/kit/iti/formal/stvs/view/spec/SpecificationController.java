@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec;
 
+import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer;
 import edu.kit.iti.formal.stvs.logic.specification.smtlib.SmtConcretizer;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.Selection;
@@ -29,7 +30,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 
 /**
@@ -221,7 +221,7 @@ public class SpecificationController implements Controller {
 
     final ValidSpecification specToConcretize;
     final List<ValidFreeVariable> freeVariables;
-    final SmtConcretizer concretizer;
+    final SpecificationConcretizer concretizer;
 
     private ConcretizationRunner(ValidSpecification specToConcretize,
         List<ValidFreeVariable> freeVariables) {
@@ -236,8 +236,8 @@ public class SpecificationController implements Controller {
     }
 
     @Override
-    public Process getProcess() {
-      return concretizer.getProcess();
+    public void terminate() {
+      concretizer.terminate();
     }
   }
 }

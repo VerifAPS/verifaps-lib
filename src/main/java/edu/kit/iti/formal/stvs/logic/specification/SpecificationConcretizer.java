@@ -28,6 +28,10 @@ public interface SpecificationConcretizer {
       ValidSpecification validSpecification,
       List<ValidFreeVariable> freeVariables)
       throws ConcretizationException;
-  
+
+  /**
+   * Terminates the calculation of the concrete specification.
+   */
+  void terminate();
 }
 

@@ -29,10 +29,6 @@ public class SmtConcretizer implements SpecificationConcretizer {
     this.z3Solver = new Z3Solver(config);
   }
 
-  public Process getProcess() {
-    return z3Solver.getProcess();
-  }
-
   /**
    * Delegates the solving task to the Z3-Process and registers handlers for the result and
    * exceptions.
@@ -47,5 +43,16 @@ public class SmtConcretizer implements SpecificationConcretizer {
         new SmtEncoder(config.getMaxLineRollout(), validSpecification, freeVariables);
     return z3Solver.concretizeSmtModel(encoder.getConstraint(),
         validSpecification.getColumnHeaders());
+  }
+
+  /**
+   * Terminates the calculation of the concrete specification.
+   */
+  @Override
+  public void terminate() {
+    Process runningProcess = z3Solver.getProcess();
+    if (runningProcess != null && runningProcess.isAlive()) {
+      runningProcess.destroy();
+    }
   }
 }

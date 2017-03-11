@@ -81,7 +81,7 @@ public class SmtConcretizerTest {
     concretizer
         .calculateConcreteSpecification(spec, freeVariables);
     long start = stopwatch.runtime(TimeUnit.MILLISECONDS);
-    concretizer.getProcess().destroy();
+    concretizer.terminate();
     long end = stopwatch.runtime(TimeUnit.MILLISECONDS);
     final long maxTime = 5;
     assertTrue("Except time to terminate to be smaller than "+maxTime+ ", but was"+(end-start),

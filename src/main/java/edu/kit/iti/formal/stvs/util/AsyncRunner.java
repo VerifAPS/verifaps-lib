@@ -13,6 +13,6 @@ public interface AsyncRunner<T> {
    */
   T run() throws Exception;
 
-  Process getProcess();
+  void terminate();
 
 }
