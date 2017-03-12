@@ -117,6 +117,10 @@ public class VerificationScenario {
     return verificationResult;
   }
 
+  public VerificationEngine getVerificationEngine() {
+    return verificationEngine;
+  }
+
   private class VerificationChangedListener implements ChangeListener<VerificationResult> {
     @Override
     public void changed(ObservableValue<? extends VerificationResult> observableValue,

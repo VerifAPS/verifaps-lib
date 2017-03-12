@@ -7,6 +7,7 @@ import edu.kit.iti.formal.stvs.model.verification.*;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javafx.scene.control.Alert;
 import org.apache.commons.io.FileUtils;
@@ -42,9 +43,11 @@ public class VerificationResultHandler implements VerificationResultVisitor {
         "A counterexample is available.", alertBody, logFileContents).showAndWait();
     StvsRootModel rootModel = controller.getRootModel();
     // Show read-only copy of spec with counterexample in a new tab
-    assert rootModel.getScenario().getActiveSpec() != null;
+    Optional<ConstraintSpecification> verifiedSpec = rootModel.getScenario()
+        .getVerificationEngine().getCurrentSpec();
+    assert verifiedSpec.isPresent();
     HybridSpecification readOnlySpec = new HybridSpecification(
-        new ConstraintSpecification(rootModel.getScenario().getActiveSpec()), false);
+        new ConstraintSpecification(verifiedSpec.get()), false);
     readOnlySpec.setCounterExample(result.getCounterexample());
     rootModel.getHybridSpecifications().add(readOnlySpec);
   }

@@ -78,7 +78,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   public void startVerification(VerificationScenario scenario, ConstraintSpecification spec)
       throws IOException, ExportException, ProcessCreationException {
 
-    currentSpec = spec;
+    currentSpec = new ConstraintSpecification(spec);
     // Write ConstraintSpecification and Code to temporary input files for GeTeTa
     File tempSpecFile = File.createTempFile("verification-spec", ".xml");
     File tempCodeFile = File.createTempFile("verification-code", ".st");
@@ -119,6 +119,11 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   @Override
   public VerificationResult getVerificationResult() {
     return verificationResult.get();
+  }
+
+  @Override
+  public Optional<ConstraintSpecification> getCurrentSpec() {
+    return Optional.ofNullable(currentSpec);
   }
 
   public NullableProperty<VerificationResult> verificationResultProperty() {
