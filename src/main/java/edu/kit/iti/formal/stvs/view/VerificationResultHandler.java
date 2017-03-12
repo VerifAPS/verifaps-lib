@@ -43,11 +43,14 @@ public class VerificationResultHandler implements VerificationResultVisitor {
         "A counterexample is available.", alertBody, logFileContents).showAndWait();
     StvsRootModel rootModel = controller.getRootModel();
     // Show read-only copy of spec with counterexample in a new tab
-    Optional<ConstraintSpecification> verifiedSpec = rootModel.getScenario()
-        .getVerificationEngine().getCurrentSpec();
-    assert verifiedSpec.isPresent();
+    ConstraintSpecification verifiedSpec = rootModel.getScenario()
+        .getVerificationEngine().getVerificationSpecification();
+    // It should be impossible to be null, since the visitor is only invoked when
+    // startVerification() on a VerificationEngine has been called. And then this value
+    // will never be null
+    assert verifiedSpec != null;
     HybridSpecification readOnlySpec = new HybridSpecification(
-        new ConstraintSpecification(verifiedSpec.get()), false);
+        new ConstraintSpecification(verifiedSpec), false);
     readOnlySpec.setCounterExample(result.getCounterexample());
     rootModel.getHybridSpecifications().add(readOnlySpec);
   }
