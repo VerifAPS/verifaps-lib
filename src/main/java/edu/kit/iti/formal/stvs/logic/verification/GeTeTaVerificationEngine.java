@@ -78,6 +78,11 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   public void startVerification(VerificationScenario scenario, ConstraintSpecification spec)
       throws IOException, ExportException, ProcessCreationException {
 
+    /*
+     * This will create a deep copy, so that modifying the original ConstraintSpecification between
+     * calling tartVerification() and getVerificationSpecification() will have no effect on the
+     * possibly newly opened counter example tab.
+     */
     currentSpec = new ConstraintSpecification(spec);
     // Write ConstraintSpecification and Code to temporary input files for GeTeTa
     File tempSpecFile = File.createTempFile("verification-spec", ".xml");
@@ -122,8 +127,8 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   }
 
   @Override
-  public Optional<ConstraintSpecification> getCurrentSpec() {
-    return Optional.ofNullable(currentSpec);
+  public ConstraintSpecification getVerificationSpecification() {
+    return currentSpec;
   }
 
   public NullableProperty<VerificationResult> verificationResultProperty() {

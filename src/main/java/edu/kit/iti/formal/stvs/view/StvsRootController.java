@@ -154,8 +154,9 @@ public class StvsRootController implements Controller {
     if (res == null) {
       AlertFactory.createAlert(Alert.AlertType.ERROR, "Verification Error",
           "The verification result is null.", "").showAndWait();
+    } else {
+      res.accept(verificationResultHandler);
     }
-    res.accept(verificationResultHandler);
   }
 
   /**

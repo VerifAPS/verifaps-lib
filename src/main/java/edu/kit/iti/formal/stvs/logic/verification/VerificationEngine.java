@@ -35,12 +35,14 @@ public interface VerificationEngine {
   VerificationResult getVerificationResult();
 
   /**
-   * Get the last specification for which a verification was triggered. This will return a deep
-   * copy: Modifying the original {@link ConstraintSpecification} between calling
-   * startVerification() and getCurrentSpec() will have no effect on the return value.
+   * Get the last specification for which a verification was triggered.
+   * This value is null before any calls of
+   * {@link #startVerification(VerificationScenario, ConstraintSpecification)}, but will never
+   * be null once that method is called once.
+   *
    * @return The last specification for which a verification was triggered
    */
-  Optional<ConstraintSpecification> getCurrentSpec();
+  ConstraintSpecification getVerificationSpecification();
 
   /**
    * Cancels a running verification.
