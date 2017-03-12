@@ -63,6 +63,8 @@ public class EditorPaneController implements Controller {
         .addListener((observable, oldValue, newValue) -> updateFontSize(newValue.intValue()));
     this.globalConfig.editorFontFamilyProperty()
         .addListener((observable, oldValue, newValue) -> updateFontFamily(newValue));
+    updateFontFamily(globalConfig.getEditorFontFamily());
+    updateFontSize(globalConfig.getEditorFontSize());
   }
 
   private void updateFontFamily(String fontFamily) {
