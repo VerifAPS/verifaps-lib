@@ -1,4 +1,4 @@
-![STVS Logo](src/main/resources/edu/kit/iti/formal/stvs/logo.svg)
+![STVS Logo](src/main/resources/edu/kit/iti/formal/stvs/logo.png)
 # Structured Text Verification Studio - STVS
 
 ![Application Screenshot](screenshot.png)
