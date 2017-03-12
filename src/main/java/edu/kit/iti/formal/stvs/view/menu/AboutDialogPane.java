@@ -1,8 +1,11 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
+import edu.kit.iti.formal.stvs.StvsApplication;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
 /**
@@ -30,8 +33,9 @@ public class AboutDialogPane extends DialogPane {
    */
   public AboutDialogPane() {
 
+    Image logo = new Image(StvsApplication.class.getResourceAsStream("logo.png"));
     this.content = new VBox(new Label("Structured Text Verification Studio - STVS"),
-        new Label("Version: 1.0.1"));
+        new Label("Version: 1.0.1"), new ImageView(logo));
     this.setContent(content);
     this.getButtonTypes().addAll(ButtonType.CLOSE);
     this.getContent().setId("AboutDialogPane");
