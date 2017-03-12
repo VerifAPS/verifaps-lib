@@ -3,7 +3,11 @@ package edu.kit.iti.formal.stvs.view;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
-import edu.kit.iti.formal.stvs.model.verification.*;
+import edu.kit.iti.formal.stvs.model.verification.Counterexample;
+import edu.kit.iti.formal.stvs.model.verification.VerificationError;
+import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
+import edu.kit.iti.formal.stvs.model.verification.VerificationResultVisitor;
+import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 
 import java.io.IOException;
@@ -24,6 +28,7 @@ public class VerificationResultHandler implements VerificationResultVisitor {
 
   /**
    * Creates an instance of this visitor.
+   *
    * @param controller root controller from which the rootModel is taken
    */
   public VerificationResultHandler(StvsRootController controller) {
@@ -33,8 +38,8 @@ public class VerificationResultHandler implements VerificationResultVisitor {
   }
 
   /**
-   * Visits a {@link Counterexample}.
-   * This displays the counterexample in a new tab.
+   * Visits a {@link Counterexample}. This displays the counterexample in a new tab.
+   *
    * @param result Counterexample to visit.
    */
   public void visitCounterexample(Counterexample result) {
@@ -56,8 +61,8 @@ public class VerificationResultHandler implements VerificationResultVisitor {
   }
 
   /**
-   * Visits a {@link VerificationError}.
-   * This displays an appropriate error dialog.
+   * Visits a {@link VerificationError}. This displays an appropriate error dialog.
+   *
    * @param result error to visit
    */
   public void visitVerificationError(VerificationError result) {
@@ -76,8 +81,8 @@ public class VerificationResultHandler implements VerificationResultVisitor {
   }
 
   /**
-   * Visits a {@link VerificationSuccess}.
-   * This displays an appropriate success dialog.
+   * Visits a {@link VerificationSuccess}. This displays an appropriate success dialog.
+   *
    * @param result success to visit
    */
   public void visitVerificationSuccess(VerificationSuccess result) {

@@ -144,6 +144,11 @@ public class StvsRootModel {
     ExporterFacade.exportSession(this, ExporterFacade.ExportFormat.XML, sessionFile);
   }
 
+  /**
+   * Adds a new {@link HybridSpecification} to the list accessible via
+   * {@link StvsRootModel#getHybridSpecifications()}.
+   * The new specification already includes columns for variables declared in the code.
+   */
   public void addNewHybridSpec() {
     HybridSpecification hybridSpec = new HybridSpecification(new FreeVariableList(), true);
     ParsedCode parsedCode = getScenario().getCode().getParsedCode();

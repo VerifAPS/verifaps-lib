@@ -188,7 +188,7 @@ public class ExpressionParser extends CellExpressionBaseVisitor<Expression> {
   }
 
   private static Integer getArrayIndex(TerminalNode node) {
-    int index = Integer.valueOf(node.getText());
+    int index = Integer.parseInt(node.getText());
     if (index > 0) {
       throw new UnsupportedExpressionRuntimeException("Positive Variable Index");
     }
