@@ -58,6 +58,7 @@ public class VerificationScenario {
    * @param spec The specification to be verified
    * @throws IOException Exception while IO interaction
    * @throws ExportException Exception while exporting
+   * @throws ProcessCreationException exception while creating process
    */
   public void verify(GlobalConfig config, ConstraintSpecification spec)
       throws IOException, ExportException, ProcessCreationException {
@@ -114,6 +115,10 @@ public class VerificationScenario {
 
   public NullableProperty<VerificationResult> verificationResultProperty() {
     return verificationResult;
+  }
+
+  public VerificationEngine getVerificationEngine() {
+    return verificationEngine;
   }
 
   private class VerificationChangedListener implements ChangeListener<VerificationResult> {

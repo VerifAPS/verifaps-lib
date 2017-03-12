@@ -175,7 +175,6 @@ public class EditorPaneController implements Controller {
   }
 
   private List<String> getHightlightingClass(Token token) {
-    // TODO: Add more colours (styles) to tokens
     switch (token.getType()) {
       case IEC61131Lexer.ELSEIF:
       case IEC61131Lexer.THEN:

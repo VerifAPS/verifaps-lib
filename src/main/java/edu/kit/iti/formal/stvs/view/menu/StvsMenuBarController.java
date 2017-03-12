@@ -76,31 +76,37 @@ public class StvsMenuBarController implements Controller {
     view.openRecentItems.clear();
     for (String filename : rootModel.get().getHistory().getFilenames()) {
       MenuItem newItem = new MenuItem(filename);
-      newItem.setOnAction((actionEvent -> {
-        try {
-          ImporterFacade.importFile(new File(filename), rootModel.get().getGlobalConfig(),
-              rootModel.get().getHistory(), (hybridSpecification) -> {
-                // handle hybridspecification
-                rootModel.get().getHybridSpecifications().add(hybridSpecification);
-              }, (rootModel) -> {
-                // handle rootModel
-                this.rootModel.setValue(rootModel);
-              }, (code -> {
-                // handle code
-                this.rootModel.get().getScenario().setCode(code);
-              }));
-          this.rootModel.get().getHistory().addFilename(filename);
-        } catch (IOException | ImportException e) {
-          AlertFactory.createAlert(Alert.AlertType.ERROR, "File Open Error",
-              "An error occurred " + "while opening a file.",
-              "The file " + filename + " could not be opened.", e.getMessage()).showAndWait();
-        }
-      }));
+      newItem.setOnAction((actionEvent -> doOpenFile(new File(filename))));
       view.openRecentItems.add(newItem);
     }
     view.openRecent.getItems().clear();
     view.openRecent.getItems().addAll(view.openRecentItems);
   }
+
+  private void doOpenFile(File file) {
+    try {
+      ImporterFacade.importFile(file, rootModel.get().getGlobalConfig(),
+          rootModel.get().getHistory(), (hybridSpecification) -> {
+            // handle hybridspecification
+            rootModel.get().getHybridSpecifications().add(hybridSpecification);
+          }, (rootModel) -> {
+            // handle rootModel
+            rootModel.setWorkingdir(file.getParentFile());
+            rootModel.setFilename(file.getName());
+            this.rootModel.setValue(rootModel);
+          }, (code -> {
+            // handle code
+            rootModel.get().getScenario().setCode(code);
+          }));
+      rootModel.get().getHistory().addFilename(file.getAbsolutePath());
+    } catch (IOException | ImportException ex) {
+      AlertFactory.createAlert(Alert.AlertType.ERROR, "File Open Error",
+          "An error occurred while opening a file.",
+          "The file " + file.getAbsolutePath() + " could not be opened.",
+          ex.getMessage()).showAndWait();
+    }
+  }
+
 
   private void saveSessionAs(ActionEvent actionEvent) {
     FileChooser fileChooser =
@@ -200,23 +206,7 @@ public class StvsMenuBarController implements Controller {
     if (chosenFile == null) {
       return;
     }
-    try {
-      ImporterFacade.importFile(chosenFile, rootModel.get().getGlobalConfig(),
-          rootModel.get().getHistory(), (hybridSpecification) -> {
-            // handle hybridspecification
-            rootModel.get().getHybridSpecifications().add(hybridSpecification);
-          }, (rootModel) -> {
-            // handle rootModel
-            rootModel.setWorkingdir(chosenFile.getParentFile());
-            rootModel.setFilename(chosenFile.getName());
-            this.rootModel.setValue(rootModel);
-          }, (code -> {
-            // handle code
-            this.rootModel.get().getScenario().setCode(code);
-          }));
-    } catch (IOException | ImportException e) {
-      AlertFactory.createAlert(e).showAndWait();
-    }
+    doOpenFile(chosenFile);
   }
 
 

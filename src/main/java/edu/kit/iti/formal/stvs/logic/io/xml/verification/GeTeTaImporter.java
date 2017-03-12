@@ -7,6 +7,7 @@ import edu.kit.iti.formal.exteta_1_0.report.ObjectFactory;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.VariableEscaper;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlImporter;
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
@@ -15,10 +16,7 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
 import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
-import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
-import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
-import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
-import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
+import edu.kit.iti.formal.stvs.model.table.*;
 import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess;
@@ -41,6 +39,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import javafx.collections.ObservableList;
 import org.w3c.dom.Node;
 
 /**
@@ -66,14 +65,17 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   private static final Pattern BOOL_VALUE_PATTERN = Pattern.compile("(TRUE)|(FALSE)");
 
   private final List<Type> typeContext;
+  private final ConstraintSpecification constraintSpecification;
 
   /**
    * Creates a new GeTeTaImporter.
    *
    * @param typeContext List of types available in the specification
+   * @param constraintSpec The constraintSpecification for which this is a counterexample
    */
-  public GeTeTaImporter(List<Type> typeContext) {
+  public GeTeTaImporter(List<Type> typeContext, ConstraintSpecification constraintSpec) {
     this.typeContext = typeContext;
+    this.constraintSpecification = constraintSpec;
   }
 
   /**
@@ -139,16 +141,22 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   private ConcreteSpecification parseCounterexample(Message message) throws ImportException {
     // Parse variables from counterexample
     Message.Log log = message.getLog();
-    // Don't know exact enum types yet --> Map from name to either "INT", "BOOLEAN", "ENUM"
-    // Don't know whether input or output yet
+
     Map<String, Type> varTypes = new HashMap<>();
-    List<String> varNames = getVarNamesFromLog(log);
+    List<String> varNames = new ArrayList<>();
+    Map<String, VariableCategory> varCategories = new HashMap<>();
+
+    for (SpecIoVariable specIoVariable : constraintSpecification.getColumnHeaders()) {
+      String name = specIoVariable.getName();
+      varNames.add(name);
+      varCategories.put(name, specIoVariable.getCategory());
+      varTypes.put(name, getType(specIoVariable));
+    }
 
     List<String> rowMap = message.getCounterexample().getRowMappings().getRowMap();
     // It does not matter which of the rowMaps to use, so always use the zeroeth
     List<Integer> rowNums = parseRowMap(rowMap.get(0));
-    Map<String, Value> currentValues = new HashMap<>();
-    Map<String, VariableCategory> varCategories = new HashMap<>();
+    Map<String, Value> currentValues = makeInitialValues(varTypes);
 
     // Parse concrete rows
     List<Counterexample.Step> steps = message.getCounterexample().getTrace().getStep();
@@ -160,14 +168,29 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
 
     ConcreteSpecification concreteSpec = new ConcreteSpecification(true);
     for (String varName : varNames) {
-      if (currentValues.containsKey(varName)) {
-        concreteSpec.getColumnHeaders()
-            .add(new ValidIoVariable(varCategories.get(varName), varName, varTypes.get(varName)));
-      }
+      concreteSpec.getColumnHeaders().add(new ValidIoVariable(varCategories.get(varName), varName,
+          varTypes.get(varName)));
     }
     concreteSpec.getRows().addAll(concreteRows);
     concreteSpec.getDurations().addAll(concreteDurations);
     return concreteSpec;
+  }
+
+  private Map<String,Value> makeInitialValues(Map<String, Type> variableTypes) {
+    Map<String, Value> initialValues = new HashMap<>();
+    for (String varName : variableTypes.keySet()) {
+      initialValues.put(varName, variableTypes.get(varName).generateDefaultValue());
+    }
+    return initialValues;
+  }
+
+  private Type getType(SpecIoVariable variable) throws ImportException {
+    for (Type type : typeContext) {
+      if (type.getTypeName().equals(variable.getType())) {
+        return type;
+      }
+    }
+    throw new ImportException("Cannot find type for variable " + variable.getName());
   }
 
   /**
@@ -297,39 +320,9 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
       Map<String, Value> currentValues) {
     SpecificationRow<ConcreteCell> row = SpecificationRow.createUnobservableRow(new HashMap<>());
     for (String varName : varNames) {
-      if (currentValues.containsKey(varName)) {
-        row.getCells().put(varName, new ConcreteCell(currentValues.get(varName)));
-      }
+      row.getCells().put(varName, new ConcreteCell(currentValues.get(varName)));
     }
     return row;
-  }
-
-  /**
-   * Parses the output log of the GeTeTa verification engine and returns all found variable names.
-   *
-   * @param log GeTeTa output log
-   * @return list of variable names
-   */
-  private List<String> getVarNamesFromLog(Message.Log log) {
-    List<Message.Log.Entry> entries = log.getEntry();
-    List<String> varNames = new ArrayList<>();
-
-    for (int i = 0; i < entries.size(); i++) {
-      Message.Log.Entry entry = entries.get(i);
-      if (VARIABLES_FOUND_PATTERN.matcher(entry.getValue()).matches()) {
-        Message.Log.Entry nextEntry = entries.get(++i);
-        String entryString = nextEntry.getValue();
-        while (VARIABLE_DECL_PATTERN.matcher(entryString).matches()) {
-          entryString = entryString.replaceAll("\\s+", "");
-          int colonIndex = entryString.indexOf(":");
-          String varName = entryString.substring(0, colonIndex);
-          varNames.add(VariableEscaper.unescapeIdentifier(varName));
-          entryString = entries.get(++i).getValue();
-        }
-        break;
-      }
-    }
-    return varNames;
   }
 
   /**

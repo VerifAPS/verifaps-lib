@@ -93,6 +93,7 @@ public class FreeVariable implements Variable {
 
   /**
    * Assigns a new value to the free variable.
+   * @param defaultValue value to set to
    */
   public void setDefaultValue(String defaultValue) {
     this.defaultValue.set(defaultValue);

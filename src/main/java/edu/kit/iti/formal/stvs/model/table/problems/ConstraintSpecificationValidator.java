@@ -156,7 +156,7 @@ public class ConstraintSpecificationValidator {
     } else {
       validSpecification.set(null);
     }
-    valid.set(minorSpecProblems.isEmpty());
+    valid.set(specProblems.isEmpty());
   }
 
   /**

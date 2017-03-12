@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
 
@@ -26,8 +27,8 @@ public class GeTeTaExporterTest {
         .ImportFormat.XML);
     File tempFile = File.createTempFile("test", "");
     ExporterFacade.exportSpec(constraintSpec, ExporterFacade.ExportFormat.GETETA, tempFile);
-    String expectedString = TestUtils.readFromFile(StvsApplication.class.getResource
-        ("testSets/valid_1/geteta_input_valid_1.xml").toURI().getPath());
+    String expectedString = TestUtils.readFromFile(Paths.get(StvsApplication.class.getResource
+        ("testSets/valid_1/geteta_input_valid_1.xml").toURI()).toString());
     String actualString = TestUtils.readFromFile(tempFile.getAbsolutePath());
     assertEquals(TestUtils.removeWhitespace(expectedString), TestUtils.removeWhitespace(actualString));
   }

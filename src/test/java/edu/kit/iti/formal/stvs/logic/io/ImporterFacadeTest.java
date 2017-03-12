@@ -130,9 +130,12 @@ public class ImporterFacadeTest {
   public void importVerificationResult() throws Exception {
     List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL, TypeFactory.enumOfName
         ("enumD", "literalOne", "literalTwo"));
+    ConstraintSpecification constraintSpec = ImporterFacade.importConstraintSpec(StvsApplication
+            .class.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml"),
+        ImporterFacade.ImportFormat.XML);
     VerificationResult result = ImporterFacade.importVerificationResult(StvsApplication.class
         .getResourceAsStream("testSets/valid_1/geteta_report_valid_1.xml"), ImporterFacade
-        .ImportFormat.GETETA, typeContext);
+        .ImportFormat.GETETA, typeContext, constraintSpec);
     assertThat(result, instanceOf(VerificationSuccess.class));
   }
 
@@ -140,9 +143,12 @@ public class ImporterFacadeTest {
   public void importVerificationResultBadFormat() throws Exception {
     List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL, TypeFactory.enumOfName
         ("enumD", "literalOne", "literalTwo"));
+    ConstraintSpecification constraintSpec = ImporterFacade.importConstraintSpec(StvsApplication
+            .class.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml"),
+        ImporterFacade.ImportFormat.XML);
     VerificationResult result = ImporterFacade.importVerificationResult(StvsApplication.class
         .getResourceAsStream("testSets/valid_1/geteta_report_valid_1.xml"), ImporterFacade
-        .ImportFormat.XML, typeContext);
+        .ImportFormat.XML, typeContext, constraintSpec);
   }
 
   @Test

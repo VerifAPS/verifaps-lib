@@ -29,6 +29,7 @@ public class ProcessMonitor extends Thread {
    * Starts the detection for the given process.
    *
    * @param process the process for which one would like to detect when it is finished
+   * @param timeout Timeout after which the process is killed automatically
    */
   public ProcessMonitor(Process process, int timeout) {
     try {

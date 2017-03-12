@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.model.verification;
 
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
-import edu.kit.iti.formal.stvs.view.VerificationResultVisitor;
 
 import java.io.File;
 import java.util.Optional;
