@@ -16,7 +16,11 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.expressions.Value;
 import edu.kit.iti.formal.stvs.model.expressions.ValueBool;
 import edu.kit.iti.formal.stvs.model.expressions.ValueInt;
-import edu.kit.iti.formal.stvs.model.table.*;
+import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
+import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
+import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess;
@@ -39,7 +43,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import javafx.collections.ObservableList;
 import org.w3c.dom.Node;
 
 /**
@@ -140,7 +143,6 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
    */
   private ConcreteSpecification parseCounterexample(Message message) throws ImportException {
     // Parse variables from counterexample
-    Message.Log log = message.getLog();
 
     Map<String, Type> varTypes = new HashMap<>();
     List<String> varNames = new ArrayList<>();
@@ -168,18 +170,18 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
 
     ConcreteSpecification concreteSpec = new ConcreteSpecification(true);
     for (String varName : varNames) {
-      concreteSpec.getColumnHeaders().add(new ValidIoVariable(varCategories.get(varName), varName,
-          varTypes.get(varName)));
+      concreteSpec.getColumnHeaders()
+          .add(new ValidIoVariable(varCategories.get(varName), varName, varTypes.get(varName)));
     }
     concreteSpec.getRows().addAll(concreteRows);
     concreteSpec.getDurations().addAll(concreteDurations);
     return concreteSpec;
   }
 
-  private Map<String,Value> makeInitialValues(Map<String, Type> variableTypes) {
+  private Map<String, Value> makeInitialValues(Map<String, Type> variableTypes) {
     Map<String, Value> initialValues = new HashMap<>();
-    for (String varName : variableTypes.keySet()) {
-      initialValues.put(varName, variableTypes.get(varName).generateDefaultValue());
+    for (Map.Entry<String, Type> typeEntry : variableTypes.entrySet()) {
+      initialValues.put(typeEntry.getKey(), typeEntry.getValue().generateDefaultValue());
     }
     return initialValues;
   }
