@@ -103,7 +103,6 @@ public class SpecificationController implements Controller {
     view.getStartButton().setOnAction(this::onVerificationButtonClicked);
     view.getStartButton().disableProperty().bind(specificationInvalid);
     view.getStartConcretizerButton().disableProperty().bind(specificationConcretizable.not());
-
     view.getStartConcretizerButton().setOnAction(this::startConcretizer);
 
     hybridSpecification.concreteInstanceProperty()

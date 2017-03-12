@@ -59,6 +59,7 @@ public class SpecificationTable<H extends Named, C, D> {
    * See also
    * <a href="http://stackoverflow.com/questions/31687642/callback-and-extractors-for-javafx-observablelist">
    *   this post</a> on why and how extractors are used.
+   * @param name name of this specification
    * @param columnHeaderExtractor The extractor for the column headers
    * @param durationExtractor The extractor for the duration headers
    */

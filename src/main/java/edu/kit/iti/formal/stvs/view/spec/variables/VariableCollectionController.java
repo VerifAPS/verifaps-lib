@@ -83,7 +83,7 @@ public class VariableCollectionController implements Controller {
         .setCellValueFactory(data -> data.getValue().defaultValueProperty());
 
     view.getNameTableColumn().setCellFactory(this::cellFactory);
-    view.getTypeTableColumn().setCellFactory(this::cellFactory); // TODO: Make this combo box again!
+    view.getTypeTableColumn().setCellFactory(this::cellFactory);
     view.getDefaultValueTableColumn().setCellFactory(this::cellFactory);
 
     view.getFreeVariableTableView().setItems(freeVariableList.getVariables());
@@ -125,7 +125,6 @@ public class VariableCollectionController implements Controller {
         getStyleClass().remove("freevar-problem");
         getStyleClass().add("freevar-problem");
         setTooltip(new Tooltip(tooltip));
-        // TODO: Javafx tables dont update it's cells view from
       }
 
       private void configureUnproblematic() {
@@ -152,8 +151,6 @@ public class VariableCollectionController implements Controller {
 
   private TableRow<FreeVariable> rowFactory(TableView<FreeVariable> tableView) {
     TableRow<FreeVariable> row = new TableRow<>();
-
-    // TODO: Drag n drop does not work
 
     row.setOnDragDetected(event -> {
       ObservableList<FreeVariable> selected = tableView.getSelectionModel().getSelectedItems();
@@ -183,7 +180,6 @@ public class VariableCollectionController implements Controller {
         String dragboardContent = db.getContent(JSON_MIME_TYPE).toString();
         List<FreeVariable> droppedVariables = Json.stringToRealFreeVariables(dragboardContent);
 
-        // TODO: Multiple variables with same name get deleted
         tableView.getItems().removeIf(freeVariable -> droppedVariables.stream()
             .anyMatch(var -> var.getName().equals(freeVariable.getName())));
 

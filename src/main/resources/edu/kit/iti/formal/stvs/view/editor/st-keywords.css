@@ -12,7 +12,6 @@
     -fx-underline: true;
     -fx-fill: red;
     -fx-font-weight: bold;
-   //TODO: optimize
 }
 
 .vardef {

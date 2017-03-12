@@ -120,6 +120,9 @@ public class TimingDiagramController implements Controller {
    * @param concreteSpec the concrete specification which should be used to extract the needed
    *        information
    * @param specIoVar the variable for which a diagram should be generated
+   * @param globalXAxis  global x axis used for all diagrams
+   * @param selection selection that should be updated when hovering with mouse
+   * @param activated only update selection if true
    * @return A {@link Pair} which holds a {@link TimingDiagramController} and a {@link NumberAxis}
    */
   public static Pair<TimingDiagramController, Axis> createIntegerTimingDiagram(
@@ -139,6 +142,9 @@ public class TimingDiagramController implements Controller {
    * @param concreteSpec the concrete specification which should be used to extract the needed
    *        information
    * @param specIoVar the variable for which a diagram should be generated
+   * @param globalXAxis  global x axis used for all diagrams
+   * @param selection selection that should be updated when hovering with mouse
+   * @param activated only update selection if true
    * @return A {@link Pair} which holds a {@link TimingDiagramController} and a {@link CategoryAxis}
    */
   public static Pair<TimingDiagramController, Axis> createBoolTimingDiagram(
@@ -161,6 +167,10 @@ public class TimingDiagramController implements Controller {
    * @param concreteSpec the concrete specification which should be used to extract the needed
    *        information
    * @param specIoVar the variable for which a diagram should be generated
+   * @param typeEnum type of the enum this diagram is generated for
+   * @param globalXAxis  global x axis used for all diagrams
+   * @param selection selection that should be updated when hovering with mouse
+   * @param activated only update selection if true
    * @return A {@link Pair} which holds a {@link TimingDiagramController} and a {@link CategoryAxis}
    */
   public static Pair<TimingDiagramController, Axis> createEnumTimingDiagram(

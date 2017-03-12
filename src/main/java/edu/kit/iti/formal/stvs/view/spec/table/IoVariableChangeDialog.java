@@ -42,8 +42,6 @@ public class IoVariableChangeDialog extends Dialog<Void> {
     getDialogPane().getButtonTypes().add(changeButton);
     getDialogPane().setId("IoVariableChangeDialogPane");
 
-    // TODO: Add feedback: Tell the user why he can't add a column with that particular name
-    // maybe controlsfx validator?
     getDialogPane().lookupButton(changeButton).disableProperty()
         .bind(definitionPane.createDefinitionInvalidBinding(alreadyDefinedVariables));
   }

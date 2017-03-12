@@ -187,6 +187,7 @@ public class ImporterFacade {
    *
    * @param input The stream from which to import from
    * @param format The format to use for importing
+   * @param typeContext types in the verified specification
    * @return The imported result
    * @throws ImportException exception during importing
    */
@@ -278,9 +279,12 @@ public class ImporterFacade {
    *
    * @param file The file to open
    * @param globalConfig The current global config
+   * @param currentHistory history of the opened files to this point
    * @param importHybridSpecificationHandler A file handler (invoked if the file is a Specification)
    * @param importStvsRootModelHandler A file handler (invoked if the file is a Session)
    * @param codeConsumer A file handler (invoked if the file is a code file)
+   * @throws IOException general io exception
+   * @throws ImportException general importing exception
    */
   public static void importFile(File file, GlobalConfig globalConfig, History currentHistory,
       ImportHybridSpecificationHandler importHybridSpecificationHandler,

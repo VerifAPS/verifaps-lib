@@ -23,6 +23,8 @@ public interface SpecificationConcretizer {
    *
    * @param validSpecification The valid specification that should be concretized
    * @param freeVariables FreeVariables that were used in the {@link ValidSpecification}
+   * @return calculated concrete specification
+   * @throws ConcretizationException general error during concretization
    */
   ConcreteSpecification calculateConcreteSpecification(
       ValidSpecification validSpecification,

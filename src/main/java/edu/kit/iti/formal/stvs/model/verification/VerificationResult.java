@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.model.verification;
 
-import edu.kit.iti.formal.stvs.view.VerificationResultVisitor;
+import edu.kit.iti.formal.stvs.view.VerificationResultHandler;
 
 import java.io.File;
 import java.util.Optional;
@@ -17,7 +17,7 @@ public interface VerificationResult {
    * Accept a visitor.
    * @param visitor The visitor to visit this VerificationResult
    */
-  void accept(VerificationResultVisitor visitor);
+  void accept(VerificationResultHandler visitor);
 
   /**
    * Get the log file (containing the output of the verification engine) or an empty Optional if
