@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="" isConcrete="false"
+               name="Unnamed Specification">
+    <variables>
+        <ioVariable colwidth="171" data-type="BOOL" io="input" name="Start_Stop"/>
+        <ioVariable colwidth="172" data-type="BOOL" io="output" name="ONS_Trig"/>
+        <freeVariable data-type="INT" name="freeVarA"/>
+        <freeVariable data-type="BOOL" default="TRUE" name="freeVarB"/>
+    </variables>
+    <rows>
+        <row comment="">
+            <duration>1</duration>
+            <cell>=TRUE</cell>
+            <cell>=FALSE</cell>
+        </row>
+        <row comment="">
+            <duration>1</duration>
+            <cell>freeVarB</cell>
+            <cell>Start_Stop[-1]</cell>
+        </row>
+    </rows>
+</specification>

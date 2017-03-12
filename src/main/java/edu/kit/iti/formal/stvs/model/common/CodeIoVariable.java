@@ -1,7 +1,8 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 /**
- * Created by philipp on 09.01.17.
+ * An input or output variable declared in the code.
+ *
  * @author Philipp
  */
 public class CodeIoVariable extends IoVariable {
@@ -12,9 +13,10 @@ public class CodeIoVariable extends IoVariable {
 
   /**
    * Creates a variable that appears in the code.
+   *
    * @param category The category of the variable
-   * @param type     The identifier of the type of the variable
-   * @param name     The name of the Variable
+   * @param type The identifier of the type of the variable
+   * @param name The name of the Variable
    */
   public CodeIoVariable(VariableCategory category, String type, String name) {
     if (category == null || type == null || name == null) {
@@ -40,7 +42,7 @@ public class CodeIoVariable extends IoVariable {
     return type;
   }
 
-  public boolean equals(CodeIoVariable other) {
+  private boolean equals(CodeIoVariable other) {
     if (other == null) {
       return false;
     }
@@ -48,17 +50,34 @@ public class CodeIoVariable extends IoVariable {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (obj == null) {
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if (!(obj instanceof CodeIoVariable)) {
+
+    CodeIoVariable that = (CodeIoVariable) o;
+
+    if (getCategory() != that.getCategory()) {
       return false;
     }
-    CodeIoVariable other = (CodeIoVariable) obj;
-    return equals(other);
+    if (getType() != null ? !getType().equals(that.getType()) : that.getType() != null) {
+      return false;
+    }
+    return getName() != null ? getName().equals(that.getName()) : that.getName() == null;
   }
 
+  @Override
+  public int hashCode() {
+    int result = getCategory() != null ? getCategory().hashCode() : 0;
+    result = 31 * result + (getType() != null ? getType().hashCode() : 0);
+    result = 31 * result + (getName() != null ? getName().hashCode() : 0);
+    return result;
+  }
+
+  @Override
   public String toString() {
     return "CodeIoVariable(" + category + " " + name + " : " + type + ")";
   }

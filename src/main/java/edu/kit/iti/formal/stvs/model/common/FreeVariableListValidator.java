@@ -1,15 +1,29 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 import edu.kit.iti.formal.stvs.model.expressions.Type;
-import javafx.beans.Observable;
-import javafx.beans.property.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
 /**
- * Created by philipp on 09.02.17.
+ * The validator for the effective model {@link FreeVariableList}. This class provides
+ * automatically updating properties for the formal model
+ * (see {@link #validFreeVariablesProperty()}) and for any
+ * problems encountered while validating (see {@link #problemsProperty()}).
+ *
  * @author Philipp
  */
 public class FreeVariableListValidator {
@@ -21,8 +35,17 @@ public class FreeVariableListValidator {
   private final ObjectProperty<List<ValidFreeVariable>> validVars;
   private final BooleanProperty valid;
 
-
-  public FreeVariableListValidator(ObjectProperty<List<Type>> typeContext, FreeVariableList freeVariables) {
+  /**
+   * <p>Creates a validator with the given formal type context model for the effective
+   * free variable model.</p>
+   *
+   * @param typeContext the context for validating the free variables and generating the valid
+   *                    free variables
+   * @param freeVariables the free variables model to validate
+   */
+  public FreeVariableListValidator(
+      ObjectProperty<List<Type>> typeContext,
+      FreeVariableList freeVariables) {
     this.typeContext = typeContext;
     this.freeVariables = freeVariables;
 
@@ -35,6 +58,10 @@ public class FreeVariableListValidator {
     revalidate();
   }
 
+  /**
+   * Starts the validation algorithm and updates the {@link #validFreeVariablesProperty()} and
+   * the {@link #problemsProperty()}.
+   */
   public void revalidate() {
     Map<String, Type> typesByName = typeContext.get().stream()
         .collect(Collectors.toMap(Type::getTypeName, Function.identity()));
@@ -44,8 +71,8 @@ public class FreeVariableListValidator {
     List<ValidFreeVariable> validated = new ArrayList<>();
 
     freeVariables.getVariables().forEach(freeVariable -> {
-      Optional<DuplicateFreeVariableProblem> optionalDuplicateProblem =
-          DuplicateFreeVariableProblem.checkForDuplicates(freeVariable, freeVariables.getVariables());
+      Optional<DuplicateFreeVariableProblem> optionalDuplicateProblem = DuplicateFreeVariableProblem
+          .checkForDuplicates(freeVariable, freeVariables.getVariables());
       optionalDuplicateProblem.ifPresent(problem -> insertProblem(problems, freeVariable, problem));
       if (!optionalDuplicateProblem.isPresent()) {
         try {
@@ -82,5 +109,9 @@ public class FreeVariableListValidator {
 
   public ReadOnlyObjectProperty<List<ValidFreeVariable>> validFreeVariablesProperty() {
     return validVars;
+  }
+
+  public List<ValidFreeVariable> getValidFreeVariables() {
+    return validVars.get();
   }
 }

@@ -2,13 +2,14 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+
+import java.math.BigInteger;
+import javax.xml.bind.JAXBElement;
+
 import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBElement;
-import java.math.BigInteger;
-
 /**
- * This class provides the functionality to export a {@link GlobalConfig} object to a xml node.
+ * This class provides the functionality to export a {@link GlobalConfig} object to an xml node.
  *
  * @author Benjamin Alt
  */
@@ -27,8 +28,8 @@ public class XmlConfigExporter extends XmlExporter<GlobalConfig> {
     Config.General general = objectFactory.createConfigGeneral();
     general.setUiLanguage(source.getUiLanguage());
     general.setSimulationTimeout(new BigInteger(Integer.toString(source.getSimulationTimeout())));
-    general.setVerificationTimeout(new BigInteger(Integer.toString(source.getVerificationTimeout()
-    )));
+    general
+        .setVerificationTimeout(new BigInteger(Integer.toString(source.getVerificationTimeout())));
     general.setMaxLineRollout(new BigInteger(Integer.toString(source.getMaxLineRollout())));
     Config.General.WindowSize windowSize = objectFactory.createConfigGeneralWindowSize();
     windowSize.setHeight(new BigInteger(Integer.toString(source.getWindowHeight())));
@@ -48,6 +49,6 @@ public class XmlConfigExporter extends XmlExporter<GlobalConfig> {
     deps.setGetetaCommand(source.getGetetaCommand());
     config.setDependencies(deps);
     JAXBElement<Config> element = objectFactory.createConfig(config);
-    return marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml");
+    return marshalToNode(element, NAMESPACE);
   }
 }

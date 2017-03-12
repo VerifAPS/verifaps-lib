@@ -30,7 +30,7 @@ import static org.junit.runners.Parameterized.Parameter;
 @RunWith(Parameterized.class)
 public class ConstraintSpecificationValidatorTest {
 
-  @Parameters(name="{0}")
+  @Parameters(name = "{0}")
   public static Collection<String> testfiles() {
     return Arrays.asList(
         "valid_table.json",

@@ -4,6 +4,7 @@ import javafx.scene.Node;
 
 /**
  * Created by csicar on 10.01.17.
+ *
  * @author Carsten Csiky
  */
 public interface Controller {

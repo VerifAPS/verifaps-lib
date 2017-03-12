@@ -10,16 +10,21 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
-import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Stopwatch;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by csicar on 13.02.17.
@@ -53,6 +58,36 @@ public class SmtConcretizerTest {
     return validator.getValidSpecification();
   }
 
+  @Rule
+  public Stopwatch stopwatch = new Stopwatch() {
+    @Override
+    public long runtime(TimeUnit unit) {
+      return super.runtime(unit);
+    }
+  };
+
+  @Test
+  public void testTermination() throws Exception {
+    ValidSpecification spec = importSpec("testSpec.xml");
+
+    Map<Integer, Integer> maxDurations = new HashMap<Integer,
+        Integer>() {{
+      put(0, 3000);
+      put(1, 1);
+      put(2, 2);
+    }};
+
+    SmtConcretizer concretizer = new SmtConcretizer(GlobalConfig.autoloadConfig());
+    concretizer
+        .calculateConcreteSpecification(spec, freeVariables);
+    long start = stopwatch.runtime(TimeUnit.MILLISECONDS);
+    concretizer.terminate();
+    long end = stopwatch.runtime(TimeUnit.MILLISECONDS);
+    final long maxTime = 5;
+    assertTrue("Except time to terminate to be smaller than "+maxTime+ ", but was"+(end-start),
+       end - start < maxTime);
+  }
+
   @Test
   public void simpleTest() throws Exception {
 
@@ -66,8 +101,7 @@ public class SmtConcretizerTest {
     }};
 
     SmtConcretizer concretizer = new SmtConcretizer(GlobalConfig.autoloadConfig());
-    concretizer
-        .calculateConcreteSpecification(spec, freeVariables, System.out::println, Throwable::printStackTrace);
+    concretizer.calculateConcreteSpecification(spec, freeVariables);
   }
 
 }

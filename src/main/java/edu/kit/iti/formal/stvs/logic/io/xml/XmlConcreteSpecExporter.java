@@ -1,19 +1,20 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
-import edu.kit.iti.formal.stvs.model.common.IoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
+
+import java.util.stream.Collectors;
+import javax.xml.bind.JAXBElement;
+
 import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBElement;
-import java.util.stream.Collectors;
-
 /**
- * This class provides the functionality to export
- * {@link ConcreteSpecification ConcreteSpecifications} to xml nodes.
+ * This class provides the functionality to export {@link ConcreteSpecification
+ * ConcreteSpecifications} to xml nodes.
+ *
  * @author Benjamin Alt
  */
 public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> {
@@ -21,10 +22,11 @@ public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> 
   private ObjectFactory objectFactory;
   private XmlConstraintSpecExporter constraintSpecExporter;
 
+  /**
+   * Creates an instance.
+   */
   public XmlConcreteSpecExporter() {
     objectFactory = new ObjectFactory();
-    //TODO: I can't get my head around why this should be here but removing it breaks the static variable in
-    //XmlConstraintSpecExporter. There is something fishy here. I will investigate this later.
     constraintSpecExporter = new XmlConstraintSpecExporter();
   }
 
@@ -45,7 +47,7 @@ public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> 
     specTable.setName(source.getName());
     JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable> element =
         objectFactory.createSpecification(specTable);
-    return marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml");
+    return marshalToNode(element, NAMESPACE);
   }
 
 
@@ -90,7 +92,8 @@ public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> 
   protected Variables makeVariables(ConcreteSpecification concreteSpec) {
     Variables variables = objectFactory.createVariables();
     variables.getIoVariable().addAll(concreteSpec.getColumnHeaders().stream()
-        .map(XmlConstraintSpecExporter::makeIoVariable).collect(Collectors.toList()));
+        .map(validIoVar ->
+            constraintSpecExporter.makeIoVariable(validIoVar)).collect(Collectors.toList()));
     return variables;
   }
 }

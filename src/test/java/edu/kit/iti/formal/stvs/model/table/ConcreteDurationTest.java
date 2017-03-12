@@ -37,7 +37,7 @@ public class ConcreteDurationTest {
   public void testGetEndCycle() {
     ConcreteDuration duration = new ConcreteDuration(3, 4);
     assertEquals(7, duration.getEndCycle());
-    duration = new ConcreteDuration(0,0);
+    duration = new ConcreteDuration(0, 0);
     assertEquals(0, duration.getEndCycle());
     duration = new ConcreteDuration(1, 0);
     assertEquals(1, duration.getEndCycle());

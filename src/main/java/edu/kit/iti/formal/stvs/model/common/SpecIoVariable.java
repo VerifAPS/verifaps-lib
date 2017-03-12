@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 /**
- * Created by csicar on 11.01.17.
+ * An input/output variable in a specification table.
  * @author Philipp
  */
 public class SpecIoVariable extends IoVariable implements Commentable {
@@ -21,9 +21,10 @@ public class SpecIoVariable extends IoVariable implements Commentable {
 
   /**
    * Creates a variable that appears in the specification.
-   * @param category       The category of the variable
+   *
+   * @param category The category of the variable
    * @param typeIdentifier The identifier of the type of the variable
-   * @param name           The name of the Variable
+   * @param name The name of the Variable
    */
   public SpecIoVariable(VariableCategory category, String typeIdentifier, String name) {
     this.category = new SimpleObjectProperty<>(category);
@@ -33,6 +34,10 @@ public class SpecIoVariable extends IoVariable implements Commentable {
     this.comment = new SimpleStringProperty("");
   }
 
+  /**
+   * Copy constructor: Create a deep copy of a given SpecIoVariable.
+   * @param specIoVariable The SpecIoVariable to copy
+   */
   public SpecIoVariable(SpecIoVariable specIoVariable) {
     this(specIoVariable.getCategory(), specIoVariable.getType(), specIoVariable.getName());
   }
@@ -67,10 +72,15 @@ public class SpecIoVariable extends IoVariable implements Commentable {
     return category.get();
   }
 
+  public void setCategory(VariableCategory category) {
+    this.category.set(category);
+  }
+
   public ObjectProperty<VariableCategory> categoryProperty() {
     return category;
   }
 
+  @Override
   public String toString() {
     return "SpecIoVariable(" + category.get() + " " + name.get() + " : " + type.get() + ")";
   }
@@ -118,8 +128,8 @@ public class SpecIoVariable extends IoVariable implements Commentable {
     if (category != null ? !category.get().equals(that.category.get()) : that.category != null) {
       return false;
     }
-    return columnConfig != null ? columnConfig.equals(that.columnConfig) : that.columnConfig == null;
-
+    return columnConfig != null ? columnConfig.equals(that.columnConfig)
+        : that.columnConfig == null;
   }
 
   @Override
@@ -129,9 +139,5 @@ public class SpecIoVariable extends IoVariable implements Commentable {
     result = 31 * result + (category != null ? category.hashCode() : 0);
     result = 31 * result + (columnConfig != null ? columnConfig.hashCode() : 0);
     return result;
-  }
-
-  public void setCategory(VariableCategory category) {
-    this.category.set(category);
   }
 }

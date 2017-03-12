@@ -5,8 +5,9 @@ import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 /**
- * A cell which contains concrete values. The cells of a {@link ConcreteSpecification} are of
- * this class.
+ * A cell which contains concrete values. The cells of a {@link ConcreteSpecification} are of this
+ * class.
+ *
  * @author Benjamin Alt
  */
 public class ConcreteCell implements StringReadable {
@@ -15,8 +16,9 @@ public class ConcreteCell implements StringReadable {
   private final ReadOnlyStringProperty stringProperty;
 
   /**
-   * Construct a new concrete cell which contains a given value. This value is read-only: It
-   * cannot be changed once the cell has been constructed.
+   * Construct a new concrete cell which contains a given value. This value is read-only: It cannot
+   * be changed once the cell has been constructed.
+   *
    * @param value The value of the cell
    */
   public ConcreteCell(Value value) {
@@ -34,9 +36,18 @@ public class ConcreteCell implements StringReadable {
   }
 
   @Override
+  public int hashCode() {
+    return getValue() != null ? getValue().hashCode() : 0;
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof ConcreteCell)) return false;
-    if (obj == this) return true;
+    if (!(obj instanceof ConcreteCell)) {
+      return false;
+    }
+    if (obj == this) {
+      return true;
+    }
     ConcreteCell other = (ConcreteCell) obj;
     return value.equals(other.value);
   }

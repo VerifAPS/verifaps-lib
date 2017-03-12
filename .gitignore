@@ -1,11 +1,12 @@
 ## Manual STVS gitignore rules
 /bin/
-
+generated/
 /.idea/
 /out/
 *.iml
 /build/
 /buildtmp/
+/schema/
 
 /.classpath
 /.project

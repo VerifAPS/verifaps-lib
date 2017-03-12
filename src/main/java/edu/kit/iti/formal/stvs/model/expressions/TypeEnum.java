@@ -7,10 +7,9 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * runtime-representation for enum types.
+ * Runtime-representation for enum types. This is (in contrast to {@link TypeInt} or
+ * {@link TypeBool}) NOT a singleton, since different instances of this can be created at runtime.
  *
- * This is (in contrast to {@link TypeInt} or {@link TypeBool}) NOT a
- * singleton, since different instances of this can be created at runtime.
  * @author Philipp
  */
 public class TypeEnum implements Type {
@@ -20,16 +19,19 @@ public class TypeEnum implements Type {
   private final List<ValueEnum> valueList;
 
   /**
-   * Create a new enum-type. This should only happen, when
-   * an enum is parsed in st-code.
+   * Create a new enum-type. This should only happen, when an enum is parsed in st-code. St-code
+   * example definition of an enum: <tt>COLORS : (red, green, blue)</tt>
    *
-   * St-code example definition of an enum:
-   * <tt>COLORS : (red, green, blue)</tt>
    * @param enumTypeName the type name (<tt>COLORS</tt> in this example)
-   * @param values the possible values that this enum can be
-   *               ([<tt>red</tt>, <tt>green</tt>, <tt>blue</tt>] in this example)
+   * @param values the possible values that this enum can be ([<tt>red</tt>, <tt>green</tt>,
+   *        <tt>blue</tt>] in this example)
+   * @throws IllegalArgumentException if the given list of values is empty
    */
   public TypeEnum(String enumTypeName, List<String> values) {
+    if (values.isEmpty()) {
+      throw new IllegalArgumentException(
+          "Cannot create enum \"" + enumTypeName + "\" without any values.");
+    }
     this.enumTypeName = enumTypeName;
     this.valueMap = new HashMap<>();
     this.valueList = new ArrayList<>();
@@ -41,20 +43,15 @@ public class TypeEnum implements Type {
   }
 
   @Override
-  public <R> R match(
-      TypeIntegerHandler<R> matchIntType,
-      TypeBooleanHandler<R> matchBoolType,
+  public <R> R match(TypeIntegerHandler<R> matchIntType, TypeBooleanHandler<R> matchBoolType,
       TypeEnumHandler<R> matchEnumType) {
     return matchEnumType.handle(this);
   }
 
   @Override
   public boolean checksAgainst(Type other) {
-    return other.match(
-        () -> false,
-        () -> false,
-        (otherEnum) -> otherEnum.getTypeName().equals(getTypeName())
-    );
+    return other.match(() -> false, () -> false,
+        (otherEnum) -> otherEnum.getTypeName().equals(getTypeName()));
   }
 
   @Override
@@ -69,9 +66,6 @@ public class TypeEnum implements Type {
 
   @Override
   public Value generateDefaultValue() {
-    // return first element in the values array
-    // TODO: Handle Enum without any values?
-    // Could such an enum even be represented in ST code?
     return valueMap.values().iterator().next();
   }
 
@@ -79,6 +73,12 @@ public class TypeEnum implements Type {
     return valueList;
   }
 
+  /**
+   * Returns a value of this enum that is resolved by name.
+   * 
+   * @param enumName Name of the value
+   * @return Value identified by the given name
+   */
   public ValueEnum valueOf(String enumName) {
     ValueEnum enumVal = valueMap.get(enumName);
     if (enumVal == null) {

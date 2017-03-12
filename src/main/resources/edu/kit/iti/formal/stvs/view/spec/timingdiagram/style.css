@@ -21,6 +21,10 @@
     -fx-minor-tick-visible: false;
 }
 
+.globalXAxisContainer{
+    -fx-min-height: 30px;
+}
+
 .labelContainer * {
     -fx-font-family: monospace;
     -fx-font-weight: bold;

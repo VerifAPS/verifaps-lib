@@ -7,13 +7,14 @@ import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
-import edu.kit.iti.formal.stvs.model.table.JsonTableParser;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecificationValidatorTest;
+import edu.kit.iti.formal.stvs.model.table.JsonTableParser;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -31,18 +32,14 @@ public class XmlConstraintSpecImporterTest {
   public void setUp() throws ImportException {
     importer = new XmlConstraintSpecImporter();
   }
-  
+
   @Test
   public void testDoImportValid1() throws Exception {
-    FileInputStream inputStream = new FileInputStream(new File
-        (this.getClass().getResource("spec_constraint_valid_1.xml").toURI()));
+    InputStream inputStream = this.getClass()
+        .getResourceAsStream("spec_constraint_valid_1.xml");
     ConstraintSpecification importedSpec = importer.doImport(inputStream);
     JsonElement testjson = JsonTableParser.jsonFromResource("valid_table.json",
         ConstraintSpecificationValidatorTest.class);
-
-    List<CodeIoVariable> codeIoVariables = Collections.emptyList();
-
-    List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL);
 
     ConstraintSpecification expectedSpec =
         JsonTableParser.constraintTableFromJson(testjson);

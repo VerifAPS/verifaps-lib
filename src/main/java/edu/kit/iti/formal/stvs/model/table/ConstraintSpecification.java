@@ -2,46 +2,47 @@ package edu.kit.iti.formal.stvs.model.table;
 
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
- * A specification the cell contents and durations of which are specified by constraints rather
- * than concrete values. This corresponds to a "generalized test table".
+ * A specification the cell contents and durations of which are specified by constraints rather than
+ * concrete values. This corresponds to a "generalized test table".
+ *
  * @author Benjamin Alt
  */
-public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, ConstraintCell,
-    ConstraintDuration> implements Commentable {
+public class ConstraintSpecification extends
+    SpecificationTable<SpecIoVariable, ConstraintCell, ConstraintDuration> implements Commentable {
 
   /**
    * Construct a new specification row containing ConstraintCells.
+   *
    * @param initialCells The initial cells, a Map from column identifier to ConstraintCell, with
-   *                     which to fill the new row
+   *        which to fill the new row
    * @return A SpecificationRow containing the given ConstraintCells
    */
   public static SpecificationRow<ConstraintCell> createRow(
       Map<String, ConstraintCell> initialCells) {
     return new SpecificationRow<>(initialCells,
-        cell -> new Observable[] {
-            cell.stringRepresentationProperty(),
-            cell.commentProperty()
-        });
+        cell -> new Observable[] {cell.stringRepresentationProperty(), cell.commentProperty()});
   }
 
   private final StringProperty comment;
   private final FreeVariableList freeVariableList;
-  private final ChangeListener<String> onSpecIoVariableNameChanged = this::onSpecIoVariableNameChanged;
+  private final ChangeListener<String> onSpecIoVariableNameChanged;
 
   /**
-   * Construct a new, empty ConstraintSpecification with a default name from an initial list of
-   * free variables.
+   * Construct a new, empty ConstraintSpecification with a default name from an initial list of free
+   * variables.
+   *
    * @param freeVariableList The initial list of free variables
    */
   public ConstraintSpecification(FreeVariableList freeVariableList) {
@@ -51,21 +52,17 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
   /**
    * Construct a new, empty ConstraintSpecification with a given name and an initial list of free
    * variables.
+   *
    * @param name The name of the ConstraintSpecification
    * @param freeVariableList The list of free variables
    */
   public ConstraintSpecification(String name, FreeVariableList freeVariableList) {
-    super(
-        name,
-        columnHeader -> new Observable[] {
-            columnHeader.nameProperty(),
-            columnHeader.typeProperty(),
-            columnHeader.categoryProperty()
-        },
-        durationCell -> new Observable[] {
-            durationCell.stringRepresentationProperty(),
-            durationCell.commentProperty()
-        });
+    super(name,
+        columnHeader -> new Observable[] {columnHeader.nameProperty(), columnHeader.typeProperty(),
+            columnHeader.categoryProperty()},
+        durationCell -> new Observable[] {durationCell.stringRepresentationProperty(),
+            durationCell.commentProperty()});
+    this.onSpecIoVariableNameChanged = this::onSpecIoVariableNameChanged;
     this.freeVariableList = freeVariableList;
 
     this.comment = new SimpleStringProperty("");
@@ -73,6 +70,7 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
 
   /**
    * Copy constructor. Creates a deep copy of another ConstraintSpecification.
+   *
    * @param sourceSpec The ConstraintSpecification to copy
    */
   public ConstraintSpecification(ConstraintSpecification sourceSpec) {
@@ -86,8 +84,8 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
       for (String colHeader : row.getCells().keySet()) {
         clonedCells.put(colHeader, new ConstraintCell(row.getCells().get(colHeader)));
       }
-      SpecificationRow<ConstraintCell> clonedRow = new SpecificationRow<>(clonedCells, row
-          .getExtractor());
+      SpecificationRow<ConstraintCell> clonedRow =
+          new SpecificationRow<>(clonedCells, row.getExtractor());
       clonedRow.setComment(row.getComment());
       getRows().add(clonedRow);
     }
@@ -109,7 +107,8 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
   }
 
   /**
-   * Add a listener for name changes to a given {@SpecIoVariable}.
+   * Add a listener for name changes to a given {@code SpecIoVariable}.
+   *
    * @param specIoVariable The SpecIoVariable to add a name change listener to
    */
   private void subscribeToIoVariable(SpecIoVariable specIoVariable) {
@@ -117,16 +116,15 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
   }
 
   /**
-   * Remove a listener for name changes from a given {@SpecIoVariable}.
+   * Remove a listener for name changes from a given {@code SpecIoVariable}.
+   *
    * @param specIoVariable The SpecIoVariable to remove a listener from
    */
   private void unsubscribeFromIoVariable(SpecIoVariable specIoVariable) {
     specIoVariable.nameProperty().removeListener(onSpecIoVariableNameChanged);
   }
 
-  private void onSpecIoVariableNameChanged(
-      ObservableValue<? extends String> obs,
-      String nameBefore,
+  private void onSpecIoVariableNameChanged(ObservableValue<? extends String> obs, String nameBefore,
       String nameAfter) {
     for (SpecificationRow<ConstraintCell> row : getRows()) {
       ConstraintCell entry = row.getCells().get(nameBefore);
@@ -153,16 +151,25 @@ public class ConstraintSpecification extends SpecificationTable<SpecIoVariable, 
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-
-    ConstraintSpecification that = (ConstraintSpecification) o;
-
-    if (getComment() != null ? !getComment().equals(that.getComment()) : that.getComment() != null)
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
-    return getFreeVariableList() != null ? getFreeVariableList().equals(that.getFreeVariableList()) : that.getFreeVariableList() == null;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+
+    ConstraintSpecification that = (ConstraintSpecification) obj;
+
+    if (getComment() != null ? !getComment().equals(that.getComment())
+        : that.getComment() != null) {
+      return false;
+    }
+    return getFreeVariableList() != null ? getFreeVariableList().equals(that.getFreeVariableList())
+        : that.getFreeVariableList() == null;
   }
 
   @Override

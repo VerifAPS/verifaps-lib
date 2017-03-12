@@ -12,20 +12,26 @@ import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import edu.kit.iti.formal.stvs.model.verification.VerificationState;
 import edu.kit.iti.formal.stvs.view.Controller;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.scene.control.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TextInputDialog;
+
 /**
+ * Controller for {@link SpecificationsPane}. The tab logic is handled here.
+ *
  * @author Carsten Csiky
  */
 public class SpecificationsPaneController implements Controller {
@@ -33,19 +39,25 @@ public class SpecificationsPaneController implements Controller {
   private final GlobalConfig globalConfig;
   private ObservableList<HybridSpecification> hybridSpecifications;
   private SpecificationsPane view;
-  private ContextMenu contextMenu;
   private ObjectProperty<VerificationState> state;
   private ObjectProperty<List<Type>> typeContext;
   private ObjectProperty<List<CodeIoVariable>> ioVariables;
   private final Map<Tab, SpecificationController> controllers;
   private final VerificationScenario scenario;
 
-  public SpecificationsPaneController(
-      ObservableList<HybridSpecification> hybridSpecifications,
-      ObjectProperty<VerificationState> state,
-      ObjectProperty<List<Type>> typeContext,
-      ObjectProperty<List<CodeIoVariable>> ioVariables,
-      GlobalConfig globalConfig,
+  /**
+   * Creates an instance of this controller.
+   *
+   * @param hybridSpecifications list of the specifications t display
+   * @param state the state of the verification
+   * @param typeContext  available types in code
+   * @param ioVariables  available variables in code
+   * @param globalConfig Global config object
+   * @param scenario scenario that represents what the verification needs
+   */
+  public SpecificationsPaneController(ObservableList<HybridSpecification> hybridSpecifications,
+      ObjectProperty<VerificationState> state, ObjectProperty<List<Type>> typeContext,
+      ObjectProperty<List<CodeIoVariable>> ioVariables, GlobalConfig globalConfig,
       VerificationScenario scenario) {
     this.view = new SpecificationsPane();
     this.globalConfig = globalConfig;
@@ -58,19 +70,19 @@ public class SpecificationsPaneController implements Controller {
 
     hybridSpecifications.forEach(this::addTab);
     this.view.onTabAdded(() -> {
-      HybridSpecification hybridSpecification = new HybridSpecification(
-          new FreeVariableList(new ArrayList<>()), true);
+      HybridSpecification hybridSpecification =
+          new HybridSpecification(new FreeVariableList(new ArrayList<>()), true);
+      System.out.println(ioVariables.get());
       for (CodeIoVariable ioVariable : ioVariables.get()) {
-        SpecIoVariable specIoVariable = new SpecIoVariable(ioVariable.getCategory(), ioVariable
-            .getType(), ioVariable.getName());
+        SpecIoVariable specIoVariable = new SpecIoVariable(ioVariable.getCategory(),
+            ioVariable.getType(), ioVariable.getName());
         hybridSpecification.getColumnHeaders().add(specIoVariable);
       }
       hybridSpecifications.add(hybridSpecification);
-
     });
 
-    view.getTabPane().getSelectionModel().selectedItemProperty().addListener((obs, old, tab)
-        -> onSwitchActiveTab(tab));
+    view.getTabPane().getSelectionModel().selectedItemProperty()
+        .addListener((obs, old, tab) -> onSwitchActiveTab(tab));
     onSwitchActiveTab(view.getTabPane().getSelectionModel().getSelectedItem());
 
     hybridSpecifications.addListener((ListChangeListener<HybridSpecification>) change -> {
@@ -105,9 +117,9 @@ public class SpecificationsPaneController implements Controller {
   }
 
   private SpecificationController addTab(HybridSpecification hybridSpecification, int index) {
-    SpecificationController controller = new SpecificationController(
-        typeContext, ioVariables, hybridSpecification, this.state,
-        Bindings.isEmpty(scenario.getCode().syntaxErrorsProperty()).not(), globalConfig);
+    final SpecificationController controller =
+        new SpecificationController(typeContext, ioVariables, hybridSpecification, this.state,
+            Bindings.isEmpty(scenario.getCode().syntaxErrorsProperty()).not(), globalConfig);
     Tab tab = new Tab();
     tab.setOnCloseRequest(e -> onTabCloseRequest(e, tab));
     if (hybridSpecification.isEditable()) {
@@ -123,7 +135,12 @@ public class SpecificationsPaneController implements Controller {
     view.getTabs().add(index, tab);
     controllers.put(tab, controller);
     view.getTabPane().getSelectionModel().select(tab);
+    scenario.setActiveSpec(hybridSpecification);
     return controller;
+  }
+
+  public SpecificationController addTab(HybridSpecification hybridSpecification) {
+    return addTab(hybridSpecification, 0);
   }
 
   private void onTabSetName(ActionEvent actionEvent) {
@@ -133,7 +150,9 @@ public class SpecificationsPaneController implements Controller {
     textInputDialog.setHeaderText("Set Specification Name");
     textInputDialog.setTitle("Specification Name");
     textInputDialog.showAndWait();
-    activeSpec.setName(textInputDialog.getResult());
+    if (textInputDialog.getResult() != null) {
+      activeSpec.setName(textInputDialog.getResult());
+    }
   }
 
   private ContextMenu createTabContextMenu() {
@@ -142,10 +161,6 @@ public class SpecificationsPaneController implements Controller {
     setNameItem.setOnAction(this::onTabSetName);
     contextMenu.getItems().add(setNameItem);
     return contextMenu;
-  }
-
-  public SpecificationController addTab(HybridSpecification hybridSpecification) {
-    return addTab(hybridSpecification, 0);
   }
 
 

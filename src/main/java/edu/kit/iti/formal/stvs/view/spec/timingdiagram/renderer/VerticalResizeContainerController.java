@@ -8,7 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 
 /**
- * Controller for {@link VerticalResizeContainerView}
+ * Controller for {@link VerticalResizeContainerView}.
  *
  * @author Leon Kaucher
  */
@@ -45,7 +45,8 @@ public class VerticalResizeContainerController implements Controller {
       double newSize = cacheSize.get() + (event.getScreenY() - mouseYStart.get());
       view.getContentContainer().setPrefHeight(newSize);
       view.getContent().setPrefHeight(newSize);
-      Platform.runLater(() -> view.getParent().getParent().getParent().getParent().getParent().getParent().requestLayout());
+      Platform.runLater(() -> view.getParent().getParent().getParent().getParent().getParent()
+          .getParent().requestLayout());
     });
   }
 

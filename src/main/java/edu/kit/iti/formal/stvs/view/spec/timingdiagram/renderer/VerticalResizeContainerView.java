@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
 
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -16,6 +17,9 @@ public class VerticalResizeContainerView extends AnchorPane {
   private VBox contentContainer = new VBox();
   private Rectangle dragLine = new Rectangle(10, 5, Color.BEIGE);
 
+  /**
+   * Creates an instance of this container class.
+   */
   public VerticalResizeContainerView() {
     this.getChildren().add(container);
     container.getChildren().addAll(contentContainer);
@@ -24,10 +28,9 @@ public class VerticalResizeContainerView extends AnchorPane {
     AnchorPane.setRightAnchor(container, 0.0);
     AnchorPane.setTopAnchor(container, 0.0);
     dragLine.widthProperty().bind(container.widthProperty());
-    //AnchorPane.setBottomAnchor(dragLine, 0.0);
-    this.getStylesheets().add(
-        TimingDiagramView.class.getResource("resizeContainer.css").toExternalForm()
-    );
+    // AnchorPane.setBottomAnchor(dragLine, 0.0);
+    ViewUtils.setupView(this, "resizeContainer.css");
+
     this.getStyleClass().add("resizeContainer");
     dragLine.getStyleClass().add("dragLine");
   }

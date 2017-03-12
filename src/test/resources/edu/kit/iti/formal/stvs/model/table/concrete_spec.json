@@ -1,11 +1,18 @@
 {
-  "freevariables":[],
-  "variables":[
-    { "iotype":"INPUT", "name":"A", "type":"INT" },
-    { "iotype":"OUTPUT", "name":"B", "type":"BOOL" }
+  "freevariables": [],
+  "variables": [
+    {
+      "iotype": "INPUT",
+      "name": "A",
+      "type": "INT"
+    },
+    {
+      "iotype": "OUTPUT",
+      "name": "B",
+      "type": "BOOL"
+    }
   ],
-
-  "rows":[
+  "rows": [
     " 0 | FALSE",
     " 0 | FALSE",
     " 1 | TRUE",
@@ -14,7 +21,7 @@
     " 4 | TRUE",
     " 0 | FALSE"
   ],
-  "durations":[
+  "durations": [
     "2",
     "4",
     "1"

@@ -1,10 +1,9 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 /**
- * runtime-representation for boolean values of {@link Expression}s.
+ * Runtime-representation for boolean values of {@link Expression}s.
+ * This is a singleton with two instances, TRUE and FALSE, since there is no state to the values.
  *
- * This is a singleton with two instances, TRUE and FALSE, since there
- * is no state to the values.
  * @author Philipp
  */
 public class ValueBool implements Value {
@@ -23,9 +22,7 @@ public class ValueBool implements Value {
   }
 
   @Override
-  public <R> R match(
-      ValueIntegerHandler<R> matchInt,
-      ValueBooleanHandler<R> matchBoolean,
+  public <R> R match(ValueIntegerHandler<R> matchInt, ValueBooleanHandler<R> matchBoolean,
       ValueEnumHandler<R> matchEnum) {
     return matchBoolean.handle(value);
   }
@@ -54,8 +51,12 @@ public class ValueBool implements Value {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!(obj instanceof ValueBool)) return false;
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof ValueBool)) {
+      return false;
+    }
 
     ValueBool valueBool = (ValueBool) obj;
 

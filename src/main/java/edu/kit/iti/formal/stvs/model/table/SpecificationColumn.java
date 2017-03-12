@@ -1,13 +1,14 @@
 package edu.kit.iti.formal.stvs.model.table;
 
+import java.util.List;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import java.util.List;
-
 /**
- * A column in a specification (see {@link SpecificationTable}). The generic type parameter C is
- * the type of the cells.
+ * A column in a specification (see {@link SpecificationTable}). The generic type parameter C is the
+ * type of the cells.
+ *
  * @author Benjamin Alt
  */
 public class SpecificationColumn<C> implements Commentable {
@@ -17,6 +18,7 @@ public class SpecificationColumn<C> implements Commentable {
 
   /**
    * Create a new SpecificationColumn fro a list of cells.
+   *
    * @param cells The cells for this column.
    */
   public SpecificationColumn(List<C> cells) {
@@ -44,17 +46,32 @@ public class SpecificationColumn<C> implements Commentable {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    SpecificationColumn<?> that = (SpecificationColumn<?>) o;
-
-    if (cells != null ? !cells.equals(that.cells) : that.cells != null) return false;
-    return comment != null ? comment.get().equals(that.comment.get()) : that.comment == null;
-
+  public int hashCode() {
+    int result = getCells() != null ? getCells().hashCode() : 0;
+    result = 31 * result + (getComment() != null ? getComment().hashCode() : 0);
+    return result;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+
+    SpecificationColumn<?> that = (SpecificationColumn<?>) obj;
+
+    if ((getCells() != null)
+        ? !getCells().equals(that.getCells()) : (that.getCells() != null)) {
+      return false;
+    }
+    return (getComment() != null
+        ? getComment().equals(that.getComment()) : that.getComment() == null);
+  }
+
+  @Override
   public String toString() {
     return "SpecificationColumn(cells: " + cells + ", comment: " + comment.get() + ")";
   }

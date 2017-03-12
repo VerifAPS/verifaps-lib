@@ -1,11 +1,9 @@
 package edu.kit.iti.formal.stvs.model.table;
 
-import edu.kit.iti.formal.exteta_1.Options;
 import edu.kit.iti.formal.stvs.StvsApplication;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConcreteSpecImporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecImporter;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeFactory;
@@ -64,7 +62,7 @@ public class HybridSpecificationTest {
     assertEquals(new Selection("A", 3), hybridSpec.getSelection());
   }
 
-  @Test (expected = IllegalArgumentException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testSetConcreteInstanceInvalid() throws ImportException {
     ConcreteSpecification badConcreteSpec = ImporterFacade.importConcreteSpec
         (XmlConcreteSpecImporter.class.getResourceAsStream("spec_concrete_empty.xml"),

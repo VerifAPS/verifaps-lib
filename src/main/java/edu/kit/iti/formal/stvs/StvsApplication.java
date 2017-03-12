@@ -7,13 +7,18 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
- * Created by csicar on 09.01.17.
- * @author Benjamin Alt
+ * The entry point to ST Verification Studio.
+ *
+ * @author Leon Kaucher
  */
 public class StvsApplication extends Application {
 
   private StvsMainScene mainScene = new StvsMainScene();
 
+  /**
+   * Launch the application.
+   * @param args The command-line arguments passed to the application
+   */
   public static void main(String[] args) {
     launch(args);
   }
@@ -26,8 +31,8 @@ public class StvsApplication extends Application {
     primaryStage.setScene(mainScene.getScene());
     primaryStage.setMaximized(mainScene.shouldBeMaximizedProperty().get());
     mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty());
-    primaryStage.getIcons().add(new Image(StvsApplication.class
-        .getResourceAsStream("clipboard.png")));
+    primaryStage.getIcons()
+        .add(new Image(StvsApplication.class.getResourceAsStream("logo.png")));
     primaryStage.show();
   }
 

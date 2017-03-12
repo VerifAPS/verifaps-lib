@@ -8,21 +8,22 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
-import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.util.stream.Collectors;
+import javax.xml.bind.JAXBElement;
+
+import org.w3c.dom.Node;
 
 /**
- * This class provides the functionality to export {@link ConstraintSpecification ConstraintSpecifications}
- * to xml nodes.
+ * This class provides the functionality to export {@link ConstraintSpecification
+ * ConstraintSpecifications} to xml nodes.
  *
  * @author Benjamin Alt
  */
 public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecification> {
 
-  private static ObjectFactory objectFactory;
+  private ObjectFactory objectFactory;
 
   public XmlConstraintSpecExporter() {
     objectFactory = new ObjectFactory();
@@ -46,7 +47,7 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
     specTable.setName(source.getName());
     JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable> element =
         objectFactory.createSpecification(specTable);
-    return marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml");
+    return marshalToNode(element, NAMESPACE);
   }
 
   /**
@@ -92,7 +93,7 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
       Variables.FreeVariable freeVar = objectFactory.createVariablesFreeVariable();
       freeVar.setName(freeVariable.getName());
       freeVar.setDataType(freeVariable.getType());
-      if (freeVariable.getDefaultValue() != "") {
+      if (!freeVariable.getDefaultValue().equals("")) {
         freeVar.setDefault(freeVariable.getDefaultValue());
       }
       variables.getFreeVariable().add(freeVar);
@@ -106,7 +107,7 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
    * @param validIoVariable Variable from which a {@link Variables.IoVariable} should be generated
    * @return generated {@link Variables.IoVariable}
    */
-  protected static Variables.IoVariable makeIoVariable(IoVariable validIoVariable) {
+  protected Variables.IoVariable makeIoVariable(IoVariable validIoVariable) {
     Variables.IoVariable ioVar = objectFactory.createVariablesIoVariable();
     ioVar.setComment(ioVar.getComment());
     ioVar.setDataType(validIoVariable.getType());

@@ -1,13 +1,12 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
 import edu.kit.iti.formal.stvs.model.code.Code;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by bal on 12.02.17.

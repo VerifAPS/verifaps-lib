@@ -7,12 +7,10 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
- * runtime-representation for variables in {@link Expression}s.
+ * Runtime-representation for variables in {@link Expression}s.
+ * At this point it is not known whether this is a reference to a {@link FreeVariable} or an
+ * {@link IoVariable}; it is simply the String name of either of those.
  *
- * <p>At this point it is not known, whether this is a reference to a
- * {@link FreeVariable}
- * or an {@link IoVariable}, it
- * is simply the String name of either of those.
  * @author Philipp
  */
 public class VariableExpr extends Expression {
@@ -24,9 +22,10 @@ public class VariableExpr extends Expression {
 
   /**
    * Constructs a new VariableExpr with a backwards reference.
+   *
    * @param varName the name as a reference to a variable
-   * @param index the index of the backwards-reference
-   *              (for expressions like <tt>A[-1]</tt> for example)
+   * @param index the index of the backwards-reference (for expressions like <tt>A[-1]</tt> for
+   *        example)
    */
   public VariableExpr(String varName, int index) {
     this.varName = varName;
@@ -35,6 +34,7 @@ public class VariableExpr extends Expression {
 
   /**
    * Constructs a new VariableExpr without a backwards reference.
+   *
    * @param name the name as a reference to a variable.
    */
   public VariableExpr(String name) {
@@ -60,8 +60,27 @@ public class VariableExpr extends Expression {
   }
 
   @Override
-  public boolean equals(Object other) {
-    return (other instanceof VariableExpr) && this.equals((VariableExpr) other);
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    VariableExpr that = (VariableExpr) o;
+
+    if (varName != null ? !varName.equals(that.varName) : that.varName != null) {
+      return false;
+    }
+    return getIndex() != null ? getIndex().equals(that.getIndex()) : that.getIndex() == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = varName != null ? varName.hashCode() : 0;
+    result = 31 * result + (getIndex() != null ? getIndex().hashCode() : 0);
+    return result;
   }
 
   public String toString() {

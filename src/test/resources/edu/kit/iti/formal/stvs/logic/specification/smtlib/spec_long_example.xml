@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="" isConcrete="false">
+    <variables>
+        <ioVariable io="output" name="A1" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A2" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A3" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A4" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A5" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A6" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A7" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A8" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A9" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A10" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A11" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A12" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A13" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A14" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A15" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A16" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A17" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A18" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A19" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A20" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A21" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A22" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A23" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A24" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A25" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A26" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A27" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A28" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A29" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A30" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A31" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A32" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A33" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A34" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A35" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A36" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A37" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A38" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A39" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A40" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A41" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A42" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A43" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A44" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A45" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A46" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A47" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A48" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A49" data-type="INT"></ioVariable>
+        <ioVariable io="output" name="A50" data-type="INT"></ioVariable>
+    </variables>
+    <rows>
+        <row><!-- Hier ist die Reihenfolge der Cells wichtig! -->
+            <duration comment="I am a duration comment!">1</duration>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+            <cell>0</cell>
+        </row>
+        <row>
+            <duration>3000</duration>
+            <cell>=A1[-1]+1</cell>
+            <cell>=A2[-1]+1</cell>
+            <cell>=A3[-1]+1</cell>
+            <cell>=A4[-1]+1</cell>
+            <cell>=A5[-1]+1</cell>
+            <cell>=A6[-1]+1</cell>
+            <cell>=A7[-1]+1</cell>
+            <cell>=A8[-1]+1</cell>
+            <cell>=A9[-1]+1</cell>
+            <cell>=A10[-1]+1</cell>
+            <cell>=A11[-1]+1</cell>
+            <cell>=A12[-1]+1</cell>
+            <cell>=A13[-1]+1</cell>
+            <cell>=A14[-1]+1</cell>
+            <cell>=A15[-1]+1</cell>
+            <cell>=A16[-1]+1</cell>
+            <cell>=A17[-1]+1</cell>
+            <cell>=A18[-1]+1</cell>
+            <cell>=A19[-1]+1</cell>
+            <cell>=A20[-1]+1</cell>
+            <cell>=A21[-1]+1</cell>
+            <cell>=A22[-1]+1</cell>
+            <cell>=A23[-1]+1</cell>
+            <cell>=A24[-1]+1</cell>
+            <cell>=A25[-1]+1</cell>
+            <cell>=A26[-1]+1</cell>
+            <cell>=A27[-1]+1</cell>
+            <cell>=A28[-1]+1</cell>
+            <cell>=A29[-1]+1</cell>
+            <cell>=A30[-1]+1</cell>
+            <cell>=A31[-1]+1</cell>
+            <cell>=A32[-1]+1</cell>
+            <cell>=A33[-1]+1</cell>
+            <cell>=A34[-1]+1</cell>
+            <cell>=A35[-1]+1</cell>
+            <cell>=A36[-1]+1</cell>
+            <cell>=A37[-1]+1</cell>
+            <cell>=A38[-1]+1</cell>
+            <cell>=A39[-1]+1</cell>
+            <cell>=A40[-1]+1</cell>
+            <cell>=A41[-1]+1</cell>
+            <cell>=A42[-1]+1</cell>
+            <cell>=A43[-1]+1</cell>
+            <cell>=A44[-1]+1</cell>
+            <cell>=A45[-1]+1</cell>
+            <cell>=A46[-1]+1</cell>
+            <cell>=A47[-1]+1</cell>
+            <cell>=A48[-1]+1</cell>
+            <cell>=A49[-1]+1</cell>
+            <cell>=A50[-1]+1</cell>
+        </row>
+    </rows>
+    <enumTypes/>
+</specification>

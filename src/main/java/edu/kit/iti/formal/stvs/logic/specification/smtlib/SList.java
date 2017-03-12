@@ -4,28 +4,22 @@ import de.tudresden.inf.lat.jsexp.Sexp;
 import de.tudresden.inf.lat.jsexp.SexpFactory;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Represents a S-Expression of form ( expr_1 expr_2 expr_3 ... expr_n)
+ *
  * @author Carsten Csiky
  */
 public class SList implements SExpression {
   private List<SExpression> sexp;
 
   /**
-   * Helper constructor.
-   * @see SList#SList(List)
-   * @param sexp array of {@link SExpression}
-   */
-  public SList(SExpression... sexp) {
-    this(Arrays.asList(sexp));
-  }
-
-  /**
    * Creates an instance from a list of {@link SExpression}.
+   * if the passed list must be modifiable for the methods add() and allAll() to work properly
    * @param sexp list of {@link SExpression}
    */
   public SList(List<SExpression> sexp) {
@@ -33,11 +27,12 @@ public class SList implements SExpression {
   }
 
   /**
-   * Helper constructor.
-   * Creates a {@link SAtom} for any passed string an calls {@link SList#SList(List)}
+   * Helper constructor. Creates a {@link SAtom} for any passed string an calls
+   * {@link SList#SList(List)}
+   *
    * @param vals atomic expressions as string
    */
-  public SList(String ... vals) {
+  public SList(String... vals) {
     this(Arrays.stream(vals).map(SAtom::new).collect(Collectors.toList()));
   }
 
@@ -54,8 +49,9 @@ public class SList implements SExpression {
   }
 
   /**
-   * Creates an SList with the first argument interpreted as
-   * atomic expression followed by {@code sexp}.
+   * Creates an SList with the first argument interpreted as atomic expression followed by
+   * {@code sexp}.
+   *
    * @param command atomic command expression
    * @param sexp following expressions
    */
@@ -66,8 +62,9 @@ public class SList implements SExpression {
   }
 
   /**
-   * Creates an instance by using an {@link Sexp} as a base.
-   * Every item in {@code exp} will become an item in this list.
+   * Creates an instance by using an {@link Sexp} as a base. Every item in {@code exp} will become
+   * an item in this list.
+   *
    * @param exp base expression
    */
   public SList(Sexp exp) {
@@ -97,18 +94,19 @@ public class SList implements SExpression {
 
   @Override
   public String toText() {
-    return " ( " + getList().stream().map(SExpression::toText).collect(Collectors.joining(" ")) + " ) ";
+    return " ( " + getList().stream().map(SExpression::toText).collect(Collectors.joining(" "))
+        + " ) ";
   }
 
   public SList addAll(SExpression... sexp) {
-    return  addAll(Arrays.asList(sexp));
+    return addAll(Arrays.asList(sexp));
   }
 
-  public SList addAll(String ... values) {
+  public SList addAll(String... values) {
     return addAll(Arrays.stream(values).map(SAtom::new).collect(Collectors.toList()));
   }
 
-  public SList addAll(List<SExpression> exprs) {
+  public SList addAll(Collection<SExpression> exprs) {
     this.sexp.addAll(exprs);
     return this;
   }
@@ -123,12 +121,11 @@ public class SList implements SExpression {
 
   /**
    * Returns the List as a string
+   *
    * @return string representation: "(item_1 item_2 ... item_n)"
    */
   public String toString() {
-    return "( " + getList().stream().map(Object::toString).collect(Collectors.joining(
-        " "))
-        + " )";
+    return "( " + getList().stream().map(Object::toString).collect(Collectors.joining(" ")) + " )";
   }
 
   @Override

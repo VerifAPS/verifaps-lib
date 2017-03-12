@@ -10,7 +10,6 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeFactory;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
-import gnu.trove.map.TObjectByteMap;
 import javafx.beans.value.ObservableValue;
 import junit.framework.AssertionFailedError;
 import org.junit.Before;
@@ -22,7 +21,8 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by bal on 26.02.17.
@@ -101,15 +101,16 @@ public class VerificationScenarioTest {
       List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL, TypeFactory.enumOfName
           ("enumD", "literalOne", "literalTwo"));
       try {
+        ConstraintSpecification constraintSpec = ImporterFacade.importConstraintSpec(StvsApplication
+                .class.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml"),
+            ImporterFacade.ImportFormat.XML);
         VerificationResult expectedResult = ImporterFacade.importVerificationResult(StvsApplication
             .class.getResourceAsStream("testSets/valid_1/geteta_report_valid_1.xml"), ImporterFacade
-            .ImportFormat.GETETA, typeContext);
+            .ImportFormat.GETETA, typeContext, constraintSpec);
         /* Cannot just assertEquals() with verificationResults, as logFileNames (randomly
         generated) will be different
         assertEquals(expectedResult, newResult); */
-        assertEquals(expectedResult.getCounterExample(), newResult.getCounterExample());
-        assertEquals(expectedResult.getStatus(), newResult.getStatus());
-        assertEquals(expectedResult.getVerificationError(), newResult.getVerificationError());
+        assertEquals(expectedResult.getClass(), newResult.getClass());
       } catch (ImportException e) {
         throw new AssertionFailedError();
       }

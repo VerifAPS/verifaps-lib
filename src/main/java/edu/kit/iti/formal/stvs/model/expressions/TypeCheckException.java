@@ -1,8 +1,9 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 /**
- * An Exception for type errors. Occurs when one wants to parse an
- * {@link Expression} like <tt>2 AND TRUE</tt> or <tt>42 = FALSE</tt>.
+ * An Exception for type errors. Occurs when one wants to parse an {@link Expression} like
+ * <tt>2 AND TRUE</tt> or <tt>42 = FALSE</tt>.
+ *
  * @author Philipp
  */
 public class TypeCheckException extends Exception {
@@ -11,8 +12,9 @@ public class TypeCheckException extends Exception {
   private final Expression mistypedExpression;
 
   /**
-   * @param mistypedExpression the expression that is ill-typed. This would
-   *                           be the whole expression (for example <tt>2 AND TRUE</tt>)
+   * Create a new TypeCheckException.
+   * @param mistypedExpression the expression that is ill-typed. This would be the whole expression
+   *        (for example <tt>2 AND TRUE</tt>)
    * @param message a message about what went wrong.
    */
   public TypeCheckException(Expression mistypedExpression, String message) {
@@ -21,20 +23,31 @@ public class TypeCheckException extends Exception {
   }
 
   /**
-   * @return the expression that is ill-typed. This would
-   *         be the whole expression (for example <tt>2 AND TRUE</tt>)
+   * Get the expression for which this TypeCheckException was thrown.
+   * @return the expression that is ill-typed. This would be the whole expression (for example
+   *         <tt>2 AND TRUE</tt>)
    */
   public Expression getMistypedExpression() {
     return mistypedExpression;
   }
 
   @Override
+  public int hashCode() {
+    return getMistypedExpression() != null ? getMistypedExpression().hashCode() : 0;
+  }
+
+  @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     TypeCheckException that = (TypeCheckException) o;
 
-    return getMistypedExpression() != null ? getMistypedExpression().equals(that.getMistypedExpression()) : that.getMistypedExpression() == null;
+    return getMistypedExpression() != null ? getMistypedExpression().equals(
+        that.getMistypedExpression()) : that.getMistypedExpression() == null;
   }
 }

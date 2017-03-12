@@ -2,18 +2,18 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 /**
  * Created by leonk on 12.02.2017.
+ *
  * @author Leon Kaucher
  */
 public class BitvectorUtils {
-  private static final char[] HEX_CHARS = new char[]{'0', '1', '2', '3', '4',
-      '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+  private static final char[] HEX_CHARS =
+      new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
   /**
-   * Convert an integer to its hex representation.
-   * The length specifies the number of output digits.
-   * e.g. a length of 2 lets you convert positive numbers between 0 an 255
-   * or numbers between -128 and 127 to their string representation
-   * Numbers are represented as a hexadecimal two's complement.
+   * Convert an integer to its hex representation. The length specifies the number of output digits.
+   * e.g. a length of 2 lets you convert positive numbers between 0 an 255 or numbers between -128
+   * and 127 to their string representation Numbers are represented as a hexadecimal two's
+   * complement.
    *
    * @param integer arbitrary integer
    * @param length Number of digits of output

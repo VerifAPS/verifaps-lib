@@ -1,10 +1,8 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
-import edu.kit.iti.formal.stvs.StvsApplication;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;

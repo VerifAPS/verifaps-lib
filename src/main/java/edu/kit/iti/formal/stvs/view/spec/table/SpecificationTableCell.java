@@ -6,30 +6,38 @@ import edu.kit.iti.formal.stvs.model.table.problems.CellProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.model.table.problems.DurationProblem;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.DefaultStringConverter;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
- * Created by philipp on 13.02.17.
+ * The view for a cell in a specification table.
+ *
  * @author Philipp
  */
 public class SpecificationTableCell extends TextFieldTableCell<HybridRow, String> {
 
   private final ConstraintSpecificationValidator validator;
 
-  public SpecificationTableCell(
-      ConstraintSpecificationValidator validator) {
+  /**
+   * Create a new SpecificationTableCell with a given validator.
+   * @param validator The validator for this cell
+   */
+  public SpecificationTableCell(ConstraintSpecificationValidator validator) {
     super(new DefaultStringConverter());
     this.validator = validator;
 
     validator.problemsProperty().addListener(observable -> this.onProblemsChanged());
+    emptyProperty().addListener(observable -> this.onProblemsChanged());
     getStyleClass().add("spec-cell");
+    ViewUtils.setupId(this);
     onProblemsChanged();
   }
 
@@ -39,14 +47,11 @@ public class SpecificationTableCell extends TextFieldTableCell<HybridRow, String
     if (!empty && getCellModel() != null) {
       List<String> counterExampleCells = getCellModel().counterExamplesProperty();
       VBox counterExampleLabels = new VBox();
-      counterExampleLabels.getChildren().addAll(
-          counterExampleCells.stream()
-          .map(text -> {
-            Label label = new Label(text);
-            label.getStyleClass().add("spec-counterexample");
-            return label;
-          })
-          .collect(Collectors.toList()));
+      counterExampleLabels.getChildren().addAll(counterExampleCells.stream().map(text -> {
+        Label label = new Label(text);
+        label.getStyleClass().add("spec-counterexample");
+        return label;
+      }).collect(Collectors.toList()));
       setGraphic(counterExampleLabels);
     }
   }
@@ -86,10 +91,13 @@ public class SpecificationTableCell extends TextFieldTableCell<HybridRow, String
   }
 
   private HybridCell<?> getCellModel() {
-    // Null hell
-    if (getTableRow() == null) return null;
+    if (getTableRow() == null) {
+      return null;
+    }
     HybridRow row = (HybridRow) getTableRow().getItem();
-    if (row == null) return null;
+    if (row == null) {
+      return null;
+    }
     String columnId = (String) getTableColumn().getUserData();
     if (columnId != null) {
       return row.getCells().get(columnId);

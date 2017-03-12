@@ -5,18 +5,18 @@
             name="Ta"
             version="1.0">
 
-  <variables>
-    <variable data-type="INT" io="input" name="i"/>
-    <variable data-type="INT" io="output" name="o"/>
-    <variable data-type="INT" io="output" name="c"/>
-  </variables>
+    <variables>
+        <variable data-type="INT" io="input" name="i"/>
+        <variable data-type="INT" io="output" name="o"/>
+        <variable data-type="INT" io="output" name="c"/>
+    </variables>
 
-  <steps>
-    <step duration="[10,-]">
-      <cell>-</cell>
-      <cell>i</cell>
-      <cell>42</cell>
-    </step>
-  </steps>
+    <steps>
+        <step duration="[10,-]">
+            <cell>-</cell>
+            <cell>i</cell>
+            <cell>42</cell>
+        </step>
+    </steps>
 
 </test-table>

@@ -9,9 +9,11 @@ import javafx.beans.Observable;
 /**
  * A specification table that has been validated (is free from {@link SpecProblem}s) and can be
  * concretized (by a {@link edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer}).
+ *
  * @author Benjamin Alt
  */
-public class ValidSpecification extends SpecificationTable<ValidIoVariable, Expression, LowerBoundedInterval> {
+public class ValidSpecification
+    extends SpecificationTable<ValidIoVariable, Expression, LowerBoundedInterval> {
 
   /**
    * Create a new empty ValidSpecification.

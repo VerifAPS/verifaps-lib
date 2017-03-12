@@ -3,15 +3,23 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.util.ListTypeConverter;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
 
 import java.util.List;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+
 /**
+ * The dialog for configuring new i/o variables (i.e. adding columns) in a specification table.
  * @author Philipp
  */
 public class IoVariableChooserDialog extends Dialog<SpecIoVariable> {
@@ -22,8 +30,12 @@ public class IoVariableChooserDialog extends Dialog<SpecIoVariable> {
   private final ListView<CodeIoVariable> ioVariables;
   private final ButtonType createButton = new ButtonType("Create", ButtonBar.ButtonData.OK_DONE);
 
-  public IoVariableChooserDialog(
-      ObjectProperty<List<CodeIoVariable>> codeIoVariables,
+  /**
+   * Creates an instance of a chooser dialog.
+   * @param codeIoVariables variables that can be found in code
+   * @param alreadyDefinedVariables variables already used in the table
+   */
+  public IoVariableChooserDialog(ObjectProperty<List<CodeIoVariable>> codeIoVariables,
       ObservableList<SpecIoVariable> alreadyDefinedVariables) {
     super();
 
@@ -47,9 +59,11 @@ public class IoVariableChooserDialog extends Dialog<SpecIoVariable> {
 
     getDialogPane().lookupButton(createButton).disableProperty()
         .bind(definitionPane.createDefinitionInvalidBinding(alreadyDefinedVariables));
+    getDialogPane().setId("IoVariableChooserDialogPane");
   }
 
-  private ListCell<CodeIoVariable> createCellForListView(ListView<CodeIoVariable> codeIoVariableListView) {
+  private ListCell<CodeIoVariable> createCellForListView(
+      ListView<CodeIoVariable> codeIoVariableListView) {
     return new ListCell<CodeIoVariable>() {
       @Override
       protected void updateItem(CodeIoVariable item, boolean empty) {
@@ -63,7 +77,8 @@ public class IoVariableChooserDialog extends Dialog<SpecIoVariable> {
     };
   }
 
-  private void onSelectionChanged(ObservableValue<? extends CodeIoVariable> obs, CodeIoVariable old, CodeIoVariable value) {
+  private void onSelectionChanged(ObservableValue<? extends CodeIoVariable> obs, CodeIoVariable old,
+      CodeIoVariable value) {
     definitionPane.setFromIoVariable(value);
   }
 

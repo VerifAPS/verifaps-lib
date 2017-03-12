@@ -1,29 +1,35 @@
 package edu.kit.iti.formal.stvs.view.common;
 
+import edu.kit.iti.formal.stvs.view.ViewUtils;
+
+import java.util.Optional;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.control.TextField;
 
-import java.util.Optional;
-
 /**
- * Created by csicar on 15.02.17.
+ * A Input field that only allows positive integers.
+ *
  * @author Carsten Csiky
  */
 public class PositiveIntegerInputField extends TextField {
   private BooleanProperty valid;
 
+  /**
+   * Creates an instances of this positive integer only field.
+   */
   public PositiveIntegerInputField() {
     this.textProperty().addListener(this::onInputChange);
     valid = new SimpleBooleanProperty();
     valid.addListener(this::onValidStateChange);
     this.alignmentProperty().setValue(Pos.CENTER_RIGHT);
+    ViewUtils.setupId(this);
   }
 
-  private void onValidStateChange(ObservableValue<?> observableValue, Boolean old, Boolean
-      value) {
+  private void onValidStateChange(ObservableValue<?> observableValue, Boolean old, Boolean value) {
     if (value) {
       this.getStyleClass().add("valid");
     } else {
@@ -36,8 +42,9 @@ public class PositiveIntegerInputField extends TextField {
   }
 
   /**
-   * get inputfield value as an integer
-   * if no integer representation is available Optional.empty() will be returned
+   * get inputfield value as an integer if no integer representation is available Optional.empty()
+   * will be returned
+   *
    * @return value as an integer
    */
   public Optional<Integer> getInteger() {

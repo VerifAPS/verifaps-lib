@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
-import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import org.junit.Before;
@@ -8,6 +7,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -46,8 +47,8 @@ public class XmlConfigImporterTest {
     assertEquals(expectedConfig, actualConfig);
   }
 
-  @Test(expected=ImportException.class)
-  public void testDoInvalidImport() throws Exception {
+  @Test(expected = ImportException.class)
+  public void testDoImportInvalidData() throws Exception {
     FileInputStream inputStream = new FileInputStream(new File
         (this.getClass().getResource("config_invalid_1.xml").toURI()));
     GlobalConfig config = importer.doImport(inputStream);

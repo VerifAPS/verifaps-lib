@@ -7,6 +7,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 /**
  * An abstract duration given by a constraint rather than a concrete value. For the grammar of
  * constraint durations, see https://git.scc.kit.edu/peese/stverificationstudio/issues/25.
+ *
  * @author Benjamin Alt
  */
 public class ConstraintDuration implements CellOperationProvider {
@@ -17,6 +18,7 @@ public class ConstraintDuration implements CellOperationProvider {
   /**
    * Construct a new ConstraintDuration from its string representation (i.e. the constraint as
    * string).
+   *
    * @param stringRepresentation A string representation of the constraint duration
    */
   public ConstraintDuration(String stringRepresentation) {
@@ -61,12 +63,31 @@ public class ConstraintDuration implements CellOperationProvider {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof ConstraintDuration)) return false;
-    if (obj == this) return true;
-    ConstraintDuration other = (ConstraintDuration) obj;
-    return new EqualsBuilder()
-        .append(stringRepresentation.get(), other.stringRepresentation.get())
-        .append(comment.get(), other.comment.get())
-        .isEquals();
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+
+    ConstraintDuration that = (ConstraintDuration) obj;
+
+    if ((getAsString() != null)
+        ? !getAsString().equals(that.getAsString()) : (that.getAsString() != null)) {
+      return false;
+    }
+    return (getComment() != null)
+        ? getComment().equals(that.getComment()) : (that.getComment() == null);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getAsString() != null ? getAsString().hashCode() : 0;
+    result = 31 * result + (getComment() != null ? getComment().hashCode() : 0);
+    return result;
+  }
+
+  public String toString() {
+    return debuggingString();
   }
 }

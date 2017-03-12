@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 /**
- * runtime-representation of unary expressions. Examples:
- * <tt>NOT TRUE</tt>, <tt>- 3</tt>.
+ * Runtime-representation of unary expressions. Examples: <tt>NOT TRUE</tt>, <tt>- 3</tt>.
+ *
  * @author Philipp
  */
 public class UnaryFunctionExpr extends Expression {
@@ -18,6 +18,8 @@ public class UnaryFunctionExpr extends Expression {
   private final Expression argument;
 
   /**
+   * Creates an instance that represents an unary function.
+   *
    * @param operation the unary operation
    * @param argument the expression to apply the operation to
    */

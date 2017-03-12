@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.logic.specification;
 
 import edu.kit.iti.formal.stvs.logic.specification.smtlib.OptionalConcreteSpecificationHandler;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.util.ThrowableHandler;
 
@@ -9,28 +10,29 @@ import java.util.List;
 
 
 /**
- * Interface a concretizer must implement.
+ * Interface a concretizer must implement. Concretizers create a {@link ConcreteSpecification}
+ * (a concrete instance of a specification table) from a {@link ValidSpecification}.
+ *
  * @author Benjamin Alt
  */
 public interface SpecificationConcretizer {
 
   /**
-   * Must implement the solving task and registers handlers for the
-   * result and exceptions.
+   * Create a concrete instance from a given valid constraint specification and a list of free
+   * variables.
    *
-   * @param validSpecification The valid specification that should be conretized
-   * @param freeVariables FreeVariables that were used in the {@code validSpecification}
-   * @param specificationHandler handles the concrete specification
-   *                             (or an empty {@link java.util.Optional}) if result not present
-   * @param exceptionHandler handles exceptions
+   * @param validSpecification The valid specification that should be concretized
+   * @param freeVariables FreeVariables that were used in the {@link ValidSpecification}
+   * @return calculated concrete specification
+   * @throws ConcretizationException general error during concretization
    */
-  void calculateConcreteSpecification(ValidSpecification validSpecification,
-                                      List<ValidFreeVariable> freeVariables,
-                                      OptionalConcreteSpecificationHandler specificationHandler,
-                                      ThrowableHandler exceptionHandler);
+  ConcreteSpecification calculateConcreteSpecification(
+      ValidSpecification validSpecification,
+      List<ValidFreeVariable> freeVariables)
+      throws ConcretizationException;
 
   /**
-   * Terminates the concretization.
+   * Terminates the calculation of the concrete specification.
    */
   void terminate();
 }

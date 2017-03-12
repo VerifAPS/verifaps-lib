@@ -6,7 +6,8 @@ import javafx.beans.property.SimpleStringProperty;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * @author Benjamin Alt
@@ -17,7 +18,7 @@ public class ConcreteCellTest {
 
   @Before
   public void setUp() {
-      cellA = new ConcreteCell(new ValueInt(4));
+    cellA = new ConcreteCell(new ValueInt(4));
   }
 
   @Test

@@ -14,21 +14,23 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
-import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+
+import org.w3c.dom.Node;
 
 /**
- * This class provides the functionality to import whole sessions from xml nodes.
+ * This class provides the functionality to import whole sessions ({@link StvsRootModel}s) from
+ * xml nodes.
  *
  * @author Benjamin Alt
  */
@@ -41,18 +43,17 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
   private History currentHistory;
 
   /**
-   * Creates an Importer.
-   * {@code currentConfig} and {@code currentHistory} are
-   * later passed to the new {@link StvsRootModel}.
+   * Creates an Importer. {@code currentConfig} and {@code currentHistory} are later passed to the
+   * new {@link StvsRootModel}.
    *
-   * @param currentConfig  currently used configuration
+   * @param currentConfig currently used configuration
    * @param currentHistory currently used history
    * @throws ImportException Exception while importing
    */
-  public XmlSessionImporter(GlobalConfig currentConfig, History currentHistory) throws
-      ImportException {
+  public XmlSessionImporter(GlobalConfig currentConfig, History currentHistory)
+      throws ImportException {
     constraintSpecImporter = new XmlConstraintSpecImporter();
-    //configImporter = new XmlConfigImporter();
+    // configImporter = new XmlConfigImporter();
     this.objectFactory = new ObjectFactory();
     this.currentConfig = currentConfig;
     this.currentHistory = currentHistory;
@@ -70,8 +71,8 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-      Session importedSession = ((JAXBElement<Session>) jaxbUnmarshaller.unmarshal(source))
-          .getValue();
+      Session importedSession =
+          ((JAXBElement<Session>) jaxbUnmarshaller.unmarshal(source)).getValue();
 
       // Code
       Code code = new Code();
@@ -79,31 +80,13 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
       VerificationScenario scenario = new VerificationScenario(code);
 
       List<Type> typeContext = Optional.ofNullable(code.getParsedCode())
-          .map(ParsedCode::getDefinedTypes)
-          .orElse(Arrays.asList(TypeInt.INT, TypeBool.BOOL));
-
-      /* Config (optional in xsd, not imported/exported with session right now but separately,
-      as per customer request)
-      GlobalConfig config = new GlobalConfig();
-      if (importedSession.getConfig() != null) {
-        JAXBElement<Config> element = objectFactory.createConfig(importedSession.getConfig());
-        config = configImporter.doImportFromXmlNode(XmlExporter.marshalToNode(element));
-      } */
-
-      /* History (optional in xsd, not imported/exported with session right now but separately
-      History history = new History();
-      for (String codeFile : importedSession.getHistory().getCode()) {
-        history.addCodeFile(codeFile);
-      }
-      for (String specFile : importedSession.getHistory().getSpec()) {
-        history.addSpecFile(specFile);
-      } */
+          .map(ParsedCode::getDefinedTypes).orElse(Arrays.asList(TypeInt.INT, TypeBool.BOOL));
 
       // Tabs
       List<HybridSpecification> hybridSpecs = importTabs(importedSession, typeContext);
 
-      return new StvsRootModel(hybridSpecs, currentConfig, currentHistory, scenario, new File(System
-          .getProperty("user.home")), "");
+      return new StvsRootModel(hybridSpecs, currentConfig, currentHistory, scenario,
+          new File(System.getProperty("user.home")), "");
     } catch (JAXBException e) {
       throw new ImportException(e);
     }
@@ -117,10 +100,8 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
    * @return list of imported specifications (tabs)
    * @throws ImportException Exception while importing
    */
-  private List<HybridSpecification> importTabs(
-      Session importedSession,
-      List<Type> typeContext
-  )throws ImportException {
+  private List<HybridSpecification> importTabs(Session importedSession, List<Type> typeContext)
+      throws ImportException {
     XmlConcreteSpecImporter concreteSpecImporter = new XmlConcreteSpecImporter(typeContext);
     List<HybridSpecification> hybridSpecs = new ArrayList<>();
     for (Tab tab : importedSession.getTabs().getTab()) {
@@ -135,11 +116,11 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
               throw new ImportException("Tab may not have more than one abstract specification");
             }
             ConstraintSpecification constraintSpec = constraintSpecImporter.doImportFromXmlNode(
-                XmlExporter.marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml"));
+                XmlExporter.marshalToNode(element, XmlExporter.NAMESPACE));
             hybridSpec = new HybridSpecification(constraintSpec, !tab.isReadOnly());
           } else {
             ConcreteSpecification concreteSpec = concreteSpecImporter.doImportFromXmlNode(
-                XmlExporter.marshalToNode(element, "edu.kit.iti.formal.stvs.logic.io.xml"));
+                XmlExporter.marshalToNode(element, XmlExporter.NAMESPACE));
             if (concreteSpec.isCounterExample()) {
               counterExample = concreteSpec;
             } else {

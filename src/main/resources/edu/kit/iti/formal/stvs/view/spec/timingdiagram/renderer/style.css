@@ -11,10 +11,16 @@
 .axis:top > .axis-label,
 .axis:left > .axis-label {
     -fx-padding: 0;
+    -fx-pref-width: 0;
 }
 .axis:bottom > .axis-label,
 .axis:right > .axis-label {
     -fx-padding: 0;
+}
+
+.axis:left{
+    -fx-tick-length: 0;
+    -fx-tick-label-gap: 0;
 }
 
 .axis{

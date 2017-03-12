@@ -1,8 +1,9 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 /**
- * The class for expressions that are constant. Examples are
- * <tt>42</tt>, <tt>TRUE</tt> or <tt>my_enum_constructor</tt>.
+ * The class for expressions that are constant. Examples are <tt>42</tt>, <tt>TRUE</tt> or
+ * <tt>my_enum_constructor</tt>.
+ *
  * @author Philipp
  */
 public class LiteralExpr extends Expression {
@@ -32,6 +33,11 @@ public class LiteralExpr extends Expression {
   @Override
   public boolean equals(Object other) {
     return (other instanceof LiteralExpr) && this.equals((LiteralExpr) other);
+  }
+
+  @Override
+  public int hashCode() {
+    return getValue() != null ? getValue().hashCode() : 0;
   }
 
   @Override

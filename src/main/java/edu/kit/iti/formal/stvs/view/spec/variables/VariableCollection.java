@@ -1,24 +1,23 @@
 package edu.kit.iti.formal.stvs.view.spec.variables;
 
-import de.jensd.fx.glyphs.GlyphsDude;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 
 /**
- * Created by csicar on 10.01.17.
+ * This is the view that displays free variables and offers editing them.
+ *
  * @author Philipp
  */
 public class VariableCollection extends VBox {
 
   public enum Column {
-    NAME,
-    TYPE,
-    VALUE
+    NAME, TYPE, VALUE
   }
 
   private final Label overviewLabel;
@@ -27,18 +26,23 @@ public class VariableCollection extends VBox {
   private final TableColumn<FreeVariable, String> typeTableColumn;
   private final TableColumn<FreeVariable, String> defaultValueTableColumn;
 
+  /**
+   * Creates an instance of this view.
+   */
   public VariableCollection() {
     this.overviewLabel = new Label("Free Variables:");
     this.freeVariableTableView = new TableView<>();
+    this.freeVariableTableView.setId("VariableCollectionTableView");
     this.nameTableColumn = new TableColumn<>("Name");
     this.typeTableColumn = new TableColumn<>("Type");
     this.defaultValueTableColumn = new TableColumn<>("Default Value");
 
-    getStylesheets().add(VariableCollection.class.getResource("style.css").toExternalForm());
+    ViewUtils.setupView(this);
 
     nameTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
     typeTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
-    defaultValueTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.2));
+    defaultValueTableColumn.prefWidthProperty()
+        .bind(freeVariableTableView.widthProperty().multiply(0.2));
 
 
     nameTableColumn.setUserData(Column.NAME);
@@ -47,8 +51,8 @@ public class VariableCollection extends VBox {
 
     freeVariableTableView.setEditable(true);
     freeVariableTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    freeVariableTableView.getColumns().addAll(
-        nameTableColumn, typeTableColumn, defaultValueTableColumn);
+    freeVariableTableView.getColumns().addAll(nameTableColumn, typeTableColumn,
+        defaultValueTableColumn);
 
     this.overviewLabel.getStyleClass().addAll("freevar", "overview-label");
     this.freeVariableTableView.getStyleClass().addAll("freevar", "variable-table-view");

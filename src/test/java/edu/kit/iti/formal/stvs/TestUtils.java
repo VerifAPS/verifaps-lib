@@ -2,9 +2,10 @@ package edu.kit.iti.formal.stvs;
 
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecImporter;
-import edu.kit.iti.formal.stvs.model.common.*;
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
+import edu.kit.iti.formal.stvs.model.common.FreeVariableProblem;
+import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
@@ -14,14 +15,23 @@ import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.stage.FileChooser;
+import org.mockito.Mockito;
+import org.mockito.stubbing.OngoingStubbing;
+import org.powermock.api.mockito.PowerMockito;
 
+import java.io.File;
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.testfx.util.WaitForAsyncUtils.sleep;
 
 /**
  * Created by bal on 10.02.17.
@@ -92,11 +102,29 @@ public class TestUtils {
       validator.problemsProperty().get().entrySet().stream()
           .map(entry -> entry.getKey() + " -> "
               + entry.getValue().stream()
-              .map(FreeVariableProblem::getGUIMessage)
+              .map(FreeVariableProblem::getGuiMessage)
               .collect(Collectors.toList()))
           .forEach(System.err::println);
       throw new RuntimeException("Couldn't validate");
     }
     return validator.validFreeVariablesProperty().get();
+  }
+
+  public static void gimmeTime() {
+    sleep(5, TimeUnit.SECONDS);
+  }
+
+  public static void mockFiles(URL ... urls) throws Exception {
+    List<File> files = Arrays.stream(urls)
+        .map(URL::getPath)
+        .map(File::new)
+        .collect(Collectors.toList());
+    FileChooser chooser = Mockito.mock(FileChooser.class);
+    OngoingStubbing<File> stub = Mockito.when(chooser.showOpenDialog(any()));
+    for (File file : files) {
+      stub = stub.thenReturn(file);
+    }
+    Mockito.when(chooser.getExtensionFilters()).thenReturn(FXCollections.observableList(new ArrayList<>()));
+    PowerMockito.whenNew(FileChooser.class).withAnyArguments().thenReturn(chooser);
   }
 }

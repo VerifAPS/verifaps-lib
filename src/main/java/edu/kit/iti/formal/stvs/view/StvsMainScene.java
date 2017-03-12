@@ -6,6 +6,9 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.menu.StvsMenuBarController;
+
+import java.io.IOException;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -17,10 +20,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import javax.xml.bind.JAXBException;
-import java.io.IOException;
 
 /**
- * Created by csicar on 09.01.17.
+ * Main Scene that holds all visible nodes of the program.
+ *
  * @author Lukas Fritsch
  */
 public class StvsMainScene {
@@ -28,13 +31,16 @@ public class StvsMainScene {
   private StvsMenuBarController menuBarController;
   private StvsRootController rootController;
   private ObjectProperty<StvsRootModel> rootModelProperty;
-  private ContextMenu contextMenu;
   private final Scene scene;
 
   public StvsMainScene() {
     this(StvsRootModel.autoloadSession());
   }
 
+  /**
+   * Creates an instance from a root model.
+   * @param rootModel Model that should be represented by this instance.
+   */
   public StvsMainScene(StvsRootModel rootModel) {
     this.rootModelProperty = new SimpleObjectProperty<>(rootModel);
     this.rootController = new StvsRootController(rootModelProperty.get());
@@ -44,24 +50,23 @@ public class StvsMainScene {
 
     rootModelProperty.addListener(this::rootModelChanged);
 
-    this.scene = new Scene(createVBox(), rootModel.getGlobalConfig().getWindowWidth(), rootModel.getGlobalConfig().getWindowHeight());
+    this.scene = new Scene(createVBox(), rootModel.getGlobalConfig().getWindowWidth(),
+        rootModel.getGlobalConfig().getWindowHeight());
 
     rootModel.getGlobalConfig().windowWidthProperty().bind(scene.widthProperty());
     rootModel.getGlobalConfig().windowHeightProperty().bind(scene.heightProperty());
   }
 
   private VBox createVBox() {
-    VBox vBox = new VBox();
-    vBox.getChildren().addAll(menuBarController.getView(), rootController.getView());
+    VBox vbox = new VBox();
+    vbox.getChildren().addAll(menuBarController.getView(), rootController.getView());
     VBox.setVgrow(rootController.getView(), Priority.ALWAYS);
 
-    return vBox;
+    return vbox;
   }
 
-  private void rootModelChanged(
-      ObservableValue<? extends StvsRootModel> obs,
-      StvsRootModel oldModel,
-      StvsRootModel rootModel) {
+  private void rootModelChanged(ObservableValue<? extends StvsRootModel> obs,
+      StvsRootModel oldModel, StvsRootModel rootModel) {
     this.rootController = new StvsRootController(rootModel);
     scene.setRoot(createVBox());
   }
@@ -78,6 +83,9 @@ public class StvsMainScene {
     return scene;
   }
 
+  /**
+   * Code that should be executed before the scene is destroyed on exit.
+   */
   public void onClose() {
     StvsRootModel stvsRootModel = rootModelProperty.get();
     if (stvsRootModel != null) {
@@ -86,8 +94,9 @@ public class StvsMainScene {
         stvsRootModel.getHistory().autosaveHistory();
         stvsRootModel.autosaveSession();
       } catch (IOException | ExportException | JAXBException e) {
-        AlertFactory.createAlert(Alert.AlertType.ERROR, "Autosave error", "Error saving the current" +
-            " configuration", "The current configuration could not be saved.", e.getMessage());
+        AlertFactory.createAlert(Alert.AlertType.ERROR, "Autosave error",
+            "Error saving the current" + " configuration",
+            "The current configuration could not be saved.", e.getMessage()).showAndWait();
       }
     }
   }

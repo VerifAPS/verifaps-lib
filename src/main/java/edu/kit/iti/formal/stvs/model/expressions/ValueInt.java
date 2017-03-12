@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 /**
- * runtime-representation for integer values of {@link Expression}s.
+ * Runtime-representation for integer values of {@link Expression}s.
+ * This is not a singleton (in contrast to {@link ValueBool}), since many different instances can be
+ * created at runtime.
  *
- * <p>This is not a singleton (in contrast to {@link ValueBool}), since
- * many different instances can be created at runtime.
  * @author Philipp
  */
 public class ValueInt implements Value {
@@ -19,9 +19,7 @@ public class ValueInt implements Value {
   }
 
   @Override
-  public <R> R match(
-      ValueIntegerHandler<R> matchInt,
-      ValueBooleanHandler<R> matchBoolean,
+  public <R> R match(ValueIntegerHandler<R> matchInt, ValueBooleanHandler<R> matchBoolean,
       ValueEnumHandler<R> matchEnum) {
     return matchInt.handle(value);
   }
@@ -36,8 +34,12 @@ public class ValueInt implements Value {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!(obj instanceof ValueInt)) return false;
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof ValueInt)) {
+      return false;
+    }
 
     ValueInt valueInt = (ValueInt) obj;
 

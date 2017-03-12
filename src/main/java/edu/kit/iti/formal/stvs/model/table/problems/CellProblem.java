@@ -3,7 +3,9 @@ package edu.kit.iti.formal.stvs.model.table.problems;
 import edu.kit.iti.formal.stvs.model.common.Selection;
 
 /**
- * Created by Philipp on 03.02.2017.
+ * Models problems in cells. Used for rendering in the view (see
+ * {@link edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableCell}).
+ * </p>
  * @author Philipp
  */
 public class CellProblem extends SpecProblem {
@@ -11,6 +13,13 @@ public class CellProblem extends SpecProblem {
   private final int row;
   private final String column;
 
+  /**
+   * Constructor for a problem that has an error message and a position inside a table.
+   *
+   * @param errorMessage the error message
+   * @param column the column of the problematic cell
+   * @param row the row of the problematic cell
+   */
   public CellProblem(String errorMessage, String column, int row) {
     super(errorMessage, new Selection(column, row));
     this.row = row;
@@ -26,14 +35,22 @@ public class CellProblem extends SpecProblem {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
 
-    CellProblem that = (CellProblem) o;
+    CellProblem that = (CellProblem) obj;
 
-    if (getRow() != that.getRow()) return false;
+    if (getRow() != that.getRow()) {
+      return false;
+    }
     return getColumn() != null ? getColumn().equals(that.getColumn()) : that.getColumn() == null;
   }
 

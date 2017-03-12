@@ -13,15 +13,26 @@ plugins {
 
 apply plugin: 'application'
 apply plugin: "jacoco"
+apply plugin: 'antlr'
 
 compileJava.options.encoding = 'UTF-8'
+compileJava.dependsOn(xjc)
 
 sourceSets {
     main {
         java {
-            srcDirs =  ['src/main/java', 'src/generated/java']
+            srcDirs = [
+                'src/main/java',
+                'build/generated-src/jaxb',
+                'build/generated-src/antlr/main'
+            ]
         }
     }
+}
+
+javadoc {
+    failOnError false
+    options.charSet = 'UTF-8'
 }
 
 // In this section you declare where to find the dependencies of your project
@@ -34,8 +45,6 @@ repositories {
         url "http://formal.iti.kit.edu/maven2/"
     }
 }
-
-// In this section you declare the dependencies for your production and test code
 dependencies {
     compile 'com.fifesoft:rsyntaxtextarea:2.6.0'
     compile 'org.apache.commons:commons-collections4:4.0'
@@ -50,20 +59,42 @@ dependencies {
     compile group: 'de.jensd', name: 'fontawesomefx', version: '8.9'
     compile group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.2.3-1'
 
+    testCompile "junit:junit:4.12"
+
+    antlr 'org.antlr:antlr4:4.6'
+
     jaxb 'com.sun.xml.bind:jaxb-xjc:2.2.7-b41'
     jaxb 'com.sun.xml.bind:jaxb-impl:2.2.7-b41'
     jaxb 'javax.xml.bind:jaxb-api:2.2.7'
 
     testCompile "junit:junit:4.12"
+    testCompile group: 'com.googlecode.junit-toolbox', name: 'junit-toolbox', version: '2.2'
+    testCompile "org.testfx:testfx-core:4.0.+"
+    testCompile "org.testfx:testfx-junit:4.0.+"
+    testCompile "org.mockito:mockito-core:2.4.0"
+    testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '1.7.0RC2'
+    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '1.7.0RC2'
 }
 
 System.setProperty('javax.xml.accessExternalSchema', 'file')
 
+jacocoTestReport {
+    reports {
+        csv.enabled true
+    }
+}
+
 jaxb {
     xjc {
         xsdDir "src/main/resources/fileFormats/"
-        destinationDir "src/generated/java/"
+        destinationDir "build/generated-src/jaxb/"
+        args = ["-encoding", "UTF-8"]
     }
+}
+
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += ["-visitor", "-long-messages"]
 }
 
 jar {
@@ -78,6 +109,13 @@ test {
         includeTestsMatching "edu.kit.iti.formal.stvs.logic.*"
     }
 
+
+    useJUnit {
+        excludeCategories 'edu.kit.iti.formal.stvs.Performance'
+        excludeCategories 'edu.kit.iti.formal.stvs.Demo'
+        excludeCategories 'edu.kit.iti.formal.stvs.RandomTest'
+    }
+
     testLogging {
         showStandardStreams = true
     }
@@ -85,5 +123,19 @@ test {
         append = false
         destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
         classDumpFile = file("$buildDir/jacoco/classpathdumps")
+    }
+}
+
+
+task guiTest(type: Test) {
+    filter {
+        includeTestsMatching "edu.kit.iti.formal.stvs.view.*"
+    }
+    useJUnit {
+        excludeCategories 'edu.kit.iti.formal.stvs.Demo'
+        excludeCategories 'edu.kit.iti.formal.stvs.Performance'
+    }
+    testLogging {
+        showStandardStreams = true
     }
 }

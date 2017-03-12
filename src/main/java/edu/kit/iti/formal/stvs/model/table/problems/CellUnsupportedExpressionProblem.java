@@ -3,6 +3,9 @@ package edu.kit.iti.formal.stvs.model.table.problems;
 import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 
 /**
+ * The cell problem analog to the {@link UnsupportedExpressionException}. Created when expressions
+ * with function calls or if guards or similar are encountered which have not yet been implemented.
+ *
  * @author Benjamin Alt
  */
 public class CellUnsupportedExpressionProblem extends CellProblem {
@@ -13,7 +16,15 @@ public class CellUnsupportedExpressionProblem extends CellProblem {
     return exception.getMessage();
   }
 
-  public CellUnsupportedExpressionProblem(UnsupportedExpressionException exception, String column, int row) {
+  /**
+   * Creates the cell problem for an {@link UnsupportedExpressionException}, a column and a row.
+   *
+   * @param exception the exception that caused this cell problem
+   * @param column the column of the cell in the table
+   * @param row the row of the cell in the table
+   */
+  public CellUnsupportedExpressionProblem(UnsupportedExpressionException exception, String column,
+      int row) {
     super(createErrorMessage(exception), column, row);
     this.exception = exception;
   }
@@ -23,12 +34,18 @@ public class CellUnsupportedExpressionProblem extends CellProblem {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
 
-    CellUnsupportedExpressionProblem that = (CellUnsupportedExpressionProblem) o;
+    CellUnsupportedExpressionProblem that = (CellUnsupportedExpressionProblem) obj;
 
     return exception != null ? exception.equals(that.exception) : that.exception == null;
   }

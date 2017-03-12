@@ -1,32 +1,22 @@
 package edu.kit.iti.formal.stvs.model.expressions;
 
 /**
- * The runtime-representation for parsed, binary function expressions.
- * Examples are: +, -, =, AND, OR, etc. Anything that has two arguments.
+ * The runtime-representation for parsed, binary function expressions. Examples are: +, -, =, AND,
+ * OR, etc. Anything that has two arguments.
+ *
  * @author Philipp
  */
 public class BinaryFunctionExpr extends Expression {
 
   public enum Op {
     // (BOOL, BOOL) -> BOOL
-    AND,
-    OR,
-    XOR,
+    AND, OR, XOR,
     // (INT, INT) -> BOOL
-    GREATER_THAN,
-    GREATER_EQUALS,
-    LESS_THAN,
-    LESS_EQUALS,
+    GREATER_THAN, GREATER_EQUALS, LESS_THAN, LESS_EQUALS,
     // (a, a) -> BOOL
-    EQUALS,
-    NOT_EQUALS,
+    EQUALS, NOT_EQUALS,
     // (INT, INT) -> INT
-    PLUS,
-    MINUS,
-    MULTIPLICATION,
-    DIVISION,
-    MODULO,
-    POWER
+    PLUS, MINUS, MULTIPLICATION, DIVISION, MODULO, POWER
   }
 
   private final Op operation;
@@ -62,19 +52,25 @@ public class BinaryFunctionExpr extends Expression {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof BinaryFunctionExpr)) return false;
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof BinaryFunctionExpr)) {
+      return false;
+    }
 
-    BinaryFunctionExpr that = (BinaryFunctionExpr) o;
+    BinaryFunctionExpr that = (BinaryFunctionExpr) obj;
 
     if (operation != that.operation) {
       return false;
     }
-    if (firstArgument != null ? !firstArgument.equals(that.firstArgument) : that.firstArgument != null) {
+    if (firstArgument != null ? !firstArgument.equals(that.firstArgument)
+        : that.firstArgument != null) {
       return false;
     }
-    return secondArgument != null ? secondArgument.equals(that.secondArgument) : that.secondArgument == null;
+    return secondArgument != null ? secondArgument.equals(that.secondArgument)
+        : that.secondArgument == null;
   }
 
   @Override

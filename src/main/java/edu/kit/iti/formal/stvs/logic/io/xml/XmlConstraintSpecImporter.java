@@ -9,18 +9,19 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
-import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+
+import org.w3c.dom.Node;
 
 /**
  * This class provides the functionality to import constraint specifications from xml nodes.
@@ -55,8 +56,8 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
   @Override
   public ConstraintSpecification doImportFromXmlNode(Node source) throws ImportException {
     try {
-      SpecificationTable importedSpec = ((JAXBElement<SpecificationTable>) unmarshaller
-          .unmarshal(source)).getValue();
+      SpecificationTable importedSpec =
+          ((JAXBElement<SpecificationTable>) unmarshaller.unmarshal(source)).getValue();
 
       FreeVariableList freeVariables = importFreeVariableSet(importedSpec.getVariables());
       List<SpecIoVariable> ioVariables = importIoVariables(importedSpec.getVariables());
@@ -69,15 +70,13 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
   /**
    * Imports a {@link ConstraintSpecification} from a {@link SpecificationTable}.
    *
-   * @param ioVariables  defined variables
+   * @param ioVariables defined variables
    * @param importedSpec specification table previously imported from xml
    * @return imported constraint specification
    * @throws ImportException Exception while importing
    */
   private ConstraintSpecification importConstraintSpec(FreeVariableList freeVariables,
-                                                       List<SpecIoVariable> ioVariables,
-                                                       SpecificationTable importedSpec)
-      throws ImportException {
+      List<SpecIoVariable> ioVariables, SpecificationTable importedSpec) throws ImportException {
     ConstraintSpecification constraintSpec = new ConstraintSpecification(freeVariables);
     constraintSpec.setName(importedSpec.getName());
 
@@ -93,7 +92,7 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
       ConstraintDuration newDuration = new ConstraintDuration(row.getDuration().getValue());
       newDuration.setComment(row.getDuration().getComment());
       constraintSpec.getDurations().add(newDuration);
-      SpecificationRow<ConstraintCell> row1 = createSpecificationRowFoCycle(ioVariables, row);
+      SpecificationRow<ConstraintCell> row1 = createSpecificationRowForCycle(ioVariables, row);
       constraintSpec.getRows().add(row1);
     }
 
@@ -105,12 +104,11 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
    * Creates a {@link SpecificationRow} that represents a {@code row}.
    *
    * @param ioVariables IO Variables that are present in the specification
-   * @param row         Row which holds the information to create a specification row.
+   * @param row Row which holds the information to create a specification row.
    * @return Specification row
-   * @throws ImportException Mismatch between size of {@code row} and size of
-   *                         {@code ioVariables}
+   * @throws ImportException Mismatch between size of {@code row} and size of {@code ioVariables}
    */
-  private SpecificationRow<ConstraintCell> createSpecificationRowFoCycle(
+  private SpecificationRow<ConstraintCell> createSpecificationRowForCycle(
       List<SpecIoVariable> ioVariables, Rows.Row row) throws ImportException {
     Map<String, ConstraintCell> cellsMap = new HashMap<>();
     for (int j = 0; j < row.getCell().size(); j++) {
@@ -122,7 +120,9 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
     if (cellsMap.size() != ioVariables.size()) {
       throw new ImportException("Row too short: Do not have a cell for each IOVariable");
     }
-    return ConstraintSpecification.createRow(cellsMap);
+    SpecificationRow<ConstraintCell> newRow = ConstraintSpecification.createRow(cellsMap);
+    newRow.setComment(row.getComment());
+    return newRow;
   }
 
   /**
@@ -132,8 +132,7 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
    * @return list of specification variables
    * @throws ImportException exception while importing
    */
-  protected List<SpecIoVariable> importIoVariables(Variables variables)
-      throws ImportException {
+  protected List<SpecIoVariable> importIoVariables(Variables variables) throws ImportException {
     List<SpecIoVariable> ioVariables = new ArrayList<>();
     for (Variables.IoVariable variable : variables.getIoVariable()) {
       try {
@@ -152,14 +151,13 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
   }
 
   /**
-   * mports {@link FreeVariable FreeVariables} from {@link Variables}.
+   * Imports {@link FreeVariable FreeVariables} from {@link Variables}.
    *
    * @param variables variables from which should be imported
    * @return object representing the free variables
    * @throws ImportException exception while importing
    */
-  private FreeVariableList importFreeVariableSet(Variables variables)
-      throws ImportException {
+  private FreeVariableList importFreeVariableSet(Variables variables) throws ImportException {
     List<FreeVariable> freeVariableSet = new ArrayList<>();
     for (Variables.FreeVariable freeVar : variables.getFreeVariable()) {
       String typeString = freeVar.getDataType();
@@ -170,8 +168,7 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
 
   @Override
   protected String getXsdFilePath() throws URISyntaxException {
-    File xsdFile =
-        new File(this.getClass().getResource("/fileFormats/specification.xsd").toURI());
+    File xsdFile = new File(this.getClass().getResource("/fileFormats/specification.xsd").toURI());
     return xsdFile.getAbsolutePath();
   }
 }

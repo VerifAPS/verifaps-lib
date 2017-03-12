@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.stvs.model.common;
 
 /**
- * Created by Philipp on 10.01.2017.
+ * The category of a variable.
+ *
  * @author Philipp
  */
 public enum VariableCategory {
-  INPUT,
-  OUTPUT
+  INPUT, OUTPUT
 }

@@ -1,11 +1,11 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
-
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.Exporter;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringWriter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -19,9 +19,9 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringWriter;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /**
  * Common superclass for all Exporters that export to xml.
@@ -30,10 +30,12 @@ import java.io.StringWriter;
  */
 public abstract class XmlExporter<F> implements Exporter<F> {
 
+  public static final String NAMESPACE = "edu.kit.iti.formal.stvs.logic.io.xml";
+
   /**
    * Exports an Object as xml.
    *
-   * @param source Ebject to export
+   * @param source Object to export
    * @return The output xml is written to this stream
    * @throws ExportException Exception while exporting
    */
@@ -46,7 +48,7 @@ public abstract class XmlExporter<F> implements Exporter<F> {
       transformer.transform(new DOMSource(xmlNode), new StreamResult(writer));
       String xmlString = writer.toString();
       ByteArrayOutputStream stream = new ByteArrayOutputStream();
-      stream.write(xmlString.getBytes());
+      stream.write(xmlString.getBytes("utf-8"));
       return stream;
     } catch (TransformerException | IOException e) {
       throw new ExportException(e);
@@ -56,13 +58,13 @@ public abstract class XmlExporter<F> implements Exporter<F> {
   /**
    * Marshals a {@link JAXBElement} to a xml node.
    *
-   * @param element   The element that should be marshaled
+   * @param element The element that should be marshaled
    * @param namespace Xml namespace used in the exported node
    * @return Node representing the input {@code element}
    * @throws ExportException Exception while exporting
    */
-  protected static Node marshalToNode(JAXBElement element, String namespace) throws
-      ExportException {
+  protected static Node marshalToNode(JAXBElement element, String namespace)
+      throws ExportException {
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();
@@ -78,9 +80,8 @@ public abstract class XmlExporter<F> implements Exporter<F> {
   }
 
   /**
-   * Must be implemented by subclasses.
-   * This method must provide the logic to convert the given {@code source} object into
-   * a xml {@link Node}
+   * Must be implemented by subclasses. This method must provide the logic to convert the given
+   * {@code source} object into a xml {@link Node}
    *
    * @param source Element that should be converted
    * @return Xml node

@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNotEquals;
 public class SpecificationRowTest {
 
   private static <E extends Observable> Callback<E, Observable[]> identityExtractor() {
-    return param -> new Observable[] { param };
+    return param -> new Observable[] {param};
   }
 
   private final StringProperty toBeChanged = new SimpleStringProperty("");

@@ -11,9 +11,15 @@ public class TestUtils {
   }
 
   public static <T> boolean collectionsEqual(Collection<T> as, Collection<T> bs) {
-    if (as == bs) return true;
-    if (as == null || bs == null) return false;
-    if (as.size() != bs.size()) return false;
+    if (as == bs) {
+      return true;
+    }
+    if (as == null || bs == null) {
+      return false;
+    }
+    if (as.size() != bs.size()) {
+      return false;
+    }
 
     return as.stream().allMatch(elem -> bs.stream().anyMatch(elem::equals));
   }

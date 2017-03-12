@@ -2,14 +2,12 @@ package edu.kit.iti.formal.stvs.model.config;
 
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigImporter;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by bal on 26.02.17.

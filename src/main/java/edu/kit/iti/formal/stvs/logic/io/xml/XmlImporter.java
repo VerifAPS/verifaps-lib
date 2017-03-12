@@ -2,12 +2,14 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.Importer;
-import org.apache.commons.io.IOUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URISyntaxException;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -15,8 +17,12 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.*;
-import java.net.URISyntaxException;
+
+import org.apache.commons.io.IOUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Common superclass for all Importers that import from xml.
@@ -36,8 +42,7 @@ public abstract class XmlImporter<T> implements Importer<T> {
    */
   private void validateAgainstXsd(InputStream xml)
       throws SAXException, IOException, URISyntaxException {
-    SchemaFactory factory =
-        SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     Schema schema = factory.newSchema(new File(getXsdFilePath()));
     Validator validator = schema.newValidator();
     validator.validate(new StreamSource(xml));
@@ -59,8 +64,7 @@ public abstract class XmlImporter<T> implements Importer<T> {
       String inputString = writer.toString();
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       dbf.setNamespaceAware(true);
-      Document doc = dbf.newDocumentBuilder()
-          .parse(new InputSource(new StringReader(inputString)));
+      Document doc = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(inputString)));
       return doImportFromXmlNode(doc.getDocumentElement());
     } catch (SAXException | IOException | ParserConfigurationException | URISyntaxException e) {
       throw new ImportException(e);
@@ -68,9 +72,9 @@ public abstract class XmlImporter<T> implements Importer<T> {
   }
 
   /**
-   * Must be implemented by subclasses.
-   * This method must provide the logic to convert the given {@code source} {@link Node} into
-   * the corresponding object.
+   * Must be implemented by subclasses. This method must provide the logic to convert the given
+   * {@code source} {@link Node} into the corresponding object.
+   *
    * @param source Node to import
    * @return imported object
    * @throws ImportException Exception while importing
@@ -78,9 +82,9 @@ public abstract class XmlImporter<T> implements Importer<T> {
   public abstract T doImportFromXmlNode(Node source) throws ImportException;
 
   /**
-   * Must be implemented by subclasses.
-   * This method must provide the logic to get the path to the xsd file this
-   * importer should use to check its input against.
+   * Must be implemented by subclasses. This method must provide the logic to get the path to the
+   * xsd file this importer should use to check its input against.
+   *
    * @return Path to the xsd
    * @throws URISyntaxException could not parse uri to xsd file
    */

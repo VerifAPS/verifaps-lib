@@ -109,7 +109,8 @@ public class JsonTableParser {
             specIoVariable,
             Collections.emptyList(),
             typesByName,
-            problem -> {} // ignore insignificant problems
+            problem -> {
+            } // ignore insignificant problems
         );
         concreteSpec.getColumnHeaders().add(validIoVariable);
       } catch (InvalidIoVarProblem problem) {
@@ -122,10 +123,10 @@ public class JsonTableParser {
       Map<String, ConcreteCell> cells = MapUtil.mapValuesWithKey(row.getCells(),
           (columnId, cellString) -> new ConcreteCell(
               concreteSpec.getColumnHeaderByName(columnId).getValidType().parseLiteral(cellString.trim())
-          .orElseThrow(() -> new RuntimeException("Couldnt parse: "
-              + cellString + " of type "
-              + concreteSpec.getColumnHeaderByName(columnId).getValidType().getTypeName()
-              + " in column " + columnId))));
+                  .orElseThrow(() -> new RuntimeException("Couldnt parse: "
+                      + cellString + " of type "
+                      + concreteSpec.getColumnHeaderByName(columnId).getValidType().getTypeName()
+                      + " in column " + columnId))));
       concreteSpec.getRows().add(SpecificationRow.createUnobservableRow(cells));
     }
 
@@ -151,7 +152,7 @@ public class JsonTableParser {
       Map<String, ConstraintCell> cells = new HashMap<>();
 
       row.getCells().forEach((columnId, cellString) ->
-        cells.put(columnId, new ConstraintCell(cellString)));
+          cells.put(columnId, new ConstraintCell(cellString)));
 
       spec.getRows().add(ConstraintSpecification.createRow(cells));
     }
@@ -167,8 +168,8 @@ public class JsonTableParser {
   public static FreeVariableList freeVariableSetFromJson(JsonElement element) {
     FreeVariableList freeVariableList = new FreeVariableList(new ArrayList<>());
     GSON.fromJson(element, JsonFreeVarSet.class).freevariables.stream()
-      .map(JsonTableParser::toFreeVariable)
-    .forEach(freeVar -> freeVariableList.getVariables().add(freeVar));
+        .map(JsonTableParser::toFreeVariable)
+        .forEach(freeVar -> freeVariableList.getVariables().add(freeVar));
 
     return freeVariableList;
   }
@@ -197,7 +198,7 @@ public class JsonTableParser {
     String[] split = s.split("\\s*\\|\\s*");
     Map<String, String> elems = new HashMap<>();
     for (int i = 0; i < split.length; i++) {
-      elems.put(ioVars.get(i).getName(), split[i]);
+      elems.put(ioVars.get(i).getName(), split[i].trim());
     }
     return SpecificationRow.createUnobservableRow(elems);
   }
@@ -208,9 +209,12 @@ public class JsonTableParser {
 
   private static Type typeFromString(String input) {
     switch (input) {
-      case "INT": return TypeInt.INT;
-      case "BOOL": return TypeBool.BOOL;
-      default: return new TypeEnum(input, Collections.emptyList());
+      case "INT":
+        return TypeInt.INT;
+      case "BOOL":
+        return TypeBool.BOOL;
+      default:
+        return new TypeEnum(input, Collections.emptyList());
     }
   }
 }
