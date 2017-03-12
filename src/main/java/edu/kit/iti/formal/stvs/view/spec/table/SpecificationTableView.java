@@ -38,7 +38,7 @@ public class SpecificationTableView extends VBox {
    * @param tableView The underlying {@link TableView} of {@link HybridRow}s
    */
   public SpecificationTableView(TableView<HybridRow> tableView) {
-    this(new Label("Specification-Table:"), tableView);
+    this(new Label("Specification Table:"), tableView);
   }
 
   public Label getHeader() {

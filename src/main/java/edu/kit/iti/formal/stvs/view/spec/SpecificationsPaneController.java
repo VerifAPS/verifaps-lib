@@ -135,6 +135,7 @@ public class SpecificationsPaneController implements Controller {
     view.getTabs().add(index, tab);
     controllers.put(tab, controller);
     view.getTabPane().getSelectionModel().select(tab);
+    scenario.setActiveSpec(hybridSpecification);
     return controller;
   }
 
