@@ -40,6 +40,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   private GlobalConfig config;
   private File getetaOutputFile;
   private ProcessMonitor processMonitor;
+  private ConstraintSpecification currentSpec;
 
   /**
    * Creates an instance based on given {@link GlobalConfig} and {@code typeContext}. The
@@ -77,7 +78,8 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   public void startVerification(VerificationScenario scenario, ConstraintSpecification spec)
       throws IOException, ExportException, ProcessCreationException {
 
-    // Write ConstraintSpecification and Code to temporary files
+    currentSpec = spec;
+    // Write ConstraintSpecification and Code to temporary input files for GeTeTa
     File tempSpecFile = File.createTempFile("verification-spec", ".xml");
     File tempCodeFile = File.createTempFile("verification-code", ".st");
     ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.GETETA, tempSpecFile);
@@ -146,7 +148,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
         } else {
           result = ImporterFacade.importVerificationResult(
               new ByteArrayInputStream(cleanedProcessOutput.getBytes("utf-8")),
-              ImporterFacade.ImportFormat.GETETA, typeContext);
+              ImporterFacade.ImportFormat.GETETA, typeContext, currentSpec);
         }
       } catch (IOException | ImportException exception) {
         result = new VerificationError(exception, logFile);

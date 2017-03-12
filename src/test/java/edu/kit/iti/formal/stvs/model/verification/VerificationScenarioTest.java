@@ -101,9 +101,12 @@ public class VerificationScenarioTest {
       List<Type> typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL, TypeFactory.enumOfName
           ("enumD", "literalOne", "literalTwo"));
       try {
+        ConstraintSpecification constraintSpec = ImporterFacade.importConstraintSpec(StvsApplication
+                .class.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml"),
+            ImporterFacade.ImportFormat.XML);
         VerificationResult expectedResult = ImporterFacade.importVerificationResult(StvsApplication
             .class.getResourceAsStream("testSets/valid_1/geteta_report_valid_1.xml"), ImporterFacade
-            .ImportFormat.GETETA, typeContext);
+            .ImportFormat.GETETA, typeContext, constraintSpec);
         /* Cannot just assertEquals() with verificationResults, as logFileNames (randomly
         generated) will be different
         assertEquals(expectedResult, newResult); */

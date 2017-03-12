@@ -187,15 +187,16 @@ public class ImporterFacade {
    *
    * @param input The stream from which to import from
    * @param format The format to use for importing
-   * @param typeContext types in the verified specification
+   * @param typeContext Types in the verified specification
+   * @param constraintSpec The constraint specification for which to import a verification result
    * @return The imported result
    * @throws ImportException exception during importing
    */
   public static VerificationResult importVerificationResult(InputStream input, ImportFormat format,
-      List<Type> typeContext) throws ImportException {
+      List<Type> typeContext, ConstraintSpecification constraintSpec) throws ImportException {
     switch (format) {
       case GETETA:
-        return new GeTeTaImporter(typeContext).doImport(input);
+        return new GeTeTaImporter(typeContext, constraintSpec).doImport(input);
       default:
         throw new ImportException("Unsupported import format");
     }
