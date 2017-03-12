@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.verification;
 
-import edu.kit.iti.formal.stvs.view.VerificationResultHandler;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -100,7 +98,7 @@ public class VerificationError implements VerificationResult {
   }
 
   @Override
-  public void accept(VerificationResultHandler visitor) {
+  public void accept(VerificationResultVisitor visitor) {
     visitor.visitVerificationError(this);
   }
 

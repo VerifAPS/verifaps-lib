@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.verification;
 
-import edu.kit.iti.formal.stvs.view.VerificationResultHandler;
-
 import java.io.File;
 import java.util.Optional;
 
@@ -19,7 +17,7 @@ public class VerificationSuccess implements VerificationResult {
   }
 
   @Override
-  public void accept(VerificationResultHandler visitor) {
+  public void accept(VerificationResultVisitor visitor) {
     visitor.visitVerificationSuccess(this);
   }
 
