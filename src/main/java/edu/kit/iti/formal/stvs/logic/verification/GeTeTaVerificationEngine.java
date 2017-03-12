@@ -78,8 +78,9 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
   public void startVerification(VerificationScenario scenario, ConstraintSpecification spec)
       throws IOException, ExportException, ProcessCreationException {
 
-    /* This will create a deep copy, so that modifying the original ConstraintSpecification
-     * between calling tartVerification() and getVerificationSpecification() will have no effect on the
+    /*
+     * This will create a deep copy, so that modifying the original ConstraintSpecification between
+     * calling tartVerification() and getVerificationSpecification() will have no effect on the
      * possibly newly opened counter example tab.
      */
     currentSpec = new ConstraintSpecification(spec);
