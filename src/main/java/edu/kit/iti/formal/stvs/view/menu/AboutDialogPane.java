@@ -34,8 +34,10 @@ public class AboutDialogPane extends DialogPane {
   public AboutDialogPane() {
 
     Image logo = new Image(StvsApplication.class.getResourceAsStream("logo.png"));
-    this.content = new VBox(new Label("Structured Text Verification Studio - STVS"),
-        new Label("Version: 1.0.1"), new ImageView(logo));
+    this.content = new VBox(
+        new ImageView(logo),
+        new Label("Structured Text Verification Studio - STVS"),
+        new Label("Version: 1.0.1"));
     this.setContent(content);
     this.getButtonTypes().addAll(ButtonType.CLOSE);
     this.getContent().setId("AboutDialogPane");
