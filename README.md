@@ -1,13 +1,17 @@
 ![STVS Logo](src/main/resources/edu/kit/iti/formal/stvs/logo.png)
-# Structured Text Verification Studio - STVS
+
+Structured Text Verification Studio - STVS
+==========================================
 
 ![Application Screenshot](screenshot.png)
 
-## About
+About
+-----
 
 A graphical frontend for the verification of Structured Text code using generalized test tables (see [GeTeTa](https://github.com/VerifAPS/geteta)). This frontend also eases the understanding of test tables via a timing-diagram that shows a concrete example of a general test table.
 
-## Installation
+Installation
+------------
 
 Make sure the following programs are installed:
  * [nuXmv](https://nuxmv.fbk.eu/)
@@ -17,9 +21,14 @@ Make sure the following programs are installed:
 
 [Download](
 https://git.scc.kit.edu/api/v3/projects/1721/builds/artifacts/master/download?job=buildFatJar)
- the zip file and unpack it. Next run the jar named `stvs/stverificationstudio.jar`
+ the zip file, unpack it and run the jar named `stvs/stverificationstudio.jar`
 
-To do that, go to ```Edit``` > ```Preferences``` and change the paths to fit your system. For example:
+Next go to ```Edit``` > ```Preferences``` and change the paths to fit your system. For example:
  * Path to NuXmv Executable: ```/usr/bin/nuXmv```
  * Path to Z3: ```/usr/bin/z3```
  * GeTeTa Command: ```java -jar /opt/share/geteta/geteta.jar -c ${code} -t ${spec} -x```
+
+Contributing
+------------
+
+for more information about contributing and compiling from source check out the [contribute guide](contribute.md)
