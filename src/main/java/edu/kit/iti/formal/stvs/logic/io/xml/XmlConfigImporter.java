@@ -3,8 +3,8 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 
-import java.io.File;
-import java.net.URISyntaxException;
+import java.io.IOException;
+import java.net.URL;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -113,8 +113,7 @@ public class  XmlConfigImporter extends XmlImporter<GlobalConfig> {
   }
 
   @Override
-  protected String getXsdFilePath() throws URISyntaxException {
-    File xsdFile = new File(this.getClass().getResource("/fileFormats/config.xsd").toURI());
-    return xsdFile.getAbsolutePath();
+  protected URL getXsdResource() throws IOException {
+    return getClass().getResource("/fileFormats/config.xsd");
   }
 }

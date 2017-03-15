@@ -10,8 +10,8 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteDuration;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 
-import java.io.File;
-import java.net.URISyntaxException;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -158,8 +158,7 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
   }
 
   @Override
-  protected String getXsdFilePath() throws URISyntaxException {
-    File xsdFile = new File(this.getClass().getResource("/fileFormats/specification.xsd").toURI());
-    return xsdFile.getAbsolutePath();
+  protected URL getXsdResource() throws IOException {
+    return this.getClass().getResource("/fileFormats/specification.xsd");
   }
 }

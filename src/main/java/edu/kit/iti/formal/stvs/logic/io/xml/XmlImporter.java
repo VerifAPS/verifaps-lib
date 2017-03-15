@@ -3,13 +3,8 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.Importer;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URISyntaxException;
+import java.io.*;
+import java.net.URL;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -33,17 +28,16 @@ public abstract class XmlImporter<T> implements Importer<T> {
   private static final String INPUT_ENCODING = "utf8";
 
   /**
-   * Checks that the given input matches the definition defined by {@code getXsdFilePath()}.
+   * Checks that the given input matches the definition defined by {@code getXsdStream()}.
    *
    * @param xml Stream that holds the xml to be validated
    * @throws SAXException A general xml exception
    * @throws IOException Error while communicating with IO while validating
-   * @throws URISyntaxException could not parse uri to xsd file
    */
   private void validateAgainstXsd(InputStream xml)
-      throws SAXException, IOException, URISyntaxException {
+      throws SAXException, IOException {
     SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-    Schema schema = factory.newSchema(new File(getXsdFilePath()));
+    Schema schema = factory.newSchema(getXsdResource());
     Validator validator = schema.newValidator();
     validator.validate(new StreamSource(xml));
   }
@@ -66,7 +60,7 @@ public abstract class XmlImporter<T> implements Importer<T> {
       dbf.setNamespaceAware(true);
       Document doc = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(inputString)));
       return doImportFromXmlNode(doc.getDocumentElement());
-    } catch (SAXException | IOException | ParserConfigurationException | URISyntaxException e) {
+    } catch (SAXException | IOException | ParserConfigurationException e) {
       throw new ImportException(e);
     }
   }
@@ -86,7 +80,7 @@ public abstract class XmlImporter<T> implements Importer<T> {
    * xsd file this importer should use to check its input against.
    *
    * @return Path to the xsd
-   * @throws URISyntaxException could not parse uri to xsd file
+   * @throws IOException could not get xsd stream
    */
-  protected abstract String getXsdFilePath() throws URISyntaxException;
+  protected abstract URL getXsdResource() throws IOException;
 }

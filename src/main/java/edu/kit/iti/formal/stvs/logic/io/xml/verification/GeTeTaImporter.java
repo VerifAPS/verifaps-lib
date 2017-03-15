@@ -27,7 +27,7 @@ import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -343,9 +343,8 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
   }
 
   @Override
-  protected String getXsdFilePath() throws URISyntaxException {
-    File xsdFile = new File(this.getClass().getResource("/fileFormats/report.xsd").toURI());
-    return xsdFile.getAbsolutePath();
+  protected URL getXsdResource() throws IOException {
+    return this.getClass().getResource("/fileFormats/report.xsd");
   }
 
   /**

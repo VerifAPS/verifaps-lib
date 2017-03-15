@@ -10,8 +10,8 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow;
 
-import java.io.File;
-import java.net.URISyntaxException;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -167,8 +167,7 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
   }
 
   @Override
-  protected String getXsdFilePath() throws URISyntaxException {
-    File xsdFile = new File(this.getClass().getResource("/fileFormats/specification.xsd").toURI());
-    return xsdFile.getAbsolutePath();
+  protected URL getXsdResource() throws IOException {
+    return getClass().getResource("/fileFormats/specification.xsd");
   }
 }

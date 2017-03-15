@@ -16,7 +16,8 @@ import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 
 import java.io.File;
-import java.net.URISyntaxException;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -142,8 +143,7 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
   }
 
   @Override
-  protected String getXsdFilePath() throws URISyntaxException {
-    File xsdFile = new File(this.getClass().getResource("/fileFormats/session.xsd").toURI());
-    return xsdFile.getAbsolutePath();
+  protected URL getXsdResource() throws IOException {
+    return getClass().getResource("/fileFormats/session.xsd");
   }
 }
