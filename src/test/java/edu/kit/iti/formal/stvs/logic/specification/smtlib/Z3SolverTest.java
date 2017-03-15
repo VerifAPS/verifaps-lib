@@ -131,6 +131,7 @@ public class Z3SolverTest {
   }
 
   @Test
+  @Ignore
   public void testTerminate() throws Exception {
     Thread thread = new Thread(() -> {
       try {
