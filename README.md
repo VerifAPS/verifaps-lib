@@ -7,6 +7,16 @@
 
 A graphical frontend for the verification of Structured Text code using generalized test tables (see [GeTeTa](getetalink)). This frontend also eases the understanding of test tables via a timing-diagram that shows a concrete example of a general test table.
 
+## Installation
+
+Make sure the following programs are installed:
+ * [nuXmv](https://nuxmv.fbk.eu/)
+ * [GeTeTa](getetalink)
+ * [Z3](https://github.com/Z3Prover/z3)
+ * [Java](http://www.oracle.com/technetwork/indexes/downloads/index.html#java)
+
+[Download](https://git.scc.kit.edu/api/v3/projects/1721/builds/articts/master/download?job=buildFatJar) the Jar and run it
+
 ## How to build and run
 
 System requirements:
