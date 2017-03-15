@@ -1,12 +1,12 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
 import edu.kit.iti.formal.stvs.StvsApplication;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
-import javafx.scene.control.Label;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 
 /**
  * <p>
@@ -32,14 +32,16 @@ public class AboutDialogPane extends DialogPane {
    * Creates the Dialog Pane that displays 'About' information.
    */
   public AboutDialogPane() {
-
     Image logo = new Image(StvsApplication.class.getResourceAsStream("logo.png"));
-    this.content = new VBox(
-        new ImageView(logo),
-        new Label("Structured Text Verification Studio - STVS"),
-        new Label("Version: 1.0.1"));
-    this.setContent(content);
+    ImageView logoView = new ImageView(logo);
+    Label name = new Label("Structured Text Verification Studio - STVS");
+    name.setFont(Font.font("DejaVu Sans Mono", 30));
+    Label version = new Label("Version: 1.1");
+
+    this.content = new VBox(logoView, name, version);
+    this.content.setAlignment(Pos.CENTER);
     this.getButtonTypes().addAll(ButtonType.CLOSE);
-    this.getContent().setId("AboutDialogPane");
+    this.setContent(content);
+
   }
 }
