@@ -15,8 +15,8 @@ Make sure the following programs are installed:
  * [Z3](https://github.com/Z3Prover/z3)
  * [Java](http://www.oracle.com/technetwork/indexes/downloads/index.html#java)
 
-[Download](https://git.scc.kit.edu/api/v3/projects/1721/builds/artifacts/master/download?job
-=buildFatJar)
+[Download](
+https://git.scc.kit.edu/api/v3/projects/1721/builds/artifacts/master/download?job=buildFatJar)
  the zip file and unpack it. Next run the jar named `stvs/stverificationstudio.jar`
 
 ## How to build and run
