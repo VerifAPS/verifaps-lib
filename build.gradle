@@ -103,6 +103,17 @@ jar {
     }
 }
 
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',
+                'Implementation-Version': '1.1',
+                'Main-Class': 'edu.kit.iti.formal.stvs.StvsApplication'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 test {
     filter {
         includeTestsMatching "edu.kit.iti.formal.stvs.model.*"
