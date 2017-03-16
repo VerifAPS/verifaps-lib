@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs;
 
-import edu.kit.iti.formal.stvs.view.HostServiceSingleton;
+import edu.kit.iti.formal.stvs.view.common.HostServiceSingleton;
 import edu.kit.iti.formal.stvs.view.StvsMainScene;
 import javafx.application.Application;
 import javafx.application.Platform;

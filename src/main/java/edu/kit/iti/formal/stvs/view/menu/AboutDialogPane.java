@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
 import edu.kit.iti.formal.stvs.StvsApplication;
-import edu.kit.iti.formal.stvs.view.HostServiceSingleton;
+import edu.kit.iti.formal.stvs.view.common.HostServiceSingleton;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;

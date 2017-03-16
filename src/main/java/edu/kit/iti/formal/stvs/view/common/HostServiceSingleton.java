@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.stvs.view;
+package edu.kit.iti.formal.stvs.view.common;
 
 import javafx.application.HostServices;
 
