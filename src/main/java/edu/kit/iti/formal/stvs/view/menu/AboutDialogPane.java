@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
 import edu.kit.iti.formal.stvs.StvsApplication;
+import edu.kit.iti.formal.stvs.view.common.ActualHyperLink;
 import edu.kit.iti.formal.stvs.view.common.HostServiceSingleton;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -29,7 +30,6 @@ import javafx.scene.text.Font;
  */
 public class AboutDialogPane extends DialogPane {
 
-  private TabPane content;
 
   /**
    * Creates the Dialog Pane that displays 'About' information.
@@ -41,21 +41,13 @@ public class AboutDialogPane extends DialogPane {
 
     this.setContent(tabPane);
     this.getButtonTypes().addAll(ButtonType.CLOSE);
-    this.setContent(content);
+    this.setContent(tabPane);
 
   }
 
   private static HBox createLibrary(String name, String url, String license, String licenseUrl) {
-    Hyperlink nameView = new Hyperlink(name);
-
-
-    nameView.setOnAction(actionEvent -> {
-      HostServiceSingleton.getInstance().showDocument(url);
-    });
-    Hyperlink licenseView = new Hyperlink(license);
-    licenseView.setOnAction(actionEvent -> {
-      HostServiceSingleton.getInstance().showDocument(licenseUrl);
-    });
+    Hyperlink nameView = new ActualHyperLink(name, url);
+    Hyperlink licenseView = new ActualHyperLink(license, licenseUrl);
 
     HBox hBox = new HBox(nameView, new Label("License: "), licenseView);
     hBox.setAlignment(Pos.CENTER_LEFT);
@@ -142,10 +134,13 @@ public class AboutDialogPane extends DialogPane {
     ImageView logoView = new ImageView(logo);
     Label name = new Label("Structured Text Verification Studio");
     name.setFont(Font.font("DejaVu Sans Mono", 30));
-    Label subtitle = new Label("STVS");
     Label version = new Label("Version: 1.1");
+    Hyperlink homepage = new ActualHyperLink(
+        "Homepage",
+        "https://git.scc.kit.edu/peese/stverificationstudio/"
+    );
 
-    VBox aboutBox = new VBox(logoView, name, subtitle, version);
+    VBox aboutBox = new VBox(logoView, name, version, homepage);
     aboutBox.setAlignment(Pos.CENTER);
     aboutBox.setPadding(new Insets(20.0, 15.0, 20.0, 15.0));
     Tab tab = new Tab("About", aboutBox);
