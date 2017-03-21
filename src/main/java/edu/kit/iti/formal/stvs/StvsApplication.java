@@ -24,16 +24,25 @@ public class StvsApplication extends Application {
   }
 
   @Override
-  public void start(Stage primaryStage) {
+  public void init() {
+    Stage primaryStage = new Stage();
+    this.mainScene = new StvsMainScene();
     Platform.setImplicitExit(true);
-    mainScene = new StvsMainScene();
     primaryStage.setTitle("Structured Text Verification Studio - STVS");
     primaryStage.setScene(mainScene.getScene());
     primaryStage.setMaximized(mainScene.shouldBeMaximizedProperty().get());
-    mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty());
-    primaryStage.getIcons()
-        .add(new Image(StvsApplication.class.getResourceAsStream("logo.png")));
+    primaryStage.getIcons().addAll(
+        new Image(StvsApplication.class.getResourceAsStream("logo_large.png")),
+        new Image(StvsApplication.class.getResourceAsStream("logo.png")));
     primaryStage.show();
+
+    mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty());
+  }
+
+  @Override
+  public void start(Stage primaryStage) {
+    primaryStage.show();
+    primaryStage.hide();
   }
 
   @Override
