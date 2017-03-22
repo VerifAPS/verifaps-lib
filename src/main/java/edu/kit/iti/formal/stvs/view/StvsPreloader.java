@@ -3,6 +3,8 @@ package edu.kit.iti.formal.stvs.view;
 import edu.kit.iti.formal.stvs.StvsApplication;
 import javafx.application.Platform;
 import javafx.application.Preloader;
+import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -13,6 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -47,15 +50,18 @@ public class StvsPreloader extends Preloader {
     box.setStyle(
         "-fx-background-color: rgba(255, 255, 255, 0.5);"
     );
+    box.setPadding(new Insets(50));
     BorderPane root = new BorderPane(box);
     Scene scene = new Scene(root);
     scene.setFill(Color.TRANSPARENT);
     stage.setScene(scene);
 
-    stage.show();
     ImageView splashView = new ImageView(splashImage);
     box.getChildren().addAll(splashView);
-
+    stage.show();
+    Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+    stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
+    stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
   }
 
   @Override
