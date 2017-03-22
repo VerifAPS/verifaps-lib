@@ -57,7 +57,7 @@ public class StvsPreloader extends Preloader {
     stage.setScene(scene);
 
     ImageView splashView = new ImageView(splashImage);
-    box.getChildren().addAll(splashView);
+    box.getChildren().addAll(splashView, new Label("ST Verification Studio is loading.."));
     stage.show();
     Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
     stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
