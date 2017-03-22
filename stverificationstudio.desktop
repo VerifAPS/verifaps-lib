@@ -2,7 +2,7 @@
 Name=ST Verification Studio
 Comment=Graphical Structured Text verifier
 Icon=/opt/stverificationstudio/src/resources/edu/kit/iti/formal/stvs/logo.svg
-Exec=java -jar /opt/stverificationstudio/build/libs/stverificationstudio-all.jar
+Exec=/opt/stverificationstudio/stverificationstudio
 Terminal=false
 Type=Application
 Categories=Application
