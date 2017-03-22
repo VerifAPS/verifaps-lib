@@ -13,7 +13,7 @@
     </general>
     <editor>
         <showLineNumbers>true</showLineNumbers>
-        <fontFamily>Courier</fontFamily>
+        <fontFamily>DejaVu Sans Mono</fontFamily>
         <fontSize>12</fontSize>
     </editor>
     <dependencies>

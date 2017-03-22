@@ -24,29 +24,29 @@ import javafx.beans.property.StringProperty;
 public class GlobalConfig {
 
   protected static final String AUTOLOAD_CONFIG_FILENAME = "stvs-config.xml";
+
   public static final String CONFIG_DIRPATH =
       System.getProperty("user.home") + File.separator + ".config";
   private List<String> validLanguages = Arrays.asList("EN");
-
   // General
   private IntegerProperty verificationTimeout;
+
   private IntegerProperty simulationTimeout;
   private BooleanProperty windowMaximized;
   private IntegerProperty windowHeight;
   private IntegerProperty windowWidth;
   private StringProperty uiLanguage;
   private IntegerProperty maxLineRollout;
-
   // Editor
   private IntegerProperty editorFontSize;
+
   private StringProperty editorFontFamily;
   private BooleanProperty showLineNumbers;
-
   // Dependency paths
   private StringProperty nuxmvFilename;
+
   private StringProperty z3Path;
   private StringProperty getetaCommand;
-
   /**
    * Creates a default configuration. Paths are set to <tt>[Path to ... Executable]</tt>.
    */
@@ -429,5 +429,25 @@ public class GlobalConfig {
     result = 31 * result + (getZ3Path() != null ? getZ3Path().hashCode() : 0);
     result = 31 * result + (getGetetaCommand() != null ? getGetetaCommand().hashCode() : 0);
     return result;
+  }
+
+  @Override
+  public String toString() {
+    return "GlobalConfig{" +
+        "validLanguages=" + validLanguages +
+        ", verificationTimeout=" + verificationTimeout +
+        ", simulationTimeout=" + simulationTimeout +
+        ", windowMaximized=" + windowMaximized +
+        ", windowHeight=" + windowHeight +
+        ", windowWidth=" + windowWidth +
+        ", uiLanguage=" + uiLanguage +
+        ", maxLineRollout=" + maxLineRollout +
+        ", editorFontSize=" + editorFontSize +
+        ", editorFontFamily=" + editorFontFamily +
+        ", showLineNumbers=" + showLineNumbers +
+        ", nuxmvFilename=" + nuxmvFilename +
+        ", z3Path=" + z3Path +
+        ", getetaCommand=" + getetaCommand +
+        '}';
   }
 }
