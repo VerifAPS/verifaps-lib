@@ -12,7 +12,7 @@ while [ -L "$SCRIPT_FILE" ]; do
   SCRIPT_FILE="$(basename "$SCRIPT_FILE")"
 done
 
-GP_HOME="$(pwd)"
+STVS_HOME="$(pwd)"
 
 cd "$WORKING_DIR"
 
@@ -35,5 +35,5 @@ if [ ! -x "$JAVA_COMMAND" ]; then
   exit 1
 fi
 
-$JAVA_COMMAND -jar $WORKING_DIR/build/libs/stverificationstudio-all.jar
+$JAVA_COMMAND -jar $STVS_HOME/stverificationstudio.jar
 

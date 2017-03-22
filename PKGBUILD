@@ -2,7 +2,7 @@
 
 pkgname=stverificationstudio
 pkgver=1.1
-pkgrel=1
+pkgrel=1.1
 pkgdesc="Graphical Structured Text verifier"
 arch=('any')
 url="https://git.scc.kit.edu/peese/stverificationstudio/"
@@ -15,10 +15,9 @@ package() {
   mkdir -p "$pkgdir/opt/"
   cp --recursive "$srcdir/stvs" "$pkgdir/opt/$pkgname"
 
-ls $pkgdir/opt/$pkgname/
   chmod 755 "$pkgdir/opt/$pkgname/stverificationstudio"
-  install -D -m0644 "$pkgdir/stverificationstudio.desktop"
-  "$pkgdir/usr/share/applications/stverificationstudio.desktop"
+ls $pkgdir/opt/$pkgname/
+  install -D -m0644 "$pkgdir/opt/$pkgname/stverificationstudio.desktop" "$pkgdir/usr/share/applications/stverificationstudio.desktop"
   mkdir -p "$pkgdir/usr/bin"
   ln -s "/opt/$pkgname/stverificationstudio" "$pkgdir/usr/bin/stverificationstudio"
 }
