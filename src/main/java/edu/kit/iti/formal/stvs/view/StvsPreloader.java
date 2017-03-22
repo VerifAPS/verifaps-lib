@@ -12,6 +12,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -24,42 +25,47 @@ import java.util.Timer;
  */
 public class StvsPreloader extends Preloader {
   private Stage stage;
+  private Image splashImage;
 
 
   @Override
   public void init() {
+
+    splashImage = new Image(StvsApplication.class.getResourceAsStream("logo.png"));
   }
 
   @Override
   public void start(Stage stage) {
     this.stage = stage;
+
+    stage.initStyle(StageStyle.TRANSPARENT);
+
     VBox box = new VBox(20);
     box.setMaxWidth(Region.USE_PREF_SIZE);
     box.setMaxHeight(Region.USE_PREF_SIZE);
     box.setBackground(Background.EMPTY);
-
+    box.setStyle(
+        "-fx-background-color: rgba(255, 255, 255, 0.5);"
+    );
     BorderPane root = new BorderPane(box);
     Scene scene = new Scene(root);
-    scene.setFill(null);
-
-    stage.setWidth(800);
-    stage.setHeight(600);
-    stage.initStyle(StageStyle.TRANSPARENT);
+    scene.setFill(Color.TRANSPARENT);
     stage.setScene(scene);
 
-
     stage.show();
-    Platform.runLater(() -> {
-      Image splashImage = new Image(StvsApplication.class.getResourceAsStream("logo_large.png"));
-      ImageView splashView = new ImageView(splashImage);
-      box.getChildren().addAll(splashView);
-    });
+    ImageView splashView = new ImageView(splashImage);
+    box.getChildren().addAll(splashView);
+
   }
 
   @Override
   public void handleStateChangeNotification(StateChangeNotification evt) {
     if (evt.getType() == StateChangeNotification.Type.BEFORE_START) {
-
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
       stage.hide();
     }
   }

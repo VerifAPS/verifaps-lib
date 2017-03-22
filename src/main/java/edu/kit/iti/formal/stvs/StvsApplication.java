@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 public class StvsApplication extends Application {
 
   private StvsMainScene mainScene = new StvsMainScene();
+  private Stage primaryStage;
 
   /**
    * Launch the application.
@@ -25,29 +26,33 @@ public class StvsApplication extends Application {
 
   @Override
   public void init() {
-    Stage primaryStage = new Stage();
     this.mainScene = new StvsMainScene();
-    Platform.setImplicitExit(true);
-    primaryStage.setTitle("Structured Text Verification Studio - STVS");
-    primaryStage.setScene(mainScene.getScene());
-    primaryStage.setMaximized(mainScene.shouldBeMaximizedProperty().get());
-    primaryStage.getIcons().addAll(
-        new Image(StvsApplication.class.getResourceAsStream("logo_large.png")),
-        new Image(StvsApplication.class.getResourceAsStream("logo.png")));
-    primaryStage.show();
 
-    mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty());
+    Platform.runLater(() -> {
+      this.primaryStage = new Stage();
+      Platform.setImplicitExit(true);
+      primaryStage.setTitle("Structured Text Verification Studio - STVS");
+      primaryStage.setScene(mainScene.getScene());
+      primaryStage.setMaximized(mainScene.shouldBeMaximizedProperty().get());
+      primaryStage.getIcons().addAll(
+          new Image(StvsApplication.class.getResourceAsStream("logo_large.png")),
+          new Image(StvsApplication.class.getResourceAsStream("logo.png")));
+      mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty());
+
+      primaryStage.show();
+
+    });
   }
 
   @Override
   public void start(Stage primaryStage) {
-    primaryStage.show();
     primaryStage.hide();
   }
 
   @Override
   public void stop() {
     mainScene.onClose();
+    this.primaryStage.hide();
     System.exit(0);
   }
 }
