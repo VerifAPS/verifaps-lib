@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-table xmlns="http://formal.iti.kit.edu/exteta-1.0">
+    <variables>
+        <variable data-type="INT" io="output" identifier="var_I"/>
+        <variable data-type="INT" io="output" identifier="var_J"/>
+        <variable data-type="INT" io="output" identifier="var_SUM"/>
+        <variable data-type="BOOLEAN" io="input" identifier="var_FLAG"/>
+    </variables>
+    <steps>
+        <step duration="[4,-]">
+            <cell>= 3 MOD 4</cell>
+            <cell>[1,2]</cell>
+            <cell>= var_SUM[-1] + var_J</cell>
+            <cell>FALSE</cell>
+        </step>
+        <step duration="1">
+            <cell>=3+3</cell>
+            <cell>-</cell>
+            <cell>-</cell>
+            <cell>TRUE</cell>
+        </step>
+    </steps>
+</test-table>
+

@@ -121,7 +121,9 @@ public class StatesTransformer implements TableTransformer {
         SVariable inc = new SVariable("clock" + s.getId() + "_tic", dt);
         SVariable limit = new SVariable("clock" + s.getId() + "_limit", dt);
 
-        mt.getDefinitions().put(reset, SMVFacade.NOT(s.getDefKeep()));
+        // change to due issues #5
+        mt.getDefinitions()
+                .put(reset, SMVFacade.next(SMVFacade.NOT(s.getSMVVariable())));
         mt.getDefinitions().put(inc, s.getDefKeep());
         mt.getDefinitions().put(limit, // c > 0dX_MAX
                 new SBinaryExpression(clockModule,

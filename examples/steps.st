@@ -1,0 +1,7 @@
+PROGRAM steps
+
+VAR_OUTPUT o : INT := 1; END_VAR
+
+o := o + 1;
+
+END_PROGRAM
