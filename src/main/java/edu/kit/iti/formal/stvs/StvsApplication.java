@@ -2,6 +2,8 @@ package edu.kit.iti.formal.stvs;
 
 import edu.kit.iti.formal.stvs.view.common.HostServiceSingleton;
 import edu.kit.iti.formal.stvs.view.StvsMainScene;
+import edu.kit.iti.formal.stvs.view.menu.WizardManager;
+import edu.kit.iti.formal.stvs.view.menu.WizardPage;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
@@ -39,6 +41,8 @@ public class StvsApplication extends Application {
           new Image(StvsApplication.class.getResourceAsStream("logo_large.png")),
           new Image(StvsApplication.class.getResourceAsStream("logo.png")));
       mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty());
+
+      new WizardManager(new WizardPage("Test1"), new WizardPage("Test2")).showAndWait();
 
       primaryStage.show();
 

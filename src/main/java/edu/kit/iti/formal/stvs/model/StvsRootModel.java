@@ -33,6 +33,7 @@ public class StvsRootModel {
   private History history;
   private VerificationScenario scenario;
   private File workingdir;
+  private boolean firstStart = false;
 
   private String filename;
 
@@ -43,6 +44,7 @@ public class StvsRootModel {
   public StvsRootModel() {
     this(FXCollections.observableArrayList(), new GlobalConfig(), new History(),
         new VerificationScenario(), new File(System.getProperty("user.home")), "");
+    firstStart = true;
   }
 
   /**
@@ -106,6 +108,10 @@ public class StvsRootModel {
 
   public void setFilename(String filename) {
     this.filename = filename;
+  }
+
+  public boolean isFirstStart() {
+    return firstStart;
   }
 
   /**
