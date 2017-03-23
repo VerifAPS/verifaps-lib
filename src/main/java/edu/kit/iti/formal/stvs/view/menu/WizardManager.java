@@ -1,21 +1,14 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
 
-import java.io.File;
-
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -50,7 +43,7 @@ public class WizardManager implements Controller {
 
   protected void onPageChanged(Observable observable) {
     int page = pageNumber.get();
-    wizardView.getTitelLabel().setText(wizardPages.get(page).getTitle());
+    wizardView.getTitleLabel().setText(wizardPages.get(page).getTitle());
     wizardView.getPageNumberLabel().setText((page + 1) + "/" + wizardPages.size());
     wizardView.setContent(wizardPages.get(page));
     if (page == 0) {

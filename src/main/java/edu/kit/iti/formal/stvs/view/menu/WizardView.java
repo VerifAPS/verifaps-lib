@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.view.menu;
 
 import edu.kit.iti.formal.stvs.view.ViewUtils;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,7 +14,7 @@ import javafx.scene.layout.VBox;
  */
 public class WizardView extends VBox {
 
-  private final Label titelLabel = new Label();
+  private final Label titleLabel = new Label();
   private final Label pageNumberLabel = new Label();
   private final Button next = new Button("next");
   private final Button previous = new Button("previous");
@@ -31,10 +30,10 @@ public class WizardView extends VBox {
   private AnchorPane createHeader() {
     AnchorPane header = new AnchorPane();
     header.getStyleClass().add("header");
-    header.getChildren().addAll(titelLabel, pageNumberLabel);
-    titelLabel.getStyleClass().add("title");
-    AnchorPane.setLeftAnchor(titelLabel, 10.0);
-    AnchorPane.setTopAnchor(titelLabel, 10.0);
+    header.getChildren().addAll(titleLabel, pageNumberLabel);
+    titleLabel.getStyleClass().add("title");
+    AnchorPane.setLeftAnchor(titleLabel, 10.0);
+    AnchorPane.setTopAnchor(titleLabel, 10.0);
     AnchorPane.setRightAnchor(pageNumberLabel, 10.0);
     AnchorPane.setTopAnchor(pageNumberLabel, 10.0);
     return header;
@@ -51,8 +50,8 @@ public class WizardView extends VBox {
     return footer;
   }
 
-  public Label getTitelLabel() {
-    return titelLabel;
+  public Label getTitleLabel() {
+    return titleLabel;
   }
 
   public Label getPageNumberLabel() {
