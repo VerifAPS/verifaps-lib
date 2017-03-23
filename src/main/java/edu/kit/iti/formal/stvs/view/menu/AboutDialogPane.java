@@ -135,12 +135,34 @@ public class AboutDialogPane extends DialogPane {
     Label name = new Label("Structured Text Verification Studio");
     name.setFont(Font.font("DejaVu Sans Mono", 30));
     Label version = new Label("Version: 1.1");
-    Hyperlink homepage = new ActualHyperLink(
-        "Homepage",
-        "https://git.scc.kit.edu/peese/stverificationstudio/"
+
+    Hyperlink license = new ActualHyperLink(
+        "License: GPLv3",
+        "https://github.com/VerifAPS/stvs/blob/master/LICENSE"
     );
 
-    VBox aboutBox = new VBox(logoView, name, version, homepage);
+    Hyperlink homepage = new ActualHyperLink(
+        "Homepage",
+        "http://formal.iti.kit.edu/stvs"
+    );
+
+    Hyperlink repo = new ActualHyperLink(
+        "Repository",
+        "https://github.com/verifaps/stvs"
+    );
+
+    HBox versionAndLicense =  new HBox(version, license);
+    versionAndLicense.setAlignment(Pos.CENTER);
+
+    HBox links = new HBox(homepage, repo);
+    links.setAlignment(Pos.CENTER);
+    
+    VBox aboutBox = new VBox(
+        logoView,
+        name,
+        versionAndLicense,
+        links
+    );
     aboutBox.setAlignment(Pos.CENTER);
     aboutBox.setPadding(new Insets(20.0, 15.0, 20.0, 15.0));
     Tab tab = new Tab("About", aboutBox);
