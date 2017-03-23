@@ -29,6 +29,7 @@ public class StvsApplication extends Application {
 
   @Override
   public void init() {
+    HostServiceSingleton.setInstance(getHostServices());
     this.mainScene = new StvsMainScene();
 
     Platform.runLater(() -> {
