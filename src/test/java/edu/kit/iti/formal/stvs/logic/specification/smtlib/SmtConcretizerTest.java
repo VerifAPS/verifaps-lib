@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
+import edu.kit.iti.formal.stvs.TestUtils;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
@@ -16,7 +17,7 @@ import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValid
 import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Stopwatch;
@@ -65,6 +66,8 @@ public class SmtConcretizerTest {
       return super.runtime(unit);
     }
   };
+
+  @Before public void before() { TestUtils.assumeZ3Exists();}
 
   @Test
   public void testTermination() throws Exception {

@@ -6,6 +6,7 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
 import edu.kit.iti.formal.stvs.model.common.FreeVariableProblem;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.expressions.Type;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
@@ -17,6 +18,7 @@ import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.stage.FileChooser;
+import org.junit.Assume;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
 import org.powermock.api.mockito.PowerMockito;
@@ -127,4 +129,23 @@ public class TestUtils {
     Mockito.when(chooser.getExtensionFilters()).thenReturn(FXCollections.observableList(new ArrayList<>()));
     PowerMockito.whenNew(FileChooser.class).withAnyArguments().thenReturn(chooser);
   }
+}
+
+    private static void assumeFileExists(String message, String executable) {
+        Assume.assumeTrue(message, new File(executable).exists());
+    }
+
+    public static void assumeNuXmvExists() {
+        assumeFileExists(
+                "The nuxmv command is not set or a non-existing file. Tests are skipped!",
+                GlobalConfig.autoloadConfig().getNuxmvFilename());
+    }
+
+    public static void assumeGetetaExists() {
+        String[] toks = GlobalConfig.autoloadConfig().getGetetaCommand()
+                .split(" ");
+        assumeFileExists(
+                "The geteta command is not set or a non-existing file. Tests are skipped!",
+                toks[0]);
+    }
 }
