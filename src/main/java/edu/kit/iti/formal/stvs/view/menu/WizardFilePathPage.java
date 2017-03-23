@@ -28,11 +28,11 @@ public class WizardFilePathPage extends WizardPage {
     super(title);
 
     Node notValidIcon = GlyphsDude.createIcon(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
-    notValidContainer.getChildren().addAll(
-        notValidIcon,
-        new Label("If you leave this empty, not all features of STVS will work as expected!")
-    );
-    notValidContainer.visibleProperty().bind(filePathField.getTextField().textProperty().isEmpty());
+    notValidContainer.getChildren().addAll(notValidIcon,
+        new Label("Something is wrong with this path. Not all features of STVS will work as expected!"));
+    notValidContainer.visibleProperty().bind(valid.not());
+    filePathField.getTextField().textProperty().addListener(this::validator);
+    validator(filePathField.getTextField().textProperty());
 
     this.getChildren().addAll(new Label(description), filePathField, notValidContainer);
     filePathField.getTextField().textProperty().bindBidirectional(filePath);
@@ -44,5 +44,22 @@ public class WizardFilePathPage extends WizardPage {
     this(title, description, filePath);
     this.getChildren().addAll(new Label("Download the dependency from:"),
         new ActualHyperLink(downloadLink, downloadLink));
+  }
+
+  private void validator(Observable observable) {
+    String path = filePathField.getTextField().textProperty().get();
+    if (path != null && new File(path).canRead()) {
+      valid.setValue(true);
+    } else {
+      valid.setValue(false);
+    }
+  }
+
+  public boolean isValid() {
+    return valid.get();
+  }
+
+  public BooleanProperty validProperty() {
+    return valid;
   }
 }
