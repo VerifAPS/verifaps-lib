@@ -20,8 +20,9 @@ import javafx.collections.ObservableList;
 
 /**
  * The model equivalent of a "session". Contains a list of {@link HybridSpecification}s, a
- * {@link GlobalConfig}, a {@link History} and a {@link VerificationScenario} which has a
- * reference to the currently loaded code.
+ * {@link GlobalConfig}, a {@link History} and a {@link VerificationScenario} which has a reference
+ * to the currently loaded code.
+ * 
  * @author Benjamin Alt
  */
 public class StvsRootModel {
@@ -37,8 +38,8 @@ public class StvsRootModel {
   private String filename;
 
   /**
-   * Create a new empty StvsRootModel with no specifications or code, an empty history and a
-   * default config.
+   * Create a new empty StvsRootModel with no specifications or code, an empty history and a default
+   * config.
    */
   public StvsRootModel() {
     this(FXCollections.observableArrayList(), new GlobalConfig(), new History(),
@@ -55,8 +56,8 @@ public class StvsRootModel {
    * @param scenario The verification scenario (containing a reference to the current code)
    * @param workingdir working-directory that should be used (e.g. for opening and saving)
    * @param filename The filename of the session file. This can be used e.g. for a "Save Session"
-   *                 file dialog or other applications when it may be useful to know where a
-   *                 session was loaded from, or where it ought to be stored
+   *        file dialog or other applications when it may be useful to know where a session was
+   *        loaded from, or where it ought to be stored
    */
   public StvsRootModel(List<HybridSpecification> hybridSpecifications, GlobalConfig globalConfig,
       History history, VerificationScenario scenario, File workingdir, String filename) {
@@ -66,6 +67,23 @@ public class StvsRootModel {
     this.scenario = scenario;
     this.workingdir = workingdir;
     this.filename = filename;
+  }
+
+  /**
+   * Loads the last session saved via {@link StvsRootModel#autosaveSession()} (see
+   * {@link GlobalConfig#CONFIG_DIRPATH} and {@link StvsRootModel#AUTOLOAD_SESSION_FILENAME}.
+   *
+   * @return The autoloaded root model.
+   */
+  public static StvsRootModel autoloadSession() {
+    File sessionFile =
+        new File(GlobalConfig.CONFIG_DIRPATH + File.separator + AUTOLOAD_SESSION_FILENAME);
+    try {
+      return ImporterFacade.importSession(sessionFile, ImporterFacade.ImportFormat.XML,
+          new GlobalConfig(), new History());
+    } catch (Exception e) {
+      return new StvsRootModel();
+    }
   }
 
   public ObservableList<HybridSpecification> getHybridSpecifications() {
@@ -108,25 +126,15 @@ public class StvsRootModel {
     this.filename = filename;
   }
 
-  /**
-   * Loads the last session saved via {@link StvsRootModel#autosaveSession()} (see
-   * {@link GlobalConfig#CONFIG_DIRPATH} and {@link StvsRootModel#AUTOLOAD_SESSION_FILENAME}.
-   * @return The autoloaded root model.
-   */
-  public static StvsRootModel autoloadSession() {
-    File sessionFile =
-        new File(GlobalConfig.CONFIG_DIRPATH + File.separator + AUTOLOAD_SESSION_FILENAME);
-    try {
-      return ImporterFacade.importSession(sessionFile, ImporterFacade.ImportFormat.XML,
-          new GlobalConfig(), new History());
-    } catch (Exception e) {
-      return new StvsRootModel();
-    }
+  public boolean isFirstStart() {
+    return !new File(GlobalConfig.CONFIG_DIRPATH + File.separator + AUTOLOAD_SESSION_FILENAME)
+        .exists();
   }
 
   /**
-   * Saves the current session to {@link StvsRootModel#AUTOLOAD_SESSION_FILENAME} in the
-   * directory {@link GlobalConfig#CONFIG_DIRPATH}.
+   * Saves the current session to {@link StvsRootModel#AUTOLOAD_SESSION_FILENAME} in the directory
+   * {@link GlobalConfig#CONFIG_DIRPATH}.
+   * 
    * @throws IOException when the directory does not exist and cannot be created
    * @throws ExportException when there is an error during export
    */
@@ -146,8 +154,8 @@ public class StvsRootModel {
 
   /**
    * Adds a new {@link HybridSpecification} to the list accessible via
-   * {@link StvsRootModel#getHybridSpecifications()}.
-   * The new specification already includes columns for variables declared in the code.
+   * {@link StvsRootModel#getHybridSpecifications()}. The new specification already includes columns
+   * for variables declared in the code.
    */
   public void addNewHybridSpec() {
     HybridSpecification hybridSpec = new HybridSpecification(new FreeVariableList(), true);
@@ -155,10 +163,8 @@ public class StvsRootModel {
     if (parsedCode != null) {
       System.out.println(parsedCode.getDefinedTypes());
       parsedCode.getDefinedVariables().forEach(codeIoVariable -> {
-        hybridSpec.getColumnHeaders().add(new SpecIoVariable(
-            codeIoVariable.getCategory(),
-            codeIoVariable.getType(),
-            codeIoVariable.getName()));
+        hybridSpec.getColumnHeaders().add(new SpecIoVariable(codeIoVariable.getCategory(),
+            codeIoVariable.getType(), codeIoVariable.getName()));
       });
     }
     getHybridSpecifications().add(hybridSpec);

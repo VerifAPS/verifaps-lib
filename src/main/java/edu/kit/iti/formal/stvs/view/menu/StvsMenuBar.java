@@ -34,6 +34,7 @@ public class StvsMenuBar extends MenuBar {
   public MenuItem saveSpec;
   public MenuItem saveAll;
   public MenuItem config;
+  public MenuItem wizard;
   public MenuItem newCode;
   public MenuItem newSpec;
   public MenuItem saveSessionAs;
@@ -71,6 +72,8 @@ public class StvsMenuBar extends MenuBar {
     config = new MenuItem("Preferences");
     config.setAccelerator(KeyCombination.keyCombination("Ctrl+,"));
 
+    wizard = new MenuItem("Rerun configuration wizard");
+
 
     newCode = new MenuItem("New Code");
     newSpec = new MenuItem("New Specification");
@@ -84,7 +87,7 @@ public class StvsMenuBar extends MenuBar {
     file.getItems().addAll(newCode, newSpec, open, openOther, openRecent, (new SeparatorMenuItem()),
         saveCode, saveSpec, saveAll, saveSessionAs);
 
-    edit.getItems().addAll(config);
+    edit.getItems().addAll(config, wizard);
 
     help.getItems().addAll(about);
 

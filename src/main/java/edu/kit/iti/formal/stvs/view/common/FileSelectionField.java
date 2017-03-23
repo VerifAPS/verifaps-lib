@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
 
 /**
@@ -32,6 +33,7 @@ public class FileSelectionField extends HBox {
     getChildren().add(textField);
     getChildren().add(fileSelectButton);
     fileSelectButton.setOnAction(this::onFileSelectButtonClicked);
+    this.setHgrow(textField, Priority.ALWAYS);
   }
 
   private void onFileSelectButtonClicked(ActionEvent actionEvent) {
