@@ -19,7 +19,6 @@ public class StvsMenuBar extends MenuBar {
 
   public Menu file;
   public Menu edit;
-  public Menu view;
   public Menu help;
 
   public Menu openOther;
@@ -47,7 +46,6 @@ public class StvsMenuBar extends MenuBar {
     // create top-level menus
     file = new Menu("File");
     edit = new Menu("Edit");
-    view = new Menu("View");
     help = new Menu("Help");
 
     // create menu-items
@@ -92,6 +90,6 @@ public class StvsMenuBar extends MenuBar {
     help.getItems().addAll(about);
 
     // Add menus to menubar
-    this.getMenus().addAll(file, edit, view, help);
+    this.getMenus().addAll(file, edit, help);
   }
 }
