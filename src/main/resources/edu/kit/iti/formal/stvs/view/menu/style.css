@@ -19,3 +19,7 @@
 #WizardView .footer{
     -fx-pref-height: 50px;
 }
+
+#WizardView #FileSelectionField{
+    -fx-pref-width: 600px;
+}

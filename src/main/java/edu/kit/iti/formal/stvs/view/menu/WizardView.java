@@ -69,9 +69,9 @@ public class WizardView extends VBox {
 
   public void setContent(Node view) {
     content.getChildren().setAll(view);
-    AnchorPane.setLeftAnchor(view, 0.0);
-    AnchorPane.setRightAnchor(view, 0.0);
-    AnchorPane.setTopAnchor(view, 0.0);
-    AnchorPane.setBottomAnchor(view, 0.0);
+    AnchorPane.setLeftAnchor(view, 10.0);
+    AnchorPane.setRightAnchor(view, 10.0);
+    AnchorPane.setTopAnchor(view, 10.0);
+    AnchorPane.setBottomAnchor(view, 10.0);
   }
 }

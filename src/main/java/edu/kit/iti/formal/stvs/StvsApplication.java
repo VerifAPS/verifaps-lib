@@ -1,9 +1,8 @@
 package edu.kit.iti.formal.stvs;
 
-import edu.kit.iti.formal.stvs.view.common.HostServiceSingleton;
 import edu.kit.iti.formal.stvs.view.StvsMainScene;
-import edu.kit.iti.formal.stvs.view.menu.WizardManager;
-import edu.kit.iti.formal.stvs.view.menu.WizardPage;
+import edu.kit.iti.formal.stvs.view.common.HostServiceSingleton;
+import edu.kit.iti.formal.stvs.view.menu.WelcomeWizard;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
@@ -21,6 +20,7 @@ public class StvsApplication extends Application {
 
   /**
    * Launch the application.
+   * 
    * @param args The command-line arguments passed to the application
    */
   public static void main(String[] args) {
@@ -43,7 +43,10 @@ public class StvsApplication extends Application {
           new Image(StvsApplication.class.getResourceAsStream("logo.png")));
       mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty());
 
-      new WizardManager(new WizardPage("Test1"), new WizardPage("Test2")).showAndWait();
+      if(mainScene.getRootController().getRootModel().isFirstStart()) {
+        new WelcomeWizard(mainScene.getRootController().getRootModel().getGlobalConfig())
+            .showAndWait();
+      }
 
       primaryStage.show();
 

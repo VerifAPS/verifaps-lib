@@ -69,6 +69,7 @@ public class StvsMenuBarController implements Controller {
     view.saveCode.setOnAction(this::saveCode);
     view.saveSpec.setOnAction(this::saveSpec);
     view.config.setOnAction(this::openConfigDialog);
+    view.wizard.setOnAction(this::openWizard);
     view.about.setOnAction(this::openAboutDialog);
   }
 
@@ -133,6 +134,10 @@ public class StvsMenuBarController implements Controller {
   private void openConfigDialog(ActionEvent t) {
     ConfigDialogManager dialogManager = new ConfigDialogManager(rootModel.get().getGlobalConfig());
     dialogManager.showAndWait();
+  }
+
+  private void openWizard(ActionEvent actionEvent) {
+    new WelcomeWizard(rootModel.get().getGlobalConfig()).showAndWait();
   }
 
   private void openAboutDialog(ActionEvent actionEvent) {
