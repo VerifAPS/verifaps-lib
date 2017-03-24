@@ -1,4 +1,6 @@
 ![STVS Logo](src/main/resources/edu/kit/iti/formal/stvs/logo.png)
+[![CircleCI](https://circleci.com/gh/VerifAPS/stvs.svg?style=svg)](https://circleci.com/gh/VerifAPS/stvs)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ddb6c2defb4b445ebf1f6dc2d6205841)](https://www.codacy.com/app/wadoon/stvs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=VerifAPS/stvs&amp;utm_campaign=Badge_Grade)
 
 Structured Text Verification Studio - STVS
 ==========================================
