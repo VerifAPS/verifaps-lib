@@ -19,4 +19,4 @@ deployment:
          then
           cp stverificationstudio* $CIRCLE_ARTIFACTS/;
         fi
-      - cp src/main/resources/**/logo* $CIRCLE_ARTIFACTS/
+      - cp build/resources/main/**/logo* $CIRCLE_ARTIFACTS/
