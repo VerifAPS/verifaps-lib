@@ -1,0 +1,8 @@
+deployment:
+  allInOneJar:
+    branch: circleci-yml
+    commands:
+      - ./gradlew fatJar
+      - cp build/libs/*.jar $CIRCLE_ARTIFACTS/stverificationstudio.jar
+      - cp stverificationstudio* $CIRCLE_ARTIFACTS/
+      - cp src/main/resources/**/logo* $CIRCLE_ARTIFACTS/
