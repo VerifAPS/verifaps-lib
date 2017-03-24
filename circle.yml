@@ -15,7 +15,8 @@ deployment:
       - ./gradlew fatJar
       - cp build/libs/*.jar $CIRCLE_ARTIFACTS/stverificationstudio.jar
       - >
-        if [ -e file ] then
-          cp stverificationstudio* $CIRCLE_ARTIFACTS/
+        if [ -e stverificationstudio ];
+         then
+          cp stverificationstudio* $CIRCLE_ARTIFACTS/;
         fi
       - cp src/main/resources/**/logo* $CIRCLE_ARTIFACTS/
