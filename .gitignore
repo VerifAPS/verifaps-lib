@@ -12,6 +12,9 @@ generated/
 /.project
 /.settings/
 
+/.gradle/
+
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
