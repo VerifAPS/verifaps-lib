@@ -134,6 +134,12 @@ public class TestUtils {
         Assume.assumeTrue(message, new File(executable).exists());
     }
 
+    public static void assumeZ3Exists() {
+        assumeFileExists(
+                "The z3 command is not set or a non-existing file. Tests are skipped!",
+                GlobalConfig.autoloadConfig().getZ3Path());
+    }
+
     public static void assumeNuXmvExists() {
         assumeFileExists(
                 "The nuxmv command is not set or a non-existing file. Tests are skipped!",
