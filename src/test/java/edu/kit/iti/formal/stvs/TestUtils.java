@@ -129,7 +129,6 @@ public class TestUtils {
     Mockito.when(chooser.getExtensionFilters()).thenReturn(FXCollections.observableList(new ArrayList<>()));
     PowerMockito.whenNew(FileChooser.class).withAnyArguments().thenReturn(chooser);
   }
-}
 
     private static void assumeFileExists(String message, String executable) {
         Assume.assumeTrue(message, new File(executable).exists());
