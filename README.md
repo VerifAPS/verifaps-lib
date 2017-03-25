@@ -20,7 +20,7 @@ Make sure the following programs are installed:
  * [Java](http://www.oracle.com/technetwork/indexes/downloads/index.html#java)
 
 [Download](
-https://git.scc.kit.edu/api/v3/projects/1721/builds/artifacts/master/download?job=buildFatJar)
+https://circleci-tkn.rhcloud.com/api/v1/project/VerifAPS/stvs/tree/circleci-yml/latest/artifacts/stverificationstudio.jar)
  the zip file, unpack it and run the jar named `stvs/stverificationstudio.jar`
 
 Next go to ```Edit``` > ```Preferences``` and change the paths to fit your system. For example:
