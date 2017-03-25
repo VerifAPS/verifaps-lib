@@ -33,4 +33,5 @@ Next go to ```Edit``` > ```Preferences``` and change the paths to fit your syste
 Contributing
 ------------
 
-for more information about contributing and compiling from source check out the [contribute guide](CONTRIBUTING.md)
+For more information about contributing and compiling from source check out the [contribute 
+guide](CONTRIBUTING.md).
