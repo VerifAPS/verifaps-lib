@@ -3,9 +3,11 @@
 test:
   override:
     - ./gradlew test
+    - ./gradlew jacocoTestReport
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
     - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+    - cp build/reports/jacoco $CIRCLE_ARTIFACTS/coverage-report
 
 
 deployment:
