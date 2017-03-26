@@ -98,18 +98,8 @@ public class FunctionDeclaration extends TopLevelScopeElement {
     }
 
     /** {@inheritDoc} */
-    @Override
-    public String getBlockName() {
+    @Override public String getIdentifier() {
         return getFunctionName();
-    }
-
-    /**
-     * <p>Setter for the field <code>returnType</code>.</p>
-     *
-     * @param returnType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     */
-    public void setReturnType(Any returnType) {
-        this.returnType = returnType;
     }
 
     /**
@@ -119,5 +109,14 @@ public class FunctionDeclaration extends TopLevelScopeElement {
      */
     public Any getReturnType() {
         return returnType;
+    }
+
+    /**
+     * <p>Setter for the field <code>returnType</code>.</p>
+     *
+     * @param returnType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     */
+    public void setReturnType(Any returnType) {
+        this.returnType = returnType;
     }
 }

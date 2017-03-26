@@ -22,47 +22,49 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
-import com.google.common.base.Strings;
 import org.antlr.v4.runtime.*;
 
 /**
  * Created by weigl on 10/07/14.
  */
 public class NiceErrorListener extends BaseErrorListener {
+    private String content;
 
-	private String content;
+    public NiceErrorListener(String content) {
+        this.content = content;
+    }
 
-	public NiceErrorListener(String content) {
-		this.content = content;
-	}
+    @Override public void syntaxError(Recognizer<?, ?> recognizer,
+            Object offendingSymbol, int line, int charPositionInLine,
+            String msg, RecognitionException e) {
 
-	@Override
-	public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine,
-			String msg, RecognitionException e) {
+        String lines[] = content.split("\n");
+        System.err.println(line + "@" + charPositionInLine);
+        System.err.println(((Parser) recognizer).getRuleInvocationStack());
 
-		String lines[] = content.split("\n");
-		System.err.println(line + "@"+charPositionInLine);
-		System.err.println(((Parser) recognizer).getRuleInvocationStack());
+        RuleContext cur = e.getCtx();
+        Parser p = (Parser) recognizer;
+        while (cur != null) {
+            System.err.println(
+                    cur.depth() + " >> " + recognizer.getRuleNames()[cur
+                            .getRuleIndex()] + " : " + cur.getText());
+            cur = cur.parent;
+        }
 
-		RuleContext cur = e.getCtx();
-		Parser p = (Parser) recognizer;
-		while (cur != null) {
-			System.err.println(cur.depth() + " >> " + recognizer.getRuleNames()[cur.getRuleIndex()] + " : "
-					+ cur.getText());
-			cur = cur.parent;
-		}
+        System.err.format("ERROR: line %d:%d: %s%n", line, charPositionInLine,
+                msg);
+        for (int i = Math.max(0, line - 2); i < lines.length; i++) {
+            System.err.println(lines[i]);
 
-		System.err.format("ERROR: line %d:%d: %s%n", line, charPositionInLine, msg);
-		for (int i = Math.max(0, line - 2); i < lines.length; i++) {
-			System.err.println(lines[i]);
-
-			if (i + 1 == line) {
-				System.err.println(">" + Strings.repeat(" ", Math.max(0, charPositionInLine - 1)) + "^ " + msg);
-
-				break;
-
-			}
-		}
-		System.err.format("==============================\n");
-	}
+            if (i + 1 == line) {
+                System.err.print(">");
+                for (int j = 0; j < Math.max(0, charPositionInLine - 1); j++) {
+                    System.out.print(' ');
+                }
+                System.out.println("^ " + msg);
+                break;
+            }
+        }
+        System.err.format("==============================\n");
+    }
 }

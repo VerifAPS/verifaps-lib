@@ -22,8 +22,11 @@ package edu.kit.iti.formal.automation.sfclang.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.sfclang.SFCAstVisitor;
+import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
+import edu.kit.iti.formal.automation.st.ast.Statement;
+import edu.kit.iti.formal.automation.st.ast.StatementList;
+import edu.kit.iti.formal.automation.st.ast.TopLevelScopeElement;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.Collection;
@@ -121,7 +124,7 @@ public class SFCDeclaration extends TopLevelScopeElement {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return getBlockName();
+        return getIdentifier();
     }
 
     /** {@inheritDoc} */
@@ -186,8 +189,7 @@ public class SFCDeclaration extends TopLevelScopeElement {
     }
 
     /** {@inheritDoc} */
-    @Override
-    public String getBlockName() {
+    @Override public String getIdentifier() {
         return name;
     }
 

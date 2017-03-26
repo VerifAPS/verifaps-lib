@@ -22,15 +22,13 @@ package edu.kit.iti.formal.automation.scope;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
+import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.st.ast.*;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by weigl on 24.11.16.
@@ -45,6 +43,7 @@ public class GlobalScope {
     private Map<String, TypeDeclaration> dataTypes = new HashMap<>();
     private List<FunctionResolver> functionResolvers = new LinkedList<>();
     private TypeScope types = TypeScope.builtin();
+    private Map<String, ClassDeclaration> classes = new LinkedHashMap<>();
 
     /**
      * <p>defaultScope.</p>
@@ -95,7 +94,7 @@ public class GlobalScope {
      * @param programDeclaration a {@link edu.kit.iti.formal.automation.st.ast.ProgramDeclaration} object.
      */
     public void registerProgram(ProgramDeclaration programDeclaration) {
-        programs.put(programDeclaration.getBlockName(), programDeclaration);
+        programs.put(programDeclaration.getIdentifier(), programDeclaration);
     }
 
     /**
@@ -104,7 +103,7 @@ public class GlobalScope {
      * @param functionDeclaration a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
      */
     public void registerFunction(FunctionDeclaration functionDeclaration) {
-        functions.put(functionDeclaration.getBlockName(), functionDeclaration);
+        functions.put(functionDeclaration.getIdentifier(), functionDeclaration);
     }
 
     /**
@@ -113,7 +112,7 @@ public class GlobalScope {
      * @param fblock a {@link edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration} object.
      */
     public void registerFunctionBlock(FunctionBlockDeclaration fblock) {
-        fb.put(fblock.getBlockName(), fblock);
+        fb.put(fblock.getIdentifier(), fblock);
     }
 
     /**
@@ -137,20 +136,31 @@ public class GlobalScope {
 
         boolean a = fb.containsKey(name);
         boolean b = dataTypes.containsKey(name);
-        if (a && b) {
+        boolean c = classes.containsKey(name);
+
+        if (a && b || a && c || b && c) {
             System.out.println("ambguity fb vs. type");
         }
+
         Any q;
         if (a) {
             q = new FunctionBlockDataType(fb.get(name));
             types.put(name, q);
             return q;
         }
+
         if (b) {
             q = dataTypes.get(name).getDataType(this);
             types.put(name, q);
             return q;
         }
+
+        if (c) {
+            q = new ClassDataType(classes.get(name));
+            types.put(name, q);
+            return q;
+        }
+
         throw new DataTypeNotDefinedException("Could not find: " + name);
     }
 
@@ -158,7 +168,7 @@ public class GlobalScope {
      * <p>resolveFunction.</p>
      *
      * @param functionCall a {@link edu.kit.iti.formal.automation.st.ast.FunctionCall} object.
-     * @param local a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
+     * @param local        a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
      */
     public FunctionDeclaration resolveFunction(FunctionCall functionCall, LocalScope local) {
@@ -167,5 +177,19 @@ public class GlobalScope {
             if (decl != null) return decl;
         }
         return null;
+    }
+
+    /**
+     * Used to make a class or interface to be known.
+     *
+     * @param clazz
+     * @see edu.kit.iti.formal.automation.ResolveDataTypes
+     */
+    public void registerClass(ClassDeclaration clazz) {
+        classes.put(clazz.getIdentifier(), clazz);
+    }
+
+    public ClassDeclaration resolveClass(String key) {
+        return classes.get(key);
     }
 }

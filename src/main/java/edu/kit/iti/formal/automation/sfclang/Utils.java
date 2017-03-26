@@ -22,8 +22,7 @@ package edu.kit.iti.formal.automation.sfclang;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.parser.IEC61131Parser;
-import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.ast.Top;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
@@ -41,131 +40,89 @@ public class Utils {
      */
     public static String getRandomName() {
         return "action_" + (int) (Math.random() * 10000);
-
     }
 
     /**
      * <p>setPosition.</p>
      *
-     * @param top a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
+     * @param top   a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
      * @param first a {@link org.antlr.v4.runtime.Token} object.
      */
-    public static void setPosition(Top top, Token first) {
+    public static void setStartPosition(Top top, Token first) {
+        if (first == null)
+            return;
         top.setStartPosition(new Top.Position(first.getLine(),
                 first.getCharPositionInLine()));
     }
 
-    /**
-     * <p>setPosition.</p>
-     *
-     * @param top a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     * @param first a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     * @param last a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     */
-    public static void setPosition(Top top, Top first, Top last) {
-        top.setStartPosition(first.getStartPosition());
-        top.setEndPosition(last.getEndPosition());
+    public static void setStartPosition(Top top, ParserRuleContext rule) {
+        setStartPosition(top, rule.getStart());
     }
 
-    /**
-     * <p>setPosition.</p>
-     *
-     * @param top a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     * @param first a {@link org.antlr.v4.runtime.Token} object.
-     * @param last a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     */
-    public static void setPosition(Top top, Token first, Top last) {
-        Utils.setPosition(top, first);
-        top.setEndPosition(last.getEndPosition());
+    public static void setStartPosition(Top top, Top rule) {
+        top.setStartPosition(rule.getStartPosition());
     }
 
-    /**
-     * <p>setPosition.</p>
-     *
-     * @param top a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     * @param ctx a {@link org.antlr.v4.runtime.ParserRuleContext} object.
-     */
-    public static void setPosition(Top top, ParserRuleContext ctx) {
-        setPosition(top, ctx.getStart());
-        setLastPosition(top, ctx.getStop());
-    }
-
-    /**
-     * <p>setPosition.</p>
-     *
-     * @param top a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     * @param first a {@link org.antlr.v4.runtime.Token} object.
-     * @param last a {@link org.antlr.v4.runtime.Token} object.
-     */
-    public static void setPosition(Top top, Token first, Token last) {
-        setPosition(top, first);
-        top.setEndPosition(new Top.Position(last.getLine(),
-                last.getCharPositionInLine() + last.getText().length()));
-    }
-
-    /**
-     * <p>setPositionComplete.</p>
-     *
-     * @param top a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     * @param token a {@link org.antlr.v4.runtime.Token} object.
-     */
-    public static void setPositionComplete(Top top, Token token) {
-        setPosition(top, token, token);
-    }
-
-    /**
-     * <p>setLastPosition.</p>
-     *
-     * @param ast a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     * @param tok a {@link org.antlr.v4.runtime.Token} object.
-     */
+    //
     public static void setLastPosition(Top ast, Token tok) {
         if (tok == null) return;
         ast.setEndPosition(new Top.Position(tok.getLine(), tok.getCharPositionInLine()));
     }
 
-    /**
-     * <p>setLastPosition.</p>
-     *
-     * @param ast a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     * @param ctx a {@link org.antlr.v4.runtime.ParserRuleContext} object.
-     */
     public static void setLastPosition(Top ast, ParserRuleContext ctx) {
         setLastPosition(ast, ctx.getStop());
-
     }
 
-    /**
-     * <p>setPosition.</p>
-     *
-     * @param top a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     * @param array a {@link org.antlr.v4.runtime.Token} object.
-     * @param ctx a {@link org.antlr.v4.runtime.ParserRuleContext} object.
-     */
+    public static void setLastPosition(Top ast, Top ast2) {
+        if (ast2 == null || ast == null)
+            return;
+        ast.setEndPosition(ast2.getEndPosition());
+    }
+
+    public static void setPosition(Top top, Token first, Token last) {
+        setStartPosition(top, first);
+        setLastPosition(top, last);
+    }
+
+    public static void setPosition(Top top, Top first, Top last) {
+        setStartPosition(top, first);
+        setLastPosition(top, last);
+    }
+
+    public static void setPosition(Top top, Token first, Top last) {
+        setStartPosition(top, first);
+        setLastPosition(top, last);
+    }
+
+    public static void setPosition(Top top, Top first, Token last) {
+        setStartPosition(top, first);
+        setLastPosition(top, last);
+    }
+
+    public static void setPosition(Top top, ParserRuleContext ctx) {
+        setStartPosition(top, ctx);
+        setLastPosition(top, ctx);
+    }
+
+    public static void setPosition(Top top, ParserRuleContext first,
+            ParserRuleContext last) {
+        setStartPosition(top, first);
+        setLastPosition(top, last);
+    }
+
+    public static void setPosition(Top top, Token token) {
+        setPosition(top, token, token);
+    }
+
+
     public static void setPosition(Top top,
                                    Token array,
                                    ParserRuleContext ctx) {
         setPosition(top, array, ctx.getStop());
     }
 
-    /**
-     * <p>setLastPosition.</p>
-     *
-     * @param ast a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     * @param ast2 a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     */
-    public static void setLastPosition(Top ast, Top ast2) {
-        if(ast2==null || ast == null) return;
-        ast.setEndPosition(ast2.getEndPosition());
-    }
-
-    /**
-     * <p>setPosition.</p>
-     *
-     * @param ast a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     * @param integer_type_name a {@link org.antlr.v4.runtime.ParserRuleContext} object.
-     * @param rparen a {@link org.antlr.v4.runtime.Token} object.
-     */
-    public static void setPosition(Top ast, ParserRuleContext integer_type_name, Token rparen) {
+    public static void setPosition(Top ast, ParserRuleContext rule,
+            Token stop) {
+        setPosition(ast, rule.getStart(), stop);
     }
 }

@@ -79,8 +79,7 @@ public class FunctionBlockDeclaration extends TopLevelScopeElement {
     }
 
     /** {@inheritDoc} */
-    @Override
-    public String getBlockName() {
+    @Override public String getIdentifier() {
         return getFunctionBlockName();
     }
 }

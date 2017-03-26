@@ -24,10 +24,10 @@ package edu.kit.iti.formal.automation.sfclang;
 
 import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration;
-import edu.kit.iti.formal.automation.st.util.CodeWriter;
-import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
+import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
+import edu.kit.iti.formal.automation.st.util.CodeWriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +67,8 @@ public class SFCLangPrinter implements SFCAstVisitor<Object> {
     /** {@inheritDoc} */
     @Override
     public Object visit(SFCDeclaration decl) {
-        cw.keyword("sfc").append(" ").append(decl.getBlockName()).nl().increaseIndent();
+        cw.keyword("sfc").append(" ").append(decl.getIdentifier()).nl()
+                .increaseIndent();
 
         stPrinter.visit(decl.getLocalScope());
 
@@ -90,7 +91,7 @@ public class SFCLangPrinter implements SFCAstVisitor<Object> {
     }
 
     private void printAction(FunctionBlockDeclaration fbd) {
-        cw.nl().keyword("action").append(" ").append(fbd.getBlockName());
+        cw.nl().keyword("action").append(" ").append(fbd.getIdentifier());
         cw.increaseIndent();
         cw.nl();
         stPrinter.visit(fbd.getLocalScope());

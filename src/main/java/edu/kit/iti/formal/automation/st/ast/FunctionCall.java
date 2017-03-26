@@ -22,8 +22,8 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import java.util.List;
  * @version $Id: $Id
  */
 public class FunctionCall extends Expression {
-    private String functionName;
+    private SymbolicReference functionName;
     private List<Parameter> parameters = new ArrayList<>();
 
     /**
@@ -52,7 +52,7 @@ public class FunctionCall extends Expression {
      * @param expr a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
      */
     public FunctionCall(String fnName, Expression... expr) {
-        functionName = fnName;
+        functionName = new SymbolicReference(fnName);
         for (Expression e : expr) {
             parameters.add(new Parameter(e));
         }
@@ -73,16 +73,16 @@ public class FunctionCall extends Expression {
      *
      * @return a {@link java.lang.String} object.
      */
-    public String getFunctionName() {
+    public SymbolicReference getFunctionName() {
         return functionName;
     }
 
     /**
      * <p>Setter for the field <code>functionName</code>.</p>
      *
-     * @param functionName a {@link java.lang.String} object.
+     * @param functionName a {@link String} object.
      */
-    public void setFunctionName(String functionName) {
+    public void setFunctionName(SymbolicReference functionName) {
         this.functionName = functionName;
     }
 

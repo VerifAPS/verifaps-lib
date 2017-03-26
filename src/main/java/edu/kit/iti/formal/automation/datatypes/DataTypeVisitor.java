@@ -148,4 +148,6 @@ public interface DataTypeVisitor<T> {
      * @return a T object.
      */
     T visit(AnyNum anyNum);
+
+    T visit(ClassDataType classDataType);
 }

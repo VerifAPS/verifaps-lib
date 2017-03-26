@@ -26,9 +26,9 @@ package edu.kit.iti.formal.automation.sfclang;
 import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
-import edu.kit.iti.formal.automation.st.util.HTMLCodeWriter;
-import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.st.StructuredTextHtmlPrinter;
+import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
+import edu.kit.iti.formal.automation.st.util.HTMLCodeWriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +69,8 @@ public class SFCLangHTMLPrinter implements SFCAstVisitor<HTMLCodeWriter> {
 	@Override
 	public HTMLCodeWriter visit(SFCDeclaration decl) {
 
-		hcw.keyword("sfc").append(" ").append(decl.getBlockName()).nl().increaseIndent();
+        hcw.keyword("sfc").append(" ").append(decl.getIdentifier()).nl()
+                .increaseIndent();
 
 		stPrinter.visit(decl.getLocalScope());
 
@@ -124,9 +125,9 @@ public class SFCLangHTMLPrinter implements SFCAstVisitor<HTMLCodeWriter> {
 	}
 
 	private void printAction(FunctionBlockDeclaration fbd) {
-		hcw.nl().keyword("action").append(" ").append(fbd.getBlockName());
-		hcw.increaseIndent();
-		hcw.nl();
+        hcw.nl().keyword("action").append(" ").append(fbd.getIdentifier());
+        hcw.increaseIndent();
+        hcw.nl();
 		stPrinter.visit(fbd.getLocalScope());
 		stPrinter.visit(fbd.getFunctionBody());
 		hcw.decreaseIndent();

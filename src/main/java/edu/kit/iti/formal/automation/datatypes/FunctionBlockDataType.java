@@ -39,7 +39,7 @@ public class FunctionBlockDataType extends RecordType {
      * @param fb a {@link edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration} object.
      */
     public FunctionBlockDataType(FunctionBlockDeclaration fb) {
-        super(fb.getBlockName());
+        super(fb.getIdentifier());
         functionBlock = fb;
     }
 

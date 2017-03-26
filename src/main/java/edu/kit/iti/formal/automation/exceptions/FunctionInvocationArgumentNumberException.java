@@ -22,13 +22,10 @@ package edu.kit.iti.formal.automation.exceptions;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.exceptions.IECException;
-
 /**
- * Created by weigl on 27.11.16.
- *
  * @author weigl
  * @version $Id: $Id
+ * @since 27.11.16.
  */
 public class FunctionInvocationArgumentNumberException extends IECException {
 }

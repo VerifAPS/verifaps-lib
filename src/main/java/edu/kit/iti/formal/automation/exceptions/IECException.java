@@ -23,10 +23,11 @@ package edu.kit.iti.formal.automation.exceptions;
  */
 
 /**
- * Created by weigl on 27.11.16.
+ * Top class of exceptions.
  *
  * @author weigl
- * @version $Id: $Id
+ * @version 1
+ * @since 27.11.16.
  */
-public class IECException extends RuntimeException {
+public abstract class IECException extends RuntimeException {
 }

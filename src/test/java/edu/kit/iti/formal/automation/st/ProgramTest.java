@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.st;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.NiceErrorListener;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import org.antlr.v4.runtime.ANTLRFileStream;
@@ -29,8 +30,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,11 +41,13 @@ import java.util.ArrayList;
 
 @RunWith(Parameterized.class)
 public class ProgramTest {
+    @Parameter public String testFile;
+
     public static final File[] getResources(String folder) {
         URL f = ProgramTest.class.getClassLoader().getResource(folder);
         if (f == null) {
             System.err.format("Could not find %s%n", folder);
-            return new File[0]  ;
+            return new File[0];
         }
         File file = new File(f.getFile());
         return file.listFiles();
@@ -60,15 +63,21 @@ public class ProgramTest {
         return list;
     }
 
-
-    @Parameter
-    public String testFile;
-
-
     @Test
     public void testParser() throws IOException {
         IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRFileStream(testFile));
+
+/*
+        Vocabulary v = lexer.getVocabulary();
+        for (Token t : lexer.getAllTokens()) {
+            System.out.format("%20s : %10s @%d:%d%n",
+                    t.getText(), v.getDisplayName(t.getType()), t.getLine(),
+                    t.getCharPositionInLine());
+        }
+*/
+
         IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
+        parser.addErrorListener(new NiceErrorListener(testFile));
         parser.start();
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
     }

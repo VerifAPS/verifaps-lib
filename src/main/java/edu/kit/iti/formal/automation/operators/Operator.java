@@ -25,10 +25,14 @@ package edu.kit.iti.formal.automation.operators;
 import edu.kit.iti.formal.automation.datatypes.Any;
 
 /**
- * <p>Operator interface.</p>
+ * A Operator is an binary or unary operation associated with a special keyword.
+ * <p>
+ * In ST there are only binary or unary operators. No ternary operator is defined.
+ * <p>
+ * An operator has symbol and a list of expected types.
  *
- * @author weigl
- * @version $Id: $Id
+ * @author Alexander Weigl
+ * @version 1
  */
 public interface Operator {
     /**
@@ -37,6 +41,7 @@ public interface Operator {
      * @return a {@link java.lang.String} object.
      */
     String symbol();
+
     /**
      * <p>getExpectedDataTypes.</p>
      *

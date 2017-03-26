@@ -94,8 +94,7 @@ public class ProgramDeclaration extends TopLevelScopeElement {
     }
 
     /** {@inheritDoc} */
-    @Override
-    public String getBlockName() {
+    @Override public String getIdentifier() {
         return getProgramName();
     }
 }

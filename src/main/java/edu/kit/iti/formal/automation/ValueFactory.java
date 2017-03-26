@@ -22,13 +22,14 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.sfclang.Utils;
-import edu.kit.iti.formal.automation.st.ast.Expression;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.datatypes.values.*;
+import edu.kit.iti.formal.automation.sfclang.Utils;
+import edu.kit.iti.formal.automation.st.ast.Expression;
 import org.antlr.v4.runtime.Token;
 
 import java.util.BitSet;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -131,7 +132,7 @@ public class ValueFactory {
      * <p>makeAnyBit.</p>
      *
      * @param dataType a T object.
-     * @param <T> a T object.
+     * @param <T>      a T object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
     public static <T extends AnyBit> ScalarValue<T, BitSet> makeAnyBit(T dataType) {
@@ -192,7 +193,7 @@ public class ValueFactory {
      */
     public static ScalarValue<? extends AnyBit, Bits> parseBitLiteral(Token s) {
         ScalarValue<? extends AnyBit, Bits> val = parseBitLiteral(s.getText());
-        Utils.setPositionComplete(val, s);
+        Utils.setPosition(val, s);
         return val;
     }
 
@@ -240,7 +241,7 @@ public class ValueFactory {
      */
     public static ScalarValue<? extends AnyInt, Long> parseIntegerLiteral(Token token) {
         ScalarValue<? extends AnyInt, Long> val = parseIntegerLiteral(token.getText());
-        Utils.setPositionComplete(val, token);
+        Utils.setPosition(val, token);
         return val;
     }
 
@@ -306,7 +307,7 @@ public class ValueFactory {
      */
     public static ScalarValue<EnumerateType, String> makeEnumeratedValue(Token token) {
         ScalarValue<EnumerateType, String> val = makeEnumeratedValue(token.getText());
-        Utils.setPositionComplete(val, token);
+        Utils.setPosition(val, token);
         return val;
     }
 
@@ -329,7 +330,7 @@ public class ValueFactory {
      */
     public static ScalarValue<? extends IECString, String> parseStringLiteral(Token token) {
         ScalarValue<? extends IECString, String> val = parseStringLiteral(token.getText());
-        Utils.setPositionComplete(val, token);
+        Utils.setPosition(val, token);
         return val;
     }
 
@@ -355,7 +356,7 @@ public class ValueFactory {
      */
     public static ScalarValue<TimeType, TimeValue> parseTimeLiteral(Token token) {
         ScalarValue<TimeType, TimeValue> val = parseTimeLiteral(token.getText());
-        Utils.setPositionComplete(val, token);
+        Utils.setPosition(val, token);
         return val;
     }
 
@@ -435,7 +436,7 @@ public class ValueFactory {
      */
     public static ScalarValue<AnyBit.Bool, Bits> makeBool(Token token) {
         ScalarValue<AnyBit.Bool, Bits> val = makeBool(token.getText());
-        Utils.setPositionComplete(val, token);
+        Utils.setPosition(val, token);
         return val;
     }
 
@@ -467,7 +468,7 @@ public class ValueFactory {
      */
     public static ScalarValue<? extends AnyReal, Double> parseRealLiteral(Token token) {
         ScalarValue<? extends AnyReal, Double> val = parseRealLiteral(token.getText());
-        Utils.setPositionComplete(val, token);
+        Utils.setPosition(val, token);
         return val;
     }
 
@@ -491,7 +492,7 @@ public class ValueFactory {
      */
     public static ScalarValue<AnyDate.DateAndTime, DateAndTimeValue> parseDateAndTimeLiteral(Token s) {
         ScalarValue<AnyDate.DateAndTime, DateAndTimeValue> val = parseDateAndTimeLiteral(s.getText());
-        Utils.setPositionComplete(val, s);
+        Utils.setPosition(val, s);
         return val;
     }
 
@@ -521,7 +522,7 @@ public class ValueFactory {
      */
     public static ScalarValue<AnyDate.Date, DateValue> parseDateLiteral(Token token) {
         ScalarValue<AnyDate.Date, DateValue> val = parseDateLiteral(token.getText());
-        Utils.setPositionComplete(val, token);
+        Utils.setPosition(val, token);
         return val;
     }
 
@@ -554,7 +555,7 @@ public class ValueFactory {
      */
     public static ScalarValue<AnyDate.TimeOfDay, TimeOfDayValue> parseTimeOfDayLiteral(Token token) {
         ScalarValue<AnyDate.TimeOfDay, TimeOfDayValue> val = parseTimeOfDayLiteral(token.getText());
-        Utils.setPositionComplete(val, token);
+        Utils.setPosition(val, token);
         return val;
     }
 
@@ -565,21 +566,24 @@ public class ValueFactory {
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
     public static ScalarValue<AnyDate.TimeOfDay, TimeOfDayValue> parseTimeOfDayLiteral(String s) {
-        Pattern pattern = Pattern.compile("(?<hour>\\d?\\d):(?<min>\\d?\\d):(?<sec>\\d?\\d)(.(?<ms>\\d?\\d))?");
+        Pattern pattern = Pattern.compile(
+                "(?<hour>\\d?\\d):(?<min>\\d?\\d)(:(?<sec>\\d?\\d))?(.(?<ms>\\d+))?");
 
         Matcher matcher = pattern.matcher(removePrefix(s));
+        Function<String, Integer> parseInt = (String key) -> {
+            String a = matcher.group(key);
+            if (a == null)
+                return 0;
+            else
+                return Integer.parseInt(a);
+        };
+
         if (matcher.matches()) {
-
-            int hour = Integer.parseInt(matcher.group("hour"));
-            int min = Integer.parseInt(matcher.group("min"));
-            int sec = Integer.parseInt(matcher.group("sec"));
-
-            int ms = 0;
-            if (matcher.group("ms") != null)
-                ms = Integer.parseInt(matcher.group("ms"));
-
+            int hour = parseInt.apply("hour");
+            int min = parseInt.apply("min");
+            int sec = parseInt.apply("sec");
+            int ms = parseInt.apply("ms");
             TimeOfDayValue tod = new TimeOfDayValue(hour, min, sec, ms);
-
             return new ScalarValue<>(AnyDate.TIME_OF_DAY, tod);
 
         } else {

@@ -27,20 +27,26 @@ import edu.kit.iti.formal.automation.datatypes.promotion.DefaultTypePromoter;
 import edu.kit.iti.formal.automation.datatypes.promotion.TypePromotion;
 
 /**
- * Created by weigl on 24.11.16.
+ * BinaryOperator represents a binary operator, e.g. addition +, multiply *, etc.
  *
- * @author weigl
- * @version $Id: $Id
+ * <p>Created on 24.11.16.</p>
+ *
+ * @author Alexander Weigl
+ * @version 1
  */
 public class BinaryOperator implements Operator {
-    final String symbol;
-    final Any validType;
+    private final String symbol;
+    private final Any validType;
+
+    /**
+     *
+     */
     protected TypePromotion promoter = new DefaultTypePromoter();
 
     /**
      * <p>Constructor for BinaryOperator.</p>
      *
-     * @param symbol a {@link java.lang.String} object.
+     * @param symbol    a {@link java.lang.String} object.
      * @param validType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
     protected BinaryOperator(String symbol, Any validType) {
@@ -59,13 +65,17 @@ public class BinaryOperator implements Operator {
         return argument.getClass().isAssignableFrom(validType.getClass());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String symbol() {
         return symbol;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Any[] getExpectedDataTypes() {
         return new Any[]{validType, validType};
@@ -74,7 +84,7 @@ public class BinaryOperator implements Operator {
     /**
      * <p>getPromotedType.</p>
      *
-     * @param left a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param left  a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      * @param right a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */

@@ -268,8 +268,7 @@ public class TypeDeclarations extends TopLevelElement implements List<TypeDeclar
     }
 
     /** {@inheritDoc} */
-    @Override
-    public String getBlockName() {
+    @Override public String getIdentifier() {
         return "types";
     }
 }

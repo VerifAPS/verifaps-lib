@@ -22,17 +22,19 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.st.Identifiable;
+
 /**
  * Created by weigl on 13.06.14.
  *
  * @author weigl
  * @version $Id: $Id
  */
-public abstract class TopLevelElement extends Top {
+public abstract class TopLevelElement extends Top implements Identifiable {
     /**
-     * <p>getBlockName.</p>
+     * <p>getIdentifier.</p>
      *
      * @return a {@link java.lang.String} object.
      */
-    public abstract String getBlockName();
+    public abstract String getIdentifier();
 }

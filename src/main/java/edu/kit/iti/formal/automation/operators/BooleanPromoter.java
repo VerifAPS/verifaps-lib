@@ -26,11 +26,18 @@ import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.AnyBit;
 import edu.kit.iti.formal.automation.datatypes.promotion.TypePromotion;
 
-class BooleanPromoter implements TypePromotion {
-    /** Constant <code>INSTANCE</code> */
+/**
+ *
+ */
+public class BooleanPromoter implements TypePromotion {
+    /**
+     * Constant <code>INSTANCE</code>
+     */
     public static final TypePromotion INSTANCE = new BooleanPromoter();
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Any getPromotion(Any a, Any b) {
         return AnyBit.BOOL;

@@ -23,10 +23,9 @@ package edu.kit.iti.formal.automation.exceptions;
  */
 
 /**
- * Created by weigl on 25.11.16.
- *
  * @author weigl
  * @version $Id: $Id
+ * @since 25.11.16
  */
 public class DataTypeNotDefinedException extends RuntimeException {
     /**
@@ -49,7 +48,7 @@ public class DataTypeNotDefinedException extends RuntimeException {
      * <p>Constructor for DataTypeNotDefinedException.</p>
      *
      * @param message a {@link java.lang.String} object.
-     * @param cause a {@link java.lang.Throwable} object.
+     * @param cause   a {@link java.lang.Throwable} object.
      */
     public DataTypeNotDefinedException(String message, Throwable cause) {
         super(message, cause);
@@ -67,9 +66,9 @@ public class DataTypeNotDefinedException extends RuntimeException {
     /**
      * <p>Constructor for DataTypeNotDefinedException.</p>
      *
-     * @param message a {@link java.lang.String} object.
-     * @param cause a {@link java.lang.Throwable} object.
-     * @param enableSuppression a boolean.
+     * @param message            a {@link java.lang.String} object.
+     * @param cause              a {@link java.lang.Throwable} object.
+     * @param enableSuppression  a boolean.
      * @param writableStackTrace a boolean.
      */
     protected DataTypeNotDefinedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {

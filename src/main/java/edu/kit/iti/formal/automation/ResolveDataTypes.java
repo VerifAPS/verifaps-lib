@@ -27,21 +27,20 @@ import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
-import jdk.nashorn.internal.objects.Global;
 
 /**
- * <p>ResolveDataTypes class.</p>
+ * ResolveDataTypes searches and set the data type attributes based on the given global scope.
  *
  * @author Alexander Weigl
- * @version 1 (25.11.16)
+ * @version 1
+ * @since 25.11.16
  */
 public class ResolveDataTypes extends DefaultVisitor<Object> {
     private GlobalScope scope = new GlobalScope();
-
     private boolean registerPhase = true;
 
     /**
-     * <p>Constructor for ResolveDataTypes.</p>
+     * A default scope is used
      */
     public ResolveDataTypes() {
     }
@@ -49,7 +48,7 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
     /**
      * <p>Constructor for ResolveDataTypes.</p>
      *
-     * @param scope a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
+     * @param scope a {@link GlobalScope} that is used for finding builtin types.
      */
     public ResolveDataTypes(GlobalScope scope) {
         this.scope = scope;
@@ -59,23 +58,36 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
     /**
      * <p>resolve.</p>
      *
-     * @param tle a {@link edu.kit.iti.formal.automation.st.ast.TopLevelElements} object.
+     * @param tle a list of {@link TopLevelElement}
      * @return a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
      */
     public static GlobalScope resolve(TopLevelElements tle) {
         GlobalScope globalScope = GlobalScope.defaultScope();
-        ResolveDataTypes rdt = new ResolveDataTypes(globalScope);
+        return resolve(globalScope, tle);
+    }
+
+    /**
+     * <p>resolve.</p>
+     *
+     * @param scope
+     * @param tle   a list of {@link TopLevelElement}
+     * @return a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
+     */
+    public static GlobalScope resolve(GlobalScope scope, TopLevelElements tle) {
+        ResolveDataTypes rdt = new ResolveDataTypes(scope);
         tle.visit(rdt);
         rdt.registerPhase = false;
         tle.visit(rdt);
-        return globalScope;
+        return scope;
     }
 
     private Any resolve(String name) {
         return scope.resolveDataType(name);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
         programDeclaration.setGlobalScope(scope);
@@ -86,7 +98,9 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
         return super.visit(programDeclaration);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
         functionDeclaration.setGlobalScope(scope);
@@ -100,7 +114,9 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(LocalScope localScope) {
         localScope.getLocalVariables().values().forEach(
@@ -109,7 +125,9 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
         functionBlockDeclaration.setGlobalScope(scope);
@@ -120,22 +138,27 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
         return super.visit(functionBlockDeclaration);
     }
 
-
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(SubRangeTypeDeclaration subRangeTypeDeclaration) {
         if (registerPhase) scope.registerType(subRangeTypeDeclaration);
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(SimpleTypeDeclaration simpleTypeDeclaration) {
         if (registerPhase) scope.registerType(simpleTypeDeclaration);
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(VariableDeclaration variableDeclaration) {
         if (!registerPhase) { //every data type is registered
@@ -145,29 +168,36 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
         return null;
     }
 
-
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(PointerTypeDeclaration ptd) {
         if (registerPhase) scope.registerType(ptd);
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ArrayTypeDeclaration arrayTypeDeclaration) {
         if (registerPhase) scope.registerType(arrayTypeDeclaration);
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(EnumerationTypeDeclaration enumerationTypeDeclaration) {
         if (registerPhase) scope.registerType(enumerationTypeDeclaration);
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(StringTypeDeclaration stringTypeDeclaration) {
         if (registerPhase) scope.registerType(stringTypeDeclaration);
@@ -175,7 +205,9 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(TypeDeclarations typeDeclarations) {
         for (TypeDeclaration td : typeDeclarations)
@@ -183,11 +215,24 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(StructureTypeDeclaration structureTypeDeclaration) {
         if (registerPhase) scope.registerType(structureTypeDeclaration);
         return null;
     }
 
+    @Override public Object visit(ClassDeclaration clazz) {
+        if (registerPhase)
+            scope.registerClass(clazz);
+        else {
+            if (clazz)
+        } return super.visit(clazz);
+    }
+
+    @Override public Object visit(MethodDeclaration method) {
+
+    }
 }

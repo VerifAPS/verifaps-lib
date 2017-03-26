@@ -39,8 +39,7 @@ public class ResourceDeclaration extends TopLevelScopeElement {
     }
 
     /** {@inheritDoc} */
-    @Override
-    public String getBlockName() {
+    @Override public String getIdentifier() {
         return "<resource>";
     }
 }

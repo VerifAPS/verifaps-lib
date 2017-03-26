@@ -22,11 +22,28 @@ package edu.kit.iti.formal.automation.exceptions;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.st.ast.FunctionCall;
+import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
+
 /**
- * Created by weigl on 27.11.16.
+ * FunctionUndefinedException is thrown if
+ * a function is used but not in the list of toplevel elements.
  *
  * @author weigl
- * @version $Id: $Id
+ * @since 27.11.16.
  */
 public class FunctionUndefinedException extends IECException {
+    private final FunctionCall functionCall;
+
+    public FunctionUndefinedException(FunctionCall call) {
+        this.functionCall = call;
+    }
+
+    /**
+     * @return the function call that could not be resolved
+     * @since 0.1.12
+     */
+    public FunctionCall getFunctionCall() {
+        return functionCall;
+    }
 }
