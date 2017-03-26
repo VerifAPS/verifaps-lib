@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.ArrayList;
@@ -31,9 +32,10 @@ import java.util.List;
  * @author Alexander Weigl
  * @version 1 (20.02.17)
  */
-public class ClassDeclaration extends TopLevelScopeElement
-{
+public class ClassDeclaration extends TopLevelScopeElement {
     private List<MethodDeclaration> methods = new ArrayList<>();
+    private IdentifierPlaceHolder<ClassDeclaration> parentClass;
+    private List<IdentifierPlaceHolder<ClassDeclaration>> interfaces;
     private String name;
 
     @Override
@@ -50,8 +52,7 @@ public class ClassDeclaration extends TopLevelScopeElement
         return this;
     }
 
-    @Override
-    public String getBlockName() {
+    @Override public String getIdentifier() {
         return name;
     }
 

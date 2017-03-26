@@ -22,12 +22,12 @@ package edu.kit.iti.formal.automation.st.util;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
-import edu.kit.iti.formal.automation.st.ast.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -334,7 +334,7 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         vd.setDataTypeName(variableDeclaration.getDataTypeName());
         if (variableDeclaration.getInit() != null)
             vd.setInit((Initialization) variableDeclaration.getInit().visit(this));
-        vd.setName(variableDeclaration.getName());
+        vd.setIdentifier(variableDeclaration.getIdentifier());
         vd.setType(variableDeclaration.getType());*/
         return vd;
     }

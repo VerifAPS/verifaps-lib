@@ -218,40 +218,15 @@ TwoDigit
 fragment
 TOD_VALUE
 :
-	TwoDigit COLON TwoDigit COLON TwoDigit
-	(
-		DOT TwoDigit
-	)?
+	TwoDigit COLON TwoDigit
+	(COLON TwoDigit (DOT DIGIT+)?) ?
 ;
 
-DATE_LITERAL
-:
-	(
-		DATE
-		| 'D'
-	) '#' DATE_VALUE
-;
+DATE_LITERAL : (DATE | 'D' )         '#' DATE_VALUE;
+TOD_LITERAL  : (TIME_OF_DAY | T O D) '#' TOD_VALUE;
+DATETIME     : (DATE_AND_TIME | D T) '#' DATE_VALUE MINUS TOD_VALUE;
 
-TOD_LITERAL
-:
-	(
-		TIME_OF_DAY
-		| T O D
-	) '#' TOD_VALUE
-;
-
-DATETIME
-:
-	(
-		DATE_AND_TIME
-		| D T
-	) '#' DATE_VALUE MINUS TOD_VALUE
-;
-
-INCOMPL_LOCATION_LITERAL
-:
-	'AT%' [IQM] '*'
-;
+INCOMPL_LOCATION_LITERAL : 'AT%' [IQM] '*';
 
 fragment
 StringCharacters
@@ -949,7 +924,8 @@ PUBLIC :  P U B L I C;
 PRIVATE : P R I V A T E;
 SUPER : S U P E R;
 THIS : T H I S;
-EXTENDS : E X T E N D S;
+EXTENDS : (E X T E N D S);
+
 IDENTIFIER
 :
 	[a-zA-Z_] [$a-zA-Z0-9_]*

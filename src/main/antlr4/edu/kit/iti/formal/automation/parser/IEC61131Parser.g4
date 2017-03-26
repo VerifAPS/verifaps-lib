@@ -40,6 +40,12 @@ returns [TopLevelElement ast]
 	| function_declaration
 	{ $ast = $function_declaration.ast; }
 
+    | class_declaration
+	{ $ast = $class_declaration.ast; }
+
+    | interface_declaration
+    { $ast = $interface_declaration.ast; }
+
 	| function_block_declaration
 	{ $ast = ($function_block_declaration.ast); }
 
@@ -457,7 +463,7 @@ returns [ List<String> ast = new ArrayList<>()]
 function_declaration
 returns [ FunctionDeclaration ast = new FunctionDeclaration() ]
 :
-	FUNCTION name = IDENTIFIER COLON
+	FUNCTION identifier = IDENTIFIER COLON
 	( elementary_type_name
 	  {$ast.setReturnTypeName($elementary_type_name.text);}
 	| IDENTIFIER
@@ -465,7 +471,7 @@ returns [ FunctionDeclaration ast = new FunctionDeclaration() ]
 	var_decls[$ast.getLocalScope().builder()]
 	body = statement_list END_FUNCTION
 	{ Utils.setPosition($ast, $FUNCTION, $END_FUNCTION);
-	  $ast.setFunctionName($name.text);
+	  $ast.setFunctionName($identifier.text);
 	  $ast.setStatements($body.ast); }
 ;
 
@@ -506,12 +512,26 @@ variable_keyword[VariableBuilder v]
 function_block_declaration
 returns [ FunctionBlockDeclaration ast = new FunctionBlockDeclaration()]
 :
-	FUNCTION_BLOCK name = IDENTIFIER
+	FUNCTION_BLOCK identifier = IDENTIFIER
 	var_decls [$ast.getLocalScope().builder()]
 	body = statement_list END_FUNCTION_BLOCK
-	{ $ast.setFunctionBlockName($name.text);
+	{ $ast.setFunctionBlockName($identifier.text);
       $ast.setFunctionBody($body.ast);
       Utils.setPosition($ast, $FUNCTION_BLOCK, $END_FUNCTION_BLOCK);}
+
+;
+
+interface_declaration
+returns [ ClassDeclaration ast = new ClassDeclaration()]
+:
+    INTERFACE identifier=IDENTIFIER
+	(EXTENDS sp=IDENTIFIER)?
+
+	var_decls[$ast.getLocalScope().builder()]
+	methods { $ast.setMethods($methods.ast); }
+	END_INTERFACE
+	{ $ast.setBlockName($identifier.text);
+      Utils.setPosition($ast, $INTERFACE, $END_INTERFACE);}
 
 ;
 
@@ -519,19 +539,21 @@ returns [ FunctionBlockDeclaration ast = new FunctionBlockDeclaration()]
 class_declaration
 returns [ ClassDeclaration ast = new ClassDeclaration()]
 :
-	(FUNCTION_BLOCK|INTERFACE) name=IDENTIFIER
-	(EXTENDS sp=IDENTIFIER)?
+	(FUNCTION_BLOCK) identifier=IDENTIFIER
+	(EXTENDS sp=IDENTIFIER
+	    {$ast.setParentClass($sp.text);}
+	)?
+	(IMPLEMENTS sp=IDENTIFIER
+	    {$ast.addImplements($sp.text);}
+	)*
 
 	var_decls[$ast.getLocalScope().builder()]
 
 	methods { $ast.setMethods($methods.ast); }
 
-	body = statement_list
-
-	(END_FUNCTION_BLOCK|END_INTERFACE)
-	{ $ast.setBlockName($name.text);
+	END_FUNCTION_BLOCK
+	{ $ast.setBlockName($identifier.text);
       Utils.setPosition($ast, $FUNCTION_BLOCK, $END_FUNCTION_BLOCK);}
-
 ;
 
 methods
@@ -543,21 +565,25 @@ returns [List<MethodDeclaration> ast = new ArrayList<>() ]
 method
 returns [MethodDeclaration ast = new MethodDeclaration()]
 :
-
     (PUBLIC|PRIVATE)?
-    METHOD
+    METHOD identifier=IDENTIFIER {$ast.setName($identifier.text);}
+    (COLON ( elementary_type_name
+          	  {$ast.setReturnTypeName($elementary_type_name.text);}
+          	| IDENTIFIER
+                {$ast.setReturnTypeName($IDENTIFIER.text);})
+    )?
     var_decls[$ast.getLocalScope().builder()]
-    statement_list {$ast.setBody($statement_list.ast);}
+    statement_list {$ast.setStatements($statement_list.ast);}
     END_METHOD
 ;
 
 program_declaration
 returns [ ProgramDeclaration ast = new ProgramDeclaration()]
 :
-	PROGRAM name=IDENTIFIER
+	PROGRAM identifier=IDENTIFIER
 	var_decls[$ast.getLocalScope().builder()]
 	body = statement_list END_PROGRAM
-	{ $ast.setProgramName($name.text);
+	{ $ast.setProgramName($identifier.text);
       $ast.setProgramBody($body.ast);
       Utils.setPosition($ast, $PROGRAM, $END_PROGRAM);}
 
@@ -566,7 +592,7 @@ returns [ ProgramDeclaration ast = new ProgramDeclaration()]
 configuration_declaration
 returns [ ConfigurationDeclaration ast = new ConfigurationDeclaration()]
 :
-	CONFIGURATION name = IDENTIFIER
+	CONFIGURATION identifier = IDENTIFIER
     //(global_var_declarations [$ast.getLocalScope().builder()]	)?
 	(
 		single_resource_declaration
@@ -850,7 +876,7 @@ returns [ Expression ast]
 functioncall
 returns [ FunctionCall ast = new FunctionCall()]
 :
-	IDENTIFIER LPAREN
+	symbolic_variable LPAREN
 	(
 		param_assignment
 		(
@@ -858,8 +884,8 @@ returns [ FunctionCall ast = new FunctionCall()]
 		)*
 	)? RPAREN
 	{
-        $ast.setFunctionName($IDENTIFIER.text);
-        Utils.setPosition($ast, $IDENTIFIER, $RPAREN);
+        $ast.setFunctionName($symbolic_variable.ast);
+        Utils.setPosition($ast, $symbolic_variable.ast, $RPAREN);
     }
 
 ;
@@ -930,7 +956,7 @@ symbolic_variable
 returns [ SymbolicReference ast = new SymbolicReference() ]
 :
     //x^[a,252]
-	IDENTIFIER
+	(IDENTIFIER|SUPER|THIS)
 	(REF { $ast.derefVar(); })?
 	(
 		subscript_list
@@ -977,7 +1003,7 @@ returns [ Statement ast ]
 	| RETURN SEMICOLON
 	{
 	  $ast = new ReturnStatement();
-	  Utils.setPositionComplete($ast, $RETURN);
+	  Utils.setPosition($ast, $RETURN);
 	}
 
 ;
@@ -1162,8 +1188,8 @@ returns [ExitStatement ast = new ExitStatement()]
  */
 start_sfc returns [ SFCDeclaration ast = new SFCDeclaration() ]
 :
-	SFC name=IDENTIFIER
-	{$ast.setBlockName($name.text);}
+	SFC identifier=IDENTIFIER
+	{$ast.setBlockName($identifier.text);}
 	var_decls[$ast.getLocalScope().builder()]
 	(
 		action_declaration [$ast.getActions()]
@@ -1190,8 +1216,8 @@ returns [ FunctionBlockDeclaration ast = new FunctionBlockDeclaration() ]
 :
 	ACTION
 	(
-		name = IDENTIFIER
-		{$ast.setFunctionBlockName($name.text);}
+		identifier = IDENTIFIER
+		{$ast.setFunctionBlockName($identifier.text);}
 
 	)?
 	var_decls[$ast.getLocalScope().builder()]
@@ -1206,12 +1232,12 @@ returns [ FunctionBlockDeclaration ast = new FunctionBlockDeclaration() ]
 step_declaration [List<StepDeclaration> steps]
 returns [StepDeclaration s = new StepDeclaration();]
 :
-	STEP name = IDENTIFIER
+	STEP identifier = IDENTIFIER
 	(
 		event [$s]
 	)* END_STEP
 	{
-		$s.setName($name.text);
+		$s.setName($identifier.text);
 		$steps.add($s);
 	}
 

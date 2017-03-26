@@ -29,10 +29,8 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author Alexander Weigl
  * @version 1 (20.02.17)
  */
-public class MethodDeclaration extends Top {
+public class MethodDeclaration extends FunctionDeclaration {
     private ClassDeclaration classDeclaration;
-    private LocalScope localScope;
-    private StatementList body;
 
     @Override
     public <T> T visit(Visitor<T> visitor) {
@@ -41,14 +39,6 @@ public class MethodDeclaration extends Top {
 
     public LocalScope getLocalScope() {
         return localScope;
-    }
-
-    public void setBody(StatementList body) {
-        this.body = body;
-    }
-
-    public StatementList getBody() {
-        return body;
     }
 
     public ClassDeclaration getClassDeclaration() {
@@ -60,8 +50,8 @@ public class MethodDeclaration extends Top {
         return this;
     }
 
-    public MethodDeclaration setLocalScope(LocalScope localScope) {
-        this.localScope = localScope;
-        return this;
+    public void setName(String n) {
+        setFunctionName(n);
     }
+
 }
