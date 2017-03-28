@@ -22,13 +22,11 @@ Make sure the following programs are installed:
  * [Java](http://www.oracle.com/technetwork/indexes/downloads/index.html#java)
 
 [Download](
-https://git.scc.kit.edu/api/v3/projects/1721/builds/artifacts/master/download?job=buildFatJar)
- the zip file, unpack it and run the jar named `stvs/stverificationstudio.jar`
+https://circleci-tkn.rhcloud.com/api/v1/project/VerifAPS/stvs/tree/circleci-yml/latest/artifacts/stverificationstudio.jar)
+ the jar and run it.
+ 
+On first startup a setup-wizard will open and guide you through the next steps.
 
-Next go to ```Edit``` > ```Preferences``` and change the paths to fit your system. For example:
- * Path to NuXmv Executable: ```/usr/bin/nuXmv```
- * Path to Z3: ```/usr/bin/z3```
- * GeTeTa Command: ```java -jar /opt/share/geteta/geteta.jar -c ${code} -t ${spec} -x```
 
 Contributing
 ------------
