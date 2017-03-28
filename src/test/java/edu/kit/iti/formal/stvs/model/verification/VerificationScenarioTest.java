@@ -28,12 +28,12 @@ import static org.junit.Assert.assertNull;
  * Created by bal on 26.02.17.
  */
 public class VerificationScenarioTest {
-  private final long TIMEOUT = 5000;
+  private static final long TIMEOUT = 5000;
   private VerificationScenario scenario;
   private ConstraintSpecification constraintSpec;
   private GlobalConfig config;
   private Code code;
-  private boolean done;
+  private volatile boolean done;
 
   @Before
   public void setUp() throws URISyntaxException, IOException, ImportException {
@@ -47,7 +47,7 @@ public class VerificationScenarioTest {
     config = GlobalConfig.autoloadConfig();
   }
 
-  @Test
+  @Test(timeout=VerificationScenarioTest.TIMEOUT)
   public void testVerify() throws Exception {
     scenario.verificationResultProperty().addListener(new VerificationResultListener());
     assertEquals(VerificationState.NOT_STARTED, scenario.verificationState().get());
@@ -57,9 +57,6 @@ public class VerificationScenarioTest {
     long startTime = System.currentTimeMillis();
     while (!done) {
       Thread.sleep(500);
-      if (System.currentTimeMillis() - startTime > TIMEOUT) {
-        throw new AssertionFailedError("Verification result timed out");
-      }
     }
   }
 
