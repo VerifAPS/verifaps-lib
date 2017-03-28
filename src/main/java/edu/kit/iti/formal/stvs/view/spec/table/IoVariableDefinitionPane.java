@@ -87,6 +87,14 @@ public class IoVariableDefinitionPane extends GridPane {
     return nameTextField;
   }
 
+  public ComboBox<VariableCategory> getCategoryComboBox() {
+    return categoryComboBox;
+  }
+
+  public TextField getTypeTextField() {
+    return typeTextField;
+  }
+
   /**
    * Returns if the specified SpecIOVariable is invalid.
    * This includes that the defined name must not be present in

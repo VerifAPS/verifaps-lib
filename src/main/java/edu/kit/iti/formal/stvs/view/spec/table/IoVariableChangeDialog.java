@@ -2,8 +2,13 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 
+import java.awt.event.KeyEvent;
 import java.util.List;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 
@@ -31,6 +36,7 @@ public class IoVariableChangeDialog extends Dialog<Void> {
    */
   public IoVariableChangeDialog(
       SpecIoVariable variableToChange, List<SpecIoVariable> alreadyDefinedVariables) {
+    setTitle("Change Settings of " + variableToChange.getName());
     this.variableToChange = variableToChange;
     this.changeButton = new ButtonType("Change");
     this.definitionPane = new IoVariableDefinitionPane(variableToChange.getCategory(),
@@ -40,6 +46,8 @@ public class IoVariableChangeDialog extends Dialog<Void> {
 
     getDialogPane().setContent(definitionPane);
     getDialogPane().getButtonTypes().add(changeButton);
+    Button button = (Button) getDialogPane().lookupButton(changeButton);
+    button.setDefaultButton(true);
     getDialogPane().setId("IoVariableChangeDialogPane");
 
     getDialogPane().lookupButton(changeButton).disableProperty()

@@ -3,10 +3,11 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 import edu.kit.iti.formal.stvs.view.spec.Lockable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 
 /**
@@ -37,15 +38,24 @@ public class CommentPopup extends Dialog<String> implements Lockable {
     GridPane grid = new GridPane();
     grid.setHgap(10);
     grid.setVgap(10);
-    grid.setPadding(new Insets(20, 150, 10, 10));
+    //grid.setPadding(new Insets(20, 150, 10, 10));
     grid.add(commentField, 0, 0);
+    commentField.setOnKeyPressed((KeyEvent event) -> {
+       if(event.isShiftDown() && event.getCode() == KeyCode.ENTER) {
+           setResult(commentField.getText());
+           close();
+       }
+
+       if(event.getCode() == KeyCode.ESCAPE) {
+           setResult(commentContent);
+           close();
+       }
+    });
 
 
     this.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
     this.getDialogPane().setContent(grid);
     this.getDialogPane().setId("CommentPopupPane");
-
-
   }
 
   public TextArea getCommentField() {
