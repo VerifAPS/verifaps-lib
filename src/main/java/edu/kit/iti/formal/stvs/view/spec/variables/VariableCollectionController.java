@@ -79,12 +79,12 @@ public class VariableCollectionController implements Controller {
 
     view.getNameTableColumn().setCellValueFactory(data -> data.getValue().nameProperty());
     view.getTypeTableColumn().setCellValueFactory(data -> data.getValue().typeProperty());
-    view.getDefaultValueTableColumn()
-        .setCellValueFactory(data -> data.getValue().defaultValueProperty());
+    view.getConstraintTableColumn()
+        .setCellValueFactory(data -> data.getValue().constraintProperty());
 
     view.getNameTableColumn().setCellFactory(this::cellFactory);
     view.getTypeTableColumn().setCellFactory(this::cellFactory);
-    view.getDefaultValueTableColumn().setCellFactory(this::cellFactory);
+    view.getConstraintTableColumn().setCellFactory(this::cellFactory);
 
     view.getFreeVariableTableView().setItems(freeVariableList.getVariables());
   }

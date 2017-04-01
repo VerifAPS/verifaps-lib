@@ -54,7 +54,7 @@ public class Json {
       FreeVar var = new FreeVar();
       var.name = freeVariable.getName();
       var.type = freeVariable.getType();
-      var.defaultval = freeVariable.getDefaultValue();
+      var.defaultval = freeVariable.getConstraint();
       return var;
     }).collect(Collectors.toList());
     FreeVarSelection selection = new FreeVarSelection();

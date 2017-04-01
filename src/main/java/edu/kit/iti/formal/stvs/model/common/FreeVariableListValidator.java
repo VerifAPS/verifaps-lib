@@ -66,6 +66,10 @@ public class FreeVariableListValidator {
     Map<String, Type> typesByName = typeContext.get().stream()
         .collect(Collectors.toMap(Type::getTypeName, Function.identity()));
 
+    Map<String, Type> variableMap = new HashMap<>();
+    freeVariables.getVariables().forEach(
+            var -> variableMap.put(var.getName(), typesByName.get(var.getType()) ));
+
     Map<FreeVariable, List<FreeVariableProblem>> problems = new HashMap<>();
 
     List<ValidFreeVariable> validated = new ArrayList<>();
@@ -73,10 +77,13 @@ public class FreeVariableListValidator {
     freeVariables.getVariables().forEach(freeVariable -> {
       Optional<DuplicateFreeVariableProblem> optionalDuplicateProblem = DuplicateFreeVariableProblem
           .checkForDuplicates(freeVariable, freeVariables.getVariables());
+
       optionalDuplicateProblem.ifPresent(problem -> insertProblem(problems, freeVariable, problem));
+
       if (!optionalDuplicateProblem.isPresent()) {
         try {
-          validated.add(InvalidFreeVariableProblem.tryToConvertToValid(freeVariable, typesByName));
+          validated.add(InvalidFreeVariableProblem.tryToConvertToValid(freeVariable,
+                  typesByName, variableMap));
         } catch (InvalidFreeVariableProblem problem) {
           insertProblem(problems, freeVariable, problem);
         }

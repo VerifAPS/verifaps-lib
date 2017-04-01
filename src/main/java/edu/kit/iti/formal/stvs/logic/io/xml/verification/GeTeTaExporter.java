@@ -91,9 +91,9 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
       ConstraintVariable exportedVariable = objectFactory.createConstraintVariable();
       exportedVariable.setName(VariableEscaper.escapeIdentifier(freeVariable.getName()));
       exportedVariable.setDataType(getDataType(freeVariable));
-      if (freeVariable.getDefaultValue().length() > 0) {
+      if (freeVariable.getConstraint().length() > 0) {
         exportedVariable
-            .setConstraint(VariableEscaper.escapeIdentifier(freeVariable.getDefaultValue()));
+            .setConstraint(VariableEscaper.escapeIdentifier(freeVariable.getConstraint()));
       } else {
         exportedVariable.setConstraint("-");
       }
