@@ -2,8 +2,11 @@ package edu.kit.iti.formal.stvs.view;
 
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
+import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 
 /**
  * Provides static methods for view operations.
@@ -68,4 +71,23 @@ public class ViewUtils {
     parent.setId(parent.getClass().getSimpleName());
   }
 
+    /**
+     * @param url the url of the website to be shown
+     */
+    public static void openHelpText(String title, String url) {
+        WebView wv = new WebView();
+        wv.getEngine().setJavaScriptEnabled(false);
+        wv.getEngine().load(url);
+        Scene pane = new Scene(wv);
+        Stage state = new Stage();
+        state.setScene(pane);
+        //                pane.getButtonTypes().add(ButtonType.CLOSE);
+        state.setAlwaysOnTop(true);
+        state.setTitle(title);
+        state.setResizable(true);
+        state.setOpacity(0.8);
+        state.setMinHeight(250);
+        state.setMinWidth(250);
+        state.show();
+    }
 }

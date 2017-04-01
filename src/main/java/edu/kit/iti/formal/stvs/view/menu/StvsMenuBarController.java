@@ -5,28 +5,29 @@ import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.CO
 import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.SESSION;
 import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.SPECIFICATION;
 
+import edu.kit.iti.formal.stvs.logic.examples.ExamplesFacade;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
-import edu.kit.iti.formal.stvs.model.code.ParsedCode;
-import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
+import edu.kit.iti.formal.stvs.model.examples.Example;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.view.Controller;
+import edu.kit.iti.formal.stvs.view.ViewUtils;
 import edu.kit.iti.formal.stvs.view.common.AlertFactory;
 import edu.kit.iti.formal.stvs.view.common.FileChooserFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.MenuItem;
 import javafx.stage.FileChooser;
@@ -73,6 +74,43 @@ public class StvsMenuBarController implements Controller {
         view.saveSpec.setOnAction(this::saveSpec);
         view.config.setOnAction(this::openConfigDialog);
         view.about.setOnAction(this::openAboutDialog);
+
+        //popluate examples
+        for (Example ex : ExamplesFacade.getExamples()) {
+            final Example a = ex;
+            final MenuItem mex = new MenuItem(ex.getName());
+            mex.setOnAction((value) -> this.openExample(a));
+            mex.setMnemonicParsing(true);
+            Tooltip.install(mex.getGraphic(), new Tooltip(ex.getDescription()));
+            view.examples.getItems().add(mex);
+        }
+    }
+
+    void openExample(Example ex) {
+        URL url = ex.getSessionFile();
+        try {
+            StvsRootModel session = ImporterFacade
+                    .importSession(url.openStream(),
+                            ImporterFacade.ImportFormat.XML,
+                            rootModel.get().getGlobalConfig(),
+                            rootModel.get().getHistory());
+
+            session.setFilename(ex.getName());
+            this.rootModel.set(session);
+
+            if (null != ex.getHtmlHelp()) {
+                ViewUtils.openHelpText("Help for " + ex.getName() + " Example",
+                        ex.getHtmlHelp());
+            }
+
+        }
+        catch (ImportException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void updateHistoryMenu() {
