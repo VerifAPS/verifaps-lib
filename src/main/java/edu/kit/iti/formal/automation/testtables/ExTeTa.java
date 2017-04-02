@@ -23,6 +23,9 @@ package edu.kit.iti.formal.automation.testtables;
  */
 
 import edu.kit.iti.formal.automation.SymbExFacade;
+import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
+import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException;
+import edu.kit.iti.formal.automation.exceptions.UnknownVariableException;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.testtables.builder.TableTransformation;
 import edu.kit.iti.formal.automation.testtables.exception.GetetaException;
@@ -49,13 +52,29 @@ public class ExTeTa {
         try {
             CommandLine cli = parse(args);
             run(cli);
-        } catch (ParseException e) {
+        }
+        catch (FunctionUndefinedException e) {
+            Report.fatal("Could not call %s" ,
+                    e.getFunctionCall().getFunctionName().getIdentifier());
+        }
+        catch (UnknownVariableException e) {
             Report.fatal(e.getMessage());
-        } catch (JAXBException e) {
+        }
+        catch (DataTypeNotDefinedException e) {
+            Report.fatal(
+                    "Could not parse the given ST sources. There is an unknown datatype. %s",
+                    e.getMessage());
+        }
+        catch (ParseException e) {
+            Report.fatal(e.getMessage());
+        }
+        catch (JAXBException e) {
             Report.fatal(e.getLinkedException().getMessage());
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             Report.fatal("IOExcepton: %s", e.getMessage());
-        } catch (GetetaException e) {
+        }
+        catch (GetetaException e) {
             Report.fatal("%s: %s", e.getClass().getSimpleName(),
                     e.getMessage());
 
@@ -75,7 +94,6 @@ public class ExTeTa {
         String tableFilename = cli.getOptionValue("t");
         String codeFilename = cli.getOptionValue("c");
 
-
         if (tableFilename == null || codeFilename == null) {
             Report.fatal("No code or table file given.");
             System.exit(1);
@@ -85,39 +103,46 @@ public class ExTeTa {
         GeneralizedTestTable table = Facade.readTable(tableFilename);
         TopLevelElements code = Facade.readProgram(codeFilename);
 
-
         if (cli.getOptionValue('m') != null)
             switch (cli.getOptionValue('m')) {
-                case "concrete-smv":
-                    table.getOptions().setMode(Mode.CONCRETE_TABLE);
-                    break;
-                case "conformance":
-                    table.getOptions().setMode(Mode.CONFORMANCE);
-                    break;
-                case "input-seq-exists":
-                    table.getOptions().setMode(Mode.INPUT_SEQUENCE_EXISTS);
-                    break;
+            case "concrete-smv":
+                table.getOptions().setMode(Mode.CONCRETE_TABLE);
+                break;
+            case "conformance":
+                table.getOptions().setMode(Mode.CONFORMANCE);
+                break;
+            case "input-seq-exists":
+                table.getOptions().setMode(Mode.INPUT_SEQUENCE_EXISTS);
+                break;
+            case "monitor":
+                table.getOptions().setMode(Mode.MONITOR_GENERATION);
+                break;
             }
 
+        if (table.getOptions().getMode() == Mode.MONITOR_GENERATION) {
 
-        //
-        SMVModule modCode = SymbExFacade.evaluateProgram(code);
-        SMVType superEnumType = Facade.createSuperEnum(code);
-        TableTransformation tt = new TableTransformation(table, superEnumType);
-        SMVModule modTable = tt.transform();
-        SMVModule mainModule = Facade.glue(modTable, modCode, table.getOptions());
+        }
+        else {
+            SMVModule modCode = SymbExFacade.evaluateProgram(code);
+            SMVType superEnumType = Facade.createSuperEnum(code);
+            TableTransformation tt = new TableTransformation(table,
+                    superEnumType);
+            SMVModule modTable = tt.transform();
+            SMVModule mainModule = Facade
+                    .glue(modTable, modCode, table.getOptions());
 
-        List<SMVModule> modules = new LinkedList<>();
-        modules.add(mainModule);
-        modules.add(modTable);
-        modules.add(modCode);
-        modules.addAll(tt.getHelperModules());
-        boolean b = Facade.runNuXMV(tableFilename, modules);
+            List<SMVModule> modules = new LinkedList<>();
+            modules.add(mainModule);
+            modules.add(modTable);
+            modules.add(modCode);
+            modules.addAll(tt.getHelperModules());
+            boolean b = Facade.runNuXMV(tableFilename, modules);
 
-        if (Report.getMessage().getCounterexample() != null) {
-            CounterExampleAnalyzer cea = new CounterExampleAnalyzer(table,
-                    Report.getMessage());
-            cea.run();
+            if (Report.getMessage().getCounterexample() != null) {
+                CounterExampleAnalyzer cea = new CounterExampleAnalyzer(table,
+                        Report.getMessage());
+                cea.run();
+            }
         }
     }
 

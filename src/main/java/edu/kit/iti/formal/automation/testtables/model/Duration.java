@@ -68,7 +68,7 @@ public class Duration {
      *
      * @return
      */
-    public boolean skippable() {
+    public boolean isSkippable() {
         return lower == 0;
     }
 
@@ -80,7 +80,7 @@ public class Duration {
      * @return
      */
     public int maxCounterValue() {
-        return Math.max(lower, upper) + 1;
+        return getBound() + 1;
     }
 
     /**
@@ -116,5 +116,12 @@ public class Duration {
      */
     public boolean contains(int cycles) {
         return (lower <= cycles && (isUnbounded() || cycles <= upper));
+    }
+
+    /**
+     * @return
+     */
+    public int getBound() {
+        return isUnbounded() ? lower : upper;
     }
 }

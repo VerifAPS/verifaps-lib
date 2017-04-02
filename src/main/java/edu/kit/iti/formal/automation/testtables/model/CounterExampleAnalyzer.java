@@ -22,9 +22,9 @@ package edu.kit.iti.formal.automation.testtables.model;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.testtables.StateReachability;
 import edu.kit.iti.formal.automation.testtables.report.Counterexample;
 import edu.kit.iti.formal.automation.testtables.report.Message;
+import edu.kit.iti.formal.smv.ast.SVariable;
 
 import java.util.*;
 
@@ -33,23 +33,20 @@ import java.util.*;
  * @version 1 (08.02.17)
  */
 public class CounterExampleAnalyzer {
-    private final StateReachability reach;
     private final List<State> states;
     private final Message message;
     private List<Map<String, String>> ceStates = new ArrayList<>();
     private List<Map<String, String>> ceInput = new ArrayList<>();
 
-    public CounterExampleAnalyzer(
-            GeneralizedTestTable testTable,
-            Message msg) {
-        this.reach = testTable.getReachability();
-        this.states = this.reach.getStates();
+    public CounterExampleAnalyzer(GeneralizedTestTable testTable, Message msg) {
+        this.states = testTable.getRegion().flat();
         this.message = msg;
 
         //making a dense counter example
         Map<String, String> lastState = new HashMap<>();
         Map<String, String> lastInput = new HashMap<>();
-        for (Counterexample.Step step : msg.getCounterexample().getTrace().getStep()) {
+        for (Counterexample.Step step : msg.getCounterexample().getTrace()
+                .getStep()) {
             Map<String, String> state = new HashMap<>(lastState);
             Map<String, String> input = new HashMap<>(lastInput);
 
@@ -68,49 +65,57 @@ public class CounterExampleAnalyzer {
             ceStates.add(state);
         }
 
-        Message.Counterexample.RowMappings value =new Message.Counterexample.RowMappings();
+        Message.Counterexample.RowMappings value = new Message.Counterexample.RowMappings();
         msg.getCounterexample().setRowMappings(value);
     }
 
-
     public List<String> run() {
         Queue<SearchNode> queue = new LinkedList<>();
-
         for (State s : this.states) {
-            if (isTrue(0, "s" + s.getId())) {
-                SearchNode sn = new SearchNode(0, s);
-                queue.add(sn);
+            for (State.AutomatonState a : s.getAutomataStates()) {
+                if (a.isStartState() && isTrue(0, a.getSMVVariable())) {
+                    SearchNode sn = new SearchNode(0, a);
+                    queue.add(sn);
+                }
+                else {
+                    break;
+                }
             }
         }
 
         while (!queue.isEmpty()) {
             SearchNode cur = queue.remove();
             int time = cur.time;
-            State state = cur.state;
+            State.AutomatonState state = cur.state;
 
-            if (time >= ceStates.size()) continue;
+            if (time >= ceStates.size())
+                continue;
 
             String fwd = state.getDefForward().getName();
-            String out = state.getDefOutput().getName();
-            String keep = state.getDefKeep().getName();
-
-            if (isTrue(time, keep)) {
-                queue.add(new SearchNode(time + 1, state, cur));
-            }
+            String failed = state.getDefFailed().getName();
 
             if (isTrue(time, fwd)) {
                 //include every outgoing state
-                reach.getOutgoing(state).forEach(
-                        r -> queue.add(new SearchNode(time + 1, r, cur))
-                );
+                state.getOutgoing().forEach(
+                        r -> queue.add(new SearchNode(time + 1, r, cur)));
+
+                //step can be repeated infinitely, if fwd=TRUE
+                if (state.isUnbounded() && isTrue(time, fwd)) {
+                    queue.add(new SearchNode(time + 1, state, cur));
+                }
             }
 
-            if (isFalse(time, out)) {
+            if (isTrue(time, failed)) {
                 //yuhuuu the counter example
-                message.getCounterexample().getRowMappings().getRowMap().add(cur.getRows());
+                message.getCounterexample().getRowMappings().getRowMap()
+                        .add(cur.getRows());
             }
         }
         return message.getCounterexample().getRowMappings().getRowMap();
+    }
+
+    private boolean isTrue(int time, SVariable var) {
+        return isTrue(time, var.getName());
     }
 
     private boolean isTrue(int time, String var) {
@@ -121,13 +126,16 @@ public class CounterExampleAnalyzer {
         var = "table." + var;
         try {
             String val = ceInput.get(time).get(var);
-            if (val != null) return val;
-        } catch (IndexOutOfBoundsException e) {
+            if (val != null)
+                return val;
+        }
+        catch (IndexOutOfBoundsException e) {
 
         }
         try {
             return ceStates.get(time).get(var);
-        } catch (IndexOutOfBoundsException e1) {
+        }
+        catch (IndexOutOfBoundsException e1) {
         }
         return null;
     }
@@ -138,14 +146,15 @@ public class CounterExampleAnalyzer {
 
     private static class SearchNode {
         final int time;
-        final State state;
+        final State.AutomatonState state;
         final SearchNode parent;
 
-        public SearchNode(int i, State s) {
+        public SearchNode(int i, State.AutomatonState s) {
             this(i, s, null);
         }
 
-        public SearchNode(int time, State state, SearchNode parent) {
+        public SearchNode(int time, State.AutomatonState state,
+                SearchNode parent) {
             this.parent = parent;
             this.state = state;
             this.time = time;
@@ -155,7 +164,7 @@ public class CounterExampleAnalyzer {
             String s = "";
             if (parent != null)
                 s = parent.getRows() + ", ";
-            return s + state.getId();
+            return s + state.getState().getId();
         }
     }
 }

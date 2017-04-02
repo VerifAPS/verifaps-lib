@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.testtables.builder;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.testtables.model.State;
 import edu.kit.iti.formal.smv.SMVFacade;
 import edu.kit.iti.formal.smv.ast.SBinaryOperator;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
@@ -33,9 +32,9 @@ import edu.kit.iti.formal.smv.ast.SMVExpr;
 public class ConformanceInvariantTransformer implements TableTransformer {
     @Override
     public void accept(TableTransformation tt) {
-        SMVExpr states = tt.getReachable().getStates().stream()
-                .map(State::getSMVVariable)
-                .map(v -> (SMVExpr) v)
+        SMVExpr states = tt.getTestTable().getRegion().flat().stream()
+                .flatMap(s -> s.getAutomataStates().stream())
+                .map(s->(SMVExpr) s.getSMVVariable())
                 .reduce(SMVFacade.reducer(SBinaryOperator.OR))
                 .get();
 

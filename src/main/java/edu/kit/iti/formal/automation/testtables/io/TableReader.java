@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.testtables.io;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
+import edu.kit.iti.formal.automation.testtables.model.Duration;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.Region;
 import edu.kit.iti.formal.automation.testtables.model.State;
@@ -41,7 +42,6 @@ public class TableReader {
     private GeneralizedTestTable gtt = new GeneralizedTestTable();
     private int stepNumber = 0;
 
-
     public TableReader(File input) {
         this.input = input;
     }
@@ -49,10 +49,11 @@ public class TableReader {
     public void run() throws JAXBException {
         Report.debug("read xml file %s", input);
 
-        @SuppressWarnings("restriction")
-        JAXBContext jc = JAXBContext.newInstance(ObjectFactory.class);
+        @SuppressWarnings("restriction") JAXBContext jc = JAXBContext
+                .newInstance(ObjectFactory.class);
         Unmarshaller jaxbUnmarshaller = jc.createUnmarshaller();
-        JAXBElement<?> root = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(input);
+        JAXBElement<?> root = (JAXBElement<?>) jaxbUnmarshaller
+                .unmarshal(input);
         TestTable xml = (TestTable) root.getValue();
 
         Report.debug("xml file successfully read", input);
@@ -81,7 +82,8 @@ public class TableReader {
     }
 
     private void translateOptions(TestTable xml) {
-        if (xml.getOptions() == null || xml.getOptions().getOption().isEmpty()) {
+        if (xml.getOptions() == null || xml.getOptions().getOption()
+                .isEmpty()) {
             Report.info("No options in table file.");
             return;
         }
@@ -105,12 +107,19 @@ public class TableReader {
 
     private Region translateSteps(Block steps) {
         Region r = new Region(stepNumber++);
-        r.setDuration(IOFacade.parseDuration(steps.getDuration()));
-
+        String duration = steps.getDuration();
+        if (duration == null) {
+            Report.info("Duration is not given, assume '[1,1]'");
+            r.setDuration(new Duration(1, 1));
+        }
+        else {
+            r.setDuration(IOFacade.parseDuration(duration));
+        }
         for (Object o : steps.getStepOrBlock()) {
             if (o instanceof Step) {
                 r.getStates().add(translateStep((Step) o));
-            } else if (o instanceof Block) {
+            }
+            else if (o instanceof Block) {
                 r.getStates().add(translateSteps((Block) o));
             }
         }
@@ -151,8 +160,10 @@ public class TableReader {
         }
 
         gtt.getIoVariables().forEach((k, v) -> {
-            if (v.getDataType() == null || v.getName() == null || v.getName().isEmpty() || v.getIo() == null || v.getIo().isEmpty())
-                throw new IllegalArgumentException("variable " + v.getName() + " is bad");
+            if (v.getDataType() == null || v.getName() == null || v.getName()
+                    .isEmpty() || v.getIo() == null || v.getIo().isEmpty())
+                throw new IllegalArgumentException(
+                        "variable " + v.getName() + " is bad");
         });
     }
 

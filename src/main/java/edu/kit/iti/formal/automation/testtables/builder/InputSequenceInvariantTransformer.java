@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.testtables.builder;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.testtables.model.State;
 import edu.kit.iti.formal.smv.SMVFacade;
 import edu.kit.iti.formal.smv.ast.SBinaryOperator;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
@@ -45,9 +44,9 @@ public class InputSequenceInvariantTransformer implements TableTransformer {
         */
 
         // one of the rows is always active
-        SMVExpr states = tt.getReachable().getStates().stream()
-                .map(State::getSMVVariable)
-                .map(v -> (SMVExpr) v)
+        SMVExpr states = tt.getTestTable().getRegion().flat().stream()
+                .flatMap(s -> s.getAutomataStates().stream())
+                .map(v -> (SMVExpr) v.getSMVVariable())
                 .reduce(SMVFacade.reducer(SBinaryOperator.OR))
                 .get();
 

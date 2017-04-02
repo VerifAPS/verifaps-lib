@@ -25,5 +25,5 @@ package edu.kit.iti.formal.automation.testtables.model.options;
 public enum Mode {
     CONFORMANCE,
     INPUT_SEQUENCE_EXISTS,
-    CONCRETE_TABLE;
+    CONCRETE_TABLE, MONITOR_GENERATION;
 }

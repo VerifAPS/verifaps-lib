@@ -27,9 +27,7 @@ import edu.kit.iti.formal.smv.ast.SMVExpr;
 import edu.kit.iti.formal.smv.ast.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Alexander Weigl
@@ -39,7 +37,12 @@ public class State {
     private final int id;
     private final List<SMVExpr> inputExpr = new ArrayList<>();
     private final List<SMVExpr> outputExpr = new ArrayList<>();
-    private Duration duration = new Duration(1,1);
+    private Duration duration = new Duration(1, 1);
+    private List<AutomatonState> automataStates;
+
+    private final Set<State> incoming = new HashSet<>();
+    private final Set<State> outgoing = new HashSet<>();
+    private boolean initialReachable;
 
     public State(int id) {
         this.id = id;
@@ -66,10 +69,6 @@ public class State {
         a.add(e);
     }
 
-    public SVariable getSMVVariable() {
-        return new SVariable("s" + id, SMVType.BOOLEAN);
-    }
-
     /**
      * @return
      */
@@ -78,7 +77,6 @@ public class State {
     }
 
     /**
-     *
      * @return
      */
     public int getId() {
@@ -91,18 +89,18 @@ public class State {
         return l;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         State state = (State) o;
 
         return id == state.id;
     }
 
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
         return id;
     }
 
@@ -110,8 +108,8 @@ public class State {
         return new SVariable("s" + id + "_fwd", SMVType.BOOLEAN);
     }
 
-    public SVariable getDefKeep() {
-        return new SVariable("s" + id + "_keep", SMVType.BOOLEAN);
+    public SVariable getDefFailed() {
+        return new SVariable("s" + id + "_fail", SMVType.BOOLEAN);
     }
 
     public SVariable getDefInput() {
@@ -120,5 +118,89 @@ public class State {
 
     public SVariable getDefOutput() {
         return new SVariable("s" + id + "_out", SMVType.BOOLEAN);
+    }
+
+    public List<AutomatonState> getAutomataStates() {
+        if (automataStates == null)
+            automataStates = new ArrayList<>();
+
+        if (automataStates.size() == 0) {
+            for (int i = 1; i <= duration.getBound(); i++) {
+                automataStates.add(new AutomatonState(i));
+            }
+        }
+        return automataStates;
+    }
+
+    public Set<State> getOutgoing() {
+        return outgoing;
+    }
+
+    public Set<State> getIncoming() {
+        return incoming;
+    }
+
+    public void setInitialReachable(boolean initialReachable) {
+        this.initialReachable = initialReachable;
+    }
+
+    public boolean isInitialReachable() {
+        return initialReachable;
+    }
+
+    public class AutomatonState {
+        int count;
+
+        private final Set<AutomatonState> incoming = new HashSet<>();
+        private final Set<AutomatonState> outgoing = new HashSet<>();
+
+        public AutomatonState(int cnt) {
+            count = cnt;
+        }
+
+        public boolean isOptional() {
+            return count >= duration.getLower();
+        }
+
+        public boolean isFirst() {
+            return count == 1;
+        }
+
+        public State getState() {
+            return State.this;
+        }
+
+        public Set<AutomatonState> getIncoming() {
+            return incoming;
+        }
+
+        public Set<AutomatonState> getOutgoing() {
+            return outgoing;
+        }
+
+        public SVariable getSMVVariable() {
+            return SVariable.create("s" + getId() + "_" + count).asBool();
+        }
+
+        public SVariable getDefForward() {
+            return SVariable.create("s_%d_%d_fwd", id, count).asBool();
+        }
+
+        public SVariable getDefFailed() {
+            return SVariable.create("s_%d_%d_fail", id, count).asBool();
+        }
+
+        /**
+         * Returns true iff this is the automaton that can infinitely repeated.
+         *
+         * @return
+         */
+        public boolean isUnbounded() {
+            return count == duration.getBound() && duration.isUnbounded();
+        }
+
+        public boolean isStartState() {
+            return isInitialReachable() && isFirst();
+        }
     }
 }

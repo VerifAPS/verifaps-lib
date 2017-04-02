@@ -44,16 +44,16 @@ public class GeneralizedTestTable {
     private final LinkedHashMap<String, IoVariable> ioVariables = new LinkedHashMap<>();
     private final Map<String, ConstraintVariable> constraintVariables = new HashMap<>();
     private final Map<String, SVariable> variableMap = new HashMap<>();
-    private final Properties properties = new Properties(System.getProperties());
+    private final Properties properties = new Properties(
+            System.getProperties());
     private final Map<String, FunctionDeclaration> functions = new HashMap<>();
     private final Map<SVariable, Integer> references = new HashMap<>();
     private Region region;
     private TableOptions options = null;
     private String name;
-    private StateReachability reachability;
 
     public TableOptions getOptions() {
-        if(options==null) {
+        if (options == null) {
             options = new TableOptions();
             PropertyInitializer.initialize(options, properties);
         }
@@ -65,8 +65,18 @@ public class GeneralizedTestTable {
         return this;
     }
 
-    public StateReachability getReachability() {
-        return new StateReachability(this);
+    public void calculateReachability() {
+        for (State s : this.getRegion().flat()) {
+            s.getOutgoing().clear();
+            s.getIncoming().clear();
+            s.getAutomataStates().clear();
+
+            for (State.AutomatonState a : s.getAutomataStates()) {
+                a.getOutgoing().clear();
+                a.getIncoming().clear();
+            }
+        }
+        new StateReachability(this);
     }
 
     public Map<String, IoVariable> getIoVariables() {
@@ -95,8 +105,9 @@ public class GeneralizedTestTable {
         IoVariable a = ioVariables.get(text);
         ConstraintVariable b = constraintVariables.get(text);
 
-        if(a!=null && b!=null)
-            throw new IllegalStateException("constraint and io variable have the same name.");
+        if (a != null && b != null)
+            throw new IllegalStateException(
+                    "constraint and io variable have the same name.");
 
         if (a != null)
             return a;
@@ -119,7 +130,7 @@ public class GeneralizedTestTable {
 
     public void addFunctions(List<TopLevelElement> file) {
         for (TopLevelElement e : file) {
-            functions.put(e.getBlockName(), (FunctionDeclaration) e);
+            functions.put(e.getIdentifier(), (FunctionDeclaration) e);
         }
     }
 
@@ -134,7 +145,8 @@ public class GeneralizedTestTable {
     public IoVariable getIoVariables(int i) {
         int k = 0;
         for (IoVariable v : ioVariables.values()) {
-            if (k++ == i) return v;
+            if (k++ == i)
+                return v;
         }
         return null;
     }
@@ -146,7 +158,8 @@ public class GeneralizedTestTable {
     public SMVExpr getReference(SVariable columnVariable, int i) {
         if (i == 0) {
             return columnVariable;
-        } else {
+        }
+        else {
             SReference ref = new SReference(i, columnVariable);
             int max = Math.max(references.getOrDefault(columnVariable, i), i);
             references.put(columnVariable, max);

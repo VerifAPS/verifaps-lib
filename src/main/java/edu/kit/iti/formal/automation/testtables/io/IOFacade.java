@@ -40,6 +40,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
  */
 public final class IOFacade {
     public static CellExpressionParser createParser(String input) {
+        assert input!=null;
         CellExpressionLexer lexer = new CellExpressionLexer(new ANTLRInputStream(input));
         lexer.removeErrorListeners();
         lexer.addErrorListener(ThrowingErrorListener.INSTANCE);

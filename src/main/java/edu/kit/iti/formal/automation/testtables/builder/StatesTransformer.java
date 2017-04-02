@@ -22,8 +22,6 @@ package edu.kit.iti.formal.automation.testtables.builder;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.testtables.StateReachability;
-import edu.kit.iti.formal.automation.testtables.model.Duration;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.State;
 import edu.kit.iti.formal.automation.testtables.model.TableModule;
@@ -34,131 +32,81 @@ import java.util.List;
 
 /**
  * Created by weigl on 17.12.16.
+ *
+ * @version 2
  */
 public class StatesTransformer implements TableTransformer {
-    private static final int INITIAL_CLOCK_VALUE = 1;
     private TableModule mt;
     private GeneralizedTestTable gtt;
-    private StateReachability reachable;
     private SVariable errorState;
 
     private void createStates() {
         List<State> flat = gtt.getRegion().flat();
         flat.forEach(this::introduceState);
-        flat.forEach(this::addNextAssignments);
         insertErrorState();
-        insertInitialState();
     }
 
     private void introduceState(State s) {
-        Duration d = s.getDuration();
-        mt.getStateVars().add(s.getSMVVariable());
-
-        SMVExpr clockVariableKeep;
-        SMVExpr clockVariableFwd;
-
-        if (d.isOneStep()) { // [1,1]
-            clockVariableFwd = SLiteral.TRUE;
-            clockVariableKeep = SLiteral.FALSE;
-        } else if (d.getLower() == 0 && d.isUnbounded()) {
-            clockVariableFwd = SLiteral.TRUE;
-            clockVariableKeep = SLiteral.TRUE;
-        } else {
-            //excluded 1, [0,*]
-            //possible [n,m], [0,m], [n,*]
-            SVariable clock = introduceClock(s);
-
-            if (d.getLower() <= 0) {
-                clockVariableFwd = SLiteral.TRUE;
-            } else {
-                clockVariableFwd = new SBinaryExpression(clock,
-                        SBinaryOperator.GREATER_EQUAL,
-                        new SLiteral(clock.getSMVType(), d.getLower()));
-            }
-
-            if (d.getUpper() == -1) {
-                clockVariableKeep = SLiteral.TRUE;
-            } else {
-                clockVariableKeep = new SBinaryExpression(clock,
-                        SBinaryOperator.LESS_THAN,
-                        new SLiteral(clock.getSMVType(), d.getUpper()));
-            }
-        }
-
         // define output predicate
-        mt.getDefinitions().put(s.getDefOutput(),
-                SMVFacade.combine(SBinaryOperator.AND, s.getOutputExpr(), SLiteral.TRUE));
+        define(s.getDefOutput(),
+                SMVFacade.combine(SBinaryOperator.AND, s.getOutputExpr()));
 
         // define input predicate
-        mt.getDefinitions().put(s.getDefInput(),
-                SMVFacade.combine(SBinaryOperator.AND, s.getInputExpr(), SLiteral.TRUE));
+        define(s.getDefInput(),
+                SMVFacade.combine(SBinaryOperator.AND, s.getInputExpr()));
 
-        // define keep predicate
-        mt.getDefinitions().put(s.getDefKeep(),
-                SMVFacade.combine(SBinaryOperator.AND,
-                        s.getSMVVariable(), s.getDefInput(), s.getDefOutput(), clockVariableKeep));
+        // define failed predicate
+        define(s.getDefFailed(), SMVFacade
+                .combine(SBinaryOperator.AND, s.getDefInput(),
+                        s.getDefOutput().not()));
 
         // define forward predicate
-        mt.getDefinitions().put(s.getDefForward(),
-                SMVFacade.combine(SBinaryOperator.AND,
-                        s.getSMVVariable(), s.getDefInput(), s.getDefOutput(), clockVariableFwd));
+        define(s.getDefForward(), SMVFacade
+                .combine(SBinaryOperator.AND, s.getDefInput(),
+                        s.getDefOutput()));
+
+        for (State.AutomatonState ss : s.getAutomataStates()) {
+            introduceAutomatonStateDefinitions(ss);
+            introduceAutomatonState(ss);
+        }
+
     }
 
-    private SVariable introduceClock(State s) {
-
-        //region Find suitable datatype
-        int concreteValue = gtt.getOptions().getConcreteTableOptions().getCount(s.getId(), -1);
-        int max = Math.max(concreteValue, s.getDuration().maxCounterValue());
-        int bits = (int) Math.ceil(Math.log(1 + max) / Math.log(2));
-        SMVType.SMVTypeWithWidth dt = new SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, bits);
-        //endregion
-
-        // clock variable
-        SVariable clockModule = new SVariable("clock" + s.getId(), dt);
-
-        // definitions
-        SVariable reset = new SVariable("clock" + s.getId() + "_rs", dt);
-        SVariable inc = new SVariable("clock" + s.getId() + "_tic", dt);
-        SVariable limit = new SVariable("clock" + s.getId() + "_limit", dt);
-
-        // change to due issues #5
-        mt.getDefinitions()
-                .put(reset, SMVFacade.next(SMVFacade.NOT(s.getSMVVariable())));
-        mt.getDefinitions().put(inc, s.getDefKeep());
-        mt.getDefinitions().put(limit, // c > 0dX_MAX
-                new SBinaryExpression(clockModule,
-                        SBinaryOperator.GREATER_THAN,
-                        new SLiteral(dt, max)));
-
-        // clock assignments
-        SAssignment init = new SAssignment(clockModule, new SLiteral(dt, INITIAL_CLOCK_VALUE));
-        SAssignment next = new SAssignment(clockModule, SMVFacade.caseexpr(
-                reset, new SLiteral(dt, 0),
-                SMVFacade.combine(SBinaryOperator.AND, inc, limit), clockModule,
-                inc, new SBinaryExpression(clockModule, SBinaryOperator.PLUS,
-                        new SLiteral(dt, 1)),
-                SMVFacade.next(s.getSMVVariable()), new SLiteral(dt, INITIAL_CLOCK_VALUE)
-        ));
-
-        mt.getStateVars().add(clockModule);
-        mt.getInitAssignments().add(init);
-        mt.getNextAssignments().add(next);
-        mt.getClocks().put(s, clockModule);
-        return clockModule;
+    /**
+     * defines the s_id_cnt_failed and s_id_cnt_fwd
+     *
+     * @param ss
+     */
+    private void introduceAutomatonStateDefinitions(State.AutomatonState ss) {
+        define(ss.getDefForward(), SMVFacade
+                .combine(SBinaryOperator.AND, ss.getSMVVariable(),
+                        ss.getState().getDefForward()));
+        define(ss.getDefFailed(), SMVFacade
+                .combine(SBinaryOperator.AND, ss.getSMVVariable(),
+                        ss.getState().getDefFailed()));
     }
 
+    /**
+     * @param automatonState
+     */
+    private void introduceAutomatonState(State.AutomatonState automatonState) {
+        SVariable var = automatonState.getSMVVariable();
+        mt.getStateVars().add(var);
+        mt.getInit().add(automatonState.isStartState() ? var : var.not());
 
-    private void addNextAssignments(State inc) {
-        // I get actived if one of my outgoing is valid
-        SMVExpr or = reachable.getIncoming(inc)
-                .map(State::getDefForward)
+        SMVExpr or = automatonState.getIncoming().stream()
+                .map(State.AutomatonState::getDefForward)
                 .map(fwd -> (SMVExpr) fwd)
                 .reduce(SMVFacade.reducer(SBinaryOperator.OR))
-                .orElseGet(() -> SLiteral.FALSE);
+                .orElse(SLiteral.FALSE);
 
-        SAssignment assignment = new SAssignment(inc.getSMVVariable(),
-                SMVFacade.combine(SBinaryOperator.OR,
-                        or, inc.getDefKeep()));
+        if (automatonState.isUnbounded()) {
+            or = SMVFacade.combine(SBinaryOperator.OR, or,
+                    automatonState.getDefFailed());
+        }
+
+        SAssignment assignment = new SAssignment(
+                automatonState.getSMVVariable(), or);
         mt.getNextAssignments().add(assignment);
     }
 
@@ -167,35 +115,24 @@ public class StatesTransformer implements TableTransformer {
         mt.getStateVars().add(errorState);
 
         // disable in the beginning
-        mt.getInit().add(SMVFacade.NOT(errorState));
+        mt.getInit().add(errorState.not());
 
-        SMVExpr e = reachable.getStates().stream()
-                .map(s ->
-                        // s_i & I_i & !O_i
-                        SMVFacade.combine(SBinaryOperator.AND,
-                                s.getSMVVariable(),
-                                s.getDefInput(),
-                                SMVFacade.NOT(s.getDefOutput())))
+        SMVExpr e = gtt.getRegion().flat().stream()
+                .flatMap(s -> s.getAutomataStates().stream())
+                .map(s -> (SMVExpr) s.getDefFailed())
                 .reduce(SMVFacade.reducer(SBinaryOperator.OR))
-                .get();
-
+                .orElse(SLiteral.TRUE);
         SAssignment a = new SAssignment(errorState, e);
         mt.getNextAssignments().add(a);
     }
 
-    public void insertInitialState() {
-        reachable.getStates().forEach(s ->
-                mt.getInit().add(
-                        !reachable.isInitialReachable(s)
-                                ? SMVFacade.NOT(s.getSMVVariable())
-                                : s.getSMVVariable()));
+    private void define(SVariable defOutput, SMVExpr combine) {
+        mt.getDefinitions().put(defOutput, combine);
     }
 
-    @Override
-    public void accept(TableTransformation tt) {
+    @Override public void accept(TableTransformation tt) {
         mt = tt.getTableModule();
         gtt = tt.getTestTable();
-        reachable = tt.getReachable();
         errorState = tt.getErrorState();
         createStates();
     }

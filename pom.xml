@@ -10,7 +10,7 @@
 
     <artifactId>geteta</artifactId>
     <!-- Every version upgrade, add a changelog to src/site/index.xhtml -->
-    <version>0.4.4</version>
+    <version>0.5.0</version>
 
     <repositories>
         <repository>
@@ -42,13 +42,13 @@
         <dependency>
             <groupId>edu.kit.iti.formal</groupId>
             <artifactId>iec61131lang</artifactId>
-            <version>0.1.12</version>
+            <version>0.1.13</version>
         </dependency>
 
         <dependency>
             <groupId>edu.kit.iti.formal</groupId>
             <artifactId>iec-symbex</artifactId>
-            <version>0.2.0</version>
+            <version>0.2.1</version>
         </dependency>
 
         <dependency>

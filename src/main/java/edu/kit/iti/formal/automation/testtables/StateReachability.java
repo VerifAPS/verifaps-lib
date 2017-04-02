@@ -22,13 +22,12 @@ package edu.kit.iti.formal.automation.testtables;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.testtables.io.Report;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.Region;
 import edu.kit.iti.formal.automation.testtables.model.State;
 
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 /**
  * Calculation of the State/Row reachability.
@@ -51,31 +50,69 @@ import java.util.stream.Stream;
  * </p>
  *
  * @author Alexander Weigl
- * @version 1 (12.12.16)
+ * @version 2 (12.12.16)
  */
 public class StateReachability {
     private final GeneralizedTestTable gtt;
-    private final Map<State, Set<State>> reachability = new HashMap<>();
     private final List<State> flatList;
 
     public StateReachability(GeneralizedTestTable table) {
         gtt = table;
         flatList = gtt.getRegion().flat();
+
         initTable();
         addRegions(gtt.getRegion());
         fixpoint();
-
-        // report
-        reachability.forEach((k, v) -> {
-            Report.debug("Row %d can reach: {%s}",
-                    k.getId(),
-                    v.stream()
-                            .map(State::getId)
-                            .map(Object::toString)
-                            .reduce((a, b) -> a + ", " + b).orElse(""));
-        });
+        maintainIncomning();
+        maintainAutomata();
+        isInitialReachable();
     }
 
+    private void maintainAutomata() {
+        for (State state : flatList) {
+            List<State.AutomatonState> astates = state.getAutomataStates();
+            for (int i = 0; i < astates.size(); i++) {
+                final State.AutomatonState a = astates.get(i);
+
+                if (a.isFirst()) {
+                    State s = a.getState();
+                    s.getIncoming().stream()
+                            .flatMap(as -> as.getAutomataStates().stream())
+                            .filter(State.AutomatonState::isOptional)
+                            .forEach(b -> connect(b, a));
+                }
+
+                //
+                if (i + 1 < astates.size()) {
+                    connect(a, astates.get(i + 1));
+                }
+
+                //connect to first automata state in every next row
+                if (a.isOptional()) {
+                    state.getOutgoing().forEach(next -> {
+                        connect(a, next.getAutomataStates().get(0));
+                    });
+                }
+
+                if (a.isUnbounded()) {
+                    connect(a, a);
+                }
+            }
+        }
+    }
+
+    private void connect(State.AutomatonState a, State.AutomatonState b) {
+        a.getOutgoing().add(b);
+        b.getIncoming().add(a);
+    }
+
+    private void maintainIncomning() {
+        for (State out : flatList) {
+            for (State in : out.getOutgoing()) {
+                in.getIncoming().add(out);
+            }
+        }
+    }
 
     /**
      * The fixpoint algorithm.
@@ -86,25 +123,24 @@ public class StateReachability {
         while (changed) { // as long we have changes
             changed = false;
             //for each row
-            for (Map.Entry<State, Set<State>> current : reachability.entrySet()) {
-                //copy because of failsafe
-                Set<State> reachables = new HashSet<>(current.getValue());
+            for (State state : flatList) {
+                int oldSize = state.getOutgoing().size();
+                Set<State> reached = new HashSet<>(flatList.size());
                 //foreach reachable state
-                for (State reachable : reachables) {
-                    // if reachable state is skippable, add their reachable state list
-                    if (reachable.getDuration().skippable()) {
-                        Set<State> r = reachability.get(current.getKey());
-                        int oldsze = r.size();
-                        r.addAll(reachability.get(reachable));
-                        if (oldsze != r.size())
-                            changed = true;
+                for (State reachable : state.getOutgoing()) {
+                    // if reachable state is isSkippable, add their reachable state list
+                    if (reachable.getDuration().isSkippable()) {
+                        reached.addAll(reachable.getOutgoing());
                     }
                 }
+                //add to the outgoing
+                state.getOutgoing().addAll(reached);
+                //check for size
+                changed = changed || state.getOutgoing().size() != oldSize;
             }
 
         }
     }
-
 
     /**
      * initialize the region borders
@@ -112,74 +148,40 @@ public class StateReachability {
      * @param r
      */
     private void addRegions(Region r) {
-        if (r.getDuration().getUpper() != 1) {
-            reachability.get(r.getStates().get(r.getStates().size() - 1))
+        if (r.getDuration().getUpper() > 1) {
+            r.getStates().get(r.getStates().size() - 1).getOutgoing()
                     .add(r.getStates().get(0));
         }
 
-        r.getStates().stream()
-                .filter(s -> s instanceof Region)
-                .forEach(s -> {
-                    Region region = (Region) s;
-                    addRegions(region);
-                });
+        //Regions can be isSkippable
+        r.getStates().stream().filter(s -> s instanceof Region).forEach(s -> {
+            Region region = (Region) s;
+            addRegions(region);
+        });
     }
 
+    /**
+     * i-th row can reach (i+1)-th row
+     */
     private void initTable() {
-        for (State s : flatList) {
-            reachability.put(s, new HashSet<>());
-        }
-
         for (int i = 0; i < flatList.size() - 1; i++) {
-            reachability.get(flatList.get(i)).add(flatList.get(i + 1));
+            flatList.get(i).getOutgoing().add(flatList.get(i + 1));
         }
     }
 
-    /**
-     * Returns true if <code>to</code> can be reached directly from <code>from</code>
-     *
-     * @param from a {@link State} from the given {@link GeneralizedTestTable}
-     * @param to   a {@link State} from the given {@link GeneralizedTestTable}
-     * @return signals the direct reachability
-     * @throws NullPointerException if from is not from the given {@link GeneralizedTestTable}
-     */
-    public boolean isReachable(State from, State to) {
-        return reachability.get(from).contains(to);
-    }
+    private void isInitialReachable() {
+        Queue<State> queue = new LinkedList<>();
+        queue.add(flatList.get(0));
+        while (!queue.isEmpty()) {
+            State s = queue.remove();
+            //already reached
+            if (s.isInitialReachable())
+                continue;
 
-    /**
-     * @return
-     */
-    public List<State> getStates() {
-        return flatList;
-    }
+            s.setInitialReachable(true);
 
-    /**
-     * Returns true, if the given {@link State} <code>s</code> is active at start.
-     *
-     * @param s a {@link State} from the {@link GeneralizedTestTable}
-     * @return
-     */
-    public boolean isInitialReachable(State s) {
-        for (State a : flatList) {
-            if (a.equals(s)) return true;
-            if (!a.getDuration().skippable()) return false;
+            if (s.getDuration().isSkippable())
+                queue.addAll(s.getOutgoing());
         }
-        return false;
-    }
-
-    /**
-     * @param incoming
-     * @return
-     */
-    public Stream<State> getIncoming(State incoming) {
-        return reachability.entrySet().stream().map(
-                e -> e.getValue().contains(incoming) ? e.getKey() : null
-        ).filter(a -> a != null);
-
-    }
-
-    public Set<State> getOutgoing(State state) {
-        return reachability.get(state);
     }
 }
