@@ -208,12 +208,12 @@ public class SmtEncoder {
      * @param variable variable for which the assertion should be generated
      * @return asserts that the variable is equal to its default value
      */
-    private SList getDefaultValueEquality(ValidFreeVariable variable) {
+    private SExpression getDefaultValueEquality(ValidFreeVariable variable) {
         Expression constraint = variable.getConstraint();
 
         SmtConvertExpressionVisitor scev = new SmtConvertExpressionVisitor(this,
                 0, 0, variable.asIOVariable());
-        return sexpr("=", variable.getSMTName(), constraint.takeVisitor(scev));
+        return constraint.takeVisitor(scev);
 
         /*return defaultValue.match((integerVal) -> sexpr("=",
                         "|" + variable.getName() + "|",
