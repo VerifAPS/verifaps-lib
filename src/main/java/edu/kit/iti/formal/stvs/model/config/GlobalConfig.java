@@ -58,7 +58,7 @@ public class GlobalConfig {
     windowWidth = new SimpleIntegerProperty(800);
     editorFontSize = new SimpleIntegerProperty(12);
     maxLineRollout = new SimpleIntegerProperty(50);
-    editorFontFamily = new SimpleStringProperty("Courier");
+    editorFontFamily = new SimpleStringProperty("monospace");
     showLineNumbers = new SimpleBooleanProperty(true);
     uiLanguage = new SimpleStringProperty("EN");
     nuxmvFilename = new SimpleStringProperty("[Path to NuXmv Executable]");
