@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <test-table xmlns="http://formal.iti.kit.edu/exteta-1.0" version="1.0">
     <variables>
-        <variable io="input" identifier="R" data-type="INT"/>
-        <variable io="input" identifier="B" data-type="BOOLEAN"/>
-        <variable io="output" identifier="C" data-type="INT"/>
-        <variable io="output" identifier="D" data-type="INT"/>
-        <constraint constraint="3" identifier="p" data-type="INT"/>
+        <variable io="input" name="R" data-type="INT"/>
+        <variable io="input" name="B" data-type="BOOLEAN"/>
+        <variable io="output" name="C" data-type="INT"/>
+        <variable io="output" name="D" data-type="INT"/>
+        <constraint constraint="3" name="p" data-type="INT"/>
     </variables>
     <steps>
         <step duration="[1,5]">

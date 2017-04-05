@@ -9,9 +9,7 @@
         <step duration="[4,4]"><cell>4</cell></step>
         <step duration="[5,5]"><cell>5</cell></step>
         <step duration="[6,6]"><cell>6</cell></step>
-        <step duration="[7,7]">
-            <cell>7</cell>
-        </step>
+        <step duration="[7,7]"><cell>7</cell></step>
         <step duration="[8,8]"><cell>8</cell></step>
         <step duration="[9,9]"><cell>9</cell></step>
         <step duration="[10,10]"><cell>10</cell></step>

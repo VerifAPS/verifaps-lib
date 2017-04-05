@@ -48,12 +48,13 @@ public class StatesTransformer implements TableTransformer {
 
     private void introduceState(State s) {
         // define output predicate
-        define(s.getDefOutput(),
-                SMVFacade.combine(SBinaryOperator.AND, s.getOutputExpr()));
+        define(s.getDefOutput(), SMVFacade
+                .combine(SBinaryOperator.AND, s.getOutputExpr(),
+                        SLiteral.TRUE));
 
         // define input predicate
-        define(s.getDefInput(),
-                SMVFacade.combine(SBinaryOperator.AND, s.getInputExpr()));
+        define(s.getDefInput(), SMVFacade
+                .combine(SBinaryOperator.AND, s.getInputExpr(), SLiteral.TRUE));
 
         // define failed predicate
         define(s.getDefFailed(), SMVFacade
