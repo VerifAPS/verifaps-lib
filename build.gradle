@@ -44,7 +44,7 @@ repositories {
     maven {
         url "http://formal.iti.kit.edu/maven2/"
     }
-    mavenLocal()
+    //mavenLocal()
 }
 dependencies {
     compile 'org.apache.commons:commons-collections4:4.0'
