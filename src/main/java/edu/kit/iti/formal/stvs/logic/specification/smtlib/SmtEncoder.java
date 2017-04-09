@@ -244,10 +244,10 @@ public class SmtEncoder {
     if (j < 0) {
       return 0;
     }
-    Optional<Integer> interval = specification.getDurations().get(j).getUpperBound();
+    Optional<Integer> upperBound = specification.getDurations().get(j).getUpperBound();
 
-    if (interval.isPresent()) {
-      return Math.min(maxDurations.get(j), interval.get());
+    if (upperBound.isPresent()) {
+      return upperBound.get();
     } else {
       return maxDurations.get(j);
     }
