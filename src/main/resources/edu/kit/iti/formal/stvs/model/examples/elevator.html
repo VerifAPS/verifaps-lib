@@ -1,0 +1,46 @@
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+</head>
+<body>
+<h1>Elevator</h1>
+
+<img src="elevator.png" align="center">
+
+<p>
+    The function block from this scenario controls an elevator.
+    It has three inputs, the current position of the elevator,
+    the requested position (the position where it need to go),
+    and if the button pressed.
+
+    If <code>ButtonPressed</code> is <code>TRUE</code>, the function block goes
+    to the <code>RequestedPosition</code>.
+</p>
+
+<h2>Normal Behaviour</h2>
+<p>
+
+</p>
+
+<h2>Invariant Table</h2>
+<p>
+    The second table presents an invariant of the system.
+    The system should never move the elevator with an open door.
+
+    Insert the following line at line 20.
+</p>
+
+<blockquote>
+    <code>
+        Door := MOTOR_STATE#Open;
+    </code>
+</blockquote>
+
+</p>
+
+<p>
+
+</p>
+
+</body>
+</html>

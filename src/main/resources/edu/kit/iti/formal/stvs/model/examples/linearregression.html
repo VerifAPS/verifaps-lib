@@ -1,0 +1,86 @@
+<html>
+<head>
+    <link rel="stylesheet" href="style.css" type="text/css"/>
+</head>
+<body>
+
+<h1>Linear Regression</h1>
+
+<p>
+    Interpolation blocks which map actual sensor values to a defined range of
+    physical values in software provide one of the most commonly needed
+    functions in software for automated systems.
+
+    The function block examined here can be operated in two different modes:
+    Before the actual operation, the calibration function (mode »Teach«)
+    In practice, these points are provided by the application engineer who
+    manually
+    calibrates the system by supplying default work pieces to the system.
+
+    After calibration, the mapping function (mode »Op«) performs linear
+    interpolation where it translates a sensor reading into the physical value
+    according to the learned data.
+</p>
+<p>
+    A schematic view of the function block is shown in Fig.&nbsp;6 below.
+    Besides
+    the mode selector (Mode) and the sensor value input (X), the block has two
+    additional inputs needed during calibration: (TPy) is used as the
+    physical reference value during teaching and (TPSet) indicates that teaching
+    is
+    in progress if set to 1. The block's single output is the physical value
+    (Y).
+
+    In normal operation, after two reference points <em>(x<sub>1</sub>,
+    y<sub>1</sub>)</em> and <em>(x<sub>2</sub>,
+    y<sub>2</sub>)</em> have been learned, the input value <em>X</em> results in
+    an output
+    value
+    <em>Y = L(x<sub>1</sub>, y<sub>1</sub>, x<sub>2</sub>, y<sub>2</sub>,
+        X)</em>
+    which the linear regression between the two points defined as
+
+<blockquote>
+    <em>
+        L(x<sub>1</sub>, y<sub>1</sub>, x<sub>2</sub>, y<sub>2</sub>, X) = <sub><em>def</em></sub>
+        y<sub>1</sub> +
+        (y<sub>2</sub>-y<sub>1</sub>) &divide; (x<sub>2</sub>-x<sub>1</sub>)
+        &centerdot;
+        (X-x<sub>1</sub>)&nbsp;.
+    </em>
+</blockquote>
+</p>
+
+<div style="text-align: center">
+    <img src="linearregression.png">
+</div>
+
+<p>
+    If the two reference points make interpolation impossible (e.g., if
+    <em>x<sub>1</sub>=x<sub>2</sub></em>), the function block enters an error
+    state. If no reference
+    point is presented for more than cycles which in teaching mode, the block
+    also goes into the error state.
+
+    Before finishing calibration or if the function block is in the error state,
+    the output Y is always 0.
+
+    Fig.&nbsp;6 includes a state chart for the block which contains the
+    normal operation state, the error state and the teaching state which is
+    subdivided into four substates <em>s<sub>1</sub></em> to
+    <em>s<sub>4</sub></em>.
+</p>
+
+
+<p>This example is presented in a paper submitted for INDIN'17. For citation
+    refer to
+</p>
+
+<blockquote>
+    <code>
+        BibTex follows when paper is accepted.
+    </code>
+</blockquote>
+
+</body>
+</html>

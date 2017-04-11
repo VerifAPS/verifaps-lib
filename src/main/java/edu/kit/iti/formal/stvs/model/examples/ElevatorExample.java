@@ -8,7 +8,7 @@ public final class ElevatorExample extends Example {
     public ElevatorExample() {
         name = "Elevator";
         description = "Demo";
-        htmlHelp = null;//getClass().getResource("minmax.html");
+        htmlHelp = "elevator.html";
         sessionFile = getClass().getResource("elevator.xml");
     }
 }

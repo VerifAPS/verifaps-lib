@@ -8,7 +8,7 @@ public final class MinMaxExample extends Example {
     public MinMaxExample() {
         name = "MinMaxWarning";
         description = "Example of iFM'17 Paper";
-        htmlHelp = "https://formal.iti.kit.edu/minmax.html";
+        htmlHelp = "minmax.html";
         sessionFile = getClass().getResource("minmax.xml");
     }
 }
