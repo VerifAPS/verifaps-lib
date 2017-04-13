@@ -95,7 +95,7 @@ public class StvsMenuBarController implements Controller {
                             rootModel.get().getGlobalConfig(),
                             rootModel.get().getHistory());
 
-            session.setFilename(ex.getName());
+            session.setFilename(null);
             this.rootModel.set(session);
 
             if (null != ex.getHtmlHelp()) {

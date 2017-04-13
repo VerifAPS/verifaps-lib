@@ -7,8 +7,8 @@ package edu.kit.iti.formal.stvs.model.examples;
 public final class ElevatorExample extends Example {
     public ElevatorExample() {
         name = "Elevator";
-        description = "Demo";
-        htmlHelp = "elevator.html";
+        description = "Simple Demonstration";
+        htmlHelp = getClass().getResource("elevator.html").toExternalForm();
         sessionFile = getClass().getResource("elevator.xml");
     }
 }
