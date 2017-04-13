@@ -17,14 +17,14 @@ import javafx.scene.layout.VBox;
 public class VariableCollection extends VBox {
 
   public enum Column {
-    NAME, TYPE, VALUE
+    NAME, TYPE, CONSTRAINT
   }
 
   private final Label overviewLabel;
   private final TableView<FreeVariable> freeVariableTableView;
   private final TableColumn<FreeVariable, String> nameTableColumn;
   private final TableColumn<FreeVariable, String> typeTableColumn;
-  private final TableColumn<FreeVariable, String> defaultValueTableColumn;
+  private final TableColumn<FreeVariable, String> constraintTableColumn;
 
   /**
    * Creates an instance of this view.
@@ -35,24 +35,24 @@ public class VariableCollection extends VBox {
     this.freeVariableTableView.setId("VariableCollectionTableView");
     this.nameTableColumn = new TableColumn<>("Name");
     this.typeTableColumn = new TableColumn<>("Type");
-    this.defaultValueTableColumn = new TableColumn<>("Default Value");
+    this.constraintTableColumn = new TableColumn<>("Constraint");
 
     ViewUtils.setupView(this);
 
     nameTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
     typeTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
-    defaultValueTableColumn.prefWidthProperty()
+    constraintTableColumn.prefWidthProperty()
         .bind(freeVariableTableView.widthProperty().multiply(0.2));
 
 
     nameTableColumn.setUserData(Column.NAME);
     typeTableColumn.setUserData(Column.TYPE);
-    defaultValueTableColumn.setUserData(Column.VALUE);
+    constraintTableColumn.setUserData(Column.CONSTRAINT);
 
     freeVariableTableView.setEditable(true);
     freeVariableTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     freeVariableTableView.getColumns().addAll(nameTableColumn, typeTableColumn,
-        defaultValueTableColumn);
+            constraintTableColumn);
 
     this.overviewLabel.getStyleClass().addAll("freevar", "overview-label");
     this.freeVariableTableView.getStyleClass().addAll("freevar", "variable-table-view");
@@ -76,7 +76,7 @@ public class VariableCollection extends VBox {
     return typeTableColumn;
   }
 
-  public TableColumn<FreeVariable, String> getDefaultValueTableColumn() {
-    return defaultValueTableColumn;
+  public TableColumn<FreeVariable, String> getConstraintTableColumn() {
+    return constraintTableColumn;
   }
 }

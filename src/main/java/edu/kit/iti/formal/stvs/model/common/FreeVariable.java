@@ -18,11 +18,12 @@ public class FreeVariable implements Variable {
    * change events when the properties of a FreeVariable change.
    */
   public static final Callback<FreeVariable, Observable[]> EXTRACTOR = freeVar -> new Observable[] {
-      freeVar.nameProperty(), freeVar.typeProperty(), freeVar.defaultValueProperty()};
+      freeVar.nameProperty(), freeVar.typeProperty(), freeVar.constraintProperty()};
+  private static final String DONTCARE = "-";
 
   private final StringProperty name;
   private final StringProperty type;
-  private final StringProperty defaultValue;
+  private final StringProperty constraint;
 
   /**
    * Creates a free variable with a name and type. A default value will be generated through
@@ -32,9 +33,7 @@ public class FreeVariable implements Variable {
    * @param type Identifier of the type of the free variable
    */
   public FreeVariable(String name, String type) {
-    this.name = new SimpleStringProperty(name);
-    this.type = new SimpleStringProperty(type);
-    this.defaultValue = new SimpleStringProperty("");
+    this(name, type, null);
   }
 
   /**
@@ -42,12 +41,13 @@ public class FreeVariable implements Variable {
    *
    * @param name Name of the free variable
    * @param type Identifier of the type of the free variable
-   * @param defaultValue Default value of the free variable
+   * @param constraint Default value of the free variable
    */
-  public FreeVariable(String name, String type, String defaultValue) {
+  public FreeVariable(String name, String type, String constraint) {
     this.name = new SimpleStringProperty(name);
     this.type = new SimpleStringProperty(type);
-    this.defaultValue = new SimpleStringProperty(defaultValue == null ? "" : defaultValue);
+    this.constraint = new SimpleStringProperty(
+            constraint == null ? DONTCARE : constraint);
   }
 
   /**
@@ -55,7 +55,7 @@ public class FreeVariable implements Variable {
    * @param freeVar The variable to copy
    */
   public FreeVariable(FreeVariable freeVar) {
-    this(freeVar.getName(), freeVar.getType(), freeVar.getDefaultValue());
+    this(freeVar.getName(), freeVar.getType(), freeVar.getConstraint());
   }
 
   public String getName() {
@@ -83,26 +83,26 @@ public class FreeVariable implements Variable {
     this.type.set(type);
   }
 
-  public String getDefaultValue() {
-    return defaultValue.get();
+  public String getConstraint() {
+    return constraint.get();
   }
 
-  public StringProperty defaultValueProperty() {
-    return defaultValue;
+  public StringProperty constraintProperty() {
+    return constraint;
   }
 
   /**
    * Assigns a new value to the free variable.
-   * @param defaultValue value to set to
+   * @param constraint value to set to
    */
-  public void setDefaultValue(String defaultValue) {
-    this.defaultValue.set(defaultValue);
+  public void setConstraint(String constraint) {
+    this.constraint.set(constraint);
   }
 
   @Override
   public String toString() {
-    return "FreeVariable{" + "name=" + name.get() + ", type=" + type.get() + ", defaultValue="
-        + defaultValue.get() + '}';
+    return "FreeVariable{" + "name=" + name.get() + ", type=" + type.get() + ", constraint="
+        + constraint.get() + '}';
   }
 
   @Override
@@ -122,15 +122,15 @@ public class FreeVariable implements Variable {
     if (getType() != null ? !getType().equals(that.getType()) : that.getType() != null) {
       return false;
     }
-    return getDefaultValue() != null ? getDefaultValue().equals(that.getDefaultValue())
-        : that.getDefaultValue() == null;
+    return getConstraint() != null ? getConstraint().equals(that.getConstraint())
+        : that.getConstraint() == null;
   }
 
   @Override
   public int hashCode() {
     int result = getName() != null ? getName().hashCode() : 0;
     result = 31 * result + (getType() != null ? getType().hashCode() : 0);
-    result = 31 * result + (getDefaultValue() != null ? getDefaultValue().hashCode() : 0);
+    result = 31 * result + (getConstraint() != null ? getConstraint().hashCode() : 0);
     return result;
   }
 }

@@ -3,10 +3,7 @@ package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 import de.tudresden.inf.lat.jsexp.Sexp;
 import de.tudresden.inf.lat.jsexp.SexpFactory;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -40,11 +37,11 @@ public class SList implements SExpression {
    * Creates an empty SList.
    */
   public SList() {
-    this(new LinkedList<SExpression>());
+    this(new ArrayList<>());
   }
 
   public SList(String command) {
-    this(new LinkedList<SExpression>());
+    this(new ArrayList<>());
     addAll(command);
   }
 
@@ -126,6 +123,20 @@ public class SList implements SExpression {
    */
   public String toString() {
     return "( " + getList().stream().map(Object::toString).collect(Collectors.joining(" ")) + " )";
+  }
+
+  public static SList sexpr(String... vals) {
+    return new SList(vals);
+  }
+
+
+  public static SList sexpr(String command, SExpression...  vals) {
+    return new SList(command, vals);
+  }
+
+
+  public static SList sexpr(Sexp sexp) {
+    return new SList(sexp);
   }
 
   @Override
