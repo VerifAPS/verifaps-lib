@@ -56,6 +56,10 @@ public class SLiteral extends SMVExpr {
         dataType = dt;
     }
 
+    public static LiteralBuilder create(Object value) {
+        return new LiteralBuilder(value);
+    }
+
     public SMVType getSMVType() {
         return dataType;
     }
@@ -92,10 +96,6 @@ public class SLiteral extends SMVExpr {
         return result;
     }
 
-    public static LiteralBuilder create(Object value) {
-        return new LiteralBuilder(value);
-    }
-
     public static class LiteralBuilder {
 
         private final SLiteral literal;
@@ -106,6 +106,7 @@ public class SLiteral extends SMVExpr {
         }
 
         public SLiteral as(SMVType type) {
+            assert type != null;
             literal.dataType = type;
             return literal;
         }

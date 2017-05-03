@@ -26,8 +26,6 @@ package edu.kit.iti.formal.smv.ast;
  * #L%
  */
 
-/************************************************************/
-
 /**
  *
  */
@@ -38,13 +36,24 @@ public abstract class SMVExpr extends SMVAst {
      */
     public abstract SMVType getSMVType();
 
-
     //region builder methods
+    public SFunction eventually() {
+        return new SFunction("F", this);
+    }
+
+    public SFunction globally() {
+        return new SFunction("G", this);
+    }
+
     public SBinaryExpression equal(SMVExpr e) {
         return op(SBinaryOperator.EQUAL, e);
     }
 
     public SBinaryExpression and(SMVExpr e) {
+        return op(SBinaryOperator.AND, e);
+    }
+
+    public SBinaryExpression or(SMVExpr e) {
         return op(SBinaryOperator.AND, e);
     }
 
@@ -61,6 +70,10 @@ public abstract class SMVExpr extends SMVAst {
 
     public SUnaryExpression minus() {
         return new SUnaryExpression(SUnaryOperator.MINUS, this);
+    }
+
+    public SMVExpr implies(SFunction e) {
+        return op(SBinaryOperator.IMPL, e);
     }
     //endregion
 }

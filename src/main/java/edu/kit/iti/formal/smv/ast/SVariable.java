@@ -28,10 +28,6 @@ package edu.kit.iti.formal.smv.ast;
 
 import edu.kit.iti.formal.smv.SMVAstVisitor;
 
-import java.util.Comparator;
-
-/************************************************************/
-
 /**
  *
  */
@@ -52,13 +48,19 @@ public class SVariable extends SMVExpr implements Comparable<SVariable> {
         return new SVariable(name, SMVType.BOOLEAN);
     }
 
-    @Override
-    public int hashCode() {
+    public static Builder create(String name) {
+        return new Builder(name);
+    }
+
+    public static Builder create(String fmt, Object... vals) {
+        return create(String.format(fmt, vals));
+    }
+
+    @Override public int hashCode() {
         return name.hashCode();
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    @Override public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -73,14 +75,11 @@ public class SVariable extends SMVExpr implements Comparable<SVariable> {
             if (other.name != null) {
                 return false;
             }
-        } else if (!name.equals(other.name)) {
+        }
+        else if (!name.equals(other.name)) {
             return false;
         }
         return true;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public SMVType getDatatype() {
@@ -95,27 +94,24 @@ public class SVariable extends SMVExpr implements Comparable<SVariable> {
         return datatype;
     }
 
-    @Override
-    public <T> T accept(SMVAstVisitor<T> visitor) {
+    @Override public <T> T accept(SMVAstVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @Override
-    public int compareTo(SVariable o) {
+    @Override public int compareTo(SVariable o) {
         return name.compareTo(o.name);
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return name;
-    }
-
-    public static Builder create(String name) {
-        return new Builder(name);
     }
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     static public class Builder {
@@ -130,17 +126,19 @@ public class SVariable extends SMVExpr implements Comparable<SVariable> {
             return v;
         }
 
-
         public SVariable with(int width, GroundDataType dt) {
             return with(new SMVType.SMVTypeWithWidth(dt, width));
         }
 
         public SVariable withSigned(int width) {
-            return with(new SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, width));
+            return with(new SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD,
+                    width));
         }
 
         public SVariable withUnsigned(int width) {
-            return with(new SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, width));
+            return with(
+                    new SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD,
+                            width));
         }
 
         public SVariable asBool() {

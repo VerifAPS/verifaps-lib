@@ -26,8 +26,6 @@ package edu.kit.iti.formal.smv.ast;
  * #L%
  */
 
-/************************************************************/
-
 import edu.kit.iti.formal.smv.SMVAstVisitor;
 
 /**
@@ -55,5 +53,9 @@ public class SUnaryExpression extends SMVExpr {
     @Override
     public <T> T accept(SMVAstVisitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override public String toString() {
+        return operator.symbol() + expr;
     }
 }
