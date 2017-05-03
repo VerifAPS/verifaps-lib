@@ -100,8 +100,10 @@ public class PropertyInitializer {
             Object s = null;
             if (type.isEnum()) {
                 for (Object o : type.getEnumConstants()) {
-                    if (o.toString().equals(val))
+                    if (o.toString().equals(val)) {
                         s = o;
+                        break;
+                    }
                 }
             } else if (type == Integer.class)
                 s = Integer.parseInt(val);
@@ -115,6 +117,7 @@ public class PropertyInitializer {
             f.getWriteMethod().invoke(value, s);
         } catch (NullPointerException npe) {
             //do nothing
+            //npe.printStackTrace();
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }

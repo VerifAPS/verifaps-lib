@@ -90,6 +90,7 @@ public class TableReader {
 
         for (Options.Option o : xml.getOptions().getOption()) {
             gtt.addOption(o.getKey(), o.getValue());
+            Report.info("Option %s set to %s", o.getKey(), o.getValue());
         }
     }
 

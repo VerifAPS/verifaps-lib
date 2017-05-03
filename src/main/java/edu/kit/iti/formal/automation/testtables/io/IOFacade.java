@@ -53,6 +53,12 @@ public final class IOFacade {
         return parser;
     }
 
+    /**
+     * @param cell
+     * @param column
+     * @param vars
+     * @return
+     */
     public static SMVExpr parseCellExpression(String cell, SVariable column, GeneralizedTestTable vars) {
         try {
             assert cell != null;
@@ -62,7 +68,8 @@ public final class IOFacade {
             Report.debug("parsed: %s to %s", cell, expr);
             return expr;
         } catch (ParseCancellationException pce) {
-            Report.error("Error in %s", cell);
+            Report.error("Error during parsing '%s'  for column '%s'", cell,
+                    column.getName());
             Report.error(pce.getMessage());
             throw pce;
         }

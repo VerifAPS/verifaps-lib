@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.testtables.io.xmv;
 
 
 import edu.kit.iti.formal.automation.testtables.io.Report;
+import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 
 import java.io.File;
@@ -36,21 +37,13 @@ import java.util.List;
  * @version 1 (12.12.16)
  */
 public class NuXMVAdapter implements Runnable {
-    public static final String[] IC3_COMMANDS = new String[]{"read_model",
-            "flatten_hierarchy",
-            "show_vars",
-            "encode_variables",
-            "build_boolean_model",
-            "check_invar_ic3",
-            "quit"};
-
     private final NuXMVProcess process;
     private List<SMVModule> modules;
+    private VerificationTechnique technique = VerificationTechnique.INVAR;
 
     public NuXMVAdapter(File table, List<SMVModule> modules) {
         this.modules = modules;
         this.process = new NuXMVProcess()
-                .commands(IC3_COMMANDS)
                 .workingDirectory(
                         new File(table.getParentFile(),
                                 table.getName().replace(".xml", "")))
@@ -61,6 +54,7 @@ public class NuXMVAdapter implements Runnable {
     @Override
     public void run() {
         process.workingDirectory().mkdirs();
+        process.commands(technique.getCommands());
         try {
             createModuleFile();
         } catch (IOException e) {
@@ -71,7 +65,6 @@ public class NuXMVAdapter implements Runnable {
         }
         process.run();
     }
-
 
 
     private void createModuleFile() throws IOException {
@@ -85,5 +78,14 @@ public class NuXMVAdapter implements Runnable {
 
     public boolean isVerified() {
         return process.isVerified();
+    }
+
+    public VerificationTechnique getTechnique() {
+        return technique;
+    }
+
+    public void setTechnique(VerificationTechnique technique) {
+        assert technique != null;
+        this.technique = technique;
     }
 }

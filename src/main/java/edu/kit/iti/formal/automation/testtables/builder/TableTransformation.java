@@ -25,7 +25,9 @@ package edu.kit.iti.formal.automation.testtables.builder;
 import edu.kit.iti.formal.automation.testtables.StateReachability;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.TableModule;
-import edu.kit.iti.formal.smv.ast.*;
+import edu.kit.iti.formal.smv.ast.SMVModule;
+import edu.kit.iti.formal.smv.ast.SMVType;
+import edu.kit.iti.formal.smv.ast.SVariable;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -33,8 +35,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class TableTransformation {
-    private List<Consumer<TableTransformation>> transformers = new LinkedList<>();
     private final StateReachability reachable;
+    private List<Consumer<TableTransformation>> transformers = new LinkedList<>();
     private GeneralizedTestTable gtt;
     private TableModule mt = new TableModule();
     private SVariable errorState = new SVariable("ERROR", SMVType.BOOLEAN);
@@ -55,6 +57,7 @@ public class TableTransformation {
         transformers.add(new StatesTransformer());
         transformers.add(new ConstraintVariableTransformer());
         transformers.add(new BackwardsReferencesTransformer());
+        transformers.add(new LTLSpecTransformer());
 
         switch (gtt.getOptions().getMode()) {
             case CONFORMANCE:

@@ -122,6 +122,6 @@ public class Duration {
      * @return
      */
     public int getBound() {
-        return isUnbounded() ? lower : upper;
+        return Math.max(1, Math.max(lower, upper));
     }
 }

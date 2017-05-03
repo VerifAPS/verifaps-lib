@@ -136,7 +136,8 @@ public class ExTeTa {
             modules.add(modTable);
             modules.add(modCode);
             modules.addAll(tt.getHelperModules());
-            boolean b = Facade.runNuXMV(tableFilename, modules);
+            boolean b = Facade.runNuXMV(tableFilename, modules,
+                    table.getOptions().getVerificationTechnique());
 
             if (Report.getMessage().getCounterexample() != null) {
                 CounterExampleAnalyzer cea = new CounterExampleAnalyzer(table,
@@ -155,6 +156,7 @@ public class ExTeTa {
         options.addOption("o", "output", true, "ouput");
         options.addOption("c", "code", true, "program files");
         options.addOption("m", "mode", true, "mode");
+        options.addOption("t", "technique", true, "verification technique");
 
         return clp.parse(options, args, true);
     }

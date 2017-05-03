@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.testtables.io;
  */
 
 import edu.kit.iti.formal.automation.testtables.exception.ProgramAbortionException;
+import edu.kit.iti.formal.automation.testtables.report.Assignment;
 import edu.kit.iti.formal.automation.testtables.report.Counterexample;
 import edu.kit.iti.formal.automation.testtables.report.Message;
 import edu.kit.iti.formal.automation.testtables.report.ObjectFactory;
@@ -30,6 +31,7 @@ import edu.kit.iti.formal.automation.testtables.report.ObjectFactory;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import java.util.function.Consumer;
 
 /**
  * @author Alexander Weigl
@@ -71,10 +73,11 @@ public class Report {
     public static void abort() {
         throw new ProgramAbortionException();
     }
+
     private static void print(String level, String fmt, Object... args) {
         Message.Log.Entry e = new Message.Log.Entry();
         e.setLevel(level);
-        e.setTime((int) (System.currentTimeMillis()     - START_TIME));
+        e.setTime((int) (System.currentTimeMillis() - START_TIME));
         e.setValue(String.format(fmt, args));
         msg.getLog().getEntry().add(e);
     }
@@ -88,6 +91,23 @@ public class Report {
             for (Message.Log.Entry e : msg.getLog().getEntry()) {
                 System.out.printf("[%5d] (%5s): %s%n", e.getTime(), e.getLevel(), e.getValue());
             }
+
+            int i = 0;
+            if (msg.getCounterexample() != null) {
+                for (Counterexample.Step step : msg.getCounterexample()
+                        .getTrace().getStep()) {
+                    System.out.format("STEP %d %n", i++);
+                    step.getInput().forEach(Report.print("INPUT > "));
+                    step.getState().forEach(Report.print("STATE > "));
+                    System.out.println();
+                }
+
+                msg.getCounterexample().getRowMappings().getRowMap()
+                        .forEach(rm -> {
+                            System.out.println("ROWMAP > " + rm);
+                        });
+            }
+            System.out.println("STATUS: " + msg.getReturncode());
         } else {
             try {
                 JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
@@ -98,10 +118,19 @@ public class Report {
                 e.printStackTrace();
             }
         }
+
+    }
+
+    private static Consumer<Assignment> print(String suffix) {
+        return (Assignment assignment) -> {
+            System.out.println(
+                    suffix + "" + assignment.getName() + " = " + assignment
+                            .getValue());
+        };
     }
 
     public static void setCounterExample(Counterexample counterExample) {
-        if(msg.getCounterexample()==null) {
+        if (msg.getCounterexample() == null) {
             msg.setCounterexample(new Message.Counterexample());
         }
         msg.getCounterexample().setTrace(counterExample);

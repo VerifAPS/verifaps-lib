@@ -37,11 +37,10 @@ public class State {
     private final int id;
     private final List<SMVExpr> inputExpr = new ArrayList<>();
     private final List<SMVExpr> outputExpr = new ArrayList<>();
-    private Duration duration = new Duration(1, 1);
-    private List<AutomatonState> automataStates;
-
     private final Set<State> incoming = new HashSet<>();
     private final Set<State> outgoing = new HashSet<>();
+    private Duration duration = new Duration(1, 1);
+    private List<AutomatonState> automataStates;
     private boolean initialReachable;
 
     public State(int id) {
@@ -129,6 +128,7 @@ public class State {
                 automataStates.add(new AutomatonState(i));
             }
         }
+        assert automataStates.size() != 0;
         return automataStates;
     }
 
@@ -140,19 +140,18 @@ public class State {
         return incoming;
     }
 
-    public void setInitialReachable(boolean initialReachable) {
-        this.initialReachable = initialReachable;
-    }
-
     public boolean isInitialReachable() {
         return initialReachable;
     }
 
-    public class AutomatonState {
-        int count;
+    public void setInitialReachable(boolean initialReachable) {
+        this.initialReachable = initialReachable;
+    }
 
+    public class AutomatonState {
         private final Set<AutomatonState> incoming = new HashSet<>();
         private final Set<AutomatonState> outgoing = new HashSet<>();
+        int count;
 
         public AutomatonState(int cnt) {
             count = cnt;

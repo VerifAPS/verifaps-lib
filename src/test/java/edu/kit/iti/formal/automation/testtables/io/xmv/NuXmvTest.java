@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.testtables.io.xmv;
 
 
 import edu.kit.iti.formal.automation.testtables.io.Report;
+import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
@@ -37,7 +38,7 @@ import java.io.File;
 public class NuXmvTest {
     @Test public void simpleSuccessRun() {
         NuXMVProcess p = new NuXMVProcess()
-                .commands(NuXMVAdapter.IC3_COMMANDS)
+                .commands(VerificationTechnique.IC3.getCommands())
                 .moduleFile(new File("src/test/resources/success.smv").getAbsoluteFile())
                 .workingDirectory(new File("target/test"))
                 .output("success.log");
@@ -51,7 +52,7 @@ public class NuXmvTest {
 
     @Test public void simpleSuccessCE() {
         NuXMVProcess p = new NuXMVProcess()
-                .commands(NuXMVAdapter.IC3_COMMANDS)
+                .commands(VerificationTechnique.IC3.getCommands())
                 .moduleFile(new File("src/test/resources/counterexample.smv").getAbsoluteFile())
                 .workingDirectory(new File("target/test").getAbsoluteFile())
                 .output("error.log");

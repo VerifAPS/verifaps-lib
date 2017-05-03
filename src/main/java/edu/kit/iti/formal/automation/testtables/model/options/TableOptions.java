@@ -22,14 +22,15 @@ package edu.kit.iti.formal.automation.testtables.model.options;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique;
+
 /**
  * Created by weigl on 16.12.16.
  */
 public class TableOptions {
     private Mode mode;
-
+    private VerificationTechnique verificationTechnique = VerificationTechnique.INVAR;
     private ConcreteTableOptions concreteTableOptions = new ConcreteTableOptions();
-
     private DataTypeOptions dataTypeOptions = new DataTypeOptions();
     private boolean useNext = true;
 
@@ -69,5 +70,14 @@ public class TableOptions {
 
     public void setUseNext(boolean useNext) {
         this.useNext = useNext;
+    }
+
+    @Property("technique") public VerificationTechnique getVerificationTechnique() {
+        return verificationTechnique;
+    }
+
+    public void setVerificationTechnique(
+            VerificationTechnique verificationTechnique) {
+        this.verificationTechnique = verificationTechnique;
     }
 }

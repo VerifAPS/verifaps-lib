@@ -23,7 +23,6 @@ package edu.kit.iti.formal.automation.testtables;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.st.ast.CaseStatement;
 import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
@@ -31,8 +30,8 @@ import edu.kit.iti.formal.automation.testtables.io.TableReader;
 import edu.kit.iti.formal.automation.testtables.io.xmv.NuXMVAdapter;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.SReference;
+import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique;
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions;
-import edu.kit.iti.formal.smv.SMVAstVisitor;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
@@ -74,8 +73,9 @@ public class Facade {
         return mg.getProduct();
     }
 
-    public static boolean runNuXMV(String tableFilename, SMVModule... modules) {
-        return runNuXMV(tableFilename, Arrays.asList(modules));
+    public static boolean runNuXMV(String tableFilename,
+            VerificationTechnique technique, SMVModule... modules) {
+        return runNuXMV(tableFilename, Arrays.asList(modules), technique);
     }
 
     public static String getHistoryName(SVariable variable, int cycles) {
@@ -86,8 +86,10 @@ public class Facade {
         return variable.getName() + "__history";
     }
 
-    public static boolean runNuXMV(String tableFilename, List<SMVModule> modules) {
+    public static boolean runNuXMV(String tableFilename,
+            List<SMVModule> modules, VerificationTechnique vt) {
         NuXMVAdapter adapter = new NuXMVAdapter(new File(tableFilename), modules);
+        adapter.setTechnique(vt);
         adapter.run();
         return adapter.isVerified();
     }
