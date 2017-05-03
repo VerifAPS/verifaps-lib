@@ -27,10 +27,6 @@ import edu.kit.iti.formal.automation.exceptions.IllegalTypeException;
 import edu.kit.iti.formal.smv.ast.GroundDataType;
 import edu.kit.iti.formal.smv.ast.SMVType;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.function.Function;
-
 /**
  * Created by weigl on 11.12.16.
  */
@@ -139,5 +135,9 @@ public class DataTypeTranslator implements DataTypeVisitor<SMVType> {
     @Override
     public SMVType visit(AnyNum anyNum) {
         throw new IllegalTypeException("Could not match");
+    }
+
+    @Override public SMVType visit(ClassDataType classDataType) {
+        return null;
     }
 }

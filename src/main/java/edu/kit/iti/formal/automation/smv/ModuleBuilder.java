@@ -24,11 +24,13 @@ package edu.kit.iti.formal.automation.smv;
 
 import edu.kit.iti.formal.automation.SymbExFacade;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
-import edu.kit.iti.formal.automation.st.ast.*;
-import edu.kit.iti.formal.smv.ast.*;
+import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
+import edu.kit.iti.formal.automation.st.ast.TypeDeclarations;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Alexander Weigl
@@ -55,7 +57,7 @@ public class ModuleBuilder implements Runnable {
 
     @Override
     public void run() {
-        module.setName(program.getBlockName());
+        module.setName(program.getProgramName());
 
         Set<VariableDeclaration> outputVars =
                 new HashSet<>(program.getLocalScope()

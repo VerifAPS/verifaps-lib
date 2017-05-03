@@ -22,12 +22,12 @@ package edu.kit.iti.formal.automation.st0.trans;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.AssignmentStatement;
-import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
 import edu.kit.iti.formal.automation.datatypes.AnyBit;
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.datatypes.values.Bits;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.st.ast.AssignmentStatement;
+import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
 import edu.kit.iti.formal.automation.st.util.AstCopyVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 
@@ -48,7 +48,8 @@ public class SFCResetReplacer extends AstCopyVisitor {
             SymbolicReference sr = (SymbolicReference) assignmentStatement.getLocation();
             ScalarValue<AnyBit.Bool, Bits> value = (ScalarValue<AnyBit.Bool, Bits>) assignmentStatement.getExpression();
 
-            if (sr.getIdentifier().endsWith("$SFCReset") &&
+            if (sr.getIdentifier() != null && sr.getIdentifier()
+                    .endsWith("$SFCReset") &&
                     value.getValue().getRegister() > 0) {
                 System.out.println(sr.getIdentifier());
                 return new AssignmentStatement(

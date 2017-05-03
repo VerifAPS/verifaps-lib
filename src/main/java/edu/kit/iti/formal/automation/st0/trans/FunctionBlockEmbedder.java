@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st0.trans;
 
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstCopyVisitor;
+import edu.kit.iti.formal.automation.visitors.Visitable;
 
 import java.util.function.Function;
 
@@ -40,6 +41,10 @@ public class FunctionBlockEmbedder extends AstCopyVisitor {
         this.instanceName = instanceName;
         toEmbedd = embeddable;
         renameVariable = rename;
+    }
+
+    @Override public Object defaultVisit(Visitable visitable) {
+        return visitable;
     }
 
     @Override

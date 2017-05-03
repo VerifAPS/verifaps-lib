@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.st0;
  */
 
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.DataTypes;
+import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st0.trans.*;
@@ -52,7 +52,8 @@ public class STSimplifier {
     public void transform() {
         step0();
         step1();
-        //TODO unhandled cases in visitor: step2();
+        //TODO unhandled cases in visitor:
+        step2();
         step3();
         step4();
         step5();
@@ -112,16 +113,11 @@ public class STSimplifier {
             String typeName = vd.getDataTypeName();
             Any type = vd.getDataType();
 
-            if (DataTypes.getDataTypeNames().contains(typeName)) {
-                continue; // baseType built in type
-            }
-
-            if (allTypeDeclaration.declares(typeName)) {
-                continue; // defined by TYPE ... END_TYPE
-            }
-
-            if (functionBlocks.containsKey(typeName)) {
-                statements = embeddFunctionBlocksImpl(declared, statements, vd, functionBlocks.get(typeName));
+            if (type instanceof FunctionBlockDataType) {
+                FunctionBlockDataType fbdType = (FunctionBlockDataType) type;
+                FunctionBlockDeclaration fbd = fbdType.getFunctionBlock();
+                statements = embeddFunctionBlocksImpl(declared, statements, vd,
+                        fbd);
             }
         }
         return statements;

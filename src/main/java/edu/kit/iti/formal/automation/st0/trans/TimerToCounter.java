@@ -22,39 +22,52 @@ package edu.kit.iti.formal.automation.st0.trans;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.ValueFactory;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.AnyInt;
+import edu.kit.iti.formal.automation.datatypes.AnyUInt;
 import edu.kit.iti.formal.automation.datatypes.TimeType;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.datatypes.values.TimeValue;
+import edu.kit.iti.formal.automation.st.ast.SimpleTypeDeclaration;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.automation.st.util.AstCopyVisitor;
+import edu.kit.iti.formal.automation.visitors.Visitable;
 
 /**
  * @author Alexander Weigl (06.07.2014)
  * @version 1
  */
 public class TimerToCounter extends AstCopyVisitor {
-
-    private long cycleTime = 4;
+    public static long DEFAULT_CYCLE_TIME = 4;
+    private final long cycleTime;
 
     public TimerToCounter(long cycleTime) {
         this.cycleTime = cycleTime;
     }
 
+    @Override public Object defaultVisit(Visitable visitable) {
+        return visitable;
+    }
+
     @Override
     public Object visit(VariableDeclaration vd) {
-        vd = (VariableDeclaration) super.visit(vd);
         if (vd.getDataTypeName() == "TIME" || vd.getDataType() == TimeType.TIME_TYPE) {
-            if (vd.getInit() != null) {
-                ScalarValue newVal = (ScalarValue) ((ScalarValue) vd.getInit()).visit(this);
-                vd.setDataType(newVal.getDataType());
-                //TODO: vd.setInit(newVal);
-            } else {
-                vd.setDataType(AnyInt.INT);
-            }
+            VariableDeclaration newVariable = new VariableDeclaration(
+                    vd.getName(), vd.getType(), AnyUInt.UINT);
+
+            ScalarValue newVal = vd.getInit() != null ?
+                    (ScalarValue) vd.getInit().visit(this) :
+                    ValueFactory.makeUInt(0);
+
+            //vd.setDataType(newVal.getDataType());
+            SimpleTypeDeclaration sd = new SimpleTypeDeclaration();
+            sd.setInitialization(newVal);
+            setPositions(vd.getInit(), sd);
+            newVariable.setTypeDeclaration(sd);
+            return newVariable;
         }
-        return vd;
+        return super.visit(vd);
     }
 
     @Override

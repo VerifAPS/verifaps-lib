@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
+        <Console identifier="Console" target="SYSTEM_OUT">
             <PatternLayout>
                 <Pattern>%p %m (%F:%L)%n</Pattern>
             </PatternLayout>

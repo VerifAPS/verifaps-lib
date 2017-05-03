@@ -1,19 +1,19 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns="http://maven.apache.org/POM/4.0.0"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>iec-symbex</artifactId>
-    <version>0.2.0</version>
+	<version>0.3.0</version>
     <packaging>jar</packaging>
 
-    <name>iec-symbex</name>
     <url>http://formal.iti.kit.edu/weigl/software/iec-symbex</url>
 	<description>Symbolic Execution of IEC-Software</description>
 
 	<parent>
 		<groupId>edu.kit.iti.formal</groupId>
 		<artifactId>verifaps</artifactId>
-		<version>1.2.0</version>
+		<version>1.4.0</version>
 	</parent>
 
 	<repositories>
@@ -33,7 +33,7 @@
 	    <dependency>
 		    <groupId>edu.kit.iti.formal</groupId>
 		    <artifactId>iec61131lang</artifactId>
-		    <version>0.1.9</version>
+			<version>0.1.14-beta</version>
 	    </dependency>
 	    <dependency>
 		    <groupId>edu.kit.iti.formal</groupId>
