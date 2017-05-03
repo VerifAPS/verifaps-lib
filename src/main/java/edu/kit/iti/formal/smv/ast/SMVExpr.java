@@ -54,7 +54,7 @@ public abstract class SMVExpr extends SMVAst {
     }
 
     public SBinaryExpression or(SMVExpr e) {
-        return op(SBinaryOperator.AND, e);
+        return op(SBinaryOperator.OR, e);
     }
 
     public SBinaryExpression op(SBinaryOperator o, SMVExpr e) {
