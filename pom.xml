@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>iec-symbex</artifactId>
-	<version>0.3.0</version>
+	<version>0.4.0</version>
     <packaging>jar</packaging>
 
     <url>http://formal.iti.kit.edu/weigl/software/iec-symbex</url>
@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>edu.kit.iti.formal</groupId>
 		<artifactId>verifaps</artifactId>
-		<version>1.4.0</version>
+		<version>1.3.1</version>
 	</parent>
 
 	<repositories>
