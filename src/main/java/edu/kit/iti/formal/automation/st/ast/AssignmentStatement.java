@@ -107,4 +107,8 @@ public class AssignmentStatement extends Statement {
         this.reference = reference;
         return this;
     }
+
+    @Override public AssignmentStatement clone() {
+        return new AssignmentStatement(variable.clone(), expression.clone());
+    }
 }

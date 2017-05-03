@@ -59,22 +59,26 @@ public class StatementList extends ArrayList<Statement> implements Visitable {
         addAll(statements);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public boolean add(Statement statement) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override public boolean add(Statement statement) {
         if (statement == null)
             return false;
         return super.add(statement);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void add(int index, Statement element) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override public void add(int index, Statement element) {
         if (element == null)
             return;
 
@@ -85,9 +89,15 @@ public class StatementList extends ArrayList<Statement> implements Visitable {
      * <p>comment.</p>
      *
      * @param format a {@link java.lang.String} object.
-     * @param args a {@link java.lang.Object} object.
+     * @param args   a {@link java.lang.Object} object.
      */
     public void comment(String format, Object... args) {
         add(new CommentStatement(format, args));
+    }
+
+    public StatementList clone() {
+        StatementList sl = new StatementList();
+        forEach(s -> sl.add(s.clone()));
+        return sl;
     }
 }

@@ -22,12 +22,12 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.operators.BinaryOperator;
 import edu.kit.iti.formal.automation.operators.Operators;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -143,6 +143,10 @@ public class BinaryExpression extends Expression {
         return c;
     }
 
+    @Override public BinaryExpression clone() {
+        return new BinaryExpression(leftExpr.clone(), rightExpr.clone(),
+                operator);
+    }
 
     /** {@inheritDoc} */
     @Override

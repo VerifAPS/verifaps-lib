@@ -82,4 +82,9 @@ public class Range {
     public void setStop(ScalarValue<? extends AnyInt, Long> stop) {
         this.stop = stop;
     }
+
+    public Range clone() {
+        Range r = new Range(start.clone(), stop.clone());
+        return r;
+    }
 }

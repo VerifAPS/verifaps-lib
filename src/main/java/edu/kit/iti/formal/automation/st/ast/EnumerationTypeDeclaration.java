@@ -23,9 +23,10 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.ValueFactory;
-import edu.kit.iti.formal.automation.datatypes.*;
-import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.datatypes.AnyInt;
+import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.*;
@@ -102,6 +103,16 @@ public class EnumerationTypeDeclaration extends TypeDeclaration<ScalarValue<Enum
         return et;
     }
 
+    @Override public EnumerationTypeDeclaration clone() {
+        EnumerationTypeDeclaration etd = new EnumerationTypeDeclaration();
+        etd.allowedValues = new ArrayList<>(allowedValues);
+        etd.counter = counter;
+        etd.baseType = baseType;
+        etd.baseTypeName = baseTypeName;
+        etd.values = new HashMap<>(values);
+        etd.typeName = typeName;
+        return etd;
+    }
 
     /**
      * <p>setInt.</p>

@@ -48,4 +48,8 @@ public class FunctionBlockDataType extends RecordType {
     public String repr(Object obj) {
         return "not possible";
     }
+
+    public FunctionBlockDeclaration getFunctionBlock() {
+        return functionBlock;
+    }
 }

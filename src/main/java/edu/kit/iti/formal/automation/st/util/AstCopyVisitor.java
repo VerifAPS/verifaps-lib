@@ -267,7 +267,7 @@ public class AstCopyVisitor extends DefaultVisitor<Object> {
         return i;
     }
 
-    private Top setPositions(Top old, Top fresh) {
+    protected Top setPositions(Top old, Top fresh) {
         fresh.setStartPosition(old.getStartPosition());
         fresh.setEndPosition(old.getEndPosition());
         return fresh;

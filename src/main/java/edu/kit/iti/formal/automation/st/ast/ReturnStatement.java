@@ -32,10 +32,13 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @version $Id: $Id
  */
 public class ReturnStatement extends Statement {
-
     /** {@inheritDoc} */
     @Override
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override public ReturnStatement clone() {
+        return new ReturnStatement();
     }
 }

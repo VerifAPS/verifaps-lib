@@ -22,12 +22,11 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -102,6 +101,9 @@ public class UnaryExpression extends Expression {
         return a;
     }
 
+    @Override public UnaryExpression clone() {
+        return new UnaryExpression(operator, expression.clone());
+    }
 
     /** {@inheritDoc} */
     @Override

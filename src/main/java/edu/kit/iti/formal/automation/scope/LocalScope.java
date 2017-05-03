@@ -24,11 +24,16 @@ package edu.kit.iti.formal.automation.scope;
 
 import edu.kit.iti.formal.automation.VariableScope;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
-import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
+import edu.kit.iti.formal.automation.st.ast.VariableBuilder;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -38,7 +43,8 @@ import java.util.stream.Collectors;
  * @author Alexander Weigl
  * @version 1 (13.06.14)
  */
-public class LocalScope implements Visitable, Iterable<VariableDeclaration> {
+public class LocalScope
+        implements Cloneable, Visitable, Iterable<VariableDeclaration> {
     private VariableScope localVariables = new VariableScope();
     private GlobalScope globalScope = new GlobalScope();
 
@@ -168,21 +174,21 @@ public class LocalScope implements Visitable, Iterable<VariableDeclaration> {
     }
 
     /**
-     * <p>Setter for the field <code>globalScope</code>.</p>
-     *
-     * @param globalScope a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
-     */
-    public void setGlobalScope(GlobalScope globalScope) {
-        this.globalScope = globalScope;
-    }
-
-    /**
      * <p>Getter for the field <code>globalScope</code>.</p>
      *
      * @return a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
      */
     public GlobalScope getGlobalScope() {
         return globalScope;
+    }
+
+    /**
+     * <p>Setter for the field <code>globalScope</code>.</p>
+     *
+     * @param globalScope a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
+     */
+    public void setGlobalScope(GlobalScope globalScope) {
+        this.globalScope = globalScope;
     }
 
     /**
@@ -212,5 +218,15 @@ public class LocalScope implements Visitable, Iterable<VariableDeclaration> {
      */
     public VariableDeclaration getVariable(String s) {
         return localVariables.get(s);
+    }
+
+    @Override public LocalScope clone() {
+        LocalScope ls = new LocalScope(this);
+        ls.globalScope = globalScope.clone();
+        for (Map.Entry<String, VariableDeclaration> e : localVariables
+                .entrySet()) {
+            ls.localVariables.put(e.getKey(), e.getValue().clone());
+        }
+        return ls;
     }
 }

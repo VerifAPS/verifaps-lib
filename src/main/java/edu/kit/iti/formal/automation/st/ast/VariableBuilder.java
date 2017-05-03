@@ -46,7 +46,7 @@ public class VariableBuilder {
     private Initialization initialization;
     private List<String> identifiers;
     private TypeDeclaration type;
-    private Top.Position pEnd, pStart;
+    private Position pEnd, pStart;
 
     /**
      * <p>Constructor for VariableBuilder.</p>
@@ -263,8 +263,8 @@ public class VariableBuilder {
      * @param end a {@link org.antlr.v4.runtime.Token} object.
      */
     public void setPosition(Token start, Token end) {
-        pStart = new Top.Position(start.getLine(), start.getCharPositionInLine());
-        pEnd = new Top.Position(end.getLine(), end.getCharPositionInLine());
+        pStart = new Position(start.getLine(), start.getCharPositionInLine());
+        pEnd = new Position(end.getLine(), end.getCharPositionInLine());
 
     }
 

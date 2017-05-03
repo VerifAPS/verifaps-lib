@@ -22,8 +22,8 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -95,16 +95,6 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
     public abstract <S> S visit(Visitor<S> visitor);
 
     /**
-     * <p>Setter for the field <code>initialization</code>.</p>
-     *
-     * @param initialization a T object.
-     */
-    public void setInitialization(T initialization) {
-        this.initialization = initialization;
-    }
-
-
-    /**
      * <p>Getter for the field <code>baseType</code>.</p>
      *
      * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
@@ -132,6 +122,15 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
     }
 
     /**
+     * <p>Setter for the field <code>initialization</code>.</p>
+     *
+     * @param initialization a T object.
+     */
+    public void setInitialization(T initialization) {
+        this.initialization = initialization;
+    }
+
+    /**
      * <p>getDataType.</p>
      *
      * @param globalScope a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
@@ -142,4 +141,5 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
         return getBaseType();
     }
 
+    public abstract TypeDeclaration<T> clone();
 }

@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -45,13 +44,14 @@ public class ForStatement extends Statement {
     /**
      * <p>Constructor for ForStatement.</p>
      *
-     * @param variable a {@link java.lang.String} object.
-     * @param start a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     * @param stop a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     * @param step a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
+     * @param variable   a {@link java.lang.String} object.
+     * @param start      a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
+     * @param stop       a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
+     * @param step       a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
      * @param statements a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
      */
-    public ForStatement(String variable, Expression start, Expression stop, Expression step, StatementList statements) {
+    public ForStatement(String variable, Expression start, Expression stop,
+            Expression step, StatementList statements) {
         this.variable = variable;
         this.start = start;
         this.stop = stop;
@@ -149,9 +149,23 @@ public class ForStatement extends Statement {
         this.statements = statements;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override public Statement clone() {
+        ForStatement fs = new ForStatement();
+        fs.variable = variable;
+        if (start != null)
+            fs.start = start.clone();
+        if (stop != null)
+            fs.stop = stop.clone();
+        if (step != null)
+            fs.step = step.clone();
+        fs.statements = statements.clone();
+        return fs;
     }
 }

@@ -37,4 +37,6 @@ public abstract class TopLevelElement extends Top implements Identifiable {
      * @return a {@link java.lang.String} object.
      */
     public abstract String getIdentifier();
+
+    public abstract TopLevelElement clone();
 }

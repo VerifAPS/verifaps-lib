@@ -100,6 +100,10 @@ public class IdentifierInitializer extends Initialization {
         return enumType;
     }
 
+    @Override public IdentifierInitializer clone() {
+        return new IdentifierInitializer(value).setEnumType(enumType);
+    }
+
     /** {@inheritDoc} */
     @Override
     public <T> T visit(Visitor<T> visitor) {

@@ -22,11 +22,11 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.RangeType;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import edu.kit.iti.formal.automation.datatypes.AnyInt;
 
 /**
  * Created by weigl on 13.06.14.
@@ -64,6 +64,16 @@ public class SubRangeTypeDeclaration extends TypeDeclaration<ScalarValue<? exten
                 (AnyInt) super.getDataType(globalScope));
         setBaseType(rt);
         return rt;
+    }
+
+    @Override public SubRangeTypeDeclaration clone() {
+        SubRangeTypeDeclaration t = new SubRangeTypeDeclaration();
+        t.range = range.clone();
+        t.typeName = typeName;
+        t.baseType = baseType;
+        t.baseTypeName = baseTypeName;
+        t.initialization = initialization.clone();
+        return t;
     }
 
     /** {@inheritDoc} */

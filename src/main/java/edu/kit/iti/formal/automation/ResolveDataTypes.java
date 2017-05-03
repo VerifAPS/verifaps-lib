@@ -88,8 +88,7 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Object visit(ProgramDeclaration programDeclaration) {
+    @Override public Object visit(ProgramDeclaration programDeclaration) {
         programDeclaration.setGlobalScope(scope);
         if (registerPhase)
             scope.registerProgram(programDeclaration);
@@ -101,8 +100,7 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Object visit(FunctionDeclaration functionDeclaration) {
+    @Override public Object visit(FunctionDeclaration functionDeclaration) {
         functionDeclaration.setGlobalScope(scope);
         if (registerPhase)
             scope.registerFunction(functionDeclaration);
@@ -117,19 +115,17 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Object visit(LocalScope localScope) {
-        localScope.getLocalVariables().values().forEach(
-                vd -> vd.setDataType(resolve(vd.getDataTypeName()))
-        );
+    @Override public Object visit(LocalScope localScope) {
+        localScope.getLocalVariables().values()
+                .forEach(vd -> vd.setDataType(resolve(vd.getDataTypeName())));
         return null;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
+    @Override public Object visit(
+            FunctionBlockDeclaration functionBlockDeclaration) {
         functionBlockDeclaration.setGlobalScope(scope);
         if (registerPhase)
             scope.registerFunctionBlock(functionBlockDeclaration);
@@ -141,29 +137,30 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Object visit(SubRangeTypeDeclaration subRangeTypeDeclaration) {
-        if (registerPhase) scope.registerType(subRangeTypeDeclaration);
+    @Override public Object visit(
+            SubRangeTypeDeclaration subRangeTypeDeclaration) {
+        if (registerPhase)
+            scope.registerType(subRangeTypeDeclaration);
         return null;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Object visit(SimpleTypeDeclaration simpleTypeDeclaration) {
-        if (registerPhase) scope.registerType(simpleTypeDeclaration);
+    @Override public Object visit(SimpleTypeDeclaration simpleTypeDeclaration) {
+        if (registerPhase)
+            scope.registerType(simpleTypeDeclaration);
         return null;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Object visit(VariableDeclaration variableDeclaration) {
+    @Override public Object visit(VariableDeclaration variableDeclaration) {
         if (!registerPhase) { //every data type is registered
             variableDeclaration.setDataType(
-                    variableDeclaration.getTypeDeclaration().getDataType(scope));
+                    variableDeclaration.getTypeDeclaration()
+                            .getDataType(scope));
         }
         return null;
     }
@@ -171,36 +168,37 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Object visit(PointerTypeDeclaration ptd) {
-        if (registerPhase) scope.registerType(ptd);
+    @Override public Object visit(PointerTypeDeclaration ptd) {
+        if (registerPhase)
+            scope.registerType(ptd);
         return null;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Object visit(ArrayTypeDeclaration arrayTypeDeclaration) {
-        if (registerPhase) scope.registerType(arrayTypeDeclaration);
+    @Override public Object visit(ArrayTypeDeclaration arrayTypeDeclaration) {
+        if (registerPhase)
+            scope.registerType(arrayTypeDeclaration);
         return null;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Object visit(EnumerationTypeDeclaration enumerationTypeDeclaration) {
-        if (registerPhase) scope.registerType(enumerationTypeDeclaration);
+    @Override public Object visit(
+            EnumerationTypeDeclaration enumerationTypeDeclaration) {
+        if (registerPhase)
+            scope.registerType(enumerationTypeDeclaration);
         return null;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Object visit(StringTypeDeclaration stringTypeDeclaration) {
-        if (registerPhase) scope.registerType(stringTypeDeclaration);
+    @Override public Object visit(StringTypeDeclaration stringTypeDeclaration) {
+        if (registerPhase)
+            scope.registerType(stringTypeDeclaration);
 
         return null;
     }
@@ -208,8 +206,7 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Object visit(TypeDeclarations typeDeclarations) {
+    @Override public Object visit(TypeDeclarations typeDeclarations) {
         for (TypeDeclaration td : typeDeclarations)
             td.visit(this);
         return null;
@@ -218,9 +215,10 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Object visit(StructureTypeDeclaration structureTypeDeclaration) {
-        if (registerPhase) scope.registerType(structureTypeDeclaration);
+    @Override public Object visit(
+            StructureTypeDeclaration structureTypeDeclaration) {
+        if (registerPhase)
+            scope.registerType(structureTypeDeclaration);
         return null;
     }
 
@@ -228,12 +226,13 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
         if (registerPhase)
             scope.registerClass(clazz);
         else {
-            //if (clazz)
-        } 
+            //TODO
+        }
         return super.visit(clazz);
     }
 
     @Override public Object visit(MethodDeclaration method) {
-
+        //TODO
+        return null;
     }
 }

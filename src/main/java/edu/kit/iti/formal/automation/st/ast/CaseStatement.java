@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by weigla on 09.06.2014.
@@ -107,6 +108,12 @@ public class CaseStatement extends Statement {
         this.elseCase = elseCase;
     }
 
+    @Override public CaseStatement clone() {
+        CaseStatement c = new CaseStatement();
+        cases.forEach(cs -> c.addCase(cs.clone()));
+        return c;
+    }
+
     public static class Case extends Top {
         List<CaseConditions> conditions = new ArrayList<>();
         StatementList statements = new StatementList();
@@ -134,6 +141,14 @@ public class CaseStatement extends Statement {
         @Override
         public <T> T visit(Visitor<T> visitor) {
             return visitor.visit(this);
+        }
+
+        @Override public Case clone() {
+            Case c = new Case();
+            c.conditions = conditions.stream().map(CaseConditions::clone)
+                    .collect(Collectors.toList());
+            c.statements = statements.clone();
+            return c;
         }
     }
 }

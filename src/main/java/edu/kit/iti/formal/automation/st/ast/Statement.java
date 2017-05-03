@@ -29,4 +29,5 @@ package edu.kit.iti.formal.automation.st.ast;
  * @version $Id: $Id
  */
 public abstract class Statement extends Top {
+    @Override public abstract Statement clone();
 }

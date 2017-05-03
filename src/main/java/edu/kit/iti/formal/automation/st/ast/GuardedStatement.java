@@ -94,4 +94,11 @@ public class GuardedStatement extends Statement {
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    @Override public GuardedStatement clone() {
+        GuardedStatement gs = new GuardedStatement();
+        gs.condition = condition.clone();
+        gs.statements = statements.clone();
+        return gs;
+    }
 }

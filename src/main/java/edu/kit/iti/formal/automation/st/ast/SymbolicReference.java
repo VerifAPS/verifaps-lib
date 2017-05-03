@@ -22,9 +22,9 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -38,14 +38,15 @@ public class SymbolicReference extends Reference {
     private ExpressionList subscripts;
     private Reference sub;
 
-
     /**
      * <p>Constructor for SymbolicReference.</p>
      *
-     * @param s a {@link java.lang.String} object.
+     * @param s   a {@link java.lang.String} object.
      * @param sub a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
      */
     public SymbolicReference(String s, Reference sub) {
+        if (s == null)
+            throw new IllegalArgumentException();
         this.sub = sub;
         identifier = s;
     }
@@ -68,6 +69,8 @@ public class SymbolicReference extends Reference {
         this.identifier = symbolicReference.identifier;
         this.subscripts = symbolicReference.getSubscripts();
         this.sub = symbolicReference.sub;
+        if (this.identifier == null)
+            throw new IllegalArgumentException();
     }
 
     /**
@@ -101,6 +104,8 @@ public class SymbolicReference extends Reference {
      * @param identifier a {@link java.lang.String} object.
      */
     public void setIdentifier(String identifier) {
+        if (identifier == null)
+            throw new IllegalArgumentException();
         this.identifier = identifier;
     }
 
@@ -140,25 +145,33 @@ public class SymbolicReference extends Reference {
         this.sub = sub;
     }
 
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SymbolicReference)) return false;
+    /**
+     * {@inheritDoc}
+     */
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof SymbolicReference))
+            return false;
 
         SymbolicReference that = (SymbolicReference) o;
 
-        if (!identifier.equals(that.identifier)) return false;
-        if (sub != null ? !sub.equals(that.sub) : that.sub != null) return false;
-        if (subscripts != null ? !subscripts.equals(that.subscripts) : that.subscripts != null) return false;
+        if (!identifier.equals(that.identifier))
+            return false;
+        if (sub != null ? !sub.equals(that.sub) : that.sub != null)
+            return false;
+        if (subscripts != null ?
+                !subscripts.equals(that.subscripts) :
+                that.subscripts != null)
+            return false;
 
         return true;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public int hashCode() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override public int hashCode() {
         int result = identifier.hashCode();
         result = 31 * result + (subscripts != null ? subscripts.hashCode() : 0);
         result = 31 * result + (sub != null ? sub.hashCode() : 0);
@@ -178,15 +191,26 @@ public class SymbolicReference extends Reference {
 
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Any dataType(LocalScope localScope) throws VariableNotDefinedException {
+    /**
+     * {@inheritDoc}
+     */
+    @Override public Any dataType(LocalScope localScope)
+            throws VariableNotDefinedException {
         return localScope.getVariable(this).getDataType();
+    }
+
+    @Override public SymbolicReference clone() {
+        SymbolicReference sr = new SymbolicReference();
+        sr.identifier = identifier;
+        sr.subscripts = subscripts.clone();
+        sr.sub = sub.clone();
+        return sr;
     }
 }

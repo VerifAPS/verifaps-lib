@@ -22,11 +22,11 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.DataTypes;
-import edu.kit.iti.formal.automation.visitors.Visitor;
 import edu.kit.iti.formal.automation.datatypes.IECArray;
+import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +44,16 @@ public class ArrayTypeDeclaration extends TypeDeclaration<ArrayInitialization> {
     @Override
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override public ArrayTypeDeclaration clone() {
+        ArrayTypeDeclaration atd = new ArrayTypeDeclaration();
+        ranges.forEach(range -> atd.ranges.add(range.clone()));
+        atd.typeName = typeName;
+        atd.baseType = baseType;
+        atd.baseTypeName = baseTypeName;
+        atd.initialization = initialization.clone();
+        return atd;
     }
 
     /**

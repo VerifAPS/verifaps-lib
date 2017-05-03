@@ -65,4 +65,8 @@ public class FunctionCallStatement extends Statement {
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    @Override public FunctionCallStatement clone() {
+        return new FunctionCallStatement(functionCall.clone());
+    }
 }

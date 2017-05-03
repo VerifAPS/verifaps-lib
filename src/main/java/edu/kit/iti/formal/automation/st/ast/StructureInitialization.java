@@ -22,10 +22,10 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.HashMap;
@@ -40,7 +40,6 @@ import java.util.Map;
 public class StructureInitialization extends Initialization {
     private Map<String, Initialization> initValues = new HashMap<>();
     private String structureName;
-
 
     /**
      * <p>Getter for the field <code>initValues</code>.</p>
@@ -63,7 +62,7 @@ public class StructureInitialization extends Initialization {
     /**
      * <p>addField.</p>
      *
-     * @param s a {@link java.lang.String} object.
+     * @param s    a {@link java.lang.String} object.
      * @param init a {@link edu.kit.iti.formal.automation.st.ast.Initialization} object.
      */
     public void addField(String s, Initialization init) {
@@ -88,16 +87,26 @@ public class StructureInitialization extends Initialization {
         this.structureName = structureName;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Any dataType(LocalScope localScope) throws VariableNotDefinedException, TypeConformityException {
+    /**
+     * {@inheritDoc}
+     */
+    @Override public Any dataType(LocalScope localScope)
+            throws VariableNotDefinedException, TypeConformityException {
         //TODO
         return null;
+    }
+
+    @Override public StructureInitialization clone() {
+        StructureInitialization st = new StructureInitialization();
+        st.structureName = structureName;
+        st.initValues = new HashMap<>(initValues);
+        return st;
     }
 }

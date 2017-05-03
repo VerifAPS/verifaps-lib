@@ -22,8 +22,6 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.visitors.Visitable;
-
 /**
  * Created by weigl on 13.06.14.
  *
@@ -31,5 +29,5 @@ import edu.kit.iti.formal.automation.visitors.Visitable;
  * @version $Id: $Id
  */
 public abstract class Initialization extends Expression {
-
+    public abstract Initialization clone();
 }

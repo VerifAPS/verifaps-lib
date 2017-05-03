@@ -102,6 +102,15 @@ public class FunctionDeclaration extends TopLevelScopeElement {
         return getFunctionName();
     }
 
+    @Override public FunctionDeclaration clone() {
+        FunctionDeclaration fd = new FunctionDeclaration();
+        fd.functionName = functionName;
+        fd.returnType = returnType;
+        fd.returnTypeName = returnTypeName;
+        fd.statements = statements.clone();
+        return fd;
+    }
+
     /**
      * <p>Getter for the field <code>returnType</code>.</p>
      *

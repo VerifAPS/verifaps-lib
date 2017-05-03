@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
@@ -32,8 +31,8 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
-public class VariableDeclaration
-        extends Top implements Comparable<VariableDeclaration> {
+public class VariableDeclaration extends Top
+        implements Comparable<VariableDeclaration> {
     /**
      * Constant <code>INPUT=1</code>
      */
@@ -192,6 +191,8 @@ public class VariableDeclaration
      * @return a {@link edu.kit.iti.formal.automation.st.ast.Initialization} object.
      */
     public Initialization getInit() {
+        if (typeDeclaration == null)
+            return null;
         return typeDeclaration.initialization;
     }
 
@@ -247,7 +248,6 @@ public class VariableDeclaration
     public void setType(int type) {
         this.type = type;
     }
-
 
     /**
      * <p>is.</p>
@@ -359,16 +359,14 @@ public class VariableDeclaration
     /**
      * {@inheritDoc}
      */
-    @Override
-    public int compareTo(VariableDeclaration o) {
+    @Override public int compareTo(VariableDeclaration o) {
         return getName().compareTo(o.getName());
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return name + " : " + getDataTypeName() + ":=" + getInit();
     }
 
@@ -391,14 +389,14 @@ public class VariableDeclaration
         this.typeDeclaration = typeDeclaration;
     }
 
-
     /**
      * {@inheritDoc}
      */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         VariableDeclaration that = (VariableDeclaration) o;
 
@@ -408,8 +406,14 @@ public class VariableDeclaration
     /**
      * {@inheritDoc}
      */
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
         return name.hashCode();
+    }
+
+    @Override public VariableDeclaration clone() {
+        VariableDeclaration vd = new VariableDeclaration(name, type,
+                typeDeclaration);
+        vd.setDataType(dataType);
+        return vd;
     }
 }

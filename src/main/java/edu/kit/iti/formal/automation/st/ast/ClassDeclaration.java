@@ -34,12 +34,11 @@ import java.util.List;
  */
 public class ClassDeclaration extends TopLevelScopeElement {
     private List<MethodDeclaration> methods = new ArrayList<>();
-    private IdentifierPlaceHolder<ClassDeclaration> parentClass;
-    private List<IdentifierPlaceHolder<ClassDeclaration>> interfaces;
+    private IdentifierPlaceHolder<ClassDeclaration> parentClass = new IdentifierPlaceHolder<>();
+    private List<IdentifierPlaceHolder<ClassDeclaration>> interfaces = new ArrayList<>();
     private String name;
 
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    @Override public <T> T visit(Visitor<T> visitor) {
         return null;
     }
 
@@ -56,8 +55,25 @@ public class ClassDeclaration extends TopLevelScopeElement {
         return name;
     }
 
+    public void setParentClass(String parent) {
+        parentClass.setIdentifier(parent);
+    }
+
+    public void addImplements(String interfaze) {
+        interfaces.add(new IdentifierPlaceHolder<>(interfaze));
+    }
+
     public ClassDeclaration setBlockName(String name) {
         this.name = name;
         return this;
+    }
+
+    @Override public ClassDeclaration clone() {
+        ClassDeclaration c = new ClassDeclaration();
+        c.name = name;
+        methods.forEach(m -> c.methods.add(m.clone()));
+        c.parentClass = parentClass.clone();
+        interfaces.forEach(i -> c.interfaces.add(i.clone()));
+        return c;
     }
 }

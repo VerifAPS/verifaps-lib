@@ -22,12 +22,13 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by weigl on 02.08.16.
@@ -90,5 +91,10 @@ public class Location extends Expression {
     @Override
     public Any dataType(LocalScope localScope) {
         return null;//TODO
+    }
+
+    @Override public Location clone() {
+        return new Location(path.stream().map(Reference::clone)
+                .collect(Collectors.toList()));
     }
 }

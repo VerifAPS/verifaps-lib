@@ -27,7 +27,8 @@ package edu.kit.iti.formal.automation.st;
  * @author Alexander Weigl
  * @since 04.03.2017
  */
-public class IdentifierPlaceHolder<T extends Identifiable> {
+public class IdentifierPlaceHolder<T extends Identifiable>
+        implements Cloneable {
     private String identifier;
     private T realObject;
 
@@ -63,5 +64,12 @@ public class IdentifierPlaceHolder<T extends Identifiable> {
         assert realObject.getIdentifier().equals(identifier);
         this.realObject = realObject;
         return this;
+    }
+
+    @Override public IdentifierPlaceHolder<T> clone() {
+        IdentifierPlaceHolder<T> iph = new IdentifierPlaceHolder<T>();
+        iph.identifier = identifier;
+        iph.realObject = realObject;
+        return iph;
     }
 }

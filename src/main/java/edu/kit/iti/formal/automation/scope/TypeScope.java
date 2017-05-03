@@ -22,14 +22,17 @@ package edu.kit.iti.formal.automation.scope;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.*;
+import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDate;
+import edu.kit.iti.formal.automation.datatypes.AnyReal;
+import edu.kit.iti.formal.automation.datatypes.TimeType;
 
-import java.lang.String;
 import java.util.TreeMap;
 
 import static edu.kit.iti.formal.automation.datatypes.AnyBit.*;
 import static edu.kit.iti.formal.automation.datatypes.AnyInt.*;
-import static edu.kit.iti.formal.automation.datatypes.IECString.*;
+import static edu.kit.iti.formal.automation.datatypes.IECString.STRING_16BIT;
+import static edu.kit.iti.formal.automation.datatypes.IECString.STRING_8BIT;
 
 /**
  * Stores the available user defined/built-in datatypes
@@ -51,7 +54,6 @@ public class TypeScope extends TreeMap<String, Any> {
     public static TypeScope empty() {
         return new TypeScope();
     }
-
 
     /**
      * <p>builtin.</p>
@@ -78,5 +80,11 @@ public class TypeScope extends TreeMap<String, Any> {
     public void register(Any... any) {
         for (Any a : any)
             put(a.getName(), a);
+    }
+
+    public TypeScope clone() {
+        TypeScope ts = new TypeScope();
+        ts.putAll(this);
+        return ts;
     }
 }

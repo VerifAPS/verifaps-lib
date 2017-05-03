@@ -80,4 +80,8 @@ public class CommentStatement extends Statement {
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    @Override public CommentStatement clone() {
+        return new CommentStatement(comment);
+    }
 }

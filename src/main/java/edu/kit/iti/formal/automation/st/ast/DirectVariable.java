@@ -22,8 +22,8 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -31,7 +31,9 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  *
  * @author weigl
  * @version $Id: $Id
+ * @deprecated currently unsupported
  */
+@Deprecated
 public class DirectVariable extends Reference {
     /**
      * <p>Constructor for DirectVariable.</p>
@@ -52,5 +54,9 @@ public class DirectVariable extends Reference {
     @Override
     public Any dataType(LocalScope localScope) {
         throw new IllegalStateException(("not implemented"));
+    }
+
+    @Override public Reference clone() {
+        return new DirectVariable("todo");
     }
 }

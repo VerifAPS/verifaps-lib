@@ -25,7 +25,6 @@ package edu.kit.iti.formal.automation;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 
 import java.util.LinkedHashMap;
-import java.util.TreeMap;
 
 /**
  * Created by weigl on 24.11.16.
@@ -33,7 +32,8 @@ import java.util.TreeMap;
  * @author weigl
  * @version $Id: $Id
  */
-public class VariableScope extends LinkedHashMap<String, VariableDeclaration> {
+public class VariableScope extends LinkedHashMap<String, VariableDeclaration>
+        implements Cloneable {
     /**
      * <p>add.</p>
      *
@@ -41,5 +41,11 @@ public class VariableScope extends LinkedHashMap<String, VariableDeclaration> {
      */
     public void add(VariableDeclaration var) {
         put(var.getName(), var);
+    }
+
+    @Override public VariableScope clone() {
+        VariableScope vs = new VariableScope();
+        forEach((s, v) -> vs.put(s, v.clone()));
+        return vs;
     }
 }

@@ -23,8 +23,8 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.ValueFactory;
-import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.datatypes.AnyInt;
+import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
@@ -35,10 +35,13 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @version $Id: $Id
  */
 public abstract class CaseConditions extends Top {
+    public abstract CaseConditions clone();
+
     public static class Range extends CaseConditions {
         private ScalarValue<? extends AnyInt, Integer> start, stop;
 
-        public Range(ScalarValue<? extends AnyInt, Integer> start, ScalarValue<? extends AnyInt, Integer> stop) {
+        public Range(ScalarValue<? extends AnyInt, Integer> start,
+                ScalarValue<? extends AnyInt, Integer> stop) {
             this.start = start;
             this.stop = stop;
         }
@@ -46,7 +49,6 @@ public abstract class CaseConditions extends Top {
         public Range(edu.kit.iti.formal.automation.st.ast.Range ast) {
             super();
         }
-
 
         public ScalarValue<? extends AnyInt, Integer> getStart() {
             return start;
@@ -64,9 +66,12 @@ public abstract class CaseConditions extends Top {
             this.stop = stop;
         }
 
-
         public <T> T visit(Visitor<T> visitor) {
             return visitor.visit(this);
+        }
+
+        @Override public Range clone() {
+            return new Range(start.clone(), stop.clone());
         }
     }
 
@@ -85,9 +90,12 @@ public abstract class CaseConditions extends Top {
             this.value = value;
         }
 
-
         public <T> T visit(Visitor<T> visitor) {
             return visitor.visit(this);
+        }
+
+        @Override public IntegerCondition clone() {
+            return new IntegerCondition(value.clone());
         }
     }
 
@@ -126,6 +134,13 @@ public abstract class CaseConditions extends Top {
 
         public <T> T visit(Visitor<T> visitor) {
             return visitor.visit(this);
+        }
+
+        @Override public Enumeration clone() {
+            Enumeration e = new Enumeration(start.clone());
+            if (stop != null)
+                e.stop = stop.clone();
+            return e;
         }
     }
 }

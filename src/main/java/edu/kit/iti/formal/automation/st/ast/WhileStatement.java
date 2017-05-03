@@ -35,4 +35,11 @@ public class WhileStatement extends GuardedStatement {
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    @Override public WhileStatement clone() {
+        WhileStatement ws = new WhileStatement();
+        ws.condition = condition.clone();
+        ws.statements = statements.clone();
+        return ws;
+    }
 }

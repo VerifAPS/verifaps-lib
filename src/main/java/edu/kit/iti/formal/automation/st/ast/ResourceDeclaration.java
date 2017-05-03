@@ -42,4 +42,8 @@ public class ResourceDeclaration extends TopLevelScopeElement {
     @Override public String getIdentifier() {
         return "<resource>";
     }
+
+    @Override public TopLevelElement clone() {
+        return new ResourceDeclaration();
+    }
 }

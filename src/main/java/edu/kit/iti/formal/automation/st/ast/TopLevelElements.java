@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.*;
@@ -57,6 +56,12 @@ public class TopLevelElements extends Top implements List<TopLevelElement> {
     public <T> T visit(Visitor<T> sev) {//empty
         list.stream().forEach(a->a.visit(sev));
         return null;
+    }
+
+    @Override public Top clone() {
+        TopLevelElements es = new TopLevelElements();
+        forEach(e -> es.add(e.clone()));
+        return es;
     }
 
     /** {@inheritDoc} */

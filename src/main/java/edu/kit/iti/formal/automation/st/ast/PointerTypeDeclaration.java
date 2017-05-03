@@ -22,10 +22,10 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.datatypes.PointerType;
 import edu.kit.iti.formal.automation.datatypes.values.PointerValue;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -46,17 +46,25 @@ public class PointerTypeDeclaration
         setBaseTypeName(pt);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public PointerType getDataType(GlobalScope globalScope) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override public PointerType getDataType(GlobalScope globalScope) {
         PointerType pt = new PointerType(super.getDataType(globalScope));
         baseType = pt;
         return pt;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public <S> S visit(Visitor<S> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override public <S> S visit(Visitor<S> visitor) {
         return visitor.visit(this);
+    }
+
+    public PointerTypeDeclaration clone() {
+        PointerTypeDeclaration pt = new PointerTypeDeclaration(
+                getBaseTypeName());
+        return pt;
     }
 }

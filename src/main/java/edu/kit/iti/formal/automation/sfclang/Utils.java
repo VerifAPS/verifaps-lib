@@ -22,6 +22,8 @@ package edu.kit.iti.formal.automation.sfclang;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.values.PointerValue;
+import edu.kit.iti.formal.automation.st.ast.Position;
 import edu.kit.iti.formal.automation.st.ast.Top;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -51,7 +53,7 @@ public class Utils {
     public static void setStartPosition(Top top, Token first) {
         if (first == null)
             return;
-        top.setStartPosition(new Top.Position(first.getLine(),
+        top.setStartPosition(new Position(first.getLine(),
                 first.getCharPositionInLine()));
     }
 
@@ -66,7 +68,8 @@ public class Utils {
     //
     public static void setLastPosition(Top ast, Token tok) {
         if (tok == null) return;
-        ast.setEndPosition(new Top.Position(tok.getLine(), tok.getCharPositionInLine()));
+        ast.setEndPosition(
+                new Position(tok.getLine(), tok.getCharPositionInLine()));
     }
 
     public static void setLastPosition(Top ast, ParserRuleContext ctx) {
@@ -124,5 +127,10 @@ public class Utils {
     public static void setPosition(Top ast, ParserRuleContext rule,
             Token stop) {
         setPosition(ast, rule.getStart(), stop);
+    }
+
+    public static void setPosition(PointerValue target, PointerValue from) {
+        target.setStartPosition(from.getStartPosition().clone());
+        target.setEndPosition(from.getEndPosition().clone());
     }
 }

@@ -28,6 +28,7 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by weigla on 09.06.2014.
@@ -49,7 +50,7 @@ public class FunctionCall extends Expression {
      * <p>Constructor for FunctionCall.</p>
      *
      * @param fnName a {@link java.lang.String} object.
-     * @param expr a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
+     * @param expr   a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
      */
     public FunctionCall(String fnName, Expression... expr) {
         functionName = new SymbolicReference(fnName);
@@ -89,7 +90,7 @@ public class FunctionCall extends Expression {
     /**
      * <p>addInputParameter.</p>
      *
-     * @param key a {@link java.lang.String} object.
+     * @param key   a {@link java.lang.String} object.
      * @param visit a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
      */
     public void addInputParameter(String key, Expression visit) {
@@ -101,7 +102,7 @@ public class FunctionCall extends Expression {
     /**
      * <p>addOutputParameter.</p>
      *
-     * @param key a {@link java.lang.String} object.
+     * @param key   a {@link java.lang.String} object.
      * @param visit a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
      */
     public void addOutputParameter(String key, Reference visit) {
@@ -129,20 +130,29 @@ public class FunctionCall extends Expression {
         this.parameters = parameters;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Any dataType(LocalScope localScope) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override public Any dataType(LocalScope localScope) {
         return null;//TODO lookup function
     }
 
+    @Override public FunctionCall clone() {
+        FunctionCall f = new FunctionCall();
+        f.functionName = functionName;
+        f.parameters = parameters.stream().map(Parameter::clone)
+                .collect(Collectors.toList());
+        return f;
+    }
 
-    public static class Parameter {
+    public static class Parameter implements Cloneable {
         private String name;
         private boolean output;
         private Expression expression;
@@ -154,9 +164,12 @@ public class FunctionCall extends Expression {
         }
 
         public Parameter(Expression expr) {
-            this(null,false,expr);
+            this(null, false, expr);
         }
 
+        public Parameter clone() {
+            return new Parameter(name, output, expression.clone());
+        }
 
         public String getName() {
             return name;

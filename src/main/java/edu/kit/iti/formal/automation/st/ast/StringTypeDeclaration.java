@@ -22,12 +22,12 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.visitors.Visitor;
 import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.IECString;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
  * Created by weigl on 13.06.14.
@@ -62,6 +62,16 @@ public class StringTypeDeclaration extends TypeDeclaration<ScalarValue<? extends
         //TODO
         setBaseType(IECString.STRING_16BIT);
         return getBaseType();
+    }
+
+    @Override public StringTypeDeclaration clone() {
+        StringTypeDeclaration t = new StringTypeDeclaration();
+        t.initialization = initialization.clone();
+        t.typeName = typeName;
+        t.baseType = baseType;
+        t.baseTypeName = baseTypeName;
+        t.size = size.clone();
+        return t;
     }
 
     /** {@inheritDoc} */

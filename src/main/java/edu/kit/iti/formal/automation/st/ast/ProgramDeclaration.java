@@ -97,4 +97,11 @@ public class ProgramDeclaration extends TopLevelScopeElement {
     @Override public String getIdentifier() {
         return getProgramName();
     }
+
+    public ProgramDeclaration clone() {
+        ProgramDeclaration pd = new ProgramDeclaration();
+        pd.programName = programName;
+        pd.programBody = programBody.clone();
+        return pd;
+    }
 }

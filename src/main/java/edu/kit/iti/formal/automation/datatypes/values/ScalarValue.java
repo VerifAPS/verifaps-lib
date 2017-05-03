@@ -22,9 +22,9 @@ package edu.kit.iti.formal.automation.datatypes.values;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.Initialization;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.st.ast.Initialization;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -87,6 +87,11 @@ public class ScalarValue<T extends Any, S> extends Initialization
     @Override
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override public ScalarValue<T, S> clone() {
+        ScalarValue<T, S> sv = new ScalarValue<T, S>(dataType, value);
+        return sv;
     }
 
     /** {@inheritDoc} */

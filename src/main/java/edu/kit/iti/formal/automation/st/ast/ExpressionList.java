@@ -22,8 +22,8 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.*;
@@ -244,5 +244,11 @@ public class ExpressionList extends Expression
     @Override
     public Any dataType(LocalScope localScope) {
         throw new IllegalStateException("not implemented");
+    }
+
+    @Override public ExpressionList clone() {
+        ExpressionList el = new ExpressionList();
+        forEach(e -> el.add(e.clone()));
+        return el;
     }
 }

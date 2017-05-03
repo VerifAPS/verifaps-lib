@@ -22,9 +22,9 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.RecordType;
+import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.HashMap;
@@ -64,4 +64,15 @@ public class StructureTypeDeclaration extends TypeDeclaration<StructureInitializ
         setBaseType(rt);
         return rt;
     }
+
+    @Override public StructureTypeDeclaration clone() {
+        StructureTypeDeclaration t = new StructureTypeDeclaration();
+        t.initialization = initialization.clone();
+        t.fields = new HashMap<>(fields);
+        t.typeName = typeName;
+        t.baseType = baseType;
+        t.baseTypeName = baseTypeName;
+        return t;
+    }
+
 }

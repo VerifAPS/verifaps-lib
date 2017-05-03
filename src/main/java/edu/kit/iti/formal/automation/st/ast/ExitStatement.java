@@ -45,4 +45,8 @@ public class ExitStatement extends Statement {
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    @Override public ExitStatement clone() {
+        return EXIT_STATMENT;
+    }
 }

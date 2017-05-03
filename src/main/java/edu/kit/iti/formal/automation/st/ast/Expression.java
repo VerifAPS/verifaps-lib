@@ -22,10 +22,10 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 
 /**
  * <p>Abstract Expression class.</p>
@@ -45,4 +45,6 @@ public abstract class Expression extends Top {
     public abstract Any dataType(LocalScope localScope)
             throws VariableNotDefinedException,
             TypeConformityException;
+
+    @Override public abstract Expression clone();
 }

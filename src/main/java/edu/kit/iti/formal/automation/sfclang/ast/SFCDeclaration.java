@@ -43,7 +43,6 @@ import java.util.stream.Collectors;
  * @version $Id: $Id
  */
 public class SFCDeclaration extends TopLevelScopeElement {
-
     private List<StepDeclaration> steps = new LinkedList<>();
     private List<FunctionBlockDeclaration> actions = new LinkedList<>();
     private List<TransitionDeclaration> transitions = new LinkedList<>();
@@ -191,6 +190,14 @@ public class SFCDeclaration extends TopLevelScopeElement {
     /** {@inheritDoc} */
     @Override public String getIdentifier() {
         return name;
+    }
+
+    @Override public SFCDeclaration clone() {
+        SFCDeclaration sfc = new SFCDeclaration();
+        actions.forEach(a -> sfc.actions.add(a.clone()));
+        // steps.forEach(s -> sfc.steps.add(s.clone()));
+        // return sfc;
+        throw new IllegalStateException("not implemented yet!");
     }
 
     /**

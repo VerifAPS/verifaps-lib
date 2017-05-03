@@ -43,7 +43,6 @@ public class FunctionBlockDeclaration extends TopLevelScopeElement {
         return functionBlockName;
     }
 
-
     /**
      * <p>Setter for the field <code>functionBlockName</code>.</p>
      *
@@ -71,15 +70,24 @@ public class FunctionBlockDeclaration extends TopLevelScopeElement {
         this.functionBody = functionBody;
     }
 
-
-    /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override public String getIdentifier() {
         return getFunctionBlockName();
+    }
+
+    @Override public FunctionBlockDeclaration clone() {
+        FunctionBlockDeclaration fb = new FunctionBlockDeclaration();
+        fb.functionBlockName = functionBlockName;
+        fb.functionBody = functionBody.clone();
+        return fb;
     }
 }

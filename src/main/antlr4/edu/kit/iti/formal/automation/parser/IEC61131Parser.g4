@@ -956,7 +956,7 @@ symbolic_variable
 returns [ SymbolicReference ast = new SymbolicReference() ]
 :
     //x^[a,252]
-	(IDENTIFIER|SUPER|THIS)
+	a=(IDENTIFIER|SUPER|THIS)
 	(REF { $ast.derefVar(); })?
 	(
 		subscript_list
@@ -966,7 +966,7 @@ returns [ SymbolicReference ast = new SymbolicReference() ]
 	(
 		DOT other=symbolic_variable
 	)?
-	{ $ast.setIdentifier($IDENTIFIER.text);
+	{ $ast.setIdentifier($a.text);
       $ast.setSub($DOT.text != null ? $other.ast : null);
       setPosition($ast, $ctx);
     }
@@ -1177,7 +1177,7 @@ returns [ExitStatement ast = new ExitStatement()]
 :
 	EXIT
 	{
-	    //$ast.line($EXIT);
+	    Utils.setPosition($ast,$EXIT);
 	}
 
 ;

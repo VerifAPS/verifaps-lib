@@ -104,4 +104,11 @@ public class IfStatement extends Statement {
     public void addGuardedCommand(GuardedStatement gc) {
         conditionalBranches.add(gc);
     }
+
+    @Override public IfStatement clone() {
+        IfStatement is = new IfStatement();
+        conditionalBranches.forEach(gs -> is.addGuardedCommand(gs.clone()));
+        is.setElseBranch(elseBranch.clone());
+        return is;
+    }
 }

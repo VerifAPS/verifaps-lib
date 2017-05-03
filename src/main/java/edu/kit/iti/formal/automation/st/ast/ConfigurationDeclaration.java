@@ -41,4 +41,8 @@ public class ConfigurationDeclaration extends TopLevelScopeElement {
     @Override public String getIdentifier() {
         return "<configuration>";
     }
+
+    @Override public ConfigurationDeclaration clone() {
+        return new ConfigurationDeclaration();
+    }
 }

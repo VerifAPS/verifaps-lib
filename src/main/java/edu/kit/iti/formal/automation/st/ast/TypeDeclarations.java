@@ -61,6 +61,12 @@ public class TypeDeclarations extends TopLevelElement implements List<TypeDeclar
         return visitor.visit(this);
     }
 
+    @Override public TypeDeclarations clone() {
+        TypeDeclarations td = new TypeDeclarations();
+        forEach(t -> td.add(t.clone()));
+        return td;
+    }
+
     /** {@inheritDoc} */
     @Override
     public int size() {

@@ -32,8 +32,7 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
 public class MethodDeclaration extends FunctionDeclaration {
     private ClassDeclaration classDeclaration;
 
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    @Override public <T> T visit(Visitor<T> visitor) {
         return null;
     }
 
@@ -45,7 +44,8 @@ public class MethodDeclaration extends FunctionDeclaration {
         return classDeclaration;
     }
 
-    public MethodDeclaration setClassDeclaration(ClassDeclaration classDeclaration) {
+    public MethodDeclaration setClassDeclaration(
+            ClassDeclaration classDeclaration) {
         this.classDeclaration = classDeclaration;
         return this;
     }
@@ -54,4 +54,13 @@ public class MethodDeclaration extends FunctionDeclaration {
         setFunctionName(n);
     }
 
+    @Override public MethodDeclaration clone() {
+        MethodDeclaration md = new MethodDeclaration();
+        md.classDeclaration = classDeclaration; //no copy!
+        md.localScope = localScope.clone();
+        md.functionName = functionName;
+        md.returnType = returnType;
+        md.returnTypeName = returnTypeName;
+        return md;
+    }
 }

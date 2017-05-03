@@ -42,12 +42,17 @@ Parser and AST for StructuredText, Sequential Function Charts and Function Block
 
 ```
 $ git clone  https://github.com/VerifAPS/iec61131lang.git
-$ mvn compile assembly
 $ mvn install
 ```
 
 # Changelog 
 
+* 0.1.14-beta
+ * deep copy of ast by `Object.clone()`
+ * *beta* integration of oo features
+ * `Position` became an top-level class
+* 0.1.13
+ * minor bug fixes
 * 0.1.12
  * Fix NPE in AstVisitor
 * 0.1.11 
@@ -55,6 +60,8 @@ $ mvn install
 
 # TODO
 
+* [ ] Visitor for adding making explicit of the default initialization values
+* [ ] explicit type promotion
 * [ ] Unit Tests, especially for wrong expressions and statements
 * [ ] Error Messages
 * [ ] Documentation
@@ -84,6 +91,7 @@ $ mvn install
   * [ ] Object Oriented Function Blocks
     * [ ] Interfaces
     * [ ] Extends Clause
+    * [x] implemented as datastructures
 * [ ] Sequential Function Chart
   * [x] Steps with Actions
   * [x] Transitions

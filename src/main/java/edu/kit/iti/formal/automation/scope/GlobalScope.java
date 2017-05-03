@@ -83,10 +83,9 @@ public class GlobalScope {
      * @param key a {@link java.lang.Object} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
      */
-    public FunctionDeclaration getFunction(Object key) {
+    public FunctionDeclaration getFunction(String key) {
         return functions.get(key);
     }
-
 
     /**
      * <p>registerProgram.</p>
@@ -171,10 +170,12 @@ public class GlobalScope {
      * @param local        a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
      */
-    public FunctionDeclaration resolveFunction(FunctionCall functionCall, LocalScope local) {
+    public FunctionDeclaration resolveFunction(FunctionCall functionCall,
+            LocalScope local) {
         for (FunctionResolver fr : functionResolvers) {
             FunctionDeclaration decl = fr.resolve(functionCall, local);
-            if (decl != null) return decl;
+            if (decl != null)
+                return decl;
         }
         return null;
     }
@@ -191,5 +192,17 @@ public class GlobalScope {
 
     public ClassDeclaration resolveClass(String key) {
         return classes.get(key);
+    }
+
+    public GlobalScope clone() {
+        GlobalScope gs = new GlobalScope();
+        gs.classes = new HashMap<>(classes);
+        gs.dataTypes = new HashMap<>(dataTypes);
+        gs.fb = new HashMap<>(fb);
+        gs.functionResolvers = new ArrayList<>(functionResolvers);
+        gs.functions = new HashMap<>(functions);
+        gs.programs = new HashMap<>(programs);
+        gs.types = types.clone();
+        return gs;
     }
 }
