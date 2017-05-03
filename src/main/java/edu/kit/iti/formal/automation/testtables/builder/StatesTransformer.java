@@ -101,10 +101,11 @@ public class StatesTransformer implements TableTransformer {
                 .reduce(SMVFacade.reducer(SBinaryOperator.OR))
                 .orElse(SLiteral.FALSE);
 
+        /*
         if (automatonState.isUnbounded()) {
             or = SMVFacade.combine(SBinaryOperator.OR, or,
-                    automatonState.getDefFailed());
-        }
+                    automatonState.getDefForward());
+        }*/
 
         SAssignment assignment = new SAssignment(
                 automatonState.getSMVVariable(), or);

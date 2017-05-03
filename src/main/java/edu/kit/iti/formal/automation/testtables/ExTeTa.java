@@ -26,6 +26,7 @@ import edu.kit.iti.formal.automation.SymbExFacade;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException;
 import edu.kit.iti.formal.automation.exceptions.UnknownVariableException;
+import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.testtables.builder.TableTransformation;
 import edu.kit.iti.formal.automation.testtables.exception.GetetaException;
@@ -33,6 +34,7 @@ import edu.kit.iti.formal.automation.testtables.io.Report;
 import edu.kit.iti.formal.automation.testtables.model.CounterExampleAnalyzer;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.options.Mode;
+import edu.kit.iti.formal.automation.testtables.monitor.MonitorGeneration;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SMVType;
 import org.apache.commons.cli.CommandLine;
@@ -54,7 +56,7 @@ public class ExTeTa {
             run(cli);
         }
         catch (FunctionUndefinedException e) {
-            Report.fatal("Could not call %s" ,
+            Report.fatal("Could not call %s",
                     e.getFunctionCall().getFunctionName().getIdentifier());
         }
         catch (UnknownVariableException e) {
@@ -79,11 +81,12 @@ public class ExTeTa {
                     e.getMessage());
 
         }
-
+        catch (Exception e) {
+            Report.fatal(e.getMessage());
+        }
     }
 
-    public static void run(CommandLine cli)
-            throws ParseException, JAXBException, IOException {
+    public static void run(CommandLine cli) throws Exception {
         // xml
         Report.XML_MODE = cli.hasOption("x");
 
@@ -120,7 +123,11 @@ public class ExTeTa {
             }
 
         if (table.getOptions().getMode() == Mode.MONITOR_GENERATION) {
-
+            MonitorGeneration mg = new MonitorGeneration(table);
+            TopLevelElements fbs = mg.call();
+            StructuredTextPrinter stp = new StructuredTextPrinter();
+            fbs.visit(stp);
+            System.out.println(stp.getString());
         }
         else {
             SMVModule modCode = SymbExFacade.evaluateProgram(code);
