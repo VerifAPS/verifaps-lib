@@ -11,8 +11,14 @@
         <step duration="[6,6]"><cell>6</cell></step>
         <step duration="[7,7]"><cell>7</cell></step>
         <step duration="[8,8]"><cell>8</cell></step>
-        <step duration="[9,9]"><cell>9</cell></step>
+        <step duration="[1,10]">
+            <cell>9</cell>
+        </step>
         <step duration="[10,10]"><cell>10</cell></step>
     </steps>
+
+    <options>
+        <option key="technique" value="IC3"/>
+    </options>
 
 </test-table>
