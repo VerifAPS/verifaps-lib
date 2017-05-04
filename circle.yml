@@ -11,6 +11,7 @@ test:
     - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
     - mkdir -p $CIRCLE_ARTIFACTS/coverage-report
     - cp -r build/reports/jacoco $CIRCLE_ARTIFACTS/coverage-report
+    - cp -r build/reports/tests/test/ $CIRCLE_ARTIFACTS/test-report/
 
 
 deployment:
