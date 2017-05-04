@@ -228,8 +228,9 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
         if (registerPhase)
             scope.registerClass(clazz);
         else {
-            if (clazz)
-        } return super.visit(clazz);
+            //if (clazz)
+        } 
+        return super.visit(clazz);
     }
 
     @Override public Object visit(MethodDeclaration method) {
