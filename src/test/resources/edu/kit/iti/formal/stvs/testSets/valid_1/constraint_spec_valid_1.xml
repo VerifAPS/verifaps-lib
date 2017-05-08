@@ -6,7 +6,7 @@
         <ioVariable colwidth="100" data-type="BOOL" io="input" name="B"/>
         <ioVariable colwidth="100" data-type="INT" io="output" name="C"/>
         <ioVariable colwidth="100" data-type="enumD" io="output" name="D"/>
-        <freeVariable data-type="BOOL" name="p"/>
+        <freeVariable data-type="BOOL" default="-" name="p"/>
         <freeVariable data-type="INT" default="42" name="q"/>
     </variables>
     <rows>

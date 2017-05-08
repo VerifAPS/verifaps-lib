@@ -109,6 +109,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
       // Starts the verification process in another thread
       processMonitor.start();
     } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException exception) {
+      exception.printStackTrace();
       throw new ProcessCreationException("The verification could not be launched");
     }
   }

@@ -29,7 +29,7 @@
                 <variables>
                     <ioVariable colwidth="171" data-type="BOOL" io="input" name="Start_Stop"/>
                     <ioVariable colwidth="172" data-type="BOOL" io="output" name="ONS_Trig"/>
-                    <freeVariable data-type="INT" name="freeVarA"/>
+                    <freeVariable data-type="INT" default="-" name="freeVarA"/>
                     <freeVariable data-type="BOOL" default="TRUE" name="freeVarB"/>
                 </variables>
                 <rows>

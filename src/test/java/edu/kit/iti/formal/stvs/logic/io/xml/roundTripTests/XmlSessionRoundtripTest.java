@@ -44,7 +44,8 @@ import static org.junit.Assert.assertEquals;
     File tempFile = File.createTempFile("test", "");
     ExporterFacade.exportSession(importedSession, ExporterFacade.ExportFormat.XML, tempFile);
     String fileContentsAfter = TestUtils.readFromFile(tempFile.getAbsolutePath());
-    assertEquals(TestUtils.removeWhitespace(fileContentsBefore),
+    assertEquals("ComparisonFailure at file: "+file.getPath(), TestUtils.removeWhitespace
+            (fileContentsBefore),
         TestUtils.removeWhitespace(fileContentsAfter));
   }
 }

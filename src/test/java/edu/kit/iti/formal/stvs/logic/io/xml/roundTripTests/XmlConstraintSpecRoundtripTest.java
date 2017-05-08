@@ -42,7 +42,8 @@ public class XmlConstraintSpecRoundtripTest {
     File tempFile = File.createTempFile("test", "");
     ExporterFacade.exportSpec(importedSpec, ExporterFacade.ExportFormat.XML, tempFile);
     String fileContentsAfter = TestUtils.readFromFile(tempFile.getAbsolutePath());
-    assertEquals(TestUtils.removeWhitespace(fileContentsBefore),
+    assertEquals("ComparisonFailure at File:" + file.getPath(), TestUtils.removeWhitespace
+            (fileContentsBefore),
         TestUtils.removeWhitespace(fileContentsAfter));
   }
 }
