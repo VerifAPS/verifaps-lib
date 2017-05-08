@@ -8,6 +8,7 @@ import java.util.Optional;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.util.Callback;
 
 /**
  * <p>
@@ -37,13 +38,6 @@ public class CommentPopupManager {
   public CommentPopupManager(Commentable commentable, boolean editable) {
     CommentPopup popup = new CommentPopup(commentable.getComment());
     popup.setEditable(editable);
-
-    popup.setResultConverter((dialogButton) -> {
-      if (dialogButton != ButtonType.APPLY) {
-        return null;
-      }
-      return popup.getCommentField().getText();
-    });
     Optional<String> newValue = popup.showAndWait();
     System.out.println(newValue);
     newValue.ifPresent(commentable::setComment);

@@ -24,6 +24,8 @@ public class StvsRootView extends SplitPane {
     this.specifications = specifications;
     ViewUtils.setupId(this);
 
+    // for presentations
+    //this.setStyle("-fx-font-size: 16pt");
 
     this.getItems().addAll(editor, specifications);
   }

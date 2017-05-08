@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml">
+    <code>
+        <plaintext><![CDATA[
+TYPE
+  MOTOR_STATE : (GoDown, Stationary, GoUp);
+  DOOR_STATE : (Open, Closed);
+END_TYPE
+
+PROGRAM Elevator
+
+  VAR_INPUT
+    CurrentPos : INT;
+    RequestedPos : INT;
+    ButtonPressed : BOOL;
+  END_VAR
+
+  VAR_OUTPUT
+    Motor : MOTOR_STATE := MOTOR_STATE#Stationary;
+    Door : DOOR_STATE := DOOR_STATE#Closed;
+  END_VAR
+
+  IF ButtonPressed THEN
+
+    Door := DOOR_STATE#Closed;
+
+    IF RequestedPos > CurrentPos THEN
+      Motor := MOTOR_STATE#GoUp;
+    ELSEIF RequestedPos < CurrentPos THEN
+      Motor := MOTOR_STATE#GoDown;
+    END_IF
+
+  END_IF
+
+  IF RequestedPos = CurrentPos THEN
+    Motor := MOTOR_STATE#Stationary;
+    Door := MOTOR_STATE#Open;
+  END_IF
+
+END_PROGRAM
+]]></plaintext>
+    </code>
+    <tabs>
+        <tab id="0" open="false" readOnly="false">
+            <specification comment="" isConcrete="false"
+                           name="Invariant Table">
+                <variables>
+                    <ioVariable colwidth="100" data-type="INT" io="input"
+                                name="CurrentPos"/>
+                    <ioVariable colwidth="100" data-type="INT" io="input"
+                                name="RequestedPos"/>
+                    <ioVariable colwidth="100" data-type="BOOL" io="input"
+                                name="ButtonPressed"/>
+                    <ioVariable colwidth="100" data-type="MOTOR_STATE"
+                                io="output" name="Motor"/>
+                    <ioVariable colwidth="100" data-type="DOOR_STATE"
+                                io="output" name="Door"/>
+                </variables>
+                <rows>
+                    <row comment="">
+                        <duration>1</duration>
+                        <cell>-</cell>
+                        <cell>-</cell>
+                        <cell>-</cell>
+                        <cell>Motor = Stationary | Door = Closed</cell>
+                        <cell>-</cell>
+                    </row>
+                </rows>
+            </specification>
+            <specification isConcrete="true" isCounterExample="true"
+                           name="Unnamed Specification">
+                <variables>
+                    <ioVariable data-type="INT" io="input" name="CurrentPos"/>
+                    <ioVariable data-type="INT" io="input" name="RequestedPos"/>
+                    <ioVariable data-type="BOOL" io="input"
+                                name="ButtonPressed"/>
+                    <ioVariable data-type="MOTOR_STATE" io="output"
+                                name="Motor"/>
+                    <ioVariable data-type="DOOR_STATE" io="output" name="Door"/>
+                </variables>
+                <rows>
+                    <row>
+                        <duration>1</duration>
+                        <cycle>
+                            <cell>1</cell>
+                            <cell>32768</cell>
+                            <cell>TRUE</cell>
+                            <cell>GoDown</cell>
+                            <cell>Open</cell>
+                        </cycle>
+                    </row>
+                </rows>
+            </specification>
+        </tab>
+        <tab id="1" open="false" readOnly="false">
+            <specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml"
+                           comment=""
+                           isConcrete="false" name="ConcreteCase">
+                <variables>
+                    <ioVariable colwidth="133" data-type="INT" io="input"
+                                name="CurrentPos"/>
+                    <ioVariable colwidth="153" data-type="INT" io="input"
+                                name="RequestedPos"/>
+                    <ioVariable colwidth="171" data-type="BOOL" io="input"
+                                name="ButtonPressed"/>
+                    <ioVariable colwidth="171" data-type="MOTOR_STATE"
+                                io="output"
+                                name="Motor"/>
+                    <ioVariable colwidth="156" data-type="DOOR_STATE"
+                                io="output"
+                                name="Door"/>
+                </variables>
+                <rows>
+                    <row comment="">
+                        <duration>1</duration>
+                        <cell>1</cell>
+                        <cell>3</cell>
+                        <cell>TRUE</cell>
+                        <cell>GoUp</cell>
+                        <cell>Closed</cell>
+                    </row>
+                    <row comment="">
+                        <duration>1</duration>
+                        <cell>2</cell>
+                        <cell>3</cell>
+                        <cell>FALSE</cell>
+                        <cell>GoUp</cell>
+                        <cell>Closed</cell>
+                    </row>
+                    <row comment="">
+                        <duration>1</duration>
+                        <cell>3</cell>
+                        <cell>3</cell>
+                        <cell>FALSE</cell>
+                        <cell>Stationary</cell>
+                        <cell>Closed</cell>
+                    </row>
+                    <row comment="">
+                        <duration>1</duration>
+                        <cell>3</cell>
+                        <cell>3</cell>
+                        <cell>FALSE</cell>
+                        <cell>Stationary</cell>
+                        <cell>Open</cell>
+                    </row>
+                </rows>
+            </specification>
+        </tab>
+    </tabs>
+</session>

@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib;
 
 import edu.kit.iti.formal.stvs.Performance;
+import edu.kit.iti.formal.stvs.TestUtils;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.logic.specification.ConcretizationException;
@@ -50,10 +51,10 @@ public class Z3SolverTest {
 
   private Z3Solver solver;
 
-  @Before
-  public void initialize() {
-    this.solver = new Z3Solver(GlobalConfig.autoloadConfig());
-  }
+    @Before public void initialize() {
+        this.solver = new Z3Solver(GlobalConfig.autoloadConfig());
+        TestUtils.assumeZ3Exists();
+    }
 
   private ValidSpecification importSpec(String name) throws
       ImportException {

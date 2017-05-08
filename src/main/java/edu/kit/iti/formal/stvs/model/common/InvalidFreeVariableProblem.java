@@ -1,11 +1,12 @@
 package edu.kit.iti.formal.stvs.model.common;
 
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.expressions.Value;
-import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
+import edu.kit.iti.formal.stvs.model.expressions.*;
 
 import java.util.Map;
 
+import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser;
+import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException;
+import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
@@ -18,62 +19,90 @@ import org.apache.commons.lang3.StringEscapeUtils;
  */
 public class InvalidFreeVariableProblem extends FreeVariableProblem {
 
-  /**
-   * Tries to validate the given {@link FreeVariable} (effective model) to the formal model
-   * {@link ValidFreeVariable}. If that cannot be done successfully it throws a problem.
-   *
-   * @param freeVariable the effective model to validate
-   * @param typesByName a type context valdiation
-   * @return the formal model, if successfully validated
-   * @throws InvalidFreeVariableProblem if this free variable is not input-valid
-   */
-  public static ValidFreeVariable tryToConvertToValid(
-      FreeVariable freeVariable, Map<String, Type> typesByName)
-      throws InvalidFreeVariableProblem {
-    String validName = tryToGetValidName(freeVariable);
-    Type validType = tryToGetValidType(freeVariable, typesByName);
-    Value validDefaultValue = tryToGetValidDefaultValue(freeVariable, validType);
-    return new ValidFreeVariable(validName, validType, validDefaultValue);
-  }
-
-  private static String tryToGetValidName(FreeVariable freeVariable)
-      throws InvalidFreeVariableProblem {
-    String varName = freeVariable.getName();
-    if (VariableExpr.IDENTIFIER_PATTERN.matcher(varName).matches()) {
-      return varName;
-    } else {
-      throw new InvalidFreeVariableProblem(
-          "Variable has illegal characters in name: " + StringEscapeUtils.escapeJava(varName));
+    /**
+     * Tries to validate the given {@link FreeVariable} (effective model) to the formal model
+     * {@link ValidFreeVariable}. If that cannot be done successfully it throws a problem.
+     *
+     * @param freeVariable the effective model to validate
+     * @param typesByName  a type context valdiation
+     * @param variableMap
+     * @return the formal model, if successfully validated
+     * @throws InvalidFreeVariableProblem if this free variable is not input-valid
+     */
+    public static ValidFreeVariable tryToConvertToValid(
+            FreeVariable freeVariable, Map<String, Type> typesByName,
+            Map<String, Type> variableMap)
+            throws InvalidFreeVariableProblem {
+        String validName = tryToGetValidName(freeVariable);
+        Type validType = tryToGetValidType(freeVariable, typesByName);
+        Expression expr = trytoGetValidConstraint(freeVariable, typesByName,
+                variableMap);
+        return new ValidFreeVariable(validName, validType, expr);
     }
-  }
 
-  private static Type tryToGetValidType(FreeVariable freeVariable, Map<String, Type> typesByName)
-      throws InvalidFreeVariableProblem {
-    Type foundType = typesByName.get(freeVariable.getType());
-    if (foundType == null) {
-      throw new InvalidFreeVariableProblem(
-          "Variable has unknown type: " + StringEscapeUtils.escapeJava(freeVariable.getType()));
+    private static String tryToGetValidName(FreeVariable freeVariable)
+            throws InvalidFreeVariableProblem {
+        String varName = freeVariable.getName();
+        if (VariableExpr.IDENTIFIER_PATTERN.matcher(varName).matches()) {
+            return varName;
+        }
+        else {
+            throw new InvalidFreeVariableProblem(
+                    "Variable has illegal characters in name: "
+                            + StringEscapeUtils.escapeJava(varName));
+        }
     }
-    return foundType;
-  }
 
-  private static Value tryToGetValidDefaultValue(
-      FreeVariable freeVariable, Type freeVarType) throws InvalidFreeVariableProblem {
-    if (freeVariable.getDefaultValue().isEmpty()) {
-      return null;
+    private static Type tryToGetValidType(FreeVariable freeVariable,
+            Map<String, Type> typesByName) throws InvalidFreeVariableProblem {
+        Type foundType = typesByName.get(freeVariable.getType());
+        if (foundType == null) {
+            throw new InvalidFreeVariableProblem(
+                    "Variable has unknown type: " + StringEscapeUtils
+                            .escapeJava(freeVariable.getType()));
+        }
+        return foundType;
     }
-    return freeVarType.parseLiteral(freeVariable.getDefaultValue().trim())
+
+    private static Expression trytoGetValidConstraint(FreeVariable freeVariable,
+            Map<String, Type> typeContext,
+            Map<String, Type> variableMap) throws InvalidFreeVariableProblem {
+        if (freeVariable.getConstraint().isEmpty()) {
+            return new LiteralExpr(ValueBool.TRUE);
+        }
+        ExpressionParser parser = new ExpressionParser(freeVariable.getName(),
+                typeContext.values());
+        try {
+            Expression expr = parser
+                    .parseExpression(freeVariable.getConstraint());
+            TypeChecker tc = new TypeChecker(variableMap);
+            tc.typeCheck(expr);
+            return expr;
+        }
+        catch (ParseException e) {
+            e.printStackTrace();
+            throw new InvalidFreeVariableProblem(e.getParseErrorMessage());
+        }
+        catch (UnsupportedExpressionException e) {
+            throw new InvalidFreeVariableProblem(
+                    e.getUnsupportedExpressionDescription());
+        }
+        catch (TypeCheckException e) {
+            throw new InvalidFreeVariableProblem(e.getMessage());
+        }
+
+
+    /*return freeVarType.parseLiteral(freeVariable.getConstraint().trim())
         .orElseThrow(() -> new InvalidFreeVariableProblem("Couldn't parse default value: "
-            + StringEscapeUtils.escapeJava(freeVariable.getDefaultValue())));
-  }
+            + StringEscapeUtils.escapeJava(freeVariable.getConstraint())));*/
+    }
 
-  protected InvalidFreeVariableProblem(String errorMessage) {
-    super(errorMessage);
-  }
+    protected InvalidFreeVariableProblem(String errorMessage) {
+        super(errorMessage);
+    }
 
-  @Override
-  public String getProblemName() {
-    return "invalid free variable";
-  }
+    @Override public String getProblemName() {
+        return "invalid free variable";
+    }
 
 }

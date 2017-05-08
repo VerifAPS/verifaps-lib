@@ -4,6 +4,7 @@ import edu.kit.iti.formal.stvs.StvsApplication;
 import edu.kit.iti.formal.stvs.view.common.ActualHyperLink;
 import edu.kit.iti.formal.stvs.view.common.HostServiceSingleton;
 import javafx.geometry.Insets;
+import edu.kit.iti.formal.stvs.StvsVersion;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -16,12 +17,12 @@ import javafx.scene.text.Font;
  * <p>
  * The Dialog Pane that shows 'About' information.
  * </p>
- *
+ * <p>
  * <p>
  * Is created when the user clicks on 'Help' -> 'About' and shows the name and version information,
  * etc.
  * </p>
- *
+ * <p>
  * <p>
  * Created by csicar on 16.02.17.
  * </p>
@@ -134,7 +135,9 @@ public class AboutDialogPane extends DialogPane {
     ImageView logoView = new ImageView(logo);
     Label name = new Label("Structured Text Verification Studio");
     name.setFont(Font.font("DejaVu Sans Mono", 30));
-    Label version = new Label("Version: 1.1");
+    Label version = new Label(
+            "Version: " + StvsVersion.getVersion() + " built from "
+                    + StvsVersion.getBuildId());
 
     Hyperlink license = new ActualHyperLink(
         "License: GPLv3",
@@ -156,7 +159,7 @@ public class AboutDialogPane extends DialogPane {
 
     HBox links = new HBox(homepage, repo);
     links.setAlignment(Pos.CENTER);
-    
+
     VBox aboutBox = new VBox(
         logoView,
         name,

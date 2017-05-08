@@ -1,48 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?><session xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml">
 <code>
 <plaintext>TYPE
-  TrafficLight : (Red, Green);
+	TrafficLight : (Red, Green);
 END_TYPE
 
 PROGRAM PedestrianTrafficLight
 
-  VAR_INPUT
-    pedBtnPress : BOOL;
-  END_VAR
-  
-  VAR_OUTPUT
+VAR_INPUT
+	pedBtnPress : BOOL;
+END_VAR
+
+VAR_OUTPUT
     carLight : TrafficLight;
     pedLight : TrafficLight;
-    counter  : INT;
-  END_VAR
+    counter : INT;
+END_VAR
 
-  VAR
+VAR
     buttonPressedBefore : BOOL;
-  END_VAR
+END_VAR
 
 
-  IF (NOT buttonPressedBefore) AND pedBtnPress THEN
-    carLight := TrafficLight#Red;
-  END_IF
+    IF (NOT buttonPressedBefore) AND pedBtnPress THEN
+        carLight := TrafficLight#Red;
+    END_IF
 
-  IF counter = 10 THEN
-    pedLight := TrafficLight#Green;
-  ELSIF counter = 40 THEN
-    pedLight := TrafficLight#Red;
-  ELSIF counter = 50 THEN
-    carLight := TrafficLight#Green;
-  END_IF
+    IF counter = 10 THEN
+        pedLight := TrafficLight#Green;
+    ELSIF counter = 40 THEN
+        pedLight := TrafficLight#Red;
+    ELSIF counter = 50 THEN
+        carLight := TrafficLight#Green;
+    END_IF
 
-  IF carLight = TrafficLight#Red THEN
-    counter := counter + 1;
-  ELSE
-    counter := 0;
-  END_IF
-  
-  buttonPressedBefore := pedBtnPress;
+    IF carLight = TrafficLight#Red THEN
+        counter := counter + 1;
+    ELSE
+        counter := 0;
+    END_IF
+
+    buttonPressedBefore := pedBtnPress;
 
 
-END_PROGRAM</plaintext>
+END_PROGRAM
+        </plaintext>
 </code>
 <tabs>
 <tab id="0" open="false" readOnly="false">
@@ -56,7 +57,6 @@ END_PROGRAM</plaintext>
 <cell>-</cell>
 </row>
 </rows>
-<enumTypes/>
 </specification>
 </tab>
 <tab id="1" open="false" readOnly="false">
@@ -68,7 +68,6 @@ END_PROGRAM</plaintext>
 <ioVariable colwidth="100" data-type="INT" io="output" name="counter"/>
 </variables>
 <rows/>
-<enumTypes/>
 </specification>
 </tab>
 <tab id="2" open="false" readOnly="false">
@@ -123,7 +122,6 @@ END_PROGRAM</plaintext>
 <cell>0</cell>
 </row>
 </rows>
-<enumTypes/>
 </specification>
 </tab>
 <tab id="3" open="false" readOnly="false">
@@ -143,7 +141,6 @@ END_PROGRAM</plaintext>
 <cell>-</cell>
 </row>
 </rows>
-<enumTypes/>
 </specification>
 </tab>
 </tabs>

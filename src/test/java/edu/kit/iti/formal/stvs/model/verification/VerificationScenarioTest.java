@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.verification;
 
 import edu.kit.iti.formal.stvs.StvsApplication;
+import edu.kit.iti.formal.stvs.TestUtils;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.code.Code;
@@ -37,6 +38,9 @@ public class VerificationScenarioTest {
 
   @Before
   public void setUp() throws URISyntaxException, IOException, ImportException {
+    TestUtils.assumeNuXmvExists();
+    TestUtils.assumeGetetaExists();
+
     scenario = new VerificationScenario();
     code = ImporterFacade.importStCode(new File(StvsApplication.class.getResource
         ("testSets/valid_1/code_valid_1.st").toURI()));

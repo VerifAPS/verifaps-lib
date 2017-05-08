@@ -70,11 +70,21 @@ public class VariableEscaper {
     for (Token token : code.getTokens()) {
       if (token.getType() == IEC61131Lexer.IDENTIFIER) {
         res.append(escapeIdentifier(token.getText()));
+      } else if(token.getType() == IEC61131Lexer.CAST_LITERAL) {
+        res.append(escapeEnumReference(token.getText()));
       } else {
         res.append(token.getText());
       }
     }
     return res.toString();
+  }
+
+  private static String escapeEnumReference(String tokenText) {
+    String[] tokens = tokenText.split("#");
+    if (tokens.length != 2) {
+      return escapeIdentifier(tokenText);
+    }
+    return escapeIdentifier(tokens[0]) + "#" + escapeIdentifier(tokens[1]);
   }
 
   /**

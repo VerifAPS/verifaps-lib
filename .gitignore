@@ -12,6 +12,9 @@ generated/
 /.project
 /.settings/
 
+/.gradle/
+
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
@@ -159,3 +162,4 @@ _minted*
 
 # scrwfile
 *.wrt
+classes
