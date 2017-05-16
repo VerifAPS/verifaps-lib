@@ -163,7 +163,7 @@ public class ExTeTa {
         options.addOption("o", "output", true, "ouput");
         options.addOption("c", "code", true, "program files");
         options.addOption("m", "mode", true, "mode");
-        options.addOption("t", "technique", true, "verification technique");
+        options.addOption("v", "technique", true, "verification technique");
 
         return clp.parse(options, args, true);
     }
