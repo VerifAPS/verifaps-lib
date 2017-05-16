@@ -37,6 +37,7 @@ import edu.kit.iti.formal.automation.smv.operators.OperationMap;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.smv.SMVFacade;
+import edu.kit.iti.formal.smv.ast.*;
 
 import java.util.HashMap;
 import java.util.List;

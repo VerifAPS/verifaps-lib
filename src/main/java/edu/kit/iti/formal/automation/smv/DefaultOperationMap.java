@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.operators.BinaryOperator;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
 import edu.kit.iti.formal.automation.smv.operators.OperationMap;
 import edu.kit.iti.formal.smv.SMVFacade;
+import edu.kit.iti.formal.smv.ast.*;
 
 /**
  * Default translation for ST-Operators.

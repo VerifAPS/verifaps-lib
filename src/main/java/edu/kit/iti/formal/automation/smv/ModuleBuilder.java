@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TypeDeclarations;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import edu.kit.iti.formal.smv.ast.*;
 
 import java.util.HashSet;
 import java.util.List;
