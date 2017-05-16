@@ -7,6 +7,7 @@
         <groupId>edu.kit.iti.formal</groupId>
         <artifactId>verifaps</artifactId>
         <version>1.3.1</version>
+        <relativePath></relativePath>
     </parent>
 
     <artifactId>iec61131lang</artifactId>
