@@ -88,8 +88,13 @@ public class SpecificationsPaneController implements Controller {
     hybridSpecifications.addListener((ListChangeListener<HybridSpecification>) change -> {
       while (change.next()) {
 
+        /* addedPositionIndex stores the index that changed (starting at .getFrom()
+        * and should be ending at .getTo() ). Since in our case only one change should occur
+        * at a time, there is no need to worry about edge-cases (for now)*/
+        int addedPositionIndex = change.getFrom();
         for (HybridSpecification addItem : change.getAddedSubList()) {
-          addTab(addItem);
+          addTab(addItem, addedPositionIndex);
+          addedPositionIndex++;
         }
         for (HybridSpecification spec : change.getRemoved()) {
           removeTab(change.getFrom());

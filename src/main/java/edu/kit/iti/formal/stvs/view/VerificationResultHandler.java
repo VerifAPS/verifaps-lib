@@ -57,7 +57,8 @@ public class VerificationResultHandler implements VerificationResultVisitor {
     HybridSpecification readOnlySpec = new HybridSpecification(
         new ConstraintSpecification(verifiedSpec), false);
     readOnlySpec.setCounterExample(result.getCounterexample());
-    rootModel.getHybridSpecifications().add(readOnlySpec);
+    int newIndex = rootModel.getHybridSpecifications().size();
+    rootModel.getHybridSpecifications().add(newIndex, readOnlySpec);
   }
 
   /**
