@@ -76,7 +76,7 @@ public class FunctionBlockEmbedder extends AstCopyVisitor {
     @Override
     public Object visit(FunctionCallStatement functionCallStatement) {
         FunctionCall call = functionCallStatement.getFunctionCall();
-        if (instanceName.equals(call.getFunctionName())) {
+        if (instanceName.equals(call.getFunctionName().getIdentifier())) {
             StatementList sl = new StatementList();
             for (FunctionCall.Parameter p : call.getParameters()) {
                 if (!p.isOutput()) {

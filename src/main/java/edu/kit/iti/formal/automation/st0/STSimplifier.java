@@ -123,10 +123,28 @@ public class STSimplifier {
         return statements;
     }
 
+    private LocalScope prefixNames(LocalScope scope, String s) {
+        LocalScope copy = new LocalScope();
+        for(VariableDeclaration vd : scope) {
+        	VariableDeclaration nd = new VariableDeclaration(vd);
+        	if(nd.isInput() || nd.isInOut() || nd.isOutput()) {
+        		int mask =
+        			VariableDeclaration.INPUT |
+        			VariableDeclaration.INOUT |
+        			VariableDeclaration.OUTPUT;
+        		nd.setType((nd.getType() & ~mask) | VariableDeclaration.LOCAL);
+        	}
+        	nd.setName(s + nd.getName());
+            copy.add(nd);
+        }
+        return copy;
+    }
+
+    
     private StatementList embeddFunctionBlocksImpl(LocalScope origin, StatementList intoStatements,
                                                    VariableDeclaration vd, FunctionBlockDeclaration fbd) {
         final String prefix = vd.getName() + "$";
-        LocalScope embeddVariables = fbd.getLocalScope().prefixNames(prefix);
+        LocalScope embeddVariables = prefixNames(fbd.getLocalScope(), prefix);
 
         //declare new variables
         origin.getLocalVariables().putAll(embeddVariables.getLocalVariables());

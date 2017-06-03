@@ -13,9 +13,9 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="TEST" name="Maven: commons-io:commons-io:2.5" level="project" />
-    <orderEntry type="module" module-name="iec61131lang" />
+    <orderEntry type="library" name="Maven: edu.kit.iti.formal:iec61131lang:0.1.14-beta" level="project" />
     <orderEntry type="library" name="Maven: org.antlr:antlr4:4.5.3" level="project" />
-    <orderEntry type="module" module-name="smvtools" />
+    <orderEntry type="library" name="Maven: edu.kit.iti.formal:smv-model:0.1.3" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:20.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.12" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
