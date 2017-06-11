@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>iec61131lang</artifactId>
-    <version>0.1.15-beta</version>
+    <version>0.1.15-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>iec61131lang</name>

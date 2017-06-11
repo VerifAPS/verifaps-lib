@@ -26,7 +26,7 @@
     </repositories>
 
     <artifactId>iec-xml</artifactId>
-    <version>0.1.1-beta</version>
+    <version>0.1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>iec-xml</name>
@@ -61,7 +61,7 @@
         <dependency>
             <groupId>edu.kit.iti.formal</groupId>
             <artifactId>iec61131lang</artifactId>
-            <version>0.1.14-beta</version>
+            <version>0.1.15-SNAPSHOT</version>
         </dependency>
 
         <dependency>
