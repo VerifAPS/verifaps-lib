@@ -5,7 +5,7 @@
 
     <parent>
         <groupId>edu.kit.iti.formal</groupId>
-        <artifactId>verifaps</artifactId>
+        <artifactId>verifaps-lib</artifactId>
         <version>1.4.0</version>
         <relativePath>..</relativePath>
     </parent>
