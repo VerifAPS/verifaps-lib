@@ -1,0 +1,218 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+          "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+          "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+
+<!--
+    Checkstyle configuration that checks the Google coding conventions from Google Java Style
+    that can be found at https://google.github.io/styleguide/javaguide.html.
+
+    Checkstyle is very configurable. Be sure to read the documentation at
+    http://checkstyle.sf.net (or in your downloaded distribution).
+
+    To completely disable a check, just comment it out or delete it from the file.
+
+    Authors: Max Vetrenko, Ruslan Diachenko, Roman Ivanov.
+ -->
+
+<module identifier = "Checker">
+    <property identifier="charset" value="UTF-8"/>
+
+    <property identifier="severity" value="warning"/>
+
+    <property identifier="fileExtensions" value="java, properties, xml"/>
+    <!-- Checks for whitespace                               -->
+    <!-- See http://checkstyle.sf.net/config_whitespace.html -->
+        <module identifier="FileTabCharacter">
+            <property identifier="eachLine" value="true"/>
+        </module>
+
+    <module identifier="TreeWalker">
+        <module identifier="OuterTypeFilename"/>
+        <module identifier="IllegalTokenText">
+            <property identifier="tokens" value="STRING_LITERAL, CHAR_LITERAL"/>
+            <property identifier="format" value="\\u00(08|09|0(a|A)|0(c|C)|0(d|D)|22|27|5(C|c))|\\(0(10|11|12|14|15|42|47)|134)"/>
+            <property identifier="message" value="Avoid using corresponding octal or Unicode escape."/>
+        </module>
+        <module identifier="AvoidEscapedUnicodeCharacters">
+            <property identifier="allowEscapesForControlCharacters" value="true"/>
+            <property identifier="allowByTailComment" value="true"/>
+            <property identifier="allowNonPrintableEscapes" value="true"/>
+        </module>
+        <module identifier="LineLength">
+            <property identifier="max" value="100"/>
+            <property identifier="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+        </module>
+        <module identifier="AvoidStarImport"/>
+        <module identifier="OneTopLevelClass"/>
+        <module identifier="NoLineWrap"/>
+        <module identifier="EmptyBlock">
+            <property identifier="option" value="TEXT"/>
+            <property identifier="tokens" value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_SWITCH"/>
+        </module>
+        <module identifier="NeedBraces"/>
+        <module identifier="LeftCurly">
+            <property identifier="maxLineLength" value="100"/>
+        </module>
+        <module identifier="RightCurly"/>
+        <module identifier="RightCurly">
+            <property identifier="option" value="alone"/>
+            <property identifier="tokens" value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, LITERAL_DO, STATIC_INIT, INSTANCE_INIT"/>
+        </module>
+        <module identifier="WhitespaceAround">
+            <property identifier="allowEmptyConstructors" value="true"/>
+            <property identifier="allowEmptyMethods" value="true"/>
+            <property identifier="allowEmptyTypes" value="true"/>
+            <property identifier="allowEmptyLoops" value="true"/>
+            <message key="ws.notFollowed"
+             value="WhitespaceAround: ''{0}'' is not followed by whitespace. Empty blocks may only be represented as '{}' when not part of a multi-block statement (4.1.3)"/>
+             <message key="ws.notPreceded"
+             value="WhitespaceAround: ''{0}'' is not preceded with whitespace."/>
+        </module>
+        <module identifier="OneStatementPerLine"/>
+        <module identifier="MultipleVariableDeclarations"/>
+        <module identifier="ArrayTypeStyle"/>
+        <module identifier="MissingSwitchDefault"/>
+        <module identifier="FallThrough"/>
+        <module identifier="UpperEll"/>
+        <module identifier="ModifierOrder"/>
+        <module identifier="EmptyLineSeparator">
+            <property identifier="allowNoEmptyLineBetweenFields" value="true"/>
+        </module>
+        <module identifier="SeparatorWrap">
+            <property identifier="tokens" value="DOT"/>
+            <property identifier="option" value="nl"/>
+        </module>
+        <module identifier="SeparatorWrap">
+            <property identifier="tokens" value="COMMA"/>
+            <property identifier="option" value="EOL"/>
+        </module>
+        <module identifier="PackageName">
+            <property identifier="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+            <message key="identifier.invalidPattern"
+             value="Package identifier ''{0}'' must match pattern ''{1}''."/>
+        </module>
+        <module identifier="TypeName">
+            <message key="identifier.invalidPattern"
+             value="Type identifier ''{0}'' must match pattern ''{1}''."/>
+        </module>
+        <module identifier="MemberName">
+            <property identifier="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$"/>
+            <message key="identifier.invalidPattern"
+             value="Member identifier ''{0}'' must match pattern ''{1}''."/>
+        </module>
+        <module identifier="ParameterName">
+            <property identifier="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
+            <property identifier="excludeScope" value="public"/>
+            <message key="identifier.invalidPattern"
+             value="Parameter identifier ''{0}'' must match pattern ''{1}''."/>
+        </module>
+        <module identifier="ParameterName">
+            <property identifier="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$"/>
+            <property identifier="scope" value="public"/>
+            <message key="identifier.invalidPattern"
+             value="Parameter identifier ''{0}'' must match pattern ''{1}''."/>
+        </module>
+        <module identifier="CatchParameterName">
+            <property identifier="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$"/>
+            <message key="identifier.invalidPattern"
+             value="Catch parameter identifier ''{0}'' must match pattern ''{1}''."/>
+        </module>
+        <module identifier="LocalVariableName">
+            <property identifier="tokens" value="VARIABLE_DEF"/>
+            <property identifier="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$"/>
+            <property identifier="allowOneCharVarInForLoop" value="true"/>
+            <message key="identifier.invalidPattern"
+             value="Local variable identifier ''{0}'' must match pattern ''{1}''."/>
+        </module>
+        <module identifier="ClassTypeParameterName">
+            <property identifier="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
+            <message key="identifier.invalidPattern"
+             value="Class type identifier ''{0}'' must match pattern ''{1}''."/>
+        </module>
+        <module identifier="MethodTypeParameterName">
+            <property identifier="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
+            <message key="identifier.invalidPattern"
+             value="Method type identifier ''{0}'' must match pattern ''{1}''."/>
+        </module>
+        <module identifier="InterfaceTypeParameterName">
+            <property identifier="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
+            <message key="identifier.invalidPattern"
+             value="Interface type identifier ''{0}'' must match pattern ''{1}''."/>
+        </module>
+        <module identifier="NoFinalizer"/>
+        <module identifier="GenericWhitespace">
+            <message key="ws.followed"
+             value="GenericWhitespace ''{0}'' is followed by whitespace."/>
+             <message key="ws.preceded"
+             value="GenericWhitespace ''{0}'' is preceded with whitespace."/>
+             <message key="ws.illegalFollow"
+             value="GenericWhitespace ''{0}'' should followed by whitespace."/>
+             <message key="ws.notPreceded"
+             value="GenericWhitespace ''{0}'' is not preceded with whitespace."/>
+        </module>
+        <module identifier="Indentation">
+            <property identifier="basicOffset" value="2"/>
+            <property identifier="braceAdjustment" value="0"/>
+            <property identifier="caseIndent" value="2"/>
+            <property identifier="throwsIndent" value="4"/>
+            <property identifier="lineWrappingIndentation" value="4"/>
+            <property identifier="arrayInitIndent" value="2"/>
+        </module>
+        <module identifier="AbbreviationAsWordInName">
+            <property identifier="ignoreFinal" value="false"/>
+            <property identifier="allowedAbbreviationLength" value="1"/>
+        </module>
+        <module identifier="OverloadMethodsDeclarationOrder"/>
+        <module identifier="VariableDeclarationUsageDistance"/>
+        <module identifier="CustomImportOrder">
+            <property identifier="sortImportsInGroupAlphabetically" value="true"/>
+            <property identifier="separateLineBetweenGroups" value="true"/>
+            <property identifier="customImportOrderRules" value="STATIC###THIRD_PARTY_PACKAGE"/>
+        </module>
+        <module identifier="MethodParamPad"/>
+        <module identifier="ParenPad"/>
+        <module identifier="OperatorWrap">
+            <property identifier="option" value="NL"/>
+            <property identifier="tokens" value="BAND, BOR, BSR, BXOR, DIV, EQUAL, GE, GT, LAND, LE, LITERAL_INSTANCEOF, LOR, LT, MINUS, MOD, NOT_EQUAL, PLUS, QUESTION, SL, SR, STAR, METHOD_REF "/>
+        </module>
+        <module identifier="AnnotationLocation">
+            <property identifier="tokens" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF"/>
+        </module>
+        <module identifier="AnnotationLocation">
+            <property identifier="tokens" value="VARIABLE_DEF"/>
+            <property identifier="allowSamelineMultipleAnnotations" value="true"/>
+        </module>
+        <module identifier="NonEmptyAtclauseDescription"/>
+        <module identifier="JavadocTagContinuationIndentation"/>
+        <module identifier="SummaryJavadoc">
+            <property identifier="forbiddenSummaryFragments" value="^@return the *|^This method returns |^A [{]@code [a-zA-Z0-9]+[}]( is a )"/>
+        </module>
+        <module identifier="JavadocParagraph"/>
+        <module identifier="AtclauseOrder">
+            <property identifier="tagOrder" value="@param, @return, @throws, @deprecated"/>
+            <property identifier="target" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF, VARIABLE_DEF"/>
+        </module>
+        <module identifier="JavadocMethod">
+            <property identifier="scope" value="public"/>
+            <property identifier="allowMissingParamTags" value="true"/>
+            <property identifier="allowMissingThrowsTags" value="true"/>
+            <property identifier="allowMissingReturnTag" value="true"/>
+            <property identifier="minLineCount" value="2"/>
+            <property identifier="allowedAnnotations" value="Override, Test"/>
+            <property identifier="allowThrowsTagsForSubclasses" value="true"/>
+        </module>
+        <module identifier="MethodName">
+            <property identifier="format" value="^[a-z][a-z0-9][a-zA-Z0-9_]*$"/>
+            <message key="identifier.invalidPattern"
+             value="Method identifier ''{0}'' must match pattern ''{1}''."/>
+        </module>
+        <module identifier="SingleLineJavadoc">
+            <property identifier="ignoreInlineTags" value="false"/>
+        </module>
+        <module identifier="EmptyCatchBlock">
+            <property identifier="exceptionVariableName" value="expected"/>
+        </module>
+        <module identifier="CommentsIndentation"/>
+    </module>
+</module>
