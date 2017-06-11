@@ -1,0 +1,14 @@
+language: java
+jdk:
+  - oraclejdk8
+cache:
+  directoriei:
+  - .autoconf
+  - $HOME/.m2
+build: 
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+script: 
+  - mvn test -DrepoToken=$COVERALLS
+after_success:
+  - mvn clean cobertura:cobertura coveralls:report -DrepoToken=$COVERALLS
+

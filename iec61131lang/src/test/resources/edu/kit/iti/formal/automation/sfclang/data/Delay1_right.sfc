@@ -1,0 +1,51 @@
+SFC D1R
+
+    VAR_OUTPUT 
+        o : bool
+    END_VAR
+
+
+    VAR_INPUT 
+        i : int
+    END_VAR
+	
+	VAR
+		s : bool
+	END_VAR
+
+    STEP A 
+        ON active ACTION 
+            s := true
+        END_ACTION
+    END_STEP
+
+
+    STEP I2
+    END_STEP
+
+    STEP I1a
+        on active action 
+            s := not s;
+        end_action 
+    END_STEP
+    
+    STEP I1b
+    on active action 
+            s := not not s;
+        end_action 
+    END_STEP
+
+    STEP Boing
+        on active action 
+            o := s;
+        end_action
+    END_STEP
+
+
+    GOTO true :: A -> I1a
+    GOTO true :: A -> I1b
+    GOTO true :: I1a -> I2
+    GOTO true :: I1b -> I2
+    GOTO true :: I2 -> Boing
+
+END_SFC

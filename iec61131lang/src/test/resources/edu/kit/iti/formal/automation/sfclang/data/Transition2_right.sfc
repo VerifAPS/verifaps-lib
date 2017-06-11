@@ -1,0 +1,41 @@
+SFC T2R
+
+    VAR_OUTPUT 
+        o : int
+    END_VAR
+
+    VAR_INPUT 
+        i : int;
+    END_VAR 
+
+
+    STEP A
+        on active action 
+            o := i;
+        end_action
+    END_STEP 
+    
+    
+    STEP B1 
+        ON active ACTION
+            o := 1
+        END_ACTION
+    END_STEP
+    
+    STEP B2 
+        ON active ACTION
+            o := 2;
+        END_ACTION
+    END_STEP
+    
+    STEP B3 
+        ON active ACTION
+            o := 2;
+        END_ACTION
+    END_STEP
+
+    GOTO i<= 562          :: A -> B1;
+    GOTO i> 562 and i<600 :: A -> B2;
+    GOTO i>= 600          :: A -> B3;
+
+END_SFC

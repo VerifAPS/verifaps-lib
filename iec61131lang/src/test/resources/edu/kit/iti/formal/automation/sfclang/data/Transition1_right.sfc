@@ -1,0 +1,48 @@
+SFC T1R
+
+    VAR_OUTPUT 
+        o : bool;
+    END_VAR
+    
+    VAR_INPUT
+        i : int;
+    END_VAR
+	
+	VAR_INPUT
+		b :bool;
+	END_VAR
+
+    STEP A 
+        on active action 
+            o := true;
+        end_action 
+    END_STEP
+
+    STEP B1
+       on active action 
+            o := false;
+       end_action 
+    END_STEP
+
+    STEP B2
+       on active action 
+            o := false;
+       end_action 
+    END_STEP
+
+
+    STEP B3
+       on active action 
+            o := true;
+       end_action 
+    END_STEP
+
+    GOTO i<0 :: A->B1
+    GOTO i=0 :: A->B2
+    GOTO i>0 :: A->B3
+
+    GOTO not b :: B1->A
+    GOTO not b :: B2->A
+    GOTO  b :: B3->A
+
+END_SFC

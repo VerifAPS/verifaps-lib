@@ -1,0 +1,31 @@
+SFC I1L
+
+    VAR_INPUT   i : bool; j :bool END_VAR
+    VAR_OUTPUT  o : int; END_VAR
+
+    STEP A 
+        on active action 
+        end_action 
+    END_STEP
+
+
+    STEP Sub
+        on active action 
+            o := o - 1;
+        end_action 
+    END_STEP
+
+    STEP Add
+        on active action 
+            o := o + 1;
+        end_action 
+    END_STEP
+    
+    
+    GOTO i and not j :: A -> Sub
+    GOTO j and not i :: A -> Add
+    
+    GOTO true :: Add -> A
+    GOTO true :: Sub -> A
+    
+END_SFC

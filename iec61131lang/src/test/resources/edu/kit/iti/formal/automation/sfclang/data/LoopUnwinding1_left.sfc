@@ -1,0 +1,170 @@
+SFC Unwinded
+
+    VAR_OUTPUT 
+        o : INT;
+    END_VAR
+
+    GOTO TRUE :: A -> B;
+    GOTO TRUE :: B -> C;
+    GOTO TRUE :: C -> D;    
+    GOTO TRUE :: D -> E;    
+    GOTO TRUE :: E -> F;    
+    GOTO TRUE :: F -> G;
+    GOTO TRUE :: G -> H;
+    GOTO TRUE :: H -> I;
+    GOTO TRUE :: I -> J;
+    GOTO TRUE :: J -> K;
+    GOTO TRUE :: K -> L;
+    GOTO TRUE :: L -> M;
+    GOTO TRUE :: M -> N;
+    GOTO TRUE :: N -> O;
+    GOTO TRUE :: O -> P;
+    GOTO TRUE :: P -> Q;
+    GOTO TRUE :: Q -> R;
+    GOTO TRUE :: R -> S;
+    GOTO TRUE :: S -> T;
+    GOTO TRUE :: T -> U;
+    GOTO TRUE :: U -> V;
+    GOTO TRUE :: V -> A;
+
+    STEP A
+        ON active ACTION
+            o := 1
+        END_ACTION 
+    END_STEP
+
+    STEP B
+        ON active ACTION
+            o := 2
+        END_ACTION 
+    END_STEP
+
+
+    STEP C
+        ON active ACTION
+            o := 3
+        END_ACTION 
+    END_STEP
+
+    STEP D
+        ON active ACTION
+            o := 4
+        END_ACTION 
+    END_STEP
+
+
+    STEP E
+        ON active ACTION
+            o := 5
+        END_ACTION 
+    END_STEP
+
+    STEP F
+        ON active ACTION
+            o := 6
+        END_ACTION 
+    END_STEP
+
+
+    STEP G
+        ON active ACTION
+            o := 7
+        END_ACTION 
+    END_STEP
+
+    STEP H
+        ON active ACTION
+            o := 8
+        END_ACTION 
+    END_STEP
+
+    STEP I
+        ON active ACTION
+            o := 9
+        END_ACTION 
+    END_STEP
+
+
+    STEP J
+        ON active ACTION
+            o := 10
+        END_ACTION 
+    END_STEP
+
+    STEP K
+        ON active ACTION
+            o := 11
+        END_ACTION 
+    END_STEP
+    
+    STEP L
+        ON active ACTION
+            o := 12
+        END_ACTION 
+    END_STEP
+
+
+    STEP M
+        ON active ACTION
+            o := 13
+        END_ACTION 
+    END_STEP
+
+    STEP N
+        ON active ACTION
+            o := 14
+        END_ACTION 
+    END_STEP
+
+    STEP O
+        ON active ACTION
+            o := 15
+        END_ACTION 
+    END_STEP
+	
+	 STEP P
+        ON active ACTION
+            o := 16
+        END_ACTION 
+    END_STEP
+
+
+    STEP Q
+        ON active ACTION
+            o := 17
+        END_ACTION 
+    END_STEP
+
+    STEP R
+        ON active ACTION
+            o := 18
+        END_ACTION 
+    END_STEP
+
+    STEP S
+        ON active ACTION
+            o := 19
+        END_ACTION 
+    END_STEP
+
+
+    STEP T
+        ON active ACTION
+            o := 20
+        END_ACTION 
+    END_STEP
+
+    STEP U
+        ON active ACTION
+            o := 21
+        END_ACTION
+    END_STEP
+
+    STEP V
+        ON active ACTION
+            o := 22 
+        END_ACTION 
+    END_STEP
+    
+
+END_SFC
