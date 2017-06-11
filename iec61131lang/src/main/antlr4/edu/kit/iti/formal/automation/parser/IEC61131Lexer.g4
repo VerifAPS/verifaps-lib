@@ -941,7 +941,7 @@ WS
 
 COMMENT
 :
-	'(*' ~[]* '*)' -> channel ( HIDDEN )
+	'(*' .*? '*)' -> channel ( HIDDEN )
 ;
 
 LINE_COMMENT

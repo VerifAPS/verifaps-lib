@@ -24,6 +24,7 @@ package edu.kit.iti.formal.smv.parser;
 
 import edu.kit.iti.formal.smv.ast.*;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -346,31 +347,23 @@ public class SMVTransformToAST extends SMVBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitCtlUnaryExpr(SMVParser.CtlUnaryExprContext ctx) {
+    public Object visitTemporalBinExpr(SMVParser.TemporalBinExprContext ctx) {
         return new SQuantified(STemporalOperator.valueOf(ctx.op),
-                (SMVExpr) ctx.expr().accept(this));
+                (SMVExpr) ctx.left.accept(this),
+                (SMVExpr) ctx.right.accept(this));
     }
 
     @Override
-    public Object visitLtlBinaryOp(SMVParser.LtlBinaryOpContext ctx) {
-        return new SQuantified(STemporalOperator.valueOf(ctx.op),
-                (SMVExpr) ctx.expr(0).accept(this),
-                (SMVExpr) ctx.expr(1).accept(this));
-    }
-
-    @Override
-    public Object visitCtlBinaryOp(SMVParser.CtlBinaryOpContext ctx) {
-        return new SQuantified(STemporalOperator.valueOf(ctx.op),
-                (SMVExpr) ctx.expr(0).accept(this),
-                (SMVExpr) ctx.expr(1).accept(this));
-    }
-
-    @Override
-    public Object visitLtlUnaryOp(SMVParser.LtlUnaryOpContext ctx) {
+    public Object visitTemporalUnaryExpr(SMVParser.TemporalUnaryExprContext ctx) {
         return new SQuantified(
                 STemporalOperator.valueOf(ctx.op),
                 (SMVExpr) ctx.expr().accept(this)
         );
+    }
+
+    @Override
+    public SMVExpr visitTemporalParen(SMVParser.TemporalParenContext ctx) {
+        return (SMVExpr) ctx.expr().accept(this);
     }
 
     @Override
@@ -406,9 +399,15 @@ public class SMVTransformToAST extends SMVBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitNumberExpr(SMVParser.NumberExprContext ctx) {
+    public Object visitIntegerLiteral(SMVParser.IntegerLiteralContext ctx) {
         return new SLiteral(SMVType.INT,
                 new BigInteger(ctx.value.getText()));
+    }
+
+    @Override
+    public Object visitFloatLiteral(SMVParser.FloatLiteralContext ctx) {
+        return new SLiteral(SMVType.FLOAT,
+                new BigDecimal(ctx.value.getText()));
     }
 
     @Override

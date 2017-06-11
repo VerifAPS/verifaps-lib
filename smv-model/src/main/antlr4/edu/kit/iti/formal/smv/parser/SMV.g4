@@ -113,10 +113,10 @@ moduleType :
 
 
 expr
-    : expr op=('U'|'V'|'S'|'T') expr  #ltlBinaryOp
-    | op=('X' | 'G' | 'F' | 'Y' | 'Z' | 'H' | 'O') expr #ltlUnaryOp
-    | expr op=('AU'|'EU') expr  #ctlBinaryOp
-    | op=('EG' | 'EX' | 'EF' | 'AG' | 'AX' | 'AF') expr #ctlUnaryExpr
+    : left=expr op=('AU'|'EU'|'U'|'V'|'S'|'T') right=expr #temporalBinExpr
+    | op=('EG' | 'EX' | 'EF' | 'AG' | 'AX' | 'AF'| 'X'
+         | 'G' | 'F' | 'Y' | 'Z' | 'H' | 'O') expr #temporalUnaryExpr
+    | '(' expr ')' #temporalParen
     | stateExpr #exprStateExpr
     ;
 
@@ -142,12 +142,13 @@ stateExpr:
 
 terminalAtom
     : '(' stateExpr ')'                  # paren
-	| func=ID '(' stateExpr (',' stateExpr)* ')'          # functionExpr
+	| func=(ID|'next'|'init') '(' stateExpr (',' stateExpr)* ')'          # functionExpr
 	| casesExpr                          # casesExprAtom
 	| var=ID                             # variableAccess
 	| var=ID ('[' NUMBER ']')*           # arrayAccess
 	| value=ID ('.' dotted=terminalAtom | ('[' array+=NUMBER ']')*)? #variableDotted
-	| value=NUMBER #numberExpr
+	| value=NUMBER #integerLiteral
+	| value=FLOAT #floatLiteral
 	| value='TRUE' #trueExpr
 	| value='FALSE' #falseExpr
 	| '{' stateExpr (',' stateExpr)* '}' #setExpr
@@ -155,7 +156,7 @@ terminalAtom
 	| rangeExpr #rangeExpr2
     ;
 
-rangeExpr : lower=NUM '..' upper=NUM;
+rangeExpr : lower=NUMBER '..' upper=NUMBER;
 
 casesExpr :
 	'case' (branches+=caseBranch)+ 'esac';
@@ -175,6 +176,8 @@ WORD:
 ID:
 	('A'..'Z' | 'a'..'z' | '_' | '$' | '#' | '-' | '.')+;
 
-INT: ('0'..'9')+;
+fragment INT: ('0'..'9')+;
+FLOAT: INT '.' INT;
+
 
 WS:	(' ' | '\t' | '\r' | '\n')+ -> channel(HIDDEN);

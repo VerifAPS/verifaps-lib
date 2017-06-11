@@ -22,16 +22,19 @@ package edu.kit.iti.formal.smv;
  * #L%
  */
 
-import java.util.Arrays;
+import edu.kit.iti.formal.smv.ast.*;
+import edu.kit.iti.formal.smv.ast.SCaseExpression.Case;
+
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import edu.kit.iti.formal.smv.ast.*;
-import edu.kit.iti.formal.smv.ast.SCaseExpression.Case;
-import edu.kit.iti.formal.smv.ast.SVariable;
-
 public class Printer implements SMVAstVisitor<String> {
+
+    public static String toString(SMVModule m) {
+        Printer p = new Printer();
+        return p.visit(m);
+    }
 
     @Override
     public String visit(SMVAst top) {
@@ -100,12 +103,6 @@ public class Printer implements SMVAstVisitor<String> {
 
         sb.append("\nesac");
         return sb.toString();
-    }
-
-
-    public static String toString(SMVModule m) {
-        Printer p = new Printer();
-        return p.visit(m);
     }
 
     @Override
@@ -200,6 +197,21 @@ public class Printer implements SMVAstVisitor<String> {
                 + ")";
     }
 
+    @Override
+    public String visit(SQuantified quantified) {
+        switch (quantified.getOperator().arity()) {
+            case 1:
+                return quantified.getOperator().symbol()
+                        + "(" + quantified.getQuantified(0).accept(this) + ")";
+            case 2:
+                return "(" + quantified.getQuantified(0).accept(this) + ")"
+                        + quantified.getOperator().symbol()
+                        + "(" + quantified.getQuantified(1).accept(this) + ")";
+            default:
+                throw new IllegalStateException("too much arity");
+        }
+    }
+
     private void printVariables(StringBuilder sb, String type, List<SVariable> vars) {
         if (vars.size() != 0) {
             sb.append(type).append('\n');
@@ -215,7 +227,6 @@ public class Printer implements SMVAstVisitor<String> {
             sb.append("-- end of ").append(type).append('\n');
         }
     }
-
 
 
     @Override

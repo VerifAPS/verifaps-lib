@@ -57,4 +57,21 @@ public class SQuantified extends SMVExpr {
     public <T> T accept(SMVAstVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    public STemporalOperator getOperator() {
+        return operator;
+    }
+
+    public void setOperator(STemporalOperator operator) {
+        this.operator = operator;
+    }
+
+    public List<SMVExpr> getQuantified() {
+        return quantified;
+    }
+
+
+    public SMVExpr getQuantified(int i) {
+        return quantified.get(i);
+    }
 }

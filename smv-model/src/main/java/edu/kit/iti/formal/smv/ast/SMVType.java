@@ -24,6 +24,7 @@ package edu.kit.iti.formal.smv.ast;
 
 import edu.kit.iti.formal.smv.Printer;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -143,21 +144,22 @@ public class SMVType {
 
         @Override
         public String format(Object value) {
-            long l = 0;
+            BigInteger bigInteger = BigInteger.ZERO;
             if (value instanceof String) {
-                l = Long.parseLong(value.toString());
+                bigInteger = new BigInteger(value.toString());
             } else if (value instanceof Integer) {
                 Integer integer = (Integer) value;
-                l = integer;
+                bigInteger = BigInteger.valueOf((Integer) value);
             } else if (value instanceof Long) {
-                l = (Long) value;
-            }
+                bigInteger = BigInteger.valueOf((Long) value);
+            } else if (value instanceof BigInteger)
+                bigInteger = (BigInteger) value;
 
-            return String.format("%s0%sd%d_%d",
-                    (l < 0 ? "-" : ""),
+            return String.format("%s0%sd%d_%s",
+                    (bigInteger.signum() < 0 ? "-" : ""),
                     (baseType == GroundDataType.SIGNED_WORD ? "s" : "u"),
                     width,
-                    Math.abs(l));
+                    bigInteger.abs().toString());
         }
     }
 

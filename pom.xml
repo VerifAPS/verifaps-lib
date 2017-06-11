@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.kit.iti.formal</groupId>
-    <artifactId>verifaps</artifactId>
+    <artifactId>verifaps-lib</artifactId>
     <version>1.4.0</version>
     <packaging>pom</packaging>
 
@@ -27,6 +27,7 @@
         <module>iec61131lang</module>
         <module>smv-model</module>
         <module>iec-xml</module>
+        <module>aps-rvt</module>
     </modules>
 
     <properties>
@@ -57,7 +58,11 @@
     </prerequisites>
 
     <distributionManagement>
-
+        <repository>
+            <id>bintray-verifaps-all</id>
+            <name>verifaps-all</name>
+            <url>https://api.bintray.com/maven/verifaps/all/verifaps-lib/;publish=1</url>
+        </repository>
     </distributionManagement>
 
     <build>
@@ -74,7 +79,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>

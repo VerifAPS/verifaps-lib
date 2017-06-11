@@ -68,6 +68,14 @@ public enum STemporalOperator {
         return valueOf(op.getText());
     }
 
+    public int arity() {
+        return arity;
+    }
+
+    public String symbol() {
+        return symbol;
+    }
+
     private enum TemporalLanguage {
         LTL, CTL, PSL
     }

@@ -20,12 +20,14 @@
         AST and Printer for Symbolic Model Verifier format.
     </description>
 
-    <repositories>
+
+    <distributionManagement>
         <repository>
-            <id>institute</id>
-            <url>https://formal.iti.kit.edu/maven2</url>
+            <id>bintray-verifaps-all</id>
+            <name>verifaps-all</name>
+            <url>https://api.bintray.com/maven/verifaps/all/smv-model/;publish=1</url>
         </repository>
-    </repositories>
+    </distributionManagement>
 
     <build>
         <plugins>
