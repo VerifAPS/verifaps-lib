@@ -30,6 +30,9 @@ import java.util.List;
 
 public class SMVType {
     public static final SMVType BOOLEAN = new SMVType(GroundDataType.BOOLEAN);
+    public static final SMVType INT = new SMVType(GroundDataType.INT);
+    public static final SMVType FLOAT = new SMVType(GroundDataType.FLOAT);
+
     protected GroundDataType baseType;
 
     public SMVType() {
@@ -37,6 +40,24 @@ public class SMVType {
 
     public SMVType(GroundDataType b) {
         baseType = b;
+    }
+
+    public static SMVType infer(List<SMVType> list) {
+        //TODO
+        return null;
+    }
+
+    public static SMVType infer(SMVType a, SMVType b) {
+        //TODO
+        return null;
+    }
+
+    public static SMVType unsigned(int i) {
+        return new SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, i);
+    }
+
+    public static SMVType signed(int i) {
+        return new SMVTypeWithWidth(GroundDataType.SIGNED_WORD, i);
     }
 
     public GroundDataType getBaseType() {
@@ -63,14 +84,20 @@ public class SMVType {
         return baseType.hashCode();
     }
 
-    public static SMVType infer(List<SMVType> list) {
-        //TODO
-        return null;
+    public SLiteral valueOf(String value) {
+        SLiteral l = new SLiteral();
+        l.dataType = this;
+        l.value = baseType.parse(value);
+        return l;
     }
 
-    public static SMVType infer(SMVType a, SMVType b) {
-        //TODO
-        return null;
+    public String format(Object value) {
+        return baseType.format(value);
+    }
+
+    @Override
+    public String toString() {
+        return "boolean";
     }
 
     public static class SMVTypeWithWidth extends SMVType {
@@ -183,30 +210,6 @@ public class SMVType {
         }
     }
 
-    public static SMVType unsigned(int i) {
-        return new SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, i);
-    }
-
-    public static SMVType signed(int i) {
-        return new SMVTypeWithWidth(GroundDataType.SIGNED_WORD, i);
-    }
-
-    public SLiteral valueOf(String value) {
-        SLiteral l = new SLiteral();
-        l.dataType = this;
-        l.value = baseType.parse(value);
-        return l;
-    }
-
-    public String format(Object value) {
-        return baseType.format(value);
-    }
-
-    @Override
-    public String toString() {
-        return "boolean";
-    }
-
     public static class Module extends SMVType {
         private final List<? extends SMVExpr> parameters;
         private final String moduleName;
@@ -251,4 +254,5 @@ public class SMVType {
             return result;
         }
     }
+
 }

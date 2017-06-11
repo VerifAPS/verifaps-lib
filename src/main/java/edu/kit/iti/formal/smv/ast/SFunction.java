@@ -26,22 +26,28 @@ import edu.kit.iti.formal.smv.FunctionTypeSolver;
 import edu.kit.iti.formal.smv.SMVAstVisitor;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Alexander Weigl
  * @version 1 (12.12.16)
  */
 public class SFunction extends SMVExpr {
-    private final SMVExpr[] arguments;
+    private final List<SMVExpr> arguments;
     private final String functionName;
     private FunctionTypeSolver typeSolver;
 
     public SFunction(String funcName, SMVExpr... expr) {
         this.functionName = funcName;
-        this.arguments = expr;
+        this.arguments = Arrays.asList(expr);
     }
 
-    public SMVExpr[] getArguments() {
+    public SFunction(String text, List<SMVExpr> exprs) {
+        this.functionName = text;
+        this.arguments = exprs;
+    }
+
+    public List<SMVExpr> getArguments() {
         return arguments;
     }
 
@@ -69,6 +75,6 @@ public class SFunction extends SMVExpr {
 
     @Override
     public String toString() {
-        return functionName + "(" + Arrays.toString(arguments) +")";
+        return functionName + "(" + arguments + ")";
     }
 }

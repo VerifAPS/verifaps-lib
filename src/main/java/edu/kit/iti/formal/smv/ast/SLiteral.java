@@ -34,9 +34,8 @@ import edu.kit.iti.formal.smv.SMVAstVisitor;
  *
  */
 public class SLiteral extends SMVExpr {
-    public static final SMVExpr TRUE = new SLiteral(SMVType.BOOLEAN, true);
-
-    public static final SMVExpr FALSE = new SLiteral(SMVType.BOOLEAN, false);
+    public static final SLiteral TRUE = new SLiteral(SMVType.BOOLEAN, true);
+    public static final SLiteral FALSE = new SLiteral(SMVType.BOOLEAN, false);
 
     /**
      *
@@ -96,8 +95,7 @@ public class SLiteral extends SMVExpr {
         return result;
     }
 
-    public static class LiteralBuilder {
-
+    public static class LiteralBuilder<T> {
         private final SLiteral literal;
 
         public LiteralBuilder(Object value) {

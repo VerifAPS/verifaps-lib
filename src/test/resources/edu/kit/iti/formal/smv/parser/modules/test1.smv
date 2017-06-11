@@ -1,0 +1,17 @@
+MODULE main
+
+IVAR
+        x : unsigned word[4];
+
+VAR
+        s : unsigned word[4];
+        dbz : boolean;
+
+INVARSPEC
+        ! dbz;
+
+ASSIGN
+init(dbz) := FALSE;
+next(dbz) := x = 0ud4_0;
+init(s) := 0ud4_15;
+next(s) := s / x;

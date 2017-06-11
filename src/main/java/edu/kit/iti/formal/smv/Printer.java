@@ -193,7 +193,7 @@ public class Printer implements SMVAstVisitor<String> {
     @Override
     public String visit(SFunction func) {
         return func.getFunctionName() + "(" +
-                Arrays.stream(func.getArguments())
+                func.getArguments().stream()
                         .map(a -> a.accept(this))
                         .reduce((a, b) -> a + ", " + b)
                         .get()

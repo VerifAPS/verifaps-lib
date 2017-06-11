@@ -148,4 +148,14 @@ public enum SBinaryOperator implements SOperator {
     public String symbol() {
         return symbol;
     }
+
+    public static SBinaryOperator findBySymbol(String symbol) {
+        for (SBinaryOperator op :
+                values()) {
+            if (op.symbol.equalsIgnoreCase(symbol)) {
+                return op;
+            }
+        }
+        return null;
+    }
 }

@@ -33,10 +33,10 @@ import jdk.nashorn.internal.ir.FunctionCall;
  */
 public class FunctionTypeSolvers {
     public static final FunctionTypeSolver FIRST_ARGUMENT =
-            (SFunction f) -> f.getArguments()[0].getSMVType();
+            (SFunction f) -> f.getArguments().get(0).getSMVType();
 
     public static final FunctionTypeSolver LAST_ARGUMENT =
-            (SFunction f) -> f.getArguments()[f.getArguments().length - 1].getSMVType();
+            (SFunction f) -> f.getArguments().get(f.getArguments().size() - 1).getSMVType();
 
     public static final FunctionTypeSolver TO_SIGNED =
             (SFunction f) -> {

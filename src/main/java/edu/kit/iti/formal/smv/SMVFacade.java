@@ -33,7 +33,7 @@ import java.util.function.BinaryOperator;
  */
 public class SMVFacade {
     public static SFunction getFunction1(String name) {
-        SFunction f = new SFunction(name, null);
+        SFunction f = new SFunction(name);
         f.setTypeSolver(FunctionTypeSolvers.FIRST_ARGUMENT);
         return f;
     }
