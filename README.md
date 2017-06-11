@@ -138,7 +138,7 @@ END_SFC
                 <elements>*
             END_SFC
 
-<element>   :== <var_decl> | <step_decl> | <transition>
+<entry>   :== <var_decl> | <step_decl> | <transition>
 <step_decl> :== STEP <identifier>
                   on <event> (action <statement>* end_action
                              | <function-identifier> )

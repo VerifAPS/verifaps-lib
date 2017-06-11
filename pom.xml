@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>iec61131lang</artifactId>
-    <version>0.1.14-beta</version>
+    <version>0.1.15-beta</version>
     <packaging>jar</packaging>
 
     <name>iec61131lang</name>
@@ -31,7 +31,7 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.5.3</version>
+                <version>4.7</version>
 
                 <configuration>
                     <atn>false</atn>
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4</artifactId>
-            <version>4.5.3</version>
+            <version>4.7</version>
         </dependency>
     </dependencies>
 </project>
