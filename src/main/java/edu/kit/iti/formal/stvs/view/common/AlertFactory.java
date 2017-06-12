@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.view.common;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Locale;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
@@ -41,8 +42,12 @@ public class AlertFactory {
     exception.printStackTrace(pw);
     String stackTrace = sw.toString();
 
-    return createAlert(Alert.AlertType.ERROR, title, description, exception.getMessage(),
-        stackTrace);
+    return createAlert(Alert.AlertType.ERROR, title, description, exception.getMessage()
+        /*
+          // Decided in Issue https://github.com/VerifAPS/stvs/issues/20, that the expandable content
+          // should not be shown, instead it should be just logged
+        , stackTrace
+        //*/);
   }
 
   /**
@@ -85,7 +90,7 @@ public class AlertFactory {
     textArea.setMaxHeight(Double.MAX_VALUE);
     GridPane.setVgrow(textArea, Priority.ALWAYS);
     GridPane.setHgrow(textArea, Priority.ALWAYS);
-
+    
     if (expandableContent != null && expandableContent.length() > 0) {
       GridPane expContent = new GridPane();
       expContent.setMaxWidth(Double.MAX_VALUE);
