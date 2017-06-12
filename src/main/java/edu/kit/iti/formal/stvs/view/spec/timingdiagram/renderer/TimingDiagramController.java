@@ -136,6 +136,7 @@ public class TimingDiagramController implements Controller {
     yaxis.setPrefWidth(30);
     yaxis.setSide(Side.LEFT);
     yaxis.setTickLabelFormatter(new IntegerTickLabelConverter());
+    yaxis.setMinorTickVisible(false);
     TimingDiagramController timingDiagramController = new TimingDiagramController(globalXAxis,
         yaxis, concreteSpec, specIoVar, selection, activated);
     return new ImmutablePair<>(timingDiagramController, yaxis);
