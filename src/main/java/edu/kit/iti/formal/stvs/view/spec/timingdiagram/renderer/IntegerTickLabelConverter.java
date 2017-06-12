@@ -25,7 +25,7 @@ public class IntegerTickLabelConverter extends StringConverter<Number> {
   @Override
   public String toString(Number number) {
     if (number.intValue() == number.doubleValue()) {
-      return ""+number;
+      return ""+number.intValue();
     }
     return "";
   }
