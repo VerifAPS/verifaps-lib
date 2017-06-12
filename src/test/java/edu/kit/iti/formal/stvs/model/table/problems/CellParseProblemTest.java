@@ -26,8 +26,7 @@ public class CellParseProblemTest {
 
   @Before
   public void setUp() {
-    parseEx = new ParseException(1, 2, "extraneous input '<>' expecting {'(', '-', NOT, 'if', T, "
-        + "F, IDENTIFIER, INTEGER}");
+    parseEx = new ParseException(1, 2, "no viable alternative at input '<>'");
     problem = new CellParseProblem(parseEx, "A", 4);
   }
 
