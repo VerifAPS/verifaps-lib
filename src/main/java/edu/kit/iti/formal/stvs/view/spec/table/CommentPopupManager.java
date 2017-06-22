@@ -39,7 +39,6 @@ public class CommentPopupManager {
     CommentPopup popup = new CommentPopup(commentable.getComment());
     popup.setEditable(editable);
     Optional<String> newValue = popup.showAndWait();
-    System.out.println(newValue);
     newValue.ifPresent(commentable::setComment);
 
   }

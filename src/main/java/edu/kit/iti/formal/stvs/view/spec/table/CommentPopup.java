@@ -52,10 +52,16 @@ public class CommentPopup extends Dialog<String> implements Lockable {
        }
     });
 
+    this.setResultConverter(buttonType -> this.getTextValue());
+
 
     this.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
     this.getDialogPane().setContent(grid);
     this.getDialogPane().setId("CommentPopupPane");
+  }
+
+  public String getTextValue() {
+    return commentField.getText();
   }
 
   public TextArea getCommentField() {
@@ -76,4 +82,6 @@ public class CommentPopup extends Dialog<String> implements Lockable {
   public BooleanProperty getEditableProperty() {
     return editable;
   }
+
+
 }
