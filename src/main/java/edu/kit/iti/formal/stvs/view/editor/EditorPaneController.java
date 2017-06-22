@@ -9,26 +9,24 @@ import edu.kit.iti.formal.stvs.model.code.ParsedCode;
 import edu.kit.iti.formal.stvs.model.code.SyntaxError;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.view.Controller;
-
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.KeyEvent;
 import org.antlr.v4.runtime.Token;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
+
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by csicar on 09.01.17. Some parts are inspired by examples of the used library:
@@ -69,6 +67,20 @@ public class EditorPaneController implements Controller {
                 (observable, oldValue, newValue) -> updateFontFamily(newValue));
         updateFontFamily(globalConfig.getEditorFontFamily());
         updateFontSize(globalConfig.getEditorFontSize());
+        filterAltEvents();
+    }
+
+    private void filterAltEvents() {
+
+        EventHandler<KeyEvent> handler = e -> {
+            if(e.isAltDown()) {
+                System.out.println("AltDown");
+                Event.fireEvent(this.view, e);
+            }
+        };
+        this.view.getCodeArea().setOnKeyPressed(handler);
+
+
     }
 
     private void updateFontFamily(String fontFamily) {
@@ -95,6 +107,7 @@ public class EditorPaneController implements Controller {
         item.setOnAction(t -> action.run());
         return item;
     }
+
 
     private void setupContextMenu() {
         CodeArea codeArea = view.getCodeArea();
