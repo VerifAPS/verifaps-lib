@@ -49,12 +49,6 @@ public class SpecificationTableView extends VBox {
         @Override
         protected void updateItem(Object item, boolean empty) {
           super.updateItem(item, empty);
-          System.out.println(item);
-          System.out.println(empty);
-          System.out.println(this.getTableRow());
-          System.out.println(this);
-          System.out.println("----\n\n");
-          System.out.println(this.getIndex());
           if (empty) {
             setText("");
           } else {
