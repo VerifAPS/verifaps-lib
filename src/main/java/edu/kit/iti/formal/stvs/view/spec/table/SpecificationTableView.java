@@ -2,7 +2,10 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 
 import edu.kit.iti.formal.stvs.model.table.HybridRow;
 import edu.kit.iti.formal.stvs.view.ViewUtils;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -28,9 +31,39 @@ public class SpecificationTableView extends VBox {
     this.header = header;
     header.getStyleClass().add("spec-header");
     this.tableView = tableView;
+    tableView.getColumns().add(0, createIndexColumn());
     this.getChildren().addAll(header, tableView);
     setVgrow(tableView, Priority.ALWAYS);
     ViewUtils.setupView(this);
+  }
+
+  /**
+   * creates the index column at the front of the table
+   */
+  private TableColumn<HybridRow, Object> createIndexColumn() {
+    TableColumn<HybridRow, Object> indexColumn = new TableColumn<>("#");
+    indexColumn.setSortable(false);
+    indexColumn.setCellFactory(hybridRowObjectTableColumn ->
+      new TableCell<HybridRow, Object>(){
+
+        @Override
+        protected void updateItem(Object item, boolean empty) {
+          super.updateItem(item, empty);
+          System.out.println(item);
+          System.out.println(empty);
+          System.out.println(this.getTableRow());
+          System.out.println(this);
+          System.out.println("----\n\n");
+          System.out.println(this.getIndex());
+          if (empty) {
+            setText("");
+          } else {
+            setText(this.getIndex() + "");
+          }
+        }
+      }
+    );
+    return indexColumn;
   }
 
   /**
