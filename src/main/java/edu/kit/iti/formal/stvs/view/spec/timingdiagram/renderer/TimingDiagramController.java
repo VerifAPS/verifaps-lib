@@ -114,6 +114,10 @@ public class TimingDiagramController implements Controller {
     initCommon();
   }
 
+
+  /*
+  All Diagrams are constructed via factory-methods because the NumberAxis is a final class.
+   */
   /**
    * Generates an integer timing diagram.
    *
@@ -131,6 +135,8 @@ public class TimingDiagramController implements Controller {
     NumberAxis yaxis = new NumberAxis(0, 10, 1);
     yaxis.setPrefWidth(30);
     yaxis.setSide(Side.LEFT);
+    yaxis.setTickLabelFormatter(new IntegerTickLabelConverter());
+    yaxis.setMinorTickVisible(false);
     TimingDiagramController timingDiagramController = new TimingDiagramController(globalXAxis,
         yaxis, concreteSpec, specIoVar, selection, activated);
     return new ImmutablePair<>(timingDiagramController, yaxis);

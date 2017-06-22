@@ -26,8 +26,7 @@ public class CellParseProblemTest {
 
   @Before
   public void setUp() {
-    parseEx = new ParseException(1, 2, "extraneous input '<>' expecting {'(', '-', NOT, 'if', T, "
-        + "F, IDENTIFIER, INTEGER}");
+    parseEx = new ParseException(1, 2, "extraneous input '<>' expecting {'(', '-', NOT, 'if', T, F, IDENTIFIER, INTEGER}");
     problem = new CellParseProblem(parseEx, "A", 4);
   }
 
@@ -44,7 +43,7 @@ public class CellParseProblemTest {
           problematicCell);
     } catch (CellProblem problem) {
       assertThat(problem, instanceOf(CellParseProblem.class));
-      assertEquals(problem, this.problem);
+      assertEquals(this.problem, problem);
     }
   }
 

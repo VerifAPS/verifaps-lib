@@ -15,7 +15,7 @@ public class VerticalResizeContainerView extends AnchorPane {
   private VBox container = new VBox();
   private AnchorPane content = new AnchorPane();
   private VBox contentContainer = new VBox();
-  private Rectangle dragLine = new Rectangle(10, 5, Color.BEIGE);
+  private Rectangle dragLine = new Rectangle(10, 10, Color.BEIGE);
 
   /**
    * Creates an instance of this container class.
