@@ -22,7 +22,10 @@ package edu.kit.iti.formal.automation.st;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.TestUtils;
+import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import org.antlr.v4.runtime.CharStreams;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -51,7 +54,21 @@ public class InValidExpressionTest {
 
     @Test
     public void testInValidExpression() {
-        assertFalse(ValidExpressionTest.test(invalid));
+        IEC61131Parser parser = IEC61131Facade.getParser(CharStreams.fromString(invalid));
+        boolean error = false;
+        try {
+            IEC61131Parser.ExpressionContext ctx = parser.expression();
+            System.out.println(ctx.toString(parser));
+            System.out.println(IEC61131Facade.print(IEC61131Facade.expr(invalid)));
+            System.out.println(ctx.stop.getTokenSource().nextToken());
+            error = !ctx.stop.getTokenSource().nextToken().getText().equals("EOF");
+            //error = false;
+        } catch (Exception e) {
+            error = true;
+        }
+        error = error || parser.getNumberOfSyntaxErrors() > 0;
+        System.out.println(parser.getNumberOfSyntaxErrors());
+        assertTrue(error);
     }
 }
 

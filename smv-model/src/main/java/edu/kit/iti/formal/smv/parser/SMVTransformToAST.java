@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * @version 1 (10.06.17)
  */
 public class SMVTransformToAST extends SMVBaseVisitor<Object> {
-    private SMVModuleImpl lastModule;
+    private SMVModule lastModule;
 
     @Override
     public List<SMVModule> visitModules(SMVParser.ModulesContext ctx) {
@@ -45,8 +45,8 @@ public class SMVTransformToAST extends SMVBaseVisitor<Object> {
     }
 
     @Override
-    public SMVModuleImpl visitModule(SMVParser.ModuleContext ctx) {
-        SMVModuleImpl module = new SMVModuleImpl();
+    public SMVModule visitModule(SMVParser.ModuleContext ctx) {
+        SMVModule module = new SMVModule();
         module.setName(ctx.name.getText());
         ctx.params.forEach(fpctx ->
                 module.getModuleParameter().add(

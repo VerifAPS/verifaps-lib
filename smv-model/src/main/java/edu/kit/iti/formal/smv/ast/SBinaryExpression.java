@@ -23,6 +23,7 @@ package edu.kit.iti.formal.smv.ast;
  */
 
 import edu.kit.iti.formal.smv.SMVAstVisitor;
+import org.jetbrains.annotations.NotNull;
 
 /************************************************************/
 
@@ -57,6 +58,11 @@ public class SBinaryExpression extends SMVExpr {
 
     public SMVType getSMVType() {
         return SMVType.infer(left.getSMVType(), right.getSMVType());
+    }
+
+    @Override
+    public @NotNull SBinaryExpression inModule(@NotNull String module) {
+        return new SBinaryExpression(left.inModule(module), operator, right.inModule(module));
     }
 
 

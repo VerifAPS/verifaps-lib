@@ -58,7 +58,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T visit(CaseConditions.Range range) {
+    public T visit(CaseCondition.Range range) {
         range.getStart().visit(this);
         range.getStop().visit(this);
         return null;
@@ -68,7 +68,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T visit(CaseConditions.IntegerCondition integerCondition) {
+    public T visit(CaseCondition.IntegerCondition integerCondition) {
         integerCondition.getValue().visit(this);
         return null;
     }
@@ -77,7 +77,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T visit(CaseConditions.Enumeration enumeration) {
+    public T visit(CaseCondition.Enumeration enumeration) {
         enumeration.getStart().visit(this);
         enumeration.getStop().visit(this);
 
@@ -241,7 +241,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(CaseStatement.Case aCase) {
         aCase.getStatements().visit(this);
-        for (CaseConditions c : aCase.getConditions())
+        for (CaseCondition c : aCase.getConditions())
             c.visit(this);
         return null;
     }

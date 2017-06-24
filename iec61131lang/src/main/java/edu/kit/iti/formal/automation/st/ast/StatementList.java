@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by weigla on 09.06.2014.
@@ -59,6 +60,10 @@ public class StatementList extends ArrayList<Statement> implements Visitable {
         addAll(statements);
     }
 
+    public StatementList(List<Statement> ts) {
+        super(ts);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -69,7 +74,8 @@ public class StatementList extends ArrayList<Statement> implements Visitable {
     /**
      * {@inheritDoc}
      */
-    @Override public boolean add(Statement statement) {
+    @Override
+    public boolean add(Statement statement) {
         if (statement == null)
             return false;
         return super.add(statement);
@@ -78,7 +84,8 @@ public class StatementList extends ArrayList<Statement> implements Visitable {
     /**
      * {@inheritDoc}
      */
-    @Override public void add(int index, Statement element) {
+    @Override
+    public void add(int index, Statement element) {
         if (element == null)
             return;
 

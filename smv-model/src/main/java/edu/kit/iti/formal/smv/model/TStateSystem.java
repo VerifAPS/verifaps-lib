@@ -37,11 +37,11 @@ import edu.kit.iti.formal.smv.ast.SMVType;
  * @author weigl
  */
 public class TStateSystem {
-    protected SMVModuleImpl m = new SMVModuleImpl();
+    protected SMVModule m = new SMVModule();
     public State init = new State();
     public String name;
 
-    public SMVModuleImpl asModule() {
+    public SMVModule asModule() {
        /* Set<State> states = getStates();
 
         List<SVariable> statesX = states.stream().map(TStateSystem::toVar).collect(Collectors.toList());

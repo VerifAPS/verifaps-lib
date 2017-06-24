@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.st0.trans;
  */
 
 import edu.kit.iti.formal.automation.st.ast.*;
-import edu.kit.iti.formal.automation.st.util.AstCopyVisitor;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,9 +31,10 @@ import java.util.Map;
 
 /**
  * Created by weigl on 03/10/14.
+ *
  * @author Alexander Weigl
  */
-public class ExpressionReplacer extends AstCopyVisitor {
+public class ExpressionReplacer extends AstVisitor<Object> {
     private StatementList statements;
     private Map<Expression, Expression> replacements = new HashMap<>();
 

@@ -22,8 +22,8 @@ package edu.kit.iti.formal.automation.exceptions;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.st.STUtil;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.BinaryExpression;
 import edu.kit.iti.formal.automation.st.ast.Expression;
@@ -44,9 +44,9 @@ public class TypeConformityException extends IECException {
     /**
      * <p>Constructor for TypeConformityException.</p>
      *
-     * @param expr a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
+     * @param expr     a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
      * @param expected an array of {@link edu.kit.iti.formal.automation.datatypes.Any} objects.
-     * @param actual a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param actual   a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
     public TypeConformityException(Expression expr, Any[] expected, Any... actual) {
         this.expression = expr;
@@ -81,11 +81,13 @@ public class TypeConformityException extends IECException {
         return expression;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getMessage() {
         return String.format("Type(s) violated in %s %nExpected:%s %nGot:%s %n ",
-                STUtil.print(expression),
+                IEC61131Facade.print(expression),
                 Arrays.toString(this.expected),
                 Arrays.toString(this.actual));
     }

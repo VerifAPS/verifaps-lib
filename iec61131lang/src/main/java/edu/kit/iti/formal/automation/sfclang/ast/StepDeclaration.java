@@ -116,4 +116,11 @@ public class StepDeclaration {
     public void setInitial(boolean initial) {
         initial = initial;
     }
+
+    public void addEvent(String type, String... actionNames) {
+        if (!getEvents().containsKey(type)) {
+            getEvents().put(type, new ArrayList<>());
+        }
+        getEvents().get(type).addAll(Arrays.asList(actionNames));
+    }
 }

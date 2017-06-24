@@ -1,6 +1,6 @@
 SFC I1R
 
-    VAR_INPUT   i : bool; j :bool END_VAR
+    VAR_INPUT   i : bool; j :bool; END_VAR
     VAR_OUTPUT  o : int; END_VAR
 
     STEP A 

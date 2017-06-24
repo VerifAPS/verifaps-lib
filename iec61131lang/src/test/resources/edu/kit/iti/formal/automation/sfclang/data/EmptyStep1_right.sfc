@@ -7,7 +7,7 @@ SFC ES1R
 
     STEP A 
         on active action
-            o := 1
+            o := 1;
         end_action
     END_STEP 
 
@@ -20,7 +20,7 @@ SFC ES1R
     
     STEP B 
         on active action 
-            o:=2
+            o:=2;
         end_action
     END_STEP 
     

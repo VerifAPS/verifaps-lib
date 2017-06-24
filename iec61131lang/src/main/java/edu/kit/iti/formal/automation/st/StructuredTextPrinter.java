@@ -101,7 +101,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
     /** {@inheritDoc} */
     @Override
-    public Object visit(CaseConditions.IntegerCondition integerCondition) {
+    public Object visit(CaseCondition.IntegerCondition integerCondition) {
         sb.appendIdent();
         integerCondition.getValue().visit(this);
         return null;
@@ -109,7 +109,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
     /** {@inheritDoc} */
     @Override
-    public Object visit(CaseConditions.Enumeration enumeration) {
+    public Object visit(CaseCondition.Enumeration enumeration) {
         if (enumeration.getStart() == enumeration.getStop()) {
             enumeration.getStart().visit(this);
         } else {
@@ -392,12 +392,12 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
     /** {@inheritDoc} */
     @Override
-    public Object visit(FunctionCallStatement functionCallStatement) {
+    public Object visit(FunctionBlockCallStatement fbc) {
         sb.nl();
-        sb.append(functionCallStatement.getFunctionCall().getFunctionName()).append("(");
+        sb.append(fbc.getFunctionBlockName()).append("(");
 
         boolean params = false;
-        for (FunctionCall.Parameter entry : functionCallStatement.getFunctionCall().getParameters()) {
+        for (FunctionBlockCallStatement.Parameter entry : fbc.getParameters()) {
             if (entry.getName() != null) {
                 sb.append(entry.getName());
                 if (entry.isOutput())
@@ -421,7 +421,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     @Override
     public Object visit(CaseStatement.Case aCase) {
         sb.nl();
-        for (CaseConditions cc : aCase.getConditions()) {
+        for (CaseCondition cc : aCase.getConditions()) {
             cc.visit(this);
             sb.append(", ");
         }

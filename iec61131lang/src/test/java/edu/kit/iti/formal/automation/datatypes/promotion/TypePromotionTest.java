@@ -27,10 +27,10 @@ import static edu.kit.iti.formal.automation.datatypes.AnyInt.USINT;
 import static org.junit.Assert.*;
 import static edu.kit.iti.formal.automation.datatypes.AnyInt.*;
 
+import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
-import edu.kit.iti.formal.automation.st.STUtil;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import org.junit.Before;
@@ -149,7 +149,7 @@ public class TypePromotionTest {
     }
 
     private void assertDataType(Any dt, String sexpr, LocalScope vd) throws VariableNotDefinedException, TypeConformityException {
-        assertEquals(dt, STUtil.expr(sexpr).dataType(vd));
+        assertEquals(dt, IEC61131Facade.expr(sexpr).dataType(vd));
     }
 
     @Test(expected = VariableNotDefinedException.class)

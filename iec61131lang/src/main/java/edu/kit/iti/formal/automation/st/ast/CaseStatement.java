@@ -115,18 +115,18 @@ public class CaseStatement extends Statement {
     }
 
     public static class Case extends Top {
-        List<CaseConditions> conditions = new ArrayList<>();
+        List<CaseCondition> conditions = new ArrayList<>();
         StatementList statements = new StatementList();
 
-        public void addCondition(CaseConditions condition) {
+        public void addCondition(CaseCondition condition) {
             conditions.add(condition);
         }
 
-        public List<CaseConditions> getConditions() {
+        public List<CaseCondition> getConditions() {
             return conditions;
         }
 
-        public void setConditions(List<CaseConditions> conditions) {
+        public void setConditions(List<CaseCondition> conditions) {
             this.conditions = conditions;
         }
 
@@ -145,7 +145,7 @@ public class CaseStatement extends Statement {
 
         @Override public Case clone() {
             Case c = new Case();
-            c.conditions = conditions.stream().map(CaseConditions::clone)
+            c.conditions = conditions.stream().map(CaseCondition::clone)
                     .collect(Collectors.toList());
             c.statements = statements.clone();
             return c;

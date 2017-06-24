@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import com.google.common.base.Strings;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -42,7 +43,7 @@ public class CommentStatement extends Statement {
      * <p>Constructor for CommentStatement.</p>
      *
      * @param format a {@link java.lang.String} object.
-     * @param args a {@link java.lang.Object} object.
+     * @param args   a {@link java.lang.Object} object.
      */
     public CommentStatement(String format, Object... args) {
         this(String.format(format, args));
@@ -75,13 +76,23 @@ public class CommentStatement extends Statement {
         this.comment = comment;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @Override public CommentStatement clone() {
+    @Override
+    public CommentStatement clone() {
         return new CommentStatement(comment);
+    }
+
+    public static Statement box(String s, Object... args) {
+        String line = Strings.repeat("*", 79);
+        s = "(" + line + "\n *" + Strings.padStart(String.format(s, args), 79, '*')
+                + "\n " + line.substring(1) + ")";
+        return new CommentStatement(s);
     }
 }

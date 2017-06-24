@@ -78,26 +78,26 @@ public interface Visitor<T> {
     /**
      * <p>visit.</p>
      *
-     * @param range a {@link edu.kit.iti.formal.automation.st.ast.CaseConditions.Range} object.
+     * @param range a {@link CaseCondition.Range} object.
      * @return a T object.
      */
-    T visit(CaseConditions.Range range);
+    T visit(CaseCondition.Range range);
 
     /**
      * <p>visit.</p>
      *
-     * @param integerCondition a {@link edu.kit.iti.formal.automation.st.ast.CaseConditions.IntegerCondition} object.
+     * @param integerCondition a {@link CaseCondition.IntegerCondition} object.
      * @return a T object.
      */
-    T visit(CaseConditions.IntegerCondition integerCondition);
+    T visit(CaseCondition.IntegerCondition integerCondition);
 
     /**
      * <p>visit.</p>
      *
-     * @param enumeration a {@link edu.kit.iti.formal.automation.st.ast.CaseConditions.Enumeration} object.
+     * @param enumeration a {@link CaseCondition.Enumeration} object.
      * @return a T object.
      */
-    T visit(CaseConditions.Enumeration enumeration);
+    T visit(CaseCondition.Enumeration enumeration);
 
     /**
      * <p>visit.</p>
@@ -266,10 +266,10 @@ public interface Visitor<T> {
     /**
      * <p>visit.</p>
      *
-     * @param functionCallStatement a {@link edu.kit.iti.formal.automation.st.ast.FunctionCallStatement} object.
+     * @param functionBlockCallStatement a {@link FunctionBlockCallStatement} object.
      * @return a T object.
      */
-    T visit(FunctionCallStatement functionCallStatement);
+    T visit(FunctionBlockCallStatement functionBlockCallStatement);
 
     /**
      * <p>visit.</p>

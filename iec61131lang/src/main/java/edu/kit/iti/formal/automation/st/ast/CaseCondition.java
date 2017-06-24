@@ -29,15 +29,15 @@ import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
- * <p>Abstract CaseConditions class.</p>
+ * <p>Abstract CaseCondition class.</p>
  *
  * @author weigl
  * @version $Id: $Id
  */
-public abstract class CaseConditions extends Top {
-    public abstract CaseConditions clone();
+public abstract class CaseCondition extends Top {
+    public abstract CaseCondition clone();
 
-    public static class Range extends CaseConditions {
+    public static class Range extends CaseCondition {
         private ScalarValue<? extends AnyInt, Integer> start, stop;
 
         public Range(ScalarValue<? extends AnyInt, Integer> start,
@@ -75,7 +75,7 @@ public abstract class CaseConditions extends Top {
         }
     }
 
-    public static class IntegerCondition extends CaseConditions {
+    public static class IntegerCondition extends CaseCondition {
         private ScalarValue<? extends AnyInt, Long> value;
 
         public IntegerCondition(ScalarValue<? extends AnyInt, Long> value) {
@@ -99,7 +99,7 @@ public abstract class CaseConditions extends Top {
         }
     }
 
-    public static class Enumeration extends CaseConditions {
+    public static class Enumeration extends CaseCondition {
         private ScalarValue<EnumerateType, String> start;
         private ScalarValue<EnumerateType, String> stop;
 

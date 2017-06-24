@@ -1,21 +1,21 @@
 SFC D1L
 
     VAR_OUTPUT 
-        o : bool
+        o : bool;
     END_VAR
 
 
     VAR_INPUT 
-        i : int
+        i : int;
     END_VAR
 	
 	VAR
-		s: bool
+		s: bool;
 	END_VAR
 
     STEP A 
         ON active ACTION 
-            s := true
+            s := true;
         END_ACTION
     END_STEP
 

@@ -26,13 +26,12 @@ package edu.kit.iti.formal.smv.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.smv.SMVAstVisitor;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import edu.kit.iti.formal.smv.SMVAstVisitor;
 
 /************************************************************/
 
@@ -68,7 +67,7 @@ public class SCaseExpression extends SMVExpr {
                 condition = current.condition;
             }
         }
-            esac.addCase(condition, previous.then);
+        esac.addCase(condition, previous.then);
         return esac;
     }
 
@@ -86,6 +85,42 @@ public class SCaseExpression extends SMVExpr {
     @Override
     public int hashCode() {
         return cases.hashCode();
+    }
+
+    public <T> T accept(SMVAstVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
+    public SMVType getSMVType() {
+        List<SMVType> list = cases.stream().map((Case a) -> {
+            return a.then.getSMVType();
+        }).collect(Collectors.toList());
+
+        return SMVType.infer(list);
+    }
+
+    @Override
+    public @NotNull SCaseExpression inModule(@NotNull String module) {
+        SCaseExpression sCaseExpression = new SCaseExpression();
+        for (Case c : cases) {
+            sCaseExpression.add(c.condition.inModule(module), c.then.inModule(module));
+        }
+        return sCaseExpression;
+    }
+
+    public Case addCase(SMVExpr cond, SMVExpr var) {
+        Case c = new Case(cond, var);
+        cases.add(c);
+        return c;
+    }
+
+    @Override
+    public String toString() {
+        return "if " +
+                cases.stream()
+                        .map(c -> c.toString()).reduce((a, b) -> a + "\n" + b)
+                        .orElseGet(() -> "")
+                + " fi";
     }
 
     /**
@@ -132,32 +167,5 @@ public class SCaseExpression extends SMVExpr {
             result = 31 * result + then.hashCode();
             return result;
         }
-    }
-
-    public <T> T accept(SMVAstVisitor<T> visitor) {
-        return visitor.visit(this);
-    }
-
-    public SMVType getSMVType() {
-        List<SMVType> list = cases.stream().map((Case a) -> {
-            return a.then.getSMVType();
-        }).collect(Collectors.toList());
-
-        return SMVType.infer(list);
-    }
-
-    public Case addCase(SMVExpr cond, SMVExpr var) {
-        Case c = new Case(cond, var);
-        cases.add(c);
-        return c;
-    }
-
-    @Override
-    public String toString() {
-        return "if " +
-                cases.stream()
-                        .map(c -> c.toString()).reduce((a, b) -> a + "\n" + b)
-                        .orElseGet(() -> "")
-                + " fi";
     }
 }

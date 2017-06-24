@@ -28,6 +28,7 @@ import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.st.ast.TypeDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TypeDeclarations;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
+import org.antlr.v4.runtime.CharStreams;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -49,7 +50,7 @@ public class TestEnumParse extends DefaultVisitor<Void> {
 
     @Test
     public void testEnumMembers() {
-        TopLevelElements toplevel = IEC61131Facade.file(code);
+        TopLevelElements toplevel = IEC61131Facade.file(CharStreams.fromString(code));
         TypeDeclarations decls = (TypeDeclarations) toplevel.get(0);
         EnumerationTypeDeclaration enumdecl = (EnumerationTypeDeclaration) decls.get(0);
         assertEquals(Arrays.asList("one", "two", "three"),

@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.smv;
 
 import edu.kit.iti.formal.automation.SymbExFacade;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import edu.kit.iti.formal.smv.SMVAstDefaultVisitor;
 import edu.kit.iti.formal.smv.SMVAstVisitor;
 import edu.kit.iti.formal.smv.ast.*;
 
@@ -67,7 +68,7 @@ public class VariableDependency {
         return reached;
     }
 
-    static class VarVisitor implements SMVAstVisitor<Void> {
+    static class VarVisitor extends SMVAstDefaultVisitor<Void> {
         private final Set<SVariable> ignored;
         private final Set<SVariable> reached;
 
@@ -127,7 +128,7 @@ public class VariableDependency {
 
         @Override
         public Void visit(SFunction func) {
-            Arrays.stream(func.getArguments()).forEach(a -> a.accept(this));
+            func.getArguments().forEach(a -> a.accept(this));
             return null;
         }
     }

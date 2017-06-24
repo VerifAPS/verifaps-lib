@@ -216,9 +216,15 @@ public class SMVType {
         private final List<? extends SMVExpr> parameters;
         private final String moduleName;
 
+        public Module(String name) {
+            moduleName = name;
+            parameters = new ArrayList<>();
+        }
+
+
         public Module(String name, List<? extends SMVExpr> moduleParameter) {
             this.moduleName = name;
-            this.parameters = moduleParameter;
+            parameters = moduleParameter;
         }
 
         public Module(String name, SVariable... variables) {

@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation;
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.Expression;
@@ -31,7 +32,10 @@ import edu.kit.iti.formal.automation.st.ast.StatementList;
 import edu.kit.iti.formal.automation.st.ast.Top;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * <p>IEC61131Facade class.</p>
@@ -44,13 +48,23 @@ public class IEC61131Facade {
     /**
      * Parse the given string into an expression.
      *
-     * @param str an expression in Structured Text
+     * @param input an expression in Structured Text
      * @return The AST of the Expression
      */
-    public static Expression expr(String str) {
-        IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(str));
-        IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
-        return parser.expression().ast;
+    public static Expression expr(CharStream input) {
+        IEC61131Parser parser = getParser(input);
+        IEC61131Parser.ExpressionContext ctx = parser.expression();
+        return (Expression) ctx.accept(new IECParseTreeToAST());
+    }
+
+    @NotNull
+    public static IEC61131Parser getParser(CharStream input) {
+        IEC61131Lexer lexer = new IEC61131Lexer(input);
+        return new IEC61131Parser(new CommonTokenStream(lexer));
+    }
+
+    public static Expression expr(String input) {
+        return expr(CharStreams.fromString(input));
     }
 
     /**
@@ -71,10 +85,13 @@ public class IEC61131Facade {
      * @param str a {@link java.lang.String} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
      */
-    public static StatementList statements(String str) {
-        IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(str));
-        IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
-        return parser.statement_list().ast;
+    public static StatementList statements(CharStream input) {
+        IEC61131Parser parser = getParser(input);
+        return (StatementList) parser.statement_list().accept(new IECParseTreeToAST());
+    }
+
+    public static StatementList statements(String input) {
+        return statements(CharStreams.fromString(input));
     }
 
 
@@ -84,10 +101,9 @@ public class IEC61131Facade {
      * @param str a {@link java.lang.String} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.TopLevelElements} object.
      */
-    public static TopLevelElements file(String str) {
-        IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream(str));
-        IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
-        return new TopLevelElements(parser.start().ast);
+    public static TopLevelElements file(CharStream input) {
+        IEC61131Parser parser = getParser(input);
+        return (TopLevelElements) parser.start().accept(new IECParseTreeToAST());
     }
 
     /**

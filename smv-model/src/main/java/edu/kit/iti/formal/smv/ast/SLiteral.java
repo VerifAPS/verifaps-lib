@@ -27,6 +27,7 @@ package edu.kit.iti.formal.smv.ast;
  */
 
 import edu.kit.iti.formal.smv.SMVAstVisitor;
+import org.jetbrains.annotations.NotNull;
 
 /************************************************************/
 
@@ -61,6 +62,11 @@ public class SLiteral extends SMVExpr {
 
     public SMVType getSMVType() {
         return dataType;
+    }
+
+    @Override
+    public @NotNull SLiteral inModule(@NotNull String module) {
+        return new SLiteral(dataType, value);
     }
 
     @Override

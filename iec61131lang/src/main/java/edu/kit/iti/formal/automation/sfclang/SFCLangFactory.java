@@ -22,8 +22,10 @@ package edu.kit.iti.formal.automation.sfclang;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
 import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
 import org.antlr.v4.runtime.*;
 
@@ -38,58 +40,12 @@ import java.io.Reader;
  * @version $Id: $Id
  */
 public class SFCLangFactory {
-
-    /**
-     * <p>parse.</p>
-     *
-     * @param filename a {@link java.lang.String} object.
-     * @return a {@link edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration} object.
-     * @throws java.io.IOException if any.
-     */
-    public static SFCDeclaration parse(String filename) throws IOException {
-        CharStream cs = new ANTLRFileStream(filename);
-        return parse(cs);
+    public static SFCDeclaration parse(String input) throws IOException {
+        return parse(CharStreams.fromString(input));
     }
 
-    /**
-     * <p>parse.</p>
-     *
-     * @param reader a {@link java.io.Reader} object.
-     * @return a {@link edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration} object.
-     * @throws java.io.IOException if any.
-     */
-    public static SFCDeclaration parse(Reader reader) throws IOException {
-        CharStream cs = new ANTLRInputStream(reader);
-        return parse(cs);
-    }
-
-    /**
-     * <p>parse.</p>
-     *
-     * @param cs a {@link org.antlr.v4.runtime.CharStream} object.
-     * @return a {@link edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration} object.
-     */
     public static SFCDeclaration parse(CharStream cs) {
-        IEC61131Lexer lexer = new IEC61131Lexer(cs);
-        IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
-
-        parser.setBuildParseTree(true);
-        parser.setTrace(true);
-
-        return parser.start_sfc().ast;
-    }
-
-
-    /**
-     * <p>parse.</p>
-     *
-     * @param stream a {@link java.io.InputStream} object.
-     * @return a {@link edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration} object.
-     * @throws java.io.IOException if any.
-     */
-    public static SFCDeclaration parse(InputStream stream) throws IOException {
-        CharStream cs = new ANTLRInputStream(stream);
-        return parse(cs);
-
+        IEC61131Parser parser = IEC61131Facade.getParser(cs);
+        return (SFCDeclaration) parser.start_sfc().accept(new IECParseTreeToAST());
     }
 }

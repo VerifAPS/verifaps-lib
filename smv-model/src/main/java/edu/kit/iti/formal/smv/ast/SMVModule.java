@@ -22,53 +22,126 @@ package edu.kit.iti.formal.smv.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.smv.Printer;
 import edu.kit.iti.formal.smv.SMVAstVisitor;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/************************************************************/
+
 /**
- * @author Alexander Weigl
- * @version 1 (11.12.16)
+ *
  */
-public interface SMVModule {
-    List<SVariable> getModuleParameter();
-
+public class SMVModule extends SMVAst {
     /**
      *
      */
-    List<SVariable> getInputVars();
-
+    protected List<SVariable> inputvars = new ArrayList<>();
+    protected List<SVariable> moduleParameters = new ArrayList<>();
     /**
      *
      */
-    List<SVariable> getStateVars();
+    protected List<SVariable> statevars = new ArrayList<>();
+    /**
+     *
+     */
+    protected List<SVariable> frozenvars = new ArrayList<>();
 
-    List<SVariable> getFrozenVars();
+    protected List<SAssignment> init = new ArrayList<>();
+    protected List<SMVExpr> invariants = new ArrayList<>();
+    protected List<SMVExpr> invariantspecs = new ArrayList<>();
+    protected List<SMVExpr> ltlspec = new ArrayList<>();
+    protected List<SMVExpr> ctlspec = new ArrayList<>();
+    protected List<SAssignment> next = new ArrayList<>();
+    protected String name = "";
+    protected List<SMVExpr> transexpr = new ArrayList<>();
+    protected List<SMVExpr> initexpr = new ArrayList<>();
+    private Map<SVariable, SMVExpr> definitions = new HashMap<>();
 
-    List<SMVExpr> getInvar();
-
-    List<SMVExpr> getInvarSpec();
-
-    List<SMVExpr> getLTLSpec();
-
-    List<SMVExpr> getTrans();
-
-    List<SMVExpr> getInit();
-
-    List<SMVExpr> getCTLSpec();
-
-    List<SAssignment> getInitAssignments();
-
-    List<SAssignment> getNextAssignments();
-
-    Map<SVariable, SMVExpr> getDefinitions();
-
-    String getName();
-
-    default
-    public <T> T accept(SMVAstVisitor<T> visitor) {
-        return visitor.visit(this);
+    
+    public List<SVariable> getModuleParameter() {
+        return moduleParameters;
     }
 
+    
+    public List<SVariable> getInputVars() {
+        return inputvars;
+    }
+
+    
+    public List<SVariable> getStateVars() {
+        return statevars;
+    }
+
+    
+    public List<SVariable> getFrozenVars() {
+        return frozenvars;
+    }
+
+    
+    public List<SMVExpr> getInvar() {
+        return invariants;
+    }
+
+    
+    public List<SMVExpr> getInvarSpec() {
+        return invariantspecs;
+    }
+
+    
+    public List<SMVExpr> getLTLSpec() {
+        return ltlspec;
+    }
+
+    
+    public List<SMVExpr> getTrans() {
+        return transexpr;
+    }
+
+    
+    public List<SMVExpr> getInit() {
+        return initexpr;
+    }
+
+    
+    public List<SMVExpr> getCTLSpec() {
+        return ctlspec;
+    }
+
+    
+    public List<SAssignment> getInitAssignments() {
+        return init;
+    }
+
+    
+    public List<SAssignment> getNextAssignments() {
+        return next;
+    }
+
+    
+    public Map<SVariable, SMVExpr> getDefinitions() {
+        return definitions;
+    }
+
+    
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    
+    public <T> T accept(SMVAstVisitor<T> visitor) {
+        return visitor.visit((SMVModule) this);
+    }
+
+    public String toString() {
+        return Printer.toString(this);
+    }
 }
+

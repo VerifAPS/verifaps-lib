@@ -56,6 +56,21 @@ public class DataTypeTranslator implements DataTypeVisitor<SMVType> {
     }*/
 
     @Override
+    public SMVType visit(AnyReal real) {
+        return null;
+    }
+
+    @Override
+    public SMVType visit(AnyReal.Real real) {
+        return null;
+    }
+
+    @Override
+    public SMVType visit(AnyReal.LReal real) {
+        return null;
+    }
+
+    @Override
     public SMVType visit(AnyBit anyBit) {
         if (anyBit == AnyBit.BOOL) {
             return SMVType.BOOLEAN;
@@ -94,11 +109,6 @@ public class DataTypeTranslator implements DataTypeVisitor<SMVType> {
 
     @Override
     public SMVType visit(TimeType timeType) {
-        throw new IllegalTypeException("Could not match");
-    }
-
-    @Override
-    public SMVType visit(RecordType.Field field) {
         throw new IllegalTypeException("Could not match");
     }
 

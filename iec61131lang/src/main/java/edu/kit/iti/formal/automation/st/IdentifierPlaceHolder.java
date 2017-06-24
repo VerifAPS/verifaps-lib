@@ -43,6 +43,10 @@ public class IdentifierPlaceHolder<T extends Identifiable>
         this.identifier = identifier;
     }
 
+    public boolean isIdentified() {
+        return getIdentifiedObject() != null;
+    }
+
     public String getIdentifier() {
         if (realObject != null)
             return realObject.getIdentifier();
@@ -66,7 +70,8 @@ public class IdentifierPlaceHolder<T extends Identifiable>
         return this;
     }
 
-    @Override public IdentifierPlaceHolder<T> clone() {
+    @Override
+    public IdentifierPlaceHolder<T> clone() {
         IdentifierPlaceHolder<T> iph = new IdentifierPlaceHolder<T>();
         iph.identifier = identifier;
         iph.realObject = realObject;

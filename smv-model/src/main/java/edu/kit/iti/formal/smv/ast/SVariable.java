@@ -27,6 +27,7 @@ package edu.kit.iti.formal.smv.ast;
  */
 
 import edu.kit.iti.formal.smv.SMVAstVisitor;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -34,6 +35,7 @@ import edu.kit.iti.formal.smv.SMVAstVisitor;
 public class SVariable extends SMVExpr implements Comparable<SVariable> {
     private String name;
     private SMVType datatype;
+    private int metadata;
 
     public SVariable() {
 
@@ -56,11 +58,13 @@ public class SVariable extends SMVExpr implements Comparable<SVariable> {
         return create(String.format(fmt, vals));
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return name.hashCode();
     }
 
-    @Override public boolean equals(Object obj) {
+    @Override
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -75,8 +79,7 @@ public class SVariable extends SMVExpr implements Comparable<SVariable> {
             if (other.name != null) {
                 return false;
             }
-        }
-        else if (!name.equals(other.name)) {
+        } else if (!name.equals(other.name)) {
             return false;
         }
         return true;
@@ -94,15 +97,18 @@ public class SVariable extends SMVExpr implements Comparable<SVariable> {
         return datatype;
     }
 
-    @Override public <T> T accept(SMVAstVisitor<T> visitor) {
+    @Override
+    public <T> T accept(SMVAstVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @Override public int compareTo(SVariable o) {
+    @Override
+    public int compareTo(SVariable o) {
         return name.compareTo(o.name);
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return name;
     }
 
@@ -113,6 +119,29 @@ public class SVariable extends SMVExpr implements Comparable<SVariable> {
     public void setName(String name) {
         this.name = name;
     }
+
+    public int getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(int metadata) {
+        this.metadata = metadata;
+    }
+
+    public SVariable addMetadata(int metadata) {
+        this.metadata |= metadata;
+        return this;
+    }
+
+    public boolean hasMetadata(int metadata) {
+        return 0 != (this.metadata & metadata);
+    }
+
+    @NotNull
+    public SVariable inModule(@NotNull String module) {
+        return SVariable.create(module + "." + name).with(datatype);
+    }
+
 
     static public class Builder {
         SVariable v = new SVariable();

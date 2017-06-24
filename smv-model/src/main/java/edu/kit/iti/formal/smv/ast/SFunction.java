@@ -24,9 +24,11 @@ package edu.kit.iti.formal.smv.ast;
 
 import edu.kit.iti.formal.smv.FunctionTypeSolver;
 import edu.kit.iti.formal.smv.SMVAstVisitor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -71,6 +73,12 @@ public class SFunction extends SMVExpr {
     @Override
     public SMVType getSMVType() {
         return typeSolver.getDataType(this);
+    }
+
+    @Override
+    public @NotNull SFunction inModule(@NotNull String module) {
+        return new SFunction(functionName,
+                arguments.stream().map(a -> a.inModule(module)).collect(Collectors.toList()));
     }
 
     @Override

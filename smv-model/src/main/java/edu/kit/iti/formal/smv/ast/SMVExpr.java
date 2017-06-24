@@ -26,6 +26,8 @@ package edu.kit.iti.formal.smv.ast;
  * #L%
  */
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  *
  */
@@ -37,26 +39,48 @@ public abstract class SMVExpr extends SMVAst {
     public abstract SMVType getSMVType();
 
     //region builder methods
-    public SFunction eventually() {
-        return new SFunction("F", this);
+    public SQuantified eventually() {
+        return new SQuantified(STemporalOperator.F, this);
     }
 
-    public SFunction globally() {
-        return new SFunction("G", this);
+    public SQuantified globally() {
+        return new SQuantified(STemporalOperator.G, this);
     }
 
+    public SQuantified next() {
+        return new SQuantified(STemporalOperator.X, this);
+    }
+
+    public SQuantified since() {
+        return new SQuantified(STemporalOperator.S, this);
+    }
+
+    @NotNull
+    public SQuantified once() {
+        return new SQuantified(STemporalOperator.O, this);
+    }
+
+    @NotNull
+    public SQuantified until(SMVExpr other) {
+        return new SQuantified(STemporalOperator.U, this, other);
+    }
+
+    @NotNull
     public SBinaryExpression equal(SMVExpr e) {
         return op(SBinaryOperator.EQUAL, e);
     }
 
+    @NotNull
     public SBinaryExpression and(SMVExpr e) {
         return op(SBinaryOperator.AND, e);
     }
 
+    @NotNull
     public SBinaryExpression or(SMVExpr e) {
         return op(SBinaryOperator.OR, e);
     }
 
+    @NotNull
     public SBinaryExpression op(SBinaryOperator o, SMVExpr e) {
         SBinaryExpression product = new SBinaryExpression(this, o, e);
         product.operator = o;
@@ -64,16 +88,28 @@ public abstract class SMVExpr extends SMVAst {
         return product;
     }
 
+    @NotNull
     public SUnaryExpression not() {
         return new SUnaryExpression(SUnaryOperator.NEGATE, this);
     }
 
+    @NotNull
     public SUnaryExpression minus() {
         return new SUnaryExpression(SUnaryOperator.MINUS, this);
     }
 
-    public SMVExpr implies(SFunction e) {
+    @NotNull
+    public SMVExpr implies(SMVExpr e) {
         return op(SBinaryOperator.IMPL, e);
     }
+
+
+    @NotNull
+    public SMVExpr inModule(@NotNull SVariable module) {
+        return inModule(module.getName());
+    }
+
+    @NotNull
+    public abstract SMVExpr inModule(@NotNull String module);
     //endregion
 }

@@ -27,6 +27,7 @@ package edu.kit.iti.formal.smv.ast;
  */
 
 import edu.kit.iti.formal.smv.SMVAstVisitor;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -48,6 +49,11 @@ public class SUnaryExpression extends SMVExpr {
 
     public SMVType getSMVType() {
         return expr.getSMVType();
+    }
+
+    @Override
+    public @NotNull SUnaryExpression inModule(@NotNull String module) {
+        return new SUnaryExpression(operator, expr.inModule(module));
     }
 
     @Override

@@ -22,13 +22,13 @@ package edu.kit.iti.formal.automation.st.util;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
-import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
+import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -66,7 +66,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(CaseConditions.IntegerCondition integerCondition) {
+    public Object visit(CaseCondition.IntegerCondition integerCondition) {
         ScalarValue sv = (ScalarValue) integerCondition.getValue().<Object>visit(this);
         integerCondition.setValue(sv);
         return integerCondition;
@@ -76,7 +76,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(CaseConditions.Enumeration enumeration) {
+    public Object visit(CaseCondition.Enumeration enumeration) {
         enumeration.setStart((ScalarValue<EnumerateType, String>) enumeration.getStart().<Object>visit(this));
         enumeration.setStop((ScalarValue<EnumerateType, String>) enumeration.getStop().<Object>visit(this));
         return enumeration;
@@ -195,10 +195,8 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(FunctionCall functionCall) {
-        LinkedList<FunctionCall.Parameter> list = new LinkedList<>();
-        for (FunctionCall.Parameter p : functionCall.getParameters()) {
-            list.add(p);
-        }
+        List<Expression> list = new ArrayList<>();
+        list.addAll(functionCall.getParameters());
         functionCall.setParameters(list);
         return functionCall;
     }
@@ -252,10 +250,10 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(FunctionCallStatement functionCallStatement) {
-        functionCallStatement.setFunctionCall((FunctionCall)
-                functionCallStatement.getFunctionCall().visit(this));
-        return functionCallStatement;
+    public Object visit(FunctionBlockCallStatement fbc) {
+        fbc.getParameters().stream()
+                .forEach(p -> p.setExpression((Expression) p.getExpression().visit(this)));
+        return fbc;
     }
 
     /**
@@ -263,7 +261,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(CaseStatement.Case aCase) {
-        List<CaseConditions> v = this.<CaseConditions>visitList(aCase.getConditions());
+        List<CaseCondition> v = this.<CaseCondition>visitList(aCase.getConditions());
         aCase.setConditions(v);
         aCase.setStatements((StatementList) aCase.getStatements().visit(this));
         return aCase;
@@ -296,7 +294,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(CaseConditions.Range range) {
+    public Object visit(CaseCondition.Range range) {
         range.setStart((ScalarValue) range.getStart().visit(this));
         range.setStop((ScalarValue) range.getStop().visit(this));
         return super.visit(range);

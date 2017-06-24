@@ -24,9 +24,11 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,165 +36,74 @@ import java.util.stream.Collectors;
  * Created by weigla on 09.06.2014.
  *
  * @author weigl
- * @version $Id: $Id
+ * @version 2, rewrite to separate fn block call vs function call in expr
  */
 public class FunctionCall extends Expression {
-    private SymbolicReference functionName;
-    private List<Parameter> parameters = new ArrayList<>();
+    private final IdentifierPlaceHolder<FunctionDeclaration> function = new IdentifierPlaceHolder<>();
+    private List<Expression> parameters = new ArrayList<>();
 
-    /**
-     * <p>Constructor for FunctionCall.</p>
-     */
     public FunctionCall() {
     }
 
-    /**
-     * <p>Constructor for FunctionCall.</p>
-     *
-     * @param fnName a {@link java.lang.String} object.
-     * @param expr   a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     */
     public FunctionCall(String fnName, Expression... expr) {
-        functionName = new SymbolicReference(fnName);
-        for (Expression e : expr) {
-            parameters.add(new Parameter(e));
-        }
+        setFunctionName(fnName);
+        parameters = Arrays.asList(expr);
     }
 
-    /**
-     * <p>Constructor for FunctionCall.</p>
-     *
-     * @param functionCall a {@link edu.kit.iti.formal.automation.st.ast.FunctionCall} object.
-     */
     public FunctionCall(FunctionCall functionCall) {
-        functionName = functionCall.functionName;
+        function.setIdentifier(functionCall.getFunctionName());
+        function.setIdentifiedObject(functionCall.function.getIdentifiedObject());
         parameters.addAll(functionCall.parameters);
     }
 
-    /**
-     * <p>Getter for the field <code>functionName</code>.</p>
-     *
-     * @return a {@link java.lang.String} object.
-     */
-    public SymbolicReference getFunctionName() {
-        return functionName;
+    public FunctionCall(String text, List<Expression> expr) {
+        setFunctionName(text);
+        parameters = new ArrayList<>(expr);
     }
 
-    /**
-     * <p>Setter for the field <code>functionName</code>.</p>
-     *
-     * @param functionName a {@link String} object.
-     */
-    public void setFunctionName(SymbolicReference functionName) {
-        this.functionName = functionName;
+    public String getFunctionName() {
+        return function.getIdentifier();
     }
 
-    /**
-     * <p>addInputParameter.</p>
-     *
-     * @param key   a {@link java.lang.String} object.
-     * @param visit a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     */
-    public void addInputParameter(String key, Expression visit) {
-        if (visit == null)
-            throw new IllegalArgumentException("expression can not be null");
-        parameters.add(new Parameter(key, false, visit));
+    public void setFunctionName(String functionName) {
+        function.setIdentifier(functionName);
     }
 
-    /**
-     * <p>addOutputParameter.</p>
-     *
-     * @param key   a {@link java.lang.String} object.
-     * @param visit a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
-     */
-    public void addOutputParameter(String key, Reference visit) {
-        assert key != null;
-        assert visit != null;
-
-        parameters.add(new Parameter(key, false, visit));
-    }
-
-    /**
-     * <p>Getter for the field <code>parameters</code>.</p>
-     *
-     * @return a {@link java.util.List} object.
-     */
-    public List<Parameter> getParameters() {
+    public List<Expression> getParameters() {
         return parameters;
     }
 
-    /**
-     * <p>Setter for the field <code>parameters</code>.</p>
-     *
-     * @param parameters a {@link java.util.List} object.
-     */
-    public void setParameters(List<Parameter> parameters) {
+    public void setParameters(List<Expression> parameters) {
         this.parameters = parameters;
+    }
+
+    public FunctionDeclaration getFunction() {
+        return function.getIdentifiedObject();
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override public <T> T visit(Visitor<T> visitor) {
+    @Override
+    public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override public Any dataType(LocalScope localScope) {
-        return null;//TODO lookup function
+    @Override
+    public Any dataType(LocalScope localScope) {
+        return function.getIdentifiedObject().returnType;
     }
 
-    @Override public FunctionCall clone() {
+    @Override
+    public FunctionCall clone() {
         FunctionCall f = new FunctionCall();
-        f.functionName = functionName;
-        f.parameters = parameters.stream().map(Parameter::clone)
+        f.function.setIdentifier(this.function.getIdentifier());
+        f.function.setIdentifiedObject(this.function.getIdentifiedObject());
+        f.parameters = parameters.stream().map(Expression::clone)
                 .collect(Collectors.toList());
         return f;
-    }
-
-    public static class Parameter implements Cloneable {
-        private String name;
-        private boolean output;
-        private Expression expression;
-
-        public Parameter(String name, boolean output, Expression expression) {
-            this.name = name;
-            this.output = output;
-            this.expression = expression;
-        }
-
-        public Parameter(Expression expr) {
-            this(null, false, expr);
-        }
-
-        public Parameter clone() {
-            return new Parameter(name, output, expression.clone());
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public boolean isOutput() {
-            return output;
-        }
-
-        public void setOutput(boolean output) {
-            this.output = output;
-        }
-
-        public Expression getExpression() {
-            return expression;
-        }
-
-        public void setExpression(Expression expression) {
-            this.expression = expression;
-        }
     }
 }

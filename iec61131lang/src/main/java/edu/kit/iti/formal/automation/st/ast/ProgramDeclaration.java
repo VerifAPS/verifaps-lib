@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -30,7 +31,8 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
-public class ProgramDeclaration extends TopLevelScopeElement {
+public class ProgramDeclaration extends TopLevelScopeElement
+        implements Identifiable {
     private StatementList programBody;
     private String programName;
 

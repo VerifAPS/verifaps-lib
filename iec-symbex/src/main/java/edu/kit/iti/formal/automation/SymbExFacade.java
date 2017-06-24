@@ -40,25 +40,20 @@ import java.util.List;
  * @version 1 (12.12.16)
  */
 public final class SymbExFacade {
-    public static final SMVExpr evaluateFunction(FunctionDeclaration decl,
-            SMVExpr... args) {
+    public static SMVExpr evaluateFunction(FunctionDeclaration decl, SMVExpr... args) {
         return evaluateFunction(decl, Arrays.asList(args));
-
     }
 
-    private static SMVExpr evaluateFunction(FunctionDeclaration decl,
-            List<SMVExpr> ts) {
+    public static SMVExpr evaluateFunction(FunctionDeclaration decl, List<SMVExpr> ts) {
         SymbolicExecutioner se = new SymbolicExecutioner();
         SymbolicState state = new SymbolicState();
         // <name>(i1,i2,i2,...)
         FunctionCall fc = new FunctionCall();
-        fc.setFunctionName(new SymbolicReference(decl.getFunctionName()));
+        fc.setFunctionName(decl.getFunctionName());
         int i = 0;
         for (VariableDeclaration vd : decl.getLocalScope()
                 .filterByFlags(VariableDeclaration.INPUT)) {
-            fc.getParameters()
-                    .add(new FunctionCall.Parameter(vd.getName(), false,
-                            new SymbolicReference(vd.getName())));
+            fc.getParameters().add(new SymbolicReference(vd.getName()));
             state.put(se.lift(vd), ts.get(i++));
         }
         se.push(state);
@@ -83,7 +78,7 @@ public final class SymbExFacade {
     }
 
     public static final SMVModule evaluateProgram(ProgramDeclaration decl,
-            TypeDeclarations types) {
+                                                  TypeDeclarations types) {
         SymbolicExecutioner se = new SymbolicExecutioner();
         decl.visit(se);
         ModuleBuilder moduleBuilder = new ModuleBuilder(decl, types, se.peek());

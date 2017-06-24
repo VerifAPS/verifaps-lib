@@ -45,4 +45,8 @@ public class ClassDataType extends Any {
     @Override public <T> T accept(DataTypeVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    public ClassDeclaration getClazz() {
+        return clazz;
+    }
 }

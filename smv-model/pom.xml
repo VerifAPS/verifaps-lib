@@ -7,7 +7,7 @@
         <groupId>edu.kit.iti.formal</groupId>
         <artifactId>verifaps-lib</artifactId>
         <version>1.4.0</version>
-        <relativePath></relativePath>
+        <relativePath>..</relativePath>
     </parent>
 
     <name>smv-model</name>

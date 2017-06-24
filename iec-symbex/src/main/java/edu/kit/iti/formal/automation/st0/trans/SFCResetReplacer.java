@@ -28,13 +28,13 @@ import edu.kit.iti.formal.automation.datatypes.values.Bits;
 import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.st.ast.AssignmentStatement;
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
-import edu.kit.iti.formal.automation.st.util.AstCopyVisitor;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 
 /**
  * Created by weigl on 28/10/14.
  */
-public class SFCResetReplacer extends AstCopyVisitor {
+public class SFCResetReplacer extends AstVisitor<Object> {
 
 
     @Override

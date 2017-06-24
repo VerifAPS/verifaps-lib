@@ -31,14 +31,14 @@ import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.datatypes.values.TimeValue;
 import edu.kit.iti.formal.automation.st.ast.SimpleTypeDeclaration;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
-import edu.kit.iti.formal.automation.st.util.AstCopyVisitor;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 
 /**
  * @author Alexander Weigl (06.07.2014)
  * @version 1
  */
-public class TimerToCounter extends AstCopyVisitor {
+public class TimerToCounter extends AstVisitor<Object> {
     public static long DEFAULT_CYCLE_TIME = 4;
     private final long cycleTime;
 
@@ -63,7 +63,7 @@ public class TimerToCounter extends AstCopyVisitor {
             //vd.setDataType(newVal.getDataType());
             SimpleTypeDeclaration sd = new SimpleTypeDeclaration();
             sd.setInitialization(newVal);
-            setPositions(vd.getInit(), sd);
+            //setPositions(vd.getInit(), sd);
             newVariable.setTypeDeclaration(sd);
             return newVariable;
         }

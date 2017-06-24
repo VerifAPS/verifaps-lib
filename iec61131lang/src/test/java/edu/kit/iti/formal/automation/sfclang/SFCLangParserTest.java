@@ -23,6 +23,12 @@ package edu.kit.iti.formal.automation.sfclang;
  */
 
 
+import edu.kit.iti.formal.automation.IEC61131Facade;
+import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
+import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
+import org.antlr.v4.runtime.CharStreams;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -37,10 +43,9 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class SFCLangParserTest {
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<String> data() {
-        return Arrays.asList(new String[]{
-                "data/Algo1_left.sfc",
+        return Arrays.asList("data/Algo1_left.sfc",
                 "data/Algo1_right.sfc",
                 "data/Delay1_left.sfc",
                 "data/Delay1_right.sfc",
@@ -57,8 +62,7 @@ public class SFCLangParserTest {
                 "data/Transition2_left.sfc",
                 "data/Transition2_right.sfc",
                 "data/Types1_left.sfc",
-                "data/Types1_right.sfc"
-        });
+                "data/Types1_right.sfc");
     }
 
     private String inputFilename;
@@ -72,7 +76,9 @@ public class SFCLangParserTest {
     @Test
     public void read() throws ClassNotFoundException, IOException {
         System.out.println("Test: " + inputFilename);
-        SFCLangFactory.parse(getClass()
-                .getResourceAsStream(inputFilename));
+        IEC61131Parser parser = IEC61131Facade.getParser(CharStreams.fromStream(getClass()
+                .getResourceAsStream(inputFilename)));
+        SFCDeclaration decl = (SFCDeclaration) parser.start_sfc().accept(new IECParseTreeToAST());
+        Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
     }
 }

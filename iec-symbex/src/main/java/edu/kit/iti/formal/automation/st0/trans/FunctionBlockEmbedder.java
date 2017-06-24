@@ -45,7 +45,7 @@ package edu.kit.iti.formal.automation.st0.trans;
  */
 
 import edu.kit.iti.formal.automation.st.ast.*;
-import edu.kit.iti.formal.automation.st.util.AstCopyVisitor;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 
 import java.util.function.Function;
@@ -54,29 +54,27 @@ import java.util.function.Function;
  * @author Alexander Weigl (26.06.2014)
  * @version 1
  */
-public class FunctionBlockEmbedder extends AstCopyVisitor {
+public class FunctionBlockEmbedder extends AstVisitor {
     private final String instanceName;
     private final StatementList toEmbedd;
     private Function<String, String> renameVariable;
 
-    public FunctionBlockEmbedder(String instanceName, StatementList embeddable, Function<String, String> rename) {
+    public FunctionBlockEmbedder(String instanceName,
+                                 StatementList embeddable,
+                                 Function<String, String> rename) {
         this.instanceName = instanceName;
         toEmbedd = embeddable;
         renameVariable = rename;
     }
 
-    @Override public Object defaultVisit(Visitable visitable) {
-        return visitable;
-    }
-
     @Override
     public Object visit(SymbolicReference symbolicReference) {
         if (instanceName.equals(symbolicReference.getIdentifier())) {
-		if(symbolicReference.getSub() != null) {
-			String field = ((SymbolicReference) symbolicReference.getSub()).getIdentifier();
-			SymbolicReference s = new SymbolicReference(instanceName + "$" + field);
-			return s;
-		}
+            if (symbolicReference.getSub() != null) {
+                String field = ((SymbolicReference) symbolicReference.getSub()).getIdentifier();
+                SymbolicReference s = new SymbolicReference(instanceName + "$" + field);
+                return s;
+            }
         }
         return super.visit(symbolicReference);
     }
@@ -96,39 +94,34 @@ public class FunctionBlockEmbedder extends AstCopyVisitor {
     }
 
     @Override
-    public Object visit(FunctionCallStatement functionCallStatement) {
-        FunctionCall call = functionCallStatement.getFunctionCall();
-        if (instanceName.equals(call.getFunctionName().getIdentifier())) {
-            StatementList sl = new StatementList();
-            for (FunctionCall.Parameter p : call.getParameters()) {
-                if (!p.isOutput()) {
-                    String name = renameVariable.apply(p.getName());
-
-                    AssignmentStatement assign = new AssignmentStatement(
-                            new SymbolicReference(name, null),
-                            p.getExpression()
-                    );
-                    sl.add(assign);
-                }
-            }
-            sl.addAll(toEmbedd);
-
-            for (FunctionCall.Parameter p : call.getParameters()) {
-                if (p.isOutput()) {
-                    String name = renameVariable.apply(p.getName());
-
-                    AssignmentStatement assign = new AssignmentStatement(
-                            (Reference) p.getExpression(),
-                            new SymbolicReference(name, null)
-                    );
-                    sl.add(assign);
-                }
-            }
-
-            return sl;
-        } else {
-            return super.visit(functionCallStatement);
+    public Object visit(FunctionBlockCallStatement fbc) {
+        if (!instanceName.equals(fbc.getCalleeName())) {
+            return super.visit(fbc); // I am not caring about this instance.
         }
+
+        StatementList sl = new StatementList();
+        fbc.getInputParameters().forEach(in -> {
+            String internalName = renameVariable.apply(in.getName());
+            sl.add(new AssignmentStatement(
+                    new SymbolicReference(internalName),
+                    in.getExpression()
+            ));
+        });
+
+        sl.add(CommentStatement.box("Call of %s:%s", instanceName, fbc.getFunctionBlockName()));
+        sl.addAll(this.toEmbedd);
+        fbc.getOutputParameters().forEach(p -> {
+            String name = renameVariable.apply(p.getName());
+
+            AssignmentStatement assign = new AssignmentStatement(
+                    (Reference) p.getExpression(),
+                    new SymbolicReference(name)
+            );
+            sl.add(assign);
+        });
+        sl.add(CommentStatement.box("End of call"));
+
+        return sl;
     }
 
     public StatementList embedd(StatementList into) {

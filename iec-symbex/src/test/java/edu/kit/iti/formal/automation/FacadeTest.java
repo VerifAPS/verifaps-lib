@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation;
 
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.smv.ast.*;
+import org.antlr.v4.runtime.CharStreams;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
@@ -39,7 +40,7 @@ public class FacadeTest {
     @Test
     public void testEvaluateFunction() throws IOException {
         InputStream resource = getClass().getResourceAsStream("/edu/kit/iti/formal/automation/st/func_sel.st");
-        List<TopLevelElement> toplevels = IEC61131Facade.file(IOUtils.toString(resource, "utf-8"));
+        List<TopLevelElement> toplevels = IEC61131Facade.file(CharStreams.fromStream(resource));
         FunctionDeclaration func = (FunctionDeclaration) toplevels.get(0);
         SMVExpr state = SymbExFacade.evaluateFunction(func,
                 SVariable.create("a").asBool(),
@@ -53,7 +54,8 @@ public class FacadeTest {
     public void testModuleBuilder() throws IOException {
         InputStream resource = getClass().
                 getResourceAsStream("/edu/kit/iti/formal/automation/st/symbextest.st");
-        TopLevelElements toplevels = IEC61131Facade.file(IOUtils.toString(resource, "utf-8"));
+        TopLevelElements toplevels = IEC61131Facade.file(CharStreams.fromStream(resource));
+
         IEC61131Facade.resolveDataTypes(toplevels);
         SMVModule module = SymbExFacade.evaluateProgram(
                 (ProgramDeclaration) toplevels.get(2),

@@ -1,9 +1,7 @@
 SFC A1R
-    VAR t : int; s : int END_VAR
-    
-    VAR_INPUT i : int END_VAR
-	
-	VAR_OUTPUT o :int END_VAR
+    VAR t : int; s : int; END_VAR
+    VAR_INPUT i : int; END_VAR
+	VAR_OUTPUT o :int; END_VAR
     
     STEP A
         ON active ACTION 

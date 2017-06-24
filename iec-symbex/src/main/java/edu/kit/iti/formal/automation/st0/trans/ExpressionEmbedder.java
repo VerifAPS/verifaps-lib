@@ -24,9 +24,9 @@ package edu.kit.iti.formal.automation.st0.trans;
 
 import edu.kit.iti.formal.automation.st.ast.BinaryExpression;
 import edu.kit.iti.formal.automation.st.ast.Expression;
-import edu.kit.iti.formal.automation.st.ast.UnaryExpression;
-import edu.kit.iti.formal.automation.st.util.AstCopyVisitor;
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
+import edu.kit.iti.formal.automation.st.ast.UnaryExpression;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 
 import java.util.Map;
 
@@ -34,7 +34,7 @@ import java.util.Map;
  * @author Alexander Weigl (26.06.2014)
  * @version 1
  */
-public class ExpressionEmbedder extends AstCopyVisitor {
+public class ExpressionEmbedder extends AstVisitor<Object> {
     private final Map<Expression, Expression> assignments;
 
     public ExpressionEmbedder(Map<Expression, Expression> assignments) {

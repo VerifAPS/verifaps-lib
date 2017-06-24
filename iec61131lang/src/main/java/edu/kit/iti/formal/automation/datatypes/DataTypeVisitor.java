@@ -29,6 +29,12 @@ package edu.kit.iti.formal.automation.datatypes;
  * @version 1 (12.12.16)
  */
 public interface DataTypeVisitor<T> {
+    T visit(AnyReal real);
+
+    T visit(AnyReal.Real real);
+
+    T visit(AnyReal.LReal real);
+
     /**
      * <p>visit.</p>
      *
@@ -84,14 +90,6 @@ public interface DataTypeVisitor<T> {
      * @return a T object.
      */
     T visit(TimeType timeType);
-
-    /**
-     * <p>visit.</p>
-     *
-     * @param field a {@link edu.kit.iti.formal.automation.datatypes.RecordType.Field} object.
-     * @return a T object.
-     */
-    T visit(RecordType.Field field);
 
     /**
      * <p>visit.</p>

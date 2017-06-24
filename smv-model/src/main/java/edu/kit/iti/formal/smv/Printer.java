@@ -165,6 +165,7 @@ public class Printer implements SMVAstVisitor<String> {
     private void printSection(StringBuilder sb, String section, List<SMVExpr> exprs) {
         if (exprs.size() > 0) {
             for (SMVExpr e : exprs) {
+                if(e==null) continue;
                 sb.append(section).append("\n\t");
                 sb.append(e.accept(this)).append(";\n\n");
             }

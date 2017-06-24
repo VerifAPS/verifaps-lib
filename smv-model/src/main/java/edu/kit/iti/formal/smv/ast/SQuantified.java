@@ -23,10 +23,12 @@ package edu.kit.iti.formal.smv.ast;
  */
 
 import edu.kit.iti.formal.smv.SMVAstVisitor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -51,6 +53,12 @@ public class SQuantified extends SMVExpr {
     @Override
     public SMVType getSMVType() {
         return SMVType.BOOLEAN;
+    }
+
+    @Override
+    public @NotNull SQuantified inModule(@NotNull String module) {
+        return new SQuantified(operator,
+                quantified.stream().map(a -> a.inModule(module)).collect(Collectors.toList()));
     }
 
     @Override

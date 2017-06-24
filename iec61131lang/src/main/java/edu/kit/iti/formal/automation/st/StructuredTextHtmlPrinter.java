@@ -22,11 +22,11 @@ package edu.kit.iti.formal.automation.st;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
-import edu.kit.iti.formal.automation.st.util.HTMLCodeWriter;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.util.HTMLCodeWriter;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Sections;
 import edu.kit.iti.formal.automation.visitors.Visitable;
@@ -60,7 +60,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         this.printComments = printComments;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object defaultVisit(Visitable visitable) {
         sb.div(Sections.ERROR).append("not implemented: ").append(visitable.getClass());
@@ -77,7 +79,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return sb.toString();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ExitStatement exitStatement) {
 
@@ -87,18 +91,22 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Object visit(CaseConditions.IntegerCondition integerCondition) {
+    public Object visit(CaseCondition.IntegerCondition integerCondition) {
         sb.div(Sections.CASE_INTEGER_CONDITION);
         integerCondition.getValue().visit(this);
         sb.end();
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Object visit(CaseConditions.Enumeration enumeration) {
+    public Object visit(CaseCondition.Enumeration enumeration) {
         sb.div(Sections.CASE_ENUM_CONDITION);
         if (enumeration.getStart() == enumeration.getStop()) {
             sb.appendIdent();
@@ -113,7 +121,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(BinaryExpression binaryExpression) {
         sb.div(Sections.BINARY_EXPRESSION);
@@ -128,7 +138,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(AssignmentStatement assignStatement) {
         sb.div(Sections.ASSIGNMENT);
@@ -139,7 +151,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(EnumerationTypeDeclaration enumerationTypeDeclaration) {
         sb.div(Sections.TYPE_DECL_ENUM).div(Sections.TYPE_NAME).append(enumerationTypeDeclaration.getTypeName());
@@ -157,7 +171,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(RepeatStatement repeatStatement) {
         sb.div(Sections.REPEAT).keyword("REPEAT");
@@ -169,7 +185,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(WhileStatement whileStatement) {
         sb.div(Sections.WHILE).keyword("WHILE");
@@ -181,7 +199,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(UnaryExpression unaryExpression) {
         sb.div(Sections.UNARY_EXPRESSION, Sections.OPERATOR)
@@ -192,7 +212,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(TypeDeclarations typeDeclarations) {
         sb.div(Sections.TYPE_DECL).keyword("TYPE");
@@ -204,7 +226,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseStatement caseStatement) {
         sb.div(Sections.CASE_STATEMENT).keyword("CASE");
@@ -218,11 +242,13 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(Location symbolicReference) {
     /*TODO
-		sb.variable(symbolicReference.getIdentifier());
+        sb.variable(symbolicReference.getIdentifier());
 
 
 		if (symbolicReference.getSubscripts() != null && !symbolicReference.getSubscripts().isEmpty()) {
@@ -243,7 +269,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(StatementList statements) {
         sb.div(Sections.STATEMENT_BLOCK);
@@ -260,7 +288,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
         sb.div(Sections.PROGRAM).keyword("PROGRAM");
@@ -275,7 +305,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ScalarValue<? extends Any, ?> tsScalarValue) {
         sb.div(Sections.VALUE).span(tsScalarValue.getDataType().getName())
@@ -284,7 +316,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ExpressionList expressions) {
         sb.append(Sections.EXPRESSION_LIST);
@@ -296,18 +330,17 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(FunctionCall functionCall) {
         sb.div(Sections.FUNC_CALL);
         sb.append(functionCall.getFunctionName()).append("(");
 
         boolean params = false;
-        for (FunctionCall.Parameter entry : functionCall.getParameters()) {
-            if (entry.getName() != null) {
-                sb.variable(entry.getName()).append(entry.isOutput() ? " => " : " := ");
-            }
-            entry.getExpression().visit(this);
+        for (Expression entry : functionCall.getParameters()) {
+            entry.visit(this);
             sb.seperator(",");
             params = true;
         }
@@ -318,7 +351,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ForStatement forStatement) {
         sb.div(Sections.FOR);
@@ -336,7 +371,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
         sb.div(Sections.FB).keyword("FUNCTION_BLOCK ").variable(functionBlockDeclaration.getFunctionBlockName());
@@ -348,14 +385,18 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ReturnStatement returnStatement) {
         sb.keyword("RETURN").ts();
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(IfStatement ifStatement) {
         sb.div(Sections.IFSTATEMENT);
@@ -381,20 +422,28 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Object visit(FunctionCallStatement functionCallStatement) {
+    public Object visit(FunctionBlockCallStatement fbc) {
         sb.div(Sections.FB_CALL);
-        functionCallStatement.getFunctionCall().visit(this);
+        sb.append(fbc.getFunctionBlockName())
+                .append("(");
+        for (FunctionBlockCallStatement.Parameter p :fbc.getParameters()) {
+            //TODO
+        }
         sb.end();
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseStatement.Case aCase) {
         sb.div(Sections.CASE);
-        for (CaseConditions cc : aCase.getConditions()) {
+        for (CaseCondition cc : aCase.getConditions()) {
             cc.visit(this);
             sb.seperator(",");
         }
@@ -406,7 +455,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(SimpleTypeDeclaration simpleTypeDeclaration) {
         sb.div(Sections.TYPE_DECL_SIMPLE).type(simpleTypeDeclaration.getBaseTypeName());
@@ -418,7 +469,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(LocalScope localScope) {
         sb.div(Sections.VARIABLES_DEFINITIONS);
@@ -465,7 +518,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CommentStatement commentStatement) {
         if (printComments) {

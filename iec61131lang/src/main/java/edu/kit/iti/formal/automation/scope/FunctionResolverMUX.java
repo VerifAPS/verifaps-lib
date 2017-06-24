@@ -46,7 +46,7 @@ public class FunctionResolverMUX implements FunctionResolver {
 
             List<Any> datatypes = call.getParameters().stream().map((expr) -> {
                 try {
-                    return expr.getExpression().dataType(scope);
+                    return expr.dataType(scope);
                 } catch (VariableNotDefinedException variableNotDefinedinScope) {
                     variableNotDefinedinScope.printStackTrace();
                 } catch (TypeConformityException e) {
@@ -84,7 +84,7 @@ public class FunctionResolverMUX implements FunctionResolver {
 
         private static CaseStatement.Case createCase(int i) {
             CaseStatement.Case c = new CaseStatement.Case();
-            c.addCondition(new CaseConditions.IntegerCondition(
+            c.addCondition(new CaseCondition.IntegerCondition(
                     ValueFactory.makeInt(i)));
             c.getStatements().add(new AssignmentStatement(new SymbolicReference("MUX"), new SymbolicReference("a" + i)));
             return c;

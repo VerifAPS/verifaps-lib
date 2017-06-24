@@ -1,3 +1,2 @@
-EXIT
-;
-exit
+EXIT;
+exit;

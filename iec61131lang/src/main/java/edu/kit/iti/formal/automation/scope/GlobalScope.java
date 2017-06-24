@@ -68,7 +68,7 @@ public class GlobalScope {
     }
 
     /**
-     * <p>getFunctionBlock.</p>
+     * <p>getCalleeName.</p>
      *
      * @param key a {@link java.lang.Object} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration} object.

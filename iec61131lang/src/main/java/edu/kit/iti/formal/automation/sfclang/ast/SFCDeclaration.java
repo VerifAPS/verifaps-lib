@@ -83,39 +83,9 @@ public class SFCDeclaration extends TopLevelScopeElement {
     public void setTransitions(List<TransitionDeclaration> transition) {
         this.transitions = transition;
     }
-
-    /**
-     * <p>getDeclaration.</p>
-     *
-     * @return a {@link java.util.List} object.
-     */
-    public List<StepDeclaration> getDeclaration() {
-        return steps;
-    }
-
-    /**
-     * <p>setDeclaration.</p>
-     *
-     * @param declaration a {@link java.util.List} object.
-     */
-    public void setDeclaration(List<StepDeclaration> declaration) {
-        this.steps = declaration;
-    }
-
-    /**
-     * <p>Getter for the field <code>actions</code>.</p>
-     *
-     * @return a {@link java.util.List} object.
-     */
     public List<FunctionBlockDeclaration> getActions() {
         return actions;
     }
-
-    /**
-     * <p>Setter for the field <code>actions</code>.</p>
-     *
-     * @param actions a {@link java.util.List} object.
-     */
     public void setActions(List<FunctionBlockDeclaration> actions) {
         this.actions = actions;
     }

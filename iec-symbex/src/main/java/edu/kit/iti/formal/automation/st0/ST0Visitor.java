@@ -83,8 +83,8 @@ public abstract class ST0Visitor<T> extends DefaultVisitor<T> {
     }
 
     @Override
-    public T visit(FunctionCallStatement functionCallStatement) {
-        return super.visit(functionCallStatement);
+    public T visit(FunctionBlockCallStatement fbc) {
+        return super.visit(fbc);
     }
 
     @Override

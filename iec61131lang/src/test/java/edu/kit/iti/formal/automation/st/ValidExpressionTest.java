@@ -22,11 +22,13 @@ package edu.kit.iti.formal.automation.st;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.TestUtils;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.st.ast.Expression;
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,20 +63,16 @@ public class ValidExpressionTest {
     }
 
     static boolean test(String s) {
-        ANTLRInputStream stream = new ANTLRInputStream(s);
-        IEC61131Lexer lexer = new IEC61131Lexer(stream);
-        CommonTokenStream cts = new CommonTokenStream(lexer);
-        IEC61131Parser parser = new IEC61131Parser(cts);
-
+        IEC61131Parser parser = IEC61131Facade.getParser(CharStreams.fromString(s));
         try {
-            Expression e = parser.expression().ast;
-           // System.out.println(e);
+            IEC61131Parser.ExpressionContext ctx = parser.expression();
+            System.out.println(ctx.toString(parser));
+            assertEquals("input was not completely consumed",
+                    "<EOF>", ctx.stop.getTokenSource().nextToken().getText());
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
-
         return parser.getNumberOfSyntaxErrors() == 0;
     }
-
 }

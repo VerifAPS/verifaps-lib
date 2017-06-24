@@ -213,7 +213,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         //endregion
 
         //region transfer variables
-        List<FunctionCall.Parameter> parameters = functionCall.getParameters();
+        List<Expression> parameters = functionCall.getParameters();
         List<VariableDeclaration> inputVars = fd.getLocalScope().filterByFlags(VariableDeclaration.INPUT);
 
         if (parameters.size() != inputVars.size()) {
@@ -223,7 +223,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         for (int i = 0; i < parameters.size(); i++) {
             // name from definition, in order of declaration, expression from caller site
             calleeState.put(lift(inputVars.get(i)),
-                    parameters.get(i).getExpression().visit(this));
+                    parameters.get(i).visit(this));
         }
         push(calleeState);
         //endregion
@@ -282,19 +282,19 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     }
 
     @Override
-    public SMVExpr visit(CaseConditions.Range r) {
+    public SMVExpr visit(CaseCondition.Range r) {
         throw new IllegalArgumentException("unsupported");
     }
 
     @Override
-    public SMVExpr visit(CaseConditions.IntegerCondition i) {
+    public SMVExpr visit(CaseCondition.IntegerCondition i) {
         BinaryExpression be = new BinaryExpression(caseExpression, i.getValue(), Operators.EQUALS);
         return be.visit(this);
     }
 
 
     @Override
-    public SMVExpr visit(CaseConditions.Enumeration e) {
+    public SMVExpr visit(CaseCondition.Enumeration e) {
         BinaryExpression be = new BinaryExpression(caseExpression, e.getStart(), Operators.EQUALS);
         return be.visit(this);
         //TODO rework case conditions

@@ -36,6 +36,6 @@ public class DefinedFunctionResolver implements FunctionResolver {
     @Override
     public FunctionDeclaration resolve(FunctionCall call, LocalScope scope) {
         return scope.getGlobalScope()
-                .getFunction(call.getFunctionName().getIdentifier());
+                .getFunction(call.getFunctionName());
     }
 }

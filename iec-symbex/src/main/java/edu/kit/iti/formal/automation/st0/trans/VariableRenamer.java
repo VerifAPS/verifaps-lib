@@ -24,14 +24,14 @@ package edu.kit.iti.formal.automation.st0.trans;
 
 import edu.kit.iti.formal.automation.st.ast.StatementList;
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
-import edu.kit.iti.formal.automation.st.util.AstCopyVisitor;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 
 import java.util.function.Function;
 
 /**
  * @author Alexander Weigl (26.06.2014)
  */
-public class VariableRenamer extends AstCopyVisitor {
+public class VariableRenamer extends AstVisitor {
     private final StatementList statements;
     private final Function<String, String> newName;
 

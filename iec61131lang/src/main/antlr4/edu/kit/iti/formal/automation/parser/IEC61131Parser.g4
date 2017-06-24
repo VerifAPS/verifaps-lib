@@ -1,187 +1,86 @@
 parser grammar IEC61131Parser;
 
-options {
-    tokenVocab = IEC61131Lexer;
-}
+options {tokenVocab = IEC61131Lexer;}
 
-@header {
-import java.util.*;
-import edu.kit.iti.formal.automation.sfclang.ast.*;
-import static edu.kit.iti.formal.automation.sfclang.Utils.*;
-import   edu.kit.iti.formal.automation.sfclang.Utils;
-import edu.kit.iti.formal.automation.*;
-import edu.kit.iti.formal.automation.st.ast.*;
-import edu.kit.iti.formal.automation.datatypes.*;
-import edu.kit.iti.formal.automation.operators.*;
-import edu.kit.iti.formal.automation.datatypes.values.*;
-import static edu.kit.iti.formal.automation.st.ast.VariableDeclaration.*;
-}
+@header {}
 
 @members {
 }
 
 start
-returns [ List<TopLevelElement> ast = new LinkedList<>() ]
 :
-	(library_element_declaration
-	    {
-	        if($library_element_declaration.ast != null)
-              $ast.add($library_element_declaration.ast);
-	    })+
+	(library_element_declaration)+
 ;
 
 
 library_element_declaration
-returns [TopLevelElement ast]
 :
 	data_type_declaration
-	{ $ast = $data_type_declaration.ast; }
-
 	| function_declaration
-	{ $ast = $function_declaration.ast; }
-
     | class_declaration
-	{ $ast = $class_declaration.ast; }
-
     | interface_declaration
-    { $ast = $interface_declaration.ast; }
-
 	| function_block_declaration
-	{ $ast = ($function_block_declaration.ast); }
-
 	| program_declaration
-	{ $ast = ($program_declaration.ast); }
-
-	| configuration_declaration
-	// { $start::ast.add($configuration_declaration.ast); }
-
-;
-
-library_element_name
-:
-	data_type_name
-	| IDENTIFIER
+//	| configuration_declaration
 ;
 
 constant
-returns [ ScalarValue<?,?> ast]
 :
-	integer
-	{ $ast= $integer.ast; }
-
+      integer
 	| real
-	{ $ast= $real.ast; }
-
 	| string
-	{ $ast= $string.ast; }
-
 	| time
-	{ $ast= $time.ast; }
-
 	| timeofday
-	{ $ast= $timeofday.ast; }
-
 	| date
-	{ $ast= $date.ast; }
-	//| boolc     { $ast= $boolc.ast; }
-
 	| datetime
-	{ $ast= $datetime.ast; }
-
 	| cast
-	{ $ast= $cast.ast; }
-
 	| bits
-	{ $ast= $bits.ast; }
-
 ;
 
-cast
-returns [ ScalarValue<EnumerateType, String> ast]
+cast 
 :
 	CAST_LITERAL
-	{ $ast = ValueFactory.makeEnumeratedValue($CAST_LITERAL);
-		  Utils.setPosition($ast, $CAST_LITERAL); }
-
 ;
 
-integer
-returns [ ScalarValue<? extends AnyInt, Long> ast]
+integer 
 :
-	INTEGER_LITERAL
-	{ $ast = ValueFactory.parseIntegerLiteral($INTEGER_LITERAL);
-		  Utils.setPosition($ast, $INTEGER_LITERAL); }
-
+	MINUS? INTEGER_LITERAL
 ;
 
-bits
-returns [ ScalarValue<? extends AnyBit, Bits> ast]
-:
-	BITS_LITERAL
-	{ $ast = ValueFactory.parseBitLiteral($BITS_LITERAL);
-		  Utils.setPosition($ast, $BITS_LITERAL); }
+bits 
+: BITS_LITERAL;
 
-;
+real 
+: REAL_LITERAL;
 
-real
-returns [ ScalarValue<? extends AnyReal, Double> ast ]
-:
-	REAL_LITERAL
-	{ $ast = ValueFactory.parseRealLiteral($REAL_LITERAL);
-	  Utils.setPosition($ast, $REAL_LITERAL); }
+string 
 
-;
-
-string
-returns [ ScalarValue<? extends IECString, String> ast]
 :
 	tok =
 	(
 		WSTRING_LITERAL
 		| STRING_LITERAL
 	)
-	{ $ast = ValueFactory.parseStringLiteral($tok);
-	  Utils.setPosition($ast, $tok); }
-
-
 ;
 
 time
-returns [ ScalarValue<TimeType, TimeValue> ast]
 :
 	TIME_LITERAL
-	{$ast = ValueFactory.parseTimeLiteral($TIME_LITERAL);
-		 Utils.setPosition($ast, $TIME_LITERAL); }
-
-
-;
+	;
 
 timeofday
-returns [ ScalarValue<AnyDate.TimeOfDay, TimeOfDayValue> ast]
 :
 	TOD_LITERAL
-	{ $ast =ValueFactory.parseTimeOfDayLiteral($TOD_LITERAL.text);
-		 Utils.setPosition($ast, $TOD_LITERAL); }
-
-
 ;
 
 date
-returns [ ScalarValue<AnyDate.Date, DateValue> ast]
 :
 	DATE_LITERAL
-	{$ast = ValueFactory.parseDateLiteral($DATE_LITERAL.text);
-		 Utils.setPosition($ast, $DATE_LITERAL); }
-
 ;
 
 datetime
-returns [ ScalarValue<AnyDate.DateAndTime, DateAndTimeValue> ast]
 :
 	DATETIME
-	{ $ast = ValueFactory.parseDateAndTimeLiteral($DATETIME);
-		 Utils.setPosition($ast, $DATETIME); }
-
 ;
 
 data_type_name
@@ -272,123 +171,73 @@ generic_type_name
 ;
 
 data_type_declaration
-returns [ TypeDeclarations ast = new TypeDeclarations();  ]
 :
-	TYPE
-	(
-	    IDENTIFIER COLON type_declaration
-	    SEMICOLON
-		{$ast.add($type_declaration.ast);
-		 $type_declaration.ast.setTypeName($IDENTIFIER.getText()); }
-	)+ END_TYPE
-	{Utils.setPosition($ast,$TYPE,$END_TYPE);}
+	TYPE (IDENTIFIER COLON type_declaration SEMICOLON)+ END_TYPE
 ;
 
 type_declaration
-returns [TypeDeclaration ast]
 :
-	( array_specification       {$ast = $array_specification.ast;}
-	| enumerated_specification 	{$ast = $enumerated_specification.ast;}
-	| string_type_declaration 	    {$ast = $string_type_declaration.ast;}
-	| subrange_spec_init	    {$ast = $subrange_spec_init.ast;}
-	| structure_declaration     {$ast = $structure_declaration.ast;}
-	| (data_type_name)
-	  ( R_EDGE {/*dt.pushRisingEdge(); */}
-	  | F_EDGE {/*dt.pushFallingEdge();*/}
+	( array_specification
+	| enumerated_specification
+	| string_type_declaration
+	| subrange_spec_init
+	| structure_declaration
+	| data_type_name
+	  ( R_EDGE
+	  | F_EDGE
 	  )?
-	  { SimpleTypeDeclaration td = new SimpleTypeDeclaration();
-        td.setBaseTypeName($data_type_name.text);
-        $ast = td; }
 	)
-	( ASSIGN i=initializations
-	  { $ast.setInitialization($i.ast);
-	    Utils.setLastPosition($ast, $i.ast); } )?
+	( ASSIGN i=initializations)?
 ;
 
 
 //region initializations
 initializations
-returns [ Initialization ast ]
 :
-    constant
-      {$ast = $constant.ast;}
-    | IDENTIFIER
-      {$ast = new IdentifierInitializer($IDENTIFIER.text);}
-    | array_initialization
-      {$ast = $array_initialization.ast;}
-    | structure_initialization
-      {$ast = $structure_initialization.ast;}
+    constant #initializations_constant
+    | IDENTIFIER #initializations_identifier
+    | array_initialization #initializations_array_initialization
+    | structure_initialization #initializations_structure_initialization
 ;
 
 subrange_spec_init
-returns [SubRangeTypeDeclaration ast = new SubRangeTypeDeclaration()]
 :
 	integer_type_name LPAREN subrange RPAREN
-	{ $ast.setBaseTypeName($integer_type_name.text);
-      $ast.setRange($subrange.ast);
-      Utils.setPosition($ast, $integer_type_name.ctx ,$RPAREN); }
 ;
 
 subrange
-returns [ Range ast]
-locals [ int x1=1, int x2 = 1]
 :
-	(a=MINUS {$x1=-1;})?  c=integer RANGE
-	(b=MINUS {$x2=-1;})?  d=integer
-	{ $ast = new Range(/*$x1*/$c.ast, /*$x2*/$d.ast);
-      }//Utils.setPosition($ast, $c.ctx, $d.ctx); }
+	 c=integer RANGE d=integer
 ;
 
 enumerated_specification
-returns [ EnumerationTypeDeclaration  ast = new EnumerationTypeDeclaration()]
 :
-	(
-		LPAREN
-		    a=IDENTIFIER
-            {$ast.addValue($a.text);}
-		    ( ASSIGN integer
-		      {$ast.setInt($integer.ast);}
-		    )?
-
-			( COMMA a=IDENTIFIER
-              {$ast.addValue($a.text);}
-    		  ( ASSIGN integer
-    		    {$ast.setInt($integer.ast);}
-    		  )?
+	(LPAREN
+		    name+=IDENTIFIER ( ASSIGN integer )?
+			( COMMA name+=IDENTIFIER
+    		  ( ASSIGN integer )?
 		    )*
-		RPAREN
-	)
-	{ Utils.setPosition($ast, $LPAREN, $RPAREN); }
-
-	| IDENTIFIER { $ast.setBaseTypeName($IDENTIFIER.text);
-          Utils.setPosition($ast, $IDENTIFIER); }
+	 RPAREN)
+	| basename=IDENTIFIER
 ;
 
 
 array_specification
-returns [ ArrayTypeDeclaration ast = new ArrayTypeDeclaration() ]
-:
-	/*IDENTIFIER
-	{ $ast.setBaseTypeName($IDENTIFIER.text);}
-	|*/ ARRAY LBRACKET ranges += subrange
-	(
-		COMMA ranges += subrange
-	)* RBRACKET OF non_generic_type_name
-	{ Utils.setPosition($ast, $ARRAY, $non_generic_type_name.ctx);
-      $ast.setBaseTypeName($non_generic_type_name.text);
-      for(SubrangeContext src : $ranges) {
-        $ast.addSubRange(src.ast);
-      }}
-;
 
+:
+	| ARRAY LBRACKET ranges += subrange
+	  (COMMA ranges += subrange)*
+	  RBRACKET OF non_generic_type_name
+
+;
+//TODO need to clarify https://infosys.beckhoff.com/english.php?content=../content/1033/tcplccontrol/html/tcplcctrl_array.htm&id=
 array_initialization
-returns [ ArrayInitialization ast = new ArrayInitialization()]
+
 :
 	LBRACKET array_initial_elements
 	(
 		COMMA array_initial_elements
 	)* RBRACKET
-	{ Utils.setPosition($ast, $LBRACKET,$RBRACKET); }
 ;
 
 array_initial_elements
@@ -403,105 +252,75 @@ array_initial_elements
 array_initial_element
 :
 	constant
-	{ $array_initialization::ast.add($constant.ast); }
-
+	//
 	| structure_initialization
-	{ $array_initialization::ast.add($structure_initialization.ast); }
-
+	//
 	| array_initialization
-	{ $array_initialization::ast.add($array_initialization.ast); }
-
+	//
 ;
 
 structure_declaration
-returns [ StructureTypeDeclaration ast = new StructureTypeDeclaration() ]
 :
 	STRUCT
-	(IDENTIFIER COLON type_declaration SEMICOLON
-	 { $ast.addField($IDENTIFIER.text, $type_declaration.ast);}
-	)+
+	(IDENTIFIER COLON type_declaration SEMICOLON)*
 	END_STRUCT
 ;
 
 structure_initialization
-returns [ StructureInitialization ast = new StructureInitialization()]
 :
 	LPAREN
 	I=IDENTIFIER ASSIGN i=initializations
-	{$ast.addField($I.text, $i.ast);}
-	( I=IDENTIFIER ASSIGN i=initializations
-	  {$ast.addField($I.text, $i.ast);}
-	)*
+	( I=IDENTIFIER ASSIGN i=initializations)*
 	RPAREN
 ;
 
 string_type_declaration
-returns [ StringTypeDeclaration ast = new StringTypeDeclaration()]
 :
 	baseType=(STRING|WSTRING)
-    {$ast.setBaseTypeName($baseType.text);   }
-	( LBRACKET integer
-	  { $ast.setSize($integer.ast);}
-	  RBRACKET )?
+	( LBRACKET integer RBRACKET )?
 ;
 
 
 identifier_list
-returns [ List<String> ast = new ArrayList<>()]
 :
 	names += IDENTIFIER
 	(
 		COMMA names += IDENTIFIER
 	)*
-	{
-        for(Token t : $names)
-            $ast.add(t.getText());
-    }
-
 ;
 
 function_declaration
-returns [ FunctionDeclaration ast = new FunctionDeclaration() ]
 :
 	FUNCTION identifier = IDENTIFIER COLON
-	( elementary_type_name
-	  {$ast.setReturnTypeName($elementary_type_name.text);}
-	| IDENTIFIER
-      {$ast.setReturnTypeName($IDENTIFIER.text);})
-	var_decls[$ast.getLocalScope().builder()]
+	( returnET=elementary_type_name	| returnID=IDENTIFIER)
+	var_decls
 	body = statement_list END_FUNCTION
-	{ Utils.setPosition($ast, $FUNCTION, $END_FUNCTION);
-	  $ast.setFunctionName($identifier.text);
-	  $ast.setStatements($body.ast); }
 ;
 
-var_decls [VariableBuilder gather]
+var_decls
 :
-    ( { gather.clear(); }
-      variable_keyword[gather]
-      (
-        identifier_list {gather.identifiers($identifier_list.ast);}
-        COLON
-        td=type_declaration
-        SEMICOLON
-        { gather.setPosition($variable_keyword.ctx, $SEMICOLON);
-          gather.type($td.ast).close(); }
-        )*
-      END_VAR
-    )*
+    (var_decl)*
 ;
 
-variable_keyword[VariableBuilder v]
+var_decl
 :
-	( VAR        {v.push(LOCAL);}
-	| VAR_INPUT  {v.push(INPUT);}
-	| VAR_OUTPUT {v.push(OUTPUT);}
-	| VAR_IN_OUT {v.push(INOUT);}
-	| VAR_EXTERNAL  { v.clear(VariableDeclaration.EXTERNAL);}
-	| VAR_GLOBAL {v.push(INOUT);}
+    variable_keyword
+    (identifier_list COLON td=type_declaration SEMICOLON)*
+    END_VAR
+;
+
+
+variable_keyword
+:
+	( VAR
+	| VAR_INPUT
+	| VAR_OUTPUT
+	| VAR_IN_OUT
+	| VAR_EXTERNAL
+	| VAR_GLOBAL
 	)
-	( CONSTANT   {v.mix(VariableDeclaration.CONSTANT);}
-	| RETAIN     {v.mix(VariableDeclaration.RETAIN);}
+	( CONSTANT
+	| RETAIN
     | NON_RETAIN
     )?
 ;
@@ -510,90 +329,59 @@ variable_keyword[VariableBuilder v]
 //endregion
 
 function_block_declaration
-returns [ FunctionBlockDeclaration ast = new FunctionBlockDeclaration()]
 :
 	FUNCTION_BLOCK identifier = IDENTIFIER
-	var_decls [$ast.getLocalScope().builder()]
+	var_decls
 	body = statement_list END_FUNCTION_BLOCK
-	{ $ast.setFunctionBlockName($identifier.text);
-      $ast.setFunctionBody($body.ast);
-      Utils.setPosition($ast, $FUNCTION_BLOCK, $END_FUNCTION_BLOCK);}
-
 ;
 
 interface_declaration
-returns [ ClassDeclaration ast = new ClassDeclaration()]
 :
     INTERFACE identifier=IDENTIFIER
 	(EXTENDS sp=IDENTIFIER)?
-
-	var_decls[$ast.getLocalScope().builder()]
-	methods { $ast.setMethods($methods.ast); }
+	var_decls
+	methods
 	END_INTERFACE
-	{ $ast.setBlockName($identifier.text);
-      Utils.setPosition($ast, $INTERFACE, $END_INTERFACE);}
-
 ;
 
 
 class_declaration
-returns [ ClassDeclaration ast = new ClassDeclaration()]
 :
 	(FUNCTION_BLOCK) identifier=IDENTIFIER
-	(EXTENDS sp=IDENTIFIER
-	    {$ast.setParentClass($sp.text);}
-	)?
-	(IMPLEMENTS sp=IDENTIFIER
-	    {$ast.addImplements($sp.text);}
-	)*
+	(EXTENDS inherit=IDENTIFIER)?
+	(IMPLEMENTS interfaces=IDENTIFIER)*
 
-	var_decls[$ast.getLocalScope().builder()]
+	var_decls
 
-	methods { $ast.setMethods($methods.ast); }
+	methods
 
 	END_FUNCTION_BLOCK
-	{ $ast.setBlockName($identifier.text);
-      Utils.setPosition($ast, $FUNCTION_BLOCK, $END_FUNCTION_BLOCK);}
 ;
 
-methods
-returns [List<MethodDeclaration> ast = new ArrayList<>() ]
-:
-    (method { $ast.add($method.ast); })+
-;
-
+methods: method*;
 method
-returns [MethodDeclaration ast = new MethodDeclaration()]
 :
     (PUBLIC|PRIVATE)?
-    METHOD identifier=IDENTIFIER {$ast.setName($identifier.text);}
-    (COLON ( elementary_type_name
-          	  {$ast.setReturnTypeName($elementary_type_name.text);}
-          	| IDENTIFIER
-                {$ast.setReturnTypeName($IDENTIFIER.text);})
-    )?
-    var_decls[$ast.getLocalScope().builder()]
-    statement_list {$ast.setStatements($statement_list.ast);}
+    METHOD identifier=IDENTIFIER
+    (COLON ( returnET=elementary_type_name
+          	| returnID=IDENTIFIER))?
+    var_decls
+    statement_list
     END_METHOD
 ;
 
 program_declaration
-returns [ ProgramDeclaration ast = new ProgramDeclaration()]
 :
 	PROGRAM identifier=IDENTIFIER
-	var_decls[$ast.getLocalScope().builder()]
+	var_decls
 	body = statement_list END_PROGRAM
-	{ $ast.setProgramName($identifier.text);
-      $ast.setProgramBody($body.ast);
-      Utils.setPosition($ast, $PROGRAM, $END_PROGRAM);}
-
 ;
 
+/*
 configuration_declaration
-returns [ ConfigurationDeclaration ast = new ConfigurationDeclaration()]
+
 :
 	CONFIGURATION identifier = IDENTIFIER
-    //(global_var_declarations [$ast.getLocalScope().builder()]	)?
 	(
 		single_resource_declaration
 		|
@@ -608,16 +396,14 @@ returns [ ConfigurationDeclaration ast = new ConfigurationDeclaration()]
 		access_declarations
 	)?
 	(
-		//instance_specific_initializations [$ast.getLocalScope().builder()]
 	)? END_CONFIGURATION
 ;
 
 resource_declaration
-returns [ ResourceDeclaration ast = new ResourceDeclaration()]
+
 :
 	RESOURCE IDENTIFIER ON IDENTIFIER
 	(
-		//global_var_declarations [$ast.getLocalScope().builder()]
 	)? single_resource_declaration END_RESOURCE
 ;
 
@@ -782,99 +568,123 @@ instance_specific_initializations [VariableBuilder gather]
 			IDENTIFIER COLON IDENTIFIER ASSIGN structure_initialization
 		)
 	)
-;*/
+;
+*/
 
 expression
-returns [ Expression ast ]
+
 :
 	MINUS sub = expression
-	{
-        $ast = new UnaryExpression(
-                    Operators.MINUS,
-                    $sub.ast);
-        Utils.setPosition($ast, $MINUS, $sub.ast);
-    }
-
+    #unaryMinusExpr
 	| NOT sub = expression
-	{
-        $ast = new UnaryExpression(
-                    Operators.NOT,
-                    $sub.ast);
-        Utils.setPosition($ast, $NOT, $sub.ast);
-    }
-
+    #unaryNegateExpr
 	| LPAREN sub=expression RPAREN
-	{ $ast = $sub.ast;
-	  Utils.setPosition($ast, $LPAREN, $RPAREN); }
-
-
+    #parenExpr
 	| left = expression op = POWER right = expression
-	{ $ast = new BinaryExpression($left.ast, $right.ast, Operators.POWER);
-      Utils.setPosition($ast, $left.ast, $right.ast);
-    }
-
+    #binaryPowerExpr
 	| <assoc=right> left=expression op=(MOD	| DIV) right = expression
-	{ $ast = new BinaryExpression($left.ast, $right.ast, $op.text);
-      Utils.setPosition($ast, $left.ast, $right.ast);
-	}
-
+    #binaryModDivExpr
 	| left=expression op=MULT right=expression
-	{ $ast = new BinaryExpression($left.ast, $right.ast, Operators.MULT);
-	  Utils.setPosition($ast, $left.ast, $right.ast);
-    }
-
+    #binaryMultExpr
 	| left=expression op =(PLUS|MINUS) right=expression
-	{ $ast = new BinaryExpression($left.ast, $right.ast, $op.text);
-      Utils.setPosition($ast, $left.ast, $right.ast);
-	}
-
+	#binaryPlusMinusExpr
 	| left=expression op=( LESS_THAN | GREATER_THAN | GREATER_EQUALS | LESS_EQUALS) right=expression
-	{ $ast = new BinaryExpression($left.ast, $right.ast, $op.text);
-      Utils.setPosition($ast, $left.ast, $right.ast);
-	}
-
+    #binaryCmpExpr
 	| left=expression op=(EQUALS|NOT_EQUALS) right=expression
-	{ $ast = new BinaryExpression($left.ast, $right.ast, $op.text);
-      Utils.setPosition($ast, $left.ast, $right.ast);
-    }
-
+	#binaryEqExpr
 	| left=expression op=AND right=expression
-	{ $ast = new BinaryExpression($left.ast, $right.ast, Operators.AND);
-      Utils.setPosition($ast, $left.ast, $right.ast);
-	}
+	#binaryAndExpr
 	| left=expression op=OR right=expression
-	{ $ast = new BinaryExpression($left.ast, $right.ast, Operators.OR);
-      Utils.setPosition($ast, $left.ast, $right.ast);
-	}
-
+	#binaryOrExpr
 	| left=expression op=XOR right=expression
-	{ $ast = new BinaryExpression($left.ast, $right.ast, Operators.XOR);
-	  Utils.setPosition($ast, $left.ast, $right.ast);
-	}
-
+	#binaryXORExpr
 	//BASE CASE
-
 	| primary_expression
-	{ $ast = $primary_expression.ast; 	}
-
+    #primaryExpr
 ;
 
 primary_expression
-returns [ Expression ast]
+
 :
 	constant
-	{ $ast = $constant.ast; }
-
 	| v=variable
-	{ $ast = $v.ast; }
-
 	| functioncall
-	{ $ast = $functioncall.ast; }
-
 ;
 
+/////////MARKER
+
 functioncall
-returns [ FunctionCall ast = new FunctionCall()]
+
+:
+	id=IDENTIFIER LPAREN
+	(
+		expression (COMMA expression)*
+	)? RPAREN
+;
+
+statement_list
+:
+	(statement)*
+;
+
+statement
+:
+	  assignment_statement SEMICOLON
+   	| functionblockcall SEMICOLON
+	| return_statement SEMICOLON
+	| if_statement
+    | case_statement
+	| for_statement
+	| while_statement
+	| repeat_statement
+	| exit_statement SEMICOLON
+;
+
+assignment_statement
+
+:
+	a=variable (RASSIGN|ASSIGN) expression
+;
+
+variable
+
+:
+	direct_variable
+	| symbolic_variable
+;
+
+symbolic_variable
+
+:
+    //x^[a,252]
+	a=(IDENTIFIER|SUPER|THIS)
+	(REF )?
+	(
+		subscript_list
+        (REF)?
+	)?
+	(
+		DOT other=symbolic_variable
+	)?
+;
+
+subscript_list
+
+:
+	LBRACKET expression
+	(COMMA expression)* RBRACKET
+;
+
+direct_variable
+
+:
+	DIRECT_VARIABLE_LITERAL
+;
+
+return_statement : RETURN;
+
+functionblockcall
+
 :
 	symbolic_variable LPAREN
 	(
@@ -883,381 +693,109 @@ returns [ FunctionCall ast = new FunctionCall()]
 			COMMA param_assignment
 		)*
 	)? RPAREN
-	{
-        $ast.setFunctionName($symbolic_variable.ast);
-        Utils.setPosition($ast, $symbolic_variable.ast, $RPAREN);
-    }
-
 ;
 
 param_assignment
 :
-	(
-		id = IDENTIFIER (ASSIGN)
-	)? expression
-	{
-          $functioncall::ast.addInputParameter($id.text, $expression.ast);
-        }
-	| IDENTIFIER ARROW_RIGHT v=variable
-	{
-          $functioncall::ast.addOutputParameter($IDENTIFIER.text, $v.ast);
-    }
-;
-
-statement_list
-returns [ StatementList ast = new StatementList()]
-:
-	(statement { $ast.add($statement.ast); })*
-;
-
-statement
-returns [ Statement ast]
-:
-    SEMICOLON // the empty statement
-    |
-	  assignment_statement
-	{ $ast = $assignment_statement.ast; }
-
-	| subprogram_control_statement
-	{ $ast = $subprogram_control_statement.ast; }
-
-	| selection_statement
-	{ $ast = $selection_statement.ast; }
-
-	| iteration_statement
-	{ $ast = $iteration_statement.ast; }
-
-;
-
-assignment_statement
-returns [ AssignmentStatement ast ]
-locals [ boolean ref = false; ]
-:
-	a=variable (RASSIGN|ASSIGN) expression SEMICOLON
-	{
-        $ast = new AssignmentStatement($a.ast, $expression.ast);
-        $ast.setReference($RASSIGN != null);
-        setPosition($ast, $ctx);
-    }
-;
-
-variable
-returns [ Reference ast]
-:
-	direct_variable
-	{ $ast = $direct_variable.ast; }
-
-	| symbolic_variable
-	{ $ast = $symbolic_variable.ast; }
-
-;
-
-symbolic_variable
-returns [ SymbolicReference ast = new SymbolicReference() ]
-:
-    //x^[a,252]
-	a=(IDENTIFIER|SUPER|THIS)
-	(REF { $ast.derefVar(); })?
-	(
-		subscript_list
-		{$ast.setSubscripts($subscript_list.ast);}
-        (REF       { $ast.derefSubscript(); })?
-	)?
-	(
-		DOT other=symbolic_variable
-	)?
-	{ $ast.setIdentifier($a.text);
-      $ast.setSub($DOT.text != null ? $other.ast : null);
-      setPosition($ast, $ctx);
-    }
-
-;
-
-subscript_list
-returns [ ExpressionList ast = new ExpressionList()]
-:
-	LBRACKET expression
-	{$ast.add($expression.ast);}
-
-	(
-		COMMA expression
-		{$ast.add($expression.ast);}
-
-	)* RBRACKET
-;
-
-direct_variable
-returns [ DirectVariable ast]
-:
-	DIRECT_VARIABLE_LITERAL
-	{ $ast=new DirectVariable($DIRECT_VARIABLE_LITERAL.text); }
-
-;
-
-
-subprogram_control_statement
-returns [ Statement ast ]
-:
-	functioncall SEMICOLON
-	{$ast = new FunctionCallStatement($functioncall.ast);}
-	| RETURN SEMICOLON
-	{
-	  $ast = new ReturnStatement();
-	  Utils.setPosition($ast, $RETURN);
-	}
-
-;
-
-selection_statement
-returns [ Statement ast ]
-:
-	if_statement
-	{$ast = $if_statement.ast;}
-
-	| case_statement
-	{$ast = $case_statement.ast;}
-
+	(id=IDENTIFIER ASSIGN)? expression
+	| id=IDENTIFIER ARROW_RIGHT v=variable
 ;
 
 if_statement
-returns [ IfStatement ast = new IfStatement() ]
+
 :
-	IF
-	cond = expression THEN thenlist = statement_list
-	{
-	    $ast.addGuardedCommand($cond.ast, $thenlist.ast);
-	}
-
-	(
-		ELSEIF cond = expression THEN thenlist = statement_list
-		{ $ast.addGuardedCommand($cond.ast, $thenlist.ast);}
-
-	)*
-	(
-		ELSE elselist = statement_list
-	)? END_IF SEMICOLON?
-	{
-        if($ELSE.text != null)
-            $ast.setElseBranch($elselist.ast);
-
-        Utils.setPosition($ast, $IF, $END_IF);
-    }
+	IF cond+=expression THEN thenlist+=statement_list
+	(ELSEIF cond+=expression THEN thenlist+=statement_list)*
+	(ELSE elselist = statement_list)?
+	END_IF SEMICOLON?
 ;
 
 case_statement
-returns [ CaseStatement ast = new CaseStatement()]
 :
 	CASE
-
-	cond = expression OF case_element
-	(
-		case_element
-	)*
-	(
-		ELSE elselist = statement_list
-		{$ast.setElseCase($elselist.ast);}
-
-	)? END_CASE
-	{
-        $ast.setExpression($cond.ast);
-        Utils.setPosition($ast, $CASE, $END_CASE);
-    }
+	cond=expression OF
+	(case_entry)+
+	(ELSE elselist=statement_list)?
+	END_CASE
 ;
 
-case_element
-returns [ CaseStatement.Case cs = new CaseStatement.Case()]
+case_entry
 :
-	case_list COLON statement_list
-	{
-        //$cs.line($COLON);
-        $cs.setStatements($statement_list.ast);
-        $case_statement::ast.addCase($cs);
-    }
-
+	case_condition (COMMA case_condition)*
+    COLON statement_list
 ;
 
-case_list
-:
-	case_list_element
-	(
-		COMMA case_list_element
-	)*
-;
-
-case_list_element
+case_condition
 :
 	subrange
-	{ $case_element::cs.addCondition(new CaseConditions.Range($subrange.ast)); }
-
 	| integer
-	{ $case_element::cs.addCondition(
-                        new CaseConditions.IntegerCondition($integer.ast)); }
-
 	| cast
-	{ $case_element::cs.addCondition(
-                    new CaseConditions.Enumeration($cast.ast)); }
-
 	| IDENTIFIER
-	{ $case_element::cs.addCondition(
-                    new CaseConditions.Enumeration($IDENTIFIER.text)); }
-
-;
-
-iteration_statement
-returns [ Statement ast]
-:
-	for_statement
-	{ $ast = $for_statement.ast; }
-
-	| while_statement
-	{ $ast = $while_statement.ast; }
-
-	| repeat_statement
-	{ $ast = $repeat_statement.ast; }
-
-	| exit_statement
-	{ $ast = $exit_statement.ast; }
-
 ;
 
 for_statement
-returns [ ForStatement ast = new ForStatement()]
 :
-	FOR var = IDENTIFIER ASSIGN for_list DO statement_list END_FOR
-	{
-        $ast.setVariable($var.text);
-        $ast.setStatements($statement_list.ast);
-        //$ast.line($FOR);
-        Utils.setPosition($ast, $FOR, $END_FOR);
-     }
-
-;
-
-for_list
-:
-	begin = expression TO endPosition = expression
-	(
-		BY step = expression
-		{$for_statement::ast.setStep($step.ast);}
-
-	)?
-	{
-        $for_statement::ast.setStop($endPosition.ast);
-        $for_statement::ast.setStart($begin.ast);
-    }
-
+	FOR var=IDENTIFIER ASSIGN
+	begin=expression TO endPosition=expression
+	(BY step = expression)?
+	DO statement_list END_FOR
 ;
 
 while_statement
-returns [WhileStatement ast = new WhileStatement()]
 :
 	WHILE expression DO statement_list END_WHILE
-	{
-        $ast.setCondition($expression.ast);
-        $ast.setStatements($statement_list.ast);
-        //$ast.line($WHILE);
-    }
-
 ;
 
 repeat_statement
-returns [RepeatStatement ast = new RepeatStatement()]
 :
 	REPEAT statement_list UNTIL expression END_REPEAT
-	{
-            $ast.setCondition($expression.ast);
-            $ast.setStatements($statement_list.ast);
-            //$ast.line($REPEAT);
-     }
-
 ;
 
 exit_statement
-returns [ExitStatement ast = new ExitStatement()]
 :
 	EXIT
-	{
-	    Utils.setPosition($ast,$EXIT);
-	}
-
 ;
 
 
 /**
  * SFC LANG
  */
-start_sfc returns [ SFCDeclaration ast = new SFCDeclaration() ]
+start_sfc 
 :
 	SFC identifier=IDENTIFIER
-	{$ast.setBlockName($identifier.text);}
-	var_decls[$ast.getLocalScope().builder()]
-	(
-		action_declaration [$ast.getActions()]
-		| goto_declaration [$ast.getTransitions()]
-		| step_declaration [$ast.getSteps()]
+	var_decls
+	(     action_declaration
+		| goto_declaration
+		| step_declaration
 	)* END_SFC
 ;
 
-goto_declaration [List<TransitionDeclaration> transitions]
+goto_declaration
 :
-	GOTO guard=expression DCOLON from=identifier_list RIGHTARROW to=identifier_list
-	{
-		TransitionDeclaration t = new TransitionDeclaration();
-		t.setFrom($from.ast);
-		t.setTo($from.ast);
-		t.setGuard($guard.ast);
-
-		transitions.add(t);
-	}
+	GOTO guard=expression DCOLON from=identifier_list RIGHTARROW to=identifier_list SEMICOLON?
 ;
 
-action_declaration [List<FunctionBlockDeclaration> actions]
-returns [ FunctionBlockDeclaration ast = new FunctionBlockDeclaration() ]
+action_declaration
 :
-	ACTION
-	(
-		identifier = IDENTIFIER
-		{$ast.setFunctionBlockName($identifier.text);}
-
-	)?
-	var_decls[$ast.getLocalScope().builder()]
+	ACTION	(identifier = IDENTIFIER)?
+	var_decls
 	body=statement_list
-	{
-		$ast.setFunctionBody($body.ast);
-		$actions.add($ast);
-	}
 	END_ACTION
 ;
 
-step_declaration [List<StepDeclaration> steps]
-returns [StepDeclaration s = new StepDeclaration();]
+step_declaration
 :
-	STEP identifier = IDENTIFIER
-	(
-		event [$s]
-	)* END_STEP
-	{
-		$s.setName($identifier.text);
-		$steps.add($s);
-	}
-
+	STEP identifier=IDENTIFIER
+	(event)*
+	END_STEP
 ;
 
-event [StepDeclaration step]
+event
 :
 	ON type=IDENTIFIER
 	(
 		ACTION body=statement_list
-		{
-            FunctionBlockDeclaration fbd = new FunctionBlockDeclaration();
-            fbd.setFunctionBody($body.ast);
-            fbd.setFunctionBlockName(Utils.getRandomName());
-            $start_sfc::ast.getActions().add(fbd);
-            $step.push($type.text, fbd.getFunctionBlockName());
-		}
 		END_ACTION
-
 		| action=IDENTIFIER
-		  {$step.push($type.text, $action.text);}
-	)
+    )
 ;

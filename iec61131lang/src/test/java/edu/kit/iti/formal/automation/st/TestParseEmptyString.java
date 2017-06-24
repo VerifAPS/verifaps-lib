@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st;
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
+import org.antlr.v4.runtime.CharStreams;
 import org.junit.Test;
 
 /**
@@ -33,6 +34,6 @@ public class TestParseEmptyString {
 
   @Test
   public void testParseEmptyString() {
-    IEC61131Facade.file("").visit(new DefaultVisitor<Void>());
+    IEC61131Facade.file(CharStreams.fromString("")).visit(new DefaultVisitor<Void>());
   }
 }

@@ -25,13 +25,13 @@ package edu.kit.iti.formal.automation.st0.trans;
 import edu.kit.iti.formal.automation.datatypes.IECArray;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
-import edu.kit.iti.formal.automation.st.util.AstCopyVisitor;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 
 /**
  * Created by weigl on 03/10/14.
  */
-public class ArrayEmbedder extends AstCopyVisitor {
+public class ArrayEmbedder extends AstVisitor<Object> {
     private LocalScope currentScope;
 
 

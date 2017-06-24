@@ -90,7 +90,7 @@ public class DefaultVisitor<T> implements Visitor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T visit(CaseConditions.Range range) {
+    public T visit(CaseCondition.Range range) {
         return defaultVisit(range);
     }
 
@@ -98,7 +98,7 @@ public class DefaultVisitor<T> implements Visitor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T visit(CaseConditions.IntegerCondition integerCondition) {
+    public T visit(CaseCondition.IntegerCondition integerCondition) {
         return defaultVisit(integerCondition);
     }
 
@@ -106,7 +106,7 @@ public class DefaultVisitor<T> implements Visitor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T visit(CaseConditions.Enumeration enumeration) {
+    public T visit(CaseCondition.Enumeration enumeration) {
         return defaultVisit(enumeration);
     }
 
@@ -276,8 +276,8 @@ public class DefaultVisitor<T> implements Visitor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T visit(FunctionCallStatement functionCallStatement) {
-        return defaultVisit(functionCallStatement);
+    public T visit(FunctionBlockCallStatement fbc) {
+        return defaultVisit(fbc);
     }
 
     /**

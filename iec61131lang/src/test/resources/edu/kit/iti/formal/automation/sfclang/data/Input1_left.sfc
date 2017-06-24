@@ -1,11 +1,10 @@
 SFC I1L
 
-    VAR_INPUT   i : bool; j :bool END_VAR
+    VAR_INPUT   i : bool; j :bool; END_VAR
     VAR_OUTPUT  o : int; END_VAR
 
     STEP A 
-        on active action 
-        end_action 
+        on active action  end_action
     END_STEP
 
 

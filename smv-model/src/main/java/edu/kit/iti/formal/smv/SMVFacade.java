@@ -23,6 +23,11 @@ package edu.kit.iti.formal.smv;
  */
 
 import edu.kit.iti.formal.smv.ast.*;
+import edu.kit.iti.formal.smv.parser.Facade;
+import edu.kit.iti.formal.smv.parser.SMVParser;
+import edu.kit.iti.formal.smv.parser.SMVTransformToAST;
+import org.antlr.v4.runtime.CharStreams;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -72,6 +77,11 @@ public class SMVFacade {
 
     public static SUnaryExpression NOT(SMVExpr e) {
         return new SUnaryExpression(SUnaryOperator.NEGATE, e);
+    }
+
+    public static SMVExpr expr(@NotNull String s) {
+        SMVParser.ExprContext ctx = Facade.getParser(CharStreams.fromString(s)).expr();
+        return (SMVExpr) ctx.accept(new SMVTransformToAST());
     }
 
 /*

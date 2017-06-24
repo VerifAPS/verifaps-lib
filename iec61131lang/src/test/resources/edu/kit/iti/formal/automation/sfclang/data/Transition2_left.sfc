@@ -1,7 +1,7 @@
 SFC T2L
 
     VAR_OUTPUT 
-        o : int
+        o : int;
     END_VAR
 
     VAR_INPUT 
@@ -18,7 +18,7 @@ SFC T2L
     
     STEP B1 
         ON active ACTION
-            o := 1
+            o := 1;
         END_ACTION
     END_STEP
     

@@ -49,21 +49,27 @@ import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TypeDeclarations;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
-import edu.kit.iti.formal.smv.ast.*;
+import edu.kit.iti.formal.smv.ast.SAssignment;
+import edu.kit.iti.formal.smv.ast.SMVExpr;
+import edu.kit.iti.formal.smv.ast.SMVModule;
+import edu.kit.iti.formal.smv.ast.SVariable;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
  * @version 1 (12.12.16)
  */
 public class ModuleBuilder implements Runnable {
+    public static final int INPUT_VARIABLE = 1;
+    public static final int OUTPUT_VARIABLE = 2;
 
     private final ProgramDeclaration program;
     private final SymbolicState finalState;
-    private final SMVModuleImpl module = new SMVModuleImpl();
+    private final SMVModule module = new SMVModule();
     private final VariableDependency vardeps;
     //private Map<VariableDeclaration, SVariable> vars = new HashMap<>();
 
@@ -71,10 +77,9 @@ public class ModuleBuilder implements Runnable {
         finalState = ss;
         program = decl;
         vardeps = new VariableDependency(finalState);
-
     }
 
-    public SMVModuleImpl getModule() {
+    public SMVModule getModule() {
         return module;
     }
 
@@ -93,6 +98,13 @@ public class ModuleBuilder implements Runnable {
 
         Set<SVariable> stateVariables = vardeps.dependsOn(outputVars, inputVars);
 
+        Set<String> outputVarNames = outputVars.stream().map(VariableDeclaration::getName).collect(Collectors.toSet());
+        for (SVariable var : stateVariables) {
+            if (outputVarNames.contains(var.getName())) {
+                var.addMetadata(OUTPUT_VARIABLE);
+            }
+        }
+
         insertVariables(stateVariables);
         insertInputVariables(inputVars);
     }
@@ -100,6 +112,7 @@ public class ModuleBuilder implements Runnable {
     private void insertInputVariables(List<VariableDeclaration> decls) {
         decls.stream()
                 .map(SymbExFacade::asSVariable)
+                .map(sVariable -> sVariable.addMetadata(INPUT_VARIABLE))
                 .forEach(module.getModuleParameter()::add);
     }
 

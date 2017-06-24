@@ -632,7 +632,7 @@ RETURN
 
 RIGHT_ARROW
 :
-	 R I G H T '_' A R R O W
+	 '=>'
 ;
 
 R_EDGE
