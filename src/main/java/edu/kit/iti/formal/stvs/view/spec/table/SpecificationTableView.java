@@ -40,22 +40,11 @@ public class SpecificationTableView extends VBox {
   /**
    * creates the index column at the front of the table
    */
-  private TableColumn<HybridRow, Object> createIndexColumn() {
-    TableColumn<HybridRow, Object> indexColumn = new TableColumn<>("#");
+  private TableColumn<HybridRow, String> createIndexColumn() {
+    TableColumn<HybridRow, String> indexColumn = new TableColumn<>("#");
     indexColumn.setSortable(false);
     indexColumn.setCellFactory(hybridRowObjectTableColumn ->
-      new TableCell<HybridRow, Object>(){
-
-        @Override
-        protected void updateItem(Object item, boolean empty) {
-          super.updateItem(item, empty);
-          if (empty) {
-            setText("");
-          } else {
-            setText(this.getIndex() + "");
-          }
-        }
-      }
+      new IndexTableCell(tableView)
     );
     return indexColumn;
   }
