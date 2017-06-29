@@ -74,7 +74,6 @@ public class EditorPaneController implements Controller {
 
         EventHandler<KeyEvent> handler = e -> {
             if(e.isAltDown()) {
-                System.out.println("AltDown");
                 Event.fireEvent(this.view, e);
             }
         };
