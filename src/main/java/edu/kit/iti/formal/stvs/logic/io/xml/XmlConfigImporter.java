@@ -2,15 +2,15 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
+import org.w3c.dom.Node;
 
-import java.io.IOException;
-import java.net.URL;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
-import org.w3c.dom.Node;
+import java.io.IOException;
+import java.net.URL;
+import edu.kit.iti.formal.stvs.io._1.*;
 
 /**
  * This class provides the functionality to import a {@link GlobalConfig} from a xml node.

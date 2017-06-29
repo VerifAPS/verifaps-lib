@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.xml.bind.JAXBElement;
 
 import org.w3c.dom.Node;
+import edu.kit.iti.formal.stvs.io._1.*;
 
 /**
  * This class provides the functionality to export {@link ConstraintSpecification
@@ -38,14 +39,14 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
    */
   @Override
   public Node exportToXmlNode(ConstraintSpecification source) throws ExportException {
-    edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable specTable =
+    SpecificationTable specTable =
         objectFactory.createSpecificationTable();
     specTable.setVariables(makeVariables(source));
     specTable.setRows(makeRows(source));
     specTable.setComment(source.getComment());
     specTable.setIsConcrete(false);
     specTable.setName(source.getName());
-    JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable> element =
+    JAXBElement<SpecificationTable> element =
         objectFactory.createSpecification(specTable);
     return marshalToNode(element, NAMESPACE);
   }

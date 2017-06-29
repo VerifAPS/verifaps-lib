@@ -1,12 +1,13 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
+import edu.kit.iti.formal.stvs.io._1.Config;
+import edu.kit.iti.formal.stvs.io._1.ObjectFactory;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
-
-import java.math.BigInteger;
-import javax.xml.bind.JAXBElement;
-
 import org.w3c.dom.Node;
+
+import javax.xml.bind.JAXBElement;
+import java.math.BigInteger;
 
 /**
  * This class provides the functionality to export a {@link GlobalConfig} object to an xml node.
