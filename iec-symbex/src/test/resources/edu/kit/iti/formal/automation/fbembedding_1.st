@@ -1,0 +1,23 @@
+PROGRAM main
+VAR_INPUT i : INT; END_VAR
+VAR_OUTPUT o : INT; END_VAR
+
+VAR
+   a : FB1();
+END_VAR
+
+a();
+
+END_PROGRAM
+
+
+FUNCTION_BLOCK
+
+VAR_INPUT j : INT; END_VAR
+VAR_OUTPUT p : INT; END_VAR
+VAR sum : INT; END_VAR
+
+sum := p + sum;
+p := sum / p;
+
+END_FUNCTION_BLOCK

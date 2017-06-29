@@ -1,5 +1,3 @@
-package edu.kit.iti.formal.automation;
-
 /*-
  * #%L
  * iec61131lang
@@ -28,7 +26,7 @@ import edu.kit.iti.formal.automation.sfclang.Utils;
 import edu.kit.iti.formal.automation.st.ast.Expression;
 import org.antlr.v4.runtime.Token;
 
-import java.util.BitSet;
+import java.math.BigInteger;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,8 +44,8 @@ public class ValueFactory {
      * @param value a long.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<Int, Long> makeInt(long value) {
-        return new ScalarValue<Int, Long>(AnyInt.INT, value);
+    public static ScalarValue<Int, BigInteger> makeInt(long value) {
+        return new ScalarValue<>(AnyInt.INT, BigInteger.valueOf(value));
     }
 
     /**
@@ -56,8 +54,8 @@ public class ValueFactory {
      * @param value a long.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<UInt, Long> makeUInt(long value) {
-        return new ScalarValue<UInt, Long>(AnyInt.UINT, value);
+    public static ScalarValue<UInt, BigInteger> makeUInt(long value) {
+        return new ScalarValue<>(AnyInt.UINT, BigInteger.valueOf(value));
     }
 
     /**
@@ -66,8 +64,8 @@ public class ValueFactory {
      * @param value a int.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<SInt, Integer> makeSInt(int value) {
-        return new ScalarValue<>(AnyInt.SINT, value);
+    public static ScalarValue<SInt, BigInteger> makeSInt(int value) {
+        return new ScalarValue<>(AnyInt.SINT, BigInteger.valueOf(value));
     }
 
     /**
@@ -76,8 +74,9 @@ public class ValueFactory {
      * @param value a int.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<DInt, Integer> makeLInt(int value) {
-        return new ScalarValue<>(AnyInt.DINT, value);
+    public static ScalarValue<DInt, BigInteger> makeLInt(int value) {
+        return new ScalarValue<>(AnyInt.DINT,
+                BigInteger.valueOf(value));
     }
 
     /**
@@ -86,8 +85,9 @@ public class ValueFactory {
      * @param value a int.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<LInt, Integer> makeDInt(int value) {
-        return new ScalarValue<>(AnyInt.LINT, value);
+    public static ScalarValue<LInt, BigInteger> makeDInt(int value) {
+        return new ScalarValue<>(AnyInt.LINT,
+                BigInteger.valueOf(value));
     }
 
 
@@ -96,7 +96,7 @@ public class ValueFactory {
      *
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<Int, Integer> makeInt() {
+    public static ScalarValue<Int, BigInteger> makeInt() {
         return new ScalarValue<>(AnyInt.INT, AnyInt.DEFAULT);
     }
 
@@ -105,7 +105,7 @@ public class ValueFactory {
      *
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<SInt, Integer> makeSInt() {
+    public static ScalarValue<SInt, BigInteger> makeSInt() {
         return new ScalarValue<>(AnyInt.SINT, AnyInt.DEFAULT);
     }
 
@@ -114,7 +114,7 @@ public class ValueFactory {
      *
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<DInt, Integer> makeLInt() {
+    public static ScalarValue<DInt, BigInteger> makeLInt() {
         return new ScalarValue<>(AnyInt.DINT, AnyInt.DEFAULT);
     }
 
@@ -123,7 +123,7 @@ public class ValueFactory {
      *
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<LInt, Integer> makeDInt() {
+    public static ScalarValue<LInt, BigInteger> makeDInt() {
         return new ScalarValue<>(AnyInt.LINT, AnyInt.DEFAULT);
     }
 
@@ -135,8 +135,8 @@ public class ValueFactory {
      * @param <T>      a T object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static <T extends AnyBit> ScalarValue<T, BitSet> makeAnyBit(T dataType) {
-        return new ScalarValue<>(dataType, new BitSet(dataType.getBitLength()));
+    public static <T extends AnyBit> ScalarValue<T, Bits> makeAnyBit(T dataType) {
+        return new ScalarValue<>(dataType, new Bits(dataType.getBitLength()));
     }
 
     /**
@@ -144,7 +144,7 @@ public class ValueFactory {
      *
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<AnyBit.Bool, BitSet> makeBool() {
+    public static ScalarValue<AnyBit.Bool, Bits> makeBool() {
         return makeAnyBit(AnyBit.BOOL);
     }
 
@@ -153,7 +153,7 @@ public class ValueFactory {
      *
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<AnyBit.Word, BitSet> makeWord() {
+    public static ScalarValue<AnyBit.Word, Bits> makeWord() {
         return makeAnyBit(AnyBit.WORD);
     }
 
@@ -162,7 +162,7 @@ public class ValueFactory {
      *
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<AnyBit.DWord, BitSet> makeDWord() {
+    public static ScalarValue<AnyBit.DWord, Bits> makeDWord() {
         return makeAnyBit(AnyBit.DWORD);
     }
 
@@ -171,7 +171,7 @@ public class ValueFactory {
      *
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<AnyBit.LWord, BitSet> makeLWord() {
+    public static ScalarValue<AnyBit.LWord, Bits> makeLWord() {
         return makeAnyBit(AnyBit.LWORD);
     }
 
@@ -239,8 +239,8 @@ public class ValueFactory {
      * @param token a {@link org.antlr.v4.runtime.Token} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<? extends AnyInt, Long> parseIntegerLiteral(Token token) {
-        ScalarValue<? extends AnyInt, Long> val = parseIntegerLiteral(token.getText());
+    public static ScalarValue<? extends AnyInt, BigInteger> parseIntegerLiteral(Token token) {
+        ScalarValue<? extends AnyInt, BigInteger> val = parseIntegerLiteral(token.getText());
         Utils.setPosition(val, token);
         return val;
     }
@@ -251,11 +251,11 @@ public class ValueFactory {
      * @param s a {@link java.lang.String} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<? extends AnyInt, Long> parseIntegerLiteral(String s) {
+    public static ScalarValue<? extends AnyInt, BigInteger> parseIntegerLiteral(String s) {
         String first = getPrefix(s);
 
         int bits = 0;
-        long value = parseOrdinal(removePrefix(s));
+        BigInteger value = BigInteger.valueOf(parseOrdinal(removePrefix(s)));
 
         if (first == null || "INT".equalsIgnoreCase(first)) {
             return new ScalarValue<>(AnyInt.INT, value);
@@ -264,7 +264,7 @@ public class ValueFactory {
                 case "2":
                 case "8":
                 case "16":
-                    value = parseOrdinal(s);
+                    value = BigInteger.valueOf(parseOrdinal((s)));
                     return new ScalarValue<>(AnyInt.INT, value);
                 case "SINT":
                     return new ScalarValue<>(AnyInt.SINT, value);
@@ -285,19 +285,6 @@ public class ValueFactory {
         throw new IllegalStateException();
     }
 
-
-    private static long parseOrdinal(String s) {
-        String prefix = getPrefix(s);
-        int radix = 10;
-        if (prefix != null) {
-            radix = Integer.parseInt(prefix);
-        }
-        try {
-            return Long.parseLong(removePrefix(s), radix);
-        } catch (NumberFormatException nfe) {
-            return 0;
-        }
-    }
 
     /**
      * <p>makeEnumeratedValue.</p>
@@ -405,29 +392,6 @@ public class ValueFactory {
         return new ScalarValue<>(TimeType.TIME_TYPE, tv);
     }
 
-    private static String removePrefix(String s) {
-        int beginIndex = s.indexOf('#');
-        if (beginIndex == -1)
-            return s;
-
-        beginIndex += 1;
-        return s.substring(beginIndex);
-    }
-
-    /**
-     * <p>getPrefix.</p>
-     *
-     * @param s a {@link java.lang.String} object.
-     * @return a {@link java.lang.String} object.
-     */
-    public static String getPrefix(String s) {
-        int beginIndex = s.indexOf('#');
-        if (beginIndex == -1)
-            return null;
-        return s.substring(0, beginIndex);
-    }
-
-
     /**
      * <p>makeBool.</p>
      *
@@ -490,8 +454,8 @@ public class ValueFactory {
      * @param s a {@link org.antlr.v4.runtime.Token} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<AnyDate.DateAndTime, DateAndTimeValue> parseDateAndTimeLiteral(Token s) {
-        ScalarValue<AnyDate.DateAndTime, DateAndTimeValue> val = parseDateAndTimeLiteral(s.getText());
+    public static ScalarValue<AnyDate.DateAndTime, DateAndTimeData> parseDateAndTimeLiteral(Token s) {
+        ScalarValue<AnyDate.DateAndTime, DateAndTimeData> val = parseDateAndTimeLiteral(s.getText());
         Utils.setPosition(val, s);
         return val;
     }
@@ -502,15 +466,15 @@ public class ValueFactory {
      * @param s a {@link java.lang.String} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<AnyDate.DateAndTime, DateAndTimeValue> parseDateAndTimeLiteral(String s) {
+    public static ScalarValue<AnyDate.DateAndTime, DateAndTimeData> parseDateAndTimeLiteral(String s) {
         s = removePrefix(s);
 
         String a = s.substring(0, "yyyy-mm-dd".length());
         String b = s.substring("yyyy-mm-dd-".length());
 
-        DateValue date = parseDateLiteral(a).getValue();
-        TimeOfDayValue tod = parseTimeOfDayLiteral(b).getValue();
-        DateAndTimeValue val = new DateAndTimeValue(date, tod);
+        DateData date = parseDateLiteral(a).getValue();
+        TimeofDayData tod = parseTimeOfDayLiteral(b).getValue();
+        DateAndTimeData val = new DateAndTimeData(date, tod);
         return new ScalarValue<>(AnyDate.DATE_AND_TIME, val);
     }
 
@@ -520,8 +484,8 @@ public class ValueFactory {
      * @param token a {@link org.antlr.v4.runtime.Token} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<AnyDate.Date, DateValue> parseDateLiteral(Token token) {
-        ScalarValue<AnyDate.Date, DateValue> val = parseDateLiteral(token.getText());
+    public static ScalarValue<AnyDate.Date, DateData> parseDateLiteral(Token token) {
+        ScalarValue<AnyDate.Date, DateData> val = parseDateLiteral(token.getText());
         Utils.setPosition(val, token);
         return val;
     }
@@ -532,7 +496,7 @@ public class ValueFactory {
      * @param s a {@link java.lang.String} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<AnyDate.Date, DateValue> parseDateLiteral(String s) {
+    public static ScalarValue<AnyDate.Date, DateData> parseDateLiteral(String s) {
         Pattern pattern = Pattern.compile("(?<year>\\d\\d\\d\\d)-(?<month>\\d?\\d)-(?<day>\\d?\\d)");
 
         Matcher matcher = pattern.matcher(removePrefix(s));
@@ -540,7 +504,7 @@ public class ValueFactory {
             int year = Integer.parseInt(matcher.group("year"));
             int month = Integer.parseInt(matcher.group("month"));
             int day = Integer.parseInt(matcher.group("day"));
-            DateValue date = new DateValue(year, month, day);
+            DateData date = new DateData(year, month, day);
             return new ScalarValue<>(AnyDate.DATE, date);
         } else {
             throw new IllegalArgumentException("given string is not a time of day value");
@@ -553,8 +517,8 @@ public class ValueFactory {
      * @param token a {@link org.antlr.v4.runtime.Token} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<AnyDate.TimeOfDay, TimeOfDayValue> parseTimeOfDayLiteral(Token token) {
-        ScalarValue<AnyDate.TimeOfDay, TimeOfDayValue> val = parseTimeOfDayLiteral(token.getText());
+    public static ScalarValue<AnyDate.TimeOfDay, TimeofDayData> parseTimeOfDayLiteral(Token token) {
+        ScalarValue<AnyDate.TimeOfDay, TimeofDayData> val = parseTimeOfDayLiteral(token.getText());
         Utils.setPosition(val, token);
         return val;
     }
@@ -565,7 +529,7 @@ public class ValueFactory {
      * @param s a {@link java.lang.String} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
-    public static ScalarValue<AnyDate.TimeOfDay, TimeOfDayValue> parseTimeOfDayLiteral(String s) {
+    public static ScalarValue<AnyDate.TimeOfDay, TimeofDayData> parseTimeOfDayLiteral(String s) {
         Pattern pattern = Pattern.compile(
                 "(?<hour>\\d?\\d):(?<min>\\d?\\d)(:(?<sec>\\d?\\d))?(.(?<ms>\\d+))?");
 
@@ -583,7 +547,7 @@ public class ValueFactory {
             int min = parseInt.apply("min");
             int sec = parseInt.apply("sec");
             int ms = parseInt.apply("ms");
-            TimeOfDayValue tod = new TimeOfDayValue(hour, min, sec, ms);
+            TimeofDayData tod = new TimeofDayData(hour, min, sec, ms);
             return new ScalarValue<>(AnyDate.TIME_OF_DAY, tod);
 
         } else {

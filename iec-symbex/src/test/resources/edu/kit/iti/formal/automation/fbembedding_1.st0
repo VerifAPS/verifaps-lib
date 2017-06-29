@@ -1,0 +1,18 @@
+PROGRAM main
+VAR_INPUT i : INT; END_VAR
+VAR_OUTPUT o : INT; END_VAR
+
+VAR a$sum : INT; END_VAR
+
+
+a$sum := j + sum;
+p := a$sum / a$p;
+
+
+END_PROGRAM
+
+VAR_INPUT j : INT; END_VAR
+VAR_OUTPUT p : INT; END_VAR
+
+
+END_FUNCTION_BLOCK

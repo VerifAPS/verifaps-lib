@@ -75,9 +75,9 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
      */
     public static GlobalScope resolve(GlobalScope scope, TopLevelElements tle) {
         ResolveDataTypes rdt = new ResolveDataTypes(scope);
-        tle.visit(rdt);
+        tle.accept(rdt);
         rdt.registerPhase = false;
-        tle.visit(rdt);
+        tle.accept(rdt);
         return scope;
     }
 
@@ -93,7 +93,7 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
         if (registerPhase)
             scope.registerProgram(programDeclaration);
         else
-            programDeclaration.getLocalScope().visit(this);
+            programDeclaration.getLocalScope().accept(this);
         return super.visit(programDeclaration);
     }
 
@@ -107,7 +107,7 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
         else {
             functionDeclaration.setReturnType(
                     resolve(functionDeclaration.getReturnTypeName()));
-            functionDeclaration.getLocalScope().visit(this);
+            functionDeclaration.getLocalScope().accept(this);
         }
         return null;
     }
@@ -130,7 +130,7 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
         if (registerPhase)
             scope.registerFunctionBlock(functionBlockDeclaration);
         else
-            functionBlockDeclaration.getLocalScope().visit(this);
+            functionBlockDeclaration.getLocalScope().accept(this);
         return super.visit(functionBlockDeclaration);
     }
 
@@ -208,7 +208,7 @@ public class ResolveDataTypes extends DefaultVisitor<Object> {
      */
     @Override public Object visit(TypeDeclarations typeDeclarations) {
         for (TypeDeclaration td : typeDeclarations)
-            td.visit(this);
+            td.accept(this);
         return null;
     }
 

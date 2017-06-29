@@ -23,23 +23,51 @@ package edu.kit.iti.formal.automation.datatypes;
  */
 
 /**
- * <p>UnsignedInt class.</p>
+ * <p>AnyUInt class.</p>
  *
  * @author weigl
  * @version $Id: $Id
  */
-public final class UnsignedInt extends AnyUnsignedInt {
+public class AnyUInt extends AnyInt {
     /**
-     * <p>Constructor for UnsignedInt.</p>
+     * <p>Constructor for AnyUInt.</p>
+     *
+     * @param bitLength a int.
      */
-    public UnsignedInt() {
-        super(16);
+    public AnyUInt(int bitLength) {
+        super(bitLength, false);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AnyInt asSigned() {
+        return new AnySignedInt(bitLength);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AnyUInt asUnsgined() {
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AnyInt next() {
-        return DataTypes.UDINT;
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isValid(long value) {
+        return value < (1 << bitLength);
     }
 
     @Override

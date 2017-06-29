@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.datatypes;
+package edu.kit.iti.formal.automation.datatypes.values;
 
 /*-
  * #%L
@@ -22,43 +22,30 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import lombok.*;
+import lombok.experimental.Tolerate;
+
 /**
- * <p>AnyUInt class.</p>
+ * <p>TimeOfDayValue class.</p>
  *
  * @author weigl
  * @version $Id: $Id
  */
-public class AnyUInt extends AnyInt {
-    /**
-     * <p>Constructor for AnyUInt.</p>
-     *
-     * @param bitLength a int.
-     */
-    public AnyUInt(int bitLength) {
-        super(bitLength, false);
+@Data
+@ToString
+@NoArgsConstructor
+@EqualsAndHashCode
+public class TimeOfDayValue {
+    private int hours, minutes, seconds, millieseconds;
+
+    public TimeOfDayValue(int hours, int minutes, int seconds) {
+        this.hours = hours;
+        this.minutes = minutes;
+        this.seconds = seconds;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public AnyInt asSigned() {
-        return new AnySignedInt(bitLength);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public AnyUInt asUnsgined() {
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public AnyInt next() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isValid(long value) {
-        return value < (1 << bitLength);
+    public TimeOfDayValue(int hour, int min, int sec, int ms) {
+        this(hour, min, sec);
+        millieseconds = ms;
     }
 }

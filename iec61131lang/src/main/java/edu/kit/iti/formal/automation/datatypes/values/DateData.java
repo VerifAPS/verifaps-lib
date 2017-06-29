@@ -22,27 +22,19 @@ package edu.kit.iti.formal.automation.datatypes.values;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+import lombok.*;
 
 /**
- * Created by weigl on 11.06.14.
+ * <p>DateValue class.</p>
  *
  * @author weigl
  * @version $Id: $Id
  */
 @Data
+@ToString
 @EqualsAndHashCode
-public abstract class Value<T extends Any, S> {
-    @NonNull private final T dataType;
-    @NonNull private final S value;
-
-    public Value(T dataType, S value) {
-        this.dataType = dataType;
-        this.value = value;
-    }
-
-
+@NoArgsConstructor
+@AllArgsConstructor
+public class DateValue {
+    private int year, month, day;
 }
