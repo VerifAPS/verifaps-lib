@@ -77,7 +77,9 @@ public class VerificationResultHandler implements VerificationResultVisitor {
     }
     AlertFactory
         .createAlert(Alert.AlertType.ERROR, "Verification Error",
-            "An error occurred during verification.", result.getMessage(), expandableContent)
+            "An error occurred during verification.", result.getMessage()/*
+            stacktrace should not be shown. (See Issue #20)
+            expandableContent*/)
         .showAndWait();
   }
 
