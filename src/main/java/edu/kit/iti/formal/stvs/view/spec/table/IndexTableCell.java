@@ -38,7 +38,7 @@ public class IndexTableCell extends TableCell<HybridRow, String> {
       icon.visibleProperty().bind(getCommentPropertyByIndex(newIndex).isEmpty().not());
       tooltip.textProperty().bind(getCommentPropertyByIndex(newIndex));
     };
-    indexChangeListener.changed(null, this.getIndex(), 0);
+    indexChangeListener.changed(null, 0, this.getIndex());
     this.indexProperty().addListener(indexChangeListener);
 
     this.setGraphic(icon);
