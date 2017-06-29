@@ -367,6 +367,10 @@ public class SpecificationTableController implements Controller {
 
         event.setDropCompleted(true);
         tableView.getSelectionModel().clearAndSelect(dropIndex);
+
+        //update indexProperty on TableCells (needed for the IndexColumn's CommentIcon)
+        tableView.refresh();
+
         event.consume();
       }
     });
