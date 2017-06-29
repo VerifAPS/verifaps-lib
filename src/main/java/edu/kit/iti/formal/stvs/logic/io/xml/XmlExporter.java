@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
  */
 public abstract class XmlExporter<F> implements Exporter<F> {
 
-  public static final String NAMESPACE = "edu.kit.iti.formal.stvs.logic.io.xml";
+  public static final String NAMESPACE = "edu.kit.iti.formal.stvs.io._1";
 
   /**
    * Exports an Object as xml.
