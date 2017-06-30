@@ -11,10 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 /**
  * Represents the view for the collection of multiple timing diagrams.
@@ -56,9 +53,12 @@ public class TimingDiagramCollectionView extends VBox {
     getChildren().addAll(outdatedMessage, scrollPane, globalAxisContainer, xscrollBar);
 
     globalAxisContainer.getChildren().add(xaxis);
+
     setPadding(new Insets(0, 0, 0, 0));
-    yaxisStickRightContainer.getChildren().addAll(yaxisContainer, labelContainer);
+    yaxisStickRightContainer.getChildren().addAll(labelContainer, yaxisContainer);
     yaxisStickRightContainer.setMinWidth(0);
+
+
     AnchorPane.setRightAnchor(yaxisContainer, 0.0);
     AnchorPane.setLeftAnchor(labelContainer, 0.0);
     AnchorPane.setBottomAnchor(labelContainer, 0.0);
@@ -77,6 +77,21 @@ public class TimingDiagramCollectionView extends VBox {
     globalAxisContainer.getStyleClass().add("globalXAxisContainer");
     xaxis.prefWidthProperty().bind(diagramContainer.widthProperty());
     axisDiagramContainer.setDividerPosition(0, 0.1);
+
+    /*
+    needed as a workaround for a bug in JavaFx on Linux, where a LineChart Axis only
+    updates, once it has been moved. The moving only "counts" if the Window is shown
+    see issue #28
+     */
+    axisDiagramContainer.sceneProperty().addListener((observableValue, old, scene)
+        -> {
+      if(scene != null) {
+        scene.getWindow().setOnShown(windowEvent -> {
+          axisDiagramContainer.setDividerPosition(0, 0.1);
+        });
+      }
+    });
+
     scrollPane.getStyleClass().add("noborder-scroll-pane");
     labelContainer.getStyleClass().add("labelContainer");
     ViewUtils.setupView(this);
