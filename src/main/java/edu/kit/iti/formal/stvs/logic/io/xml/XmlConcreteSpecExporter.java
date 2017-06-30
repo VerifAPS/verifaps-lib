@@ -5,11 +5,11 @@ import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
 import edu.kit.iti.formal.stvs.model.table.ConcreteCell;
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
-
-import java.util.stream.Collectors;
-import javax.xml.bind.JAXBElement;
-
 import org.w3c.dom.Node;
+
+import javax.xml.bind.JAXBElement;
+import java.util.stream.Collectors;
+import edu.kit.iti.formal.stvs.io._1.*;
 
 /**
  * This class provides the functionality to export {@link ConcreteSpecification
@@ -38,14 +38,14 @@ public class XmlConcreteSpecExporter extends XmlExporter<ConcreteSpecification> 
    * @throws ExportException Exception during marshalling
    */
   public Node exportToXmlNode(ConcreteSpecification source) throws ExportException {
-    edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable specTable =
+    SpecificationTable specTable =
         objectFactory.createSpecificationTable();
     specTable.setVariables(makeVariables(source));
     specTable.setRows(makeRows(source));
     specTable.setIsConcrete(true);
     specTable.setIsCounterExample(source.isCounterExample());
     specTable.setName(source.getName());
-    JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.SpecificationTable> element =
+    JAXBElement<SpecificationTable> element =
         objectFactory.createSpecification(specTable);
     return marshalToNode(element, NAMESPACE);
   }

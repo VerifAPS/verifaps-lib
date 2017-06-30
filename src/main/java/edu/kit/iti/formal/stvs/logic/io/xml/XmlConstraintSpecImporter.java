@@ -22,6 +22,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.w3c.dom.Node;
+import edu.kit.iti.formal.stvs.io._1.*;
+
 
 /**
  * This class provides the functionality to import constraint specifications from xml nodes.
