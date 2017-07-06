@@ -93,6 +93,10 @@ public class ParsedCode {
           return Optional.of(VariableCategory.INPUT);
         case VariableDeclaration.OUTPUT:
           return Optional.of(VariableCategory.OUTPUT);
+        case VariableDeclaration.LOCAL:
+          return Optional.of(VariableCategory.LOCAL);
+        case VariableDeclaration.INOUT:
+          return Optional.of(VariableCategory.INOUT);
         default:
           return Optional.empty();
       }
