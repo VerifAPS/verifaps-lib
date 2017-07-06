@@ -16,18 +16,22 @@ public class SpecIoVariable extends IoVariable implements Commentable {
   private StringProperty name;
   private StringProperty type;
   private ObjectProperty<VariableCategory> category;
+  private ObjectProperty<VariableRole> role;
   private ColumnConfig columnConfig;
   private StringProperty comment;
+
 
   /**
    * Creates a variable that appears in the specification.
    *
    * @param category The category of the variable
+   * @param role The role the variable plays in Verification and Concretisation e.g. Assume / Assert
    * @param typeIdentifier The identifier of the type of the variable
    * @param name The name of the Variable
    */
-  public SpecIoVariable(VariableCategory category, String typeIdentifier, String name) {
+  public SpecIoVariable(VariableCategory category, VariableRole role, String typeIdentifier, String name) {
     this.category = new SimpleObjectProperty<>(category);
+    this.role = new SimpleObjectProperty<>(role);
     this.type = new SimpleStringProperty(typeIdentifier);
     this.name = new SimpleStringProperty(name);
     this.columnConfig = new ColumnConfig();
@@ -35,11 +39,23 @@ public class SpecIoVariable extends IoVariable implements Commentable {
   }
 
   /**
+   * Creates a variable that appears in the specification.
+   * role will be the standard role for the given category
+   * @param category The category of the variable
+   * @param typeIdentifier The identifier of the type of the variable
+   * @param name The name of the Variable
+   */
+  public SpecIoVariable(VariableCategory category, String typeIdentifier, String name) {
+    this(category, category.getDefaultRole(), typeIdentifier, name);
+  }
+
+
+  /**
    * Copy constructor: Create a deep copy of a given SpecIoVariable.
    * @param specIoVariable The SpecIoVariable to copy
    */
   public SpecIoVariable(SpecIoVariable specIoVariable) {
-    this(specIoVariable.getCategory(), specIoVariable.getType(), specIoVariable.getName());
+    this(specIoVariable.getCategory(), specIoVariable.getRole(), specIoVariable.getType(), specIoVariable.getName());
   }
 
   public String getName() {
@@ -139,5 +155,13 @@ public class SpecIoVariable extends IoVariable implements Commentable {
     result = 31 * result + (category != null ? category.hashCode() : 0);
     result = 31 * result + (columnConfig != null ? columnConfig.hashCode() : 0);
     return result;
+  }
+
+  public VariableRole getRole() {
+    return role.get();
+  }
+
+  public ObjectProperty<VariableRole> roleProperty() {
+    return role;
   }
 }

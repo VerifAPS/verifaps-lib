@@ -6,5 +6,16 @@ package edu.kit.iti.formal.stvs.model.common;
  * @author Philipp
  */
 public enum VariableCategory {
-  INPUT, OUTPUT, INOUT, LOCAL;
+  INPUT(VariableRole.ASSUME), OUTPUT(VariableRole.ASSERT),
+  INOUT(VariableRole.ASSERT), LOCAL(VariableRole.ASSUME);
+
+  private final VariableRole defaultRole;
+
+  VariableCategory(VariableRole defaultRole) {
+    this.defaultRole = defaultRole;
+  }
+
+  public VariableRole getDefaultRole() {
+    return defaultRole;
+  }
 }

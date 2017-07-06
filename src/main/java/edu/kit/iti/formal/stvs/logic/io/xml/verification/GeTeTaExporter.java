@@ -14,6 +14,7 @@ import edu.kit.iti.formal.stvs.logic.io.xml.XmlExporter;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
+import edu.kit.iti.formal.stvs.model.common.VariableRole;
 import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import edu.kit.iti.formal.stvs.model.table.ConstraintDuration;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
@@ -115,10 +116,10 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
       IoVariable exportedVariable = objectFactory.createIoVariable();
       exportedVariable.setName(VariableEscaper.escapeIdentifier(ioVariable.getName()));
       exportedVariable.setDataType(getDataType(ioVariable));
-      if (ioVariable.getCategory() == VariableCategory.INPUT) {
-        exportedVariable.setIo("input");
-      } else {
+      if (ioVariable.getRole() == VariableRole.ASSERT) {
         exportedVariable.setIo("output");
+      } else {
+        exportedVariable.setIo("input");
       }
       variables.getVariableOrConstraint().add(exportedVariable);
     }
