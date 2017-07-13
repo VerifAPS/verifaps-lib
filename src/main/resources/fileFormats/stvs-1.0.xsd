@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
         xmlns:tns="http://formal.iti.kit.edu/stvs/io/1.0/"
+        elementFormDefault="qualified"
         targetNamespace="http://formal.iti.kit.edu/stvs/io/1.0/">
 
-    <!-- section History -->
+    <!-- root elements -->
+    <element name="history" type="tns:History"/>
+    <element name="config" type="tns:Config"/>
+    <element name="session" type="tns:Session"/>
+    <element name="specification" type="tns:SpecificationTable"/>
+
+
+
+    <!-- region History -->
     <complexType name="History">
         <sequence>
             <element name="filename" type="string" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
     </complexType>
-    <element name="history" type="tns:History"/>
-    <!-- endsection -->
+    <!-- endregion -->
 
-    <!-- section Config -->
+    <!-- region Config -->
     <complexType name="Config">
         <sequence>
             <element name="general" minOccurs="0" maxOccurs="1">
@@ -59,10 +67,10 @@
             </element>
         </sequence>
     </complexType>
-    <element name="config" type="tns:Config"/>
-    <!-- endsection Config -->
+    <!-- endregion Config -->
 
 
+    <!-- Specification and Session -->
     <complexType name="Variables">
         <sequence>
             <element name="ioVariable" minOccurs="0" maxOccurs="unbounded">
@@ -153,8 +161,6 @@
         <attribute name="name" type="string" use="optional" default="Unnamed Specification"/>
     </complexType>
 
-    <element name="specification" type="tns:SpecificationTable"/>
-
     <complexType name="Code">
         <sequence>
             <element name="plaintext" type="string" minOccurs="1" maxOccurs="1"/>
@@ -198,7 +204,5 @@
             <element name="history" type="tns:History" minOccurs="0" maxOccurs="1"/>
         </sequence>
     </complexType>
-
-    <element name="session" type="tns:Session">
-    </element>
+    <!-- endregion -->
 </schema>

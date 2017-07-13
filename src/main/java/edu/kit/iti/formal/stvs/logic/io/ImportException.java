@@ -6,33 +6,28 @@ package edu.kit.iti.formal.stvs.logic.io;
  * @author Benjamin Alt
  */
 public class ImportException extends Exception {
-  private String message;
-  private Exception originalException;
+    private String message;
 
-  /**
-   * Create a new ImportException with a given error message.
-   * @param message The error message
-   */
-  public ImportException(String message) {
-    this.message = message;
-    originalException = null;
-  }
+    /**
+     * Create a new ImportException with a given error message.
+     *
+     * @param message The error message
+     */
+    public ImportException(String message) {
+        super(message);
+    }
 
-  /**
-   * Create a new ImportException from a given Exception (e.g. an exception which was caught
-   * during import).
-   * @param e The original exception
-   */
-  public ImportException(Exception e) {
-    originalException = e;
-    message = e.getMessage();
-  }
+    /**
+     * Create a new ImportException from a given Exception (e.g. an exception which was caught
+     * during import).
+     *
+     * @param e The original exception
+     */
+    public ImportException(Exception e) {
+        super(e);
+    }
 
-  /**
-   * Get the error message of this ImportException.
-   * @return The error message
-   */
-  public String getMessage() {
-    return message;
-  }
+    public ImportException(String s, Exception e) {
+        super(s, e);
+    }
 }
