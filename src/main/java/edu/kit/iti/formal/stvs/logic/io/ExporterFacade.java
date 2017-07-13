@@ -173,7 +173,7 @@ public class ExporterFacade {
           exportHistory.getFilename().add(filename);
         }
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        JAXBContext context = JAXBContext.newInstance(XmlExporter.NAMESPACE);
+        JAXBContext context = JAXBContext.newInstance(XmlExporter.OF_STVS);
         JAXBElement<edu.kit.iti.formal.stvs.io._1.History> element =
             new ObjectFactory().createHistory(exportHistory);
         context.createMarshaller().marshal(element, bos);

@@ -33,7 +33,6 @@ public class StvsPreloader extends Preloader {
 
   @Override
   public void init() {
-
     splashImage = new Image(StvsApplication.class.getResourceAsStream("logo.png"));
   }
 
@@ -47,11 +46,13 @@ public class StvsPreloader extends Preloader {
     box.setMaxWidth(Region.USE_PREF_SIZE);
     box.setMaxHeight(Region.USE_PREF_SIZE);
     box.setBackground(Background.EMPTY);
-    box.setStyle(
-        "-fx-background-color: rgba(255, 255, 255, 0.5);"
-    );
+    String style = "-fx-background-color: rgba(255, 255, 255, 0.5);";
+    box.setStyle(style);
+
     box.setPadding(new Insets(50));
     BorderPane root = new BorderPane(box);
+    root.setStyle(style);
+    root.setBackground(Background.EMPTY);
     Scene scene = new Scene(root);
     scene.setFill(Color.TRANSPARENT);
     stage.setScene(scene);

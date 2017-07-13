@@ -51,6 +51,7 @@ public class SpecificationView extends VBox implements Lockable {
     tablePane = new StackPane();
     timingDiagramPane = new AnchorPane();
     buttonBox = new HBox();
+    buttonBox.getStyleClass().addAll("button-box", "verification-action-buttons");
     startVerificationButton = new Button();
     startConcretizerButton = new Button();
     setVerificationButtonPlay();
@@ -76,6 +77,7 @@ public class SpecificationView extends VBox implements Lockable {
     icon.setFill(Color.MEDIUMSEAGREEN);
     startVerificationButton.setText("Verify");
     startVerificationButton.setGraphic(icon);
+    startVerificationButton.getStyleClass().addAll("action", "action-verification");
   }
 
   /**
@@ -95,6 +97,7 @@ public class SpecificationView extends VBox implements Lockable {
     Text icon = GlyphsDude.createIcon(FontAwesomeIcon.LINE_CHART);
     icon.setFill(Color.MEDIUMSEAGREEN);
     startConcretizerButton.setText("Concretize");
+    startConcretizerButton.getStyleClass().addAll("action", "action-concretize");
     startConcretizerButton.setGraphic(icon);
   }
 

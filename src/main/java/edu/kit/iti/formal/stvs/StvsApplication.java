@@ -1,6 +1,8 @@
 package edu.kit.iti.formal.stvs;
 
+import com.sun.javafx.application.LauncherImpl;
 import edu.kit.iti.formal.stvs.view.StvsMainScene;
+import edu.kit.iti.formal.stvs.view.StvsPreloader;
 import edu.kit.iti.formal.stvs.view.common.HostServiceSingleton;
 import edu.kit.iti.formal.stvs.view.menu.WelcomeWizard;
 import javafx.application.Application;
@@ -27,38 +29,39 @@ public class StvsApplication extends Application {
      */
     public static void main(String[] args) {
         Locale.setDefault(Locale.ENGLISH);
-        launch(args);
-    }
-
-    @Override
-    public void init() {
-        HostServiceSingleton.setInstance(getHostServices());
-        this.mainScene = new StvsMainScene();
-
-        Platform.runLater(() -> {
-            this.primaryStage = new Stage();
-            Platform.setImplicitExit(true);
-            primaryStage.setTitle("Structured Text Verification Studio - STVS");
-            primaryStage.setScene(mainScene.getScene());
-            primaryStage.setMaximized(mainScene.shouldBeMaximizedProperty().get());
-            primaryStage.getIcons().addAll(
-                    new Image(StvsApplication.class.getResourceAsStream("logo_large.png")),
-                    new Image(StvsApplication.class.getResourceAsStream("logo.png")));
-            mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty());
-
-            if (mainScene.getRootController().getRootModel().isFirstStart()) {
-                new WelcomeWizard(mainScene.getRootController().getRootModel().getGlobalConfig())
-                        .showAndWait();
-            }
-
-            primaryStage.show();
-
-        });
+        LauncherImpl.launchApplication(StvsApplication.class, StvsPreloader.class, args);
     }
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.hide();
+        HostServiceSingleton.setInstance(getHostServices()); //weigl: ???
+        this.mainScene = new StvsMainScene();
+        this.primaryStage = new Stage();
+        Platform.setImplicitExit(true);
+        primaryStage.setTitle(StvsVersion.getWindowTitle());
+        primaryStage.setScene(mainScene.getScene());
+        primaryStage.setMaximized(mainScene.shouldBeMaximizedProperty().get());
+        primaryStage.getIcons().addAll(
+                new Image(StvsApplication.class.getResourceAsStream("logo_large.png")),
+                new Image(StvsApplication.class.getResourceAsStream("logo.png")));
+        mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty());
+
+        mainScene.getScene().getStylesheets().add(
+                StvsApplication.class.getResource("normal.css").toExternalForm()
+        );
+
+        if (System.getProperty("presentation-mode", "false").equals("true")) {
+            mainScene.getScene().getStylesheets().add(
+                    StvsApplication.class.getResource("presentation.css").toExternalForm()
+            );
+        }
+
+        if (mainScene.getRootController().getRootModel().isFirstStart()) {
+            new WelcomeWizard(mainScene.getRootController().getRootModel().getGlobalConfig())
+                    .showAndWait();
+        }
+
+        primaryStage.show();
     }
 
     @Override

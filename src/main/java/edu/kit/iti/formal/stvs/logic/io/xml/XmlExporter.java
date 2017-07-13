@@ -34,7 +34,7 @@ public abstract class XmlExporter<F> implements Exporter<F> {
     public static final Class<edu.kit.iti.formal.exteta_1.ObjectFactory> OF_EXTETA = edu.kit.iti.formal.exteta_1.ObjectFactory.class;
     public static final Class<edu.kit.iti.formal.exteta_1_0.report.ObjectFactory> OF_EXTETA_REPORT = edu.kit.iti.formal.exteta_1_0.report.ObjectFactory.class;
 
-    public static final String NAMESPACE = "http://formal.iti.kit.edu/stvs/io/1.0/";
+    //public static final String NAMESPACE = "http://formal.iti.kit.edu/stvs/io/1.0/";
 
     /**
      * Marshals a {@link JAXBElement} to a xml node.

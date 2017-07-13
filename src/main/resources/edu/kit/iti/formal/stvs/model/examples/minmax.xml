@@ -1,112 +1,181 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<session xmlns="http://formal.iti.kit.edu/stvs/io/1.0">
-    <specification comment="" isConcrete="false" name="NoCollisionSpec">
-        <variables>
-            <ioVariable colwidth="100" data-type="OperationMode" io="input" name="mode"/>
-            <ioVariable colwidth="100" data-type="BOOL" io="input" name="learn"/>
-            <ioVariable colwidth="100" data-type="INT" io="input" name="I"/>
-            <ioVariable colwidth="100" data-type="INT" io="output" name="Q"/>
-            <ioVariable colwidth="100" data-type="BOOL" io="output" name="W"/>
-            <freeVariable data-type="INT" default="0" name="p"/>
-            <freeVariable data-type="INT" default="5" name="q"/>
-        </variables>
-        <rows>
-            <row>
-                <duration>[1,-]</duration>
-                <cell>Active</cell>
-                <cell>-</cell>
-                <cell>-</cell>
-                <cell>0</cell>
-                <cell>false</cell>
-            </row>
-            <row>
-                <duration>[1,-]</duration>
-                <cell>Learn</cell>
-                <cell>false</cell>
-                <cell>-</cell>
-                <cell>0</cell>
-                <cell>false</cell>
-            </row>
-            <row>
-                <duration>[1,-]</duration>
-                <cell>Learn</cell>
-                <cell>true</cell>
-                <cell>[p,q]</cell>
-                <cell>[p,q]</cell>
-                <cell>false</cell>
-            </row>
-            <row>
-                <duration>[0,-]</duration>
-                <cell>Active</cell>
-                <cell>-</cell>
-                <cell>[p,q]</cell>
-                <cell>[p,q]</cell>
-                <cell>false</cell>
-            </row>
-            <row>
-                <duration>[10,10]</duration>
-                <cell>Active</cell>
-                <cell>-</cell>
-                <cell>&gt;q</cell>
-                <cell>&lt;=q</cell>
-                <cell>false</cell>
-            </row>
-            <row>
-                <duration>[1,-]</duration>
-                <cell>Active</cell>
-                <cell>-</cell>
-                <cell>&gt;q</cell>
-                <cell>&lt;=q</cell>
-                <cell>true</cell>
-            </row>
-            <row>
-                <duration>[5,5]</duration>
-                <cell>Active</cell>
-                <cell>-</cell>
-                <cell>[p,q]</cell>
-                <cell>[p,q]</cell>
-                <cell>true</cell>
-            </row>
-            <row>
-                <duration>[1,-]</duration>
-                <cell>Active</cell>
-                <cell>-</cell>
-                <cell>[p,q]</cell>
-                <cell>[p,q]</cell>
-                <cell>false</cell>
-            </row>
-            <row>
-                <duration>[10,10]</duration>
-                <cell>Active</cell>
-                <cell>-</cell>
-                <cell>&lt;p</cell>
-                <cell>&gt;=p</cell>
-                <cell>false</cell>
-            </row>
-            <row>
-                <duration>[1,-]</duration>
-                <cell>Active</cell>
-                <cell>-</cell>
-                <cell>&lt;p</cell>
-                <cell>&gt;=p</cell>
-                <cell>true</cell>
-            </row>
-            <row>
-                <duration>[5,5]</duration>
-                <cell>Active</cell>
-                <cell>-</cell>
-                <cell>[p,q]</cell>
-                <cell>[p,q]</cell>
-                <cell>true</cell>
-            </row>
-            <row>
-                <duration>[1,-]</duration>
-                <cell>Active</cell>
-                <cell>-</cell>
-                <cell>[p,q]</cell>
-                <cell>[p,q]</cell>
-                <cell>false</cell>
-            </row>
-        </rows>
-    </specification>
+<session xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
+    <code>
+        <plaintext><![CDATA[
+TYPE
+  OperationMode : (Learn , Active);
+END_TYPE
+
+
+PROGRAM MinMaxWarning
+VAR CONSTANT
+    WAIT_BEFORE_WARNING : INT; // Amount of cycles outside  before given a warning.
+    WAIT_AFTER_WARNING  : INT; // Amount of cycles inside, before withdraw warning.
+END_VAR
+
+VAR_INPUT
+  mode     : OperationMode; // learning or active mode
+  learn    : BOOL;          // True iff current signal should be learnt
+  I        : INT;           // input signal
+END_VAR
+
+VAR_OUTPUT
+        W       : Bool;     // Warning flag, iff $I \not\in [lower,upper]$
+        Q       : INT;      // Truncated input signal
+END_VAR
+
+VAR
+        lower,         // minimal teached value
+        upper : INT;   // maximal teach value
+        cntQuench,     // remaining cycles for withdraw warning
+        cntHeat : INT; // remaining cycles to signal warning
+END_VAR
+
+
+IF mode = Learn THEN // go into learning
+        IF learn THEN
+                lower = MIN(lower, I);
+                upper = MAX(upper, I);
+        END_IF
+        Q := 0;
+        W := FALSE;
+ELSE
+        Q := MIN( upper, MAX( lower, I) );
+
+        IF upper < lower THEN
+           Q := 0;
+           RETURN;
+        END_IF
+
+        IF I <> Q THEN
+                cntHeat := cntHeat - 1;
+                cntQuench := WAIT_AFTER_WARNING;
+                IF cntHeat = 0 THEN
+                        W := TRUE;
+                END_IF
+        ELSE
+                cntQuench := cntQuench - 1;
+                cntHeat := WAIT_BEFORE_WARNING;
+                IF cntQuench = 0 THEN
+                        W := FALSE;
+                END_IF
+        END_IF
+END_IF
+
+END_PROGRAM]]></plaintext>
+    </code>
+
+    <tabs>
+        <tab id="1" open="true" readOnly="false">
+            <specification comment="" isConcrete="false" name="NoCollisionSpec">
+                <variables>
+                    <ioVariable colwidth="100" data-type="OperationMode" io="input" name="mode"/>
+                    <ioVariable colwidth="100" data-type="BOOL" io="input" name="learn"/>
+                    <ioVariable colwidth="100" data-type="INT" io="input" name="I"/>
+                    <ioVariable colwidth="100" data-type="INT" io="output" name="Q"/>
+                    <ioVariable colwidth="100" data-type="BOOL" io="output" name="W"/>
+                    <freeVariable data-type="INT" default="0" name="p"/>
+                    <freeVariable data-type="INT" default="5" name="q"/>
+                </variables>
+                <rows>
+                    <row>
+                        <duration>[1,-]</duration>
+                        <cell>Active</cell>
+                        <cell>-</cell>
+                        <cell>-</cell>
+                        <cell>0</cell>
+                        <cell>false</cell>
+                    </row>
+                    <row>
+                        <duration>[1,-]</duration>
+                        <cell>Learn</cell>
+                        <cell>false</cell>
+                        <cell>-</cell>
+                        <cell>0</cell>
+                        <cell>false</cell>
+                    </row>
+                    <row>
+                        <duration>[1,-]</duration>
+                        <cell>Learn</cell>
+                        <cell>true</cell>
+                        <cell>[p,q]</cell>
+                        <cell>[p,q]</cell>
+                        <cell>false</cell>
+                    </row>
+                    <row>
+                        <duration>[0,-]</duration>
+                        <cell>Active</cell>
+                        <cell>-</cell>
+                        <cell>[p,q]</cell>
+                        <cell>[p,q]</cell>
+                        <cell>false</cell>
+                    </row>
+                    <row>
+                        <duration>[10,10]</duration>
+                        <cell>Active</cell>
+                        <cell>-</cell>
+                        <cell>&gt;q</cell>
+                        <cell>&lt;=q</cell>
+                        <cell>false</cell>
+                    </row>
+                    <row>
+                        <duration>[1,-]</duration>
+                        <cell>Active</cell>
+                        <cell>-</cell>
+                        <cell>&gt;q</cell>
+                        <cell>&lt;=q</cell>
+                        <cell>true</cell>
+                    </row>
+                    <row>
+                        <duration>[5,5]</duration>
+                        <cell>Active</cell>
+                        <cell>-</cell>
+                        <cell>[p,q]</cell>
+                        <cell>[p,q]</cell>
+                        <cell>true</cell>
+                    </row>
+                    <row>
+                        <duration>[1,-]</duration>
+                        <cell>Active</cell>
+                        <cell>-</cell>
+                        <cell>[p,q]</cell>
+                        <cell>[p,q]</cell>
+                        <cell>false</cell>
+                    </row>
+                    <row>
+                        <duration>[10,10]</duration>
+                        <cell>Active</cell>
+                        <cell>-</cell>
+                        <cell>&lt;p</cell>
+                        <cell>&gt;=p</cell>
+                        <cell>false</cell>
+                    </row>
+                    <row>
+                        <duration>[1,-]</duration>
+                        <cell>Active</cell>
+                        <cell>-</cell>
+                        <cell>&lt;p</cell>
+                        <cell>&gt;=p</cell>
+                        <cell>true</cell>
+                    </row>
+                    <row>
+                        <duration>[5,5]</duration>
+                        <cell>Active</cell>
+                        <cell>-</cell>
+                        <cell>[p,q]</cell>
+                        <cell>[p,q]</cell>
+                        <cell>true</cell>
+                    </row>
+                    <row>
+                        <duration>[1,-]</duration>
+                        <cell>Active</cell>
+                        <cell>-</cell>
+                        <cell>[p,q]</cell>
+                        <cell>[p,q]</cell>
+                        <cell>false</cell>
+                    </row>
+                </rows>
+            </specification>
+        </tab>
+    </tabs>
 </session>
