@@ -55,7 +55,7 @@ public class XmlSessionExporter extends XmlExporter<StvsRootModel> {
     // Tabs
     session.setTabs(makeTabs(source));
     JAXBElement<Session> element = objectFactory.createSession(session);
-    return marshalToNode(element, NAMESPACE);
+    return marshalToNode(element, objectFactory.getClass());
   }
 
   /**

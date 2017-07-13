@@ -93,7 +93,7 @@ END_PROGRAM
             </specification>
         </tab>
         <tab id="1" open="false" readOnly="false">
-            <specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml"
+            <specification xmlns="http://formal.iti.kit.edu/stvs/io/1.0/"
                            comment=""
                            isConcrete="false" name="ConcreteCase">
                 <variables>

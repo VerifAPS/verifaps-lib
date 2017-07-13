@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="" isConcrete="false" name="NoCollisionSpec">
+<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/io/1.0/" comment="" isConcrete="false" name="NoCollisionSpec">
 <variables>
 <ioVariable colwidth="100" data-type="OperationMode" io="input" name="mode"/>
 <ioVariable colwidth="100" data-type="BOOL" io="input" name="learn"/>

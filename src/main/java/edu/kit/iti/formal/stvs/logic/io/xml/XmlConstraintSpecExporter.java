@@ -48,7 +48,7 @@ public class XmlConstraintSpecExporter extends XmlExporter<ConstraintSpecificati
     specTable.setName(source.getName());
     JAXBElement<SpecificationTable> element =
         objectFactory.createSpecification(specTable);
-    return marshalToNode(element, NAMESPACE);
+    return marshalToNode(element, OF_STVS);
   }
 
   /**

@@ -118,11 +118,11 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
               throw new ImportException("Tab may not have more than one abstract specification");
             }
             ConstraintSpecification constraintSpec = constraintSpecImporter.doImportFromXmlNode(
-                XmlExporter.marshalToNode(element, XmlExporter.NAMESPACE));
+                XmlExporter.marshalToNode(element, XmlExporter.OF_STVS));
             hybridSpec = new HybridSpecification(constraintSpec, !tab.isReadOnly());
           } else {
             ConcreteSpecification concreteSpec = concreteSpecImporter.doImportFromXmlNode(
-                XmlExporter.marshalToNode(element, XmlExporter.NAMESPACE));
+                XmlExporter.marshalToNode(element, XmlExporter.OF_STVS));
             if (concreteSpec.isCounterExample()) {
               counterExample = concreteSpec;
             } else {

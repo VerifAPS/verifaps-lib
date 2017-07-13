@@ -1,8 +1,8 @@
 <?xml version="1.0" standalone="no"?>
 
-<config xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml"
+<config xmlns="http://formal.iti.kit.edu/stvs/io/1.0/"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://formal.iti.kit.edu/stvs/logic/io/xml ../config.xsd">
+        xsi:schemaLocation="http://formal.iti.kit.edu/stvs/io/1.0/ ../config.xsd">
     <general>
         <uiLanguage>EN</uiLanguage>
         <windowSize>

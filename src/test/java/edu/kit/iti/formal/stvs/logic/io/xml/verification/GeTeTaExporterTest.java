@@ -11,25 +11,28 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Benjamin Alt
  */
 public class GeTeTaExporterTest {
-  @Test
-  public void testExport() throws ImportException, IOException, ExportException, URISyntaxException {
-    ConstraintSpecification constraintSpec = ImporterFacade.importConstraintSpec(StvsApplication
-        .class.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml"), ImporterFacade
-        .ImportFormat.XML);
-    File tempFile = File.createTempFile("test", "");
-    ExporterFacade.exportSpec(constraintSpec, ExporterFacade.ExportFormat.GETETA, tempFile);
-    String expectedString = TestUtils.readFromFile(Paths.get(StvsApplication.class.getResource
-        ("testSets/valid_1/geteta_input_valid_1.xml").toURI()).toString());
-    String actualString = TestUtils.readFromFile(tempFile.getAbsolutePath());
-    assertEquals(TestUtils.removeWhitespace(expectedString), TestUtils.removeWhitespace(actualString));
-  }
+    @Test
+    public void testExport() throws ImportException, IOException, ExportException, URISyntaxException {
+        InputStream stream = StvsApplication.class.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml");
+        ConstraintSpecification constraintSpec = ImporterFacade.importConstraintSpec(
+                stream, ImporterFacade.ImportFormat.XML);
+        File tempFile = File.createTempFile("test", "");
+        ExporterFacade.exportSpec(constraintSpec, ExporterFacade.ExportFormat.GETETA, tempFile);
+        String expectedString = TestUtils.readFromFile(
+                Paths.get(StvsApplication.class.getResource("testSets/valid_1/geteta_input_valid_1.xml").toURI()).toString());
+        String actualString = TestUtils.readFromFile(tempFile.getAbsolutePath());
+        assertEquals(
+                TestUtils.removeWhitespace(expectedString),
+                TestUtils.removeWhitespace(actualString));
+    }
 }

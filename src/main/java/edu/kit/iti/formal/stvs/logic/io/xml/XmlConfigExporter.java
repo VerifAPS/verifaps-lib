@@ -50,6 +50,6 @@ public class XmlConfigExporter extends XmlExporter<GlobalConfig> {
     deps.setGetetaCommand(source.getGetetaCommand());
     config.setDependencies(deps);
     JAXBElement<Config> element = objectFactory.createConfig(config);
-    return marshalToNode(element, NAMESPACE);
+    return marshalToNode(element, OF_STVS);
   }
 }

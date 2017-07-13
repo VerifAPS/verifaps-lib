@@ -254,7 +254,7 @@ public class ImporterFacade {
       throws JAXBException, ImportException {
     switch (format) {
       case XML:
-        JAXBContext context = JAXBContext.newInstance(XmlExporter.NAMESPACE);
+        JAXBContext context = JAXBContext.newInstance(edu.kit.iti.formal.stvs.io._1.ObjectFactory.class);
         JAXBElement<edu.kit.iti.formal.stvs.io._1.History> element =
             (JAXBElement<edu.kit.iti.formal.stvs.io._1.History>) context.createUnmarshaller()
                 .unmarshal(chosenFile);
