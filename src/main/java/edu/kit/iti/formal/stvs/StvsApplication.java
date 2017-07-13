@@ -8,6 +8,8 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+import java.util.Locale;
+
 /**
  * The entry point to ST Verification Studio.
  *
@@ -15,53 +17,54 @@ import javafx.stage.Stage;
  */
 public class StvsApplication extends Application {
 
-  private StvsMainScene mainScene = new StvsMainScene();
-  private Stage primaryStage;
+    private StvsMainScene mainScene = new StvsMainScene();
+    private Stage primaryStage;
 
-  /**
-   * Launch the application.
-   * 
-   * @param args The command-line arguments passed to the application
-   */
-  public static void main(String[] args) {
-    launch(args);
-  }
+    /**
+     * Launch the application.
+     *
+     * @param args The command-line arguments passed to the application
+     */
+    public static void main(String[] args) {
+        Locale.setDefault(Locale.ENGLISH);
+        launch(args);
+    }
 
-  @Override
-  public void init() {
-    HostServiceSingleton.setInstance(getHostServices());
-    this.mainScene = new StvsMainScene();
+    @Override
+    public void init() {
+        HostServiceSingleton.setInstance(getHostServices());
+        this.mainScene = new StvsMainScene();
 
-    Platform.runLater(() -> {
-      this.primaryStage = new Stage();
-      Platform.setImplicitExit(true);
-      primaryStage.setTitle("Structured Text Verification Studio - STVS");
-      primaryStage.setScene(mainScene.getScene());
-      primaryStage.setMaximized(mainScene.shouldBeMaximizedProperty().get());
-      primaryStage.getIcons().addAll(
-          new Image(StvsApplication.class.getResourceAsStream("logo_large.png")),
-          new Image(StvsApplication.class.getResourceAsStream("logo.png")));
-      mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty());
+        Platform.runLater(() -> {
+            this.primaryStage = new Stage();
+            Platform.setImplicitExit(true);
+            primaryStage.setTitle("Structured Text Verification Studio - STVS");
+            primaryStage.setScene(mainScene.getScene());
+            primaryStage.setMaximized(mainScene.shouldBeMaximizedProperty().get());
+            primaryStage.getIcons().addAll(
+                    new Image(StvsApplication.class.getResourceAsStream("logo_large.png")),
+                    new Image(StvsApplication.class.getResourceAsStream("logo.png")));
+            mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty());
 
-      if(mainScene.getRootController().getRootModel().isFirstStart()) {
-        new WelcomeWizard(mainScene.getRootController().getRootModel().getGlobalConfig())
-            .showAndWait();
-      }
+            if (mainScene.getRootController().getRootModel().isFirstStart()) {
+                new WelcomeWizard(mainScene.getRootController().getRootModel().getGlobalConfig())
+                        .showAndWait();
+            }
 
-      primaryStage.show();
+            primaryStage.show();
 
-    });
-  }
+        });
+    }
 
-  @Override
-  public void start(Stage primaryStage) {
-    primaryStage.hide();
-  }
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.hide();
+    }
 
-  @Override
-  public void stop() {
-    mainScene.onClose();
-    this.primaryStage.hide();
-    System.exit(0);
-  }
+    @Override
+    public void stop() {
+        mainScene.onClose();
+        this.primaryStage.hide();
+        System.exit(0);
+    }
 }
