@@ -10,7 +10,7 @@ public final class PedestrianLightExample extends Example {
     public PedestrianLightExample() {
         name = "Pedestrian Light";
         description = "Demo";
-        htmlHelp = getClass().getResource("minmax.html").toExternalForm();//"https://formal.iti.kit.edu/stvs/minmax.html";
+        htmlHelp = getClass().getResource("light.html").toExternalForm();//"https://formal.iti.kit.edu/stvs/minmax.html";
         sessionFile = getClass().getResource("light.xml");
     }
 }
