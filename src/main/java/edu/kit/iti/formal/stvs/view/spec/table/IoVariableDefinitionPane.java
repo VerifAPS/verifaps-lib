@@ -3,6 +3,7 @@ package edu.kit.iti.formal.stvs.view.spec.table;
 import edu.kit.iti.formal.stvs.model.common.IoVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
+import edu.kit.iti.formal.stvs.model.common.VariableRole;
 import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
 import edu.kit.iti.formal.stvs.view.ViewUtils;
 
@@ -25,6 +26,7 @@ import javafx.scene.layout.GridPane;
 public class IoVariableDefinitionPane extends GridPane {
 
   private final ComboBox<VariableCategory> categoryComboBox;
+  private final ComboBox<VariableRole> variableRoleComboBox;
   private final TextField nameTextField;
   private final TextField typeTextField;
 
@@ -32,7 +34,7 @@ public class IoVariableDefinitionPane extends GridPane {
    * Creates an instance for an input variable with empty name/type.
    */
   public IoVariableDefinitionPane() {
-    this(VariableCategory.INPUT, "", "");
+    this(VariableCategory.INPUT, VariableRole.ASSUME, "", "");
   }
 
   /**
@@ -41,7 +43,7 @@ public class IoVariableDefinitionPane extends GridPane {
    * @param initialName Default name
    * @param initialType Default type
    */
-  public IoVariableDefinitionPane(VariableCategory initialCategory, String initialName,
+  public IoVariableDefinitionPane(VariableCategory initialCategory, VariableRole initialRole, String initialName,
       String initialType) {
     super();
 
@@ -49,18 +51,22 @@ public class IoVariableDefinitionPane extends GridPane {
     setHgap(10);
 
     this.categoryComboBox = new ComboBox<>(
-        FXCollections.observableArrayList(VariableCategory.INPUT, VariableCategory.OUTPUT));
+        FXCollections.observableArrayList(VariableCategory.values()));
+    this.variableRoleComboBox = new ComboBox<>(
+        FXCollections.observableArrayList(VariableRole.values()));
     this.nameTextField = new TextField(initialName);
     this.typeTextField = new TextField(initialType);
 
     categoryComboBox.valueProperty().set(initialCategory);
 
     add(new Label("category: "), 0, 0);
-    add(new Label("name: "), 0, 1);
-    add(new Label("type: "), 0, 2);
+    add(new Label("verification-role: "), 0, 1);
+    add(new Label("name: "), 0, 2);
+    add(new Label("type: "), 0, 3);
     add(categoryComboBox, 1, 0);
-    add(nameTextField, 1, 1);
-    add(typeTextField, 1, 2);
+    add(variableRoleComboBox, 1, 1);
+    add(nameTextField, 1, 2);
+    add(typeTextField, 1, 3);
     ViewUtils.setupId(this);
   }
 
@@ -70,6 +76,7 @@ public class IoVariableDefinitionPane extends GridPane {
    */
   public void setFromIoVariable(IoVariable ioVariable) {
     this.categoryComboBox.valueProperty().set(ioVariable.getCategory());
+    this.variableRoleComboBox.valueProperty().set(ioVariable.getCategory().getDefaultRole());
     this.nameTextField.setText(ioVariable.getName());
     this.typeTextField.setText(ioVariable.getType());
   }

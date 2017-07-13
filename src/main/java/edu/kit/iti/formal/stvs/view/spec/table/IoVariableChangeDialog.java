@@ -39,8 +39,11 @@ public class IoVariableChangeDialog extends Dialog<Void> {
     setTitle("Change Settings of " + variableToChange.getName());
     this.variableToChange = variableToChange;
     this.changeButton = new ButtonType("Change");
-    this.definitionPane = new IoVariableDefinitionPane(variableToChange.getCategory(),
-        variableToChange.getName(), variableToChange.getType());
+    this.definitionPane = new IoVariableDefinitionPane(
+        variableToChange.getCategory(),
+        variableToChange.getRole(),
+        variableToChange.getName(),
+        variableToChange.getType());
 
     setResultConverter(this::convertResult);
 
