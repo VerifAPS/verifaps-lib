@@ -7,7 +7,10 @@ import edu.kit.iti.formal.stvs.view.common.HostServiceSingleton;
 import edu.kit.iti.formal.stvs.view.menu.WelcomeWizard;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.util.Locale;
@@ -49,6 +52,20 @@ public class StvsApplication extends Application {
         mainScene.getScene().getStylesheets().add(
                 StvsApplication.class.getResource("normal.css").toExternalForm()
         );
+
+        //Debugger snippet for finding the styleclasses for the node under cursor.
+        mainScene.getScene().addEventFilter(MouseEvent.MOUSE_MOVED, mouseEvent -> {
+            if (mouseEvent.isAltDown() && mouseEvent.isControlDown()) {
+                try {
+                    Node node = (Node) mouseEvent.getTarget();
+                    ObservableList<String> classes = node.getStyleClass();
+                    System.out.println("Classes of " + node.getClass().getSimpleName() + " are " + classes);
+                } catch (ClassCastException e) {
+
+                }
+            }
+        });
+
 
         if (System.getProperty("presentation-mode", "false").equals("true")) {
             mainScene.getScene().getStylesheets().add(
