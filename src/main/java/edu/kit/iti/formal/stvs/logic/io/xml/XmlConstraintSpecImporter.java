@@ -170,6 +170,6 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
 
   @Override
   protected URL getXsdResource() throws IOException {
-    return getClass().getResource("/fileFormats/specification.xsd");
+    return getClass().getResource("/fileFormats/stvs-1.0.xsd");
   }
 }

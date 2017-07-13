@@ -145,6 +145,6 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
 
   @Override
   protected URL getXsdResource() throws IOException {
-    return getClass().getResource("/fileFormats/session.xsd");
+    return getClass().getResource("/fileFormats/stvs-1.0.xsd");
   }
 }

@@ -65,9 +65,7 @@ public class SpecificationView extends VBox implements Lockable {
     splitPane.setDividerPosition(1, 0.5);
     this.getChildren().add(splitPane);
     splitPane.setPrefHeight(Integer.MAX_VALUE);
-    ViewUtils.setupId(this);
-
-
+    ViewUtils.setupClass(this);
   }
 
   /**

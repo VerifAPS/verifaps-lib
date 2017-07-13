@@ -61,7 +61,7 @@ public class IoVariableDefinitionPane extends GridPane {
     add(categoryComboBox, 1, 0);
     add(nameTextField, 1, 1);
     add(typeTextField, 1, 2);
-    ViewUtils.setupId(this);
+    ViewUtils.setupClass(this);
   }
 
   /**

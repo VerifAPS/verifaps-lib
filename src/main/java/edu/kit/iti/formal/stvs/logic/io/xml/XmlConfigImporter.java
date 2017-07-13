@@ -114,6 +114,6 @@ public class  XmlConfigImporter extends XmlImporter<GlobalConfig> {
 
   @Override
   protected URL getXsdResource() throws IOException {
-    return getClass().getResource("/fileFormats/config.xsd");
+    return getClass().getResource("/fileFormats/stvs-1.0.xsd");
   }
 }

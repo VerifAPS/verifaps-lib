@@ -22,7 +22,7 @@ public class SpecificationsPane extends AnchorPane {
   public SpecificationsPane() {
     this.tabPane = new TabPane();
     this.addButton = new Button("+");
-    ViewUtils.setupId(this);
+    ViewUtils.setupClass(this);
 
 
     AnchorPane.setTopAnchor(tabPane, 0.0);

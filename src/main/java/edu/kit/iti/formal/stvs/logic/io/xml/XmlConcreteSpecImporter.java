@@ -160,6 +160,6 @@ public class XmlConcreteSpecImporter extends XmlImporter<ConcreteSpecification> 
 
   @Override
   protected URL getXsdResource() throws IOException {
-    return this.getClass().getResource("/fileFormats/specification.xsd");
+    return this.getClass().getResource("/fileFormats/stvs-1.0.xsd.xsd");
   }
 }

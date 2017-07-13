@@ -27,7 +27,7 @@ public class FileSelectionField extends HBox {
   public FileSelectionField() {
     super();
     setSpacing(10);
-    ViewUtils.setupId(this);
+    ViewUtils.setupClass(this);
     textField = new TextField();
     Button fileSelectButton = GlyphsDude.createIconButton(FontAwesomeIcon.FOLDER_OPEN);
     getChildren().add(textField);

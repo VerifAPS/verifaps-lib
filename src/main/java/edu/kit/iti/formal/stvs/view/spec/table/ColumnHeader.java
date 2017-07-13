@@ -45,7 +45,7 @@ public class ColumnHeader extends VBox {
     this.columnTypeLabel = new Label(specIoVariable.getType());
     this.typeOfLabel = new Label(" : ");
     this.problemTooltip = new Tooltip("");
-    ViewUtils.setupId(this);
+    ViewUtils.setupClass(this);
 
     categoryLabel.textProperty().bind(Bindings.convert(specIoVariable.categoryProperty()));
     columnNameLabel.textProperty().bind(specIoVariable.nameProperty());
