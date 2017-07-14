@@ -1,12 +1,21 @@
 package edu.kit.iti.formal.stvs.view;
 
+import com.sun.javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.logging.LogManager;
 
 /**
  * Provides static methods for view operations.
@@ -14,6 +23,21 @@ import javafx.stage.Stage;
  * @author Benjamin Alt
  */
 public class ViewUtils {
+    public static final Logger LOGGER = LoggerFactory.getLogger(ViewUtils.class);
+
+    //hack for getting the auto resizing
+    //see https://stackoverflow.com/questions/23284437/javafx-tablecolumn-resize-to-fit-cell-content
+    private static Method columnToFitMethod;
+
+    static {
+        try {
+            columnToFitMethod = TableViewSkin.class.getDeclaredMethod("resizeColumnToFitContent", TableColumn.class, int.class);
+            columnToFitMethod.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Calculates the {@link Transform Transformation} from children node coordinates to
      * parent node coordinates.
@@ -58,7 +82,6 @@ public class ViewUtils {
      */
     public static void setupView(Parent parent, String stylesheet) {
         parent.getStylesheets().add(parent.getClass().getResource(stylesheet).toExternalForm());
-
         setupClass(parent);
     }
 
@@ -77,7 +100,7 @@ public class ViewUtils {
      */
     public static void setupClass(Parent parent, String clazz) {
         parent.getStyleClass().add(clazz);
-        System.err.println("Style Class known: " + parent.getClass().getSimpleName());
+        LOGGER.debug("Style Class known: " + parent.getClass().getSimpleName());
     }
 
     /**
@@ -98,5 +121,15 @@ public class ViewUtils {
         state.setMinHeight(250);
         state.setMinWidth(250);
         state.show();
+    }
+
+    public static void autoFitTable(TableView tableView) {
+        for (Object column : tableView.getColumns()) {
+            try {
+                columnToFitMethod.invoke(tableView.getSkin(), column, -1);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
