@@ -56,14 +56,15 @@ dependencies {
     compile 'commons-io:commons-io:2.5'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'org.fxmisc.richtext:richtextfx:0.6.10'
-    compile 'org.antlr:antlr4-runtime:4.6'
+    compile 'org.antlr:antlr4-runtime:4.7'
     compile 'edu.kit.iti.formal:iec61131lang:0.1.15-SNAPSHOT'
     compile group: 'de.jensd', name: 'fontawesomefx', version: '8.9'
     compile group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.2.3-1'
+    compile 'org.slf4j:slf4j-jdk14:1.8.0-alpha2'
 
     testCompile "junit:junit:4.12"
 
-    antlr 'org.antlr:antlr4:4.6'
+    antlr 'org.antlr:antlr4:4.7'
 
     jaxb 'com.sun.xml.bind:jaxb-xjc:2.2.7-b41'
     jaxb 'com.sun.xml.bind:jaxb-impl:2.2.7-b41'
