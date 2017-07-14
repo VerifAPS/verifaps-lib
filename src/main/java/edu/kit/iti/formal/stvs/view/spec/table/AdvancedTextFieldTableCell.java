@@ -13,6 +13,10 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by Lukas on 13.07.2017.
  */
@@ -76,11 +80,54 @@ public class AdvancedTextFieldTableCell<S,T> extends TableCell<S,T>{
                 cancelEdit();
             } else if (t.getCode() == KeyCode.TAB) {
                 commitEdit(converter.get().fromString(textField.getText()));
-                    getTableView().edit(3, getTableColumn());
 
+                selectNextTableCell(!t.isShiftDown());
             }
-                }
-        );
+        });
+    }
+
+  private void selectNextTableCell(boolean forward) {
+    TableColumn<S, ?> nextColumn = getNextColumn(forward);
+    int nextRowIndex = getTableRow().getIndex();
+    //current column is at the end / start of the table
+    if (nextColumn == null) {
+      // move to the next row, when direction is forward; backward if direction is backward
+      nextRowIndex += (forward ? 1 : -1);
+      //if forward? -> use 1 as next Column (since the 0th Column is assumed to not be editable
+      //if !forward? -> use last column in table
+      nextColumn = getTableView().getColumns().get(forward ? 1 : getTableView().getColumns().size() - 1 );
+    }
+    getTableView().edit(nextRowIndex, nextColumn);
+  }
+
+  /**
+   * getNextColumn: get the next (previous) Column relative to this TableCell.
+   * @param forward should it return the next or previous Column?
+   * @return next (previous) TableColumn or null if none exists in this row
+   */
+  private TableColumn<S, ?> getNextColumn(boolean forward) {
+        List<TableColumn<S, ?>> columns = new ArrayList<>();
+        columns.addAll(getTableView().getColumns());
+
+        // There is no other column that supports editing.
+        if (columns.size() < 2) {
+          return null;
+        }
+        int currentIndex = columns.indexOf(getTableColumn());
+        int nextIndex = currentIndex;
+        if (forward) {
+          nextIndex++;
+          if (nextIndex > columns.size() - 1) {
+            return null;
+          }
+        } else {
+          nextIndex--;
+          //assumes, that the first column is not editable
+          if (nextIndex < 1) {
+            return null;
+          }
+        }
+        return columns.get(nextIndex);
     }
 
 
