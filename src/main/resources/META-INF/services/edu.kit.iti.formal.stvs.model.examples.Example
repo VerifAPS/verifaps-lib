@@ -3,3 +3,4 @@ edu.kit.iti.formal.stvs.model.examples.PedestrianLightExample
 edu.kit.iti.formal.stvs.model.examples.ElevatorExample
 edu.kit.iti.formal.stvs.model.examples.LinearRegressionExample
 edu.kit.iti.formal.stvs.model.examples.LinearRegressionCombinedExample
+edu.kit.iti.formal.stvs.model.examples.ConveyorBeltExample
