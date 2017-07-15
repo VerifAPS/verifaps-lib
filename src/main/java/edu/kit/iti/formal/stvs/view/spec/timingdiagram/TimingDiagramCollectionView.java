@@ -7,10 +7,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollBar;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SplitPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 /**
@@ -19,7 +16,7 @@ import javafx.scene.layout.*;
  * @author Leon Kaucher
  * @author Carsten Csiky
  */
-public class TimingDiagramCollectionView extends VBox {
+public class TimingDiagramCollectionView extends TitledPane {
   private final Label outdatedLabel;
   private final HBox outdatedMessage;
   private ScrollPane scrollPane = new ScrollPane(); // Container that holds the axisDiagramContainer
@@ -40,7 +37,7 @@ public class TimingDiagramCollectionView extends VBox {
    * the left.
    */
   public TimingDiagramCollectionView() {
-    super();
+    setText("Timing Diagram");
     getStyleClass().add("collectionView");
     // Create the message at the top of all diagrams, that is visible when the diagram is outdated
     outdatedLabel = new Label("This Timing-Diagram is outdated.");

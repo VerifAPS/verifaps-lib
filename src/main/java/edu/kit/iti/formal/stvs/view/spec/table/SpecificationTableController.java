@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec.table;
 
-import com.sun.javafx.scene.control.skin.TableViewSkin;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
@@ -16,7 +15,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import org.slf4j.Logger;
@@ -84,7 +82,12 @@ public class SpecificationTableController implements Controller {
 
         this.view = new SpecificationTableView(tableView);
 
-        view.getHeader().setContextMenu(createTopLevelContextMenu());
+        view.getBtnAddRows().setOnAction(event -> insertRow());
+        view.getBtnCommentRow().setOnAction(event -> addRowComment());
+        view.getBtnRemoveRows().setOnAction(event -> deleteRow());
+        view.getBtnResize().setOnAction(event -> resizeColumns());
+
+        //view.getHeader().setContextMenu(createTopLevelContextMenu());
 
         hybridSpecification.getColumnHeaders().forEach(this::addColumnToView);
 
@@ -170,6 +173,37 @@ public class SpecificationTableController implements Controller {
         }
     }
 
+    public void insertRow() {
+        int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
+        addEmptyRow(selectedIndex + 1);
+    }
+
+    public void deleteRow() {
+        List<HybridRow> toRemove = new ArrayList<>();
+        toRemove.addAll(tableView.getSelectionModel().getSelectedItems());
+        removeByReference(hybridSpec.getHybridRows(), toRemove);
+    }
+
+    public void addNewColumn() {
+        new IoVariableChooserDialog(codeIoVariables, hybridSpec.getColumnHeaders())
+                .showAndWait().ifPresent(this::addNewColumn);
+    }
+
+    public void addRowComment() {
+        int index = tableView.getSelectionModel().getSelectedIndex();
+        if (index < 0) {
+            return;
+        }
+        CommentPopupManager popupController =
+                new CommentPopupManager(hybridSpec.getRows().get(index), hybridSpec.isEditable());
+    }
+
+    public void resizeColumns() {
+        LOGGER.debug("SpecificationTableController.resizeColumns");
+        ViewUtils.autoFitTable(tableView);
+    }
+
+
     private ContextMenu createContextMenu() {
         MenuItem insertRow = new MenuItem("Insert Row");
         MenuItem columnResize = new MenuItem("Resize columns");
@@ -177,47 +211,25 @@ public class SpecificationTableController implements Controller {
         MenuItem comment = new MenuItem("Comment ...");
 
         insertRow.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
-        insertRow.setOnAction(event -> {
-            int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
-            addEmptyRow(selectedIndex + 1);
-        });
+        insertRow.setOnAction(event -> insertRow());
 
         deleteRow.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
-        deleteRow.setOnAction(event -> {
-            List<HybridRow> toRemove = new ArrayList<>();
-            toRemove.addAll(tableView.getSelectionModel().getSelectedItems());
-            removeByReference(hybridSpec.getHybridRows(), toRemove);
-        });
+        deleteRow.setOnAction(event -> deleteRow());
 
         MenuItem addNewColumn = new MenuItem("New Column...");
-        addNewColumn.setOnAction(
-                event -> new IoVariableChooserDialog(codeIoVariables, hybridSpec.getColumnHeaders())
-                        .showAndWait().ifPresent(this::addNewColumn));
+        addNewColumn.setOnAction(event -> addNewColumn());
 
-        comment.setOnAction(event -> {
-            int index = tableView.getSelectionModel().getSelectedIndex();
-            if (index < 0) {
-                return;
-            }
-            CommentPopupManager popupController =
-                    new CommentPopupManager(hybridSpec.getRows().get(index), hybridSpec.isEditable());
-        });
+        comment.setOnAction(event -> addRowComment());
         comment.setAccelerator(KeyCodeCombination.keyCombination("Ctrl+k"));
         insertRow.disableProperty().bind(Bindings.not(tableView.editableProperty()));
         deleteRow.disableProperty().bind(Bindings.not(tableView.editableProperty()));
         addNewColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
-
         columnResize.setAccelerator(KeyCodeCombination.keyCombination("Ctrl+R"));
-        columnResize.setOnAction(this::resizeColumns);
-
+        columnResize.setOnAction(event -> resizeColumns());
 
         return new ContextMenu(insertRow, deleteRow, addNewColumn, comment, columnResize);
     }
 
-    public void resizeColumns(ActionEvent actionEvent) {
-        LOGGER.debug("SpecificationTableController.resizeColumns");
-        ViewUtils.autoFitTable(tableView);
-    }
 
     private ContextMenu createColumnContextMenu(TableColumn<HybridRow, ?> column) {
         MenuItem changeColumn = new MenuItem("Change Column...");
