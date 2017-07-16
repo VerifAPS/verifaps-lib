@@ -87,15 +87,17 @@ public class XmlConstraintSpecImporter extends XmlImporter<ConstraintSpecificati
       constraintSpec.getColumnHeaders().add(specIoVariable);
     }
 
-    // Add the rows
+    // Add the rowsj
     Rows rows = importedSpec.getRows();
-    for (int i = 0; i < rows.getRow().size(); i++) {
-      Rows.Row row = rows.getRow().get(i);
-      ConstraintDuration newDuration = new ConstraintDuration(row.getDuration().getValue());
-      newDuration.setComment(row.getDuration().getComment());
-      constraintSpec.getDurations().add(newDuration);
-      SpecificationRow<ConstraintCell> row1 = createSpecificationRowForCycle(ioVariables, row);
-      constraintSpec.getRows().add(row1);
+    if(rows!=null) {
+        for (int i = 0; i < rows.getRow().size(); i++) {
+            Rows.Row row = rows.getRow().get(i);
+            ConstraintDuration newDuration = new ConstraintDuration(row.getDuration().getValue());
+            newDuration.setComment(row.getDuration().getComment());
+            constraintSpec.getDurations().add(newDuration);
+            SpecificationRow<ConstraintCell> row1 = createSpecificationRowForCycle(ioVariables, row);
+            constraintSpec.getRows().add(row1);
+        }
     }
 
     constraintSpec.setComment(importedSpec.getComment());

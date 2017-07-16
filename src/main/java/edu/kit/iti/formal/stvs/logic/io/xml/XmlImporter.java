@@ -60,6 +60,7 @@ public abstract class XmlImporter<T> implements Importer<T> {
             Document doc = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(inputString)));
             return doImportFromXmlNode(doc.getDocumentElement());
         } catch (SAXException | IOException | ParserConfigurationException e) {
+            e.printStackTrace();
             throw new ImportException(e);
         }
     }

@@ -6,13 +6,10 @@ import edu.kit.iti.formal.stvs.model.table.HybridRow;
 import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
-import java.awt.event.ActionEvent;
 
 /**
  * The view responsible for displaying
@@ -71,21 +68,26 @@ public class SpecificationTableView extends TitledPane {
     }
 
     private void showInDialog(javafx.event.ActionEvent event) {
-        System.out.println("SpecificationTableView.SpecificationTableView");
-        Stage s = new Stage(StageStyle.UTILITY);
+        //("SpecificationTableView.SpecificationTableView");
+        Stage s = new Stage(StageStyle.DECORATED);
+        s.setTitle(getText());
         s.initModality(Modality.APPLICATION_MODAL);
-        //s.setFullScreen(true);
-        s.setMaximized(true);
+        s.setMinHeight(640);
+        s.setMinHeight(480);
+        s.setFullScreen(true);
+        //s.setMaximized(true);
         //TableView<HybridRow> newView = new TableView<>(tableView.getItems());
-        getChildren().remove(tableView);
+        setContent(new Label("opened externally"));
         BorderPane root = new BorderPane(tableView);
         ButtonBar bb = new ButtonBar();
         root.setTop(bb);
         s.setScene(new Scene(root));
         Button yesButton = new Button("Close");
         ButtonBar.setButtonData(yesButton, ButtonBar.ButtonData.CANCEL_CLOSE);
+        bb.getButtons().addAll(yesButton);
+        yesButton.setOnAction(e -> s.hide());
         s.showAndWait();
-        getChildren().addAll(tableView);
+        setContent(tableView);
     }
 
     /**

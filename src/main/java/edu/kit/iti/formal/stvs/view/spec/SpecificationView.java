@@ -32,7 +32,7 @@ public class SpecificationView extends VBox implements Lockable {
 
 
     //private final SplitPane splitPane = new SplitPane();
-    private final HBox buttonBox;
+    private final HBox buttonBox = new HBox(5);
     private Button startVerificationButton;
     private Button startConcretizerButton;
     private VariableCollection variableCollection;
@@ -46,8 +46,7 @@ public class SpecificationView extends VBox implements Lockable {
         //splitPane = new SplitPane();
         //SplitPane.setResizableWithParent(variablesPane,true);
 
-        buttonBox = new HBox();
-        buttonBox.getStyleClass().addAll("button-box", "action-buttons");
+        buttonBox.getStyleClass().addAll("button-box", "verification-action-buttons", "action-buttons");
         startVerificationButton = new Button();
         startConcretizerButton = new Button();
         setVerificationButtonPlay();
@@ -61,10 +60,14 @@ public class SpecificationView extends VBox implements Lockable {
         //splitPane.setDividerPosition(0, 0.25);
         //splitPane.setDividerPosition(1, 0.5);
         //getChildren().addAll(splitPane);
-        getChildren().addAll(variablesPane,
-                new ResizerPane(() -> variableCollection.getContent()), tablePane,
-                new ResizerPane(() -> tableView.getContent()), timingDiagramPane);
-
+        ScrollPane scrollPane = new ScrollPane(
+                new VBox(variablesPane,
+                        new ResizerPane(() -> variableCollection.getContent()), tablePane,
+                        new ResizerPane(() -> tableView.getContent()), timingDiagramPane));
+        getChildren().addAll(scrollPane);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setFitToWidth(true);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
         ViewUtils.setupClass(this);
     }
 
@@ -161,7 +164,6 @@ public class SpecificationView extends VBox implements Lockable {
      */
     public void setEmptyDiagram(Node emptyDiagram) {
         this.diagram = null;
-
         timingDiagramPane.getChildren().setAll(emptyDiagram);
 
         //timingDiagramPane.getChildren().add(emptyDiagram);
@@ -224,13 +226,13 @@ public class SpecificationView extends VBox implements Lockable {
             setOnMousePressed(event -> {
                 startY = event.getScreenY();
                 startHeight = ((Region) nodeSupplier.get()).getHeight();
-                System.out.println("started at " + startY + "   " + startHeight);
+                //System.out.println("started at " + startY + "   " + startHeight);
             });
 
             setOnMouseDragged(event -> {
                 event.consume();
                 double diff = event.getScreenY() - startY;
-                System.out.println("DIFF" + diff + "  " + startHeight + diff);
+                //System.out.println("DIFF" + diff + "  " + startHeight + diff);
                 ((Region) nodeSupplier.get()).setPrefHeight(startHeight + diff);
             });
         }
