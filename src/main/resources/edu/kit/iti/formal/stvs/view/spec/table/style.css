@@ -40,6 +40,15 @@
   -fx-text-fill: darkgreen;
 }
 
+.spec-column-header.category-label.label.local {
+  -fx-text-fill: coral;
+}
+
+
+.spec-column-header.category-label.label.inout {
+  -fx-text-fill: darkturquoise;
+}
+
 .spec-column-header.category-label.label {
   -fx-text-alignment: center;
   -fx-font-family: monospace;

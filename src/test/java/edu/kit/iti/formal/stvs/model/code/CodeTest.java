@@ -91,7 +91,7 @@ public class CodeTest {
   @Test
   public void testParsedCodeIOVariableExtraction() {
     ParsedCode parsed = enumDefinition.getParsedCode();
-    assertEquals("Find all defined IOVariables", 5, parsed.getDefinedVariables().size());
+    assertEquals("Find all defined IOVariables", 7, parsed.getDefinedVariables().size());
 
     Type myEnum = new TypeEnum("MY_ENUM", Arrays.asList("possible", "values", "enum"));
     Set<CodeIoVariable> expectedVariables = new HashSet<>();
@@ -100,7 +100,8 @@ public class CodeTest {
     expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, myEnum.getTypeName(), "my_enum"));
     expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, myEnum.getTypeName(), "my_output"));
     expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, "BOOL", "seriously"));
-
+    expectedVariables.add(new CodeIoVariable(VariableCategory.LOCAL, myEnum.getTypeName(),"my_enum_local"));
+    expectedVariables.add(new CodeIoVariable(VariableCategory.INOUT, "BOOL", "active_inout"));
     assertCollectionsEqual(expectedVariables, parsed.getDefinedVariables());
   }
 
