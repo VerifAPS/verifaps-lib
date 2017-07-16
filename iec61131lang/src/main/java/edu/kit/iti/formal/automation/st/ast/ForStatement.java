@@ -23,6 +23,9 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Created by weigla on 09.06.2014.
@@ -30,28 +33,19 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
+@Data
+@EqualsAndHashCode
+@ToString
 public class ForStatement extends Statement {
     private String variable;
     private Expression start, stop, step;
     private StatementList statements = new StatementList();
 
-    /**
-     * <p>Constructor for ForStatement.</p>
-     */
     public ForStatement() {
     }
 
-    /**
-     * <p>Constructor for ForStatement.</p>
-     *
-     * @param variable   a {@link java.lang.String} object.
-     * @param start      a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     * @param stop       a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     * @param step       a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     * @param statements a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     */
     public ForStatement(String variable, Expression start, Expression stop,
-            Expression step, StatementList statements) {
+                        Expression step, StatementList statements) {
         this.variable = variable;
         this.start = start;
         this.stop = stop;
@@ -152,20 +146,22 @@ public class ForStatement extends Statement {
     /**
      * {@inheritDoc}
      */
-    @Override public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @Override public Statement clone() {
+    @Override
+    public Statement copy() {
         ForStatement fs = new ForStatement();
+        fs.setRuleContext(getRuleContext());
         fs.variable = variable;
         if (start != null)
-            fs.start = start.clone();
+            fs.start = start.copy();
         if (stop != null)
-            fs.stop = stop.clone();
+            fs.stop = stop.copy();
         if (step != null)
-            fs.step = step.clone();
-        fs.statements = statements.clone();
+            fs.step = step.copy();
+        fs.statements = statements.copy();
         return fs;
     }
 }

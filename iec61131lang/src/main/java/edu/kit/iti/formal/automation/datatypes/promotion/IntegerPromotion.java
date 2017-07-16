@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.datatypes.promotion;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.AnySignedInt;
-import edu.kit.iti.formal.automation.datatypes.AnyUInt;
+import edu.kit.iti.formal.automation.datatypes.AnyUnsignedInt;
 
 /**
  * Created by weigl on 24.11.16.
@@ -43,13 +43,13 @@ public class IntegerPromotion implements TypePromotion {
             return promote((AnySignedInt) a, (AnySignedInt) b);
         } catch (ClassCastException e) {
             try {
-                return promote((AnyUInt) a, (AnyUInt) b);
+                return promote((AnyUnsignedInt) a, (AnyUnsignedInt) b);
             } catch (ClassCastException e1) {
                 try {
-                    return promote((AnySignedInt) a, (AnyUInt) b);
+                    return promote((AnySignedInt) a, (AnyUnsignedInt) b);
                 } catch (ClassCastException e2) {
                     try{
-                        return promote((AnySignedInt) b, (AnyUInt) a);
+                        return promote((AnySignedInt) b, (AnyUnsignedInt) a);
                     }catch (ClassCastException e3) {
                         return null;
                     }
@@ -76,11 +76,11 @@ public class IntegerPromotion implements TypePromotion {
     /**
      * <p>promote.</p>
      *
-     * @param a a {@link edu.kit.iti.formal.automation.datatypes.AnyUInt} object.
-     * @param b a {@link edu.kit.iti.formal.automation.datatypes.AnyUInt} object.
+     * @param a a {@link AnyUnsignedInt} object.
+     * @param b a {@link AnyUnsignedInt} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
-    public Any promote(AnyUInt a, AnyUInt b) {
+    public Any promote(AnyUnsignedInt a, AnyUnsignedInt b) {
         if (a.getBitLength() >= b.getBitLength())
             return a;
         else
@@ -91,10 +91,10 @@ public class IntegerPromotion implements TypePromotion {
      * <p>promote.</p>
      *
      * @param a a {@link edu.kit.iti.formal.automation.datatypes.AnySignedInt} object.
-     * @param b a {@link edu.kit.iti.formal.automation.datatypes.AnyUInt} object.
+     * @param b a {@link AnyUnsignedInt} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
-    public Any promote(AnySignedInt a, AnyUInt b) {
+    public Any promote(AnySignedInt a, AnyUnsignedInt b) {
         if (a.getBitLength() > b.getBitLength())
             return a;
         else

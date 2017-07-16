@@ -23,6 +23,9 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,18 +36,13 @@ import java.util.List;
  * @author weigl
  * @version $Id: $Id
  */
+@Data
+@EqualsAndHashCode
+@ToString
 public class IfStatement extends Statement {
     private List<GuardedStatement> conditionalBranches = new ArrayList<>();
     private StatementList elseBranch = new StatementList();
 
-
-    /**
-     * <p>addGuardedCommand.</p>
-     *
-     * @param expr a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     * @param statements a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.GuardedStatement} object.
-     */
     public GuardedStatement addGuardedCommand(Expression expr, StatementList statements) {
         if (expr == null)
             throw new IllegalArgumentException();
@@ -54,61 +52,20 @@ public class IfStatement extends Statement {
         return e;
     }
 
-    /**
-     * <p>Getter for the field <code>conditionalBranches</code>.</p>
-     *
-     * @return a {@link java.util.List} object.
-     */
-    public List<GuardedStatement> getConditionalBranches() {
-        return conditionalBranches;
-    }
-
-    /**
-     * <p>Setter for the field <code>conditionalBranches</code>.</p>
-     *
-     * @param conditionalBranches a {@link java.util.List} object.
-     */
-    public void setConditionalBranches(List<GuardedStatement> conditionalBranches) {
-        this.conditionalBranches = conditionalBranches;
-    }
-
-    /**
-     * <p>Getter for the field <code>elseBranch</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     */
-    public StatementList getElseBranch() {
-        return elseBranch;
-    }
-
-    /**
-     * <p>Setter for the field <code>elseBranch</code>.</p>
-     *
-     * @param elseBranch a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     */
-    public void setElseBranch(StatementList elseBranch) {
-        this.elseBranch = elseBranch;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /**
-     * <p>addGuardedCommand.</p>
-     *
-     * @param gc a {@link edu.kit.iti.formal.automation.st.ast.GuardedStatement} object.
-     */
     public void addGuardedCommand(GuardedStatement gc) {
         conditionalBranches.add(gc);
     }
 
-    @Override public IfStatement clone() {
+
+    @Override
+    public IfStatement copy() {
         IfStatement is = new IfStatement();
-        conditionalBranches.forEach(gs -> is.addGuardedCommand(gs.clone()));
-        is.setElseBranch(elseBranch.clone());
+        conditionalBranches.forEach(gs -> is.addGuardedCommand(gs.copy()));
+        is.setElseBranch(elseBranch.copy());
         return is;
     }
 }

@@ -22,11 +22,9 @@ package edu.kit.iti.formal.automation.visitors;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
-import edu.kit.iti.formal.automation.st.ast.ArrayInitialization;
 
 /**
  * Created by weigla on 14.06.2014.
@@ -36,7 +34,7 @@ import edu.kit.iti.formal.automation.st.ast.ArrayInitialization;
  */
 public interface Visitor<T> {
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param location a {@link edu.kit.iti.formal.automation.st.ast.Location} object.
      * @return a T object.
@@ -44,7 +42,7 @@ public interface Visitor<T> {
     T visit(Location location);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param initializations a {@link edu.kit.iti.formal.automation.st.ast.ArrayInitialization} object.
      * @return a T object.
@@ -52,7 +50,7 @@ public interface Visitor<T> {
     T visit(ArrayInitialization initializations);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param arrayTypeDeclaration a {@link edu.kit.iti.formal.automation.st.ast.ArrayTypeDeclaration} object.
      * @return a T object.
@@ -60,7 +58,7 @@ public interface Visitor<T> {
     T visit(ArrayTypeDeclaration arrayTypeDeclaration);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param assignmentStatement a {@link edu.kit.iti.formal.automation.st.ast.AssignmentStatement} object.
      * @return a T object.
@@ -68,7 +66,7 @@ public interface Visitor<T> {
     T visit(AssignmentStatement assignmentStatement);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param exitStatement a {@link edu.kit.iti.formal.automation.st.ast.ExitStatement} object.
      * @return a T object.
@@ -76,7 +74,7 @@ public interface Visitor<T> {
     T visit(ExitStatement exitStatement);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param range a {@link CaseCondition.Range} object.
      * @return a T object.
@@ -84,7 +82,7 @@ public interface Visitor<T> {
     T visit(CaseCondition.Range range);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param integerCondition a {@link CaseCondition.IntegerCondition} object.
      * @return a T object.
@@ -92,7 +90,7 @@ public interface Visitor<T> {
     T visit(CaseCondition.IntegerCondition integerCondition);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param enumeration a {@link CaseCondition.Enumeration} object.
      * @return a T object.
@@ -100,7 +98,7 @@ public interface Visitor<T> {
     T visit(CaseCondition.Enumeration enumeration);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param binaryExpression a {@link edu.kit.iti.formal.automation.st.ast.BinaryExpression} object.
      * @return a T object.
@@ -108,17 +106,17 @@ public interface Visitor<T> {
     T visit(BinaryExpression binaryExpression);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param configurationDeclaration a {@link edu.kit.iti.formal.automation.st.ast.ConfigurationDeclaration} object.
      * @return a T object.
      */
     T visit(ConfigurationDeclaration configurationDeclaration);
 
-    //T visit(DirectVariable directVariable);
+    //T accept(DirectVariable directVariable);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param enumerationTypeDeclaration a {@link edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration} object.
      * @return a T object.
@@ -126,7 +124,7 @@ public interface Visitor<T> {
     T visit(EnumerationTypeDeclaration enumerationTypeDeclaration);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param repeatStatement a {@link edu.kit.iti.formal.automation.st.ast.RepeatStatement} object.
      * @return a T object.
@@ -134,7 +132,7 @@ public interface Visitor<T> {
     T visit(RepeatStatement repeatStatement);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param whileStatement a {@link edu.kit.iti.formal.automation.st.ast.WhileStatement} object.
      * @return a T object.
@@ -142,7 +140,7 @@ public interface Visitor<T> {
     T visit(WhileStatement whileStatement);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param unaryExpression a {@link edu.kit.iti.formal.automation.st.ast.UnaryExpression} object.
      * @return a T object.
@@ -150,7 +148,7 @@ public interface Visitor<T> {
     T visit(UnaryExpression unaryExpression);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param typeDeclarations a {@link edu.kit.iti.formal.automation.st.ast.TypeDeclarations} object.
      * @return a T object.
@@ -158,17 +156,17 @@ public interface Visitor<T> {
     T visit(TypeDeclarations typeDeclarations);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param caseStatement a {@link edu.kit.iti.formal.automation.st.ast.CaseStatement} object.
      * @return a T object.
      */
     T visit(CaseStatement caseStatement);
 
-    //T visit(SymbolicReference symbolicReference);
+    //T accept(SymbolicReference symbolicReference);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param statements a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
      * @return a T object.
@@ -176,23 +174,16 @@ public interface Visitor<T> {
     T visit(StatementList statements);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param programDeclaration a {@link edu.kit.iti.formal.automation.st.ast.ProgramDeclaration} object.
      * @return a T object.
      */
     T visit(ProgramDeclaration programDeclaration);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param tsScalarValue a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
-     * @return a T object.
-     */
-    T visit(ScalarValue<? extends Any, ? extends Object> tsScalarValue);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param expressions a {@link edu.kit.iti.formal.automation.st.ast.ExpressionList} object.
      * @return a T object.
@@ -200,7 +191,7 @@ public interface Visitor<T> {
     T visit(ExpressionList expressions);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param functionDeclaration a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
      * @return a T object.
@@ -208,7 +199,7 @@ public interface Visitor<T> {
     T visit(FunctionDeclaration functionDeclaration);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param functionCall a {@link edu.kit.iti.formal.automation.st.ast.FunctionCall} object.
      * @return a T object.
@@ -216,7 +207,7 @@ public interface Visitor<T> {
     T visit(FunctionCall functionCall);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param forStatement a {@link edu.kit.iti.formal.automation.st.ast.ForStatement} object.
      * @return a T object.
@@ -224,7 +215,7 @@ public interface Visitor<T> {
     T visit(ForStatement forStatement);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param resourceDeclaration a {@link edu.kit.iti.formal.automation.st.ast.ResourceDeclaration} object.
      * @return a T object.
@@ -232,7 +223,7 @@ public interface Visitor<T> {
     T visit(ResourceDeclaration resourceDeclaration);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param functionBlockDeclaration a {@link edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration} object.
      * @return a T object.
@@ -240,7 +231,7 @@ public interface Visitor<T> {
     T visit(FunctionBlockDeclaration functionBlockDeclaration);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param returnStatement a {@link edu.kit.iti.formal.automation.st.ast.ReturnStatement} object.
      * @return a T object.
@@ -248,7 +239,7 @@ public interface Visitor<T> {
     T visit(ReturnStatement returnStatement);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param ifStatement a {@link edu.kit.iti.formal.automation.st.ast.IfStatement} object.
      * @return a T object.
@@ -256,7 +247,7 @@ public interface Visitor<T> {
     T visit(IfStatement ifStatement);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param guardedStatement a {@link edu.kit.iti.formal.automation.st.ast.GuardedStatement} object.
      * @return a T object.
@@ -264,7 +255,7 @@ public interface Visitor<T> {
     T visit(GuardedStatement guardedStatement);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param functionBlockCallStatement a {@link FunctionBlockCallStatement} object.
      * @return a T object.
@@ -272,7 +263,7 @@ public interface Visitor<T> {
     T visit(FunctionBlockCallStatement functionBlockCallStatement);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param aCase a {@link edu.kit.iti.formal.automation.st.ast.CaseStatement.Case} object.
      * @return a T object.
@@ -280,7 +271,7 @@ public interface Visitor<T> {
     T visit(CaseStatement.Case aCase);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param stringTypeDeclaration a {@link edu.kit.iti.formal.automation.st.ast.StringTypeDeclaration} object.
      * @return a T object.
@@ -288,7 +279,7 @@ public interface Visitor<T> {
     T visit(StringTypeDeclaration stringTypeDeclaration);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param structureTypeDeclaration a {@link edu.kit.iti.formal.automation.st.ast.StructureTypeDeclaration} object.
      * @return a T object.
@@ -296,7 +287,7 @@ public interface Visitor<T> {
     T visit(StructureTypeDeclaration structureTypeDeclaration);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param subRangeTypeDeclaration a {@link edu.kit.iti.formal.automation.st.ast.SubRangeTypeDeclaration} object.
      * @return a T object.
@@ -304,7 +295,7 @@ public interface Visitor<T> {
     T visit(SubRangeTypeDeclaration subRangeTypeDeclaration);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param simpleTypeDeclaration a {@link edu.kit.iti.formal.automation.st.ast.SimpleTypeDeclaration} object.
      * @return a T object.
@@ -312,7 +303,7 @@ public interface Visitor<T> {
     T visit(SimpleTypeDeclaration simpleTypeDeclaration);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param localScope a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
      * @return a T object.
@@ -320,7 +311,7 @@ public interface Visitor<T> {
     T visit(LocalScope localScope);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param variableDeclaration a {@link edu.kit.iti.formal.automation.st.ast.VariableDeclaration} object.
      * @return a T object.
@@ -328,7 +319,7 @@ public interface Visitor<T> {
     T visit(VariableDeclaration variableDeclaration);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param commentStatement a {@link edu.kit.iti.formal.automation.st.ast.CommentStatement} object.
      * @return a T object.
@@ -336,7 +327,7 @@ public interface Visitor<T> {
     T visit(CommentStatement commentStatement);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param structureInitialization a {@link edu.kit.iti.formal.automation.st.ast.StructureInitialization} object.
      * @return a T object.
@@ -344,7 +335,7 @@ public interface Visitor<T> {
     T visit(StructureInitialization structureInitialization);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param deref a {@link edu.kit.iti.formal.automation.st.ast.Deref} object.
      * @return a T object.
@@ -352,7 +343,7 @@ public interface Visitor<T> {
     T visit(Deref deref);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param symbolicReference a {@link edu.kit.iti.formal.automation.st.ast.SymbolicReference} object.
      * @return a T object.
@@ -360,7 +351,7 @@ public interface Visitor<T> {
     T visit(SymbolicReference symbolicReference);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param ptd a {@link edu.kit.iti.formal.automation.st.ast.PointerTypeDeclaration} object.
      * @return a T object.
@@ -368,7 +359,7 @@ public interface Visitor<T> {
     T visit(PointerTypeDeclaration ptd);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param init a {@link edu.kit.iti.formal.automation.st.ast.IdentifierInitializer} object.
      * @return a T object.
@@ -379,4 +370,8 @@ public interface Visitor<T> {
     T visit(ClassDeclaration clazz);
 
     T visit(MethodDeclaration method);
+
+    T visit(Literal literal);
+
+    T visit(FunctionBlockCallStatement.Parameter parameter);
 }

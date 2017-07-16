@@ -23,8 +23,12 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import com.google.common.base.Predicates;
+import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +41,8 @@ import java.util.stream.Stream;
  * @author weigl
  * @version $Id: $Id
  */
+@EqualsAndHashCode
+@ToString
 public class FunctionBlockCallStatement extends Statement {
     private IdentifierPlaceHolder<FunctionBlockDeclaration> calleeName = new IdentifierPlaceHolder<>();
     private List<Parameter> parameters = new ArrayList<>();
@@ -55,15 +61,12 @@ public class FunctionBlockCallStatement extends Statement {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
     public String getFunctionBlockName() {
-        if (calleeName.getIdentifiedObject() != null)
-            return calleeName.getIdentifiedObject().getFunctionBlockName();
-        return null;
+        return calleeName.getIdentifier();
     }
 
     public void setFunctionBlockName(String functionName) {
@@ -106,12 +109,11 @@ public class FunctionBlockCallStatement extends Statement {
         this.parameters = parameters;
     }
 
-
     @Override
-    public FunctionBlockCallStatement clone() {
+    public FunctionBlockCallStatement copy() {
         FunctionBlockCallStatement f = new FunctionBlockCallStatement();
         f.setFunctionBlockName(getFunctionBlockName());
-        f.parameters = parameters.stream().map(Parameter::clone)
+        f.parameters = parameters.stream().map(Parameter::copy)
                 .collect(Collectors.toList());
         return f;
     }
@@ -133,10 +135,17 @@ public class FunctionBlockCallStatement extends Statement {
     }
 
 
-    public static class Parameter implements Cloneable {
+    @Data
+    @EqualsAndHashCode
+    @ToString
+    public static class Parameter
+            extends Top<IEC61131Parser.Param_assignmentContext> {
         private String name;
         private boolean output;
         private Expression expression;
+
+        public Parameter() {
+        }
 
         public Parameter(String name, boolean output, Expression expression) {
             this.name = name;
@@ -148,32 +157,14 @@ public class FunctionBlockCallStatement extends Statement {
             this(null, false, expr);
         }
 
-        public Parameter clone() {
-            return new Parameter(name, output, expression.clone());
+        @Override
+        public Parameter copy() {
+            return new Parameter(name, output, expression.copy());
         }
 
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public boolean isOutput() {
-            return output;
-        }
-
-        public void setOutput(boolean output) {
-            this.output = output;
-        }
-
-        public Expression getExpression() {
-            return expression;
-        }
-
-        public void setExpression(Expression expression) {
-            this.expression = expression;
+        @Override
+        public <T> T accept(Visitor<T> visitor) {
+            return visitor.visit(this);
         }
     }
 

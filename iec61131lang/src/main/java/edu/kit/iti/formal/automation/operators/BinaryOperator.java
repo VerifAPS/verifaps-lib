@@ -25,16 +25,19 @@ package edu.kit.iti.formal.automation.operators;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.promotion.DefaultTypePromoter;
 import edu.kit.iti.formal.automation.datatypes.promotion.TypePromotion;
+import edu.kit.iti.formal.automation.st.ast.Copyable;
+
+import java.io.Serializable;
 
 /**
  * BinaryOperator represents a binary operator, e.g. addition +, multiply *, etc.
- *
+ * <p>
  * <p>Created on 24.11.16.</p>
  *
  * @author Alexander Weigl
  * @version 1
  */
-public class BinaryOperator implements Operator {
+public class BinaryOperator implements Operator{
     private final String symbol;
     private final Any validType;
 

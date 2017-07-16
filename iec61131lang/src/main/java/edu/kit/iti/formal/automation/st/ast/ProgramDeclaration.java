@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.*;
 
 /**
  * Created by weigl on 13.06.14.
@@ -31,67 +32,18 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
+@ToString
+@EqualsAndHashCode
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class ProgramDeclaration extends TopLevelScopeElement
         implements Identifiable {
     private StatementList programBody;
     private String programName;
 
-    /**
-     * <p>Constructor for ProgramDeclaration.</p>
-     */
-    public ProgramDeclaration() {
-    }
-
-    /**
-     * <p>Constructor for ProgramDeclaration.</p>
-     *
-     * @param p a {@link edu.kit.iti.formal.automation.st.ast.ProgramDeclaration} object.
-     */
-    public ProgramDeclaration(ProgramDeclaration p) {
-        super(p);
-        programName = p.getProgramName();
-        programBody = new StatementList(p.getProgramBody());
-    }
-
-    /**
-     * <p>Getter for the field <code>programName</code>.</p>
-     *
-     * @return a {@link java.lang.String} object.
-     */
-    public String getProgramName() {
-        return programName;
-    }
-
-    /**
-     * <p>Setter for the field <code>programName</code>.</p>
-     *
-     * @param programName a {@link java.lang.String} object.
-     */
-    public void setProgramName(String programName) {
-        this.programName = programName;
-    }
-
-    /**
-     * <p>Getter for the field <code>programBody</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     */
-    public StatementList getProgramBody() {
-        return programBody;
-    }
-
-    /**
-     * <p>Setter for the field <code>programBody</code>.</p>
-     *
-     * @param programBody a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     */
-    public void setProgramBody(StatementList programBody) {
-        this.programBody = programBody;
-    }
-
     /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
@@ -100,10 +52,12 @@ public class ProgramDeclaration extends TopLevelScopeElement
         return getProgramName();
     }
 
-    public ProgramDeclaration clone() {
+    public ProgramDeclaration copy() {
         ProgramDeclaration pd = new ProgramDeclaration();
+        pd.setRuleContext(getRuleContext());
+        pd.setLocalScope(getLocalScope().copy());
         pd.programName = programName;
-        pd.programBody = programBody.clone();
+        pd.programBody = programBody.copy();
         return pd;
     }
 }

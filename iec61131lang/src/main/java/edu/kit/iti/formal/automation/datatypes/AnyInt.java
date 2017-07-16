@@ -22,6 +22,8 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import java.math.BigInteger;
+
 /**
  * <p>Abstract AnyInt class.</p>
  *
@@ -29,24 +31,7 @@ package edu.kit.iti.formal.automation.datatypes;
  * @version $Id: $Id
  */
 public abstract class AnyInt extends AnyNum {
-    /** Constant <code>DEFAULT</code> */
-    public static final Integer DEFAULT = 0;
-    /** Constant <code>SINT</code> */
-    public static final SInt SINT = new SInt();
-    /** Constant <code>USINT</code> */
-    public static final USInt USINT = new USInt();
-    /** Constant <code>INT</code> */
-    public static final Int INT = new Int();
-    /** Constant <code>UINT</code> */
-    public static final UInt UINT = new UInt();
-    /** Constant <code>UDINT</code> */
-    public static final UDInt UDINT = new UDInt();
-    /** Constant <code>DINT</code> */
-    public static final DInt DINT = new DInt();
-    /** Constant <code>ULINT</code> */
-    public static final ULInt ULINT = new ULInt();
-    /** Constant <code>LINT</code> */
-    public static final LInt LINT = new LInt();
+
 
     protected int bitLength = 0;
 
@@ -65,19 +50,59 @@ public abstract class AnyInt extends AnyNum {
      * <p>Constructor for AnyInt.</p>
      *
      * @param bitLength a int.
-     * @param signed a boolean.
+     * @param signed    a boolean.
      */
     public AnyInt(int bitLength, boolean signed) {
         this.bitLength = bitLength;
         this.signed = signed;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * <p>getDataTypeFor.</p>
+     *
+     * @param number   a int.
+     * @param unsigned a boolean.
+     * @return a {@link edu.kit.iti.formal.automation.datatypes.AnyInt} object.
+     */
+    public static AnyInt getDataTypeFor(int number, boolean unsigned) {
+        AnyInt[] values;
+        if (unsigned)
+            values = new AnyInt[]{DataTypes.USINT, DataTypes.UINT, DataTypes.ULINT, DataTypes.UDINT};
+        else
+            values = new AnyInt[]{DataTypes.SINT, DataTypes.INT, DataTypes.LINT, DataTypes.DINT};
+
+        int bits = (int) Math.ceil(Math.log(number) / Math.log(2));
+
+        if (bits < 0)
+            return unsigned ? DataTypes.USINT : DataTypes.SINT;
+
+        /*for (AnyInt bit : values)
+            if (bit.getBitLength() >= bits)
+                return bit;*/
+
+        if (unsigned)
+            return new AnyUnsignedInt(bits) {
+                @Override
+                public String getName() {
+                    return "UINT";
+                }
+            };
+        else
+            return new AnySignedInt(bits) {
+                @Override
+                public String getName() {
+                    return "INT[" + bitLength + "]";
+                }
+            };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String repr(Object obj) {
         return getClass().getSimpleName().toUpperCase() + "#" + obj;
     }
-
 
     /**
      * <p>Getter for the field <code>bitLength</code>.</p>
@@ -116,45 +141,6 @@ public abstract class AnyInt extends AnyNum {
     }
 
     /**
-     * <p>getDataTypeFor.</p>
-     *
-     * @param number a int.
-     * @param unsigned a boolean.
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.AnyInt} object.
-     */
-    public static AnyInt getDataTypeFor(int number, boolean unsigned) {
-        AnyInt[] values;
-        if (unsigned)
-            values = new AnyInt[]{USINT, UINT, ULINT, UDINT};
-        else
-            values = new AnyInt[]{SINT, INT, LINT, DINT};
-
-        int bits = (int) Math.ceil(Math.log(number) / Math.log(2));
-
-        if (bits < 0)
-            return unsigned ? USINT : SINT;
-
-        /*for (AnyInt bit : values)
-            if (bit.getBitLength() >= bits)
-                return bit;*/
-
-        if (unsigned)
-            return new AnyUInt(bits) {
-                @Override
-                public String getName() {
-                    return "UINT";
-                }
-            };
-        else
-            return new AnySignedInt(bits) {
-                @Override
-                public String getName() {
-                    return "INT[" + bitLength + "]";
-                }
-            };
-    }
-
-    /**
      * <p>next.</p>
      *
      * @return a {@link edu.kit.iti.formal.automation.datatypes.AnyInt} object.
@@ -164,9 +150,9 @@ public abstract class AnyInt extends AnyNum {
     /**
      * <p>asUnsgined.</p>
      *
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.AnyUInt} object.
+     * @return a {@link AnyUnsignedInt} object.
      */
-    public abstract AnyUInt asUnsgined();
+    public abstract AnyUnsignedInt asUnsgined();
 
     /**
      * <p>asSigned.</p>
@@ -184,7 +170,9 @@ public abstract class AnyInt extends AnyNum {
      */
     public abstract boolean isValid(long value);
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         if (name.isEmpty())
@@ -193,7 +181,9 @@ public abstract class AnyInt extends AnyNum {
             return name;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -206,7 +196,9 @@ public abstract class AnyInt extends AnyNum {
 
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int result = bitLength;
@@ -215,9 +207,15 @@ public abstract class AnyInt extends AnyNum {
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T accept(DataTypeVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    public abstract BigInteger getUpperBound();
+    public abstract BigInteger getLowerBound();
+
 }

@@ -23,8 +23,8 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -33,25 +33,31 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
-public class SimpleTypeDeclaration extends TypeDeclaration<ScalarValue<?, ?>> {
-    /** {@inheritDoc} */
+public class SimpleTypeDeclaration extends TypeDeclaration<Literal> {
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Any getDataType(GlobalScope globalScope) {
         return super.getDataType(globalScope);
     }
 
-    @Override public SimpleTypeDeclaration clone() {
+    @Override
+    public SimpleTypeDeclaration copy() {
         SimpleTypeDeclaration std = new SimpleTypeDeclaration();
+        std.setRuleContext(getRuleContext());
         std.baseType = baseType;
         std.baseTypeName = baseTypeName;
         std.typeName = typeName;
-        std.initialization = initialization.clone();
+        std.initialization = Utils.copyNull(initialization);
         return std;
     }
 }

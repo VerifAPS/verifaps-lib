@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation;
 
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 
 /**
@@ -33,7 +34,7 @@ import java.util.LinkedHashMap;
  * @version $Id: $Id
  */
 public class VariableScope extends LinkedHashMap<String, VariableDeclaration>
-        implements Cloneable {
+        implements Cloneable, Serializable {
     /**
      * <p>add.</p>
      *
@@ -42,10 +43,10 @@ public class VariableScope extends LinkedHashMap<String, VariableDeclaration>
     public void add(VariableDeclaration var) {
         put(var.getName(), var);
     }
-
+/*
     @Override public VariableScope clone() {
         VariableScope vs = new VariableScope();
         forEach((s, v) -> vs.put(s, v.clone()));
         return vs;
-    }
+    }*/
 }

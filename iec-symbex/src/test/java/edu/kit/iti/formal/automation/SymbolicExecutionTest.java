@@ -27,15 +27,11 @@ import edu.kit.iti.formal.automation.smv.SymbolicExecutioner;
 import edu.kit.iti.formal.automation.smv.SymbolicState;
 import edu.kit.iti.formal.automation.st.ast.StatementList;
 import edu.kit.iti.formal.smv.SMVFacade;
-import edu.kit.iti.formal.smv.ast.SCaseExpression;
 import edu.kit.iti.formal.smv.ast.SLiteral;
 import edu.kit.iti.formal.smv.ast.SVariable;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.swing.plaf.SliderUI;
-import java.util.TreeSet;
 
 /**
  * @author Alexander Weigl
@@ -59,7 +55,7 @@ public class SymbolicExecutionTest {
                         "c := 3;" +
                         "c := a+c;" +
                         "b := 2*a+c;");
-        list.visit(se);
+        list.accept(se);
         Assert.assertEquals("{a=0sd16_2, b=((0sd16_2*0sd16_2)+(0sd16_2+0sd16_3)), c=(0sd16_2+0sd16_3)}",
                 se.peek().toString()
         );
@@ -69,7 +65,7 @@ public class SymbolicExecutionTest {
     public void simpleIfTest() {
         StatementList list = IEC61131Facade.statements(
                 "a := 2; c:= 4; b:=b; IF a = 2 THEN b := 2; ELSE b := 1; c:=2; END_IF;");
-        list.visit(se);
+        list.accept(se);
         Assert.assertEquals("{a=0sd16_2, b=if :: (0sd16_2=0sd16_2)->0sd16_2\n" +
                         ":: TRUE->0sd16_1 fi, c=if :: (0sd16_2=0sd16_2)->0sd16_4\n" +
                         ":: TRUE->0sd16_2 fi}",
@@ -94,7 +90,7 @@ public class SymbolicExecutionTest {
         ss.put(b, SMVFacade.caseexpr(one.equal(two), two, SLiteral.TRUE, b));
 
         se.peek().put(b,b);
-        list.visit(se);
+        list.accept(se);
 
         ss.forEach((key, value) -> {
             Assert.assertEquals(value, se.peek().get(key));

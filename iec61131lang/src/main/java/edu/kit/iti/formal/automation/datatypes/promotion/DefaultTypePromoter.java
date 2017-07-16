@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.datatypes.promotion;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -33,7 +34,7 @@ import java.util.ArrayList;
  * @author weigl
  * @version $Id: $Id
  */
-public class DefaultTypePromoter implements TypePromotion {
+public class DefaultTypePromoter implements TypePromotion, Serializable {
     ArrayList<TypePromotion> promoters = new ArrayList<>();
 
     /**

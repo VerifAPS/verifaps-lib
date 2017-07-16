@@ -26,7 +26,6 @@ import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.scope.LocalScope;
-import edu.kit.iti.formal.automation.sfclang.Utils;
 import edu.kit.iti.formal.automation.st.ast.Initialization;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
@@ -37,21 +36,24 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @version $Id: $Id
  */
 public class PointerValue extends Initialization {
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Any dataType(LocalScope localScope) throws VariableNotDefinedException, TypeConformityException {
         return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    public <T> T accept(Visitor<T> visitor) {
         return null;
     }
 
-    @Override public PointerValue clone() {
+    @Override
+    public PointerValue copy() {
         PointerValue pv = new PointerValue();
-        Utils.setPosition(pv, this);
         return pv;
     }
 }

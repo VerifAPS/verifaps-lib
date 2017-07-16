@@ -22,15 +22,13 @@ package edu.kit.iti.formal.automation.st0.trans;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.ValueFactory;
-import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.AnyInt;
-import edu.kit.iti.formal.automation.datatypes.AnyUInt;
+import edu.kit.iti.formal.automation.datatypes.DataTypes;
 import edu.kit.iti.formal.automation.datatypes.TimeType;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
-import edu.kit.iti.formal.automation.datatypes.values.TimeValue;
+import edu.kit.iti.formal.automation.st.ast.Literal;
+import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
 import edu.kit.iti.formal.automation.st.ast.SimpleTypeDeclaration;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 
@@ -38,7 +36,7 @@ import edu.kit.iti.formal.automation.visitors.Visitable;
  * @author Alexander Weigl (06.07.2014)
  * @version 1
  */
-public class TimerToCounter extends AstVisitor<Object> {
+public class TimerToCounter extends AstMutableVisitor {
     public static long DEFAULT_CYCLE_TIME = 4;
     private final long cycleTime;
 
@@ -46,7 +44,15 @@ public class TimerToCounter extends AstVisitor<Object> {
         this.cycleTime = cycleTime;
     }
 
-    @Override public Object defaultVisit(Visitable visitable) {
+    public static ST0Transformation getTransformation() {
+        return state -> {
+            TimerToCounter ttc = new TimerToCounter(4);
+            state.theProgram = (ProgramDeclaration) ttc.visit(state.theProgram);
+        };
+    }
+
+    @Override
+    public Object defaultVisit(Visitable visitable) {
         return visitable;
     }
 
@@ -54,11 +60,11 @@ public class TimerToCounter extends AstVisitor<Object> {
     public Object visit(VariableDeclaration vd) {
         if (vd.getDataTypeName() == "TIME" || vd.getDataType() == TimeType.TIME_TYPE) {
             VariableDeclaration newVariable = new VariableDeclaration(
-                    vd.getName(), vd.getType(), AnyUInt.UINT);
+                    vd.getName(), vd.getType(), DataTypes.UINT);
 
-            ScalarValue newVal = vd.getInit() != null ?
-                    (ScalarValue) vd.getInit().visit(this) :
-                    ValueFactory.makeUInt(0);
+            Literal newVal = vd.getInit() != null
+                    ? (Literal) vd.getInit().accept(this)
+                    : Literal.integer(0);
 
             //vd.setDataType(newVal.getDataType());
             SimpleTypeDeclaration sd = new SimpleTypeDeclaration();
@@ -69,14 +75,14 @@ public class TimerToCounter extends AstVisitor<Object> {
         }
         return super.visit(vd);
     }
-
+    /*
     @Override
     public Object visit(ScalarValue<? extends Any, ?> tsScalarValue) {
-        if (tsScalarValue.getDataType() == TimeType.TIME_TYPE) {
+        /*if (tsScalarValue.getDataType() == TimeType.TIME_TYPE) {
             TimeValue timeValue = (TimeValue) tsScalarValue.getValue();
             long val = timeValue.asMillieseconds() / this.cycleTime;
             return new ScalarValue<>(AnyInt.getDataTypeFor((int) val, true), val);
         }
         return super.visit(tsScalarValue);
-    }
+    }*/
 }

@@ -23,6 +23,8 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -36,6 +38,8 @@ import java.util.stream.Stream;
  * @author weigl
  * @version $Id: $Id
  */
+@EqualsAndHashCode
+@ToString
 public class TypeDeclarations extends TopLevelElement implements List<TypeDeclaration> {
     private List<TypeDeclaration> declarations = new ArrayList<>();
 
@@ -57,13 +61,14 @@ public class TypeDeclarations extends TopLevelElement implements List<TypeDeclar
     }
 
     /** {@inheritDoc} */
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @Override public TypeDeclarations clone() {
+    @Override public TypeDeclarations copy() {
         TypeDeclarations td = new TypeDeclarations();
-        forEach(t -> td.add(t.clone()));
+        td.setRuleContext(getRuleContext());
+        forEach(t -> td.add(t.copy()));
         return td;
     }
 
@@ -161,18 +166,6 @@ public class TypeDeclarations extends TopLevelElement implements List<TypeDeclar
     @Override
     public void clear() {
         declarations.clear();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean equals(Object o) {
-        return declarations.equals(o);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int hashCode() {
-        return declarations.hashCode();
     }
 
     /** {@inheritDoc} */

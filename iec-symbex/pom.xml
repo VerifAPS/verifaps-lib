@@ -5,10 +5,7 @@
 
     <artifactId>iec-symbex</artifactId>
 	<version>0.4.2-SNAPSHOT</version>
-    <modules>
-        <module>../iec-run</module>
-    </modules>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <url>http://formal.iti.kit.edu/weigl/software/iec-symbex</url>
 	<description>Symbolic Execution of IEC-Software</description>

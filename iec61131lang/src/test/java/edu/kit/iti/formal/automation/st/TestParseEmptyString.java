@@ -34,6 +34,6 @@ public class TestParseEmptyString {
 
   @Test
   public void testParseEmptyString() {
-    IEC61131Facade.file(CharStreams.fromString("")).visit(new DefaultVisitor<Void>());
+    IEC61131Facade.file(CharStreams.fromString("")).accept(new DefaultVisitor<Void>());
   }
 }

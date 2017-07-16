@@ -45,8 +45,7 @@ public class DirectVariable extends Reference {
     }
 
     /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         throw new IllegalStateException("not implemented");
     }
 
@@ -56,7 +55,8 @@ public class DirectVariable extends Reference {
         throw new IllegalStateException(("not implemented"));
     }
 
-    @Override public Reference clone() {
+    @Override public Reference copy() {
         return new DirectVariable("todo");
     }
+
 }

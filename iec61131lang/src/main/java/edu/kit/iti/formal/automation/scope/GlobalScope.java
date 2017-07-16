@@ -22,12 +22,14 @@ package edu.kit.iti.formal.automation.scope;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.st.ast.*;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -36,7 +38,7 @@ import java.util.*;
  * @author weigl
  * @version $Id: $Id
  */
-public class GlobalScope {
+public class GlobalScope implements Serializable {
     private Map<String, ProgramDeclaration> programs = new HashMap<>();
     private Map<String, FunctionBlockDeclaration> fb = new HashMap<>();
     private Map<String, FunctionDeclaration> functions = new HashMap<>();
@@ -184,7 +186,7 @@ public class GlobalScope {
      * Used to make a class or interface to be known.
      *
      * @param clazz
-     * @see edu.kit.iti.formal.automation.ResolveDataTypes
+     * @see ResolveDataTypes
      */
     public void registerClass(ClassDeclaration clazz) {
         classes.put(clazz.getIdentifier(), clazz);

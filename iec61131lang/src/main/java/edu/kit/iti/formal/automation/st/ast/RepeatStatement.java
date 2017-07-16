@@ -24,6 +24,8 @@ package edu.kit.iti.formal.automation.st.ast;
 
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * <p>RepeatStatement class.</p>
@@ -31,10 +33,23 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
+@EqualsAndHashCode
+@ToString
 public class RepeatStatement extends WhileStatement {
 
-    /** {@inheritDoc} */
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public RepeatStatement copy() {
+        RepeatStatement rs = new RepeatStatement();
+        rs.setRuleContext(getRuleContext());
+        rs.setCondition(condition.copy());
+        rs.setStatements(statements.copy());
+        return rs;
     }
 }

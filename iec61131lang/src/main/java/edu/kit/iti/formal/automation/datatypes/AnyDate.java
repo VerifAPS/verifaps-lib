@@ -22,9 +22,9 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.values.DateValue;
-import edu.kit.iti.formal.automation.datatypes.values.DateAndTimeValue;
-import edu.kit.iti.formal.automation.datatypes.values.TimeOfDayValue;
+import edu.kit.iti.formal.automation.datatypes.values.DateData;
+import edu.kit.iti.formal.automation.datatypes.values.DateAndTimeData;
+import edu.kit.iti.formal.automation.datatypes.values.TimeofDayData;
 
 /**
  * <p>Abstract AnyDate class.</p>
@@ -36,7 +36,7 @@ public abstract class AnyDate extends Any {
     public static class Date extends AnyDate {
         @Override
         public String repr(Object obj) {
-            DateValue dt = (DateValue) obj;
+            DateData dt = (DateData) obj;
             return String.format("DATE#%4d-%2d-%2d",
                     dt.getYear(), dt.getMonth(), dt.getDay());
         }
@@ -50,7 +50,7 @@ public abstract class AnyDate extends Any {
     public static class TimeOfDay extends AnyDate {
         @Override
         public String repr(Object obj) {
-            TimeOfDayValue dt = (TimeOfDayValue) obj;
+            TimeofDayData dt = (TimeofDayData) obj;
             return String.format("TOD#%2d:%2d:%2d.%3d",
                     dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMillieseconds());
         }
@@ -65,7 +65,7 @@ public abstract class AnyDate extends Any {
     public static class DateAndTime extends AnyDate {
         @Override
         public String repr(Object obj) {
-            DateAndTimeValue dt = (DateAndTimeValue) obj;
+            DateAndTimeData dt = (DateAndTimeData) obj;
             return String.format("DT#%4d-%2d-%2d-%2d:%2d:%2d.%3d",
                     dt.getYear(), dt.getMonth(), dt.getDay(), dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMillieSeconds());
         }

@@ -25,13 +25,14 @@ package edu.kit.iti.formal.automation.st0.trans;
 import edu.kit.iti.formal.automation.datatypes.IECArray;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 
 /**
  * Created by weigl on 03/10/14.
  */
-public class ArrayEmbedder extends AstVisitor<Object> {
+public class ArrayEmbedder extends AstMutableVisitor {
     private LocalScope currentScope;
 
 
@@ -42,7 +43,7 @@ public class ArrayEmbedder extends AstVisitor<Object> {
 
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
-        currentScope = (LocalScope) programDeclaration.getLocalScope().visit(this);
+        currentScope = (LocalScope) programDeclaration.getLocalScope().accept(this);
         ProgramDeclaration pd = (ProgramDeclaration) super.visit(programDeclaration);
         pd.setLocalScope(currentScope);
         return pd;
@@ -50,7 +51,7 @@ public class ArrayEmbedder extends AstVisitor<Object> {
 
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
-        currentScope = (LocalScope) functionDeclaration.getLocalScope().visit(this);
+        currentScope = (LocalScope) functionDeclaration.getLocalScope().accept(this);
         ProgramDeclaration pd = (ProgramDeclaration) super.visit(functionDeclaration);
         pd.setLocalScope(currentScope);
         return pd;
@@ -58,7 +59,7 @@ public class ArrayEmbedder extends AstVisitor<Object> {
 
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        currentScope = (LocalScope) functionBlockDeclaration.getLocalScope().visit(this);
+        currentScope = (LocalScope) functionBlockDeclaration.getLocalScope().accept(this);
         ProgramDeclaration pd = (ProgramDeclaration) super.visit(functionBlockDeclaration);
         pd.setLocalScope(currentScope);
         return pd;
@@ -79,7 +80,7 @@ public class ArrayEmbedder extends AstVisitor<Object> {
             StringBuilder sb = new StringBuilder(identifier);
 
             for (Expression expression : symbolicReference.getSubscripts()) {
-                long pos = (Long) expression.visit(iee);
+                long pos = (Long) expression.accept(iee);
                 sb.append("_").append(pos);
             }
             VariableDeclaration vd = currentScope.getVariable(symbolicReference);
@@ -95,4 +96,10 @@ public class ArrayEmbedder extends AstVisitor<Object> {
         }
     }
 
+    public static ST0Transformation getTransformation() {
+        return state -> {
+            ArrayEmbedder ae = new ArrayEmbedder();
+            state.theProgram = (ProgramDeclaration) state.theProgram.accept(ae);
+        };
+    }
 }

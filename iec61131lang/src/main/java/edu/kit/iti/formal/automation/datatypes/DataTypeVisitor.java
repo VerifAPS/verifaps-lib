@@ -4,7 +4,7 @@ package edu.kit.iti.formal.automation.datatypes;
  * #%L
  * iec61131lang
  * %%
- * Copyright (C) 2016 Alexander Weigl
+ * Copyright (C) 2017 Alexander Weigl
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -22,12 +22,12 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+
 /**
- * <p>DataTypeVisitor interface.</p>
- *
+ * @param <T>
  * @author Alexander Weigl
- * @version 1 (12.12.16)
  */
+
 public interface DataTypeVisitor<T> {
     T visit(AnyReal real);
 
@@ -35,116 +35,102 @@ public interface DataTypeVisitor<T> {
 
     T visit(AnyReal.LReal real);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param anyBit a {@link edu.kit.iti.formal.automation.datatypes.AnyBit} object.
-     * @return a T object.
-     */
     T visit(AnyBit anyBit);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param dateAndTime a {@link edu.kit.iti.formal.automation.datatypes.AnyDate.DateAndTime} object.
-     * @return a T object.
-     */
     T visit(AnyDate.DateAndTime dateAndTime);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param timeOfDay a {@link edu.kit.iti.formal.automation.datatypes.AnyDate.TimeOfDay} object.
-     * @return a T object.
-     */
+
     T visit(AnyDate.TimeOfDay timeOfDay);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param date a {@link edu.kit.iti.formal.automation.datatypes.AnyDate.Date} object.
-     * @return a T object.
-     */
+
     T visit(AnyDate.Date date);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param anyInt a {@link edu.kit.iti.formal.automation.datatypes.AnyInt} object.
-     * @return a T object.
-     */
-    T visit(AnyInt anyInt);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param enumerateType a {@link edu.kit.iti.formal.automation.datatypes.EnumerateType} object.
-     * @return a T object.
-     */
+    default T visit(AnyInt anyInt) {
+        return visit((AnyNum) anyInt);
+    }
+
+    default T visit(AnySignedInt anyInt) {
+        return visit((AnyInt) anyInt);
+    }
+
+    default T visit(AnyUnsignedInt anyInt) {
+        return visit((AnyInt) anyInt);
+    }
+
+    default T visit(Int anyInt) {
+        return visit((AnyInt) anyInt);
+    }
+
+    default T visit(SInt anyInt) {
+        return visit((AnyInt) anyInt);
+    }
+
+    default T visit(DInt anyInt) {
+        return visit((AnyInt) anyInt);
+    }
+
+    default T visit(LInt anyInt) {
+        return visit((AnyInt) anyInt);
+    }
+
+    default T visit(UDInt anyInt) {
+        return visit((AnyInt) anyInt);
+    }
+
+    default T visit(USInt anyInt) {
+        return visit((AnyInt) anyInt);
+    }
+
+    default T visit(ULInt anyInt) {
+        return visit((AnyInt) anyInt);
+    }
+
+    default T visit(UInt anyInt) {
+        return visit((AnyInt) anyInt);
+    }
+
+    default T visit(AnyBit.Bool bool) {
+        return visit((AnyBit) bool);
+    }
+
+    default T visit(AnyBit.Byte word) {
+        return visit((AnyBit) word);
+    }
+
+    default T visit(AnyBit.Word word) {
+        return visit((AnyBit) word);
+    }
+
+    default T visit(AnyBit.DWord word) {
+        return visit((AnyBit) word);
+    }
+
+    default T visit(AnyBit.LWord word) {
+        return visit((AnyBit) word);
+    }
+
+
     T visit(EnumerateType enumerateType);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param timeType a {@link edu.kit.iti.formal.automation.datatypes.TimeType} object.
-     * @return a T object.
-     */
     T visit(TimeType timeType);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param rangeType a {@link edu.kit.iti.formal.automation.datatypes.RangeType} object.
-     * @return a T object.
-     */
     T visit(RangeType rangeType);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param recordType a {@link edu.kit.iti.formal.automation.datatypes.RecordType} object.
-     * @return a T object.
-     */
     T visit(RecordType recordType);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param pointerType a {@link edu.kit.iti.formal.automation.datatypes.PointerType} object.
-     * @return a T object.
-     */
+
     T visit(PointerType pointerType);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param string a {@link edu.kit.iti.formal.automation.datatypes.IECString.String} object.
-     * @return a T object.
-     */
+
     T visit(IECString.String string);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param wString a {@link edu.kit.iti.formal.automation.datatypes.IECString.WString} object.
-     * @return a T object.
-     */
+
     T visit(IECString.WString wString);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param iecArray a {@link edu.kit.iti.formal.automation.datatypes.IECArray} object.
-     * @return a T object.
-     */
+
     T visit(IECArray iecArray);
 
-    /**
-     * <p>visit.</p>
-     *
-     * @param anyNum a {@link edu.kit.iti.formal.automation.datatypes.AnyNum} object.
-     * @return a T object.
-     */
     T visit(AnyNum anyNum);
 
     T visit(ClassDataType classDataType);

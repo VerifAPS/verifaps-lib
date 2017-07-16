@@ -24,6 +24,8 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,13 +34,16 @@ import java.util.List;
  * @author Alexander Weigl
  * @version 1 (20.02.17)
  */
+
+@EqualsAndHashCode
+@ToString
 public class ClassDeclaration extends TopLevelScopeElement {
     private List<MethodDeclaration> methods = new ArrayList<>();
     private IdentifierPlaceHolder<ClassDeclaration> parentClass = new IdentifierPlaceHolder<>();
     private List<IdentifierPlaceHolder<ClassDeclaration>> interfaces = new ArrayList<>();
     private String name;
 
-    @Override public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return null;
     }
 
@@ -68,12 +73,12 @@ public class ClassDeclaration extends TopLevelScopeElement {
         return this;
     }
 
-    @Override public ClassDeclaration clone() {
+    @Override public ClassDeclaration copy() {
         ClassDeclaration c = new ClassDeclaration();
         c.name = name;
-        methods.forEach(m -> c.methods.add(m.clone()));
-        c.parentClass = parentClass.clone();
-        interfaces.forEach(i -> c.interfaces.add(i.clone()));
+        methods.forEach(m -> c.methods.add(m.copy()));
+        c.parentClass = parentClass.copy();
+        interfaces.forEach(i -> c.interfaces.add(i.copy()));
         return c;
     }
 }

@@ -95,7 +95,7 @@ public class TransitionDeclaration {
 	}
 
 	/**
-	 * <p>visit.</p>
+	 * <p>accept.</p>
 	 *
 	 * @param v a {@link edu.kit.iti.formal.automation.sfclang.SFCAstVisitor} object.
 	 * @param <T> a T object.

@@ -22,20 +22,25 @@ package edu.kit.iti.formal.automation.st0.trans;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.AnyBit;
-import edu.kit.iti.formal.automation.datatypes.EnumerateType;
-import edu.kit.iti.formal.automation.datatypes.values.Bits;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
-import edu.kit.iti.formal.automation.st.ast.AssignmentStatement;
-import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
+import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
+import edu.kit.iti.formal.automation.st.util.Statements;
 import edu.kit.iti.formal.automation.visitors.Visitable;
+import org.antlr.v4.runtime.CommonToken;
 
 /**
  * Created by weigl on 28/10/14.
  */
-public class SFCResetReplacer extends AstVisitor<Object> {
+public class SFCResetReplacer extends AstMutableVisitor {
 
+
+    public static ST0Transformation getTransformation() {
+        return state -> {
+            SFCResetReplacer srr = new SFCResetReplacer();
+            state.theProgram = (ProgramDeclaration) state.theProgram.accept(srr);
+        };
+    }
 
     @Override
     public Object defaultVisit(Visitable visitable) {
@@ -46,20 +51,18 @@ public class SFCResetReplacer extends AstVisitor<Object> {
     public Object visit(AssignmentStatement assignmentStatement) {
         try {
             SymbolicReference sr = (SymbolicReference) assignmentStatement.getLocation();
-            ScalarValue<AnyBit.Bool, Bits> value = (ScalarValue<AnyBit.Bool, Bits>) assignmentStatement.getExpression();
+            Expression expression = assignmentStatement.getExpression();
 
             if (sr.getIdentifier() != null && sr.getIdentifier()
-                    .endsWith("$SFCReset") &&
-                    value.getValue().getRegister() > 0) {
-                System.out.println(sr.getIdentifier());
-                return new AssignmentStatement(
-                        new SymbolicReference(sr.getIdentifier().replace("SFCReset", "_state")),
-                        new ScalarValue<EnumerateType, String>(new EnumerateType(), "Init")
-                );
+                    .endsWith("$SFCReset")) {
+                return Statements.ifthen(
+                        expression,
+                        new AssignmentStatement(
+                                new SymbolicReference(sr.getIdentifier().replace("SFCReset", "_state")),
+                                Literal.enumerate(new CommonToken(-1, "Init"))
+                        ));
             }
-
         } catch (ClassCastException e) {
-
         }
         return super.visit(assignmentStatement);
     }

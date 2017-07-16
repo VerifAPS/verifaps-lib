@@ -22,7 +22,11 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * <ul>
@@ -33,25 +37,19 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version 2
  */
+@Data
+@ToString
+@EqualsAndHashCode
 public class AssignmentStatement extends Statement {
-    private Reference variable;
+    private Reference location;
     private Expression expression;
     private boolean reference;
 
-    /**
-     * <p>Constructor for AssignmentStatement.</p>
-     */
     public AssignmentStatement() {
     }
 
-    /**
-     * <p>Constructor for AssignmentStatement.</p>
-     *
-     * @param variable   a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
-     * @param expression a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     */
     public AssignmentStatement(Reference variable, Expression expression) {
-        this.variable = variable;
+        this.location= variable;
         this.expression = expression;
     }
 
@@ -59,44 +57,8 @@ public class AssignmentStatement extends Statement {
     /**
      * {@inheritDoc}
      */
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
-    }
-
-    /**
-     * <p>getLocation.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
-     */
-    public Reference getLocation() {
-        return variable;
-    }
-
-    /**
-     * <p>setLocation.</p>
-     *
-     * @param variable a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
-     */
-    public void setLocation(Reference variable) {
-        this.variable = variable;
-    }
-
-    /**
-     * <p>Getter for the field <code>expression</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     */
-    public Expression getExpression() {
-        return expression;
-    }
-
-    /**
-     * <p>Setter for the field <code>expression</code>.</p>
-     *
-     * @param expression a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     */
-    public void setExpression(Expression expression) {
-        this.expression = expression;
     }
 
     public boolean isReference() {
@@ -108,7 +70,12 @@ public class AssignmentStatement extends Statement {
         return this;
     }
 
-    @Override public AssignmentStatement clone() {
-        return new AssignmentStatement(variable.clone(), expression.clone());
+    @Override
+    public AssignmentStatement copy() {
+        AssignmentStatement a = new AssignmentStatement(
+                Utils.copyNull(location),
+                Utils.copyNull(expression));
+        a.setRuleContext(getRuleContext());
+        return a;
     }
 }

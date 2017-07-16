@@ -90,20 +90,22 @@ public class StructureInitialization extends Initialization {
     /**
      * {@inheritDoc}
      */
-    @Override public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override public Any dataType(LocalScope localScope)
+    @Override
+    public Any dataType(LocalScope localScope)
             throws VariableNotDefinedException, TypeConformityException {
         //TODO
         return null;
     }
 
-    @Override public StructureInitialization clone() {
+    @Override
+    public StructureInitialization copy() {
         StructureInitialization st = new StructureInitialization();
         st.structureName = structureName;
         st.initValues = new HashMap<>(initValues);

@@ -25,7 +25,7 @@ package edu.kit.iti.formal.automation.smv;
 import edu.kit.iti.formal.automation.SymbExFacade;
 import edu.kit.iti.formal.automation.Utils;
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.exceptions.FunctionInvocationArgumentNumberException;
 import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException;
 import edu.kit.iti.formal.automation.exceptions.UnknownDatatype;
@@ -119,15 +119,15 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
     //region rewriting of expressions using the current state
     @Override public SMVExpr visit(BinaryExpression binaryExpression) {
-        SMVExpr left = binaryExpression.getLeftExpr().visit(this);
-        SMVExpr right = binaryExpression.getRightExpr().visit(this);
+        SMVExpr left = binaryExpression.getLeftExpr().accept(this);
+        SMVExpr right = binaryExpression.getRightExpr().accept(this);
         return operationMap
                 .translateBinaryOperator(left, binaryExpression.getOperator(),
                         right);
     }
 
     @Override public SMVExpr visit(UnaryExpression u) {
-        SMVExpr left = u.getExpression().visit(this);
+        SMVExpr left = u.getExpression().accept(this);
         return operationMap.translateUnaryOperator(u.getOperator(), left);
     }
 
@@ -139,8 +139,8 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     //endregion
 
     @Override
-    public SLiteral visit(ScalarValue<? extends Any, ?> tsScalarValue) {
-        return Utils.asSMVLiteral(tsScalarValue);
+    public SLiteral visit(Literal literal) {
+        return Utils.asSMVLiteral(literal.asValue());
     }
 
     @Override
@@ -155,7 +155,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
             peek().put(s, s);
         }
 
-        programDeclaration.getProgramBody().visit(this);
+        programDeclaration.getProgramBody().accept(this);
         return null;
     }
 
@@ -163,7 +163,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     public SMVExpr visit(AssignmentStatement assign) {
         SymbolicState s = peek();
         s.put(lift((SymbolicReference) assign.getLocation()),
-                assign.getExpression().visit(this));
+                assign.getExpression().accept(this));
         return null;
     }
 
@@ -173,7 +173,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
             if (s instanceof ExitStatement) {
                 return null;
             }
-            s.visit(this);
+            s.accept(this);
         }
         return null;
     }
@@ -204,7 +204,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
             if (!calleeState.containsKey(vd.getName())) {
                 TypeDeclaration td = vd.getTypeDeclaration();
                 if (td != null && td.getInitialization() != null) {
-                    td.getInitialization().visit(this);
+                    td.getInitialization().accept(this);
                 } else {
                     calleeState.put(lift(vd), Utils.getDefaultValue(vd.getDataType()));
                 }
@@ -223,13 +223,13 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         for (int i = 0; i < parameters.size(); i++) {
             // name from definition, in order of declaration, expression from caller site
             calleeState.put(lift(inputVars.get(i)),
-                    parameters.get(i).visit(this));
+                    parameters.get(i).accept(this));
         }
         push(calleeState);
         //endregion
 
         // execution of body
-        fd.getStatements().visit(this);
+        fd.getStatements().accept(this);
         pop();
 
         return calleeState.get(lift(fd.getLocalScope().getVariable(fd.getFunctionName())));
@@ -240,14 +240,14 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         SymbolicBranches branchStates = new SymbolicBranches();
 
         for (GuardedStatement gs : statement.getConditionalBranches()) {
-            SMVExpr condition = gs.getCondition().visit(this);
+            SMVExpr condition = gs.getCondition().accept(this);
             push();
-            gs.getStatements().visit(this);
+            gs.getStatements().accept(this);
             branchStates.addBranch(condition, pop());
         }
 
         push();
-        statement.getElseBranch().visit(this);
+        statement.getElseBranch().accept(this);
         branchStates.addBranch(SLiteral.TRUE, pop());
 
         peek().putAll(branchStates.asCompressed());
@@ -261,12 +261,12 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         for (CaseStatement.Case gs : caseStatement.getCases()) {
             SMVExpr condition = buildCondition(caseStatement.getExpression(), gs);
             push();
-            gs.getStatements().visit(this);
+            gs.getStatements().accept(this);
             branchStates.addBranch(condition, pop());
         }
 
         push();
-        caseStatement.getElseCase().visit(this);
+        caseStatement.getElseCase().accept(this);
         branchStates.addBranch(SLiteral.TRUE, pop());
 
         peek().putAll(branchStates.asCompressed());
@@ -277,7 +277,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         caseExpression = e;
         return c.getConditions()
                 .stream()
-                .map(a -> a.visit(this))
+                .map(a -> a.accept(this))
                 .reduce(SMVFacade.reducer(SBinaryOperator.OR)).get();
     }
 
@@ -289,14 +289,14 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     @Override
     public SMVExpr visit(CaseCondition.IntegerCondition i) {
         BinaryExpression be = new BinaryExpression(caseExpression, i.getValue(), Operators.EQUALS);
-        return be.visit(this);
+        return be.accept(this);
     }
 
 
     @Override
     public SMVExpr visit(CaseCondition.Enumeration e) {
         BinaryExpression be = new BinaryExpression(caseExpression, e.getStart(), Operators.EQUALS);
-        return be.visit(this);
+        return be.accept(this);
         //TODO rework case conditions
     }
 }

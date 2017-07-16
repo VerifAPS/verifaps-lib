@@ -25,7 +25,7 @@ package edu.kit.iti.formal.automation.datatypes.values;
 import lombok.*;
 
 /**
- * <p>DateValue class.</p>
+ * <p>DateData class.</p>
  *
  * @author weigl
  * @version $Id: $Id
@@ -35,6 +35,6 @@ import lombok.*;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class DateValue {
+public class DateData {
     private int year, month, day;
 }

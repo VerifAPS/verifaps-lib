@@ -32,17 +32,23 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  */
 public class ConfigurationDeclaration extends TopLevelScopeElement {
 
-    /** {@inheritDoc} */
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
-    @Override public String getIdentifier() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getIdentifier() {
         return "<configuration>";
     }
 
-    @Override public ConfigurationDeclaration clone() {
+    @Override
+    public ConfigurationDeclaration copy() {
         return new ConfigurationDeclaration();
     }
 }

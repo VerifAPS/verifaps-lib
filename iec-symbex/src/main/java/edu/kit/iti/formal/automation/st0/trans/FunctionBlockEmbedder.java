@@ -22,31 +22,9 @@ package edu.kit.iti.formal.automation.st0.trans;
  * #L%
  */
 
-/*-
- * #%L
- * iec-symbex
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
 import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
-import edu.kit.iti.formal.automation.visitors.Visitable;
 
 import java.util.function.Function;
 
@@ -54,7 +32,7 @@ import java.util.function.Function;
  * @author Alexander Weigl (26.06.2014)
  * @version 1
  */
-public class FunctionBlockEmbedder extends AstVisitor {
+public class FunctionBlockEmbedder extends AstMutableVisitor {
     private final String instanceName;
     private final StatementList toEmbedd;
     private Function<String, String> renameVariable;
@@ -62,6 +40,8 @@ public class FunctionBlockEmbedder extends AstVisitor {
     public FunctionBlockEmbedder(String instanceName,
                                  StatementList embeddable,
                                  Function<String, String> rename) {
+        assert embeddable != null;
+        assert !instanceName.isEmpty();
         this.instanceName = instanceName;
         toEmbedd = embeddable;
         renameVariable = rename;
@@ -83,7 +63,10 @@ public class FunctionBlockEmbedder extends AstVisitor {
     public Object visit(StatementList statements) {
         StatementList r = new StatementList();
         for (Statement s : statements) {
-            Object visit = s.visit(this);
+            Object visit = s.accept(this);
+            if(visit==null){
+                throw new IllegalArgumentException("got null for " + s.getNodeName());
+            }
             if (visit instanceof StatementList) {
                 r.addAll((StatementList) visit);
             } else {
@@ -125,6 +108,6 @@ public class FunctionBlockEmbedder extends AstVisitor {
     }
 
     public StatementList embedd(StatementList into) {
-        return (StatementList) into.visit(this);
+        return (StatementList) into.accept(this);
     }
 }

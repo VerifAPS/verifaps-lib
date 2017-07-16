@@ -23,7 +23,11 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 
+import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,13 +39,18 @@ import java.util.stream.Collectors;
  * @author weigl
  * @version $Id: $Id
  */
+@EqualsAndHashCode
+@ToString
+@Data
 public class CaseStatement extends Statement {
     private Expression expression;
     private List<Case> cases = new ArrayList<>();
     private StatementList elseCase = new StatementList();
 
-    /** {@inheritDoc} */
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
@@ -54,66 +63,21 @@ public class CaseStatement extends Statement {
         cases.add(cs);
     }
 
-    /**
-     * <p>Getter for the field <code>expression</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     */
-    public Expression getExpression() {
-        return expression;
-    }
 
-    /**
-     * <p>Setter for the field <code>expression</code>.</p>
-     *
-     * @param expression a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     */
-    public void setExpression(Expression expression) {
-        this.expression = expression;
-    }
 
-    /**
-     * <p>Getter for the field <code>cases</code>.</p>
-     *
-     * @return a {@link java.util.List} object.
-     */
-    public List<Case> getCases() {
-        return cases;
-    }
-
-    /**
-     * <p>Setter for the field <code>cases</code>.</p>
-     *
-     * @param cases a {@link java.util.List} object.
-     */
-    public void setCases(List<Case> cases) {
-        this.cases = cases;
-    }
-
-    /**
-     * <p>Getter for the field <code>elseCase</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     */
-    public StatementList getElseCase() {
-        return elseCase;
-    }
-
-    /**
-     * <p>Setter for the field <code>elseCase</code>.</p>
-     *
-     * @param elseCase a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     */
-    public void setElseCase(StatementList elseCase) {
-        this.elseCase = elseCase;
-    }
-
-    @Override public CaseStatement clone() {
+    @Override
+    public CaseStatement copy() {
         CaseStatement c = new CaseStatement();
-        cases.forEach(cs -> c.addCase(cs.clone()));
+        c.setRuleContext(getRuleContext());
+        c.expression = expression.copy();
+        cases.forEach(cs -> c.addCase(cs.copy()));
+        c.elseCase = Utils.copyNull(getElseCase());
         return c;
     }
 
+    @Data
+    @EqualsAndHashCode
+    @ToString
     public static class Case extends Top {
         List<CaseCondition> conditions = new ArrayList<>();
         StatementList statements = new StatementList();
@@ -122,32 +86,17 @@ public class CaseStatement extends Statement {
             conditions.add(condition);
         }
 
-        public List<CaseCondition> getConditions() {
-            return conditions;
-        }
-
-        public void setConditions(List<CaseCondition> conditions) {
-            this.conditions = conditions;
-        }
-
-        public StatementList getStatements() {
-            return statements;
-        }
-
-        public void setStatements(StatementList statements) {
-            this.statements = statements;
-        }
-
-        @Override
-        public <T> T visit(Visitor<T> visitor) {
+        public <T> T accept(Visitor<T> visitor) {
             return visitor.visit(this);
         }
 
-        @Override public Case clone() {
+        @Override
+        public Case copy() {
             Case c = new Case();
-            c.conditions = conditions.stream().map(CaseCondition::clone)
+            c.conditions = conditions.stream()
+                    .map(CaseCondition::copy)
                     .collect(Collectors.toList());
-            c.statements = statements.clone();
+            c.statements = statements.copy();
             return c;
         }
     }

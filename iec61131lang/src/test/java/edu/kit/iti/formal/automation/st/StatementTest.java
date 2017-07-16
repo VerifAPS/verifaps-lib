@@ -22,9 +22,15 @@ package edu.kit.iti.formal.automation.st;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
+import edu.kit.iti.formal.automation.st.ast.Statement;
+import edu.kit.iti.formal.automation.st.ast.StatementList;
 import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
 import org.junit.Test;
@@ -59,8 +65,12 @@ public class StatementTest {
     public void testParser() throws IOException {
         IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRFileStream(testFile));
         IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
-        parser.statement_list();
+        IEC61131Parser.Statement_listContext ctx = parser.statement_list();
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
-    }
+      }
 
+      @Test public void testCopy() throws IOException {
+          StatementList sl = IEC61131Facade.statements(CharStreams.fromFileName(testFile));
+          Assert.assertEquals(sl, sl.copy());
+      }
 }

@@ -22,9 +22,13 @@ package edu.kit.iti.formal.automation.st;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
 import org.junit.Test;
@@ -63,4 +67,9 @@ public class TypesTest {
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
     }
 
+    @Test
+    public void testCopy() throws IOException {
+        TopLevelElements ast = IEC61131Facade.file(CharStreams.fromFileName(testFile));
+        Assert.assertEquals(ast, ast.copy());
+    }
 }

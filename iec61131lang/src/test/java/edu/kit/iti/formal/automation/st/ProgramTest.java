@@ -25,6 +25,9 @@ package edu.kit.iti.formal.automation.st;
 import edu.kit.iti.formal.automation.NiceErrorListener;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
+import edu.kit.iti.formal.automation.st.ast.StatementList;
+import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
@@ -78,8 +81,11 @@ public class ProgramTest {
 
         IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
         parser.addErrorListener(new NiceErrorListener(testFile));
-        parser.start();
+        IEC61131Parser.StartContext ctx = parser.start();
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
+        TopLevelElements sl = (TopLevelElements) ctx.accept(new IECParseTreeToAST());
+        Assert.assertEquals(sl, sl.copy());
+
     }
 
 }

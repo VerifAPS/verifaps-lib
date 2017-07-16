@@ -30,6 +30,7 @@ import edu.kit.iti.formal.automation.st.ast.Expression;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -74,5 +75,10 @@ public class ValidExpressionTest {
             return false;
         }
         return parser.getNumberOfSyntaxErrors() == 0;
+    }
+
+    @Test public void testCopy() {
+        Expression e = IEC61131Facade.expr(this.validExpression);
+        Assert.assertEquals(e, e.copy());
     }
 }

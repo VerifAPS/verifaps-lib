@@ -79,20 +79,18 @@ public class CommentStatement extends Statement {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
-
     @Override
-    public CommentStatement clone() {
+    public CommentStatement copy() {
         return new CommentStatement(comment);
     }
 
     public static Statement box(String s, Object... args) {
         String line = Strings.repeat("*", 79);
-        s = "(" + line + "\n *" + Strings.padStart(String.format(s, args), 79, '*')
-                + "\n " + line.substring(1) + ")";
+        s = line + "\n *" + Strings.padEnd(String.format(s, args)+"   ", 79, '*')
+                + "\n " + line;
         return new CommentStatement(s);
     }
 }

@@ -24,12 +24,15 @@ package edu.kit.iti.formal.automation.scope;
 
 import edu.kit.iti.formal.automation.VariableScope;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
+import edu.kit.iti.formal.automation.st.ast.Copyable;
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
 import edu.kit.iti.formal.automation.st.ast.VariableBuilder;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import org.apache.commons.lang3.SerializationUtils;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +47,7 @@ import java.util.stream.Collectors;
  * @version 1 (13.06.14)
  */
 public class LocalScope
-        implements Cloneable, Visitable, Iterable<VariableDeclaration> {
+        implements Visitable, Iterable<VariableDeclaration>, Copyable<LocalScope> {
     private VariableScope localVariables = new VariableScope();
     private GlobalScope globalScope = new GlobalScope();
 
@@ -94,6 +97,9 @@ public class LocalScope
         this.localVariables = localVariables;
     }
 
+    public Map<String, VariableDeclaration> asMap() {
+        return localVariables;
+    }
 
     /**
      * <p>add.</p>
@@ -104,8 +110,10 @@ public class LocalScope
         localVariables.put(var.getName(), var);
     }
 
-    /** {@inheritDoc} */
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
@@ -125,26 +133,34 @@ public class LocalScope
         return copy;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterator<VariableDeclaration> iterator() {
         return localVariables.values().iterator();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void forEach(Consumer<? super VariableDeclaration> action) {
         localVariables.values().forEach(action);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Spliterator<VariableDeclaration> spliterator() {
         return localVariables.values().spliterator();
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("LocalScope{");
@@ -220,12 +236,13 @@ public class LocalScope
         return localVariables.get(s);
     }
 
-    @Override public LocalScope clone() {
+    @Override
+    public LocalScope copy() {
         LocalScope ls = new LocalScope(this);
         ls.globalScope = globalScope.clone();
         for (Map.Entry<String, VariableDeclaration> e : localVariables
                 .entrySet()) {
-            ls.localVariables.put(e.getKey(), e.getValue().clone());
+            ls.localVariables.put(e.getKey(), e.getValue().copy());
         }
         return ls;
     }

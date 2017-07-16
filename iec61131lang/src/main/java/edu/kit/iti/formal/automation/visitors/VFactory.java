@@ -44,7 +44,7 @@ public class VFactory {
         StructuredTextHtmlPrinter stp = new StructuredTextHtmlPrinter();
         stp.setPrintComments(comments);
         stp.preamble();
-        elements.visit(stp);
+        elements.accept(stp);
         stp.closeHtml();
         return stp.getString();
     }
@@ -60,7 +60,7 @@ public class VFactory {
         if (a == null) return "";
         StructuredTextPrinter s = new StructuredTextPrinter();
         s.setPrintComments(comments);
-        a.visit(s);
+        a.accept(s);
         return s.getString();
     }
 
@@ -84,7 +84,7 @@ public class VFactory {
     public static String ast2St(TopLevelElements st0ast, boolean comments) {
         StructuredTextPrinter stp = new StructuredTextPrinter();
         stp.setPrintComments(comments);
-        st0ast.visit(stp);
+        st0ast.accept(stp);
         return stp.getString();
     }
 
@@ -99,7 +99,7 @@ public class VFactory {
         StructuredTextHtmlPrinter stp = new StructuredTextHtmlPrinter();
         stp.setPrintComments(comments);
         stp.preamble();
-        st0ast.visit(stp);
+        st0ast.accept(stp);
         stp.closeHtml();
         return stp.getString();
     }

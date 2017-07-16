@@ -29,6 +29,9 @@ import edu.kit.iti.formal.automation.operators.BinaryOperator;
 import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * <p>BinaryExpression class.</p>
@@ -36,102 +39,39 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
+@EqualsAndHashCode(callSuper = false)
+@ToString
+@Data
 public class BinaryExpression extends Expression {
     private Expression leftExpr, rightExpr;
     private BinaryOperator operator;
 
-    /**
-     * <p>Constructor for BinaryExpression.</p>
-     *
-     * @param leftExpr a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     * @param rightExpr a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     * @param operator a {@link edu.kit.iti.formal.automation.operators.BinaryOperator} object.
-     */
     public BinaryExpression(Expression leftExpr, Expression rightExpr, BinaryOperator operator) {
         if (leftExpr == null || rightExpr == null || operator == null) {
             throw new IllegalArgumentException();
         }
-
 
         this.leftExpr = leftExpr;
         this.rightExpr = rightExpr;
         this.operator = operator;
     }
 
-    /**
-     * <p>Constructor for BinaryExpression.</p>
-     *
-     * @param leftExpr a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     * @param rightExpr a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     * @param operator a {@link java.lang.String} object.
-     */
     public BinaryExpression(Expression leftExpr, Expression rightExpr, String operator) {
         this.leftExpr = leftExpr;
         this.rightExpr = rightExpr;
         this.operator = (BinaryOperator) Operators.lookup(operator);
     }
 
-
     /**
-     * <p>Getter for the field <code>leftExpr</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
+     * {@inheritDoc}
      */
-    public Expression getLeftExpr() {
-        return leftExpr;
-    }
-
-    /**
-     * <p>Setter for the field <code>leftExpr</code>.</p>
-     *
-     * @param leftExpr a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     */
-    public void setLeftExpr(Expression leftExpr) {
-        this.leftExpr = leftExpr;
-    }
-
-    /**
-     * <p>Getter for the field <code>rightExpr</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     */
-    public Expression getRightExpr() {
-        return rightExpr;
-    }
-
-    /**
-     * <p>Setter for the field <code>rightExpr</code>.</p>
-     *
-     * @param rightExpr a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     */
-    public void setRightExpr(Expression rightExpr) {
-        this.rightExpr = rightExpr;
-    }
-
-    /**
-     * <p>Getter for the field <code>operator</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.operators.BinaryOperator} object.
-     */
-    public BinaryOperator getOperator() {
-        return operator;
-    }
-
-    /**
-     * <p>Setter for the field <code>operator</code>.</p>
-     *
-     * @param operator a {@link edu.kit.iti.formal.automation.operators.BinaryOperator} object.
-     */
-    public void setOperator(BinaryOperator operator) {
-        this.operator = operator;
-    }
-
-    /** {@inheritDoc} */
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Any dataType(LocalScope localScope) throws VariableNotDefinedException, TypeConformityException {
         Any a = leftExpr.dataType(localScope);
@@ -143,32 +83,12 @@ public class BinaryExpression extends Expression {
         return c;
     }
 
-    @Override public BinaryExpression clone() {
-        return new BinaryExpression(leftExpr.clone(), rightExpr.clone(),
+    @Override
+    public BinaryExpression copy() {
+        BinaryExpression be = new BinaryExpression(leftExpr.copy(),
+                rightExpr.copy(),
                 operator);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BinaryExpression)) return false;
-
-        BinaryExpression that = (BinaryExpression) o;
-
-        if (!leftExpr.equals(that.leftExpr)) return false;
-        if (operator != that.operator) return false;
-        if (!rightExpr.equals(that.rightExpr)) return false;
-
-        return true;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int hashCode() {
-        int result = leftExpr.hashCode();
-        result = 31 * result + rightExpr.hashCode();
-        result = 31 * result + operator.hashCode();
-        return result;
+        be.setRuleContext(getRuleContext());
+        return be;
     }
 }

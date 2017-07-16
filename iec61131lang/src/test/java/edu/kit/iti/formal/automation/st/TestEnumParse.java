@@ -29,11 +29,13 @@ import edu.kit.iti.formal.automation.st.ast.TypeDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TypeDeclarations;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.Token;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -54,7 +56,7 @@ public class TestEnumParse extends DefaultVisitor<Void> {
         TypeDeclarations decls = (TypeDeclarations) toplevel.get(0);
         EnumerationTypeDeclaration enumdecl = (EnumerationTypeDeclaration) decls.get(0);
         assertEquals(Arrays.asList("one", "two", "three"),
-                enumdecl.getAllowedValues());
+                enumdecl.getAllowedValues().stream().map(Token::getText).collect(Collectors.toList()));
     }
 
 

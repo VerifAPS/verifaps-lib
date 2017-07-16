@@ -22,13 +22,20 @@ package edu.kit.iti.formal.automation.st;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.st.ast.Copyable;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 /**
  * @param <T> an class which is identifiable
  * @author Alexander Weigl
  * @since 04.03.2017
  */
+@ToString
+@EqualsAndHashCode
 public class IdentifierPlaceHolder<T extends Identifiable>
-        implements Cloneable {
+        implements Copyable<IdentifierPlaceHolder> {
     private String identifier;
     private T realObject;
 
@@ -65,13 +72,13 @@ public class IdentifierPlaceHolder<T extends Identifiable>
     }
 
     public IdentifierPlaceHolder setIdentifiedObject(T realObject) {
-        assert realObject.getIdentifier().equals(identifier);
+        assert identifier == null || realObject == null || realObject.getIdentifier().equals(identifier);
         this.realObject = realObject;
         return this;
     }
 
     @Override
-    public IdentifierPlaceHolder<T> clone() {
+    public IdentifierPlaceHolder<T> copy() {
         IdentifierPlaceHolder<T> iph = new IdentifierPlaceHolder<T>();
         iph.identifier = identifier;
         iph.realObject = realObject;

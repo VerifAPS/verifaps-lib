@@ -30,11 +30,11 @@ package edu.kit.iti.formal.automation.visitors;
  */
 public interface Visitable {
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param visitor a {@link edu.kit.iti.formal.automation.visitors.Visitor} object.
      * @param <T> a T object.
      * @return a T object.
      */
-    public <T> T visit(Visitor<T> visitor);
+    public <T> T accept(Visitor<T> visitor);
 }

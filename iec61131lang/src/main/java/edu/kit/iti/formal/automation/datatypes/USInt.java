@@ -28,11 +28,16 @@ package edu.kit.iti.formal.automation.datatypes;
  * @author weigl
  * @version $Id: $Id
  */
-public final  class USInt extends AnyUInt {
-        /**
-         * <p>Constructor for USInt.</p>
-         */
-        public USInt() {
-            super(8);
-        }
+public final class USInt extends AnyUnsignedInt {
+    /**
+     * <p>Constructor for USInt.</p>
+     */
+    public USInt() {
+        super(8);
     }
+
+    @Override
+    public <T> T accept(DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+}

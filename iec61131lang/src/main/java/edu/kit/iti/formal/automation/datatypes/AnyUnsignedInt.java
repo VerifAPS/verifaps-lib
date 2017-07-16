@@ -22,49 +22,28 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
-/**
- * <p>AnyUInt class.</p>
- *
- * @author weigl
- * @version $Id: $Id
- */
-public class AnyUInt extends AnyInt {
-    /**
-     * <p>Constructor for AnyUInt.</p>
-     *
-     * @param bitLength a int.
-     */
-    public AnyUInt(int bitLength) {
+import java.math.BigInteger;
+
+public class AnyUnsignedInt extends AnyInt {
+    public AnyUnsignedInt(int bitLength) {
         super(bitLength, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public AnyInt asSigned() {
         return new AnySignedInt(bitLength);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public AnyUInt asUnsgined() {
+    public AnyUnsignedInt asUnsgined() {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public AnyInt next() {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isValid(long value) {
         return value < (1 << bitLength);
@@ -72,6 +51,16 @@ public class AnyUInt extends AnyInt {
 
     @Override
     public <T> T accept(DataTypeVisitor<T> visitor) {
-        return visitor.visit(DataTypes.SINT);
+        return visitor.visit(this);
+    }
+
+    @Override
+    public BigInteger getUpperBound() {
+        return BigInteger.ONE.shiftLeft(bitLength);
+    }
+
+    @Override
+    public BigInteger getLowerBound() {
+        return BigInteger.ZERO;
     }
 }

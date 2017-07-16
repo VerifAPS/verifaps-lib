@@ -22,6 +22,8 @@ package edu.kit.iti.formal.automation.datatypes.values;
  * #L%
  */
 
+import lombok.*;
+
 /**
  * Created by weigl on 11.06.14.
  * Immutable
@@ -29,6 +31,9 @@ package edu.kit.iti.formal.automation.datatypes.values;
  * @author weigl
  * @version $Id: $Id
  */
+@Data
+@EqualsAndHashCode
+@ToString
 public class Bits {
     private long register;
     private final long nbits;
@@ -162,37 +167,6 @@ public class Bits {
         return new Bits(register ^ other.register, nbits);
     }
 
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return "Bits{" +
-                "register=" + register +
-                ", nbits=" + nbits +
-                '}';
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Bits)) return false;
-
-        Bits bits = (Bits) o;
-
-        if (nbits != bits.nbits) return false;
-        if (register != bits.register) return false;
-
-        return true;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int hashCode() {
-        int result = (int) (register ^ (register >>> 32));
-        result = 31 * result + (int) (nbits ^ (nbits >>> 32));
-        return result;
-    }
 
     /**
      * <p>Setter for the field <code>register</code>.</p>

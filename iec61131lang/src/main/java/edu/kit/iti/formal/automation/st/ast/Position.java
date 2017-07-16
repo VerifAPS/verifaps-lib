@@ -10,67 +10,48 @@ package edu.kit.iti.formal.automation.st.ast;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
 
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import lombok.Data;
+import org.antlr.v4.runtime.Token;
+
 /**
  * @author Alexander Weigl
  * @version 1 (15.04.17)
  */
+@RequiredArgsConstructor
+@EqualsAndHashCode
+@ToString
+@Data
 public class Position implements Cloneable {
-    final int lineNumber;
-    final int charInLine;
+    private final int lineNumber;
+    private final int charInLine;
+    private final int offset;
 
-    public Position(int lineNumber, int charInLine) {
-        this.lineNumber = lineNumber;
-        this.charInLine = charInLine;
+    public Position(Token token) {
+        this(token.getLine(), token.getCharPositionInLine(), token.getStartIndex());
     }
 
-    public Position() {
-        this(-1, -1);
+    @Override
+    public Position clone() {
+        return new Position(lineNumber, charInLine, offset);
     }
 
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    public int getCharInLine() {
-        return charInLine;
-    }
-
-    @Override public Position clone() {
-        return new Position(lineNumber, charInLine);
-    }
-
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "@" + lineNumber + ":" + charInLine;
-    }
-
-    @Override public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-
-        Position position = (Position) o;
-
-        if (lineNumber != position.lineNumber)
-            return false;
-        return charInLine == position.charInLine;
-    }
-
-    @Override public int hashCode() {
-        int result = lineNumber;
-        result = 31 * result + charInLine;
-        return result;
     }
 }

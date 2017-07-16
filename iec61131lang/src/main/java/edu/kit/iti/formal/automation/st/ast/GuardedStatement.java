@@ -23,82 +23,32 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.*;
 
 /**
  * Created by weigla on 09.06.2014.
  *
  * @author weigl
- * @version $Id: $Id
  */
+@ToString
+@Data
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
 public class GuardedStatement extends Statement {
     protected Expression condition;
     protected StatementList statements = new StatementList();
 
-    /**
-     * <p>Constructor for GuardedStatement.</p>
-     */
-    public GuardedStatement() {
-
-    }
-
-    /**
-     * <p>Constructor for GuardedStatement.</p>
-     *
-     * @param condition a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     * @param statements a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     */
-    public GuardedStatement(Expression condition, StatementList statements) {
-        this.condition = condition;
-        this.statements = statements;
-    }
-
-    /**
-     * <p>Getter for the field <code>condition</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     */
-    public Expression getCondition() {
-        return condition;
-    }
-
-    /**
-     * <p>Setter for the field <code>condition</code>.</p>
-     *
-     * @param condition a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     */
-    public void setCondition(Expression condition) {
-        this.condition = condition;
-    }
-
-
-    /**
-     * <p>Getter for the field <code>statements</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     */
-    public StatementList getStatements() {
-        return statements;
-    }
-
-    /**
-     * <p>Setter for the field <code>statements</code>.</p>
-     *
-     * @param statements a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     */
-    public void setStatements(StatementList statements) {
-        this.statements = statements;
-    }
-
     /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @Override public GuardedStatement clone() {
+    @Override public GuardedStatement copy() {
         GuardedStatement gs = new GuardedStatement();
-        gs.condition = condition.clone();
-        gs.statements = statements.clone();
+        gs.setRuleContext(gs.getRuleContext());
+        gs.condition = condition.copy();
+        gs.statements = statements.copy();
         return gs;
     }
 }

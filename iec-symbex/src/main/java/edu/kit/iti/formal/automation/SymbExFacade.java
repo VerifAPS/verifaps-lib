@@ -58,7 +58,7 @@ public final class SymbExFacade {
         }
         se.push(state);
         se.getGlobalScope().registerFunction(decl);
-        return fc.visit(se);
+        return fc.accept(se);
     }
 
     /**
@@ -80,7 +80,7 @@ public final class SymbExFacade {
     public static final SMVModule evaluateProgram(ProgramDeclaration decl,
                                                   TypeDeclarations types) {
         SymbolicExecutioner se = new SymbolicExecutioner();
-        decl.visit(se);
+        decl.accept(se);
         ModuleBuilder moduleBuilder = new ModuleBuilder(decl, types, se.peek());
         moduleBuilder.run();
         return moduleBuilder.getModule();

@@ -54,9 +54,10 @@ public class Location extends Expression {
         this.path = path;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
@@ -87,14 +88,20 @@ public class Location extends Expression {
         return path.stream().map(a -> a.toString()).reduce("", (a, b) -> a + "." + b);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Any dataType(LocalScope localScope) {
         return null;//TODO
     }
 
-    @Override public Location clone() {
-        return new Location(path.stream().map(Reference::clone)
+    @Override
+    public Location copy() {
+        Location l = new Location(
+                path.stream().map(Reference::copy)
                 .collect(Collectors.toList()));
+        l.setRuleContext(getRuleContext());
+        return l;
     }
 }

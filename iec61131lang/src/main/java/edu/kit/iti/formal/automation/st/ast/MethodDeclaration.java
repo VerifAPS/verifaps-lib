@@ -24,15 +24,21 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * @author Alexander Weigl
  * @version 1 (20.02.17)
  */
+
+@EqualsAndHashCode
+@ToString
 public class MethodDeclaration extends FunctionDeclaration {
     private ClassDeclaration classDeclaration;
 
-    @Override public <T> T visit(Visitor<T> visitor) {
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
         return null;
     }
 
@@ -54,13 +60,13 @@ public class MethodDeclaration extends FunctionDeclaration {
         setFunctionName(n);
     }
 
-    @Override public MethodDeclaration clone() {
+    @Override
+    public MethodDeclaration copy() {
         MethodDeclaration md = new MethodDeclaration();
         md.classDeclaration = classDeclaration; //no copy!
-        md.localScope = localScope.clone();
+        md.localScope = localScope.copy();
         md.functionName = functionName;
-        md.returnType = returnType;
-        md.returnTypeName = returnTypeName;
+        md.returnType = returnType.copy();
         return md;
     }
 }

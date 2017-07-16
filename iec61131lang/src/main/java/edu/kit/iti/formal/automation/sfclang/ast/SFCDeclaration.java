@@ -83,29 +83,34 @@ public class SFCDeclaration extends TopLevelScopeElement {
     public void setTransitions(List<TransitionDeclaration> transition) {
         this.transitions = transition;
     }
+
     public List<FunctionBlockDeclaration> getActions() {
         return actions;
     }
+
     public void setActions(List<FunctionBlockDeclaration> actions) {
         this.actions = actions;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return getIdentifier();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    public <T> T accept(Visitor<T> visitor) {
         return null;
     }
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
-     * @param v a {@link edu.kit.iti.formal.automation.sfclang.SFCAstVisitor} object.
+     * @param v   a {@link edu.kit.iti.formal.automation.sfclang.SFCAstVisitor} object.
      * @param <T> a T object.
      * @return a T object.
      */
@@ -157,14 +162,18 @@ public class SFCDeclaration extends TopLevelScopeElement {
 
     }
 
-    /** {@inheritDoc} */
-    @Override public String getIdentifier() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getIdentifier() {
         return name;
     }
 
-    @Override public SFCDeclaration clone() {
+    @Override
+    public SFCDeclaration copy() {
         SFCDeclaration sfc = new SFCDeclaration();
-        actions.forEach(a -> sfc.actions.add(a.clone()));
+        actions.forEach(a -> sfc.actions.add(a.copy()));
         // steps.forEach(s -> sfc.steps.add(s.clone()));
         // return sfc;
         throw new IllegalStateException("not implemented yet!");

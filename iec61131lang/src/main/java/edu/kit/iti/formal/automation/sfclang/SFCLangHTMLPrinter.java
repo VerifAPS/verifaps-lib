@@ -96,7 +96,7 @@ public class SFCLangHTMLPrinter implements SFCAstVisitor<HTMLCodeWriter> {
 	@Override
 	public HTMLCodeWriter visit(TransitionDeclaration decl) {
 		hcw.nl().keyword("goto").append(" ");
-		decl.getGuard().visit(stPrinter);
+		decl.getGuard().accept(stPrinter);
 		hcw.append(" ").keyword("::").append(" ");
 
 		printList(decl.getFrom());

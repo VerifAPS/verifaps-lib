@@ -22,10 +22,14 @@ package edu.kit.iti.formal.automation.datatypes.values;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * Created by weigl on 11.06.14.
@@ -35,14 +39,12 @@ import lombok.NonNull;
  */
 @Data
 @EqualsAndHashCode
+@RequiredArgsConstructor
 public abstract class Value<T extends Any, S> {
-    @NonNull private final T dataType;
-    @NonNull private final S value;
-
-    public Value(T dataType, S value) {
-        this.dataType = dataType;
-        this.value = value;
-    }
+    @NonNull
+    private final T dataType;
+    @NonNull
+    private final S value;
 
 
 }

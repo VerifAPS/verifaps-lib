@@ -24,7 +24,6 @@ package edu.kit.iti.formal.automation.st.util;
 
 import edu.kit.iti.formal.automation.st.ast.AssignmentStatement;
 import edu.kit.iti.formal.automation.visitors.Visitable;
-import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,12 +42,12 @@ public class UsageFinder extends AstVisitor {
     @Override
     public Object visit(AssignmentStatement assignmentStatement) {
         writtenReferences.add(assignmentStatement.getLocation().toString());
-        assignmentStatement.getExpression().visit(this);
+        assignmentStatement.getExpression().accept(this);
         return null;
     }
 
     /*@Override
-    public Object visit(SymbolicReference symbolicReference) {
+    public Object accept(SymbolicReference symbolicReference) {
         readedReference.add(symbolicReference.getIdentifier());
         return null;
     }*/
@@ -97,7 +96,7 @@ public class UsageFinder extends AstVisitor {
      */
     public static UsageFinder investigate(Visitable visitable) {
         UsageFinder waf = new UsageFinder();
-        visitable.visit(waf);
+        visitable.accept(waf);
         return waf;
     }
 }

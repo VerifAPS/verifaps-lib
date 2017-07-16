@@ -947,3 +947,6 @@ COMMENT
 LINE_COMMENT
   : '//' ~[\r\n]* -> channel(HIDDEN)
   ;
+
+
+ERROR_CHAR : .;

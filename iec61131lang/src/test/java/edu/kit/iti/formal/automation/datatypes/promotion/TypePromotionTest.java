@@ -22,10 +22,9 @@ package edu.kit.iti.formal.automation.datatypes.promotion;
  * #L%
  */
 
-import static edu.kit.iti.formal.automation.datatypes.AnyInt.UDINT;
-import static edu.kit.iti.formal.automation.datatypes.AnyInt.USINT;
+import static edu.kit.iti.formal.automation.datatypes.DataTypes.UDINT;
+import static edu.kit.iti.formal.automation.datatypes.DataTypes.USINT;
 import static org.junit.Assert.*;
-import static edu.kit.iti.formal.automation.datatypes.AnyInt.*;
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.datatypes.*;
@@ -51,12 +50,12 @@ public class TypePromotionTest {
     @Before
     public void setup() {
         vd = new LocalScope();
-        vd.add(new VariableDeclaration("a", UINT));
-        vd.add(new VariableDeclaration("b", INT));
+        vd.add(new VariableDeclaration("a", DataTypes.UINT));
+        vd.add(new VariableDeclaration("b", DataTypes.INT));
         vd.add(new VariableDeclaration("c", AnyBit.BOOL));
         vd.add(new VariableDeclaration("d", AnyBit.BOOL));
         vd.add(new VariableDeclaration("e", AnyBit.BYTE));
-        vd.add(new VariableDeclaration("f", ULINT));
+        vd.add(new VariableDeclaration("f", DataTypes.ULINT));
         vd.add(new VariableDeclaration("r", AnyReal.REAL));
         vd.add(new VariableDeclaration("q", AnyReal.LREAL));
 
@@ -67,44 +66,44 @@ public class TypePromotionTest {
 
     @Test
     public void testSignedInteger() {
-        assertEquals(LINT, ip.getPromotion(LINT, SINT));
-        assertEquals(LINT, ip.getPromotion(LINT, INT));
-        assertEquals(LINT, ip.getPromotion(LINT, DINT));
-        assertEquals(LINT, ip.getPromotion(SINT, LINT));
-        assertEquals(LINT, ip.getPromotion(INT, LINT));
-        assertEquals(LINT, ip.getPromotion(DINT, LINT));
-        assertEquals(LINT, ip.getPromotion(LINT, LINT));
+        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.LINT, DataTypes.SINT));
+        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.LINT, DataTypes.INT));
+        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.LINT, DataTypes.DINT));
+        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.SINT, DataTypes.LINT));
+        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.INT, DataTypes.LINT));
+        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.DINT, DataTypes.LINT));
+        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.LINT, DataTypes.LINT));
 
 
-        assertEquals(SINT, ip.getPromotion(SINT, SINT));
-        assertEquals(INT, ip.getPromotion(SINT, INT));
-        assertEquals(DINT, ip.getPromotion(SINT, DINT));
+        assertEquals(DataTypes.SINT, ip.getPromotion(DataTypes.SINT, DataTypes.SINT));
+        assertEquals(DataTypes.INT, ip.getPromotion(DataTypes.SINT, DataTypes.INT));
+        assertEquals(DataTypes.DINT, ip.getPromotion(DataTypes.SINT, DataTypes.DINT));
 
-        assertEquals(INT, ip.getPromotion(INT, SINT));
-        assertEquals(INT, ip.getPromotion(INT, INT));
-        assertEquals(DINT, ip.getPromotion(INT, DINT));
-        assertEquals(LINT, ip.getPromotion(INT, LINT));
+        assertEquals(DataTypes.INT, ip.getPromotion(DataTypes.INT, DataTypes.SINT));
+        assertEquals(DataTypes.INT, ip.getPromotion(DataTypes.INT, DataTypes.INT));
+        assertEquals(DataTypes.DINT, ip.getPromotion(DataTypes.INT, DataTypes.DINT));
+        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.INT, DataTypes.LINT));
 
     }
 
     @Test
     public void testUnSignedInteger() {
-        assertEquals(ULINT, ip.getPromotion(ULINT, USINT));
-        assertEquals(ULINT, ip.getPromotion(ULINT, UINT));
-        assertEquals(ULINT, ip.getPromotion(ULINT, UDINT));
-        assertEquals(ULINT, ip.getPromotion(USINT, ULINT));
-        assertEquals(ULINT, ip.getPromotion(UINT, ULINT));
-        assertEquals(ULINT, ip.getPromotion(UDINT, ULINT));
-        assertEquals(ULINT, ip.getPromotion(ULINT, ULINT));
+        assertEquals(DataTypes.ULINT, ip.getPromotion(DataTypes.ULINT, USINT));
+        assertEquals(DataTypes.ULINT, ip.getPromotion(DataTypes.ULINT, DataTypes.UINT));
+        assertEquals(DataTypes.ULINT, ip.getPromotion(DataTypes.ULINT, UDINT));
+        assertEquals(DataTypes.ULINT, ip.getPromotion(USINT, DataTypes.ULINT));
+        assertEquals(DataTypes.ULINT, ip.getPromotion(DataTypes.UINT, DataTypes.ULINT));
+        assertEquals(DataTypes.ULINT, ip.getPromotion(UDINT, DataTypes.ULINT));
+        assertEquals(DataTypes.ULINT, ip.getPromotion(DataTypes.ULINT, DataTypes.ULINT));
 
         assertEquals(USINT, ip.getPromotion(USINT, USINT));
-        assertEquals(UINT, ip.getPromotion(USINT, UINT));
+        assertEquals(DataTypes.UINT, ip.getPromotion(USINT, DataTypes.UINT));
         assertEquals(UDINT, ip.getPromotion(USINT, UDINT));
 
-        assertEquals(UINT, ip.getPromotion(UINT, USINT));
-        assertEquals(UINT, ip.getPromotion(UINT, UINT));
-        assertEquals(UDINT, ip.getPromotion(UINT, UDINT));
-        assertEquals(ULINT, ip.getPromotion(UINT, ULINT));
+        assertEquals(DataTypes.UINT, ip.getPromotion(DataTypes.UINT, USINT));
+        assertEquals(DataTypes.UINT, ip.getPromotion(DataTypes.UINT, DataTypes.UINT));
+        assertEquals(UDINT, ip.getPromotion(DataTypes.UINT, UDINT));
+        assertEquals(DataTypes.ULINT, ip.getPromotion(DataTypes.UINT, DataTypes.ULINT));
 
     }
 
@@ -118,21 +117,21 @@ public class TypePromotionTest {
     @Test
     public void integerMixed() {
         IntegerPromotion ip = new IntegerPromotion();
-        assertEquals(INT, ip.getPromotion(INT, UINT));
-        assertEquals(INT, ip.getPromotion(UINT, INT));
+        assertEquals(DataTypes.INT, ip.getPromotion(DataTypes.INT, DataTypes.UINT));
+        assertEquals(DataTypes.INT, ip.getPromotion(DataTypes.UINT, DataTypes.INT));
     }
 
 
     @Test
     public void nonConformity() {
-        assertEquals(null, ip.getPromotion(INT, AnyBit.WORD));
+        assertEquals(null, ip.getPromotion(DataTypes.INT, AnyBit.WORD));
     }
 
     @Test
     public void basicOperators() throws VariableNotDefinedException, TypeConformityException {
-        assertDataType(INT, "-SINT#2 + UINT#2", null);
-        assertDataType(LINT, "-SINT#2 - LINT#2", null);
-        assertDataType(SINT, "-SINT#2", null);
+        assertDataType(DataTypes.INT, "-SINT#2 + UINT#2", null);
+        assertDataType(DataTypes.LINT, "-SINT#2 - LINT#2", null);
+        assertDataType(DataTypes.SINT, "-SINT#2", null);
         assertDataType(AnyBit.BOOL, "TRUE AND FALSE", null);
         assertDataType(AnyBit.BOOL, "NOT TRUE", null);
         assertDataType(AnyBit.BOOL, "NOT TRUE AND FALSE OR TRUE ", null);

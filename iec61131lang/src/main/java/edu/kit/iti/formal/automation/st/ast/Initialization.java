@@ -29,5 +29,6 @@ package edu.kit.iti.formal.automation.st.ast;
  * @version $Id: $Id
  */
 public abstract class Initialization extends Expression {
-    public abstract Initialization clone();
+    @Override
+    public abstract Initialization copy();
 }

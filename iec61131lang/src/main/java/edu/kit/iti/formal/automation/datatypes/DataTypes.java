@@ -22,8 +22,12 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import java.math.BigInteger;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <p>DataTypes class.</p>
@@ -32,12 +36,39 @@ import java.util.Set;
  * @version 1
  */
 public class DataTypes {
-    static HashMap<String, Any> map = new HashMap<>();
+    public static final BigInteger DEFAULT = BigInteger.ZERO;
+    public static final SInt SINT = new SInt();
+    public static final USInt USINT = new USInt();
+    public static final UInt UINT = new UInt();
+    public static final Int INT = new Int();
+    public static final UDInt UDINT = new UDInt();
+    public static final DInt DINT = new DInt();
+    public static final ULInt ULINT = new ULInt();
+    public static final LInt LINT = new LInt();
+    public static final AnyInt UNKNWON_SIGNED_INT = new AnySignedInt(-1);
+    public static final AnyUnsignedInt UNKNWON_UNSIGNED_INT = new AnyUnsignedInt(-1);
+    public static final AnyInt ANY_INT = new AnySignedInt(-1) {
+        @Override
+        public AnyInt next() {
+            return null;
+        }
 
-    static void add(Any any) {
-        map.put(any.getName(), any);
-        map.put(any.getName().replace("_", ""), any);
-    }
+        @Override
+        public AnyUnsignedInt asUnsgined() {
+            return UNKNWON_UNSIGNED_INT;
+        }
+
+        @Override
+        public AnyInt asSigned() {
+            return UNKNWON_SIGNED_INT;
+        }
+
+        @Override
+        public boolean isValid(long value) {
+            return true;
+        }
+    };
+    static HashMap<String, Any> map = new HashMap<>();
 
     static {
         add(AnyBit.BOOL);
@@ -45,15 +76,15 @@ public class DataTypes {
         add(AnyBit.WORD);
         add(AnyBit.DWORD);
 
-        add(AnyInt.SINT);
-        add(AnyInt.INT);
-        add(AnyInt.DINT);
-        add(AnyInt.LINT);
+        add(SINT);
+        add(INT);
+        add(DINT);
+        add(LINT);
 
-        add(AnyInt.USINT);
-        add(AnyInt.UINT);
-        add(AnyInt.UDINT);
-        add(AnyInt.ULINT);
+        add(USINT);
+        add(UINT);
+        add(UDINT);
+        add(ULINT);
 
         add(AnyReal.LREAL);
         add(AnyReal.REAL);
@@ -70,6 +101,11 @@ public class DataTypes {
         map.put("TOD", AnyDate.TIME_OF_DAY);
         map.put("DT", AnyDate.DATE_AND_TIME);
         map.put("T", TimeType.TIME_TYPE);
+    }
+
+    static void add(Any any) {
+        map.put(any.getName(), any);
+        map.put(any.getName().replace("_", ""), any);
     }
 
     /**
@@ -90,4 +126,52 @@ public class DataTypes {
     public static Set<String> getDataTypeNames() {
         return map.keySet();
     }
+
+    public static List<? extends AnyInt> getIntegers() {
+        return getIntegers(AnyInt.class);
+    }
+
+    public static List<? extends AnyInt> getIntegers(Class<? extends AnyInt> anyIntClass) {
+        List<? extends AnyInt> list = get(anyIntClass);
+        list.sort(Comparator.<AnyInt>comparingInt(o -> o.bitLength));
+        return list;
+    }
+
+    public static List<? extends AnyInt> getSignedIntegers() {
+        return getIntegers(AnySignedInt.class);
+    }
+
+    public static List<? extends AnyInt> getUnSignedIntegers() {
+        return getIntegers(AnyUnsignedInt.class);
+    }
+
+    private static <T extends Any> List<? extends T> get(Class<T> anyClazz) {
+        return (List<? extends T>) map.values().stream().filter(
+                a -> anyClazz.isAssignableFrom(a.getClass()))
+                .collect(Collectors.toList());
+    }
+
+
+    public static AnyInt findSuitableInteger(BigInteger s) {
+        return findSuitableInteger(s, getIntegers());
+    }
+
+    public static AnyInt findSuitableInteger(BigInteger s, boolean signed) {
+        return findSuitableInteger(s,
+                signed ? DataTypes.getSignedIntegers()
+                        : DataTypes.getUnSignedIntegers()
+        );
+    }
+
+    public static AnyInt findSuitableInteger(BigInteger s, Iterable<? extends AnyInt> integerTypes) {
+        for (AnyInt anyInt : integerTypes) {
+            if (s.compareTo(anyInt.getUpperBound()) < 0
+                    && anyInt.getLowerBound().compareTo(s) < 0) {
+                return anyInt;
+            }
+        }
+        throw new IllegalStateException("integer literal too big");
+    }
+
+
 }

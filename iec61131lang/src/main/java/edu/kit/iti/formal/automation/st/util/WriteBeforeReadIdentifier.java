@@ -81,14 +81,14 @@ public class WriteBeforeReadIdentifier extends AstVisitor<WriteBeforeReadIdentif
     public WBRState visit(AssignmentStatement assignmentStatement) {
         WBRState wbrState = new WBRState();
         current = wbrState;
-        assignmentStatement.getExpression().visit(this);
+        assignmentStatement.getExpression().accept(this);
         Reference variable = assignmentStatement.getLocation();
         wbrState.write(variable.toString());
         return wbrState;
     }
 
     /*@Override
-    public WBRState visit(SymbolicReference symbolicReference) {
+    public WBRState accept(SymbolicReference symbolicReference) {
         current.read(symbolicReference.getIdentifier());
         return null;
     }*/
@@ -98,7 +98,7 @@ public class WriteBeforeReadIdentifier extends AstVisitor<WriteBeforeReadIdentif
     public WBRState visit(StatementList statements) {
         WBRState state = new WBRState();
         for (Statement s : statements) {
-            WBRState w = s.visit(this);
+            WBRState w = s.accept(this);
             state.seq(w);
         }
         return state;
@@ -111,7 +111,7 @@ public class WriteBeforeReadIdentifier extends AstVisitor<WriteBeforeReadIdentif
 
         for (FunctionBlockCallStatement.Parameter in : fbc.getParameters())
             if (!in.isOutput()) {
-                WBRState s = in.getExpression().visit(this);
+                WBRState s = in.getExpression().accept(this);
                 state.add(s);
             }
 
@@ -141,7 +141,7 @@ public class WriteBeforeReadIdentifier extends AstVisitor<WriteBeforeReadIdentif
         }
 
         if (ifStatement.getElseBranch().size() > 0) {
-            WBRState elseState = ifStatement.getElseBranch().visit(this);
+            WBRState elseState = ifStatement.getElseBranch().accept(this);
             state.add(elseState);
         }
 
@@ -156,8 +156,8 @@ public class WriteBeforeReadIdentifier extends AstVisitor<WriteBeforeReadIdentif
         WBRState state = new WBRState();
         current = state;
 
-        guardedStatement.getCondition().visit(this);
-        current = guardedStatement.getStatements().visit(this);
+        guardedStatement.getCondition().accept(this);
+        current = guardedStatement.getStatements().accept(this);
 
         for (String candidate : current.candidates) {
             state.write(candidate);
@@ -172,7 +172,7 @@ public class WriteBeforeReadIdentifier extends AstVisitor<WriteBeforeReadIdentif
     /** {@inheritDoc} */
     @Override
     public WBRState visit(CaseStatement.Case aCase) {
-        return aCase.getStatements().visit(this);
+        return aCase.getStatements().accept(this);
     }
 
     /** {@inheritDoc} */
@@ -180,7 +180,7 @@ public class WriteBeforeReadIdentifier extends AstVisitor<WriteBeforeReadIdentif
     public WBRState visit(CaseStatement caseStatement) {
         WBRState state = new WBRState();
         current = state;
-        caseStatement.getExpression().visit(this);
+        caseStatement.getExpression().accept(this);
 
 
         List<WBRState> cond = caseStatement.getCases().stream().map(this::visit).collect(Collectors.toList());
@@ -192,7 +192,7 @@ public class WriteBeforeReadIdentifier extends AstVisitor<WriteBeforeReadIdentif
 
 
         if (caseStatement.getElseCase().size() > 0) {
-            WBRState elseState = caseStatement.getElseCase().visit(this);
+            WBRState elseState = caseStatement.getElseCase().accept(this);
             cases.add(elseState);
 
         }
@@ -206,7 +206,7 @@ public class WriteBeforeReadIdentifier extends AstVisitor<WriteBeforeReadIdentif
     /** {@inheritDoc} */
     @Override
     public WBRState visit(ProgramDeclaration programDeclaration) {
-        return programDeclaration.getProgramBody().visit(this);
+        return programDeclaration.getProgramBody().accept(this);
     }
 
     /**
@@ -218,6 +218,6 @@ public class WriteBeforeReadIdentifier extends AstVisitor<WriteBeforeReadIdentif
     public static Set<String> investigate(Visitable visitable) {
         WriteBeforeReadIdentifier wbri = new
                 WriteBeforeReadIdentifier();
-        return visitable.visit(wbri).candidates;
+        return visitable.accept(wbri).candidates;
     }
 }

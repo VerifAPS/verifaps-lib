@@ -39,7 +39,11 @@ public final class SInt extends AnySignedInt {
     /** {@inheritDoc} */
     @Override
     public AnyInt next() {
-        return INT;
+        return DataTypes.INT;
     }
 
+    @Override
+    public <T> T accept(DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }

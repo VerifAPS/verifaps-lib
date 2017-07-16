@@ -22,11 +22,16 @@ package edu.kit.iti.formal.automation.datatypes.values;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.AnyDate;
+import edu.kit.iti.formal.automation.sfclang.Utils;
 import lombok.*;
-import lombok.experimental.Tolerate;
+
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * <p>TimeOfDayValue class.</p>
+ * <p>TimeofDayData class.</p>
  *
  * @author weigl
  * @version $Id: $Id
@@ -35,17 +40,42 @@ import lombok.experimental.Tolerate;
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode
-public class TimeOfDayValue {
+public class TimeofDayData {
     private int hours, minutes, seconds, millieseconds;
 
-    public TimeOfDayValue(int hours, int minutes, int seconds) {
+    public TimeofDayData(int hours, int minutes, int seconds) {
         this.hours = hours;
         this.minutes = minutes;
         this.seconds = seconds;
     }
 
-    public TimeOfDayValue(int hour, int min, int sec, int ms) {
+    public TimeofDayData(int hour, int min, int sec, int ms) {
         this(hour, min, sec);
         millieseconds = ms;
+    }
+
+    public static Value<AnyDate.TimeOfDay, TimeofDayData> parse(String tod) {
+        Pattern pattern = Pattern.compile(
+                "(?<hour>\\d?\\d):(?<min>\\d?\\d)(:(?<sec>\\d?\\d))?(.(?<ms>\\d+))?");
+        Utils.Splitted s = Utils.split(tod);
+        Matcher matcher = pattern.matcher(s.value().get());
+        Function<String, Integer> parseInt = (String key) -> {
+            String a = matcher.group(key);
+            if (a == null)
+                return 0;
+            else
+                return Integer.parseInt(a);
+        };
+
+        if (matcher.matches()) {
+            int hour = parseInt.apply("hour");
+            int min = parseInt.apply("min");
+            int sec = parseInt.apply("sec");
+            int ms = parseInt.apply("ms");
+            TimeofDayData t = new TimeofDayData(hour, min, sec, ms);
+            return new Values.VToD(AnyDate.TIME_OF_DAY, t);
+        } else {
+            throw new IllegalArgumentException("Given string is not a time of day value.");
+        }
     }
 }

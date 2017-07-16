@@ -23,16 +23,16 @@ package edu.kit.iti.formal.automation.datatypes;
  */
 
 /**
- * <p>UnsignedInt class.</p>
+ * <p>UInt class.</p>
  *
  * @author weigl
  * @version $Id: $Id
  */
-public final class UnsignedInt extends AnyUnsignedInt {
+public final class UInt extends AnyUnsignedInt {
     /**
-     * <p>Constructor for UnsignedInt.</p>
+     * <p>Constructor for UInt.</p>
      */
-    public UnsignedInt() {
+    public UInt() {
         super(16);
     }
 
@@ -44,6 +44,6 @@ public final class UnsignedInt extends AnyUnsignedInt {
 
     @Override
     public <T> T accept(DataTypeVisitor<T> visitor) {
-        return visitor.visit(DataTypes.SINT);
+        return visitor.visit(this);
     }
 }

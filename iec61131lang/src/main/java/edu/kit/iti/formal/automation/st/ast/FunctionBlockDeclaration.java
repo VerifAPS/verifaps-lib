@@ -23,6 +23,8 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Created by weigl on 13.06.14.
@@ -30,6 +32,8 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
+@EqualsAndHashCode
+@ToString
 public class FunctionBlockDeclaration extends TopLevelScopeElement {
     private StatementList functionBody = new StatementList();
     private String functionBlockName;
@@ -73,21 +77,24 @@ public class FunctionBlockDeclaration extends TopLevelScopeElement {
     /**
      * {@inheritDoc}
      */
-    @Override public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override public String getIdentifier() {
+    @Override
+    public String getIdentifier() {
         return getFunctionBlockName();
     }
 
-    @Override public FunctionBlockDeclaration clone() {
+    @Override
+    public FunctionBlockDeclaration copy() {
         FunctionBlockDeclaration fb = new FunctionBlockDeclaration();
+        fb.setRuleContext(getRuleContext());
         fb.functionBlockName = functionBlockName;
-        fb.functionBody = functionBody.clone();
+        fb.functionBody = functionBody.copy();
         return fb;
     }
 }

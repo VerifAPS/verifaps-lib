@@ -29,16 +29,23 @@ package edu.kit.iti.formal.automation.datatypes;
  * @version $Id: $Id
  */
 public final class Int extends AnySignedInt {
-    /** {@inheritDoc} */
-    @Override
-    public AnyInt next() {
-        return DINT;
-    }
-
     /**
      * <p>Constructor for Int.</p>
      */
     public Int() {
         super(16);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AnyInt next() {
+        return DataTypes.DINT;
+    }
+
+    @Override
+    public <T> T accept(DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

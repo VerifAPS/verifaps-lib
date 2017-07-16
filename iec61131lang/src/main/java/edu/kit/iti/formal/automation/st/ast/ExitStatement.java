@@ -24,6 +24,8 @@ package edu.kit.iti.formal.automation.st.ast;
 
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Created by weigla on 09.06.2014.
@@ -31,6 +33,8 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
+@EqualsAndHashCode
+@ToString
 public class ExitStatement extends Statement {
     /** Constant <code>EXIT_STATMENT</code> */
     public static ExitStatement EXIT_STATMENT = new ExitStatement();
@@ -42,11 +46,14 @@ public class ExitStatement extends Statement {
     }
 
     /** {@inheritDoc} */
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @Override public ExitStatement clone() {
-        return EXIT_STATMENT;
+    @Override
+    public Statement copy() {
+        ExitStatement es = new ExitStatement();
+        es.setRuleContext(getRuleContext());
+        return es;
     }
 }

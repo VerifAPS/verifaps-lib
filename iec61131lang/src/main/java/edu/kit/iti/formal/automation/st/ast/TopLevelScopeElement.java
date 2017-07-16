@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.LocalScope;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by weigl on 13.06.14.
@@ -31,7 +32,7 @@ import edu.kit.iti.formal.automation.scope.LocalScope;
  * @author weigl
  * @version $Id: $Id
  */
-public abstract class TopLevelScopeElement extends TopLevelElement {
+public abstract class TopLevelScopeElement<T extends ParserRuleContext> extends TopLevelElement<T> {
     protected LocalScope localScope = new LocalScope();
 
     /**
@@ -68,12 +69,16 @@ public abstract class TopLevelScopeElement extends TopLevelElement {
         return localScope;
     }
 
+    @Override
+    public abstract TopLevelScopeElement<T> copy();
+
     /**
      * <p>Setter for the field <code>localScope</code>.</p>
      *
      * @param localScope a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
      */
     public void setLocalScope(LocalScope localScope) {
+        assert localScope != null;
         this.localScope = localScope;
     }
 

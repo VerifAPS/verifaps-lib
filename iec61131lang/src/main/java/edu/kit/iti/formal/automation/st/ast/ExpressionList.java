@@ -25,6 +25,9 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -38,217 +41,290 @@ import java.util.stream.Stream;
  * @author weigl
  * @version $Id: $Id
  */
+@NoArgsConstructor
 public class ExpressionList extends Expression
         implements List<Expression> {
     private List<Expression> expressions = new ArrayList<>();
 
-    /** {@inheritDoc} */
+    public ExpressionList(List<Expression> expr) {
+        expressions.addAll(expr);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int size() {
         return expressions.size();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isEmpty() {
         return expressions.isEmpty();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean contains(Object o) {
         return expressions.contains(o);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterator<Expression> iterator() {
         return expressions.iterator();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object[] toArray() {
         return expressions.toArray();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T[] toArray(T[] a) {
         return expressions.toArray(a);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean add(Expression expression) {
         return expressions.add(expression);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean remove(Object o) {
         return expressions.remove(o);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean containsAll(Collection<?> c) {
         return expressions.containsAll(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean addAll(Collection<? extends Expression> c) {
         return expressions.addAll(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean addAll(int index, Collection<? extends Expression> c) {
         return expressions.addAll(index, c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean removeAll(Collection<?> c) {
         return expressions.removeAll(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean retainAll(Collection<?> c) {
         return expressions.retainAll(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void replaceAll(UnaryOperator<Expression> operator) {
         expressions.replaceAll(operator);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sort(Comparator<? super Expression> c) {
         expressions.sort(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void clear() {
         expressions.clear();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         return expressions.equals(o);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return expressions.hashCode();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Expression get(int index) {
         return expressions.get(index);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Expression set(int index, Expression element) {
         return expressions.set(index, element);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void add(int index, Expression element) {
         expressions.add(index, element);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Expression remove(int index) {
         return expressions.remove(index);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int indexOf(Object o) {
         return expressions.indexOf(o);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int lastIndexOf(Object o) {
         return expressions.lastIndexOf(o);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ListIterator<Expression> listIterator() {
         return expressions.listIterator();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ListIterator<Expression> listIterator(int index) {
         return expressions.listIterator(index);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Expression> subList(int fromIndex, int toIndex) {
         return expressions.subList(fromIndex, toIndex);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Spliterator<Expression> spliterator() {
         return expressions.spliterator();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean removeIf(Predicate<? super Expression> filter) {
         return expressions.removeIf(filter);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Stream<Expression> stream() {
         return expressions.stream();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Stream<Expression> parallelStream() {
         return expressions.parallelStream();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void forEach(Consumer<? super Expression> action) {
         expressions.forEach(action);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Any dataType(LocalScope localScope) {
         throw new IllegalStateException("not implemented");
     }
 
-    @Override public ExpressionList clone() {
+    @Override
+    public ExpressionList copy() {
         ExpressionList el = new ExpressionList();
-        forEach(e -> el.add(e.clone()));
+        forEach(e -> el.add(e.copy()));
         return el;
     }
 }

@@ -22,14 +22,13 @@ package edu.kit.iti.formal.automation.st;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.HTMLCodeWriter;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Sections;
 import edu.kit.iti.formal.automation.visitors.Visitable;
+import org.antlr.v4.runtime.Token;
 
 /**
  * Created by weigla on 15.06.2014.
@@ -97,7 +96,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     @Override
     public Object visit(CaseCondition.IntegerCondition integerCondition) {
         sb.div(Sections.CASE_INTEGER_CONDITION);
-        integerCondition.getValue().visit(this);
+        integerCondition.getValue().accept(this);
         sb.end();
         return null;
     }
@@ -110,12 +109,12 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         sb.div(Sections.CASE_ENUM_CONDITION);
         if (enumeration.getStart() == enumeration.getStop()) {
             sb.appendIdent();
-            enumeration.getStart().visit(this);
+            enumeration.getStart().accept(this);
         } else {
             sb.appendIdent();
-            enumeration.getStart().visit(this);
+            enumeration.getStart().accept(this);
             sb.append("..");
-            enumeration.getStop().visit(this);
+            enumeration.getStop().accept(this);
         }
         sb.end();
         return null;
@@ -128,11 +127,11 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     public Object visit(BinaryExpression binaryExpression) {
         sb.div(Sections.BINARY_EXPRESSION);
         sb.append('(');
-        binaryExpression.getLeftExpr().visit(this);
+        binaryExpression.getLeftExpr().accept(this);
         sb.div(Sections.OPERATOR, Sections.KEYWORD);
         sb.append(" ").append(binaryExpression.getOperator().symbol()).append(" ");
         sb.end().end();
-        binaryExpression.getRightExpr().visit(this);
+        binaryExpression.getRightExpr().accept(this);
         sb.append(')');
         sb.end();
         return null;
@@ -144,9 +143,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     @Override
     public Object visit(AssignmentStatement assignStatement) {
         sb.div(Sections.ASSIGNMENT);
-        assignStatement.getLocation().visit(this);
+        assignStatement.getLocation().accept(this);
         sb.operator(":=");
-        assignStatement.getExpression().visit(this);
+        assignStatement.getExpression().accept(this);
         sb.seperator(";").end();
         return null;
     }
@@ -161,8 +160,8 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
 
         sb.div(Sections.TYPE_DECL_DECL).append("(");
 
-        for (String s : enumerationTypeDeclaration.getAllowedValues()) {
-            sb.div(Sections.VALUE).append(s);
+        for (Token s : enumerationTypeDeclaration.getAllowedValues()) {
+            sb.div(Sections.VALUE).append(s.getText());
             sb.end().seperator(",");
         }
 
@@ -177,9 +176,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     @Override
     public Object visit(RepeatStatement repeatStatement) {
         sb.div(Sections.REPEAT).keyword("REPEAT");
-        repeatStatement.getStatements().visit(this);
+        repeatStatement.getStatements().accept(this);
         sb.keyword(" UNTIL ");
-        repeatStatement.getCondition().visit(this);
+        repeatStatement.getCondition().accept(this);
         sb.keyword("END_REPEAT");
         sb.end();
         return null;
@@ -191,9 +190,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     @Override
     public Object visit(WhileStatement whileStatement) {
         sb.div(Sections.WHILE).keyword("WHILE");
-        whileStatement.getCondition().visit(this);
+        whileStatement.getCondition().accept(this);
         sb.keyword(" DO ");
-        whileStatement.getStatements().visit(this);
+        whileStatement.getStatements().accept(this);
         sb.keyword("END_WHILE");
         sb.end();
         return null;
@@ -207,7 +206,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         sb.div(Sections.UNARY_EXPRESSION, Sections.OPERATOR)
                 .append(unaryExpression.getOperator().symbol());
         sb.end().append(" ");
-        unaryExpression.getExpression().visit(this);
+        unaryExpression.getExpression().accept(this);
         sb.end();
         return null;
     }
@@ -219,7 +218,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     public Object visit(TypeDeclarations typeDeclarations) {
         sb.div(Sections.TYPE_DECL).keyword("TYPE");
         for (TypeDeclaration decl : typeDeclarations) {
-            decl.visit(this);
+            decl.accept(this);
         }
         sb.keyword("END_TYPE");
         sb.end();
@@ -232,10 +231,10 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     @Override
     public Object visit(CaseStatement caseStatement) {
         sb.div(Sections.CASE_STATEMENT).keyword("CASE");
-        caseStatement.getExpression().visit(this);
+        caseStatement.getExpression().accept(this);
         sb.keyword(" OF ");
         for (CaseStatement.Case c : caseStatement.getCases()) {
-            c.visit(this);
+            c.accept(this);
         }
         sb.keyword("END_CASE");
         sb.end();
@@ -255,7 +254,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
 
 			sb.div(Sections.SUBSCRIPT).append('[');
 			for (Expression expr : symbolicReference.getSubscripts()) {
-				expr.visit(this);
+				expr.accept(this);
 				sb.append(',');
 			}
 			sb.append(']');
@@ -264,7 +263,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
 
 		if (symbolicReference.getSub() != null) {
 			sb.append(".");
-			symbolicReference.getSub().visit(this);
+			symbolicReference.getSub().accept(this);
 		}*/
         return null;
     }
@@ -280,7 +279,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
                 sb.append("{*ERROR: stmt null*}");
             } else {
                 sb.div(Sections.STATEMENT);
-                stmt.visit(this);
+                stmt.accept(this);
                 sb.end();
             }
         }
@@ -297,9 +296,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         sb.div(Sections.VARIABLE).append(programDeclaration.getProgramName());
         sb.end().append('\n');
 
-        programDeclaration.getLocalScope().visit(this);
+        programDeclaration.getLocalScope().accept(this);
 
-        programDeclaration.getProgramBody().visit(this);
+        programDeclaration.getProgramBody().accept(this);
         sb.keyword("END_PROGRAM");
         sb.end();
         return null;
@@ -307,14 +306,13 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
 
     /**
      * {@inheritDoc}
-     */
-    @Override
-    public Object visit(ScalarValue<? extends Any, ?> tsScalarValue) {
-        sb.div(Sections.VALUE).span(tsScalarValue.getDataType().getName())
-                .append(tsScalarValue.getDataType().repr(tsScalarValue.getValue()));
-        sb.end().end();
-        return null;
-    }
+     *
+     @Override public Object visit(ScalarValue<? extends Any, ?> tsScalarValue) {
+     sb.div(Sections.VALUE).span(tsScalarValue.getDataType().getName())
+     .append(tsScalarValue.getDataType().repr(tsScalarValue.getValue()));
+     sb.end().end();
+     return null;
+     }*/
 
     /**
      * {@inheritDoc}
@@ -323,7 +321,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     public Object visit(ExpressionList expressions) {
         sb.append(Sections.EXPRESSION_LIST);
         for (Expression e : expressions) {
-            e.visit(this);
+            e.accept(this);
             sb.seperator(",");
         }
         sb.deleteLastSeparator().end();
@@ -340,7 +338,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
 
         boolean params = false;
         for (Expression entry : functionCall.getParameters()) {
-            entry.visit(this);
+            entry.accept(this);
             sb.seperator(",");
             params = true;
         }
@@ -360,11 +358,11 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         sb.keyword("FOR");
         sb.variable(forStatement.getVariable());
         sb.append(" := ");
-        forStatement.getStart().visit(this);
+        forStatement.getStart().accept(this);
         sb.keyword("TO");
-        forStatement.getStop().visit(this);
+        forStatement.getStop().accept(this);
         sb.keyword("DO");
-        forStatement.getStatements().visit(this);
+        forStatement.getStatements().accept(this);
         sb.decreaseIndent().nl();
         sb.append("END_FOR");
         sb.end();
@@ -378,9 +376,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
         sb.div(Sections.FB).keyword("FUNCTION_BLOCK ").variable(functionBlockDeclaration.getFunctionBlockName());
 
-        functionBlockDeclaration.getLocalScope().visit(this);
+        functionBlockDeclaration.getLocalScope().accept(this);
 
-        functionBlockDeclaration.getFunctionBody().visit(this);
+        functionBlockDeclaration.getFunctionBody().accept(this);
         sb.keyword("END_FUNCTION_BLOCK").ts().end();
         return null;
     }
@@ -407,16 +405,16 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
             else
                 sb.keyword("ELSIF");
 
-            ifStatement.getConditionalBranches().get(i).getCondition().visit(this);
+            ifStatement.getConditionalBranches().get(i).getCondition().accept(this);
             sb.keyword("THEN");
             sb.div("thenblock");
-            ifStatement.getConditionalBranches().get(i).getStatements().visit(this);
+            ifStatement.getConditionalBranches().get(i).getStatements().accept(this);
             sb.end();
         }
 
         if (ifStatement.getElseBranch().size() > 0) {
             sb.keyword("ELSE");
-            ifStatement.getElseBranch().visit(this);
+            ifStatement.getElseBranch().accept(this);
         }
         sb.keyword("END_IF").ts().end();
         return null;
@@ -430,7 +428,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         sb.div(Sections.FB_CALL);
         sb.append(fbc.getFunctionBlockName())
                 .append("(");
-        for (FunctionBlockCallStatement.Parameter p :fbc.getParameters()) {
+        for (FunctionBlockCallStatement.Parameter p : fbc.getParameters()) {
             //TODO
         }
         sb.end();
@@ -444,13 +442,13 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     public Object visit(CaseStatement.Case aCase) {
         sb.div(Sections.CASE);
         for (CaseCondition cc : aCase.getConditions()) {
-            cc.visit(this);
+            cc.accept(this);
             sb.seperator(",");
         }
         sb.deleteLastSeparator();
         sb.seperator(":");
 
-        aCase.getStatements().visit(this);
+        aCase.getStatements().accept(this);
         sb.end();
         return null;
     }
@@ -463,7 +461,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         sb.div(Sections.TYPE_DECL_SIMPLE).type(simpleTypeDeclaration.getBaseTypeName());
         if (simpleTypeDeclaration.getInitialization() != null) {
             sb.operator(" := ");
-            simpleTypeDeclaration.getInitialization().visit(this);
+            simpleTypeDeclaration.getInitialization().accept(this);
         }
         sb.end();
         return null;
@@ -509,7 +507,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
 
             if (vd.getInit() != null) {
                 sb.operator(" := ");
-                vd.getInit().visit(this);
+                vd.getInit().accept(this);
             }
 
             sb.keyword("END_VAR").end();

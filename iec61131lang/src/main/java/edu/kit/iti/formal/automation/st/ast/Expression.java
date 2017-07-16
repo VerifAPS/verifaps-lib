@@ -40,11 +40,12 @@ public abstract class Expression extends Top {
      * @param localScope a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      * @throws edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException if any.
-     * @throws edu.kit.iti.formal.automation.exceptions.TypeConformityException if any.
+     * @throws edu.kit.iti.formal.automation.exceptions.TypeConformityException     if any.
      */
     public abstract Any dataType(LocalScope localScope)
             throws VariableNotDefinedException,
             TypeConformityException;
 
-    @Override public abstract Expression clone();
+    @Override
+    public abstract Expression copy();
 }

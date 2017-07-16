@@ -47,7 +47,7 @@ public class SymbolicExecutionerSSA extends SymbolicExecutioner {
         // save
         int c = counter.getOrDefault(var, 0);
         SVariable v = new SVariable(var + "__" + c + "_", null);
-        definitions.put(v, assign.getExpression().visit(this));
+        definitions.put(v, assign.getExpression().accept(this));
         s.put(var, v);
         counter.put(var, ++c);
         return null;

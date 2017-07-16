@@ -25,9 +25,10 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.IECString;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * Created by weigl on 13.06.14.
@@ -35,26 +36,11 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
-public class StringTypeDeclaration extends TypeDeclaration<ScalarValue<? extends IECString, String>> {
-    private ScalarValue<? extends AnyInt, Long> size;
+@Data
+@ToString
+public class StringTypeDeclaration extends TypeDeclaration<Literal> {
+    private Literal size;
 
-    /**
-     * <p>Getter for the field <code>size</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
-     */
-    public ScalarValue<? extends AnyInt, Long> getSize() {
-        return size;
-    }
-
-    /**
-     * <p>Setter for the field <code>size</code>.</p>
-     *
-     * @param size a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
-     */
-    public void setSize(ScalarValue<? extends AnyInt, Long> size) {
-        this.size = size;
-    }
 
     /** {@inheritDoc} */
     @Override
@@ -64,19 +50,19 @@ public class StringTypeDeclaration extends TypeDeclaration<ScalarValue<? extends
         return getBaseType();
     }
 
-    @Override public StringTypeDeclaration clone() {
+    @Override public StringTypeDeclaration copy() {
         StringTypeDeclaration t = new StringTypeDeclaration();
-        t.initialization = initialization.clone();
+        t.initialization = initialization.copy();
         t.typeName = typeName;
         t.baseType = baseType;
         t.baseTypeName = baseTypeName;
-        t.size = size.clone();
+        t.size = size.copy();
         return t;
     }
 
     /** {@inheritDoc} */
     @Override
-    public <S> S visit(Visitor<S> visitor) {
+    public <S> S accept(Visitor<S> visitor) {
         return visitor.visit(this);
     }
 }

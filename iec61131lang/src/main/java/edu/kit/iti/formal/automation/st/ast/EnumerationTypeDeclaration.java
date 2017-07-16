@@ -22,14 +22,20 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.ValueFactory;
 import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.datatypes.values.Value;
+import edu.kit.iti.formal.automation.datatypes.values.Values;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import org.antlr.v4.runtime.Token;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by weigl on 13.06.14.
@@ -37,10 +43,11 @@ import java.util.*;
  * @author weigl
  * @version $Id: $Id
  */
-public class EnumerationTypeDeclaration extends TypeDeclaration<ScalarValue<EnumerateType, ?>> {
-    private List<String> allowedValues = new LinkedList<>();
-    private Map<String, ScalarValue<? extends AnyInt, Long>> values = new HashMap<>();
-    private int counter = 0;
+@EqualsAndHashCode
+public class EnumerationTypeDeclaration extends TypeDeclaration<Literal> {
+    private List<Token> allowedValues = new LinkedList<>();
+    private List<Integer> values = new ArrayList<>();
+    private Integer counter = 0;
 
     /**
      * <p>Constructor for EnumerationTypeDeclaration.</p>
@@ -49,78 +56,66 @@ public class EnumerationTypeDeclaration extends TypeDeclaration<ScalarValue<Enum
         setBaseTypeName("ENUM");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public <S> S visit(Visitor<S> visitor) {
+    public <S> S accept(Visitor<S> visitor) {
         return visitor.visit(this);
     }
 
-    /**
-     * <p>addValue.</p>
-     *
-     * @param text a {@link java.lang.String} object.
-     */
-    public void addValue(String text) {
+    public void addValue(Token text) {
         allowedValues.add(text);
-        values.put(text, ValueFactory.makeUInt(counter));
-        counter++;
+        values.add(counter);
+        counter += 1;
     }
 
-    /**
-     * <p>Getter for the field <code>allowedValues</code>.</p>
-     *
-     * @return a {@link java.util.List} object.
-     */
-    public List<String> getAllowedValues() {
+    public List<Token> getAllowedValues() {
         return allowedValues;
     }
 
-    /**
-     * <p>Setter for the field <code>allowedValues</code>.</p>
-     *
-     * @param allowedValues a {@link java.util.List} object.
-     */
-    public void setAllowedValues(List<String> allowedValues) {
+    public void setAllowedValues(List<Token> allowedValues) {
         this.allowedValues = allowedValues;
     }
 
-    /** {@inheritDoc} */
     @Override
     public EnumerateType getDataType(GlobalScope globalScope) {
-        String init = allowedValues.get(0);
-        if (initialization != null && initialization.getValue() != null) {
-            if (initialization.getValue() instanceof String) {
-                String value = (String) initialization.getValue();
-                init = value;
-            } else if (initialization.getValue() instanceof Integer) {
-                Integer value = (Integer) initialization.getValue();
-                init = allowedValues.get(value);
+        //TODO rework
+        String init = allowedValues.get(0).getText();
+        if (initialization != null) {
+            if (initialization.getDataType() instanceof EnumerateType) {
+                Value value = (Value) initialization.asValue();
+                //init = value;
+            } else if (initialization.getDataType() instanceof AnyInt) {
+                Values.VAnyInt value = (Values.VAnyInt) initialization.asValue();
+                //init = allowedValues.get(value);
             }
         }
 
-        EnumerateType et = new EnumerateType(getTypeName(), allowedValues, init);
+        EnumerateType et = new EnumerateType(getTypeName(),
+                allowedValues.stream().map(Token::getText).collect(Collectors.toList()),
+                init);
         setBaseType(et);
         return et;
     }
 
-    @Override public EnumerationTypeDeclaration clone() {
+
+    @Override
+    public EnumerationTypeDeclaration copy() {
         EnumerationTypeDeclaration etd = new EnumerationTypeDeclaration();
         etd.allowedValues = new ArrayList<>(allowedValues);
         etd.counter = counter;
         etd.baseType = baseType;
         etd.baseTypeName = baseTypeName;
-        etd.values = new HashMap<>(values);
+        etd.values = new ArrayList<>(values);
         etd.typeName = typeName;
         return etd;
     }
 
-    /**
-     * <p>setInt.</p>
-     *
-     * @param val a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
-     */
-    public void setInt(ScalarValue<? extends AnyInt, Long> val) {
-        values.put(allowedValues.get(allowedValues.size() - 1), val);
-        counter = (int) (val.getValue() + 1);
+
+    public void setInt(Literal val) {
+        Values.VAnyInt v = (Values.VAnyInt) val.asValue();
+        values.set(values.size() - 1, v.getValue().intValue());
+        counter = v.getValue().intValue() + 1;
     }
 }

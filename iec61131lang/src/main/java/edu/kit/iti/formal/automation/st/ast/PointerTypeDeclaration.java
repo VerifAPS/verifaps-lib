@@ -24,7 +24,6 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.datatypes.PointerType;
 import edu.kit.iti.formal.automation.datatypes.values.PointerValue;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
@@ -36,7 +35,7 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @version $Id: $Id
  */
 public class PointerTypeDeclaration
-        extends TypeDeclaration<ScalarValue<PointerType, PointerValue>> {
+        extends TypeDeclaration<Literal> {
     /**
      * <p>Constructor for PointerTypeDeclaration.</p>
      *
@@ -49,7 +48,8 @@ public class PointerTypeDeclaration
     /**
      * {@inheritDoc}
      */
-    @Override public PointerType getDataType(GlobalScope globalScope) {
+    @Override
+    public PointerType getDataType(GlobalScope globalScope) {
         PointerType pt = new PointerType(super.getDataType(globalScope));
         baseType = pt;
         return pt;
@@ -58,11 +58,12 @@ public class PointerTypeDeclaration
     /**
      * {@inheritDoc}
      */
-    @Override public <S> S visit(Visitor<S> visitor) {
+    @Override
+    public <S> S accept(Visitor<S> visitor) {
         return visitor.visit(this);
     }
 
-    public PointerTypeDeclaration clone() {
+    public PointerTypeDeclaration copy() {
         PointerTypeDeclaration pt = new PointerTypeDeclaration(
                 getBaseTypeName());
         return pt;

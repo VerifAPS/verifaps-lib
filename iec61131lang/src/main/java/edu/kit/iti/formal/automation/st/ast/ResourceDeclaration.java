@@ -32,18 +32,23 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  */
 public class ResourceDeclaration extends TopLevelScopeElement {
 
-    /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
-    @Override public String getIdentifier() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getIdentifier() {
         return "<resource>";
     }
 
-    @Override public TopLevelElement clone() {
+    @Override
+    public ResourceDeclaration copy() {
         return new ResourceDeclaration();
     }
 }

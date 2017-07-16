@@ -22,15 +22,16 @@ package edu.kit.iti.formal.automation.st;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
-import edu.kit.iti.formal.automation.datatypes.*;
+import edu.kit.iti.formal.automation.datatypes.IECArray;
+import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.operators.Operator;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
-import edu.kit.iti.formal.automation.st.util.CodeWriter;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.util.CodeWriter;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
+import org.antlr.v4.runtime.Token;
 
 /**
  * Created by weigla on 15.06.2014.
@@ -39,6 +40,62 @@ import edu.kit.iti.formal.automation.visitors.Visitable;
  * @version $Id: $Id
  */
 public class StructuredTextPrinter extends DefaultVisitor<Object> {
+    /**
+     * Constant <code>SL_ST</code>
+     */
+    public static StringLiterals SL_ST = StringLiterals.create();
+    /**
+     * Constant <code>SL_SMV</code>
+     */
+    public static StringLiterals SL_SMV = new StringLiterals() {
+        @Override
+        public String operator(UnaryOperator operator) {
+            /*switch (operator) {
+                case MINUS:
+                    return "-";
+                case NEGATE:
+                    return "!";
+            }*/
+            return "<<unknown ue operator>>";
+        }
+
+        @Override
+        public String operator(Operator operator) {
+            /*switch (operator) {
+                case AND:
+                    return "&";
+                case OR:
+                    return "|";
+                case XOR:
+                    return "xor";
+                case NOT_EQUALS:
+                    return "!=";
+            }*/
+            return operator.symbol();
+        }
+
+        /*
+        @Override
+        public String repr(ScalarValue<? extends Any, ?> sv) {
+            if (sv.getDataType() instanceof AnyUnsignedInt) {
+                AnyInt dataType = (AnyInt) sv.getDataType();
+                return String.format("0ud%d_%d", 13, sv.getValue());
+            }
+
+            if (sv.getDataType() instanceof AnySignedInt) {
+                AnyInt dataType = (AnyInt) sv.getDataType();
+                return String.format("0sd%d_%d", 14, sv.getValue());
+            }
+
+            if (sv.getDataType() instanceof EnumerateType) {
+                EnumerateType dataType = (EnumerateType) sv.getDataType();
+                return sv.getValue().toString();
+            }
+
+            return super.repr(sv);
+        }
+        */
+    };
     private final StringLiterals literals;
     public CodeWriter sb = new CodeWriter();
     private boolean printComments;
@@ -77,7 +134,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         this.printComments = printComments;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object defaultVisit(Visitable visitable) {
         throw new IllegalArgumentException("not implemented: " + visitable.getClass());
@@ -92,73 +151,86 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return sb.toString();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ExitStatement exitStatement) {
         sb.append(literals.exit()).append(literals.statement_separator());
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseCondition.IntegerCondition integerCondition) {
         sb.appendIdent();
-        integerCondition.getValue().visit(this);
+        integerCondition.getValue().accept(this);
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseCondition.Enumeration enumeration) {
         if (enumeration.getStart() == enumeration.getStop()) {
-            enumeration.getStart().visit(this);
+            enumeration.getStart().accept(this);
         } else {
-            enumeration.getStart().visit(this);
+            enumeration.getStart().accept(this);
             sb.append("..");
-            enumeration.getStop().visit(this);
+            enumeration.getStop().accept(this);
         }
 
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(BinaryExpression binaryExpression) {
         sb.append('(');
-        binaryExpression.getLeftExpr().visit(this);
+        binaryExpression.getLeftExpr().accept(this);
         sb.append(" ").append(literals.operator(binaryExpression.getOperator())).append(" ");
-        binaryExpression.getRightExpr().visit(this);
+        binaryExpression.getRightExpr().accept(this);
         sb.append(')');
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(AssignmentStatement assignStatement) {
         sb.nl();
-        assignStatement.getLocation().visit(this);
+        assignStatement.getLocation().accept(this);
         sb.append(literals.assign());
-        assignStatement.getExpression().visit(this);
+        assignStatement.getExpression().accept(this);
         sb.append(";");
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ConfigurationDeclaration configurationDeclaration) {
         return null;
     }
 
-
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(EnumerationTypeDeclaration enumerationTypeDeclaration) {
         sb.nl().append(enumerationTypeDeclaration.getTypeName()).append(" : ");
 
         sb.append("(");
 
-        for (String s : enumerationTypeDeclaration.getAllowedValues())
-            sb.append(s).append(" , ");
+        for (Token s : enumerationTypeDeclaration.getAllowedValues())
+            sb.append(s.getText()).append(" , ");
 
         sb.deleteLast(3);
         sb.append(");");
@@ -166,79 +238,88 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(RepeatStatement repeatStatement) {
         sb.nl();
         sb.append("REPEAT").increaseIndent();
-        repeatStatement.getStatements().visit(this);
+        repeatStatement.getStatements().accept(this);
 
         sb.decreaseIndent().nl().append("UNTIL ");
-        repeatStatement.getCondition().visit(this);
+        repeatStatement.getCondition().accept(this);
         sb.append("END_REPEAT");
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(WhileStatement whileStatement) {
         sb.nl();
         sb.append("WHILE ");
-        whileStatement.getCondition().visit(this);
+        whileStatement.getCondition().accept(this);
         sb.append(" DO ").increaseIndent();
-        whileStatement.getStatements().visit(this);
+        whileStatement.getStatements().accept(this);
         sb.decreaseIndent().nl();
         sb.append("END_WHILE");
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(UnaryExpression unaryExpression) {
         sb.append(literals.operator(unaryExpression.getOperator())).append(" ");
-        unaryExpression.getExpression().visit(this);
+        unaryExpression.getExpression().accept(this);
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(TypeDeclarations typeDeclarations) {
 
         if (typeDeclarations.size() > 0) {
             sb.append("TYPE").increaseIndent();
             for (TypeDeclaration decl : typeDeclarations) {
-                decl.visit(this);
+                decl.accept(this);
             }
             sb.decreaseIndent().nl().append("END_TYPE").nl().nl();
         }
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseStatement caseStatement) {
 
         sb.nl().append("CASE ");
-        caseStatement.getExpression().visit(this);
+        caseStatement.getExpression().accept(this);
         sb.append(" OF ").increaseIndent();
 
         for (CaseStatement.Case c : caseStatement.getCases()) {
-            c.visit(this);
+            c.accept(this);
             sb.nl();
         }
 
         if (caseStatement.getElseCase().size() > 0) {
             sb.nl().append("ELSE ");
-            caseStatement.getElseCase().visit(this);
+            caseStatement.getElseCase().accept(this);
         }
 
         sb.nl().decreaseIndent().appendIdent().append("END_CASE;");
         return null;
     }
 
-
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param symbolicReference a {@link edu.kit.iti.formal.automation.st.ast.SymbolicReference} object.
      * @return a {@link java.lang.Object} object.
@@ -249,7 +330,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         if (symbolicReference.getSubscripts() != null && !symbolicReference.getSubscripts().isEmpty()) {
             sb.append('[');
             for (Expression expr : symbolicReference.getSubscripts()) {
-                expr.visit(this);
+                expr.accept(this);
                 sb.append(',');
             }
             sb.deleteLast();
@@ -258,56 +339,74 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
         if (symbolicReference.getSub() != null) {
             sb.append(".");
-            //symbolicReference.getSub().visit(this);
+            //symbolicReference.getSub().accept(this);
         }
 
         return null;
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritDoc} *
+     @Override public Object visit(ScalarValue<? extends Any, ?> tsScalarValue) {
+     sb.append(literals.repr(tsScalarValue));
+     return null;
+     }*/
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(StatementList statements) {
         for (Statement stmt : statements) {
             if (stmt == null) {
                 sb.append("{*ERROR: stmt null*}");
             } else {
-                stmt.visit(this);
+                stmt.accept(this);
             }
         }
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
         sb.append("PROGRAM ").append(programDeclaration.getProgramName()).append('\n');
 
-        programDeclaration.getLocalScope().visit(this);
+        programDeclaration.getLocalScope().accept(this);
 
-        programDeclaration.getProgramBody().visit(this);
+        programDeclaration.getProgramBody().accept(this);
         sb.decreaseIndent().nl().append("END_PROGRAM").nl();
         return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Object visit(ScalarValue<? extends Any, ?> tsScalarValue) {
-        sb.append(literals.repr(tsScalarValue));
-        return null;
-    }
+    /*
+     * TODO to new ast visitor
+     *
+     * @Override public Object accept(CaseExpression caseExpression) {
+     * sb.append("CASES(").increaseIndent(); for (CaseExpression.Case cas :
+     * caseExpression.getCases()) { cas.getCondition().accept(this); sb.append(
+     * " -> "); cas.getExpression().accept(this); sb.append(";").nl(); }
+     * sb.append("ELSE -> "); caseExpression.getElseExpression().accept(this);
+     * sb.append(")").decreaseIndent(); return null; }
+     */
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ExpressionList expressions) {
         for (Expression e : expressions) {
-            e.visit(this);
+            e.accept(this);
             sb.append(", ");
         }
         sb.deleteLast(2);
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(FunctionCall functionCall) {
         // TODO
@@ -315,47 +414,43 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /*
-     * TODO to new ast visitor
-     *
-     * @Override public Object visit(CaseExpression caseExpression) {
-     * sb.append("CASES(").increaseIndent(); for (CaseExpression.Case cas :
-     * caseExpression.getCases()) { cas.getCondition().visit(this); sb.append(
-     * " -> "); cas.getExpression().visit(this); sb.append(";").nl(); }
-     * sb.append("ELSE -> "); caseExpression.getElseExpression().visit(this);
-     * sb.append(")").decreaseIndent(); return null; }
+    /**
+     * {@inheritDoc}
      */
-    /** {@inheritDoc} */
     @Override
     public Object visit(ForStatement forStatement) {
         sb.nl();
         sb.append("FOR ").append(forStatement.getVariable());
         sb.append(" := ");
-        forStatement.getStart().visit(this);
+        forStatement.getStart().accept(this);
         sb.append(" TO ");
-        forStatement.getStop().visit(this);
+        forStatement.getStop().accept(this);
         sb.append(" DO ").increaseIndent();
-        forStatement.getStatements().visit(this);
+        forStatement.getStatements().accept(this);
         sb.decreaseIndent().nl();
         sb.append("END_FOR");
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
         sb.append("FUNCTION_BLOCK ").append(functionBlockDeclaration.getFunctionBlockName()).increaseIndent();
 
-        functionBlockDeclaration.getLocalScope().visit(this);
+        functionBlockDeclaration.getLocalScope().accept(this);
 
         sb.nl();
 
-        functionBlockDeclaration.getFunctionBody().visit(this);
+        functionBlockDeclaration.getFunctionBody().accept(this);
         sb.decreaseIndent().nl().append("END_FUNCTION_BLOCK").nl().nl();
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(ReturnStatement returnStatement) {
         sb.appendIdent();
@@ -363,7 +458,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(IfStatement ifStatement) {
         for (int i = 0; i < ifStatement.getConditionalBranches().size(); i++) {
@@ -374,23 +471,25 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
             else
                 sb.append("ELSEIF ");
 
-            ifStatement.getConditionalBranches().get(i).getCondition().visit(this);
+            ifStatement.getConditionalBranches().get(i).getCondition().accept(this);
 
             sb.append(" THEN").increaseIndent();
-            ifStatement.getConditionalBranches().get(i).getStatements().visit(this);
+            ifStatement.getConditionalBranches().get(i).getStatements().accept(this);
             sb.decreaseIndent();
         }
 
         if (ifStatement.getElseBranch().size() > 0) {
             sb.nl().append("ELSE").increaseIndent();
-            ifStatement.getElseBranch().visit(this);
+            ifStatement.getElseBranch().accept(this);
             sb.decreaseIndent();
         }
         sb.nl().append("END_IF;");
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(FunctionBlockCallStatement fbc) {
         sb.nl();
@@ -406,7 +505,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
                     sb.append(" := ");
             }
 
-            entry.getExpression().visit(this);
+            entry.getExpression().accept(this);
             sb.append(", ");
             params = true;
         }
@@ -417,34 +516,40 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CaseStatement.Case aCase) {
         sb.nl();
         for (CaseCondition cc : aCase.getConditions()) {
-            cc.visit(this);
+            cc.accept(this);
             sb.append(", ");
         }
         sb.deleteLast(2);
         sb.append(":");
         sb.increaseIndent();
-        aCase.getStatements().visit(this);
+        aCase.getStatements().accept(this);
         sb.decreaseIndent();
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(SimpleTypeDeclaration simpleTypeDeclaration) {
         sb.append(simpleTypeDeclaration.getBaseTypeName());
         if (simpleTypeDeclaration.getInitialization() != null) {
             sb.append(" := ");
-            simpleTypeDeclaration.getInitialization().visit(this);
+            simpleTypeDeclaration.getInitialization().accept(this);
         }
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(LocalScope localScope) {
         for (VariableDeclaration vd : localScope.getLocalVariables().values()) {
@@ -482,13 +587,13 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
             if (vd.getInit() != null) {
                 sb.append(" := ");
-                vd.getInit().visit(this);
+                vd.getInit().accept(this);
             }
 
             sb.append("; END_VAR ");
 
 			/*sb.append("{*")
-					.append((vd.isInput() ? "I" : "") + (vd.isOutput() ? "O" : "") + (vd.isLocal() ? "L" : "")
+                    .append((vd.isInput() ? "I" : "") + (vd.isOutput() ? "O" : "") + (vd.isLocal() ? "L" : "")
 							+ (vd.is(READED) ? "R" : "r") + (vd.is(WRITTEN_TO) ? "W" : "w")
 							+ (vd.is(WRITE_BEFORE_READ) ? "X" : "x")
 							+ (vd.is(STSimplifier.PROGRAM_VARIABLE) ? "P" : "p"))
@@ -502,9 +607,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
             IECArray dataType = (IECArray) vd.getDataType();
             sb.append(" ARRAY[");
             for (Range range : dataType.getRanges()) {
-                range.getStart().visit(this);
+                range.getStart().accept(this);
                 sb.append("..");
-                range.getStop().visit(this);
+                range.getStop().accept(this);
                 sb.append(",");
             }
             sb.deleteLast();
@@ -514,7 +619,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object visit(CommentStatement commentStatement) {
         if (printComments) {
@@ -532,6 +639,15 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
      */
     public void clear() {
         sb = new CodeWriter();
+    }
+
+    /**
+     * <p>setCodeWriter.</p>
+     *
+     * @param cw a {@link edu.kit.iti.formal.automation.st.util.CodeWriter} object.
+     */
+    public void setCodeWriter(CodeWriter cw) {
+        this.sb = cw;
     }
 
     public static class StringLiterals {
@@ -568,68 +684,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
             return "(* ";
         }
 
-        public String repr(ScalarValue<? extends Any, ?> sv) {
+        public String repr(Value sv) {
             return sv.getDataType().repr(sv.getValue());
         }
-    }
 
-    /** Constant <code>SL_ST</code> */
-    public static StringLiterals SL_ST = StringLiterals.create();
-    /** Constant <code>SL_SMV</code> */
-    public static StringLiterals SL_SMV = new StringLiterals() {
-        @Override
-        public String operator(UnaryOperator operator) {
-            /*switch (operator) {
-                case MINUS:
-                    return "-";
-                case NEGATE:
-                    return "!";
-            }*/
-            return "<<unknown ue operator>>";
-        }
-
-        @Override
-        public String operator(Operator operator) {
-            /*switch (operator) {
-                case AND:
-                    return "&";
-                case OR:
-                    return "|";
-                case XOR:
-                    return "xor";
-                case NOT_EQUALS:
-                    return "!=";
-            }*/
-            return operator.symbol();
-        }
-
-        @Override
-        public String repr(ScalarValue<? extends Any, ?> sv) {
-            if (sv.getDataType() instanceof AnyUInt) {
-                AnyInt dataType = (AnyInt) sv.getDataType();
-                return String.format("0ud%d_%d", 13, sv.getValue());
-            }
-
-            if (sv.getDataType() instanceof AnySignedInt) {
-                AnyInt dataType = (AnyInt) sv.getDataType();
-                return String.format("0sd%d_%d", 14, sv.getValue());
-            }
-
-            if (sv.getDataType() instanceof EnumerateType) {
-                EnumerateType dataType = (EnumerateType) sv.getDataType();
-                return sv.getValue().toString();
-            }
-
-            return super.repr(sv);
-        }
-    };
-
-    /**
-     * <p>setCodeWriter.</p>
-     *
-     * @param cw a {@link edu.kit.iti.formal.automation.st.util.CodeWriter} object.
-     */
-    public void setCodeWriter(CodeWriter cw) {
-        this.sb = cw;
     }
 }

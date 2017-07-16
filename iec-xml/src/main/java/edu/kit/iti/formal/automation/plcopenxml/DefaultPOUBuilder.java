@@ -23,12 +23,11 @@ package edu.kit.iti.formal.automation.plcopenxml;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.st.ast.Literal;
 import edu.kit.iti.formal.automation.st.ast.VariableBuilder;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import org.jdom2.Element;
-import org.jdom2.xpath.XPathFactory;
 
 
 /**
@@ -66,7 +65,7 @@ public abstract class DefaultPOUBuilder implements PCLOpenXMLBuilder.Builder {
         for (Element e : vars.getChildren("variable")) {
             String name = e.getAttributeValue("name");
             String datatype = getDatatype(e.getChild("type"));
-            ScalarValue<?, ?> initValue = getInitialValue(e.getChild("initialValue"));
+            Literal initValue = getInitialValue(e.getChild("initialValue"));
             builder.identifiers(name)
                     .setInitialization(initValue)
                     .setBaseType(datatype)
@@ -84,7 +83,7 @@ public abstract class DefaultPOUBuilder implements PCLOpenXMLBuilder.Builder {
     }
 
 
-    private ScalarValue<?, ?> getInitialValue(Element initialValue) {
+    private Literal getInitialValue(Element initialValue) {
         if (initialValue == null)
             return null;
 
@@ -92,7 +91,7 @@ public abstract class DefaultPOUBuilder implements PCLOpenXMLBuilder.Builder {
         if (simpleValue == null)
             return null;
 
-        return (ScalarValue<?, ?>) IEC61131Facade.expr(simpleValue.getAttributeValue("value"));
+        return (Literal) IEC61131Facade.expr(simpleValue.getAttributeValue("value"));
     }
 
 }

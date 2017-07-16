@@ -22,8 +22,8 @@ package edu.kit.iti.formal.automation.scope;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.ValueFactory;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.DataTypes;
 import edu.kit.iti.formal.automation.datatypes.promotion.DefaultTypePromoter;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
@@ -39,7 +39,9 @@ import java.util.stream.Collectors;
  * @version $Id: $Id
  */
 public class FunctionResolverMUX implements FunctionResolver {
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FunctionDeclaration resolve(FunctionCall call, LocalScope scope) {
         if ("MUX".equals(call.getFunctionName())) {
@@ -68,7 +70,7 @@ public class FunctionResolverMUX implements FunctionResolver {
         public MUXFunctionDeclaration(List<Any> call) {
             super();
             CaseStatement stmt = new CaseStatement();
-            returnType = call.get(1);
+            returnType.setIdentifiedObject(call.get(1));
             DefaultTypePromoter dtp = new DefaultTypePromoter();
             for (int i = 0; i < call.size(); i++) {
                 localScope.add(new VariableDeclaration("a" + i,
@@ -76,7 +78,9 @@ public class FunctionResolverMUX implements FunctionResolver {
 
                 if (i > 0) {
                     stmt.addCase(createCase(i));
-                    returnType = dtp.getPromotion(returnType,call.get(i));
+                    returnType.setIdentifiedObject(dtp.getPromotion(
+                            returnType.getIdentifiedObject(),
+                            call.get(i)));
                 }
             }
             statements.add(stmt);
@@ -85,8 +89,9 @@ public class FunctionResolverMUX implements FunctionResolver {
         private static CaseStatement.Case createCase(int i) {
             CaseStatement.Case c = new CaseStatement.Case();
             c.addCondition(new CaseCondition.IntegerCondition(
-                    ValueFactory.makeInt(i)));
-            c.getStatements().add(new AssignmentStatement(new SymbolicReference("MUX"), new SymbolicReference("a" + i)));
+                    new Literal(DataTypes.INT, "" + i)));
+            c.getStatements().add(new AssignmentStatement(new SymbolicReference("MUX"),
+                    new SymbolicReference("a" + i)));
             return c;
         }
     }

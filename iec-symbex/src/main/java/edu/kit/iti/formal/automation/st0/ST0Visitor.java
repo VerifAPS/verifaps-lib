@@ -23,7 +23,6 @@ package edu.kit.iti.formal.automation.st0;
  */
 
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 
@@ -53,7 +52,7 @@ public abstract class ST0Visitor<T> extends DefaultVisitor<T> {
     }
 
     @Override
-    public T visit(ScalarValue<? extends Any, ?> tsScalarValue) {
+    public T visit(Literal tsScalarValue) {
         return super.visit(tsScalarValue);
     }
 

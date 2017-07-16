@@ -80,6 +80,6 @@ public class ExpressionReplacer extends AstVisitor<Object> {
     }
 
     public Collection<? extends Statement> replace() {
-        return (StatementList) getStatements().visit(this);
+        return (StatementList) getStatements().accept(this);
     }
 }

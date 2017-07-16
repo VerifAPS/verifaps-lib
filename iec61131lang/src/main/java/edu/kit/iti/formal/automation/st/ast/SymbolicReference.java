@@ -25,7 +25,11 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Created by weigl on 11.06.14.
@@ -33,6 +37,9 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
+@Data
+@EqualsAndHashCode
+@ToString
 public class SymbolicReference extends Reference {
     private String identifier;
     private ExpressionList subscripts;
@@ -146,39 +153,6 @@ public class SymbolicReference extends Reference {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof SymbolicReference))
-            return false;
-
-        SymbolicReference that = (SymbolicReference) o;
-
-        if (!identifier.equals(that.identifier))
-            return false;
-        if (sub != null ? !sub.equals(that.sub) : that.sub != null)
-            return false;
-        if (subscripts != null ?
-                !subscripts.equals(that.subscripts) :
-                that.subscripts != null)
-            return false;
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override public int hashCode() {
-        int result = identifier.hashCode();
-        result = 31 * result + (subscripts != null ? subscripts.hashCode() : 0);
-        result = 31 * result + (sub != null ? sub.hashCode() : 0);
-        return result;
-    }
-
-    /**
      * <p>derefVar.</p>
      */
     public void derefVar() {
@@ -194,23 +168,26 @@ public class SymbolicReference extends Reference {
     /**
      * {@inheritDoc}
      */
-    @Override public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override public Any dataType(LocalScope localScope)
+    @Override
+    public Any dataType(LocalScope localScope)
             throws VariableNotDefinedException {
         return localScope.getVariable(this).getDataType();
     }
 
-    @Override public SymbolicReference clone() {
+    @Override
+    public SymbolicReference copy() {
         SymbolicReference sr = new SymbolicReference();
+        sr.setRuleContext(getRuleContext());
         sr.identifier = identifier;
-        sr.subscripts = subscripts.clone();
-        sr.sub = sub.clone();
+        sr.subscripts = Utils.copyNull(subscripts);
+        sr.sub = Utils.copyNull(sub);
         return sr;
     }
 }

@@ -23,28 +23,28 @@ package edu.kit.iti.formal.automation.datatypes.values;
  */
 
 /**
- * <p>DateAndTimeValue class.</p>
+ * <p>DateAndTimeData class.</p>
  *
  * @author weigl
  * @version $Id: $Id
  */
-public class DateAndTimeValue {
-    private DateValue date = new DateValue();
-    private TimeOfDayValue tod = new TimeOfDayValue();
+public class DateAndTimeData {
+    private DateData date = new DateData();
+    private TimeofDayData tod = new TimeofDayData();
 
     /**
-     * <p>Constructor for DateAndTimeValue.</p>
+     * <p>Constructor for DateAndTimeData.</p>
      *
-     * @param date a {@link edu.kit.iti.formal.automation.datatypes.values.DateValue} object.
-     * @param tod a {@link edu.kit.iti.formal.automation.datatypes.values.TimeOfDayValue} object.
+     * @param date a {@link DateData} object.
+     * @param tod a {@link TimeofDayData} object.
      */
-    public DateAndTimeValue(DateValue date, TimeOfDayValue tod) {
+    public DateAndTimeData(DateData date, TimeofDayData tod) {
         this.date = date;
         this.tod = tod;
     }
 
     /**
-     * <p>Constructor for DateAndTimeValue.</p>
+     * <p>Constructor for DateAndTimeData.</p>
      *
      * @param years a int.
      * @param months a int.
@@ -53,7 +53,7 @@ public class DateAndTimeValue {
      * @param minutes a int.
      * @param seconds a int.
      */
-    public DateAndTimeValue(int years, int months, int days, int hours, int minutes, int seconds) {
+    public DateAndTimeData(int years, int months, int days, int hours, int minutes, int seconds) {
         setYear(years);
         setMonth(months);
         setDay(days);
@@ -65,7 +65,7 @@ public class DateAndTimeValue {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return "DateAndTimeValue{" +
+        return "DateAndTimeData{" +
                 "date=" + date +
                 ", tod=" + tod +
                 '}';
@@ -75,9 +75,9 @@ public class DateAndTimeValue {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DateAndTimeValue)) return false;
+        if (!(o instanceof DateAndTimeData)) return false;
 
-        DateAndTimeValue that = (DateAndTimeValue) o;
+        DateAndTimeData that = (DateAndTimeData) o;
 
         if (!date.equals(that.date)) return false;
         if (!tod.equals(that.tod)) return false;
@@ -96,36 +96,36 @@ public class DateAndTimeValue {
     /**
      * <p>Getter for the field <code>date</code>.</p>
      *
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.values.DateValue} object.
+     * @return a {@link DateData} object.
      */
-    public DateValue getDate() {
+    public DateData getDate() {
         return date;
     }
 
     /**
      * <p>Setter for the field <code>date</code>.</p>
      *
-     * @param date a {@link edu.kit.iti.formal.automation.datatypes.values.DateValue} object.
+     * @param date a {@link DateData} object.
      */
-    public void setDate(DateValue date) {
+    public void setDate(DateData date) {
         this.date = date;
     }
 
     /**
      * <p>Getter for the field <code>tod</code>.</p>
      *
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.values.TimeOfDayValue} object.
+     * @return a {@link TimeofDayData} object.
      */
-    public TimeOfDayValue getTod() {
+    public TimeofDayData getTod() {
         return tod;
     }
 
     /**
      * <p>Setter for the field <code>tod</code>.</p>
      *
-     * @param tod a {@link edu.kit.iti.formal.automation.datatypes.values.TimeOfDayValue} object.
+     * @param tod a {@link TimeofDayData} object.
      */
-    public void setTod(TimeOfDayValue tod) {
+    public void setTod(TimeofDayData tod) {
         this.tod = tod;
     }
 

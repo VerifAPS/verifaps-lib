@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.operators;
  */
 
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.AnyUInt;
+import edu.kit.iti.formal.automation.datatypes.AnyUnsignedInt;
 
 /**
  * <p>UnaryOperator class.</p>
@@ -59,27 +59,15 @@ public class UnaryOperator implements Operator {
         return new Any[]{validFor};
     }
 
-    /**
-     * <p>isValid.</p>
-     *
-     * @param a a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     * @return a boolean.
-     */
     public boolean isValid(Any a) {
         return validFor.getClass().isAssignableFrom(a.getClass());
     }
 
-    /**
-     * <p>getPromotedType.</p>
-     *
-     * @param a a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     */
     public Any getPromotedType(Any a) {
         if (isValid(a)) {
-            if (a instanceof AnyUInt) {
-                AnyUInt anyUInt = (AnyUInt) a;
-                return anyUInt.asSigned();
+            if (a instanceof AnyUnsignedInt) {
+                AnyUnsignedInt anyUnsignedInt = (AnyUnsignedInt) a;
+                return anyUnsignedInt.asSigned();
             }
             return a;
         }

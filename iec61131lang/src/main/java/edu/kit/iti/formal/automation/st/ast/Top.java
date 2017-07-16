@@ -23,12 +23,12 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.visitors.Visitable;
-import edu.kit.iti.formal.automation.visitors.Visitor;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.Serializable;
 
 /**
  * <p>Abstract Top class.</p>
@@ -36,78 +36,18 @@ import java.util.Map;
  * @author weigl
  * @version $Id: $Id
  */
-public abstract class Top implements Visitable, Cloneable {
+public abstract class Top<R extends ParserRuleContext>
+        implements Visitable, Copyable<Top<R>>, HasRuleContext<R>, Serializable {
+    private transient R ruleContext;
 
-    private Position startPosition = new Position(), endPosition = new Position();
-
-    private static void toString(Object o, Class<?> clazz,
-            Map<String, Object> list) {
-        Field f[] = clazz.getDeclaredFields();
-        AccessibleObject.setAccessible(f, true);
-
-        if (clazz.getSuperclass().getSuperclass() != null) {
-            toString(o, clazz.getSuperclass(), list);
-        }
-
-        for (int i = 0; i < f.length; i++) {
-            try {
-                list.put(f[i].getName(), f[i].get(o));
-            }
-            catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
+    @Override
+    public R getRuleContext() {
+        return ruleContext;
     }
 
-    /**
-     * <p>repeat.</p>
-     *
-     * @param str   a {@link java.lang.String} object.
-     * @param times a int.
-     * @return a {@link java.lang.String} object.
-     */
-    public static String repeat(String str, int times) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < times; i++) {
-            sb.append(str);
-        }
-        return sb.toString();
-    }
-
-    /**
-     * <p>Getter for the field <code>startPosition</code>.</p>
-     *
-     * @return a {@link Position} object.
-     */
-    public Position getStartPosition() {
-        return startPosition;
-    }
-
-    /**
-     * <p>Setter for the field <code>startPosition</code>.</p>
-     *
-     * @param start a {@link Position} object.
-     */
-    public void setStartPosition(Position start) {
-        this.startPosition = start;
-    }
-
-    /**
-     * <p>Getter for the field <code>endPosition</code>.</p>
-     *
-     * @return a {@link Position} object.
-     */
-    public Position getEndPosition() {
-        return endPosition;
-    }
-
-    /**
-     * <p>Setter for the field <code>endPosition</code>.</p>
-     *
-     * @param endPosition a {@link Position} object.
-     */
-    public void setEndPosition(Position endPosition) {
-        this.endPosition = endPosition;
+    public Top<R> setRuleContext(R ruleContext) {
+        this.ruleContext = ruleContext;
+        return this;
     }
 
     /**
@@ -116,54 +56,14 @@ public abstract class Top implements Visitable, Cloneable {
      * @return a {@link java.lang.String} object.
      */
     public String getNodeName() {
-        return getClass().getName();
+        return getClass().getSimpleName();
     }
 
-    /**
-     * <p>toString.</p>
-     *
-     * @return a {@link java.lang.String} object.
-     */
+    @Override
+    public abstract Top copy();
+
+    @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        toString(0, sb);
-        return sb.toString();
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
-
-    /**
-     * <p>toString.</p>
-     *
-     * @param indent a int.
-     * @param sb     a {@link java.lang.StringBuilder} object.
-     */
-    protected void toString(int indent, StringBuilder sb) {
-        Map<String, Object> fields = new HashMap<>();
-        Top.toString(this, getClass(), fields);
-
-        sb.append("(").append(getClass().getSimpleName()).append("\n");
-
-        for (Map.Entry<String, Object> e : fields.entrySet()) {
-            String tab = repeat(" ", indent + e.getKey().length());
-            sb.append(tab).append(':').append(e.getKey()).append(' ');
-            if (e.getValue() instanceof Top) {
-                Top a = (Top) e.getValue();
-                a.toString(indent + 3 + e.getKey().length(), sb);
-            }
-            else {
-                sb.append(e.getValue());
-            }
-            sb.append("\n");
-        }
-        sb.setLength(sb.length() - 1);
-
-        sb.append(")");
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public abstract <T> T visit(Visitor<T> visitor);
-
-    @Override public abstract Top clone();
 }

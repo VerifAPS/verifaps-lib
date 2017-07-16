@@ -23,6 +23,8 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -34,6 +36,8 @@ import java.util.stream.Stream;
  *
  * @author weigla (04.07.2014)
  */
+@EqualsAndHashCode
+@ToString
 public class TopLevelElements extends Top implements List<TopLevelElement> {
     private List<TopLevelElement> list = new ArrayList<>();
 
@@ -52,201 +56,251 @@ public class TopLevelElements extends Top implements List<TopLevelElement> {
         list = new ArrayList<>(elements);
     }
 
-    /** {@inheritDoc} */
-    public <T> T visit(Visitor<T> sev) {//empty
-        list.stream().forEach(a->a.visit(sev));
+    /**
+     * {@inheritDoc}
+     */
+    public <T> T accept(Visitor<T> sev) {//empty
+        list.stream().forEach(a -> a.accept(sev));
         return null;
     }
 
-    @Override public Top clone() {
+    @Override
+    public TopLevelElements copy() {
         TopLevelElements es = new TopLevelElements();
-        forEach(e -> es.add(e.clone()));
+        forEach(e -> es.add(e.copy()));
         return es;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int size() {
         return list.size();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isEmpty() {
         return list.isEmpty();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean contains(Object o) {
         return list.contains(o);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterator<TopLevelElement> iterator() {
         return list.iterator();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object[] toArray() {
         return list.toArray();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T[] toArray(T[] a) {
         return list.toArray(a);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean add(TopLevelElement topLevelElement) {
         return list.add(topLevelElement);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean remove(Object o) {
         return list.remove(o);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean containsAll(Collection<?> c) {
         return list.containsAll(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean addAll(Collection<? extends TopLevelElement> c) {
         return list.addAll(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean addAll(int index, Collection<? extends TopLevelElement> c) {
         return list.addAll(index, c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean removeAll(Collection<?> c) {
         return list.removeAll(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean retainAll(Collection<?> c) {
         return list.retainAll(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void replaceAll(UnaryOperator<TopLevelElement> operator) {
         list.replaceAll(operator);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sort(Comparator<? super TopLevelElement> c) {
         list.sort(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void clear() {
         list.clear();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public boolean equals(Object o) {
-        return list.equals(o);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int hashCode() {
-        return list.hashCode();
-    }
-
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TopLevelElement get(int index) {
         return list.get(index);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TopLevelElement set(int index, TopLevelElement element) {
         return list.set(index, element);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void add(int index, TopLevelElement element) {
         list.add(index, element);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TopLevelElement remove(int index) {
         return list.remove(index);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int indexOf(Object o) {
         return list.indexOf(o);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int lastIndexOf(Object o) {
         return list.lastIndexOf(o);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ListIterator<TopLevelElement> listIterator() {
         return list.listIterator();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ListIterator<TopLevelElement> listIterator(int index) {
         return list.listIterator(index);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<TopLevelElement> subList(int fromIndex, int toIndex) {
         return list.subList(fromIndex, toIndex);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Spliterator<TopLevelElement> spliterator() {
         return list.spliterator();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean removeIf(Predicate<? super TopLevelElement> filter) {
         return list.removeIf(filter);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Stream<TopLevelElement> stream() {
         return list.stream();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Stream<TopLevelElement> parallelStream() {
         return list.parallelStream();
     }
+
 }

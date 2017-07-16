@@ -29,5 +29,5 @@ package edu.kit.iti.formal.automation.st.ast;
  * @version $Id: $Id
  */
 public abstract class Reference extends Expression {
-    public abstract Reference clone();
+    public abstract Reference copy();
 }

@@ -59,6 +59,6 @@ public class ExpressionEmbedder extends AstVisitor<Object> {
     private Expression copyOrSubstitute(Expression expression) {
         return assignments.getOrDefault(expression,
                 //TODO infinite loop call
-                (Expression) expression.visit(this));
+                (Expression) expression.accept(this));
     }
 }

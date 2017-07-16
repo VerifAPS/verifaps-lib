@@ -25,12 +25,14 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
+import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by weigla on 09.06.2014.
@@ -38,6 +40,8 @@ import java.util.stream.Collectors;
  * @author weigl
  * @version 2, rewrite to separate fn block call vs function call in expr
  */
+@EqualsAndHashCode
+@ToString
 public class FunctionCall extends Expression {
     private final IdentifierPlaceHolder<FunctionDeclaration> function = new IdentifierPlaceHolder<>();
     private List<Expression> parameters = new ArrayList<>();
@@ -84,8 +88,7 @@ public class FunctionCall extends Expression {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
@@ -94,16 +97,16 @@ public class FunctionCall extends Expression {
      */
     @Override
     public Any dataType(LocalScope localScope) {
-        return function.getIdentifiedObject().returnType;
+        return function.getIdentifiedObject().getReturnType();
     }
 
     @Override
-    public FunctionCall clone() {
-        FunctionCall f = new FunctionCall();
-        f.function.setIdentifier(this.function.getIdentifier());
-        f.function.setIdentifiedObject(this.function.getIdentifiedObject());
-        f.parameters = parameters.stream().map(Expression::clone)
-                .collect(Collectors.toList());
-        return f;
+    public Expression copy() {
+        FunctionCall fc = new FunctionCall();
+        fc.setRuleContext(getRuleContext());
+        fc.setFunctionName(getFunctionName());
+        fc.setParameters(Utils.copy(parameters));
+        return fc;
+
     }
 }

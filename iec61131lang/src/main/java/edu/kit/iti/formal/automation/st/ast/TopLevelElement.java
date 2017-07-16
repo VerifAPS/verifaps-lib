@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.st.Identifiable;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by weigl on 13.06.14.
@@ -30,7 +31,7 @@ import edu.kit.iti.formal.automation.st.Identifiable;
  * @author weigl
  * @version $Id: $Id
  */
-public abstract class TopLevelElement extends Top implements Identifiable {
+public abstract class TopLevelElement<T extends ParserRuleContext> extends Top<T> implements Identifiable {
     /**
      * <p>getIdentifier.</p>
      *
@@ -38,5 +39,7 @@ public abstract class TopLevelElement extends Top implements Identifiable {
      */
     public abstract String getIdentifier();
 
-    public abstract TopLevelElement clone();
+
+    @Override
+    public abstract TopLevelElement<T> copy();
 }

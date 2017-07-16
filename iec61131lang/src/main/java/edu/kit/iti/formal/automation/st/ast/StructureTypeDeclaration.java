@@ -25,6 +25,7 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.RecordType;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 import java.util.HashMap;
@@ -51,7 +52,7 @@ public class StructureTypeDeclaration extends TypeDeclaration<StructureInitializ
 
     /** {@inheritDoc} */
     @Override
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
@@ -65,9 +66,10 @@ public class StructureTypeDeclaration extends TypeDeclaration<StructureInitializ
         return rt;
     }
 
-    @Override public StructureTypeDeclaration clone() {
+    @Override public StructureTypeDeclaration copy() {
         StructureTypeDeclaration t = new StructureTypeDeclaration();
-        t.initialization = initialization.clone();
+        t.setRuleContext(getRuleContext());
+        t.initialization = Utils.copyNull(initialization);
         t.fields = new HashMap<>(fields);
         t.typeName = typeName;
         t.baseType = baseType;

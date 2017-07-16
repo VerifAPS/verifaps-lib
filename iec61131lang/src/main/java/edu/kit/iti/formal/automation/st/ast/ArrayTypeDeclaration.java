@@ -26,7 +26,10 @@ import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.DataTypes;
 import edu.kit.iti.formal.automation.datatypes.IECArray;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,22 +40,28 @@ import java.util.List;
  * @author weigl
  * @version $Id: $Id
  */
+@EqualsAndHashCode
+@ToString
 public class ArrayTypeDeclaration extends TypeDeclaration<ArrayInitialization> {
     private List<Range> ranges = new ArrayList<>();
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @Override public ArrayTypeDeclaration clone() {
+    @Override
+    public ArrayTypeDeclaration copy() {
         ArrayTypeDeclaration atd = new ArrayTypeDeclaration();
-        ranges.forEach(range -> atd.ranges.add(range.clone()));
+        atd.setRuleContext(getRuleContext());
+        ranges.forEach(range -> atd.ranges.add(range.copy()));
         atd.typeName = typeName;
         atd.baseType = baseType;
         atd.baseTypeName = baseTypeName;
-        atd.initialization = initialization.clone();
+        atd.initialization = Utils.copyNull(initialization);
         return atd;
     }
 
@@ -65,7 +74,9 @@ public class ArrayTypeDeclaration extends TypeDeclaration<ArrayInitialization> {
         ranges.add(ast);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Any getDataType(GlobalScope globalScope) {
         super.getDataType(globalScope);

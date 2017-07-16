@@ -24,7 +24,6 @@ package edu.kit.iti.formal.automation.visitors;
 
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.st.ast.*;
 
 /**
@@ -42,7 +41,7 @@ public class DefaultVisitor<T> implements Visitor<T> {
      * @return a T object.
      */
     public T defaultVisit(Visitable visitable) {
-        //return visitable.visit(this);
+        //return visitable.accept(this);
         return null;
     }
 
@@ -190,14 +189,6 @@ public class DefaultVisitor<T> implements Visitor<T> {
     @Override
     public T visit(ProgramDeclaration programDeclaration) {
         return defaultVisit(programDeclaration);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T visit(ScalarValue<? extends Any, ?> tsScalarValue) {
-        return defaultVisit(tsScalarValue);
     }
 
     /**
@@ -392,5 +383,15 @@ public class DefaultVisitor<T> implements Visitor<T> {
     @Override
     public T visit(MethodDeclaration method) {
         return defaultVisit(method);
+    }
+
+    @Override
+    public T visit(Literal literal) {
+        return defaultVisit(literal);
+    }
+
+    @Override
+    public T visit(FunctionBlockCallStatement.Parameter parameter) {
+        return null;
     }
 }

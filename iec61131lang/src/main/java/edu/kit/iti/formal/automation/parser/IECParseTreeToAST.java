@@ -60,7 +60,7 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitCast(IEC61131Parser.CastContext ctx) {
+    public Literal visitCast(IEC61131Parser.CastContext ctx) {
         Literal ast = Literal.enumerate(ctx.CAST_LITERAL().getSymbol());
         ast.setRuleContext(ctx);
         return ast;
@@ -575,6 +575,13 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitStatement(IEC61131Parser.StatementContext ctx) {
+        return oneOf(ctx.assignment_statement(), ctx.if_statement(), ctx.exit_statement(),
+                ctx.repeat_statement(), ctx.return_statement(), ctx.while_statement(),
+                ctx.case_statement(), ctx.functionblockcall(), ctx.for_statement());
+    }
+
+    @Override
     public Object visitSymbolic_variable(IEC61131Parser.Symbolic_variableContext ctx) {
         //TODO REWORK
         SymbolicReference ast = new SymbolicReference();
@@ -597,9 +604,9 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     }
 
     @Override
-    public List<Expression> visitSubscript_list(
+    public ExpressionList visitSubscript_list(
             IEC61131Parser.Subscript_listContext ctx) {
-        return allOf(ctx.expression());
+        return new ExpressionList(allOf(ctx.expression()));
     }
 
     @Override
@@ -637,7 +644,13 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     @Override
     public Object visitParam_assignment(
             IEC61131Parser.Param_assignmentContext ctx) {
-        return super.visitParam_assignment(ctx);
+        FunctionBlockCallStatement.Parameter p = new FunctionBlockCallStatement.Parameter();
+        if (ctx.ARROW_RIGHT() != null)
+            p.setOutput(true);
+
+        p.setName(ctx.id.getText());
+        p.setExpression((Expression) ctx.expression().accept(this));
+        return p;
     }
 
     @Override
@@ -663,9 +676,10 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         ast.setRuleContext(ctx);
 
         ast.getCases().addAll(allOf(ctx.case_entry()));
-        ast.setElseCase((StatementList) ctx.elselist.accept(this));
+        if (ctx.elselist != null)
+            ast.setElseCase((StatementList) ctx.elselist.accept(this));
+
         ast.setExpression((Expression) ctx.cond.accept(this));
-        //Utils.setPosition(ast, ctx.CASE, ctx.END_CASE);
         return ast;
     }
 
@@ -680,13 +694,26 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
 
     @Override
     public Object visitCase_condition(IEC61131Parser.Case_conditionContext ctx) {
+        CaseCondition cc = null;
         if (ctx.IDENTIFIER() != null) {
-            return new CaseCondition.Enumeration(
+            cc = new CaseCondition.Enumeration(
                     Literal.enumerate(ctx.IDENTIFIER().getSymbol()));
-        } else {
-            return oneOf(ctx.subrange(), ctx.integer(), ctx.cast());
         }
+        if (ctx.integer() != null) {
+            cc = new CaseCondition.IntegerCondition((Literal)
+                    ctx.integer().accept(this));
+        }
+        if (ctx.subrange() != null) {
+            Range r = (Range) ctx.subrange().accept(this);
+            cc = new CaseCondition.Range(r.getStart(), r.getStop());
+        }
+        if (ctx.cast() != null) {
+            cc = new CaseCondition.Enumeration((Literal) ctx.cast().accept(this));
+        }
+        cc.setRuleContext(ctx);
+        return cc;
     }
+
 
     @Override
     public Object visitFor_statement(IEC61131Parser.For_statementContext ctx) {

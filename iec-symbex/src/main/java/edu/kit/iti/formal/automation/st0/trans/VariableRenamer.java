@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st0.trans;
 
 import edu.kit.iti.formal.automation.st.ast.StatementList;
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
+import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 
 import java.util.function.Function;
@@ -31,11 +32,12 @@ import java.util.function.Function;
 /**
  * @author Alexander Weigl (26.06.2014)
  */
-public class VariableRenamer extends AstVisitor {
+public class VariableRenamer extends AstMutableVisitor {
     private final StatementList statements;
     private final Function<String, String> newName;
 
     public VariableRenamer(StatementList functionBody, Function<String, String> newName) {
+        assert !functionBody.isEmpty();
         this.newName = newName;
         statements = functionBody;
     }
@@ -49,6 +51,6 @@ public class VariableRenamer extends AstVisitor {
     }
 
     public StatementList rename() {
-        return (StatementList) statements.visit(this);
+        return (StatementList) statements.accept(this);
     }
 }

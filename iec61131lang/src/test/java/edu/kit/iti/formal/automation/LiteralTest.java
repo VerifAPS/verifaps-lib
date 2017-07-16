@@ -22,229 +22,65 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
+import edu.kit.iti.formal.automation.st.ast.Literal;
+import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import java.math.BigInteger;
+import java.util.Arrays;
+
+import static edu.kit.iti.formal.automation.datatypes.DataTypes.*;
 
 /**
  * @author Alexander Weigl
  * @version 1 (03.03.17)
  */
-public class ValueFactoryTest {
-    @Test
-    public void makeInt() throws Exception {
-      /*  Assert.assertEquals((Integer) 0, ValueFactory.makeInt().getValue());
-        Assert.assertEquals((Long) 161141L,
-                ValueFactory.makeInt(161141).getValue());
-    */
+@RunWith(Parameterized.class)
+public class LiteralTest {
+    @Parameterized.Parameter(0)
+    public String input;
+    @Parameterized.Parameter(1)
+    public Any literalDataType;
+    @Parameterized.Parameter(2)
+    public long value;
+    @Parameterized.Parameter(3)
+    public Any valueDataType;
+    @Parameterized.Parameter(4)
+    public boolean explicit;
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Iterable<Object[]> integers() {
+        return Arrays.asList(
+                new Object[]{"16#F", ANY_INT, 15, USINT, false},
+                new Object[]{("-16#F"), ANY_INT, -15, SINT, false},
+                new Object[]{"16#FFFFFDABC", ANY_INT, 68719467196L, LINT, false},
+                new Object[]{"8#71164424", ANY_INT, 15001876, DINT, false},
+                new Object[]{"SINT#16#F", SINT, 15, SINT, true},
+                new Object[]{"-UINT#16#F", UINT, -15, SINT, true},
+                new Object[]{"70000", ANY_INT, 70000, DINT, false}
+        );
+    }
+
+
+    private Literal getLiteral(String s) {
+        return (Literal) IEC61131Facade.getParser(s).constant().accept(new IECParseTreeToAST());
     }
 
     @Test
-    public void makeUInt() throws Exception {
-
+    public void testIntegerLiteral() {
+        Literal p = getLiteral(input);
+        Assert.assertEquals(literalDataType, p.getDataType());
+        Assert.assertEquals(explicit, p.isDataTypeExplicit());
+        Assert.assertEquals(p.isSigned() ? input.substring(1) : input, p.getText());
+        Assert.assertEquals(
+                BigInteger.valueOf(value),
+                p.asValue().getValue());
+        Assert.assertEquals(
+                valueDataType, p.asValue().getDataType());
     }
 
-    @Test
-    public void makeSInt() throws Exception {
-
-    }
-
-    @Test
-    public void makeLInt() throws Exception {
-
-    }
-
-    @Test
-    public void makeDInt() throws Exception {
-
-    }
-
-    @Test
-    public void makeInt1() throws Exception {
-
-    }
-
-    @Test
-    public void makeSInt1() throws Exception {
-
-    }
-
-    @Test
-    public void makeLInt1() throws Exception {
-
-    }
-
-    @Test
-    public void makeDInt1() throws Exception {
-
-    }
-
-    @Test
-    public void makeAnyBit() throws Exception {
-
-    }
-
-    @Test
-    public void makeBool() throws Exception {
-
-    }
-
-    @Test
-    public void makeWord() throws Exception {
-
-    }
-
-    @Test
-    public void makeDWord() throws Exception {
-
-    }
-
-    @Test
-    public void makeLWord() throws Exception {
-
-    }
-
-    @Test
-    public void parseLiteral() throws Exception {
-
-    }
-
-    @Test
-    public void parseBitLiteral() throws Exception {
-
-    }
-
-    @Test
-    public void parseBitLiteral1() throws Exception {
-
-    }
-
-    @Test
-    public void parseIntegerLiteral() throws Exception {
-
-    }
-
-    @Test
-    public void parseIntegerLiteral1() throws Exception {
-
-    }
-
-    @Test
-    public void makeEnumeratedValue() throws Exception {
-
-    }
-
-    @Test
-    public void makeEnumeratedValue1() throws Exception {
-
-    }
-
-    @Test
-    public void parseStringLiteral() throws Exception {
-
-    }
-
-    @Test
-    public void parseStringLiteral1() throws Exception {
-
-    }
-
-    @Test
-    public void parseTimeLiteral() throws Exception {
-
-    }
-
-    @Test
-    public void parseTimeLiteral1() throws Exception {
-
-    }
-
-    @Test
-    public void getPrefix() throws Exception {
-
-    }
-
-    @Test
-    public void makeBool1() throws Exception {
-
-    }
-
-    @Test
-    public void makeBool2() throws Exception {
-
-    }
-
-    @Test
-    public void makeBool3() throws Exception {
-
-    }
-
-    @Test
-    public void parseRealLiteral() throws Exception {
-
-    }
-
-    @Test
-    public void parseRealLiteral1() throws Exception {
-
-    }
-
-    @Test
-    public void parseDateAndTimeLiteral() throws Exception {
-
-    }
-
-    @Test
-    public void parseDateAndTimeLiteral1() throws Exception {
-
-    }
-
-    @Test
-    public void parseDateLiteral() throws Exception {
-
-    }
-
-    @Test
-    public void parseDateLiteral1() throws Exception {
-
-    }
-
-    @Test
-    public void parseTimeOfDayLiteral() throws Exception {
-
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void parseTimeOfDayLiteralErrorHour()
-            throws Exception {
-     //   ValueFactory.parseTimeOfDayLiteral("200:61").getValue();
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void parseTimeOfDayLiteralErrorMin()
-            throws Exception {
-       // ValueFactory.parseTimeOfDayLiteral("20:610:20").getValue();
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void parseTimeOfDayLiteralErrorSec()
-            throws Exception {
-        //  ValueFactory.parseTimeOfDayLiteral("20:61:a").getValue();
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void parseTimeOfDayLiteralErrorMsec()
-            throws Exception {
-        //    ValueFactory.parseTimeOfDayLiteral("200:61:1.6a").getValue();
-    }
-
-    @Test
-    public void parseTimeOfDayLiteral1() throws Exception {
-      /*  Assert.assertEquals(new TimeofDayData(20, 61, 00, 00),
-                ValueFactory.parseTimeOfDayLiteral("20:61").getValue());
-
-        Assert.assertEquals(new TimeofDayData(20, 61, 10, 00),
-                ValueFactory.parseTimeOfDayLiteral("20:61:10").getValue());
-
-        Assert.assertEquals(new TimeofDayData(20, 61, 62, 1005),
-                ValueFactory.parseTimeOfDayLiteral("20:61:62.1005").getValue());*/
-    }
 }

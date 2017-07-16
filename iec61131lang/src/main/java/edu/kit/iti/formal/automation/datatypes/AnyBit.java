@@ -24,6 +24,9 @@ package edu.kit.iti.formal.automation.datatypes;
 
 import edu.kit.iti.formal.automation.datatypes.values.Bits;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by weigl on 10.06.14.
  *
@@ -31,16 +34,29 @@ import edu.kit.iti.formal.automation.datatypes.values.Bits;
  * @version $Id: $Id
  */
 public abstract class AnyBit extends Any {
-    /** Constant <code>BOOL</code> */
+    /**
+     * Constant <code>BOOL</code>
+     */
     public final static Bool BOOL = new Bool();
-    /** Constant <code>BYTE</code> */
+    /**
+     * Constant <code>BYTE</code>
+     */
     public final static Byte BYTE = new Byte();
-    /** Constant <code>WORD</code> */
+    /**
+     * Constant <code>WORD</code>
+     */
     public final static Word WORD = new Word();
-    /** Constant <code>DWORD</code> */
+    /**
+     * Constant <code>DWORD</code>
+     */
     public final static DWord DWORD = new DWord();
-    /** Constant <code>LWORD</code> */
+    /**
+     * Constant <code>LWORD</code>
+     */
     public final static LWord LWORD = new LWord();
+
+    public static final List<AnyBit> DATATYPES = Arrays.asList(AnyBit.BYTE,
+            AnyBit.LWORD, AnyBit.WORD, AnyBit.DWORD, AnyBit.BOOL);
 
 
     protected int bitLength;
@@ -59,14 +75,17 @@ public abstract class AnyBit extends Any {
     }
 
 
-
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T accept(DataTypeVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String repr(Object obj) {
         if (obj instanceof Bits) {
@@ -95,11 +114,19 @@ public abstract class AnyBit extends Any {
             }
             return "FALSE";
         }
+
+        public <T> T accept(DataTypeVisitor<T> visitor) {
+            return visitor.visit(this);
+        }
     }
 
     public final static class Byte extends AnyBit {
         public Byte() {
             super(8);
+        }
+
+        public <T> T accept(DataTypeVisitor<T> visitor) {
+            return visitor.visit(this);
         }
     }
 
@@ -107,17 +134,29 @@ public abstract class AnyBit extends Any {
         public Word() {
             super(16);
         }
+
+        public <T> T accept(DataTypeVisitor<T> visitor) {
+            return visitor.visit(this);
+        }
     }
 
     public final static class DWord extends AnyBit {
         public DWord() {
             super(32);
         }
+
+        public <T> T accept(DataTypeVisitor<T> visitor) {
+            return visitor.visit(this);
+        }
     }
 
     public final static class LWord extends AnyBit {
         public LWord() {
             super(64);
+        }
+
+        public <T> T accept(DataTypeVisitor<T> visitor) {
+            return visitor.visit(this);
         }
     }
 }

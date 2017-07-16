@@ -32,7 +32,7 @@ public final class LInt extends AnySignedInt {
     /** {@inheritDoc} */
     @Override
     public AnyInt next() {
-        return LINT;
+        return DataTypes.LINT;
     }
 
     /**
@@ -40,5 +40,9 @@ public final class LInt extends AnySignedInt {
      */
     public LInt() {
         super(64);
+    }
+    @Override
+    public <T> T accept(DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

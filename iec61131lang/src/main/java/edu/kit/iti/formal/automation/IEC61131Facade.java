@@ -22,6 +22,8 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.analysis.FindDataTypes;
+import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
@@ -31,7 +33,6 @@ import edu.kit.iti.formal.automation.st.ast.Expression;
 import edu.kit.iti.formal.automation.st.ast.StatementList;
 import edu.kit.iti.formal.automation.st.ast.Top;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
-import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -75,7 +76,7 @@ public class IEC61131Facade {
      */
     public static String print(Top ast) {
         StructuredTextPrinter stp = new StructuredTextPrinter();
-        ast.visit(stp);
+        ast.accept(stp);
         return stp.getString();
     }
 
@@ -113,8 +114,16 @@ public class IEC61131Facade {
      * @return a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
      */
     public static GlobalScope resolveDataTypes(TopLevelElements elements) {
-        return ResolveDataTypes.resolve(elements);
+        GlobalScope scope = GlobalScope.defaultScope();
+        FindDataTypes fdt = new FindDataTypes(scope);
+        ResolveDataTypes rdt = new ResolveDataTypes(scope);
+        elements.accept(fdt);
+        elements.accept(rdt);
+        return scope;
     }
 
 
+    public static IEC61131Parser getParser(String s) {
+        return getParser(CharStreams.fromString(s));
+    }
 }

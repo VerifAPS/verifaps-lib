@@ -22,14 +22,21 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.st.Identifiable;
+
 /**
  * Created by weigl on 10.06.14.
  *
  * @author weigl
  * @version $Id: $Id
  */
-public abstract class Any {
+public abstract class Any implements Identifiable {
     protected String name = "any";
+
+    @Override
+    public String getIdentifier() {
+        return name;
+    }
 
     /**
      * <p>Constructor for Any.</p>

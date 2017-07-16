@@ -92,9 +92,9 @@ public class VariableDeclaration extends Top
      */
     public static final int FIRST_FREE = 1 << 16;
     /**
-     * Constant <code>NOT_READED=4096</code>
+     * Constant <code>NOT_READ=4096</code>
      */
-    public static final int NOT_READED = 4096;
+    public static final int NOT_READ = 4096;
 
     private String name;
     private Any dataType;
@@ -352,7 +352,8 @@ public class VariableDeclaration extends Top
     /**
      * {@inheritDoc}
      */
-    public <T> T visit(Visitor<T> visitor) {
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
@@ -410,7 +411,7 @@ public class VariableDeclaration extends Top
         return name.hashCode();
     }
 
-    @Override public VariableDeclaration clone() {
+    @Override public VariableDeclaration copy() {
         VariableDeclaration vd = new VariableDeclaration(name, type,
                 typeDeclaration);
         vd.setDataType(dataType);

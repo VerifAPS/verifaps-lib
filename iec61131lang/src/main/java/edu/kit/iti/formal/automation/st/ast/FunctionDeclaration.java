@@ -23,7 +23,11 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Created by weigl on 13.06.14.
@@ -31,101 +35,62 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
-public class FunctionDeclaration extends TopLevelScopeElement {
+@EqualsAndHashCode
+@ToString
+public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Function_declarationContext> {
+    protected IdentifierPlaceHolder<Any> returnType = new IdentifierPlaceHolder<>();
     protected String functionName;
-    protected String returnTypeName;
-    protected Any returnType;
     protected StatementList statements = new StatementList();
 
-    /**
-     * <p>Getter for the field <code>functionName</code>.</p>
-     *
-     * @return a {@link java.lang.String} object.
-     */
     public String getFunctionName() {
         return functionName;
     }
 
-    /**
-     * <p>Setter for the field <code>functionName</code>.</p>
-     *
-     * @param functionName a {@link java.lang.String} object.
-     */
     public void setFunctionName(String functionName) {
         this.functionName = functionName;
     }
 
-    /**
-     * <p>Getter for the field <code>returnTypeName</code>.</p>
-     *
-     * @return a {@link java.lang.String} object.
-     */
     public String getReturnTypeName() {
-        return returnTypeName;
+        return returnType.getIdentifier();
     }
 
-    /**
-     * <p>Setter for the field <code>returnTypeName</code>.</p>
-     *
-     * @param returnType a {@link java.lang.String} object.
-     */
-    public void setReturnTypeName(String returnType) {
-        this.returnTypeName = returnType;
+    public void setReturnTypeName(String rt) {
+        returnType.setIdentifier(rt);
     }
 
-    /**
-     * <p>Getter for the field <code>statements</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     */
+    public Any getReturnType() {
+        return returnType.getIdentifiedObject();
+    }
+
+    public void setReturnType(Any rt) {
+        returnType.setIdentifiedObject(rt);
+    }
+
+
     public StatementList getStatements() {
         return statements;
     }
 
-    /**
-     * <p>Setter for the field <code>statements</code>.</p>
-     *
-     * @param statements a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     */
     public void setStatements(StatementList statements) {
         this.statements = statements;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
-    @Override public String getIdentifier() {
+    @Override
+    public String getIdentifier() {
         return getFunctionName();
     }
 
-    @Override public FunctionDeclaration clone() {
+    @Override
+    public FunctionDeclaration copy() {
         FunctionDeclaration fd = new FunctionDeclaration();
         fd.functionName = functionName;
-        fd.returnType = returnType;
-        fd.returnTypeName = returnTypeName;
-        fd.statements = statements.clone();
+        fd.returnType = returnType.copy();
+        fd.statements = statements.copy();
         return fd;
-    }
-
-    /**
-     * <p>Getter for the field <code>returnType</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     */
-    public Any getReturnType() {
-        return returnType;
-    }
-
-    /**
-     * <p>Setter for the field <code>returnType</code>.</p>
-     *
-     * @param returnType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     */
-    public void setReturnType(Any returnType) {
-        this.returnType = returnType;
     }
 }

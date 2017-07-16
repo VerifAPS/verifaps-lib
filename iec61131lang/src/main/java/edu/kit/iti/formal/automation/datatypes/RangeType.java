@@ -30,14 +30,14 @@ package edu.kit.iti.formal.automation.datatypes;
  */
 public class RangeType extends Any {
     private long bottom, top;
-    private AnyInt base = AnyInt.INT;
+    private AnyInt base = DataTypes.INT;
 
     /**
      * <p>Constructor for RangeType.</p>
      *
      * @param bottom a long.
-     * @param top a long.
-     * @param base a {@link edu.kit.iti.formal.automation.datatypes.AnyInt} object.
+     * @param top    a long.
+     * @param base   a {@link edu.kit.iti.formal.automation.datatypes.AnyInt} object.
      */
     public RangeType(long bottom, long top, AnyInt base) {
         this.bottom = bottom;
@@ -98,14 +98,18 @@ public class RangeType extends Any {
         this.base = base;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String repr(Object obj) {
         return base.repr(obj);
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T accept(DataTypeVisitor<T> visitor) {
         return visitor.visit(this);

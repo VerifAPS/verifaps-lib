@@ -23,11 +23,6 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.VariableScope;
-import edu.kit.iti.formal.automation.datatypes.AnyInt;
-import edu.kit.iti.formal.automation.datatypes.IECString;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 
 import java.util.Arrays;
 import java.util.EmptyStackException;
@@ -58,6 +53,7 @@ public class VariableBuilder {
     }
 
     //region Handling of special flags (like constant, input or global)
+
     /**
      * <p>clear.</p>
      *
@@ -145,17 +141,9 @@ public class VariableBuilder {
         return type(new PointerTypeDeclaration(pointsTo));
     }
 
-    /**
-     * <p>stringType.</p>
-     *
-     * @param base a {@link java.lang.String} object.
-     * @param length a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
-     * @param def a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.VariableBuilder} object.
-     */
     public VariableBuilder stringType(String base,
-                                      ScalarValue<? extends AnyInt, Long> length,
-                                      ScalarValue<? extends IECString, String> def) {
+                                      Literal length,
+                                      Literal def) {
         StringTypeDeclaration std = new StringTypeDeclaration();
         std.setBaseTypeName(base);
         std.setSize(length);
@@ -234,38 +222,6 @@ public class VariableBuilder {
     public VariableBuilder identifiers(List<String> ast) {
         identifiers = ast;
         return this;
-    }
-
-    /**
-     * <p>setPosition.</p>
-     *
-     * @param start a {@link org.antlr.v4.runtime.ParserRuleContext} object.
-     * @param end a {@link org.antlr.v4.runtime.Token} object.
-     */
-    public void setPosition(ParserRuleContext start, Token end) {
-        setPosition(start.getStart(), end);
-    }
-
-    /**
-     * <p>setPosition.</p>
-     *
-     * @param start a {@link org.antlr.v4.runtime.Token} object.
-     * @param end a {@link org.antlr.v4.runtime.ParserRuleContext} object.
-     */
-    public void setPosition(Token start, ParserRuleContext end) {
-        setPosition(start, end.getStop());
-    }
-
-    /**
-     * <p>setPosition.</p>
-     *
-     * @param start a {@link org.antlr.v4.runtime.Token} object.
-     * @param end a {@link org.antlr.v4.runtime.Token} object.
-     */
-    public void setPosition(Token start, Token end) {
-        pStart = new Position(start.getLine(), start.getCharPositionInLine());
-        pEnd = new Position(end.getLine(), end.getCharPositionInLine());
-
     }
 
     /**

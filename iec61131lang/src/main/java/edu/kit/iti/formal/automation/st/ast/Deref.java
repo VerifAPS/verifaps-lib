@@ -25,6 +25,9 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Created by weigl on 02.08.16.
@@ -32,45 +35,18 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
+@ToString
+@EqualsAndHashCode
+@Data
 public class Deref extends Reference {
     private Reference reference;
 
-    /**
-     * <p>Constructor for Deref.</p>
-     *
-     * @param reference a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
-     */
     public Deref(Reference reference) {
         this.reference = reference;
     }
 
-    /**
-     * <p>Getter for the field <code>reference</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
-     */
-    public Reference getReference() {
-        return reference;
-    }
-
-    /**
-     * <p>Setter for the field <code>reference</code>.</p>
-     *
-     * @param reference a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
-     */
-    public void setReference(Reference reference) {
-        this.reference = reference;
-    }
-
     /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return reference + "^";
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
@@ -80,7 +56,7 @@ public class Deref extends Reference {
         return null;//TODO
     }
 
-    @Override public Deref clone() {
-        return new Deref(reference.clone());
+    @Override public Deref copy() {
+        return new Deref(reference.copy());
     }
 }

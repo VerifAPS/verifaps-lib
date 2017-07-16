@@ -23,9 +23,9 @@ package edu.kit.iti.formal.automation.st.util;
  */
 
 import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
-import edu.kit.iti.formal.automation.st.ast.*;
 
 /**
  * Created by weigl on 10/07/14.
@@ -48,8 +48,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(AssignmentStatement assignmentStatement) {
-        assignmentStatement.getExpression().visit(this);
-        assignmentStatement.getLocation().visit(this);
+        assignmentStatement.getExpression().accept(this);
+        assignmentStatement.getLocation().accept(this);
         return null;
     }
 
@@ -59,8 +59,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(CaseCondition.Range range) {
-        range.getStart().visit(this);
-        range.getStop().visit(this);
+        range.getStart().accept(this);
+        range.getStop().accept(this);
         return null;
     }
 
@@ -69,7 +69,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(CaseCondition.IntegerCondition integerCondition) {
-        integerCondition.getValue().visit(this);
+        integerCondition.getValue().accept(this);
         return null;
     }
 
@@ -78,11 +78,9 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(CaseCondition.Enumeration enumeration) {
-        enumeration.getStart().visit(this);
-        enumeration.getStop().visit(this);
-
+        enumeration.getStart().accept(this);
+        enumeration.getStop().accept(this);
         return null;
-
     }
 
     /**
@@ -90,8 +88,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(BinaryExpression binaryExpression) {
-        binaryExpression.getLeftExpr().visit(this);
-        binaryExpression.getRightExpr().visit(this);
+        binaryExpression.getLeftExpr().accept(this);
+        binaryExpression.getRightExpr().accept(this);
         return null;
     }
 
@@ -100,8 +98,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(RepeatStatement repeatStatement) {
-        repeatStatement.getCondition().visit(this);
-        repeatStatement.getStatements().visit(this);
+        repeatStatement.getCondition().accept(this);
+        repeatStatement.getStatements().accept(this);
         return null;
     }
 
@@ -110,9 +108,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(WhileStatement whileStatement) {
-        whileStatement.getCondition().visit(this);
-        whileStatement.getStatements().visit(this);
-
+        whileStatement.getCondition().accept(this);
+        whileStatement.getStatements().accept(this);
         return null;
     }
 
@@ -121,7 +118,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(UnaryExpression unaryExpression) {
-        unaryExpression.getExpression().visit(this);
+        unaryExpression.getExpression().accept(this);
         return null;
     }
 
@@ -131,7 +128,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(TypeDeclarations typeDeclarations) {
         for (TypeDeclaration td : typeDeclarations)
-            td.visit(this);
+            td.accept(this);
         return null;
     }
 
@@ -140,11 +137,11 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(CaseStatement caseStatement) {
-        caseStatement.getExpression().visit(this);
+        caseStatement.getExpression().accept(this);
         for (CaseStatement.Case c : caseStatement.getCases())
-            c.visit(this);
+            c.accept(this);
 
-        caseStatement.getElseCase().visit(this);
+        caseStatement.getElseCase().accept(this);
 
         return null;
     }
@@ -155,7 +152,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(StatementList statements) {
         for (Statement s : statements)
-            s.visit(this);
+            if (s != null)
+                s.accept(this);
         return null;
     }
 
@@ -164,8 +162,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(ProgramDeclaration programDeclaration) {
-        programDeclaration.getProgramBody().visit(this);
-        programDeclaration.getLocalScope().visit(this);
+        programDeclaration.getLocalScope().accept(this);
+        programDeclaration.getProgramBody().accept(this);
         return null;
     }
 
@@ -175,7 +173,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(ExpressionList expressions) {
         for (Expression e : expressions)
-            e.visit(this);
+            e.accept(this);
         return null;
     }
 
@@ -184,8 +182,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(FunctionDeclaration functionDeclaration) {
-        functionDeclaration.getLocalScope().visit(this);
-        functionDeclaration.getStatements().visit(this);
+        functionDeclaration.getLocalScope().accept(this);
+        functionDeclaration.getStatements().accept(this);
         return null;
     }
 
@@ -194,11 +192,11 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(ForStatement forStatement) {
-        forStatement.getStart().visit(this);
+        forStatement.getStart().accept(this);
         if (forStatement.getStep() != null)
-            forStatement.getStep().visit(this);
-        forStatement.getStop().visit(this);
-        forStatement.getStatements().visit(this);
+            forStatement.getStep().accept(this);
+        forStatement.getStop().accept(this);
+        forStatement.getStatements().accept(this);
         return null;
     }
 
@@ -207,8 +205,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        functionBlockDeclaration.getFunctionBody().visit(this);
-        functionBlockDeclaration.getLocalScope().visit(this);
+        functionBlockDeclaration.getLocalScope().accept(this);
+        functionBlockDeclaration.getFunctionBody().accept(this);
         return null;
     }
 
@@ -219,9 +217,9 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(IfStatement ifStatement) {
         for (GuardedStatement gs : ifStatement.getConditionalBranches())
-            gs.visit(this);
+            gs.accept(this);
 
-        ifStatement.getElseBranch().visit(this);
+        ifStatement.getElseBranch().accept(this);
         return null;
     }
 
@@ -230,8 +228,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(GuardedStatement guardedStatement) {
-        guardedStatement.getCondition().visit(this);
-        guardedStatement.getStatements().visit(this);
+        guardedStatement.getCondition().accept(this);
+        guardedStatement.getStatements().accept(this);
         return null;
     }
 
@@ -240,9 +238,9 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(CaseStatement.Case aCase) {
-        aCase.getStatements().visit(this);
+        aCase.getStatements().accept(this);
         for (CaseCondition c : aCase.getConditions())
-            c.visit(this);
+            c.accept(this);
         return null;
     }
 
@@ -252,7 +250,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(LocalScope localScope) {
         for (VariableDeclaration vd : localScope.getLocalVariables().values())
-            vd.visit(this);
+            vd.accept(this);
         return null;
     }
 
@@ -263,4 +261,84 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     public T visit(VariableDeclaration variableDeclaration) {
         return super.visit(variableDeclaration);
     }
+
+    @Override
+    public T visit(Location location) {
+        return super.visit(location);
+    }
+
+    @Override
+    public T visit(ArrayInitialization initializations) {
+        for (Initialization init : initializations)
+            init.accept(this);
+        return super.visit(initializations);
+    }
+
+    @Override
+    public T visit(FunctionCall functionCall) {
+        functionCall.getParameters().forEach(e -> e.accept(this));
+        return super.visit(functionCall);
+    }
+
+    @Override
+    public T visit(FunctionBlockCallStatement fbc) {
+        fbc.getParameters().forEach(p -> p.accept(this));
+        return super.visit(fbc);
+    }
+
+    @Override
+    public T visit(FunctionBlockCallStatement.Parameter parameter) {
+        parameter.getExpression().accept(this);
+        return super.visit(parameter);
+    }
+
+    @Override
+    public T visit(StringTypeDeclaration stringTypeDeclaration) {
+        stringTypeDeclaration.getInitialization().accept(this);
+        return super.visit(stringTypeDeclaration);
+    }
+
+    @Override
+    public T visit(StructureTypeDeclaration structureTypeDeclaration) {
+        return super.visit(structureTypeDeclaration);
+    }
+
+    @Override
+    public T visit(SubRangeTypeDeclaration subRangeTypeDeclaration) {
+        return super.visit(subRangeTypeDeclaration);
+    }
+
+    @Override
+    public T visit(SimpleTypeDeclaration simpleTypeDeclaration) {
+        return super.visit(simpleTypeDeclaration);
+    }
+
+    @Override
+    public T visit(CommentStatement commentStatement) {
+        return super.visit(commentStatement);
+    }
+
+    @Override
+    public T visit(StructureInitialization structureInitialization) {
+        structureInitialization.getInitValues().values().forEach(v -> v.accept(this));
+        return super.visit(structureInitialization);
+    }
+
+    @Override
+    public T visit(ClassDeclaration clazz) {
+        clazz.getLocalScope().accept(this);
+        for (MethodDeclaration m : clazz.getMethods()) {
+            m.accept(this);
+        }
+        return super.visit(clazz);
+    }
+
+    @Override
+    public T visit(MethodDeclaration method) {
+        method.getLocalScope().accept(this);
+        method.getStatements().accept(this);
+        return null;
+    }
+
+
 }

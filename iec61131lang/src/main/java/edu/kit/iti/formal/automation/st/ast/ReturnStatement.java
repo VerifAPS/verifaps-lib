@@ -24,6 +24,8 @@ package edu.kit.iti.formal.automation.st.ast;
 
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Created by weigla on 09.06.2014.
@@ -31,14 +33,18 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
+@EqualsAndHashCode
+@ToString
 public class ReturnStatement extends Statement {
     /** {@inheritDoc} */
-    @Override
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @Override public ReturnStatement clone() {
-        return new ReturnStatement();
+
+    @Override public ReturnStatement copy() {
+        ReturnStatement rt = new ReturnStatement();
+        rt.setRuleContext(getRuleContext());
+        return rt;
     }
 }

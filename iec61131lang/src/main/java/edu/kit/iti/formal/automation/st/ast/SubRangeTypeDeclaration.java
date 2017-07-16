@@ -24,17 +24,20 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.RangeType;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Created by weigl on 13.06.14.
  *
- * @author weigl
- * @version $Id: $Id
+ * @author Alexander Weigl
  */
-public class SubRangeTypeDeclaration extends TypeDeclaration<ScalarValue<? extends AnyInt, Long>> {
+@EqualsAndHashCode
+@ToString
+public class SubRangeTypeDeclaration extends TypeDeclaration<Literal> {
     private Range range;
 
     /**
@@ -55,30 +58,35 @@ public class SubRangeTypeDeclaration extends TypeDeclaration<ScalarValue<? exten
         this.range = range;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RangeType getDataType(GlobalScope globalScope) {
         RangeType rt = new RangeType(
-                (long) range.getStart().getValue(),
+              /* TODO (long) range.getStart().getValue(),
                 (long) range.getStop().getValue(),
-                (AnyInt) super.getDataType(globalScope));
+                */0, 0, (AnyInt) super.getDataType(globalScope));
         setBaseType(rt);
         return rt;
     }
 
-    @Override public SubRangeTypeDeclaration clone() {
+    @Override
+    public SubRangeTypeDeclaration copy() {
         SubRangeTypeDeclaration t = new SubRangeTypeDeclaration();
-        t.range = range.clone();
+        t.range = Utils.copyNull(range);
         t.typeName = typeName;
         t.baseType = baseType;
         t.baseTypeName = baseTypeName;
-        t.initialization = initialization.clone();
+        t.initialization = Utils.copyNull(initialization);
         return t;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 }

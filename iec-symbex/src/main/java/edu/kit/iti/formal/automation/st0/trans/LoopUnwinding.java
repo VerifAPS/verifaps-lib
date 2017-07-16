@@ -22,21 +22,26 @@ package edu.kit.iti.formal.automation.st0.trans;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.AnyInt;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
-import edu.kit.iti.formal.automation.st.util.AstVisitor;
+import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 
 /**
  * Created by weigl on 03/10/14.
  */
-public class LoopUnwinding extends AstVisitor<Object> {
+public class LoopUnwinding extends AstMutableVisitor {
     private LocalScope currentScope;
 
     public LoopUnwinding() {
 
+    }
+
+    public static ST0Transformation getTransformation() {
+        return state -> {
+            LoopUnwinding loopUnwinding = new LoopUnwinding();
+            state.theProgram = (ProgramDeclaration) state.theProgram.accept(loopUnwinding);
+        };
     }
 
     @Override
@@ -76,15 +81,12 @@ public class LoopUnwinding extends AstVisitor<Object> {
 
         StatementList sl = new StatementList();
 
-
         ExpressionReplacer er = new ExpressionReplacer();
         er.setStatements(forStatement.getStatements());
         SymbolicReference ref = new SymbolicReference(var);
         for (int i = start; i < stop; i += step) {
             er.getReplacements().put(
-                    ref,
-                    new ScalarValue<>(AnyInt.INT, i)
-            );
+                    ref, Literal.integer(i));
             sl.addAll(er.replace());
         }
         return sl;
@@ -92,6 +94,6 @@ public class LoopUnwinding extends AstVisitor<Object> {
 
     private long eval(Expression expr) {
         IntegerExpressionEvaluator iee = new IntegerExpressionEvaluator(currentScope);
-        return (long) expr.visit(iee);
+        return (long) expr.accept(iee);
     }
 }

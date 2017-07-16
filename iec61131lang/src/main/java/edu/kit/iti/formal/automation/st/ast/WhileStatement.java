@@ -23,6 +23,8 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Created by weigla on 09.06.2014.
@@ -30,16 +32,18 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
+@EqualsAndHashCode
+@ToString
 public class WhileStatement extends GuardedStatement {
-    /** {@inheritDoc} */
-    public <T> T visit(Visitor<T> visitor) {
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @Override public WhileStatement clone() {
+    @Override public WhileStatement copy() {
         WhileStatement ws = new WhileStatement();
-        ws.condition = condition.clone();
-        ws.statements = statements.clone();
+        ws.setRuleContext(getRuleContext());
+        ws.condition = condition.copy();
+        ws.statements = statements.copy();
         return ws;
     }
 }

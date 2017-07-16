@@ -22,11 +22,13 @@ package edu.kit.iti.formal.automation.sfclang;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.values.PointerValue;
-import edu.kit.iti.formal.automation.st.ast.Position;
-import edu.kit.iti.formal.automation.st.ast.Top;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
+import lombok.AllArgsConstructor;
+import lombok.ToString;
+
+import java.math.BigInteger;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>Utils class.</p>
@@ -35,6 +37,8 @@ import org.antlr.v4.runtime.Token;
  * @version $Id: $Id
  */
 public class Utils {
+    static Pattern PATTERN = Pattern.compile("((?<prefix>\\D\\w*?)#)?((?<radix>\\d+?)#)?(?<value>.*)");
+
     /**
      * <p>getRandomName.</p>
      *
@@ -44,93 +48,45 @@ public class Utils {
         return "action_" + (int) (Math.random() * 10000);
     }
 
-    /**
-     * <p>setPosition.</p>
-     *
-     * @param top   a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
-     * @param first a {@link org.antlr.v4.runtime.Token} object.
-     */
-    public static void setStartPosition(Top top, Token first) {
-        if (first == null)
-            return;
-        top.setStartPosition(new Position(first.getLine(),
-                first.getCharPositionInLine()));
+
+    public static Splitted split(String s) {
+        Matcher t = PATTERN.matcher(s);
+        if (t.matches()) {
+            Splitted r = new Splitted(t.group("prefix"), t.group("radix"), t.group("value"));
+            return r;
+        } else {
+            throw new IllegalArgumentException("Argument is not well word: expected form " + PATTERN.pattern());
+        }
     }
 
-    public static void setStartPosition(Top top, ParserRuleContext rule) {
-        setStartPosition(top, rule.getStart());
+    public static BigInteger getIntegerLiteralValue(String text, boolean sign) {
+        Splitted s = split(text);
+        return sign ? s.number().negate() : s.number();
     }
 
-    public static void setStartPosition(Top top, Top rule) {
-        top.setStartPosition(rule.getStartPosition());
-    }
+    @AllArgsConstructor
+    @ToString
+    public static class Splitted {
+        private String prefix, ordinal, value;
 
-    //
-    public static void setLastPosition(Top ast, Token tok) {
-        if (tok == null) return;
-        ast.setEndPosition(
-                new Position(tok.getLine(), tok.getCharPositionInLine()));
-    }
+        public Optional<String> prefix() {
+            return prefix == null ? Optional.empty() : Optional.of(prefix);
+        }
 
-    public static void setLastPosition(Top ast, ParserRuleContext ctx) {
-        setLastPosition(ast, ctx.getStop());
-    }
+        public Optional<String> radix() {
+            return ordinal == null ? Optional.empty() : Optional.of(ordinal);
+        }
 
-    public static void setLastPosition(Top ast, Top ast2) {
-        if (ast2 == null || ast == null)
-            return;
-        ast.setEndPosition(ast2.getEndPosition());
-    }
+        public Optional<String> value() {
+            return value == null ? Optional.empty() : Optional.of(value);
+        }
 
-    public static void setPosition(Top top, Token first, Token last) {
-        setStartPosition(top, first);
-        setLastPosition(top, last);
-    }
-
-    public static void setPosition(Top top, Top first, Top last) {
-        setStartPosition(top, first);
-        setLastPosition(top, last);
-    }
-
-    public static void setPosition(Top top, Token first, Top last) {
-        setStartPosition(top, first);
-        setLastPosition(top, last);
-    }
-
-    public static void setPosition(Top top, Top first, Token last) {
-        setStartPosition(top, first);
-        setLastPosition(top, last);
-    }
-
-    public static void setPosition(Top top, ParserRuleContext ctx) {
-        setStartPosition(top, ctx);
-        setLastPosition(top, ctx);
-    }
-
-    public static void setPosition(Top top, ParserRuleContext first,
-            ParserRuleContext last) {
-        setStartPosition(top, first);
-        setLastPosition(top, last);
-    }
-
-    public static void setPosition(Top top, Token token) {
-        setPosition(top, token, token);
-    }
-
-
-    public static void setPosition(Top top,
-                                   Token array,
-                                   ParserRuleContext ctx) {
-        setPosition(top, array, ctx.getStop());
-    }
-
-    public static void setPosition(Top ast, ParserRuleContext rule,
-            Token stop) {
-        setPosition(ast, rule.getStart(), stop);
-    }
-
-    public static void setPosition(PointerValue target, PointerValue from) {
-        target.setStartPosition(from.getStartPosition().clone());
-        target.setEndPosition(from.getEndPosition().clone());
+        public BigInteger number() {
+            int r = 10;
+            if (ordinal != null) {
+                r = Integer.parseInt(ordinal);
+            }
+            return new BigInteger(value, r);
+        }
     }
 }

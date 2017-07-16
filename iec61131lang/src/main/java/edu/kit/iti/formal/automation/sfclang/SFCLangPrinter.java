@@ -144,7 +144,7 @@ public class SFCLangPrinter implements SFCAstVisitor<Object> {
     @Override
     public Object visit(TransitionDeclaration decl) {
         cw.nl().keyword("goto").append(" ");
-        decl.getGuard().visit(stPrinter);
+        decl.getGuard().accept(stPrinter);
         cw.append(" ").keyword("::").append(" ");
 
         printList(decl.getFrom());

@@ -28,6 +28,9 @@ import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * <p>UnaryExpression class.</p>
@@ -35,6 +38,9 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
+@Data
+@EqualsAndHashCode
+@ToString
 public class UnaryExpression extends Expression {
     UnaryOperator operator;
     Expression expression;
@@ -42,7 +48,7 @@ public class UnaryExpression extends Expression {
     /**
      * <p>Constructor for UnaryExpression.</p>
      *
-     * @param operator a {@link edu.kit.iti.formal.automation.operators.UnaryOperator} object.
+     * @param operator   a {@link edu.kit.iti.formal.automation.operators.UnaryOperator} object.
      * @param expression a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
      */
     public UnaryExpression(UnaryOperator operator, Expression expression) {
@@ -86,12 +92,16 @@ public class UnaryExpression extends Expression {
         this.expression = expression;
     }
 
-    /** {@inheritDoc} */
-    public <T> T visit(Visitor<T> visitor) {
+    /**
+     * {@inheritDoc}
+     */
+    public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Any dataType(LocalScope localScope) throws VariableNotDefinedException, TypeConformityException {
         Any a = operator.getPromotedType(expression.dataType(localScope));
@@ -101,11 +111,16 @@ public class UnaryExpression extends Expression {
         return a;
     }
 
-    @Override public UnaryExpression clone() {
-        return new UnaryExpression(operator, expression.clone());
+    @Override
+    public UnaryExpression copy() {
+        UnaryExpression ue = new UnaryExpression(operator, expression.copy());
+        ue.setRuleContext(getRuleContext());
+        return ue;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -119,7 +134,9 @@ public class UnaryExpression extends Expression {
         return true;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int result = operator.hashCode();

@@ -25,6 +25,8 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Created by weigl on 13.06.14.
@@ -32,6 +34,8 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
+@EqualsAndHashCode
+@ToString
 public abstract class TypeDeclaration<T extends Initialization> extends Top {
     protected String typeName;
     protected String baseTypeName;
@@ -92,7 +96,7 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
     }
 
     /** {@inheritDoc} */
-    public abstract <S> S visit(Visitor<S> visitor);
+    public abstract <S> S accept(Visitor<S> visitor);
 
     /**
      * <p>Getter for the field <code>baseType</code>.</p>
@@ -141,5 +145,5 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
         return getBaseType();
     }
 
-    public abstract TypeDeclaration<T> clone();
+    public abstract TypeDeclaration<T> copy();
 }

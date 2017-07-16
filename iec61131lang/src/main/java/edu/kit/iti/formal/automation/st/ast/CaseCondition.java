@@ -22,11 +22,12 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.ValueFactory;
-import edu.kit.iti.formal.automation.datatypes.AnyInt;
-import edu.kit.iti.formal.automation.datatypes.EnumerateType;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * <p>Abstract CaseCondition class.</p>
@@ -35,112 +36,71 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @version $Id: $Id
  */
 public abstract class CaseCondition extends Top {
-    public abstract CaseCondition clone();
+    public abstract CaseCondition copy();
 
+    @Data
+    @AllArgsConstructor
+    @EqualsAndHashCode
+    @ToString
     public static class Range extends CaseCondition {
-        private ScalarValue<? extends AnyInt, Integer> start, stop;
+        private Literal start, stop;
 
-        public Range(ScalarValue<? extends AnyInt, Integer> start,
-                ScalarValue<? extends AnyInt, Integer> stop) {
-            this.start = start;
-            this.stop = stop;
-        }
-
-        public Range(edu.kit.iti.formal.automation.st.ast.Range ast) {
-            super();
-        }
-
-        public ScalarValue<? extends AnyInt, Integer> getStart() {
-            return start;
-        }
-
-        public void setStart(ScalarValue<? extends AnyInt, Integer> start) {
-            this.start = start;
-        }
-
-        public ScalarValue<? extends AnyInt, Integer> getStop() {
-            return stop;
-        }
-
-        public void setStop(ScalarValue<? extends AnyInt, Integer> stop) {
-            this.stop = stop;
-        }
-
-        public <T> T visit(Visitor<T> visitor) {
+        public <T> T accept(Visitor<T> visitor) {
             return visitor.visit(this);
         }
 
-        @Override public Range clone() {
-            return new Range(start.clone(), stop.clone());
+        @Override
+        public Range copy() {
+            Range r = new Range(start.copy(), Utils.copyNull(stop));
+            r.setRuleContext(getRuleContext());
+            return r;
         }
     }
 
+    @AllArgsConstructor
+    @ToString
+    @Data
+    @EqualsAndHashCode
     public static class IntegerCondition extends CaseCondition {
-        private ScalarValue<? extends AnyInt, Long> value;
+        private Literal value;
 
-        public IntegerCondition(ScalarValue<? extends AnyInt, Long> value) {
-            this.value = value;
-        }
-
-        public ScalarValue<? extends AnyInt, Long> getValue() {
-            return value;
-        }
-
-        public void setValue(ScalarValue<? extends AnyInt, Long> value) {
-            this.value = value;
-        }
-
-        public <T> T visit(Visitor<T> visitor) {
+        public <T> T accept(Visitor<T> visitor) {
             return visitor.visit(this);
         }
 
-        @Override public IntegerCondition clone() {
-            return new IntegerCondition(value.clone());
+        @Override
+        public IntegerCondition copy() {
+            return new IntegerCondition(value.copy());
         }
     }
 
+    @EqualsAndHashCode
+    @AllArgsConstructor
+    @Data
     public static class Enumeration extends CaseCondition {
-        private ScalarValue<EnumerateType, String> start;
-        private ScalarValue<EnumerateType, String> stop;
+        private Literal start;
+        private Literal stop;
 
-        public Enumeration(ScalarValue<EnumerateType, String> start) {
+        public Enumeration(Literal start) {
             this.start = this.stop = start;
         }
 
-        public Enumeration(String start, String stop) {
-            this.start = ValueFactory.makeEnumeratedValue(start);
-            this.stop = ValueFactory.makeEnumeratedValue(stop);
-        }
-
-        public Enumeration(String s) {
-            this(ValueFactory.makeEnumeratedValue(s));
-        }
-
-        public ScalarValue<EnumerateType, String> getStart() {
-            return start;
-        }
-
-        public void setStart(ScalarValue<EnumerateType, String> start) {
-            this.start = start;
-        }
-
-        public ScalarValue<EnumerateType, String> getStop() {
-            return stop;
-        }
-
-        public void setStop(ScalarValue<EnumerateType, String> stop) {
-            this.stop = stop;
-        }
-
-        public <T> T visit(Visitor<T> visitor) {
+        public <T> T accept(Visitor<T> visitor) {
             return visitor.visit(this);
         }
 
-        @Override public Enumeration clone() {
+        @Override
+        public Enumeration copy() {
+            Enumeration e = new Enumeration(start.copy(), stop != null ? stop.copy() : null);
+            e.setRuleContext(getRuleContext());
+            return e;
+        }
+
+        /*@Override public Enumeration clone() {
             Enumeration e = new Enumeration(start.clone());
             if (stop != null)
                 e.stop = stop.clone();
             return e;
-        }
+        }*/
     }
 }

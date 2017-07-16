@@ -34,7 +34,7 @@ import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
  */
 public interface SFCAstVisitor<T> {
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param decl a {@link edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration} object.
      * @return a T object.
@@ -42,7 +42,7 @@ public interface SFCAstVisitor<T> {
     T visit(SFCDeclaration decl);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param decl a {@link edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration} object.
      * @return a T object.
@@ -50,7 +50,7 @@ public interface SFCAstVisitor<T> {
     T visit(StepDeclaration decl);
 
     /**
-     * <p>visit.</p>
+     * <p>accept.</p>
      *
      * @param decl a {@link edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration} object.
      * @return a T object.

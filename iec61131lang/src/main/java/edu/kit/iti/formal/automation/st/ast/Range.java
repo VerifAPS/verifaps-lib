@@ -22,8 +22,10 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.AnyInt;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  * Created by weigl on 13.06.14.
@@ -31,60 +33,16 @@ import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
  * @author weigl
  * @version $Id: $Id
  */
-public class Range {
-    private ScalarValue<? extends AnyInt, Long> start;
-    private ScalarValue<? extends AnyInt, Long> stop;
+@Data
+@EqualsAndHashCode
+@ToString
+@RequiredArgsConstructor
+public class Range implements Copyable<Range>{
+    private final Literal start, stop;
 
-    /**
-     * <p>Constructor for Range.</p>
-     *
-     * @param start a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
-     * @param stop a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
-     */
-    public Range(ScalarValue<? extends AnyInt, Long> start, ScalarValue<? extends AnyInt, Long> stop) {
-        this.start = start;
-        this.stop = stop;
-    }
 
-    /**
-     * <p>Getter for the field <code>start</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
-     */
-    public ScalarValue<? extends AnyInt, Long> getStart() {
-        return start;
-    }
-
-    /**
-     * <p>Setter for the field <code>start</code>.</p>
-     *
-     * @param start a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
-     */
-    public void setStart(ScalarValue<? extends AnyInt, Long> start) {
-        this.start = start;
-    }
-
-    /**
-     * <p>Getter for the field <code>stop</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
-     */
-    public ScalarValue<? extends AnyInt, Long> getStop() {
-        return stop
-                ;
-    }
-
-    /**
-     * <p>Setter for the field <code>stop</code>.</p>
-     *
-     * @param stop a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
-     */
-    public void setStop(ScalarValue<? extends AnyInt, Long> stop) {
-        this.stop = stop;
-    }
-
-    public Range clone() {
-        Range r = new Range(start.clone(), stop.clone());
-        return r;
+    @Override
+    public Range copy() {
+        return new Range(start.copy(), stop.copy());
     }
 }

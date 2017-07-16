@@ -23,14 +23,15 @@ package edu.kit.iti.formal.automation.st0.trans;
  */
 
 import edu.kit.iti.formal.automation.Console;
-import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.values.ScalarValue;
+import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.operators.BinaryOperator;
 import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
+
+import java.math.BigInteger;
 
 /**
  * Created by weigl on 03/10/14.
@@ -46,8 +47,8 @@ public class IntegerExpressionEvaluator extends AstVisitor<Long> {
     public Long visit(BinaryExpression binaryExpression) {
         BinaryOperator op = binaryExpression.getOperator();
 
-        long left = binaryExpression.getLeftExpr().visit(this);
-        long right = binaryExpression.getRightExpr().visit(this);
+        long left = binaryExpression.getLeftExpr().accept(this);
+        long right = binaryExpression.getRightExpr().accept(this);
 
         if (op == Operators.ADD)
             return left + right;
@@ -65,7 +66,7 @@ public class IntegerExpressionEvaluator extends AstVisitor<Long> {
     @Override
     public Long visit(UnaryExpression unaryExpression) {
         UnaryOperator op = unaryExpression.getOperator();
-        long left = unaryExpression.getExpression().visit(this);
+        long left = unaryExpression.getExpression().accept(this);
 
         if (op == Operators.MINUS)
             return -left;
@@ -75,22 +76,20 @@ public class IntegerExpressionEvaluator extends AstVisitor<Long> {
     }
 
     @Override
-    public Long visit(ScalarValue<? extends Any, ?> tsScalarValue) {
-        long r = 0;
-        if (tsScalarValue.getValue() instanceof Integer) {
-            return (long) ((int) ((Integer) tsScalarValue.getValue()));
-        } else {
-            return (Long) tsScalarValue.getValue();
+    public Long visit(Literal tsScalarValue) {
+        if (tsScalarValue.getDataType() instanceof AnyInt) {
+            return ((BigInteger) tsScalarValue.asValue().getValue()).longValue();
         }
+        return 0L;
     }
 
     @Override
     public Long visit(SymbolicReference symbolicReference) {
         String id = symbolicReference.getIdentifier();
         VariableDeclaration vd = scope.getVariable(symbolicReference);
-        ScalarValue sv = (ScalarValue) vd.getInit();
+        // ScalarValue sv = (ScalarValue) vd.getInit();
         try {
-            return (Long) sv.getValue();
+            return (Long) 0L;//sv.getValue();
         } catch (ClassCastException e) {
             Console.error("%s is not a integer variable", id);
             return 0L;
