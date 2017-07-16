@@ -22,7 +22,7 @@ import javafx.util.converter.DefaultStringConverter;
  *
  * @author Philipp
  */
-public class SpecificationTableCell extends TextFieldTableCell<HybridRow, String> {
+public class SpecificationTableCell extends AdvancedTextFieldTableCell<HybridRow, String> {
 
   private final ConstraintSpecificationValidator validator;
 
