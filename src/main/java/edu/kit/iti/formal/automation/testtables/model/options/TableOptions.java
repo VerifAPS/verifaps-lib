@@ -29,7 +29,7 @@ import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique;
  */
 public class TableOptions {
     private Mode mode;
-    private VerificationTechnique verificationTechnique = VerificationTechnique.INVAR;
+    private VerificationTechnique verificationTechnique = VerificationTechnique.IC3;
     private ConcreteTableOptions concreteTableOptions = new ConcreteTableOptions();
     private DataTypeOptions dataTypeOptions = new DataTypeOptions();
     private boolean useNext = true;

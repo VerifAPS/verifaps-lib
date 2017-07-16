@@ -29,6 +29,8 @@ import edu.kit.iti.formal.automation.testtables.model.Region;
 import edu.kit.iti.formal.automation.testtables.model.State;
 import edu.kit.iti.formal.automation.testtables.schema.*;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -77,7 +79,7 @@ public class TableReader {
 
         String func = xml.getFunctions();
         if (!func.isEmpty()) {
-            gtt.addFunctions(IEC61131Facade.file(func));
+            gtt.addFunctions(IEC61131Facade.file(CharStreams.fromString(func)));
         }
     }
 

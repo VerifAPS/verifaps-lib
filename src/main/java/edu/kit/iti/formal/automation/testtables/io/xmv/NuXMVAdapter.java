@@ -39,7 +39,7 @@ import java.util.List;
 public class NuXMVAdapter implements Runnable {
     private final NuXMVProcess process;
     private List<SMVModule> modules;
-    private VerificationTechnique technique = VerificationTechnique.INVAR;
+    private VerificationTechnique technique = VerificationTechnique.IC3;//VerificationTechnique.INVAR;
 
     public NuXMVAdapter(File table, List<SMVModule> modules) {
         this.modules = modules;

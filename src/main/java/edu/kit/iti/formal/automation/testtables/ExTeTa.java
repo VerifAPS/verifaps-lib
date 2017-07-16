@@ -54,35 +54,29 @@ public class ExTeTa {
         try {
             CommandLine cli = parse(args);
             run(cli);
-        }
-        catch (FunctionUndefinedException e) {
+        } catch (FunctionUndefinedException e) {
             Report.fatal("Could not call %s",
-                    e.getFunctionCall().getFunctionName().getIdentifier());
-        }
-        catch (UnknownVariableException e) {
+                    e.getFunctionCall().getFunctionName());
+        } catch (UnknownVariableException | ParseException e) {
             Report.fatal(e.getMessage());
-        }
-        catch (DataTypeNotDefinedException e) {
-            Report.fatal(
-                    "Could not parse the given ST sources. There is an unknown datatype. %s",
+        } catch (DataTypeNotDefinedException e) {
+            Report.fatal("Could not parse the given ST sources. There is an unknown datatype. %s",
                     e.getMessage());
-        }
-        catch (ParseException e) {
-            Report.fatal(e.getMessage());
-        }
-        catch (JAXBException e) {
+            e.printStackTrace();
+        } catch (JAXBException e) {
             Report.fatal(e.getLinkedException().getMessage());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             Report.fatal("IOExcepton: %s", e.getMessage());
-        }
-        catch (GetetaException e) {
+        } catch (GetetaException e) {
             Report.fatal("%s: %s", e.getClass().getSimpleName(),
                     e.getMessage());
-
-        }
-        catch (Exception e) {
-            Report.fatal(e.getMessage());
+        } catch (Exception e) {
+            if (e.getMessage() == null) {
+                Report.fatal(e.getClass().getName());
+                e.printStackTrace();
+            } else {
+                Report.fatal(e.getMessage());
+            }
         }
     }
 
@@ -108,28 +102,27 @@ public class ExTeTa {
 
         if (cli.getOptionValue('m') != null)
             switch (cli.getOptionValue('m')) {
-            case "concrete-smv":
-                table.getOptions().setMode(Mode.CONCRETE_TABLE);
-                break;
-            case "conformance":
-                table.getOptions().setMode(Mode.CONFORMANCE);
-                break;
-            case "input-seq-exists":
-                table.getOptions().setMode(Mode.INPUT_SEQUENCE_EXISTS);
-                break;
-            case "monitor":
-                table.getOptions().setMode(Mode.MONITOR_GENERATION);
-                break;
+                case "concrete-smv":
+                    table.getOptions().setMode(Mode.CONCRETE_TABLE);
+                    break;
+                case "conformance":
+                    table.getOptions().setMode(Mode.CONFORMANCE);
+                    break;
+                case "input-seq-exists":
+                    table.getOptions().setMode(Mode.INPUT_SEQUENCE_EXISTS);
+                    break;
+                case "monitor":
+                    table.getOptions().setMode(Mode.MONITOR_GENERATION);
+                    break;
             }
 
         if (table.getOptions().getMode() == Mode.MONITOR_GENERATION) {
             MonitorGeneration mg = new MonitorGeneration(table);
             TopLevelElements fbs = mg.call();
             StructuredTextPrinter stp = new StructuredTextPrinter();
-            fbs.visit(stp);
+            fbs.accept(stp);
             System.out.println(stp.getString());
-        }
-        else {
+        } else {
             SMVModule modCode = SymbExFacade.evaluateProgram(code);
             SMVType superEnumType = Facade.createSuperEnum(code);
             TableTransformation tt = new TableTransformation(table,

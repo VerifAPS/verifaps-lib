@@ -41,7 +41,7 @@ public class BinaryModelGluer implements Runnable {
     private final SMVModule code;
     private final SMVModule table;
     private final TableOptions options;
-    private SMVModuleImpl product = new SMVModuleImpl();
+    private SMVModule product = new SMVModule();
 
     public BinaryModelGluer(TableOptions options,
                             SMVModule modTable,

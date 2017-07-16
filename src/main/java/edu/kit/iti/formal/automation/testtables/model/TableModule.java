@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.testtables.model;
  * #L%
  */
 
-import edu.kit.iti.formal.smv.ast.SMVModuleImpl;
+import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SVariable;
 
 import java.util.HashMap;
@@ -32,7 +32,7 @@ import java.util.Map;
  * @author Alexander Weigl
  * @version 1 (11.12.16)
  */
-public class TableModule extends SMVModuleImpl {
+public class TableModule extends SMVModule {
     private Map<State, SVariable> clocks = new HashMap<>();
 
     public Map<State, SVariable> getClocks() {

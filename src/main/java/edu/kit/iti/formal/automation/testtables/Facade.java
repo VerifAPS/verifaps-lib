@@ -23,8 +23,11 @@ package edu.kit.iti.formal.automation.testtables;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyInt;
+import edu.kit.iti.formal.automation.datatypes.DataTypes;
+import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.testtables.io.TableReader;
 import edu.kit.iti.formal.automation.testtables.io.xmv.NuXMVAdapter;
@@ -32,18 +35,20 @@ import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.SReference;
 import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique;
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions;
+import edu.kit.iti.formal.automation.testtables.schema.DataType;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
-import org.apache.commons.io.IOUtils;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.Token;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Facade {
     public static GeneralizedTestTable readTable(String filename) throws JAXBException {
@@ -53,11 +58,52 @@ public class Facade {
     }
 
     public static TopLevelElements readProgram(String optionValue) throws IOException {
-        try (FileReader r = new FileReader(optionValue)) {
-            TopLevelElements a = IEC61131Facade.file(IOUtils.toString(r));
-            IEC61131Facade.resolveDataTypes(a);
-            return a;
-        }
+        TopLevelElements a = IEC61131Facade.file(CharStreams.fromFileName(optionValue));
+        IEC61131Facade.resolveDataTypes(a);
+        resolveEnumsAndSetInts(a);
+        return a;
+    }
+
+    private static void resolveEnumsAndSetInts(TopLevelElements a) {
+        AstVisitor<Object> astVisitor = new AstVisitor<Object>() {
+            public GlobalScope global;
+
+            @Override
+            public Object visit(ProgramDeclaration decl) {
+                this.global = decl.getLocalScope().getGlobalScope();
+                return super.visit(decl);
+            }
+
+            @Override
+            public Object visit(VariableDeclaration declaration) {
+                if (declaration.getDataType() instanceof AnyInt) {
+                    declaration.setDataType(DataTypes.INT);
+                    if(declaration.getInit()!=null && declaration.getInit() instanceof Literal) {
+                        Literal l = (Literal) declaration.getInit();
+                        l.setDataType(DataTypes.INT);
+                    }
+                }
+                return declaration;
+            }
+
+            @Override
+            public Object visit(Literal literal) {
+                if (!literal.isDataTypeExplicit() && literal.getDataType() instanceof AnyInt) {
+                    literal.setDataTypeExplicit(true);
+                    literal.setDataType(DataTypes.INT);
+                } else {
+                    if (literal.getDataType() == null) {
+                        String dt = literal.getDataTypeName();
+                        if (dt != null && !dt.isEmpty()) {
+                            Any a = global.resolveDataType(dt);
+                            literal.setDataType(a);
+                        }
+                    }
+                }
+                return literal;
+            }
+        };
+        a.accept(astVisitor);
     }
 
     public static DelayModuleBuilder delay(SReference ref) {
@@ -74,7 +120,7 @@ public class Facade {
     }
 
     public static boolean runNuXMV(String tableFilename,
-            VerificationTechnique technique, SMVModule... modules) {
+                                   VerificationTechnique technique, SMVModule... modules) {
         return runNuXMV(tableFilename, Arrays.asList(modules), technique);
     }
 
@@ -87,7 +133,7 @@ public class Facade {
     }
 
     public static boolean runNuXMV(String tableFilename,
-            List<SMVModule> modules, VerificationTechnique vt) {
+                                   List<SMVModule> modules, VerificationTechnique vt) {
         NuXMVAdapter adapter = new NuXMVAdapter(new File(tableFilename), modules);
         adapter.setTechnique(vt);
         adapter.run();
@@ -96,7 +142,7 @@ public class Facade {
 
     public static SMVType createSuperEnum(TopLevelElements code) {
         SuperEnumCreator sec = new SuperEnumCreator();
-        code.visit(sec);
+        code.accept(sec);
         return sec.getType();
     }
 
@@ -109,7 +155,7 @@ public class Facade {
 
         @Override
         public Void visit(EnumerationTypeDeclaration etd) {
-            type.getValues().addAll(etd.getAllowedValues());
+            type.getValues().addAll(etd.getAllowedValues().stream().map(Token::getText).collect(Collectors.toList()));
             return null;
         }
     }

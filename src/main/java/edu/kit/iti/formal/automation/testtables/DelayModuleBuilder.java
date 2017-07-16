@@ -35,7 +35,7 @@ public class DelayModuleBuilder implements Runnable {
     private final SMVType datatype;
     private final SVariable variable;
     private SMVType moduleType;
-    private SMVModuleImpl module = new SMVModuleImpl();
+    private SMVModule module = new SMVModule();
 
     public DelayModuleBuilder(SVariable var, int cycles) {
 
@@ -85,11 +85,11 @@ public class DelayModuleBuilder implements Runnable {
         return this;
     }
 
-    public SMVModuleImpl getModule() {
+    public SMVModule getModule() {
         return module;
     }
 
-    public DelayModuleBuilder setModule(SMVModuleImpl module) {
+    public DelayModuleBuilder setModule(SMVModule module) {
         this.module = module;
         return this;
     }

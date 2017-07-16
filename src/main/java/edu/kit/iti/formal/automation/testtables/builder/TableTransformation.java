@@ -35,11 +35,12 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class TableTransformation {
+    public static final String ERROR_STATE_IDENTIFIER = "___$ERROR$STATE";
     private final StateReachability reachable;
     private List<Consumer<TableTransformation>> transformers = new LinkedList<>();
     private GeneralizedTestTable gtt;
     private TableModule mt = new TableModule();
-    private SVariable errorState = new SVariable("ERROR", SMVType.BOOLEAN);
+    private SVariable errorState = new SVariable(ERROR_STATE_IDENTIFIER, SMVType.BOOLEAN);
     private List<SMVModule> helper = new LinkedList<>();
     private SMVType superEnumType;
 
