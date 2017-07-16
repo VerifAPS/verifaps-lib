@@ -202,6 +202,7 @@ public class EditorPaneController implements Controller {
         case IEC61131Lexer.COMMENT:
         case IEC61131Lexer.LINE_COMMENT:
             return listOf("comment");
+            case IEC61131Lexer.RETURN:
         case IEC61131Lexer.INTERFACE:
         case IEC61131Lexer.END_INTERFACE:
         case IEC61131Lexer.METHOD:

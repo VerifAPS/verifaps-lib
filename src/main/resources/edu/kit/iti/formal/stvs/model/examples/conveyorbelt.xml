@@ -1,10 +1,12 @@
 <session xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
-<code>
-    <plaintext><![CDATA[
+    <code>
+        <plaintext><![CDATA[
 TYPE WorkpieceTypes_t : ( EXPRESS, NORMAL );
      Position_t       : (FIRST, SECOND, END);
      Error_t          : (NO_ERROR,
                          DOUBLE_WORKPIECE,
+                         WORKPIECE_TOO_LIGHT,
+                         WORKPIECE_TOO_HEAVY,
                          MISS_LIGHTBARRIER_1,
                          MISS_LIGHTBARRIER_2,
                          MISS_LIGHTBARRIER_3);
@@ -28,20 +30,12 @@ VAR
 	DesiredPosition   : Position_t;
 	State             : INT;
 	lowerTimeReached,
-    upperTimeReached  : BOOL;
-	P1Push, P2Push   : BOOL;
-	Clock 			 : INT;
+        upperTimeReached  : BOOL;
+	P1Push, P2Push    : BOOL;
+	Clock             : INT;
 END_VAR
 
 VAR CONSTANT
-	(*TIMING_START_TO_LB1  : TIME := TIME#80MS;
-	TIMING_LB1_TO_LB2    : TIME := TIME#20MS;
-	TIMING_LB2_TO_LB3    : TIME := TIME#20MS;
-	TIMING_LB3_TO_P1     : TIME := TIME#30MS;
-	TIMING_P1_TO_P2      : TIME := TIME#30MS;
-	TIMING_P2_TO_END     : TIME := TIME#50MS;
-	DELAY                : TIME := TIME#20MS;*)
-
 	TIMING_START_TO_LB1  : INT := 8;
 	TIMING_LB1_TO_LB2    : INT := 2;
 	TIMING_LB2_TO_LB3    : INT := 2;
@@ -55,33 +49,32 @@ VAR CONSTANT
 	BULKY_GOOD_WEIGHT : INT := 32;//kg
 END_VAR
 
-ERROR := NO_ERROR;
+ERROR := Error_t#NO_ERROR;
 
 IF LightBarrier0 THEN
-	IF State <> 0 THEN
-		ERROR := DOUBLE_WORKPIECE;
-		RETURN;
-	END_IF
-
-	IF LOWER_WEIGHT_LIMIT > WeightSensorFront THEN
-		ERROR := WORKPIECE_TOO_LIGHT;
-	ELSEIF WeightSensorFront > UPPER_WEIGHT_LIMIT THEN
-		ERROR := WORKPIECE_TOO_HEAVY;
-	END_IF
-
-	State := 1;
-	MoveBelt := TRUE;
-	IF WeightSensorFront >= BULKY_GOOD_WEIGHT THEN
-		P1Push := FALSE;
- 		P2Push := FALSE;
-
-	ELSIF WorkpieceType = WorkpieceTypes_t.EXPRESS THEN
-		P1Push := TRUE;
- 		P2Push := FALSE;
- 	ELSE
-		P1Push := FALSE;
- 		P2Push := TRUE;
- 	END_IF
+	IF State <> 0 THEN  // guard for more than 1 workpiece on the conveyor
+		ERROR := Error_t#DOUBLE_WORKPIECE;
+		State := 0;
+	ELSE
+	    /   / guarding lower and upper weight
+	    IF LOWER_WEIGHT_LIMIT > WeightSensorFront THEN
+		    ERROR := Error_t#WORKPIECE_TOO_LIGHT;
+	    ELSEIF WeightSensorFront > UPPER_WEIGHT_LIMIT THEN
+		    ERROR := Error_t#WORKPIECE_TOO_HEAVY;
+	    ELSE // everything is fine, determine drop out lane
+	        State := 1;
+	        IF WeightSensorFront >= BULKY_GOOD_WEIGHT THEN
+		        P1Push := FALSE;
+         		P2Push := FALSE;
+	        ELSIF WorkpieceType = WorkpieceTypes_t#EXPRESS THEN
+		        P1Push := TRUE;
+         		P2Push := FALSE;
+         	ELSE
+		        P1Push := FALSE;
+         		P2Push := TRUE;
+         	END_IF
+         END_IF
+    END_IF
 END_IF
 
 IF State = 0 THEN
@@ -110,8 +103,6 @@ CASE State OF
 END_CASE
 
 CASE State OF
-	0:  MoveBelt := FALSE;
-
 	1:  IF lowerTimeReached AND LightBarrier1 THEN
 			State := State + 1;
 		END_IF
@@ -140,19 +131,692 @@ CASE State OF
 END_CASE
 
 IF upperTimeReached THEN
-	ERROR := MISS_LIGHTBARRIER_1;
+        // could be more precise
+	ERROR := Error_t#MISS_LIGHTBARRIER_1;
 	State := 0;
 END_IF
 
-END_PROGRAM
-    ]]></plaintext>
-</code>
-    <tabs>
-        <tab id="1" open="true" readOnly="false">
-            <specification isConcrete="false">
-                <variables>
+MoveBelt := State <> 0;
 
+END_PROGRAM]]></plaintext>
+    </code>
+    <tabs>
+        <tab id="0" open="false" readOnly="false">
+            <specification comment="" isConcrete="false" name="Unnamed Specification">
+                <variables>
+                    <ioVariable colwidth="213" data-type="INT" io="input" name="WeightSensorFront"/>
+                    <ioVariable colwidth="184" data-type="BOOL" io="input" name="LightBarrier0"/>
+                    <ioVariable colwidth="184" data-type="BOOL" io="input" name="LightBarrier1"/>
+                    <ioVariable colwidth="184" data-type="BOOL" io="input" name="LightBarrier2"/>
+                    <ioVariable colwidth="184" data-type="BOOL" io="input" name="LightBarrier3"/>
+                    <ioVariable colwidth="292" data-type="WorkpieceTypes_t" io="input" name="WorkpieceType"/>
+                    <ioVariable colwidth="155" data-type="BOOL" io="output" name="MoveBelt"/>
+                    <ioVariable colwidth="131" data-type="BOOL" io="output" name="Push1"/>
+                    <ioVariable colwidth="131" data-type="BOOL" io="output" name="Push2"/>
+                    <ioVariable colwidth="145" data-type="Error_t" io="output" name="ERROR"/>
                 </variables>
+                <rows>
+                    <row comment="">
+                        <duration>-</duration>
+                        <cell>-</cell>
+                        <cell>FALSE</cell>
+                        <cell>-</cell>
+                        <cell>-</cell>
+                        <cell>-</cell>
+                        <cell>-</cell>
+                        <cell>FALSE</cell>
+                        <cell>FALSE</cell>
+                        <cell>FALSE</cell>
+                        <cell>NO_ERROR</cell>
+                    </row>
+                    <row comment="">
+                        <duration>1</duration>
+                        <cell>10</cell>
+                        <cell>TRUE</cell>
+                        <cell>-</cell>
+                        <cell>-</cell>
+                        <cell>-</cell>
+                        <cell>NORMAL</cell>
+                        <cell>TRUE</cell>
+                        <cell>FALSE</cell>
+                        <cell>FALSE</cell>
+                        <cell>NO_ERROR</cell>
+                    </row>
+                </rows>
+            </specification>
+            <specification isConcrete="true" isCounterExample="false" name="Unnamed Specification">
+                <variables>
+                    <ioVariable data-type="INT" io="input" name="WeightSensorFront"/>
+                    <ioVariable data-type="BOOL" io="input" name="LightBarrier0"/>
+                    <ioVariable data-type="BOOL" io="input" name="LightBarrier1"/>
+                    <ioVariable data-type="BOOL" io="input" name="LightBarrier2"/>
+                    <ioVariable data-type="BOOL" io="input" name="LightBarrier3"/>
+                    <ioVariable data-type="WorkpieceTypes_t" io="input" name="WorkpieceType"/>
+                    <ioVariable data-type="BOOL" io="output" name="MoveBelt"/>
+                    <ioVariable data-type="BOOL" io="output" name="Push1"/>
+                    <ioVariable data-type="BOOL" io="output" name="Push2"/>
+                    <ioVariable data-type="Error_t" io="output" name="ERROR"/>
+                </variables>
+                <rows>
+                    <row>
+                        <duration>50</duration>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>0</cell>
+                            <cell>FALSE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>TRUE</cell>
+                            <cell>EXPRESS</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                    </row>
+                    <row>
+                        <duration>1</duration>
+                        <cycle>
+                            <cell>10</cell>
+                            <cell>TRUE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NORMAL</cell>
+                            <cell>TRUE</cell>
+                            <cell>FALSE</cell>
+                            <cell>FALSE</cell>
+                            <cell>NO_ERROR</cell>
+                        </cycle>
+                    </row>
+                </rows>
             </specification>
         </tab>
     </tabs>

@@ -27,6 +27,8 @@ import java.util.Optional;
 
 import javafx.application.Platform;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handles communication with the GeTeTa verification engine.
@@ -34,6 +36,8 @@ import org.apache.commons.io.IOUtils;
  * @author Benjamin Alt
  */
 public class GeTeTaVerificationEngine implements VerificationEngine {
+  private static final Logger LOGGER = LoggerFactory.getLogger(GeTeTaVerificationEngine.class);
+
   private Process getetaProcess;
   private NullableProperty<VerificationResult> verificationResult;
   private List<Type> typeContext;
@@ -88,10 +92,14 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     File tempSpecFile = File.createTempFile("verification-spec", ".xml");
     File tempCodeFile = File.createTempFile("verification-code", ".st");
     ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.GETETA, tempSpecFile);
-    ExporterFacade.exportCode(scenario.getCode(), tempCodeFile, true);
+    //weigl set escapeVariables to false, due to bug with enum constant
+    ExporterFacade.exportCode(scenario.getCode(), tempCodeFile, false);
     String getetaCommand =
         config.getGetetaCommand().replace("${code}", tempCodeFile.getAbsolutePath())
             .replace("${spec}", tempSpecFile.getAbsolutePath());
+
+    LOGGER.info("Geteta command: {}", getetaCommand);
+
 
     // Start verification engine in new child process
     if (getetaProcess != null) {
@@ -100,6 +108,9 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     ProcessBuilder processBuilder = new ProcessBuilder(getetaCommand.split(" "));
     processBuilder.environment().put("NUXMV", config.getNuxmvFilename());
     getetaOutputFile = File.createTempFile("verification-result", ".log");
+    LOGGER.info("Code file: {}", tempCodeFile);
+    LOGGER.info("Specification file: {}", tempSpecFile);
+    LOGGER.info("Verification log file: {}", getetaOutputFile.getAbsoluteFile());
     processBuilder.redirectOutput(getetaOutputFile);
     try {
       getetaProcess = processBuilder.start();

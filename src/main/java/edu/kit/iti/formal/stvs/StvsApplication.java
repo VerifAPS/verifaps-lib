@@ -76,7 +76,7 @@ public class StvsApplication extends Application {
         });
 
 
-        if (System.getProperty("presentation-mode", "false").equals("true")) {
+        if (System.getProperty("presentation", "false").equals("true")) {
             mainScene.getScene().getStylesheets().add(
                     StvsApplication.class.getResource("presentation.css").toExternalForm()
             );
