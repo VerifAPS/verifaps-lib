@@ -1,10 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConcreteSpecImporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigImporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecImporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlExporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionImporter;
+import edu.kit.iti.formal.stvs.logic.io.xml.*;
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
@@ -15,29 +11,22 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import edu.kit.iti.formal.stvs.io._1.*;
 
 /**
  * Facade class for facilitating the import of different objects from different formats.
@@ -265,9 +254,9 @@ public class ImporterFacade {
       throws JAXBException, ImportException {
     switch (format) {
       case XML:
-        JAXBContext context = JAXBContext.newInstance(XmlExporter.NAMESPACE);
-        JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.History> element =
-            (JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.History>) context.createUnmarshaller()
+        JAXBContext context = JAXBContext.newInstance(edu.kit.iti.formal.stvs.io._1.ObjectFactory.class);
+        JAXBElement<edu.kit.iti.formal.stvs.io._1.History> element =
+            (JAXBElement<edu.kit.iti.formal.stvs.io._1.History>) context.createUnmarshaller()
                 .unmarshal(chosenFile);
         return new History(element.getValue().getFilename());
       default:

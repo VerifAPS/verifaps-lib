@@ -156,6 +156,6 @@ public class GeTeTaExporter extends XmlExporter<ConstraintSpecification> {
     testTable.setVariables(makeVariables(source));
     testTable.setSteps(makeSteps(source));
     JAXBElement<TestTable> element = objectFactory.createTestTable(testTable);
-    return marshalToNode(element, EXTETA_NAMESPACE);
+    return marshalToNode(element, OF_EXTETA);
   }
 }

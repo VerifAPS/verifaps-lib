@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import edu.kit.iti.formal.stvs.logic.io.xml.ObjectFactory;
+import edu.kit.iti.formal.stvs.io._1.ObjectFactory;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecExporter;
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlExporter;
@@ -12,16 +12,11 @@ import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Facade class for facilitating the export of different objects to different export formats.
@@ -172,14 +167,14 @@ public class ExporterFacade {
       throws ExportException, JAXBException, IOException {
     switch (format) {
       case XML:
-        edu.kit.iti.formal.stvs.logic.io.xml.History exportHistory =
+        edu.kit.iti.formal.stvs.io._1.History exportHistory =
             new ObjectFactory().createHistory();
         for (String filename : history.getFilenames()) {
           exportHistory.getFilename().add(filename);
         }
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        JAXBContext context = JAXBContext.newInstance(XmlExporter.NAMESPACE);
-        JAXBElement<edu.kit.iti.formal.stvs.logic.io.xml.History> element =
+        JAXBContext context = JAXBContext.newInstance(XmlExporter.OF_STVS);
+        JAXBElement<edu.kit.iti.formal.stvs.io._1.History> element =
             new ObjectFactory().createHistory(exportHistory);
         context.createMarshaller().marshal(element, bos);
         writeToFile(bos, file);

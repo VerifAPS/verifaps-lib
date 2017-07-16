@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.model.code;
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
 import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration;
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
@@ -22,9 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Token;
 
 /**
  * Represents the formal model of source code (extracted from {@link Code}).
@@ -46,14 +49,15 @@ public class ParsedCode {
 
     @Override
     public Void visit(TypeDeclarations decls) {
-      decls.stream().forEach(decl -> decl.visit(this));
+      decls.stream().forEach(decl -> decl.accept(this));
       return null;
     }
 
     @Override
     public Void visit(EnumerationTypeDeclaration enumType) {
       if (!enumType.getAllowedValues().isEmpty()) {
-        TypeEnum type = new TypeEnum(enumType.getTypeName(), enumType.getAllowedValues());
+        TypeEnum type = new TypeEnum(enumType.getTypeName(),
+                enumType.getAllowedValues().stream().map(Token::getText).collect(Collectors.toList()));
         this.definedTypes.add(type);
       }
       return null;
@@ -180,18 +184,18 @@ public class ParsedCode {
 
     // Find types in parsed code
     TypeDeclarationVisitor typeVisitor = new TypeDeclarationVisitor();
-    ast.visit(typeVisitor);
+    ast.accept(typeVisitor);
     Map<String, Type> definedTypesByName = new HashMap<>();
     typeVisitor.getDefinedTypes()
         .forEach(type -> definedTypesByName.put(type.getTypeName(), type));
 
     // Find IoVariables in parsed code
     VariableVisitor variableVisitor = new VariableVisitor();
-    ast.visit(variableVisitor);
+    ast.accept(variableVisitor);
 
     // Find code blocks in parsed code
     BlockVisitor blockVisitor = new BlockVisitor();
-    ast.visit(blockVisitor);
+    ast.accept(blockVisitor);
     List<FoldableCodeBlock> foldableCodeBlocks = blockVisitor.getFoldableCodeBlocks();
 
     parsedCodeListener.accept(new ParsedCode(foldableCodeBlocks,
@@ -210,7 +214,7 @@ public class ParsedCode {
     parser.removeErrorListeners();
     parser.addErrorListener(syntaxErrorListener);
 
-    return new TopLevelElements(parser.start().ast);
+    return (TopLevelElements) parser.start().accept(new IECParseTreeToAST());
   }
 
   /**

@@ -24,8 +24,7 @@ public class ExportException extends Exception {
    * @param exception The original exception
    */
   public ExportException(Exception exception) {
-    originalException = exception;
-    message = exception.getMessage();
+    super(exception);
   }
 
   /**

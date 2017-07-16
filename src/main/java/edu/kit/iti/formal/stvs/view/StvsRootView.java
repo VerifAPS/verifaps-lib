@@ -22,7 +22,7 @@ public class StvsRootView extends SplitPane {
   public StvsRootView(EditorPane editor, SpecificationsPane specifications) {
     this.editor = editor;
     this.specifications = specifications;
-    ViewUtils.setupId(this);
+    ViewUtils.setupClass(this);
 
     // for presentations
     //this.setStyle("-fx-font-size: 16pt");

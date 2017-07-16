@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml" comment="f8Rsf6NkPm3CT89XDnBlvDvpYvtGkMyOOun99AqYZ2Sp5QQp3s3nRny3eQ6" isConcrete="false" name="uJP7mh481p2bLg4Tw5V">
+<?xml version="1.0" encoding="UTF-8"?><specification xmlns="http://formal.iti.kit.edu/stvs/io/1.0/" comment="f8Rsf6NkPm3CT89XDnBlvDvpYvtGkMyOOun99AqYZ2Sp5QQp3s3nRny3eQ6" isConcrete="false" name="uJP7mh481p2bLg4Tw5V">
 <variables>
 <ioVariable colwidth="100" data-type="BOOL" io="output" name="ZdYm9P0ijUN"/>
 <ioVariable colwidth="100" data-type="B4Za4" io="input" name="Aq4xmTe4kyKuRJclFCTf8xESWGmxKZlucm2Ndjo9PO"/>

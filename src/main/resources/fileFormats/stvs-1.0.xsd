@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:tns="http://formal.iti.kit.edu/stvs/io/1.0/"
+        elementFormDefault="qualified"
+        targetNamespace="http://formal.iti.kit.edu/stvs/io/1.0/">
+
+    <!-- root elements -->
+    <element name="history" type="tns:History"/>
+    <element name="config" type="tns:Config"/>
+    <element name="session" type="tns:Session"/>
+    <element name="specification" type="tns:SpecificationTable"/>
+
+
+
+    <!-- region History -->
+    <complexType name="History">
+        <sequence>
+            <element name="filename" type="string" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+    <!-- endregion -->
+
+    <!-- region Config -->
+    <complexType name="Config">
+        <sequence>
+            <element name="general" minOccurs="0" maxOccurs="1">
+                <complexType>
+                    <sequence>
+                        <element name="uiLanguage" type="string" minOccurs="0" maxOccurs="1"/>
+                        <element name="windowSize" minOccurs="0" maxOccurs="1">
+                            <complexType>
+                                <sequence>
+                                    <element name="width" type="positiveInteger" minOccurs="0"
+                                             maxOccurs="1"/>
+                                    <element name="height" type="positiveInteger" minOccurs="0"
+                                             maxOccurs="1"/>
+                                    <element name="maximized" type="boolean" minOccurs="0" maxOccurs="1"/>
+                                </sequence>
+                            </complexType>
+                        </element>
+                        <element name="verificationTimeout" type="positiveInteger" minOccurs="0"
+                                 maxOccurs="1"/>
+                        <element name="simulationTimeout" type="positiveInteger" minOccurs="0" maxOccurs="1"/>
+                        <element name="maxLineRollout" type="positiveInteger" minOccurs="0"
+                                 maxOccurs="1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="editor" minOccurs="0" maxOccurs="1">
+                <complexType>
+                    <sequence>
+                        <element name="showLineNumbers" type="boolean" minOccurs="0" maxOccurs="1"
+                                 default="true"/>
+                        <element name="fontFamily" type="string" minOccurs="0" maxOccurs="1"/>
+                        <element name="fontSize" type="positiveInteger" minOccurs="0" maxOccurs="1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="dependencies" minOccurs="0" maxOccurs="1">
+                <complexType>
+                    <sequence>
+                        <element name="z3Path" type="string" minOccurs="0" maxOccurs="1"/>
+                        <element name="getetaCommand" type="string" minOccurs="0" maxOccurs="1"/>
+                        <element name="nuxmvFilename" type="string" minOccurs="0" maxOccurs="1"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </sequence>
+    </complexType>
+    <!-- endregion Config -->
+
+
+    <!-- Specification and Session -->
+    <complexType name="Variables">
+        <sequence>
+            <element name="ioVariable" minOccurs="0" maxOccurs="unbounded">
+                <complexType>
+                    <attribute name="io" type="string" use="required"/>
+                    <attribute name="name" type="string" use="required"/>
+                    <attribute name="data-type" type="string" use="required"/>
+                    <attribute name="colwidth" type="positiveInteger" use="optional"/>
+                    <attribute name="comment" type="string" use="optional"/>
+                </complexType>
+            </element>
+            <element name="freeVariable" minOccurs="0" maxOccurs="unbounded">
+                <complexType>
+                    <attribute name="name" type="string" use="required"/>
+                    <attribute name="data-type" type="string" use="required"/>
+                    <attribute name="default" type="string" use="optional"/>
+                </complexType>
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="Rows">
+        <sequence>
+            <element name="row" minOccurs="0" maxOccurs="unbounded">
+                <complexType>
+                    <sequence>
+                        <element name="duration" minOccurs="1" maxOccurs="1">
+                            <complexType>
+                                <simpleContent>
+                                    <extension base="string">
+                                        <attribute name="comment" type="string" use="optional"/>
+                                    </extension>
+                                </simpleContent>
+                            </complexType>
+                        </element>
+                        <choice>
+                            <sequence>
+                                <element name="cell" minOccurs="1" maxOccurs="unbounded">
+                                    <complexType>
+                                        <simpleContent>
+                                            <extension base="string">
+                                                <attribute name="comment" type="string" use="optional"/>
+                                            </extension>
+                                        </simpleContent>
+                                    </complexType>
+                                </element>
+                            </sequence>
+                            <sequence>
+                                <element name="cycle" minOccurs="0" maxOccurs="unbounded">
+                                    <complexType>
+                                        <sequence>
+                                            <element name="cell" type="string" minOccurs="1"
+                                                     maxOccurs="unbounded"/>
+                                        </sequence>
+                                    </complexType>
+                                </element>
+                            </sequence>
+                        </choice>
+                    </sequence>
+                    <attribute name="comment" type="string" use="optional"/>
+                </complexType>
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="EnumTypes">
+        <sequence>
+            <element name="enum" minOccurs="0" maxOccurs="unbounded">
+                <complexType>
+                    <sequence>
+                        <element name="literal" type="string" minOccurs="1" maxOccurs="unbounded"/>
+                    </sequence>
+                    <attribute name="name"/>
+                </complexType>
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="SpecificationTable">
+        <sequence>
+            <element name="variables" type="tns:Variables" minOccurs="1" maxOccurs="1"/>
+            <element name="rows" type="tns:Rows" minOccurs="0" maxOccurs="1"/>
+            <element name="enumTypes" type="tns:EnumTypes" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+        <attribute name="isConcrete" type="boolean" use="required"/>
+        <attribute name="isCounterExample" type="boolean" use="optional" default="false"/>
+        <attribute name="comment" type="string" use="optional"/>
+        <attribute name="name" type="string" use="optional" default="Unnamed Specification"/>
+    </complexType>
+
+    <complexType name="Code">
+        <sequence>
+            <element name="plaintext" type="string" minOccurs="1" maxOccurs="1"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="Tab">
+        <sequence>
+            <annotation>
+                <documentation>A tab must contain at least 1 specification; it may contain
+                    two (in the case of a hybridspecification)
+                </documentation>
+            </annotation>
+            <element name="specification" type="tns:SpecificationTable" minOccurs="1"
+                     maxOccurs="2"/>
+        </sequence>
+        <attribute name="id" type="nonNegativeInteger" use="required"/>
+        <attribute name="open" type="boolean" use="required">
+            <annotation>
+                <documentation>Only one tab can be open in a session</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="readOnly" type="boolean" use="required"/>
+    </complexType>
+
+    <complexType name="Session">
+        <sequence minOccurs="1" maxOccurs="1">
+            <element name="code" type="tns:Code"/>
+            <element name="tabs">
+                <complexType>
+                    <sequence minOccurs="1" maxOccurs="unbounded">
+                        <element name="tab" type="tns:Tab"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <!-- The "config" element is currently not used (i.e. ignored), but remains in XSD for
+            backwards compatibility & future extendability -->
+            <element name="config" type="tns:Config" minOccurs="0" maxOccurs="1"/>
+            <!-- The "history" element is currently not used (i.e. ignored), but remains in XSD for
+            backwards compatibility & future extendability -->
+            <element name="history" type="tns:History" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+    </complexType>
+    <!-- endregion -->
+</schema>

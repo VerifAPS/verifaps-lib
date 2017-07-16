@@ -1,5 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><session xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml">
-<code>
+<?xml version="1.0" encoding="UTF-8"?>
+<session xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
+
+    <code>
 <plaintext>TYPE
   OpMode : (Op , Teach);
   TeachStatus :  (Ok, NoTeachPoints, Teaching, InvalidTeachPoints, InvalidInputValue);

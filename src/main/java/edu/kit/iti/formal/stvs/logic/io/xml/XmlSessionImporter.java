@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
+import edu.kit.iti.formal.stvs.io._1.*;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
@@ -117,11 +118,11 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
               throw new ImportException("Tab may not have more than one abstract specification");
             }
             ConstraintSpecification constraintSpec = constraintSpecImporter.doImportFromXmlNode(
-                XmlExporter.marshalToNode(element, XmlExporter.NAMESPACE));
+                XmlExporter.marshalToNode(element, XmlExporter.OF_STVS));
             hybridSpec = new HybridSpecification(constraintSpec, !tab.isReadOnly());
           } else {
             ConcreteSpecification concreteSpec = concreteSpecImporter.doImportFromXmlNode(
-                XmlExporter.marshalToNode(element, XmlExporter.NAMESPACE));
+                XmlExporter.marshalToNode(element, XmlExporter.OF_STVS));
             if (concreteSpec.isCounterExample()) {
               counterExample = concreteSpec;
             } else {
@@ -144,6 +145,6 @@ public class XmlSessionImporter extends XmlImporter<StvsRootModel> {
 
   @Override
   protected URL getXsdResource() throws IOException {
-    return getClass().getResource("/fileFormats/session.xsd");
+    return getClass().getResource("/fileFormats/stvs-1.0.xsd");
   }
 }

@@ -1,0 +1,14 @@
+.header {
+    -fx-padding: 5pt;
+    -fx-font-size: 16pt;
+}
+
+.verification-action-buttons {
+    -fx-padding: 5pt;
+    -fx-spacing: 5pt;
+}
+
+.action {
+    -fx-font-size: 12pt;
+    -fx-height: 16pt;
+}

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<session xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml">
+<session xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
     <code>
         <plaintext><![CDATA[
 TYPE
@@ -93,7 +93,7 @@ END_PROGRAM
             </specification>
         </tab>
         <tab id="1" open="false" readOnly="false">
-            <specification xmlns="http://formal.iti.kit.edu/stvs/logic/io/xml"
+            <specification xmlns="http://formal.iti.kit.edu/stvs/io/1.0/"
                            comment=""
                            isConcrete="false" name="ConcreteCase">
                 <variables>

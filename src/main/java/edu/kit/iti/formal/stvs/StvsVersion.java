@@ -17,4 +17,7 @@ public class StvsVersion {
         return StvsVersion.class.getPackage().getName();
     }
 
+    public static String getWindowTitle() {
+        return "Structured Text Verification Studio - STVS";
+    }
 }

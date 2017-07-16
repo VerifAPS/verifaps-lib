@@ -108,7 +108,7 @@ public class ConfigDialogPane extends DialogPane {
     grid.add(new Label("Maximum Number of Rollouts per Line"), 0, 11);
     grid.add(maxLineRollout, 1, 11);
     this.setContent(grid);
-    ViewUtils.setupId(this);
+    ViewUtils.setupClass(this);
 
   }
 }

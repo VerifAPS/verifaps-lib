@@ -41,7 +41,7 @@ public class AlertFactory {
     PrintWriter pw = new PrintWriter(sw);
     exception.printStackTrace(pw);
     String stackTrace = sw.toString();
-
+    System.out.println(stackTrace);
     return createAlert(Alert.AlertType.ERROR, title, description, exception.getMessage()
         /*
           // Decided in Issue https://github.com/VerifAPS/stvs/issues/20, that the expandable content

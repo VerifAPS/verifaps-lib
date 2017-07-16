@@ -1,82 +1,105 @@
 package edu.kit.iti.formal.stvs.view.spec.variables;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import edu.kit.iti.formal.stvs.model.common.FreeVariable;
 import edu.kit.iti.formal.stvs.view.ViewUtils;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 
 /**
  * This is the view that displays free variables and offers editing them.
  *
  * @author Philipp
+ * @author Alexander Weigl
  */
-public class VariableCollection extends VBox {
+public class VariableCollection extends TitledPane {
+    private final TableView<FreeVariable> freeVariableTableView = new TableView<>();
+    private final TableColumn<FreeVariable, String> nameTableColumn = new TableColumn<>("Name");
+    private final TableColumn<FreeVariable, String> typeTableColumn = new TableColumn<>("Type");
+    private final TableColumn<FreeVariable, String> constraintTableColumn = new TableColumn<>("Constraint");
 
-  public enum Column {
-    NAME, TYPE, CONSTRAINT
-  }
-
-  private final Label overviewLabel;
-  private final TableView<FreeVariable> freeVariableTableView;
-  private final TableColumn<FreeVariable, String> nameTableColumn;
-  private final TableColumn<FreeVariable, String> typeTableColumn;
-  private final TableColumn<FreeVariable, String> constraintTableColumn;
-
-  /**
-   * Creates an instance of this view.
-   */
-  public VariableCollection() {
-    this.overviewLabel = new Label("Free Variables:");
-    this.freeVariableTableView = new TableView<>();
-    this.freeVariableTableView.setId("VariableCollectionTableView");
-    this.nameTableColumn = new TableColumn<>("Name");
-    this.typeTableColumn = new TableColumn<>("Type");
-    this.constraintTableColumn = new TableColumn<>("Constraint");
-
-    ViewUtils.setupView(this);
-
-    nameTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
-    typeTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
-    constraintTableColumn.prefWidthProperty()
-        .bind(freeVariableTableView.widthProperty().multiply(0.2));
+    private final BorderPane content = new BorderPane();
+    private final ToolBar toolBar = new ToolBar();
+    private final Button btnRemoveRow = new Button("Remove Rows",
+            new FontAwesomeIconView(FontAwesomeIcon.MINUS_SQUARE));
+    private final Button btnAddRow = new Button("Add Rows",
+            new FontAwesomeIconView(FontAwesomeIcon.PLUS_SQUARE));
+    //private final Button btnRemoveRow = new Button();
 
 
-    nameTableColumn.setUserData(Column.NAME);
-    typeTableColumn.setUserData(Column.TYPE);
-    constraintTableColumn.setUserData(Column.CONSTRAINT);
+    /**
+     * Creates an instance of this view.
+     */
+    public VariableCollection() {
+        setText("Global Variables");
+        this.freeVariableTableView.setId("VariableCollectionTableView");
+        ViewUtils.setupView(this);
 
-    freeVariableTableView.setEditable(true);
-    freeVariableTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    freeVariableTableView.getColumns().addAll(nameTableColumn, typeTableColumn,
-            constraintTableColumn);
 
-    this.overviewLabel.getStyleClass().addAll("freevar", "overview-label");
-    this.freeVariableTableView.getStyleClass().addAll("freevar", "variable-table-view");
+        nameTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
+        typeTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
+        constraintTableColumn.prefWidthProperty()
+                .bind(freeVariableTableView.widthProperty().multiply(0.2));
 
-    this.getChildren().addAll(overviewLabel, freeVariableTableView);
-  }
+        nameTableColumn.setUserData(Column.NAME);
+        typeTableColumn.setUserData(Column.TYPE);
+        constraintTableColumn.setUserData(Column.CONSTRAINT);
 
-  public TableView<FreeVariable> getFreeVariableTableView() {
-    return freeVariableTableView;
-  }
+        freeVariableTableView.setEditable(true);
+        freeVariableTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        freeVariableTableView.getColumns().setAll(nameTableColumn, typeTableColumn, constraintTableColumn);
 
-  public void removeVariableView(Node view) {
-    this.getChildren().removeAll(view);
-  }
+        Region stretch = new Region();
+        HBox.setHgrow(stretch, Priority.ALWAYS);
 
-  public TableColumn<FreeVariable, String> getNameTableColumn() {
-    return nameTableColumn;
-  }
+        //this.overviewLabel.getStyleClass().addAll("freevar", "overview-label");
+        this.freeVariableTableView.getStyleClass().addAll("freevar", "variable-table-view");
+        setContent(content);
+        content.setCenter(freeVariableTableView);
+        content.setTop(toolBar);
 
-  public TableColumn<FreeVariable, String> getTypeTableColumn() {
-    return typeTableColumn;
-  }
+        btnAddRow.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        btnRemoveRow.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        toolBar.getItems().setAll(stretch,btnAddRow, btnRemoveRow);
+        setMinHeight(0);
+        setMaxHeight(1000);
+    }
 
-  public TableColumn<FreeVariable, String> getConstraintTableColumn() {
-    return constraintTableColumn;
-  }
+    public TableView<FreeVariable> getFreeVariableTableView() {
+        return freeVariableTableView;
+    }
+
+    public void removeVariableView(Node view) {
+        this.getChildren().removeAll(view);
+    }
+
+    public TableColumn<FreeVariable, String> getNameTableColumn() {
+        return nameTableColumn;
+    }
+
+    public TableColumn<FreeVariable, String> getTypeTableColumn() {
+        return typeTableColumn;
+    }
+
+    public TableColumn<FreeVariable, String> getConstraintTableColumn() {
+        return constraintTableColumn;
+    }
+
+
+    public Button getBtnAddRow() {
+        return btnAddRow;
+    }
+
+    public Button getBtnRemoveRow() {
+        return btnRemoveRow;
+    }
+
+    public enum Column {
+        NAME, TYPE, CONSTRAINT
+    }
 }

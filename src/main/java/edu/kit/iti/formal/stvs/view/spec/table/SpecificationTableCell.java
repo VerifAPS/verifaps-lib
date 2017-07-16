@@ -37,7 +37,7 @@ public class SpecificationTableCell extends TextFieldTableCell<HybridRow, String
     validator.problemsProperty().addListener(observable -> this.onProblemsChanged());
     emptyProperty().addListener(observable -> this.onProblemsChanged());
     getStyleClass().add("spec-cell");
-    ViewUtils.setupId(this);
+    ViewUtils.setupClass(this);
     onProblemsChanged();
   }
 
