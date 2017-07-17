@@ -75,6 +75,7 @@ public class VerificationResultHandler implements VerificationResultVisitor {
         // Do nothing, don't want to distract from the actual error
       }
     }
+    System.err.println(expandableContent);
     AlertFactory
         .createAlert(Alert.AlertType.ERROR, "Verification Error",
             "An error occurred during verification.", result.getMessage()/*
