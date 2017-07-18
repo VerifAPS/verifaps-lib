@@ -23,7 +23,6 @@ package edu.kit.iti.formal.automation.testtables.builder;
  */
 
 import edu.kit.iti.formal.automation.testtables.model.State;
-import edu.kit.iti.formal.automation.testtables.report.Counterexample;
 import edu.kit.iti.formal.smv.SMVFacade;
 import edu.kit.iti.formal.smv.ast.SBinaryOperator;
 import edu.kit.iti.formal.smv.ast.SLiteral;
@@ -42,7 +41,8 @@ import java.util.stream.Collectors;
  * @version 1 (03.05.17)
  */
 public class LTLSpecTransformer implements TableTransformer {
-    @Override public void accept(TableTransformation tt) {
+    @Override
+    public void accept(TableTransformation tt) {
         List<State> steps = tt.getTestTable().getRegion().flat();
         State lastStep = steps.get(steps.size() - 1);
         State.AutomatonState lastAutomataStep = lastStep.getAutomataStates()
@@ -61,7 +61,8 @@ public class LTLSpecTransformer implements TableTransformer {
 
         SMVExpr fairness = steps.stream()
                 .filter(state -> state.getDuration().isUnbounded())
-                .flatMap(state-> state.getOutgoing().stream())
+                .flatMap(state -> state.getOutgoing().stream())
+                .filter(state -> state.getId() != -1)
                 .map(State::getDefInput)
                 .map(s -> (SMVExpr) s.eventually().globally())
                 .reduce(SMVFacade.reducer(SBinaryOperator.AND))
