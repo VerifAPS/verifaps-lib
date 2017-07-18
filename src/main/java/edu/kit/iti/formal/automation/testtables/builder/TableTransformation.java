@@ -35,12 +35,15 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class TableTransformation {
-    public static final String ERROR_STATE_IDENTIFIER = "___$ERROR$STATE";
+    public static final String ERROR_STATE_IDENTIFIER = "_$ERROR";
+    private static final String SENTINEL_STATE_IDENTIFIER = "_$SENTINEL";
     private final StateReachability reachable;
     private List<Consumer<TableTransformation>> transformers = new LinkedList<>();
     private GeneralizedTestTable gtt;
     private TableModule mt = new TableModule();
-    private SVariable errorState = new SVariable(ERROR_STATE_IDENTIFIER, SMVType.BOOLEAN);
+    private static SVariable errorState = new SVariable(ERROR_STATE_IDENTIFIER, SMVType.BOOLEAN);
+    private static SVariable sentinelState = new SVariable(SENTINEL_STATE_IDENTIFIER, SMVType.BOOLEAN);
+
     private List<SMVModule> helper = new LinkedList<>();
     private SMVType superEnumType;
 
@@ -50,6 +53,11 @@ public class TableTransformation {
         this.superEnumType = superEnumType;
         init();
     }
+
+    public SVariable getSentinelState() {
+        return sentinelState;
+    }
+
 
     private void init() {
         transformers.clear();

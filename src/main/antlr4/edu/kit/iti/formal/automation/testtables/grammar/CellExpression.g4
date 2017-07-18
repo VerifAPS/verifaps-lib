@@ -73,9 +73,10 @@ guardedcommand
 ;
 
 fixed_interval :
-      dc=MINUS
+    ( dc=MINUS
     | LBRACKET a=i COMMA (inf=MINUS | b=i) RBRACKET
-    | c=i
+    | a=i COMMA (inf=MINUS | b=i)
+    | c=i) EOF
 ;
 
 AND: '&' | 'AND';

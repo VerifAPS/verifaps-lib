@@ -39,11 +39,14 @@ public class StatesTransformer implements TableTransformer {
     private TableModule mt;
     private GeneralizedTestTable gtt;
     private SVariable errorState;
+    private SVariable sentinelState;
+    private State sentinel;
 
     private void createStates() {
         List<State> flat = gtt.getRegion().flat();
         flat.forEach(this::introduceState);
         insertErrorState();
+        insertSentinel();
     }
 
     private void introduceState(State s) {
@@ -128,14 +131,29 @@ public class StatesTransformer implements TableTransformer {
         mt.getNextAssignments().add(a);
     }
 
+    private void insertSentinel() {
+        mt.getStateVars().add(sentinelState);
+        mt.getInit().add(sentinelState.not());
+        SMVExpr e = sentinel.getAutomataStates().get(0).getIncoming().stream()
+                .map(State.AutomatonState::getDefForward)
+                .map(fwd -> (SMVExpr) fwd)
+                .reduce(SMVFacade.reducer(SBinaryOperator.OR))
+                .orElse(SLiteral.FALSE);
+        SAssignment a = new SAssignment(sentinelState, e.or(sentinelState));
+        mt.getNextAssignments().add(a);
+    }
+
     private void define(SVariable defOutput, SMVExpr combine) {
         mt.getDefinitions().put(defOutput, combine);
     }
 
-    @Override public void accept(TableTransformation tt) {
+    @Override
+    public void accept(TableTransformation tt) {
         mt = tt.getTableModule();
         gtt = tt.getTestTable();
         errorState = tt.getErrorState();
+        sentinelState = tt.getSentinelState();
+        sentinel = tt.getReachable().getSentinel();
         createStates();
     }
 }

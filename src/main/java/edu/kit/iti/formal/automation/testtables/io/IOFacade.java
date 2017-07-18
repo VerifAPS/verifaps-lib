@@ -40,7 +40,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
  */
 public final class IOFacade {
     public static CellExpressionParser createParser(String input) {
-        assert input!=null;
+        assert input != null;
         CellExpressionLexer lexer = new CellExpressionLexer(new ANTLRInputStream(input));
         lexer.removeErrorListeners();
         lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
@@ -76,7 +76,8 @@ public final class IOFacade {
     }
 
     public static Duration parseDuration(String duration) {
-        CellExpressionParser.Fixed_intervalContext p = createParser(duration).fixed_interval();
+        CellExpressionParser parser = createParser(duration);
+        CellExpressionParser.Fixed_intervalContext p = parser.fixed_interval();
         Duration d = new Duration();
         if (p.c != null) {
             int i = Integer.parseInt(p.c.getText());
@@ -92,12 +93,13 @@ public final class IOFacade {
             else
                 d.setUpper(Integer.parseInt(p.b.getText()));
         }
+        assert parser.getNumberOfSyntaxErrors() == 0;
         assert d.invariant();
         return d;
     }
 
     public static SVariable asSMVVariable(Variable column) {
-        if(column==null) return null;
+        if (column == null) return null;
         SVariable v = new SVariable(column.getName(),
                 getSMVDataType(column.getDataType()));
         return v;

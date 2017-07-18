@@ -22,12 +22,12 @@ package edu.kit.iti.formal.automation.testtables;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.testtables.model.Duration;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.Region;
 import edu.kit.iti.formal.automation.testtables.model.State;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Calculation of the State/Row reachability.
@@ -53,12 +53,16 @@ import java.util.stream.Collectors;
  * @version 2 (12.12.16)
  */
 public class StateReachability {
+    public static final int SENTINEL_ID = -1;
     private final GeneralizedTestTable gtt;
     private final List<State> flatList;
+    private final State sentinel = new State(SENTINEL_ID);
 
     public StateReachability(GeneralizedTestTable table) {
         gtt = table;
+        sentinel.setDuration(new Duration(1, 1));
         flatList = gtt.getRegion().flat();
+        flatList.add(sentinel);
 
         initTable();
         addRegions(gtt.getRegion());
@@ -98,6 +102,7 @@ public class StateReachability {
                     connect(a, a);
                 }
             }
+            state.setEndState(state.getOutgoing().contains(sentinel));
         }
     }
 
@@ -183,5 +188,9 @@ public class StateReachability {
             if (s.getDuration().isSkippable())
                 queue.addAll(s.getOutgoing());
         }
+    }
+
+    public State getSentinel() {
+        return sentinel;
     }
 }

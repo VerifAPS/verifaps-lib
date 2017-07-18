@@ -42,6 +42,7 @@ public class State {
     private Duration duration = new Duration(1, 1);
     private List<AutomatonState> automataStates;
     private boolean initialReachable;
+    private boolean endState;
 
     public State(int id) {
         this.id = id;
@@ -88,7 +89,8 @@ public class State {
         return l;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -99,7 +101,8 @@ public class State {
         return id == state.id;
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return id;
     }
 
@@ -146,6 +149,10 @@ public class State {
 
     public void setInitialReachable(boolean initialReachable) {
         this.initialReachable = initialReachable;
+    }
+
+    public void setEndState(boolean endState) {
+        this.endState = endState;
     }
 
     public class AutomatonState {
@@ -200,6 +207,16 @@ public class State {
 
         public boolean isStartState() {
             return isInitialReachable() && isFirst();
+        }
+
+        public boolean isEndState() {
+            if (outgoing.size() == 0) {
+                return true;
+            } else {
+                return outgoing.stream()
+                        .map(s -> s.isEndState() || s.isOptional())
+                        .reduce((a, b) -> a | b).orElse(false);
+            }
         }
     }
 }

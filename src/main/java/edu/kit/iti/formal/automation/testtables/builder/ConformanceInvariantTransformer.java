@@ -38,6 +38,8 @@ public class ConformanceInvariantTransformer implements TableTransformer {
                 .reduce(SMVFacade.reducer(SBinaryOperator.OR))
                 .get();
 
+        states = states.or(tt.getSentinelState());
+
         // ! ( \/ states) -> !error
         SMVExpr invar = SMVFacade.combine(SBinaryOperator.IMPL,
                 tt.getErrorState(),
