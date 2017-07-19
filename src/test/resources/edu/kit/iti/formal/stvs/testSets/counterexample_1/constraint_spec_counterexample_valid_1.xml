@@ -4,6 +4,7 @@
     <variables>
         <ioVariable colwidth="171" data-type="BOOL" io="input" name="Start_Stop"/>
         <ioVariable colwidth="172" data-type="BOOL" io="output" name="ONS_Trig"/>
+        <ioVariable colwidth="172" data-type="INT" io="input" name="neg_val"/>
         <freeVariable data-type="INT" default="-" name="freeVarA"/>
         <freeVariable data-type="BOOL" default="TRUE" name="freeVarB"/>
     </variables>
@@ -12,11 +13,13 @@
             <duration>1</duration>
             <cell>=TRUE</cell>
             <cell>=FALSE</cell>
+            <cell>=-10</cell>
         </row>
         <row comment="">
             <duration>1</duration>
             <cell>freeVarB</cell>
             <cell>Start_Stop[-1]</cell>
+            <cell>=-10</cell>
         </row>
     </rows>
 </specification>
