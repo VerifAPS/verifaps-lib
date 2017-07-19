@@ -26,7 +26,7 @@ public class SpecificationTableView extends TitledPane {
     private final Button btnAddRows = new Button("Add Row",
             new FontAwesomeIconView(FontAwesomeIcon.PLUS_SQUARE));
     private final Button btnResize = new Button("Resize",
-            new FontAwesomeIconView(FontAwesomeIcon.FLAG_CHECKERED));
+            new FontAwesomeIconView(FontAwesomeIcon.ADJUST));
     private final Button btnCommentRow = new Button("Comment",
             new FontAwesomeIconView(FontAwesomeIcon.COMMENT));
     private TableView<HybridRow> tableView;
