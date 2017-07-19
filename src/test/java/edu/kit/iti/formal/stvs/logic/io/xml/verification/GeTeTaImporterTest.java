@@ -33,7 +33,8 @@ public class GeTeTaImporterTest {
     Counterexample counterexample = (Counterexample) verificationResult;
     assertEquals(ValueBool.TRUE, counterexample.getCounterexample().getRows().get(0).getCells()
         .get("ONS_Trig").getValue());
-    assertEquals(2, counterexample.getCounterexample().getColumnHeaders().size());
+    assertEquals(new ValueInt(-10), counterexample.getCounterexample().getConcreteValuesForConstraintCell("neg_val", 0).get(0).getValue());
+    assertEquals(3, counterexample.getCounterexample().getColumnHeaders().size());
     assertEquals(1, counterexample.getCounterexample().getDurations().size());
   }
 

@@ -366,6 +366,9 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
     if (INT_VALUE_PATTERN.matcher(varValue).matches()) {
       int underlineIndex = varValue.indexOf("_");
       int intVal = Integer.parseInt(varValue.substring(underlineIndex + 1, varValue.length()));
+      if(varValue.charAt(0) == '-') {
+        intVal = - intVal;
+      }
       currentValues.put(varName, new ValueInt(intVal));
       if (!varTypes.containsKey(varName)) {
         varTypes.put(varName, TypeInt.INT);

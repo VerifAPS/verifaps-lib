@@ -30,6 +30,7 @@
         <trace>
             <step>
                 <input name="var_Start_Stop" value="TRUE"/>
+                <input name="var_neg_val" value="-0sd16_10"/>
                 <input name="table.s1_in" value="TRUE"/>
                 <state name="table.var_freeVarB" value="TRUE"/>
                 <state name="table.var_freeVarA" value="0sd16_0"/>
@@ -48,6 +49,7 @@
                 <state name="table.s1_fwd" value="FALSE"/>
             </step>
             <step>
+                <input name="var_neg_val" value="-0sd16_10"/>
                 <state name="code.var_Rising_ONS" value="TRUE"/>
                 <state name="table.s1" value="FALSE"/>
                 <state name="table.var_Start_Stop__history._$1" value="TRUE"/>
