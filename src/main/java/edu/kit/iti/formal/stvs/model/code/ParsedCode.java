@@ -92,6 +92,10 @@ public class ParsedCode {
     }
 
     private Optional<VariableCategory> getCategoryFromDeclaration(VariableDeclaration varDecl) {
+      if (varDecl.isConstant()) {
+        return Optional.empty();
+
+      }
       switch (varDecl.getType()) {
         case VariableDeclaration.INPUT:
           return Optional.of(VariableCategory.INPUT);
