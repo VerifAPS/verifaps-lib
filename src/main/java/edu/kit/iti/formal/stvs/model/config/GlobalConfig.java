@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.kit.iti.formal.stvs.logic.io.ExecutableLocator;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -61,8 +62,12 @@ public class GlobalConfig {
     editorFontFamily = new SimpleStringProperty("DejaVu Sans Mono");
     showLineNumbers = new SimpleBooleanProperty(true);
     uiLanguage = new SimpleStringProperty("EN");
-    nuxmvFilename = new SimpleStringProperty("[Path to NuXmv Executable]");
-    z3Path = new SimpleStringProperty("[Path to Z3 Executable]");
+    nuxmvFilename = new SimpleStringProperty(
+        ExecutableLocator.findExecutableFileAsString("nuXmv")
+            .orElse("[Path to nuXmv Executable]"));
+    z3Path = new SimpleStringProperty(
+        ExecutableLocator.findExecutableFileAsString("z3")
+        .orElse("[Path to Z3 Executable]"));
     getetaCommand =
         new SimpleStringProperty("java -jar /path/to/geteta.jar -c ${code} -t ${spec} -x");
   }
