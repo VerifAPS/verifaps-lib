@@ -33,6 +33,10 @@ public class WizardManager implements Controller {
     wizardView.getPrevious().setOnAction(this::previous);
 
     wizardStage = makeStage(wizardView);
+    wizardStage.setWidth(wizardView.getWidth());
+    wizardStage.setHeight(wizardView.getHeight());
+    wizardStage.setX(0.0);
+    wizardStage.setY(0.0);
   }
 
   protected Stage makeStage(WizardView wizardView) {
@@ -53,10 +57,10 @@ public class WizardManager implements Controller {
     }
     if (page == wizardPages.size() - 1) {
       wizardView.getNext().setOnAction(this::finish);
-      wizardView.getNext().setText("finish");
+      wizardView.getNext().setText("Finish");
     } else {
       wizardView.getNext().setOnAction(this::next);
-      wizardView.getNext().setText("next");
+      wizardView.getNext().setText("Next");
     }
   }
 
