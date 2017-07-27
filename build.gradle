@@ -64,6 +64,8 @@ dependencies {
 
     compile 'org.fxmisc.cssfx:cssfx:1.0.0'
 
+    compile 'org.controlsfx:controlsfx:8.40.13'
+
     testCompile "junit:junit:4.12"
 
     antlr 'org.antlr:antlr4:4.7'
@@ -158,7 +160,7 @@ test {
     jacoco {
         append = false
         destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
-        classDumpFile = file("$buildDir/jacoco/classpathdumps")
+        //classDumpFile = file("$buildDir/jacoco/classpathdumps")
     }
 }
 
