@@ -1,17 +1,31 @@
 package edu.kit.iti.formal.stvs.view.editor;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import edu.kit.iti.formal.stvs.model.code.SyntaxError;
 import edu.kit.iti.formal.stvs.view.ViewUtils;
 
 import java.util.Collection;
+import java.util.function.IntFunction;
+import java.util.logging.Filter;
+import java.util.stream.Collector;
 
+import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Text;
+import org.controlsfx.control.PopOver;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleSpans;
@@ -36,9 +50,9 @@ import org.fxmisc.richtext.StyleSpans;
 public class EditorPane extends SplitPane {
 
   private CodeArea codeArea;
-  private ListView<SyntaxError> syntaxErrorListView;
 
-  private Pane syntaxErrorPane;
+  private final IntFunction<Node> lineNumberFactory;
+  private final ObservableList<SyntaxError> syntaxErrors;
 
   /**
    * <p>
@@ -69,30 +83,41 @@ public class EditorPane extends SplitPane {
   public EditorPane(String code, ObservableList<SyntaxError> syntaxErrors,
       boolean showLineNumbers) {
     super();
+    this.syntaxErrors = syntaxErrors;
     ViewUtils.setupView(this);
 
     codeArea = new CodeArea(code);
+    lineNumberFactory = LineNumberFactory.get(codeArea);
     if (showLineNumbers) {
-      codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+      codeArea.setParagraphGraphicFactory(this::createLinePrefixForLine);
     }
-    syntaxErrorListView = new ListView<>(syntaxErrors);
-    syntaxErrorListView.getStyleClass().addAll("model-text-area");
-    syntaxErrorPane = new AnchorPane(syntaxErrorListView);
-    AnchorPane.setBottomAnchor(syntaxErrorListView, 0.0);
-    AnchorPane.setTopAnchor(syntaxErrorListView, 0.0);
-    AnchorPane.setLeftAnchor(syntaxErrorListView, 0.0);
-    AnchorPane.setRightAnchor(syntaxErrorListView, 0.0);
-    this.getItems().addAll(codeArea, syntaxErrorPane);
+    this.getItems().addAll(codeArea);
     this.setOrientation(Orientation.VERTICAL);
     this.setDividerPositions(0.8);
   }
 
-  public ListView<SyntaxError> getSyntaxErrorListView() {
-    return syntaxErrorListView;
+  private void setLineIcon(int i, FilteredList<SyntaxError> syntaxErrors, Label icon) {
+    icon.setVisible(syntaxErrors.size() != 0);
+    String combinedMessages = syntaxErrors.stream()
+        .map(SyntaxError::getMessage)
+        .reduce("", (s, s2) -> s + s2);
+    icon.setTooltip(new Tooltip(combinedMessages));
   }
 
-  public Pane getSyntaxErrorPane() {
-    return syntaxErrorPane;
+  /**
+   * prefix the line with the line number and possibly an error icon
+   * @param i line number
+   * @return Node intended as the prefix
+   */
+  private Node createLinePrefixForLine(int i) {
+
+    Label icon = GlyphsDude.createIconLabel(FontAwesomeIcon.EXCLAMATION_CIRCLE, "", null, null, null);
+    FilteredList<SyntaxError> lineSyntaxErrors = syntaxErrors.filtered(syntaxError -> syntaxError.getLine() == i + 1);
+    setLineIcon(i, lineSyntaxErrors, icon);
+    syntaxErrors.addListener((ListChangeListener.Change<?> change) -> {
+      setLineIcon(i, lineSyntaxErrors, icon);
+    });
+    return new HBox(lineNumberFactory.apply(i), icon);
   }
 
   public StringProperty getCodeProperty() {
@@ -122,7 +147,7 @@ public class EditorPane extends SplitPane {
    */
   public void setShowLineNumbers(boolean showLineNumbers) {
     if (showLineNumbers) {
-      codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+      codeArea.setParagraphGraphicFactory(this::createLinePrefixForLine);
     } else {
       codeArea.setParagraphGraphicFactory(null);
     }
