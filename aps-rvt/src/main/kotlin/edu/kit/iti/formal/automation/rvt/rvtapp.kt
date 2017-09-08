@@ -30,6 +30,11 @@ class RvtArgs(parser: ArgParser) {
             .default(".")
 }
 
+/**
+ * Entry point for Regression Verification
+ *
+ * @param args
+ */
 fun main(args: Array<String>) {
     val hf = DefaultHelpFormatter()
     val parser = ArgParser(args, helpFormatter = hf)

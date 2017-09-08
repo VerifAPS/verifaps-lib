@@ -7,6 +7,9 @@ import edu.kit.iti.formal.smv.ast.*
 import mu.KLogging
 import java.io.Writer
 
+/**
+ *
+ */
 fun commonVariables(a: Collection<out SVariable>,
                     b: Collection<out SVariable>,
                     pred: SVarEquals)
@@ -22,7 +25,13 @@ fun commonVariables(a: Collection<out SVariable>,
     return set
 }
 
+
+/**
+ *
+ */
 typealias SVarEquals = (SVariable, SVariable) -> Boolean
+
+
 val nameEqual: SVarEquals = { a, b -> a.name == b.name }
 
 
