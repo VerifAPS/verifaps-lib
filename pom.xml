@@ -112,14 +112,20 @@
             <id>local</id>
             <url>file://${env.HOME}/tmp/verifaps-repo/</url>
         </snapshotRepository>
+
+        <snapshotRepository>
+            <id>bwcloud</id>
+            <url>dav:http://141.52.38.245/verifaps-lib</url>
+        </snapshotRepository>
+
     </distributionManagement>
 
     <build>
         <extensions>
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh-external</artifactId>
-                <version>1.0-beta-6</version>
+                <artifactId>wagon-webdav-jackrabbit</artifactId>
+                <version>3.0</version>
             </extension>
         </extensions>
 
@@ -174,6 +180,7 @@
                 </executions>
             </plugin>
 
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
@@ -190,7 +197,7 @@
                         <version>1.7</version>
                     </dependency>
                 </dependencies>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 
