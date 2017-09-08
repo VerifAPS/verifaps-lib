@@ -109,26 +109,12 @@
         </repository>
 
         <snapshotRepository>
-            <id>local</id>
+            <id>local-file</id>
             <url>file://${env.HOME}/tmp/verifaps-repo/</url>
         </snapshotRepository>
-
-        <snapshotRepository>
-            <id>bwcloud</id>
-            <url>dav:http://141.52.38.245/verifaps-lib</url>
-        </snapshotRepository>
-
     </distributionManagement>
 
     <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-webdav-jackrabbit</artifactId>
-                <version>3.0</version>
-            </extension>
-        </extensions>
-
         <plugins>
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
@@ -138,7 +124,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>1.10</version>
+                <version>1.14</version>
                 <executions>
                     <execution>
                         <id>first</id>
