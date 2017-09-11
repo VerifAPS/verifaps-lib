@@ -12,11 +12,9 @@ import java.math.BigInteger
 import kotlin.test.assertEquals
 
 class ExpressionVisitorTest {
-    private val parser = createAst(this.javaClass.getResource("expressionVisitorTest.basicTest.st"))
-
     @Test
     fun basicTest() {
-        val ast = parser.start().accept(IECParseTreeToAST()) as TopLevelElements
+        val ast = getAst(this.javaClass.getResource("expressionVisitorTest.testIfStatement.st"))
         val expressions = ArrayList<Expression>()
         ast.accept<Any>(object: DefaultVisitor<Unit>() {
             override fun defaultVisit(visitable: Visitable?) {
@@ -36,7 +34,7 @@ class ExpressionVisitorTest {
         })
 
         val expressionValues: List<ExpressionValue> = expressions.map {
-            it.accept<ExpressionValue>(ExpressionVisitor(State())) as ExpressionValue
+            it.accept<ExpressionValue>(ExpressionVisitor(TopState(), LocalScope())) as ExpressionValue
         }
 
         println(expressionValues.map { it.toString() }.joinToString("\n"))

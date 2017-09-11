@@ -2,6 +2,8 @@ package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.IEC61131Parser
+import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
+import edu.kit.iti.formal.automation.st.ast.TopLevelElements
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import java.io.IOException
@@ -17,3 +19,5 @@ fun createAst(file: Path): IEC61131Parser {
 }
 
 fun createAst(file: URL) = createAst(Paths.get(file.toURI()))
+
+fun getAst(file: URL) = createAst(file).start().accept(IECParseTreeToAST()) as TopLevelElements

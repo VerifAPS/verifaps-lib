@@ -1,17 +1,27 @@
 package edu.kit.iti.formal.automation.run
 
-import edu.kit.iti.formal.automation.datatypes.values.Value
+import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.datatypes.values.Values
 import edu.kit.iti.formal.automation.operators.Operators
+import edu.kit.iti.formal.automation.run.stexceptions.ExecutionException
 import edu.kit.iti.formal.automation.scope.LocalScope
-import edu.kit.iti.formal.automation.st.ast.BinaryExpression
-import edu.kit.iti.formal.automation.st.ast.FunctionCall
-import edu.kit.iti.formal.automation.st.ast.Literal
-import edu.kit.iti.formal.automation.st.ast.UnaryExpression
+import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder
+import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
-import java.math.BigDecimal
+import edu.kit.iti.formal.automation.visitors.Visitable
 
-class ExpressionVisitor(private val state : State) : DefaultVisitor<ExpressionValue>() {
+class ExpressionVisitor(private val state : State, private val localScope : LocalScope) : DefaultVisitor<ExpressionValue>() {
+
+    override fun defaultVisit(visitable: Visitable?): ExpressionValue {
+        TODO("missing visitor for visitable ${visitable.toString()}")
+    }
+
+    override fun visit(functionCall: FunctionCall): ExpressionValue {
+
+        val innerState = NestedState(state)
+        val functionDeclaration = localScope.globalScope.resolveFunction(functionCall, localScope)
+        return functionCall.function.accept(ExpressionVisitor(innerState, functionDeclaration.localScope))
+    }
 
     override fun visit(unaryExpression: UnaryExpression): ExpressionValue {
         //"as ExpressionValue" should not be necessary, but the compiler complains otherwise
@@ -25,7 +35,27 @@ class ExpressionVisitor(private val state : State) : DefaultVisitor<ExpressionVa
     }
 
     override fun visit(literal: Literal) : ExpressionValue {
-        return literal.asValue()
+        try {
+            return literal.asValue()
+        } catch (npe : NullPointerException) {
+
+            val identifier = literal.dataTypeName
+            val resolvedDataType = localScope.globalScope.resolveDataType(identifier)
+            if (resolvedDataType is EnumerateType) {
+                return Values.VAnyEnum(resolvedDataType, literal.textValue)
+            }
+        }
+        TODO("implement other cases for $literal")
+    }
+
+    override fun visit(symbolicReference: SymbolicReference): ExpressionValue {
+        val variableName = symbolicReference.identifier
+
+        val variableState = state[variableName]
+                ?: throw ExecutionException("Variable $variableName not found")
+
+        return variableState
+                .orElseThrow { throw ExecutionException("Variable $variableName not initialized") }
     }
 
     override fun visit(binaryExpression: BinaryExpression): ExpressionValue {
@@ -33,7 +63,10 @@ class ExpressionVisitor(private val state : State) : DefaultVisitor<ExpressionVa
         val rightValue = binaryExpression.rightExpr.accept<ExpressionValue>(this) as ExpressionValue
         return when(binaryExpression.operator) {
             Operators.ADD -> OperationEvaluator.add(leftValue, rightValue)
-            else -> TODO()
+            Operators.EQUALS -> OperationEvaluator.equalValues(leftValue, rightValue)
+            Operators.AND -> OperationEvaluator.and(leftValue, rightValue)
+            Operators.GREATER_THAN -> OperationEvaluator.greaterThan(leftValue, rightValue)
+            else -> TODO("operator ${binaryExpression.operator.symbol()} is not implemented")
         }
     }
 
