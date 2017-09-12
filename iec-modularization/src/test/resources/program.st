@@ -1,0 +1,41 @@
+
+FUNCTION_BLOCK FB
+VAR_INPUT
+	x : INT;
+END_VAR
+VAR_OUTPUT
+	y : INT;
+END_VAR
+	y := x+6;
+END_FUNCTION_BLOCK
+
+PROGRAM PGRM
+VAR_INPUT
+	x : INT;
+END_VAR
+VAR_OUTPUT
+	y : INT;
+END_VAR
+VAR
+	INST_FB : FB;
+END_VAR
+
+	y := x + 5;
+	
+	INST_FB.x := 7;
+	INST_FB();
+	
+	IF x > 7 THEN
+		INST_FB(x := INST_FB.y);
+	ELSE
+		INST_FB();
+	END_IF
+	
+	IF INST_FB.y > 5 THEN
+		y := 6;
+	ELSEIF x > 3 THEN
+		y := 7;
+	ELSE
+		y := 8;
+	END_IF
+END_PROGRAM

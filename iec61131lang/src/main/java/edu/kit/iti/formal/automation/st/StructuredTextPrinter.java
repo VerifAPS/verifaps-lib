@@ -635,6 +635,16 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object visit(Literal literal) {
+        sb.append(literal.getText());
+        return null;
+
+    }
+
+    /**
      * <p>clear.</p>
      */
     public void clear() {
