@@ -14,8 +14,8 @@ import kotlin.test.assertEquals
 class ExpressionVisitorTest {
     @Test
     fun basicTest() {
-        val ast = getAst(this.javaClass.getResource("expressionVisitorTest.testIfStatement.st"))
-        val expressions = ArrayList<Expression>()
+        val ast = getAst(this.javaClass.getResource("expressionVisitorTest.basicTest.st"))
+        val expressions = mutableListOf<Visitable>();
         ast.accept<Any>(object: DefaultVisitor<Unit>() {
             override fun defaultVisit(visitable: Visitable?) {
             }
