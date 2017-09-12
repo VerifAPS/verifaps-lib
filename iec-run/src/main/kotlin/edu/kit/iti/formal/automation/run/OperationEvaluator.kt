@@ -6,8 +6,10 @@ import edu.kit.iti.formal.automation.datatypes.values.Values
 import edu.kit.iti.formal.automation.operators.Operator
 import edu.kit.iti.formal.automation.run.stexceptions.TypeMissmatchException
 
-class BinaryEvaluator(operator: Operator, leftType: Any, rightType: Any, eval: (ExpressionValue, ExpressionValue) -> ExpressionValue)
-
+/**
+ * OperationEvaluator executes an ST operator on given ExpressionValues.
+ * If Operation if illegal, an error will be thrown
+ */
 object OperationEvaluator {
     fun add(leftValue: ExpressionValue, rightValue: ExpressionValue): ExpressionValue {
 
@@ -18,7 +20,7 @@ object OperationEvaluator {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    fun add(leftValue: Values.VAnyInt, rightValue: Values.VAnyInt): Values.VAnyInt {
+    private fun add(leftValue: Values.VAnyInt, rightValue: Values.VAnyInt): Values.VAnyInt {
         return Values.VAnyInt(leftValue.dataType, leftValue.value.add(rightValue.value))
         TODO("choose correct datatype and modulo the addition")
     }
@@ -54,14 +56,14 @@ object OperationEvaluator {
         }
     }
 
-    fun greaterThan(leftValue: Values.VAnyInt, rightValue: ExpressionValue): Values.VBool {
+    private fun greaterThan(leftValue: Values.VAnyInt, rightValue: ExpressionValue): Values.VBool {
         if (rightValue is Values.VAnyInt) {
             return Values.VBool(AnyBit.BOOL,leftValue.value > rightValue.value)
         }
         throw TypeMissmatchException("must be both integer")
     }
 
-    fun greaterThan(leftValue: Values.VAnyReal, rightValue: ExpressionValue) : Values.VBool {
+    private fun greaterThan(leftValue: Values.VAnyReal, rightValue: ExpressionValue) : Values.VBool {
         if (rightValue is Values.VAnyReal) {
             return Values.VBool(AnyBit.BOOL, leftValue.value > rightValue.value)
         }

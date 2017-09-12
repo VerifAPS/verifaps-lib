@@ -18,22 +18,42 @@ sealed class State : HashMap<String, Optional<ExpressionValue>>() {
      */
     fun getInitialized(key: String) : ExpressionValue? = get(key)?.orElse(null)
 
+    /**
+     * define a Variable with name [key].
+     */
+    //TODO make sure that defineVariable(key) always adds the variable to the local scope.
     fun defineVariable(key: String) = put(key, Optional.empty())
 
+    /**
+     * updates the value of a defined variable to [value].
+     * [key] is variable identifier
+     * @throws ExecutionException if variable is not defined
+     */
     fun updateValue(key: String, value: ExpressionValue): Optional<ExpressionValue>? {
         if (!isDefined(key)) throw ExecutionException("Variable \"$key\" is not defined")
         return put(key, Optional.of(value))
     }
 
+    /**
+     * is the variable with name [key] initialized
+     */
     fun isInitialized(key: String) = get(key)?.isPresent ?: false // return true, if get(key) contains a value; false otherwise
 
+    /**
+     * is the variable with name [key] defined?
+     */
     fun isDefined(key: String) = containsKey(key)
 }
 
+/**
+ * Root State of a State-Tree
+ */
+class TopState : State()
 
-class TopState() : State()
-
-class NestedState(val parentState: State) : State() {
+/**
+ * NestedState represents a State, that has a parent
+ */
+class NestedState(private val parentState: State) : State() {
     override fun get(key: String): Optional<ExpressionValue>? {
         return super.get(key) ?: return parentState[key]
     }

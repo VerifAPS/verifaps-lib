@@ -7,13 +7,17 @@ import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
 import java.util.*
 
+/**
+ * Represents the Runtime of ST-execution
+ * changes the [state] depending on the visited Nodes
+ */
 class Runtime(val state: State) : DefaultVisitor<Unit>() {
     /*
      * stores the variable definitions (e.g. "VAR a : INT END_VAR"
      * The variables are scoped, hence the Stack data-type
      */
     private val definitionScopeStack: Stack<LocalScope> = Stack()
-    private val typeDeclarationAdder = TypeDeclarationAdder(definitionScopeStack)
+    private val typeDeclarationAdder = TypeDeclarationAdder()
     override fun visit(variableDeclaration: VariableDeclaration) {
         variableDeclaration.init
         return super.visit(variableDeclaration)
@@ -27,20 +31,21 @@ class Runtime(val state: State) : DefaultVisitor<Unit>() {
     }
 
     override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
-        typeDeclarationAdder.postpone(enumerationTypeDeclaration)
+        typeDeclarationAdder.queueDeclaration(enumerationTypeDeclaration)
     }
 
     override fun visit(programDeclaration: ProgramDeclaration) {
         val localScope = programDeclaration.localScope
         definitionScopeStack.push(localScope)
-        typeDeclarationAdder.addToGlobalScope(localScope.globalScope)
+        typeDeclarationAdder.addQueuedDeclarations(localScope.globalScope)
         initializeLocalVariables(localScope)
 
         return programDeclaration!!.programBody.accept(this)
     }
 
     private fun initializeLocalVariables(localScope: LocalScope) {
-        localScope.localVariables.forEach {
+        val localVariables: Map<out String, VariableDeclaration> = localScope.localVariables
+        localVariables.map {
             val initExpr = it.value.init
             val initialValue : Optional<ExpressionValue> = when(initExpr) {
                 null -> Optional.empty()

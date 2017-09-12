@@ -10,6 +10,11 @@ import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
 
+/**
+ * evaluates the expression given via .visit() and runs creates a Runtime to call on functions in the expression.
+ * ExpressionVisitor resolves variable values in [state] and declarations in [localScope]
+ * ExpressionVisitor may modifies [state] indirectly through Runtime
+ */
 class ExpressionVisitor(private val state : State, private val localScope : LocalScope) : DefaultVisitor<ExpressionValue>() {
 
     override fun defaultVisit(visitable: Visitable?): ExpressionValue {
