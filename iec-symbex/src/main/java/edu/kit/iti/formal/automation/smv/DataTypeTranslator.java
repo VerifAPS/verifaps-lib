@@ -96,10 +96,13 @@ public class DataTypeTranslator implements DataTypeVisitor<SMVType> {
 
     @Override
     public SMVType visit(AnyInt inttype) {
-        return new SMVType.SMVTypeWithWidth(
+       /*TODO: Make this configurable
+            return new SMVType.SMVTypeWithWidth(
                 inttype.isSigned() ?
                         GroundDataType.SIGNED_WORD :
                         GroundDataType.UNSIGNED_WORD, inttype.getBitLength());
+        */
+       return new SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, 16);
     }
 
     @Override

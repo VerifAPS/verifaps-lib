@@ -59,7 +59,7 @@ open class RegressionVerification(
     }
 
     protected open fun commonOutputVariables(): Set<Pair<SVariable, SVariable>> {
-        return edu.kit.iti.formal.automation.rvt.commonOutputVariables(oldVersion, newVersion, nameEqual)
+        return commonOutputVariables(oldVersion, newVersion, nameEqual)
     }
 
     protected open fun staticInitModule() {
@@ -70,8 +70,9 @@ open class RegressionVerification(
             oldVersion.name += "_old"
             logger.info("modules renamed due to collision")
         }
-        newModuleType = SMVType.Module(newVersion.name)
-        oldModuleType = SMVType.Module(oldVersion.name)
+
+        newModuleType = SMVType.Module(newVersion.name, newVersion.moduleParameter)
+        oldModuleType = SMVType.Module(oldVersion.name, oldVersion.moduleParameter)
     }
 
     protected open fun addInputVariables() {
