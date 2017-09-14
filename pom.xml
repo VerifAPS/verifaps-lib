@@ -27,6 +27,7 @@
         <module>iec61131lang</module>
         <module>smv-model</module>
         <module>iec-xml</module>
+        <module>iec-modularization</module>
         <module>aps-rvt</module>
         <module>iec-run</module>
     </modules>
