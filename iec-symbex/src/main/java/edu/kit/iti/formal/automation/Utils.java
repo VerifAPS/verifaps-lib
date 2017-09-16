@@ -32,7 +32,7 @@ import edu.kit.iti.formal.automation.exceptions.IllegalTypeException;
 import edu.kit.iti.formal.automation.exceptions.OperatorNotFoundException;
 import edu.kit.iti.formal.automation.operators.BinaryOperator;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
-import edu.kit.iti.formal.automation.smv.DataTypeTranslator;
+import edu.kit.iti.formal.automation.smv.dt.DataTypeTranslator;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.smv.ast.*;
 
@@ -90,7 +90,7 @@ public class Utils {
 
     private static SMVType getSMVDataType(Any dataType) {
         DataTypeTranslator dtt = new DataTypeTranslator();
-        return dataType.accept(dtt);
+        return dtt.translate(dataType);
     }
 
     public static SLiteral asSMVLiteral(Value<?, ?> tsValue) {

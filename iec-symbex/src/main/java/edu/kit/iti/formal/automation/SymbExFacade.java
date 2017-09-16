@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.smv.DataTypeTranslator;
+import edu.kit.iti.formal.automation.smv.dt.DataTypeTranslator;
 import edu.kit.iti.formal.automation.smv.ModuleBuilder;
 import edu.kit.iti.formal.automation.smv.SymbolicExecutioner;
 import edu.kit.iti.formal.automation.smv.SymbolicState;
@@ -87,7 +87,6 @@ public final class SymbExFacade {
     }
 
     public static final SVariable asSVariable(VariableDeclaration vd) {
-        return new SVariable(vd.getName(),
-                vd.getDataType().accept(DataTypeTranslator.INSTANCE));
+        return new DataTypeTranslator().translate(vd);
     }
 }

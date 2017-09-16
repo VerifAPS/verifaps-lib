@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.*
 
 
 /**
- *
+ * This enum contains possible commands sequences for nuXmv reachability checking.
  * @author Alexander Weigl
  * @version 1 (11.09.17)
  */
@@ -24,16 +24,25 @@ enum class NuXMVCommand(vararg val commands: String) {
             "build_boolean_model", "check_invar_bmc -a een-sorrensen", "quit")
 }
 
+/**
+ * This array is a list of commands we need to set for every nuXmv instance.
+ * Currently, it sets the TRACE plugin to XML output.
+ *
+ *
+ */
 val PREAMBLE = listOf(
         "set default_trace_plugin 6"
 )
 
+/**
+ * @author Alexander Weigl
+ */
 class ProcessRunner(val commandLine: Array<String>,
                     val stdin: File)
     : Callable<String> {
 
     var stdoutFile = File("stdout.log")
-    var stderrFile = File("stderr.log")
+    //var stderrFile = File("stderr.log")
     var workingDirectory = File(".")
 
     override fun call(): String {
@@ -61,7 +70,6 @@ inline fun println(fmt: String, vararg obj: Any) {
  *
  * @author Alexander Weigl
  */
-//(System.getenv() as java.util.Map<String, String>).getOrDefault("NUXMV", "nuXmv")
 class NuXMVProcess(var moduleFile: File) : Callable<Boolean> {
 
     var commands: Array<String> = arrayOf("quit")
@@ -108,6 +116,9 @@ class NuXMVProcess(var moduleFile: File) : Callable<Boolean> {
     }
 }
 
+/**
+ *
+ */
 @XmlRootElement(name = "counter-example")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType
@@ -186,6 +197,9 @@ class CounterExample {
     }
 }
 
+/**
+ * @author Alexander Weigl
+ */
 class NuXMVOutput(
         val errors: List<String> = arrayListOf(),
         val counterExample: CounterExample? = null
