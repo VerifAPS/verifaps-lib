@@ -16,18 +16,40 @@ import java.io.IOException
 import java.nio.charset.Charset
 
 
+/**
+ * This class represents the input arguments for the cli application.
+ *
+ *
+ * @author Alexander Weigl
+ */
 class RvtArgs(parser: ArgParser) {
-    val verbose by parser.flagging("-v", "--verbose", help = "enable verbose mode")
-    val debugMode by parser.flagging("--debug", help = "enable debugging")
-    val oldVersion by parser.storing("--old", help = "old version of the plc software").default("old.st")
-    val newVersion by parser.storing("--new", help = "new version of the plc software").default("new.st")
+    val verbose by parser.flagging("-v", "--verbose", help = "enable verbose mode, set the logger to info")
+
+    val debugMode by parser.flagging("--debug",
+            help = "sets the logger to DEBUG level")
+
+    val oldVersion by parser.storing("--old",
+            help = "old version of the plc software")
+            .default("old.st")
+
+    val newVersion by parser.storing("--new",
+            help = "new version of the plc software")
+            .default("new.st")
+
     val disableST0Pipeline by parser.flagging("-D", help = "disable ST0 pipeline")
 
-    val outputSMVOutputName by parser.storing("--to-smv-file", help = "name of the smv-module", argName = "FILENAME")
+    val outputSMVOutputName by parser.storing("--to-smv-file",
+            help = "name of the smv-module",
+            argName = "FILENAME")
             .default("main.smv")
 
-    val outputDirectory by parser.storing("--output", "-o", help = "name of the smv-module", argName = "FOLDER")
+    val outputDirectory by parser.storing("--output", "-o",
+            help = "name of the smv-module",
+            argName = "FOLDER")
             .default(".")
+
+    val doNotVerify by parser.flagging("--do-not-verify",
+            help = "skips the call of nuXmv if set")
 }
 
 /**
@@ -40,25 +62,68 @@ fun main(args: Array<String>) {
     val parser = ArgParser(args, helpFormatter = hf)
     val arguments = RvtArgs(parser)
 
-    var st2Pipe = TransformationPipeline(arguments.disableST0Pipeline)
+    val rvtApp = RvtApp(arguments.oldVersion, arguments.newVersion);
+    rvtApp.disableSimplifier = arguments.disableST0Pipeline
+    rvtApp.outputFolder = File(arguments.outputDirectory)
+    rvtApp.outputSmvName = arguments.outputSMVOutputName
 
-    val oldModule = st2Pipe.run(arguments.oldVersion)
-    val newModule = st2Pipe.run(arguments.newVersion)
-
-    val rvt = RegressionVerification(
-            newVersion = newModule,
-            oldVersion = oldModule)
-    rvt.run()
-
-    val outputFolder = File(arguments.outputDirectory)
-    val outputSMV = File(outputFolder, arguments.outputSMVOutputName)
-
-    outputFolder.mkdirs()
-    val writer = outputSMV.bufferedWriter()
-    rvt.writeTo(writer)
-    writer.close()
+    rvtApp.build()
+    if (!arguments.doNotVerify)
+        rvtApp.verify()
 }
 
+class RvtApp(var oldVersionFilename: String,
+             var newVersionFilename: String) {
+    companion object : KLogging()
+
+    var disableSimplifier: Boolean = false
+    var outputFolder = File("output")
+    var outputSmvName = "module.smv"
+    var nuxmvCommands = NuXMVCommand.INVAR
+    val nuxmvOutput = "nuxmv.log"
+
+    private var outputSMV: File? = null
+
+    fun build(): RvtApp {
+        var st2Pipe = TransformationPipeline(disableSimplifier)
+        val oldModule = st2Pipe.run(oldVersionFilename)
+        val newModule = st2Pipe.run(newVersionFilename)
+
+        logger.info("Bundling modules $oldVersionFilename with $newVersionFilename")
+        val rvt = RegressionVerification(
+                newVersion = newModule,
+                oldVersion = oldModule)
+        rvt.run()
+
+        outputSMV = File(outputFolder, outputSmvName)
+
+        logger.info("Create ouput folder $outputFolder")
+        outputFolder.mkdirs()
+        outputSMV!!.bufferedWriter().use { fw ->
+            rvt.writeTo(fw)
+        }
+        return this
+    }
+
+    fun verify(): Boolean {
+        if (outputSMV != null) {
+            val mc = NuXMVProcess(outputSMV!!)
+            mc.commands = nuxmvCommands.commands as Array<String>
+            mc.executablePath = System.getenv().getOrDefault("NUXMV", "nuxmv")
+            mc.outputFile = File(outputFolder, nuxmvOutput)
+            mc.workingDirectory = outputFolder
+            return mc.call()
+        } else {
+            build()
+            return verify()
+        }
+    }
+
+}
+
+/**
+ *
+ */
 class TransformationPipeline(var diableST0: Boolean = false) {
     companion object : KLogging()
 

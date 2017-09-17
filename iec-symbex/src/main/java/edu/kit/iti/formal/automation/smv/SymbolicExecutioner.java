@@ -33,11 +33,15 @@ import edu.kit.iti.formal.automation.exceptions.UnknownVariableException;
 import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.smv.dt.DataTypeTranslator;
+import edu.kit.iti.formal.automation.smv.dt.TypeTranslator;
 import edu.kit.iti.formal.automation.smv.operators.OperationMap;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.smv.SMVFacade;
 import edu.kit.iti.formal.smv.ast.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +59,10 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     //region state handling
     private Stack<SymbolicState> state = new Stack<>();
     private Expression caseExpression;
+
+    @Getter
+    @Setter
+    private TypeTranslator typeTranslator = new DataTypeTranslator();
 
     public SymbolicExecutioner() {
         push(new SymbolicState());
@@ -102,7 +110,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
                         .resolveDataType(vd.getDataTypeName()));
             }
             if (!varCache.containsKey(vd))
-                varCache.put(vd.getName(), SymbExFacade.asSVariable(vd));
+                varCache.put(vd.getName(), typeTranslator.translate(vd));
             return varCache.get(vd.getName());
         } catch (NullPointerException e) {
             throw new UnknownDatatype("Datatype not given/inferred for variable "

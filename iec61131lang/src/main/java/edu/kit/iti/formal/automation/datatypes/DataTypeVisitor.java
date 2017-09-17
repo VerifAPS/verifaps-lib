@@ -24,27 +24,42 @@ package edu.kit.iti.formal.automation.datatypes;
 
 
 /**
- * @param <T>
+ * @param <T> return type
  * @author Alexander Weigl
  */
 
 public interface DataTypeVisitor<T> {
-    T visit(AnyReal real);
+    default T defaultVisit(Any any) {
+        return null;
+    }
 
-    T visit(AnyReal.Real real);
+    default T visit(AnyReal real) {
+        return defaultVisit(real);
+    }
 
-    T visit(AnyReal.LReal real);
+    default T visit(AnyReal.Real real) {
+        return defaultVisit(real);
+    }
 
-    T visit(AnyBit anyBit);
+    default T visit(AnyReal.LReal real) {
+        return defaultVisit(real);
+    }
 
-    T visit(AnyDate.DateAndTime dateAndTime);
+    default T visit(AnyBit anyBit) {
+        return defaultVisit(anyBit);
+    }
 
+    default T visit(AnyDate.DateAndTime dateAndTime) {
+        return defaultVisit(dateAndTime);
+    }
 
-    T visit(AnyDate.TimeOfDay timeOfDay);
+    default T visit(AnyDate.TimeOfDay timeOfDay) {
+        return defaultVisit(timeOfDay);
+    }
 
-
-    T visit(AnyDate.Date date);
-
+    default T visit(AnyDate.Date date) {
+        return defaultVisit(date);
+    }
 
     default T visit(AnyInt anyInt) {
         return visit((AnyNum) anyInt);
@@ -110,28 +125,43 @@ public interface DataTypeVisitor<T> {
         return visit((AnyBit) word);
     }
 
+    default T visit(EnumerateType enumerateType) {
+        return defaultVisit(enumerateType);
+    }
 
-    T visit(EnumerateType enumerateType);
+    default T visit(TimeType timeType) {
+        return defaultVisit(timeType);
+    }
 
-    T visit(TimeType timeType);
+    default T visit(RangeType rangeType) {
+        return defaultVisit(rangeType);
+    }
 
-    T visit(RangeType rangeType);
+    default T visit(RecordType recordType) {
+        return defaultVisit(recordType);
+    }
 
-    T visit(RecordType recordType);
+    default T visit(PointerType pointerType) {
+        return defaultVisit(pointerType);
+    }
 
+    default T visit(IECString.String string) {
+        return defaultVisit(string);
+    }
 
-    T visit(PointerType pointerType);
+    default T visit(IECString.WString wString) {
+        return defaultVisit(wString);
+    }
 
+    default T visit(IECArray iecArray) {
+        return defaultVisit(iecArray);
+    }
 
-    T visit(IECString.String string);
+    default T visit(AnyNum anyNum) {
+        return defaultVisit(anyNum);
+    }
 
-
-    T visit(IECString.WString wString);
-
-
-    T visit(IECArray iecArray);
-
-    T visit(AnyNum anyNum);
-
-    T visit(ClassDataType classDataType);
+    default T visit(ClassDataType classDataType) {
+        return defaultVisit(classDataType);
+    }
 }
