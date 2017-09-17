@@ -32,10 +32,13 @@ public class TestMain {
 
 	@Test
 	public final void testMethod() throws IOException {
-		ModularProof.createProof(
+
+		final ModularProver prover = new ModularProver(
 				IEC61131Facade.file(CharStreams.fromStream(
-						getClass().getResourceAsStream("/program.st"))),
+						getClass().getResourceAsStream("/program1.st"))),
 				IEC61131Facade.file(CharStreams.fromStream(
-						getClass().getResourceAsStream("/program.st"))));
+						getClass().getResourceAsStream("/program2.st"))));
+
+		prover.start();
 	}
 }

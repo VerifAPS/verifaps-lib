@@ -23,18 +23,59 @@ package edu.kit.iti.formal.automation.modularization;
  */
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public final class GraphNode<T> {
+
+	private final class ElementIterator implements Iterator<T> {
+
+		private Iterator<GraphNode<T>> _it;
+
+		private ElementIterator(Iterable<GraphNode<T>> source) {
+			_it = source.iterator();
+		}
+
+		@Override
+		public final boolean hasNext() {
+			return _it.hasNext();
+		}
+
+		@Override
+		public final T next() {
+			return _it.next().element;
+		}
+	}
 
 	public T element = null;
 
 	public final Set<GraphNode<T>> pred = new HashSet<>();
 	public final Set<GraphNode<T>> succ = new HashSet<>();
 
+	public final Iterable<T> predElements = () -> new ElementIterator(pred);
+	public final Iterable<T> succElements = () -> new ElementIterator(succ);
+
 	public GraphNode() {}
 
 	public GraphNode(final T element) {
 		this.element = element;
+	}
+
+	public final void addPredecessor(final GraphNode<T> node) {
+		pred     .add(node);
+		node.succ.add(this);
+	}
+
+	public final void addPredecessors(final Iterable<GraphNode<T>> nodes) {
+		for(GraphNode<T> i : nodes) addPredecessor(i);
+	}
+
+	public final void addSuccessor(final GraphNode<T> node) {
+		succ     .add(node);
+		node.pred.add(this);
+	}
+
+	public final void addSuccessors(final Iterable<GraphNode<T>> nodes) {
+		for(GraphNode<T> i : nodes) addSuccessor(i);
 	}
 }

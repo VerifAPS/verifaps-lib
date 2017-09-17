@@ -22,96 +22,167 @@ package edu.kit.iti.formal.automation.modularization;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.modularization.ssa.*;
-import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
-import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
-import edu.kit.iti.formal.automation.st.ast.TopLevelScopeElement;
+import edu.kit.iti.formal.automation.SymbExFacade;
+import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
+import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
+import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.smv.ast.SMVModule;
 
 import java.util.*;
 
 public class FunctionBlock {
 
-	public final Program owner;
-	public final String name;
+	private final Set<VariableDeclaration> _tempFbInstances = new HashSet<>();
+	private       FunctionBlockLink        _link;
 
-	public final Set<Variable> in    = new HashSet<>();
-	public final Set<Variable> out   = new HashSet<>();
-	public final Set<Variable> local = new HashSet<>();
+	public final Program                    program;
+	public final String                     name;
+	public final StatementList              body;
+	public final IntermediateRepresentation ir;
+	public final GraphNode<FunctionBlock>   cgNode;
 
-	private FunctionBlockLink _link;
-
-	public final Map<String, Variable> ssaVariables = new HashMap<>();
+	public final Set<VariableDeclaration> in    = new HashSet<>();
+	public final Set<VariableDeclaration> out   = new HashSet<>();
+	public final Set<VariableDeclaration> local = new HashSet<>();
 	public final Map<String, FunctionBlockInstance> fbInstances = new HashMap<>();
-	public final List<Statement> body = new LinkedList<>();
-	public final GraphNode<FunctionBlock> cgNode;
+
+	private final void _addAbstractedVariables(
+			final String     prefix,
+			final LocalScope dstScope) {
+
+		_addInlinedVariables(prefix, dstScope, out, VariableDeclaration.INPUT);
+	}
+
+	private final void _addInlinedVariables(
+			final String     prefix,
+			final LocalScope dstScope) {
+
+		_addInlinedVariables(prefix, dstScope, in,    VariableDeclaration.LOCAL);
+		_addInlinedVariables(prefix, dstScope, out,   VariableDeclaration.LOCAL);
+		_addInlinedVariables(prefix, dstScope, local, VariableDeclaration.LOCAL);
+
+		for(FunctionBlockInstance i : fbInstances.values())
+			i.type._addInlinedVariables(
+					prefix + i.getName() + '$', dstScope);
+	}
+
+	private final void _addInlinedVariables(
+			final String                   prefix,
+			final LocalScope               dstScope,
+			final Set<VariableDeclaration> variables,
+			final int                      type) {
+
+		for(VariableDeclaration i : variables) {
+
+			final VariableDeclaration newVar = new VariableDeclaration(i);
+
+			newVar  .setName(prefix + i.getName());
+			newVar  .setType(type);
+			dstScope.add    (newVar);
+		}
+	}
 
 	public FunctionBlock(
-			final Program              owner,
+			final Program              program,
 			final TopLevelScopeElement source) {
 
-		this.owner  = owner;
-		this.name   = source.getIdentifier();
-		this.cgNode = new GraphNode<>(this);
+		this.program = program;
+		this.name    = source.getIdentifier();
+		this.ir      = new IntermediateRepresentation(this);
+		this.cgNode  = new GraphNode<>(this);
 
-		final Creator ssaCreator =
-				new Creator(this, source.getLocalScope());
+		StatementList body = null;
 
-		if(source instanceof ProgramDeclaration) {
-			((ProgramDeclaration)source).getProgramBody().accept(ssaCreator);
-		} else if(source instanceof FunctionBlockDeclaration) {
-			((FunctionBlockDeclaration)source).
-					getFunctionBody().accept(ssaCreator);
-		}
+		if(source instanceof ProgramDeclaration)
+			body = ((ProgramDeclaration)      source).getProgramBody();
+		if(source instanceof FunctionBlockDeclaration)
+			body = ((FunctionBlockDeclaration)source).getFunctionBody();
 
-		for(Statement i : body) {
-			i.computeDependencies();
-			System.out.println(i.pdgNode.pred.size() + "  " + i);
-		}
+		this.body = body;
 
-		for(FunctionBlockInstance i : fbInstances.values())
-			for(CallSite j : i.callSites) j.computeCallSiteDependencies();
-
-		owner.functionBlocks.put(name, this);
-	}
-
-	public final void addFunctionBlockInstance(
-			final FunctionBlockInstance fbInstance) {
-		fbInstances.put(fbInstance.name, fbInstance);
-	}
-
-	public final void addSsaVariable(final Variable var) {
-
-		ssaVariables.put(var.name, var);
-
-		if(!(var instanceof FunctionBlockVariable) && var.declaration != null) {
-
-			if(var.declaration.isInput() || var.declaration.isInOut()) {
-				in.add(var);
-				new InputAssignment(this, var);
-			}
-
-			if(var.declaration.isOutput() || var.declaration.isInOut())
-				out.add(var);
-
-			if(var.declaration.isLocal()) {
-				local.add(var);
-				new DirectAssignment(this, var, null);
+		// Process all variables except for the function block instances, as
+		// those cannot be resolved at this point
+		for(VariableDeclaration i : source.getLocalScope()) {
+			if(i.getDataType() instanceof FunctionBlockDataType) {
+				_tempFbInstances.add(i);
+			} else if(i.isInput()) {
+				in.add(i);
+			} else if(i.isOutput()) {
+				out.add(i);
+			} else {
+				local.add(i);
 			}
 		}
+
+		program.functionBlocks.put(name, this);
 	}
 
-	public final void computeDependencies() {
+	public final void createIR() {
 
-		final Set<FunctionBlock> depFunctionBlocks = new HashSet<>();
-
-		for(FunctionBlockInstance i : fbInstances.values())
-			depFunctionBlocks.add(owner.functionBlocks.get(i.fbName));
-
-		for(FunctionBlock i : depFunctionBlocks) {
-			cgNode  .pred.add(i.cgNode);
-			i.cgNode.succ.add(cgNode);
+		for(VariableDeclaration i : _tempFbInstances) {
+			final FunctionBlockInstance fbInstance = new FunctionBlockInstance(
+					i,
+					program.functionBlocks.get(
+							i.getTypeDeclaration().getTypeName()),
+					this);
+			cgNode.addSuccessor(fbInstance.type.cgNode);
 		}
 
-		System.out.println(name + ": " + cgNode.pred.size());
+		ir.create(body);
+	}
+
+	public final FunctionBlockLink getLink(){
+		return _link;
+	}
+
+	public final void inline(
+			final String        prefix,
+			final StatementList dstBody) {
+
+		final SmvPreparator smvPreparator =
+				new SmvPreparator(ir, prefix, dstBody);
+
+		for(Statement i : body) i.accept(smvPreparator);
+	}
+
+	public final boolean isAbstractionPossible() {
+		return _link != null &&
+				_link.getState() == FunctionBlockLink.State.EQUIVALENT;
+	}
+
+	public final void setLink(final FunctionBlockLink link) {
+		_link = link;
+	}
+
+	public final SMVModule asSmvModule(
+			final Set<FunctionBlockInstance> abstractedInstances,
+			final String                     suffix) {
+
+		final ProgramDeclaration programDecl = new ProgramDeclaration();
+		final LocalScope         dstScope    = programDecl.getLocalScope();
+
+		programDecl.setProgramName(name);
+
+		_addInlinedVariables("", dstScope, in,    VariableDeclaration.INPUT);
+		_addInlinedVariables("", dstScope, out,   VariableDeclaration.OUTPUT);
+		_addInlinedVariables("", dstScope, local, VariableDeclaration.LOCAL);
+
+		for(FunctionBlockInstance i : fbInstances.values()) {
+			if(abstractedInstances.contains(i)) {
+				i.type._addAbstractedVariables(i.getName() + '$', dstScope);
+			} else {
+				i.type._addInlinedVariables(i.getName() + '$', dstScope);
+			}
+		}
+
+		inline("", programDecl.getProgramBody());
+
+		final SMVModule module = SymbExFacade.evaluateProgram(
+				programDecl, program.typeDeclarations);
+
+		module.setName(module.getName() + suffix);
+
+		return module;
 	}
 }

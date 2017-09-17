@@ -32,10 +32,16 @@ public final class Program {
 
 	public final FunctionBlock              main;
 	public final Map<String, FunctionBlock> functionBlocks = new HashMap<>();
+	public final TypeDeclarations typeDeclarations = new TypeDeclarations();
 
 	public Program(final TopLevelElements elements) {
 
 		IEC61131Facade.resolveDataTypes(elements);
+
+		// Collect all type declarations
+		for(TopLevelElement i : elements)
+			if(i instanceof TypeDeclarations)
+				typeDeclarations.addAll((TypeDeclarations)i);
 
 		FunctionBlock main = null;
 		for(TopLevelElement i : elements) {
@@ -46,9 +52,9 @@ public final class Program {
 		}
 		this.main = main;
 
+		for(FunctionBlock i : functionBlocks.values()) i.createIR();
+
 		if(main == null)
 			throw new NullPointerException("No program declaration found");
-
-		for(FunctionBlock i : functionBlocks.values()) i.computeDependencies();
 	}
 }
