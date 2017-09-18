@@ -63,10 +63,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
 
     /* Check if nuXmv executable exists */
     File nuxmvFile = new File(config.getNuxmvFilename());
-    if (!nuxmvFile.exists() || nuxmvFile.isDirectory()) {
-      throw new FileNotFoundException(
-          "The NuXmv executable " + nuxmvFile.getAbsolutePath() + " could not be found.");
-    }
+    //TODO check if nuXmv is executable by running it.
   }
 
   /**
@@ -106,6 +103,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
       cancelVerification();
     }
     ProcessBuilder processBuilder = new ProcessBuilder(getetaCommand.split(" "));
+    System.out.println(getetaCommand);
     processBuilder.environment().put("NUXMV", config.getNuxmvFilename());
     getetaOutputFile = File.createTempFile("verification-result", ".log");
     LOGGER.info("Code file: {}", tempCodeFile);
