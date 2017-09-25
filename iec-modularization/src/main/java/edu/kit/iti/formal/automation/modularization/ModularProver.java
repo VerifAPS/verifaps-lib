@@ -22,20 +22,19 @@ package edu.kit.iti.formal.automation.modularization;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
+import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
-import edu.kit.iti.formal.automation.st.ast.TypeDeclaration;
-import edu.kit.iti.formal.automation.st.ast.TypeDeclarations;
 
 import java.util.*;
 
-public class ModularProver {
+public final class ModularProver {
 
 	private final Program _program1;
 	private final Program _program2;
 	private final SmvVerifier _smvVerifier =
 			new SmvVerifier("nuXmv/bin/nuXmv.exe");
 
+	// Links are stored bottom-up ordered
 	private final List<FunctionBlockLink> _proofOrder  = new LinkedList<>();
 
 	private void _addFunctionBlockLink(
@@ -66,11 +65,11 @@ public class ModularProver {
 		_addFunctionBlockLink(
 				_program1.main, _program2.main, remaining1, remaining2);
 
-		// Math function blocks with equal names
-		for(Map.Entry<String, FunctionBlock> i : remaining1.entrySet())
-			if(remaining2.containsKey(i.getKey()))
+		// Match function blocks with equal names
+		for(String i : new HashSet<>(remaining1.keySet()))
+			if(remaining2.containsKey(i))
 				_addFunctionBlockLink(
-						i.getValue(), remaining2.get(i.getKey()),
+						remaining1.get(i), remaining2.get(i),
 						remaining1, remaining2);
 	}
 
@@ -78,18 +77,20 @@ public class ModularProver {
 			final TopLevelElements prgm1,
 			final TopLevelElements prgm2) {
 
-		_program1 = new Program(prgm1);
-		_program2 = new Program(prgm2);
+		_program1 = new Program(prgm1, AbstractionVariable::getName1);
+		_program2 = new Program(prgm2, AbstractionVariable::getName2);
 
 		_findFunctionBlockLinks();
 		_createProofOrder(_program1.main);
+
+		for(FunctionBlockLink i : _proofOrder) i.findInstanceLinks();
 	}
 
 	public final boolean start() {
 
-		for(FunctionBlockLink i : _proofOrder) i.checkEquivalence(_smvVerifier);
+		for(FunctionBlockLink i : _proofOrder)
+			i.checkEquivalence(_smvVerifier);
 
-		return _program1.main.getLink().getState() ==
-				FunctionBlockLink.State.EQUIVALENT;
+		return _program1.main.getLink().isEquivalent();
 	}
 }

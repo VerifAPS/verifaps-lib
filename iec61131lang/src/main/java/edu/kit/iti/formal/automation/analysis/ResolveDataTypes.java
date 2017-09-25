@@ -94,6 +94,16 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     }
 
     @Override
+    public Object visit(Literal literal) {
+        try {
+            EnumerateType enumType = (EnumerateType)local.getGlobalScope().
+                    resolveDataType(literal.getDataTypeName());
+            literal.setDataType(enumType);
+        } catch(ClassCastException | DataTypeNotDefinedException e) {}
+        return null;
+    }
+
+    @Override
     public Object visit(SymbolicReference ref) {
         String first = ref.getIdentifier();
         try {

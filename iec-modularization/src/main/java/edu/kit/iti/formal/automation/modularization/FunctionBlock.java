@@ -22,16 +22,15 @@ package edu.kit.iti.formal.automation.modularization;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.SymbExFacade;
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
-import edu.kit.iti.formal.automation.scope.LocalScope;
-import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.*;
-import edu.kit.iti.formal.smv.ast.SMVModule;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-public class FunctionBlock {
+public final class FunctionBlock {
 
 	private final Set<VariableDeclaration> _tempFbInstances = new HashSet<>();
 	private       FunctionBlockLink        _link;
@@ -42,46 +41,13 @@ public class FunctionBlock {
 	public final IntermediateRepresentation ir;
 	public final GraphNode<FunctionBlock>   cgNode;
 
-	public final Set<VariableDeclaration> in    = new HashSet<>();
-	public final Set<VariableDeclaration> out   = new HashSet<>();
-	public final Set<VariableDeclaration> local = new HashSet<>();
+	public final InlinedFunctionBlock inlinedAll;
+	public final InlinedFunctionBlock inlinedAbstracted;
+
+	public final Map<String, VariableDeclaration>   in          = new HashMap<>();
+	public final Map<String, VariableDeclaration>   out         = new HashMap<>();
+	public final Map<String, VariableDeclaration>   local       = new HashMap<>();
 	public final Map<String, FunctionBlockInstance> fbInstances = new HashMap<>();
-
-	private final void _addAbstractedVariables(
-			final String     prefix,
-			final LocalScope dstScope) {
-
-		_addInlinedVariables(prefix, dstScope, out, VariableDeclaration.INPUT);
-	}
-
-	private final void _addInlinedVariables(
-			final String     prefix,
-			final LocalScope dstScope) {
-
-		_addInlinedVariables(prefix, dstScope, in,    VariableDeclaration.LOCAL);
-		_addInlinedVariables(prefix, dstScope, out,   VariableDeclaration.LOCAL);
-		_addInlinedVariables(prefix, dstScope, local, VariableDeclaration.LOCAL);
-
-		for(FunctionBlockInstance i : fbInstances.values())
-			i.type._addInlinedVariables(
-					prefix + i.getName() + '$', dstScope);
-	}
-
-	private final void _addInlinedVariables(
-			final String                   prefix,
-			final LocalScope               dstScope,
-			final Set<VariableDeclaration> variables,
-			final int                      type) {
-
-		for(VariableDeclaration i : variables) {
-
-			final VariableDeclaration newVar = new VariableDeclaration(i);
-
-			newVar  .setName(prefix + i.getName());
-			newVar  .setType(type);
-			dstScope.add    (newVar);
-		}
-	}
 
 	public FunctionBlock(
 			final Program              program,
@@ -91,6 +57,8 @@ public class FunctionBlock {
 		this.name    = source.getIdentifier();
 		this.ir      = new IntermediateRepresentation(this);
 		this.cgNode  = new GraphNode<>(this);
+		this.inlinedAll        = new InlinedFunctionBlock(this);
+		this.inlinedAbstracted = new InlinedFunctionBlock(this);
 
 		StatementList body = null;
 
@@ -100,6 +68,7 @@ public class FunctionBlock {
 			body = ((FunctionBlockDeclaration)source).getFunctionBody();
 
 		this.body = body;
+		this.body.accept(new CtrlStatementNormalizer(source.getLocalScope()));
 
 		// Process all variables except for the function block instances, as
 		// those cannot be resolved at this point
@@ -107,11 +76,11 @@ public class FunctionBlock {
 			if(i.getDataType() instanceof FunctionBlockDataType) {
 				_tempFbInstances.add(i);
 			} else if(i.isInput()) {
-				in.add(i);
+				in.put(i.getName(), i);
 			} else if(i.isOutput()) {
-				out.add(i);
+				out.put(i.getName(), i);
 			} else {
-				local.add(i);
+				local.put(i.getName(), i);
 			}
 		}
 
@@ -136,53 +105,8 @@ public class FunctionBlock {
 		return _link;
 	}
 
-	public final void inline(
-			final String        prefix,
-			final StatementList dstBody) {
-
-		final SmvPreparator smvPreparator =
-				new SmvPreparator(ir, prefix, dstBody);
-
-		for(Statement i : body) i.accept(smvPreparator);
-	}
-
-	public final boolean isAbstractionPossible() {
-		return _link != null &&
-				_link.getState() == FunctionBlockLink.State.EQUIVALENT;
-	}
-
 	public final void setLink(final FunctionBlockLink link) {
+		assert _link == null;
 		_link = link;
-	}
-
-	public final SMVModule asSmvModule(
-			final Set<FunctionBlockInstance> abstractedInstances,
-			final String                     suffix) {
-
-		final ProgramDeclaration programDecl = new ProgramDeclaration();
-		final LocalScope         dstScope    = programDecl.getLocalScope();
-
-		programDecl.setProgramName(name);
-
-		_addInlinedVariables("", dstScope, in,    VariableDeclaration.INPUT);
-		_addInlinedVariables("", dstScope, out,   VariableDeclaration.OUTPUT);
-		_addInlinedVariables("", dstScope, local, VariableDeclaration.LOCAL);
-
-		for(FunctionBlockInstance i : fbInstances.values()) {
-			if(abstractedInstances.contains(i)) {
-				i.type._addAbstractedVariables(i.getName() + '$', dstScope);
-			} else {
-				i.type._addInlinedVariables(i.getName() + '$', dstScope);
-			}
-		}
-
-		inline("", programDecl.getProgramBody());
-
-		final SMVModule module = SymbExFacade.evaluateProgram(
-				programDecl, program.typeDeclarations);
-
-		module.setName(module.getName() + suffix);
-
-		return module;
 	}
 }

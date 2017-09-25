@@ -1,6 +1,8 @@
+package edu.kit.iti.formal.automation.modularization;
+
 /*-
  * #%L
- * aps-rvt
+ * iec-modularization
  * %%
  * Copyright (C) 2017 Alexander Weigl
  * %%
@@ -19,29 +21,30 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package edu.kit.iti.formal.automation.rvt
 
-import org.apache.commons.io.FileUtils
-import org.junit.Test
+public final class Pair<T> {
 
-import org.junit.Assert.*
+	public interface Selector<T> {
+		T getElement(Pair<T> pair);
+	}
 
-/**
- * @author Alexander Weigl
- * @version 1 (14.09.17)
- */
-class McKtTest {
-    @Test
-    fun testParseOutput() {
-        val resource = javaClass.getResource("/cex.xml")
-        val xml = resource.readText()
-        val out =parseOutput(xml)
-        assertFalse(out.hasErrors)
-        assertEquals(0, out.errors.size)
-        assertNotNull(out.counterExample)
+	public T a;
+	public T b;
 
-        assertEquals(false, out.isVerified)
-        println(out.counterExample)
-    }
+	public Pair() {
+		this(null, null);
+	}
 
+	public Pair(final T a, final T b) {
+		this.a = a;
+		this.b = b;
+	}
+
+	public static <T> T getA(final Pair<T> pair) {
+		return pair.a;
+	}
+
+	public static <T> T getB(final Pair<T> pair) {
+		return pair.b;
+	}
 }

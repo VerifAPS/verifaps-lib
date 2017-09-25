@@ -1,6 +1,3 @@
-TYPE
-	TestEnum: (First, Second);
-END_TYPE
 
 FUNCTION_BLOCK BLOCK_A
 	VAR_INPUT  x : INT; END_VAR
@@ -11,7 +8,7 @@ END_FUNCTION_BLOCK
 FUNCTION_BLOCK BLOCK_B
 	VAR_INPUT  x : INT; END_VAR
 	VAR_OUTPUT y : INT; END_VAR
-	y := x + INT#6;
+	y := x + INT#3;
 END_FUNCTION_BLOCK
 
 PROGRAM PGRM
@@ -19,14 +16,6 @@ PROGRAM PGRM
 	VAR_OUTPUT y      : INT;     END_VAR
 	VAR        INST_A : BLOCK_A; END_VAR
 	VAR        INST_B : BLOCK_B; END_VAR
-	VAR        state  : TestEnum; END_VAR
-	
-	CASE state OF
-		TestEnum#First:
-			INST_A.x := INT#4;
-		TestEnum#Second:
-			INST_A.x := INT#8;
-	END_CASE
 	
 	INST_A.x := x + INT#7;
 	INST_A();
@@ -34,5 +23,5 @@ PROGRAM PGRM
 	INST_B.x := INST_A.y + INT#9;
 	INST_B();
 	
-	y := INST_B.y;
+	y := INST_B.y + INT#3;
 END_PROGRAM

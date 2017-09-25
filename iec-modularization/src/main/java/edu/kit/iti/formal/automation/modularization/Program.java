@@ -23,21 +23,86 @@ package edu.kit.iti.formal.automation.modularization;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
+import edu.kit.iti.formal.automation.SymbExFacade;
+import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public final class Program {
 
 	public final FunctionBlock              main;
 	public final Map<String, FunctionBlock> functionBlocks = new HashMap<>();
 	public final TypeDeclarations typeDeclarations = new TypeDeclarations();
+	/*
+	// returns 'true' if the link has been found
+	private boolean _findLinkInCallGraph(
+			final FunctionBlock        fb,
+			final FunctionBlockLink    fbLink,
+			final Stack<FunctionBlock> path,
+			final Set<FunctionBlock>   fixed) {
 
-	public Program(final TopLevelElements elements) {
+		// Function blocks that are already part of the order are not visited
+		// again
+		if(fixed.contains(fb)) return false;
+
+		path.push(fb);
+
+		if(fb.getLink() == fbLink) {
+
+			// TODO: be careful with stack iteration (order!)
+			topDownOrdered.addAll(path);
+			fixed         .addAll(path);
+			return true;
+
+		} else {
+
+			for(FunctionBlock i : fb.cgNode.succElements)
+				if(_findLinkInCallGraph(i, fbLink, path, fixed)) return true;
+		}
+
+		path.pop();
+		return false;
+	}
+
+	private void _findLinkInCallGraph(
+			final FunctionBlockLink  fbLink,
+			final Set<FunctionBlock> fixed) {
+
+		for(FunctionBlock i : fixed)
+			_findLinkInCallGraph(i, fbLink, new Stack<>(), fixed);
+	}
+	*/
+	private void _createInlinedFunctionBlock(
+			final FunctionBlock                    fb,
+			final AbstractionVariable.NameSelector nameSelector) {
+
+		for(FunctionBlock i : fb.cgNode.succElements)
+			_createInlinedFunctionBlock(i, nameSelector);
+
+		// Will do nothing if is has been created before
+		fb.inlinedAll.create(
+				new InlinedFunctionBlock.Configuration(fb),
+				null, nameSelector);
+	}
+
+	public Program(
+			final TopLevelElements                 elements,
+			final AbstractionVariable.NameSelector nameSelector) {
 
 		IEC61131Facade.resolveDataTypes(elements);
+		/*
+		final TopLevelElements simplified = SymbExFacade.simplify(elements, false, true, true, true, true);
+		final StructuredTextPrinter stp = new StructuredTextPrinter();
 
+		for(TopLevelElement i : simplified) {
+			stp.clear();
+			i.accept(stp);
+			System.out.println(stp.getString());
+		}
+		*/
 		// Collect all type declarations
 		for(TopLevelElement i : elements)
 			if(i instanceof TypeDeclarations)
@@ -56,5 +121,7 @@ public final class Program {
 
 		if(main == null)
 			throw new NullPointerException("No program declaration found");
+
+		_createInlinedFunctionBlock(main, nameSelector);
 	}
 }

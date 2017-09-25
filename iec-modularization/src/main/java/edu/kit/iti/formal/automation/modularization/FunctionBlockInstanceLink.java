@@ -1,6 +1,8 @@
+package edu.kit.iti.formal.automation.modularization;
+
 /*-
  * #%L
- * aps-rvt
+ * iec-modularization
  * %%
  * Copyright (C) 2017 Alexander Weigl
  * %%
@@ -19,29 +21,25 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package edu.kit.iti.formal.automation.rvt
 
-import org.apache.commons.io.FileUtils
-import org.junit.Test
+public final class FunctionBlockInstanceLink {
 
-import org.junit.Assert.*
+	public final FunctionBlockInstance fbi1;
+	public final FunctionBlockInstance fbi2;
+	public final FunctionBlockLink     fbLink;
 
-/**
- * @author Alexander Weigl
- * @version 1 (14.09.17)
- */
-class McKtTest {
-    @Test
-    fun testParseOutput() {
-        val resource = javaClass.getResource("/cex.xml")
-        val xml = resource.readText()
-        val out =parseOutput(xml)
-        assertFalse(out.hasErrors)
-        assertEquals(0, out.errors.size)
-        assertNotNull(out.counterExample)
+	public FunctionBlockInstanceLink(
+			final FunctionBlockInstance fbi1,
+			final FunctionBlockInstance fbi2) {
 
-        assertEquals(false, out.isVerified)
-        println(out.counterExample)
-    }
+		this.fbi1   = fbi1;
+		this.fbi2   = fbi2;
+		this.fbLink = fbi1.type.getLink();
 
+		// The types of the instances must be linked as well
+		assert fbLink != null && fbLink == fbi2.type.getLink();
+
+		fbi1.setLink(this);
+		fbi2.setLink(this);
+	}
 }

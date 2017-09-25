@@ -28,6 +28,7 @@ import edu.kit.iti.formal.automation.smv.SymbolicExecutioner;
 import edu.kit.iti.formal.automation.smv.SymbolicState;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st0.STSimplifier;
+import edu.kit.iti.formal.automation.st0.trans.*;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SVariable;
@@ -67,6 +68,35 @@ public final class SymbExFacade {
      */
     public static final TopLevelElements simplify(TopLevelElements elements) {
         STSimplifier stSimplifier = new STSimplifier(elements);
+        stSimplifier.transform();
+        return stSimplifier.getProcessed();
+    }
+
+    public static final TopLevelElements simplify(TopLevelElements elements,
+                                                  boolean embedFunctionBlocks,
+                                                  boolean unwindLoops,
+                                                  boolean timerToCounter,
+                                                  boolean embedArrays,
+                                                  boolean replaceSFCReset) {
+        STSimplifier stSimplifier = new STSimplifier(elements);
+        List<ST0Transformation> transformations = stSimplifier.getTransformations();
+
+        if(embedFunctionBlocks) {
+            transformations.add(new FunctionBlockEmbedding());
+        }
+        if(unwindLoops) {
+            transformations.add(LoopUnwinding.getTransformation());
+        }
+        if(timerToCounter) {
+            transformations.add(TimerToCounter.getTransformation());
+        }
+        if(embedArrays) {
+            transformations.add(ArrayEmbedder.getTransformation());
+        }
+        if(replaceSFCReset) {
+            transformations.add(SFCResetReplacer.getTransformation());
+        }
+
         stSimplifier.transform();
         return stSimplifier.getProcessed();
     }

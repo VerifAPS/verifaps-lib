@@ -22,7 +22,22 @@ package edu.kit.iti.formal.automation.modularization;
  * #L%
  */
 
-public final class Mapping {
+public final class Logging {
 
-	//public static final void mapVariables
+	private static int _indent = 0;
+
+	private Logging() {}
+
+	public static void log(final String msg) {
+		for(int i = 0; i < _indent; i++) System.out.print('\t');
+		System.out.println("> " + msg);
+	}
+
+	public static void popIndent() {
+		_indent--;
+	}
+
+	public static void pushIndent() {
+		_indent++;
+	}
 }
