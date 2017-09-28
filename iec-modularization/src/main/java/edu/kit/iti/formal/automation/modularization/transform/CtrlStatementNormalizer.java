@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.modularization;
+package edu.kit.iti.formal.automation.modularization.transform;
 
 /*-
  * #%L
@@ -33,8 +33,7 @@ import java.util.ListIterator;
 
 public final class CtrlStatementNormalizer extends AstVisitor<Object> {
 
-	private final LocalScope _scope;
-	private       Expression _caseExpression = null;
+	private Expression _caseExpression = null;
 
 	private final StatementList _aggregateToElseBranch(
 			final GuardedStatement guardedStmt,
@@ -74,10 +73,6 @@ public final class CtrlStatementNormalizer extends AstVisitor<Object> {
 					new BinaryExpression(
 							_caseExpression, stop,  Operators.LESS_EQUALS),
 					Operators.AND);
-	}
-
-	public CtrlStatementNormalizer(final LocalScope scope) {
-		_scope = scope;
 	}
 
 	@Override

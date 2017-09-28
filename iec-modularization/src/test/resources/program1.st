@@ -20,6 +20,7 @@ PROGRAM PGRM
 	VAR        INST_A : BLOCK_A; END_VAR
 	VAR        INST_B : BLOCK_B; END_VAR
 	VAR        state  : TestEnum; END_VAR
+	VAR  TestTimer : TON; END_VAR
 	
 	CASE state OF
 		TestEnum#First:
@@ -27,9 +28,11 @@ PROGRAM PGRM
 		TestEnum#Second:
 			INST_A.x := INT#8;
 	END_CASE
-	
+	TestTimer();
 	INST_A.x := x + INT#7;
-	INST_A();
+	IF x > 5 THEN
+		INST_A();
+	END_IF
 	
 	INST_B.x := INST_A.y + INT#9;
 	INST_B();

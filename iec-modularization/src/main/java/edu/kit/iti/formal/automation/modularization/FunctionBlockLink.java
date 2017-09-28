@@ -120,6 +120,18 @@ public final class FunctionBlockLink {
 					inst2.type.out.get(i).getTypeDeclaration());
 	}
 
+	private SMVExpr _createEquivExpression(
+			final String               name1,
+			final String               name2,
+			final Map<String, SMVType> types1,
+			final Map<String, SMVType> types2) {
+
+		return new SBinaryExpression(
+				new SVariable("fb1." + name1, types1.get(name1)),
+				SBinaryOperator.EQUAL,
+				new SVariable("fb2." + name2, types2.get(name2)));
+	}
+
 	private boolean _checkEqualActivation(
 			final FunctionBlockInstanceLink          instLink,
 			final InlinedFunctionBlock.Configuration config1,
@@ -127,13 +139,15 @@ public final class FunctionBlockLink {
 			final VariableMapping                    output,
 			final SmvVerifier                        smvVerifier) {
 
-		final InlinedFunctionBlock dstFb1 = new InlinedFunctionBlock(fb1);
-		final InlinedFunctionBlock dstFb2 = new InlinedFunctionBlock(fb2);
+		final InlinedFunctionBlock dstFb1 =
+				new InlinedFunctionBlock(fb1, instLink.fbi1);
+		final InlinedFunctionBlock dstFb2 =
+				new InlinedFunctionBlock(fb2, instLink.fbi2);
 
 		_createAbstractionVariables(dstFb1, dstFb2, config1);
 
-		dstFb1.create(config1, instLink.fbi1, AbstractionVariable::getName1);
-		dstFb2.create(config2, instLink.fbi2, AbstractionVariable::getName2);
+		dstFb1.create(config1, AbstractionVariable::getName1);
+		dstFb2.create(config2, AbstractionVariable::getName2);
 
 		return _checkEquivalence(
 				dstFb1, dstFb2, output, smvVerifier,
@@ -151,8 +165,8 @@ public final class FunctionBlockLink {
 
 		_createAbstractionVariables(dstFb1, dstFb2, config1);
 
-		dstFb1.create(config1, null, AbstractionVariable::getName1);
-		dstFb2.create(config2, null, AbstractionVariable::getName2);
+		dstFb1.create(config1, AbstractionVariable::getName1);
+		dstFb2.create(config2, AbstractionVariable::getName2);
 
 		return _checkEquivalence(
 				dstFb1, dstFb2, output, smvVerifier,
@@ -165,6 +179,11 @@ public final class FunctionBlockLink {
 			final VariableMapping      output,
 			final SmvVerifier          smvVerifier,
 			final String               fileName) {
+
+		assert (dstFb1.activatedInstance == null &&
+				dstFb2.activatedInstance == null) ||
+				dstFb1.activatedInstance.getLink() ==
+						dstFb2.activatedInstance.getLink();
 
 		final SMVModule moduleMain = new SMVModule();
 		final SMVModule module1    = SymbExFacade.evaluateProgram(
@@ -255,22 +274,29 @@ public final class FunctionBlockLink {
 
 		// Only the state variables that considered to be output are collected
 		// in this map
-		final Map<String, SMVType> outputTypes    = new HashMap<>();
+		final Map<String, SMVType> stateTypes1    = new HashMap<>();
+		final Map<String, SMVType> stateTypes2    = new HashMap<>();
 		final List<SMVExpr>        invarEquations = new LinkedList<>();
 
-		// Find all common output variables
+		// Store all output types
 		for(SVariable i : module1.getStateVars())
-			if(output.var2ByVar1.containsKey(i.getName()))
-				outputTypes.put(i.getName(), i.getDatatype());
+			stateTypes1.put(i.getName(), i.getDatatype());
+		for(SVariable i : module2.getStateVars())
+			stateTypes2.put(i.getName(), i.getDatatype());
 
-		for(Map.Entry<String, String> i : output.var2ByVar1.entrySet()) {
+		if(dstFb1.activatedInstance != null) {
 
-			final SMVType dataType = outputTypes.get(i.getKey());
+			for(FunctionBlockInstance.CallSite i :
+					dstFb1.activatedInstance.callSites)
+				_createActivationInvariant(
+						i.getLink(), dstFb1, dstFb2, invarEquations,
+						stateTypes1, stateTypes2);
 
-			invarEquations.add(new SBinaryExpression(
-					new SVariable("fb1." + i.getKey(),   dataType),
-					SBinaryOperator.EQUAL,
-					new SVariable("fb2." + i.getValue(), dataType)));
+		} else {
+
+			for(Map.Entry<String, String> i : output.var2ByVar1.entrySet())
+				invarEquations.add(_createEquivExpression(
+						i.getKey(), i.getValue(), stateTypes1, stateTypes2));
 		}
 
 		// Aggregate all equivalence terms into a single term
@@ -281,8 +307,42 @@ public final class FunctionBlockLink {
 				SMVFacade.combine(SBinaryOperator.AND, invarEquations));
 
 		return smvVerifier.verify(
-				fileName + ".smv", false,
-				moduleMain, module1, module2);
+				fileName, false, moduleMain, module1, module2);
+	}
+
+	private void _createActivationInvariant(
+			final CallSiteLink         csLink,
+			final InlinedFunctionBlock dstFb1,
+			final InlinedFunctionBlock dstFb2,
+			final List<SMVExpr>        dstEquations,
+			final Map<String, SMVType> types1,
+			final Map<String, SMVType> types2) {
+
+		final InlinedFunctionBlock.Activation activation1 =
+				dstFb1.activationVariables.get(csLink.cs1);
+		final InlinedFunctionBlock.Activation activation2 =
+				dstFb2.activationVariables.get(csLink.cs2);
+
+		final List<SMVExpr> implyEquations = new LinkedList<>();
+
+		dstEquations.add(_createEquivExpression(
+				activation1.activationBit.getName(),
+				activation2.activationBit.getName(),
+				types1, types2));
+
+		for(Map.Entry<String, String> j :
+				dstFb1.activatedInstance.type.getLink().varMappingIn.var2ByVar1.entrySet())
+			implyEquations.add(_createEquivExpression(
+					activation1.variables.get(j.getKey()).getName(),
+					activation1.variables.get(j.getValue()).getName(),
+					types1, types2));
+
+		dstEquations.add(new SBinaryExpression(
+				new SVariable(
+						"fb1." + activation1.activationBit.getName(),
+						SMVType.BOOLEAN),
+				SBinaryOperator.IMPL,
+				SMVFacade.combine(SBinaryOperator.AND, implyEquations)));
 	}
 
 	private void _createInstanceLink(
@@ -294,9 +354,9 @@ public final class FunctionBlockLink {
 		final FunctionBlockInstance instance1 = fb1.fbInstances.get(instName1);
 		final FunctionBlockInstance instance2 = fb2.fbInstances.get(instName2);
 
-		// Right now we only want the instances to have exactly one call site in
-		// both function blocks
-		if(instance1.callSites.size() == 1 && instance2.callSites.size() == 1)
+		// Right now we only want the instances to have the same amount of call
+		// sites
+		if(instance1.callSites.size() == instance2.callSites.size())
 			new FunctionBlockInstanceLink(instance1, instance2);
 
 		remaining1.remove(instName1);
@@ -333,6 +393,22 @@ public final class FunctionBlockLink {
 		Logging.log("Checking equivalence of [" +
 				fb1.name + "," + fb2.name + "]");
 		Logging.pushIndent();
+
+		if(fb1.srcString.equals(fb2.srcString)) {
+
+			boolean calleesEqual = true;
+			for(FunctionBlock i : fb1.cgNode.succElements)
+				if(!i.getLink().isEquivalent()) calleesEqual = false;
+
+			if(calleesEqual) {
+
+				Logging.log("Structural equivalent (no proof)");
+				Logging.popIndent();
+
+				_state = State.EQUIVALENT;
+				return;
+			}
+		}
 
 		final Set<GraphNode<FunctionBlockInstance.CallSite>> callSiteNodes =
 				new HashSet<>();
@@ -395,6 +471,21 @@ public final class FunctionBlockLink {
 		_state = fbEquivalent ? State.EQUIVALENT : State.NOT_EQUIVALENT;
 	}
 
+	public final void checkEquivalenceInlined(
+			final SmvVerifier smvVerifier) {
+
+		Logging.log("Checking equivalence (fully inlined) of [" +
+				fb1.name + "," + fb2.name + "]");
+		Logging.pushIndent();
+
+		final boolean fbEquivalent = _checkEquivalence(
+				fb1.inlinedAll, fb2.inlinedAll, varMappingOut, smvVerifier,
+				"equiv_inlined_[" + fb1.name + "]-[" + fb2.name + "]");
+
+		Logging.log(fbEquivalent ? "Equivalent" : "Not equivalent");
+		Logging.popIndent();
+	}
+
 	public final void findInstanceLinks() {
 
 		// necessary condition: the types of linked instances must also be
@@ -437,6 +528,20 @@ public final class FunctionBlockLink {
 			if(i.a.size() == 1 && i.b.size() == 1)
 				_createInstanceLink(
 						i.a.iterator().next(), i.b.iterator().next(), i.a, i.b);
+	}
+
+	public final Set<String> getCommonVariables(
+			final FunctionBlock fb,
+			final boolean       useInputMapping) {
+
+		assert fb == fb1 || fb == fb2;
+
+		final VariableMapping varMapping =
+				useInputMapping ? varMappingIn : varMappingOut;
+
+		if(fb == fb1) return varMapping.var2ByVar1.keySet();
+		if(fb == fb2) return varMapping.var1ByVar2.keySet();
+		return null;
 	}
 
 	public final State getState() {

@@ -27,47 +27,67 @@ import edu.kit.iti.formal.automation.st.util.AstVisitor;
 
 import java.util.Stack;
 
-public abstract class StatementListModifier extends AstVisitor<StatementList> {
+// Precondition: No case statements
+public abstract class StatementListModifier extends AstVisitor<Object> {
 
+	private final boolean              _createNew;
 	private final Stack<StatementList> _stmtLists = new Stack<>();
+
+	protected StatementListModifier(final boolean createNew) {
+		_createNew = createNew;
+	}
 
 	protected final void _addToCurrentList(final Statement stmt) {
 		assert _stmtLists.peek() != null;
 		_stmtLists.peek().add(stmt);
 	}
 
+	protected void _onEnterFirstStatementList(final StatementList stmtList) {}
+
 	protected void _onEnterStatementList(final StatementList stmtList) {}
 
 	@Override
-	public StatementList visit(final AssignmentStatement assignStmt) {
+	public Object visit(final AssignmentStatement assignStmt) {
 		_addToCurrentList(assignStmt);
 		return super.visit(assignStmt);
 	}
 
 	@Override
-	public StatementList visit(final FunctionBlockCallStatement fbCallStmt) {
+	public Object visit(final FunctionBlockCallStatement fbCallStmt) {
 		_addToCurrentList(fbCallStmt);
 		return super.visit(fbCallStmt);
 	}
 
 	@Override
-	public StatementList visit(final IfStatement ifStmt) {
+	public Object visit(final IfStatement ifStmt) {
 
-		_addToCurrentList(ifStmt);
+		final IfStatement newIfStmt = new IfStatement();
 
-		for(GuardedStatement i : ifStmt.getConditionalBranches()) {
-			i.getCondition().accept(this);
-			i.setStatements(i.getStatements().accept(this));
-		}
-		ifStmt.setElseBranch(ifStmt.getElseBranch().accept(this));
+		_addToCurrentList(newIfStmt);
+
+		for(GuardedStatement i : ifStmt.getConditionalBranches())
+			newIfStmt.getConditionalBranches().add(new GuardedStatement(
+					i.getCondition(),
+					(StatementList)i.getStatements().accept(this)));
+
+		newIfStmt.setElseBranch(
+				(StatementList)ifStmt.getElseBranch().accept(this));
 		return null;
 	}
 
 	@Override
-	public final StatementList visit(final StatementList stmtList) {
-		_stmtLists.push(new StatementList());
+	public final Object visit(final StatementList stmtList) {
+
+		final StatementList oldStatements = new StatementList(stmtList);
+
+		_stmtLists.push(_createNew ? new StatementList() : stmtList);
+
+		if(_stmtLists.size() == 1) _onEnterFirstStatementList(stmtList);
 		_onEnterStatementList(stmtList);
-		for(Statement i : stmtList) i.accept(this);
+
+		if(!_createNew) stmtList.clear();
+		for(Statement i : oldStatements) i.accept(this);
+
 		return _stmtLists.pop();
 	}
 }

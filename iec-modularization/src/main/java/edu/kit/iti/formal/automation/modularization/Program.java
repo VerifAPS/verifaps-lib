@@ -24,10 +24,11 @@ package edu.kit.iti.formal.automation.modularization;
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.SymbExFacade;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.modularization.transform.CtrlStatementNormalizer;
+import edu.kit.iti.formal.automation.modularization.transform.FunctionCallParamRemover;
+import edu.kit.iti.formal.automation.modularization.transform.TimerToCounter;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.*;
-import edu.kit.iti.formal.automation.st.util.AstVisitor;
 
 import java.util.*;
 
@@ -36,45 +37,7 @@ public final class Program {
 	public final FunctionBlock              main;
 	public final Map<String, FunctionBlock> functionBlocks = new HashMap<>();
 	public final TypeDeclarations typeDeclarations = new TypeDeclarations();
-	/*
-	// returns 'true' if the link has been found
-	private boolean _findLinkInCallGraph(
-			final FunctionBlock        fb,
-			final FunctionBlockLink    fbLink,
-			final Stack<FunctionBlock> path,
-			final Set<FunctionBlock>   fixed) {
 
-		// Function blocks that are already part of the order are not visited
-		// again
-		if(fixed.contains(fb)) return false;
-
-		path.push(fb);
-
-		if(fb.getLink() == fbLink) {
-
-			// TODO: be careful with stack iteration (order!)
-			topDownOrdered.addAll(path);
-			fixed         .addAll(path);
-			return true;
-
-		} else {
-
-			for(FunctionBlock i : fb.cgNode.succElements)
-				if(_findLinkInCallGraph(i, fbLink, path, fixed)) return true;
-		}
-
-		path.pop();
-		return false;
-	}
-
-	private void _findLinkInCallGraph(
-			final FunctionBlockLink  fbLink,
-			final Set<FunctionBlock> fixed) {
-
-		for(FunctionBlock i : fixed)
-			_findLinkInCallGraph(i, fbLink, new Stack<>(), fixed);
-	}
-	*/
 	private void _createInlinedFunctionBlock(
 			final FunctionBlock                    fb,
 			final AbstractionVariable.NameSelector nameSelector) {
@@ -84,43 +47,50 @@ public final class Program {
 
 		// Will do nothing if is has been created before
 		fb.inlinedAll.create(
-				new InlinedFunctionBlock.Configuration(fb),
-				null, nameSelector);
+				new InlinedFunctionBlock.Configuration(fb), nameSelector);
 	}
 
 	public Program(
 			final TopLevelElements                 elements,
 			final AbstractionVariable.NameSelector nameSelector) {
 
-		IEC61131Facade.resolveDataTypes(elements);
-		/*
-		final TopLevelElements simplified = SymbExFacade.simplify(elements, false, true, true, true, true);
-		final StructuredTextPrinter stp = new StructuredTextPrinter();
-
-		for(TopLevelElement i : simplified) {
-			stp.clear();
-			i.accept(stp);
-			System.out.println(stp.getString());
-		}
-		*/
 		// Collect all type declarations
 		for(TopLevelElement i : elements)
 			if(i instanceof TypeDeclarations)
 				typeDeclarations.addAll((TypeDeclarations)i);
 
+		// Simplify and normalize program
+		for(TopLevelElement i : elements) {
+
+			if(!(i instanceof TopLevelScopeElement)) continue;
+
+			SymbExFacade.simplify(typeDeclarations, (TopLevelScopeElement)i,
+					true,
+					false,
+					true,
+					true);
+
+			i.accept(new CtrlStatementNormalizer());
+			i.accept(new FunctionCallParamRemover());
+			i.accept(new TimerToCounter());
+		}
+
+		IEC61131Facade.resolveDataTypes(elements);
+
 		FunctionBlock main = null;
 		for(TopLevelElement i : elements) {
-			if(i instanceof ProgramDeclaration)
-				main = new FunctionBlock(this, (ProgramDeclaration)i);
-			if(i instanceof FunctionBlockDeclaration)
-				new FunctionBlock(this, (FunctionBlockDeclaration)i);
+			if(i instanceof ProgramDeclaration) {
+				main = new FunctionBlock(this, (TopLevelScopeElement)i);
+			} else if(i instanceof FunctionBlockDeclaration) {
+				new FunctionBlock(this, (TopLevelScopeElement)i);
+			}
 		}
+		assert main != null;
+
 		this.main = main;
 
+		// Create the intermediate representations
 		for(FunctionBlock i : functionBlocks.values()) i.createIR();
-
-		if(main == null)
-			throw new NullPointerException("No program declaration found");
 
 		_createInlinedFunctionBlock(main, nameSelector);
 	}

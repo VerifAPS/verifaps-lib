@@ -22,7 +22,11 @@ package edu.kit.iti.formal.automation.modularization;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.SymbExFacade;
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
+import edu.kit.iti.formal.automation.modularization.transform.FunctionCallParamRemover;
+import edu.kit.iti.formal.automation.modularization.transform.TimerToCounter;
+import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.*;
 
 import java.util.HashMap;
@@ -40,6 +44,7 @@ public final class FunctionBlock {
 	public final StatementList              body;
 	public final IntermediateRepresentation ir;
 	public final GraphNode<FunctionBlock>   cgNode;
+	public final String                     srcString;
 
 	public final InlinedFunctionBlock inlinedAll;
 	public final InlinedFunctionBlock inlinedAbstracted;
@@ -53,22 +58,25 @@ public final class FunctionBlock {
 			final Program              program,
 			final TopLevelScopeElement source) {
 
-		this.program = program;
-		this.name    = source.getIdentifier();
-		this.ir      = new IntermediateRepresentation(this);
-		this.cgNode  = new GraphNode<>(this);
-		this.inlinedAll        = new InlinedFunctionBlock(this);
-		this.inlinedAbstracted = new InlinedFunctionBlock(this);
+		final StructuredTextPrinter stp = new StructuredTextPrinter();
+		source.accept(stp);
+
+		this.program   = program;
+		this.name      = source.getIdentifier();
+		this.ir        = new IntermediateRepresentation(this);
+		this.cgNode    = new GraphNode<>(this);
+		this.srcString = stp.getString();
+		this.inlinedAll        = new InlinedFunctionBlock(this, null);
+		this.inlinedAbstracted = new InlinedFunctionBlock(this, null);
 
 		StatementList body = null;
-
 		if(source instanceof ProgramDeclaration)
-			body = ((ProgramDeclaration)      source).getProgramBody();
+			body = ((ProgramDeclaration)source).getProgramBody();
 		if(source instanceof FunctionBlockDeclaration)
 			body = ((FunctionBlockDeclaration)source).getFunctionBody();
+		assert body != null;
 
 		this.body = body;
-		this.body.accept(new CtrlStatementNormalizer(source.getLocalScope()));
 
 		// Process all variables except for the function block instances, as
 		// those cannot be resolved at this point

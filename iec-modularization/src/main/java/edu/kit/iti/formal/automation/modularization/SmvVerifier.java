@@ -25,6 +25,7 @@ package edu.kit.iti.formal.automation.modularization;
 
 import edu.kit.iti.formal.smv.ast.SMVModule;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.regex.Pattern;
@@ -49,17 +50,21 @@ public final class SmvVerifier {
 			final boolean       ltl,
 			final SMVModule ... modules) {
 
-		Logging.log("Writing proof to '" + fileName + "'");
+		Logging.log("Writing proof to '" + fileName + ".smv'");
 
 		String invarLine = null;
 		
-		_nuXmv.setModuleFile(fileName);
+		_nuXmv.setModuleFile(fileName + ".smv");
 		
 		try(PrintWriter pw = new PrintWriter(_nuXmv.getModuleFile())) {
 			for(SMVModule i : modules) pw.println(i.toString());
 		} catch(IOException e) {}
 		
 		_nuXmv.run();
+
+		try(PrintWriter pw = new PrintWriter(new File(_nuXmv.getWorkingDirectory(), fileName + ".txt"))) {
+			for(String i : _nuXmv.getOutput()) pw.println(i);
+		} catch(IOException e) {}
 
 		final Pattern invarLinePattern =
 				ltl ? _INVAR_LINE_LTL : _INVAR_LINE_STATE;

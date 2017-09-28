@@ -22,23 +22,24 @@ package edu.kit.iti.formal.automation.modularization;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.IEC61131Facade;
-import org.antlr.v4.runtime.CharStreams;
-import org.junit.Test;
+public final class CallSiteLink {
 
-import java.io.IOException;
+	public final FunctionBlockInstance.CallSite cs1;
+	public final FunctionBlockInstance.CallSite cs2;
+	public final FunctionBlockInstanceLink      fbiLink;
 
-public class TestMain {
+	public CallSiteLink(
+			final FunctionBlockInstance.CallSite cs1,
+			final FunctionBlockInstance.CallSite cs2) {
 
-	@Test
-	public final void testMethod() throws IOException {
+		this.cs1     = cs1;
+		this.cs2     = cs2;
+		this.fbiLink = cs1.instance.getLink();
 
-		final ModularProver prover = new ModularProver(
-				IEC61131Facade.file(CharStreams.fromStream(
-						getClass().getResourceAsStream("/scenario0.st"))),
-				IEC61131Facade.file(CharStreams.fromStream(
-						getClass().getResourceAsStream("/scenario1.st"))));
+		// The instances of the call sites must be linked as well
+		assert fbiLink != null && fbiLink == cs1.instance.getLink();
 
-		prover.start();
+		cs1.setLink(this);
+		cs2.setLink(this);
 	}
 }

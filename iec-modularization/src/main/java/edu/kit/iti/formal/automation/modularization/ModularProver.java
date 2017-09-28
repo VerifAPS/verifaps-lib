@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.modularization;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 
 import java.util.*;
@@ -88,8 +87,18 @@ public final class ModularProver {
 
 	public final boolean start() {
 
+		final long t0 = System.currentTimeMillis();
+
 		for(FunctionBlockLink i : _proofOrder)
 			i.checkEquivalence(_smvVerifier);
+
+		final long t1 = System.currentTimeMillis();
+
+		_program1.main.getLink().checkEquivalenceInlined(_smvVerifier);
+
+		final long t2 = System.currentTimeMillis();
+
+		System.out.println((t1 - t0) + " vs " + (t2 - t1));
 
 		return _program1.main.getLink().isEquivalent();
 	}

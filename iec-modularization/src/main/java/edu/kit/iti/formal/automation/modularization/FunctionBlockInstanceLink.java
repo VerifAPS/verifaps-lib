@@ -39,7 +39,14 @@ public final class FunctionBlockInstanceLink {
 		// The types of the instances must be linked as well
 		assert fbLink != null && fbLink == fbi2.type.getLink();
 
+		// We want the instances to have the same number of call sites
+		assert fbi1.callSites.size() == fbi2.callSites.size();
+
 		fbi1.setLink(this);
 		fbi2.setLink(this);
+
+		// TODO: The call site links are not created intelligently
+		for(int i = 0; i < fbi1.callSites.size(); i++)
+			new CallSiteLink(fbi1.callSites.get(i), fbi2.callSites.get(i));
 	}
 }

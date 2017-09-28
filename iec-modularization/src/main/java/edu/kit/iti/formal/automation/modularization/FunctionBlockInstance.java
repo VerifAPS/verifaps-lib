@@ -33,6 +33,9 @@ public final class FunctionBlockInstance {
 
 	public final class CallSite {
 
+		private CallSiteLink _link = null;
+
+		public final int                        id;
 		public final FunctionBlockCallStatement fbCallStmt;
 		public final FunctionBlockInstance      instance;
 		public final GraphNode<CallSite>        csNode;
@@ -40,11 +43,12 @@ public final class FunctionBlockInstance {
 
 		public CallSite(final FunctionBlockCallStatement fbCallStmt) {
 
+			this.id            = callSites.size();
 			this.fbCallStmt    = fbCallStmt;
 			this.instance      = FunctionBlockInstance.this;
 			this.csNode        = new GraphNode<>(this);
 			this.activationBit = new VariableDeclaration(
-					name + "$act$" + callSites.size(),
+					name + "$act$" + id,
 					VariableDeclaration.OUTPUT,
 					AnyBit.BOOL);
 
@@ -75,6 +79,15 @@ public final class FunctionBlockInstance {
 						if(!checked.contains(i)) notChecked.add(i);
 				}
 			}
+		}
+
+		public final CallSiteLink getLink() {
+			return _link;
+		}
+
+		public final void setLink(CallSiteLink link) {
+			assert _link == null;
+			_link = link;
 		}
 	}
 

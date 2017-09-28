@@ -72,6 +72,53 @@ public final class SymbExFacade {
         return stSimplifier.getProcessed();
     }
 
+    public static final void simplify(TypeDeclarations types,
+                                      TopLevelScopeElement tlsElement,
+                                      boolean unwindLoops,
+                                      boolean timerToCounter,
+                                      boolean embedArrays,
+                                      boolean replaceSFCReset) {
+
+        ProgramDeclaration program = tlsElement instanceof ProgramDeclaration ?
+                (ProgramDeclaration)tlsElement : null;
+        FunctionBlockDeclaration fb = tlsElement instanceof FunctionBlockDeclaration ?
+                (FunctionBlockDeclaration)tlsElement : null;
+        FunctionDeclaration function = tlsElement instanceof FunctionDeclaration ?
+                (FunctionDeclaration)tlsElement : null;
+
+        assert program != null || fb != null || function != null;
+
+        final ProgramDeclaration container = new ProgramDeclaration();
+        container.setProgramName(tlsElement.getIdentifier());
+        container.setLocalScope (tlsElement.getLocalScope());
+
+        if(program != null) container.setProgramBody(program.getProgramBody());
+        if(fb != null) container.setProgramBody(fb.getFunctionBody());
+        if(function != null) container.setProgramBody(function.getStatements());
+
+        TopLevelElements elements = new TopLevelElements();
+        elements.add(types);
+        elements.add(container);
+
+        final TopLevelElements simplified = simplify(
+                elements, false,
+                unwindLoops, timerToCounter, embedArrays, replaceSFCReset);
+
+        ProgramDeclaration simpleProgram = null;
+        for(TopLevelElement i : simplified) {
+            if(i instanceof ProgramDeclaration) {
+                simpleProgram = (ProgramDeclaration)i;
+                break;
+            }
+        }
+        assert simpleProgram != null;
+
+        tlsElement.setLocalScope(simpleProgram.getLocalScope());
+        if(program != null) program.setProgramBody(simpleProgram.getProgramBody());
+        if(fb != null) fb.setFunctionBody(simpleProgram.getProgramBody());
+        if(function != null) function.setStatements(simpleProgram.getProgramBody());
+    }
+
     public static final TopLevelElements simplify(TopLevelElements elements,
                                                   boolean embedFunctionBlocks,
                                                   boolean unwindLoops,

@@ -97,8 +97,9 @@ public final class VariableMapping {
 		unmapped2.addAll(varByName2.keySet());
 
 		fullMatch   = unmapped1.isEmpty() && unmapped2.isEmpty();
-		matchFactor =
-				2 * var2ByVar1.size() / (variables1.size() + variables2.size());
+		matchFactor = 1;
+		//matchFactor =
+		//		2 * var2ByVar1.size() / (variables1.size() + variables2.size());
 	}
 
 	public final VariableMapping prefixed(

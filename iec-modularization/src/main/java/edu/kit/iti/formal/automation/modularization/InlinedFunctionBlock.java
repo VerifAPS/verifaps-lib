@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.modularization;
  */
 
 import edu.kit.iti.formal.automation.datatypes.AnyBit;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
@@ -33,19 +34,14 @@ public final class InlinedFunctionBlock {
 
 	private final class BodyCreator extends StatementListModifier {
 
-		private final FunctionBlockInstance _activationInst;
-		private final Configuration         _config;
-		private       boolean               _rootStmtList = true;
+		private final Configuration _config;
 
-		private BodyCreator(
-				final FunctionBlockInstance activationInst,
-				final Configuration         config) {
-
-			_activationInst = activationInst;
-			_config         = config;
+		private BodyCreator(final Configuration config) {
+			super(true);
+			_config = config;
 		}
 
-		private void _addAssignment(
+		private void _addActivationBitAssignment(
 				final FunctionBlockInstance.CallSite callSite,
 				final String                         literal) {
 
@@ -54,29 +50,42 @@ public final class InlinedFunctionBlock {
 					new Literal          (AnyBit.BOOL, literal)));
 		}
 
-		@Override
-		protected void _onEnterStatementList(final StatementList stmtList) {
+		private void _addCallSiteInputAssignments(
+				final FunctionBlockInstance.CallSite callSite) {
 
-			if(!_rootStmtList || _activationInst == null) return;
+			final Activation activation = activationVariables.get(callSite);
 
-			for(FunctionBlockInstance.CallSite i : _activationInst.callSites)
-				_addAssignment(i, "FALSE");
-
-			_rootStmtList = false;
+			for(String i : activation.variables.keySet())
+				_addToCurrentList(new AssignmentStatement(
+						new SymbolicReference(
+								activation.variables.get(i).getName()),
+						new SymbolicReference(
+								callSite.instance.name + "$" + i)));
 		}
 
 		@Override
-		public final StatementList visit(
-				final FunctionBlockCallStatement fbCallStmt) {
+		protected void _onEnterFirstStatementList(
+				final StatementList stmtList) {
 
-			final FunctionBlockInstance.CallSite callSite =
+			if(activatedInstance == null) return;
+
+			for(FunctionBlockInstance.CallSite i : activatedInstance.callSites)
+				_addActivationBitAssignment(i, "FALSE");
+		}
+
+		@Override
+		public final Object visit(final FunctionBlockCallStatement fbCallStmt) {
+
+			final FunctionBlockInstance.CallSite callSite   =
 					original.ir.callSites.get(fbCallStmt);
-			final FunctionBlockInstance fbInstance        = callSite.instance;
-			final InstanceState         instState         =
+			final FunctionBlockInstance          fbInstance = callSite.instance;
+			final InstanceState                  instState  =
 					_config.getState(fbInstance);
 
-			if(fbInstance == _activationInst)
-				_addAssignment(callSite, "TRUE");
+			if(fbInstance == activatedInstance) {
+				_addCallSiteInputAssignments(callSite);
+				_addActivationBitAssignment(callSite, "TRUE");
+			}
 
 			// For abstracted instances no statements need to be added
 			if(instState == InstanceState.ABSTRACTED) return null;
@@ -118,6 +127,33 @@ public final class InlinedFunctionBlock {
 		ABSTRACTED
 	}
 
+	public final class Activation {
+
+		public final FunctionBlockInstance.CallSite   callSite;
+		public final VariableDeclaration              activationBit;
+		public final Map<String, VariableDeclaration> variables =
+				new HashMap<>();
+
+		private Activation(final FunctionBlockInstance.CallSite callSite) {
+
+			final FunctionBlock type = activatedInstance.type;
+
+			this.callSite      = callSite;
+			this.activationBit = new VariableDeclaration(
+					activatedInstance.name + "$act$" + callSite.id,
+					VariableDeclaration.OUTPUT,
+					AnyBit.BOOL);
+
+			for(String i : type.getLink().getCommonVariables(type, true))
+				variables.put(i, new VariableDeclaration(
+						activatedInstance.name + "$" + i + "$" + callSite.id,
+						VariableDeclaration.OUTPUT,
+						type.in.get(i).getDataType()));
+
+			activationVariables.put(callSite, this);
+		}
+	}
+
 	public static final class Configuration {
 
 		private final Map<FunctionBlockInstance, InstanceState> _instStates =
@@ -154,8 +190,11 @@ public final class InlinedFunctionBlock {
 
 	// provides the input and output variables
 	public final FunctionBlock            original;
+	public final FunctionBlockInstance    activatedInstance;
 	public final Map<String, AbstractionVariable> abstractionVars = new HashMap<>();
 	public final ProgramDeclaration declaration = new ProgramDeclaration();
+	public final Map<FunctionBlockInstance.CallSite, Activation>
+			activationVariables = new HashMap<>();
 
 	private void _addVariables(
 			final String                        prefix,
@@ -167,33 +206,43 @@ public final class InlinedFunctionBlock {
 					prefix + i.getName(), specifier, i.getDataType()));
 	}
 
-	private void _useActivationAsOutput(final FunctionBlockInstance fbInst) {
+	private void _useActivationAsOutput() {
 
 		final Set<String> prefixedInputNames = new HashSet<>();
+		final LocalScope  localScope         = declaration.getLocalScope();
 
-		for(String i : fbInst.type.in.keySet())
-			prefixedInputNames.add(fbInst.name + "$" + i);
+		for(String i : activatedInstance.type.in.keySet())
+			prefixedInputNames.add(activatedInstance.name + "$" + i);
 
-		for(VariableDeclaration i : declaration.getLocalScope()) {
-			if(original.out.containsKey(i.getName())) {
+		for(VariableDeclaration i : declaration.getLocalScope())
+			if(original.out.containsKey(i.getName()))
 				i.setType(VariableDeclaration.LOCAL);
-			} else if(prefixedInputNames.contains(i.getName())) {
-				i.setType(VariableDeclaration.OUTPUT);
-			}
-		}
 
-		for(FunctionBlockInstance.CallSite i : fbInst.callSites)
-			declaration.getLocalScope().add(i.activationBit);
+		for(Activation i : activationVariables.values()) {
+			localScope.add(i.activationBit);
+			for(VariableDeclaration j : i.variables.values()) localScope.add(j);
+		}
 	}
 
-	public InlinedFunctionBlock(final FunctionBlock original) {
-		this.original = original;
+	public InlinedFunctionBlock(
+			final FunctionBlock         original,
+			final FunctionBlockInstance activatedInstance) {
+
+		this.original          = original;
+		this.activatedInstance = activatedInstance;
 		this.declaration.setProgramName(original.name);
+
+		if(activatedInstance == null) return;
+
+		// Only matched instances are relevant for activation
+		assert activatedInstance.getLink() != null;
+
+		for(FunctionBlockInstance.CallSite i : activatedInstance.callSites)
+			new Activation(i);
 	}
 
 	public final void create(
 			final Configuration                    config,
-			final FunctionBlockInstance            activatedInst,
 			final AbstractionVariable.NameSelector nameSelector) {
 
 		if(_created) return;
@@ -227,10 +276,15 @@ public final class InlinedFunctionBlock {
 					i.name + "$", VariableDeclaration.LOCAL, i.type.local.values());
 		}
 
-		declaration.setProgramBody(
-				original.body.accept(new BodyCreator(activatedInst, config)));
+		//final StructuredTextPrinter stp = new StructuredTextPrinter();
+		//System.out.println("original:");
+		//original.body.accept(stp);
+		//System.out.println(stp.getString());
 
-		if(activatedInst != null) _useActivationAsOutput(activatedInst);
+		declaration.setProgramBody(
+				(StatementList)original.body.accept(new BodyCreator(config)));
+
+		if(activatedInstance != null) _useActivationAsOutput();
 		_created = true;
 	}
 
