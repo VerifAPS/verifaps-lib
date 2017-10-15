@@ -22,96 +22,99 @@ package edu.kit.iti.formal.automation.modularization;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.modularization.ssa.*;
-import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
-import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
-import edu.kit.iti.formal.automation.st.ast.TopLevelScopeElement;
+import edu.kit.iti.formal.automation.SymbExFacade;
+import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
+import edu.kit.iti.formal.automation.modularization.transform.FunctionCallParamRemover;
+import edu.kit.iti.formal.automation.modularization.transform.TimerToCounter;
+import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
+import edu.kit.iti.formal.automation.st.ast.*;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-public class FunctionBlock {
+public final class FunctionBlock {
 
-	public final Program owner;
-	public final String name;
+	private final Set<VariableDeclaration> _tempFbInstances = new HashSet<>();
+	private       FunctionBlockLink        _link;
 
-	public final Set<Variable> in    = new HashSet<>();
-	public final Set<Variable> out   = new HashSet<>();
-	public final Set<Variable> local = new HashSet<>();
+	public final Program                    program;
+	public final String                     name;
+	public final StatementList              body;
+	public final IntermediateRepresentation ir;
+	public final GraphNode<FunctionBlock>   cgNode;
+	public final String                     srcString;
 
-	private FunctionBlockLink _link;
+	public final InlinedFunctionBlock inlinedAll;
+	public final InlinedFunctionBlock inlinedAbstracted;
 
-	public final Map<String, Variable> ssaVariables = new HashMap<>();
+	public final Map<String, VariableDeclaration>   in          = new HashMap<>();
+	public final Map<String, VariableDeclaration>   out         = new HashMap<>();
+	public final Map<String, VariableDeclaration>   local       = new HashMap<>();
 	public final Map<String, FunctionBlockInstance> fbInstances = new HashMap<>();
-	public final List<Statement> body = new LinkedList<>();
-	public final GraphNode<FunctionBlock> cgNode;
 
 	public FunctionBlock(
-			final Program              owner,
+			final Program              program,
 			final TopLevelScopeElement source) {
 
-		this.owner  = owner;
-		this.name   = source.getIdentifier();
-		this.cgNode = new GraphNode<>(this);
+		final StructuredTextPrinter stp = new StructuredTextPrinter();
+		source.accept(stp);
 
-		final Creator ssaCreator =
-				new Creator(this, source.getLocalScope());
+		this.program   = program;
+		this.name      = source.getIdentifier();
+		this.ir        = new IntermediateRepresentation(this);
+		this.cgNode    = new GraphNode<>(this);
+		this.srcString = stp.getString();
+		this.inlinedAll        = new InlinedFunctionBlock(this, null);
+		this.inlinedAbstracted = new InlinedFunctionBlock(this, null);
 
-		if(source instanceof ProgramDeclaration) {
-			((ProgramDeclaration)source).getProgramBody().accept(ssaCreator);
-		} else if(source instanceof FunctionBlockDeclaration) {
-			((FunctionBlockDeclaration)source).
-					getFunctionBody().accept(ssaCreator);
-		}
+		StatementList body = null;
+		if(source instanceof ProgramDeclaration)
+			body = ((ProgramDeclaration)source).getProgramBody();
+		if(source instanceof FunctionBlockDeclaration)
+			body = ((FunctionBlockDeclaration)source).getFunctionBody();
+		assert body != null;
 
-		for(Statement i : body) {
-			i.computeDependencies();
-			System.out.println(i.pdgNode.pred.size() + "  " + i);
-		}
+		this.body = body;
 
-		for(FunctionBlockInstance i : fbInstances.values())
-			for(CallSite j : i.callSites) j.computeCallSiteDependencies();
-
-		owner.functionBlocks.put(name, this);
-	}
-
-	public final void addFunctionBlockInstance(
-			final FunctionBlockInstance fbInstance) {
-		fbInstances.put(fbInstance.name, fbInstance);
-	}
-
-	public final void addSsaVariable(final Variable var) {
-
-		ssaVariables.put(var.name, var);
-
-		if(!(var instanceof FunctionBlockVariable) && var.declaration != null) {
-
-			if(var.declaration.isInput() || var.declaration.isInOut()) {
-				in.add(var);
-				new InputAssignment(this, var);
-			}
-
-			if(var.declaration.isOutput() || var.declaration.isInOut())
-				out.add(var);
-
-			if(var.declaration.isLocal()) {
-				local.add(var);
-				new DirectAssignment(this, var, null);
+		// Process all variables except for the function block instances, as
+		// those cannot be resolved at this point
+		for(VariableDeclaration i : source.getLocalScope()) {
+			if(i.getDataType() instanceof FunctionBlockDataType) {
+				_tempFbInstances.add(i);
+			} else if(i.isInput()) {
+				in.put(i.getName(), i);
+			} else if(i.isOutput()) {
+				out.put(i.getName(), i);
+			} else {
+				local.put(i.getName(), i);
 			}
 		}
+
+		program.functionBlocks.put(name, this);
 	}
 
-	public final void computeDependencies() {
+	public final void createIR() {
 
-		final Set<FunctionBlock> depFunctionBlocks = new HashSet<>();
-
-		for(FunctionBlockInstance i : fbInstances.values())
-			depFunctionBlocks.add(owner.functionBlocks.get(i.fbName));
-
-		for(FunctionBlock i : depFunctionBlocks) {
-			cgNode  .pred.add(i.cgNode);
-			i.cgNode.succ.add(cgNode);
+		for(VariableDeclaration i : _tempFbInstances) {
+			final FunctionBlockInstance fbInstance = new FunctionBlockInstance(
+					i,
+					program.functionBlocks.get(
+							i.getTypeDeclaration().getTypeName()),
+					this);
+			cgNode.addSuccessor(fbInstance.type.cgNode);
 		}
 
-		System.out.println(name + ": " + cgNode.pred.size());
+		ir.create(body);
+	}
+
+	public final FunctionBlockLink getLink(){
+		return _link;
+	}
+
+	public final void setLink(final FunctionBlockLink link) {
+		assert _link == null;
+		_link = link;
 	}
 }

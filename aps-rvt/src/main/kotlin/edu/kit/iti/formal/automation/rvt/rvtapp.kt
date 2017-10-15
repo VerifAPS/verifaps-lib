@@ -16,20 +16,40 @@ import java.io.IOException
 import java.nio.charset.Charset
 
 
+/**
+ * This class represents the input arguments for the cli application.
+ *
+ *
+ * @author Alexander Weigl
+ */
 class RvtArgs(parser: ArgParser) {
-    val verbose by parser.flagging("-v", "--verbose", help = "enable verbose mode")
-    val debugMode by parser.flagging("--debug", help = "enable debugging")
-    val oldVersion by parser.storing("--old", help = "old version of the plc software").default("old.st")
-    val newVersion by parser.storing("--new", help = "new version of the plc software").default("new.st")
+    val verbose by parser.flagging("-v", "--verbose", help = "enable verbose mode, set the logger to info")
+
+    val debugMode by parser.flagging("--debug",
+            help = "sets the logger to DEBUG level")
+
+    val oldVersion by parser.storing("--old",
+            help = "old version of the plc software")
+            .default("old.st")
+
+    val newVersion by parser.storing("--new",
+            help = "new version of the plc software")
+            .default("new.st")
+
     val disableST0Pipeline by parser.flagging("-D", help = "disable ST0 pipeline")
 
-    val outputSMVOutputName by parser.storing("--to-smv-file", help = "name of the smv-module", argName = "FILENAME")
+    val outputSMVOutputName by parser.storing("--to-smv-file",
+            help = "name of the smv-module",
+            argName = "FILENAME")
             .default("main.smv")
 
-    val outputDirectory by parser.storing("--output", "-o", help = "name of the smv-module", argName = "FOLDER")
+    val outputDirectory by parser.storing("--output", "-o",
+            help = "name of the smv-module",
+            argName = "FOLDER")
             .default(".")
 
-    val doNotVerify by parser.flagging("--do-not-verify", help = "")
+    val doNotVerify by parser.flagging("--do-not-verify",
+            help = "skips the call of nuXmv if set")
 }
 
 /**

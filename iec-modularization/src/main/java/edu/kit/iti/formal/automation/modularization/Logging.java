@@ -22,15 +22,22 @@ package edu.kit.iti.formal.automation.modularization;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.st.ast.*;
+public final class Logging {
 
-public class ModularProof {
+	private static int _indent = 0;
 
-	public static final void createProof(
-			final TopLevelElements prgm1,
-			final TopLevelElements prgm2) {
+	private Logging() {}
 
-		new Program(prgm1);
+	public static void log(final String msg) {
+		for(int i = 0; i < _indent; i++) System.out.print('\t');
+		System.out.println("> " + msg);
+	}
+
+	public static void popIndent() {
+		_indent--;
+	}
+
+	public static void pushIndent() {
+		_indent++;
 	}
 }

@@ -19,23 +19,17 @@ END_VAR
 VAR
 	INST_FB : FB;
 END_VAR
-
-	y := x + 5;
-	
-	INST_FB.x := 7;
+	INST_FB.x := 4;
 	INST_FB();
-	
-	IF x > 7 THEN
-		INST_FB(x := INST_FB.y);
-	ELSE
-		INST_FB();
-	END_IF
-	
-	IF INST_FB.y > 5 THEN
+	INST_FB.x := INST_FB.y + 2;
+	INST_FB();
+	y := INST_FB.y;
+	IF x > 5 THEN
 		y := 6;
 	ELSEIF x > 3 THEN
 		y := 7;
 	ELSE
-		y := 8;
+		y := x;
 	END_IF
+	y := y + 4;
 END_PROGRAM

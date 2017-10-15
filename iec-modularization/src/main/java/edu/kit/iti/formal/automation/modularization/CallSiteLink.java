@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.modularization.ssa;
+package edu.kit.iti.formal.automation.modularization;
 
 /*-
  * #%L
@@ -22,22 +22,24 @@ package edu.kit.iti.formal.automation.modularization.ssa;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.modularization.FunctionBlock;
+public final class CallSiteLink {
 
-public abstract class Assignment extends Statement {
+	public final FunctionBlockInstance.CallSite cs1;
+	public final FunctionBlockInstance.CallSite cs2;
+	public final FunctionBlockInstanceLink      fbiLink;
 
-	public final Variable variable;
-	public final int      index;
+	public CallSiteLink(
+			final FunctionBlockInstance.CallSite cs1,
+			final FunctionBlockInstance.CallSite cs2) {
 
-	protected Assignment(
-			final FunctionBlock owner,
-			final Variable      variable) {
+		this.cs1     = cs1;
+		this.cs2     = cs2;
+		this.fbiLink = cs1.instance.getLink();
 
-		super(owner);
+		// The instances of the call sites must be linked as well
+		assert fbiLink != null && fbiLink == cs1.instance.getLink();
 
-		this.variable = variable;
-		this.index    = variable.getNextIndex();
-
-		variable.assignments.add(this);
+		cs1.setLink(this);
+		cs2.setLink(this);
 	}
 }

@@ -1,8 +1,8 @@
-package edu.kit.iti.formal.automation.modularization.ssa;
+package edu.kit.iti.formal.automation.smv.dt;
 
 /*-
  * #%L
- * iec-modularization
+ * iec-symbex
  * %%
  * Copyright (C) 2017 Alexander Weigl
  * %%
@@ -22,28 +22,19 @@ package edu.kit.iti.formal.automation.modularization.ssa;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.modularization.FunctionBlock;
+import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import edu.kit.iti.formal.smv.ast.SMVType;
+import edu.kit.iti.formal.smv.ast.SVariable;
 
-public class CallSiteAssignment extends Assignment {
+/**
+ * @author Alexander Weigl
+ */
+public interface TypeTranslator {
+    SMVType translate(Any datatype);
 
-	public final CallSite callSite;
+    default SVariable translate(VariableDeclaration vdecl) {
+        return SVariable.create(vdecl.getName()).with(translate(vdecl.getDataType()));
+    }
 
-	public CallSiteAssignment(
-			final FunctionBlock owner,
-			final FunctionBlockVariable variable,
-			final CallSite callSite) {
-
-		super(owner, variable);
-		this.callSite = callSite;
-	}
-
-	@Override
-	public final void computeDependencies() {
-		_addDependency(callSite);
-	}
-
-	@Override
-	public final String toString() {
-		return "WRITE_TO(" + variable.toString(index) + ")";
-	}
 }

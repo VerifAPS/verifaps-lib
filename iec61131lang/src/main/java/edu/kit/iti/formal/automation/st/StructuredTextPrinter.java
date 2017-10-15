@@ -339,7 +339,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
         if (symbolicReference.getSub() != null) {
             sb.append(".");
-            //symbolicReference.getSub().accept(this);
+            symbolicReference.getSub().accept(this);
         }
 
         return null;

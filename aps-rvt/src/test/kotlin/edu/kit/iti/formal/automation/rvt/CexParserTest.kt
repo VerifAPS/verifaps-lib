@@ -1,8 +1,6 @@
-package edu.kit.iti.formal.automation.modularization.ssa;
-
 /*-
  * #%L
- * iec-modularization
+ * aps-rvt
  * %%
  * Copyright (C) 2017 Alexander Weigl
  * %%
@@ -21,26 +19,23 @@ package edu.kit.iti.formal.automation.modularization.ssa;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+package edu.kit.iti.formal.automation.rvt
 
-import edu.kit.iti.formal.automation.modularization.FunctionBlock;
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import org.junit.Test
+import javax.xml.bind.JAXBContext
 
-public final class FunctionBlockVariable extends Variable {
+/**
+ *
+ * @author Alexander Weigl
+ * @version 1 (12.09.17)
+ */
 
-	public final FunctionBlockInstance fbInstance;
-	public final String                subscriptName;
-
-	public FunctionBlockVariable(
-			final FunctionBlock         owner,
-			final VariableDeclaration   declaration,
-			final FunctionBlockInstance fbInstance) {
-
-		super(
-				owner,
-				declaration,
-				fbInstance.name + '.' + declaration.getName());
-
-		this.fbInstance    = fbInstance;
-		this.subscriptName = declaration.getName();
-	}
+class CexTests {
+    @Test
+    fun testCexXml() {
+        val ctx = JAXBContext.newInstance(CounterExample::class.java)
+        val um = ctx.createUnmarshaller()
+        val cex = um.unmarshal(CounterExample::class.java.getResource("/cex.xml"))
+        println(cex)
+    }
 }

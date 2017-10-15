@@ -72,7 +72,8 @@ public class IdentifierPlaceHolder<T extends Identifiable>
     }
 
     public IdentifierPlaceHolder setIdentifiedObject(T realObject) {
-        assert identifier == null || realObject == null || realObject.getIdentifier().equals(identifier);
+        // TODO: assertion should be changed
+        //assert identifier == null || realObject == null || realObject.getIdentifier().equals(identifier);
         this.realObject = realObject;
         return this;
     }

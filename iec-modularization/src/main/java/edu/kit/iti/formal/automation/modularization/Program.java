@@ -23,32 +23,75 @@ package edu.kit.iti.formal.automation.modularization;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
+import edu.kit.iti.formal.automation.SymbExFacade;
+import edu.kit.iti.formal.automation.modularization.transform.CtrlStatementNormalizer;
+import edu.kit.iti.formal.automation.modularization.transform.FunctionCallParamRemover;
+import edu.kit.iti.formal.automation.modularization.transform.TimerToCounter;
+import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public final class Program {
 
 	public final FunctionBlock              main;
 	public final Map<String, FunctionBlock> functionBlocks = new HashMap<>();
+	public final TypeDeclarations typeDeclarations = new TypeDeclarations();
 
-	public Program(final TopLevelElements elements) {
+	private void _createInlinedFunctionBlock(
+			final FunctionBlock                    fb,
+			final AbstractionVariable.NameSelector nameSelector) {
+
+		for(FunctionBlock i : fb.cgNode.succElements)
+			_createInlinedFunctionBlock(i, nameSelector);
+
+		// Will do nothing if is has been created before
+		fb.inlinedAll.create(
+				new InlinedFunctionBlock.Configuration(fb), nameSelector);
+	}
+
+	public Program(
+			final TopLevelElements                 elements,
+			final AbstractionVariable.NameSelector nameSelector) {
+
+		// Collect all type declarations
+		for(TopLevelElement i : elements)
+			if(i instanceof TypeDeclarations)
+				typeDeclarations.addAll((TypeDeclarations)i);
+
+		// Simplify and normalize program
+		for(TopLevelElement i : elements) {
+
+			if(!(i instanceof TopLevelScopeElement)) continue;
+
+			SymbExFacade.simplify(typeDeclarations, (TopLevelScopeElement)i,
+					true,
+					false,
+					true,
+					true);
+
+			i.accept(new CtrlStatementNormalizer());
+			i.accept(new FunctionCallParamRemover());
+			i.accept(new TimerToCounter());
+		}
 
 		IEC61131Facade.resolveDataTypes(elements);
 
 		FunctionBlock main = null;
 		for(TopLevelElement i : elements) {
-			if(i instanceof ProgramDeclaration)
-				main = new FunctionBlock(this, (ProgramDeclaration)i);
-			if(i instanceof FunctionBlockDeclaration)
-				new FunctionBlock(this, (FunctionBlockDeclaration)i);
+			if(i instanceof ProgramDeclaration) {
+				main = new FunctionBlock(this, (TopLevelScopeElement)i);
+			} else if(i instanceof FunctionBlockDeclaration) {
+				new FunctionBlock(this, (TopLevelScopeElement)i);
+			}
 		}
+		assert main != null;
+
 		this.main = main;
 
-		if(main == null)
-			throw new NullPointerException("No program declaration found");
+		// Create the intermediate representations
+		for(FunctionBlock i : functionBlocks.values()) i.createIR();
 
-		for(FunctionBlock i : functionBlocks.values()) i.computeDependencies();
+		_createInlinedFunctionBlock(main, nameSelector);
 	}
 }

@@ -22,22 +22,29 @@ package edu.kit.iti.formal.automation.modularization;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
+public final class Pair<T> {
 
-public final class Util {
+	public interface Selector<T> {
+		T getElement(Pair<T> pair);
+	}
 
-	public static final String referenceToString(
-			final SymbolicReference symbRef,
-			final String            connector) {
+	public T a;
+	public T b;
 
-		final StringBuilder sb  = new StringBuilder();
-		SymbolicReference   ref = symbRef;
+	public Pair() {
+		this(null, null);
+	}
 
-		while(ref != null) {
-			sb.append(connector).append(ref.getIdentifier());
-			ref = (SymbolicReference) ref.getSub();
-		}
+	public Pair(final T a, final T b) {
+		this.a = a;
+		this.b = b;
+	}
 
-		return sb.substring(connector.length());
+	public static <T> T getA(final Pair<T> pair) {
+		return pair.a;
+	}
+
+	public static <T> T getB(final Pair<T> pair) {
+		return pair.b;
 	}
 }

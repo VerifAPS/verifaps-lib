@@ -24,6 +24,8 @@ package edu.kit.iti.formal.automation.smv;
 
 
 import edu.kit.iti.formal.automation.SymbExFacade;
+import edu.kit.iti.formal.automation.smv.dt.DataTypeTranslator;
+import edu.kit.iti.formal.automation.smv.dt.TypeTranslator;
 import edu.kit.iti.formal.automation.st.ast.Literal;
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TypeDeclarations;
@@ -32,6 +34,8 @@ import edu.kit.iti.formal.smv.ast.SAssignment;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SVariable;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -51,6 +55,11 @@ public class ModuleBuilder implements Runnable {
     private final SMVModule module = new SMVModule();
     private final VariableDependency vardeps;
     //private Map<VariableDeclaration, SVariable> vars = new HashMap<>();
+
+    @Getter
+    @Setter
+    private TypeTranslator typeTranslator = new DataTypeTranslator();
+
 
     public ModuleBuilder(ProgramDeclaration decl, TypeDeclarations types, SymbolicState ss) {
         finalState = ss;
@@ -90,7 +99,7 @@ public class ModuleBuilder implements Runnable {
 
     private void insertInputVariables(List<VariableDeclaration> decls) {
         decls.stream()
-                .map(SymbExFacade::asSVariable)
+                .map(typeTranslator::translate)
                 .map(sVariable -> sVariable.addMetadata(INPUT_VARIABLE))
                 .forEach(module.getModuleParameter()::add);
     }
