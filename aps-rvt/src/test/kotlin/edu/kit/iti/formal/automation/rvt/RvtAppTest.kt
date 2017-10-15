@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.automation.rvt
 
-import org.junit.Assert.*
 import org.junit.Test
+import kotlin.test.assertTrue
 
 /**
  * @author Alexander Weigl
@@ -10,12 +10,22 @@ import org.junit.Test
 class RvtAppTest {
     @Test
     fun testVerifySimple(): Unit {
-        val old = "src/test/resources/simple1_new.st"
-        val new = "src/test/resources/simple1_old.st"
+        val old = "simple1_new"
+        val new = "simple1_old"
+        assertEqualBehaviour(old, new)
+    }
 
-        val app = RvtApp(old, new)
+    @Test
+    fun testVerifyCasesIf(): Unit {
+        val old = "caseif_old"
+        val new = "caseif_new"
+        assertEqualBehaviour(old, new)
+    }
 
+    private fun assertEqualBehaviour(old: String, new: String) {
+        val app = RvtApp("src/test/resources/$old.st",
+                        "src/test/resources/$new.st")
         app.build()
-        app.verify()
+        assertTrue(app.verify());
     }
 }

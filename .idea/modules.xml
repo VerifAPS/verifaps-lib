@@ -2,14 +2,14 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/aps-rvt/aps-rvt.iml" filepath="$PROJECT_DIR$/aps-rvt/aps-rvt.iml" />
-      <module fileurl="file://$PROJECT_DIR$/iec-modularization/iec-modularization.iml" filepath="$PROJECT_DIR$/iec-modularization/iec-modularization.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aps-rvt/aps-rvt.iml" filepath="$PROJECT_DIR$/aps-rvt/aps-rvt.iml" group="verifaps-lib and modules" />
+      <module fileurl="file://$PROJECT_DIR$/iec-modularization/iec-modularization.iml" filepath="$PROJECT_DIR$/iec-modularization/iec-modularization.iml" group="verifaps-lib and modules" />
       <module fileurl="file://$PROJECT_DIR$/iec-run/iec-run.iml" filepath="$PROJECT_DIR$/iec-run/iec-run.iml" />
-      <module fileurl="file://$PROJECT_DIR$/iec-symbex/iec-symbex.iml" filepath="$PROJECT_DIR$/iec-symbex/iec-symbex.iml" />
-      <module fileurl="file://$PROJECT_DIR$/iec-xml/iec-xml.iml" filepath="$PROJECT_DIR$/iec-xml/iec-xml.iml" />
-      <module fileurl="file://$PROJECT_DIR$/iec61131lang/iec61131lang.iml" filepath="$PROJECT_DIR$/iec61131lang/iec61131lang.iml" />
-      <module fileurl="file://$PROJECT_DIR$/smv-model/smv-model.iml" filepath="$PROJECT_DIR$/smv-model/smv-model.iml" />
-      <module fileurl="file://$PROJECT_DIR$/verifaps-lib.iml" filepath="$PROJECT_DIR$/verifaps-lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/iec-symbex/iec-symbex.iml" filepath="$PROJECT_DIR$/iec-symbex/iec-symbex.iml" group="verifaps-lib and modules" />
+      <module fileurl="file://$PROJECT_DIR$/iec-xml/iec-xml.iml" filepath="$PROJECT_DIR$/iec-xml/iec-xml.iml" group="verifaps-lib and modules" />
+      <module fileurl="file://$PROJECT_DIR$/iec61131lang/iec61131lang.iml" filepath="$PROJECT_DIR$/iec61131lang/iec61131lang.iml" group="verifaps-lib and modules" />
+      <module fileurl="file://$PROJECT_DIR$/smv-model/smv-model.iml" filepath="$PROJECT_DIR$/smv-model/smv-model.iml" group="verifaps-lib and modules" />
+      <module fileurl="file://$PROJECT_DIR$/verifaps-lib.iml" filepath="$PROJECT_DIR$/verifaps-lib.iml" group="verifaps-lib and modules" />
     </modules>
   </component>
 </project>

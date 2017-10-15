@@ -29,7 +29,7 @@
         <module>iec-xml</module>
         <module>iec-modularization</module>
         <module>aps-rvt</module>
-        <module>iec-run</module>
+        <module>iec-assertEqualBehaviour</module>
     </modules>
 
     <properties>
