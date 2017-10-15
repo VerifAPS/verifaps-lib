@@ -24,8 +24,6 @@ package edu.kit.iti.formal.automation.smv;
 
 import edu.kit.iti.formal.automation.SymbExFacade;
 import edu.kit.iti.formal.automation.Utils;
-import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.exceptions.FunctionInvocationArgumentNumberException;
 import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException;
 import edu.kit.iti.formal.automation.exceptions.UnknownDatatype;
@@ -118,7 +116,8 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     }
 
     //region rewriting of expressions using the current state
-    @Override public SMVExpr visit(BinaryExpression binaryExpression) {
+    @Override
+    public SMVExpr visit(BinaryExpression binaryExpression) {
         SMVExpr left = binaryExpression.getLeftExpr().accept(this);
         SMVExpr right = binaryExpression.getRightExpr().accept(this);
         return operationMap
@@ -126,7 +125,8 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
                         right);
     }
 
-    @Override public SMVExpr visit(UnaryExpression u) {
+    @Override
+    public SMVExpr visit(UnaryExpression u) {
         SMVExpr left = u.getExpression().accept(this);
         return operationMap.translateUnaryOperator(u.getOperator(), left);
     }
@@ -283,7 +283,10 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
     @Override
     public SMVExpr visit(CaseCondition.Range r) {
-        throw new IllegalArgumentException("unsupported");
+        BinaryExpression lower = new BinaryExpression(caseExpression, r.getStart(), Operators.GREATER_EQUALS);
+        BinaryExpression upper = new BinaryExpression(r.getStop(), caseExpression, Operators.GREATER_EQUALS);
+        BinaryExpression and = new BinaryExpression(lower, upper, Operators.AND);
+        return and.accept(this);
     }
 
     @Override

@@ -88,11 +88,13 @@ public class Utils {
         return new SVariable(name.getName(), Utils.getSMVDataType(name.getDataType()));
     }
 
+    @Deprecated
     private static SMVType getSMVDataType(Any dataType) {
         DataTypeTranslator dtt = new DataTypeTranslator();
         return dataType.accept(dtt);
     }
 
+    @Deprecated
     public static SLiteral asSMVLiteral(Value<?, ?> tsValue) {
         /*if (tsValue.getValue() instanceof Bits) {
             Bits value = (Bits) tsValue.getValue();
