@@ -50,6 +50,7 @@ public class DefaultS2SFunctionTranslator implements S2SFunctionTranslator {
         logicalOperators.put(SBinaryOperator.OR, "or");
         logicalOperators.put(SBinaryOperator.IMPL, "impl");
         logicalOperators.put(SBinaryOperator.EQUAL, "=");
+        logicalOperators.put(SBinaryOperator.NOT_EQUAL, "!=");
         logicalOperators.put(SBinaryOperator.XOR, "xor");
         logicalOperators.put(SBinaryOperator.XNOR, "=");
 
@@ -66,7 +67,9 @@ public class DefaultS2SFunctionTranslator implements S2SFunctionTranslator {
         bvsOperators.put(SBinaryOperator.GREATER_THAN, "bvsgt");
         bvsOperators.put(SBinaryOperator.LESS_EQUAL, "bvsle");
         bvsOperators.put(SBinaryOperator.LESS_THAN, "bvslt");
+        bvsOperators.put(SBinaryOperator.NOT_EQUAL, "!=");
 
+        bvuOperators.put(SBinaryOperator.NOT_EQUAL, "!=");
         bvuOperators.put(SBinaryOperator.MUL, "bvmul");
         bvuOperators.put(SBinaryOperator.PLUS, "bvadd");
         bvuOperators.put(SBinaryOperator.DIV, "bvudiv");

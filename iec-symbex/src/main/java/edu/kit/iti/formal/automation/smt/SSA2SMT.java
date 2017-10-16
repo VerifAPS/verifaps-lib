@@ -99,10 +99,11 @@ public class SSA2SMT implements Runnable {
 
         @Override
         public Sexp visit(SVariable v) {
-            Sexp access = newNonAtomicSexp();
-            access.add(newAtomicSexp(SMTProgram.STATE_NAME));
+            /*Sexp access = newNonAtomicSexp();
             access.add(newAtomicSexp(v.getName()));
-            return access;
+            access.add(newAtomicSexp(SMTProgram.STATE_NAME));
+            */
+            return newAtomicSexp(SMTProgram.STATE_NAME + v.getName());
         }
 
         @Override

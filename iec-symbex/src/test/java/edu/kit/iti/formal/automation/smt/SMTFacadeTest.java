@@ -50,6 +50,10 @@ public class SMTFacadeTest {
         TopLevelElements symplifiedCode = SymbExFacade.simplify(code);
         SMVModule module = SymbExFacade.evaluateProgram(symplifiedCode);
         SMTProgram program = SMTFacade.translate(module);
-        System.out.println(program.getSMT("init", "next"));
+        System.out.println(program.getPreamble());
+        System.out.println(program.getStepDefinition(true, "_0"));
+        System.out.println(program.getStepDefinition(false, "_1"));
+        System.out.println(program.getAssertInit("_0"));
+        System.out.println(program.getAssertNext("_0", "_1"));
     }
 }
