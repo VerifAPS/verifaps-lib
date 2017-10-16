@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.run
 
+import edu.kit.iti.formal.automation.run.stexceptions.StEvaluationException
 import edu.kit.iti.formal.automation.run.stexceptions.TypeMissmatchException
 import edu.kit.iti.formal.automation.scope.LocalScope
 import edu.kit.iti.formal.automation.st.ast.*
@@ -51,14 +52,41 @@ class Runtime(val state: State) : DefaultVisitor<Unit>() {
 
     override fun visit(fbc: FunctionBlockCallStatement?) {
 
-
-
-        unctionResolver
-
-
-
-        peekLocalScope().globalScope.resolveFunction(, peekLocalScope())
         TODO()
+    }
+
+    override fun visit(whileStatement: WhileStatement) {
+        fun checkCondition() = (whileStatement.condition as Visitable).accept(ExpressionVisitor(state, peekLocalScope()))
+        while(checkCondition().value == true) {
+            whileStatement.statements.accept(this)
+        }
+    }
+
+    override fun visit(forStatement: ForStatement) {
+        val variableName = forStatement.variable
+        val startValue = (forStatement.start as Visitable).accept<ExpressionValue>(ExpressionVisitor(state, peekLocalScope()))
+        val stopValue = (forStatement.stop as Visitable).accept<ExpressionValue>(ExpressionVisitor(state, peekLocalScope()))
+        val stepValue = (forStatement.step as Visitable).accept<ExpressionValue>(ExpressionVisitor(state, peekLocalScope()))
+        state.put(variableName, Optional.of(startValue))
+
+        fun conditionHolds() : Boolean {
+            val variableValue = state[variableName] ?: return false
+            logger.debug { "Does the ForStatement-Condition hold? current: $variableValue stopValue: $stopValue" }
+            return variableValue.map {
+                OperationEvaluator.lessThan(it, stopValue)
+            }.orElseThrow {
+                StEvaluationException("variable $variableName not found")
+            }.value
+        }
+
+        while(conditionHolds()) {
+            logger.debug { "for-loop-condition still holds. execute statement body" }
+            forStatement.statements.accept(this)
+
+            val variableValue = state[variableName]
+            logger.debug { "increase for-loop variable ($variableValue) by step ($stepValue)" }
+            state[variableName] = variableValue!!.map { OperationEvaluator.add(it, stepValue) }
+        }
     }
 
     private fun initializeLocalVariables(localScope: LocalScope) {

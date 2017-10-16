@@ -6,11 +6,9 @@ import edu.kit.iti.formal.automation.datatypes.values.Values
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.run.stexceptions.ExecutionException
 import edu.kit.iti.formal.automation.scope.LocalScope
-import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
-import java.math.BigDecimal
 
 /**
  * evaluates the expression given via .visit() and runs creates a Runtime to call on functions in the expression.
@@ -83,14 +81,20 @@ class ExpressionVisitor(private val state : State, private val localScope : Loca
         val rightValue = binaryExpression.rightExpr.accept<ExpressionValue>(this) as ExpressionValue
 
         //TODO resolve function by using dataType
-        binaryExpression.dataType(localScope)
+        //binaryExpression.dataType(localScope)
 
         return when(binaryExpression.operator) {
             Operators.ADD -> OperationEvaluator.add(leftValue, rightValue)
+            Operators.MULT -> OperationEvaluator.multiply(leftValue, rightValue)
             Operators.EQUALS -> OperationEvaluator.equalValues(leftValue, rightValue)
-            Operators.AND -> OperationEvaluator.and(leftValue, rightValue)
+            Operators.NOT_EQUALS -> OperationEvaluator.notEquals(leftValue, rightValue)
             Operators.GREATER_THAN -> OperationEvaluator.greaterThan(leftValue, rightValue)
-            else -> TODO("operator ${binaryExpression.operator.symbol()} is not implemented")
+            Operators.GREATER_EQUALS -> OperationEvaluator.greaterThanOrEquals(leftValue, rightValue)
+            Operators.LESS_THAN -> OperationEvaluator.lessThan(leftValue, rightValue)
+            Operators.LESS_EQUALS -> OperationEvaluator.lessThanOrEquals(leftValue, rightValue)
+            Operators.AND -> OperationEvaluator.and(leftValue, rightValue)
+            Operators.SUB -> OperationEvaluator.subtract(leftValue, rightValue)
+            else -> TODO("operator ${binaryExpression.operator.symbol()} is not implemented (${binaryExpression.operator.toString()})")
         }
     }
 

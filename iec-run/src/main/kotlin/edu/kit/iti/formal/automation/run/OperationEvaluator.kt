@@ -1,11 +1,15 @@
 package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.datatypes.Any
-import edu.kit.iti.formal.automation.datatypes.AnyBit
-import edu.kit.iti.formal.automation.datatypes.values.Values
-import edu.kit.iti.formal.automation.operators.Operator
-import edu.kit.iti.formal.automation.run.stexceptions.TypeMissmatchException
 
+import edu.kit.iti.formal.automation.datatypes.AnyBit
+import edu.kit.iti.formal.automation.datatypes.AnyInt
+import edu.kit.iti.formal.automation.datatypes.AnyReal
+import edu.kit.iti.formal.automation.datatypes.values.Value
+import edu.kit.iti.formal.automation.datatypes.values.Values
+import edu.kit.iti.formal.automation.run.stexceptions.TypeMissmatchException
+import java.math.BigDecimal
+import java.math.BigInteger
 /**
  * OperationEvaluator executes an ST operator on given ExpressionValues.
  * If Operation if illegal, an error will be thrown
@@ -26,6 +30,18 @@ object OperationEvaluator {
     }
 
 
+    fun multiply(leftValue: ExpressionValue, rightValue: ExpressionValue): ExpressionValue {
+        return when {
+            leftValue is Values.VAnyInt && rightValue is Values.VAnyInt -> multiply(leftValue, rightValue)
+            else -> TODO("implement other data type")
+        }
+    }
+
+    fun multiply(leftValue: Values.VAnyInt, rightValue: Values.VAnyInt) : Values.VAnyInt {
+        return Values.VAnyInt(leftValue.dataType, leftValue.value.multiply(rightValue.value))
+    }
+
+
     fun not(expressionValue: ExpressionValue): ExpressionValue {
         if (expressionValue is Values.VBool) {
             return Values.VBool(expressionValue.dataType, expressionValue.value.not())
@@ -33,7 +49,6 @@ object OperationEvaluator {
             throw TypeMissmatchException("must be bool")
         }
     }
-
 
     fun negate(expressionValue: ExpressionValue): ExpressionValue {
         return when (expressionValue) {
@@ -44,8 +59,12 @@ object OperationEvaluator {
     }
 
     fun equalValues(leftValue: ExpressionValue, rightValue: ExpressionValue): ExpressionValue {
-        //TODO promote types for equals comparison
-        return Values.VBool(AnyBit.BOOL, leftValue.value == rightValue.value && leftValue.dataType == rightValue.dataType)
+        //TODO promote types for equals comparison and make compare data types
+        return Values.VBool(AnyBit.BOOL, leftValue.value == rightValue.value)
+    }
+
+    fun notEquals(leftValue: ExpressionValue, rightValue: ExpressionValue): ExpressionValue {
+        return not(equalValues(leftValue, rightValue))
     }
 
     fun and(leftValue: ExpressionValue, rightValue: ExpressionValue): Values.VBool {
@@ -56,25 +75,73 @@ object OperationEvaluator {
         }
     }
 
-    private fun greaterThan(leftValue: Values.VAnyInt, rightValue: ExpressionValue): Values.VBool {
-        if (rightValue is Values.VAnyInt) {
-            return Values.VBool(AnyBit.BOOL,leftValue.value > rightValue.value)
-        }
-        throw TypeMissmatchException("must be both integer")
-    }
+    private fun greaterThan(leftValue: Values.VAnyInt, rightValue: Values.VAnyInt)=
+            Values.VBool(AnyBit.BOOL, leftValue.value > rightValue.value)
 
-    private fun greaterThan(leftValue: Values.VAnyReal, rightValue: ExpressionValue) : Values.VBool {
-        if (rightValue is Values.VAnyReal) {
-            return Values.VBool(AnyBit.BOOL, leftValue.value > rightValue.value)
-        }
-        throw TypeMissmatchException("must be both real numbers")
-    }
+    private fun greaterThan(leftValue: Values.VAnyReal, rightValue: Values.VAnyReal)=
+            Values.VBool(AnyBit.BOOL, leftValue.value > rightValue.value)
 
     fun greaterThan(leftValue: ExpressionValue, rightValue: ExpressionValue): Values.VBool {
-        return when (leftValue) {
-            is Values.VAnyInt -> greaterThan(leftValue, rightValue)
-            is Values.VAnyReal -> greaterThan(leftValue, rightValue)
+        return when {
+            leftValue is Values.VAnyReal || rightValue is Values.VAnyReal -> greaterThan(toReal(leftValue), toReal(rightValue))
+            leftValue is Values.VAnyInt && rightValue is Values.VAnyInt -> greaterThan(leftValue, rightValue)
             else -> throw TypeMissmatchException("must be a number")
         }
+    }
+
+    private fun greaterThanOrEquals(leftValue: Values.VAnyInt, rightValue: Values.VAnyInt)=
+            Values.VBool(AnyBit.BOOL, leftValue.value >= rightValue.value)
+
+    private fun greaterThanOrEquals(leftValue: Values.VAnyReal, rightValue: Values.VAnyReal)=
+            Values.VBool(AnyBit.BOOL, leftValue.value >= rightValue.value)
+
+    fun greaterThanOrEquals(leftValue: ExpressionValue, rightValue: ExpressionValue): Values.VBool {
+        return when {
+            leftValue is Values.VAnyReal || rightValue is Values.VAnyReal -> greaterThanOrEquals(toReal(leftValue), toReal(rightValue))
+            leftValue is Values.VAnyInt && rightValue is Values.VAnyInt -> greaterThanOrEquals(leftValue, rightValue)
+            else -> throw TypeMissmatchException("must be a number")
+        }
+    }
+
+    private fun lessThanOrEquals(leftValue: Values.VAnyInt, rightValue: Values.VAnyInt)=
+            Values.VBool(AnyBit.BOOL, leftValue.value <= rightValue.value)
+
+    private fun lessThanOrEquals(leftValue: Values.VAnyReal, rightValue: Values.VAnyReal)=
+            Values.VBool(AnyBit.BOOL, leftValue.value <= rightValue.value)
+
+    fun lessThanOrEquals(leftValue: ExpressionValue, rightValue: ExpressionValue): Values.VBool {
+        return when {
+            leftValue is Values.VAnyReal || rightValue is Values.VAnyReal -> lessThanOrEquals(toReal(leftValue), toReal(rightValue))
+            leftValue is Values.VAnyInt && rightValue is Values.VAnyInt -> lessThanOrEquals(leftValue, rightValue)
+            else -> throw TypeMissmatchException("must be a number")
+        }
+    }
+
+    private fun lessThan(leftValue: Values.VAnyInt, rightValue: Values.VAnyInt)=
+            Values.VBool(AnyBit.BOOL, leftValue.value < rightValue.value)
+
+    private fun lessThan(leftValue: Values.VAnyReal, rightValue: Values.VAnyReal)=
+            Values.VBool(AnyBit.BOOL, leftValue.value < rightValue.value)
+
+
+    fun lessThan(leftValue: ExpressionValue, rightValue: ExpressionValue): Values.VBool {
+        return when {
+            leftValue is Values.VAnyReal || rightValue is Values.VAnyReal -> lessThan(toReal(leftValue), toReal(rightValue))
+            leftValue is Values.VAnyInt && rightValue is Values.VAnyInt -> lessThan(leftValue, rightValue)
+            else -> throw TypeMissmatchException("must be a number")
+        }
+    }
+
+    private fun toReal(expressionValue: ExpressionValue): Values.VAnyReal {
+        val content = expressionValue.value
+        return Values.VAnyReal(AnyReal.REAL, when(content) {
+            is BigInteger -> BigDecimal(content)
+            is BigDecimal -> content
+            else -> throw TypeMissmatchException("cannot be a real number")
+        })
+    }
+
+    fun subtract(leftValue: ExpressionValue, rightValue: ExpressionValue): ExpressionValue {
+        return add(leftValue, negate(rightValue))
     }
 }

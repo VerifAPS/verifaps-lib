@@ -6,6 +6,7 @@ import mu.KotlinLogging
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.math.BigInteger
 import java.util.*
 class RuntimeTest {
     @Before
@@ -68,12 +69,38 @@ class RuntimeTest {
     }
 
     @Test
+    fun forLoopTest() {
+        val ast = getAst(this.javaClass.getResource("runtimeTest.forLoopTest.st"))
+        val topState = TopState()
+        ast.accept<Any>(Runtime(topState))
+        println("final state:")
+        topState.forEach {
+            println(it)
+        }
+        assertEquals(BigInteger.valueOf(32), topState["Var1"]!!.get().value)
+    }
+
+    @Test
+    fun whileLoopTest() {
+        val ast = getAst(this.javaClass.getResource("runtimeTest.whileLoopTest.st"))
+        val topState = TopState()
+        ast.accept<Any>(Runtime(topState))
+        println("final state:")
+        topState.forEach {
+            println(it)
+        }
+        assertEquals(BigInteger.valueOf(32), topState["Var1"]!!.get().value)
+        assertEquals(BigInteger.valueOf(0), topState["counter"]!!.get().value)
+    }
+
+    @Test
     fun functionBlockTest() {
         val ast = getAst(this.javaClass.getResource("runtimeTest.functionBlockTest.st"))
         val topState = TopState()
         val runtime = Runtime(topState)
         ast.accept<Any>(runtime)
         println("final state:")
+
         topState.forEach {
             println(it)
         }
