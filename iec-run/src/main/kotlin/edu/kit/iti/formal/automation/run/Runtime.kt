@@ -5,6 +5,7 @@ import edu.kit.iti.formal.automation.scope.LocalScope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
+import mu.KLogging
 import java.util.*
 
 /**
@@ -12,6 +13,7 @@ import java.util.*
  * changes the [state] depending on the visited Nodes
  */
 class Runtime(val state: State) : DefaultVisitor<Unit>() {
+    companion object : KLogging()
     /*
      * stores the variable definitions (e.g. "VAR a : INT END_VAR"
      * The variables are scoped, hence the Stack data-type
@@ -31,7 +33,11 @@ class Runtime(val state: State) : DefaultVisitor<Unit>() {
     }
 
     override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
-        typeDeclarationAdder.queueDeclaration(enumerationTypeDeclaration)
+        typeDeclarationAdder.queueTypeDeclaration(enumerationTypeDeclaration)
+    }
+
+    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) {
+        typeDeclarationAdder.queueFunctionBlockDeclaration(functionBlockDeclaration)
     }
 
     override fun visit(programDeclaration: ProgramDeclaration) {
@@ -43,6 +49,18 @@ class Runtime(val state: State) : DefaultVisitor<Unit>() {
         return programDeclaration!!.programBody.accept(this)
     }
 
+    override fun visit(fbc: FunctionBlockCallStatement?) {
+
+
+
+        unctionResolver
+
+
+
+        peekLocalScope().globalScope.resolveFunction(, peekLocalScope())
+        TODO()
+    }
+
     private fun initializeLocalVariables(localScope: LocalScope) {
         val localVariables: Map<out String, VariableDeclaration> = localScope.localVariables
         localVariables.map {
@@ -50,7 +68,7 @@ class Runtime(val state: State) : DefaultVisitor<Unit>() {
             val initialValue : Optional<ExpressionValue> = when(initExpr) {
                 null -> Optional.empty()
                 else -> Optional.of(initExpr.accept<ExpressionValue>(
-                        ExpressionVisitor(state, definitionScopeStack.peek())
+                        ExpressionVisitor(state, peekLocalScope())
                 ) as ExpressionValue)
             }
 
@@ -60,9 +78,9 @@ class Runtime(val state: State) : DefaultVisitor<Unit>() {
 
     private fun chooseGuardedStatement(ifStatement: IfStatement) : GuardedStatement? {
         for (statement in ifStatement.conditionalBranches) {
-            val returnValue : ExpressionValue = (statement.condition as Visitable)
+            val returnValue: ExpressionValue = (statement.condition as Visitable)
                     .accept<ExpressionValue>(
-                            ExpressionVisitor(state, definitionScopeStack.peek())
+                            ExpressionVisitor(state, peekLocalScope())
                     )
             if (returnValue.value is Boolean) {
                 if (returnValue.value == true) {
@@ -77,8 +95,13 @@ class Runtime(val state: State) : DefaultVisitor<Unit>() {
     }
 
     override fun visit(ifStatement: IfStatement) {
-        val chosenCodeBlock = chooseGuardedStatement(ifStatement) ?: return
-        chosenCodeBlock.accept<Any>(this) // will run visit(GuardedStatement)
+        val chosenGuardedStatement = chooseGuardedStatement(ifStatement)
+        if (chosenGuardedStatement != null) {
+            chosenGuardedStatement.accept<Any>(this) // will run visit(GuardedStatement)
+            return
+        }
+        val elseBranch = ifStatement.elseBranch
+        elseBranch.accept(this)
     }
 
     override fun visit(guardedStatement: GuardedStatement) {
@@ -86,23 +109,27 @@ class Runtime(val state: State) : DefaultVisitor<Unit>() {
     }
 
     override fun visit(statements: StatementList?) {
-        statements!!.forEach { it.accept<Any>(this) }
+        statements!!.forEach {
+            logger.debug { "Executing statement $it" }
+            it.accept<Any>(this)
+        }
     }
 
     override fun visit(assignmentStatement: AssignmentStatement) {
-        val expressionVisitor = ExpressionVisitor(state, definitionScopeStack.peek())
+        val expressionVisitor = ExpressionVisitor(state, peekLocalScope())
         val expressionValue = assignmentStatement.expression.accept<ExpressionValue>(expressionVisitor) as ExpressionValue
         val nodeName = assignmentStatement.location.accept<Any>(object : DefaultVisitor<Unit>() {
             override fun visit(symbolicReference: SymbolicReference) {
                 state.updateValue(symbolicReference.identifier, expressionValue)
-                println(symbolicReference.identifier)
+                logger.debug { """ "${symbolicReference.identifier}" now as value $expressionValue""" }
             }
 
             override fun visit(deref: Deref) {
                 TODO("implement")
             }
         })
-        println(state)
 
     }
+
+    private fun peekLocalScope() = definitionScopeStack.peek()
 }

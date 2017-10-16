@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
+import edu.kit.iti.formal.automation.datatypes.TimeType
 import edu.kit.iti.formal.automation.datatypes.values.Values
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.run.stexceptions.ExecutionException
@@ -9,6 +10,7 @@ import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
+import java.math.BigDecimal
 
 /**
  * evaluates the expression given via .visit() and runs creates a Runtime to call on functions in the expression.
@@ -40,18 +42,31 @@ class ExpressionVisitor(private val state : State, private val localScope : Loca
     }
 
     override fun visit(literal: Literal) : ExpressionValue {
+        /*literal.asValue() does either throw an exception or returns null, if no direct value is available
+        DISCUSS: is this intentional or accidental? better way distinguishing between IdentifierPlaceHolder and other?
+        (is IdentifierPlaceHolder) did not work  -> solve be using resolveDataType*/
         try {
-            return literal.asValue()
+            val asValue = literal.asValue()
+            if (asValue != null) {
+                return asValue
+            }
         } catch (npe : NullPointerException) {
 
-            val identifier = literal.dataTypeName
-            val resolvedDataType = localScope.globalScope.resolveDataType(identifier)
-            if (resolvedDataType is EnumerateType) {
-                return Values.VAnyEnum(resolvedDataType, literal.textValue)
-            }
+        }
+
+        val identifier = literal.dataTypeName
+        val resolvedDataType = localScope.globalScope.resolveDataType(identifier)
+        if (resolvedDataType is EnumerateType) {
+            return Values.VAnyEnum(resolvedDataType, literal.textValue)
+        }
+        //DISCUSS: Time-Literal has resolvedDataType LREAL ?!
+        if (resolvedDataType is TimeType) {
+            TODO()
+            //return Values.VAnyReal(resolvedDataType, BigDecimal.valueOf(0))
         }
         TODO("implement other cases for $literal")
     }
+
 
     override fun visit(symbolicReference: SymbolicReference): ExpressionValue {
         val variableName = symbolicReference.identifier
@@ -66,6 +81,10 @@ class ExpressionVisitor(private val state : State, private val localScope : Loca
     override fun visit(binaryExpression: BinaryExpression): ExpressionValue {
         val leftValue = binaryExpression.leftExpr.accept<ExpressionValue>(this) as ExpressionValue
         val rightValue = binaryExpression.rightExpr.accept<ExpressionValue>(this) as ExpressionValue
+
+        //TODO resolve function by using dataType
+        binaryExpression.dataType(localScope)
+
         return when(binaryExpression.operator) {
             Operators.ADD -> OperationEvaluator.add(leftValue, rightValue)
             Operators.EQUALS -> OperationEvaluator.equalValues(leftValue, rightValue)

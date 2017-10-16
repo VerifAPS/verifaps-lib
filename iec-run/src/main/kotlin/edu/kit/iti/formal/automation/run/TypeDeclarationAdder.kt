@@ -1,21 +1,27 @@
 package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.scope.GlobalScope
+import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration
 import edu.kit.iti.formal.automation.st.ast.TypeDeclaration
 
 /**
  * ugly way for making adding TypeDeclarations possible, before the @see{Runtime}-Visitor as visited a scoped Element.
- * with .queueDeclaration() a typeDeclaration can be added to the queue;
+ * with .queueTypeDeclaration() a typeDeclaration can be added to the queue;
  * with .addQueuedDeclarations() the queued declarations will be added to the global scope.
  */
 class TypeDeclarationAdder {
     private val typeDeclarations: MutableList<TypeDeclaration<*>> = mutableListOf()
+    private val functionBlockDeclarations: MutableList<FunctionBlockDeclaration> = mutableListOf()
 
     /**
      * queue [typeDeclaration] for addition to the global scope.
      */
-    fun queueDeclaration(typeDeclaration: TypeDeclaration<*>) {
+    fun queueTypeDeclaration(typeDeclaration: TypeDeclaration<*>) {
         typeDeclarations.add(typeDeclaration)
+    }
+
+    fun queueFunctionBlockDeclaration(functionBlockDeclaration: FunctionBlockDeclaration) {
+        functionBlockDeclarations.add(functionBlockDeclaration)
     }
 
     /**
@@ -23,6 +29,9 @@ class TypeDeclarationAdder {
      */
     fun addQueuedDeclarations(globalScope: GlobalScope) {
         typeDeclarations.forEach { globalScope.registerType(it) }
-        typeDeclarations.retainAll(listOf())
+        typeDeclarations.retainAll(emptyList())
+
+        functionBlockDeclarations.forEach { globalScope.registerFunctionBlock(it) }
+        functionBlockDeclarations.retainAll(emptyList())
     }
 }
