@@ -22,8 +22,7 @@ package edu.kit.iti.formal.automation.smv;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.SymbExFacade;
-import edu.kit.iti.formal.automation.Utils;
+import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.FunctionInvocationArgumentNumberException;
 import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException;
 import edu.kit.iti.formal.automation.exceptions.UnknownDatatype;
@@ -31,9 +30,7 @@ import edu.kit.iti.formal.automation.exceptions.UnknownVariableException;
 import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.LocalScope;
-import edu.kit.iti.formal.automation.smv.dt.DataTypeTranslator;
-import edu.kit.iti.formal.automation.smv.dt.TypeTranslator;
-import edu.kit.iti.formal.automation.smv.operators.OperationMap;
+import edu.kit.iti.formal.automation.smv.translators.*;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.smv.SMVFacade;
@@ -53,14 +50,26 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     private GlobalScope globalScope = GlobalScope.defaultScope();
     private LocalScope localScope = new LocalScope(globalScope);
     private Map<String, SVariable> varCache = new HashMap<>();
-    private OperationMap operationMap = new DefaultOperationMap();
-    //region state handling
-    private Stack<SymbolicState> state = new Stack<>();
-    private Expression caseExpression;
 
     @Getter
     @Setter
-    private TypeTranslator typeTranslator = new DataTypeTranslator();
+    private OperationMap operationMap = new DefaultOperationMap();
+
+    @Getter
+    @Setter
+    private TypeTranslator typeTranslator = new DefaultTypeTranslator();
+
+    @Getter
+    @Setter
+    private ValueTranslator valueTranslator = new DefaultValueTranslator();
+
+    @Getter
+    @Setter
+    private InitValueTranslator initValueTranslator = new DefaultInitValue();
+
+    //region state handling
+    private Stack<SymbolicState> state = new Stack<>();
+    private Expression caseExpression;
 
     public SymbolicExecutioner() {
         push(new SymbolicState());
@@ -148,7 +157,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
     @Override
     public SLiteral visit(Literal literal) {
-        return Utils.asSMVLiteral(literal.asValue());
+        return valueTranslator.translate(literal);
     }
 
     @Override
@@ -214,7 +223,10 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
                 if (td != null && td.getInitialization() != null) {
                     td.getInitialization().accept(this);
                 } else {
-                    calleeState.put(lift(vd), Utils.getDefaultValue(vd.getDataType()));
+
+                    calleeState.put(lift(vd),
+                            valueTranslator.translate(
+                                    initValueTranslator.getInit(vd.getDataType())));
                 }
             }
         }

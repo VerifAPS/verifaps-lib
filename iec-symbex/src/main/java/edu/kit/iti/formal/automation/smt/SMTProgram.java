@@ -1,5 +1,27 @@
 package edu.kit.iti.formal.automation.smt;
 
+/*-
+ * #%L
+ * iec-symbex
+ * %%
+ * Copyright (C) 2017 Alexander Weigl
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import de.tudresden.inf.lat.jsexp.Sexp;
 import de.tudresden.inf.lat.jsexp.SexpFactory;
 import de.tudresden.inf.lat.jsexp.SexpParserException;
@@ -53,29 +75,19 @@ public class SMTProgram {
     private Map<String, Sexp> nextPredicates = new TreeMap<>();
     private Sexp inputDefinition;
 
-    private static Sexp getArgsFor(Map<String, Sexp> dt) {
-        Sexp args = newNonAtomicSexp();
-        createSortSexp(dt, args);
-        return args;
-    }
-
     /**
      * adds the given arguments in the map into the given sexps.
      *
      * @param dt
-     * @param args
      */
-    private static void createSortSexp(Map<String, Sexp> dt, Sexp args) {
-        dt.forEach((name, datatype) -> {
-                    Sexp arg = newNonAtomicSexp();
-                    arg.add(newAtomicSexp(name));
-                    arg.add(datatype);
-                    args.add(arg);
-                }
-        );
+    private static String createSortSexp(Map<String, Sexp> dt) {
+        return dt.entrySet().stream()
+                .map(entry -> "(" + entry.getKey() + " " + entry.getValue() + ")")
+                .reduce((a, b) -> a + " " + b)
+                .orElse("");
     }
 
-    public static Sexp createRecord(String name, Map<String, Sexp> dataTypes) {
+    public static Sexp createRecord(String name, Map<String, Sexp> dataTypes) throws SexpParserException {
         /*
          * <pre>
          * (declare-datatype () ( (state (constructor (name type) ...)))))
@@ -86,18 +98,9 @@ public class SMTProgram {
          * </pre>
          *
          */
-        Sexp dt = newNonAtomicSexp();
-        dt.add(newAtomicSexp(DECLARE_DATATYPES));
-        dt.add(newNonAtomicSexp());
-        Sexp defs = newNonAtomicSexp();
-        Sexp def = newNonAtomicSexp();
-        Sexp con = newNonAtomicSexp();
-        defs.add(def);
-        def.add(con);
-        def.add(newAtomicSexp(name));
-        con.add(newAtomicSexp("mk-" + name));
-        createSortSexp(dataTypes, con);
-        return dt;
+        String s = String.format("(declare-datatypes () ( (%s (mk-%s %s))))",
+                name, name, createSortSexp(dataTypes));
+        return SexpFactory.parse(s);
     }
 
     public Sexp getInitFunction(String name) throws SexpParserException {
@@ -105,7 +108,7 @@ public class SMTProgram {
         func.add(newAtomicSexp(DEFINE_FUNCTION));
         func.add(newAtomicSexp(name));
         Sexp args = SexpFactory.parse(String.format("((%s %s))",
-                NEW_STATE_NAME, stateDataTypeName));
+                STATE_NAME, stateDataTypeName));
         func.add(args);
         func.add(newAtomicSexp(SMT_BOOLEAN));
         func.add(getInitBody());
@@ -116,7 +119,14 @@ public class SMTProgram {
         Sexp body = newNonAtomicSexp();
         body.add(newAtomicSexp("and"));
         initPredicates.forEach((name, pred) -> {
-            body.add(pred);
+            Sexp eq = newNonAtomicSexp();
+            eq.add(newAtomicSexp("="));
+            Sexp access = newNonAtomicSexp();
+            access.add(newAtomicSexp(STATE_NAME));
+            access.add(newAtomicSexp(name));
+            eq.add(access);
+            eq.add(pred);
+            body.add(eq);
         });
         return body;
     }
@@ -127,7 +137,7 @@ public class SMTProgram {
         func.add(newAtomicSexp(name));
         Sexp args = SexpFactory.parse(String.format("((%s %s) (%s %s) (%s %s))",
                 STATE_NAME, stateDataTypeName,
-                INPUT_NAME, inputDataTypes,
+                INPUT_NAME, inputDataTypeName,
                 NEW_STATE_NAME, stateDataTypeName
         ));
         func.add(args);
@@ -153,11 +163,11 @@ public class SMTProgram {
         return body;
     }
 
-    public Sexp getStateDataType() {
+    public Sexp getStateDataType() throws SexpParserException {
         return createRecord(stateDataTypeName, stateDataTypes);
     }
 
-    public Sexp getInputDataType() {
+    public Sexp getInputDataType() throws SexpParserException {
         return createRecord(getInputDataTypeName(), inputDataTypes);
     }
 
@@ -168,9 +178,9 @@ public class SMTProgram {
             Sexp init = getInitFunction(initFuncName);
             Sexp next = getNextFunction(initNextName);
 
-            return dataType.toIndentedString() +
-                    inputType.toIndentedString() +
-                    init.toIndentedString() +
+            return dataType.toIndentedString() + "\n\n" +
+                    inputType.toIndentedString() + "\n\n" +
+                    init.toIndentedString() + "\n\n" +
                     next.toIndentedString();
         } catch (SexpParserException e) {
             e.printStackTrace();

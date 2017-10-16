@@ -20,7 +20,7 @@ VAR_INPUT
         in1 : INT;
 END_VAR
 
-MAX := SEL(in0&gt;=in1, in0, in1);
+MAX := SEL(in0>=in1, in0, in1);
 
 END_FUNCTION
 
@@ -30,7 +30,7 @@ VAR_INPUT
         in1 : INT;
 END_VAR
 
-MIN := SEL(in0&lt;=in1, in0, in1);
+MIN := SEL(in0<=in1, in0, in1);
 
 END_FUNCTION
 
@@ -71,12 +71,12 @@ IF mode = OperationMode#Learn THEN // go into learning
 ELSE
         Q := MIN( upper, MAX( lower, I) );
 
-        IF upper &lt; lower THEN
+        IF upper < lower THEN
            Q := 0;
            RETURN;
         END_IF
 
-        IF I &lt;&gt; Q THEN
+        IF I <> Q THEN
                 cntHeat := cntHeat - 1;
                 cntQuench := WAIT_AFTER_WARNING;
                 IF cntHeat = 0 THEN

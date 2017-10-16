@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.smv.dt;
+package edu.kit.iti.formal.automation.smv.translators;
 
 /*-
  * #%L
@@ -27,13 +27,11 @@ import edu.kit.iti.formal.automation.exceptions.IllegalTypeException;
 import edu.kit.iti.formal.smv.ast.GroundDataType;
 import edu.kit.iti.formal.smv.ast.SMVType;
 
-import java.lang.reflect.Type;
-
 /**
  * Created by weigl on 11.12.16.
  */
-public class DataTypeTranslator implements TypeTranslator{
-    public static final DataTypeTranslator INSTANCE = new DataTypeTranslator();
+public class DefaultTypeTranslator implements TypeTranslator{
+    public static final DefaultTypeTranslator INSTANCE = new DefaultTypeTranslator();
 
     @Override
     public SMVType translate(Any datatype) {

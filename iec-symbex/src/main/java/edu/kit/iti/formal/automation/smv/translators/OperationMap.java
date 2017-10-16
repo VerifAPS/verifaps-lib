@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.smv.operators;
+package edu.kit.iti.formal.automation.smv.translators;
 
 /*-
  * #%L

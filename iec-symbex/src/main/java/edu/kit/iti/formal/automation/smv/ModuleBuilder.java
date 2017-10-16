@@ -23,9 +23,7 @@ package edu.kit.iti.formal.automation.smv;
  */
 
 
-import edu.kit.iti.formal.automation.SymbExFacade;
-import edu.kit.iti.formal.automation.smv.dt.DataTypeTranslator;
-import edu.kit.iti.formal.automation.smv.dt.TypeTranslator;
+import edu.kit.iti.formal.automation.smv.translators.*;
 import edu.kit.iti.formal.automation.st.ast.Literal;
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TypeDeclarations;
@@ -58,7 +56,15 @@ public class ModuleBuilder implements Runnable {
 
     @Getter
     @Setter
-    private TypeTranslator typeTranslator = new DataTypeTranslator();
+    private TypeTranslator typeTranslator = DefaultTypeTranslator.INSTANCE;
+
+    @Getter
+    @Setter
+    private ValueTranslator valueTranslator = DefaultValueTranslator.INSTANCE;
+
+    @Getter
+    @Setter
+    private InitValueTranslator initValueTranslator = DefaultInitValue.INSTANCE;
 
 
     public ModuleBuilder(ProgramDeclaration decl, TypeDeclarations types, SymbolicState ss) {
@@ -123,7 +129,8 @@ public class ModuleBuilder implements Runnable {
             Literal sv = (Literal) s.getInit();
             e = sv.accept(new SymbolicExecutioner());
         } else {
-            e = InitValue.INSTANCE.getInit(var.getSMVType());
+            e = valueTranslator.translate(
+                    initValueTranslator.getInit(s.getDataType()));
         }
         SAssignment a = new SAssignment(var, e);
         module.getInitAssignments().add(a);

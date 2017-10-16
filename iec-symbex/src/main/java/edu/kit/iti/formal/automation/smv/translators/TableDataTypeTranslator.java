@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.smv.dt;
+package edu.kit.iti.formal.automation.smv.translators;
 
 /*-
  * #%L
@@ -45,7 +45,7 @@ public class TableDataTypeTranslator implements TypeTranslator {
     @Getter
     private Map<String, Integer> integerMap = new HashMap<>();
 
-    private DataTypeTranslator dttFallback = new DataTypeTranslator();
+    private DefaultTypeTranslator dttFallback = new DefaultTypeTranslator();
 
     /**
      *

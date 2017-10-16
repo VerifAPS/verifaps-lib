@@ -13,6 +13,10 @@
 
     <artifactId>iec-modularization</artifactId>
 
+    <properties>
+        <license.copyrightOwner>Daniel Lentzsch</license.copyrightOwner>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>edu.kit.iti.formal</groupId>

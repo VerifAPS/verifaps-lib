@@ -44,12 +44,15 @@ public class SMVType {
     }
 
     public static SMVType infer(List<SMVType> list) {
-        //TODO
+        if(list.stream().allMatch(a->a.equals(list.get(0))))
+            return list.get(0);
         return null;
     }
 
     public static SMVType infer(SMVType a, SMVType b) {
-        //TODO
+        if(a.equals(b))
+            return a;
+
         return null;
     }
 

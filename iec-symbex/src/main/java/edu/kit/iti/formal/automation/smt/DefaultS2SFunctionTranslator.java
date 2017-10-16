@@ -1,8 +1,31 @@
 package edu.kit.iti.formal.automation.smt;
 
+/*-
+ * #%L
+ * iec-symbex
+ * %%
+ * Copyright (C) 2017 Alexander Weigl
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import de.tudresden.inf.lat.jsexp.Sexp;
 import edu.kit.iti.formal.smv.ast.*;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +83,8 @@ public class DefaultS2SFunctionTranslator implements S2SFunctionTranslator {
     }
 
     @Override
-    public Sexp translateOperator(SBinaryOperator operator, SMVType typeLeft, SMVType rightType) {
+    @Nonnull
+    public Sexp translateOperator(@Nonnull SBinaryOperator operator, @Nonnull SMVType typeLeft, @Nonnull SMVType rightType) {
         String defaultValue = "not-found-operator-" + operator.symbol();
 
         if (typeLeft.getBaseType() == BOOLEAN) {
@@ -73,6 +97,10 @@ public class DefaultS2SFunctionTranslator implements S2SFunctionTranslator {
         }
 
         if (typeLeft.getBaseType() == GroundDataType.UNSIGNED_WORD) {
+            return newAtomicSexp(bvuOperators.getOrDefault(operator, defaultValue));
+        }
+
+        if(typeLeft instanceof SMVType.EnumType) {
             return newAtomicSexp(bvuOperators.getOrDefault(operator, defaultValue));
         }
 

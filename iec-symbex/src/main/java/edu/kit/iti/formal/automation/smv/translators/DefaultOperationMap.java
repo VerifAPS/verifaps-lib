@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.smv;
+package edu.kit.iti.formal.automation.smv.translators;
 
 /*-
  * #%L
@@ -25,7 +25,7 @@ package edu.kit.iti.formal.automation.smv;
 import edu.kit.iti.formal.automation.Utils;
 import edu.kit.iti.formal.automation.operators.BinaryOperator;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
-import edu.kit.iti.formal.automation.smv.operators.OperationMap;
+import edu.kit.iti.formal.automation.smv.translators.OperationMap;
 import edu.kit.iti.formal.smv.SMVFacade;
 import edu.kit.iti.formal.smv.ast.*;
 
