@@ -195,6 +195,15 @@ public class SMTProgram {
     public String getPreamble() {
         StringBuilder sb = new StringBuilder();
         sb.append("(set-logic QF_BV)\n");
+        sb.append(
+                "(define-fun <> ((a Bool) (b Bool)) Bool\n" +
+                        "  (not (= a b)))\n");
+
+        for (int i = 1; i <= 64; i++) {
+            sb.append(String.format("(define-fun <> ((a (_ BitVec %d)) (b (_ BitVec %d))) Bool (not (= a b)))\n", i, i ));
+        }
+
+
         try {
             Sexp init = getInitFunction();
             Sexp next = getNextFunction();

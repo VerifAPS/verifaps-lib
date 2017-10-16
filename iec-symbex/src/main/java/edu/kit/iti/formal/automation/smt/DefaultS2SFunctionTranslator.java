@@ -50,7 +50,7 @@ public class DefaultS2SFunctionTranslator implements S2SFunctionTranslator {
         logicalOperators.put(SBinaryOperator.OR, "or");
         logicalOperators.put(SBinaryOperator.IMPL, "impl");
         logicalOperators.put(SBinaryOperator.EQUAL, "=");
-        logicalOperators.put(SBinaryOperator.NOT_EQUAL, "!=");
+        logicalOperators.put(SBinaryOperator.NOT_EQUAL, "xor");
         logicalOperators.put(SBinaryOperator.XOR, "xor");
         logicalOperators.put(SBinaryOperator.XNOR, "=");
 
@@ -60,21 +60,21 @@ public class DefaultS2SFunctionTranslator implements S2SFunctionTranslator {
         bvsOperators.put(SBinaryOperator.DIV, "bvsdiv");
         bvsOperators.put(SBinaryOperator.XOR, "bvxor");
         bvsOperators.put(SBinaryOperator.XNOR, "bvxnor");
-        bvsOperators.put(SBinaryOperator.EQUAL, "bvcomp"); //NOT RETURN BOOL
+        bvsOperators.put(SBinaryOperator.EQUAL, "=");
         bvsOperators.put(SBinaryOperator.MINUS, "bvsub");
         bvsOperators.put(SBinaryOperator.MOD, "bvsmod");
         bvsOperators.put(SBinaryOperator.GREATER_EQUAL, "bvsge");
         bvsOperators.put(SBinaryOperator.GREATER_THAN, "bvsgt");
         bvsOperators.put(SBinaryOperator.LESS_EQUAL, "bvsle");
         bvsOperators.put(SBinaryOperator.LESS_THAN, "bvslt");
-        bvsOperators.put(SBinaryOperator.NOT_EQUAL, "!=");
+        bvsOperators.put(SBinaryOperator.NOT_EQUAL, "<>");
 
-        bvuOperators.put(SBinaryOperator.NOT_EQUAL, "!=");
+        bvuOperators.put(SBinaryOperator.NOT_EQUAL, "<>");
         bvuOperators.put(SBinaryOperator.MUL, "bvmul");
         bvuOperators.put(SBinaryOperator.PLUS, "bvadd");
         bvuOperators.put(SBinaryOperator.DIV, "bvudiv");
         bvuOperators.put(SBinaryOperator.XOR, "bvxor");
-        bvuOperators.put(SBinaryOperator.EQUAL, "bvcomp");
+        bvuOperators.put(SBinaryOperator.EQUAL, "=");
         bvuOperators.put(SBinaryOperator.XNOR, "bvxnor");
         bvuOperators.put(SBinaryOperator.MINUS, "bvsub");
         bvuOperators.put(SBinaryOperator.MOD, "bvurem");
