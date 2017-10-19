@@ -39,7 +39,7 @@ public final class FunctionCallParamRemover extends StatementListModifier {
 	public final StatementList visit(
 			final FunctionBlockCallStatement fbCallStmt) {
 
-		assert fbCallStmt.getOutputParameters().count() == 0;
+		//assert fbCallStmt.getOutputParameters().count() == 0;
 
 		final String prefix = fbCallStmt.getCalleeName() + "$";
 
