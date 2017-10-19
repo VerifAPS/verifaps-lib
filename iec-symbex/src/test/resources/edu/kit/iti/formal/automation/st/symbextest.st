@@ -31,7 +31,7 @@ PROGRAM ABC
         S#C:
             z := FALSE;
             state := S#A;
-    END_CASE;
+    END_CASE
     w := SEL(x, 0, w+1);
     x := NOT x;
 END_PROGRAM
