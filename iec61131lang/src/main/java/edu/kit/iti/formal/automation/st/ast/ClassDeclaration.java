@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -31,54 +32,49 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Alexander Weigl
+ * @author Alexander Weigl, Augusto Modanese
  * @version 1 (20.02.17)
  */
 
+@Data
 @EqualsAndHashCode
 @ToString
 public class ClassDeclaration extends TopLevelScopeElement {
-    private List<MethodDeclaration> methods = new ArrayList<>();
-    private IdentifierPlaceHolder<ClassDeclaration> parentClass = new IdentifierPlaceHolder<>();
-    private List<IdentifierPlaceHolder<ClassDeclaration>> interfaces = new ArrayList<>();
     private String name;
+    private boolean final_ = false;
+    private boolean abstract_ = false;
+    private IdentifierPlaceHolder<ClassDeclaration> parent = new IdentifierPlaceHolder<>();
+    private List<IdentifierPlaceHolder<InterfaceDeclaration>> interfaces = new ArrayList<>();
+    private List<MethodDeclaration> methods = new ArrayList<>();
 
     public <T> T accept(Visitor<T> visitor) {
-        return null;
-    }
-
-    public List<MethodDeclaration> getMethods() {
-        return methods;
-    }
-
-    public ClassDeclaration setMethods(List<MethodDeclaration> methods) {
-        this.methods = methods;
-        return this;
+        return visitor.visit(this);
     }
 
     @Override public String getIdentifier() {
         return name;
     }
 
-    public void setParentClass(String parent) {
-        parentClass.setIdentifier(parent);
+    public void setParent(String parent) {
+        this.parent.setIdentifier(parent);
     }
 
     public void addImplements(String interfaze) {
         interfaces.add(new IdentifierPlaceHolder<>(interfaze));
     }
 
-    public ClassDeclaration setBlockName(String name) {
-        this.name = name;
-        return this;
+    public void addImplements(List<String> interfaceList) {
+        interfaceList.forEach(i -> addImplements(i));
     }
 
     @Override public ClassDeclaration copy() {
         ClassDeclaration c = new ClassDeclaration();
         c.name = name;
-        methods.forEach(m -> c.methods.add(m.copy()));
-        c.parentClass = parentClass.copy();
+        c.final_ = final_;
+        c.abstract_ = abstract_;
+        c.parent = parent.copy();
         interfaces.forEach(i -> c.interfaces.add(i.copy()));
+        methods.forEach(m -> c.methods.add(m.copy()));
         return c;
     }
 }

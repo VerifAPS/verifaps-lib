@@ -403,20 +403,20 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitClass_declaration(
-            IEC61131Parser.Class_declarationContext ctx) {
+    public Object visitClass_declaration(IEC61131Parser.Class_declarationContext ctx) {
         ClassDeclaration ast = new ClassDeclaration();
-        //TODO interface/extend missing
-        //ast.setParentClass(ctx);
-        //ast.addImplements(ctx.sp.text);
-
-        ast.setLocalScope((LocalScope) ctx.var_decls().accept(this));
-
-        ast.setMethods((List<MethodDeclaration>) ctx.methods().accept(this));
-        ast.setBlockName(ctx.identifier.getText());
         ast.setRuleContext(ctx);
-
-        //Utils.setPosition(ast, ctx.INTERFACE, ctx.END_INTERFACE);
+        ast.setLocalScope((LocalScope) ctx.var_decls().accept(this));
+        ast.setFinal_(ctx.FINAL() != null);
+        ast.setAbstract_(ctx.ABSTRACT() != null);
+        ast.setName(ctx.identifier.getText());
+        if (ctx.inherit != null) {
+            ast.setParentClass(ctx.inherit.getText());
+        }
+        if (ctx.interfaces != null) {
+            ast.addImplements((List<String>) ctx.interfaces.accept(this));
+        }
+        ast.setMethods((List<MethodDeclaration>) ctx.methods().accept(this));
         return ast;
     }
 
