@@ -388,9 +388,8 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        functionBlockDeclaration.setLocalScope((LocalScope) functionBlockDeclaration.getLocalScope().accept(this));
         functionBlockDeclaration.setFunctionBody((StatementList) functionBlockDeclaration.getFunctionBody().accept(this));
-        return functionBlockDeclaration;
+        return visit((ClassDeclaration) functionBlockDeclaration);
     }
 
     /**

@@ -23,38 +23,21 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
  * Created by weigl on 13.06.14.
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
+@Data
 @EqualsAndHashCode
 @ToString
-public class FunctionBlockDeclaration extends TopLevelScopeElement {
+public class FunctionBlockDeclaration extends ClassDeclaration {
     private StatementList functionBody = new StatementList();
-    private String functionBlockName;
-
-    /**
-     * <p>Getter for the field <code>functionBlockName</code>.</p>
-     *
-     * @return a {@link java.lang.String} object.
-     */
-    public String getFunctionBlockName() {
-        return functionBlockName;
-    }
-
-    /**
-     * <p>Setter for the field <code>functionBlockName</code>.</p>
-     *
-     * @param functionBlockName a {@link java.lang.String} object.
-     */
-    public void setFunctionBlockName(String functionBlockName) {
-        this.functionBlockName = functionBlockName;
-    }
 
     /**
      * <p>Getter for the field <code>functionBody</code>.</p>
@@ -86,14 +69,19 @@ public class FunctionBlockDeclaration extends TopLevelScopeElement {
      */
     @Override
     public String getIdentifier() {
-        return getFunctionBlockName();
+        return getName();
     }
 
     @Override
     public FunctionBlockDeclaration copy() {
         FunctionBlockDeclaration fb = new FunctionBlockDeclaration();
         fb.setRuleContext(getRuleContext());
-        fb.functionBlockName = functionBlockName;
+        fb.setName(getName());
+        fb.setFinal_(isFinal_());
+        fb.setAbstract_(isAbstract_());
+        fb.setParent(getParent().getIdentifier());
+        getInterfaces().forEach(i -> fb.addImplements(i.getIdentifier()));
+        getMethods().forEach(m -> fb.getMethods().add(m.copy()));
         fb.functionBody = functionBody.copy();
         return fb;
     }

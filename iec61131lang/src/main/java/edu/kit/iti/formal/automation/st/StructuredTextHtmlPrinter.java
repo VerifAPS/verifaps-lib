@@ -374,7 +374,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        sb.div(Sections.FB).keyword("FUNCTION_BLOCK ").variable(functionBlockDeclaration.getFunctionBlockName());
+        sb.div(Sections.FB).keyword("FUNCTION_BLOCK ").variable(functionBlockDeclaration.getName());
 
         functionBlockDeclaration.getLocalScope().accept(this);
 

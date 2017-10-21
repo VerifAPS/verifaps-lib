@@ -338,9 +338,15 @@ access_specifier
 
 function_block_declaration
 :
-	FUNCTION_BLOCK identifier = IDENTIFIER
+	FUNCTION_BLOCK
+    (FINAL | ABSTRACT)?
+	identifier = IDENTIFIER
+	(EXTENDS inherit=IDENTIFIER)?
+	(IMPLEMENTS interfaces=identifier_list)?
 	var_decls
-	body = statement_list END_FUNCTION_BLOCK
+	methods
+	body = statement_list
+	END_FUNCTION_BLOCK
 ;
 
 interface_declaration
