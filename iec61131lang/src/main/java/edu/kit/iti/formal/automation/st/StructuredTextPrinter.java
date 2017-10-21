@@ -437,7 +437,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        sb.append("FUNCTION_BLOCK ").append(functionBlockDeclaration.getFunctionBlockName()).increaseIndent();
+        sb.append("FUNCTION_BLOCK ").append(functionBlockDeclaration.getName()).increaseIndent();
 
         functionBlockDeclaration.getLocalScope().accept(this);
 

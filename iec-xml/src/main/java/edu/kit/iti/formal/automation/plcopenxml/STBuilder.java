@@ -54,7 +54,7 @@ public class STBuilder extends DefaultPOUBuilder {
             default:
                 FunctionBlockDeclaration fbd = new FunctionBlockDeclaration();
                 fbd.setFunctionBody(body);
-                fbd.setFunctionBlockName(name);
+                fbd.setName(name);
                 fbd.setLocalScope(scope);
                 return fbd;
         }

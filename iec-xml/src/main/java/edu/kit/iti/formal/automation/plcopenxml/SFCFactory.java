@@ -148,7 +148,7 @@ public class SFCFactory extends DefaultPOUBuilder implements PCLOpenXMLBuilder.B
             String name = action.getAttributeValue("name");
             String stCode = action.getChild("body").getChild("ST").getChildText("xhtml");
             FunctionBlockDeclaration act = new FunctionBlockDeclaration();
-            act.setFunctionBlockName(name);
+            act.setName(name);
             act.setFunctionBody(IEC61131Facade.statements(stCode));
             decl.getActions().add(act);
         }
