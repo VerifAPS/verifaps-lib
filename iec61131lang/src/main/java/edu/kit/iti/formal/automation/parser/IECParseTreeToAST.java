@@ -38,7 +38,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * @author Alexander Weigl
+ * @author Alexander Weigl, Augusto Modanese
  * @version 1 (23.06.17)
  */
 public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
@@ -433,6 +433,9 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     public Object visitMethod(IEC61131Parser.MethodContext ctx) {
         MethodDeclaration ast = new MethodDeclaration();
         ast.setName(ctx.identifier.getText());
+        if (ctx.access_specifier() != null) {
+            ast.setAccessSpecifier(AccessSpecifier.valueOf(ctx.access_specifier().getText()));
+        }
         if (ctx.returnET != null)
             ast.setReturnTypeName(ctx.returnET.getText());
         if (ctx.returnID != null)

@@ -22,8 +22,8 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -34,26 +34,13 @@ import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
+@Data
 public class MethodDeclaration extends FunctionDeclaration {
-    private ClassDeclaration classDeclaration;
+    private AccessSpecifier accessSpecifier = AccessSpecifier.defaultAccessSpecifier();
 
     @Override
     public <T> T accept(Visitor<T> visitor) {
         return null;
-    }
-
-    public LocalScope getLocalScope() {
-        return localScope;
-    }
-
-    public ClassDeclaration getClassDeclaration() {
-        return classDeclaration;
-    }
-
-    public MethodDeclaration setClassDeclaration(
-            ClassDeclaration classDeclaration) {
-        this.classDeclaration = classDeclaration;
-        return this;
     }
 
     public void setName(String n) {
@@ -63,7 +50,7 @@ public class MethodDeclaration extends FunctionDeclaration {
     @Override
     public MethodDeclaration copy() {
         MethodDeclaration md = new MethodDeclaration();
-        md.classDeclaration = classDeclaration; //no copy!
+        md.accessSpecifier = accessSpecifier;
         md.localScope = localScope.copy();
         md.functionName = functionName;
         md.returnType = returnType.copy();
