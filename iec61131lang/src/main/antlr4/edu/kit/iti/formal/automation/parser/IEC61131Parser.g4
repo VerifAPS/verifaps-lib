@@ -328,6 +328,14 @@ variable_keyword
 
 //endregion
 
+access_specifier
+:
+    PUBLIC
+    | PROTECTED
+    | INTERNAL
+    | PRIVATE
+;
+
 function_block_declaration
 :
 	FUNCTION_BLOCK identifier = IDENTIFIER
@@ -361,8 +369,10 @@ class_declaration
 methods: method*;
 method
 :
-    (PUBLIC|PRIVATE)?
-    METHOD identifier=IDENTIFIER
+    METHOD (access_specifier)?
+    (FINAL | ABSTRACT)?
+    (OVERRIDE)?
+    identifier=IDENTIFIER
     (COLON ( returnET=elementary_type_name
           	| returnID=IDENTIFIER))?
     var_decls
