@@ -558,13 +558,18 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitFunctioncall(
-            IEC61131Parser.FunctioncallContext ctx) {
-        List<Expression> expr = allOf(ctx.expression());
-        FunctionCall fc = new FunctionCall(ctx.id.getText(), expr);
-        //        Utils.setPosition(ast, ctx.id, ctx.RPAREN);
-        fc.setParameters(expr);
-        return fc.setRuleContext(ctx);
+    public Object visitInvocation(IEC61131Parser.InvocationContext ctx) {
+        Invocation i = new Invocation();
+        i.setCallee((SymbolicReference) ctx.id.accept(this));
+        if (ctx.expression().isEmpty()) {
+            // Using parameters
+            i.addParameters(allOf(ctx.param_assignment()));
+        }
+        else {
+            // Using expressions
+            i.addExpressionParameters(allOf(ctx.expression()));
+        }
+        return i.setRuleContext(ctx);
     }
 
     @Override
@@ -589,7 +594,8 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     public Object visitStatement(IEC61131Parser.StatementContext ctx) {
         return oneOf(ctx.assignment_statement(), ctx.if_statement(), ctx.exit_statement(),
                 ctx.repeat_statement(), ctx.return_statement(), ctx.while_statement(),
-                ctx.case_statement(), ctx.functionblockcall(), ctx.for_statement());
+                ctx.case_statement(), ctx.invocation_statement(),
+                ctx.for_statement());
     }
 
     @Override
@@ -637,25 +643,16 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitFunctionblockcall(
-            IEC61131Parser.FunctionblockcallContext ctx) {
-        FunctionBlockCallStatement fbcs = new FunctionBlockCallStatement();
-        fbcs.setFunctionBlockName(ctx.symbolic_variable().getText());
-        ctx.param_assignment().stream().forEach(
-                a ->
-                        fbcs.getParameters().add(
-                                (FunctionBlockCallStatement.Parameter)
-                                        a.accept(this))
-        );
-
-        //setPosition
-        return fbcs;
+    public Object visitInvocation_statement(IEC61131Parser.Invocation_statementContext ctx) {
+        InvocationStatement is = new InvocationStatement();
+        is.setInvocation((Invocation) ctx.invocation().accept(this));
+        return is;
     }
 
     @Override
     public Object visitParam_assignment(
             IEC61131Parser.Param_assignmentContext ctx) {
-        FunctionBlockCallStatement.Parameter p = new FunctionBlockCallStatement.Parameter();
+        Invocation.Parameter p = new Invocation.Parameter();
         if (ctx.ARROW_RIGHT() != null)
             p.setOutput(true);
 

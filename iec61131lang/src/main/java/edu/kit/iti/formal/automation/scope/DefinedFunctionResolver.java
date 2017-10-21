@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.scope;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.FunctionCall;
+import edu.kit.iti.formal.automation.st.ast.Invocation;
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
 
 /**
@@ -34,8 +34,8 @@ import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
 public class DefinedFunctionResolver implements FunctionResolver {
     /** {@inheritDoc} */
     @Override
-    public FunctionDeclaration resolve(FunctionCall call, LocalScope scope) {
+    public FunctionDeclaration resolve(Invocation call, LocalScope scope) {
         return scope.getGlobalScope()
-                .getFunction(call.getFunctionName());
+                .getFunction(call.getCalleeName());
     }
 }

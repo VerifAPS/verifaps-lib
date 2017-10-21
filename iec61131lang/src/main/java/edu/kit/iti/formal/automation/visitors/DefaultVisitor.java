@@ -23,7 +23,6 @@ package edu.kit.iti.formal.automation.visitors;
  */
 
 import edu.kit.iti.formal.automation.scope.LocalScope;
-import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.st.ast.*;
 
 /**
@@ -211,8 +210,8 @@ public class DefaultVisitor<T> implements Visitor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T visit(FunctionCall functionCall) {
-        return defaultVisit(functionCall);
+    public T visit(Invocation invocation) {
+        return defaultVisit(invocation);
     }
 
     /**
@@ -267,7 +266,7 @@ public class DefaultVisitor<T> implements Visitor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T visit(FunctionBlockCallStatement fbc) {
+    public T visit(InvocationStatement fbc) {
         return defaultVisit(fbc);
     }
 
@@ -396,7 +395,7 @@ public class DefaultVisitor<T> implements Visitor<T> {
     }
 
     @Override
-    public T visit(FunctionBlockCallStatement.Parameter parameter) {
-        return null;
+    public T visit(Invocation.Parameter parameter) {
+        return defaultVisit(parameter);
     }
 }

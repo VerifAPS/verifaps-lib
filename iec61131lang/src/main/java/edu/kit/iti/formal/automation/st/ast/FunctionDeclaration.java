@@ -37,7 +37,8 @@ import lombok.ToString;
  */
 @EqualsAndHashCode
 @ToString
-public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Function_declarationContext> {
+public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Function_declarationContext>
+        implements Invocable {
     protected IdentifierPlaceHolder<Any> returnType = new IdentifierPlaceHolder<>();
     protected String functionName;
     protected StatementList statements = new StatementList();
@@ -51,6 +52,8 @@ public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Fun
     }
 
     public String getReturnTypeName() {
+        if (returnType.getIdentifier() == null)
+            return "VOID";
         return returnType.getIdentifier();
     }
 

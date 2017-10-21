@@ -53,7 +53,7 @@ public abstract class StatementListModifier extends AstVisitor<Object> {
 	}
 
 	@Override
-	public Object visit(final FunctionBlockCallStatement fbCallStmt) {
+	public Object visit(final InvocationStatement fbCallStmt) {
 		_addToCurrentList(fbCallStmt);
 		return super.visit(fbCallStmt);
 	}
