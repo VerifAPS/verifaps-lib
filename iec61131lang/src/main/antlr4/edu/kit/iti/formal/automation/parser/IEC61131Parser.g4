@@ -355,15 +355,14 @@ interface_declaration
 
 class_declaration
 :
-	(FUNCTION_BLOCK) identifier=IDENTIFIER
+	CLASS
+    (FINAL | ABSTRACT)?
+	identifier=IDENTIFIER
 	(EXTENDS inherit=IDENTIFIER)?
-	(IMPLEMENTS interfaces=IDENTIFIER)*
-
+	(IMPLEMENTS interfaces=identifier_list)?
 	var_decls
-
 	methods
-
-	END_FUNCTION_BLOCK
+	END_CLASS
 ;
 
 methods: method*;
