@@ -346,7 +346,7 @@ function_block_declaration
 interface_declaration
 :
     INTERFACE identifier=IDENTIFIER
-	(EXTENDS sp=IDENTIFIER)?
+	(EXTENDS sp=identifier_list)?
 	var_decls
 	methods
 	END_INTERFACE

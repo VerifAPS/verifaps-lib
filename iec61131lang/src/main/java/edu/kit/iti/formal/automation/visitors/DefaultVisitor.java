@@ -376,6 +376,11 @@ public class DefaultVisitor<T> implements Visitor<T> {
     }
 
     @Override
+    public T visit(InterfaceDeclaration interfaceDeclaration) {
+        return defaultVisit(interfaceDeclaration);
+    }
+
+    @Override
     public T visit(ClassDeclaration clazz) {
         return defaultVisit(clazz);
     }
