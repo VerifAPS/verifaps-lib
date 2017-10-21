@@ -368,6 +368,7 @@ public interface Visitor<T> {
      */
     T visit(IdentifierInitializer init);
 
+    T visit(InterfaceDeclaration interfaceDeclaration);
 
     T visit(ClassDeclaration clazz);
 
