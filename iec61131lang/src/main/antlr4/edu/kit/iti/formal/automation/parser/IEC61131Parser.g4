@@ -375,6 +375,8 @@ methods: method*;
 method
 :
     METHOD (access_specifier)?
+    (FINAL | ABSTRACT)?
+    (OVERRIDE)?
     identifier=IDENTIFIER
     (COLON ( returnET=elementary_type_name
           	| returnID=IDENTIFIER))?

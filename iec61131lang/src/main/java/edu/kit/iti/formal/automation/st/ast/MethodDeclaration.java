@@ -37,6 +37,9 @@ import lombok.ToString;
 @Data
 public class MethodDeclaration extends FunctionDeclaration {
     private AccessSpecifier accessSpecifier = AccessSpecifier.defaultAccessSpecifier();
+    private boolean final_ = false;
+    private boolean abstract_ = false;
+    private boolean override = false;
 
     @Override
     public <T> T accept(Visitor<T> visitor) {
@@ -51,6 +54,9 @@ public class MethodDeclaration extends FunctionDeclaration {
     public MethodDeclaration copy() {
         MethodDeclaration md = new MethodDeclaration();
         md.accessSpecifier = accessSpecifier;
+        md.final_ = final_;
+        md.abstract_ = abstract_;
+        md.override = override;
         md.localScope = localScope.copy();
         md.functionName = functionName;
         md.returnType = returnType.copy();

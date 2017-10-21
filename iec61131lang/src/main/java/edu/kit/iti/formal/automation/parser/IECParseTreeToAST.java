@@ -439,6 +439,9 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         if (ctx.access_specifier() != null) {
             ast.setAccessSpecifier(AccessSpecifier.valueOf(ctx.access_specifier().getText()));
         }
+        ast.setFinal_(ctx.FINAL() != null);
+        ast.setAbstract_(ctx.ABSTRACT() != null);
+        ast.setOverride(ctx.OVERRIDE() != null);
         if (ctx.returnET != null)
             ast.setReturnTypeName(ctx.returnET.getText());
         if (ctx.returnID != null)
