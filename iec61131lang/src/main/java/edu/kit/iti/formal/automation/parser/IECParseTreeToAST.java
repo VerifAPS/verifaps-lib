@@ -573,6 +573,7 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
                 (Reference) ctx.a.accept(this),
                 (Expression) ctx.expression().accept(this));
         ast.setReference(ctx.RASSIGN() != null);
+        ast.setAssignmentAttempt(ctx.ASSIGN_ATTEMPT() != null);
         //setPosition(ast, ctx.ctx);
         return ast;
     }
