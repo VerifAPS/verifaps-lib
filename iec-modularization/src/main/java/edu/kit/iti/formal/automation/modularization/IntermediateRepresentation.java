@@ -91,7 +91,7 @@ public final class IntermediateRepresentation extends AstVisitor<Object> {
 
 	public final Map<Statement, GraphNode<Statement>> pdg = new HashMap<>();
 
-	public final Map<FunctionBlockCallStatement, FunctionBlockInstance.CallSite>
+	public final Map<InvocationStatement, FunctionBlockInstance.CallSite>
 			callSites = new HashMap<>();
 
 	private GraphNode<Statement> _createNode(final Statement statement) {
@@ -145,7 +145,7 @@ public final class IntermediateRepresentation extends AstVisitor<Object> {
 	}
 
 	@Override
-	public final Object visit(final FunctionBlockCallStatement fbCallStmt) {
+	public final Object visit(final InvocationStatement fbCallStmt) {
 
 		final FunctionBlockInstance          fbInstance =
 				functionBlock.fbInstances.get(fbCallStmt.getCalleeName());

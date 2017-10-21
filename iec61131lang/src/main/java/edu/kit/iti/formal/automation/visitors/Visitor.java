@@ -24,7 +24,6 @@ package edu.kit.iti.formal.automation.visitors;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 
@@ -203,10 +202,10 @@ public interface Visitor<T> {
     /**
      * <p>accept.</p>
      *
-     * @param functionCall a {@link edu.kit.iti.formal.automation.st.ast.FunctionCall} object.
+     * @param invocation a {@link Invocation} object.
      * @return a T object.
      */
-    T visit(FunctionCall functionCall);
+    T visit(Invocation invocation);
 
     /**
      * <p>accept.</p>
@@ -259,10 +258,10 @@ public interface Visitor<T> {
     /**
      * <p>accept.</p>
      *
-     * @param functionBlockCallStatement a {@link FunctionBlockCallStatement} object.
+     * @param invocationStatement a {@link InvocationStatement} object.
      * @return a T object.
      */
-    T visit(FunctionBlockCallStatement functionBlockCallStatement);
+    T visit(InvocationStatement invocationStatement);
 
     /**
      * <p>accept.</p>
@@ -376,5 +375,5 @@ public interface Visitor<T> {
 
     T visit(Literal literal);
 
-    T visit(FunctionBlockCallStatement.Parameter parameter);
+    T visit(Invocation.Parameter parameter);
 }

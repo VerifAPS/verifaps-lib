@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.modularization;
  */
 
 import edu.kit.iti.formal.automation.datatypes.AnyBit;
-import edu.kit.iti.formal.automation.st.ast.FunctionBlockCallStatement;
+import edu.kit.iti.formal.automation.st.ast.InvocationStatement;
 import edu.kit.iti.formal.automation.st.ast.Statement;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 
@@ -36,12 +36,12 @@ public final class FunctionBlockInstance {
 		private CallSiteLink _link = null;
 
 		public final int                        id;
-		public final FunctionBlockCallStatement fbCallStmt;
+		public final InvocationStatement fbCallStmt;
 		public final FunctionBlockInstance      instance;
 		public final GraphNode<CallSite>        csNode;
 		public final VariableDeclaration        activationBit;
 
-		public CallSite(final FunctionBlockCallStatement fbCallStmt) {
+		public CallSite(final InvocationStatement fbCallStmt) {
 
 			this.id            = callSites.size();
 			this.fbCallStmt    = fbCallStmt;
@@ -71,7 +71,7 @@ public final class FunctionBlockInstance {
 				checked.add(node);
 
 				if(node != firstNode &&
-						node.element instanceof FunctionBlockCallStatement) {
+						node.element instanceof InvocationStatement) {
 					csNode.addPredecessor(
 							ir.callSites.get(node.element).csNode);
 				} else {

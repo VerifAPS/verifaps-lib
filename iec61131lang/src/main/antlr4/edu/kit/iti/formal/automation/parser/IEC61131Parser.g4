@@ -623,17 +623,18 @@ primary_expression
 :
 	constant
 	| v=variable
-	| functioncall
+	| invocation
 ;
 
 /////////MARKER
-
-functioncall
-
+invocation
 :
-	id=IDENTIFIER LPAREN
+	id=symbolic_variable LPAREN
 	(
-		expression (COMMA expression)*
+		(
+            (expression (COMMA expression)*)
+            | (param_assignment (COMMA param_assignment)*)
+		)
 	)? RPAREN
 ;
 
@@ -645,7 +646,7 @@ statement_list
 statement
 :
 	  assignment_statement SEMICOLON
-   	| functionblockcall SEMICOLON
+   	| invocation_statement SEMICOLON
 	| return_statement SEMICOLON
 	| if_statement
     | case_statement
@@ -660,6 +661,12 @@ assignment_statement
 :
 	a=variable (ASSIGN_ATTEMPT|RASSIGN|ASSIGN) expression
 ;
+
+invocation_statement
+:
+    invocation
+;
+
 
 variable
 
@@ -697,18 +704,6 @@ direct_variable
 ;
 
 return_statement : RETURN;
-
-functionblockcall
-
-:
-	symbolic_variable LPAREN
-	(
-		param_assignment
-		(
-			COMMA param_assignment
-		)*
-	)? RPAREN
-;
 
 param_assignment
 :

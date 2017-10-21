@@ -49,12 +49,12 @@ public final class SymbExFacade {
         SymbolicExecutioner se = new SymbolicExecutioner();
         SymbolicState state = new SymbolicState();
         // <name>(i1,i2,i2,...)
-        FunctionCall fc = new FunctionCall();
-        fc.setFunctionName(decl.getFunctionName());
+        Invocation fc = new Invocation();
+        fc.setCalleeName(decl.getFunctionName());
         int i = 0;
         for (VariableDeclaration vd : decl.getLocalScope()
                 .filterByFlags(VariableDeclaration.INPUT)) {
-            fc.getParameters().add(new SymbolicReference(vd.getName()));
+            fc.getParameters().add(new Invocation.Parameter(new SymbolicReference(vd.getName())));
             state.put(se.lift(vd), ts.get(i++));
         }
         se.push(state);

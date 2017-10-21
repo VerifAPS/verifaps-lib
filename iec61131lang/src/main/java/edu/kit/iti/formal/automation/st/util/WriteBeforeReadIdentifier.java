@@ -106,16 +106,16 @@ public class WriteBeforeReadIdentifier extends AstVisitor<WriteBeforeReadIdentif
 
     /** {@inheritDoc} */
     @Override
-    public WBRState visit(FunctionBlockCallStatement fbc) {
+    public WBRState visit(InvocationStatement fbc) {
         WBRState state = new WBRState();
 
-        for (FunctionBlockCallStatement.Parameter in : fbc.getParameters())
+        for (Invocation.Parameter in : fbc.getParameters())
             if (!in.isOutput()) {
                 WBRState s = in.getExpression().accept(this);
                 state.add(s);
             }
 
-        for (FunctionBlockCallStatement.Parameter in : fbc.getParameters())
+        for (Invocation.Parameter in : fbc.getParameters())
             if (in.isOutput())
                 state.write(in.getName());
 
