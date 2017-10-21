@@ -80,7 +80,7 @@ public class STSimplifier {
                 state.theProgram = (ProgramDeclaration) tle;
             } else if (tle instanceof FunctionBlockDeclaration) {
                 FunctionBlockDeclaration declaration = (FunctionBlockDeclaration) tle;
-                state.functionBlocks.put(declaration.getFunctionBlockName(), declaration);
+                state.functionBlocks.put(declaration.getName(), declaration);
             } else if (tle instanceof TypeDeclarations) {
                 TypeDeclarations typeDeclarations = (TypeDeclarations) tle;
                 appendTypeDeclarations(typeDeclarations);

@@ -58,7 +58,7 @@ public class BuildSFCModel {
         for (FunctionBlockDeclaration adecl :
                 decl.getActions()) {
             SFCAction action = new SFCAction();
-            action.name = adecl.getFunctionBlockName();
+            action.name = adecl.getName();
             action.statements = adecl.getFunctionBody();
             model.addAction(action);
         }

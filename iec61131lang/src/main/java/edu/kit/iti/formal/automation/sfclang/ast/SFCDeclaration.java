@@ -152,7 +152,7 @@ public class SFCDeclaration extends TopLevelScopeElement {
      */
     public Collection<? extends Statement> getAction(String action) {
         Optional<FunctionBlockDeclaration> fb = getActions().stream()
-                .filter(a -> a.getFunctionBlockName().equals(action)).findFirst();
+                .filter(a -> a.getName().equals(action)).findFirst();
 
         if (fb.isPresent()) {
             return fb.get().getFunctionBody();
