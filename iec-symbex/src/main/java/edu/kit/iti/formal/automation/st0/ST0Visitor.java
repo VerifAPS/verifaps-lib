@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.st0;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 
@@ -72,8 +71,8 @@ public abstract class ST0Visitor<T> extends DefaultVisitor<T> {
     }
 
     @Override
-    public T visit(FunctionCall functionCall) {
-        return super.visit(functionCall);
+    public T visit(Invocation invocation) {
+        return super.visit(invocation);
     }
 
     @Override
@@ -82,7 +81,7 @@ public abstract class ST0Visitor<T> extends DefaultVisitor<T> {
     }
 
     @Override
-    public T visit(FunctionBlockCallStatement fbc) {
+    public T visit(InvocationStatement fbc) {
         return super.visit(fbc);
     }
 

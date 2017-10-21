@@ -275,19 +275,19 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     }
 
     @Override
-    public T visit(FunctionCall functionCall) {
-        functionCall.getParameters().forEach(e -> e.accept(this));
-        return super.visit(functionCall);
+    public T visit(Invocation invocation) {
+        invocation.getParameters().forEach(e -> e.accept(this));
+        return super.visit(invocation);
     }
 
     @Override
-    public T visit(FunctionBlockCallStatement fbc) {
-        fbc.getParameters().forEach(p -> p.accept(this));
+    public T visit(InvocationStatement fbc) {
+        fbc.getInvocation().accept(this);
         return super.visit(fbc);
     }
 
     @Override
-    public T visit(FunctionBlockCallStatement.Parameter parameter) {
+    public T visit(Invocation.Parameter parameter) {
         parameter.getExpression().accept(this);
         return super.visit(parameter);
     }

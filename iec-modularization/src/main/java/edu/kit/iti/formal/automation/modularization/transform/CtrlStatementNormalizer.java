@@ -22,9 +22,7 @@ package edu.kit.iti.formal.automation.modularization.transform;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.operators.Operators;
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 
@@ -131,7 +129,7 @@ public final class CtrlStatementNormalizer extends AstVisitor<Object> {
 	}
 
 	@Override
-	public final Object visit(final FunctionBlockCallStatement fcCallStmt) {
+	public final Object visit(final InvocationStatement fcCallStmt) {
 		return fcCallStmt;
 	}
 

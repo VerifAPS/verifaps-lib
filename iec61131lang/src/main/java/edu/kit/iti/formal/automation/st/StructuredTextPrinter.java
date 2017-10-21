@@ -408,9 +408,27 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(FunctionCall functionCall) {
-        // TODO
-        sb.append(functionCall.getFunctionName()).append("(").append(")");
+    public Object visit(Invocation invocation) {
+        sb.append(invocation.getCalleeName()).append("(");
+
+        boolean params = false;
+        for (Invocation.Parameter entry : invocation.getParameters()) {
+            if (entry.getName() != null) {
+                sb.append(entry.getName());
+                if (entry.isOutput())
+                    sb.append(" => ");
+                else
+                    sb.append(" := ");
+            }
+
+            entry.getExpression().accept(this);
+            sb.append(", ");
+            params = true;
+        }
+
+        if (params)
+            sb.deleteLast(2);
+        sb.append(");");
         return null;
     }
 
@@ -491,28 +509,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(FunctionBlockCallStatement fbc) {
+    public Object visit(InvocationStatement fbc) {
         sb.nl();
-        sb.append(fbc.getFunctionBlockName()).append("(");
-
-        boolean params = false;
-        for (FunctionBlockCallStatement.Parameter entry : fbc.getParameters()) {
-            if (entry.getName() != null) {
-                sb.append(entry.getName());
-                if (entry.isOutput())
-                    sb.append(" => ");
-                else
-                    sb.append(" := ");
-            }
-
-            entry.getExpression().accept(this);
-            sb.append(", ");
-            params = true;
-        }
-
-        if (params)
-            sb.deleteLast(2);
-        sb.append(");");
+        fbc.getInvocation().accept(this);
         return null;
     }
 

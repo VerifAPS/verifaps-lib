@@ -55,7 +55,7 @@ public class ECoreXMLGenerator {
 		new ECoreXMLGenerator(Top.class, AssignmentStatement.class, BinaryExpression.class, CaseCondition.class,
 				CaseStatement.class, CommentStatement.class, ConfigurationDeclaration.class, Deref.class,
 				DirectVariable.class, ExitStatement.class, Expression.class, ExpressionList.class, ForStatement.class,
-				FunctionBlockDeclaration.class, FunctionCall.class, FunctionBlockCallStatement.class, GuardedStatement.class,
+				FunctionBlockDeclaration.class, Invocation.class, InvocationStatement.class, GuardedStatement.class,
 				Location.class, Reference.class, RepeatStatement.class, ResourceDeclaration.class,
 				ReturnStatement.class, Statement.class, SymbolicReference.class, TopLevelScopeElement.class,
 				UnaryExpression.class, IfStatement.class, WhileStatement.class).run();

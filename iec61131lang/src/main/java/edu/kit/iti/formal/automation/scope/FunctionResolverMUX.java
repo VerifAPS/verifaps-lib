@@ -43,12 +43,12 @@ public class FunctionResolverMUX implements FunctionResolver {
      * {@inheritDoc}
      */
     @Override
-    public FunctionDeclaration resolve(FunctionCall call, LocalScope scope) {
-        if ("MUX".equals(call.getFunctionName())) {
+    public FunctionDeclaration resolve(Invocation call, LocalScope scope) {
+        if ("MUX".equals(call.getCalleeName())) {
 
-            List<Any> datatypes = call.getParameters().stream().map((expr) -> {
+            List<Any> datatypes = call.getParameters().stream().map((parameter) -> {
                 try {
-                    return expr.dataType(scope);
+                    return parameter.getExpression().dataType(scope);
                 } catch (VariableNotDefinedException variableNotDefinedinScope) {
                     variableNotDefinedinScope.printStackTrace();
                 } catch (TypeConformityException e) {

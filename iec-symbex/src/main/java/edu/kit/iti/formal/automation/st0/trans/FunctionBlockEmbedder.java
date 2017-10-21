@@ -24,7 +24,6 @@ package edu.kit.iti.formal.automation.st0.trans;
 
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
-import edu.kit.iti.formal.automation.st.util.AstVisitor;
 
 import java.util.function.Function;
 
@@ -77,7 +76,7 @@ public class FunctionBlockEmbedder extends AstMutableVisitor {
     }
 
     @Override
-    public Object visit(FunctionBlockCallStatement fbc) {
+    public Object visit(InvocationStatement fbc) {
         if (!instanceName.equals(fbc.getCalleeName())) {
             return super.visit(fbc); // I am not caring about this instance.
         }
@@ -91,7 +90,7 @@ public class FunctionBlockEmbedder extends AstMutableVisitor {
             ));
         });
 
-        sl.add(CommentStatement.box("Call of %s:%s", instanceName, fbc.getFunctionBlockName()));
+        sl.add(CommentStatement.box("Call of %s:%s", instanceName, fbc.getCalleeName()));
         sl.addAll(this.toEmbedd);
         fbc.getOutputParameters().forEach(p -> {
             String name = renameVariable.apply(p.getName());

@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.st.util;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
@@ -184,11 +183,11 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(FunctionCall functionCall) {
-        List<Expression> list = new ArrayList<>();
-        list.addAll(functionCall.getParameters());
-        functionCall.setParameters(list);
-        return functionCall;
+    public Object visit(Invocation invocation) {
+        invocation.setCallee((SymbolicReference) invocation.getCallee().accept(this));
+        invocation.setParameters(invocation.getParameters().stream()
+                .map(p -> (Invocation.Parameter) p.accept(this)).collect(Collectors.toList()));
+        return invocation;
     }
 
     /**
@@ -240,16 +239,13 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(FunctionBlockCallStatement fbc) {
-        fbc.setParameters(
-                fbc.getParameters().stream()
-                        .map(p -> (FunctionBlockCallStatement.Parameter) p.accept(this))
-                        .collect(Collectors.toList()));
+    public Object visit(InvocationStatement fbc) {
+        fbc.setInvocation((Invocation) fbc.getInvocation().accept(this));
         return fbc;
     }
 
     @Override
-    public Object visit(FunctionBlockCallStatement.Parameter parameter) {
+    public Object visit(Invocation.Parameter parameter) {
         parameter.setExpression((Expression) parameter.getExpression().accept(this));
         return parameter;
     }

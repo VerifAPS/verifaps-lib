@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.modularization.transform;
 
 import edu.kit.iti.formal.automation.modularization.StatementListModifier;
 import edu.kit.iti.formal.automation.st.ast.AssignmentStatement;
-import edu.kit.iti.formal.automation.st.ast.FunctionBlockCallStatement;
+import edu.kit.iti.formal.automation.st.ast.InvocationStatement;
 import edu.kit.iti.formal.automation.st.ast.StatementList;
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
 
@@ -37,7 +37,7 @@ public final class FunctionCallParamRemover extends StatementListModifier {
 	}
 
 	public final StatementList visit(
-			final FunctionBlockCallStatement fbCallStmt) {
+			final InvocationStatement fbCallStmt) {
 
 		//assert fbCallStmt.getOutputParameters().count() == 0;
 

@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -36,7 +37,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode
 @ToString
-public class FunctionBlockDeclaration extends ClassDeclaration {
+public class FunctionBlockDeclaration extends ClassDeclaration implements Invocable {
     private StatementList functionBody = new StatementList();
 
     /**
@@ -70,6 +71,11 @@ public class FunctionBlockDeclaration extends ClassDeclaration {
     @Override
     public String getIdentifier() {
         return getName();
+    }
+
+    @Override
+    public Any getReturnType() {
+        return null;  // no return value when invoking function blocks
     }
 
     @Override

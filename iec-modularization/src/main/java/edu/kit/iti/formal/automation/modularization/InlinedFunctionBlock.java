@@ -74,7 +74,7 @@ public final class InlinedFunctionBlock {
 		}
 
 		@Override
-		public final Object visit(final FunctionBlockCallStatement fbCallStmt) {
+		public final Object visit(final InvocationStatement fbCallStmt) {
 
 			final FunctionBlockInstance.CallSite callSite   =
 					original.ir.callSites.get(fbCallStmt);

@@ -80,7 +80,7 @@ public class GlobalScope implements Serializable {
     }
 
     /**
-     * <p>getFunction.</p>
+     * <p>getInvoked.</p>
      *
      * @param key a {@link java.lang.Object} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
@@ -168,14 +168,14 @@ public class GlobalScope implements Serializable {
     /**
      * <p>resolveFunction.</p>
      *
-     * @param functionCall a {@link edu.kit.iti.formal.automation.st.ast.FunctionCall} object.
+     * @param invocation a {@link Invocation} object.
      * @param local        a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
      */
-    public FunctionDeclaration resolveFunction(FunctionCall functionCall,
+    public FunctionDeclaration resolveFunction(Invocation invocation,
             LocalScope local) {
         for (FunctionResolver fr : functionResolvers) {
-            FunctionDeclaration decl = fr.resolve(functionCall, local);
+            FunctionDeclaration decl = fr.resolve(invocation, local);
             if (decl != null)
                 return decl;
         }
