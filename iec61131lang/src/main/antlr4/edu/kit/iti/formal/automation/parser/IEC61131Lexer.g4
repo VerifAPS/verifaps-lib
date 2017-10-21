@@ -745,6 +745,11 @@ ASSIGN
 
 RASSIGN : 'REF=' ;//| '&=';
 
+ASSIGN_ATTEMPT
+:
+    '?='
+;
+
 
 COMMA
 :
