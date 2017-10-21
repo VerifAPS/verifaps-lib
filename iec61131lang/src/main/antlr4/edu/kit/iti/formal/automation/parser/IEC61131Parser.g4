@@ -653,7 +653,7 @@ statement
 assignment_statement
 
 :
-	a=variable (RASSIGN|ASSIGN) expression
+	a=variable (ASSIGN_ATTEMPT|RASSIGN|ASSIGN) expression
 ;
 
 variable
