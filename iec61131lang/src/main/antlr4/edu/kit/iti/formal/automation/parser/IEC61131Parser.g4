@@ -35,6 +35,7 @@ constant
 	| datetime
 	| cast
 	| bits
+	| ref_null
 ;
 
 cast 
@@ -81,6 +82,11 @@ date
 datetime
 :
 	DATETIME
+;
+
+ref_null
+:
+    NULL
 ;
 
 data_type_name
@@ -182,6 +188,7 @@ type_declaration
 	| string_type_declaration
 	| subrange_spec_init
 	| structure_declaration
+	| reference_specification
 	| data_type_name
 	  ( R_EDGE
 	  | F_EDGE
@@ -198,6 +205,7 @@ initializations
     | IDENTIFIER #initializations_identifier
     | array_initialization #initializations_array_initialization
     | structure_initialization #initializations_structure_initialization
+    | invocation #initializations_invocation
 ;
 
 subrange_spec_init
@@ -280,6 +288,10 @@ string_type_declaration
 	( LBRACKET integer RBRACKET )?
 ;
 
+reference_specification
+:
+    REF_TO type_declaration
+;
 
 identifier_list
 :

@@ -398,4 +398,9 @@ public class DefaultVisitor<T> implements Visitor<T> {
     public T visit(Invocation.Parameter parameter) {
         return defaultVisit(parameter);
     }
+
+    @Override
+    public T visit(ReferenceSpecification referenceSpecification) {
+        return defaultVisit(referenceSpecification);
+    }
 }

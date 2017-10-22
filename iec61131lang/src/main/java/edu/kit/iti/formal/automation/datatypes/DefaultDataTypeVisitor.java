@@ -93,6 +93,11 @@ public abstract class DefaultDataTypeVisitor<T> implements DataTypeVisitor<T> {
     }
 
     @Override
+    public T visit(ReferenceType referenceType) {
+        return null;
+    }
+
+    @Override
     public T visit(IECString.String string) {
         return null;
     }
