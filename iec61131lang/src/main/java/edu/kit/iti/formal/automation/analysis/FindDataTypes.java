@@ -28,7 +28,7 @@ import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import lombok.RequiredArgsConstructor;
 
 /**
- * @author Alexander Weigl
+ * @author Alexander Weigl, Augusto Modanese
  * @version 1 (25.06.17)
  */
 @RequiredArgsConstructor
@@ -75,6 +75,12 @@ public class FindDataTypes extends DefaultVisitor<Object> {
     public Object visit(ClassDeclaration clazz) {
         globalScope.registerClass(clazz);
         return super.visit(clazz);
+    }
+
+    @Override
+    public Object visit(InterfaceDeclaration interfaceDeclaration) {
+        globalScope.registerInterface(interfaceDeclaration);
+        return super.visit(interfaceDeclaration);
     }
 
     /**

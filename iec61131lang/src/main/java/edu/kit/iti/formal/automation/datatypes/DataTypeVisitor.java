@@ -25,7 +25,7 @@ package edu.kit.iti.formal.automation.datatypes;
 
 /**
  * @param <T> return type
- * @author Alexander Weigl
+ * @author Alexander Weigl, Augusto Modanese
  */
 
 public interface DataTypeVisitor<T> {
@@ -171,5 +171,9 @@ public interface DataTypeVisitor<T> {
 
     default T visit(ClassDataType classDataType) {
         return defaultVisit(classDataType);
+    }
+
+    default T visit(InterfaceDataType interfaceDataType) {
+        return defaultVisit(interfaceDataType);
     }
 }
