@@ -22,8 +22,11 @@
 
 package edu.kit.iti.formal.automation.st.ast;
 
+import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyReference;
 import edu.kit.iti.formal.automation.datatypes.ReferenceType;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -41,15 +44,16 @@ public class ReferenceSpecification extends TypeDeclaration<Initialization> {
     public ReferenceSpecification() {
     }
 
-    public ReferenceSpecification(TypeDeclaration refTo) {
-        this.refTo = refTo;
+    @Override
+    public String getTypeName() {
+        return "REF_TO "  + refTo.getTypeName();
     }
 
     @Override
     public ReferenceType getDataType(GlobalScope globalScope) {
-        ReferenceType pt = new ReferenceType(super.getDataType(globalScope));
-        baseType = pt;
-        return pt;
+        ReferenceType rt = new ReferenceType(globalScope.resolveDataType(refTo.getTypeName()));
+        baseType = rt;
+        return rt;
     }
 
     public <T> T accept(Visitor<T> visitor) {
@@ -58,6 +62,9 @@ public class ReferenceSpecification extends TypeDeclaration<Initialization> {
 
     @Override
     public ReferenceSpecification copy() {
-        return new ReferenceSpecification(refTo.copy());
+        ReferenceSpecification rs = new ReferenceSpecification();
+        rs.refTo = refTo;
+        rs.baseType = baseType;
+        return rs;
     }
 }

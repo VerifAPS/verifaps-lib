@@ -23,21 +23,22 @@ package edu.kit.iti.formal.automation.scope;
  */
 
 import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
-import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.ClassDataType;
-import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
+import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.st.ast.*;
+import lombok.ToString;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
  * Created by weigl on 24.11.16.
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
+@ToString
 public class GlobalScope implements Serializable {
     private Map<String, ProgramDeclaration> programs = new HashMap<>();
     private Map<String, FunctionBlockDeclaration> fb = new HashMap<>();
@@ -46,6 +47,7 @@ public class GlobalScope implements Serializable {
     private List<FunctionResolver> functionResolvers = new LinkedList<>();
     private TypeScope types = TypeScope.builtin();
     private Map<String, ClassDeclaration> classes = new LinkedHashMap<>();
+    private Map<String, InterfaceDeclaration> interfaces = new LinkedHashMap<>();
 
     /**
      * <p>defaultScope.</p>
@@ -77,6 +79,10 @@ public class GlobalScope implements Serializable {
      */
     public FunctionBlockDeclaration getFunctionBlock(Object key) {
         return fb.get(key);
+    }
+
+    public List<FunctionBlockDeclaration> getFunctionBlocks() {
+        return new ArrayList<>(fb.values());
     }
 
     /**
@@ -138,6 +144,7 @@ public class GlobalScope implements Serializable {
         boolean a = fb.containsKey(name);
         boolean b = dataTypes.containsKey(name);
         boolean c = classes.containsKey(name);
+        boolean d = interfaces.containsKey(name);
 
         if (a && b || a && c || b && c) {
             System.out.println("ambguity fb vs. type");
@@ -161,6 +168,16 @@ public class GlobalScope implements Serializable {
             types.put(name, q);
             return q;
         }
+
+        if (d) {
+            q = new InterfaceDataType(interfaces.get(name));
+            types.put(name, q);
+            return q;
+        }
+
+        // Reference
+        if (name.length() > 7 && name.substring(0, 7).equals("REF_TO "))
+            return new ReferenceType(resolveDataType(name.substring(7)));
 
         throw new DataTypeNotDefinedException("Could not find: " + name);
     }
@@ -194,6 +211,22 @@ public class GlobalScope implements Serializable {
 
     public ClassDeclaration resolveClass(String key) {
         return classes.get(key);
+    }
+
+    public List<ClassDeclaration> getClasses() {
+        return new ArrayList<>(classes.values());
+    }
+
+    public void registerInterface(InterfaceDeclaration interfaceDeclaration) {
+        interfaces.put(interfaceDeclaration.getName(), interfaceDeclaration);
+    }
+
+    public InterfaceDeclaration resolveInterface(String key) {
+        return interfaces.get(key);
+    }
+
+    public List<InterfaceDeclaration> getInterfaces() {
+        return new ArrayList<>(interfaces.values());
     }
 
     public GlobalScope clone() {
