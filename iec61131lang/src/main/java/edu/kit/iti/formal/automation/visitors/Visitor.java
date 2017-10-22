@@ -376,4 +376,6 @@ public interface Visitor<T> {
     T visit(Literal literal);
 
     T visit(Invocation.Parameter parameter);
+
+    T visit(ReferenceSpecification referenceSpecification);
 }

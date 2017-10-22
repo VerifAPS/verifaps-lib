@@ -168,6 +168,10 @@ public class Literal extends Initialization {
         return integer(new CommonToken(-1, "" + Math.abs(val)), val < 0);
     }
 
+    public static Literal ref_null(Token symbol) {
+        return new Literal(AnyReference.ANY_REF, symbol);
+    }
+
     public Any getDataType() {
         return dataType.getIdentifiedObject();
     }

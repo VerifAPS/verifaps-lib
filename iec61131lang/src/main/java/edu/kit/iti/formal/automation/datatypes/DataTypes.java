@@ -101,6 +101,8 @@ public class DataTypes {
         map.put("TOD", AnyDate.TIME_OF_DAY);
         map.put("DT", AnyDate.DATE_AND_TIME);
         map.put("T", TimeType.TIME_TYPE);
+
+        map.put("VOID", AnyReference.ANY_REF);
     }
 
     static void add(Any any) {

@@ -65,6 +65,7 @@ public class TypeScope extends TreeMap<String, Any> {
         e.register(AnyDate.TIME_OF_DAY, AnyDate.DATE_AND_TIME, AnyDate.DATE,
                 TimeType.TIME_TYPE);
         e.register(AnyReal.REAL, AnyReal.LREAL);
+        e.register("VOID", null);
         return e;
     }
 
@@ -76,6 +77,10 @@ public class TypeScope extends TreeMap<String, Any> {
     public void register(Any... any) {
         for (Any a : any)
             put(a.getName(), a);
+    }
+
+    public void register(String name, Any type) {
+        put(name, type);
     }
 
     public TypeScope clone() {
