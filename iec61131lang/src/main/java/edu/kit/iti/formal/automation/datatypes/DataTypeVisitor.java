@@ -61,6 +61,10 @@ public interface DataTypeVisitor<T> {
         return defaultVisit(date);
     }
 
+    default T visit(AnyReference reference) {
+        return defaultVisit(reference);
+    }
+
     default T visit(AnyInt anyInt) {
         return visit((AnyNum) anyInt);
     }
@@ -143,6 +147,10 @@ public interface DataTypeVisitor<T> {
 
     default T visit(PointerType pointerType) {
         return defaultVisit(pointerType);
+    }
+
+    default T visit(ReferenceType referenceType) {
+        return defaultVisit(referenceType);
     }
 
     default T visit(IECString.String string) {

@@ -128,6 +128,13 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitRef_null(IEC61131Parser.Ref_nullContext ctx) {
+        Literal ast = Literal.ref_null(ctx.NULL().getSymbol());
+        ast.setRuleContext(ctx);
+        return ast;
+    }
+
+    @Override
     public Object visitData_type_declaration(
             IEC61131Parser.Data_type_declarationContext ctx) {
         TypeDeclarations ast = new TypeDeclarations();
@@ -172,7 +179,8 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         TypeDeclaration<Initialization> t = oneOf(
                 ctx.array_specification(), ctx.enumerated_specification(),
                 ctx.string_type_declaration(), ctx.subrange_spec_init(),
-                ctx.structure_declaration(), ctx.data_type_name());
+                ctx.structure_declaration(), ctx.reference_specification(),
+                ctx.data_type_name());
 
         if (ctx.i != null) {
             t.setInitialization((Initialization) ctx.i.accept(this));
@@ -277,6 +285,14 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         ast.setRuleContext(ctx);
 
         ast.addField(ctx.I.getText(), (Initialization) ctx.i.accept(this));
+        return ast;
+    }
+
+    @Override
+    public Object visitReference_specification(IEC61131Parser.Reference_specificationContext ctx) {
+        ReferenceSpecification ast = new ReferenceSpecification();
+        ast.setRuleContext(ctx);
+        ast.setRefTo((TypeDeclaration) ctx.type_declaration().accept(this));
         return ast;
     }
 

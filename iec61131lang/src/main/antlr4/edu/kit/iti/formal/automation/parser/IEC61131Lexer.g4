@@ -880,6 +880,11 @@ FALSE
 	F A L S E
 ;
 
+NULL
+:
+    N U L L
+;
+
 SEMICOLON
 :
 	';'
@@ -937,6 +942,7 @@ PRIVATE : P R I V A T E;
 SUPER : S U P E R;
 THIS : T H I S;
 EXTENDS : (E X T E N D S);
+REF_TO : R E F UNDERSCORE T O;
 
 IDENTIFIER
 :
