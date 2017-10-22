@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.st;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.NiceErrorListener;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
@@ -85,7 +86,13 @@ public class ProgramTest {
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
         TopLevelElements sl = (TopLevelElements) ctx.accept(new IECParseTreeToAST());
         Assert.assertEquals(sl, sl.copy());
+    }
 
+    @Test
+    public void testParseTreetoAST() throws IOException {
+        TopLevelElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
+        String ast = IEC61131Facade.print(tle);
+        System.out.println(ast);
     }
 
 }
