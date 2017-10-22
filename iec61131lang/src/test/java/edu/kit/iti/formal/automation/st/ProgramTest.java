@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.NiceErrorListener;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
+import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.st.ast.StatementList;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import org.antlr.v4.runtime.ANTLRFileStream;
@@ -40,7 +41,10 @@ import org.junit.runners.Parameterized.Parameter;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 
 @RunWith(Parameterized.class)
@@ -91,8 +95,24 @@ public class ProgramTest {
     @Test
     public void testParseTreetoAST() throws IOException {
         TopLevelElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
-        String ast = IEC61131Facade.print(tle);
-        System.out.println(ast);
+        // Compare generated and original code
+        Assert.assertEquals(IEC61131Facade.print(tle),
+                Files.readAllLines(Paths.get(testFile)).stream().collect(Collectors.joining("\n")));
+    }
+
+    @Test
+    public void testResolveDataTypes() throws IOException {
+        TopLevelElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
+        GlobalScope gs = IEC61131Facade.resolveDataTypes(tle);
+
+        /*
+        System.out.println("Interfaces:");
+        System.out.println(gs.getInterfaces());
+        System.out.println("Classes:");
+        System.out.println(gs.getClasses());
+        System.out.println("Function blocks:");
+        System.out.println(gs.getFunctionBlocks());
+        */
     }
 
 }

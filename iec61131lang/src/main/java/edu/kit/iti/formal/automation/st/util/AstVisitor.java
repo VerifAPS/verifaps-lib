@@ -30,7 +30,7 @@ import edu.kit.iti.formal.automation.visitors.Visitable;
 /**
  * Created by weigl on 10/07/14.
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
 public class AstVisitor<T> extends DefaultVisitor<T> {
@@ -331,6 +331,14 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
             m.accept(this);
         }
         return super.visit(clazz);
+    }
+
+    @Override
+    public T visit(InterfaceDeclaration interfaceDeclaration) {
+        interfaceDeclaration.getLocalScope().accept(this);
+        for (MethodDeclaration m : interfaceDeclaration.getMethods())
+            m.accept(this);
+        return super.visit(interfaceDeclaration);
     }
 
     @Override
