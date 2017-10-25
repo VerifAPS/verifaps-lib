@@ -692,7 +692,9 @@ symbolic_variable
 :
     //x^[a,252]
 	a=(IDENTIFIER|SUPER|THIS)
-	(REF )?
+	(
+        (deref += REF)*
+	)?
 	(
 		subscript_list
         (REF)?

@@ -629,9 +629,7 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
             ast.setSubscripts((ExpressionList) ctx.subscript_list().accept(this));
         }
 
-        if (ctx.REF() != null) {
-            ast.derefSubscript();
-        }
+        ast.setDerefCount(ctx.deref.size());
 
         return ast;
     }

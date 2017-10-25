@@ -12,3 +12,4 @@ sin(x*)
 *
 *+
 abc, fdsf
+a^b
