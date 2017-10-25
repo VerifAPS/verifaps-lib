@@ -281,10 +281,11 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     @Override
     public Object visitStructure_initialization(
             IEC61131Parser.Structure_initializationContext ctx) {
+        // Includes class and FB initializations
         StructureInitialization ast = new StructureInitialization();
         ast.setRuleContext(ctx);
-
-        ast.addField(ctx.I.getText(), (Initialization) ctx.i.accept(this));
+        for (int i = 0; i < ctx.IDENT.size(); i++)
+            ast.addField(ctx.IDENT.get(i).getText(), (Initialization) ctx.init.get(i).accept(this));
         return ast;
     }
 
