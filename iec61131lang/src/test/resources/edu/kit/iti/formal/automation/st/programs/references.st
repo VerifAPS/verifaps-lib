@@ -37,5 +37,12 @@ interf2:= instderived; // interf2 is a reference to derived class
 rinstDerived3 ?= interf1; // rinstDerived3 == NULL
 rinstDerived4 ?= interf2; // rinstDerived4 will contain a valid
                           // reference to instDerived
+
+rinstBase1:= REF(instBase); // rinstbase1 references base class
+rinstBase2:= REF(instDerived); // rinstbase2 references derived class
+
+rinstBase1^.x := interf1^.func();  // 42
+rinstBase2^.x := interf2^.func();  // 24
+
 END_PROGRAM
 

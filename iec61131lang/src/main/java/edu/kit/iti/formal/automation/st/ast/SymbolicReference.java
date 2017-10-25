@@ -44,6 +44,12 @@ public class SymbolicReference extends Reference {
     private String identifier;
     private ExpressionList subscripts;
     private Reference sub;
+    private Any dataType;
+
+    /**
+     * Number of times reference is dereferenced.
+     */
+    private int derefCount = 0;
 
     /**
      * <p>Constructor for SymbolicReference.</p>
@@ -153,19 +159,6 @@ public class SymbolicReference extends Reference {
     }
 
     /**
-     * <p>derefVar.</p>
-     */
-    public void derefVar() {
-    }
-
-    /**
-     * <p>derefSubscript.</p>
-     */
-    public void derefSubscript() {
-
-    }
-
-    /**
      * {@inheritDoc}
      */
     public <T> T accept(Visitor<T> visitor) {
@@ -188,6 +181,7 @@ public class SymbolicReference extends Reference {
         sr.identifier = identifier;
         sr.subscripts = Utils.copyNull(subscripts);
         sr.sub = Utils.copyNull(sub);
+        sr.derefCount = derefCount;
         return sr;
     }
 }
