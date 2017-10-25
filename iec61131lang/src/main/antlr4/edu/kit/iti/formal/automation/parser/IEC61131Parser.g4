@@ -277,8 +277,8 @@ structure_declaration
 structure_initialization
 :
 	LPAREN
-	name+=IDENTIFIER ASSIGN init+=initializations
-	(COMMA name+=IDENTIFIER ASSIGN init+=initializations)*
+	(IDENT += IDENTIFIER) ASSIGN (init += initializations)
+	( COMMA (IDENT += IDENTIFIER) ASSIGN (init += initializations))*
 	RPAREN
 ;
 
