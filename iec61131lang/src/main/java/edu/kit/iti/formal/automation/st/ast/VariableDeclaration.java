@@ -22,13 +22,16 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import com.google.common.collect.ImmutableMap;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+
+import java.util.Map;
 
 /**
  * Created by weigla on 09.06.2014.
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
 public class VariableDeclaration extends Top
@@ -95,6 +98,18 @@ public class VariableDeclaration extends Top
      * Constant <code>NOT_READ=4096</code>
      */
     public static final int NOT_READ = 4096;
+
+    // Access specifiers
+    public static final int PUBLIC = 1 << 20;
+    public static final int INTERNAL = 1 << 21;
+    public static final int PROTECTED = 1 << 22;
+    public static final int PRIVATE = 1 << 23;
+
+    public static final Map<AccessSpecifier, Integer> ACCESS_SPECIFIER_DICT = ImmutableMap.of(
+            AccessSpecifier.PUBLIC, PUBLIC,
+            AccessSpecifier.INTERNAL, INTERNAL,
+            AccessSpecifier.PROTECTED, PROTECTED,
+            AccessSpecifier.PRIVATE, PRIVATE);
 
     private String name;
     private Any dataType;
@@ -347,6 +362,22 @@ public class VariableDeclaration extends Top
      */
     public boolean isGlobal() {
         return is(GLOBAL);
+    }
+
+    public boolean isPublic() {
+        return is(PUBLIC);
+    }
+
+    public boolean isInternal() {
+        return is(INTERNAL);
+    }
+
+    public boolean isProtected() {
+        return is(PROTECTED);
+    }
+
+    public boolean isPrivate() {
+        return is(PRIVATE);
     }
 
     /**

@@ -387,6 +387,12 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         if (ctx.RETAIN() != null) {
             gather.mix(VariableDeclaration.RETAIN);
         }
+
+        // Access specifier
+        if (ctx.access_specifier() != null) {
+            gather.mix(VariableDeclaration.ACCESS_SPECIFIER_DICT.get(
+                    AccessSpecifier.valueOf(ctx.access_specifier().getText())));
+        }
         return null;
     }
 

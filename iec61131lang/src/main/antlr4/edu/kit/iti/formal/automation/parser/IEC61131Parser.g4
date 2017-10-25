@@ -335,6 +335,7 @@ variable_keyword
 	| RETAIN
     | NON_RETAIN
     )?
+    (access_specifier)?
 ;
 
 
