@@ -33,6 +33,7 @@ NOT ( a OR B ) = ( NOT a AND NOT b)
 pt.abc
 pt.adf+1
 abc^.test
+abc^^^.test^
 aegf[1]
 afdsf[1,2]
 acbc.adfba[1,2]
