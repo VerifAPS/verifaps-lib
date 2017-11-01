@@ -179,6 +179,10 @@ public class GlobalScope implements Serializable {
         if (name.length() > 7 && name.substring(0, 7).equals("REF_TO "))
             return new ReferenceType(resolveDataType(name.substring(7)));
 
+        // Void
+        if (name == "VOID")
+            return null;
+
         throw new DataTypeNotDefinedException("Could not find: " + name);
     }
 

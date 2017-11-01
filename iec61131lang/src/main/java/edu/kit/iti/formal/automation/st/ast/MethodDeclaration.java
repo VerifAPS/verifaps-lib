@@ -42,8 +42,15 @@ public class MethodDeclaration extends FunctionDeclaration {
     private boolean override = false;
 
     @Override
+    public String getReturnTypeName() {
+        if (returnType.getIdentifier() == null)
+            return "VOID";
+        return super.getReturnTypeName();
+    }
+
+    @Override
     public <T> T accept(Visitor<T> visitor) {
-        return null;
+        return visitor.visit(this);
     }
 
     public void setName(String n) {
