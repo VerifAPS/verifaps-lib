@@ -340,6 +340,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public Object visit(SymbolicReference symbolicReference) {
         sb.append(symbolicReference.getIdentifier());
 
+        for (int i = 0; i < symbolicReference.getDerefCount(); i++)
+            sb.append("^");
+
         if (symbolicReference.getSubscripts() != null && !symbolicReference.getSubscripts().isEmpty()) {
             sb.append('[');
             for (Expression expr : symbolicReference.getSubscripts()) {
@@ -468,13 +471,37 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        sb.append("FUNCTION_BLOCK ").append(functionBlockDeclaration.getName()).increaseIndent();
+        sb.append("FUNCTION_BLOCK ");
+
+        if (functionBlockDeclaration.isFinal_())
+            sb.append("FINAL ");
+        if (functionBlockDeclaration.isAbstract_())
+            sb.append("ABSTRACT ");
+
+        sb.append(functionBlockDeclaration.getName());
+
+        String parent = functionBlockDeclaration.getParent().getIdentifier();
+        if (parent != null)
+            sb.append(" EXTENDS ").append(parent);
+
+        String interfaces = functionBlockDeclaration.getInterfaces().stream()
+                .map(i -> i.getIdentifier())
+                .collect(Collectors.joining(", "));
+        if (!interfaces.isEmpty())
+            sb.append(" IMPLEMENTS ").append(interfaces);
+
+        sb.increaseIndent().nl();
 
         functionBlockDeclaration.getLocalScope().accept(this);
 
         sb.nl();
 
+        functionBlockDeclaration.getMethods().forEach(m -> m.accept(this));
+
+        sb.nl();
+
         functionBlockDeclaration.getFunctionBody().accept(this);
+
         sb.decreaseIndent().nl().append("END_FUNCTION_BLOCK").nl().nl();
         return null;
     }
@@ -541,7 +568,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         if (method.isOverride())
             sb.append("OVERRIDE ");
 
-        sb.append(method.getAccessSpecifier());
+        sb.append(method.getAccessSpecifier() + " ");
+
+        sb.append(method.getIdentifier());
 
         String returnType = method.getReturnTypeName();
         if (!returnType.isEmpty())
@@ -617,7 +646,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
             ifStatement.getElseBranch().accept(this);
             sb.decreaseIndent();
         }
-        sb.nl().append("END_IF;");
+        sb.nl().append("END_IF");
         return null;
     }
 
