@@ -55,6 +55,10 @@ public abstract class AnyDate extends Any {
                     dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMillieseconds());
         }
 
+        @Override
+        public String getName() {
+            return "TIME_OF_DAY";
+        }
 
         @Override
         public <T> T accept(DataTypeVisitor<T> visitor) {
@@ -68,6 +72,11 @@ public abstract class AnyDate extends Any {
             DateAndTimeData dt = (DateAndTimeData) obj;
             return String.format("DT#%4d-%2d-%2d-%2d:%2d:%2d.%3d",
                     dt.getYear(), dt.getMonth(), dt.getDay(), dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMillieSeconds());
+        }
+
+        @Override
+        public String getName() {
+            return "DATE_AND_TIME";
         }
 
         @Override
