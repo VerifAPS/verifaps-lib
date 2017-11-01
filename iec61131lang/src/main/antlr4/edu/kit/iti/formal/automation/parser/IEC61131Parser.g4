@@ -394,7 +394,7 @@ method
     (COLON ( returnET=elementary_type_name
           	| returnID=IDENTIFIER))?
     var_decls
-    statement_list
+    body = statement_list
     END_METHOD
 ;
 
