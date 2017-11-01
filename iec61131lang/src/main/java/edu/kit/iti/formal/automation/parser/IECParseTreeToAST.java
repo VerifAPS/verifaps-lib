@@ -672,11 +672,14 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     public Object visitParam_assignment(
             IEC61131Parser.Param_assignmentContext ctx) {
         Invocation.Parameter p = new Invocation.Parameter();
-        if (ctx.ARROW_RIGHT() != null)
+        if (ctx.RIGHT_ARROW() != null) {
             p.setOutput(true);
-
-        p.setName(ctx.id.getText());
-        p.setExpression((Expression) ctx.expression().accept(this));
+            p.setExpression((Expression) ctx.v.accept(this));
+        }
+        else
+            p.setExpression((Expression) ctx.expression().accept(this));
+        if (ctx.id != null)
+            p.setName(ctx.id.getText());
         return p;
     }
 

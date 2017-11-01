@@ -722,8 +722,8 @@ return_statement : RETURN;
 
 param_assignment
 :
-	(id=IDENTIFIER ASSIGN)? expression
-	| id=IDENTIFIER ARROW_RIGHT v=variable
+	id=IDENTIFIER RIGHT_ARROW v=variable
+	| (id=IDENTIFIER ASSIGN)? expression
 ;
 
 if_statement
