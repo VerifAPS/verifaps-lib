@@ -28,8 +28,7 @@ import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
-import edu.kit.iti.formal.automation.st.ast.StatementList;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.*;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
@@ -105,14 +104,24 @@ public class ProgramTest {
         TopLevelElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
         GlobalScope gs = IEC61131Facade.resolveDataTypes(tle);
 
-        /*
-        System.out.println("Interfaces:");
-        System.out.println(gs.getInterfaces());
-        System.out.println("Classes:");
-        System.out.println(gs.getClasses());
-        System.out.println("Function blocks:");
-        System.out.println(gs.getFunctionBlocks());
-        */
+        System.out.println(gs.getInterfaces().size() + " Interfaces:");
+        for (TopLevelElement topLevelElement : gs.getInterfaces())
+            System.out.println(topLevelElement);
+        System.out.println(gs.getClasses().size() + " Classes:");
+        for (TopLevelElement topLevelElement : gs.getClasses())
+            System.out.println(topLevelElement);
+        System.out.println(gs.getFunctionBlocks().size() + " Function blocks:");
+        for (TopLevelElement topLevelElement : gs.getFunctionBlocks()) {
+            FunctionBlockDeclaration functionBlockDeclaration = (FunctionBlockDeclaration) topLevelElement;
+            System.out.println(functionBlockDeclaration.getIdentifier());
+            for (MethodDeclaration methodDeclaration : functionBlockDeclaration.getMethods()) {
+                System.out.println(methodDeclaration.getFunctionName() + " : " + methodDeclaration.getReturnTypeName());
+                System.out.println(methodDeclaration);
+            }
+            System.out.println(functionBlockDeclaration);
+        }
+
+        //System.out.println(gs.getClasses().get(0).getLocalScope());
     }
 
 }
