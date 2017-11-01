@@ -458,6 +458,7 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     @Override
     public Object visitMethod(IEC61131Parser.MethodContext ctx) {
         MethodDeclaration ast = new MethodDeclaration();
+        //ast.setRuleContext(ctx);
         ast.setName(ctx.identifier.getText());
         if (ctx.access_specifier() != null) {
             ast.setAccessSpecifier(AccessSpecifier.valueOf(ctx.access_specifier().getText()));
@@ -471,8 +472,7 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
             ast.setReturnTypeName(ctx.returnID.getText());
 
         ast.setLocalScope((LocalScope) ctx.var_decls().accept(this));
-        ast.setStatements((StatementList) ctx.statement_list().accept(this));
-        // ast.setRuleContext(ctx);
+        ast.setStatements((StatementList) ctx.body.accept(this));
         return ast;
     }
 
