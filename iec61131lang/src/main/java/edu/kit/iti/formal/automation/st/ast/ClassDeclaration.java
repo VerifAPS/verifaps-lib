@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
@@ -58,12 +59,27 @@ public class ClassDeclaration extends TopLevelScopeElement {
         this.parent.setIdentifier(parent);
     }
 
+    public void setMethods(List<MethodDeclaration> methods) {
+        for (MethodDeclaration methodDeclaration : methods)
+            methodDeclaration.setParent(this);
+        this.methods = methods;
+    }
+
     public void addImplements(String interfaze) {
         interfaces.add(new IdentifierPlaceHolder<>(interfaze));
     }
 
     public void addImplements(List<String> interfaceList) {
         interfaceList.forEach(i -> addImplements(i));
+    }
+
+    @Override
+    public void setGlobalScope(GlobalScope global) {
+        super.setGlobalScope(global);
+        if (parent.getIdentifier() != null)
+            parent.setIdentifiedObject(global.resolveClass(parent.getIdentifier()));
+        for (IdentifierPlaceHolder<InterfaceDeclaration> interfaceDeclaration : interfaces)
+            interfaceDeclaration.setIdentifiedObject(global.resolveInterface(interfaceDeclaration.getIdentifier()));
     }
 
     @Override public ClassDeclaration copy() {

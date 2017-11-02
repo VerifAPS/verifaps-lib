@@ -72,6 +72,13 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     }
 
     @Override
+    public Object visit(MethodDeclaration methodDeclaration) {
+        methodDeclaration.setGlobalScope(scope);
+        methodDeclaration.setReturnType(resolve(methodDeclaration.getReturnTypeName()));
+        return super.visit(methodDeclaration);
+    }
+
+    @Override
     public Object visit(LocalScope localScope) {
         local = localScope;
         localScope.getLocalVariables().values()
@@ -83,6 +90,12 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
         functionBlockDeclaration.setGlobalScope(scope);
         return super.visit(functionBlockDeclaration);
+    }
+
+    @Override
+    public Object visit(ClassDeclaration classDeclaration) {
+        classDeclaration.setGlobalScope(scope);
+        return super.visit(classDeclaration);
     }
 
     @Override
