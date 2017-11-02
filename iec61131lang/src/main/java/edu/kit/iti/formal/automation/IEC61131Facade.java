@@ -31,10 +31,7 @@ import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
-import edu.kit.iti.formal.automation.st.ast.Expression;
-import edu.kit.iti.formal.automation.st.ast.StatementList;
-import edu.kit.iti.formal.automation.st.ast.Top;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.*;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -135,6 +132,57 @@ public class IEC61131Facade {
         elements.accept(new FindInstances(instanceScope));
         return instanceScope;
     }
+
+    /**
+     * Resolve types of top level elements and print them along with some minor statistics.
+     * @param topLevelElements
+     * @return Top level elements, formatted, as string.
+     */
+    public static String printTopLevelElements(TopLevelElements topLevelElements) {
+        StringBuilder sb = new StringBuilder();
+        // Resolve data types and print them
+        GlobalScope gs = resolveDataTypes(topLevelElements);
+        sb.append("   " + gs.getInterfaces().size() + " Interfaces:\n");
+        for (TopLevelElement topLevelElement : gs.getInterfaces())
+            sb.append(topLevelElement + "\n");
+        sb.append("\n");
+        sb.append("   " + gs.getClasses().size() + " Classes:\n");
+        for (TopLevelElement topLevelElement : gs.getClasses())
+            sb.append(topLevelElement + "\n");
+        sb.append("\n");
+        sb.append("   " + gs.getFunctionBlocks().size() + " Function blocks:\n");
+        for (TopLevelElement topLevelElement : gs.getFunctionBlocks()) {
+            FunctionBlockDeclaration functionBlockDeclaration = (FunctionBlockDeclaration) topLevelElement;
+            sb.append(functionBlockDeclaration.getIdentifier() + "  " + functionBlockDeclaration + "\n");
+            for (MethodDeclaration methodDeclaration : functionBlockDeclaration.getMethods()) {
+                sb.append(methodDeclaration.getIdentifier() + " : " + methodDeclaration.getReturnTypeName() + "  ");
+                sb.append(methodDeclaration + "\n");
+            }
+            sb.append("\n");
+        }
+        sb.append("\n");
+        // Resolve instances and print them
+        InstanceScope instanceScope = findInstances(topLevelElements, gs);
+        sb.append("   === Interface instances ===\n");
+        for (InterfaceDeclaration interfaceDeclaration : gs.getInterfaces()) {
+            sb.append(" = " + interfaceDeclaration.getIdentifier() + " = \n");
+            sb.append(instanceScope.getInstancesOfInterface(interfaceDeclaration) + "\n");
+        }
+        sb.append("\n");
+        sb.append("   === Class instances ===\n");
+        for (ClassDeclaration classDeclaration : gs.getClasses()) {
+            sb.append(" = " + classDeclaration.getIdentifier() + " = \n");
+            sb.append(instanceScope.getPolymorphInstancesOfClass(classDeclaration) + "\n");
+        }
+        sb.append("\n");
+        sb.append("   === Function block instances ===\n");
+        for (FunctionBlockDeclaration functionBlockDeclaration : gs.getFunctionBlocks()) {
+            sb.append(" = " + functionBlockDeclaration.getIdentifier() + " = \n");
+            sb.append(instanceScope.getPolymorphInstancesOfFunctionBlock(functionBlockDeclaration) + "\n");
+        }
+        return sb.toString();
+    }
+
 
     public static IEC61131Parser getParser(String s) {
         return getParser(CharStreams.fromString(s));
