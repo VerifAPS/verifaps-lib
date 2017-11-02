@@ -32,8 +32,6 @@ import lombok.*;
  * @version $Id: $Id
  */
 @Data
-@EqualsAndHashCode
-@ToString
 public class Bits {
     private long register;
     private final long nbits;

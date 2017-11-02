@@ -24,8 +24,6 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * Created by weigla on 09.06.2014.
@@ -34,8 +32,6 @@ import lombok.ToString;
  * @version $Id: $Id
  */
 @Data
-@EqualsAndHashCode
-@ToString
 public class ForStatement extends Statement {
     private String variable;
     private Expression start, stop, step;

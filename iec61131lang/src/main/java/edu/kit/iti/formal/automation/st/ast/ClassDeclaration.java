@@ -37,8 +37,7 @@ import java.util.List;
  */
 
 @Data
-@EqualsAndHashCode
-@ToString
+@EqualsAndHashCode(exclude = "methods")
 public class ClassDeclaration extends TopLevelScopeElement {
     private String name;
     private boolean final_ = false;

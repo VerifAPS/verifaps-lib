@@ -42,5 +42,5 @@ public interface FunctionResolver {
      * @param scope a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
      */
-    public FunctionDeclaration resolve(Invocation call, LocalScope scope);
+    FunctionDeclaration resolve(Invocation call, LocalScope scope);
 }

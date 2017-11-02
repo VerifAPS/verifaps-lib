@@ -22,27 +22,21 @@
 
 package edu.kit.iti.formal.automation.st.ast;
 
-import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.AnyReference;
 import edu.kit.iti.formal.automation.datatypes.ReferenceType;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
-import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Augusto Modanese
  */
 @Data
-@EqualsAndHashCode
-@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReferenceSpecification extends TypeDeclaration<Initialization> {
     private TypeDeclaration refTo;
-
-    public ReferenceSpecification() {
-    }
 
     @Override
     public String getTypeName() {

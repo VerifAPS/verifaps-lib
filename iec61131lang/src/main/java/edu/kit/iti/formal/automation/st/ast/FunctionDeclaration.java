@@ -26,6 +26,7 @@ import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -35,8 +36,9 @@ import lombok.ToString;
  * @author weigl
  * @version $Id: $Id
  */
-@EqualsAndHashCode
-@ToString
+@Data
+@EqualsAndHashCode(exclude = "statements")
+@ToString(exclude = "statements")
 public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Function_declarationContext>
         implements Invocable {
     protected IdentifierPlaceHolder<Any> returnType = new IdentifierPlaceHolder<>();

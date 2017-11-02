@@ -34,8 +34,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@EqualsAndHashCode
-@ToString
 public class TimeValue {
     private double days, hours, minutes, seconds, millieseconds;
 }

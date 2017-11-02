@@ -28,7 +28,9 @@ import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
-import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
+import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
+import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
@@ -40,10 +42,7 @@ import org.junit.runners.Parameterized.Parameter;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 
 @RunWith(Parameterized.class)

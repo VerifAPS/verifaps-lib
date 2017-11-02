@@ -26,9 +26,7 @@ import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -42,18 +40,11 @@ import java.util.stream.Collectors;
  * @version 3, adapt function call as invocation
  */
 @Data
-@EqualsAndHashCode
-@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class Invocation extends Expression {
     private SymbolicReference callee;
     private List<Parameter> parameters = new ArrayList<>();
-
-    public Invocation() {
-    }
-
-    public Invocation(String calleeName) {
-        setCalleeName(calleeName);
-    }
 
     public Invocation(String calleeName, Expression... expr) {
         setCalleeName(calleeName);
@@ -134,8 +125,6 @@ public class Invocation extends Expression {
     }
 
     @Data
-    @EqualsAndHashCode
-    @ToString
     public static class Parameter
             extends Top<IEC61131Parser.Param_assignmentContext> implements Comparable {
         private String name;

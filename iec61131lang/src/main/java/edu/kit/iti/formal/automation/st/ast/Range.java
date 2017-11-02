@@ -23,9 +23,6 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
 /**
  * Created by weigl on 13.06.14.
@@ -34,9 +31,6 @@ import lombok.ToString;
  * @version $Id: $Id
  */
 @Data
-@EqualsAndHashCode
-@ToString
-@RequiredArgsConstructor
 public class Range implements Copyable<Range>{
     private final Literal start, stop;
 

@@ -31,8 +31,6 @@ import lombok.*;
  * @version $Id: $Id
  */
 @Data
-@ToString
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class DateData {
