@@ -27,5 +27,5 @@ package edu.kit.iti.formal.automation.st.ast;
  * @version 1 (29.06.17)
  */
 public interface Copyable<T> {
-    public T copy();
+    T copy();
 }

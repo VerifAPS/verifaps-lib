@@ -26,7 +26,7 @@ import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,15 +35,12 @@ import java.util.List;
  * @author Augusto Modanese
  */
 @Data
-@EqualsAndHashCode
-@ToString
+@EqualsAndHashCode(exclude = "methods")
+@NoArgsConstructor
 public class InterfaceDeclaration extends TopLevelScopeElement {
     private String name;
     private List<MethodDeclaration> methods = new ArrayList<>();
     private List<IdentifierPlaceHolder<InterfaceDeclaration>> extendsInterfaces = new ArrayList<>();
-
-    public InterfaceDeclaration() {
-    }
 
     @Override public String getIdentifier() {
         return name;

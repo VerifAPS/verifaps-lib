@@ -80,9 +80,7 @@ public class DateAndTimeData {
         DateAndTimeData that = (DateAndTimeData) o;
 
         if (!date.equals(that.date)) return false;
-        if (!tod.equals(that.tod)) return false;
-
-        return true;
+        return tod.equals(that.tod);
     }
 
     /** {@inheritDoc} */

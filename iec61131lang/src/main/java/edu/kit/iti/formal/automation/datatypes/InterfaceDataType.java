@@ -23,22 +23,16 @@
 package edu.kit.iti.formal.automation.datatypes;
 
 import edu.kit.iti.formal.automation.st.ast.InterfaceDeclaration;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * @author Augusto Modanese
  */
 @Data
-@EqualsAndHashCode
-@ToString
+@AllArgsConstructor
 public class InterfaceDataType extends Any {
     private InterfaceDeclaration interfaceDeclaration;
-
-    public InterfaceDataType(InterfaceDeclaration interfaceDeclaration) {
-        this.interfaceDeclaration = interfaceDeclaration;
-    }
 
     @Override
     public String repr(Object obj) {
