@@ -31,6 +31,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Augusto Modanese
@@ -62,6 +63,19 @@ public class InterfaceDeclaration extends TopLevelScopeElement {
         super.setGlobalScope(global);
         for (IdentifierPlaceHolder<InterfaceDeclaration> interfaceDeclaration : extendsInterfaces)
             interfaceDeclaration.setIdentifiedObject(global.resolveInterface(interfaceDeclaration.getIdentifier()));
+    }
+
+    /**
+     * To be called only after bound to global scope!
+     * @return The list of interfaces the interface extends.
+     */
+    public List<InterfaceDeclaration> getExtendedInterfaces() {
+        List<InterfaceDeclaration> extendedInterfaces = extendsInterfaces.stream()
+                .map(i -> i.getIdentifiedObject()).collect(Collectors.toList());
+        // Add extended interfaces
+        for (InterfaceDeclaration interfaceDeclaration : extendedInterfaces)
+            extendedInterfaces.addAll(interfaceDeclaration.getExtendedInterfaces());
+        return extendedInterfaces;
     }
 
     @Override

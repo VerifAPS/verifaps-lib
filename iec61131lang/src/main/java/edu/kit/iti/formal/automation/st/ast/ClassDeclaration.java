@@ -30,7 +30,9 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl, Augusto Modanese
@@ -80,6 +82,66 @@ public class ClassDeclaration extends TopLevelScopeElement {
             parent.setIdentifiedObject(global.resolveClass(parent.getIdentifier()));
         for (IdentifierPlaceHolder<InterfaceDeclaration> interfaceDeclaration : interfaces)
             interfaceDeclaration.setIdentifiedObject(global.resolveInterface(interfaceDeclaration.getIdentifier()));
+    }
+
+    /**
+     * To be called only after bound to global scope!
+     * @return The parent class. Return null if the class has no parent.
+     */
+    public ClassDeclaration getParentClass() {
+        return parent.getIdentifiedObject();
+    }
+
+    /**
+     * To be called only after bound to global scope!
+     * @return The list of classes the class can be an instance of, taking polymorphy into account.
+     */
+    public List<ClassDeclaration> getExtendedClasses() {
+        List<ClassDeclaration> extendedClasses = new ArrayList<>();
+        extendedClasses.add(this);
+        ClassDeclaration parentClass = getParentClass();
+        if (parentClass != null)
+            extendedClasses.addAll(parentClass.getExtendedClasses());
+        return extendedClasses;
+    }
+
+    /**
+     * To be called only after bound to global scope!
+     * @return Whether the class extends the given other class.
+     */
+    public boolean extendsClass(ClassDeclaration otherClass) {
+        ClassDeclaration parentClass = getParentClass();
+        if (parentClass == otherClass)
+            return true;
+        else if (parentClass == null)
+            return false;  // reached top of hierarchy
+        return getParentClass().extendsClass(otherClass);
+    }
+
+    /**
+     * To be called only after bound to global scope!
+     * @return The interfaces the class implements. Includes the interfaces of all parent classes.
+     */
+    public List<InterfaceDeclaration> getImplementedInterfaces() {
+        List<InterfaceDeclaration> implementedInterfaces = interfaces.stream()
+                .map(IdentifierPlaceHolder::getIdentifiedObject).collect(Collectors.toList());
+        // Add interfaces from parent classes
+        ClassDeclaration parentClass = getParentClass();
+        if (parentClass != null)
+            implementedInterfaces.addAll(parentClass.getImplementedInterfaces());
+        // Add extended interfaces
+        implementedInterfaces.addAll(implementedInterfaces.stream()
+                .map(InterfaceDeclaration::getExtendedInterfaces)
+                .flatMap(Collection::stream).collect(Collectors.toList()));
+        return implementedInterfaces;
+    }
+
+    /**
+     * To be called only after bound to global scope!
+     * @return Whether the class implements the given interface.
+     */
+    public boolean implementsInterface(InterfaceDeclaration interfaceDeclaration) {
+        return getImplementedInterfaces().contains(interfaceDeclaration);
     }
 
     @Override public ClassDeclaration copy() {
