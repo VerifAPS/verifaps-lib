@@ -35,8 +35,8 @@ import lombok.ToString;
  * @author weigl
  * @version $Id: $Id
  */
-@EqualsAndHashCode
-@ToString
+@EqualsAndHashCode(exclude = "statements")
+@ToString(exclude = "statements")
 public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Function_declarationContext>
         implements Invocable {
     protected IdentifierPlaceHolder<Any> returnType = new IdentifierPlaceHolder<>();

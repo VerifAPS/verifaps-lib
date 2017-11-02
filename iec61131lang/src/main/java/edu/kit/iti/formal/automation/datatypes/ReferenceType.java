@@ -22,9 +22,8 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * Created by weigl on 01.08.16.
@@ -33,19 +32,9 @@ import lombok.ToString;
  * @version $Id: $Id
  */
 @Data
-@EqualsAndHashCode
-@ToString
+@AllArgsConstructor
 public class ReferenceType extends AnyReference {
     Any of;
-
-    /**
-     * <p>Constructor for ReferenceType.</p>
-     *
-     * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     */
-    public ReferenceType(Any dataType) {
-        of = dataType;
-    }
 
     /** {@inheritDoc} */
     @Override

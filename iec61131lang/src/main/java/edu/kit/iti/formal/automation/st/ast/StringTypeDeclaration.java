@@ -23,12 +23,10 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.IECString;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
-import lombok.ToString;
 
 /**
  * Created by weigl on 13.06.14.
@@ -37,7 +35,6 @@ import lombok.ToString;
  * @version $Id: $Id
  */
 @Data
-@ToString
 public class StringTypeDeclaration extends TypeDeclaration<Literal> {
     private Literal size;
 

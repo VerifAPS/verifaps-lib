@@ -32,7 +32,6 @@ import lombok.EqualsAndHashCode;
 import org.antlr.v4.runtime.Token;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -84,7 +83,7 @@ public class EnumerationTypeDeclaration extends TypeDeclaration<Literal> {
         String init = allowedValues.get(0).getText();
         if (initialization != null) {
             if (initialization.getDataType() instanceof EnumerateType) {
-                Value value = (Value) initialization.asValue();
+                Value value = initialization.asValue();
                 //init = value;
             } else if (initialization.getDataType() instanceof AnyInt) {
                 Values.VAnyInt value = (Values.VAnyInt) initialization.asValue();

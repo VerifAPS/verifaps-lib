@@ -28,8 +28,6 @@ import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * Created by weigl on 11.06.14.
@@ -38,8 +36,6 @@ import lombok.ToString;
  * @version $Id: $Id
  */
 @Data
-@EqualsAndHashCode
-@ToString
 public class SymbolicReference extends Reference {
     private String identifier;
     private ExpressionList subscripts;

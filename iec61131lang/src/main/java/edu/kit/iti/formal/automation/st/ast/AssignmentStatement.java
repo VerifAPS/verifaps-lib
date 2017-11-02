@@ -25,8 +25,6 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * <ul>
@@ -38,8 +36,6 @@ import lombok.ToString;
  * @version 2
  */
 @Data
-@ToString
-@EqualsAndHashCode
 public class AssignmentStatement extends Statement {
     private Reference location;
     private Expression expression;

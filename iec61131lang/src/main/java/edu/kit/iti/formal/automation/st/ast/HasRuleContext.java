@@ -23,8 +23,6 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
-import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -32,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
  * @version 1 (25.06.17)
  */
 public interface HasRuleContext<T extends ParserRuleContext> {
-    public T getRuleContext();
+    T getRuleContext();
 
     default Position getStartPosition() {
         return new Position(getRuleContext().getStart());

@@ -37,8 +37,6 @@ import java.util.List;
  */
 
 @Data
-@EqualsAndHashCode
-@ToString
 public class ClassDeclaration extends TopLevelScopeElement {
     private String name;
     private boolean final_ = false;

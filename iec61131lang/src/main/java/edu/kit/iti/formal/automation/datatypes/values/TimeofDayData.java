@@ -37,9 +37,7 @@ import java.util.regex.Pattern;
  * @version $Id: $Id
  */
 @Data
-@ToString
 @NoArgsConstructor
-@EqualsAndHashCode
 public class TimeofDayData {
     private int hours, minutes, seconds, millieseconds;
 

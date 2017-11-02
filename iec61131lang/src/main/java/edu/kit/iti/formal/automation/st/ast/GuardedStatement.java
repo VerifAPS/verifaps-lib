@@ -30,9 +30,7 @@ import lombok.*;
  *
  * @author weigl
  */
-@ToString
 @Data
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class GuardedStatement extends Statement {

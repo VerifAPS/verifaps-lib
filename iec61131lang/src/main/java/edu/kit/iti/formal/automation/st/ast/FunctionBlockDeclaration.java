@@ -24,8 +24,9 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 /**
@@ -34,9 +35,10 @@ import lombok.ToString;
  * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
-@Data
-@EqualsAndHashCode
-@ToString
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class FunctionBlockDeclaration extends ClassDeclaration implements Invocable {
     private StatementList functionBody = new StatementList();
 

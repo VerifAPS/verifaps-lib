@@ -28,13 +28,13 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * @author Alexander Weigl
+ * @author Alexander Weigl, Augusto Modanese
  * @version 1 (20.02.17)
  */
 
-@EqualsAndHashCode
-@ToString
 @Data
+@EqualsAndHashCode(callSuper = true, exclude = "parent")
+@ToString(callSuper = true, exclude = "parent")
 public class MethodDeclaration extends FunctionDeclaration {
     private AccessSpecifier accessSpecifier = AccessSpecifier.defaultAccessSpecifier();
     private boolean final_ = false;
