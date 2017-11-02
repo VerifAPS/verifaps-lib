@@ -214,7 +214,10 @@ public class GlobalScope implements Serializable {
     }
 
     public ClassDeclaration resolveClass(String key) {
-        return classes.get(key);
+        ClassDeclaration classDeclaration = classes.get(key);
+        if (classDeclaration == null)
+            classDeclaration = getFunctionBlock(key);
+        return classDeclaration;
     }
 
     public List<ClassDeclaration> getClasses() {

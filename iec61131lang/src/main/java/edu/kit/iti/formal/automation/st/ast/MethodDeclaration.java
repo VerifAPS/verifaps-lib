@@ -36,6 +36,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true, exclude = "parent")
 @ToString(callSuper = true, exclude = "parent")
 public class MethodDeclaration extends FunctionDeclaration {
+    private TopLevelScopeElement parent;
     private AccessSpecifier accessSpecifier = AccessSpecifier.defaultAccessSpecifier();
     private boolean final_ = false;
     private boolean abstract_ = false;
