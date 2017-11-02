@@ -71,6 +71,10 @@ public class GlobalScope implements Serializable {
         return programs.get(key);
     }
 
+    public List<ProgramDeclaration> getPrograms() {
+        return new ArrayList<>(programs.values());
+    }
+
     /**
      * <p>getCalleeName.</p>
      *

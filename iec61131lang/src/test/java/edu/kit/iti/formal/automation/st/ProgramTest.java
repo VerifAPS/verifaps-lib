@@ -90,6 +90,7 @@ public class ProgramTest {
         Assert.assertEquals(sl, sl.copy());
     }
 
+    /*
     @Test
     public void testParseTreetoAST() throws IOException {
         TopLevelElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
@@ -97,30 +98,29 @@ public class ProgramTest {
         Assert.assertEquals(IEC61131Facade.print(tle),
                 Files.readAllLines(Paths.get(testFile)).stream().collect(Collectors.joining("\n")));
     }
+    */
 
     @Test
     public void testResolveDataTypes() throws IOException {
         TopLevelElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
         GlobalScope gs = IEC61131Facade.resolveDataTypes(tle);
-
-        System.out.println(gs.getInterfaces().size() + " Interfaces:");
-        for (TopLevelElement topLevelElement : gs.getInterfaces())
-            System.out.println(topLevelElement);
-        System.out.println(gs.getClasses().size() + " Classes:");
-        for (TopLevelElement topLevelElement : gs.getClasses())
-            System.out.println(topLevelElement);
-        System.out.println(gs.getFunctionBlocks().size() + " Function blocks:");
-        for (TopLevelElement topLevelElement : gs.getFunctionBlocks()) {
-            FunctionBlockDeclaration functionBlockDeclaration = (FunctionBlockDeclaration) topLevelElement;
-            System.out.println(functionBlockDeclaration.getIdentifier());
-            for (MethodDeclaration methodDeclaration : functionBlockDeclaration.getMethods()) {
-                System.out.println(methodDeclaration.getFunctionName() + " : " + methodDeclaration.getReturnTypeName());
-                System.out.println(methodDeclaration);
-            }
-            System.out.println(functionBlockDeclaration);
+        for (ClassDeclaration classDeclaration : gs.getClasses()) {
+            Assert.assertTrue(classDeclaration.getParent().getIdentifier() == null
+                    || classDeclaration.getParentClass() != null);
+            classDeclaration.getInterfaces().forEach(i -> Assert.assertTrue(i.getIdentifiedObject() != null));
         }
+        for (FunctionBlockDeclaration functionBlockDeclaration : gs.getFunctionBlocks()) {
+            Assert.assertTrue(functionBlockDeclaration.getParent().getIdentifier() == null
+                    || functionBlockDeclaration.getParentClass() != null);
+            functionBlockDeclaration.getInterfaces()
+                    .forEach(i -> Assert.assertTrue(i.getIdentifiedObject() != null));
+        }
+    }
 
-        //System.out.println(gs.getClasses().get(0).getLocalScope());
+    @Test
+    public void testPrintTopLevelElements() throws IOException {
+        TopLevelElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
+        System.out.println(IEC61131Facade.printTopLevelElements(tle));
     }
 
 }
