@@ -23,11 +23,13 @@ package edu.kit.iti.formal.automation;
  */
 
 import edu.kit.iti.formal.automation.analysis.FindDataTypes;
+import edu.kit.iti.formal.automation.analysis.FindInstances;
 import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.Expression;
 import edu.kit.iti.formal.automation.st.ast.StatementList;
@@ -122,6 +124,17 @@ public class IEC61131Facade {
         return scope;
     }
 
+    /**
+     * Find all instances of classes and FBs.
+     * @param elements The top level elements.
+     * @param globalScope Global scope after data types have been resolved.
+     * @return The instance scope containing all instances.
+     */
+    public static InstanceScope findInstances(TopLevelElements elements, GlobalScope globalScope) {
+        InstanceScope instanceScope = new InstanceScope(globalScope);
+        elements.accept(new FindInstances(instanceScope));
+        return instanceScope;
+    }
 
     public static IEC61131Parser getParser(String s) {
         return getParser(CharStreams.fromString(s));
