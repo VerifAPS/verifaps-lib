@@ -22,6 +22,10 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +35,9 @@ import java.util.List;
  * @author weigl
  * @version $Id: $Id
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RecordType extends Any {
     private String name;
     private List<Field> fields = new ArrayList<>();

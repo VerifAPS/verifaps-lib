@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.datatypes;
  */
 
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
+import lombok.Data;
 
 /**
  * Created by weigl on 25.11.16.
@@ -30,17 +31,13 @@ import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
  * @author weigl
  * @version $Id: $Id
  */
-public class FunctionBlockDataType extends RecordType {
-    private final FunctionBlockDeclaration functionBlock;
+@Data
+public class FunctionBlockDataType extends ClassDataType {
+    private FunctionBlockDeclaration functionBlock;
 
-    /**
-     * <p>Constructor for FunctionBlockDataType.</p>
-     *
-     * @param fb a {@link edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration} object.
-     */
-    public FunctionBlockDataType(FunctionBlockDeclaration fb) {
-        super(fb.getIdentifier());
-        functionBlock = fb;
+    public FunctionBlockDataType(FunctionBlockDeclaration functionBlockDeclaration) {
+        super(functionBlockDeclaration);
+        functionBlock = functionBlockDeclaration;
     }
 
     /** {@inheritDoc} */

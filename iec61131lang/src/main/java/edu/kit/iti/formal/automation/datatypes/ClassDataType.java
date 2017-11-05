@@ -23,6 +23,8 @@ package edu.kit.iti.formal.automation.datatypes;
  */
 
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
  * This data type represents a class.
@@ -31,12 +33,10 @@ import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
  * @version 1
  * @since 04.03.17
  */
-public class ClassDataType extends Any {
+@Data
+@AllArgsConstructor
+public class ClassDataType extends RecordType {
     private final ClassDeclaration clazz;
-
-    public ClassDataType(ClassDeclaration classDeclaration) {
-        clazz = classDeclaration;
-    }
 
     @Override public String repr(Object obj) {
         return null;
