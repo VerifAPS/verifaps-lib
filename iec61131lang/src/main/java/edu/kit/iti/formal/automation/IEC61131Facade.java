@@ -122,19 +122,20 @@ public class IEC61131Facade {
     }
 
     /**
-     * Find all instances of classes and FBs.
-     * @param elements The top level elements.
+     * Find all instances of classes and FBs belonging to the given top level element..
+     * @param element The top level element to visit.
      * @param globalScope Global scope after data types have been resolved.
      * @return The instance scope containing all instances.
      */
-    public static InstanceScope findInstances(TopLevelElements elements, GlobalScope globalScope) {
+    public static InstanceScope findInstances(TopLevelElement element, GlobalScope globalScope) {
         InstanceScope instanceScope = new InstanceScope(globalScope);
-        elements.accept(new FindInstances(instanceScope));
+        element.accept(new FindInstances(instanceScope));
         return instanceScope;
     }
 
     /**
      * Resolve types of top level elements and print them along with some minor statistics.
+     * Assume there is a single program declaration.
      * @param topLevelElements
      * @return Top level elements, formatted, as string.
      */
@@ -161,24 +162,34 @@ public class IEC61131Facade {
             sb.append("\n");
         }
         sb.append("\n");
-        // Resolve instances and print them
-        InstanceScope instanceScope = findInstances(topLevelElements, gs);
-        sb.append("   === Interface instances ===\n");
-        for (InterfaceDeclaration interfaceDeclaration : gs.getInterfaces()) {
-            sb.append(" = " + interfaceDeclaration.getIdentifier() + " = \n");
-            sb.append(instanceScope.getInstancesOfInterface(interfaceDeclaration) + "\n");
-        }
-        sb.append("\n");
-        sb.append("   === Class instances ===\n");
-        for (ClassDeclaration classDeclaration : gs.getClasses()) {
-            sb.append(" = " + classDeclaration.getIdentifier() + " = \n");
-            sb.append(instanceScope.getPolymorphInstancesOfClass(classDeclaration) + "\n");
-        }
-        sb.append("\n");
-        sb.append("   === Function block instances ===\n");
-        for (FunctionBlockDeclaration functionBlockDeclaration : gs.getFunctionBlocks()) {
-            sb.append(" = " + functionBlockDeclaration.getIdentifier() + " = \n");
-            sb.append(instanceScope.getPolymorphInstancesOfFunctionBlock(functionBlockDeclaration) + "\n");
+        // Resolve instances for the first program we find and print them
+        TopLevelElement topLevelElement = null;
+        for (TopLevelElement tle : topLevelElements)
+            if (tle instanceof ProgramDeclaration) {
+                topLevelElement = tle;
+                break;
+            }
+        if (topLevelElement == null)
+            sb.append("No program declaration to print instances of.");
+        else {
+            InstanceScope instanceScope = findInstances(topLevelElement, gs);
+            sb.append("   === Interface instances ===\n");
+            for (InterfaceDeclaration interfaceDeclaration : gs.getInterfaces()) {
+                sb.append(" = " + interfaceDeclaration.getIdentifier() + " = \n");
+                sb.append(instanceScope.getInstancesOfInterface(interfaceDeclaration) + "\n");
+            }
+            sb.append("\n");
+            sb.append("   === Class instances ===\n");
+            for (ClassDeclaration classDeclaration : gs.getClasses()) {
+                sb.append(" = " + classDeclaration.getIdentifier() + " = \n");
+                sb.append(instanceScope.getPolymorphInstancesOfClass(classDeclaration) + "\n");
+            }
+            sb.append("\n");
+            sb.append("   === Function block instances ===\n");
+            for (FunctionBlockDeclaration functionBlockDeclaration : gs.getFunctionBlocks()) {
+                sb.append(" = " + functionBlockDeclaration.getIdentifier() + " = \n");
+                sb.append(instanceScope.getPolymorphInstancesOfFunctionBlock(functionBlockDeclaration) + "\n");
+            }
         }
         return sb.toString();
     }

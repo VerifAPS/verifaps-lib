@@ -399,7 +399,7 @@ public class VariableDeclaration extends Top
      * {@inheritDoc}
      */
     @Override public String toString() {
-        return name + " : " + getDataTypeName() + ":=" + getInit();
+        return name + " : " + getDataTypeName() + " := " + getInit();
     }
 
     /**
