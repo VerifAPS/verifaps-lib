@@ -23,6 +23,11 @@ package edu.kit.iti.formal.automation.datatypes;
  */
 
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This data type represents a class.
@@ -31,12 +36,10 @@ import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
  * @version 1
  * @since 04.03.17
  */
-public class ClassDataType extends Any {
+@Data
+@AllArgsConstructor
+public class ClassDataType extends RecordType {
     private final ClassDeclaration clazz;
-
-    public ClassDataType(ClassDeclaration classDeclaration) {
-        clazz = classDeclaration;
-    }
 
     @Override public String repr(Object obj) {
         return null;
@@ -53,5 +56,12 @@ public class ClassDataType extends Any {
 
     public ClassDeclaration getClazz() {
         return clazz;
+    }
+
+    @Override
+    public List<Field> getFields() {
+        return clazz.getEffectiveLocalScope().stream()
+                .map(v -> new Field(v.getName(), v.getDataType()))
+                .collect(Collectors.toList());
     }
 }
