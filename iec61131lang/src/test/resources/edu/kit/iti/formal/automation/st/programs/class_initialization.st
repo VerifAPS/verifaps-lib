@@ -1,6 +1,12 @@
-CLASS Student
+CLASS ID_Card
   VAR
     id : INT;
+  END_VAR
+END_CLASS
+
+CLASS Student
+  VAR
+    id_card : ID_Card;
     name : STRING;
   END_VAR
 END_CLASS
@@ -8,10 +14,11 @@ END_CLASS
 CLASS Verifier
   METHOD verify : BOOL
     VAR_INPUT
-      id : INT;
+      id_card : ID_Card;
     END_VAR
 
-    IF (ID > 9) THEN
+    (* Super-secure verification *)
+    IF (id_card.id > 9) THEN
       Verifier := TRUE;
     ELSE
       Verifier := FALSE;
@@ -22,11 +29,12 @@ END_CLASS
 
 PROGRAM MyProgram
   VAR
-    student : Student := (id := 42, name := "Toby");
-    no_student : Student := (id := 0, name := "Victor");
+    student_id_card : ID_Card := (id := 42);
+    student : Student := (id := student_id_card, name := "Toby");
+    fake_student : Student := (id_card := null, name := "Victor");
     verif : Verifier;
   END_VAR
 
   verif.verify(student.id); // TRUE
-  verif.verify(no_student.id); // FALSE
+  verif.verify(fake_student.id); // FALSE
 END_PROGRAM

@@ -27,7 +27,7 @@ import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
 /**
  * This data type represents a class.
  *
- * @author Alexander Weigl
+ * @author Alexander Weigl, Augusto Modanese
  * @version 1
  * @since 04.03.17
  */
@@ -40,6 +40,11 @@ public class ClassDataType extends Any {
 
     @Override public String repr(Object obj) {
         return null;
+    }
+
+    @Override
+    public String getName() {
+        return clazz.getName();
     }
 
     @Override public <T> T accept(DataTypeVisitor<T> visitor) {

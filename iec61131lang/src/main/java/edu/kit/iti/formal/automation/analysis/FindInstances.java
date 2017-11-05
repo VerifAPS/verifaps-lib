@@ -26,12 +26,18 @@ import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
+import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import lombok.RequiredArgsConstructor;
 
 /**
  * Visitor which finds all instances of classes and FBs and adds them to the global scope.
+ *
+ * Intended to be called on a single top level element to find all instances which can be traced back to it:
+ *   InstanceScope instanceScope = new InstanceScope(globalScope);
+ *   topLevelElement.accept(new FindInstances(instanceScope));
  *
  * @author Augusto Modanese
  */
@@ -39,19 +45,43 @@ import lombok.RequiredArgsConstructor;
 public class FindInstances extends AstVisitor {
     private final InstanceScope instanceScope;
 
+    /**
+     * Used during traversal to know the current parent instance.
+     */
+    private InstanceScope.Instance parentInstance = null;
+
     @Override
-    public Object visit(LocalScope localScope) {
-        localScope.forEach(variableDeclaration -> {
-            if (variableDeclaration.isInput() || variableDeclaration.isOutput() || variableDeclaration.isInOut())
-                return;
-            Any dataType = variableDeclaration.getDataType();
-            // Function blocks extend classes, so they must go first (more specific)
-            if (dataType instanceof FunctionBlockDataType)
-                instanceScope.registerFunctionBlockInstance(((FunctionBlockDataType) dataType).getFunctionBlock(),
-                        variableDeclaration);
-            else if (dataType instanceof ClassDataType)
-                instanceScope.registerClassInstance(((ClassDataType) dataType).getClazz(), variableDeclaration);
-        });
-        return super.visit(localScope);
+    public Object visit(VariableDeclaration variableDeclaration) {
+        if (variableDeclaration.isInput() || variableDeclaration.isOutput() || variableDeclaration.isInOut())
+            return super.visit(variableDeclaration);
+        InstanceScope.Instance currentInstance = new InstanceScope.Instance(parentInstance, variableDeclaration);
+        Any dataType = variableDeclaration.getDataType();
+        // Function blocks extend classes, so they must go first (more specific)
+        if (dataType instanceof FunctionBlockDataType) {
+            FunctionBlockDeclaration functionBlock = ((FunctionBlockDataType) dataType).getFunctionBlock();
+            instanceScope.registerFunctionBlockInstance(functionBlock, currentInstance);
+            recurse(functionBlock, currentInstance);
+        }
+        else if (dataType instanceof ClassDataType) {
+            ClassDeclaration classDeclaration = ((ClassDataType) dataType).getClazz();
+            instanceScope.registerClassInstance(classDeclaration, currentInstance);
+            recurse(classDeclaration, currentInstance);
+        }
+        return super.visit(variableDeclaration);
+    }
+
+    /**
+     * Recurse one level down a class or function block.
+     * @param classDeclaration The class or function block to visit.
+     * @param currentInstance The instance referent to classDeclaration.
+     */
+    private void recurse(ClassDeclaration classDeclaration, InstanceScope.Instance currentInstance) {
+        // Save old instance
+        InstanceScope.Instance oldParentInstance = parentInstance;
+        // Recurse
+        parentInstance = currentInstance;
+        classDeclaration.accept(this);
+        // Restore state
+        parentInstance = oldParentInstance;
     }
 }
