@@ -94,6 +94,19 @@ class RuntimeTest {
     }
 
     @Test
+    fun repeatLoopTest() {
+        val ast = getAst(this.javaClass.getResource("runtimeTest.repeatLoopTest.st"))
+        val topState = TopState()
+        ast.accept<Any>(Runtime(topState))
+        println("final state:")
+        topState.forEach {
+            println(it)
+        }
+        assertEquals(BigInteger.valueOf(32), topState["Var1"]!!.get().value)
+        assertEquals(BigInteger.valueOf(0), topState["counter"]!!.get().value)
+    }
+
+    @Test
     fun functionBlockTest() {
         val ast = getAst(this.javaClass.getResource("runtimeTest.functionBlockTest.st"))
         val topState = TopState()

@@ -62,6 +62,13 @@ class Runtime(val state: State) : DefaultVisitor<Unit>() {
         }
     }
 
+    override fun visit(repeatStatement: RepeatStatement) {
+        fun checkCondition() = (repeatStatement.condition as Visitable).accept(ExpressionVisitor(state, peekLocalScope()))
+        do {
+            repeatStatement.statements.accept(this)
+        } while (checkCondition().value == false)
+    }
+
     override fun visit(forStatement: ForStatement) {
         val variableName = forStatement.variable
         val startValue = (forStatement.start as Visitable).accept<ExpressionValue>(ExpressionVisitor(state, peekLocalScope()))

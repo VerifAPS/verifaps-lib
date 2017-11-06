@@ -1,31 +1,45 @@
 package edu.kit.iti.formal.automation.run
 
-import edu.kit.iti.formal.automation.datatypes.Any
-
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.AnyInt
 import edu.kit.iti.formal.automation.datatypes.AnyReal
-import edu.kit.iti.formal.automation.datatypes.values.Value
+import edu.kit.iti.formal.automation.datatypes.DataTypes
+import edu.kit.iti.formal.automation.datatypes.promotion.IntegerPromotion
 import edu.kit.iti.formal.automation.datatypes.values.Values
 import edu.kit.iti.formal.automation.run.stexceptions.TypeMissmatchException
 import java.math.BigDecimal
 import java.math.BigInteger
+
 /**
  * OperationEvaluator executes an ST operator on given ExpressionValues.
  * If Operation if illegal, an error will be thrown
  */
 object OperationEvaluator {
     fun add(leftValue: ExpressionValue, rightValue: ExpressionValue): ExpressionValue {
-
-        if (leftValue is Values.VAnyInt && rightValue is Values.VAnyInt) {
-            return add(leftValue, rightValue)
+        return when {
+            leftValue is Values.VAnyReal || rightValue is Values.VAnyReal -> add(toReal(leftValue), toReal(rightValue))
+            leftValue is Values.VAnyInt && rightValue is Values.VAnyInt -> add(leftValue, rightValue)
+            else -> throw TypeMissmatchException("must be numbers")
         }
+    }
 
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    private fun createNormalizedValue() {
+
     }
 
     private fun add(leftValue: Values.VAnyInt, rightValue: Values.VAnyInt): Values.VAnyInt {
-        return Values.VAnyInt(leftValue.dataType, leftValue.value.add(rightValue.value))
+        val integerPromotion = IntegerPromotion()
+        val promotedType = integerPromotion.getPromotion(leftValue.dataType, rightValue.dataType)
+        if (promotedType is AnyInt) {
+            return Values.VAnyInt(promotedType,
+                    leftValue.value.add(rightValue.value)
+                            .mod(BigInteger.valueOf(2).pow(promotedType.bitLength)))
+        }
+        TODO("choose correct datatype and modulo the addition")
+    }
+
+    private fun add(leftValue: Values.VAnyReal, rightValue: Values.VAnyReal): Values.VAnyReal {
+        return Values.VAnyReal(leftValue.dataType, leftValue.value.add(rightValue.value))
         TODO("choose correct datatype and modulo the addition")
     }
 
