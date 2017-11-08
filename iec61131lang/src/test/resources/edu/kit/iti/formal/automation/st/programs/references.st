@@ -1,4 +1,6 @@
 INTERFACE ITF1
+  METHOD func : INT
+  END_METHOD
 END_INTERFACE
 
 INTERFACE ITF2
@@ -8,16 +10,26 @@ INTERFACE ITF3
 END_INTERFACE
 
 CLASS ClBase IMPLEMENTS ITF1, ITF2
+  VAR
+    x : INT;
+  END_VAR
+
+  METHOD func : INT
+    func := 42;
+  END_METHOD
 END_CLASS
 
 CLASS ClDerived EXTENDS ClBase
+  METHOD func : INT
+    func := 24;
+  END_METHOD
 END_CLASS
 
 PROGRAM A
   VAR
     instbase : ClBase;
     instderived: ClDerived;
-    rinstBase1, pinstBase2: REF_TO ClBase;
+    rinstBase1, rinstBase2: REF_TO ClBase;
     rinstDerived1, rinstDerived2: REF_TO ClDerived;
     rinstDerived3, rinstDerived4: REF_TO ClDerived;
     interf1: ITF1;
