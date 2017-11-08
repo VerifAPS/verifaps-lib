@@ -107,6 +107,12 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     }
 
     @Override
+    public Object visit(ArrayTypeDeclaration arrayTypeDeclaration) {
+        arrayTypeDeclaration.setBaseType(globalScope.resolveDataType(arrayTypeDeclaration.getTypeName()));
+        return super.visit(arrayTypeDeclaration);
+    }
+
+    @Override
     public Object visit(Literal literal) {
         try {
             EnumerateType enumType = (EnumerateType)local.getGlobalScope().
