@@ -25,6 +25,8 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.st.Identifiable;
+import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
@@ -37,7 +39,7 @@ import lombok.Data;
  */
 @Data
 public class SymbolicReference extends Reference {
-    private String identifier;
+    private IdentifierPlaceHolder identifier = new IdentifierPlaceHolder();
     private ExpressionList subscripts;
     private Reference sub;
     private Any dataType;
@@ -57,7 +59,7 @@ public class SymbolicReference extends Reference {
         if (s == null)
             throw new IllegalArgumentException();
         this.sub = sub;
-        identifier = s;
+        identifier.setIdentifier(s);
     }
 
     /**
@@ -104,7 +106,7 @@ public class SymbolicReference extends Reference {
      * @return a {@link java.lang.String} object.
      */
     public String getIdentifier() {
-        return identifier;
+        return identifier.getIdentifier();
     }
 
     /**
@@ -115,7 +117,15 @@ public class SymbolicReference extends Reference {
     public void setIdentifier(String identifier) {
         if (identifier == null)
             throw new IllegalArgumentException();
-        this.identifier = identifier;
+        this.identifier.setIdentifier(identifier);
+    }
+
+    public Identifiable getIdentifiedObject() {
+        return identifier.getIdentifiedObject();
+    }
+
+    public void setIdentifiedObject(Identifiable identifiedObject) {
+        identifier.setIdentifiedObject(identifiedObject);
     }
 
     /**

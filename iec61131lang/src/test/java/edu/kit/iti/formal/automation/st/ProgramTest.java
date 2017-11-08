@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st;
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.NiceErrorListener;
+import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
@@ -31,6 +32,8 @@ import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
@@ -123,4 +126,23 @@ public class ProgramTest {
         System.out.println(IEC61131Facade.printTopLevelElements(tle));
     }
 
+    @Test
+    public void testEffectiveSubtypes() throws IOException {
+        TopLevelElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
+        GlobalScope gs = IEC61131Facade.resolveDataTypes(tle);
+        IEC61131Facade.findEffectiveSubtypes(tle, gs);
+        AstVisitor effectiveSubtypesPrinter = new AstVisitor() {
+            @Override
+            public Object visit(VariableDeclaration variableDeclaration) {
+                if (!variableDeclaration.getEffectiveDataTypes().isEmpty()) {
+                    System.out.println(variableDeclaration);
+                    for (Any dataType : variableDeclaration.getEffectiveDataTypes())
+                        System.out.println("* " + dataType.getName());
+                    System.out.println();
+                }
+                return super.visit(variableDeclaration);
+            }
+        };
+        tle.accept(effectiveSubtypesPrinter);
+    }
 }

@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.datatypes;
  */
 
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
+import edu.kit.iti.formal.automation.st.ast.TopLevelScopeElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -37,6 +38,11 @@ import lombok.Data;
 @AllArgsConstructor
 public class ClassDataType extends RecordType {
     private final ClassDeclaration clazz;
+
+    @Override
+    public TopLevelScopeElement getDeclaration() {
+        return clazz;
+    }
 
     @Override public String repr(Object obj) {
         return null;

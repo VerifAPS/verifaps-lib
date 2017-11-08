@@ -25,9 +25,11 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.scope.LocalScope;
-import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +45,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Invocation extends Expression {
-    private final IdentifierPlaceHolder<Invocable> callee = new IdentifierPlaceHolder<>();
+    @NonNull
+    private SymbolicReference callee;
     private List<Parameter> parameters = new ArrayList<>();
 
     public Invocation(String calleeName, Expression... expr) {
@@ -54,8 +57,7 @@ public class Invocation extends Expression {
     }
 
     public Invocation(Invocation invocation) {
-        callee.setIdentifier(invocation.getCalleeName());
-        callee.setIdentifiedObject(invocation.callee.getIdentifiedObject());
+        callee = invocation.getCallee();
         parameters.addAll(invocation.parameters);
     }
 
@@ -102,12 +104,12 @@ public class Invocation extends Expression {
      */
     @Override
     public Any dataType(LocalScope localScope) {
-        return callee.getIdentifiedObject().getReturnType();
+        return ((Invocable) callee.getIdentifiedObject()).getReturnType();
     }
 
     @Override
     public Expression copy() {
-        Invocation fc = new Invocation();
+        Invocation fc = new Invocation(this);
         fc.setRuleContext(getRuleContext());
         fc.setCalleeName(getCalleeName());
         fc.setParameters(new ArrayList<>(parameters));

@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation;
  */
 
 import edu.kit.iti.formal.automation.analysis.FindDataTypes;
+import edu.kit.iti.formal.automation.analysis.FindEffectiveSubtypes;
 import edu.kit.iti.formal.automation.analysis.FindInstances;
 import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
@@ -131,6 +132,17 @@ public class IEC61131Facade {
         InstanceScope instanceScope = new InstanceScope(globalScope);
         element.accept(new FindInstances(instanceScope));
         return instanceScope;
+    }
+
+    private static final int FIND_EFFECTIVE_SUBTYPES_LIMIT = 1000;
+
+    public static void findEffectiveSubtypes(TopLevelElements topLevelElements, GlobalScope globalScope) {
+        FindEffectiveSubtypes findEffectiveSubtypes = new FindEffectiveSubtypes();
+        for (int i = 0; i < FIND_EFFECTIVE_SUBTYPES_LIMIT; i++) {
+            findEffectiveSubtypes.prepareRun();
+            topLevelElements.accept(findEffectiveSubtypes);
+        }
+        System.out.println("Done: fixpoint is " + findEffectiveSubtypes.fixpointReached());
     }
 
     /**

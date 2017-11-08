@@ -581,7 +581,8 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
 
     @Override
     public Object visitInvocation(IEC61131Parser.InvocationContext ctx) {
-        Invocation i = new Invocation(ctx.id.getText());
+        Invocation i = new Invocation();
+        i.setCallee((SymbolicReference) ctx.id.accept(this));
         if (ctx.expression().isEmpty()) {
             // Using parameters
             i.addParameters(allOf(ctx.param_assignment()));
