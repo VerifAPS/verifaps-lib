@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.st.ast.TopLevelScopeElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,7 +33,7 @@ import java.util.List;
 /**
  * Created by weigl on 10.06.14.
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
 @Data
@@ -41,6 +42,10 @@ import java.util.List;
 public class RecordType extends Any {
     private String name;
     private List<Field> fields = new ArrayList<>();
+    /**
+     * The declaration associated with the type.
+     */
+    private TopLevelScopeElement declaration;
 
     /**
      * <p>Constructor for RecordType.</p>
