@@ -31,8 +31,13 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class InterfaceDataType extends Any {
+public class InterfaceDataType extends RecordType {
     private InterfaceDeclaration interfaceDeclaration;
+
+    @Override
+    public String getName() {
+        return interfaceDeclaration.getName();
+    }
 
     @Override
     public String repr(Object obj) {

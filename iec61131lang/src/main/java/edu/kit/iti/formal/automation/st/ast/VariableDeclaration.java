@@ -25,8 +25,11 @@ package edu.kit.iti.formal.automation.st.ast;
 import com.google.common.collect.ImmutableMap;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by weigla on 09.06.2014.
@@ -34,6 +37,7 @@ import java.util.Map;
  * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
+@Data
 public class VariableDeclaration extends Top
         implements Comparable<VariableDeclaration> {
     /**
@@ -115,6 +119,11 @@ public class VariableDeclaration extends Top
     private Any dataType;
     private int type;
     private TypeDeclaration typeDeclaration;
+
+    /**
+     * Set of effective data types the values of the variable can assume. Populated in static analysis.
+     */
+    private final Set<Any> effectiveDataTypes = new HashSet<>();
 
     /**
      * <p>Constructor for VariableDeclaration.</p>
@@ -419,6 +428,14 @@ public class VariableDeclaration extends Top
      */
     public void setTypeDeclaration(TypeDeclaration<?> typeDeclaration) {
         this.typeDeclaration = typeDeclaration;
+    }
+
+    public void addEffectiveDataType(Any dataType) {
+        effectiveDataTypes.add(dataType);
+    }
+
+    public boolean hasEffectiveDataType(Any dataType) {
+        return effectiveDataTypes.contains(dataType);
     }
 
     /**
