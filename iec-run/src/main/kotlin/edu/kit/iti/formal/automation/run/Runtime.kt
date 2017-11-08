@@ -2,6 +2,7 @@ package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.run.stexceptions.StEvaluationException
 import edu.kit.iti.formal.automation.run.stexceptions.TypeMissmatchException
+import edu.kit.iti.formal.automation.scope.GlobalScope
 import edu.kit.iti.formal.automation.scope.LocalScope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
@@ -13,14 +14,14 @@ import java.util.*
  * Represents the Runtime of ST-execution
  * changes the [state] depending on the visited Nodes
  */
-class Runtime(val state: State) : DefaultVisitor<Unit>() {
+class Runtime(val state: State, private val definitionScopeStack: Stack<LocalScope> = Stack()) : DefaultVisitor<Unit>() {
     companion object : KLogging()
     /*
      * stores the variable definitions (e.g. "VAR a : INT END_VAR"
      * The variables are scoped, hence the Stack data-type
      */
-    private val definitionScopeStack: Stack<LocalScope> = Stack()
     private val typeDeclarationAdder = TypeDeclarationAdder()
+
     override fun visit(variableDeclaration: VariableDeclaration) {
         variableDeclaration.init
         return super.visit(variableDeclaration)
@@ -41,6 +42,10 @@ class Runtime(val state: State) : DefaultVisitor<Unit>() {
         typeDeclarationAdder.queueFunctionBlockDeclaration(functionBlockDeclaration)
     }
 
+    override fun visit(functionDeclaration: FunctionDeclaration) {
+        typeDeclarationAdder.queueFunctionDeclaration(functionDeclaration)
+    }
+
     override fun visit(programDeclaration: ProgramDeclaration) {
         val localScope = programDeclaration.localScope
         definitionScopeStack.push(localScope)
@@ -50,9 +55,20 @@ class Runtime(val state: State) : DefaultVisitor<Unit>() {
         return programDeclaration!!.programBody.accept(this)
     }
 
-    override fun visit(fbc: FunctionBlockCallStatement?) {
-
-        TODO()
+    override fun visit(fbc: FunctionBlockCallStatement) {
+        val innerState = TopState()
+        fbc.parameters.filter { !it.isOutput }.forEach {
+            val parameterValue = (it.expression as Visitable).accept<ExpressionValue>(ExpressionVisitor(state, peekLocalScope()))
+            innerState.put(it.name, Optional.of(parameterValue))
+        }
+        val fbName = fbc.functionBlockName
+        val fbTypeName = peekLocalScope().getVariable(fbName).typeDeclaration.baseTypeName
+        val fb = peekLocalScope().globalScope.getFunctionBlock(fbTypeName)
+        fb.accept<Any>(Runtime(innerState))
+        fbc.outputParameters.forEach {
+            val parameterValue = (it.expression as Visitable).accept<ExpressionValue>(ExpressionVisitor(innerState, peekLocalScope()))
+            state.put(it.name, Optional.of(parameterValue))
+        }
     }
 
     override fun visit(whileStatement: WhileStatement) {
@@ -96,7 +112,7 @@ class Runtime(val state: State) : DefaultVisitor<Unit>() {
         }
     }
 
-    private fun initializeLocalVariables(localScope: LocalScope) {
+    public fun initializeLocalVariables(localScope: LocalScope) {
         val localVariables: Map<out String, VariableDeclaration> = localScope.localVariables
         localVariables.map {
             val initExpr = it.value.init

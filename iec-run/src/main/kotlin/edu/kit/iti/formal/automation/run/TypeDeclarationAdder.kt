@@ -2,6 +2,7 @@ package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.scope.GlobalScope
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration
+import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.st.ast.TypeDeclaration
 
 /**
@@ -12,6 +13,7 @@ import edu.kit.iti.formal.automation.st.ast.TypeDeclaration
 class TypeDeclarationAdder {
     private val typeDeclarations: MutableList<TypeDeclaration<*>> = mutableListOf()
     private val functionBlockDeclarations: MutableList<FunctionBlockDeclaration> = mutableListOf()
+    private  val functionDeclarations: MutableList<FunctionDeclaration> = mutableListOf()
 
     /**
      * queue [typeDeclaration] for addition to the global scope.
@@ -24,14 +26,23 @@ class TypeDeclarationAdder {
         functionBlockDeclarations.add(functionBlockDeclaration)
     }
 
+    fun queueFunctionDeclaration(functionDeclaration: FunctionDeclaration) {
+        functionDeclarations.add(functionDeclaration)
+    }
+
     /**
      * add queued type declarations to the [globalScope]
      */
-    fun addQueuedDeclarations(globalScope: GlobalScope) {
+    fun addQueuedDeclarations(globalScope: GlobalScope): TypeDeclarationAdder {
         typeDeclarations.forEach { globalScope.registerType(it) }
         typeDeclarations.retainAll(emptyList())
 
         functionBlockDeclarations.forEach { globalScope.registerFunctionBlock(it) }
         functionBlockDeclarations.retainAll(emptyList())
+
+
+        functionDeclarations.forEach { globalScope.registerFunction(it) }
+        functionDeclarations.retainAll(emptyList())
+        return this
     }
 }

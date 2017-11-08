@@ -11,7 +11,7 @@ PROGRAM my_sth
 
     b2 := NOT FALSE;
     number := (- 19);
-    n2 := number + 2;
+    n2 := (- 3)+ 2;
     b := NOT b;
 END_PROGRAM
 

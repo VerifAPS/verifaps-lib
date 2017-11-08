@@ -5,6 +5,7 @@ import edu.kit.iti.formal.automation.datatypes.AnyInt
 import edu.kit.iti.formal.automation.datatypes.AnyReal
 import edu.kit.iti.formal.automation.datatypes.DataTypes
 import edu.kit.iti.formal.automation.datatypes.promotion.IntegerPromotion
+import edu.kit.iti.formal.automation.datatypes.promotion.RealPromotion
 import edu.kit.iti.formal.automation.datatypes.values.Values
 import edu.kit.iti.formal.automation.run.stexceptions.TypeMissmatchException
 import java.math.BigDecimal
@@ -23,24 +24,42 @@ object OperationEvaluator {
         }
     }
 
-    private fun createNormalizedValue() {
 
+    /**
+     * normalize the Expression's Value to its DataType
+     */
+    public fun normalizeInt(value: Values.VAnyInt) : Values.VAnyInt {
+        val type  = value.dataType
+        //if negative and unsigned -> offset value into positive region
+        val mask = BigInteger.valueOf(2).pow(type.bitLength).subtract(BigInteger.valueOf(1))
+        if(!type.isSigned && value.value < BigInteger.ZERO) {
+            TODO("make positive")
+        }
+        var newValue = value.value
+        while (newValue > type.upperBound) {
+            newValue -= (type.upperBound - type.lowerBound + BigInteger.valueOf(1))
+        }
+
+        return Values.VAnyInt(type, newValue)
     }
 
     private fun add(leftValue: Values.VAnyInt, rightValue: Values.VAnyInt): Values.VAnyInt {
         val integerPromotion = IntegerPromotion()
         val promotedType = integerPromotion.getPromotion(leftValue.dataType, rightValue.dataType)
-        if (promotedType is AnyInt) {
-            return Values.VAnyInt(promotedType,
-                    leftValue.value.add(rightValue.value)
-                            .mod(BigInteger.valueOf(2).pow(promotedType.bitLength)))
+         if (promotedType is AnyInt) {
+            return normalizeInt(Values.VAnyInt(promotedType,
+                    leftValue.value.add(rightValue.value)))
         }
         TODO("choose correct datatype and modulo the addition")
     }
 
     private fun add(leftValue: Values.VAnyReal, rightValue: Values.VAnyReal): Values.VAnyReal {
-        return Values.VAnyReal(leftValue.dataType, leftValue.value.add(rightValue.value))
-        TODO("choose correct datatype and modulo the addition")
+        val realPromotion = RealPromotion()
+        val promotedType = realPromotion.getPromotion(leftValue.dataType, rightValue.dataType)
+        if (promotedType is AnyReal) {
+            return Values.VAnyReal(promotedType, leftValue.value)
+        }
+        throw TypeMissmatchException("could not promote '${leftValue.value}+${rightValue.value}' to appropriate type");
     }
 
 
@@ -52,7 +71,7 @@ object OperationEvaluator {
     }
 
     fun multiply(leftValue: Values.VAnyInt, rightValue: Values.VAnyInt) : Values.VAnyInt {
-        return Values.VAnyInt(leftValue.dataType, leftValue.value.multiply(rightValue.value))
+        return normalizeInt(Values.VAnyInt(leftValue.dataType, leftValue.value.multiply(rightValue.value)))
     }
 
 
@@ -66,7 +85,8 @@ object OperationEvaluator {
 
     fun negate(expressionValue: ExpressionValue): ExpressionValue {
         return when (expressionValue) {
-            is Values.VAnyInt -> Values.VAnyInt(expressionValue.dataType.asSigned(), expressionValue.value.negate())
+            is Values.VAnyInt -> normalizeInt(
+                    Values.VAnyInt(expressionValue.dataType.asSigned(), expressionValue.value.negate()))
             is Values.VAnyReal -> Values.VAnyReal(expressionValue.dataType, expressionValue.value.negate())
             else -> throw TypeMissmatchException("must be a number")
         }

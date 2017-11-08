@@ -118,4 +118,18 @@ class RuntimeTest {
             println(it)
         }
     }
+
+    @Test
+    fun functionTest() {
+        val ast = getAst(this.javaClass.getResource("runtimeTest.functionTest.st"))
+        val topState = TopState()
+        val runtime = Runtime(topState, Stack())
+        ast.accept<Any>(runtime)
+        println("final state:")
+
+        assertEquals(BigInteger.valueOf(-162), topState["Var1"]!!.get().value)
+        assertEquals(BigInteger.valueOf(7), topState["x"]!!.get().value)
+        assertEquals(BigInteger.valueOf(8), topState["y"]!!.get().value)
+    }
+
 }

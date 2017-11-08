@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.run
 
+import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.datatypes.TimeType
 import edu.kit.iti.formal.automation.datatypes.values.Values
@@ -9,6 +10,7 @@ import edu.kit.iti.formal.automation.scope.LocalScope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
+import java.util.*
 
 /**
  * evaluates the expression given via .visit() and runs creates a Runtime to call on functions in the expression.
@@ -21,11 +23,46 @@ class ExpressionVisitor(private val state : State, private val localScope : Loca
         TODO("missing visitor for visitable ${visitable.toString()}")
     }
 
+    private fun setMatchingArgToParam(parameters: List<ExpressionValue>, arguments: Map<String, VariableDeclaration>, state: State) {
+        val sortedArguments = arguments.entries
+                .sortedBy {
+                    print(it)
+                    it.value.typeDeclaration.startPosition.offset
+                }
+                .map {
+                    it.key
+                }
+        println(state)
+        sortedArguments.forEachIndexed { i, name -> state.put(name, Optional.of(parameters[i])) }
+        println(state)
+    }
+
     override fun visit(functionCall: FunctionCall): ExpressionValue {
 
-        val innerState = NestedState(state)
-        val functionDeclaration = localScope.globalScope.resolveFunction(functionCall, localScope)
-        return functionCall.function.accept(ExpressionVisitor(innerState, functionDeclaration.localScope))
+        val innerState = TopState()
+        val functionDeclaration = localScope.globalScope.getFunction(functionCall.functionName)
+        val definitionScopeStack = Stack<LocalScope>()
+        functionDeclaration.setGlobalScope(localScope.globalScope)
+
+        definitionScopeStack.push(functionDeclaration.localScope)
+
+
+        val runtime = Runtime(innerState, definitionScopeStack)
+
+        runtime.initializeLocalVariables(functionDeclaration.localScope)
+
+        val evaluatedParams = functionCall.parameters.map { (it as Visitable).accept<ExpressionValue>(this) }
+        setMatchingArgToParam(evaluatedParams, functionDeclaration.localScope.localVariables, innerState)
+
+        innerState[functionCall.functionName] = Optional.empty();
+
+        functionDeclaration.statements.accept(runtime)
+        val returnValue = innerState[functionCall.functionName]
+
+        if (returnValue != null) {
+            return returnValue.orElseThrow { ExecutionException("Return value not set in function '${functionCall.functionName}' declaration") }
+        }
+        throw ExecutionException("Return value not initialized in function ${functionCall.functionName}")
     }
 
     override fun visit(unaryExpression: UnaryExpression): ExpressionValue {
