@@ -403,4 +403,9 @@ public class DefaultVisitor<T> implements Visitor<T> {
     public T visit(ReferenceSpecification referenceSpecification) {
         return defaultVisit(referenceSpecification);
     }
+
+    @Override
+    public T visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
+        return defaultVisit(globalVariableListDeclaration);
+    }
 }

@@ -26,10 +26,9 @@ import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.st.ast.*;
-import lombok.ToString;
+import lombok.Data;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -38,7 +37,7 @@ import java.util.*;
  * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
-@ToString
+@Data
 public class GlobalScope implements Serializable {
     private Map<String, ProgramDeclaration> programs = new HashMap<>();
     private Map<String, FunctionBlockDeclaration> fb = new HashMap<>();
@@ -48,6 +47,7 @@ public class GlobalScope implements Serializable {
     private TypeScope types = TypeScope.builtin();
     private Map<String, ClassDeclaration> classes = new LinkedHashMap<>();
     private Map<String, InterfaceDeclaration> interfaces = new LinkedHashMap<>();
+    private LocalScope globalVariableList = new LocalScope();
 
     /**
      * <p>defaultScope.</p>
@@ -239,12 +239,18 @@ public class GlobalScope implements Serializable {
     public GlobalScope clone() {
         GlobalScope gs = new GlobalScope();
         gs.classes = new HashMap<>(classes);
+        gs.interfaces = new HashMap<>(interfaces);
         gs.dataTypes = new HashMap<>(dataTypes);
         gs.fb = new HashMap<>(fb);
         gs.functionResolvers = new ArrayList<>(functionResolvers);
         gs.functions = new HashMap<>(functions);
         gs.programs = new HashMap<>(programs);
         gs.types = types.clone();
+        // Needed to resolve circular dependency
+        globalVariableList.setGlobalScope(null);
+        gs.globalVariableList = globalVariableList.copy();
+        gs.globalVariableList.setGlobalScope(this);
+        globalVariableList.setGlobalScope(this);
         return gs;
     }
 }

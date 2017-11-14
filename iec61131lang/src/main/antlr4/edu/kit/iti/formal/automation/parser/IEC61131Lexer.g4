@@ -500,6 +500,11 @@ END_FUNCTION_BLOCK
 	 E N D UNDERSCORE F U N C T I O N UNDERSCORE B L O C K
 ;
 
+END_GVL
+:
+    E N D UNDERSCORE G V L
+;
+
 END_IF
 :
 	E N D '_' I F
@@ -563,6 +568,11 @@ FUNCTION_BLOCK
 F_EDGE
 :
 	F '_' E D G E
+;
+
+GVL
+:
+    G V L
 ;
 
 IF

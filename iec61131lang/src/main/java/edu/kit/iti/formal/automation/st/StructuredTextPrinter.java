@@ -605,6 +605,13 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     }
 
     @Override
+    public Object visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
+        sb.append("GVL").nl();
+        globalVariableListDeclaration.getLocalScope().accept(this);
+        return null;
+    }
+
+    @Override
     public Object visit(ReferenceSpecification referenceSpecification) {
         sb.append("REF_TO ");
         referenceSpecification.getRefTo().accept(this);

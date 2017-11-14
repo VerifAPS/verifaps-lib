@@ -378,4 +378,6 @@ public interface Visitor<T> {
     T visit(Invocation.Parameter parameter);
 
     T visit(ReferenceSpecification referenceSpecification);
+
+    T visit(GlobalVariableListDeclaration globalVariableListDeclaration);
 }
