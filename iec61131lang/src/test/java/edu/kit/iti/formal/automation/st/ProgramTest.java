@@ -34,7 +34,7 @@ import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
-import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
 import org.junit.Test;
@@ -50,7 +50,7 @@ import java.util.ArrayList;
 
 @RunWith(Parameterized.class)
 public class ProgramTest {
-    @Parameter public String testFile;
+    @Parameter public File testFile;
 
     public static final File[] getResources(String folder) {
         URL f = ProgramTest.class.getClassLoader().getResource(folder);
@@ -67,14 +67,14 @@ public class ProgramTest {
         File[] resources = getResources("edu/kit/iti/formal/automation/st/programs");
         ArrayList<Object[]> list = new ArrayList<>();
         for (File f : resources) {
-            list.add(new Object[]{f.getAbsolutePath()});
+            list.add(new Object[]{f});
         }
         return list;
     }
 
     @Test
     public void testParser() throws IOException {
-        IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRFileStream(testFile));
+        IEC61131Lexer lexer = new IEC61131Lexer(CharStreams.fromPath(testFile.toPath()));
 
 /*
         Vocabulary v = lexer.getVocabulary();
@@ -86,7 +86,7 @@ public class ProgramTest {
 */
 
         IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
-        parser.addErrorListener(new NiceErrorListener(testFile));
+        parser.addErrorListener(new NiceErrorListener(testFile.getName()));
         IEC61131Parser.StartContext ctx = parser.start();
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
         TopLevelElements sl = (TopLevelElements) ctx.accept(new IECParseTreeToAST());
@@ -105,7 +105,7 @@ public class ProgramTest {
 
     @Test
     public void testResolveDataTypes() throws IOException {
-        TopLevelElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
+        TopLevelElements tle = IEC61131Facade.file(testFile);
         GlobalScope gs = IEC61131Facade.resolveDataTypes(tle);
         for (ClassDeclaration classDeclaration : gs.getClasses()) {
             Assert.assertTrue(classDeclaration.getParent().getIdentifier() == null
@@ -122,13 +122,13 @@ public class ProgramTest {
 
     @Test
     public void testPrintTopLevelElements() throws IOException {
-        TopLevelElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
+        TopLevelElements tle = IEC61131Facade.file(testFile);
         System.out.println(IEC61131Facade.printTopLevelElements(tle));
     }
 
     @Test
     public void testEffectiveSubtypes() throws IOException {
-        TopLevelElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
+        TopLevelElements tle = IEC61131Facade.file(testFile);
         GlobalScope gs = IEC61131Facade.resolveDataTypes(tle);
         IEC61131Facade.findEffectiveSubtypes(tle, gs);
         AstVisitor effectiveSubtypesPrinter = new AstVisitor() {
