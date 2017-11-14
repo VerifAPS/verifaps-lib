@@ -181,7 +181,7 @@ public class Literal extends Initialization {
     }
 
     public String getText() {
-        return token.getText();
+        return (signed ? "-" : "") + token.getText();
     }
 
     @Override
