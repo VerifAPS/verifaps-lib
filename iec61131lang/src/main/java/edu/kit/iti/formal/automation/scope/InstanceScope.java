@@ -23,6 +23,7 @@
 package edu.kit.iti.formal.automation.scope;
 
 import edu.kit.iti.formal.automation.st.ast.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
 
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Scope representing class and FB instances in the program being analyzed.
@@ -117,6 +119,13 @@ public class InstanceScope implements Serializable {
         return functionBlockPolymorphInstances.get(functionBlockDeclaration);
     }
 
+    /**
+     * @return A (flat) list of all instances in the scope.
+     */
+    public List<Instance> getAllInstances() {
+        return classInstances.values().stream().flatMap(l -> l.stream()).collect(Collectors.toList());
+    }
+
     public void registerClassInstance(ClassDeclaration classDeclaration, Instance instance) {
         classInstances.get(classDeclaration).add(instance);
         classDeclaration.getImplementedInterfaces().forEach(i -> interfaceInstances.get(i).add(instance));
@@ -140,6 +149,7 @@ public class InstanceScope implements Serializable {
      * Model an instance of a class or function block. Maintains a reference to where the instance is declared.
      */
     @Data
+    @AllArgsConstructor
     public static class Instance {
         /**
          * Null iff parent is a program.
@@ -147,5 +157,14 @@ public class InstanceScope implements Serializable {
         private final Instance parent;
 
         private final VariableDeclaration variableDeclaration;
+
+        private StructureInitialization initialization;
+
+        public Instance(Instance parent, VariableDeclaration variableDeclaration) {
+            this(parent, variableDeclaration, (StructureInitialization) variableDeclaration.getInit());
+            // Add initialization if none
+            if (initialization == null)
+                initialization = new StructureInitialization();
+        }
     }
 }
