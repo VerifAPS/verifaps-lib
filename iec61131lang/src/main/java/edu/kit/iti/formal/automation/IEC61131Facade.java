@@ -163,6 +163,7 @@ public class IEC61131Facade {
      * @param topLevelElements
      * @return Top level elements, formatted, as string.
      */
+    @NotNull
     public static String printTopLevelElements(TopLevelElements topLevelElements) {
         StringBuilder sb = new StringBuilder();
         // Resolve data types and print them

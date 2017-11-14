@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import com.google.common.collect.ImmutableMap;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 
@@ -39,7 +40,7 @@ import java.util.Set;
  */
 @Data
 public class VariableDeclaration extends Top
-        implements Comparable<VariableDeclaration> {
+        implements Comparable<VariableDeclaration>, Identifiable {
     /**
      * Constant <code>INPUT=1</code>
      */
@@ -220,9 +221,9 @@ public class VariableDeclaration extends Top
         return typeDeclaration.initialization;
     }
 
-    /*public void setInit(Initialization init) {
+    public void setInit(Initialization init) {
         this.typeDeclaration.setInitialization(init);
-    }*/
+    }
 
     /**
      * <p>getDataTypeName.</p>
@@ -464,5 +465,10 @@ public class VariableDeclaration extends Top
                 typeDeclaration);
         vd.setDataType(dataType);
         return vd;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return name;
     }
 }
