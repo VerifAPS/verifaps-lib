@@ -28,6 +28,7 @@ import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
+import edu.kit.iti.formal.automation.st.ast.InterfaceDeclaration;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,8 @@ public class FindInstances extends AstVisitor {
 
     @Override
     public Object visit(VariableDeclaration variableDeclaration) {
-        if (variableDeclaration.isInput() || variableDeclaration.isOutput() || variableDeclaration.isInOut())
+        if (variableDeclaration.isInput() || variableDeclaration.isOutput() || variableDeclaration.isInOut()
+                || currentTopLevelScopeElement instanceof InterfaceDeclaration)
             return super.visit(variableDeclaration);
         InstanceScope.Instance currentInstance = new InstanceScope.Instance(parentInstance, variableDeclaration);
         Any dataType = variableDeclaration.getDataType();
@@ -60,14 +62,24 @@ public class FindInstances extends AstVisitor {
         if (dataType instanceof FunctionBlockDataType) {
             FunctionBlockDeclaration functionBlock = ((FunctionBlockDataType) dataType).getFunctionBlock();
             instanceScope.registerFunctionBlockInstance(functionBlock, currentInstance);
+            variableDeclaration.addInstance(currentInstance);
             recurse(functionBlock, currentInstance);
         }
         else if (dataType instanceof ClassDataType) {
             ClassDeclaration classDeclaration = ((ClassDataType) dataType).getClazz();
             instanceScope.registerClassInstance(classDeclaration, currentInstance);
+            variableDeclaration.addInstance(currentInstance);
             recurse(classDeclaration, currentInstance);
         }
         return super.visit(variableDeclaration);
+    }
+
+    @Override
+    public Object visit(ClassDeclaration clazz) {
+        // When visiting a class, make sure to visit the variables in the parent classes too
+        if (clazz.getParentClass() != null)
+            clazz.getParentClass().getLocalScope().accept(this);
+        return super.visit(clazz);
     }
 
     /**
