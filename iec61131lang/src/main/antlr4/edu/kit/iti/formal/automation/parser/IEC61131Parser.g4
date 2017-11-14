@@ -21,6 +21,7 @@ library_element_declaration
     | interface_declaration
 	| function_block_declaration
 	| program_declaration
+	| global_variable_list_declaration
 //	| configuration_declaration
 ;
 
@@ -405,6 +406,11 @@ program_declaration
 	body = statement_list END_PROGRAM
 ;
 
+global_variable_list_declaration
+:
+    GVL var_decls END_GVL
+;
+
 /*
 configuration_declaration
 
@@ -692,7 +698,7 @@ symbolic_variable
 
 :
     //x^[a,252]
-	a=(IDENTIFIER|SUPER|THIS)
+	a=(IDENTIFIER|SUPER|THIS|GVL)
 	(
         (deref += REF)*
 	)?

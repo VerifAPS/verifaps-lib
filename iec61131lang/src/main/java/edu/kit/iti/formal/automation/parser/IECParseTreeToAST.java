@@ -342,6 +342,13 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitGlobal_variable_list_declaration(IEC61131Parser.Global_variable_list_declarationContext ctx) {
+        GlobalVariableListDeclaration gvl = new GlobalVariableListDeclaration();
+        gvl.setLocalScope((LocalScope) ctx.var_decls().accept(this));
+        return gvl;
+    }
+
+    @Override
     public Object visitVar_decls(
             IEC61131Parser.Var_declsContext ctx) {
         LocalScope localScope = new LocalScope();

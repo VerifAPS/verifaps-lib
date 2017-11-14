@@ -99,6 +99,12 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     }
 
     @Override
+    public Object visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
+        globalVariableListDeclaration.setGlobalScope(globalScope);
+        return super.visit(globalVariableListDeclaration);
+    }
+
+    @Override
     public Object visit(VariableDeclaration variableDeclaration) {
         variableDeclaration.setDataType(
                 variableDeclaration.getTypeDeclaration()
