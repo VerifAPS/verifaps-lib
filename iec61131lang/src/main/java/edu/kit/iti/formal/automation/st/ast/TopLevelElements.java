@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.visitors.Visitable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -38,7 +39,7 @@ import java.util.stream.Stream;
  */
 @EqualsAndHashCode
 @ToString
-public class TopLevelElements extends Top implements List<TopLevelElement> {
+public class TopLevelElements extends Top implements List<TopLevelElement>, Visitable {
     private List<TopLevelElement> list = new ArrayList<>();
 
     /**
@@ -60,7 +61,8 @@ public class TopLevelElements extends Top implements List<TopLevelElement> {
      * {@inheritDoc}
      */
     public <T> T accept(Visitor<T> sev) {//empty
-        list.stream().forEach(a -> a.accept(sev));
+        for (TopLevelElement tle : new ArrayList<>(list))
+            tle.accept(sev);
         return null;
     }
 

@@ -30,6 +30,7 @@ import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
+import lombok.NonNull;
 
 /**
  * Created by weigl on 11.06.14.
@@ -39,9 +40,10 @@ import lombok.Data;
  */
 @Data
 public class SymbolicReference extends Reference {
+    @NonNull
     private IdentifierPlaceHolder identifier = new IdentifierPlaceHolder();
     private ExpressionList subscripts;
-    private Reference sub;
+    private SymbolicReference sub;
     private Any dataType;
 
     /**
@@ -55,7 +57,7 @@ public class SymbolicReference extends Reference {
      * @param s   a {@link java.lang.String} object.
      * @param sub a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
      */
-    public SymbolicReference(String s, Reference sub) {
+    public SymbolicReference(String s, SymbolicReference sub) {
         if (s == null)
             throw new IllegalArgumentException();
         this.sub = sub;
@@ -97,6 +99,8 @@ public class SymbolicReference extends Reference {
      * @param ast a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
      */
     public void addSubscript(Expression ast) {
+        if (subscripts == null)
+            subscripts = new ExpressionList();
         subscripts.add(ast);
     }
 
@@ -105,6 +109,7 @@ public class SymbolicReference extends Reference {
      *
      * @return a {@link java.lang.String} object.
      */
+    @NonNull
     public String getIdentifier() {
         return identifier.getIdentifier();
     }
@@ -128,40 +133,8 @@ public class SymbolicReference extends Reference {
         identifier.setIdentifiedObject(identifiedObject);
     }
 
-    /**
-     * <p>Getter for the field <code>subscripts</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.ExpressionList} object.
-     */
-    public ExpressionList getSubscripts() {
-        return subscripts;
-    }
-
-    /**
-     * <p>Setter for the field <code>subscripts</code>.</p>
-     *
-     * @param subscripts a {@link edu.kit.iti.formal.automation.st.ast.ExpressionList} object.
-     */
-    public void setSubscripts(ExpressionList subscripts) {
-        this.subscripts = subscripts;
-    }
-
-    /**
-     * <p>Getter for the field <code>sub</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
-     */
-    public Reference getSub() {
-        return sub;
-    }
-
-    /**
-     * <p>Setter for the field <code>sub</code>.</p>
-     *
-     * @param sub a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
-     */
-    public void setSub(Reference sub) {
-        this.sub = sub;
+    public boolean hasSub() {
+        return sub != null;
     }
 
     /**
@@ -184,10 +157,15 @@ public class SymbolicReference extends Reference {
     public SymbolicReference copy() {
         SymbolicReference sr = new SymbolicReference();
         sr.setRuleContext(getRuleContext());
-        sr.identifier = identifier;
+        sr.identifier = identifier.copy();
         sr.subscripts = Utils.copyNull(subscripts);
         sr.sub = Utils.copyNull(sub);
         sr.derefCount = derefCount;
         return sr;
+    }
+
+    @Override
+    public String toString() {
+        return getIdentifier() + (sub == null ? "" : "." + sub.toString());
     }
 }

@@ -27,6 +27,8 @@ import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 
+import java.util.ArrayList;
+
 /**
  * Created by weigl on 10/07/14.
  *
@@ -327,7 +329,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(ClassDeclaration clazz) {
         clazz.getLocalScope().accept(this);
-        for (MethodDeclaration m : clazz.getMethods()) {
+        for (MethodDeclaration m : new ArrayList<>(clazz.getMethods())) {
             m.accept(this);
         }
         return super.visit(clazz);
