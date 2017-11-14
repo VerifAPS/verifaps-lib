@@ -38,6 +38,10 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+
 /**
  * <p>IEC61131Facade class.</p>
  *
@@ -105,6 +109,14 @@ public class IEC61131Facade {
     public static TopLevelElements file(CharStream input) {
         IEC61131Parser parser = getParser(input);
         return (TopLevelElements) parser.start().accept(new IECParseTreeToAST());
+    }
+
+    public static TopLevelElements file(Path s) throws IOException {
+        return file(CharStreams.fromPath(s));
+    }
+
+    public static TopLevelElements file(File f) throws IOException {
+        return file(f.toPath());
     }
 
     /**
