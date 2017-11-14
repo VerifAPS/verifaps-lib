@@ -348,5 +348,9 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
-
+    @Override
+    public T visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
+        globalVariableListDeclaration.getLocalScope().accept(this);
+        return super.visit(globalVariableListDeclaration);
+    }
 }

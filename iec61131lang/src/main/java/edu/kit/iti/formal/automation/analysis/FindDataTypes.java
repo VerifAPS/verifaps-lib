@@ -120,4 +120,9 @@ public class FindDataTypes extends AstVisitor {
         return null;
     }
 
+    @Override
+    public Object visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
+        globalScope.setGlobalVariableList(globalVariableListDeclaration.getLocalScope());
+        return super.visit(globalVariableListDeclaration);
+    }
 }
