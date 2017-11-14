@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import com.google.common.collect.ImmutableMap;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
@@ -120,6 +121,11 @@ public class VariableDeclaration extends Top
     private Any dataType;
     private int type;
     private TypeDeclaration typeDeclaration;
+
+    /**
+     * Set of instances which this variable can assume. Populated by static analysis.
+     */
+    private final Set<InstanceScope.Instance> instances = new HashSet<>();
 
     /**
      * Set of effective data types the values of the variable can assume. Populated in static analysis.
@@ -429,6 +435,10 @@ public class VariableDeclaration extends Top
      */
     public void setTypeDeclaration(TypeDeclaration<?> typeDeclaration) {
         this.typeDeclaration = typeDeclaration;
+    }
+
+    public void addInstance(InstanceScope.Instance instance) {
+        instances.add(instance);
     }
 
     public void addEffectiveDataType(Any dataType) {
