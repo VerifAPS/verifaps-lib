@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.analysis;
 
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
-import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
  * @version 1 (25.06.17)
  */
 @RequiredArgsConstructor
-public class FindDataTypes extends DefaultVisitor<Object> {
+public class FindDataTypes extends AstVisitor {
     private final GlobalScope globalScope;
 
     @Override
@@ -81,6 +81,13 @@ public class FindDataTypes extends DefaultVisitor<Object> {
     public Object visit(InterfaceDeclaration interfaceDeclaration) {
         globalScope.registerInterface(interfaceDeclaration);
         return super.visit(interfaceDeclaration);
+    }
+
+    @Override
+    public Object visit(VariableDeclaration variableDeclaration) {
+        if (variableDeclaration.getTypeDeclaration() instanceof ArrayTypeDeclaration)
+            variableDeclaration.getTypeDeclaration().accept(this);
+        return super.visit(variableDeclaration);
     }
 
     @Override

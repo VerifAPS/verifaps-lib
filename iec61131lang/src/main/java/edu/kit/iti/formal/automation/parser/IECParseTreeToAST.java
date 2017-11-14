@@ -33,6 +33,7 @@ import edu.kit.iti.formal.automation.st.ast.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -251,20 +252,26 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         ArrayInitialization ast = new ArrayInitialization();
         ast.setRuleContext(ctx);
 
-        ctx.array_initial_elements().forEach(a -> a.accept(this));
+        ctx.array_initial_elements().forEach(a -> ast.addAll((List<Initialization>) a.accept(this)));
         return ast;
     }
 
     @Override
     public Object visitArray_initial_elements(
             IEC61131Parser.Array_initial_elementsContext ctx) {
-        throw new IllegalStateException();
+        List<Initialization> initializations = new ArrayList<>();
+        int count = 1;
+        if (ctx.integer() != null)
+            count = Integer.parseInt(((Literal) ctx.integer().accept(this)).getTextValue());
+        for (int i = 0; i < count; i++)
+            initializations.add((Initialization) ctx.array_initial_element().accept(this));
+        return initializations;
     }
 
     @Override
     public Object visitArray_initial_element(
             IEC61131Parser.Array_initial_elementContext ctx) {
-        throw new IllegalStateException();
+        return oneOf(ctx.constant(), ctx.structure_initialization(), ctx.array_initialization());
     }
 
     @Override

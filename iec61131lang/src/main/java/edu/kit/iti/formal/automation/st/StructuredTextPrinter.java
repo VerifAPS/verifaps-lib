@@ -33,7 +33,6 @@ import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 import org.antlr.v4.runtime.Token;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -784,6 +783,19 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     @Override
     public Object visit(IdentifierInitializer identifierInitializer) {
         // stub!
+        return null;
+    }
+
+    @Override
+    public Object visit(ArrayInitialization initializations) {
+        sb.append("[");
+        initializations.forEach(i -> {
+            i.accept(this);
+            sb.append(", ");
+        });
+        // Added an extra ", "
+        sb.deleteLast(2);
+        sb.append("]");
         return null;
     }
 
