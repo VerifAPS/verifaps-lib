@@ -802,9 +802,13 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public Object visit(StructureInitialization structureInitialization) {
         // stub!
         sb.append("(");
-        structureInitialization.getInitValues().entrySet().stream()
-                .map(entry -> entry.getKey() + " := " + entry.getValue())
-                .collect(Collectors.joining(", "));
+        structureInitialization.getInitValues().entrySet().stream().forEach(initialization -> {
+            sb.append(initialization.getKey()).append(" := ");
+            initialization.getValue().accept(this);
+            sb.append(", ");
+        });
+        // Added an extra ", "
+        sb.deleteLast(2);
         sb.append(")");
         return null;
     }
