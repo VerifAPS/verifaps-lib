@@ -246,7 +246,7 @@ array_initialization
 	LBRACKET array_initial_elements
 	(
 		COMMA array_initial_elements
-	)* RBRACKET
+	)* COMMA? RBRACKET
 ;
 
 array_initial_elements

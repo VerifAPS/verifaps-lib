@@ -32,9 +32,9 @@ import edu.kit.iti.formal.automation.st.ast.VariableBuilder;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import org.apache.commons.lang3.SerializationUtils;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,24 +48,15 @@ import java.util.stream.Collectors;
  * @author Alexander Weigl
  * @version 1 (13.06.14)
  */
+@Data
+@NoArgsConstructor
 public class LocalScope
         implements Visitable, Iterable<VariableDeclaration>, Copyable<LocalScope> {
     private VariableScope localVariables = new VariableScope();
-    private GlobalScope globalScope = new GlobalScope();
+    private GlobalScope globalScope;
 
-    /**
-     * <p>Constructor for LocalScope.</p>
-     */
-    public LocalScope() {
-    }
-
-    /**
-     * <p>Constructor for LocalScope.</p>
-     *
-     * @param global a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
-     */
-    public LocalScope(GlobalScope global) {
-        globalScope = global;
+    public LocalScope(GlobalScope globalScope) {
+        this.globalScope = globalScope;
     }
 
     /**
@@ -78,25 +69,6 @@ public class LocalScope
         for (Map.Entry<String, VariableDeclaration> e : local.localVariables.entrySet()) {
             localVariables.put(e.getKey(), new VariableDeclaration(e.getValue()));
         }
-    }
-
-
-    /**
-     * <p>Getter for the field <code>localVariables</code>.</p>
-     *
-     * @return a {@link java.util.Map} object.
-     */
-    public Map<String, VariableDeclaration> getLocalVariables() {
-        return localVariables;
-    }
-
-    /**
-     * <p>Setter for the field <code>localVariables</code>.</p>
-     *
-     * @param localVariables a {@link edu.kit.iti.formal.automation.VariableScope} object.
-     */
-    public void setLocalVariables(VariableScope localVariables) {
-        this.localVariables = localVariables;
     }
 
     public Map<String, VariableDeclaration> asMap() {
@@ -192,24 +164,6 @@ public class LocalScope
     }
 
     /**
-     * <p>Getter for the field <code>globalScope</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
-     */
-    public GlobalScope getGlobalScope() {
-        return globalScope;
-    }
-
-    /**
-     * <p>Setter for the field <code>globalScope</code>.</p>
-     *
-     * @param globalScope a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
-     */
-    public void setGlobalScope(GlobalScope globalScope) {
-        this.globalScope = globalScope;
-    }
-
-    /**
      * <p>builder.</p>
      *
      * @return a {@link edu.kit.iti.formal.automation.st.ast.VariableBuilder} object.
@@ -238,10 +192,15 @@ public class LocalScope
         return localVariables.get(s);
     }
 
+    public boolean hasVariable(String variable) {
+        return localVariables.containsKey(variable);
+    }
+
     @Override
     public LocalScope copy() {
         LocalScope ls = new LocalScope(this);
-        ls.globalScope = globalScope.clone();
+        if (globalScope != null)
+            ls.globalScope = globalScope.clone();
         for (Map.Entry<String, VariableDeclaration> e : localVariables
                 .entrySet()) {
             ls.localVariables.put(e.getKey(), e.getValue().copy());

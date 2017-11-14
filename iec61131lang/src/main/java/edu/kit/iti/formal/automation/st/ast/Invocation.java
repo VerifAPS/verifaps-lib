@@ -42,9 +42,13 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Invocation extends Expression {
+public class Invocation extends Initialization {
     private SymbolicReference callee;
     private List<Parameter> parameters = new ArrayList<>();
+
+    public Invocation(String calleeName) {
+        setCalleeName(calleeName);
+    }
 
     public Invocation(String calleeName, Expression... expr) {
         setCalleeName(calleeName);
@@ -92,7 +96,7 @@ public class Invocation extends Expression {
     }
 
     public String getCalleeName() {
-        return callee.getIdentifier();
+        return callee.toString();
     }
 
     public void setCalleeName(String calleeName) {
@@ -115,7 +119,7 @@ public class Invocation extends Expression {
     }
 
     @Override
-    public Expression copy() {
+    public Invocation copy() {
         Invocation fc = new Invocation(this);
         fc.setRuleContext(getRuleContext());
         fc.callee = callee.copy();

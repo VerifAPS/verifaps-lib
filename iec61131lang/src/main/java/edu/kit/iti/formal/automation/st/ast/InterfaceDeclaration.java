@@ -73,7 +73,7 @@ public class InterfaceDeclaration extends TopLevelScopeElement {
         List<InterfaceDeclaration> extendedInterfaces = extendsInterfaces.stream()
                 .map(i -> i.getIdentifiedObject()).collect(Collectors.toList());
         // Add extended interfaces
-        for (InterfaceDeclaration interfaceDeclaration : extendedInterfaces)
+        for (InterfaceDeclaration interfaceDeclaration : new ArrayList<>(extendedInterfaces))
             extendedInterfaces.addAll(interfaceDeclaration.getExtendedInterfaces());
         return extendedInterfaces;
     }

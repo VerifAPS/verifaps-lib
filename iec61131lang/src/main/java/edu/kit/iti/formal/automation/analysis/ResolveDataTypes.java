@@ -39,24 +39,20 @@ import edu.kit.iti.formal.automation.st.util.AstVisitor;
  * @since 25.11.16
  */
 public class ResolveDataTypes extends AstVisitor<Object> {
-    private final GlobalScope scope;
-    private LocalScope local;
+    private final GlobalScope globalScope;
+    private LocalScope localScope;
 
-    public ResolveDataTypes() {
-        this(GlobalScope.defaultScope());
-    }
-
-    public ResolveDataTypes(GlobalScope scope) {
-        this.scope = scope;
+    public ResolveDataTypes(GlobalScope globalScope) {
+        this.globalScope = globalScope;
     }
 
     private Any resolve(String name) {
-        return scope.resolveDataType(name);
+        return globalScope.resolveDataType(name);
     }
 
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
-        programDeclaration.setGlobalScope(scope);
+        programDeclaration.setGlobalScope(globalScope);
         return super.visit(programDeclaration);
     }
 
@@ -65,7 +61,7 @@ public class ResolveDataTypes extends AstVisitor<Object> {
      */
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
-        functionDeclaration.setGlobalScope(scope);
+        functionDeclaration.setGlobalScope(globalScope);
         functionDeclaration.setReturnType(
                 resolve(functionDeclaration.getReturnTypeName()));
         return super.visit(functionDeclaration);
@@ -73,14 +69,14 @@ public class ResolveDataTypes extends AstVisitor<Object> {
 
     @Override
     public Object visit(MethodDeclaration methodDeclaration) {
-        methodDeclaration.setGlobalScope(scope);
+        methodDeclaration.setGlobalScope(globalScope);
         methodDeclaration.setReturnType(resolve(methodDeclaration.getReturnTypeName()));
         return super.visit(methodDeclaration);
     }
 
     @Override
     public Object visit(LocalScope localScope) {
-        local = localScope;
+        this.localScope = localScope;
         localScope.getLocalVariables().values()
                 .forEach(vd -> vd.setDataType(resolve(vd.getDataTypeName())));
         return null;
@@ -88,13 +84,13 @@ public class ResolveDataTypes extends AstVisitor<Object> {
 
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        functionBlockDeclaration.setGlobalScope(scope);
+        functionBlockDeclaration.setGlobalScope(globalScope);
         return super.visit(functionBlockDeclaration);
     }
 
     @Override
     public Object visit(ClassDeclaration classDeclaration) {
-        classDeclaration.setGlobalScope(scope);
+        classDeclaration.setGlobalScope(globalScope);
         return super.visit(classDeclaration);
     }
 
@@ -108,7 +104,7 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     public Object visit(VariableDeclaration variableDeclaration) {
         variableDeclaration.setDataType(
                 variableDeclaration.getTypeDeclaration()
-                        .getDataType(scope));
+                        .getDataType(globalScope));
         return null;
     }
 
@@ -121,7 +117,7 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     @Override
     public Object visit(Literal literal) {
         try {
-            EnumerateType enumType = (EnumerateType)local.getGlobalScope().
+            EnumerateType enumType = (EnumerateType) localScope.getGlobalScope().
                     resolveDataType(literal.getDataTypeName());
             literal.setDataType(enumType);
         } catch(ClassCastException | DataTypeNotDefinedException e) {}
@@ -132,7 +128,7 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     public Object visit(SymbolicReference ref) {
         String first = ref.getIdentifier();
         try {
-            Any dataType = local.getGlobalScope().resolveDataType(first);
+            Any dataType = localScope.getGlobalScope().resolveDataType(first);
             EnumerateType et = (EnumerateType) dataType;
             String second = ((SymbolicReference) ref.getSub()).getIdentifier();
         } catch (ClassCastException | DataTypeNotDefinedException e) {
