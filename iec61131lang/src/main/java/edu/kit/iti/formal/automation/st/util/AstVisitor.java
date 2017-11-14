@@ -36,6 +36,8 @@ import java.util.ArrayList;
  * @version $Id: $Id
  */
 public class AstVisitor<T> extends DefaultVisitor<T> {
+    protected TopLevelScopeElement currentTopLevelScopeElement;
+
     /**
      * {@inheritDoc}
      */
@@ -164,6 +166,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(ProgramDeclaration programDeclaration) {
+        currentTopLevelScopeElement = programDeclaration;
         programDeclaration.getLocalScope().accept(this);
         programDeclaration.getProgramBody().accept(this);
         return null;
@@ -184,6 +187,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(FunctionDeclaration functionDeclaration) {
+        currentTopLevelScopeElement = functionDeclaration;
         functionDeclaration.getLocalScope().accept(this);
         functionDeclaration.getStatements().accept(this);
         return null;
@@ -328,6 +332,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(ClassDeclaration clazz) {
+        currentTopLevelScopeElement = clazz;
         clazz.getLocalScope().accept(this);
         for (MethodDeclaration m : new ArrayList<>(clazz.getMethods())) {
             m.accept(this);
@@ -337,6 +342,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(InterfaceDeclaration interfaceDeclaration) {
+        currentTopLevelScopeElement = interfaceDeclaration;
         interfaceDeclaration.getLocalScope().accept(this);
         for (MethodDeclaration m : interfaceDeclaration.getMethods())
             m.accept(this);
@@ -352,6 +358,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
+        currentTopLevelScopeElement = globalVariableListDeclaration;
         globalVariableListDeclaration.getLocalScope().accept(this);
         return super.visit(globalVariableListDeclaration);
     }
