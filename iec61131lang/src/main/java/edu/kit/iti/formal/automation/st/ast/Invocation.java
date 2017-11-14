@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class Invocation extends Initialization {
     @NonNull
-    private SymbolicReference callee;
+    private SymbolicReference callee = new SymbolicReference();
     private List<Parameter> parameters = new ArrayList<>();
 
     public Invocation(String calleeName) {
