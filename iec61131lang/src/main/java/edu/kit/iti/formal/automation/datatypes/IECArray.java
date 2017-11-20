@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.st.ast.ArrayTypeDeclaration;
 import edu.kit.iti.formal.automation.st.ast.Range;
 
 import java.util.ArrayList;
@@ -48,6 +49,11 @@ public class IECArray extends Any {
         this.name = name;
         this.fieldType = fieldType;
         this.ranges = ranges;
+    }
+
+    public IECArray(ArrayTypeDeclaration arrayTypeDeclaration) {
+        fieldType = arrayTypeDeclaration.getBaseType();
+        ranges = arrayTypeDeclaration.getRanges();
     }
 
     /**

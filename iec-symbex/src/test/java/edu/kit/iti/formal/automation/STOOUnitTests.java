@@ -28,10 +28,14 @@ import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
+import edu.kit.iti.formal.automation.stoo.trans.GlobalInstances;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 /**
@@ -58,5 +62,21 @@ public class STOOUnitTests {
                 .findAny().get();
         InstanceScope instanceScope = IEC61131Facade.findInstances(program, globalScope);
         return new STOOSimplifier.State(program, topLevelElements, globalScope, instanceScope);
+    }
+
+    @Test
+    public void assertGlobalInstances() throws IOException {
+        File[] stFiles = getSTFiles(RESOURCES_PATH + "/global_instances");
+        for (File file : stFiles) {
+            STOOSimplifier.State st = processSTFile(file);
+            TopLevelElements st1Expected = IEC61131Facade.file(Paths.get(file.toPath() + "oo"));
+            IEC61131Facade.resolveDataTypes(st1Expected);
+
+            GlobalInstances globalInstances = new GlobalInstances();
+            globalInstances.transform(st);
+            TopLevelElements st1Actual = st.getTopLevelElements();
+
+            Assert.assertEquals(IEC61131Facade.print(st1Expected), IEC61131Facade.print(st1Actual));
+        }
     }
 }
