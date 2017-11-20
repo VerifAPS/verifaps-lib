@@ -24,7 +24,6 @@ package edu.kit.iti.formal.automation.st.util;
 
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
-import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 
 import java.util.ArrayList;
@@ -39,7 +38,7 @@ import java.util.stream.Collectors;
  *
  * @author Alexander Weigl (26.06.2014)
  */
-public class AstMutableVisitor extends DefaultVisitor<Object> {
+public class AstMutableVisitor extends AstVisitor<Object> {
     /**
      * {@inheritDoc}
      */
@@ -470,6 +469,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         for (MethodDeclaration method : clazz.getMethods()) {
             methods.add((MethodDeclaration) method.accept(this));
         }
+        clazz.setMethods(methods);
 
         return super.visit(clazz);
     }
@@ -479,6 +479,24 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
         method.setLocalScope((LocalScope) method.getLocalScope().accept(this));
         method.setStatements((StatementList) method.getStatements().accept(this));
         return super.visit(method);
+    }
+
+    @Override
+    public Object visit(InterfaceDeclaration interfaceDeclaration) {
+        List<MethodDeclaration> methods = new ArrayList<>(interfaceDeclaration.getMethods().size());
+        for (MethodDeclaration method : interfaceDeclaration.getMethods()) {
+            MethodDeclaration newMethod = (MethodDeclaration) method.accept(this);
+            if (newMethod != null)
+                methods.add(method);
+        }
+        interfaceDeclaration.setMethods(methods);
+        return super.visit(interfaceDeclaration);
+    }
+
+    @Override
+    public Object visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
+        globalVariableListDeclaration.setLocalScope((LocalScope) visit(globalVariableListDeclaration.getLocalScope()));
+        return super.visit(globalVariableListDeclaration);
     }
 
     @Override

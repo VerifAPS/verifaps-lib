@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -62,5 +63,15 @@ public class MethodDeclaration extends FunctionDeclaration {
         md.functionName = functionName;
         md.returnType = returnType.copy();
         return md;
+    }
+
+    /**
+     * @return A copy of the method's local scope, accounting for its parent's (effective) local scope too.
+     */
+    public LocalScope getFullScope() {
+        LocalScope fullScope = localScope.copy();
+        if (parent != null && parent instanceof ClassDeclaration)
+            ((ClassDeclaration) parent).getEffectiveLocalScope().forEach(fullScope::add);
+        return fullScope;
     }
 }
