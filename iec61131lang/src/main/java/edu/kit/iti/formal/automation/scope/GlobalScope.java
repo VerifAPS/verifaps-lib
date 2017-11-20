@@ -161,12 +161,6 @@ public class GlobalScope implements Serializable {
             return q;
         }
 
-        if (b) {
-            q = dataTypes.get(name).getDataType(this);
-            types.put(name, q);
-            return q;
-        }
-
         if (c) {
             q = new ClassDataType(classes.get(name));
             types.put(name, q);
@@ -175,6 +169,12 @@ public class GlobalScope implements Serializable {
 
         if (d) {
             q = new InterfaceDataType(interfaces.get(name));
+            types.put(name, q);
+            return q;
+        }
+
+        if (b) {
+            q = dataTypes.get(name).getDataType(this);
             types.put(name, q);
             return q;
         }
