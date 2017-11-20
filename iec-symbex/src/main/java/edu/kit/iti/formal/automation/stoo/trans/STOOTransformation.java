@@ -39,6 +39,11 @@ public abstract class STOOTransformation {
     static final String INSTANCE_ID_VAR_NAME = "_INSTANCE_ID";
 
     /**
+     * Suffix for the instance ID type.
+     */
+    static final String INSTANCE_ID_TYPE_SUFFIX = "_TYPE";
+
+    /**
      * Standard prefix of an instance array's name.
      */
     static final String INSTANCE_ARRAY_NAME_PREFIX = "_INSTANCES_";

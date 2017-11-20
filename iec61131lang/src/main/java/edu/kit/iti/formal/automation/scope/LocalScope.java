@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * <p>LocalScope class.</p>
@@ -50,8 +51,7 @@ import java.util.stream.Collectors;
  */
 @Data
 @NoArgsConstructor
-public class LocalScope
-        implements Visitable, Iterable<VariableDeclaration>, Copyable<LocalScope> {
+public class LocalScope implements Visitable, Iterable<VariableDeclaration>, Copyable<LocalScope> {
     private VariableScope localVariables = new VariableScope();
     private GlobalScope globalScope;
 
@@ -134,6 +134,9 @@ public class LocalScope
         return localVariables.values().spliterator();
     }
 
+    public Stream<VariableDeclaration> stream() {
+        return localVariables.values().stream();
+    }
 
     /**
      * {@inheritDoc}
