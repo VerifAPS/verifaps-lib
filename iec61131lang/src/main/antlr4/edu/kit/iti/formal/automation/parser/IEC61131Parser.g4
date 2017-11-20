@@ -185,7 +185,6 @@ data_type_declaration
 type_declaration
 :
 	( array_specification
-	| enumerated_specification
 	| string_type_declaration
 	| subrange_spec_init
 	| structure_declaration
@@ -194,6 +193,7 @@ type_declaration
 	  ( R_EDGE
 	  | F_EDGE
 	  )?
+	| enumerated_specification
 	)
 	( ASSIGN i=initializations)?
 ;

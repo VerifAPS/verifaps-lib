@@ -33,7 +33,7 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
-public class SimpleTypeDeclaration extends TypeDeclaration<Literal> {
+public class SimpleTypeDeclaration<T extends Initialization> extends TypeDeclaration<T> {
     /**
      * {@inheritDoc}
      */
