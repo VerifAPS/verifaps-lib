@@ -37,6 +37,13 @@ import java.util.ArrayList;
  */
 public class AstVisitor<T> extends DefaultVisitor<T> {
     /**
+     * AST elements we're currently visiting.
+     */
+    protected LocalScope currentLocalScope;
+    protected LocalScope currentFullLocalScope;
+    protected TopLevelScopeElement currentTopLevelScopeElement;
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -164,7 +171,9 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(ProgramDeclaration programDeclaration) {
+        currentTopLevelScopeElement = programDeclaration;
         programDeclaration.getLocalScope().accept(this);
+        currentFullLocalScope = currentLocalScope;
         programDeclaration.getProgramBody().accept(this);
         return null;
     }
@@ -184,7 +193,9 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(FunctionDeclaration functionDeclaration) {
+        currentTopLevelScopeElement = functionDeclaration;
         functionDeclaration.getLocalScope().accept(this);
+        currentFullLocalScope = currentLocalScope;
         functionDeclaration.getStatements().accept(this);
         return null;
     }
@@ -202,14 +213,11 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public T visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        functionBlockDeclaration.getLocalScope().accept(this);
-        functionBlockDeclaration.getFunctionBody().accept(this);
-        return null;
+    public T visit(Invocation invocation) {
+        invocation.getCallee().accept(this);
+        invocation.getParameters().forEach(e -> e.accept(this));
+        return super.visit(invocation);
     }
 
 
@@ -251,6 +259,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(LocalScope localScope) {
+        currentLocalScope = localScope;
         for (VariableDeclaration vd : localScope.getLocalVariables().values())
             vd.accept(this);
         return null;
@@ -276,10 +285,14 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return super.visit(initializations);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public T visit(Invocation invocation) {
-        invocation.getParameters().forEach(e -> e.accept(this));
-        return super.visit(invocation);
+    public T visit(FunctionBlockDeclaration functionBlockDeclaration) {
+        visit((ClassDeclaration) functionBlockDeclaration);
+        functionBlockDeclaration.getFunctionBody().accept(this);
+        return null;
     }
 
     @Override
@@ -328,6 +341,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(ClassDeclaration clazz) {
+        currentTopLevelScopeElement = clazz;
+        currentFullLocalScope = clazz.getEffectiveLocalScope();
         clazz.getLocalScope().accept(this);
         for (MethodDeclaration m : new ArrayList<>(clazz.getMethods())) {
             m.accept(this);
@@ -337,6 +352,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(InterfaceDeclaration interfaceDeclaration) {
+        currentTopLevelScopeElement = interfaceDeclaration;
         interfaceDeclaration.getLocalScope().accept(this);
         for (MethodDeclaration m : interfaceDeclaration.getMethods())
             m.accept(this);
@@ -345,13 +361,16 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(MethodDeclaration method) {
+        if (method.getParent() instanceof ClassDeclaration)
+            currentFullLocalScope = method.getFullScope();
         method.getLocalScope().accept(this);
         method.getStatements().accept(this);
-        return null;
+        return super.visit(method);
     }
 
     @Override
     public T visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
+        currentTopLevelScopeElement = globalVariableListDeclaration;
         globalVariableListDeclaration.getLocalScope().accept(this);
         return super.visit(globalVariableListDeclaration);
     }

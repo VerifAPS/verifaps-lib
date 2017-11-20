@@ -40,7 +40,6 @@ import edu.kit.iti.formal.automation.st.util.AstVisitor;
  */
 public class ResolveDataTypes extends AstVisitor<Object> {
     private final GlobalScope globalScope;
-    private LocalScope localScope;
 
     public ResolveDataTypes(GlobalScope globalScope) {
         this.globalScope = globalScope;
@@ -76,10 +75,9 @@ public class ResolveDataTypes extends AstVisitor<Object> {
 
     @Override
     public Object visit(LocalScope localScope) {
-        this.localScope = localScope;
         localScope.getLocalVariables().values()
                 .forEach(vd -> vd.setDataType(resolve(vd.getDataTypeName())));
-        return null;
+        return super.visit(localScope);
     }
 
     @Override
@@ -117,7 +115,7 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     @Override
     public Object visit(Literal literal) {
         try {
-            EnumerateType enumType = (EnumerateType) localScope.getGlobalScope().
+            EnumerateType enumType = (EnumerateType) currentLocalScope.getGlobalScope().
                     resolveDataType(literal.getDataTypeName());
             literal.setDataType(enumType);
         } catch(ClassCastException | DataTypeNotDefinedException e) {}
@@ -128,7 +126,7 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     public Object visit(SymbolicReference ref) {
         String first = ref.getIdentifier();
         try {
-            Any dataType = localScope.getGlobalScope().resolveDataType(first);
+            Any dataType = currentLocalScope.getGlobalScope().resolveDataType(first);
             EnumerateType et = (EnumerateType) dataType;
             String second = ((SymbolicReference) ref.getSub()).getIdentifier();
         } catch (ClassCastException | DataTypeNotDefinedException e) {
