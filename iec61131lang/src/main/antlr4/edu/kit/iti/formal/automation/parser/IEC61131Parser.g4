@@ -270,7 +270,7 @@ structure_initialization
 :
 	LPAREN
 	I=IDENTIFIER ASSIGN i=initializations
-	( I=IDENTIFIER ASSIGN i=initializations)*
+	(COMMA I=IDENTIFIER ASSIGN i=initializations)*
 	RPAREN
 ;
 
