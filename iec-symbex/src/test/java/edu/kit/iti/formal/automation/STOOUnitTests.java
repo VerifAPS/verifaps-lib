@@ -22,25 +22,32 @@
 
 package edu.kit.iti.formal.automation;
 
+import com.google.common.base.CaseFormat;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
-import edu.kit.iti.formal.automation.stoo.trans.GlobalInstances;
+import edu.kit.iti.formal.automation.stoo.trans.STOOTransformation;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Augusto Modanese
  */
+@RunWith(Parameterized.class)
 public class STOOUnitTests {
     private static final String RESOURCES_PATH = "edu/kit/iti/formal/automation/st/stoo/unit";
 
@@ -64,19 +71,36 @@ public class STOOUnitTests {
         return new STOOSimplifier.State(program, topLevelElements, globalScope, instanceScope);
     }
 
+    private static STOOSimplifier.State processSTFile(Path path) throws IOException {
+        return processSTFile(path.toFile());
+    }
+
+    @Parameterized.Parameters
+    public static List<Object[]> stooTransformations() {
+        return STOOSimplifier.TRANSFORMATIONS.stream()
+                .flatMap(t -> Arrays.stream(getSTFiles(RESOURCES_PATH + "/"
+                                + CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, t.getClass().getSimpleName())))
+                        .map(f -> new Object[] {t, f}))
+                .collect(Collectors.toList());
+    }
+
+    @Parameterized.Parameter
+    public STOOTransformation stooTransformation;
+
+    @Parameterized.Parameter(1)
+    public File file;
+
     @Test
-    public void assertGlobalInstances() throws IOException {
-        File[] stFiles = getSTFiles(RESOURCES_PATH + "/global_instances");
-        for (File file : stFiles) {
-            STOOSimplifier.State st = processSTFile(file);
-            TopLevelElements st1Expected = IEC61131Facade.file(Paths.get(file.toPath() + "oo"));
-            IEC61131Facade.resolveDataTypes(st1Expected);
+    public void testSTOOTransformation() throws IOException {
+        System.out.println(stooTransformation.getClass().getSimpleName());
+        System.out.println(file.getName());
 
-            GlobalInstances globalInstances = new GlobalInstances();
-            globalInstances.transform(st);
-            TopLevelElements st1Actual = st.getTopLevelElements();
+        STOOSimplifier.State st = processSTFile(file);
+        TopLevelElements st1Expected = processSTFile(Paths.get(file.toPath() + "oo")).getTopLevelElements();
 
-            Assert.assertEquals(IEC61131Facade.print(st1Expected), IEC61131Facade.print(st1Actual));
-        }
+        stooTransformation.transform(st);
+        TopLevelElements st1Actual = st.getTopLevelElements();
+
+        Assert.assertEquals(IEC61131Facade.print(st1Expected), IEC61131Facade.print(st1Actual));
     }
 }
