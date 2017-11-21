@@ -24,12 +24,11 @@ package edu.kit.iti.formal.automation.analysis;
 
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
+import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import lombok.RequiredArgsConstructor;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Conduct static analysis to find the effective subtypes of all references (including interface-type references).
@@ -74,6 +73,9 @@ public class FindEffectiveSubtypes extends AstVisitor {
         fixpoint = true;
     }
 
+    private final GlobalScope globalScope;
+    private final InstanceScope instanceScope;
+
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
         visit ((TopLevelScopeElement) functionDeclaration);
@@ -113,11 +115,31 @@ public class FindEffectiveSubtypes extends AstVisitor {
         // Base case
         if (variableDeclaration.getDataType() instanceof ClassDataType)
             variableDeclaration.addEffectiveDataType(variableDeclaration.getDataType());
+        // Add all possible cases
+        // TODO: rewrite
+        else if (variableDeclaration.getDataType() instanceof InterfaceDataType) {
+            globalScope.getClasses().stream()
+                    .filter(c -> c.implementsInterface(
+                            ((InterfaceDataType) variableDeclaration.getDataType()).getInterfaceDeclaration()))
+                    .filter(c -> !instanceScope.getInstancesOfClass(c).isEmpty())
+                    .forEach(c -> variableDeclaration.addEffectiveDataType(globalScope.resolveDataType(c)));
+            assert variableDeclaration.getEffectiveDataTypes().size() > 0;
+        }
+        else if (variableDeclaration.getDataType() instanceof ReferenceType) {
+            ClassDeclaration clazz = ((ClassDataType) ((ReferenceType) variableDeclaration.getDataType()).getOf())
+                    .getClazz();
+            globalScope.getClasses().stream()
+                    .filter(c -> c.equals(clazz) || c.extendsClass(clazz))
+                    .filter(c -> !instanceScope.getInstancesOfClass(c).isEmpty())
+                    .forEach(c -> variableDeclaration.addEffectiveDataType(globalScope.resolveDataType(c)));
+            assert variableDeclaration.getEffectiveDataTypes().size() > 0;
+        }
         return super.visit(variableDeclaration);
     }
 
     @Override
     public Object visit(AssignmentStatement assignmentStatement) {
+        /*  TODO: rewrite
         VariableDeclaration variableDeclaration = (VariableDeclaration) resolveReference(
                 (SymbolicReference) assignmentStatement.getLocation());
         // We are interested in (regular) references and interface types
@@ -136,6 +158,7 @@ public class FindEffectiveSubtypes extends AstVisitor {
                     fixpoint = false;
                 }
         }
+        */
         return super.visit(assignmentStatement);
     }
 

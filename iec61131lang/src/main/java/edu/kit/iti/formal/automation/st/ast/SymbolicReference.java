@@ -51,6 +51,12 @@ public class SymbolicReference extends Reference {
     private Any dataType;
 
     /**
+     * Used in STOO transformations to set the symbolic reference's effective type (in contrast to dataType, which
+     * might be a deferred type).
+     */
+    private Any effectiveDataType;
+
+    /**
      * Number of times reference is dereferenced.
      */
     private int derefCount = 0;
@@ -88,6 +94,7 @@ public class SymbolicReference extends Reference {
         this.sub = symbolicReference.sub;
         this.derefCount = symbolicReference.derefCount;
         this.dataType = symbolicReference.dataType;
+        this.effectiveDataType = symbolicReference.effectiveDataType;
         if (this.identifier == null)
             throw new IllegalArgumentException();
     }
@@ -203,6 +210,7 @@ public class SymbolicReference extends Reference {
         sr.sub = Utils.copyNull(sub);
         sr.derefCount = derefCount;
         sr.dataType = dataType;
+        sr.effectiveDataType = effectiveDataType;
         return sr;
     }
 
