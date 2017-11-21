@@ -307,7 +307,7 @@ public class AstMutableVisitor extends AstVisitor<Object> {
      */
     @Override
     public Object visit(LocalScope localScope) {
-        return localScope;
+        return super.visit(localScope);
     }
 
     /**
@@ -448,6 +448,8 @@ public class AstMutableVisitor extends AstVisitor<Object> {
 
     @Override
     public Object visit(SymbolicReference symbolicReference) {
+        if (symbolicReference.hasSubscripts())
+            symbolicReference.setSubscripts((ExpressionList) symbolicReference.getSubscripts().accept(this));
         return super.visit(symbolicReference);
     }
 

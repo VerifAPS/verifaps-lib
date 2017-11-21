@@ -25,6 +25,8 @@ package edu.kit.iti.formal.automation.analysis;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
+import edu.kit.iti.formal.automation.datatypes.RecordType;
+import edu.kit.iti.formal.automation.datatypes.ReferenceType;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.LocalScope;
@@ -32,9 +34,9 @@ import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 
 /**
- * ResolveDataTypes searches and set the data type attributes based on the given global scope.
+ * Searche and set the data type attributes based on the given global scope.
  *
- * @author Alexander Weigl
+ * @author Alexander Weigl, Augusto Modanese
  * @version 1
  * @since 25.11.16
  */
@@ -124,14 +126,60 @@ public class ResolveDataTypes extends AstVisitor<Object> {
 
     @Override
     public Object visit(SymbolicReference ref) {
-        String first = ref.getIdentifier();
+        // Discover the reference's identified objects and data type and set them
         try {
-            Any dataType = currentLocalScope.getGlobalScope().resolveDataType(first);
-            EnumerateType et = (EnumerateType) dataType;
-            String second = ((SymbolicReference) ref.getSub()).getIdentifier();
-        } catch (ClassCastException | DataTypeNotDefinedException e) {
+            Any identifiedObjectDataType = null;
+            LocalScope newLocalScope = null;
 
+            // THIS
+            if (ref.getIdentifier() == "THIS") {
+                ref.setIdentifiedObject(currentTopLevelScopeElement);
+                identifiedObjectDataType = globalScope.resolveDataType(ref.getIdentifiedObject().getIdentifier());
+                newLocalScope = currentLocalScope;
+            }
+            // SUPER
+            else if (ref.getIdentifier() == "SUPER") {
+                ClassDeclaration parentClass = ((ClassDeclaration) currentTopLevelScopeElement).getParentClass();
+                ref.setIdentifiedObject(parentClass);
+                identifiedObjectDataType = globalScope.resolveDataType(parentClass.getName());
+                newLocalScope = parentClass.getLocalScope();
+            }
+            // Variable in scope or GVL
+            else if (currentLocalScope.hasVariable(ref.getIdentifier()) || ref.getIdentifier() == "GVL") {
+                VariableDeclaration refVariable;
+                if (ref.getIdentifier() == "GVL")
+                    refVariable = currentLocalScope.getGlobalScope().getGlobalVariableList().getVariable(ref);
+                else
+                    refVariable = currentLocalScope.getVariable(ref);
+                ref.setIdentifiedObject(refVariable);
+                identifiedObjectDataType = refVariable.getDataType();
+                for (int i = 0; i < ref.getDerefCount(); i++)
+                    identifiedObjectDataType = ((ReferenceType) identifiedObjectDataType).getOf();
+                if (ref.hasSub())
+                    newLocalScope = ((RecordType) identifiedObjectDataType).getDeclaration().getLocalScope();
+            }
+
+            // Method
+            if (currentTopLevelScopeElement instanceof ClassDeclaration
+                    && ((ClassDeclaration) currentTopLevelScopeElement).hasMethod(ref.getIdentifier())) {
+                MethodDeclaration method = ((ClassDeclaration) currentTopLevelScopeElement)
+                        .getMethod(ref.getIdentifier());
+                ref.setIdentifiedObject(method);
+                ref.setDataType(method.getReturnType());
+            }
+            // Recurse
+            else if (ref.hasSub()) {
+                // Switch to local scope of top level scope element
+                LocalScope oldLocalScope = currentLocalScope;
+                currentLocalScope = newLocalScope;
+                ref.getSub().accept(this);
+                ref.setDataType(ref.getSub().getDataType());
+                currentLocalScope = oldLocalScope;
+            } else
+                ref.setDataType(identifiedObjectDataType);
+        } catch (ClassCastException | DataTypeNotDefinedException e) {
+            e.printStackTrace();
         }
-        return null;
+        return super.visit(ref);
     }
 }

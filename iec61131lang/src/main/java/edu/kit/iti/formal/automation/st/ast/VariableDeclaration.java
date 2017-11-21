@@ -25,9 +25,12 @@ package edu.kit.iti.formal.automation.st.ast;
 import com.google.common.collect.ImmutableMap;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -40,6 +43,8 @@ import java.util.Set;
  * @version $Id: $Id
  */
 @Data
+@EqualsAndHashCode(callSuper = true, exclude = "parent")
+@ToString(callSuper = true, exclude = "parent")
 public class VariableDeclaration extends Top
         implements Comparable<VariableDeclaration>, Identifiable {
     /**
@@ -121,6 +126,11 @@ public class VariableDeclaration extends Top
     private Any dataType;
     private int type;
     private TypeDeclaration typeDeclaration;
+
+    /**
+     * The local scope the variable is declared in.
+     */
+    private LocalScope parent;
 
     /**
      * Set of instances which this variable can assume. Populated by static analysis.

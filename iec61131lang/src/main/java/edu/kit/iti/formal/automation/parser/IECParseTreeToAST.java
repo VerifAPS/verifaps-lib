@@ -356,6 +356,8 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         ctx.var_decl().forEach(vd -> {
             vd.accept(this);
         });
+        for (VariableDeclaration variableDeclaration : localScope.getLocalVariables().values())
+            variableDeclaration.setParent(localScope);
         gather = null;
         return localScope;
     }
