@@ -31,6 +31,10 @@ import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by weigl on 11.06.14.
@@ -82,6 +86,8 @@ public class SymbolicReference extends Reference {
         this.identifier = symbolicReference.identifier;
         this.subscripts = symbolicReference.getSubscripts();
         this.sub = symbolicReference.sub;
+        this.derefCount = symbolicReference.derefCount;
+        this.dataType = symbolicReference.dataType;
         if (this.identifier == null)
             throw new IllegalArgumentException();
     }
@@ -91,6 +97,13 @@ public class SymbolicReference extends Reference {
      */
     public SymbolicReference() {
 
+    }
+
+    public SymbolicReference(List<SymbolicReference> symbolicReferenceList) {
+        this(symbolicReferenceList.get(0));
+        sub = symbolicReferenceList.size() > 1
+                ? new SymbolicReference(symbolicReferenceList.subList(1, symbolicReferenceList.size()))
+                : null;
     }
 
     /**
@@ -138,6 +151,34 @@ public class SymbolicReference extends Reference {
     }
 
     /**
+     * @return The symbolic reference in a flat list format containing all its subreferences and starting with the
+     * reference itself.
+     */
+    public List<SymbolicReference> asList() {
+        List<SymbolicReference> list = new ArrayList<>();
+        if (sub != null)
+            list.addAll(sub.asList());
+        list.add(0, this);
+        return list;
+    }
+
+    public boolean isArrayAccess() {
+        return subscripts != null;
+    }
+
+    /**
+     * @return The local scope in which the reference is declared, or null if the scope cannot be determined.
+     */
+    public LocalScope getLocalScope() {
+        Identifiable identifiedObject = getIdentifiedObject();
+        if (identifiedObject instanceof VariableDeclaration)
+            return ((VariableDeclaration) identifiedObject).getParent();
+        else if (identifiedObject instanceof MethodDeclaration)
+            return ((MethodDeclaration) identifiedObject).getParent().getLocalScope();
+        return null;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public <T> T accept(Visitor<T> visitor) {
@@ -161,11 +202,15 @@ public class SymbolicReference extends Reference {
         sr.subscripts = Utils.copyNull(subscripts);
         sr.sub = Utils.copyNull(sub);
         sr.derefCount = derefCount;
+        sr.dataType = dataType;
         return sr;
     }
 
     @Override
     public String toString() {
-        return getIdentifier() + (sub == null ? "" : "." + sub.toString());
+        return getIdentifier()
+                + StringUtils.repeat('^', derefCount)
+                + (subscripts != null ? subscripts.toString() : "")
+                + (sub == null ? "" : "." + sub.toString());
     }
 }

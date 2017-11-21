@@ -67,7 +67,9 @@ public class LocalScope
     public LocalScope(LocalScope local) {
         globalScope = local.globalScope;
         for (Map.Entry<String, VariableDeclaration> e : local.localVariables.entrySet()) {
-            localVariables.put(e.getKey(), new VariableDeclaration(e.getValue()));
+            VariableDeclaration variableDeclaration = new VariableDeclaration(e.getValue());
+            variableDeclaration.setName(e.getKey());
+            add(variableDeclaration);
         }
     }
 
@@ -82,6 +84,7 @@ public class LocalScope
      */
     public void add(VariableDeclaration var) {
         localVariables.put(var.getName(), var);
+        var.setParent(this);
     }
 
     /**
@@ -201,9 +204,10 @@ public class LocalScope
         LocalScope ls = new LocalScope(this);
         if (globalScope != null)
             ls.globalScope = globalScope.clone();
-        for (Map.Entry<String, VariableDeclaration> e : localVariables
-                .entrySet()) {
-            ls.localVariables.put(e.getKey(), e.getValue().copy());
+        for (Map.Entry<String, VariableDeclaration> e : localVariables.entrySet()) {
+            VariableDeclaration variableDeclaration = new VariableDeclaration(e.getValue().copy());
+            variableDeclaration.setName(e.getKey());
+            ls.add(variableDeclaration);
         }
         return ls;
     }

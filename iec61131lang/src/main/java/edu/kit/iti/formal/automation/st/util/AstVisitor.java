@@ -262,7 +262,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         currentLocalScope = localScope;
         for (VariableDeclaration vd : localScope.getLocalVariables().values())
             vd.accept(this);
-        return null;
+        return super.visit(localScope);
     }
 
     /**
