@@ -149,8 +149,9 @@ public class IEC61131Facade {
 
     private static final int FIND_EFFECTIVE_SUBTYPES_LIMIT = 1000;
 
-    public static void findEffectiveSubtypes(TopLevelElements topLevelElements, GlobalScope globalScope) {
-        FindEffectiveSubtypes findEffectiveSubtypes = new FindEffectiveSubtypes();
+    public static void findEffectiveSubtypes(TopLevelElements topLevelElements, GlobalScope globalScope,
+                                             InstanceScope instanceScope) {
+        FindEffectiveSubtypes findEffectiveSubtypes = new FindEffectiveSubtypes(globalScope, instanceScope);
         int i;
         for (i = 0; i < FIND_EFFECTIVE_SUBTYPES_LIMIT && !findEffectiveSubtypes.fixpointReached(); i++) {
             findEffectiveSubtypes.prepareRun();

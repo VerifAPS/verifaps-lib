@@ -24,7 +24,6 @@ package edu.kit.iti.formal.automation.st;
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.NiceErrorListener;
-import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
@@ -32,8 +31,6 @@ import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
-import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
@@ -126,6 +123,7 @@ public class ProgramTest {
         System.out.println(IEC61131Facade.printTopLevelElements(tle));
     }
 
+    /*
     @Test
     public void testEffectiveSubtypes() throws IOException {
         TopLevelElements tle = IEC61131Facade.file(testFile);
@@ -145,4 +143,5 @@ public class ProgramTest {
         };
         tle.accept(effectiveSubtypesPrinter);
     }
+    */
 }
