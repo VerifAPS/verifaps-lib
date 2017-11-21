@@ -174,6 +174,14 @@ public class SymbolicReference extends Reference {
     }
 
     /**
+     * @return The variable this reference references.
+     */
+    public VariableDeclaration toVariable() {
+        List<SymbolicReference> referenceList = asList();
+        return (VariableDeclaration) referenceList.get(referenceList.size() - 1).getIdentifiedObject();
+    }
+
+    /**
      * @return The local scope in which the reference is declared, or null if the scope cannot be determined.
      */
     public LocalScope getLocalScope() {

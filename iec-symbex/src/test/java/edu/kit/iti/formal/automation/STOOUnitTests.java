@@ -68,6 +68,7 @@ public class STOOUnitTests {
                 .filter(tle -> tle instanceof ProgramDeclaration)
                 .findAny().get();
         InstanceScope instanceScope = IEC61131Facade.findInstances(program, globalScope);
+        IEC61131Facade.findEffectiveSubtypes(topLevelElements, globalScope, instanceScope);
         return new STOOSimplifier.State(program, topLevelElements, globalScope, instanceScope);
     }
 

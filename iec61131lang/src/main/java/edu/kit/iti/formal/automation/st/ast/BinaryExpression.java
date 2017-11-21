@@ -36,7 +36,7 @@ import lombok.ToString;
 /**
  * <p>BinaryExpression class.</p>
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
 @EqualsAndHashCode(callSuper = false)
@@ -45,6 +45,22 @@ import lombok.ToString;
 public class BinaryExpression extends Expression {
     private Expression leftExpr, rightExpr;
     private BinaryOperator operator;
+
+    public static BinaryExpression andExpression(Expression leftExpr, Expression rightExpr) {
+        return new BinaryExpression(leftExpr, rightExpr, Operators.AND);
+    }
+
+    public static BinaryExpression equalsExpression(Expression leftExpr, Expression rightExpr) {
+        return new BinaryExpression(leftExpr, rightExpr, Operators.EQUALS);
+    }
+
+    public static BinaryExpression greaterEqualsExpression(Expression leftExpr, Expression rightExpr) {
+        return new BinaryExpression(leftExpr, rightExpr, Operators.GREATER_EQUALS);
+    }
+
+    public static BinaryExpression lessEqualsExpression(Expression leftExpr, Expression rightExpr) {
+        return new BinaryExpression(leftExpr, rightExpr, Operators.LESS_EQUALS);
+    }
 
     public BinaryExpression(Expression leftExpr, Expression rightExpr, BinaryOperator operator) {
         if (leftExpr == null || rightExpr == null || operator == null) {
