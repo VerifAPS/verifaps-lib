@@ -1,0 +1,102 @@
+TYPE
+  _INSTANCE_ID_TYPE : INT(-1..2) := -1;
+END_TYPE
+
+CLASS A
+  VAR
+    _INSTANCE_ID : _INSTANCE_ID_TYPE := -1;
+    x : INT := 0;
+  END_VAR
+END_CLASS
+
+CLASS B EXTENDS A
+  VAR
+    _INSTANCE_ID : _INSTANCE_ID_TYPE := -1;
+  END_VAR
+END_CLASS
+
+PROGRAM MY_PROGRAM
+  VAR_INPUT
+    switch : BOOL;
+  END_VAR
+  VAR
+    r : REF_TO A;
+    a1 : A := (x := 1);
+    a2 : A := (x := 2);
+    b : B;
+  END_VAR
+
+  IF (switch) THEN
+    r := REF(a1);
+  ELSE
+    r := REF(b);
+  END_IF
+
+  IF (r^._INSTANCE_ID >= 1 AND r^._INSTANCE_ID <= 2) THEN
+    IF (r^.x = 0) THEN
+      r := REF(a1);
+      IF (r^._INSTANCE_ID >= 1 AND r^._INSTANCE_ID <= 2) THEN
+        r^.x := 1;
+      ELSEIF (r^._INSTANCE_ID >= 0 AND r^._INSTANCE_ID <= 0) THEN
+        r^.x := 1;
+      END_IF
+    ELSEIF (r^.x = 1) THEN
+      r := REF(a2);
+      IF (r^._INSTANCE_ID >= 1 AND r^._INSTANCE_ID <= 2) THEN
+        r^.x := 2;
+      ELSEIF (r^._INSTANCE_ID >= 0 AND r^._INSTANCE_ID <= 0) THEN
+        r^.x := 2;
+      END_IF
+    ELSE
+      r := REF(b);
+      IF (r^._INSTANCE_ID >= 1 AND r^._INSTANCE_ID <= 2) THEN
+        r^.x := 0;
+      ELSEIF (r^._INSTANCE_ID >= 0 AND r^._INSTANCE_ID <= 0) THEN
+        r^.x := 0;
+      END_IF
+    END_IF
+  ELSEIF (r^._INSTANCE_ID >= 0 AND r^._INSTANCE_ID <= 0) THEN
+    IF (r^.x = 0) THEN
+      r := REF(a1);
+      IF (r^._INSTANCE_ID >= 1 AND r^._INSTANCE_ID <= 2) THEN
+        r^.x := 1;
+      ELSEIF (r^._INSTANCE_ID >= 0 AND r^._INSTANCE_ID <= 0) THEN
+        r^.x := 1;
+      END_IF
+    ELSEIF (r^.x = 1) THEN
+      r := REF(a2);
+      IF (r^._INSTANCE_ID >= 1 AND r^._INSTANCE_ID <= 2) THEN
+        r^.x := 2;
+      ELSEIF (r^._INSTANCE_ID >= 0 AND r^._INSTANCE_ID <= 0) THEN
+        r^.x := 2;
+      END_IF
+    ELSE
+      r := REF(b);
+      IF (r^._INSTANCE_ID >= 1 AND r^._INSTANCE_ID <= 2) THEN
+        r^.x := 0;
+      ELSEIF (r^._INSTANCE_ID >= 0 AND r^._INSTANCE_ID <= 0) THEN
+        r^.x := 0;
+      END_IF
+    END_IF
+  END_IF
+
+  IF (r^._INSTANCE_ID >= 1 AND r^._INSTANCE_ID <= 2) THEN
+    WHILE (r^.x = 1) DO
+      IF (r^._INSTANCE_ID >= 1 AND r^._INSTANCE_ID <= 2) THEN
+        r^.x := 2;
+      ELSEIF (r^._INSTANCE_ID >= 0 AND r^._INSTANCE_ID <= 0) THEN
+        r^.x := 2;
+      END_IF
+      r := REF(a1);
+    END_WHILE
+  ELSEIF (r^._INSTANCE_ID >= 0 AND r^._INSTANCE_ID <= 0) THEN
+    WHILE (r^.x = 1) DO
+      IF (r^._INSTANCE_ID >= 1 AND r^._INSTANCE_ID <= 2) THEN
+        r^.x := 2;
+      ELSEIF (r^._INSTANCE_ID >= 0 AND r^._INSTANCE_ID <= 0) THEN
+        r^.x := 2;
+      END_IF
+      r := REF(a1);
+    END_WHILE
+  END_IF
+END_PROGRAM

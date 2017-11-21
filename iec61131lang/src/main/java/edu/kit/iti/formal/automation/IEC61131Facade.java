@@ -78,6 +78,7 @@ public class IEC61131Facade {
      */
     public static String print(Top ast) {
         StructuredTextPrinter stp = new StructuredTextPrinter();
+        //stp.setPrintComments(true);
         ast.accept(stp);
         return stp.getString();
     }
