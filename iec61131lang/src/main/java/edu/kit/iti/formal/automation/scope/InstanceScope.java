@@ -29,9 +29,9 @@ import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
@@ -42,11 +42,12 @@ import java.util.stream.Collectors;
 @ToString
 public class InstanceScope implements Serializable {
     private final GlobalScope globalScope;
-    private Map<ClassDeclaration, List<Instance>> classInstances = new HashMap();
-    //private Map<FunctionBlockDeclaration, List<Instance>> functionBlockInstances = new HashMap();
-    private Map<InterfaceDeclaration, List<Instance>> interfaceInstances = new HashMap();
-    private Map<ClassDeclaration, List<Instance>> classPolymorphInstances = new HashMap();
-    //private Map<FunctionBlockDeclaration, List<Instance>> functionBlockPolymorphInstances = new HashMap();
+    // Use TreeMap to assure instances are always in order; needed to write tests with explicit instance IDs
+    private Map<ClassDeclaration, List<Instance>> classInstances = new TreeMap();
+    //private Map<FunctionBlockDeclaration, List<Instance>> functionBlockInstances = new TreeMap();
+    private Map<InterfaceDeclaration, List<Instance>> interfaceInstances = new TreeMap();
+    private Map<ClassDeclaration, List<Instance>> classPolymorphInstances = new TreeMap();
+    //private Map<FunctionBlockDeclaration, List<Instance>> functionBlockPolymorphInstances = new TreeMap();
 
     public InstanceScope(GlobalScope globalScope) {
         this.globalScope = globalScope;
