@@ -91,4 +91,26 @@ public class InterfaceDeclaration extends TopLevelScopeElement {
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    public boolean hasMethod(String method) {
+        return methods.stream().filter(m -> m.getFunctionName().equals(method)).findAny().isPresent();
+    }
+
+    public boolean hasMethodWithInheritance(String method) {
+        if (hasMethod(method))
+            return hasMethod(method);
+        if (extendsInterfaces.isEmpty())
+            return hasMethod(method);
+        return extendsInterfaces.stream()
+                .filter(i -> i.getIdentifiedObject().hasMethodWithInheritance(method))
+                .findAny().isPresent();
+    }
+
+    public MethodDeclaration getMethod(String method) {
+        if (hasMethod(method))
+            return methods.stream().filter(m -> m.getFunctionName().equals(method)).findAny().get();
+        return extendsInterfaces.stream()
+                .filter(i -> i.getIdentifiedObject().hasMethodWithInheritance(method))
+                .findAny().get().getIdentifiedObject().getMethod(method);
+    }
 }

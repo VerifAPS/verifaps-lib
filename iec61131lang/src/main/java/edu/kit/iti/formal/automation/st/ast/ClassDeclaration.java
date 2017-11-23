@@ -22,12 +22,13 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import com.google.common.collect.Streams;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,10 +62,49 @@ public class ClassDeclaration extends TopLevelScopeElement {
         this.parent.setIdentifier(parent);
     }
 
+    public MethodDeclaration getMethod(String identifier) {
+        if (hasMethod(identifier))
+            return methods.stream().filter(m -> m.getFunctionName().equals(identifier)).findAny().get();
+        assert hasMethodWithInheritance(identifier);
+        return getMethodsWithInheritance().stream()
+                .filter(m -> m.getFunctionName().equals(identifier))
+                .findAny().get();
+    }
+
+    /**
+     * @return The class' methods, accounting for inheritance (parent classes).
+     */
+    public List<MethodDeclaration> getMethodsWithInheritance() {
+        if (!hasParentClass())
+            return getMethods();
+        List<MethodDeclaration> parentMethods = getParentClass().getMethodsWithInheritance();
+        // Make sure to remove obfuscated and overriden methods from parent
+        return Streams.concat(parentMethods.stream().filter(m -> !hasMethod(m.getFunctionName())),
+                getMethods().stream())
+                .collect(Collectors.toList());
+    }
+
     public void setMethods(List<MethodDeclaration> methods) {
         for (MethodDeclaration methodDeclaration : methods)
             methodDeclaration.setParent(this);
         this.methods = methods;
+    }
+
+    public boolean hasMethod(MethodDeclaration method) {
+        return methods.contains(method);
+    }
+
+    public boolean hasMethod(String method) {
+        return methods.stream().anyMatch(m -> m.getFunctionName().equals(method));
+    }
+
+    /**
+     * @param method
+     * @return Whether the class has a method with the given name, accounting for inheritance (parent classes).
+     */
+    public boolean hasMethodWithInheritance(String method) {
+        return getMethodsWithInheritance().stream()
+                .anyMatch(m -> m.getFunctionName().equals(method));
     }
 
     public void addImplements(String interfaze) {
@@ -85,11 +125,30 @@ public class ClassDeclaration extends TopLevelScopeElement {
     }
 
     /**
+     * @return (A copy of) the class' local scope when accounting for inheritance.
+     */
+    public LocalScope getEffectiveLocalScope() {
+        // Base case
+        if (!hasParentClass())
+            return getLocalScope();
+        LocalScope localScope = getLocalScope().copy();
+        getParentClass().getEffectiveLocalScope().getLocalVariables().values().stream()
+                // Disconsider obfuscated variables
+                .filter(v -> !localScope.hasVariable(v.getName()))
+                .forEach(localScope::add);
+        return localScope;
+    }
+
+    /**
      * To be called only after bound to global scope!
      * @return The parent class. Return null if the class has no parent.
      */
     public ClassDeclaration getParentClass() {
         return parent.getIdentifiedObject();
+    }
+
+    public boolean hasParentClass() {
+        return getParentClass() != null;
     }
 
     /**

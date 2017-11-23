@@ -33,7 +33,7 @@ import lombok.ToString;
  */
 
 @Data
-@EqualsAndHashCode(callSuper = true, exclude = "parent")
+@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true, exclude = "parent")
 public class MethodDeclaration extends FunctionDeclaration {
     private TopLevelScopeElement parent;
