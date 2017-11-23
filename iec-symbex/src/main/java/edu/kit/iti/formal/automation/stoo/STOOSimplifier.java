@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
  * @author Augusto Modanese
  */
 @Data
+@AllArgsConstructor
 public class STOOSimplifier {
     public static final List<Class<? extends STOOTransformation>> TRANSFORMATIONS = ImmutableList.of(
             GlobalInstances.class,
@@ -53,6 +54,11 @@ public class STOOSimplifier {
     );
 
     private final State state;
+
+    public STOOSimplifier(TopLevelElement astRoot, TopLevelElements topLevelElements, GlobalScope globalScope,
+                          InstanceScope instanceScope) {
+        state = new State(astRoot, topLevelElements, globalScope, instanceScope);
+    }
 
     public void simplify() {
         for (Class<? extends STOOTransformation> transformation : TRANSFORMATIONS)
