@@ -350,7 +350,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
     public Object visit(TypeDeclarations typeDeclarations) {
         TypeDeclarations td = new TypeDeclarations();
         for (TypeDeclaration t : typeDeclarations)
-            td.add((TypeDeclaration) td.accept(this));
+            td.add((TypeDeclaration) t.accept(this));
         return td;
     }
 
