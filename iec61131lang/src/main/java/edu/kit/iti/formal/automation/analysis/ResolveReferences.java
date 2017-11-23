@@ -70,6 +70,9 @@ public class ResolveReferences extends AstVisitor {
                         identifiedObjectDataType = ((IECArray) identifiedObjectDataType).getFieldType();
                     if (ref.hasSub())
                         if (identifiedObjectDataType instanceof ClassDataType) {
+                            if (!(refVariable.getDataType() instanceof ReferenceType)
+                                    && !(refVariable.getDataType() instanceof InterfaceDataType))
+                                ref.setEffectiveDataType(refVariable.getDataType());
                             newTopLevelScopeElement = ((ClassDataType) identifiedObjectDataType).getClazz();
                             newLocalScope = ((ClassDeclaration) newTopLevelScopeElement).getEffectiveLocalScope();
                         } else {
