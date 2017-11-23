@@ -51,6 +51,10 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
         this.typeName = typeName;
     }
 
+    public TypeDeclaration(Any dataType) {
+        this(dataType.getName());
+    }
+
     /**
      * <p>Getter for the field <code>typeName</code>.</p>
      *

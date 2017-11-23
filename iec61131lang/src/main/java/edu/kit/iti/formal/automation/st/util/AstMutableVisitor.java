@@ -469,7 +469,9 @@ public class AstMutableVisitor extends AstVisitor<Object> {
 
         List<MethodDeclaration> methods = new ArrayList<>(clazz.getMethods().size());
         for (MethodDeclaration method : clazz.getMethods()) {
-            methods.add((MethodDeclaration) method.accept(this));
+            MethodDeclaration newMethod = (MethodDeclaration) method.accept(this);
+            if (newMethod != null)
+                methods.add(newMethod);
         }
         clazz.setMethods(methods);
 
