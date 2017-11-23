@@ -23,7 +23,8 @@ package edu.kit.iti.formal.automation.analysis;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.*;
+import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.LocalScope;
@@ -125,71 +126,5 @@ public class ResolveDataTypes extends AstVisitor<Object> {
             literal.setDataType(enumType);
         } catch(ClassCastException | DataTypeNotDefinedException e) {}
         return null;
-    }
-
-    @Override
-    public Object visit(SymbolicReference ref) {
-        // Discover the reference's identified objects and data type and set them
-        try {
-            Any identifiedObjectDataType = null;
-            LocalScope newLocalScope = null;
-
-            // THIS
-            if (ref.getIdentifier().equals("THIS")) {
-                ref.setIdentifiedObject(currentTopLevelScopeElement);
-                identifiedObjectDataType = globalScope.resolveDataType(ref.getIdentifiedObject().getIdentifier());
-                newLocalScope = currentLocalScope;
-            }
-            // SUPER
-            else if (ref.getIdentifier().equals("SUPER")) {
-                ClassDeclaration parentClass = ((ClassDeclaration) currentTopLevelScopeElement).getParentClass();
-                ref.setIdentifiedObject(parentClass);
-                identifiedObjectDataType = globalScope.resolveDataType(parentClass.getName());
-                newLocalScope = parentClass.getLocalScope();
-            }
-            // Variable in scope or GVL
-            else if (currentLocalScope.hasVariable(ref.getIdentifier()) || ref.getIdentifier().equals("GVL")) {
-                VariableDeclaration refVariable;
-                if (ref.getIdentifier().equals("GVL")) {
-                    ref = ref.getSub();
-                    refVariable = currentLocalScope.getGlobalScope().getGlobalVariableList().getVariable(ref);
-                }
-                else
-                    refVariable = currentLocalScope.getVariable(ref);
-                ref.setIdentifiedObject(refVariable);
-                identifiedObjectDataType = refVariable.getDataType();
-                for (int i = 0; i < ref.getDerefCount(); i++)
-                    identifiedObjectDataType = ((ReferenceType) identifiedObjectDataType).getOf();
-                // Array access yields array field type
-                if (identifiedObjectDataType instanceof IECArray && ref.getSubscripts() != null)
-                    identifiedObjectDataType = ((IECArray) identifiedObjectDataType).getFieldType();
-                if (ref.hasSub())
-                    newLocalScope = identifiedObjectDataType instanceof ClassDataType
-                            ? ((ClassDataType) identifiedObjectDataType).getClazz().getEffectiveLocalScope()
-                            : ((RecordType) identifiedObjectDataType).getDeclaration().getLocalScope();
-            }
-
-            // Method
-            if (currentTopLevelScopeElement instanceof ClassDeclaration
-                    && ((ClassDeclaration) currentTopLevelScopeElement).hasMethod(ref.getIdentifier())) {
-                MethodDeclaration method = ((ClassDeclaration) currentTopLevelScopeElement)
-                        .getMethod(ref.getIdentifier());
-                ref.setIdentifiedObject(method);
-                ref.setDataType(method.getReturnType());
-            }
-            // Recurse
-            else if (ref.hasSub()) {
-                // Switch to local scope of top level scope element
-                LocalScope oldLocalScope = currentLocalScope;
-                currentLocalScope = newLocalScope;
-                ref.getSub().accept(this);
-                ref.setDataType(ref.getSub().getDataType());
-                currentLocalScope = oldLocalScope;
-            } else
-                ref.setDataType(identifiedObjectDataType);
-        } catch (ClassCastException | DataTypeNotDefinedException e) {
-            e.printStackTrace();
-        }
-        return super.visit(ref);
     }
 }

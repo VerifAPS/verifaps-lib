@@ -22,10 +22,7 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.analysis.FindDataTypes;
-import edu.kit.iti.formal.automation.analysis.FindEffectiveSubtypes;
-import edu.kit.iti.formal.automation.analysis.FindInstances;
-import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
+import edu.kit.iti.formal.automation.analysis.*;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
@@ -130,8 +127,10 @@ public class IEC61131Facade {
         GlobalScope scope = GlobalScope.defaultScope();
         FindDataTypes fdt = new FindDataTypes(scope);
         ResolveDataTypes rdt = new ResolveDataTypes(scope);
+        ResolveReferences rr = new ResolveReferences(scope);
         elements.accept(fdt);
         elements.accept(rdt);
+        elements.accept(rr);
         return scope;
     }
 

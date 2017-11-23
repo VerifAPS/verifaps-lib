@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.scope;
  * #L%
  */
 
+import com.google.common.collect.ImmutableMap;
 import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
@@ -30,6 +31,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by weigl on 24.11.16.
@@ -41,7 +43,10 @@ import java.util.*;
 public class GlobalScope implements Serializable {
     private Map<String, ProgramDeclaration> programs = new HashMap<>();
     private Map<String, FunctionBlockDeclaration> fb = new HashMap<>();
-    private Map<String, FunctionDeclaration> functions = new HashMap<>();
+    // TODO expand built-in function list
+    private Map<String, FunctionDeclaration> functions = new HashMap<>(ImmutableMap.of(
+            "REF", new FunctionDeclaration("REF")
+    ));
     private Map<String, TypeDeclaration> dataTypes = new HashMap<>();
     private List<FunctionResolver> functionResolvers = new LinkedList<>();
     private TypeScope types = TypeScope.builtin();
@@ -133,6 +138,14 @@ public class GlobalScope implements Serializable {
      */
     public void registerType(TypeDeclaration dt) {
         dataTypes.put(dt.getTypeName(), dt);
+    }
+
+    public Any resolveDataType(ClassDeclaration classDeclaration) {
+        return resolveDataType(classDeclaration.getName());
+    }
+
+    public Any resolveDataType(EnumerateType enumerateType) {
+        return resolveDataType(enumerateType.getName());
     }
 
     /**
@@ -252,5 +265,25 @@ public class GlobalScope implements Serializable {
         gs.globalVariableList.setGlobalScope(this);
         globalVariableList.setGlobalScope(this);
         return gs;
+    }
+
+    public List<EnumerateType> getEnumerateTypes() {
+        return dataTypes.values().stream()
+                .map(t -> t.getBaseType())
+                .filter(t -> t instanceof EnumerateType)
+                .map(t -> (EnumerateType) t)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getAllowedTypeValues() {
+        return getEnumerateTypes().stream()
+                .flatMap(t -> t.getAllowedValues().stream())
+                .collect(Collectors.toList());
+    }
+
+    public EnumerateType getTypeOfValue(String value) {
+        return getEnumerateTypes().stream()
+                .filter(t -> t.isAllowedValue(value))
+                .findAny().get();
     }
 }

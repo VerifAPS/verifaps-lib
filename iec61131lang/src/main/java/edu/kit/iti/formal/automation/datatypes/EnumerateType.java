@@ -124,7 +124,7 @@ public class EnumerateType extends Any {
      * @param defValue a {@link java.lang.String} object.
      */
     public void setDefValue(String defValue) {
-        assert allowedValues.contains(defValue);
+        assert isAllowedValue(defValue);
         this.defValue = defValue;
     }
 
@@ -140,5 +140,9 @@ public class EnumerateType extends Any {
     @Override
     public <T> T accept(DataTypeVisitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    public boolean isAllowedValue(String value) {
+        return allowedValues.contains(value);
     }
 }
