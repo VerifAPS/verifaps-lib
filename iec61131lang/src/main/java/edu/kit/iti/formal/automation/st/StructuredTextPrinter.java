@@ -644,6 +644,32 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
     }
 
+    @Override
+    public Object visit(ArrayInitialization initializations) {
+        sb.append("[");
+        initializations.forEach(i -> {
+            i.accept(this);
+            sb.append(", ");
+        });
+        // Added an extra ", "
+        sb.deleteLast(2);
+        sb.append("]");
+        return null;
+    }
+
+    public Object visit(StructureInitialization structureInitialization) {
+        sb.append("(");
+        structureInitialization.getInitValues().entrySet().stream().forEach(initialization -> {
+            sb.append(initialization.getKey()).append(" := ");
+            initialization.getValue().accept(this);
+            sb.append(", ");
+        });
+        // Added an extra ", "
+        sb.deleteLast(2);
+        sb.append(")");
+        return null;
+    }
+
     /**
      * <p>clear.</p>
      */
