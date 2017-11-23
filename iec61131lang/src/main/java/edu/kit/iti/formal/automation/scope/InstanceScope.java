@@ -43,10 +43,10 @@ import java.util.stream.Collectors;
 public class InstanceScope implements Serializable {
     private final GlobalScope globalScope;
     private Map<ClassDeclaration, List<Instance>> classInstances = new HashMap();
-    private Map<FunctionBlockDeclaration, List<Instance>> functionBlockInstances = new HashMap();
+    //private Map<FunctionBlockDeclaration, List<Instance>> functionBlockInstances = new HashMap();
     private Map<InterfaceDeclaration, List<Instance>> interfaceInstances = new HashMap();
     private Map<ClassDeclaration, List<Instance>> classPolymorphInstances = new HashMap();
-    private Map<FunctionBlockDeclaration, List<Instance>> functionBlockPolymorphInstances = new HashMap();
+    //private Map<FunctionBlockDeclaration, List<Instance>> functionBlockPolymorphInstances = new HashMap();
 
     public InstanceScope(GlobalScope globalScope) {
         this.globalScope = globalScope;
@@ -56,10 +56,10 @@ public class InstanceScope implements Serializable {
             classInstances.put(classDeclaration, new ArrayList());
             classPolymorphInstances.put(classDeclaration, new ArrayList());
         }
-        for (FunctionBlockDeclaration functionBlockDeclaration : globalScope.getFunctionBlocks()) {
+        /*for (FunctionBlockDeclaration functionBlockDeclaration : globalScope.getFunctionBlocks()) {
             functionBlockInstances.put(functionBlockDeclaration, new ArrayList());
             functionBlockPolymorphInstances.put(functionBlockDeclaration, new ArrayList());
-        }
+        }*/
     }
 
     /**
@@ -87,7 +87,8 @@ public class InstanceScope implements Serializable {
      * @return The instances of a function block, disregarding polymorphy.
      */
     public List<Instance> getInstancesOfFunctionBlock(FunctionBlockDeclaration functionBlockDeclaration) {
-        return functionBlockInstances.get(functionBlockDeclaration);
+        return getInstancesOfClass(functionBlockDeclaration);
+        //return functionBlockInstances.get(functionBlockDeclaration);
     }
 
     /**
@@ -116,7 +117,8 @@ public class InstanceScope implements Serializable {
      */
     public List<Instance> getPolymorphInstancesOfFunctionBlock(
             FunctionBlockDeclaration functionBlockDeclaration) {
-        return functionBlockPolymorphInstances.get(functionBlockDeclaration);
+        return getPolymorphInstancesOfClass(functionBlockDeclaration);
+        //return functionBlockPolymorphInstances.get(functionBlockDeclaration);
     }
 
     /**
@@ -134,6 +136,8 @@ public class InstanceScope implements Serializable {
 
     public void registerFunctionBlockInstance(FunctionBlockDeclaration functionBlockDeclaration,
                                               Instance instance) {
+        registerClassInstance(functionBlockDeclaration, instance);
+        /*
         functionBlockInstances.get(functionBlockDeclaration).add(instance);
         functionBlockDeclaration.getImplementedInterfaces().forEach(i -> interfaceInstances.get(i).add(instance));
         functionBlockDeclaration.getExtendedClasses().forEach(c -> {
@@ -143,6 +147,7 @@ public class InstanceScope implements Serializable {
                 // Function blocks may also extend classes
                 classPolymorphInstances.get(c).add(instance);
         });
+        */
     }
 
     /**

@@ -129,6 +129,7 @@ public class GlobalScope implements Serializable {
      */
     public void registerFunctionBlock(FunctionBlockDeclaration fblock) {
         fb.put(fblock.getIdentifier(), fblock);
+        classes.put(fblock.getIdentifier(), fblock);
     }
 
     /**

@@ -85,6 +85,11 @@ public class FindInstances extends AstVisitor {
         return super.visit(clazz);
     }
 
+    @Override
+    public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
+        return super.visit((ClassDeclaration) functionBlockDeclaration);
+    }
+
     /**
      * Recurse one level down a class or function block.
      * @param classDeclaration The class or function block to visit.
