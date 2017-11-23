@@ -29,10 +29,7 @@ import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
-import edu.kit.iti.formal.automation.stoo.trans.BranchEffectiveTypes;
-import edu.kit.iti.formal.automation.stoo.trans.GlobalInstances;
-import edu.kit.iti.formal.automation.stoo.trans.ReferenceToArrayAccess;
-import edu.kit.iti.formal.automation.stoo.trans.STOOTransformation;
+import edu.kit.iti.formal.automation.stoo.trans.*;
 import javafx.util.Pair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -49,8 +46,8 @@ public class STOOSimplifier {
     public final static List<STOOTransformation> TRANSFORMATIONS = ImmutableList.of(
             new GlobalInstances(),
             new BranchEffectiveTypes(),
-            new ReferenceToArrayAccess()
-            //new MethodToFunction()
+            new ReferenceToArrayAccess(),
+            new MethodToFunction()
     );
 
     private final State state;

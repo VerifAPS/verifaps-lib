@@ -58,6 +58,11 @@ public abstract class STOOTransformation {
      */
     static final String SELF_PARAMETER_NAME = "_SELF";
 
+    /**
+     * Separator to use between a class' name and its method when converting the method to a function.
+     */
+    static final String CLASS_METHOD_NAME_SEPARATOR = "_";
+
     STOOSimplifier.State state;
 
     public void transform(STOOSimplifier.State state) {

@@ -168,7 +168,7 @@ public class VariableDeclaration extends Top
      * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
     public VariableDeclaration(String name, Any dataType) {
-        this.name = name;
+        this(name, new SimpleTypeDeclaration(dataType));
         this.dataType = dataType;
     }
 

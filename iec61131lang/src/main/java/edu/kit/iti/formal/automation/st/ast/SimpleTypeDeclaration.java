@@ -26,6 +26,8 @@ import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Created by weigl on 13.06.14.
@@ -33,7 +35,13 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
+@Data
+@NoArgsConstructor
 public class SimpleTypeDeclaration<T extends Initialization> extends TypeDeclaration<T> {
+    public SimpleTypeDeclaration(Any type) {
+        super(type);
+    }
+
     /**
      * {@inheritDoc}
      */

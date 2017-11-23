@@ -76,7 +76,6 @@ public class Invocation extends Initialization {
 
     public void addParameter(Parameter parameter) {
         parameters.add(parameter);
-        parameters.sort(Parameter::compareTo);
     }
 
     public void addParameters(List<Parameter> parameterList) {
