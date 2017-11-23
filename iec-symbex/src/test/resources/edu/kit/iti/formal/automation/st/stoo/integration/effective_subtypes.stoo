@@ -1,0 +1,147 @@
+TYPE
+  _INSTANCE_ID_TYPE : INT(-1..20) := -1;
+END_TYPE
+
+TYPE
+  A: STRUCT
+    b1 : _INSTANCE_ID_TYPE := -1;
+    b2 : _INSTANCE_ID_TYPE := -1;
+    c1 : _INSTANCE_ID_TYPE := -1;
+    c2 : _INSTANCE_ID_TYPE := -1;
+    _INSTANCE_ID : _INSTANCE_ID_TYPE := -1;
+  END_STRUCT;
+
+  A1: STRUCT
+    _INSTANCE_ID : _INSTANCE_ID_TYPE := -1;
+  END_STRUCT;
+
+  A2: STRUCT
+    _INSTANCE_ID : _INSTANCE_ID_TYPE := -1;
+  END_STRUCT;
+
+  B: STRUCT
+    c1 : _INSTANCE_ID_TYPE := -1;
+    c2 : _INSTANCE_ID_TYPE := -1;
+    _INSTANCE_ID : _INSTANCE_ID_TYPE := -1;
+  END_STRUCT;
+
+  C : STRUCT
+    _INSTANCE_ID : _INSTANCE_ID_TYPE := -1;
+  END_STRUCT;
+END_TYPE
+
+FUNCTION A_f : INT
+  VAR_INPUT
+    x : INT;
+  END_VAR
+  VAR_IN_OUT
+    _SELF : A;
+  END_VAR
+
+  A_f := 42;
+END_FUNCTION
+
+FUNCTION A1_f : INT
+  VAR_INPUT
+    x : INT;
+  END_VAR
+  VAR_IN_OUT
+    _SELF : A1;
+  END_VAR
+
+  A1_f := 24;
+END_FUNCTION
+
+FUNCTION A2_f : INT
+  VAR_INPUT
+    x : INT;
+  END_VAR
+  VAR_IN_OUT
+    _SELF : A2;
+  END_VAR
+
+  A2_f := 33;
+END_FUNCTION
+
+GVL
+  VAR_GLOBAL
+    _INSTANCES_A : ARRAY [0..1] OF A := [
+      (_INSTANCE_ID := 0, b1 := 2, b2 := 3, c1 := 11, c2 := 12),
+      (_INSTANCE_ID := 1, b1 := 4, b2 := 5, c1 := 17, c2 := 18)
+    ];
+    _INSTANCES_A1 : ARRAY [1..1] OF A1 := [
+      (_INSTANCE_ID := 1)
+    ];
+    _INSTANCES_B : ARRAY [2..6] OF B := [
+      (_INSTANCE_ID := 2, c1 := 7, c2 := 8),
+      (_INSTANCE_ID := 3, c1 := 9, c2 := 10),
+      (_INSTANCE_ID := 4, c1 := 13, c2 := 14),
+      (_INSTANCE_ID := 5, c1 := 15, c2 := 16),
+      (_INSTANCE_ID := 6, c1 := 19, c2 := 20)
+    ];
+    _INSTANCES_C : ARRAY [7..20] OF C := [
+      (_INSTANCE_ID := 7),
+      (_INSTANCE_ID := 8),
+      (_INSTANCE_ID := 9),
+      (_INSTANCE_ID := 10),
+      (_INSTANCE_ID := 11),
+      (_INSTANCE_ID := 12),
+      (_INSTANCE_ID := 13),
+      (_INSTANCE_ID := 14),
+      (_INSTANCE_ID := 15),
+      (_INSTANCE_ID := 16),
+      (_INSTANCE_ID := 17),
+      (_INSTANCE_ID := 18),
+      (_INSTANCE_ID := 19),
+      (_INSTANCE_ID := 20)
+    ];
+  END_VAR
+END_GVL
+
+PROGRAM MY_PROGRAM
+  VAR_INPUT
+    switch : BOOL;
+    x : INT;
+  END_VAR
+  VAR
+    i : _INSTANCE_ID_TYPE := -1;
+    a : _INSTANCE_ID_TYPE := 0;
+    a1 : _INSTANCE_ID_TYPE := 1;
+    b : _INSTANCE_ID_TYPE := 6;
+    r : _INSTANCE_ID_TYPE := -1;
+  END_VAR
+  VAR_OUTPUT
+    y : INT;
+  END_VAR
+
+  r := a1;
+
+  IF (switch) THEN
+    i := a;
+  ELSE
+    i := b;
+  END_IF
+
+  IF (r >= 1 AND r <= 1) THEN
+    y := A1_f(x, _SELF := GVL._INSTANCES_A1[r]);
+  ELSEIF (r >= 0 AND r <= 0) THEN
+    y := A_f(x, _SELF := GVL._INSTANCES_A[r]);
+  END_IF
+
+  IF (r >= 1 AND r <= 1) THEN
+    GVL._INSTANCES_A[r].c1 := GVL._INSTANCES_B[GVL._INSTANCES_A[a].b1].c1;
+  ELSEIF (r >= 0 AND r <= 0) THEN
+    GVL._INSTANCES_A[r].c1 := GVL._INSTANCES_B[GVL._INSTANCES_A[a].b1].c1;
+  END_IF
+  IF (r >= 1 AND r <= 1) THEN
+    GVL._INSTANCES_A[r].c2 := GVL._INSTANCES_B[GVL._INSTANCES_A[a].b2].c2;
+  ELSEIF (r >= 0 AND r <= 0) THEN
+    GVL._INSTANCES_A[r].c2 := GVL._INSTANCES_B[GVL._INSTANCES_A[a].b2].c2;
+  END_IF
+
+  IF (r >= 1 AND r <= 1) THEN
+    GVL._INSTANCES_B[GVL._INSTANCES_A[r].b1].c2 := GVL._INSTANCES_A[r].c2;
+  ELSEIF (r >= 0 AND r <= 0) THEN
+    GVL._INSTANCES_B[GVL._INSTANCES_A[r].b1].c2 := GVL._INSTANCES_A[r].c2;
+  END_IF
+END_PROGRAM

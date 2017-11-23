@@ -22,14 +22,12 @@
 
 package edu.kit.iti.formal.automation;
 
-import com.google.common.base.CaseFormat;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
-import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
-import edu.kit.iti.formal.automation.stoo.trans.STOOTransformation;
+import edu.kit.iti.formal.automation.visitors.Utils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,18 +40,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Augusto Modanese
  */
 @RunWith(Parameterized.class)
-public class STOOUnitTests {
-    private static final String RESOURCES_PATH = "edu/kit/iti/formal/automation/st/stoo/unit";
+public class STOOIntegrationTests {
+    private static final String RESOURCES_PATH = "edu/kit/iti/formal/automation/st/stoo/integration";
 
     public static File[] getSTFiles(String folder) {
-        URL f = STOOUnitTests.class.getClassLoader().getResource(folder);
+        URL f = STOOIntegrationTests.class.getClassLoader().getResource(folder);
         if (f == null) {
             System.err.format("Could not find %s%n", folder);
             return new File[0];
@@ -65,9 +61,8 @@ public class STOOUnitTests {
     public static STOOSimplifier.State processSTFile(File f) throws IOException {
         TopLevelElements topLevelElements =  IEC61131Facade.file(f);
         GlobalScope globalScope = IEC61131Facade.resolveDataTypes(topLevelElements);
-        TopLevelElement program = topLevelElements.stream()
-                .filter(tle -> tle instanceof ProgramDeclaration)
-                .findAny().get();
+        TopLevelElement program = Utils.findProgram(topLevelElements);
+        assert program != null;
         InstanceScope instanceScope = IEC61131Facade.findInstances(program, globalScope);
         IEC61131Facade.findEffectiveSubtypes(topLevelElements, globalScope, instanceScope);
         return new STOOSimplifier.State(program, topLevelElements, globalScope, instanceScope);
@@ -77,32 +72,23 @@ public class STOOUnitTests {
         return processSTFile(path.toFile());
     }
 
-    @Parameterized.Parameter
-    public Class<? extends STOOTransformation> stooTransformation;
-
     @Parameterized.Parameters
-    public static List<Object[]> stooTransformations() {
-        return STOOSimplifier.TRANSFORMATIONS.stream()
-                .flatMap(t -> Arrays.stream(getSTFiles(RESOURCES_PATH + "/"
-                        + CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, t.getSimpleName())))
-                        .map(f -> new Object[] {t, f}))
-                .collect(Collectors.toList());
+    public static Object[] files() {
+        return getSTFiles(RESOURCES_PATH);
     }
 
-    @Parameterized.Parameter(1)
+    @Parameterized.Parameter
     public File file;
 
-    @Test
-    public void testSTOOTransformation() throws IOException, IllegalAccessException, InstantiationException {
-        STOOTransformation uut = stooTransformation.newInstance();
-
-        System.out.println(uut.getClass().getSimpleName());
+    @Test(timeout = 4000)
+    public void testSTOOTransformation() throws IOException {
         System.out.println(file.getName());
 
         STOOSimplifier.State st = processSTFile(file);
         TopLevelElements st1Expected = processSTFile(Paths.get(file.toPath() + "oo")).getTopLevelElements();
 
-        uut.transform(st);
+        STOOSimplifier simplifier = new STOOSimplifier(st);
+        simplifier.simplify();
         TopLevelElements st1Actual = st.getTopLevelElements();
 
         Collections.sort(st1Actual);

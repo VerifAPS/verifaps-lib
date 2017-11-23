@@ -76,14 +76,17 @@ public class Invocation extends Initialization {
 
     public void addParameter(Parameter parameter) {
         parameters.add(parameter);
+        parameters.sort(Parameter::compareTo);
     }
 
     public void addParameters(List<Parameter> parameterList) {
         parameters.addAll(parameterList);
+        parameters.sort(Parameter::compareTo);
     }
 
     public void addExpressionParameters(List<Expression> expressionList) {
         expressionList.forEach(e -> parameters.add(new Parameter(e)));
+        parameters.sort(Parameter::compareTo);
     }
 
     public List<Parameter> getInputParameters() {

@@ -31,6 +31,8 @@ import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
 import edu.kit.iti.formal.automation.visitors.Visitable;
+import javafx.collections.FXCollections;
+import javafx.collections.transformation.SortedList;
 import javafx.util.Pair;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;

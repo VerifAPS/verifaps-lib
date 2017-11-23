@@ -50,28 +50,28 @@ GVL
     _INSTANCES_A1 : ARRAY [1..1] OF A1 := [
       (_INSTANCE_ID := 1)
     ];
-    _INSTANCES_B : ARRAY [14..18] OF B := [
-      (_INSTANCE_ID := 14, c1 := 0, c2 := 1),
-      (_INSTANCE_ID := 15, c1 := 2, c2 := 3),
-      (_INSTANCE_ID := 16, c1 := 6, c2 := 7),
-      (_INSTANCE_ID := 17, c1 := 8, c2 := 9),
-      (_INSTANCE_ID := 18, c1 := 12, c2 := 13)
+    _INSTANCES_B : ARRAY [2..6] OF B := [
+      (_INSTANCE_ID := 2, c1 := 7, c2 := 8),
+      (_INSTANCE_ID := 3, c1 := 9, c2 := 10),
+      (_INSTANCE_ID := 4, c1 := 13, c2 := 14),
+      (_INSTANCE_ID := 5, c1 := 15, c2 := 16),
+      (_INSTANCE_ID := 6, c1 := 19, c2 := 20)
     ];
-    _INSTANCES_C : ARRAY [0..13] OF C := [
-      (_INSTANCE_ID := 0),
-      (_INSTANCE_ID := 1),
-      (_INSTANCE_ID := 2),
-      (_INSTANCE_ID := 3),
-      (_INSTANCE_ID := 4),
-      (_INSTANCE_ID := 5),
-      (_INSTANCE_ID := 6),
+    _INSTANCES_C : ARRAY [7..20] OF C := [
       (_INSTANCE_ID := 7),
       (_INSTANCE_ID := 8),
       (_INSTANCE_ID := 9),
       (_INSTANCE_ID := 10),
       (_INSTANCE_ID := 11),
       (_INSTANCE_ID := 12),
-      (_INSTANCE_ID := 13)
+      (_INSTANCE_ID := 13),
+      (_INSTANCE_ID := 14),
+      (_INSTANCE_ID := 15),
+      (_INSTANCE_ID := 16),
+      (_INSTANCE_ID := 17),
+      (_INSTANCE_ID := 18),
+      (_INSTANCE_ID := 19),
+      (_INSTANCE_ID := 20)
     ];
   END_VAR
 END_GVL
