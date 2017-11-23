@@ -23,10 +23,7 @@ package edu.kit.iti.formal.automation.analysis;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.EnumerateType;
-import edu.kit.iti.formal.automation.datatypes.RecordType;
-import edu.kit.iti.formal.automation.datatypes.ReferenceType;
+import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.LocalScope;
@@ -95,6 +92,12 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     }
 
     @Override
+    public Object visit(InterfaceDeclaration interfaceDeclaration) {
+        interfaceDeclaration.setGlobalScope(globalScope);
+        return super.visit(interfaceDeclaration);
+    }
+
+    @Override
     public Object visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
         globalVariableListDeclaration.setGlobalScope(globalScope);
         return super.visit(globalVariableListDeclaration);
@@ -132,31 +135,38 @@ public class ResolveDataTypes extends AstVisitor<Object> {
             LocalScope newLocalScope = null;
 
             // THIS
-            if (ref.getIdentifier() == "THIS") {
+            if (ref.getIdentifier().equals("THIS")) {
                 ref.setIdentifiedObject(currentTopLevelScopeElement);
                 identifiedObjectDataType = globalScope.resolveDataType(ref.getIdentifiedObject().getIdentifier());
                 newLocalScope = currentLocalScope;
             }
             // SUPER
-            else if (ref.getIdentifier() == "SUPER") {
+            else if (ref.getIdentifier().equals("SUPER")) {
                 ClassDeclaration parentClass = ((ClassDeclaration) currentTopLevelScopeElement).getParentClass();
                 ref.setIdentifiedObject(parentClass);
                 identifiedObjectDataType = globalScope.resolveDataType(parentClass.getName());
                 newLocalScope = parentClass.getLocalScope();
             }
             // Variable in scope or GVL
-            else if (currentLocalScope.hasVariable(ref.getIdentifier()) || ref.getIdentifier() == "GVL") {
+            else if (currentLocalScope.hasVariable(ref.getIdentifier()) || ref.getIdentifier().equals("GVL")) {
                 VariableDeclaration refVariable;
-                if (ref.getIdentifier() == "GVL")
+                if (ref.getIdentifier().equals("GVL")) {
+                    ref = ref.getSub();
                     refVariable = currentLocalScope.getGlobalScope().getGlobalVariableList().getVariable(ref);
+                }
                 else
                     refVariable = currentLocalScope.getVariable(ref);
                 ref.setIdentifiedObject(refVariable);
                 identifiedObjectDataType = refVariable.getDataType();
                 for (int i = 0; i < ref.getDerefCount(); i++)
                     identifiedObjectDataType = ((ReferenceType) identifiedObjectDataType).getOf();
+                // Array access yields array field type
+                if (identifiedObjectDataType instanceof IECArray && ref.getSubscripts() != null)
+                    identifiedObjectDataType = ((IECArray) identifiedObjectDataType).getFieldType();
                 if (ref.hasSub())
-                    newLocalScope = ((RecordType) identifiedObjectDataType).getDeclaration().getLocalScope();
+                    newLocalScope = identifiedObjectDataType instanceof ClassDataType
+                            ? ((ClassDataType) identifiedObjectDataType).getClazz().getEffectiveLocalScope()
+                            : ((RecordType) identifiedObjectDataType).getDeclaration().getLocalScope();
             }
 
             // Method
