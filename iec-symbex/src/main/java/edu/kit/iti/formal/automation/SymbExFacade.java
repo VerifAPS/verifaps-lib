@@ -22,13 +22,17 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.smv.translators.DefaultTypeTranslator;
+import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.smv.ModuleBuilder;
 import edu.kit.iti.formal.automation.smv.SymbolicExecutioner;
 import edu.kit.iti.formal.automation.smv.SymbolicState;
+import edu.kit.iti.formal.automation.smv.translators.DefaultTypeTranslator;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st0.STSimplifier;
 import edu.kit.iti.formal.automation.st0.trans.*;
+import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
+import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SVariable;
@@ -67,7 +71,15 @@ public final class SymbExFacade {
      * @return
      */
     public static final TopLevelElements simplify(TopLevelElements elements) {
-        STSimplifier stSimplifier = new STSimplifier(elements);
+        // STOO
+        GlobalScope globalScope = IEC61131Facade.resolveDataTypes(elements);
+        TopLevelElement program = Utils.findProgram(elements);
+        InstanceScope instanceScope = IEC61131Facade.findInstances(program, globalScope);
+        IEC61131Facade.findEffectiveSubtypes(elements, globalScope, instanceScope);
+        STOOSimplifier stooSimplifier = new STOOSimplifier(program, elements, globalScope, instanceScope);
+        stooSimplifier.simplify();
+        // ST0
+        STSimplifier stSimplifier = new STSimplifier(stooSimplifier.getState().getTopLevelElements());
         stSimplifier.addDefaultPipeline();
         stSimplifier.transform();
         return stSimplifier.getProcessed();
@@ -151,13 +163,19 @@ public final class SymbExFacade {
 
     public static final SMVModule evaluateProgram(TopLevelElements elements) {
         TopLevelElements a = simplify(elements);
-        return evaluateProgram((ProgramDeclaration) a.get(1),
-                (TypeDeclarations) a.get(0));
+        GlobalScope globalScope = IEC61131Facade.resolveDataTypes(a);
+        return evaluateProgram(Utils.findProgram(a),
+                (TypeDeclarations) a.get(0), globalScope);
+    }
+
+    public static final SMVModule evaluateProgram(ProgramDeclaration decl, TypeDeclarations types) {
+        // If global scope is null, symbolic executioner will be instanced with the default scope
+        return evaluateProgram(decl, types, null);
     }
 
     public static final SMVModule evaluateProgram(ProgramDeclaration decl,
-                                                  TypeDeclarations types) {
-        SymbolicExecutioner se = new SymbolicExecutioner();
+                                                  TypeDeclarations types, GlobalScope globalScope) {
+        SymbolicExecutioner se = new SymbolicExecutioner(globalScope);
         decl.accept(se);
         ModuleBuilder moduleBuilder = new ModuleBuilder(decl, types, se.peek());
         moduleBuilder.run();

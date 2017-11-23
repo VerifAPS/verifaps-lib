@@ -74,6 +74,12 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         push(new SymbolicState());
     }
 
+    public SymbolicExecutioner(GlobalScope globalScope) {
+        this();
+        if (globalScope != null)
+            this.globalScope = globalScope;
+    }
+
     //region getter and setters
     public GlobalScope getGlobalScope() {
         return globalScope;
