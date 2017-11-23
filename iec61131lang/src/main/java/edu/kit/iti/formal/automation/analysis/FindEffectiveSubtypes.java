@@ -201,7 +201,7 @@ public class FindEffectiveSubtypes extends AstVisitor {
         else if (topLevelScopeElement.getLocalScope().asMap().keySet().contains(firstId)) {
             firstIdObject = topLevelScopeElement.getLocalScope().getVariable(firstId);
             // Dereference if needed
-            if (reference.getDerefCount() > 0) {
+            if (reference.getDerefCount() > 0 || reference.getSub() != null) {
                 Any firstIdDataType = topLevelScopeElement.getLocalScope().getVariable(firstId).getDataType();
                 for (int i = 0; i < reference.getDerefCount(); i++)
                     firstIdDataType = ((ReferenceType) firstIdDataType).getOf();
@@ -211,8 +211,11 @@ public class FindEffectiveSubtypes extends AstVisitor {
         else
             throw new DataTypeNotDefinedException("Unknown reference '" + reference + "' at " + topLevelScopeElement);
         // Recurse if needed
-        if (reference.getSub() != null)
-            return resolveReference((SymbolicReference) reference.getSub(), (TopLevelScopeElement) firstIdObject);
+        if (reference.getSub() != null) {
+            assert firstIdObject instanceof TopLevelScopeElement;
+            return resolveReference(reference.getSub(), (TopLevelScopeElement) firstIdObject);
+        }
+        assert firstIdObject instanceof VariableDeclaration;
         return firstIdObject;
     }
 }

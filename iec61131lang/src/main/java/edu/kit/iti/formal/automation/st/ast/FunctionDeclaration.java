@@ -47,6 +47,17 @@ public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Fun
     protected String functionName;
     protected StatementList statements = new StatementList();
 
+    public FunctionDeclaration(String functionName) {
+        this.functionName = functionName;
+    }
+
+    public FunctionDeclaration(FunctionDeclaration functionDeclaration) {
+        functionName = functionDeclaration.functionName;
+        returnType = functionDeclaration.returnType.copy();
+        statements = functionDeclaration.statements.copy();
+        localScope = functionDeclaration.localScope.copy();
+    }
+
     public String getFunctionName() {
         return functionName;
     }
