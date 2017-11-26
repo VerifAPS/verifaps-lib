@@ -12,6 +12,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: de.tu-dresden.inf.lat.jsexp:jsexp:0.2.2" level="project" />
     <orderEntry type="module" module-name="iec61131lang" />
     <orderEntry type="library" name="Maven: org.antlr:antlr4:4.7" level="project" />
     <orderEntry type="library" name="Maven: org.antlr:antlr-runtime:3.5.2" level="project" />

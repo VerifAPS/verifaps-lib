@@ -23,6 +23,9 @@
 .idea/**/gradle.xml
 .idea/**/libraries
 
+# Kotlin
+.idea/**/kotlinc.xml
+
 # CMake
 cmake-build-debug/
 
@@ -102,3 +105,6 @@ buildNumber.properties
 !/.mvn/wrapper/maven-wrapper.jar
 
 # End of https://www.gitignore.io/api/intellij,maven,java
+
+# SelfXMatFlow
+selfxmatflow*
