@@ -25,6 +25,8 @@ package edu.kit.iti.formal.automation.datatypes;
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,10 +41,17 @@ import java.util.stream.Collectors;
 @Data
 @AllArgsConstructor
 public class ClassDataType extends RecordType {
+    @NotNull
     private final ClassDeclaration clazz;
 
+    @Nullable
     @Override public String repr(Object obj) {
         return null;
+    }
+
+    @Override
+    public <T> T accept(@NotNull DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
     @Override
@@ -50,10 +59,7 @@ public class ClassDataType extends RecordType {
         return clazz.getName();
     }
 
-    @Override public <T> T accept(DataTypeVisitor<T> visitor) {
-        return visitor.visit(this);
-    }
-
+    @NotNull
     public ClassDeclaration getClazz() {
         return clazz;
     }

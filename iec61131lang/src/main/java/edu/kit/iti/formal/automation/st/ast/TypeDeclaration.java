@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by weigl on 13.06.14.
@@ -47,11 +48,11 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
      *
      * @param typeName a {@link java.lang.String} object.
      */
-    public TypeDeclaration(String typeName) {
+    public TypeDeclaration(@NotNull String typeName) {
         this.typeName = typeName;
     }
 
-    public TypeDeclaration(Any dataType) {
+    public TypeDeclaration(@NotNull Any dataType) {
         this(dataType.getName());
     }
 
@@ -66,7 +67,7 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
     }
 
     /** {@inheritDoc} */
-    public abstract <S> S accept(Visitor<S> visitor);
+    public abstract <S> S accept(@NotNull Visitor<S> visitor);
 
     /**
      * <p>getDataType.</p>
@@ -74,7 +75,7 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
      * @param globalScope a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
-    public Any getDataType(GlobalScope globalScope) {
+    public Any getDataType(@NotNull GlobalScope globalScope) {
         setBaseType(globalScope.resolveDataType(getBaseTypeName()));
         return getBaseType();
     }

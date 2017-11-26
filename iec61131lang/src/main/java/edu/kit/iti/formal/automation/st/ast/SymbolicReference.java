@@ -32,6 +32,7 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -139,9 +140,7 @@ public class SymbolicReference extends Reference {
      *
      * @param identifier a {@link java.lang.String} object.
      */
-    public void setIdentifier(String identifier) {
-        if (identifier == null)
-            throw new IllegalArgumentException();
+    public void setIdentifier(@NotNull String identifier) {
         this.identifier.setIdentifier(identifier);
     }
 

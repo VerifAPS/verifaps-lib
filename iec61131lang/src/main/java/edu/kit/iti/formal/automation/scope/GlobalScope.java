@@ -28,6 +28,8 @@ import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.st.ast.*;
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.*;
@@ -41,17 +43,26 @@ import java.util.stream.Collectors;
  */
 @Data
 public class GlobalScope implements Serializable {
+    @NotNull
     private Map<String, ProgramDeclaration> programs = new HashMap<>();
+    @NotNull
     private Map<String, FunctionBlockDeclaration> fb = new HashMap<>();
     // TODO expand built-in function list
+    @NotNull
     private Map<String, FunctionDeclaration> functions = new HashMap<>(ImmutableMap.of(
             "REF", new FunctionDeclaration("REF")
     ));
+    @NotNull
     private Map<String, TypeDeclaration> dataTypes = new HashMap<>();
+    @NotNull
     private List<FunctionResolver> functionResolvers = new LinkedList<>();
+    @NotNull
     private TypeScope types = TypeScope.builtin();
+    @NotNull
     private Map<String, ClassDeclaration> classes = new LinkedHashMap<>();
+    @NotNull
     private Map<String, InterfaceDeclaration> interfaces = new LinkedHashMap<>();
+    @NotNull
     private LocalScope globalVariableList = new LocalScope();
 
     /**
@@ -59,6 +70,7 @@ public class GlobalScope implements Serializable {
      *
      * @return a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
      */
+    @NotNull
     public static GlobalScope defaultScope() {
         GlobalScope g = new GlobalScope();
         g.functionResolvers.add(new DefinedFunctionResolver());
@@ -72,10 +84,11 @@ public class GlobalScope implements Serializable {
      * @param key a {@link java.lang.Object} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.ProgramDeclaration} object.
      */
-    public ProgramDeclaration getProgram(Object key) {
+    public ProgramDeclaration getProgram(@NotNull Object key) {
         return programs.get(key);
     }
 
+    @NotNull
     public List<ProgramDeclaration> getPrograms() {
         return new ArrayList<>(programs.values());
     }
@@ -86,10 +99,11 @@ public class GlobalScope implements Serializable {
      * @param key a {@link java.lang.Object} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration} object.
      */
-    public FunctionBlockDeclaration getFunctionBlock(Object key) {
+    public FunctionBlockDeclaration getFunctionBlock(@NotNull Object key) {
         return fb.get(key);
     }
 
+    @NotNull
     public List<FunctionBlockDeclaration> getFunctionBlocks() {
         return new ArrayList<>(fb.values());
     }
@@ -109,7 +123,7 @@ public class GlobalScope implements Serializable {
      *
      * @param programDeclaration a {@link edu.kit.iti.formal.automation.st.ast.ProgramDeclaration} object.
      */
-    public void registerProgram(ProgramDeclaration programDeclaration) {
+    public void registerProgram(@NotNull ProgramDeclaration programDeclaration) {
         programs.put(programDeclaration.getIdentifier(), programDeclaration);
     }
 
@@ -118,7 +132,7 @@ public class GlobalScope implements Serializable {
      *
      * @param functionDeclaration a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
      */
-    public void registerFunction(FunctionDeclaration functionDeclaration) {
+    public void registerFunction(@NotNull FunctionDeclaration functionDeclaration) {
         functions.put(functionDeclaration.getIdentifier(), functionDeclaration);
     }
 
@@ -127,7 +141,7 @@ public class GlobalScope implements Serializable {
      *
      * @param fblock a {@link edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration} object.
      */
-    public void registerFunctionBlock(FunctionBlockDeclaration fblock) {
+    public void registerFunctionBlock(@NotNull FunctionBlockDeclaration fblock) {
         fb.put(fblock.getIdentifier(), fblock);
         classes.put(fblock.getIdentifier(), fblock);
     }
@@ -137,15 +151,15 @@ public class GlobalScope implements Serializable {
      *
      * @param dt a {@link edu.kit.iti.formal.automation.st.ast.TypeDeclaration} object.
      */
-    public void registerType(TypeDeclaration dt) {
+    public void registerType(@NotNull TypeDeclaration dt) {
         dataTypes.put(dt.getTypeName(), dt);
     }
 
-    public Any resolveDataType(ClassDeclaration classDeclaration) {
+    public Any resolveDataType(@NotNull ClassDeclaration classDeclaration) {
         return resolveDataType(classDeclaration.getName());
     }
 
-    public Any resolveDataType(EnumerateType enumerateType) {
+    public Any resolveDataType(@NotNull EnumerateType enumerateType) {
         return resolveDataType(enumerateType.getName());
     }
 
@@ -155,7 +169,7 @@ public class GlobalScope implements Serializable {
      * @param name a {@link java.lang.String} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
-    public Any resolveDataType(String name) {
+    public Any resolveDataType(@NotNull String name) {
         if (types.containsKey(name))
             return types.get(name);
 
@@ -207,8 +221,9 @@ public class GlobalScope implements Serializable {
      * @param local        a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
      */
+    @Nullable
     public FunctionDeclaration resolveFunction(Invocation invocation,
-            LocalScope local) {
+                                               LocalScope local) {
         for (FunctionResolver fr : functionResolvers) {
             FunctionDeclaration decl = fr.resolve(invocation, local);
             if (decl != null)
@@ -223,33 +238,36 @@ public class GlobalScope implements Serializable {
      * @param clazz
      * @see ResolveDataTypes
      */
-    public void registerClass(ClassDeclaration clazz) {
+    public void registerClass(@NotNull ClassDeclaration clazz) {
         classes.put(clazz.getIdentifier(), clazz);
     }
 
-    public ClassDeclaration resolveClass(String key) {
+    public ClassDeclaration resolveClass(@NotNull String key) {
         ClassDeclaration classDeclaration = classes.get(key);
         if (classDeclaration == null)
             classDeclaration = getFunctionBlock(key);
         return classDeclaration;
     }
 
+    @NotNull
     public List<ClassDeclaration> getClasses() {
         return new ArrayList<>(classes.values());
     }
 
-    public void registerInterface(InterfaceDeclaration interfaceDeclaration) {
+    public void registerInterface(@NotNull InterfaceDeclaration interfaceDeclaration) {
         interfaces.put(interfaceDeclaration.getName(), interfaceDeclaration);
     }
 
-    public InterfaceDeclaration resolveInterface(String key) {
+    public InterfaceDeclaration resolveInterface(@NotNull String key) {
         return interfaces.get(key);
     }
 
+    @NotNull
     public List<InterfaceDeclaration> getInterfaces() {
         return new ArrayList<>(interfaces.values());
     }
 
+    @NotNull
     public GlobalScope clone() {
         GlobalScope gs = new GlobalScope();
         gs.classes = new HashMap<>(classes);
@@ -282,6 +300,7 @@ public class GlobalScope implements Serializable {
                 .collect(Collectors.toList());
     }
 
+    @NotNull
     public EnumerateType getTypeOfValue(String value) {
         return getEnumerateTypes().stream()
                 .filter(t -> t.isAllowedValue(value))

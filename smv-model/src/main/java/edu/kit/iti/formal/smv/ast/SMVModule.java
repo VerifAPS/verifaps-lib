@@ -24,6 +24,7 @@ package edu.kit.iti.formal.smv.ast;
 
 import edu.kit.iti.formal.smv.Printer;
 import edu.kit.iti.formal.smv.SMVAstVisitor;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import java.util.Map;
 /**
  *
  */
+@Data
 public class SMVModule extends SMVAst {
     /**
      *
@@ -137,7 +139,7 @@ public class SMVModule extends SMVAst {
 
     
     public <T> T accept(SMVAstVisitor<T> visitor) {
-        return visitor.visit((SMVModule) this);
+        return visitor.visit(this);
     }
 
     public String toString() {

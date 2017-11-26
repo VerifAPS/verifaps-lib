@@ -43,72 +43,77 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Invocation extends Initialization {
-    private SymbolicReference callee;
+    @NotNull
+    private SymbolicReference callee = new SymbolicReference();
+    @NotNull
     private List<Parameter> parameters = new ArrayList<>();
 
-    public Invocation(String calleeName) {
+    public Invocation(@NotNull String calleeName) {
         setCalleeName(calleeName);
     }
 
-    public Invocation(String calleeName, Expression... expr) {
+    public Invocation(@NotNull String calleeName, @NotNull Expression... expr) {
         setCalleeName(calleeName);
         for (Expression e : expr) {
             parameters.add(new Parameter(e));
         }
     }
 
-    public Invocation(Invocation invocation) {
+    public Invocation(@NotNull Invocation invocation) {
         callee = invocation.getCallee();
         parameters.addAll(invocation.parameters);
     }
 
-    public Invocation(String calleeName, List<Expression> expr) {
+    public Invocation(@NotNull String calleeName, @NotNull List<Expression> expr) {
         setCalleeName(calleeName);
         for (Expression e : expr) {
             parameters.add(new Parameter(e));
         }
     }
 
-    public Invocation(FunctionDeclaration function) {
+    public Invocation(@NotNull FunctionDeclaration function) {
         setCallee(new SymbolicReference(function.getFunctionName()));
         callee.setIdentifiedObject(function);
     }
 
-    public void addParameter(Parameter parameter) {
+    public void addParameter(@NotNull Parameter parameter) {
         parameters.add(parameter);
         parameters.sort(Parameter::compareTo);
     }
 
-    public void addParameters(List<Parameter> parameterList) {
+    public void addParameters(@NotNull List<Parameter> parameterList) {
         parameters.addAll(parameterList);
         parameters.sort(Parameter::compareTo);
     }
 
-    public void addExpressionParameters(List<Expression> expressionList) {
+    public void addExpressionParameters(@NotNull List<Expression> expressionList) {
         expressionList.forEach(e -> parameters.add(new Parameter(e)));
         parameters.sort(Parameter::compareTo);
     }
 
+    @NotNull
     public List<Parameter> getInputParameters() {
-        return parameters.stream().filter(p -> p.isInput()).collect(Collectors.toList());
+        return parameters.stream().filter(Parameter::isInput).collect(Collectors.toList());
     }
 
+    @NotNull
     public List<Parameter> getOutputParameters() {
-        return parameters.stream().filter(p -> p.isOutput()).collect(Collectors.toList());
+        return parameters.stream().filter(Parameter::isOutput).collect(Collectors.toList());
     }
 
+    @NotNull
     public String getCalleeName() {
         return callee.toString();
     }
 
-    public void setCalleeName(String calleeName) {
+    public void setCalleeName(@NotNull String calleeName) {
         callee = new SymbolicReference(calleeName);
     }
 
     /**
      * {@inheritDoc}
      */
-    public <T> T accept(Visitor<T> visitor) {
+    public <T> T accept(@NotNull Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
@@ -116,10 +121,11 @@ public class Invocation extends Initialization {
      * {@inheritDoc}
      */
     @Override
-    public Any dataType(LocalScope localScope) {
+    public Any dataType(@NotNull LocalScope localScope) {
         return ((Invocable) callee.getIdentifiedObject()).getReturnType();
     }
 
+    @NotNull
     @Override
     public Invocation copy() {
         Invocation fc = new Invocation(this);
@@ -131,22 +137,15 @@ public class Invocation extends Initialization {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Parameter
             extends Top<IEC61131Parser.Param_assignmentContext> implements Comparable {
         private String name;
         private boolean output;
         private Expression expression;
 
-        public Parameter() {
-        }
-
-        public Parameter(String name, boolean output, Expression expression) {
-            this.name = name;
-            this.output = output;
-            this.expression = expression;
-        }
-
-        public Parameter(Expression expr) {
+        public Parameter(@NotNull Expression expr) {
             this(null, false, expr);
         }
 
@@ -154,13 +153,14 @@ public class Invocation extends Initialization {
             return !output;
         }
 
+        @NotNull
         @Override
         public Parameter copy() {
             return new Parameter(name, output, expression.copy());
         }
 
         @Override
-        public <T> T accept(Visitor<T> visitor) {
+        public <T> T accept(@NotNull Visitor<T> visitor) {
             return visitor.visit(this);
         }
 
