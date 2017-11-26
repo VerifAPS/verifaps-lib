@@ -46,7 +46,7 @@ public class SBinaryExpression extends SMVExpr {
      */
     public SBinaryOperator operator;
 
-    public SBinaryExpression(SMVExpr left, SBinaryOperator op, SMVExpr right) {
+    public SBinaryExpression(@NotNull SMVExpr left, @NotNull SBinaryOperator op, @NotNull SMVExpr right) {
         this.left = left;
         this.right = right;
         this.operator = op;

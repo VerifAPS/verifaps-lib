@@ -25,6 +25,7 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by weigl on 13.06.14.
@@ -77,8 +78,7 @@ public abstract class TopLevelScopeElement<T extends ParserRuleContext> extends 
      *
      * @param localScope a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
      */
-    public void setLocalScope(LocalScope localScope) {
-        assert localScope != null;
+    public void setLocalScope(@NotNull LocalScope localScope) {
         this.localScope = localScope;
     }
 

@@ -31,6 +31,8 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -155,7 +157,7 @@ public class VariableDeclaration extends Top
      * @param name a {@link java.lang.String} object.
      * @param td   a {@link edu.kit.iti.formal.automation.st.ast.TypeDeclaration} object.
      */
-    public VariableDeclaration(String name, TypeDeclaration td) {
+    public VariableDeclaration(@NotNull String name, @NotNull TypeDeclaration td) {
         this();
         this.name = name;
         typeDeclaration = td;
@@ -167,7 +169,7 @@ public class VariableDeclaration extends Top
      * @param name     a {@link java.lang.String} object.
      * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
-    public VariableDeclaration(String name, Any dataType) {
+    public VariableDeclaration(@NotNull String name, @NotNull Any dataType) {
         this(name, new SimpleTypeDeclaration(dataType));
         this.dataType = dataType;
     }
@@ -177,7 +179,7 @@ public class VariableDeclaration extends Top
      *
      * @param value a {@link edu.kit.iti.formal.automation.st.ast.VariableDeclaration} object.
      */
-    public VariableDeclaration(VariableDeclaration value) {
+    public VariableDeclaration(@NotNull VariableDeclaration value) {
         this(value.getName(), value.getType(), value.getTypeDeclaration());
         dataType = value.dataType;
         typeDeclaration = value.typeDeclaration;
@@ -190,7 +192,7 @@ public class VariableDeclaration extends Top
      * @param flags a int.
      * @param td    a {@link edu.kit.iti.formal.automation.st.ast.TypeDeclaration} object.
      */
-    public VariableDeclaration(String name, int flags, TypeDeclaration td) {
+    public VariableDeclaration(@NotNull String name, int flags, @NotNull TypeDeclaration td) {
         this.name = name;
         type = flags;
         typeDeclaration = td;
@@ -203,7 +205,7 @@ public class VariableDeclaration extends Top
      * @param flags a int.
      * @param dt    a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
-    public VariableDeclaration(String name, int flags, Any dt) {
+    public VariableDeclaration(@NotNull String name, int flags, @NotNull Any dt) {
         this(name, dt);
         setType(flags);
     }
@@ -222,7 +224,7 @@ public class VariableDeclaration extends Top
      *
      * @param name a {@link java.lang.String} object.
      */
-    public void setName(String name) {
+    public void setName(@NotNull String name) {
         this.name = name;
     }
 
@@ -231,6 +233,7 @@ public class VariableDeclaration extends Top
      *
      * @return a {@link edu.kit.iti.formal.automation.st.ast.Initialization} object.
      */
+    @Nullable
     public Initialization getInit() {
         if (typeDeclaration == null)
             return null;
@@ -246,6 +249,7 @@ public class VariableDeclaration extends Top
      *
      * @return a {@link java.lang.String} object.
      */
+    @Nullable
     public String getDataTypeName() {
         if (dataType != null)
             return dataType.getName();
@@ -268,7 +272,7 @@ public class VariableDeclaration extends Top
      *
      * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
-    public void setDataType(Any dataType) {
+    public void setDataType(@NotNull Any dataType) {
         this.dataType = dataType;
     }
 
@@ -410,22 +414,26 @@ public class VariableDeclaration extends Top
      * {@inheritDoc}
      */
     @Override
-    public <T> T accept(Visitor<T> visitor) {
+    public <T> T accept(@NotNull Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override public int compareTo(VariableDeclaration o) {
+    @Override
+    public int compareTo(@NotNull VariableDeclaration o) {
         return getName().compareTo(o.getName());
     }
 
     /**
-     * {@inheritDoc}
+     * <p>Setter for the field <code>typeDeclaration</code>.</p>
+     *
+     * @param typeDeclaration a {@link edu.kit.iti.formal.automation.st.ast.TypeDeclaration} object.
+     *                        <b>shared data</b>
      */
-    @Override public String toString() {
-        return name + " : " + getDataTypeName() + " := " + getInit();
+    public void setTypeDeclaration(@NotNull TypeDeclaration<?> typeDeclaration) {
+        this.typeDeclaration = typeDeclaration;
     }
 
     /**
@@ -437,32 +445,23 @@ public class VariableDeclaration extends Top
         return typeDeclaration;
     }
 
-    /**
-     * <p>Setter for the field <code>typeDeclaration</code>.</p>
-     *
-     * @param typeDeclaration a {@link edu.kit.iti.formal.automation.st.ast.TypeDeclaration} object.
-     *                        <b>shared data</b>
-     */
-    public void setTypeDeclaration(TypeDeclaration<?> typeDeclaration) {
-        this.typeDeclaration = typeDeclaration;
-    }
-
-    public void addInstance(InstanceScope.Instance instance) {
+    public void addInstance(@NotNull InstanceScope.Instance instance) {
         instances.add(instance);
     }
 
-    public void addEffectiveDataType(Any dataType) {
+    public void addEffectiveDataType(@NotNull Any dataType) {
         effectiveDataTypes.add(dataType);
     }
 
-    public boolean hasEffectiveDataType(Any dataType) {
+    public boolean hasEffectiveDataType(@NotNull Any dataType) {
         return effectiveDataTypes.contains(dataType);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(@Nullable Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -473,18 +472,29 @@ public class VariableDeclaration extends Top
         return name.equals(that.name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override public int hashCode() {
-        return name.hashCode();
-    }
-
+    @NotNull
     @Override public VariableDeclaration copy() {
         VariableDeclaration vd = new VariableDeclaration(name, type,
                 typeDeclaration);
-        vd.setDataType(dataType);
+        vd.dataType = dataType;
         return vd;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
+    @Override
+    public String toString() {
+        return name + " : " + getDataTypeName() + " := " + getInit();
     }
 
     @Override

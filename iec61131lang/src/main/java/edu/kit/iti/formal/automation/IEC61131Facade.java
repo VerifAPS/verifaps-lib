@@ -30,7 +30,6 @@ import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.*;
-import lombok.NonNull;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -141,7 +140,7 @@ public class IEC61131Facade {
      * @param globalScope Global scope after data types have been resolved.
      * @return The instance scope containing all instances.
      */
-    public static InstanceScope findInstances(@NonNull TopLevelElement element, @NonNull GlobalScope globalScope) {
+    public static InstanceScope findInstances(@NotNull TopLevelElement element, @NotNull GlobalScope globalScope) {
         InstanceScope instanceScope = new InstanceScope(globalScope);
         element.accept(new FindInstances(instanceScope));
         return instanceScope;

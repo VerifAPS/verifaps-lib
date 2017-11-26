@@ -28,6 +28,7 @@ import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by weigl on 13.06.14.
@@ -38,7 +39,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class SimpleTypeDeclaration<T extends Initialization> extends TypeDeclaration<T> {
-    public SimpleTypeDeclaration(Any type) {
+    public SimpleTypeDeclaration(@NotNull Any type) {
         super(type);
     }
 
@@ -46,7 +47,7 @@ public class SimpleTypeDeclaration<T extends Initialization> extends TypeDeclara
      * {@inheritDoc}
      */
     @Override
-    public <T> T accept(Visitor<T> visitor) {
+    public <T> T accept(@NotNull Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
@@ -54,10 +55,11 @@ public class SimpleTypeDeclaration<T extends Initialization> extends TypeDeclara
      * {@inheritDoc}
      */
     @Override
-    public Any getDataType(GlobalScope globalScope) {
+    public Any getDataType(@NotNull GlobalScope globalScope) {
         return super.getDataType(globalScope);
     }
 
+    @NotNull
     @Override
     public SimpleTypeDeclaration copy() {
         SimpleTypeDeclaration std = new SimpleTypeDeclaration();
