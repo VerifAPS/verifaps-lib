@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 /**
  * Created by weigl on 26.11.16.
@@ -78,10 +79,11 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     //region state handling
     @NotNull
     private Stack<SymbolicState> state = new Stack<>();
+    private SymbolicState globalState = new SymbolicState();
     private Expression caseExpression;
 
     public SymbolicExecutioner() {
-        push(new SymbolicState());
+        push(new SymbolicState(globalState));
     }
 
     public SymbolicExecutioner(@Nullable GlobalScope globalScope) {
@@ -115,7 +117,13 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     }
 
     public SymbolicState pop() {
-        return state.pop();
+        SymbolicState top = state.pop();
+        // Update global variables
+        for (SVariable var : globalState.keySet()) {
+            peek().replace(var, top.get(var));
+            globalState.replace(var, top.get(var));
+        }
+        return top;
     }
 
     public void push() {
@@ -183,6 +191,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     public SCaseExpression visit(@NotNull ProgramDeclaration programDeclaration) {
         localScope = programDeclaration.getLocalScope();
         globalScope = localScope.getGlobalScope();
+
         push(new SymbolicState(localScope.getLocalVariables().size()));
 
         // initialize root state
@@ -190,6 +199,10 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
             SVariable s = lift(vd);
             peek().put(s, s);
         }
+
+        globalState = new SymbolicState();
+        for (VariableDeclaration var : localScope.filterByFlags(VariableDeclaration.GLOBAL))
+            globalState.put(lift(var), peek().get(lift(var)));
 
         programDeclaration.getProgramBody().accept(this);
         return null;
@@ -228,7 +241,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
 
         //initialize data structure
-        SymbolicState calleeState = new SymbolicState();
+        SymbolicState calleeState = new SymbolicState(globalState);
         SymbolicState callerState = peek();
 
         //region register function name as output variable

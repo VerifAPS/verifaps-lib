@@ -138,6 +138,7 @@ public final class SymbExFacade {
                                                   boolean timerToCounter,
                                                   boolean embedArrays,
                                                   boolean replaceSFCReset) {
+        // TODO account for additional ST0 transformations
         STSimplifier stSimplifier = new STSimplifier(elements);
         List<ST0Transformation> transformations = stSimplifier.getTransformations();
 
