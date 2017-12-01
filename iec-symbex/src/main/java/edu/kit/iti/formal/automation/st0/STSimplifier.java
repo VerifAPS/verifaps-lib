@@ -39,11 +39,12 @@ public class STSimplifier {
     private List<ST0Transformation> transformations = new ArrayList<>();
     private State state = new State();
 
-    public STSimplifier(List<TopLevelElement> inputElements) {
+    public STSimplifier(TopLevelElements inputElements) {
         state.inputElements = inputElements;
     }
 
     public void addDefaultPipeline() {
+        transformations.add(new GlobalVariableListEmbedding());
         transformations.add(new FunctionBlockEmbedding());
         transformations.add(LoopUnwinding.getTransformation());
         transformations.add(TimerToCounter.getTransformation());
@@ -87,7 +88,9 @@ public class STSimplifier {
             } else if (tle instanceof FunctionDeclaration) {
                 //FunctionDeclaration functionDeclaration = (FunctionDeclaration) tle;
                 //functions
-            } else {
+            } else if (tle instanceof GlobalVariableListDeclaration)
+                state.globalVariableList = (GlobalVariableListDeclaration) tle;
+            else {
                 throw new IllegalArgumentException("TLE: " + tle.getClass() + " is not handled yet.");
             }
         }
@@ -127,9 +130,10 @@ public class STSimplifier {
     }
 
     public static class State {
-        public List<TopLevelElement> inputElements;
+        public TopLevelElements inputElements;
         public ProgramDeclaration theProgram;
         public Map<String, FunctionBlockDeclaration> functionBlocks = new HashMap<>();
         public TypeDeclarations allTypeDeclaration = new TypeDeclarations();
+        public GlobalVariableListDeclaration globalVariableList;
     }
 }
