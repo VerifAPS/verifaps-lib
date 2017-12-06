@@ -77,12 +77,6 @@ public class FindDataTypes extends DefaultVisitor<Object> {
         return super.visit(clazz);
     }
 
-    @Override
-    public Object visit(ArrayTypeDeclaration arrayTypeDeclaration) {
-        globalScope.registerType(arrayTypeDeclaration);
-        return null;
-    }
-
     /**
      * {@inheritDoc}
      */
