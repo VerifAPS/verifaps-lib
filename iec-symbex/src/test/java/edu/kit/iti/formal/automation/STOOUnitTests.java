@@ -76,30 +76,32 @@ public class STOOUnitTests {
         return processSTFile(path.toFile());
     }
 
+    @Parameterized.Parameter
+    public Class<? extends STOOTransformation> stooTransformation;
+
     @Parameterized.Parameters
     public static List<Object[]> stooTransformations() {
         return STOOSimplifier.TRANSFORMATIONS.stream()
                 .flatMap(t -> Arrays.stream(getSTFiles(RESOURCES_PATH + "/"
-                                + CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, t.getClass().getSimpleName())))
+                        + CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, t.getSimpleName())))
                         .map(f -> new Object[] {t, f}))
                 .collect(Collectors.toList());
     }
-
-    @Parameterized.Parameter
-    public STOOTransformation stooTransformation;
 
     @Parameterized.Parameter(1)
     public File file;
 
     @Test
-    public void testSTOOTransformation() throws IOException {
-        System.out.println(stooTransformation.getClass().getSimpleName());
+    public void testSTOOTransformation() throws IOException, IllegalAccessException, InstantiationException {
+        STOOTransformation uut = stooTransformation.newInstance();
+
+        System.out.println(uut.getClass().getSimpleName());
         System.out.println(file.getName());
 
         STOOSimplifier.State st = processSTFile(file);
         TopLevelElements st1Expected = processSTFile(Paths.get(file.toPath() + "oo")).getTopLevelElements();
 
-        stooTransformation.transform(st);
+        uut.transform(st);
         TopLevelElements st1Actual = st.getTopLevelElements();
 
         Assert.assertEquals(IEC61131Facade.print(st1Expected), IEC61131Facade.print(st1Actual));

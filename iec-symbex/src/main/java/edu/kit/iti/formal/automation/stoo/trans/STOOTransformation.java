@@ -59,6 +59,11 @@ public abstract class STOOTransformation {
     static final String SELF_PARAMETER_NAME = "_SELF";
 
     /**
+     * Name of the super instance attribute. See Inheritance.
+     */
+    static final String SUPER_ATTRIBUTE_NAME = "_SUPER";
+
+    /**
      * Separator to use between a class' name and its method when converting the method to a function.
      */
     static final String CLASS_METHOD_NAME_SEPARATOR = "_";

@@ -45,7 +45,7 @@ public class ClassToRecord extends STOOTransformation {
             else if (tle instanceof ClassDeclaration) {
                 state.getTopLevelElements().remove(tle);
                 // Struct should only contain internal state variables
-                List<VariableDeclaration> fields = ((ClassDeclaration) tle).getEffectiveLocalScope().stream()
+                List<VariableDeclaration> fields = ((ClassDeclaration) tle).getLocalScope().stream()
                         .filter(v -> !v.isInput() && !v.isOutput() && !v.isInOut())
                         .collect(Collectors.toList());
                 records.add(new StructureTypeDeclaration(((ClassDeclaration) tle).getName(), fields));
