@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.TopLevelScopeElement;
+import edu.kit.iti.formal.automation.st.ast.TypeDeclaration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -48,15 +48,16 @@ public class RecordType extends Any {
     /**
      * The declaration associated with the type.
      */
-    private TopLevelScopeElement declaration;
+    private TypeDeclaration declaration;
 
     /**
      * <p>Constructor for RecordType.</p>
      *
      * @param name a {@link java.lang.String} object.
      */
-    public RecordType(@NotNull String name) {
+    public RecordType(@NotNull String name, @NotNull TypeDeclaration declaration) {
         this.name = name;
+        this.declaration = declaration;
     }
 
     /**
