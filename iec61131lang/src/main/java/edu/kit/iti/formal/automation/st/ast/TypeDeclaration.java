@@ -38,6 +38,7 @@ import org.jetbrains.annotations.NotNull;
 @Data
 @NoArgsConstructor
 public abstract class TypeDeclaration<T extends Initialization> extends Top {
+    protected Any dataType;
     protected String typeName;
     protected String baseTypeName;
     protected Any baseType;
@@ -54,6 +55,7 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
 
     public TypeDeclaration(@NotNull Any dataType) {
         this(dataType.getName());
+        this.dataType = dataType;
     }
 
     /**
