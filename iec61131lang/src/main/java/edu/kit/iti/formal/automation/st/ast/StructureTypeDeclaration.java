@@ -31,6 +31,8 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.List;
+
 /**
  * Created by weigl on 13.06.14.
  *
@@ -48,6 +50,11 @@ public class StructureTypeDeclaration extends TypeDeclaration<StructureInitializ
      */
     public void addField(String s, TypeDeclaration ast) {
         fields.put(s, ast);
+    }
+
+    public StructureTypeDeclaration(String typeName, List<VariableDeclaration> fields) {
+        super(typeName);
+        fields.forEach(this.fields::add);
     }
 
     /** {@inheritDoc} */

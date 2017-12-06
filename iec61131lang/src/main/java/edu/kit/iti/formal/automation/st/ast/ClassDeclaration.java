@@ -29,6 +29,7 @@ import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +43,7 @@ import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(exclude = "methods")
+@NoArgsConstructor
 public class ClassDeclaration extends TopLevelScopeElement {
     private String name;
     private boolean final_ = false;
@@ -49,6 +51,16 @@ public class ClassDeclaration extends TopLevelScopeElement {
     private IdentifierPlaceHolder<ClassDeclaration> parent = new IdentifierPlaceHolder<>();
     private List<IdentifierPlaceHolder<InterfaceDeclaration>> interfaces = new ArrayList<>();
     private List<MethodDeclaration> methods = new ArrayList<>();
+
+    public ClassDeclaration(ClassDeclaration clazz) {
+        this.name = clazz.name;
+        this.final_ = clazz.final_;
+        this.abstract_ = clazz.abstract_;
+        this.parent = parent.copy();
+        clazz.interfaces.forEach(i -> interfaces.add(i.copy()));
+        clazz.methods.forEach(m -> methods.add(m.copy()));
+        this.localScope = clazz.getEffectiveLocalScope().copy();
+    }
 
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);

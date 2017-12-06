@@ -24,7 +24,10 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * Created by weigl on 13.06.14.
@@ -38,6 +41,10 @@ import lombok.*;
 @NoArgsConstructor
 public class FunctionBlockDeclaration extends ClassDeclaration implements Invocable {
     private StatementList functionBody = new StatementList();
+
+    public FunctionBlockDeclaration(ClassDeclaration clazz) {
+        super(clazz);
+    }
 
     /**
      * <p>Getter for the field <code>functionBody</code>.</p>
