@@ -43,18 +43,24 @@ import java.util.stream.Collectors;
  */
 @Data
 public class STOOSimplifier {
-    public final static List<STOOTransformation> TRANSFORMATIONS = ImmutableList.of(
-            new GlobalInstances(),
-            new BranchEffectiveTypes(),
-            new ReferenceToArrayAccess(),
-            new MethodToFunction()
+    public static final List<Class<? extends STOOTransformation>> TRANSFORMATIONS = ImmutableList.of(
+            GlobalInstances.class,
+            BranchEffectiveTypes.class,
+            Inheritance.class,
+            MethodToFunction.class,
+            ReferenceToArrayAccess.class,
+            ClassToRecord.class
     );
 
     private final State state;
 
     public void simplify() {
-        for (STOOTransformation transformation : TRANSFORMATIONS)
-            transformation.transform(state);
+        for (Class<? extends STOOTransformation> transformation : TRANSFORMATIONS)
+            try {
+                transformation.newInstance().transform(state);
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
     }
 
     @Data

@@ -43,11 +43,12 @@ END_CLASS
 
 GVL
   VAR_GLOBAL
-    _INSTANCES_A : ARRAY [20..20] OF A := [
-      (_INSTANCE_ID := 20, b1 := 14, b2 := 15, c1 := 4, c2 := 5)
+    _INSTANCES_A : ARRAY [0..1] OF A := [
+      (_INSTANCE_ID := 0, b1 := 2, b2 := 3, c1 := 11, c2 := 12),
+      (_INSTANCE_ID := 1, b1 := 4, b2 := 5, c1 := 17, c2 := 18)
     ];
-    _INSTANCES_A1 : ARRAY [19..19] OF A1 := [
-      (_INSTANCE_ID := 19, b1 := 16, b2 := 17, c1 := 10, c2 := 11)
+    _INSTANCES_A1 : ARRAY [1..1] OF A1 := [
+      (_INSTANCE_ID := 1)
     ];
     _INSTANCES_B : ARRAY [14..18] OF B := [
       (_INSTANCE_ID := 14, c1 := 0, c2 := 1),

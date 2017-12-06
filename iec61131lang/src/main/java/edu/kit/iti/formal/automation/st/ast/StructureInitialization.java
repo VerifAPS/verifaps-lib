@@ -28,8 +28,10 @@ import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,9 +41,14 @@ import java.util.Map;
  * @version $Id: $Id
  */
 @Data
+@NoArgsConstructor
 public class StructureInitialization extends Initialization {
     private Map<String, Initialization> initValues = new HashMap<>();
     private String structureName;
+
+    public StructureInitialization(List<Map.Entry<String, Initialization>> initEntries) {
+        initEntries.forEach(entry -> initValues.put(entry.getKey(), entry.getValue()));
+    }
 
     /**
      * <p>Getter for the field <code>initValues</code>.</p>
