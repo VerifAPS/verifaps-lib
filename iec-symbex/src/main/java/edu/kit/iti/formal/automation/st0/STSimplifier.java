@@ -49,6 +49,7 @@ public class STSimplifier {
         transformations.add(LoopUnwinding.getTransformation());
         transformations.add(TimerToCounter.getTransformation());
         transformations.add(ArrayEmbedder.getTransformation());
+        transformations.add(new StructEmbedding());
         transformations.add(SFCResetReplacer.getTransformation());
     }
 
@@ -66,6 +67,7 @@ public class STSimplifier {
     public TopLevelElements getProcessed() {
         TopLevelElements l = new TopLevelElements();
         l.add(state.allTypeDeclaration);
+        l.addAll(state.functions.values());
         l.add(state.theProgram);
         return l;
     }
@@ -86,8 +88,8 @@ public class STSimplifier {
                 TypeDeclarations typeDeclarations = (TypeDeclarations) tle;
                 appendTypeDeclarations(typeDeclarations);
             } else if (tle instanceof FunctionDeclaration) {
-                //FunctionDeclaration functionDeclaration = (FunctionDeclaration) tle;
-                //functions
+                FunctionDeclaration function = (FunctionDeclaration) tle;
+                state.functions.put(function.getFunctionName(), function);
             } else if (tle instanceof GlobalVariableListDeclaration)
                 state.globalVariableList = (GlobalVariableListDeclaration) tle;
             else {
@@ -104,6 +106,10 @@ public class STSimplifier {
     private void appendTypeDeclarations(TypeDeclarations typeDeclarations) {
         for (TypeDeclaration td : typeDeclarations) {
             boolean allowed = true;
+            if (td instanceof StructureTypeDeclaration) {
+                state.structs.put(td.getTypeName(), (StructureTypeDeclaration) td);
+                continue;
+            }
             switch (td.getBaseTypeName()) {
                 case "SINT":
                 case "INT":
@@ -133,6 +139,8 @@ public class STSimplifier {
         public TopLevelElements inputElements;
         public ProgramDeclaration theProgram;
         public Map<String, FunctionBlockDeclaration> functionBlocks = new HashMap<>();
+        public Map<String, FunctionDeclaration> functions = new HashMap<>();
+        public Map<String, StructureTypeDeclaration> structs = new HashMap<>();
         public TypeDeclarations allTypeDeclaration = new TypeDeclarations();
         public GlobalVariableListDeclaration globalVariableList;
     }
