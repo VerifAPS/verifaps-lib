@@ -68,6 +68,7 @@ public final class SymbExFacade {
      */
     public static final TopLevelElements simplify(TopLevelElements elements) {
         STSimplifier stSimplifier = new STSimplifier(elements);
+        stSimplifier.addDefaultPipeline();
         stSimplifier.transform();
         return stSimplifier.getProcessed();
     }
