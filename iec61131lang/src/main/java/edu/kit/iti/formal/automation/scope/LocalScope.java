@@ -87,6 +87,14 @@ public class LocalScope implements Visitable, Iterable<VariableDeclaration>, Cop
         var.setParent(this);
     }
 
+    public void addAll(List<VariableDeclaration> vars) {
+        vars.forEach(this::add);
+    }
+
+    public void addAll(VariableScope variableScope) {
+        variableScope.values().forEach(this::add);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -212,6 +220,13 @@ public class LocalScope implements Visitable, Iterable<VariableDeclaration>, Cop
             variableDeclaration.setName(e.getKey());
             ls.add(variableDeclaration);
         }
+        return ls;
+    }
+
+    public LocalScope shallowCopy() {
+        LocalScope ls = new LocalScope();
+        ls.globalScope = globalScope;
+        ls.addAll(localVariables);
         return ls;
     }
 }

@@ -143,7 +143,7 @@ public class ClassDeclaration extends TopLevelScopeElement {
         // Base case
         if (!hasParentClass())
             return getLocalScope();
-        LocalScope localScope = getLocalScope().copy();
+        LocalScope localScope = getLocalScope().shallowCopy();
         getParentClass().getEffectiveLocalScope().getLocalVariables().values().stream()
                 // Disconsider obfuscated variables
                 .filter(v -> !localScope.hasVariable(v.getName()))
