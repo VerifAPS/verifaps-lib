@@ -43,6 +43,11 @@ public class SimpleTypeDeclaration<T extends Initialization> extends TypeDeclara
         super(type);
     }
 
+    public SimpleTypeDeclaration(@NotNull Any type, @NotNull T init) {
+        this(type);
+        initialization = init;
+    }
+
     /**
      * {@inheritDoc}
      */

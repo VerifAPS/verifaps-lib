@@ -152,7 +152,7 @@ public final class SymbExFacade {
             transformations.add(TimerToCounter.getTransformation());
         }
         if(embedArrays) {
-            transformations.add(ArrayEmbedder.getTransformation());
+            transformations.add(new ArrayEmbedder());
         }
         if(replaceSFCReset) {
             transformations.add(SFCResetReplacer.getTransformation());
