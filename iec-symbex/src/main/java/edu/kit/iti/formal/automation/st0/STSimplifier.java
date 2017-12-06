@@ -48,7 +48,7 @@ public class STSimplifier {
         transformations.add(new FunctionBlockEmbedding());
         transformations.add(LoopUnwinding.getTransformation());
         transformations.add(TimerToCounter.getTransformation());
-        transformations.add(ArrayEmbedder.getTransformation());
+        transformations.add(new ArrayEmbedder());
         transformations.add(new StructEmbedding());
         transformations.add(SFCResetReplacer.getTransformation());
     }

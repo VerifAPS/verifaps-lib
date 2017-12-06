@@ -156,6 +156,10 @@ public class SymbolicReference extends Reference {
         return sub != null;
     }
 
+    public boolean hasSubscripts() {
+        return subscripts != null;
+    }
+
     /**
      * @return The symbolic reference in a flat list format containing all its subreferences and starting with the
      * reference itself.

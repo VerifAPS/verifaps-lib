@@ -22,84 +22,164 @@ package edu.kit.iti.formal.automation.st0.trans;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.IECArray;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.datatypes.DataTypes;
+import edu.kit.iti.formal.automation.datatypes.RangeType;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
+import edu.kit.iti.formal.automation.st0.STSimplifier;
 import edu.kit.iti.formal.automation.visitors.Visitable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.util.stream.Collectors;
 
 /**
  * Created by weigl on 03/10/14.
+ * @author Alexander Weigl, Augusto Modanese
  */
-public class ArrayEmbedder extends AstMutableVisitor {
-    private LocalScope currentScope;
-
-
-    @Override
-    public Object defaultVisit(Visitable visitable) {
-        return visitable;
-    }
+public class ArrayEmbedder implements ST0Transformation {
+    private STSimplifier.State state;
 
     @Override
-    public Object visit(ProgramDeclaration programDeclaration) {
-        currentScope = (LocalScope) programDeclaration.getLocalScope().accept(this);
-        ProgramDeclaration pd = (ProgramDeclaration) super.visit(programDeclaration);
-        pd.setLocalScope(currentScope);
-        return pd;
-    }
-
-    @Override
-    public Object visit(FunctionDeclaration functionDeclaration) {
-        currentScope = (LocalScope) functionDeclaration.getLocalScope().accept(this);
-        ProgramDeclaration pd = (ProgramDeclaration) super.visit(functionDeclaration);
-        pd.setLocalScope(currentScope);
-        return pd;
-    }
-
-    @Override
-    public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        currentScope = (LocalScope) functionBlockDeclaration.getLocalScope().accept(this);
-        ProgramDeclaration pd = (ProgramDeclaration) super.visit(functionBlockDeclaration);
-        pd.setLocalScope(currentScope);
-        return pd;
-    }
-
-    @Override
-    public Object visit(ArrayTypeDeclaration arrayType) {
-        return super.visit(arrayType);
-    }
-
-
-    @Override
-    public Object visit(SymbolicReference symbolicReference) {
-        String identifier = symbolicReference.getIdentifier();
-
-        if (symbolicReference.getSubscripts() != null) {
-            IntegerExpressionEvaluator iee = new IntegerExpressionEvaluator(currentScope);
-            StringBuilder sb = new StringBuilder(identifier);
-
-            for (Expression expression : symbolicReference.getSubscripts()) {
-                long pos = (Long) expression.accept(iee);
-                sb.append("_").append(pos);
+    public void transform(STSimplifier.State state) {
+        this.state = state;
+        for (VariableDeclaration arrayVariable : state.theProgram.getLocalScope().stream()
+                .filter(v -> v.getTypeDeclaration() instanceof ArrayTypeDeclaration)
+                .collect(Collectors.toList())) {
+            ArrayTypeDeclaration array = (ArrayTypeDeclaration) arrayVariable.getTypeDeclaration();
+            assert array.getInitialization() != null;
+            for (Range range : array.getRanges()) {
+                int rangeMin = Integer.parseInt(range.getStart().getText());
+                int rangeMax = Integer.parseInt(range.getStop().getText());
+                // TODO multiple ranges
+                for (int i = rangeMin; i <= rangeMax; i++) {
+                    VariableDeclaration var = new VariableDeclaration(arrayVariable.getIdentifier() + "$" + i,
+                            new SimpleTypeDeclaration(array.getBaseType(),
+                                    array.getInitialization().get(i - rangeMin)));
+                    if (arrayVariable.isGlobal())
+                        var.setType(VariableDeclaration.GLOBAL);
+                    state.theProgram.getLocalScope().add(var);
+                }
             }
-            VariableDeclaration vd = currentScope.getVariable(symbolicReference);
-            IECArray atd = (IECArray) vd.getDataType();
-            VariableDeclaration vdnew = new VariableDeclaration(sb.toString(),
-                    vd.getType(),
-                    vd.getDataType());
-            vdnew.setDataType(atd.getFieldType());
-            currentScope.add(vdnew);
-            return new SymbolicReference(sb.toString());
-        } else {
+            ArrayEmbedderVisitor arrayEmbedderVisitor = new ArrayEmbedderVisitor(arrayVariable);
+            state.functions.values().forEach(f -> f.accept(arrayEmbedderVisitor));
+            state.theProgram.accept(arrayEmbedderVisitor);
+            state.theProgram.getLocalScope().getLocalVariables().remove(arrayVariable.getName());
+        }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    private static class ArrayAccessRenameVisitor extends AstMutableVisitor {
+        private final String toRename;
+        private final int access;
+
+        @Override
+        public Object visit(SymbolicReference symbolicReference) {
+            if (symbolicReference.getIdentifier().equals(toRename) && symbolicReference.hasSubscripts()) {
+                symbolicReference.setIdentifier(toRename + "$" + access);
+                symbolicReference.setSubscripts(null);
+            }
             return super.visit(symbolicReference);
         }
     }
 
-    public static ST0Transformation getTransformation() {
-        return state -> {
-            ArrayEmbedder ae = new ArrayEmbedder();
-            state.theProgram = (ProgramDeclaration) state.theProgram.accept(ae);
-        };
+    @Getter
+    @AllArgsConstructor
+    private class ArrayEmbedderVisitor extends AstMutableVisitor {
+        private final VariableDeclaration arrayVariable;
+
+        Object visit(Statement statement) {
+            FindReferenceWithSubscriptVisitor findReferenceWithSubscriptVisitor = new FindReferenceWithSubscriptVisitor();
+            statement.accept(findReferenceWithSubscriptVisitor);
+            IfStatement branch = new IfStatement();
+            while (findReferenceWithSubscriptVisitor.found()) {
+                SymbolicReference instanceReference = findReferenceWithSubscriptVisitor.getTheReference();
+                // TODO multiple subscripts
+                Expression subscript = instanceReference.getSubscripts().get(0);
+                // Add branches based on the instance reference we found
+                ArrayTypeDeclaration array = (ArrayTypeDeclaration)
+                        state.theProgram.getLocalScope().getVariable(instanceReference).getTypeDeclaration();
+                // TODO multiple ranges
+                Range range = array.getRanges().get(0);
+                RangeType rangeType = new RangeType(range.getStartValue(), range.getStopValue(), DataTypes.USINT);
+                int rangeMin = Integer.parseInt(range.getStart().getText());
+                for (int i = rangeMin; i <= Integer.parseInt(range.getStop().getText()); i++) {
+                    StatementList block = new StatementList(statement.copy());
+                    block.accept(new ArrayAccessRenameVisitor(instanceReference.getIdentifier(), i));
+                    branch.addGuardedCommand(new GuardedStatement(
+                            BinaryExpression.equalsExpression(subscript, new Literal(rangeType, Integer.toString(i))),
+                            block));
+                }
+                // Perform search once more
+                findReferenceWithSubscriptVisitor.reset();
+            }
+            if (branch.getConditionalBranches().isEmpty())
+                // Keep statements intact we case we don't find anything to rename
+                return statement;
+            else if (branch.getConditionalBranches().size() == 1)
+                // Only one condition branch, no need for IF
+                return branch.getConditionalBranches().get(0).getStatements().get(0);
+            else
+                return branch;
+        }
+
+        @Override
+        public Object visit(StatementList statements) {
+            StatementList statementList = new StatementList();
+            for (Statement statement : statements) {
+                // We need to handle guarded statements differently since the guard cannot contain another if statement
+                if (statement instanceof IfStatement) {
+                    IfStatement ifStatement = (IfStatement) statement;
+                    IfStatement newIfStatement = new IfStatement();
+                    for (GuardedStatement guardedStatement : ifStatement.getConditionalBranches())
+                        newIfStatement.addGuardedCommand(guardedStatement.getCondition(),
+                                (StatementList) guardedStatement.getStatements().accept(this));
+                    newIfStatement.setElseBranch((StatementList) ifStatement.getElseBranch().accept(this));
+                    statement = newIfStatement;
+                } else if (statement instanceof GuardedStatement) {
+                    GuardedStatement guardedStatement = (GuardedStatement) statement;
+                    guardedStatement.setStatements((StatementList) guardedStatement.getStatements().accept(this));
+                    statement = guardedStatement;
+                }
+                statementList.add((Statement) visit(statement));
+            }
+            return statementList;
+        }
+
+        @Getter
+        private class FindReferenceWithSubscriptVisitor extends AstVisitor {
+            private SymbolicReference theReference;
+
+            boolean found() {
+                return theReference != null;
+            }
+
+            @Override
+            public Object defaultVisit(Visitable visitable) {
+                if (found())
+                    return null;
+                return super.defaultVisit(visitable);
+            }
+
+            @Override
+            public Object visit(SymbolicReference symbolicReference) {
+                if (found())
+                    return null;
+                if (symbolicReference.getIdentifier().equals(arrayVariable.getIdentifier())
+                        && symbolicReference.hasSubscripts())
+                    theReference = symbolicReference;
+                if (symbolicReference.hasSub())
+                    symbolicReference.getSub().accept(this);
+                if (symbolicReference.hasSubscripts())
+                    symbolicReference.getSubscripts().accept(this);
+                return super.visit(symbolicReference);
+            }
+
+            void reset() {
+                theReference = null;
+            }
+        }
     }
 }
