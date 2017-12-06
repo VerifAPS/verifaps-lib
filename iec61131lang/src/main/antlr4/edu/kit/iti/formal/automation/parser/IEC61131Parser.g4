@@ -271,7 +271,7 @@ array_initial_element
 structure_declaration
 :
 	STRUCT
-	(IDENTIFIER COLON type_declaration SEMICOLON)*
+	(ids += IDENTIFIER COLON tds += type_declaration SEMICOLON)*
 	END_STRUCT
 ;
 

@@ -278,10 +278,13 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     public Object visitStructure_declaration(
             IEC61131Parser.Structure_declarationContext ctx) {
         StructureTypeDeclaration ast = new StructureTypeDeclaration();
-        for (int i = 0; i < ctx.type_declaration().size(); i++) {
-            ast.addField(ctx.IDENTIFIER(i).getText(),
-                    (TypeDeclaration) ctx.type_declaration(i).accept(this));
-        }
+        LocalScope localScope = new LocalScope();
+        gather = localScope.builder();
+        Streams.forEachPair(ctx.ids.stream(), ctx.tds.stream(),
+                (id, type) -> gather.identifiers(id.getText())
+                        .type((TypeDeclaration) type.accept(this)).close());
+        gather = null;
+        ast.setFields(localScope);
         return ast;
     }
 

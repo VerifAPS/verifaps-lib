@@ -25,59 +25,56 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.RecordType;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-
-import java.util.HashMap;
-import java.util.Map;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 /**
  * Created by weigl on 13.06.14.
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 public class StructureTypeDeclaration extends TypeDeclaration<StructureInitialization> {
-    Map<String, TypeDeclaration> fields = new HashMap<>();
+    @NotNull LocalScope fields = new LocalScope();
 
-    /**
-     * <p>addField.</p>
-     *
-     * @param s a {@link java.lang.String} object.
-     * @param ast a {@link edu.kit.iti.formal.automation.st.ast.TypeDeclaration} object.
-     */
-    public void addField(String s, TypeDeclaration ast) {
-        fields.put(s, ast);
-    }
-
-    public StructureTypeDeclaration(String typeName, List<VariableDeclaration> fields) {
+    public StructureTypeDeclaration(@NotNull String typeName, @NotNull List<VariableDeclaration> fields) {
         super(typeName);
         fields.forEach(this.fields::add);
     }
 
     /** {@inheritDoc} */
     @Override
-    public <T> T accept(Visitor<T> visitor) {
+    public <T> T accept(@NotNull Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override
-    public Any getDataType(GlobalScope globalScope) {
-        RecordType rt = new RecordType(getTypeName());
-        for(Map.Entry<String, TypeDeclaration> s: fields.entrySet())
-            rt.addField(s.getKey(), s.getValue().getDataType(globalScope));
+    public Any getDataType(@NotNull GlobalScope globalScope) {
+        RecordType rt = new RecordType(getTypeName(), this);
+        for (VariableDeclaration s: fields.getLocalVariables().values())
+            rt.addField(s.getName(), s.getTypeDeclaration().getDataType(globalScope));
         setBaseType(rt);
         return rt;
     }
 
+    @NotNull
     @Override public StructureTypeDeclaration copy() {
         StructureTypeDeclaration t = new StructureTypeDeclaration();
         t.setRuleContext(getRuleContext());
         t.initialization = Utils.copyNull(initialization);
-        t.fields = new HashMap<>(fields);
+        t.fields = fields.copy();
         t.typeName = typeName;
         t.baseType = baseType;
         t.baseTypeName = baseTypeName;
