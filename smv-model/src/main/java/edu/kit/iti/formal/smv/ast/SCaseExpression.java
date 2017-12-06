@@ -60,7 +60,7 @@ public class SCaseExpression extends SMVExpr {
         for (int i = 1; i < cases.size(); i++) {
             Case current = cases.get(i);
             if (previous.then.equals(current.then)) {
-                condition = condition.and(current.condition);
+                condition = condition.or(current.condition);
             } else {
                 esac.addCase(condition, previous.then);
                 previous = current;
