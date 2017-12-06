@@ -161,6 +161,7 @@ public class VariableDeclaration extends Top
         this();
         this.name = name;
         typeDeclaration = td;
+        dataType = td.dataType;
     }
 
     /**
