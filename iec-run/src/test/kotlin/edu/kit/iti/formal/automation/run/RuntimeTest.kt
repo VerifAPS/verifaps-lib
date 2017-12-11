@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.run
 
 import com.sun.istack.internal.logging.Logger
+import edu.kit.iti.formal.automation.IEC61131Facade
 import mu.KLogging
 import mu.KotlinLogging
 import org.junit.Assert.assertEquals
@@ -115,6 +116,22 @@ class RuntimeTest {
         println("final state:")
 
         topState.forEach {
+            println(it)
+        }
+    }
+
+    @Test
+    fun structTest() {
+        val ast = getAst(this.javaClass.getResource("runtimeTest.structTest.st"))
+        val topState = TopState()
+        IEC61131Facade.resolveDataTypes(ast)
+
+        val runtime = Runtime(topState)
+        ast.accept<Any>(runtime)
+
+        println("final state")
+        topState.forEach {
+
             println(it)
         }
     }

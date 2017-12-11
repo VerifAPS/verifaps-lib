@@ -9,6 +9,7 @@ import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
 import mu.KLogging
 import java.util.*
+import java.util.function.Consumer
 
 /**
  * Represents the Runtime of ST-execution
@@ -22,10 +23,6 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<LocalSco
      */
     private val typeDeclarationAdder = TypeDeclarationAdder()
 
-    override fun visit(variableDeclaration: VariableDeclaration) {
-        variableDeclaration.init
-        return super.visit(variableDeclaration)
-    }
     override fun defaultVisit(visitable: Visitable?)  {
         TODO("method not implemented for: $visitable")
     }
@@ -36,6 +33,10 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<LocalSco
 
     override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
         typeDeclarationAdder.queueTypeDeclaration(enumerationTypeDeclaration)
+    }
+
+    override fun visit(structureTypeDeclaration: StructureTypeDeclaration) {
+        typeDeclarationAdder.queueTypeStructureDeclaration(structureTypeDeclaration)
     }
 
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) {
@@ -169,7 +170,34 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<LocalSco
     override fun visit(assignmentStatement: AssignmentStatement) {
         val expressionVisitor = ExpressionVisitor(state, peekLocalScope())
         val expressionValue = assignmentStatement.expression.accept<ExpressionValue>(expressionVisitor) as ExpressionValue
-        val nodeName = assignmentStatement.location.accept<Any>(object : DefaultVisitor<Unit>() {
+        val sub = (assignmentStatement.location as SymbolicReference).sub
+        val identifier = (assignmentStatement.location as SymbolicReference).identifier
+        var current = state[identifier]
+        if (sub != null) {
+            val subIdentifier = sub.accept<Any>(object : DefaultVisitor<String>() {
+                override fun visit(symbolicReference: SymbolicReference):String {
+                    return symbolicReference.identifier
+                }
+
+                override fun visit(deref: Deref): String {
+                    TODO("implement")
+                }
+            })
+            current!!.ifPresent({
+                if (it is StructValue) {
+                    val structValue = it.value
+                    state.updateValue(identifier, StructValue(it.dataType, it.value.mapValues {
+                        if (it.key == subIdentifier){
+                            expressionValue
+                        } else {
+                            it.value
+                        }}))
+                }
+            })
+        } else {
+            state.updateValue(identifier, expressionValue)
+        }
+        /*val nodeName = assignmentStatement.location.accept<Any>(object : DefaultVisitor<Unit>() {
             override fun visit(symbolicReference: SymbolicReference) {
                 state.updateValue(symbolicReference.identifier, expressionValue)
                 logger.debug { """ "${symbolicReference.identifier}" now as value $expressionValue""" }
@@ -178,7 +206,7 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<LocalSco
             override fun visit(deref: Deref) {
                 TODO("implement")
             }
-        })
+        })*/
 
     }
 

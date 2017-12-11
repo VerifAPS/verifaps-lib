@@ -3,6 +3,7 @@ package edu.kit.iti.formal.automation.run
 import edu.kit.iti.formal.automation.scope.GlobalScope
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
+import edu.kit.iti.formal.automation.st.ast.StructureTypeDeclaration
 import edu.kit.iti.formal.automation.st.ast.TypeDeclaration
 
 /**
@@ -14,6 +15,7 @@ class TypeDeclarationAdder {
     private val typeDeclarations: MutableList<TypeDeclaration<*>> = mutableListOf()
     private val functionBlockDeclarations: MutableList<FunctionBlockDeclaration> = mutableListOf()
     private  val functionDeclarations: MutableList<FunctionDeclaration> = mutableListOf()
+    private val structureTypeDeclarations: MutableList<StructureTypeDeclaration> = mutableListOf()
 
     /**
      * queue [typeDeclaration] for addition to the global scope.
@@ -30,6 +32,10 @@ class TypeDeclarationAdder {
         functionDeclarations.add(functionDeclaration)
     }
 
+    fun queueTypeStructureDeclaration(structureTypeDeclaration: StructureTypeDeclaration) {
+        structureTypeDeclarations.add(structureTypeDeclaration)
+    }
+
     /**
      * add queued type declarations to the [globalScope]
      */
@@ -43,6 +49,9 @@ class TypeDeclarationAdder {
 
         functionDeclarations.forEach { globalScope.registerFunction(it) }
         functionDeclarations.retainAll(emptyList())
+
+        structureTypeDeclarations.forEach { globalScope.registerType(it) }
+        structureTypeDeclarations.retainAll(emptyList())
         return this
     }
 }

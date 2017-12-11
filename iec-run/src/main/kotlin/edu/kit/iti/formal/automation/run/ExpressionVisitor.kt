@@ -2,7 +2,11 @@ package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
+import edu.kit.iti.formal.automation.datatypes.RecordType
 import edu.kit.iti.formal.automation.datatypes.TimeType
+import edu.kit.iti.formal.automation.datatypes.values.RecordValue
+import edu.kit.iti.formal.automation.datatypes.values.RuntimeVariable
+import edu.kit.iti.formal.automation.datatypes.values.Value
 import edu.kit.iti.formal.automation.datatypes.values.Values
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.run.stexceptions.ExecutionException
@@ -21,6 +25,15 @@ class ExpressionVisitor(private val state : State, private val localScope : Loca
 
     override fun defaultVisit(visitable: Visitable?): ExpressionValue {
         TODO("missing visitor for visitable ${visitable.toString()}")
+    }
+
+    override fun visit(structureInitialization: StructureInitialization): ExpressionValue {
+        val structInitValues = structureInitialization.initValues.mapValues {
+            (it.value as Visitable).accept<ExpressionValue>(ExpressionVisitor(state, localScope))
+        }//.mapValues { RuntimeVariable(it.key) }
+
+        return StructValue(RecordType("anonymous"), structInitValues)
+
     }
 
     private fun setMatchingArgToParam(parameters: List<ExpressionValue>, arguments: Map<String, VariableDeclaration>, state: State) {
