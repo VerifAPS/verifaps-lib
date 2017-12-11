@@ -22,21 +22,10 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.AnyBit;
-import edu.kit.iti.formal.automation.datatypes.AnyInt;
-import edu.kit.iti.formal.automation.datatypes.values.Bits;
-import edu.kit.iti.formal.automation.datatypes.values.Value;
-import edu.kit.iti.formal.automation.datatypes.values.Values;
-import edu.kit.iti.formal.automation.exceptions.IllegalTypeException;
 import edu.kit.iti.formal.automation.exceptions.OperatorNotFoundException;
 import edu.kit.iti.formal.automation.operators.BinaryOperator;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
-import edu.kit.iti.formal.automation.smv.DataTypeTranslator;
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.smv.ast.*;
-
-import java.math.BigInteger;
 
 /**
  * Created by weigl on 26.11.16.
@@ -83,38 +72,4 @@ public class Utils {
         }
         throw new OperatorNotFoundException("Could not find " + operator.symbol());
     }
-
-    public static SVariable asSMVVariable(VariableDeclaration name) {
-        return new SVariable(name.getName(), Utils.getSMVDataType(name.getDataType()));
-    }
-
-    private static SMVType getSMVDataType(Any dataType) {
-        DataTypeTranslator dtt = new DataTypeTranslator();
-        return dataType.accept(dtt);
-    }
-
-    public static SLiteral asSMVLiteral(Value<?, ?> tsValue) {
-        /*if (tsValue.getValue() instanceof Bits) {
-            Bits value = (Bits) tsValue.getValue();
-            return asSMVLiteral(new Values.VAnyBit((AnyInt) tsValue.getDataType(), value.getRegister()));
-        }*/
-        return new SLiteral(getSMVDataType(tsValue.getDataType()), tsValue.getValue());
-    }
-
-    public static SMVExpr getDefaultValue(Any dataType) {
-        if (dataType instanceof AnyInt) {
-            return asSMVLiteral(new Values.VAnyInt((AnyInt) dataType, BigInteger.ZERO));
-        }
-
-        if (dataType instanceof AnyBit.Bool) {
-            return asSMVLiteral(new Values.VBool((AnyBit.Bool) dataType, false));
-        }
-
-        if (dataType instanceof AnyBit) {
-            return asSMVLiteral(new Values.VAnyBit((AnyBit) dataType,
-                    new Bits(((AnyBit) dataType).getBitLength())));
-        }
-        throw new IllegalTypeException();
-    }
-
 }

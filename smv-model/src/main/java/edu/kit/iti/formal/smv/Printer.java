@@ -133,9 +133,11 @@ public class Printer implements SMVAstVisitor<String> {
         printSectionSingle(sb, "TRANS", m.getTrans());
 
 
-        sb.append("ASSIGN\n");
-        printAssignments(sb, m.getInitAssignments(), "init");
-        printAssignments(sb, m.getNextAssignments(), "next");
+        if (m.getInitAssignments().size() > 0 || m.getNextAssignments().size() > 0) {
+            sb.append("ASSIGN\n");
+            printAssignments(sb, m.getInitAssignments(), "init");
+            printAssignments(sb, m.getNextAssignments(), "next");
+        }
 
         sb.append("\n-- end of module ").append(m.getName()).append('\n');
         return sb.toString();

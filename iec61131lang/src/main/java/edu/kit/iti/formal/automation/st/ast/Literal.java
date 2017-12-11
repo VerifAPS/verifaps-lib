@@ -199,6 +199,9 @@ public class Literal extends Initialization {
     }
 
     private Value asValue(DataTypeVisitor<Value> transformer) {
+        if(dataType.getIdentifiedObject()==null) {
+            throw new IllegalStateException("no identified data type");
+        }
         return dataType.getIdentifiedObject().accept(transformer);
     }
 

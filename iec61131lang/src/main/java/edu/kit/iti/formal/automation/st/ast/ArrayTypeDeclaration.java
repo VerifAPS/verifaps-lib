@@ -23,7 +23,6 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.DataTypes;
 import edu.kit.iti.formal.automation.datatypes.IECArray;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.visitors.Utils;
@@ -44,6 +43,7 @@ import java.util.List;
 @ToString
 public class ArrayTypeDeclaration extends TypeDeclaration<ArrayInitialization> {
     private List<Range> ranges = new ArrayList<>();
+    private IECArray type;
 
     /**
      * {@inheritDoc}
@@ -79,10 +79,10 @@ public class ArrayTypeDeclaration extends TypeDeclaration<ArrayInitialization> {
      */
     @Override
     public Any getDataType(GlobalScope globalScope) {
-        super.getDataType(globalScope);
-        Any dt = DataTypes.getDataType(getBaseTypeName());
-        IECArray array = new IECArray(getTypeName(), getBaseType(), ranges);
-        setBaseType(dt);
-        return array;
+        if (type != null)
+            return type;
+        setBaseType(globalScope.resolveDataType(getBaseTypeName()));
+        type = new IECArray(getTypeName(), getBaseType(), ranges);
+        return type;
     }
 }

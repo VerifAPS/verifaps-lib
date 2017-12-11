@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="aps-rvt" />
+        <module name="iec-modularization" />
         <module name="iec-run" />
         <module name="iec-symbex" />
         <module name="iec-xml" />
@@ -18,6 +19,7 @@
     <bytecodeTargetLevel>
       <module name="aps-rvt" target="1.8" />
       <module name="apsrvt" target="1.8" />
+      <module name="iec-modularization" target="1.8" />
       <module name="iec-run" target="1.8" />
       <module name="iec-symbex" target="1.8" />
       <module name="iec-xml" target="1.8" />

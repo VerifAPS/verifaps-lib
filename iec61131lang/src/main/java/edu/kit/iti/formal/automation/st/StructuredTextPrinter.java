@@ -339,7 +339,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
         if (symbolicReference.getSub() != null) {
             sb.append(".");
-            //symbolicReference.getSub().accept(this);
+            symbolicReference.getSub().accept(this);
         }
 
         return null;
@@ -632,6 +632,42 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         }
         return null;
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object visit(Literal literal) {
+        sb.append(literal.getText());
+        return null;
+
+    }
+
+    @Override
+    public Object visit(ArrayInitialization initializations) {
+        sb.append("[");
+        initializations.forEach(i -> {
+            i.accept(this);
+            sb.append(", ");
+        });
+        // Added an extra ", "
+        sb.deleteLast(2);
+        sb.append("]");
+        return null;
+    }
+
+    public Object visit(StructureInitialization structureInitialization) {
+        sb.append("(");
+        structureInitialization.getInitValues().entrySet().stream().forEach(initialization -> {
+            sb.append(initialization.getKey()).append(" := ");
+            initialization.getValue().accept(this);
+            sb.append(", ");
+        });
+        // Added an extra ", "
+        sb.deleteLast(2);
+        sb.append(")");
+        return null;
     }
 
     /**

@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>edu.kit.iti.formal</groupId>
 		<artifactId>verifaps-lib</artifactId>
-		<version>1.4.0</version>
+		<version>1.4.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -43,5 +43,11 @@
 		    <artifactId>smv-model</artifactId>
 		    <version>0.2.0-SNAPSHOT</version>
 	    </dependency>
+
+		<dependency>
+			<groupId>de.tu-dresden.inf.lat.jsexp</groupId>
+			<artifactId>jsexp</artifactId>
+			<version>0.2.2</version>
+		</dependency>
     </dependencies>
 </project>

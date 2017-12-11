@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.smv.operators;
+package edu.kit.iti.formal.automation.smv.translators;
 
 /*-
  * #%L
@@ -22,17 +22,22 @@ package edu.kit.iti.formal.automation.smv.operators;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.operators.BinaryOperator;
-import edu.kit.iti.formal.automation.operators.UnaryOperator;
+import edu.kit.iti.formal.automation.datatypes.values.Value;
+import edu.kit.iti.formal.automation.st.ast.Literal;
+import edu.kit.iti.formal.smv.ast.SLiteral;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
+
+import javax.annotation.Nonnull;
 
 /**
  * @author Alexander Weigl
- * @version 1 (15.04.17)
+ * @version 1 (16.10.17)
  */
-public interface OperationMap {
-    SMVExpr translateBinaryOperator(SMVExpr left, BinaryOperator operator,
-            SMVExpr right);
+public interface ValueTranslator {
+    @Nonnull
+    default SLiteral translate(@Nonnull Literal literal) {
+        return translate(literal.asValue());
+    }
 
-    SMVExpr translateUnaryOperator(UnaryOperator operator, SMVExpr sub);
+    SLiteral translate(Value init);
 }

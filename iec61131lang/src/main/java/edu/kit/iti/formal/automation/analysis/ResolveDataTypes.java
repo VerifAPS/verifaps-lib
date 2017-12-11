@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.analysis;
 
+
 /*-
  * #%L
  * iec61131lang
@@ -89,6 +90,16 @@ public class ResolveDataTypes extends AstVisitor<Object> {
         variableDeclaration.setDataType(
                 variableDeclaration.getTypeDeclaration()
                         .getDataType(scope));
+        return null;
+    }
+
+    @Override
+    public Object visit(Literal literal) {
+        try {
+            EnumerateType enumType = (EnumerateType)local.getGlobalScope().
+                    resolveDataType(literal.getDataTypeName());
+            literal.setDataType(enumType);
+        } catch(ClassCastException | DataTypeNotDefinedException e) {}
         return null;
     }
 

@@ -27,8 +27,8 @@
         <module>iec61131lang</module>
         <module>smv-model</module>
         <module>iec-xml</module>
+        <module>iec-modularization</module>
         <module>aps-rvt</module>
-        <module>iec-run</module>
     </modules>
 
     <properties>
@@ -109,20 +109,12 @@
         </repository>
 
         <snapshotRepository>
-            <id>local</id>
+            <id>local-file</id>
             <url>file://${env.HOME}/tmp/verifaps-repo/</url>
         </snapshotRepository>
     </distributionManagement>
 
     <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh-external</artifactId>
-                <version>1.0-beta-6</version>
-            </extension>
-        </extensions>
-
         <plugins>
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
@@ -132,7 +124,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>1.10</version>
+                <version>1.14</version>
                 <executions>
                     <execution>
                         <id>first</id>
@@ -174,6 +166,7 @@
                 </executions>
             </plugin>
 
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
@@ -190,7 +183,7 @@
                         <version>1.7</version>
                     </dependency>
                 </dependencies>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 

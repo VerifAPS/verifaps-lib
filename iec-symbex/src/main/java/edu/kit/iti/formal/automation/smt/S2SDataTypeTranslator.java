@@ -1,10 +1,10 @@
-package edu.kit.iti.formal.automation.smv;
+package edu.kit.iti.formal.automation.smt;
 
 /*-
  * #%L
  * iec-symbex
  * %%
- * Copyright (C) 2016 Alexander Weigl
+ * Copyright (C) 2017 Alexander Weigl
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -22,23 +22,16 @@ package edu.kit.iti.formal.automation.smv;
  * #L%
  */
 
+import de.tudresden.inf.lat.jsexp.Sexp;
 import edu.kit.iti.formal.smv.ast.SLiteral;
-import edu.kit.iti.formal.smv.ast.SMVExpr;
 import edu.kit.iti.formal.smv.ast.SMVType;
 
 /**
  * @author Alexander Weigl
- * @version 1 (12.12.16)
+ * @version 1 (15.10.17)
  */
-public class InitValue {
-    public static final InitValue INSTANCE = new InitValue();
+public interface S2SDataTypeTranslator {
+    Sexp translate(SMVType datatype);
 
-    public SMVExpr getInit(SMVType type) {
-        Object def;
-        if (type instanceof SMVType.EnumType) {
-            def = ((SMVType.EnumType) type).getValues().get(0);
-        } else if (type instanceof SMVType.SMVTypeWithWidth) def = 0;
-        else def = false;
-        return new SLiteral(type, def);
-    }
+    Sexp translate(SLiteral l);
 }

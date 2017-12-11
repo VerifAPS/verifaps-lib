@@ -22,12 +22,13 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.smv.DataTypeTranslator;
+import edu.kit.iti.formal.automation.smv.translators.DefaultTypeTranslator;
 import edu.kit.iti.formal.automation.smv.ModuleBuilder;
 import edu.kit.iti.formal.automation.smv.SymbolicExecutioner;
 import edu.kit.iti.formal.automation.smv.SymbolicState;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st0.STSimplifier;
+import edu.kit.iti.formal.automation.st0.trans.*;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SVariable;
@@ -67,6 +68,83 @@ public final class SymbExFacade {
      */
     public static final TopLevelElements simplify(TopLevelElements elements) {
         STSimplifier stSimplifier = new STSimplifier(elements);
+        stSimplifier.addDefaultPipeline();
+        stSimplifier.transform();
+        return stSimplifier.getProcessed();
+    }
+
+    public static final void simplify(TypeDeclarations types,
+                                      TopLevelScopeElement tlsElement,
+                                      boolean unwindLoops,
+                                      boolean timerToCounter,
+                                      boolean embedArrays,
+                                      boolean replaceSFCReset) {
+
+        ProgramDeclaration program = tlsElement instanceof ProgramDeclaration ?
+                (ProgramDeclaration)tlsElement : null;
+        FunctionBlockDeclaration fb = tlsElement instanceof FunctionBlockDeclaration ?
+                (FunctionBlockDeclaration)tlsElement : null;
+        FunctionDeclaration function = tlsElement instanceof FunctionDeclaration ?
+                (FunctionDeclaration)tlsElement : null;
+
+        assert program != null || fb != null || function != null;
+
+        final ProgramDeclaration container = new ProgramDeclaration();
+        container.setProgramName(tlsElement.getIdentifier());
+        container.setLocalScope (tlsElement.getLocalScope());
+
+        if(program != null) container.setProgramBody(program.getProgramBody());
+        if(fb != null) container.setProgramBody(fb.getFunctionBody());
+        if(function != null) container.setProgramBody(function.getStatements());
+
+        TopLevelElements elements = new TopLevelElements();
+        elements.add(types);
+        elements.add(container);
+
+        final TopLevelElements simplified = simplify(
+                elements, false,
+                unwindLoops, timerToCounter, embedArrays, replaceSFCReset);
+
+        ProgramDeclaration simpleProgram = null;
+        for(TopLevelElement i : simplified) {
+            if(i instanceof ProgramDeclaration) {
+                simpleProgram = (ProgramDeclaration)i;
+                break;
+            }
+        }
+        assert simpleProgram != null;
+
+        tlsElement.setLocalScope(simpleProgram.getLocalScope());
+        if(program != null) program.setProgramBody(simpleProgram.getProgramBody());
+        if(fb != null) fb.setFunctionBody(simpleProgram.getProgramBody());
+        if(function != null) function.setStatements(simpleProgram.getProgramBody());
+    }
+
+    public static final TopLevelElements simplify(TopLevelElements elements,
+                                                  boolean embedFunctionBlocks,
+                                                  boolean unwindLoops,
+                                                  boolean timerToCounter,
+                                                  boolean embedArrays,
+                                                  boolean replaceSFCReset) {
+        STSimplifier stSimplifier = new STSimplifier(elements);
+        List<ST0Transformation> transformations = stSimplifier.getTransformations();
+
+        if(embedFunctionBlocks) {
+            transformations.add(new FunctionBlockEmbedding());
+        }
+        if(unwindLoops) {
+            transformations.add(LoopUnwinding.getTransformation());
+        }
+        if(timerToCounter) {
+            transformations.add(TimerToCounter.getTransformation());
+        }
+        if(embedArrays) {
+            transformations.add(ArrayEmbedder.getTransformation());
+        }
+        if(replaceSFCReset) {
+            transformations.add(SFCResetReplacer.getTransformation());
+        }
+
         stSimplifier.transform();
         return stSimplifier.getProcessed();
     }
@@ -87,7 +165,6 @@ public final class SymbExFacade {
     }
 
     public static final SVariable asSVariable(VariableDeclaration vd) {
-        return new SVariable(vd.getName(),
-                vd.getDataType().accept(DataTypeTranslator.INSTANCE));
+        return new DefaultTypeTranslator().translate(vd);
     }
 }

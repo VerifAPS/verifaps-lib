@@ -22,10 +22,7 @@ package edu.kit.iti.formal.automation.smv;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.SymbExFacade;
-import edu.kit.iti.formal.automation.Utils;
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.exceptions.FunctionInvocationArgumentNumberException;
 import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException;
 import edu.kit.iti.formal.automation.exceptions.UnknownDatatype;
@@ -33,11 +30,13 @@ import edu.kit.iti.formal.automation.exceptions.UnknownVariableException;
 import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.LocalScope;
-import edu.kit.iti.formal.automation.smv.operators.OperationMap;
+import edu.kit.iti.formal.automation.smv.translators.*;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.smv.SMVFacade;
 import edu.kit.iti.formal.smv.ast.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +50,23 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     private GlobalScope globalScope = GlobalScope.defaultScope();
     private LocalScope localScope = new LocalScope(globalScope);
     private Map<String, SVariable> varCache = new HashMap<>();
+
+    @Getter
+    @Setter
     private OperationMap operationMap = new DefaultOperationMap();
+
+    @Getter
+    @Setter
+    private TypeTranslator typeTranslator = new DefaultTypeTranslator();
+
+    @Getter
+    @Setter
+    private ValueTranslator valueTranslator = new DefaultValueTranslator();
+
+    @Getter
+    @Setter
+    private InitValueTranslator initValueTranslator = new DefaultInitValue();
+
     //region state handling
     private Stack<SymbolicState> state = new Stack<>();
     private Expression caseExpression;
@@ -102,7 +117,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
                         .resolveDataType(vd.getDataTypeName()));
             }
             if (!varCache.containsKey(vd))
-                varCache.put(vd.getName(), SymbExFacade.asSVariable(vd));
+                varCache.put(vd.getName(), typeTranslator.translate(vd));
             return varCache.get(vd.getName());
         } catch (NullPointerException e) {
             throw new UnknownDatatype("Datatype not given/inferred for variable "
@@ -118,7 +133,8 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     }
 
     //region rewriting of expressions using the current state
-    @Override public SMVExpr visit(BinaryExpression binaryExpression) {
+    @Override
+    public SMVExpr visit(BinaryExpression binaryExpression) {
         SMVExpr left = binaryExpression.getLeftExpr().accept(this);
         SMVExpr right = binaryExpression.getRightExpr().accept(this);
         return operationMap
@@ -126,7 +142,8 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
                         right);
     }
 
-    @Override public SMVExpr visit(UnaryExpression u) {
+    @Override
+    public SMVExpr visit(UnaryExpression u) {
         SMVExpr left = u.getExpression().accept(this);
         return operationMap.translateUnaryOperator(u.getOperator(), left);
     }
@@ -140,7 +157,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
     @Override
     public SLiteral visit(Literal literal) {
-        return Utils.asSMVLiteral(literal.asValue());
+        return valueTranslator.translate(literal);
     }
 
     @Override
@@ -206,7 +223,10 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
                 if (td != null && td.getInitialization() != null) {
                     td.getInitialization().accept(this);
                 } else {
-                    calleeState.put(lift(vd), Utils.getDefaultValue(vd.getDataType()));
+
+                    calleeState.put(lift(vd),
+                            valueTranslator.translate(
+                                    initValueTranslator.getInit(vd.getDataType())));
                 }
             }
         }
@@ -283,7 +303,10 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
     @Override
     public SMVExpr visit(CaseCondition.Range r) {
-        throw new IllegalArgumentException("unsupported");
+        BinaryExpression lower = new BinaryExpression(caseExpression, r.getStart(), Operators.GREATER_EQUALS);
+        BinaryExpression upper = new BinaryExpression(r.getStop(), caseExpression, Operators.GREATER_EQUALS);
+        BinaryExpression and = new BinaryExpression(lower, upper, Operators.AND);
+        return and.accept(this);
     }
 
     @Override

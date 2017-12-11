@@ -7,6 +7,9 @@ import edu.kit.iti.formal.smv.ast.*
 import mu.KLogging
 import java.io.Writer
 
+/**
+ *
+ */
 fun commonVariables(a: Collection<out SVariable>,
                     b: Collection<out SVariable>,
                     pred: SVarEquals)
@@ -22,7 +25,13 @@ fun commonVariables(a: Collection<out SVariable>,
     return set
 }
 
+
+/**
+ *
+ */
 typealias SVarEquals = (SVariable, SVariable) -> Boolean
+
+
 val nameEqual: SVarEquals = { a, b -> a.name == b.name }
 
 
@@ -50,7 +59,7 @@ open class RegressionVerification(
     }
 
     protected open fun commonOutputVariables(): Set<Pair<SVariable, SVariable>> {
-        return edu.kit.iti.formal.automation.rvt.commonOutputVariables(oldVersion, newVersion, nameEqual)
+        return commonOutputVariables(oldVersion, newVersion, nameEqual)
     }
 
     protected open fun staticInitModule() {
@@ -61,8 +70,9 @@ open class RegressionVerification(
             oldVersion.name += "_old"
             logger.info("modules renamed due to collision")
         }
-        newModuleType = SMVType.Module(newVersion.name)
-        oldModuleType = SMVType.Module(oldVersion.name)
+
+        newModuleType = SMVType.Module(newVersion.name, newVersion.moduleParameter)
+        oldModuleType = SMVType.Module(oldVersion.name, oldVersion.moduleParameter)
     }
 
     protected open fun addInputVariables() {

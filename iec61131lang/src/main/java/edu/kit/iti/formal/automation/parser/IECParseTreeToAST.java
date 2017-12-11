@@ -275,8 +275,9 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
             IEC61131Parser.Structure_initializationContext ctx) {
         StructureInitialization ast = new StructureInitialization();
         ast.setRuleContext(ctx);
-
-        ast.addField(ctx.I.getText(), (Initialization) ctx.i.accept(this));
+        for (int i = 0; i < ctx.init.size(); i++) {
+            ast.addField(ctx.name.get(i).getText(), (Initialization) ctx.init.get(i).accept(this));
+        }
         return ast;
     }
 

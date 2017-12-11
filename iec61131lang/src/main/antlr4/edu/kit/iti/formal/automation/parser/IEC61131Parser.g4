@@ -269,8 +269,8 @@ structure_declaration
 structure_initialization
 :
 	LPAREN
-	I=IDENTIFIER ASSIGN i=initializations
-	( I=IDENTIFIER ASSIGN i=initializations)*
+	name+=IDENTIFIER ASSIGN init+=initializations
+	(COMMA name+=IDENTIFIER ASSIGN init+=initializations)*
 	RPAREN
 ;
 

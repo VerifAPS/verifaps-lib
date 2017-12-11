@@ -39,7 +39,7 @@ import lombok.*;
 @Data
 public class ProgramDeclaration extends TopLevelScopeElement
         implements Identifiable {
-    private StatementList programBody;
+    private StatementList programBody = new StatementList();
     private String programName;
 
     /** {@inheritDoc} */
