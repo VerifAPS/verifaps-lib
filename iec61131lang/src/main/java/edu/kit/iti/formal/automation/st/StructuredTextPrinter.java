@@ -602,6 +602,23 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visit(SubRangeTypeDeclaration subRangeTypeDeclaration) {
+        sb.append(subRangeTypeDeclaration.getTypeName());
+        sb.append(": ").append(subRangeTypeDeclaration.getBaseTypeName());
+        sb.append("(");
+        subRangeTypeDeclaration.getRange().getStart().accept(this);
+        sb.append(" .. ");
+        subRangeTypeDeclaration.getRange().getStop().accept(this);
+        sb.append(")");
+        if (subRangeTypeDeclaration.getInitialization() != null) {
+            sb.append(" := ");
+            subRangeTypeDeclaration.getInitialization().accept(this);
+        }
+        sb.append(";");
+        return null;
+    }
+
     private void variableDataType(VariableDeclaration vd) {
         if (vd.getDataType() instanceof IECArray) {
             IECArray dataType = (IECArray) vd.getDataType();
