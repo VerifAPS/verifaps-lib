@@ -27,7 +27,9 @@ import edu.kit.iti.formal.automation.datatypes.RangeType;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -37,6 +39,8 @@ import lombok.ToString;
  */
 @EqualsAndHashCode
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class SubRangeTypeDeclaration extends TypeDeclaration<Literal> {
     private Range range;
 
@@ -63,11 +67,11 @@ public class SubRangeTypeDeclaration extends TypeDeclaration<Literal> {
      */
     @Override
     public RangeType getDataType(GlobalScope globalScope) {
-        RangeType rt = new RangeType(
-              /* TODO (long) range.getStart().getValue(),
-                (long) range.getStop().getValue(),
-                */0, 0, (AnyInt) super.getDataType(globalScope));
-        setBaseType(rt);
+        int start = Integer.valueOf(range.getStart().getText());
+        int stop = Integer.valueOf(range.getStop().getText());
+        assert start <= stop;
+        RangeType rt = new RangeType(typeName, start, stop, (AnyInt) super.getDataType(globalScope));
+        setDataType(rt);
         return rt;
     }
 

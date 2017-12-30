@@ -52,4 +52,12 @@ public class Range implements Copyable<Range>{
     public Range copy() {
         return new Range(start.copy(), stop.copy());
     }
+
+    public int getStartValue() {
+        return Integer.valueOf(start.getText());
+    }
+
+    public int getStopValue() {
+        return Integer.valueOf(stop.getText());
+    }
 }

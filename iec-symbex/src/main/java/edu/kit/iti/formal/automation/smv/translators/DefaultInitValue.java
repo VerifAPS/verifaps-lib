@@ -26,8 +26,8 @@ import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.datatypes.values.Bits;
 import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.datatypes.values.Values;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -39,8 +39,8 @@ public class DefaultInitValue implements InitValueTranslator {
     public static final DefaultInitValue INSTANCE = new DefaultInitValue();
     private static final DataTypeVisitor<Value> VISITOR = new InitValueVisitor();
 
-    @Nonnull
-    public Value getInit(@Nonnull Any type) {
+    @NotNull
+    public Value getInit(@NotNull Any type) {
         return type.accept(VISITOR);
     }
 
@@ -68,6 +68,11 @@ public class DefaultInitValue implements InitValueTranslator {
         @Override
         public Value visit(EnumerateType enumerateType) {
             return new Values.VAnyEnum(enumerateType, enumerateType.getDefValue());
+        }
+
+        public Value visit(RangeType rangeType) {
+            // TODO use type's initialization value, if it exists
+            return visit(rangeType.getBase());
         }
     }
 }

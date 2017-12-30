@@ -160,8 +160,7 @@ public class ValueTransformation extends DefaultDataTypeVisitor<Value> {
 
     @Override
     public Value visit(RangeType rangeType) {
-        return new Values.VAnyInt(rangeType.getBase(),
-                new BigInteger(literal.getText()));
+        return new Values.VAnyInt(rangeType, new BigInteger(literal.getText()));
     }
 
     @Override
