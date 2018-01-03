@@ -280,9 +280,14 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         }
 
         for (int i = 0; i < parameters.size(); i++) {
-            // name from definition, in order of declaration, expression from caller site
-            calleeState.put(lift(inputVars.get(i)),
-                    parameters.get(i).getExpression().accept(this));
+            Invocation.Parameter parameter = parameters.get(i);
+            if (parameters.get(i).getName() == null)
+                // name from definition, in order of declaration, expression from caller site
+                calleeState.put(lift(inputVars.get(i)), parameter.getExpression().accept(this));
+            else
+                calleeState.put(
+                        lift(inputVars.stream().filter(iv -> iv.getName().equals(parameter.getName())).findAny().get()),
+                        parameter.getExpression().accept(this));
         }
         push(calleeState);
         //endregion
