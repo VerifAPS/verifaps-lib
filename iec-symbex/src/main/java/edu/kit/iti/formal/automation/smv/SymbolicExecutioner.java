@@ -22,6 +22,8 @@ package edu.kit.iti.formal.automation.smv;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.EnumerateType;
+import edu.kit.iti.formal.automation.datatypes.values.Values;
 import edu.kit.iti.formal.automation.exceptions.FunctionInvocationArgumentNumberException;
 import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException;
 import edu.kit.iti.formal.automation.exceptions.UnknownDatatype;
@@ -175,7 +177,14 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
     @Override
     public SMVExpr visit(@NotNull SymbolicReference symbolicReference) {
-        return peek().get(lift(symbolicReference));
+        if (symbolicReference.getDataType() instanceof EnumerateType
+                && ((EnumerateType) symbolicReference.getDataType())
+                .getAllowedValues().contains(symbolicReference.getIdentifier()))
+            return valueTranslator.translate(new Values.VAnyEnum(
+                    (EnumerateType) symbolicReference.getDataType(),
+                    symbolicReference.getIdentifier()));
+        else
+            return peek().get(lift(symbolicReference));
     }
 
     //endregion
