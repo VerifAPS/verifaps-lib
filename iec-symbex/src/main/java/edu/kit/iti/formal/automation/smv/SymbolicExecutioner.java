@@ -41,11 +41,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * Created by weigl on 26.11.16.
@@ -282,30 +278,47 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
         //region transfer variables
         List<Invocation.Parameter> parameters = invocation.getParameters();
-        List<VariableDeclaration> inputVars = fd.getLocalScope().filterByFlags(VariableDeclaration.INPUT);
+        List<VariableDeclaration> inputVars = fd.getLocalScope().filterByFlags(
+                VariableDeclaration.INPUT | VariableDeclaration.INOUT | VariableDeclaration.OUTPUT);
 
-        if (parameters.size() != inputVars.size()) {
+        if (parameters.size() > inputVars.size()) {
             throw new FunctionInvocationArgumentNumberException();
         }
 
         for (int i = 0; i < parameters.size(); i++) {
             Invocation.Parameter parameter = parameters.get(i);
+            if (parameter.isOutput())
+                continue;
             if (parameters.get(i).getName() == null)
                 // name from definition, in order of declaration, expression from caller site
                 calleeState.put(lift(inputVars.get(i)), parameter.getExpression().accept(this));
-            else
-                calleeState.put(
-                        lift(inputVars.stream().filter(iv -> iv.getName().equals(parameter.getName())).findAny().get()),
-                        parameter.getExpression().accept(this));
+            else {
+                Optional o = inputVars.stream().filter(iv -> iv.getName().equals(parameter.getName())).findAny();
+                if (o.isPresent())
+                    calleeState.put(lift((VariableDeclaration) o.get()), parameter.getExpression().accept(this));
+            }
         }
         push(calleeState);
         //endregion
 
         // execution of body
         fd.getStatements().accept(this);
-        pop();
 
-        return calleeState.get(lift(fd.getLocalScope().getVariable(fd.getFunctionName())));
+        SymbolicState returnState = pop();
+        // Update output variables
+        List<Invocation.Parameter> outputParameters = invocation.getParameters();
+        List<VariableDeclaration> outputVars = fd.getLocalScope().filterByFlags(
+                VariableDeclaration.OUTPUT | VariableDeclaration.INOUT);
+        for (Invocation.Parameter parameter : outputParameters) {
+            Optional o = outputVars.stream().filter(iv -> iv.getName().equals(parameter.getName())).findAny();
+            if (o.isPresent())
+                peek().replace(lift((SymbolicReference) parameter.getExpression()),
+                        returnState.get(lift((VariableDeclaration) o.get())));
+        }
+
+        return fd.getReturnType() != null
+                ? calleeState.get(lift(fd.getLocalScope().getVariable(fd.getFunctionName())))
+                : null;
     }
 
     @Nullable
