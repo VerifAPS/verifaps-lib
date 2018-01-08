@@ -2,6 +2,7 @@ package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
+import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType
 import edu.kit.iti.formal.automation.datatypes.RecordType
 import edu.kit.iti.formal.automation.datatypes.TimeType
 import edu.kit.iti.formal.automation.datatypes.values.RecordValue
@@ -14,6 +15,7 @@ import edu.kit.iti.formal.automation.scope.LocalScope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
+import org.stringtemplate.v4.misc.STRuntimeMessage
 import java.util.*
 
 /**
@@ -121,6 +123,19 @@ class ExpressionVisitor(private val state : State, private val localScope : Loca
 
         val variableState = state[variableName]
                 ?: throw ExecutionException("Variable $variableName not found")
+
+        var dataType = symbolicReference.dataType(localScope)
+        if (dataType is FunctionBlockDataType) {
+            val structValue = state[symbolicReference.identifier]!!.orElseThrow { ExecutionException("variable not defined") }.value
+            if (symbolicReference.sub != null && structValue is Map<*, *>) {
+                val matching = structValue.filter {
+                    it.key == (symbolicReference.sub as SymbolicReference).identifier }.values.first()
+                if (matching != null && matching is ExpressionValue) {
+                    return matching
+                }
+            }
+            TODO();
+        }
 
         return variableState
                 .orElseThrow { throw ExecutionException("Variable $variableName not initialized") }

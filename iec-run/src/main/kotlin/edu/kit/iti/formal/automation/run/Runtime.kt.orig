@@ -1,22 +1,21 @@
 package edu.kit.iti.formal.automation.run
 
-import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType
-import edu.kit.iti.formal.automation.datatypes.RecordType
-import edu.kit.iti.formal.automation.run.stexceptions.ExecutionException
 import edu.kit.iti.formal.automation.run.stexceptions.StEvaluationException
 import edu.kit.iti.formal.automation.run.stexceptions.TypeMissmatchException
+import edu.kit.iti.formal.automation.scope.GlobalScope
 import edu.kit.iti.formal.automation.scope.LocalScope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
 import mu.KLogging
 import java.util.*
+import java.util.function.Consumer
 
 /**
  * Represents the Runtime of ST-execution
  * changes the [state] depending on the visited Nodes
  */
-class Runtime (val state: State, private val definitionScopeStack: Stack<LocalScope> = Stack()) : DefaultVisitor<Unit>() {
+class Runtime(val state: State, private val definitionScopeStack: Stack<LocalScope> = Stack()) : DefaultVisitor<Unit>() {
     companion object : KLogging()
     /*
      * stores the variable definitions (e.g. "VAR a : INT END_VAR"
@@ -41,7 +40,6 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<LocalSc
     }
 
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) {
-
         typeDeclarationAdder.queueFunctionBlockDeclaration(functionBlockDeclaration)
     }
 
@@ -60,44 +58,18 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<LocalSc
 
     override fun visit(fbc: FunctionBlockCallStatement) {
         val innerState = TopState()
-        val fbName = fbc.functionBlockName
-        val fbTypeName = peekLocalScope().getVariable(fbName).typeDeclaration.baseTypeName
-        val fbDataType = peekLocalScope().globalScope.resolveDataType(fbTypeName);
-        val fb = peekLocalScope().globalScope.getFunctionBlock(fbTypeName)
-
-        val fbPrevValue = state[fbName]!!.orElseThrow { ExecutionException("not initialized") }.value
-        if (fbPrevValue is HashMap<*, *>) {
-            fbPrevValue.forEach {
-                innerState.put(it.key as String, Optional.of(it.value as ExpressionValue))
-            }
-        }
-
-
         fbc.parameters.filter { !it.isOutput }.forEach {
             val parameterValue = (it.expression as Visitable).accept<ExpressionValue>(ExpressionVisitor(state, peekLocalScope()))
             innerState.put(it.name, Optional.of(parameterValue))
         }
-
-
-        val innerLocalScope = Stack<LocalScope>()
-        innerLocalScope.push(peekLocalScope().globalScope.getFunctionBlock(fbTypeName).localScope);
-
-        fb.functionBody.accept(Runtime(innerState, innerLocalScope))
-
-        val structValue = mutableMapOf<String, ExpressionValue>()
-        innerState.forEach {
-            val key = it.key
-            it.value.ifPresent {
-                structValue.put(key, it)
-            }
+        val fbName = fbc.functionBlockName
+        val fbTypeName = peekLocalScope().getVariable(fbName).typeDeclaration.baseTypeName
+        val fb = peekLocalScope().globalScope.getFunctionBlock(fbTypeName)
+        fb.accept<Any>(Runtime(innerState))
+        fbc.outputParameters.forEach {
+            val parameterValue = (it.expression as Visitable).accept<ExpressionValue>(ExpressionVisitor(innerState, peekLocalScope()))
+            state.put(it.name, Optional.of(parameterValue))
         }
-        if (fbDataType is RecordType) {
-
-            state.put(fbName, Optional.of(StructValue(fbDataType, structValue)))
-        } else {
-            TODO()
-        }
-
     }
 
     override fun visit(whileStatement: WhileStatement) {
@@ -121,7 +93,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<LocalSc
         val stepValue = (forStatement.step as Visitable).accept<ExpressionValue>(ExpressionVisitor(state, peekLocalScope()))
         state.put(variableName, Optional.of(startValue))
 
-        fun conditionHolds(): Boolean {
+        fun conditionHolds() : Boolean {
             val variableValue = state[variableName] ?: return false
             logger.debug { "Does the ForStatement-Condition hold? current: $variableValue stopValue: $stopValue" }
             return variableValue.map {
@@ -131,7 +103,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<LocalSc
             }.value
         }
 
-        while (conditionHolds()) {
+        while(conditionHolds()) {
             logger.debug { "for-loop-condition still holds. execute statement body" }
             forStatement.statements.accept(this)
 
@@ -141,39 +113,12 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<LocalSc
         }
     }
 
-    public fun defaultValueForDataType(dataType: VariableDeclaration) : Optional<ExpressionValue> {
-        //(it.value.dataType as FunctionBlockDataType).functionBlock.localScope
-        if (dataType == null) {
-            TODO()
-        }
-        return when(dataType.dataType) {
-            is FunctionBlockDataType -> {
-                val innerState = TopState()
-                val innerStack = Stack<LocalScope>()
-                innerStack.push((dataType.dataType as FunctionBlockDataType).functionBlock.localScope)
-                val innerRuntime = Runtime(innerState, innerStack)
-                innerRuntime.initializeLocalVariables((dataType.dataType as FunctionBlockDataType).functionBlock.localScope);
-
-                val structValue = mutableMapOf<String, ExpressionValue>()
-                innerState.forEach {
-                    val key = it.key
-                    it.value.ifPresent {
-                        structValue.put(key, it)
-                    }
-                }
-                return Optional.of(StructValue(dataType.dataType as FunctionBlockDataType, structValue))
-            }
-            else -> Optional.empty();
-        }
-    }
-
-
     public fun initializeLocalVariables(localScope: LocalScope) {
         val localVariables: Map<out String, VariableDeclaration> = localScope.localVariables
         localVariables.map {
             val initExpr = it.value.init
             val initialValue : Optional<ExpressionValue> = when(initExpr) {
-                null -> defaultValueForDataType(it.value);
+                null -> Optional.empty()
                 else -> Optional.of(initExpr.accept<ExpressionValue>(
                         ExpressionVisitor(state, peekLocalScope())
                 ) as ExpressionValue)

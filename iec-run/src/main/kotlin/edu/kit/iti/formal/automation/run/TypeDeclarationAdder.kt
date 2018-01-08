@@ -13,7 +13,7 @@ import edu.kit.iti.formal.automation.st.ast.TypeDeclaration
  */
 class TypeDeclarationAdder {
     private val typeDeclarations: MutableList<TypeDeclaration<*>> = mutableListOf()
-    private val functionBlockDeclarations: MutableList<FunctionBlockDeclaration> = mutableListOf()
+    public val functionBlockDeclarations: MutableList<FunctionBlockDeclaration> = mutableListOf()
     private  val functionDeclarations: MutableList<FunctionDeclaration> = mutableListOf()
     private val structureTypeDeclarations: MutableList<StructureTypeDeclaration> = mutableListOf()
 

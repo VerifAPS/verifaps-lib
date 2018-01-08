@@ -111,6 +111,7 @@ class RuntimeTest {
     fun functionBlockTest() {
         val ast = getAst(this.javaClass.getResource("runtimeTest.functionBlockTest.st"))
         val topState = TopState()
+        IEC61131Facade.resolveDataTypes(ast)
         val runtime = Runtime(topState)
         ast.accept<Any>(runtime)
         println("final state:")
