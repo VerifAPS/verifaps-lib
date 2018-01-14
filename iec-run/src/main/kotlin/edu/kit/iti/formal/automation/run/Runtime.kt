@@ -73,7 +73,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<LocalSc
         }
 
 
-        fbc.parameters.filter { !it.isOutput }.forEach {
+        fbc.parameters./*filter { !it.isOutput }.*/forEach {
             val parameterValue = (it.expression as Visitable).accept<ExpressionValue>(ExpressionVisitor(state, peekLocalScope()))
             innerState.put(it.name, Optional.of(parameterValue))
         }
@@ -171,6 +171,10 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<LocalSc
     public fun initializeLocalVariables(localScope: LocalScope) {
         val localVariables: Map<out String, VariableDeclaration> = localScope.localVariables
         localVariables.map {
+            val stateVal = state[it.key]
+            if (stateVal != null && stateVal.isPresent) {
+                return@map
+            }
             val initExpr = it.value.init
             val initialValue : Optional<ExpressionValue> = when(initExpr) {
                 null -> defaultValueForDataType(it.value);
@@ -252,16 +256,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<LocalSc
         } else {
             state.updateValue(identifier, expressionValue)
         }
-        /*val nodeName = assignmentStatement.location.accept<Any>(object : DefaultVisitor<Unit>() {
-            override fun visit(symbolicReference: SymbolicReference) {
-                state.updateValue(symbolicReference.identifier, expressionValue)
-                logger.debug { """ "${symbolicReference.identifier}" now as value $expressionValue""" }
-            }
 
-            override fun visit(deref: Deref) {
-                TODO("implement")
-            }
-        })*/
 
     }
 

@@ -8,13 +8,13 @@ PROGRAM Elevator
 
   VAR_INPUT
     CurrentPos : INT := 3;
-    RequestedPos : INT := 3;
-    ButtonPressed : BOOL := false;
+    RequestedPos : INT := 5;
+    ButtonPressed : BOOL;
   END_VAR
 
   VAR_OUTPUT
     Motor : MOTOR_STATE := MOTOR_STATE#Stationary;
-    Door : DOOR_STATE := DOOR_STATE#Closed;
+    Door : DOOR_STATE := DOOR_STATE#Open;
   END_VAR
 
   IF ButtonPressed THEN

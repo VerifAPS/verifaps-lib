@@ -2,6 +2,8 @@ package edu.kit.iti.formal.automation.run
 
 import com.sun.istack.internal.logging.Logger
 import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.datatypes.AnyBit
+import edu.kit.iti.formal.automation.datatypes.values.Values
 import mu.KLogging
 import mu.KotlinLogging
 import org.junit.Assert.assertEquals
@@ -61,12 +63,24 @@ class RuntimeTest {
     @Test
     fun elevatorTest() {
         val ast = getAst(this.javaClass.getResource("runtimeTest.elevatorTest.st"))
-        val topState = TopState()
-        ast.accept<Any>(Runtime(topState))
-        println("final state:")
-        topState.forEach {
+
+        val exec = IecRunFascade(ast)
+
+        exec.topState["ButtonPressed"] = Optional.of(Values.VBool(AnyBit.BOOL, true) as ExpressionValue)
+        exec.execute()
+
+        println("1st state:")
+        exec.topState.forEach {
             println(it)
         }
+
+        exec.execute()
+        println("2nd state:")
+        exec.topState.forEach {
+            println(it)
+        }
+
+
     }
 
     @Test
@@ -124,14 +138,11 @@ class RuntimeTest {
     @Test
     fun structTest() {
         val ast = getAst(this.javaClass.getResource("runtimeTest.structTest.st"))
-        val topState = TopState()
-        IEC61131Facade.resolveDataTypes(ast)
-
-        val runtime = Runtime(topState)
-        ast.accept<Any>(runtime)
+        val exec = IecRunFascade(ast)
+        exec.execute()
 
         println("final state")
-        topState.forEach {
+        exec.topState.forEach {
 
             println(it)
         }

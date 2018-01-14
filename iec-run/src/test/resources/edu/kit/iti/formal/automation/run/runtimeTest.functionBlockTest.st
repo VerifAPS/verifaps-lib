@@ -22,7 +22,7 @@ PROGRAM  Analogsensor
       e : BOOL;
     END_VAR
 
-    timeout(IN := TRUE, IN2 := TRUE);
+    timeout(IN := TRUE, IN2 := TRUE, Q := False);
 
     e := timeout.Q;
 
