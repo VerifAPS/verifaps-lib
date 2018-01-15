@@ -22,12 +22,20 @@
 
     <repositories>
         <repository>
+            <id>kit-maven</id>
+            <name>kit-maven</name>
+            <url>http://formal.iti.kit.edu/maven2/</url>
+        </repository>
+        <repository>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-            <id>central</id>
-            <name>bintray</name>
-            <url>http://jcenter.bintray.com</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <id>jcenter</id>
+            <name>JCenter</name>
+            <url>https://jcenter.bintray.com/</url>
         </repository>
     </repositories>
 
@@ -87,10 +95,14 @@
             <version>1.4.5</version>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.dokka</groupId>
+            <artifactId>dokka-fatjar</artifactId>
+            <version>${dokka.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test</artifactId>
+            <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -123,71 +135,24 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
-        <!--
-        <plugins>
             <plugin>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <version>${kotlin.version}</version>
+                <groupId>org.jetbrains.dokka</groupId>
+                <artifactId>dokka-maven-plugin</artifactId>
+                <version>${dokka.version}</version>
                 <executions>
                     <execution>
-                        <id>compile</id>
+                        <phase>pre-site</phase>
                         <goals>
-                            <goal>compile</goal>
+                            <goal>dokka</goal>
                         </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
-                                <sourceDir>${project.basedir}/src/main/java</sourceDir>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
-                                <sourceDir>${project.basedir}/src/test/java</sourceDir>
-                            </sourceDirs>
-                        </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <includes>
+                        <include>Module.md</include>
+                    </includes>
+                </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
-                <executions>
-        <execution>
-            <id>default-compile</id>
-            <phase>none</phase>
-        </execution>
-        <execution>
-            <id>default-testCompile</id>
-            <phase>none</phase>
-        </execution>
-        <execution>
-            <id>java-compile</id>
-            <phase>compile</phase>
-            <goals>
-                <goal>compile</goal>
-            </goals>
-        </execution>
-        <execution>
-            <id>java-test-compile</id>
-            <phase>test-compile</phase>
-            <goals>
-                <goal>testCompile</goal>
-            </goals>
-        </execution>
-    </executions>
-</plugin>
         </plugins>
-        -->
     </build>
-
 </project>

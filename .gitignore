@@ -6,6 +6,7 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff:
+.idea/ # ignore .idea folder entirely (as far as I know, nothing in there needs to be in git
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/dictionaries
