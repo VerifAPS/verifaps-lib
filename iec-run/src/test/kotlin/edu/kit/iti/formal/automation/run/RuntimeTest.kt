@@ -3,6 +3,8 @@ package edu.kit.iti.formal.automation.run
 import com.sun.istack.internal.logging.Logger
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
+import edu.kit.iti.formal.automation.datatypes.AnyInt
+import edu.kit.iti.formal.automation.datatypes.AnySignedInt
 import edu.kit.iti.formal.automation.datatypes.values.Values
 import mu.KLogging
 import mu.KotlinLogging
@@ -73,6 +75,8 @@ class RuntimeTest {
         exec.topState.forEach {
             println(it)
         }
+
+        exec.topState["CurrentPos"] = Optional.of(Values.VAnyInt(AnyInt.getDataTypeFor(5, false), BigInteger.valueOf(5)) as ExpressionValue)
 
         exec.execute()
         println("2nd state:")
