@@ -16,8 +16,8 @@ public class WizardView extends VBox {
 
   private final Label titleLabel = new Label();
   private final Label pageNumberLabel = new Label();
-  private final Button next = new Button("next");
-  private final Button previous = new Button("previous");
+  private final Button next = new Button("Next");
+  private final Button previous = new Button("Previous");
   private final AnchorPane content = new AnchorPane();
 
   public WizardView() {
@@ -47,6 +47,7 @@ public class WizardView extends VBox {
     footer.getChildren().add(bottonBox);
     AnchorPane.setRightAnchor(bottonBox, 20.0);
     AnchorPane.setTopAnchor(bottonBox, 10.0);
+    AnchorPane.setBottomAnchor(bottonBox, 10.0);
     return footer;
   }
 
