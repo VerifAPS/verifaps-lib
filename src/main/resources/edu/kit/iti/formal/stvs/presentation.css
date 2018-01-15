@@ -79,3 +79,8 @@
     -fx-stroke: red;
     -fx-stroke-width: 5pt;
 }
+
+.title {
+    -fx-font-weight: bold;
+    -fx-font-size: 120%;
+}

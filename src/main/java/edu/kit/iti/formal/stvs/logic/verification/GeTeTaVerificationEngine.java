@@ -12,23 +12,15 @@ import edu.kit.iti.formal.stvs.model.verification.VerificationError;
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult;
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
 import edu.kit.iti.formal.stvs.util.ProcessCreationException;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
-
 import javafx.application.Platform;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Handles communication with the GeTeTa verification engine.
@@ -63,10 +55,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
 
     /* Check if nuXmv executable exists */
     File nuxmvFile = new File(config.getNuxmvFilename());
-    if (!nuxmvFile.exists() || nuxmvFile.isDirectory()) {
-      throw new FileNotFoundException(
-          "The NuXmv executable " + nuxmvFile.getAbsolutePath() + " could not be found.");
-    }
+    //TODO check if nuXmv is executable by running it.
   }
 
   /**
@@ -106,6 +95,7 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
       cancelVerification();
     }
     ProcessBuilder processBuilder = new ProcessBuilder(getetaCommand.split(" "));
+    System.out.println(getetaCommand);
     processBuilder.environment().put("NUXMV", config.getNuxmvFilename());
     getetaOutputFile = File.createTempFile("verification-result", ".log");
     LOGGER.info("Code file: {}", tempCodeFile);

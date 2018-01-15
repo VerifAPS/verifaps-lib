@@ -15,6 +15,9 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import org.slf4j.Logger;
@@ -83,7 +86,7 @@ public class SpecificationTableController implements Controller {
         this.view = new SpecificationTableView(tableView);
 
         view.getBtnAddRows().setOnAction(event -> insertRow());
-        view.getBtnCommentRow().setOnAction(event -> addRowComment());
+        view.getBtnCommentRow().setOnAction(event -> addRowComment(event));
         view.getBtnRemoveRows().setOnAction(event -> deleteRow());
         view.getBtnResize().setOnAction(event -> resizeColumns());
 
@@ -152,15 +155,6 @@ public class SpecificationTableController implements Controller {
         return new SpecificationTableCell(validator);
     }
 
-    private ContextMenu createTopLevelContextMenu() {
-        MenuItem comment = new MenuItem("Comment ...");
-        comment.setAccelerator(KeyCombination.keyCombination("Ctrl+k"));
-        comment.setOnAction(event -> {
-            new CommentPopupManager(hybridSpec, hybridSpec.isEditable());
-        });
-        return new ContextMenu(comment);
-    }
-
     private <T> void removeByReference(List<T> toBeRemovedFrom, List<T> toRemove) {
         for (T referenceToRemove : toRemove) {
             Iterator<T> iterator = toBeRemovedFrom.iterator();
@@ -189,13 +183,14 @@ public class SpecificationTableController implements Controller {
                 .showAndWait().ifPresent(this::addNewColumn);
     }
 
-    public void addRowComment() {
+    public void addRowComment(Event event) {
         int index = tableView.getSelectionModel().getSelectedIndex();
         if (index < 0) {
             return;
         }
-        CommentPopupManager popupController =
-                new CommentPopupManager(hybridSpec.getRows().get(index), hybridSpec.isEditable());
+        TableColumn<HybridRow, ?> tableColumn = tableView.getColumns().get(1);
+        CommentPopOverManager popOverManager =
+            new CommentPopOverManager(hybridSpec.getRows().get(index), hybridSpec.isEditable(), tableColumn.getGraphic(), 0, 200);
     }
 
     public void resizeColumns() {
@@ -219,7 +214,7 @@ public class SpecificationTableController implements Controller {
         MenuItem addNewColumn = new MenuItem("New Column...");
         addNewColumn.setOnAction(event -> addNewColumn());
 
-        comment.setOnAction(event -> addRowComment());
+        comment.setOnAction(event -> addRowComment(event));
         comment.setAccelerator(KeyCodeCombination.keyCombination("Ctrl+k"));
         insertRow.disableProperty().bind(Bindings.not(tableView.editableProperty()));
         deleteRow.disableProperty().bind(Bindings.not(tableView.editableProperty()));
@@ -248,7 +243,7 @@ public class SpecificationTableController implements Controller {
         commentColumn.setOnAction(event -> {
             String specIoVariableName = (String) column.getUserData();
             SpecIoVariable commentable = hybridSpec.getColumnHeaderByName(specIoVariableName);
-            new CommentPopupManager(commentable, tableView.isEditable());
+            new CommentPopOverManager(commentable, tableView.isEditable(), column.getGraphic());
         });
         changeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
         removeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));

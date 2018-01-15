@@ -157,7 +157,8 @@ public class GeTeTaImporter extends XmlImporter<VerificationResult> {
 
     List<String> rowMap = message.getCounterexample().getRowMappings().getRowMap();
     // It does not matter which of the rowMaps to use, so always use the zeroeth
-    List<Integer> rowNums = parseRowMap(rowMap.get(0));
+      //take the last counterexample
+    List<Integer> rowNums = parseRowMap(rowMap.get(rowMap.size()-1));
     Map<String, Value> currentValues = makeInitialValues(varTypes);
 
     // Parse concrete rows

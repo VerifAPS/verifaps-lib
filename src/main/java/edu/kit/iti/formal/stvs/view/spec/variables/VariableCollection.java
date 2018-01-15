@@ -39,7 +39,7 @@ public class VariableCollection extends TitledPane {
         setText("Global Variables");
         this.freeVariableTableView.setId("VariableCollectionTableView");
         ViewUtils.setupView(this);
-
+        setExpanded(false);
 
         nameTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
         typeTableColumn.prefWidthProperty().bind(freeVariableTableView.widthProperty().multiply(0.4));
@@ -59,6 +59,7 @@ public class VariableCollection extends TitledPane {
 
         //this.overviewLabel.getStyleClass().addAll("freevar", "overview-label");
         this.freeVariableTableView.getStyleClass().addAll("freevar", "variable-table-view");
+        freeVariableTableView.setPrefHeight(100.0);
         setContent(content);
         content.setCenter(freeVariableTableView);
         content.setTop(toolBar);
