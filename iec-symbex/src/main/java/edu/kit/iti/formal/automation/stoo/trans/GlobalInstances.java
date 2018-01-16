@@ -29,8 +29,11 @@ import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
 import edu.kit.iti.formal.automation.visitors.Utils;
+import javafx.util.Pair;
 import lombok.AllArgsConstructor;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -67,12 +70,15 @@ public class GlobalInstances extends STOOTransformation {
                 continue;  // ignore if no instances present
             // Set array type declaration
             ArrayTypeDeclaration instanceArray = new ArrayTypeDeclaration();
-            instanceArray.addSubRange(new Range(state.getInstanceIDRangeToClass(classDeclaration)));
+            for (Pair<Integer, Integer> range : state.getInstanceIDRangesToClass(classDeclaration))
+                instanceArray.addSubRange(new Range(range.getKey(), range.getValue()));
             instanceArray.setBaseType(state.getGlobalScope().resolveDataType(classDeclaration.getName()));
             // Set instances initializations in the array's initializations
             ArrayInitialization arrayInitialization = new ArrayInitialization();
-            for (InstanceScope.Instance instance : state.getInstanceScope()
-                    .getPolymorphInstancesOfClass(classDeclaration)) {
+            List<InstanceScope.Instance> classInstances = state.getInstanceScope()
+                    .getPolymorphInstancesOfClass(classDeclaration);
+            classInstances.sort(Comparator.comparingInt(state::getInstanceID));
+            for (InstanceScope.Instance instance : classInstances) {
                 // Initialization contains only variables in the class' scope (no inheritance)
                 StructureInitialization instanceInitialization = new StructureInitialization(
                         instance.getInitialization().getInitValues().entrySet().stream()
