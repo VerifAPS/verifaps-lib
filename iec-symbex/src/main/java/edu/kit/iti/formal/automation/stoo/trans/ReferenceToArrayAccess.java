@@ -23,7 +23,9 @@
 package edu.kit.iti.formal.automation.stoo.trans;
 
 import com.google.common.collect.Streams;
-import edu.kit.iti.formal.automation.datatypes.*;
+import edu.kit.iti.formal.automation.datatypes.ClassDataType;
+import edu.kit.iti.formal.automation.datatypes.InterfaceDataType;
+import edu.kit.iti.formal.automation.datatypes.ReferenceType;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
@@ -90,7 +92,12 @@ public class ReferenceToArrayAccess extends STOOTransformation {
             // Clear effective types since we took care of the instance reference
             instanceReference.get().setEffectiveDataType(null);
             // Recurse
-            newNode.getSub().addSubscript((SymbolicReference) node.accept(this));
+            SymbolicReference subscript = (SymbolicReference) node.accept(this);
+            // TODO Fix
+            // For now patching missing instance ID
+            if (subscript.getIdentifier().equals(SELF_PARAMETER_NAME) && !subscript.hasSub())
+                subscript.setSub(new SymbolicReference(INSTANCE_ID_VAR_NAME));
+            newNode.getSub().addSubscript(subscript);
             return newNode;
         }
     }
