@@ -22,16 +22,14 @@
 
 package edu.kit.iti.formal.automation.scope;
 
+import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.st.ast.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -126,7 +124,18 @@ public class InstanceScope implements Serializable {
      * @return A (flat) list of all instances in the scope.
      */
     public List<Instance> getAllInstances() {
-        return classInstances.values().stream().flatMap(l -> l.stream()).collect(Collectors.toList());
+        return classInstances.values().stream()
+                .flatMap(Collection::stream)
+                .sorted(Comparator.comparing(i -> {
+                    assert i.getVariableDeclaration().getDataType() instanceof ClassDataType;
+                    ClassDeclaration instanceClass =
+                            ((ClassDataType) i.getVariableDeclaration().getDataType()).getClazz();
+                    StringBuilder sortName = new StringBuilder(instanceClass.getName());
+                    for (ClassDeclaration parent = instanceClass.getParentClass(); parent != null;
+                         parent = parent.getParentClass())
+                        sortName.insert(0, parent.getName() + "$");
+                    return sortName.toString();
+                })).collect(Collectors.toList());
     }
 
     public void registerClassInstance(ClassDeclaration classDeclaration, Instance instance) {
