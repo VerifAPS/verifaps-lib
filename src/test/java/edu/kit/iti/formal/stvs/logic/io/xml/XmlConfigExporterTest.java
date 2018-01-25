@@ -23,7 +23,10 @@ public class XmlConfigExporterTest {
 
   @Test
   public void testExportConstraintDefault() throws Exception {
-    ByteArrayOutputStream result = exporter.export(new GlobalConfig());
+    GlobalConfig globalConfig = new GlobalConfig();
+    globalConfig.setZ3Path("[Path to Z3 Executable]");
+    globalConfig.setNuxmvFilename("[Path to NuXmv Executable]");
+    ByteArrayOutputStream result = exporter.export(globalConfig);
     String resultString = new String(result.toByteArray(), "utf-8");
     String expectedString = IOUtils.toString(
         this.getClass().getResourceAsStream("config_valid_default.xml"), "UTF-8");

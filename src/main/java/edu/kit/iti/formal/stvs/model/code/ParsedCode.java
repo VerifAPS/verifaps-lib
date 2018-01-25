@@ -127,8 +127,8 @@ public class ParsedCode {
     }
 
     private void addBlock(Top topElement) {
-      foldableCodeBlocks.add(new FoldableCodeBlock(topElement.getStartPosition().getLineNumber(),
-          topElement.getEndPosition().getLineNumber()));
+      foldableCodeBlocks.add(new FoldableCodeBlock(topElement.getRuleContext().start.getLine(),
+          topElement.getRuleContext().stop.getLine()));
     }
 
     @Override

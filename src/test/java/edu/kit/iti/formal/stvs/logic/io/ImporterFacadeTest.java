@@ -115,6 +115,10 @@ public class ImporterFacadeTest {
             ".xml").toURI());
     GlobalConfig actualConfig = ImporterFacade.importConfig(file, ImporterFacade.ImportFormat.XML);
     GlobalConfig expectedConfig = new GlobalConfig();
+
+    //reset global config values
+    expectedConfig.setNuxmvFilename("[Path to NuXmv Executable]");
+    expectedConfig.setZ3Path("[Path to Z3 Executable]");
     Assert.assertEquals(expectedConfig, actualConfig);
   }
 

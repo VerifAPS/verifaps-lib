@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<test-table xmlns="http://formal.iti.kit.edu/exteta-1.0" version="1.0">
+<test-table xmlns="http://formal.iti.kit.edu/exteta-1.0">
     <variables>
-        <variable data-type="INT" io="input" name="var_A"/>
-        <variable data-type="BOOLEAN" io="input" name="var_B"/>
-        <variable data-type="INT" io="output" name="var_C"/>
-        <variable data-type="ENUM" io="output" name="var_D"/>
-        <constraint constraint="-" data-type="BOOLEAN" name="var_p"/>
-        <constraint constraint="42" data-type="INT" name="var_q"/>
+        <variable data-type="INT" io="input" name="A"/>
+        <variable data-type="BOOLEAN" io="input" name="B"/>
+        <variable data-type="INT" io="output" name="C"/>
+        <variable data-type="ENUM" io="output" name="D"/>
+        <constraint constraint="-" data-type="BOOLEAN" name="p"/>
+        <constraint constraint="42" data-type="INT" name="q"/>
     </variables>
     <steps>
         <step duration="[2,3]">
-            <cell>var_q</cell>
-            <cell>= NOT var_p</cell>
+            <cell>q</cell>
+            <cell>= NOT p</cell>
             <cell>-</cell>
-            <cell>var_literalOne</cell>
+            <cell>literalOne</cell>
         </step>
         <step duration="-">
-            <cell>= var_C[-1] - 1</cell>
-            <cell>var_B[-1]</cell>
+            <cell>= C[-1] - 1</cell>
+            <cell>B[-1]</cell>
             <cell>52</cell>
             <cell>-</cell>
         </step>

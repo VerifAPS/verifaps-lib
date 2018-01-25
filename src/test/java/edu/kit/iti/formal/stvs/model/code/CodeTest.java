@@ -107,11 +107,11 @@ public class CodeTest {
 
   @Test
   public void testParsedCodeBlocks() {
-    FoldableCodeBlock expectedBlock = new FoldableCodeBlock(5, 15);
+    FoldableCodeBlock expectedBlock = new FoldableCodeBlock(5, 27);
     assertEquals(expectedBlock, enumDefinition.getParsedCode().getFoldableCodeBlocks().get(0));
     assertEquals(1, enumDefinition.getParsedCode().getFoldableCodeBlocks().size());
     assertEquals(5, enumDefinition.getParsedCode().getFoldableCodeBlocks().get(0).getStartLine());
-    assertEquals(15, enumDefinition.getParsedCode().getFoldableCodeBlocks().get(0).getEndLine());
+    assertEquals(27, enumDefinition.getParsedCode().getFoldableCodeBlocks().get(0).getEndLine());
   }
 
   @Test

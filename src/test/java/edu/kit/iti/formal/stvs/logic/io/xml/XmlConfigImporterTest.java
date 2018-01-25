@@ -44,6 +44,8 @@ public class XmlConfigImporterTest {
             ".xml").toURI()));
     GlobalConfig actualConfig = importer.doImport(inputStream);
     GlobalConfig expectedConfig = new GlobalConfig();
+    expectedConfig.setZ3Path("[Path to Z3 Executable]");
+    expectedConfig.setNuxmvFilename("[Path to NuXmv Executable]");
     assertEquals(expectedConfig, actualConfig);
   }
 
