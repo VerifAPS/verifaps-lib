@@ -4,14 +4,18 @@ import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements
 
 class IecRunFascade(val ast : TopLevelElements) {
-    val topState = TopState()
-    val runtime = Runtime(topState)
 
     init {
         IEC61131Facade.resolveDataTypes(ast)
     }
 
-    fun execute(): TopState {
+    fun executeCode(): TopState {
+        val topState = TopState()
+        return executeCode(topState)
+    }
+
+    fun executeCode(topState : TopState): TopState {
+        val runtime = Runtime(topState)
         ast.accept<Any>(runtime)
         return topState
     }

@@ -1,13 +1,9 @@
 package edu.kit.iti.formal.automation.run
 
-import com.sun.istack.internal.logging.Logger
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.AnyInt
-import edu.kit.iti.formal.automation.datatypes.AnySignedInt
 import edu.kit.iti.formal.automation.datatypes.values.Values
-import mu.KLogging
-import mu.KotlinLogging
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -40,12 +36,18 @@ class RuntimeTest {
         assertEquals(
                 HashSet(listOf(
                         "b2" to Optional.of(true),
+                        "n8" to Optional.of(true),
+                        "n9" to Optional.of(true),
                         "number" to Optional.of(-19),
-                        "n2" to Optional.of(-17),
+                        "n2" to Optional.of(-1),
+                        "n10" to Optional.of(false),
                         "b" to Optional.of(false),
                         "n3" to Optional.of(4),
-                        "n4" to Optional.empty()
-                )).toString(),
+                        "n4" to Optional.empty(),
+                        "n5" to Optional.of(6),
+                        "n6" to Optional.of(6),
+                        "n7" to Optional.of(-1)
+                        )).toString(),
                 HashSet(topState.map { it.key to it.value.map { it.value } }).toString()
         )
 
@@ -66,23 +68,49 @@ class RuntimeTest {
     fun elevatorTest() {
         val ast = getAst(this.javaClass.getResource("runtimeTest.elevatorTest.st"))
 
+        val topState = TopState()
         val exec = IecRunFascade(ast)
 
-        exec.topState["ButtonPressed"] = Optional.of(Values.VBool(AnyBit.BOOL, true) as ExpressionValue)
-        exec.execute()
+        topState["ButtonPressed"] = Optional.of(Values.VBool(AnyBit.BOOL, true) as ExpressionValue)
+        exec.executeCode(topState)
 
         println("1st state:")
-        exec.topState.forEach {
+        topState.forEach {
             println(it)
         }
 
-        exec.topState["CurrentPos"] = Optional.of(Values.VAnyInt(AnyInt.getDataTypeFor(5, false), BigInteger.valueOf(5)) as ExpressionValue)
+        assertEquals(
+                HashSet(listOf(
+                        "RequestedPos" to Optional.of(5),
+                        "CurrentPos" to Optional.of(3),
+                        "Motor" to Optional.of("GoUp"),
+                        "ButtonPressed" to Optional.of(true),
+                        "Door" to Optional.of("Closed")
+                )).toString(),
+                HashSet(topState.map { it.key to it.value.map { it.value } }).toString()
+        )
 
-        exec.execute()
+
+
+        topState["CurrentPos"] = Optional.of(Values.VAnyInt(AnyInt.getDataTypeFor(5, false), BigInteger.valueOf(5)) as ExpressionValue)
+
+        exec.executeCode(topState)
+
         println("2nd state:")
-        exec.topState.forEach {
+        topState.forEach {
             println(it)
         }
+
+        assertEquals(
+                HashSet(listOf(
+                        "RequestedPos" to Optional.of(5),
+                        "CurrentPos" to Optional.of(5),
+                        "Motor" to Optional.of("Stationary"),
+                        "ButtonPressed" to Optional.of(true),
+                        "Door" to Optional.of("Open")
+                )).toString(),
+                HashSet(topState.map { it.key to it.value.map { it.value } }).toString()
+        )
 
 
     }
@@ -142,11 +170,12 @@ class RuntimeTest {
     @Test
     fun structTest() {
         val ast = getAst(this.javaClass.getResource("runtimeTest.structTest.st"))
+        val topState = TopState()
         val exec = IecRunFascade(ast)
-        exec.execute()
+        exec.executeCode()
 
         println("final state")
-        exec.topState.forEach {
+        topState.forEach {
 
             println(it)
         }

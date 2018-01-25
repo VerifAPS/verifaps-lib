@@ -158,7 +158,9 @@ class ExpressionVisitor(private val state : State, private val localScope : Loca
             Operators.LESS_THAN -> OperationEvaluator.lessThan(leftValue, rightValue)
             Operators.LESS_EQUALS -> OperationEvaluator.lessThanOrEquals(leftValue, rightValue)
             Operators.AND -> OperationEvaluator.and(leftValue, rightValue)
+            Operators.OR -> OperationEvaluator.or(leftValue, rightValue)
             Operators.SUB -> OperationEvaluator.subtract(leftValue, rightValue)
+            Operators.MOD -> OperationEvaluator.modulo(leftValue, rightValue)
             else -> TODO("operator ${binaryExpression.operator.symbol()} is not implemented (${binaryExpression.operator.toString()})")
         }
     }

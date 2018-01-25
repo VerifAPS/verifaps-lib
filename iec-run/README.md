@@ -4,15 +4,21 @@ IEC-Run
 High-Level logical definition
 ----
 
-IEC-Run will take ST-Code and a list containing variable-assignments for input variables (as used in ST in Program-Declarations) and
-return a list containing variable-assignments. Each item in the list represents one cycle of sps-execution.
+IEC-Run will take ST-Code and a map of assignments (as used in ST in Program-Declarations) and
+return a map of assignments. Each call to `executeCode(topState)` represents one cycle of sps-execution.
+You can execute multiple cycles by calling `executeCode`` multiple times, passing in the same `topState`.
 
 ```kotlin
-typealias Identifier = String
+typealias ExpressionValue = Value<out Any, out kotlin.Any>
+// TopState has basically this type:
+typealias TopState = HashMap<String, Optional<ExpressionValue>>
+
 
 class IecRunFascade {
- fun evaluateCode(inputVariableValuesPerCycle: List<Map<Identifier, Value>>) 
-    : List<Map<Identifier, Value>>
+ fun evaluateCode(beforeState : TopState) 
+    : TopState
+ 
+ fun evaluateCode() : TopState
 }
 ```
 

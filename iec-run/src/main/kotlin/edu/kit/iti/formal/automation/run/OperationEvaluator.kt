@@ -178,4 +178,24 @@ object OperationEvaluator {
     fun subtract(leftValue: ExpressionValue, rightValue: ExpressionValue): ExpressionValue {
         return add(leftValue, negate(rightValue))
     }
+
+    fun modulo(leftValue: Values.VAnyInt, rightValue: Values.VAnyInt) =
+            Values.VAnyInt(leftValue.dataType, leftValue.value.mod(rightValue.value))
+
+    fun modulo(leftValue: ExpressionValue, rightValue: ExpressionValue): ExpressionValue {
+        return when {
+            leftValue is Values.VAnyInt && rightValue is Values.VAnyInt -> modulo(leftValue, rightValue)
+            else -> throw TypeMissmatchException("modulo expects both to be int")
+        }
+    }
+
+    fun or(leftValue: Values.VBool, rightValue: Values.VBool) =
+            Values.VBool(leftValue.dataType, leftValue.value || rightValue.value)
+
+    fun or(leftValue: ExpressionValue, rightValue: ExpressionValue): ExpressionValue {
+        return when {
+            leftValue is Values.VBool && rightValue is Values.VBool -> or(leftValue, rightValue)
+            else -> throw TypeMissmatchException("or expects booleans")
+        }
+    }
 }
