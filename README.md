@@ -22,7 +22,7 @@ Make sure the following programs are installed:
  * [Java](http://www.oracle.com/technetwork/indexes/downloads/index.html#java)
 
 [Download](
-https://circleci-tkn.rhcloud.com/api/v1/project/VerifAPS/stvs/tree/master/latest/artifacts/stverificationstudio.jar)
+https://github.com/VerifAPS/stvs/releases/download/v.1.4/stverificationstudio-all-1.4.0-beta.jar)
  the jar and run it.
  
 On first startup a setup-wizard will open and guide you through the next steps.
