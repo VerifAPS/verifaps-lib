@@ -16,7 +16,7 @@ apply plugin: "jacoco"
 apply plugin: 'antlr'
 
 group = "edu.kit.iti.formal"
-version = "1.2.0-beta"
+version = "1.4.0-beta"
 
 compileJava.options.encoding = 'UTF-8'
 compileJava.dependsOn(xjc)
