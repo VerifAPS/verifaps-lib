@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
+import edu.kit.iti.formal.stvs.TestUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -13,9 +14,11 @@ import static org.junit.Assert.*;
  */
 public class ExecutableLocatorTest {
 
+
   @Test
-  @Ignore // b/c this depends on the machine's configuration
   public void testPathWithZ3Linux() throws Exception {
+    TestUtils.assumeZ3Exists();
+
     Optional<File> z3 = ExecutableLocator.findExecutableFile("z3");
     assertEquals(Optional.of(new File("/usr/bin/z3")), z3);
     System.out.println(z3.toString());
@@ -23,6 +26,8 @@ public class ExecutableLocatorTest {
 
   @Test
   public void testPathWithZ3LinuxString() throws Exception {
+    TestUtils.assumeNuXmvExists();
+
     Optional<File> nuXmv = ExecutableLocator.findExecutableFile("nuXmv");
     assertEquals(Optional.of(new File("/usr/local/bin/nuXmv")), nuXmv);
     System.out.println(nuXmv.toString());
