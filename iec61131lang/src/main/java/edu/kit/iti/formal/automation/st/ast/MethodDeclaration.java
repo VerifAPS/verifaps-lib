@@ -22,38 +22,36 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * @author Alexander Weigl
+ * @author Alexander Weigl, Augusto Modanese
  * @version 1 (20.02.17)
  */
 
-@EqualsAndHashCode
-@ToString
+@Data
+@EqualsAndHashCode(callSuper = true, exclude = "parent")
+@ToString(callSuper = true, exclude = "parent")
 public class MethodDeclaration extends FunctionDeclaration {
-    private ClassDeclaration classDeclaration;
+    private TopLevelScopeElement parent;
+    private AccessSpecifier accessSpecifier = AccessSpecifier.defaultAccessSpecifier();
+    private boolean final_ = false;
+    private boolean abstract_ = false;
+    private boolean override = false;
+
+    @Override
+    public String getReturnTypeName() {
+        if (returnType.getIdentifier() == null)
+            return "VOID";
+        return super.getReturnTypeName();
+    }
 
     @Override
     public <T> T accept(Visitor<T> visitor) {
-        return null;
-    }
-
-    public LocalScope getLocalScope() {
-        return localScope;
-    }
-
-    public ClassDeclaration getClassDeclaration() {
-        return classDeclaration;
-    }
-
-    public MethodDeclaration setClassDeclaration(
-            ClassDeclaration classDeclaration) {
-        this.classDeclaration = classDeclaration;
-        return this;
+        return visitor.visit(this);
     }
 
     public void setName(String n) {
@@ -63,7 +61,10 @@ public class MethodDeclaration extends FunctionDeclaration {
     @Override
     public MethodDeclaration copy() {
         MethodDeclaration md = new MethodDeclaration();
-        md.classDeclaration = classDeclaration; //no copy!
+        md.accessSpecifier = accessSpecifier;
+        md.final_ = final_;
+        md.abstract_ = abstract_;
+        md.override = override;
         md.localScope = localScope.copy();
         md.functionName = functionName;
         md.returnType = returnType.copy();

@@ -29,8 +29,6 @@ import edu.kit.iti.formal.automation.operators.UnaryOperator;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * <p>UnaryExpression class.</p>
@@ -39,8 +37,6 @@ import lombok.ToString;
  * @version $Id: $Id
  */
 @Data
-@EqualsAndHashCode
-@ToString
 public class UnaryExpression extends Expression {
     UnaryOperator operator;
     Expression expression;
@@ -129,9 +125,7 @@ public class UnaryExpression extends Expression {
         UnaryExpression that = (UnaryExpression) o;
 
         if (!expression.equals(that.expression)) return false;
-        if (operator != that.operator) return false;
-
-        return true;
+        return operator == that.operator;
     }
 
     /**

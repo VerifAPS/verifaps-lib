@@ -22,39 +22,25 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 /**
  * Created by weigl on 13.06.14.
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
-@EqualsAndHashCode
-@ToString
-public class FunctionBlockDeclaration extends TopLevelScopeElement {
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class FunctionBlockDeclaration extends ClassDeclaration implements Invocable {
     private StatementList functionBody = new StatementList();
-    private String functionBlockName;
-
-    /**
-     * <p>Getter for the field <code>functionBlockName</code>.</p>
-     *
-     * @return a {@link java.lang.String} object.
-     */
-    public String getFunctionBlockName() {
-        return functionBlockName;
-    }
-
-    /**
-     * <p>Setter for the field <code>functionBlockName</code>.</p>
-     *
-     * @param functionBlockName a {@link java.lang.String} object.
-     */
-    public void setFunctionBlockName(String functionBlockName) {
-        this.functionBlockName = functionBlockName;
-    }
 
     /**
      * <p>Getter for the field <code>functionBody</code>.</p>
@@ -86,14 +72,24 @@ public class FunctionBlockDeclaration extends TopLevelScopeElement {
      */
     @Override
     public String getIdentifier() {
-        return getFunctionBlockName();
+        return getName();
+    }
+
+    @Override
+    public Any getReturnType() {
+        return null;  // no return value when invoking function blocks
     }
 
     @Override
     public FunctionBlockDeclaration copy() {
         FunctionBlockDeclaration fb = new FunctionBlockDeclaration();
         fb.setRuleContext(getRuleContext());
-        fb.functionBlockName = functionBlockName;
+        fb.setName(getName());
+        fb.setFinal_(isFinal_());
+        fb.setAbstract_(isAbstract_());
+        fb.setParent(getParent().getIdentifier());
+        getInterfaces().forEach(i -> fb.addImplements(i.getIdentifier()));
+        getMethods().forEach(m -> fb.getMethods().add(m.copy()));
         fb.functionBody = functionBody.copy();
         return fb;
     }

@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.smv;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.FunctionInvocationArgumentNumberException;
 import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException;
 import edu.kit.iti.formal.automation.exceptions.UnknownDatatype;
@@ -196,10 +195,10 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     }
 
     @Override
-    public SMVExpr visit(FunctionCall functionCall) {
-        FunctionDeclaration fd = globalScope.resolveFunction(functionCall, localScope);
+    public SMVExpr visit(Invocation invocation) {
+        FunctionDeclaration fd = globalScope.resolveFunction(invocation, localScope);
         if (fd == null)
-            throw new FunctionUndefinedException(functionCall);
+            throw new FunctionUndefinedException(invocation);
 
 
         //initialize data structure
@@ -233,7 +232,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         //endregion
 
         //region transfer variables
-        List<Expression> parameters = functionCall.getParameters();
+        List<Invocation.Parameter> parameters = invocation.getParameters();
         List<VariableDeclaration> inputVars = fd.getLocalScope().filterByFlags(VariableDeclaration.INPUT);
 
         if (parameters.size() != inputVars.size()) {
@@ -243,7 +242,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         for (int i = 0; i < parameters.size(); i++) {
             // name from definition, in order of declaration, expression from caller site
             calleeState.put(lift(inputVars.get(i)),
-                    parameters.get(i).accept(this));
+                    parameters.get(i).getExpression().accept(this));
         }
         push(calleeState);
         //endregion

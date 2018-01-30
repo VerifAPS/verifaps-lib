@@ -23,20 +23,24 @@ package edu.kit.iti.formal.automation;
  */
 
 import edu.kit.iti.formal.automation.analysis.FindDataTypes;
+import edu.kit.iti.formal.automation.analysis.FindEffectiveSubtypes;
+import edu.kit.iti.formal.automation.analysis.FindInstances;
 import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
-import edu.kit.iti.formal.automation.st.ast.Expression;
-import edu.kit.iti.formal.automation.st.ast.StatementList;
-import edu.kit.iti.formal.automation.st.ast.Top;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.*;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * <p>IEC61131Facade class.</p>
@@ -107,6 +111,14 @@ public class IEC61131Facade {
         return (TopLevelElements) parser.start().accept(new IECParseTreeToAST());
     }
 
+    public static TopLevelElements file(Path s) throws IOException {
+        return file(CharStreams.fromPath(s));
+    }
+
+    public static TopLevelElements file(File f) throws IOException {
+        return file(f.toPath());
+    }
+
     /**
      * <p>resolveDataTypes.</p>
      *
@@ -120,6 +132,91 @@ public class IEC61131Facade {
         elements.accept(fdt);
         elements.accept(rdt);
         return scope;
+    }
+
+    /**
+     * Find all instances of classes and FBs belonging to the given top level element..
+     * @param element The top level element to visit.
+     * @param globalScope Global scope after data types have been resolved.
+     * @return The instance scope containing all instances.
+     */
+    public static InstanceScope findInstances(TopLevelElement element, GlobalScope globalScope) {
+        InstanceScope instanceScope = new InstanceScope(globalScope);
+        element.accept(new FindInstances(instanceScope));
+        return instanceScope;
+    }
+
+    private static final int FIND_EFFECTIVE_SUBTYPES_LIMIT = 1000;
+
+    public static void findEffectiveSubtypes(TopLevelElements topLevelElements, GlobalScope globalScope) {
+        FindEffectiveSubtypes findEffectiveSubtypes = new FindEffectiveSubtypes();
+        for (int i = 0; i < FIND_EFFECTIVE_SUBTYPES_LIMIT; i++) {
+            findEffectiveSubtypes.prepareRun();
+            topLevelElements.accept(findEffectiveSubtypes);
+        }
+        System.out.println("Done: fixpoint is " + findEffectiveSubtypes.fixpointReached());
+    }
+
+    /**
+     * Resolve types of top level elements and print them along with some minor statistics.
+     * Assume there is a single program declaration.
+     * @param topLevelElements
+     * @return Top level elements, formatted, as string.
+     */
+    @NotNull
+    public static String printTopLevelElements(TopLevelElements topLevelElements) {
+        StringBuilder sb = new StringBuilder();
+        // Resolve data types and print them
+        GlobalScope gs = resolveDataTypes(topLevelElements);
+        sb.append("   " + gs.getInterfaces().size() + " Interfaces:\n");
+        for (TopLevelElement topLevelElement : gs.getInterfaces())
+            sb.append(topLevelElement + "\n");
+        sb.append("\n");
+        sb.append("   " + gs.getClasses().size() + " Classes:\n");
+        for (TopLevelElement topLevelElement : gs.getClasses())
+            sb.append(topLevelElement + "\n");
+        sb.append("\n");
+        sb.append("   " + gs.getFunctionBlocks().size() + " Function blocks:\n");
+        for (TopLevelElement topLevelElement : gs.getFunctionBlocks()) {
+            FunctionBlockDeclaration functionBlockDeclaration = (FunctionBlockDeclaration) topLevelElement;
+            sb.append(functionBlockDeclaration.getIdentifier() + "  " + functionBlockDeclaration + "\n");
+            for (MethodDeclaration methodDeclaration : functionBlockDeclaration.getMethods()) {
+                sb.append(methodDeclaration.getIdentifier() + " : " + methodDeclaration.getReturnTypeName() + "  ");
+                sb.append(methodDeclaration + "\n");
+            }
+            sb.append("\n");
+        }
+        sb.append("\n");
+        // Resolve instances for the first program we find and print them
+        TopLevelElement topLevelElement = null;
+        for (TopLevelElement tle : topLevelElements)
+            if (tle instanceof ProgramDeclaration) {
+                topLevelElement = tle;
+                break;
+            }
+        if (topLevelElement == null)
+            sb.append("No program declaration to print instances of.");
+        else {
+            InstanceScope instanceScope = findInstances(topLevelElement, gs);
+            sb.append("   === Interface instances ===\n");
+            for (InterfaceDeclaration interfaceDeclaration : gs.getInterfaces()) {
+                sb.append(" = " + interfaceDeclaration.getIdentifier() + " = \n");
+                sb.append(instanceScope.getInstancesOfInterface(interfaceDeclaration) + "\n");
+            }
+            sb.append("\n");
+            sb.append("   === Class instances ===\n");
+            for (ClassDeclaration classDeclaration : gs.getClasses()) {
+                sb.append(" = " + classDeclaration.getIdentifier() + " = \n");
+                sb.append(instanceScope.getPolymorphInstancesOfClass(classDeclaration) + "\n");
+            }
+            sb.append("\n");
+            sb.append("   === Function block instances ===\n");
+            for (FunctionBlockDeclaration functionBlockDeclaration : gs.getFunctionBlocks()) {
+                sb.append(" = " + functionBlockDeclaration.getIdentifier() + " = \n");
+                sb.append(instanceScope.getPolymorphInstancesOfFunctionBlock(functionBlockDeclaration) + "\n");
+            }
+        }
+        return sb.toString();
     }
 
 

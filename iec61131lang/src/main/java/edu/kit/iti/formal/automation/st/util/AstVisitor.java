@@ -27,13 +27,17 @@ import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 
+import java.util.ArrayList;
+
 /**
  * Created by weigl on 10/07/14.
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
 public class AstVisitor<T> extends DefaultVisitor<T> {
+    protected TopLevelScopeElement currentTopLevelScopeElement;
+
     /**
      * {@inheritDoc}
      */
@@ -162,6 +166,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(ProgramDeclaration programDeclaration) {
+        currentTopLevelScopeElement = programDeclaration;
         programDeclaration.getLocalScope().accept(this);
         programDeclaration.getProgramBody().accept(this);
         return null;
@@ -182,6 +187,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(FunctionDeclaration functionDeclaration) {
+        currentTopLevelScopeElement = functionDeclaration;
         functionDeclaration.getLocalScope().accept(this);
         functionDeclaration.getStatements().accept(this);
         return null;
@@ -275,19 +281,19 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     }
 
     @Override
-    public T visit(FunctionCall functionCall) {
-        functionCall.getParameters().forEach(e -> e.accept(this));
-        return super.visit(functionCall);
+    public T visit(Invocation invocation) {
+        invocation.getParameters().forEach(e -> e.accept(this));
+        return super.visit(invocation);
     }
 
     @Override
-    public T visit(FunctionBlockCallStatement fbc) {
-        fbc.getParameters().forEach(p -> p.accept(this));
+    public T visit(InvocationStatement fbc) {
+        fbc.getInvocation().accept(this);
         return super.visit(fbc);
     }
 
     @Override
-    public T visit(FunctionBlockCallStatement.Parameter parameter) {
+    public T visit(Invocation.Parameter parameter) {
         parameter.getExpression().accept(this);
         return super.visit(parameter);
     }
@@ -326,11 +332,21 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(ClassDeclaration clazz) {
+        currentTopLevelScopeElement = clazz;
         clazz.getLocalScope().accept(this);
-        for (MethodDeclaration m : clazz.getMethods()) {
+        for (MethodDeclaration m : new ArrayList<>(clazz.getMethods())) {
             m.accept(this);
         }
         return super.visit(clazz);
+    }
+
+    @Override
+    public T visit(InterfaceDeclaration interfaceDeclaration) {
+        currentTopLevelScopeElement = interfaceDeclaration;
+        interfaceDeclaration.getLocalScope().accept(this);
+        for (MethodDeclaration m : interfaceDeclaration.getMethods())
+            m.accept(this);
+        return super.visit(interfaceDeclaration);
     }
 
     @Override
@@ -340,5 +356,10 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
-
+    @Override
+    public T visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
+        currentTopLevelScopeElement = globalVariableListDeclaration;
+        globalVariableListDeclaration.getLocalScope().accept(this);
+        return super.visit(globalVariableListDeclaration);
+    }
 }

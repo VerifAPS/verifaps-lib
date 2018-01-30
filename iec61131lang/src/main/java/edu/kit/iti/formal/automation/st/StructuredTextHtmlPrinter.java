@@ -332,12 +332,12 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(FunctionCall functionCall) {
+    public Object visit(Invocation invocation) {
         sb.div(Sections.FUNC_CALL);
-        sb.append(functionCall.getFunctionName()).append("(");
+        sb.append(invocation.getCalleeName()).append("(");
 
         boolean params = false;
-        for (Expression entry : functionCall.getParameters()) {
+        for (Invocation.Parameter entry : invocation.getParameters()) {
             entry.accept(this);
             sb.seperator(",");
             params = true;
@@ -374,7 +374,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        sb.div(Sections.FB).keyword("FUNCTION_BLOCK ").variable(functionBlockDeclaration.getFunctionBlockName());
+        sb.div(Sections.FB).keyword("FUNCTION_BLOCK ").variable(functionBlockDeclaration.getName());
 
         functionBlockDeclaration.getLocalScope().accept(this);
 
@@ -424,14 +424,8 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(FunctionBlockCallStatement fbc) {
-        sb.div(Sections.FB_CALL);
-        sb.append(fbc.getFunctionBlockName())
-                .append("(");
-        for (FunctionBlockCallStatement.Parameter p : fbc.getParameters()) {
-            //TODO
-        }
-        sb.end();
+    public Object visit(InvocationStatement fbc) {
+        fbc.getInvocation().accept(this);
         return null;
     }
 

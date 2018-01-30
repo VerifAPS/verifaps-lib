@@ -21,6 +21,7 @@ library_element_declaration
     | interface_declaration
 	| function_block_declaration
 	| program_declaration
+	| global_variable_list_declaration
 //	| configuration_declaration
 ;
 
@@ -35,6 +36,7 @@ constant
 	| datetime
 	| cast
 	| bits
+	| ref_null
 ;
 
 cast 
@@ -81,6 +83,11 @@ date
 datetime
 :
 	DATETIME
+;
+
+ref_null
+:
+    NULL
 ;
 
 data_type_name
@@ -182,6 +189,7 @@ type_declaration
 	| string_type_declaration
 	| subrange_spec_init
 	| structure_declaration
+	| reference_specification
 	| data_type_name
 	  ( R_EDGE
 	  | F_EDGE
@@ -198,6 +206,7 @@ initializations
     | IDENTIFIER #initializations_identifier
     | array_initialization #initializations_array_initialization
     | structure_initialization #initializations_structure_initialization
+    | invocation #initializations_invocation
 ;
 
 subrange_spec_init
@@ -237,7 +246,7 @@ array_initialization
 	LBRACKET array_initial_elements
 	(
 		COMMA array_initial_elements
-	)* RBRACKET
+	)* COMMA? RBRACKET
 ;
 
 array_initial_elements
@@ -269,8 +278,8 @@ structure_declaration
 structure_initialization
 :
 	LPAREN
-	name+=IDENTIFIER ASSIGN init+=initializations
-	(COMMA name+=IDENTIFIER ASSIGN init+=initializations)*
+	(IDENT += IDENTIFIER) ASSIGN (init += initializations)
+	( COMMA (IDENT += IDENTIFIER) ASSIGN (init += initializations))*
 	RPAREN
 ;
 
@@ -280,6 +289,10 @@ string_type_declaration
 	( LBRACKET integer RBRACKET )?
 ;
 
+reference_specification
+:
+    REF_TO type_declaration
+;
 
 identifier_list
 :
@@ -323,22 +336,37 @@ variable_keyword
 	| RETAIN
     | NON_RETAIN
     )?
+    (access_specifier)?
 ;
 
 
 //endregion
 
+access_specifier
+:
+    PUBLIC
+    | PROTECTED
+    | INTERNAL
+    | PRIVATE
+;
+
 function_block_declaration
 :
-	FUNCTION_BLOCK identifier = IDENTIFIER
+	FUNCTION_BLOCK
+    (FINAL | ABSTRACT)?
+	identifier = IDENTIFIER
+	(EXTENDS inherit=IDENTIFIER)?
+	(IMPLEMENTS interfaces=identifier_list)?
 	var_decls
-	body = statement_list END_FUNCTION_BLOCK
+	methods
+	body = statement_list
+	END_FUNCTION_BLOCK
 ;
 
 interface_declaration
 :
     INTERFACE identifier=IDENTIFIER
-	(EXTENDS sp=IDENTIFIER)?
+	(EXTENDS sp=identifier_list)?
 	var_decls
 	methods
 	END_INTERFACE
@@ -347,26 +375,27 @@ interface_declaration
 
 class_declaration
 :
-	(FUNCTION_BLOCK) identifier=IDENTIFIER
+	CLASS
+    (FINAL | ABSTRACT)?
+	identifier=IDENTIFIER
 	(EXTENDS inherit=IDENTIFIER)?
-	(IMPLEMENTS interfaces=IDENTIFIER)*
-
+	(IMPLEMENTS interfaces=identifier_list)?
 	var_decls
-
 	methods
-
-	END_FUNCTION_BLOCK
+	END_CLASS
 ;
 
 methods: method*;
 method
 :
-    (PUBLIC|PRIVATE)?
-    METHOD identifier=IDENTIFIER
+    METHOD (access_specifier)?
+    (FINAL | ABSTRACT)?
+    (OVERRIDE)?
+    identifier=IDENTIFIER
     (COLON ( returnET=elementary_type_name
           	| returnID=IDENTIFIER))?
     var_decls
-    statement_list
+    body = statement_list
     END_METHOD
 ;
 
@@ -375,6 +404,11 @@ program_declaration
 	PROGRAM identifier=IDENTIFIER
 	var_decls
 	body = statement_list END_PROGRAM
+;
+
+global_variable_list_declaration
+:
+    GVL var_decls END_GVL
 ;
 
 /*
@@ -608,17 +642,18 @@ primary_expression
 :
 	constant
 	| v=variable
-	| functioncall
+	| invocation
 ;
 
 /////////MARKER
-
-functioncall
-
+invocation
 :
-	id=IDENTIFIER LPAREN
+	id=symbolic_variable LPAREN
 	(
-		expression (COMMA expression)*
+		(
+            (expression (COMMA expression)*)
+            | (param_assignment (COMMA param_assignment)*)
+		)
 	)? RPAREN
 ;
 
@@ -630,7 +665,7 @@ statement_list
 statement
 :
 	  assignment_statement SEMICOLON
-   	| functionblockcall SEMICOLON
+   	| invocation_statement SEMICOLON
 	| return_statement SEMICOLON
 	| if_statement
     | case_statement
@@ -643,8 +678,14 @@ statement
 assignment_statement
 
 :
-	a=variable (RASSIGN|ASSIGN) expression
+	a=variable (ASSIGN_ATTEMPT|RASSIGN|ASSIGN) expression
 ;
+
+invocation_statement
+:
+    invocation
+;
+
 
 variable
 
@@ -657,8 +698,10 @@ symbolic_variable
 
 :
     //x^[a,252]
-	a=(IDENTIFIER|SUPER|THIS)
-	(REF )?
+	a=(IDENTIFIER|SUPER|THIS|GVL)
+	(
+        (deref += REF)*
+	)?
 	(
 		subscript_list
         (REF)?
@@ -683,22 +726,10 @@ direct_variable
 
 return_statement : RETURN;
 
-functionblockcall
-
-:
-	symbolic_variable LPAREN
-	(
-		param_assignment
-		(
-			COMMA param_assignment
-		)*
-	)? RPAREN
-;
-
 param_assignment
 :
-	(id=IDENTIFIER ASSIGN)? expression
-	| id=IDENTIFIER ARROW_RIGHT v=variable
+	id=IDENTIFIER RIGHT_ARROW v=variable
+	| (id=IDENTIFIER ASSIGN)? expression
 ;
 
 if_statement

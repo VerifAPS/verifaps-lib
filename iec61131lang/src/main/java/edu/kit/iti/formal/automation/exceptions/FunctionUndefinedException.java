@@ -22,8 +22,7 @@ package edu.kit.iti.formal.automation.exceptions;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.FunctionCall;
-import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
+import edu.kit.iti.formal.automation.st.ast.Invocation;
 
 /**
  * FunctionUndefinedException is thrown if
@@ -33,17 +32,17 @@ import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
  * @since 27.11.16.
  */
 public class FunctionUndefinedException extends IECException {
-    private final FunctionCall functionCall;
+    private final Invocation invocation;
 
-    public FunctionUndefinedException(FunctionCall call) {
-        this.functionCall = call;
+    public FunctionUndefinedException(Invocation call) {
+        this.invocation = call;
     }
 
     /**
      * @return the function call that could not be resolved
      * @since 0.1.12
      */
-    public FunctionCall getFunctionCall() {
-        return functionCall;
+    public Invocation getInvocation() {
+        return invocation;
     }
 }

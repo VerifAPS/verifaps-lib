@@ -23,23 +23,34 @@ package edu.kit.iti.formal.automation.datatypes;
  */
 
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
+import edu.kit.iti.formal.automation.st.ast.TopLevelScopeElement;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
  * This data type represents a class.
  *
- * @author Alexander Weigl
+ * @author Alexander Weigl, Augusto Modanese
  * @version 1
  * @since 04.03.17
  */
-public class ClassDataType extends Any {
+@Data
+@AllArgsConstructor
+public class ClassDataType extends RecordType {
     private final ClassDeclaration clazz;
 
-    public ClassDataType(ClassDeclaration classDeclaration) {
-        clazz = classDeclaration;
+    @Override
+    public TopLevelScopeElement getDeclaration() {
+        return clazz;
     }
 
     @Override public String repr(Object obj) {
         return null;
+    }
+
+    @Override
+    public String getName() {
+        return clazz.getName();
     }
 
     @Override public <T> T accept(DataTypeVisitor<T> visitor) {

@@ -25,8 +25,6 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * <ul>
@@ -34,16 +32,15 @@ import lombok.ToString;
  * <li>Version 1: 11.06.14</li>
  * </ul>
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version 2
  */
 @Data
-@ToString
-@EqualsAndHashCode
 public class AssignmentStatement extends Statement {
     private Reference location;
     private Expression expression;
     private boolean reference;
+    private boolean assignmentAttempt;
 
     public AssignmentStatement() {
     }
@@ -75,6 +72,8 @@ public class AssignmentStatement extends Statement {
         AssignmentStatement a = new AssignmentStatement(
                 Utils.copyNull(location),
                 Utils.copyNull(expression));
+        a.setReference(reference);
+        a.setAssignmentAttempt(assignmentAttempt);
         a.setRuleContext(getRuleContext());
         return a;
     }

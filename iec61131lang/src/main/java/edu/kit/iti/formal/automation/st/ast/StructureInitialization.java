@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +38,7 @@ import java.util.Map;
  * @author weigl
  * @version $Id: $Id
  */
+@Data
 public class StructureInitialization extends Initialization {
     private Map<String, Initialization> initValues = new HashMap<>();
     private String structureName;
@@ -67,24 +69,6 @@ public class StructureInitialization extends Initialization {
      */
     public void addField(String s, Initialization init) {
         initValues.put(s, init);
-    }
-
-    /**
-     * <p>Getter for the field <code>structureName</code>.</p>
-     *
-     * @return a {@link java.lang.String} object.
-     */
-    public String getStructureName() {
-        return structureName;
-    }
-
-    /**
-     * <p>Setter for the field <code>structureName</code>.</p>
-     *
-     * @param structureName a {@link java.lang.String} object.
-     */
-    public void setStructureName(String structureName) {
-        this.structureName = structureName;
     }
 
     /**

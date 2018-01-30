@@ -36,5 +36,5 @@ public interface Visitable {
      * @param <T> a T object.
      * @return a T object.
      */
-    public <T> T accept(Visitor<T> visitor);
+    <T> T accept(Visitor<T> visitor);
 }

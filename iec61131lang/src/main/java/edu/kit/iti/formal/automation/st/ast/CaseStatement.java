@@ -26,8 +26,6 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +37,6 @@ import java.util.stream.Collectors;
  * @author weigl
  * @version $Id: $Id
  */
-@EqualsAndHashCode
-@ToString
 @Data
 public class CaseStatement extends Statement {
     private Expression expression;
@@ -76,8 +72,6 @@ public class CaseStatement extends Statement {
     }
 
     @Data
-    @EqualsAndHashCode
-    @ToString
     public static class Case extends Top {
         List<CaseCondition> conditions = new ArrayList<>();
         StatementList statements = new StatementList();

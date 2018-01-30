@@ -22,13 +22,19 @@ package edu.kit.iti.formal.automation.st;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.NiceErrorListener;
+import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
-import edu.kit.iti.formal.automation.st.ast.StatementList;
+import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
+import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
-import org.antlr.v4.runtime.ANTLRFileStream;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,7 +50,7 @@ import java.util.ArrayList;
 
 @RunWith(Parameterized.class)
 public class ProgramTest {
-    @Parameter public String testFile;
+    @Parameter public File testFile;
 
     public static final File[] getResources(String folder) {
         URL f = ProgramTest.class.getClassLoader().getResource(folder);
@@ -61,14 +67,14 @@ public class ProgramTest {
         File[] resources = getResources("edu/kit/iti/formal/automation/st/programs");
         ArrayList<Object[]> list = new ArrayList<>();
         for (File f : resources) {
-            list.add(new Object[]{f.getAbsolutePath()});
+            list.add(new Object[]{f});
         }
         return list;
     }
 
     @Test
     public void testParser() throws IOException {
-        IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRFileStream(testFile));
+        IEC61131Lexer lexer = new IEC61131Lexer(CharStreams.fromPath(testFile.toPath()));
 
 /*
         Vocabulary v = lexer.getVocabulary();
@@ -80,12 +86,63 @@ public class ProgramTest {
 */
 
         IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
-        parser.addErrorListener(new NiceErrorListener(testFile));
+        parser.addErrorListener(new NiceErrorListener(testFile.getName()));
         IEC61131Parser.StartContext ctx = parser.start();
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
         TopLevelElements sl = (TopLevelElements) ctx.accept(new IECParseTreeToAST());
         Assert.assertEquals(sl, sl.copy());
-
     }
 
+    /*
+    @Test
+    public void testParseTreetoAST() throws IOException {
+        TopLevelElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
+        // Compare generated and original code
+        Assert.assertEquals(IEC61131Facade.print(tle),
+                Files.readAllLines(Paths.get(testFile)).stream().collect(Collectors.joining("\n")));
+    }
+    */
+
+    @Test
+    public void testResolveDataTypes() throws IOException {
+        TopLevelElements tle = IEC61131Facade.file(testFile);
+        GlobalScope gs = IEC61131Facade.resolveDataTypes(tle);
+        for (ClassDeclaration classDeclaration : gs.getClasses()) {
+            Assert.assertTrue(classDeclaration.getParent().getIdentifier() == null
+                    || classDeclaration.getParentClass() != null);
+            classDeclaration.getInterfaces().forEach(i -> Assert.assertTrue(i.getIdentifiedObject() != null));
+        }
+        for (FunctionBlockDeclaration functionBlockDeclaration : gs.getFunctionBlocks()) {
+            Assert.assertTrue(functionBlockDeclaration.getParent().getIdentifier() == null
+                    || functionBlockDeclaration.getParentClass() != null);
+            functionBlockDeclaration.getInterfaces()
+                    .forEach(i -> Assert.assertTrue(i.getIdentifiedObject() != null));
+        }
+    }
+
+    @Test
+    public void testPrintTopLevelElements() throws IOException {
+        TopLevelElements tle = IEC61131Facade.file(testFile);
+        System.out.println(IEC61131Facade.printTopLevelElements(tle));
+    }
+
+    @Test
+    public void testEffectiveSubtypes() throws IOException {
+        TopLevelElements tle = IEC61131Facade.file(testFile);
+        GlobalScope gs = IEC61131Facade.resolveDataTypes(tle);
+        IEC61131Facade.findEffectiveSubtypes(tle, gs);
+        AstVisitor effectiveSubtypesPrinter = new AstVisitor() {
+            @Override
+            public Object visit(VariableDeclaration variableDeclaration) {
+                if (!variableDeclaration.getEffectiveDataTypes().isEmpty()) {
+                    System.out.println(variableDeclaration);
+                    for (Any dataType : variableDeclaration.getEffectiveDataTypes())
+                        System.out.println("* " + dataType.getName());
+                    System.out.println();
+                }
+                return super.visit(variableDeclaration);
+            }
+        };
+        tle.accept(effectiveSubtypesPrinter);
+    }
 }

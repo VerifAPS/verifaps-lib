@@ -22,63 +22,133 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * @author Alexander Weigl
+ * @author Alexander Weigl, Augusto Modanese
  * @version 1 (20.02.17)
  */
 
-@EqualsAndHashCode
-@ToString
+@Data
 public class ClassDeclaration extends TopLevelScopeElement {
-    private List<MethodDeclaration> methods = new ArrayList<>();
-    private IdentifierPlaceHolder<ClassDeclaration> parentClass = new IdentifierPlaceHolder<>();
-    private List<IdentifierPlaceHolder<ClassDeclaration>> interfaces = new ArrayList<>();
     private String name;
+    private boolean final_ = false;
+    private boolean abstract_ = false;
+    private IdentifierPlaceHolder<ClassDeclaration> parent = new IdentifierPlaceHolder<>();
+    private List<IdentifierPlaceHolder<InterfaceDeclaration>> interfaces = new ArrayList<>();
+    private List<MethodDeclaration> methods = new ArrayList<>();
 
     public <T> T accept(Visitor<T> visitor) {
-        return null;
-    }
-
-    public List<MethodDeclaration> getMethods() {
-        return methods;
-    }
-
-    public ClassDeclaration setMethods(List<MethodDeclaration> methods) {
-        this.methods = methods;
-        return this;
+        return visitor.visit(this);
     }
 
     @Override public String getIdentifier() {
         return name;
     }
 
-    public void setParentClass(String parent) {
-        parentClass.setIdentifier(parent);
+    public void setParent(String parent) {
+        this.parent.setIdentifier(parent);
+    }
+
+    public void setMethods(List<MethodDeclaration> methods) {
+        for (MethodDeclaration methodDeclaration : methods)
+            methodDeclaration.setParent(this);
+        this.methods = methods;
     }
 
     public void addImplements(String interfaze) {
         interfaces.add(new IdentifierPlaceHolder<>(interfaze));
     }
 
-    public ClassDeclaration setBlockName(String name) {
-        this.name = name;
-        return this;
+    public void addImplements(List<String> interfaceList) {
+        interfaceList.forEach(i -> addImplements(i));
+    }
+
+    @Override
+    public void setGlobalScope(GlobalScope global) {
+        super.setGlobalScope(global);
+        parent.setIdentifiedObject(global.resolveClass(parent.getIdentifier()));
+        for (IdentifierPlaceHolder<InterfaceDeclaration> interfaceDeclaration : interfaces)
+            interfaceDeclaration.setIdentifiedObject(global.resolveInterface(interfaceDeclaration.getIdentifier()));
+    }
+
+    /**
+     * To be called only after bound to global scope!
+     * @return The parent class. Return null if the class has no parent.
+     */
+    public ClassDeclaration getParentClass() {
+        return parent.getIdentifiedObject();
+    }
+
+    /**
+     * To be called only after bound to global scope!
+     * @return The list of classes the class can be an instance of, taking polymorphy into account.
+     */
+    public List<ClassDeclaration> getExtendedClasses() {
+        List<ClassDeclaration> extendedClasses = new ArrayList<>();
+        extendedClasses.add(this);
+        ClassDeclaration parentClass = getParentClass();
+        if (parentClass != null)
+            extendedClasses.addAll(parentClass.getExtendedClasses());
+        return extendedClasses;
+    }
+
+    /**
+     * To be called only after bound to global scope!
+     * @return Whether the class extends the given other class.
+     */
+    public boolean extendsClass(ClassDeclaration otherClass) {
+        ClassDeclaration parentClass = getParentClass();
+        if (parentClass == otherClass)
+            return true;
+        else if (parentClass == null)
+            return false;  // reached top of hierarchy
+        return getParentClass().extendsClass(otherClass);
+    }
+
+    /**
+     * To be called only after bound to global scope!
+     * @return The interfaces the class implements. Includes the interfaces of all parent classes.
+     */
+    public List<InterfaceDeclaration> getImplementedInterfaces() {
+        List<InterfaceDeclaration> implementedInterfaces = interfaces.stream()
+                .map(i -> i.getIdentifiedObject()).collect(Collectors.toList());
+        // Add interfaces from parent classes
+        ClassDeclaration parentClass = getParentClass();
+        if (parentClass != null)
+            implementedInterfaces.addAll(parentClass.getImplementedInterfaces());
+        // Add extended interfaces
+        implementedInterfaces.addAll(implementedInterfaces.stream()
+                .map(i -> i.getExtendedInterfaces())
+                .flatMap(l -> l.stream()).collect(Collectors.toList()));
+        return implementedInterfaces;
+    }
+
+    /**
+     * To be called only after bound to global scope!
+     * @return Whether the class implements the given interface.
+     */
+    public boolean implementsInterface(InterfaceDeclaration interfaceDeclaration) {
+        return getImplementedInterfaces().contains(interfaceDeclaration);
     }
 
     @Override public ClassDeclaration copy() {
         ClassDeclaration c = new ClassDeclaration();
         c.name = name;
-        methods.forEach(m -> c.methods.add(m.copy()));
-        c.parentClass = parentClass.copy();
+        c.final_ = final_;
+        c.abstract_ = abstract_;
+        c.parent = parent.copy();
         interfaces.forEach(i -> c.interfaces.add(i.copy()));
+        methods.forEach(m -> c.methods.add(m.copy()));
         return c;
     }
 }

@@ -22,17 +22,26 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import com.google.common.collect.ImmutableMap;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.scope.InstanceScope;
+import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by weigla on 09.06.2014.
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
+@Data
 public class VariableDeclaration extends Top
-        implements Comparable<VariableDeclaration> {
+        implements Comparable<VariableDeclaration>, Identifiable {
     /**
      * Constant <code>INPUT=1</code>
      */
@@ -96,10 +105,32 @@ public class VariableDeclaration extends Top
      */
     public static final int NOT_READ = 4096;
 
+    // Access specifiers
+    public static final int PUBLIC = 1 << 20;
+    public static final int INTERNAL = 1 << 21;
+    public static final int PROTECTED = 1 << 22;
+    public static final int PRIVATE = 1 << 23;
+
+    public static final Map<AccessSpecifier, Integer> ACCESS_SPECIFIER_DICT = ImmutableMap.of(
+            AccessSpecifier.PUBLIC, PUBLIC,
+            AccessSpecifier.INTERNAL, INTERNAL,
+            AccessSpecifier.PROTECTED, PROTECTED,
+            AccessSpecifier.PRIVATE, PRIVATE);
+
     private String name;
     private Any dataType;
     private int type;
     private TypeDeclaration typeDeclaration;
+
+    /**
+     * Set of instances which this variable can assume. Populated by static analysis.
+     */
+    private final Set<InstanceScope.Instance> instances = new HashSet<>();
+
+    /**
+     * Set of effective data types the values of the variable can assume. Populated in static analysis.
+     */
+    private final Set<Any> effectiveDataTypes = new HashSet<>();
 
     /**
      * <p>Constructor for VariableDeclaration.</p>
@@ -196,9 +227,9 @@ public class VariableDeclaration extends Top
         return typeDeclaration.initialization;
     }
 
-    /*public void setInit(Initialization init) {
+    public void setInit(Initialization init) {
         this.typeDeclaration.setInitialization(init);
-    }*/
+    }
 
     /**
      * <p>getDataTypeName.</p>
@@ -349,6 +380,22 @@ public class VariableDeclaration extends Top
         return is(GLOBAL);
     }
 
+    public boolean isPublic() {
+        return is(PUBLIC);
+    }
+
+    public boolean isInternal() {
+        return is(INTERNAL);
+    }
+
+    public boolean isProtected() {
+        return is(PROTECTED);
+    }
+
+    public boolean isPrivate() {
+        return is(PRIVATE);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -368,7 +415,7 @@ public class VariableDeclaration extends Top
      * {@inheritDoc}
      */
     @Override public String toString() {
-        return name + " : " + getDataTypeName() + ":=" + getInit();
+        return name + " : " + getDataTypeName() + " := " + getInit();
     }
 
     /**
@@ -388,6 +435,18 @@ public class VariableDeclaration extends Top
      */
     public void setTypeDeclaration(TypeDeclaration<?> typeDeclaration) {
         this.typeDeclaration = typeDeclaration;
+    }
+
+    public void addInstance(InstanceScope.Instance instance) {
+        instances.add(instance);
+    }
+
+    public void addEffectiveDataType(Any dataType) {
+        effectiveDataTypes.add(dataType);
+    }
+
+    public boolean hasEffectiveDataType(Any dataType) {
+        return effectiveDataTypes.contains(dataType);
     }
 
     /**
@@ -416,5 +475,10 @@ public class VariableDeclaration extends Top
                 typeDeclaration);
         vd.setDataType(dataType);
         return vd;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return name;
     }
 }

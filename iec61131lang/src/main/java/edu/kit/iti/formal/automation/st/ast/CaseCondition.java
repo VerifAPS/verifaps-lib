@@ -26,8 +26,6 @@ import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * <p>Abstract CaseCondition class.</p>
@@ -40,8 +38,6 @@ public abstract class CaseCondition extends Top {
 
     @Data
     @AllArgsConstructor
-    @EqualsAndHashCode
-    @ToString
     public static class Range extends CaseCondition {
         private Literal start, stop;
 
@@ -58,9 +54,7 @@ public abstract class CaseCondition extends Top {
     }
 
     @AllArgsConstructor
-    @ToString
     @Data
-    @EqualsAndHashCode
     public static class IntegerCondition extends CaseCondition {
         private Literal value;
 
@@ -74,7 +68,6 @@ public abstract class CaseCondition extends Top {
         }
     }
 
-    @EqualsAndHashCode
     @AllArgsConstructor
     @Data
     public static class Enumeration extends CaseCondition {

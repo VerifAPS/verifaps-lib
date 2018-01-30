@@ -25,7 +25,7 @@ package edu.kit.iti.formal.automation.datatypes;
 
 /**
  * @param <T> return type
- * @author Alexander Weigl
+ * @author Alexander Weigl, Augusto Modanese
  */
 
 public interface DataTypeVisitor<T> {
@@ -59,6 +59,10 @@ public interface DataTypeVisitor<T> {
 
     default T visit(AnyDate.Date date) {
         return defaultVisit(date);
+    }
+
+    default T visit(AnyReference reference) {
+        return defaultVisit(reference);
     }
 
     default T visit(AnyInt anyInt) {
@@ -145,6 +149,10 @@ public interface DataTypeVisitor<T> {
         return defaultVisit(pointerType);
     }
 
+    default T visit(ReferenceType referenceType) {
+        return defaultVisit(referenceType);
+    }
+
     default T visit(IECString.String string) {
         return defaultVisit(string);
     }
@@ -163,5 +171,9 @@ public interface DataTypeVisitor<T> {
 
     default T visit(ClassDataType classDataType) {
         return defaultVisit(classDataType);
+    }
+
+    default T visit(InterfaceDataType interfaceDataType) {
+        return defaultVisit(interfaceDataType);
     }
 }

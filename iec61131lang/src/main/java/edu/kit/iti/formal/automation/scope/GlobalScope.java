@@ -23,11 +23,10 @@ package edu.kit.iti.formal.automation.scope;
  */
 
 import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
-import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.datatypes.ClassDataType;
-import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
+import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.st.ast.*;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.*;
@@ -35,9 +34,10 @@ import java.util.*;
 /**
  * Created by weigl on 24.11.16.
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
+@Data
 public class GlobalScope implements Serializable {
     private Map<String, ProgramDeclaration> programs = new HashMap<>();
     private Map<String, FunctionBlockDeclaration> fb = new HashMap<>();
@@ -46,6 +46,8 @@ public class GlobalScope implements Serializable {
     private List<FunctionResolver> functionResolvers = new LinkedList<>();
     private TypeScope types = TypeScope.builtin();
     private Map<String, ClassDeclaration> classes = new LinkedHashMap<>();
+    private Map<String, InterfaceDeclaration> interfaces = new LinkedHashMap<>();
+    private LocalScope globalVariableList = new LocalScope();
 
     /**
      * <p>defaultScope.</p>
@@ -69,6 +71,10 @@ public class GlobalScope implements Serializable {
         return programs.get(key);
     }
 
+    public List<ProgramDeclaration> getPrograms() {
+        return new ArrayList<>(programs.values());
+    }
+
     /**
      * <p>getCalleeName.</p>
      *
@@ -79,8 +85,12 @@ public class GlobalScope implements Serializable {
         return fb.get(key);
     }
 
+    public List<FunctionBlockDeclaration> getFunctionBlocks() {
+        return new ArrayList<>(fb.values());
+    }
+
     /**
-     * <p>getFunction.</p>
+     * <p>getInvoked.</p>
      *
      * @param key a {@link java.lang.Object} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
@@ -138,6 +148,7 @@ public class GlobalScope implements Serializable {
         boolean a = fb.containsKey(name);
         boolean b = dataTypes.containsKey(name);
         boolean c = classes.containsKey(name);
+        boolean d = interfaces.containsKey(name);
 
         if (a && b || a && c || b && c) {
             System.out.println("ambguity fb vs. type");
@@ -162,20 +173,34 @@ public class GlobalScope implements Serializable {
             return q;
         }
 
+        if (d) {
+            q = new InterfaceDataType(interfaces.get(name));
+            types.put(name, q);
+            return q;
+        }
+
+        // Reference
+        if (name.length() > 7 && name.substring(0, 7).equals("REF_TO "))
+            return new ReferenceType(resolveDataType(name.substring(7)));
+
+        // Void
+        if (name == "VOID")
+            return null;
+
         throw new DataTypeNotDefinedException("Could not find: " + name);
     }
 
     /**
      * <p>resolveFunction.</p>
      *
-     * @param functionCall a {@link edu.kit.iti.formal.automation.st.ast.FunctionCall} object.
+     * @param invocation a {@link Invocation} object.
      * @param local        a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
      */
-    public FunctionDeclaration resolveFunction(FunctionCall functionCall,
+    public FunctionDeclaration resolveFunction(Invocation invocation,
             LocalScope local) {
         for (FunctionResolver fr : functionResolvers) {
-            FunctionDeclaration decl = fr.resolve(functionCall, local);
+            FunctionDeclaration decl = fr.resolve(invocation, local);
             if (decl != null)
                 return decl;
         }
@@ -193,7 +218,26 @@ public class GlobalScope implements Serializable {
     }
 
     public ClassDeclaration resolveClass(String key) {
-        return classes.get(key);
+        ClassDeclaration classDeclaration = classes.get(key);
+        if (classDeclaration == null)
+            classDeclaration = getFunctionBlock(key);
+        return classDeclaration;
+    }
+
+    public List<ClassDeclaration> getClasses() {
+        return new ArrayList<>(classes.values());
+    }
+
+    public void registerInterface(InterfaceDeclaration interfaceDeclaration) {
+        interfaces.put(interfaceDeclaration.getName(), interfaceDeclaration);
+    }
+
+    public InterfaceDeclaration resolveInterface(String key) {
+        return interfaces.get(key);
+    }
+
+    public List<InterfaceDeclaration> getInterfaces() {
+        return new ArrayList<>(interfaces.values());
     }
 
     public GlobalScope clone() {

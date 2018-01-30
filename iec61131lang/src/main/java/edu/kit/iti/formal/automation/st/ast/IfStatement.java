@@ -24,8 +24,6 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +35,6 @@ import java.util.List;
  * @version $Id: $Id
  */
 @Data
-@EqualsAndHashCode
-@ToString
 public class IfStatement extends Statement {
     private List<GuardedStatement> conditionalBranches = new ArrayList<>();
     private StatementList elseBranch = new StatementList();

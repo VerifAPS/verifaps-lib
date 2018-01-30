@@ -33,12 +33,13 @@ import edu.kit.iti.formal.automation.st.ast.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * @author Alexander Weigl
+ * @author Alexander Weigl, Augusto Modanese
  * @version 1 (23.06.17)
  */
 public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
@@ -128,6 +129,13 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitRef_null(IEC61131Parser.Ref_nullContext ctx) {
+        Literal ast = Literal.ref_null(ctx.NULL().getSymbol());
+        ast.setRuleContext(ctx);
+        return ast;
+    }
+
+    @Override
     public Object visitData_type_declaration(
             IEC61131Parser.Data_type_declarationContext ctx) {
         TypeDeclarations ast = new TypeDeclarations();
@@ -172,7 +180,8 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         TypeDeclaration<Initialization> t = oneOf(
                 ctx.array_specification(), ctx.enumerated_specification(),
                 ctx.string_type_declaration(), ctx.subrange_spec_init(),
-                ctx.structure_declaration(), ctx.data_type_name());
+                ctx.structure_declaration(), ctx.reference_specification(),
+                ctx.data_type_name());
 
         if (ctx.i != null) {
             t.setInitialization((Initialization) ctx.i.accept(this));
@@ -243,20 +252,26 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         ArrayInitialization ast = new ArrayInitialization();
         ast.setRuleContext(ctx);
 
-        ctx.array_initial_elements().forEach(a -> a.accept(this));
+        ctx.array_initial_elements().forEach(a -> ast.addAll((List<Initialization>) a.accept(this)));
         return ast;
     }
 
     @Override
     public Object visitArray_initial_elements(
             IEC61131Parser.Array_initial_elementsContext ctx) {
-        throw new IllegalStateException();
+        List<Initialization> initializations = new ArrayList<>();
+        int count = 1;
+        if (ctx.integer() != null)
+            count = Integer.parseInt(((Literal) ctx.integer().accept(this)).getTextValue());
+        for (int i = 0; i < count; i++)
+            initializations.add((Initialization) ctx.array_initial_element().accept(this));
+        return initializations;
     }
 
     @Override
     public Object visitArray_initial_element(
             IEC61131Parser.Array_initial_elementContext ctx) {
-        throw new IllegalStateException();
+        return oneOf(ctx.constant(), ctx.structure_initialization(), ctx.array_initialization());
     }
 
     @Override
@@ -273,11 +288,19 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     @Override
     public Object visitStructure_initialization(
             IEC61131Parser.Structure_initializationContext ctx) {
+        // Includes class and FB initializations
         StructureInitialization ast = new StructureInitialization();
         ast.setRuleContext(ctx);
-        for (int i = 0; i < ctx.init.size(); i++) {
-            ast.addField(ctx.name.get(i).getText(), (Initialization) ctx.init.get(i).accept(this));
-        }
+        for (int i = 0; i < ctx.IDENT.size(); i++)
+            ast.addField(ctx.IDENT.get(i).getText(), (Initialization) ctx.init.get(i).accept(this));
+        return ast;
+    }
+
+    @Override
+    public Object visitReference_specification(IEC61131Parser.Reference_specificationContext ctx) {
+        ReferenceSpecification ast = new ReferenceSpecification();
+        ast.setRuleContext(ctx);
+        ast.setRefTo((TypeDeclaration) ctx.type_declaration().accept(this));
         return ast;
     }
 
@@ -316,6 +339,13 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         ast.setFunctionName(ctx.identifier.getText());
         ast.setStatements((StatementList) ctx.body.accept(this));
         return ast;
+    }
+
+    @Override
+    public Object visitGlobal_variable_list_declaration(IEC61131Parser.Global_variable_list_declarationContext ctx) {
+        GlobalVariableListDeclaration gvl = new GlobalVariableListDeclaration();
+        gvl.setLocalScope((LocalScope) ctx.var_decls().accept(this));
+        return gvl;
     }
 
     @Override
@@ -371,54 +401,63 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         if (ctx.RETAIN() != null) {
             gather.mix(VariableDeclaration.RETAIN);
         }
+
+        // Access specifier
+        if (ctx.access_specifier() != null) {
+            gather.mix(VariableDeclaration.ACCESS_SPECIFIER_DICT.get(
+                    AccessSpecifier.valueOf(ctx.access_specifier().getText())));
+        }
         return null;
     }
 
     @Override
-    public Object visitFunction_block_declaration(
-            IEC61131Parser.Function_block_declarationContext ctx) {
+    public Object visitFunction_block_declaration(IEC61131Parser.Function_block_declarationContext ctx) {
         FunctionBlockDeclaration ast = new FunctionBlockDeclaration();
         ast.setRuleContext(ctx);
-
-
         ast.setLocalScope((LocalScope) ctx.var_decls().accept(this));
-
-        ast.setFunctionBlockName(ctx.identifier.getText());
+        ast.setFinal_(ctx.FINAL() != null);
+        ast.setAbstract_(ctx.ABSTRACT() != null);
+        ast.setName(ctx.identifier.getText());
+        if (ctx.inherit != null) {
+            ast.setParent(ctx.inherit.getText());
+        }
+        if (ctx.interfaces != null) {
+            ast.addImplements((List<String>) ctx.interfaces.accept(this));
+        }
+        ast.setMethods((List<MethodDeclaration>) ctx.methods().accept(this));
         ast.setFunctionBody((StatementList) ctx.body.accept(this));
         //Utils.setPosition(ast, ctx.FUNCTION_BLOCK, ctx.END_FUNCTION_BLOCK);
         return ast;
     }
 
     @Override
-    public Object visitInterface_declaration(
-            IEC61131Parser.Interface_declarationContext ctx) {
-        ClassDeclaration ast = new ClassDeclaration();
+    public Object visitInterface_declaration(IEC61131Parser.Interface_declarationContext ctx) {
+        InterfaceDeclaration ast = new InterfaceDeclaration();
         ast.setRuleContext(ctx);
-
         ast.setLocalScope((LocalScope) ctx.var_decls().accept(this));
-
-        //TODO interface/extend missing
+        ast.setName(ctx.identifier.getText());
         ast.setMethods((List<MethodDeclaration>) ctx.methods().accept(this));
-        ast.setBlockName(ctx.identifier.getText());
-        //Utils.setPosition(ast, ctx.INTERFACE(), ctx.END_INTERFACE());
+        if (ctx.sp != null) {
+            ((List<String>) ctx.sp.accept(this)).forEach(i -> ast.addExtends(i));
+        }
         return ast;
     }
 
     @Override
-    public Object visitClass_declaration(
-            IEC61131Parser.Class_declarationContext ctx) {
+    public Object visitClass_declaration(IEC61131Parser.Class_declarationContext ctx) {
         ClassDeclaration ast = new ClassDeclaration();
-        //TODO interface/extend missing
-        //ast.setParentClass(ctx);
-        //ast.addImplements(ctx.sp.text);
-
-        ast.setLocalScope((LocalScope) ctx.var_decls().accept(this));
-
-        ast.setMethods((List<MethodDeclaration>) ctx.methods().accept(this));
-        ast.setBlockName(ctx.identifier.getText());
         ast.setRuleContext(ctx);
-
-        //Utils.setPosition(ast, ctx.INTERFACE, ctx.END_INTERFACE);
+        ast.setLocalScope((LocalScope) ctx.var_decls().accept(this));
+        ast.setFinal_(ctx.FINAL() != null);
+        ast.setAbstract_(ctx.ABSTRACT() != null);
+        ast.setName(ctx.identifier.getText());
+        if (ctx.inherit != null) {
+            ast.setParent(ctx.inherit.getText());
+        }
+        if (ctx.interfaces != null) {
+            ast.addImplements((List<String>) ctx.interfaces.accept(this));
+        }
+        ast.setMethods((List<MethodDeclaration>) ctx.methods().accept(this));
         return ast;
     }
 
@@ -433,15 +472,21 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     @Override
     public Object visitMethod(IEC61131Parser.MethodContext ctx) {
         MethodDeclaration ast = new MethodDeclaration();
+        //ast.setRuleContext(ctx);
         ast.setName(ctx.identifier.getText());
+        if (ctx.access_specifier() != null) {
+            ast.setAccessSpecifier(AccessSpecifier.valueOf(ctx.access_specifier().getText()));
+        }
+        ast.setFinal_(ctx.FINAL() != null);
+        ast.setAbstract_(ctx.ABSTRACT() != null);
+        ast.setOverride(ctx.OVERRIDE() != null);
         if (ctx.returnET != null)
             ast.setReturnTypeName(ctx.returnET.getText());
         if (ctx.returnID != null)
             ast.setReturnTypeName(ctx.returnID.getText());
 
         ast.setLocalScope((LocalScope) ctx.var_decls().accept(this));
-        ast.setStatements((StatementList) ctx.statement_list().accept(this));
-        // ast.setRuleContext(ctx);
+        ast.setStatements((StatementList) ctx.body.accept(this));
         return ast;
     }
 
@@ -549,13 +594,18 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitFunctioncall(
-            IEC61131Parser.FunctioncallContext ctx) {
-        List<Expression> expr = allOf(ctx.expression());
-        FunctionCall fc = new FunctionCall(ctx.id.getText(), expr);
-        //        Utils.setPosition(ast, ctx.id, ctx.RPAREN);
-        fc.setParameters(expr);
-        return fc.setRuleContext(ctx);
+    public Object visitInvocation(IEC61131Parser.InvocationContext ctx) {
+        Invocation i = new Invocation();
+        i.setCallee((SymbolicReference) ctx.id.accept(this));
+        if (ctx.expression().isEmpty()) {
+            // Using parameters
+            i.addParameters(allOf(ctx.param_assignment()));
+        }
+        else {
+            // Using expressions
+            i.addExpressionParameters(allOf(ctx.expression()));
+        }
+        return i.setRuleContext(ctx);
     }
 
     @Override
@@ -571,6 +621,7 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
                 (Reference) ctx.a.accept(this),
                 (Expression) ctx.expression().accept(this));
         ast.setReference(ctx.RASSIGN() != null);
+        ast.setAssignmentAttempt(ctx.ASSIGN_ATTEMPT() != null);
         //setPosition(ast, ctx.ctx);
         return ast;
     }
@@ -579,7 +630,8 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     public Object visitStatement(IEC61131Parser.StatementContext ctx) {
         return oneOf(ctx.assignment_statement(), ctx.if_statement(), ctx.exit_statement(),
                 ctx.repeat_statement(), ctx.return_statement(), ctx.while_statement(),
-                ctx.case_statement(), ctx.functionblockcall(), ctx.for_statement());
+                ctx.case_statement(), ctx.invocation_statement(),
+                ctx.for_statement());
     }
 
     @Override
@@ -597,9 +649,7 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
             ast.setSubscripts((ExpressionList) ctx.subscript_list().accept(this));
         }
 
-        if (ctx.REF() != null) {
-            ast.derefSubscript();
-        }
+        ast.setDerefCount(ctx.deref.size());
 
         return ast;
     }
@@ -627,30 +677,24 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitFunctionblockcall(
-            IEC61131Parser.FunctionblockcallContext ctx) {
-        FunctionBlockCallStatement fbcs = new FunctionBlockCallStatement();
-        fbcs.setFunctionBlockName(ctx.symbolic_variable().getText());
-        ctx.param_assignment().stream().forEach(
-                a ->
-                        fbcs.getParameters().add(
-                                (FunctionBlockCallStatement.Parameter)
-                                        a.accept(this))
-        );
-
-        //setPosition
-        return fbcs;
+    public Object visitInvocation_statement(IEC61131Parser.Invocation_statementContext ctx) {
+        InvocationStatement is = new InvocationStatement();
+        is.setInvocation((Invocation) ctx.invocation().accept(this));
+        return is;
     }
 
     @Override
     public Object visitParam_assignment(
             IEC61131Parser.Param_assignmentContext ctx) {
-        FunctionBlockCallStatement.Parameter p = new FunctionBlockCallStatement.Parameter();
-        if (ctx.ARROW_RIGHT() != null)
+        Invocation.Parameter p = new Invocation.Parameter();
+        if (ctx.RIGHT_ARROW() != null) {
             p.setOutput(true);
-
-        p.setName(ctx.id.getText());
-        p.setExpression((Expression) ctx.expression().accept(this));
+            p.setExpression((Expression) ctx.v.accept(this));
+        }
+        else
+            p.setExpression((Expression) ctx.expression().accept(this));
+        if (ctx.id != null)
+            p.setName(ctx.id.getText());
         return p;
     }
 
@@ -780,7 +824,7 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     @Override
     public Object visitAction_declaration(IEC61131Parser.Action_declarationContext ctx) {
         FunctionBlockDeclaration fbd = new FunctionBlockDeclaration();
-        fbd.setFunctionBlockName(ctx.IDENTIFIER().getText());
+        fbd.setName(ctx.IDENTIFIER().getText());
         fbd.setLocalScope((LocalScope) ctx.var_decls().accept(this));
         fbd.setFunctionBody((StatementList) ctx.statement_list().accept(this));
         return fbd;
@@ -802,9 +846,9 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         } else {
             FunctionBlockDeclaration fbd = new FunctionBlockDeclaration();
             fbd.setFunctionBody((StatementList) ctx.body.accept(this));
-            fbd.setFunctionBlockName(Utils.getRandomName());
+            fbd.setName(Utils.getRandomName());
             sfc.getActions().add(fbd);
-            stepDeclaration.addEvent(type, fbd.getFunctionBlockName());
+            stepDeclaration.addEvent(type, fbd.getName());
         }
         return null;
     }

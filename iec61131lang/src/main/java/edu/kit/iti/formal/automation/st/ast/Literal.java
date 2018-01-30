@@ -32,9 +32,7 @@ import edu.kit.iti.formal.automation.sfclang.Utils;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 
@@ -43,8 +41,6 @@ import org.antlr.v4.runtime.Token;
  * @version 1 (25.06.17)
  */
 @Data
-@EqualsAndHashCode
-@ToString
 @NoArgsConstructor
 public class Literal extends Initialization {
     private final IdentifierPlaceHolder<Any> dataType = new IdentifierPlaceHolder<>();
@@ -168,6 +164,10 @@ public class Literal extends Initialization {
         return integer(new CommonToken(-1, "" + Math.abs(val)), val < 0);
     }
 
+    public static Literal ref_null(Token symbol) {
+        return new Literal(AnyReference.ANY_REF, symbol);
+    }
+
     public Any getDataType() {
         return dataType.getIdentifiedObject();
     }
@@ -181,7 +181,7 @@ public class Literal extends Initialization {
     }
 
     public String getText() {
-        return token.getText();
+        return (signed ? "-" : "") + token.getText();
     }
 
     @Override

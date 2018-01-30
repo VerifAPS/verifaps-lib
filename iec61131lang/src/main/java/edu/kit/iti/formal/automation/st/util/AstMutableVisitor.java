@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.st.util;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
@@ -184,11 +183,10 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(FunctionCall functionCall) {
-        List<Expression> list = new ArrayList<>();
-        list.addAll(functionCall.getParameters());
-        functionCall.setParameters(list);
-        return functionCall;
+    public Object visit(Invocation invocation) {
+        invocation.setParameters(invocation.getParameters().stream()
+                .map(p -> (Invocation.Parameter) p.accept(this)).collect(Collectors.toList()));
+        return invocation;
     }
 
     /**
@@ -240,16 +238,13 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(FunctionBlockCallStatement fbc) {
-        fbc.setParameters(
-                fbc.getParameters().stream()
-                        .map(p -> (FunctionBlockCallStatement.Parameter) p.accept(this))
-                        .collect(Collectors.toList()));
+    public Object visit(InvocationStatement fbc) {
+        fbc.getInvocation().accept(this);
         return fbc;
     }
 
     @Override
-    public Object visit(FunctionBlockCallStatement.Parameter parameter) {
+    public Object visit(Invocation.Parameter parameter) {
         parameter.setExpression((Expression) parameter.getExpression().accept(this));
         return parameter;
     }
@@ -259,7 +254,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(CaseStatement.Case aCase) {
-        List<CaseCondition> v = this.<CaseCondition>visitList(aCase.getConditions());
+        List<CaseCondition> v = this.visitList(aCase.getConditions());
         aCase.setConditions(v);
         aCase.setStatements((StatementList) aCase.getStatements().accept(this));
         return aCase;
@@ -268,7 +263,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
     private <T> List<T> visitList(List<? extends Visitable> list) {
         List l = new ArrayList();
         for (Visitable v : list)
-            l.add((T) v.accept(this));
+            l.add(v.accept(this));
         return l;
     }
 
@@ -295,7 +290,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
     public Object visit(CaseCondition.Range range) {
         range.setStart((Literal) range.getStart().accept(this));
         range.setStop((Literal) range.getStop().accept(this));
-        return (CaseCondition.Range) super.visit(range);
+        return super.visit(range);
     }
 
     /**
@@ -430,7 +425,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(SimpleTypeDeclaration simpleTypeDeclaration) {
-        return (SimpleTypeDeclaration) super.visit(simpleTypeDeclaration);
+        return super.visit(simpleTypeDeclaration);
     }
 
 
@@ -439,32 +434,32 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(StructureInitialization structureInitialization) {
-        return (StructureInitialization) super.visit(structureInitialization);
+        return super.visit(structureInitialization);
     }
 
     @Override
     public Object visit(Location location) {
-        return (Location) super.visit(location);
+        return super.visit(location);
     }
 
     @Override
     public Object visit(Deref deref) {
-        return (Deref) super.visit(deref);
+        return super.visit(deref);
     }
 
     @Override
     public Object visit(SymbolicReference symbolicReference) {
-        return (SymbolicReference) super.visit(symbolicReference);
+        return super.visit(symbolicReference);
     }
 
     @Override
     public Object visit(PointerTypeDeclaration ptd) {
-        return (PointerTypeDeclaration) super.visit(ptd);
+        return super.visit(ptd);
     }
 
     @Override
     public Object visit(IdentifierInitializer init) {
-        return (IdentifierInitializer) super.visit(init);
+        return super.visit(init);
     }
 
     @Override
@@ -476,18 +471,18 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
             methods.add((MethodDeclaration) method.accept(this));
         }
 
-        return (ClassDeclaration) super.visit(clazz);
+        return super.visit(clazz);
     }
 
     @Override
     public Object visit(MethodDeclaration method) {
         method.setLocalScope((LocalScope) method.getLocalScope().accept(this));
         method.setStatements((StatementList) method.getStatements().accept(this));
-        return (MethodDeclaration) super.visit(method);
+        return super.visit(method);
     }
 
     @Override
     public Object visit(Literal literal) {
-        return (Literal) super.visit(literal);
+        return super.visit(literal);
     }
 }

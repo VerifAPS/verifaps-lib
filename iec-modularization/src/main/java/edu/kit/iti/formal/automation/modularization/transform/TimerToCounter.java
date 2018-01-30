@@ -22,15 +22,12 @@ package edu.kit.iti.formal.automation.modularization.transform;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.VariableScope;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.modularization.StatementListModifier;
 import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.scope.LocalScope;
-import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.*;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -96,7 +93,7 @@ public class TimerToCounter extends StatementListModifier {
 	}
 
 	@Override
-	public final Object visit(final FunctionBlockCallStatement fbCallStmt) {
+	public final Object visit(final InvocationStatement fbCallStmt) {
 
 		final String name = fbCallStmt.getCalleeName();
 

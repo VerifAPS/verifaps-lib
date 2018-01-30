@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -35,9 +36,11 @@ import lombok.ToString;
  * @author weigl
  * @version $Id: $Id
  */
-@EqualsAndHashCode
-@ToString
-public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Function_declarationContext> {
+@EqualsAndHashCode(exclude = "statements")
+@ToString(exclude = "statements")
+@NoArgsConstructor
+public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Function_declarationContext>
+        implements Invocable {
     protected IdentifierPlaceHolder<Any> returnType = new IdentifierPlaceHolder<>();
     protected String functionName;
     protected StatementList statements = new StatementList();

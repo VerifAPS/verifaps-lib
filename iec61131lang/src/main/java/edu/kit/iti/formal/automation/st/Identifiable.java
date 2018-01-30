@@ -35,5 +35,5 @@ public interface Identifiable {
     /**
      * @return
      */
-    public String getIdentifier();
+    String getIdentifier();
 }

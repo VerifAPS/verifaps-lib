@@ -25,11 +25,11 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.st.Identifiable;
+import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * Created by weigl on 11.06.14.
@@ -38,12 +38,16 @@ import lombok.ToString;
  * @version $Id: $Id
  */
 @Data
-@EqualsAndHashCode
-@ToString
 public class SymbolicReference extends Reference {
-    private String identifier;
+    private IdentifierPlaceHolder identifier = new IdentifierPlaceHolder();
     private ExpressionList subscripts;
-    private Reference sub;
+    private SymbolicReference sub;
+    private Any dataType;
+
+    /**
+     * Number of times reference is dereferenced.
+     */
+    private int derefCount = 0;
 
     /**
      * <p>Constructor for SymbolicReference.</p>
@@ -51,11 +55,11 @@ public class SymbolicReference extends Reference {
      * @param s   a {@link java.lang.String} object.
      * @param sub a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
      */
-    public SymbolicReference(String s, Reference sub) {
+    public SymbolicReference(String s, SymbolicReference sub) {
         if (s == null)
             throw new IllegalArgumentException();
         this.sub = sub;
-        identifier = s;
+        identifier.setIdentifier(s);
     }
 
     /**
@@ -102,7 +106,7 @@ public class SymbolicReference extends Reference {
      * @return a {@link java.lang.String} object.
      */
     public String getIdentifier() {
-        return identifier;
+        return identifier.getIdentifier();
     }
 
     /**
@@ -113,56 +117,19 @@ public class SymbolicReference extends Reference {
     public void setIdentifier(String identifier) {
         if (identifier == null)
             throw new IllegalArgumentException();
-        this.identifier = identifier;
+        this.identifier.setIdentifier(identifier);
     }
 
-    /**
-     * <p>Getter for the field <code>subscripts</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.ExpressionList} object.
-     */
-    public ExpressionList getSubscripts() {
-        return subscripts;
+    public Identifiable getIdentifiedObject() {
+        return identifier.getIdentifiedObject();
     }
 
-    /**
-     * <p>Setter for the field <code>subscripts</code>.</p>
-     *
-     * @param subscripts a {@link edu.kit.iti.formal.automation.st.ast.ExpressionList} object.
-     */
-    public void setSubscripts(ExpressionList subscripts) {
-        this.subscripts = subscripts;
+    public void setIdentifiedObject(Identifiable identifiedObject) {
+        identifier.setIdentifiedObject(identifiedObject);
     }
 
-    /**
-     * <p>Getter for the field <code>sub</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
-     */
-    public Reference getSub() {
-        return sub;
-    }
-
-    /**
-     * <p>Setter for the field <code>sub</code>.</p>
-     *
-     * @param sub a {@link edu.kit.iti.formal.automation.st.ast.Reference} object.
-     */
-    public void setSub(Reference sub) {
-        this.sub = sub;
-    }
-
-    /**
-     * <p>derefVar.</p>
-     */
-    public void derefVar() {
-    }
-
-    /**
-     * <p>derefSubscript.</p>
-     */
-    public void derefSubscript() {
-
+    public boolean hasSub() {
+        return sub != null;
     }
 
     /**
@@ -185,9 +152,15 @@ public class SymbolicReference extends Reference {
     public SymbolicReference copy() {
         SymbolicReference sr = new SymbolicReference();
         sr.setRuleContext(getRuleContext());
-        sr.identifier = identifier;
+        sr.identifier = identifier.copy();
         sr.subscripts = Utils.copyNull(subscripts);
         sr.sub = Utils.copyNull(sub);
+        sr.derefCount = derefCount;
         return sr;
+    }
+
+    @Override
+    public String toString() {
+        return getIdentifier() + (sub == null ? "" : "." + sub.toString());
     }
 }

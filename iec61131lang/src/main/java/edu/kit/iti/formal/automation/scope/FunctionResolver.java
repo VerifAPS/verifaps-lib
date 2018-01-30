@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.scope;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.FunctionCall;
+import edu.kit.iti.formal.automation.st.ast.Invocation;
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
 
 /**
@@ -38,9 +38,9 @@ public interface FunctionResolver {
      * For example, "MUX" function has a ellipsis argument (so not possible),
      * on call site a declaration is generated.
      *
-     * @param call a {@link edu.kit.iti.formal.automation.st.ast.FunctionCall} object.
+     * @param call a {@link Invocation} object.
      * @param scope a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
      */
-    public FunctionDeclaration resolve(FunctionCall call, LocalScope scope);
+    FunctionDeclaration resolve(Invocation call, LocalScope scope);
 }
