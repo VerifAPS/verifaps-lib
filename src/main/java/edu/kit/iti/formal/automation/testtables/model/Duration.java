@@ -57,7 +57,7 @@ public class Duration {
      * @return
      */
     public boolean isUnbounded() {
-        return upper == -1;
+        return upper <= -1;
     }
 
     /**

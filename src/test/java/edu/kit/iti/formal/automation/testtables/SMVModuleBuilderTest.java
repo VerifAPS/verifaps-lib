@@ -35,6 +35,14 @@ public class SMVModuleBuilderTest {
                 "src/test/resources/detwait/detwait1.smv");
     }
 
+
+    @Test
+    public void testOmega1() throws JAXBException, IOException {
+        test("src/test/resources/omega/simplify1.xml",
+                "src/test/resources/omega/simplify1.smv");
+    }
+
+
     public void test(String table, String expectedSMVFile) throws JAXBException, IOException {
         GeneralizedTestTable gtt = Facade.readTable(table);
         String expected = FileUtils.readFileToString(new java.io.File(expectedSMVFile), "utf-8");
