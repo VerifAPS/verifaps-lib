@@ -1,0 +1,82 @@
+import org.unbrokendome.gradle.plugins.xjc.XjcGenerate
+
+plugins {
+    id 'org.unbroken-dome.xjc' version '1.1.3'
+    id 'io.franzbecker.gradle-lombok' version '1.11'
+    id "com.github.hierynomus.license" version "0.14.0"
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'antlr'
+
+group = 'edu.kit.iti.formal'
+version = '0.6.0-SNAPSHOT'
+
+description = """
+    Generalized Test Table
+"""
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+def antlrOutputDir = file("build/generated-src/antlr")
+def xjcOutputDir = file("build/generated-src/xjc")
+
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url "http://formal.iti.kit.edu/maven2" }
+    maven { url "http://repo.maven.apache.org/maven2" }
+}
+dependencies {
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    compile group: 'edu.kit.iti.formal', name: 'iec61131lang', version: '0.1.15-SNAPSHOT'
+    compile group: 'edu.kit.iti.formal', name: 'iec-symbex', version: '0.4.2-SNAPSHOT'
+    compile group: 'edu.kit.iti.formal', name: 'smv-model', version: '0.2.0-SNAPSHOT'
+    testCompile 'junit:junit:4.12'
+    antlr group: 'org.antlr', name: 'antlr4', version: 4.7
+
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs antlrOutputDir, xjcOutputDir
+        }
+    }
+}
+
+generateGrammarSource {
+    outputDirectory antlrOutputDir
+    arguments << '-package' << 'edu.kit.iti.formal.automation.testtables.grammar'
+    arguments << '-visitor'
+}
+
+xjcGenerate.enabled = false
+
+task xjcGenerateExteta(type: XjcGenerate) {
+    docLanguage = "en"
+    source = file('src/main/xsd/exteta-1.1.xsd')
+    outputDirectory = xjcOutputDir
+    targetPackage = "edu.kit.iti.formal.automation.testtables.schema"
+}
+
+task xjcGenerateReport(type: XjcGenerate) {
+    source = fileTree('src/main/xsd/') { include 'report.xsd' }
+    outputDirectory = xjcOutputDir
+    docLanguage = "en"
+    targetPackage = "edu.kit.iti.formal.automation.testtables.report"
+}
+
+compileJava.dependsOn xjcGenerateExteta
+compileJava.dependsOn xjcGenerateReport
+
+license {
+    header = file("gradle/HEADER")
+    ext.name = "geteta"
+    ext.holder = "Alexander Weigl <weigl@kit.edu>"
+    ext.year = "2016-2018"
+}
