@@ -1,11 +1,9 @@
 package edu.kit.iti.formal.automation.testtables;
 
-import edu.kit.iti.formal.automation.testtables.io.Report;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.State;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import javax.xml.bind.JAXBException;
@@ -20,6 +18,37 @@ public class StateReachabilityTest {
         /*Report.XML_MODE = false;
         Report.close();*/
     }
+
+    @Test
+    public void testReachabilityDetWait1() throws JAXBException {
+        GeneralizedTestTable gtt = Facade.readTable("src/test/resources/detwait/detwait1.xml");
+        String out = getReachabilityString(gtt);
+        Assert.assertEquals("1#(2)\n" +
+                "2#(-1)", out);
+    }
+
+    @Test
+    public void testReachabilityDetWait2() throws JAXBException {
+        GeneralizedTestTable gtt = Facade.readTable("src/test/resources/detwait/detwait2.xml");
+        String out = getReachabilityString(gtt);
+        System.out.println(out);
+        Assert.assertEquals("1#(2)\n" +
+                "2#(3,4)\n" +
+                "3#(4)\n" +
+                "4#()", out);
+    }
+
+    @Test
+    public void testReachabilityDetWait3() throws JAXBException {
+        GeneralizedTestTable gtt = Facade.readTable("src/test/resources/detwait/detwait3.xml");
+        String out = getReachabilityString(gtt);
+        System.out.println(out);
+        Assert.assertEquals("1#(2)\n" +
+                "2#(3,4)\n" +
+                "3#(4)\n" +
+                "4#()", out);
+    }
+
 
     @Test
     public void testReachabilityOmega1() throws JAXBException {

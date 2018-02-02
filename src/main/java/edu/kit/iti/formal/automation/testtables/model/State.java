@@ -26,6 +26,7 @@ import edu.kit.iti.formal.automation.testtables.schema.IoVariable;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
 import edu.kit.iti.formal.smv.ast.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
+import lombok.Data;
 
 import java.util.*;
 
@@ -33,25 +34,44 @@ import java.util.*;
  * @author Alexander Weigl
  * @version 1 (10.12.16)
  */
+@Data
 public class State extends TableNode {
     private final List<SMVExpr> inputExpr = new ArrayList<>();
     private final List<SMVExpr> outputExpr = new ArrayList<>();
     private final Set<State> incoming = new HashSet<>();
     private final Set<State> outgoing = new HashSet<>();
+    /**
+     *
+     */
+    private final SVariable defInput;
+    /**
+     *
+     */
+    private final SVariable defFailed;
+    /**
+     *
+     */
+    private final SVariable defForward;
+    /**
+     *
+     */
+    private final SVariable defOutput;
+    /**
+     * The predicate that allows keeping in this state.
+     * Only necessary iff duration is DET_WAIT.
+     */
+    private final SVariable defKeep;
     private List<AutomatonState> automataStates;
     private boolean initialReachable;
     private boolean endState;
 
     public State(int id) {
         super(id);
-    }
-
-    public List<SMVExpr> getInputExpr() {
-        return inputExpr;
-    }
-
-    public List<SMVExpr> getOutputExpr() {
-        return outputExpr;
+        defOutput = new SVariable("s" + id + "_out", SMVType.BOOLEAN);
+        defForward = new SVariable("s" + id + "_fwd", SMVType.BOOLEAN);
+        defFailed = new SVariable("s" + id + "_fail", SMVType.BOOLEAN);
+        defInput = new SVariable("s" + id + "_in", SMVType.BOOLEAN);
+        defKeep = new SVariable("s" + id + "_keep", SMVType.BOOLEAN);
     }
 
     public void add(IoVariable v, SMVExpr e) {
@@ -99,55 +119,24 @@ public class State extends TableNode {
         return id;
     }
 
-    public SVariable getDefForward() {
-        return new SVariable("s" + id + "_fwd", SMVType.BOOLEAN);
-    }
-
-    public SVariable getDefFailed() {
-        return new SVariable("s" + id + "_fail", SMVType.BOOLEAN);
-    }
-
-    public SVariable getDefInput() {
-        return new SVariable("s" + id + "_in", SMVType.BOOLEAN);
-    }
-
-    public SVariable getDefOutput() {
-        return new SVariable("s" + id + "_out", SMVType.BOOLEAN);
-    }
-
     @Override
     public List<AutomatonState> getAutomataStates() {
         if (automataStates == null)
             automataStates = new ArrayList<>();
 
         if (automataStates.size() == 0) {
-            for (int i = 1; i <= duration.getBound(); i++) {
-                automataStates.add(new AutomatonState(i));
+            if (duration.isDeterministicWait() || duration.isOmega()) {
+                automataStates.add(new AutomatonState(1));
+            } else {
+                for (int i = 1; i <= duration.getBound(); i++) {
+                    automataStates.add(new AutomatonState(i));
+                }
             }
         }
         assert automataStates.size() != 0;
         return automataStates;
     }
 
-    public Set<State> getOutgoing() {
-        return outgoing;
-    }
-
-    public Set<State> getIncoming() {
-        return incoming;
-    }
-
-    public boolean isInitialReachable() {
-        return initialReachable;
-    }
-
-    public void setInitialReachable(boolean initialReachable) {
-        this.initialReachable = initialReachable;
-    }
-
-    public void setEndState(boolean endState) {
-        this.endState = endState;
-    }
 
     @Override
     public int depth() {
@@ -196,7 +185,7 @@ public class State extends TableNode {
         }
 
         /**
-         * Returns true iff this is the automaton that can infinitely repeated.
+         * Returns true iff this is the automaton state that can infinitely repeated.
          *
          * @return
          */

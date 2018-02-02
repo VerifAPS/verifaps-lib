@@ -175,9 +175,13 @@ public class StateReachability {
      * Initialize the table with the direct reachability.
      * 1. i-th row can reach (i+1)-th row
      * 2. End of the region, to beginning of a region.
+     * 3. Abort on \omega!
      */
     private void initTable() {
         for (int i = 0; i < flatList.size() - 1; i++) {
+            if (flatList.get(i).getDuration().isOmega()) {
+                break;
+            }
             flatList.get(i).getOutgoing().add(flatList.get(i + 1));
         }
     }

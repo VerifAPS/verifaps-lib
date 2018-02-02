@@ -55,7 +55,6 @@ public class ConcreteTableInvariantTransformer implements TableTransformer {
         SVariable lastRow = rows.get(rows.size() - 1).getDefForward();
         SVariable sentinel = SVariable.create("SENTINEL").asBool();
 
-
         // add state var
         tableModule.getStateVars().add(sentinel);
 

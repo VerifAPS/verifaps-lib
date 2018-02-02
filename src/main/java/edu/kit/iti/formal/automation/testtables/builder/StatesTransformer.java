@@ -29,12 +29,14 @@ import edu.kit.iti.formal.smv.SMVFacade;
 import edu.kit.iti.formal.smv.ast.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Creates the states and definition for each row and time including error and sentinel.
  * Created by weigl on 17.12.16.
  *
- * @version 2
+ * @version 3
  */
 public class StatesTransformer implements TableTransformer {
     private TableModule mt;
@@ -58,7 +60,8 @@ public class StatesTransformer implements TableTransformer {
 
         // define input predicate
         define(s.getDefInput(), SMVFacade
-                .combine(SBinaryOperator.AND, s.getInputExpr(), SLiteral.TRUE));
+                .combine(SBinaryOperator.AND,
+                        s.getInputExpr(), SLiteral.TRUE));
 
         // define failed predicate
         define(s.getDefFailed(), SMVFacade
@@ -66,15 +69,28 @@ public class StatesTransformer implements TableTransformer {
                         s.getDefOutput().not()));
 
         // define forward predicate
-        define(s.getDefForward(), SMVFacade
-                .combine(SBinaryOperator.AND, s.getDefInput(),
+        define(s.getDefForward(),
+                SMVFacade.combine(SBinaryOperator.AND, s.getDefInput(),
                         s.getDefOutput()));
 
-        for (State.AutomatonState ss : s.getAutomataStates()) {
-            introduceAutomatonStateDefinitions(ss);
-            introduceAutomatonState(ss);
+        if (s.getDuration().isDeterministicWait()) {
+            SMVExpr outgoingIsValid = SMVFacade
+                    .combine(SBinaryOperator.OR,
+                            s.getOutgoing().stream()
+                                    .map(State::getDefForward)
+                                    .collect(Collectors.toList())
+                    );
+
+            define(s.getDefKeep(),
+                    SMVFacade.combine(SBinaryOperator.AND,
+                            outgoingIsValid.not(), s.getDefInput(), s.getDefOutput()
+                    ));
         }
 
+        for (State.AutomatonState ss : s.getAutomataStates()) {
+            introduceAutomatonStateDefines(ss);
+            introduceAutomatonState(ss);
+        }
     }
 
     /**
@@ -82,7 +98,7 @@ public class StatesTransformer implements TableTransformer {
      *
      * @param ss
      */
-    private void introduceAutomatonStateDefinitions(State.AutomatonState ss) {
+    private void introduceAutomatonStateDefines(State.AutomatonState ss) {
         define(ss.getDefForward(), SMVFacade
                 .combine(SBinaryOperator.AND, ss.getSMVVariable(),
                         ss.getState().getDefForward()));
@@ -96,14 +112,34 @@ public class StatesTransformer implements TableTransformer {
      */
     private void introduceAutomatonState(State.AutomatonState automatonState) {
         SVariable var = automatonState.getSMVVariable();
+
+        // sate variable
         mt.getStateVars().add(var);
+
+        //initialize state variable with true iff isStartState
         mt.getInit().add(automatonState.isStartState() ? var : var.not());
 
-        SMVExpr or = automatonState.getIncoming().stream()
+        //If one predeccor is true, then we are true.
+        Stream<State.AutomatonState> incoming = automatonState.getIncoming().stream();
+
+        //remove self-loop on DET_WAIT, because we cannot use `_fwd`, we need `_keep`
+        if (automatonState.getState().getDuration().isDeterministicWait()) {
+            incoming = incoming.filter(as -> !as.equals(automatonState));
+        }
+
+        SMVExpr activate = incoming
                 .map(State.AutomatonState::getDefForward)
                 .map(fwd -> (SMVExpr) fwd)
                 .reduce(SMVFacade.reducer(SBinaryOperator.OR))
                 .orElse(SLiteral.FALSE);
+
+        if (automatonState.getState().getDuration().isDeterministicWait()) {
+            // If this state is true, it stays true, until
+            // no successor was correctly guessed.
+            activate = activate.or(
+                    var.and(automatonState.getState().getDefKeep()
+                    ));
+        }
 
         /*
         if (automatonState.isUnbounded()) {
@@ -112,7 +148,7 @@ public class StatesTransformer implements TableTransformer {
         }*/
 
         SAssignment assignment = new SAssignment(
-                automatonState.getSMVVariable(), or);
+                automatonState.getSMVVariable(), activate);
         mt.getNextAssignments().add(assignment);
     }
 
