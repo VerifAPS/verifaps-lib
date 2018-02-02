@@ -75,8 +75,17 @@ compileJava.dependsOn xjcGenerateExteta
 compileJava.dependsOn xjcGenerateReport
 
 license {
+    mapping { java='PHP' }
     header = file("gradle/HEADER")
     ext.name = "geteta"
     ext.holder = "Alexander Weigl <weigl@kit.edu>"
     ext.year = "2016-2018"
+}
+
+task run(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'edu.kit.iti.formal.automation.testtables.ExTeTa'
+    if (project.hasProperty("appArgs")) {
+        args Eval.me(appArgs)
+    }
 }

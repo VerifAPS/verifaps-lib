@@ -1,26 +1,24 @@
-package edu.kit.iti.formal.automation.testtables.io;
-
-/*-
- * #%L
+/*
  * geteta
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+ *
+ * Copyright (C) 2016-2018 -- Alexander Weigl <weigl@kit.edu>
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
  */
+package edu.kit.iti.formal.automation.testtables.io;
+
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.testtables.model.Duration;
@@ -37,11 +35,15 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class TableReader {
+    private static final String DEFAULT_CELL_VALUE = "-";
     private File input;
     private GeneralizedTestTable gtt = new GeneralizedTestTable();
     private int stepNumber = 0;
+    private Map<Integer, String> lastColumnValue = new TreeMap<>();
 
     public TableReader(File input) {
         this.input = input;
@@ -113,15 +115,13 @@ public class TableReader {
         if (duration == null) {
             Report.info("Duration is not given, assume '[1,1]'");
             r.setDuration(new Duration(1, 1));
-        }
-        else {
+        } else {
             r.setDuration(IOFacade.parseDuration(duration));
         }
         for (Object o : steps.getStepOrBlock()) {
             if (o instanceof Step) {
                 r.getChildren().add(translateStep((Step) o));
-            }
-            else if (o instanceof Block) {
+            } else if (o instanceof Block) {
                 r.getChildren().add(translateSteps((Block) o));
             }
         }
@@ -131,12 +131,28 @@ public class TableReader {
     private State translateStep(Step step) {
         State s = new State(stepNumber++);
 
-        for (int i = 0; i < step.getCell().size(); i++) {
+        for (int i = 0; i < gtt.getIoVariables().size(); i++) {
             IoVariable v = gtt.getIoVariables(i);
             String name = v.getName();
-            SMVExpr e = IOFacade.parseCellExpression(step.getCell().get(i),
+
+            String cellValue = null;
+            if (i < step.getCell().size()) {
+                cellValue = step.getCell().get(i);
+            }
+
+            if (cellValue == null || cellValue.isEmpty()) {
+                if (lastColumnValue.containsKey(i))
+                    cellValue = lastColumnValue.get(i);
+                else {
+                    cellValue = DEFAULT_CELL_VALUE;
+                    Report.warn("No cell value for var: %s in %d/%d. Inserting '-'. ",
+                            name, s.getId(), i);
+                }
+            }
+            SMVExpr e = IOFacade.parseCellExpression(cellValue,
                     gtt.getSMVVariable(name), gtt);
             s.add(v, e);
+            lastColumnValue.put(i, cellValue);
         }
 
         s.setDuration(IOFacade.parseDuration(step.getDuration()));
