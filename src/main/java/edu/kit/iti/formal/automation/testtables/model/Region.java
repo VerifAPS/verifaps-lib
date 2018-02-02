@@ -22,24 +22,29 @@ package edu.kit.iti.formal.automation.testtables.model;
  * #L%
  */
 
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * created on 10.12.16.
+ *
  * @author Alexander Weigl
- * @version  1
+ * @version 1
  */
-public class Region extends State {
-    private List<State> children = new ArrayList<>();
+@Data
+public class Region extends TableNode {
+    private List<TableNode> children = new ArrayList<>();
 
     public Region(int id) {
         super(id);
     }
 
-    public List<State> getStates() {
-        return children;
+    @Override
+    public boolean isLeaf() {
+        return false;
     }
 
     /**
@@ -47,16 +52,28 @@ public class Region extends State {
      */
     @Override
     public int count() {
-        return children.stream().mapToInt(State::count).sum();
+        return children.stream().mapToInt(TableNode::count).sum();
     }
 
     /**
-     *
      * @return
      */
+    @Override
     public List<State> flat() {
         return children.stream()
                 .flatMap((a) -> a.flat().stream())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public int depth() {
+        return 1 + children.stream().mapToInt(TableNode::depth).max().orElse(0);
+    }
+
+    @Override
+    public List<State.AutomatonState> getAutomataStates() {
+        List<State.AutomatonState> seq = new ArrayList<>(100);
+        flat().forEach(state -> seq.addAll(state.getAutomataStates()));
+        return seq;
     }
 }

@@ -36,10 +36,10 @@ public class ConstraintVariableTransformer implements TableTransformer {
     @Override
     public void accept(TableTransformation tt) {
         GeneralizedTestTable gtt = tt.getTestTable();
-        SMVModule mt= tt.getTableModule();
+        SMVModule mt = tt.getTableModule();
         for (ConstraintVariable cv : gtt.getConstraintVariable().values()) {
             SVariable var = gtt.getSMVVariable(cv.getName());
-            if(cv.getDataType()== DataType.ENUM) {
+            if (cv.getDataType() == DataType.ENUM) {
                 var.setDatatype(tt.getSuperEnumType());
             }
             mt.getFrozenVars().add(var);

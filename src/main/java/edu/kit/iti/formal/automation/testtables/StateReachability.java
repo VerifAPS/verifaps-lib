@@ -62,7 +62,11 @@ public class StateReachability {
         gtt = table;
         sentinel.setDuration(new Duration(1, 1));
         flatList = gtt.getRegion().flat();
-        flatList.add(sentinel);
+
+        State lastState = flatList.get(flatList.size() - 1);
+        if (!lastState.getDuration().isOmega()) {
+            flatList.add(sentinel);
+        }
 
         initTable();
         addRegions(gtt.getRegion());
@@ -143,7 +147,6 @@ public class StateReachability {
                 //check for size
                 changed = changed || state.getOutgoing().size() != oldSize;
             }
-
         }
     }
 
@@ -153,20 +156,25 @@ public class StateReachability {
      * @param r
      */
     private void addRegions(Region r) {
-        if (r.getDuration().getUpper() > 1) {
-            r.getStates().get(r.getStates().size() - 1).getOutgoing()
-                    .add(r.getStates().get(0));
+        if (r.getDuration().isRepeatable()) {
+            List<State> flat = r.flat();
+            flat.get(r.getChildren().size() - 1).getOutgoing()
+                    .add(flat.get(0));
         }
 
         //Regions can be isSkippable
-        r.getStates().stream().filter(s -> s instanceof Region).forEach(s -> {
-            Region region = (Region) s;
-            addRegions(region);
+
+        r.getChildren().forEach(s -> {
+            if (!s.isLeaf()) {
+                addRegions((Region) s);
+            }
         });
     }
 
     /**
-     * i-th row can reach (i+1)-th row
+     * Initialize the table with the direct reachability.
+     * 1. i-th row can reach (i+1)-th row
+     * 2. End of the region, to beginning of a region.
      */
     private void initTable() {
         for (int i = 0; i < flatList.size() - 1; i++) {

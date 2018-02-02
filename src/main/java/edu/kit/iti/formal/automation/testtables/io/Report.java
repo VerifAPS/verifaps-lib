@@ -76,7 +76,7 @@ public class Report {
 
     private static void print(String level, String fmt, Object... args) {
         if (fmt == null) {
-return;//            throw new IllegalArgumentException("fmt is null");
+            return;//            throw new IllegalArgumentException("fmt is null");
         }
         Message.Log.Entry e = new Message.Log.Entry();
         e.setLevel(level);

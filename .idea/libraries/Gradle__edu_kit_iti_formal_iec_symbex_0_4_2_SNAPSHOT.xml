@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: edu.kit.iti.formal:iec-symbex:0.4.2-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/edu/kit/iti/formal/iec-symbex/0.4.2-SNAPSHOT/iec-symbex-0.4.2-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

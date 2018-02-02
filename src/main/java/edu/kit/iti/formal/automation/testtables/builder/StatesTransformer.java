@@ -31,6 +31,7 @@ import edu.kit.iti.formal.smv.ast.*;
 import java.util.List;
 
 /**
+ * Creates the states and definition for each row and time including error and sentinel.
  * Created by weigl on 17.12.16.
  *
  * @version 2

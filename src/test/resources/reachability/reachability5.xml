@@ -1,0 +1,13 @@
+<test-table xmlns="http://formal.iti.kit.edu/exteta-1.1" version="1.1">
+    <variables>
+        <variable io="input" name="i" data-type="BOOLEAN"/>
+        <variable io="output" name="o" data-type="BOOLEAN"/>
+    </variables>
+    <steps>
+        <step duration="[1,-]"><cell>T</cell><cell>F</cell></step>
+        <block duration="[1,-]">
+            <step duration="[1,1]"><cell>T</cell><cell>F</cell></step>
+        </block>
+        <step duration="[10,10]"><cell>T</cell><cell>F</cell></step>
+    </steps>
+</test-table>

@@ -33,27 +33,17 @@ import java.util.*;
  * @author Alexander Weigl
  * @version 1 (10.12.16)
  */
-public class State {
-    private final int id;
+public class State extends TableNode {
     private final List<SMVExpr> inputExpr = new ArrayList<>();
     private final List<SMVExpr> outputExpr = new ArrayList<>();
     private final Set<State> incoming = new HashSet<>();
     private final Set<State> outgoing = new HashSet<>();
-    private Duration duration = new Duration(1, 1);
     private List<AutomatonState> automataStates;
     private boolean initialReachable;
     private boolean endState;
 
     public State(int id) {
-        this.id = id;
-    }
-
-    public Duration getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Duration duration) {
-        this.duration = duration;
+        super(id);
     }
 
     public List<SMVExpr> getInputExpr() {
@@ -69,20 +59,23 @@ public class State {
         a.add(e);
     }
 
-    /**
-     * @return
-     */
+    @Override
+    public boolean isLeaf() {
+        return true;
+    }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public List<TableNode> getChildren() {
+        return Collections.EMPTY_LIST;
+    }
+
+    @Override
     public int count() {
         return 1;
     }
 
-    /**
-     * @return
-     */
-    public int getId() {
-        return id;
-    }
-
+    @Override
     public List<State> flat() {
         LinkedList<State> l = new LinkedList<>();
         l.add(this);
@@ -122,6 +115,7 @@ public class State {
         return new SVariable("s" + id + "_out", SMVType.BOOLEAN);
     }
 
+    @Override
     public List<AutomatonState> getAutomataStates() {
         if (automataStates == null)
             automataStates = new ArrayList<>();
@@ -153,6 +147,11 @@ public class State {
 
     public void setEndState(boolean endState) {
         this.endState = endState;
+    }
+
+    @Override
+    public int depth() {
+        return 0;
     }
 
     public class AutomatonState {

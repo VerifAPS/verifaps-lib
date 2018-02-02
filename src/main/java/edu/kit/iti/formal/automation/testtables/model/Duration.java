@@ -22,12 +22,18 @@ package edu.kit.iti.formal.automation.testtables.model;
  * #L%
  */
 
+import lombok.Data;
+
 /**
  * <p>Created on 10.12.16</p>
  *
  * @author Alexander Weigl
  */
+@Data
 public class Duration {
+    public static final Duration OMEGA = new Duration(-2, -2);
+    public static final Duration DET_WAIT = new Duration(-1, -1);
+
     private int lower;
     private int upper;
 
@@ -42,7 +48,7 @@ public class Duration {
     }
 
     public boolean invariant() {
-        return (upper >= lower || isUnbounded()) && lower >= 0;
+        return true;//(upper >= lower || isUnbounded()) && lower >= 0;
     }
 
     /**
@@ -83,6 +89,18 @@ public class Duration {
         return getBound() + 1;
     }
 
+
+    /**
+     *
+     */
+    public boolean isDeterministicWait() {
+        return equals(DET_WAIT);
+    }
+
+    public boolean isOmega() {
+        return equals(OMEGA);
+    }
+
     /**
      * Returns true if the duration is a singleton interval
      *
@@ -92,20 +110,12 @@ public class Duration {
         return upper == lower;
     }
 
-    public int getLower() {
-        return lower;
-    }
-
-    public void setLower(int lower) {
-        this.lower = lower;
-    }
-
-    public int getUpper() {
-        return upper;
-    }
-
-    public void setUpper(int upper) {
-        this.upper = upper;
+    /**
+     *
+     * @return true iff this row can be applied more than once.
+     */
+    public boolean isRepeatable() {
+        return upper > 1 || upper == OMEGA.upper || upper == DET_WAIT.upper;
     }
 
     /**

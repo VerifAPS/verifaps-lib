@@ -98,6 +98,16 @@ public class ExTeTa {
 
         //
         GeneralizedTestTable table = Facade.readTable(tableFilename);
+        OmegaSimplifier os = new OmegaSimplifier(table);
+        os.run();
+        if (!os.getIgnored().isEmpty()) {
+            table = os.getProduct();
+            System.out.printf("I ignore following rows: %s, because they are behind an \\omega duration.%n",
+                    os.getIgnored());
+        }
+
+
+        //
         TopLevelElements code = Facade.readProgram(codeFilename);
 
         if (cli.getOptionValue('m') != null)

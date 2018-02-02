@@ -160,7 +160,7 @@ public class StatesClockTransformer implements TableTransformer {
         // disable in the beginning
         mt.getInit().add(SMVFacade.NOT(errorState));
 
-        SMVExpr e = reachable.getStates().stream()
+        SMVExpr e = reachable.getChildren().stream()
                 .map(s ->
                         // s_i & I_i & !O_i
                         SMVFacade.combine(SBinaryOperator.AND,
@@ -175,7 +175,7 @@ public class StatesClockTransformer implements TableTransformer {
     }
 
     public void insertInitialState() {
-        reachable.getStates().forEach(s ->
+        reachable.getChildren().forEach(s ->
                 mt.getInit().add(
                         !reachable.isInitialReachable(s)
                                 ? SMVFacade.NOT(s.getSMVVariable())

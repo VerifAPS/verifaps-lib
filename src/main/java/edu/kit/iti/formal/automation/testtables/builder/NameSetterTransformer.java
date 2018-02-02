@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.TableModule;
 
 /**
+ * Transfers the name of the table to the name of the SMV module.
  * Created by weigl on 17.12.16.
  */
 public class NameSetterTransformer implements TableTransformer {

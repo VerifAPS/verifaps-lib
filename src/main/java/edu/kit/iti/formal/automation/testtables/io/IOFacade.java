@@ -76,6 +76,15 @@ public final class IOFacade {
     }
 
     public static Duration parseDuration(String duration) {
+        if(duration.equalsIgnoreCase("omega")) {
+            return Duration.OMEGA;
+        }
+
+        if(duration.equalsIgnoreCase("wait")) {
+            return Duration.DET_WAIT;
+        }
+
+
         CellExpressionParser parser = createParser(duration);
         CellExpressionParser.Fixed_intervalContext p = parser.fixed_interval();
         Duration d = new Duration();

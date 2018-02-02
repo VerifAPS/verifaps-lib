@@ -29,7 +29,6 @@ import edu.kit.iti.formal.automation.testtables.model.Region;
 import edu.kit.iti.formal.automation.testtables.model.State;
 import edu.kit.iti.formal.automation.testtables.schema.*;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
-import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 
 import javax.xml.bind.JAXBContext;
@@ -120,10 +119,10 @@ public class TableReader {
         }
         for (Object o : steps.getStepOrBlock()) {
             if (o instanceof Step) {
-                r.getStates().add(translateStep((Step) o));
+                r.getChildren().add(translateStep((Step) o));
             }
             else if (o instanceof Block) {
-                r.getStates().add(translateSteps((Block) o));
+                r.getChildren().add(translateSteps((Block) o));
             }
         }
         return r;

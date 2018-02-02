@@ -12,6 +12,9 @@ Generalized Test Tables ensures safety in automation software.
 
 These are jar files include all dependencies:
 
+* 0.6.0-alpha: **not released yet**
+  * \omega duration
+  * reintroduce blocks
 * 0.5.0-alpha: **not released**
   * new automata model
   * different verification techniques (IC3, BMC, LTL)
