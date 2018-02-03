@@ -9,6 +9,7 @@
 
 plugins {
     id 'com.github.jacobono.jaxb' version '1.3.5'
+    id 'com.github.kt3k.coveralls' version '2.8.2'
 }
 
 apply plugin: 'application'
@@ -88,6 +89,7 @@ System.setProperty('javax.xml.accessExternalSchema', 'file')
 jacocoTestReport {
     reports {
         csv.enabled true
+        xml.enabled = true // coveralls plugin depends on xml format report
     }
 }
 
@@ -176,4 +178,8 @@ task guiTest(type: Test) {
     testLogging {
         showStandardStreams = true
     }
+}
+
+tasks.coveralls {
+    //dependsOn 'check'
 }
