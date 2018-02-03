@@ -29,7 +29,7 @@ import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
-import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.*;
@@ -123,10 +123,10 @@ public class IEC61131Facade {
      * <p>resolveDataTypes.</p>
      *
      * @param elements a {@link edu.kit.iti.formal.automation.st.ast.TopLevelElements} object.
-     * @return a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
+     * @return a {@link edu.kit.iti.formal.automation.scope.Scope} object.
      */
-    public static GlobalScope resolveDataTypes(TopLevelElements elements) {
-        GlobalScope scope = GlobalScope.defaultScope();
+    public static Scope resolveDataTypes(TopLevelElements elements) {
+        Scope scope = Scope.defaultScope();
         FindDataTypes fdt = new FindDataTypes(scope);
         ResolveDataTypes rdt = new ResolveDataTypes(scope);
         elements.accept(fdt);
@@ -140,7 +140,7 @@ public class IEC61131Facade {
      * @param globalScope Global scope after data types have been resolved.
      * @return The instance scope containing all instances.
      */
-    public static InstanceScope findInstances(TopLevelElement element, GlobalScope globalScope) {
+    public static InstanceScope findInstances(TopLevelElement element, Scope globalScope) {
         InstanceScope instanceScope = new InstanceScope(globalScope);
         element.accept(new FindInstances(instanceScope));
         return instanceScope;
@@ -148,7 +148,7 @@ public class IEC61131Facade {
 
     private static final int FIND_EFFECTIVE_SUBTYPES_LIMIT = 1000;
 
-    public static void findEffectiveSubtypes(TopLevelElements topLevelElements, GlobalScope globalScope) {
+    public static void findEffectiveSubtypes(TopLevelElements topLevelElements, Scope globalScope) {
         FindEffectiveSubtypes findEffectiveSubtypes = new FindEffectiveSubtypes();
         for (int i = 0; i < FIND_EFFECTIVE_SUBTYPES_LIMIT; i++) {
             findEffectiveSubtypes.prepareRun();
@@ -167,7 +167,7 @@ public class IEC61131Facade {
     public static String printTopLevelElements(TopLevelElements topLevelElements) {
         StringBuilder sb = new StringBuilder();
         // Resolve data types and print them
-        GlobalScope gs = resolveDataTypes(topLevelElements);
+        Scope gs = resolveDataTypes(topLevelElements);
         sb.append("   " + gs.getInterfaces().size() + " Interfaces:\n");
         for (TopLevelElement topLevelElement : gs.getInterfaces())
             sb.append(topLevelElement + "\n");

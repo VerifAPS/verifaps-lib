@@ -22,12 +22,11 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,30 +38,18 @@ import java.util.stream.Collectors;
  */
 
 @Data
-public class ClassDeclaration extends TopLevelScopeElement {
-    private String name;
+public class ClassDeclaration extends Classifier<ParserRuleContext> {
     private boolean final_ = false;
     private boolean abstract_ = false;
+
     private IdentifierPlaceHolder<ClassDeclaration> parent = new IdentifierPlaceHolder<>();
-    private List<IdentifierPlaceHolder<InterfaceDeclaration>> interfaces = new ArrayList<>();
-    private List<MethodDeclaration> methods = new ArrayList<>();
 
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @Override public String getIdentifier() {
-        return name;
-    }
-
     public void setParent(String parent) {
         this.parent.setIdentifier(parent);
-    }
-
-    public void setMethods(List<MethodDeclaration> methods) {
-        for (MethodDeclaration methodDeclaration : methods)
-            methodDeclaration.setParent(this);
-        this.methods = methods;
     }
 
     public void addImplements(String interfaze) {
@@ -73,16 +60,9 @@ public class ClassDeclaration extends TopLevelScopeElement {
         interfaceList.forEach(i -> addImplements(i));
     }
 
-    @Override
-    public void setGlobalScope(GlobalScope global) {
-        super.setGlobalScope(global);
-        parent.setIdentifiedObject(global.resolveClass(parent.getIdentifier()));
-        for (IdentifierPlaceHolder<InterfaceDeclaration> interfaceDeclaration : interfaces)
-            interfaceDeclaration.setIdentifiedObject(global.resolveInterface(interfaceDeclaration.getIdentifier()));
-    }
-
     /**
      * To be called only after bound to global scope!
+     *
      * @return The parent class. Return null if the class has no parent.
      */
     public ClassDeclaration getParentClass() {
@@ -91,6 +71,7 @@ public class ClassDeclaration extends TopLevelScopeElement {
 
     /**
      * To be called only after bound to global scope!
+     *
      * @return The list of classes the class can be an instance of, taking polymorphy into account.
      */
     public List<ClassDeclaration> getExtendedClasses() {
@@ -104,6 +85,7 @@ public class ClassDeclaration extends TopLevelScopeElement {
 
     /**
      * To be called only after bound to global scope!
+     *
      * @return Whether the class extends the given other class.
      */
     public boolean extendsClass(ClassDeclaration otherClass) {
@@ -117,6 +99,7 @@ public class ClassDeclaration extends TopLevelScopeElement {
 
     /**
      * To be called only after bound to global scope!
+     *
      * @return The interfaces the class implements. Includes the interfaces of all parent classes.
      */
     public List<InterfaceDeclaration> getImplementedInterfaces() {
@@ -133,15 +116,8 @@ public class ClassDeclaration extends TopLevelScopeElement {
         return implementedInterfaces;
     }
 
-    /**
-     * To be called only after bound to global scope!
-     * @return Whether the class implements the given interface.
-     */
-    public boolean implementsInterface(InterfaceDeclaration interfaceDeclaration) {
-        return getImplementedInterfaces().contains(interfaceDeclaration);
-    }
-
-    @Override public ClassDeclaration copy() {
+    @Override
+    public ClassDeclaration copy() {
         ClassDeclaration c = new ClassDeclaration();
         c.name = name;
         c.final_ = final_;

@@ -24,7 +24,8 @@ package edu.kit.iti.formal.automation.visitors;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
+import edu.kit.iti.formal.automation.sfclang.ast.*;
 import edu.kit.iti.formal.automation.st.ast.*;
 
 /**
@@ -306,10 +307,10 @@ public interface Visitor<T> {
     /**
      * <p>accept.</p>
      *
-     * @param localScope a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
+     * @param localScope a {@link edu.kit.iti.formal.automation.scope.Scope} object.
      * @return a T object.
      */
-    T visit(LocalScope localScope);
+    T visit(Scope localScope);
 
     /**
      * <p>accept.</p>
@@ -380,4 +381,14 @@ public interface Visitor<T> {
     T visit(ReferenceSpecification referenceSpecification);
 
     T visit(GlobalVariableListDeclaration globalVariableListDeclaration);
+
+    T visit(SFCStep sfcStep);
+
+    T visit(SFCAction sfcAction);
+
+    T visit(SFCNetwork sfcNetwork);
+
+    T visit(SFCImplementation sfc);
+
+    T visit(SFCTransition transition);
 }

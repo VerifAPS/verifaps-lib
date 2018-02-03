@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.run
 
-import edu.kit.iti.formal.automation.scope.GlobalScope
+import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.st.ast.StructureTypeDeclaration
@@ -39,7 +39,7 @@ class TypeDeclarationAdder {
     /**
      * add queued type declarations to the [globalScope]
      */
-    fun addQueuedDeclarations(globalScope: GlobalScope): TypeDeclarationAdder {
+    fun addQueuedDeclarations(globalScope: Scope): TypeDeclarationAdder {
         typeDeclarations.forEach { globalScope.registerType(it) }
         typeDeclarations.retainAll(emptyList())
 

@@ -23,11 +23,11 @@ package edu.kit.iti.formal.automation.plcopenxml;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.scope.LocalScope;
-import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
+import edu.kit.iti.formal.automation.scope.Scope;
+import edu.kit.iti.formal.automation.sfclang.ast.SFCAction;
+import edu.kit.iti.formal.automation.sfclang.ast.SFCImplementation;
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
-import javafx.scene.NodeBuilder;
+import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import lombok.Data;
 import lombok.ToString;
 import org.jdom2.Attribute;
@@ -45,9 +45,6 @@ import java.util.*;
  */
 public class SFCFactory extends DefaultPOUBuilder implements PCLOpenXMLBuilder.Builder {
     private static final String CODESYS_ON_STEP = "700a583f-b4d4-43e4-8c14-629c7cd3bec8";
-    private SFCDeclaration decl = new SFCDeclaration();
-    private Map<Integer, NodeBuilder> builders = new HashMap<>();
-
     private static final XPathExpression<Element> xpathFindRootStep;
     private static final XPathExpression<Element> xpathGetLocalId;
     private static final XPathExpression<Element> xpathGetVendorData;
@@ -72,19 +69,30 @@ public class SFCFactory extends DefaultPOUBuilder implements PCLOpenXMLBuilder.B
                 Filters.element(), id);
     }
 
+    Set<Node> steps = new HashSet<>();
+    private FunctionBlockDeclaration decl = new FunctionBlockDeclaration();
+    private SFCImplementation sfc = new SFCImplementation();
+
     public SFCFactory(Element element) {
         super(element);
     }
 
-    @Override
-    public TopLevelElement build() {
-        LocalScope vs = parseInterface();
-        parseActions();
-        traverse();
-        return decl;
+    private static String getVendorSpecificAttribute(Element e, String guid) {
+        xpathGetVendorData.setVariable("id", guid);
+        Element element = xpathGetVendorData.evaluateFirst(e);
+        return element == null ? "" : element.getTextTrim();
     }
 
-    Set<Node> steps = new HashSet<>();
+    @Override
+    public TopLevelElements build() {
+        Scope vs = parseInterface();
+        decl.setSfcBody(sfc);
+        parseActions();
+        traverse();
+        TopLevelElements tle = new TopLevelElements();
+        tle.add(decl);
+        return tle;
+    }
 
     private void traverse() {
         Element rootStep = xpathFindRootStep.evaluateFirst(element);
@@ -135,22 +143,15 @@ public class SFCFactory extends DefaultPOUBuilder implements PCLOpenXMLBuilder.B
         }
     }
 
-
-    private static String getVendorSpecificAttribute(Element e, String guid) {
-        xpathGetVendorData.setVariable("id", guid);
-        Element element = xpathGetVendorData.evaluateFirst(e);
-        return element == null ? "" : element.getTextTrim();
-    }
-
     private void parseActions() {
         XPathExpression<Element> xpath = XPathFactory.instance().compile("//action", Filters.element());
         for (Element action : xpath.evaluate(element)) {
             String name = action.getAttributeValue("name");
             String stCode = action.getChild("body").getChild("ST").getChildText("xhtml");
-            FunctionBlockDeclaration act = new FunctionBlockDeclaration();
+            SFCAction act = new SFCAction();
             act.setName(name);
-            act.setFunctionBody(IEC61131Facade.statements(stCode));
-            decl.getActions().add(act);
+            act.setStBody(IEC61131Facade.statements(stCode));
+            sfc.getActions().add(act);
         }
     }
 

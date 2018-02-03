@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.RangeType;
-import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.EqualsAndHashCode;
@@ -62,7 +62,7 @@ public class SubRangeTypeDeclaration extends TypeDeclaration<Literal> {
      * {@inheritDoc}
      */
     @Override
-    public RangeType getDataType(GlobalScope globalScope) {
+    public RangeType getDataType(Scope globalScope) {
         RangeType rt = new RangeType(
               /* TODO (long) range.getStart().getValue(),
                 (long) range.getStop().getValue(),

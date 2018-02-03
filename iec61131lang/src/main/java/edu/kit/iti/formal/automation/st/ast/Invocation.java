@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -107,7 +107,7 @@ public class Invocation extends Initialization {
      * {@inheritDoc}
      */
     @Override
-    public Any dataType(LocalScope localScope) {
+    public Any dataType(Scope localScope) {
         return ((Invocable) callee.getIdentifiedObject()).getReturnType();
     }
 

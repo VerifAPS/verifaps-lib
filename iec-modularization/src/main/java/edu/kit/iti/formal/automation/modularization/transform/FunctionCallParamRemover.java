@@ -32,25 +32,25 @@ import java.util.ArrayList;
 
 public final class FunctionCallParamRemover extends StatementListModifier {
 
-	public FunctionCallParamRemover() {
-		super(false);
-	}
+    public FunctionCallParamRemover() {
+        super(false);
+    }
 
-	public final StatementList visit(
-			final InvocationStatement fbCallStmt) {
+    public final StatementList visit(
+            final InvocationStatement fbCallStmt) {
 
-		assert fbCallStmt.getOutputParameters().count() == 0;
+        assert fbCallStmt.getOutputParameters().size() == 0;
 
-		final String prefix = fbCallStmt.getCalleeName() + "$";
+        final String prefix = fbCallStmt.getCalleeName() + "$";
 
-		fbCallStmt.getInputParameters().forEach((param) -> _addToCurrentList(
-				new AssignmentStatement(
-						new SymbolicReference(
-								prefix + param.getName()),
-						param.getExpression())));
-		_addToCurrentList(fbCallStmt);
+        fbCallStmt.getInputParameters().forEach((param) -> _addToCurrentList(
+                new AssignmentStatement(
+                        new SymbolicReference(
+                                prefix + param.getName()),
+                        param.getExpression())));
+        _addToCurrentList(fbCallStmt);
 
-		fbCallStmt.setParameters(new ArrayList<>());
-		return null;
-	}
+        fbCallStmt.setParameters(new ArrayList<>());
+        return null;
+    }
 }

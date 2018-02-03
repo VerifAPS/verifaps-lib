@@ -82,11 +82,11 @@ public class ModuleBuilder implements Runnable {
         module.setName(program.getProgramName());
 
         Set<VariableDeclaration> outputVars =
-                new HashSet<>(program.getLocalScope()
+                new HashSet<>(program.getScope()
                         .filterByFlags(VariableDeclaration.OUTPUT));
 
         List<VariableDeclaration> inputVars =
-                program.getLocalScope()
+                program.getScope()
                         .filterByFlags(VariableDeclaration.INPUT);
 
 
@@ -123,7 +123,7 @@ public class ModuleBuilder implements Runnable {
     }
 
     private void addInitAssignment(SVariable var) {
-        VariableDeclaration s = program.getLocalScope().getVariable(var.getName());
+        VariableDeclaration s = program.getScope().getVariable(var.getName());
         SMVExpr e;
         if (s.getInit() != null) {
             Literal sv = (Literal) s.getInit();

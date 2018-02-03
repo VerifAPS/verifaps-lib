@@ -27,7 +27,7 @@ import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.datatypes.values.ValueTransformation;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.sfclang.Utils;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
@@ -185,7 +185,7 @@ public class Literal extends Initialization {
     }
 
     @Override
-    public Any dataType(LocalScope localScope) throws VariableNotDefinedException, TypeConformityException {
+    public Any dataType(Scope localScope) throws VariableNotDefinedException, TypeConformityException {
         return dataType.getIdentifiedObject();
     }
 

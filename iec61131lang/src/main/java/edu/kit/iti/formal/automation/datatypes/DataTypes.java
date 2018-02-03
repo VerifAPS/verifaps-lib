@@ -23,10 +23,7 @@ package edu.kit.iti.formal.automation.datatypes;
  */
 
 import java.math.BigInteger;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -45,11 +42,11 @@ public class DataTypes {
     public static final DInt DINT = new DInt();
     public static final ULInt ULINT = new ULInt();
     public static final LInt LINT = new LInt();
-    public static final AnyInt UNKNWON_SIGNED_INT = new AnySignedInt(-1);
-    public static final AnyUnsignedInt UNKNWON_UNSIGNED_INT = new AnyUnsignedInt(-1);
+    public static final AnyInt UNKNWON_SIGNED_INT = new AnySignedInt.Arbitrary(-1);
+    public static final AnyUnsignedInt UNKNWON_UNSIGNED_INT = new AnyUnsignedInt.Arbitrary(-1);
     public static final AnyInt ANY_INT = new AnySignedInt(-1) {
         @Override
-        public AnyInt next() {
+        public Optional<AnyInt> next() {
             return null;
         }
 

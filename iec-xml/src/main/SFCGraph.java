@@ -26,7 +26,7 @@ import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.plcopenxml.IECExpressions;
 import edu.kit.iti.formal.automation.plcopenxml.sfc.SFCBuilder;
 import edu.kit.iti.formal.automation.plcopenxml.sfc.StepBuilder;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.Expression;
 import edu.kit.iti.formal.automation.st.ast.StatementList;
 import edu.kit.iti.formal.automation.visitors.VFactory;
@@ -70,11 +70,11 @@ public class SFCGraph {
         }
     }
 
-    public LocalScope getScope() {
+    public Scope getScope() {
         return scope;
     }
 
-    public void setScope(LocalScope scope) {
+    public void setScope(Scope scope) {
         this.scope = scope;
     }
 

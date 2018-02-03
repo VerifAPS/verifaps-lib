@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.datatypes;
  */
 
 import java.math.BigInteger;
+import java.util.Optional;
 
 /**
  * <p>Abstract AnyInt class.</p>
@@ -31,10 +32,7 @@ import java.math.BigInteger;
  * @version $Id: $Id
  */
 public abstract class AnyInt extends AnyNum {
-
-
     protected int bitLength = 0;
-
     protected boolean signed = false;
 
     /**
@@ -73,6 +71,11 @@ public abstract class AnyInt extends AnyNum {
 
         int bits = (int) Math.ceil(Math.log(number) / Math.log(2));
 
+        for (AnyInt candidate : values) {
+            if(candidate.bitLength >= bits)
+                return candidate;
+        }
+
         if (bits < 0)
             return unsigned ? DataTypes.USINT : DataTypes.SINT;
 
@@ -81,19 +84,9 @@ public abstract class AnyInt extends AnyNum {
                 return bit;*/
 
         if (unsigned)
-            return new AnyUnsignedInt(bits) {
-                @Override
-                public String getName() {
-                    return "UINT";
-                }
-            };
+            return new AnyUnsignedInt.Arbitrary(bits);
         else
-            return new AnySignedInt(bits) {
-                @Override
-                public String getName() {
-                    return "INT[" + bitLength + "]";
-                }
-            };
+            return new AnySignedInt.Arbitrary(bits);
     }
 
     /**
@@ -145,7 +138,7 @@ public abstract class AnyInt extends AnyNum {
      *
      * @return a {@link edu.kit.iti.formal.automation.datatypes.AnyInt} object.
      */
-    public abstract AnyInt next();
+    public abstract Optional<AnyInt> next();
 
     /**
      * <p>asUnsgined.</p>
@@ -216,6 +209,7 @@ public abstract class AnyInt extends AnyNum {
     }
 
     public abstract BigInteger getUpperBound();
+
     public abstract BigInteger getLowerBound();
 
 }

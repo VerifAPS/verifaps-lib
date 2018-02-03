@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.st0.trans;
  */
 
 import edu.kit.iti.formal.automation.datatypes.IECArray;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
@@ -33,7 +33,7 @@ import edu.kit.iti.formal.automation.visitors.Visitable;
  * Created by weigl on 03/10/14.
  */
 public class ArrayEmbedder extends AstMutableVisitor {
-    private LocalScope currentScope;
+    private Scope currentScope;
 
 
     @Override
@@ -43,25 +43,25 @@ public class ArrayEmbedder extends AstMutableVisitor {
 
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
-        currentScope = (LocalScope) programDeclaration.getLocalScope().accept(this);
+        currentScope = (Scope) programDeclaration.getScope().accept(this);
         ProgramDeclaration pd = (ProgramDeclaration) super.visit(programDeclaration);
-        pd.setLocalScope(currentScope);
+        pd.setScope(currentScope);
         return pd;
     }
 
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
-        currentScope = (LocalScope) functionDeclaration.getLocalScope().accept(this);
+        currentScope = (Scope) functionDeclaration.getScope().accept(this);
         ProgramDeclaration pd = (ProgramDeclaration) super.visit(functionDeclaration);
-        pd.setLocalScope(currentScope);
+        pd.setScope(currentScope);
         return pd;
     }
 
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        currentScope = (LocalScope) functionBlockDeclaration.getLocalScope().accept(this);
+        currentScope = (Scope) functionBlockDeclaration.getScope().accept(this);
         ProgramDeclaration pd = (ProgramDeclaration) super.visit(functionBlockDeclaration);
-        pd.setLocalScope(currentScope);
+        pd.setScope(currentScope);
         return pd;
     }
 

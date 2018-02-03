@@ -5,154 +5,30 @@
     <parent>
         <artifactId>verifaps-lib</artifactId>
         <groupId>edu.kit.iti.formal</groupId>
-        <version>1.4.1-SNAPSHOT</version>
+        <version>1.5.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>iec-assertEqualBehaviour</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.1.4-3</kotlin.version>
-        <junit.version>4.12</junit.version>
-        <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
-    </properties>
-
-    <repositories>
-        <repository>
-            <id>kit-maven</id>
-            <name>kit-maven</name>
-            <url>http://formal.iti.kit.edu/maven2/</url>
-        </repository>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <id>jcenter</id>
-            <name>JCenter</name>
-            <url>https://jcenter.bintray.com/</url>
-        </repository>
-    </repositories>
+    <artifactId>iec-modularization</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>edu.kit.iti.formal</groupId>
             <artifactId>iec61131lang</artifactId>
-            <version>0.1.15-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.kit.iti.formal</groupId>
             <artifactId>smv-model</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.kit.iti.formal</groupId>
             <artifactId>iec-xml</artifactId>
-            <version>0.1.1-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.xenomachina</groupId>
-            <artifactId>kotlin-argparser</artifactId>
-            <version>2.0.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jre8</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test-junit</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>no.tornado</groupId>
-            <artifactId>tornadofx</artifactId>
-            <version>1.7.7</version>
         </dependency>
         <dependency>
             <groupId>edu.kit.iti.formal</groupId>
             <artifactId>iec-symbex</artifactId>
-            <version>0.4.2-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.github.microutils</groupId>
-            <artifactId>kotlin-logging</artifactId>
-            <version>1.4.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.dokka</groupId>
-            <artifactId>dokka-fatjar</artifactId>
-            <version>${dokka.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib</artifactId>
-            <version>${kotlin.version}</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <sourceDirectory>src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
-
-        <plugins>
-            <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <configuration>
-                    <jvmTarget>1.8</jvmTarget>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.jetbrains.dokka</groupId>
-                <artifactId>dokka-maven-plugin</artifactId>
-                <version>${dokka.version}</version>
-                <executions>
-                    <execution>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>dokka</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <includes>
-                        <include>Module.md</include>
-                    </includes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

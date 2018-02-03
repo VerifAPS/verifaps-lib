@@ -6,18 +6,16 @@
     <parent>
         <groupId>edu.kit.iti.formal</groupId>
         <artifactId>verifaps-lib</artifactId>
-        <version>1.4.1-SNAPSHOT</version>
+        <version>1.5.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <artifactId>iec61131lang</artifactId>
-    <version>0.1.15-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>iec61131lang</name>
     <description>Parser and AST for IEC61131-3 languages</description>
     <url>http://github.com/VerifAPS/iec61131lang</url>
-
 
     <distributionManagement>
         <repository>
@@ -65,7 +63,6 @@
                     <aggregate>true</aggregate>
                 </configuration>
             </plugin>
-
         </plugins>
 
     </build>

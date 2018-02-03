@@ -307,7 +307,7 @@ function_declaration
 	FUNCTION identifier = IDENTIFIER COLON
 	( returnET=elementary_type_name	| returnID=IDENTIFIER)
 	var_decls
-	body = statement_list END_FUNCTION
+	funcBody END_FUNCTION
 ;
 
 var_decls
@@ -318,8 +318,13 @@ var_decls
 var_decl
 :
     variable_keyword
-    (identifier_list COLON td=type_declaration SEMICOLON)*
+    var_decl_inner
     END_VAR
+;
+
+var_decl_inner
+:
+        (identifier_list COLON td=type_declaration SEMICOLON)*
 ;
 
 
@@ -359,9 +364,12 @@ function_block_declaration
 	(IMPLEMENTS interfaces=identifier_list)?
 	var_decls
 	methods
-	body = statement_list
+	body
 	END_FUNCTION_BLOCK
 ;
+
+body : sfc | /*| ladder_diagram | fb_diagram | instruction_list |*/ statement_list;
+funcBody : /*ladder_diagram | fb_diagram | instruction_list |*/ statement_list;
 
 interface_declaration
 :
@@ -395,7 +403,7 @@ method
     (COLON ( returnET=elementary_type_name
           	| returnID=IDENTIFIER))?
     var_decls
-    body = statement_list
+    body
     END_METHOD
 ;
 
@@ -403,12 +411,14 @@ program_declaration
 :
 	PROGRAM identifier=IDENTIFIER
 	var_decls
-	body = statement_list END_PROGRAM
+	body END_PROGRAM
 ;
 
 global_variable_list_declaration
 :
-    GVL var_decls END_GVL
+    VAR_GLOBAL
+        var_decl_inner
+    END_VAR
 ;
 
 /*
@@ -695,10 +705,9 @@ variable
 ;
 
 symbolic_variable
-
 :
     //x^[a,252]
-	a=(IDENTIFIER|SUPER|THIS|GVL)
+	a=(IDENTIFIER|SUPER|THIS)
 	(
         (deref += REF)*
 	)?
@@ -768,7 +777,7 @@ for_statement
 :
 	FOR var=IDENTIFIER ASSIGN
 	begin=expression TO endPosition=expression
-	(BY step = expression)?
+	(BY by=expression)?
 	DO statement_list END_FOR
 ;
 
@@ -788,9 +797,22 @@ exit_statement
 ;
 
 
-/**
- * SFC LANG
- */
+ // Table 54 - 61 - Sequential Function Chart (SFC)
+ sfc:  sfc_network+;
+ sfc_network : init_step (step | transition | action )*;
+ init_step : INITIAL_STEP step_name=IDENTIFIER COLON ( action_association SEMICOLON )* END_STEP;
+ step : STEP step_name=IDENTIFIER COLON ( action_association SEMICOLON )* END_STEP;
+ action_association : actionName=IDENTIFIER '(' actionQualifier ? ( ',' indicatorName=IDENTIFIER )* ')';
+ actionQualifier : IDENTIFIER (COMMA actionTime )?;
+ actionTime: TIME_LITERAL | IDENTIFIER;
+ transition : TRANSITION name=IDENTIFIER? ( LPAREN PRIORITY ASSIGN INTEGER_LITERAL RPAREN)?
+                FROM from=steps TO to=steps transitionCond END_TRANSITION;
+ steps : IDENTIFIER | LPAREN IDENTIFIER ( COMMA IDENTIFIER )+ RPAREN;
+ transitionCond : ASSIGN expression SEMICOLON /*| COLON ( FBD_Network | LD_Rung ) | ':=' IL_Simple_Inst*/;
+ action : ACTION IDENTIFIER COLON body END_ACTION;
+//
+
+/*
 start_sfc 
 :
 	SFC identifier=IDENTIFIER
@@ -830,3 +852,4 @@ event
 		| action=IDENTIFIER
     )
 ;
+*/

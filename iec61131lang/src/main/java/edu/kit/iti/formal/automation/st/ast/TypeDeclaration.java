@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -137,10 +137,10 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
     /**
      * <p>getDataType.</p>
      *
-     * @param globalScope a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
+     * @param globalScope a {@link edu.kit.iti.formal.automation.scope.Scope} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
-    public Any getDataType(GlobalScope globalScope) {
+    public Any getDataType(Scope globalScope) {
         setBaseType(globalScope.resolveDataType(getBaseTypeName()));
         return getBaseType();
     }

@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.plcopenxml;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import org.jdom2.Element;
 
@@ -37,9 +37,8 @@ public class STBuilder extends DefaultPOUBuilder {
     }
 
     @Override
-    public TopLevelElement build() {
-        TopLevelScopeElement topLevelElement = null;
-        LocalScope scope = parseInterface();
+    public TopLevelElements build() {
+        Scope scope = parseInterface();
         String name = element.getAttributeValue("name");
         String code = element.getChild("body").getChild("ST").getChildText("xhtml");
         StatementList body = IEC61131Facade.statements(code);
@@ -47,16 +46,16 @@ public class STBuilder extends DefaultPOUBuilder {
         switch (element.getAttributeValue("pouType")) {
             case "program":
                 ProgramDeclaration pd = new ProgramDeclaration();
-                pd.setProgramBody(body);
+                pd.setStBody(body);
                 pd.setProgramName(name);
-                pd.setLocalScope(scope);
-                return pd;
+                pd.setScope(scope);
+                return TopLevelElements.singleton(pd);
             default:
                 FunctionBlockDeclaration fbd = new FunctionBlockDeclaration();
-                fbd.setFunctionBody(body);
+                fbd.setStBody(body);
                 fbd.setName(name);
-                fbd.setLocalScope(scope);
-                return fbd;
+                fbd.setScope(scope);
+                return TopLevelElements.singleton(fbd);
         }
     }
 }

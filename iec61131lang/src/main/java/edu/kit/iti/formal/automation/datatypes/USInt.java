@@ -22,6 +22,8 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import java.util.Optional;
+
 /**
  * <p>USInt class.</p>
  *
@@ -34,6 +36,16 @@ public final class USInt extends AnyUnsignedInt {
      */
     public USInt() {
         super(8);
+    }
+
+    @Override
+    public Optional<AnyInt> next() {
+        return Optional.of(DataTypes.UINT);
+    }
+
+    @Override
+    public AnyInt asSigned() {
+        return DataTypes.SINT;
     }
 
     @Override

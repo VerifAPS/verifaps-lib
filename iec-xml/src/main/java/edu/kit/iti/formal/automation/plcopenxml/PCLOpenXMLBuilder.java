@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.plcopenxml;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
+import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import org.jdom2.*;
 import org.jdom2.filter.Filters;
@@ -43,10 +43,27 @@ import java.util.List;
  * Created by weigl on 23/06/14.
  */
 public class PCLOpenXMLBuilder {
+    private static final SAXHandlerFactory FACTORY = new SAXHandlerFactory() {
+        @Override
+        public SAXHandler createSAXHandler(JDOMFactory factory) {
+            return new SAXHandler() {
+                @Override
+                public void startElement(
+                        String namespaceURI, String localName, String qName, Attributes atts)
+                        throws SAXException {
+                    super.startElement("", localName, qName, atts);
+                }
+
+                @Override
+                public void startPrefixMapping(String prefix, String uri) throws SAXException {
+                    return;
+                }
+            };
+        }
+    };
     private final File filename;
     private XPathFactory xpathFactory = XPathFactory.instance();
     private List<Builder> builders = new ArrayList<>();
-
 
     public PCLOpenXMLBuilder(File filename) {
         this.filename = filename;
@@ -58,7 +75,6 @@ public class PCLOpenXMLBuilder {
         return saxBuilder.build(filename);
     }
 
-
     public TopLevelElements build() throws JDOMException, IOException {
         Document p = loadXml();
         p.getRootElement().setNamespace(Namespace.NO_NAMESPACE);
@@ -66,9 +82,12 @@ public class PCLOpenXMLBuilder {
         addBuilders("//pou[body/FB]", this::createFBFactory, p);
         addBuilders("//pou[body/ST]", this::createSTFactory, p);
 
-        builders.forEach(Builder::build);
+        TopLevelElements ast = new TopLevelElements();
+        builders.forEach(b -> {
+            ast.addAll(b.build());
+        });
 
-        return null;
+        return ast;
     }
 
     private Builder createSTFactory(Element element) {
@@ -95,25 +114,6 @@ public class PCLOpenXMLBuilder {
     }
 
     interface Builder {
-        TopLevelElement build();
+        TopLevelElements build();
     }
-
-    private static final SAXHandlerFactory FACTORY = new SAXHandlerFactory() {
-        @Override
-        public SAXHandler createSAXHandler(JDOMFactory factory) {
-            return new SAXHandler() {
-                @Override
-                public void startElement(
-                        String namespaceURI, String localName, String qName, Attributes atts)
-                        throws SAXException {
-                    super.startElement("", localName, qName, atts);
-                }
-
-                @Override
-                public void startPrefixMapping(String prefix, String uri) throws SAXException {
-                    return;
-                }
-            };
-        }
-    };
 }

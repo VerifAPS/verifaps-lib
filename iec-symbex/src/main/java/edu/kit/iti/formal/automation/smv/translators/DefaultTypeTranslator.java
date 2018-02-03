@@ -30,7 +30,7 @@ import edu.kit.iti.formal.smv.ast.SMVType;
 /**
  * Created by weigl on 11.12.16.
  */
-public class DefaultTypeTranslator implements TypeTranslator{
+public class DefaultTypeTranslator implements TypeTranslator {
     public static final DefaultTypeTranslator INSTANCE = new DefaultTypeTranslator();
 
     @Override
@@ -97,32 +97,32 @@ public class DefaultTypeTranslator implements TypeTranslator{
 
         @Override
         public SMVType visit(TimeType timeType) {
-            throw new IllegalTypeException("Could not match");
+            throw new IllegalTypeException("Could not match" + timeType);
         }
 
         @Override
         public SMVType visit(RangeType rangeType) {
-            throw new IllegalTypeException("Could not match");
+            throw new IllegalTypeException("Could not match" + rangeType);
         }
 
         @Override
         public SMVType visit(RecordType recordType) {
-            throw new IllegalTypeException("Could not match");
+            throw new IllegalTypeException("Could not match " + recordType);
         }
 
         @Override
         public SMVType visit(PointerType pointerType) {
-            throw new IllegalTypeException("Could not match");
+            throw new IllegalTypeException("Could not match" + pointerType);
         }
 
         @Override
         public SMVType visit(IECString.String string) {
-            throw new IllegalTypeException("Could not match");
+            throw new IllegalTypeException("Could not match" + string);
         }
 
         @Override
         public SMVType visit(IECString.WString wString) {
-            throw new IllegalTypeException("Could not match");
+            throw new IllegalTypeException("Could not match " + wString);
         }
 
         @Override
@@ -132,7 +132,7 @@ public class DefaultTypeTranslator implements TypeTranslator{
 
         @Override
         public SMVType visit(AnyNum anyNum) {
-            throw new IllegalTypeException("Could not match");
+            throw new IllegalTypeException("Could not match: " + anyNum);
         }
 
         @Override

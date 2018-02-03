@@ -11,7 +11,7 @@ import edu.kit.iti.formal.automation.datatypes.values.Value
 import edu.kit.iti.formal.automation.datatypes.values.Values
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.run.stexceptions.ExecutionException
-import edu.kit.iti.formal.automation.scope.LocalScope
+import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
@@ -23,7 +23,7 @@ import java.util.*
  * ExpressionVisitor resolves variable values in [state] and declarations in [localScope]
  * ExpressionVisitor may modifies [state] indirectly through Runtime
  */
-class ExpressionVisitor(private val state : State, private val localScope : LocalScope) : DefaultVisitor<ExpressionValue>() {
+class ExpressionVisitor(private val state : State, private val localScope : Scope) : DefaultVisitor<ExpressionValue>() {
 
     override fun defaultVisit(visitable: Visitable?): ExpressionValue {
         TODO("missing visitor for visitable ${visitable.toString()}")
@@ -56,8 +56,8 @@ class ExpressionVisitor(private val state : State, private val localScope : Loca
 
         val innerState = TopState()
         val functionDeclaration = localScope.globalScope.getFunction(functionCall.functionName)
-        val definitionScopeStack = Stack<LocalScope>()
-        functionDeclaration.setGlobalScope(localScope.globalScope)
+        val definitionScopeStack = Stack<Scope>()
+        functionDeclaration.setScope(localScope.globalScope)
 
         definitionScopeStack.push(functionDeclaration.localScope)
 

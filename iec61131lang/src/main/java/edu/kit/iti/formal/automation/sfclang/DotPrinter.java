@@ -22,9 +22,11 @@ package edu.kit.iti.formal.automation.sfclang;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
-import edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration;
-import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
+import edu.kit.iti.formal.automation.sfclang.ast.SFCImplementation;
+import edu.kit.iti.formal.automation.sfclang.ast.SFCNetwork;
+import edu.kit.iti.formal.automation.sfclang.ast.SFCStep;
+import edu.kit.iti.formal.automation.sfclang.ast.SFCTransition;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.st.util.CodeWriter;
 
 /**
@@ -33,52 +35,55 @@ import edu.kit.iti.formal.automation.st.util.CodeWriter;
  * @author weigl
  * @version $Id: $Id
  */
-public class DotPrinter implements SFCAstVisitor<CodeWriter> {
+public class DotPrinter extends AstVisitor<Void> {
+    private CodeWriter cw = new CodeWriter();
 
-	private CodeWriter cw = new CodeWriter();
+    public static String dot(SFCImplementation decl) {
+        DotPrinter p = new DotPrinter();
+        p.visit(decl);
+        return p.cw.toString();
+    }
 
-	/**
-	 * <p>dot.</p>
-	 *
-	 * @param decl a {@link edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration} object.
-	 * @return a {@link java.lang.String} object.
-	 */
-	public static String dot(SFCDeclaration decl) {
-		DotPrinter p = new DotPrinter();
-		p.visit(decl);
-		return p.cw.toString();
-	}
+    @Override
+    public Void visit(SFCImplementation decl) {
+        cw.append("digraph g {").increaseIndent();
+        cw.nl();
+        decl.getNetworks().forEach(n -> visit(n));
+        cw.decreaseIndent();
+        cw.nl().append("}");
+        return null;
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	public CodeWriter visit(SFCDeclaration decl) {
-		cw.append("digraph g {").increaseIndent();
-		cw.nl();
+    public Void visit(SFCNetwork n) {
+        cw.append("digraph f {").increaseIndent();
+        cw.nl();
+        n.getSteps().forEach(s -> s.accept(this));
+        cw.decreaseIndent();
+        cw.nl().append("}");
+        return null;
+    }
 
-		for (StepDeclaration step : decl.getSteps()) {
-			step.visit(this);
-		}
 
-		cw.decreaseIndent();
-		cw.nl().append("}");
-		return cw;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Void visit(SFCStep decl) {
+        cw.nl().append(decl.getName());
+        cw.append(" [label=\"" + decl.getName() + "\", shape=rectangle]");
+        return null;
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	public CodeWriter visit(StepDeclaration decl) {
-		cw.nl().append(decl.getName());
-		return cw.append(" [label=\"" + decl.getName() + "\", shape=rectangle]");
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public CodeWriter visit(TransitionDeclaration decl) {
-		for (String from : decl.getFrom()) {
-			for (String to : decl.getTo())
-				cw.nl().append(from).append(" -> ").append(to).append(";");
-		}
-		return cw;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Void visit(SFCTransition decl) {
+        for (SFCStep from : decl.getFrom()) {
+            for (SFCStep to : decl.getTo())
+                cw.nl().append(from).append(" -> ").append(to).append(";");
+        }
+        return null;
+    }
 
 }

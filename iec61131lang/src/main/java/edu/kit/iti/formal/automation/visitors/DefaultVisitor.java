@@ -22,7 +22,8 @@ package edu.kit.iti.formal.automation.visitors;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
+import edu.kit.iti.formal.automation.sfclang.ast.*;
 import edu.kit.iti.formal.automation.st.ast.*;
 
 /**
@@ -314,7 +315,7 @@ public class DefaultVisitor<T> implements Visitor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T visit(LocalScope localScope) {
+    public T visit(Scope localScope) {
         return defaultVisit(localScope);
     }
 
@@ -407,5 +408,30 @@ public class DefaultVisitor<T> implements Visitor<T> {
     @Override
     public T visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
         return defaultVisit(globalVariableListDeclaration);
+    }
+
+    @Override
+    public T visit(SFCStep sfcStep) {
+        return defaultVisit(sfcStep);
+    }
+
+    @Override
+    public T visit(SFCAction sfcAction) {
+        return defaultVisit(sfcAction);
+    }
+
+    @Override
+    public T visit(SFCNetwork sfcNetwork) {
+        return defaultVisit(sfcNetwork);
+    }
+
+    @Override
+    public T visit(SFCImplementation sfc) {
+        return defaultVisit(sfc);
+    }
+
+    @Override
+    public T visit(SFCTransition transition) {
+        return defaultVisit(transition);
     }
 }

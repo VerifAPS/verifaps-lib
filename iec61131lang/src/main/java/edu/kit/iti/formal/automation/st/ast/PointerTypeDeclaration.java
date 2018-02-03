@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.datatypes.PointerType;
 import edu.kit.iti.formal.automation.datatypes.values.PointerValue;
-import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
 /**
@@ -49,7 +49,7 @@ public class PointerTypeDeclaration
      * {@inheritDoc}
      */
     @Override
-    public PointerType getDataType(GlobalScope globalScope) {
+    public PointerType getDataType(Scope globalScope) {
         PointerType pt = new PointerType(super.getDataType(globalScope));
         baseType = pt;
         return pt;

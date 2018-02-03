@@ -22,8 +22,6 @@ package edu.kit.iti.formal.automation.exceptions;
  * #L%
  */
 
-import org.omg.CORBA.SystemException;
-
 /**
  * Created by weigl on 27.11.16.
  */

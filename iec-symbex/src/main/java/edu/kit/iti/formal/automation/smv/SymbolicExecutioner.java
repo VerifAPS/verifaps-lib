@@ -27,8 +27,7 @@ import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException;
 import edu.kit.iti.formal.automation.exceptions.UnknownDatatype;
 import edu.kit.iti.formal.automation.exceptions.UnknownVariableException;
 import edu.kit.iti.formal.automation.operators.Operators;
-import edu.kit.iti.formal.automation.scope.GlobalScope;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.smv.translators.*;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
@@ -46,8 +45,10 @@ import java.util.Stack;
  * Created by weigl on 26.11.16.
  */
 public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
-    private GlobalScope globalScope = GlobalScope.defaultScope();
-    private LocalScope localScope = new LocalScope(globalScope);
+    @Getter
+    @Setter
+    private Scope currentScope;
+
     private Map<String, SVariable> varCache = new HashMap<>();
 
     @Getter
@@ -74,24 +75,6 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         push(new SymbolicState());
     }
 
-    //region getter and setters
-    public GlobalScope getGlobalScope() {
-        return globalScope;
-    }
-
-    public void setGlobalScope(GlobalScope globalScope) {
-        this.globalScope = globalScope;
-    }
-    //endregion
-
-    public LocalScope getLocalScope() {
-        return localScope;
-    }
-
-    public void setLocalScope(LocalScope localScope) {
-        this.localScope = localScope;
-    }
-
     public SymbolicState peek() {
         return state.peek();
     }
@@ -111,10 +94,9 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
     public SVariable lift(VariableDeclaration vd) {
         try {
-            if (vd.getDataType() == null) {
-                vd.setDataType(localScope.getGlobalScope()
-                        .resolveDataType(vd.getDataTypeName()));
-            }
+            if (vd.getDataType() == null)
+                vd.setDataType(currentScope.resolveDataType(vd.getDataTypeName()));
+
             if (!varCache.containsKey(vd))
                 varCache.put(vd.getName(), typeTranslator.translate(vd));
             return varCache.get(vd.getName());
@@ -161,17 +143,16 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
     @Override
     public SCaseExpression visit(ProgramDeclaration programDeclaration) {
-        localScope = programDeclaration.getLocalScope();
-        globalScope = localScope.getGlobalScope();
-        push(new SymbolicState(localScope.getLocalVariables().size()));
+        currentScope = programDeclaration.getScope();
+        push(new SymbolicState(currentScope.asMap().size()));
 
         // initialize root state
-        for (VariableDeclaration vd : localScope) {
+        for (VariableDeclaration vd : currentScope) {
             SVariable s = lift(vd);
             peek().put(s, s);
         }
 
-        programDeclaration.getProgramBody().accept(this);
+        programDeclaration.getStBody().accept(this);
         return null;
     }
 
@@ -196,7 +177,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
     @Override
     public SMVExpr visit(Invocation invocation) {
-        FunctionDeclaration fd = globalScope.resolveFunction(invocation, localScope);
+        FunctionDeclaration fd = currentScope.resolveFunction(invocation, currentScope);
         if (fd == null)
             throw new FunctionUndefinedException(invocation);
 
@@ -206,8 +187,8 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         SymbolicState callerState = peek();
 
         //region register function name as output variable
-        if (null == fd.getLocalScope().getVariable(fd.getFunctionName())) {
-            fd.getLocalScope().builder()
+        if (null == fd.getScope().getVariable(fd.getFunctionName())) {
+            fd.getScope().builder()
                     .setBaseType(fd.getReturnTypeName())
                     .push(VariableDeclaration.OUTPUT)
                     .identifiers(fd.getFunctionName())
@@ -216,7 +197,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         //endregion
 
         //region local variables (declaration and initialization)
-        for (VariableDeclaration vd : fd.getLocalScope().getLocalVariables().values()) {
+        for (VariableDeclaration vd : fd.getScope().asMap().values()) {
             if (!calleeState.containsKey(vd.getName())) {
                 TypeDeclaration td = vd.getTypeDeclaration();
                 if (td != null && td.getInitialization() != null) {
@@ -233,7 +214,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
         //region transfer variables
         List<Invocation.Parameter> parameters = invocation.getParameters();
-        List<VariableDeclaration> inputVars = fd.getLocalScope().filterByFlags(VariableDeclaration.INPUT);
+        List<VariableDeclaration> inputVars = fd.getScope().filterByFlags(VariableDeclaration.INPUT);
 
         if (parameters.size() != inputVars.size()) {
             throw new FunctionInvocationArgumentNumberException();
@@ -248,10 +229,10 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         //endregion
 
         // execution of body
-        fd.getStatements().accept(this);
+        fd.getStBody().accept(this);
         pop();
 
-        return calleeState.get(lift(fd.getLocalScope().getVariable(fd.getFunctionName())));
+        return calleeState.get(lift(fd.getScope().getVariable(fd.getFunctionName())));
     }
 
     @Override

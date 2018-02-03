@@ -22,8 +22,9 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.GlobalScope;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
+import lombok.Getter;
+import lombok.Setter;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
@@ -33,7 +34,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
  * @version $Id: $Id
  */
 public abstract class TopLevelScopeElement<T extends ParserRuleContext> extends TopLevelElement<T> {
-    protected LocalScope localScope = new LocalScope();
+    @Getter
+    @Setter
+    protected Scope scope = new Scope();
 
     /**
      * <p>Constructor for TopLevelScopeElement.</p>
@@ -43,30 +46,12 @@ public abstract class TopLevelScopeElement<T extends ParserRuleContext> extends 
     }
 
     /**
-     * <p>setGlobalScope.</p>
-     *
-     * @param global a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
-     */
-    public void setGlobalScope(GlobalScope global) {
-        localScope.setGlobalScope(global);
-    }
-
-    /**
      * <p>Constructor for TopLevelScopeElement.</p>
      *
      * @param p a {@link edu.kit.iti.formal.automation.st.ast.TopLevelScopeElement} object.
      */
     public TopLevelScopeElement(TopLevelScopeElement p) {
-        localScope = new LocalScope(p.getLocalScope());
-    }
-
-    /**
-     * <p>Getter for the field <code>localScope</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
-     */
-    public LocalScope getLocalScope() {
-        return localScope;
+        scope = new Scope(p.getScope());
     }
 
     @Override
@@ -75,12 +60,10 @@ public abstract class TopLevelScopeElement<T extends ParserRuleContext> extends 
     /**
      * <p>Setter for the field <code>localScope</code>.</p>
      *
-     * @param localScope a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
+     * @param localScope a {@link edu.kit.iti.formal.automation.scope.Scope} object.
      */
-    public void setLocalScope(LocalScope localScope) {
+    public void setScope(Scope localScope) {
         assert localScope != null;
-        this.localScope = localScope;
+        this.scope = localScope;
     }
-
-
 }

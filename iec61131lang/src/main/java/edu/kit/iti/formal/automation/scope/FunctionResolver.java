@@ -39,8 +39,8 @@ public interface FunctionResolver {
      * on call site a declaration is generated.
      *
      * @param call a {@link Invocation} object.
-     * @param scope a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
+     * @param scope a {@link edu.kit.iti.formal.automation.scope.Scope} object.
      * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
      */
-    FunctionDeclaration resolve(Invocation call, LocalScope scope);
+    FunctionDeclaration resolve(Invocation call, Scope scope);
 }

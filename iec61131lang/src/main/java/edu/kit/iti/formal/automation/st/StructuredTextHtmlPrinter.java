@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.HTMLCodeWriter;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
@@ -296,9 +296,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
         sb.div(Sections.VARIABLE).append(programDeclaration.getProgramName());
         sb.end().append('\n');
 
-        programDeclaration.getLocalScope().accept(this);
+        programDeclaration.getScope().accept(this);
 
-        programDeclaration.getProgramBody().accept(this);
+        programDeclaration.getStBody().accept(this);
         sb.keyword("END_PROGRAM");
         sb.end();
         return null;
@@ -376,9 +376,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
         sb.div(Sections.FB).keyword("FUNCTION_BLOCK ").variable(functionBlockDeclaration.getName());
 
-        functionBlockDeclaration.getLocalScope().accept(this);
+        functionBlockDeclaration.getScope().accept(this);
 
-        functionBlockDeclaration.getFunctionBody().accept(this);
+        functionBlockDeclaration.getStBody().accept(this);
         sb.keyword("END_FUNCTION_BLOCK").ts().end();
         return null;
     }
@@ -465,10 +465,9 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(LocalScope localScope) {
+    public Object visit(Scope localScope) {
         sb.div(Sections.VARIABLES_DEFINITIONS);
-        for (VariableDeclaration vd : localScope.getLocalVariables().values()) {
-            vd.getDataType();
+        for (VariableDeclaration vd : localScope.asMap().values()) {
             sb.div(Sections.VARIABLES_DEFINITION);
 
             if (vd.isInput())

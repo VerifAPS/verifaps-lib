@@ -22,24 +22,28 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import java.util.Optional;
+
 /**
- * <p>DInt class.</p>
- *
  * @author weigl
  * @version $Id: $Id
  */
 public final class DInt extends AnySignedInt {
-    /** {@inheritDoc} */
-    @Override
-    public AnyInt next() {
-        return DataTypes.LINT;
+    public DInt() {
+        super(32);
     }
 
     /**
-     * <p>Constructor for DInt.</p>
+     * {@inheritDoc}
      */
-    public DInt() {
-        super(32);
+    @Override
+    public Optional<AnyInt> next() {
+        return Optional.ofNullable(DataTypes.LINT);
+    }
+
+    @Override
+    public AnyUnsignedInt asUnsgined() {
+        return DataTypes.UDINT;
     }
 
     @Override

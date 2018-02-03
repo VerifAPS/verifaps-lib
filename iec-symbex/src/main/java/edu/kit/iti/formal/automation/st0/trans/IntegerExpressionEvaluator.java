@@ -27,7 +27,7 @@ import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.operators.BinaryOperator;
 import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 
@@ -37,9 +37,9 @@ import java.math.BigInteger;
  * Created by weigl on 03/10/14.
  */
 public class IntegerExpressionEvaluator extends AstVisitor<Long> {
-    private LocalScope scope;
+    private Scope scope;
 
-    public IntegerExpressionEvaluator(LocalScope scope) {
+    public IntegerExpressionEvaluator(Scope scope) {
         this.scope = scope;
     }
 

@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.plcopenxml;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
+import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import org.jdom2.Element;
 
 /**
@@ -35,7 +35,7 @@ public class FBFactory extends DefaultPOUBuilder implements PCLOpenXMLBuilder.Bu
     }
 
     @Override
-    public TopLevelElement build() {
-        return null;
+    public TopLevelElements build() {
+        return new TopLevelElements();
     }
 }

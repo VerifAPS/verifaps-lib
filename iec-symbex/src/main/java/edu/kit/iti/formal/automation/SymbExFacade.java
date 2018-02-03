@@ -52,13 +52,13 @@ public final class SymbExFacade {
         Invocation fc = new Invocation();
         fc.setCalleeName(decl.getFunctionName());
         int i = 0;
-        for (VariableDeclaration vd : decl.getLocalScope()
+        for (VariableDeclaration vd : decl.getScope()
                 .filterByFlags(VariableDeclaration.INPUT)) {
             fc.getParameters().add(new Invocation.Parameter(new SymbolicReference(vd.getName())));
             state.put(se.lift(vd), ts.get(i++));
         }
         se.push(state);
-        se.getGlobalScope().registerFunction(decl);
+        se.getCurrentScope().getTopLevel().registerFunction(decl);
         return fc.accept(se);
     }
 
@@ -91,11 +91,11 @@ public final class SymbExFacade {
 
         final ProgramDeclaration container = new ProgramDeclaration();
         container.setProgramName(tlsElement.getIdentifier());
-        container.setLocalScope (tlsElement.getLocalScope());
+        container.setScope (tlsElement.getScope());
 
-        if(program != null) container.setProgramBody(program.getProgramBody());
-        if(fb != null) container.setProgramBody(fb.getFunctionBody());
-        if(function != null) container.setProgramBody(function.getStatements());
+        if(program != null) container.setStBody(program.getStBody());
+        if(fb != null) container.setStBody(fb.getStBody());
+        if(function != null) container.setStBody(function.getStBody());
 
         TopLevelElements elements = new TopLevelElements();
         elements.add(types);
@@ -114,10 +114,11 @@ public final class SymbExFacade {
         }
         assert simpleProgram != null;
 
-        tlsElement.setLocalScope(simpleProgram.getLocalScope());
-        if(program != null) program.setProgramBody(simpleProgram.getProgramBody());
-        if(fb != null) fb.setFunctionBody(simpleProgram.getProgramBody());
-        if(function != null) function.setStatements(simpleProgram.getProgramBody());
+        tlsElement.setScope(simpleProgram.getScope());
+        if(program != null) program.setStBody(simpleProgram.getStBody());
+        if(fb != null) fb.setStBody(simpleProgram.getStBody());
+        if(function != null)
+            function.setStBody(simpleProgram.getStBody());
     }
 
     public static final TopLevelElements simplify(TopLevelElements elements,

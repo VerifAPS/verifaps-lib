@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.analysis;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class FindDataTypes extends AstVisitor {
-    private final GlobalScope globalScope;
+    private final Scope globalScope;
 
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
@@ -127,8 +127,8 @@ public class FindDataTypes extends AstVisitor {
     }
 
     @Override
-    public Object visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
-        globalScope.setGlobalVariableList(globalVariableListDeclaration.getLocalScope());
-        return super.visit(globalVariableListDeclaration);
+    public Object visit(GlobalVariableListDeclaration gvl) {
+        globalScope.addVariables(gvl.getScope());
+        return super.visit(gvl);
     }
 }

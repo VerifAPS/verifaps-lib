@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st.util;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
@@ -174,8 +174,8 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
-        programDeclaration.setLocalScope((LocalScope) programDeclaration.getLocalScope().accept(this));
-        programDeclaration.setProgramBody((StatementList) programDeclaration.getProgramBody().accept(this));
+        programDeclaration.setScope((Scope) programDeclaration.getScope().accept(this));
+        programDeclaration.setStBody((StatementList) programDeclaration.getStBody().accept(this));
         return programDeclaration;
     }
 
@@ -306,7 +306,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(LocalScope localScope) {
+    public Object visit(Scope localScope) {
         return localScope;
     }
 
@@ -365,8 +365,10 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
-        functionDeclaration.setLocalScope((LocalScope) functionDeclaration.getLocalScope().accept(this));
-        functionDeclaration.setStatements((StatementList) functionDeclaration.getStatements().accept(this));
+        functionDeclaration.setScope((Scope) functionDeclaration.getScope().accept(this));
+        if (functionDeclaration.getStBody() != null)
+            functionDeclaration.setStBody((StatementList)
+                    functionDeclaration.getStBody().accept(this));
         return functionDeclaration;
     }
 
@@ -383,8 +385,8 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        functionBlockDeclaration.setLocalScope((LocalScope) functionBlockDeclaration.getLocalScope().accept(this));
-        functionBlockDeclaration.setFunctionBody((StatementList) functionBlockDeclaration.getFunctionBody().accept(this));
+        functionBlockDeclaration.setScope((Scope) functionBlockDeclaration.getScope().accept(this));
+        functionBlockDeclaration.setStBody((StatementList) functionBlockDeclaration.getStBody().accept(this));
         return functionBlockDeclaration;
     }
 
@@ -464,7 +466,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(ClassDeclaration clazz) {
-        clazz.setLocalScope((LocalScope) clazz.getLocalScope().accept(this));
+        clazz.setScope((Scope) clazz.getScope().accept(this));
 
         List<MethodDeclaration> methods = new ArrayList<>(clazz.getMethods().size());
         for (MethodDeclaration method : clazz.getMethods()) {
@@ -476,8 +478,9 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(MethodDeclaration method) {
-        method.setLocalScope((LocalScope) method.getLocalScope().accept(this));
-        method.setStatements((StatementList) method.getStatements().accept(this));
+        method.setScope((Scope) method.getScope().accept(this));
+        if (method.getStBody() != null)
+            method.setStBody((StatementList) method.getStBody().accept(this));
         return super.visit(method);
     }
 

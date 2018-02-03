@@ -78,7 +78,7 @@ public class FindInstances extends AstVisitor {
     public Object visit(ClassDeclaration clazz) {
         // When visiting a class, make sure to visit the variables in the parent classes too
         if (clazz.getParentClass() != null)
-            clazz.getParentClass().getLocalScope().accept(this);
+            clazz.getParentClass().getScope().accept(this);
         return super.visit(clazz);
     }
 

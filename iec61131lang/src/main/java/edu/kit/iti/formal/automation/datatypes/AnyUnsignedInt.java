@@ -23,25 +23,16 @@ package edu.kit.iti.formal.automation.datatypes;
  */
 
 import java.math.BigInteger;
+import java.util.Optional;
 
-public class AnyUnsignedInt extends AnyInt {
+public abstract class AnyUnsignedInt extends AnyInt {
     public AnyUnsignedInt(int bitLength) {
         super(bitLength, false);
     }
 
     @Override
-    public AnyInt asSigned() {
-        return new AnySignedInt(bitLength);
-    }
-
-    @Override
     public AnyUnsignedInt asUnsgined() {
         return this;
-    }
-
-    @Override
-    public AnyInt next() {
-        return null;
     }
 
     @Override
@@ -62,5 +53,21 @@ public class AnyUnsignedInt extends AnyInt {
     @Override
     public BigInteger getLowerBound() {
         return BigInteger.ZERO;
+    }
+
+    public static class Arbitrary extends AnyUnsignedInt {
+        public Arbitrary(int bitLength) {
+            super(bitLength);
+        }
+
+        @Override
+        public Optional<AnyInt> next() {
+            return Optional.empty();
+        }
+
+        @Override
+        public AnyInt asSigned() {
+            return new AnySignedInt.Arbitrary(bitLength);
+        }
     }
 }

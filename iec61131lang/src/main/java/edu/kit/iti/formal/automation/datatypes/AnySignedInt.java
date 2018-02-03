@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.datatypes;
  */
 
 import java.math.BigInteger;
+import java.util.Optional;
 
 /**
  * <p>AnySignedInt class.</p>
@@ -30,7 +31,7 @@ import java.math.BigInteger;
  * @author weigl
  * @version $Id: $Id
  */
-public class AnySignedInt extends AnyInt {
+public abstract class AnySignedInt extends AnyInt {
     /**
      * <p>Constructor for AnySignedInt.</p>
      *
@@ -53,22 +54,6 @@ public class AnySignedInt extends AnyInt {
      * {@inheritDoc}
      */
     @Override
-    public AnyUnsignedInt asUnsgined() {
-        return new AnyUnsignedInt(bitLength);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AnyInt next() {
-        return null;//TODO
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean isValid(long value) {
         long max = (2 << bitLength) - 1;
         long min = -(2 << bitLength);
@@ -83,5 +68,21 @@ public class AnySignedInt extends AnyInt {
     @Override
     public BigInteger getLowerBound() {
         return BigInteger.ONE.shiftLeft(bitLength - 1).negate();
+    }
+
+    public static class Arbitrary extends AnySignedInt {
+        public Arbitrary(int bitLength) {
+            super(bitLength);
+        }
+
+        @Override
+        public Optional<AnyInt> next() {
+            return Optional.empty();
+        }
+
+        @Override
+        public AnyUnsignedInt asUnsgined() {
+            return new AnyUnsignedInt.Arbitrary(bitLength);
+        }
     }
 }

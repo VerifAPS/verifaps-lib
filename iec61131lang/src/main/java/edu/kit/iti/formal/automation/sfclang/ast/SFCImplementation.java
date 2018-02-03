@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.st.ast;
+package edu.kit.iti.formal.automation.sfclang.ast;
 
 /*-
  * #%L
@@ -22,41 +22,43 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.scope.Scope;
+import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import edu.kit.iti.formal.automation.st.ast.Top;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Created by weigl on 02.08.16.
+ * Top-Level Declaration for a Sequential Function Chart,
+ * containing steps, actions, transitions, variables declaration.
  *
  * @author weigl
  * @version $Id: $Id
  */
-@ToString
-@EqualsAndHashCode
 @Data
-public class Deref extends Reference {
-    private Reference reference;
+public class SFCImplementation extends Top<IEC61131Parser.SfcContext> {
+    private List<SFCNetwork> networks = new ArrayList<>();
+    private List<SFCAction> actions = new ArrayList<>();
 
-    public Deref(Reference reference) {
-        this.reference = reference;
+
+    public SFCAction getAction(String name) {
+        return actions.stream().filter(
+                (SFCAction a) -> a.getName().equals(name)).findFirst().orElse(null);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Any dataType(Scope localScope) {
-        return null;//TODO
-    }
-
-    @Override public Deref copy() {
-        return new Deref(reference.copy());
+    public SFCImplementation copy() {
+        SFCImplementation sfc = new SFCImplementation();
+        networks.forEach(a -> sfc.networks.add(a.copy()));
+        throw new IllegalStateException("not implemented yet!");
     }
 }

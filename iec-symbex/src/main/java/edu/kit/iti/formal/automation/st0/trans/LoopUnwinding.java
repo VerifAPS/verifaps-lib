@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st0.trans;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
@@ -31,7 +31,7 @@ import edu.kit.iti.formal.automation.visitors.Visitable;
  * Created by weigl on 03/10/14.
  */
 public class LoopUnwinding extends AstMutableVisitor {
-    private LocalScope currentScope;
+    private Scope currentScope;
 
     public LoopUnwinding() {
 
@@ -51,19 +51,19 @@ public class LoopUnwinding extends AstMutableVisitor {
 
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
-        currentScope = programDeclaration.getLocalScope();
+        currentScope = programDeclaration.getScope();
         return super.visit(programDeclaration);
     }
 
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
-        currentScope = functionDeclaration.getLocalScope();
+        currentScope = functionDeclaration.getScope();
         return super.visit(functionDeclaration);
     }
 
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        currentScope = functionBlockDeclaration.getLocalScope();
+        currentScope = functionBlockDeclaration.getScope();
         return super.visit(functionBlockDeclaration);
     }
 

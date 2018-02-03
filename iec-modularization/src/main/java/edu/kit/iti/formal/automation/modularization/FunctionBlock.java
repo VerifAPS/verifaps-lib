@@ -22,10 +22,7 @@ package edu.kit.iti.formal.automation.modularization;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.SymbExFacade;
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
-import edu.kit.iti.formal.automation.modularization.transform.FunctionCallParamRemover;
-import edu.kit.iti.formal.automation.modularization.transform.TimerToCounter;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.*;
 
@@ -71,16 +68,16 @@ public final class FunctionBlock {
 
 		StatementList body = null;
 		if(source instanceof ProgramDeclaration)
-			body = ((ProgramDeclaration)source).getProgramBody();
+			body = ((ProgramDeclaration)source).getStBody();
 		if(source instanceof FunctionBlockDeclaration)
-			body = ((FunctionBlockDeclaration)source).getFunctionBody();
+			body = ((FunctionBlockDeclaration)source).getStBody();
 		assert body != null;
 
 		this.body = body;
 
 		// Process all variables except for the function block instances, as
 		// those cannot be resolved at this point
-		for(VariableDeclaration i : source.getLocalScope()) {
+		for(VariableDeclaration i : source.getScope()) {
 			if(i.getDataType() instanceof FunctionBlockDataType) {
 				_tempFbInstances.add(i);
 			} else if(i.isInput()) {

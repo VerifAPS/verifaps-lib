@@ -22,12 +22,6 @@ package edu.kit.iti.formal.automation.sfclang;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
-import edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration;
-import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
-
-import java.util.*;
-
 /**
  * Created by weigl on 11.09.15.
  *
@@ -35,7 +29,7 @@ import java.util.*;
  * @version $Id: $Id
  */
 public class SFCLayouter {
-
+/*
     static class LayoutMetaData {
         int childBranching = 0;
         double width, height, x, y;
@@ -43,23 +37,12 @@ public class SFCLayouter {
 
     HashMap<String, LayoutMetaData> meta = new HashMap<>();
 
-    private final SFCDeclaration sfcDeclaration;
+    private final SFCImplementation sfcDeclaration;
 
-    /**
-     * <p>Constructor for SFCLayouter.</p>
-     *
-     * @param declaration a {@link edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration} object.
-     */
-    public SFCLayouter(SFCDeclaration declaration) {
+    public SFCLayouter(SFCImplementation declaration) {
         sfcDeclaration = declaration;
     }
 
-
-    /**
-     * <p>widthOfSubSfc.</p>
-     *
-     * @param step a {@link edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration} object.
-     */
     public void widthOfSubSfc(StepDeclaration step) {
         Queue<StepDeclaration> steps = new LinkedList<>();
         Set<String> visited = new HashSet<>();
@@ -78,13 +61,6 @@ public class SFCLayouter {
     }
 
 
-    /**
-     * <p>widthOfSubSfc.</p>
-     *
-     * @param visited a {@link java.util.Set} object.
-     * @param step a {@link edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration} object.
-     * @return a int.
-     */
     public int widthOfSubSfc(Set<String> visited, StepDeclaration step) {
         visited.add(step.getName());
         int sum = 0;
@@ -108,9 +84,6 @@ public class SFCLayouter {
     }
 
 
-    /**
-     * <p>layout.</p>
-     */
     public void layout() {
         StepDeclaration init = null;
         for (StepDeclaration s : sfcDeclaration.getSteps()) {
@@ -135,12 +108,6 @@ public class SFCLayouter {
 
     }
 
-    /**
-     * <p>getSuccessors.</p>
-     *
-     * @param sd a {@link edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration} object.
-     * @return a {@link java.util.List} object.
-     */
     public List<TransitionDeclaration> getSuccessors(StepDeclaration sd) {
         List<TransitionDeclaration> list = new ArrayList<>();
         for (TransitionDeclaration t : sfcDeclaration.getTransitions()) {
@@ -150,5 +117,5 @@ public class SFCLayouter {
         }
         return list;
     }
-
+*/
 }

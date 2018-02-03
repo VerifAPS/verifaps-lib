@@ -42,19 +42,19 @@ import java.util.stream.Stream;
 public class TopLevelElements extends Top implements List<TopLevelElement>, Visitable {
     private List<TopLevelElement> list = new ArrayList<>();
 
-    /**
-     * <p>Constructor for TopLevelElements.</p>
-     */
+
     public TopLevelElements() {
     }
 
-    /**
-     * <p>Constructor for TopLevelElements.</p>
-     *
-     * @param elements a {@link java.util.List} object.
-     */
+
     public TopLevelElements(List<TopLevelElement> elements) {
         list = new ArrayList<>(elements);
+    }
+
+    public static TopLevelElements singleton(TopLevelElement pd) {
+        TopLevelElements tle = new TopLevelElements();
+        tle.add(pd);
+        return tle;
     }
 
     /**
@@ -304,5 +304,4 @@ public class TopLevelElements extends Top implements List<TopLevelElement>, Visi
     public Stream<TopLevelElement> parallelStream() {
         return list.parallelStream();
     }
-
 }

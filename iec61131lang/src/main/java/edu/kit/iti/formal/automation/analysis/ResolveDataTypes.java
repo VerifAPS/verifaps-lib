@@ -26,8 +26,7 @@ package edu.kit.iti.formal.automation.analysis;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
-import edu.kit.iti.formal.automation.scope.GlobalScope;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 
@@ -39,10 +38,10 @@ import edu.kit.iti.formal.automation.st.util.AstVisitor;
  * @since 25.11.16
  */
 public class ResolveDataTypes extends AstVisitor<Object> {
-    private final GlobalScope globalScope;
-    private LocalScope localScope;
+    private final Scope globalScope;
+    private Scope localScope;
 
-    public ResolveDataTypes(GlobalScope globalScope) {
+    public ResolveDataTypes(Scope globalScope) {
         this.globalScope = globalScope;
     }
 
@@ -52,7 +51,7 @@ public class ResolveDataTypes extends AstVisitor<Object> {
 
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
-        programDeclaration.setGlobalScope(globalScope);
+        programDeclaration.getScope().setParent(globalScope);
         return super.visit(programDeclaration);
     }
 
@@ -61,7 +60,7 @@ public class ResolveDataTypes extends AstVisitor<Object> {
      */
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
-        functionDeclaration.setGlobalScope(globalScope);
+        functionDeclaration.getScope().setParent(globalScope);
         functionDeclaration.setReturnType(
                 resolve(functionDeclaration.getReturnTypeName()));
         return super.visit(functionDeclaration);
@@ -69,34 +68,34 @@ public class ResolveDataTypes extends AstVisitor<Object> {
 
     @Override
     public Object visit(MethodDeclaration methodDeclaration) {
-        methodDeclaration.setGlobalScope(globalScope);
+        methodDeclaration.getScope().setParent(localScope);
         methodDeclaration.setReturnType(resolve(methodDeclaration.getReturnTypeName()));
         return super.visit(methodDeclaration);
     }
 
     @Override
-    public Object visit(LocalScope localScope) {
+    public Object visit(Scope localScope) {
         this.localScope = localScope;
-        localScope.getLocalVariables().values()
+        localScope.getVariables().values()
                 .forEach(vd -> vd.setDataType(resolve(vd.getDataTypeName())));
         return null;
     }
 
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        functionBlockDeclaration.setGlobalScope(globalScope);
+        functionBlockDeclaration.getScope().setParent(globalScope);
         return super.visit(functionBlockDeclaration);
     }
 
     @Override
     public Object visit(ClassDeclaration classDeclaration) {
-        classDeclaration.setGlobalScope(globalScope);
+        classDeclaration.getScope().setParent(globalScope);
         return super.visit(classDeclaration);
     }
 
     @Override
     public Object visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
-        globalVariableListDeclaration.setGlobalScope(globalScope);
+        globalVariableListDeclaration.getScope().setParent(globalScope);
         return super.visit(globalVariableListDeclaration);
     }
 
@@ -117,10 +116,10 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     @Override
     public Object visit(Literal literal) {
         try {
-            EnumerateType enumType = (EnumerateType) localScope.getGlobalScope().
-                    resolveDataType(literal.getDataTypeName());
+            EnumerateType enumType = (EnumerateType) localScope.resolveDataType(literal.getDataTypeName());
             literal.setDataType(enumType);
-        } catch(ClassCastException | DataTypeNotDefinedException e) {}
+        } catch (ClassCastException | DataTypeNotDefinedException e) {
+        }
         return null;
     }
 
@@ -128,7 +127,7 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     public Object visit(SymbolicReference ref) {
         String first = ref.getIdentifier();
         try {
-            Any dataType = localScope.getGlobalScope().resolveDataType(first);
+            Any dataType = localScope.resolveDataType(first);
             EnumerateType et = (EnumerateType) dataType;
             String second = ((SymbolicReference) ref.getSub()).getIdentifier();
         } catch (ClassCastException | DataTypeNotDefinedException e) {

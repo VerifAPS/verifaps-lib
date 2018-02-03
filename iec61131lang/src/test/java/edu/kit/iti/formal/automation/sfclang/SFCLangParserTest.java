@@ -26,7 +26,7 @@ package edu.kit.iti.formal.automation.sfclang;
 import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
-import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
+import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,6 +42,12 @@ import java.util.Collection;
  */
 @RunWith(Parameterized.class)
 public class SFCLangParserTest {
+
+    private String inputFilename;
+
+    public SFCLangParserTest(String inputFilename) {
+        this.inputFilename = inputFilename;
+    }
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<String> data() {
@@ -65,20 +71,13 @@ public class SFCLangParserTest {
                 "data/Types1_right.sfc");
     }
 
-    private String inputFilename;
-
-
-    public SFCLangParserTest(String inputFilename) {
-        this.inputFilename = inputFilename;
-    }
-
-
     @Test
     public void read() throws ClassNotFoundException, IOException {
         System.out.println("Test: " + inputFilename);
         IEC61131Parser parser = IEC61131Facade.getParser(CharStreams.fromStream(getClass()
                 .getResourceAsStream(inputFilename)));
-        SFCDeclaration decl = (SFCDeclaration) parser.start_sfc().accept(new IECParseTreeToAST());
+        FunctionBlockDeclaration ctx = (FunctionBlockDeclaration) parser.function_block_declaration().accept(new IECParseTreeToAST());
+        Assert.assertNotNull(ctx.getSfcBody());
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
     }
 }

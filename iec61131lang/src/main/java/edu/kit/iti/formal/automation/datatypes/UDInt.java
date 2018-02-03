@@ -22,6 +22,8 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import java.util.Optional;
+
 /**
  * <p>UDInt class.</p>
  *
@@ -29,11 +31,19 @@ package edu.kit.iti.formal.automation.datatypes;
  * @version $Id: $Id
  */
 public final class UDInt extends AnyUnsignedInt {
-    /**
-     * <p>Constructor for UDInt.</p>
-     */
     public UDInt() {
         super(32);
+    }
+
+
+    @Override
+    public Optional<AnyInt> next() {
+        return Optional.of(DataTypes.ULINT);
+    }
+
+    @Override
+    public AnyInt asSigned() {
+        return DataTypes.LINT;
     }
 
     @Override

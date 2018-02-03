@@ -4,7 +4,7 @@ package edu.kit.iti.formal.automation.plcopenxml;
  * #%L
  * iec-xml
  * %%
- * Copyright (C) 2017 Alexander Weigl
+ * Copyright (C) 2018 Alexander Weigl
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -22,19 +22,37 @@ package edu.kit.iti.formal.automation.plcopenxml;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.jdom2.JDOMException;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 
 /**
  * @author Alexander Weigl
- * @version 1 (15.06.17)
+ * @version 1 (21.11.17)
  */
-public final class IECXMLFacade {
-    public static TopLevelElements readPLCOpenXml(final String filename) throws JDOMException, IOException {
-        PCLOpenXMLBuilder b = new PCLOpenXMLBuilder(new File(filename));
-        return b.build();
+public class Extractor {
+    public static boolean toSt0;
+    public static File output;
+
+    public static void main(String args[]) throws JDOMException, IOException {
+        OptionParser parser = new OptionParser("0o::h*");
+        OptionSet options = parser.parse(args);
+
+        if (options.hasArgument("o")) {
+            output = new File(options.valueOf("o").toString());
+        }
+
+        toSt0 = options.has("0");
+
+        String input = options.nonOptionArguments().get(0).toString();
+        TopLevelElements toplevel = IECXMLFacade.readPLCOpenXml(input);
+        @NotNull String out = IEC61131Facade.print(toplevel);
+        System.out.println(out);
     }
 }

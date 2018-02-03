@@ -23,16 +23,7 @@ package edu.kit.iti.formal.automation.sfclang;
  */
 
 
-import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
-import edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration;
-import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
 import edu.kit.iti.formal.automation.st.StructuredTextHtmlPrinter;
-import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
-import edu.kit.iti.formal.automation.st.util.HTMLCodeWriter;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * <p>SFCLangHTMLPrinter class.</p>
@@ -40,137 +31,117 @@ import java.util.Set;
  * @author weigl
  * @version $Id: $Id
  */
-public class SFCLangHTMLPrinter implements SFCAstVisitor<HTMLCodeWriter> {
-	private HTMLCodeWriter hcw = new HTMLCodeWriter();
-	private StructuredTextHtmlPrinter stPrinter;
+public class SFCLangHTMLPrinter extends StructuredTextHtmlPrinter {
+ /*
+    private HTMLCodeWriter hcw = new HTMLCodeWriter();
+    private StructuredTextHtmlPrinter stPrinter;
 
-	/**
-	 * <p>Constructor for SFCLangHTMLPrinter.</p>
-	 */
-	public SFCLangHTMLPrinter() {
-		stPrinter = new StructuredTextHtmlPrinter();
-		stPrinter.setCodeWriter(hcw);
-	}
+    public SFCLangHTMLPrinter() {
+        stPrinter = new StructuredTextHtmlPrinter();
+        stPrinter.setCodeWriter(hcw);
+    }
 
-	/**
-	 * <p>html.</p>
-	 *
-	 * @param decl a {@link edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration} object.
-	 * @return a {@link java.lang.String} object.
-	 */
-	public static String html(SFCDeclaration decl) {
-		SFCLangHTMLPrinter p = new SFCLangHTMLPrinter();
-		p.hcw.appendHtmlPreamble();
-		p.visit(decl);
-		return p.hcw.toString();
-	}
+    public static String html(SFCImplementation decl) {
+        SFCLangHTMLPrinter p = new SFCLangHTMLPrinter();
+        p.hcw.appendHtmlPreamble();
+        p.visit(decl);
+        return p.hcw.toString();
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	public HTMLCodeWriter visit(SFCDeclaration decl) {
+    @Override
+    public HTMLCodeWriter visit(SFCImplementation decl) {
 
         hcw.keyword("sfc").append(" ").append(decl.getIdentifier()).nl()
                 .increaseIndent();
 
-		stPrinter.visit(decl.getLocalScope());
+        stPrinter.visit(decl.getScope());
 
-		hcw.nl().nl();
+        hcw.nl().nl();
 
-		for (FunctionBlockDeclaration fbd : decl.getActions()) {
-			printAction(fbd);
-		}
+        for (FunctionBlockDeclaration fbd : decl.getActions()) {
+            printAction(fbd);
+        }
 
-		for (TransitionDeclaration t : decl.getTransitions()) {
-			t.visit(this);
-		}
+        for (TransitionDeclaration t : decl.getTransitions()) {
+            t.visit(this);
+        }
 
-		for (StepDeclaration s : decl.getSteps()) {
-			s.visit(this);
-		}
+        for (StepDeclaration s : decl.getSteps()) {
+            s.visit(this);
+        }
 
-		hcw.decreaseIndent().nl().keyword("end_sfc");
-		return hcw;
-	}
+        hcw.decreaseIndent().nl().keyword("end_sfc");
+        return hcw;
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	public HTMLCodeWriter visit(TransitionDeclaration decl) {
-		hcw.nl().keyword("goto").append(" ");
-		decl.getGuard().accept(stPrinter);
-		hcw.append(" ").keyword("::").append(" ");
+    @Override
+    public HTMLCodeWriter visit(TransitionDeclaration decl) {
+        hcw.nl().keyword("goto").append(" ");
+        decl.getGuard().accept(stPrinter);
+        hcw.append(" ").keyword("::").append(" ");
 
-		printList(decl.getFrom());
-		hcw.append(" ").keyword("->").append(" ");
-		printList(decl.getTo());
+        printList(decl.getFrom());
+        hcw.append(" ").keyword("->").append(" ");
+        printList(decl.getTo());
 
-		return hcw;
-	}
+        return hcw;
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	public HTMLCodeWriter visit(StepDeclaration decl) {
-		hcw.nl().keyword("step").append(" ").append(decl.getName());
-		hcw.increaseIndent();
+    @Override
+    public HTMLCodeWriter visit(StepDeclaration decl) {
+        hcw.nl().keyword("step").append(" ").append(decl.getName());
+        hcw.increaseIndent();
 
-		/*FIXME
-		appendEvents(decl.getOnEntry(), "entry");
+		//FIXME
+        appendEvents(decl.getOnEntry(), "entry");
 		appendEvents(decl.getOnActive(), "active");
 		appendEvents(decl.getOnExit(), "exit");
-		*/
 
-		hcw.decreaseIndent();
-		hcw.nl().keyword("end_step");
+        hcw.decreaseIndent();
+        hcw.nl().
 
-		return hcw;
-	}
+    keyword("end_step");
 
-	private void printAction(FunctionBlockDeclaration fbd) {
+        return hcw;
+}
+
+    private void printAction(FunctionBlockDeclaration fbd) {
         hcw.nl().keyword("action").append(" ").append(fbd.getIdentifier());
         hcw.increaseIndent();
         hcw.nl();
-		stPrinter.visit(fbd.getLocalScope());
-		stPrinter.visit(fbd.getFunctionBody());
-		hcw.decreaseIndent();
-		hcw.nl().keyword("end_action");
-	}
+        stPrinter.visit(fbd.getScope());
+        stPrinter.visit(fbd.getStBody());
+        hcw.decreaseIndent();
+        hcw.nl().keyword("end_action");
+    }
 
-	private void appendEvents(List<String> seq, String type) {
-		if (!seq.isEmpty()) {
-			hcw.nl().keyword("on").append(" ").keyword(type).append(" ");
-			printList(seq);
-			hcw.nl();
-		}
-	}
+    private void appendEvents(List<String> seq, String type) {
+        if (!seq.isEmpty()) {
+            hcw.nl().keyword("on").append(" ").keyword(type).append(" ");
+            printList(seq);
+            hcw.nl();
+        }
+    }
 
-	private void printList(List<String> seq) {
-		for (String n : seq) {
-			hcw.append(n).append(", ");
-		}
-		hcw.deleteLast(2);
-	}
+    private void printList(List<String> seq) {
+        for (String n : seq) {
+            hcw.append(n).append(", ");
+        }
+        hcw.deleteLast(2);
+    }
 
-	private void printList(Set<String> seq) {
-		ArrayList<String> array = new ArrayList<>(seq);
-		array.sort(String.CASE_INSENSITIVE_ORDER);
-		printList(array);
-	}
+    private void printList(Set<String> seq) {
+        ArrayList<String> array = new ArrayList<>(seq);
+        array.sort(String.CASE_INSENSITIVE_ORDER);
+        printList(array);
+    }
 
-	/**
-	 * <p>getCodeWriter.</p>
-	 *
-	 * @return a {@link edu.kit.iti.formal.automation.st.util.HTMLCodeWriter} object.
-	 */
-	public HTMLCodeWriter getCodeWriter() {
-		return hcw;
-	}
+    public HTMLCodeWriter getCodeWriter() {
+        return hcw;
+    }
 
-	/**
-	 * <p>setCodeWriter.</p>
-	 *
-	 * @param cw a {@link edu.kit.iti.formal.automation.st.util.HTMLCodeWriter} object.
-	 */
-	public void setCodeWriter(HTMLCodeWriter cw) {
-		this.hcw = cw;
-	}
-
+    public void setCodeWriter(HTMLCodeWriter cw) {
+        this.hcw = cw;
+    }
+*/
 }

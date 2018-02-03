@@ -33,18 +33,20 @@ import java.util.Set;
 
 /**
  * Conduct static analysis to find the effective subtypes of all references (including interface-type references).
- *
+ * <p>
  * Based on abstract interpretation. The abstract domains are the class and FB types in the program. Look for
  * invocations and assignments to infer possible subtypes.
- *
+ * <p>
  * Intended to be repeatedly called until a fixpoint is reached.
- *
+ * <p>
  * Usage:
+ * <code><pre>
  *   FindEffectiveSubtypes fes = new FindEffectiveSubtypes();
  *   while (!fes.fixpointReached()) {
  *       fes.prepareRun();
  *       ast.accept(fes);
  *   }
+ * </pre></code>
  *
  * @author Augusto Modanese
  */
@@ -76,13 +78,13 @@ public class FindEffectiveSubtypes extends AstVisitor {
 
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
-        visit ((TopLevelScopeElement) functionDeclaration);
+        visit((TopLevelScopeElement) functionDeclaration);
         return super.visit(functionDeclaration);
     }
 
     @Override
     public Object visit(MethodDeclaration method) {
-        visit((TopLevelScopeElement) method);
+        //visit((TopLevelScopeElement) method);
         return super.visit(method);
     }
 
@@ -146,6 +148,7 @@ public class FindEffectiveSubtypes extends AstVisitor {
 
     /**
      * Resolve the type of the given expression. Assume the type can only be a class or FB data type.
+     *
      * @param expression
      * @return The data type of the expression. Null if the type cannot be recognized.
      */
@@ -160,6 +163,7 @@ public class FindEffectiveSubtypes extends AstVisitor {
     /**
      * Resolve the given reference and return the object associated with it. Used to retrieve the variable declaration
      * or the appropriate invocable from a symbolic reference.
+     *
      * @param reference The symbolic reference to resolve.
      * @return The object associated with the identifier.
      */
@@ -175,17 +179,16 @@ public class FindEffectiveSubtypes extends AstVisitor {
             firstIdObject = topLevelScopeElement;
         else if (firstId == "SUPER")
             firstIdObject = ((ClassDeclaration) topLevelScopeElement).getParentClass();
-        else if (topLevelScopeElement.getLocalScope().asMap().keySet().contains(firstId)) {
-            firstIdObject = topLevelScopeElement.getLocalScope().getVariable(firstId);
+        else if (topLevelScopeElement.getScope().asMap().keySet().contains(firstId)) {
+            firstIdObject = topLevelScopeElement.getScope().getVariable(firstId);
             // Dereference if needed
             if (reference.getDerefCount() > 0) {
-                Any firstIdDataType = topLevelScopeElement.getLocalScope().getVariable(firstId).getDataType();
+                Any firstIdDataType = topLevelScopeElement.getScope().getVariable(firstId).getDataType();
                 for (int i = 0; i < reference.getDerefCount(); i++)
                     firstIdDataType = ((ReferenceType) firstIdDataType).getOf();
                 firstIdObject = ((RecordType) firstIdDataType).getDeclaration();
             }
-        }
-        else
+        } else
             throw new DataTypeNotDefinedException("Unknown reference '" + reference + "' at " + topLevelScopeElement);
         // Recurse if needed
         if (reference.getSub() != null)

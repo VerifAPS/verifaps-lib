@@ -22,6 +22,9 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import javax.xml.crypto.Data;
+import java.util.Optional;
+
 /**
  * <p>SInt class.</p>
  *
@@ -29,17 +32,19 @@ package edu.kit.iti.formal.automation.datatypes;
  * @version $Id: $Id
  */
 public final class SInt extends AnySignedInt {
-    /**
-     * <p>Constructor for SInt.</p>
-     */
     public SInt() {
         super(8);
     }
 
     /** {@inheritDoc} */
     @Override
-    public AnyInt next() {
-        return DataTypes.INT;
+    public Optional<AnyInt> next() {
+        return Optional.of(DataTypes.INT);
+    }
+
+    @Override
+    public AnyUnsignedInt asUnsgined() {
+        return DataTypes.USINT;
     }
 
     @Override

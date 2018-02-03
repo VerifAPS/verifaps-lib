@@ -1,10 +1,10 @@
-package edu.kit.iti.formal.automation.sfclang.model;
+package edu.kit.iti.formal.automation.plcopenxml;
 
 /*-
  * #%L
- * iec61131lang
+ * iec-xml
  * %%
- * Copyright (C) 2016 Alexander Weigl
+ * Copyright (C) 2018 Alexander Weigl
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -22,19 +22,20 @@ package edu.kit.iti.formal.automation.sfclang.model;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import org.jdom2.Element;
 
 /**
- * Created by weigl on 22.01.16.
- *
- * @author weigl
- * @version $Id: $Id
+ * @author Alexander Weigl
+ * @version 1 (21.11.17)
  */
-public class SFCStep {
-    public String name;
-    public boolean isInitial;
-    public Map<String, List<SFCAction>> events = new HashMap<>();
-    public List<SFCTransition> outgoing, incoming;
+public class PPXUtils {
+    public VariableDeclaration getInterfaceAsPlainText(Element addData){
+        /**
+         * <addData>
+         <data name="http://www.3s-software.com/plcopenxml/interfaceasplaintext" handleUnknown="implementation">
+         <InterfaceAsPlainText>
+         */
+        return null;
+    }
 }

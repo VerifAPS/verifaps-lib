@@ -206,7 +206,7 @@ public class WriteBeforeReadIdentifier extends AstVisitor<WriteBeforeReadIdentif
     /** {@inheritDoc} */
     @Override
     public WBRState visit(ProgramDeclaration programDeclaration) {
-        return programDeclaration.getProgramBody().accept(this);
+        return programDeclaration.getStBody().accept(this);
     }
 
     /**

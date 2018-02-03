@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -317,7 +317,7 @@ public class ExpressionList extends Expression
      * {@inheritDoc}
      */
     @Override
-    public Any dataType(LocalScope localScope) {
+    public Any dataType(Scope localScope) {
         throw new IllegalStateException("not implemented");
     }
 

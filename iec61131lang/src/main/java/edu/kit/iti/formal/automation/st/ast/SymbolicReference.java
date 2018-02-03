@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Utils;
@@ -143,7 +143,7 @@ public class SymbolicReference extends Reference {
      * {@inheritDoc}
      */
     @Override
-    public Any dataType(LocalScope localScope)
+    public Any dataType(Scope localScope)
             throws VariableNotDefinedException {
         return localScope.getVariable(this).getDataType();
     }

@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.smv.SymbolicExecutioner;
 import edu.kit.iti.formal.automation.st.ast.StatementList;
 import org.junit.Assert;
@@ -39,9 +39,9 @@ public class SymbolicExecutionTest {
     @Before
     public void setupExecutioner() {
         se = new SymbolicExecutioner();
-        LocalScope scope = new LocalScope();
+        Scope scope = new Scope();
         scope.builder().identifiers("a", "b", "c", "d", "e", "f").setBaseType("INT").create();
-        scope.getLocalVariables().values().forEach(se::lift);
+        scope.asMap().values().forEach(se::lift);
     }
 
     @Test

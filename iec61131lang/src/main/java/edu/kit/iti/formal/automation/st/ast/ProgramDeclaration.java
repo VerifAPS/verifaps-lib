@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.sfclang.ast.SFCImplementation;
 import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.*;
@@ -39,25 +40,37 @@ import lombok.*;
 @Data
 public class ProgramDeclaration extends TopLevelScopeElement
         implements Identifiable {
-    private StatementList programBody = new StatementList();
+    private StatementList stBody;
     private String programName;
+    private SFCImplementation sfcBody;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /** {@inheritDoc} */
-    @Override public String getIdentifier() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getIdentifier() {
         return getProgramName();
     }
 
     public ProgramDeclaration copy() {
         ProgramDeclaration pd = new ProgramDeclaration();
         pd.setRuleContext(getRuleContext());
-        pd.setLocalScope(getLocalScope().copy());
+        pd.setScope(getScope().copy());
         pd.programName = programName;
-        pd.programBody = programBody.copy();
+
+        if (stBody != null)
+            pd.stBody = stBody.copy();
+
+        if (sfcBody != null)
+            pd.sfcBody = sfcBody.copy();
+
         return pd;
     }
 }

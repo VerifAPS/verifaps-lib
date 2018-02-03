@@ -2,8 +2,7 @@ package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.datatypes.values.Values
-import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
-import edu.kit.iti.formal.automation.scope.LocalScope
+import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
@@ -21,7 +20,7 @@ class ExpressionVisitorTest {
             }
 
             override fun visit(programDeclaration: ProgramDeclaration?) {
-                return programDeclaration!!.programBody.accept(this)
+                return programDeclaration!!.stBody.accept(this)
             }
 
             override fun visit(statements: StatementList?) {
@@ -34,7 +33,7 @@ class ExpressionVisitorTest {
         })
 
         val expressionValues: List<ExpressionValue> = expressions.map {
-            it.accept<ExpressionValue>(ExpressionVisitor(TopState(), LocalScope())) as ExpressionValue
+            it.accept<ExpressionValue>(ExpressionVisitor(TopState(), Scope())) as ExpressionValue
         }
 
         println(expressionValues.map { it.toString() }.joinToString("\n"))

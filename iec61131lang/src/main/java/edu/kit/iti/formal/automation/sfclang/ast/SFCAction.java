@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.sfclang;
+package edu.kit.iti.formal.automation.sfclang.ast;
 
 /*-
  * #%L
@@ -22,30 +22,35 @@ package edu.kit.iti.formal.automation.sfclang;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
-import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
-import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
-import org.antlr.v4.runtime.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+import edu.kit.iti.formal.automation.st.ast.StatementList;
+import edu.kit.iti.formal.automation.st.ast.Top;
+import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
 
 /**
- * Created by weigl on 07.02.16.
+ * Created by weigl on 22.01.16.
  *
  * @author weigl
  * @version $Id: $Id
  */
-public class SFCLangFactory {
-    public static SFCDeclaration parse(String input) throws IOException {
-        return parse(CharStreams.fromString(input));
+@Data
+public class SFCAction extends Top<IEC61131Parser.ActionContext> {
+    private String name;
+    private StatementList stBody;
+    private SFCImplementation sfcBody;
+
+    @Override
+    public SFCAction copy() {
+        SFCAction a = new SFCAction();
+        a.setName(getName());
+        a.stBody = stBody.copy();
+        a.sfcBody = sfcBody.copy();
+        return a;
     }
 
-    public static SFCDeclaration parse(CharStream cs) {
-        IEC61131Parser parser = IEC61131Facade.getParser(cs);
-        return (SFCDeclaration) parser.start_sfc().accept(new IECParseTreeToAST());
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

@@ -25,7 +25,6 @@ package edu.kit.iti.formal.smv;
 import edu.kit.iti.formal.smv.ast.GroundDataType;
 import edu.kit.iti.formal.smv.ast.SFunction;
 import edu.kit.iti.formal.smv.ast.SMVType;
-import jdk.nashorn.internal.ir.FunctionCall;
 
 /**
  * @author Alexander Weigl

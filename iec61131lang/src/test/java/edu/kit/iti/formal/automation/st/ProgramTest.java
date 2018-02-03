@@ -28,7 +28,7 @@ import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
-import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
@@ -106,7 +106,7 @@ public class ProgramTest {
     @Test
     public void testResolveDataTypes() throws IOException {
         TopLevelElements tle = IEC61131Facade.file(testFile);
-        GlobalScope gs = IEC61131Facade.resolveDataTypes(tle);
+        Scope gs = IEC61131Facade.resolveDataTypes(tle);
         for (ClassDeclaration classDeclaration : gs.getClasses()) {
             Assert.assertTrue(classDeclaration.getParent().getIdentifier() == null
                     || classDeclaration.getParentClass() != null);
@@ -129,7 +129,7 @@ public class ProgramTest {
     @Test
     public void testEffectiveSubtypes() throws IOException {
         TopLevelElements tle = IEC61131Facade.file(testFile);
-        GlobalScope gs = IEC61131Facade.resolveDataTypes(tle);
+        Scope gs = IEC61131Facade.resolveDataTypes(tle);
         IEC61131Facade.findEffectiveSubtypes(tle, gs);
         AstVisitor effectiveSubtypesPrinter = new AstVisitor() {
             @Override

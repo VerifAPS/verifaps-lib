@@ -41,14 +41,14 @@ import java.util.stream.Collectors;
  */
 @ToString
 public class InstanceScope implements Serializable {
-    private final GlobalScope globalScope;
+    private final Scope globalScope;
     private Map<ClassDeclaration, List<Instance>> classInstances = new HashMap();
     private Map<FunctionBlockDeclaration, List<Instance>> functionBlockInstances = new HashMap();
     private Map<InterfaceDeclaration, List<Instance>> interfaceInstances = new HashMap();
     private Map<ClassDeclaration, List<Instance>> classPolymorphInstances = new HashMap();
     private Map<FunctionBlockDeclaration, List<Instance>> functionBlockPolymorphInstances = new HashMap();
 
-    public InstanceScope(GlobalScope globalScope) {
+    public InstanceScope(Scope globalScope) {
         this.globalScope = globalScope;
         for (InterfaceDeclaration interfaceDeclaration : globalScope.getInterfaces())
             interfaceInstances.put(interfaceDeclaration, new ArrayList());

@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st.util;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.st.ast.TopLevelScopeElement;
@@ -42,7 +42,7 @@ public class ExplicitIntializationValues {
 
     public static TopLevelElement makeExplicitInitializationValues(
             TopLevelScopeElement element) {
-        LocalScope scope = element.getLocalScope();
+        Scope scope = element.getScope();
         //makeExplicitInitializationValues(scope);
         return element;
     }

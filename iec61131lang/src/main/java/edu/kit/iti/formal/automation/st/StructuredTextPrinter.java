@@ -26,7 +26,7 @@ import edu.kit.iti.formal.automation.datatypes.IECArray;
 import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.operators.Operator;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.CodeWriter;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
@@ -381,9 +381,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public Object visit(ProgramDeclaration programDeclaration) {
         sb.append("PROGRAM ").append(programDeclaration.getProgramName()).append('\n');
 
-        programDeclaration.getLocalScope().accept(this);
+        programDeclaration.getScope().accept(this);
 
-        programDeclaration.getProgramBody().accept(this);
+        programDeclaration.getStBody().accept(this);
         sb.decreaseIndent().nl().append("END_PROGRAM").nl();
         return null;
     }
@@ -484,7 +484,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
         sb.increaseIndent().nl();
 
-        functionBlockDeclaration.getLocalScope().accept(this);
+        functionBlockDeclaration.getScope().accept(this);
 
         sb.nl();
 
@@ -492,7 +492,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
         sb.nl();
 
-        functionBlockDeclaration.getFunctionBody().accept(this);
+        functionBlockDeclaration.getStBody().accept(this);
 
         sb.decreaseIndent().nl().append("END_FUNCTION_BLOCK").nl().nl();
         return null;
@@ -502,7 +502,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public Object visit(InterfaceDeclaration interfaceDeclaration) {
         sb.append("INTERFACE ").append(interfaceDeclaration.getName());
 
-        String extendsInterfaces = interfaceDeclaration.getExtendsInterfaces().stream()
+        String extendsInterfaces = interfaceDeclaration.getInterfaces().stream()
                 .map(i -> i.getIdentifier())
                 .collect(Collectors.joining(", "));
         if (!extendsInterfaces.isEmpty())
@@ -510,7 +510,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
         sb.increaseIndent().nl();
 
-        interfaceDeclaration.getLocalScope().accept(this);
+        interfaceDeclaration.getScope().accept(this);
 
         interfaceDeclaration.getMethods().forEach(m -> m.accept(this));
 
@@ -541,7 +541,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
         sb.increaseIndent().nl();
 
-        clazz.getLocalScope().accept(this);
+        clazz.getScope().accept(this);
 
         clazz.getMethods().forEach(m -> m.accept(this));
 
@@ -570,9 +570,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
         sb.increaseIndent().nl();
 
-        method.getLocalScope().accept(this);
+        method.getScope().accept(this);
 
-        method.getStatements().accept(this);
+        method.getStBody().accept(this);
 
         sb.decreaseIndent().nl().append("END_METHOD").nl().nl();
         return null;
@@ -588,9 +588,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
         sb.increaseIndent().nl();
 
-        functionDeclaration.getLocalScope().accept(this);
+        functionDeclaration.getScope().accept(this);
 
-        functionDeclaration.getStatements().accept(this);
+        functionDeclaration.getStBody().accept(this);
 
         sb.decreaseIndent().nl().append("END_FUNCTION").nl().nl();
         return null;
@@ -599,7 +599,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     @Override
     public Object visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
         sb.append("GVL").nl();
-        globalVariableListDeclaration.getLocalScope().accept(this);
+        globalVariableListDeclaration.getScope().accept(this);
         return null;
     }
 
@@ -694,8 +694,8 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(LocalScope localScope) {
-        for (VariableDeclaration vd : localScope.getLocalVariables().values()) {
+    public Object visit(Scope localScope) {
+        for (VariableDeclaration vd : localScope.getVariables().values()) {
             vd.getDataType();
             sb.nl().append("VAR");
 

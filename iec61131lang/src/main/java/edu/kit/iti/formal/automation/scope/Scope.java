@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.automation.scope;
 
+
+
 /*-
  * #%L
  * iec61131lang
@@ -22,23 +24,31 @@ package edu.kit.iti.formal.automation.scope;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.VariableScope;
 import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
+import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.visitors.Visitable;
+import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
- * Created by weigl on 24.11.16.
- *
- * @author weigl, Augusto Modanese
- * @version $Id: $Id
+ * @author Alexander Weigl
+ * @version 1 (13.06.14)
  */
 @Data
-public class GlobalScope implements Serializable {
+@NoArgsConstructor
+public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable<Scope> {
+    private VariableScope variables = new VariableScope();
+    private Scope parent;
     private Map<String, ProgramDeclaration> programs = new HashMap<>();
     private Map<String, FunctionBlockDeclaration> fb = new HashMap<>();
     private Map<String, FunctionDeclaration> functions = new HashMap<>();
@@ -47,90 +57,157 @@ public class GlobalScope implements Serializable {
     private TypeScope types = TypeScope.builtin();
     private Map<String, ClassDeclaration> classes = new LinkedHashMap<>();
     private Map<String, InterfaceDeclaration> interfaces = new LinkedHashMap<>();
-    private LocalScope globalVariableList = new LocalScope();
 
-    /**
-     * <p>defaultScope.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.scope.GlobalScope} object.
-     */
-    public static GlobalScope defaultScope() {
-        GlobalScope g = new GlobalScope();
+    public Scope(Scope parent) {
+        this.parent = parent;
+    }
+
+    public static Scope defaultScope() {
+        Scope g = new Scope();
         g.functionResolvers.add(new DefinedFunctionResolver());
         g.functionResolvers.add(new FunctionResolverMUX());
         return g;
     }
 
+    public Map<String, VariableDeclaration> asMap() {
+        return variables;
+    }
+
+    public void add(VariableDeclaration var) {
+        variables.put(var.getName(), var);
+    }
+
     /**
-     * <p>getProgram.</p>
-     *
-     * @param key a {@link java.lang.Object} object.
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.ProgramDeclaration} object.
+     * {@inheritDoc}
      */
-    public ProgramDeclaration getProgram(Object key) {
-        return programs.get(key);
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
+    public Scope prefixNames(String s) {
+        Scope copy = new Scope();
+        for (Map.Entry<String, VariableDeclaration> vd : this.variables.entrySet()) {
+            VariableDeclaration nd = new VariableDeclaration(vd.getValue());
+            nd.setName(s + nd.getName());
+            copy.add(nd);
+        }
+        return copy;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterator<VariableDeclaration> iterator() {
+        return variables.values().iterator();
+    }
+
+    @Override
+    public void forEach(Consumer<? super VariableDeclaration> action) {
+        variables.values().forEach(action);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Spliterator<VariableDeclaration> spliterator() {
+        return variables.values().spliterator();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Scope{");
+        for (String s : variables.keySet()) {
+            VariableDeclaration vd = variables.get(s);
+            sb.append(s).append(":").append(vd.getDataType());
+            if (vd.getInit() != null) sb.append(" := ").append(vd.getInit());
+            sb.append("},");
+        }
+        sb.delete(sb.length() - 1, sb.length());
+        sb.append("}");
+        return sb.toString();
+    }
+
+    /**
+     * <p>getVariable.</p>
+     *
+     * @param reference a {@link edu.kit.iti.formal.automation.st.ast.SymbolicReference} object.
+     * @return a {@link edu.kit.iti.formal.automation.st.ast.VariableDeclaration} object.
+     * @throws edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException if any.
+     */
+    public VariableDeclaration getVariable(SymbolicReference reference)
+            throws VariableNotDefinedException {
+        if (variables.containsKey(reference.getIdentifier()))
+            return variables.get(reference.getIdentifier());
+        throw new VariableNotDefinedException(this, reference);
+    }
+
+    /**
+     * <p>builder.</p>
+     *
+     * @return a {@link edu.kit.iti.formal.automation.st.ast.VariableBuilder} object.
+     */
+    public VariableBuilder builder() {
+        return new VariableBuilder(variables);
+    }
+
+    public List<VariableDeclaration> filterByFlags(int flags) {
+        return variables.values().stream().filter((v) -> v.is(flags)).collect(Collectors.toList());
+    }
+
+    public VariableDeclaration getVariable(String s) {
+        return variables.computeIfAbsent(s, getFromParent(s, parent::getVariable));
+    }
+
+    public boolean hasVariable(String variable) {
+        return variables.containsKey(variable);
+    }
+
+    public ProgramDeclaration getProgram(String key) {
+        return programs.computeIfAbsent(key, getFromParent(key, parent::getProgram));
     }
 
     public List<ProgramDeclaration> getPrograms() {
         return new ArrayList<>(programs.values());
     }
 
-    /**
-     * <p>getCalleeName.</p>
-     *
-     * @param key a {@link java.lang.Object} object.
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration} object.
-     */
-    public FunctionBlockDeclaration getFunctionBlock(Object key) {
-        return fb.get(key);
+    public <T> Function<String, T> getFromParent(String key, Function<String, T> func) {
+        return k -> {
+            if (parent != null) {
+                return func.apply(key);
+            }
+            return null;
+        };
+    }
+
+    public FunctionBlockDeclaration getFunctionBlock(String key) {
+        return fb.computeIfAbsent(key, getFromParent(key, parent::getFunctionBlock));
     }
 
     public List<FunctionBlockDeclaration> getFunctionBlocks() {
         return new ArrayList<>(fb.values());
     }
 
-    /**
-     * <p>getInvoked.</p>
-     *
-     * @param key a {@link java.lang.Object} object.
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
-     */
     public FunctionDeclaration getFunction(String key) {
-        return functions.get(key);
+        return functions.computeIfAbsent(key, getFromParent(key, parent::getFunction));
     }
 
-    /**
-     * <p>registerProgram.</p>
-     *
-     * @param programDeclaration a {@link edu.kit.iti.formal.automation.st.ast.ProgramDeclaration} object.
-     */
     public void registerProgram(ProgramDeclaration programDeclaration) {
         programs.put(programDeclaration.getIdentifier(), programDeclaration);
     }
 
-    /**
-     * <p>registerFunction.</p>
-     *
-     * @param functionDeclaration a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
-     */
     public void registerFunction(FunctionDeclaration functionDeclaration) {
         functions.put(functionDeclaration.getIdentifier(), functionDeclaration);
     }
 
-    /**
-     * <p>registerFunctionBlock.</p>
-     *
-     * @param fblock a {@link edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration} object.
-     */
     public void registerFunctionBlock(FunctionBlockDeclaration fblock) {
         fb.put(fblock.getIdentifier(), fblock);
     }
 
-    /**
-     * <p>registerType.</p>
-     *
-     * @param dt a {@link edu.kit.iti.formal.automation.st.ast.TypeDeclaration} object.
-     */
     public void registerType(TypeDeclaration dt) {
         dataTypes.put(dt.getTypeName(), dt);
     }
@@ -187,18 +264,13 @@ public class GlobalScope implements Serializable {
         if (name == "VOID")
             return null;
 
+        if (parent != null)
+            return parent.resolveDataType(name);
+
         throw new DataTypeNotDefinedException("Could not find: " + name);
     }
 
-    /**
-     * <p>resolveFunction.</p>
-     *
-     * @param invocation a {@link Invocation} object.
-     * @param local        a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.FunctionDeclaration} object.
-     */
-    public FunctionDeclaration resolveFunction(Invocation invocation,
-            LocalScope local) {
+    public FunctionDeclaration resolveFunction(Invocation invocation, Scope local) {
         for (FunctionResolver fr : functionResolvers) {
             FunctionDeclaration decl = fr.resolve(invocation, local);
             if (decl != null)
@@ -221,6 +293,10 @@ public class GlobalScope implements Serializable {
         ClassDeclaration classDeclaration = classes.get(key);
         if (classDeclaration == null)
             classDeclaration = getFunctionBlock(key);
+
+        if (parent != null && classDeclaration == null)
+            return parent.resolveClass(key);
+
         return classDeclaration;
     }
 
@@ -240,8 +316,10 @@ public class GlobalScope implements Serializable {
         return new ArrayList<>(interfaces.values());
     }
 
-    public GlobalScope clone() {
-        GlobalScope gs = new GlobalScope();
+
+    @Override
+    public Scope copy() {
+        Scope gs = new Scope(getParent());
         gs.classes = new HashMap<>(classes);
         gs.dataTypes = new HashMap<>(dataTypes);
         gs.fb = new HashMap<>(fb);
@@ -249,6 +327,20 @@ public class GlobalScope implements Serializable {
         gs.functions = new HashMap<>(functions);
         gs.programs = new HashMap<>(programs);
         gs.types = types.clone();
+
+        for (Map.Entry<String, VariableDeclaration> e : variables.entrySet()) {
+            gs.variables.put(e.getKey(), e.getValue().copy());
+        }
         return gs;
+    }
+
+    public void addVariables(Scope scope) {
+        variables.putAll(scope.getVariables());
+    }
+
+    public Scope getTopLevel() {
+        Scope s = this;
+        while (s.getParent() != null) s = s.getParent();
+        return s;
     }
 }

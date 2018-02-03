@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.modularization;
  */
 
 import edu.kit.iti.formal.automation.datatypes.AnyBit;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
@@ -97,7 +97,7 @@ public final class InlinedFunctionBlock {
 							fbInstance.type.inlinedAbstracted :
 							fbInstance.type.inlinedAll;
 
-			for(Statement i : inlinedFb.declaration.getProgramBody()) {
+			for(Statement i : inlinedFb.declaration.getStBody()) {
 				final Statement stmtCopy = i.copy();
 				stmtCopy.accept(prefixAdder);
 				_addToCurrentList(stmtCopy);
@@ -202,19 +202,19 @@ public final class InlinedFunctionBlock {
 			final Iterable<VariableDeclaration> variables) {
 
 		for(VariableDeclaration i : variables)
-			declaration.getLocalScope().add(new VariableDeclaration(
+			declaration.getScope().add(new VariableDeclaration(
 					prefix + i.getName(), specifier, i.getDataType()));
 	}
 
 	private void _useActivationAsOutput() {
 
 		final Set<String> prefixedInputNames = new HashSet<>();
-		final LocalScope  localScope         = declaration.getLocalScope();
+		final Scope  localScope         = declaration.getScope();
 
 		for(String i : activatedInstance.type.in.keySet())
 			prefixedInputNames.add(activatedInstance.name + "$" + i);
 
-		for(VariableDeclaration i : declaration.getLocalScope())
+		for(VariableDeclaration i : declaration.getScope())
 			if(original.out.containsKey(i.getName()))
 				i.setType(VariableDeclaration.LOCAL);
 
@@ -250,7 +250,7 @@ public final class InlinedFunctionBlock {
 		// The abstraction variables are created outside as they need the
 		// reference to the corresponding function block
 		for(AbstractionVariable i : abstractionVars.values())
-			declaration.getLocalScope().add(new VariableDeclaration(
+			declaration.getScope().add(new VariableDeclaration(
 					nameSelector.getName(i),
 					VariableDeclaration.INPUT,
 					i.type));
@@ -281,7 +281,7 @@ public final class InlinedFunctionBlock {
 		//original.body.accept(stp);
 		//System.out.println(stp.getString());
 
-		declaration.setProgramBody(
+		declaration.setStBody(
 				(StatementList)original.body.accept(new BodyCreator(config)));
 
 		if(activatedInstance != null) _useActivationAsOutput();

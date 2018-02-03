@@ -26,7 +26,7 @@ import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.datatypes.values.Values;
-import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.EqualsAndHashCode;
 import org.antlr.v4.runtime.Token;
@@ -78,7 +78,7 @@ public class EnumerationTypeDeclaration extends TypeDeclaration<Literal> {
     }
 
     @Override
-    public EnumerateType getDataType(GlobalScope globalScope) {
+    public EnumerateType getDataType(Scope globalScope) {
         //TODO rework
         String init = allowedValues.get(0).getText();
         if (initialization != null) {

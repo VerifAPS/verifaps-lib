@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.sfclang.ast.SFCImplementation;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -39,30 +39,11 @@ import lombok.ToString;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class FunctionBlockDeclaration extends ClassDeclaration implements Invocable {
-    private StatementList functionBody = new StatementList();
+public class FunctionBlockDeclaration extends ClassDeclaration {
+    private StatementList stBody;
+    private SFCImplementation sfcBody;
+    private String name;
 
-    /**
-     * <p>Getter for the field <code>functionBody</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     */
-    public StatementList getFunctionBody() {
-        return functionBody;
-    }
-
-    /**
-     * <p>Setter for the field <code>functionBody</code>.</p>
-     *
-     * @param functionBody a {@link edu.kit.iti.formal.automation.st.ast.StatementList} object.
-     */
-    public void setFunctionBody(StatementList functionBody) {
-        this.functionBody = functionBody;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
@@ -76,21 +57,14 @@ public class FunctionBlockDeclaration extends ClassDeclaration implements Invoca
     }
 
     @Override
-    public Any getReturnType() {
-        return null;  // no return value when invoking function blocks
-    }
-
-    @Override
     public FunctionBlockDeclaration copy() {
         FunctionBlockDeclaration fb = new FunctionBlockDeclaration();
         fb.setRuleContext(getRuleContext());
         fb.setName(getName());
-        fb.setFinal_(isFinal_());
-        fb.setAbstract_(isAbstract_());
-        fb.setParent(getParent().getIdentifier());
-        getInterfaces().forEach(i -> fb.addImplements(i.getIdentifier()));
-        getMethods().forEach(m -> fb.getMethods().add(m.copy()));
-        fb.functionBody = functionBody.copy();
+        if (stBody != null)
+            fb.stBody = stBody.copy();
+        if (sfcBody != null)
+            fb.sfcBody = sfcBody.copy();
         return fb;
     }
 }

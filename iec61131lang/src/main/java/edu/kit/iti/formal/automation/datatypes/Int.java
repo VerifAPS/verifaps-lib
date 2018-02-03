@@ -22,6 +22,8 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import java.util.Optional;
+
 /**
  * <p>Int class.</p>
  *
@@ -40,8 +42,13 @@ public final class Int extends AnySignedInt {
      * {@inheritDoc}
      */
     @Override
-    public AnyInt next() {
-        return DataTypes.DINT;
+    public Optional<AnyInt> next() {
+        return Optional.ofNullable(DataTypes.DINT);
+    }
+
+    @Override
+    public AnyUnsignedInt asUnsgined() {
+        return DataTypes.UINT;
     }
 
     @Override

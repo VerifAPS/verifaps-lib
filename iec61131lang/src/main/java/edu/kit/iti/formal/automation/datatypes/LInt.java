@@ -22,6 +22,8 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import java.util.Optional;
+
 /**
  * <p>LInt class.</p>
  *
@@ -29,18 +31,26 @@ package edu.kit.iti.formal.automation.datatypes;
  * @version $Id: $Id
  */
 public final class LInt extends AnySignedInt {
-    /** {@inheritDoc} */
-    @Override
-    public AnyInt next() {
-        return DataTypes.LINT;
-    }
-
     /**
      * <p>Constructor for LInt.</p>
      */
     public LInt() {
         super(64);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<AnyInt> next() {
+        return Optional.empty();
+    }
+
+    @Override
+    public AnyUnsignedInt asUnsgined() {
+        return DataTypes.ULINT;
+    }
+
     @Override
     public <T> T accept(DataTypeVisitor<T> visitor) {
         return visitor.visit(this);

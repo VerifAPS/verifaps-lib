@@ -30,7 +30,7 @@ import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,12 +44,12 @@ public class TypePromotionTest {
     static IntegerPromotion ip = IntegerPromotion.INSTANCE;
 
 
-    LocalScope vd = new LocalScope();
+    Scope vd = new Scope();
     EnumerateType et = new EnumerateType("states", Arrays.asList("X", "Y", "Z"));
 
     @Before
     public void setup() {
-        vd = new LocalScope();
+        vd = new Scope();
         vd.add(new VariableDeclaration("a", DataTypes.UINT));
         vd.add(new VariableDeclaration("b", DataTypes.INT));
         vd.add(new VariableDeclaration("c", AnyBit.BOOL));
@@ -147,7 +147,7 @@ public class TypePromotionTest {
         //assertDataType(INT, "MAX(2,3)", null);
     }
 
-    private void assertDataType(Any dt, String sexpr, LocalScope vd) throws VariableNotDefinedException, TypeConformityException {
+    private void assertDataType(Any dt, String sexpr, Scope vd) throws VariableNotDefinedException, TypeConformityException {
         assertEquals(dt, IEC61131Facade.expr(sexpr).dataType(vd));
     }
 

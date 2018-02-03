@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.RecordType;
-import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 
@@ -58,7 +58,7 @@ public class StructureTypeDeclaration extends TypeDeclaration<StructureInitializ
 
     /** {@inheritDoc} */
     @Override
-    public Any getDataType(GlobalScope globalScope) {
+    public Any getDataType(Scope globalScope) {
         RecordType rt = new RecordType(getTypeName());
         for(Map.Entry<String, TypeDeclaration> s: fields.entrySet())
             rt.addField(s.getKey(), s.getValue().getDataType(globalScope));

@@ -22,10 +22,9 @@ package edu.kit.iti.formal.automation.st0.trans;
  * #L%
  */
 
-import com.google.errorprone.annotations.Var;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.st.ast.StatementList;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
@@ -43,21 +42,21 @@ public class FunctionBlockEmbedding implements ST0Transformation {
     @Override
     public void transform(STSimplifier.State state) {
         for (FunctionBlockDeclaration fbd : state.functionBlocks.values()) {
-            StatementList newStatements = embeddFunctionBlocks(fbd.getLocalScope(), fbd.getFunctionBody());
-            fbd.setFunctionBody(newStatements);
+            StatementList newStatements = embeddFunctionBlocks(fbd.getScope(), fbd.getStBody());
+            fbd.setStBody(newStatements);
         }
 
-        for (VariableDeclaration vd : state.theProgram.getLocalScope().getLocalVariables().values()) {
+        for (VariableDeclaration vd : state.theProgram.getScope()) {
             vd.setType(vd.getType() | STSimplifier.PROGRAM_VARIABLE);
         }
 
-        state.theProgram.setProgramBody(
-                embeddFunctionBlocks(state.theProgram.getLocalScope(),
-                                     state.theProgram.getProgramBody()));
+        state.theProgram.setStBody(
+                embeddFunctionBlocks(state.theProgram.getScope(),
+                                     state.theProgram.getStBody()));
     }
 
-    private StatementList embeddFunctionBlocks(LocalScope declared, StatementList statements) {
-        Set<VariableDeclaration> decls = new HashSet<>(declared.getLocalVariables().values());
+    private StatementList embeddFunctionBlocks(Scope declared, StatementList statements) {
+        Set<VariableDeclaration> decls = new HashSet<>(declared.asMap().values());
         for (VariableDeclaration vd : decls) {
             String typeName = vd.getDataTypeName();
             Any type = vd.getDataType();
@@ -73,7 +72,7 @@ public class FunctionBlockEmbedding implements ST0Transformation {
     }
 
 
-    private StatementList embeddFunctionBlocksImpl(LocalScope origin, StatementList intoStatements,
+    private StatementList embeddFunctionBlocksImpl(Scope origin, StatementList intoStatements,
                                                    VariableDeclaration vd, FunctionBlockDeclaration fbd) {
         assert !intoStatements.isEmpty();
         final String prefix = vd.getName() + "$";
@@ -82,16 +81,16 @@ public class FunctionBlockEmbedding implements ST0Transformation {
             return prefix + s;
         };
 
-        LocalScope embeddVariables = prefixNames(fbd.getLocalScope(), newName);
+        Scope embeddVariables = prefixNames(fbd.getScope(), newName);
 
         //declare new variables
-        origin.getLocalVariables().putAll(embeddVariables.getLocalVariables());
+        origin.addVariables(embeddVariables);
 
         // remove FunctionBlock Instance
-        origin.getLocalVariables().remove(vd.getName());
+        origin.asMap().remove(vd.getName());
 
         //Make a copy of the statements and add prefix to every variable
-        VariableRenamer vr = new VariableRenamer(fbd.getFunctionBody(), newName);
+        VariableRenamer vr = new VariableRenamer(fbd.getStBody(), newName);
         StatementList sl = vr.rename(); // <- this can be injected
 
         // inject into every function block call
@@ -99,8 +98,8 @@ public class FunctionBlockEmbedding implements ST0Transformation {
         return fbe.embedd(intoStatements);
     }
 
-    private LocalScope prefixNames(LocalScope scope, Function<String, String> newName) {
-        LocalScope copy = new LocalScope().copy();
+    private Scope prefixNames(Scope scope, Function<String, String> newName) {
+        Scope copy = new Scope().copy();
         for (VariableDeclaration vd : scope) {
             VariableDeclaration nd = vd.copy();
             if (nd.isInput() || nd.isInOut() || nd.isOutput()) {

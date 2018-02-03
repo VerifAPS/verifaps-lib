@@ -57,7 +57,7 @@ public class Graph2Ast {
         vb.setBaseType("BOOL").identifiers(TRANSIT_VARIABLE).close();
 
         fbd.setFunctionBlockName(graph.getName());
-        fbd.setLocalScope(graph.getScope());
+        fbd.setScope(graph.getScope());
 
         enumStates = new EnumerationTypeDeclaration();
         enumStates.setTypeName(getStatesTypeName());

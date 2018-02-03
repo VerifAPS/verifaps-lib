@@ -23,7 +23,7 @@
 package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.datatypes.ReferenceType;
-import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,7 +44,7 @@ public class ReferenceSpecification extends TypeDeclaration<Initialization> {
     }
 
     @Override
-    public ReferenceType getDataType(GlobalScope globalScope) {
+    public ReferenceType getDataType(Scope globalScope) {
         ReferenceType rt = new ReferenceType(globalScope.resolveDataType(refTo.getTypeName()));
         baseType = rt;
         return rt;

@@ -34,8 +34,7 @@ import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
 public class DefinedFunctionResolver implements FunctionResolver {
     /** {@inheritDoc} */
     @Override
-    public FunctionDeclaration resolve(Invocation call, LocalScope scope) {
-        return scope.getGlobalScope()
-                .getFunction(call.getCalleeName());
+    public FunctionDeclaration resolve(Invocation call, Scope scope) {
+        return scope.getFunction(call.getCalleeName());
     }
 }

@@ -22,17 +22,7 @@ package edu.kit.iti.formal.automation.sfclang;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration;
-import edu.kit.iti.formal.automation.sfclang.ast.StepDeclaration;
-import edu.kit.iti.formal.automation.sfclang.ast.TransitionDeclaration;
-import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
-import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
-import edu.kit.iti.formal.automation.st.util.CodeWriter;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 
 /**
  * <p>SFCLangPrinter class.</p>
@@ -40,37 +30,28 @@ import java.util.Set;
  * @author weigl
  * @version $Id: $Id
  */
-public class SFCLangPrinter implements SFCAstVisitor<Object> {
+public class SFCLangPrinter extends AstVisitor<Object> {
+    /*
     private CodeWriter cw = new CodeWriter();
     private StructuredTextPrinter stPrinter;
 
-    /**
-     * <p>Constructor for SFCLangPrinter.</p>
-     */
     public SFCLangPrinter() {
         stPrinter = new StructuredTextPrinter();
         stPrinter.setCodeWriter(cw);
     }
 
-    /**
-     * <p>print.</p>
-     *
-     * @param a a {@link edu.kit.iti.formal.automation.sfclang.ast.SFCDeclaration} object.
-     * @return a {@link java.lang.String} object.
-     */
-    public static String print(SFCDeclaration a) {
+    public static String print(SFCImplementation a) {
         SFCLangPrinter p = new SFCLangPrinter();
         a.visit(p);
         return p.cw.toString();
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Object visit(SFCDeclaration decl) {
+    public Object visit(SFCImplementation decl) {
         cw.keyword("sfc").append(" ").append(decl.getIdentifier()).nl()
                 .increaseIndent();
 
-        stPrinter.visit(decl.getLocalScope());
+        stPrinter.visit(decl.getScope());
 
         cw.nl().nl();
 
@@ -94,13 +75,12 @@ public class SFCLangPrinter implements SFCAstVisitor<Object> {
         cw.nl().keyword("action").append(" ").append(fbd.getIdentifier());
         cw.increaseIndent();
         cw.nl();
-        stPrinter.visit(fbd.getLocalScope());
-        stPrinter.visit(fbd.getFunctionBody());
+        stPrinter.visit(fbd.getScope());
+        stPrinter.visit(fbd.getStBody());
         cw.decreaseIndent();
         cw.nl().keyword("end_action");
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object visit(StepDeclaration decl) {
         cw.nl().keyword("step").append(" ").append(decl.getName());
@@ -140,7 +120,6 @@ public class SFCLangPrinter implements SFCAstVisitor<Object> {
         printList(array);
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object visit(TransitionDeclaration decl) {
         cw.nl().keyword("goto").append(" ");
@@ -154,22 +133,11 @@ public class SFCLangPrinter implements SFCAstVisitor<Object> {
         return null;
     }
 
-    /**
-     * <p>getCodeWriter.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.st.util.CodeWriter} object.
-     */
     public CodeWriter getCodeWriter() {
         return cw;
     }
-
-    /**
-     * <p>setCodeWriter.</p>
-     *
-     * @param cw a {@link edu.kit.iti.formal.automation.st.util.CodeWriter} object.
-     */
     public void setCodeWriter(CodeWriter cw) {
         this.cw = cw;
     }
-
+*/
 }

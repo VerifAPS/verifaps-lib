@@ -43,7 +43,7 @@ public class FunctionResolverMUX implements FunctionResolver {
      * {@inheritDoc}
      */
     @Override
-    public FunctionDeclaration resolve(Invocation call, LocalScope scope) {
+    public FunctionDeclaration resolve(Invocation call, Scope scope) {
         if ("MUX".equals(call.getCalleeName())) {
 
             List<Any> datatypes = call.getParameters().stream().map((parameter) -> {
@@ -73,7 +73,7 @@ public class FunctionResolverMUX implements FunctionResolver {
             returnType.setIdentifiedObject(call.get(1));
             DefaultTypePromoter dtp = new DefaultTypePromoter();
             for (int i = 0; i < call.size(); i++) {
-                localScope.add(new VariableDeclaration("a" + i,
+                scope.add(new VariableDeclaration("a" + i,
                         VariableDeclaration.INPUT, call.get(i)));
 
                 if (i > 0) {
@@ -83,7 +83,7 @@ public class FunctionResolverMUX implements FunctionResolver {
                             call.get(i)));
                 }
             }
-            statements.add(stmt);
+            stBody.add(stmt);
         }
 
         private static CaseStatement.Case createCase(int i) {

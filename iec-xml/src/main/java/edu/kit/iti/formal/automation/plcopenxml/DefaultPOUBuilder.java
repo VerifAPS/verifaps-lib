@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.plcopenxml;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.Literal;
 import edu.kit.iti.formal.automation.st.ast.VariableBuilder;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
@@ -43,9 +43,9 @@ public abstract class DefaultPOUBuilder implements PCLOpenXMLBuilder.Builder {
     }
 
 
-    public LocalScope parseInterface() {
+    public Scope parseInterface() {
         Element interfaze = element.getChild("interface");
-        LocalScope d = new LocalScope();
+        Scope d = new Scope();
         add(interfaze.getChild("inputVars"), d, VariableDeclaration.INPUT);
         add(interfaze.getChild("outputVars"), d, VariableDeclaration.OUTPUT);
         add(interfaze.getChild("localVars"), d, 0);
@@ -54,7 +54,7 @@ public abstract class DefaultPOUBuilder implements PCLOpenXMLBuilder.Builder {
         return d;
     }
 
-    protected void add(Element vars, LocalScope d, int flags) {
+    protected void add(Element vars, Scope d, int flags) {
         if (vars == null) {
             return;
         }

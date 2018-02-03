@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.exceptions;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
 
 /**
@@ -33,15 +33,15 @@ import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
  */
 public class VariableNotDefinedException extends IECException {
     private final SymbolicReference reference;
-    private final LocalScope localScope;
+    private final Scope localScope;
 
     /**
      * <p>Constructor for VariableNotDefinedException.</p>
      *
-     * @param variableDeclarations a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
+     * @param variableDeclarations a {@link edu.kit.iti.formal.automation.scope.Scope} object.
      * @param reference a {@link edu.kit.iti.formal.automation.st.ast.SymbolicReference} object.
      */
-    public VariableNotDefinedException(LocalScope variableDeclarations, SymbolicReference reference) {
+    public VariableNotDefinedException(Scope variableDeclarations, SymbolicReference reference) {
         this.localScope = variableDeclarations;
         this.reference = reference;
     }
@@ -58,9 +58,9 @@ public class VariableNotDefinedException extends IECException {
     /**
      * <p>Getter for the field <code>localScope</code>.</p>
      *
-     * @return a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
+     * @return a {@link edu.kit.iti.formal.automation.scope.Scope} object.
      */
-    public LocalScope getLocalScope() {
+    public Scope getScope() {
         return localScope;
     }
 

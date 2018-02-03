@@ -22,6 +22,10 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import edu.kit.iti.formal.automation.scope.Scope;
+import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,18 +39,25 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = "parent")
 @ToString(callSuper = true, exclude = "parent")
-public class MethodDeclaration extends FunctionDeclaration {
-    private TopLevelScopeElement parent;
+public class MethodDeclaration extends Top<IEC61131Parser.MethodContext> implements Invocable {
+    protected IdentifierPlaceHolder<Any> returnType = new IdentifierPlaceHolder<>();
+    protected String methodName;
+    protected StatementList stBody;
+    protected Scope scope = new Scope();
+    protected Classifier parent;
     private AccessSpecifier accessSpecifier = AccessSpecifier.defaultAccessSpecifier();
     private boolean final_ = false;
     private boolean abstract_ = false;
     private boolean override = false;
 
-    @Override
     public String getReturnTypeName() {
         if (returnType.getIdentifier() == null)
             return "VOID";
-        return super.getReturnTypeName();
+        return returnType.getIdentifier();
+    }
+
+    public void setReturnTypeName(String rt) {
+        returnType.setIdentifier(rt);
     }
 
     @Override
@@ -54,9 +65,14 @@ public class MethodDeclaration extends FunctionDeclaration {
         return visitor.visit(this);
     }
 
-    public void setName(String n) {
-        setFunctionName(n);
+    public Any getReturnType() {
+        return returnType.getIdentifiedObject();
     }
+
+    public void setReturnType(Any rt) {
+        returnType.setIdentifiedObject(rt);
+    }
+
 
     @Override
     public MethodDeclaration copy() {
@@ -65,9 +81,14 @@ public class MethodDeclaration extends FunctionDeclaration {
         md.final_ = final_;
         md.abstract_ = abstract_;
         md.override = override;
-        md.localScope = localScope.copy();
-        md.functionName = functionName;
+        md.scope = scope.copy();
+        md.methodName = methodName;
         md.returnType = returnType.copy();
         return md;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return getMethodName();
     }
 }

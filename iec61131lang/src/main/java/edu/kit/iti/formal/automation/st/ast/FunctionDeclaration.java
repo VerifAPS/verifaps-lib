@@ -26,9 +26,7 @@ import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * Created by weigl on 13.06.14.
@@ -39,19 +37,13 @@ import lombok.ToString;
 @EqualsAndHashCode(exclude = "statements")
 @ToString(exclude = "statements")
 @NoArgsConstructor
+@Getter
+@Setter
 public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Function_declarationContext>
         implements Invocable {
     protected IdentifierPlaceHolder<Any> returnType = new IdentifierPlaceHolder<>();
     protected String functionName;
-    protected StatementList statements = new StatementList();
-
-    public String getFunctionName() {
-        return functionName;
-    }
-
-    public void setFunctionName(String functionName) {
-        this.functionName = functionName;
-    }
+    protected StatementList stBody = new StatementList();
 
     public String getReturnTypeName() {
         return returnType.getIdentifier();
@@ -70,14 +62,6 @@ public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Fun
     }
 
 
-    public StatementList getStatements() {
-        return statements;
-    }
-
-    public void setStatements(StatementList statements) {
-        this.statements = statements;
-    }
-
 
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
@@ -93,7 +77,7 @@ public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Fun
         FunctionDeclaration fd = new FunctionDeclaration();
         fd.functionName = functionName;
         fd.returnType = returnType.copy();
-        fd.statements = statements.copy();
+        fd.stBody= stBody.copy();
         return fd;
     }
 }

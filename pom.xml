@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.kit.iti.formal</groupId>
     <artifactId>verifaps-lib</artifactId>
-    <version>1.4.1-SNAPSHOT</version>
+    <version>1.5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <organization>
@@ -20,7 +20,7 @@
         <tag>HEAD</tag>
     </scm>
 
-    <inceptionYear>2017</inceptionYear>
+    <inceptionYear>2018</inceptionYear>
 
     <modules>
         <module>iec-symbex</module>
@@ -36,12 +36,50 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <license.inceptionYear>2017</license.inceptionYear>
+        <license.inceptionYear>2018</license.inceptionYear>
         <license.copyrightOwner>Alexander Weigl</license.copyrightOwner>
         <license.name>gpl_v3</license.name>
 
         <!-- <url>scpexe://i57adm.ira.uka.de/home/i57/weigl/htdocs/weigl/maven2/</url> -->
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>edu.kit.iti.formal</groupId>
+                <artifactId>iec-symbex</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>edu.kit.iti.formal</groupId>
+                <artifactId>iec61131lang</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>edu.kit.iti.formal</groupId>
+                <artifactId>smv-model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>edu.kit.iti.formal</groupId>
+                <artifactId>iec-xml</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>edu.kit.iti.formal</groupId>
+                <artifactId>aps-rvt</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>edu.kit.iti.formal</groupId>
+                <artifactId>iec-modularization</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -71,30 +109,27 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.5</version>
+            <version>2.6</version>
         </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>22.0</version>
+            <version>23.6-jre</version>
         </dependency>
 
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.16</version>
+            <version>1.16.20</version>
             <scope>provided</scope>
         </dependency>
-
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.6</version>
+            <version>3.7</version>
         </dependency>
-
     </dependencies>
 
     <prerequisites>

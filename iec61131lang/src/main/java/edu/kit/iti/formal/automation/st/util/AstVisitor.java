@@ -22,7 +22,10 @@ package edu.kit.iti.formal.automation.st.util;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.LocalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
+import edu.kit.iti.formal.automation.sfclang.ast.SFCAction;
+import edu.kit.iti.formal.automation.sfclang.ast.SFCNetwork;
+import edu.kit.iti.formal.automation.sfclang.ast.SFCStep;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
@@ -167,8 +170,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(ProgramDeclaration programDeclaration) {
         currentTopLevelScopeElement = programDeclaration;
-        programDeclaration.getLocalScope().accept(this);
-        programDeclaration.getProgramBody().accept(this);
+        programDeclaration.getScope().accept(this);
+        programDeclaration.getStBody().accept(this);
         return null;
     }
 
@@ -188,8 +191,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(FunctionDeclaration functionDeclaration) {
         currentTopLevelScopeElement = functionDeclaration;
-        functionDeclaration.getLocalScope().accept(this);
-        functionDeclaration.getStatements().accept(this);
+        functionDeclaration.getScope().accept(this);
+        functionDeclaration.getStBody().accept(this);
         return null;
     }
 
@@ -211,8 +214,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        functionBlockDeclaration.getLocalScope().accept(this);
-        functionBlockDeclaration.getFunctionBody().accept(this);
+        functionBlockDeclaration.getScope().accept(this);
+        functionBlockDeclaration.getStBody().accept(this);
         return null;
     }
 
@@ -254,8 +257,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T visit(LocalScope localScope) {
-        for (VariableDeclaration vd : localScope.getLocalVariables().values())
+    public T visit(Scope localScope) {
+        for (VariableDeclaration vd : localScope.asMap().values())
             vd.accept(this);
         return null;
     }
@@ -333,7 +336,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(ClassDeclaration clazz) {
         currentTopLevelScopeElement = clazz;
-        clazz.getLocalScope().accept(this);
+        clazz.getScope().accept(this);
         for (MethodDeclaration m : new ArrayList<>(clazz.getMethods())) {
             m.accept(this);
         }
@@ -343,7 +346,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(InterfaceDeclaration interfaceDeclaration) {
         currentTopLevelScopeElement = interfaceDeclaration;
-        interfaceDeclaration.getLocalScope().accept(this);
+        interfaceDeclaration.getScope().accept(this);
         for (MethodDeclaration m : interfaceDeclaration.getMethods())
             m.accept(this);
         return super.visit(interfaceDeclaration);
@@ -351,15 +354,91 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(MethodDeclaration method) {
-        method.getLocalScope().accept(this);
-        method.getStatements().accept(this);
+        method.getScope().accept(this);
+        if (method.getStBody() != null)
+            method.getStBody().accept(this);
         return null;
     }
 
     @Override
     public T visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
         currentTopLevelScopeElement = globalVariableListDeclaration;
-        globalVariableListDeclaration.getLocalScope().accept(this);
+        globalVariableListDeclaration.getScope().accept(this);
         return super.visit(globalVariableListDeclaration);
+    }
+
+    @Override
+    public T visit(ArrayTypeDeclaration arrayTypeDeclaration) {
+        return super.visit(arrayTypeDeclaration);
+    }
+
+    @Override
+    public T visit(ExitStatement exitStatement) {
+        return super.visit(exitStatement);
+    }
+
+    @Override
+    public T visit(ConfigurationDeclaration configurationDeclaration) {
+        return super.visit(configurationDeclaration);
+    }
+
+    @Override
+    public T visit(EnumerationTypeDeclaration enumerationTypeDeclaration) {
+        return super.visit(enumerationTypeDeclaration);
+    }
+
+    @Override
+    public T visit(ResourceDeclaration resourceDeclaration) {
+        return super.visit(resourceDeclaration);
+    }
+
+    @Override
+    public T visit(ReturnStatement returnStatement) {
+        return super.visit(returnStatement);
+    }
+
+    @Override
+    public T visit(Deref deref) {
+        return super.visit(deref);
+    }
+
+    @Override
+    public T visit(SymbolicReference symbolicReference) {
+        return super.visit(symbolicReference);
+    }
+
+    @Override
+    public T visit(PointerTypeDeclaration ptd) {
+        return super.visit(ptd);
+    }
+
+    @Override
+    public T visit(IdentifierInitializer init) {
+        return super.visit(init);
+    }
+
+    @Override
+    public T visit(Literal literal) {
+        return super.visit(literal);
+    }
+
+    @Override
+    public T visit(ReferenceSpecification referenceSpecification) {
+        return super.visit(referenceSpecification);
+    }
+
+    @Override
+    public T visit(SFCStep sfcStep) {
+        return super.visit(sfcStep);
+    }
+
+    @Override
+    public T visit(SFCAction sfcAction) {
+        return super.visit(sfcAction);
+    }
+
+    @Override
+    public T visit(SFCNetwork sfcNetwork) {
+        return super.visit(sfcNetwork);
     }
 }
