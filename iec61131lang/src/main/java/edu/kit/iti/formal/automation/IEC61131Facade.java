@@ -29,8 +29,8 @@ import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
-import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.*;
 import org.antlr.v4.runtime.CharStream;
@@ -50,6 +50,8 @@ import java.nio.file.Path;
  * @since 27.11.16
  */
 public class IEC61131Facade {
+    private static final int FIND_EFFECTIVE_SUBTYPES_LIMIT = 1000;
+
     /**
      * Parse the given string into an expression.
      *
@@ -99,7 +101,6 @@ public class IEC61131Facade {
         return statements(CharStreams.fromString(input));
     }
 
-
     /**
      * <p>file.</p>
      *
@@ -136,7 +137,8 @@ public class IEC61131Facade {
 
     /**
      * Find all instances of classes and FBs belonging to the given top level element..
-     * @param element The top level element to visit.
+     *
+     * @param element     The top level element to visit.
      * @param globalScope Global scope after data types have been resolved.
      * @return The instance scope containing all instances.
      */
@@ -145,8 +147,6 @@ public class IEC61131Facade {
         element.accept(new FindInstances(instanceScope));
         return instanceScope;
     }
-
-    private static final int FIND_EFFECTIVE_SUBTYPES_LIMIT = 1000;
 
     public static void findEffectiveSubtypes(TopLevelElements topLevelElements, Scope globalScope) {
         FindEffectiveSubtypes findEffectiveSubtypes = new FindEffectiveSubtypes();
@@ -157,9 +157,11 @@ public class IEC61131Facade {
         System.out.println("Done: fixpoint is " + findEffectiveSubtypes.fixpointReached());
     }
 
+
     /**
      * Resolve types of top level elements and print them along with some minor statistics.
      * Assume there is a single program declaration.
+     *
      * @param topLevelElements
      * @return Top level elements, formatted, as string.
      */

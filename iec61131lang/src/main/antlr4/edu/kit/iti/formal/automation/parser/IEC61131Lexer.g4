@@ -617,16 +617,19 @@ BIT
 	| '0'
 ;
 
+fragment
 DOLLAR
 :
 	'$'
 ;
 
+fragment
 DQUOTE
 :
 	'"'
 ;
 
+fragment
 FALSE
 :
 	F A L S E
@@ -647,6 +650,7 @@ SQUOTE
 	'\''
 ;
 
+fragment
 TRUE
 :
 	T R U E
