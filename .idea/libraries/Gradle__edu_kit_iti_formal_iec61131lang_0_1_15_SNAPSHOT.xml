@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: edu.kit.iti.formal:iec61131lang:0.1.15-SNAPSHOT">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/edu/kit/iti/formal/iec61131lang/0.1.15-SNAPSHOT/iec61131lang-0.1.15-SNAPSHOT.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

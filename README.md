@@ -1,6 +1,8 @@
 # geteta &mdash; Generalized Test Tables
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/655e1ba61c2040eb8bccdb8f8a3799d1)](https://www.codacy.com/app/wadoon/geteta?utm_source=github.com&utm_medium=referral&utm_content=VerifAPS/geteta&utm_campaign=badger)
+[![Coverage Status](https://coveralls.io/repos/github/VerifAPS/geteta/badge.svg)](https://coveralls.io/github/VerifAPS/geteta)
+[![CircleCI](https://circleci.com/gh/VerifAPS/geteta.svg?style=svg)](https://circleci.com/gh/VerifAPS/geteta)
 
 Generalized Test Tables ensures safety in automation software.
 
@@ -12,9 +14,13 @@ Generalized Test Tables ensures safety in automation software.
 
 These are jar files include all dependencies:
 
-* 0.6.0-alpha: **not released yet**
-  * \omega duration
-  * reintroduce blocks
+* 0.6.0: **not released yet**
+  * `omega` duration
+  * `wait` duration
+  * Reintroduction blocks
+  * Empty cells copies has the value from the cell above. 
+    If no cell above (first row), it is don't-care `-`.
+  * 
 * 0.5.0-alpha: **not released**
   * new automata model
   * different verification techniques (IC3, BMC, LTL)

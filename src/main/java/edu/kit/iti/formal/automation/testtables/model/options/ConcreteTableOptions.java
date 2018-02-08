@@ -28,9 +28,9 @@ import java.util.TreeMap;
  * Created by weigl on 16.12.16.
  */
 public class ConcreteTableOptions implements InitializableFromProperties {
-    private Map<Integer, Integer> stepCounter = new TreeMap<>();
+    private Map<String, Integer> stepCounter = new TreeMap<>();
 
-    public int getCount(int step, int defaultValue) {
+    public int getCount(String step, int defaultValue) {
         return stepCounter.getOrDefault(step, defaultValue);
     }
 
@@ -40,7 +40,7 @@ public class ConcreteTableOptions implements InitializableFromProperties {
         for (Map.Entry<Object, Object> e : p.entrySet()) {
             String key = e.getKey().toString();
             if (key.startsWith(namespace)) {
-                int step = Integer.parseInt(key.substring(nslength));
+                String step = key.substring(nslength);
                 int count = Integer.parseInt(e.getValue().toString());
                 stepCounter.put(step, count);
             }

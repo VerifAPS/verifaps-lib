@@ -34,6 +34,7 @@ import java.util.*;
  */
 @Data
 public class State extends TableNode {
+    public static final String SENTINEL_ID = "$$$";
     private final List<SMVExpr> inputExpr = new ArrayList<>();
     private final List<SMVExpr> outputExpr = new ArrayList<>();
     private final Set<State> incoming = new HashSet<>();
@@ -63,13 +64,17 @@ public class State extends TableNode {
     private boolean initialReachable;
     private boolean endState;
 
-    public State(int id) {
+    public State(String id) {
         super(id);
         defOutput = new SVariable("s" + id + "_out", SMVType.BOOLEAN);
         defForward = new SVariable("s" + id + "_fwd", SMVType.BOOLEAN);
         defFailed = new SVariable("s" + id + "_fail", SMVType.BOOLEAN);
         defInput = new SVariable("s" + id + "_in", SMVType.BOOLEAN);
         defKeep = new SVariable("s" + id + "_keep", SMVType.BOOLEAN);
+    }
+
+    public State(int id) {
+        this(String.valueOf(id));
     }
 
     public void add(IoVariable v, SMVExpr e) {
@@ -109,12 +114,12 @@ public class State extends TableNode {
 
         State state = (State) o;
 
-        return id == state.id;
+        return Objects.equals(id, state.id);
     }
 
     @Override
     public int hashCode() {
-        return id;
+        return id.hashCode();
     }
 
     @Override
@@ -171,15 +176,15 @@ public class State extends TableNode {
         }
 
         public SVariable getSMVVariable() {
-            return SVariable.create("s" + getId() + "_" + count).asBool();
+            return SVariable.create("s_%s_%d", id, count).asBool();
         }
 
         public SVariable getDefForward() {
-            return SVariable.create("s_%d_%d_fwd", id, count).asBool();
+            return SVariable.create("s_%s_%d_fwd", id, count).asBool();
         }
 
         public SVariable getDefFailed() {
-            return SVariable.create("s_%d_%d_fail", id, count).asBool();
+            return SVariable.create("s_%s_%d_fail", id, count).asBool();
         }
 
         /**

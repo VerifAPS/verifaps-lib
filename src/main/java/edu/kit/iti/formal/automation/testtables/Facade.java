@@ -24,7 +24,7 @@ import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.DataTypes;
-import edu.kit.iti.formal.automation.scope.GlobalScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.testtables.io.TableReader;
@@ -33,7 +33,6 @@ import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.SReference;
 import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique;
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions;
-import edu.kit.iti.formal.automation.testtables.schema.DataType;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
@@ -64,11 +63,11 @@ public class Facade {
 
     private static void resolveEnumsAndSetInts(TopLevelElements a) {
         AstVisitor<Object> astVisitor = new AstVisitor<Object>() {
-            public GlobalScope global;
+            public Scope global;
 
             @Override
             public Object visit(ProgramDeclaration decl) {
-                this.global = decl.getLocalScope().getGlobalScope();
+                this.global = decl.getScope().getParent();
                 return super.visit(decl);
             }
 

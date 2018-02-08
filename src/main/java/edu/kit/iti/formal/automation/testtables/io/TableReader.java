@@ -28,6 +28,7 @@ import edu.kit.iti.formal.automation.testtables.model.State;
 import edu.kit.iti.formal.automation.testtables.schema.*;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -137,7 +138,7 @@ public class TableReader {
 
             String cellValue = null;
             if (i < step.getCell().size()) {
-                cellValue = step.getCell().get(i);
+                cellValue = step.getCell().get(i).trim();
             }
 
             if (cellValue == null || cellValue.isEmpty()) {
@@ -149,10 +150,19 @@ public class TableReader {
                             name, s.getId(), i);
                 }
             }
-            SMVExpr e = IOFacade.parseCellExpression(cellValue,
-                    gtt.getSMVVariable(name), gtt);
-            s.add(v, e);
-            lastColumnValue.put(i, cellValue);
+            try {
+                SMVExpr e = IOFacade.parseCellExpression(cellValue,
+                        gtt.getSMVVariable(name), gtt);
+                s.add(v, e);
+                lastColumnValue.put(i, cellValue);
+            } catch (ParseCancellationException pce) {
+                Report.error("Error during parsing '%s'  for column '%s' (%d) and row '%d'", cellValue,
+                        name, i, s.getId());
+                Report.error(pce.getMessage());
+                throw pce;
+            }
+
+
         }
 
         s.setDuration(IOFacade.parseDuration(step.getDuration()));

@@ -51,10 +51,9 @@ import java.util.*;
  * @version 2 (12.12.16)
  */
 public class StateReachability {
-    public static final int SENTINEL_ID = -1;
     private final GeneralizedTestTable gtt;
     private final List<State> flatList;
-    private final State sentinel = new State(SENTINEL_ID);
+    private final State sentinel = new State(State.SENTINEL_ID);
 
     public StateReachability(GeneralizedTestTable table) {
         gtt = table;

@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.testtables.model;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -32,7 +31,7 @@ import java.util.List;
 @Data
 @RequiredArgsConstructor
 public abstract class TableNode {
-    protected final int id;
+    protected final String id;
     protected Duration duration = new Duration(1, 1);
 
     public abstract boolean isLeaf();

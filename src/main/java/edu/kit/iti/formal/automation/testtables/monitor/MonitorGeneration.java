@@ -41,12 +41,12 @@ package edu.kit.iti.formal.automation.testtables.monitor;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
+import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.VariableBuilder;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
-import edu.kit.iti.formal.automation.testtables.schema.IoVariable;
-import edu.kit.iti.formal.automation.testtables.schema.Variable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 
@@ -62,8 +62,9 @@ public class MonitorGeneration implements Callable<TopLevelElements> {
         this.gtt = gtt;
     }
 
-    @Override public TopLevelElements call() throws Exception {
-        final VariableBuilder vars = fb.getLocalScope().builder();
+    @Override
+    public TopLevelElements call() throws Exception {
+        final VariableBuilder vars = fb.getScope().builder();
         vars.push(VariableDeclaration.INPUT);
 
         // IOVariables -> VAR_INPUT
@@ -77,7 +78,6 @@ public class MonitorGeneration implements Callable<TopLevelElements> {
         for (int i = 0; i < gtt.getRegion().count(); i++) {
             vars.identifiers(String.format("ROW_%2d", i)).setBaseType("BOOL").close();
         }
-
 
 
         return new TopLevelElements(Arrays.asList(fb));

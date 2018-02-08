@@ -72,12 +72,14 @@ public class StatesTransformer implements TableTransformer {
                         s.getDefOutput()));
 
         if (s.getDuration().isDeterministicWait()) {
-            SMVExpr outgoingIsValid = SMVFacade
-                    .combine(SBinaryOperator.OR,
-                            s.getOutgoing().stream()
-                                    .map(State::getDefForward)
-                                    .collect(Collectors.toList())
-                    );
+            List<SMVExpr> collect = s.getOutgoing().stream()
+                    .filter(k -> !k.getId().equals(State.SENTINEL_ID))
+                    .map(State::getDefInput)
+                    .collect(Collectors.toList());
+            SMVExpr outgoingIsValid =
+                    collect.size() > 0
+                            ? SMVFacade.combine(SBinaryOperator.OR, collect)
+                            : SLiteral.TRUE;
 
             define(s.getDefKeep(),
                     SMVFacade.combine(SBinaryOperator.AND,

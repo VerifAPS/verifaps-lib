@@ -36,8 +36,12 @@ import java.util.stream.Collectors;
 public class Region extends TableNode {
     private List<TableNode> children = new ArrayList<>();
 
+    public Region(String id) {
+        super(String.valueOf(id));
+    }
+
     public Region(int id) {
-        super(id);
+        this(""+id);
     }
 
     @Override

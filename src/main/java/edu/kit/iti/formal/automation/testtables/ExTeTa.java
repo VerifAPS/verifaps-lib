@@ -53,8 +53,9 @@ public class ExTeTa {
             CommandLine cli = parse(args);
             run(cli);
         } catch (FunctionUndefinedException e) {
+            e.printStackTrace();
             Report.fatal("Could not call %s",
-                    e.getFunctionCall().getFunctionName());
+                    e.getInvocation().getCalleeName());
         } catch (UnknownVariableException | ParseException e) {
             Report.fatal(e.getMessage());
         } catch (DataTypeNotDefinedException e) {
@@ -70,11 +71,11 @@ public class ExTeTa {
             Report.fatal("%s: %s", e.getClass().getSimpleName(),
                     e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             if (e.getMessage() == null) {
                 Report.fatal(e.getClass().getName());
-                e.printStackTrace();
             } else {
-                Report.fatal(e.getMessage());
+                Report.fatal("%s: %s", e.getClass().getSimpleName(), e.getMessage());
             }
         }
     }
@@ -132,7 +133,7 @@ public class ExTeTa {
             fbs.accept(stp);
             System.out.println(stp.getString());
         } else {
-            SMVModule modCode = SymbExFacade.evaluateProgram(code);
+            SMVModule modCode = evaluate(code);
             SMVType superEnumType = Facade.createSuperEnum(code);
             TableTransformation tt = new TableTransformation(table,
                     superEnumType);
@@ -154,6 +155,10 @@ public class ExTeTa {
                 cea.run();
             }
         }
+    }
+
+    private static SMVModule evaluate(TopLevelElements code) {
+        return SymbExFacade.evaluateProgram(code);
     }
 
     private static CommandLine parse(String[] args) throws ParseException {

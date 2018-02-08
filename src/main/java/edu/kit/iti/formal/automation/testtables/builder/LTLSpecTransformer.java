@@ -81,7 +81,7 @@ public class LTLSpecTransformer implements TableTransformer {
         SMVExpr fairness = steps.stream()
                 .filter(state -> state.getDuration().isUnbounded())
                 .flatMap(state -> state.getOutgoing().stream())
-                .filter(state -> state.getId() != -1)
+                .filter(state -> state.getId() != State.SENTINEL_ID)
                 .map(State::getDefInput)
                 .map(s -> (SMVExpr) s.eventually().globally())
                 .reduce(SMVFacade.reducer(SBinaryOperator.AND))

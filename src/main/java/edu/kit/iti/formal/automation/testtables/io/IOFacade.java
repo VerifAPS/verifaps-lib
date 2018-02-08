@@ -31,7 +31,6 @@ import edu.kit.iti.formal.smv.ast.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 /**
  * Created by weigl on 10.12.16.
@@ -57,28 +56,22 @@ public final class IOFacade {
      * @param vars
      * @return
      */
-    public static SMVExpr parseCellExpression(String cell, SVariable column, GeneralizedTestTable vars) {
-        try {
-            assert cell != null;
-            CellExpressionParser.CellContext p = createParser(cell).cell();
-            ExprVisitor ev = new ExprVisitor(column, vars);
-            SMVExpr expr = p.accept(ev);
-            Report.debug("parsed: %s to %s", cell, expr);
-            return expr;
-        } catch (ParseCancellationException pce) {
-            Report.error("Error during parsing '%s'  for column '%s'", cell,
-                    column.getName());
-            Report.error(pce.getMessage());
-            throw pce;
-        }
+    public static SMVExpr parseCellExpression(String cell, SVariable column,
+                                              GeneralizedTestTable vars) {
+        assert cell != null;
+        CellExpressionParser.CellContext p = createParser(cell).cell();
+        ExprVisitor ev = new ExprVisitor(column, vars);
+        SMVExpr expr = p.accept(ev);
+        Report.debug("parsed: %s to %s", cell, expr);
+        return expr;
     }
 
     public static Duration parseDuration(String duration) {
-        if(duration.equalsIgnoreCase("omega")) {
+        if (duration.equalsIgnoreCase("omega")) {
             return Duration.OMEGA;
         }
 
-        if(duration.equalsIgnoreCase("wait")) {
+        if (duration.equalsIgnoreCase("wait")) {
             return Duration.DET_WAIT;
         }
 

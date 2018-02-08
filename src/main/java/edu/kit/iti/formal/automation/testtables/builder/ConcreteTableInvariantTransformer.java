@@ -67,7 +67,7 @@ public class ConcreteTableInvariantTransformer implements TableTransformer {
         //Strengthen the _fwd literals
         rows.forEach(s -> {
             SMVExpr clock = tableModule.getClocks().get(s);
-            int id = s.getId();
+            String id = s.getId();
 
             int cycles = cto.getCount(id, s.getDuration().getLower());
 
