@@ -32,11 +32,12 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * <p>BinaryExpression class.</p>
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
 @EqualsAndHashCode(callSuper = false)
@@ -46,26 +47,42 @@ public class BinaryExpression extends Expression {
     private Expression leftExpr, rightExpr;
     private BinaryOperator operator;
 
-    public BinaryExpression(Expression leftExpr, Expression rightExpr, BinaryOperator operator) {
-        if (leftExpr == null || rightExpr == null || operator == null) {
-            throw new IllegalArgumentException();
-        }
-
+    public BinaryExpression(@NotNull Expression leftExpr, @NotNull Expression rightExpr, @NotNull BinaryOperator operator) {
         this.leftExpr = leftExpr;
         this.rightExpr = rightExpr;
         this.operator = operator;
     }
 
-    public BinaryExpression(Expression leftExpr, Expression rightExpr, String operator) {
+    public BinaryExpression(@NotNull Expression leftExpr, @NotNull Expression rightExpr, @NotNull String operator) {
         this.leftExpr = leftExpr;
         this.rightExpr = rightExpr;
         this.operator = (BinaryOperator) Operators.lookup(operator);
     }
 
+    @NotNull
+    public static BinaryExpression andExpression(@NotNull Expression leftExpr, @NotNull Expression rightExpr) {
+        return new BinaryExpression(leftExpr, rightExpr, Operators.AND);
+    }
+
+    @NotNull
+    public static BinaryExpression equalsExpression(@NotNull Expression leftExpr, @NotNull Expression rightExpr) {
+        return new BinaryExpression(leftExpr, rightExpr, Operators.EQUALS);
+    }
+
+    @NotNull
+    public static BinaryExpression greaterEqualsExpression(@NotNull Expression leftExpr, @NotNull Expression rightExpr) {
+        return new BinaryExpression(leftExpr, rightExpr, Operators.GREATER_EQUALS);
+    }
+
+    @NotNull
+    public static BinaryExpression lessEqualsExpression(@NotNull Expression leftExpr, @NotNull Expression rightExpr) {
+        return new BinaryExpression(leftExpr, rightExpr, Operators.LESS_EQUALS);
+    }
+
     /**
      * {@inheritDoc}
      */
-    public <T> T accept(Visitor<T> visitor) {
+    public <T> T accept(@NotNull Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
@@ -83,6 +100,7 @@ public class BinaryExpression extends Expression {
         return c;
     }
 
+    @NotNull
     @Override
     public BinaryExpression copy() {
         BinaryExpression be = new BinaryExpression(leftExpr.copy(),

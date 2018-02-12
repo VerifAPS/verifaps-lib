@@ -79,14 +79,14 @@ public abstract class Values {
         }
     }
 
-    public static class VDateAndTime extends Value<AnyDate.DateAndTime, DateAndTimeData> {
-        public VDateAndTime(AnyDate.DateAndTime dataType, DateAndTimeData value) {
+    public static class VTime extends Value<TimeType, TimeValue> {
+        public VTime(TimeType dataType, TimeValue value) {
             super(dataType, value);
         }
     }
 
-    public static class VTimeOfDay extends Value<AnyDate.TimeOfDay, TimeofDayData> {
-        public VTimeOfDay(AnyDate.TimeOfDay dataType, TimeofDayData value) {
+    public static class VDateAndTime extends Value<AnyDate.DateAndTime, DateAndTimeData> {
+        public VDateAndTime(AnyDate.DateAndTime dataType, DateAndTimeData value) {
             super(dataType, value);
         }
     }

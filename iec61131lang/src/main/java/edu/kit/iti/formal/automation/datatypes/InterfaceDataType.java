@@ -23,7 +23,6 @@
 package edu.kit.iti.formal.automation.datatypes;
 
 import edu.kit.iti.formal.automation.st.ast.InterfaceDeclaration;
-import edu.kit.iti.formal.automation.st.ast.TopLevelScopeElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -34,11 +33,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class InterfaceDataType extends RecordType {
     private InterfaceDeclaration interfaceDeclaration;
-
-    @Override
-    public TopLevelScopeElement getDeclaration() {
-        return interfaceDeclaration;
-    }
 
     @Override
     public String getName() {

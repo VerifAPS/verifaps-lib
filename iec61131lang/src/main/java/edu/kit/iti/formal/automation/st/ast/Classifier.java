@@ -39,6 +39,14 @@ public abstract class Classifier<T extends ParserRuleContext> extends TopLevelSc
     protected List<MethodDeclaration> methods = new ArrayList<>();
     protected String name = "";
 
+    public List<IdentifierPlaceHolder<InterfaceDeclaration>> getInterfaces() {
+        return interfaces;
+    }
+
+    public void setInterfaces(List<IdentifierPlaceHolder<InterfaceDeclaration>> interfaces) {
+        this.interfaces = interfaces;
+    }
+
     public void addExtends(String interfaze) {
         interfaces.add(new IdentifierPlaceHolder<>(interfaze));
     }

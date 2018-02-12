@@ -22,13 +22,19 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import com.google.common.collect.Streams;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,18 +44,74 @@ import java.util.stream.Collectors;
  */
 
 @Data
+@EqualsAndHashCode(exclude = "methods")
+@NoArgsConstructor
 public class ClassDeclaration extends Classifier<ParserRuleContext> {
+    @NotNull
+    private IdentifierPlaceHolder<ClassDeclaration> parent = new IdentifierPlaceHolder<>();
+    @NotNull
+    private List<MethodDeclaration> methods = new ArrayList<>();
     private boolean final_ = false;
     private boolean abstract_ = false;
-
-    private IdentifierPlaceHolder<ClassDeclaration> parent = new IdentifierPlaceHolder<>();
 
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
+    @Override
+    public String getIdentifier() {
+        return name;
+    }
+
     public void setParent(String parent) {
         this.parent.setIdentifier(parent);
+    }
+
+    public MethodDeclaration getMethod(String identifier) {
+        if (hasMethod(identifier))
+            return methods.stream().filter(m -> m.getName().equals(identifier)).findAny().get();
+        assert hasMethodWithInheritance(identifier);
+        return getMethodsWithInheritance().stream()
+                .filter(m -> m.getName().equals(identifier))
+                .findAny().get();
+    }
+
+    /**
+     * @return The class' methods, accounting for inheritance (parent classes).
+     */
+    public List<MethodDeclaration> getMethodsWithInheritance() {
+        if (!hasParentClass())
+            return getMethods();
+        List<MethodDeclaration> parentMethods = getParentClass().getMethodsWithInheritance();
+        // Make sure to remove obfuscated and overriden methods from parent
+        return Streams.concat(parentMethods.stream().filter(m -> !hasMethod(m.getName())),
+                getMethods().stream())
+                .collect(Collectors.toList());
+    }
+
+    public void setMethods(List<MethodDeclaration> methods) {
+        for (MethodDeclaration methodDeclaration : methods) {
+            methodDeclaration.setParent(this);
+            methodDeclaration.getScope().setParent(scope);
+        }
+        this.methods = methods;
+    }
+
+    public boolean hasMethod(MethodDeclaration method) {
+        return methods.contains(method);
+    }
+
+    public boolean hasMethod(String method) {
+        return methods.stream().anyMatch(m -> m.getName().equals(method));
+    }
+
+    /**
+     * @param method
+     * @return Whether the class has a method with the given name, accounting for inheritance (parent classes).
+     */
+    public boolean hasMethodWithInheritance(String method) {
+        return getMethodsWithInheritance().stream()
+                .anyMatch(m -> m.getName().equals(method));
     }
 
     public void addImplements(String interfaze) {
@@ -61,12 +123,31 @@ public class ClassDeclaration extends Classifier<ParserRuleContext> {
     }
 
     /**
+     * @return (A copy of) the class' local scope when accounting for inheritance.
+     */
+    public Scope getEffectiveScope() {
+        // Base case
+        if (!hasParentClass())
+            return getScope();
+        Scope localScope = getScope().copy();
+        getParentClass().getEffectiveScope().asMap().values().stream()
+                // Disconsider obfuscated variables
+                .filter(v -> !localScope.hasVariable(v.getName()))
+                .forEach(localScope::add);
+        return localScope;
+    }
+
+    /**
      * To be called only after bound to global scope!
      *
      * @return The parent class. Return null if the class has no parent.
      */
     public ClassDeclaration getParentClass() {
         return parent.getIdentifiedObject();
+    }
+
+    public boolean hasParentClass() {
+        return getParentClass() != null;
     }
 
     /**
@@ -104,16 +185,25 @@ public class ClassDeclaration extends Classifier<ParserRuleContext> {
      */
     public List<InterfaceDeclaration> getImplementedInterfaces() {
         List<InterfaceDeclaration> implementedInterfaces = interfaces.stream()
-                .map(i -> i.getIdentifiedObject()).collect(Collectors.toList());
+                .map(IdentifierPlaceHolder::getIdentifiedObject).collect(Collectors.toList());
         // Add interfaces from parent classes
         ClassDeclaration parentClass = getParentClass();
         if (parentClass != null)
             implementedInterfaces.addAll(parentClass.getImplementedInterfaces());
         // Add extended interfaces
         implementedInterfaces.addAll(implementedInterfaces.stream()
-                .map(i -> i.getExtendedInterfaces())
-                .flatMap(l -> l.stream()).collect(Collectors.toList()));
+                .map(InterfaceDeclaration::getExtendedInterfaces)
+                .flatMap(Collection::stream).collect(Collectors.toList()));
         return implementedInterfaces;
+    }
+
+    /**
+     * To be called only after bound to global scope!
+     *
+     * @return Whether the class implements the given interface.
+     */
+    public boolean implementsInterface(InterfaceDeclaration interfaceDeclaration) {
+        return getImplementedInterfaces().contains(interfaceDeclaration);
     }
 
     @Override
@@ -126,5 +216,10 @@ public class ClassDeclaration extends Classifier<ParserRuleContext> {
         interfaces.forEach(i -> c.interfaces.add(i.copy()));
         methods.forEach(m -> c.methods.add(m.copy()));
         return c;
+    }
+
+    @Nullable
+    public String getParentName() {
+        return getParent().getIdentifier();
     }
 }

@@ -128,7 +128,7 @@ SFC example
 
     GOTO true :: A -> B
     GOTO true :: B -> A
-END_SFC
+END_FUNCTION_BLOCK
 ```
 
 ## EBNF
@@ -136,7 +136,7 @@ END_SFC
 ```
 <SFC>  :==  SFC <identifier>
                 <elements>*
-            END_SFC
+            END_FUNCTION_BLOCK
 
 <entry>   :== <var_decl> | <step_decl> | <transition>
 <step_decl> :== STEP <identifier>

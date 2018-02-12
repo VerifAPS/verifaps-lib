@@ -27,4 +27,4 @@ SFC I1L
     GOTO true :: Add -> A
     GOTO true :: Sub -> A
     
-END_SFC
+END_FUNCTION_BLOCK

@@ -22,15 +22,24 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import lombok.Getter;
+import lombok.Setter;
+
+import java.math.BigInteger;
+import java.util.Optional;
+
 /**
  * Created by weigl on 10.06.14.
  *
  * @author weigl
  * @version $Id: $Id
  */
-public class RangeType extends Any {
-    private long bottom, top;
-    private AnyInt base = DataTypes.INT;
+@Getter
+@Setter
+public class RangeType extends AnyInt {
+    private int bottom;
+    private int top;
+    private AnyInt base;
 
     /**
      * <p>Constructor for RangeType.</p>
@@ -39,62 +48,18 @@ public class RangeType extends Any {
      * @param top    a long.
      * @param base   a {@link edu.kit.iti.formal.automation.datatypes.AnyInt} object.
      */
-    public RangeType(long bottom, long top, AnyInt base) {
+    public RangeType(int bottom, int top, AnyInt base) {
+        super(base.bitLength, base.signed);
         this.bottom = bottom;
         this.top = top;
+        this.base = base;
     }
 
-    /**
-     * <p>Getter for the field <code>bottom</code>.</p>
-     *
-     * @return a long.
-     */
-    public long getBottom() {
-        return bottom;
-    }
-
-    /**
-     * <p>Setter for the field <code>bottom</code>.</p>
-     *
-     * @param bottom a long.
-     */
-    public void setBottom(long bottom) {
+    public RangeType(String name, int bottom, int top, AnyInt base) {
+        super(base.bitLength, base.signed);
+        this.name = name;
         this.bottom = bottom;
-    }
-
-    /**
-     * <p>Getter for the field <code>top</code>.</p>
-     *
-     * @return a long.
-     */
-    public long getTop() {
-        return top;
-    }
-
-    /**
-     * <p>Setter for the field <code>top</code>.</p>
-     *
-     * @param top a long.
-     */
-    public void setTop(long top) {
         this.top = top;
-    }
-
-    /**
-     * <p>Getter for the field <code>base</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.AnyInt} object.
-     */
-    public AnyInt getBase() {
-        return base;
-    }
-
-    /**
-     * <p>Setter for the field <code>base</code>.</p>
-     *
-     * @param base a {@link edu.kit.iti.formal.automation.datatypes.AnyInt} object.
-     */
-    public void setBase(AnyInt base) {
         this.base = base;
     }
 
@@ -106,6 +71,25 @@ public class RangeType extends Any {
         return base.repr(obj);
     }
 
+    @Override
+    public Optional<AnyInt> next() {
+        return Optional.empty();
+    }
+
+    @Override
+    public AnyUnsignedInt asUnsgined() {
+        return null;
+    }
+
+    @Override
+    public AnyInt asSigned() {
+        return null;
+    }
+
+    @Override
+    public boolean isValid(long value) {
+        return bottom <= value && value <= top;
+    }
 
     /**
      * {@inheritDoc}
@@ -113,5 +97,15 @@ public class RangeType extends Any {
     @Override
     public <T> T accept(DataTypeVisitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public BigInteger getUpperBound() {
+        return BigInteger.valueOf(top);
+    }
+
+    @Override
+    public BigInteger getLowerBound() {
+        return BigInteger.valueOf(bottom);
     }
 }

@@ -33,8 +33,6 @@ import org.antlr.v4.runtime.CommonToken;
  * Created by weigl on 28/10/14.
  */
 public class SFCResetReplacer extends AstMutableVisitor {
-
-
     public static ST0Transformation getTransformation() {
         return state -> {
             SFCResetReplacer srr = new SFCResetReplacer();

@@ -27,6 +27,7 @@
         <module>iec61131lang</module>
         <module>smv-model</module>
         <module>iec-xml</module>
+        <module>iec-run</module>
         <module>iec-modularization</module>
         <module>aps-rvt</module>
     </modules>
@@ -93,7 +94,6 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>15.0</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

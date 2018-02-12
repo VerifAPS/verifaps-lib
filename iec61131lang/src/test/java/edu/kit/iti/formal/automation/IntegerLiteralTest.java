@@ -23,6 +23,8 @@ package edu.kit.iti.formal.automation;
  */
 
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.TimeType;
+import edu.kit.iti.formal.automation.datatypes.values.TimeValue;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
 import edu.kit.iti.formal.automation.st.ast.Literal;
 import org.junit.Assert;
@@ -39,7 +41,7 @@ import static edu.kit.iti.formal.automation.datatypes.DataTypes.*;
  * @version 1 (03.03.17)
  */
 @RunWith(Parameterized.class)
-public class LiteralTest {
+public class IntegerLiteralTest {
     @Parameterized.Parameter(0)
     public String input;
     @Parameterized.Parameter(1)

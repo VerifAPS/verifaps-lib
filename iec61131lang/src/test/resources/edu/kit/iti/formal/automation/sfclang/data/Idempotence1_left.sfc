@@ -20,4 +20,4 @@ SFC I1L
         end_action
     END_STEP 
     
-END_SFC
+END_FUNCTION_BLOCK

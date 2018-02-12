@@ -22,10 +22,12 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
-import edu.kit.iti.formal.smv.ast.*;
+import edu.kit.iti.formal.smv.ast.SMVExpr;
+import edu.kit.iti.formal.smv.ast.SMVModule;
+import edu.kit.iti.formal.smv.ast.SVariable;
 import org.antlr.v4.runtime.CharStreams;
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -56,10 +58,10 @@ public class FacadeTest {
                 getResourceAsStream("/edu/kit/iti/formal/automation/st/symbextest.st");
         TopLevelElements toplevels = IEC61131Facade.file(CharStreams.fromStream(resource));
 
-        IEC61131Facade.resolveDataTypes(toplevels);
+        Scope globalScope = IEC61131Facade.resolveDataTypes(toplevels);
         SMVModule module = SymbExFacade.evaluateProgram(
                 (ProgramDeclaration) toplevels.get(2),
-                (TypeDeclarations) toplevels.get(0));
+                (TypeDeclarations) toplevels.get(0), globalScope);
         System.out.println(module);
         //System.out.println(state);
         //Assert.assertEquals();

@@ -259,14 +259,6 @@ public interface Visitor<T> {
     /**
      * <p>accept.</p>
      *
-     * @param invocationStatement a {@link InvocationStatement} object.
-     * @return a T object.
-     */
-    T visit(InvocationStatement invocationStatement);
-
-    /**
-     * <p>accept.</p>
-     *
      * @param aCase a {@link edu.kit.iti.formal.automation.st.ast.CaseStatement.Case} object.
      * @return a T object.
      */
@@ -391,4 +383,6 @@ public interface Visitor<T> {
     T visit(SFCImplementation sfc);
 
     T visit(SFCTransition transition);
+
+    T visit(InvocationStatement invocation);
 }

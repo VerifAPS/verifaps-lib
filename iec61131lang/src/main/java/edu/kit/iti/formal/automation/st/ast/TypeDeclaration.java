@@ -25,8 +25,9 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by weigl on 13.06.14.
@@ -34,9 +35,10 @@ import lombok.ToString;
  * @author weigl
  * @version $Id: $Id
  */
-@EqualsAndHashCode
-@ToString
+@Data
+@NoArgsConstructor
 public abstract class TypeDeclaration<T extends Initialization> extends Top {
+    protected Any dataType;
     protected String typeName;
     protected String baseTypeName;
     protected Any baseType;
@@ -44,17 +46,16 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
 
     /**
      * <p>Constructor for TypeDeclaration.</p>
-     */
-    public TypeDeclaration() {
-    }
-
-    /**
-     * <p>Constructor for TypeDeclaration.</p>
      *
      * @param typeName a {@link java.lang.String} object.
      */
-    public TypeDeclaration(String typeName) {
+    public TypeDeclaration(@NotNull String typeName) {
         this.typeName = typeName;
+    }
+
+    public TypeDeclaration(@NotNull Any dataType) {
+        this(dataType.getName());
+        this.dataType = dataType;
     }
 
     /**
@@ -67,72 +68,8 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
         return typeName;
     }
 
-
-    /**
-     * <p>Setter for the field <code>typeName</code>.</p>
-     *
-     * @param typeName a {@link java.lang.String} object.
-     */
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
-    }
-
-    /**
-     * <p>Getter for the field <code>baseTypeName</code>.</p>
-     *
-     * @return a {@link java.lang.String} object.
-     */
-    public String getBaseTypeName() {
-        return baseTypeName;
-    }
-
-    /**
-     * <p>Setter for the field <code>baseTypeName</code>.</p>
-     *
-     * @param baseTypeName a {@link java.lang.String} object.
-     */
-    public void setBaseTypeName(String baseTypeName) {
-        this.baseTypeName = baseTypeName;
-    }
-
     /** {@inheritDoc} */
-    public abstract <S> S accept(Visitor<S> visitor);
-
-    /**
-     * <p>Getter for the field <code>baseType</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     */
-    public Any getBaseType() {
-        return baseType;
-    }
-
-    /**
-     * <p>Setter for the field <code>baseType</code>.</p>
-     *
-     * @param baseType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     */
-    public void setBaseType(Any baseType) {
-        this.baseType = baseType;
-    }
-
-    /**
-     * <p>Getter for the field <code>initialization</code>.</p>
-     *
-     * @return a T object.
-     */
-    public T getInitialization() {
-        return initialization;
-    }
-
-    /**
-     * <p>Setter for the field <code>initialization</code>.</p>
-     *
-     * @param initialization a T object.
-     */
-    public void setInitialization(T initialization) {
-        this.initialization = initialization;
-    }
+    public abstract <S> S accept(@NotNull Visitor<S> visitor);
 
     /**
      * <p>getDataType.</p>

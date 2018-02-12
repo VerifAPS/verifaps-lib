@@ -1,0 +1,18 @@
+TYPE
+  A: STRUCT
+    x : INT;
+    y : INT;
+  END_STRUCT;
+
+  FB : STRUCT
+    state : INT;
+    active : BOOL;
+  END_STRUCT;
+END_TYPE
+
+PROGRAM MY_PROGRAM
+  VAR
+    a : A;
+    fb : FB;
+  END_VAR
+END_PROGRAM

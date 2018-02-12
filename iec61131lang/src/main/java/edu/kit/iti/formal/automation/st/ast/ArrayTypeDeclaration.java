@@ -27,8 +27,7 @@ import edu.kit.iti.formal.automation.datatypes.IECArray;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,11 +35,10 @@ import java.util.List;
 /**
  * Created by weigl on 13.06.14.
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
-@EqualsAndHashCode
-@ToString
+@Data
 public class ArrayTypeDeclaration extends TypeDeclaration<ArrayInitialization> {
     private List<Range> ranges = new ArrayList<>();
     private IECArray type;

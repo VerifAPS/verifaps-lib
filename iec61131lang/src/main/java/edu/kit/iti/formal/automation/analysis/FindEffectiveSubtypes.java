@@ -24,12 +24,11 @@ package edu.kit.iti.formal.automation.analysis;
 
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
+import edu.kit.iti.formal.automation.scope.InstanceScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import lombok.RequiredArgsConstructor;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Conduct static analysis to find the effective subtypes of all references (including interface-type references).
@@ -40,23 +39,22 @@ import java.util.Set;
  * Intended to be repeatedly called until a fixpoint is reached.
  * <p>
  * Usage:
- * <code><pre>
- *   FindEffectiveSubtypes fes = new FindEffectiveSubtypes();
- *   while (!fes.fixpointReached()) {
- *       fes.prepareRun();
- *       ast.accept(fes);
- *   }
- * </pre></code>
+ * FindEffectiveSubtypes fes = new FindEffectiveSubtypes();
+ * while (!fes.fixpointReached()) {
+ * fes.prepareRun();
+ * ast.accept(fes);
+ * }
  *
  * @author Augusto Modanese
  */
 @RequiredArgsConstructor
 public class FindEffectiveSubtypes extends AstVisitor {
+    private final Scope globalScope;
+    private final InstanceScope instanceScope;
     /**
      * Whether a fixpoint has been found.
      */
     private boolean fixpoint = false;
-
     /**
      * Keep track of current TopLevelScopeElement being visited.
      */
@@ -84,7 +82,7 @@ public class FindEffectiveSubtypes extends AstVisitor {
 
     @Override
     public Object visit(MethodDeclaration method) {
-        //visit((TopLevelScopeElement) method);
+        visit((TopLevelScopeElement) method);
         return super.visit(method);
     }
 
@@ -115,11 +113,30 @@ public class FindEffectiveSubtypes extends AstVisitor {
         // Base case
         if (variableDeclaration.getDataType() instanceof ClassDataType)
             variableDeclaration.addEffectiveDataType(variableDeclaration.getDataType());
+            // Add all possible cases
+            // TODO: rewrite
+        else if (variableDeclaration.getDataType() instanceof InterfaceDataType) {
+            globalScope.getClasses().stream()
+                    .filter(c -> c.implementsInterface(
+                            ((InterfaceDataType) variableDeclaration.getDataType()).getInterfaceDeclaration()))
+                    .filter(c -> !instanceScope.getInstancesOfClass(c).isEmpty())
+                    .forEach(c -> variableDeclaration.addEffectiveDataType(globalScope.resolveDataType(c.getName())));
+            assert variableDeclaration.getEffectiveDataTypes().size() > 0;
+        } else if (variableDeclaration.getDataType() instanceof ReferenceType) {
+            ClassDeclaration clazz = ((ClassDataType) ((ReferenceType) variableDeclaration.getDataType()).getOf())
+                    .getClazz();
+            globalScope.getClasses().stream()
+                    .filter(c -> c.equals(clazz) || c.extendsClass(clazz))
+                    .filter(c -> !instanceScope.getInstancesOfClass(c).isEmpty())
+                    .forEach(c -> variableDeclaration.addEffectiveDataType(globalScope.resolveDataType(c.getName())));
+            assert variableDeclaration.getEffectiveDataTypes().size() > 0;
+        }
         return super.visit(variableDeclaration);
     }
 
     @Override
     public Object visit(AssignmentStatement assignmentStatement) {
+        /*  TODO: rewrite
         VariableDeclaration variableDeclaration = (VariableDeclaration) resolveReference(
                 (SymbolicReference) assignmentStatement.getLocation());
         // We are interested in (regular) references and interface types
@@ -138,6 +155,7 @@ public class FindEffectiveSubtypes extends AstVisitor {
                     fixpoint = false;
                 }
         }
+        */
         return super.visit(assignmentStatement);
     }
 
@@ -182,7 +200,7 @@ public class FindEffectiveSubtypes extends AstVisitor {
         else if (topLevelScopeElement.getScope().asMap().keySet().contains(firstId)) {
             firstIdObject = topLevelScopeElement.getScope().getVariable(firstId);
             // Dereference if needed
-            if (reference.getDerefCount() > 0) {
+            if (reference.getDerefCount() > 0 || reference.getSub() != null) {
                 Any firstIdDataType = topLevelScopeElement.getScope().getVariable(firstId).getDataType();
                 for (int i = 0; i < reference.getDerefCount(); i++)
                     firstIdDataType = ((ReferenceType) firstIdDataType).getOf();
@@ -191,8 +209,11 @@ public class FindEffectiveSubtypes extends AstVisitor {
         } else
             throw new DataTypeNotDefinedException("Unknown reference '" + reference + "' at " + topLevelScopeElement);
         // Recurse if needed
-        if (reference.getSub() != null)
-            return resolveReference((SymbolicReference) reference.getSub(), (TopLevelScopeElement) firstIdObject);
+        if (reference.getSub() != null) {
+            assert firstIdObject instanceof TopLevelScopeElement;
+            return resolveReference(reference.getSub(), (TopLevelScopeElement) firstIdObject);
+        }
+        assert firstIdObject instanceof VariableDeclaration;
         return firstIdObject;
     }
 }

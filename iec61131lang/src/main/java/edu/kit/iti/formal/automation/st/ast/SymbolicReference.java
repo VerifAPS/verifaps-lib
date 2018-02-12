@@ -30,6 +30,12 @@ import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
+import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by weigl on 11.06.14.
@@ -39,10 +45,17 @@ import lombok.Data;
  */
 @Data
 public class SymbolicReference extends Reference {
+    @NonNull
     private IdentifierPlaceHolder identifier = new IdentifierPlaceHolder();
     private ExpressionList subscripts;
     private SymbolicReference sub;
     private Any dataType;
+
+    /**
+     * Used in STOO transformations to set the symbolic reference's effective type (in contrast to dataType, which
+     * might be a deferred type).
+     */
+    private Any effectiveDataType;
 
     /**
      * Number of times reference is dereferenced.
@@ -80,6 +93,9 @@ public class SymbolicReference extends Reference {
         this.identifier = symbolicReference.identifier;
         this.subscripts = symbolicReference.getSubscripts();
         this.sub = symbolicReference.sub;
+        this.derefCount = symbolicReference.derefCount;
+        this.dataType = symbolicReference.dataType;
+        this.effectiveDataType = symbolicReference.effectiveDataType;
         if (this.identifier == null)
             throw new IllegalArgumentException();
     }
@@ -91,12 +107,21 @@ public class SymbolicReference extends Reference {
 
     }
 
+    public SymbolicReference(List<SymbolicReference> symbolicReferenceList) {
+        this(symbolicReferenceList.get(0));
+        sub = symbolicReferenceList.size() > 1
+                ? new SymbolicReference(symbolicReferenceList.subList(1, symbolicReferenceList.size()))
+                : null;
+    }
+
     /**
      * <p>addSubscript.</p>
      *
      * @param ast a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
      */
     public void addSubscript(Expression ast) {
+        if (subscripts == null)
+            subscripts = new ExpressionList();
         subscripts.add(ast);
     }
 
@@ -105,6 +130,7 @@ public class SymbolicReference extends Reference {
      *
      * @return a {@link java.lang.String} object.
      */
+    @NonNull
     public String getIdentifier() {
         return identifier.getIdentifier();
     }
@@ -114,9 +140,7 @@ public class SymbolicReference extends Reference {
      *
      * @param identifier a {@link java.lang.String} object.
      */
-    public void setIdentifier(String identifier) {
-        if (identifier == null)
-            throw new IllegalArgumentException();
+    public void setIdentifier(@NotNull String identifier) {
         this.identifier.setIdentifier(identifier);
     }
 
@@ -131,6 +155,35 @@ public class SymbolicReference extends Reference {
     public boolean hasSub() {
         return sub != null;
     }
+
+    public boolean hasSubscripts() {
+        return subscripts != null;
+    }
+
+    /**
+     * @return The symbolic reference in a flat list format containing all its subreferences and starting with the
+     * reference itself.
+     */
+    public List<SymbolicReference> asList() {
+        List<SymbolicReference> list = new ArrayList<>();
+        if (sub != null)
+            list.addAll(sub.asList());
+        list.add(0, this);
+        return list;
+    }
+
+    public boolean isArrayAccess() {
+        return subscripts != null;
+    }
+
+    /**
+     * @return The variable this reference references.
+     */
+    public VariableDeclaration toVariable() {
+        List<SymbolicReference> referenceList = asList();
+        return (VariableDeclaration) referenceList.get(referenceList.size() - 1).getIdentifiedObject();
+    }
+
 
     /**
      * {@inheritDoc}
@@ -156,11 +209,16 @@ public class SymbolicReference extends Reference {
         sr.subscripts = Utils.copyNull(subscripts);
         sr.sub = Utils.copyNull(sub);
         sr.derefCount = derefCount;
+        sr.dataType = dataType;
+        sr.effectiveDataType = effectiveDataType;
         return sr;
     }
 
     @Override
     public String toString() {
-        return getIdentifier() + (sub == null ? "" : "." + sub.toString());
+        return getIdentifier()
+                + StringUtils.repeat('^', derefCount)
+                + (subscripts != null ? subscripts.toString() : "")
+                + (sub == null ? "" : "." + sub.toString());
     }
 }

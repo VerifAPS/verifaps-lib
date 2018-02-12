@@ -22,8 +22,8 @@ package edu.kit.iti.formal.automation.scope;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.Invocation;
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
+import edu.kit.iti.formal.automation.st.ast.Invocation;
 
 /**
  * Created by weigl on 26.11.16.
@@ -32,7 +32,9 @@ import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
  * @version $Id: $Id
  */
 public class DefinedFunctionResolver implements FunctionResolver {
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FunctionDeclaration resolve(Invocation call, Scope scope) {
         return scope.getFunction(call.getCalleeName());

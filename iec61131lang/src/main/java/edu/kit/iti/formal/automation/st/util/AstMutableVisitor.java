@@ -23,13 +23,11 @@ package edu.kit.iti.formal.automation.st.util;
  */
 
 import edu.kit.iti.formal.automation.scope.Scope;
+import edu.kit.iti.formal.automation.sfclang.ast.*;
 import edu.kit.iti.formal.automation.st.ast.*;
-import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -39,7 +37,7 @@ import java.util.stream.Collectors;
  *
  * @author Alexander Weigl (26.06.2014)
  */
-public class AstMutableVisitor extends DefaultVisitor<Object> {
+public class AstMutableVisitor extends AstVisitor<Object> {
     /**
      * {@inheritDoc}
      */
@@ -184,6 +182,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(Invocation invocation) {
+        invocation.setCallee((SymbolicReference) invocation.getCallee().accept(this));
         invocation.setParameters(invocation.getParameters().stream()
                 .map(p -> (Invocation.Parameter) p.accept(this)).collect(Collectors.toList()));
         return invocation;
@@ -239,7 +238,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(InvocationStatement fbc) {
-        fbc.getInvocation().accept(this);
+        fbc.setInvocation((Invocation) fbc.getInvocation().accept(this));
         return fbc;
     }
 
@@ -307,6 +306,15 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(Scope localScope) {
+        Map<String, VariableDeclaration> map = new HashMap<>(localScope.asMap());
+        Map<String, VariableDeclaration> newMap = localScope.asMap();
+        newMap.clear();
+
+        map.forEach((k,v) -> {
+            VariableDeclaration decl = (VariableDeclaration) v.accept(this);
+            newMap.put(decl.getName(), decl);
+        });
+
         return localScope;
     }
 
@@ -366,9 +374,7 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
         functionDeclaration.setScope((Scope) functionDeclaration.getScope().accept(this));
-        if (functionDeclaration.getStBody() != null)
-            functionDeclaration.setStBody((StatementList)
-                    functionDeclaration.getStBody().accept(this));
+        functionDeclaration.setStBody((StatementList) functionDeclaration.getStBody().accept(this));
         return functionDeclaration;
     }
 
@@ -385,9 +391,8 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        functionBlockDeclaration.setScope((Scope) functionBlockDeclaration.getScope().accept(this));
         functionBlockDeclaration.setStBody((StatementList) functionBlockDeclaration.getStBody().accept(this));
-        return functionBlockDeclaration;
+        return visit((ClassDeclaration) functionBlockDeclaration);
     }
 
     /**
@@ -451,6 +456,8 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(SymbolicReference symbolicReference) {
+        if (symbolicReference.hasSubscripts())
+            symbolicReference.setSubscripts((ExpressionList) symbolicReference.getSubscripts().accept(this));
         return super.visit(symbolicReference);
     }
 
@@ -470,8 +477,11 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
 
         List<MethodDeclaration> methods = new ArrayList<>(clazz.getMethods().size());
         for (MethodDeclaration method : clazz.getMethods()) {
-            methods.add((MethodDeclaration) method.accept(this));
+            MethodDeclaration newMethod = (MethodDeclaration) method.accept(this);
+            if (newMethod != null)
+                methods.add(newMethod);
         }
+        clazz.setMethods(methods);
 
         return super.visit(clazz);
     }
@@ -479,13 +489,61 @@ public class AstMutableVisitor extends DefaultVisitor<Object> {
     @Override
     public Object visit(MethodDeclaration method) {
         method.setScope((Scope) method.getScope().accept(this));
-        if (method.getStBody() != null)
-            method.setStBody((StatementList) method.getStBody().accept(this));
+        method.setStBody((StatementList) method.getStBody().accept(this));
         return super.visit(method);
+    }
+
+    @Override
+    public Object visit(InterfaceDeclaration interfaceDeclaration) {
+        List<MethodDeclaration> methods = new ArrayList<>(interfaceDeclaration.getMethods().size());
+        for (MethodDeclaration method : interfaceDeclaration.getMethods()) {
+            MethodDeclaration newMethod = (MethodDeclaration) method.accept(this);
+            if (newMethod != null)
+                methods.add(method);
+        }
+        interfaceDeclaration.setMethods(methods);
+        return super.visit(interfaceDeclaration);
+    }
+
+    @Override
+    public Object visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
+        globalVariableListDeclaration.setScope((Scope) visit(globalVariableListDeclaration.getScope()));
+        return super.visit(globalVariableListDeclaration);
     }
 
     @Override
     public Object visit(Literal literal) {
         return super.visit(literal);
+    }
+
+
+    @Override
+    public Object visit(ReferenceSpecification referenceSpecification) {
+        return super.visit(referenceSpecification);
+    }
+
+    @Override
+    public Object visit(SFCStep sfcStep) {
+        return super.visit(sfcStep);
+    }
+
+    @Override
+    public Object visit(SFCAction sfcAction) {
+        return super.visit(sfcAction);
+    }
+
+    @Override
+    public Object visit(SFCNetwork sfcNetwork) {
+        return super.visit(sfcNetwork);
+    }
+
+    @Override
+    public Object visit(SFCImplementation sfc) {
+        return super.visit(sfc);
+    }
+
+    @Override
+    public Object visit(SFCTransition transition) {
+        return super.visit(transition);
     }
 }

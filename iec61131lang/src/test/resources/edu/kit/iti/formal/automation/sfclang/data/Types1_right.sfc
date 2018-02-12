@@ -1,4 +1,4 @@
-SFC Types1R
+FUNCTION_BLOCK Types1R
 
     VAR_OUTPUT 
         o : uint;
@@ -10,4 +10,4 @@ SFC Types1R
         end_action
     END_STEP 
 
-END_SFC
+END_FUNCTION_BLOCK

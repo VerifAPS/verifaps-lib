@@ -25,9 +25,14 @@ package edu.kit.iti.formal.automation.st.ast;
 import com.google.common.collect.ImmutableMap;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -116,21 +121,30 @@ public class VariableDeclaration extends Top
             AccessSpecifier.INTERNAL, INTERNAL,
             AccessSpecifier.PROTECTED, PROTECTED,
             AccessSpecifier.PRIVATE, PRIVATE);
-
-    private String name;
-    private Any dataType;
-    private int type;
-    private TypeDeclaration typeDeclaration;
-
     /**
      * Set of instances which this variable can assume. Populated by static analysis.
      */
+    @Deprecated // does not belong here
     private final Set<InstanceScope.Instance> instances = new HashSet<>();
-
     /**
      * Set of effective data types the values of the variable can assume. Populated in static analysis.
      */
+    @Deprecated // does not belong here
     private final Set<Any> effectiveDataTypes = new HashSet<>();
+    private String name;
+
+    @Getter
+    @Setter
+    private Any dataType;
+
+    private int type;
+
+    private TypeDeclaration typeDeclaration;
+    /**
+     * The local scope the variable is declared in.
+     */
+    @Deprecated
+    private Scope parent;
 
     /**
      * <p>Constructor for VariableDeclaration.</p>
@@ -145,10 +159,11 @@ public class VariableDeclaration extends Top
      * @param name a {@link java.lang.String} object.
      * @param td   a {@link edu.kit.iti.formal.automation.st.ast.TypeDeclaration} object.
      */
-    public VariableDeclaration(String name, TypeDeclaration td) {
+    public VariableDeclaration(@NotNull String name, @NotNull TypeDeclaration td) {
         this();
         this.name = name;
         typeDeclaration = td;
+        dataType = td.dataType;
     }
 
     /**
@@ -157,8 +172,8 @@ public class VariableDeclaration extends Top
      * @param name     a {@link java.lang.String} object.
      * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
-    public VariableDeclaration(String name, Any dataType) {
-        this.name = name;
+    public VariableDeclaration(@NotNull String name, @NotNull Any dataType) {
+        this(name, new SimpleTypeDeclaration(dataType));
         this.dataType = dataType;
     }
 
@@ -167,7 +182,7 @@ public class VariableDeclaration extends Top
      *
      * @param value a {@link edu.kit.iti.formal.automation.st.ast.VariableDeclaration} object.
      */
-    public VariableDeclaration(VariableDeclaration value) {
+    public VariableDeclaration(@NotNull VariableDeclaration value) {
         this(value.getName(), value.getType(), value.getTypeDeclaration());
         dataType = value.dataType;
         typeDeclaration = value.typeDeclaration;
@@ -180,7 +195,7 @@ public class VariableDeclaration extends Top
      * @param flags a int.
      * @param td    a {@link edu.kit.iti.formal.automation.st.ast.TypeDeclaration} object.
      */
-    public VariableDeclaration(String name, int flags, TypeDeclaration td) {
+    public VariableDeclaration(@NotNull String name, int flags, @NotNull TypeDeclaration td) {
         this.name = name;
         type = flags;
         typeDeclaration = td;
@@ -193,7 +208,7 @@ public class VariableDeclaration extends Top
      * @param flags a int.
      * @param dt    a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
-    public VariableDeclaration(String name, int flags, Any dt) {
+    public VariableDeclaration(@NotNull String name, int flags, @NotNull Any dt) {
         this(name, dt);
         setType(flags);
     }
@@ -212,7 +227,7 @@ public class VariableDeclaration extends Top
      *
      * @param name a {@link java.lang.String} object.
      */
-    public void setName(String name) {
+    public void setName(@NotNull String name) {
         this.name = name;
     }
 
@@ -221,6 +236,7 @@ public class VariableDeclaration extends Top
      *
      * @return a {@link edu.kit.iti.formal.automation.st.ast.Initialization} object.
      */
+    @Nullable
     public Initialization getInit() {
         if (typeDeclaration == null)
             return null;
@@ -244,29 +260,6 @@ public class VariableDeclaration extends Top
         return null;
     }
 
-    /**
-     * <p>Getter for the field <code>dataType</code>.</p>
-     *
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     */
-    public Any getDataType() {
-        return dataType;
-    }
-
-    /**
-     * <p>Setter for the field <code>dataType</code>.</p>
-     *
-     * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     */
-    public void setDataType(Any dataType) {
-        this.dataType = dataType;
-    }
-
-    /**
-     * <p>Getter for the field <code>type</code>.</p>
-     *
-     * @return a int.
-     */
     public int getType() {
         return type;
     }
@@ -400,22 +393,24 @@ public class VariableDeclaration extends Top
      * {@inheritDoc}
      */
     @Override
-    public <T> T accept(Visitor<T> visitor) {
+    public <T> T accept(@NotNull Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override public int compareTo(VariableDeclaration o) {
+    @Override
+    public int compareTo(@NotNull VariableDeclaration o) {
         return getName().compareTo(o.getName());
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override public String toString() {
-        return name + " : " + getDataTypeName() + " := " + getInit();
+    @Override
+    public String toString() {
+        return name + " : " + getDataTypeName() + ":=" + getInit();
     }
 
     /**
@@ -433,26 +428,27 @@ public class VariableDeclaration extends Top
      * @param typeDeclaration a {@link edu.kit.iti.formal.automation.st.ast.TypeDeclaration} object.
      *                        <b>shared data</b>
      */
-    public void setTypeDeclaration(TypeDeclaration<?> typeDeclaration) {
+    public void setTypeDeclaration(@NotNull TypeDeclaration<?> typeDeclaration) {
         this.typeDeclaration = typeDeclaration;
     }
 
-    public void addInstance(InstanceScope.Instance instance) {
+    public void addInstance(@NotNull InstanceScope.Instance instance) {
         instances.add(instance);
     }
 
-    public void addEffectiveDataType(Any dataType) {
+    public void addEffectiveDataType(@NotNull Any dataType) {
         effectiveDataTypes.add(dataType);
     }
 
-    public boolean hasEffectiveDataType(Any dataType) {
+    public boolean hasEffectiveDataType(@NotNull Any dataType) {
         return effectiveDataTypes.contains(dataType);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -466,13 +462,14 @@ public class VariableDeclaration extends Top
     /**
      * {@inheritDoc}
      */
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return name.hashCode();
     }
 
-    @Override public VariableDeclaration copy() {
-        VariableDeclaration vd = new VariableDeclaration(name, type,
-                typeDeclaration);
+    @Override
+    public VariableDeclaration copy() {
+        VariableDeclaration vd = new VariableDeclaration(name, type, typeDeclaration);
         vd.setDataType(dataType);
         return vd;
     }

@@ -70,14 +70,6 @@ public class Literal extends Initialization {
         this.dataType.setIdentifiedObject(dataType);
     }
 
-    /**
-     * @return the text represenation of this literal, without any prefix
-     */
-    public String getTextValue() {
-        Utils.Splitted s = Utils.split(getText());
-        return s.value().orElse(null);
-    }
-
     public static Literal integer(Token token, boolean signed) {
         Literal l = new Literal(DataTypes.ANY_INT, token);
         Utils.Splitted s = Utils.split(token.getText());
@@ -128,6 +120,11 @@ public class Literal extends Initialization {
         return new Literal(AnyReal.REAL, symbol);
     }
 
+    public static Literal string(Token symbol, boolean b) {
+        return new Literal(b ? IECString.STRING_16BIT : IECString.STRING_8BIT, symbol);
+
+    }
+
     /*
     @Override
     public Literal clone() throws CloneNotSupportedException {
@@ -137,22 +134,17 @@ public class Literal extends Initialization {
         return l;
     }*/
 
-    public static Literal string(Token symbol, boolean b) {
-        return new Literal(b ? IECString.STRING_16BIT : IECString.STRING_8BIT, symbol);
-
-    }
-
     public static Literal time(Token text) {
-        return new Literal(AnyReal.LREAL, text);
+        return new Literal(TimeType.TIME_TYPE, text);
     }
 
     public static Literal timeOfDay(Token text) {
-        return new Literal(AnyReal.LREAL, text);
+        return new Literal(AnyDate.TIME_OF_DAY, text);
 
     }
 
     public static Literal date(Token symbol) {
-        return new Literal(AnyReal.LREAL, symbol);
+        return new Literal(AnyDate.DATE, symbol);
 
     }
 
@@ -166,6 +158,14 @@ public class Literal extends Initialization {
 
     public static Literal ref_null(Token symbol) {
         return new Literal(AnyReference.ANY_REF, symbol);
+    }
+
+    /**
+     * @return the text represenation of this literal, without any prefix
+     */
+    public String getTextValue() {
+        Utils.Splitted s = Utils.split(getText());
+        return s.value().orElse(null);
     }
 
     public Any getDataType() {
@@ -199,7 +199,7 @@ public class Literal extends Initialization {
     }
 
     private Value asValue(DataTypeVisitor<Value> transformer) {
-        if(dataType.getIdentifiedObject()==null) {
+        if (dataType.getIdentifiedObject() == null) {
             throw new IllegalStateException("no identified data type");
         }
         return dataType.getIdentifiedObject().accept(transformer);

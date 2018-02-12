@@ -39,15 +39,17 @@ public class STSimplifier {
     private List<ST0Transformation> transformations = new ArrayList<>();
     private State state = new State();
 
-    public STSimplifier(List<TopLevelElement> inputElements) {
+    public STSimplifier(TopLevelElements inputElements) {
         state.inputElements = inputElements;
     }
 
     public void addDefaultPipeline() {
+        transformations.add(new GlobalVariableListEmbedding());
         transformations.add(new FunctionBlockEmbedding());
         transformations.add(LoopUnwinding.getTransformation());
         transformations.add(TimerToCounter.getTransformation());
-        transformations.add(ArrayEmbedder.getTransformation());
+        transformations.add(new ArrayEmbedder());
+        transformations.add(new StructEmbedding());
         transformations.add(SFCResetReplacer.getTransformation());
     }
 
@@ -65,6 +67,7 @@ public class STSimplifier {
     public TopLevelElements getProcessed() {
         TopLevelElements l = new TopLevelElements();
         l.add(state.allTypeDeclaration);
+        l.addAll(state.functions.values());
         l.add(state.theProgram);
         return l;
     }
@@ -85,14 +88,17 @@ public class STSimplifier {
                 TypeDeclarations typeDeclarations = (TypeDeclarations) tle;
                 appendTypeDeclarations(typeDeclarations);
             } else if (tle instanceof FunctionDeclaration) {
-                //FunctionDeclaration functionDeclaration = (FunctionDeclaration) tle;
-                //functions
+                FunctionDeclaration function = (FunctionDeclaration) tle;
+                state.functions.put(function.getName(), function);
+            } else if (tle instanceof GlobalVariableListDeclaration) {
+                GlobalVariableListDeclaration gvl = (GlobalVariableListDeclaration) tle;
+                state.globalVariableList.getScope().addVariables(gvl.getScope());
             } else {
                 throw new IllegalArgumentException("TLE: " + tle.getClass() + " is not handled yet.");
             }
         }
 
-        if (programs != 1 || state.theProgram ==null) {
+        if (programs != 1 || state.theProgram == null) {
             System.out.println(state.inputElements.size());
             throw new IllegalArgumentException("There must be exactly one program in the List of TLE. " + programs + " found. Elements: " + state.inputElements.size());
         }
@@ -101,6 +107,10 @@ public class STSimplifier {
     private void appendTypeDeclarations(TypeDeclarations typeDeclarations) {
         for (TypeDeclaration td : typeDeclarations) {
             boolean allowed = true;
+            if (td instanceof StructureTypeDeclaration) {
+                state.structs.put(td.getTypeName(), (StructureTypeDeclaration) td);
+                continue;
+            }
             switch (td.getBaseTypeName()) {
                 case "SINT":
                 case "INT":
@@ -127,9 +137,12 @@ public class STSimplifier {
     }
 
     public static class State {
-        public List<TopLevelElement> inputElements;
+        public TopLevelElements inputElements;
         public ProgramDeclaration theProgram;
         public Map<String, FunctionBlockDeclaration> functionBlocks = new HashMap<>();
+        public Map<String, FunctionDeclaration> functions = new HashMap<>();
+        public Map<String, StructureTypeDeclaration> structs = new HashMap<>();
         public TypeDeclarations allTypeDeclaration = new TypeDeclarations();
+        public GlobalVariableListDeclaration globalVariableList = new GlobalVariableListDeclaration();
     }
 }

@@ -185,10 +185,10 @@ data_type_declaration
 type_declaration
 :
 	( array_specification
-	| enumerated_specification
 	| string_type_declaration
 	| subrange_spec_init
 	| structure_declaration
+	| enumerated_specification
 	| reference_specification
 	| data_type_name
 	  ( R_EDGE
@@ -206,7 +206,7 @@ initializations
     | IDENTIFIER #initializations_identifier
     | array_initialization #initializations_array_initialization
     | structure_initialization #initializations_structure_initialization
-    | invocation #initializations_invocation
+    //| invocation #initializations_invocation
 ;
 
 subrange_spec_init
@@ -227,7 +227,6 @@ enumerated_specification
     		  ( ASSIGN integer )?
 		    )*
 	 RPAREN)
-	| basename=IDENTIFIER
 ;
 
 
@@ -655,7 +654,7 @@ primary_expression
 	| invocation
 ;
 
-/////////MARKER
+
 invocation
 :
 	id=symbolic_variable LPAREN
@@ -705,6 +704,7 @@ variable
 ;
 
 symbolic_variable
+
 :
     //x^[a,252]
 	a=(IDENTIFIER|SUPER|THIS)
@@ -777,7 +777,7 @@ for_statement
 :
 	FOR var=IDENTIFIER ASSIGN
 	begin=expression TO endPosition=expression
-	(BY by=expression)?
+	(BY by = expression)?
 	DO statement_list END_FOR
 ;
 
@@ -852,4 +852,3 @@ event
 		| action=IDENTIFIER
     )
 ;
-*/

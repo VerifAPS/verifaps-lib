@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 public class EffectiveSubtypesTest {
     private final String testFileName = "edu/kit/iti/formal/automation/st/programs/instance_hierarchy.st";
 
-    //@Test
+    @Test
     public void testInstanceHierarchy() throws IOException {
         URL testFile = ProgramTest.class.getClassLoader().getResource(testFileName);
         TopLevelElements topLevelElements = IEC61131Facade.file(new ANTLRFileStream(testFile.getFile()));

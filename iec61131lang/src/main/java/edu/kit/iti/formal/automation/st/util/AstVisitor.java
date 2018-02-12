@@ -39,8 +39,6 @@ import java.util.ArrayList;
  * @version $Id: $Id
  */
 public class AstVisitor<T> extends DefaultVisitor<T> {
-    protected TopLevelScopeElement currentTopLevelScopeElement;
-
     /**
      * {@inheritDoc}
      */
@@ -57,7 +55,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     public T visit(AssignmentStatement assignmentStatement) {
         assignmentStatement.getExpression().accept(this);
         assignmentStatement.getLocation().accept(this);
-        return null;
+        return defaultVisit(assignmentStatement);
     }
 
 
@@ -169,7 +167,6 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(ProgramDeclaration programDeclaration) {
-        currentTopLevelScopeElement = programDeclaration;
         programDeclaration.getScope().accept(this);
         programDeclaration.getStBody().accept(this);
         return null;
@@ -190,7 +187,6 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(FunctionDeclaration functionDeclaration) {
-        currentTopLevelScopeElement = functionDeclaration;
         functionDeclaration.getScope().accept(this);
         functionDeclaration.getStBody().accept(this);
         return null;
@@ -260,7 +256,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     public T visit(Scope localScope) {
         for (VariableDeclaration vd : localScope.asMap().values())
             vd.accept(this);
-        return null;
+        return defaultVisit(localScope);
     }
 
     /**
@@ -268,6 +264,14 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(VariableDeclaration variableDeclaration) {
+        if (null != variableDeclaration.getTypeDeclaration()) {
+            variableDeclaration.getTypeDeclaration().accept(this);
+        }
+
+        if (null != variableDeclaration.getInit()) {
+            variableDeclaration.getInit().accept(this);
+        }
+
         return super.visit(variableDeclaration);
     }
 
@@ -287,12 +291,6 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     public T visit(Invocation invocation) {
         invocation.getParameters().forEach(e -> e.accept(this));
         return super.visit(invocation);
-    }
-
-    @Override
-    public T visit(InvocationStatement fbc) {
-        fbc.getInvocation().accept(this);
-        return super.visit(fbc);
     }
 
     @Override
@@ -335,7 +333,6 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(ClassDeclaration clazz) {
-        currentTopLevelScopeElement = clazz;
         clazz.getScope().accept(this);
         for (MethodDeclaration m : new ArrayList<>(clazz.getMethods())) {
             m.accept(this);
@@ -345,7 +342,6 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(InterfaceDeclaration interfaceDeclaration) {
-        currentTopLevelScopeElement = interfaceDeclaration;
         interfaceDeclaration.getScope().accept(this);
         for (MethodDeclaration m : interfaceDeclaration.getMethods())
             m.accept(this);
@@ -357,12 +353,11 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         method.getScope().accept(this);
         if (method.getStBody() != null)
             method.getStBody().accept(this);
-        return null;
+        return defaultVisit(method);
     }
 
     @Override
     public T visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
-        currentTopLevelScopeElement = globalVariableListDeclaration;
         globalVariableListDeclaration.getScope().accept(this);
         return super.visit(globalVariableListDeclaration);
     }

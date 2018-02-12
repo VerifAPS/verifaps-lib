@@ -54,10 +54,13 @@ public class FindInstances extends AstVisitor {
     @Override
     public Object visit(VariableDeclaration variableDeclaration) {
         if (variableDeclaration.isInput() || variableDeclaration.isOutput() || variableDeclaration.isInOut()
-                || currentTopLevelScopeElement instanceof InterfaceDeclaration)
+                /*|| currentTopLevelScopeElement instanceof InterfaceDeclaration*/)
+            return super.visit(variableDeclaration);
+        Any dataType = variableDeclaration.getDataType();
+        // Only classes have instances
+        if (!(dataType instanceof ClassDataType))
             return super.visit(variableDeclaration);
         InstanceScope.Instance currentInstance = new InstanceScope.Instance(parentInstance, variableDeclaration);
-        Any dataType = variableDeclaration.getDataType();
         // Function blocks extend classes, so they must go first (more specific)
         if (dataType instanceof FunctionBlockDataType) {
             FunctionBlockDeclaration functionBlock = ((FunctionBlockDataType) dataType).getFunctionBlock();
@@ -80,6 +83,11 @@ public class FindInstances extends AstVisitor {
         if (clazz.getParentClass() != null)
             clazz.getParentClass().getScope().accept(this);
         return super.visit(clazz);
+    }
+
+    @Override
+    public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
+        return super.visit((ClassDeclaration) functionBlockDeclaration);
     }
 
     /**

@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.*;
@@ -40,9 +41,9 @@ import lombok.*;
 @Getter
 @Setter
 public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Function_declarationContext>
-        implements Invocable {
+        implements Invocable, Identifiable {
     protected IdentifierPlaceHolder<Any> returnType = new IdentifierPlaceHolder<>();
-    protected String functionName;
+    protected String name;
     protected StatementList stBody = new StatementList();
 
     public String getReturnTypeName() {
@@ -61,21 +62,19 @@ public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Fun
         returnType.setIdentifiedObject(rt);
     }
 
-
-
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
     @Override
     public String getIdentifier() {
-        return getFunctionName();
+        return getName();
     }
 
     @Override
     public FunctionDeclaration copy() {
         FunctionDeclaration fd = new FunctionDeclaration();
-        fd.functionName = functionName;
+        fd.name = name;
         fd.returnType = returnType.copy();
         fd.stBody= stBody.copy();
         return fd;

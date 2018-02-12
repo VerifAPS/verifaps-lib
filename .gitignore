@@ -6,6 +6,7 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff:
+.idea/copyright/**
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/dictionaries
@@ -22,6 +23,9 @@
 # Gradle:
 .idea/**/gradle.xml
 .idea/**/libraries
+
+# Kotlin
+.idea/**/kotlinc.xml
 
 # CMake
 cmake-build-debug/
@@ -102,3 +106,6 @@ buildNumber.properties
 !/.mvn/wrapper/maven-wrapper.jar
 
 # End of https://www.gitignore.io/api/intellij,maven,java
+
+# SelfXMatFlow
+selfxmatflow*

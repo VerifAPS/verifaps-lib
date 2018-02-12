@@ -29,6 +29,8 @@ import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
+import lombok.val;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * ResolveDataTypes searches and set the data type attributes based on the given global scope.
@@ -87,9 +89,19 @@ public class ResolveDataTypes extends AstVisitor<Object> {
         return super.visit(functionBlockDeclaration);
     }
 
+    public <T extends ParserRuleContext> void visitClassifier(Classifier<T> c) {
+        val seq = c.getInterfaces();
+        seq.forEach(face ->
+                face.setIdentifiedObject(c.getScope().resolveInterface(face.getIdentifier())));
+    }
+
     @Override
     public Object visit(ClassDeclaration classDeclaration) {
-        classDeclaration.getScope().setParent(globalScope);
+        if (classDeclaration.getParentName() != null) {
+            classDeclaration.getParent().setIdentifiedObject(
+                    classDeclaration.getScope().resolveClass(classDeclaration.getParentName()));
+        }
+        visitClassifier(classDeclaration);
         return super.visit(classDeclaration);
     }
 
@@ -134,5 +146,11 @@ public class ResolveDataTypes extends AstVisitor<Object> {
 
         }
         return null;
+    }
+
+    @Override
+    public Object visit(InterfaceDeclaration interfaceDeclaration) {
+        visitClassifier(interfaceDeclaration);
+        return super.visit(interfaceDeclaration);
     }
 }

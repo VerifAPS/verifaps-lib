@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.parser;
  * #L%
  */
 
-import com.google.common.collect.Streams;
 import edu.kit.iti.formal.automation.datatypes.values.TimeValue;
 import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.scope.Scope;
@@ -229,9 +228,9 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
             }
         }
 
-        if (ctx.basename != null) {
+        /*if (ctx.basename != null) {
             ast.setBaseTypeName(ctx.basename.getText());
-        }
+        }*/
         return ast;
     }
 
@@ -330,14 +329,14 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
             IEC61131Parser.Function_declarationContext ctx) {
         FunctionDeclaration ast = new FunctionDeclaration();
         ast.setRuleContext(ctx);
-        ast.setFunctionName(ctx.identifier.getText());
+        ast.setName(ctx.identifier.getText());
         ast.setScope((Scope) ctx.var_decls().accept(this));
         if (ctx.returnET != null) {
             ast.setReturnTypeName(ctx.returnET.getText());
         } else {
             ast.setReturnTypeName(ctx.returnID.getText());
         }
-        ast.setFunctionName(ctx.identifier.getText());
+        ast.setName(ctx.identifier.getText());
         ast.setStBody((StatementList) ctx.funcBody().statement_list().accept(this));
         return ast;
     }
@@ -372,11 +371,11 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
 
     @Override
     public Object visitVar_decl_inner(IEC61131Parser.Var_decl_innerContext ctx) {
-        Streams.forEachPair(ctx.identifier_list().stream(),
-                ctx.type_declaration().stream(), (id, type) -> {
-                    gather.identifiers((List<String>) id.accept(this))
-                            .type((TypeDeclaration) type.accept(this)).close();
-                });
+        for (int i = 0; i < ctx.type_declaration().size(); i++) {
+            gather.identifiers((List<String>) ctx.identifier_list(i).accept(this))
+                    .type((TypeDeclaration) ctx.type_declaration(i).accept(this)).close();
+
+        }
         return null;
     }
 
@@ -484,8 +483,8 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     @Override
     public Object visitMethod(IEC61131Parser.MethodContext ctx) {
         MethodDeclaration ast = new MethodDeclaration();
-        ast.setRuleContext(ctx);
-        ast.setMethodName(ctx.identifier.getText());
+        //ast.setRuleContext(ctx);
+        ast.setName(ctx.identifier.getText());
         if (ctx.access_specifier() != null) {
             ast.setAccessSpecifier(AccessSpecifier.valueOf(ctx.access_specifier().getText()));
         }
@@ -493,10 +492,15 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         ast.setAbstract_(ctx.ABSTRACT() != null);
         ast.setOverride(ctx.OVERRIDE() != null);
 
-        if (ctx.returnET != null)
+        if (ctx.returnET != null) {
             ast.setReturnTypeName(ctx.returnET.getText());
-        if (ctx.returnID != null)
-            ast.setReturnTypeName(ctx.returnID.getText());
+        } else {
+            if (ctx.returnID != null) {
+                ast.setReturnTypeName(ctx.returnID.getText());
+            } else {
+                ast.setReturnTypeName("VOID");
+            }
+        }
 
         ast.setScope((Scope) ctx.var_decls().accept(this));
 
@@ -668,7 +672,9 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
             ast.setSubscripts((ExpressionList) ctx.subscript_list().accept(this));
         }
 
-        ast.setDerefCount(ctx.deref.size());
+        if (ctx.REF() != null) {
+            ast.setDerefCount(0);
+        }
 
         return ast;
     }
@@ -858,7 +864,7 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
             action.setStBody((StatementList) ctx.body().statement_list().accept(this));
         }
 
-        if (ctx.body().statement_list() != null) {
+        if (ctx.body().sfc() != null) {
             action.setSfcBody((SFCImplementation) ctx.body().sfc().accept(this));
         }
         sfc.getActions().add(action);
@@ -915,10 +921,17 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     public Object visitTransition(IEC61131Parser.TransitionContext ctx) {
         assert network != null;
         SFCTransition transition = new SFCTransition();
-        transition.setName(ctx.name.getText());
-        Utils.Splitted s = Utils.split(ctx.INTEGER_LITERAL().getText());
-        int priority = s.number().intValue();
-        transition.setPriority(priority);
+        transition.setRuleContext(ctx);
+
+        if (ctx.name != null)
+            transition.setName(ctx.name.getText());
+
+        if (ctx.INTEGER_LITERAL() != null) {
+            Utils.Splitted s = Utils.split(ctx.INTEGER_LITERAL().getText());
+            int priority = s.number().intValue();
+            transition.setPriority(priority);
+        }
+
         Set<SFCStep> from = (Set<SFCStep>) visitSteps(ctx.from);
         Set<SFCStep> to = (Set<SFCStep>) visitSteps(ctx.to);
         transition.setTo(to);

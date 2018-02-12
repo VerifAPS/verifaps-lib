@@ -207,9 +207,6 @@ public class DefaultVisitor<T> implements Visitor<T> {
         return defaultVisit(functionDeclaration);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T visit(Invocation invocation) {
         return defaultVisit(invocation);
@@ -267,14 +264,6 @@ public class DefaultVisitor<T> implements Visitor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T visit(InvocationStatement fbc) {
-        return defaultVisit(fbc);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public T visit(CaseStatement.Case aCase) {
         return defaultVisit(aCase);
     }
@@ -311,12 +300,9 @@ public class DefaultVisitor<T> implements Visitor<T> {
         return defaultVisit(simpleTypeDeclaration);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T visit(Scope localScope) {
-        return defaultVisit(localScope);
+        return null;
     }
 
     /**
@@ -377,7 +363,7 @@ public class DefaultVisitor<T> implements Visitor<T> {
 
     @Override
     public T visit(InterfaceDeclaration interfaceDeclaration) {
-        return defaultVisit(interfaceDeclaration);
+        return null;
     }
 
     @Override
@@ -393,21 +379,6 @@ public class DefaultVisitor<T> implements Visitor<T> {
     @Override
     public T visit(Literal literal) {
         return defaultVisit(literal);
-    }
-
-    @Override
-    public T visit(Invocation.Parameter parameter) {
-        return defaultVisit(parameter);
-    }
-
-    @Override
-    public T visit(ReferenceSpecification referenceSpecification) {
-        return defaultVisit(referenceSpecification);
-    }
-
-    @Override
-    public T visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
-        return defaultVisit(globalVariableListDeclaration);
     }
 
     @Override
@@ -433,5 +404,25 @@ public class DefaultVisitor<T> implements Visitor<T> {
     @Override
     public T visit(SFCTransition transition) {
         return defaultVisit(transition);
+    }
+
+    @Override
+    public T visit(InvocationStatement invocation) {
+        return defaultVisit(invocation);
+    }
+
+    @Override
+    public T visit(Invocation.Parameter parameter) {
+        return defaultVisit(parameter);
+    }
+
+    @Override
+    public T visit(ReferenceSpecification referenceSpecification) {
+        return defaultVisit(referenceSpecification);
+    }
+
+    @Override
+    public T visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
+        return defaultVisit(globalVariableListDeclaration);
     }
 }

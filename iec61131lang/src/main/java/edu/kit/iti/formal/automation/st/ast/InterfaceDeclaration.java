@@ -23,12 +23,13 @@
 package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
-import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,13 +37,26 @@ import java.util.stream.Collectors;
  * @author Augusto Modanese
  */
 @Data
+@EqualsAndHashCode(exclude = "methods")
 @NoArgsConstructor
 public class InterfaceDeclaration extends Classifier<IEC61131Parser.Interface_declarationContext> {
+    private String name;
+    private List<MethodDeclaration> methods = new ArrayList<>();
+    private List<IdentifierPlaceHolder<InterfaceDeclaration>> extendsInterfaces = new ArrayList<>();
+
     @Override
-    public void setScope(Scope global) {
-        super.setScope(global);
-        for (IdentifierPlaceHolder<InterfaceDeclaration> interfaceDeclaration : interfaces)
-            interfaceDeclaration.setIdentifiedObject(global.resolveInterface(interfaceDeclaration.getIdentifier()));
+    public String getIdentifier() {
+        return name;
+    }
+
+    public void addExtends(String interfaze) {
+        extendsInterfaces.add(new IdentifierPlaceHolder<>(interfaze));
+    }
+
+    public void setMethods(List<MethodDeclaration> methods) {
+        for (MethodDeclaration methodDeclaration : methods)
+            methodDeclaration.setParent(this);
+        this.methods = methods;
     }
 
     /**
@@ -51,25 +65,47 @@ public class InterfaceDeclaration extends Classifier<IEC61131Parser.Interface_de
      * @return The list of interfaces the interface extends.
      */
     public List<InterfaceDeclaration> getExtendedInterfaces() {
-        List<InterfaceDeclaration> extendedInterfaces = interfaces.stream()
-                .map(IdentifierPlaceHolder::getIdentifiedObject).collect(Collectors.toList());
+        List<InterfaceDeclaration> extendedInterfaces = extendsInterfaces.stream()
+                .map(i -> i.getIdentifiedObject()).collect(Collectors.toList());
         // Add extended interfaces
-        for (InterfaceDeclaration interfaceDeclaration : extendedInterfaces)
+        for (InterfaceDeclaration interfaceDeclaration : new ArrayList<>(extendedInterfaces))
             extendedInterfaces.addAll(interfaceDeclaration.getExtendedInterfaces());
         return extendedInterfaces;
     }
 
     @Override
-    public InterfaceDeclaration copy() {
+    public TopLevelScopeElement copy() {
         InterfaceDeclaration i = new InterfaceDeclaration();
         i.name = name;
         methods.forEach(method -> i.methods.add(method.copy()));
-        interfaces.forEach(intf -> i.interfaces.add(intf.copy()));
+        extendsInterfaces.forEach(intf -> i.extendsInterfaces.add(intf.copy()));
         return i;
     }
 
     @Override
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    public boolean hasMethod(String method) {
+        return methods.stream().filter(m -> m.getName().equals(method)).findAny().isPresent();
+    }
+
+    public boolean hasMethodWithInheritance(String method) {
+        if (hasMethod(method))
+            return hasMethod(method);
+        if (extendsInterfaces.isEmpty())
+            return hasMethod(method);
+        return extendsInterfaces.stream()
+                .filter(i -> i.getIdentifiedObject().hasMethodWithInheritance(method))
+                .findAny().isPresent();
+    }
+
+    public MethodDeclaration getMethod(String method) {
+        if (hasMethod(method))
+            return methods.stream().filter(m -> m.getName().equals(method)).findAny().get();
+        return extendsInterfaces.stream()
+                .filter(i -> i.getIdentifiedObject().hasMethodWithInheritance(method))
+                .findAny().get().getIdentifiedObject().getMethod(method);
     }
 }

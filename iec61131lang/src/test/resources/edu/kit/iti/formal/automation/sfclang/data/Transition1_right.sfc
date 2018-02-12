@@ -1,4 +1,4 @@
-SFC T1R
+FUNCTION_BLOCK T1R
 
     VAR_OUTPUT 
         o : bool;
@@ -45,4 +45,4 @@ SFC T1R
     GOTO not b :: B2->A
     GOTO  b :: B3->A
 
-END_SFC
+END_FUNCTION_BLOCK

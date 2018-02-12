@@ -1,4 +1,4 @@
-SFC T1L
+FUNCTION_BLOCK T1L
 
     VAR_OUTPUT 
         o : bool;
@@ -20,4 +20,4 @@ SFC T1L
     GOTO true :: A->B
     GOTO true :: B->A
     
-END_SFC
+END_FUNCTION_BLOCK

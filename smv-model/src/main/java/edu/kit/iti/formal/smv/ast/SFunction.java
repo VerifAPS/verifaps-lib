@@ -53,7 +53,7 @@ public class SFunction extends SMVExpr {
         return arguments;
     }
 
-    public String getFunctionName() {
+    public String getName() {
         return functionName;
     }
 

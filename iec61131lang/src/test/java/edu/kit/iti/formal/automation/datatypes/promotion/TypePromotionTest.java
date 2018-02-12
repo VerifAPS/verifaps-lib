@@ -117,8 +117,8 @@ public class TypePromotionTest {
     @Test
     public void integerMixed() {
         IntegerPromotion ip = new IntegerPromotion();
-        assertEquals(DataTypes.INT, ip.getPromotion(DataTypes.INT, DataTypes.UINT));
-        assertEquals(DataTypes.INT, ip.getPromotion(DataTypes.UINT, DataTypes.INT));
+        assertEquals(DataTypes.DINT, ip.getPromotion(DataTypes.INT, DataTypes.UINT));
+        assertEquals(DataTypes.DINT, ip.getPromotion(DataTypes.UINT, DataTypes.INT));
     }
 
 
@@ -129,7 +129,7 @@ public class TypePromotionTest {
 
     @Test
     public void basicOperators() throws VariableNotDefinedException, TypeConformityException {
-        assertDataType(DataTypes.INT, "-SINT#2 + UINT#2", null);
+        assertDataType(DataTypes.DINT, "-SINT#2 + UINT#2", null);
         assertDataType(DataTypes.LINT, "-SINT#2 - LINT#2", null);
         assertDataType(DataTypes.SINT, "-SINT#2", null);
         assertDataType(AnyBit.BOOL, "TRUE AND FALSE", null);

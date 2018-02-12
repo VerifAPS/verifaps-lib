@@ -1,4 +1,4 @@
-SFC T2R
+FUNCTION_BLOCK T2R
 
     VAR_OUTPUT 
         o : int;
@@ -38,4 +38,4 @@ SFC T2R
     GOTO i> 562 and i<600 :: A -> B2;
     GOTO i>= 600          :: A -> B3;
 
-END_SFC
+END_FUNCTION_BLOCK

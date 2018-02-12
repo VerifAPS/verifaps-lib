@@ -22,21 +22,42 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import javafx.util.Pair;
 import lombok.Data;
 
 /**
  * Created by weigl on 13.06.14.
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
 @Data
 public class Range implements Copyable<Range>{
     private final Literal start, stop;
 
+    public Range(Literal start, Literal stop) {
+        this.start = start;
+        this.stop = stop;
+    }
+
+    public Range(int start, int stop) {
+        this(Literal.integer(start), Literal.integer(stop));
+    }
+
+    public Range(Pair<Integer, Integer> p) {
+        this(p.getKey(), p.getValue());
+    }
 
     @Override
     public Range copy() {
         return new Range(start.copy(), stop.copy());
+    }
+
+    public int getStartValue() {
+        return Integer.valueOf(start.getText());
+    }
+
+    public int getStopValue() {
+        return Integer.valueOf(stop.getText());
     }
 }

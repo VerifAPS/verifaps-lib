@@ -151,6 +151,7 @@ T#14.7s
 T#14.7h
 T#14.7d
 TIME#14.7d
+TIME#1.0s500.0ms
 TIME#5d14h12m18s44ms
 T#5d_14h_12m_18s_55ms
 TIME#5d_14h_12m_18s_5ms

@@ -22,12 +22,14 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.sfclang.ast.SFCImplementation;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+
 
 /**
  * Created by weigl on 13.06.14.
@@ -35,11 +37,11 @@ import lombok.ToString;
  * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
-@Getter
-@Setter
-@EqualsAndHashCode(callSuper = true)
+@Data
+@EqualsAndHashCode(callSuper = true, exclude = {"stBody", "sfcBody"})
 @ToString(callSuper = true)
-public class FunctionBlockDeclaration extends ClassDeclaration {
+@NoArgsConstructor
+public class FunctionBlockDeclaration extends ClassDeclaration implements Invocable {
     private StatementList stBody;
     private SFCImplementation sfcBody;
     private String name;
@@ -56,15 +58,27 @@ public class FunctionBlockDeclaration extends ClassDeclaration {
         return getName();
     }
 
+    public Any getReturnType() {
+        return null;  // no return value when invoking function blocks
+    }
+
     @Override
     public FunctionBlockDeclaration copy() {
         FunctionBlockDeclaration fb = new FunctionBlockDeclaration();
         fb.setRuleContext(getRuleContext());
         fb.setName(getName());
+
         if (stBody != null)
             fb.stBody = stBody.copy();
         if (sfcBody != null)
             fb.sfcBody = sfcBody.copy();
+
+        fb.setFinal_(isFinal_());
+        fb.setAbstract_(isAbstract_());
+        fb.setParent(getParent().getIdentifier());
+        getInterfaces().forEach(i -> fb.addImplements(i.getIdentifier()));
+        getMethods().forEach(m -> fb.getMethods().add(m.copy()));
+
         return fb;
     }
 }

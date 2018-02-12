@@ -34,11 +34,14 @@ import edu.kit.iti.formal.automation.visitors.Visitable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Alexander Weigl
@@ -185,7 +188,9 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
     }
 
     public FunctionBlockDeclaration getFunctionBlock(String key) {
-        return fb.computeIfAbsent(key, getFromParent(key, parent::getFunctionBlock));
+        if (fb.containsKey(key)) return fb.get(key);
+        if (parent != null) return parent.getFunctionBlock(key);
+        return null;
     }
 
     public List<FunctionBlockDeclaration> getFunctionBlocks() {
@@ -228,7 +233,7 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         boolean d = interfaces.containsKey(name);
 
         if (a && b || a && c || b && c) {
-            System.out.println("ambguity fb vs. type");
+            System.err.println("Ambguity in Name Resolution for: " + name);
         }
 
         Any q;
@@ -262,7 +267,7 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
 
         // Void
         if (name == "VOID")
-            return null;
+            return DataTypes.VOID;
 
         if (parent != null)
             return parent.resolveDataType(name);
@@ -289,6 +294,7 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         classes.put(clazz.getIdentifier(), clazz);
     }
 
+    @Nullable
     public ClassDeclaration resolveClass(String key) {
         ClassDeclaration classDeclaration = classes.get(key);
         if (classDeclaration == null)
@@ -300,6 +306,7 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         return classDeclaration;
     }
 
+    @NotNull
     public List<ClassDeclaration> getClasses() {
         return new ArrayList<>(classes.values());
     }
@@ -309,7 +316,11 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
     }
 
     public InterfaceDeclaration resolveInterface(String key) {
-        return interfaces.get(key);
+        if (interfaces.containsKey(key))
+            return interfaces.get(key);
+        if (parent != null)
+            return parent.resolveInterface(key);
+        return null;
     }
 
     public List<InterfaceDeclaration> getInterfaces() {
@@ -342,5 +353,9 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         Scope s = this;
         while (s.getParent() != null) s = s.getParent();
         return s;
+    }
+
+    public Stream<VariableDeclaration> stream() {
+        return asMap().values().stream();
     }
 }

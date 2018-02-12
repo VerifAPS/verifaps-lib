@@ -26,6 +26,9 @@ import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by weigl on 13.06.14.
@@ -33,7 +36,18 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl
  * @version $Id: $Id
  */
-public class SimpleTypeDeclaration extends TypeDeclaration<Literal> {
+@Data
+@NoArgsConstructor
+public class SimpleTypeDeclaration<T extends Initialization> extends TypeDeclaration<T> {
+    public SimpleTypeDeclaration(@NotNull Any type) {
+        super(type);
+    }
+
+    public SimpleTypeDeclaration(@NotNull Any type, @NotNull T init) {
+        this(type);
+        initialization = init;
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -19,9 +19,9 @@ CLASS Verifier
 
     (* Super-secure verification *)
     IF (id_card.id > 9) THEN
-      Verifier := TRUE;
+      verify := TRUE;
     ELSE
-      Verifier := FALSE;
+      verify := FALSE;
     END_IF
   END_METHOD
 END_CLASS
@@ -35,6 +35,6 @@ PROGRAM MyProgram
     verif : Verifier;
   END_VAR
 
-  verif.verify(student.id); // TRUE
-  verif.verify(fake_student.id); // FALSE
+  verif.verify(student.id_card); // TRUE
+  verif.verify(fake_student.id_card); // FALSE
 END_PROGRAM

@@ -27,14 +27,8 @@ import edu.kit.iti.formal.automation.st0.STSimplifier;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runner.notification.RunListener;
-import org.junit.runners.Parameterized;
 
 import java.io.IOException;
-import java.util.function.Function;
-
-import static java.util.Arrays.asList;
 
 /**
  * @author Alexander Weigl
@@ -46,6 +40,11 @@ public class ST0Tests {
         assertResultST0("fbembedding_1");
     }
 
+    @Test
+    public void structEmbedding() throws IOException {
+        assertResultST0("struct_embedding");
+    }
+
     private void assertResultST0(String file) throws IOException {
         TopLevelElements st = IEC61131Facade.file(
                 CharStreams.fromStream(getClass().getResourceAsStream(file + ".st")));
@@ -53,19 +52,13 @@ public class ST0Tests {
                 CharStreams.fromStream(getClass().getResourceAsStream(file + ".st0")));
 
         IEC61131Facade.resolveDataTypes(st);
-        IEC61131Facade.resolveDataTypes(st0exp);
 
-        STSimplifier ss = new STSimplifier(st);
-        ss.addDefaultPipeline();
-        ss.transform();
-        TopLevelElements st0 = ss.getProcessed();
+        STSimplifier stSimplifier = new STSimplifier(st);
+        stSimplifier.addDefaultPipeline();
+        stSimplifier.transform();
+        st = stSimplifier.getProcessed();
 
-        String print = IEC61131Facade.print(st0.get(1));
-        System.out.println(print);
-        Assert.assertEquals(
-                IEC61131Facade.print(st0exp.get(0)),
-                print);
-        //Assert.assertEquals(st0exp.get(0), st0.get(1));
+        Assert.assertEquals(IEC61131Facade.print(st0exp), IEC61131Facade.print(st));
     }
 
 }

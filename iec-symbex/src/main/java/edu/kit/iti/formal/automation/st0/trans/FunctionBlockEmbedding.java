@@ -41,31 +41,23 @@ import java.util.function.Function;
 public class FunctionBlockEmbedding implements ST0Transformation {
     @Override
     public void transform(STSimplifier.State state) {
-        for (FunctionBlockDeclaration fbd : state.functionBlocks.values()) {
-            StatementList newStatements = embeddFunctionBlocks(fbd.getScope(), fbd.getStBody());
-            fbd.setStBody(newStatements);
-        }
-
         for (VariableDeclaration vd : state.theProgram.getScope()) {
             vd.setType(vd.getType() | STSimplifier.PROGRAM_VARIABLE);
         }
 
         state.theProgram.setStBody(
-                embeddFunctionBlocks(state.theProgram.getScope(),
-                                     state.theProgram.getStBody()));
+                embeddFunctionBlocks(state.theProgram.getScope(), state.theProgram.getStBody()));
     }
 
     private StatementList embeddFunctionBlocks(Scope declared, StatementList statements) {
         Set<VariableDeclaration> decls = new HashSet<>(declared.asMap().values());
+        statements = statements.copy();
         for (VariableDeclaration vd : decls) {
-            String typeName = vd.getDataTypeName();
             Any type = vd.getDataType();
-
             if (type instanceof FunctionBlockDataType) {
                 FunctionBlockDataType fbdType = (FunctionBlockDataType) type;
                 FunctionBlockDeclaration fbd = fbdType.getFunctionBlock();
-                statements = embeddFunctionBlocksImpl(declared, statements, vd,
-                        fbd);
+                statements = embeddFunctionBlocksImpl(declared, statements, vd, fbd);
             }
         }
         return statements;
@@ -73,9 +65,13 @@ public class FunctionBlockEmbedding implements ST0Transformation {
 
 
     private StatementList embeddFunctionBlocksImpl(Scope origin, StatementList intoStatements,
-                                                   VariableDeclaration vd, FunctionBlockDeclaration fbd) {
+                                                   VariableDeclaration instance, FunctionBlockDeclaration fbd) {
         assert !intoStatements.isEmpty();
-        final String prefix = vd.getName() + "$";
+        //recursive call:
+        StatementList toBeEmbedded = embeddFunctionBlocks(fbd.getScope(), fbd.getStBody());
+
+
+        final String prefix = instance.getName() + "$";
         //rename function
         Function<String, String> newName = (String s) -> {
             return prefix + s;
@@ -87,14 +83,14 @@ public class FunctionBlockEmbedding implements ST0Transformation {
         origin.addVariables(embeddVariables);
 
         // remove FunctionBlock Instance
-        origin.asMap().remove(vd.getName());
+        origin.asMap().remove(instance.getName());
 
         //Make a copy of the statements and add prefix to every variable
-        VariableRenamer vr = new VariableRenamer(fbd.getStBody(), newName);
-        StatementList sl = vr.rename(); // <- this can be injected
+        VariableRenamer vr = new VariableRenamer(toBeEmbedded, newName);
+        StatementList prefixedStatements = vr.rename(); // <- this can be injected
 
         // inject into every function block call
-        FunctionBlockEmbedder fbe = new FunctionBlockEmbedder(vd.getName(), sl, newName);
+        FunctionBlockEmbedder fbe = new FunctionBlockEmbedder(instance.getName(), prefixedStatements, newName);
         return fbe.embedd(intoStatements);
     }
 

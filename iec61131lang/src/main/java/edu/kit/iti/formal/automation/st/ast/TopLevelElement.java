@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.st.Identifiable;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by weigl on 13.06.14.
@@ -31,7 +32,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
  * @author weigl
  * @version $Id: $Id
  */
-public abstract class TopLevelElement<T extends ParserRuleContext> extends Top<T> implements Identifiable {
+public abstract class TopLevelElement<T extends ParserRuleContext> extends Top<T>
+        implements Identifiable, Comparable<TopLevelElement> {
     /**
      * <p>getIdentifier.</p>
      *
@@ -42,4 +44,9 @@ public abstract class TopLevelElement<T extends ParserRuleContext> extends Top<T
 
     @Override
     public abstract TopLevelElement<T> copy();
+
+    @Override
+    public int compareTo(@NotNull TopLevelElement topLevelElement) {
+        return getIdentifier().compareTo(topLevelElement.getIdentifier());
+    }
 }

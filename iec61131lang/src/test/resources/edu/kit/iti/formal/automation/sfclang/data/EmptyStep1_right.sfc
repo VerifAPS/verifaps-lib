@@ -25,4 +25,4 @@ SFC ES1R
     END_STEP 
     
     GOTO true :: B -> A 
-END_SFC
+END_FUNCTION_BLOCK

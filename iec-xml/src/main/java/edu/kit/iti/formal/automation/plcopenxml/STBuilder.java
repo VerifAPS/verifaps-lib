@@ -38,6 +38,7 @@ public class STBuilder extends DefaultPOUBuilder {
 
     @Override
     public TopLevelElements build() {
+        TopLevelScopeElement topLevelElement = null;
         Scope scope = parseInterface();
         String name = element.getAttributeValue("name");
         String code = element.getChild("body").getChild("ST").getChildText("xhtml");

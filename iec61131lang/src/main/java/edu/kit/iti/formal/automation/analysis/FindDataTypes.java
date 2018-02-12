@@ -37,18 +37,21 @@ public class FindDataTypes extends AstVisitor {
 
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
+        setParentScope(programDeclaration);
         globalScope.registerProgram(programDeclaration);
         return null;
     }
 
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
+        setParentScope(functionBlockDeclaration);
         globalScope.registerFunctionBlock(functionBlockDeclaration);
         return null;
     }
 
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
+        setParentScope(functionDeclaration);
         globalScope.registerFunction(functionDeclaration);
         return null;
     }
@@ -56,6 +59,12 @@ public class FindDataTypes extends AstVisitor {
     @Override
     public Object visit(SubRangeTypeDeclaration subRangeTypeDeclaration) {
         globalScope.registerType(subRangeTypeDeclaration);
+        return null;
+    }
+
+    @Override
+    public Object visit(VariableDeclaration variableDeclaration) {
+        //weigl: do not register anonymous datatype, or references to data types.
         return null;
     }
 
@@ -73,21 +82,16 @@ public class FindDataTypes extends AstVisitor {
 
     @Override
     public Object visit(ClassDeclaration clazz) {
+        setParentScope(clazz);
         globalScope.registerClass(clazz);
         return super.visit(clazz);
     }
 
     @Override
     public Object visit(InterfaceDeclaration interfaceDeclaration) {
+        setParentScope(interfaceDeclaration);
         globalScope.registerInterface(interfaceDeclaration);
         return super.visit(interfaceDeclaration);
-    }
-
-    @Override
-    public Object visit(VariableDeclaration variableDeclaration) {
-        if (variableDeclaration.getTypeDeclaration() instanceof ArrayTypeDeclaration)
-            variableDeclaration.getTypeDeclaration().accept(this);
-        return super.visit(variableDeclaration);
     }
 
     @Override
@@ -130,5 +134,9 @@ public class FindDataTypes extends AstVisitor {
     public Object visit(GlobalVariableListDeclaration gvl) {
         globalScope.addVariables(gvl.getScope());
         return super.visit(gvl);
+    }
+
+    public void setParentScope(TopLevelScopeElement tle) {
+        tle.getScope().setParent(globalScope);
     }
 }

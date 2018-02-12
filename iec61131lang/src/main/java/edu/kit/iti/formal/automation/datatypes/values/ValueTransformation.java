@@ -155,13 +155,12 @@ public class ValueTransformation extends DefaultDataTypeVisitor<Value> {
 
     @Override
     public Value visit(TimeType timeType) {
-        throw new NotImplementedException("time data type not supported");
+        return new Values.VTime(timeType, new TimeValue(literal.getTextValue()));
     }
 
     @Override
     public Value visit(RangeType rangeType) {
-        return new Values.VAnyInt(rangeType.getBase(),
-                new BigInteger(literal.getText()));
+        return new Values.VAnyInt(rangeType, new BigInteger(literal.getText()));
     }
 
     @Override

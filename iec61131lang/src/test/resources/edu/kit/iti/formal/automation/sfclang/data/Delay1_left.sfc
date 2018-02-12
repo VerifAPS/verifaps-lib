@@ -37,4 +37,4 @@ SFC D1L
     GOTO true :: I1 -> I2
     GOTO true :: I2 -> Boing
 
-END_SFC
+END_FUNCTION_BLOCK

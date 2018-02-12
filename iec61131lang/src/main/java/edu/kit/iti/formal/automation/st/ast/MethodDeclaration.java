@@ -22,10 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.scope.Scope;
-import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,42 +34,19 @@ import lombok.ToString;
  */
 
 @Data
-@EqualsAndHashCode(callSuper = true, exclude = "parent")
+@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true, exclude = "parent")
-public class MethodDeclaration extends Top<IEC61131Parser.MethodContext> implements Invocable {
-    protected IdentifierPlaceHolder<Any> returnType = new IdentifierPlaceHolder<>();
-    protected String methodName;
-    protected StatementList stBody;
-    protected Scope scope = new Scope();
-    protected Classifier parent;
+public class MethodDeclaration extends FunctionDeclaration {
+    private TopLevelScopeElement parent;
     private AccessSpecifier accessSpecifier = AccessSpecifier.defaultAccessSpecifier();
     private boolean final_ = false;
     private boolean abstract_ = false;
     private boolean override = false;
 
-    public String getReturnTypeName() {
-        if (returnType.getIdentifier() == null)
-            return "VOID";
-        return returnType.getIdentifier();
-    }
-
-    public void setReturnTypeName(String rt) {
-        returnType.setIdentifier(rt);
-    }
-
     @Override
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
-
-    public Any getReturnType() {
-        return returnType.getIdentifiedObject();
-    }
-
-    public void setReturnType(Any rt) {
-        returnType.setIdentifiedObject(rt);
-    }
-
 
     @Override
     public MethodDeclaration copy() {
@@ -82,13 +56,18 @@ public class MethodDeclaration extends Top<IEC61131Parser.MethodContext> impleme
         md.abstract_ = abstract_;
         md.override = override;
         md.scope = scope.copy();
-        md.methodName = methodName;
+        md.name = name;
         md.returnType = returnType.copy();
         return md;
     }
 
-    @Override
-    public String getIdentifier() {
-        return getMethodName();
+    /**
+     * @return A copy of the method's local scope, accounting for its parent's (effective) local scope too.
+     */
+    public Scope getFullScope() {
+        Scope fullScope = scope.copy();
+        if (parent != null && parent instanceof ClassDeclaration)
+            ((ClassDeclaration) parent).getEffectiveScope().forEach(fullScope::add);
+        return fullScope;
     }
 }

@@ -65,6 +65,17 @@ public class DataTypes {
             return true;
         }
     };
+    public static final Any VOID = new Any("VOID") {
+        @Override
+        public String repr(Object obj) {
+            return "void";
+        }
+
+        @Override
+        public <T> T accept(DataTypeVisitor<T> visitor) {
+            return null;
+        }
+    };
     static HashMap<String, Any> map = new HashMap<>();
 
     static {
@@ -98,6 +109,8 @@ public class DataTypes {
         map.put("TOD", AnyDate.TIME_OF_DAY);
         map.put("DT", AnyDate.DATE_AND_TIME);
         map.put("T", TimeType.TIME_TYPE);
+
+        map.put("VOID", AnyReference.ANY_REF);
     }
 
     static void add(Any any) {
@@ -161,13 +174,15 @@ public class DataTypes {
     }
 
     public static AnyInt findSuitableInteger(BigInteger s, Iterable<? extends AnyInt> integerTypes) {
+        if(s.equals(BigInteger.ZERO)) return INT;
+
         for (AnyInt anyInt : integerTypes) {
             if (s.compareTo(anyInt.getUpperBound()) < 0
                     && anyInt.getLowerBound().compareTo(s) < 0) {
                 return anyInt;
             }
         }
-        throw new IllegalStateException("integer literal too big");
+        throw new IllegalStateException("integer literal too big with : " + s);
     }
 
 

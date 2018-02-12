@@ -97,12 +97,14 @@ public class DefaultTypeTranslator implements TypeTranslator {
 
         @Override
         public SMVType visit(TimeType timeType) {
-            throw new IllegalTypeException("Could not match" + timeType);
+            throw new IllegalTypeException("Could not match " + timeType+ ". There is to time type in SMV.");
         }
 
         @Override
         public SMVType visit(RangeType rangeType) {
-            throw new IllegalTypeException("Could not match" + rangeType);
+            // TODO base types other than SINT
+            // TODO variable width (needs to match with values everywhere)
+            return new SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, 8);
         }
 
         @Override
@@ -122,7 +124,7 @@ public class DefaultTypeTranslator implements TypeTranslator {
 
         @Override
         public SMVType visit(IECString.WString wString) {
-            throw new IllegalTypeException("Could not match " + wString);
+            throw new IllegalTypeException("Could not match");
         }
 
         @Override

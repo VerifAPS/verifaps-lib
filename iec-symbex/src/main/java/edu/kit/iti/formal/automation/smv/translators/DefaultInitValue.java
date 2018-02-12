@@ -26,6 +26,7 @@ import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.datatypes.values.Bits;
 import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.datatypes.values.Values;
+import edu.kit.iti.formal.automation.st.ast.Literal;
 
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
@@ -68,6 +69,11 @@ public class DefaultInitValue implements InitValueTranslator {
         @Override
         public Value visit(EnumerateType enumerateType) {
             return new Values.VAnyEnum(enumerateType, enumerateType.getDefValue());
+        }
+
+        public Value visit(RangeType rangeType) {
+            // TODO use type's initialization value, if it exists
+            return visit(rangeType.getBase());
         }
     }
 }

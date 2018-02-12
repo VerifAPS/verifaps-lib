@@ -33,6 +33,8 @@ import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 import org.antlr.v4.runtime.Token;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -243,6 +245,12 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visit(IdentifierInitializer init) {
+        sb.append(init.getValue());
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -290,7 +298,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public Object visit(TypeDeclarations typeDeclarations) {
 
         if (typeDeclarations.size() > 0) {
-            sb.append("TYPE").increaseIndent();
+            sb.append("TYPE ").increaseIndent();
             for (TypeDeclaration decl : typeDeclarations) {
                 decl.accept(this);
             }
@@ -380,9 +388,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
         sb.append("PROGRAM ").append(programDeclaration.getProgramName()).append('\n');
-
         programDeclaration.getScope().accept(this);
-
         programDeclaration.getStBody().accept(this);
         sb.decreaseIndent().nl().append("END_PROGRAM").nl();
         return null;
@@ -477,10 +483,11 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
             sb.append(" EXTENDS ").append(parent);
 
         String interfaces = functionBlockDeclaration.getInterfaces().stream()
-                .map(i -> i.getIdentifier())
+                .map(IdentifierPlaceHolder::getIdentifier)
                 .collect(Collectors.joining(", "));
-        if (!interfaces.isEmpty())
+        if (!interfaces.isEmpty()) {
             sb.append(" IMPLEMENTS ").append(interfaces);
+        }
 
         sb.increaseIndent().nl();
 
@@ -502,8 +509,8 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public Object visit(InterfaceDeclaration interfaceDeclaration) {
         sb.append("INTERFACE ").append(interfaceDeclaration.getName());
 
-        String extendsInterfaces = interfaceDeclaration.getInterfaces().stream()
-                .map(i -> i.getIdentifier())
+        String extendsInterfaces = interfaceDeclaration.getExtendsInterfaces().stream()
+                .map(IdentifierPlaceHolder::getIdentifier)
                 .collect(Collectors.joining(", "));
         if (!extendsInterfaces.isEmpty())
             sb.append(" EXTENDS ").append(extendsInterfaces);
@@ -556,7 +563,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         if (method.isFinal_())
             sb.append("FINAL ");
         if (method.isAbstract_())
-            sb.append("ABSTRACT" );
+            sb.append("ABSTRACT");
         if (method.isOverride())
             sb.append("OVERRIDE ");
 
@@ -580,17 +587,19 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
-        sb.append("FUNCTION ").append(functionDeclaration.getFunctionName());
+        sb.append("FUNCTION ").append(functionDeclaration.getName());
 
         String returnType = functionDeclaration.getReturnTypeName();
-        if (!returnType.isEmpty())
+        if (!(returnType == null || returnType.isEmpty()))
             sb.append(" : " + returnType);
 
         sb.increaseIndent().nl();
 
         functionDeclaration.getScope().accept(this);
 
-        functionDeclaration.getStBody().accept(this);
+        if (functionDeclaration.getStBody() != null) {
+            functionDeclaration.getStBody().accept(this);
+        }
 
         sb.decreaseIndent().nl().append("END_FUNCTION").nl().nl();
         return null;
@@ -690,12 +699,95 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visit(StructureTypeDeclaration structureTypeDeclaration) {
+        sb.append(structureTypeDeclaration.getTypeName());
+        sb.append(": STRUCT").nl().increaseIndent();
+        structureTypeDeclaration.getFields().values().forEach(s -> s.accept(this));
+        sb.decreaseIndent().append("END_STRUCT;").nl();
+        return null;
+    }
+
+    @Override
+    public Object visit(SubRangeTypeDeclaration subRangeTypeDeclaration) {
+        sb.append(subRangeTypeDeclaration.getTypeName());
+        sb.append(": ").append(subRangeTypeDeclaration.getBaseTypeName());
+        sb.append("(");
+        subRangeTypeDeclaration.getRange().getStart().accept(this);
+        sb.append(" .. ");
+        subRangeTypeDeclaration.getRange().getStop().accept(this);
+        sb.append(")");
+        if (subRangeTypeDeclaration.getInitialization() != null) {
+            sb.append(" := ");
+            subRangeTypeDeclaration.getInitialization().accept(this);
+        }
+        sb.append(";");
+        return null;
+    }
+
+    private void variableDataType(VariableDeclaration vd) {
+        if (vd.getDataType() instanceof IECArray) {
+            IECArray dataType = (IECArray) vd.getDataType();
+            sb.append(" ARRAY[");
+            for (Range range : dataType.getRanges()) {
+                range.getStart().accept(this);
+                sb.append("..");
+                range.getStop().accept(this);
+                sb.append(",");
+            }
+            sb.deleteLast();
+            sb.append("] OF ").append(dataType.getFieldType().getName());
+        } else {
+            sb.append(vd.getDataTypeName());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object visit(CommentStatement commentStatement) {
+        if (printComments) {
+            sb.nl();
+            sb.append(literals.comment_open());
+            sb.append(commentStatement.getComment());
+            sb.append(literals.comment_close());
+        }
+        return null;
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object visit(Literal literal) {
+        sb.append(literal.getText());
+        return null;
+
+    }
+
+    @Override
+    public Object visit(ArrayInitialization initializations) {
+        sb.append("[");
+        initializations.forEach(i -> {
+            i.accept(this);
+            sb.append(", ");
+        });
+        // Added an extra ", "
+        sb.deleteLast(2);
+        sb.append("]");
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Object visit(Scope localScope) {
-        for (VariableDeclaration vd : localScope.getVariables().values()) {
+        List<VariableDeclaration> variables = localScope.stream().collect(Collectors.toList());
+        Collections.sort(variables, VariableDeclaration::compareTo);
+        for (VariableDeclaration vd : variables) {
             vd.getDataType();
             sb.nl().append("VAR");
 
@@ -745,69 +837,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    private void variableDataType(VariableDeclaration vd) {
-        if (vd.getDataType() instanceof IECArray) {
-            IECArray dataType = (IECArray) vd.getDataType();
-            sb.append(" ARRAY[");
-            for (Range range : dataType.getRanges()) {
-                range.getStart().accept(this);
-                sb.append("..");
-                range.getStop().accept(this);
-                sb.append(",");
-            }
-            sb.deleteLast();
-            sb.append("] OF ").append(dataType.getFieldType().getName());
-        } else {
-            sb.append(vd.getDataTypeName());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object visit(CommentStatement commentStatement) {
-        if (printComments) {
-            sb.nl();
-            sb.append(literals.comment_open());
-            sb.append(commentStatement.getComment());
-            sb.append(literals.comment_close());
-        }
-        return null;
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object visit(Literal literal) {
-        sb.append(literal.getText());
-        return null;
-
-    }
-
-    @Override
-    public Object visit(IdentifierInitializer identifierInitializer) {
-        // stub!
-        return null;
-    }
-
-    @Override
-    public Object visit(ArrayInitialization initializations) {
-        sb.append("[");
-        initializations.forEach(i -> {
-            i.accept(this);
-            sb.append(", ");
-        });
-        // Added an extra ", "
-        sb.deleteLast(2);
-        sb.append("]");
-        return null;
-    }
-
     public Object visit(StructureInitialization structureInitialization) {
-        // stub!
         sb.append("(");
         structureInitialization.getInitValues().entrySet().stream().forEach(initialization -> {
             sb.append(initialization.getKey()).append(" := ");

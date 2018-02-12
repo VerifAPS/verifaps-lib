@@ -22,10 +22,12 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.TopLevelScopeElement;
+import edu.kit.iti.formal.automation.st.ast.TypeDeclaration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,19 +43,21 @@ import java.util.List;
 @AllArgsConstructor
 public class RecordType extends Any {
     private String name;
+    @NotNull
     private List<Field> fields = new ArrayList<>();
     /**
      * The declaration associated with the type.
      */
-    private TopLevelScopeElement declaration;
+    private TypeDeclaration declaration;
 
     /**
      * <p>Constructor for RecordType.</p>
      *
      * @param name a {@link java.lang.String} object.
      */
-    public RecordType(String name) {
+    public RecordType(@NotNull String name, @NotNull TypeDeclaration declaration) {
         this.name = name;
+        this.declaration = declaration;
     }
 
     /**
@@ -71,23 +75,31 @@ public class RecordType extends Any {
      * @param name a {@link java.lang.String} object.
      * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
-    public void addField(String name, Any dataType) {
+    public void addField(@NotNull String name, @NotNull Any dataType) {
         fields.add(new Field(name, dataType));
     }
 
     /** {@inheritDoc} */
+    @Nullable
     @Override
     public String repr(Object obj) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T accept(@NotNull DataTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 
     public class Field {
         private String name;
         private Any dataType;
         private Object defValue;
 
-        public Field(String name, Any dataType) {
+        public Field(@NotNull String name, @NotNull Any dataType) {
             this.name = name;
             this.dataType = dataType;
         }
@@ -96,7 +108,7 @@ public class RecordType extends Any {
             return name;
         }
 
-        public void setName(String name) {
+        public void setName(@NotNull String name) {
             this.name = name;
         }
 
@@ -104,7 +116,7 @@ public class RecordType extends Any {
             return dataType;
         }
 
-        public void setDataType(Any dataType) {
+        public void setDataType(@NotNull Any dataType) {
             this.dataType = dataType;
         }
 
@@ -112,16 +124,9 @@ public class RecordType extends Any {
             return defValue;
         }
 
-        public void setDefValue(Object defValue) {
+        public void setDefValue(@NotNull Object defValue) {
             this.defValue = defValue;
         }
 
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public <T> T accept(DataTypeVisitor<T> visitor) {
-        return visitor.visit(this);
     }
 }

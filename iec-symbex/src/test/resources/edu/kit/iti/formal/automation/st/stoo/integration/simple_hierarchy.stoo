@@ -1,0 +1,83 @@
+TYPE
+  _INSTANCE_ID_TYPE : INT(-1..2) := -1;
+END_TYPE
+
+TYPE
+  A: STRUCT
+    _INSTANCE_ID : _INSTANCE_ID_TYPE := -1;
+    x: INT;
+    y: INT;
+  END_STRUCT;
+
+  B: STRUCT
+    _INSTANCE_ID : _INSTANCE_ID_TYPE := -1;
+    z: INT;
+  END_STRUCT;
+
+  C: STRUCT
+    _INSTANCE_ID : _INSTANCE_ID_TYPE := -1;
+    r: INT;
+  END_STRUCT;
+END_TYPE
+
+FUNCTION A_f : INT
+  VAR_IN_OUT
+    _SELF : A;
+  END_VAR
+  A_f := _SELF.x + _SELF.y;
+END_FUNCTION
+
+FUNCTION A_g : INT
+  VAR_IN_OUT
+    _SELF : A;
+  END_VAR
+  A_g := _SELF.x * _SELF.y;
+END_FUNCTION
+
+FUNCTION B_f : INT
+  VAR_IN_OUT
+    _SELF : B;
+  END_VAR
+  B_f := A_f(_SELF := GVL._INSTANCES_A[_SELF._INSTANCE_ID]) + _SELF.z;
+END_FUNCTION
+
+FUNCTION B_g : INT
+  VAR_IN_OUT
+    _SELF : B;
+  END_VAR
+  B_g := GVL._INSTANCES_A[_SELF._INSTANCE_ID].x * GVL._INSTANCES_A[_SELF._INSTANCE_ID].y * _SELF.z;
+END_FUNCTION
+
+FUNCTION C_g : INT
+  VAR_IN_OUT
+    _SELF : C;
+  END_VAR
+  C_g := _SELF.r * GVL._INSTANCES_A[_SELF._INSTANCE_ID].x
+        * GVL._INSTANCES_A[_SELF._INSTANCE_ID].y * GVL._INSTANCES_B[_SELF._INSTANCE_ID].z;
+END_FUNCTION
+
+GVL
+  VAR_GLOBAL
+    _INSTANCES_A: ARRAY [0..2] OF A := [(_INSTANCE_ID := 0, x := 42, y := 24),
+                                        (_INSTANCE_ID := 1, x := 33, y := 44),
+                                        (_INSTANCE_ID := 2, x := 1, y := 2)];
+    _INSTANCES_B: ARRAY [1..2] OF B := [(_INSTANCE_ID := 1, z := 55),
+                                        (_INSTANCE_ID := 2, z := 3)];
+    _INSTANCES_C: ARRAY [2..2] OF C := [(_INSTANCE_ID := 2, r := 4)];
+  END_VAR
+END_GVL
+
+PROGRAM MY_PROGRAM
+  VAR
+    a : _INSTANCE_ID_TYPE := 0;
+    b : _INSTANCE_ID_TYPE := 1;
+    c : _INSTANCE_ID_TYPE := 2;
+  END_VAR
+  VAR_OUTPUT
+    x : INT;
+    y : INT;
+  END_VAR
+
+  y := B_f(_SELF := GVL._INSTANCES_B[c]);
+  x := GVL._INSTANCES_A[c].x;
+END_PROGRAM

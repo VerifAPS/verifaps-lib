@@ -33,6 +33,7 @@ import edu.kit.iti.formal.automation.datatypes.values.TimeValue;
 public class TimeType extends Any {
     /** Constant <code>TIME_TYPE</code> */
     public static final TimeType TIME_TYPE = new TimeType();
+    public static final TimeType LTIME_TYPE = new TimeType();
 
     /**
      * <p>Constructor for TimeType.</p>
@@ -50,7 +51,7 @@ public class TimeType extends Any {
         stb.add(time.getHours(), "h");
         stb.add(time.getMinutes(), "m");
         stb.add(time.getSeconds(), "s");
-        stb.add(time.getMillieseconds(), "ms");
+        stb.add(time.getMilliseconds(), "ms");
         return stb.sb.toString();
     /**
      * <p>add.</p>

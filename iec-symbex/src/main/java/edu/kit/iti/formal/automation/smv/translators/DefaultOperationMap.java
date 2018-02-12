@@ -25,9 +25,9 @@ package edu.kit.iti.formal.automation.smv.translators;
 import edu.kit.iti.formal.automation.Utils;
 import edu.kit.iti.formal.automation.operators.BinaryOperator;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
-import edu.kit.iti.formal.automation.smv.translators.OperationMap;
 import edu.kit.iti.formal.smv.SMVFacade;
 import edu.kit.iti.formal.smv.ast.*;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Default translation for ST-Operators.
@@ -36,8 +36,8 @@ import edu.kit.iti.formal.smv.ast.*;
  * @version 1 (15.04.17)
  */
 public class DefaultOperationMap implements OperationMap {
-    @Override public SMVExpr translateBinaryOperator(SMVExpr left,
-            BinaryOperator operator, SMVExpr right) {
+    @Override public SMVExpr translateBinaryOperator(@NotNull SMVExpr left,
+            @NotNull BinaryOperator operator, @NotNull SMVExpr right) {
         if (operator.equals(SBinaryOperator.DIV)) {
             return div(left, right);
         }
@@ -45,8 +45,9 @@ public class DefaultOperationMap implements OperationMap {
         return new SBinaryExpression(left, op, right);
     }
 
-    @Override public SMVExpr translateUnaryOperator(UnaryOperator operator,
-            SMVExpr sub) {
+    @NotNull
+    @Override public SMVExpr translateUnaryOperator(@NotNull UnaryOperator operator,
+                                                    @NotNull SMVExpr sub) {
         return new SUnaryExpression(Utils.getSMVOperator(operator), sub);
     }
 
@@ -59,7 +60,7 @@ public class DefaultOperationMap implements OperationMap {
      * @param divisor
      * @return
      */
-    protected SMVExpr div(SMVExpr dividend, SMVExpr divisor) {
+    protected SMVExpr div(@NotNull SMVExpr dividend, @NotNull SMVExpr divisor) {
         return SMVFacade.caseexpr(
                 divisor.equal(SLiteral.create(0).as(divisor.getSMVType())),
                 SLiteral.create(0).as(dividend.getSMVType()), SLiteral.TRUE,
