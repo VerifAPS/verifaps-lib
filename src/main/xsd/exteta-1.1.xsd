@@ -69,7 +69,7 @@
 
     <complexType name="step">
         <sequence minOccurs="0" maxOccurs="unbounded">
-            <element name="cell" type="string"/>
+            <any/>
             <!-- <choice> <element name="const" type="tns:cellSimpleValueType" />
                 <element name="capture" type="string" /> <element name="expr" type="tns:cellExpressionType"
                 /> <element name="dontcare" type="tns:cellDontCareType" /> <element name="rel"

@@ -150,9 +150,9 @@ public class ExTeTa {
                     table.getOptions().getVerificationTechnique());
 
             if (Report.getMessage().getCounterexample() != null) {
-                CounterExampleAnalyzer cea = new CounterExampleAnalyzer(table,
+                /*CounterExampleAnalyzer cea = new CounterExampleAnalyzer(table,
                         Report.getMessage());
-                cea.run();
+                cea.run();*/
             }
         }
     }

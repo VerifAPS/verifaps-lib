@@ -107,10 +107,12 @@ public class Report {
                     System.out.println();
                 }
 
-                msg.getCounterexample().getRowMappings().getRowMap()
-                        .forEach(rm -> {
-                            System.out.println("ROWMAP > " + rm);
-                        });
+                if (msg.getCounterexample().getRowMappings() != null) {
+                    msg.getCounterexample().getRowMappings().getRowMap()
+                            .forEach(rm -> {
+                                System.out.println("ROWMAP > " + rm);
+                            });
+                }
             }
             System.out.println("STATUS: " + msg.getReturncode());
         } else {

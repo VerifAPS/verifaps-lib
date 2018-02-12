@@ -29,6 +29,8 @@ import edu.kit.iti.formal.automation.testtables.schema.*;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -38,6 +40,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class TableReader {
     private static final String DEFAULT_CELL_VALUE = "-";
@@ -48,6 +51,13 @@ public class TableReader {
 
     public TableReader(File input) {
         this.input = input;
+    }
+
+    private static String get(List<Element> cells, String name) {
+        return cells.stream()
+                .filter(c -> c.getTagName().equals(name))
+                .map(n->n.getFirstChild().getNodeValue())
+                .findFirst().orElse(null);
     }
 
     public void run() throws JAXBException {
@@ -131,22 +141,21 @@ public class TableReader {
 
     private State translateStep(Step step) {
         State s = new State(stepNumber++);
+        List<Element> cells = step.getAny().stream()
+                .map(Element.class::cast).collect(Collectors.toList());
 
         for (int i = 0; i < gtt.getIoVariables().size(); i++) {
             IoVariable v = gtt.getIoVariables(i);
             String name = v.getName();
 
-            String cellValue = null;
-            if (i < step.getCell().size()) {
-                cellValue = step.getCell().get(i).trim();
-            }
+            String cellValue = get(cells, name);
 
             if (cellValue == null || cellValue.isEmpty()) {
                 if (lastColumnValue.containsKey(i))
                     cellValue = lastColumnValue.get(i);
                 else {
                     cellValue = DEFAULT_CELL_VALUE;
-                    Report.warn("No cell value for var: %s in %d/%d. Inserting '-'. ",
+                    Report.warn("No cell value for var: %s in %s/%d. Inserting '-'. ",
                             name, s.getId(), i);
                 }
             }
