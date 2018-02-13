@@ -53,7 +53,7 @@ public class TableReader {
         this.input = input;
     }
 
-    private static String get(List<Element> cells, String name) {
+    public static String get(List<Element> cells, String name) {
         return cells.stream()
                 .filter(c -> c.getTagName().equals(name))
                 .map(n->n.getFirstChild().getNodeValue())

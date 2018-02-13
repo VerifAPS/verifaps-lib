@@ -43,15 +43,21 @@ package edu.kit.iti.formal.automation.testtables;
 
 import com.google.common.base.Strings;
 import edu.kit.iti.formal.automation.st.util.Tuple;
-import edu.kit.iti.formal.automation.testtables.model.*;
-import edu.kit.iti.formal.automation.testtables.schema.Variable;
-import edu.kit.iti.formal.smv.ast.SMVExpr;
+import edu.kit.iti.formal.automation.testtables.io.TableReader;
+import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
+import edu.kit.iti.formal.automation.testtables.schema.*;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.ParseException;
+import org.w3c.dom.Element;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
@@ -62,7 +68,13 @@ import java.util.stream.Collectors;
  * @version 1 (01.02.18)
  */
 public class PrintTable {
-    public static Stack<Tuple<Duration, Integer>> durations = new Stack<>();
+    public static Stack<Tuple<String, Integer>> durations = new Stack<>();
+    public static GeneralizedTestTable table;
+    public static TestTable xml;
+    private static int currentRow = 0;
+    private static List<IoVariable> input;
+    private static List<IoVariable> output;
+    private static HashMap<String, String> cache = new HashMap<>();
 
     public static void main(String[] args) throws ParseException, JAXBException {
         CommandLine cli = parse(args);
@@ -72,65 +84,119 @@ public class PrintTable {
     }
 
     private static void print(String s) throws JAXBException {
-        GeneralizedTestTable table = Facade.readTable(s);
-        List<Variable> input = table.getIoVariables().values().stream()
+        @SuppressWarnings("restriction") JAXBContext jc = JAXBContext
+                .newInstance(ObjectFactory.class);
+        Unmarshaller jaxbUnmarshaller = jc.createUnmarshaller();
+        JAXBElement<?> root = (JAXBElement<?>) jaxbUnmarshaller
+                .unmarshal(new File(s));
+        xml = (TestTable) root.getValue();
+        table = Facade.readTable(s);
+
+        input = table.getIoVariables().values().stream()
                 .filter(v -> Objects.equals(v.getIo(), "input")).collect(Collectors.toList());
-        List<Variable> output = table.getIoVariables().values().stream()
+        output = table.getIoVariables().values().stream()
                 .filter(v -> Objects.equals(v.getIo(), "output")).collect(Collectors.toList());
 
         int depth = table.getRegion().depth();
-        String format = Strings.repeat("c", 1 + depth + table.getIoVariables().size());
-        System.out.format("\\begin{tabular}{%s}%n", format);
+        System.out.format("\\begin{tabular}{c|%s|%s|%s}%n",
+                Strings.repeat("c", input.size()),
+                Strings.repeat("c", output.size()),
+                Strings.repeat("c", depth + 1));
 
         System.out.printf("\\# & \\multicolumn{%d}{c}{Input} & " +
-                        "\\multicolumn{%d}{c}{Output} & \\coltime \\\\",
+                        "\\multicolumn{%d}{c}{Output} & \\coltime \\\\%n",
                 input.size(), output.size());
-        System.out.printf("  & %s &%s \\\\",
+        System.out.printf("  & %s &%s \\\\%n",
                 input.stream().map(Variable::getName).reduce((a, b) -> a + " & " + b).orElse(""),
                 output.stream().map(Variable::getName).reduce((a, b) -> a + " & " + b).orElse(""));
 
-        printRegionLatex(0, table.getRegion());
+        printRegionLatex(xml.getSteps().getBlockOrStep());
 
-        System.out.format("\\end{tabular}%n");
+        System.out.format("\\bottomrule\n\\end{tabular}%n");
     }
 
-    private static int printRegionLatex(int start, Region region) {
-        if (region.getDuration() != null) {
-            durations.push(Tuple.make(region.getDuration(), region.count()));
-        }
-
-        for (TableNode s : region.getChildren()) {
-            if (s instanceof Region) {
-                start = printRegionLatex(start, (Region) s);
-            } else {
-                printState(start, (State) s);
-                start++;
+    private static void printRegionLatex(List<Object> region) {
+        for (Object o : region) {
+            if (o instanceof Step) {
+                printStep((Step) o);
+            }
+            if (o instanceof Block) {
+                System.out.println("\\midrule");
+                printRegionLatex((Block) o);
+                System.out.println("\\midrule");
             }
         }
-        return start;
     }
 
-    private static void printState(int start, State s) {
-        System.out.printf("%d &", start);
-        for (SMVExpr input : s.getInputExpr()) {
-            System.out.printf(input.toString() + " & ");
-        }
-        for (SMVExpr output : s.getOutputExpr()) {
-            System.out.printf(output.toString() + " & ");
-        }
-        System.out.printf(s.getDuration().toString());
+    private static void printRegionLatex(Block b) {
+        durations.push(Tuple.make(b.getDuration(), countSteps(b)));
+        printRegionLatex(b.getStepOrBlock());
+    }
 
+    private static int countSteps(Block b) {
+        int count = 0;
+        for (Object o : b.getStepOrBlock()) {
+            if (o instanceof Step) {
+                count += 1;
+            }
+            if (o instanceof Block) {
+                count += countSteps((Block) o);
+            }
+        }
+        return count;
+    }
+
+    private static void printStep(Step s) {
+        System.out.printf("%2d", currentRow++);
+        List<Element> any = s.getAny().stream().map(Element.class::cast).collect(Collectors.toList());
+        input.forEach(v ->
+                System.out.printf(" & %15s", get(any, v.getName()))
+        );
+
+        output.forEach(v ->
+                System.out.printf(" & %15s", get(any, v.getName()))
+        );
+
+        System.out.printf(" & %15s", s.getDuration());
         while (!durations.empty()) {
-            Tuple<Duration, Integer> d = durations.pop();
-            System.out.printf("\\multirow{%d}{%s} &", d.b, d.a);
+            Tuple<String, Integer> d = durations.pop();
+            System.out.printf(" & \\multirow{%d}{*}{%s}", d.b, beautifyDuration(d.a));
         }
         System.out.printf("\\\\%n");
+    }
+
+    private static String beautifyDuration(String d) {
+        switch (d) {
+            case "omega":
+                return "$\\omega$";
+            case "wait":
+                return "\\textsc{wait}";
+            default:
+                return String.format("$%s$", d);
+        }
+    }
+
+    private static String get(List<Element> s, String varName) {
+        String value = TableReader.get(s, varName);
+        String cacheValue = cache.get(varName);
+        if (value != null) {
+            cache.put(varName, value);
+            if (value.equals(cacheValue))
+                return "";
+            return value;
+        }
+        if (cacheValue == null) {
+            cache.put(varName, "-");
+            return "-";
+        } else {
+            return "";
+        }
     }
 
     public static CommandLine parse(String[] args) throws ParseException {
         CommandLineParser clp = new DefaultParser();
         org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
-        options.addOption("-f", "format", true, "output format");
+        options.addOption("f", "format", true, "output format");
         return clp.parse(options, args, true);
     }
 }
