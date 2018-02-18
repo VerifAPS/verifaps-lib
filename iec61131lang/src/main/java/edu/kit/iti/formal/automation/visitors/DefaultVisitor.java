@@ -387,8 +387,8 @@ public class DefaultVisitor<T> implements Visitor<T> {
     }
 
     @Override
-    public T visit(SFCAction sfcAction) {
-        return defaultVisit(sfcAction);
+    public T visit(ActionDeclaration actionDeclaration) {
+        return defaultVisit(actionDeclaration);
     }
 
     @Override

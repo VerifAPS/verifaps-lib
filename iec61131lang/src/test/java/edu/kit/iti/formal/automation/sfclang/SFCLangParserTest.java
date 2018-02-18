@@ -26,14 +26,17 @@ package edu.kit.iti.formal.automation.sfclang;
 import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
+import edu.kit.iti.formal.automation.st.PrettyPrinterTest;
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
 import org.antlr.v4.runtime.CharStreams;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
-import org.junit.Assume;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,8 +46,9 @@ import java.util.Collection;
  */
 @RunWith(Parameterized.class)
 public class SFCLangParserTest {
-
     private String inputFilename;
+    private FunctionBlockDeclaration ctx;
+    private IEC61131Parser parser;
 
     public SFCLangParserTest(String inputFilename) {
         this.inputFilename = inputFilename;
@@ -72,15 +76,29 @@ public class SFCLangParserTest {
                 "data/Types1_right.sfc");
     }
 
+    @Before
+    public void parse() throws IOException {
+        parser = IEC61131Facade.getParser(CharStreams.fromStream(getClass().getResourceAsStream(inputFilename)));
+        ctx = (FunctionBlockDeclaration) parser.function_block_declaration().accept(new IECParseTreeToAST());
+    }
+
     @Test
     public void read() throws ClassNotFoundException, IOException {
-        //disable!
-        Assume.assumeFalse(true);
-        System.out.println("Test: " + inputFilename);
-        IEC61131Parser parser = IEC61131Facade.getParser(CharStreams.fromStream(getClass()
-                .getResourceAsStream(inputFilename)));
-        FunctionBlockDeclaration ctx = (FunctionBlockDeclaration) parser.function_block_declaration().accept(new IECParseTreeToAST());
-        Assert.assertNotNull(ctx.getSfcBody());
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
+        parser.getErrorReporter().throwException(() -> {
+            try {
+                return FileUtils.readFileToString(new File(inputFilename), "utf-8").split("\n");
+            } catch (IOException e) {
+                return new String[]{};
+            }
+        });
+        Assert.assertFalse(parser.getErrorReporter().hasErrors());
+        Assert.assertNotNull(ctx.getSfcBody());
+    }
+
+    @Test
+    public void prettyPrintByString() throws IOException {
+        PrettyPrinterTest.testPrettyPrintByString(ctx,
+                new File("src/test/resources/edu/kit/iti/formal/automation/sfclang/",inputFilename));
     }
 }

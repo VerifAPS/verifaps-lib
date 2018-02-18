@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.operators.Operator;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
 import edu.kit.iti.formal.automation.scope.Scope;
+import edu.kit.iti.formal.automation.sfclang.ast.*;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.CodeWriter;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
@@ -118,6 +119,12 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
      */
     public StructuredTextPrinter(StringLiterals sl_smv) {
         literals = sl_smv;
+    }
+
+    public static String print(Top astNode) {
+        StructuredTextPrinter p = new StructuredTextPrinter();
+        astNode.accept(p);
+        return p.getString();
     }
 
     /**
@@ -371,17 +378,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object visit(ProgramDeclaration programDeclaration) {
-        sb.append("PROGRAM ").append(programDeclaration.getProgramName()).append('\n');
-        programDeclaration.getScope().accept(this);
-        programDeclaration.getStBody().accept(this);
-        sb.decreaseIndent().nl().append("END_PROGRAM").nl();
-        return null;
-    }
+
 
     /*
      * TODO to new ast visitor
@@ -393,6 +390,23 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
      * sb.append("ELSE -> "); caseExpression.getElseExpression().accept(this);
      * sb.append(")").decreaseIndent(); return null; }
      */
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object visit(ProgramDeclaration programDeclaration) {
+        sb.append("PROGRAM ").append(programDeclaration.getProgramName()).append('\n');
+        programDeclaration.getScope().accept(this);
+
+        if (!programDeclaration.getActions().isEmpty()) {
+            programDeclaration.getActions().forEach((k, v) -> v.accept(this));
+        }
+
+        programDeclaration.getStBody().accept(this);
+        sb.decreaseIndent().nl().append("END_PROGRAM").nl();
+        return null;
+    }
 
     /**
      * {@inheritDoc}
@@ -481,14 +495,21 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         sb.increaseIndent().nl();
 
         functionBlockDeclaration.getScope().accept(this);
-
         sb.nl();
 
-        functionBlockDeclaration.getMethods().forEach(m -> m.accept(this));
+        if (!functionBlockDeclaration.getMethods().isEmpty()) {
+            functionBlockDeclaration.getMethods().forEach(m -> m.accept(this));
+            sb.nl();
+        }
 
-        sb.nl();
+        if (!functionBlockDeclaration.getActions().isEmpty()) {
+            functionBlockDeclaration.getActions().forEach((k, v) -> v.accept(this));
+        }
 
-        functionBlockDeclaration.getStBody().accept(this);
+        if (functionBlockDeclaration.getStBody() != null)
+            functionBlockDeclaration.getStBody().accept(this);
+        else if (functionBlockDeclaration.getSfcBody() != null)
+            functionBlockDeclaration.getSfcBody().accept(this);
 
         sb.decreaseIndent().nl().append("END_FUNCTION_BLOCK").nl().nl();
         return null;
@@ -644,6 +665,18 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
             sb.decreaseIndent();
         }
         sb.nl().append("END_IF");
+        return null;
+    }
+
+    @Override
+    public Object visit(ActionDeclaration ad) {
+        sb.nl().append("ACTION ").append(ad.getName()).increaseIndent();
+        if (ad.getStBody() != null) {
+            ad.getStBody().accept(this);
+        } else if (ad.getSfcBody() != null) {
+            ad.getSfcBody().accept(this);
+        }
+        sb.decreaseIndent().nl().append("END_ACTION");
         return null;
     }
 
@@ -839,9 +872,75 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visit(SFCStep sfcStep) {
+        sb.nl().append(sfcStep.isInitial() ? "INITIAL_STEP" : "STEP ");
+        sb.append(sfcStep.getName()).append(":").increaseIndent();
+        sfcStep.getEvents().forEach(aa -> visit(aa));
+        sb.decreaseIndent().nl();
+        sb.append("END_STEP").nl();
+        return null;
+    }
+
+    private void visit(SFCStep.AssociatedAction aa) {
+        sb.nl().append(aa.getActionName()).append('(').append(aa.getQualifier().getQualifier().symbol);
+        if (aa.getQualifier().getQualifier().hasTime) {
+            if (aa.getQualifier().getTime() != null) {
+                sb.append(", ").append(aa.getQualifier().getTime());
+            } else if (aa.getQualifier().getTimeVariable() != null) {
+                sb.append(", ").append(aa.getQualifier().getTimeVariable());
+            }
+        }
+        sb.append(");");
+    }
+
+    @Override
+    public Object visit(SFCNetwork sfcNetwork) {
+        sfcNetwork.getSteps().forEach(a -> a.accept(this));
+
+        sfcNetwork.getSteps().stream()
+                .flatMap(s -> s.getIncoming().stream())
+                .forEachOrdered(t -> t.accept(this));
+
+        return null;
+    }
+
+    @Override
+    public Object visit(SFCImplementation sfc) {
+        sfc.getActions().forEach(a -> a.accept(this));
+        sfc.getNetworks().forEach(n -> n.accept(this));
+        return null;
+    }
+
+    @Override
+    public Object visit(SFCTransition transition) {
+        String f = transition.getFrom().stream().map(SFCStep::getName).collect(Collectors.joining(","));
+        String t = transition.getTo().stream().map(SFCStep::getName).collect(Collectors.joining(","));
+
+        sb.nl().append("TRANSITION FROM");
+
+        if (transition.getFrom().size() == 1) {
+            sb.append('(').append(f).append(')');
+        } else {
+            sb.append(f);
+        }
+        sb.append(" TO ");
+        if (transition.getTo().size() == 1) {
+            sb.append('(').append(t).append(')');
+        } else {
+            sb.append(t);
+        }
+        sb.append(" := ");
+
+        transition.getGuard().accept(this);
+        sb.append(";").append(" END_TRANSITION");
+        return null;
+    }
+
     /**
      * <p>clear.</p>
      */
+
     public void clear() {
         sb = new CodeWriter();
     }

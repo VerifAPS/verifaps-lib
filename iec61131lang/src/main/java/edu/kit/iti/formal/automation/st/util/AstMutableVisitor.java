@@ -26,6 +26,7 @@ import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.sfclang.ast.*;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.Visitable;
+import lombok.val;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -162,7 +163,10 @@ public class AstMutableVisitor extends AstVisitor<Object> {
         StatementList r = new StatementList();
         for (Statement s : statements) {
             if (s == null) continue;
-            r.add((Statement) s.accept(this));
+            val stmt = s.accept(this);
+            if (stmt instanceof StatementList) {
+                r.addAll((StatementList) stmt);
+            } else r.add((Statement) stmt);
         }
         return r;
     }
@@ -310,7 +314,7 @@ public class AstMutableVisitor extends AstVisitor<Object> {
         Map<String, VariableDeclaration> newMap = localScope.asMap();
         newMap.clear();
 
-        map.forEach((k,v) -> {
+        map.forEach((k, v) -> {
             VariableDeclaration decl = (VariableDeclaration) v.accept(this);
             newMap.put(decl.getName(), decl);
         });
@@ -528,8 +532,8 @@ public class AstMutableVisitor extends AstVisitor<Object> {
     }
 
     @Override
-    public Object visit(SFCAction sfcAction) {
-        return super.visit(sfcAction);
+    public Object visit(ActionDeclaration actionDeclaration) {
+        return super.visit(actionDeclaration);
     }
 
     @Override

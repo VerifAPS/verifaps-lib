@@ -4,10 +4,11 @@ FUNCTION_BLOCK Types1R
         o : uint;
     END_VAR
 
-    STEP A
-        on active action
-            o := 257;
-        end_action
-    END_STEP 
+    INITIAL_STEP A:
+        A_active(N);
+    END_STEP
+    ACTION A_active
+        o := 257;
+    end_action
 
 END_FUNCTION_BLOCK

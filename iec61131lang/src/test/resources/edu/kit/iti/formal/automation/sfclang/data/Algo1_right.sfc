@@ -1,29 +1,32 @@
-SFC A1R
+FUNCTION_BLOCK A1R
     VAR t : int; s : int; END_VAR
     VAR_INPUT i : int; END_VAR
 	VAR_OUTPUT o :int; END_VAR
     
-    STEP A
-        ON active ACTION 
-            t := i;
-        END_ACTION
+    INITIAL_STEP A:
+        A_active(N);
     END_STEP
 
+    ACTION A_active
+        t := i;
+    END_ACTION
 
-    STEP B
-        ON active ACTION 
-            s := s + 1;
-        END_ACTION
-    END_STEP
-    
-    GOTO true :: A -> B
-    GOTO (s+1)*(s+1) > t :: B -> C
-	GOTO (s+1)*(s+1) <= t :: B -> B
-    
-    STEP C 
-        ON active ACTION 
-            o := s;
-        END_ACTION 
+
+    STEP B:
+        B_active(N);
     END_STEP
 
+    ACTION B_active
+        s := s + 1;
+    END_ACTION
+
+
+    TRANSITION FROM A  TO B := true ; END_TRANSITION
+    TRANSITION FROM B  TO C := (s+1)*(s+1) > t ; END_TRANSITION
+	TRANSITION FROM B  TO B := (s+1)*(s+1) <= t ; END_TRANSITION
+    STEP C:
+	C_active(N);
+END_STEP
+
+ACTION C_active: o := s; END_ACTION
 END_FUNCTION_BLOCK

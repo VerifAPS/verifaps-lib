@@ -22,10 +22,14 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.sfclang.ast.ActionDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.SFCImplementation;
 import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.*;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Created by weigl on 13.06.14.
@@ -43,6 +47,7 @@ public class ProgramDeclaration extends TopLevelScopeElement
     private StatementList stBody;
     private String programName;
     private SFCImplementation sfcBody;
+    private HashMap<String, ActionDeclaration> actions = new LinkedHashMap<>();
 
     /**
      * {@inheritDoc}
@@ -71,6 +76,11 @@ public class ProgramDeclaration extends TopLevelScopeElement
         if (sfcBody != null)
             pd.sfcBody = sfcBody.copy();
 
+        actions.forEach((k, v) -> pd.getActions().put(k, v.copy()));
         return pd;
+    }
+
+    public void addAction(ActionDeclaration act) {
+        actions.put(act.getName(), act);
     }
 }

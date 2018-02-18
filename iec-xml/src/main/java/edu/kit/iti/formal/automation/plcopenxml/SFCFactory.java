@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.plcopenxml;
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.scope.Scope;
-import edu.kit.iti.formal.automation.sfclang.ast.SFCAction;
+import edu.kit.iti.formal.automation.sfclang.ast.ActionDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.SFCImplementation;
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
@@ -148,7 +148,7 @@ public class SFCFactory extends DefaultPOUBuilder implements PCLOpenXMLBuilder.B
         for (Element action : xpath.evaluate(element)) {
             String name = action.getAttributeValue("name");
             String stCode = action.getChild("body").getChild("ST").getChildText("xhtml");
-            SFCAction act = new SFCAction();
+            ActionDeclaration act = new ActionDeclaration();
             act.setName(name);
             act.setStBody(IEC61131Facade.statements(stCode));
             sfc.getActions().add(act);
@@ -300,8 +300,8 @@ public class SFCFactory extends DefaultPOUBuilder implements PCLOpenXMLBuilder.B
         return IEC61131Facade.expr(expression);
     }
 
-    private List<SFCAction> parseActions(Project.Types.Pous.Pou.Actions actions) {
-        ArrayList<SFCAction> l = new ArrayList<>();
+    private List<ActionDeclaration> parseActions(Project.Types.Pous.Pou.Actions actions) {
+        ArrayList<ActionDeclaration> l = new ArrayList<>();
 
         if (actions != null) {
             for (Project.Types.Pous.Pou.Actions.Action action : actions.getAction())
@@ -310,7 +310,7 @@ public class SFCFactory extends DefaultPOUBuilder implements PCLOpenXMLBuilder.B
         return l;
     }
 
-    private SFCAction parseAction(Project.Types.Pous.Pou.Actions.Action action) {
+    private ActionDeclaration parseAction(Project.Types.Pous.Pou.Actions.Action action) {
         String name = action.getName();
         org.w3c.dom.Element st = (org.w3c.dom.Element) action.getBody().getST().getAny();
 
@@ -319,7 +319,7 @@ public class SFCFactory extends DefaultPOUBuilder implements PCLOpenXMLBuilder.B
         }
 
         StatementList sl = parseStatementList(st);
-        return new SFCAction(name, sl);
+        return new ActionDeclaration(name, sl);
     }
 
 

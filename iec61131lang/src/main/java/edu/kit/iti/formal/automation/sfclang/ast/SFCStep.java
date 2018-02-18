@@ -42,7 +42,7 @@ public class SFCStep extends Top<IEC61131Parser.StepContext> {
     private String name;
     private boolean isInitial;
     private List<AssociatedAction> events = new ArrayList<>();
-    private List<SFCTransition> outgoing, incoming;
+    private List<SFCTransition> outgoing = new ArrayList<>(), incoming = new ArrayList<>();
 
     public AssociatedAction addAction(SFCActionQualifier qualifier, String text) {
         AssociatedAction aa = new AssociatedAction();

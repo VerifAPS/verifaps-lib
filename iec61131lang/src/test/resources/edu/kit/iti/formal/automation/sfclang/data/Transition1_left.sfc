@@ -5,19 +5,16 @@ FUNCTION_BLOCK T1L
     END_VAR
 
 
-    STEP A 
-        on active action 
-            o := true;
-        end_action 
+    INITIAL_STEP A:
+	A_active(N);
     END_STEP
-    
-    STEP B
-       on active action 
-            o := false;
-       end_action 
-    END_STEP
-    
-    GOTO true :: A->B
-    GOTO true :: B->A
-    
+
+ACTION A_active: o := true; END_ACTION
+    STEP B:
+	_active(N);
+END_STEP
+
+ACTION B_active: o := false; END_ACTION
+    TRANSITION FROM A TO B := true ; END_TRANSITION
+    TRANSITION FROM B TO A := true ; END_TRANSITION
 END_FUNCTION_BLOCK

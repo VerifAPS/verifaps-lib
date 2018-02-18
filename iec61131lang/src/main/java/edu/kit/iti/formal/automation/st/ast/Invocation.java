@@ -61,6 +61,7 @@ public class Invocation extends Initialization {
         }
     }
 
+    @Deprecated
     public Invocation(@NotNull Invocation invocation) {
         callee = invocation.getCallee();
         parameters.addAll(invocation.parameters);
@@ -83,12 +84,12 @@ public class Invocation extends Initialization {
         parameters.sort(Parameter::compareTo);
     }
 
-    public void addParameters(@NotNull List<Parameter> parameterList) {
+    public void addParameters(@NotNull List<@NotNull Parameter> parameterList) {
         parameters.addAll(parameterList);
         parameters.sort(Parameter::compareTo);
     }
 
-    public void addExpressionParameters(@NotNull List<Expression> expressionList) {
+    public void addExpressionParameters(@NotNull List<@NotNull Expression> expressionList) {
         expressionList.forEach(e -> parameters.add(new Parameter(e)));
         parameters.sort(Parameter::compareTo);
     }
@@ -135,7 +136,6 @@ public class Invocation extends Initialization {
         fc.callee = callee.copy();
         fc.setParameters(new ArrayList<>(parameters.stream().map(Parameter::copy).collect(Collectors.toList())));
         return fc;
-
     }
 
     @Data

@@ -29,6 +29,7 @@ import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
+import edu.kit.iti.formal.automation.sfclang.ast.ActionDeclaration;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
@@ -60,6 +61,7 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
     private TypeScope types = TypeScope.builtin();
     private Map<String, ClassDeclaration> classes = new LinkedHashMap<>();
     private Map<String, InterfaceDeclaration> interfaces = new LinkedHashMap<>();
+    private Map<String, ActionDeclaration> actions = new LinkedHashMap<>();
 
     public Scope(Scope parent) {
         this.parent = parent;
@@ -357,5 +359,19 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
 
     public Stream<VariableDeclaration> stream() {
         return asMap().values().stream();
+    }
+
+    @Nullable
+    public ActionDeclaration getAction(@NotNull String name) {
+        if (actions.containsKey(name))
+            return actions.get(name);
+        if (parent != null) {
+            return parent.getAction(name);
+        }
+        return null;
+    }
+
+    public void registerAction(@NotNull ActionDeclaration a) {
+        actions.put(a.getName(), a);
     }
 }

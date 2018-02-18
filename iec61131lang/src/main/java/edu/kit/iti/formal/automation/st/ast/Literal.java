@@ -32,6 +32,7 @@ import edu.kit.iti.formal.automation.sfclang.Utils;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
@@ -41,6 +42,7 @@ import org.antlr.v4.runtime.Token;
  * @version 1 (25.06.17)
  */
 @Data
+@EqualsAndHashCode(exclude = {"token"})
 @NoArgsConstructor
 public class Literal extends Initialization {
     private final IdentifierPlaceHolder<Any> dataType = new IdentifierPlaceHolder<>();

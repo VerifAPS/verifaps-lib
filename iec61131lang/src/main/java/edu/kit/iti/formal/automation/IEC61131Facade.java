@@ -22,17 +22,22 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.analysis.*;
+import edu.kit.iti.formal.automation.analysis.FindDataTypes;
+import edu.kit.iti.formal.automation.analysis.FindEffectiveSubtypes;
+import edu.kit.iti.formal.automation.analysis.FindInstances;
+import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
-import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.*;
+import lombok.val;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.misc.Interval;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -47,6 +52,8 @@ import java.nio.file.Path;
  * @since 27.11.16
  */
 public class IEC61131Facade {
+    private static final int FIND_EFFECTIVE_SUBTYPES_LIMIT = 1000;
+
     /**
      * Parse the given string into an expression.
      *
@@ -56,13 +63,18 @@ public class IEC61131Facade {
     public static Expression expr(CharStream input) {
         IEC61131Parser parser = getParser(input);
         IEC61131Parser.ExpressionContext ctx = parser.expression();
-        return (Expression) ctx.accept(new IECParseTreeToAST());
+        val expr = (Expression) ctx.accept(new IECParseTreeToAST());
+        parser.getErrorReporter().throwException();
+        return expr;
     }
 
     @NotNull
     public static IEC61131Parser getParser(CharStream input) {
         IEC61131Lexer lexer = new IEC61131Lexer(input);
-        return new IEC61131Parser(new CommonTokenStream(lexer));
+        IEC61131Parser p = new IEC61131Parser(new CommonTokenStream(lexer));
+        p.getErrorListeners().clear();
+        p.addErrorListener(p.getErrorReporter());
+        return p;
     }
 
     public static Expression expr(String input) {
@@ -87,17 +99,20 @@ public class IEC61131Facade {
      */
     public static StatementList statements(CharStream input) {
         IEC61131Parser parser = getParser(input);
-        return (StatementList) parser.statement_list().accept(new IECParseTreeToAST());
+        val stmts = (StatementList) parser.statement_list().accept(new IECParseTreeToAST());
+        parser.getErrorReporter().throwException();
+        return stmts;
     }
 
     public static StatementList statements(String input) {
         return statements(CharStreams.fromString(input));
     }
 
-
     public static TopLevelElements file(CharStream input) {
         IEC61131Parser parser = getParser(input);
-        return (TopLevelElements) parser.start().accept(new IECParseTreeToAST());
+        TopLevelElements tle = (TopLevelElements) parser.start().accept(new IECParseTreeToAST());
+        parser.getErrorReporter().throwException();
+        return tle;
     }
 
     public static TopLevelElements file(Path s) throws IOException {
@@ -127,7 +142,8 @@ public class IEC61131Facade {
 
     /**
      * Find all instances of classes and FBs belonging to the given top level element..
-     * @param element The top level element to visit.
+     *
+     * @param element     The top level element to visit.
      * @param globalScope Global scope after data types have been resolved.
      * @return The instance scope containing all instances.
      */
@@ -136,8 +152,6 @@ public class IEC61131Facade {
         element.accept(new FindInstances(instanceScope));
         return instanceScope;
     }
-
-    private static final int FIND_EFFECTIVE_SUBTYPES_LIMIT = 1000;
 
     public static void findEffectiveSubtypes(TopLevelElements topLevelElements, Scope globalScope,
                                              InstanceScope instanceScope) {
@@ -153,6 +167,7 @@ public class IEC61131Facade {
     /**
      * Resolve types of top level elements and print them along with some minor statistics.
      * Assume there is a single program declaration.
+     *
      * @param topLevelElements
      * @return Top level elements, formatted, as string.
      */

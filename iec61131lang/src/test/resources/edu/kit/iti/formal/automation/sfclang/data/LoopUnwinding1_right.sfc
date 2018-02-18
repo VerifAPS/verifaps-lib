@@ -1,15 +1,13 @@
-SFC Loop
+FUNCTION_BLOCK Loop
 
     VAR_OUTPUT 
         o : INT;
     END_VAR
 
-    STEP A
-        ON active ACTION
-            o := o + 1;
-        END_ACTION
-    END_STEP
-	
-	GOTO TRUE :: A->A
+    INITIAL_STEP A:
+	A_active(N);
+END_STEP
 
+ACTION A_active: o := o + 1;   END_ACTION
+TRANSITION FROM A TO A := TRUE ; END_TRANSITION
 END_FUNCTION_BLOCK

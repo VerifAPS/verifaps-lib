@@ -376,7 +376,7 @@ public interface Visitor<T> {
 
     T visit(SFCStep sfcStep);
 
-    T visit(SFCAction sfcAction);
+    T visit(ActionDeclaration actionDeclaration);
 
     T visit(SFCNetwork sfcNetwork);
 

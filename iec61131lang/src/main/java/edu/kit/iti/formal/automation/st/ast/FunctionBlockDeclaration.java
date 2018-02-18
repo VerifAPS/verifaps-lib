@@ -22,13 +22,18 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import com.sun.activation.registries.MailcapParseException;
 import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.sfclang.ast.ActionDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.SFCImplementation;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 /**
@@ -45,6 +50,7 @@ public class FunctionBlockDeclaration extends ClassDeclaration implements Invoca
     private StatementList stBody;
     private SFCImplementation sfcBody;
     private String name;
+    private Map<String, ActionDeclaration> actions = new LinkedHashMap<>();
 
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
@@ -73,6 +79,8 @@ public class FunctionBlockDeclaration extends ClassDeclaration implements Invoca
         if (sfcBody != null)
             fb.sfcBody = sfcBody.copy();
 
+        actions.forEach((k, v) -> fb.getActions().put(k, v.copy()));
+
         fb.setFinal_(isFinal_());
         fb.setAbstract_(isAbstract_());
         fb.setParent(getParent().getIdentifier());
@@ -80,5 +88,9 @@ public class FunctionBlockDeclaration extends ClassDeclaration implements Invoca
         getMethods().forEach(m -> fb.getMethods().add(m.copy()));
 
         return fb;
+    }
+
+    public void addAction(ActionDeclaration act) {
+        actions.put(act.getName(), act);
     }
 }

@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.st.util;
  */
 
 import edu.kit.iti.formal.automation.scope.Scope;
-import edu.kit.iti.formal.automation.sfclang.ast.SFCAction;
+import edu.kit.iti.formal.automation.sfclang.ast.ActionDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.SFCNetwork;
 import edu.kit.iti.formal.automation.sfclang.ast.SFCStep;
 import edu.kit.iti.formal.automation.st.ast.*;
@@ -428,8 +428,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     }
 
     @Override
-    public T visit(SFCAction sfcAction) {
-        return super.visit(sfcAction);
+    public T visit(ActionDeclaration actionDeclaration) {
+        return super.visit(actionDeclaration);
     }
 
     @Override

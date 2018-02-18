@@ -5,6 +5,8 @@ options {tokenVocab = IEC61131Lexer;}
 @header {}
 
 @members {
+    @lombok.Getter @lombok.Setter @org.jetbrains.annotations.NotNull
+    private ErrorReporter errorReporter = new ErrorReporter();
 }
 
 start
@@ -363,12 +365,18 @@ function_block_declaration
 	(IMPLEMENTS interfaces=identifier_list)?
 	var_decls
 	methods
+	action*
 	body
 	END_FUNCTION_BLOCK
 ;
 
-body : sfc | /*| ladder_diagram | fb_diagram | instruction_list |*/ statement_list;
-funcBody : /*ladder_diagram | fb_diagram | instruction_list |*/ statement_list;
+body :
+      sfc
+    | /*| ladder_diagram | fb_diagram | instruction_list |*/
+      statement_list;
+
+funcBody : /*ladder_diagram | fb_diagram | instruction_list |*/
+            statement_list;
 
 interface_declaration
 :
@@ -410,6 +418,7 @@ program_declaration
 :
 	PROGRAM identifier=IDENTIFIER
 	var_decls
+	action*
 	body END_PROGRAM
 ;
 
@@ -809,7 +818,7 @@ exit_statement
                 FROM from=steps TO to=steps transitionCond END_TRANSITION;
  steps : IDENTIFIER | LPAREN IDENTIFIER ( COMMA IDENTIFIER )+ RPAREN;
  transitionCond : ASSIGN expression SEMICOLON /*| COLON ( FBD_Network | LD_Rung ) | ':=' IL_Simple_Inst*/;
- action : ACTION IDENTIFIER COLON body END_ACTION;
+ action : ACTION IDENTIFIER COLON? body END_ACTION;
 //
 
 /*

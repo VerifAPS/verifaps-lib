@@ -40,12 +40,12 @@ import java.util.List;
 @Data
 public class SFCImplementation extends Top<IEC61131Parser.SfcContext> {
     private List<SFCNetwork> networks = new ArrayList<>();
-    private List<SFCAction> actions = new ArrayList<>();
+    private List<ActionDeclaration> actions = new ArrayList<>();
 
 
-    public SFCAction getAction(String name) {
+    public ActionDeclaration getAction(String name) {
         return actions.stream().filter(
-                (SFCAction a) -> a.getName().equals(name)).findFirst().orElse(null);
+                (ActionDeclaration a) -> a.getName().equals(name)).findFirst().orElse(null);
     }
 
     /**

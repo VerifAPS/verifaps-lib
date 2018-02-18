@@ -63,8 +63,7 @@ public class StatementTest {
 
     @Test
     public void testParser() throws IOException {
-        IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRFileStream(testFile));
-        IEC61131Parser parser = new IEC61131Parser(new CommonTokenStream(lexer));
+        IEC61131Parser parser = IEC61131Facade.getParser(CharStreams.fromFileName(testFile));
         IEC61131Parser.Statement_listContext ctx = parser.statement_list();
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
       }

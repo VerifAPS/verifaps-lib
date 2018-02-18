@@ -31,6 +31,7 @@ import edu.kit.iti.formal.automation.st.ast.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -433,6 +434,10 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         }
         ast.setMethods((List<MethodDeclaration>) ctx.methods().accept(this));
 
+        ctx.action().forEach(act -> {
+            ast.addAction((ActionDeclaration) act.accept(this));
+        });
+
         if (ctx.body().statement_list() != null)
             ast.setStBody((StatementList) ctx.body().statement_list().accept(this));
         if (ctx.body().sfc() != null)
@@ -523,6 +528,10 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         if (ctx.body().sfc() != null)
             ast.setSfcBody((SFCImplementation) ctx.body().sfc().accept(this));
 
+        ctx.action().forEach(act -> {
+            ast.addAction((ActionDeclaration) act.accept(this));
+        });
+        
         return ast;
     }
 
@@ -846,7 +855,7 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         }
 
         ctx.action().forEach(a -> {
-            visitAction(a);
+            sfc.getActions().add(visitAction(a));
         });
 
         ctx.transition().forEach(t -> {
@@ -857,8 +866,8 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitAction(IEC61131Parser.ActionContext ctx) {
-        SFCAction action = new SFCAction();
+    public ActionDeclaration visitAction(IEC61131Parser.ActionContext ctx) {
+        ActionDeclaration action = new ActionDeclaration();
         action.setName(ctx.IDENTIFIER().getSymbol().getText());
         if (ctx.body().statement_list() != null) {
             action.setStBody((StatementList) ctx.body().statement_list().accept(this));
@@ -867,8 +876,7 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         if (ctx.body().sfc() != null) {
             action.setSfcBody((SFCImplementation) ctx.body().sfc().accept(this));
         }
-        sfc.getActions().add(action);
-        return null;
+        return action;
     }
 
     @Override

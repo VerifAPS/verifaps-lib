@@ -39,6 +39,7 @@ public class FindDataTypes extends AstVisitor {
     public Object visit(ProgramDeclaration programDeclaration) {
         setParentScope(programDeclaration);
         globalScope.registerProgram(programDeclaration);
+        programDeclaration.getActions().forEach((n,a)->programDeclaration.getScope().registerAction(a));
         return null;
     }
 
@@ -46,6 +47,7 @@ public class FindDataTypes extends AstVisitor {
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
         setParentScope(functionBlockDeclaration);
         globalScope.registerFunctionBlock(functionBlockDeclaration);
+        functionBlockDeclaration.getActions().forEach((n, a) -> functionBlockDeclaration.getScope().registerAction(a));
         return null;
     }
 

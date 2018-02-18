@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.st;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
+import edu.kit.iti.formal.automation.parser.ErrorReporter;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Test;
@@ -32,7 +33,7 @@ import org.junit.Test;
  */
 public class TestParseEmptyString {
 
-  @Test
+  @Test(expected = ErrorReporter.IEC61131ParserException.class)
   public void testParseEmptyString() {
     IEC61131Facade.file(CharStreams.fromString("")).accept(new DefaultVisitor<Void>());
   }

@@ -1,23 +1,20 @@
-SFC ES1L
+FUNCTION_BLOCK ES1L
 
     VAR_OUTPUT 
         o : int;
     END_VAR
 
 
-    STEP A 
-        on active action
-            o := 1;
-        end_action
-    END_STEP 
+    INITIAL_STEP A:
+	A_active(N);
+END_STEP
 
-    GOTO true :: A -> B
-    
-    STEP B 
-        on active action 
-            o:=2;
-        end_action
-    END_STEP 
-    
-    GOTO true :: B -> A 
+ACTION A_active: o := 1; END_ACTION
+    TRANSITION FROM A  TO B := true ; END_TRANSITION
+    STEP B:
+	B_active(N);
+END_STEP
+
+ACTION B_active: o:=2;   END_ACTION
+TRANSITION FROM B  TO A  := true ; END_TRANSITION
 END_FUNCTION_BLOCK

@@ -125,8 +125,15 @@ public class ProgramTest {
     @Test
     public void testPrintTopLevelElements() throws IOException {
         TopLevelElements tle = IEC61131Facade.file(testFile);
-        System.out.println(IEC61131Facade.print(tle));
+        PrettyPrinterTest.testPrettyPrintByString(tle, testFile);
     }
+
+    @Test
+    public void testPrintTopLevelElementsByEquals() throws IOException {
+        TopLevelElements tle = IEC61131Facade.file(testFile);
+        PrettyPrinterTest.testPrettyPrintByEquals(tle);
+    }
+
 
     /*
     @Test

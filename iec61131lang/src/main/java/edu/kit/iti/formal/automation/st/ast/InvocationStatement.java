@@ -58,7 +58,7 @@ public class InvocationStatement extends Statement {
     @Override
     public InvocationStatement copy() {
         InvocationStatement f = new InvocationStatement();
-        f.setInvocation(invocation);
+        f.setInvocation(invocation.copy());
         return f;
     }
 
@@ -72,6 +72,10 @@ public class InvocationStatement extends Statement {
 
     public String getCalleeName() {
         return invocation.getCalleeName();
+    }
+
+    public SymbolicReference getCallee() {
+        return invocation.getCallee();
     }
 
     public void setCalleeName(String calleeName) {

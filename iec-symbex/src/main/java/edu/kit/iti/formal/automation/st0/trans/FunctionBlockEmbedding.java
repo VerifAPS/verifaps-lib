@@ -25,13 +25,14 @@ package edu.kit.iti.formal.automation.st0.trans;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
 import edu.kit.iti.formal.automation.scope.Scope;
-import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
-import edu.kit.iti.formal.automation.st.ast.StatementList;
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st0.STSimplifier;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -45,31 +46,36 @@ public class FunctionBlockEmbedding implements ST0Transformation {
             vd.setType(vd.getType() | STSimplifier.PROGRAM_VARIABLE);
         }
 
-        state.theProgram.setStBody(
-                embeddFunctionBlocks(state.theProgram.getScope(), state.theProgram.getStBody()));
+        CodeWithScope cws = new CodeWithScope(state.theProgram);
+        state.theProgram.setStBody(embeddFunctionBlocks(cws));
     }
 
-    private StatementList embeddFunctionBlocks(Scope declared, StatementList statements) {
-        Set<VariableDeclaration> decls = new HashSet<>(declared.asMap().values());
-        statements = statements.copy();
+    /**
+     * first embedds the variables for each function block
+     */
+    private StatementList embeddFunctionBlocks(CodeWithScope outer) {
+        Set<VariableDeclaration> decls = new HashSet<>(outer.scope.asMap().values());
+        ActionEmbedder ae = new ActionEmbedder(outer);
+        outer.statements = ae.embedd();
+
         for (VariableDeclaration vd : decls) {
             Any type = vd.getDataType();
             if (type instanceof FunctionBlockDataType) {
                 FunctionBlockDataType fbdType = (FunctionBlockDataType) type;
                 FunctionBlockDeclaration fbd = fbdType.getFunctionBlock();
-                statements = embeddFunctionBlocksImpl(declared, statements, vd, fbd);
+                CodeWithScope inner = new CodeWithScope(fbd);
+                outer.statements = embeddFunctionBlocksImpl(outer, vd, inner);
             }
         }
-        return statements;
+        return outer.statements;
     }
 
 
-    private StatementList embeddFunctionBlocksImpl(Scope origin, StatementList intoStatements,
-                                                   VariableDeclaration instance, FunctionBlockDeclaration fbd) {
-        assert !intoStatements.isEmpty();
-        //recursive call:
-        StatementList toBeEmbedded = embeddFunctionBlocks(fbd.getScope(), fbd.getStBody());
+    private StatementList embeddFunctionBlocksImpl(CodeWithScope outer, VariableDeclaration instance, CodeWithScope inner) {
+        assert !outer.statements.isEmpty();
 
+        //recursive call:
+        StatementList toBeEmbedded = embeddFunctionBlocks(inner);
 
         final String prefix = instance.getName() + "$";
         //rename function
@@ -77,21 +83,33 @@ public class FunctionBlockEmbedding implements ST0Transformation {
             return prefix + s;
         };
 
-        Scope embeddVariables = prefixNames(fbd.getScope(), newName);
+        Scope embeddVariables = prefixNames(inner.scope, newName);
 
         //declare new variables
-        origin.addVariables(embeddVariables);
+        outer.scope.addVariables(embeddVariables);
 
         // remove FunctionBlock Instance
-        origin.asMap().remove(instance.getName());
+        outer.scope.asMap().remove(instance.getName());
 
         //Make a copy of the statements and add prefix to every variable
         VariableRenamer vr = new VariableRenamer(toBeEmbedded, newName);
         StatementList prefixedStatements = vr.rename(); // <- this can be injected
 
         // inject into every function block call
-        FunctionBlockEmbedder fbe = new FunctionBlockEmbedder(instance.getName(), prefixedStatements, newName);
-        return fbe.embedd(intoStatements);
+        FunctionBlockEmbedder fbe = FunctionBlockEmbedder.builder()
+                .instanceName(instance.getName())
+                .toEmbedd(prefixedStatements)
+                .renameVariable(newName)
+                .build();
+
+
+        inner.actions.forEach((n,s) -> {
+                    VariableRenamer v = new VariableRenamer(s, newName);
+                    fbe.getActions().put(n, v.rename()); // <- this can be injected
+                }
+        );
+
+        return fbe.embedd(outer.statements);
     }
 
     private Scope prefixNames(Scope scope, Function<String, String> newName) {
@@ -111,4 +129,46 @@ public class FunctionBlockEmbedding implements ST0Transformation {
         return copy;
     }
 
+    @Builder
+    @AllArgsConstructor
+    public static class CodeWithScope {
+        Scope scope;
+        StatementList statements;
+        Map<String, StatementList> actions = new HashMap<>();
+
+        public CodeWithScope(ProgramDeclaration theProgram) {
+            scope = theProgram.getScope();
+            statements = theProgram.getStBody().copy();
+            theProgram.getActions().forEach((k, v) -> actions.put(k, v.getStBody()));
+        }
+
+        public CodeWithScope(FunctionBlockDeclaration fbd) {
+            scope = fbd.getScope();
+            statements = fbd.getStBody().copy();
+            fbd.getActions().forEach((k, v) -> actions.put(k, v.getStBody()));
+        }
+
+    }
+
+    @RequiredArgsConstructor
+    private class ActionEmbedder extends AstMutableVisitor {
+        final CodeWithScope cws;
+
+        public StatementList embedd() {
+            return (StatementList) cws.statements.accept(this);
+        }
+
+        @Override
+        public Object visit(InvocationStatement fbc) {
+            //TODO this should be done via the scope.
+            // One place to rule function resolving!
+            if (cws.actions.containsKey(fbc.getCalleeName())) {
+                StatementList statements = new StatementList(cws.actions.get(fbc.getCalleeName()));
+                statements.add(0, CommentStatement.box("Call of action: %s", fbc.getCalleeName()));
+                statements.add( CommentStatement.box("End of action call: %s", fbc.getCalleeName()));
+                return statements;
+            }
+            return super.visit(fbc);
+        }
+    }
 }

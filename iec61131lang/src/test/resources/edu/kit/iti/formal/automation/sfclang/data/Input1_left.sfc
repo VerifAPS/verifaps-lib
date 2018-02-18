@@ -1,30 +1,26 @@
-SFC I1L
+FUNCTION_BLOCK I1L
 
     VAR_INPUT   i : bool; j :bool; END_VAR
     VAR_OUTPUT  o : int; END_VAR
 
-    STEP A 
-        on active action  end_action
-    END_STEP
+    INITIAL_STEP A:
+	A_active(N);
+END_STEP
 
+ACTION A_active:  END_ACTION
+STEP Su:
+	Sub_active(N);
+END_STEP
 
-    STEP Sub
-        on active action 
-            o := o - 1;
-        end_action 
-    END_STEP
+ACTION Sub_active: o := o - 1; END_ACTION
+    STEP Ad:
+	Add_active(N);
+END_STEP
 
-    STEP Add
-        on active action 
-            o := o + 1;
-        end_action 
-    END_STEP
+ACTION Add_active: o := o + 1; END_ACTION
     
-    
-    GOTO i and not j :: A -> Sub
-    GOTO j and not i :: A -> Add
-    
-    GOTO true :: Add -> A
-    GOTO true :: Sub -> A
-    
+    TRANSITION FROM A  TO Sub := i and not j ; END_TRANSITION
+    TRANSITION FROM A  TO Add := j and not i ; END_TRANSITION
+    TRANSITION FROM Add  TO A := true ; END_TRANSITION
+    TRANSITION FROM Sub  TO A := true ; END_TRANSITION
 END_FUNCTION_BLOCK

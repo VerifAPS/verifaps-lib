@@ -1,4 +1,4 @@
-SFC I1R
+FUNCTION_BLOCK I1R
 
     VAR_OUTPUT 
         o : bool;
@@ -8,17 +8,15 @@ SFC I1R
         i : int;
     END_VAR
 
-    STEP A 
+    INITIAL_STEP A:
         
     END_STEP
     
-    GOTO i=0 :: A -> B
-	GOTO i<>0 :: A->A
-    
-    STEP B 
-        on active action
-            o := true;
-        end_action
-    END_STEP 
-    
+    TRANSITION FROM A  TO B := i=0 ; END_TRANSITION
+	TRANSITION FROM A TO A := i<>0 ; END_TRANSITION
+    STEP B:
+	B_active(N);
+END_STEP
+
+ACTION B_active: o := true; END_ACTION
 END_FUNCTION_BLOCK

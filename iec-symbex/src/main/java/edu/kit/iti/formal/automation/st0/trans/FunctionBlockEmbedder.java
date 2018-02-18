@@ -24,27 +24,25 @@ package edu.kit.iti.formal.automation.st0.trans;
 
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.val;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
  * @author Alexander Weigl (26.06.2014)
  * @version 1
  */
+@Builder
 public class FunctionBlockEmbedder extends AstMutableVisitor {
     private final String instanceName;
     private final StatementList toEmbedd;
-    private Function<String, String> renameVariable;
-
-    public FunctionBlockEmbedder(String instanceName,
-                                 StatementList embeddable,
-                                 Function<String, String> rename) {
-        assert embeddable != null;
-        assert !instanceName.isEmpty();
-        this.instanceName = instanceName;
-        toEmbedd = embeddable;
-        renameVariable = rename;
-    }
+    @Getter
+    private final Map<String, StatementList> actions = new HashMap<>();
+    private final Function<String, String> renameVariable;
 
     @Override
     public Object visit(SymbolicReference symbolicReference) {
@@ -63,7 +61,7 @@ public class FunctionBlockEmbedder extends AstMutableVisitor {
         StatementList r = new StatementList();
         for (Statement s : statements) {
             Object visit = s.accept(this);
-            if(visit==null){
+            if (visit == null) {
                 throw new IllegalArgumentException("got null for " + s.getNodeName());
             }
             if (visit instanceof StatementList) {
@@ -77,10 +75,13 @@ public class FunctionBlockEmbedder extends AstMutableVisitor {
 
     @Override
     public Object visit(InvocationStatement fbc) {
-        if (!instanceName.equals(fbc.getCalleeName())) {
+        val call = fbc.getCallee();
+        if (!instanceName.equals(call.getIdentifier())) {
             return super.visit(fbc); // I am not caring about this instance.
         }
 
+        // rewrite input parameters as assignments
+        // f(a:=2) ==> f$a:=2; f()
         StatementList sl = new StatementList();
         fbc.getInputParameters().forEach(in -> {
             String internalName = renameVariable.apply(in.getName());
@@ -91,10 +92,21 @@ public class FunctionBlockEmbedder extends AstMutableVisitor {
         });
 
         sl.add(CommentStatement.box("Call of %s:%s", instanceName, fbc.getCalleeName()));
-        sl.addAll(this.toEmbedd);
+        if (call.getSub() == null) {//insert main statement block
+            sl.addAll(this.toEmbedd);
+        } else {
+            String actionName = call.getSub().getIdentifier();
+            if (actions.containsKey(actionName)) {
+                sl.addAll(actions.get(actionName));
+            } else {
+                sl.add(CommentStatement.box("//ERROR: COULD NOT FIND ACTION %s.%s",
+                        instanceName, actionName));
+            }
+        }
+
+        //rewrite output variables as trailing assignments.
         fbc.getOutputParameters().forEach(p -> {
             String name = renameVariable.apply(p.getName());
-
             AssignmentStatement assign = new AssignmentStatement(
                     (Reference) p.getExpression(),
                     new SymbolicReference(name)
@@ -102,7 +114,6 @@ public class FunctionBlockEmbedder extends AstMutableVisitor {
             sl.add(assign);
         });
         sl.add(CommentStatement.box("End of call"));
-
         return sl;
     }
 

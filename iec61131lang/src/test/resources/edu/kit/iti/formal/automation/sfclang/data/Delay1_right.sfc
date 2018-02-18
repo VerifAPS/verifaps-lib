@@ -1,9 +1,8 @@
-SFC D1R
+FUNCTION_BLOCK D1R
 
     VAR_OUTPUT 
         o : bool;
     END_VAR
-
 
     VAR_INPUT 
         i : int;
@@ -13,39 +12,39 @@ SFC D1R
 		s : bool;
 	END_VAR
 
-    STEP A 
-        ON active ACTION 
-            s := true;
-        END_ACTION
+    INITIAL_STEP A:
+        A_active(N);
     END_STEP
 
+    ACTION A_active:
+        s := true;
+    END_ACTION
 
-    STEP I2
+
+    STEP I:
     END_STEP
 
-    STEP I1a
-        on active action 
-            s := not s;
-        end_action 
-    END_STEP
-    
-    STEP I1b
-    on active action 
-            s := not not s;
-        end_action 
+    STEP I1:
+	    I1a_active(N);
     END_STEP
 
-    STEP Boing
-        on active action 
-            o := s;
-        end_action
+    ACTION I1a_active: s := not s; END_ACTION
+
+    STEP I1:
+	    I1_active(N);
     END_STEP
 
+    ACTION I1_active: s := not not s; END_ACTION
 
-    GOTO true :: A -> I1a
-    GOTO true :: A -> I1b
-    GOTO true :: I1a -> I2
-    GOTO true :: I1b -> I2
-    GOTO true :: I2 -> Boing
+    STEP Boin:
+	    Boin_active(N);
+    END_STEP
 
+    ACTION Boin_active: o := s; END_ACTION
+
+    TRANSITION FROM A  TO I1a := true ; END_TRANSITION
+    TRANSITION FROM A  TO I1b := true ; END_TRANSITION
+    TRANSITION FROM I1a  TO I2 := true ; END_TRANSITION
+    TRANSITION FROM I1b  TO I2 := true ; END_TRANSITION
+    TRANSITION FROM I2  TO Boing := true ; END_TRANSITION
 END_FUNCTION_BLOCK
