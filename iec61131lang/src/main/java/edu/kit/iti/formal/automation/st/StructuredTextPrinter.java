@@ -179,7 +179,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(CaseCondition.Enumeration enumeration) {
-        if (enumeration.getStart() == enumeration.getStop()) {
+        if (enumeration.getStart().equals(enumeration.getStop())) {
             enumeration.getStart().accept(this);
         } else {
             enumeration.getStart().accept(this);
@@ -331,12 +331,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /**
-     * <p>accept.</p>
-     *
-     * @param symbolicReference a {@link edu.kit.iti.formal.automation.st.ast.SymbolicReference} object.
-     * @return a {@link java.lang.Object} object.
-     */
+    @Override
     public Object visit(SymbolicReference symbolicReference) {
         sb.append(symbolicReference.getIdentifier());
 
@@ -360,12 +355,6 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
         return null;
     }
-
-    /** {@inheritDoc} *
-     @Override public Object visit(ScalarValue<? extends Any, ?> tsScalarValue) {
-     sb.append(literals.repr(tsScalarValue));
-     return null;
-     }*/
 
     /**
      * {@inheritDoc}

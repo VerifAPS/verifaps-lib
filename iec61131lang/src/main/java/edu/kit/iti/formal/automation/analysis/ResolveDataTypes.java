@@ -48,7 +48,7 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     }
 
     private Any resolve(String name) {
-        return globalScope.resolveDataType(name);
+        return localScope.resolveDataType(name);
     }
 
     @Override
@@ -78,8 +78,12 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     @Override
     public Object visit(Scope localScope) {
         this.localScope = localScope;
-        localScope.getVariables().values()
-                .forEach(vd -> vd.setDataType(resolve(vd.getDataTypeName())));
+        localScope.getVariables().values().forEach(vd -> {
+            vd.setDataType(resolve(vd.getDataTypeName()));
+            if(vd.getInit()!=null){
+                vd.getInit().accept(this);
+            }
+        });
         return null;
     }
 
