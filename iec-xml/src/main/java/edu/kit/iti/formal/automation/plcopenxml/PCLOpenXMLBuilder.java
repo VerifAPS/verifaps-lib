@@ -22,8 +22,10 @@ package edu.kit.iti.formal.automation.plcopenxml;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.IEC61131Facade;
+import edu.kit.iti.formal.automation.sfclang.ast.ActionDeclaration;
+import edu.kit.iti.formal.automation.sfclang.ast.SFCImplementation;
+import edu.kit.iti.formal.automation.st.ast.*;
 import org.jdom2.*;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
@@ -36,13 +38,17 @@ import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by weigl on 23/06/14.
  */
 public class PCLOpenXMLBuilder {
+    /**
+     * This handler ignores namespaces!
+     */
     private static final SAXHandlerFactory FACTORY = new SAXHandlerFactory() {
         @Override
         public SAXHandler createSAXHandler(JDOMFactory factory) {
@@ -61,12 +67,91 @@ public class PCLOpenXMLBuilder {
             };
         }
     };
+    private static XPathFactory xpathFactory = XPathFactory.instance();
     private final File filename;
-    private XPathFactory xpathFactory = XPathFactory.instance();
-    private List<Builder> builders = new ArrayList<>();
+    private Document document;
 
     public PCLOpenXMLBuilder(File filename) {
         this.filename = filename;
+    }
+
+    private static Map<String, ActionDeclaration> buildActions(Element e) {
+        Map<String, ActionDeclaration> map = new LinkedHashMap<>();
+        XPathExpression<Element> actions = xpathFactory.compile("./actions/action", Filters.element());
+        List<Element> elements = actions.evaluate(e);
+        for (Element action : elements) {
+            ActionDeclaration ad = buildAction(action);
+            map.put(ad.getName(), ad);
+        }
+        return map;
+    }
+
+    private static ActionDeclaration buildAction(Element action) {
+        ActionDeclaration ad = new ActionDeclaration();
+        ad.setName(action.getAttributeValue("name"));
+        ad.setStBody(buildSTForPOU(action));
+        ad.setSfcBody(buildSFCForPOU(action));
+        return ad;
+    }
+
+    private static TopLevelElement buildPOU(Element e) {
+        switch (e.getAttributeValue("pouType")) {
+            case "functionBlock":
+                return buildFunctionBlock(e);
+            case "program":
+                return buildProgram(e);
+            case "function":
+                return buildFunction(e);
+        }
+        return null;
+    }
+
+    private static FunctionDeclaration buildFunction(Element e) {
+        FunctionDeclaration fd = new FunctionDeclaration();
+        fd.setName(e.getAttributeValue("name"));
+        fd.setScope(new InterfaceBuilder(e.getChild("interface")).get());
+        fd.setStBody(buildSTForPOU(e));
+        //TODO how to find the return type fd.setReturnType();
+        return fd;
+    }
+
+    private static FunctionBlockDeclaration buildFunctionBlock(Element e) {
+        FunctionBlockDeclaration pd = new FunctionBlockDeclaration();
+        pd.setName(e.getAttributeValue("name"));
+        pd.setScope(new InterfaceBuilder(e.getChild("interface")).get());
+        pd.setStBody(buildSTForPOU(e));
+        pd.setSfcBody(buildSFCForPOU(e));
+        pd.setActions(buildActions(e));
+        return pd;
+    }
+
+    private static ProgramDeclaration buildProgram(Element e) {
+        ProgramDeclaration pd = new ProgramDeclaration();
+        pd.setProgramName(e.getAttributeValue("name"));
+        pd.setScope(new InterfaceBuilder(e.getChild("interface"))
+                .get());
+        pd.setStBody(buildSTForPOU(e));
+        pd.setSfcBody(buildSFCForPOU(e));
+        pd.setActions(buildActions(e));
+        return pd;
+    }
+
+    private static SFCImplementation buildSFCForPOU(Element e) {
+        XPathExpression<Element> getSTBody = xpathFactory.compile("./body/SFC", Filters.element());
+        Element sfcElement = getSTBody.evaluateFirst(e);
+        if (sfcElement != null) {
+            return new SFCFactory(sfcElement).get();
+        }
+        return null;
+    }
+
+    private static StatementList buildSTForPOU(Element e) {
+        XPathExpression<Text> getSTBody = xpathFactory.compile("./body/ST/xhtml/text()", Filters.text());
+        Text code = getSTBody.evaluateFirst(e);
+        if (code != null) {
+            return IEC61131Facade.statements(code.getText());
+        }
+        return null;
     }
 
     protected Document loadXml() throws IOException, JDOMException {
@@ -76,44 +161,18 @@ public class PCLOpenXMLBuilder {
     }
 
     public TopLevelElements build() throws JDOMException, IOException {
-        Document p = loadXml();
-        p.getRootElement().setNamespace(Namespace.NO_NAMESPACE);
-        addBuilders("//pou[body/SFC]", this::createSFCFactory, p);
-        addBuilders("//pou[body/FB]", this::createFBFactory, p);
-        addBuilders("//pou[body/ST]", this::createSTFactory, p);
-
+        document = loadXml();
+        document.getRootElement().setNamespace(Namespace.NO_NAMESPACE);
         TopLevelElements ast = new TopLevelElements();
-        builders.forEach(b -> {
-            ast.addAll(b.build());
-        });
-
+        for (Element e : getPOUs()) {
+            ast.add(buildPOU(e));
+        }
         return ast;
     }
 
-    private Builder createSTFactory(Element element) {
-        return new STBuilder(element);
-    }
+    public Iterable<? extends Element> getPOUs() {
+        XPathExpression<Element> e = xpathFactory.compile("//pou", Filters.element());
+        return e.evaluate(document);
 
-    private Builder createFBFactory(Element element) {
-        return new FBFactory(element);
-    }
-
-    private Builder createSFCFactory(Element element) {
-        return new SFCFactory(element);
-    }
-
-    private void addBuilders(String xpath, BuilderFactory factory, Document document) {
-        XPathExpression<Element> cxpath = xpathFactory.compile(xpath,
-                Filters.element());
-        List<Element> elements = cxpath.evaluate(document);
-        elements.forEach(e -> builders.add(factory.createBuilder(e)));
-    }
-
-    interface BuilderFactory {
-        Builder createBuilder(Element element);
-    }
-
-    interface Builder {
-        TopLevelElements build();
     }
 }

@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.parser;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.values.TimeValue;
 import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.sfclang.Utils;
@@ -31,7 +30,6 @@ import edu.kit.iti.formal.automation.st.ast.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -531,7 +529,7 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         ctx.action().forEach(act -> {
             ast.addAction((ActionDeclaration) act.accept(this));
         });
-        
+
         return ast;
     }
 
@@ -896,15 +894,9 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     public Object visitAction_association(IEC61131Parser.Action_associationContext ctx) {
         // 'N' | 'R' | 'S' | 'P' | ( ( 'L' | 'D' | 'SD' | 'DS' | 'SL' ) ',' Action_Time );
         SFCActionQualifier qualifier = new SFCActionQualifier();
-        if (null != ctx.actionQualifier().actionTime()) {
-            if (null != ctx.actionQualifier().actionTime()) {
-                Literal timeLiteral = Literal.time(ctx.actionQualifier().actionTime().TIME_LITERAL().getSymbol());
-                qualifier.setTime((TimeValue) timeLiteral.asValue().getValue());
-            }
-            if (null != ctx.actionQualifier().IDENTIFIER()) {
-                String var = ctx.actionQualifier().IDENTIFIER().getSymbol().getText();
-                qualifier.setTimeVariable(var);
-            }
+        if (null != ctx.actionQualifier().expression()) {
+                Expression expr = (Expression) ctx.actionQualifier().expression().accept(this);
+                qualifier.setTime(expr);
         }
 
         String q = ctx.actionQualifier().IDENTIFIER().getText();

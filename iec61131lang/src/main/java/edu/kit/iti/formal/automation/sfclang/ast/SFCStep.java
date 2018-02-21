@@ -25,7 +25,10 @@ package edu.kit.iti.formal.automation.sfclang.ast;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.st.ast.Top;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +41,9 @@ import java.util.stream.Collectors;
  * @version $Id: $Id
  */
 @Data
+@EqualsAndHashCode(exclude = {"incoming", "outgoing"})
+@NoArgsConstructor
+@AllArgsConstructor
 public class SFCStep extends Top<IEC61131Parser.StepContext> {
     private String name;
     private boolean isInitial;
@@ -68,8 +74,10 @@ public class SFCStep extends Top<IEC61131Parser.StepContext> {
         return visitor.visit(this);
     }
 
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Data
-    public class AssociatedAction {
+    public static class AssociatedAction {
         private SFCActionQualifier qualifier;
         private String actionName;
 

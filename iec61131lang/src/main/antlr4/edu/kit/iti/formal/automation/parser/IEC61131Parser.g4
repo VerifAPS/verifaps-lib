@@ -812,8 +812,8 @@ exit_statement
  init_step : INITIAL_STEP step_name=IDENTIFIER COLON ( action_association SEMICOLON )* END_STEP;
  step : STEP step_name=IDENTIFIER COLON ( action_association SEMICOLON )* END_STEP;
  action_association : actionName=IDENTIFIER '(' actionQualifier ? ( ',' indicatorName=IDENTIFIER )* ')';
- actionQualifier : IDENTIFIER (COMMA actionTime )?;
- actionTime: TIME_LITERAL | IDENTIFIER;
+ actionQualifier : IDENTIFIER (COMMA expression )?;
+ //actionTime: TIME_LITERAL | IDENTIFIER;
  transition : TRANSITION name=IDENTIFIER? ( LPAREN PRIORITY ASSIGN INTEGER_LITERAL RPAREN)?
                 FROM from=steps TO to=steps transitionCond END_TRANSITION;
  steps : IDENTIFIER | LPAREN IDENTIFIER ( COMMA IDENTIFIER )+ RPAREN;

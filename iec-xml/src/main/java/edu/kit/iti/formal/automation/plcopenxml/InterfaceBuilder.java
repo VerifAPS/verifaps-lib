@@ -4,7 +4,7 @@ package edu.kit.iti.formal.automation.plcopenxml;
  * #%L
  * iec-xml
  * %%
- * Copyright (C) 2017 Alexander Weigl
+ * Copyright (C) 2018 Alexander Weigl
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -27,30 +27,33 @@ import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.Literal;
 import edu.kit.iti.formal.automation.st.ast.VariableBuilder;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.jdom2.Element;
 
+import java.util.function.Supplier;
 
 /**
+ * Construct from an &lt;interface&gt; and {@link edu.kit.iti.formal.automation.scope.Scope}
+ *
  * @author Alexander Weigl
- * @version 1 (30.05.17)
+ * @version 1 (20.02.18)
  */
-public abstract class DefaultPOUBuilder implements PCLOpenXMLBuilder.Builder {
+@Data
+@RequiredArgsConstructor
+@AllArgsConstructor
+public class InterfaceBuilder implements Supplier<Scope> {
+    private final Element interfaze;
+    private Scope scope = new Scope();
 
-    protected Element element;
-
-    public DefaultPOUBuilder(Element element) {
-        this.element = element;
-    }
-
-
-    public Scope parseInterface() {
-        Element interfaze = element.getChild("interface");
+    @Override
+    public Scope get() {
         Scope d = new Scope();
         add(interfaze.getChild("inputVars"), d, VariableDeclaration.INPUT);
         add(interfaze.getChild("outputVars"), d, VariableDeclaration.OUTPUT);
         add(interfaze.getChild("localVars"), d, 0);
         //TODO Test for IN_OUT and others
-
         return d;
     }
 
@@ -62,7 +65,7 @@ public abstract class DefaultPOUBuilder implements PCLOpenXMLBuilder.Builder {
         VariableBuilder builder = d.builder();
         builder.push(flags);
 
-        for (Element e : vars.getChildren("variable")) {
+        for (org.jdom2.Element e : vars.getChildren("variable")) {
             String name = e.getAttributeValue("name");
             String datatype = getDatatype(e.getChild("type"));
             Literal initValue = getInitialValue(e.getChild("initialValue"));
@@ -73,8 +76,8 @@ public abstract class DefaultPOUBuilder implements PCLOpenXMLBuilder.Builder {
         }
     }
 
-    protected String getDatatype(Element e) {
-        Element derived = e.getChild("derived");
+    protected String getDatatype(org.jdom2.Element e) {
+        org.jdom2.Element derived = e.getChild("derived");
         if (derived != null) {
             return derived.getAttributeValue("name");
         } else {
@@ -83,15 +86,14 @@ public abstract class DefaultPOUBuilder implements PCLOpenXMLBuilder.Builder {
     }
 
 
-    private Literal getInitialValue(Element initialValue) {
+    private Literal getInitialValue(org.jdom2.Element initialValue) {
         if (initialValue == null)
             return null;
 
-        Element simpleValue = initialValue.getChild("simpleValue");
+        org.jdom2.Element simpleValue = initialValue.getChild("simpleValue");
         if (simpleValue == null)
             return null;
 
         return (Literal) IEC61131Facade.expr(simpleValue.getAttributeValue("value"));
     }
-
 }

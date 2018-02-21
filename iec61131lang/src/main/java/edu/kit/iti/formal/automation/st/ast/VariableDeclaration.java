@@ -47,46 +47,16 @@ import java.util.Set;
 @Data
 public class VariableDeclaration extends Top
         implements Comparable<VariableDeclaration>, Identifiable {
-    /**
-     * Constant <code>INPUT=1</code>
-     */
     public static final int INPUT = 1;
-    /**
-     * Constant <code>OUTPUT=2</code>
-     */
     public static final int OUTPUT = 2;
-    /**
-     * Constant <code>INOUT=4</code>
-     */
-    public static final int INOUT = 4;
-    /**
-     * Constant <code>LOCAL=8</code>
-     */
-    public static final int LOCAL = 8;
-    /**
-     * Constant <code>GLOBAL=16</code>
-     */
-    public static final int GLOBAL = 16;
-    /**
-     * Constant <code>CONSTANT=32</code>
-     */
-    public static final int CONSTANT = 32;
-    /**
-     * Constant <code>RETAIN=64</code>
-     */
-    public static final int RETAIN = 64;
-    /**
-     * Constant <code>LOCATED=128</code>
-     */
-    public static final int LOCATED = 128;
-    /**
-     * Constant <code>EXTERNAL=256</code>
-     */
-    public static final int EXTERNAL = 256;
-    /**
-     * Constant <code>TEMP=512</code>
-     */
-    public static final int TEMP = 512;
+    public static final int INOUT = INPUT | OUTPUT;
+    public static final int LOCAL = OUTPUT << 1;
+    public static final int GLOBAL = LOCAL << 1;
+    public static final int CONSTANT = GLOBAL << 1;
+    public static final int RETAIN = CONSTANT << 1;
+    public static final int LOCATED = RETAIN << 1;
+    public static final int EXTERNAL = LOCATED << 1;
+    public static final int TEMP = 512 << EXTERNAL;
 
     /**
      * Constant <code>WRITTEN_TO=1024</code>

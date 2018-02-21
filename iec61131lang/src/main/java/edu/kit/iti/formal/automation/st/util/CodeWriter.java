@@ -77,7 +77,7 @@ public class CodeWriter implements Serializable, CharSequence {
      * @return a {@link edu.kit.iti.formal.automation.st.util.CodeWriter} object.
      */
     public CodeWriter decreaseIndent() {
-        identDepth--;
+        identDepth = Math.max(identDepth - 1, 0);
         return this;
     }
 

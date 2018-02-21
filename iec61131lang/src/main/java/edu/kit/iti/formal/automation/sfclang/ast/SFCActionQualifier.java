@@ -22,28 +22,53 @@ package edu.kit.iti.formal.automation.sfclang.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.values.TimeValue;
+import edu.kit.iti.formal.automation.st.ast.Expression;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Alexander Weigl
  * @version 1 (30.01.18)
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SFCActionQualifier {
-    private Qualifier qualifier;
-    private TimeValue time;
-    private String timeVariable;
+    public static SFCActionQualifier RAISING = new SFCActionQualifier(Qualifier.RAISING);
+    public static SFCActionQualifier FALLING = new SFCActionQualifier(Qualifier.FALLING);
+    public static SFCActionQualifier NON_STORED = new SFCActionQualifier(Qualifier.NON_STORED);
+    public static SFCActionQualifier OVERRIDING_RESET = new SFCActionQualifier(Qualifier.OVERRIDING_RESET);
+    public static SFCActionQualifier SET = new SFCActionQualifier(Qualifier.SET);
 
-    private boolean hasTime() {
+    private Qualifier qualifier;
+    private Expression time;
+
+    public SFCActionQualifier(Qualifier qq) {
+        qualifier = qq;
+    }
+
+    public SFCActionQualifier(String qName) {
+        try {
+            qualifier = SFCActionQualifier.Qualifier.valueOf(qName);
+        } catch (IllegalArgumentException e) {
+            for (Qualifier q : Qualifier.values()) {
+                if (q.symbol.equals(qName)) {
+                    qualifier = q;
+                    break;
+                }
+            }
+        }
+    }
+
+    public boolean hasTime() {
         return qualifier.hasTime;
     }
 
     public SFCActionQualifier copy() {
         SFCActionQualifier q = new SFCActionQualifier();
-        q.qualifier=qualifier;
-        q.time = time;
-        q.timeVariable = timeVariable;
+        q.qualifier = qualifier;
+        q.time = time.copy();
         return q;
     }
 
@@ -55,7 +80,9 @@ public class SFCActionQualifier {
         STORE_AND_DELAY("SD", true),
         STORE_AND_LIMITED("SL", true),
         STORE_DELAYED("D", true),
-        DELAYED_AND_STORED("DS", true);
+        DELAYED_AND_STORED("DS", true),
+        RAISING("P1 ", false),
+        FALLING("P0", false);
 
         public final String symbol;
         public final boolean hasTime;
@@ -65,4 +92,5 @@ public class SFCActionQualifier {
             this.hasTime = hasTime;
         }
     }
+
 }

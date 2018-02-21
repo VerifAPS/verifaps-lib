@@ -4,7 +4,7 @@ package edu.kit.iti.formal.automation.plcopenxml;
  * #%L
  * iec-xml
  * %%
- * Copyright (C) 2017 Alexander Weigl
+ * Copyright (C) 2018 Alexander Weigl
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -22,20 +22,18 @@ package edu.kit.iti.formal.automation.plcopenxml;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
-import org.jdom2.Element;
+import edu.kit.iti.formal.automation.IEC61131Facade;
+import org.jdom2.JDOMException;
+
+import java.io.IOException;
 
 /**
  * @author Alexander Weigl
- * @version 1 (30.05.17)
+ * @version 1 (20.02.18)
  */
-public class FBFactory extends DefaultPOUBuilder implements PCLOpenXMLBuilder.Builder {
-    public FBFactory(Element element) {
-        super(element);
-    }
-
-    @Override
-    public TopLevelElements build() {
-        return new TopLevelElements();
+public class ExportAsPlain {
+    public static void main(String args[]) throws JDOMException, IOException {
+        System.out.println(
+                IEC61131Facade.print(IECXMLFacade.readPLCOpenXml(args[0])));
     }
 }

@@ -10,18 +10,20 @@ package edu.kit.iti.formal.automation.st;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import edu.kit.iti.formal.automation.datatypes.IECArray;
 import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.operators.Operator;
@@ -34,7 +36,7 @@ import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 import org.antlr.v4.runtime.Token;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -395,15 +397,22 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(ProgramDeclaration programDeclaration) {
-        sb.append("PROGRAM ").append(programDeclaration.getProgramName()).append('\n');
-        programDeclaration.getScope().accept(this);
+    public Object visit(ProgramDeclaration pd) {
+        sb.append("PROGRAM ").append(pd.getProgramName()).increaseIndent();
+        pd.getScope().accept(this);
 
-        if (!programDeclaration.getActions().isEmpty()) {
-            programDeclaration.getActions().forEach((k, v) -> v.accept(this));
+        sb.nl();
+
+        if (!pd.getActions().isEmpty()) {
+            pd.getActions().forEach((k, v) -> v.accept(this));
+            sb.nl();
         }
 
-        programDeclaration.getStBody().accept(this);
+        if (pd.getStBody() != null)
+            pd.getStBody().accept(this);
+        if (pd.getSfcBody() != null)
+            pd.getSfcBody().accept(this);
+
         sb.decreaseIndent().nl().append("END_PROGRAM").nl();
         return null;
     }
@@ -493,7 +502,6 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         }
 
         sb.increaseIndent().nl();
-
         functionBlockDeclaration.getScope().accept(this);
         sb.nl();
 
@@ -802,59 +810,49 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object visit(Scope localScope) {
         List<VariableDeclaration> variables = localScope.stream().collect(Collectors.toList());
-        Collections.sort(variables, VariableDeclaration::compareTo);
-        for (VariableDeclaration vd : variables) {
-            vd.getDataType();
+        Multimap<Integer, VariableDeclaration> varType = HashMultimap.create(3, variables.size() / 3 + 1);
+        variables.forEach(v -> varType.put(v.getType(), v));
+
+        for (Integer type : varType.keySet()) {
+            ArrayList<VariableDeclaration> vars = new ArrayList<>(varType.get(type));
+            vars.sort(VariableDeclaration::compareTo);
             sb.nl().append("VAR");
 
-            if (vd.isInput())
-                sb.append("_INPUT");
-            if (vd.isOutput())
-                sb.append("_OUTPUT");
-            if (vd.isInOut())
+            if ((VariableDeclaration.INOUT & type) != 0) {
                 sb.append("_INOUT");
-
-            if (vd.isExternal())
-                sb.append("_EXTERNAL");
-            if (vd.isGlobal())
-                sb.append("_GLOBAL");
-
-            sb.append(" ");
-
-            if (vd.isConstant())
-                sb.append(" CONSTANT ");
-
-            if (vd.isRetain())
-                sb.append("RETAIN");
-            /*
-             * else sb.append("NON_RETAIN");
-			 */
-
-            sb.append(" ");
-
-            sb.append(vd.getName()).append(" : ");
-
-            variableDataType(vd);
-
-            if (vd.getInit() != null) {
-                sb.append(" := ");
-                vd.getInit().accept(this);
+            } else {
+                if ((VariableDeclaration.INPUT & type) != 0)
+                    sb.append("_INPUT");
+                if ((VariableDeclaration.OUTPUT & type) != 0)
+                    sb.append("_OUTPUT");
+                if ((VariableDeclaration.EXTERNAL & type) != 0)
+                    sb.append("_EXTERNAL");
+                if ((VariableDeclaration.GLOBAL & type) != 0)
+                    sb.append("_GLOBAL");
+                if ((VariableDeclaration.TEMP & type) != 0)
+                    sb.append("TEMP");
             }
-
-            sb.append("; END_VAR ");
-
-			/*sb.append("{*")
-                    .append((vd.isInput() ? "I" : "") + (vd.isOutput() ? "O" : "") + (vd.isLocal() ? "L" : "")
-							+ (vd.is(READED) ? "R" : "r") + (vd.is(WRITTEN_TO) ? "W" : "w")
-							+ (vd.is(WRITE_BEFORE_READ) ? "X" : "x")
-							+ (vd.is(STSimplifier.PROGRAM_VARIABLE) ? "P" : "p"))
-					.append("*}");*/
+            sb.append(" ");
+            if ((VariableDeclaration.CONSTANT & type) != 0)
+                sb.append("CONSTANT ");
+            if ((VariableDeclaration.RETAIN & type) != 0)
+                sb.append("RETAIN ");
+            sb.increaseIndent();
+            for (VariableDeclaration vd : vars) {
+                sb.nl();
+                sb.append(vd.getName()).append(" : ");
+                variableDataType(vd);
+                if (vd.getInit() != null) {
+                    sb.append(" := ");
+                    vd.getInit().accept(this);
+                }
+                sb.append(";");
+            }
+            sb.decreaseIndent().nl().append("END_VAR");
+            sb.nl();
         }
         return null;
     }
@@ -874,7 +872,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(SFCStep sfcStep) {
-        sb.nl().append(sfcStep.isInitial() ? "INITIAL_STEP" : "STEP ");
+        sb.nl().append(sfcStep.isInitial() ? "INITIAL_STEP " : "STEP ");
         sb.append(sfcStep.getName()).append(":").increaseIndent();
         sfcStep.getEvents().forEach(aa -> visit(aa));
         sb.decreaseIndent().nl();
@@ -885,18 +883,25 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     private void visit(SFCStep.AssociatedAction aa) {
         sb.nl().append(aa.getActionName()).append('(').append(aa.getQualifier().getQualifier().symbol);
         if (aa.getQualifier().getQualifier().hasTime) {
-            if (aa.getQualifier().getTime() != null) {
-                sb.append(", ").append(aa.getQualifier().getTime());
-            } else if (aa.getQualifier().getTimeVariable() != null) {
-                sb.append(", ").append(aa.getQualifier().getTimeVariable());
-            }
+            sb.append(", ");
+            aa.getQualifier().getTime().accept(this);
         }
         sb.append(");");
     }
 
     @Override
     public Object visit(SFCNetwork sfcNetwork) {
-        sfcNetwork.getSteps().forEach(a -> a.accept(this));
+        ArrayList<SFCStep> seq = new ArrayList<>(sfcNetwork.getSteps());
+        seq.sort((o1, o2) -> {
+            if (o1.isInitial())
+                return -1;
+            if (o2.isInitial())
+                return 1;
+            return o1.getName().compareTo(o2.getName());
+        });
+
+        seq.forEach(a -> a.accept(this));
+
 
         sfcNetwork.getSteps().stream()
                 .flatMap(s -> s.getIncoming().stream())
@@ -917,22 +922,22 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         String f = transition.getFrom().stream().map(SFCStep::getName).collect(Collectors.joining(","));
         String t = transition.getTo().stream().map(SFCStep::getName).collect(Collectors.joining(","));
 
-        sb.nl().append("TRANSITION FROM");
+        sb.nl().append("TRANSITION FROM ");
 
-        if (transition.getFrom().size() == 1) {
+        if (transition.getFrom().size() > 1) {
             sb.append('(').append(f).append(')');
         } else {
             sb.append(f);
         }
         sb.append(" TO ");
-        if (transition.getTo().size() == 1) {
+        if (transition.getTo().size() > 1) {
             sb.append('(').append(t).append(')');
         } else {
             sb.append(t);
         }
         sb.append(" := ");
 
-        transition.getGuard().accept(this);
+            transition.getGuard().accept(this);
         sb.append(";").append(" END_TRANSITION");
         return null;
     }
@@ -953,6 +958,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public void setCodeWriter(CodeWriter cw) {
         this.sb = cw;
     }
+
 
     public static class StringLiterals {
 
@@ -995,6 +1001,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         public String repr(Value sv) {
             return sv.getDataType().repr(sv.getValue());
         }
-
     }
+
+
 }

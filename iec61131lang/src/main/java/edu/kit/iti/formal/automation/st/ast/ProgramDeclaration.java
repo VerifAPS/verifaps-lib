@@ -30,6 +30,7 @@ import lombok.*;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Created by weigl on 13.06.14.
@@ -47,7 +48,7 @@ public class ProgramDeclaration extends TopLevelScopeElement
     private StatementList stBody;
     private String programName;
     private SFCImplementation sfcBody;
-    private HashMap<String, ActionDeclaration> actions = new LinkedHashMap<>();
+    private Map<String, ActionDeclaration> actions = new LinkedHashMap<>();
 
     /**
      * {@inheritDoc}
