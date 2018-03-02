@@ -30,7 +30,6 @@ import edu.kit.iti.formal.smv.ast.SMVExpr;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -55,8 +54,8 @@ public class TableReader {
 
     public static String get(List<Element> cells, String name) {
         return cells.stream()
-                .filter(c -> c.getTagName().equals(name))
-                .map(n->n.getFirstChild().getNodeValue())
+                .filter(c -> c.getTagName().equals(name) && c.getFirstChild() != null)
+                .map(n -> n.getFirstChild().getNodeValue())
                 .findFirst().orElse(null);
     }
 
@@ -142,13 +141,15 @@ public class TableReader {
     private State translateStep(Step step) {
         State s = new State(stepNumber++);
         List<Element> cells = step.getAny().stream()
-                .map(Element.class::cast).collect(Collectors.toList());
+                .map(Element.class::cast)
+                .collect(Collectors.toList());
 
         for (int i = 0; i < gtt.getIoVariables().size(); i++) {
             IoVariable v = gtt.getIoVariables(i);
             String name = v.getName();
 
             String cellValue = get(cells, name);
+            s.getEntryForColumn().put(name, cellValue);
 
             if (cellValue == null || cellValue.isEmpty()) {
                 if (lastColumnValue.containsKey(i))
@@ -200,7 +201,7 @@ public class TableReader {
             if (v.getDataType() == null || v.getName() == null || v.getName()
                     .isEmpty() || v.getIo() == null || v.getIo().isEmpty())
                 throw new IllegalArgumentException(
-                        "variable " + v.getName() + " is bad");
+                        "variable " + v + " is bad");
         });
     }
 

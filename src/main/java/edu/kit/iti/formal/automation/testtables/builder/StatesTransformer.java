@@ -128,8 +128,18 @@ public class StatesTransformer implements TableTransformer {
         }
 
         SMVExpr activate = incoming
-                .map(State.AutomatonState::getDefForward)
-                .map(fwd -> (SMVExpr) fwd)
+                .map(inc -> {
+                    SMVExpr fwd = inc.getDefForward();
+                    /* If incoming state is det.wait, then this state becomes only active
+                     *  if it has not fired before.
+                     */
+                    if (inc.getState().getDuration().isDeterministicWait()) {
+                        SMVExpr inputAndState = automatonState.getSMVVariable().and(automatonState.getState().getDefInput()).not();
+                        fwd = fwd.and(inputAndState);
+                    }
+                    return fwd;
+                })
+                .map(SMVExpr.class::cast)
                 .reduce(SMVFacade.reducer(SBinaryOperator.OR))
                 .orElse(SLiteral.FALSE);
 
@@ -139,6 +149,7 @@ public class StatesTransformer implements TableTransformer {
             activate = activate.or(
                     var.and(automatonState.getState().getDefKeep()
                     ));
+            //TODO add following state (s->!s_in)
         }
 
         /*

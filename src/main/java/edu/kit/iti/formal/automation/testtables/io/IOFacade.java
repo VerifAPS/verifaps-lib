@@ -30,6 +30,7 @@ import edu.kit.iti.formal.smv.ast.SMVExpr;
 import edu.kit.iti.formal.smv.ast.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 /**
@@ -38,7 +39,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 public final class IOFacade {
     public static CellExpressionParser createParser(String input) {
         assert input != null;
-        CellExpressionLexer lexer = new CellExpressionLexer(new ANTLRInputStream(input));
+        CellExpressionLexer lexer = new CellExpressionLexer(CharStreams.fromString(input));
         lexer.removeErrorListeners();
         lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
 

@@ -37,6 +37,7 @@ public class State extends TableNode {
     public static final String SENTINEL_ID = "$$$";
     private final List<SMVExpr> inputExpr = new ArrayList<>();
     private final List<SMVExpr> outputExpr = new ArrayList<>();
+    private final Map<String, String> entryForColumn = new HashMap<>();
     private final Set<State> incoming = new HashSet<>();
     private final Set<State> outgoing = new HashSet<>();
     /**

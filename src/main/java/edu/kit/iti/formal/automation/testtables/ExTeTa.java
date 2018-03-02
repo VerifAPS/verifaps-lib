@@ -25,14 +25,16 @@ import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException;
 import edu.kit.iti.formal.automation.exceptions.UnknownVariableException;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
+import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.TypeDeclarations;
 import edu.kit.iti.formal.automation.testtables.builder.TableTransformation;
 import edu.kit.iti.formal.automation.testtables.exception.GetetaException;
 import edu.kit.iti.formal.automation.testtables.io.Report;
-import edu.kit.iti.formal.automation.testtables.model.CounterExampleAnalyzer;
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable;
 import edu.kit.iti.formal.automation.testtables.model.options.Mode;
 import edu.kit.iti.formal.automation.testtables.monitor.MonitorGeneration;
+import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SMVType;
 import org.apache.commons.cli.CommandLine;
@@ -133,7 +135,7 @@ public class ExTeTa {
             fbs.accept(stp);
             System.out.println(stp.getString());
         } else {
-            SMVModule modCode = evaluate(code);
+            SMVModule modCode = evaluate(cli.hasOption("no-simplify"), code);
             SMVType superEnumType = Facade.createSuperEnum(code);
             TableTransformation tt = new TableTransformation(table,
                     superEnumType);
@@ -157,8 +159,14 @@ public class ExTeTa {
         }
     }
 
-    private static SMVModule evaluate(TopLevelElements code) {
-        return SymbExFacade.evaluateProgram(code);
+    private static SMVModule evaluate(boolean disableSimplify, TopLevelElements code) {
+        if (!disableSimplify)
+            return SymbExFacade.evaluateProgram(code);
+        else {
+            ProgramDeclaration program = Utils.findProgram(code);
+            return SymbExFacade.evaluateProgram(program, (TypeDeclarations) code.get(0),
+                    program.getScope());
+        }
     }
 
     private static CommandLine parse(String[] args) throws ParseException {
@@ -166,6 +174,7 @@ public class ExTeTa {
 
         org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
         options.addOption("x", false, "enable XML mode");
+        options.addOption("", "no-simplify", false, "disable");
         options.addOption("t", "table", true, "the xml file of the table");
         options.addOption("o", "output", true, "ouput");
         options.addOption("c", "code", true, "program files");
