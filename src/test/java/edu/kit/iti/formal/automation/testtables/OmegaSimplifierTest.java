@@ -40,7 +40,7 @@ public class OmegaSimplifierTest {
 
 
     private String test(String filename) throws JAXBException {
-        GeneralizedTestTable gtt = Facade.readTable("src/test/resources/omega/" + filename);
+        GeneralizedTestTable gtt = Facade.INSTANCE.readTable("src/test/resources/omega/" + filename);
         OmegaSimplifier os = new OmegaSimplifier(gtt);
         os.run();
         return os.getIgnored().stream().map(State::getId).collect(Collectors.joining(","));

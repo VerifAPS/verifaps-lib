@@ -80,7 +80,7 @@ public class CellExpressionTest {
     @Test
     public void parse() {
         SVariable v = SVariable.create("Q").withSigned(16);
-        SMVExpr e = IOFacade.parseCellExpression(expr, v, gtt);
+        SMVExpr e = IOFacade.INSTANCE.parseCellExpression(expr, v, gtt);
         System.out.println(e);
     }
 

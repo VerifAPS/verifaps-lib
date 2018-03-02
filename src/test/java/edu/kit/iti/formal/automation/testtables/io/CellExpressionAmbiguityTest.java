@@ -44,7 +44,7 @@ public class CellExpressionAmbiguityTest {
 
     public static SMVExpr parse(String cell) {
 
-        SMVExpr smvExpr = IOFacade.parseCellExpression(cell, defaultVar(), CellExpressionTest.defaultTestTable());
+        SMVExpr smvExpr = IOFacade.INSTANCE.parseCellExpression(cell, defaultVar(), CellExpressionTest.defaultTestTable());
         return smvExpr;
     }
 
@@ -67,13 +67,13 @@ public class CellExpressionAmbiguityTest {
 
     @Test(expected = ProgramAbortionException.class)
     public void testInvalidReferencePositive() {
-        IOFacade.parseCellExpression("b[2]", SVariable.create("a").asBool(), CellExpressionTest.defaultTestTable());
+        IOFacade.INSTANCE.parseCellExpression("b[2]", SVariable.create("a").asBool(), CellExpressionTest.defaultTestTable());
     }
 
 
     @Test
     public void testValidReferenceZero() {
-        IOFacade.parseCellExpression("b[0]", SVariable.create("a").asBool(), CellExpressionTest.defaultTestTable());
+        IOFacade.INSTANCE.parseCellExpression("b[0]", SVariable.create("a").asBool(), CellExpressionTest.defaultTestTable());
     }
 
 }

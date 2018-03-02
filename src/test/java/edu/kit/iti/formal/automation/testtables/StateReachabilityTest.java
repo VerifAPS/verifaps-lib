@@ -40,7 +40,7 @@ public class StateReachabilityTest {
 
     @Test
     public void testReachabilityDetWait1() throws JAXBException {
-        GeneralizedTestTable gtt = Facade.readTable("src/test/resources/detwait/detwait1.xml");
+        GeneralizedTestTable gtt = Facade.INSTANCE.readTable("src/test/resources/detwait/detwait1.xml");
         String out = getReachabilityString(gtt);
         Assert.assertEquals("1#(2)\n" +
                 "2#(-1)", out);
@@ -48,7 +48,7 @@ public class StateReachabilityTest {
 
     @Test
     public void testReachabilityDetWait2() throws JAXBException {
-        GeneralizedTestTable gtt = Facade.readTable("src/test/resources/detwait/detwait2.xml");
+        GeneralizedTestTable gtt = Facade.INSTANCE.readTable("src/test/resources/detwait/detwait2.xml");
         String out = getReachabilityString(gtt);
         System.out.println(out);
         Assert.assertEquals("1#(2)\n" +
@@ -59,7 +59,7 @@ public class StateReachabilityTest {
 
     @Test
     public void testReachabilityDetWait3() throws JAXBException {
-        GeneralizedTestTable gtt = Facade.readTable("src/test/resources/detwait/detwait3.xml");
+        GeneralizedTestTable gtt = Facade.INSTANCE.readTable("src/test/resources/detwait/detwait3.xml");
         String out = getReachabilityString(gtt);
         System.out.println(out);
         Assert.assertEquals("1#(2)\n" +
@@ -71,7 +71,7 @@ public class StateReachabilityTest {
 
     @Test
     public void testReachabilityOmega1() throws JAXBException {
-        GeneralizedTestTable gtt = Facade.readTable("src/test/resources/omega/reachability1.xml");
+        GeneralizedTestTable gtt = Facade.INSTANCE.readTable("src/test/resources/omega/reachability1.xml");
         String out = getReachabilityString(gtt);
         System.out.println(out);
         Assert.assertEquals("1#(2)\n" +
@@ -82,7 +82,7 @@ public class StateReachabilityTest {
 
     @Test
     public void testReachability1() throws JAXBException {
-        GeneralizedTestTable gtt = Facade.readTable("src/test/resources/reachability/reachability1.xml");
+        GeneralizedTestTable gtt = Facade.INSTANCE.readTable("src/test/resources/reachability/reachability1.xml");
         String out = getReachabilityString(gtt);
         System.out.println(out);
         Assert.assertEquals("1#(2)\n" +
@@ -93,7 +93,7 @@ public class StateReachabilityTest {
 
     @Test
     public void testReachability4() throws JAXBException {
-        GeneralizedTestTable gtt = Facade.readTable("src/test/resources/reachability/reachability4.xml");
+        GeneralizedTestTable gtt = Facade.INSTANCE.readTable("src/test/resources/reachability/reachability4.xml");
         String out = getReachabilityString(gtt);
         System.out.println(out);
         Assert.assertEquals("1#(3)\n" +
@@ -108,7 +108,7 @@ public class StateReachabilityTest {
 
     @Test
     public void testReachability2() throws JAXBException {
-        GeneralizedTestTable gtt = Facade.readTable("src/test/resources/reachability/reachability2.xml");
+        GeneralizedTestTable gtt = Facade.INSTANCE.readTable("src/test/resources/reachability/reachability2.xml");
         String out = getReachabilityString(gtt);
         System.out.println(out);
         Assert.assertEquals("1#(2,3,4)\n" +
@@ -119,7 +119,7 @@ public class StateReachabilityTest {
 
     @Test
     public void testReachability3() throws JAXBException {
-        GeneralizedTestTable gtt = Facade.readTable("src/test/resources/reachability/reachability3.xml");
+        GeneralizedTestTable gtt = Facade.INSTANCE.readTable("src/test/resources/reachability/reachability3.xml");
         String out = getReachabilityString(gtt);
         System.out.println(out);
         Assert.assertEquals("1#(7)\n" +
@@ -132,7 +132,7 @@ public class StateReachabilityTest {
 
     @Test
     public void testReachability5() throws JAXBException {
-        GeneralizedTestTable gtt = Facade.readTable("src/test/resources/reachability/reachability5.xml");
+        GeneralizedTestTable gtt = Facade.INSTANCE.readTable("src/test/resources/reachability/reachability5.xml");
         String out = getReachabilityString(gtt);
         System.out.println(out);
         Assert.assertEquals("1#(3)\n" +

@@ -44,7 +44,7 @@ public class NuXmvTest {
         Assume.assumeTrue(p.executablePath().startsWith("/"));
 
         p.run();
-        Report.close();
+        Report.INSTANCE.close();
         Assert.assertTrue(p.isVerified());
     }
 
@@ -56,8 +56,8 @@ public class NuXmvTest {
                 .output("error.log");
         Assume.assumeTrue(p.executablePath().startsWith("/"));
         p.run();
-        Report.XML_MODE=true;
-        Report.close();
+        Report.INSTANCE.setXML_MODE(true);
+        Report.INSTANCE.close();
         Assert.assertFalse(p.isVerified());
     }
 }

@@ -63,9 +63,9 @@ public class SMVModuleBuilderTest {
 
 
     public void test(String table, String expectedSMVFile) throws JAXBException, IOException {
-        GeneralizedTestTable gtt = Facade.readTable(table);
+        GeneralizedTestTable gtt = Facade.INSTANCE.readTable(table);
         String expected = FileUtils.readFileToString(new java.io.File(expectedSMVFile), "utf-8");
-        SMVType enumType = Facade.createSuperEnum(new TopLevelElements());
+        SMVType enumType = Facade.INSTANCE.createSuperEnum(new TopLevelElements());
         TableTransformation tt = new TableTransformation(gtt, enumType);
         SMVModule module = tt.transform();
         String output = module.toString();
