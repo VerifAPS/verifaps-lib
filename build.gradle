@@ -1,6 +1,8 @@
 import org.unbrokendome.gradle.plugins.xjc.XjcGenerate
 
 plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.2.30"
+
     id 'org.unbroken-dome.xjc' version '1.1.3'
     id 'io.franzbecker.gradle-lombok' version '1.11'
     id "com.github.hierynomus.license" version "0.14.0"
@@ -13,6 +15,7 @@ plugins {
 }
 
 apply plugin: 'java'
+apply plugin: 'kotlin'
 apply plugin: 'maven'
 apply plugin: 'antlr'
 //apply plugin: 'application'
@@ -45,8 +48,13 @@ dependencies {
     compile group: 'edu.kit.iti.formal', name: 'iec-symbex', version: '1.5.0-SNAPSHOT'
     compile group: 'edu.kit.iti.formal', name: 'smv-model', version: '1.5.0-SNAPSHOT'
     testCompile 'junit:junit:4.12'
-    antlr group: 'org.antlr', name: 'antlr4', version: 4.7
 
+    compile "org.jetbrains.kotlin:kotlin-reflect:1.2.30"
+    testCompile "org.jetbrains.kotlin:kotlin-test:1.2.30"
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit:1.2.30"
+
+    antlr group: 'org.antlr', name: 'antlr4', version: 4.7
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.30"
 }
 
 sourceSets {
@@ -85,6 +93,7 @@ compileJava.dependsOn xjcGenerateReport
 license {
     mapping {
         java = 'PHP'
+        //"*.kt" = 'JAVA'
         //"*.g4" = 'PHP'
     }
 
@@ -128,4 +137,15 @@ task run(type: JavaExec) {
 cobertura.coverageFormats = ['html', 'xml'] // coveralls plugin depends on xml format report
 tasks.coveralls {
     //dependsOn 'check'
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }

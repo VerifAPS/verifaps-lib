@@ -79,7 +79,6 @@ public class PrintTable {
     private static Counter markCounter = new Counter();
     private static HashMap<String, Integer> lastTikzMarkColumn = new HashMap<>();
     private static ImmutableList<String> specialChars = ImmutableList.of("_", "^", "~", "$", "%", "#", "&", "{", "}");
-    private static int totalNumSteps;
     private static HashMap<String, ArrayList<String>> columns = new LinkedHashMap<>();
 
     public static void main(String[] args) throws ParseException, JAXBException {
@@ -91,7 +90,7 @@ public class PrintTable {
 
     private static void print(String s) throws JAXBException {
         table = Facade.readTable(s);
-        totalNumSteps = table.getRegion().count();
+        //int totalNumSteps = table.getRegion().count();
         fillColumns();
 
         input = table.getIoVariables().values().stream()
@@ -101,8 +100,8 @@ public class PrintTable {
 
         int depth = table.getRegion().depth();
 
-        System.out.println("\\documentclass{standalone}");
-        System.out.println("\\usepackage{booktabs,array,scalerel,microtype,multirow,tikz,boldline}");
+        System.out.println("\\documentclass{standalone}\n\\usepackage{../gtt}");
+        /*System.out.println("\\usepackage{booktabs,array,scalerel,microtype,multirow,tikz,boldline}");
         System.out.println("\\usetikzlibrary{calc,arrows,arrows.meta}");
         System.out.println("\\newcommand\\FALSE{FALSE}\n" +
                 "\\newcommand\\TRUE{TRUE}\n" +
@@ -122,7 +121,7 @@ public class PrintTable {
         System.out.println("\\newcommand\\variableheader[1]{#1}");
         System.out.println("\\newcommand\\categoryheader[1]{#1}");
         System.out.println("\\newcommand\\tikzmark[1]{\\tikz[remember picture,overlay] \\coordinate (#1);}\n");
-
+        */
         System.out.println("\\begin{document}\n");
 
         System.out.format("\\begin{tabular}{c|%s|%s|%s}%n",
@@ -254,7 +253,8 @@ public class PrintTable {
     */
 
     private static void printStep(State s) {
-        System.out.printf("%2d", currentRow++);
+        System.out.printf("\\gttrow");
+        currentRow++;
         //List<Element> any = s.getAny().stream().map(Element.class::cast).collect(Collectors.toList());
 
         input.forEach(v ->
