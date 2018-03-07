@@ -21,93 +21,55 @@ package edu.kit.iti.formal.automation.testtables.io.xmv
 
 
 import edu.kit.iti.formal.automation.testtables.io.Report
-import edu.kit.iti.formal.automation.testtables.report.Counterexample
+import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique
 import org.apache.commons.io.IOUtils
-
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
-import java.util.Arrays
+import java.util.*
 
 /**
  * @author Alexander Weigl
  * @version 1 (13.12.16)
  */
-class NuXMVProcess : Runnable {
-    private var commands: Array<String>? = null
-    private var executablePath = (System.getenv() as java.util.Map<String, String>).getOrDefault("NUXMV", "nuXmv")
-    private var moduleFile: File? = null
-    private var workingDirectory: File? = null
-    private var outputFile: File? = null
+class NuXMVProcess(var commands: Array<String>,
+                   var moduleFile: File,
+                   var workingDirectory: File,
+                   var outputFile: File) : Runnable {
+    var executablePath = System.getenv().getOrDefault("NUXMV", "nuXmv")
+
     var isVerified: Boolean = false
         private set
 
-    //region builder
+    private constructor(builder: Builder) :
+            this(builder.commands, builder.moduleFile,
+                    builder.workingDirectory, builder.outputFile)
 
-    fun output(path: String): NuXMVProcess {
-        return outputFile(File(workingDirectory, path))
-    }
+    class Builder private constructor() {
+        var commands: Array<String> = VerificationTechnique.IC3.commands
+        var moduleFile: File = File("modules.smv")
+        var workingDirectory: File = File(".")
+        var outputFile: File = File("log.txt")
 
-    fun module(path: String): NuXMVProcess {
-        return moduleFile(File(workingDirectory, path))
-    }
+        constructor(init: Builder.() -> Unit) : this() {
+            init()
+        }
 
-    fun outputFile(): File? {
-        return outputFile
+        fun commands(init: Builder.() -> Array<String>) = apply { commands = init() }
+        fun wd(init: Builder.() -> File) = apply { workingDirectory = init() }
+        fun module(init: Builder.() -> File) = apply { moduleFile = init() }
+        fun output(init: Builder.() -> File) = apply { outputFile = init() }
+        fun build() = NuXMVProcess(this)
     }
-
-    fun outputFile(f: File): NuXMVProcess {
-        outputFile = f
-        return this
-    }
-
-    fun commands(): Array<String>? {
-        return commands
-    }
-
-    fun commands(vararg commands: String): NuXMVProcess {
-        this.commands = commands
-        return this
-    }
-
-    fun executablePath(): String {
-        return executablePath
-    }
-
-    fun executablePath(executablePath: String): NuXMVProcess {
-        this.executablePath = executablePath
-        return this
-    }
-
-    fun moduleFile(): File? {
-        if (moduleFile == null)
-            module("source.xmv")
-        return moduleFile
-    }
-
-    fun moduleFile(moduleFile: File): NuXMVProcess {
-        this.moduleFile = moduleFile
-        return this
-    }
-
-    fun workingDirectory(): File? {
-        return workingDirectory
-    }
-
-    fun workingDirectory(workingDirectory: File): NuXMVProcess {
-        this.workingDirectory = workingDirectory
-        return this
-    }
-    //endregion
 
     override fun run() {
-        workingDirectory!!.mkdirs()
-        val commands = arrayOf(executablePath, "-int", moduleFile()!!.absolutePath)
+        workingDirectory.mkdirs()
+        val commands = arrayOf(executablePath, "-int", moduleFile.absolutePath)
 
         try {
             createIC3CommandFile()
         } catch (e: IOException) {
-            Report.error("Could not create command file: %s in %s", IC3_XMV, workingDirectory)
+            Report.error("Could not create command file: %s in %s", COMMANDS_FILE, workingDirectory)
             Report.setErrorLevel("io-error") //TODO more detail in error level?
             return
         }
@@ -117,7 +79,7 @@ class NuXMVProcess : Runnable {
             val pb = ProcessBuilder(*commands)
                     .directory(workingDirectory)
                     .redirectOutput(outputFile!!)
-                    .redirectInput(File(workingDirectory, IC3_XMV))
+                    .redirectInput(File(workingDirectory, COMMANDS_FILE))
                     .redirectErrorStream(true)
 
             Report.info("Start '%s'", Arrays.toString(commands))
@@ -146,13 +108,12 @@ class NuXMVProcess : Runnable {
 
     @Throws(IOException::class)
     private fun createIC3CommandFile() {
-        workingDirectory()!!.mkdirs()
-        val f = File(workingDirectory, IC3_XMV)
-        FileWriter(f).use { fw -> IOUtils.writeLines(Arrays.asList(*commands!!), "\n", fw) }
+        workingDirectory.mkdirs()
+        val f = File(workingDirectory, COMMANDS_FILE)
+        FileWriter(f).use { fw -> IOUtils.writeLines(Arrays.asList(*commands), "\n", fw) }
     }
 
     companion object {
-        val IC3_XMV = "commands.xmv"
+        val COMMANDS_FILE = "commands.xmv"
     }
-
 }

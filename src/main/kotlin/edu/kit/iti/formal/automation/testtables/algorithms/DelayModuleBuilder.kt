@@ -17,9 +17,12 @@
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  */
-package edu.kit.iti.formal.automation.testtables
+package edu.kit.iti.formal.automation.testtables.algorithms
 
-import edu.kit.iti.formal.smv.ast.*
+import edu.kit.iti.formal.smv.ast.SAssignment
+import edu.kit.iti.formal.smv.ast.SMVModule
+import edu.kit.iti.formal.smv.ast.SMVType
+import edu.kit.iti.formal.smv.ast.SVariable
 import java.lang.String
 
 /**
@@ -31,8 +34,8 @@ import java.lang.String
 class DelayModuleBuilder(private val variable: SVariable, cycles: Int) : Runnable {
     val historyLength: Int
     private val datatype: SMVType?
-    private var moduleType: SMVType? = null
-    private var module = SMVModule()
+    var moduleType: SMVType = SMVType.Module("...")
+    val module = SMVModule()
 
     init {
 
@@ -69,23 +72,5 @@ class DelayModuleBuilder(private val variable: SVariable, cycles: Int) : Runnabl
 
         // type
         moduleType = SMVType.Module(module.name, variable)
-    }
-
-    fun getModuleType(): SMVType? {
-        return moduleType
-    }
-
-    fun setModuleType(moduleType: SMVType): DelayModuleBuilder {
-        this.moduleType = moduleType
-        return this
-    }
-
-    fun getModule(): SMVModule {
-        return module
-    }
-
-    fun setModule(module: SMVModule): DelayModuleBuilder {
-        this.module = module
-        return this
     }
 }

@@ -25,32 +25,29 @@ import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
 import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException
 import edu.kit.iti.formal.automation.exceptions.UnknownVariableException
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
-import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements
 import edu.kit.iti.formal.automation.st.ast.TypeDeclarations
+import edu.kit.iti.formal.automation.testtables.algorithms.OmegaSimplifier
 import edu.kit.iti.formal.automation.testtables.builder.TableTransformation
 import edu.kit.iti.formal.automation.testtables.exception.GetetaException
 import edu.kit.iti.formal.automation.testtables.io.Report
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
 import edu.kit.iti.formal.automation.testtables.monitor.MonitorGeneration
 import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.automation.visitors.Visitor
 import edu.kit.iti.formal.smv.ast.SMVModule
-import edu.kit.iti.formal.smv.ast.SMVType
 import org.apache.commons.cli.CommandLine
-import org.apache.commons.cli.CommandLineParser
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.ParseException
-
-import javax.xml.bind.JAXBException
 import java.io.IOException
-import java.util.LinkedList
+import java.util.*
+import javax.xml.bind.JAXBException
 
 object ExTeTa {
-    var DEBUG = true
-
     @JvmStatic
     fun main(args: Array<String>) {
+        Locale.setDefault(Locale.US)
+
         try {
             val cli = parse(args)
             run(cli)
@@ -103,7 +100,7 @@ object ExTeTa {
         }
 
         //
-        var table: GeneralizedTestTable? = Facade.readTable(tableFilename)
+        var table = Facade.readTable(tableFilename)
         val os = OmegaSimplifier(table)
         os.run()
         if (!os.ignored.isEmpty()) {
@@ -118,17 +115,17 @@ object ExTeTa {
 
         if (cli.getOptionValue('m') != null)
             when (cli.getOptionValue('m')) {
-                "concrete-smv" -> table!!.options.mode = Mode.CONCRETE_TABLE
-                "conformance" -> table!!.options.mode = Mode.CONFORMANCE
-                "input-seq-exists" -> table!!.options.mode = Mode.INPUT_SEQUENCE_EXISTS
-                "monitor" -> table!!.options.mode = Mode.MONITOR_GENERATION
+                "concrete-smv" -> table.options.mode = Mode.CONCRETE_TABLE
+                "conformance" -> table.options.mode = Mode.CONFORMANCE
+                "input-seq-exists" -> table.options.mode = Mode.INPUT_SEQUENCE_EXISTS
+                "monitor" -> table.options.mode = Mode.MONITOR_GENERATION
             }
 
-        if (table!!.options.mode == Mode.MONITOR_GENERATION) {
+        if (table.options.mode == Mode.MONITOR_GENERATION) {
             val mg = MonitorGeneration(table)
             val fbs = mg.call()
             val stp = StructuredTextPrinter()
-            fbs.accept<Any>(stp)
+            fbs.accept<Any>(stp as Visitor<out Any>)
             println(stp.string)
         } else {
             val modCode = evaluate(cli.hasOption("no-simplify"), code)
@@ -143,7 +140,7 @@ object ExTeTa {
             modules.add(mainModule)
             modules.add(modTable)
             modules.add(modCode)
-            modules.addAll(tt.helperModules)
+            modules.addAll(tt.model.helperModules)
             val b = Facade.runNuXMV(tableFilename, modules,
                     table.options.verificationTechnique)
 
@@ -180,5 +177,4 @@ object ExTeTa {
 
         return clp.parse(options, args, true)
     }
-
 }

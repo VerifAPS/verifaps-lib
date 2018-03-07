@@ -43,11 +43,8 @@ package edu.kit.iti.formal.automation.testtables.monitor
 
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements
-import edu.kit.iti.formal.automation.st.ast.VariableBuilder
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-
-import java.util.Arrays
 import java.util.concurrent.Callable
 
 /**
@@ -76,7 +73,6 @@ class MonitorGeneration(internal val gtt: GeneralizedTestTable) : Callable<TopLe
             vars.identifiers(String.format("ROW_%2d", i)).setBaseType("BOOL").close()
         }
 
-
-        return TopLevelElements(Arrays.asList<TopLevelElement>(fb))
+        return TopLevelElements(listOf(fb))
     }
 }

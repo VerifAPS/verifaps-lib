@@ -41,32 +41,28 @@ package edu.kit.iti.formal.automation.testtables
  * #L%
  */
 
-import com.google.common.base.Function
 import com.google.common.base.Strings
 import com.google.common.collect.ImmutableList
 import edu.kit.iti.formal.automation.st.util.Tuple
-import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionParser
+import edu.kit.iti.formal.automation.testtables.algorithms.LatexPrinter
 import edu.kit.iti.formal.automation.testtables.io.IOFacade
 import edu.kit.iti.formal.automation.testtables.io.TableReader
 import edu.kit.iti.formal.automation.testtables.model.*
 import edu.kit.iti.formal.automation.testtables.schema.IoVariable
-import edu.kit.iti.formal.automation.testtables.schema.Variable
 import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.apache.commons.cli.CommandLine
-import org.apache.commons.cli.CommandLineParser
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.ParseException
 import org.w3c.dom.Element
-import javax.xml.bind.JAXBException
 import java.util.*
-import java.util.stream.Collectors
+import javax.xml.bind.JAXBException
 
 /**
  * @author Alexander Weigl
  * @version 1 (01.02.18)
  */
 object PrintTable {
-    private val DONT_CARE = "--"
+    private const val DONT_CARE = "\\DONTCARE"
     private val durations = Stack<Tuple<Duration, Int>>()
     private var table: GeneralizedTestTable? = null
     private var currentRow = 0
@@ -89,49 +85,35 @@ object PrintTable {
         }
     }
 
+    private var customStyFile: String = ""
+
     @Throws(JAXBException::class)
     private fun print(s: String) {
         table = Facade.readTable(s)
         totalNumSteps = table!!.region!!.count()
         fillColumns()
 
-        input = table!!.ioVariables.values.stream()
-                .filter { v -> v.io == "input" }.collect<List<IoVariable>, Any>(Collectors.toList())
-        output = table!!.ioVariables.values.stream()
-                .filter { v -> v.io == "output" }.collect<List<IoVariable>, Any>(Collectors.toList())
+        input = table!!.ioVariables.values
+                .filter { v -> v.io == "input" }
+        output = table!!.ioVariables.values
+                .filter { v -> v.io == "output" }
 
         val depth = table!!.region!!.depth()
 
         println("\\documentclass{standalone}")
-        println("\\usepackage{booktabs,array,scalerel,microtype,multirow,tikz,boldline}")
-        println("\\usetikzlibrary{calc,arrows,arrows.meta}")
-        println("\\newcommand\\FALSE{FALSE}\n" +
-                "\\newcommand\\TRUE{TRUE}\n" +
-                "\\newcommand\\DONTCARE{--}\n" +
-                "\\newcommand\\singlecopy[1]{#1}\n")
-        println("\\newcommand\\rowgroupduration[2]{%" +
-                "\\newcommand\\rowgroupduration[2]{%\n" +
-                "  \\multirow{#1}{*}{\n" +
-                "    \\tikz{\n" +
-                "      \\draw[Bracket-Bracket] (0,0.5ex) -- +($(0,-#1em) - (0,1.5em)$) node[midway]{#2};\n" +
-                "    }\n" +
-                "  }\n" +
-                "}")
-        println("\\usepackage{wasysym}\n")
-        println("\\newcommand{\\coltime}{\\clock}\n")
-        println("\\newcommand{\\drawrepetition}[2]{\\draw[Circle-Circle] (#1) -- (#2);}\n")
-        println("\\newcommand\\variableheader[1]{#1}")
-        println("\\newcommand\\categoryheader[1]{#1}")
-        println("\\newcommand\\tikzmark[1]{\\tikz[remember picture,overlay] \\coordinate (#1);}\n")
+        println("\\usepackage{gtt}\n")
+        if (customStyFile.isNotEmpty())
+            println("\\usepackage{$customStyFile}\n")
 
         println("\\begin{document}\n")
 
         System.out.format("\\begin{tabular}{c|%s|%s|%s}%n",
-                Strings.repeat("c", input!!.size),
-                Strings.repeat("c", output!!.size),
-                Strings.repeat("c", depth + 1))
+                "c".repeat(input!!.size),
+                "c".repeat(output!!.size),
+                "c".repeat(depth + 1))
 
-        System.out.printf("\\# & \\multicolumn{%d}{c}{\\categoryheader{Input}} & " + "\\multicolumn{%d}{c}{\\categoryheader{Output}} & \\coltime \\\\%n",
+        System.out.printf("\\# & \\multicolumn{%d}{c}{\\categoryheader{Input}} & " +
+                "\\multicolumn{%d}{c}{\\categoryheader{Output}} & \\coltime \\\\%n",
                 input!!.size, output!!.size)
 
         val wrapColumnHeader = { hdr: String -> "\\variableheader{$hdr}" }
@@ -140,11 +122,11 @@ object PrintTable {
                 input!!.stream().map { it.name }
                         .map { escape(it) }
                         .map(wrapColumnHeader)
-                        .reduce { a, b -> a + " & " + b }.orElse(""),
+                        .reduce { a, b -> "$a & $b" }.orElse(""),
                 output!!.stream().map { it.name }
                         .map { escape(it) }
                         .map(wrapColumnHeader)
-                        .reduce { a, b -> a + " & " + b }.orElse(""))
+                        .reduce { a, b -> "$a & $b" }.orElse(""))
 
         println("\\toprule")
 
@@ -159,11 +141,15 @@ object PrintTable {
     }
 
     private fun fillColumns() {
-        table!!.ioVariables.forEach { k, v -> columns[k] = ArrayList() }
+        table!!.ioVariables.keys.forEach { k -> columns[k] = ArrayList() }
 
         //prefill
         table!!.region!!.flat()
-                .forEach { s -> s.entryForColumn.forEach { k, v -> columns[k].add(parseAndSafePrint(Strings.nullToEmpty(v))) } }
+                .forEach { s ->
+                    s.entryForColumn.forEach { k, v ->
+                        columns[k]?.add(parseAndSafePrint(Strings.nullToEmpty(v)))
+                    }
+                }
 
         //simplify
         columns.forEach { k, v ->
@@ -206,11 +192,11 @@ object PrintTable {
     }
 
     internal fun escape(s: String): String {
-        var s = s
+        var t = s
         for (sc in specialChars) {
-            s = s.replace(sc, '\\' + sc)
+            t = t.replace(sc, '\\' + sc)
         }
-        return s
+        return t
     }
 
     private fun printRegionLatex(region: List<TableNode>) {
@@ -250,9 +236,9 @@ object PrintTable {
         System.out.printf("%2d", currentRow++)
         //List<Element> any = s.getAny().stream().map(Element.class::cast).collect(Collectors.toList());
 
-        input!!.forEach { v -> System.out.printf(" & %15s", columns[v.name].get(currentRow - 1)) }
+        input!!.forEach { v -> System.out.printf(" & %15s", columns[v.name]?.get(currentRow - 1)) }
 
-        output!!.forEach { v -> System.out.printf(" & %15s", columns[v.name].get(currentRow - 1)) }
+        output!!.forEach { v -> System.out.printf(" & %15s", columns[v.name]?.get(currentRow - 1)) }
 
         System.out.printf(" & %15s", beautifyDuration(s.duration))
         while (!durations.empty()) {
@@ -282,7 +268,7 @@ object PrintTable {
         if (value != null) { //value defined
             cache[varName] = value //save into cache
             return if (value == cacheValue) if (lastRow) tikzMarkAndDraw(varName) else "" else tikzMarkAndDraw(varName) + escape(value)
-//else return new value.
+            //else return new value.
         }
         if (cacheValue == null) {
             cache[varName] = "-"
@@ -321,9 +307,8 @@ object PrintTable {
     class Counter {
         private val counter = LinkedHashMap<String, Int>()
 
-        fun peek(s: String): Int {
-            return (counter as java.util.Map<String, Int>).computeIfAbsent(s) { a -> 0 }
-        }
+        fun peek(s: String): Int =
+                counter.computeIfAbsent(s) { _ -> 0 }
 
         fun getAndIncrement(s: String): Int {
             val peek = peek(s)

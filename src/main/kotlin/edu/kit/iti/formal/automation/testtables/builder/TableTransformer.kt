@@ -28,4 +28,4 @@ import java.util.function.Consumer
  * @author Alexander Weigl
  * @version 1 (17.12.16)
  */
-interface TableTransformer : Consumer<TableTransformation>
+interface TableTransformer : Consumer<ConstructionModel>

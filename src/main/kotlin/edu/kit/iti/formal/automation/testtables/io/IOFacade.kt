@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.testtables.io
 
 import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionLexer
 import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionParser
-import edu.kit.iti.formal.automation.testtables.io.IOFacade.getSMVDataType
 import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.schema.DataType
@@ -30,7 +29,6 @@ import edu.kit.iti.formal.automation.testtables.schema.Variable
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVType
 import edu.kit.iti.formal.smv.ast.SVariable
-import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
@@ -100,12 +98,12 @@ object IOFacade {
         return d
     }
 
-    fun asSMVVariable(column: Variable?): SVariable? {
-        return if (column == null) null else SVariable(column.name,
-                getSMVDataType(column.dataType))
+    fun asSMVVariable(column: Variable): SVariable {
+        return SVariable(column.name, getSMVDataType(column.dataType))
     }
 
     private fun getSMVDataType(dataType: DataType): SMVType {
         return DataTypeTranslator.INSTANCE.apply(dataType)
+                ?: error("Data type $dataType is not supported by DataTypeTranslator")
     }
 }

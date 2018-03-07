@@ -17,32 +17,24 @@
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  */
-package edu.kit.iti.formal.automation.testtables
+package edu.kit.iti.formal.automation.testtables.algorithms
 
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.Region
 import edu.kit.iti.formal.automation.testtables.model.State
-import edu.kit.iti.formal.automation.testtables.model.TableNode
-import lombok.Getter
-import lombok.RequiredArgsConstructor
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * @author Alexander Weigl
  * @version 1 (01.02.18)
  */
-@RequiredArgsConstructor
-class OmegaSimplifier : Runnable {
-    val product: GeneralizedTestTable? = null
-    @Getter
-    private val ignored = ArrayList<State>()
-
+class OmegaSimplifier(val product: GeneralizedTestTable) : Runnable {
+    val ignored = ArrayList<State>()
     private var abort = false
 
     override fun run() {
         abort = false
-        product!!.region = recur(product.region)
+        product.region = recur(product.region)
     }
 
     /**

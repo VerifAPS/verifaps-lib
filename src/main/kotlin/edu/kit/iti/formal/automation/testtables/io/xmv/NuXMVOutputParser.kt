@@ -45,36 +45,31 @@ import edu.kit.iti.formal.automation.testtables.io.Report
 import edu.kit.iti.formal.automation.testtables.report.Assignment
 import edu.kit.iti.formal.automation.testtables.report.Counterexample
 import org.apache.commons.io.FileUtils
-
 import java.io.File
 import java.io.IOException
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.util.stream.Stream
 
 class NuXMVOutputParser(private val inputLines: Stream<String>) {
-
-    internal var ceFound = false
-    internal var ce: Counterexample
+    private var ceFound = false
+    private var ce: Counterexample = Counterexample()
     internal var invariantHolds: Boolean = false
-    internal var errorFound: Boolean = false
-    private var currentStep: Counterexample.Step? = null
+    private var errorFound: Boolean = false
+    private var currentStep: Counterexample.Step = Counterexample.Step()
     private var current: MutableList<Assignment>? = null
 
     @Throws(IOException::class)
-    constructor(input: File) : this(FileUtils.readFileToString(input, "utf-8")) {
-    }
+    constructor(input: File) : this(FileUtils.readFileToString(input, "utf-8"))
 
-    constructor(content: String) : this(NEWLINE.splitAsStream(content)) {}
+    constructor(content: String) : this(NEWLINE.splitAsStream(content))
 
     fun run(): Counterexample {
-        ce = Counterexample()
         currentStep = Counterexample.Step()
-        current = currentStep!!.state
+        current = currentStep.state
         //ce.getStep().add(currentStep);
 
-        inputLines.map<String>(Function<String, String> { it.trim({ it <= ' ' }) })
-                .forEach(Consumer<String> { this.handle(it) })
+        inputLines.map { it.trim({ it <= ' ' }) }
+                  .forEach { handle(it) }
 
         if (ceFound) {
             Report.setErrorLevel("not-verified")
@@ -99,7 +94,7 @@ class NuXMVOutputParser(private val inputLines: Stream<String>) {
             if (ceFound) {
 
                 if (INPUT_MARKER.matcher(line).matches()) {
-                    current = currentStep!!.input
+                    current = currentStep.input
                     return
                 }
 

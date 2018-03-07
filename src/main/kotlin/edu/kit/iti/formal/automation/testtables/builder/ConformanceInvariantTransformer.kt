@@ -28,18 +28,17 @@ import edu.kit.iti.formal.smv.ast.SMVExpr
  * Created by weigl on 17.12.16.
  */
 class ConformanceInvariantTransformer : TableTransformer {
-    override fun accept(tt: TableTransformation) {
-        var states = tt.testTable.region!!.flat().stream()
-                .flatMap<AutomatonState> { s -> s.automataStates.stream() }
+    override fun accept(tt: ConstructionModel) {
+        var states = tt.testTable.region!!.flat()
+                .flatMap { s -> s.automataStates }
                 .map { s -> s.smvVariable as SMVExpr }
-                .reduce(SMVFacade.reducer(SBinaryOperator.OR))
-                .get()
+                .reduce { a, b -> a.or(b) }
 
-        states = states.or(tt.sentinelState)
+        states = states.or(tt.sentinelVariable)
 
         // ! ( \/ states) -> !error
         val invar = SMVFacade.combine(SBinaryOperator.IMPL,
-                tt.errorState,
+                tt.errorVariable,
                 states)
 
         tt.tableModule.invarSpec.add(invar)

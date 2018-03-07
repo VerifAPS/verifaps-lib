@@ -26,21 +26,26 @@ import lombok.RequiredArgsConstructor
  * @author Alexander Weigl
  * @version 1 (01.02.18)
  */
-@Data
-@RequiredArgsConstructor
-abstract class TableNode {
-    val id: String? = null
-    protected var duration = Duration(1, 1)
+abstract class TableNode(val id: String) {
+    var duration = Duration(1, 1)
 
     abstract val isLeaf: Boolean
-
     abstract val children: List<TableNode>
-
     abstract val automataStates: List<State.AutomatonState>
 
     abstract fun count(): Int
-
     abstract fun flat(): List<State>
-
     abstract fun depth(): Int
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as TableNode
+        if (id != other.id) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
 }

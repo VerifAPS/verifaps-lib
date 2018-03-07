@@ -24,67 +24,63 @@ import edu.kit.iti.formal.automation.testtables.schema.IoVariable
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVType
 import edu.kit.iti.formal.smv.ast.SVariable
-import lombok.Data
-
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * @author Alexander Weigl
  * @version 1 (10.12.16)
  */
-@Data
-class State(id: String) : TableNode(id) {
-    val inputExpr: List<SMVExpr> = ArrayList()
-    val outputExpr: List<SMVExpr> = ArrayList()
-    val entryForColumn: Map<String, String> = HashMap()
-    val incoming: Set<State> = HashSet()
-    val outgoing: Set<State> = HashSet()
-    /**
-     *
-     */
-    val defInput: SVariable
-    /**
-     *
-     */
-    val defFailed: SVariable
-    /**
-     *
-     */
-    val defForward: SVariable
-    /**
-     *
-     */
-    val defOutput: SVariable
+open class State(id: String) : TableNode(id) {
+    /** Input constraints as list. */
+    val inputExpr: MutableList<SMVExpr> = ArrayList()
+    /** Output constraints as list. */
+    val outputExpr: MutableList<SMVExpr> = ArrayList()
+    /** Access to the raw fields. */
+    val entryForColumn: MutableMap<String, String?> = HashMap()
+
+    /** incoming states */
+    val incoming: MutableSet<State> = HashSet()
+
+    /** outgoing states */
+    val outgoing: MutableSet<State> = HashSet()
+
+    /** variable of input contraint definition */
+    val defOutput = SVariable("s" + id + "_out", SMVType.BOOLEAN)
+    val defForward = SVariable("s" + id + "_fwd", SMVType.BOOLEAN)
+    val defFailed = SVariable("s" + id + "_fail", SMVType.BOOLEAN)
+    val defInput = SVariable("s" + id + "_in", SMVType.BOOLEAN)
+
     /**
      * The predicate that allows keeping in this state.
      * Only necessary iff duration is DET_WAIT.
      */
-    val defKeep: SVariable
-    private var automataStates: MutableList<AutomatonState>? = null
+    val defKeep = SVariable("s" + id + "_keep", SMVType.BOOLEAN)
+
+
+    override val automataStates: MutableList<AutomatonState> = ArrayList()
+        get() {
+            if (field.isEmpty()) {
+                if (duration.isDeterministicWait || duration.isOmega) {
+                    field.add(AutomatonState(1))
+                } else {
+                    for (i in 1..duration.bound) {
+                        field.add(AutomatonState(i))
+                    }
+                }
+            }
+            assert(field.size != 0)
+            return field
+        }
+
     var isInitialReachable: Boolean = false
-        set(initialReachable) {
-            field = isInitialReachable
-        }
     var isEndState: Boolean = false
-        set(endState) {
-            field = isEndState
-        }
 
-    override val isLeaf: Boolean
-        get() = true
+    override val isLeaf: Boolean = true
 
-    override val children: List<TableNode>
-        get() = Collections.EMPTY_LIST
+    override val children: List<TableNode> = Collections.EMPTY_LIST as List<TableNode>
 
-    init {
-        defOutput = SVariable("s" + id + "_out", SMVType.BOOLEAN)
-        defForward = SVariable("s" + id + "_fwd", SMVType.BOOLEAN)
-        defFailed = SVariable("s" + id + "_fail", SMVType.BOOLEAN)
-        defInput = SVariable("s" + id + "_in", SMVType.BOOLEAN)
-        defKeep = SVariable("s" + id + "_keep", SMVType.BOOLEAN)
-    }
-
-    constructor(id: Int) : this(id.toString()) {}
+    constructor(id: Int) : this(id.toString())
 
     fun add(v: IoVariable, e: SMVExpr) {
         val a = if (v.io == "input") inputExpr else outputExpr
@@ -116,49 +112,31 @@ class State(id: String) : TableNode(id) {
         return id!!.hashCode()
     }
 
-    override fun getAutomataStates(): List<AutomatonState> {
-        if (automataStates == null)
-            automataStates = ArrayList()
-
-        if (automataStates!!.size == 0) {
-            if (duration.isDeterministicWait || duration.isOmega) {
-                automataStates!!.add(AutomatonState(1))
-            } else {
-                for (i in 1..duration.bound) {
-                    automataStates!!.add(AutomatonState(i))
-                }
-            }
-        }
-        assert(automataStates!!.size != 0)
-        return automataStates
-    }
-
 
     override fun depth(): Int {
         return 0
     }
 
-    inner class AutomatonState(internal var count: Int) {
-        val incoming: Set<AutomatonState> = HashSet()
-        val outgoing: Set<AutomatonState> = HashSet()
+    inner class AutomatonState(private val position: Int, private val name: String) {
+        val incoming: MutableSet<AutomatonState> = HashSet()
+        val outgoing: MutableSet<AutomatonState> = HashSet()
+
+        constructor(count: Int) : this(count, "${State@ id}_$id")
 
         val isOptional: Boolean
-            get() = count >= duration.lower
+            get() = position >= duration.lower
 
         val isFirst: Boolean
-            get() = count == 1
+            get() = position == 1
 
         val state: State
             get() = this@State
 
-        val smvVariable: SVariable
-            get() = SVariable.create("s_%s_%d", id, count).asBool()
+        val smvVariable: SVariable = SVariable.create("s_$name").asBool()
 
-        val defForward: SVariable
-            get() = SVariable.create("s_%s_%d_fwd", id, count).asBool()
+        val defForward: SVariable = SVariable.create("s_${name}_fwd").asBool()
 
-        val defFailed: SVariable
-            get() = SVariable.create("s_%s_%d_fail", id, count).asBool()
+        val defFailed: SVariable = SVariable.create("s_${name}_fail").asBool()
 
         /**
          * Returns true iff this is the automaton state that can infinitely repeated.
@@ -166,22 +144,18 @@ class State(id: String) : TableNode(id) {
          * @return
          */
         val isUnbounded: Boolean
-            get() = count == duration.bound && duration.isUnbounded
+            get() = position == duration.bound && duration.isUnbounded
 
         val isStartState: Boolean
             get() = isInitialReachable && isFirst
 
         val isEndState: Boolean
-            get() = if (outgoing.size == 0) {
-                true
+            get() = if (outgoing.isEmpty()) {
+                true //TODO check for omega?
             } else {
                 outgoing.stream()
                         .map { s -> s.isEndState || s.isOptional }
                         .reduce { a, b -> a or b }.orElse(false)
             }
-    }
-
-    companion object {
-        val SENTINEL_ID = "$$$"
     }
 }

@@ -33,33 +33,25 @@ import java.io.IOException
  * @version 1 (12.12.16)
  */
 class NuXMVAdapter(table: File, private val modules: List<SMVModule>) : Runnable {
-    private val process: NuXMVProcess
-    var technique: VerificationTechnique? = VerificationTechnique.IC3
-        set(technique) {
-            assert(technique != null)
-            field = technique
-        }//VerificationTechnique.INVAR;
+    private val process: NuXMVProcess = NuXMVProcess.Builder {
+        workingDirectory = File(table.parentFile, table.name.replace(".xml", ""))
+        outputFile = File(String.format("log_%d.txt", (Math.random() * 100).toInt()))
+        moduleFile = File("modules.smv")
+    }.build()
+
+    var technique: VerificationTechnique = VerificationTechnique.IC3
 
     val isVerified: Boolean
         get() = process.isVerified
 
-    init {
-        this.process = NuXMVProcess()
-                .workingDirectory(
-                        File(table.parentFile,
-                                table.name.replace(".xml", "")))
-                .output(String.format("log_%d.txt", (Math.random() * 100).toInt()))
-                .module("modules.smv")
-    }
-
     override fun run() {
-        process.workingDirectory()!!.mkdirs()
-        process.commands(*this.technique!!.commands)
+        process.workingDirectory.mkdirs()
+        process.commands = this.technique.commands
         try {
             createModuleFile()
         } catch (e: IOException) {
             Report.fatal("Could not create module file %s (%s)",
-                    process.moduleFile(), e)
+                    process.moduleFile, e)
             Report.setErrorLevel("io-error")
             System.exit(1)
         }
@@ -70,7 +62,7 @@ class NuXMVAdapter(table: File, private val modules: List<SMVModule>) : Runnable
 
     @Throws(IOException::class)
     private fun createModuleFile() {
-        FileWriter(process.moduleFile()!!).use { fw ->
+        FileWriter(process.moduleFile).use { fw ->
             for (m in modules) {
                 fw.write(m.toString())
                 fw.write("\n")

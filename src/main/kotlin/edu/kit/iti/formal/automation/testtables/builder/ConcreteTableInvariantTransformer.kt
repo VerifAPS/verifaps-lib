@@ -22,12 +22,8 @@ package edu.kit.iti.formal.automation.testtables.builder
 
 import edu.kit.iti.formal.automation.testtables.exception.IllegalClockCyclesException
 import edu.kit.iti.formal.automation.testtables.io.Report
-import edu.kit.iti.formal.automation.testtables.model.State
-import edu.kit.iti.formal.automation.testtables.model.TableModule
-import edu.kit.iti.formal.automation.testtables.model.options.ConcreteTableOptions
 import edu.kit.iti.formal.smv.ast.SAssignment
 import edu.kit.iti.formal.smv.ast.SLiteral
-import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
 
 /**
@@ -42,7 +38,7 @@ import edu.kit.iti.formal.smv.ast.SVariable
  * @version 1 (24.12.16)
  */
 class ConcreteTableInvariantTransformer : TableTransformer {
-    override fun accept(tt: TableTransformation) {
+    override fun accept(tt: ConstructionModel) {
         val cto = tt.testTable.options.concreteTableOptions
         val rows = tt.testTable.region!!.flat()
         val tableModule = tt.tableModule
@@ -62,7 +58,7 @@ class ConcreteTableInvariantTransformer : TableTransformer {
         tableModule.invarSpec.add(sentinel.not())
 
         //Strengthen the _fwd literals
-        rows.forEach { s ->
+        rows.forEach outer@{ s ->
             val clock = tableModule.clocks[s]
             val id = s.id
 
@@ -70,7 +66,7 @@ class ConcreteTableInvariantTransformer : TableTransformer {
 
             if (clock == null) {
                 Report.info("Step %d has no clock, could not " + "enforce count of %d cycles.", id, cycles)
-                return@rows.forEach
+                return@outer
             }
 
 
@@ -86,7 +82,7 @@ class ConcreteTableInvariantTransformer : TableTransformer {
                     .`as`(clock!!.smvType)
 
             val fwd = tableModule.definitions[s.defForward]
-            tableModule.definitions[s.defForward] = fwd.and(clock.equal(count))
+            tableModule.definitions[s.defForward] = fwd?.and(clock.equal(count))
         }
     }
 }

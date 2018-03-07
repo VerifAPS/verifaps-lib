@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.testtables.model
 
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.st.ast.TopLevelElement
-import edu.kit.iti.formal.automation.testtables.StateReachability
 import edu.kit.iti.formal.automation.testtables.io.IOFacade
 import edu.kit.iti.formal.automation.testtables.model.options.PropertyInitializer
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
@@ -39,28 +38,26 @@ import java.util.*
  * @version 2
  */
 class GeneralizedTestTable {
-    private val ioVariables = LinkedHashMap<String, IoVariable>()
+    val ioVariables = LinkedHashMap<String, IoVariable>()
     private val constraintVariables = HashMap<String, ConstraintVariable>()
     private val variableMap = HashMap<String, SVariable>()
     private val properties = Properties(
             System.getProperties())
     private val functions = HashMap<String, FunctionDeclaration>()
-    private val references = HashMap<SVariable, Int>()
+    val references = HashMap<SVariable, Int>()
     var region: Region? = null
-    var options: TableOptions? = null
-        get() {
-            if (field == null) {
-                field = TableOptions()
-                PropertyInitializer.initialize(field, properties)
-            }
-            return field
-        }
+
+    val options: TableOptions by lazy {
+        val o = TableOptions()
+        PropertyInitializer.initialize(o, properties)
+        o
+    }
     var name: String? = null
 
     val constraintVariable: Map<String, ConstraintVariable>
         get() = constraintVariables
 
-    fun calculateReachability() {
+    fun clearReachability() {
         for (s in this.region!!.flat()) {
             s.outgoing.clear()
             s.incoming.clear()
@@ -71,7 +68,6 @@ class GeneralizedTestTable {
                 a.incoming.clear()
             }
         }
-        StateReachability(this)
     }
 
     fun getIoVariables(): Map<String, IoVariable> {
@@ -82,10 +78,13 @@ class GeneralizedTestTable {
         variableMap.computeIfAbsent(text) { k ->
             IOFacade.asSMVVariable(getVariable(k))
         }
-        return variableMap[text]
+        return variableMap[text] ?: error("Looked up non-existing variable.")
     }
 
-    private fun getVariable(text: String): Variable? {
+    fun isVariable(text: String) = text in ioVariables || text in constraintVariables
+
+
+    private fun getVariable(text: String): Variable {
         val a = ioVariables[text]
         val b = constraintVariables[text]
 
@@ -93,7 +92,7 @@ class GeneralizedTestTable {
             throw IllegalStateException(
                     "constraint and io variable have the same name.")
 
-        return a ?: b
+        return a ?: b ?: error("Could not found a variable with $text in signature.")
     }
 
     fun add(v: IoVariable) {
@@ -106,7 +105,7 @@ class GeneralizedTestTable {
 
     fun addOption(key: String, value: String) {
         properties[key] = value
-        options = null // reset options
+        //options = null // reset options
     }
 
     fun addFunctions(file: List<TopLevelElement<*>>) {

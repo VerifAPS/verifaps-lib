@@ -20,7 +20,7 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
 
-import edu.kit.iti.formal.automation.testtables.DelayModuleBuilder
+import edu.kit.iti.formal.automation.testtables.algorithms.DelayModuleBuilder
 import edu.kit.iti.formal.automation.testtables.Facade
 import edu.kit.iti.formal.smv.ast.SVariable
 
@@ -30,11 +30,12 @@ import edu.kit.iti.formal.smv.ast.SVariable
  * @version 1 (17.12.16)
  */
 class BackwardsReferencesTransformer : TableTransformer {
-    private var tt: TableTransformation? = null
+    private var tt: ConstructionModel? = null
 
-    override fun accept(tt: TableTransformation) {
+    override fun accept(tt: ConstructionModel) {
         this.tt = tt
-        tt.testTable.references.forEach(BiConsumer<SVariable, Int> { variable, history -> this.addDelayModule(variable, history) })
+        tt.testTable.references
+                .forEach{ variable, history -> this.addDelayModule(variable, history) }
     }
 
     private fun addDelayModule(variable: SVariable, history: Int?) {

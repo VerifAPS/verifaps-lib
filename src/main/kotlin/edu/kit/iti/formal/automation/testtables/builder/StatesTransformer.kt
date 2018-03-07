@@ -19,13 +19,9 @@
  */
 package edu.kit.iti.formal.automation.testtables.builder
 
-
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.State
-import edu.kit.iti.formal.automation.testtables.model.TableModule
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.*
-import java.util.stream.Collectors
 import java.util.stream.Stream
 
 /**
@@ -34,16 +30,10 @@ import java.util.stream.Stream
  *
  * @version 3
  */
-class StatesTransformer : TableTransformer {
-    private var mt: TableModule? = null
-    private var gtt: GeneralizedTestTable? = null
-    private var errorState: SVariable? = null
-    private var sentinelState: SVariable? = null
-    private var sentinel: State? = null
-
-    private fun createStates() {
-        val flat = gtt!!.region!!.flat()
-        flat.forEach(Consumer<State> { this.introduceState(it) })
+class StatesTransformer : AbstractTransformer() {
+    override fun transform() {
+        val flat = model.testTable.region!!.flat()
+        flat.forEach({ this.introduceState(it) })
         insertErrorState()
         insertSentinel()
     }
@@ -70,19 +60,16 @@ class StatesTransformer : TableTransformer {
                         s.defOutput))
 
         if (s.duration.isDeterministicWait) {
-            val collect = s.outgoing.stream()
-                    .filter { k -> k.id != State.SENTINEL_ID }
-                    .map<SVariable>(Function<State, SVariable> { it.getDefInput() })
-                    .collect<List<SMVExpr>, Any>(Collectors.toList())
-            val outgoingIsValid = if (collect.size > 0)
-                SMVFacade.combine(SBinaryOperator.OR, collect)
-            else
-                SLiteral.TRUE
+            val collect = s.outgoing
+                    .filter { k -> k != model.sentinelState }
+                    .map { it.defInput }
+
+            val outgoingIsValid =
+                    SMVFacade.combine(SBinaryOperator.OR, collect, SLiteral.TRUE)
 
             define(s.defKeep,
                     SMVFacade.combine(SBinaryOperator.AND,
-                            outgoingIsValid.not(), s.defInput, s.defOutput
-                    ))
+                            outgoingIsValid.not(), s.defInput, s.defOutput))
         }
 
         for (ss in s.automataStates) {
@@ -112,10 +99,10 @@ class StatesTransformer : TableTransformer {
         val `var` = automatonState.smvVariable
 
         // sate variable
-        mt!!.stateVars.add(`var`)
+        model.tableModule.stateVars.add(`var`)
 
         //initialize state variable with true iff isStartState
-        mt!!.init.add(if (automatonState.isStartState) `var` else `var`.not())
+        model.tableModule.init.add(if (automatonState.isStartState) `var` else `var`.not())
 
         //If one predeccor is true, then we are true.
         var incoming: Stream<State.AutomatonState> = automatonState.incoming.stream()
@@ -137,7 +124,7 @@ class StatesTransformer : TableTransformer {
                     }
                     fwd
                 }
-                .map<SMVExpr>(Function<SMVExpr, SMVExpr> { SMVExpr::class.java.cast(it) })
+                .map { SMVExpr::class.java.cast(it) }
                 .reduce(SMVFacade.reducer(SBinaryOperator.OR))
                 .orElse(SLiteral.FALSE)
 
@@ -158,47 +145,40 @@ class StatesTransformer : TableTransformer {
 
         val assignment = SAssignment(
                 automatonState.smvVariable, activate)
-        mt!!.nextAssignments.add(assignment)
+        model.tableModule.nextAssignments.add(assignment)
     }
 
     private fun insertErrorState() {
         // new error state
-        mt!!.stateVars.add(errorState)
+        model.tableModule.stateVars.add(model.errorVariable)
 
         // disable in the beginning
-        mt!!.init.add(errorState!!.not())
+        model.tableModule.init.add(model.errorVariable.not())
 
-        val e = gtt!!.region!!.flat().stream()
-                .flatMap<AutomatonState> { s -> s.automataStates.stream() }
+        val e = model.testTable.region!!.flat().stream()
+                .flatMap { s -> s.automataStates.stream() }
                 .map { s -> s.defFailed as SMVExpr }
-                .reduce(SMVFacade.reducer(SBinaryOperator.OR))
+                .reduce { a, b -> a.or(b) }
                 .orElse(SLiteral.TRUE)
-        val a = SAssignment(errorState, e)
-        mt!!.nextAssignments.add(a)
+        val a = SAssignment(model.errorVariable, e)
+        model.tableModule.nextAssignments.add(a)
     }
 
     private fun insertSentinel() {
-        mt!!.stateVars.add(sentinelState)
-        mt!!.init.add(sentinelState!!.not())
-        val e = sentinel!!.automataStates[0].incoming.stream()
-                .map<SVariable>(Function<AutomatonState, SVariable> { it.getDefForward() })
+        val sentinel = model.sentinelVariable
+        val tm = model.tableModule
+        tm.stateVars.add(sentinel)
+        tm.init.add(sentinel.not())
+        val e = model.sentinelState.automataStates[0].incoming.stream()
+                .map { it.defForward }
                 .map { fwd -> fwd as SMVExpr }
                 .reduce(SMVFacade.reducer(SBinaryOperator.OR))
                 .orElse(SLiteral.FALSE)
-        val a = SAssignment(sentinelState, e.or(sentinelState))
-        mt!!.nextAssignments.add(a)
+        val a = SAssignment(sentinel, e.or(sentinel))
+        tm.nextAssignments.add(a)
     }
 
     private fun define(defOutput: SVariable, combine: SMVExpr) {
-        mt!!.definitions[defOutput] = combine
-    }
-
-    override fun accept(tt: TableTransformation) {
-        mt = tt.tableModule
-        gtt = tt.testTable
-        errorState = tt.errorState
-        sentinelState = tt.sentinelState
-        sentinel = tt.reachable.sentinel
-        createStates()
+        model.tableModule.definitions[defOutput] = combine
     }
 }

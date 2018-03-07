@@ -61,10 +61,10 @@ class PropertyInitializer(private var value: Any?, private val properties: Prope
     }
 
     private fun getPath(namespace: String, p: Property, f: PropertyDescriptor): String {
-        return if (p.value().isEmpty()) {
+        return if (p.value.isEmpty()) {
             join(namespace, f.name)
         } else {
-            join(namespace, p.value())
+            join(namespace, p.value)
         }
     }
 

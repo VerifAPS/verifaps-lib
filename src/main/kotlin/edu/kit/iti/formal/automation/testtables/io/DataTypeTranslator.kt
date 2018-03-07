@@ -30,7 +30,7 @@ import java.util.function.Function
 /**
  * Created by weigl on 11.12.16.
  */
-class DataTypeTranslator : Function<DataType, SMVType> {
+class DataTypeTranslator : Function<DataType, SMVType?> {
     private val map = HashMap<DataType, SMVType>()
 
     init {
@@ -54,7 +54,7 @@ class DataTypeTranslator : Function<DataType, SMVType> {
         map[DataType.BOOLEAN] = SMVType.BOOLEAN
     }
 
-    override fun apply(dataType: DataType): SMVType {
+    override fun apply(dataType: DataType): SMVType? {
         return map[dataType]
     }
 

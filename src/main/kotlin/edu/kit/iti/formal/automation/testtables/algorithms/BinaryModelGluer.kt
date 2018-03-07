@@ -17,16 +17,14 @@
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  */
-package edu.kit.iti.formal.automation.testtables
+package edu.kit.iti.formal.automation.testtables.algorithms
 
 import edu.kit.iti.formal.automation.testtables.exception.SpecificationInterfaceMisMatchException
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
 import edu.kit.iti.formal.smv.SMVFacade
-import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SMVType
 import edu.kit.iti.formal.smv.ast.SVariable
-import java.util.stream.Collectors
 
 /**
  * @author Alexander Weigl
@@ -41,34 +39,29 @@ class BinaryModelGluer(private val options: TableOptions,
         product.name = MAIN_MODULE
         product.inputVars.addAll(code.moduleParameter)
 
-        product.stateVars.add(SVariable(
-                CODE_MODULE,
-                SMVType.Module(code.name,
-                        code.moduleParameter)))
-
-        val taP = table.moduleParameter.stream().map { v ->
-            if (code.moduleParameter.contains(v)) {
-                return@table.getModuleParameter().stream().map v
+        product.stateVars.add(
+                SVariable(CODE_MODULE,
+                        SMVType.Module(code.name,
+                                code.moduleParameter)))
+        val tableParameters = table.moduleParameter.map { v ->
+            if (v in code.moduleParameter) {
+                v
             } else {
                 //output of program code
-                if (!code.stateVars.contains(v)) {
+                if (v !in code.stateVars) {
                     throw SpecificationInterfaceMisMatchException(code, v)
                 }
-
-                val `var` = SVariable(CODE_MODULE + "." + v, v.smvType)
-                return@table.getModuleParameter().stream().map if (options.isUseNext)
-                    SMVFacade.next(`var`)
-                else
-                    `var`
+                val variable = SVariable("${CODE_MODULE}.v", v.smvType)
+                if (options.isUseNext) SMVFacade.next(variable) else variable
             }
-        }.collect<List<SMVExpr>, Any>(Collectors.toList())
+        }
         product.stateVars.add(SVariable(TABLE_MODULE,
-                SMVType.Module(table.name, taP)))
+                SMVType.Module(table.name, tableParameters)))
     }
 
     companion object {
         val TABLE_MODULE = "table"
         val CODE_MODULE = "code"
-        val MAIN_MODULE = "main"
+        val MAIN_MODULE = ""
     }
 }

@@ -20,8 +20,6 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
 
-import edu.kit.iti.formal.smv.SMVFacade
-import edu.kit.iti.formal.smv.ast.SBinaryOperator
 import edu.kit.iti.formal.smv.ast.SMVExpr
 
 /**
@@ -35,17 +33,16 @@ class InputSequenceInvariantTransformer : TableTransformer {
      *
      * @param tt
      */
-    override fun accept(tt: TableTransformation) {
+    override fun accept(tt: ConstructionModel) {
         /*
             exists an input and state pair in every turn
         */
 
         // one of the rows is always active
-        val states = tt.testTable.region!!.flat().stream()
-                .flatMap<AutomatonState> { s -> s.automataStates.stream() }
+        val states = tt.testTable.region!!.flat()
+                .flatMap { s -> s.automataStates }
                 .map { v -> v.smvVariable as SMVExpr }
-                .reduce(SMVFacade.reducer(SBinaryOperator.OR))
-                .get()
+                .reduce { a, b -> a.or(b) }
 
         tt.tableModule.invarSpec.add(states)
     }

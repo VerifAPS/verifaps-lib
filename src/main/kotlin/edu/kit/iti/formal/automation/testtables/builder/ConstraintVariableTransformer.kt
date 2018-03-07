@@ -31,7 +31,7 @@ import edu.kit.iti.formal.smv.ast.SVariable
  * Created by weigl on 17.12.16.
  */
 class ConstraintVariableTransformer : TableTransformer {
-    override fun accept(tt: TableTransformation) {
+    override fun accept(tt: ConstructionModel) {
         val gtt = tt.testTable
         val mt = tt.tableModule
         for (cv in gtt.constraintVariable.values) {

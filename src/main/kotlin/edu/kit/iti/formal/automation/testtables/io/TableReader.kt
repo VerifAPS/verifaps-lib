@@ -26,18 +26,14 @@ import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.Region
 import edu.kit.iti.formal.automation.testtables.model.State
 import edu.kit.iti.formal.automation.testtables.schema.*
-import edu.kit.iti.formal.smv.ast.SMVExpr
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.w3c.dom.Element
-
+import java.io.File
+import java.util.*
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
 import javax.xml.bind.JAXBException
-import javax.xml.bind.Unmarshaller
-import java.io.File
-import java.util.TreeMap
-import java.util.stream.Collectors
 
 class TableReader(private val input: File) {
     val product = GeneralizedTestTable()
@@ -126,31 +122,28 @@ class TableReader(private val input: File) {
 
     private fun translateStep(step: Step): State {
         val s = State(stepNumber++)
-        val cells = step.any.stream()
-                .map<Element>(Function<Any, Element> { Element::class.java.cast(it) })
-                .collect<List<Element>, Any>(Collectors.toList())
+        val cells = step.any.map { Element::class.java.cast(it) }
 
         for (i in 0 until product.ioVariables.size) {
             val v = product.getIoVariables(i)
             val name = v!!.name
 
-            var cellValue = get(cells, name)
-            s.entryForColumn[name] = cellValue
+            val cellContent = get(cells, name)
+            s.entryForColumn[name] = cellContent
+            val cellValue: String =
+                    if (cellContent == null || cellContent.isEmpty())
+                        lastColumnValue.getOrElse(i, {
+                            Report.warn("No cell value for var: %s in %s/%d. Inserting '-'. ",
+                                    name, s.id, i)
+                            DEFAULT_CELL_VALUE
+                        })
+                    else cellContent
 
-            if (cellValue == null || cellValue.isEmpty()) {
-                if (lastColumnValue.containsKey(i))
-                    cellValue = lastColumnValue[i]
-                else {
-                    cellValue = DEFAULT_CELL_VALUE
-                    Report.warn("No cell value for var: %s in %s/%d. Inserting '-'. ",
-                            name, s.id, i)
-                }
-            }
             try {
                 val e = IOFacade.parseCellExpression(cellValue,
                         product.getSMVVariable(name), product)
                 s.add(v, e)
-                lastColumnValue[i] = cellValue
+                this.lastColumnValue[i] = cellValue
             } catch (pce: ParseCancellationException) {
                 Report.error("Error during parsing '%s'  for column '%s' (%d) and row '%d'", cellValue,
                         name, i, s.id)
@@ -191,7 +184,6 @@ class TableReader(private val input: File) {
 
     companion object {
         private val DEFAULT_CELL_VALUE = "-"
-
         operator fun get(cells: List<Element>, name: String): String? {
             return cells.stream()
                     .filter { c -> c.tagName == name && c.firstChild != null }

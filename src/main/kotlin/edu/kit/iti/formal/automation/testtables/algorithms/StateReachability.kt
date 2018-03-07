@@ -17,15 +17,16 @@
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  */
-package edu.kit.iti.formal.automation.testtables
+package edu.kit.iti.formal.automation.testtables.algorithms
 
 
+import edu.kit.iti.formal.automation.testtables.builder.ConstructionModel
+import edu.kit.iti.formal.automation.testtables.builder.SingleState
 import edu.kit.iti.formal.automation.testtables.model.Duration
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.Region
 import edu.kit.iti.formal.automation.testtables.model.State
-
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Calculation of the State/Row reachability.
@@ -53,21 +54,25 @@ import java.util.*
  * @author Alexander Weigl
  * @version 2 (12.12.16)
  */
-class StateReachability(private val gtt: GeneralizedTestTable) {
+class StateReachability(
+        private val sentinel: SingleState,
+        private val root: Region) {
+
     private val flatList: MutableList<State>
-    val sentinel = State(State.SENTINEL_ID)
+
+    constructor(model: ConstructionModel) :
+            this(model.sentinelState, model.testTable.region!!)
 
     init {
         sentinel.duration = Duration(1, 1)
-        flatList = gtt.region!!.flat()
-
+        flatList = ArrayList(root.flat())
         val lastState = flatList[flatList.size - 1]
         if (!lastState.duration.isOmega) {
             flatList.add(sentinel)
         }
 
         initTable()
-        addRegions(gtt.region)
+        addRegions(root)
         fixpoint()
         maintainIncomning()
         maintainAutomata()
@@ -82,9 +87,9 @@ class StateReachability(private val gtt: GeneralizedTestTable) {
 
                 if (a.isFirst) {
                     val s = a.state
-                    s.incoming.stream()
-                            .flatMap<AutomatonState> { `as` -> `as`.automataStates.stream() }
-                            .filter(Predicate<AutomatonState> { it.isOptional() })
+                    s.incoming
+                            .flatMap { it.automataStates }
+                            .filter { it.isOptional }
                             .forEach { b -> connect(b, a) }
                 }
 
@@ -151,8 +156,8 @@ class StateReachability(private val gtt: GeneralizedTestTable) {
      *
      * @param r
      */
-    private fun addRegions(r: Region?) {
-        if (r!!.duration.isRepeatable) {
+    private fun addRegions(r: Region) {
+        if (r.duration.isRepeatable) {
             val flat = r.flat()
             flat[r.children.size - 1].outgoing
                     .add(flat[0])

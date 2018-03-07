@@ -21,30 +21,28 @@ package edu.kit.iti.formal.automation.testtables
 
 
 import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.datatypes.Any
 import edu.kit.iti.formal.automation.datatypes.AnyInt
 import edu.kit.iti.formal.automation.datatypes.DataTypes
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
+import edu.kit.iti.formal.automation.testtables.algorithms.BinaryModelGluer
+import edu.kit.iti.formal.automation.testtables.algorithms.DelayModuleBuilder
 import edu.kit.iti.formal.automation.testtables.io.TableReader
 import edu.kit.iti.formal.automation.testtables.io.xmv.NuXMVAdapter
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.SReference
 import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
+import edu.kit.iti.formal.automation.visitors.Visitor
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SMVType
 import edu.kit.iti.formal.smv.ast.SVariable
 import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.Token
-
-import javax.xml.bind.JAXBException
 import java.io.File
 import java.io.IOException
-import java.util.ArrayList
-import java.util.Arrays
-import java.util.stream.Collectors
+import java.util.*
+import javax.xml.bind.JAXBException
 
 object Facade {
     @Throws(JAXBException::class)
@@ -63,15 +61,14 @@ object Facade {
     }
 
     private fun resolveEnumsAndSetInts(a: TopLevelElements) {
-        val astVisitor = object : AstVisitor<Any>() {
-            var global: Scope
+        val astVisitor = object : AstVisitor<Unit>() {
+            lateinit var global: Scope
 
-            override fun visit(decl: ProgramDeclaration): Any {
+            override fun visit(decl: ProgramDeclaration) {
                 this.global = decl.scope.parent
-                return super.visit(decl)
             }
 
-            override fun visit(declaration: VariableDeclaration): Any {
+            override fun visit(declaration: VariableDeclaration) {
                 if (declaration.dataType is AnyInt) {
                     declaration.dataType = DataTypes.INT
                     if (declaration.init != null && declaration.init is Literal) {
@@ -79,10 +76,9 @@ object Facade {
                         l!!.dataType = DataTypes.INT
                     }
                 }
-                return declaration
             }
 
-            override fun visit(literal: Literal): Any {
+            override fun visit(literal: Literal) {
                 if (!literal.isDataTypeExplicit && literal.dataType is AnyInt) {
                     literal.isDataTypeExplicit = true
                     literal.dataType = DataTypes.INT
@@ -95,10 +91,9 @@ object Facade {
                         }
                     }
                 }
-                return literal
             }
         }
-        a.accept<Any>(astVisitor)
+        a.accept<Unit>(astVisitor as Visitor<*>)
     }
 
     fun delay(ref: SReference): DelayModuleBuilder {
@@ -140,16 +135,15 @@ object Facade {
         return sec.getType()
     }
 
-    private class SuperEnumCreator : AstVisitor<Void>() {
+    private class SuperEnumCreator : AstVisitor<Unit?>() {
         private val type = SMVType.EnumType(ArrayList())
 
         fun getType(): SMVType {
             return type
         }
 
-        override fun visit(etd: EnumerationTypeDeclaration): Void? {
-            type.values.addAll(etd.allowedValues.stream().map<String>(
-                    Function<Token, String> { it.getText() }).collect<List<String>, Any>(Collectors.toList()))
+        override fun visit(etd: EnumerationTypeDeclaration): Unit? {
+            type.values.addAll(etd.allowedValues.map { it.text })
             return null
         }
     }

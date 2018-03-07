@@ -20,10 +20,7 @@
 package edu.kit.iti.formal.automation.testtables.model
 
 
-import lombok.Data
-
-import java.util.ArrayList
-import java.util.stream.Collectors
+import java.util.*
 
 /**
  * created on 10.12.16.
@@ -31,9 +28,8 @@ import java.util.stream.Collectors
  * @author Alexander Weigl
  * @version 1
  */
-@Data
 class Region(id: String) : TableNode(id) {
-    override var children: List<TableNode> = ArrayList()
+    override var children: MutableList<TableNode> = ArrayList()
         set(children) {
             field = this.children
         }
@@ -41,12 +37,11 @@ class Region(id: String) : TableNode(id) {
     override val isLeaf: Boolean
         get() = false
 
-    override val automataStates: List<State.AutomatonState>
-        get() {
-            val seq = ArrayList<State.AutomatonState>(100)
-            flat().forEach { state -> seq.addAll(state.automataStates) }
-            return seq
-        }
+    override val automataStates: List<State.AutomatonState> by lazy {
+        val seq = ArrayList<State.AutomatonState>(100)
+        flat().forEach { state -> seq.addAll(state.automataStates) }
+        seq
+    }
 
     constructor(id: Int) : this("" + id) {}
 
@@ -54,19 +49,18 @@ class Region(id: String) : TableNode(id) {
      * @return
      */
     override fun count(): Int {
-        return this.children.stream().mapToInt(ToIntFunction<TableNode> { it.count() }).sum()
+        return this.children.sumBy { it.count() }
     }
 
     /**
      * @return
      */
     override fun flat(): List<State> {
-        return this.children.stream()
-                .flatMap { a -> a.flat().stream() }
-                .collect<List<State>, Any>(Collectors.toList())
+        return this.children.flatMap { a -> a.flat() }
     }
 
     override fun depth(): Int {
-        return 1 + this.children.stream().mapToInt(ToIntFunction<TableNode> { it.depth() }).max().orElse(0)
+        val c = (this.children.maxBy { it.depth() }?.depth() ?: 0)
+        return 1 + c
     }
 }

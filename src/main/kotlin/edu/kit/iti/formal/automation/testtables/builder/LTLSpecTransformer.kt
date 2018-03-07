@@ -41,13 +41,9 @@ package edu.kit.iti.formal.automation.testtables.builder
  * #L%
  */
 
-import edu.kit.iti.formal.automation.testtables.model.State
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.SBinaryOperator
-import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVExpr
-import edu.kit.iti.formal.smv.ast.SVariable
-import java.util.stream.Collectors
 
 /**
  * Construction of the LTL specification for strict conformance.
@@ -59,30 +55,28 @@ import java.util.stream.Collectors
  * @version 1 (03.05.17)
  */
 class LTLSpecTransformer : TableTransformer {
-    override fun accept(tt: TableTransformation) {
+    override fun accept(tt: ConstructionModel) {
         val steps = tt.testTable.region!!.flat()
         val lastStep = steps[steps.size - 1]
         val lastAutomataStep = lastStep.automataStates[lastStep.automataStates.size - 1]
 
         val lastStateForward = lastAutomataStep.defForward
 
-        val automataStates = steps.stream()
-                .flatMap<AutomatonState> { s -> s.automataStates.stream() }
-                .map<SUnaryExpression> { `as` -> `as`.smvVariable.not() }
-                .collect<List<SMVExpr>, Any>(Collectors.toList())
-        automataStates.add(tt.errorState.not())
+        val automataStates = ArrayList<SMVExpr>(steps
+                .flatMap { s -> s.automataStates }
+                .map { `as` -> `as`.smvVariable.not() })
+        automataStates.add(tt.errorVariable.not())
 
         val noStateSelected = SMVFacade
                 .combine(SBinaryOperator.AND, automataStates)
 
-        val fairness = steps.stream()
+        val fairness = steps
                 .filter { state -> state.duration.isUnbounded }
-                .flatMap { state -> state.outgoing.stream() }
-                .filter { state -> state.id !== State.SENTINEL_ID }
-                .map<SVariable>(Function<State, SVariable> { it.getDefInput() })
+                .flatMap { state -> state.outgoing }
+                .filter { state -> state != tt.sentinelState }
+                .map { it.defInput }
                 .map { s -> s.eventually().globally() as SMVExpr }
-                .reduce(SMVFacade.reducer(SBinaryOperator.AND))
-                .orElse(SLiteral.TRUE)
+                .reduce { a, b -> a.and(b) }
 
         val ltlspec = fairness
                 .implies(noStateSelected.or(lastStateForward).eventually())

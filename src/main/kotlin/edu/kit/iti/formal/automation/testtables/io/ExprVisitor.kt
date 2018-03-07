@@ -25,10 +25,8 @@ import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionBaseVisito
 import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionParser
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.smv.ast.*
-
-import javax.swing.plaf.SliderUI
-import java.util.LinkedList
-import java.util.stream.Collectors
+import lombok.experimental.`var`
+import java.util.*
 
 /**
  * Created by weigl on 09.12.16.
@@ -36,10 +34,8 @@ import java.util.stream.Collectors
 class ExprVisitor(private val columnVariable: SVariable, private val gtt: GeneralizedTestTable) : CellExpressionBaseVisitor<SMVExpr>() {
 
     override fun visitCell(ctx: CellExpressionParser.CellContext): SMVExpr {
-        return ctx.chunk().stream()
-                .map<SMVExpr>(Function<ChunkContext, SMVExpr> { this.visitChunk(it) })
+        return ctx.chunk().map { this.visitChunk(it) }
                 .reduce { a, b -> SBinaryExpression(a, SBinaryOperator.AND, b) }
-                .get()
     }
 
     override fun visitChunk(ctx: CellExpressionParser.ChunkContext): SMVExpr {
@@ -162,7 +158,7 @@ class ExprVisitor(private val columnVariable: SVariable, private val gtt: Genera
 
     override fun visitFunctioncall(ctx: CellExpressionParser.FunctioncallContext): SMVExpr {
         //TODO call function/symbolic execution
-        val args = ctx.expr().stream().map { c -> c.accept(this) }.collect<List<SMVExpr>, Any>(Collectors.toList())
+        val args = ctx.expr().map { c -> c.accept(this) }
         return SFunction(ctx.IDENTIFIER().text,
                 *args.toTypedArray())
     }
@@ -172,21 +168,20 @@ class ExprVisitor(private val columnVariable: SVariable, private val gtt: Genera
     }
 
     override fun visitVariable(ctx: CellExpressionParser.VariableContext): SMVExpr {
-        val `var` = gtt.getSMVVariable(ctx.IDENTIFIER().text)
+        val varText = ctx.IDENTIFIER().text
         val isReference = ctx.RBRACKET() != null
 
-        if (`var` == null) {
+        return if (gtt.isVariable(varText)) {
+            val variable = gtt.getSMVVariable(varText)
             if (isReference)
-                throw IllegalExpressionException(
-                        "You referenced a variable " + ctx.IDENTIFIER().text + ", but it is not found as a defined io-variable.")
-            return SLiteral(ENUM_TYPE, ctx.IDENTIFIER().text)
+                gtt.getReference(variable, Integer.parseInt(ctx.i().text))
+            else
+                variable
+        } else {
+            if (isReference)
+                throw IllegalExpressionException("You referenced a variable $varText, but it is not found as a defined io-variable.")
+            SLiteral(ENUM_TYPE, varText)
         }
-
-        return if (isReference)
-            gtt.getReference(`var`, Integer.parseInt(ctx.i().text))
-        else
-            `var`
-
     }
 
     override fun visitLogicalAnd(ctx: CellExpressionParser.LogicalAndContext): SMVExpr {

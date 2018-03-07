@@ -27,8 +27,7 @@ import edu.kit.iti.formal.smv.ast.SVariable
 /**
  * Created by weigl on 15.12.16.
  */
-class SReference(var cycles: Int, var variable: SVariable?) {
-
+class SReference(var cycles: Int, var variable: SVariable) {
     init {
         if (cycles >= 0) {
             Report.fatal("Only support for negative reference (looking backwards).")
@@ -43,13 +42,13 @@ class SReference(var cycles: Int, var variable: SVariable?) {
         val that = o as SReference?
 
         if (cycles != that!!.cycles) return false
-        return if (variable != null) variable == that.variable else that.variable == null
+        return variable == that.variable
 
     }
 
     override fun hashCode(): Int {
         var result = cycles
-        result = 31 * result + if (variable != null) variable!!.hashCode() else 0
+        result = 31 * result + variable.hashCode()
         return result
     }
 
@@ -60,8 +59,6 @@ class SReference(var cycles: Int, var variable: SVariable?) {
      */
     fun asVariable(): SVariable {
         val newName = Facade.getHistoryName(variable, Math.abs(cycles))
-        return SVariable(newName, variable!!.smvType)
+        return SVariable(newName, variable.smvType)
     }
-
-
 }

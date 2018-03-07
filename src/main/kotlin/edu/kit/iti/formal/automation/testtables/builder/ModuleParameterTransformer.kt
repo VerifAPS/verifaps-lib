@@ -20,18 +20,14 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
 
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.smv.ast.SVariable
-
 /**
  * Created by weigl on 17.12.16.
  */
 class ModuleParameterTransformer : TableTransformer {
-    override fun accept(tt: TableTransformation) {
-        val gtt = tt.testTable
-        for (cv in gtt.ioVariables.keys) {
-            val `var` = gtt.getSMVVariable(cv)
-            tt.tableModule.moduleParameter.add(`var`)
+    override fun accept(tt: ConstructionModel) {
+        tt.testTable.ioVariables.keys.forEach {
+            tt.tableModule.moduleParameter.add(
+                    tt.testTable.getSMVVariable(it))
         }
     }
 }

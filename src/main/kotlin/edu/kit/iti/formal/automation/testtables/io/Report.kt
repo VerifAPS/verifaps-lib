@@ -25,11 +25,9 @@ import edu.kit.iti.formal.automation.testtables.report.Assignment
 import edu.kit.iti.formal.automation.testtables.report.Counterexample
 import edu.kit.iti.formal.automation.testtables.report.Message
 import edu.kit.iti.formal.automation.testtables.report.ObjectFactory
-
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBException
 import javax.xml.bind.Marshaller
-import java.util.function.Consumer
 
 /**
  * @author Alexander Weigl
@@ -38,8 +36,7 @@ import java.util.function.Consumer
 object Report {
     var XML_MODE = false
     internal var START_TIME = System.currentTimeMillis()
-    var message: Message
-        internal set
+    var message: Message = Message()
 
     init {
         clear()
@@ -47,28 +44,27 @@ object Report {
 
     fun clear() {
         message = Message()
-        val log = Message.Log()
-        message.log = log
+        message.log = Message.Log()
         message.returncode = "unknown"
     }
 
-    fun debug(msg: String, vararg args: Any) {
+    fun debug(msg: String, vararg args: Any?) {
         print("debug", msg, *args)
     }
 
-    fun info(msg: String, vararg args: Any) {
+    fun info(msg: String, vararg args: Any?) {
         print("info", msg, *args)
     }
 
-    fun warn(msg: String, vararg args: Any) {
+    fun warn(msg: String, vararg args: Any?) {
         print("warn", msg, *args)
     }
 
-    fun error(msg: String, vararg args: Any) {
+    fun error(msg: String?, vararg args: Any?) {
         print("error", msg, *args)
     }
 
-    fun fatal(msg: String, vararg args: Any) {
+    fun fatal(msg: String?, vararg args: Any?) {
         print("fatal", msg, *args)
         setErrorLevel("fatal-error")
     }
@@ -77,7 +73,7 @@ object Report {
         throw ProgramAbortionException()
     }
 
-    private fun print(level: String, fmt: String?, vararg args: Any) {
+    private fun print(level: String, fmt: String?, vararg args: Any?) {
         if (fmt == null) {
             return //            throw new IllegalArgumentException("fmt is null");
         }
@@ -128,11 +124,9 @@ object Report {
 
     }
 
-    private fun print(suffix: String): Consumer<Assignment> {
+    private fun print(suffix: String): (Assignment) -> Unit {
         return { assignment: Assignment ->
-            println(
-                    suffix + "" + assignment.name + " = " + assignment
-                            .value)
+            println("$suffix${assignment.name} = ${assignment.value}")
         }
     }
 

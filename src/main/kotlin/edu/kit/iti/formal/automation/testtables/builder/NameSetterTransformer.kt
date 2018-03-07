@@ -21,15 +21,13 @@ package edu.kit.iti.formal.automation.testtables.builder
 
 
 import edu.kit.iti.formal.automation.testtables.io.Report
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.automation.testtables.model.TableModule
 
 /**
  * Transfers the name of the table to the name of the SMV module.
  * Created by weigl on 17.12.16.
  */
 class NameSetterTransformer : TableTransformer {
-    override fun accept(tt: TableTransformation) {
+    override fun accept(tt: ConstructionModel) {
         val mt = tt.tableModule
         val gtt = tt.testTable
         if (gtt.name == null || gtt.name!!.isEmpty()) {

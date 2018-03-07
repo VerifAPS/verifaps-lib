@@ -20,36 +20,22 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
 
-import edu.kit.iti.formal.automation.testtables.StateReachability
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.automation.testtables.model.TableModule
+import edu.kit.iti.formal.automation.testtables.model.options.Mode
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SMVType
 import edu.kit.iti.formal.smv.ast.SVariable
-import java.util.LinkedList
+import java.util.*
 import java.util.function.Consumer
 
-class TableTransformation(val testTable: GeneralizedTestTable, val superEnumType: SMVType) {
-    val reachable: StateReachability
-    private val transformers = LinkedList<Consumer<TableTransformation>>()
-    val tableModule = TableModule()
+class TableTransformation(
+        val testTable: GeneralizedTestTable,
+        val superEnumType: SMVType) {
 
-    private val helper = LinkedList<SMVModule>()
-
-    val helperModules: Collection<SMVModule>
-        get() = helper
+    val model = ConstructionModel(superEnumType, testTable)
+    val transformers = LinkedList<Consumer<ConstructionModel>>()
 
     init {
-        reachable = StateReachability(testTable)
-        init()
-    }
-
-    fun getSentinelState(): SVariable {
-        return sentinelState
-    }
-
-
-    private fun init() {
         transformers.clear()
         transformers.add(NameSetterTransformer())
         transformers.add(ModuleParameterTransformer())
@@ -66,18 +52,7 @@ class TableTransformation(val testTable: GeneralizedTestTable, val superEnumType
     }
 
     fun transform(): SMVModule {
-        transformers.forEach { a -> a.accept(this) }
-        return tableModule
-    }
-
-    fun getErrorState(): SVariable {
-        return errorState
-    }
-
-    companion object {
-        val ERROR_STATE_IDENTIFIER = "_\$ERROR"
-        private val SENTINEL_STATE_IDENTIFIER = "_\$SENTINEL"
-        private val errorState = SVariable(ERROR_STATE_IDENTIFIER, SMVType.BOOLEAN)
-        private val sentinelState = SVariable(SENTINEL_STATE_IDENTIFIER, SMVType.BOOLEAN)
+        transformers.forEach { a -> a.accept(model) }
+        return model.tableModule
     }
 }

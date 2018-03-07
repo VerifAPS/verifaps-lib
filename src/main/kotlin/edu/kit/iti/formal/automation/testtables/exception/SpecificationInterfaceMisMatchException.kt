@@ -20,12 +20,9 @@
 package edu.kit.iti.formal.automation.testtables.exception
 
 
-import com.google.common.collect.Streams
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
-
 import java.util.*
-import java.util.stream.Collectors
 
 /**
  * @author Alexander Weigl
@@ -45,94 +42,95 @@ class SpecificationInterfaceMisMatchException : GetetaException {
                           writableStackTrace: Boolean) : super(message, cause, enableSuppression, writableStackTrace) {
     }
 
-    constructor(code: SMVModule, v: SVariable) : super(String.format("Could not find variable '%s' in module: %s. Candidates would be: %s", v.name, code.name,
-            candidates(v.name, code)
-    )) {
-    }
+    constructor(code: SMVModule, v: SVariable) :
+            super(String.format("Could not find variable '%s' in module: %s. Candidates would be: %s",
+                    v.name, code.name, SpecificationInterfaceMisMatchException.candidates(v.name, code)
+            ))
 
-    private fun candidates(name: String, code: SMVModule): String {
-        val candidates = Streams.concat(code.stateVars.stream(),
-                Streams.concat(code.inputVars.stream(), code.frozenVars.stream()))
-                .map<String>(Function<SVariable, String> { it.getName() })
-                .collect<List<String>, Any>(Collectors.toList())
-        val best = candidates(name, candidates)
-        return best.stream().limit(3).collect<String, *>(Collectors.joining(", ", "[", "]"))
-    }
+    companion object {
 
-    private fun candidates(name: String, code: List<String>): Collection<String> {
-        val heap = PriorityQueue(
-                LevensteinCaseInsensitiveComparator(name))
-        heap.addAll(code)
-        return heap
-    }
-
-    internal class LevensteinCaseInsensitiveComparator(name: String) : Comparator<String> {
-        private val reference: String
-        var computed: MutableMap<String, Int> = HashMap()
-
-        init {
-            this.reference = name.toLowerCase()
+        private fun candidates(name: String, code: SMVModule): String {
+            val vars = code.stateVars + code.inputVars + code.frozenVars;
+            val candidates = vars.map { it.name }
+            val best = candidates(name, candidates)
+            return best.take(3).reduce { a, b -> "$a, $b" }
         }
 
-
-        override fun compare(o1: String, o2: String): Int {
-            val level1 = getLevenstheinToRef(o1)
-            val level2 = getLevenstheinToRef(o2)
-            return Integer.compare(level1, level2)
+        private fun candidates(name: String, code: List<String>): Collection<String> {
+            val heap = PriorityQueue(
+                    LevensteinCaseInsensitiveComparator(name))
+            heap.addAll(code)
+            return heap
         }
 
-        private fun getLevenstheinToRef(o1: String): Int {
-            val k = o1.toLowerCase()
-            return (computed as java.util.Map<String, Int>).computeIfAbsent(k) { s -> levenshteinDistance(reference, s) }
-        }
+        internal class LevensteinCaseInsensitiveComparator(name: String) : Comparator<String> {
+            private val reference: String
+            var computed: MutableMap<String, Int> = HashMap()
 
-        /**
-         * from https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Java
-         *
-         * @param lhs
-         * @param rhs
-         * @return
-         */
-        fun levenshteinDistance(lhs: CharSequence, rhs: CharSequence): Int {
-            val len0 = lhs.length + 1
-            val len1 = rhs.length + 1
-
-            // the array of distances
-            var cost = IntArray(len0)
-            var newcost = IntArray(len0)
-
-            // initial cost of skipping prefix in String s0
-            for (i in 0 until len0) cost[i] = i
-
-            // dynamically computing the array of distances
-
-            // transformation cost for each letter in s1
-            for (j in 1 until len1) {
-                // initial cost of skipping prefix in String s1
-                newcost[0] = j
-
-                // transformation cost for each letter in s0
-                for (i in 1 until len0) {
-                    // matching current letters in both strings
-                    val match = if (lhs[i - 1] == rhs[j - 1]) 0 else 1
-
-                    // computing cost for each transformation
-                    val cost_replace = cost[i - 1] + match
-                    val cost_insert = cost[i] + 1
-                    val cost_delete = newcost[i - 1] + 1
-
-                    // keep minimum cost
-                    newcost[i] = Math.min(Math.min(cost_insert, cost_delete), cost_replace)
-                }
-
-                // swap cost/newcost arrays
-                val swap = cost
-                cost = newcost
-                newcost = swap
+            init {
+                this.reference = name.toLowerCase()
             }
 
-            // the distance is the cost for transforming all letters in both strings
-            return cost[len0 - 1]
+
+            override fun compare(o1: String, o2: String): Int {
+                val level1 = getLevenstheinToRef(o1)
+                val level2 = getLevenstheinToRef(o2)
+                return Integer.compare(level1, level2)
+            }
+
+            private fun getLevenstheinToRef(o1: String): Int {
+                val k = o1.toLowerCase()
+                return (computed as java.util.Map<String, Int>).computeIfAbsent(k) { s -> levenshteinDistance(reference, s) }
+            }
+
+            /**
+             * from https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Java
+             *
+             * @param lhs
+             * @param rhs
+             * @return
+             */
+            fun levenshteinDistance(lhs: CharSequence, rhs: CharSequence): Int {
+                val len0 = lhs.length + 1
+                val len1 = rhs.length + 1
+
+                // the array of distances
+                var cost = IntArray(len0)
+                var newcost = IntArray(len0)
+
+                // initial cost of skipping prefix in String s0
+                for (i in 0 until len0) cost[i] = i
+
+                // dynamically computing the array of distances
+
+                // transformation cost for each letter in s1
+                for (j in 1 until len1) {
+                    // initial cost of skipping prefix in String s1
+                    newcost[0] = j
+
+                    // transformation cost for each letter in s0
+                    for (i in 1 until len0) {
+                        // matching current letters in both strings
+                        val match = if (lhs[i - 1] == rhs[j - 1]) 0 else 1
+
+                        // computing cost for each transformation
+                        val cost_replace = cost[i - 1] + match
+                        val cost_insert = cost[i] + 1
+                        val cost_delete = newcost[i - 1] + 1
+
+                        // keep minimum cost
+                        newcost[i] = Math.min(Math.min(cost_insert, cost_delete), cost_replace)
+                    }
+
+                    // swap cost/newcost arrays
+                    val swap = cost
+                    cost = newcost
+                    newcost = swap
+                }
+
+                // the distance is the cost for transforming all letters in both strings
+                return cost[len0 - 1]
+            }
         }
     }
 }

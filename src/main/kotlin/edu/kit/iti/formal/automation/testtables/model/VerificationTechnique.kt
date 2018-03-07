@@ -58,9 +58,5 @@ enum class VerificationTechnique private constructor(vararg commands: String) {
     BMC("read_model", "flatten_hierarchy", "show_vars", "encode_variables",
             "build_boolean_model", "check_invar_bmc -a een-sorrensen", "quit");
 
-    val commands: Array<String>
-
-    init {
-        this.commands = commands
-    }
+    val commands: Array<String> = commands as Array<String>
 }

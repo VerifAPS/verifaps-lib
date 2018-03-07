@@ -20,20 +20,13 @@
 package edu.kit.iti.formal.automation.testtables.model
 
 
-import lombok.Data
-
 /**
  *
  * Created on 10.12.16
  *
  * @author Alexander Weigl
  */
-@Data
-class Duration {
-
-    private val lower: Int
-    private val upper: Int
-
+data class Duration(var lower: Int = 1, var upper: Int = 1) {
     /**
      * returns true, iff the step can be applied arbitrary often (no upper bound)
      *
@@ -58,13 +51,15 @@ class Duration {
     val isSkippable: Boolean
         get() = lower == 0
 
-
     /**
      *
      */
     val isDeterministicWait: Boolean
         get() = equals(DET_WAIT)
 
+    /**
+     * isOmega, aka. strong repeat
+     */
     val isOmega: Boolean
         get() = equals(OMEGA)
 
@@ -81,24 +76,12 @@ class Duration {
     val bound: Int
         get() = Math.max(1, Math.max(lower, upper))
 
-    constructor() {
-        assert(invariant())
-    }
-
-    constructor(l: Int, u: Int) {
-        lower = l
-        upper = u
-        assert(invariant())
-    }
-
     fun invariant(): Boolean {
         return true//(upper >= lower || isUnbounded()) && lower >= 0;
     }
 
     /**
      * returns the maximum integer interval border.
-     *
-     *
      *
      * Useful for the integer width needed to store the clock value
      *

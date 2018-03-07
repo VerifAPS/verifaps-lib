@@ -41,10 +41,8 @@ package edu.kit.iti.formal.automation.testtables.model
  * #L%
  */
 
-import edu.kit.iti.formal.automation.testtables.report.Counterexample
 import edu.kit.iti.formal.automation.testtables.report.Message
 import edu.kit.iti.formal.smv.ast.SVariable
-
 import java.util.*
 
 /**
@@ -133,11 +131,11 @@ class CounterExampleAnalyzer(testTable: GeneralizedTestTable, private val messag
         return "TRUE" == getValue(time, `var`)
     }
 
-    private fun getValue(time: Int, `var`: String): String? {
-        var `var` = `var`
-        `var` = "table." + `var`
+    private fun getValue(time: Int, variable: String): String? {
+        var _var = variable
+        _var = "table." + variable
         try {
-            val `val` = ceInput[time][`var`]
+            val `val` = ceInput[time][_var]
             if (`val` != null)
                 return `val`
         } catch (e: IndexOutOfBoundsException) {
@@ -145,7 +143,7 @@ class CounterExampleAnalyzer(testTable: GeneralizedTestTable, private val messag
         }
 
         try {
-            return ceStates[time][`var`]
+            return ceStates[time][_var]
         } catch (e1: IndexOutOfBoundsException) {
         }
 
