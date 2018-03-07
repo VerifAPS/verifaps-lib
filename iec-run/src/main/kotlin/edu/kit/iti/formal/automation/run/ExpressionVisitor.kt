@@ -15,6 +15,7 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
+import jdk.nashorn.internal.ir.FunctionCall
 import org.stringtemplate.v4.misc.STRuntimeMessage
 import java.util.*
 
@@ -23,7 +24,8 @@ import java.util.*
  * ExpressionVisitor resolves variable values in [state] and declarations in [localScope]
  * ExpressionVisitor may modifies [state] indirectly through Runtime
  */
-class ExpressionVisitor(private val state : State, private val localScope : Scope) : DefaultVisitor<ExpressionValue>() {
+class ExpressionVisitor(private val state : State,
+                        private val localScope : Scope) : DefaultVisitor<ExpressionValue>() {
 
     override fun defaultVisit(visitable: Visitable?): ExpressionValue {
         TODO("missing visitor for visitable ${visitable.toString()}")
@@ -33,9 +35,7 @@ class ExpressionVisitor(private val state : State, private val localScope : Scop
         val structInitValues = structureInitialization.initValues.mapValues {
             (it.value as Visitable).accept<ExpressionValue>(ExpressionVisitor(state, localScope))
         }//.mapValues { RuntimeVariable(it.key) }
-
-        return StructValue(RecordType("anonymous"), structInitValues)
-
+        return StructValue(RecordType(), structInitValues)
     }
 
     private fun setMatchingArgToParam(parameters: List<ExpressionValue>, arguments: Map<String, VariableDeclaration>, state: State) {
@@ -52,32 +52,32 @@ class ExpressionVisitor(private val state : State, private val localScope : Scop
         println(state)
     }
 
-    override fun visit(functionCall: FunctionCall): ExpressionValue {
 
+    override fun visit(functionCall: Invocation): ExpressionValue {
         val innerState = TopState()
-        val functionDeclaration = localScope.globalScope.getFunction(functionCall.functionName)
+        val functionDeclaration = localScope.getFunction(functionCall.calleeName)
         val definitionScopeStack = Stack<Scope>()
-        functionDeclaration.setScope(localScope.globalScope)
+        //functionDeclaration.setScope(localScope)
 
-        definitionScopeStack.push(functionDeclaration.localScope)
+        definitionScopeStack.push(functionDeclaration.scope)
 
 
         val runtime = Runtime(innerState, definitionScopeStack)
 
-        runtime.initializeLocalVariables(functionDeclaration.localScope)
+        runtime.initializeLocalVariables(functionDeclaration.scope)
 
         val evaluatedParams = functionCall.parameters.map { (it as Visitable).accept<ExpressionValue>(this) }
-        setMatchingArgToParam(evaluatedParams, functionDeclaration.localScope.localVariables, innerState)
+        setMatchingArgToParam(evaluatedParams, functionDeclaration.scope.variables, innerState)
 
-        innerState[functionCall.functionName] = Optional.empty();
+        innerState[functionCall.calleeName] = Optional.empty();
 
-        functionDeclaration.statements.accept(runtime)
-        val returnValue = innerState[functionCall.functionName]
+        functionDeclaration.stBody.accept(runtime)
+        val returnValue = innerState[functionCall.calleeName]
 
         if (returnValue != null) {
-            return returnValue.orElseThrow { ExecutionException("Return value not set in function '${functionCall.functionName}' declaration") }
+            return returnValue.orElseThrow { ExecutionException("Return value not set in function '${functionCall.calleeName}' declaration") }
         }
-        throw ExecutionException("Return value not initialized in function ${functionCall.functionName}")
+        throw ExecutionException("Return value not initialized in function ${functionCall.calleeName}")
     }
 
     override fun visit(unaryExpression: UnaryExpression): ExpressionValue {
@@ -105,7 +105,7 @@ class ExpressionVisitor(private val state : State, private val localScope : Scop
         }
 
         val identifier = literal.dataTypeName
-        val resolvedDataType = localScope.globalScope.resolveDataType(identifier)
+        val resolvedDataType = localScope.resolveDataType(identifier)
         if (resolvedDataType is EnumerateType) {
             return Values.VAnyEnum(resolvedDataType, literal.textValue)
         }

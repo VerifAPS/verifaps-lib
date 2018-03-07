@@ -34,7 +34,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ReferenceType extends AnyReference {
-    Any of;
+    AnyDt of;
 
     /** {@inheritDoc} */
     @Override

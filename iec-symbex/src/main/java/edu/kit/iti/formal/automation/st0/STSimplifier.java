@@ -50,7 +50,7 @@ public class STSimplifier {
         transformations.add(TimerToCounter.getTransformation());
         transformations.add(new ArrayEmbedder());
         transformations.add(new StructEmbedding());
-        transformations.add(SFCResetReplacer.getTransformation());
+        //transformations.add(SFCResetReplacer.getTransformation());
         transformations.add(new RemoveActionsFromProgram());
     }
 

@@ -33,7 +33,7 @@ import java.util.List;
  * @author weigl
  * @version $Id: $Id
  */
-public abstract class AnyBit extends Any {
+public abstract class AnyBit extends AnyDt {
     /**
      * Constant <code>BOOL</code>
      */

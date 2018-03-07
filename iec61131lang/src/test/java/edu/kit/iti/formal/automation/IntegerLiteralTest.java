@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.TimeType;
 import edu.kit.iti.formal.automation.datatypes.values.TimeValue;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
@@ -45,11 +45,11 @@ public class IntegerLiteralTest {
     @Parameterized.Parameter(0)
     public String input;
     @Parameterized.Parameter(1)
-    public Any literalDataType;
+    public AnyDt literalDataType;
     @Parameterized.Parameter(2)
     public long value;
     @Parameterized.Parameter(3)
-    public Any valueDataType;
+    public AnyDt valueDataType;
     @Parameterized.Parameter(4)
     public boolean explicit;
 

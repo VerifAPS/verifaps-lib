@@ -211,7 +211,10 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(FunctionBlockDeclaration functionBlockDeclaration) {
         functionBlockDeclaration.getScope().accept(this);
+        if(functionBlockDeclaration.getStBody()!=null)
         functionBlockDeclaration.getStBody().accept(this);
+        if(functionBlockDeclaration.getSfcBody()!=null)
+            functionBlockDeclaration.getSfcBody().accept(this);
         return null;
     }
 

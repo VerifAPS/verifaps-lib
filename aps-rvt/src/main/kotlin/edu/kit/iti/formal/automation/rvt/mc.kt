@@ -62,7 +62,7 @@ class ProcessRunner(val commandLine: Array<String>,
     }
 }
 
-inline fun println(fmt: String, vararg obj: Any) {
+inline fun println(fmt: String, vararg obj: Any?) {
     System.out.format(fmt, *obj)
 }
 

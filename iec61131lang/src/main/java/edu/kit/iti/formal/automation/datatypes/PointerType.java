@@ -28,15 +28,15 @@ package edu.kit.iti.formal.automation.datatypes;
  * @author weigl
  * @version $Id: $Id
  */
-public class PointerType extends Any {
-    Any of;
+public class PointerType extends AnyDt {
+    AnyDt of;
 
     /**
      * <p>Constructor for PointerType.</p>
      *
-     * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public PointerType(Any dataType) {
+    public PointerType(AnyDt dataType) {
         of = dataType;
     }
 

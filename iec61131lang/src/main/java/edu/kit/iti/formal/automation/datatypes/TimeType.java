@@ -30,7 +30,7 @@ import edu.kit.iti.formal.automation.datatypes.values.TimeValue;
  * @author weigl
  * @version $Id: $Id
  */
-public class TimeType extends Any {
+public class TimeType extends AnyDt {
     /** Constant <code>TIME_TYPE</code> */
     public static final TimeType TIME_TYPE = new TimeType();
     public static final TimeType LTIME_TYPE = new TimeType();

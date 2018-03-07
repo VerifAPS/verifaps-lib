@@ -119,7 +119,7 @@ public class GlobalInstances extends STOOTransformation {
 
     @AllArgsConstructor
     private static class AddInstanceIDVisitor extends AstVisitor {
-        private final Any instanceIDType;
+        private final AnyDt instanceIDType;
 
         @Override
         public Object visit(ClassDeclaration clazz) {

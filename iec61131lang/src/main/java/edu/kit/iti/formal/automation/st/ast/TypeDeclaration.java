@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
@@ -38,10 +38,10 @@ import org.jetbrains.annotations.NotNull;
 @Data
 @NoArgsConstructor
 public abstract class TypeDeclaration<T extends Initialization> extends Top {
-    protected Any dataType;
+    protected AnyDt dataType;
     protected String typeName;
     protected String baseTypeName;
-    protected Any baseType;
+    protected AnyDt baseType;
     protected T initialization;
 
     /**
@@ -53,7 +53,7 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
         this.typeName = typeName;
     }
 
-    public TypeDeclaration(@NotNull Any dataType) {
+    public TypeDeclaration(@NotNull AnyDt dataType) {
         this(dataType.getName());
         this.dataType = dataType;
     }
@@ -75,9 +75,9 @@ public abstract class TypeDeclaration<T extends Initialization> extends Top {
      * <p>getDataType.</p>
      *
      * @param globalScope a {@link edu.kit.iti.formal.automation.scope.Scope} object.
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @return a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public Any getDataType(Scope globalScope) {
+    public AnyDt getDataType(Scope globalScope) {
         setBaseType(globalScope.resolveDataType(getBaseTypeName()));
         return getBaseType();
     }

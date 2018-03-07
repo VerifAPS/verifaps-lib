@@ -34,18 +34,18 @@ import java.util.List;
  * @author weigl
  * @version $Id: $Id
  */
-public class IECArray extends Any {
-    private final Any fieldType;
+public class IECArray extends AnyDt {
+    private final AnyDt fieldType;
     private List<Range> ranges = new ArrayList<>();
 
     /**
      * <p>Constructor for IECArray.</p>
      *
      * @param name a {@link java.lang.String} object.
-     * @param fieldType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param fieldType a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      * @param ranges a {@link java.util.List} object.
      */
-    public IECArray(String name, Any fieldType, List<Range> ranges) {
+    public IECArray(String name, AnyDt fieldType, List<Range> ranges) {
         this.name = name;
         this.fieldType = fieldType;
         this.ranges = ranges;
@@ -59,9 +59,9 @@ public class IECArray extends Any {
     /**
      * <p>Getter for the field <code>fieldType</code>.</p>
      *
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @return a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public Any getFieldType() {
+    public AnyDt getFieldType() {
         return fieldType;
     }
 

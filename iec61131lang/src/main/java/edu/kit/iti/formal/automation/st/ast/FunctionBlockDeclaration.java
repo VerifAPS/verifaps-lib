@@ -22,8 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import com.sun.activation.registries.MailcapParseException;
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.sfclang.ast.ActionDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.SFCImplementation;
 import edu.kit.iti.formal.automation.visitors.Visitor;
@@ -64,7 +63,7 @@ public class FunctionBlockDeclaration extends ClassDeclaration implements Invoca
         return getName();
     }
 
-    public Any getReturnType() {
+    public AnyDt getReturnType() {
         return null;  // no return value when invoking function blocks
     }
 

@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.VariableScope;
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.RecordType;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Utils;
@@ -65,7 +65,7 @@ public class StructureTypeDeclaration extends TypeDeclaration<StructureInitializ
      */
     @NotNull
     @Override
-    public Any getDataType(@NotNull Scope globalScope) {
+    public AnyDt getDataType(@NotNull Scope globalScope) {
         RecordType rt = new RecordType(getTypeName(), this);
         for (VariableDeclaration s : fields.values())
             rt.addField(s.getName(), s.getTypeDeclaration().getDataType(globalScope));

@@ -46,7 +46,7 @@ public class ResolveReferences extends AstVisitor {
         // Discover the reference's identified objects and data type and set them
         if (currentTopLevelScopeElement != null)
             try {
-                Any identifiedObjectDataType = null;
+                AnyDt identifiedObjectDataType = null;
                 Scope newScope = null;
                 TopLevelScopeElement newTopLevelScopeElement = null;
 

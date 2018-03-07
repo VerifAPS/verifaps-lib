@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.operators;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.AnyUnsignedInt;
 
 /**
@@ -33,15 +33,15 @@ import edu.kit.iti.formal.automation.datatypes.AnyUnsignedInt;
  */
 public class UnaryOperator implements Operator {
     private final String symbol;
-    private final Any validFor;
+    private final AnyDt validFor;
 
     /**
      * <p>Constructor for UnaryOperator.</p>
      *
      * @param symbol a {@link java.lang.String} object.
-     * @param any a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param any a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public UnaryOperator(String symbol, Any any) {
+    public UnaryOperator(String symbol, AnyDt any) {
         this.symbol = symbol;
         this.validFor = any;
         Operators.register(symbol, this);
@@ -55,15 +55,15 @@ public class UnaryOperator implements Operator {
 
     /** {@inheritDoc} */
     @Override
-    public Any[] getExpectedDataTypes() {
-        return new Any[]{validFor};
+    public AnyDt[] getExpectedDataTypes() {
+        return new AnyDt[]{validFor};
     }
 
-    public boolean isValid(Any a) {
+    public boolean isValid(AnyDt a) {
         return validFor.getClass().isAssignableFrom(a.getClass());
     }
 
-    public Any getPromotedType(Any a) {
+    public AnyDt getPromotedType(AnyDt a) {
         if (isValid(a)) {
             if (a instanceof AnyUnsignedInt) {
                 AnyUnsignedInt anyUnsignedInt = (AnyUnsignedInt) a;

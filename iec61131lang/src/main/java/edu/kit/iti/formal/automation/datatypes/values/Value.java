@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.datatypes.values;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -33,7 +33,7 @@ import lombok.NonNull;
  * @version $Id: $Id
  */
 @Data
-public abstract class Value<T extends Any, S> {
+public abstract class Value<T extends AnyDt, S> {
     @NonNull
     private final T dataType;
     @NonNull

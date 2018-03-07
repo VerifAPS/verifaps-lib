@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.scope;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.DataTypes;
 import edu.kit.iti.formal.automation.datatypes.promotion.DefaultTypePromoter;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
@@ -46,7 +46,7 @@ public class FunctionResolverMUX implements FunctionResolver {
     public FunctionDeclaration resolve(Invocation call, Scope scope) {
         if ("MUX".equals(call.getCalleeName())) {
 
-            List<Any> datatypes = call.getParameters().stream().map((parameter) -> {
+            List<AnyDt> datatypes = call.getParameters().stream().map((parameter) -> {
                 try {
                     return parameter.getExpression().dataType(scope);
                 } catch (VariableNotDefinedException variableNotDefinedinScope) {
@@ -67,7 +67,7 @@ public class FunctionResolverMUX implements FunctionResolver {
 
     public static class MUXFunctionDeclaration extends FunctionDeclaration {
 
-        public MUXFunctionDeclaration(List<Any> call) {
+        public MUXFunctionDeclaration(List<AnyDt> call) {
             super();
             CaseStatement stmt = new CaseStatement();
             returnType.setIdentifiedObject(call.get(1));

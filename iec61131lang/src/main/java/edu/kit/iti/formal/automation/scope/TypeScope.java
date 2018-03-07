@@ -37,7 +37,7 @@ import static edu.kit.iti.formal.automation.datatypes.IECString.STRING_8BIT;
  * @author weigl
  * @version $Id: $Id
  */
-public class TypeScope extends TreeMap<String, Any> {
+public class TypeScope extends TreeMap<String, AnyDt> {
 
     private TypeScope() {
     }
@@ -72,14 +72,14 @@ public class TypeScope extends TreeMap<String, Any> {
     /**
      * <p>register.</p>
      *
-     * @param any a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param any a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public void register(Any... any) {
-        for (Any a : any)
+    public void register(AnyDt... any) {
+        for (AnyDt a : any)
             put(a.getName(), a);
     }
 
-    public void register(String name, Any type) {
+    public void register(String name, AnyDt type) {
         put(name, type);
     }
 

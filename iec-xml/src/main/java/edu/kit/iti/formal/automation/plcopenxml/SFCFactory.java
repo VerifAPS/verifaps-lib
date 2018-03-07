@@ -28,6 +28,7 @@ import edu.kit.iti.formal.automation.parser.ErrorReporter;
 import edu.kit.iti.formal.automation.sfclang.ast.*;
 import edu.kit.iti.formal.automation.st.ast.Literal;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
 import org.jdom2.Attribute;
@@ -47,6 +48,8 @@ import java.util.stream.Collectors;
  * @version 1 (30.05.17)
  */
 public class SFCFactory implements Supplier<SFCImplementation> {
+    public static final String CODESYS_ON_ENTRY = "a6b08bd8-b696-47e3-9cbf-7408b61c9ff8";
+    public static final String CODESYS_ON_EXIT = "a2621e18-7de3-4ea6-ae6d-89e9e0b7befd";
     private static final String CODESYS_ON_STEP = "700a583f-b4d4-43e4-8c14-629c7cd3bec8";
     private static final XPathFactory xpf = XPathFactory.instance();
     private static final XPathExpression<Element> xpathFindRootStep;
@@ -167,7 +170,7 @@ public class SFCFactory implements Supplier<SFCImplementation> {
         traverse();
         translate();
 
-
+        // only simult. div/conv used, use the rest!
         ArrayList<Node> n = new ArrayList<>(nodes.values());
         n.removeAll(usedTransitions);
         for (Node node : n) {
@@ -178,7 +181,7 @@ public class SFCFactory implements Supplier<SFCImplementation> {
 
         n = new ArrayList<>(nodes.values());
         n.removeAll(usedTransitions);
-        System.out.println(n);
+        //System.out.printf("%s%n", n);
 
         sfc.getNetworks().add(network);
         return sfc;
@@ -251,7 +254,6 @@ public class SFCFactory implements Supplier<SFCImplementation> {
         return t;
     }
 
-    @Data
     @ToString(callSuper = true)
     public class Transition extends Node {
         public String conditions;
@@ -292,11 +294,11 @@ public class SFCFactory implements Supplier<SFCImplementation> {
 
 
         @Override
-        public List<PseudoTransition> getTransitions(boolean incoming) {
-            Set<Node> ref = incoming ? getIncoming() : getOutgoing();
+        public List<PseudoTransition> getTransitions(boolean incdirection) {
+            Set<Node> ref = incdirection? incoming:outgoing;
             if (ref.size() == 0)
                 System.err.println("Transition " + this + " does not have an incoming or outgoing connection");
-            return ref.stream().flatMap(s -> s.getTransitions(incoming).stream())
+            return ref.stream().flatMap(s -> s.getTransitions(incdirection).stream())
                     .map(pt -> {
                         pt.addGuard(conditions);
                         pt.usedNodes.add(this);
@@ -306,7 +308,7 @@ public class SFCFactory implements Supplier<SFCImplementation> {
         }
     }
 
-    @Data
+    @EqualsAndHashCode(of = "localId")
     @ToString(exclude = {"outgoing", "incoming"})
     public class Node implements Comparable<Step> {
         public Element entry;
@@ -342,7 +344,7 @@ public class SFCFactory implements Supplier<SFCImplementation> {
             while (!queue.isEmpty()) {
                 Node n = queue.remove();
                 if (n instanceof Step) {
-                    stepsFrom.add(n.getName());
+                    stepsFrom.add(n.name);
                 } else {
                     if (n instanceof JumpStep) {
                         stepsFrom.add(((JumpStep) n).jumpTo);
@@ -427,6 +429,9 @@ public class SFCFactory implements Supplier<SFCImplementation> {
         public Step(Element e) {
             super(e);
             onWhile = getVendorSpecificAttribute(e, CODESYS_ON_STEP);
+            onEntry = getVendorSpecificAttribute(e, CODESYS_ON_ENTRY);
+            onExit = getVendorSpecificAttribute(e, CODESYS_ON_EXIT);
+
             String initialStep = e.getAttributeValue("initialStep");
             initial = initialStep != null && Boolean.valueOf(initialStep);
             //TODO onExit = getVendorSpecificAttribute(e, CODESYS_ON_STEP);
@@ -435,13 +440,13 @@ public class SFCFactory implements Supplier<SFCImplementation> {
 
         @Override
         public List<PseudoTransition> getTransitions(boolean incoming) {
-            return Collections.singletonList(new PseudoTransition(getName(), this));
+            return Collections.singletonList(new PseudoTransition(name, this));
         }
 
         public SFCStep createSFCStep() {
             SFCStep ss = new SFCStep();
             ss.setInitial(initial);
-            ss.setName(getName());
+            ss.setName(name);
             parseActionBlock(localId, ss.getEvents());
 
             if (onWhile != null && !onWhile.isEmpty())
@@ -458,7 +463,6 @@ public class SFCFactory implements Supplier<SFCImplementation> {
     }
 
     @ToString(callSuper = true)
-
     public class Convergence extends Node {
         public boolean parallel;
 
@@ -472,13 +476,13 @@ public class SFCFactory implements Supplier<SFCImplementation> {
         }
 
         @Override
-        public List<PseudoTransition> getTransitions(boolean incoming) {
-            Set<Node> ref = incoming ? getIncoming() : getOutgoing();
+        public List<PseudoTransition> getTransitions(boolean inc) {
+            Set<Node> ref = inc ? incoming : outgoing;
             if (parallel) {
-                if (incoming) {
+                if (inc) {
                     PseudoTransition pt = new PseudoTransition(this);
                     for (Node n : ref) {
-                        for (PseudoTransition p : n.getTransitions(incoming)) {
+                        for (PseudoTransition p : n.getTransitions(inc)) {
                             pt.steps.addAll(p.steps);
                             pt.guards.addAll(p.guards);
                             pt.usedNodes.addAll(p.usedNodes);
@@ -488,8 +492,11 @@ public class SFCFactory implements Supplier<SFCImplementation> {
                 }
             }
             return ref.stream()
-                    .flatMap(n -> n.getTransitions(incoming).stream())
-                    .map(pt -> {pt.usedNodes.add(this); return pt;})
+                    .flatMap(n -> n.getTransitions(inc).stream())
+                    .map(pt -> {
+                        pt.usedNodes.add(this);
+                        return pt;
+                    })
                     .collect(Collectors.toList());
         }
 
@@ -532,12 +539,12 @@ public class SFCFactory implements Supplier<SFCImplementation> {
         }
 
         @Override
-        public List<PseudoTransition> getTransitions(boolean incoming) {
-            Set<Node> ref = incoming ? getIncoming() : getOutgoing();
-            if (parallel && !incoming) {
+        public List<PseudoTransition> getTransitions(boolean incdirection) {
+            Set<Node> ref = incdirection ? incoming : outgoing;
+            if (parallel && !incdirection) {
                 PseudoTransition pt = new PseudoTransition(this);
                 for (Node n : ref) {
-                    for (PseudoTransition p : n.getTransitions(incoming)) {
+                    for (PseudoTransition p : n.getTransitions(incdirection)) {
                         pt.steps.addAll(p.steps);
                         pt.guards.addAll(p.guards);
                     }
@@ -545,8 +552,11 @@ public class SFCFactory implements Supplier<SFCImplementation> {
                 return Collections.singletonList(pt);
             }
             return ref.stream()
-                    .flatMap(n -> n.getTransitions(incoming).stream())
-                    .map(pt -> {pt.usedNodes.add(this); return pt;})
+                    .flatMap(n -> n.getTransitions(incdirection).stream())
+                    .map(pt -> {
+                        pt.usedNodes.add(this);
+                        return pt;
+                    })
                     .collect(Collectors.toList());
         }
 

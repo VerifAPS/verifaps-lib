@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.datatypes.promotion;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 
 /**
  * Created by weigl on 24.11.16.
@@ -36,7 +36,7 @@ public class SelfPromotion implements TypePromotion {
 
     /** {@inheritDoc} */
     @Override
-    public Any getPromotion(Any a, Any b) {
+    public AnyDt getPromotion(AnyDt a, AnyDt b) {
         if (a.equals(b))
             return a;
         else

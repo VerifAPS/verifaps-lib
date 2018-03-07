@@ -9,7 +9,7 @@ return a map of assignments. Each call to `executeCode(topState)` represents one
 You can execute multiple cycles by calling `executeCode`` multiple times, passing in the same `topState`.
 
 ```kotlin
-typealias ExpressionValue = Value<out Any, out kotlin.Any>
+typealias ExpressionValue = Value<out AnyDt, out kotlin.AnyDt>
 // TopState has basically this type:
 typealias TopState = HashMap<String, Optional<ExpressionValue>>
 

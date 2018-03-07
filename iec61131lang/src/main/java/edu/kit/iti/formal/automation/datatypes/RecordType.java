@@ -41,7 +41,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecordType extends Any {
+public class RecordType extends AnyDt {
     private String name;
     @NotNull
     private List<Field> fields = new ArrayList<>();
@@ -73,9 +73,9 @@ public class RecordType extends Any {
      * <p>addField.</p>
      *
      * @param name a {@link java.lang.String} object.
-     * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public void addField(@NotNull String name, @NotNull Any dataType) {
+    public void addField(@NotNull String name, @NotNull AnyDt dataType) {
         fields.add(new Field(name, dataType));
     }
 
@@ -96,10 +96,10 @@ public class RecordType extends Any {
 
     public class Field {
         private String name;
-        private Any dataType;
+        private AnyDt dataType;
         private Object defValue;
 
-        public Field(@NotNull String name, @NotNull Any dataType) {
+        public Field(@NotNull String name, @NotNull AnyDt dataType) {
             this.name = name;
             this.dataType = dataType;
         }
@@ -112,11 +112,11 @@ public class RecordType extends Any {
             this.name = name;
         }
 
-        public Any getDataType() {
+        public AnyDt getDataType() {
             return dataType;
         }
 
-        public void setDataType(@NotNull Any dataType) {
+        public void setDataType(@NotNull AnyDt dataType) {
             this.dataType = dataType;
         }
 

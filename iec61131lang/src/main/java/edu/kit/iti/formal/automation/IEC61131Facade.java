@@ -37,8 +37,8 @@ import lombok.val;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.misc.Interval;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,11 +87,23 @@ public class IEC61131Facade {
      * @param ast a {@link edu.kit.iti.formal.automation.st.ast.Top} object.
      * @return a {@link java.lang.String} object.
      */
-    public static String print(Top ast) {
+    public static String print(Top ast, boolean comments) {
         StructuredTextPrinter stp = new StructuredTextPrinter();
-        //stp.setPrintComments(true);
+        stp.setPrintComments(comments);
         ast.accept(stp);
         return stp.getString();
+    }
+
+    public static String print(StatementList statements) {
+        StructuredTextPrinter stp = new StructuredTextPrinter();
+        statements.accept(stp);
+        return stp.getString();
+    }
+
+
+    @Nullable
+    public static String print(@Nullable Top top) {
+        return print(top, false);
     }
 
     /**
@@ -232,4 +244,5 @@ public class IEC61131Facade {
     public static IEC61131Parser getParser(String s) {
         return getParser(CharStreams.fromString(s));
     }
+
 }

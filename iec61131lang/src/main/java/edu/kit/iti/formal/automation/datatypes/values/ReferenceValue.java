@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.datatypes.values;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.scope.Scope;
@@ -40,7 +40,7 @@ public class ReferenceValue extends Initialization {
      * {@inheritDoc}
      */
     @Override
-    public Any dataType(Scope localScope) throws VariableNotDefinedException, TypeConformityException {
+    public AnyDt dataType(Scope localScope) throws VariableNotDefinedException, TypeConformityException {
         return null;
     }
 

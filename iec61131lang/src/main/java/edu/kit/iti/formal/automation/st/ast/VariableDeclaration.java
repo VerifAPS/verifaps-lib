@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import com.google.common.collect.ImmutableMap;
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.Identifiable;
@@ -100,12 +100,12 @@ public class VariableDeclaration extends Top
      * Set of effective data types the values of the variable can assume. Populated in static analysis.
      */
     @Deprecated // does not belong here
-    private final Set<Any> effectiveDataTypes = new HashSet<>();
+    private final Set<AnyDt> effectiveDataTypes = new HashSet<>();
     private String name;
 
     @Getter
     @Setter
-    private Any dataType;
+    private AnyDt dataType;
 
     private int type;
 
@@ -140,9 +140,9 @@ public class VariableDeclaration extends Top
      * <p>Constructor for VariableDeclaration.</p>
      *
      * @param name     a {@link java.lang.String} object.
-     * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public VariableDeclaration(@NotNull String name, @NotNull Any dataType) {
+    public VariableDeclaration(@NotNull String name, @NotNull AnyDt dataType) {
         this(name, new SimpleTypeDeclaration(dataType));
         this.dataType = dataType;
     }
@@ -176,9 +176,9 @@ public class VariableDeclaration extends Top
      *
      * @param name  a {@link java.lang.String} object.
      * @param flags a int.
-     * @param dt    a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param dt    a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public VariableDeclaration(@NotNull String name, int flags, @NotNull Any dt) {
+    public VariableDeclaration(@NotNull String name, int flags, @NotNull AnyDt dt) {
         this(name, dt);
         setType(flags);
     }
@@ -406,11 +406,11 @@ public class VariableDeclaration extends Top
         instances.add(instance);
     }
 
-    public void addEffectiveDataType(@NotNull Any dataType) {
+    public void addEffectiveDataType(@NotNull AnyDt dataType) {
         effectiveDataTypes.add(dataType);
     }
 
-    public boolean hasEffectiveDataType(@NotNull Any dataType) {
+    public boolean hasEffectiveDataType(@NotNull AnyDt dataType) {
         return effectiveDataTypes.contains(dataType);
     }
 

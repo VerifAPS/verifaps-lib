@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.modularization.transform;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.AnyBit;
 import edu.kit.iti.formal.automation.datatypes.DataTypes;
 import edu.kit.iti.formal.automation.modularization.StatementListModifier;
@@ -62,7 +62,7 @@ public class TimerToCounter extends StatementListModifier {
     }
 
     private Literal _createLiteral(
-            final Any type,
+            final AnyDt type,
             final String value) {
 
         final Literal literal = new Literal(type, value);

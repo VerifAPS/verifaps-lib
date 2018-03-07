@@ -93,4 +93,8 @@ public class CommentStatement extends Statement {
                 + "\n " + line;
         return new CommentStatement(s);
     }
+
+    public static Statement single(String fmt, Object... args) {
+        return new CommentStatement(fmt, args);
+    }
 }

@@ -25,10 +25,7 @@ package edu.kit.iti.formal.automation.sfclang.ast;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.st.ast.Top;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +38,7 @@ import java.util.stream.Collectors;
  * @version $Id: $Id
  */
 @Data
+@ToString(exclude = {"incoming", "outgoing"})
 @EqualsAndHashCode(exclude = {"incoming", "outgoing"})
 @NoArgsConstructor
 @AllArgsConstructor

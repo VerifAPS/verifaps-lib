@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.run
 
+import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType
 import edu.kit.iti.formal.automation.datatypes.RecordType
 import edu.kit.iti.formal.automation.run.stexceptions.ExecutionException
@@ -50,20 +51,19 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<Scope> 
     }
 
     override fun visit(programDeclaration: ProgramDeclaration) {
-        val localScope = programDeclaration.localScope
+        val localScope = programDeclaration.scope
         definitionScopeStack.push(localScope)
-        typeDeclarationAdder.addQueuedDeclarations(localScope.globalScope)
+        typeDeclarationAdder.addQueuedDeclarations(localScope)
         initializeLocalVariables(localScope)
-
         return programDeclaration!!.stBody.accept(this)
     }
 
-    override fun visit(fbc: FunctionBlockCallStatement) {
+    override fun visit(fbc: InvocationStatement) {
         val innerState = TopState()
-        val fbName = fbc.functionBlockName
+        val fbName = fbc.calleeName
         val fbTypeName = peekScope().getVariable(fbName).typeDeclaration.baseTypeName
-        val fbDataType = peekScope().globalScope.resolveDataType(fbTypeName);
-        val fb = peekScope().globalScope.getFunctionBlock(fbTypeName)
+        val fbDataType = peekScope().resolveDataType(fbTypeName);
+        val fb = peekScope().getFunctionBlock(fbTypeName)
 
         val fbPrevValue = state[fbName]!!.orElseThrow { ExecutionException("not initialized") }.value
         if (fbPrevValue is HashMap<*, *>) {
@@ -80,7 +80,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<Scope> 
 
 
         val innerScope = Stack<Scope>()
-        innerScope.push(peekScope().globalScope.getFunctionBlock(fbTypeName).localScope);
+        innerScope.push(peekScope().getFunctionBlock(fbTypeName).scope);
 
         fb.stBody.accept(Runtime(innerState, innerScope))
 
@@ -150,9 +150,9 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<Scope> 
             is FunctionBlockDataType -> {
                 val innerState = TopState()
                 val innerStack = Stack<Scope>()
-                innerStack.push((dataType.dataType as FunctionBlockDataType).functionBlock.localScope)
+                innerStack.push((dataType.dataType as FunctionBlockDataType).functionBlock.scope)
                 val innerRuntime = Runtime(innerState, innerStack)
-                innerRuntime.initializeLocalVariables((dataType.dataType as FunctionBlockDataType).functionBlock.localScope);
+                innerRuntime.initializeLocalVariables((dataType.dataType as FunctionBlockDataType).functionBlock.scope);
 
                 val structValue = mutableMapOf<String, ExpressionValue>()
                 innerState.forEach {
@@ -169,7 +169,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<Scope> 
 
 
     public fun initializeLocalVariables(localScope: Scope) {
-        val localVariables: Map<out String, VariableDeclaration> = localScope.localVariables
+        val localVariables: Map<out String, VariableDeclaration> = localScope.variables
         localVariables.map {
             val stateVal = state[it.key]
             if (stateVal != null && stateVal.isPresent) {
@@ -208,7 +208,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<Scope> 
     override fun visit(ifStatement: IfStatement) {
         val chosenGuardedStatement = chooseGuardedStatement(ifStatement)
         if (chosenGuardedStatement != null) {
-            chosenGuardedStatement.accept<Any>(this) // will run visit(GuardedStatement)
+            chosenGuardedStatement.accept<AnyDt>(this) // will run visit(GuardedStatement)
             return
         }
         val elseBranch = ifStatement.elseBranch
@@ -222,7 +222,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<Scope> 
     override fun visit(statements: StatementList?) {
         statements!!.forEach {
             logger.debug { "Executing statement $it" }
-            it.accept<Any>(this)
+            it.accept<AnyDt>(this)
         }
     }
 
@@ -233,7 +233,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<Scope> 
         val identifier = (assignmentStatement.location as SymbolicReference).identifier
         var current = state[identifier]
         if (sub != null) {
-            val subIdentifier = sub.accept<Any>(object : DefaultVisitor<String>() {
+            val subIdentifier = sub.accept<AnyDt>(object : DefaultVisitor<String>() {
                 override fun visit(symbolicReference: SymbolicReference):String {
                     return symbolicReference.identifier
                 }

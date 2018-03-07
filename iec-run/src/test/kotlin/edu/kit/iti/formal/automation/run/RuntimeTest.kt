@@ -41,7 +41,7 @@ class RuntimeTest {
     fun testIfStatement() {
         val ast = getAst(this.javaClass.getResource("runtimeTest.testIfStatement.st"))
         val topState = TopState()
-        ast.accept<Any>(Runtime(topState))
+        ast.accept<AnyDt>(Runtime(topState))
         assertEquals(arrayListOf(
                 "number" to Optional.of(300),
                 "n2" to Optional.of(4),
@@ -53,7 +53,7 @@ class RuntimeTest {
     fun testVariableReference() {
         val ast = getAst(this.javaClass.getResource("runtimeTest.testVariableReference.st"))
         val topState = TopState()
-        ast.accept<Any>(Runtime(topState))
+        ast.accept<AnyDt>(Runtime(topState))
         print("result of execution: $topState")
         assertEquals(
                 HashSet(listOf(
@@ -79,7 +79,7 @@ class RuntimeTest {
     fun advancedTest() {
         val ast = getAst(this.javaClass.getResource("runtimeTest.advancedTest.st"))
         val topState = TopState()
-        ast.accept<Any>(Runtime(topState))
+        ast.accept<AnyDt>(Runtime(topState))
         println("final state:")
         topState.forEach {
             println(it)
@@ -141,7 +141,7 @@ class RuntimeTest {
     fun forLoopTest() {
         val ast = getAst(this.javaClass.getResource("runtimeTest.forLoopTest.st"))
         val topState = TopState()
-        ast.accept<Any>(Runtime(topState))
+        ast.accept<AnyDt>(Runtime(topState))
         println("final state:")
         topState.forEach {
             println(it)
@@ -153,7 +153,7 @@ class RuntimeTest {
     fun whileLoopTest() {
         val ast = getAst(this.javaClass.getResource("runtimeTest.whileLoopTest.st"))
         val topState = TopState()
-        ast.accept<Any>(Runtime(topState))
+        ast.accept<AnyDt>(Runtime(topState))
         println("final state:")
         topState.forEach {
             println(it)
@@ -166,7 +166,7 @@ class RuntimeTest {
     fun repeatLoopTest() {
         val ast = getAst(this.javaClass.getResource("runtimeTest.repeatLoopTest.st"))
         val topState = TopState()
-        ast.accept<Any>(Runtime(topState))
+        ast.accept<AnyDt>(Runtime(topState))
         println("final state:")
         topState.forEach {
             println(it)
@@ -181,7 +181,7 @@ class RuntimeTest {
         val topState = TopState()
         IEC61131Facade.resolveDataTypes(ast)
         val runtime = Runtime(topState)
-        ast.accept<Any>(runtime)
+        ast.accept<AnyDt>(runtime)
         println("final state:")
 
         topState.forEach {
@@ -208,7 +208,7 @@ class RuntimeTest {
         val ast = getAst(this.javaClass.getResource("runtimeTest.functionTest.st"))
         val topState = TopState()
         val runtime = Runtime(topState, Stack())
-        ast.accept<Any>(runtime)
+        ast.accept<AnyDt>(runtime)
         println("final state:")
 
         assertEquals(BigInteger.valueOf(-162), topState["Var1"]!!.get().value)

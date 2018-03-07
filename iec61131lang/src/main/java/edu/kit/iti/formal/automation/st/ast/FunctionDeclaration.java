@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
@@ -42,7 +42,7 @@ import lombok.*;
 @Setter
 public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Function_declarationContext>
         implements Invocable, Identifiable {
-    protected IdentifierPlaceHolder<Any> returnType = new IdentifierPlaceHolder<>();
+    protected IdentifierPlaceHolder<AnyDt> returnType = new IdentifierPlaceHolder<>();
     protected String name;
     protected StatementList stBody = new StatementList();
 
@@ -54,11 +54,11 @@ public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Fun
         returnType.setIdentifier(rt);
     }
 
-    public Any getReturnType() {
+    public AnyDt getReturnType() {
         return returnType.getIdentifiedObject();
     }
 
-    public void setReturnType(Any rt) {
+    public void setReturnType(AnyDt rt) {
         returnType.setIdentifiedObject(rt);
     }
 

@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.operators;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.AnyBit;
 import edu.kit.iti.formal.automation.datatypes.promotion.TypePromotion;
 
@@ -39,7 +39,7 @@ public class BooleanPromoter implements TypePromotion {
      * {@inheritDoc}
      */
     @Override
-    public Any getPromotion(Any a, Any b) {
+    public AnyDt getPromotion(AnyDt a, AnyDt b) {
         return AnyBit.BOOL;
     }
 }

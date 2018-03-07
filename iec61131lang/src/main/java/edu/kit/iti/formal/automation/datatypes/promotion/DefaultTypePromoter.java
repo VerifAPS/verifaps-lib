@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.datatypes.promotion;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -49,9 +49,9 @@ public class DefaultTypePromoter implements TypePromotion, Serializable {
 
     /** {@inheritDoc} */
     @Override
-    public Any getPromotion(Any a, Any b) {
+    public AnyDt getPromotion(AnyDt a, AnyDt b) {
         for (TypePromotion tp : promoters) {
-            Any c = tp.getPromotion(a, b);
+            AnyDt c = tp.getPromotion(a, b);
             if (c != null) return c;
         }
         return null;

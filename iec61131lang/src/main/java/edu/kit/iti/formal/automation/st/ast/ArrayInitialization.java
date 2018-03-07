@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.scope.Scope;
@@ -314,7 +314,7 @@ public class ArrayInitialization extends Initialization
      * {@inheritDoc}
      */
     @Override
-    public Any dataType(Scope localScope)
+    public AnyDt dataType(Scope localScope)
             throws VariableNotDefinedException, TypeConformityException {
         //TODO
         return null;

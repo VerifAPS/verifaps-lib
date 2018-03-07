@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
@@ -96,7 +96,7 @@ public class IdentifierInitializer extends Initialization {
 
     /** {@inheritDoc} */
     @Override
-    public Any dataType(Scope localScope) throws VariableNotDefinedException, TypeConformityException {
+    public AnyDt dataType(Scope localScope) throws VariableNotDefinedException, TypeConformityException {
         return enumType;
     }
 

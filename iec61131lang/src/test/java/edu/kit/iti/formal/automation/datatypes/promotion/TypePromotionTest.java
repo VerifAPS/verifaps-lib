@@ -147,7 +147,7 @@ public class TypePromotionTest {
         //assertDataType(INT, "MAX(2,3)", null);
     }
 
-    private void assertDataType(Any dt, String sexpr, Scope vd) throws VariableNotDefinedException, TypeConformityException {
+    private void assertDataType(AnyDt dt, String sexpr, Scope vd) throws VariableNotDefinedException, TypeConformityException {
         assertEquals(dt, IEC61131Facade.expr(sexpr).dataType(vd));
     }
 

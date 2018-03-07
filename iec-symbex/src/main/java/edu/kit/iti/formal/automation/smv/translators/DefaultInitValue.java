@@ -41,7 +41,7 @@ public class DefaultInitValue implements InitValueTranslator {
     private static final DataTypeVisitor<Value> VISITOR = new InitValueVisitor();
 
     @Nonnull
-    public Value getInit(@Nonnull Any type) {
+    public Value getInit(@Nonnull AnyDt type) {
         return type.accept(VISITOR);
     }
 

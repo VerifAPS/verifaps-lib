@@ -30,6 +30,7 @@
         <module>iec-run</module>
         <module>iec-modularization</module>
         <module>aps-rvt</module>
+        <module>frontend</module>
     </modules>
 
     <properties>

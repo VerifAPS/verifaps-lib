@@ -28,7 +28,7 @@ import lombok.Data;
  * @author Augusto Modanese
  */
 @Data
-public class AnyReference extends Any {
+public class AnyReference extends AnyDt {
     public static final AnyReference ANY_REF = new AnyReference();
 
     @Override

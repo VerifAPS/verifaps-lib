@@ -45,7 +45,10 @@ import org.antlr.v4.runtime.Token;
 @EqualsAndHashCode(exclude = {"token"})
 @NoArgsConstructor
 public class Literal extends Initialization {
-    private final IdentifierPlaceHolder<Any> dataType = new IdentifierPlaceHolder<>();
+    public static final Literal FALSE = new Literal(AnyBit.BOOL, "FALSE");
+    public static final Literal TRUE = new Literal(AnyBit.BOOL, "TRUE");
+
+    private final IdentifierPlaceHolder<AnyDt> dataType = new IdentifierPlaceHolder<>();
     private boolean dataTypeExplicit;
     private Token token;
     // for integers only
@@ -54,20 +57,22 @@ public class Literal extends Initialization {
     public Literal(String dataTypeName, Token symbol) {
         token = symbol;
         dataType.setIdentifier(dataTypeName);
+        assert dataTypeName != null;
     }
 
 
     public Literal(String dataTypeName, String symbol) {
         token = new CommonToken(-1, symbol);
         dataType.setIdentifier(dataTypeName);
+        assert dataTypeName != null;
     }
 
-    public Literal(Any dataType, String symbol) {
+    public Literal(AnyDt dataType, String symbol) {
         token = new CommonToken(-1, symbol);
         this.dataType.setIdentifiedObject(dataType);
     }
 
-    public Literal(Any dataType, Token symbol) {
+    public Literal(AnyDt dataType, Token symbol) {
         token = symbol;
         this.dataType.setIdentifiedObject(dataType);
     }
@@ -170,11 +175,11 @@ public class Literal extends Initialization {
         return s.value().orElse(null);
     }
 
-    public Any getDataType() {
+    public AnyDt getDataType() {
         return dataType.getIdentifiedObject();
     }
 
-    public void setDataType(Any dataType) {
+    public void setDataType(AnyDt dataType) {
         this.dataType.setIdentifiedObject(dataType);
     }
 
@@ -187,7 +192,7 @@ public class Literal extends Initialization {
     }
 
     @Override
-    public Any dataType(Scope localScope) throws VariableNotDefinedException, TypeConformityException {
+    public AnyDt dataType(Scope localScope) throws VariableNotDefinedException, TypeConformityException {
         return dataType.getIdentifiedObject();
     }
 
@@ -202,7 +207,7 @@ public class Literal extends Initialization {
 
     private Value asValue(DataTypeVisitor<Value> transformer) {
         if (dataType.getIdentifiedObject() == null) {
-            throw new IllegalStateException("no identified data type");
+            throw new IllegalStateException("no identified data type. given data type name" + dataType.getIdentifier());
         }
         return dataType.getIdentifiedObject().accept(transformer);
     }
@@ -212,6 +217,7 @@ public class Literal extends Initialization {
         Literal l = new Literal(getDataTypeName(), getToken());
         l.dataTypeExplicit = dataTypeExplicit;
         l.signed = signed;
+        l.dataType.setIdentifier(dataType.getIdentifier());
         l.dataType.setIdentifiedObject(dataType.getIdentifiedObject());
         return l;
     }

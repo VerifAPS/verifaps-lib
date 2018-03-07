@@ -91,7 +91,7 @@ public class FunctionBlockEmbedder extends AstMutableVisitor {
             ));
         });
 
-        sl.add(CommentStatement.box("Call of %s:%s", instanceName, fbc.getCalleeName()));
+        sl.add(CommentStatement.single("Call of %s:%s", instanceName, fbc.getCalleeName()));
         if (call.getSub() == null) {//insert main statement block
             sl.addAll(this.toEmbedd);
         } else {
@@ -99,7 +99,7 @@ public class FunctionBlockEmbedder extends AstMutableVisitor {
             if (actions.containsKey(actionName)) {
                 sl.addAll(actions.get(actionName));
             } else {
-                sl.add(CommentStatement.box("//ERROR: COULD NOT FIND ACTION %s.%s",
+                sl.add(CommentStatement.single("//ERROR: COULD NOT FIND ACTION %s.%s",
                         instanceName, actionName));
             }
         }
@@ -113,7 +113,7 @@ public class FunctionBlockEmbedder extends AstMutableVisitor {
             );
             sl.add(assign);
         });
-        sl.add(CommentStatement.box("End of call"));
+        sl.add(CommentStatement.single("End of call"));
         return sl;
     }
 

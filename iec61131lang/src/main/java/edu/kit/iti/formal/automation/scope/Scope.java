@@ -223,9 +223,9 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
      * <p>resolveDataType.</p>
      *
      * @param name a {@link java.lang.String} object.
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @return a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public Any resolveDataType(String name) {
+    public AnyDt resolveDataType(String name) {
         if (types.containsKey(name))
             return types.get(name);
 
@@ -238,7 +238,7 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
             System.err.println("Ambguity in Name Resolution for: " + name);
         }
 
-        Any q;
+        AnyDt q;
         if (a) {
             q = new FunctionBlockDataType(fb.get(name));
             types.put(name, q);

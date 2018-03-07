@@ -28,9 +28,9 @@ package edu.kit.iti.formal.automation.datatypes;
  * @author weigl
  * @version $Id: $Id
  */
-public class AnyNum extends Any {
+public class AnyNum extends AnyDt {
     /** Constant <code>ANY_NUM</code> */
-    public static final Any ANY_NUM = new AnyNum();
+    public static final AnyDt ANY_NUM = new AnyNum();
 
     /** {@inheritDoc} */
     @Override

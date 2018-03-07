@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.analysis;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.scope.Scope;
@@ -47,7 +47,7 @@ public class ResolveDataTypes extends AstVisitor<Object> {
         this.globalScope = globalScope;
     }
 
-    private Any resolve(String name) {
+    private AnyDt resolve(String name) {
         return localScope.resolveDataType(name);
     }
 
@@ -143,7 +143,7 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     public Object visit(SymbolicReference ref) {
         String first = ref.getIdentifier();
         try {
-            Any dataType = localScope.resolveDataType(first);
+            AnyDt dataType = localScope.resolveDataType(first);
             EnumerateType et = (EnumerateType) dataType;
             String second = ((SymbolicReference) ref.getSub()).getIdentifier();
         } catch (ClassCastException | DataTypeNotDefinedException e) {

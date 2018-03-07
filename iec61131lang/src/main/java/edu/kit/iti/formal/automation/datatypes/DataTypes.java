@@ -65,7 +65,7 @@ public class DataTypes {
             return true;
         }
     };
-    public static final Any VOID = new Any("VOID") {
+    public static final AnyDt VOID = new AnyDt("VOID") {
         @Override
         public String repr(Object obj) {
             return "void";
@@ -76,7 +76,7 @@ public class DataTypes {
             return null;
         }
     };
-    static HashMap<String, Any> map = new HashMap<>();
+    static HashMap<String, AnyDt> map = new HashMap<>();
 
     static {
         add(AnyBit.BOOL);
@@ -113,7 +113,7 @@ public class DataTypes {
         map.put("VOID", AnyReference.ANY_REF);
     }
 
-    static void add(Any any) {
+    static void add(AnyDt any) {
         map.put(any.getName(), any);
         map.put(any.getName().replace("_", ""), any);
     }
@@ -122,9 +122,9 @@ public class DataTypes {
      * <p>getDataType.</p>
      *
      * @param name a {@link java.lang.String} object.
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @return a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public static Any getDataType(String name) {
+    public static AnyDt getDataType(String name) {
         return map.get(name);
     }
 
@@ -155,7 +155,7 @@ public class DataTypes {
         return getIntegers(AnyUnsignedInt.class);
     }
 
-    private static <T extends Any> List<? extends T> get(Class<T> anyClazz) {
+    private static <T extends AnyDt> List<? extends T> get(Class<T> anyClazz) {
         return (List<? extends T>) map.values().stream().filter(
                 a -> anyClazz.isAssignableFrom(a.getClass()))
                 .collect(Collectors.toList());

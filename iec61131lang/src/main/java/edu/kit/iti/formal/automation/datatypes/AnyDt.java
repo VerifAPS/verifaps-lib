@@ -30,7 +30,7 @@ import edu.kit.iti.formal.automation.st.Identifiable;
  * @author weigl
  * @version $Id: $Id
  */
-public abstract class Any implements Identifiable {
+public abstract class AnyDt implements Identifiable {
     protected String name = "any";
 
     @Override
@@ -39,18 +39,18 @@ public abstract class Any implements Identifiable {
     }
 
     /**
-     * <p>Constructor for Any.</p>
+     * <p>Constructor for AnyDt.</p>
      */
-    protected Any() {
+    protected AnyDt() {
         name = getClass().getSimpleName().toUpperCase();
     }
 
     /**
-     * <p>Constructor for Any.</p>
+     * <p>Constructor for AnyDt.</p>
      *
      * @param name a {@link java.lang.String} object.
      */
-    protected Any(String name) {
+    protected AnyDt(String name) {
         this.name = name;
     }
 

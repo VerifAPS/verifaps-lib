@@ -31,7 +31,7 @@ import java.util.List;
  * @author weigl
  * @version $Id: $Id
  */
-public class EnumerateType extends Any {
+public class EnumerateType extends AnyDt {
     private String name;
     private List<String> allowedValues = new ArrayList<>();
     private String defValue;
@@ -144,5 +144,10 @@ public class EnumerateType extends Any {
 
     public boolean isAllowedValue(String value) {
         return allowedValues.contains(value);
+    }
+
+    @Override
+    public String getIdentifier() {
+        return name;
     }
 }

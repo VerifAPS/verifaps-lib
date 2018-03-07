@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.datatypes.promotion;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 
 /**
  * Created by weigl on 24.11.16.
@@ -34,9 +34,9 @@ public interface TypePromotion {
     /**
      * <p>getPromotion.</p>
      *
-     * @param a a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     * @param b a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param a a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
+     * @param b a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
+     * @return a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    Any getPromotion(Any a, Any b);
+    AnyDt getPromotion(AnyDt a, AnyDt b);
 }

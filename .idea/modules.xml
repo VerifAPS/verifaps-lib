@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/aps-rvt/aps-rvt.iml" filepath="$PROJECT_DIR$/aps-rvt/aps-rvt.iml" />
+      <module fileurl="file://$PROJECT_DIR$/frontend/frontend.iml" filepath="$PROJECT_DIR$/frontend/frontend.iml" />
       <module fileurl="file://$PROJECT_DIR$/iec-modularization/iec-modularization.iml" filepath="$PROJECT_DIR$/iec-modularization/iec-modularization.iml" />
       <module fileurl="file://$PROJECT_DIR$/iec-run/iec-run.iml" filepath="$PROJECT_DIR$/iec-run/iec-run.iml" />
       <module fileurl="file://$PROJECT_DIR$/iec-symbex/iec-symbex.iml" filepath="$PROJECT_DIR$/iec-symbex/iec-symbex.iml" />

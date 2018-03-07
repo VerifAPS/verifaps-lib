@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.sfclang.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.st.ast.Top;
 import edu.kit.iti.formal.automation.visitors.Visitor;
@@ -54,5 +55,9 @@ public class SFCNetwork extends Top<IEC61131Parser.Sfc_networkContext> {
 
     public Optional<SFCStep> getStep(String text) {
         return steps.stream().filter(s -> s.getName().equalsIgnoreCase(text)).findAny();
+    }
+
+    public SFCStep getInitialStep() {
+        return steps.stream().filter(SFCStep::isInitial).findFirst().orElse(null);
     }
 }

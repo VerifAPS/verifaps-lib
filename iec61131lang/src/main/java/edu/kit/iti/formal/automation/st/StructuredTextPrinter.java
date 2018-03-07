@@ -34,6 +34,8 @@ import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.CodeWriter;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
+import lombok.Getter;
+import lombok.Setter;
 import org.antlr.v4.runtime.Token;
 
 import java.util.ArrayList;
@@ -83,7 +85,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
         /*
         @Override
-        public String repr(ScalarValue<? extends Any, ?> sv) {
+        public String repr(ScalarValue<? extends AnyDt, ?> sv) {
             if (sv.getDataType() instanceof AnyUnsignedInt) {
                 AnyInt dataType = (AnyInt) sv.getDataType();
                 return String.format("0ud%d_%d", 13, sv.getValue());
@@ -105,6 +107,11 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     };
     private final StringLiterals literals;
     public CodeWriter sb = new CodeWriter();
+    @Getter
+    @Setter
+    private BodyPrinting bodyPrinting = BodyPrinting.ST;
+    @Getter
+    @Setter
     private boolean printComments;
 
     /**
@@ -380,19 +387,6 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
-
-
-    /*
-     * TODO to new ast visitor
-     *
-     * @Override public Object accept(CaseExpression caseExpression) {
-     * sb.append("CASES(").increaseIndent(); for (CaseExpression.Case cas :
-     * caseExpression.getCases()) { cas.getCondition().accept(this); sb.append(
-     * " -> "); cas.getExpression().accept(this); sb.append(";").nl(); }
-     * sb.append("ELSE -> "); caseExpression.getElseExpression().accept(this);
-     * sb.append(")").decreaseIndent(); return null; }
-     */
-
     /**
      * {@inheritDoc}
      */
@@ -408,14 +402,24 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
             sb.nl();
         }
 
-        if (pd.getStBody() != null)
-            pd.getStBody().accept(this);
-        if (pd.getSfcBody() != null)
-            pd.getSfcBody().accept(this);
+        printBody(pd.getStBody(), pd.getSfcBody());
 
         sb.decreaseIndent().nl().append("END_PROGRAM").nl();
         return null;
     }
+
+
+
+    /*
+     * TODO to new ast visitor
+     *
+     * @Override public Object accept(CaseExpression caseExpression) {
+     * sb.append("CASES(").increaseIndent(); for (CaseExpression.Case cas :
+     * caseExpression.getCases()) { cas.getCondition().accept(this); sb.append(
+     * " -> "); cas.getExpression().accept(this); sb.append(";").nl(); }
+     * sb.append("ELSE -> "); caseExpression.getElseExpression().accept(this);
+     * sb.append(")").decreaseIndent(); return null; }
+     */
 
     /**
      * {@inheritDoc}
@@ -514,10 +518,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
             functionBlockDeclaration.getActions().forEach((k, v) -> v.accept(this));
         }
 
-        if (functionBlockDeclaration.getStBody() != null)
-            functionBlockDeclaration.getStBody().accept(this);
-        else if (functionBlockDeclaration.getSfcBody() != null)
-            functionBlockDeclaration.getSfcBody().accept(this);
+        printBody(functionBlockDeclaration.getStBody(), functionBlockDeclaration.getSfcBody());
 
         sb.decreaseIndent().nl().append("END_FUNCTION_BLOCK").nl().nl();
         return null;
@@ -679,11 +680,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     @Override
     public Object visit(ActionDeclaration ad) {
         sb.nl().append("ACTION ").append(ad.getName()).increaseIndent();
-        if (ad.getStBody() != null) {
-            ad.getStBody().accept(this);
-        } else if (ad.getSfcBody() != null) {
-            ad.getSfcBody().accept(this);
-        }
+        printBody(ad.getStBody(), ad.getSfcBody());
         sb.decreaseIndent().nl().append("END_ACTION");
         return null;
     }
@@ -792,6 +789,8 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(Literal literal) {
+        if(literal.getDataTypeName()!=null)
+            sb.append(literal.getDataTypeName()).append('#');
         sb.append(literal.getText());
         return null;
 
@@ -821,7 +820,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
             vars.sort(VariableDeclaration::compareTo);
             sb.nl().append("VAR");
 
-            if ((VariableDeclaration.INOUT & type) != 0) {
+            if ((VariableDeclaration.INPUT & type) >= VariableDeclaration.INOUT) {
                 sb.append("_INOUT");
             } else {
                 if ((VariableDeclaration.INPUT & type) != 0)
@@ -937,9 +936,28 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         }
         sb.append(" := ");
 
-            transition.getGuard().accept(this);
+        transition.getGuard().accept(this);
         sb.append(";").append(" END_TRANSITION");
         return null;
+    }
+
+    private void printBody(StatementList stBody, SFCImplementation sfcBody) {
+        switch (getBodyPrinting()) {
+            case ST:
+                if (stBody != null) {
+                    stBody.accept(this);
+                } else {
+                    if (sfcBody != null) sfcBody.accept(this);
+                }
+                break;
+            case SFC:
+                if (sfcBody != null) {
+                    sfcBody.accept(this);
+                } else {
+                    if (stBody != null) stBody.accept(this);
+                }
+                break;
+        }
     }
 
     /**
@@ -959,6 +977,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         this.sb = cw;
     }
 
+    public enum BodyPrinting {
+        ST, SFC
+    }
 
     public static class StringLiterals {
 

@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.datatypes.promotion;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.AnyInt;
 import edu.kit.iti.formal.automation.datatypes.AnyReal;
 
@@ -39,7 +39,7 @@ public class RealPromotion implements TypePromotion {
 
     /** {@inheritDoc} */
     @Override
-    public Any getPromotion(Any a, Any b) {
+    public AnyDt getPromotion(AnyDt a, AnyDt b) {
         try {
             return promote((AnyReal) a, (AnyReal) b);
         } catch (ClassCastException e) {
@@ -55,11 +55,11 @@ public class RealPromotion implements TypePromotion {
         }
     }
 
-    private Any promote(AnyReal a, AnyInt b) {
+    private AnyDt promote(AnyReal a, AnyInt b) {
         return a;
     }
 
-    private Any promote(AnyReal a, AnyReal b) {
+    private AnyDt promote(AnyReal a, AnyReal b) {
         if (a.equals(b)) return a;
         if (a instanceof AnyReal.LReal) {
             return a;

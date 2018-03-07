@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.datatypes.promotion;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.PointerType;
 
 /**
@@ -33,7 +33,7 @@ import edu.kit.iti.formal.automation.datatypes.PointerType;
  */
 public class PointerPromotion {
     /*
-    public Any conformTo(Any dataType) {
+    public AnyDt conformTo(AnyDt dataType) {
         if (dataType instanceof PointerType) {
             PointerType pointerType = (PointerType) dataType;
             return new PointerType(pointerType.conformTo(of));

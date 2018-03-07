@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
@@ -39,11 +39,11 @@ import org.jetbrains.annotations.NotNull;
 @Data
 @NoArgsConstructor
 public class SimpleTypeDeclaration<T extends Initialization> extends TypeDeclaration<T> {
-    public SimpleTypeDeclaration(@NotNull Any type) {
+    public SimpleTypeDeclaration(@NotNull AnyDt type) {
         super(type);
     }
 
-    public SimpleTypeDeclaration(@NotNull Any type, @NotNull T init) {
+    public SimpleTypeDeclaration(@NotNull AnyDt type, @NotNull T init) {
         this(type);
         initialization = init;
     }
@@ -60,7 +60,7 @@ public class SimpleTypeDeclaration<T extends Initialization> extends TypeDeclara
      * {@inheritDoc}
      */
     @Override
-    public Any getDataType(Scope globalScope) {
+    public AnyDt getDataType(Scope globalScope) {
         return super.getDataType(globalScope);
     }
 

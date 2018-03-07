@@ -34,7 +34,7 @@ public class DefaultTypeTranslator implements TypeTranslator {
     public static final DefaultTypeTranslator INSTANCE = new DefaultTypeTranslator();
 
     @Override
-    public SMVType translate(Any datatype) {
+    public SMVType translate(AnyDt datatype) {
         DefaultTranslatorVisitor dtv = new DefaultTranslatorVisitor();
         return datatype.accept(dtv);
     }

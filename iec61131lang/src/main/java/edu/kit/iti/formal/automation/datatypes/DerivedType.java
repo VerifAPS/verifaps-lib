@@ -28,8 +28,8 @@ package edu.kit.iti.formal.automation.datatypes;
  * @author weigla (25.06.2014)
  * @version 1
  */
-public abstract  class DerivedType extends Any {
-    private Any derivedFrom;
+public abstract  class DerivedType extends AnyDt {
+    private AnyDt derivedFrom;
     private String derivedFromName;
 
     /**

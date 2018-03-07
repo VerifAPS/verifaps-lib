@@ -22,7 +22,7 @@
 
 package edu.kit.iti.formal.automation.analysis;
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
@@ -56,7 +56,7 @@ public class FindInstances extends AstVisitor {
         if (variableDeclaration.isInput() || variableDeclaration.isOutput() || variableDeclaration.isInOut()
                 /*|| currentTopLevelScopeElement instanceof InterfaceDeclaration*/)
             return super.visit(variableDeclaration);
-        Any dataType = variableDeclaration.getDataType();
+        AnyDt dataType = variableDeclaration.getDataType();
         // Only classes have instances
         if (!(dataType instanceof ClassDataType))
             return super.visit(variableDeclaration);

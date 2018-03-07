@@ -28,7 +28,7 @@ package edu.kit.iti.formal.automation.datatypes;
  * @author weigl
  * @version $Id: $Id
  */
-public abstract class IECString extends Any {
+public abstract class IECString extends AnyDt {
     /** Constant <code>STRING_8BIT</code> */
     public final static String STRING_8BIT = new String();
     /** Constant <code>STRING_16BIT</code> */

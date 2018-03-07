@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st0.trans;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
@@ -32,7 +32,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -59,7 +62,7 @@ public class FunctionBlockEmbedding implements ST0Transformation {
         outer.statements = ae.embedd();
 
         for (VariableDeclaration vd : decls) {
-            Any type = vd.getDataType();
+            AnyDt type = vd.getDataType();
             if (type instanceof FunctionBlockDataType) {
                 FunctionBlockDataType fbdType = (FunctionBlockDataType) type;
                 FunctionBlockDeclaration fbd = fbdType.getFunctionBlock();
@@ -92,7 +95,7 @@ public class FunctionBlockEmbedding implements ST0Transformation {
         outer.scope.asMap().remove(instance.getName());
 
         //Make a copy of the statements and add prefix to every variable
-        VariableRenamer vr = new VariableRenamer(toBeEmbedded, newName);
+        VariableRenamer vr = new VariableRenamer(toBeEmbedded.copy(), newName);
         StatementList prefixedStatements = vr.rename(); // <- this can be injected
 
         // inject into every function block call
@@ -103,9 +106,10 @@ public class FunctionBlockEmbedding implements ST0Transformation {
                 .build();
 
 
-        inner.actions.forEach((n,s) -> {
-                    VariableRenamer v = new VariableRenamer(s, newName);
-                    fbe.getActions().put(n, v.rename()); // <- this can be injected
+        inner.actions.forEach((n, s) -> {
+                    //TODO strange that I do not need a variable renaming here
+                    //VariableRenamer v = new VariableRenamer(s, newName);
+                    fbe.getActions().put(n, s); // <- this can be injected
                 }
         );
 
@@ -164,8 +168,8 @@ public class FunctionBlockEmbedding implements ST0Transformation {
             // One place to rule function resolving!
             if (cws.actions.containsKey(fbc.getCalleeName())) {
                 StatementList statements = new StatementList(cws.actions.get(fbc.getCalleeName()));
-                statements.add(0, CommentStatement.box("Call of action: %s", fbc.getCalleeName()));
-                statements.add( CommentStatement.box("End of action call: %s", fbc.getCalleeName()));
+                statements.add(0, CommentStatement.single("Call of action: %s", fbc.getCalleeName()));
+                statements.add(CommentStatement.single("End of action call: %s", fbc.getCalleeName()));
                 return statements;
             }
             return super.visit(fbc);

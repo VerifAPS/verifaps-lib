@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.operators.BinaryOperator;
@@ -90,10 +90,10 @@ public class BinaryExpression extends Expression {
      * {@inheritDoc}
      */
     @Override
-    public Any dataType(Scope localScope) throws VariableNotDefinedException, TypeConformityException {
-        Any a = leftExpr.dataType(localScope);
-        Any b = rightExpr.dataType(localScope);
-        Any c = operator.getPromotedType(a, b);
+    public AnyDt dataType(Scope localScope) throws VariableNotDefinedException, TypeConformityException {
+        AnyDt a = leftExpr.dataType(localScope);
+        AnyDt b = rightExpr.dataType(localScope);
+        AnyDt c = operator.getPromotedType(a, b);
         if (c == null) throw new TypeConformityException(
                 this, operator.getExpectedDataTypes(), a, b
         );

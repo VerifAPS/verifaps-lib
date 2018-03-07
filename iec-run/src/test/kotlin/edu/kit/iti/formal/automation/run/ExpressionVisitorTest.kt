@@ -37,7 +37,7 @@ class ExpressionVisitorTest {
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-        ast.accept<Any>(object: DefaultVisitor<Unit>() {
+        ast.accept<AnyDt>(object: DefaultVisitor<Unit>() {
             override fun defaultVisit(visitable: Visitable?) {
             }
 
@@ -46,7 +46,7 @@ class ExpressionVisitorTest {
             }
 
             override fun visit(statements: StatementList?) {
-                statements!!.forEach { it.accept<Any>(this) }
+                statements!!.forEach { it.accept<AnyDt>(this) }
             }
 
             override fun visit(assignmentStatement: AssignmentStatement?) {

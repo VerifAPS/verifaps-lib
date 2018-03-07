@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.IECString;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
@@ -41,7 +41,7 @@ public class StringTypeDeclaration extends TypeDeclaration<Literal> {
 
     /** {@inheritDoc} */
     @Override
-    public Any getDataType(Scope globalScope) {
+    public AnyDt getDataType(Scope globalScope) {
         //TODO
         setBaseType(IECString.STRING_16BIT);
         return getBaseType();

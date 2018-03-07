@@ -28,6 +28,7 @@ import edu.kit.iti.formal.automation.st.ast.Top;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 
+import java.util.Comparator;
 import java.util.Set;
 
 /**
@@ -54,5 +55,12 @@ public class SFCTransition extends Top<IEC61131Parser.TransitionContext> {
     @Override
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    public static class PriorityComparison implements Comparator<SFCTransition> {
+        @Override
+        public int compare(SFCTransition o1, SFCTransition o2) {
+            return Integer.compare(o1.priority, o2.priority);
+        }
     }
 }

@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.datatypes.promotion;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ import java.util.List;
  * @version $Id: $Id
  */
 public class TableTypePromotion implements TypePromotion {
-    private List<Any[]> table = new ArrayList<>();
+    private List<AnyDt[]> table = new ArrayList<>();
 
     /**
      * <p>Constructor for TableTypePromotion.</p>
@@ -47,7 +47,7 @@ public class TableTypePromotion implements TypePromotion {
      *
      * @param table a {@link java.util.List} object.
      */
-    public TableTypePromotion(List<Any[]> table) {
+    public TableTypePromotion(List<AnyDt[]> table) {
         this.table = table;
     }
 
@@ -63,8 +63,8 @@ public class TableTypePromotion implements TypePromotion {
 
     /** {@inheritDoc} */
     @Override
-    public Any getPromotion(Any a, Any b) {
-        for (Any[] ary : table) {
+    public AnyDt getPromotion(AnyDt a, AnyDt b) {
+        for (AnyDt[] ary : table) {
             if (ary[0].equals(a) && ary[1].equals(b))
                 return ary[2];
         }

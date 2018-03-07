@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.sfclang.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.st.ast.Invocable;
 import edu.kit.iti.formal.automation.st.ast.StatementList;
@@ -66,7 +66,7 @@ public class ActionDeclaration extends Top<IEC61131Parser.ActionContext> impleme
     }
 
     @Override
-    public Any getReturnType() {
+    public AnyDt getReturnType() {
         return null;
     }
 }

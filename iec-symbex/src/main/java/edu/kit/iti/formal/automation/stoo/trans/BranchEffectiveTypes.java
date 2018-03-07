@@ -22,7 +22,7 @@
 
 package edu.kit.iti.formal.automation.stoo.trans;
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.datatypes.InterfaceDataType;
 import edu.kit.iti.formal.automation.datatypes.ReferenceType;
@@ -93,7 +93,7 @@ public class BranchEffectiveTypes extends STOOTransformation {
                     .filter(sr -> sr.getEffectiveDataType() == null)
                     .filter(sr -> sr.getIdentifiedObject() instanceof VariableDeclaration)
                     .filter(sr -> {
-                        Any referencedType = ((VariableDeclaration) sr.getIdentifiedObject()).getDataType();
+                        AnyDt referencedType = ((VariableDeclaration) sr.getIdentifiedObject()).getDataType();
                         // Only consider references and interface types
                         if (referencedType instanceof InterfaceDataType)
                             return sr.hasSub();
@@ -133,9 +133,9 @@ public class BranchEffectiveTypes extends STOOTransformation {
          * The effective type to set.
          */
         @NotNull
-        private final Any effectiveType;
+        private final AnyDt effectiveType;
 
-        SetEffectiveTypeToReferenceVisitor(@NotNull SymbolicReference theReference, @NotNull Any effectiveType) {
+        SetEffectiveTypeToReferenceVisitor(@NotNull SymbolicReference theReference, @NotNull AnyDt effectiveType) {
             this.theReference = theReference;
             this.effectiveType = effectiveType;
             theReferenceAsList = theReference.asList();
@@ -220,9 +220,9 @@ public class BranchEffectiveTypes extends STOOTransformation {
                                             @NotNull SymbolicReference deferredTypeReference) {
             IfStatement branch = new IfStatement();
             // Add branches based on the instance reference we found
-            Set<Any> effectiveTypes = deferredTypeReference.toVariable().getEffectiveDataTypes();
+            Set<AnyDt> effectiveTypes = deferredTypeReference.toVariable().getEffectiveDataTypes();
             if (effectiveTypes.size() > 1)
-                for (Any effectiveType : new SortedList<>(FXCollections.observableArrayList(effectiveTypes))) {
+                for (AnyDt effectiveType : new SortedList<>(FXCollections.observableArrayList(effectiveTypes))) {
                     StatementList block = new StatementList(originalStatement.copy());
                     //block.add(0, new CommentStatement(deferredTypeReference + " : " + effectiveType.getName()));
                     SetEffectiveTypeToReferenceVisitor setEffectiveTypeVisitor =
@@ -258,7 +258,7 @@ public class BranchEffectiveTypes extends STOOTransformation {
             instanceIDReferenceList.get(instanceIDReferenceList.size() - 1).setSub(
                     new SymbolicReference(INSTANCE_ID_VAR_NAME));
             // _INSTANCE_ID >= instanceIDRange(lower) AND _INSTANCE_ID <= instanceIDRange(upper)
-            Any instanceIDType = state.getScope().resolveDataType(
+            AnyDt instanceIDType = state.getScope().resolveDataType(
                     INSTANCE_ID_VAR_NAME + INSTANCE_ID_TYPE_SUFFIX);
             return BinaryExpression.andExpression(
                     BinaryExpression.greaterEqualsExpression(instanceIDReference,

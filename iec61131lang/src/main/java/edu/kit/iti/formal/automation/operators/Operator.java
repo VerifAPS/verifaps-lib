@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.operators;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 
 /**
  * A Operator is an binary or unary operation associated with a special keyword.
@@ -45,8 +45,8 @@ public interface Operator {
     /**
      * <p>getExpectedDataTypes.</p>
      *
-     * @return an array of {@link edu.kit.iti.formal.automation.datatypes.Any} objects.
+     * @return an array of {@link edu.kit.iti.formal.automation.datatypes.AnyDt} objects.
      */
-    Any[] getExpectedDataTypes();
+    AnyDt[] getExpectedDataTypes();
 }
 

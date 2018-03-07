@@ -307,7 +307,7 @@ public class StructuredTextHtmlPrinter extends DefaultVisitor<Object> {
     /**
      * {@inheritDoc}
      *
-     @Override public Object visit(ScalarValue<? extends Any, ?> tsScalarValue) {
+     @Override public Object visit(ScalarValue<? extends AnyDt, ?> tsScalarValue) {
      sb.div(Sections.VALUE).span(tsScalarValue.getDataType().getName())
      .append(tsScalarValue.getDataType().repr(tsScalarValue.getValue()));
      sb.end().end();

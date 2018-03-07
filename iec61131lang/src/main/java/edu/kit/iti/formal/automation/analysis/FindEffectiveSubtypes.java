@@ -142,13 +142,13 @@ public class FindEffectiveSubtypes extends AstVisitor {
         // We are interested in (regular) references and interface types
         if (variableDeclaration.getDataType() instanceof AnyReference
                 || variableDeclaration.getDataType() instanceof InterfaceDataType) {
-            Set<Any> effectiveDataTypes = new HashSet<>();
+            Set<AnyDt> effectiveDataTypes = new HashSet<>();
             if (assignmentStatement.getExpression() instanceof SymbolicReference) {
                 effectiveDataTypes = ((VariableDeclaration) resolveReference(
                         (SymbolicReference) assignmentStatement.getExpression())).getEffectiveDataTypes();
             }
             // TODO invocation
-            for (Any dataType : effectiveDataTypes)
+            for (AnyDt dataType : effectiveDataTypes)
                 if (!variableDeclaration.hasEffectiveDataType(dataType) && !(dataType instanceof InterfaceDataType)) {
                     // Register new type
                     variableDeclaration.addEffectiveDataType(dataType);
@@ -170,7 +170,7 @@ public class FindEffectiveSubtypes extends AstVisitor {
      * @param expression
      * @return The data type of the expression. Null if the type cannot be recognized.
      */
-    private Any resolveType(Expression expression) {
+    private AnyDt resolveType(Expression expression) {
         if (expression instanceof Invocation)
             return ((Invocable) resolveReference(((Invocation) expression).getCallee())).getReturnType();
         else if (expression instanceof SymbolicReference)
@@ -201,7 +201,7 @@ public class FindEffectiveSubtypes extends AstVisitor {
             firstIdObject = topLevelScopeElement.getScope().getVariable(firstId);
             // Dereference if needed
             if (reference.getDerefCount() > 0 || reference.getSub() != null) {
-                Any firstIdDataType = topLevelScopeElement.getScope().getVariable(firstId).getDataType();
+                AnyDt firstIdDataType = topLevelScopeElement.getScope().getVariable(firstId).getDataType();
                 for (int i = 0; i < reference.getDerefCount(); i++)
                     firstIdDataType = ((ReferenceType) firstIdDataType).getOf();
                 firstIdObject = ((RecordType) firstIdDataType).getDeclaration();

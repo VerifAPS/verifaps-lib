@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.Identifiable;
@@ -49,13 +49,13 @@ public class SymbolicReference extends Reference {
     private IdentifierPlaceHolder identifier = new IdentifierPlaceHolder();
     private ExpressionList subscripts;
     private SymbolicReference sub;
-    private Any dataType;
+    private AnyDt dataType;
 
     /**
      * Used in STOO transformations to set the symbolic reference's effective type (in contrast to dataType, which
      * might be a deferred type).
      */
-    private Any effectiveDataType;
+    private AnyDt effectiveDataType;
 
     /**
      * Number of times reference is dereferenced.
@@ -196,7 +196,7 @@ public class SymbolicReference extends Reference {
      * {@inheritDoc}
      */
     @Override
-    public Any dataType(Scope localScope)
+    public AnyDt dataType(Scope localScope)
             throws VariableNotDefinedException {
         return localScope.getVariable(this).getDataType();
     }

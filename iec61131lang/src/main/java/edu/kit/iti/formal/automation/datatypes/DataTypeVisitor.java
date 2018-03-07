@@ -29,7 +29,7 @@ package edu.kit.iti.formal.automation.datatypes;
  */
 
 public interface DataTypeVisitor<T> {
-    default T defaultVisit(Any any) {
+    default T defaultVisit(AnyDt any) {
         return null;
     }
 

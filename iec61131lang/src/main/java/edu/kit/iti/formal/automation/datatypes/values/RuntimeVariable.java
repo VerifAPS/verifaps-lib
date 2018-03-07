@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.datatypes.values;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 
 /**
  * Created by weigl on 10.06.14.
@@ -33,7 +33,7 @@ import edu.kit.iti.formal.automation.datatypes.Any;
 public class RuntimeVariable {
     private String name;
     private Object value;
-    private Any dataType;
+    private AnyDt dataType;
 
     /**
      * <p>Constructor for RuntimeVariable.</p>
@@ -48,9 +48,9 @@ public class RuntimeVariable {
      * <p>Constructor for RuntimeVariable.</p>
      *
      * @param name a {@link java.lang.String} object.
-     * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public RuntimeVariable(String name, Any dataType) {
+    public RuntimeVariable(String name, AnyDt dataType) {
         this.name = name;
         this.dataType = dataType;
     }
@@ -60,9 +60,9 @@ public class RuntimeVariable {
      *
      * @param name a {@link java.lang.String} object.
      * @param value a {@link java.lang.Object} object.
-     * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public RuntimeVariable(String name, Object value, Any dataType) {
+    public RuntimeVariable(String name, Object value, AnyDt dataType) {
         this.name = name;
         this.value = value;
         this.dataType = dataType;
@@ -107,18 +107,18 @@ public class RuntimeVariable {
     /**
      * <p>Getter for the field <code>dataType</code>.</p>
      *
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @return a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public Any getDataType() {
+    public AnyDt getDataType() {
         return dataType;
     }
 
     /**
      * <p>Setter for the field <code>dataType</code>.</p>
      *
-     * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public void setDataType(Any dataType) {
+    public void setDataType(AnyDt dataType) {
         this.dataType = dataType;
     }
 }

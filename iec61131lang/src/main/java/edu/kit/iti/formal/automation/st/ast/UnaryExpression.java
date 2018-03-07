@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
@@ -99,8 +99,8 @@ public class UnaryExpression extends Expression {
      * {@inheritDoc}
      */
     @Override
-    public Any dataType(Scope localScope) throws VariableNotDefinedException, TypeConformityException {
-        Any a = operator.getPromotedType(expression.dataType(localScope));
+    public AnyDt dataType(Scope localScope) throws VariableNotDefinedException, TypeConformityException {
+        AnyDt a = operator.getPromotedType(expression.dataType(localScope));
         if (a == null) {
             throw new TypeConformityException(this, operator.getExpectedDataTypes(), a);
         }

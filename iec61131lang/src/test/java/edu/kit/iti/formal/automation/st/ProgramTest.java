@@ -146,7 +146,7 @@ public class ProgramTest {
             public Object visit(VariableDeclaration variableDeclaration) {
                 if (!variableDeclaration.getEffectiveDataTypes().isEmpty()) {
                     System.out.println(variableDeclaration);
-                    for (Any dataType : variableDeclaration.getEffectiveDataTypes())
+                    for (AnyDt dataType : variableDeclaration.getEffectiveDataTypes())
                         System.out.println("* " + dataType.getName());
                     System.out.println();
                 }

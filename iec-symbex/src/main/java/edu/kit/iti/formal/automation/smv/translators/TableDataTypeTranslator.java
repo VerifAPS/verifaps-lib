@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.smv.translators;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.smv.ast.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
@@ -37,7 +37,7 @@ import java.util.Map;
 public class TableDataTypeTranslator implements TypeTranslator {
     /**
      */
-    private Map<Any, SMVType> map = new HashMap<>();
+    private Map<AnyDt, SMVType> map = new HashMap<>();
 
     /**
      *
@@ -52,7 +52,7 @@ public class TableDataTypeTranslator implements TypeTranslator {
      *
      */
     @Override
-    public SMVType translate(Any datatype) {
+    public SMVType translate(AnyDt datatype) {
         return map.computeIfAbsent(datatype, dttFallback::translate);
     }
 

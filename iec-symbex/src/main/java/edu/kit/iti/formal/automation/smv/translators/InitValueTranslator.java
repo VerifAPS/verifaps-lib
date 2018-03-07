@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.smv.translators;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.values.Value;
 
 /**
@@ -30,5 +30,5 @@ import edu.kit.iti.formal.automation.datatypes.values.Value;
  * @version 1 (16.10.17)
  */
 public interface InitValueTranslator {
-    <T extends Any,S> Value<T,S> getInit(Any type);
+    <T extends AnyDt,S> Value<T,S> getInit(AnyDt type);
 }

@@ -22,7 +22,7 @@
 
 package edu.kit.iti.formal.automation.st.ast;
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.st.Identifiable;
 
 /**
@@ -35,5 +35,5 @@ import edu.kit.iti.formal.automation.st.Identifiable;
  * @since 04.03.17
  */
 public interface Invocable extends Identifiable {
-    Any getReturnType();
+    AnyDt getReturnType();
 }

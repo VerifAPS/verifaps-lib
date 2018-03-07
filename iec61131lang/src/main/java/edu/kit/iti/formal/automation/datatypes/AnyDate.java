@@ -32,7 +32,7 @@ import edu.kit.iti.formal.automation.datatypes.values.TimeofDayData;
  * @author weigl
  * @version $Id: $Id
  */
-public abstract class AnyDate extends Any {
+public abstract class AnyDate extends AnyDt {
     public static class Date extends AnyDate {
         @Override
         public String repr(Object obj) {

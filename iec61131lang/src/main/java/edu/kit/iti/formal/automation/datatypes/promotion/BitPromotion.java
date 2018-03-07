@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.datatypes.promotion;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.AnyBit;
 
 /**
@@ -37,7 +37,7 @@ public class BitPromotion implements TypePromotion {
 
     /** {@inheritDoc} */
     @Override
-    public Any getPromotion(Any a, Any b) {
+    public AnyDt getPromotion(AnyDt a, AnyDt b) {
         try {
             return promote((AnyBit) a, (AnyBit) b);
         } catch (ClassCastException e) {
@@ -45,7 +45,7 @@ public class BitPromotion implements TypePromotion {
         }
     }
 
-    private Any promote(AnyBit a, AnyBit b) {
+    private AnyDt promote(AnyBit a, AnyBit b) {
         if(a.getBitLength()>= b.getBitLength())
             return a;
         else

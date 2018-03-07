@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.exceptions;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.BinaryExpression;
 import edu.kit.iti.formal.automation.st.ast.Expression;
@@ -38,17 +38,17 @@ import java.util.Arrays;
  * @version $Id: $Id
  */
 public class TypeConformityException extends IECException {
-    private final Any[] actual, expected;
+    private final AnyDt[] actual, expected;
     private final Expression expression;
 
     /**
      * <p>Constructor for TypeConformityException.</p>
      *
      * @param expr     a {@link edu.kit.iti.formal.automation.st.ast.Expression} object.
-     * @param expected an array of {@link edu.kit.iti.formal.automation.datatypes.Any} objects.
-     * @param actual   a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param expected an array of {@link edu.kit.iti.formal.automation.datatypes.AnyDt} objects.
+     * @param actual   a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public TypeConformityException(Expression expr, Any[] expected, Any... actual) {
+    public TypeConformityException(Expression expr, AnyDt[] expected, AnyDt... actual) {
         this.expression = expr;
         this.expected = expected;
         this.actual = actual;
@@ -57,18 +57,18 @@ public class TypeConformityException extends IECException {
     /**
      * <p>getActualDatatypes.</p>
      *
-     * @return an array of {@link edu.kit.iti.formal.automation.datatypes.Any} objects.
+     * @return an array of {@link edu.kit.iti.formal.automation.datatypes.AnyDt} objects.
      */
-    public Any[] getActualDatatypes() {
+    public AnyDt[] getActualDatatypes() {
         return actual;
     }
 
     /**
      * <p>getExpectedDataTypes.</p>
      *
-     * @return an array of {@link edu.kit.iti.formal.automation.datatypes.Any} objects.
+     * @return an array of {@link edu.kit.iti.formal.automation.datatypes.AnyDt} objects.
      */
-    public Any[] getExpectedDataTypes() {
+    public AnyDt[] getExpectedDataTypes() {
         return expected;
     }
 

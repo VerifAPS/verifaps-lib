@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.operators;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.promotion.DefaultTypePromoter;
 import edu.kit.iti.formal.automation.datatypes.promotion.TypePromotion;
 import edu.kit.iti.formal.automation.st.ast.Copyable;
@@ -39,7 +39,7 @@ import java.io.Serializable;
  */
 public class BinaryOperator implements Operator{
     private final String symbol;
-    private final Any validType;
+    private final AnyDt validType;
 
     /**
      *
@@ -50,9 +50,9 @@ public class BinaryOperator implements Operator{
      * <p>Constructor for BinaryOperator.</p>
      *
      * @param symbol    a {@link java.lang.String} object.
-     * @param validType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param validType a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    protected BinaryOperator(String symbol, Any validType) {
+    protected BinaryOperator(String symbol, AnyDt validType) {
         this.symbol = symbol;
         this.validType = validType;
         Operators.register(symbol, this);
@@ -61,10 +61,10 @@ public class BinaryOperator implements Operator{
     /**
      * <p>isTypeConform.</p>
      *
-     * @param argument a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param argument a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      * @return a boolean.
      */
-    public boolean isTypeConform(Any argument) {
+    public boolean isTypeConform(AnyDt argument) {
         return argument.getClass().isAssignableFrom(validType.getClass());
     }
 
@@ -80,18 +80,18 @@ public class BinaryOperator implements Operator{
      * {@inheritDoc}
      */
     @Override
-    public Any[] getExpectedDataTypes() {
-        return new Any[]{validType, validType};
+    public AnyDt[] getExpectedDataTypes() {
+        return new AnyDt[]{validType, validType};
     }
 
     /**
      * <p>getPromotedType.</p>
      *
-     * @param left  a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     * @param right a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
-     * @return a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
+     * @param left  a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
+     * @param right a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
+     * @return a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public Any getPromotedType(Any left, Any right) {
+    public AnyDt getPromotedType(AnyDt left, AnyDt right) {
         return promoter.getPromotion(left, right);
     }
 
