@@ -2,7 +2,6 @@ import org.unbrokendome.gradle.plugins.xjc.XjcGenerate
 
 plugins {
     id "org.jetbrains.kotlin.jvm" version "1.2.30"
-
     id 'org.unbroken-dome.xjc' version '1.1.3'
     id 'io.franzbecker.gradle-lombok' version '1.11'
     id "com.github.hierynomus.license" version "0.14.0"
@@ -11,15 +10,16 @@ plugins {
     id 'net.saliman.cobertura' version '2.3.1'
     id 'com.github.kt3k.coveralls' version '2.8.2'
 //    id "io.github.ddimtirov.codacy" version "0.1.0"
-
 }
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'maven'
 apply plugin: 'antlr'
+apply plugin: 'idea'
 //apply plugin: 'application'
 
+ext.kotlin_version = '1.2.30'
 group = 'edu.kit.iti.formal'
 version = '0.6.0-SNAPSHOT'
 //mainClassName = "edu.kit.iti.formal.automation.testtables.ExTeTa"
@@ -41,6 +41,7 @@ repositories {
     maven { url "http://formal.iti.kit.edu/maven2" }
     maven { url "http://repo.maven.apache.org/maven2" }
 }
+
 dependencies {
     compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
@@ -48,13 +49,9 @@ dependencies {
     compile group: 'edu.kit.iti.formal', name: 'iec-symbex', version: '1.5.0-SNAPSHOT'
     compile group: 'edu.kit.iti.formal', name: 'smv-model', version: '1.5.0-SNAPSHOT'
     testCompile 'junit:junit:4.12'
-
-    compile "org.jetbrains.kotlin:kotlin-reflect:1.2.30"
-    testCompile "org.jetbrains.kotlin:kotlin-test:1.2.30"
-    testCompile "org.jetbrains.kotlin:kotlin-test-junit:1.2.30"
-
     antlr group: 'org.antlr', name: 'antlr4', version: 4.7
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.30"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile 'com.github.jferard:fastods:0.4.1'
 }
 
 sourceSets {
@@ -64,6 +61,17 @@ sourceSets {
         }
     }
 }
+
+idea {
+    module {
+        // if you hate browsing Javadoc
+        downloadJavadoc = false
+
+        // and love reading sources :)
+        downloadSources = true
+    }
+}
+
 
 generateGrammarSource {
     outputDirectory antlrOutputDir
@@ -91,11 +99,8 @@ compileJava.dependsOn xjcGenerateExteta
 compileJava.dependsOn xjcGenerateReport
 
 license {
-    mapping {
-        java = 'PHP'
-        //"*.kt" = 'JAVA'
-        //"*.g4" = 'PHP'
-    }
+    mapping("java", "PHP")
+    mapping("kt", "PHP")
 
     header = file("gradle/HEADER")
     ext.name = "geteta"
@@ -139,13 +144,4 @@ tasks.coveralls {
     //dependsOn 'check'
 }
 
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
+
