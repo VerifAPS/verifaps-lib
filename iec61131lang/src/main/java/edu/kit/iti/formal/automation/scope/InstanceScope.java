@@ -47,6 +47,8 @@ public class InstanceScope implements Serializable {
     private Map<ClassDeclaration, List<Instance>> classPolymorphInstances = new TreeMap();
     //private Map<FunctionBlockDeclaration, List<Instance>> functionBlockPolymorphInstances = new TreeMap();
 
+    private List<Instance> allInstances;
+
     public InstanceScope(GlobalScope globalScope) {
         this.globalScope = globalScope;
         for (InterfaceDeclaration interfaceDeclaration : globalScope.getInterfaces())
@@ -124,18 +126,20 @@ public class InstanceScope implements Serializable {
      * @return A (flat) list of all instances in the scope.
      */
     public List<Instance> getAllInstances() {
-        return classInstances.values().stream()
-                .flatMap(Collection::stream)
-                .sorted(Comparator.comparing(i -> {
-                    assert i.getVariableDeclaration().getDataType() instanceof ClassDataType;
-                    ClassDeclaration instanceClass =
-                            ((ClassDataType) i.getVariableDeclaration().getDataType()).getClazz();
-                    StringBuilder sortName = new StringBuilder(instanceClass.getName());
-                    for (ClassDeclaration parent = instanceClass.getParentClass(); parent != null;
-                         parent = parent.getParentClass())
-                        sortName.insert(0, parent.getName() + "$");
-                    return sortName.toString();
-                })).collect(Collectors.toList());
+        if (allInstances == null)
+            allInstances = classInstances.values().stream()
+                    .flatMap(Collection::stream)
+                    .sorted(Comparator.comparing(i -> {
+                        assert i.getVariableDeclaration().getDataType() instanceof ClassDataType;
+                        ClassDeclaration instanceClass =
+                                ((ClassDataType) i.getVariableDeclaration().getDataType()).getClazz();
+                        StringBuilder sortName = new StringBuilder(instanceClass.getName());
+                        for (ClassDeclaration parent = instanceClass.getParentClass(); parent != null;
+                             parent = parent.getParentClass())
+                            sortName.insert(0, parent.getName() + "$");
+                        return sortName.toString();
+                    })).collect(Collectors.toList());
+        return allInstances;
     }
 
     public void registerClassInstance(ClassDeclaration classDeclaration, Instance instance) {

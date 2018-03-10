@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.st0.trans;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.datatypes.DataTypes;
 import edu.kit.iti.formal.automation.datatypes.RangeType;
 import edu.kit.iti.formal.automation.st.ast.*;
@@ -32,7 +33,11 @@ import edu.kit.iti.formal.automation.visitors.Visitable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Created by weigl on 03/10/14.
@@ -106,8 +111,29 @@ public class ArrayEmbedder implements ST0Transformation {
                 // TODO multiple ranges
                 Range range = array.getRanges().get(0);
                 RangeType rangeType = new RangeType(range.getStartValue(), range.getStopValue(), DataTypes.USINT);
-                int rangeMin = Integer.parseInt(range.getStart().getText());
-                for (int i = rangeMin; i <= Integer.parseInt(range.getStop().getText()); i++) {
+                Set<Integer> values = new HashSet<>();
+                if (subscript instanceof SymbolicReference) {
+                    SymbolicReference r = (SymbolicReference) subscript;
+                    while (r.hasSub())
+                        r = r.getSub();
+                    if (r.getIdentifiedObject() instanceof VariableDeclaration)
+                        try {
+                            state.stooState.getEffectiveSubtypeScope()
+                                    .getTypes((VariableDeclaration) r.getIdentifiedObject()).parallelStream()
+                                    .map(t -> state.stooState.getInstanceIDRangesToClass(
+                                            ((ClassDataType) t).getClazz()))
+                                    .forEach(pairs -> pairs.parallelStream()
+                                            .forEach(p -> IntStream.range(p.getKey(), p.getValue() + 1)
+                                                    .forEach(values::add)));
+                        }
+                        catch (NoSuchElementException ignored) { }
+                }
+                if (values.isEmpty()) {
+                    int rangeMin = Integer.parseInt(range.getStart().getText());
+                    for (int i = rangeMin; i <= Integer.parseInt(range.getStop().getText()); i++)
+                        values.add(i);
+                }
+                for (int i : values) {
                     StatementList block = new StatementList(statement.copy());
                     block.accept(new ArrayAccessRenameVisitor(instanceReference.getIdentifier(), i));
                     branch.addGuardedCommand(new GuardedStatement(
