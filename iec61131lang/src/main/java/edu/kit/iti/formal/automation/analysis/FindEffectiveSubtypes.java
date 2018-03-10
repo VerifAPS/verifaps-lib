@@ -22,15 +22,25 @@
 
 package edu.kit.iti.formal.automation.analysis;
 
-import edu.kit.iti.formal.automation.datatypes.*;
+import edu.kit.iti.formal.automation.datatypes.Any;
+import edu.kit.iti.formal.automation.datatypes.ClassDataType;
+import edu.kit.iti.formal.automation.datatypes.InterfaceDataType;
+import edu.kit.iti.formal.automation.datatypes.ReferenceType;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.scope.EffectiveSubtypeScope;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
+import javafx.util.Pair;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Conduct static analysis to find the effective subtypes of all references (including interface-type references).
@@ -117,112 +127,103 @@ public class FindEffectiveSubtypes extends AstVisitor {
     @Override
     public Object visit(VariableDeclaration variableDeclaration) {
         // Base case
-        if (variableDeclaration.getDataType() instanceof ClassDataType)
-            effectiveSubtypeScope.registerType(
-                    currentTopLevelScopeElement, variableDeclaration, variableDeclaration.getDataType());
+        if (variableDeclaration.getDataType() instanceof ClassDataType) {
+            effectiveSubtypeScope.registerVariable(variableDeclaration);
+            registerType(variableDeclaration, variableDeclaration.getDataType());
+        }
         // Add all possible cases
-        // TODO: rewrite
-        else if (variableDeclaration.getDataType() instanceof InterfaceDataType) {
-            globalScope.getClasses().stream()
-                    .filter(c -> c.implementsInterface(
-                            ((InterfaceDataType) variableDeclaration.getDataType()).getInterfaceDeclaration()))
-                    .filter(c -> !instanceScope.getInstancesOfClass(c).isEmpty())
-                    .forEach(c -> effectiveSubtypeScope.registerType(
-                            currentTopLevelScopeElement, variableDeclaration, globalScope.resolveDataType(c)));
-            assert effectiveSubtypeScope.getTypes(currentTopLevelScopeElement, variableDeclaration).size() > 0;
-        }
-        else if (variableDeclaration.getDataType() instanceof ReferenceType) {
-            ClassDeclaration clazz = ((ClassDataType) ((ReferenceType) variableDeclaration.getDataType()).getOf())
-                    .getClazz();
-            globalScope.getClasses().stream()
-                    .filter(c -> c.equals(clazz) || c.extendsClass(clazz))
-                    .filter(c -> !instanceScope.getInstancesOfClass(c).isEmpty())
-                    .forEach(c -> effectiveSubtypeScope.registerType(
-                            currentTopLevelScopeElement, variableDeclaration, globalScope.resolveDataType(c)));
-            assert effectiveSubtypeScope.getTypes(currentTopLevelScopeElement, variableDeclaration).size() > 0;
-        }
+        else if (containsInstance(variableDeclaration))
+            effectiveSubtypeScope.registerVariable(variableDeclaration);
         return super.visit(variableDeclaration);
     }
 
     @Override
     public Object visit(AssignmentStatement assignmentStatement) {
-        /*  TODO: rewrite
-        VariableDeclaration variableDeclaration = (VariableDeclaration) resolveReference(
-                (SymbolicReference) assignmentStatement.getLocation());
-        // We are interested in (regular) references and interface types
-        if (variableDeclaration.getDataType() instanceof AnyReference
-                || variableDeclaration.getDataType() instanceof InterfaceDataType) {
-            Set<Any> effectiveDataTypes = new HashSet<>();
-            if (assignmentStatement.getExpression() instanceof SymbolicReference) {
-                effectiveDataTypes = ((VariableDeclaration) resolveReference(
-                        (SymbolicReference) assignmentStatement.getExpression())).getEffectiveDataTypes();
-            }
-            // TODO invocation
-            for (Any dataType : effectiveDataTypes)
-                if (!variableDeclaration.hasEffectiveDataType(dataType) && !(dataType instanceof InterfaceDataType)) {
-                    // Register new type
-                    variableDeclaration.addEffectiveDataType(dataType);
-                    fixpoint = false;
-                }
-        }
-        */
+        VariableDeclaration variable =
+                (VariableDeclaration) resolveReference((SymbolicReference) assignmentStatement.getLocation()).getKey();
+        if (containsInstance(variable))
+            registerTypes(variable, resolveTypes(assignmentStatement.getExpression()));
         return super.visit(assignmentStatement);
     }
 
     @Override
     public Object visit(Invocation invocation) {
+        TopLevelScopeElement invoked = (TopLevelScopeElement) resolveReference(invocation.getCallee()).getKey();
+        for (Invocation.Parameter parameter : invocation.getParameters()) {
+            VariableDeclaration variable = invoked.getLocalScope().getVariable(parameter.getName());
+            if (variable != null && containsInstance(variable))
+                registerTypes(variable, resolveTypes(parameter.getExpression()));
+        }
         return super.visit(invocation);
+    }
+
+    private boolean containsInstance(@NotNull VariableDeclaration variable) {
+        return variable.getDataType() instanceof ClassDataType
+                || variable.getDataType() instanceof InterfaceDataType
+                || variable.getDataType() instanceof ReferenceType;
+    }
+
+    private void registerType(@NotNull VariableDeclaration variable, @NotNull Any dataType) {
+        int oldDataTypeCount = effectiveSubtypeScope.getTypes(variable).size();
+        effectiveSubtypeScope.registerType(variable, dataType);
+        fixpoint = fixpoint && (oldDataTypeCount == effectiveSubtypeScope.getTypes(variable).size());
+    }
+
+    private void registerTypes(@NotNull VariableDeclaration variable, @NotNull Collection<Any> dataTypes) {
+        int oldDataTypeCount = effectiveSubtypeScope.getTypes(variable).size();
+        effectiveSubtypeScope.registerTypes(variable, dataTypes);
+        fixpoint = fixpoint && (oldDataTypeCount == effectiveSubtypeScope.getTypes(variable).size());
     }
 
     /**
      * Resolve the type of the given expression. Assume the type can only be a class or FB data type.
      * @param expression
-     * @return The data type of the expression. Null if the type cannot be recognized.
+     * @return The data types of the expression, as a set.
      */
-    private Any resolveType(Expression expression) {
-        if (expression instanceof Invocation)
-            return ((Invocable) resolveReference(((Invocation) expression).getCallee())).getReturnType();
-        else if (expression instanceof SymbolicReference)
-            return ((VariableDeclaration) resolveReference((SymbolicReference) expression)).getDataType();
-        return null;
+    @NotNull
+    private Set<Any> resolveTypes(@NotNull Expression expression) {
+        Set<Any> dataTypes = new HashSet<>();
+        if (expression instanceof Invocation) {
+            dataTypes.add(
+                    ((Invocation) expression).getCalleeName().equals("REF")
+                            ? ((VariableDeclaration) resolveReference(
+                            (SymbolicReference) ((Invocation) expression).getParameters()
+                                    .get(0).getExpression()).getKey()).getDataType()
+                            : ((Invocable) resolveReference(((Invocation) expression).getCallee()).getKey())
+                            .getReturnType());
+        }
+        else if (expression instanceof SymbolicReference) {
+            VariableDeclaration variable =
+                    (VariableDeclaration) resolveReference((SymbolicReference) expression).getKey();
+            dataTypes.addAll(effectiveSubtypeScope.getTypes(variable));
+        }
+        else {
+            // TODO other cases
+            throw new NotImplementedException();
+        }
+        return dataTypes;
     }
 
     /**
      * Resolve the given reference and return the object associated with it. Used to retrieve the variable declaration
      * or the appropriate invocable from a symbolic reference.
      * @param reference The symbolic reference to resolve.
-     * @return The object associated with the identifier.
+     * @return The object associated with the identifier, plus its parent element (null if none).
      */
-    private Top resolveReference(SymbolicReference reference) {
-        return resolveReference(reference, currentTopLevelScopeElement);
-    }
-
-    private Top resolveReference(SymbolicReference reference, TopLevelScopeElement topLevelScopeElement) {
-        // Resolve the first identifier. Handle the subordinate ones recursively.
-        String firstId = reference.getIdentifier();
-        Top firstIdObject;
-        if (firstId == "THIS")
-            firstIdObject = topLevelScopeElement;
-        else if (firstId == "SUPER")
-            firstIdObject = ((ClassDeclaration) topLevelScopeElement).getParentClass();
-        else if (topLevelScopeElement.getLocalScope().asMap().keySet().contains(firstId)) {
-            firstIdObject = topLevelScopeElement.getLocalScope().getVariable(firstId);
-            // Dereference if needed
-            if (reference.getDerefCount() > 0 || reference.getSub() != null) {
-                Any firstIdDataType = topLevelScopeElement.getLocalScope().getVariable(firstId).getDataType();
-                for (int i = 0; i < reference.getDerefCount(); i++)
-                    firstIdDataType = ((ReferenceType) firstIdDataType).getOf();
-                firstIdObject = ((RecordType) firstIdDataType).getDeclaration();
-            }
-        }
+    @NotNull
+    private Pair<Top, TopLevelScopeElement> resolveReference(@NotNull SymbolicReference reference) {
+        while (reference.hasSub())
+            reference = reference.getSub();
+        if (reference.getIdentifiedObject() instanceof VariableDeclaration)
+            return new Pair<>((VariableDeclaration) reference.getIdentifiedObject(),
+                    ((VariableDeclaration) reference.getIdentifiedObject()).getParent());
+        else if (reference.getIdentifiedObject() instanceof MethodDeclaration)
+            return new Pair<>((MethodDeclaration) reference.getIdentifiedObject(),
+                    ((MethodDeclaration) reference.getIdentifiedObject()).getParent());
+        else if (reference.getIdentifiedObject() instanceof FunctionDeclaration)
+            return new Pair<>((FunctionDeclaration) reference.getIdentifiedObject(), null);
         else
-            throw new DataTypeNotDefinedException("Unknown reference '" + reference + "' at " + topLevelScopeElement);
-        // Recurse if needed
-        if (reference.getSub() != null) {
-            assert firstIdObject instanceof TopLevelScopeElement;
-            return resolveReference(reference.getSub(), (TopLevelScopeElement) firstIdObject);
-        }
-        assert firstIdObject instanceof VariableDeclaration;
-        return firstIdObject;
+            throw new DataTypeNotDefinedException(
+                    "Unknown reference '" + reference + "' at " + currentTopLevelScopeElement.getIdentifier());
     }
 }

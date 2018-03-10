@@ -192,7 +192,7 @@ public class SymbolicReference extends Reference {
     public LocalScope getLocalScope() {
         Identifiable identifiedObject = getIdentifiedObject();
         if (identifiedObject instanceof VariableDeclaration)
-            return ((VariableDeclaration) identifiedObject).getParent();
+            return ((VariableDeclaration) identifiedObject).getParent().getLocalScope();
         else if (identifiedObject instanceof MethodDeclaration)
             return ((MethodDeclaration) identifiedObject).getParent().getLocalScope();
         return null;

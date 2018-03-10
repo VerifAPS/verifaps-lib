@@ -25,7 +25,6 @@ package edu.kit.iti.formal.automation.st.ast;
 import com.google.common.collect.ImmutableMap;
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
-import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
@@ -130,9 +129,9 @@ public class VariableDeclaration extends Top
     private TypeDeclaration typeDeclaration;
 
     /**
-     * The local scope the variable is declared in.
+     * The top level scope element the variable is declared in.
      */
-    private LocalScope parent;
+    private TopLevelScopeElement parent;
 
     /**
      * Set of instances which this variable can assume. Populated by static analysis.

@@ -26,14 +26,12 @@ package edu.kit.iti.formal.automation.scope;
 
 import edu.kit.iti.formal.automation.VariableScope;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
-import edu.kit.iti.formal.automation.st.ast.Copyable;
-import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
-import edu.kit.iti.formal.automation.st.ast.VariableBuilder;
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
@@ -50,13 +48,20 @@ import java.util.stream.Stream;
  * @version 1 (13.06.14)
  */
 @Data
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class LocalScope implements Visitable, Iterable<VariableDeclaration>, Copyable<LocalScope> {
     private VariableScope localVariables = new VariableScope();
     private GlobalScope globalScope;
 
-    public LocalScope(GlobalScope globalScope) {
+    private final TopLevelScopeElement parent;
+
+    public LocalScope() {
+        parent = null;
+    }
+
+    public LocalScope(@NotNull GlobalScope globalScope, TopLevelScopeElement parent) {
         this.globalScope = globalScope;
+        this.parent = parent;
     }
 
     /**
@@ -66,6 +71,7 @@ public class LocalScope implements Visitable, Iterable<VariableDeclaration>, Cop
      */
     public LocalScope(LocalScope local) {
         globalScope = local.globalScope;
+        parent = local.parent;
         for (Map.Entry<String, VariableDeclaration> e : local.localVariables.entrySet()) {
             VariableDeclaration variableDeclaration = new VariableDeclaration(e.getValue());
             variableDeclaration.setName(e.getKey());
@@ -84,7 +90,8 @@ public class LocalScope implements Visitable, Iterable<VariableDeclaration>, Cop
      */
     public void add(VariableDeclaration var) {
         localVariables.put(var.getName(), var);
-        var.setParent(this);
+        if (var.getParent() == null)
+            var.setParent(parent);
     }
 
     public void addAll(List<VariableDeclaration> vars) {
@@ -109,7 +116,7 @@ public class LocalScope implements Visitable, Iterable<VariableDeclaration>, Cop
      * @return a {@link edu.kit.iti.formal.automation.scope.LocalScope} object.
      */
     public LocalScope prefixNames(String s) {
-        LocalScope copy = new LocalScope();
+        LocalScope copy = new LocalScope(parent);
         for (Map.Entry<String, VariableDeclaration> vd : this.localVariables.entrySet()) {
             VariableDeclaration nd = new VariableDeclaration(vd.getValue());
             nd.setName(s + nd.getName());
@@ -228,7 +235,7 @@ public class LocalScope implements Visitable, Iterable<VariableDeclaration>, Cop
     }
 
     public LocalScope shallowCopy() {
-        LocalScope ls = new LocalScope();
+        LocalScope ls = new LocalScope(parent);
         ls.globalScope = globalScope;
         ls.addAll(localVariables);
         return ls;
