@@ -2,34 +2,38 @@ package edu.kit.iti.formal.automation.scope;
 
 import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.st.Identifiable;
-import edu.kit.iti.formal.automation.st.ast.TopLevelScopeElement;
+import edu.kit.iti.formal.automation.st.ast.MethodDeclaration;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import javafx.util.Pair;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 public class EffectiveSubtypeScope extends HashMap<Pair<String, String>, Set<Any>> {
-    public void registerType(@NotNull TopLevelScopeElement tle, @NotNull VariableDeclaration variable,
-                             @NotNull Any dataType) {
-        if (!containsKey(pair(tle, variable)))
-            put(pair(tle, variable), new HashSet<>());
-        get(pair(tle, variable)).add(dataType);
+    public void registerVariable(@NotNull VariableDeclaration variable) {
+        if (!containsKey(pair(variable, variable.getParent())))
+            put(pair(variable, variable.getParent()), new HashSet<>());
     }
 
-    @NotNull
-    public Set<Any> getTypes(TopLevelScopeElement tle, VariableDeclaration variable) {
-        Set<Any> types = get(pair(tle, variable));
+    public void registerType(@NotNull VariableDeclaration variable, @NotNull Any dataType) {
+        get(pair(variable, variable.getParent())).add(dataType);
+    }
+
+    public void registerTypes(@NotNull VariableDeclaration variable, @NotNull Collection<Any> dataTypes) {
+        dataTypes.forEach(dt -> registerType(variable, dt));
+    }
+
+    public Set<Any> getTypes(VariableDeclaration variable) {
+        Set<Any> types = get(pair(variable, variable.getParent()));
         if (types == null)
-            throw new NoSuchElementException(tle.getIdentifier() + " " + variable.getName());
+            throw new NoSuchElementException(pair(variable, variable.getParent()).toString());
         return types;
     }
 
-    @NotNull
-    private Pair<String, String> pair(@NotNull Identifiable i1, @NotNull Identifiable i2) {
-        return new Pair<>(i1.getIdentifier(), i2.getIdentifier());
+    private Pair<String, String> pair(@NotNull Identifiable variable, @NotNull Identifiable parent) {
+        return new Pair<>(variable.getIdentifier(),
+                parent instanceof MethodDeclaration
+                        ? ((MethodDeclaration) parent).getParent().getIdentifier()
+                        : parent.getIdentifier());
     }
 }

@@ -50,7 +50,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     @Nullable
     private GlobalScope globalScope = GlobalScope.defaultScope();
     @Nullable
-    private LocalScope localScope = new LocalScope(globalScope);
+    private LocalScope localScope = new LocalScope(globalScope, null);
     @NotNull
     private Map<String, SVariable> varCache = new HashMap<>();
 

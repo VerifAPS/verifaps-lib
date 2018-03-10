@@ -246,8 +246,8 @@ public class BranchEffectiveTypes extends STOOTransformation {
             assert reference.getIdentifiedObject() instanceof VariableDeclaration;
             assert parent instanceof TopLevelScopeElement;
             // Add branches based on the instance reference we found
-            Set<Any> effectiveTypes = state.getEffectiveSubtypeScope().getTypes(
-                    (TopLevelScopeElement) parent, (VariableDeclaration) reference.getIdentifiedObject());
+            Set<Any> effectiveTypes =
+                    state.getEffectiveSubtypeScope().getTypes((VariableDeclaration) reference.getIdentifiedObject());
             boolean allBlocksEqual = true;  // true until false
             StatementList lastBlock = null;
             if (effectiveTypes.size() > 1)
@@ -273,7 +273,6 @@ public class BranchEffectiveTypes extends STOOTransformation {
                 Optional o = effectiveTypes.stream().findAny();
                 assert o.isPresent();
                 originalStatement.accept(new SetEffectiveTypeToReferenceVisitor(deferredTypeReference, (Any) o.get()));
-
             }
             if (branch.getConditionalBranches().isEmpty())
                 // Keep statements intact we case we don't find any reference to an instance
