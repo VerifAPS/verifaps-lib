@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st0;
 
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st0.trans.*;
+import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,8 +40,9 @@ public class STSimplifier {
     private List<ST0Transformation> transformations = new ArrayList<>();
     private State state = new State();
 
-    public STSimplifier(TopLevelElements inputElements) {
+    public STSimplifier(TopLevelElements inputElements, STOOSimplifier.State stooState) {
         state.inputElements = inputElements;
+        state.stooState = stooState;
     }
 
     public void addDefaultPipeline() {
@@ -144,5 +146,6 @@ public class STSimplifier {
         public Map<String, StructureTypeDeclaration> structs = new HashMap<>();
         public TypeDeclarations allTypeDeclaration = new TypeDeclarations();
         public GlobalVariableListDeclaration globalVariableList;
+        public STOOSimplifier.State stooState;
     }
 }

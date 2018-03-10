@@ -31,7 +31,6 @@ import edu.kit.iti.formal.automation.smv.SymbolicState;
 import edu.kit.iti.formal.automation.smv.translators.DefaultTypeTranslator;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st0.STSimplifier;
-import edu.kit.iti.formal.automation.st0.trans.*;
 import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
@@ -96,12 +95,14 @@ public final class SymbExFacade {
                 new STOOSimplifier(program, elements, globalScope, instanceScope, effectiveSubtypeScope);
         stooSimplifier.simplify();
         // ST0
-        STSimplifier stSimplifier = new STSimplifier(stooSimplifier.getState().getTopLevelElements());
+        STSimplifier stSimplifier = new STSimplifier(stooSimplifier.getState().getTopLevelElements(),
+                stooSimplifier.getState());
         stSimplifier.addDefaultPipeline();
         stSimplifier.transform();
         return stSimplifier.getProcessed();
     }
 
+    /*
     public static final void simplify(TypeDeclarations types,
                                       TopLevelScopeElement tlsElement,
                                       boolean unwindLoops,
@@ -178,6 +179,7 @@ public final class SymbExFacade {
         stSimplifier.transform();
         return stSimplifier.getProcessed();
     }
+    */
 
     public static SMVModule evaluateProgram(TopLevelElements elements) {
         return evaluateProgram(elements, false);
