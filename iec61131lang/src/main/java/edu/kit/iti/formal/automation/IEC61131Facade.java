@@ -26,6 +26,7 @@ import edu.kit.iti.formal.automation.analysis.*;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
+import edu.kit.iti.formal.automation.scope.EffectiveSubtypeScope;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
@@ -79,6 +80,12 @@ public class IEC61131Facade {
         StructuredTextPrinter stp = new StructuredTextPrinter();
         //stp.setPrintComments(true);
         ast.accept(stp);
+        return stp.getString();
+    }
+
+    public static String print(StatementList ast) {
+        StructuredTextPrinter stp = new StructuredTextPrinter();
+        ast.forEach(s -> s.accept(stp));
         return stp.getString();
     }
 
@@ -148,8 +155,8 @@ public class IEC61131Facade {
 
     private static final int FIND_EFFECTIVE_SUBTYPES_LIMIT = 1000;
 
-    public static void findEffectiveSubtypes(TopLevelElements topLevelElements, GlobalScope globalScope,
-                                             InstanceScope instanceScope) {
+    public static EffectiveSubtypeScope findEffectiveSubtypes(TopLevelElements topLevelElements,
+                                                              GlobalScope globalScope, InstanceScope instanceScope) {
         FindEffectiveSubtypes findEffectiveSubtypes = new FindEffectiveSubtypes(globalScope, instanceScope);
         int i;
         for (i = 0; i < FIND_EFFECTIVE_SUBTYPES_LIMIT && !findEffectiveSubtypes.fixpointReached(); i++) {
@@ -157,6 +164,7 @@ public class IEC61131Facade {
             topLevelElements.accept(findEffectiveSubtypes);
         }
         System.out.println("Done: fixpoint is " + findEffectiveSubtypes.fixpointReached() + " after " + i + " steps");
+        return findEffectiveSubtypes.getEffectiveSubtypeScope();
     }
 
     /**

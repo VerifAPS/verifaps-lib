@@ -23,6 +23,7 @@ package edu.kit.iti.formal.smv.ast;
  */
 
 import edu.kit.iti.formal.smv.SMVAstVisitor;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 
 /************************************************************/
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  *
  */
+@EqualsAndHashCode(callSuper = false)
 public class SBinaryExpression extends SMVExpr {
     /**
      *
@@ -77,6 +79,7 @@ public class SBinaryExpression extends SMVExpr {
     }
 
 
+    /*
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -97,4 +100,5 @@ public class SBinaryExpression extends SMVExpr {
         result = 31 * result + (operator != null ? operator.hashCode() : 0);
         return result;
     }
+    */
 }

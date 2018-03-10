@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.datatypes.values.ValueTransformation;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
+import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.sfclang.Utils;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
@@ -35,6 +36,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Alexander Weigl
@@ -143,21 +145,21 @@ public class Literal extends Initialization {
     }
 
     public static Literal time(Token text) {
-        return new Literal(AnyReal.LREAL, text);
+        return new Literal(TimeType.TIME_TYPE, text);
     }
 
     public static Literal timeOfDay(Token text) {
-        return new Literal(AnyReal.LREAL, text);
+        return new Literal(AnyDate.TIME_OF_DAY, text);
 
     }
 
     public static Literal date(Token symbol) {
-        return new Literal(AnyReal.LREAL, symbol);
+        return new Literal(AnyDate.DATE, symbol);
 
     }
 
     public static Literal dateAndTime(Token symbol) {
-        return new Literal(AnyReal.LREAL, symbol);
+        return new Literal(AnyDate.DATE_AND_TIME, symbol);
     }
 
     public static Literal integer(int val) {
@@ -180,6 +182,12 @@ public class Literal extends Initialization {
         return dataType.getIdentifier();
     }
 
+    public String getDataTypeName(@NotNull GlobalScope globalScope) {
+        if (globalScope.getEnumerateTypeMap().keySet().contains(getText()))
+            return globalScope.getEnumerateTypeMap().get(getText()).getTypeName();
+        return getDataTypeName();
+    }
+
     public String getText() {
         return (signed ? "-" : "") + token.getText();
     }
@@ -194,10 +202,12 @@ public class Literal extends Initialization {
         return visitor.visit(this);
     }
 
+    @NotNull
     public Value asValue() {
         return asValue(new ValueTransformation(this));
     }
 
+    @NotNull
     private Value asValue(DataTypeVisitor<Value> transformer) {
         if(dataType.getIdentifiedObject()==null) {
             throw new IllegalStateException("no identified data type");

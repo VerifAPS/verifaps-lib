@@ -64,6 +64,8 @@ public class GlobalScope implements Serializable {
     private Map<String, InterfaceDeclaration> interfaces = new LinkedHashMap<>();
     @NotNull
     private LocalScope globalVariableList = new LocalScope();
+    @NotNull
+    private Map<String, EnumerationTypeDeclaration> enumerateTypeMap = new HashMap<>();
 
     /**
      * <p>defaultScope.</p>
@@ -153,6 +155,12 @@ public class GlobalScope implements Serializable {
      */
     public void registerType(@NotNull TypeDeclaration dt) {
         dataTypes.put(dt.getTypeName(), dt);
+    }
+
+    public void registerType(@NotNull EnumerationTypeDeclaration enumerationTypeDeclaration) {
+        registerType((TypeDeclaration) enumerationTypeDeclaration);
+        enumerationTypeDeclaration.getAllowedValues().forEach(
+                v -> enumerateTypeMap.put(v.getText(), enumerationTypeDeclaration));
     }
 
     public Any resolveDataType(@NotNull ClassDeclaration classDeclaration) {

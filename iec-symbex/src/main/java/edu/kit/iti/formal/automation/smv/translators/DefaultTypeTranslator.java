@@ -31,6 +31,8 @@ import edu.kit.iti.formal.smv.ast.SMVType;
  * Created by weigl on 11.12.16.
  */
 public class DefaultTypeTranslator implements TypeTranslator{
+    private static final int WORD_LENGTH = 8;
+
     public static final DefaultTypeTranslator INSTANCE = new DefaultTypeTranslator();
 
     @Override
@@ -71,7 +73,8 @@ public class DefaultTypeTranslator implements TypeTranslator{
 
         @Override
         public SMVType visit(AnyDate.TimeOfDay timeOfDay) {
-            throw new IllegalTypeException("Could not match");
+            return new SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, WORD_LENGTH);
+            //throw new IllegalTypeException("Could not match");
         }
 
         @Override
@@ -87,7 +90,7 @@ public class DefaultTypeTranslator implements TypeTranslator{
                         GroundDataType.SIGNED_WORD :
                         GroundDataType.UNSIGNED_WORD, inttype.getBitLength());
         */
-            return new SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, 16);
+            return new SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, WORD_LENGTH);
         }
 
         @Override
@@ -97,14 +100,14 @@ public class DefaultTypeTranslator implements TypeTranslator{
 
         @Override
         public SMVType visit(TimeType timeType) {
-            throw new IllegalTypeException("Could not match");
+            return new SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, WORD_LENGTH);
         }
 
         @Override
         public SMVType visit(RangeType rangeType) {
             // TODO base types other than SINT
             // TODO variable width (needs to match with values everywhere)
-            return new SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, 8);
+            return new SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, WORD_LENGTH);
         }
 
         @Override

@@ -56,6 +56,7 @@ public class STSimplifier {
     public void transform() {
         initializeState();
         for (ST0Transformation t : transformations) {
+            System.out.println(t.getClass().getSimpleName());
             t.transform(state);
         }
     }

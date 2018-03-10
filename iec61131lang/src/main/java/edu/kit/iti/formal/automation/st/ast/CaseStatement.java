@@ -25,7 +25,9 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +74,8 @@ public class CaseStatement extends Statement {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Case extends Top {
         List<CaseCondition> conditions = new ArrayList<>();
         StatementList statements = new StatementList();

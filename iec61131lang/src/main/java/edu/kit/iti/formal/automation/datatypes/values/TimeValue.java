@@ -29,11 +29,42 @@ package edu.kit.iti.formal.automation.datatypes.values;
  * @version $Id: $Id
  */
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.Duration;
+import java.time.format.DateTimeParseException;
+import java.util.concurrent.TimeUnit;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class TimeValue {
-    private double days, hours, minutes, seconds, millieseconds;
+    private long milliseconds;
+
+    public TimeValue(String textValue) {
+        try {
+            milliseconds = Duration.parse("PT" + textValue).toMillis();
+        } catch (DateTimeParseException e) {
+            System.err.println(textValue);
+            e.printStackTrace();
+        }
+    }
+
+    public long getDays() {
+        return TimeUnit.MILLISECONDS.toDays(milliseconds);
+    }
+
+    public long getHours() {
+        return TimeUnit.MILLISECONDS.toHours(milliseconds);
+    }
+
+    public long getMinutes() {
+        return TimeUnit.MILLISECONDS.toMinutes(milliseconds);
+    }
+
+    public long getSeconds() {
+        return TimeUnit.MILLISECONDS.toSeconds(milliseconds);
+    }
 }

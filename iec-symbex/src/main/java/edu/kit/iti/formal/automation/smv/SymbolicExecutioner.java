@@ -81,7 +81,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     private Expression caseExpression;
 
     public SymbolicExecutioner() {
-        push(new SymbolicState(globalState));
+        push(new SymbolicState());
     }
 
     public SymbolicExecutioner(@Nullable GlobalScope globalScope) {
@@ -114,13 +114,32 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         return state.peek();
     }
 
+    public SMVExpr get(SVariable var) {
+        if (peek().containsKey(var))
+            return peek().get(var);
+        return globalState.get(var);
+    }
+
+    public void put(SVariable var, SMVExpr val) {
+        peek().put(var, val);
+    }
+
+    public void replace(SVariable var, SMVExpr val) {
+        if (peek().containsKey(var))
+            peek().replace(var, val);
+        else
+            globalState.replace(var, val);
+    }
+
     public SymbolicState pop() {
         SymbolicState top = state.pop();
         // Update global variables
+        /*
         for (SVariable var : globalState.keySet()) {
             peek().replace(var, top.get(var));
             globalState.replace(var, top.get(var));
         }
+        */
         return top;
     }
 
@@ -171,74 +190,6 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         return operationMap.translateUnaryOperator(u.getOperator(), left);
     }
 
-    @Override
-    public SMVExpr visit(@NotNull SymbolicReference symbolicReference) {
-        if (symbolicReference.getDataType() instanceof EnumerateType
-                && ((EnumerateType) symbolicReference.getDataType())
-                .getAllowedValues().contains(symbolicReference.getIdentifier()))
-            return valueTranslator.translate(new Values.VAnyEnum(
-                    (EnumerateType) symbolicReference.getDataType(),
-                    symbolicReference.getIdentifier()));
-        else
-            return peek().get(lift(symbolicReference));
-    }
-
-    //endregion
-
-    @NotNull
-    @Override
-    public SLiteral visit(@NotNull Literal literal) {
-        return valueTranslator.translate(literal);
-    }
-
-    @Nullable
-    @Override
-    public SCaseExpression visit(@NotNull ProgramDeclaration programDeclaration) {
-        localScope = programDeclaration.getLocalScope();
-        globalScope = localScope.getGlobalScope();
-
-        push(new SymbolicState(localScope.getLocalVariables().size()));
-
-        // initialize root state
-        for (VariableDeclaration vd : localScope) {
-            SVariable s = lift(vd);
-            peek().put(s, s);
-        }
-
-        globalState = new SymbolicState();
-        for (VariableDeclaration var : localScope.filterByFlags(VariableDeclaration.GLOBAL))
-            globalState.put(lift(var), peek().get(lift(var)));
-
-        programDeclaration.getProgramBody().accept(this);
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public SMVExpr visit(@NotNull AssignmentStatement assign) {
-        SymbolicState s = peek();
-        s.put(lift((SymbolicReference) assign.getLocation()),
-                assign.getExpression().accept(this));
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public SCaseExpression visit(@NotNull StatementList statements) {
-        for (Statement s : statements) {
-            if (s instanceof ExitStatement) {
-                return null;
-            }
-            s.accept(this);
-        }
-        return null;
-    }
-
-    @Override
-    public SMVExpr visit(@NotNull InvocationStatement fbc) {
-        return visit(fbc.getInvocation());
-    }
-
     public SMVExpr visit(@NotNull Invocation invocation) {
         FunctionDeclaration fd = globalScope.resolveFunction(invocation, localScope);
         if (fd == null)
@@ -246,7 +197,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
 
         //initialize data structure
-        SymbolicState calleeState = new SymbolicState(globalState);
+        SymbolicState calleeState = new SymbolicState();
         SymbolicState callerState = peek();
 
         //region register function name as output variable
@@ -282,6 +233,8 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
                 VariableDeclaration.INPUT | VariableDeclaration.INOUT | VariableDeclaration.OUTPUT);
 
         if (parameters.size() > inputVars.size()) {
+            System.err.println(fd.getFunctionName());
+            inputVars.stream().map(VariableDeclaration::getName).forEach(System.err::println);
             throw new FunctionInvocationArgumentNumberException();
         }
 
@@ -289,15 +242,23 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
             Invocation.Parameter parameter = parameters.get(i);
             if (parameter.isOutput())
                 continue;
-            if (parameters.get(i).getName() == null)
+            if (parameter.getName() == null)
                 // name from definition, in order of declaration, expression from caller site
                 calleeState.put(lift(inputVars.get(i)), parameter.getExpression().accept(this));
             else {
                 Optional o = inputVars.stream().filter(iv -> iv.getName().equals(parameter.getName())).findAny();
-                if (o.isPresent())
-                    calleeState.put(lift((VariableDeclaration) o.get()), parameter.getExpression().accept(this));
+                if (o.isPresent()) {
+                    SMVExpr e = parameter.getExpression().accept(this);
+                    assert e != null;
+                    calleeState.put(lift((VariableDeclaration) o.get()), e);
+                }
             }
         }
+
+        for (VariableDeclaration outputVar : fd.getLocalScope().filterByFlags(VariableDeclaration.OUTPUT))
+            calleeState.put(lift(outputVar), valueTranslator.translate(
+                    initValueTranslator.getInit(outputVar.getDataType())));
+
         push(calleeState);
         //endregion
 
@@ -312,13 +273,81 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         for (Invocation.Parameter parameter : outputParameters) {
             Optional o = outputVars.stream().filter(iv -> iv.getName().equals(parameter.getName())).findAny();
             if (o.isPresent())
-                peek().replace(lift((SymbolicReference) parameter.getExpression()),
+                replace(lift((SymbolicReference) parameter.getExpression()),
                         returnState.get(lift((VariableDeclaration) o.get())));
         }
 
         return fd.getReturnType() != null
                 ? calleeState.get(lift(fd.getLocalScope().getVariable(fd.getFunctionName())))
                 : null;
+    }
+
+    //endregion
+
+    @NotNull
+    @Override
+    public SLiteral visit(@NotNull Literal literal) {
+        return valueTranslator.translate(literal);
+    }
+
+    @Nullable
+    @Override
+    public SCaseExpression visit(@NotNull ProgramDeclaration programDeclaration) {
+        localScope = programDeclaration.getLocalScope();
+        globalScope = localScope.getGlobalScope();
+
+        push(new SymbolicState(localScope.getLocalVariables().size()));
+
+        // initialize root state
+        for (VariableDeclaration vd : localScope) {
+            SVariable s = lift(vd);
+            peek().put(s, s);
+        }
+
+        globalState = new SymbolicState();
+        for (VariableDeclaration var : localScope.filterByFlags(VariableDeclaration.GLOBAL))
+            globalState.put(lift(var), get(lift(var)));
+
+        programDeclaration.getProgramBody().accept(this);
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public SMVExpr visit(@NotNull AssignmentStatement assign) {
+        put(lift((SymbolicReference) assign.getLocation()),
+                assign.getExpression().accept(this));
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public SCaseExpression visit(@NotNull StatementList statements) {
+        for (Statement s : statements) {
+            if (s instanceof ExitStatement) {
+                return null;
+            }
+            s.accept(this);
+        }
+        return null;
+    }
+
+    @Override
+    public SMVExpr visit(@NotNull InvocationStatement fbc) {
+        return visit(fbc.getInvocation());
+    }
+
+    @NotNull
+    @Override
+    public SMVExpr visit(@NotNull SymbolicReference symbolicReference) {
+        if (symbolicReference.getDataType() instanceof EnumerateType
+                && ((EnumerateType) symbolicReference.getDataType())
+                .getAllowedValues().contains(symbolicReference.getIdentifier()))
+            return valueTranslator.translate(new Values.VAnyEnum(
+                    (EnumerateType) symbolicReference.getDataType(),
+                    symbolicReference.getIdentifier()));
+        else
+            return get(lift(symbolicReference));
     }
 
     @Nullable

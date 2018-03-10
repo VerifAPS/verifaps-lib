@@ -90,10 +90,10 @@ public class ModuleBuilder implements Runnable {
                         .filterByFlags(VariableDeclaration.INPUT);
 
 
-        Set<SVariable> stateVariables = vardeps.dependsOn(outputVars, inputVars);
-        //stateVariables = finalState.keySet().stream()
-         //       .filter(v -> !inputVars.stream().anyMatch(v2 -> v2.getName().equals(v.getName())))
-          //      .collect(Collectors.toSet());
+        Set<SVariable> stateVariables; //= vardeps.dependsOn(outputVars, inputVars);
+        stateVariables = finalState.keySet().stream()
+               .filter(v -> inputVars.stream().noneMatch(v2 -> v2.getName().equals(v.getName())))
+               .collect(Collectors.toSet());
 
         Set<String> outputVarNames = outputVars.stream().map(VariableDeclaration::getName).collect(Collectors.toSet());
         for (SVariable var : stateVariables) {

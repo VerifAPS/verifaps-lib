@@ -44,7 +44,7 @@ public class ArrayEmbedder implements ST0Transformation {
     @Override
     public void transform(STSimplifier.State state) {
         this.state = state;
-        for (VariableDeclaration arrayVariable : state.theProgram.getLocalScope().stream()
+        for (VariableDeclaration arrayVariable : state.theProgram.getLocalScope().parallelStream()
                 .filter(v -> v.getTypeDeclaration() instanceof ArrayTypeDeclaration)
                 .collect(Collectors.toList())) {
             ArrayTypeDeclaration array = (ArrayTypeDeclaration) arrayVariable.getTypeDeclaration();
@@ -63,6 +63,8 @@ public class ArrayEmbedder implements ST0Transformation {
                 }
             }
             ArrayEmbedderVisitor arrayEmbedderVisitor = new ArrayEmbedderVisitor(arrayVariable);
+            state.functions.values().forEach(f -> f.accept(arrayEmbedderVisitor));
+            state.theProgram.accept(arrayEmbedderVisitor);
             state.functions.values().forEach(f -> f.accept(arrayEmbedderVisitor));
             state.theProgram.accept(arrayEmbedderVisitor);
             state.theProgram.getLocalScope().getLocalVariables().remove(arrayVariable.getName());
@@ -138,7 +140,19 @@ public class ArrayEmbedder implements ST0Transformation {
                                 (StatementList) guardedStatement.getStatements().accept(this));
                     newIfStatement.setElseBranch((StatementList) ifStatement.getElseBranch().accept(this));
                     statement = newIfStatement;
-                } else if (statement instanceof GuardedStatement) {
+                }
+                else if (statement instanceof CaseStatement) {
+                    CaseStatement caseStatement = (CaseStatement) statement;
+                    CaseStatement newCaseStatement = new CaseStatement();
+                    newCaseStatement.setExpression(caseStatement.getExpression());
+                    for (CaseStatement.Case c : caseStatement.getCases())
+                        newCaseStatement.addCase(new CaseStatement.Case(
+                                c.getConditions(), (StatementList) c.getStatements().accept(this)
+                        ));
+                    newCaseStatement.setElseCase((StatementList) caseStatement.getElseCase().accept(this));
+                    statement = newCaseStatement;
+                }
+                else if (statement instanceof GuardedStatement) {
                     GuardedStatement guardedStatement = (GuardedStatement) statement;
                     guardedStatement.setStatements((StatementList) guardedStatement.getStatements().accept(this));
                     statement = guardedStatement;

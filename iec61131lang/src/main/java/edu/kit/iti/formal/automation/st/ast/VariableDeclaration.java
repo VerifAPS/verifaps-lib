@@ -140,11 +140,6 @@ public class VariableDeclaration extends Top
     private final Set<InstanceScope.Instance> instances = new HashSet<>();
 
     /**
-     * Set of effective data types the values of the variable can assume. Populated in static analysis.
-     */
-    private final Set<Any> effectiveDataTypes = new HashSet<>();
-
-    /**
      * <p>Constructor for VariableDeclaration.</p>
      */
     public VariableDeclaration() {
@@ -448,14 +443,6 @@ public class VariableDeclaration extends Top
 
     public void addInstance(@NotNull InstanceScope.Instance instance) {
         instances.add(instance);
-    }
-
-    public void addEffectiveDataType(@NotNull Any dataType) {
-        effectiveDataTypes.add(dataType);
-    }
-
-    public boolean hasEffectiveDataType(@NotNull Any dataType) {
-        return effectiveDataTypes.contains(dataType);
     }
 
     /**

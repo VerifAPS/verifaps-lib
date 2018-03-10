@@ -122,7 +122,7 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     public Object visit(Literal literal) {
         try {
             EnumerateType enumType = (EnumerateType) currentLocalScope.getGlobalScope().
-                    resolveDataType(literal.getDataTypeName());
+                    resolveDataType(literal.getDataTypeName(globalScope));
             literal.setDataType(enumType);
         } catch(ClassCastException | DataTypeNotDefinedException e) {}
         return null;

@@ -39,9 +39,9 @@ import java.util.stream.Collectors;
  *
  */
 public class SCaseExpression extends SMVExpr {
-    public List<Case> cases = new LinkedList<>();
+    public final List<Case> cases = new LinkedList<>();
 
-    public void add(SMVExpr condition, SMVExpr value) {
+    public void add(@NotNull SMVExpr condition, @NotNull SMVExpr value) {
         cases.add(new Case(condition, value));
     }
 
@@ -92,9 +92,7 @@ public class SCaseExpression extends SMVExpr {
     }
 
     public SMVType getSMVType() {
-        List<SMVType> list = cases.stream().map((Case a) -> {
-            return a.then.getSMVType();
-        }).collect(Collectors.toList());
+        List<SMVType> list = cases.stream().map((Case a) -> a.then.getSMVType()).collect(Collectors.toList());
 
         return SMVType.infer(list);
     }
@@ -108,19 +106,10 @@ public class SCaseExpression extends SMVExpr {
         return sCaseExpression;
     }
 
-    public Case addCase(SMVExpr cond, SMVExpr var) {
+    public Case addCase(@NotNull SMVExpr cond, @NotNull SMVExpr var) {
         Case c = new Case(cond, var);
         cases.add(c);
         return c;
-    }
-
-    @Override
-    public String toString() {
-        return "if " +
-                cases.stream()
-                        .map(c -> c.toString()).reduce((a, b) -> a + "\n" + b)
-                        .orElseGet(() -> "")
-                + " fi";
     }
 
     /**
@@ -130,16 +119,15 @@ public class SCaseExpression extends SMVExpr {
         /**
          *
          */
-        public SMVExpr condition;
+        @NotNull
+        public final SMVExpr condition;
         /**
          *
          */
-        public SMVExpr then;
+        @NotNull
+        public final SMVExpr then;
 
-        public Case() {
-        }
-
-        public Case(SMVExpr cond, SMVExpr var) {
+        Case(@NotNull SMVExpr cond, @NotNull SMVExpr var) {
             condition = cond;
             then = var;
         }
@@ -156,8 +144,7 @@ public class SCaseExpression extends SMVExpr {
 
             Case aCase = (Case) o;
 
-            if (!condition.equals(aCase.condition)) return false;
-            return then.equals(aCase.then);
+            return condition.equals(aCase.condition) && then.equals(aCase.then);
 
         }
 
@@ -168,4 +155,15 @@ public class SCaseExpression extends SMVExpr {
             return result;
         }
     }
+
+    @Override
+    public String toString() {
+        return "if " +
+                cases.stream()
+                        .map(Case::toString).reduce((a, b) -> a + "\n" + b)
+                        .orElse("")
+                + " fi";
+    }
+
+
 }
