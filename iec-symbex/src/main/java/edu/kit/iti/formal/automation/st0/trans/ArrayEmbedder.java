@@ -32,10 +32,12 @@ import edu.kit.iti.formal.automation.st0.STSimplifier;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -68,9 +70,17 @@ public class ArrayEmbedder implements ST0Transformation {
                 }
             }
             ArrayEmbedderVisitor arrayEmbedderVisitor = new ArrayEmbedderVisitor(arrayVariable);
-            state.functions.values().forEach(f -> f.accept(arrayEmbedderVisitor));
+            state.functions.values().parallelStream().forEach(f -> {
+                //System.out.println(f.getFunctionName());
+                f.accept(arrayEmbedderVisitor);
+            });
+            //System.out.println(state.theProgram.getProgramName());
             state.theProgram.accept(arrayEmbedderVisitor);
-            state.functions.values().forEach(f -> f.accept(arrayEmbedderVisitor));
+            state.functions.values().parallelStream().forEach(f -> {
+                //System.out.println(f.getFunctionName());
+                f.accept(arrayEmbedderVisitor);
+            });
+            //System.out.println(state.theProgram.getProgramName());
             state.theProgram.accept(arrayEmbedderVisitor);
             state.theProgram.getLocalScope().getLocalVariables().remove(arrayVariable.getName());
         }
@@ -97,12 +107,58 @@ public class ArrayEmbedder implements ST0Transformation {
     private class ArrayEmbedderVisitor extends AstMutableVisitor {
         private final VariableDeclaration arrayVariable;
 
-        Object visit(Statement statement) {
-            FindReferenceWithSubscriptVisitor findReferenceWithSubscriptVisitor = new FindReferenceWithSubscriptVisitor();
-            statement.accept(findReferenceWithSubscriptVisitor);
+        @Override
+        public Object visit(StatementList statements) {
+            // First branch the entire code block for read-only variables
+            Object newStatements = findAndBranch(statements, new FindReferenceWithSubscriptVisitor(
+                    symbolicReference -> {
+                        if (!(symbolicReference.getIdentifiedObject() instanceof VariableDeclaration))
+                            return false;
+                        VariableDeclaration var = (VariableDeclaration) symbolicReference.getIdentifiedObject();
+                        return var.is(VariableDeclaration.INPUT);
+                    }));
+            assert newStatements instanceof Statement || newStatements instanceof StatementList;
+            statements = newStatements instanceof Statement
+                    ? new StatementList((Statement) newStatements)
+                    : (StatementList) newStatements;
+            // Now the rest
+            StatementList statementList = new StatementList();
+            for (Statement statement : statements) {
+                // We need to handle guarded statements differently since the guard cannot contain another if statement
+                if (statement instanceof IfStatement) {
+                    IfStatement ifStatement = (IfStatement) statement;
+                    IfStatement newIfStatement = new IfStatement();
+                    for (GuardedStatement guardedStatement : ifStatement.getConditionalBranches())
+                        newIfStatement.addGuardedCommand(guardedStatement.getCondition(),
+                                (StatementList) guardedStatement.getStatements().accept(this));
+                    newIfStatement.setElseBranch((StatementList) ifStatement.getElseBranch().accept(this));
+                    statement = newIfStatement;
+                } else if (statement instanceof CaseStatement) {
+                    CaseStatement caseStatement = (CaseStatement) statement;
+                    CaseStatement newCaseStatement = new CaseStatement();
+                    newCaseStatement.setExpression(caseStatement.getExpression());
+                    for (CaseStatement.Case c : caseStatement.getCases())
+                        newCaseStatement.addCase(new CaseStatement.Case(
+                                c.getConditions(), (StatementList) c.getStatements().accept(this)
+                        ));
+                    newCaseStatement.setElseCase((StatementList) caseStatement.getElseCase().accept(this));
+                    statement = newCaseStatement;
+                } else if (statement instanceof GuardedStatement) {
+                    GuardedStatement guardedStatement = (GuardedStatement) statement;
+                    guardedStatement.setStatements((StatementList) guardedStatement.getStatements().accept(this));
+                    statement = guardedStatement;
+                }
+                statementList.add((Statement) findAndBranch(statement, new FindReferenceWithSubscriptVisitor()));
+            }
+            return statementList;
+        }
+
+        private Object findAndBranch(Visitable codeBlock, FindReferenceWithSubscriptVisitor subscriptFinder) {
+            assert codeBlock instanceof Statement || codeBlock instanceof StatementList;
+            codeBlock.accept(subscriptFinder);
             IfStatement branch = new IfStatement();
-            while (findReferenceWithSubscriptVisitor.found()) {
-                SymbolicReference instanceReference = findReferenceWithSubscriptVisitor.getTheReference();
+            while (subscriptFinder.found()) {
+                SymbolicReference instanceReference = subscriptFinder.getTheReference();
                 // TODO multiple subscripts
                 Expression subscript = instanceReference.getSubscripts().get(0);
                 // Add branches based on the instance reference we found
@@ -134,18 +190,20 @@ public class ArrayEmbedder implements ST0Transformation {
                         values.add(i);
                 }
                 for (int i : values) {
-                    StatementList block = new StatementList(statement.copy());
+                    StatementList block = codeBlock instanceof Statement
+                            ? new StatementList((Statement) ((Statement) codeBlock).copy())
+                            : new StatementList(((StatementList) codeBlock).copy());
                     block.accept(new ArrayAccessRenameVisitor(instanceReference.getIdentifier(), i));
                     branch.addGuardedCommand(new GuardedStatement(
                             BinaryExpression.equalsExpression(subscript, new Literal(rangeType, Integer.toString(i))),
                             block));
                 }
                 // Perform search once more
-                findReferenceWithSubscriptVisitor.reset();
+                subscriptFinder.reset();
             }
             if (branch.getConditionalBranches().isEmpty())
                 // Keep statements intact we case we don't find anything to rename
-                return statement;
+                return codeBlock;
             else if (branch.getConditionalBranches().size() == 1)
                 // Only one condition branch, no need for IF
                 return branch.getConditionalBranches().get(0).getStatements().get(0);
@@ -153,44 +211,15 @@ public class ArrayEmbedder implements ST0Transformation {
                 return branch;
         }
 
-        @Override
-        public Object visit(StatementList statements) {
-            StatementList statementList = new StatementList();
-            for (Statement statement : statements) {
-                // We need to handle guarded statements differently since the guard cannot contain another if statement
-                if (statement instanceof IfStatement) {
-                    IfStatement ifStatement = (IfStatement) statement;
-                    IfStatement newIfStatement = new IfStatement();
-                    for (GuardedStatement guardedStatement : ifStatement.getConditionalBranches())
-                        newIfStatement.addGuardedCommand(guardedStatement.getCondition(),
-                                (StatementList) guardedStatement.getStatements().accept(this));
-                    newIfStatement.setElseBranch((StatementList) ifStatement.getElseBranch().accept(this));
-                    statement = newIfStatement;
-                }
-                else if (statement instanceof CaseStatement) {
-                    CaseStatement caseStatement = (CaseStatement) statement;
-                    CaseStatement newCaseStatement = new CaseStatement();
-                    newCaseStatement.setExpression(caseStatement.getExpression());
-                    for (CaseStatement.Case c : caseStatement.getCases())
-                        newCaseStatement.addCase(new CaseStatement.Case(
-                                c.getConditions(), (StatementList) c.getStatements().accept(this)
-                        ));
-                    newCaseStatement.setElseCase((StatementList) caseStatement.getElseCase().accept(this));
-                    statement = newCaseStatement;
-                }
-                else if (statement instanceof GuardedStatement) {
-                    GuardedStatement guardedStatement = (GuardedStatement) statement;
-                    guardedStatement.setStatements((StatementList) guardedStatement.getStatements().accept(this));
-                    statement = guardedStatement;
-                }
-                statementList.add((Statement) visit(statement));
-            }
-            return statementList;
-        }
-
         @Getter
+        @RequiredArgsConstructor
         private class FindReferenceWithSubscriptVisitor extends AstVisitor {
+            private final Function<SymbolicReference, Boolean> match;
             private SymbolicReference theReference;
+
+            FindReferenceWithSubscriptVisitor() {
+                match = symbolicReference -> true;
+            }
 
             boolean found() {
                 return theReference != null;
@@ -207,8 +236,11 @@ public class ArrayEmbedder implements ST0Transformation {
             public Object visit(SymbolicReference symbolicReference) {
                 if (found())
                     return null;
+                // TODO multiple subscripts
                 if (symbolicReference.getIdentifier().equals(arrayVariable.getIdentifier())
-                        && symbolicReference.hasSubscripts())
+                        && symbolicReference.hasSubscripts()
+                        && symbolicReference.getSubscripts().get(0) instanceof SymbolicReference
+                        && match.apply((SymbolicReference) symbolicReference.getSubscripts().get(0)))
                     theReference = symbolicReference;
                 if (symbolicReference.hasSub())
                     symbolicReference.getSub().accept(this);
