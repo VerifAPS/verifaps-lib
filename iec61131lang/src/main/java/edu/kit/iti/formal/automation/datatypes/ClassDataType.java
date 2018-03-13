@@ -22,13 +22,14 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -65,9 +66,9 @@ public class ClassDataType extends RecordType {
     }
 
     @Override
-    public List<Field> getFields() {
-        return clazz.getEffectiveLocalScope().stream()
-                .map(v -> new Field(v.getName(), v.getDataType()))
-                .collect(Collectors.toList());
+    public LocalScope getFields() {
+        return new LocalScope(clazz.getEffectiveLocalScope().stream()
+                .map(VariableDeclaration::copy)
+                .collect(Collectors.toList()));
     }
 }

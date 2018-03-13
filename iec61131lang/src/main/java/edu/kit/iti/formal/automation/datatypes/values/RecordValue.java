@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.datatypes.values;
  */
 
 import edu.kit.iti.formal.automation.datatypes.RecordType;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,9 +46,10 @@ public class RecordValue {
     public RecordValue(RecordType recordType) {
         this.recordType = recordType;
 
-        for (RecordType.Field field : recordType.getFields()) {
+        for (VariableDeclaration field : recordType.getFields()) {
             fieldValues.put(field.getName(),
-                    new RuntimeVariable(field.getName(), field.getDefValue(), field.getDataType())
+                    new RuntimeVariable(field.getName(),
+                            field.getTypeDeclaration().getInitialization(), field.getDataType())
             );
         }
     }

@@ -63,8 +63,10 @@ public class StructureTypeDeclaration extends TypeDeclaration<StructureInitializ
     @Override
     public Any getDataType(@NotNull GlobalScope globalScope) {
         RecordType rt = new RecordType(getTypeName(), this);
-        for (VariableDeclaration s: fields.getLocalVariables().values())
-            rt.addField(s.getName(), s.getTypeDeclaration().getDataType(globalScope));
+        for (VariableDeclaration s : fields.getLocalVariables().values()) {
+            s.setDataType(s.getTypeDeclaration().getDataType(globalScope));
+            rt.getFields().add(s.copy());
+        }
         setBaseType(rt);
         return rt;
     }

@@ -25,6 +25,7 @@ package edu.kit.iti.formal.automation.st.util;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.Visitable;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -163,7 +164,13 @@ public class AstMutableVisitor extends AstVisitor<Object> {
         StatementList r = new StatementList();
         for (Statement s : statements) {
             if (s == null) continue;
-            r.add((Statement) s.accept(this));
+            Object o = s.accept(this);
+            if (o instanceof Statement)
+                r.add((Statement) o);
+            else if (o instanceof StatementList)
+                r.addAll((StatementList) o);
+            else
+                throw new NotImplementedException();
         }
         return r;
     }

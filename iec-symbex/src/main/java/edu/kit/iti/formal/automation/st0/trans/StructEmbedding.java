@@ -82,18 +82,20 @@ public class StructEmbedding implements ST0Transformation {
         }
 
         @NotNull
-        private VariableDeclaration createStructVariable(@NotNull RecordType.Field field,
+        private VariableDeclaration createStructVariable(@NotNull VariableDeclaration field,
                                                          @NotNull VariableDeclaration structVariable) {
             StructureInitialization initialization =
                     (StructureInitialization) structVariable.getTypeDeclaration().getInitialization();
             VariableDeclaration newVariable =
                     new VariableDeclaration(structVariable.getName() + "$" + field.getName(),
-                            structVariable.getType(),
+                            structVariable.getType() | field.getType(),
                             field.getDataType());
             newVariable.getTypeDeclaration().setBaseType(field.getDataType());
             newVariable.getTypeDeclaration().setBaseTypeName(field.getDataType().getName());
             if (initialization != null)
                 newVariable.getTypeDeclaration().setInitialization(initialization.getInitValues().get(field.getName()));
+            else
+                newVariable.setInit(field.getInit());
             return newVariable;
         }
     }
@@ -114,7 +116,7 @@ public class StructEmbedding implements ST0Transformation {
                     if (symbolicReference.getIdentifier().equals(structName) && !symbolicReference.hasSub()) {
                         // Found structure being passed as parameter
                         invocation.getParameters().remove(parameter);
-                        for (RecordType.Field field : structType.getFields())
+                        for (VariableDeclaration field : structType.getFields())
                             invocation.addParameter(new Invocation.Parameter(
                                     parameter.getName() != null
                                             ? parameter.getName() + "$" + field.getName()

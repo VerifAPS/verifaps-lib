@@ -22,15 +22,14 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.st.ast.TypeDeclaration;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by weigl on 10.06.14.
@@ -44,7 +43,7 @@ import java.util.List;
 public class RecordType extends Any {
     private String name;
     @NotNull
-    private List<Field> fields = new ArrayList<>();
+    private LocalScope fields = new LocalScope();
     /**
      * The declaration associated with the type.
      */
@@ -61,22 +60,13 @@ public class RecordType extends Any {
     }
 
     /**
-     * <p>Getter for the field <code>fields</code>.</p>
-     *
-     * @return a {@link java.util.List} object.
-     */
-    public List<Field> getFields() {
-        return fields;
-    }
-
-    /**
      * <p>addField.</p>
      *
      * @param name a {@link java.lang.String} object.
      * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.Any} object.
      */
     public void addField(@NotNull String name, @NotNull Any dataType) {
-        fields.add(new Field(name, dataType));
+        fields.add(new VariableDeclaration(name, dataType));
     }
 
     /** {@inheritDoc} */
@@ -94,6 +84,7 @@ public class RecordType extends Any {
         return visitor.visit(this);
     }
 
+    @Deprecated
     public class Field {
         private String name;
         private Any dataType;
