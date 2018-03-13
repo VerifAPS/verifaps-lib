@@ -250,7 +250,7 @@ public class BranchEffectiveTypes extends STOOTransformation {
                     state.getEffectiveSubtypeScope().getTypes((VariableDeclaration) reference.getIdentifiedObject());
             boolean allBlocksEqual = true;  // true until false
             StatementList lastBlock = null;
-            if (effectiveTypes.size() > 1)
+            if (effectiveTypes.size() > 1 && !((VariableDeclaration) reference.getIdentifiedObject()).isConstant())
                 for (Any effectiveType : new SortedList<>(FXCollections.observableArrayList(effectiveTypes))) {
                     StatementList block = new StatementList(originalStatement.copy());
                     //block.add(0, new CommentStatement(deferredTypeReference + " : " + effectiveType.getName()));
@@ -270,6 +270,8 @@ public class BranchEffectiveTypes extends STOOTransformation {
                     }
                 }
             else {
+                assert !((VariableDeclaration) reference.getIdentifiedObject()).isConstant()
+                        || effectiveTypes.size() == 1;
                 Optional o = effectiveTypes.stream().findAny();
                 assert o.isPresent();
                 originalStatement.accept(new SetEffectiveTypeToReferenceVisitor(deferredTypeReference, (Any) o.get()));

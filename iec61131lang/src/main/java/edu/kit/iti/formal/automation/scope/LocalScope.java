@@ -79,6 +79,11 @@ public class LocalScope implements Visitable, Iterable<VariableDeclaration>, Cop
         }
     }
 
+    public LocalScope(List<VariableDeclaration> vars) {
+        this();
+        vars.forEach(this::add);
+    }
+
     public Map<String, VariableDeclaration> asMap() {
         return localVariables;
     }

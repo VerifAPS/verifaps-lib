@@ -272,7 +272,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
                 VariableDeclaration.OUTPUT | VariableDeclaration.INOUT);
         for (Invocation.Parameter parameter : outputParameters) {
             Optional o = outputVars.stream().filter(iv -> iv.getName().equals(parameter.getName())).findAny();
-            if (o.isPresent())
+            if (o.isPresent() && parameter.getExpression() instanceof SymbolicReference)
                 replace(lift((SymbolicReference) parameter.getExpression()),
                         returnState.get(lift((VariableDeclaration) o.get())));
         }

@@ -464,6 +464,7 @@ public class VariableDeclaration extends Top
         VariableDeclaration vd = new VariableDeclaration(name, type,
                 typeDeclaration);
         vd.dataType = dataType;
+        vd.setInit(getInit());
         return vd;
     }
 

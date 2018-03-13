@@ -139,6 +139,7 @@ public class ReferenceToArrayAccess extends STOOTransformation {
                 if (variableDeclaration.getInstances().size() == 1) {
                     Optional<InstanceScope.Instance> o = variableDeclaration.getInstances().stream().findAny();
                     assert o.isPresent();
+                    variableDeclaration.setType(VariableDeclaration.CONSTANT);
                     variableDeclaration.setInit(new Literal(variableDeclaration.getDataType(),
                             Integer.toString(state.getInstanceID(o.get()))));
                 } else variableDeclaration.setInit(new Literal(variableDeclaration.getDataType(),
