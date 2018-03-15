@@ -31,7 +31,7 @@ import edu.kit.iti.formal.smv.ast.SMVType;
  * Created by weigl on 11.12.16.
  */
 public class DefaultTypeTranslator implements TypeTranslator{
-    private static final int WORD_LENGTH = 8;
+    private static final int WORD_LENGTH = 16;
 
     public static final DefaultTypeTranslator INSTANCE = new DefaultTypeTranslator();
 
