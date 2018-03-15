@@ -22,6 +22,7 @@
 
 package edu.kit.iti.formal.automation;
 
+import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SMVType;
@@ -42,13 +43,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * @author Augusto Modanese
  */
 @RunWith(Parameterized.class)
 public class FacadeSTFileTest {
-    private static final String RESOURCES_PATH = "edu/kit/iti/formal/automation/smv";
+    private static final String RESOURCES_PATH = "edu/kit/iti/formal/automation/smv/eval";
 
     private Process nuxmv;
 
@@ -84,10 +86,14 @@ public class FacadeSTFileTest {
             Files.createDirectory(getSMVDirectory());
     }
 
-    @Test(timeout = 2 * 60 * 1000)
+    @Test(timeout = 5 * 60 * 1000)
     public void testSMVEvaluateProgram() throws IOException, InterruptedException {
         System.out.println(file.getName());
         TopLevelElements code = IEC61131Facade.file(file);
+        System.out.println("Found " + code.stream()
+                .filter(tle -> tle instanceof ClassDeclaration)
+                .collect(Collectors.toList())
+                .size() + " classes");
         code = SymbExFacade.simplifyOO(code);
         PrintWriter pw = new PrintWriter(Paths.get(getSMVDirectory() + "/" + file.getName() + "oo").toString());
         pw.println(IEC61131Facade.print(code));
@@ -101,10 +107,11 @@ public class FacadeSTFileTest {
         SMVModule mainModule = createMainModule(module);
         StringBuilder smvCode = new StringBuilder(mainModule.toString());
         smvCode.append(module.toString());
-        System.out.println(smvCode);
+        //System.out.println(smvCode);
         PrintWriter printWriter = new PrintWriter(getSMVFile().toString());
         printWriter.println(smvCode);
         printWriter.close();
+        System.out.println(file.getName());
         /*
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
