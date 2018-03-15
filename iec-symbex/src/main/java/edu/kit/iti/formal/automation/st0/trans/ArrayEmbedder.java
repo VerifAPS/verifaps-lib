@@ -172,17 +172,24 @@ public class ArrayEmbedder implements ST0Transformation {
                     SymbolicReference r = (SymbolicReference) subscript;
                     while (r.hasSub())
                         r = r.getSub();
-                    if (r.getIdentifiedObject() instanceof VariableDeclaration)
-                        try {
-                            state.stooState.getEffectiveSubtypeScope()
-                                    .getTypes((VariableDeclaration) r.getIdentifiedObject()).parallelStream()
-                                    .map(t -> state.stooState.getInstanceIDRangesToClass(
-                                            ((ClassDataType) t).getClazz()))
-                                    .forEach(pairs -> pairs.parallelStream()
-                                            .forEach(p -> IntStream.range(p.getKey(), p.getValue() + 1)
-                                                    .forEach(values::add)));
-                        }
-                        catch (NoSuchElementException ignored) { }
+                    if (r.getIdentifiedObject() instanceof VariableDeclaration) {
+                        VariableDeclaration variable = (VariableDeclaration) r.getIdentifiedObject();
+                        if (!(variable.getInstances().isEmpty()))
+                            variable.getInstances().parallelStream()
+                                    .map(i -> state.stooState.getInstanceID(i))
+                                    .forEach(values::add);
+                        else
+                            try {
+                                state.stooState.getEffectiveSubtypeScope()
+                                        .getTypes(variable).parallelStream()
+                                        .map(t -> state.stooState.getInstanceIDRangesToClass(
+                                                ((ClassDataType) t).getClazz()))
+                                        .forEach(pairs -> pairs.parallelStream()
+                                                .forEach(p -> IntStream.range(p.getKey(), p.getValue() + 1)
+                                                        .forEach(values::add)));
+                            } catch (NoSuchElementException ignored) {
+                            }
+                    }
                 }
                 if (values.isEmpty()) {
                     int rangeMin = Integer.parseInt(range.getStart().getText());
