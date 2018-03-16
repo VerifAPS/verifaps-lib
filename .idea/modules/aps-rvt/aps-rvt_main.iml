@@ -77,10 +77,10 @@
     <orderEntry type="library" name="Gradle: de.tu-dresden.inf.lat.jsexp:jsexp:0.2.2" level="project" />
     <orderEntry type="library" name="Gradle: org.glassfish:javax.json:1.0.4" level="project" />
     <orderEntry type="library" name="Gradle: org.antlr:ST4:4.0.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.projectlombok:lombok:1.16.20" level="project" />
+    <orderEntry type="module" module-name="iec-symbex_main" />
     <orderEntry type="module" module-name="smv-model_main" />
     <orderEntry type="module" module-name="iec-xml_main" />
     <orderEntry type="module" module-name="iec61131lang_main" />
-    <orderEntry type="module" module-name="iec-symbex_main" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.projectlombok:lombok:1.16.20" level="project" />
   </component>
 </module>
