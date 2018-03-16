@@ -83,10 +83,10 @@
     <orderEntry type="library" name="Gradle: net.sf.jopt-simple:jopt-simple:4.9" level="project" />
     <orderEntry type="library" name="Gradle: de.tu-dresden.inf.lat.jsexp:jsexp:0.2.2" level="project" />
     <orderEntry type="library" name="Gradle: org.glassfish:javax.json:1.0.4" level="project" />
+    <orderEntry type="module" module-name="smv-model_main" />
     <orderEntry type="module" module-name="iec-symbex_main" />
     <orderEntry type="module" module-name="iec-xml_main" />
     <orderEntry type="module" module-name="iec61131lang_main" />
-    <orderEntry type="module" module-name="smv-model_main" />
   </component>
   <component name="TestModuleProperties" production-module="aps-rvt_main" />
 </module>
