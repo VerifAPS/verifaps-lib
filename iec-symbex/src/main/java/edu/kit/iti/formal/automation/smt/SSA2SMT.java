@@ -38,7 +38,7 @@ import static de.tudresden.inf.lat.jsexp.SexpFactory.newNonAtomicSexp;
 
 /**
  * @author Alexander Weigl
- * @version 1 (27.01.17) &mid; 2 (15.10.17)
+ * @version 1 (27.01.17), 2 (15.10.17)
  */
 @RequiredArgsConstructor
 public class SSA2SMT implements Runnable {

@@ -158,7 +158,7 @@ class CounterExample {
 
     class Values {
         @field:XmlAttribute
-        var id: Integer? = null
+        var id: Int? = null
 
         @field:XmlElements(XmlElement(name = "value"))
         var values = arrayListOf<Value>()

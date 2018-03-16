@@ -1,0 +1,13 @@
+apply plugin: 'antlr'
+
+description = 'Library for creation and parsing of SMV files.'
+
+dependencies {
+    compile group: 'org.antlr', name: 'antlr4-runtime', version:'4.7'
+    antlr group: 'org.antlr', name: 'antlr4', version:'4.7'
+}
+
+generateGrammarSource {
+    arguments += ["-long-messages", "-visitor",
+                  "-package", "edu.kit.iti.formal.smv.parser"]
+}

@@ -35,7 +35,7 @@
                 <configuration>
                     <atn>false</atn>
                     <visitor>true</visitor>
-                    <libDirectory>src/main/antlr4/edu/kit/iti/formal/automation/st/antlr</libDirectory>
+                    <libDirectory>src/main/antlr/edu/kit/iti/formal/automation/st/antlr</libDirectory>
                 </configuration>
 
                 <executions>

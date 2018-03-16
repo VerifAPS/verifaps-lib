@@ -12,4 +12,4 @@ deployment:
     releases:
         branch: master
         commands:
-            - share/mvn-release.sh
+            #- share/mvn-release.sh
