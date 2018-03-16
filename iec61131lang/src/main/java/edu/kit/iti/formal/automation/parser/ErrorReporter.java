@@ -58,7 +58,7 @@ public class ErrorReporter extends BaseErrorListener {
         se.charPositionInLine = charPositionInLine;
         se.msg = msg;
         if (print) {
-            System.err.printf("[syntax-error] %s:%d%d: %s%n", se.source, line, charPositionInLine, msg);
+            System.err.printf("[syntax-error] %s:%d:%d: %s%n", se.source, line, charPositionInLine, msg);
         }
         errors.add(se.build());
     }

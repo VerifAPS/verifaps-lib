@@ -1,80 +1,3 @@
-(* Special verification function, throwing error during transformation, if detected.
- *
- *)
-FUNCTION ERROR : ANY
-VAR msg : STRING; END_VAR
-
-// special handling
-
-END_FUNCTION
-
-(* special handling
- *
- *)
-FUNCTION SMV : ANY
-VAR_INPUT
-        code : WSTRING;
-END_VAR
-
-END_FUNCTION
-
-
-(*
- *Binary selection between 2 operands in0
-   (G is FALSE) and in1 (G is TRUE)*)
- *)
-FUNCTION SEL : ANY
-VAR_INPUT
-        G : BOOL;
-        a,b : ANY;
-END_VAR
-
-IF G THEN SEL := a;
-     ELSE SEL := b; END_IF
-
-END_FUNCTION
-
-
-(* Returns the greater of 2 values
- *
- *)
-FUNCTION MAX : ANY_INT
-VAR_INPUT
-        in0 : ANY_INT;
-        in1 : ANY_INT;
-END_VAR
-
-MAX := sel(in0>=in1, in0, in1);
-
-END_FUNCTION
-
-
-(* Returns the lesser of 2 values in0 and in1
- *
- *)
-FUNCTION MIN : ANY_INT
-VAR_INPUT
-        in0 : ANY_INT;
-        in1 : ANY_INT;
-END_VAR
-
-MIN := sel(in0<=in1, in0, in1);
-
-END_FUNCTION
-
-(* Limits the value range (in is set back to MIN or MAX in case of exceeding the range
- *
- *)
-FUNCTION LIMIT
-VAR_INPUT
-        min, in, max : ANY_BIT;
-END_VAR
-
-LIMIT := MAX(min, MIN(in, max));
-
-END_FUNCTION
-
-
 (*
  * Bitwise rotation to the right of operator in by K
  *
@@ -104,18 +27,17 @@ END_FUNCTION
 (* Bitwise left-shift of operator in by K
  *
  *)
-FUNCTION SHL
+FUNCTION SHL : ANY_BIT
 VAR_INPUT
         in : ANY_BIT;
         K : INT;
 END_VAR
-
 END_FUNCTION
 
 (*
  * Bitwise right-shift of operator in by K
  *)
-FUNCTION SHR
+FUNCTION SHR : ANY_BIT
 VAR_INPUT
         in : ANY_BIT;
         K : INT;
@@ -126,18 +48,17 @@ END_FUNCTION
 (*
  * Bitwise rotation to the left of operator in by K
  *)
-FUNCTION ROL
+FUNCTION ROL : ANY_BIT
 VAR_INPUT
         in : ANY_BIT;
         K : INT;
 END_VAR
-
 END_FUNCTION
 
 (*
  * Selects the Kth value out of a group of values (in0 to In_n)
  *)
-FUNCTION MUX
+FUNCTION MUX : ANY_BIT
 VAR_INPUT
         K   : ANY_INT;
         in0 : ANY;
@@ -153,15 +74,13 @@ FUNCTION ADR : DWORD
 VAR_INPUT
         a : ANY;
 END_VAR
-
-ERROR("Pointers are not implemented")
-
+ERROR("Pointers are not implemented");
 END_FUNCTION
 
 (* BOOL_TO_<type> Type conversion of the boolean operand
  *
  *)
-FUNCTION BOOL_TO_INT :
+FUNCTION BOOL_TO_INT : INT
 VAR_INPUT
         b : BOOL;
 END_VAR
@@ -185,9 +104,9 @@ END_FUNCTION
 (*
  * Type conversion of an INT Operand to another elementary type
  *)
-FUNCTION INT_TO_ANY
+FUNCTION INT_TO_ANY : ANY
 VAR_INPUT
-        TO : ANY_INT;
+        Q : ANY_INT;
 END_VAR
 
 END_FUNCTION
@@ -212,17 +131,16 @@ END_FUNCTION
 
 
 (* Type conversion of a TIME operand to another elementary type *)
-FUNCTION TIME_TO_INT
+FUNCTION TIME_TO_INT : INT
 VAR_INPUT
-        time : TIME;
+        Q: TIME;
 END_VAR
-
 END_FUNCTION
 
 (* Type conversion of a TOD operand to another elementary type *)
-FUNCTION TOD_TO_TYPE
+FUNCTION TOD_TO_TYPE : ANY_BIT
 VAR_INPUT
-        TO : ANY_BIT;
+        Q : ANY_BIT;
 END_VAR
 
 END_FUNCTION
@@ -235,7 +153,16 @@ END_VAR
 
 END_FUNCTION
 (* Type conversion of a DT operand to another elementary type *)
-FUNCTION DT
+FUNCTION DT : INT
+VAR_INPUT
+        TO : ANY_BIT;
+        type : INT;
+END_VAR
+
+END_FUNCTION
+
+(* type		Type conversion of a STRING operand to another elementary type *)
+FUNCTION STRING : STRING
 VAR_INPUT
         TO : ANY_BIT;
         <type : INT;
@@ -243,16 +170,8 @@ END_VAR
 
 END_FUNCTION
 
-(* type>		Type conversion of a STRING operand to another elementary type *)
-FUNCTION STRING
-VAR_INPUT
-        TO : ANY_BIT;
-        <type : INT;
-END_VAR
-
-END_FUNCTION
 (* to INT *)
-FUNCTION TRUNC
+FUNCTION TRUNC : STRING
 VAR_INPUT
         in : ANY_BIT;
         TRUNC : INT;
@@ -260,7 +179,7 @@ END_VAR
 
 END_FUNCTION
 (* operand in *)
-FUNCTION ABS
+FUNCTION ABS : INT
 VAR_INPUT
         in : ANY_BIT;
         ABS : INT;
@@ -270,7 +189,7 @@ END_FUNCTION
 
 (*
 (* operand in *)
-FUNCTION SQRT
+FUNCTION SQRT : REAL
 VAR_INPUT
         in : ANY_BIT;
         SQRT : INT;
@@ -284,7 +203,7 @@ VAR_INPUT
         LN : INT;
 END_VAR
 
-END_FUNCTION
+END_FUNCTION : REAL
 (* in, baseType 10 *)
 FUNCTION LOG
 VAR_INPUT
@@ -302,7 +221,7 @@ END_VAR
 
 END_FUNCTION
 (* in *)
-FUNCTION SIN
+FUNCTION SIN : REAL
 VAR_INPUT
         in : ANY_BIT;
         SIN : INT;
@@ -310,7 +229,7 @@ END_VAR
 
 END_FUNCTION
 (* in *)
-FUNCTION COS
+FUNCTION COS : REAL
 VAR_INPUT
         IN : ANY_BIT;
         COS : INT;
@@ -318,15 +237,15 @@ END_VAR
 
 END_FUNCTION
 (* in *)
-FUNCTION TAN
+FUNCTION TAN : REAL
 VAR_INPUT
         in : ANY_BIT;
         TAN : INT;
 END_VAR
-
 END_FUNCTION
+
 (* operand in *)
-FUNCTION ASIN
+FUNCTION ASIN : REAL
 VAR_INPUT
         in : ANY_BIT;
         ASIN : INT;
@@ -334,7 +253,7 @@ END_VAR
 
 END_FUNCTION
 (* operand in *)
-FUNCTION ACOS
+FUNCTION ACOS : REAL
 VAR_INPUT
         in : ANY_BIT;
         ACOS : INT;
@@ -342,39 +261,38 @@ END_VAR
 
 END_FUNCTION
 (* operand in *)
-FUNCTION ATAN
+FUNCTION ATAN : REAL
 VAR_INPUT
         in : ANY_BIT;
         ATAN : INT;
 END_VAR
-
 END_FUNCTION
+
 (* of operand in with expt *)
-FUNCTION EXPT
+FUNCTION EXPT : REAL
 VAR_INPUT
         in : ANY_BIT;
         expt : INT;
 END_VAR
-
 END_FUNCTION
 (* operand in *)
-FUNCTION LEN
+FUNCTION LEN : STRING
 VAR_INPUT
         in : ANY_BIT;
         LEN : INT;
 END_VAR
-
 END_FUNCTION
 (* string of given size of string str standard.lib *)
-FUNCTION LEFT
+FUNCTION LEFT : STRING
 VAR_INPUT
         str : ANY_BIT;
         size : INT;
 END_VAR
 
 END_FUNCTION
+
 (* string of given size of string str standard.lib *)
-FUNCTION RIGHT
+FUNCTION RIGHT : STRING
 VAR_INPUT
         str : ANY_BIT;
         size : INT;
@@ -383,10 +301,14 @@ END_VAR
 END_FUNCTION
 (* string of str of given length *)
 
-MID(str, len, pos)	MID		Partial
-
+FUNCTION MID : STRING
+VAR_INPUT
+    str : STRING;
+    len, pos : INT;
+END_VAR
+END_FUNCTION
 (* two subsequent strings standard.lib *)
-FUNCTION CONCAT
+FUNCTION CONCAT : STRING
 VAR_INPUT
         str1 : ANY_BIT;
         str2 : INT;
@@ -395,7 +317,7 @@ END_VAR
 END_FUNCTION
 
 (* string str1 in String str2 at position pos standard.lib *)
-FUNCTION INSERT
+FUNCTION INSERT : STRING
 VAR_INPUT
         str1,str2 : ANY_BIT;
         pos : INT;
@@ -404,7 +326,7 @@ END_VAR
 END_FUNCTION
 
 //-                     - -- -
-FUNCTION  DELETE
+FUNCTION  DELETE : STRING
 
 VAR_INPUT
         str1 : ANY_BIT;
@@ -413,7 +335,7 @@ END_VAR
 
 END_FUNCTION
 
-FUNCTION REPLACE
+FUNCTION REPLACE : STRING
 VAR_INPUT
         str1,str : ANY_BIT;
         len, pos : INT;
@@ -421,57 +343,12 @@ END_VAR
 
 END_FUNCTION
 
-FUNCTION FIND
+FUNCTION FIND : INT
 VAR_INPUT
-        str1 : ANY_BIT;
-        str2 : INT;
+        str1 : STRING;
+        str2 : STRING;
 END_VAR
 
 END_FUNCTION
 *)
 
-
-(* from: http://www.fernhillsoftware.com/help/iec-61131/common-elements/standard-function-blocks/down-counter.html *)
-Function_Block CTD
-        Var_Input CD : BOOL R_EDGE; LD : BOOL; PV : INT; End_Var
-        Var_Output Q : BOOL; CV : INT; End_Var
-
-        IF LD THEN
-            CV := PV;
-        ELSEIF CU AND (CV > 0)
-            CV := CV - 1;
-        END_IF;
-
-        Q := (CV <= 0);
-    End_Function_Block
-
-Function_Block CTU
-    Var_Input CU : BOOL R_EDGE; R : BOOL; PV : INT; End_Var
-    Var_Output Q : BOOL; CV : INT; End_Var
-
-    IF R THEN
-        CV := 0;
-    ELSEIF CU AND (CV < PV )
-        CV := CV + 1;
-    END_IF;
-
-    Q := (CV >= PV);
-End_Function_Block
-
-Function_Block R_TRIG
-    Var_Input CLK : BOOL; End_Var
-    Var_Output Q : BOOL; End_Var
-    Var M : BOOL; End_Var
-
-    Q := CLK AND NOT M;
-    M := CLK;
-End_Function_Block
-
-Function_Block F_TRIG
-    Var_Input CLK : BOOL; End_Var
-    Var_Output Q : BOOL; End_Var
-    Var M : BOOL := TRUE; End_Var
-
-    Q := NOT CLK AND NOT M;
-    M := NOT CLK;
-End_Function_Block

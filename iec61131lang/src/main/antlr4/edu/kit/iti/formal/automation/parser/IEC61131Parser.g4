@@ -11,7 +11,7 @@ options {tokenVocab = IEC61131Lexer;}
 
 start
 :
-	(library_element_declaration)+
+	(library_element_declaration)*
 ;
 
 
@@ -112,6 +112,9 @@ elementary_type_name
 	| STRING
 	| WSTRING
 	| TIME
+	| ANY
+	| ANY_BIT
+	| ANY_INT
 ;
 
 numeric_type_name
