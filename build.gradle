@@ -3,19 +3,28 @@ plugins {
     id 'io.franzbecker.gradle-lombok' version '1.11' apply false
     id "com.github.hierynomus.license" version "0.14.0" apply false
     id "com.jfrog.bintray" version "1.7.3" apply false
+    id 'com.palantir.git-version' version '0.10.1' apply false
 }
 
 allprojects {
     apply plugin: 'maven'
     apply plugin: 'idea'
+    apply plugin: 'com.palantir.git-version'
+
     group = 'edu.kit.iti.formal'
-    version = '1.5.0-SNAPSHOT'
+
+    ext.gitVersion = versionDetails()
+    version = ext.gitVersion.lastTag.replace("v","")
+    if (! ext.gitVersion.isClean) {
+        version = "${version}-SNAPSHOT"
+    }
+
+    //println(ext.gitVersion)
+    //println(version)
 
     idea {
         module {
-            // if you hate browsing Javadoc
             downloadJavadoc = false
-            // and love reading sources :)
             downloadSources = true
         }
     }
