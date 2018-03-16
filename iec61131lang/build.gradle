@@ -3,13 +3,14 @@ apply plugin: 'antlr'
 description = 'iec61131lang'
 
 dependencies {
-    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7'
-    antlr group: 'org.antlr', name: 'antlr4', version: '4.7'
+    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.1'
+    antlr group: 'org.antlr', name: 'antlr4', version: '4.7.1'
 }
 
 generateGrammarSource {
-    arguments += ["-long-messages", "-visitor",
-                  "-package", "edu.kit.iti.formal.automation.parser",
-                  "-lib", "./src/main/antlr/edu/kit/iti/formal/automation/parser"]
+    maxHeapSize = "64m"
+    arguments += ["-visitor", "-long-messages", "-package","edu.kit.iti.formal.automation.parser"]
+    outputDirectory file("${project.buildDir}/generated-src/antlr/main/edu/kit/iti/formal/automation/parser")
+    println(arguments)
 }
 

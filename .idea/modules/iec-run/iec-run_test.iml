@@ -33,7 +33,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="iec-run_main" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -47,6 +46,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="iec-run_main" />
     <orderEntry type="library" name="Gradle: com.ibm.icu:icu4j:58.2" level="project" />
     <orderEntry type="library" name="Gradle: org.glassfish:javax.json:1.0.4" level="project" />
     <orderEntry type="library" name="Gradle: org.abego.treelayout:org.abego.treelayout.core:1.0.3" level="project" />
@@ -70,16 +70,16 @@
     <orderEntry type="library" name="Gradle: com.google.errorprone:error_prone_annotations:2.1.3" level="project" />
     <orderEntry type="library" name="Gradle: com.google.j2objc:j2objc-annotations:1.1" level="project" />
     <orderEntry type="library" name="Gradle: org.codehaus.mojo:animal-sniffer-annotations:1.14" level="project" />
-    <orderEntry type="library" name="Gradle: org.antlr:antlr4:4.7" level="project" />
-    <orderEntry type="library" name="Gradle: org.antlr:antlr4-runtime:4.7" level="project" />
+    <orderEntry type="library" name="Gradle: org.antlr:antlr4:4.7.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.antlr:antlr4-runtime:4.7.1" level="project" />
     <orderEntry type="library" name="Gradle: org.jdom:jdom2:2.0.6" level="project" />
     <orderEntry type="library" name="Gradle: jaxen:jaxen:1.1.4" level="project" />
     <orderEntry type="library" name="Gradle: net.sf.jopt-simple:jopt-simple:4.9" level="project" />
     <orderEntry type="library" name="Gradle: de.tu-dresden.inf.lat.jsexp:jsexp:0.2.2" level="project" />
     <orderEntry type="library" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
-    <orderEntry type="module" module-name="iec-symbex_main" />
     <orderEntry type="module" module-name="iec-xml_main" />
     <orderEntry type="module" module-name="iec61131lang_main" />
+    <orderEntry type="module" module-name="iec-symbex_main" />
     <orderEntry type="module" module-name="smv-model_main" />
   </component>
   <component name="TestModuleProperties" production-module="iec-run_main" />

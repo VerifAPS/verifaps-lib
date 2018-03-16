@@ -2,8 +2,6 @@ parser grammar IEC61131Parser;
 
 options {tokenVocab = IEC61131Lexer;}
 
-@header {}
-
 @members {
     @lombok.Getter @lombok.Setter @org.jetbrains.annotations.NotNull
     private ErrorReporter errorReporter = new ErrorReporter();
