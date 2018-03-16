@@ -33,6 +33,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="iec-modularization_main" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -45,7 +46,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="iec-modularization_main" />
     <orderEntry type="library" name="Gradle: com.ibm.icu:icu4j:58.2" level="project" />
     <orderEntry type="library" name="Gradle: org.glassfish:javax.json:1.0.4" level="project" />
     <orderEntry type="library" name="Gradle: org.abego.treelayout:org.abego.treelayout.core:1.0.3" level="project" />

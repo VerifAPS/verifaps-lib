@@ -10,6 +10,6 @@ dependencies {
 generateGrammarSource {
     arguments += ["-long-messages", "-visitor",
                   "-package", "edu.kit.iti.formal.automation.parser",
-                  "-lib", "src/main/antlr/edu/kit/iti/formal/automation/parser"]
+                  "-lib", "$projectDir/src/main/antlr/edu/kit/iti/formal/automation/parser"]
 }
 
