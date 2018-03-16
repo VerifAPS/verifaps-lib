@@ -22,6 +22,7 @@
 
 package edu.kit.iti.formal.automation.stoo.trans;
 
+import edu.kit.iti.formal.automation.st.util.Tuple;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.scope.Scope;
@@ -29,7 +30,7 @@ import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
 import edu.kit.iti.formal.automation.visitors.Utils;
-import javafx.util.Pair;
+
 import lombok.AllArgsConstructor;
 
 import java.util.Comparator;
@@ -71,8 +72,8 @@ public class GlobalInstances extends STOOTransformation {
                 continue;  // ignore if no instances present
             // Set array type declaration
             ArrayTypeDeclaration instanceArray = new ArrayTypeDeclaration();
-            for (Pair<Integer, Integer> range : state.getInstanceIDRangesToClass(classDeclaration))
-                instanceArray.addSubRange(new Range(range.getKey(), range.getValue()));
+            for (Tuple<Integer, Integer> range : state.getInstanceIDRangesToClass(classDeclaration))
+                instanceArray.addSubRange(new Range(range.a, range.b));
             instanceArray.setBaseType(state.getScope().resolveDataType(classDeclaration.getName()));
             // Set instances initializations in the array's initializations
             ArrayInitialization arrayInitialization = new ArrayInitialization();
