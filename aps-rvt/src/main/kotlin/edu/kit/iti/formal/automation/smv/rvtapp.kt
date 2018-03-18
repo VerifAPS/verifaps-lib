@@ -7,6 +7,8 @@ import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements
+import edu.kit.iti.formal.smv.NuXMVInvariantsCommand
+import edu.kit.iti.formal.smv.NuXMVProcess
 import edu.kit.iti.formal.smv.ast.SMVModule
 import mu.KLogging
 import org.antlr.v4.runtime.CharStreams
@@ -79,7 +81,7 @@ class RvtApp(var oldVersionFilename: String,
     var disableSimplifier: Boolean = false
     var outputFolder = File("output")
     var outputSmvName = "module.smv"
-    var nuxmvCommands = NuXMVCommand.INVAR
+    var nuxmvCommands = NuXMVInvariantsCommand.INVAR
     val nuxmvOutput = "nuxmv.log"
 
     private var outputSMV: File? = null
@@ -112,7 +114,8 @@ class RvtApp(var oldVersionFilename: String,
             mc.executablePath = System.getenv().getOrDefault("NUXMV", "nuxmv")
             mc.outputFile = File(outputFolder, nuxmvOutput)
             mc.workingDirectory = outputFolder
-            return mc.call()
+            val result = mc.call()
+            return result.isVerified
         } else {
             build()
             return verify()
