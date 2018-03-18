@@ -13,7 +13,7 @@
         <dokka.version>0.9.15</dokka.version>
         <junit.version>4.12</junit.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
-        <main.class>edu.kit.iti.formal.automation.rvt.rvtapp.App</main.class>
+        <main.class>edu.kit.iti.formal.automation.smv.rvtapp.App</main.class>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>

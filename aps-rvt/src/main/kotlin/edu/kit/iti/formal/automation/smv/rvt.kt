@@ -1,6 +1,5 @@
-package edu.kit.iti.formal.automation.rvt
+package edu.kit.iti.formal.automation.smv
 
-import edu.kit.iti.formal.automation.smv.ModuleBuilder
 import edu.kit.iti.formal.smv.Printer
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.*

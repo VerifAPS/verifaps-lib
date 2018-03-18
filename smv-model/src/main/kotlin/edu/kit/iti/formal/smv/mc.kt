@@ -1,11 +1,11 @@
-package edu.kit.iti.formal.automation.rvt
+package edu.kit.iti.formal.smv
 
 import mu.KLogging
+import org.jdom2.input.SAXBuilder
 import java.io.File
 import java.io.IOException
+import java.io.StringReader
 import java.util.concurrent.Callable
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.annotation.*
 
 
 /**
@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.*
  * @author Alexander Weigl
  * @version 1 (11.09.17)
  */
-enum class NuXMVCommand(vararg val commands: String) {
+enum class NuXMVInvariantsCommand(vararg val commands: String) {
     IC3("read_model", "flatten_hierarchy", "show_vars", "encode_variables",
             "build_boolean_model", "check_invar_ic3", "quit"),
     LTL("read_model", "flatten_hierarchy", "show_vars", "encode_variables",
@@ -27,23 +27,30 @@ enum class NuXMVCommand(vararg val commands: String) {
 /**
  * This array is a list of commands we need to set for every nuXmv instance.
  * Currently, it sets the TRACE plugin to XML output.
- *
- *
  */
 val PREAMBLE = listOf(
         "set default_trace_plugin 6"
 )
 
 /**
+ * This array is a list of commands we need to set for every nuXmv instance.
+ * Currently, it sets the TRACE plugin to XML output.
+ */
+val POSTAMBLE = listOf(
+        "quit"
+)
+
+typealias NuXMVOutputParser = (txt: String) -> NuXMVOutput
+
+/**
  * @author Alexander Weigl
  */
 class ProcessRunner(val commandLine: Array<String>,
-                    val stdin: File)
-    : Callable<String> {
+                    val stdin: File) : Callable<String> {
 
     var stdoutFile = File("stdout.log")
     //var stderrFile = File("stderr.log")
-    var workingDirectory = File(".")
+    var workingDirectory = File("")
 
     override fun call(): String {
         val pb = ProcessBuilder(*commandLine)
@@ -62,7 +69,7 @@ class ProcessRunner(val commandLine: Array<String>,
     }
 }
 
-inline fun println(fmt: String, vararg obj: Any?) {
+private fun println(fmt: String, vararg obj: Any?) {
     System.out.format(fmt, *obj)
 }
 
@@ -70,19 +77,15 @@ inline fun println(fmt: String, vararg obj: Any?) {
  *
  * @author Alexander Weigl
  */
-class NuXMVProcess(var moduleFile: File) : Callable<Boolean> {
-
+class NuXMVProcess(var moduleFile: File) : Callable<NuXMVOutput> {
     var commands: Array<String> = arrayOf("quit")
     var executablePath = "nuXmv"
     var workingDirectory = moduleFile.parentFile
     var outputFile = File("nuxmv.log")
-    var isVerified: Boolean = false
-        get() = if (result != null) result!!.isVerified else false
+    var result: NuXMVOutput? = null
+    var outputParser: NuXMVOutputParser = ::parseXmlOutput
 
-    private var result: NuXMVOutput? = null
-
-
-    override fun call(): Boolean {
+    override fun call(): NuXMVOutput {
         workingDirectory.mkdirs()
         val commands = arrayOf(executablePath, "-int", moduleFile.absolutePath)
         try {
@@ -93,11 +96,12 @@ class NuXMVProcess(var moduleFile: File) : Callable<Boolean> {
             val pr = ProcessRunner(commands, commandFile)
             pr.stdoutFile = outputFile
             val output = pr.call()
-            result = parseOutput(output)
+            result = outputParser(output)
+            return result!!
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
-        return isVerified
+        return NuXMVOutput(NuXMVAnswer.ERROR)
     }
 
     @Throws(IOException::class)
@@ -119,100 +123,64 @@ class NuXMVProcess(var moduleFile: File) : Callable<Boolean> {
 /**
  *
  */
-@XmlRootElement(name = "counter-example")
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType
-class CounterExample {
-    @field:XmlAttribute
-    var type: String? = null
-
-    @field:XmlAttribute
-    var id: String? = null
-
-    @field:XmlAttribute
-    var desc: String? = null
-
-    @field:XmlElements(XmlElement(name = "node"))
-    var nodes: List<Node> = arrayListOf()
-
-    @XmlType
-    @XmlAccessorType(XmlAccessType.FIELD)
-
-    class Node {
-        @field:XmlElement
-        var state: Values = Values()
-
-        @field:XmlElement
-        var input: Values = Values()
-
-        @field:XmlElement
-        var combinatorial: Values = Values()
-
-        override fun toString(): String {
-            return "Node(state=$state, input=$input, combinatorial=$combinatorial)"
-        }
-    }
-
-    @XmlType
-    @XmlAccessorType(XmlAccessType.FIELD)
-
-    class Values {
-        @field:XmlAttribute
-        var id: Int? = null
-
-        @field:XmlElements(XmlElement(name = "value"))
-        var values = arrayListOf<Value>()
-
-        override fun toString(): String {
-            return "Values(id=$id, values=$values)"
-        }
-    }
-
-    @XmlType
-    @XmlAccessorType(XmlAccessType.FIELD)
-
-    class Value {
-        @field:XmlAttribute
-        var variable: String = ""
-
-        @field:XmlValue
-        var value: String = ""
-
-        override fun toString(): String {
-            return "Value(variable='$variable', value='$value')"
-        }
-    }
-
-    override fun toString(): String {
-        return "CounterExample(type=$type, id=$id, desc=$desc, nodes=$nodes)"
-    }
+class CounterExample(
+        var type: Int = 0,
+        var id: Int = 0,
+        var desc: String = "",
+        val inputVariables: MutableSet<String> = hashSetOf(),
+        val states: MutableList<MutableMap<String, String>> = arrayListOf()
+) {
 
     companion object {
-        fun load(xml: String): CounterExample {
-            val ctx = JAXBContext.newInstance(CounterExample::class.java)
-            val um = ctx.createUnmarshaller()
-            val cex = um.unmarshal(xml.reader())
-            return cex as CounterExample
+        fun load(text: String): CounterExample {
+            val ce = CounterExample()
+            val saxBuilder = SAXBuilder()
+            val doc = saxBuilder.build(StringReader(text));
+            val root = doc.rootElement
+            ce.type = Integer.parseInt(root.getAttributeValue("type"))
+            ce.id = Integer.parseInt(root.getAttributeValue("id"))
+            ce.desc = root.getAttributeValue("desc")
+
+            root.getChildren("node").forEach {
+                val m = HashMap<String, String>()
+                val state = it.getChild("state").getChildren("value")
+                val input = it.getChild("input").getChildren("value")
+
+                input.forEach { ce.inputVariables.add(it.getAttributeValue("variable")) }
+                (state + input).forEach { m[it.getAttributeValue("variable")] = it.textTrim }
+                ce.states += m
+            }
+
+            return ce
         }
     }
 }
 
+enum class NuXMVAnswer {
+    VERIFIED, COUNTER_EXAMPLE, ERROR
+}
+
 /**
+ * Represents an output of a nuxmv run.
  * @author Alexander Weigl
+ * @version 2
  */
 class NuXMVOutput(
+        val state: NuXMVAnswer,
         val errors: List<String> = arrayListOf(),
         val counterExample: CounterExample? = null
 ) {
     val hasErrors: Boolean
         get() = errors.isNotEmpty()
     val isVerified: Boolean
-        get() = counterExample == null
+        get() = state == NuXMVAnswer.VERIFIED
 }
 
-fun parseOutput(text: String): NuXMVOutput {
+/**
+ *
+ */
+fun parseXmlOutput(text: String): NuXMVOutput {
     val lines = text.split('\n')
-
     val predError = { it: String ->
         //empirical
         it.contains("error")
@@ -221,9 +189,8 @@ fun parseOutput(text: String): NuXMVOutput {
     }
 
     if (predError(text)) {
-        val errors =
-                lines.filter(predError)
-        return NuXMVOutput(errors)
+        val errors = lines.filter(predError)
+        return NuXMVOutput(NuXMVAnswer.ERROR, errors)
     }
 
     val idxCex = lines.indexOfFirst {
@@ -233,7 +200,7 @@ fun parseOutput(text: String): NuXMVOutput {
         val closing = lines.lastIndexOf("</counter-example>")
         val xml = lines.slice(idxCex..closing)
                 .joinToString("\n")
-        return NuXMVOutput(counterExample = CounterExample.load(xml))
+        return NuXMVOutput(NuXMVAnswer.COUNTER_EXAMPLE, counterExample = CounterExample.load(xml))
     }
-    return NuXMVOutput()
+    return NuXMVOutput(NuXMVAnswer.VERIFIED)
 }

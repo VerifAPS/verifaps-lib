@@ -19,9 +19,8 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package edu.kit.iti.formal.automation.rvt
+package edu.kit.iti.formal.smv
 
-import org.apache.commons.io.FileUtils
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -35,7 +34,7 @@ class McKtTest {
     fun testParseOutput() {
         val resource = javaClass.getResource("/cex.xml")
         val xml = resource.readText()
-        val out =parseOutput(xml)
+        val out = parseXmlOutput(xml)
         assertFalse(out.hasErrors)
         assertEquals(0, out.errors.size)
         assertNotNull(out.counterExample)

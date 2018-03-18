@@ -19,23 +19,34 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package edu.kit.iti.formal.automation.rvt
+package edu.kit.iti.formal.automation.smv
 
 import org.junit.Test
-import javax.xml.bind.JAXBContext
+import kotlin.test.assertTrue
 
 /**
- *
  * @author Alexander Weigl
- * @version 1 (12.09.17)
+ * @version 1 (14.09.17)
  */
-
-class CexTests {
+class RvtAppTest {
     @Test
-    fun testCexXml() {
-        val ctx = JAXBContext.newInstance(CounterExample::class.java)
-        val um = ctx.createUnmarshaller()
-        val cex = um.unmarshal(CounterExample::class.java.getResource("/cex.xml"))
-        println(cex)
+    fun testVerifySimple(): Unit {
+        val old = "simple1_new"
+        val new = "simple1_old"
+        assertEqualBehaviour(old, new)
+    }
+
+    @Test
+    fun testVerifyCasesIf(): Unit {
+        val old = "caseif_old"
+        val new = "caseif_new"
+        assertEqualBehaviour(old, new)
+    }
+
+    private fun assertEqualBehaviour(old: String, new: String) {
+        val app = RvtApp("src/test/resources/$old.st",
+                        "src/test/resources/$new.st")
+        app.build()
+        assertTrue(app.verify());
     }
 }
