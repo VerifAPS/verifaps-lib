@@ -49,9 +49,9 @@ public class InstanceScope implements Serializable {
 
     public InstanceScope(Scope globalScope) {
         this.globalScope = globalScope;
-        for (InterfaceDeclaration interfaceDeclaration : globalScope.getInterfaces())
+        for (InterfaceDeclaration interfaceDeclaration : globalScope.getInterfaces().values())
             interfaceInstances.put(interfaceDeclaration, new ArrayList());
-        for (ClassDeclaration classDeclaration : globalScope.getClasses()) {
+        for (ClassDeclaration classDeclaration : globalScope.getClasses().values()) {
             classInstances.put(classDeclaration, new ArrayList());
             classPolymorphInstances.put(classDeclaration, new ArrayList());
         }

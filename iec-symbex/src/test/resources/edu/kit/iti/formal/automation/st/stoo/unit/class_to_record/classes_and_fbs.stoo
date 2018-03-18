@@ -13,6 +13,6 @@ END_TYPE
 PROGRAM MY_PROGRAM
   VAR
     a : A;
-    fb : FB;
+    functionBlocks : FB;
   END_VAR
 END_PROGRAM

@@ -27,7 +27,6 @@ package edu.kit.iti.formal.automation.scope;
 import edu.kit.iti.formal.automation.VariableScope;
 import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.datatypes.*;
-import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.sfclang.ast.ActionDeclaration;
 import edu.kit.iti.formal.automation.st.ast.*;
@@ -40,7 +39,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,20 +50,20 @@ import java.util.stream.Stream;
 @Data
 @NoArgsConstructor
 public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable<Scope> {
-    private VariableScope variables = new VariableScope();
+    private final VariableScope variables = new VariableScope();
+    private final Namespace<ActionDeclaration> actions = new Namespace<>();
     private Scope parent;
-    private Map<String, ProgramDeclaration> programs = new HashMap<>();
-    private Map<String, FunctionBlockDeclaration> fb = new HashMap<>();
-    private Map<String, FunctionDeclaration> functions = new HashMap<>();
-    private Map<String, TypeDeclaration> dataTypes = new HashMap<>();
+    private Namespace<ProgramDeclaration> programs = new Namespace<>();
+    private Namespace<FunctionBlockDeclaration> functionBlocks = new Namespace<>();
+    private Namespace<FunctionDeclaration> functions = new Namespace<>();
+    private Namespace<TypeDeclaration> dataTypes = new Namespace<>();
     private List<FunctionResolver> functionResolvers = new LinkedList<>();
     private TypeScope types = TypeScope.builtin();
-    private Map<String, ClassDeclaration> classes = new LinkedHashMap<>();
-    private Map<String, InterfaceDeclaration> interfaces = new LinkedHashMap<>();
-    private Map<String, ActionDeclaration> actions = new LinkedHashMap<>();
+    private Namespace<ClassDeclaration> classes = new Namespace<>();
+    private Namespace<InterfaceDeclaration> interfaces = new Namespace<>();
 
     public Scope(Scope parent) {
-        this.parent = parent;
+        setParent(parent);
     }
 
     public static Scope defaultScope() {
@@ -72,6 +71,27 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         g.functionResolvers.add(new DefinedFunctionResolver());
         g.functionResolvers.add(new FunctionResolverMUX());
         return g;
+    }
+
+    public void setParent(Scope parent) {
+        if (parent != null) {
+            programs.parent = parent::getPrograms;
+            functionBlocks.parent = parent::getFunctionBlocks;
+            functions.parent = parent::getFunctions;
+            actions.parent = parent::getActions;
+            classes.parent = parent::getClasses;
+            dataTypes.parent = parent::getDataTypes;
+            interfaces.parent = parent::getInterfaces;
+        } else {
+            programs.parent = null;
+            functionBlocks.parent = null;
+            functions.parent = null;
+            actions.parent = null;
+            classes.parent = null;
+            dataTypes.parent = null;
+            interfaces.parent = null;
+        }
+        this.parent = parent;
     }
 
     public Map<String, VariableDeclaration> asMap() {
@@ -164,59 +184,48 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         return variables.values().stream().filter((v) -> v.is(flags)).collect(Collectors.toList());
     }
 
-    public VariableDeclaration getVariable(String s) {
-        return variables.computeIfAbsent(s, getFromParent(s, parent::getVariable));
-    }
+    public @Nullable VariableDeclaration getVariable(String s) {
+        if (variables.containsKey(s)) {
+            return variables.get(s);
+        }
 
-    public boolean hasVariable(String variable) {
-        return variables.containsKey(variable);
-    }
-
-    public ProgramDeclaration getProgram(String key) {
-        return programs.computeIfAbsent(key, getFromParent(key, parent::getProgram));
-    }
-
-    public List<ProgramDeclaration> getPrograms() {
-        return new ArrayList<>(programs.values());
-    }
-
-    public <T> Function<String, T> getFromParent(String key, Function<String, T> func) {
-        return k -> {
-            if (parent != null) {
-                return func.apply(key);
-            }
-            return null;
-        };
-    }
-
-    public FunctionBlockDeclaration getFunctionBlock(String key) {
-        if (fb.containsKey(key)) return fb.get(key);
-        if (parent != null) return parent.getFunctionBlock(key);
+        if (parent != null)
+            return parent.getVariable(s);
         return null;
     }
 
-    public List<FunctionBlockDeclaration> getFunctionBlocks() {
-        return new ArrayList<>(fb.values());
+    public boolean hasVariable(String variable) {
+        return variables.containsKey(variable) ||
+                (parent != null && parent.hasVariable(variable));
     }
 
+    public ProgramDeclaration getProgram(String key) {
+        return programs.lookup(key);
+    }
+
+    public FunctionBlockDeclaration getFunctionBlock(String key) {
+        return functionBlocks.lookup(key);
+    }
+
+
     public FunctionDeclaration getFunction(String key) {
-        return functions.computeIfAbsent(key, getFromParent(key, parent::getFunction));
+        return functions.lookup(key);
     }
 
     public void registerProgram(ProgramDeclaration programDeclaration) {
-        programs.put(programDeclaration.getIdentifier(), programDeclaration);
+        programs.register(programDeclaration.getIdentifier(), programDeclaration);
     }
 
     public void registerFunction(FunctionDeclaration functionDeclaration) {
-        functions.put(functionDeclaration.getIdentifier(), functionDeclaration);
+        functions.register(functionDeclaration.getIdentifier(), functionDeclaration);
     }
 
     public void registerFunctionBlock(FunctionBlockDeclaration fblock) {
-        fb.put(fblock.getIdentifier(), fblock);
+        functionBlocks.register(fblock.getIdentifier(), fblock);
     }
 
     public void registerType(TypeDeclaration dt) {
-        dataTypes.put(dt.getTypeName(), dt);
+        dataTypes.register(dt.getTypeName(), dt);
     }
 
     /**
@@ -229,7 +238,7 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         if (types.containsKey(name))
             return types.get(name);
 
-        boolean a = fb.containsKey(name);
+        boolean a = functionBlocks.containsKey(name);
         boolean b = dataTypes.containsKey(name);
         boolean c = classes.containsKey(name);
         boolean d = interfaces.containsKey(name);
@@ -240,25 +249,25 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
 
         AnyDt q;
         if (a) {
-            q = new FunctionBlockDataType(fb.get(name));
+            q = new FunctionBlockDataType(functionBlocks.lookup(name));
             types.put(name, q);
             return q;
         }
 
         if (b) {
-            q = dataTypes.get(name).getDataType(this);
+            q = dataTypes.lookup(name).getDataType(this);
             types.put(name, q);
             return q;
         }
 
         if (c) {
-            q = new ClassDataType(classes.get(name));
+            q = new ClassDataType(classes.lookup(name));
             types.put(name, q);
             return q;
         }
 
         if (d) {
-            q = new InterfaceDataType(interfaces.get(name));
+            q = new InterfaceDataType(interfaces.lookup(name));
             types.put(name, q);
             return q;
         }
@@ -274,7 +283,8 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         if (parent != null)
             return parent.resolveDataType(name);
 
-        throw new DataTypeNotDefinedException("Could not find: " + name);
+        //   throw new DataTypeNotDefinedException("Could not find: " + name);
+        return null;
     }
 
     public FunctionDeclaration resolveFunction(Invocation invocation, Scope local) {
@@ -293,52 +303,32 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
      * @see ResolveDataTypes
      */
     public void registerClass(ClassDeclaration clazz) {
-        classes.put(clazz.getIdentifier(), clazz);
+        classes.register(clazz.getIdentifier(), clazz);
     }
 
     @Nullable
     public ClassDeclaration resolveClass(String key) {
-        ClassDeclaration classDeclaration = classes.get(key);
-        if (classDeclaration == null)
-            classDeclaration = getFunctionBlock(key);
-
-        if (parent != null && classDeclaration == null)
-            return parent.resolveClass(key);
-
-        return classDeclaration;
-    }
-
-    @NotNull
-    public List<ClassDeclaration> getClasses() {
-        return new ArrayList<>(classes.values());
+        return classes.lookup(key);
     }
 
     public void registerInterface(InterfaceDeclaration interfaceDeclaration) {
-        interfaces.put(interfaceDeclaration.getName(), interfaceDeclaration);
+        interfaces.register(interfaceDeclaration.getName(), interfaceDeclaration);
     }
 
     public InterfaceDeclaration resolveInterface(String key) {
-        if (interfaces.containsKey(key))
-            return interfaces.get(key);
-        if (parent != null)
-            return parent.resolveInterface(key);
-        return null;
+        return interfaces.lookup(key);
     }
-
-    public List<InterfaceDeclaration> getInterfaces() {
-        return new ArrayList<>(interfaces.values());
-    }
-
 
     @Override
     public Scope copy() {
         Scope gs = new Scope(getParent());
-        gs.classes = new HashMap<>(classes);
-        gs.dataTypes = new HashMap<>(dataTypes);
-        gs.fb = new HashMap<>(fb);
+        gs.classes = new Namespace<>(classes);
+        gs.interfaces = new Namespace<>(interfaces);
+        gs.dataTypes = new Namespace<>(dataTypes);
+        gs.functionBlocks = new Namespace<>(functionBlocks);
         gs.functionResolvers = new ArrayList<>(functionResolvers);
-        gs.functions = new HashMap<>(functions);
-        gs.programs = new HashMap<>(programs);
+        gs.functions = new Namespace<>(functions);
+        gs.programs = new Namespace<>(programs);
         gs.types = types.clone();
 
         for (Map.Entry<String, VariableDeclaration> e : variables.entrySet()) {
@@ -363,15 +353,49 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
 
     @Nullable
     public ActionDeclaration getAction(@NotNull String name) {
-        if (actions.containsKey(name))
-            return actions.get(name);
-        if (parent != null) {
-            return parent.getAction(name);
-        }
-        return null;
+        return actions.lookup(name);
     }
 
     public void registerAction(@NotNull ActionDeclaration a) {
-        actions.put(a.getName(), a);
+        actions.register(a.getName(), a);
+    }
+
+
+    public class Namespace<T> {
+        Supplier<Namespace<T>> parent;
+        private HashMap<String, T> map = new LinkedHashMap<>();
+
+        public Namespace(Namespace<T> other) {
+            map.putAll(other.map);
+            parent = other.parent;
+        }
+
+        public Namespace() {
+
+        }
+
+        public T lookup(String key) {
+            if (map.containsKey(key)) return map.get(key);
+            if (parent != null && parent.get() != null) parent.get().lookup(key);
+            return null;
+        }
+
+        public void register(String key, T obj) {
+            map.put(key, obj);
+        }
+
+        public Stream<T> getAll() {
+            if (parent != null && parent.get() != null)
+                return Stream.concat(parent.get().getAll(), map.values().stream());
+            return map.values().stream();
+        }
+
+        public boolean containsKey(String name) {
+            return map.containsKey(name);
+        }
+
+        public Collection<T> values() {
+            return map.values();
+        }
     }
 }

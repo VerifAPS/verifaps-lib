@@ -1,0 +1,7 @@
+
+description = ''
+dependencies {
+  compile project(':iec61131lang')
+  compile project(':smv-model')
+  compile project(':iec-symbex')
+}

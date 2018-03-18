@@ -40,7 +40,6 @@ import static de.tudresden.inf.lat.jsexp.SexpFactory.newNonAtomicSexp;
  * <p>
  * Additionally it provides some meta data over these function.
  * <p>
- * <p>
  * An SMT program consist out of three parts:
  * <ul>
  * <li>A predicate <em>init(X)</em> for valid initial states <em>X</em></li>
@@ -48,7 +47,6 @@ import static de.tudresden.inf.lat.jsexp.SexpFactory.newNonAtomicSexp;
  * <li>A description of states <em>X</em></li>
  * <li>A description of input values <em>I</em></li>
  * </ul>
- * </p>
  *
  * @author Alexander Weigl
  * @version 1 (15.10.17)
@@ -200,7 +198,7 @@ public class SMTProgram {
                         "  (not (= a b)))\n");
 
         for (int i = 1; i <= 64; i++) {
-            sb.append(String.format("(define-fun <> ((a (_ BitVec %d)) (b (_ BitVec %d))) Bool (not (= a b)))\n", i, i ));
+            sb.append(String.format("(define-fun <> ((a (_ BitVec %d)) (b (_ BitVec %d))) Bool (not (= a b)))\n", i, i));
         }
 
 

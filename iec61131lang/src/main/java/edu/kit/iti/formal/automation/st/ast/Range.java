@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import javafx.util.Pair;
 import lombok.Data;
 
 /**
@@ -32,7 +31,7 @@ import lombok.Data;
  * @version $Id: $Id
  */
 @Data
-public class Range implements Copyable<Range>{
+public class Range implements Copyable<Range> {
     private final Literal start, stop;
 
     public Range(Literal start, Literal stop) {
@@ -44,9 +43,9 @@ public class Range implements Copyable<Range>{
         this(Literal.integer(start), Literal.integer(stop));
     }
 
-    public Range(Pair<Integer, Integer> p) {
+    /*public Range(Pair<Integer, Integer> p) {
         this(p.getKey(), p.getValue());
-    }
+    }*/
 
     @Override
     public Range copy() {

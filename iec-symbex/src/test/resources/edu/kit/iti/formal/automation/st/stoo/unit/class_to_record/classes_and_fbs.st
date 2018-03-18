@@ -27,6 +27,6 @@ END_FUNCTION_BLOCK
 PROGRAM MY_PROGRAM
   VAR
     a : A;
-    fb : FB;
+    functionBlocks : FB;
   END_VAR
 END_PROGRAM

@@ -22,6 +22,7 @@
 
 package edu.kit.iti.formal.automation.stoo.trans;
 
+import edu.kit.iti.formal.automation.st.util.Tuple;
 import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.datatypes.InterfaceDataType;
@@ -31,14 +32,12 @@ import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
 import edu.kit.iti.formal.automation.visitors.Visitable;
-import javafx.collections.FXCollections;
-import javafx.collections.transformation.SortedList;
-import javafx.util.Pair;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.TreeSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -222,13 +221,13 @@ public class BranchEffectiveTypes extends STOOTransformation {
             // Add branches based on the instance reference we found
             Set<AnyDt> effectiveTypes = deferredTypeReference.toVariable().getEffectiveDataTypes();
             if (effectiveTypes.size() > 1)
-                for (AnyDt effectiveType : new SortedList<>(FXCollections.observableArrayList(effectiveTypes))) {
+                for (AnyDt effectiveType : effectiveTypes) {
                     StatementList block = new StatementList(originalStatement.copy());
                     //block.add(0, new CommentStatement(deferredTypeReference + " : " + effectiveType.getName()));
                     SetEffectiveTypeToReferenceVisitor setEffectiveTypeVisitor =
                             new SetEffectiveTypeToReferenceVisitor(deferredTypeReference, effectiveType);
                     block.accept(setEffectiveTypeVisitor);
-                    for (Pair<Integer, Integer> instanceIDRange
+                    for (Tuple<Integer, Integer> instanceIDRange
                             : state.getInstanceIDRangesToClass((ClassDataType) effectiveType, false)) {
                         Expression guard = instanceIDInRangeGuard(deferredTypeReference, instanceIDRange);
                         guard.accept(setEffectiveTypeVisitor);
@@ -252,7 +251,7 @@ public class BranchEffectiveTypes extends STOOTransformation {
          * in the range defined by instanceIDRange.
          */
         private Expression instanceIDInRangeGuard(@NotNull SymbolicReference instanceReference,
-                                                  @NotNull Pair<Integer, Integer> instanceIDRange) {
+                                                  @NotNull Tuple<Integer, Integer> instanceIDRange) {
             SymbolicReference instanceIDReference = instanceReference.copy();
             List<SymbolicReference> instanceIDReferenceList = instanceIDReference.asList();
             instanceIDReferenceList.get(instanceIDReferenceList.size() - 1).setSub(
@@ -262,9 +261,9 @@ public class BranchEffectiveTypes extends STOOTransformation {
                     INSTANCE_ID_VAR_NAME + INSTANCE_ID_TYPE_SUFFIX);
             return BinaryExpression.andExpression(
                     BinaryExpression.greaterEqualsExpression(instanceIDReference,
-                            new Literal(instanceIDType, Integer.toString(instanceIDRange.getKey()))),
+                            new Literal(instanceIDType, Integer.toString(instanceIDRange.a))),
                     BinaryExpression.lessEqualsExpression(instanceIDReference,
-                            new Literal(instanceIDType, Integer.toString(instanceIDRange.getValue()))));
+                            new Literal(instanceIDType, Integer.toString(instanceIDRange.b))));
         }
     }
 }

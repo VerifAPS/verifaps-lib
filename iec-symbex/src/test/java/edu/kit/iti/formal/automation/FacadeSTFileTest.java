@@ -114,9 +114,9 @@ public class FacadeSTFileTest {
     private SMVModule createMainModule(@NotNull SMVModule uut) {
         SMVModule mainModule = new SMVModule();
         mainModule.setName("main");
-        mainModule.setStatevars(new ArrayList<>(uut.getModuleParameter()));
+        mainModule.setStateVars(new ArrayList<>(uut.getModuleParameters()));
         mainModule.getStateVars().add(
-                new SVariable("uut", new SMVType.Module(uut.getName(), uut.getModuleParameter())));
+                new SVariable("uut", new SMVType.Module(uut.getName(), uut.getModuleParameters())));
         return mainModule;
     }
 }
