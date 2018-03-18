@@ -143,11 +143,17 @@ class CounterExample(
 
             root.getChildren("node").forEach {
                 val m = HashMap<String, String>()
-                val state = it.getChild("state").getChildren("value")
-                val input = it.getChild("input").getChildren("value")
-
-                input.forEach { ce.inputVariables.add(it.getAttributeValue("variable")) }
-                (state + input).forEach { m[it.getAttributeValue("variable")] = it.textTrim }
+                if (it.getChild("state") != null) {
+                    val state = it.getChild("state").getChildren("value")
+                    state.forEach { m[it.getAttributeValue("variable")] = it.textTrim }
+                }
+                if (it.getChild("input") != null) {
+                    val input = it.getChild("input").getChildren("value")
+                    input.forEach {
+                        ce.inputVariables.add(it.getAttributeValue("variable"))
+                        m[it.getAttributeValue("variable")] = it.textTrim
+                    }
+                }
                 ce.states += m
             }
 
