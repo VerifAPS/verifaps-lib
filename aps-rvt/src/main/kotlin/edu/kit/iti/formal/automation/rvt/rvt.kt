@@ -10,8 +10,8 @@ import java.io.Writer
 /**
  *
  */
-fun commonVariables(a: Collection<out SVariable>,
-                    b: Collection<out SVariable>,
+fun commonVariables(a: Collection<SVariable>,
+                    b: Collection<SVariable>,
                     pred: SVarEquals)
         : Set<Pair<SVariable, SVariable>> {
     val set = HashSet<Pair<SVariable, SVariable>>()
@@ -55,7 +55,7 @@ open class RegressionVerification(
     companion object : KLogging()
 
     protected open fun commonInputVariables(): Set<Pair<SVariable, SVariable>> {
-        return commonVariables(oldVersion.moduleParameter, newVersion.moduleParameter, nameEqual)
+        return commonVariables(oldVersion.moduleParameters, newVersion.moduleParameters, nameEqual)
     }
 
     protected open fun commonOutputVariables(): Set<Pair<SVariable, SVariable>> {
@@ -71,14 +71,14 @@ open class RegressionVerification(
             logger.info("modules renamed due to collision")
         }
 
-        newModuleType = SMVType.Module(newVersion.name, newVersion.moduleParameter)
-        oldModuleType = SMVType.Module(oldVersion.name, oldVersion.moduleParameter)
+        newModuleType = SMVType.Module(newVersion.name, newVersion.moduleParameters)
+        oldModuleType = SMVType.Module(oldVersion.name, oldVersion.moduleParameters)
     }
 
     protected open fun addInputVariables() {
         val commonInput = commonInputVariables()
-        val uncoveredOld = ArrayList<SVariable>(oldVersion.moduleParameter)
-        val uncoveredNew = ArrayList<SVariable>(newVersion.moduleParameter)
+        val uncoveredOld = ArrayList<SVariable>(oldVersion.moduleParameters)
+        val uncoveredNew = ArrayList<SVariable>(newVersion.moduleParameters)
 
         for ((first, second) in commonInput) {
             assert(first.datatype == second.datatype) { "Datatypes are not equal for ${first} and ${second}" }
@@ -125,7 +125,7 @@ open class RegressionVerification(
         else SMVFacade.combine(SBinaryOperator.AND, list)
 
         glueModule.ltlSpec.add(equalOutputExpr.globally())
-        glueModule.invarSpec.add(equalOutputExpr)
+        glueModule.invariantSpecs.add(equalOutputExpr)
     }
 
 
@@ -196,7 +196,7 @@ open class ReVeWithMiter(oldVersion: SMVModule, newVersion: SMVModule, val miter
 
         glueModule.stateVars.add(miterVar)
         glueModule.ltlSpec.add(miter.ltlSpec?.inModule(miterInstanceName))
-        glueModule.invarSpec.add(miter.invarSpec?.inModule(miterInstanceName))
+        glueModule.invariantSpecs.add(miter.invarSpec?.inModule(miterInstanceName))
     }
 
     override fun writeTo(writer: Writer) {
@@ -214,13 +214,13 @@ open class GloballyMiter(oldVersion: SMVModule, newVersion: SMVModule)
         val output = commonOutputVariables(oldVersion, newVersion, nameEqual)
         val list = ArrayList<SMVExpr>()
 
-        for (v in oldVersion.moduleParameter + oldVersion.stateVars) {
-            module.moduleParameter.add(v.prefix(oldPrefix))
+        for (v in oldVersion.moduleParameters + oldVersion.stateVars) {
+            module.moduleParameters.add(v.prefix(oldPrefix))
             parameterIsNew += Pair(v, false)
         }
 
-        for (v in newVersion.moduleParameter + newVersion.stateVars) {
-            module.moduleParameter.add(v.prefix(newPrefix))
+        for (v in newVersion.moduleParameters + newVersion.stateVars) {
+            module.moduleParameters.add(v.prefix(newPrefix))
             parameterIsNew += Pair(v, true)
         }
 
@@ -256,12 +256,12 @@ open class UntilMiter(oldVersion: SMVModule, newVersion: SMVModule, val inner: M
     override fun build() {
         inner.build()
         module.name = "UntilMiter"
-        module.moduleParameter.addAll(inner.module.moduleParameter)
+        module.moduleParameters.addAll(inner.module.moduleParameters)
 
         module.stateVars.add(
                 SVariable.create("inner")
                         .with(SMVType.Module(inner.module.name,
-                                inner.module.moduleParameter))
+                                inner.module.moduleParameters))
         )
 
         val end = SVariable.bool("premise")

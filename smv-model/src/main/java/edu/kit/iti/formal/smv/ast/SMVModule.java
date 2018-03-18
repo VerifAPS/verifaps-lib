@@ -66,8 +66,18 @@ public class SMVModule extends SMVAst {
     public <T> T accept(SMVAstVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
     public String toString() {
         return Printer.toString(this);
     }
+
+    public List<SAssignment> getNextAssignments() {
+        return next;
+    }
+
+    public List<SAssignment> getInitAssignments() {
+        return init;
+    }
+
 }
 
