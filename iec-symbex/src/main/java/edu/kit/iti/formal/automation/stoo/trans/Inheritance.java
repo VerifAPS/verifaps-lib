@@ -84,7 +84,7 @@ public class Inheritance extends STOOTransformation {
     @Override
     public void transform(@NotNull STOOSimplifier.State state) {
         super.transform(state);
-        for (ClassDeclaration classDeclaration : state.getScope().getClasses()) {
+        for (ClassDeclaration classDeclaration : state.getScope().getClasses().values()) {
             if (!classDeclaration.hasParentClass())
                 continue;
             // Add/fix super accesses (inside class)

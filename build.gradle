@@ -14,9 +14,11 @@ allprojects {
     group = 'edu.kit.iti.formal'
 
     ext.gitVersion = versionDetails()
-    version = ext.gitVersion.lastTag.replace("v","")
-    if (! ext.gitVersion.isClean) {
-        version = "${version}-SNAPSHOT"
+    if (ext.gitVersion.lastTag) {
+        version = ext.gitVersion.lastTag.replace("v", "")
+        if (!ext.gitVersion.isClean) {
+            version = "${version}-SNAPSHOT"
+        }
     }
 
     //println(ext.gitVersion)

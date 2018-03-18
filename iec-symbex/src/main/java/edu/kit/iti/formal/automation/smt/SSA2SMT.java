@@ -62,11 +62,11 @@ public class SSA2SMT implements Runnable {
         Smv2SMTVisitor v = new Smv2SMTVisitor();
 
         //rewrite initial assignments
-        input.getInitAssignments().forEach(a -> product.getInitPredicates().put(a.target.getName(),
+        input.getInit().forEach(a -> product.getInitPredicates().put(a.target.getName(),
                 a.expr.accept(v)));
 
         //rewrite next assignments
-        input.getNextAssignments().forEach(a -> {
+        input.getNext().forEach(a -> {
             product.getNextPredicates().put(a.target.getName(),
                     a.expr.accept(v));
         });
@@ -80,7 +80,7 @@ public class SSA2SMT implements Runnable {
         );
 
         //define input values
-        input.getModuleParameter().forEach(var -> {
+        input.getModuleParameters().forEach(var -> {
                     product.getInputDataTypes()
                             .put(var.getName(),
                                     dtTranslator.translate(var.getDatatype()));

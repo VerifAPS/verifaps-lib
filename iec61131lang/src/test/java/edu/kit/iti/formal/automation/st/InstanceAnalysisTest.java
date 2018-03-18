@@ -52,7 +52,7 @@ public class InstanceAnalysisTest {
         TopLevelElements topLevelElements = IEC61131Facade.file(new ANTLRFileStream(testFile.getFile()));
         Scope globalScope = IEC61131Facade.resolveDataTypes(topLevelElements);
         // Only one program in test file
-        ProgramDeclaration myProgram = globalScope.getPrograms().get(0);
+        ProgramDeclaration myProgram = globalScope.getPrograms().values().iterator().next();
         InstanceScope instanceScope = IEC61131Facade.findInstances(myProgram, globalScope);
 
         // Assert correct number of instances

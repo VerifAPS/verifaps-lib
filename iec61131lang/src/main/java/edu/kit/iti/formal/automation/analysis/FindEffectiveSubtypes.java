@@ -116,7 +116,7 @@ public class FindEffectiveSubtypes extends AstVisitor {
             // Add all possible cases
             // TODO: rewrite
         else if (variableDeclaration.getDataType() instanceof InterfaceDataType) {
-            globalScope.getClasses().stream()
+            globalScope.getClasses().values().stream()
                     .filter(c -> c.implementsInterface(
                             ((InterfaceDataType) variableDeclaration.getDataType()).getInterfaceDeclaration()))
                     .filter(c -> !instanceScope.getInstancesOfClass(c).isEmpty())
@@ -125,7 +125,7 @@ public class FindEffectiveSubtypes extends AstVisitor {
         } else if (variableDeclaration.getDataType() instanceof ReferenceType) {
             ClassDeclaration clazz = ((ClassDataType) ((ReferenceType) variableDeclaration.getDataType()).getOf())
                     .getClazz();
-            globalScope.getClasses().stream()
+            globalScope.getClasses().values().stream()
                     .filter(c -> c.equals(clazz) || c.extendsClass(clazz))
                     .filter(c -> !instanceScope.getInstancesOfClass(c).isEmpty())
                     .forEach(c -> variableDeclaration.addEffectiveDataType(globalScope.resolveDataType(c.getName())));

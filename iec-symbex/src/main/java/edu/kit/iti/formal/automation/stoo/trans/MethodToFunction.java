@@ -52,7 +52,7 @@ public class MethodToFunction extends STOOTransformation {
         state.getTopLevelElements().accept(new AddSelfParameterToMethodsVisitor());
         // Convert methods into functions
         state.getTopLevelElements().accept(new MethodInvocationToFunctionCallVisitor());
-        state.getScope().getClasses().forEach(c -> c.getMethods().forEach(this::addNewFunction));
+        state.getScope().getClasses().getAll().forEach(c -> c.getMethods().forEach(this::addNewFunction));
         state.getTopLevelElements().addAll(newFunctions.values());
         state.getTopLevelElements().accept(new RemoveMethodsVisitor());
     }

@@ -23,8 +23,8 @@
 package edu.kit.iti.formal.automation.st;
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import org.antlr.v4.runtime.ANTLRFileStream;
@@ -52,7 +52,7 @@ public class EffectiveSubtypesTest {
         TopLevelElements topLevelElements = IEC61131Facade.file(new ANTLRFileStream(testFile.getFile()));
         Scope globalScope = IEC61131Facade.resolveDataTypes(topLevelElements);
         // Only one program in test file
-        ProgramDeclaration myProgram = globalScope.getPrograms().get(0);
+        ProgramDeclaration myProgram = globalScope.getPrograms().values().iterator().next();
         InstanceScope instanceScope = IEC61131Facade.findInstances(myProgram, globalScope);
 
         // Assert correct number of instances

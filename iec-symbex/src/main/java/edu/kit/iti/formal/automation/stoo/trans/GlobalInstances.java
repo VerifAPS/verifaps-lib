@@ -67,7 +67,7 @@ public class GlobalInstances extends STOOTransformation {
         state.getScope().registerType(instanceIDType);
         // Add global instance arrays
         Scope gvl = state.getScope().getTopLevel();
-        for (ClassDeclaration classDeclaration : state.getScope().getClasses()) {
+        for (ClassDeclaration classDeclaration : state.getScope().getClasses().values()) {
             if (state.getInstanceScope().getPolymorphInstancesOfClass(classDeclaration).size() == 0)
                 continue;  // ignore if no instances present
             // Set array type declaration

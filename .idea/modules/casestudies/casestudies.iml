@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id=":frontend" external.linked.project.path="$MODULE_DIR$/../../../frontend" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="edu.kit.iti.formal" external.system.module.version="0.9-SNAPSHOT" type="JAVA_MODULE" version="4">
+<module external.linked.project.id=":casestudies" external.linked.project.path="$MODULE_DIR$/../../../casestudies" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="edu.kit.iti.formal" external.system.module.version="0.9-SNAPSHOT" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="kotlin-language" name="Kotlin">
       <configuration version="3" platform="JVM 1.6" useProjectSettings="false">
         <compilerSettings />
         <compilerArguments>
-          <option name="destination" value="$MODULE_DIR$/../../../frontend/build/classes/kotlin/main" />
+          <option name="destination" value="$MODULE_DIR$/../../../casestudies/build/classes/kotlin/main" />
           <option name="noStdlib" value="true" />
           <option name="noReflect" value="true" />
-          <option name="moduleName" value="frontend" />
+          <option name="moduleName" value="casestudies" />
           <option name="addCompilerBuiltIns" value="true" />
           <option name="loadBuiltInsFromDependencies" value="true" />
           <option name="languageVersion" value="1.2" />
@@ -24,19 +24,19 @@
     </facet>
   </component>
   <component name="NewModuleRootManager">
-    <output url="file://$MODULE_DIR$/../../../frontend/out/production/classes" />
-    <output-test url="file://$MODULE_DIR$/../../../frontend/out/test/classes" />
+    <output url="file://$MODULE_DIR$/../../../casestudies/out/production/classes" />
+    <output-test url="file://$MODULE_DIR$/../../../casestudies/out/test/classes" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../../frontend">
-      <sourceFolder url="file://$MODULE_DIR$/../../../frontend/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../frontend/src/main/kotlin" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../frontend/src/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../frontend/src/test/kotlin" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../frontend/src/main/resources" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../frontend/src/test/resources" type="java-test-resource" />
-      <excludeFolder url="file://$MODULE_DIR$/../../../frontend/.gradle" />
-      <excludeFolder url="file://$MODULE_DIR$/../../../frontend/build" />
-      <excludeFolder url="file://$MODULE_DIR$/../../../frontend/out" />
+    <content url="file://$MODULE_DIR$/../../../casestudies">
+      <sourceFolder url="file://$MODULE_DIR$/../../../casestudies/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../casestudies/src/main/kotlin" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../casestudies/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../casestudies/src/test/kotlin" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../casestudies/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../casestudies/src/test/resources" type="java-test-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../casestudies/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../casestudies/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../casestudies/out" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
