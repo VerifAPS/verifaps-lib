@@ -25,34 +25,61 @@ package edu.kit.iti.formal.smv;
 import edu.kit.iti.formal.smv.ast.*;
 import edu.kit.iti.formal.smv.ast.SCaseExpression.Case;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-public class Printer implements SMVAstVisitor<String> {
+public class Printer implements SMVAstVisitor {
+    private final PrintWriter sb;
 
-    public static String toString(SMVModule m) {
-        Printer p = new Printer();
-        return p.visit(m);
+    public Printer(String fileName, boolean append) throws FileNotFoundException {
+        sb = new PrintWriter(new FileOutputStream(new File(fileName), append));
+    }
+
+    public Printer(String fileName) throws FileNotFoundException {
+        this(fileName, false);
+    }
+
+    public static void write(SMVModule m, String fileName, boolean append) throws FileNotFoundException {
+        Printer p = new Printer(fileName, append);
+        m.accept(p);
+        p.sb.close();
     }
 
     @Override
-    public String visit(SMVAst top) {
+    public Object visit(SMVAst top) {
         throw new IllegalArgumentException("not implemented for " + top);
     }
 
     @Override
-    public String visit(SBinaryExpression be) {
+    public Object visit(SBinaryExpression be) {
         int pleft = precedence(be.left);
         int pright = precedence(be.right);
         int pown = precedence(be);
 
-        String a = be.left.accept(this);
-        String b = be.right.accept(this);
+        if (pleft > pown) {
+            sb.append("(");
+            be.left.accept(this);
+            sb.append(")");
+        }
+        else
+            be.left.accept(this);
 
-        return (pleft > pown ? "(" + a + ")" : a)
-                + " " + be.operator.symbol() + " "
-                + (pright > pown ? "(" + b + ")" : b);
+        sb.append(" ").append(be.operator.symbol()).append(" ");
+
+        if (pright > pown) {
+            sb.append("(");
+            be.right.accept(this);
+            sb.append(")");
+        }
+        else
+            be.right.accept(this);
+
+        return null;
     }
 
     private int precedence(SMVExpr expr) {
@@ -74,166 +101,214 @@ public class Printer implements SMVAstVisitor<String> {
     }
 
     @Override
-    public String visit(SUnaryExpression ue) {
+    public Object visit(SUnaryExpression ue) {
         if (ue.expr instanceof SBinaryExpression) {
-            return ue.operator.symbol() + "(" + ue.expr.accept(this) + ")";
+            sb.append(ue.operator.symbol()).append("(");
+            ue.expr.accept(this);
+            sb.append(")");
         }
-        return ue.operator.symbol() + ue.expr.accept(this);
+        else {
+            sb.append(ue.operator.symbol());
+            ue.expr.accept(this);
+        }
+
+        return null;
     }
 
     @Override
-    public String visit(SLiteral l) {
-        return l.getSMVType().format(l.value);
+    public Object visit(SLiteral l) {
+        sb.append(l.getSMVType().format(l.value));
+
+        return null;
     }
 
     @Override
-    public String visit(SAssignment a) {
-        return a.target.accept(this) + " := " + a.expr.accept(this) + ";\n";
+    public Object visit(SAssignment a) {
+        a.target.accept(this);
+        sb.append(" := ");
+        a.expr.accept(this);
+        sb.println();
+
+        return null;
     }
 
     @Override
-    public String visit(SCaseExpression ce) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("case \n");
+    public Object visit(SCaseExpression ce) {
+        sb.append("case").println();
         for (Case esac : ce.cases) {
-            sb.append(esac.condition.accept(this)).append(" : ")
-                    .append(esac.then.accept(this))
-                    .append("; ");
+            esac.condition.accept(this);
+            sb.append(" : ");
+            esac.then.accept(this);
+            sb.append("; ");
         }
+        sb.println();
+        sb.append("esac");
 
-        sb.append("\nesac");
-        return sb.toString();
+        return null;
     }
 
     @Override
-    public String visit(SMVModule m) {
-        StringBuilder sb = new StringBuilder();
+    public Object visit(SMVModule m) {
         sb.append("MODULE ").append(m.getName());
         if (!m.getModuleParameter().isEmpty()) {
-            sb.append("(").append(
-                    m.getModuleParameter().stream()
-                            .map(p -> p.accept(this))
-                            .reduce((a, b) -> a + ", " + b)
-                            .get())
-                    .append(")");
+            sb.append("(");
+            for (int i = 0; i < m.getModuleParameter().size(); i++) {
+                m.getModuleParameter().get(i).accept(this);
+                if (i < m.getModuleParameter().size() - 1)
+                    sb.append(", ");
+            }
+            sb.append(")");
         }
-        sb.append('\n');
+        sb.println();
 
-        printVariables(sb, "IVAR", m.getInputVars());
-        printVariables(sb, "FROZENVAR", m.getFrozenVars());
-        printVariables(sb, "VAR", m.getStateVars());
+        printVariables("IVAR", m.getInputVars());
+        printVariables("FROZENVAR", m.getFrozenVars());
+        printVariables("VAR", m.getStateVars());
 
-        printAssignments(sb, "DEFINE", m.getDefinitions());
+        printAssignments("DEFINE", m.getDefinitions());
 
-        printSection(sb, "LTLSPEC", m.getLTLSpec());
-        printSection(sb, "CTLSPEC", m.getCTLSpec());
-        printSection(sb, "INVARSPEC", m.getInvarSpec());
-        printSection(sb, "INVAR", m.getInvar());
-        printSectionSingle(sb, "INIT", m.getInit());
-        printSectionSingle(sb, "TRANS", m.getTrans());
+        printSection("LTLSPEC", m.getLTLSpec());
+        printSection("CTLSPEC", m.getCTLSpec());
+        printSection("INVARSPEC", m.getInvarSpec());
+        printSection("INVAR", m.getInvar());
+        printSectionSingle("INIT", m.getInit());
+        printSectionSingle("TRANS", m.getTrans());
 
 
         if (m.getInitAssignments().size() > 0 || m.getNextAssignments().size() > 0) {
-            sb.append("ASSIGN\n");
-            printAssignments(sb, m.getInitAssignments(), "init");
-            printAssignments(sb, m.getNextAssignments(), "next");
+            sb.println("ASSIGN");
+            printAssignments(m.getInitAssignments(), "init");
+            printAssignments(m.getNextAssignments(), "next");
         }
 
         sb.append("\n-- end of module ").append(m.getName()).append('\n');
-        return sb.toString();
+
+        return null;
     }
 
-    private void printSectionSingle(StringBuilder sb, String section, List<SMVExpr> exprs) {
+    private void printSectionSingle(String section, List<SMVExpr> exprs) {
         if (!exprs.isEmpty()) {
-            sb.append(section).append("\n");
-            sb.append("\t")
-                    .append(
-                            SMVFacade.combine(SBinaryOperator.AND, exprs).accept(this)
-                    ).append(";\n");
+            sb.append(section).println();
+            sb.append("\t");
+            SMVFacade.combine(SBinaryOperator.AND, exprs).accept(this);
+            sb.append(";").println();
         }
     }
 
-    private void printAssignments(StringBuilder sb, List<SAssignment> assignments, String func) {
+    private void printAssignments(List<SAssignment> assignments, String func) {
         for (SAssignment a : assignments) {
             sb.append("\t")
                     .append(func)
                     .append('(')
                     .append(a.target.getName())
-                    .append(") := ")
-                    .append(a.expr.accept(this)).append(";\n");
+                    .append(") := ");
+            a.expr.accept(this);
+            sb.append(";").println();
         }
     }
 
-    private void printSection(StringBuilder sb, String section, List<SMVExpr> exprs) {
+    private void printSection(String section, List<SMVExpr> exprs) {
         if (exprs.size() > 0) {
             for (SMVExpr e : exprs) {
                 if(e==null) continue;
-                sb.append(section).append("\n\t");
-                sb.append(e.accept(this)).append(";\n\n");
+                sb.append(section).println();
+                sb.append("\t");
+                e.accept(this);
+                sb.append(";").println();
+                sb.println();
             }
         }
     }
 
-    private void printAssignments(StringBuilder sb, String section,
-                                  Map<SVariable, SMVExpr> definitions) {
+    private void printAssignments(String section, Map<SVariable, SMVExpr> definitions) {
         if (definitions.size() > 0) {
             TreeSet<SVariable> keys = new TreeSet<>(definitions.keySet());
 
-            sb.append(section).append("\n");
+            sb.append(section).println();
             for (SVariable k : keys) {
                 sb.append("\t")
                         .append(k.getName())
-                        .append(" := ")
-                        .append(definitions.get(k).accept(this))
-                        .append(";\n");
+                        .append(" := ");
+                definitions.get(k).accept(this);
+                sb.append(";").println();
             }
         }
     }
 
     @Override
-    public String visit(SFunction func) {
-        return func.getFunctionName() + "(" +
-                func.getArguments().stream()
-                        .map(a -> a.accept(this))
-                        .reduce((a, b) -> a + ", " + b)
-                        .get()
-                + ")";
+    public Object visit(SFunction func) {
+        sb.append(func.getFunctionName()).append("(");
+        for (int i = 0; i < func.getArguments().size(); i++) {
+            func.getArguments().get(i).accept(this);
+            if (i < func.getArguments().size() - 1)
+                sb.append(", ");
+        }
+        sb.append(")");
+
+        return null;
     }
 
     @Override
-    public String visit(SQuantified quantified) {
+    public Object visit(SQuantified quantified) {
         switch (quantified.getOperator().arity()) {
             case 1:
-                return quantified.getOperator().symbol()
-                        + "(" + quantified.getQuantified(0).accept(this) + ")";
+                sb.append(quantified.getOperator().symbol()).append("(");
+                quantified.getQuantified(0).accept(this);
+                sb.append(")");
+                break;
             case 2:
-                return "(" + quantified.getQuantified(0).accept(this) + ")"
-                        + quantified.getOperator().symbol()
-                        + "(" + quantified.getQuantified(1).accept(this) + ")";
+                sb.append("(");
+                quantified.getQuantified(0).accept(this);
+                sb.append(")")
+                        .append(quantified.getOperator().symbol())
+                        .append("(");
+                quantified.getQuantified(1).accept(this);
+                sb.append(")");
+                break;
             default:
                 throw new IllegalStateException("too much arity");
         }
+
+        return null;
     }
 
-    private void printVariables(StringBuilder sb, String type, List<SVariable> vars) {
+    @Override
+    public Object visit(SMVType.Module module) {
+        sb.append(module.getModuleName()).append("(");
+        for (int i = 0; i < module.getParameters().size(); i++) {
+            module.getParameters().get(i).accept(this);
+            if (i < module.getParameters().size() - 1)
+                sb.append(", ");
+        }
+        sb.append(")");
+
+        return null;
+    }
+
+    private void printVariables(String type, List<SVariable> vars) {
         if (vars.size() != 0) {
-            sb.append(type).append('\n');
+            sb.append(type).println();
 
             for (SVariable var : vars) {
                 sb.append('\t')
                         .append(var.getName())
-                        .append(" : ")
-                        .append(var.getSMVType())
-                        .append(";\n");
+                        .append(" : ");
+                if (var.getSMVType() instanceof SMVType.Module)
+                    var.getSMVType().accept(this);
+                else
+                    sb.append(var.getSMVType().toString());
+                sb.append(";").println();
             }
 
-            sb.append("-- end of ").append(type).append('\n');
+            sb.append("-- end of ").append(type).println();
         }
     }
 
 
     @Override
-    public String visit(SVariable v) {
-        return v.getName();
+    public Object visit(SVariable v) {
+        sb.append(v.getName());
+
+        return null;
     }
 }

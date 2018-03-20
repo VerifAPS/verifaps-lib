@@ -48,4 +48,6 @@ public interface SMVAstVisitor<T> {
     T visit(SFunction func);
 
     T visit(SQuantified quantified);
+
+    T visit(SMVType.Module module);
 }

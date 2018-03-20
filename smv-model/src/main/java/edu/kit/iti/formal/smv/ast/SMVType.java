@@ -22,14 +22,15 @@ package edu.kit.iti.formal.smv.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.smv.Printer;
+import edu.kit.iti.formal.smv.SMVAstVisitor;
+import lombok.Getter;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SMVType {
+public class SMVType extends SMVAst {
     public static final SMVType BOOLEAN = new SMVType(GroundDataType.BOOLEAN);
     public static final SMVType INT = new SMVType(GroundDataType.INT);
     public static final SMVType FLOAT = new SMVType(GroundDataType.FLOAT);
@@ -97,6 +98,11 @@ public class SMVType {
     @Override
     public String toString() {
         return "boolean";
+    }
+
+    @Override
+    public <T> T accept(SMVAstVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
     public static class SMVTypeWithWidth extends SMVType {
@@ -210,6 +216,7 @@ public class SMVType {
         }
     }
 
+    @Getter
     public static class Module extends SMVType {
         private final List<? extends SMVExpr> parameters;
         private final String moduleName;
@@ -227,16 +234,6 @@ public class SMVType {
 
         public Module(String name, SVariable... variables) {
             this(name, Arrays.asList(variables));
-        }
-
-        @Override
-        public String toString() {
-            Printer printer = new Printer();
-            return String.format("%s(%s)",
-                    moduleName,
-                    parameters.stream()
-                            .map(v -> v.accept(printer))
-                            .reduce((a, b) -> a + ", " + b).orElse(""));
         }
 
         @Override
@@ -258,6 +255,11 @@ public class SMVType {
             result = 31 * result + parameters.hashCode();
             result = 31 * result + moduleName.hashCode();
             return result;
+        }
+
+        @Override
+        public <T> T accept(SMVAstVisitor<T> visitor) {
+            return visitor.visit(this);
         }
     }
 

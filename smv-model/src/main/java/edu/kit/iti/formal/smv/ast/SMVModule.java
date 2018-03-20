@@ -26,6 +26,8 @@ import edu.kit.iti.formal.smv.Printer;
 import edu.kit.iti.formal.smv.SMVAstVisitor;
 import lombok.Data;
 
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -142,8 +144,16 @@ public class SMVModule extends SMVAst {
         return visitor.visit(this);
     }
 
-    public String toString() {
-        return Printer.toString(this);
+    public void write(String fileName) throws FileNotFoundException {
+        Printer.write(this, fileName, false);
+    }
+
+    public void write(Path smvFile) throws FileNotFoundException {
+        write(smvFile.toString());
+    }
+
+    public void write(Path smvFile, boolean append) throws FileNotFoundException {
+        Printer.write(this, smvFile.toString(), append);
     }
 }
 

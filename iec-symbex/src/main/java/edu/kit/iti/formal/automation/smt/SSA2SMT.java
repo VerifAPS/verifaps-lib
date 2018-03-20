@@ -163,6 +163,11 @@ public class SSA2SMT implements Runnable {
             throw new IllegalStateException("illegal AST node discovered! SQuantified not allowed in assignments");
         }
 
+        @Override
+        public Sexp visit(SMVType.Module module) {
+            return null;
+        }
+
         @Nonnull
         private Sexp ifThenElse(final List<SCaseExpression.Case> cases, int n) {
             if (n >= cases.size()) {

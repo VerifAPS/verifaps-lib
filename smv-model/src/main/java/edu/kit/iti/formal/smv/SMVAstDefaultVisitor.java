@@ -82,4 +82,9 @@ public class SMVAstDefaultVisitor<T> implements SMVAstVisitor<T> {
     public T visit(SQuantified quantified) {
         return defaultVisit(quantified);
     }
+
+    @Override
+    public T visit(SMVType.Module module) {
+        return defaultVisit(module);
+    }
 }

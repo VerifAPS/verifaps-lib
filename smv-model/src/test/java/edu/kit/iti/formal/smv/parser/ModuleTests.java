@@ -60,7 +60,7 @@ public class ModuleTests {
         SMVTransformToAST a = new SMVTransformToAST();
         List<SMVModule> list = (List<SMVModule>) ctx.accept(a);
         for (SMVModule m : list) {
-            Printer p = new Printer();
+            Printer p = new Printer(f.getAbsolutePath() + ".smv");
             System.out.println(m.accept(p));
         }
         Assert.assertEquals(0, slp.getNumberOfSyntaxErrors());

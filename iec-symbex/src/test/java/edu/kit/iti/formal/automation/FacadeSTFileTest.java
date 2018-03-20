@@ -86,7 +86,7 @@ public class FacadeSTFileTest {
             Files.createDirectory(getSMVDirectory());
     }
 
-    @Test(timeout = 5 * 60 * 1000)
+    @Test(timeout = 10 * 1000)
     public void testSMVEvaluateProgram() throws IOException, InterruptedException {
         System.out.println(file.getName());
         TopLevelElements code = IEC61131Facade.file(file);
@@ -105,12 +105,8 @@ public class FacadeSTFileTest {
         pw.close();
         SMVModule module = SymbExFacade.evaluateProgram(code, true);
         SMVModule mainModule = createMainModule(module);
-        StringBuilder smvCode = new StringBuilder(mainModule.toString());
-        smvCode.append(module.toString());
-        //System.out.println(smvCode);
-        PrintWriter printWriter = new PrintWriter(getSMVFile().toString());
-        printWriter.println(smvCode);
-        printWriter.close();
+        mainModule.write(getSMVFile());
+        module.write(getSMVFile(), true);
         System.out.println(file.getName());
         /*
         ProcessBuilder processBuilder = new ProcessBuilder();
