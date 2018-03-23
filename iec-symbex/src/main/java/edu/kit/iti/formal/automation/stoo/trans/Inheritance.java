@@ -22,6 +22,7 @@
 
 package edu.kit.iti.formal.automation.stoo.trans;
 
+import edu.kit.iti.formal.automation.st.util.Tuple;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
@@ -29,7 +30,6 @@ import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
-import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,7 +51,7 @@ public class Inheritance extends STOOTransformation {
      * method) from, and the count of hierarchy levels up until this class is reached. Otherwise, return the sentinel
      * value (null, -1).
      */
-    private static Pair<ClassDeclaration, Integer> getInheritedFrom(@NotNull ClassDeclaration accessedVariableClass,
+    private static Tuple<ClassDeclaration, Integer> getInheritedFrom(@NotNull ClassDeclaration accessedVariableClass,
                                                                     @NotNull String accessedField) {
         ClassDeclaration parentClass = accessedVariableClass;
         int hierarchyLevel = 0;
@@ -62,29 +62,29 @@ public class Inheritance extends STOOTransformation {
             hierarchyLevel++;
         }
         if (parentClass == null)
-            return new Pair<>(null, -1);
-        return new Pair<>(parentClass, hierarchyLevel);
+            return new Tuple<>(null, -1);
+        return new Tuple<>(parentClass, hierarchyLevel);
     }
 
-    private static Pair<ClassDeclaration, Integer> getInheritedFrom(@NotNull ClassDeclaration accessedVariableClass,
+    private static Tuple<ClassDeclaration, Integer> getInheritedFrom(@NotNull ClassDeclaration accessedVariableClass,
                                                                     @NotNull SymbolicReference accessedField) {
         return getInheritedFrom(accessedVariableClass, accessedField.getIdentifier());
     }
 
     private static ClassDeclaration getInheritedFromClass(@NotNull ClassDeclaration accessedVariableClass,
                                                           @NotNull SymbolicReference accessedField) {
-        return getInheritedFrom(accessedVariableClass, accessedField).getKey();
+        return getInheritedFrom(accessedVariableClass, accessedField).a;
     }
 
     private static ClassDeclaration getInheritedFromClass(@NotNull ClassDeclaration accessedVariableClass,
                                                           @NotNull String accessedField) {
-        return getInheritedFrom(accessedVariableClass, accessedField).getKey();
+        return getInheritedFrom(accessedVariableClass, accessedField).a;
     }
 
     @Override
     public void transform(@NotNull STOOSimplifier.State state) {
         super.transform(state);
-        for (ClassDeclaration classDeclaration : state.getScope().getClasses()) {
+        for (ClassDeclaration classDeclaration : state.getScope().getClasses().values()) {
             if (!classDeclaration.hasParentClass())
                 continue;
             // Add/fix super accesses (inside class)

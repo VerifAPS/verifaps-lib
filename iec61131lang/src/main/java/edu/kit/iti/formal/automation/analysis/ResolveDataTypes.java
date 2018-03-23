@@ -47,14 +47,10 @@ public class ResolveDataTypes extends AstVisitor<Object> {
         this.globalScope = globalScope;
     }
 
-    private AnyDt resolve(String name) {
-        return localScope.resolveDataType(name);
-    }
-
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
-        programDeclaration.getScope().setParent(globalScope);
-        return super.visit(programDeclaration);
+        super.visit(programDeclaration);
+        return null;
     }
 
     /**
@@ -62,25 +58,27 @@ public class ResolveDataTypes extends AstVisitor<Object> {
      */
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
-        functionDeclaration.getScope().setParent(globalScope);
+        super.visit(functionDeclaration);
         functionDeclaration.setReturnType(
-                resolve(functionDeclaration.getReturnTypeName()));
-        return super.visit(functionDeclaration);
+                localScope.resolveDataType(functionDeclaration.getReturnTypeName()));
+        return null;
     }
 
     @Override
     public Object visit(MethodDeclaration methodDeclaration) {
-        methodDeclaration.getScope().setParent(localScope);
-        methodDeclaration.setReturnType(resolve(methodDeclaration.getReturnTypeName()));
-        return super.visit(methodDeclaration);
+        super.visit(methodDeclaration);
+        methodDeclaration.setReturnType(localScope.resolveDataType(methodDeclaration.getReturnTypeName()));
+        return null;
     }
 
     @Override
     public Object visit(Scope localScope) {
         this.localScope = localScope;
+        this.localScope.setParent(globalScope);
+
         localScope.getVariables().values().forEach(vd -> {
-            vd.setDataType(resolve(vd.getDataTypeName()));
-            if(vd.getInit()!=null){
+            vd.setDataType(localScope.resolveDataType(vd.getDataTypeName()));
+            if (vd.getInit() != null) {
                 vd.getInit().accept(this);
             }
         });
@@ -143,9 +141,11 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     public Object visit(SymbolicReference ref) {
         String first = ref.getIdentifier();
         try {
-            AnyDt dataType = localScope.resolveDataType(first);
-            EnumerateType et = (EnumerateType) dataType;
-            String second = ((SymbolicReference) ref.getSub()).getIdentifier();
+            if (ref.getSub() != null) {
+                AnyDt dataType = localScope.resolveDataType(first);
+                EnumerateType et = (EnumerateType) dataType;
+                String second = ((SymbolicReference) ref.getSub()).getIdentifier();
+            }
         } catch (ClassCastException | DataTypeNotDefinedException e) {
 
         }

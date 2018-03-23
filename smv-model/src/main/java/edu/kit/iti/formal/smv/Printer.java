@@ -109,9 +109,9 @@ public class Printer implements SMVAstVisitor<String> {
     public String visit(SMVModule m) {
         StringBuilder sb = new StringBuilder();
         sb.append("MODULE ").append(m.getName());
-        if (!m.getModuleParameter().isEmpty()) {
+        if (!m.getModuleParameters().isEmpty()) {
             sb.append("(").append(
-                    m.getModuleParameter().stream()
+                    m.getModuleParameters().stream()
                             .map(p -> p.accept(this))
                             .reduce((a, b) -> a + ", " + b)
                             .get())
@@ -125,18 +125,18 @@ public class Printer implements SMVAstVisitor<String> {
 
         printAssignments(sb, "DEFINE", m.getDefinitions());
 
-        printSection(sb, "LTLSPEC", m.getLTLSpec());
-        printSection(sb, "CTLSPEC", m.getCTLSpec());
-        printSection(sb, "INVARSPEC", m.getInvarSpec());
-        printSection(sb, "INVAR", m.getInvar());
-        printSectionSingle(sb, "INIT", m.getInit());
-        printSectionSingle(sb, "TRANS", m.getTrans());
+        printSection(sb, "LTLSPEC", m.getLtlSpec());
+        printSection(sb, "CTLSPEC", m.getCtlSpec());
+        printSection(sb, "INVARSPEC", m.getInvariantSpecs());
+        printSection(sb, "INVAR", m.getInvariants());
+        printSectionSingle(sb, "INIT", m.getInitExpr());
+        printSectionSingle(sb, "TRANS", m.getTransExpr());
 
 
-        if (m.getInitAssignments().size() > 0 || m.getNextAssignments().size() > 0) {
+        if (m.getInit().size() > 0 || m.getNext().size() > 0) {
             sb.append("ASSIGN\n");
-            printAssignments(sb, m.getInitAssignments(), "init");
-            printAssignments(sb, m.getNextAssignments(), "next");
+            printAssignments(sb, m.getInit(), "init");
+            printAssignments(sb, m.getNext(), "next");
         }
 
         sb.append("\n-- end of module ").append(m.getName()).append('\n');
@@ -167,7 +167,7 @@ public class Printer implements SMVAstVisitor<String> {
     private void printSection(StringBuilder sb, String section, List<SMVExpr> exprs) {
         if (exprs.size() > 0) {
             for (SMVExpr e : exprs) {
-                if(e==null) continue;
+                if (e == null) continue;
                 sb.append(section).append("\n\t");
                 sb.append(e.accept(this)).append(";\n\n");
             }

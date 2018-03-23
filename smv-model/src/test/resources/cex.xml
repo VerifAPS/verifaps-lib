@@ -1,0 +1,917 @@
+<counter-example type="0" id="1" desc="IC3 counterexample" >
+	<node>
+		<state id="1">
+			<value variable="z">0ud16_0</value>
+		</state>
+		<input id="2">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="2">
+			<value variable="z">0ud16_1</value>
+		</state>
+		<input id="3">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="3">
+			<value variable="z">0ud16_2</value>
+		</state>
+		<input id="4">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="4">
+			<value variable="z">0ud16_3</value>
+		</state>
+		<input id="5">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="5">
+			<value variable="z">0ud16_4</value>
+		</state>
+		<input id="6">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="6">
+			<value variable="z">0ud16_5</value>
+		</state>
+		<input id="7">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="7">
+			<value variable="z">0ud16_6</value>
+		</state>
+		<input id="8">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="8">
+			<value variable="z">0ud16_7</value>
+		</state>
+		<input id="9">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="9">
+			<value variable="z">0ud16_8</value>
+		</state>
+		<input id="10">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="10">
+			<value variable="z">0ud16_9</value>
+		</state>
+		<input id="11">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="11">
+			<value variable="z">0ud16_10</value>
+		</state>
+		<input id="12">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="12">
+			<value variable="z">0ud16_11</value>
+		</state>
+		<input id="13">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="13">
+			<value variable="z">0ud16_12</value>
+		</state>
+		<input id="14">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="14">
+			<value variable="z">0ud16_13</value>
+		</state>
+		<input id="15">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="15">
+			<value variable="z">0ud16_14</value>
+		</state>
+		<input id="16">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="16">
+			<value variable="z">0ud16_15</value>
+		</state>
+		<input id="17">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="17">
+			<value variable="z">0ud16_16</value>
+		</state>
+		<input id="18">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="18">
+			<value variable="z">0ud16_17</value>
+		</state>
+		<input id="19">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="19">
+			<value variable="z">0ud16_18</value>
+		</state>
+		<input id="20">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="20">
+			<value variable="z">0ud16_19</value>
+		</state>
+		<input id="21">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="21">
+			<value variable="z">0ud16_20</value>
+		</state>
+		<input id="22">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="22">
+			<value variable="z">0ud16_21</value>
+		</state>
+		<input id="23">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="23">
+			<value variable="z">0ud16_22</value>
+		</state>
+		<input id="24">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="24">
+			<value variable="z">0ud16_23</value>
+		</state>
+		<input id="25">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="25">
+			<value variable="z">0ud16_24</value>
+		</state>
+		<input id="26">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="26">
+			<value variable="z">0ud16_25</value>
+		</state>
+		<input id="27">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="27">
+			<value variable="z">0ud16_26</value>
+		</state>
+		<input id="28">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="28">
+			<value variable="z">0ud16_27</value>
+		</state>
+		<input id="29">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="29">
+			<value variable="z">0ud16_28</value>
+		</state>
+		<input id="30">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="30">
+			<value variable="z">0ud16_29</value>
+		</state>
+		<input id="31">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="31">
+			<value variable="z">0ud16_30</value>
+		</state>
+		<input id="32">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="32">
+			<value variable="z">0ud16_31</value>
+		</state>
+		<input id="33">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="33">
+			<value variable="z">0ud16_32</value>
+		</state>
+		<input id="34">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="34">
+			<value variable="z">0ud16_33</value>
+		</state>
+		<input id="35">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="35">
+			<value variable="z">0ud16_34</value>
+		</state>
+		<input id="36">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="36">
+			<value variable="z">0ud16_35</value>
+		</state>
+		<input id="37">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="37">
+			<value variable="z">0ud16_36</value>
+		</state>
+		<input id="38">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="38">
+			<value variable="z">0ud16_37</value>
+		</state>
+		<input id="39">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="39">
+			<value variable="z">0ud16_38</value>
+		</state>
+		<input id="40">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="40">
+			<value variable="z">0ud16_39</value>
+		</state>
+		<input id="41">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="41">
+			<value variable="z">0ud16_40</value>
+		</state>
+		<input id="42">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="42">
+			<value variable="z">0ud16_41</value>
+		</state>
+		<input id="43">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="43">
+			<value variable="z">0ud16_42</value>
+		</state>
+		<input id="44">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="44">
+			<value variable="z">0ud16_43</value>
+		</state>
+		<input id="45">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="45">
+			<value variable="z">0ud16_44</value>
+		</state>
+		<input id="46">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="46">
+			<value variable="z">0ud16_45</value>
+		</state>
+		<input id="47">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="47">
+			<value variable="z">0ud16_46</value>
+		</state>
+		<input id="48">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="48">
+			<value variable="z">0ud16_47</value>
+		</state>
+		<input id="49">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="49">
+			<value variable="z">0ud16_48</value>
+		</state>
+		<input id="50">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="50">
+			<value variable="z">0ud16_49</value>
+		</state>
+		<input id="51">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="51">
+			<value variable="z">0ud16_50</value>
+		</state>
+		<input id="52">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="52">
+			<value variable="z">0ud16_51</value>
+		</state>
+		<input id="53">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="53">
+			<value variable="z">0ud16_52</value>
+		</state>
+		<input id="54">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="54">
+			<value variable="z">0ud16_53</value>
+		</state>
+		<input id="55">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="55">
+			<value variable="z">0ud16_54</value>
+		</state>
+		<input id="56">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="56">
+			<value variable="z">0ud16_55</value>
+		</state>
+		<input id="57">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="57">
+			<value variable="z">0ud16_56</value>
+		</state>
+		<input id="58">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="58">
+			<value variable="z">0ud16_57</value>
+		</state>
+		<input id="59">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="59">
+			<value variable="z">0ud16_58</value>
+		</state>
+		<input id="60">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="60">
+			<value variable="z">0ud16_59</value>
+		</state>
+		<input id="61">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="61">
+			<value variable="z">0ud16_60</value>
+		</state>
+		<input id="62">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="62">
+			<value variable="z">0ud16_61</value>
+		</state>
+		<input id="63">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="63">
+			<value variable="z">0ud16_62</value>
+		</state>
+		<input id="64">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="64">
+			<value variable="z">0ud16_63</value>
+		</state>
+		<input id="65">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="65">
+			<value variable="z">0ud16_64</value>
+		</state>
+		<input id="66">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="66">
+			<value variable="z">0ud16_65</value>
+		</state>
+		<input id="67">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="67">
+			<value variable="z">0ud16_66</value>
+		</state>
+		<input id="68">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="68">
+			<value variable="z">0ud16_67</value>
+		</state>
+		<input id="69">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="69">
+			<value variable="z">0ud16_68</value>
+		</state>
+		<input id="70">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="70">
+			<value variable="z">0ud16_69</value>
+		</state>
+		<input id="71">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="71">
+			<value variable="z">0ud16_70</value>
+		</state>
+		<input id="72">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="72">
+			<value variable="z">0ud16_71</value>
+		</state>
+		<input id="73">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="73">
+			<value variable="z">0ud16_72</value>
+		</state>
+		<input id="74">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="74">
+			<value variable="z">0ud16_73</value>
+		</state>
+		<input id="75">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="75">
+			<value variable="z">0ud16_74</value>
+		</state>
+		<input id="76">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="76">
+			<value variable="z">0ud16_75</value>
+		</state>
+		<input id="77">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="77">
+			<value variable="z">0ud16_76</value>
+		</state>
+		<input id="78">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="78">
+			<value variable="z">0ud16_77</value>
+		</state>
+		<input id="79">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="79">
+			<value variable="z">0ud16_78</value>
+		</state>
+		<input id="80">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="80">
+			<value variable="z">0ud16_79</value>
+		</state>
+		<input id="81">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="81">
+			<value variable="z">0ud16_80</value>
+		</state>
+		<input id="82">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="82">
+			<value variable="z">0ud16_81</value>
+		</state>
+		<input id="83">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="83">
+			<value variable="z">0ud16_82</value>
+		</state>
+		<input id="84">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="84">
+			<value variable="z">0ud16_83</value>
+		</state>
+		<input id="85">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="85">
+			<value variable="z">0ud16_84</value>
+		</state>
+		<input id="86">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="86">
+			<value variable="z">0ud16_85</value>
+		</state>
+		<input id="87">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="87">
+			<value variable="z">0ud16_86</value>
+		</state>
+		<input id="88">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="88">
+			<value variable="z">0ud16_87</value>
+		</state>
+		<input id="89">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="89">
+			<value variable="z">0ud16_88</value>
+		</state>
+		<input id="90">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="90">
+			<value variable="z">0ud16_89</value>
+		</state>
+		<input id="91">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="91">
+			<value variable="z">0ud16_90</value>
+		</state>
+		<input id="92">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="92">
+			<value variable="z">0ud16_91</value>
+		</state>
+		<input id="93">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="93">
+			<value variable="z">0ud16_92</value>
+		</state>
+		<input id="94">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="94">
+			<value variable="z">0ud16_93</value>
+		</state>
+		<input id="95">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="95">
+			<value variable="z">0ud16_94</value>
+		</state>
+		<input id="96">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="96">
+			<value variable="z">0ud16_95</value>
+		</state>
+		<input id="97">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="97">
+			<value variable="z">0ud16_96</value>
+		</state>
+		<input id="98">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="98">
+			<value variable="z">0ud16_97</value>
+		</state>
+		<input id="99">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="99">
+			<value variable="z">0ud16_98</value>
+		</state>
+		<input id="100">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="100">
+			<value variable="z">0ud16_99</value>
+		</state>
+		<input id="101">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="101">
+			<value variable="z">0ud16_100</value>
+		</state>
+		<input id="102">
+			<value variable="x">0ud1_1</value>
+			<value variable="y">0ud1_0</value>
+		</input>
+	</node>
+	<node>
+		<state id="102">
+			<value variable="z">0ud16_101</value>
+		</state>
+	</node>
+	<loops> </loops>
+</counter-example>

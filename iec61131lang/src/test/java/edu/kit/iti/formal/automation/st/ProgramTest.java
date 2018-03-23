@@ -104,7 +104,7 @@ public class ProgramTest {
     public void testResolveDataTypes() throws IOException {
         TopLevelElements tle = IEC61131Facade.file(testFile);
         Scope gs = IEC61131Facade.resolveDataTypes(tle);
-        for (ClassDeclaration classDeclaration : gs.getClasses()) {
+        for (ClassDeclaration classDeclaration : gs.getClasses().values()) {
             Assert.assertTrue(
                     classDeclaration.getParentName() == null
                     || classDeclaration.getParentClass() != null);
@@ -112,7 +112,7 @@ public class ProgramTest {
                     i -> Assert.assertTrue("Could not resolve interface for classes.",
                             i.getIdentifiedObject() != null));
         }
-        for (FunctionBlockDeclaration functionBlockDeclaration : gs.getFunctionBlocks()) {
+        for (FunctionBlockDeclaration functionBlockDeclaration : gs.getFunctionBlocks().values()) {
             Assert.assertTrue(functionBlockDeclaration.getParent().getIdentifier() == null
                     || functionBlockDeclaration.getParentClass() != null);
             functionBlockDeclaration.getInterfaces()
