@@ -34,7 +34,7 @@ public interface TypeTranslator {
     SMVType translate(AnyDt datatype);
 
     default SVariable translate(VariableDeclaration vdecl) {
-        return SVariable.create(vdecl.getName()).with(translate(vdecl.getDataType()));
+        return SVariable.Companion.create(vdecl.getName()).with(translate(vdecl.getDataType()));
     }
 
 }

@@ -22,7 +22,6 @@ package edu.kit.iti.formal.smv;
  * #L%
  */
 
-import edu.kit.iti.formal.smv.ast.GroundDataType;
 import edu.kit.iti.formal.smv.ast.SMVType;
 import junit.framework.Assert;
 import org.junit.Test;

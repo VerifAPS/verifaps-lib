@@ -309,7 +309,7 @@ public final class FunctionBlockLink {
         //		STemporalOperator.G,
         //		SMVFacade.combine(SBinaryOperator.AND, invarEquations)));
         moduleMain.getInvariantSpecs().add(
-                SMVFacade.combine(SBinaryOperator.AND, invarEquations));
+                SMVFacade.INSTANCE.combine(SBinaryOperator.AND, invarEquations));
 
         return smvVerifier.verify(
                 fileName, false, moduleMain, module1, module2);
@@ -345,9 +345,9 @@ public final class FunctionBlockLink {
         dstEquations.add(new SBinaryExpression(
                 new SVariable(
                         "fb1." + activation1.activationBit.getName(),
-                        SMVType.BOOLEAN),
+                        SMVType.Companion.getBOOLEAN()),
                 SBinaryOperator.IMPL,
-                SMVFacade.combine(SBinaryOperator.AND, implyEquations)));
+                SMVFacade.INSTANCE.combine(SBinaryOperator.AND, implyEquations)));
     }
 
     private void _createInstanceLink(
