@@ -1,7 +1,8 @@
 package edu.kit.iti.formal.automation.smv
 
-import edu.kit.iti.formal.smv.SMVPrinter
 import edu.kit.iti.formal.smv.SMVFacade
+import edu.kit.iti.formal.smv.SMVModuleType
+import edu.kit.iti.formal.smv.SMVPrinter
 import edu.kit.iti.formal.smv.ast.*
 import mu.KLogging
 import java.io.Writer
@@ -45,8 +46,8 @@ open class RegressionVerification(
 
     val glueModule = SMVModule()
 
-    var oldModuleType: SMVType.Module? = null
-    var newModuleType: SMVType.Module? = null
+    var oldModuleType: SMVModuleType? = null
+    var newModuleType: SMVModuleType? = null
 
     val oldInstanceName = "__old__"
     val newInstanceName = "__new__"
@@ -70,8 +71,8 @@ open class RegressionVerification(
             logger.info("modules renamed due to collision")
         }
 
-        newModuleType = SMVType.Module(newVersion.name, newVersion.moduleParameters)
-        oldModuleType = SMVType.Module(oldVersion.name, oldVersion.moduleParameters)
+        newModuleType = SMVModuleType(newVersion.name, newVersion.moduleParameters)
+        oldModuleType = SMVModuleType(oldVersion.name, oldVersion.moduleParameters)
     }
 
     protected open fun addInputVariables() {
@@ -80,7 +81,7 @@ open class RegressionVerification(
         val uncoveredNew = ArrayList<SVariable>(newVersion.moduleParameters)
 
         for ((first, second) in commonInput) {
-            assert(first.datatype == second.datatype) { "Datatypes are not equal for ${first} and ${second}" }
+            assert(first.dataType == second.dataType) { "Datatypes are not equal for ${first} and ${second}" }
             glueModule.inputVars.add(first)
 
             uncoveredOld.remove(first)
@@ -113,10 +114,8 @@ open class RegressionVerification(
 
         for ((fst, snd) in output) {
             val eq = SVariable.bool("eq_${fst.name}_${snd.name}")
-            glueModule.definitions.put(
-                    eq,
-                    fst.inModule(oldName).equal(snd.inModule(newName))
-            )
+            glueModule.definitions.add(
+                    SAssignment(eq, fst.inModule(oldName).equal(snd.inModule(newName))))
             list.add(eq)
         }
 
@@ -190,12 +189,14 @@ open class ReVeWithMiter(oldVersion: SMVModule, newVersion: SMVModule, val miter
                         }
 
         val miterVar = SVariable.create(miterInstanceName).with(
-                SMVType.Module(miter.module.name, parameters)
+                SMVModuleType(miter.module.name, parameters)
         )
 
         glueModule.stateVars.add(miterVar)
-        glueModule.ltlSpec.add(miter.ltlSpec?.inModule(miterInstanceName))
-        glueModule.invariantSpecs.add(miter.invarSpec?.inModule(miterInstanceName))
+        if (miter.ltlSpec != null)
+            glueModule.ltlSpec.add(miter.ltlSpec!!.inModule(miterInstanceName))
+        if (miter.invarSpec != null)
+            glueModule.invariantSpecs.add(miter.invarSpec!!.inModule(miterInstanceName))
     }
 
     override fun writeTo(writer: Writer) {
@@ -228,7 +229,7 @@ open class GloballyMiter(oldVersion: SMVModule, newVersion: SMVModule)
             val eq = SVariable.bool("eq_${fst.name}_${snd.name}")
             val old = fst.prefix(oldPrefix)
             val new = snd.prefix(newPrefix)
-            module.definitions.put(eq, old.equal(new))
+            module.definitions.add(SAssignment(eq, old.equal(new)))
             list.add(eq)
         }
 
@@ -241,7 +242,7 @@ open class GloballyMiter(oldVersion: SMVModule, newVersion: SMVModule)
 }
 
 private fun SVariable.prefix(prefix: String): SVariable {
-    return SVariable(prefix + this.name, this.datatype)
+    return SVariable(prefix + this.name, this.dataType!!)
 }
 
 open class UntilMiter(oldVersion: SMVModule, newVersion: SMVModule, val inner: Miter)
@@ -249,7 +250,7 @@ open class UntilMiter(oldVersion: SMVModule, newVersion: SMVModule, val inner: M
     var triggerCondition = SVariable.bool("END_TRIGGER_POINT")
 
     open fun event(expr: SMVExpr) {
-        module.definitions[triggerCondition] = expr
+        module.definitions.add(SAssignment(triggerCondition, expr))
     }
 
     override fun build() {
@@ -259,7 +260,7 @@ open class UntilMiter(oldVersion: SMVModule, newVersion: SMVModule, val inner: M
 
         module.stateVars.add(
                 SVariable.create("inner")
-                        .with(SMVType.Module(inner.module.name,
+                        .with(SMVModuleType(inner.module.name,
                                 inner.module.moduleParameters))
         )
 
@@ -271,7 +272,8 @@ open class UntilMiter(oldVersion: SMVModule, newVersion: SMVModule, val inner: M
                 // next(premise) = premise & !EVENT
                 SAssignment(end, end.and(triggerCondition.not())))
 
-        invarSpec = end.implies(inner.invarSpec?.inModule("inner"))
+        if (inner.invarSpec != null)
+            invarSpec = end.implies(inner.invarSpec!!.inModule("inner"))
     }
 
     override fun writeTo(writer: Writer) {

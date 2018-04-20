@@ -88,8 +88,10 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
     }
 
     override fun visitDefineBody(ctx: SMVParser.DefineBodyContext): Any? {
-        lastModule!!.definitions[SVariable.create(ctx.`var`.getText()).with(null)] =
-                ctx.expr().accept(this) as SMVExpr
+        lastModule!!.definitions.add(
+                SAssignment(SVariable.create(ctx.`var`.getText()).with(null),
+                        ctx.expr().accept(this) as SMVExpr)
+        )
         return null
     }
 
@@ -179,7 +181,7 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
 
     override fun visitEnumType(ctx: SMVParser.EnumTypeContext): Any {
         val ids = ctx.expr().map { it.getText() }
-        return EnumType(ids)
+        return SMVEnumType(ids)
     }
 
     override fun visitIntervalType(ctx: SMVParser.IntervalTypeContext): Any {
@@ -195,7 +197,7 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
     override fun visitModuleTypeSimple(ctx: SMVParser.ModuleTypeSimpleContext): Any {
         val parameters: List<SMVExpr> = ctx.stateExpr()
                 .map({ se -> se.accept(this) as SMVExpr })
-        return ModuleType(ctx.mod.text, parameters)
+        return SMVModuleType(ctx.mod.text, parameters)
     }
 
     override fun visitStateExpr(ctx: SMVParser.StateExprContext): SMVExpr {
@@ -330,10 +332,6 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
     }
 
     override fun visitArrayAccess(ctx: SMVParser.ArrayAccessContext): Any {
-        throw IllegalStateException("not supported")
-    }
-
-    override fun visitVariableDotted(ctx: SMVParser.VariableDottedContext): Any {
         throw IllegalStateException("not supported")
     }
 

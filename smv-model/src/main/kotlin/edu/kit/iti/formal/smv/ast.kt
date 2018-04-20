@@ -203,7 +203,10 @@ data class SLiteral(var value: Any, override var dataType: SMVType? = null)
 
     companion object {
 
+        @JvmField
         val TRUE = SLiteral(true, SMVTypes.BOOLEAN)
+
+        @JvmField
         val FALSE = SLiteral(false, SMVTypes.BOOLEAN)
 
         fun integer(from: Long) = integer(BigInteger.valueOf(from))
@@ -314,7 +317,7 @@ abstract class SMVExpr : SMVAst() {
 }
 
 data class SMVModule(
-        var name: String,
+        var name: String = "<empty>",
         /**
          *
          */

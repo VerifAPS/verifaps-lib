@@ -23,9 +23,9 @@ package edu.kit.iti.formal.automation.smt;
  */
 
 import de.tudresden.inf.lat.jsexp.Sexp;
+import edu.kit.iti.formal.smv.SMVType;
 import edu.kit.iti.formal.smv.ast.SBinaryOperator;
 import edu.kit.iti.formal.smv.ast.SFunction;
-import edu.kit.iti.formal.smv.ast.SMVType;
 import edu.kit.iti.formal.smv.ast.SUnaryOperator;
 
 import java.util.List;

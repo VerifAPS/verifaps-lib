@@ -135,12 +135,12 @@ public class ModuleBuilder implements Runnable {
                     initValueTranslator.getInit(s.getDataType()));
         }
         SAssignment a = new SAssignment(var, e);
-        module.getInit().add(a);
+        module.getInitAssignments().add(a);
     }
 
     private void addNextAssignment(SVariable s) {
         SMVExpr e = finalState.get(s);
         SAssignment a = new SAssignment(s, e);
-        module.getNext().add(a);
+        module.getNextAssignments().add(a);
     }
 }

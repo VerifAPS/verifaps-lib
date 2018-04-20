@@ -141,12 +141,11 @@ stateExpr:
     ;
 
 terminalAtom
-    : '(' stateExpr ')'                  # paren
-	| func=(ID|'next'|'init') '(' stateExpr (',' stateExpr)* ')'          # functionExpr
-	| casesExpr                          # casesExprAtom
-	| var=ID                             # variableAccess
-	| var=ID ('[' NUMBER ']')*           # arrayAccess
-	| value=ID ('.' dotted=terminalAtom | ('[' array+=NUMBER ']')*)? #variableDotted
+    : '(' stateExpr ')'                                     # paren
+	| func=ID '(' stateExpr (',' stateExpr)* ')'            # functionExpr
+	| casesExpr                                             # casesExprAtom
+	| value=ID ('.' ID)* ('[' array+=NUMBER ']')?           # variableAccess
+	| var=ID ('[' NUMBER ']')*                              # arrayAccess
 	| value=NUMBER #integerLiteral
 	| value=FLOAT #floatLiteral
 	| value='TRUE' #trueExpr

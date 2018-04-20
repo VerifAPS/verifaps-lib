@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.smv.translators;
 
 import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
-import edu.kit.iti.formal.smv.ast.SMVType;
+import edu.kit.iti.formal.smv.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
 
 /**

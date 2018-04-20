@@ -24,8 +24,10 @@ package edu.kit.iti.formal.automation.smv.translators;
 
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.IllegalTypeException;
-import edu.kit.iti.formal.smv.GroundDataType;
-import edu.kit.iti.formal.smv.ast.SMVType;
+import edu.kit.iti.formal.smv.SMVEnumType;
+import edu.kit.iti.formal.smv.SMVType;
+import edu.kit.iti.formal.smv.SMVTypes;
+import edu.kit.iti.formal.smv.SMVWordType;
 
 /**
  * Created by weigl on 11.12.16.
@@ -58,10 +60,9 @@ public class DefaultTypeTranslator implements TypeTranslator {
         @Override
         public SMVType visit(AnyBit anyBit) {
             if (anyBit == AnyBit.BOOL) {
-                return SMVType.Companion.getBOOLEAN();
+                return SMVTypes.BOOLEAN.INSTANCE;
             }
-            return new SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD,
-                    anyBit.getBitLength());
+            return new SMVWordType(false, anyBit.getBitLength());
         }
 
         @Override
@@ -87,12 +88,12 @@ public class DefaultTypeTranslator implements TypeTranslator {
                         GroundDataType.SIGNED_WORD :
                         GroundDataType.UNSIGNED_WORD, inttype.getBitLength());
         */
-            return new SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, 16);
+            return new SMVWordType(true, 16);
         }
 
         @Override
         public SMVType visit(EnumerateType enumerateType) {
-            return new SMVType.EnumType(enumerateType.getAllowedValues());
+            return new SMVEnumType(enumerateType.getAllowedValues());
         }
 
         @Override
@@ -104,7 +105,7 @@ public class DefaultTypeTranslator implements TypeTranslator {
         public SMVType visit(RangeType rangeType) {
             // TODO base types other than SINT
             // TODO variable width (needs to match with values everywhere)
-            return new SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, 8);
+            return new SMVWordType(true, 8);
         }
 
         @Override

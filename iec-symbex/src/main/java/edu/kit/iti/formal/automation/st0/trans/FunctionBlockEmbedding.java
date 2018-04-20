@@ -138,6 +138,7 @@ public class FunctionBlockEmbedding implements ST0Transformation {
     public static class CodeWithScope {
         Scope scope;
         StatementList statements;
+        @Builder.Default
         Map<String, StatementList> actions = new HashMap<>();
 
         public CodeWithScope(ProgramDeclaration theProgram) {
