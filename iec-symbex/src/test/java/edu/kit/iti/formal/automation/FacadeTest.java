@@ -45,9 +45,9 @@ public class FacadeTest {
         List<TopLevelElement> toplevels = IEC61131Facade.file(CharStreams.fromStream(resource));
         FunctionDeclaration func = (FunctionDeclaration) toplevels.get(0);
         SMVExpr state = SymbExFacade.evaluateFunction(func,
-                SVariable.create("a").asBool(),
-                SVariable.create("b").asBool(),
-                SVariable.create("c").asBool());
+                SVariable.Companion.create("a").asBool(),
+                SVariable.Companion.create("b").asBool(),
+                SVariable.Companion.create("c").asBool());
         System.out.println(state);
         //Assert.assertEquals();
     }

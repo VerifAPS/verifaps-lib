@@ -17,4 +17,5 @@ project(':iec-run').projectDir = "$rootDir/iec-run" as File
 project(':iec-modularization').projectDir = "$rootDir/iec-modularization" as File
 project(':aps-rvt').projectDir = "$rootDir/aps-rvt" as File
 project(':casestudies').projectDir = "$rootDir/casestudies" as File
+include 'asdl'
 

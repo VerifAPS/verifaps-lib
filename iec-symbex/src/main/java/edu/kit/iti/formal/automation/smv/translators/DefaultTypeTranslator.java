@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.smv.translators;
 
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.IllegalTypeException;
-import edu.kit.iti.formal.smv.ast.GroundDataType;
+import edu.kit.iti.formal.smv.GroundDataType;
 import edu.kit.iti.formal.smv.ast.SMVType;
 
 /**
@@ -58,7 +58,7 @@ public class DefaultTypeTranslator implements TypeTranslator {
         @Override
         public SMVType visit(AnyBit anyBit) {
             if (anyBit == AnyBit.BOOL) {
-                return SMVType.BOOLEAN;
+                return SMVType.Companion.getBOOLEAN();
             }
             return new SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD,
                     anyBit.getBitLength());

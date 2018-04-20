@@ -106,10 +106,10 @@ public class SSA2SMT implements Runnable {
 
         @Override
         public Sexp visit(SBinaryExpression be) {
-            Sexp left = be.left.accept(this);
-            Sexp right = be.right.accept(this);
-            Sexp op = fnTranslator.translateOperator(be.operator,
-                    be.left.getSMVType(), be.right.getSMVType());
+            Sexp left = be.getLeft().accept(this);
+            Sexp right = be.getRight().accept(this);
+            Sexp op = fnTranslator.translateOperator(be.getOperator(),
+                    be.getLeft().getSMVType(), be.getRight().getSMVType());
 
             Sexp call = newNonAtomicSexp();
             call.add(op);
@@ -120,8 +120,8 @@ public class SSA2SMT implements Runnable {
 
         @Override
         public Sexp visit(SUnaryExpression ue) {
-            Sexp right = ue.expr.accept(this);
-            Sexp op = fnTranslator.translateOperator(ue.operator, ue.expr.getSMVType());
+            Sexp right = ue.getExpr().accept(this);
+            Sexp op = fnTranslator.translateOperator(ue.getOperator(), ue.getExpr().getSMVType());
             Sexp call = newNonAtomicSexp();
             call.add(op);
             call.add(right);
@@ -140,7 +140,7 @@ public class SSA2SMT implements Runnable {
 
         @Override
         public Sexp visit(SCaseExpression ce) {
-            return ifThenElse(ce.cases, 0);
+            return ifThenElse(ce.getCases(), 0);
         }
 
         @Override
@@ -169,13 +169,13 @@ public class SSA2SMT implements Runnable {
 
             if (n == cases.size() - 1) {//last element
                 // ignoring the last condition for well-definedness
-                return cases.get(n).then.accept(this);
+                return cases.get(n).getThen().accept(this);
             }
 
             Sexp ite = newNonAtomicSexp();
             ite.add(newAtomicSexp("ite"));
-            ite.add(cases.get(n).condition.accept(this));
-            ite.add(cases.get(n).then.accept(this));
+            ite.add(cases.get(n).getCondition().accept(this));
+            ite.add(cases.get(n).getThen().accept(this));
             ite.add(ifThenElse(cases, n + 1));
             return ite;
         }

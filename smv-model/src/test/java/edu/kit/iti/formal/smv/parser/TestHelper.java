@@ -96,11 +96,11 @@ public class TestHelper {
     }
 
     public static SMVParser getParser(String input) {
-        return Facade.getParser(CharStreams.fromString(input));
+        return Facade.INSTANCE.getParser(CharStreams.fromString(input));
     }
 
     public static SMVParser getParser(File f) throws IOException {
-        return Facade.getParser(CharStreams.fromFileName(f.getAbsolutePath()));
+        return Facade.INSTANCE.getParser(CharStreams.fromFileName(f.getAbsolutePath()));
     }
 
     public static SMVExpr toExpr(String s) {

@@ -25,7 +25,7 @@ package edu.kit.iti.formal.automation.smt;
 import de.tudresden.inf.lat.jsexp.Sexp;
 import de.tudresden.inf.lat.jsexp.SexpFactory;
 import de.tudresden.inf.lat.jsexp.SexpParserException;
-import edu.kit.iti.formal.smv.ast.GroundDataType;
+import edu.kit.iti.formal.smv.GroundDataType;
 import edu.kit.iti.formal.smv.ast.SLiteral;
 import edu.kit.iti.formal.smv.ast.SMVType;
 
@@ -101,20 +101,20 @@ public class DefaultS2STranslator implements S2SDataTypeTranslator {
     @Override
     public Sexp translate(SLiteral l) {
 
-        if (l.getSMVType() == SMVType.BOOLEAN)
-            return newAtomicSexp(l.value.toString().equalsIgnoreCase("TRUE") ? "true" : "false");
+        if (l.getSMVType() == SMVType.Companion.getBOOLEAN())
+            return newAtomicSexp(l.getValue().toString().equalsIgnoreCase("TRUE") ? "true" : "false");
 
         String prefix = "#b";
         if (l.getSMVType().getBaseType() == GroundDataType.SIGNED_WORD
                 || l.getSMVType().getBaseType() == GroundDataType.UNSIGNED_WORD) {
             SMVType.SMVTypeWithWidth t = (SMVType.SMVTypeWithWidth) l.getSMVType();
-            BigInteger b = (BigInteger) l.value;
+            BigInteger b = (BigInteger) l.getValue();
             return newAtomicSexp("#b" + twoComplement(b, t.getWidth()));
         }
 
         if (l.getSMVType() instanceof SMVType.EnumType) {
             SMVType.EnumType et = (SMVType.EnumType) l.getSMVType();
-            String value = (String) l.value;
+            String value = (String) l.getValue();
             int i = et.getValues().indexOf(value);
             return newAtomicSexp("#b" + twoComplement(BigInteger.valueOf(i), 16));
         }

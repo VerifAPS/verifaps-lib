@@ -67,10 +67,10 @@ public class TableDataTypeTranslator implements TypeTranslator {
         if (integerMap.containsKey(vdecl.getName())) {
             int i = integerMap.get(vdecl.getName());
             if (i == 0)
-                return SVariable.create(vdecl.getName()).asBool();
-            return SVariable.create(vdecl.getName()).with(i < 0 ? SMVType.unsigned(-i) : SMVType.signed(i));
+                return SVariable.Companion.create(vdecl.getName()).asBool();
+            return SVariable.Companion.create(vdecl.getName()).with(i < 0 ? SMVType.Companion.unsigned(-i) : SMVType.Companion.signed(i));
         } else {
-            return SVariable.create(vdecl.getName()).with(translate(vdecl.getDataType()));
+            return SVariable.Companion.create(vdecl.getName()).with(translate(vdecl.getDataType()));
         }
     }
 }
