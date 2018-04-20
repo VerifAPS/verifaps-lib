@@ -4,5 +4,27 @@
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="aps-rvt_main" target="1.8" />
+      <module name="aps-rvt_test" target="1.8" />
+      <module name="asdl_main" target="1.8" />
+      <module name="asdl_test" target="1.8" />
+      <module name="casestudies_main" target="1.8" />
+      <module name="casestudies_test" target="1.8" />
+      <module name="flycheck_main" target="1.8" />
+      <module name="flycheck_test" target="1.8" />
+      <module name="iec-modularization_main" target="1.8" />
+      <module name="iec-modularization_test" target="1.8" />
+      <module name="iec-run_main" target="1.8" />
+      <module name="iec-run_test" target="1.8" />
+      <module name="iec-symbex_main" target="1.8" />
+      <module name="iec-symbex_test" target="1.8" />
+      <module name="iec-xml_main" target="1.8" />
+      <module name="iec-xml_test" target="1.8" />
+      <module name="iec61131lang_main" target="1.8" />
+      <module name="iec61131lang_test" target="1.8" />
+      <module name="smv-model_main" target="1.8" />
+      <module name="smv-model_test" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

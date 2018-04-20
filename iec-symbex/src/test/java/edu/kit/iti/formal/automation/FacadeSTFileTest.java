@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation;
 
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.smv.ast.SMVModule;
-import edu.kit.iti.formal.smv.ast.SMVType;
+import edu.kit.iti.formal.smv.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;

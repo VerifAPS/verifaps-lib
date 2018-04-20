@@ -23,8 +23,8 @@ package edu.kit.iti.formal.automation.smt;
  */
 
 import de.tudresden.inf.lat.jsexp.Sexp;
+import edu.kit.iti.formal.smv.SMVType;
 import edu.kit.iti.formal.smv.ast.SLiteral;
-import edu.kit.iti.formal.smv.ast.SMVType;
 
 /**
  * @author Alexander Weigl

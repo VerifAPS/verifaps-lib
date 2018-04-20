@@ -30,6 +30,7 @@ import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import java.util.*
+import java.util.function.BinaryOperator
 
 /**
  * Created by weigl on 26.11.16.
@@ -77,23 +78,19 @@ object SMVFacade {
         return { a: SMVExpr, b: SMVExpr -> SBinaryExpression(a, op, b) }
     }
 
+    fun reducerFn(op: SBinaryOperator): BinaryOperator<SMVExpr> {
+        return BinaryOperator({ a: SMVExpr, b: SMVExpr -> SBinaryExpression(a, op, b) })
+    }
+
     fun NOT(e: SMVExpr): SUnaryExpression {
         return SUnaryExpression(SUnaryOperator.NEGATE, e)
     }
 
     fun expr(s: String): SMVExpr {
         val ctx = getParser(CharStreams.fromString(s)).expr()
-        return ctx  .accept(SMVTransformToAST()) as SMVExpr
+        return ctx.accept(SMVTransformToAST()) as SMVExpr
     }
 
-    /*
-    public static CaseExpression makeIfThenElse(Expression cond, Expression thenExpr, Expression elseExpr) {
-        CaseExpression result = new CaseExpression();
-        result.addCase(cond, thenExpr);
-        result.setElseExpression(elseExpr);
-        return result;
-    }
-*/
     fun wordConcat(a: SMVExpr, b: SMVExpr) = a.wordConcat(b)
 
     fun expand(expr: SMVExpr, sz: SLiteral): SMVExpr =

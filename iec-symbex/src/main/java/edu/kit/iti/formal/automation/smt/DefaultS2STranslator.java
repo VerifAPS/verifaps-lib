@@ -10,12 +10,12 @@ package edu.kit.iti.formal.automation.smt;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -25,9 +25,11 @@ package edu.kit.iti.formal.automation.smt;
 import de.tudresden.inf.lat.jsexp.Sexp;
 import de.tudresden.inf.lat.jsexp.SexpFactory;
 import de.tudresden.inf.lat.jsexp.SexpParserException;
-import edu.kit.iti.formal.smv.GroundDataType;
+import edu.kit.iti.formal.smv.SMVEnumType;
+import edu.kit.iti.formal.smv.SMVType;
+import edu.kit.iti.formal.smv.SMVTypes;
+import edu.kit.iti.formal.smv.SMVWordType;
 import edu.kit.iti.formal.smv.ast.SLiteral;
-import edu.kit.iti.formal.smv.ast.SMVType;
 
 import java.math.BigInteger;
 
@@ -76,11 +78,12 @@ public class DefaultS2STranslator implements S2SDataTypeTranslator {
 
     @Override
     public Sexp translate(SMVType datatype) {
-        if (GroundDataType.BOOLEAN == datatype.getBaseType())
+        if (SMVTypes.BOOLEAN.INSTANCE.equals(datatype)) {
             return newAtomicSexp(SMTProgram.SMT_BOOLEAN);
+        }
 
-        if (datatype instanceof SMVType.SMVTypeWithWidth) {
-            int width = ((SMVType.SMVTypeWithWidth) datatype).getWidth();
+        if (datatype instanceof SMVWordType) {
+            int width = ((SMVWordType) datatype).getWidth();
             Sexp bv = newNonAtomicSexp();
             bv.add(newAtomicSexp("_"));
             bv.add(newAtomicSexp("BitVec"));
@@ -88,7 +91,7 @@ public class DefaultS2STranslator implements S2SDataTypeTranslator {
             return bv;
         }
 
-        if(datatype instanceof SMVType.EnumType) {
+        if (datatype instanceof SMVEnumType) {
             try {
                 return SexpFactory.parse("(_ BitVec 16)");
             } catch (SexpParserException e) {
@@ -98,27 +101,25 @@ public class DefaultS2STranslator implements S2SDataTypeTranslator {
 
         throw new IllegalArgumentException();
     }
+
     @Override
     public Sexp translate(SLiteral l) {
-
-        if (l.getSMVType() == SMVType.Companion.getBOOLEAN())
+        if (l.getDataType() == SMVTypes.INT.INSTANCE)
             return newAtomicSexp(l.getValue().toString().equalsIgnoreCase("TRUE") ? "true" : "false");
 
         String prefix = "#b";
-        if (l.getSMVType().getBaseType() == GroundDataType.SIGNED_WORD
-                || l.getSMVType().getBaseType() == GroundDataType.UNSIGNED_WORD) {
-            SMVType.SMVTypeWithWidth t = (SMVType.SMVTypeWithWidth) l.getSMVType();
+        if (l.getDataType() instanceof SMVWordType) {
+            SMVWordType t = (SMVWordType) l.getDataType();
             BigInteger b = (BigInteger) l.getValue();
             return newAtomicSexp("#b" + twoComplement(b, t.getWidth()));
         }
 
-        if (l.getSMVType() instanceof SMVType.EnumType) {
-            SMVType.EnumType et = (SMVType.EnumType) l.getSMVType();
+        if (l.getDataType() instanceof SMVEnumType) {
+            SMVEnumType et = (SMVEnumType) l.getDataType();
             String value = (String) l.getValue();
             int i = et.getValues().indexOf(value);
             return newAtomicSexp("#b" + twoComplement(BigInteger.valueOf(i), 16));
         }
-
         throw new IllegalArgumentException();
     }
 }
