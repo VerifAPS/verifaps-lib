@@ -1,12 +1,9 @@
-<<<<<<< HEAD
 import edu.kit.iti.formal.asdl.*
 import edu.kit.iti.formal.asdl.Enum
 import org.junit.Test
+import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
-=======
-import edu.kit.iti.formal.asdl.ADSL
->>>>>>> fd2d040... wip
 
 /**
  *
@@ -18,11 +15,7 @@ class SMVADSL : ADSL() {
         module {
             pkgName = "edu.kit.iti.formal.smv.ast"
             classPrefix = "Smv"
-<<<<<<< HEAD
             name = "ast"
-=======
-            name = "Ast"
->>>>>>> fd2d040... wip
 
             group("Ast") {
                 group("Expr") {
@@ -47,13 +40,67 @@ class SMVADSL : ADSL() {
             }
         }
     }
-<<<<<<< HEAD
 
     @Test
     fun test() {
         val testGenerator = TestGenerator()
         this.generate(testGenerator)
         println(testGenerator.sstream.toString())
+        val jg = JavaGenerator(File("tmp/smv"))
+
+        val packageWriter: PrintFunction<AbstractNode> = { n: AbstractNode, p: PrintWriter ->
+            p.format("package %s;%n%n", n.pkgName);
+        }
+
+        val imports: PrintFunction<AbstractNode> = { n: AbstractNode, p: PrintWriter ->
+            p.format("import java.lang.*;%n")
+            p.format("import lombok.*;\n\n")
+        }
+
+        val classDecl: PrintFunction<AbstractNode> = { n: AbstractNode, p: PrintWriter ->
+            val mod = when (n) {
+                is Group -> "abstract"
+                else -> ""
+            }
+
+            p.format("@Getter @Setter public %s class %s ", mod, n.name)
+            if (n.parent != null)
+                p.format("extends %s", n.parent?.name)
+            p.print(" {\n\n")
+        }
+
+        val props = { n: AbstractNode, p: PrintWriter ->
+            when (n) {
+                is NodeWithAttributes -> {
+                    n.properties.forEach {
+                        val type = if (it.reference)
+                            "IdentifierPlaceHolder<${it.type}>"
+                        else if (it.many)
+                            "List<${it.type}>"
+                        else it.type
+
+                        p.print(if (it.optional) "@Nullable" else "@Notnull")
+
+                        p.print("\nprivate ${type} ${it.name}")
+                        if (it.many)
+                            p.print(" = new ArrayList<>();")
+                        else if (it.reference)
+                            p.print("= new IdentifierPlaceHolder<>()")
+                        else
+                            p.print(" = null;")
+                        p.println()
+                    }
+                }
+            }
+        }
+
+        val visitorGen = { n: AbstractNode, p: PrintWriter ->
+            p.println("""@Override public <T> T accept(Visitor<T> v) {
+                {return v.visit(this);}
+              """.trimIndent());
+        }
+        jg.genMethods += visitorGen
+        generate(jg)
     }
 }
 
@@ -115,10 +162,7 @@ class TestGenerator : Generator() {
 
     override fun visit(e: Enum) {
         newline()
-        writer.format("Enum %s.%s:",e.pkgName,e.name)
+        writer.format("Enum %s.%s:", e.pkgName, e.name)
     }
 
 }
-=======
-}
->>>>>>> fd2d040... wip

@@ -31,7 +31,6 @@ import edu.kit.iti.formal.automation.scope.Scope;
  * <p>Abstract Expression class.</p>
  *
  * @author weigl
- * @version $Id: $Id
  */
 public abstract class Expression extends Top {
     /**

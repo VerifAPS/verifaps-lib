@@ -1,18 +1,13 @@
 package edu.kit.iti.formal.asdl
 
-<<<<<<< HEAD
 import java.io.File
+import java.io.PrintWriter
 
 
 abstract class AbstractNode {
     var name: String = ""
     var pkgName: String = ""
-=======
-
-abstract class AbstractNode {
-    var name: String=""
-    var pkgName: String=""
->>>>>>> fd2d040... wip
+    var parent: AbstractNode? = null
 
     abstract fun <T> accept(visitor: Visitor<T>): T
 }
@@ -33,10 +28,7 @@ interface NodeContainer {
 
     fun group(name: String, f: Group.() -> Unit): Group {
         val g = Group()
-<<<<<<< HEAD
         g.name = name
-=======
->>>>>>> fd2d040... wip
         f(g)
         return group(g)
     }
@@ -44,11 +36,7 @@ interface NodeContainer {
 
     fun leaf(name: String): Leaf {
         val l = Leaf()
-<<<<<<< HEAD
         l.name = name
-=======
-        l.name
->>>>>>> fd2d040... wip
         return leaf(l)
     }
 
@@ -110,17 +98,23 @@ interface NodeWithAttributes {
     }
 }
 
+interface HasAspects<T> {
+    val aspects: MutableList<Aspect<T>>
+}
+
 class Enum : AbstractNode() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
 
-class Group : NodeWithAttributes, NodeContainer, AbstractNode() {
+class Group : NodeWithAttributes, NodeContainer, AbstractNode(), HasAspects<Group> {
+    override val aspects: MutableList<Aspect<Group>> = arrayListOf()
     override val nodes: MutableList<AbstractNode> = arrayListOf()
     override val properties: MutableSet<NodeProperty> = mutableSetOf()
     override fun <T> accept(visitor: Visitor<T>) = visitor.visit(this)
 }
 
-class Leaf : NodeWithAttributes, AbstractNode() {
+class Leaf : NodeWithAttributes, HasAspects<Leaf>, AbstractNode() {
+    override val aspects: MutableList<Aspect<Leaf>> = arrayListOf()
     override val properties: MutableSet<NodeProperty> = hashSetOf()
     override fun <T> accept(visitor: Visitor<T>) = visitor.visit(this)
 }
@@ -136,14 +130,10 @@ data class NodeProperty(var name: String = "",
                         var optional: Boolean = false,
                         var many: Boolean = false,
                         var reference: Boolean = false) {
-<<<<<<< HEAD
-
     init {
         type = type.trim('*', '?', '>')
     }
 
-=======
->>>>>>> fd2d040... wip
     companion object {
         internal fun translate(type: String): NodeProperty {
             try {
@@ -198,12 +188,40 @@ open class ADSL {
     fun generate(generator: Generator) {
         modules.forEach {
             it.accept(PackagePropagation())
+            it.accept(ParentSetter())
             it.accept(ClassPrefixPropagation())
             it.accept(generator)
         }
     }
 }
 
+class ParentSetter() : Traversal<Unit>() {
+
+    override fun visit(l: Leaf) {
+        l.parent = parent;
+    }
+
+    override fun visit(g: Group) {
+        g.parent = parent
+        parent = g
+        traverse(g)
+        parent = g.parent
+    }
+
+    override fun visit(m: Module) {
+        traverse(m)
+    }
+
+    override fun visit(e: Enum) {
+        e.parent = parent
+    }
+
+    var parent: AbstractNode? = null
+}
+
+/**
+ *
+ */
 class ClassPrefixPropagation : Traversal<Unit>() {
     lateinit var prefix: String
     override fun visit(l: Leaf) {
@@ -228,6 +246,9 @@ class ClassPrefixPropagation : Traversal<Unit>() {
     }
 }
 
+/**
+ *
+ */
 class PackagePropagation : Traversal<Unit>() {
     lateinit var currentPackage: String
 
@@ -257,46 +278,77 @@ class PackagePropagation : Traversal<Unit>() {
     }
 }
 
-abstract class Generator : Visitor<Unit>
+abstract class Generator : Traversal<Unit>()
 
-class JavaGenerator(val outputDirectory: File,
-                    val memberGeneratorsGroup : List<(Leaf) -> String> = arrayListOf(),
-                    val memberGeneratorsLeaf : List<(Leaf) -> String> = arrayListOf()) : Generator() {
+typealias PrintFunction<T> = (T, PrintWriter) -> Unit
+
+interface Aspect<T> {
+    fun imports(obj: T, p: PrintWriter) = Unit
+    fun beforeClassDecl(obj: T, p: PrintWriter) = Unit
+    fun properties(obj: T, p: PrintWriter) = Unit
+    fun members(obj: T, p: PrintWriter) = Unit
+    fun endOfClass(obj: T, p: PrintWriter) = Unit
+    fun afterClass(obj: T, p: PrintWriter) = Unit
+}
+
+class JavaGenerator(val outputDirectory: File) : Generator() {
+    val nodeAspects = arrayListOf<Aspect<AbstractNode>>()
+    val leafAspects = arrayListOf<Aspect<Leaf>>()
+    val groupAspects = arrayListOf<Aspect<Group>>()
+    val moduleAspects = arrayListOf<Aspect<Group>>()
 
     protected fun ensurePackage(pkg: String): File {
-        val f = File(outputDirectory, pkg)
+        val f = File(outputDirectory, pkg.replace('.', '/')).absoluteFile
         f.mkdirs()
         return f
     }
 
-    override fun visit(l: Leaf) {
-        val f = File(ensurePackage(l.pkgName), l.name)
+    protected fun <T : AbstractNode> visit(l: T, vararg lloa: ArrayList<Aspect<T>>) {
+        val f = File(ensurePackage(l.pkgName), l.name + ".java")
         f.createNewFile()
+        println("$f created!")
+
+        val _lloa = lloa.toMutableList()
+        when (l) {
+            is HasAspects<*> -> _lloa.add(l.aspects as ArrayList<Aspect<T>>)
+        }
+
         f.bufferedWriter().use {
-            it.write("""
-                package %s
-
-
-            """.trimIndent())
-
+            val pw = PrintWriter(it)
+            this.r(l, _lloa, pw, Aspect<T>::afterClass)
+            pw.close()
         }
     }
 
+    private fun <T> r(l: T, lloa: MutableList<ArrayList<Aspect<T>>>,
+                          writer: PrintWriter,
+                          func: (Aspect<T>, T, PrintWriter) -> Unit) {
+        for (loa in lloa) {
+            for (aspect in loa) {
+                func.invoke(aspect, l, writer)
+            }
+        }
+    }
+
+    override fun visit(l: Leaf) {
+        visit(l as AbstractNode)
+    }
+
     override fun visit(g: Group) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        visit(g as AbstractNode)
+        traverse(g)
     }
 
     override fun visit(m: Module) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        traverse(m)
     }
 
     override fun visit(e: Enum) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-abstract class Generator : Visitor<Unit> {
-
 }
+
 
 class KotlinGenerator : Generator() {
     override fun visit(l: Leaf) {
