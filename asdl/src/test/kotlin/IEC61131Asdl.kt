@@ -1,6 +1,17 @@
+@file:JvmName("IEC61131Adsl")
+
 import edu.kit.iti.formal.asdl.ADSL
+import java.io.File
+
+fun main(args: Array<String>) {
+    IEC().generate(File(args[0]))
+}
 
 class IEC : ADSL() {
+    fun generate(output: File) {
+        println(output)
+    }
+
     init {
         module {
             name = "IEC"
@@ -9,6 +20,8 @@ class IEC : ADSL() {
             leaf("VariableDeclaration")
 
             group("Top") {
+                skip = true
+
                 group("TypeDeclaration") {
                     leaf("StructureTypeDeclaration")
                     leaf("StringTypeDeclaration")
@@ -57,7 +70,7 @@ class IEC : ADSL() {
                         leaf("ReferenceValue")
                     }
                     leaf("Location")
-                    leaf("UnaryExpression")
+                    leaf("UnaryExpression", "UnaryOperator op, Expression expr")
                     //ExpressionList
                     leaf("Reference")
                     leaf("BinaryExpression")
@@ -65,15 +78,32 @@ class IEC : ADSL() {
 
                 group("Statement") {
                     leaf("ExitStatement")
-                    leaf("AssignmentStatement")
-                    leaf("WhileStatement")
-                    leaf("RepeatStatement")
-                    leaf("InvocationStatement")
                     leaf("ReturnStatement")
-                    leaf("CaseStatement")
-                    leaf("ForStatement")
-                    leaf("CommentStatement")
-                    leaf("IfStatement")
+
+                    leaf("AssignmentStatement",
+                            "Reference location",
+                            "Expression expression",
+                            "boolean reference",
+                            "boolean assignmentAttempt")
+
+                    leaf("WhileStatement",
+                            "Expression condition",
+                            "Statement* statements")
+
+                    leaf("RepeatStatement",
+                            "Expression condition",
+                            "Statement* statements")
+
+                    leaf("InvocationStatement")
+                    leaf("CaseStatement", "Expression expression, Case* _cases")
+                    leaf("ForStatement", "Location variable",
+                            "Expression start", "Expression stop", "Expression? step",
+                            "Statement* statements"
+                    )
+                    leaf("CommentStatement", "String text")
+                    leaf("IfStatement",
+
+                            )
                 }
             }
         }

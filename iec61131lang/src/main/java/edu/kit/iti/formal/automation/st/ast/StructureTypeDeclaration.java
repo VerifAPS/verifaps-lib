@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.VariableScope;
+import edu.kit.iti.formal.automation.scope.VariableScope;
 import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.RecordType;
 import edu.kit.iti.formal.automation.scope.Scope;

@@ -32,77 +32,189 @@ class SMVADSL : ADSL() {
                         leaf("EnumLiteral", "String value")
                         leaf("EnumLiteral", "String value")
                     }
-                    leaf("SQuantified", "Quantifier quantifier, Expr* quantified")
+                    leaf("Quantified", "Quantifier quantifier, Expr* quantified")
                     leaf("UnaryExpression", "UnaryOperator op, Expr expr")
                     leaf("Variable", "String* names")
                 }
-                leaf("SMVModule")
+                leaf("Module")
             }
         }
     }
 
     @Test
-    fun test() {
+    fun test() = generate(File("tmp/smv"))
+
+    fun generate(output: File) {
         val testGenerator = TestGenerator()
         this.generate(testGenerator)
         println(testGenerator.sstream.toString())
-        val jg = JavaGenerator(File("tmp/smv"))
 
-        val packageWriter: PrintFunction<AbstractNode> = { n: AbstractNode, p: PrintWriter ->
-            p.format("package %s;%n%n", n.pkgName);
+        val propertyToJavaString = { it: NodeProperty ->
+            if (it.reference) {
+                if (!it.many)
+                    """
+                    private IdentifierPlaceHolder<${it.type}> ${it.name} = new IdentifierPlaceHolder<>();
+                    public ${it.type} get${it.name.capitalize()}() { return ${'$'}{it.name}.get();}
+                    public void set${it.name.capitalize()}(${it.type} obj) { return ${it.name}.set(obj);}
+
+                    public void set${it.name.capitalize()}Identifier(Reference obj) { ${it.name}.setName(obj);}
+                    public Reference get${it.name.capitalize()}Identifier() { return ${it.name}.getName();}
+
+                    public IdentifierPlaceHolder<${it.type}> get${it.name.capitalize()}Reference() { return ${it.name}; }
+                    """
+                else
+                    """
+                    private List<IdentifierPlaceHolder<${it.type}>> ${it.name} = new ArrayList<>();
+                    /*public ${it.type} get${it.name.capitalize()}() { return ${'$'}{it.name}.get();}
+                    public void set${it.name.capitalize()}(${it.type} obj) { return ${it.name}.set(obj);}
+
+                    public void set${it.name.capitalize()}Identifier(Reference obj) { ${it.name}.setName(obj);}
+                    public Reference get${it.name.capitalize()}Identifier() { return ${it.name}.getName();}
+
+                    public IdentifierPlaceHolder<${it.type}> get${it.name.capitalize()}Reference() { return ${it.name}; }
+                    */
+                    """
+            } else if (it.many) {
+                """
+                private IdentifierPlaceHolder<${it.type}> ${it.name} = new IdentifierPlaceHolder<>();
+                public List<${it.type}> get${it.name.capitalize()}() { return ${it.name}.get();}
+
+                public void add${it.name.capitalize()}(${it.name} obj) { ${it.name}.add(obj);}
+                public void remove${it.name.capitalize()}(${it.name} obj) { ${it.name}.remove(obj);}
+                """
+            } else {
+                """
+                    private ${it.type} ${it.name} = null;
+                    public ${it.type} get${it.name.capitalize()}() { return ${it.name};}
+                    public void set${it.name.capitalize()}(${it.type} obj) { ${it.name} = obj;}
+                """
+            }
         }
 
-        val imports: PrintFunction<AbstractNode> = { n: AbstractNode, p: PrintWriter ->
-            p.format("import java.lang.*;%n")
-            p.format("import lombok.*;\n\n")
-        }
 
-        val classDecl: PrintFunction<AbstractNode> = { n: AbstractNode, p: PrintWriter ->
-            val mod = when (n) {
-                is Group -> "abstract"
-                else -> ""
+        open class TplJavaGenerator(val outputDirectory: File, val topClass: String = "Top", val visitorBaseName: String = "Visitor") : Generator() {
+            val classes0: MutableList<String> = arrayListOf()
+
+            fun visitorCreate0(n: AbstractNode): String {
+                classes0 += n.name
+                return "@Override public <T> T accept($visitorBaseName<T> v){ return v.visit(this); }"
             }
 
-            p.format("@Getter @Setter public %s class %s ", mod, n.name)
-            if (n.parent != null)
-                p.format("extends %s", n.parent?.name)
-            p.print(" {\n\n")
-        }
+            override fun visit(l: Leaf) {
+                asJavaFile(l) {
+                    """
+                    package ${l.pkgName};
 
-        val props = { n: AbstractNode, p: PrintWriter ->
-            when (n) {
-                is NodeWithAttributes -> {
-                    n.properties.forEach {
-                        val type = if (it.reference)
-                            "IdentifierPlaceHolder<${it.type}>"
-                        else if (it.many)
-                            "List<${it.type}>"
-                        else it.type
+                    import lombok.*;
 
-                        p.print(if (it.optional) "@Nullable" else "@Notnull")
+                    @Getter @Setter
+                    public class ${l.name} ${if (l.parent != null) "extends " + l.parent!!.name else ""} {
+                        ${l.properties.lines { propertyToJavaString(it) }}
 
-                        p.print("\nprivate ${type} ${it.name}")
-                        if (it.many)
-                            p.print(" = new ArrayList<>();")
-                        else if (it.reference)
-                            p.print("= new IdentifierPlaceHolder<>()")
-                        else
-                            p.print(" = null;")
-                        p.println()
+                        ${childrenFunction(l)}
+
+                        ${visitorCreate0(l)}
+
+                        ${copyFunc(l.name, l)}
                     }
+                    """.trimIndent()
                 }
+            }
+
+            private fun copyFunc(name: String, l: NodeWithAttributes): String {
+                return """
+                    @Override
+                    public $name copy() {
+                        $name tmp = new $name();
+                        copy(tmp);
+                        return tmp;
+                    }
+
+                    @Override
+                    public void copy($name other) {
+                        super.copy(other);//recursive call
+                        ${l.properties.lines {
+                    if (it.reference || !it.isNode)
+                        "other.set${it.name.capitalize()}(get${it.name.capitalize()}());"
+                    else if (it.many) {
+                        "get${it.name.capitalize()}.forEach(a->other.add${it.name.capitalize()}(a.copy());"
+                    } else {
+                        "other.set${it.name.capitalize()}(get${it.name.capitalize()}().copy());"
+                    }
+                }}
+                    }
+                    """
+            }
+
+            private fun childrenFunction(n: NodeWithAttributes): String {
+                val props = n.properties.filter { !it.reference && it.isNode }.map { it.name }
+                return """
+                    @Override
+                    public $topClass[] getChildren() {
+                        $topClass[] a = $topClass[${props.size}];
+
+                        ${if (props.isNotEmpty())
+                    props.mapIndexed { index, s -> "a[$index] = $s;" }
+                            .reduce { a, b -> a + "\n" + b }
+                else ""}
+                        return a;
+                    }
+                """.trimIndent()
+            }
+
+
+            override fun visit(l: Group) {
+                traverse(l)
+                asJavaFile(l) {
+                    """package ${l.pkgName};
+                           import lombok.*;
+                           @Getter @Setters
+                           public abstract class ${l.name} ${if (l.parent != null) "extends " + l.parent!!.name else ""} {
+                               ${l.properties.forEach { propertyToJavaString(it) }}
+
+                           }
+                           """.trimIndent()
+                }
+            }
+
+            override fun visit(m: Module) {
+                traverse(m)
+            }
+
+            override fun visit(e: Enum) {
+            }
+
+            fun <T : AbstractNode> asJavaFile(n: T, func: (T) -> String) {
+                val file = File(ensurePackage(n.pkgName), n.name + ".java")
+                println("[asdl] $file created")
+                file.bufferedWriter().use { it.write(func(n)); it.close() }
+            }
+
+            protected fun ensurePackage(pkg: String): File {
+                val f = File(outputDirectory, pkg.replace('.', '/')).absoluteFile
+                f.mkdirs()
+                return f
             }
         }
 
         val visitorGen = { n: AbstractNode, p: PrintWriter ->
-            p.println("""@Override public <T> T accept(Visitor<T> v) {
-                {return v.visit(this);}
-              """.trimIndent());
+            p.println("""
+            @Override
+            public <T> T accept(Visitor<T> v) {
+                return v.visit(this);
+            }
+            """.trimIndent())
         }
-        jg.genMethods += visitorGen
-        generate(jg)
+        generate(TplJavaGenerator(output))
     }
 }
+
+private fun <T> Iterable<T>.lines(function: (T) -> String): String =
+        try {
+            this.map { function(it) }.reduce({ a, b -> a + "\n" + b })
+        } catch (e: UnsupportedOperationException) {
+            ""
+        }
 
 class TestGenerator : Generator() {
     val sstream = StringWriter()

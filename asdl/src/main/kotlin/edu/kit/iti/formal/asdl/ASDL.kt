@@ -8,6 +8,7 @@ abstract class AbstractNode {
     var name: String = ""
     var pkgName: String = ""
     var parent: AbstractNode? = null
+    var skip: Boolean = false
 
     abstract fun <T> accept(visitor: Visitor<T>): T
 }
@@ -129,7 +130,8 @@ data class NodeProperty(var name: String = "",
                         var type: String = "",
                         var optional: Boolean = false,
                         var many: Boolean = false,
-                        var reference: Boolean = false) {
+                        var reference: Boolean = false,
+                        var isNode: Boolean = true) {
     init {
         type = type.trim('*', '?', '>')
     }
@@ -189,6 +191,7 @@ open class ADSL {
         modules.forEach {
             it.accept(PackagePropagation())
             it.accept(ParentSetter())
+            setIsNodeType(it)
             it.accept(ClassPrefixPropagation())
             it.accept(generator)
         }
@@ -219,19 +222,60 @@ class ParentSetter() : Traversal<Unit>() {
     var parent: AbstractNode? = null
 }
 
+fun setIsNodeType(m: Module) {
+    val names = mutableSetOf<String>()
+    val props = arrayListOf<NodeProperty>()
+    val prefix = m.classPrefix
+
+    class GetNodes : Traversal<Unit>() {
+        override fun visit(l: Leaf) {
+            names.add(l.name)
+            names.add(prefix + l.name)
+            props.addAll(l.properties)
+        }
+
+        override fun visit(l: Group) {
+            names.add(l.name)
+            names.add(prefix + l.name)
+            props.addAll(l.properties)
+            traverse(l)
+        }
+
+        override fun visit(m: Module) {
+            traverse(m)
+        }
+
+        override fun visit(e: Enum) {}
+    }
+
+    m.accept(GetNodes())
+    println(names)
+    props.forEach { it.isNode = it.type in names }
+}
+
+
 /**
  *
  */
 class ClassPrefixPropagation : Traversal<Unit>() {
     lateinit var prefix: String
     override fun visit(l: Leaf) {
-        if (!l.name.startsWith(prefix))
-            l.name = prefix + l.name
+        l.name = prefixed(l.name)
+        l.properties.forEach { visit(it) }
     }
 
+    private fun visit(it: NodeProperty) {
+        if (it.isNode)
+            it.type = prefixed(it.type)
+    }
+
+    private fun prefixed(name: String): String =
+            if (name.startsWith(prefix))
+                name else prefix + name
+
     override fun visit(g: Group) {
-        if (!g.name.startsWith(prefix))
-            g.name = prefix + g.name
+        g.name = prefixed(g.name)
+        g.properties.forEach { visit(it) }
         traverse(g)
     }
 
@@ -291,19 +335,19 @@ interface Aspect<T> {
     fun afterClass(obj: T, p: PrintWriter) = Unit
 }
 
-class JavaGenerator(val outputDirectory: File) : Generator() {
+open class JavaGenerator(val outputDirectory: File) : Generator() {
     val nodeAspects = arrayListOf<Aspect<AbstractNode>>()
     val leafAspects = arrayListOf<Aspect<Leaf>>()
     val groupAspects = arrayListOf<Aspect<Group>>()
     val moduleAspects = arrayListOf<Aspect<Group>>()
 
-    protected fun ensurePackage(pkg: String): File {
+    open protected fun ensurePackage(pkg: String): File {
         val f = File(outputDirectory, pkg.replace('.', '/')).absoluteFile
         f.mkdirs()
         return f
     }
 
-    protected fun <T : AbstractNode> visit(l: T, vararg lloa: ArrayList<Aspect<T>>) {
+    open protected fun <T : AbstractNode> visit(l: T, vararg lloa: ArrayList<Aspect<T>>) {
         val f = File(ensurePackage(l.pkgName), l.name + ".java")
         f.createNewFile()
         println("$f created!")
@@ -320,9 +364,9 @@ class JavaGenerator(val outputDirectory: File) : Generator() {
         }
     }
 
-    private fun <T> r(l: T, lloa: MutableList<ArrayList<Aspect<T>>>,
-                          writer: PrintWriter,
-                          func: (Aspect<T>, T, PrintWriter) -> Unit) {
+    open protected fun <T> r(l: T, lloa: MutableList<ArrayList<Aspect<T>>>,
+                             writer: PrintWriter,
+                             func: (Aspect<T>, T, PrintWriter) -> Unit) {
         for (loa in lloa) {
             for (aspect in loa) {
                 func.invoke(aspect, l, writer)

@@ -24,7 +24,6 @@ package edu.kit.iti.formal.automation.scope;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.VariableScope;
 import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;

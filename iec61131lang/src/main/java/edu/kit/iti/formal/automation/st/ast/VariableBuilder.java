@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.VariableScope;
+import edu.kit.iti.formal.automation.scope.VariableScope;
 
 import java.util.Arrays;
 import java.util.EmptyStackException;
@@ -46,7 +46,7 @@ public class VariableBuilder {
     /**
      * <p>Constructor for VariableBuilder.</p>
      *
-     * @param scope a {@link edu.kit.iti.formal.automation.VariableScope} object.
+     * @param scope a {@link VariableScope} object.
      */
     public VariableBuilder(VariableScope scope) {
         this.scope = scope;

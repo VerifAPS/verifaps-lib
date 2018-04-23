@@ -1,3 +1,7 @@
 description = "Abstract Syntax Definition Language"
 
 sourceCompatibility = 1.8
+
+
+dependencies {
+}

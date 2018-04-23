@@ -1,13 +1,9 @@
 package edu.kit.iti.formal.automation.run
 
-import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType
 import edu.kit.iti.formal.automation.datatypes.RecordType
 import edu.kit.iti.formal.automation.datatypes.TimeType
-import edu.kit.iti.formal.automation.datatypes.values.RecordValue
-import edu.kit.iti.formal.automation.datatypes.values.RuntimeVariable
-import edu.kit.iti.formal.automation.datatypes.values.Value
 import edu.kit.iti.formal.automation.datatypes.values.Values
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.run.stexceptions.ExecutionException
@@ -15,8 +11,6 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
-import jdk.nashorn.internal.ir.FunctionCall
-import org.stringtemplate.v4.misc.STRuntimeMessage
 import java.util.*
 
 /**

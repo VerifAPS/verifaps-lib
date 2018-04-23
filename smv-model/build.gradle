@@ -1,4 +1,5 @@
 apply plugin: 'antlr'
+apply plugin: 'kotlin'
 
 description = 'Library for creation and parsing of SMV files.'
 
@@ -8,6 +9,17 @@ dependencies {
     compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.5.3'
     compile group: 'org.jdom', name: 'jdom2', version: '2.0.6'
 }
+
+task generateASDL(type:JavaExec) {
+    group "My"
+    description "Executes asdl"
+    main = "IECAsdl"
+    classpath(project(':asdl').sourceSets.test.output,
+              project(':asdl').sourceSets.main.output)
+    println(classpath)
+}
+generateASDL.dependsOn << project(":asdl").compileKotlin
+generateASDL.dependsOn << project(":asdl").compileTestKotlin
 
 generateGrammarSource {
     arguments += ["-long-messages", "-visitor",

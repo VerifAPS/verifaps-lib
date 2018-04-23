@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.st;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.NiceErrorListener;
+import edu.kit.iti.formal.automation.parser.NiceErrorListener;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
