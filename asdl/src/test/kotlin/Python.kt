@@ -1,5 +1,6 @@
 import edu.kit.iti.formal.asdl.ADSL
 import edu.kit.iti.formal.asdl.JavaGenerator
+import edu.kit.iti.formal.asdl.TestGenerator
 import org.junit.Test
 import java.io.File
 

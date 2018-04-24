@@ -660,7 +660,8 @@ class SUnaryExpression(
 /**
  *
  */
-enum class SUnaryOperator private constructor(private val symbol: String, private val precedence: Int) : SOperator {
+enum class SUnaryOperator private constructor(private val symbol: String,
+                                              private val precedence: Int) : SOperator {
     /**
      *
      */

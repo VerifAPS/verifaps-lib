@@ -103,9 +103,9 @@ interface HasAspects<T> {
     val aspects: MutableList<Aspect<T>>
 }
 
-class Enum : AbstractNode() {
+/*class Enum : AbstractNode() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
-}
+}*/
 
 class Group : NodeWithAttributes, NodeContainer, AbstractNode(), HasAspects<Group> {
     override val aspects: MutableList<Aspect<Group>> = arrayListOf()
@@ -161,7 +161,7 @@ interface Visitor<out T> {
     fun visit(l: Leaf): T
     fun visit(g: Group): T
     fun visit(m: Module): T
-    fun visit(e: Enum): T
+    //fun visit(e: Enum): T
 }
 
 abstract class Traversal<T> : Visitor<T> {
@@ -174,7 +174,7 @@ abstract class Traversal<T> : Visitor<T> {
         m.nodes.forEach { it.accept(this) }
     }
 
-    fun traverse(e: Enum) {}
+    //fun traverse(e: Enum) {}
 }
 
 
@@ -215,9 +215,9 @@ class ParentSetter() : Traversal<Unit>() {
         traverse(m)
     }
 
-    override fun visit(e: Enum) {
+    /*override fun visit(e: Enum) {
         e.parent = parent
-    }
+    }*/
 
     var parent: AbstractNode? = null
 }
@@ -245,7 +245,7 @@ fun setIsNodeType(m: Module) {
             traverse(m)
         }
 
-        override fun visit(e: Enum) {}
+        //override fun visit(e: Enum) {}
     }
 
     m.accept(GetNodes())
@@ -284,10 +284,10 @@ class ClassPrefixPropagation : Traversal<Unit>() {
         traverse(m)
     }
 
-    override fun visit(e: Enum) {
+   /* override fun visit(e: Enum) {
         if (!e.name.startsWith(prefix))
             e.name = prefix + e.name
-    }
+    }*/
 }
 
 /**
@@ -316,10 +316,10 @@ class PackagePropagation : Traversal<Unit>() {
         traverse(m)
     }
 
-    override fun visit(e: Enum) {
+    /*override fun visit(e: Enum) {
         if (e.pkgName.isBlank())
             e.pkgName = currentPackage
-    }
+    }*/
 }
 
 abstract class Generator : Traversal<Unit>()
@@ -333,81 +333,4 @@ interface Aspect<T> {
     fun members(obj: T, p: PrintWriter) = Unit
     fun endOfClass(obj: T, p: PrintWriter) = Unit
     fun afterClass(obj: T, p: PrintWriter) = Unit
-}
-
-open class JavaGenerator(val outputDirectory: File) : Generator() {
-    val nodeAspects = arrayListOf<Aspect<AbstractNode>>()
-    val leafAspects = arrayListOf<Aspect<Leaf>>()
-    val groupAspects = arrayListOf<Aspect<Group>>()
-    val moduleAspects = arrayListOf<Aspect<Group>>()
-
-    open protected fun ensurePackage(pkg: String): File {
-        val f = File(outputDirectory, pkg.replace('.', '/')).absoluteFile
-        f.mkdirs()
-        return f
-    }
-
-    open protected fun <T : AbstractNode> visit(l: T, vararg lloa: ArrayList<Aspect<T>>) {
-        val f = File(ensurePackage(l.pkgName), l.name + ".java")
-        f.createNewFile()
-        println("$f created!")
-
-        val _lloa = lloa.toMutableList()
-        when (l) {
-            is HasAspects<*> -> _lloa.add(l.aspects as ArrayList<Aspect<T>>)
-        }
-
-        f.bufferedWriter().use {
-            val pw = PrintWriter(it)
-            this.r(l, _lloa, pw, Aspect<T>::afterClass)
-            pw.close()
-        }
-    }
-
-    open protected fun <T> r(l: T, lloa: MutableList<ArrayList<Aspect<T>>>,
-                             writer: PrintWriter,
-                             func: (Aspect<T>, T, PrintWriter) -> Unit) {
-        for (loa in lloa) {
-            for (aspect in loa) {
-                func.invoke(aspect, l, writer)
-            }
-        }
-    }
-
-    override fun visit(l: Leaf) {
-        visit(l as AbstractNode)
-    }
-
-    override fun visit(g: Group) {
-        visit(g as AbstractNode)
-        traverse(g)
-    }
-
-    override fun visit(m: Module) {
-        traverse(m)
-    }
-
-    override fun visit(e: Enum) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-}
-
-
-class KotlinGenerator : Generator() {
-    override fun visit(l: Leaf) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun visit(g: Group) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun visit(m: Module) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun visit(e: Enum) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 }
