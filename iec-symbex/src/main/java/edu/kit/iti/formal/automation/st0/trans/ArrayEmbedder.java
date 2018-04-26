@@ -65,6 +65,8 @@ public class ArrayEmbedder implements ST0Transformation {
             ArrayEmbedderVisitor arrayEmbedderVisitor = new ArrayEmbedderVisitor(arrayVariable);
             state.functions.values().forEach(f -> f.accept(arrayEmbedderVisitor));
             state.theProgram.accept(arrayEmbedderVisitor);
+            state.functions.values().forEach(f -> f.accept(arrayEmbedderVisitor));
+            state.theProgram.accept(arrayEmbedderVisitor);
             state.theProgram.getLocalScope().getLocalVariables().remove(arrayVariable.getName());
         }
     }

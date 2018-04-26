@@ -23,7 +23,9 @@
 package edu.kit.iti.formal.automation.stoo.trans;
 
 import com.google.common.collect.Streams;
-import edu.kit.iti.formal.automation.datatypes.*;
+import edu.kit.iti.formal.automation.datatypes.ClassDataType;
+import edu.kit.iti.formal.automation.datatypes.InterfaceDataType;
+import edu.kit.iti.formal.automation.datatypes.ReferenceType;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
@@ -73,7 +75,9 @@ public class ReferenceToArrayAccess extends STOOTransformation {
             Optional<SymbolicReference> instanceReference = Streams.findLast(symbolicReferenceList.stream()
                     .filter(r -> r.getEffectiveDataType() instanceof ClassDataType));
             // Keep node the same in case no instance references appear
-            if (!instanceReference.isPresent())
+            if (!instanceReference.isPresent()
+                || (currentLocalScope.hasVariable(instanceReference.get().getIdentifier())
+                    && currentLocalScope.getVariable(instanceReference.get().getIdentifier()).isInOut()))
                 return node;
             // Replace the reference with an array access
             // That is, if y is the instance reference: x.y.z -> GVL._INSTANCES_<class name>[x.y].z
@@ -90,7 +94,12 @@ public class ReferenceToArrayAccess extends STOOTransformation {
             // Clear effective types since we took care of the instance reference
             instanceReference.get().setEffectiveDataType(null);
             // Recurse
-            newNode.getSub().addSubscript((SymbolicReference) node.accept(this));
+            SymbolicReference subscript = (SymbolicReference) node.accept(this);
+            // TODO Fix
+            // For now patching missing instance ID
+            if (subscript.getIdentifier().equals(SELF_PARAMETER_NAME) && !subscript.hasSub())
+                subscript.setSub(new SymbolicReference(INSTANCE_ID_VAR_NAME));
+            newNode.getSub().addSubscript(subscript);
             return newNode;
         }
     }
@@ -113,12 +122,12 @@ public class ReferenceToArrayAccess extends STOOTransformation {
         @Override
         public Object visit(@NotNull VariableDeclaration variableDeclaration) {
             // Make sure to ignore array types; they have the same type as the array entries have
-            if ((variableDeclaration.getDataType() instanceof InterfaceDataType
-                    || variableDeclaration.getDataType() instanceof ReferenceType
-                    || variableDeclaration.getDataType() instanceof ClassDataType)
-                    && !(variableDeclaration.getTypeDeclaration() instanceof ArrayTypeDeclaration)
+            if (((variableDeclaration.getDataType() instanceof ClassDataType
                     && !(variableDeclaration.isInput() || variableDeclaration.isOutput()
-                        || variableDeclaration.isInOut())) {
+                    || variableDeclaration.isInOut()))
+                    || variableDeclaration.getDataType() instanceof InterfaceDataType
+                    || variableDeclaration.getDataType() instanceof ReferenceType)
+                    && !(variableDeclaration.getTypeDeclaration() instanceof ArrayTypeDeclaration)) {
                 // Convert reference to INT reference, i.e., address in the respective array
                 variableDeclaration.setTypeDeclaration(new SimpleTypeDeclaration<>());
                 variableDeclaration.setDataType(

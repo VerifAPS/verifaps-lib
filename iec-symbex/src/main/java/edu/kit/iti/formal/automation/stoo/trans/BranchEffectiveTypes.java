@@ -26,6 +26,7 @@ import edu.kit.iti.formal.automation.datatypes.Any;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.datatypes.InterfaceDataType;
 import edu.kit.iti.formal.automation.datatypes.ReferenceType;
+import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
@@ -35,6 +36,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.transformation.SortedList;
 import javafx.util.Pair;
 import lombok.Getter;
+import org.apache.commons.collections.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -231,8 +233,23 @@ public class BranchEffectiveTypes extends STOOTransformation {
         private Statement createIfStatement(@NotNull Statement originalStatement,
                                             @NotNull SymbolicReference deferredTypeReference) {
             IfStatement branch = new IfStatement();
+            // Find variable
+            Identifiable parent = currentTopLevelScopeElement;
+            SymbolicReference reference = deferredTypeReference;
+            while (reference.hasSub() && reference.getDerefCount() == 0) {
+                parent = reference.getIdentifiedObject();
+                if (parent instanceof VariableDeclaration
+                    && ((VariableDeclaration) parent).getDataType() instanceof ClassDataType)
+                    parent = ((ClassDataType) ((VariableDeclaration) parent).getDataType()).getClazz();
+                reference = reference.getSub();
+            }
+            assert reference.getIdentifiedObject() instanceof VariableDeclaration;
+            assert parent instanceof TopLevelScopeElement;
             // Add branches based on the instance reference we found
-            Set<Any> effectiveTypes = deferredTypeReference.toVariable().getEffectiveDataTypes();
+            Set<Any> effectiveTypes = state.getEffectiveSubtypeScope().getTypes(
+                    (TopLevelScopeElement) parent, (VariableDeclaration) reference.getIdentifiedObject());
+            boolean allBlocksEqual = true;  // true until false
+            StatementList lastBlock = null;
             if (effectiveTypes.size() > 1)
                 for (Any effectiveType : new SortedList<>(FXCollections.observableArrayList(effectiveTypes))) {
                     StatementList block = new StatementList(originalStatement.copy());
@@ -245,6 +262,11 @@ public class BranchEffectiveTypes extends STOOTransformation {
                         Expression guard = instanceIDInRangeGuard(deferredTypeReference, instanceIDRange);
                         guard.accept(setEffectiveTypeVisitor);
                         branch.addGuardedCommand(guard, block);
+                        if (allBlocksEqual) {
+                            if (lastBlock != null)
+                                allBlocksEqual = CollectionUtils.isEqualCollection(block, lastBlock);
+                            lastBlock = block;
+                        }
                     }
                 }
             else {
@@ -255,9 +277,13 @@ public class BranchEffectiveTypes extends STOOTransformation {
             }
             if (branch.getConditionalBranches().isEmpty())
                 // Keep statements intact we case we don't find any reference to an instance
+                // or when everything stays the same
                 return originalStatement;
-            else
-                return branch;
+            if (allBlocksEqual) {
+                assert branch.getConditionalBranches().get(0).getStatements().size() == 1;
+                return branch.getConditionalBranches().get(0).getStatements().get(0);
+            }
+            return branch;
         }
 
         /**

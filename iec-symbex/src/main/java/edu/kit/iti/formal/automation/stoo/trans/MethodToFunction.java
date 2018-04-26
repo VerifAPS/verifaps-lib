@@ -155,7 +155,8 @@ public class MethodToFunction extends STOOTransformation {
         public Object visit(@NotNull Invocation invocation) {
             // Pass 'self' as an additional parameter
             SymbolicReference callee = invocation.getCallee();
-            if (callee.hasSub()) {
+            if (callee.hasSub() && invocation.getParameters().stream().noneMatch(
+                    p -> p.getName() != null && p.getName().equals(SELF_PARAMETER_NAME))) {
                 // TODO handle THIS
                 // SUPER
                 if (callee.getIdentifiedObject() instanceof ClassDeclaration) {
@@ -190,10 +191,14 @@ public class MethodToFunction extends STOOTransformation {
         @Override
         public Object visit(@NotNull SymbolicReference symbolicReference) {
             // Add "self." to variables in method block which are in the instance's local scope
-            if (visitingClassMethod && parent.getLocalScope().hasVariable(symbolicReference.getIdentifier())) {
+            if (visitingClassMethod && parent.getLocalScope().hasVariable(symbolicReference.getIdentifier())
+                    && !parent.getLocalScope().getVariable(symbolicReference.getIdentifier()).is(
+                    VariableDeclaration.INPUT | VariableDeclaration.OUTPUT | VariableDeclaration.INOUT
+            )) {
                 symbolicReference.setSub(symbolicReference.copy());
                 symbolicReference.setIdentifiedObject(null);
                 symbolicReference.setIdentifier(SELF_PARAMETER_NAME);
+                symbolicReference.setEffectiveDataType(state.getGlobalScope().resolveDataType(parent));
             }
             return super.visit(symbolicReference);
         }
