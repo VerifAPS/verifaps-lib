@@ -47,6 +47,7 @@ import java.util.stream.IntStream;
  */
 public class ArrayEmbedder implements ST0Transformation {
     private STSimplifier.State state;
+    private long instanceCount = 0;
 
     @Override
     public void transform(STSimplifier.State state) {
@@ -84,6 +85,7 @@ public class ArrayEmbedder implements ST0Transformation {
             state.theProgram.accept(arrayEmbedderVisitor);
             state.theProgram.getLocalScope().getLocalVariables().remove(arrayVariable.getName());
         }
+        //System.out.println("Counted " + instanceCount + " instances");
     }
 
     @Getter
@@ -196,6 +198,7 @@ public class ArrayEmbedder implements ST0Transformation {
                     for (int i = rangeMin; i <= Integer.parseInt(range.getStop().getText()); i++)
                         values.add(i);
                 }
+                instanceCount += values.size();
                 for (int i : values) {
                     StatementList block = codeBlock instanceof Statement
                             ? new StatementList((Statement) ((Statement) codeBlock).copy())

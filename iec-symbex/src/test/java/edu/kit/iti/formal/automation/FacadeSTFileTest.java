@@ -22,8 +22,8 @@
 
 package edu.kit.iti.formal.automation;
 
-import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
@@ -94,12 +94,14 @@ public class FacadeSTFileTest {
                 .filter(tle -> tle instanceof ClassDeclaration)
                 .collect(Collectors.toList())
                 .size() + " classes");
+        //System.out.print(countStatements(code) + " statements");
         code = SymbExFacade.simplifyOO(code);
         PrintWriter pw = new PrintWriter(Paths.get(getSMVDirectory() + "/" + file.getName() + "oo").toString());
         pw.println(IEC61131Facade.print(code));
         pw.close();
         code = IEC61131Facade.file(file);
         code = SymbExFacade.simplify(code);
+        //System.out.print(countStatements(code) + " statements after simplification");
         pw = new PrintWriter(Paths.get(getSMVDirectory() + "/" + file.getName() + "0").toString());
         pw.println(IEC61131Facade.print(code));
         pw.close();
@@ -131,5 +133,69 @@ public class FacadeSTFileTest {
         mainModule.getStateVars().add(
                 new SVariable("uut", new SMVType.Module(uut.getName(), uut.getModuleParameter())));
         return mainModule;
+    }
+
+    private static int countStatements(TopLevelElements code) {
+        StatementCounter counter = new StatementCounter();
+        code.accept(counter);
+        return counter.count;
+    }
+
+    private static class StatementCounter extends AstVisitor {
+        int count = 0;
+
+        @Override
+        public Object visit(IfStatement ifStatement) {
+            count++;
+            return super.visit(ifStatement);
+        }
+
+        @Override
+        public Object visit(ForStatement forStatement) {
+            count++;
+            return super.visit(forStatement);
+        }
+
+        @Override
+        public Object visit(AssignmentStatement assignmentStatement) {
+            count++;
+            return super.visit(assignmentStatement);
+        }
+
+        @Override
+        public Object visit(InvocationStatement fbc) {
+            count++;
+            return super.visit(fbc);
+        }
+
+        @Override
+        public Object visit(CaseStatement caseStatement) {
+            count++;
+            return super.visit(caseStatement);
+        }
+
+        @Override
+        public Object visit(ExitStatement exitStatement) {
+            count++;
+            return super.visit(exitStatement);
+        }
+
+        @Override
+        public Object visit(WhileStatement whileStatement) {
+            count++;
+            return super.visit(whileStatement);
+        }
+
+        @Override
+        public Object visit(ReturnStatement returnStatement) {
+            count++;
+            return super.visit(returnStatement);
+        }
+
+        @Override
+        public Object visit(RepeatStatement repeatStatement) {
+            count++;
+            return super.visit(repeatStatement);
+        }
     }
 }

@@ -187,7 +187,7 @@ public class GlobalScope implements Serializable {
         boolean d = interfaces.containsKey(name);
 
         if (a && b || a && c || b && c) {
-            System.out.println("ambguity fb vs. type");
+            //System.out.println("ambguity fb vs. type");
         }
 
         Any q;
