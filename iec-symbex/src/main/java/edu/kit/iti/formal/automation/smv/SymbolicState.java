@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.smv;
 
 import edu.kit.iti.formal.smv.ast.SMVExpr;
 import edu.kit.iti.formal.smv.ast.SVariable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,5 +47,10 @@ public class SymbolicState extends HashMap<SVariable, SMVExpr> {
 
     public SymbolicState(Map<? extends SVariable, ? extends SMVExpr> m) {
         super(m);
+    }
+
+    @Override
+    public SMVExpr put(@NotNull SVariable sVariable, @NotNull SMVExpr smvExpr) {
+        return super.put(sVariable, smvExpr);
     }
 }
