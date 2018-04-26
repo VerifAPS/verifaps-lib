@@ -58,7 +58,7 @@ public class InvocationStatement extends Statement {
     @Override
     public InvocationStatement copy() {
         InvocationStatement f = new InvocationStatement();
-        f.setInvocation(invocation);
+        f.setInvocation(invocation.copy());
         return f;
     }
 
