@@ -30,6 +30,7 @@ import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -44,6 +45,7 @@ import java.util.List;
  * @version $Id: $Id
  */
 @Data
+@EqualsAndHashCode(exclude = "effectiveDataType")
 public class SymbolicReference extends Reference {
     @NonNull
     private IdentifierPlaceHolder identifier = new IdentifierPlaceHolder();
@@ -217,6 +219,7 @@ public class SymbolicReference extends Reference {
         SymbolicReference sr = new SymbolicReference();
         sr.setRuleContext(getRuleContext());
         sr.identifier = identifier.copy();
+        sr.identifier.setIdentifiedObject(sr.getIdentifiedObject());
         sr.subscripts = Utils.copyNull(subscripts);
         sr.sub = Utils.copyNull(sub);
         sr.derefCount = derefCount;

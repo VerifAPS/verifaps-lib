@@ -35,6 +35,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Alexander Weigl
@@ -194,10 +195,12 @@ public class Literal extends Initialization {
         return visitor.visit(this);
     }
 
+    @NotNull
     public Value asValue() {
         return asValue(new ValueTransformation(this));
     }
 
+    @NotNull
     private Value asValue(DataTypeVisitor<Value> transformer) {
         if(dataType.getIdentifiedObject()==null) {
             throw new IllegalStateException("no identified data type");

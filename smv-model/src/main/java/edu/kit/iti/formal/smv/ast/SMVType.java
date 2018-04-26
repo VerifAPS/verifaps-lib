@@ -83,11 +83,6 @@ public class SMVType {
         return baseType == smvType.baseType;
     }
 
-    @Override
-    public int hashCode() {
-        return baseType.hashCode();
-    }
-
     public SLiteral valueOf(String value) {
         SLiteral l = new SLiteral();
         l.dataType = this;

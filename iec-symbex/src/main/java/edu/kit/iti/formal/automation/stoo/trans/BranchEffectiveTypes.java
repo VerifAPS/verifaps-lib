@@ -234,9 +234,12 @@ public class BranchEffectiveTypes extends STOOTransformation {
                     guard.accept(setEffectiveTypeVisitor);
                     branch.addGuardedCommand(guard, block);
                 }
-            else
-                originalStatement.accept(new SetEffectiveTypeToReferenceVisitor(deferredTypeReference,
-                        effectiveTypes.stream().findAny().get()));
+            else {
+                Optional o = effectiveTypes.stream().findAny();
+                assert o.isPresent();
+                originalStatement.accept(new SetEffectiveTypeToReferenceVisitor(deferredTypeReference, (Any) o.get()));
+
+            }
             if (branch.getConditionalBranches().isEmpty())
                 // Keep statements intact we case we don't find any reference to an instance
                 return originalStatement;
