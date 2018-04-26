@@ -83,6 +83,12 @@ public class IEC61131Facade {
         return stp.getString();
     }
 
+    public static String print(StatementList ast) {
+        StructuredTextPrinter stp = new StructuredTextPrinter();
+        ast.forEach(s -> s.accept(stp));
+        return stp.getString();
+    }
+
     /**
      * <p>statements.</p>
      *
