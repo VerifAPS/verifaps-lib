@@ -22,6 +22,7 @@
 
 package edu.kit.iti.formal.automation;
 
+import edu.kit.iti.formal.automation.scope.EffectiveSubtypeScope;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
@@ -64,8 +65,9 @@ public class STOOIntegrationTests {
         TopLevelElement program = Utils.findProgram(topLevelElements);
         assert program != null;
         InstanceScope instanceScope = IEC61131Facade.findInstances(program, globalScope);
-        IEC61131Facade.findEffectiveSubtypes(topLevelElements, globalScope, instanceScope);
-        return new STOOSimplifier.State(program, topLevelElements, globalScope, instanceScope);
+        EffectiveSubtypeScope effectiveSubtypeScope =
+            IEC61131Facade.findEffectiveSubtypes(topLevelElements, globalScope, instanceScope);
+        return new STOOSimplifier.State(program, topLevelElements, globalScope, instanceScope, effectiveSubtypeScope);
     }
 
     private static STOOSimplifier.State processSTFile(Path path) throws IOException {

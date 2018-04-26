@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.stoo;
 
 import com.google.common.collect.ImmutableList;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
+import edu.kit.iti.formal.automation.scope.EffectiveSubtypeScope;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
@@ -56,8 +57,8 @@ public class STOOSimplifier {
     private final State state;
 
     public STOOSimplifier(TopLevelElement astRoot, TopLevelElements topLevelElements, GlobalScope globalScope,
-                          InstanceScope instanceScope) {
-        state = new State(astRoot, topLevelElements, globalScope, instanceScope);
+                          InstanceScope instanceScope, EffectiveSubtypeScope effectiveSubtypeScope) {
+        state = new State(astRoot, topLevelElements, globalScope, instanceScope, effectiveSubtypeScope);
     }
 
     public void simplify() {
@@ -80,11 +81,13 @@ public class STOOSimplifier {
         private final TopLevelElements topLevelElements;
         private final GlobalScope globalScope;
         private final InstanceScope instanceScope;
+        private final EffectiveSubtypeScope effectiveSubtypeScope;
         private final List<InstanceScope.Instance> instances;
 
         public State(TopLevelElement topLevelElement, TopLevelElements topLevelElements, GlobalScope globalScope,
-                     InstanceScope instanceScope) {
-            this(topLevelElement, topLevelElements, globalScope, instanceScope, instanceScope.getAllInstances());
+                     InstanceScope instanceScope, EffectiveSubtypeScope effectiveSubtypeScope) {
+            this(topLevelElement, topLevelElements, globalScope, instanceScope, effectiveSubtypeScope,
+                    instanceScope.getAllInstances());
         }
 
         public int getInstanceID(InstanceScope.Instance instance) {

@@ -24,10 +24,12 @@ package edu.kit.iti.formal.automation.analysis;
 
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
+import edu.kit.iti.formal.automation.scope.EffectiveSubtypeScope;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -48,6 +50,7 @@ import lombok.RequiredArgsConstructor;
  * @author Augusto Modanese
  */
 @RequiredArgsConstructor
+@Getter
 public class FindEffectiveSubtypes extends AstVisitor {
     /**
      * Whether a fixpoint has been found.
@@ -75,6 +78,7 @@ public class FindEffectiveSubtypes extends AstVisitor {
 
     private final GlobalScope globalScope;
     private final InstanceScope instanceScope;
+    private final EffectiveSubtypeScope effectiveSubtypeScope = new EffectiveSubtypeScope();
 
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
@@ -114,7 +118,8 @@ public class FindEffectiveSubtypes extends AstVisitor {
     public Object visit(VariableDeclaration variableDeclaration) {
         // Base case
         if (variableDeclaration.getDataType() instanceof ClassDataType)
-            variableDeclaration.addEffectiveDataType(variableDeclaration.getDataType());
+            effectiveSubtypeScope.registerType(
+                    currentTopLevelScopeElement, variableDeclaration, variableDeclaration.getDataType());
         // Add all possible cases
         // TODO: rewrite
         else if (variableDeclaration.getDataType() instanceof InterfaceDataType) {
@@ -122,8 +127,9 @@ public class FindEffectiveSubtypes extends AstVisitor {
                     .filter(c -> c.implementsInterface(
                             ((InterfaceDataType) variableDeclaration.getDataType()).getInterfaceDeclaration()))
                     .filter(c -> !instanceScope.getInstancesOfClass(c).isEmpty())
-                    .forEach(c -> variableDeclaration.addEffectiveDataType(globalScope.resolveDataType(c)));
-            assert variableDeclaration.getEffectiveDataTypes().size() > 0;
+                    .forEach(c -> effectiveSubtypeScope.registerType(
+                            currentTopLevelScopeElement, variableDeclaration, globalScope.resolveDataType(c)));
+            assert effectiveSubtypeScope.getTypes(currentTopLevelScopeElement, variableDeclaration).size() > 0;
         }
         else if (variableDeclaration.getDataType() instanceof ReferenceType) {
             ClassDeclaration clazz = ((ClassDataType) ((ReferenceType) variableDeclaration.getDataType()).getOf())
@@ -131,8 +137,9 @@ public class FindEffectiveSubtypes extends AstVisitor {
             globalScope.getClasses().stream()
                     .filter(c -> c.equals(clazz) || c.extendsClass(clazz))
                     .filter(c -> !instanceScope.getInstancesOfClass(c).isEmpty())
-                    .forEach(c -> variableDeclaration.addEffectiveDataType(globalScope.resolveDataType(c)));
-            assert variableDeclaration.getEffectiveDataTypes().size() > 0;
+                    .forEach(c -> effectiveSubtypeScope.registerType(
+                            currentTopLevelScopeElement, variableDeclaration, globalScope.resolveDataType(c)));
+            assert effectiveSubtypeScope.getTypes(currentTopLevelScopeElement, variableDeclaration).size() > 0;
         }
         return super.visit(variableDeclaration);
     }

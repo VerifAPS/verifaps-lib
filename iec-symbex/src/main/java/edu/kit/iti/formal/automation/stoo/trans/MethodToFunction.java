@@ -118,7 +118,7 @@ public class MethodToFunction extends STOOTransformation {
                 // Invoking function block?
                 VariableDeclaration variable = (VariableDeclaration) callee.getSub().getIdentifiedObject();
                 if (variable.getDataType() instanceof FunctionBlockDataType
-                        || variable.getEffectiveDataTypes().stream()
+                        || state.getEffectiveSubtypeScope().getTypes(currentTopLevelScopeElement, variable).stream()
                         .anyMatch(t -> t instanceof FunctionBlockDataType))
                 return newInvocation;
             }
