@@ -146,6 +146,10 @@ public class LocalScope implements Visitable, Iterable<VariableDeclaration>, Cop
         return localVariables.values().stream();
     }
 
+    public Stream<VariableDeclaration> parallelStream() {
+        return localVariables.values().parallelStream();
+    }
+
     /**
      * {@inheritDoc}
      */

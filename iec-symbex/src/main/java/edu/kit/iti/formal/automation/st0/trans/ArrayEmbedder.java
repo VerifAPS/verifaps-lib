@@ -44,7 +44,7 @@ public class ArrayEmbedder implements ST0Transformation {
     @Override
     public void transform(STSimplifier.State state) {
         this.state = state;
-        for (VariableDeclaration arrayVariable : state.theProgram.getLocalScope().stream()
+        for (VariableDeclaration arrayVariable : state.theProgram.getLocalScope().parallelStream()
                 .filter(v -> v.getTypeDeclaration() instanceof ArrayTypeDeclaration)
                 .collect(Collectors.toList())) {
             ArrayTypeDeclaration array = (ArrayTypeDeclaration) arrayVariable.getTypeDeclaration();

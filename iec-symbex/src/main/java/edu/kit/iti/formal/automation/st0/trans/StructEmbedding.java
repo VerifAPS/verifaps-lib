@@ -70,7 +70,7 @@ public class StructEmbedding implements ST0Transformation {
 
         @Override
         public Object visit(@NotNull LocalScope localScope) {
-            for (VariableDeclaration v : new ArrayList<>(localScope.stream()
+            for (VariableDeclaration v : new ArrayList<>(localScope.parallelStream()
                     .filter(v -> v.getDataType() instanceof RecordType)
                     .collect(Collectors.toList()))) {
                 RecordType struct = (RecordType) v.getDataType();
