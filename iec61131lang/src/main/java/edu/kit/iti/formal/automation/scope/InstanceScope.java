@@ -22,6 +22,7 @@
 
 package edu.kit.iti.formal.automation.scope;
 
+import edu.kit.iti.formal.automation.analysis.InstanceSets;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.st.ast.*;
 import lombok.AllArgsConstructor;
@@ -48,6 +49,8 @@ public class InstanceScope implements Serializable {
     //private Map<FunctionBlockDeclaration, List<Instance>> functionBlockPolymorphInstances = new TreeMap();
 
     private List<Instance> allInstances;
+
+    private InstanceSets instanceSets = new InstanceSets();
 
     public InstanceScope(GlobalScope globalScope) {
         this.globalScope = globalScope;
@@ -142,26 +145,22 @@ public class InstanceScope implements Serializable {
         return allInstances;
     }
 
-    public void registerClassInstance(ClassDeclaration classDeclaration, Instance instance) {
-        classInstances.get(classDeclaration).add(instance);
-        classDeclaration.getImplementedInterfaces().forEach(i -> interfaceInstances.get(i).add(instance));
-        classDeclaration.getExtendedClasses().forEach(c -> classPolymorphInstances.get(c).add(instance));
+    /**
+     * Register a new instance of instanceClass to variable
+     * @param variable the variable containing the instance
+     * @param instanceClass the instance's class
+     * @param instance the instance to register
+     */
+    public void registerClassInstance(VariableDeclaration variable, ClassDeclaration instanceClass,
+                                      Instance instance) {
+        classInstances.get(instanceClass).add(instance);
+        instanceClass.getImplementedInterfaces().forEach(i -> interfaceInstances.get(i).add(instance));
+        instanceClass.getExtendedClasses().forEach(c -> classPolymorphInstances.get(c).add(instance));
+        instanceSets.addInstance(variable.getParent(), variable, instance);
     }
 
-    public void registerFunctionBlockInstance(FunctionBlockDeclaration functionBlockDeclaration,
-                                              Instance instance) {
-        registerClassInstance(functionBlockDeclaration, instance);
-        /*
-        functionBlockInstances.get(functionBlockDeclaration).add(instance);
-        functionBlockDeclaration.getImplementedInterfaces().forEach(i -> interfaceInstances.get(i).add(instance));
-        functionBlockDeclaration.getExtendedClasses().forEach(c -> {
-            if (c instanceof FunctionBlockDeclaration)
-                functionBlockPolymorphInstances.get(c).add(instance);
-            else
-                // Function blocks may also extend classes
-                classPolymorphInstances.get(c).add(instance);
-        });
-        */
+    public Set<Instance> getInstances(VariableDeclaration variable) {
+        return instanceSets.getInstances(variable.getParent(), variable);
     }
 
     /**

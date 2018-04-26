@@ -94,7 +94,7 @@ public class GlobalInstances extends STOOTransformation {
                                 || v.getDataType() instanceof ReferenceType
                                 || v.getDataType() instanceof InterfaceDataType)
                         .collect(Collectors.toList())) {
-                    Optional<InstanceScope.Instance> parentInstance = variable.getInstances().stream()
+                    Optional<InstanceScope.Instance> parentInstance = state.getInstancesOfVariable(variable).stream()
                             .filter(i -> i.getParent().equals(instance)).findAny();
                     parentInstance.ifPresent(i -> instanceInitialization.addField(variable.getName(),
                             new Literal(instanceIDType.getDataType(state.getGlobalScope()),

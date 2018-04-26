@@ -176,8 +176,8 @@ public class ArrayEmbedder implements ST0Transformation {
                         r = r.getSub();
                     if (r.getIdentifiedObject() instanceof VariableDeclaration) {
                         VariableDeclaration variable = (VariableDeclaration) r.getIdentifiedObject();
-                        if (!(variable.getInstances().isEmpty()))
-                            variable.getInstances().parallelStream()
+                        if (!(state.stooState.getInstancesOfVariable(variable).isEmpty()))
+                            state.stooState.getInstancesOfVariable(variable).parallelStream()
                                     .map(i -> state.stooState.getInstanceID(i))
                                     .forEach(values::add);
                         else

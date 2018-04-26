@@ -24,7 +24,6 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import com.google.common.collect.ImmutableMap;
 import edu.kit.iti.formal.automation.datatypes.Any;
-import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
@@ -33,9 +32,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by weigla on 09.06.2014.
@@ -132,11 +129,6 @@ public class VariableDeclaration extends Top
      * The top level scope element the variable is declared in.
      */
     private TopLevelScopeElement parent;
-
-    /**
-     * Set of instances which this variable can assume. Populated by static analysis.
-     */
-    private final Set<InstanceScope.Instance> instances = new HashSet<>();
 
     /**
      * <p>Constructor for VariableDeclaration.</p>
@@ -438,10 +430,6 @@ public class VariableDeclaration extends Top
      */
     public TypeDeclaration getTypeDeclaration() {
         return typeDeclaration;
-    }
-
-    public void addInstance(@NotNull InstanceScope.Instance instance) {
-        instances.add(instance);
     }
 
     /**

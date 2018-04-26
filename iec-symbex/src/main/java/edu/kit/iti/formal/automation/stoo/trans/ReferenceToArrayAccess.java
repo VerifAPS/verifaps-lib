@@ -136,8 +136,9 @@ public class ReferenceToArrayAccess extends STOOTransformation {
                 variableDeclaration.getTypeDeclaration().setBaseTypeName(variableDeclaration.getDataTypeName());
                 // For top level instances (e.g., in GVL or in a program) there is a single instance for the variable,
                 // so set it. For the other instances, the default is to initialize them to NULL.
-                if (variableDeclaration.getInstances().size() == 1) {
-                    Optional<InstanceScope.Instance> o = variableDeclaration.getInstances().stream().findAny();
+                if (state.getInstancesOfVariable(variableDeclaration).size() == 1) {
+                    Optional<InstanceScope.Instance> o =
+                            state.getInstancesOfVariable(variableDeclaration).stream().findAny();
                     assert o.isPresent();
                     variableDeclaration.setType(VariableDeclaration.CONSTANT);
                     variableDeclaration.setInit(new Literal(variableDeclaration.getDataType(),

@@ -30,6 +30,7 @@ import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.automation.stoo.trans.*;
 import javafx.util.Pair;
 import lombok.AllArgsConstructor;
@@ -37,6 +38,7 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -131,6 +133,10 @@ public class STOOSimplifier {
         public List<Pair<Integer, Integer>> getInstanceIDRangesToClass(ClassDataType clazz) {
             // polymorph = true is the default
             return getInstanceIDRangesToClass(clazz.getClazz(), true);
+        }
+
+        public Set<InstanceScope.Instance> getInstancesOfVariable(VariableDeclaration variable) {
+            return instanceScope.getInstances(variable);
         }
     }
 }
