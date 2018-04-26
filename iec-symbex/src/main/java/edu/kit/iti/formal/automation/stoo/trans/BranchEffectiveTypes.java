@@ -223,16 +223,17 @@ public class BranchEffectiveTypes extends STOOTransformation {
             Set<Any> effectiveTypes = deferredTypeReference.toVariable().getEffectiveDataTypes();
             if (effectiveTypes.size() > 1)
                 for (Any effectiveType : new SortedList<>(FXCollections.observableArrayList(effectiveTypes))) {
-                    Pair<Integer, Integer> instanceIDRange =
-                            state.getInstanceIDRangeToClass((ClassDataType) effectiveType, false);
                     StatementList block = new StatementList(originalStatement.copy());
                     //block.add(0, new CommentStatement(deferredTypeReference + " : " + effectiveType.getName()));
                     SetEffectiveTypeToReferenceVisitor setEffectiveTypeVisitor =
                             new SetEffectiveTypeToReferenceVisitor(deferredTypeReference, effectiveType);
                     block.accept(setEffectiveTypeVisitor);
-                    Expression guard = instanceIDInRangeGuard(deferredTypeReference, instanceIDRange);
-                    guard.accept(setEffectiveTypeVisitor);
-                    branch.addGuardedCommand(guard, block);
+                    for (Pair<Integer, Integer> instanceIDRange
+                            : state.getInstanceIDRangesToClass((ClassDataType) effectiveType, false)) {
+                        Expression guard = instanceIDInRangeGuard(deferredTypeReference, instanceIDRange);
+                        guard.accept(setEffectiveTypeVisitor);
+                        branch.addGuardedCommand(guard, block);
+                    }
                 }
             else {
                 Optional o = effectiveTypes.stream().findAny();
