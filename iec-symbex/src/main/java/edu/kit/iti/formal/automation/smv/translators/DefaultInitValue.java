@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.smv.translators;
 
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.datatypes.values.Bits;
+import edu.kit.iti.formal.automation.datatypes.values.TimeofDayData;
 import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.datatypes.values.Values;
 import org.jetbrains.annotations.NotNull;
@@ -73,6 +74,11 @@ public class DefaultInitValue implements InitValueTranslator {
         public Value visit(RangeType rangeType) {
             // TODO use type's initialization value, if it exists
             return visit(rangeType.getBase());
+        }
+
+        @Override
+        public Value visit(TimeType timeType) {
+            return new Values.VTimeOfDay(AnyDate.TIME_OF_DAY, new TimeofDayData(0, 0, 0, 0));
         }
     }
 }

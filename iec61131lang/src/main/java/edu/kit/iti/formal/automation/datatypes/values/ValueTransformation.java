@@ -32,6 +32,11 @@ import java.math.BigInteger;
 import java.util.Collections;
 
 public class ValueTransformation extends DefaultDataTypeVisitor<Value> {
+    /**
+     * Cycle time, in milliseconds.
+     */
+    private final static int CYCLE_TIME = 10;
+
     private final Literal literal;
 
     public ValueTransformation(Literal literal) {
@@ -155,7 +160,8 @@ public class ValueTransformation extends DefaultDataTypeVisitor<Value> {
 
     @Override
     public Value visit(TimeType timeType) {
-        throw new NotImplementedException("time data type not supported");
+        long value = new TimeValue(literal.getTextValue()).getMilliseconds() / CYCLE_TIME;
+        return new Values.VAnyInt(DataTypes.UINT, new BigInteger(String.valueOf(value)));
     }
 
     @Override

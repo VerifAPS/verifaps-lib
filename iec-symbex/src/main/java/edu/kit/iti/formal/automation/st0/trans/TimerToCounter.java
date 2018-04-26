@@ -24,12 +24,8 @@ package edu.kit.iti.formal.automation.st0.trans;
 
 import edu.kit.iti.formal.automation.datatypes.DataTypes;
 import edu.kit.iti.formal.automation.datatypes.TimeType;
-import edu.kit.iti.formal.automation.st.ast.Literal;
-import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
-import edu.kit.iti.formal.automation.st.ast.SimpleTypeDeclaration;
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
-import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 
 /**
@@ -48,6 +44,8 @@ public class TimerToCounter extends AstMutableVisitor {
         return state -> {
             TimerToCounter ttc = new TimerToCounter(4);
             state.theProgram = (ProgramDeclaration) ttc.visit(state.theProgram);
+            for (FunctionDeclaration function : state.functions.values())
+                state.functions.replace(function.getFunctionName(), (FunctionDeclaration) ttc.visit(function));
         };
     }
 
@@ -69,6 +67,8 @@ public class TimerToCounter extends AstMutableVisitor {
             //vd.setDataType(newVal.getDataType());
             SimpleTypeDeclaration sd = new SimpleTypeDeclaration();
             sd.setInitialization(newVal);
+            sd.setBaseType(DataTypes.UINT);
+            sd.setBaseTypeName("UINT");
             //setPositions(vd.getInit(), sd);
             newVariable.setTypeDeclaration(sd);
             return newVariable;

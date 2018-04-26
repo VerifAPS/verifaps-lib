@@ -144,21 +144,21 @@ public class Literal extends Initialization {
     }
 
     public static Literal time(Token text) {
-        return new Literal(AnyReal.LREAL, text);
+        return new Literal(TimeType.TIME_TYPE, text);
     }
 
     public static Literal timeOfDay(Token text) {
-        return new Literal(AnyReal.LREAL, text);
+        return new Literal(AnyDate.TIME_OF_DAY, text);
 
     }
 
     public static Literal date(Token symbol) {
-        return new Literal(AnyReal.LREAL, symbol);
+        return new Literal(AnyDate.DATE, symbol);
 
     }
 
     public static Literal dateAndTime(Token symbol) {
-        return new Literal(AnyReal.LREAL, symbol);
+        return new Literal(AnyDate.DATE_AND_TIME, symbol);
     }
 
     public static Literal integer(int val) {
