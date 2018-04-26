@@ -117,12 +117,6 @@ public class ProgramTest {
         }
     }
 
-    @Test
-    public void testPrintTopLevelElements() throws IOException {
-        TopLevelElements tle = IEC61131Facade.file(testFile);
-        System.out.println(IEC61131Facade.printTopLevelElements(tle));
-    }
-
     /*
     @Test
     public void testEffectiveSubtypes() throws IOException {

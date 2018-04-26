@@ -167,69 +167,6 @@ public class IEC61131Facade {
         return findEffectiveSubtypes.getEffectiveSubtypeScope();
     }
 
-    /**
-     * Resolve types of top level elements and print them along with some minor statistics.
-     * Assume there is a single program declaration.
-     * @param topLevelElements
-     * @return Top level elements, formatted, as string.
-     */
-    @NotNull
-    public static String printTopLevelElements(TopLevelElements topLevelElements) {
-        StringBuilder sb = new StringBuilder();
-        // Resolve data types and print them
-        GlobalScope gs = resolveDataTypes(topLevelElements);
-        sb.append("   " + gs.getInterfaces().size() + " Interfaces:\n");
-        for (TopLevelElement topLevelElement : gs.getInterfaces())
-            sb.append(topLevelElement + "\n");
-        sb.append("\n");
-        sb.append("   " + gs.getClasses().size() + " Classes:\n");
-        for (TopLevelElement topLevelElement : gs.getClasses())
-            sb.append(topLevelElement + "\n");
-        sb.append("\n");
-        sb.append("   " + gs.getFunctionBlocks().size() + " Function blocks:\n");
-        for (TopLevelElement topLevelElement : gs.getFunctionBlocks()) {
-            FunctionBlockDeclaration functionBlockDeclaration = (FunctionBlockDeclaration) topLevelElement;
-            sb.append(functionBlockDeclaration.getIdentifier() + "  " + functionBlockDeclaration + "\n");
-            for (MethodDeclaration methodDeclaration : functionBlockDeclaration.getMethods()) {
-                sb.append(methodDeclaration.getIdentifier() + " : " + methodDeclaration.getReturnTypeName() + "  ");
-                sb.append(methodDeclaration + "\n");
-            }
-            sb.append("\n");
-        }
-        sb.append("\n");
-        // Resolve instances for the first program we find and print them
-        TopLevelElement topLevelElement = null;
-        for (TopLevelElement tle : topLevelElements)
-            if (tle instanceof ProgramDeclaration) {
-                topLevelElement = tle;
-                break;
-            }
-        if (topLevelElement == null)
-            sb.append("No program declaration to print instances of.");
-        else {
-            InstanceScope instanceScope = findInstances(topLevelElement, gs);
-            sb.append("   === Interface instances ===\n");
-            for (InterfaceDeclaration interfaceDeclaration : gs.getInterfaces()) {
-                sb.append(" = " + interfaceDeclaration.getIdentifier() + " = \n");
-                sb.append(instanceScope.getInstancesOfInterface(interfaceDeclaration) + "\n");
-            }
-            sb.append("\n");
-            sb.append("   === Class instances ===\n");
-            for (ClassDeclaration classDeclaration : gs.getClasses()) {
-                sb.append(" = " + classDeclaration.getIdentifier() + " = \n");
-                sb.append(instanceScope.getPolymorphInstancesOfClass(classDeclaration) + "\n");
-            }
-            sb.append("\n");
-            sb.append("   === Function block instances ===\n");
-            for (FunctionBlockDeclaration functionBlockDeclaration : gs.getFunctionBlocks()) {
-                sb.append(" = " + functionBlockDeclaration.getIdentifier() + " = \n");
-                sb.append(instanceScope.getPolymorphInstancesOfFunctionBlock(functionBlockDeclaration) + "\n");
-            }
-        }
-        return sb.toString();
-    }
-
-
     public static IEC61131Parser getParser(String s) {
         return getParser(CharStreams.fromString(s));
     }
