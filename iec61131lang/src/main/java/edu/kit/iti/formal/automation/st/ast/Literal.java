@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.datatypes.values.ValueTransformation;
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
+import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.LocalScope;
 import edu.kit.iti.formal.automation.sfclang.Utils;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
@@ -179,6 +180,12 @@ public class Literal extends Initialization {
 
     public String getDataTypeName() {
         return dataType.getIdentifier();
+    }
+
+    public String getDataTypeName(@NotNull GlobalScope globalScope) {
+        if (globalScope.getEnumerateTypeMap().keySet().contains(getText()))
+            return globalScope.getEnumerateTypeMap().get(getText()).getTypeName();
+        return getDataTypeName();
     }
 
     public String getText() {
