@@ -64,9 +64,9 @@ public class STOOIntegrationTests {
         GlobalScope globalScope = IEC61131Facade.resolveDataTypes(topLevelElements);
         TopLevelElement program = Utils.findProgram(topLevelElements);
         assert program != null;
-        InstanceScope instanceScope = IEC61131Facade.findInstances(program, globalScope);
+        InstanceScope instanceScope = OOIEC61131Facade.findInstances(program, globalScope);
         EffectiveSubtypeScope effectiveSubtypeScope =
-            IEC61131Facade.findEffectiveSubtypes(topLevelElements, globalScope, instanceScope);
+            OOIEC61131Facade.findEffectiveSubtypes(topLevelElements, globalScope, instanceScope);
         return new STOOSimplifier.State(program, topLevelElements, globalScope, instanceScope, effectiveSubtypeScope);
     }
 

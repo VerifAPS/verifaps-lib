@@ -23,6 +23,7 @@
 package edu.kit.iti.formal.automation.st;
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
+import edu.kit.iti.formal.automation.OOIEC61131Facade;
 import edu.kit.iti.formal.automation.scope.GlobalScope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
@@ -53,7 +54,7 @@ public class EffectiveSubtypesTest {
         GlobalScope globalScope = IEC61131Facade.resolveDataTypes(topLevelElements);
         // Only one program in test file
         ProgramDeclaration myProgram = globalScope.getPrograms().get(0);
-        InstanceScope instanceScope = IEC61131Facade.findInstances(myProgram, globalScope);
+        InstanceScope instanceScope = OOIEC61131Facade.findInstances(myProgram, globalScope);
 
         // Assert correct number of instances
         Assert.assertEquals(instanceScope.getInstancesOfClass("A").size(), 1);

@@ -70,9 +70,9 @@ public final class SymbExFacade {
         // STOO
         GlobalScope globalScope = IEC61131Facade.resolveDataTypes(elements);
         TopLevelElement program = Utils.findProgram(elements);
-        InstanceScope instanceScope = IEC61131Facade.findInstances(program, globalScope);
+        InstanceScope instanceScope = OOIEC61131Facade.findInstances(program, globalScope);
         EffectiveSubtypeScope effectiveSubtypeScope =
-            IEC61131Facade.findEffectiveSubtypes(elements, globalScope, instanceScope);
+            OOIEC61131Facade.findEffectiveSubtypes(elements, globalScope, instanceScope);
         STOOSimplifier stooSimplifier =
                 new STOOSimplifier(program, elements, globalScope, instanceScope, effectiveSubtypeScope);
         stooSimplifier.simplify();
@@ -87,10 +87,10 @@ public final class SymbExFacade {
         // STOO
         GlobalScope globalScope = IEC61131Facade.resolveDataTypes(elements);
         TopLevelElement program = Utils.findProgram(elements);
-        InstanceScope instanceScope = IEC61131Facade.findInstances(program, globalScope);
-        IEC61131Facade.findEffectiveSubtypes(elements, globalScope, instanceScope);
+        InstanceScope instanceScope = OOIEC61131Facade.findInstances(program, globalScope);
+        OOIEC61131Facade.findEffectiveSubtypes(elements, globalScope, instanceScope);
         EffectiveSubtypeScope effectiveSubtypeScope =
-                IEC61131Facade.findEffectiveSubtypes(elements, globalScope, instanceScope);
+                OOIEC61131Facade.findEffectiveSubtypes(elements, globalScope, instanceScope);
         STOOSimplifier stooSimplifier =
                 new STOOSimplifier(program, elements, globalScope, instanceScope, effectiveSubtypeScope);
         stooSimplifier.simplify();

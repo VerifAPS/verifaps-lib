@@ -141,32 +141,6 @@ public class IEC61131Facade {
         return scope;
     }
 
-    /**
-     * Find all instances of classes and FBs belonging to the given top level element..
-     * @param element The top level element to visit.
-     * @param globalScope Global scope after data types have been resolved.
-     * @return The instance scope containing all instances.
-     */
-    public static InstanceScope findInstances(@NotNull TopLevelElement element, @NotNull GlobalScope globalScope) {
-        InstanceScope instanceScope = new InstanceScope(globalScope);
-        element.accept(new FindInstances(instanceScope));
-        return instanceScope;
-    }
-
-    private static final int FIND_EFFECTIVE_SUBTYPES_LIMIT = 1000;
-
-    public static EffectiveSubtypeScope findEffectiveSubtypes(TopLevelElements topLevelElements,
-                                                              GlobalScope globalScope, InstanceScope instanceScope) {
-        FindEffectiveSubtypes findEffectiveSubtypes = new FindEffectiveSubtypes(globalScope, instanceScope);
-        int i;
-        for (i = 0; i < FIND_EFFECTIVE_SUBTYPES_LIMIT && !findEffectiveSubtypes.fixpointReached(); i++) {
-            findEffectiveSubtypes.prepareRun();
-            topLevelElements.accept(findEffectiveSubtypes);
-        }
-        System.out.println("Done: fixpoint is " + findEffectiveSubtypes.fixpointReached() + " after " + i + " steps");
-        return findEffectiveSubtypes.getEffectiveSubtypeScope();
-    }
-
     public static IEC61131Parser getParser(String s) {
         return getParser(CharStreams.fromString(s));
     }
