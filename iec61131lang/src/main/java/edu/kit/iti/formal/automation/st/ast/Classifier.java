@@ -24,36 +24,32 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Alexander Weigl
+ * @author Alexander Weigl, Augusto Modanese
  * @version 1 (31.01.18)
  */
 @Data
+@EqualsAndHashCode(callSuper = true, exclude = "methods")
 public abstract class Classifier<T extends ParserRuleContext> extends TopLevelScopeElement<T> {
     protected List<IdentifierPlaceHolder<InterfaceDeclaration>> interfaces = new ArrayList<>();
     protected List<MethodDeclaration> methods = new ArrayList<>();
     protected String name = "";
 
-    public List<IdentifierPlaceHolder<InterfaceDeclaration>> getInterfaces() {
-        return interfaces;
-    }
-
-    public void setInterfaces(List<IdentifierPlaceHolder<InterfaceDeclaration>> interfaces) {
-        this.interfaces = interfaces;
-    }
-
-    public void addExtends(String interfaze) {
+    public void addExtendsOrImplements(String interfaze) {
         interfaces.add(new IdentifierPlaceHolder<>(interfaze));
     }
 
     public void setMethods(List<MethodDeclaration> methods) {
-        for (MethodDeclaration methodDeclaration : methods)
+        for (MethodDeclaration methodDeclaration : methods) {
             methodDeclaration.setParent(this);
+            methodDeclaration.getScope().setParent(scope);
+        }
         this.methods = methods;
     }
 

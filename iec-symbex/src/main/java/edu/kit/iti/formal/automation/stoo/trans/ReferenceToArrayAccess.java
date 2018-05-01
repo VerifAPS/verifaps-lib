@@ -26,6 +26,7 @@ import com.google.common.collect.Streams;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.datatypes.InterfaceDataType;
 import edu.kit.iti.formal.automation.datatypes.ReferenceType;
+import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
@@ -52,10 +53,8 @@ public class ReferenceToArrayAccess extends STOOTransformation {
 
     static SymbolicReference buildGlobalArrayAccess(SymbolicReference index, ClassDeclaration instanceClass) {
         SymbolicReference arrayAccess = new SymbolicReference();
-        arrayAccess.setIdentifier(GVL_NAME);
-        arrayAccess.setSub(new SymbolicReference());
-        arrayAccess.getSub().setIdentifier(INSTANCE_ARRAY_NAME_PREFIX + instanceClass.getName());
-        arrayAccess.getSub().addSubscript(index);
+        arrayAccess.setIdentifier(INSTANCE_ARRAY_NAME_PREFIX + instanceClass.getName());
+        arrayAccess.addSubscript(index);
         return arrayAccess;
     }
 
@@ -66,9 +65,10 @@ public class ReferenceToArrayAccess extends STOOTransformation {
         @NotNull
         @Override
         public Object visit(@NotNull SymbolicReference node) {
+            assert currentScope != null;
             // Rewrite so accesses to an instance's attributes is replaced with accesses in the appropriate global array
             List<SymbolicReference> symbolicReferenceList = node.asList();
-            // Clear dereferences
+            // Clear dereferences (assume they are all correct)
             for (SymbolicReference symbolicReference : symbolicReferenceList)
                 symbolicReference.setDerefCount(0);
             // Find the last instance reference, if it exists
@@ -77,17 +77,21 @@ public class ReferenceToArrayAccess extends STOOTransformation {
             // Keep node the same in case no instance references appear
             if (!instanceReference.isPresent())
                 return node;
+            // Ignore if referring in-out (esp. struct-like) variable
+            if (currentScope.hasVariable(instanceReference.get().getIdentifier())) {
+                VariableDeclaration variable = currentScope.getVariable(instanceReference.get().getIdentifier());
+                if (variable != null && variable.isInOut())
+                    return node;
+            }
             // Replace the reference with an array access
             // That is, if y is the instance reference: x.y.z -> GVL._INSTANCES_<class name>[x.y].z
             // TODO use buildGlobalArrayAccess (see above)
             SymbolicReference newNode = new SymbolicReference();
-            newNode.setIdentifier(GVL_NAME);
-            newNode.setSub(new SymbolicReference());
             // Requirement: we have a single effective type at this point
-            newNode.getSub().setIdentifier(INSTANCE_ARRAY_NAME_PREFIX +
+            newNode.setIdentifier(INSTANCE_ARRAY_NAME_PREFIX +
                     instanceReference.get().getEffectiveDataType().getName());
             // Take care of the instance reference's subreference (z in our example above)
-            newNode.getSub().setSub(instanceReference.get().getSub());
+            newNode.setSub(instanceReference.get().getSub());
             instanceReference.get().setSub(null);
             // Clear effective types since we took care of the instance reference
             instanceReference.get().setEffectiveDataType(null);
@@ -97,7 +101,7 @@ public class ReferenceToArrayAccess extends STOOTransformation {
             // For now patching missing instance ID
             if (subscript.getIdentifier().equals(SELF_PARAMETER_NAME) && !subscript.hasSub())
                 subscript.setSub(new SymbolicReference(INSTANCE_ID_VAR_NAME));
-            newNode.getSub().addSubscript(subscript);
+            newNode.addSubscript(subscript);
             return newNode;
         }
     }
@@ -107,36 +111,32 @@ public class ReferenceToArrayAccess extends STOOTransformation {
      */
     private class ReferenceToIntVisitor extends AstMutableVisitor {
         @Override
-        public Object visit(@NotNull Invocation invocation) {
-            // Replace REF(.) with its parameter
-            if (invocation.getCalleeName().equals("REF")) {
-                Optional<Invocation.Parameter> o = invocation.getParameters().stream().findAny();
-                assert o.isPresent();
-                return o.get().getExpression().accept(this);
-            }
-            return super.visit(invocation);
+        public Object visit(ReferenceValue referenceValue) {
+            return referenceValue.getReferenceTo();
         }
 
         @Override
         public Object visit(@NotNull VariableDeclaration variableDeclaration) {
             // Make sure to ignore array types; they have the same type as the array entries have
-            if ((variableDeclaration.getDataType() instanceof InterfaceDataType
-                    || variableDeclaration.getDataType() instanceof ReferenceType
-                    || variableDeclaration.getDataType() instanceof ClassDataType)
-                    && !(variableDeclaration.getTypeDeclaration() instanceof ArrayTypeDeclaration)
+            if (((variableDeclaration.getDataType() instanceof ClassDataType
                     && !(variableDeclaration.isInput() || variableDeclaration.isOutput()
-                        || variableDeclaration.isInOut())) {
+                    || variableDeclaration.isInOut()))
+                    || variableDeclaration.getDataType() instanceof InterfaceDataType
+                    || variableDeclaration.getDataType() instanceof ReferenceType)
+                    && !(variableDeclaration.getTypeDeclaration() instanceof ArrayTypeDeclaration)) {
                 // Convert reference to INT reference, i.e., address in the respective array
                 variableDeclaration.setTypeDeclaration(new SimpleTypeDeclaration<>());
                 variableDeclaration.setDataType(
-                        state.getScope().resolveDataType(INSTANCE_ID_VAR_NAME + INSTANCE_ID_TYPE_SUFFIX));
+                        state.getGlobalScope().resolveDataType(INSTANCE_ID_VAR_NAME + INSTANCE_ID_TYPE_SUFFIX));
                 variableDeclaration.getTypeDeclaration().setBaseType(variableDeclaration.getDataType());
                 variableDeclaration.getTypeDeclaration().setBaseTypeName(variableDeclaration.getDataTypeName());
                 // For top level instances (e.g., in GVL or in a program) there is a single instance for the variable,
                 // so set it. For the other instances, the default is to initialize them to NULL.
-                if (variableDeclaration.getInstances().size() == 1) {
-                    Optional<InstanceScope.Instance> o = variableDeclaration.getInstances().stream().findAny();
+                if (state.getInstancesOfVariable(variableDeclaration).size() == 1) {
+                    Optional<InstanceScope.Instance> o =
+                            state.getInstancesOfVariable(variableDeclaration).stream().findAny();
                     assert o.isPresent();
+                    variableDeclaration.setType(VariableDeclaration.CONSTANT);
                     variableDeclaration.setInit(new Literal(variableDeclaration.getDataType(),
                             Integer.toString(state.getInstanceID(o.get()))));
                 } else variableDeclaration.setInit(new Literal(variableDeclaration.getDataType(),
@@ -148,7 +148,10 @@ public class ReferenceToArrayAccess extends STOOTransformation {
         @Override
         public Object visit(@NotNull SymbolicReference symbolicReference) {
             // Replace access to instance ID with variable itself
-            if (symbolicReference.hasSub() && symbolicReference.getSub().getIdentifier().equals(INSTANCE_ID_VAR_NAME)) {
+            if (symbolicReference.hasSub()
+                    && symbolicReference.getSub().getIdentifier().equals(INSTANCE_ID_VAR_NAME)
+                    // Prevent array access with instance ID from being replaced too
+                    && symbolicReference.getIdentifiedObject() instanceof VariableDeclaration) {
                 symbolicReference.setSub(null);
                 symbolicReference.setDerefCount(0);
                 symbolicReference.setEffectiveDataType(null);

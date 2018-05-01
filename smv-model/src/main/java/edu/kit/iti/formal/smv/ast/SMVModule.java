@@ -22,7 +22,7 @@ package edu.kit.iti.formal.smv.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.smv.Printer;
+import edu.kit.iti.formal.smv.printers.StringPrinter;
 import edu.kit.iti.formal.smv.SMVAstVisitor;
 import lombok.Data;
 
@@ -68,7 +68,7 @@ public class SMVModule extends SMVAst {
     }
 
     public String toString() {
-        return Printer.toString(this);
+        return StringPrinter.toString(this);
     }
 
     public List<SAssignment> getNextAssignments() {

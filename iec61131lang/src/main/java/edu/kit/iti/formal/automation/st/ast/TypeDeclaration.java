@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by weigl on 13.06.14.
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
 @Data

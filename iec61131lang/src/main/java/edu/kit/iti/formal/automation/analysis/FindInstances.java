@@ -24,7 +24,6 @@ package edu.kit.iti.formal.automation.analysis;
 
 import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
-import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration;
@@ -54,26 +53,16 @@ public class FindInstances extends AstVisitor {
     @Override
     public Object visit(VariableDeclaration variableDeclaration) {
         if (variableDeclaration.isInput() || variableDeclaration.isOutput() || variableDeclaration.isInOut()
-                /*|| currentTopLevelScopeElement instanceof InterfaceDeclaration*/)
+                || currentTopLevelScopeElement instanceof InterfaceDeclaration)
             return super.visit(variableDeclaration);
         AnyDt dataType = variableDeclaration.getDataType();
         // Only classes have instances
         if (!(dataType instanceof ClassDataType))
             return super.visit(variableDeclaration);
         InstanceScope.Instance currentInstance = new InstanceScope.Instance(parentInstance, variableDeclaration);
-        // Function blocks extend classes, so they must go first (more specific)
-        if (dataType instanceof FunctionBlockDataType) {
-            FunctionBlockDeclaration functionBlock = ((FunctionBlockDataType) dataType).getFunctionBlock();
-            instanceScope.registerFunctionBlockInstance(functionBlock, currentInstance);
-            variableDeclaration.addInstance(currentInstance);
-            recurse(functionBlock, currentInstance);
-        }
-        else if (dataType instanceof ClassDataType) {
-            ClassDeclaration classDeclaration = ((ClassDataType) dataType).getClazz();
-            instanceScope.registerClassInstance(classDeclaration, currentInstance);
-            variableDeclaration.addInstance(currentInstance);
-            recurse(classDeclaration, currentInstance);
-        }
+        ClassDeclaration classDeclaration = ((ClassDataType) dataType).getClazz();
+        instanceScope.registerClassInstance(variableDeclaration, classDeclaration, currentInstance);
+        recurse(classDeclaration, currentInstance);
         return super.visit(variableDeclaration);
     }
 

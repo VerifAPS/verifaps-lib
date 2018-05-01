@@ -43,7 +43,7 @@ subprojects {
     apply plugin: 'kotlin'
     apply plugin: 'maven'
 
-    ext.kotlin_version = '1.2.30'
+    ext.kotlin_version = '1.2.31'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -64,6 +64,7 @@ subprojects {
         compile group: 'commons-io', name: 'commons-io', version: '2.6'
         compile group: 'com.google.guava', name: 'guava', version: '23.6-jre'
         compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+        compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
         testCompile group: 'junit', name: 'junit', version: '4.12'
         compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
     }

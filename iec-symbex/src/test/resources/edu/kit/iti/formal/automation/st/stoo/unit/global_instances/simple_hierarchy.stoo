@@ -50,27 +50,25 @@ CLASS C EXTENDS B
   END_METHOD
 END_CLASS
 
-GVL
-  VAR_GLOBAL
-    _INSTANCES_Abs : ARRAY [0..2] OF Abs := [
-      (_INSTANCE_ID := 0),
-      (_INSTANCE_ID := 1),
-      (_INSTANCE_ID := 2)
-    ];
-    _INSTANCES_A : ARRAY [0..2] OF A := [
-      (_INSTANCE_ID := 0, x := 42, y := 24),
-      (_INSTANCE_ID := 1, x := 33, y := 44),
-      (_INSTANCE_ID := 2, x := 1, y := 2)
-    ];
-    _INSTANCES_B : ARRAY [1..2] OF B := [
-      (_INSTANCE_ID := 1, z := 55),
-      (_INSTANCE_ID := 2, z := 3)
-    ];
-    _INSTANCES_C : ARRAY [2..2] OF C := [
-      (_INSTANCE_ID := 2, r := 4)
-    ];
-  END_VAR
-END_GVL
+VAR_GLOBAL
+  _INSTANCES_Abs : ARRAY [0..2] OF Abs := [
+    (_INSTANCE_ID := 0),
+    (_INSTANCE_ID := 1),
+    (_INSTANCE_ID := 2)
+  ];
+  _INSTANCES_A : ARRAY [0..2] OF A := [
+    (_INSTANCE_ID := 0, x := 42, y := 24),
+    (_INSTANCE_ID := 1, x := 33, y := 44),
+    (_INSTANCE_ID := 2, x := 1, y := 2)
+  ];
+  _INSTANCES_B : ARRAY [1..2] OF B := [
+    (_INSTANCE_ID := 1, z := 55),
+    (_INSTANCE_ID := 2, z := 3)
+  ];
+  _INSTANCES_C : ARRAY [2..2] OF C := [
+    (_INSTANCE_ID := 2, r := 4)
+  ];
+END_VAR
 
 PROGRAM MY_PROGRAM
   VAR

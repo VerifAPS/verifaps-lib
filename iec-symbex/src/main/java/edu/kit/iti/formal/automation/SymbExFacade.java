@@ -22,6 +22,8 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.oo.OOIEC61131Facade;
+import edu.kit.iti.formal.automation.scope.EffectiveSubtypeScope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.smv.ModuleBuilder;
@@ -70,29 +72,51 @@ public final class SymbExFacade {
      * @param elements
      * @return
      */
-    public static final TopLevelElements simplify(TopLevelElements elements) {
+    public static TopLevelElements simplify(TopLevelElements elements) {
         STSimplifier stSimplifier = new STSimplifier(elements);
         stSimplifier.addDefaultPipeline();
         stSimplifier.transform();
         return stSimplifier.getProcessed();
     }
 
-    private static TopLevelElements simplifyOO(TopLevelElements elements) {
+    public static TopLevelElements simplifyOO(TopLevelElements elements) {
+        return simplifyOO(elements, false);
+    }
+
+    /**
+     * Simplify OO code.
+     * @param elements the code elements
+     * @param onlyOO run only OO simplifications
+     * @return simplified elements
+     * @see #simplify(TopLevelElements) for "classic" ST code
+     */
+    public static TopLevelElements simplifyOO(TopLevelElements elements, boolean onlyOO) {
+        // STOO
         Scope globalScope = IEC61131Facade.resolveDataTypes(elements);
         TopLevelElement program = Utils.findProgram(elements);
-        InstanceScope instanceScope = IEC61131Facade.findInstances(program, globalScope);
-        IEC61131Facade.findEffectiveSubtypes(elements, globalScope, instanceScope);
-        STOOSimplifier stooSimplifier = new STOOSimplifier(program, elements, globalScope, instanceScope);
+        InstanceScope instanceScope = OOIEC61131Facade.findInstances(program, globalScope);
+        System.out.println("Found " + instanceScope.getAllInstances().size() + " instances");
+        EffectiveSubtypeScope effectiveSubtypeScope =
+                OOIEC61131Facade.findEffectiveSubtypes(elements, globalScope, instanceScope);
+        STOOSimplifier stooSimplifier =
+                new STOOSimplifier(program, elements, globalScope, instanceScope, effectiveSubtypeScope);
         stooSimplifier.simplify();
+        if (onlyOO)
+            return stooSimplifier.getState().getTopLevelElements();
+        // ST0
+        // Pass STOO state to enable STOO-aware transformations
+        STSimplifier stSimplifier = new STSimplifier(elements, stooSimplifier.getState());
+        stSimplifier.addDefaultPipeline();
+        stSimplifier.transform();
         return stooSimplifier.getState().getTopLevelElements();
     }
 
-    public static final void simplify(TypeDeclarations types,
-                                      TopLevelScopeElement tlsElement,
-                                      boolean unwindLoops,
-                                      boolean timerToCounter,
-                                      boolean embedArrays,
-                                      boolean replaceSFCReset) {
+    public static void simplify(TypeDeclarations types,
+                                TopLevelScopeElement tlsElement,
+                                boolean unwindLoops,
+                                boolean timerToCounter,
+                                boolean embedArrays,
+                                boolean replaceSFCReset) {
 
         ProgramDeclaration program = tlsElement instanceof ProgramDeclaration ?
                 (ProgramDeclaration) tlsElement : null;
@@ -135,13 +159,12 @@ public final class SymbExFacade {
             function.setStBody(simpleProgram.getStBody());
     }
 
-    public static final TopLevelElements simplify(TopLevelElements elements,
-                                                  boolean embedFunctionBlocks,
-                                                  boolean unwindLoops,
-                                                  boolean timerToCounter,
-                                                  boolean embedArrays,
-                                                  boolean replaceSFCReset) {
-        // TODO account for additional ST0 transformations
+    public static TopLevelElements simplify(TopLevelElements elements,
+                                            boolean embedFunctionBlocks,
+                                            boolean unwindLoops,
+                                            boolean timerToCounter,
+                                            boolean embedArrays,
+                                            boolean replaceSFCReset) {
         STSimplifier stSimplifier = new STSimplifier(elements);
         List<ST0Transformation> transformations = stSimplifier.getTransformations();
 
@@ -165,20 +188,24 @@ public final class SymbExFacade {
         return stSimplifier.getProcessed();
     }
 
-    public static final SMVModule evaluateProgram(TopLevelElements elements) {
-        TopLevelElements a = simplify(elements);
+    public static SMVModule evaluateProgram(TopLevelElements elements) {
+        return evaluateProgram(elements, false);
+    }
+
+    public static SMVModule evaluateProgram(TopLevelElements elements, boolean skipSimplify) {
+        TopLevelElements a = skipSimplify ? elements : simplify(elements);
         Scope globalScope = IEC61131Facade.resolveDataTypes(a);
         return evaluateProgram(Utils.findProgram(a),
                 (TypeDeclarations) a.get(0), globalScope);
     }
 
-    public static final SMVModule evaluateProgram(ProgramDeclaration decl, TypeDeclarations types) {
+    public static SMVModule evaluateProgram(ProgramDeclaration decl, TypeDeclarations types) {
         // If global scope is null, symbolic executioner will be instanced with the default scope
         return evaluateProgram(decl, types, null);
     }
 
-    public static final SMVModule evaluateProgram(ProgramDeclaration decl,
-                                                  TypeDeclarations types, Scope globalScope) {
+    public static SMVModule evaluateProgram(ProgramDeclaration decl,
+                                            TypeDeclarations types, Scope globalScope) {
         SymbolicExecutioner se = new SymbolicExecutioner(globalScope);
         decl.accept(se);
         ModuleBuilder moduleBuilder = new ModuleBuilder(decl, types, se.peek());
@@ -186,7 +213,7 @@ public final class SymbExFacade {
         return moduleBuilder.getModule();
     }
 
-    public static final SVariable asSVariable(VariableDeclaration vd) {
+    public static SVariable asSVariable(VariableDeclaration vd) {
         return new DefaultTypeTranslator().translate(vd);
     }
 }

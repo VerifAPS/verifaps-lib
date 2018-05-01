@@ -27,6 +27,7 @@ package edu.kit.iti.formal.automation.scope;
 import edu.kit.iti.formal.automation.VariableScope;
 import edu.kit.iti.formal.automation.analysis.ResolveDataTypes;
 import edu.kit.iti.formal.automation.datatypes.*;
+import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.sfclang.ast.ActionDeclaration;
 import edu.kit.iti.formal.automation.st.ast.*;
@@ -34,6 +35,7 @@ import edu.kit.iti.formal.automation.visitors.Visitable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,20 +54,36 @@ import java.util.stream.Stream;
 public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable<Scope> {
     private final VariableScope variables = new VariableScope();
     private final Namespace<ActionDeclaration> actions = new Namespace<>();
+    @Nullable
     private Scope parent;
+    @NotNull
     private Namespace<ProgramDeclaration> programs = new Namespace<>();
+    @NotNull
     private Namespace<FunctionBlockDeclaration> functionBlocks = new Namespace<>();
+    @NotNull
     private Namespace<FunctionDeclaration> functions = new Namespace<>();
+    @NotNull
     private Namespace<TypeDeclaration> dataTypes = new Namespace<>();
+    @NotNull
     private List<FunctionResolver> functionResolvers = new LinkedList<>();
     private TypeScope types = TypeScope.builtin();
+    @NotNull
     private Namespace<ClassDeclaration> classes = new Namespace<>();
+    @NotNull
     private Namespace<InterfaceDeclaration> interfaces = new Namespace<>();
+
+    @NotNull
+    private final Map<String, EnumerateType> allowedEnumValues = new HashMap<>();
 
     public Scope(Scope parent) {
         setParent(parent);
     }
 
+    public Scope(List<VariableDeclaration> variables) {
+        variables.forEach(this::add);
+    }
+
+    @NotNull
     public static Scope defaultScope() {
         Scope g = new Scope();
         g.functionResolvers.add(new DefinedFunctionResolver());
@@ -73,7 +91,7 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         return g;
     }
 
-    public void setParent(Scope parent) {
+    public void setParent(@Nullable Scope parent) {
         if (parent != null) {
             programs.parent = parent::getPrograms;
             functionBlocks.parent = parent::getFunctionBlocks;
@@ -94,21 +112,23 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         this.parent = parent;
     }
 
+    @NotNull
     public Map<String, VariableDeclaration> asMap() {
         return variables;
     }
 
-    public void add(VariableDeclaration var) {
+    public void add(@NotNull VariableDeclaration var) {
         variables.put(var.getName(), var);
     }
 
     /**
      * {@inheritDoc}
      */
-    public <T> T accept(Visitor<T> visitor) {
+    public <T> T accept(@NotNull Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
+    @NotNull
     public Scope prefixNames(String s) {
         Scope copy = new Scope();
         for (Map.Entry<String, VariableDeclaration> vd : this.variables.entrySet()) {
@@ -122,6 +142,7 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
     /**
      * {@inheritDoc}
      */
+    @NotNull
     @Override
     public Iterator<VariableDeclaration> iterator() {
         return variables.values().iterator();
@@ -143,6 +164,7 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
     /**
      * {@inheritDoc}
      */
+    @NotNull
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Scope{");
@@ -164,8 +186,9 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
      * @return a {@link edu.kit.iti.formal.automation.st.ast.VariableDeclaration} object.
      * @throws edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException if any.
      */
-    public VariableDeclaration getVariable(SymbolicReference reference)
+    public VariableDeclaration getVariable(@NotNull SymbolicReference reference)
             throws VariableNotDefinedException {
+        // TODO does not have the same behavior as #getVariable(String) ... is this intentional?
         if (variables.containsKey(reference.getIdentifier()))
             return variables.get(reference.getIdentifier());
         throw new VariableNotDefinedException(this, reference);
@@ -176,6 +199,7 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
      *
      * @return a {@link edu.kit.iti.formal.automation.st.ast.VariableBuilder} object.
      */
+    @NotNull
     public VariableBuilder builder() {
         return new VariableBuilder(variables);
     }
@@ -199,33 +223,41 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
                 (parent != null && parent.hasVariable(variable));
     }
 
+    @Nullable
     public ProgramDeclaration getProgram(String key) {
         return programs.lookup(key);
     }
 
+    @Nullable
     public FunctionBlockDeclaration getFunctionBlock(String key) {
         return functionBlocks.lookup(key);
     }
 
 
+    @Nullable
     public FunctionDeclaration getFunction(String key) {
         return functions.lookup(key);
     }
 
-    public void registerProgram(ProgramDeclaration programDeclaration) {
+    public void registerProgram(@NotNull ProgramDeclaration programDeclaration) {
         programs.register(programDeclaration.getIdentifier(), programDeclaration);
     }
 
-    public void registerFunction(FunctionDeclaration functionDeclaration) {
+    public void registerFunction(@NotNull FunctionDeclaration functionDeclaration) {
         functions.register(functionDeclaration.getIdentifier(), functionDeclaration);
     }
 
-    public void registerFunctionBlock(FunctionBlockDeclaration fblock) {
+    public void registerFunctionBlock(@NotNull FunctionBlockDeclaration fblock) {
+        registerClass(fblock);
         functionBlocks.register(fblock.getIdentifier(), fblock);
     }
 
-    public void registerType(TypeDeclaration dt) {
+    public void registerType(@NotNull TypeDeclaration dt) {
         dataTypes.register(dt.getTypeName(), dt);
+        if (dt instanceof EnumerationTypeDeclaration)
+            ((EnumerationTypeDeclaration) dt).getAllowedValues().stream()
+                .map(Token::getText)
+                .forEach(v -> allowedEnumValues.put(v, ((EnumerationTypeDeclaration) dt).getDataType(this)));
     }
 
     /**
@@ -234,7 +266,8 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
      * @param name a {@link java.lang.String} object.
      * @return a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
-    public AnyDt resolveDataType(String name) {
+    @Nullable
+    public AnyDt resolveDataType(@NotNull String name) {
         if (types.containsKey(name))
             return types.get(name);
 
@@ -243,8 +276,9 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         boolean c = classes.containsKey(name);
         boolean d = interfaces.containsKey(name);
 
-        if (a && b || a && c || b && c) {
-            System.err.println("Ambguity in Name Resolution for: " + name);
+        //if (a && b || a && c || b && c) {
+        if (a && b || b && c) {
+            System.err.println("Ambiguity in Name Resolution for: " + name);
         }
 
         AnyDt q;
@@ -255,13 +289,13 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         }
 
         if (b) {
-            q = dataTypes.lookup(name).getDataType(this);
+            q = Objects.requireNonNull(dataTypes.lookup(name)).getDataType(this);
             types.put(name, q);
             return q;
         }
 
         if (c) {
-            q = new ClassDataType(classes.lookup(name));
+            q = new ClassDataType(Objects.requireNonNull(classes.lookup(name)));
             types.put(name, q);
             return q;
         }
@@ -277,22 +311,30 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
             return new ReferenceType(resolveDataType(name.substring(7)));
 
         // Void
-        if (name == "VOID")
+        if (name.equals("VOID"))
             return DataTypes.VOID;
+
+        // Enum
+        EnumerateType enumerateType = resolveEnum(name);
+        if (enumerateType != null)
+            return enumerateType;
 
         if (parent != null)
             return parent.resolveDataType(name);
 
-        //   throw new DataTypeNotDefinedException("Could not find: " + name);
-        return null;
+        throw new DataTypeNotDefinedException("Could not find: " + name);
+        //return null;
     }
 
-    public FunctionDeclaration resolveFunction(Invocation invocation, Scope local) {
+    @Nullable
+    public FunctionDeclaration resolveFunction(@NotNull Invocation invocation) {
         for (FunctionResolver fr : functionResolvers) {
-            FunctionDeclaration decl = fr.resolve(invocation, local);
+            FunctionDeclaration decl = fr.resolve(invocation, this);
             if (decl != null)
                 return decl;
         }
+        if (parent != null)
+            return parent.resolveFunction(invocation);
         return null;
     }
 
@@ -302,7 +344,7 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
      * @param clazz
      * @see ResolveDataTypes
      */
-    public void registerClass(ClassDeclaration clazz) {
+    public void registerClass(@NotNull ClassDeclaration clazz) {
         classes.register(clazz.getIdentifier(), clazz);
     }
 
@@ -311,14 +353,23 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         return classes.lookup(key);
     }
 
-    public void registerInterface(InterfaceDeclaration interfaceDeclaration) {
+    public void registerInterface(@NotNull InterfaceDeclaration interfaceDeclaration) {
         interfaces.register(interfaceDeclaration.getName(), interfaceDeclaration);
     }
 
+    @Nullable
     public InterfaceDeclaration resolveInterface(String key) {
         return interfaces.lookup(key);
     }
 
+    @Nullable
+    public EnumerateType resolveEnum(String value) {
+        if (allowedEnumValues.containsKey(value))
+            return allowedEnumValues.get(value);
+        return null;
+    }
+
+    @NotNull
     @Override
     public Scope copy() {
         Scope gs = new Scope(getParent());
@@ -337,7 +388,25 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         return gs;
     }
 
-    public void addVariables(Scope scope) {
+    /**
+     * @return a shallow copy of the scope (all elements are the same)
+     */
+    @NotNull
+    public Scope shallowCopy() {
+        Scope gs = new Scope(getParent());
+        gs.classes = new Namespace<>(classes);
+        gs.interfaces = new Namespace<>(interfaces);
+        gs.dataTypes = new Namespace<>(dataTypes);
+        gs.functionBlocks = new Namespace<>(functionBlocks);
+        gs.functionResolvers = new ArrayList<>(functionResolvers);
+        gs.functions = new Namespace<>(functions);
+        gs.programs = new Namespace<>(programs);
+        gs.types = types.clone();
+        gs.variables.putAll(variables);
+        return gs;
+    }
+
+    public void addVariables(@NotNull Scope scope) {
         variables.putAll(scope.getVariables());
     }
 
@@ -351,6 +420,10 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         return asMap().values().stream();
     }
 
+    public Stream<VariableDeclaration> parallelStream() {
+        return asMap().values().parallelStream();
+    }
+
     @Nullable
     public ActionDeclaration getAction(@NotNull String name) {
         return actions.lookup(name);
@@ -360,27 +433,31 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         actions.register(a.getName(), a);
     }
 
-
     public class Namespace<T> {
-        Supplier<Namespace<T>> parent;
-        private HashMap<String, T> map = new LinkedHashMap<>();
+        @Nullable Supplier<Namespace<T>> parent;
+        @NotNull
+        private final HashMap<String, T> map = new LinkedHashMap<>();
 
-        public Namespace(Namespace<T> other) {
+        Namespace(Namespace<T> other) {
             map.putAll(other.map);
             parent = other.parent;
         }
 
-        public Namespace() {
+        Namespace() {
 
         }
 
-        public T lookup(String key) {
-            if (map.containsKey(key)) return map.get(key);
-            if (parent != null && parent.get() != null) parent.get().lookup(key);
+        @Nullable T lookup(String key) {
+            if (map.containsKey(key))
+                return map.get(key);
+            if (parent != null && parent.get() != null)
+                return parent.get().lookup(key);
             return null;
         }
 
-        public void register(String key, T obj) {
+        void register(@NotNull String key, T obj) {
+            if (key.equals(""))
+                throw new IllegalArgumentException("Registering empty string is not allowed");
             map.put(key, obj);
         }
 
@@ -394,6 +471,7 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
             return map.containsKey(name);
         }
 
+        @NotNull
         public Collection<T> values() {
             return map.values();
         }

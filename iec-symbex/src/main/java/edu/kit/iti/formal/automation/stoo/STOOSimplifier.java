@@ -22,6 +22,8 @@
 
 package edu.kit.iti.formal.automation.stoo;
 
+import edu.kit.iti.formal.automation.scope.EffectiveSubtypeScope;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import edu.kit.iti.formal.automation.st.util.Tuple;
 import com.google.common.collect.ImmutableList;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
@@ -36,6 +38,7 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -56,8 +59,8 @@ public class STOOSimplifier {
     private final State state;
 
     public STOOSimplifier(TopLevelElement astRoot, TopLevelElements topLevelElements, Scope globalScope,
-                          InstanceScope instanceScope) {
-        state = new State(astRoot, topLevelElements, globalScope, instanceScope);
+                          InstanceScope instanceScope, EffectiveSubtypeScope effectiveSubtypeScope) {
+        state = new State(astRoot, topLevelElements, globalScope, instanceScope, effectiveSubtypeScope);
     }
 
     public void simplify() {
@@ -78,17 +81,32 @@ public class STOOSimplifier {
         private final TopLevelElement topLevelElement;
 
         private final TopLevelElements topLevelElements;
-        private final Scope scope;
+
+        private final Scope globalScope;
         private final InstanceScope instanceScope;
+        private final EffectiveSubtypeScope effectiveSubtypeScope;
         private final List<InstanceScope.Instance> instances;
 
         public State(TopLevelElement topLevelElement, TopLevelElements topLevelElements, Scope globalScope,
-                     InstanceScope instanceScope) {
-            this(topLevelElement, topLevelElements, globalScope, instanceScope, instanceScope.getAllInstances());
+                     InstanceScope instanceScope, EffectiveSubtypeScope effectiveSubtypeScope) {
+            this(topLevelElement, topLevelElements, globalScope, instanceScope, effectiveSubtypeScope,
+                    instanceScope.getAllInstances());
         }
 
         public int getInstanceID(InstanceScope.Instance instance) {
             return instances.indexOf(instance);
+        }
+
+        public Scope getGlobalScope() {
+            return globalScope;
+        }
+
+        /**
+         * @deprecated use {@link #getGlobalScope()} instead
+         */
+        @Deprecated
+        public Scope getScope() {
+            return getGlobalScope();
         }
 
         /**
@@ -127,6 +145,10 @@ public class STOOSimplifier {
         public List<Tuple<Integer, Integer>> getInstanceIDRangesToClass(ClassDataType clazz) {
             // polymorph = true is the default
             return getInstanceIDRangesToClass(clazz.getClazz(), true);
+        }
+
+        public Set<InstanceScope.Instance> getInstancesOfVariable(VariableDeclaration variable) {
+            return instanceScope.getInstances(variable);
         }
     }
 }

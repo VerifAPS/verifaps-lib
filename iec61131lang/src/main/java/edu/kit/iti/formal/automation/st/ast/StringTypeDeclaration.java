@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.datatypes.IECString;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Created by weigl on 13.06.14.
@@ -35,6 +36,7 @@ import lombok.Data;
  * @version $Id: $Id
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class StringTypeDeclaration extends TypeDeclaration<Literal> {
     private Literal size;
 

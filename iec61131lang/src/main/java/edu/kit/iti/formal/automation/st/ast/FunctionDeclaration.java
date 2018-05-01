@@ -32,11 +32,11 @@ import lombok.*;
 /**
  * Created by weigl on 13.06.14.
  *
- * @author weigl
+ * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
-@EqualsAndHashCode(exclude = "statements")
-@ToString(exclude = "statements")
+@EqualsAndHashCode(exclude = "stBody", callSuper = true)
+@ToString(exclude = "stBody")
 @NoArgsConstructor
 @Getter
 @Setter
@@ -46,7 +46,13 @@ public class FunctionDeclaration extends TopLevelScopeElement<IEC61131Parser.Fun
     protected String name;
     protected StatementList stBody = new StatementList();
 
+    public FunctionDeclaration(String name) {
+        this.name = name;
+    }
+
     public String getReturnTypeName() {
+        if (returnType.getIdentifier() == null)
+            return "VOID";
         return returnType.getIdentifier();
     }
 

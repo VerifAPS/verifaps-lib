@@ -25,6 +25,7 @@ package edu.kit.iti.formal.automation.st;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import edu.kit.iti.formal.automation.datatypes.IECArray;
+import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue;
 import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.operators.Operator;
 import edu.kit.iti.formal.automation.operators.UnaryOperator;
@@ -501,9 +502,8 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         String interfaces = functionBlockDeclaration.getInterfaces().stream()
                 .map(IdentifierPlaceHolder::getIdentifier)
                 .collect(Collectors.joining(", "));
-        if (!interfaces.isEmpty()) {
+        if (!interfaces.isEmpty())
             sb.append(" IMPLEMENTS ").append(interfaces);
-        }
 
         sb.increaseIndent().nl();
         functionBlockDeclaration.getScope().accept(this);
@@ -528,7 +528,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public Object visit(InterfaceDeclaration interfaceDeclaration) {
         sb.append("INTERFACE ").append(interfaceDeclaration.getName());
 
-        String extendsInterfaces = interfaceDeclaration.getExtendsInterfaces().stream()
+        String extendsInterfaces = interfaceDeclaration.getInterfaces().parallelStream()
                 .map(IdentifierPlaceHolder::getIdentifier)
                 .collect(Collectors.joining(", "));
         if (!extendsInterfaces.isEmpty())
@@ -582,7 +582,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         if (method.isFinal_())
             sb.append("FINAL ");
         if (method.isAbstract_())
-            sb.append("ABSTRACT");
+            sb.append("ABSTRACT ");
         if (method.isOverride())
             sb.append("OVERRIDE ");
 
@@ -626,8 +626,8 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
-        sb.append("GVL").nl();
         globalVariableListDeclaration.getScope().accept(this);
+        sb.nl();
         return null;
     }
 
@@ -635,6 +635,14 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public Object visit(ReferenceSpecification referenceSpecification) {
         sb.append("REF_TO ");
         referenceSpecification.getRefTo().accept(this);
+        return null;
+    }
+
+    @Override
+    public Object visit(ReferenceValue referenceValue) {
+        sb.append("REF(");
+        referenceValue.getReferenceTo().accept(this);
+        sb.append(")");
         return null;
     }
 
@@ -730,7 +738,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public Object visit(StructureTypeDeclaration structureTypeDeclaration) {
         sb.append(structureTypeDeclaration.getTypeName());
         sb.append(": STRUCT").nl().increaseIndent();
-        structureTypeDeclaration.getFields().values().forEach(s -> s.accept(this));
+        structureTypeDeclaration.getFields().accept(this);
         sb.decreaseIndent().append("END_STRUCT;").nl();
         return null;
     }
@@ -789,9 +797,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(Literal literal) {
-        if(literal.getDataTypeName()!=null)
+        if (literal.getDataTypeName() != null)
             sb.append(literal.getDataTypeName()).append('#');
-        sb.append(literal.getText());
+        sb.append(literal.getTextValue());
         return null;
 
     }

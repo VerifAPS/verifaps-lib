@@ -25,8 +25,10 @@ package edu.kit.iti.formal.automation.st;
 import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.scope.Scope;
+import edu.kit.iti.formal.automation.oo.OOIEC61131Facade;
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.visitors.Utils;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,16 +46,16 @@ import java.util.stream.Collectors;
  * @author Augusto Modanese
  */
 public class EffectiveSubtypesTest {
-    private final String testFileName = "edu/kit/iti/formal/automation/st/programs/instance_hierarchy.st";
-
     @Test
     public void testInstanceHierarchy() throws IOException {
+        String testFileName = "edu/kit/iti/formal/automation/st/programs/instance_hierarchy.st";
         URL testFile = ProgramTest.class.getClassLoader().getResource(testFileName);
+        assert testFile != null;
         TopLevelElements topLevelElements = IEC61131Facade.file(new ANTLRFileStream(testFile.getFile()));
         Scope globalScope = IEC61131Facade.resolveDataTypes(topLevelElements);
-        // Only one program in test file
-        ProgramDeclaration myProgram = globalScope.getPrograms().values().iterator().next();
-        InstanceScope instanceScope = IEC61131Facade.findInstances(myProgram, globalScope);
+        ProgramDeclaration myProgram = Utils.findProgram(topLevelElements);
+        assert myProgram != null;
+        InstanceScope instanceScope = OOIEC61131Facade.findInstances(myProgram, globalScope);
 
         // Assert correct number of instances
         Assert.assertEquals(instanceScope.getInstancesOfClass("A").size(), 1);
@@ -63,19 +65,19 @@ public class EffectiveSubtypesTest {
         // Assert parent instances are correct
         // Instances of A
         InstanceScope.Instance instanceA = instanceScope.getInstancesOfClass("A").get(0);
-        Assert.assertEquals(instanceA.getParent(), null);
+        Assert.assertNull(instanceA.getParent());
         // Instances of B
         List<InstanceScope.Instance> instancesB = instanceScope.getInstancesOfClass("B");
         Set<InstanceScope.Instance> instancesBParents = new HashSet<>();
         instancesBParents.add(null); // MY_PROGRAM
         instancesBParents.add(instanceA); // MY_A
-        Assert.assertEquals(instancesB.stream().map(b -> b.getParent()).collect(Collectors.toSet()),
+        Assert.assertEquals(instancesB.stream().map(InstanceScope.Instance::getParent).collect(Collectors.toSet()),
                 instancesBParents);
         // Instances of C
         List<InstanceScope.Instance> instancesC = instanceScope.getInstancesOfClass("C");
         Set<InstanceScope.Instance> instancesCParents = new HashSet<>(instancesB);
         instancesCParents.add(null);
-        Assert.assertEquals(instancesC.stream().map(c -> c.getParent()).collect(Collectors.toSet()),
+        Assert.assertEquals(instancesC.stream().map(InstanceScope.Instance::getParent).collect(Collectors.toSet()),
                 instancesCParents);
     }
 }

@@ -22,6 +22,7 @@
 
 package edu.kit.iti.formal.automation.stoo.trans;
 
+import edu.kit.iti.formal.automation.oo.OOUtils;
 import edu.kit.iti.formal.automation.st.util.Tuple;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
@@ -52,11 +53,11 @@ public class Inheritance extends STOOTransformation {
      * value (null, -1).
      */
     private static Tuple<ClassDeclaration, Integer> getInheritedFrom(@NotNull ClassDeclaration accessedVariableClass,
-                                                                    @NotNull String accessedField) {
+                                                                     @NotNull String accessedField) {
         ClassDeclaration parentClass = accessedVariableClass;
         int hierarchyLevel = 0;
         while (parentClass != null) {
-            if (parentClass.getScope().hasVariable(accessedField) || parentClass.hasMethod(accessedField))
+            if (parentClass.getScope().hasVariable(accessedField) || OOUtils.hasMethod(parentClass, accessedField))
                 break;
             parentClass = parentClass.getParentClass();
             hierarchyLevel++;
@@ -67,7 +68,7 @@ public class Inheritance extends STOOTransformation {
     }
 
     private static Tuple<ClassDeclaration, Integer> getInheritedFrom(@NotNull ClassDeclaration accessedVariableClass,
-                                                                    @NotNull SymbolicReference accessedField) {
+                                                                     @NotNull SymbolicReference accessedField) {
         return getInheritedFrom(accessedVariableClass, accessedField.getIdentifier());
     }
 
@@ -88,9 +89,9 @@ public class Inheritance extends STOOTransformation {
             if (!classDeclaration.hasParentClass())
                 continue;
             // Add/fix super accesses (inside class)
-            List<String> classFields = classDeclaration.getEffectiveScope().stream()
-                            .filter(v -> !classDeclaration.getScope().hasVariable(v.getName()))
-                            .map(VariableDeclaration::getName)
+            List<String> classFields = OOUtils.getEffectiveScope(classDeclaration).parallelStream()
+                    .filter(v -> !classDeclaration.getScope().hasVariable(v.getName()))
+                    .map(VariableDeclaration::getName)
                     .collect(Collectors.toList());
             for (String field : classFields) {
                 ClassDeclaration inheritedFromClass = getInheritedFromClass(classDeclaration, field);
@@ -108,7 +109,7 @@ public class Inheritance extends STOOTransformation {
      * to A (instead of B).
      */
     @RequiredArgsConstructor
-    private class SetSuperAccessEffectiveTypeVisitor extends AstVisitor {
+    private class SetSuperAccessEffectiveTypeVisitor extends AstVisitor<Object> {
         @NotNull
         private final ClassDeclaration theClass;
 
@@ -145,7 +146,7 @@ public class Inheritance extends STOOTransformation {
                 SymbolicReference superAccess = ReferenceToArrayAccess.buildGlobalArrayAccess(
                         new SymbolicReference(SELF_PARAMETER_NAME, new SymbolicReference(INSTANCE_ID_VAR_NAME)),
                         superClass);
-                superAccess.getSub().setSub(symbolicReference);
+                superAccess.setSub(symbolicReference);
                 return superAccess;
             }
             return super.visit(symbolicReference);

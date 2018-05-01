@@ -23,11 +23,13 @@
 package edu.kit.iti.formal.automation.datatypes;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author Augusto Modanese
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class AnyReference extends AnyDt {
     public static final AnyReference ANY_REF = new AnyReference();
 

@@ -48,22 +48,14 @@ import java.util.Map;
 public class FunctionBlockDeclaration extends ClassDeclaration implements Invocable {
     private StatementList stBody;
     private SFCImplementation sfcBody;
-    private String name;
     private Map<String, ActionDeclaration> actions = new LinkedHashMap<>();
 
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getIdentifier() {
-        return getName();
-    }
-
     public AnyDt getReturnType() {
+        // TODO replace with DataTypes.VOID?
         return null;  // no return value when invoking function blocks
     }
 
@@ -83,7 +75,7 @@ public class FunctionBlockDeclaration extends ClassDeclaration implements Invoca
         fb.setFinal_(isFinal_());
         fb.setAbstract_(isAbstract_());
         fb.setParent(getParent().getIdentifier());
-        getInterfaces().forEach(i -> fb.addImplements(i.getIdentifier()));
+        getInterfaces().forEach(i -> fb.addExtendsOrImplements(i.getIdentifier()));
         getMethods().forEach(m -> fb.getMethods().add(m.copy()));
 
         return fb;

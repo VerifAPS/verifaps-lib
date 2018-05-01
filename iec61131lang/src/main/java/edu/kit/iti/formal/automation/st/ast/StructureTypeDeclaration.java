@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.VariableScope;
 import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.RecordType;
 import edu.kit.iti.formal.automation.scope.Scope;
@@ -45,7 +44,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class StructureTypeDeclaration extends TypeDeclaration<StructureInitialization> {
-    @NotNull VariableScope fields = new VariableScope();
+    @NotNull Scope fields = new Scope();
 
     public StructureTypeDeclaration(@NotNull String typeName, @NotNull List<VariableDeclaration> fields) {
         super(typeName);
@@ -67,7 +66,7 @@ public class StructureTypeDeclaration extends TypeDeclaration<StructureInitializ
     @Override
     public AnyDt getDataType(@NotNull Scope globalScope) {
         RecordType rt = new RecordType(getTypeName(), this);
-        for (VariableDeclaration s : fields.values())
+        for (VariableDeclaration s : fields.getVariables().values())
             rt.addField(s.getName(), s.getTypeDeclaration().getDataType(globalScope));
         setBaseType(rt);
         return rt;
@@ -79,7 +78,7 @@ public class StructureTypeDeclaration extends TypeDeclaration<StructureInitializ
         StructureTypeDeclaration t = new StructureTypeDeclaration();
         t.setRuleContext(getRuleContext());
         t.initialization = Utils.copyNull(initialization);
-        fields.forEach((k, v) -> t.fields.put(k, v.copy()));
+        fields.getVariables().forEach((k, v) -> t.fields.getVariables().put(k, v.copy()));
         t.typeName = typeName;
         t.baseType = baseType;
         t.baseTypeName = baseTypeName;
@@ -90,7 +89,7 @@ public class StructureTypeDeclaration extends TypeDeclaration<StructureInitializ
         VariableDeclaration vd = new VariableDeclaration();
         vd.setName(text);
         vd.setTypeDeclaration(accept);
-        fields.put(text, vd);
+        fields.getVariables().put(text, vd);
         return vd;
     }
 }

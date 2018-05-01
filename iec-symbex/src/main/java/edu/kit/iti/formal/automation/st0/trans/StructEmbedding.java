@@ -28,6 +28,7 @@ import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.st0.STSimplifier;
+import edu.kit.iti.formal.automation.visitors.Visitable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -52,25 +53,25 @@ public class StructEmbedding implements ST0Transformation {
         process(state.theProgram);
     }
 
-    private void process(@NotNull Collection<? extends TopLevelElement> topLevelElements) {
-        topLevelElements.forEach(this::process);
+    private void process(@NotNull Collection<? extends Visitable> visitables) {
+        visitables.forEach(this::process);
     }
 
-    private void process(@NotNull TopLevelElement topLevelElement) {
+    private void process(@NotNull Visitable visitable) {
         StructEmbeddingVisitor structEmbeddingVisitor = new StructEmbeddingVisitor();
-        topLevelElement.accept(structEmbeddingVisitor);
-        for (Visitor renameVisitor : structEmbeddingVisitor.renameVisitors) {
+        visitable.accept(structEmbeddingVisitor);
+        for (Visitor<Object> renameVisitor : structEmbeddingVisitor.renameVisitors) {
             state.functions.values().forEach(f -> f.accept(renameVisitor));
             state.theProgram.accept(renameVisitor);
         }
     }
 
-    private static class StructEmbeddingVisitor extends AstVisitor {
-        final List<Visitor> renameVisitors = new ArrayList<>();
+    private static class StructEmbeddingVisitor extends AstVisitor<Object> {
+        final List<Visitor<Object>> renameVisitors = new ArrayList<>();
 
         @Override
         public Object visit(@NotNull Scope localScope) {
-            for (VariableDeclaration v : new ArrayList<>(localScope.stream()
+            for (VariableDeclaration v : new ArrayList<>(localScope.parallelStream()
                     .filter(v -> v.getDataType() instanceof RecordType)
                     .collect(Collectors.toList()))) {
                 RecordType struct = (RecordType) v.getDataType();
@@ -82,18 +83,21 @@ public class StructEmbedding implements ST0Transformation {
         }
 
         @NotNull
-        private VariableDeclaration createStructVariable(@NotNull RecordType.Field field,
+        private VariableDeclaration createStructVariable(@NotNull VariableDeclaration field,
                                                          @NotNull VariableDeclaration structVariable) {
             StructureInitialization initialization =
                     (StructureInitialization) structVariable.getTypeDeclaration().getInitialization();
             VariableDeclaration newVariable =
                     new VariableDeclaration(structVariable.getName() + "$" + field.getName(),
-                            structVariable.getType(),
+                            structVariable.getType() | field.getType(),
                             field.getDataType());
             newVariable.getTypeDeclaration().setBaseType(field.getDataType());
             newVariable.getTypeDeclaration().setBaseTypeName(field.getDataType().getName());
             if (initialization != null)
                 newVariable.getTypeDeclaration().setInitialization(initialization.getInitValues().get(field.getName()));
+            else
+                newVariable.setInit(field.getInit());
+            newVariable.setParent(structVariable.getParent());
             return newVariable;
         }
     }
@@ -114,7 +118,7 @@ public class StructEmbedding implements ST0Transformation {
                     if (symbolicReference.getIdentifier().equals(structName) && !symbolicReference.hasSub()) {
                         // Found structure being passed as parameter
                         invocation.getParameters().remove(parameter);
-                        for (RecordType.Field field : structType.getFields())
+                        for (VariableDeclaration field : structType.getFields())
                             invocation.addParameter(new Invocation.Parameter(
                                     parameter.getName() != null
                                             ? parameter.getName() + "$" + field.getName()
