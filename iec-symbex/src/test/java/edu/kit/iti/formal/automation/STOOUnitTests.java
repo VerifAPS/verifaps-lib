@@ -23,9 +23,10 @@
 package edu.kit.iti.formal.automation;
 
 import com.google.common.base.CaseFormat;
+import edu.kit.iti.formal.automation.oo.OOIEC61131Facade;
 import edu.kit.iti.formal.automation.scope.Scope;
+import edu.kit.iti.formal.automation.scope.EffectiveSubtypeScope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
-import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
@@ -43,6 +44,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -52,33 +54,36 @@ import java.util.stream.Collectors;
 public class STOOUnitTests {
     private static final String RESOURCES_PATH = "edu/kit/iti/formal/automation/st/stoo/unit";
 
-    public static File[] getSTFiles(String folder) {
+    @Parameterized.Parameter
+    public Class<? extends STOOTransformation> stooTransformation;
+
+    @Parameterized.Parameter(1)
+    public File file;
+
+    private static File[] getSTFiles(String folder) {
         URL f = STOOUnitTests.class.getClassLoader().getResource(folder);
         if (f == null) {
             System.err.format("Could not find %s%n", folder);
             return new File[0];
         }
         File file = new File(f.getFile());
-        return Arrays.stream(file.listFiles()).filter(s -> !s.getName().contains(".stoo")).toArray(File[]::new);
+        return Arrays.stream(Objects.requireNonNull(file.listFiles()))
+                .filter(s -> !s.getName().contains(".stoo")).toArray(File[]::new);
     }
 
-    public static STOOSimplifier.State processSTFile(File f) throws IOException {
+    private static STOOSimplifier.State processSTFile(File f) throws IOException {
         TopLevelElements topLevelElements =  IEC61131Facade.file(f);
         Scope globalScope = IEC61131Facade.resolveDataTypes(topLevelElements);
-        TopLevelElement program = topLevelElements.stream()
-                .filter(tle -> tle instanceof ProgramDeclaration)
-                .findAny().get();
-        InstanceScope instanceScope = IEC61131Facade.findInstances(program, globalScope);
-        IEC61131Facade.findEffectiveSubtypes(topLevelElements, globalScope, instanceScope);
-        return new STOOSimplifier.State(program, topLevelElements, globalScope, instanceScope);
+        TopLevelElement program = edu.kit.iti.formal.automation.visitors.Utils.findProgram(topLevelElements);
+        InstanceScope instanceScope = OOIEC61131Facade.findInstances(program, globalScope);
+        EffectiveSubtypeScope effectiveSubtypeScope =
+            OOIEC61131Facade.findEffectiveSubtypes(topLevelElements, globalScope, instanceScope);
+        return new STOOSimplifier.State(program, topLevelElements, globalScope, instanceScope, effectiveSubtypeScope);
     }
 
     private static STOOSimplifier.State processSTFile(Path path) throws IOException {
         return processSTFile(path.toFile());
     }
-
-    @Parameterized.Parameter
-    public Class<? extends STOOTransformation> stooTransformation;
 
     @Parameterized.Parameters
     public static List<Object[]> stooTransformations() {
@@ -88,9 +93,6 @@ public class STOOUnitTests {
                         .map(f -> new Object[] {t, f}))
                 .collect(Collectors.toList());
     }
-
-    @Parameterized.Parameter(1)
-    public File file;
 
     @Test
     public void testSTOOTransformation() throws IOException, IllegalAccessException, InstantiationException {

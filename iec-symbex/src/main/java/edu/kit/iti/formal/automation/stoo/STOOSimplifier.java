@@ -22,6 +22,9 @@
 
 package edu.kit.iti.formal.automation.stoo;
 
+import edu.kit.iti.formal.automation.scope.EffectiveSubtypeScope;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import edu.kit.iti.formal.automation.st.util.Tuple;
 import com.google.common.collect.ImmutableList;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.scope.Scope;
@@ -30,12 +33,12 @@ import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.stoo.trans.*;
-import javafx.util.Pair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -56,8 +59,8 @@ public class STOOSimplifier {
     private final State state;
 
     public STOOSimplifier(TopLevelElement astRoot, TopLevelElements topLevelElements, Scope globalScope,
-                          InstanceScope instanceScope) {
-        state = new State(astRoot, topLevelElements, globalScope, instanceScope);
+                          InstanceScope instanceScope, EffectiveSubtypeScope effectiveSubtypeScope) {
+        state = new State(astRoot, topLevelElements, globalScope, instanceScope, effectiveSubtypeScope);
     }
 
     public void simplify() {
@@ -78,17 +81,32 @@ public class STOOSimplifier {
         private final TopLevelElement topLevelElement;
 
         private final TopLevelElements topLevelElements;
-        private final Scope scope;
+
+        private final Scope globalScope;
         private final InstanceScope instanceScope;
+        private final EffectiveSubtypeScope effectiveSubtypeScope;
         private final List<InstanceScope.Instance> instances;
 
         public State(TopLevelElement topLevelElement, TopLevelElements topLevelElements, Scope globalScope,
-                     InstanceScope instanceScope) {
-            this(topLevelElement, topLevelElements, globalScope, instanceScope, instanceScope.getAllInstances());
+                     InstanceScope instanceScope, EffectiveSubtypeScope effectiveSubtypeScope) {
+            this(topLevelElement, topLevelElements, globalScope, instanceScope, effectiveSubtypeScope,
+                    instanceScope.getAllInstances());
         }
 
         public int getInstanceID(InstanceScope.Instance instance) {
             return instances.indexOf(instance);
+        }
+
+        public Scope getGlobalScope() {
+            return globalScope;
+        }
+
+        /**
+         * @deprecated use {@link #getGlobalScope()} instead
+         */
+        @Deprecated
+        public Scope getScope() {
+            return getGlobalScope();
         }
 
         /**
@@ -96,8 +114,8 @@ public class STOOSimplifier {
          * @param polymorph Whether to include instances of subclasses as well.
          * @return The list of ranges of IDs the instances of clazz are in.
          */
-        public List<Pair<Integer, Integer>> getInstanceIDRangesToClass(ClassDeclaration clazz, boolean polymorph) {
-            List<Pair<Integer, Integer>> idRanges = new ArrayList<>();
+        public List<Tuple<Integer, Integer>> getInstanceIDRangesToClass(ClassDeclaration clazz, boolean polymorph) {
+            List<Tuple<Integer, Integer>> idRanges = new ArrayList<>();
             List<InstanceScope.Instance> instances = polymorph
                     ? instanceScope.getPolymorphInstancesOfClass(clazz)
                     : instanceScope.getInstancesOfClass(clazz);
@@ -108,25 +126,29 @@ public class STOOSimplifier {
             int lower = instanceIDs.get(0);
             for (int i = 0; i <= instanceIDs.size(); i++)
                 if (i == instanceIDs.size() || instanceIDs.get(i) - lower > i) {
-                    idRanges.add(new Pair<>(lower, lower + i - instanceIDs.indexOf(lower) - 1));
+                    idRanges.add(new Tuple<>(lower, lower + i - instanceIDs.indexOf(lower) - 1));
                     if (i < instanceIDs.size())
                         lower = instanceIDs.get(i);
                 }
             return idRanges;
         }
 
-        public List<Pair<Integer, Integer>> getInstanceIDRangesToClass(ClassDataType clazz, boolean polymorph) {
+        public List<Tuple<Integer, Integer>> getInstanceIDRangesToClass(ClassDataType clazz, boolean polymorph) {
             return getInstanceIDRangesToClass(clazz.getClazz(), polymorph);
         }
 
-        public List<Pair<Integer, Integer>> getInstanceIDRangesToClass(ClassDeclaration clazz) {
+        public List<Tuple<Integer, Integer>> getInstanceIDRangesToClass(ClassDeclaration clazz) {
             // polymorph = true is the default
             return getInstanceIDRangesToClass(clazz, true);
         }
 
-        public List<Pair<Integer, Integer>> getInstanceIDRangesToClass(ClassDataType clazz) {
+        public List<Tuple<Integer, Integer>> getInstanceIDRangesToClass(ClassDataType clazz) {
             // polymorph = true is the default
             return getInstanceIDRangesToClass(clazz.getClazz(), true);
+        }
+
+        public Set<InstanceScope.Instance> getInstancesOfVariable(VariableDeclaration variable) {
+            return instanceScope.getInstances(variable);
         }
     }
 }

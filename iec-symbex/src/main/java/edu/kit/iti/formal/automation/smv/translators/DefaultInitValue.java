@@ -23,12 +23,9 @@ package edu.kit.iti.formal.automation.smv.translators;
  */
 
 import edu.kit.iti.formal.automation.datatypes.*;
-import edu.kit.iti.formal.automation.datatypes.values.Bits;
-import edu.kit.iti.formal.automation.datatypes.values.Value;
-import edu.kit.iti.formal.automation.datatypes.values.Values;
-import edu.kit.iti.formal.automation.st.ast.Literal;
+import edu.kit.iti.formal.automation.datatypes.values.*;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -40,8 +37,8 @@ public class DefaultInitValue implements InitValueTranslator {
     public static final DefaultInitValue INSTANCE = new DefaultInitValue();
     private static final DataTypeVisitor<Value> VISITOR = new InitValueVisitor();
 
-    @Nonnull
-    public Value getInit(@Nonnull AnyDt type) {
+    @NotNull
+    public Value getInit(@NotNull AnyDt type) {
         return type.accept(VISITOR);
     }
 
@@ -74,6 +71,11 @@ public class DefaultInitValue implements InitValueTranslator {
         public Value visit(RangeType rangeType) {
             // TODO use type's initialization value, if it exists
             return visit(rangeType.getBase());
+        }
+
+        @Override
+        public Value visit(TimeType timeType) {
+            return new Values.VTime(TimeType.TIME_TYPE, new TimeValue());
         }
     }
 }

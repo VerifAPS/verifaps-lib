@@ -22,9 +22,12 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.TypeDeclaration;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,12 +42,15 @@ import java.util.List;
  * @version $Id: $Id
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class RecordType extends AnyDt {
     private String name;
+
     @NotNull
-    private List<Field> fields = new ArrayList<>();
+    private Scope fields = new Scope();
+
     /**
      * The declaration associated with the type.
      */
@@ -61,22 +67,13 @@ public class RecordType extends AnyDt {
     }
 
     /**
-     * <p>Getter for the field <code>fields</code>.</p>
-     *
-     * @return a {@link java.util.List} object.
-     */
-    public List<Field> getFields() {
-        return fields;
-    }
-
-    /**
      * <p>addField.</p>
      *
      * @param name a {@link java.lang.String} object.
      * @param dataType a {@link edu.kit.iti.formal.automation.datatypes.AnyDt} object.
      */
     public void addField(@NotNull String name, @NotNull AnyDt dataType) {
-        fields.add(new Field(name, dataType));
+        fields.add(new VariableDeclaration(name, dataType));
     }
 
     /** {@inheritDoc} */
@@ -94,12 +91,13 @@ public class RecordType extends AnyDt {
         return visitor.visit(this);
     }
 
+    @Deprecated
     public class Field {
         private String name;
         private AnyDt dataType;
         private Object defValue;
 
-        public Field(@NotNull String name, @NotNull AnyDt dataType) {
+        Field(@NotNull String name, @NotNull AnyDt dataType) {
             this.name = name;
             this.dataType = dataType;
         }

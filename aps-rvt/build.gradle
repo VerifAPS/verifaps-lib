@@ -1,0 +1,13 @@
+description = ''
+dependencies {
+    compile project(':iec61131lang')
+    compile project(':smv-model')
+    compile project(':iec-xml')
+    compile project(':iec-symbex')
+    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.2.12'
+    compile group: 'com.xenomachina', name: 'kotlin-argparser', version: '2.0.4'
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.2.21'
+ //   compile group: 'no.tornado', name: 'tornadofx', version: '1.7.14'
+    compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.5.3'
+    testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit', version: '1.2.21'
+}

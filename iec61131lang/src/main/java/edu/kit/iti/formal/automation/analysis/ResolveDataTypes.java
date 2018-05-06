@@ -33,28 +33,23 @@ import lombok.val;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
- * ResolveDataTypes searches and set the data type attributes based on the given global scope.
+ * Search and set the data type attributes based on the given global scope.
  *
- * @author Alexander Weigl
+ * @author Alexander Weigl, Augusto Modanese
  * @version 1
  * @since 25.11.16
  */
 public class ResolveDataTypes extends AstVisitor<Object> {
     private final Scope globalScope;
-    private Scope localScope;
 
     public ResolveDataTypes(Scope globalScope) {
         this.globalScope = globalScope;
     }
 
-    private AnyDt resolve(String name) {
-        return localScope.resolveDataType(name);
-    }
-
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
-        programDeclaration.getScope().setParent(globalScope);
-        return super.visit(programDeclaration);
+        super.visit(programDeclaration);
+        return null;
     }
 
     /**
@@ -62,57 +57,30 @@ public class ResolveDataTypes extends AstVisitor<Object> {
      */
     @Override
     public Object visit(FunctionDeclaration functionDeclaration) {
-        functionDeclaration.getScope().setParent(globalScope);
+        super.visit(functionDeclaration);
         functionDeclaration.setReturnType(
-                resolve(functionDeclaration.getReturnTypeName()));
-        return super.visit(functionDeclaration);
-    }
-
-    @Override
-    public Object visit(MethodDeclaration methodDeclaration) {
-        methodDeclaration.getScope().setParent(localScope);
-        methodDeclaration.setReturnType(resolve(methodDeclaration.getReturnTypeName()));
-        return super.visit(methodDeclaration);
-    }
-
-    @Override
-    public Object visit(Scope localScope) {
-        this.localScope = localScope;
-        localScope.getVariables().values().forEach(vd -> {
-            vd.setDataType(resolve(vd.getDataTypeName()));
-            if(vd.getInit()!=null){
-                vd.getInit().accept(this);
-            }
-        });
+                currentScope.resolveDataType(functionDeclaration.getReturnTypeName()));
         return null;
     }
 
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        functionBlockDeclaration.getScope().setParent(globalScope);
+        visit((ClassDeclaration) functionBlockDeclaration);
         return super.visit(functionBlockDeclaration);
     }
 
-    public <T extends ParserRuleContext> void visitClassifier(Classifier<T> c) {
-        val seq = c.getInterfaces();
-        seq.forEach(face ->
-                face.setIdentifiedObject(c.getScope().resolveInterface(face.getIdentifier())));
-    }
-
     @Override
-    public Object visit(ClassDeclaration classDeclaration) {
-        if (classDeclaration.getParentName() != null) {
-            classDeclaration.getParent().setIdentifiedObject(
-                    classDeclaration.getScope().resolveClass(classDeclaration.getParentName()));
-        }
-        visitClassifier(classDeclaration);
-        return super.visit(classDeclaration);
-    }
+    public Object visit(Scope localScope) {
+        currentScope = localScope;
+        currentScope.setParent(globalScope);
 
-    @Override
-    public Object visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
-        globalVariableListDeclaration.getScope().setParent(globalScope);
-        return super.visit(globalVariableListDeclaration);
+        localScope.getVariables().values().forEach(vd -> {
+            vd.setDataType(currentScope.resolveDataType(vd.getDataTypeName()));
+            if (vd.getInit() != null) {
+                vd.getInit().accept(this);
+            }
+        });
+        return null;
     }
 
     @Override
@@ -124,37 +92,70 @@ public class ResolveDataTypes extends AstVisitor<Object> {
     }
 
     @Override
-    public Object visit(ArrayTypeDeclaration arrayTypeDeclaration) {
-        arrayTypeDeclaration.setBaseType(globalScope.resolveDataType(arrayTypeDeclaration.getTypeName()));
-        return super.visit(arrayTypeDeclaration);
-    }
-
-    @Override
-    public Object visit(Literal literal) {
-        try {
-            EnumerateType enumType = (EnumerateType) localScope.resolveDataType(literal.getDataTypeName());
-            literal.setDataType(enumType);
-        } catch (ClassCastException | DataTypeNotDefinedException e) {
+    public Object visit(ClassDeclaration classDeclaration) {
+        if (classDeclaration.getParent().getIdentifier() != null) {
+            classDeclaration.getParent().setIdentifiedObject(
+                    classDeclaration.getScope().resolveClass(classDeclaration.getParent().getIdentifier()));
+            assert classDeclaration.getParentClass() != null;
         }
-        return null;
-    }
-
-    @Override
-    public Object visit(SymbolicReference ref) {
-        String first = ref.getIdentifier();
-        try {
-            AnyDt dataType = localScope.resolveDataType(first);
-            EnumerateType et = (EnumerateType) dataType;
-            String second = ((SymbolicReference) ref.getSub()).getIdentifier();
-        } catch (ClassCastException | DataTypeNotDefinedException e) {
-
-        }
-        return null;
+        visitClassifier(classDeclaration);
+        return super.visit(classDeclaration);
     }
 
     @Override
     public Object visit(InterfaceDeclaration interfaceDeclaration) {
         visitClassifier(interfaceDeclaration);
         return super.visit(interfaceDeclaration);
+    }
+
+    @Override
+    public Object visit(MethodDeclaration methodDeclaration) {
+        super.visit(methodDeclaration);
+        methodDeclaration.setReturnType(currentScope.resolveDataType(methodDeclaration.getReturnTypeName()));
+        return null;
+    }
+
+    @Override
+    public Object visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
+        globalVariableListDeclaration.getScope().setParent(globalScope);
+        return super.visit(globalVariableListDeclaration);
+    }
+
+    @Override
+    public Object visit(ArrayTypeDeclaration arrayTypeDeclaration) {
+        arrayTypeDeclaration.setBaseType(globalScope.resolveDataType(arrayTypeDeclaration.getTypeName()));
+        return super.visit(arrayTypeDeclaration);
+    }
+
+    @Override
+    public Object visit(SymbolicReference ref) {
+        String first = ref.getIdentifier();
+        try {
+            AnyDt dataType = currentScope.resolveDataType(first);
+            EnumerateType et = (EnumerateType) dataType;
+            ref.setDataType(et);
+            if (ref.getSub() != null) {
+                String second = ((SymbolicReference) ref.getSub()).getIdentifier();
+                // TODO...?
+            }
+        } catch (ClassCastException | DataTypeNotDefinedException e) {
+
+        }
+        return null;
+    }
+
+    @Override
+    public Object visit(Literal literal) {
+        try {
+            literal.setDataType(currentScope.resolveDataType(literal.getDataTypeName()));
+        } catch (ClassCastException | DataTypeNotDefinedException e) {
+        }
+        return null;
+    }
+
+    private <T extends ParserRuleContext> void visitClassifier(Classifier<T> c) {
+        val seq = c.getInterfaces();
+        seq.forEach(face ->
+                face.setIdentifiedObject(c.getScope().resolveInterface(face.getIdentifier())));
     }
 }

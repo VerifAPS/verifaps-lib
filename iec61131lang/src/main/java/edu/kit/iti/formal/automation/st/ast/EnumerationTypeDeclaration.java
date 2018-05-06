@@ -29,6 +29,7 @@ import edu.kit.iti.formal.automation.datatypes.values.Values;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.antlr.v4.runtime.Token;
 
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
  */
 @EqualsAndHashCode
 public class EnumerationTypeDeclaration extends TypeDeclaration<Literal> {
+    @Getter
     private List<Token> allowedValues = new LinkedList<>();
     private List<Integer> values = new ArrayList<>();
     private Integer counter = 0;
@@ -67,14 +69,6 @@ public class EnumerationTypeDeclaration extends TypeDeclaration<Literal> {
         allowedValues.add(text);
         values.add(counter);
         counter += 1;
-    }
-
-    public List<Token> getAllowedValues() {
-        return allowedValues;
-    }
-
-    public void setAllowedValues(List<Token> allowedValues) {
-        this.allowedValues = allowedValues;
     }
 
     @Override

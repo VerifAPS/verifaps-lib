@@ -22,6 +22,7 @@
 
 package edu.kit.iti.formal.automation.stoo.trans;
 
+import edu.kit.iti.formal.automation.st.util.Tuple;
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.scope.Scope;
@@ -29,7 +30,7 @@ import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
 import edu.kit.iti.formal.automation.visitors.Utils;
-import javafx.util.Pair;
+
 import lombok.AllArgsConstructor;
 
 import java.util.Comparator;
@@ -48,6 +49,7 @@ public class GlobalInstances extends STOOTransformation {
         // Add GVL if none
         if (state.getTopLevelElements().stream().noneMatch(tle -> tle instanceof GlobalVariableListDeclaration)) {
             GlobalVariableListDeclaration gvl = new GlobalVariableListDeclaration();
+            gvl.setScope(state.getGlobalScope());
             // Add right before program; that's the safest spot to prevent undefined types and other issues
             state.getTopLevelElements().add(
                     state.getTopLevelElements().indexOf(Utils.findProgram(state.getTopLevelElements())),
@@ -66,13 +68,13 @@ public class GlobalInstances extends STOOTransformation {
         state.getScope().registerType(instanceIDType);
         // Add global instance arrays
         Scope gvl = state.getScope().getTopLevel();
-        for (ClassDeclaration classDeclaration : state.getScope().getClasses()) {
+        for (ClassDeclaration classDeclaration : state.getScope().getClasses().values()) {
             if (state.getInstanceScope().getPolymorphInstancesOfClass(classDeclaration).size() == 0)
                 continue;  // ignore if no instances present
             // Set array type declaration
             ArrayTypeDeclaration instanceArray = new ArrayTypeDeclaration();
-            for (Pair<Integer, Integer> range : state.getInstanceIDRangesToClass(classDeclaration))
-                instanceArray.addSubRange(new Range(range.getKey(), range.getValue()));
+            for (Tuple<Integer, Integer> range : state.getInstanceIDRangesToClass(classDeclaration))
+                instanceArray.addSubRange(new Range(range.a, range.b));
             instanceArray.setBaseType(state.getScope().resolveDataType(classDeclaration.getName()));
             // Set instances initializations in the array's initializations
             ArrayInitialization arrayInitialization = new ArrayInitialization();
@@ -95,10 +97,10 @@ public class GlobalInstances extends STOOTransformation {
                                 || v.getDataType() instanceof ReferenceType
                                 || v.getDataType() instanceof InterfaceDataType)
                         .collect(Collectors.toList())) {
-                    Optional<InstanceScope.Instance> parentInstance = variable.getInstances().stream()
+                    Optional<InstanceScope.Instance> parentInstance = state.getInstancesOfVariable(variable).stream()
                             .filter(i -> i.getParent().equals(instance)).findAny();
                     parentInstance.ifPresent(i -> instanceInitialization.addField(variable.getName(),
-                            new Literal(instanceIDType.getDataType(state.getScope()),
+                            new Literal(instanceIDType.getDataType(state.getGlobalScope()),
                                     Integer.toString(state.getInstanceID(i)))));
                 }
                 arrayInitialization.add(instanceInitialization);
@@ -118,7 +120,7 @@ public class GlobalInstances extends STOOTransformation {
     }
 
     @AllArgsConstructor
-    private static class AddInstanceIDVisitor extends AstVisitor {
+    private static class AddInstanceIDVisitor extends AstVisitor<Object> {
         private final AnyDt instanceIDType;
 
         @Override
@@ -130,6 +132,7 @@ public class GlobalInstances extends STOOTransformation {
             instanceID.setTypeDeclaration(new SimpleTypeDeclaration());
             instanceID.setDataType(instanceIDType);
             instanceID.setInit(new Literal(instanceIDType, Integer.toString(NULL_REFERENCE_ID)));
+            instanceID.setParent(clazz);
             clazz.getScope().add(instanceID);
             return super.visit(clazz);
         }

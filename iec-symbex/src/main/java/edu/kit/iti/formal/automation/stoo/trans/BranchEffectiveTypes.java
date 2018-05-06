@@ -22,6 +22,8 @@
 
 package edu.kit.iti.formal.automation.stoo.trans;
 
+import edu.kit.iti.formal.automation.st.Identifiable;
+import edu.kit.iti.formal.automation.st.util.Tuple;
 import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.datatypes.InterfaceDataType;
@@ -33,8 +35,8 @@ import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.SortedList;
-import javafx.util.Pair;
 import lombok.Getter;
+import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,8 +45,8 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Create branches in statements so an instance access always returns a predictable type.
- * Depends heavily on instance IDs.
+ * Create branches in statements so an instance access always returns a predictable (static) type.
+ * Depends on instance IDs.
  *
  * @author Augusto Modanese
  */
@@ -60,7 +62,7 @@ public class BranchEffectiveTypes extends STOOTransformation {
      * whose effective data type has not been set.
      */
     @Getter
-    private static class FindDeferredInstanceReferenceVisitor extends AstVisitor {
+    private static class FindDeferredInstanceReferenceVisitor extends AstVisitor<Object> {
         /**
          * The instance reference, if we find it.
          */
@@ -116,7 +118,7 @@ public class BranchEffectiveTypes extends STOOTransformation {
      * Visit statements and set the effective type (i.e., identified object) of the given reference to the given object.
      */
     @Getter
-    private static class SetEffectiveTypeToReferenceVisitor extends AstVisitor {
+    private static class SetEffectiveTypeToReferenceVisitor extends AstVisitor<Object> {
         /**
          * The reference whose effective type we want to set.
          */
@@ -175,6 +177,7 @@ public class BranchEffectiveTypes extends STOOTransformation {
                     = new FindDeferredInstanceReferenceVisitor();
             statement.accept(findDeferredInstanceReferenceVisitor);
             while (findDeferredInstanceReferenceVisitor.found()) {
+                assert findDeferredInstanceReferenceVisitor.getDeferredInstanceReference() != null;
                 statement = createIfStatement(statement,
                         findDeferredInstanceReferenceVisitor.getDeferredInstanceReference());
                 // Perform search once more
@@ -198,10 +201,22 @@ public class BranchEffectiveTypes extends STOOTransformation {
                                 (StatementList) guardedStatement.getStatements().accept(this));
                     newIfStatement.setElseBranch((StatementList) ifStatement.getElseBranch().accept(this));
                     statement = newIfStatement;
-                } else if (statement instanceof GuardedStatement) {
+                }
+                else if (statement instanceof CaseStatement) {
+                    CaseStatement caseStatement = (CaseStatement) statement;
+                    CaseStatement newCaseStatement = new CaseStatement();
+                    newCaseStatement.setExpression(caseStatement.getExpression());
+                    for (CaseStatement.Case c : caseStatement.getCases())
+                        newCaseStatement.addCase(new CaseStatement.Case(
+                                c.getConditions(), (StatementList) c.getStatements().accept(this)
+                        ));
+                    newCaseStatement.setElseCase((StatementList) caseStatement.getElseCase().accept(this));
+                    statement = newCaseStatement;
+                }
+                else if (statement instanceof GuardedStatement) {
                     GuardedStatement guardedStatement = (GuardedStatement) statement;
                     guardedStatement.setStatements((StatementList) guardedStatement.getStatements().accept(this));
-                    statement = guardedStatement;
+                    // statement = guardedStatement;
                 }
                 statementList.add((Statement) visit(statement));
             }
@@ -219,30 +234,59 @@ public class BranchEffectiveTypes extends STOOTransformation {
         private Statement createIfStatement(@NotNull Statement originalStatement,
                                             @NotNull SymbolicReference deferredTypeReference) {
             IfStatement branch = new IfStatement();
+            // Find variable
+            Identifiable parent = currentTopLevelScopeElement;
+            SymbolicReference reference = deferredTypeReference;
+            while (reference.hasSub() && reference.getDerefCount() == 0) {
+                parent = reference.getIdentifiedObject();
+                if (parent instanceof VariableDeclaration
+                    && ((VariableDeclaration) parent).getDataType() instanceof ClassDataType)
+                    parent = ((ClassDataType) ((VariableDeclaration) parent).getDataType()).getClazz();
+                reference = reference.getSub();
+            }
+            assert reference.getIdentifiedObject() instanceof VariableDeclaration;
+            assert parent instanceof TopLevelScopeElement;
             // Add branches based on the instance reference we found
-            Set<AnyDt> effectiveTypes = deferredTypeReference.toVariable().getEffectiveDataTypes();
-            if (effectiveTypes.size() > 1)
+            Set<AnyDt> effectiveTypes =
+                    state.getEffectiveSubtypeScope().getTypes((VariableDeclaration) reference.getIdentifiedObject());
+            // Keep statements intact we case we don't find any reference to an instance
+            // or when everything stays the same (see below)
+            boolean allBlocksEqual = true;  // true until false
+            StatementList lastBlock = null;
+            if (effectiveTypes.size() > 1 && !((VariableDeclaration) reference.getIdentifiedObject()).isConstant())
                 for (AnyDt effectiveType : new SortedList<>(FXCollections.observableArrayList(effectiveTypes))) {
                     StatementList block = new StatementList(originalStatement.copy());
                     //block.add(0, new CommentStatement(deferredTypeReference + " : " + effectiveType.getName()));
                     SetEffectiveTypeToReferenceVisitor setEffectiveTypeVisitor =
                             new SetEffectiveTypeToReferenceVisitor(deferredTypeReference, effectiveType);
                     block.accept(setEffectiveTypeVisitor);
-                    for (Pair<Integer, Integer> instanceIDRange
+                    for (Tuple<Integer, Integer> instanceIDRange
                             : state.getInstanceIDRangesToClass((ClassDataType) effectiveType, false)) {
                         Expression guard = instanceIDInRangeGuard(deferredTypeReference, instanceIDRange);
                         guard.accept(setEffectiveTypeVisitor);
                         branch.addGuardedCommand(guard, block);
+                        if (allBlocksEqual) {
+                            if (lastBlock != null)
+                                allBlocksEqual = CollectionUtils.isEqualCollection(block, lastBlock);
+                            lastBlock = block;
+                        }
                     }
                 }
-            else
-                originalStatement.accept(new SetEffectiveTypeToReferenceVisitor(deferredTypeReference,
-                        effectiveTypes.stream().findAny().get()));
+            else {
+                assert !((VariableDeclaration) reference.getIdentifiedObject()).isConstant()
+                        || effectiveTypes.size() == 1;
+                Optional o = effectiveTypes.stream().findAny();
+                assert o.isPresent();
+                originalStatement.accept(new SetEffectiveTypeToReferenceVisitor(deferredTypeReference, (AnyDt) o.get()));
+            }
+            // Everything stays the same?
             if (branch.getConditionalBranches().isEmpty())
-                // Keep statements intact we case we don't find any reference to an instance
                 return originalStatement;
-            else
-                return branch;
+            if (allBlocksEqual) {
+                assert branch.getConditionalBranches().get(0).getStatements().size() == 1;
+                return branch.getConditionalBranches().get(0).getStatements().get(0);
+            }
+            return branch;
         }
 
         /**
@@ -252,19 +296,19 @@ public class BranchEffectiveTypes extends STOOTransformation {
          * in the range defined by instanceIDRange.
          */
         private Expression instanceIDInRangeGuard(@NotNull SymbolicReference instanceReference,
-                                                  @NotNull Pair<Integer, Integer> instanceIDRange) {
+                                                  @NotNull Tuple<Integer, Integer> instanceIDRange) {
             SymbolicReference instanceIDReference = instanceReference.copy();
             List<SymbolicReference> instanceIDReferenceList = instanceIDReference.asList();
             instanceIDReferenceList.get(instanceIDReferenceList.size() - 1).setSub(
                     new SymbolicReference(INSTANCE_ID_VAR_NAME));
             // _INSTANCE_ID >= instanceIDRange(lower) AND _INSTANCE_ID <= instanceIDRange(upper)
-            AnyDt instanceIDType = state.getScope().resolveDataType(
+            AnyDt instanceIDType = state.getGlobalScope().resolveDataType(
                     INSTANCE_ID_VAR_NAME + INSTANCE_ID_TYPE_SUFFIX);
             return BinaryExpression.andExpression(
                     BinaryExpression.greaterEqualsExpression(instanceIDReference,
-                            new Literal(instanceIDType, Integer.toString(instanceIDRange.getKey()))),
+                            new Literal(instanceIDType, Integer.toString(instanceIDRange.a))),
                     BinaryExpression.lessEqualsExpression(instanceIDReference,
-                            new Literal(instanceIDType, Integer.toString(instanceIDRange.getValue()))));
+                            new Literal(instanceIDType, Integer.toString(instanceIDRange.b))));
         }
     }
 }

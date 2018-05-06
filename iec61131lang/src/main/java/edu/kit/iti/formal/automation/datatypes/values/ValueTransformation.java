@@ -32,6 +32,11 @@ import java.math.BigInteger;
 import java.util.Collections;
 
 public class ValueTransformation extends DefaultDataTypeVisitor<Value> {
+    /**
+     * Cycle time, in milliseconds.
+     */
+    private final static int CYCLE_TIME = 10;
+
     private final Literal literal;
 
     public ValueTransformation(Literal literal) {

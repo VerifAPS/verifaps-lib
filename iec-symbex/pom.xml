@@ -40,10 +40,15 @@
             <groupId>edu.kit.iti.formal</groupId>
             <artifactId>smv-model</artifactId>
         </dependency>
+		<dependency>
+			<groupId>de.tu-dresden.inf.lat.jsexp</groupId>
+			<artifactId>jsexp</artifactId>
+			<version>0.2.2</version>
+		</dependency>
         <dependency>
-            <groupId>de.tu-dresden.inf.lat.jsexp</groupId>
-            <artifactId>jsexp</artifactId>
-            <version>0.2.2</version>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.1</version>
         </dependency>
     </dependencies>
 </project>

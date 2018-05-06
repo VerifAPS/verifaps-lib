@@ -1,0 +1,37 @@
+import java.text.DateFormat
+
+apply plugin: 'antlr'
+
+description = 'iec61131lang'
+
+dependencies {
+    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.1'
+    antlr group: 'org.antlr', name: 'antlr4', version: '4.7.1'
+}
+
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += ["-visitor", "-long-messages", "-package", "edu.kit.iti.formal.automation.parser"]
+    outputDirectory file("${project.buildDir}/generated-src/antlr/main/edu/kit/iti/formal/automation/parser")
+    println(arguments)
+}
+
+task createVersionFile(type: Copy) {
+    def v = versionDetails()
+    def map = [
+            'version'       : project.version,
+            'lastTag'       : v.lastTag,
+            'commitDistance': v.commitDistance,
+            'hash'          : v.gitHash,
+            'hashFull'      : v.gitHashFull, // full 40-character Git commit hash
+            'branchName'    : v.branchName, // is null if the repository in detached HEAD mode
+            'isClean'       : v.isCleanTag,
+            'buildTime'     : new Date().toString(),
+    ]
+    from("../share/Version.java") {
+        expand(map)
+    }
+    into("${project.buildDir}/generated-src/antlr/main/edu/kit/iti/formal/automation")
+}
+
+processResources.dependsOn createVersionFile

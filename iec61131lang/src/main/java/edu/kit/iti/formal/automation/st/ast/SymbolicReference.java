@@ -29,8 +29,10 @@ import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,10 +45,12 @@ import java.util.List;
  * @author weigl
  * @version $Id: $Id
  */
-@Data
+@EqualsAndHashCode(exclude = "effectiveDataType", callSuper = false)
+@Getter
+@Setter
 public class SymbolicReference extends Reference {
     @NonNull
-    private IdentifierPlaceHolder identifier = new IdentifierPlaceHolder();
+    private IdentifierPlaceHolder<Identifiable> identifier = new IdentifierPlaceHolder<>();
     private ExpressionList subscripts;
     private SymbolicReference sub;
     private AnyDt dataType;
@@ -176,12 +180,26 @@ public class SymbolicReference extends Reference {
         return subscripts != null;
     }
 
-    /**
-     * @return The variable this reference references.
-     */
     public VariableDeclaration toVariable() {
         List<SymbolicReference> referenceList = asList();
         return (VariableDeclaration) referenceList.get(referenceList.size() - 1).getIdentifiedObject();
+    }
+
+    /**
+     * @return The scope in which the reference is declared, or null if the scope cannot be determined.
+     */
+    public Scope getScope() {
+        Identifiable identifiedObject = getIdentifiedObject();
+        if (identifiedObject instanceof VariableDeclaration)
+            return ((VariableDeclaration) identifiedObject).getParent().getScope();
+        else if (identifiedObject instanceof MethodDeclaration)
+            return ((MethodDeclaration) identifiedObject).getParent().getScope();
+        return null;
+    }
+
+    @Deprecated
+    public Scope getLocalScope() {
+        return getScope();
     }
 
 

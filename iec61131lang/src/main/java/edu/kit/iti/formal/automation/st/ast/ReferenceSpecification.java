@@ -27,12 +27,14 @@ import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
  * @author Augusto Modanese
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReferenceSpecification extends TypeDeclaration<Initialization> {
@@ -48,6 +50,11 @@ public class ReferenceSpecification extends TypeDeclaration<Initialization> {
         ReferenceType rt = new ReferenceType(globalScope.resolveDataType(refTo.getTypeName()));
         baseType = rt;
         return rt;
+    }
+
+    @Override
+    public Initialization getInitialization() {
+        return refTo.initialization;
     }
 
     public <T> T accept(Visitor<T> visitor) {

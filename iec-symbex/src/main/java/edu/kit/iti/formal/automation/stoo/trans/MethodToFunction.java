@@ -25,6 +25,7 @@ package edu.kit.iti.formal.automation.stoo.trans;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType;
 import edu.kit.iti.formal.automation.exceptions.SMVException;
+import edu.kit.iti.formal.automation.oo.OOUtils;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
@@ -36,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Convert methods in functions. Modify the affected invocations appropriately.
@@ -52,18 +54,20 @@ public class MethodToFunction extends STOOTransformation {
         state.getTopLevelElements().accept(new AddSelfParameterToMethodsVisitor());
         // Convert methods into functions
         state.getTopLevelElements().accept(new MethodInvocationToFunctionCallVisitor());
-        state.getScope().getClasses().forEach(c -> c.getMethods().forEach(this::addNewFunction));
+        state.getScope().getClasses().getAll().forEach(c -> c.getMethods().forEach(this::addNewFunction));
         state.getTopLevelElements().addAll(newFunctions.values());
         state.getTopLevelElements().accept(new RemoveMethodsVisitor());
     }
 
     private void addNewFunction(@NotNull MethodDeclaration method) {
-        //TODO for AM: no logic in AST classes.
         FunctionDeclaration newFunction = new FunctionDeclaration();
-        newFunction.setStBody(method.getStBody());
-        newFunction.setReturnType(method.getReturnType());
         newFunction.setName(((ClassDeclaration) method.getParent()).getName()
                 + CLASS_METHOD_NAME_SEPARATOR + method.getName());
+        newFunction.setReturnType(method.getReturnType());
+        newFunction.setScope(method.getScope().copy());
+        for (VariableDeclaration variable : newFunction.getScope())
+            variable.setParent(newFunction);
+        newFunction.setStBody(method.getStBody());
         // Possibly need to rename return variable
         newFunction.accept(new RenameReferenceVisitor(method.getName(), newFunction.getName()));
         newFunctions.put(method, newFunction);
@@ -85,7 +89,7 @@ public class MethodToFunction extends STOOTransformation {
      */
     @Getter
     @AllArgsConstructor
-    private static class RenameReferenceVisitor extends AstVisitor {
+    private static class RenameReferenceVisitor extends AstVisitor<Object> {
         @NotNull
         private final String reference;
         @NotNull
@@ -121,16 +125,15 @@ public class MethodToFunction extends STOOTransformation {
                 // Invoking function block?
                 VariableDeclaration variable = (VariableDeclaration) callee.getSub().getIdentifiedObject();
                 if (variable.getDataType() instanceof FunctionBlockDataType
-                        || variable.getEffectiveDataTypes().stream()
+                        || state.getEffectiveSubtypeScope().getTypes(variable).stream()
                         .anyMatch(t -> t instanceof FunctionBlockDataType))
-                    return newInvocation;
+                return newInvocation;
             }
             // Callees must always be instances of classes
             assert callee.getEffectiveDataType() instanceof ClassDataType;
             ClassDeclaration calleeEffectiveClass = ((ClassDataType) callee.getEffectiveDataType()).getClazz();
-            assert calleeEffectiveClass.hasMethod(callee.getSub().getIdentifier());
-            Invocable invoked = calleeEffectiveClass.getMethod(callee.getSub().getIdentifier());
-            assert invoked != null;
+            assert OOUtils.hasMethod(calleeEffectiveClass, callee.getSub().getIdentifier());
+            Invocable invoked = OOUtils.getMethod(calleeEffectiveClass, callee.getSub().getIdentifier());
             MethodDeclaration invokedMethod = (MethodDeclaration) invoked;
             // TODO resolve THIS
             // Replace with call to function
@@ -147,7 +150,7 @@ public class MethodToFunction extends STOOTransformation {
     /**
      * Convert invoked instances into method parameters by passing them as 'self'.
      */
-    private class AddSelfParameterToMethodsVisitor extends AstVisitor {
+    private class AddSelfParameterToMethodsVisitor extends AstVisitor<Object> {
         /**
          * Whether we are visiting a class' method's statements.
          */
@@ -158,7 +161,8 @@ public class MethodToFunction extends STOOTransformation {
         public Object visit(@NotNull Invocation invocation) {
             // Pass 'self' as an additional parameter
             SymbolicReference callee = invocation.getCallee();
-            if (callee.hasSub()) {
+            if (callee.hasSub() && invocation.getParameters().stream().noneMatch(
+                    p -> p.getName() != null && p.getName().equals(SELF_PARAMETER_NAME))) {
                 // TODO handle THIS
                 // SUPER
                 if (callee.getIdentifiedObject() instanceof ClassDeclaration) {
@@ -183,7 +187,7 @@ public class MethodToFunction extends STOOTransformation {
         @Override
         public Object visit(@NotNull MethodDeclaration method) {
             TopLevelScopeElement parent = method.getParent();
-            if (visitingClassMethod = parent != null && parent instanceof ClassDeclaration) {
+            if (visitingClassMethod = parent instanceof ClassDeclaration) {
                 this.parent = (ClassDeclaration) parent;
                 visitClassMethod(method);
             }
@@ -193,10 +197,15 @@ public class MethodToFunction extends STOOTransformation {
         @Override
         public Object visit(@NotNull SymbolicReference symbolicReference) {
             // Add "self." to variables in method block which are in the instance's local scope
-            if (visitingClassMethod && parent.getScope().hasVariable(symbolicReference.getIdentifier())) {
+            if (visitingClassMethod && parent.getScope().hasVariable(symbolicReference.getIdentifier())
+                    && !parent.getScope().getVariable(symbolicReference.getIdentifier()).isGlobal()
+                    && !Objects.requireNonNull(parent.getScope().getVariable(symbolicReference.getIdentifier())).is(
+                    VariableDeclaration.INPUT | VariableDeclaration.OUTPUT | VariableDeclaration.INOUT
+            )) {
                 symbolicReference.setSub(symbolicReference.copy());
                 symbolicReference.setIdentifiedObject(null);
                 symbolicReference.setIdentifier(SELF_PARAMETER_NAME);
+                symbolicReference.setEffectiveDataType(state.getGlobalScope().resolveDataType(parent.getName()));
             }
             return super.visit(symbolicReference);
         }
@@ -209,6 +218,7 @@ public class MethodToFunction extends STOOTransformation {
             VariableDeclaration self = new VariableDeclaration(SELF_PARAMETER_NAME,
                     state.getScope().resolveDataType(parent.getName()));
             self.setType(VariableDeclaration.INOUT);
+            self.setParent(method);
             method.getScope().add(self);
             // Add self access to variables in local scope which are in the class' scope
             visitingClassMethod = true;

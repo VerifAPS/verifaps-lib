@@ -27,6 +27,7 @@ package edu.kit.iti.formal.smv.ast;
  */
 
 import edu.kit.iti.formal.smv.SMVAstVisitor;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 
 /************************************************************/
@@ -34,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  *
  */
+@EqualsAndHashCode(callSuper = false)
 public class SLiteral extends SMVExpr {
     public static final SLiteral TRUE = new SLiteral(SMVType.BOOLEAN, true);
     public static final SLiteral FALSE = new SLiteral(SMVType.BOOLEAN, false);
@@ -82,6 +84,7 @@ public class SLiteral extends SMVExpr {
         return visitor.visit(this);
     }
 
+    /*
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -100,6 +103,7 @@ public class SLiteral extends SMVExpr {
         result = 31 * result + (value != null ? value.hashCode() : 0);
         return result;
     }
+    */
 
     public static class LiteralBuilder<T> {
         private final SLiteral literal;

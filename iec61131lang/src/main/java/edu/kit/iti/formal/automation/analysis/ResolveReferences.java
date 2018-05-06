@@ -24,48 +24,48 @@ package edu.kit.iti.formal.automation.analysis;
 
 import edu.kit.iti.formal.automation.datatypes.*;
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException;
+import edu.kit.iti.formal.automation.oo.OOUtils;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 
 /**
+ * Set identified object and its data type for every symbolic reference in code.
+ *
  * @author Augusto Modanese
  */
 @Data
-@Deprecated // "not well written, not comprehensible")
-public class ResolveReferences extends AstVisitor {
-    /*
+@EqualsAndHashCode(callSuper = true)
+@RequiredArgsConstructor
+public class ResolveReferences extends AstVisitor<Object> {
     private final Scope globalScope;
-    protected Scope currentScope;
-    protected Scope currentFullScope;
-    protected TopLevelScopeElement currentTopLevelScopeElement;
 
     @Override
     public Object visit(SymbolicReference ref) {
-        // Discover the reference's identified objects and data type and set them
         if (currentTopLevelScopeElement != null)
             try {
+                // type of the referenced object
                 AnyDt identifiedObjectDataType = null;
-                Scope newScope = null;
-                TopLevelScopeElement newTopLevelScopeElement = null;
+                // Next scope to visit
+                Scope nextScope = null;
+                // Next TopLevelScopeElement to visit
+                TopLevelScopeElement nextTopLevelScopeElement = null;
 
                 // THIS
                 if (ref.getIdentifier().equals("THIS")) {
                     ref.setIdentifiedObject(currentTopLevelScopeElement);
                     identifiedObjectDataType = globalScope.resolveDataType(currentTopLevelScopeElement.getIdentifier());
-                    newScope = currentFullScope;
-                    newTopLevelScopeElement = currentTopLevelScopeElement;
+                    nextScope = currentFullScope;
+                    nextTopLevelScopeElement = currentTopLevelScopeElement;
                 }
-                // Variable in scope or GVL
-                else if (currentFullScope.hasVariable(ref.getIdentifier()) || ref.getIdentifier().equals("GVL")) {
+                // Variable in scope
+                else if (currentFullScope.hasVariable(ref.getIdentifier())) {
                     VariableDeclaration refVariable;
-                    if (ref.getIdentifier().equals("GVL")) {
-                        ref = ref.getSub();
-                        //refVariable = currentFullScope.getGlobalVariableList().getVariable(ref);
-                    } else
-                        refVariable = currentFullScope.getVariable(ref);
-                    //ref.setIdentifiedObject(refVariable);
+                    refVariable = currentFullScope.getVariable(ref.getIdentifier());
+                    ref.setIdentifiedObject(refVariable);
                     identifiedObjectDataType = refVariable.getDataType();
                     for (int i = 0; i < ref.getDerefCount(); i++)
                         identifiedObjectDataType = ((ReferenceType) identifiedObjectDataType).getOf();
@@ -77,26 +77,28 @@ public class ResolveReferences extends AstVisitor {
                             if (!(refVariable.getDataType() instanceof ReferenceType)
                                     && !(refVariable.getDataType() instanceof InterfaceDataType))
                                 ref.setEffectiveDataType(refVariable.getDataType());
-                            newTopLevelScopeElement = ((ClassDataType) identifiedObjectDataType).getClazz();
-                            newScope = ((ClassDeclaration) newTopLevelScopeElement).getEffectiveScope();
+                            nextTopLevelScopeElement = ((ClassDataType) identifiedObjectDataType).getClazz();
+                            nextScope = OOUtils.getEffectiveScope((ClassDeclaration) nextTopLevelScopeElement);
                         } else {
                             // TODO RecordType
-                            // newTopLevelScopeElement = ((RecordType) identifiedObjectDataType).getDeclaration();
-                            // newScope = newTopLevelScopeElement.getScope();
+                            // nextTopLevelScopeElement = ((RecordType) identifiedObjectDataType).getDeclaration();
+                            // nextScope = nextTopLevelScopeElement.getLocalScope();
                         }
                 }
 
                 // Method
                 if (currentTopLevelScopeElement instanceof ClassDeclaration
-                        && ((ClassDeclaration) currentTopLevelScopeElement).hasMethodWithInheritance(ref.getIdentifier())) {
-                    MethodDeclaration method = ((ClassDeclaration) currentTopLevelScopeElement)
-                            .getMethod(ref.getIdentifier());
+                        && OOUtils.hasMethodWithInheritance((ClassDeclaration) currentTopLevelScopeElement,
+                            ref.getIdentifier())) {
+                    MethodDeclaration method = OOUtils.getMethod((ClassDeclaration) currentTopLevelScopeElement,
+                            ref.getIdentifier());
                     ref.setIdentifiedObject(method);
                     ref.setDataType(method.getReturnType());
                 } else if (currentTopLevelScopeElement instanceof InterfaceDeclaration
-                        && ((InterfaceDeclaration) currentTopLevelScopeElement).hasMethodWithInheritance(ref.getIdentifier())) {
-                    MethodDeclaration method = ((InterfaceDeclaration) currentTopLevelScopeElement)
-                            .getMethod(ref.getIdentifier());
+                        && OOUtils.hasMethodWithInheritance((InterfaceDeclaration) currentTopLevelScopeElement,
+                            ref.getIdentifier())) {
+                    MethodDeclaration method = OOUtils.getMethod((InterfaceDeclaration) currentTopLevelScopeElement,
+                            ref.getIdentifier());
                     ref.setIdentifiedObject(method);
                     ref.setDataType(method.getReturnType());
                 }
@@ -104,9 +106,9 @@ public class ResolveReferences extends AstVisitor {
                 else if (ref.getIdentifier().equals("SUPER")) {
                     ClassDeclaration parentClass = ((ClassDeclaration) currentTopLevelScopeElement).getParentClass();
                     ref.setIdentifiedObject(parentClass);
-                    //ref.setEffectiveDataType(globalScope.resolveDataType(parentClass));
+                    ref.setEffectiveDataType(globalScope.resolveDataType(parentClass.getName()));
                     if (ref.hasSub()) {
-                        MethodDeclaration method = parentClass.getMethod(ref.getSub().getIdentifier());
+                        MethodDeclaration method = OOUtils.getMethod(parentClass, ref.getSub().getIdentifier());
                         ref.getSub().setIdentifiedObject(method);
                         ref.getSub().setDataType(method.getReturnType());
                         ref.setDataType(ref.getSub().getDataType());
@@ -125,18 +127,21 @@ public class ResolveReferences extends AstVisitor {
                 } else if (ref.hasSub()) {
                     if (ref.getIdentifiedObject() instanceof VariableDeclaration
                             && identifiedObjectDataType instanceof ClassDataType
-                            && ((ClassDataType) identifiedObjectDataType).getClazz().hasMethod(ref.getSub().getIdentifier())) {
+                            && OOUtils.hasMethod(((ClassDataType) identifiedObjectDataType).getClazz(),
+                                ref.getSub().getIdentifier())) {
                         ref.getSub().setIdentifiedObject(
-                                ((ClassDataType) identifiedObjectDataType).getClazz().getMethod(ref.getSub().getIdentifier()));
-                        ref.getSub().setDataType(((MethodDeclaration) ref.getSub().getIdentifiedObject()).getReturnType());
+                                OOUtils.getMethod(((ClassDataType) identifiedObjectDataType).getClazz(),
+                                        ref.getSub().getIdentifier()));
+                        ref.getSub().setDataType(
+                                ((MethodDeclaration) ref.getSub().getIdentifiedObject()).getReturnType());
                         ref.setDataType(ref.getSub().getDataType());
                     } else {
                         // Recurse
                         // Switch to local scope of top level scope element
                         Scope oldScope = currentFullScope;
-                        currentFullScope = newScope;
+                        currentFullScope = nextScope;
                         TopLevelScopeElement oldTopLevelScopeElement = currentTopLevelScopeElement;
-                        currentTopLevelScopeElement = newTopLevelScopeElement;
+                        currentTopLevelScopeElement = nextTopLevelScopeElement;
                         ref.getSub().accept(this);
                         ref.setDataType(ref.getSub().getDataType());
                         currentFullScope = oldScope;
@@ -144,16 +149,16 @@ public class ResolveReferences extends AstVisitor {
                     }
                 }
                 // Type value
-                else if (globalScope.getAllowedTypeValues().contains(ref.getIdentifier())) {
-                    ref.setDataType(globalScope.resolveDataType(globalScope.getTypeOfValue(ref.getIdentifier())));
-                } else
+                else if (!ref.hasSub() && currentFullScope.resolveEnum(ref.getIdentifier()) != null)
+                    ref.setDataType(currentFullScope.resolveEnum(ref.getIdentifier()));
+                else
                     ref.setDataType(identifiedObjectDataType);
 
+                // Assert identified object is set for the reference
                 //assert ref.getIdentifiedObject() != null;
             } catch (ClassCastException | DataTypeNotDefinedException e) {
                 e.printStackTrace();
             }
         return super.visit(ref);
     }
-    */
 }

@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.visitors;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.sfclang.ast.*;
 import edu.kit.iti.formal.automation.st.ast.*;
@@ -371,6 +372,8 @@ public interface Visitor<T> {
     T visit(Invocation.Parameter parameter);
 
     T visit(ReferenceSpecification referenceSpecification);
+
+    T visit(ReferenceValue referenceValue);
 
     T visit(GlobalVariableListDeclaration globalVariableListDeclaration);
 

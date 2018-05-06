@@ -26,17 +26,14 @@ import edu.kit.iti.formal.automation.datatypes.DataTypes;
 import edu.kit.iti.formal.automation.datatypes.TimeType;
 import edu.kit.iti.formal.automation.datatypes.values.TimeValue;
 import edu.kit.iti.formal.automation.datatypes.values.Value;
-import edu.kit.iti.formal.automation.st.ast.Literal;
-import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
-import edu.kit.iti.formal.automation.st.ast.SimpleTypeDeclaration;
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 
 import java.util.Objects;
 
 /**
- * @author Alexander Weigl (06.07.2014)
+ * @author Alexander Weigl (06.07.2014), Augusto Modanese
  * @version 1
  */
 public class TimerToCounter extends AstMutableVisitor {
@@ -51,6 +48,8 @@ public class TimerToCounter extends AstMutableVisitor {
         return state -> {
             TimerToCounter ttc = new TimerToCounter(DEFAULT_CYCLE_TIME);
             state.theProgram = (ProgramDeclaration) ttc.visit(state.theProgram);
+            for (FunctionDeclaration function : state.functions.values())
+                state.functions.replace(function.getName(), (FunctionDeclaration) ttc.visit(function));
         };
     }
 
@@ -61,7 +60,7 @@ public class TimerToCounter extends AstMutableVisitor {
 
     @Override
     public Object visit(VariableDeclaration vd) {
-        if (vd.getDataTypeName().equalsIgnoreCase("TIME")
+        if (Objects.requireNonNull(vd.getDataTypeName()).equalsIgnoreCase("TIME")
                 || vd.getDataType() == TimeType.TIME_TYPE) {
 
             VariableDeclaration newVariable = new VariableDeclaration(
@@ -76,8 +75,11 @@ public class TimerToCounter extends AstMutableVisitor {
             }
 
             Literal newVal = Literal.integer(cycles);
-            SimpleTypeDeclaration sd = new SimpleTypeDeclaration();
+            SimpleTypeDeclaration<Literal> sd = new SimpleTypeDeclaration<>();
             sd.setInitialization(newVal);
+            sd.setBaseType(DataTypes.UINT);
+            sd.setBaseTypeName("UINT");
+            //setPositions(vd.getInit(), sd);
             newVariable.setTypeDeclaration(sd);
             return newVariable;
         }

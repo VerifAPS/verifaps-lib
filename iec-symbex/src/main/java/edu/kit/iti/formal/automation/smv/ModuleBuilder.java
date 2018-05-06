@@ -90,10 +90,13 @@ public class ModuleBuilder implements Runnable {
                         .filterByFlags(VariableDeclaration.INPUT);
 
 
-        Set<SVariable> stateVariables = vardeps.dependsOn(outputVars, inputVars);
-        //stateVariables = finalState.keySet().stream()
-         //       .filter(v -> !inputVars.stream().anyMatch(v2 -> v2.getName().equals(v.getName())))
-          //      .collect(Collectors.toSet());
+        // TODO fix so this terminates
+        //Set<SVariable> stateVariables = vardeps.dependsOn(outputVars, inputVars);
+
+        // Using this workaround instead
+        Set<SVariable> stateVariables = finalState.keySet().stream()
+               .filter(v -> inputVars.stream().noneMatch(v2 -> v2.getName().equals(v.getName())))
+              .collect(Collectors.toSet());
 
         Set<String> outputVarNames = outputVars.stream().map(VariableDeclaration::getName).collect(Collectors.toSet());
         for (SVariable var : stateVariables) {
@@ -110,7 +113,7 @@ public class ModuleBuilder implements Runnable {
         decls.stream()
                 .map(typeTranslator::translate)
                 .map(sVariable -> sVariable.addMetadata(INPUT_VARIABLE))
-                .forEach(module.getModuleParameter()::add);
+                .forEach(module.getModuleParameters()::add);
     }
 
     private void insertVariables(Set<SVariable> variables) {
@@ -136,12 +139,12 @@ public class ModuleBuilder implements Runnable {
                     initValueTranslator.getInit(s.getDataType()));
         }
         SAssignment a = new SAssignment(var, e);
-        module.getInitAssignments().add(a);
+        module.getInit().add(a);
     }
 
     private void addNextAssignment(SVariable s) {
         SMVExpr e = finalState.get(s);
         SAssignment a = new SAssignment(s, e);
-        module.getNextAssignments().add(a);
+        module.getNext().add(a);
     }
 }

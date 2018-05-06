@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.st.util;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.sfclang.ast.*;
 import edu.kit.iti.formal.automation.st.ast.*;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
  * This visitors defines all function with go down and setting the results of accept as the new value.
  * Not copying datastructures.
  *
- * @author Alexander Weigl (26.06.2014)
+ * @author Alexander Weigl (26.06.2014), Augusto Modanese
  */
 public class AstMutableVisitor extends AstVisitor<Object> {
     /**
@@ -176,6 +177,7 @@ public class AstMutableVisitor extends AstVisitor<Object> {
      */
     @Override
     public Object visit(ProgramDeclaration programDeclaration) {
+        currentTopLevelScopeElement = programDeclaration;
         programDeclaration.setScope((Scope) programDeclaration.getScope().accept(this));
         programDeclaration.setStBody((StatementList) programDeclaration.getStBody().accept(this));
         return programDeclaration;
@@ -199,7 +201,8 @@ public class AstMutableVisitor extends AstVisitor<Object> {
     public Object visit(ForStatement forStatement) {
         forStatement.setStart((Expression) forStatement.getStart().accept(this));
         forStatement.setStatements((StatementList) forStatement.getStatements().accept(this));
-        forStatement.setStep((Expression) forStatement.getStep().accept(this));
+        if (forStatement.getStep() != null)
+            forStatement.setStep((Expression) forStatement.getStep().accept(this));
         forStatement.setStop((Expression) forStatement.getStop().accept(this));
         return forStatement;
     }
@@ -310,15 +313,15 @@ public class AstMutableVisitor extends AstVisitor<Object> {
      */
     @Override
     public Object visit(Scope localScope) {
-        Map<String, VariableDeclaration> map = new HashMap<>(localScope.asMap());
-        Map<String, VariableDeclaration> newMap = localScope.asMap();
-        newMap.clear();
-
-        map.forEach((k, v) -> {
-            VariableDeclaration decl = (VariableDeclaration) v.accept(this);
-            newMap.put(decl.getName(), decl);
-        });
-
+        currentScope = localScope;
+        for (VariableDeclaration variable : localScope) {
+            //assert variable.getParent() != null;
+            VariableDeclaration newVariable = (VariableDeclaration) variable.accept(this);
+            if (newVariable == null)
+                localScope.getVariables().remove(variable.getName());
+            else
+                localScope.getVariables().replace(variable.getName(), newVariable);
+        }
         return localScope;
     }
 
@@ -466,6 +469,12 @@ public class AstMutableVisitor extends AstVisitor<Object> {
     }
 
     @Override
+    public Object visit(ReferenceValue referenceValue) {
+        referenceValue.setReferenceTo((SymbolicReference) referenceValue.getReferenceTo().accept(this));
+        return super.visit(referenceValue);
+    }
+
+    @Override
     public Object visit(PointerTypeDeclaration ptd) {
         return super.visit(ptd);
     }
@@ -477,6 +486,7 @@ public class AstMutableVisitor extends AstVisitor<Object> {
 
     @Override
     public Object visit(ClassDeclaration clazz) {
+        currentTopLevelScopeElement = clazz;
         clazz.setScope((Scope) clazz.getScope().accept(this));
 
         List<MethodDeclaration> methods = new ArrayList<>(clazz.getMethods().size());
@@ -492,6 +502,7 @@ public class AstMutableVisitor extends AstVisitor<Object> {
 
     @Override
     public Object visit(MethodDeclaration method) {
+        currentTopLevelScopeElement = method;
         method.setScope((Scope) method.getScope().accept(this));
         method.setStBody((StatementList) method.getStBody().accept(this));
         return super.visit(method);
@@ -499,6 +510,7 @@ public class AstMutableVisitor extends AstVisitor<Object> {
 
     @Override
     public Object visit(InterfaceDeclaration interfaceDeclaration) {
+        currentTopLevelScopeElement = interfaceDeclaration;
         List<MethodDeclaration> methods = new ArrayList<>(interfaceDeclaration.getMethods().size());
         for (MethodDeclaration method : interfaceDeclaration.getMethods()) {
             MethodDeclaration newMethod = (MethodDeclaration) method.accept(this);
@@ -511,6 +523,7 @@ public class AstMutableVisitor extends AstVisitor<Object> {
 
     @Override
     public Object visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
+        currentTopLevelScopeElement = globalVariableListDeclaration;
         globalVariableListDeclaration.setScope((Scope) visit(globalVariableListDeclaration.getScope()));
         return super.visit(globalVariableListDeclaration);
     }

@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st0;
 
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st0.trans.*;
+import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Alexander Weigl (26.06.2014)
+ * @author Alexander Weigl (26.06.2014), Augusto Modanese
  * @version 1
  */
 public class STSimplifier {
@@ -43,6 +44,11 @@ public class STSimplifier {
         state.inputElements = inputElements;
     }
 
+    public STSimplifier(TopLevelElements inputElements, STOOSimplifier.State stooState) {
+        this(inputElements);
+        state.stooState = stooState;
+    }
+
     public void addDefaultPipeline() {
         transformations.add(new GlobalVariableListEmbedding());
         transformations.add(new FunctionBlockEmbedding());
@@ -52,6 +58,8 @@ public class STSimplifier {
         transformations.add(new StructEmbedding());
         //transformations.add(SFCResetReplacer.getTransformation());
         transformations.add(new RemoveActionsFromProgram());
+        transformations.add(new ConstantEmbedder());  // EXPERIMENTAL
+        transformations.add(new TrivialBranchReducer());  // EXPERIMENTAL
     }
 
     public void transform() {
@@ -105,6 +113,13 @@ public class STSimplifier {
         }
     }
 
+    /**
+     * @return Whether we are transforming OO code
+     */
+    public boolean isTransformingOO() {
+        return state.stooState != null;
+    }
+
     private void appendTypeDeclarations(TypeDeclarations typeDeclarations) {
         for (TypeDeclaration td : typeDeclarations) {
             boolean allowed = true;
@@ -145,5 +160,6 @@ public class STSimplifier {
         public Map<String, StructureTypeDeclaration> structs = new HashMap<>();
         public TypeDeclarations allTypeDeclaration = new TypeDeclarations();
         public GlobalVariableListDeclaration globalVariableList = new GlobalVariableListDeclaration();
+        public STOOSimplifier.State stooState;
     }
 }

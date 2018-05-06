@@ -39,36 +39,68 @@ import java.util.stream.Collectors;
  *
  */
 public class SCaseExpression extends SMVExpr {
-    public List<Case> cases = new LinkedList<>();
+    public final List<Case> cases = new LinkedList<>();
 
-    public void add(SMVExpr condition, SMVExpr value) {
+    public void add(@NotNull SMVExpr condition, @NotNull SMVExpr value) {
         cases.add(new Case(condition, value));
     }
 
     public SMVExpr compress() {
         // if all cases have the same value then finish
         if (cases.size() == 0) return this;
-        final Case firstCase = cases.get(0);
-        boolean b = cases.stream().allMatch(aCase -> firstCase.then.equals(aCase.then));
+        int i = 0;
+        while (cases.get(i).condition.equals(SLiteral.FALSE))
+            i++;
+        final Case firstCase = cases.get(i);
+        boolean b = firstCase.condition.equals(SLiteral.TRUE)
+                || cases.parallelStream().allMatch(aCase -> firstCase.then.equals(aCase.then));
         if (b)
             return firstCase.then;
         //
         SCaseExpression esac = new SCaseExpression();
         Case previous = firstCase;
-        SMVExpr condition = previous.condition;
+        SMVExpr condition = compressCondition(previous.condition);
 
-        for (int i = 1; i < cases.size(); i++) {
+        i++;
+        for (; i < cases.size(); i++) {
             Case current = cases.get(i);
-            if (previous.then.equals(current.then)) {
-                condition = condition.or(current.condition);
-            } else {
+            if (current.condition.equals(SLiteral.FALSE))
+                continue;
+            if (current.condition.equals(SLiteral.TRUE)) {
                 esac.addCase(condition, previous.then);
                 previous = current;
                 condition = current.condition;
+                break;
+            }
+            if (previous.then.equals(current.then)) {
+                condition = condition.or(compressCondition(current.condition));
+            } else {
+                esac.addCase(condition, previous.then);
+                previous = current;
+                condition = compressCondition(current.condition);
             }
         }
+        if (esac.cases.size() == 0)
+            return previous.then;
         esac.addCase(condition, previous.then);
         return esac;
+    }
+
+    private SMVExpr compressCondition(SMVExpr condition) {
+        if (condition instanceof SBinaryExpression) {
+            SBinaryExpression binaryExpression = (SBinaryExpression) condition;
+            if (binaryExpression.operator.equals(SBinaryOperator.EQUAL)) {
+                if (binaryExpression.left.equals(binaryExpression.right))
+                    return SLiteral.TRUE;
+                if (binaryExpression.left instanceof SLiteral
+                        && binaryExpression.right instanceof SLiteral
+                        && binaryExpression.left.getSMVType() instanceof SMVType.EnumType
+                        && binaryExpression.left.getSMVType().equals(binaryExpression.right.getSMVType()))
+                    return binaryExpression.left.equals(binaryExpression.right)
+                            ? SLiteral.TRUE : SLiteral.FALSE;
+            }
+        }
+        return condition;
     }
 
     @Override
@@ -92,9 +124,7 @@ public class SCaseExpression extends SMVExpr {
     }
 
     public SMVType getSMVType() {
-        List<SMVType> list = cases.stream().map((Case a) -> {
-            return a.then.getSMVType();
-        }).collect(Collectors.toList());
+        List<SMVType> list = cases.stream().map((Case a) -> a.then.getSMVType()).collect(Collectors.toList());
 
         return SMVType.infer(list);
     }
@@ -108,19 +138,10 @@ public class SCaseExpression extends SMVExpr {
         return sCaseExpression;
     }
 
-    public Case addCase(SMVExpr cond, SMVExpr var) {
+    public Case addCase(@NotNull SMVExpr cond, @NotNull SMVExpr var) {
         Case c = new Case(cond, var);
         cases.add(c);
         return c;
-    }
-
-    @Override
-    public String toString() {
-        return "if " +
-                cases.stream()
-                        .map(c -> c.toString()).reduce((a, b) -> a + "\n" + b)
-                        .orElseGet(() -> "")
-                + " fi";
     }
 
     /**
@@ -130,16 +151,15 @@ public class SCaseExpression extends SMVExpr {
         /**
          *
          */
-        public SMVExpr condition;
+        @NotNull
+        public final SMVExpr condition;
         /**
          *
          */
-        public SMVExpr then;
+        @NotNull
+        public final SMVExpr then;
 
-        public Case() {
-        }
-
-        public Case(SMVExpr cond, SMVExpr var) {
+        Case(@NotNull SMVExpr cond, @NotNull SMVExpr var) {
             condition = cond;
             then = var;
         }
@@ -156,8 +176,7 @@ public class SCaseExpression extends SMVExpr {
 
             Case aCase = (Case) o;
 
-            if (!condition.equals(aCase.condition)) return false;
-            return then.equals(aCase.then);
+            return condition.equals(aCase.condition) && then.equals(aCase.then);
 
         }
 
@@ -168,4 +187,15 @@ public class SCaseExpression extends SMVExpr {
             return result;
         }
     }
+
+    @Override
+    public String toString() {
+        return "if " +
+                cases.stream()
+                        .map(Case::toString).reduce((a, b) -> a + "\n" + b)
+                        .orElse("")
+                + " fi";
+    }
+
+
 }

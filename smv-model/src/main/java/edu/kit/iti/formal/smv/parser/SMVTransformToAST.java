@@ -23,6 +23,7 @@ package edu.kit.iti.formal.smv.parser;
  */
 
 import edu.kit.iti.formal.smv.ast.*;
+import org.antlr.v4.runtime.RuleContext;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -49,7 +50,7 @@ public class SMVTransformToAST extends SMVBaseVisitor<Object> {
         SMVModule module = new SMVModule();
         module.setName(ctx.name.getText());
         ctx.params.forEach(fpctx ->
-                module.getModuleParameter().add(
+                module.getModuleParameters().add(
                         SVariable.create(fpctx.getText()).with(null)));
 
         lastModule = module;
@@ -114,7 +115,7 @@ public class SMVTransformToAST extends SMVBaseVisitor<Object> {
 
     @Override
     public Object visitInitBody(SMVParser.InitBodyContext ctx) {
-        lastModule.getInitAssignments().add(
+        lastModule.getInit().add(
                 new SAssignment(
                         SVariable.create(ctx.var.getText()).with(null),
                         (SMVExpr) ctx.expr().accept(this)
@@ -124,7 +125,7 @@ public class SMVTransformToAST extends SMVBaseVisitor<Object> {
 
     @Override
     public Object visitNextBody(SMVParser.NextBodyContext ctx) {
-        lastModule.getNextAssignments().add(
+        lastModule.getNext().add(
                 new SAssignment(
                         SVariable.create(ctx.var.getText()).with(null),
                         (SMVExpr) ctx.expr().accept(this)
@@ -144,7 +145,7 @@ public class SMVTransformToAST extends SMVBaseVisitor<Object> {
 
     @Override
     public Object visitInvarSpecification(SMVParser.InvarSpecificationContext ctx) {
-        lastModule.getInvarSpec().add(
+        lastModule.getInvariantSpecs().add(
                 (SMVExpr) ctx.expr().accept(this)
         );
         return null;
@@ -152,7 +153,7 @@ public class SMVTransformToAST extends SMVBaseVisitor<Object> {
 
     @Override
     public Object visitCtlSpecification(SMVParser.CtlSpecificationContext ctx) {
-        lastModule.getCTLSpec().add(
+        lastModule.getCtlSpec().add(
                 (SMVExpr) ctx.expr().accept(this)
         );
         return null;
@@ -165,7 +166,7 @@ public class SMVTransformToAST extends SMVBaseVisitor<Object> {
 
     @Override
     public Object visitLtlSpecification(SMVParser.LtlSpecificationContext ctx) {
-        lastModule.getLTLSpec().add((SMVExpr) ctx.expr().accept(this));
+        lastModule.getLtlSpec().add((SMVExpr) ctx.expr().accept(this));
         return null;
     }
 
@@ -205,7 +206,7 @@ public class SMVTransformToAST extends SMVBaseVisitor<Object> {
     public Object visitEnumType(SMVParser.EnumTypeContext ctx) {
         List<String> ids =
                 ctx.expr()
-                        .stream().map(ectx -> ectx.getText())
+                        .stream().map(RuleContext::getText)
                         .collect(Collectors.toList());
         SMVType.EnumType e = new SMVType.EnumType(ids);
         return e;

@@ -61,7 +61,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<Scope> 
     override fun visit(fbc: InvocationStatement) {
         val innerState = TopState()
         val fbName = fbc.calleeName
-        val fbTypeName = peekScope().getVariable(fbName).typeDeclaration.baseTypeName
+        val fbTypeName = peekScope().getVariable(fbName)?.typeDeclaration?.baseTypeName
         val fbDataType = peekScope().resolveDataType(fbTypeName);
         val fb = peekScope().getFunctionBlock(fbTypeName)
 

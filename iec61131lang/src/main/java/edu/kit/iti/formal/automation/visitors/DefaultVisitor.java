@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.visitors;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.sfclang.ast.*;
 import edu.kit.iti.formal.automation.st.ast.*;
@@ -363,7 +364,7 @@ public class DefaultVisitor<T> implements Visitor<T> {
 
     @Override
     public T visit(InterfaceDeclaration interfaceDeclaration) {
-        return null;
+        return defaultVisit(interfaceDeclaration);
     }
 
     @Override
@@ -419,6 +420,11 @@ public class DefaultVisitor<T> implements Visitor<T> {
     @Override
     public T visit(ReferenceSpecification referenceSpecification) {
         return defaultVisit(referenceSpecification);
+    }
+
+    @Override
+    public T visit(ReferenceValue referenceValue) {
+        return defaultVisit(referenceValue);
     }
 
     @Override

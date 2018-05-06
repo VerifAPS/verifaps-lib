@@ -22,30 +22,52 @@
 
 package edu.kit.iti.formal.automation.st0.trans;
 
+import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st0.STSimplifier;
 
 /**
- * Embed the global_variable_list into the program scope.
+ * Embed the GVL in the program's scope and rename the GVL variables accordingly.
  *
  * @author Augusto Modanese, Alexander Weigl
  */
 public class GlobalVariableListEmbedding implements ST0Transformation {
+    /**
+     * Prefix to access GVL variables.
+     */
+    private static final String GVL_NAME = "GVL";
+
+    /**
+     * New prefix to rename variables with.
+     */
+    private static final String GVL_NEW_PREFIX = "GVL" + "$";
+
     @Override
     public void transform(STSimplifier.State state) {
         // Noop if no GVL
         if (state.globalVariableList == null)
             return;
 
+        // Squash "GVL" prefix with variable name
         //state.inputElements.accept(new GVLRenameVisitor());
+
         // Move variable declarations to program
         state.globalVariableList.getScope().forEach(v -> {
+            // **** Renaming disabled! ****
+            //v.setName(GVL_NEW_PREFIX + v.getName());
+            v.setType(VariableDeclaration.GLOBAL);
+            state.theProgram.getScope().add(v);
+        });
+
+        state.theProgram.getScope().getParent().forEach(v -> {
+            // **** Renaming disabled! ****
+            //v.setName(GVL_NEW_PREFIX + v.getName());
             v.setType(VariableDeclaration.GLOBAL);
             state.theProgram.getScope().add(v);
         });
     }
 
-    /*
     static class GVLRenameVisitor extends AstMutableVisitor {
         @Override
         public Object visit(SymbolicReference symbolicReference) {
@@ -58,5 +80,5 @@ public class GlobalVariableListEmbedding implements ST0Transformation {
             }
             return super.visit(symbolicReference);
         }
-    }*/
+    }
 }

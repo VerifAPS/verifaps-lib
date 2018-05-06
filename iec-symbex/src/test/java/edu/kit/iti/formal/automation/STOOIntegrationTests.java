@@ -22,12 +22,15 @@
 
 package edu.kit.iti.formal.automation;
 
+import edu.kit.iti.formal.automation.oo.OOIEC61131Facade;
 import edu.kit.iti.formal.automation.scope.Scope;
+import edu.kit.iti.formal.automation.scope.EffectiveSubtypeScope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
 import edu.kit.iti.formal.automation.visitors.Utils;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +43,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 
 /**
  * @author Augusto Modanese
@@ -48,24 +52,29 @@ import java.util.Collections;
 public class STOOIntegrationTests {
     private static final String RESOURCES_PATH = "edu/kit/iti/formal/automation/st/stoo/integration";
 
-    public static File[] getSTFiles(String folder) {
-        URL f = STOOIntegrationTests.class.getClassLoader().getResource(folder);
+    @Parameterized.Parameter
+    public File file;
+
+    private static File[] getSTFiles() {
+        URL f = STOOIntegrationTests.class.getClassLoader().getResource(STOOIntegrationTests.RESOURCES_PATH);
         if (f == null) {
-            System.err.format("Could not find %s%n", folder);
+            System.err.format("Could not find %s%n", STOOIntegrationTests.RESOURCES_PATH);
             return new File[0];
         }
         File file = new File(f.getFile());
-        return Arrays.stream(file.listFiles()).filter(s -> !s.getName().contains(".stoo")).toArray(File[]::new);
+        return Arrays.stream(Objects.requireNonNull(file.listFiles()))
+                .filter(s -> !s.getName().contains(".stoo")).toArray(File[]::new);
     }
 
-    public static STOOSimplifier.State processSTFile(File f) throws IOException {
+    private static STOOSimplifier.State processSTFile(File f) throws IOException {
         TopLevelElements topLevelElements =  IEC61131Facade.file(f);
         Scope globalScope = IEC61131Facade.resolveDataTypes(topLevelElements);
         TopLevelElement program = Utils.findProgram(topLevelElements);
         assert program != null;
-        InstanceScope instanceScope = IEC61131Facade.findInstances(program, globalScope);
-        IEC61131Facade.findEffectiveSubtypes(topLevelElements, globalScope, instanceScope);
-        return new STOOSimplifier.State(program, topLevelElements, globalScope, instanceScope);
+        InstanceScope instanceScope = OOIEC61131Facade.findInstances(program, globalScope);
+        EffectiveSubtypeScope effectiveSubtypeScope =
+                OOIEC61131Facade.findEffectiveSubtypes(topLevelElements, globalScope, instanceScope);
+        return new STOOSimplifier.State(program, topLevelElements, globalScope, instanceScope, effectiveSubtypeScope);
     }
 
     private static STOOSimplifier.State processSTFile(Path path) throws IOException {
@@ -74,11 +83,8 @@ public class STOOIntegrationTests {
 
     @Parameterized.Parameters
     public static Object[] files() {
-        return getSTFiles(RESOURCES_PATH);
+        return getSTFiles();
     }
-
-    @Parameterized.Parameter
-    public File file;
 
     @Test(timeout = 4000)
     public void testSTOOTransformation() throws IOException {

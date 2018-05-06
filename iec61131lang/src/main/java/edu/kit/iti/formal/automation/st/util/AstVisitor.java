@@ -22,6 +22,8 @@ package edu.kit.iti.formal.automation.st.util;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue;
+import edu.kit.iti.formal.automation.oo.OOUtils;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.sfclang.ast.ActionDeclaration;
 import edu.kit.iti.formal.automation.sfclang.ast.SFCNetwork;
@@ -39,6 +41,13 @@ import java.util.ArrayList;
  * @version $Id: $Id
  */
 public class AstVisitor<T> extends DefaultVisitor<T> {
+    /**
+     * AST elements we're currently visiting.
+     */
+    protected Scope currentScope;
+    protected Scope currentFullScope;
+    protected TopLevelScopeElement currentTopLevelScopeElement;
+
     /**
      * {@inheritDoc}
      */
@@ -167,7 +176,9 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(ProgramDeclaration programDeclaration) {
+        currentTopLevelScopeElement = programDeclaration;
         programDeclaration.getScope().accept(this);
+        currentFullScope = currentScope;
         programDeclaration.getStBody().accept(this);
         return null;
     }
@@ -187,7 +198,9 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(FunctionDeclaration functionDeclaration) {
+        currentTopLevelScopeElement = functionDeclaration;
         functionDeclaration.getScope().accept(this);
+        currentFullScope = currentScope;
         functionDeclaration.getStBody().accept(this);
         return null;
     }
@@ -205,17 +218,15 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        functionBlockDeclaration.getScope().accept(this);
-        if(functionBlockDeclaration.getStBody()!=null)
-        functionBlockDeclaration.getStBody().accept(this);
-        if(functionBlockDeclaration.getSfcBody()!=null)
+        currentTopLevelScopeElement = functionBlockDeclaration;
+        currentFullScope = OOUtils.getEffectiveScope(functionBlockDeclaration);
+        if (functionBlockDeclaration.getStBody() != null)
+            functionBlockDeclaration.getStBody().accept(this);
+        if (functionBlockDeclaration.getSfcBody() != null)
             functionBlockDeclaration.getSfcBody().accept(this);
-        return null;
+        return visit((ClassDeclaration) functionBlockDeclaration);
     }
 
 
@@ -257,6 +268,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
      */
     @Override
     public T visit(Scope localScope) {
+        currentScope = localScope;
         for (VariableDeclaration vd : localScope.asMap().values())
             vd.accept(this);
         return defaultVisit(localScope);
@@ -290,8 +302,12 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
         return super.visit(initializations);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T visit(Invocation invocation) {
+        invocation.getCallee().accept(this);
         invocation.getParameters().forEach(e -> e.accept(this));
         return super.visit(invocation);
     }
@@ -303,8 +319,15 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     }
 
     @Override
+    public T visit(InvocationStatement invocation) {
+        invocation.getInvocation().accept(this);
+        return super.visit(invocation);
+    }
+
+    @Override
     public T visit(StringTypeDeclaration stringTypeDeclaration) {
-        stringTypeDeclaration.getInitialization().accept(this);
+        if (stringTypeDeclaration.getInitialization() != null)
+            stringTypeDeclaration.getInitialization().accept(this);
         return super.visit(stringTypeDeclaration);
     }
 
@@ -336,6 +359,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(ClassDeclaration clazz) {
+        currentTopLevelScopeElement = clazz;
+        currentFullScope = OOUtils.getEffectiveScope(clazz);
         clazz.getScope().accept(this);
         for (MethodDeclaration m : new ArrayList<>(clazz.getMethods())) {
             m.accept(this);
@@ -345,6 +370,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(InterfaceDeclaration interfaceDeclaration) {
+        currentTopLevelScopeElement = interfaceDeclaration;
         interfaceDeclaration.getScope().accept(this);
         for (MethodDeclaration m : interfaceDeclaration.getMethods())
             m.accept(this);
@@ -353,6 +379,8 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(MethodDeclaration method) {
+        if (method.getParent() instanceof ClassDeclaration)
+            currentFullScope = OOUtils.getFullScope(method);
         method.getScope().accept(this);
         if (method.getStBody() != null)
             method.getStBody().accept(this);
@@ -361,6 +389,7 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
 
     @Override
     public T visit(GlobalVariableListDeclaration globalVariableListDeclaration) {
+        currentTopLevelScopeElement = globalVariableListDeclaration;
         globalVariableListDeclaration.getScope().accept(this);
         return super.visit(globalVariableListDeclaration);
     }
@@ -403,6 +432,12 @@ public class AstVisitor<T> extends DefaultVisitor<T> {
     @Override
     public T visit(SymbolicReference symbolicReference) {
         return super.visit(symbolicReference);
+    }
+
+    @Override
+    public T visit(ReferenceValue referenceValue) {
+        referenceValue.getReferenceTo().accept(this);
+        return super.visit(referenceValue);
     }
 
     @Override

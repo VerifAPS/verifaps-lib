@@ -26,14 +26,14 @@ import edu.kit.iti.formal.smv.ast.SCaseExpression;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
 import edu.kit.iti.formal.smv.ast.SVariable;
 
-import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
  * Created by weigl on 27.11.16.
  */
 public class SymbolicBranches
-        extends HashMap<SVariable, SCaseExpression> {
+        extends ConcurrentHashMap<SVariable, SCaseExpression> {
     public void addBranch(SMVExpr condition, SymbolicState state) {
         for (Entry<SVariable, SMVExpr> e : state.entrySet()) {
             get(e.getKey()).add(condition, e.getValue());
@@ -55,7 +55,7 @@ public class SymbolicBranches
      */
     public SymbolicState asCompressed() {
         SymbolicState sb = new SymbolicState();
-        forEach((key, value) -> sb.put(key, value.compress()));
+        entrySet().parallelStream().forEach(entry -> sb.put(entry.getKey(), entry.getValue().compress()));
         return sb;
     }
 }
