@@ -24,10 +24,7 @@ package edu.kit.iti.formal.automation.smv;
 
 import edu.kit.iti.formal.automation.datatypes.EnumerateType;
 import edu.kit.iti.formal.automation.datatypes.values.Values;
-import edu.kit.iti.formal.automation.exceptions.FunctionInvocationArgumentNumberException;
-import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException;
-import edu.kit.iti.formal.automation.exceptions.UnknownDatatype;
-import edu.kit.iti.formal.automation.exceptions.UnknownVariableException;
+import edu.kit.iti.formal.automation.exceptions.*;
 import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.smv.translators.*;
@@ -105,11 +102,6 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
     public SymbolicState pop() {
         SymbolicState top = state.pop();
-        // Update global variables
-        for (SVariable var : globalState.keySet()) {
-            peek().replace(var, top.get(var));
-            globalState.replace(var, top.get(var));
-        }
         return top;
     }
 
@@ -118,7 +110,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     }
     //endregion
 
-    public <K, V> void push(SymbolicState map) {
+    public void push(SymbolicState map) {
         state.push(map);
     }
 
@@ -161,6 +153,15 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
     @Override
     public SMVExpr visit(@NotNull SymbolicReference symbolicReference) {
+        if (symbolicReference.getDataType() == null && !symbolicReference.hasSub()) {
+            // TODO fix this dirty workaround
+            try {
+                symbolicReference.setDataType(localScope.resolveDataType(symbolicReference.getIdentifier()));
+            }
+            catch (DataTypeNotDefinedException | ClassCastException ignored) {
+                // pass
+            }
+        }
         if (symbolicReference.getDataType() instanceof EnumerateType
                 && ((EnumerateType) symbolicReference.getDataType())
                 .getAllowedValues().contains(symbolicReference.getIdentifier()))
@@ -227,7 +228,8 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     }
 
     public SMVExpr visit(@NotNull Invocation invocation) {
-        FunctionDeclaration fd = localScope.resolveFunction(invocation, localScope);
+        assert localScope != null;
+        FunctionDeclaration fd = localScope.resolveFunction(invocation);
         if (fd == null)
             throw new FunctionUndefinedException(invocation);
 
@@ -269,6 +271,8 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
                 VariableDeclaration.INPUT | VariableDeclaration.INOUT | VariableDeclaration.OUTPUT);
 
         if (parameters.size() > inputVars.size()) {
+            //System.err.println(fd.getFunctionName());
+            //inputVars.stream().map(VariableDeclaration::getName).forEach(System.err::println);
             throw new FunctionInvocationArgumentNumberException();
         }
 
@@ -276,15 +280,23 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
             Invocation.Parameter parameter = parameters.get(i);
             if (parameter.isOutput())
                 continue;
-            if (parameters.get(i).getName() == null)
+            if (parameter.getName() == null)
                 // name from definition, in order of declaration, expression from caller site
                 calleeState.put(lift(inputVars.get(i)), parameter.getExpression().accept(this));
             else {
                 Optional o = inputVars.stream().filter(iv -> iv.getName().equals(parameter.getName())).findAny();
-                if (o.isPresent())
-                    calleeState.put(lift((VariableDeclaration) o.get()), parameter.getExpression().accept(this));
+                if (o.isPresent()) {
+                    SMVExpr e = parameter.getExpression().accept(this);
+                    assert e != null;
+                    calleeState.put(lift((VariableDeclaration) o.get()), e);
+                }
             }
         }
+
+        for (VariableDeclaration outputVar : fd.getScope().filterByFlags(VariableDeclaration.OUTPUT))
+            calleeState.put(lift(outputVar), valueTranslator.translate(
+                    initValueTranslator.getInit(outputVar.getDataType())));
+
         push(calleeState);
         //endregion
 
@@ -298,15 +310,19 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
                 VariableDeclaration.OUTPUT | VariableDeclaration.INOUT);
         for (Invocation.Parameter parameter : outputParameters) {
             Optional o = outputVars.stream().filter(iv -> iv.getName().equals(parameter.getName())).findAny();
-            if (o.isPresent())
+            if (o.isPresent() && parameter.getExpression() instanceof SymbolicReference
+                    && !(((SymbolicReference) parameter.getExpression()).getDataType() instanceof EnumerateType))
                 peek().replace(lift((SymbolicReference) parameter.getExpression()),
                         returnState.get(lift((VariableDeclaration) o.get())));
+            // TODO handle parameter.getExpression() instanceof Literal, etc.
         }
 
         return fd.getReturnType() != null
-                ? calleeState.get(lift(fd.getScope().getVariable(fd.getName())))
+                ? calleeState.get(lift(Objects.requireNonNull(fd.getScope().getVariable(fd.getName()))))
                 : null;
     }
+
+    //endregion
 
     @Nullable
     @Override

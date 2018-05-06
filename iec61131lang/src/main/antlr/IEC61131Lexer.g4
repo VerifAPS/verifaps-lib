@@ -250,6 +250,10 @@ END_FUNCTION_BLOCK
 	 E N D UNDERSCORE F U N C T I O N UNDERSCORE B L O C K
 ;
 
+END_GVL
+:
+    E N D UNDERSCORE G V L
+;
 
 END_IF
 :
@@ -316,6 +320,11 @@ F_EDGE
 	F '_' E D G E
 ;
 
+GVL
+:
+    G V L
+;
+
 IF
 :
 	I F
@@ -379,11 +388,6 @@ RETAIN
 RETURN
 :
 	 R E T U R N
-;
-
-RIGHT_ARROW
-:
-	 '=>'
 ;
 
 R_EDGE
@@ -662,7 +666,12 @@ DOT
 ;
 
 
-REF : '^';
+CARET : '^';
+
+REF
+:
+  R E F
+;
 
 RANGE
 :

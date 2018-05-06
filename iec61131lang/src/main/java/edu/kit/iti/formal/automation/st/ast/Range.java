@@ -22,6 +22,8 @@ package edu.kit.iti.formal.automation.st.ast;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.st.util.Tuple;
+import javafx.util.Pair;
 import lombok.Data;
 
 /**
@@ -43,9 +45,9 @@ public class Range implements Copyable<Range> {
         this(Literal.integer(start), Literal.integer(stop));
     }
 
-    /*public Range(Pair<Integer, Integer> p) {
-        this(p.getKey(), p.getValue());
-    }*/
+    public Range(Tuple<Integer, Integer> p) {
+        this(p.a, p.b);
+    }
 
     @Override
     public Range copy() {

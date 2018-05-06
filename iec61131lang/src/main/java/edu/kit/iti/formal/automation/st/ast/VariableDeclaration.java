@@ -24,19 +24,14 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import com.google.common.collect.ImmutableMap;
 import edu.kit.iti.formal.automation.datatypes.AnyDt;
-import edu.kit.iti.formal.automation.scope.InstanceScope;
-import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.Identifiable;
 import edu.kit.iti.formal.automation.visitors.Visitor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by weigla on 09.06.2014.
@@ -44,9 +39,11 @@ import java.util.Set;
  * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
-@Data
 public class VariableDeclaration extends Top
         implements Comparable<VariableDeclaration>, Identifiable {
+    /**
+     * Constant <code>INPUT=1</code>
+     */
     public static final int INPUT = 1;
     public static final int OUTPUT = 2;
     public static final int INOUT = INPUT | OUTPUT;
@@ -91,30 +88,25 @@ public class VariableDeclaration extends Top
             AccessSpecifier.INTERNAL, INTERNAL,
             AccessSpecifier.PROTECTED, PROTECTED,
             AccessSpecifier.PRIVATE, PRIVATE);
-    /**
-     * Set of instances which this variable can assume. Populated by static analysis.
-     */
-    @Deprecated // does not belong here
-    private final Set<InstanceScope.Instance> instances = new HashSet<>();
-    /**
-     * Set of effective data types the values of the variable can assume. Populated in static analysis.
-     */
-    @Deprecated // does not belong here
-    private final Set<AnyDt> effectiveDataTypes = new HashSet<>();
-    private String name;
 
     @Getter
     @Setter
+    private String name;
+
+    @Getter
     private AnyDt dataType;
 
     private int type;
 
     private TypeDeclaration typeDeclaration;
+
     /**
-     * The local scope the variable is declared in.
+     * The top level scope element the variable belongs to.
      */
     @Deprecated
-    private Scope parent;
+    @Getter
+    @Setter
+    private TopLevelScopeElement parent;
 
     /**
      * <p>Constructor for VariableDeclaration.</p>
@@ -166,9 +158,8 @@ public class VariableDeclaration extends Top
      * @param td    a {@link edu.kit.iti.formal.automation.st.ast.TypeDeclaration} object.
      */
     public VariableDeclaration(@NotNull String name, int flags, @NotNull TypeDeclaration td) {
-        this.name = name;
+        this(name, td);
         type = flags;
-        typeDeclaration = td;
     }
 
     /**
@@ -181,24 +172,6 @@ public class VariableDeclaration extends Top
     public VariableDeclaration(@NotNull String name, int flags, @NotNull AnyDt dt) {
         this(name, dt);
         setType(flags);
-    }
-
-    /**
-     * <p>Getter for the field <code>name</code>.</p>
-     *
-     * @return a {@link java.lang.String} object.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * <p>Setter for the field <code>name</code>.</p>
-     *
-     * @param name a {@link java.lang.String} object.
-     */
-    public void setName(@NotNull String name) {
-        this.name = name;
     }
 
     /**
@@ -217,11 +190,16 @@ public class VariableDeclaration extends Top
         this.typeDeclaration.setInitialization(init);
     }
 
+    public void setDataType(@NotNull AnyDt dataType) {
+        this.dataType = dataType;
+    }
+
     /**
      * <p>getDataTypeName.</p>
      *
      * @return a {@link java.lang.String} object.
      */
+    @Nullable
     public String getDataTypeName() {
         if (dataType != null)
             return dataType.getName();
@@ -331,7 +309,7 @@ public class VariableDeclaration extends Top
      * @return a boolean.
      */
     public boolean isInOut() {
-        return is(INOUT);
+        return isInput() && isOutput();
     }
 
     /**
@@ -402,18 +380,6 @@ public class VariableDeclaration extends Top
         this.typeDeclaration = typeDeclaration;
     }
 
-    public void addInstance(@NotNull InstanceScope.Instance instance) {
-        instances.add(instance);
-    }
-
-    public void addEffectiveDataType(@NotNull AnyDt dataType) {
-        effectiveDataTypes.add(dataType);
-    }
-
-    public boolean hasEffectiveDataType(@NotNull AnyDt dataType) {
-        return effectiveDataTypes.contains(dataType);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -440,7 +406,10 @@ public class VariableDeclaration extends Top
     @Override
     public VariableDeclaration copy() {
         VariableDeclaration vd = new VariableDeclaration(name, type, typeDeclaration);
-        vd.setDataType(dataType);
+        if (dataType != null)
+            vd.setDataType(dataType);
+        vd.setInit(getInit());
+        vd.setParent(vd.getParent());
         return vd;
     }
 

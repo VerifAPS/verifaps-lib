@@ -22,19 +22,21 @@
 
 package edu.kit.iti.formal.automation;
 
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.*;
+import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
+import edu.kit.iti.formal.smv.printers.FilePrinter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
@@ -43,33 +45,48 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Augusto Modanese
  */
 @RunWith(Parameterized.class)
 public class FacadeSTFileTest {
-    private static final String RESOURCES_PATH = "edu/kit/iti/formal/automation/smv";
+    private static final String RESOURCES_PATH = "edu/kit/iti/formal/automation/smv/eval";
+
+    @Parameterized.Parameter
+    public File file;
 
     private Process nuxmv;
 
-    public static File[] getSTFiles(String folder) {
-        URL f = STOOIntegrationTests.class.getClassLoader().getResource(folder);
+    private static File[] getSTFiles() {
+        URL f = STOOIntegrationTests.class.getClassLoader().getResource(FacadeSTFileTest.RESOURCES_PATH);
         if (f == null) {
-            System.err.format("Could not find %s%n", folder);
+            System.err.format("Could not find %s%n", FacadeSTFileTest.RESOURCES_PATH);
             return new File[0];
         }
         File file = new File(f.getFile());
-        return Arrays.stream(file.listFiles()).filter(s -> s.getName().contains(".st")).toArray(File[]::new);
+        return Arrays.stream(Objects.requireNonNull(file.listFiles()))
+                .filter(s -> s.getName().contains(".st")).toArray(File[]::new);
     }
 
     @Parameterized.Parameters
     public static Object[] files() {
-        return getSTFiles(RESOURCES_PATH);
+        return getSTFiles();
     }
 
-    @Parameterized.Parameter
-    public File file;
+    private static int countStatements(TopLevelElements code) {
+        StatementCounter counter = new StatementCounter();
+        code.accept(counter);
+        return counter.count;
+    }
+
+    private static void write(SMVModule m, String fileName, boolean append) throws FileNotFoundException {
+        FilePrinter printer = new FilePrinter(Paths.get(fileName).toFile(), append);
+        m.accept(printer);
+        printer.close();
+    }
 
     private Path getSMVFile() {
         return Paths.get(getSMVDirectory() + "/" + file.getName() + ".smv");
@@ -85,38 +102,112 @@ public class FacadeSTFileTest {
             Files.createDirectory(getSMVDirectory());
     }
 
-    @Test(timeout = 4000)
+    @Test(timeout = 10 * 1000)  // this may take as much as >=2m; set longer timeout when running complex tests
     public void testSMVEvaluateProgram() throws IOException, InterruptedException {
         System.out.println(file.getName());
         TopLevelElements code = IEC61131Facade.file(file);
-        SMVModule module = SymbExFacade.evaluateProgram(code);
+        System.out.println("Found " + code.stream()
+                .filter(tle -> tle instanceof ClassDeclaration)
+                .collect(Collectors.toList())
+                .size() + " classes");
+        //System.out.print(countStatements(code) + " statements");
+        code = SymbExFacade.simplifyOO(code, true);
+        PrintWriter pw = new PrintWriter(Paths.get(getSMVDirectory() + "/" + file.getName() + "oo").toString());
+        System.out.println("Wrote STOO file");
+        pw.println(IEC61131Facade.print(code));
+        pw.close();
+        code = IEC61131Facade.file(file);
+        code = SymbExFacade.simplifyOO(code);
+        //System.out.print(countStatements(code) + " statements after simplification");
+        pw = new PrintWriter(Paths.get(getSMVDirectory() + "/" + file.getName() + "0").toString());
+        pw.println(IEC61131Facade.print(code));
+        pw.close();
+        System.out.println("Wrote ST0 file");
+        SMVModule module = SymbExFacade.evaluateProgram(code, true);
         SMVModule mainModule = createMainModule(module);
-        StringBuilder smvCode = new StringBuilder(mainModule.toString());
-        smvCode.append(module.toString());
-//      System.out.println(smvCode);
-        PrintWriter printWriter = new PrintWriter(getSMVFile().toString());
-        printWriter.println(smvCode);
-        printWriter.close();
+        write(mainModule, getSMVFile().toString(), false);
+        write(module, getSMVFile().toString(), true);
+        System.out.println(file.getName());
+        /*
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
         processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
         processBuilder.command("nuXmv", getSMVFile().toString());
         nuxmv = processBuilder.start();
         Assert.assertEquals(nuxmv.waitFor(), 0);
+        */
     }
 
     @After
     public void tearDown() throws IOException {
-        Files.delete(getSMVFile());
-        nuxmv.destroy();
+        //Files.delete(getSMVFile());
+        //nuxmv.destroy();
     }
 
     private SMVModule createMainModule(@NotNull SMVModule uut) {
         SMVModule mainModule = new SMVModule();
         mainModule.setName("main");
         mainModule.setStateVars(new ArrayList<>(uut.getModuleParameters()));
-        mainModule.getStateVars().add(
-                new SVariable("uut", new SMVType.Module(uut.getName(), uut.getModuleParameters())));
+        SMVType mainModuleType = new SMVType.Module(uut.getName(), uut.getModuleParameters());
+        mainModule.getStateVars().add(new SVariable("uut", mainModuleType ));
         return mainModule;
+    }
+
+    private static class StatementCounter extends AstVisitor<Object> {
+        int count = 0;
+
+        @Override
+        public Object visit(AssignmentStatement assignmentStatement) {
+            count++;
+            return super.visit(assignmentStatement);
+        }
+
+        @Override
+        public Object visit(RepeatStatement repeatStatement) {
+            count++;
+            return super.visit(repeatStatement);
+        }
+
+        @Override
+        public Object visit(WhileStatement whileStatement) {
+            count++;
+            return super.visit(whileStatement);
+        }
+
+        @Override
+        public Object visit(CaseStatement caseStatement) {
+            count++;
+            return super.visit(caseStatement);
+        }
+
+        @Override
+        public Object visit(ForStatement forStatement) {
+            count++;
+            return super.visit(forStatement);
+        }
+
+        @Override
+        public Object visit(IfStatement ifStatement) {
+            count++;
+            return super.visit(ifStatement);
+        }
+
+        @Override
+        public Object visit(ExitStatement exitStatement) {
+            count++;
+            return super.visit(exitStatement);
+        }
+
+        @Override
+        public Object visit(ReturnStatement returnStatement) {
+            count++;
+            return super.visit(returnStatement);
+        }
+
+        @Override
+        public Object visit(InvocationStatement fbc) {
+            count++;
+            return super.visit(fbc);
+        }
     }
 }

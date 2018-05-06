@@ -49,11 +49,6 @@ public abstract class STOOTransformation {
     static final String INSTANCE_ARRAY_NAME_PREFIX = "_INSTANCES_";
 
     /**
-     * Standard name to access the global variable list.
-     */
-    static final String GVL_NAME = "GVL";
-
-    /**
      * Standard name for the self parameter to add to methods. See MethodToFunction.
      */
     static final String SELF_PARAMETER_NAME = "_SELF";

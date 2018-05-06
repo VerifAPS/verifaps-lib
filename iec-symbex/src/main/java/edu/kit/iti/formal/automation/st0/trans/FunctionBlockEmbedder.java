@@ -48,7 +48,7 @@ public class FunctionBlockEmbedder extends AstMutableVisitor {
     public Object visit(SymbolicReference symbolicReference) {
         if (instanceName.equals(symbolicReference.getIdentifier())) {
             if (symbolicReference.getSub() != null) {
-                String field = ((SymbolicReference) symbolicReference.getSub()).getIdentifier();
+                String field = symbolicReference.getSub().getIdentifier();
                 SymbolicReference s = new SymbolicReference(instanceName + "$" + field);
                 return s;
             }

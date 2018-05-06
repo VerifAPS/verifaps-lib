@@ -22,13 +22,16 @@ package edu.kit.iti.formal.automation.datatypes;
  * #L%
  */
 
+import edu.kit.iti.formal.automation.oo.OOUtils;
+import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration;
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -39,6 +42,7 @@ import java.util.stream.Collectors;
  * @since 04.03.17
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 public class ClassDataType extends RecordType {
     @NotNull
@@ -66,9 +70,10 @@ public class ClassDataType extends RecordType {
     }
 
     @Override
-    public List<Field> getFields() {
-        return clazz.getEffectiveScope().stream()
-                .map(v -> new Field(v.getName(), v.getDataType()))
-                .collect(Collectors.toList());
+    @NotNull
+    public Scope getFields() {
+        return new Scope(OOUtils.getEffectiveScope(clazz).parallelStream()
+                .map(VariableDeclaration::copy)
+                .collect(Collectors.toList()));
     }
 }

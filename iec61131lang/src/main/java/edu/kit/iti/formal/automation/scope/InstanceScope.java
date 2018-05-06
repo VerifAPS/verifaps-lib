@@ -22,7 +22,10 @@
 
 package edu.kit.iti.formal.automation.scope;
 
+import com.google.common.collect.Iterables;
+import edu.kit.iti.formal.automation.analysis.InstanceSets;
 import edu.kit.iti.formal.automation.datatypes.ClassDataType;
+import edu.kit.iti.formal.automation.oo.OOUtils;
 import edu.kit.iti.formal.automation.st.ast.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,24 +44,23 @@ import java.util.stream.Collectors;
 public class InstanceScope implements Serializable {
     private final Scope globalScope;
     // Use TreeMap to assure instances are always in order; needed to write tests with explicit instance IDs
-    private Map<ClassDeclaration, List<Instance>> classInstances = new TreeMap();
-    //private Map<FunctionBlockDeclaration, List<Instance>> functionBlockInstances = new TreeMap();
-    private Map<InterfaceDeclaration, List<Instance>> interfaceInstances = new TreeMap();
-    private Map<ClassDeclaration, List<Instance>> classPolymorphInstances = new TreeMap();
-    //private Map<FunctionBlockDeclaration, List<Instance>> functionBlockPolymorphInstances = new TreeMap();
+    private Map<ClassDeclaration, List<Instance>> classInstances = new TreeMap<>();
+    private Map<InterfaceDeclaration, List<Instance>> interfaceInstances = new TreeMap<>();
+    private Map<ClassDeclaration, List<Instance>> classPolymorphInstances = new TreeMap<>();
+
+    private List<Instance> allInstances;
+
+    private InstanceSets instanceSets = new InstanceSets();
 
     public InstanceScope(Scope globalScope) {
         this.globalScope = globalScope;
         for (InterfaceDeclaration interfaceDeclaration : globalScope.getInterfaces().values())
-            interfaceInstances.put(interfaceDeclaration, new ArrayList());
-        for (ClassDeclaration classDeclaration : globalScope.getClasses().values()) {
-            classInstances.put(classDeclaration, new ArrayList());
-            classPolymorphInstances.put(classDeclaration, new ArrayList());
+            interfaceInstances.put(interfaceDeclaration, new ArrayList<>());
+        for (ClassDeclaration classDeclaration :
+                Iterables.concat(globalScope.getClasses().values(), globalScope.getFunctionBlocks().values())) {
+            classInstances.put(classDeclaration, new ArrayList<>());
+            classPolymorphInstances.put(classDeclaration, new ArrayList<>());
         }
-        /*for (FunctionBlockDeclaration functionBlockDeclaration : globalScope.getFunctionBlocks()) {
-            functionBlockInstances.put(functionBlockDeclaration, new ArrayList());
-            functionBlockPolymorphInstances.put(functionBlockDeclaration, new ArrayList());
-        }*/
     }
 
     /**
@@ -73,13 +75,6 @@ public class InstanceScope implements Serializable {
      */
     public List<Instance> getInstancesOfClass(ClassDeclaration classDeclaration) {
         return classInstances.get(classDeclaration);
-    }
-
-    /**
-     * @return The instances of a function block, disregarding polymorphy.
-     */
-    public List<Instance> getInstancesOfFunctionBlock(String functionBlockName) {
-        return getInstancesOfFunctionBlock(globalScope.getFunctionBlock(functionBlockName));
     }
 
     /**
@@ -112,52 +107,41 @@ public class InstanceScope implements Serializable {
     }
 
     /**
-     * @return The instances which can have the given function block as their type. Takes polymorphy into account.
-     */
-    public List<Instance> getPolymorphInstancesOfFunctionBlock(
-            FunctionBlockDeclaration functionBlockDeclaration) {
-        return getPolymorphInstancesOfClass(functionBlockDeclaration);
-        //return functionBlockPolymorphInstances.get(functionBlockDeclaration);
-    }
-
-    /**
      * @return A (flat) list of all instances in the scope.
      */
     public List<Instance> getAllInstances() {
-        return classInstances.values().stream()
-                .flatMap(Collection::stream)
-                .sorted(Comparator.comparing(i -> {
-                    assert i.getVariableDeclaration().getDataType() instanceof ClassDataType;
-                    ClassDeclaration instanceClass =
-                            ((ClassDataType) i.getVariableDeclaration().getDataType()).getClazz();
-                    StringBuilder sortName = new StringBuilder(instanceClass.getName());
-                    for (ClassDeclaration parent = instanceClass.getParentClass(); parent != null;
-                         parent = parent.getParentClass())
-                        sortName.insert(0, parent.getName() + "$");
-                    return sortName.toString();
-                })).collect(Collectors.toList());
+        if (allInstances == null)
+            allInstances = classInstances.values().stream()
+                    .flatMap(Collection::stream)
+                    .sorted(Comparator.comparing(i -> {
+                        assert i.getVariableDeclaration().getDataType() instanceof ClassDataType;
+                        ClassDeclaration instanceClass =
+                                ((ClassDataType) i.getVariableDeclaration().getDataType()).getClazz();
+                        StringBuilder sortName = new StringBuilder(instanceClass.getName());
+                        for (ClassDeclaration parent = instanceClass.getParentClass(); parent != null;
+                             parent = parent.getParentClass())
+                            sortName.insert(0, parent.getName() + "$");
+                        return sortName.toString();
+                    })).collect(Collectors.toList());
+        return allInstances;
     }
 
-    public void registerClassInstance(ClassDeclaration classDeclaration, Instance instance) {
-        classInstances.get(classDeclaration).add(instance);
-        classDeclaration.getImplementedInterfaces().forEach(i -> interfaceInstances.get(i).add(instance));
-        classDeclaration.getExtendedClasses().forEach(c -> classPolymorphInstances.get(c).add(instance));
+    /**
+     * Register a new instance of instanceClass to variable
+     * @param variable the variable containing the instance
+     * @param instanceClass the instance's class
+     * @param instance the instance to register
+     */
+    public void registerClassInstance(VariableDeclaration variable, ClassDeclaration instanceClass,
+                                      Instance instance) {
+        classInstances.get(instanceClass).add(instance);
+        OOUtils.getImplementedInterfaces(instanceClass).forEach(i -> interfaceInstances.get(i).add(instance));
+        OOUtils.getExtendedClasses(instanceClass).forEach(c -> classPolymorphInstances.get(c).add(instance));
+        instanceSets.addInstance(variable.getParent(), variable, instance);
     }
 
-    public void registerFunctionBlockInstance(FunctionBlockDeclaration functionBlockDeclaration,
-                                              Instance instance) {
-        registerClassInstance(functionBlockDeclaration, instance);
-        /*
-        functionBlockInstances.get(functionBlockDeclaration).add(instance);
-        functionBlockDeclaration.getImplementedInterfaces().forEach(i -> interfaceInstances.get(i).add(instance));
-        functionBlockDeclaration.getExtendedClasses().forEach(c -> {
-            if (c instanceof FunctionBlockDeclaration)
-                functionBlockPolymorphInstances.get(c).add(instance);
-            else
-                // Function blocks may also extend classes
-                classPolymorphInstances.get(c).add(instance);
-        });
-        */
+    public Set<Instance> getInstances(VariableDeclaration variable) {
+        return instanceSets.getInstances(variable.getParent(), variable);
     }
 
     /**

@@ -36,13 +36,14 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Alexander Weigl
  * @version 1 (25.06.17)
  */
 @Data
-@EqualsAndHashCode(exclude = {"token"})
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class Literal extends Initialization {
     public static final Literal FALSE = new Literal(AnyBit.BOOL, "FALSE");
@@ -156,7 +157,7 @@ public class Literal extends Initialization {
     }
 
     public static Literal dateAndTime(Token symbol) {
-        return new Literal(AnyReal.LREAL, symbol);
+        return new Literal(AnyDate.DATE_AND_TIME, symbol);
     }
 
     public static Literal integer(int val) {
@@ -201,13 +202,16 @@ public class Literal extends Initialization {
         return visitor.visit(this);
     }
 
+    @NotNull
     public Value asValue() {
         return asValue(new ValueTransformation(this));
     }
 
+    @NotNull
     private Value asValue(DataTypeVisitor<Value> transformer) {
         if (dataType.getIdentifiedObject() == null) {
-            throw new IllegalStateException("no identified data type. given data type name" + dataType.getIdentifier());
+            throw new IllegalStateException(
+                    "no identified data type. given data type name " + dataType.getIdentifier());
         }
         return dataType.getIdentifiedObject().accept(transformer);
     }

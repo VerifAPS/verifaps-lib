@@ -37,6 +37,7 @@ constant
 	| cast
 	| bits
 	| ref_null
+	| reference_value
 ;
 
 cast 
@@ -197,6 +198,7 @@ type_declaration
 	  ( R_EDGE
 	  | F_EDGE
 	  )?
+	| enumerated_specification
 	)
 	( ASSIGN i=initializations)?
 ;
@@ -273,7 +275,7 @@ array_initial_element
 structure_declaration
 :
 	STRUCT
-	(IDENTIFIER COLON type_declaration SEMICOLON)*
+	(ids += IDENTIFIER COLON tds += type_declaration SEMICOLON)*
 	END_STRUCT
 ;
 
@@ -294,6 +296,11 @@ string_type_declaration
 reference_specification
 :
     REF_TO type_declaration
+;
+
+reference_value
+:
+    REF LPAREN ref_to=symbolic_variable RPAREN
 ;
 
 identifier_list
@@ -579,7 +586,7 @@ fb_task
 prog_cnxn
 :
 	symbolic_variable ASSIGN prog_data_source
-	| symbolic_variable RIGHT_ARROW data_sink
+	| symbolic_variable ARROW_RIGHT data_sink
 ;
 
 prog_data_source
@@ -719,11 +726,11 @@ symbolic_variable
     //x^[a,252]
 	a=(IDENTIFIER|SUPER|THIS)
 	(
-        (deref += REF)*
+        (deref += CARET)+
 	)?
 	(
 		subscript_list
-        (REF)?
+        (CARET)?
 	)?
 	(
 		DOT other=symbolic_variable
@@ -747,7 +754,7 @@ return_statement : RETURN;
 
 param_assignment
 :
-	id=IDENTIFIER RIGHT_ARROW v=variable
+	id=IDENTIFIER ARROW_RIGHT v=variable
 	| (id=IDENTIFIER ASSIGN)? expression
 ;
 

@@ -25,13 +25,13 @@ package edu.kit.iti.formal.automation.smv;
 import edu.kit.iti.formal.smv.ast.SMVExpr;
 import edu.kit.iti.formal.smv.ast.SVariable;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by weigl on 27.11.16.
  */
-public class SymbolicState extends HashMap<SVariable, SMVExpr> {
+public class SymbolicState extends ConcurrentHashMap<SVariable, SMVExpr> {
 
     public SymbolicState(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);

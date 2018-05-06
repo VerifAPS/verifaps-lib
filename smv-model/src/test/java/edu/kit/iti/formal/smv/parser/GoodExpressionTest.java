@@ -49,8 +49,9 @@ public class GoodExpressionTest {
         SMVParser.ExprContext e = slp.expr();
         Assert.assertEquals(0, slp.getNumberOfSyntaxErrors());
         SMVExpr expr = (SMVExpr) e.accept(new SMVTransformToAST());
-        String out = expr.accept(new SMVPrinter());
-        System.out.println(">>> " + out);
+        // TODO
+        //String out = expr.accept(new StringPrinter());
+        //System.out.println(">>> " + out);
     }
 
     @Test
@@ -70,12 +71,12 @@ public class GoodExpressionTest {
         SMVParser slp1 = TestHelper.getParser(testExpression);
         SMVParser.ExprContext e1 = slp1.expr();
         SMVExpr expr1 = (SMVExpr) e1.accept(new SMVTransformToAST());
-        String out1 = expr1.accept(new SMVPrinter());
+        String out1 = expr1.accept(new StringPrinter());
 
         SMVParser slp2 = TestHelper.getParser(out1);
         SMVParser.ExprContext e2 = slp2.expr();
         SMVExpr expr2 = (SMVExpr) e2.accept(new SMVTransformToAST());
-        String out2 = expr2.accept(new SMVPrinter());
+        String out2 = expr2.accept(new StringPrinter());
 
         Assert.assertEquals(testExpression.replaceAll("[() ]",""),
                 out2.replaceAll("[() ]",""));

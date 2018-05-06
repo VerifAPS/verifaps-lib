@@ -25,6 +25,8 @@ package edu.kit.iti.formal.smv.parser;
 
 import edu.kit.iti.formal.smv.SMVPrinter;
 import edu.kit.iti.formal.smv.ast.SMVModule;
+import edu.kit.iti.formal.smv.printers.FilePrinter;
+import edu.kit.iti.formal.smv.printers.Printer;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,6 +35,7 @@ import org.junit.runners.Parameterized;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -60,7 +63,7 @@ public class ModuleTests {
         SMVTransformToAST a = new SMVTransformToAST();
         List<SMVModule> list = (List<SMVModule>) ctx.accept(a);
         for (SMVModule m : list) {
-            SMVPrinter p = new SMVPrinter();
+            Printer p = new FilePrinter(Paths.get(f.getAbsolutePath() + ".smv").toFile());
             System.out.println(m.accept(p));
         }
         Assert.assertEquals(0, slp.getNumberOfSyntaxErrors());

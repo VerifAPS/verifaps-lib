@@ -27,7 +27,10 @@ import edu.kit.iti.formal.automation.exceptions.TypeConformityException;
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.st.ast.Initialization;
+import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
 import edu.kit.iti.formal.automation.visitors.Visitor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Created by weigl on 24.11.16.
@@ -35,7 +38,11 @@ import edu.kit.iti.formal.automation.visitors.Visitor;
  * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class ReferenceValue extends Initialization {
+    private SymbolicReference referenceTo = new SymbolicReference();
+
     /**
      * {@inheritDoc}
      */
@@ -48,12 +55,13 @@ public class ReferenceValue extends Initialization {
      * {@inheritDoc}
      */
     public <T> T accept(Visitor<T> visitor) {
-        return null;
+        return visitor.visit(this);
     }
 
     @Override
     public ReferenceValue copy() {
         ReferenceValue rv = new ReferenceValue();
+        rv.referenceTo = referenceTo.copy();
         return rv;
     }
 }

@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.datatypes;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Created by weigl on 01.08.16.
@@ -32,9 +33,15 @@ import lombok.Data;
  * @version $Id: $Id
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 public class ReferenceType extends AnyReference {
     AnyDt of;
+
+    @Override
+    public String getName() {
+        return "REF_TO " + of.getName();
+    }
 
     /** {@inheritDoc} */
     @Override

@@ -22,12 +22,15 @@ package edu.kit.iti.formal.automation.st.util;
  * #L%
  */
 
+import lombok.EqualsAndHashCode;
+
 /**
  * Created by weigl on 13.06.14.
  *
  * @author weigl
  * @version $Id: $Id
  */
+@EqualsAndHashCode
 public class Tuple<S, T> {
     public final S a;
     public final T b;
@@ -54,5 +57,10 @@ public class Tuple<S, T> {
      */
     public static <T, S> Tuple<T, S> make(T a, S b) {
         return new Tuple(a, b);
+    }
+
+    @Override
+    public String toString() {
+        return a.toString() + "=" + b.toString();
     }
 }

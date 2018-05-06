@@ -67,6 +67,11 @@ public class FindDataTypes extends AstVisitor {
     @Override
     public Object visit(VariableDeclaration variableDeclaration) {
         //weigl: do not register anonymous datatype, or references to data types.
+        /*
+        if (variableDeclaration.getTypeDeclaration() instanceof ArrayTypeDeclaration)
+            variableDeclaration.getTypeDeclaration().accept(this);
+        return super.visit(variableDeclaration);
+        */
         return null;
     }
 
@@ -138,7 +143,7 @@ public class FindDataTypes extends AstVisitor {
         return super.visit(gvl);
     }
 
-    public void setParentScope(TopLevelScopeElement tle) {
+    private void setParentScope(TopLevelScopeElement tle) {
         tle.getScope().setParent(globalScope);
     }
 }

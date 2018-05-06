@@ -62,8 +62,8 @@ public class SymbolicExecutionTest {
         StatementList list = IEC61131Facade.statements(
                 "a := 2; c:= 4; b:=0; IF a = 2 THEN b := 2; ELSE b := 1; c:=2; END_IF;");
         list.accept(se);
-        Assert.assertEquals("{a=0sd16_2, b=if :: (0sd16_2=0sd16_2)->0sd16_2\n" +
-                        ":: TRUE->0sd16_1 fi, c=if :: (0sd16_2=0sd16_2)->0sd16_4\n" +
+        Assert.assertEquals("{a=0sd16_2, b=if :: TRUE->0sd16_2\n" +
+                        ":: TRUE->0sd16_1 fi, c=if :: TRUE->0sd16_4\n" +
                         ":: TRUE->0sd16_2 fi}",
                 se.peek().toString());
     }

@@ -27,9 +27,7 @@ import edu.kit.iti.formal.automation.st.ast.Literal;
 import edu.kit.iti.formal.smv.ast.SLiteral;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.annotation.Nonnull;
-import java.lang.reflect.Type;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Alexander Weigl
@@ -42,7 +40,8 @@ public class DefaultValueTranslator implements ValueTranslator {
     private TypeTranslator tt = DefaultTypeTranslator.INSTANCE;
 
     @Override
-    public SLiteral translate(Value init) {
+    @NotNull
+    public SLiteral translate(@NotNull Value init) {
         return SLiteral.Companion.create(init.getValue()).as(tt.translate(init.getDataType()));
     }
 }
