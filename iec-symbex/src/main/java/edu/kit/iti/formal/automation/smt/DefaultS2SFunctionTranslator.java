@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.smt;
  */
 
 import de.tudresden.inf.lat.jsexp.Sexp;
+import edu.kit.iti.formal.smv.GroundDataType;
 import edu.kit.iti.formal.smv.ast.*;
 
 import javax.annotation.Nonnull;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import static de.tudresden.inf.lat.jsexp.SexpFactory.newAtomicSexp;
-import static edu.kit.iti.formal.smv.ast.GroundDataType.BOOLEAN;
+import static edu.kit.iti.formal.smv.GroundDataType.BOOLEAN;
 
 /**
  * http://smtlib.cs.uiowa.edu/Logics/QF_BV.smt2

@@ -91,14 +91,14 @@ public class VariableDependency {
 
         @Override
         public Void visit(SBinaryExpression be) {
-            be.left.accept(this);
-            be.right.accept(this);
+            be.getLeft().accept(this);
+            be.getRight().accept(this);
             return null;
         }
 
         @Override
         public Void visit(SUnaryExpression ue) {
-            ue.expr.accept(this);
+            ue.getExpr().accept(this);
             return null;
         }
 
@@ -114,9 +114,9 @@ public class VariableDependency {
 
         @Override
         public Void visit(SCaseExpression ce) {
-            for (SCaseExpression.Case c : ce.cases) {
-                c.condition.accept(this);
-                c.then.accept(this);
+            for (SCaseExpression.Case c : ce.getCases()) {
+                c.getCondition().accept(this);
+                c.getThen().accept(this);
             }
             return null;
         }

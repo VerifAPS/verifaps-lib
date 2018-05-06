@@ -23,7 +23,7 @@ package edu.kit.iti.formal.smv.parser;
  */
 
 
-import edu.kit.iti.formal.smv.Printer;
+import edu.kit.iti.formal.smv.SMVPrinter;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Assert;
@@ -60,7 +60,7 @@ public class ModuleTests {
         SMVTransformToAST a = new SMVTransformToAST();
         List<SMVModule> list = (List<SMVModule>) ctx.accept(a);
         for (SMVModule m : list) {
-            Printer p = new Printer();
+            SMVPrinter p = new SMVPrinter();
             System.out.println(m.accept(p));
         }
         Assert.assertEquals(0, slp.getNumberOfSyntaxErrors());

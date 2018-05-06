@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.smv
 
-import edu.kit.iti.formal.smv.Printer
+import edu.kit.iti.formal.smv.SMVPrinter
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.*
 import mu.KLogging
@@ -139,12 +139,12 @@ open class RegressionVerification(
 
     open fun writeTo(writer: Writer) {
         with(writer) {
-            this.write(edu.kit.iti.formal.smv.Printer.toString(glueModule))
+            this.write(edu.kit.iti.formal.smv.SMVPrinter.toString(glueModule))
             val sep = "-".repeat(80) + "\n"
             this.write(sep)
-            this.write(edu.kit.iti.formal.smv.Printer.toString(oldVersion))
+            this.write(edu.kit.iti.formal.smv.SMVPrinter.toString(oldVersion))
             this.write(sep)
-            this.write(edu.kit.iti.formal.smv.Printer.toString(newVersion))
+            this.write(edu.kit.iti.formal.smv.SMVPrinter.toString(newVersion))
             this.write(sep)
         }
     }
@@ -172,7 +172,7 @@ abstract class Miter(val oldVersion: SMVModule, val newVersion: SMVModule) {
     var invarSpec: SMVExpr? = null
     abstract fun build()
     open fun writeTo(writer: Writer) {
-        writer.write(Printer.toString(module))
+        writer.write(SMVPrinter.toString(module))
     }
 }
 

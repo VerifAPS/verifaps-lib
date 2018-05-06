@@ -322,7 +322,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
         push();
         statement.getElseBranch().accept(this);
-        branchStates.addBranch(SLiteral.TRUE, pop());
+        branchStates.addBranch(SLiteral.Companion.getTRUE(), pop());
 
         peek().putAll(branchStates.asCompressed());
         return null;
@@ -342,7 +342,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
 
         push();
         caseStatement.getElseCase().accept(this);
-        branchStates.addBranch(SLiteral.TRUE, pop());
+        branchStates.addBranch(SLiteral.Companion.getTRUE(), pop());
 
         peek().putAll(branchStates.asCompressed());
         return null;
@@ -353,7 +353,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         return c.getConditions()
                 .stream()
                 .map(a -> a.accept(this))
-                .reduce(SMVFacade.reducer(SBinaryOperator.OR)).get();
+                .reduce(SMVFacade.INSTANCE.reducer(SBinaryOperator.OR)).get();
     }
 
     @NotNull

@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.smv;
  * #L%
  */
 
-
 import edu.kit.iti.formal.automation.smv.translators.*;
 import edu.kit.iti.formal.automation.st.ast.Literal;
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
