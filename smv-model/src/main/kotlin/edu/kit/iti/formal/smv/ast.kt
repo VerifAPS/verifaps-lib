@@ -24,6 +24,7 @@ interface SOperator {
  * @version 1 (09.04.18)
  */
 abstract class SMVAst {
+    final fun repr(): String = SMVPrinter.toString(this)
     abstract fun <T> accept(visitor: SMVAstVisitor<T>): T
 }
 
@@ -53,11 +54,6 @@ data class SBinaryExpression(var left: SMVExpr,
     override fun inModule(module: String): SBinaryExpression {
         return SBinaryExpression(left.inModule(module),
                 operator, right.inModule(module))
-    }
-
-    override fun toString(): String {
-        return '('.toString() + left.toString() + operator.symbol() + right + ')'
-                .toString()
     }
 
     override fun <T> accept(visitor: SMVAstVisitor<T>): T {
@@ -125,13 +121,6 @@ data class SCaseExpression(var cases: MutableList<Case> = arrayListOf()) : SMVEx
         return c
     }
 
-    override fun toString(): String {
-        return ("if " +
-                cases.stream()
-                        .map { c -> c.toString() }.reduce { a, b -> a + "\n" + b }
-                        .orElseGet { "" }
-                + " fi")
-    }
 
     /**
      *
@@ -176,10 +165,6 @@ data class SFunction(
         return SFunction(name,
                 arguments.map { a -> a.inModule(module) })
     }
-
-    override fun toString(): String {
-        return "$name($arguments)"
-    }
 }
 
 data class SLiteral(var value: Any, override var dataType: SMVType? = null)
@@ -190,25 +175,30 @@ data class SLiteral(var value: Any, override var dataType: SMVType? = null)
     }
 
 
-    override fun toString(): String {
+    /*override fun toString(): String {
         return when (dataType) {
             null -> value.toString()
             else -> dataType!!.format(value)
         }
-    }
+    }*/
 
     override fun <T> accept(visitor: SMVAstVisitor<T>): T {
         return visitor.visit(this)
     }
 
     companion object {
-
+        @JvmStatic
         val TRUE = SLiteral(true, SMVTypes.BOOLEAN)
+        @JvmStatic
         val FALSE = SLiteral(false, SMVTypes.BOOLEAN)
 
+        @JvmStatic
         fun integer(from: Long) = integer(BigInteger.valueOf(from))
+
+        @JvmStatic
         fun integer(from: BigInteger) = SLiteral.create(from).with(SMVTypes.INT)
 
+        @JvmStatic
         fun create(value: Any) = LiteralBuilder(value)
 
 
@@ -313,7 +303,18 @@ abstract class SMVExpr : SMVAst() {
     //endregion
 }
 
-data class SMVModule(
+
+operator fun MutableList<SAssignment>.set(eq: SVariable, value: SMVExpr) {
+    this.add(SAssignment(eq, value))
+}
+
+operator fun MutableList<SAssignment>.get(eq: SVariable): SMVExpr? {
+    return this.find { it.target == eq }?.expr
+}
+
+
+data class SMVModule
+@JvmOverloads constructor(
         var name: String,
         /**
          *
@@ -341,10 +342,6 @@ data class SMVModule(
     override fun <T> accept(visitor: SMVAstVisitor<T>): T {
         return visitor.visit(this)
     }
-
-    override fun toString(): String {
-        return SMVPrinter.toString(this)
-    }
 }
 
 
@@ -367,9 +364,9 @@ data class SVariable(var name: String) : SMVExpr(), Comparable<SVariable> {
         return name!!.compareTo(o.name!!)
     }
 
-    override fun toString(): String {
+    /*override fun toString(): String {
         return name
-    }
+    }*/
 
     fun addMetadata(metadata: Int): SVariable {
         this.metadata = this.metadata or metadata
@@ -648,9 +645,9 @@ class SUnaryExpression(
         return visitor.visit(this)
     }
 
-    override fun toString(): String {
+    /*override fun toString(): String {
         return operator.symbol() + expr
-    }
+    }*/
 }
 
 

@@ -62,8 +62,8 @@ public class DefaultOperationMap implements OperationMap {
      */
     protected SMVExpr div(@NotNull SMVExpr dividend, @NotNull SMVExpr divisor) {
         return SMVFacade.INSTANCE.caseexpr(
-                divisor.equal(SLiteral.Companion.create(0).as(divisor.getSMVType())),
-                SLiteral.Companion.create(0).as(dividend.getSMVType()), SLiteral.Companion.getTRUE(),
+                divisor.equal(SLiteral.Companion.create(0).with(divisor.getDataType())),
+                SLiteral.Companion.create(0).with(dividend.getDataType()), SLiteral.Companion.getTRUE(),
                 new SBinaryExpression(dividend, SBinaryOperator.DIV, divisor));
     }
 }

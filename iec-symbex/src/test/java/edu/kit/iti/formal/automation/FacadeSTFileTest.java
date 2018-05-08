@@ -24,10 +24,11 @@ package edu.kit.iti.formal.automation;
 
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstVisitor;
+import edu.kit.iti.formal.smv.ModuleType;
+import edu.kit.iti.formal.smv.SMVPrinter;
+import edu.kit.iti.formal.smv.SMVType;
 import edu.kit.iti.formal.smv.ast.SMVModule;
-import edu.kit.iti.formal.smv.ast.SMVType;
 import edu.kit.iti.formal.smv.ast.SVariable;
-import edu.kit.iti.formal.smv.printers.FilePrinter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
@@ -36,7 +37,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
@@ -82,10 +82,8 @@ public class FacadeSTFileTest {
         return counter.count;
     }
 
-    private static void write(SMVModule m, String fileName, boolean append) throws FileNotFoundException {
-        FilePrinter printer = new FilePrinter(Paths.get(fileName).toFile(), append);
-        m.accept(printer);
-        printer.close();
+    private static void write(SMVModule m, String fileName, boolean append) {
+        SMVPrinter.toFile(m, new File(fileName), append);
     }
 
     private Path getSMVFile() {
@@ -145,11 +143,10 @@ public class FacadeSTFileTest {
     }
 
     private SMVModule createMainModule(@NotNull SMVModule uut) {
-        SMVModule mainModule = new SMVModule();
-        mainModule.setName("main");
+        SMVModule mainModule = new SMVModule("main");
         mainModule.setStateVars(new ArrayList<>(uut.getModuleParameters()));
-        SMVType mainModuleType = new SMVType.Module(uut.getName(), uut.getModuleParameters());
-        mainModule.getStateVars().add(new SVariable("uut", mainModuleType ));
+        SMVType mainModuleType = new ModuleType(uut.getName(), uut.getModuleParameters());
+        mainModule.getStateVars().add(new SVariable("uut", mainModuleType));
         return mainModule;
     }
 

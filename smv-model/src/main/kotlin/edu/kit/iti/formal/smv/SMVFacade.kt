@@ -30,6 +30,7 @@ import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import java.util.*
+import java.util.function.BinaryOperator
 
 /**
  * Created by weigl on 26.11.16.
@@ -39,17 +40,19 @@ object SMVFacade {
     val FUNCTION_ID_EXPAND = "expand"
     val FUNCTION_ID_BIT_ACCESS = "<bitaccess>"
 
+    @JvmStatic
     fun getFunction1(name: String): SFunction {
         val f = SFunction(name)
         f.typeSolver = FunctionTypeSolvers.FIRST_ARGUMENT
         return f
     }
 
+    @JvmStatic
     fun next(expr: SMVExpr): SMVExpr {
         return SFunction("next", expr)
     }
 
-
+    @JvmStatic
     fun caseexpr(vararg exprs: SMVExpr): SMVExpr {
         val e = SCaseExpression()
         var i = 0
@@ -61,29 +64,34 @@ object SMVFacade {
     }
 
 
+    @JvmStatic
     fun combine(op: SBinaryOperator, vararg exprs: SMVExpr): SMVExpr {
         return Arrays.stream(exprs).reduce(reducer(op)).get()
     }
 
+    @JvmStatic
     fun combine(op: SBinaryOperator, exprs: List<SMVExpr>): SMVExpr {
         return exprs.stream().reduce(reducer(op)).get()
     }
 
+    @JvmStatic
     fun combine(op: SBinaryOperator, exprs: List<SMVExpr>, defaultValue: SMVExpr): SMVExpr {
         return exprs.stream().reduce(reducer(op)).orElse(defaultValue)
     }
 
-    fun reducer(op: SBinaryOperator): (SMVExpr, SMVExpr) -> SMVExpr {
-        return { a: SMVExpr, b: SMVExpr -> SBinaryExpression(a, op, b) }
+    @JvmStatic
+    fun reducer(op: SBinaryOperator): BinaryOperator<SMVExpr> {
+        return BinaryOperator({ a: SMVExpr, b: SMVExpr -> SBinaryExpression(a, op, b) })
     }
 
+    @JvmStatic
     fun NOT(e: SMVExpr): SUnaryExpression {
         return SUnaryExpression(SUnaryOperator.NEGATE, e)
     }
 
     fun expr(s: String): SMVExpr {
         val ctx = getParser(CharStreams.fromString(s)).expr()
-        return ctx  .accept(SMVTransformToAST()) as SMVExpr
+        return ctx.accept(SMVTransformToAST()) as SMVExpr
     }
 
     /*

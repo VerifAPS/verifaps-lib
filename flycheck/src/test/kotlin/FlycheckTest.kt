@@ -1,4 +1,5 @@
 import edu.kit.iti.formal.automation.Flycheck
+import java.io.File
 import kotlin.test.Test
 
 /**
@@ -11,6 +12,11 @@ import kotlin.test.Test
 class FlycheckTest {
     @Test
     fun test() {
-        Flycheck.main(arrayOf("src/test/resources/test.st"))
+        val file = File("src/test/resources/test.st").absolutePath
+        try {
+            Flycheck.main(arrayOf(file))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

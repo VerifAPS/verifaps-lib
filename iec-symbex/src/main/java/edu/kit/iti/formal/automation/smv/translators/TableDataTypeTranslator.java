@@ -24,7 +24,8 @@ package edu.kit.iti.formal.automation.smv.translators;
 
 import edu.kit.iti.formal.automation.datatypes.AnyDt;
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
-import edu.kit.iti.formal.smv.ast.SMVType;
+import edu.kit.iti.formal.smv.SMVType;
+import edu.kit.iti.formal.smv.SMVTypes;
 import edu.kit.iti.formal.smv.ast.SVariable;
 import lombok.Getter;
 
@@ -68,7 +69,8 @@ public class TableDataTypeTranslator implements TypeTranslator {
             int i = integerMap.get(vdecl.getName());
             if (i == 0)
                 return SVariable.Companion.create(vdecl.getName()).asBool();
-            return SVariable.Companion.create(vdecl.getName()).with(i < 0 ? SMVType.Companion.unsigned(-i) : SMVType.Companion.signed(i));
+            return SVariable.Companion.create(vdecl.getName()).with(i < 0
+                    ? SMVTypes.unsigned(-i) : SMVTypes.signed(i));
         } else {
             return SVariable.Companion.create(vdecl.getName()).with(translate(vdecl.getDataType()));
         }

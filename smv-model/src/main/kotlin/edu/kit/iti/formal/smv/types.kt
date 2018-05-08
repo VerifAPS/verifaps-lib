@@ -4,6 +4,8 @@ import edu.kit.iti.formal.smv.ast.SFunction
 import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -89,19 +91,22 @@ object SMVTypes {
         override fun repr(): String = "boolean"
     }
 
+    @JvmStatic
     fun infer(list: List<SMVType>): SMVType? {
         return if (list.stream().allMatch { a -> a == list[0] }) list[0] else null
     }
 
+    @JvmStatic
     fun infer(a: SMVType, b: SMVType): SMVType? {
         return if (a == b) a else null
-
     }
 
+    @JvmStatic
     fun unsigned(i: Int): SMVWordType {
         return SMVWordType(false, i)
     }
 
+    @JvmStatic
     fun signed(i: Int): SMVWordType {
         return SMVWordType(true, i)
     }
@@ -137,12 +142,11 @@ data class ModuleType(
             this(name, Arrays.asList<SVariable>(*variables))
 
     override fun toString(): String {
-        val printer = SMVPrinter()
-        return String.format("%s(%s)",
-                moduleName,
-                parameters.stream()
-                        .map { v -> v.accept(printer) }
-                        .reduce { a, b -> "$a, $b" }.orElse(""))
+        val stream = StringWriter()
+        val printer = SMVPrinter(PrintWriter(stream))
+        return String.format("${moduleName}(%s)",
+                parameters.map { v -> v.toString() }//v.accept(printer) }
+                        .reduce { a, b -> "$a, $b" })
     }
 }
 

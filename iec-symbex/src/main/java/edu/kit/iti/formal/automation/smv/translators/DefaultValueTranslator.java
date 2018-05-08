@@ -42,6 +42,6 @@ public class DefaultValueTranslator implements ValueTranslator {
     @Override
     @NotNull
     public SLiteral translate(@NotNull Value init) {
-        return SLiteral.Companion.create(init.getValue()).as(tt.translate(init.getDataType()));
+        return SLiteral.create(init.getValue()).with(tt.translate(init.getDataType()));
     }
 }

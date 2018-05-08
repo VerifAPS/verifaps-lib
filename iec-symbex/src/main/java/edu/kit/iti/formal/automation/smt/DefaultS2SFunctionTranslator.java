@@ -10,12 +10,12 @@ package edu.kit.iti.formal.automation.smt;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -23,8 +23,13 @@ package edu.kit.iti.formal.automation.smt;
  */
 
 import de.tudresden.inf.lat.jsexp.Sexp;
-import edu.kit.iti.formal.smv.GroundDataType;
-import edu.kit.iti.formal.smv.ast.*;
+import edu.kit.iti.formal.smv.EnumType;
+import edu.kit.iti.formal.smv.SMVType;
+import edu.kit.iti.formal.smv.SMVTypes;
+import edu.kit.iti.formal.smv.SMVWordType;
+import edu.kit.iti.formal.smv.ast.SBinaryOperator;
+import edu.kit.iti.formal.smv.ast.SFunction;
+import edu.kit.iti.formal.smv.ast.SUnaryOperator;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -32,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 
 import static de.tudresden.inf.lat.jsexp.SexpFactory.newAtomicSexp;
-import static edu.kit.iti.formal.smv.GroundDataType.BOOLEAN;
 
 /**
  * http://smtlib.cs.uiowa.edu/Logics/QF_BV.smt2
@@ -91,20 +95,20 @@ public class DefaultS2SFunctionTranslator implements S2SFunctionTranslator {
     public Sexp translateOperator(@Nonnull SBinaryOperator operator, @Nonnull SMVType typeLeft, @Nonnull SMVType rightType) {
         String defaultValue = "not-found-operator-" + operator.symbol();
 
-        if (typeLeft.getBaseType() == BOOLEAN) {
+        if (typeLeft == SMVTypes.BOOLEAN.INSTANCE) {
             return newAtomicSexp(logicalOperators.getOrDefault(operator,
                     defaultValue));
         }
 
-        if (typeLeft.getBaseType() == GroundDataType.SIGNED_WORD) {
-            return newAtomicSexp(bvsOperators.getOrDefault(operator, defaultValue));
+        if (typeLeft instanceof SMVWordType) {
+            SMVWordType left = (SMVWordType) typeLeft;
+            if (left.getSigned())
+                return newAtomicSexp(bvsOperators.getOrDefault(operator, defaultValue));
+            else
+                return newAtomicSexp(bvuOperators.getOrDefault(operator, defaultValue));
         }
 
-        if (typeLeft.getBaseType() == GroundDataType.UNSIGNED_WORD) {
-            return newAtomicSexp(bvuOperators.getOrDefault(operator, defaultValue));
-        }
-
-        if(typeLeft instanceof SMVType.EnumType) {
+        if (typeLeft instanceof EnumType) {
             return newAtomicSexp(bvuOperators.getOrDefault(operator, defaultValue));
         }
 

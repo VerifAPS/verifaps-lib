@@ -27,7 +27,7 @@ import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st0.trans.ST0Transformation;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 
 public class TrivialBranchReducer implements ST0Transformation {
     @Override
@@ -81,7 +81,7 @@ public class TrivialBranchReducer implements ST0Transformation {
             int left = Integer.valueOf(((Literal) binaryExpression.getLeftExpr()).getText());
             int right = Integer.valueOf(((Literal) binaryExpression.getRightExpr()).getText());
             if (!binaryExpression.getOperator().equals(Operators.EQUALS))
-                throw new NotImplementedException();
+                throw new NotImplementedException("");
             return left == right;
         }
     }

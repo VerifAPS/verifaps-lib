@@ -23,13 +23,14 @@ package edu.kit.iti.formal.smv
  */
 
 import edu.kit.iti.formal.smv.ast.*
-import java.io.PrintWriter
-import java.io.StringWriter
+import org.jetbrains.annotations.NotNull
+import java.io.*
 
 class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
     override fun visit(top: SMVAst) {
         throw IllegalArgumentException("not implemented for $top")
     }
+
 
     override fun visit(be: SBinaryExpression) {
         val pleft = precedence(be.left)
@@ -71,7 +72,7 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
             stream.print(")")
         } else {
             stream.print(ue.operator.symbol())
-            stream.print(ue.expr.accept(this))
+            ue.expr.accept(this)
         }
     }
 
@@ -147,11 +148,12 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
     private fun printAssignments(func: String, assignments: List<SAssignment>) {
         for ((target, expr) in assignments) {
             stream.print("\t")
-            ;stream.print(func)
-            ;stream.print('(')
-            ;stream.print(target.name)
-            ;stream.print(") := ")
-            ;stream.print(expr.accept(this));stream.print(";\n")
+            stream.print(func)
+            stream.print('(')
+            stream.print(target.name)
+            stream.print(") := ")
+            expr.accept(this)
+            stream.print(";\n")
         }
     }
 
@@ -174,7 +176,7 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
         stream.print(func.name)
         stream.print('(')
         func.arguments.forEachIndexed { i, e ->
-            stream.print(e.accept(this))
+            e.accept(this)
             if (i + 1 < func.arguments.size)
                 stream.print(", ")
         }
@@ -190,16 +192,16 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
             1 -> {
                 stream.print(quantified.operator.symbol())
                 stream.print("( ")
-                stream.print(quantified[0].accept(this))
+                quantified[0].accept(this)
                 stream.print(")")
             }
             2 -> {
                 stream.print("( ")
-                stream.print(quantified[0].accept(this))
+                (quantified[0].accept(this))
                 stream.print(")")
                 stream.print(quantified.operator.symbol())
                 stream.print("( ")
-                stream.print(quantified[1].accept(this))
+                (quantified[1].accept(this))
                 stream.print(")")
             }
             else -> throw IllegalStateException("too much arity")
@@ -207,7 +209,7 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
     }
 
     private fun printVariables(type: String, vars: List<SVariable>) {
-        if (vars.size != 0) {
+        if (vars.isNotEmpty()) {
             stream.print(type)
             stream.print('\n')
 
@@ -215,7 +217,7 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
                 stream.print('\t')
                 stream.print(svar.name)
                 stream.print(" : ")
-                stream.print(svar.dataType)
+                stream.print(svar.dataType?.repr())
                 stream.print(";\n")
             }
 
@@ -231,12 +233,22 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
     }
 
     companion object {
-        fun toString(m: SMVModule): String {
+        @JvmStatic
+        fun toString(m: SMVAst): String {
             val w = StringWriter()
             val s = PrintWriter(w)
             val p = SMVPrinter(s)
-            p.visit(m)
+            m.accept(p)
+            s.close()
             return w.toString()
+        }
+
+        @JvmStatic
+        fun toFile(m: @NotNull SMVAst, file: @NotNull File, append: Boolean = false) {
+            PrintWriter(BufferedWriter(FileWriter(file, append))).use {
+                val p = SMVPrinter(it)
+                m.accept(p)
+            }
         }
     }
 }

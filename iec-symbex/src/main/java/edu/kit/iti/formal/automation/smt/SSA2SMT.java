@@ -10,12 +10,12 @@ package edu.kit.iti.formal.automation.smt;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -62,20 +62,21 @@ public class SSA2SMT implements Runnable {
         Smv2SMTVisitor v = new Smv2SMTVisitor();
 
         //rewrite initial assignments
-        input.getInit().forEach(a -> product.getInitPredicates().put(a.target.getName(),
-                a.expr.accept(v)));
+        input.getInitAssignments().forEach(
+                a -> product.getInitPredicates().put(a.getTarget().getName(),
+                        a.getExpr().accept(v)));
 
         //rewrite next assignments
-        input.getNext().forEach(a -> {
-            product.getNextPredicates().put(a.target.getName(),
-                    a.expr.accept(v));
+        input.getNextAssignments().forEach(a -> {
+            product.getNextPredicates().put(a.getTarget().getName(),
+                    a.getExpr().accept(v));
         });
 
         //define state values
         input.getStateVars().forEach(var -> {
                     product.getStateDataTypes()
                             .put(var.getName(),
-                                    dtTranslator.translate(var.getDatatype()));
+                                    dtTranslator.translate(var.getDataType()));
                 }
         );
 
@@ -83,7 +84,7 @@ public class SSA2SMT implements Runnable {
         input.getModuleParameters().forEach(var -> {
                     product.getInputDataTypes()
                             .put(var.getName(),
-                                    dtTranslator.translate(var.getDatatype()));
+                                    dtTranslator.translate(var.getDataType()));
                 }
         );
     }
@@ -109,7 +110,7 @@ public class SSA2SMT implements Runnable {
             Sexp left = be.getLeft().accept(this);
             Sexp right = be.getRight().accept(this);
             Sexp op = fnTranslator.translateOperator(be.getOperator(),
-                    be.getLeft().getSMVType(), be.getRight().getSMVType());
+                    be.getLeft().getDataType(), be.getRight().getDataType());
 
             Sexp call = newNonAtomicSexp();
             call.add(op);
@@ -121,7 +122,7 @@ public class SSA2SMT implements Runnable {
         @Override
         public Sexp visit(SUnaryExpression ue) {
             Sexp right = ue.getExpr().accept(this);
-            Sexp op = fnTranslator.translateOperator(ue.getOperator(), ue.getExpr().getSMVType());
+            Sexp op = fnTranslator.translateOperator(ue.getOperator(), ue.getExpr().getDataType());
             Sexp call = newNonAtomicSexp();
             call.add(op);
             call.add(right);

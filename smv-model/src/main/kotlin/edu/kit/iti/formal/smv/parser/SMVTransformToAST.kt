@@ -53,7 +53,9 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
         return module
     }
 
-    override fun visitModuleElement(ctx: SMVParser.ModuleElementContext): Any {
+    override fun visitModuleElement(ctx: SMVParser.ModuleElementContext): Any? {
+        println(ctx.childCount)
+        println(ctx.getChild(0))
         return ctx.getChild(0).accept(this)
     }
 
@@ -88,8 +90,9 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
     }
 
     override fun visitDefineBody(ctx: SMVParser.DefineBodyContext): Any? {
-        lastModule!!.definitions[SVariable.create(ctx.`var`.getText()).with(null)] =
-                ctx.expr().accept(this) as SMVExpr
+        lastModule!!.definitions.add(
+                SAssignment(SVariable.create(ctx.`var`.getText()).with(null),
+                        ctx.expr().accept(this) as SMVExpr))
         return null
     }
 
@@ -261,34 +264,6 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
 
     override fun visitFalseExpr(ctx: SMVParser.FalseExprContext): SLiteral {
         return SLiteral.FALSE
-    }
-
-    override fun visitDefineDeclaration(ctx: SMVParser.DefineDeclarationContext): Any {
-        return super.visitDefineDeclaration(ctx)
-    }
-
-    override fun visitAssignConstraint(ctx: SMVParser.AssignConstraintContext): Any {
-        return super.visitAssignConstraint(ctx)
-    }
-
-    override fun visitAssignBody(ctx: SMVParser.AssignBodyContext): Any {
-        return super.visitAssignBody(ctx)
-    }
-
-    override fun visitTrans(ctx: SMVParser.TransContext): Any {
-        return super.visitTrans(ctx)
-    }
-
-    override fun visitInit(ctx: SMVParser.InitContext): Any {
-        return super.visitInit(ctx)
-    }
-
-    override fun visitInvar(ctx: SMVParser.InvarContext): Any {
-        return super.visitInvar(ctx)
-    }
-
-    override fun visitVariableID(ctx: SMVParser.VariableIDContext): Any {
-        return super.visitVariableID(ctx)
     }
 
     override fun visitModuleTypeProcess(ctx: SMVParser.ModuleTypeProcessContext): Any {

@@ -36,8 +36,8 @@ import edu.kit.iti.formal.automation.st.util.AstVisitor;
 import edu.kit.iti.formal.automation.st.util.Tuple;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -205,7 +205,7 @@ public class FindEffectiveSubtypes extends AstVisitor {
             dataTypes = resolveTypes(((ReferenceValue) expression).getReferenceTo());
         else {
             // TODO other cases
-            throw new NotImplementedException();
+            throw new NotImplementedException("");
         }
         return dataTypes;
     }
