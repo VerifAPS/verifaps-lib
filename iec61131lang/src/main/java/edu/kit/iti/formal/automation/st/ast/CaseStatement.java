@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * @version $Id: $Id
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class CaseStatement extends Statement {
     private Expression expression;
     private List<Case> cases = new ArrayList<>();
@@ -76,7 +76,7 @@ public class CaseStatement extends Statement {
     }
 
     @Data
-    @EqualsAndHashCode(callSuper = true)
+    @EqualsAndHashCode
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Case extends Top {

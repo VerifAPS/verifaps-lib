@@ -34,7 +34,7 @@ import lombok.NoArgsConstructor;
  * @author Augusto Modanese
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReferenceSpecification extends TypeDeclaration<Initialization> {

@@ -100,7 +100,7 @@ public class FindEffectiveSubtypes extends AstVisitor {
 
     @Override
     public Object visit(MethodDeclaration method) {
-        visit((TopLevelScopeElement) method);
+        //TODO useless? visit((TopLevelScopeElement) method);
         return super.visit(method);
     }
 

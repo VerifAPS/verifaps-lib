@@ -23,6 +23,8 @@
 package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
+import edu.kit.iti.formal.automation.st.Identifiable;
+import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,9 +39,10 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(exclude = "methods", callSuper = true)
 @NoArgsConstructor
-public class InterfaceDeclaration extends Classifier<IEC61131Parser.Interface_declarationContext> {
-    private String name;
-    private List<MethodDeclaration> methods = new ArrayList<>();
+public final class InterfaceDeclaration extends TopLevelScopeElement<IEC61131Parser.Interface_declarationContext> implements Identifiable {
+    protected List<IdentifierPlaceHolder<InterfaceDeclaration>> interfaces = new ArrayList<>();
+    protected List<MethodDeclaration> methods = new ArrayList<>();
+    protected String name = "";
 
     @Override
     public String getIdentifier() {
@@ -47,11 +50,11 @@ public class InterfaceDeclaration extends Classifier<IEC61131Parser.Interface_de
     }
 
     @Override
-    public TopLevelScopeElement copy() {
+    public InterfaceDeclaration copy() {
         InterfaceDeclaration i = new InterfaceDeclaration();
         i.name = name;
         methods.forEach(method -> i.methods.add(method.copy()));
-        interfaces.forEach(intf -> i.addExtendsOrImplements(intf.getIdentifier()));
+        interfaces.forEach(intf -> i.interfaces.add(intf.copy()));
         return i;
     }
 

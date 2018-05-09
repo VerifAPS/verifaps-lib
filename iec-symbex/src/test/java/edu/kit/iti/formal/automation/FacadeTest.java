@@ -10,12 +10,12 @@ package edu.kit.iti.formal.automation;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -28,6 +28,8 @@ import edu.kit.iti.formal.smv.ast.SMVExpr;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import edu.kit.iti.formal.smv.ast.SVariable;
 import org.antlr.v4.runtime.CharStreams;
+import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -42,14 +44,18 @@ public class FacadeTest {
     @Test
     public void testEvaluateFunction() throws IOException {
         InputStream resource = getClass().getResourceAsStream("/edu/kit/iti/formal/automation/st/func_sel.st");
+        Assume.assumeNotNull(resource);
         List<TopLevelElement> toplevels = IEC61131Facade.file(CharStreams.fromStream(resource));
         FunctionDeclaration func = (FunctionDeclaration) toplevels.get(0);
         SMVExpr state = SymbExFacade.evaluateFunction(func,
                 SVariable.Companion.create("a").asBool(),
                 SVariable.Companion.create("b").asBool(),
                 SVariable.Companion.create("c").asBool());
-        System.out.println(state);
-        //Assert.assertEquals();
+        //System.out.println(state);
+        Assert.assertNotEquals(null, state);
+        Assert.assertEquals(
+                "case a : b; TRUE : c; esac".replaceAll("\\s", ""),
+                state.repr().replaceAll("\\s", ""));
     }
 
     @Test

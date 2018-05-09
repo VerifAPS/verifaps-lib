@@ -42,7 +42,7 @@ import java.util.List;
  * @version $Id: $Id
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class RecordType extends AnyDt {

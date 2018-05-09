@@ -10,12 +10,12 @@ package edu.kit.iti.formal.automation.st.ast;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -38,7 +38,7 @@ import java.util.stream.Stream;
  * @author weigl
  * @version $Id: $Id
  */
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "declarations", callSuper = false)
 @ToString
 public class TypeDeclarations extends TopLevelElement implements List<TypeDeclaration> {
     private List<TypeDeclaration> declarations = new ArrayList<>();
@@ -60,193 +60,256 @@ public class TypeDeclarations extends TopLevelElement implements List<TypeDeclar
         declarations.addAll(Arrays.asList(stp));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @Override public TypeDeclarations copy() {
+    @Override
+    public TypeDeclarations copy() {
         TypeDeclarations td = new TypeDeclarations();
         td.setRuleContext(getRuleContext());
         forEach(t -> td.add(t.copy()));
         return td;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int size() {
         return declarations.size();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isEmpty() {
         return declarations.isEmpty();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean contains(Object o) {
         return declarations.contains(o);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterator<TypeDeclaration> iterator() {
         return declarations.iterator();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object[] toArray() {
         return declarations.toArray();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T[] toArray(T[] a) {
         return declarations.toArray(a);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean add(TypeDeclaration typeDeclaration) {
         return declarations.add(typeDeclaration);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean remove(Object o) {
         return declarations.remove(o);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean containsAll(Collection<?> c) {
         return declarations.containsAll(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean addAll(Collection<? extends TypeDeclaration> c) {
         return declarations.addAll(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean addAll(int index, Collection<? extends TypeDeclaration> c) {
         return declarations.addAll(index, c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean removeAll(Collection<?> c) {
         return declarations.removeAll(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean retainAll(Collection<?> c) {
         return declarations.retainAll(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void replaceAll(UnaryOperator<TypeDeclaration> operator) {
         declarations.replaceAll(operator);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sort(Comparator<? super TypeDeclaration> c) {
         declarations.sort(c);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void clear() {
         declarations.clear();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TypeDeclaration get(int index) {
         return declarations.get(index);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TypeDeclaration set(int index, TypeDeclaration element) {
         return declarations.set(index, element);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void add(int index, TypeDeclaration element) {
         declarations.add(index, element);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TypeDeclaration remove(int index) {
         return declarations.remove(index);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int indexOf(Object o) {
         return declarations.indexOf(o);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int lastIndexOf(Object o) {
         return declarations.lastIndexOf(o);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ListIterator<TypeDeclaration> listIterator() {
         return declarations.listIterator();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ListIterator<TypeDeclaration> listIterator(int index) {
         return declarations.listIterator(index);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<TypeDeclaration> subList(int fromIndex, int toIndex) {
         return declarations.subList(fromIndex, toIndex);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Spliterator<TypeDeclaration> spliterator() {
         return declarations.spliterator();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean removeIf(Predicate<? super TypeDeclaration> filter) {
         return declarations.removeIf(filter);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Stream<TypeDeclaration> stream() {
         return declarations.stream();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Stream<TypeDeclaration> parallelStream() {
         return declarations.parallelStream();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void forEach(Consumer<? super TypeDeclaration> action) {
         declarations.forEach(action);
@@ -266,8 +329,11 @@ public class TypeDeclarations extends TopLevelElement implements List<TypeDeclar
         return false;
     }
 
-    /** {@inheritDoc} */
-    @Override public String getIdentifier() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getIdentifier() {
         return "types";
     }
 }

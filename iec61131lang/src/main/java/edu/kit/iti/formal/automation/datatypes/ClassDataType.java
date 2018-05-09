@@ -64,11 +64,6 @@ public class ClassDataType extends RecordType {
         return clazz.getName();
     }
 
-    @NotNull
-    public ClassDeclaration getClazz() {
-        return clazz;
-    }
-
     @Override
     @NotNull
     public Scope getFields() {

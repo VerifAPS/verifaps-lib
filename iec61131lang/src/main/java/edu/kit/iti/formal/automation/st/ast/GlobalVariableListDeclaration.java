@@ -24,11 +24,13 @@ package edu.kit.iti.formal.automation.st.ast;
 
 import edu.kit.iti.formal.automation.visitors.Visitor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author Augusto Modanese
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class GlobalVariableListDeclaration extends TopLevelScopeElement {
     @Override
     public String getIdentifier() {

@@ -218,7 +218,7 @@ public class MethodToFunction extends STOOTransformation {
             VariableDeclaration self = new VariableDeclaration(SELF_PARAMETER_NAME,
                     state.getScope().resolveDataType(parent.getName()));
             self.setType(VariableDeclaration.INOUT);
-            self.setParent(method);
+            //self.setParent(method);
             method.getScope().add(self);
             // Add self access to variables in local scope which are in the class' scope
             visitingClassMethod = true;

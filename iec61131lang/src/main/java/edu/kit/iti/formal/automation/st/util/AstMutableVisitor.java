@@ -10,12 +10,12 @@ package edu.kit.iti.formal.automation.st.util;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -29,7 +29,9 @@ import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.Visitable;
 import lombok.val;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -397,9 +399,17 @@ public class AstMutableVisitor extends AstVisitor<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        functionBlockDeclaration.setStBody((StatementList) functionBlockDeclaration.getStBody().accept(this));
-        return visit((ClassDeclaration) functionBlockDeclaration);
+    public FunctionBlockDeclaration visit(FunctionBlockDeclaration fbd) {
+        if (fbd.getStBody() != null)
+            fbd.setStBody((StatementList) fbd.getStBody().accept(this));
+        if (fbd.getSfcBody() != null)
+            fbd.setSfcBody((SFCImplementation) fbd.getSfcBody().accept(this));
+
+        //TODO
+        /*for (ActionDeclaration action : fbd.getActions()) {
+            visit(action);
+        }*/
+        return fbd;
     }
 
     /**
@@ -502,7 +512,6 @@ public class AstMutableVisitor extends AstVisitor<Object> {
 
     @Override
     public Object visit(MethodDeclaration method) {
-        currentTopLevelScopeElement = method;
         method.setScope((Scope) method.getScope().accept(this));
         method.setStBody((StatementList) method.getStBody().accept(this));
         return super.visit(method);

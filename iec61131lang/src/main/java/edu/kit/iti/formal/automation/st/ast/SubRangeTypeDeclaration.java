@@ -37,7 +37,7 @@ import lombok.ToString;
  *
  * @author Alexander Weigl
  */
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor

@@ -33,7 +33,7 @@ import lombok.EqualsAndHashCode;
  * @version $Id: $Id
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @AllArgsConstructor
 public class ReferenceType extends AnyReference {
     AnyDt of;

@@ -36,7 +36,7 @@ import lombok.EqualsAndHashCode;
  * @version $Id: $Id
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 public class StringTypeDeclaration extends TypeDeclaration<Literal> {
     private Literal size;
 

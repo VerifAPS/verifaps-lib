@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.st.ast;
  */
 
 import edu.kit.iti.formal.automation.scope.Scope;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -33,6 +34,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  * @author weigl
  * @version $Id: $Id
  */
+@EqualsAndHashCode(callSuper = false, of="scope")
 public abstract class TopLevelScopeElement<T extends ParserRuleContext> extends TopLevelElement<T> {
     @Getter
     @Setter

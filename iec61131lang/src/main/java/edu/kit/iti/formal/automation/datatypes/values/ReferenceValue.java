@@ -39,7 +39,7 @@ import lombok.EqualsAndHashCode;
  * @version $Id: $Id
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 public class ReferenceValue extends Initialization {
     private SymbolicReference referenceTo = new SymbolicReference();
 

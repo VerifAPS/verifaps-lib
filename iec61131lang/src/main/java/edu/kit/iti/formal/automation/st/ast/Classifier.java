@@ -25,6 +25,7 @@ package edu.kit.iti.formal.automation.st.ast;
 import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Delegate;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import java.util.List;
  * @version 1 (31.01.18)
  */
 @Data
-@EqualsAndHashCode(callSuper = true, exclude = "methods")
+@Deprecated
 public abstract class Classifier<T extends ParserRuleContext> extends TopLevelScopeElement<T> {
     protected List<IdentifierPlaceHolder<InterfaceDeclaration>> interfaces = new ArrayList<>();
     protected List<MethodDeclaration> methods = new ArrayList<>();

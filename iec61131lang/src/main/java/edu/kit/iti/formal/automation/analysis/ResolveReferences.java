@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
  * @author Augusto Modanese
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @RequiredArgsConstructor
 public class ResolveReferences extends AstVisitor<Object> {
     private final Scope globalScope;

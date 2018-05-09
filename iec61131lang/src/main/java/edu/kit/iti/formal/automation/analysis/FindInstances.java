@@ -76,7 +76,8 @@ public class FindInstances extends AstVisitor {
 
     @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        return super.visit((ClassDeclaration) functionBlockDeclaration);
+        //TODO return super.visit((ClassDeclaration) functionBlockDeclaration);
+        return null;
     }
 
     /**

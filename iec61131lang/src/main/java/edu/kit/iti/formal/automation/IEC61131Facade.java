@@ -95,7 +95,7 @@ public class IEC61131Facade {
     }
 
 
-    @Nullable
+    @NotNull
     public static String print(@Nullable Top top) {
         return print(top, false);
     }

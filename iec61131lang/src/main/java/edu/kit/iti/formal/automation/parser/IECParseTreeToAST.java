@@ -10,12 +10,12 @@ package edu.kit.iti.formal.automation.parser;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -28,12 +28,14 @@ import edu.kit.iti.formal.automation.operators.Operators;
 import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.sfclang.Utils;
 import edu.kit.iti.formal.automation.sfclang.ast.*;
+import edu.kit.iti.formal.automation.st.IdentifierPlaceHolder;
 import edu.kit.iti.formal.automation.st.ast.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -294,7 +296,7 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
                 (id, type) -> gather.identifiers(id.getText())
                         .type((TypeDeclaration) type.accept(this)).close());
         gather = null;
-        ast.setFields(localScope);
+        ast.setFields(localScope.getVariables());
         return ast;
     }
 
@@ -446,13 +448,14 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         ast.setAbstract_(ctx.ABSTRACT() != null);
         ast.setName(ctx.identifier.getText());
         if (ctx.inherit != null) {
-            ast.setParent(ctx.inherit.getText());
+            ast.setParentName(ctx.inherit.getText());
         }
         if (ctx.interfaces != null) {
-            ((List<String>) ctx.interfaces.accept(this)).forEach(ast::addExtendsOrImplements);
+            ((List<String>) ctx.interfaces.accept(this))
+                    .forEach(i -> ast.getInterfaces().add(new IdentifierPlaceHolder<>(i)));
         }
         ast.setScope((Scope) ctx.var_decls().accept(this));
-        ast.setMethods((List<MethodDeclaration>) ctx.methods().accept(this));
+        ast.getMethods().addAll((List<MethodDeclaration>) ctx.methods().accept(this));
 
         ctx.action().forEach(act -> {
             ast.addAction((ActionDeclaration) act.accept(this));
@@ -475,7 +478,8 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         ast.setName(ctx.identifier.getText());
         ast.setMethods((List<MethodDeclaration>) ctx.methods().accept(this));
         if (ctx.sp != null) {
-            ((List<String>) ctx.sp.accept(this)).forEach(i -> ast.addExtendsOrImplements(i));
+            ((List<String>) ctx.sp.accept(this))
+                    .forEach(i -> new IdentifierPlaceHolder<>(i));
         }
         return ast;
     }
@@ -512,7 +516,7 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         MethodDeclaration ast = new MethodDeclaration();
         //ast.setRuleContext(ctx);
         ast.setName(ctx.identifier.getText());
-        ast.setParent(currentTopLevelScopeElement);
+        ast.setParent((Classifier<?>) currentTopLevelScopeElement);
         if (ctx.access_specifier() != null) {
             ast.setAccessSpecifier(AccessSpecifier.valueOf(ctx.access_specifier().getText()));
         }
@@ -530,13 +534,14 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
             }
         }
 
-        currentTopLevelScopeElement = ast;
+
+        //currentTopLevelScopeElement = ast;
         ast.setScope((Scope) ctx.var_decls().accept(this));
 
         if (ctx.body().statement_list() != null)
             ast.setStBody((StatementList) ctx.body().statement_list().accept(this));
 
-        currentTopLevelScopeElement = ast.getParent();
+        //currentTopLevelScopeElement = ast.getParent();
         return ast;
     }
 
@@ -921,8 +926,8 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
         // 'N' | 'R' | 'S' | 'P' | ( ( 'L' | 'D' | 'SD' | 'DS' | 'SL' ) ',' Action_Time );
         SFCActionQualifier qualifier = new SFCActionQualifier();
         if (null != ctx.actionQualifier().expression()) {
-                Expression expr = (Expression) ctx.actionQualifier().expression().accept(this);
-                qualifier.setTime(expr);
+            Expression expr = (Expression) ctx.actionQualifier().expression().accept(this);
+            qualifier.setTime(expr);
         }
 
         String q = ctx.actionQualifier().IDENTIFIER().getText();
@@ -970,8 +975,8 @@ public class IECParseTreeToAST extends IEC61131ParserBaseVisitor<Object> {
     public Set<SFCStep> visitSteps(IEC61131Parser.StepsContext ctx) {
         return ctx.IDENTIFIER().stream()
                 .map(n -> network.getStep(n.getSymbol().getText()))
-                .filter(o -> o.isPresent())
-                .map(n -> n.get())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

@@ -38,7 +38,7 @@ import org.jetbrains.annotations.NotNull;
  * @version $Id: $Id
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @NoArgsConstructor
 public class SimpleTypeDeclaration<T extends Initialization> extends TypeDeclaration<T> {
     public SimpleTypeDeclaration(@NotNull AnyDt type) {

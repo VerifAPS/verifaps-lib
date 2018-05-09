@@ -59,6 +59,7 @@ public class SymbolicReference extends Reference {
      * Used in STOO transformations to set the symbolic reference's effective type (in contrast to dataType, which
      * might be a deferred type).
      */
+    @Deprecated
     private AnyDt effectiveDataType;
 
     /**

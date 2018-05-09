@@ -90,9 +90,9 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
     override fun visit(ce: SCaseExpression) {
         stream.print("case \n")
         for ((condition, then) in ce.cases) {
-            stream.print(condition.accept(this))
+            (condition.accept(this))
             stream.print(" : ")
-            stream.print(then.accept(this))
+            (then.accept(this))
             stream.print("; ")
         }
         stream.print("\nesac")

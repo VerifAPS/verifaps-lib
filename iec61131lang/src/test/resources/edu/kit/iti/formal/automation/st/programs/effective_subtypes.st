@@ -15,10 +15,10 @@ PROGRAM MY_PROGRAM
     switch : BOOL;
   END_VAR
   VAR
-    i : ITF;
-    r : REF_TO A;
     a : A;
     b : B;
+    i : ITF;
+    r : REF_TO A;
   END_VAR
 
   IF (switch) THEN

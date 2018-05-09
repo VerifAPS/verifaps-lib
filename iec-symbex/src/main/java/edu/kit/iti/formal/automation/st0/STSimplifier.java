@@ -36,7 +36,7 @@ import java.util.Map;
  * @version 1
  */
 public class STSimplifier {
-    public static final int PROGRAM_VARIABLE = VariableDeclaration.FIRST_FREE << 1;
+    public static final int PROGRAM_VARIABLE = VariableDeclaration.FLAG_COUNTER.get();
     private List<ST0Transformation> transformations = new ArrayList<>();
     private State state = new State();
 

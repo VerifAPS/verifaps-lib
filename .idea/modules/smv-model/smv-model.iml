@@ -29,7 +29,6 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../smv-model">
       <sourceFolder url="file://$MODULE_DIR$/../../../smv-model/src/main/antlr" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../smv-model/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../../smv-model/src/main/kotlin" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../../smv-model/src/test/antlr" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../../smv-model/src/test/java" isTestSource="true" />
@@ -43,9 +42,7 @@
     <content url="file://$MODULE_DIR$/../../../smv-model/build/generated-src/antlr/main">
       <sourceFolder url="file://$MODULE_DIR$/../../../smv-model/build/generated-src/antlr/main" isTestSource="false" />
     </content>
-    <content url="file://$MODULE_DIR$/../../../smv-model/build/generated-src/antlr/test">
-      <sourceFolder url="file://$MODULE_DIR$/../../../smv-model/build/generated-src/antlr/test" isTestSource="true" />
-    </content>
+    <content url="file://$MODULE_DIR$/../../../smv-model/build/generated-src/antlr/test" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: org.antlr:antlr4:4.7.1" level="project" />

@@ -5,7 +5,6 @@ import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements
 
 class IecRunFascade(val ast : TopLevelElements) {
-
     init {
         IEC61131Facade.resolveDataTypes(ast)
     }

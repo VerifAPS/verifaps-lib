@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  * @version 3, adapt function call as invocation
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Invocation extends Initialization {

@@ -29,7 +29,7 @@ import lombok.EqualsAndHashCode;
  * @author Augusto Modanese
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 public class AnyReference extends AnyDt {
     public static final AnyReference ANY_REF = new AnyReference();
 

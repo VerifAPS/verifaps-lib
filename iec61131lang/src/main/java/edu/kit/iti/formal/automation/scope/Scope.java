@@ -12,12 +12,12 @@ package edu.kit.iti.formal.automation.scope;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -54,6 +54,8 @@ import java.util.stream.Stream;
 public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable<Scope> {
     private final VariableScope variables = new VariableScope();
     private final Namespace<ActionDeclaration> actions = new Namespace<>();
+    @NotNull
+    private final Map<String, EnumerateType> allowedEnumValues = new HashMap<>();
     @Nullable
     private Scope parent;
     @NotNull
@@ -71,9 +73,6 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
     private Namespace<ClassDeclaration> classes = new Namespace<>();
     @NotNull
     private Namespace<InterfaceDeclaration> interfaces = new Namespace<>();
-
-    @NotNull
-    private final Map<String, EnumerateType> allowedEnumValues = new HashMap<>();
 
     public Scope(Scope parent) {
         setParent(parent);
@@ -248,7 +247,6 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
     }
 
     public void registerFunctionBlock(@NotNull FunctionBlockDeclaration fblock) {
-        registerClass(fblock);
         functionBlocks.register(fblock.getIdentifier(), fblock);
     }
 
@@ -256,8 +254,8 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         dataTypes.register(dt.getTypeName(), dt);
         if (dt instanceof EnumerationTypeDeclaration)
             ((EnumerationTypeDeclaration) dt).getAllowedValues().stream()
-                .map(Token::getText)
-                .forEach(v -> allowedEnumValues.put(v, ((EnumerationTypeDeclaration) dt).getDataType(this)));
+                    .map(Token::getText)
+                    .forEach(v -> allowedEnumValues.put(v, ((EnumerationTypeDeclaration) dt).getDataType(this)));
     }
 
     /**
@@ -433,10 +431,20 @@ public class Scope implements Visitable, Iterable<VariableDeclaration>, Copyable
         actions.register(a.getName(), a);
     }
 
+    public List<VariableDeclaration> filterByFlags(int... flag) {
+        return stream()
+                .filter(it -> {
+                    for (int f : flag)
+                        if (it.is(f)) return true;
+                    return false;
+                })
+                .collect(Collectors.toList());
+    }
+
     public class Namespace<T> {
-        @Nullable Supplier<Namespace<T>> parent;
         @NotNull
         private final HashMap<String, T> map = new LinkedHashMap<>();
+        @Nullable Supplier<Namespace<T>> parent;
 
         Namespace(Namespace<T> other) {
             map.putAll(other.map);

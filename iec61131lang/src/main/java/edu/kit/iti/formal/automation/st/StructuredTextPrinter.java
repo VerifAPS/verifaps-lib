@@ -488,14 +488,16 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
         sb.append("FUNCTION_BLOCK ");
 
+        /*
         if (functionBlockDeclaration.isFinal_())
             sb.append("FINAL ");
         if (functionBlockDeclaration.isAbstract_())
             sb.append("ABSTRACT ");
+        */
 
         sb.append(functionBlockDeclaration.getName());
 
-        String parent = functionBlockDeclaration.getParent().getIdentifier();
+        /*String parent = functionBlockDeclaration.getParent().getIdentifier();
         if (parent != null)
             sb.append(" EXTENDS ").append(parent);
 
@@ -504,18 +506,19 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
                 .collect(Collectors.joining(", "));
         if (!interfaces.isEmpty())
             sb.append(" IMPLEMENTS ").append(interfaces);
+        */
 
         sb.increaseIndent().nl();
         functionBlockDeclaration.getScope().accept(this);
         sb.nl();
 
-        if (!functionBlockDeclaration.getMethods().isEmpty()) {
+        /*if (!functionBlockDeclaration.getMethods().isEmpty()) {
             functionBlockDeclaration.getMethods().forEach(m -> m.accept(this));
             sb.nl();
-        }
+        }*/
 
         if (!functionBlockDeclaration.getActions().isEmpty()) {
-            functionBlockDeclaration.getActions().forEach((k, v) -> v.accept(this));
+            functionBlockDeclaration.getActions().forEach(v -> v.accept(this));
         }
 
         printBody(functionBlockDeclaration.getStBody(), functionBlockDeclaration.getSfcBody());
@@ -738,7 +741,10 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     public Object visit(StructureTypeDeclaration structureTypeDeclaration) {
         sb.append(structureTypeDeclaration.getTypeName());
         sb.append(": STRUCT").nl().increaseIndent();
-        structureTypeDeclaration.getFields().accept(this);
+        structureTypeDeclaration.getFields().values().forEach(it -> {
+            sb.nl();
+            it.accept(this);
+        });
         sb.decreaseIndent().append("END_STRUCT;").nl();
         return null;
     }
@@ -797,7 +803,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
      */
     @Override
     public Object visit(Literal literal) {
-        if (literal.getDataTypeName() != null)
+        if (literal.getDataTypeName() != null && !literal.getDataTypeName().isEmpty())
             sb.append(literal.getDataTypeName()).append('#');
         sb.append(literal.getTextValue());
         return null;

@@ -77,7 +77,7 @@ public final class OOUtils {
             implementedInterfaces.addAll(getImplementedInterfaces(parentClass));
         // Add extended interfaces
         implementedInterfaces.addAll(implementedInterfaces.parallelStream()
-                .map(Classifier::getInterfaces)
+                .map(InterfaceDeclaration::getInterfaces)
                 .flatMap(l -> l.parallelStream().map(IdentifierPlaceHolder::getIdentifiedObject))
                 .collect(Collectors.toList()));
         return implementedInterfaces;

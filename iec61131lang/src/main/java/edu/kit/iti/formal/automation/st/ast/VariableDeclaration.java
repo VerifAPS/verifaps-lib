@@ -10,12 +10,12 @@ package edu.kit.iti.formal.automation.st.ast;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -41,41 +41,38 @@ import java.util.Map;
  */
 public class VariableDeclaration extends Top
         implements Comparable<VariableDeclaration>, Identifiable {
+    public static final FlagCounter FLAG_COUNTER = new FlagCounter();
+
     /**
      * Constant <code>INPUT=1</code>
      */
-    public static final int INPUT = 1;
-    public static final int OUTPUT = 2;
-    public static final int INOUT = INPUT | OUTPUT;
-    public static final int LOCAL = OUTPUT << 1;
-    public static final int GLOBAL = LOCAL << 1;
-    public static final int CONSTANT = GLOBAL << 1;
-    public static final int RETAIN = CONSTANT << 1;
-    public static final int LOCATED = RETAIN << 1;
-    public static final int EXTERNAL = LOCATED << 1;
-    public static final int TEMP = 512 << EXTERNAL;
+    public static final int INPUT = FLAG_COUNTER.get();
+    public static final int OUTPUT = FLAG_COUNTER.get();
+    public static final int INOUT = FLAG_COUNTER.get(); //INPUT | OUTPUT;
+    public static final int LOCAL = FLAG_COUNTER.get();
+    public static final int GLOBAL = FLAG_COUNTER.get();
+    public static final int CONSTANT = FLAG_COUNTER.get();
+    public static final int RETAIN = FLAG_COUNTER.get();
+    public static final int LOCATED = FLAG_COUNTER.get();
+    public static final int EXTERNAL = FLAG_COUNTER.get();
+    public static final int TEMP = FLAG_COUNTER.get();
 
     /**
      * Constant <code>WRITTEN_TO=1024</code>
      */
-    public static final int WRITTEN_TO = 1024;
+    public static final int WRITTEN_TO = FLAG_COUNTER.get();
     /**
      * Constant <code>READED=2048</code>
      */
-    public static final int READED = 2048;
+    public static final int READED = FLAG_COUNTER.get();
     /**
      * Constant <code>WRITE_BEFORE_READ=2 * 4096</code>
      */
-    public static final int WRITE_BEFORE_READ = 2 * 4096;
-
-    /**
-     * Constant <code>FIRST_FREE=1 &lt;&lt; 16</code>
-     */
-    public static final int FIRST_FREE = 1 << 16;
+    public static final int WRITE_BEFORE_READ = FLAG_COUNTER.get();
     /**
      * Constant <code>NOT_READ=4096</code>
      */
-    public static final int NOT_READ = 4096;
+    public static final int NOT_READ = FLAG_COUNTER.get();
 
     // Access specifiers
     public static final int PUBLIC = 1 << 20;
@@ -416,5 +413,19 @@ public class VariableDeclaration extends Top
     @Override
     public String getIdentifier() {
         return name;
+    }
+
+    public static class FlagCounter {
+        private int internal = 1;
+
+        public int peek() {
+            return internal;
+        }
+
+        public int get() {
+            int p = peek();
+            internal <<= 1;
+            return p;
+        }
     }
 }
