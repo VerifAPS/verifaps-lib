@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st0.trans;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -53,11 +53,11 @@ public class SFCResetReplacer extends AstMutableVisitor {
 
             if (sr.getIdentifier() != null && sr.getIdentifier()
                     .endsWith("$SFCReset")) {
-                return Statements.ifthen(
+                return Statements.INSTANCE.ifthen(
                         expression,
                         new AssignmentStatement(
                                 new SymbolicReference(sr.getIdentifier().replace("SFCReset", "_state")),
-                                Literal.enumerate(new CommonToken(-1, "Init"))
+                                Literal.Companion.enumerate(new CommonToken(-1, "Init"))
                         ));
             }
         } catch (ClassCastException e) {

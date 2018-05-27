@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.sfclang;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -79,7 +79,7 @@ public class SFCLangParserTest {
 
     @Before
     public void parse() throws IOException {
-        parser = IEC61131Facade.getParser(CharStreams.fromStream(getClass().getResourceAsStream(inputFilename)));
+        parser = IEC61131Facade.INSTANCE.getParser(CharStreams.fromStream(getClass().getResourceAsStream(inputFilename)));
         ctx = (FunctionBlockDeclaration) parser.function_block_declaration().accept(new IECParseTreeToAST());
     }
 

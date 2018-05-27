@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -37,8 +37,8 @@ import java.io.IOException;
 public class PipelineTest {
     @Test
     public void test() throws IOException {
-        TopLevelElements tle = IEC61131Facade.file(new File("src/test/resources/edu/kit/iti/formal/automation/st/Crane.st"));
-        IEC61131Facade.resolveDataTypes(tle);
+        TopLevelElements tle = IEC61131Facade.INSTANCE.file(new File("src/test/resources/edu/kit/iti/formal/automation/st/Crane.st"));
+        IEC61131Facade.INSTANCE.resolveDataTypes(tle);
         tle = SymbExFacade.simplify(tle);
 
         StructuredTextPrinter printer = new StructuredTextPrinter();

@@ -14,7 +14,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -57,7 +57,7 @@ public class Inheritance extends STOOTransformation {
         ClassDeclaration parentClass = accessedVariableClass;
         int hierarchyLevel = 0;
         while (parentClass != null) {
-            if (parentClass.getScope().hasVariable(accessedField) || OOUtils.hasMethod(parentClass, accessedField))
+            if (parentClass.getScope().hasVariable(accessedField) || OOUtils.INSTANCE.hasMethod(parentClass, accessedField))
                 break;
             parentClass = parentClass.getParentClass();
             hierarchyLevel++;
@@ -74,12 +74,12 @@ public class Inheritance extends STOOTransformation {
 
     private static ClassDeclaration getInheritedFromClass(@NotNull ClassDeclaration accessedVariableClass,
                                                           @NotNull SymbolicReference accessedField) {
-        return getInheritedFrom(accessedVariableClass, accessedField).a;
+        return getInheritedFrom(accessedVariableClass, accessedField).getA();
     }
 
     private static ClassDeclaration getInheritedFromClass(@NotNull ClassDeclaration accessedVariableClass,
                                                           @NotNull String accessedField) {
-        return getInheritedFrom(accessedVariableClass, accessedField).a;
+        return getInheritedFrom(accessedVariableClass, accessedField).getA();
     }
 
     @Override
@@ -89,7 +89,7 @@ public class Inheritance extends STOOTransformation {
             if (!classDeclaration.hasParentClass())
                 continue;
             // Add/fix super accesses (inside class)
-            List<String> classFields = OOUtils.getEffectiveScope(classDeclaration).parallelStream()
+            List<String> classFields = OOUtils.INSTANCE.getEffectiveScope(classDeclaration).parallelStream()
                     .filter(v -> !classDeclaration.getScope().hasVariable(v.getName()))
                     .map(VariableDeclaration::getName)
                     .collect(Collectors.toList());

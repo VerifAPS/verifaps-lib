@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.sfclang;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 public class UtilsTest {
     @Test
     public void split1() throws Exception {
-        Utils.Splitted a = Utils.split("abc#12#111");
+        Utils.Splitted a = Utils.INSTANCE.split("abc#12#111");
         Assert.assertEquals("abc", a.prefix().get());
         Assert.assertEquals("12", a.radix().get());
         Assert.assertEquals("111", a.value().get());
@@ -42,7 +42,7 @@ public class UtilsTest {
 
     @Test
     public void split2() throws Exception {
-        Utils.Splitted a = Utils.split("12#111");
+        Utils.Splitted a = Utils.INSTANCE.split("12#111");
         System.out.println(a);
         Assert.assertFalse(a.prefix().isPresent());
         Assert.assertEquals("12", a.radix().get());
@@ -52,7 +52,7 @@ public class UtilsTest {
 
     @Test
     public void split3() throws Exception {
-        Utils.Splitted a = Utils.split("abc#def");
+        Utils.Splitted a = Utils.INSTANCE.split("abc#def");
         System.out.println(a);
         Assert.assertTrue(a.prefix().isPresent());
         Assert.assertFalse(a.radix().isPresent());

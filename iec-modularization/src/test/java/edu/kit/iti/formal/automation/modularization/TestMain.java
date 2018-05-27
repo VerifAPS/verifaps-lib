@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.modularization;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -34,9 +34,9 @@ public class TestMain {
 	public final void testMethod() throws IOException {
 
 		final ModularProver prover = new ModularProver(
-				IEC61131Facade.file(CharStreams.fromStream(
+				IEC61131Facade.INSTANCE.file(CharStreams.fromStream(
 						getClass().getResourceAsStream("/scenario0.st"))),
-				IEC61131Facade.file(CharStreams.fromStream(
+				IEC61131Facade.INSTANCE.file(CharStreams.fromStream(
 						getClass().getResourceAsStream("/scenario1.st"))));
 
 		prover.start();

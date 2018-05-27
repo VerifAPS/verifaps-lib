@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.smv;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -82,11 +82,11 @@ public class ModuleBuilder implements Runnable {
 
         Set<VariableDeclaration> outputVars =
                 new HashSet<>(program.getScope()
-                        .filterByFlags(VariableDeclaration.OUTPUT));
+                        .filterByFlags(VariableDeclaration.Companion.getOUTPUT()));
 
         List<VariableDeclaration> inputVars =
                 program.getScope()
-                        .filterByFlags(VariableDeclaration.INPUT);
+                        .filterByFlags(VariableDeclaration.Companion.getINPUT());
 
 
         // TODO fix so this terminates

@@ -26,7 +26,7 @@ sealed class State : HashMap<String, Optional<ExpressionValue>>() {
 
     /**
      * updates the value of a defined variable to [value].
-     * [key] is variable identifier
+     * [key] is variable name
      * @throws ExecutionException if variable is not defined
      */
     fun updateValue(key: String, value: ExpressionValue): Optional<ExpressionValue>? {

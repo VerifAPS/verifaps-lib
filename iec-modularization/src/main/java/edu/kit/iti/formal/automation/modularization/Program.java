@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.modularization;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -27,7 +27,6 @@ import edu.kit.iti.formal.automation.SymbExFacade;
 import edu.kit.iti.formal.automation.modularization.transform.CtrlStatementNormalizer;
 import edu.kit.iti.formal.automation.modularization.transform.FunctionCallParamRemover;
 import edu.kit.iti.formal.automation.modularization.transform.TimerToCounter;
-import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
 import edu.kit.iti.formal.automation.st.ast.*;
 
 import java.util.*;
@@ -62,9 +61,9 @@ public final class Program {
 		// Simplify and normalize program
 		for(TopLevelElement i : elements) {
 
-			if(!(i instanceof TopLevelScopeElement)) continue;
+			if(!(i instanceof HasScope)) continue;
 
-			SymbExFacade.simplify(typeDeclarations, (TopLevelScopeElement)i,
+			SymbExFacade.simplify(typeDeclarations, (HasScope)i,
 					true,
 					false,
 					true,
@@ -75,14 +74,14 @@ public final class Program {
 			i.accept(new TimerToCounter());
 		}
 
-		IEC61131Facade.resolveDataTypes(elements);
+		IEC61131Facade.INSTANCE.resolveDataTypes(elements);
 
 		FunctionBlock main = null;
 		for(TopLevelElement i : elements) {
 			if(i instanceof ProgramDeclaration) {
-				main = new FunctionBlock(this, (TopLevelScopeElement)i);
+				main = new FunctionBlock(this, (HasScope)i);
 			} else if(i instanceof FunctionBlockDeclaration) {
-				new FunctionBlock(this, (TopLevelScopeElement)i);
+				new FunctionBlock(this, (HasScope)i);
 			}
 		}
 		assert main != null;

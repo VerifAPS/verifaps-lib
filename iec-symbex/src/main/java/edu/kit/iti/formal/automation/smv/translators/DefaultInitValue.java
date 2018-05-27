@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.smv.translators;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -75,7 +75,7 @@ public class DefaultInitValue implements InitValueTranslator {
 
         @Override
         public Value visit(TimeType timeType) {
-            return new Values.VTime(TimeType.TIME_TYPE, new TimeValue());
+            return new Values.VTime(TimeType.Companion.getTIME_TYPE(), new TimeValue());
         }
     }
 }

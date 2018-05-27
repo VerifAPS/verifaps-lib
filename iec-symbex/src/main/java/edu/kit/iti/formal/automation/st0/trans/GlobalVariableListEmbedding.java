@@ -14,7 +14,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -56,14 +56,14 @@ public class GlobalVariableListEmbedding implements ST0Transformation {
         state.globalVariableList.getScope().forEach(v -> {
             // **** Renaming disabled! ****
             //v.setName(GVL_NEW_PREFIX + v.getName());
-            v.setType(VariableDeclaration.GLOBAL);
+            v.setType(VariableDeclaration.Companion.getGLOBAL());
             state.theProgram.getScope().add(v);
         });
 
         state.theProgram.getScope().getParent().forEach(v -> {
             // **** Renaming disabled! ****
             //v.setName(GVL_NEW_PREFIX + v.getName());
-            v.setType(VariableDeclaration.GLOBAL);
+            v.setType(VariableDeclaration.Companion.getGLOBAL());
             state.theProgram.getScope().add(v);
         });
     }

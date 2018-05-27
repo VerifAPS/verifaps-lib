@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.plcopenxml;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -149,7 +149,7 @@ public class PCLOpenXMLBuilder {
         XPathExpression<Text> getSTBody = xpathFactory.compile("./body/ST/xhtml/text()", Filters.text());
         Text code = getSTBody.evaluateFirst(e);
         if (code != null) {
-            return IEC61131Facade.statements(code.getText());
+            return IEC61131Facade.INSTANCE.statements(code.getText());
         }
         return null;
     }

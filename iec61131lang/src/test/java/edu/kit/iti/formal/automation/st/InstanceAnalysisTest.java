@@ -14,7 +14,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -51,11 +51,11 @@ public class InstanceAnalysisTest {
         String testFileName = "edu/kit/iti/formal/automation/st/programs/instance_hierarchy.st";
         URL testFile = ProgramTest.class.getClassLoader().getResource(testFileName);
         assert testFile != null;
-        TopLevelElements topLevelElements = IEC61131Facade.file(new ANTLRFileStream(testFile.getFile()));
-        Scope globalScope = IEC61131Facade.resolveDataTypes(topLevelElements);
-        ProgramDeclaration myProgram = Utils.findProgram(topLevelElements);
+        TopLevelElements topLevelElements = IEC61131Facade.INSTANCE.file(new ANTLRFileStream(testFile.getFile()));
+        Scope globalScope = IEC61131Facade.INSTANCE.resolveDataTypes(topLevelElements);
+        ProgramDeclaration myProgram = Utils.INSTANCE.findProgram(topLevelElements);
         assert myProgram != null;
-        InstanceScope instanceScope = OOIEC61131Facade.findInstances(myProgram, globalScope);
+        InstanceScope instanceScope = OOIEC61131Facade.INSTANCE.findInstances(myProgram, globalScope);
 
         // Assert correct number of instances
         Assert.assertEquals(instanceScope.getInstancesOfClass("A").size(), 1);

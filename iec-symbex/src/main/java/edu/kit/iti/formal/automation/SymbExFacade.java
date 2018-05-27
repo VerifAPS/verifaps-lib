@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -59,7 +59,7 @@ public final class SymbExFacade {
         fc.setCalleeName(decl.getName());
         int i = 0;
         for (VariableDeclaration vd : decl.getScope()
-                .filterByFlags(VariableDeclaration.INPUT)) {
+                .filterByFlags(VariableDeclaration.Companion.getINPUT())) {
             fc.getParameters().add(new Invocation.Parameter(new SymbolicReference(vd.getName())));
             state.put(se.lift(vd), ts.get(i++));
         }
@@ -92,12 +92,12 @@ public final class SymbExFacade {
      */
     public static TopLevelElements simplifyOO(TopLevelElements elements, boolean onlyOO) {
         // STOO
-        Scope globalScope = IEC61131Facade.resolveDataTypes(elements);
-        TopLevelElement program = Utils.findProgram(elements);
-        InstanceScope instanceScope = OOIEC61131Facade.findInstances(program, globalScope);
+        Scope globalScope = IEC61131Facade.INSTANCE.resolveDataTypes(elements);
+        TopLevelElement program = Utils.INSTANCE.findProgram(elements);
+        InstanceScope instanceScope = OOIEC61131Facade.INSTANCE.findInstances(program, globalScope);
         System.out.println("Found " + instanceScope.getAllInstances().size() + " instances");
         EffectiveSubtypeScope effectiveSubtypeScope =
-                OOIEC61131Facade.findEffectiveSubtypes(elements, globalScope, instanceScope);
+                OOIEC61131Facade.INSTANCE.findEffectiveSubtypes(elements, globalScope, instanceScope);
         STOOSimplifier stooSimplifier =
                 new STOOSimplifier(program, elements, globalScope, instanceScope, effectiveSubtypeScope);
         stooSimplifier.simplify();
@@ -112,7 +112,7 @@ public final class SymbExFacade {
     }
 
     public static void simplify(TypeDeclarations types,
-                                TopLevelScopeElement tlsElement,
+                                HasScope tlsElement,
                                 boolean unwindLoops,
                                 boolean timerToCounter,
                                 boolean embedArrays,
@@ -194,8 +194,8 @@ public final class SymbExFacade {
 
     public static SMVModule evaluateProgram(TopLevelElements elements, boolean skipSimplify) {
         TopLevelElements a = skipSimplify ? elements : simplify(elements);
-        Scope globalScope = IEC61131Facade.resolveDataTypes(a);
-        return evaluateProgram(Utils.findProgram(a),
+        Scope globalScope = IEC61131Facade.INSTANCE.resolveDataTypes(a);
+        return evaluateProgram(Utils.INSTANCE.findProgram(a),
                 (TypeDeclarations) a.get(0), globalScope);
     }
 

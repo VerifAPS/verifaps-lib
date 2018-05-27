@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -45,7 +45,7 @@ public class FacadeTest {
     public void testEvaluateFunction() throws IOException {
         InputStream resource = getClass().getResourceAsStream("/edu/kit/iti/formal/automation/st/func_sel.st");
         Assume.assumeNotNull(resource);
-        List<TopLevelElement> toplevels = IEC61131Facade.file(CharStreams.fromStream(resource));
+        List<TopLevelElement> toplevels = IEC61131Facade.INSTANCE.file(CharStreams.fromStream(resource));
         FunctionDeclaration func = (FunctionDeclaration) toplevels.get(0);
         SMVExpr state = SymbExFacade.evaluateFunction(func,
                 SVariable.Companion.create("a").asBool(),
@@ -62,9 +62,9 @@ public class FacadeTest {
     public void testModuleBuilder() throws IOException {
         InputStream resource = getClass().
                 getResourceAsStream("/edu/kit/iti/formal/automation/st/symbextest.st");
-        TopLevelElements toplevels = IEC61131Facade.file(CharStreams.fromStream(resource));
+        TopLevelElements toplevels = IEC61131Facade.INSTANCE.file(CharStreams.fromStream(resource));
 
-        Scope globalScope = IEC61131Facade.resolveDataTypes(toplevels);
+        Scope globalScope = IEC61131Facade.INSTANCE.resolveDataTypes(toplevels);
         SMVModule module = SymbExFacade.evaluateProgram(
                 (ProgramDeclaration) toplevels.get(2),
                 (TypeDeclarations) toplevels.get(0), globalScope);

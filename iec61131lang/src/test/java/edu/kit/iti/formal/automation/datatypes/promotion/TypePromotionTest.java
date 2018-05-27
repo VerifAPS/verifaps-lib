@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.datatypes.promotion;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -41,7 +41,7 @@ import java.util.Arrays;
  * Created by weigl on 15.11.16.
  */
 public class TypePromotionTest {
-    static IntegerPromotion ip = IntegerPromotion.INSTANCE;
+    static IntegerPromotion ip = IntegerPromotion.Companion.getINSTANCE();
 
 
     Scope vd = new Scope();
@@ -50,60 +50,60 @@ public class TypePromotionTest {
     @Before
     public void setup() {
         vd = new Scope();
-        vd.add(new VariableDeclaration("a", DataTypes.UINT));
-        vd.add(new VariableDeclaration("b", DataTypes.INT));
-        vd.add(new VariableDeclaration("c", AnyBit.BOOL));
-        vd.add(new VariableDeclaration("d", AnyBit.BOOL));
-        vd.add(new VariableDeclaration("e", AnyBit.BYTE));
-        vd.add(new VariableDeclaration("f", DataTypes.ULINT));
-        vd.add(new VariableDeclaration("r", AnyReal.REAL));
-        vd.add(new VariableDeclaration("q", AnyReal.LREAL));
+        vd.add(new VariableDeclaration("a", DataTypes.INSTANCE.getUINT()));
+        vd.add(new VariableDeclaration("b", DataTypes.INSTANCE.getINT()));
+        vd.add(new VariableDeclaration("c", AnyBit.Companion.getBOOL()));
+        vd.add(new VariableDeclaration("d", AnyBit.Companion.getBOOL()));
+        vd.add(new VariableDeclaration("e", AnyBit.Companion.getBYTE()));
+        vd.add(new VariableDeclaration("f", DataTypes.INSTANCE.getULINT()));
+        vd.add(new VariableDeclaration("r", AnyReal.Companion.getREAL()));
+        vd.add(new VariableDeclaration("q", AnyReal.Companion.getLREAL()));
 
-        vd.add(new VariableDeclaration("s", IECString.STRING_16BIT));
+        vd.add(new VariableDeclaration("s", IECString.Companion.getSTRING_16BIT()));
 
     }
 
 
     @Test
     public void testSignedInteger() {
-        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.LINT, DataTypes.SINT));
-        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.LINT, DataTypes.INT));
-        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.LINT, DataTypes.DINT));
-        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.SINT, DataTypes.LINT));
-        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.INT, DataTypes.LINT));
-        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.DINT, DataTypes.LINT));
-        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.LINT, DataTypes.LINT));
+        assertEquals(DataTypes.INSTANCE.getLINT(), ip.getPromotion(DataTypes.INSTANCE.getLINT(), DataTypes.INSTANCE.getSINT()));
+        assertEquals(DataTypes.INSTANCE.getLINT(), ip.getPromotion(DataTypes.INSTANCE.getLINT(), DataTypes.INSTANCE.getINT()));
+        assertEquals(DataTypes.INSTANCE.getLINT(), ip.getPromotion(DataTypes.INSTANCE.getLINT(), DataTypes.INSTANCE.getDINT()));
+        assertEquals(DataTypes.INSTANCE.getLINT(), ip.getPromotion(DataTypes.INSTANCE.getSINT(), DataTypes.INSTANCE.getLINT()));
+        assertEquals(DataTypes.INSTANCE.getLINT(), ip.getPromotion(DataTypes.INSTANCE.getINT(), DataTypes.INSTANCE.getLINT()));
+        assertEquals(DataTypes.INSTANCE.getLINT(), ip.getPromotion(DataTypes.INSTANCE.getDINT(), DataTypes.INSTANCE.getLINT()));
+        assertEquals(DataTypes.INSTANCE.getLINT(), ip.getPromotion(DataTypes.INSTANCE.getLINT(), DataTypes.INSTANCE.getLINT()));
 
 
-        assertEquals(DataTypes.SINT, ip.getPromotion(DataTypes.SINT, DataTypes.SINT));
-        assertEquals(DataTypes.INT, ip.getPromotion(DataTypes.SINT, DataTypes.INT));
-        assertEquals(DataTypes.DINT, ip.getPromotion(DataTypes.SINT, DataTypes.DINT));
+        assertEquals(DataTypes.INSTANCE.getSINT(), ip.getPromotion(DataTypes.INSTANCE.getSINT(), DataTypes.INSTANCE.getSINT()));
+        assertEquals(DataTypes.INSTANCE.getINT(), ip.getPromotion(DataTypes.INSTANCE.getSINT(), DataTypes.INSTANCE.getINT()));
+        assertEquals(DataTypes.INSTANCE.getDINT(), ip.getPromotion(DataTypes.INSTANCE.getSINT(), DataTypes.INSTANCE.getDINT()));
 
-        assertEquals(DataTypes.INT, ip.getPromotion(DataTypes.INT, DataTypes.SINT));
-        assertEquals(DataTypes.INT, ip.getPromotion(DataTypes.INT, DataTypes.INT));
-        assertEquals(DataTypes.DINT, ip.getPromotion(DataTypes.INT, DataTypes.DINT));
-        assertEquals(DataTypes.LINT, ip.getPromotion(DataTypes.INT, DataTypes.LINT));
+        assertEquals(DataTypes.INSTANCE.getINT(), ip.getPromotion(DataTypes.INSTANCE.getINT(), DataTypes.INSTANCE.getSINT()));
+        assertEquals(DataTypes.INSTANCE.getINT(), ip.getPromotion(DataTypes.INSTANCE.getINT(), DataTypes.INSTANCE.getINT()));
+        assertEquals(DataTypes.INSTANCE.getDINT(), ip.getPromotion(DataTypes.INSTANCE.getINT(), DataTypes.INSTANCE.getDINT()));
+        assertEquals(DataTypes.INSTANCE.getLINT(), ip.getPromotion(DataTypes.INSTANCE.getINT(), DataTypes.INSTANCE.getLINT()));
 
     }
 
     @Test
     public void testUnSignedInteger() {
-        assertEquals(DataTypes.ULINT, ip.getPromotion(DataTypes.ULINT, USINT));
-        assertEquals(DataTypes.ULINT, ip.getPromotion(DataTypes.ULINT, DataTypes.UINT));
-        assertEquals(DataTypes.ULINT, ip.getPromotion(DataTypes.ULINT, UDINT));
-        assertEquals(DataTypes.ULINT, ip.getPromotion(USINT, DataTypes.ULINT));
-        assertEquals(DataTypes.ULINT, ip.getPromotion(DataTypes.UINT, DataTypes.ULINT));
-        assertEquals(DataTypes.ULINT, ip.getPromotion(UDINT, DataTypes.ULINT));
-        assertEquals(DataTypes.ULINT, ip.getPromotion(DataTypes.ULINT, DataTypes.ULINT));
+        assertEquals(DataTypes.INSTANCE.getULINT(), ip.getPromotion(DataTypes.INSTANCE.getULINT(), INSTANCE.getUSINT()));
+        assertEquals(DataTypes.INSTANCE.getULINT(), ip.getPromotion(DataTypes.INSTANCE.getULINT(), DataTypes.INSTANCE.getUINT()));
+        assertEquals(DataTypes.INSTANCE.getULINT(), ip.getPromotion(DataTypes.INSTANCE.getULINT(), INSTANCE.getUDINT()));
+        assertEquals(DataTypes.INSTANCE.getULINT(), ip.getPromotion(INSTANCE.getUSINT(), DataTypes.INSTANCE.getULINT()));
+        assertEquals(DataTypes.INSTANCE.getULINT(), ip.getPromotion(DataTypes.INSTANCE.getUINT(), DataTypes.INSTANCE.getULINT()));
+        assertEquals(DataTypes.INSTANCE.getULINT(), ip.getPromotion(INSTANCE.getUDINT(), DataTypes.INSTANCE.getULINT()));
+        assertEquals(DataTypes.INSTANCE.getULINT(), ip.getPromotion(DataTypes.INSTANCE.getULINT(), DataTypes.INSTANCE.getULINT()));
 
-        assertEquals(USINT, ip.getPromotion(USINT, USINT));
-        assertEquals(DataTypes.UINT, ip.getPromotion(USINT, DataTypes.UINT));
-        assertEquals(UDINT, ip.getPromotion(USINT, UDINT));
+        assertEquals(INSTANCE.getUSINT(), ip.getPromotion(INSTANCE.getUSINT(), INSTANCE.getUSINT()));
+        assertEquals(DataTypes.INSTANCE.getUINT(), ip.getPromotion(INSTANCE.getUSINT(), DataTypes.INSTANCE.getUINT()));
+        assertEquals(INSTANCE.getUDINT(), ip.getPromotion(INSTANCE.getUSINT(), INSTANCE.getUDINT()));
 
-        assertEquals(DataTypes.UINT, ip.getPromotion(DataTypes.UINT, USINT));
-        assertEquals(DataTypes.UINT, ip.getPromotion(DataTypes.UINT, DataTypes.UINT));
-        assertEquals(UDINT, ip.getPromotion(DataTypes.UINT, UDINT));
-        assertEquals(DataTypes.ULINT, ip.getPromotion(DataTypes.UINT, DataTypes.ULINT));
+        assertEquals(DataTypes.INSTANCE.getUINT(), ip.getPromotion(DataTypes.INSTANCE.getUINT(), INSTANCE.getUSINT()));
+        assertEquals(DataTypes.INSTANCE.getUINT(), ip.getPromotion(DataTypes.INSTANCE.getUINT(), DataTypes.INSTANCE.getUINT()));
+        assertEquals(INSTANCE.getUDINT(), ip.getPromotion(DataTypes.INSTANCE.getUINT(), INSTANCE.getUDINT()));
+        assertEquals(DataTypes.INSTANCE.getULINT(), ip.getPromotion(DataTypes.INSTANCE.getUINT(), DataTypes.INSTANCE.getULINT()));
 
     }
 
@@ -117,29 +117,29 @@ public class TypePromotionTest {
     @Test
     public void integerMixed() {
         IntegerPromotion ip = new IntegerPromotion();
-        assertEquals(DataTypes.DINT, ip.getPromotion(DataTypes.INT, DataTypes.UINT));
-        assertEquals(DataTypes.DINT, ip.getPromotion(DataTypes.UINT, DataTypes.INT));
+        assertEquals(DataTypes.INSTANCE.getDINT(), ip.getPromotion(DataTypes.INSTANCE.getINT(), DataTypes.INSTANCE.getUINT()));
+        assertEquals(DataTypes.INSTANCE.getDINT(), ip.getPromotion(DataTypes.INSTANCE.getUINT(), DataTypes.INSTANCE.getINT()));
     }
 
 
     @Test
     public void nonConformity() {
-        assertEquals(null, ip.getPromotion(DataTypes.INT, AnyBit.WORD));
+        assertEquals(null, ip.getPromotion(DataTypes.INSTANCE.getINT(), AnyBit.Companion.getWORD()));
     }
 
     @Test
     public void basicOperators() throws VariableNotDefinedException, TypeConformityException {
-        assertDataType(DataTypes.DINT, "-SINT#2 + UINT#2", null);
-        assertDataType(DataTypes.LINT, "-SINT#2 - LINT#2", null);
-        assertDataType(DataTypes.SINT, "-SINT#2", null);
-        assertDataType(AnyBit.BOOL, "TRUE AND FALSE", null);
-        assertDataType(AnyBit.BOOL, "NOT TRUE", null);
-        assertDataType(AnyBit.BOOL, "NOT TRUE AND FALSE OR TRUE ", null);
-        assertDataType(IECString.STRING_16BIT, "s", vd);
-        assertDataType(AnyBit.BOOL, "TRUE AND c", vd);
-        assertDataType(AnyBit.BOOL, "d OR NOT c", vd);
-        assertDataType(AnyReal.REAL, "a + b + r", vd);
-        assertDataType(AnyReal.LREAL, "q -(a + b + r)", vd);
+        assertDataType(DataTypes.INSTANCE.getDINT(), "-SINT#2 + UINT#2", null);
+        assertDataType(DataTypes.INSTANCE.getLINT(), "-SINT#2 - LINT#2", null);
+        assertDataType(DataTypes.INSTANCE.getSINT(), "-SINT#2", null);
+        assertDataType(AnyBit.Companion.getBOOL(), "TRUE AND FALSE", null);
+        assertDataType(AnyBit.Companion.getBOOL(), "NOT TRUE", null);
+        assertDataType(AnyBit.Companion.getBOOL(), "NOT TRUE AND FALSE OR TRUE ", null);
+        assertDataType(IECString.Companion.getSTRING_16BIT(), "s", vd);
+        assertDataType(AnyBit.Companion.getBOOL(), "TRUE AND c", vd);
+        assertDataType(AnyBit.Companion.getBOOL(), "d OR NOT c", vd);
+        assertDataType(AnyReal.Companion.getREAL(), "a + b + r", vd);
+        assertDataType(AnyReal.Companion.getLREAL(), "q -(a + b + r)", vd);
     }
 
     @Test
@@ -148,17 +148,17 @@ public class TypePromotionTest {
     }
 
     private void assertDataType(AnyDt dt, String sexpr, Scope vd) throws VariableNotDefinedException, TypeConformityException {
-        assertEquals(dt, IEC61131Facade.expr(sexpr).dataType(vd));
+        assertEquals(dt, IEC61131Facade.INSTANCE.expr(sexpr).dataType(vd));
     }
 
     @Test(expected = VariableNotDefinedException.class)
     public void testVariableNotDefined() throws VariableNotDefinedException, TypeConformityException {
-        assertDataType(AnyReal.LREAL, "LLLL", vd);
+        assertDataType(AnyReal.Companion.getLREAL(), "LLLL", vd);
     }
 
     @Test(expected = TypeConformityException.class)
     public void typeMismatch() throws VariableNotDefinedException, TypeConformityException {
-        assertDataType(AnyReal.LREAL, "TRUE + 2", vd);
+        assertDataType(AnyReal.Companion.getLREAL(), "TRUE + 2", vd);
     }
 
 }

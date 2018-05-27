@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st0.trans;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -50,13 +50,13 @@ public class IntegerExpressionEvaluator extends AstVisitor<Long> {
         long left = binaryExpression.getLeftExpr().accept(this);
         long right = binaryExpression.getRightExpr().accept(this);
 
-        if (op == Operators.ADD)
+        if (op == Operators.INSTANCE.getADD())
             return left + right;
-        if (op == Operators.DIV)
+        if (op == Operators.INSTANCE.getDIV())
             return left / right;
-        if (op == Operators.SUB)
+        if (op == Operators.INSTANCE.getSUB())
             return left - right;
-        if (op == Operators.MULT)
+        if (op == Operators.INSTANCE.getMULT())
             return left * right;
 
         Console.error("Unsupported operation %s", op);
@@ -68,7 +68,7 @@ public class IntegerExpressionEvaluator extends AstVisitor<Long> {
         UnaryOperator op = unaryExpression.getOperator();
         long left = unaryExpression.getExpression().accept(this);
 
-        if (op == Operators.MINUS)
+        if (op == Operators.INSTANCE.getMINUS())
             return -left;
 
         Console.error("Unsupported operation %s", op);

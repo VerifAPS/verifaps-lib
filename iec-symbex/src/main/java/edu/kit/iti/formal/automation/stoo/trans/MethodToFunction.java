@@ -14,7 +14,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -85,7 +85,7 @@ public class MethodToFunction extends STOOTransformation {
     }
 
     /**
-     * Modify reference identifier.
+     * Modify reference name.
      */
     @Getter
     @AllArgsConstructor
@@ -132,8 +132,8 @@ public class MethodToFunction extends STOOTransformation {
             // Callees must always be instances of classes
             assert callee.getEffectiveDataType() instanceof ClassDataType;
             ClassDeclaration calleeEffectiveClass = ((ClassDataType) callee.getEffectiveDataType()).getClazz();
-            assert OOUtils.hasMethod(calleeEffectiveClass, callee.getSub().getIdentifier());
-            Invocable invoked = OOUtils.getMethod(calleeEffectiveClass, callee.getSub().getIdentifier());
+            assert OOUtils.INSTANCE.hasMethod(calleeEffectiveClass, callee.getSub().getIdentifier());
+            Invocable invoked = OOUtils.INSTANCE.getMethod(calleeEffectiveClass, callee.getSub().getIdentifier());
             MethodDeclaration invokedMethod = (MethodDeclaration) invoked;
             // TODO resolve THIS
             // Replace with call to function
@@ -174,7 +174,7 @@ public class MethodToFunction extends STOOTransformation {
                 // Regular invocation
                 else {
                     // Copy to add as SELF parameter
-                    callee = callee.copy();
+                    callee = callee.clone();
                     removeLastSub(callee);
                     callee.setDerefCount(0);
                     invocation.addParameter(new Invocation.Parameter(SELF_PARAMETER_NAME, false, callee));
@@ -186,7 +186,7 @@ public class MethodToFunction extends STOOTransformation {
         @Nullable
         @Override
         public Object visit(@NotNull MethodDeclaration method) {
-            TopLevelScopeElement parent = method.getParent();
+            HasScope parent = method.getParent();
             if (visitingClassMethod = parent instanceof ClassDeclaration) {
                 this.parent = (ClassDeclaration) parent;
                 visitClassMethod(method);
@@ -200,9 +200,9 @@ public class MethodToFunction extends STOOTransformation {
             if (visitingClassMethod && parent.getScope().hasVariable(symbolicReference.getIdentifier())
                     && !parent.getScope().getVariable(symbolicReference.getIdentifier()).isGlobal()
                     && !Objects.requireNonNull(parent.getScope().getVariable(symbolicReference.getIdentifier())).is(
-                    VariableDeclaration.INPUT | VariableDeclaration.OUTPUT | VariableDeclaration.INOUT
+                    VariableDeclaration.Companion.getINPUT() | VariableDeclaration.Companion.getOUTPUT() | VariableDeclaration.Companion.getINOUT()
             )) {
-                symbolicReference.setSub(symbolicReference.copy());
+                symbolicReference.setSub(symbolicReference.clone());
                 symbolicReference.setIdentifiedObject(null);
                 symbolicReference.setIdentifier(SELF_PARAMETER_NAME);
                 symbolicReference.setEffectiveDataType(state.getGlobalScope().resolveDataType(parent.getName()));
@@ -217,7 +217,7 @@ public class MethodToFunction extends STOOTransformation {
                         "Method " + method + " already contains a variable named '" + SELF_PARAMETER_NAME + "'self'!");
             VariableDeclaration self = new VariableDeclaration(SELF_PARAMETER_NAME,
                     state.getScope().resolveDataType(parent.getName()));
-            self.setType(VariableDeclaration.INOUT);
+            self.setType(VariableDeclaration.Companion.getINOUT());
             //self.setParent(method);
             method.getScope().add(self);
             // Add self access to variables in local scope which are in the class' scope

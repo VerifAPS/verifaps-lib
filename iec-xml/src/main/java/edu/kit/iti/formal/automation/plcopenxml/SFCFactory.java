@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.plcopenxml;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -212,8 +212,8 @@ public class SFCFactory implements Supplier<SFCImplementation> {
         for (Element action : actions) {
             String qName = action.getAttributeValue("qualifier");
             SFCActionQualifier q = new SFCActionQualifier(qName);
-            if (q.getQualifier().hasTime) {
-                q.setTime(IEC61131Facade.expr(action.getAttributeValue("duration")));
+            if (q.getQualifier().getHasTime()) {
+                q.setTime(IEC61131Facade.INSTANCE.expr(action.getAttributeValue("duration")));
                 //TODO support for indicator?
             }
             String var = action.getChild("reference").getAttributeValue("name");
@@ -243,13 +243,13 @@ public class SFCFactory implements Supplier<SFCImplementation> {
         if (guards.size() > 0) {
             String guard = guards.stream().collect(Collectors.joining(" AND "));
             try {
-                t.setGuard(IEC61131Facade.expr(guard));
+                t.setGuard(IEC61131Facade.INSTANCE.expr(guard));
             } catch (ErrorReporter.IEC61131ParserException e) {
                 System.err.println(guard);
                 System.err.println(e.getMessage());
             }
         } else {
-            t.setGuard(new Literal(AnyBit.BOOL, "TRUE"));
+            t.setGuard(new Literal(AnyBit.Companion.getBOOL(), "TRUE"));
         }
         return t;
     }
@@ -450,13 +450,13 @@ public class SFCFactory implements Supplier<SFCImplementation> {
             parseActionBlock(localId, ss.getEvents());
 
             if (onWhile != null && !onWhile.isEmpty())
-                ss.getEvents().add(new SFCStep.AssociatedAction(SFCActionQualifier.NON_STORED, onWhile));
+                ss.getEvents().add(new SFCStep.AssociatedAction(SFCActionQualifier.Companion.getNON_STORED(), onWhile));
 
             if (onExit != null && !onExit.isEmpty())
-                ss.getEvents().add(new SFCStep.AssociatedAction(SFCActionQualifier.FALLING, onExit));
+                ss.getEvents().add(new SFCStep.AssociatedAction(SFCActionQualifier.Companion.getFALLING(), onExit));
 
             if (onEntry != null && !onEntry.isEmpty())
-                ss.getEvents().add(new SFCStep.AssociatedAction(SFCActionQualifier.RAISING, onEntry));
+                ss.getEvents().add(new SFCStep.AssociatedAction(SFCActionQualifier.Companion.getRAISING(), onEntry));
 
             return ss;
         }

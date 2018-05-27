@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st0.trans;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -94,8 +94,8 @@ public class FunctionBlockEmbedding implements ST0Transformation {
         // remove FunctionBlock Instance
         outer.scope.asMap().remove(instance.getName());
 
-        //Make a copy of the statements and add prefix to every variable
-        VariableRenamer vr = new VariableRenamer(toBeEmbedded.copy(), newName);
+        //Make a clone of the statements and add prefix to every variable
+        VariableRenamer vr = new VariableRenamer(toBeEmbedded.clone(), newName);
         StatementList prefixedStatements = vr.rename(); // <- this can be injected
 
         // inject into every function block call
@@ -117,15 +117,15 @@ public class FunctionBlockEmbedding implements ST0Transformation {
     }
 
     private Scope prefixNames(Scope scope, Function<String, String> newName) {
-        Scope copy = new Scope().copy();
+        Scope copy = new Scope().clone();
         for (VariableDeclaration vd : scope) {
-            VariableDeclaration nd = vd.copy();
+            VariableDeclaration nd = vd.clone();
             if (nd.isInput() || nd.isInOut() || nd.isOutput()) {
                 int mask =
-                        VariableDeclaration.INPUT |
-                                VariableDeclaration.INOUT |
-                                VariableDeclaration.OUTPUT;
-                nd.setType((nd.getType() & ~mask) | VariableDeclaration.LOCAL);
+                        VariableDeclaration.Companion.getINPUT() |
+                                VariableDeclaration.Companion.getINOUT() |
+                                VariableDeclaration.Companion.getOUTPUT();
+                nd.setType((nd.getType() & ~mask) | VariableDeclaration.Companion.getLOCAL());
             }
             nd.setName(newName.apply(nd.getName()));
             copy.add(nd);
@@ -169,8 +169,8 @@ public class FunctionBlockEmbedding implements ST0Transformation {
             // One place to rule function resolving!
             if (cws.actions.containsKey(fbc.getCalleeName())) {
                 StatementList statements = new StatementList(cws.actions.get(fbc.getCalleeName()));
-                statements.add(0, CommentStatement.single("Call of action: %s", fbc.getCalleeName()));
-                statements.add(CommentStatement.single("End of action call: %s", fbc.getCalleeName()));
+                statements.add(0, CommentStatement.Companion.single("Call of action: %s", fbc.getCalleeName()));
+                statements.add(CommentStatement.Companion.single("End of action call: %s", fbc.getCalleeName()));
                 return statements;
             }
             return super.visit(fbc);

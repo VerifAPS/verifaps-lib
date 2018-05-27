@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -35,7 +35,7 @@ public class TestParseEmptyString {
 
     @Test//(expected = ErrorReporter.IEC61131ParserException.class)
     public void testParseEmptyString() {
-        TopLevelElements tle = IEC61131Facade.file(CharStreams.fromString(""));
+        TopLevelElements tle = IEC61131Facade.INSTANCE.file(CharStreams.fromString(""));
         Assert.assertEquals(0, tle.size());
     }
 }

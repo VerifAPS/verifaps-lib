@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -36,7 +36,7 @@ import org.junit.Test;
 public class TimeLiteralTest {
     @Test
     public void test1() {
-        Literal literal = (Literal) IEC61131Facade.expr("TIME#1s500ms");
+        Literal literal = (Literal) IEC61131Facade.INSTANCE.expr("TIME#1s500ms");
         Value<TimeType, TimeValue> t = literal.asValue();
         Assert.assertEquals(
                 new TimeValue(1500).getInternal(),

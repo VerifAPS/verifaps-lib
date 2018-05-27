@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -46,7 +46,7 @@ public class SymbolicExecutionTest {
 
     @Test
     public void simpleTest() {
-        StatementList list = IEC61131Facade.statements(
+        StatementList list = IEC61131Facade.INSTANCE.statements(
                 "a := 2;" +
                         "c := 3;" +
                         "c := a+c;" +
@@ -59,7 +59,7 @@ public class SymbolicExecutionTest {
 
     @Test
     public void simpleIfTest() {
-        StatementList list = IEC61131Facade.statements(
+        StatementList list = IEC61131Facade.INSTANCE.statements(
                 "a := 2; c:= 4; b:=0; IF a = 2 THEN b := 2; ELSE b := 1; c:=2; END_IF;");
         list.accept(se);
         Assert.assertEquals("{a=0sd16_2, b=if :: TRUE->0sd16_2\n" +

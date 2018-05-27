@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st0;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -36,7 +36,7 @@ import java.util.Map;
  * @version 1
  */
 public class STSimplifier {
-    public static final int PROGRAM_VARIABLE = VariableDeclaration.FLAG_COUNTER.get();
+    public static final int PROGRAM_VARIABLE = VariableDeclaration.Companion.getFLAG_COUNTER().get();
     private List<ST0Transformation> transformations = new ArrayList<>();
     private State state = new State();
 

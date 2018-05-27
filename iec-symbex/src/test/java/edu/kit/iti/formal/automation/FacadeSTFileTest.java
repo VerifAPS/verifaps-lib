@@ -14,7 +14,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -103,7 +103,7 @@ public class FacadeSTFileTest {
     @Test(timeout = 10 * 1000)  // this may take as much as >=2m; set longer timeout when running complex tests
     public void testSMVEvaluateProgram() throws IOException, InterruptedException {
         System.out.println(file.getName());
-        TopLevelElements code = IEC61131Facade.file(file);
+        TopLevelElements code = IEC61131Facade.INSTANCE.file(file);
         System.out.println("Found " + code.stream()
                 .filter(tle -> tle instanceof ClassDeclaration)
                 .collect(Collectors.toList())
@@ -112,13 +112,13 @@ public class FacadeSTFileTest {
         code = SymbExFacade.simplifyOO(code, true);
         PrintWriter pw = new PrintWriter(Paths.get(getSMVDirectory() + "/" + file.getName() + "oo").toString());
         System.out.println("Wrote STOO file");
-        pw.println(IEC61131Facade.print(code));
+        pw.println(IEC61131Facade.INSTANCE.print(code));
         pw.close();
-        code = IEC61131Facade.file(file);
+        code = IEC61131Facade.INSTANCE.file(file);
         code = SymbExFacade.simplifyOO(code);
         //System.out.print(countStatements(code) + " statements after simplification");
         pw = new PrintWriter(Paths.get(getSMVDirectory() + "/" + file.getName() + "0").toString());
-        pw.println(IEC61131Facade.print(code));
+        pw.println(IEC61131Facade.INSTANCE.print(code));
         pw.close();
         System.out.println("Wrote ST0 file");
         SMVModule module = SymbExFacade.evaluateProgram(code, true);

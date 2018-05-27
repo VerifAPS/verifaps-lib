@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -27,7 +27,6 @@ import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
@@ -38,7 +37,6 @@ import org.junit.runners.Parameterized.Parameter;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 
 
@@ -69,7 +67,7 @@ public class TypesTest {
 
     @Test
     public void testCopy() throws IOException {
-        TopLevelElements ast = IEC61131Facade.file(CharStreams.fromFileName(testFile));
-        Assert.assertEquals(ast, ast.copy());
+        TopLevelElements ast = IEC61131Facade.INSTANCE.file(CharStreams.fromFileName(testFile));
+        Assert.assertEquals(ast, ast.clone());
     }
 }

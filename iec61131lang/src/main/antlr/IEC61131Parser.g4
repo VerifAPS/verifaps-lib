@@ -441,7 +441,7 @@ global_variable_list_declaration
 configuration_declaration
 
 :
-	CONFIGURATION identifier = IDENTIFIER
+	CONFIGURATION name = IDENTIFIER
 	(
 		single_resource_declaration
 		|
@@ -832,7 +832,7 @@ exit_statement
 /*
 start_sfc 
 :
-	SFC identifier=IDENTIFIER
+	SFC name=IDENTIFIER
 	var_decls
 	(     action_declaration
 		| goto_declaration
@@ -847,7 +847,7 @@ goto_declaration
 
 action_declaration
 :
-	ACTION	(identifier = IDENTIFIER)?
+	ACTION	(name = IDENTIFIER)?
 	var_decls
 	body=statement_list
 	END_ACTION
@@ -855,7 +855,7 @@ action_declaration
 
 step_declaration
 :
-	STEP identifier=IDENTIFIER
+	STEP name=IDENTIFIER
 	(event)*
 	END_STEP
 ;

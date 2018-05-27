@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -52,7 +52,7 @@ public class TestEnumParse extends DefaultVisitor<Void> {
 
     @Test
     public void testEnumMembers() {
-        TopLevelElements toplevel = IEC61131Facade.file(CharStreams.fromString(code));
+        TopLevelElements toplevel = IEC61131Facade.INSTANCE.file(CharStreams.fromString(code));
         TypeDeclarations decls = (TypeDeclarations) toplevel.get(0);
         EnumerationTypeDeclaration enumdecl = (EnumerationTypeDeclaration) decls.get(0);
         assertEquals(Arrays.asList("one", "two", "three"),

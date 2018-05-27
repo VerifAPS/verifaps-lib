@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -56,20 +56,20 @@ public class IntegerLiteralTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> integers() {
         return Arrays.asList(
-                new Object[]{"16#F", ANY_INT, 15, USINT, false},
-                new Object[]{("-16#F"), ANY_INT, -15, SINT, false},
-                new Object[]{"16#FFFFFDABC", ANY_INT, 68719467196L, LINT, false},
-                new Object[]{"8#71164424", ANY_INT, 15001876, DINT, false},
-                new Object[]{"SINT#16#F", SINT, 15, SINT, true},
-                new Object[]{"-UINT#16#F", UINT, -15, SINT, true},
-                new Object[]{"70000", ANY_INT, 70000, DINT, false},
-                new Object[]{"-1", ANY_INT, -1, INT, false}
+                new Object[]{"16#F", INSTANCE.getANY_INT(), 15, INSTANCE.getUSINT(), false},
+                new Object[]{("-16#F"), INSTANCE.getANY_INT(), -15, INSTANCE.getSINT(), false},
+                new Object[]{"16#FFFFFDABC", INSTANCE.getANY_INT(), 68719467196L, INSTANCE.getLINT(), false},
+                new Object[]{"8#71164424", INSTANCE.getANY_INT(), 15001876, INSTANCE.getDINT(), false},
+                new Object[]{"SINT#16#F", INSTANCE.getSINT(), 15, INSTANCE.getSINT(), true},
+                new Object[]{"-UINT#16#F", INSTANCE.getUINT(), -15, INSTANCE.getSINT(), true},
+                new Object[]{"70000", INSTANCE.getANY_INT(), 70000, INSTANCE.getDINT(), false},
+                new Object[]{"-1", INSTANCE.getANY_INT(), -1, INSTANCE.getINT(), false}
         );
     }
 
 
     private Literal getLiteral(String s) {
-        return (Literal) IEC61131Facade.getParser(s).constant().accept(new IECParseTreeToAST());
+        return (Literal) IEC61131Facade.INSTANCE.getParser(s).constant().accept(new IECParseTreeToAST());
     }
 
     @Test

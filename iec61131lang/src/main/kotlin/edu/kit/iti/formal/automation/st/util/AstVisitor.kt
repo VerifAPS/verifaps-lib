@@ -1,0 +1,423 @@
+package edu.kit.iti.formal.automation.st.util
+
+/*-
+ * #%L
+ * iec61131lang
+ * %%
+ * Copyright (C) 2016 Alexander Weigl
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
+import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue
+import edu.kit.iti.formal.automation.oo.OOUtils
+import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.sfclang.ast.ActionDeclaration
+import edu.kit.iti.formal.automation.sfclang.ast.SFCNetwork
+import edu.kit.iti.formal.automation.sfclang.ast.SFCStep
+import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.automation.visitors.DefaultVisitor
+import edu.kit.iti.formal.automation.visitors.Visitable
+
+import java.util.ArrayList
+
+/**
+ * Created by weigl on 10/07/14.
+ *
+ * @author weigl, Augusto Modanese
+ * @version $Id: $Id
+ */
+open class AstVisitor<T> : DefaultVisitor<T>() {
+    /**
+     * AST elements we're currently visiting.
+     */
+    protected var currentScope: Scope
+    protected var currentFullScope: Scope
+    protected var currentTopLevelScopeElement: HasScope<*>
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun defaultVisit(visitable: Visitable): T? {
+        return null//throw new Error("not implemented for " + visitable.getClass());
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(assignmentStatement: AssignmentStatement): T? {
+        assignmentStatement.expression.accept<T>(this)
+        assignmentStatement.location.accept<T>(this)
+        return defaultVisit(assignmentStatement)
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(range: CaseCondition.Range): T? {
+        range.start!!.accept<T>(this)
+        range.stop!!.accept<T>(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(integerCondition: CaseCondition.IntegerCondition): T? {
+        integerCondition.value!!.accept<T>(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(enumeration: CaseCondition.Enumeration): T? {
+        enumeration.start.accept<T>(this)
+        enumeration.stop!!.accept<T>(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(binaryExpression: BinaryExpression): T? {
+        binaryExpression.leftExpr!!.accept<T>(this)
+        binaryExpression.rightExpr!!.accept<T>(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(repeatStatement: RepeatStatement): T? {
+        repeatStatement.condition.accept<T>(this)
+        repeatStatement.statements.accept(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(whileStatement: WhileStatement): T? {
+        whileStatement.condition.accept<T>(this)
+        whileStatement.statements.accept(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(unaryExpression: UnaryExpression): T? {
+        unaryExpression.expression.accept<T>(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(typeDeclarations: TypeDeclarations): T? {
+        for (td in typeDeclarations)
+            td.accept(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(caseStatement: CaseStatement): T? {
+        caseStatement.expression!!.accept<T>(this)
+        for (c in caseStatement.cases)
+            c.accept<T>(this)
+
+        caseStatement.elseCase!!.accept(this)
+
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(statements: StatementList): T? {
+        for (s in statements)
+            s?.accept<T>(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(programDeclaration: ProgramDeclaration): T? {
+        currentTopLevelScopeElement = programDeclaration
+        programDeclaration.scope.accept(this)
+        currentFullScope = currentScope
+        programDeclaration.stBody!!.accept(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(expressions: ExpressionList): T? {
+        for (e in expressions)
+            e.accept<T>(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(functionDeclaration: FunctionDeclaration): T? {
+        currentTopLevelScopeElement = functionDeclaration
+        functionDeclaration.scope.accept(this)
+        currentFullScope = currentScope
+        functionDeclaration.stBody.accept(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(forStatement: ForStatement): T? {
+        forStatement.start!!.accept<T>(this)
+        if (forStatement.step != null)
+            forStatement.step!!.accept<T>(this)
+        forStatement.stop!!.accept<T>(this)
+        forStatement.statements.accept(this)
+        return null
+    }
+
+    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration): T? {
+        currentTopLevelScopeElement = functionBlockDeclaration
+        //currentFullScope = OOUtils.getEffectiveScope(functionBlockDeclaration);
+        if (functionBlockDeclaration.stBody != null)
+            functionBlockDeclaration.stBody!!.accept(this)
+        if (functionBlockDeclaration.sfcBody != null)
+            functionBlockDeclaration.sfcBody!!.accept(this)
+        return null//functionBlockDeclaration;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(ifStatement: IfStatement): T? {
+        for (gs in ifStatement.conditionalBranches)
+            gs.accept<T>(this)
+
+        ifStatement.elseBranch.accept(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(guardedStatement: GuardedStatement): T? {
+        guardedStatement.condition.accept<T>(this)
+        guardedStatement.statements.accept(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(aCase: CaseStatement.Case): T? {
+        aCase.statements.accept(this)
+        for (c in aCase.conditions)
+            c.accept<T>(this)
+        return null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(localScope: Scope): T? {
+        currentScope = localScope
+        for (vd in localScope.asMap().values)
+            vd.accept<T>(this)
+        return defaultVisit(localScope)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(variableDeclaration: VariableDeclaration): T? {
+        if (null != variableDeclaration.typeDeclaration) {
+            variableDeclaration.typeDeclaration!!.accept(this)
+        }
+
+        if (null != variableDeclaration.init) {
+            variableDeclaration.init!!.accept<T>(this)
+        }
+
+        return super.visit(variableDeclaration)
+    }
+
+    override fun visit(location: Location): T? {
+        return super.visit(location)
+    }
+
+    override fun visit(initializations: ArrayInitialization): T? {
+        for (init in initializations)
+            init.accept<T>(this)
+        return super.visit(initializations)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun visit(invocation: Invocation): T? {
+        invocation.callee.accept<T>(this)
+        invocation.parameters.forEach { e -> e.accept(this) }
+        return super.visit(invocation)
+    }
+
+    override fun visit(parameter: Invocation.Parameter): T? {
+        parameter.expression!!.accept<T>(this)
+        return super.visit(parameter)
+    }
+
+    override fun visit(invocation: InvocationStatement): T? {
+        invocation.invocation.accept<T>(this)
+        return super.visit(invocation)
+    }
+
+    override fun visit(stringTypeDeclaration: StringTypeDeclaration): T? {
+        if (stringTypeDeclaration.initialization != null)
+            stringTypeDeclaration.initialization!!.accept<T>(this)
+        return super.visit(stringTypeDeclaration)
+    }
+
+    override fun visit(structureTypeDeclaration: StructureTypeDeclaration): T? {
+        return super.visit(structureTypeDeclaration)
+    }
+
+    override fun visit(subRangeTypeDeclaration: SubRangeTypeDeclaration): T? {
+        return super.visit(subRangeTypeDeclaration)
+    }
+
+    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration<*>): T? {
+        return super.visit(simpleTypeDeclaration)
+    }
+
+    override fun visit(commentStatement: CommentStatement): T? {
+        return super.visit(commentStatement)
+    }
+
+    override fun visit(structureInitialization: StructureInitialization): T? {
+        structureInitialization.initValues.values.forEach { v -> v.accept<T>(this) }
+        return super.visit(structureInitialization)
+    }
+
+    override fun visit(clazz: ClassDeclaration): T? {
+        currentTopLevelScopeElement = clazz
+        currentFullScope = OOUtils.getEffectiveScope(clazz)
+        clazz.scope.accept(this)
+        for (m in ArrayList(clazz.methods)) {
+            m.accept(this)
+        }
+        return super.visit(clazz)
+    }
+
+    override fun visit(interfaceDeclaration: InterfaceDeclaration): T? {
+        currentTopLevelScopeElement = interfaceDeclaration
+        interfaceDeclaration.scope.accept(this)
+        for (m in interfaceDeclaration.methods)
+            m.accept(this)
+        return super.visit(interfaceDeclaration)
+    }
+
+    override fun visit(method: MethodDeclaration): T? {
+        if (method.parent is ClassDeclaration)
+            currentFullScope = OOUtils.getFullScope(method)
+        method.scope.accept(this)
+        if (method.stBody != null)
+            method.stBody.accept(this)
+        return defaultVisit(method)
+    }
+
+    override fun visit(globalVariableListDeclaration: GlobalVariableListDeclaration): T? {
+        currentTopLevelScopeElement = globalVariableListDeclaration
+        globalVariableListDeclaration.scope.accept(this)
+        return super.visit(globalVariableListDeclaration)
+    }
+
+    override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration): T? {
+        return super.visit(arrayTypeDeclaration)
+    }
+
+    override fun visit(exitStatement: ExitStatement): T? {
+        return super.visit(exitStatement)
+    }
+
+    override fun visit(configurationDeclaration: ConfigurationDeclaration): T? {
+        return super.visit(configurationDeclaration)
+    }
+
+    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration): T? {
+        return super.visit(enumerationTypeDeclaration)
+    }
+
+    override fun visit(resourceDeclaration: ResourceDeclaration): T? {
+        return super.visit(resourceDeclaration)
+    }
+
+    override fun visit(returnStatement: ReturnStatement): T? {
+        return super.visit(returnStatement)
+    }
+
+    override fun visit(deref: Deref): T? {
+        return super.visit(deref)
+    }
+
+    override fun visit(symbolicReference: SymbolicReference): T? {
+        return super.visit(symbolicReference)
+    }
+
+    override fun visit(referenceValue: ReferenceValue): T? {
+        referenceValue.referenceTo.accept<T>(this)
+        return super.visit(referenceValue)
+    }
+
+    override fun visit(ptd: PointerTypeDeclaration): T? {
+        return super.visit(ptd)
+    }
+
+    override fun visit(init: IdentifierInitializer): T? {
+        return super.visit(init)
+    }
+
+    override fun visit(literal: Literal): T? {
+        return super.visit(literal)
+    }
+
+    override fun visit(referenceSpecification: ReferenceSpecification): T? {
+        return super.visit(referenceSpecification)
+    }
+
+    override fun visit(sfcStep: SFCStep): T? {
+        return super.visit(sfcStep)
+    }
+
+    override fun visit(actionDeclaration: ActionDeclaration): T? {
+        return super.visit(actionDeclaration)
+    }
+
+    override fun visit(sfcNetwork: SFCNetwork): T? {
+        return super.visit(sfcNetwork)
+    }
+}

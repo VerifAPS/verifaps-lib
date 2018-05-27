@@ -14,7 +14,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -67,13 +67,13 @@ public class STOOIntegrationTests {
     }
 
     private static STOOSimplifier.State processSTFile(File f) throws IOException {
-        TopLevelElements topLevelElements =  IEC61131Facade.file(f);
-        Scope globalScope = IEC61131Facade.resolveDataTypes(topLevelElements);
-        TopLevelElement program = Utils.findProgram(topLevelElements);
+        TopLevelElements topLevelElements =  IEC61131Facade.INSTANCE.file(f);
+        Scope globalScope = IEC61131Facade.INSTANCE.resolveDataTypes(topLevelElements);
+        TopLevelElement program = Utils.INSTANCE.findProgram(topLevelElements);
         assert program != null;
-        InstanceScope instanceScope = OOIEC61131Facade.findInstances(program, globalScope);
+        InstanceScope instanceScope = OOIEC61131Facade.INSTANCE.findInstances(program, globalScope);
         EffectiveSubtypeScope effectiveSubtypeScope =
-                OOIEC61131Facade.findEffectiveSubtypes(topLevelElements, globalScope, instanceScope);
+                OOIEC61131Facade.INSTANCE.findEffectiveSubtypes(topLevelElements, globalScope, instanceScope);
         return new STOOSimplifier.State(program, topLevelElements, globalScope, instanceScope, effectiveSubtypeScope);
     }
 
@@ -100,6 +100,6 @@ public class STOOIntegrationTests {
         Collections.sort(st1Actual);
         Collections.sort(st1Expected);
 
-        Assert.assertEquals(IEC61131Facade.print(st1Expected), IEC61131Facade.print(st1Actual));
+        Assert.assertEquals(IEC61131Facade.INSTANCE.print(st1Expected), IEC61131Facade.INSTANCE.print(st1Actual));
     }
 }

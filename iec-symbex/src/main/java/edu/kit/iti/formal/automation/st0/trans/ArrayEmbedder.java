@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st0.trans;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -63,11 +63,11 @@ public class ArrayEmbedder implements ST0Transformation {
                 // TODO multiple ranges
                 for (int i = rangeMin; i <= rangeMax; i++) {
                     VariableDeclaration var = new VariableDeclaration(
-                            arrayVariable.getIdentifier() + "$" + i,
+                            arrayVariable.getName() + "$" + i,
                             new SimpleTypeDeclaration<>(array.getBaseType(),
                                     array.getInitialization().get(i - rangeMin)));
                     if (arrayVariable.isGlobal()) {
-                        var.setType(VariableDeclaration.GLOBAL);
+                        var.setType(VariableDeclaration.Companion.getGLOBAL());
                         state.theProgram.getScope().add(var);
                     }
                 }
@@ -106,7 +106,7 @@ public class ArrayEmbedder implements ST0Transformation {
             }
             // Set constant value for subscript (if it is a symbolic reference)
             else if (subscript instanceof SymbolicReference && symbolicReference.equals(subscript))
-                return Literal.integer(access);
+                return Literal.Companion.integer(access);
             return super.visit(symbolicReference);
         }
     }
@@ -175,7 +175,7 @@ public class ArrayEmbedder implements ST0Transformation {
                         state.theProgram.getScope().getVariable(instanceReference).getTypeDeclaration();
                 // TODO multiple ranges
                 Range range = array.getRanges().get(0);
-                RangeType rangeType = new RangeType(range.getStartValue(), range.getStopValue(), DataTypes.USINT);
+                RangeType rangeType = new RangeType(range.getStartValue(), range.getStopValue(), DataTypes.INSTANCE.getUSINT());
                 Set<Integer> values = new HashSet<>();
                 if (subscript instanceof SymbolicReference) {
                     SymbolicReference r = (SymbolicReference) subscript;
@@ -194,7 +194,7 @@ public class ArrayEmbedder implements ST0Transformation {
                                         .map(t -> state.stooState.getInstanceIDRangesToClass(
                                                 ((ClassDataType) t).getClazz()))
                                         .forEach(pairs -> pairs.parallelStream()
-                                                .forEach(p -> IntStream.range(p.a, p.b + 1)
+                                                .forEach(p -> IntStream.range(p.getA(), p.getB() + 1)
                                                         .forEach(values::add)));
                             } catch (NoSuchElementException ignored) {
                             }
@@ -208,11 +208,11 @@ public class ArrayEmbedder implements ST0Transformation {
                 instanceCount += values.size();
                 for (int i : values) {
                     StatementList block = codeBlock instanceof Statement
-                            ? new StatementList((Statement) ((Statement) codeBlock).copy())
-                            : new StatementList(((StatementList) codeBlock).copy());
+                            ? new StatementList((Statement) ((Statement) codeBlock).clone())
+                            : new StatementList(((StatementList) codeBlock).clone());
                     block.accept(new ArrayAccessRenameVisitor(instanceReference.getIdentifier(), i, subscript));
                     branch.addGuardedCommand(new GuardedStatement(
-                            BinaryExpression.equalsExpression(subscript, new Literal(rangeType, Integer.toString(i))),
+                            BinaryExpression.Companion.equalsExpression(subscript, new Literal(rangeType, Integer.toString(i))),
                             block));
                 }
                 // Perform search once more
@@ -254,7 +254,7 @@ public class ArrayEmbedder implements ST0Transformation {
                 if (found())
                     return null;
                 // TODO multiple subscripts
-                if (symbolicReference.getIdentifier().equals(arrayVariable.getIdentifier())
+                if (symbolicReference.getIdentifier().equals(arrayVariable.getName())
                         && symbolicReference.hasSubscripts()
                         && symbolicReference.getSubscripts().get(0) instanceof SymbolicReference
                         && match.apply((SymbolicReference) symbolicReference.getSubscripts().get(0)))

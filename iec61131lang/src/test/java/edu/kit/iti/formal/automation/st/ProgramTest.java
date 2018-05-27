@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -94,7 +94,7 @@ public class ProgramTest {
         IEC61131Parser.StartContext ctx = parser.start();
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
         TopLevelElements sl = (TopLevelElements) ctx.accept(new IECParseTreeToAST());
-        Assert.assertEquals(sl, sl.copy());
+        Assert.assertEquals(sl, sl.clone());
     }
 
     /*
@@ -109,46 +109,46 @@ public class ProgramTest {
 
     @Test
     public void testResolveDataTypes() throws IOException {
-        TopLevelElements tle = IEC61131Facade.file(testFile);
-        Scope gs = IEC61131Facade.resolveDataTypes(tle);
+        TopLevelElements tle = IEC61131Facade.INSTANCE.file(testFile);
+        Scope gs = IEC61131Facade.INSTANCE.resolveDataTypes(tle);
         for (ClassDeclaration classDeclaration : gs.getClasses().values()) {
             Assert.assertTrue(
                     classDeclaration.getParent().getIdentifier() == null
                     || classDeclaration.getParentClass() != null);
             classDeclaration.getInterfaces().forEach(
                     i -> Assert.assertNotNull("Could not resolve interface for classes.",
-                            i.getIdentifiedObject()));
+                            i.getObj()));
         }
         for (FunctionBlockDeclaration functionBlockDeclaration : gs.getFunctionBlocks().values()) {
             Assert.assertTrue(functionBlockDeclaration.getParent().getIdentifier() == null
                     || functionBlockDeclaration.getParentClass() != null);
             functionBlockDeclaration.getInterfaces()
                     .forEach(i -> Assert.assertNotNull("Could not resolve interface for function blocks.",
-                            i.getIdentifiedObject()));
+                            i.getObj()));
         }
     }
 
    // @Test
     public void testPrintTopLevelElements() throws IOException {
-        TopLevelElements tle = IEC61131Facade.file(testFile);
+        TopLevelElements tle = IEC61131Facade.INSTANCE.file(testFile);
         PrettyPrinterTest.testPrettyPrintByString(tle, testFile);
     }
 
     @Test
     public void testPrintTopLevelElementsByEquals() throws IOException {
-        TopLevelElements tle = IEC61131Facade.file(testFile);
+        TopLevelElements tle = IEC61131Facade.INSTANCE.file(testFile);
         PrettyPrinterTest.testPrettyPrintByEquals(tle);
     }
 
     @Test
     public void testEffectiveSubtypes() throws IOException {
-        TopLevelElements tle = IEC61131Facade.file(testFile);
-        Scope gs = IEC61131Facade.resolveDataTypes(tle);
-        EffectiveSubtypeScope subtypeScope = OOIEC61131Facade.findEffectiveSubtypes(tle, gs, new InstanceScope(gs));
+        TopLevelElements tle = IEC61131Facade.INSTANCE.file(testFile);
+        Scope gs = IEC61131Facade.INSTANCE.resolveDataTypes(tle);
+        EffectiveSubtypeScope subtypeScope = OOIEC61131Facade.INSTANCE.findEffectiveSubtypes(tle, gs, new InstanceScope(gs));
         AstVisitor<Object> effectiveSubtypesPrinter = new AstVisitor<Object>() {
             @Override
             public Object visit(VariableDeclaration variableDeclaration) {
-                if (FindEffectiveSubtypes.containsInstance(variableDeclaration)
+                if (FindEffectiveSubtypes.Companion.containsInstance(variableDeclaration)
                     && !subtypeScope.getTypes(variableDeclaration).isEmpty()) {
                     System.out.println(variableDeclaration);
                     for (AnyDt dataType : subtypeScope.getTypes(variableDeclaration))

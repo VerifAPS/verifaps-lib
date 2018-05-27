@@ -14,7 +14,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -65,7 +65,7 @@ public class ReferenceToArrayAccess extends STOOTransformation {
         @NotNull
         @Override
         public Object visit(@NotNull SymbolicReference node) {
-            assert currentScope != null;
+            assert getCurrentScope() != null;
             // Rewrite so accesses to an instance's attributes is replaced with accesses in the appropriate global array
             List<SymbolicReference> symbolicReferenceList = node.asList();
             // Clear dereferences (assume they are all correct)
@@ -78,8 +78,8 @@ public class ReferenceToArrayAccess extends STOOTransformation {
             if (!instanceReference.isPresent())
                 return node;
             // Ignore if referring in-out (esp. struct-like) variable
-            if (currentScope.hasVariable(instanceReference.get().getIdentifier())) {
-                VariableDeclaration variable = currentScope.getVariable(instanceReference.get().getIdentifier());
+            if (getCurrentScope().hasVariable(instanceReference.get().getIdentifier())) {
+                VariableDeclaration variable = getCurrentScope().getVariable(instanceReference.get().getIdentifier());
                 if (variable != null && variable.isInOut())
                     return node;
             }
@@ -136,7 +136,7 @@ public class ReferenceToArrayAccess extends STOOTransformation {
                     Optional<InstanceScope.Instance> o =
                             state.getInstancesOfVariable(variableDeclaration).stream().findAny();
                     assert o.isPresent();
-                    variableDeclaration.setType(VariableDeclaration.CONSTANT);
+                    variableDeclaration.setType(VariableDeclaration.Companion.getCONSTANT());
                     variableDeclaration.setInit(new Literal(variableDeclaration.getDataType(),
                             Integer.toString(state.getInstanceID(o.get()))));
                 } else variableDeclaration.setInit(new Literal(variableDeclaration.getDataType(),

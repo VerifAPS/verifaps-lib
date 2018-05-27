@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.plcopenxml;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -50,8 +50,8 @@ public class InterfaceBuilder implements Supplier<Scope> {
     @Override
     public Scope get() {
         Scope d = new Scope();
-        add(interfaze.getChild("inputVars"), d, VariableDeclaration.INPUT);
-        add(interfaze.getChild("outputVars"), d, VariableDeclaration.OUTPUT);
+        add(interfaze.getChild("inputVars"), d, VariableDeclaration.Companion.getINPUT());
+        add(interfaze.getChild("outputVars"), d, VariableDeclaration.Companion.getOUTPUT());
         add(interfaze.getChild("localVars"), d, 0);
         //TODO Test for IN_OUT and others
         return d;
@@ -94,6 +94,6 @@ public class InterfaceBuilder implements Supplier<Scope> {
         if (simpleValue == null)
             return null;
 
-        return (Literal) IEC61131Facade.expr(simpleValue.getAttributeValue("value"));
+        return (Literal) IEC61131Facade.INSTANCE.expr(simpleValue.getAttributeValue("value"));
     }
 }

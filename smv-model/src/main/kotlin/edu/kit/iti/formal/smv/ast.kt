@@ -23,7 +23,7 @@ interface SOperator {
  * @author Alexander Weigl
  * @version 1 (09.04.18)
  */
-abstract class SMVAst {
+sealed class SMVAst {
     final fun repr(): String = SMVPrinter.toString(this)
     abstract fun <T> accept(visitor: SMVAstVisitor<T>): T
 }

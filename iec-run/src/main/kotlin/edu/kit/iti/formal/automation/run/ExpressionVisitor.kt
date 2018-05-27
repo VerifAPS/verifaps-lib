@@ -93,8 +93,8 @@ class ExpressionVisitor(private val state : State,
 
     override fun visit(literal: Literal) : ExpressionValue {
         /*literal.asValue() does either throw an exception or returns null, if no direct value is available
-        DISCUSS: is this intentional or accidental? better way distinguishing between IdentifierPlaceHolder and other?
-        (is IdentifierPlaceHolder) did not work  -> solve be using resolveDataType*/
+        DISCUSS: is this intentional or accidental? better way distinguishing between RefTo and other?
+        (is RefTo) did not work  -> solve be using resolveDataType*/
         try {
             val asValue = literal.asValue()
             if (asValue != null) {

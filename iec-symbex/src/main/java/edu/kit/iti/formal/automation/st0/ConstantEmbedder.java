@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st0;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.st0;
 
 import edu.kit.iti.formal.automation.st.ast.Literal;
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference;
-import edu.kit.iti.formal.automation.st.ast.TopLevelScopeElement;
+import edu.kit.iti.formal.automation.st.ast.HasScope;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
 import edu.kit.iti.formal.automation.st0.trans.ST0Transformation;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class ConstantEmbedder implements ST0Transformation {
         process(state.theProgram);
     }
 
-    private void process(TopLevelScopeElement topLevelScopeElement) {
+    private void process(HasScope topLevelScopeElement) {
         topLevelScopeElement.getScope().stream()
                 .forEach(variableDeclaration -> {
                     if (variableDeclaration.isConstant() && variableDeclaration.getInit() != null) {

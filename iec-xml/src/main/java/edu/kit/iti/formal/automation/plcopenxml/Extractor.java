@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.plcopenxml;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -52,7 +52,7 @@ public class Extractor {
 
         String input = options.nonOptionArguments().get(0).toString();
         TopLevelElements toplevel = IECXMLFacade.readPLCOpenXml(input);
-        @NotNull String out = IEC61131Facade.print(toplevel);
+        @NotNull String out = IEC61131Facade.INSTANCE.print(toplevel);
         System.out.println(out);
     }
 }

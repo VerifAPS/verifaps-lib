@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st0.trans;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -91,7 +91,7 @@ public class FunctionBlockEmbedder extends AstMutableVisitor {
             ));
         });
 
-        sl.add(CommentStatement.single("Call of %s:%s", instanceName, fbc.getCalleeName()));
+        sl.add(CommentStatement.Companion.single("Call of %s:%s", instanceName, fbc.getCalleeName()));
         if (call.getSub() == null) {//insert main statement block
             sl.addAll(this.toEmbedd);
         } else {
@@ -99,7 +99,7 @@ public class FunctionBlockEmbedder extends AstMutableVisitor {
             if (actions.containsKey(actionName)) {
                 sl.addAll(actions.get(actionName));
             } else {
-                sl.add(CommentStatement.single("//ERROR: COULD NOT FIND ACTION %s.%s",
+                sl.add(CommentStatement.Companion.single("//ERROR: COULD NOT FIND ACTION %s.%s",
                         instanceName, actionName));
             }
         }
@@ -113,7 +113,7 @@ public class FunctionBlockEmbedder extends AstMutableVisitor {
             );
             sl.add(assign);
         });
-        sl.add(CommentStatement.single("End of call"));
+        sl.add(CommentStatement.Companion.single("End of call"));
         return sl;
     }
 

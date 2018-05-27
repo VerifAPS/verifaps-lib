@@ -14,7 +14,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -235,7 +235,7 @@ public class BranchEffectiveTypes extends STOOTransformation {
                                             @NotNull SymbolicReference deferredTypeReference) {
             IfStatement branch = new IfStatement();
             // Find variable
-            Identifiable parent = currentTopLevelScopeElement;
+            Identifiable parent = getCurrentTopLevelScopeElement();
             SymbolicReference reference = deferredTypeReference;
             while (reference.hasSub() && reference.getDerefCount() == 0) {
                 parent = reference.getIdentifiedObject();
@@ -245,7 +245,7 @@ public class BranchEffectiveTypes extends STOOTransformation {
                 reference = reference.getSub();
             }
             assert reference.getIdentifiedObject() instanceof VariableDeclaration;
-            assert parent instanceof TopLevelScopeElement;
+            assert parent instanceof HasScope;
             // Add branches based on the instance reference we found
             Set<AnyDt> effectiveTypes =
                     state.getEffectiveSubtypeScope().getTypes((VariableDeclaration) reference.getIdentifiedObject());
@@ -255,7 +255,7 @@ public class BranchEffectiveTypes extends STOOTransformation {
             StatementList lastBlock = null;
             if (effectiveTypes.size() > 1 && !((VariableDeclaration) reference.getIdentifiedObject()).isConstant())
                 for (AnyDt effectiveType : new SortedList<>(FXCollections.observableArrayList(effectiveTypes))) {
-                    StatementList block = new StatementList(originalStatement.copy());
+                    StatementList block = new StatementList(originalStatement.clone());
                     //block.add(0, new CommentStatement(deferredTypeReference + " : " + effectiveType.getName()));
                     SetEffectiveTypeToReferenceVisitor setEffectiveTypeVisitor =
                             new SetEffectiveTypeToReferenceVisitor(deferredTypeReference, effectiveType);
@@ -297,18 +297,18 @@ public class BranchEffectiveTypes extends STOOTransformation {
          */
         private Expression instanceIDInRangeGuard(@NotNull SymbolicReference instanceReference,
                                                   @NotNull Tuple<Integer, Integer> instanceIDRange) {
-            SymbolicReference instanceIDReference = instanceReference.copy();
+            SymbolicReference instanceIDReference = instanceReference.clone();
             List<SymbolicReference> instanceIDReferenceList = instanceIDReference.asList();
             instanceIDReferenceList.get(instanceIDReferenceList.size() - 1).setSub(
                     new SymbolicReference(INSTANCE_ID_VAR_NAME));
             // _INSTANCE_ID >= instanceIDRange(lower) AND _INSTANCE_ID <= instanceIDRange(upper)
             AnyDt instanceIDType = state.getGlobalScope().resolveDataType(
                     INSTANCE_ID_VAR_NAME + INSTANCE_ID_TYPE_SUFFIX);
-            return BinaryExpression.andExpression(
-                    BinaryExpression.greaterEqualsExpression(instanceIDReference,
-                            new Literal(instanceIDType, Integer.toString(instanceIDRange.a))),
-                    BinaryExpression.lessEqualsExpression(instanceIDReference,
-                            new Literal(instanceIDType, Integer.toString(instanceIDRange.b))));
+            return BinaryExpression.Companion.andExpression(
+                    BinaryExpression.Companion.greaterEqualsExpression(instanceIDReference,
+                            new Literal(instanceIDType, Integer.toString(instanceIDRange.getA()))),
+                    BinaryExpression.Companion.lessEqualsExpression(instanceIDReference,
+                            new Literal(instanceIDType, Integer.toString(instanceIDRange.getB()))));
         }
     }
 }

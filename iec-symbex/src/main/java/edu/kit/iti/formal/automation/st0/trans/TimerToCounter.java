@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st0.trans;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -61,10 +61,10 @@ public class TimerToCounter extends AstMutableVisitor {
     @Override
     public Object visit(VariableDeclaration vd) {
         if (Objects.requireNonNull(vd.getDataTypeName()).equalsIgnoreCase("TIME")
-                || vd.getDataType() == TimeType.TIME_TYPE) {
+                || vd.getDataType() == TimeType.Companion.getTIME_TYPE()) {
 
             VariableDeclaration newVariable = new VariableDeclaration(
-                    vd.getName(), vd.getType(), DataTypes.UINT);
+                    vd.getName(), vd.getType(), DataTypes.INSTANCE.getUINT());
 
             int cycles = 0;
             if (vd.getInit() != null) {
@@ -74,10 +74,10 @@ public class TimerToCounter extends AstMutableVisitor {
                 cycles = 0;
             }
 
-            Literal newVal = Literal.integer(cycles);
+            Literal newVal = Literal.Companion.integer(cycles);
             SimpleTypeDeclaration<Literal> sd = new SimpleTypeDeclaration<>();
             sd.setInitialization(newVal);
-            sd.setBaseType(DataTypes.UINT);
+            sd.setBaseType(DataTypes.INSTANCE.getUINT());
             sd.setBaseTypeName("UINT");
             //setPositions(vd.getInit(), sd);
             newVariable.setTypeDeclaration(sd);
@@ -88,11 +88,11 @@ public class TimerToCounter extends AstMutableVisitor {
 
     @Override
     public Object visit(Literal literal) {
-        if (literal.getDataType() == TimeType.TIME_TYPE ||
-                Objects.equals(literal.getDataTypeName(), TimeType.TIME_TYPE.getName())) {
+        if (literal.getDataType() == TimeType.Companion.getTIME_TYPE() ||
+                Objects.equals(literal.getDataTypeName(), TimeType.Companion.getTIME_TYPE().getName())) {
             Value<TimeType, TimeValue> val = literal.asValue();
             int cycles = (int) (val.getValue().getMilliseconds() / this.cycleTime);
-            return Literal.integer(cycles);
+            return Literal.Companion.integer(cycles);
         }
         return super.visit(literal);
     }

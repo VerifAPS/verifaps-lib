@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.builtin;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -33,7 +33,7 @@ import org.junit.Test;
 public class BuiltinLoaderTest {
     @Test
     public void loadDefault() throws Exception {
-        TopLevelElements tle = BuiltinLoader.loadDefault();
+        TopLevelElements tle = BuiltinLoader.INSTANCE.loadDefault();
         Assert.assertTrue(tle.size() > 0);
     }
 }

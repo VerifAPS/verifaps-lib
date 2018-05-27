@@ -16,22 +16,16 @@ package edu.kit.iti.formal.automation.st;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
-import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
-import edu.kit.iti.formal.automation.st.ast.Statement;
 import edu.kit.iti.formal.automation.st.ast.StatementList;
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +34,6 @@ import org.junit.runners.Parameterized.Parameter;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 
 
@@ -63,13 +56,13 @@ public class StatementTest {
 
     @Test
     public void testParser() throws IOException {
-        IEC61131Parser parser = IEC61131Facade.getParser(CharStreams.fromFileName(testFile));
+        IEC61131Parser parser = IEC61131Facade.INSTANCE.getParser(CharStreams.fromFileName(testFile));
         IEC61131Parser.Statement_listContext ctx = parser.statement_list();
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
       }
 
       @Test public void testCopy() throws IOException {
-          StatementList sl = IEC61131Facade.statements(CharStreams.fromFileName(testFile));
-          Assert.assertEquals(sl, sl.copy());
+          StatementList sl = IEC61131Facade.INSTANCE.statements(CharStreams.fromFileName(testFile));
+          Assert.assertEquals(sl, sl.clone());
       }
 }

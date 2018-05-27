@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st0;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -36,7 +36,7 @@ public class TrivialBranchReducer implements ST0Transformation {
         process(state.theProgram);
     }
 
-    private void process(TopLevelScopeElement topLevelScopeElement) {
+    private void process(HasScope topLevelScopeElement) {
         topLevelScopeElement.accept(new TrivialBranchReducerVisitor());
     }
 
@@ -69,7 +69,7 @@ public class TrivialBranchReducer implements ST0Transformation {
         }
 
         private boolean evaluateTrivialCondition(Literal literal) {
-            if (!literal.getDataType().equals(AnyBit.BOOL))
+            if (!literal.getDataType().equals(AnyBit.Companion.getBOOL()))
                 throw new IllegalArgumentException();
             return literal.getTextValue().equals("TRUE");
         }
@@ -80,7 +80,7 @@ public class TrivialBranchReducer implements ST0Transformation {
                 throw new IllegalArgumentException();
             int left = Integer.valueOf(((Literal) binaryExpression.getLeftExpr()).getText());
             int right = Integer.valueOf(((Literal) binaryExpression.getRightExpr()).getText());
-            if (!binaryExpression.getOperator().equals(Operators.EQUALS))
+            if (!binaryExpression.getOperator().equals(Operators.INSTANCE.getEQUALS()))
                 throw new NotImplementedException("");
             return left == right;
         }

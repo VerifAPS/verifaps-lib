@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -54,12 +54,12 @@ public class InValidExpressionTest {
 
     @Test
     public void testInValidExpression() {
-        IEC61131Parser parser = IEC61131Facade.getParser(CharStreams.fromString(invalid));
+        IEC61131Parser parser = IEC61131Facade.INSTANCE.getParser(CharStreams.fromString(invalid));
         boolean error = false;
         try {
             IEC61131Parser.ExpressionContext ctx = parser.expression();
             System.out.println(ctx.toString(parser));
-            System.out.println(IEC61131Facade.print(IEC61131Facade.expr(invalid)));
+            System.out.println(IEC61131Facade.INSTANCE.print(IEC61131Facade.INSTANCE.expr(invalid)));
             System.out.println(ctx.stop.getTokenSource().nextToken());
             error = !ctx.stop.getTokenSource().nextToken().getText().equals("EOF");
             //error = false;

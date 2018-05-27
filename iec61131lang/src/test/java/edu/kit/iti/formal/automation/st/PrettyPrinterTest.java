@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 public class PrettyPrinterTest {
     public static void testPrettyPrintByString(Top astNode, File file) throws IOException {
         String content = FileUtils.readFileToString(file, "utf-8");
-        String printed = StructuredTextPrinter.print(astNode);
+        String printed = StructuredTextPrinter.Companion.print(astNode);
         Assert.assertEquals(
                 clean(content), clean(printed));
     }
@@ -56,9 +56,9 @@ public class PrettyPrinterTest {
     }
 
     public static void testPrettyPrintByEquals(TopLevelElements tle) throws IOException {
-        String printed = IEC61131Facade.print(tle);
+        String printed = IEC61131Facade.INSTANCE.print(tle);
         try {
-            TopLevelElements newTle = IEC61131Facade.file(CharStreams.fromString(printed));
+            TopLevelElements newTle = IEC61131Facade.INSTANCE.file(CharStreams.fromString(printed));
             for (int i = 0; i < Math.min(tle.size(), newTle.size()); i++) {
                 Assert.assertEquals(tle.get(i), newTle.get(i));
             }

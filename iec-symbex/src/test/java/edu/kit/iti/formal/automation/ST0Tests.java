@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -46,19 +46,19 @@ public class ST0Tests {
     }
 
     private void assertResultST0(String file) throws IOException {
-        TopLevelElements st = IEC61131Facade.file(
+        TopLevelElements st = IEC61131Facade.INSTANCE.file(
                 CharStreams.fromStream(getClass().getResourceAsStream(file + ".st")));
-        TopLevelElements st0exp = IEC61131Facade.file(
+        TopLevelElements st0exp = IEC61131Facade.INSTANCE.file(
                 CharStreams.fromStream(getClass().getResourceAsStream(file + ".st0")));
 
-        IEC61131Facade.resolveDataTypes(st);
+        IEC61131Facade.INSTANCE.resolveDataTypes(st);
 
         STSimplifier stSimplifier = new STSimplifier(st);
         stSimplifier.addDefaultPipeline();
         stSimplifier.transform();
         st = stSimplifier.getProcessed();
 
-        Assert.assertEquals(IEC61131Facade.print(st0exp), IEC61131Facade.print(st));
+        Assert.assertEquals(IEC61131Facade.INSTANCE.print(st0exp), IEC61131Facade.INSTANCE.print(st));
     }
 
 }

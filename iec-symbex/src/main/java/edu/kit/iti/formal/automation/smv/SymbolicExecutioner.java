@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.smv;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -44,7 +44,7 @@ import java.util.*;
  */
 public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     @Nullable
-    private Scope localScope = Scope.defaultScope();
+    private Scope localScope = Scope.Companion.defaultScope();
 
     @NotNull
     private Map<String, SVariable> varCache = new HashMap<>();
@@ -193,7 +193,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         }
 
         globalState = new SymbolicState();
-        for (VariableDeclaration var : localScope.filterByFlags(VariableDeclaration.GLOBAL))
+        for (VariableDeclaration var : localScope.filterByFlags(VariableDeclaration.Companion.getGLOBAL()))
             globalState.put(lift(var), peek().get(lift(var)));
 
         programDeclaration.getStBody().accept(this);
@@ -241,7 +241,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         if (null == fd.getScope().getVariable(fd.getName())) {//&& fd.getReturnType() != null) {
             fd.getScope().builder()
                     .setBaseType(fd.getReturnTypeName())
-                    .push(VariableDeclaration.OUTPUT)
+                    .push(VariableDeclaration.Companion.getOUTPUT())
                     .identifiers(fd.getName())
                     .create();
         }
@@ -265,7 +265,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         //region transfer variables
         List<Invocation.Parameter> parameters = invocation.getParameters();
         List<VariableDeclaration> inputVars = fd.getScope().filterByFlags(
-                VariableDeclaration.INPUT | VariableDeclaration.INOUT | VariableDeclaration.OUTPUT);
+                VariableDeclaration.Companion.getINPUT() | VariableDeclaration.Companion.getINOUT() | VariableDeclaration.Companion.getOUTPUT());
 
         if (parameters.size() > inputVars.size()) {
             //System.err.println(fd.getFunctionName());
@@ -290,7 +290,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
             }
         }
 
-        for (VariableDeclaration outputVar : fd.getScope().filterByFlags(VariableDeclaration.OUTPUT))
+        for (VariableDeclaration outputVar : fd.getScope().filterByFlags(VariableDeclaration.Companion.getOUTPUT()))
             calleeState.put(lift(outputVar), valueTranslator.translate(
                     initValueTranslator.getInit(outputVar.getDataType())));
 
@@ -304,7 +304,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
         // Update output variables
         List<Invocation.Parameter> outputParameters = invocation.getOutputParameters();
         List<VariableDeclaration> outputVars = fd.getScope().filterByFlags(
-                VariableDeclaration.OUTPUT, VariableDeclaration.INOUT);
+                VariableDeclaration.Companion.getOUTPUT(), VariableDeclaration.Companion.getINOUT());
         for (Invocation.Parameter parameter : outputParameters) {
             Optional o = outputVars.stream().filter(iv -> iv.getName().equals(parameter.getName())).findAny();
             if (o.isPresent() && parameter.getExpression() instanceof SymbolicReference
@@ -372,16 +372,16 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     @NotNull
     @Override
     public SMVExpr visit(@NotNull CaseCondition.Range r) {
-        BinaryExpression lower = new BinaryExpression(caseExpression, r.getStart(), Operators.GREATER_EQUALS);
-        BinaryExpression upper = new BinaryExpression(r.getStop(), caseExpression, Operators.GREATER_EQUALS);
-        BinaryExpression and = new BinaryExpression(lower, upper, Operators.AND);
+        BinaryExpression lower = new BinaryExpression(caseExpression, r.getStart(), Operators.INSTANCE.getGREATER_EQUALS());
+        BinaryExpression upper = new BinaryExpression(r.getStop(), caseExpression, Operators.INSTANCE.getGREATER_EQUALS());
+        BinaryExpression and = new BinaryExpression(lower, upper, Operators.INSTANCE.getAND());
         return and.accept(this);
     }
 
     @NotNull
     @Override
     public SMVExpr visit(@NotNull CaseCondition.IntegerCondition i) {
-        BinaryExpression be = new BinaryExpression(caseExpression, i.getValue(), Operators.EQUALS);
+        BinaryExpression be = new BinaryExpression(caseExpression, i.getValue(), Operators.INSTANCE.getEQUALS());
         return be.accept(this);
     }
 
@@ -389,7 +389,7 @@ public class SymbolicExecutioner extends DefaultVisitor<SMVExpr> {
     @NotNull
     @Override
     public SMVExpr visit(@NotNull CaseCondition.Enumeration e) {
-        BinaryExpression be = new BinaryExpression(caseExpression, e.getStart(), Operators.EQUALS);
+        BinaryExpression be = new BinaryExpression(caseExpression, e.getStart(), Operators.INSTANCE.getEQUALS());
         return be.accept(this);
         //TODO rework case conditions
     }

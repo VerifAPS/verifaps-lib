@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.plcopenxml;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -34,6 +34,6 @@ import java.io.IOException;
 public class ExportAsPlain {
     public static void main(String args[]) throws JDOMException, IOException {
         System.out.println(
-                IEC61131Facade.print(IECXMLFacade.readPLCOpenXml(args[0])));
+                IEC61131Facade.INSTANCE.print(IECXMLFacade.readPLCOpenXml(args[0])));
     }
 }

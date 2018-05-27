@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -38,10 +38,10 @@ import java.io.IOException;
 public class ProgramWithActionsTest {
     @Test
     public void test() throws IOException {
-        TopLevelElements tle = IEC61131Facade.file(CharStreams.fromStream(
+        TopLevelElements tle = IEC61131Facade.INSTANCE.file(CharStreams.fromStream(
                 getClass().getResourceAsStream("program_with_actions.st")
         ));
         TopLevelElements newTle = SymbExFacade.simplify(tle);
-        System.out.println(IEC61131Facade.print(newTle));
+        System.out.println(IEC61131Facade.INSTANCE.print(newTle));
     }
 }

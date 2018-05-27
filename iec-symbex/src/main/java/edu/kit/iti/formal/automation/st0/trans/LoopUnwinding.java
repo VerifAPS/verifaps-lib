@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.st0.trans;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -66,14 +66,14 @@ public class LoopUnwinding extends AstMutableVisitor {
         SymbolicReference ref = new SymbolicReference(var);
         for (int i = start; i < stop; i += step) {
             er.getReplacements().put(
-                    ref, Literal.integer(i));
+                    ref, Literal.Companion.integer(i));
             sl.addAll(er.replace());
         }
         return sl;
     }
 
     private long eval(Expression expr) {
-        IntegerExpressionEvaluator iee = new IntegerExpressionEvaluator(currentScope);
+        IntegerExpressionEvaluator iee = new IntegerExpressionEvaluator(getCurrentScope());
         return (long) expr.accept(iee);
     }
 }

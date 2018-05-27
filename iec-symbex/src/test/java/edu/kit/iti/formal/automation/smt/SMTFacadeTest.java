@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.smt;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -45,8 +45,8 @@ public class SMTFacadeTest {
                 "traffic_light_bools.st");*/
         InputStream is = new FileInputStream("src/test/resources/traffic_light_bools.st");
         Assume.assumeNotNull(is);
-        TopLevelElements code = IEC61131Facade.file(CharStreams.fromStream(is));
-        IEC61131Facade.resolveDataTypes(code);
+        TopLevelElements code = IEC61131Facade.INSTANCE.file(CharStreams.fromStream(is));
+        IEC61131Facade.INSTANCE.resolveDataTypes(code);
         TopLevelElements symplifiedCode = SymbExFacade.simplify(code);
         SMVModule module = SymbExFacade.evaluateProgram(symplifiedCode);
         SMTProgram program = SMTFacade.translate(module);
