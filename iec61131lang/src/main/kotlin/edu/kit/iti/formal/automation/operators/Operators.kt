@@ -49,32 +49,32 @@ object Operators {
     /**
      * Constant `MINUS`
      */
-    var MINUS = UnaryOperator("-", ANY_NUM)
+    var MINUS = UnaryOperator("-", AnyNum.ANY_NUM)
 
     /**
      * Constant `ADD`
      */
-    var ADD = BinaryOperator("+", ANY_NUM)
+    var ADD = BinaryOperator("+", AnyNum.ANY_NUM)
 
     /**
      * Constant `MULT`
      */
-    var MULT = BinaryOperator("*", ANY_NUM)
+    var MULT = BinaryOperator("*", AnyNum.ANY_NUM)
 
     /**
      * Constant `SUB`
      */
-    var SUB = BinaryOperator("-", ANY_NUM)
+    var SUB = BinaryOperator("-", AnyNum.ANY_NUM)
 
     /**
      * Constant `DIV`
      */
-    var DIV = BinaryOperator("/", ANY_NUM)
+    var DIV = BinaryOperator("/", AnyNum.ANY_NUM)
 
     /**
      * Constant `MOD`
      */
-    var MOD = BinaryOperator("MOD", ANY_NUM)
+    var MOD = BinaryOperator("MOD", AnyNum.ANY_NUM)
 
     /**
      * Constant `AND`

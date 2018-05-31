@@ -47,7 +47,6 @@ open class AnyNum : AnyDt() {
     }
 
     companion object {
-        /** Constant `ANY_NUM`  */
         val ANY_NUM: AnyDt = AnyNum()
     }
 }

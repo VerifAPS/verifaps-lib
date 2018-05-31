@@ -55,7 +55,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
                 functions.parent = Supplier { parent.functions }
                 actions.parent = Supplier { parent.actions }
                 classes.parent = Supplier { parent.classes }
-                dataTypes.parent = Supplier<Namespace<TypeDeclaration>> { parent.dataTypes }
+                dataTypes.parent = Supplier<Namespace<TypeDeclaration<Any?>>> { parent.dataTypes }
                 interfaces.parent = Supplier { parent.interfaces }
             } else {
                 programs.parent = null
@@ -258,7 +258,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
         }
 
         if (b) {
-            q = Objects.requireNonNull<TypeDeclaration>(dataTypes.lookup(name)).getDataType(this)
+            q = Objects.requireNonNull<TypeDeclaration<Any?>>(dataTypes.lookup(name)).getDataType(this)
             types[name] = q
             return q
         }
@@ -334,7 +334,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
         val gs = Scope(parent)
         gs.classes = Namespace(classes)
         gs.interfaces = Namespace(interfaces)
-        gs.dataTypes = Namespace<TypeDeclaration>(dataTypes)
+        gs.dataTypes = Namespace<TypeDeclaration<Any?>>(dataTypes)
         gs.functionBlocks = Namespace(functionBlocks)
         gs.functionResolvers = ArrayList(functionResolvers)
         gs.functions = Namespace(functions)
@@ -354,7 +354,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
         val gs = Scope(parent)
         gs.classes = Namespace(classes)
         gs.interfaces = Namespace(interfaces)
-        gs.dataTypes = Namespace<TypeDeclaration>(dataTypes)
+        gs.dataTypes = Namespace<TypeDeclaration<Any?>>(dataTypes)
         gs.functionBlocks = Namespace(functionBlocks)
         gs.functionResolvers = ArrayList(functionResolvers)
         gs.functions = Namespace(functions)

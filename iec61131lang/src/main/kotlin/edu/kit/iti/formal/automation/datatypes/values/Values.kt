@@ -31,32 +31,19 @@ import java.math.BigInteger
  * @author Alexander Weigl
  * @version 1 (25.06.17)
  */
-abstract class Values {
+typealias VAnyInt = Value<AnyInt, BigInteger>
 
-    class VClass(dataType: ClassDataType, value: Map<String, Value<*, *>>) : Value<ClassDataType, Map<String, Value<*, *>>>(dataType, value)
+typealias VClass = Value<ClassDataType, Map<String, Value<*, *>>>
+typealias VAnyReal = Value<AnyReal, BigDecimal>
+typealias VAnyBit = Value<AnyBit, Bits>
+typealias VBool = Value<AnyBit.Bool, Boolean>
 
-    class VAnyInt(dataType: AnyInt, value: BigInteger) : Value<AnyInt, BigInteger>(dataType, value)
+val TRUE = VBool(AnyBit.BOOL, true)
+val FALSE = VBool(AnyBit.BOOL, false)
 
-    class VAnyReal(dataType: AnyReal, value: BigDecimal) : Value<AnyReal, BigDecimal>(dataType, value)
-
-    class VAnyBit(dataType: AnyBit, value: Bits) : Value<AnyBit, Bits>(dataType, value)
-
-    class VBool(dataType: AnyBit.Bool, value: Boolean?) : Value<AnyBit.Bool, Boolean>(dataType, value) {
-        companion object {
-            val TRUE: Value<*, *> = VBool(AnyBit.BOOL, true)
-            val FALSE: Value<*, *> = VBool(AnyBit.BOOL, false)
-        }
-    }
-
-    class VIECString(dataType: IECString, value: String) : Value<IECString, String>(dataType, value)
-
-    class VDate(dataType: AnyDate.Date, value: DateData) : Value<AnyDate.Date, DateData>(dataType, value)
-
-    class VTime(dataType: TimeType, value: TimeValue) : Value<TimeType, TimeValue>(dataType, value)
-
-    class VDateAndTime(dataType: AnyDate.DateAndTime, value: DateAndTimeData) : Value<AnyDate.DateAndTime, DateAndTimeData>(dataType, value)
-
-    class VAnyEnum(enumerateType: EnumerateType, value: String) : Value<EnumerateType, String>(enumerateType, value)
-
-    class VToD(timeOfDay: AnyDate.TimeOfDay, t: TimeofDayData) : Value<AnyDate.TimeOfDay, TimeofDayData>(timeOfDay, t)
-}
+typealias VIECString = Value<IECString, String>
+typealias VDate = Value<AnyDate.Date, DateData>
+typealias VTime = Value<TimeType, TimeValue>
+typealias VDateAndTime = Value<AnyDate.DateAndTime, DateAndTimeData>
+typealias VAnyEnum = Value<EnumerateType, String>
+typealias VToD = Value<AnyDate.TimeOfDay, TimeofDayData>

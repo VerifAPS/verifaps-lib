@@ -23,8 +23,6 @@ package edu.kit.iti.formal.automation.datatypes.values
  */
 
 import edu.kit.iti.formal.automation.datatypes.AnyDt
-import lombok.Data
-import lombok.NonNull
 
 /**
  * Created by weigl on 11.06.14.
@@ -32,14 +30,6 @@ import lombok.NonNull
  * @author weigl
  * @version $Id: $Id
  */
-@Data
-abstract class Value<T : AnyDt, S> {
-    @NonNull
-    @get:lombok.NonNull
-    val dataType: T? = null
-    @NonNull
-    @get:lombok.NonNull
-    val value: S? = null
-
-
-}
+data class Value<T : AnyDt, S>(
+        val dataType: T, val value: S
+)

@@ -29,31 +29,13 @@ import edu.kit.iti.formal.automation.datatypes.promotion.TypePromotion
 /**
  * BinaryOperator represents a binary operator, e.g. addition +, multiply *, etc.
  *
- *
- *
  * Created on 24.11.16.
  *
  * @author Alexander Weigl
  * @version 1
  */
-open class BinaryOperator
-/**
- *
- * Constructor for BinaryOperator.
- *
- * @param symbol    a [java.lang.String] object.
- * @param validType a [edu.kit.iti.formal.automation.datatypes.AnyDt] object.
- */
-(private val symbol: String?, private val validType: AnyDt) : Operator {
-
-    /**
-     *
-     */
+open class BinaryOperator(private val symbol: String, private val validType: AnyDt) : Operator {
     protected var promoter: TypePromotion = DefaultTypePromoter()
-
-    /**
-     * {@inheritDoc}
-     */
     override val expectedDataTypes: Array<AnyDt>
         get() = arrayOf(validType, validType)
 
@@ -75,7 +57,7 @@ open class BinaryOperator
     /**
      * {@inheritDoc}
      */
-    override fun symbol(): String? {
+    override fun symbol(): String {
         return symbol
     }
 

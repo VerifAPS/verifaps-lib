@@ -24,7 +24,7 @@ interface SOperator {
  * @version 1 (09.04.18)
  */
 sealed class SMVAst {
-    final fun repr(): String = SMVPrinter.toString(this)
+    fun repr(): String = SMVPrinter.toString(this)
     abstract fun <T> accept(visitor: SMVAstVisitor<T>): T
 }
 
@@ -49,7 +49,6 @@ data class SBinaryExpression(var left: SMVExpr,
 
     override val dataType: SMVType?
         get() = SMVTypes.infer(left.dataType!!, right.dataType!!)
-
 
     override fun inModule(module: String): SBinaryExpression {
         return SBinaryExpression(left.inModule(module),

@@ -326,7 +326,7 @@ interface Visitor<T> {
      * @param simpleTypeDeclaration a [edu.kit.iti.formal.automation.st.ast.SimpleTypeDeclaration] object.
      * @return a T object.
      */
-    fun visit(simpleTypeDeclaration: SimpleTypeDeclaration<*>): T
+    fun visit(simpleTypeDeclaration: SimpleTypeDeclaration): T
 
     /**
      *
@@ -408,7 +408,7 @@ interface Visitor<T> {
 
     fun visit(literal: Literal): T
 
-    fun visit(parameter: Invocation.Parameter): T
+    fun visit(parameter: InvocationParameter): T
 
     fun visit(referenceSpecification: ReferenceSpecification): T
 
