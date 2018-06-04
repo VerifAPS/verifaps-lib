@@ -70,7 +70,7 @@ class FunctionResolverMUX : FunctionResolver {
             returnType.setIdentifiedObject(call[1])
             val dtp = DefaultTypePromoter()
             for (i in call.indices) {
-                scope.add(VariableDeclaration("a$i",
+                scope.add(VariableDeclaration<Initialization>("a$i",
                         VariableDeclaration.INPUT, call[i]))
 
                 if (i > 0) {

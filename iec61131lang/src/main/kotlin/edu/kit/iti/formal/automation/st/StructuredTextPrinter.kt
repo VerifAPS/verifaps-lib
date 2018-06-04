@@ -651,7 +651,7 @@ class StructuredTextPrinter
         return null
     }
 
-    private fun variableDataType(vd: VariableDeclaration) {
+    private fun variableDataType(vd: VariableDeclaration<Initialization>) {
         if (vd.dataType is IECArray) {
             val dataType = vd.dataType as IECArray
             sb.append(" ARRAY[")
@@ -706,13 +706,13 @@ class StructuredTextPrinter
     }
 
     override fun visit(localScope: Scope): Any? {
-        val variables = localScope.stream().collect<List<VariableDeclaration>, Any>(Collectors.toList())
-        val varType = HashMultimap.create<Int, VariableDeclaration>(3, variables.size / 3 + 1)
+        val variables = localScope.stream().collect<List<VariableDeclaration<Initialization>>, Any>(Collectors.toList())
+        val varType = HashMultimap.create<Int, VariableDeclaration<Initialization>>(3, variables.size / 3 + 1)
         variables.forEach { v -> varType.put(v.type, v) }
 
         for (type in varType.keySet()) {
             val vars = ArrayList(varType.get(type!!))
-            vars.sort(Comparator<VariableDeclaration> { obj, o -> obj.compareTo(o) })
+            vars.sort(Comparator<VariableDeclaration<Initialization>> { obj, o -> obj.compareTo(o) })
             sb.nl().append("VAR")
 
             if (VariableDeclaration.INPUT and type >= VariableDeclaration.INOUT) {

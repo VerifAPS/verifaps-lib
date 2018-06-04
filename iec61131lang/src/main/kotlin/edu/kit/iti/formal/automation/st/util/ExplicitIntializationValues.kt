@@ -21,28 +21,3 @@ package edu.kit.iti.formal.automation.st.util
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
-import edu.kit.iti.formal.automation.st.ast.TopLevelElement
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements
-import edu.kit.iti.formal.automation.st.ast.HasScope
-
-/**
- * @author Alexander Weigl
- * @version 1 (15.04.17)
- */
-object ExplicitIntializationValues {
-    fun makeExplicitInitializationValues(
-            elements: TopLevelElements): TopLevelElements? {
-        //return new TopLevelElements(elements.stream()
-        //   .map(ExplicitIntializationValues::makeExplicitInitializationValues)
-        //   .collect(Collectors.toList()));
-        return null
-    }
-
-    fun makeExplicitInitializationValues(
-            element: HasScope<*>): TopLevelElement<*> {
-        val scope = element.scope
-        //makeExplicitInitializationValues(scope);
-        return element
-    }
-}

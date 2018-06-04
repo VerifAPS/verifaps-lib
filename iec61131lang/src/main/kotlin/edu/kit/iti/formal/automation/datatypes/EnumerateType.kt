@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.datatypes
  * #L%
  */
 
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by weigl on 10.06.14.
@@ -30,90 +30,24 @@ import java.util.ArrayList
  * @author weigl
  * @version $Id: $Id
  */
-class EnumerateType : AnyDt {
-    override var name: String? = null
-        private set
-    /**
-     *
-     * Getter for the field `allowedValues`.
-     *
-     * @return a [java.util.List] object.
-     */
-    /**
-     *
-     * Setter for the field `allowedValues`.
-     *
-     * @param allowedValues a [java.util.List] object.
-     */
-    var allowedValues: List<String> = ArrayList()
-        set(allowedValues) {
-            field = allowedValues
-            bitlength = Math.ceil(Math.log(allowedValues.size.toDouble())).toInt()
+class EnumerateType(override var name: String = "ENUM",
+                    var allowedValues: MutableList<String> = ArrayList())
+    : AnyDt(name) {
+
+    val bitlength: Int
+        get() {
+            return Math.ceil(Math.log(allowedValues.size.toDouble())).toInt()
         }
-    /**
-     *
-     * Getter for the field `defValue`.
-     *
-     * @return a [java.lang.String] object.
-     */
-    /**
-     *
-     * Setter for the field `defValue`.
-     *
-     * @param defValue a [java.lang.String] object.
-     */
+
     var defValue: String? = null
         set(defValue) {
-            assert(isAllowedValue(defValue))
+            assert(defValue != null && isAllowedValue(field!!))
             field = defValue
         }
-    private var bitlength: Int = 0
 
-    /**
-     *
-     * Constructor for EnumerateType.
-     */
-    constructor() {
-        //the unknown type
-    }
-
-    /**
-     *
-     * Constructor for EnumerateType.
-     *
-     * @param name a [java.lang.String] object.
-     * @param allowedValues a [java.util.List] object.
-     * @param defValue a [java.lang.String] object.
-     */
-    @JvmOverloads constructor(name: String, allowedValues: List<String>, defValue: String = allowedValues[0]) {
-        this.name = name
-        allowedValues = allowedValues
-        defValue = defValue
-    }
-
-    /**
-     *
-     * Constructor for EnumerateType.
-     *
-     * @param prefix a [java.lang.String] object.
-     */
-    constructor(prefix: String) {
-        this.name = prefix
-    }
-
-    /**
-     *
-     * Getter for the field `name`.
-     *
-     * @return a [java.lang.String] object.
-     */
-    override fun getName(): String? {
-        return name
-    }
-
-    /** {@inheritDoc}  */
-    public override fun setName(name: String) {
-        this.name = name
+    constructor(name: String, allowedValues: MutableList<String>,
+                defValue: String = allowedValues[0]) : this(name, allowedValues) {
+        this.defValue = defValue
     }
 
     /** {@inheritDoc}  */
@@ -124,9 +58,8 @@ class EnumerateType : AnyDt {
             "$name#$obj"
     }
 
-
     /** {@inheritDoc}  */
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
+    override fun <T> accept(visitor: DataTypeVisitor<T>): T {
         return visitor.visit(this)
     }
 
@@ -134,10 +67,3 @@ class EnumerateType : AnyDt {
         return this.allowedValues.contains(value)
     }
 }
-/**
- *
- * Constructor for EnumerateType.
- *
- * @param name a [java.lang.String] object.
- * @param allowedValues a [java.util.List] object.
- */

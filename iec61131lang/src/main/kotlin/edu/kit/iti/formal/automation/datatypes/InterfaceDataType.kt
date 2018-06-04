@@ -23,23 +23,15 @@
 package edu.kit.iti.formal.automation.datatypes
 
 import edu.kit.iti.formal.automation.st.ast.InterfaceDeclaration
-import lombok.AllArgsConstructor
-import lombok.Data
 
 /**
  * @author Augusto Modanese
  */
-@Data
-@AllArgsConstructor
-class InterfaceDataType : RecordType {
+class InterfaceDataType(override name: String = "<empty>") : RecordType(name) {
     var interfaceDeclaration: InterfaceDeclaration? = null
         set(interfaceDeclaration) {
             field = this.interfaceDeclaration
         }
-
-    override fun getName(): String {
-        return this.interfaceDeclaration!!.name
-    }
 
     override fun repr(obj: Any): String? {
         return "INTERFACE " + this.interfaceDeclaration!!.name

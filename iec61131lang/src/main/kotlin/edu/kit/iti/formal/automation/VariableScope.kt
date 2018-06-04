@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
+import edu.kit.iti.formal.automation.st.Cloneable
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import java.io.Serializable
 import java.util.*
@@ -31,20 +32,17 @@ import java.util.*
  *
  * @author weigl
  */
-class VariableScope : LinkedHashMap<String, VariableDeclaration>(), Cloneable, Serializable {
-    /**
-     *
-     * add.
-     *
-     * @param var a [edu.kit.iti.formal.automation.st.ast.VariableDeclaration] object.
-     */
-    fun add(`var`: VariableDeclaration) {
-        put(`var`.name, `var`)
+data class VariableScope(
+        private val impl: LinkedHashMap<String, VariableDeclaration> = linkedMapOf())
+    : MutableMap<String, VariableDeclaration> by impl, Cloneable<VariableScope>, Serializable {
+
+    fun add(variable: VariableDeclaration) {
+        put(variable.name, variable)
     }
 
     override fun clone(): VariableScope {
-        VariableScope vs = new VariableScope();
-        forEach((s, v) -> vs.put(s, v.clone()));
-        return vs;
+        val vs = VariableScope()
+        forEach({ s, v -> vs.put(s, v.clone() as VariableDeclaration) })
+        return vs
     }
 }

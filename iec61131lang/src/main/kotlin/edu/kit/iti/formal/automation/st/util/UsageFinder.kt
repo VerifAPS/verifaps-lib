@@ -33,26 +33,13 @@ import java.util.HashSet
  * @author weigl
  * @version $Id: $Id
  */
-class UsageFinder : AstVisitor<*>() {
-    private var writtenReferences: MutableSet<String> = HashSet()
-    /**
-     *
-     * Getter for the field `readedReference`.
-     *
-     * @return a [java.util.Set] object.
-     */
-    /**
-     *
-     * Setter for the field `readedReference`.
-     *
-     * @param readedReference a [java.util.Set] object.
-     */
+class UsageFinder : AstVisitor<Any>() {
+    var writtenReferences: MutableSet<String> = HashSet()
     var readedReference: Set<String> = HashSet()
 
-    /** {@inheritDoc}  */
     override fun visit(assignmentStatement: AssignmentStatement): Any? {
         writtenReferences.add(assignmentStatement.location.toString())
-        assignmentStatement.expression.accept<Any>(this)
+        assignmentStatement.expression.accept(this)
         return null
     }
 
@@ -62,28 +49,7 @@ class UsageFinder : AstVisitor<*>() {
         return null;
     }*/
 
-    /**
-     *
-     * Getter for the field `writtenReferences`.
-     *
-     * @return a [java.util.Set] object.
-     */
-    fun getWrittenReferences(): Set<String> {
-        return writtenReferences
-    }
-
-    /**
-     *
-     * Setter for the field `writtenReferences`.
-     *
-     * @param writtenReferences a [java.util.Set] object.
-     */
-    fun setWrittenReferences(writtenReferences: MutableSet<String>) {
-        this.writtenReferences = writtenReferences
-    }
-
     companion object {
-
         /**
          *
          * investigate.
@@ -93,7 +59,7 @@ class UsageFinder : AstVisitor<*>() {
          */
         fun investigate(visitable: Visitable): UsageFinder {
             val waf = UsageFinder()
-            visitable.accept<Any>(waf)
+            visitable.accept(waf)
             return waf
         }
     }

@@ -26,16 +26,16 @@ package edu.kit.iti.formal.automation.datatypes
  * @author Alexander Weigl
  * @version 1 (25.06.17)
  */
-abstract class DefaultDataTypeVisitor<T> : DataTypeVisitor<T> {
+abstract class DefaultDataTypeVisitor<T> : DataTypeVisitor<T?> {
     override fun visit(real: AnyReal): T? {
         return null
     }
 
-    override fun visit(real: AnyReal.Real): T? {
+    override fun visit(real: AnyReal.REAL): T? {
         return null
     }
 
-    override fun visit(real: AnyReal.LReal): T? {
+    override fun visit(real: AnyReal.LREAL): T? {
         return null
     }
 

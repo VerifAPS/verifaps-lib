@@ -25,6 +25,7 @@ package edu.kit.iti.formal.automation.datatypes
 import edu.kit.iti.formal.automation.oo.OOUtils
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration
+import edu.kit.iti.formal.automation.st.ast.Initialization
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import lombok.AllArgsConstructor
 import lombok.Data
@@ -47,8 +48,8 @@ class ClassDataType : RecordType {
 
     override var fields: Scope
         get() = Scope(OOUtils.getEffectiveScope(clazz).parallelStream()
-                .map<VariableDeclaration>(Function<VariableDeclaration, VariableDeclaration> { it.copy() })
-                .collect<List<VariableDeclaration>, Any>(Collectors.toList()))
+                .map<VariableDeclaration<Initialization>>(Function<VariableDeclaration<Initialization>, VariableDeclaration<Initialization>> { it.copy() })
+                .collect<List<VariableDeclaration<Initialization>>, Any>(Collectors.toList()))
         set(value: Scope) {
             super.fields = value
         }

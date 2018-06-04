@@ -72,7 +72,7 @@ class ResolveDataTypes(private val globalScope: Scope) : AstVisitor<Any>() {
         return null
     }
 
-    override fun visit(variableDeclaration: VariableDeclaration): Any? {
+    override fun visit(variableDeclaration: VariableDeclaration<Initialization>): Any? {
         variableDeclaration.dataType = variableDeclaration.typeDeclaration!!
                 .getDataType(globalScope)
         return null

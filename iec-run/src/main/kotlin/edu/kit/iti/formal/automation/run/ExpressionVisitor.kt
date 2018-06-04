@@ -38,7 +38,7 @@ class ExpressionVisitor(private val state : State,
         return StructValue(RecordType(), structInitValues)
     }
 
-    private fun setMatchingArgToParam(parameters: List<ExpressionValue>, arguments: Map<String, VariableDeclaration>, state: State) {
+    private fun setMatchingArgToParam(parameters: List<ExpressionValue>, arguments: Map<String, VariableDeclaration<Initialization>>, state: State) {
         val sortedArguments = arguments.entries
                 .sortedBy {
                     print(it)

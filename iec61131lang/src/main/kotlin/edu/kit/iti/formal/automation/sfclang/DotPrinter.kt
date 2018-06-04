@@ -22,10 +22,10 @@ package edu.kit.iti.formal.automation.sfclang
  * #L%
  */
 
-import edu.kit.iti.formal.automation.sfclang.ast.SFCImplementation
-import edu.kit.iti.formal.automation.sfclang.ast.SFCNetwork
-import edu.kit.iti.formal.automation.sfclang.ast.SFCStep
-import edu.kit.iti.formal.automation.sfclang.ast.SFCTransition
+import edu.kit.iti.formal.automation.st.ast.SFCImplementation
+import edu.kit.iti.formal.automation.st.ast.SFCNetwork
+import edu.kit.iti.formal.automation.st.ast.SFCStep
+import edu.kit.iti.formal.automation.st.ast.SFCTransition
 import edu.kit.iti.formal.automation.st.util.AstVisitor
 import edu.kit.iti.formal.automation.st.util.CodeWriter
 

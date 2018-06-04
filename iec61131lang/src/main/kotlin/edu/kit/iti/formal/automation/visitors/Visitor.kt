@@ -25,7 +25,6 @@ package edu.kit.iti.formal.automation.visitors
 
 import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue
 import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.sfclang.ast.*
 import edu.kit.iti.formal.automation.st.ast.*
 
 /**

@@ -60,7 +60,7 @@ class FindDataTypes : AstVisitor<*> {
         return null
     }
 
-    override fun visit(variableDeclaration: VariableDeclaration): Any? {
+    override fun visit(variableDeclaration: VariableDeclaration<Initialization>): Any? {
         //weigl: do not register anonymous datatype, or references to data types.
         /*
         if (variableDeclaration.getTypeDeclaration() instanceof ArrayTypeDeclaration)

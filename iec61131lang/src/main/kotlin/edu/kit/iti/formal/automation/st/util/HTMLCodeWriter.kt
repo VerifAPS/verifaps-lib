@@ -23,41 +23,19 @@ package edu.kit.iti.formal.automation.st.util
  */
 
 import edu.kit.iti.formal.automation.visitors.Sections
+import java.util.*
 
-import java.util.Stack
 
-/**
- *
- * HTMLCodeWriter class.
- *
- * @author weigl
- * @version $Id: $Id
- */
 class HTMLCodeWriter : CodeWriter() {
-
     private var lastSeperatorInsertPosition: Int = 0
     private val lastIsDiv = Stack<Boolean>()
 
-    /**
-     *
-     * div.
-     *
-     * @param clazzes a [java.lang.String] object.
-     * @return a [edu.kit.iti.formal.automation.st.util.HTMLCodeWriter] object.
-     */
     operator fun div(clazzes: String): HTMLCodeWriter {
         sb.append("<div class=\"").append(clazzes.toLowerCase()).append("\">")
         lastIsDiv.push(true)
         return this
     }
 
-    /**
-     *
-     * span.
-     *
-     * @param clazzes a [java.lang.String] object.
-     * @return a [edu.kit.iti.formal.automation.st.util.HTMLCodeWriter] object.
-     */
     fun span(clazzes: String): HTMLCodeWriter {
         sb.append("<span class=\"")
                 .append(clazzes.toLowerCase())
@@ -66,34 +44,17 @@ class HTMLCodeWriter : CodeWriter() {
         return this
     }
 
-    /**
-     *
-     * end.
-     *
-     * @return a [edu.kit.iti.formal.automation.st.util.HTMLCodeWriter] object.
-     */
     fun end(): HTMLCodeWriter {
         sb.append(if (lastIsDiv.pop()) "</div>" else "</span>")
         return this
     }
 
-    /**
-     *
-     * indent.
-     *
-     * @return a [edu.kit.iti.formal.automation.st.util.HTMLCodeWriter] object.
-     */
     fun indent(): HTMLCodeWriter {
         div("indent")
         return this
     }
 
-    /**
-     *
-     * appendHtmlPreamble.
-     *
-     * @return a [edu.kit.iti.formal.automation.st.util.HTMLCodeWriter] object.
-     */
+
     fun appendHtmlPreamble(): HTMLCodeWriter {
         //		String style = "";
         //		try {
@@ -111,13 +72,7 @@ class HTMLCodeWriter : CodeWriter() {
         return this
     }
 
-    /**
-     *
-     * div.
-     *
-     * @param a a [edu.kit.iti.formal.automation.visitors.Sections] object.
-     * @return a [edu.kit.iti.formal.automation.st.util.HTMLCodeWriter] object.
-     */
+
     fun div(vararg a: Sections): HTMLCodeWriter {
         for (b in a) {
             div(b.name.toLowerCase())
@@ -125,13 +80,7 @@ class HTMLCodeWriter : CodeWriter() {
         return this
     }
 
-    /**
-     *
-     * span.
-     *
-     * @param a a [edu.kit.iti.formal.automation.visitors.Sections] object.
-     * @return a [edu.kit.iti.formal.automation.st.util.HTMLCodeWriter] object.
-     */
+
     fun span(vararg a: Sections): HTMLCodeWriter {
         for (b in a) {
             span(b.name)
@@ -139,33 +88,21 @@ class HTMLCodeWriter : CodeWriter() {
         return this
     }
 
-    /** {@inheritDoc}  */
+
     override fun keyword(word: String): HTMLCodeWriter {
         span(word).span(Sections.KEYWORD)
         super.keyword(word)
         return end().end()
     }
 
-    /**
-     *
-     * seperator.
-     *
-     * @param s a [java.lang.String] object.
-     * @return a [edu.kit.iti.formal.automation.st.util.HTMLCodeWriter] object.
-     */
+
     fun seperator(s: String): HTMLCodeWriter {
         lastSeperatorInsertPosition = length
         span(Sections.SEPARATOR).append(s)
         return this.end()
     }
 
-    /**
-     *
-     * variable.
-     *
-     * @param variable a [java.lang.String] object.
-     * @return a [edu.kit.iti.formal.automation.st.util.HTMLCodeWriter] object.
-     */
+
     fun variable(variable: String): HTMLCodeWriter {
         if (variable.contains("$")) {
             span(Sections.SPECIAL_VARIABLE).span(Sections.VARIABLE).append(variable)
@@ -175,46 +112,24 @@ class HTMLCodeWriter : CodeWriter() {
         return this.end()
     }
 
-    /**
-     *
-     * ts.
-     *
-     * @return a [edu.kit.iti.formal.automation.st.util.HTMLCodeWriter] object.
-     */
+
     fun ts(): HTMLCodeWriter {
         return seperator(";")
     }
 
-    /**
-     *
-     * type.
-     *
-     * @param baseTypeName a [java.lang.String] object.
-     * @return a [edu.kit.iti.formal.automation.st.util.HTMLCodeWriter] object.
-     */
+
     fun type(baseTypeName: String): HTMLCodeWriter {
         span(Sections.TYPE_NAME).append(baseTypeName)
         return this.end()
     }
 
-    /**
-     *
-     * operator.
-     *
-     * @param s a [java.lang.String] object.
-     * @return a [edu.kit.iti.formal.automation.st.util.HTMLCodeWriter] object.
-     */
+
     fun operator(s: String): HTMLCodeWriter {
         span(Sections.OPERATOR).append(s)
         return this.end()
     }
 
-    /**
-     *
-     * deleteLastSeparator.
-     *
-     * @return a [edu.kit.iti.formal.automation.st.util.HTMLCodeWriter] object.
-     */
+
     fun deleteLastSeparator(): HTMLCodeWriter {
         sb.setLength(lastSeperatorInsertPosition)
         return this

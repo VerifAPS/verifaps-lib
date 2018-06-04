@@ -37,11 +37,11 @@ interface DataTypeVisitor<T> {
         return defaultVisit(real)
     }
 
-    open fun visit(real: AnyReal.Real): T? {
+    open fun visit(real: AnyReal.REAL): T? {
         return defaultVisit(real)
     }
 
-    open fun visit(real: AnyReal.LReal): T? {
+    open fun visit(real: AnyReal.LREAL): T? {
         return defaultVisit(real)
     }
 
@@ -69,63 +69,55 @@ interface DataTypeVisitor<T> {
         return visit(anyInt as AnyNum)
     }
 
-    open fun visit(anyInt: AnySignedInt): T? {
+    open fun visit(anyInt: INT): T? {
         return visit(anyInt as AnyInt)
     }
 
-    open fun visit(anyInt: AnyUnsignedInt): T? {
+    open fun visit(anyInt: SINT): T? {
         return visit(anyInt as AnyInt)
     }
 
-    open fun visit(anyInt: Int): T? {
+    open fun visit(anyInt: DINT): T? {
         return visit(anyInt as AnyInt)
     }
 
-    open fun visit(anyInt: SInt): T? {
+    open fun visit(anyInt: LINT): T? {
         return visit(anyInt as AnyInt)
     }
 
-    open fun visit(anyInt: DInt): T? {
+    open fun visit(anyInt: UDINT): T? {
         return visit(anyInt as AnyInt)
     }
 
-    open fun visit(anyInt: LInt): T? {
+    open fun visit(anyInt: USINT): T? {
         return visit(anyInt as AnyInt)
     }
 
-    open fun visit(anyInt: UDInt): T? {
+    open fun visit(anyInt: ULINT): T? {
         return visit(anyInt as AnyInt)
     }
 
-    open fun visit(anyInt: USInt): T? {
+    open fun visit(anyInt: UINT): T? {
         return visit(anyInt as AnyInt)
     }
 
-    open fun visit(anyInt: ULInt): T? {
-        return visit(anyInt as AnyInt)
-    }
-
-    open fun visit(anyInt: UInt): T? {
-        return visit(anyInt as AnyInt)
-    }
-
-    open fun visit(bool: AnyBit.Bool): T? {
+    open fun visit(bool: AnyBit.BOOL): T? {
         return visit(bool as AnyBit)
     }
 
-    fun visit(word: AnyBit.Byte): T? {
+    fun visit(word: AnyBit.BYTE): T? {
         return visit(word as AnyBit)
     }
 
-    fun visit(word: AnyBit.Word): T? {
+    fun visit(word: AnyBit.WORD): T? {
         return visit(word as AnyBit)
     }
 
-    fun visit(word: AnyBit.DWord): T? {
+    fun visit(word: AnyBit.DWORD): T? {
         return visit(word as AnyBit)
     }
 
-    fun visit(word: AnyBit.LWord): T? {
+    fun visit(word: AnyBit.LWORD): T? {
         return visit(word as AnyBit)
     }
 

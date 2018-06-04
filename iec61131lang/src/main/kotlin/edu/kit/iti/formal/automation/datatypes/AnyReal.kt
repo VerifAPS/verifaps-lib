@@ -30,24 +30,12 @@ package edu.kit.iti.formal.automation.datatypes
  * @version $Id: $Id
  */
 abstract class AnyReal : AnyNum() {
-
-    /** {@inheritDoc}  */
     override fun repr(obj: Any): String {
         val d = obj as Double
         return javaClass.getName().toUpperCase() + "#" + d
     }
 
 
-    class Real : AnyReal()
-
-    class LReal : AnyReal()
-
-    companion object {
-
-        /** Constant `LREAL`  */
-        val LREAL = LReal()
-        /** Constant `REAL`  */
-        val REAL = Real()
-    }
-
+    object REAL : AnyReal()
+    object LREAL : AnyReal()
 }

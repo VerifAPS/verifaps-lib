@@ -122,7 +122,7 @@ class FindEffectiveSubtypes : AstVisitor<*> {
         currentTopLevelScopeElement = topLevelScopeElement
     }
 
-    override fun visit(variableDeclaration: VariableDeclaration): Any? {
+    override fun visit(variableDeclaration: VariableDeclaration<Initialization>): Any? {
         // Base case
         if (variableDeclaration.dataType is ClassDataType) {
             effectiveSubtypeScope.registerVariable(variableDeclaration)
@@ -136,7 +136,7 @@ class FindEffectiveSubtypes : AstVisitor<*> {
         val top: Top<*>
         try {
             top = resolveReference(assignmentStatement.location as SymbolicReference).a
-            if (top is VariableDeclaration) {
+            if (top is VariableDeclaration<Initialization>) {
                 // We are only interested in variables (may also catch, e.g., function return values)
                 if (containsInstance(top))
                     registerTypes(top, resolveTypes(assignmentStatement.expression))
@@ -158,13 +158,13 @@ class FindEffectiveSubtypes : AstVisitor<*> {
         return super.visit(invocation)
     }
 
-    private fun registerType(variable: VariableDeclaration, dataType: AnyDt) {
+    private fun registerType(variable: VariableDeclaration<Initialization>, dataType: AnyDt) {
         val oldDataTypeCount = effectiveSubtypeScope.getTypes(variable).size
         effectiveSubtypeScope.registerType(variable, dataType)
         isFixpoint = isFixpoint && oldDataTypeCount == effectiveSubtypeScope.getTypes(variable).size
     }
 
-    private fun registerTypes(variable: VariableDeclaration, dataTypes: Collection<AnyDt>) {
+    private fun registerTypes(variable: VariableDeclaration<Initialization>, dataTypes: Collection<AnyDt>) {
         val oldDataTypeCount = effectiveSubtypeScope.getTypes(variable).size
         effectiveSubtypeScope.registerTypes(variable, dataTypes)
         isFixpoint = isFixpoint && oldDataTypeCount == effectiveSubtypeScope.getTypes(variable).size
@@ -180,7 +180,7 @@ class FindEffectiveSubtypes : AstVisitor<*> {
         if (expression is Invocation)
             dataTypes.add((resolveReference(expression.callee).a as Invocable).returnType)
         else if (expression is SymbolicReference) {
-            val variable = resolveReference(expression).a as VariableDeclaration
+            val variable = resolveReference(expression).a as VariableDeclaration<Initialization>
             dataTypes.addAll(effectiveSubtypeScope.getTypes(variable))
         } else if (expression is ReferenceValue)
             dataTypes = resolveTypes(expression.referenceTo)
@@ -203,9 +203,9 @@ class FindEffectiveSubtypes : AstVisitor<*> {
         var reference = reference
         while (reference.hasSub())
             reference = reference.sub
-        if (reference.identifiedObject is VariableDeclaration)
+        if (reference.identifiedObject is VariableDeclaration<Initialization>)
         // TODO replace null with something relevant
-            return Tuple<Top<*>, HasScope<*>>(reference.identifiedObject as VariableDeclaration, null)
+            return Tuple<Top<*>, HasScope<*>>(reference.identifiedObject as VariableDeclaration<Initialization>, null)
         else if (reference.identifiedObject is MethodDeclaration)
             return Tuple<Top<*>, T>(reference.identifiedObject as MethodDeclaration,
                     (reference.identifiedObject as MethodDeclaration).parent)
@@ -217,7 +217,7 @@ class FindEffectiveSubtypes : AstVisitor<*> {
 
     companion object {
 
-        fun containsInstance(variable: VariableDeclaration): Boolean {
+        fun containsInstance(variable: VariableDeclaration<Initialization>): Boolean {
             return (variable.dataType is ClassDataType
                     || variable.dataType is InterfaceDataType
                     || variable.dataType is ReferenceType)

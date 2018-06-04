@@ -141,7 +141,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<Scope> 
         }
     }
 
-    public fun defaultValueForDataType(dataType: VariableDeclaration) : Optional<ExpressionValue> {
+    public fun defaultValueForDataType(dataType: VariableDeclaration<Initialization>) : Optional<ExpressionValue> {
         //(it.value.dataType as FunctionBlockDataType).functionBlock.localScope
         if (dataType == null) {
             TODO()
@@ -169,7 +169,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<Scope> 
 
 
     public fun initializeLocalVariables(localScope: Scope) {
-        val localVariables: Map<out String, VariableDeclaration> = localScope.variables
+        val localVariables: Map<out String, VariableDeclaration<Initialization>> = localScope.variables
         localVariables.map {
             val stateVal = state[it.key]
             if (stateVal != null && stateVal.isPresent) {

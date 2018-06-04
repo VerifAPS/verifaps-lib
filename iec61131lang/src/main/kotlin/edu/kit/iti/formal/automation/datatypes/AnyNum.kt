@@ -42,9 +42,7 @@ open class AnyNum : AnyDt() {
 
 
     /** {@inheritDoc}  */
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitor<T>) = visitor.visit(this)
 
     companion object {
         val ANY_NUM: AnyDt = AnyNum()

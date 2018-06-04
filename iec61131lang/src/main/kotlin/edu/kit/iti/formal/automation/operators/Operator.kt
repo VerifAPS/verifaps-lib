@@ -37,21 +37,7 @@ import edu.kit.iti.formal.automation.datatypes.AnyDt
  * @version 1
  */
 interface Operator {
-
-    /**
-     *
-     * getExpectedDataTypes.
-     *
-     * @return an array of [edu.kit.iti.formal.automation.datatypes.AnyDt] objects.
-     */
     val expectedDataTypes: Array<AnyDt>
-
-    /**
-     *
-     * symbol.
-     *
-     * @return a [java.lang.String] object.
-     */
     fun symbol(): String
 }
 

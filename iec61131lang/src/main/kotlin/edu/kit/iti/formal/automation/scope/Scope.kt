@@ -44,7 +44,7 @@ import java.util.stream.Stream
  * @author Alexander Weigl
  * @version 1 (13.06.14)
  */
-class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
+class Scope() : Visitable, Iterable<VariableDeclaration<Initialization>>, Cloneable<Scope> {
     private val allowedEnumValues = HashMap<String, EnumerateType>()
 
     var parent: Scope? = null
@@ -91,15 +91,15 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
         parent = parent
     }
 
-    constructor(variables: List<VariableDeclaration>) : this() {
+    constructor(variables: List<VariableDeclaration<Initialization>>) : this() {
         variables.forEach { this.add(it) }
     }
 
-    fun asMap(): Map<String, VariableDeclaration> {
+    fun asMap(): Map<String, VariableDeclaration<Initialization>> {
         return variables
     }
 
-    fun add(`var`: VariableDeclaration) {
+    fun add(`var`: VariableDeclaration<Initialization>) {
         variables[`var`.name] = `var`
     }
 
@@ -113,7 +113,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
     fun prefixNames(s: String): Scope {
         val copy = Scope()
         for ((_, value) in this.variables) {
-            val nd = VariableDeclaration(value)
+            val nd = VariableDeclaration<Initialization>(value)
             nd.name = s + nd.name
             copy.add(nd)
         }
@@ -123,18 +123,18 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
     /**
      * {@inheritDoc}
      */
-    override fun iterator(): Iterator<VariableDeclaration> {
+    override fun iterator(): Iterator<VariableDeclaration<Initialization>> {
         return variables.values.iterator()
     }
 
-    override fun forEach(action: Consumer<in VariableDeclaration>) {
+    override fun forEach(action: Consumer<in VariableDeclaration<Initialization>>) {
         variables.values.forEach(action)
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun spliterator(): Spliterator<VariableDeclaration> {
+    override fun spliterator(): Spliterator<VariableDeclaration<Initialization>> {
         return variables.values.spliterator()
     }
 
@@ -163,7 +163,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
      * @throws edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException if any.
      */
     @Throws(VariableNotDefinedException::class)
-    fun getVariable(reference: SymbolicReference): VariableDeclaration {
+    fun getVariable(reference: SymbolicReference): VariableDeclaration<Initialization> {
         // TODO does not have the same behavior as #getVariable(String) ... is this intentional?
         if (variables.containsKey(reference.identifier))
             return variables[reference.identifier]
@@ -180,11 +180,11 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
         return VariableBuilder(variables)
     }
 
-    fun filterByFlags(flags: Int): List<VariableDeclaration> {
-        return variables.values.stream().filter { v -> v.`is`(flags) }.collect<List<VariableDeclaration>, Any>(Collectors.toList())
+    fun filterByFlags(flags: Int): List<VariableDeclaration<Initialization>> {
+        return variables.values.stream().filter { v -> v.`is`(flags) }.collect<List<VariableDeclaration<Initialization>>, Any>(Collectors.toList())
     }
 
-    fun getVariable(s: String): VariableDeclaration? {
+    fun getVariable(s: String): VariableDeclaration<Initialization>? {
         if (variables.containsKey(s)) {
             return variables[s]
         }
@@ -368,11 +368,11 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
         variables.putAll(scope.variables)
     }
 
-    fun stream(): Stream<VariableDeclaration> {
+    fun stream(): Stream<VariableDeclaration<Initialization>> {
         return asMap().values.stream()
     }
 
-    fun parallelStream(): Stream<VariableDeclaration> {
+    fun parallelStream(): Stream<VariableDeclaration<Initialization>> {
         return asMap().values.parallelStream()
     }
 
@@ -384,7 +384,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
         actions.register(a.name, a)
     }
 
-    fun filterByFlags(vararg flag: Int): List<VariableDeclaration> {
+    fun filterByFlags(vararg flag: Int): List<VariableDeclaration<Initialization>> {
         return stream()
                 .filter { it ->
                     for (f in flag)
@@ -392,7 +392,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
                                 .filter true
                     false
                 }
-                .collect<List<VariableDeclaration>, Any>(Collectors.toList())
+                .collect<List<VariableDeclaration<Initialization>>, Any>(Collectors.toList())
     }
 
     inner class Namespace<T> {

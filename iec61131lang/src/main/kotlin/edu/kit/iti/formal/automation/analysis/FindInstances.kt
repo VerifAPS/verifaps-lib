@@ -25,10 +25,7 @@ package edu.kit.iti.formal.automation.analysis
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.ClassDataType
 import edu.kit.iti.formal.automation.scope.InstanceScope
-import edu.kit.iti.formal.automation.st.ast.ClassDeclaration
-import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration
-import edu.kit.iti.formal.automation.st.ast.InterfaceDeclaration
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
+import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
 import lombok.RequiredArgsConstructor
 
@@ -50,7 +47,7 @@ class FindInstances : AstVisitor<*> {
      */
     private var parentInstance: InstanceScope.Instance? = null
 
-    override fun visit(variableDeclaration: VariableDeclaration): Any? {
+    override fun visit(variableDeclaration: VariableDeclaration<Initialization>): Any? {
         if (variableDeclaration.isInput || variableDeclaration.isOutput || variableDeclaration.isInOut
                 || currentTopLevelScopeElement is InterfaceDeclaration)
             return super.visit(variableDeclaration)

@@ -45,43 +45,17 @@ abstract class AnyDt : Identifiable {
         }
     }
 
-    override var name = "any"
+    override var name: String = "ANY"
 
-    /**
-     *
-     * Constructor for AnyDt.
-     */
     protected constructor() {
         name = javaClass.getSimpleName().toUpperCase()
     }
 
-    /**
-     *
-     * Constructor for AnyDt.
-     *
-     * @param name a [java.lang.String] object.
-     */
     protected constructor(name: String) {
         this.name = name
     }
 
-
-    /**
-     *
-     * repr.
-     *
-     * @param obj a [java.lang.Object] object.
-     * @return a [java.lang.String] object.
-     */
     abstract fun repr(obj: Any): String
 
-    /**
-     *
-     * accept.
-     *
-     * @param visitor a [edu.kit.iti.formal.automation.datatypes.DataTypeVisitor] object.
-     * @param <T> a T object.
-     * @return a T object.
-    </T> */
-    abstract fun <T> accept(visitor: DataTypeVisitor<T>): T
+    abstract fun <T> accept(visitor: DataTypeVisitor<T>): T?
 }

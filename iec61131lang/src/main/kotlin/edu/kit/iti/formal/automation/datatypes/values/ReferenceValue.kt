@@ -29,38 +29,11 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.Initialization
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference
 import edu.kit.iti.formal.automation.visitors.Visitor
-import lombok.Data
-import lombok.EqualsAndHashCode
 
 /**
  * Created by weigl on 24.11.16.
  *
- * @author weigl, Augusto Modanese
+ * @author weigl
  * @version $Id: $Id
  */
-@Data
-@EqualsAndHashCode
-class ReferenceValue : Initialization {
-    private var referenceTo = SymbolicReference()
-
-    /**
-     * {@inheritDoc}
-     */
-    @Throws(VariableNotDefinedException::class, TypeConformityException::class)
-    override fun dataType(localScope: Scope): AnyDt? {
-        return null
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun <T> accept(visitor: Visitor<T>): T {
-        return visitor.visit(this)
-    }
-
-    override fun clone(): ReferenceValue {
-        val rv = ReferenceValue()
-        rv.referenceTo = referenceTo.clone()
-        return rv
-    }
-}
+data class ReferenceValue(var referenceTo: SymbolicReference = SymbolicReference())

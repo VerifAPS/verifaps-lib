@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.analysis
 
 import edu.kit.iti.formal.automation.scope.InstanceScope
 import edu.kit.iti.formal.automation.st.ast.HasScope
+import edu.kit.iti.formal.automation.st.ast.Initialization
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.automation.st.util.Tuple
 
@@ -37,7 +38,7 @@ import java.util.HashSet
  * @author Augusto Modanese
  */
 class InstanceSets : HashMap<Tuple<String, String>, Set<InstanceScope.Instance>>() {
-    fun addInstance(topLevelScopeElement: HasScope<*>, variable: VariableDeclaration,
+    fun addInstance(topLevelScopeElement: HasScope<*>, variable: VariableDeclaration<Initialization>,
                     instance: InstanceScope.Instance) {
         if (!containsKey(tuple(topLevelScopeElement, variable)))
             registerTuple(topLevelScopeElement, variable)
@@ -45,7 +46,7 @@ class InstanceSets : HashMap<Tuple<String, String>, Set<InstanceScope.Instance>>
     }
 
     fun getInstances(topLevelScopeElement: HasScope<*>,
-                     variable: VariableDeclaration): Set<InstanceScope.Instance> {
+                     variable: VariableDeclaration<Initialization>): Set<InstanceScope.Instance> {
         val instances = get(tuple(topLevelScopeElement, variable))
         if (instances == null) {
             registerTuple(topLevelScopeElement, variable)
@@ -55,12 +56,12 @@ class InstanceSets : HashMap<Tuple<String, String>, Set<InstanceScope.Instance>>
     }
 
     private fun registerTuple(topLevelScopeElement: HasScope<*>,
-                              variable: VariableDeclaration) {
+                              variable: VariableDeclaration<Initialization>) {
         put(tuple(topLevelScopeElement, variable), HashSet<Instance>())
     }
 
     private fun tuple(topLevelScopeElement: HasScope<*>,
-                      variable: VariableDeclaration): Tuple<String, String> {
+                      variable: VariableDeclaration<Initialization>): Tuple<String, String> {
         return Tuple(topLevelScopeElement.identifier, variable.name)
     }
 }

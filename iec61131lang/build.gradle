@@ -16,6 +16,8 @@ generateGrammarSource {
     println(arguments)
 }
 
+compileKotlin.dependsOn << generateGrammarSource
+
 task createVersionFile(type: Copy) {
     def v = versionDetails()
     def map = [

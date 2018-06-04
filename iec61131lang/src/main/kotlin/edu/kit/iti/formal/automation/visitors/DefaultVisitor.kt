@@ -290,4 +290,6 @@ open class DefaultVisitor<T>() : Visitor<T?> {
     override fun visit(globalVariableListDeclaration: GlobalVariableListDeclaration): T? {
         return defaultVisit(globalVariableListDeclaration)
     }
+
+    override fun visit(empty: EMPTY_EXPRESSION) = defaultVisit(empty)
 }

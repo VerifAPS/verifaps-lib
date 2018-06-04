@@ -36,7 +36,6 @@ import java.util.regex.Pattern
  * Utils class.
  *
  * @author weigl
- * @version $Id: $Id
  */
 object Utils {
     internal var PATTERN = Pattern.compile("((?<prefix>\\D\\w*?)#)?((?<radix>\\d+?)#)?(?<value>.*)")

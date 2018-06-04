@@ -23,8 +23,6 @@ package edu.kit.iti.formal.automation.datatypes
  */
 
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration
-import lombok.AllArgsConstructor
-import lombok.Data
 
 /**
  * Created by weigl on 25.11.16.
@@ -32,14 +30,7 @@ import lombok.Data
  * @author weigl
  * @version $Id: $Id
  */
-@Data
-@AllArgsConstructor
-class FunctionBlockDataType : AnyDt {
-    var functionBlock: FunctionBlockDeclaration? = null
-        set(functionBlock) {
-            field = this.functionBlock
-        }
-
+data class FunctionBlockDataType(var functionBlock: FunctionBlockDeclaration? = null) : AnyDt() {
     override fun repr(obj: Any): String {
         return this.functionBlock!!.name
     }

@@ -25,32 +25,20 @@ package edu.kit.iti.formal.automation.visitors
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.IEC61131Parser
-import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.ast.Cloneable
+import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
+import edu.kit.iti.formal.automation.st.ast.TopLevelElements
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.Lexer
 import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.ParseTree
-
 import java.lang.reflect.Method
-import java.util.ArrayList
+import java.util.*
 
 /**
- * Created by weigla on 09.06.2014.
- *
- * @author weigl
- * @version $Id: $Id
- */
+ * Created by weigla on 09.06.2014.*/
 object Utils {
-
-    /**
-     *
-     * findProgram.
-     *
-     * @param tles a [edu.kit.iti.formal.automation.st.ast.TopLevelElements] object.
-     * @return a [edu.kit.iti.formal.automation.st.ast.ProgramDeclaration] object.
-     */
     fun findProgram(tles: TopLevelElements): ProgramDeclaration? {
         for (t in tles)
             if (t is ProgramDeclaration)
@@ -58,26 +46,10 @@ object Utils {
         return null
     }
 
-    /**
-     *
-     * parseStructuredText.
-     *
-     * @param input a [java.lang.String] object.
-     * @param rule  a [java.lang.String] object.
-     * @return a [org.antlr.v4.runtime.tree.ParseTree] object.
-     */
     fun parseStructuredText(input: String, rule: String): ParseTree? {
         return parseStructuredText(ANTLRInputStream(input), rule)
     }
 
-    /**
-     *
-     * parseStructuredText.
-     *
-     * @param stream a [org.antlr.v4.runtime.ANTLRInputStream] object.
-     * @param rule   a [java.lang.String] object.
-     * @return a [org.antlr.v4.runtime.tree.ParseTree] object.
-     */
     fun parseStructuredText(stream: ANTLRInputStream, rule: String): ParseTree? {
         try {
             val stl = IEC61131Lexer(stream)
@@ -93,14 +65,6 @@ object Utils {
 
     }
 
-    /**
-     *
-     * compareTokens.
-     *
-     * @param tokens   a [java.util.List] object.
-     * @param expected an array of [java.lang.String] objects.
-     * @param lexer    a [org.antlr.v4.runtime.Lexer] object.
-     */
     fun compareTokens(tokens: List<Token>, expected: Array<String>, lexer: Lexer) {
         try {
             for (i in expected.indices) {

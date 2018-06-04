@@ -62,14 +62,14 @@ class FunctionUndefinedException(val invocation: Invocation) : IECException()
 
 class TypeConformityException(
         val expression: Expression,
-        val expectedDataTypes: Array<AnyDt>, vararg actual: AnyDt) : IECException() {
+        val expectedDataTypes: Array<AnyDt>, vararg actual: AnyDt?) : IECException() {
     val actualDatatypes: Array<AnyDt>
 
     init {
         this.actualDatatypes = actual
     }
 
-    soverride fun getMessage(): String {
+    override fun getMessage(): String {
         return String.format("Type(s) violated in %s %nExpected:%s %nGot:%s %n ",
                 IEC61131Facade.print(expression),
                 Arrays.toString(this.expectedDataTypes),

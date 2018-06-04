@@ -6,8 +6,8 @@ import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
 
 class DataTypeGeneratorVisitor() : DefaultVisitor<AnyDt>() {
-    override fun defaultVisit(visitable: Visitable): AnyDt? {
-        return super.defaultVisit(visitable)
+    override fun defaultVisit(obj: Any?): AnyDt? {
+        return super.defaultVisit(obj)
     }
 
     override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration): AnyDt? {

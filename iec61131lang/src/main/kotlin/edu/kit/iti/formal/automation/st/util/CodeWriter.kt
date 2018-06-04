@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st.util
 
 import java.io.Serializable
 import java.util.Arrays
+import java.util.function.Consumer
 
 /**
  *
@@ -34,6 +35,9 @@ import java.util.Arrays
  */
 open class CodeWriter : Serializable, CharSequence {
     protected var sb = StringBuilder()
+
+    override val length: Int = sb.length
+    override fun get(index: Int): Char = sb.get(index)
 
     private val uppercaseKeywords = true
     private val ident = "    "
@@ -186,14 +190,6 @@ open class CodeWriter : Serializable, CharSequence {
      */
     fun lastIndexOf(str: String, fromIndex: Int): Int {
         return sb.lastIndexOf(str, fromIndex)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun charAt(index: Int): Char {
-        return sb[index]
-
     }
 
     /**
@@ -429,15 +425,6 @@ open class CodeWriter : Serializable, CharSequence {
         return sb.substring(start, end)
     }
 
-    /**
-     *
-     * length.
-     *
-     * @return a int.
-     */
-    override fun length(): Int {
-        return sb.length
-    }
 
     /**
      *

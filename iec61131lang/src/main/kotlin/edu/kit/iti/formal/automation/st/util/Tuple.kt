@@ -22,43 +22,23 @@ package edu.kit.iti.formal.automation.st.util
  * #L%
  */
 
-import lombok.EqualsAndHashCode
-
 /**
  * Created by weigl on 13.06.14.
  *
  * @author weigl
  * @version $Id: $Id
  */
-@EqualsAndHashCode
-class Tuple<S, T>
-/**
- *
- * Constructor for Tuple.
- *
- * @param a a S object.
- * @param b a T object.
- */
-(val a: S, val b: T) {
-
-    override fun toString(): String {
-        return a.toString() + "=" + b.toString()
-    }
-
+data class Tuple<S, T>(val a: S, val b: T) {
     companion object {
-
-        /**
-         *
-         * make.
-         *
-         * @param a a T object.
-         * @param b a S object.
-         * @param <T> a T object.
-         * @param <S> a S object.
-         * @return a [edu.kit.iti.formal.automation.st.util.Tuple] object.
-        </S></T> */
         fun <T, S> make(a: T, b: S): Tuple<T, S> {
             return Tuple(a, b)
         }
+    }
+}
+
+data class Either<S, T>(val a: S?, val b: T?) {
+    companion object {
+        fun <T, S> make1(a: T) = Either(a, null)
+        fun <T, S> make2(b: S) = Either(null, b)
     }
 }

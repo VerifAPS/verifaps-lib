@@ -77,7 +77,7 @@ class SFC2ST : Supplier<StatementList> {
     private fun actionAnalyses() {
         //System.out.println(name);
         val actionMap = HashMultimap.create<String, SFCActionQualifier.Qualifier>()
-        network!!.steps.stream().flatMap<AssociatedAction> { s -> s.events.stream() }
+        network!!.steps.stream().flatMap<SFCStep.AssociatedAction> { s -> s.events.stream() }
                 .filter { aa -> scope!!.hasVariable(aa.actionName) }
                 .forEach { aa -> actionMap.put(aa.actionName!!, aa.qualifier!!.getQualifier()!!) }
         println(actionMap)
@@ -92,7 +92,7 @@ class SFC2ST : Supplier<StatementList> {
     }
 
     private fun addNonStoredVariablesReset() {
-        network!!.steps.stream().flatMap<AssociatedAction> { s -> s.events.stream() }
+        network!!.steps.stream().flatMap<SFCStep.AssociatedAction> { s -> s.events.stream() }
                 .filter { aa -> aa.qualifier!!.getQualifier() == SFCActionQualifier.Qualifier.NON_STORED }
                 .filter { aa -> scope!!.hasVariable(aa.actionName) }
                 .forEach { aa ->
@@ -210,7 +210,7 @@ class SFC2ST : Supplier<StatementList> {
     }
 
     private fun extractStates() {
-        enumDecl.typeName = name!! + "_states_t"
+        enumDecl.name = name!! + "_states_t"
         enumDecl.allowedValues.add(
                 CommonToken(IEC61131Lexer.IDENTIFIER, network!!.initialStep!!.name))
         for (step in network.steps) {

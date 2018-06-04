@@ -79,7 +79,7 @@ class RangeType : AnyInt {
         return Optional.empty()
     }
 
-    override fun asUnsgined(): AnyUnsignedInt? {
+    override fun asUnsigned(): AnyUnsignedInt? {
         return null
     }
 

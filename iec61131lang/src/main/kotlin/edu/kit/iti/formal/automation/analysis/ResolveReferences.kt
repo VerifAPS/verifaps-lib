@@ -60,7 +60,7 @@ class ResolveReferences : AstVisitor<Any> {
                     nextScope = currentFullScope
                     nextTopLevelScopeElement = currentTopLevelScopeElement
                 } else if (currentFullScope.hasVariable(ref.identifier)) {
-                    val refVariable: VariableDeclaration?
+                    val refVariable: VariableDeclaration<Initialization>?
                     refVariable = currentFullScope.getVariable(ref.identifier)
                     ref.identifiedObject = refVariable
                     identifiedObjectDataType = refVariable!!.dataType
@@ -112,7 +112,7 @@ class ResolveReferences : AstVisitor<Any> {
                     ref.identifiedObject = globalScope.getFunction(ref.identifier)
                     ref.dataType = (ref.identifiedObject as FunctionDeclaration).returnType
                 } else if (ref.hasSub()) {
-                    if (ref.identifiedObject is VariableDeclaration
+                    if (ref.identifiedObject is VariableDeclaration<Initialization>
                             && identifiedObjectDataType is ClassDataType
                             && OOUtils.hasMethod(identifiedObjectDataType.clazz,
                                     ref.sub!!.identifier)) {

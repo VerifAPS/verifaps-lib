@@ -23,45 +23,28 @@ package edu.kit.iti.formal.automation.st.util
  */
 
 import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue
-import edu.kit.iti.formal.automation.oo.OOUtils
 import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.sfclang.ast.ActionDeclaration
-import edu.kit.iti.formal.automation.sfclang.ast.SFCNetwork
-import edu.kit.iti.formal.automation.sfclang.ast.SFCStep
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
-import edu.kit.iti.formal.automation.visitors.Visitable
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by weigl on 10/07/14.
  *
- * @author weigl, Augusto Modanese
+ * @author weigl
  * @version $Id: $Id
  */
 open class AstVisitor<T> : DefaultVisitor<T>() {
-    /**
-     * AST elements we're currently visiting.
-     */
-    protected var currentScope: Scope
-    protected var currentFullScope: Scope
-    protected var currentTopLevelScopeElement: HasScope<*>
+    protected lateinit var scope: Scope
+    //protected val stack: Stack<Top> = Stack()
 
-    /**
-     * {@inheritDoc}
-     */
-    override fun defaultVisit(visitable: Visitable): T? {
+    override fun defaultVisit(obj: Any?): T? {
         return null//throw new Error("not implemented for " + visitable.getClass());
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     override fun visit(assignmentStatement: AssignmentStatement): T? {
-        assignmentStatement.expression.accept<T>(this)
-        assignmentStatement.location.accept<T>(this)
+        assignmentStatement.expression.accept(this)
+        assignmentStatement.location.accept(this)
         return defaultVisit(assignmentStatement)
     }
 
@@ -70,8 +53,8 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(range: CaseCondition.Range): T? {
-        range.start!!.accept<T>(this)
-        range.stop!!.accept<T>(this)
+        range.start!!.accept(this)
+        range.stop!!.accept(this)
         return null
     }
 
@@ -79,7 +62,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(integerCondition: CaseCondition.IntegerCondition): T? {
-        integerCondition.value!!.accept<T>(this)
+        integerCondition.value!!.accept(this)
         return null
     }
 
@@ -87,8 +70,8 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(enumeration: CaseCondition.Enumeration): T? {
-        enumeration.start.accept<T>(this)
-        enumeration.stop!!.accept<T>(this)
+        enumeration.start.accept(this)
+        enumeration.stop!!.accept(this)
         return null
     }
 
@@ -96,8 +79,8 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(binaryExpression: BinaryExpression): T? {
-        binaryExpression.leftExpr!!.accept<T>(this)
-        binaryExpression.rightExpr!!.accept<T>(this)
+        binaryExpression.leftExpr!!.accept(this)
+        binaryExpression.rightExpr!!.accept(this)
         return null
     }
 
@@ -105,7 +88,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(repeatStatement: RepeatStatement): T? {
-        repeatStatement.condition.accept<T>(this)
+        repeatStatement.condition.accept(this)
         repeatStatement.statements.accept(this)
         return null
     }
@@ -114,7 +97,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(whileStatement: WhileStatement): T? {
-        whileStatement.condition.accept<T>(this)
+        whileStatement.condition.accept(this)
         whileStatement.statements.accept(this)
         return null
     }
@@ -123,7 +106,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(unaryExpression: UnaryExpression): T? {
-        unaryExpression.expression.accept<T>(this)
+        unaryExpression.expression.accept(this)
         return null
     }
 
@@ -140,9 +123,9 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(caseStatement: CaseStatement): T? {
-        caseStatement.expression!!.accept<T>(this)
+        caseStatement.expression!!.accept(this)
         for (c in caseStatement.cases)
-            c.accept<T>(this)
+            c.accept(this)
 
         caseStatement.elseCase!!.accept(this)
 
@@ -154,7 +137,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      */
     override fun visit(statements: StatementList): T? {
         for (s in statements)
-            s?.accept<T>(this)
+            s?.accept(this)
         return null
     }
 
@@ -162,9 +145,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(programDeclaration: ProgramDeclaration): T? {
-        currentTopLevelScopeElement = programDeclaration
         programDeclaration.scope.accept(this)
-        currentFullScope = currentScope
         programDeclaration.stBody!!.accept(this)
         return null
     }
@@ -174,7 +155,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      */
     override fun visit(expressions: ExpressionList): T? {
         for (e in expressions)
-            e.accept<T>(this)
+            e.accept(this)
         return null
     }
 
@@ -182,9 +163,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(functionDeclaration: FunctionDeclaration): T? {
-        currentTopLevelScopeElement = functionDeclaration
         functionDeclaration.scope.accept(this)
-        currentFullScope = currentScope
         functionDeclaration.stBody.accept(this)
         return null
     }
@@ -193,16 +172,15 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(forStatement: ForStatement): T? {
-        forStatement.start!!.accept<T>(this)
+        forStatement.start!!.accept(this)
         if (forStatement.step != null)
-            forStatement.step!!.accept<T>(this)
-        forStatement.stop!!.accept<T>(this)
+            forStatement.step!!.accept(this)
+        forStatement.stop!!.accept(this)
         forStatement.statements.accept(this)
         return null
     }
 
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration): T? {
-        currentTopLevelScopeElement = functionBlockDeclaration
         //currentFullScope = OOUtils.getEffectiveScope(functionBlockDeclaration);
         if (functionBlockDeclaration.stBody != null)
             functionBlockDeclaration.stBody!!.accept(this)
@@ -217,7 +195,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      */
     override fun visit(ifStatement: IfStatement): T? {
         for (gs in ifStatement.conditionalBranches)
-            gs.accept<T>(this)
+            gs.accept(this)
 
         ifStatement.elseBranch.accept(this)
         return null
@@ -227,7 +205,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(guardedStatement: GuardedStatement): T? {
-        guardedStatement.condition.accept<T>(this)
+        guardedStatement.condition.accept(this)
         guardedStatement.statements.accept(this)
         return null
     }
@@ -235,10 +213,10 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(aCase: CaseStatement.Case): T? {
+    override fun visit(aCase: Case): T? {
         aCase.statements.accept(this)
         for (c in aCase.conditions)
-            c.accept<T>(this)
+            c.accept(this)
         return null
     }
 
@@ -246,9 +224,9 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(localScope: Scope): T? {
-        currentScope = localScope
+        scope = localScope
         for (vd in localScope.asMap().values)
-            vd.accept<T>(this)
+            vd.accept(this)
         return defaultVisit(localScope)
     }
 
@@ -261,7 +239,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
         }
 
         if (null != variableDeclaration.init) {
-            variableDeclaration.init!!.accept<T>(this)
+            variableDeclaration.init!!.accept(this)
         }
 
         return super.visit(variableDeclaration)
@@ -271,34 +249,34 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
         return super.visit(location)
     }
 
-    override fun visit(initializations: ArrayInitialization): T? {
-        for (init in initializations)
-            init.accept<T>(this)
-        return super.visit(initializations)
+    override fun visit(arrayinit: ArrayInitialization): T? {
+        for (init in arrayinit.initValues)
+            init.accept(this)
+        return super.visit(arrayinit)
     }
 
     /**
      * {@inheritDoc}
      */
     override fun visit(invocation: Invocation): T? {
-        invocation.callee.accept<T>(this)
+        invocation.callee.accept(this)
         invocation.parameters.forEach { e -> e.accept(this) }
         return super.visit(invocation)
     }
 
-    override fun visit(parameter: Invocation.Parameter): T? {
-        parameter.expression!!.accept<T>(this)
+    override fun visit(parameter: InvocationParameter): T? {
+        parameter.expression!!.accept(this)
         return super.visit(parameter)
     }
 
     override fun visit(invocation: InvocationStatement): T? {
-        invocation.invocation.accept<T>(this)
+        invocation.invocation.accept(this)
         return super.visit(invocation)
     }
 
     override fun visit(stringTypeDeclaration: StringTypeDeclaration): T? {
         if (stringTypeDeclaration.initialization != null)
-            stringTypeDeclaration.initialization!!.accept<T>(this)
+            stringTypeDeclaration.initialization!!.accept(this)
         return super.visit(stringTypeDeclaration)
     }
 
@@ -310,7 +288,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
         return super.visit(subRangeTypeDeclaration)
     }
 
-    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration<*>): T? {
+    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration): T? {
         return super.visit(simpleTypeDeclaration)
     }
 
@@ -319,13 +297,11 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
     }
 
     override fun visit(structureInitialization: StructureInitialization): T? {
-        structureInitialization.initValues.values.forEach { v -> v.accept<T>(this) }
+        structureInitialization.initValues.values.forEach { v -> v.accept(this) }
         return super.visit(structureInitialization)
     }
 
     override fun visit(clazz: ClassDeclaration): T? {
-        currentTopLevelScopeElement = clazz
-        currentFullScope = OOUtils.getEffectiveScope(clazz)
         clazz.scope.accept(this)
         for (m in ArrayList(clazz.methods)) {
             m.accept(this)
@@ -334,16 +310,13 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
     }
 
     override fun visit(interfaceDeclaration: InterfaceDeclaration): T? {
-        currentTopLevelScopeElement = interfaceDeclaration
-        interfaceDeclaration.scope.accept(this)
+        //TODO inferface? interfaceDeclaration.scope.accept(this)
         for (m in interfaceDeclaration.methods)
             m.accept(this)
         return super.visit(interfaceDeclaration)
     }
 
     override fun visit(method: MethodDeclaration): T? {
-        if (method.parent is ClassDeclaration)
-            currentFullScope = OOUtils.getFullScope(method)
         method.scope.accept(this)
         if (method.stBody != null)
             method.stBody.accept(this)
@@ -351,7 +324,6 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
     }
 
     override fun visit(globalVariableListDeclaration: GlobalVariableListDeclaration): T? {
-        currentTopLevelScopeElement = globalVariableListDeclaration
         globalVariableListDeclaration.scope.accept(this)
         return super.visit(globalVariableListDeclaration)
     }
@@ -389,7 +361,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
     }
 
     override fun visit(referenceValue: ReferenceValue): T? {
-        referenceValue.referenceTo.accept<T>(this)
+        referenceValue.referenceTo.accept(this)
         return super.visit(referenceValue)
     }
 
