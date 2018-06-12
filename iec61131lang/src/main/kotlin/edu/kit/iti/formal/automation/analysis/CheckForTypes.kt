@@ -2,16 +2,13 @@ package edu.kit.iti.formal.automation.analysis
 
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.st.util.AstVisitor
-import lombok.RequiredArgsConstructor
+import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
 
-@RequiredArgsConstructor
-class CheckForTypes : AstVisitor<Void> {
+class CheckForTypes : AstVisitorWithScope<Unit>() {
     private val reporter: Reporter? = null
-    private var scope: Scope? = null
 
-    override fun visit(symbolicReference: SymbolicReference): Void? {
-        if (null == scope!!.getVariable(symbolicReference.identifier))
+    override fun visit(symbolicReference: SymbolicReference): Unit? {
+        if (null == scope.getVariable(symbolicReference.identifier))
             reporter!!.report(
                     symbolicReference.startPosition,
                     "Could not find variable " + symbolicReference.identifier + ".",
@@ -19,30 +16,29 @@ class CheckForTypes : AstVisitor<Void> {
         return null    //super.visit(symbolicReference)
     }
 
-    override fun visit(functionDeclaration: FunctionDeclaration): Void? {
-        if (null == functionDeclaration.returnType) {
+    override fun visit(functionDeclaration: FunctionDeclaration): Unit? {
+        if (!functionDeclaration.returnType.isIdentified) {
             reporter!!.report(functionDeclaration.startPosition,
-                    "Return type " + functionDeclaration.returnTypeName + " not found.",
+                    "Return type " + functionDeclaration.returnType.identifier + " not found.",
                     "type-resolve", "error")
         }
         super.visit(functionDeclaration)
         return null
     }
 
-    override fun visit(localScope: Scope): Void? {
-        scope = localScope
+    override fun visit(localScope: Scope): Unit? {
         super.visit(localScope)
         return null
     }
 
-    override fun visit(invocation: InvocationStatement): Void? {
-        invocation.callee.accept<Void>(this)
+    override fun visit(invocation: InvocationStatement): Unit? {
+        invocation.callee.accept(this)
 
         return null
     }
 
-    override fun visit(invocation: Invocation): Void? {
-        invocation.callee.accept<Void>(this)
+    override fun visit(invocation: Invocation): Unit? {
+        invocation.callee.accept(this)
         return null
     }
 

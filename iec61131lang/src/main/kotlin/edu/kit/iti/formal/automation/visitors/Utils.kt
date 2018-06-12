@@ -25,7 +25,6 @@ package edu.kit.iti.formal.automation.visitors
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.IEC61131Parser
-import edu.kit.iti.formal.automation.st.ast.Cloneable
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements
 import org.antlr.v4.runtime.ANTLRInputStream
@@ -84,15 +83,5 @@ object Utils {
         if (expected.size < tokens.size) {
             throw AssertionError("Too much tokens found!")
         }
-    }
-
-    fun <T : Cloneable<T>> copy(`in`: List<T>): List<T> {
-        val list = ArrayList<T>()
-        `in`.forEach { a -> list.add(a.clone()) }
-        return list
-    }
-
-    fun <T : Cloneable<T>> copyNull(obj: T?): T? {
-        return obj?.clone()
     }
 }

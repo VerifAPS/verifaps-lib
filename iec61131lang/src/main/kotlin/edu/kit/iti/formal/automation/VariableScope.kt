@@ -22,7 +22,10 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
+import com.sun.org.apache.xpath.internal.operations.Variable
 import edu.kit.iti.formal.automation.st.Cloneable
+import edu.kit.iti.formal.automation.st.LookupList
+import edu.kit.iti.formal.automation.st.ast.Initialization
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import java.io.Serializable
 import java.util.*
@@ -32,7 +35,10 @@ import java.util.*
  *
  * @author weigl
  */
-data class VariableScope(
+typealias VariableScope = LookupList<VariableDeclaration>
+
+
+/*data class VariableScope(
         private val impl: LinkedHashMap<String, VariableDeclaration> = linkedMapOf())
     : MutableMap<String, VariableDeclaration> by impl, Cloneable<VariableScope>, Serializable {
 
@@ -45,4 +51,4 @@ data class VariableScope(
         forEach({ s, v -> vs.put(s, v.clone() as VariableDeclaration) })
         return vs
     }
-}
+}*/

@@ -36,6 +36,6 @@ class DefinedFunctionResolver : FunctionResolver {
      * {@inheritDoc}
      */
     override fun resolve(call: Invocation, scope: Scope): FunctionDeclaration? {
-        return scope.getFunction(call.calleeName)
+        return scope.resolveFunction(call.calleeName)
     }
 }

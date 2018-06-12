@@ -23,13 +23,11 @@ package edu.kit.iti.formal.automation.scope
  */
 
 import edu.kit.iti.formal.automation.datatypes.AnyDt
-import edu.kit.iti.formal.automation.datatypes.DataTypes
+import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.datatypes.promotion.DefaultTypePromoter
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException
-import edu.kit.iti.formal.automation.scope.FunctionResolverMUX.MUXFunctionDeclaration
 import edu.kit.iti.formal.automation.st.ast.*
-import java.util.stream.Collectors
 
 /**
  * Created by weigl on 26.11.16.
@@ -43,53 +41,43 @@ class FunctionResolverMUX : FunctionResolver {
      */
     override fun resolve(call: Invocation, scope: Scope): FunctionDeclaration? {
         if ("MUX" == call.calleeName) {
-
-            val datatypes = call.parameters.stream().map<AnyDt> { parameter ->
+            val datatypes = call.parameters.map {
                 try {
-                    return@call.getParameters().stream().map parameter . expression !!. dataType scope
+                    call.parameters.map { it.expression!!.dataType(scope) }
                 } catch (variableNotDefinedinScope: VariableNotDefinedException) {
                     variableNotDefinedinScope.printStackTrace()
                 } catch (e: TypeConformityException) {
                     e.printStackTrace()
                 }
-
-                null
-            }.collect<List<AnyDt>, Any>(Collectors.toList())
-
-            return MUXFunctionDeclaration(datatypes)
-
-
+            }
+            return createMUXFunctionDeclaration(datatypes as List<AnyDt>)
         }
         return null
     }
 
-    class MUXFunctionDeclaration(call: List<AnyDt>) : FunctionDeclaration() {
-
-        init {
-            val stmt = CaseStatement()
-            returnType.setIdentifiedObject(call[1])
-            val dtp = DefaultTypePromoter()
-            for (i in call.indices) {
-                scope.add(VariableDeclaration<Initialization>("a$i",
-                        VariableDeclaration.INPUT, call[i]))
-
-                if (i > 0) {
-                    stmt.addCase(createCase(i))
-                    returnType.setIdentifiedObject(dtp.getPromotion(
-                            returnType.identifiedObject,
-                            call[i]))
-                }
+    private fun createMUXFunctionDeclaration(datatypes: List<AnyDt>): FunctionDeclaration {
+        val fd = FunctionDeclaration(name = "MUX")
+        val stmt = CaseStatement()
+        fd.returnType.obj = datatypes[1]
+        val dtp = DefaultTypePromoter()
+        for (i in datatypes.indices) {
+            fd.scope.add(VariableDeclaration("a$i",
+                    VariableDeclaration.INPUT, datatypes[i]))
+            if (i > 0) {
+                stmt.addCase(createCase(i))
+                fd.returnType.obj = dtp.getPromotion(fd.returnType.obj!!, datatypes[i])
             }
-            stBody.add(stmt)
         }
+        fd.stBody.add(stmt)
+        return fd
+    }
 
-        private fun createCase(i: Int): CaseStatement.Case {
-            val c = CaseStatement.Case()
-            c.addCondition(CaseCondition.IntegerCondition(
-                    Literal(DataTypes.INT, "" + i)))
-            c.statements.add(AssignmentStatement(SymbolicReference("MUX"),
-                    SymbolicReference("a$i")))
-            return c
-        }
+    private fun createCase(i: Int): Case {
+        val c = Case()
+        c.addCondition(CaseCondition.IntegerCondition(Literal(INT, "" + i)))
+        c.statements.add(AssignmentStatement(SymbolicReference("MUX"),
+                SymbolicReference("a$i")))
+        return c
     }
 }
+

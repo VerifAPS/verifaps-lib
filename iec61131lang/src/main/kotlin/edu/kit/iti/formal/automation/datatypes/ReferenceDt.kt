@@ -1,10 +1,8 @@
-package edu.kit.iti.formal.automation.datatypes
-
-/*-
+/*
  * #%L
  * iec61131lang
  * %%
- * Copyright (C) 2016 Alexander Weigl
+ * Copyright (C) 2017 Alexander Weigl
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -22,40 +20,18 @@ package edu.kit.iti.formal.automation.datatypes
  * #L%
  */
 
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.EqualsAndHashCode
+package edu.kit.iti.formal.automation.datatypes
 
-/**
- * Created by weigl on 01.08.16.
- *
- * @author weigl, Augusto Modanese
- * @version $Id: $Id
- */
-@Data
-@EqualsAndHashCode
-@AllArgsConstructor
-class ReferenceType : AnyReference {
-    internal var of: AnyDt? = null
-
-    override fun getName(): String {
-        return "REF_TO " + of!!.getName()
-    }
-
-    /** {@inheritDoc}  */
-    override fun toString(): String {
-        return "REF_TO " + of!!.toString()
-    }
-
-
-    /** {@inheritDoc}  */
+data class ReferenceDt(val refTo: AnyDt) : AnyDt("REF TO $refTo") {
     override fun repr(obj: Any): String {
-        return "n/a"
+        throw IllegalStateException("No repr for ReferenceDt")
     }
 
-
-    /** {@inheritDoc}  */
     override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
         return visitor.visit(this)
+    }
+
+    companion object {
+        val ANY_REF = ReferenceDt(VOID)
     }
 }

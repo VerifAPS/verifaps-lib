@@ -23,37 +23,12 @@ package edu.kit.iti.formal.automation.operators
  */
 
 import edu.kit.iti.formal.automation.datatypes.AnyDt
-import edu.kit.iti.formal.automation.datatypes.AnyUnsignedInt
+import edu.kit.iti.formal.automation.datatypes.AnyInt
 
-/**
- *
- * UnaryOperator class.
- *
- * @author weigl
- * @version $Id: $Id
- */
-class UnaryOperator
-/**
- *
- * Constructor for UnaryOperator.
- *
- * @param symbol a [java.lang.String] object.
- * @param any a [edu.kit.iti.formal.automation.datatypes.AnyDt] object.
- */
-(private val symbol: String?, private val validFor: AnyDt) : Operator {
-
-    /** {@inheritDoc}  */
+class UnaryOperator(override val symbol: String, val validFor: AnyDt) : Operator {
     override val expectedDataTypes: Array<AnyDt>
         get() = arrayOf(validFor)
 
-    init {
-        Operators.register(symbol, this)
-    }
-
-    /** {@inheritDoc}  */
-    override fun symbol(): String? {
-        return this.symbol
-    }
 
     fun isValid(a: AnyDt): Boolean {
         return validFor.javaClass.isAssignableFrom(a.javaClass)
@@ -61,22 +36,18 @@ class UnaryOperator
 
     fun getPromotedType(a: AnyDt): AnyDt? {
         return if (isValid(a)) {
-            if (a is AnyUnsignedInt) {
+            if (a is AnyInt)
                 a.asSigned()
-            } else a
+            else a
         } else null
     }
 
     override fun equals(o: Any?): Boolean {
         if (this === o) return true
         if (o == null || javaClass != o.javaClass) return false
-
         val that = o as UnaryOperator?
-
-        return if (symbol != null) symbol == that!!.symbol else that!!.symbol == null
+        return symbol == that!!.symbol
     }
 
-    override fun hashCode(): Int {
-        return symbol?.hashCode() ?: 0
-    }
+    override fun hashCode() = symbol.hashCode()
 }

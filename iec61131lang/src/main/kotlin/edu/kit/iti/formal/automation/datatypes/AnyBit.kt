@@ -32,7 +32,7 @@ import java.util.*
  * @version $Id: $Id
  */
 abstract class AnyBit(var bitLength: Int = 0) : AnyDt() {
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T = visitor.visit(this)
+    override fun <T> accept(visitor: DataTypeVisitor<T>): T? = visitor.visit(this)
 
     override fun repr(obj: Any): String {
         if (obj is Bits) {

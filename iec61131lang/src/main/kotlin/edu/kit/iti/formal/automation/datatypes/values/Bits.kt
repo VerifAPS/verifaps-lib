@@ -22,96 +22,20 @@ package edu.kit.iti.formal.automation.datatypes.values
  * #L%
  */
 
-import lombok.*
-
 /**
  * Created by weigl on 11.06.14.
- * Immutable
- *
  * @author weigl
  * @version $Id: $Id
  */
-@Data
-class Bits
-/**
- *
- * Constructor for Bits.
- *
- * @param register a long.
- * @param nbits a long.
- */
-(register: Long, val nbits: Long) {
-    /**
-     *
-     * Getter for the field `register`.
-     *
-     * @return a long.
-     */
-    /**
-     *
-     * Setter for the field `register`.
-     *
-     * @param register a long.
-     */
-    var register: Long = 0
+data class Bits(val register: Long = 0, val nbits: Int = 1) {
+    private fun allMask() = if (nbits == 64) -1L else (1L shl nbits) - 1
 
-    /**
-     *
-     * Constructor for Bits.
-     *
-     * @param nbits a long.
-     */
-    constructor(nbits: Long) : this(0, nbits) {}
-
-    init {
-        this.register = register and allMask() // trunc
-    }
-
-    private fun allMask(): Long {
-        return if (nbits == 64L) {
-            -1L
-        } else {
-            (1L shl nbits) - 1
-        }
-    }
-
-    /**
-     *
-     * shl.
-     *
-     * @param n a int.
-     * @return a [edu.kit.iti.formal.automation.datatypes.values.Bits] object.
-     */
-    fun shl(n: Int): Bits {
-        return Bits(register shl n, nbits)
-    }
-
-    /**
-     *
-     * shr.
-     *
-     * @param n a int.
-     * @return a [edu.kit.iti.formal.automation.datatypes.values.Bits] object.
-     */
-    fun shr(n: Int): Bits {
-        return Bits(register.ushr(n), nbits)
-    }
-
-
-    /**
-     *
-     * rol.
-     *
-     * @param n a int.
-     * @return a [edu.kit.iti.formal.automation.datatypes.values.Bits] object.
-     */
+    fun shl(n: Int) = Bits(register shl n, nbits)
+    fun shr(n: Int) = Bits(register.ushr(n), nbits)
     fun rol(n: Int): Bits {
         assert(n <= nbits)
 
-        if (n.toLong() == nbits) {
-            return this
-        }
-
+        if (n == nbits) return this
 
         val maskAll = allMask()
         val maskRetain = ((2 shl nbits - n) - 1).toLong()
@@ -140,37 +64,7 @@ class Bits
         return Bits(register.ushr(n) or first, nbits)
     }
 
-
-    /**
-     *
-     * and.
-     *
-     * @param other a [edu.kit.iti.formal.automation.datatypes.values.Bits] object.
-     * @return a [edu.kit.iti.formal.automation.datatypes.values.Bits] object.
-     */
-    fun and(other: Bits): Bits {
-        return Bits(register and other.register, nbits)
-    }
-
-    /**
-     *
-     * or.
-     *
-     * @param other a [edu.kit.iti.formal.automation.datatypes.values.Bits] object.
-     * @return a [edu.kit.iti.formal.automation.datatypes.values.Bits] object.
-     */
-    fun or(other: Bits): Bits {
-        return Bits(register or other.register, nbits)
-    }
-
-    /**
-     *
-     * xor.
-     *
-     * @param other a [edu.kit.iti.formal.automation.datatypes.values.Bits] object.
-     * @return a [edu.kit.iti.formal.automation.datatypes.values.Bits] object.
-     */
-    fun xor(other: Bits): Bits {
-        return Bits(register xor other.register, nbits)
-    }
+    fun and(other: Bits): Bits = Bits(register and other.register, nbits)
+    fun or(other: Bits) = Bits(register or other.register, nbits)
+    fun xor(other: Bits): Bits = Bits(register xor other.register, nbits)
 }

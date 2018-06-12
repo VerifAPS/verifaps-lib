@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.sfclang.ast
+package edu.kit.iti.formal.automation.sfclang
 
 /*-
  * #%L
@@ -23,7 +23,6 @@ package edu.kit.iti.formal.automation.sfclang.ast
  */
 
 import com.google.common.collect.HashMultimap
-import com.google.common.collect.Multimap
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
@@ -32,7 +31,6 @@ import lombok.RequiredArgsConstructor
 import lombok.Setter
 import org.antlr.v4.runtime.CommonToken
 
-import java.util.Collections
 import java.util.function.Supplier
 
 /**
@@ -79,7 +77,7 @@ class SFC2ST : Supplier<StatementList> {
         val actionMap = HashMultimap.create<String, SFCActionQualifier.Qualifier>()
         network!!.steps.stream().flatMap<SFCStep.AssociatedAction> { s -> s.events.stream() }
                 .filter { aa -> scope!!.hasVariable(aa.actionName) }
-                .forEach { aa -> actionMap.put(aa.actionName!!, aa.qualifier!!.getQualifier()!!) }
+                .forEach { aa -> actionMap.put(aa.actionName, aa.qualifier!!.qualifier) }
         println(actionMap)
 
         /*network.getSteps().stream().flatMap(s -> s.getOutgoing().stream())
@@ -93,7 +91,7 @@ class SFC2ST : Supplier<StatementList> {
 
     private fun addNonStoredVariablesReset() {
         network!!.steps.stream().flatMap<SFCStep.AssociatedAction> { s -> s.events.stream() }
-                .filter { aa -> aa.qualifier!!.getQualifier() == SFCActionQualifier.Qualifier.NON_STORED }
+                .filter { aa -> aa.qualifier!!.qualifier == SFCActionQualifier.Qualifier.NON_STORED }
                 .filter { aa -> scope!!.hasVariable(aa.actionName) }
                 .forEach { aa ->
                     stBody.add(AssignmentStatement(
@@ -109,10 +107,10 @@ class SFC2ST : Supplier<StatementList> {
         stBody.add(statement)
 
         for (step in network!!.steps) {
-            val _case = CaseStatement.Case()
+            val _case = Case()
             val cc = CaseCondition.Enumeration(
-                    Literal(enumDecl.typeName, step.name))
-            _case.conditions = listOf<CaseCondition>(cc)
+                    Literal(enumDecl.name, step.name))
+            _case.conditions = arrayListOf(cc)
             statement.addCase(_case)
             val sl = _case.statements
 
@@ -149,13 +147,13 @@ class SFC2ST : Supplier<StatementList> {
                     }
 
             // outgoing transition
-            step.outgoing.sort(SFCTransition.PriorityComparison())
+            step.outgoing.sortWith(SFCTransition.PriorityComparison())
             step.outgoing.forEach { t ->
                 val _ifguard = IfStatement()
                 val then = StatementList()
                 then.add(AssignmentStatement(SymbolicReference(transitVariable), Literal.TRUE))
                 then.add(AssignmentStatement(SymbolicReference(stateVariable),
-                        Literal(enumDecl.typeName, t.to!!.iterator().next().name)))
+                        Literal(enumDecl.name, t.to!!.iterator().next().name)))
                 //TODO assert t.getTo().size() == 1
                 _ifguard.addGuardedCommand(t.guard, then)
                 sl.add(_ifguard)
@@ -198,12 +196,12 @@ class SFC2ST : Supplier<StatementList> {
         stateVariable = "_" + name + "_state"
         transitVariable = "_" + name + "_transit"
 
-        scope!!.builder().identifiers(stateVariable)
+        scope!!.builder().identifiers(stateVariable!!)
                 .type(enumDecl)
-                .setInitialization(IdentifierInitializer(network!!.initialStep!!.name))
+                .setInitialization(IdentifierInitializer(null, network!!.initialStep!!.name))
                 .close()
 
-        scope.builder().identifiers(transitVariable)
+        scope.builder().identifiers(transitVariable!!)
                 .boolType()
                 .setInitialization(Literal.FALSE)
                 .close()

@@ -31,13 +31,5 @@ import edu.kit.iti.formal.automation.datatypes.AnyDt
  * @version $Id: $Id
  */
 interface TypePromotion {
-    /**
-     *
-     * getPromotion.
-     *
-     * @param a a [edu.kit.iti.formal.automation.datatypes.AnyDt] object.
-     * @param b a [edu.kit.iti.formal.automation.datatypes.AnyDt] object.
-     * @return a [edu.kit.iti.formal.automation.datatypes.AnyDt] object.
-     */
-    fun getPromotion(a: AnyDt, b: AnyDt): AnyDt
+    fun getPromotion(a: AnyDt, b: AnyDt): AnyDt?
 }

@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.datatypes
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.values.TimeValue
+import edu.kit.iti.formal.automation.datatypes.values.TimeData
 
 /**
  *
@@ -39,7 +39,7 @@ class TimeType : AnyDt("TIME") {
 
     /** {@inheritDoc}  */
     override fun repr(obj: Any): String {
-        val time = obj as TimeValue
+        val time = obj as TimeData
         val stb = StringTimeBuilder()
         stb.add(time.days.toDouble(), "d")
         stb.add(time.hours.toDouble(), "h")

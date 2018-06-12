@@ -403,7 +403,7 @@ open class AstMutableVisitor : AstVisitor<Any>() {
         return super.visit(literal)
     }
 
-    override fun visit(referenceSpecification: ReferenceSpecification): Any? {
+    override fun visit(referenceSpecification: ReferenceTypeDeclaration): Any? {
         return super.visit(referenceSpecification)
     }
 
@@ -428,7 +428,7 @@ open class AstMutableVisitor : AstVisitor<Any>() {
     }
 }
 
-private fun <E> MutableCollection<E>.setAll(seq: Collection<E>) {
+fun <E> MutableCollection<E>.setAll(seq: Collection<E>) {
     this.clear()
     this.addAll(seq)
 }

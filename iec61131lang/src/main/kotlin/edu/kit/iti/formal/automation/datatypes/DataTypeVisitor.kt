@@ -28,7 +28,7 @@ package edu.kit.iti.formal.automation.datatypes
  * @author Alexander Weigl, Augusto Modanese
 </T> */
 
-interface DataTypeVisitor<T> {
+interface DataTypeVisitor<out T> {
     fun defaultVisit(any: AnyDt): T? {
         return null
     }
@@ -49,19 +49,19 @@ interface DataTypeVisitor<T> {
         return defaultVisit(anyBit)
     }
 
-    open fun visit(dateAndTime: AnyDate.DateAndTime): T? {
+    open fun visit(dateAndTime: AnyDate.DATE_AND_TIME): T? {
         return defaultVisit(dateAndTime)
     }
 
-    open fun visit(timeOfDay: AnyDate.TimeOfDay): T? {
+    open fun visit(timeOfDay: AnyDate.TIME_OF_DAY): T? {
         return defaultVisit(timeOfDay)
     }
 
-    open fun visit(date: AnyDate.Date): T? {
+    open fun visit(date: AnyDate.DATE): T? {
         return defaultVisit(date)
     }
 
-    fun visit(reference: AnyReference): T? {
+    fun visit(reference: ReferenceDt): T? {
         return defaultVisit(reference)
     }
 
@@ -141,15 +141,11 @@ interface DataTypeVisitor<T> {
         return defaultVisit(pointerType)
     }
 
-    open fun visit(referenceType: ReferenceType): T? {
-        return defaultVisit(referenceType)
-    }
-
-    open fun visit(string: IECString.String): T? {
+    open fun visit(string: IECString.STRING): T? {
         return defaultVisit(string)
     }
 
-    open fun visit(wString: IECString.WString): T? {
+    open fun visit(wString: IECString.WSTRING): T? {
         return defaultVisit(wString)
     }
 

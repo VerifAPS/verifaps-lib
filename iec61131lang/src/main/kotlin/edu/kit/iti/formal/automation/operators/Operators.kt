@@ -25,10 +25,6 @@ package edu.kit.iti.formal.automation.operators
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.AnyNum
 
-import java.util.HashMap
-
-import edu.kit.iti.formal.automation.datatypes.AnyNum.ANY_NUM
-
 /**
  * Facade.
  *
@@ -42,110 +38,56 @@ import edu.kit.iti.formal.automation.datatypes.AnyNum.ANY_NUM
  * @version 1
  */
 object Operators {
-    /**
-     * Constant `NOT`
-     */
-    var NOT = UnaryOperator("NOT", AnyBit.BOOL)
-    /**
-     * Constant `MINUS`
-     */
-    var MINUS = UnaryOperator("-", AnyNum.ANY_NUM)
-
-    /**
-     * Constant `ADD`
-     */
-    var ADD = BinaryOperator("+", AnyNum.ANY_NUM)
-
-    /**
-     * Constant `MULT`
-     */
-    var MULT = BinaryOperator("*", AnyNum.ANY_NUM)
-
-    /**
-     * Constant `SUB`
-     */
-    var SUB = BinaryOperator("-", AnyNum.ANY_NUM)
-
-    /**
-     * Constant `DIV`
-     */
-    var DIV = BinaryOperator("/", AnyNum.ANY_NUM)
-
-    /**
-     * Constant `MOD`
-     */
-    var MOD = BinaryOperator("MOD", AnyNum.ANY_NUM)
-
-    /**
-     * Constant `AND`
-     */
-    var AND = BinaryOperator("AND", AnyBit.BOOL)
-
-    /**
-     * Constant `OR`
-     */
-    var OR = BinaryOperator("OR", AnyBit.BOOL)
-
-    /**
-     * Constant `XOR`
-     */
-    var XOR = BinaryOperator("XOR", AnyBit.BOOL)
-
-    /**
-     * Constant `POWER`
-     */
-    var POWER = BinaryOperator("**", AnyNum())
-
+    val NOT = UnaryOperator("NOT", AnyBit.BOOL)
+    val MINUS = UnaryOperator("-", AnyNum.ANY_NUM)
+    val ADD = BinaryOperator("+", AnyNum.ANY_NUM)
+    val MULT = BinaryOperator("*", AnyNum.ANY_NUM)
+    val SUB = BinaryOperator("-", AnyNum.ANY_NUM)
+    val DIV = BinaryOperator("/", AnyNum.ANY_NUM)
+    val MOD = BinaryOperator("MOD", AnyNum.ANY_NUM)
+    val AND = BinaryOperator("AND", AnyBit.BOOL)
+    val OR = BinaryOperator("OR", AnyBit.BOOL)
+    val XOR = BinaryOperator("XOR", AnyBit.BOOL)
+    val POWER = BinaryOperator("**", AnyNum())
     // Comparison
-    /**
-     * Constant `EQUALS`
-     */
-    var EQUALS = ComparisonOperator("=")
-    /**
-     * Constant `NOT_EQUALS`
-     */
-    var NOT_EQUALS = ComparisonOperator("<>")
-    /**
-     * Constant `LESS_THAN`
-     */
-    var LESS_THAN = ComparisonOperator("<")
-    /**
-     * Constant `GREATER_THAN`
-     */
-    var GREATER_THAN = ComparisonOperator(">")
-    /**
-     * Constant `GREATER_EQUALS`
-     */
-    var GREATER_EQUALS = ComparisonOperator(">=")
-    /**
-     * Constant `LESS_EQUALS`
-     */
-    var LESS_EQUALS = ComparisonOperator("<=")
+    val EQUALS = ComparisonOperator("=")
+    val NOT_EQUALS = ComparisonOperator("<>")
+    val LESS_THAN = ComparisonOperator("<")
+    val GREATER_THAN = ComparisonOperator(">")
+    val GREATER_EQUALS = ComparisonOperator(">=")
+    val LESS_EQUALS = ComparisonOperator("<=")
 
 
     //
-    private var TABLE: MutableMap<String, Operator>? = null
+    private val TABLE: MutableMap<String, Operator> = mutableMapOf()
 
-    /**
-     *
-     * lookup.
-     *
-     * @param operator a [java.lang.String] object.
-     * @return a [edu.kit.iti.formal.automation.operators.Operator] object.
-     */
-    fun lookup(operator: String): Operator {
-        return TABLE!![operator]
+    init {
+        register(NOT)
+        register(MINUS)
+        register(ADD)
+        register(MULT)
+        register(SUB)
+        register(DIV)
+        register(MOD)
+        register(AND)
+        register(OR)
+        register(XOR)
+        register(POWER)
+        register(EQUALS)
+        register(NOT_EQUALS)
+        register(LESS_THAN)
+        register(GREATER_THAN)
+        register(GREATER_EQUALS)
+        register(LESS_EQUALS)
+
     }
 
-    /**
-     *
-     * register.
-     *
-     * @param symbol a [java.lang.String] object.
-     * @param op     a [edu.kit.iti.formal.automation.operators.Operator] object.
-     */
+    fun lookup(operator: String): Operator {
+        return TABLE[operator]!!
+    }
+
+    fun register(op: Operator) = register(op.symbol, op)
     fun register(symbol: String, op: Operator) {
-        if (TABLE == null) TABLE = HashMap()
-        TABLE!![symbol] = op
+        TABLE[symbol] = op
     }
 }

@@ -59,7 +59,7 @@ class RealPromotion : TypePromotion {
     }
 
     private fun promote(a: AnyReal, b: AnyReal): AnyDt? {
-        return if (a == b) a else a as? AnyReal.LReal ?: b
+        return if (a == b) a else a as? AnyReal.LREAL ?: b
     }
 
     companion object {

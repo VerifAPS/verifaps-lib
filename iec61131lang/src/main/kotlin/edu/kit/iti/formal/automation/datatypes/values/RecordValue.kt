@@ -23,51 +23,17 @@ package edu.kit.iti.formal.automation.datatypes.values
  */
 
 import edu.kit.iti.formal.automation.datatypes.RecordType
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
-
-import java.util.HashMap
+import java.util.*
 
 /**
  * Created by weigl on 10.06.14.
- *
- * @author weigl
- * @version $Id: $Id
  */
-class RecordValue
-/**
- *
- * Constructor for RecordValue.
- *
- * @param recordType a [edu.kit.iti.formal.automation.datatypes.RecordType] object.
- */
-(private val recordType: RecordType) {
-    private var fieldValues: MutableMap<String, RuntimeVariable> = HashMap()
-
-    init {
-
+data class RecordValue(
+        var fieldValues: MutableMap<String, Value<*, *>> = HashMap()) {
+    constructor(recordType: RecordType) : this() {
         for (field in recordType.fields) {
-            fieldValues[field.name] = RuntimeVariable(field.name,
-                    field.typeDeclaration!!.initialization, field.dataType)
+            //TODO factory for getting values of initializations
+            //fieldValues[field.name] = field.typeDeclaration.initialization
         }
-    }
-
-    /**
-     *
-     * Getter for the field `fieldValues`.
-     *
-     * @return a [java.util.Map] object.
-     */
-    fun getFieldValues(): Map<String, RuntimeVariable> {
-        return fieldValues
-    }
-
-    /**
-     *
-     * Setter for the field `fieldValues`.
-     *
-     * @param fieldValues a [java.util.Map] object.
-     */
-    fun setFieldValues(fieldValues: MutableMap<String, RuntimeVariable>) {
-        this.fieldValues = fieldValues
     }
 }

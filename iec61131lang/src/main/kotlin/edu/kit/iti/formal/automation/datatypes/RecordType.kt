@@ -22,76 +22,22 @@ package edu.kit.iti.formal.automation.datatypes
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.st.ast.TypeDeclaration
+import edu.kit.iti.formal.automation.VariableScope
+import edu.kit.iti.formal.automation.st.LookupListFactory
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.EqualsAndHashCode
-import lombok.NoArgsConstructor
-
-import java.util.ArrayList
 
 /**
  * Created by weigl on 10.06.14.
  *
- * @author weigl, Augusto Modanese
+ * @author weigl
  * @version $Id: $Id
  */
-@Data
-@EqualsAndHashCode
-@NoArgsConstructor
-@AllArgsConstructor
-open class RecordType : AnyDt {
-    private val name: String
+data class RecordType(val fields: VariableScope = LookupListFactory.create())
+    : AnyDt() {
 
-    open var fields = Scope()
-        set(fields) {
-            field = this.fields
-        }
+    fun addField(name: String, dataType: AnyDt)
+            = fields.add(VariableDeclaration(name, dataType))
 
-    /**
-     * The declaration associated with the type.
-     */
-    private val declaration: TypeDeclaration<*>
-
-    /**
-     *
-     * Constructor for RecordType.
-     *
-     * @param name a [java.lang.String] object.
-     */
-    constructor(name: String, declaration: TypeDeclaration<*>) {
-        this.name = name
-        this.declaration = declaration
-    }
-
-    /**
-     *
-     * addField.
-     *
-     * @param name a [java.lang.String] object.
-     * @param dataType a [edu.kit.iti.formal.automation.datatypes.AnyDt] object.
-     */
-    fun addField(name: String, dataType: AnyDt) {
-        this.fields.add(VariableDeclaration(name, dataType))
-    }
-
-    /** {@inheritDoc}  */
-    override fun repr(obj: Any): String? {
-        return null
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
-        return visitor.visit(this)
-    }
-
-    @Deprecated("")
-    inner class Field internal constructor(var name: String?, var dataType: AnyDt?) {
-        var defValue: Any? = null
-
-    }
+    override fun repr(obj: Any) = TODO()
+    override fun <T> accept(visitor: DataTypeVisitor<T>) = visitor.visit(this)
 }

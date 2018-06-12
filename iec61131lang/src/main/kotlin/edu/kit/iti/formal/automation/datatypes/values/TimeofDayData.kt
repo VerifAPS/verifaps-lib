@@ -23,11 +23,7 @@ package edu.kit.iti.formal.automation.datatypes.values
  */
 
 import edu.kit.iti.formal.automation.datatypes.AnyDate
-import edu.kit.iti.formal.automation.sfclang.Utils
-import lombok.*
-
-import java.util.function.Function
-import java.util.regex.Matcher
+import edu.kit.iti.formal.automation.sfclang.split
 import java.util.regex.Pattern
 
 /**
@@ -37,46 +33,26 @@ import java.util.regex.Pattern
  * @author weigl
  * @version $Id: $Id
  */
-@Data
-@NoArgsConstructor
-class TimeofDayData {
-    private val hours: Int
-    private val minutes: Int
-    private val seconds: Int
-    private var millieseconds: Int
-
-    constructor(hours: Int, minutes: Int, seconds: Int) {
-        this.hours = hours
-        this.minutes = minutes
-        this.seconds = seconds
-    }
-
-    constructor(hour: Int, min: Int, sec: Int, ms: Int) : this(hour, min, sec) {
-        millieseconds = ms
-    }
-
+data class TimeofDayData(var hours: Int = 0, var minutes: Int = 0,
+                         var seconds: Int = 0, var millieseconds: Int = 0) {
     companion object {
-
-        fun parse(tod: String): Value<AnyDate.TimeOfDay, TimeofDayData> {
+        fun parse(tod: String): Value<AnyDate.TIME_OF_DAY, TimeofDayData> {
             val pattern = Pattern.compile(
                     "(?<hour>\\d?\\d):(?<min>\\d?\\d)(:(?<sec>\\d?\\d))?(.(?<ms>\\d+))?")
-            val s = Utils.split(tod)
-            val matcher = pattern.matcher(s.value().get())
+            val s = split(tod)
+            val matcher = pattern.matcher(s.value!!)
             val parseInt = { key: String ->
                 val a = matcher.group(key)
-                return if (a == null)
-                    0
-                else
-                    Integer.parseInt(a)
+                if (a == null) 0 else Integer.parseInt(a)
             }
 
             if (matcher.matches()) {
-                val hour = parseInt.apply("hour")
-                val min = parseInt.apply("min")
-                val sec = parseInt.apply("sec")
-                val ms = parseInt.apply("ms")
+                val hour = parseInt("hour")
+                val min = parseInt("min")
+                val sec = parseInt("sec")
+                val ms = parseInt("ms")
                 val t = TimeofDayData(hour, min, sec, ms)
-                return Values.VToD(AnyDate.TIME_OF_DAY, t)
+                return VToD(AnyDate.TIME_OF_DAY, t)
             } else {
                 throw IllegalArgumentException("Given string is not a time of day value.")
             }

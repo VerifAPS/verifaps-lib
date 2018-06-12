@@ -3,8 +3,8 @@ parser grammar IEC61131Parser;
 options {tokenVocab = IEC61131Lexer;}
 
 @members {
-    @lombok.Getter @lombok.Setter @org.jetbrains.annotations.NotNull
     private ErrorReporter errorReporter = new ErrorReporter();
+    public ErrorReporter getErrorReporter() { return errorReporter;}
 }
 
 start
@@ -12,6 +12,31 @@ start
 	(library_element_declaration)*
 ;
 
+namespace_declaration
+:
+    NAMESPACE  INTERNAL? full_qualified_identifier using_directive* namespace_elements
+;
+
+namespace_elements
+:
+      data_type_declaration
+	| function_declaration
+    | class_declaration
+    | interface_declaration
+	| function_block_declaration
+	//not allowed | program_declaration
+	| namespace_declaration
+;
+
+full_qualified_identifier
+:
+    IDENTIFIER ( '.' IDENTIFIER)*
+;
+
+using_directive
+:
+    USING  full_qualified_identifier( COMMA full_qualified_identifier )* SEMICOLON
+;
 
 library_element_declaration
 :
@@ -22,6 +47,7 @@ library_element_declaration
 	| function_block_declaration
 	| program_declaration
 	| global_variable_list_declaration
+    | namespace_declaration
 //	| configuration_declaration
 ;
 
@@ -40,56 +66,24 @@ constant
 	| reference_value
 ;
 
-cast 
-:
-	CAST_LITERAL
-;
+cast: CAST_LITERAL;
+integer : MINUS? INTEGER_LITERAL;
+bits : BITS_LITERAL;
+real : REAL_LITERAL;
 
-integer 
-:
-	MINUS? INTEGER_LITERAL
-;
-
-bits 
-: BITS_LITERAL;
-
-real 
-: REAL_LITERAL;
-
-string 
-
+string
 :
 	tok =
-	(
-		WSTRING_LITERAL
-		| STRING_LITERAL
+	( WSTRING_LITERAL
+	| STRING_LITERAL
 	)
 ;
 
-time
-:
-	TIME_LITERAL
-	;
-
-timeofday
-:
-	TOD_LITERAL
-;
-
-date
-:
-	DATE_LITERAL
-;
-
-datetime
-:
-	DATETIME
-;
-
-ref_null
-:
-    NULL
-;
+time:	TIME_LITERAL;
+timeofday: 	TOD_LITERAL;
+date: DATE_LITERAL;
+datetime: DATETIME;
+ref_null: NULL;
 
 data_type_name
 :
@@ -211,6 +205,7 @@ initializations
     | IDENTIFIER #initializations_identifier
     | array_initialization #initializations_array_initialization
     | structure_initialization #initializations_structure_initialization
+
     //| invocation #initializations_invocation
 ;
 
@@ -245,7 +240,6 @@ array_specification
 ;
 //TODO need to clarify https://infosys.beckhoff.com/english.php?content=../content/1033/tcplccontrol/html/tcplcctrl_array.htm&id=
 array_initialization
-
 :
 	LBRACKET array_initial_elements
 	(
@@ -295,7 +289,7 @@ string_type_declaration
 
 reference_specification
 :
-    REF_TO type_declaration
+    REF_TO data_type_name //type_declaration
 ;
 
 reference_value

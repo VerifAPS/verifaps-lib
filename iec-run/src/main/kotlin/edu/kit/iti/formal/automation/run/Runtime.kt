@@ -63,7 +63,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<Scope> 
         val fbName = fbc.calleeName
         val fbTypeName = peekScope().getVariable(fbName)?.typeDeclaration?.baseTypeName
         val fbDataType = peekScope().resolveDataType(fbTypeName);
-        val fb = peekScope().getFunctionBlock(fbTypeName)
+        val fb = peekScope().resolveFunctionBlock(fbTypeName)
 
         val fbPrevValue = state[fbName]!!.orElseThrow { ExecutionException("not initialized") }.value
         if (fbPrevValue is HashMap<*, *>) {
@@ -80,7 +80,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<Scope> 
 
 
         val innerScope = Stack<Scope>()
-        innerScope.push(peekScope().getFunctionBlock(fbTypeName).scope);
+        innerScope.push(peekScope().resolveFunctionBlock(fbTypeName).scope);
 
         fb.stBody.accept(Runtime(innerState, innerScope))
 
@@ -141,7 +141,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<Scope> 
         }
     }
 
-    public fun defaultValueForDataType(dataType: VariableDeclaration<Initialization>) : Optional<ExpressionValue> {
+    public fun defaultValueForDataType(dataType: VariableDeclaration) : Optional<ExpressionValue> {
         //(it.value.dataType as FunctionBlockDataType).functionBlock.localScope
         if (dataType == null) {
             TODO()
@@ -169,7 +169,7 @@ class Runtime (val state: State, private val definitionScopeStack: Stack<Scope> 
 
 
     public fun initializeLocalVariables(localScope: Scope) {
-        val localVariables: Map<out String, VariableDeclaration<Initialization>> = localScope.variables
+        val localVariables: Map<out String, VariableDeclaration> = localScope.variables
         localVariables.map {
             val stateVal = state[it.key]
             if (stateVal != null && stateVal.isPresent) {

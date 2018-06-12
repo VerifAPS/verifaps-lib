@@ -26,7 +26,7 @@ package edu.kit.iti.formal.automation.datatypes
  * @author Alexander Weigl
  * @version 1 (25.06.17)
  */
-abstract class DefaultDataTypeVisitor<T> : DataTypeVisitor<T?> {
+abstract class DefaultDataTypeVisitor<T> : DataTypeVisitor<T> {
     override fun visit(real: AnyReal): T? {
         return null
     }
@@ -43,15 +43,15 @@ abstract class DefaultDataTypeVisitor<T> : DataTypeVisitor<T?> {
         return null
     }
 
-    override fun visit(dateAndTime: AnyDate.DateAndTime): T? {
+    override fun visit(dateAndTime: AnyDate.DATE_AND_TIME): T? {
         return null
     }
 
-    override fun visit(timeOfDay: AnyDate.TimeOfDay): T? {
+    override fun visit(timeOfDay: AnyDate.TIME_OF_DAY): T? {
         return null
     }
 
-    override fun visit(date: AnyDate.Date): T? {
+    override fun visit(date: AnyDate.DATE): T? {
         return null
     }
 
@@ -79,15 +79,15 @@ abstract class DefaultDataTypeVisitor<T> : DataTypeVisitor<T?> {
         return null
     }
 
-    override fun visit(referenceType: ReferenceType): T? {
+    override fun visit(referenceType: ReferenceDt): T? {
         return null
     }
 
-    override fun visit(string: IECString.String): T? {
+    override fun visit(string: IECString.STRING): T? {
         return null
     }
 
-    override fun visit(wString: IECString.WString): T? {
+    override fun visit(wString: IECString.WSTRING): T? {
         return null
     }
 

@@ -72,13 +72,13 @@ public class DefaultTypeTranslator implements TypeTranslator {
         }
 
         @Override
-        public SMVType visit(AnyDate.TimeOfDay timeOfDay) {
+        public SMVType visit(AnyDate.TIME_OF_DAY timeOfDay) {
             return new SMVWordType(true, WORD_LENGTH);
             //throw new IllegalTypeException("Could not match");
         }
 
         @Override
-        public SMVType visit(AnyDate.Date date) {
+        public SMVType visit(AnyDate.DATE date) {
             throw new IllegalTypeException("Could not match");
         }
 

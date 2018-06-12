@@ -22,10 +22,8 @@ package edu.kit.iti.formal.automation.datatypes
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.ArrayTypeDeclaration
 import edu.kit.iti.formal.automation.st.ast.Range
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by weigl on 07/10/14.
@@ -33,55 +31,17 @@ import java.util.ArrayList
  * @author weigl
  * @version $Id: $Id
  */
-class IECArray : AnyDt {
-    /**
-     *
-     * Getter for the field `fieldType`.
-     *
-     * @return a [edu.kit.iti.formal.automation.datatypes.AnyDt] object.
-     */
-    val fieldType: AnyDt?
-    /**
-     *
-     * Getter for the field `ranges`.
-     *
-     * @return a [java.util.List] object.
-     */
-    /**
-     *
-     * Setter for the field `ranges`.
-     *
-     * @param ranges a [java.util.List] object.
-     */
-    var ranges: List<Range> = ArrayList()
+class IECArray(name: String, val fieldType: AnyDt, var ranges: MutableList<Range> = ArrayList()) : AnyDt(name) {
+    constructor(fieldType: AnyDt, ranges: List<Range>)
+            : this("ARRAY OF ${fieldType.name}", fieldType, ranges.toMutableList())
 
-    /**
-     *
-     * Constructor for IECArray.
-     *
-     * @param name a [java.lang.String] object.
-     * @param fieldType a [edu.kit.iti.formal.automation.datatypes.AnyDt] object.
-     * @param ranges a [java.util.List] object.
-     */
-    constructor(name: String, fieldType: AnyDt, ranges: List<Range>) {
-        this.name = name
-        this.fieldType = fieldType
-        this.ranges = ranges
-    }
-
+    /*
     constructor(arrayTypeDeclaration: ArrayTypeDeclaration) {
         fieldType = arrayTypeDeclaration.baseType
         ranges = arrayTypeDeclaration.ranges
     }
+    */
 
-    /** {@inheritDoc}  */
-    override fun repr(obj: Any): String? {
-        return null
-    }
-
-
-    /** {@inheritDoc}  */
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
-        return visitor.visit(this)
-    }
+    override fun repr(obj: Any): String = TODO()
+    override fun <T> accept(visitor: DataTypeVisitor<T>): T? = visitor.visit(this)
 }

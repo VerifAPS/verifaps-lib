@@ -22,73 +22,40 @@ package edu.kit.iti.formal.automation.sfclang
  * #L%
  */
 
-import edu.kit.iti.formal.automation.sfclang.Utils.Splitted
-import lombok.AllArgsConstructor
-import lombok.ToString
-
 import java.math.BigInteger
-import java.util.Optional
-import java.util.regex.Matcher
+import java.util.*
 import java.util.regex.Pattern
 
-/**
- *
- * Utils class.
- *
- * @author weigl
- */
-object Utils {
-    internal var PATTERN = Pattern.compile("((?<prefix>\\D\\w*?)#)?((?<radix>\\d+?)#)?(?<value>.*)")
-
-    /**
-     *
-     * getRandomName.
-     *
-     * @return a [java.lang.String] object.
-     */
-    val randomName: String
-        get() = "action_" + (Math.random() * 10000).toInt()
+internal var PATTERN = Pattern.compile("((?<prefix>\\D\\w*?)#)?((?<radix>\\d+?)#)?(?<value>.*)")
 
 
-    fun split(s: String): Splitted {
-        val t = PATTERN.matcher(s)
-        return if (t.matches()) {
-            Splitted(t.group("prefix"), t.group("radix"), t.group("value"))
-        } else {
-            throw IllegalArgumentException("Argument is not well word: expected form " + PATTERN.pattern())
-        }
+private var uniqueNameId = 0
+fun getUniqueName(prefix: String = "", postfix: String = "") = "$prefix${++uniqueNameId}$postfix"
+
+fun split(s: String): Splitted {
+    val t = PATTERN.matcher(s)
+    return if (t.matches()) {
+        Splitted(t.group("prefix"), t.group("radix"), t.group("value"))
+    } else {
+        throw IllegalArgumentException("Argument is not well word: expected form " + PATTERN.pattern())
     }
+}
 
-    fun getIntegerLiteralValue(text: String, sign: Boolean): BigInteger {
-        val s = split(text)
-        return if (sign) s.number().negate() else s.number()
-    }
+fun getIntegerLiteralValue(text: String, sign: Boolean): BigInteger {
+    val s = split(text)
+    return if (sign) s.number().negate() else s.number()
+}
 
-    @AllArgsConstructor
-    @ToString
-    class Splitted {
-        private val prefix: String? = null
-        private val ordinal: String? = null
-        private val value: String? = null
+data class Splitted(
+        val prefix: String? = null,
+        val ordinal: String? = null,
+        val value: String? = null) {
 
-        fun prefix(): Optional<String> {
-            return if (prefix == null) Optional.empty() else Optional.of(prefix)
+    fun number(): BigInteger {
+        var r = 10
+        if (ordinal != null) {
+            r = Integer.parseInt(ordinal)
         }
-
-        fun radix(): Optional<String> {
-            return if (ordinal == null) Optional.empty() else Optional.of(ordinal)
-        }
-
-        fun value(): Optional<String> {
-            return if (value == null) Optional.empty() else Optional.of(value)
-        }
-
-        fun number(): BigInteger {
-            var r = 10
-            if (ordinal != null) {
-                r = Integer.parseInt(ordinal)
-            }
-            return BigInteger(value!!, r)
-        }
+        return BigInteger(value!!, r)
     }
 }

@@ -78,7 +78,7 @@ object IEC61131Facade {
      * @param ast a [edu.kit.iti.formal.automation.st.ast.Top] object.
      * @return a [java.lang.String] object.
      */
-    fun print(ast: Top<*>, comments: Boolean): String {
+    fun print(ast: Top, comments: Boolean): String {
         val stp = StructuredTextPrinter()
         stp.isPrintComments = comments
         ast.accept(stp)
@@ -92,7 +92,7 @@ object IEC61131Facade {
     }
 
 
-    fun print(top: Top<*>?): String {
+    fun print(top: Top?): String {
         return print(top!!, false)
     }
 
@@ -128,21 +128,14 @@ object IEC61131Facade {
         return file(f.toPath())
     }
 
-    /**
-     *
-     * resolveDataTypes.
-     *
-     * @param elements a [edu.kit.iti.formal.automation.st.ast.TopLevelElements] object.
-     * @return a [edu.kit.iti.formal.automation.scope.Scope] object.
-     */
     fun resolveDataTypes(elements: TopLevelElements): Scope {
         val scope = Scope.defaultScope()
         val fdt = FindDataTypes(scope)
-        val rdt = ResolveDataTypes(scope)
-        val rr = ResolveReferences(scope)
-        elements.accept<Any>(fdt)
-        elements.accept<Any>(rdt)
-        elements.accept<Any>(rr)
+        val rdt = ResolveDataTypes()
+        //val rr = ResolveReferences(scope)
+        elements.accept(fdt)
+        elements.accept(rdt)
+        //elements.accept(rr)
         return scope
     }
 

@@ -22,16 +22,10 @@ package edu.kit.iti.formal.automation.datatypes
  * #L%
  */
 
-import edu.kit.iti.formal.automation.oo.OOUtils
-import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration
-import edu.kit.iti.formal.automation.st.ast.Initialization
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import lombok.AllArgsConstructor
 import lombok.Data
 import lombok.EqualsAndHashCode
-
-import java.util.stream.Collectors
 
 /**
  * This data type represents a class.
@@ -40,29 +34,21 @@ import java.util.stream.Collectors
  * @version 1
  * @since 04.03.17
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
-@AllArgsConstructor
-class ClassDataType : RecordType {
-    val clazz: ClassDeclaration
-
-    override var fields: Scope
-        get() = Scope(OOUtils.getEffectiveScope(clazz).parallelStream()
-                .map<VariableDeclaration<Initialization>>(Function<VariableDeclaration<Initialization>, VariableDeclaration<Initialization>> { it.copy() })
-                .collect<List<VariableDeclaration<Initialization>>, Any>(Collectors.toList()))
-        set(value: Scope) {
-            super.fields = value
-        }
-
-    override fun repr(obj: Any): String? {
-        return null
+class ClassDataType(val clazz: ClassDeclaration) : AnyDt(clazz.name) {
+    override fun repr(obj: Any): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+    /* override var fields: Scope
+         get() = Scope(OOUtils.getEffectiveScope(clazz).parallelStream()
+                 .map<VariableDeclaration>(Function<VariableDeclaration, VariableDeclaration> { it.copy() })
+                 .collect<List<VariableDeclaration>, Any>(Collectors.toList()))
+         set(value: Scope) {
+             super.fields = value
+         }
+ */
 
     override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
         return visitor.visit(this)
-    }
-
-    override fun getName(): String {
-        return clazz.name
     }
 }

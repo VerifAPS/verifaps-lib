@@ -22,19 +22,11 @@
 
 package edu.kit.iti.formal.automation.oo
 
-import edu.kit.iti.formal.automation.analysis.FindEffectiveSubtypes
-import edu.kit.iti.formal.automation.analysis.FindInstances
-import edu.kit.iti.formal.automation.scope.EffectiveSubtypeScope
-import edu.kit.iti.formal.automation.scope.InstanceScope
-import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.st.ast.TopLevelElement
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements
-
-/**
+/*
  * Façade for object-oriented IEC 61131-3.
  *
  * @author Augusto Modanese
- */
+ *
 object OOIEC61131Facade {
     private val FIND_EFFECTIVE_SUBTYPES_LIMIT = 10
 
@@ -64,3 +56,4 @@ object OOIEC61131Facade {
         return findEffectiveSubtypes.effectiveSubtypeScope
     }
 }
+*/

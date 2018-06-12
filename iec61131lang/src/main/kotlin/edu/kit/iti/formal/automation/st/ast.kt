@@ -14,6 +14,7 @@ import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException
 import edu.kit.iti.formal.automation.operators.BinaryOperator
 import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.sfclang.split
 import edu.kit.iti.formal.automation.st.*
 import edu.kit.iti.formal.automation.st.Cloneable
 import edu.kit.iti.formal.automation.st.util.Tuple
@@ -25,6 +26,7 @@ import org.antlr.v4.runtime.Token
 import java.io.Serializable
 import java.util.*
 import java.util.function.Consumer
+import kotlin.collections.ArrayList
 
 sealed class Top : Visitable, edu.kit.iti.formal.automation.st.Cloneable<Top>, HasRuleContext, Serializable {
     override var ruleContext: ParserRuleContext? = null
@@ -63,7 +65,16 @@ data class ConfigurationDeclaration(override var scope: Scope) : HasScope, TopLe
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
 
-typealias RefList<T> = MutableList<RefTo<T>>
+class RefList<T : Identifiable>(private var impl: ArrayList<RefTo<T>> = arrayListOf()) : MutableList<RefTo<T>> by impl,
+        Cloneable<RefList<T>> {
+    fun add(element: String) = add(RefTo(element))
+
+    override fun clone(): RefList<T> {
+        val list = RefList<T>()
+        forEach { list += it.clone() }
+        return list
+    }
+}
 
 data class FunctionBlockDeclaration(
         override var name: String = "<empty>",
@@ -73,7 +84,7 @@ data class FunctionBlockDeclaration(
         var actions: LookupList<ActionDeclaration> = LookupListFactory.create(),
         var isFinal: Boolean = false,
         var isAbstract: Boolean = false,
-        val interfaces: RefList<InterfaceDeclaration> = arrayListOf(),
+        val interfaces: RefList<InterfaceDeclaration> = RefList(),
         val methods: MutableList<MethodDeclaration> = arrayListOf(),
         var parent: RefTo<FunctionBlockDeclaration> = RefTo()
 ) : HasScope, TopLevelElement(), Invocable {
@@ -104,9 +115,9 @@ data class ClassDeclaration(
         override var scope: Scope = Scope(),
         var isFinal: Boolean = false,
         var isAbstract: Boolean = false,
-        val interfaces: RefList<InterfaceDeclaration> = arrayListOf(),
+        val interfaces: RefList<InterfaceDeclaration> = RefList(),
         val methods: MutableList<MethodDeclaration> = arrayListOf(),
-        var parent: RefTo<FunctionBlockDeclaration> = RefTo<FunctionBlockDeclaration>())
+        val parent: RefTo<ClassDeclaration> = RefTo<ClassDeclaration>())
     : HasScope, TopLevelElement() {
 
     override fun clone() = copy()
@@ -158,7 +169,7 @@ data class ProgramDeclaration(
 
 data class InterfaceDeclaration(
         override var name: String = "",
-        var interfaces: RefList<InterfaceDeclaration> = arrayListOf(),
+        var interfaces: RefList<InterfaceDeclaration> = RefList(),
         var methods: MutableList<MethodDeclaration> = arrayListOf()
 ) : TopLevelElement(), Identifiable {
 
@@ -207,8 +218,8 @@ data class MethodDeclaration(
         var stBody: StatementList = StatementList(),
         var parent: Classifier? = null,
         var accessSpecifier: AccessSpecifier = AccessSpecifier.defaultAccessSpecifier(),
-        var final_: Boolean = false,
-        var abstract_: Boolean = false,
+        var isFinal: Boolean = false,
+        var isAbstract: Boolean = false,
         var isOverride: Boolean = false) : HasScope, Top(), Invocable, Identifiable {
 
     var returnTypeName: String?
@@ -355,10 +366,10 @@ class ReturnStatement : Statement() {
 }
 
 data class ForStatement(
-        var variable: String? = null,
-        var start: Expression? = null,
-        var stop: Expression? = null,
-        var step: Expression? = null,
+        var variable: String = "<empty>",
+        var start: Expression = EMPTY_EXPRESSION,
+        var stop: Expression = EMPTY_EXPRESSION,
+        var step: Expression? = EMPTY_EXPRESSION,
         var statements: StatementList = StatementList()) : Statement() {
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
@@ -756,8 +767,9 @@ data class StructureTypeDeclaration(
         override var name: String = "<empty>",
         override var baseType: RefTo<AnyDt> = RefTo(),
         override var initialization: StructureInitialization? = null,
-        var fields: VariableScope = VariableScope()
+        var fields: VariableScope = LookupListFactory.create()
 ) : TypeDeclaration, Top() {
+
     constructor(typeName: String, fields: List<VariableDeclaration>) : this() {
         name = typeName
         fields.forEach(Consumer<VariableDeclaration> { this.fields.add(it) })
@@ -777,12 +789,9 @@ data class StructureTypeDeclaration(
             return t
         }
     */
-    fun addField(text: String, accept: TypeDeclaration):
-            VariableDeclaration {
-        val vd = VariableDeclaration()
-        vd.name = text
-        vd.typeDeclaration = accept
-        fields[text] = vd
+    fun addField(text: String, accept: TypeDeclaration): VariableDeclaration {
+        val vd = VariableDeclaration(name = text, typeDeclaration = accept)
+        fields.add(vd)
         return vd
     }
 }
@@ -839,37 +848,36 @@ data class EnumerationTypeDeclaration(
         counter += 1
     }
 
-    /*
-    override fun getDataType(scope: Scope): EnumerateType? {
-        //TODO rework
-        val init = allowedValues[0].text
-        if (initialization != null) {
-            if (initialization!!.dataType is EnumerateType) {
-                val value = initialization!!.asValue()
-                //init = value;
-            } else if (initialization!!.dataType is AnyInt) {
-                val value = initialization!!.asValue() as Values.VAnyInt
-                //init = allowedValues.get(value);
-            }
-        }
+    override fun getDataType(scope: Scope) = super.getDataType(scope) as EnumerateType
 
-        val et = EnumerateType(getTypeName(),
-                allowedValues.stream().map<String>(Function<Token, String> { it.getText() }).collect<List<String>, Any>(Collectors.toList()),
-                init)
-        baseType = (et)
-        return et
+    /*//TODO rework
+    val init = allowedValues[0].text
+    if (initialization != null) {
+        if (initialization!!.dataType is EnumerateType) {
+            val value = initialization!!.asValue()
+            //init = value;
+        } else if (initialization!!.dataType is AnyInt) {
+            val value = initialization!!.asValue() as Values.VAnyInt
+            //init = allowedValues.get(value);
+        }
     }
-    override fun clone(): EnumerationTypeDeclaration {
-        val etd = EnumerationTypeDeclaration()
-        etd.allowedValues = ArrayList(allowedValues)
-        etd.counter = counter
-        etd.baseType = baseType
-        etd.baseTypeName = baseTypeName
-        etd.values = ArrayList(values)
-        etd.typeName = typeName
-        return etd
-    }
-    */
+
+    val et = EnumerateType(getTypeName(),
+            allowedValues.stream().map<String>(Function<Token, String> { it.getText() }).collect<List<String>, Any>(Collectors.toList()),
+            init)
+    baseType = (et)
+    return et
+override fun clone(): EnumerationTypeDeclaration {
+    val etd = EnumerationTypeDeclaration()
+    etd.allowedValues = ArrayList(allowedValues)
+    etd.counter = counter
+    etd.baseType = baseType
+    etd.baseTypeName = baseTypeName
+    etd.values = ArrayList(values)
+    etd.typeName = typeName
+    return etd
+}
+*/
 
     fun setInt(value: Literal) {
         val v = value.asValue() as VAnyInt
@@ -964,16 +972,17 @@ class PointerTypeDeclaration(
     }*/
 }
 
-class ReferenceSpecification(
+class ReferenceTypeDeclaration(
         override var name: String = "<empty>",
-        override var baseType: RefTo<AnyDt> = RefTo()) : TypeDeclaration, Top() {
-    var refTo: RefTo<AnyDt> = RefTo<AnyDt>()
-    override var initialization: Initialization? = null
+        var refTo: SimpleTypeDeclaration = SimpleTypeDeclaration(),
+        override var baseType: RefTo<AnyDt> = refTo.baseType)
+    : TypeDeclaration, Top() {
+    override var initialization: Literal? = null
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-    /* override fun clone(): ReferenceSpecification {
-        val rs = ReferenceSpecification()
+    /* override fun clone(): ReferenceTypeDeclaration {
+        val rs = ReferenceTypeDeclaration()
         rs.refTo = refTo
         rs.baseType = baseType
         return rs
@@ -1011,7 +1020,7 @@ data class StructureInitialization(
     : Initialization() {
 
     constructor(initEntries: List<Map.Entry<String, Initialization>>) : this() {
-        initEntries.forEach { entry -> addField(entry.key, entry.value)}
+        initEntries.forEach { entry -> addField(entry.key, entry.value) }
     }
 
     fun addField(s: String, init: Initialization) {
@@ -1034,40 +1043,8 @@ data class StructureInitialization(
     }*/
 }
 
-class IdentifierInitializer : Initialization {
-    private var enumType: EnumerateType? = null
-    private var value: String? = null
-
-
-    constructor() {}
-
-
-    constructor(value: String) {
-        this.value = value
-    }
-
-
-    fun getEnumType(): EnumerateType? {
-        return enumType
-    }
-
-
-    fun setEnumType(enumType: EnumerateType?): IdentifierInitializer {
-        this.enumType = enumType
-        return this
-    }
-
-
-    fun getValue(): String? {
-        return value
-    }
-
-
-    fun setValue(value: String): IdentifierInitializer {
-        this.value = value
-        return this
-    }
-
+class IdentifierInitializer(var enumType: EnumerateType? = null,
+                            var value: String? = null) : Initialization() {
 
     @Throws(VariableNotDefinedException::class, TypeConformityException::class)
     override fun dataType(localScope: Scope): AnyDt {
@@ -1079,7 +1056,6 @@ class IdentifierInitializer : Initialization {
         return IdentifierInitializer(value).setEnumType(enumType)
     }
     */
-
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
@@ -1169,18 +1145,17 @@ interface Invocable : Identifiable {
 }
 
 class Literal : Initialization {
-
-    private val dataType = RefTo<AnyDt>()
-    private var dataTypeExplicit: Boolean = false
-    private var token: Token? = null
+    val dataType = RefTo<AnyDt>()
+    var dataTypeExplicit: Boolean = false
+    var token: Token? = null
     // for integers only
-    private var signed: Boolean = false
+    var signed: Boolean = false
 
 
     val textValue: String?
         get() {
-            val s = edu.kit.iti.formal.automation.sfclang.Utils.split(text)
-            return s.value().orElse(null)
+            val s = split(text)
+            return s.value
         }
 
     val dataTypeName: String?
@@ -1219,38 +1194,35 @@ class Literal : Initialization {
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-    fun asValue(): Value<*, *> {
-        return asValue(ValueTransformation(this))
-    }
+    fun asValue(): Value<*, *>? = asValue(ValueTransformation(this))
 
-    private fun asValue(transformer: DataTypeVisitor<Value<*, *>>): Value<*, *> {
-        if (dataType.obj == null) {
-            throw IllegalStateException(
-                    "no identified data type. given data type name " + dataType.identifier!!)
-        }
-        return dataType.obj!!.accept(transformer)
-    }
+    private fun asValue(transformer: DataTypeVisitor<Value<*, *>>): Value<*, *>? =
+            if (dataType.obj == null)
+                throw IllegalStateException(
+                        "no identified data type. given data type name " + dataType.identifier!!)
+            else
+                dataType.obj!!.accept(transformer)
 
-    /*
-    override fun clone(): Literal {
-        val l = Literal(dataTypeName, getToken())
-        l.dataTypeExplicit = dataTypeExplicit
-        l.signed = signed
-        l.dataType.setIdentifier(dataType.identifier)
-        l.dataType.setIdentifiedObject(dataType.obj)
-        return l
-    }*/
+/*
+override fun clone(): Literal {
+    val l = Literal(dataTypeName, getToken())
+    l.dataTypeExplicit = dataTypeExplicit
+    l.signed = signed
+    l.dataType.setIdentifier(dataType.identifier)
+    l.dataType.setIdentifiedObject(dataType.obj)
+    return l
+}*/
 
     companion object {
         val FALSE = Literal(AnyBit.BOOL, "FALSE")
         val TRUE = Literal(AnyBit.BOOL, "TRUE")
 
         fun integer(token: Token, signed: Boolean): Literal {
-            val l = Literal(DataTypes.ANY_INT, token)
-            val s = edu.kit.iti.formal.automation.sfclang.Utils.split(token.text)
-            if (s.prefix().isPresent) {
+            val l = Literal(ANY_INT, token)
+            val s = split(token.text)
+            if (s.prefix != null) {
                 l.dataTypeExplicit = true
-                l.dataType.obj = DataTypes.getDataType(s.prefix().get())
+                l.dataType.obj = DataTypes.getDataType(s.prefix)
             }
             l.signed = signed
             return l
@@ -1268,19 +1240,19 @@ class Literal : Initialization {
 
         fun word(symbol: Token): Literal {
             val s = symbol.text
-            val first = edu.kit.iti.formal.automation.sfclang.Utils.split(s)
+            val first = split(s)
 
-            if ("TRUE".equals(first.value().get(), ignoreCase = true))
+            if ("TRUE".equals(first.value, ignoreCase = true))
                 return bool(symbol)
-            if ("FALSE".equals(first.value().get(), ignoreCase = true))
+            if ("FALSE".equals(first.value, ignoreCase = true))
                 return bool(symbol)
 
 
             var dataType: AnyBit? = null
-            if (first.prefix().isPresent) {
+            if (first.prefix != null) {
                 dataType = AnyBit.DATATYPES
                         .stream()
-                        .filter { a -> a.name.equals(first.prefix().get(), ignoreCase = true) }
+                        .filter { a -> a.name.equals(first.prefix, ignoreCase = true) }
                         .findAny()
                         .get()
 
@@ -1293,7 +1265,7 @@ class Literal : Initialization {
         }
 
         fun string(symbol: Token, b: Boolean): Literal {
-            return Literal(if (b) IECString.STRING_16BIT else IECString.STRING_8BIT, symbol)
+            return Literal(if (b) IECString.WSTRING else IECString.STRING, symbol)
 
         }
 
@@ -1321,7 +1293,7 @@ class Literal : Initialization {
         }
 
         fun ref_null(symbol: Token): Literal {
-            return Literal(AnyReference.ANY_REF, symbol)
+            return Literal(ReferenceDt.ANY_REF, symbol)
         }
     }
 }
@@ -1669,6 +1641,9 @@ class VariableDeclaration(
             return vd
         }
     */
+
+    override fun clone() = super.clone() as VariableDeclaration
+
     class FlagCounter {
         private var internal = 1
         fun peek(): Int {
@@ -1742,13 +1717,12 @@ data class Range(val start: Literal, val stop: Literal) : Cloneable<Range> {
     }*/
 }
 
-enum class AccessSpecifier {
-    PUBLIC, INTERNAL, PROTECTED, PRIVATE;
+enum class AccessSpecifier(val flag: Int) {
+    PUBLIC(VariableDeclaration.PUBLIC), INTERNAL(VariableDeclaration.INTERNAL),
+    PROTECTED(VariableDeclaration.PRIVATE), PRIVATE(VariableDeclaration.PUBLIC);
 
     companion object {
-        fun defaultAccessSpecifier(): AccessSpecifier {
-            return PROTECTED
-        }
+        fun defaultAccessSpecifier() = PROTECTED
     }
 }
 
@@ -1875,7 +1849,7 @@ data class SFCStep(var name: String = "<empty>") : Top() {
 
     data class AssociatedAction(
             var qualifier: SFCActionQualifier? = null,
-            var actionName: String? = null) {
+            var actionName: String = "<empty>") {
         /*fun copy(): AssociatedAction {
             val aa = AssociatedAction()
             aa.actionName = this.actionName
@@ -1926,8 +1900,7 @@ class SFCTransition : Top() {
     }
 }
 
-class SFCNetwork : Top() {
-    var steps: List<SFCStep> = ArrayList()
+class SFCNetwork(var steps: MutableList<SFCStep> = ArrayList()) : Top() {
 
     val initialStep: SFCStep?
         get() = steps.stream().filter({ it.isInitial }).findFirst().orElse(null)
@@ -1944,7 +1917,7 @@ class SFCNetwork : Top() {
     }
 
     fun getStep(text: String): Optional<SFCStep> {
-        return steps.stream().filter { s -> s.name!!.equals(text, ignoreCase = true) }.findAny()
+        return steps.stream().filter { s -> s.name.equals(text, ignoreCase = true) }.findAny()
     }
 }
 

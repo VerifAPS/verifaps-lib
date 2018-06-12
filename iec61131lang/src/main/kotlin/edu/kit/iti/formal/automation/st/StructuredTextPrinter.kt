@@ -29,16 +29,10 @@ import edu.kit.iti.formal.automation.datatypes.values.Value
 import edu.kit.iti.formal.automation.operators.Operator
 import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.sfclang.ast.*
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.CodeWriter
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
-import edu.kit.iti.formal.automation.visitors.Visitable
-import lombok.Getter
-import lombok.Setter
-
-import java.util.ArrayList
-import java.util.stream.Collectors
+import java.util.*
 
 /**
  * Created by weigla on 15.06.2014.
@@ -47,56 +41,23 @@ import java.util.stream.Collectors
  * @version $Id: $Id
  */
 class StructuredTextPrinter
-/**
- *
- * Constructor for StructuredTextPrinter.
- *
- * @param sl_smv a [edu.kit.iti.formal.automation.st.StructuredTextPrinter.StringLiterals] object.
- */
-@JvmOverloads constructor(private val literals: StringLiterals = SL_ST) : DefaultVisitor<Any>() {
+@JvmOverloads constructor(private val literals: StringLiterals = SL_ST) : DefaultVisitor<Unit>() {
     var sb = CodeWriter()
-    @Getter
-    @Setter
     var bodyPrinting = BodyPrinting.ST
-        set(bodyPrinting) {
-            field = this.bodyPrinting
-        }
-    /**
-     *
-     * isPrintComments.
-     *
-     * @return a boolean.
-     */
-    /**
-     *
-     * Setter for the field `printComments`.
-     *
-     * @param printComments a boolean.
-     */
-    @Getter
-    @Setter
     var isPrintComments: Boolean = false
 
-    /**
-     *
-     * getString.
-     *
-     * @return a [java.lang.String] object.
-     */
     val string: String
         get() = sb.toString()
 
-    /**
-     * {@inheritDoc}
-     */
-    override fun defaultVisit(visitable: Visitable): Any? {
-        throw IllegalArgumentException("not implemented: " + visitable.javaClass)
+
+    override fun defaultVisit(visitable: Any?): Unit? {
+        throw IllegalArgumentException("not implemented: " + visitable!!::class.java)
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(exitStatement: ExitStatement): Any? {
+    override fun visit(exitStatement: ExitStatement): Unit? {
         sb.append(literals.exit()).append(literals.statement_separator())
         return null
     }
@@ -104,22 +65,22 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(integerCondition: CaseCondition.IntegerCondition): Any? {
+    override fun visit(integerCondition: CaseCondition.IntegerCondition): Unit? {
         sb.appendIdent()
-        integerCondition.value!!.accept<Any>(this)
+        integerCondition.value!!.accept(this)
         return null
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(enumeration: CaseCondition.Enumeration): Any? {
+    override fun visit(enumeration: CaseCondition.Enumeration): Unit? {
         if (enumeration.start == enumeration.stop) {
-            enumeration.start.accept<Any>(this)
+            enumeration.start.accept(this)
         } else {
-            enumeration.start.accept<Any>(this)
+            enumeration.start.accept(this)
             sb.append("..")
-            enumeration.stop!!.accept<Any>(this)
+            enumeration.stop!!.accept(this)
         }
 
         return null
@@ -128,11 +89,11 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(binaryExpression: BinaryExpression): Any? {
+    override fun visit(binaryExpression: BinaryExpression): Unit? {
         sb.append('(')
-        binaryExpression.leftExpr!!.accept<Any>(this)
+        binaryExpression.leftExpr!!.accept(this)
         sb.append(" ").append(literals.operator(binaryExpression.operator)).append(" ")
-        binaryExpression.rightExpr!!.accept<Any>(this)
+        binaryExpression.rightExpr!!.accept(this)
         sb.append(')')
         return null
     }
@@ -140,14 +101,14 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(assignStatement: AssignmentStatement): Any? {
+    override fun visit(assignStatement: AssignmentStatement): Unit? {
         sb.nl()
-        assignStatement.location.accept<Any>(this)
+        assignStatement.location.accept(this)
         if (assignStatement.isAssignmentAttempt)
             sb.append(literals.assignmentAttempt())
         else
             sb.append(literals.assign())
-        assignStatement.expression.accept<Any>(this)
+        assignStatement.expression.accept(this)
         sb.append(";")
         return null
     }
@@ -155,15 +116,15 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(configurationDeclaration: ConfigurationDeclaration): Any? {
+    override fun visit(configurationDeclaration: ConfigurationDeclaration): Unit? {
         return null
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration): Any? {
-        sb.nl().append(enumerationTypeDeclaration.typeName).append(" : ")
+    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration): Unit? {
+        sb.nl().append(enumerationTypeDeclaration.name).append(" : ")
 
         sb.append("(")
 
@@ -176,21 +137,21 @@ class StructuredTextPrinter
         return null
     }
 
-    override fun visit(init: IdentifierInitializer): Any? {
-        sb.append(init.value)
+    override fun visit(init: IdentifierInitializer): Unit? {
+        sb.append(init.value!!)
         return null
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(repeatStatement: RepeatStatement): Any? {
+    override fun visit(repeatStatement: RepeatStatement): Unit? {
         sb.nl()
         sb.append("REPEAT").increaseIndent()
         repeatStatement.statements.accept(this)
 
         sb.decreaseIndent().nl().append("UNTIL ")
-        repeatStatement.condition.accept<Any>(this)
+        repeatStatement.condition.accept(this)
         sb.append("END_REPEAT")
         return null
     }
@@ -198,10 +159,10 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(whileStatement: WhileStatement): Any? {
+    override fun visit(whileStatement: WhileStatement): Unit? {
         sb.nl()
         sb.append("WHILE ")
-        whileStatement.condition.accept<Any>(this)
+        whileStatement.condition.accept(this)
         sb.append(" DO ").increaseIndent()
         whileStatement.statements.accept(this)
         sb.decreaseIndent().nl()
@@ -212,16 +173,16 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(unaryExpression: UnaryExpression): Any? {
-        sb.append(literals.operator(unaryExpression.operator)).append(" ")
-        unaryExpression.expression.accept<Any>(this)
+    override fun visit(unaryExpression: UnaryExpression): Unit? {
+        sb.append(literals.operator(unaryExpression.operator)!!).append(" ")
+        unaryExpression.expression.accept(this)
         return null
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(typeDeclarations: TypeDeclarations): Any? {
+    override fun visit(typeDeclarations: TypeDeclarations): Unit? {
 
         if (typeDeclarations.size > 0) {
             sb.append("TYPE ").increaseIndent()
@@ -236,14 +197,14 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(caseStatement: CaseStatement): Any? {
+    override fun visit(caseStatement: CaseStatement): Unit? {
 
         sb.nl().append("CASE ")
-        caseStatement.expression!!.accept<Any>(this)
+        caseStatement.expression!!.accept(this)
         sb.append(" OF ").increaseIndent()
 
         for (c in caseStatement.cases) {
-            c.accept<Any>(this)
+            c.accept(this)
             sb.nl()
         }
 
@@ -256,7 +217,7 @@ class StructuredTextPrinter
         return null
     }
 
-    override fun visit(symbolicReference: SymbolicReference): Any? {
+    override fun visit(symbolicReference: SymbolicReference): Unit? {
         sb.append(symbolicReference.identifier)
 
         for (i in 0 until symbolicReference.derefCount)
@@ -265,7 +226,7 @@ class StructuredTextPrinter
         if (symbolicReference.subscripts != null && !symbolicReference.subscripts!!.isEmpty()) {
             sb.append('[')
             for (expr in symbolicReference.subscripts!!) {
-                expr.accept<Any>(this)
+                expr.accept(this)
                 sb.append(',')
             }
             sb.deleteLast()
@@ -274,7 +235,7 @@ class StructuredTextPrinter
 
         if (symbolicReference.sub != null) {
             sb.append(".")
-            symbolicReference.sub!!.accept<Any>(this)
+            symbolicReference.sub!!.accept(this)
         }
 
         return null
@@ -283,12 +244,12 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(statements: StatementList): Any? {
+    override fun visit(statements: StatementList): Unit? {
         for (stmt in statements) {
             if (stmt == null) {
                 sb.append("{*ERROR: stmt null*}")
             } else {
-                stmt.accept<Any>(this)
+                stmt.accept(this)
             }
         }
         return null
@@ -297,8 +258,8 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(pd: ProgramDeclaration): Any? {
-        sb.append("PROGRAM ").append(pd.programName).increaseIndent()
+    override fun visit(pd: ProgramDeclaration): Unit? {
+        sb.append("PROGRAM ").append(pd.name).increaseIndent()
         pd.scope.accept(this)
 
         sb.nl()
@@ -329,9 +290,9 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(expressions: ExpressionList): Any? {
+    override fun visit(expressions: ExpressionList): Unit? {
         for (e in expressions) {
-            e.accept<Any>(this)
+            e.accept(this)
             sb.append(", ")
         }
         sb.deleteLast(2)
@@ -341,20 +302,20 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(invocation: Invocation): Any? {
+    override fun visit(invocation: Invocation): Unit? {
         sb.append(invocation.calleeName).append("(")
 
         var params = false
         for (entry in invocation.parameters) {
             if (entry.name != null) {
-                sb.append(entry.name)
+                sb.append(entry.name!!)
                 if (entry.isOutput)
                     sb.append(" => ")
                 else
                     sb.append(" := ")
             }
 
-            entry.expression!!.accept<Any>(this)
+            entry.expression!!.accept(this)
             sb.append(", ")
             params = true
         }
@@ -368,13 +329,13 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(forStatement: ForStatement): Any? {
+    override fun visit(forStatement: ForStatement): Unit? {
         sb.nl()
         sb.append("FOR ").append(forStatement.variable)
         sb.append(" := ")
-        forStatement.start!!.accept<Any>(this)
+        forStatement.start!!.accept(this)
         sb.append(" TO ")
-        forStatement.stop!!.accept<Any>(this)
+        forStatement.stop!!.accept(this)
         sb.append(" DO ").increaseIndent()
         forStatement.statements.accept(this)
         sb.decreaseIndent().nl()
@@ -385,7 +346,7 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration): Any? {
+    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration): Unit? {
         sb.append("FUNCTION_BLOCK ")
 
         /*
@@ -427,18 +388,16 @@ class StructuredTextPrinter
         return null
     }
 
-    override fun visit(interfaceDeclaration: InterfaceDeclaration): Any? {
+    override fun visit(interfaceDeclaration: InterfaceDeclaration): Unit? {
         sb.append("INTERFACE ").append(interfaceDeclaration.name)
 
-        val extendsInterfaces = interfaceDeclaration.interfaces.parallelStream()
-                .map<String>(Function<RefTo<InterfaceDeclaration>, String> { it.getIdentifier() })
-                .collect<String, *>(Collectors.joining(", "))
+        val extendsInterfaces = interfaceDeclaration.interfaces.map { it.identifier }
         if (!extendsInterfaces.isEmpty())
             sb.append(" EXTENDS ").append(extendsInterfaces)
 
         sb.increaseIndent().nl()
 
-        interfaceDeclaration.scope.accept(this)
+        //interfaceDeclaration.scope.accept(this)
 
         interfaceDeclaration.methods.forEach { m -> m.accept(this) }
 
@@ -446,12 +405,12 @@ class StructuredTextPrinter
         return null
     }
 
-    override fun visit(clazz: ClassDeclaration): Any? {
+    override fun visit(clazz: ClassDeclaration): Unit? {
         sb.append("CLASS ")
 
-        if (clazz.isFinal_)
+        if (clazz.isFinal)
             sb.append("FINAL ")
-        if (clazz.isAbstract_)
+        if (clazz.isAbstract)
             sb.append("ABSTRACT ")
 
         sb.append(clazz.name)
@@ -460,9 +419,7 @@ class StructuredTextPrinter
         if (parent != null)
             sb.append(" EXTENDS ").append(parent)
 
-        val interfaces = clazz.interfaces.stream()
-                .map { i -> i.identifier }
-                .collect<String, *>(Collectors.joining(", "))
+        val interfaces = clazz.interfaces.map { it.identifier }
         if (!interfaces.isEmpty())
             sb.append(" IMPLEMENTS ").append(interfaces)
 
@@ -476,12 +433,12 @@ class StructuredTextPrinter
         return null
     }
 
-    override fun visit(method: MethodDeclaration): Any? {
+    override fun visit(method: MethodDeclaration): Unit? {
         sb.append("METHOD ")
 
-        if (method.isFinal_)
+        if (method.isFinal)
             sb.append("FINAL ")
-        if (method.isAbstract_)
+        if (method.isAbstract)
             sb.append("ABSTRACT ")
         if (method.isOverride)
             sb.append("OVERRIDE ")
@@ -504,10 +461,10 @@ class StructuredTextPrinter
         return null
     }
 
-    override fun visit(functionDeclaration: FunctionDeclaration): Any? {
+    override fun visit(functionDeclaration: FunctionDeclaration): Unit? {
         sb.append("FUNCTION ").append(functionDeclaration.name)
 
-        val returnType = functionDeclaration.returnTypeName
+        val returnType = functionDeclaration.returnType.identifier
         if (!(returnType == null || returnType.isEmpty()))
             sb.append(" : $returnType")
 
@@ -523,21 +480,21 @@ class StructuredTextPrinter
         return null
     }
 
-    override fun visit(globalVariableListDeclaration: GlobalVariableListDeclaration): Any? {
+    override fun visit(globalVariableListDeclaration: GlobalVariableListDeclaration): Unit? {
         globalVariableListDeclaration.scope.accept(this)
         sb.nl()
         return null
     }
 
-    override fun visit(referenceSpecification: ReferenceSpecification): Any? {
+    override fun visit(referenceSpecification: ReferenceTypeDeclaration): Unit? {
         sb.append("REF_TO ")
         referenceSpecification.refTo!!.accept(this)
         return null
     }
 
-    override fun visit(referenceValue: ReferenceValue): Any? {
+    override fun visit(referenceValue: ReferenceValue): Unit? {
         sb.append("REF(")
-        referenceValue.referenceTo.accept<Any>(this)
+        referenceValue.referenceTo.accept(this)
         sb.append(")")
         return null
     }
@@ -545,7 +502,7 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(returnStatement: ReturnStatement): Any? {
+    override fun visit(returnStatement: ReturnStatement): Unit? {
         sb.appendIdent()
         sb.append("RETURN;")
         return null
@@ -554,7 +511,7 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(ifStatement: IfStatement): Any? {
+    override fun visit(ifStatement: IfStatement): Unit? {
         for (i in 0 until ifStatement.conditionalBranches.size) {
             sb.nl()
 
@@ -563,7 +520,7 @@ class StructuredTextPrinter
             else
                 sb.append("ELSEIF ")
 
-            ifStatement.conditionalBranches[i].condition.accept<Any>(this)
+            ifStatement.conditionalBranches[i].condition.accept(this)
 
             sb.append(" THEN").increaseIndent()
             ifStatement.conditionalBranches[i].statements.accept(this)
@@ -579,7 +536,7 @@ class StructuredTextPrinter
         return null
     }
 
-    override fun visit(ad: ActionDeclaration): Any? {
+    override fun visit(ad: ActionDeclaration): Unit? {
         sb.nl().append("ACTION ").append(ad.name).increaseIndent()
         printBody(ad.stBody, ad.sfcBody)
         sb.decreaseIndent().nl().append("END_ACTION")
@@ -589,19 +546,19 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(fbc: InvocationStatement): Any? {
+    override fun visit(fbc: InvocationStatement): Unit? {
         sb.nl()
-        fbc.invocation.accept<Any>(this)
+        fbc.invocation.accept(this)
         return null
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(aCase: CaseStatement.Case): Any? {
+    override fun visit(aCase: Case): Unit? {
         sb.nl()
         for (cc in aCase.conditions) {
-            cc.accept<Any>(this)
+            cc.accept(this)
             sb.append(", ")
         }
         sb.deleteLast(2)
@@ -615,63 +572,63 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration<*>): Any? {
-        sb.append(simpleTypeDeclaration.baseTypeName)
+    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration): Unit? {
+        sb.append(simpleTypeDeclaration.name)
         if (simpleTypeDeclaration.initialization != null) {
             sb.append(" := ")
-            simpleTypeDeclaration.initialization!!.accept<Any>(this)
+            simpleTypeDeclaration.initialization!!.accept(this)
         }
         return null
     }
 
-    override fun visit(structureTypeDeclaration: StructureTypeDeclaration): Any? {
-        sb.append(structureTypeDeclaration.typeName)
+    override fun visit(structureTypeDeclaration: StructureTypeDeclaration): Unit? {
+        sb.append(structureTypeDeclaration.name)
         sb.append(": STRUCT").nl().increaseIndent()
-        structureTypeDeclaration.fields.values.forEach { it ->
+        structureTypeDeclaration.fields.forEach { it ->
             sb.nl()
-            it.accept<Any>(this)
+            it.accept(this)
         }
         sb.decreaseIndent().append("END_STRUCT;").nl()
         return null
     }
 
-    override fun visit(subRangeTypeDeclaration: SubRangeTypeDeclaration): Any? {
-        sb.append(subRangeTypeDeclaration.typeName)
-        sb.append(": ").append(subRangeTypeDeclaration.baseTypeName)
+    override fun visit(subRangeTypeDeclaration: SubRangeTypeDeclaration): Unit? {
+        sb.append(subRangeTypeDeclaration.name)
+        sb.append(": ").append(subRangeTypeDeclaration.baseType.identifier!!)
         sb.append("(")
-        subRangeTypeDeclaration.range!!.start.accept<Any>(this)
+        subRangeTypeDeclaration.range!!.start.accept(this)
         sb.append(" .. ")
-        subRangeTypeDeclaration.range!!.stop.accept<Any>(this)
+        subRangeTypeDeclaration.range!!.stop.accept(this)
         sb.append(")")
         if (subRangeTypeDeclaration.initialization != null) {
             sb.append(" := ")
-            subRangeTypeDeclaration.initialization!!.accept<Any>(this)
+            subRangeTypeDeclaration.initialization!!.accept(this)
         }
         sb.append(";")
         return null
     }
 
-    private fun variableDataType(vd: VariableDeclaration<Initialization>) {
-        if (vd.dataType is IECArray) {
+    private fun variableDataType(vd: VariableDeclaration) {
+        if (vd.dataType.obj is IECArray) {
             val dataType = vd.dataType as IECArray
             sb.append(" ARRAY[")
             for (range in dataType.ranges) {
-                range.start.accept<Any>(this)
+                range.start.accept(this)
                 sb.append("..")
-                range.stop.accept<Any>(this)
+                range.stop.accept(this)
                 sb.append(",")
             }
             sb.deleteLast()
             sb.append("] OF ").append(dataType.fieldType!!.name)
         } else {
-            sb.append(vd.dataTypeName)
+            sb.append(vd.dataType.identifier!!)
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(commentStatement: CommentStatement): Any? {
+    override fun visit(commentStatement: CommentStatement): Unit? {
         if (isPrintComments) {
             sb.nl()
             sb.append(literals.comment_open())
@@ -685,18 +642,18 @@ class StructuredTextPrinter
     /**
      * {@inheritDoc}
      */
-    override fun visit(literal: Literal): Any? {
+    override fun visit(literal: Literal): Unit? {
         if (literal.dataTypeName != null && !literal.dataTypeName!!.isEmpty())
-            sb.append(literal.dataTypeName).append('#')
-        sb.append(literal.textValue)
+            sb.append(literal.dataType.identifier!!).append('#')
+        sb.append(literal.textValue!!)
         return null
 
     }
 
-    override fun visit(initializations: ArrayInitialization): Any? {
+    override fun visit(initializations: ArrayInitialization): Unit? {
         sb.append("[")
-        initializations.forEach { i ->
-            i.accept<Any>(this)
+        initializations.initValues.forEach {
+            it.accept(this)
             sb.append(", ")
         }
         // Added an extra ", "
@@ -705,14 +662,15 @@ class StructuredTextPrinter
         return null
     }
 
-    override fun visit(localScope: Scope): Any? {
-        val variables = localScope.stream().collect<List<VariableDeclaration<Initialization>>, Any>(Collectors.toList())
-        val varType = HashMultimap.create<Int, VariableDeclaration<Initialization>>(3, variables.size / 3 + 1)
+    override fun visit(localScope: Scope): Unit? {
+        val variables = LookupList(localScope.variables)
+        val varType = HashMultimap.create<Int, VariableDeclaration>(3, variables.size / 3 + 1)
         variables.forEach { v -> varType.put(v.type, v) }
 
         for (type in varType.keySet()) {
             val vars = ArrayList(varType.get(type!!))
-            vars.sort(Comparator<VariableDeclaration<Initialization>> { obj, o -> obj.compareTo(o) })
+            vars.sort()
+            //By { a, b -> a.compareTo(b) }
             sb.nl().append("VAR")
 
             if (VariableDeclaration.INPUT and type >= VariableDeclaration.INOUT) {
@@ -741,7 +699,7 @@ class StructuredTextPrinter
                 variableDataType(vd)
                 if (vd.init != null) {
                     sb.append(" := ")
-                    vd.init!!.accept<Any>(this)
+                    vd.init!!.accept(this)
                 }
                 sb.append(";")
             }
@@ -751,11 +709,11 @@ class StructuredTextPrinter
         return null
     }
 
-    override fun visit(structureInitialization: StructureInitialization): Any? {
+    override fun visit(structureInitialization: StructureInitialization): Unit? {
         sb.append("(")
         structureInitialization.initValues.entries.stream().forEach { initialization ->
             sb.append(initialization.key).append(" := ")
-            initialization.value.accept<Any>(this)
+            initialization.value.accept(this)
             sb.append(", ")
         }
         // Added an extra ", "
@@ -764,7 +722,7 @@ class StructuredTextPrinter
         return null
     }
 
-    override fun visit(sfcStep: SFCStep): Any? {
+    override fun visit(sfcStep: SFCStep): Unit? {
         sb.nl().append(if (sfcStep.isInitial) "INITIAL_STEP " else "STEP ")
         sb.append(sfcStep.name).append(":").increaseIndent()
         sfcStep.events.forEach { aa -> visit(aa) }
@@ -774,43 +732,33 @@ class StructuredTextPrinter
     }
 
     private fun visit(aa: SFCStep.AssociatedAction) {
-        sb.nl().append(aa.actionName).append('(').append(aa.qualifier!!.qualifier!!.symbol)
+        sb.nl().append(aa.actionName!!).append('(').append(aa.qualifier!!.qualifier!!.symbol)
         if (aa.qualifier!!.qualifier!!.hasTime) {
             sb.append(", ")
-            aa.qualifier!!.time!!.accept<Any>(this)
+            aa.qualifier!!.time!!.accept(this)
         }
         sb.append(");")
     }
 
-    override fun visit(sfcNetwork: SFCNetwork): Any? {
+    override fun visit(sfcNetwork: SFCNetwork): Unit? {
         val seq = ArrayList(sfcNetwork.steps)
-        seq.sort { o1, o2 ->
-            if (o1.isInitial)
-                return@seq.sort - 1
-            if (o2.isInitial)
-                return@seq.sort 1
-            o1.name!!.compareTo(o2.name!!)
-        }
-
+        seq.sortWith(compareBy(SFCStep::isInitial).thenBy(SFCStep::name))
         seq.forEach { a -> a.accept(this) }
-
-
         sfcNetwork.steps.stream()
                 .flatMap { s -> s.incoming.stream() }
                 .forEachOrdered { t -> t.accept(this) }
-
         return null
     }
 
-    override fun visit(sfc: SFCImplementation): Any? {
+    override fun visit(sfc: SFCImplementation): Unit? {
         sfc.actions.forEach { a -> a.accept(this) }
         sfc.networks.forEach { n -> n.accept(this) }
         return null
     }
 
-    override fun visit(transition: SFCTransition): Any? {
-        val f = transition.from!!.stream().map<String>(Function<SFCStep, String> { it.getName() }).collect<String, *>(Collectors.joining(","))
-        val t = transition.to!!.stream().map<String>(Function<SFCStep, String> { it.getName() }).collect<String, *>(Collectors.joining(","))
+    override fun visit(transition: SFCTransition): Unit? {
+        val f = transition.from!!.map { it.name }.reduce { a, b -> "$a, $b" }
+        val t = transition.to!!.map { it.name }.reduce { a, b -> "$a, $b" }
 
         sb.nl().append("TRANSITION FROM ")
 
@@ -827,7 +775,7 @@ class StructuredTextPrinter
         }
         sb.append(" := ")
 
-        transition.guard!!.accept<Any>(this)
+        transition.guard!!.accept(this)
         sb.append(";").append(" END_TRANSITION")
         return null
     }
@@ -856,24 +804,13 @@ class StructuredTextPrinter
         sb = CodeWriter()
     }
 
-    /**
-     *
-     * setCodeWriter.
-     *
-     * @param cw a [edu.kit.iti.formal.automation.st.util.CodeWriter] object.
-     */
-    fun setCodeWriter(cw: CodeWriter) {
-        this.sb = cw
-    }
-
     enum class BodyPrinting {
         ST, SFC
     }
 
     open class StringLiterals {
-
         open fun operator(operator: Operator?): String {
-            return operator!!.symbol()
+            return operator!!.symbol
         }
 
         fun assign(): String {
@@ -893,7 +830,7 @@ class StructuredTextPrinter
         }
 
         open fun operator(operator: UnaryOperator): String? {
-            return operator.symbol()
+            return operator.symbol
         }
 
         fun comment_close(): String {
@@ -905,11 +842,10 @@ class StructuredTextPrinter
         }
 
         fun repr(sv: Value<*, *>): String {
-            return sv.dataType!!.repr(sv.value)
+            return sv.dataType.repr(sv.value!!)
         }
 
         companion object {
-
             fun create(): StringLiterals {
                 return StringLiterals()
             }
@@ -935,7 +871,7 @@ class StructuredTextPrinter
                 return "<<unknown ue operator>>"
             }
 
-            override fun operator(operator: Operator): String {
+            override fun operator(operator: Operator?): String {
                 /*switch (operator) {
                 case AND:
                     return "&";
@@ -946,7 +882,7 @@ class StructuredTextPrinter
                 case NOT_EQUALS:
                     return "!=";
             }*/
-                return operator.symbol()
+                return operator!!.symbol
             }
 
             /*
@@ -972,16 +908,10 @@ class StructuredTextPrinter
         */
         }
 
-        fun print(astNode: Top<*>): String {
+        fun print(astNode: Top): String {
             val p = StructuredTextPrinter()
             astNode.accept(p)
             return p.string
         }
     }
-
-
 }
-/**
- *
- * Constructor for StructuredTextPrinter.
- */

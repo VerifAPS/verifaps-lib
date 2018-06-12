@@ -23,12 +23,9 @@ package edu.kit.iti.formal.automation.scope
  */
 
 import edu.kit.iti.formal.automation.datatypes.*
-
-import java.util.TreeMap
-
 import edu.kit.iti.formal.automation.datatypes.AnyBit.*
-import edu.kit.iti.formal.automation.datatypes.IECString.STRING_16BIT
-import edu.kit.iti.formal.automation.datatypes.IECString.STRING_8BIT
+import edu.kit.iti.formal.automation.st.Cloneable
+import java.util.*
 
 /**
  * Stores the available user defined/built-in datatypes
@@ -37,22 +34,15 @@ import edu.kit.iti.formal.automation.datatypes.IECString.STRING_8BIT
  * @author weigl
  * @version $Id: $Id
  */
-class TypeScope private constructor() : TreeMap<String, AnyDt>() {
+class TypeScope private constructor(private val impl: TreeMap<String, AnyDt> = TreeMap())
+    : MutableMap<String, AnyDt> by impl, Cloneable<TypeScope> {
 
-    /**
-     *
-     * register.
-     *
-     * @param any a [edu.kit.iti.formal.automation.datatypes.AnyDt] object.
-     */
     fun register(vararg any: AnyDt) {
         for (a in any)
             put(a.name, a)
     }
 
-    fun register(name: String, type: AnyDt?) {
-        put(name, type)
-    }
+    fun register(name: String, type: AnyDt) = put(name, type)
 
     override fun clone(): TypeScope {
         val ts = TypeScope()
@@ -61,33 +51,20 @@ class TypeScope private constructor() : TreeMap<String, AnyDt>() {
     }
 
     companion object {
-
-        /**
-         *
-         * empty.
-         *
-         * @return a [edu.kit.iti.formal.automation.scope.TypeScope] object.
-         */
         fun empty(): TypeScope {
             return TypeScope()
         }
 
-        /**
-         *
-         * builtin.
-         *
-         * @return a [edu.kit.iti.formal.automation.scope.TypeScope] object.
-         */
         fun builtin(): TypeScope {
             val e = empty()
-            e.register(DataTypes.SINT, DataTypes.INT, DataTypes.LINT, DataTypes.DINT)
-            e.register(DataTypes.USINT, DataTypes.UINT, DataTypes.ULINT, DataTypes.UDINT)
+            e.register(SINT, INT, LINT, DINT)
+            e.register(USINT, UINT, ULINT, UDINT)
             e.register(BOOL, BYTE, LWORD, WORD, DWORD)
-            e.register(STRING_8BIT, STRING_16BIT)
+            e.register(IECString.WSTRING, IECString.STRING)
             e.register(AnyDate.TIME_OF_DAY, AnyDate.DATE_AND_TIME, AnyDate.DATE,
                     TimeType.TIME_TYPE)
             e.register(AnyReal.REAL, AnyReal.LREAL)
-            e.register("VOID", null)
+            e.register(AnyDt.VOID)
             return e
         }
     }

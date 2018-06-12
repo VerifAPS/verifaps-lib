@@ -22,23 +22,11 @@
 
 package edu.kit.iti.formal.automation.scope
 
-import edu.kit.iti.formal.automation.analysis.InstanceSets
-import edu.kit.iti.formal.automation.datatypes.ClassDataType
-import edu.kit.iti.formal.automation.oo.OOUtils
-import edu.kit.iti.formal.automation.st.ast.*
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.ToString
-
-import java.io.Serializable
-import java.util.*
-import java.util.stream.Collectors
-
-/**
+/*
  * Scope representing class and FB instances in the program being analyzed.
  *
  * @author Augusto Modanese
- */
+ *
 @ToString
 class InstanceScope(private val globalScope: Scope) : Serializable {
 
@@ -133,7 +121,7 @@ class InstanceScope(private val globalScope: Scope) : Serializable {
      * @param instanceClass the instance's class
      * @param instance      the instance to register
      */
-    fun registerClassInstance(variable: VariableDeclaration<Initialization>, instanceClass: ClassDeclaration,
+    fun registerClassInstance(variable: VariableDeclaration, instanceClass: ClassDeclaration,
                               instance: Instance) {
         classInstances[instanceClass].add(instance)
         OOUtils.getImplementedInterfaces(instanceClass).forEach { i -> interfaceInstances[i].add(instance) }
@@ -141,7 +129,7 @@ class InstanceScope(private val globalScope: Scope) : Serializable {
         instanceSets.addInstance(variable.parent!!, variable, instance)
     }
 
-    fun getInstances(variable: VariableDeclaration<Initialization>): Set<Instance> {
+    fun getInstances(variable: VariableDeclaration): Set<Instance> {
         return instanceSets.getInstances(variable.parent!!, variable)
     }
 
@@ -157,14 +145,15 @@ class InstanceScope(private val globalScope: Scope) : Serializable {
          */
         val parent: Instance? = null
 
-        val variableDeclaration: VariableDeclaration<Initialization>? = null
+        val variableDeclaration: VariableDeclaration? = null
 
         private var initialization: StructureInitialization? = null
 
-        constructor(parent: Instance, variableDeclaration: VariableDeclaration<Initialization>) : this(parent, variableDeclaration, variableDeclaration.init as StructureInitialization?) {
+        constructor(parent: Instance, variableDeclaration: VariableDeclaration) : this(parent, variableDeclaration, variableDeclaration.init as StructureInitialization?) {
             // Add initialization if none
             if (initialization == null)
                 initialization = StructureInitialization()
         }
     }
 }
+*/

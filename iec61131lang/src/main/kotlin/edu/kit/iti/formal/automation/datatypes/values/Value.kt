@@ -22,7 +22,9 @@ package edu.kit.iti.formal.automation.datatypes.values
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.AnyDt
+import edu.kit.iti.formal.automation.datatypes.*
+import java.math.BigDecimal
+import java.math.BigInteger
 
 /**
  * Created by weigl on 11.06.14.
@@ -33,3 +35,20 @@ import edu.kit.iti.formal.automation.datatypes.AnyDt
 data class Value<T : AnyDt, S>(
         val dataType: T, val value: S
 )
+
+typealias VAnyInt = Value<AnyInt, BigInteger>
+
+typealias VClass = Value<ClassDataType, Map<String, Value<*, *>>>
+typealias VAnyReal = Value<AnyReal, BigDecimal>
+typealias VAnyBit = Value<AnyBit, Bits>
+typealias VBool = Value<AnyBit.BOOL, Boolean>
+
+val TRUE = VBool(AnyBit.BOOL, true)
+val FALSE = VBool(AnyBit.BOOL, false)
+
+typealias VIECString = Value<IECString, String>
+typealias VDate = Value<AnyDate.DATE, DateData>
+typealias VTime = Value<TimeType, TimeData>
+typealias VDateAndTime = Value<AnyDate.DATE_AND_TIME, DateAndTimeData>
+typealias VAnyEnum = Value<EnumerateType, String>
+typealias VToD = Value<AnyDate.TIME_OF_DAY, TimeofDayData>

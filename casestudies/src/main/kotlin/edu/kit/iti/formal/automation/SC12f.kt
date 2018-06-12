@@ -3,15 +3,13 @@ package edu.kit.iti.formal.automation
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.sfclang.ast.ActionDeclaration
-import edu.kit.iti.formal.automation.sfclang.ast.SFC2ST
+import edu.kit.iti.formal.automation.sfclang.SFC2ST
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.automation.st.ast.TypeDeclarations
 import org.jdom2.JDOMException
-import java.io.BufferedWriter
 import java.io.File
 import java.io.IOException
-import java.util.*
 
 /**
  * @author Alexander Weigl

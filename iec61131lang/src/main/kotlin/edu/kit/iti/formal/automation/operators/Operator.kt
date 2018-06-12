@@ -38,6 +38,6 @@ import edu.kit.iti.formal.automation.datatypes.AnyDt
  */
 interface Operator {
     val expectedDataTypes: Array<AnyDt>
-    fun symbol(): String
+    val symbol: String
 }
 

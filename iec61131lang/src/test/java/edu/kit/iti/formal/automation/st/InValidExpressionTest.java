@@ -46,7 +46,7 @@ import static org.junit.Assert.assertTrue;
 public class InValidExpressionTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> setup() throws IOException {
-        return TestUtils.loadLines("/edu/kit/iti/formal/automation/st/expressions/invalid.txt");
+        return TestUtils.INSTANCE.loadLines("/edu/kit/iti/formal/automation/st/expressions/invalid.txt");
     }
 
     @Parameterized.Parameter

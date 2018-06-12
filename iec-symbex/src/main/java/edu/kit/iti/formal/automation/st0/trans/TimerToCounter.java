@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.st0.trans;
 
 import edu.kit.iti.formal.automation.datatypes.DataTypes;
 import edu.kit.iti.formal.automation.datatypes.TimeType;
-import edu.kit.iti.formal.automation.datatypes.values.TimeValue;
+import edu.kit.iti.formal.automation.datatypes.values.TimeData;
 import edu.kit.iti.formal.automation.datatypes.values.Value;
 import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor;
@@ -68,7 +68,7 @@ public class TimerToCounter extends AstMutableVisitor {
 
             int cycles = 0;
             if (vd.getInit() != null) {
-                Value<TimeType, TimeValue> val = ((Literal) vd.getInit()).asValue();
+                Value<TimeType, TimeData> val = ((Literal) vd.getInit()).asValue();
                 cycles = (int) (val.getValue().getMilliseconds() / cycleTime);
             } else {
                 cycles = 0;
@@ -90,7 +90,7 @@ public class TimerToCounter extends AstMutableVisitor {
     public Object visit(Literal literal) {
         if (literal.getDataType() == TimeType.Companion.getTIME_TYPE() ||
                 Objects.equals(literal.getDataTypeName(), TimeType.Companion.getTIME_TYPE().getName())) {
-            Value<TimeType, TimeValue> val = literal.asValue();
+            Value<TimeType, TimeData> val = literal.asValue();
             int cycles = (int) (val.getValue().getMilliseconds() / this.cycleTime);
             return Literal.Companion.integer(cycles);
         }

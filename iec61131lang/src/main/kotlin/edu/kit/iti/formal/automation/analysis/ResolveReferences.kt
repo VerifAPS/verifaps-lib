@@ -22,25 +22,13 @@
 
 package edu.kit.iti.formal.automation.analysis
 
-import edu.kit.iti.formal.automation.datatypes.*
-import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
-import edu.kit.iti.formal.automation.oo.OOUtils
-import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.st.util.AstVisitor
-import lombok.Data
-import lombok.EqualsAndHashCode
-import lombok.RequiredArgsConstructor
-
+/*weigl: bad coding style
 /**
  * Set identified object and its data type for every symbolic reference in code.
  *
  * @author Augusto Modanese
  */
-@Data
-@EqualsAndHashCode
-@RequiredArgsConstructor
-class ResolveReferences : AstVisitor<Any> {
+class ResolveReferences(scope: Scope) : AstVisitor<Any> {
     val globalScope: Scope? = null
 
     override fun visit(ref: SymbolicReference): Any? {
@@ -60,7 +48,7 @@ class ResolveReferences : AstVisitor<Any> {
                     nextScope = currentFullScope
                     nextTopLevelScopeElement = currentTopLevelScopeElement
                 } else if (currentFullScope.hasVariable(ref.identifier)) {
-                    val refVariable: VariableDeclaration<Initialization>?
+                    val refVariable: VariableDeclaration?
                     refVariable = currentFullScope.getVariable(ref.identifier)
                     ref.identifiedObject = refVariable
                     identifiedObjectDataType = refVariable!!.dataType
@@ -109,10 +97,10 @@ class ResolveReferences : AstVisitor<Any> {
                     ref.identifiedObject = currentTopLevelScopeElement
                     ref.dataType = (currentTopLevelScopeElement as FunctionDeclaration).returnType
                 } else if (globalScope!!.functions.containsKey(ref.identifier)) {
-                    ref.identifiedObject = globalScope.getFunction(ref.identifier)
+                    ref.identifiedObject = globalScope.resolveFunction(ref.identifier)
                     ref.dataType = (ref.identifiedObject as FunctionDeclaration).returnType
                 } else if (ref.hasSub()) {
-                    if (ref.identifiedObject is VariableDeclaration<Initialization>
+                    if (ref.identifiedObject is VariableDeclaration
                             && identifiedObjectDataType is ClassDataType
                             && OOUtils.hasMethod(identifiedObjectDataType.clazz,
                                     ref.sub!!.identifier)) {
@@ -151,3 +139,4 @@ class ResolveReferences : AstVisitor<Any> {
         return super.visit(ref)
     }
 }
+*/

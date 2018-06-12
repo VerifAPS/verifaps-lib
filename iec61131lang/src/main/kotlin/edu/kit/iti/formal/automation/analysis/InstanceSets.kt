@@ -22,15 +22,7 @@
 
 package edu.kit.iti.formal.automation.analysis
 
-import edu.kit.iti.formal.automation.scope.InstanceScope
-import edu.kit.iti.formal.automation.st.ast.HasScope
-import edu.kit.iti.formal.automation.st.ast.Initialization
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
-import edu.kit.iti.formal.automation.st.util.Tuple
-
-import java.util.HashMap
-import java.util.HashSet
-
+/*
 /**
  * Map which keeps track of the (parent, variable) -> instance set mappings.
  * TODO consider namespaces
@@ -38,7 +30,7 @@ import java.util.HashSet
  * @author Augusto Modanese
  */
 class InstanceSets : HashMap<Tuple<String, String>, Set<InstanceScope.Instance>>() {
-    fun addInstance(topLevelScopeElement: HasScope<*>, variable: VariableDeclaration<Initialization>,
+    fun addInstance(topLevelScopeElement: HasScope<*>, variable: VariableDeclaration,
                     instance: InstanceScope.Instance) {
         if (!containsKey(tuple(topLevelScopeElement, variable)))
             registerTuple(topLevelScopeElement, variable)
@@ -46,7 +38,7 @@ class InstanceSets : HashMap<Tuple<String, String>, Set<InstanceScope.Instance>>
     }
 
     fun getInstances(topLevelScopeElement: HasScope<*>,
-                     variable: VariableDeclaration<Initialization>): Set<InstanceScope.Instance> {
+                     variable: VariableDeclaration): Set<InstanceScope.Instance> {
         val instances = get(tuple(topLevelScopeElement, variable))
         if (instances == null) {
             registerTuple(topLevelScopeElement, variable)
@@ -56,12 +48,13 @@ class InstanceSets : HashMap<Tuple<String, String>, Set<InstanceScope.Instance>>
     }
 
     private fun registerTuple(topLevelScopeElement: HasScope<*>,
-                              variable: VariableDeclaration<Initialization>) {
+                              variable: VariableDeclaration) {
         put(tuple(topLevelScopeElement, variable), HashSet<Instance>())
     }
 
     private fun tuple(topLevelScopeElement: HasScope<*>,
-                      variable: VariableDeclaration<Initialization>): Tuple<String, String> {
+                      variable: VariableDeclaration): Tuple<String, String> {
         return Tuple(topLevelScopeElement.identifier, variable.name)
     }
 }
+*/

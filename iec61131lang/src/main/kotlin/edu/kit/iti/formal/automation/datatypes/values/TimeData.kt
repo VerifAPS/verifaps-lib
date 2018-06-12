@@ -29,21 +29,10 @@ package edu.kit.iti.formal.automation.datatypes.values
  * @version $Id: $Id
  */
 
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.NoArgsConstructor
-
 import java.math.BigDecimal
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
-class TimeValue {
-    // value in millieseconds
-    private var internal = BigDecimal.ZERO
-
+data class TimeData(var internal: BigDecimal = BigDecimal.ZERO) {
     val milliseconds: Long
         get() = internal.toLong()
 
@@ -59,7 +48,7 @@ class TimeValue {
     val days: Long
         get() = 0
 
-    constructor(textValue: String) {
+    constructor(textValue: String) : this() {
         var textValue = textValue
         textValue = textValue.replace("_", "")
         val extractNumbers = Pattern.compile("([.0-9]+)([hmsd]{1,2})")
@@ -73,8 +62,8 @@ class TimeValue {
         }
     }
 
-    constructor(`val`: Double) {
-        internal = BigDecimal.valueOf(`val`)
+    constructor(time: Double) : this() {
+        internal = BigDecimal.valueOf(time)
     }
 
     private fun getModifier(mod: String): Double {

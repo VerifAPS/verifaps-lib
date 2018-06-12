@@ -23,9 +23,7 @@
 package edu.kit.iti.formal.automation.st;
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.scope.InstanceScope;
 import edu.kit.iti.formal.automation.scope.Scope;
-import edu.kit.iti.formal.automation.oo.OOIEC61131Facade;
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
 import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
 import edu.kit.iti.formal.automation.visitors.Utils;
@@ -44,7 +42,6 @@ import java.util.stream.Collectors;
  * Test analysis of effective subtypes.
  *
  * @author Augusto Modanese
- */
 public class EffectiveSubtypesTest {
     @Test
     public void testInstanceHierarchy() throws IOException {
@@ -81,3 +78,4 @@ public class EffectiveSubtypesTest {
                 instancesCParents);
     }
 }
+*/

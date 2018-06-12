@@ -42,5 +42,5 @@ interface FunctionResolver {
      * @param scope a [edu.kit.iti.formal.automation.scope.Scope] object.
      * @return a [edu.kit.iti.formal.automation.st.ast.FunctionDeclaration] object.
      */
-    fun resolve(call: Invocation, scope: Scope): FunctionDeclaration
+    fun resolve(call: Invocation, scope: Scope): FunctionDeclaration?
 }

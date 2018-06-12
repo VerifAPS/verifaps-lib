@@ -22,10 +22,9 @@ package edu.kit.iti.formal.automation.st.util
  * #L%
  */
 
-import edu.kit.iti.formal.automation.visitors.Visitable
 import edu.kit.iti.formal.automation.st.ast.*
-
-import java.util.HashSet
+import edu.kit.iti.formal.automation.visitors.Visitable
+import java.util.*
 import java.util.stream.Collectors
 
 /**
@@ -44,7 +43,7 @@ class WriteBeforeReadIdentifier : AstVisitor<WriteBeforeReadIdentifier.WBRState>
         internal var violates: MutableSet<String> = HashSet()
 
 
-        fun write(name: String?) {
+        fun write(name: String) {
             if (!readed.contains(name))
                 candidates.add(name)
             else
@@ -79,7 +78,7 @@ class WriteBeforeReadIdentifier : AstVisitor<WriteBeforeReadIdentifier.WBRState>
     override fun visit(assignmentStatement: AssignmentStatement): WBRState? {
         val wbrState = WBRState()
         current = wbrState
-        assignmentStatement.expression.accept<WBRState>(this)
+        assignmentStatement.expression.accept(this)
         val variable = assignmentStatement.location
         wbrState.write(variable.toString())
         return wbrState
@@ -95,25 +94,25 @@ class WriteBeforeReadIdentifier : AstVisitor<WriteBeforeReadIdentifier.WBRState>
     override fun visit(statements: StatementList): WBRState? {
         val state = WBRState()
         for (s in statements) {
-            val w = s.accept<WBRState>(this)
-            state.seq(w)
+            val w = s.accept(this)
+            state.seq(w!!)
         }
         return state
     }
 
     /** {@inheritDoc}  */
-    override fun visit(fbc: InvocationStatement): WBRState? {
+    override fun visit(fbc: InvocationStatement): WBRState {
         val state = WBRState()
 
         for (`in` in fbc.parameters)
             if (!`in`.isOutput) {
-                val s = `in`.expression!!.accept<WBRState>(this)
-                state.add(s)
+                val s = `in`.expression!!.accept(this)
+                state.add(s!!)
             }
 
         for (`in` in fbc.parameters)
             if (`in`.isOutput)
-                state.write(`in`.name)
+                state.write(`in`.name!!)
 
         return state
     }
@@ -124,19 +123,21 @@ class WriteBeforeReadIdentifier : AstVisitor<WriteBeforeReadIdentifier.WBRState>
     }
 
     /** {@inheritDoc}  */
-    override fun visit(ifStatement: IfStatement): WBRState? {
-        val cond = ifStatement.conditionalBranches.stream().map<WBRState>(Function<GuardedStatement, WBRState> { this.visit(it) }).collect<List<WBRState>, Any>(Collectors.toList())
+    override fun visit(ifStatement: IfStatement): WBRState {
+        val cond = ifStatement.conditionalBranches
+                .map { visit(it) }
 
         val state = WBRState()
 
         for (wbrState in cond) {
-
-            state.add(wbrState)
+            state.add(wbrState!!)
         }
 
         if (ifStatement.elseBranch.size > 0) {
             val elseState = ifStatement.elseBranch.accept(this)
-            state.add(elseState)
+            if (elseState != null) {
+                state.add(elseState)
+            }
         }
 
         state.candidates.removeAll(state.violates)
@@ -149,7 +150,7 @@ class WriteBeforeReadIdentifier : AstVisitor<WriteBeforeReadIdentifier.WBRState>
         val state = WBRState()
         current = state
 
-        guardedStatement.condition.accept<WBRState>(this)
+        guardedStatement.condition.accept(this)
         current = guardedStatement.statements.accept(this)
 
         for (candidate in current!!.candidates) {
@@ -163,28 +164,31 @@ class WriteBeforeReadIdentifier : AstVisitor<WriteBeforeReadIdentifier.WBRState>
     }
 
     /** {@inheritDoc}  */
-    override fun visit(aCase: CaseStatement.Case): WBRState? {
+    override fun visit(aCase: Case): WBRState? {
         return aCase.statements.accept(this)
     }
 
     /** {@inheritDoc}  */
-    override fun visit(caseStatement: CaseStatement): WBRState? {
+    override fun visit(caseStatement: CaseStatement): WBRState {
         val state = WBRState()
         current = state
-        caseStatement.expression!!.accept<WBRState>(this)
+        caseStatement.expression!!.accept(this)
 
 
-        val cond = caseStatement.cases.stream().map<WBRState>(Function<Case, WBRState> { this.visit(it) }).collect<List<WBRState>, Any>(Collectors.toList())
+        val cond = caseStatement.cases
+                .map { this.visit(it) }
 
         val cases = WBRState()
         for (wbrState in cond) {
-            cases.add(wbrState)
+            cases.add(wbrState!!)
         }
 
 
         if (caseStatement.elseCase!!.size > 0) {
-            val elseState = caseStatement.elseCase!!.accept(this)
-            cases.add(elseState)
+            val elseState = caseStatement.elseCase?.accept(this)
+            if (elseState != null) {
+                cases.add(elseState)
+            }
 
         }
 
@@ -200,17 +204,9 @@ class WriteBeforeReadIdentifier : AstVisitor<WriteBeforeReadIdentifier.WBRState>
     }
 
     companion object {
-
-        /**
-         *
-         * investigate.
-         *
-         * @param visitable a [edu.kit.iti.formal.automation.visitors.Visitable] object.
-         * @return a [java.util.Set] object.
-         */
         fun investigate(visitable: Visitable): Set<String> {
             val wbri = WriteBeforeReadIdentifier()
-            return visitable.accept(wbri).candidates
+            return visitable.accept(wbri)!!.candidates
         }
     }
 }

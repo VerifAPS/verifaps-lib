@@ -118,8 +118,8 @@ class HTMLCodeWriter : CodeWriter() {
     }
 
 
-    fun type(baseTypeName: String): HTMLCodeWriter {
-        span(Sections.TYPE_NAME).append(baseTypeName)
+    fun type(baseTypeName: String?): HTMLCodeWriter {
+        span(Sections.TYPE_NAME).append(baseTypeName?:"<<<null>>>")
         return this.end()
     }
 

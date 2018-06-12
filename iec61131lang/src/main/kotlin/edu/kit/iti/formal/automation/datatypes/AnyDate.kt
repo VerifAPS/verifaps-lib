@@ -22,8 +22,8 @@ package edu.kit.iti.formal.automation.datatypes
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.values.DateData
 import edu.kit.iti.formal.automation.datatypes.values.DateAndTimeData
+import edu.kit.iti.formal.automation.datatypes.values.DateData
 import edu.kit.iti.formal.automation.datatypes.values.TimeofDayData
 
 /**
@@ -33,8 +33,8 @@ import edu.kit.iti.formal.automation.datatypes.values.TimeofDayData
  * @author weigl
  * @version $Id: $Id
  */
-abstract class AnyDate : AnyDt() {
-    class Date : AnyDate() {
+abstract class AnyDate(name: String = "ANY_DATE") : AnyDt(name) {
+    object DATE : AnyDate("DATE") {
         override fun repr(obj: Any): String {
             val dt = obj as DateData
             return String.format("DATE#%4d-%2d-%2d",
@@ -46,45 +46,28 @@ abstract class AnyDate : AnyDt() {
         }
     }
 
-    class TimeOfDay : AnyDate() {
+    object TIME_OF_DAY : AnyDate("TIME_OF_DAY") {
         override fun repr(obj: Any): String {
             val dt = obj as TimeofDayData
             return String.format("TOD#%2d:%2d:%2d.%3d",
                     dt.hours, dt.minutes, dt.seconds, dt.millieseconds)
         }
 
-        override fun getName(): String {
-            return "TIME_OF_DAY"
-        }
-
         override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
             return visitor.visit(this)
         }
     }
 
-    class DateAndTime : AnyDate() {
+    object DATE_AND_TIME : AnyDate("DATE_AND_TIME") {
         override fun repr(obj: Any): String {
             val dt = obj as DateAndTimeData
             return String.format("DT#%4d-%2d-%2d-%2d:%2d:%2d.%3d",
                     dt.year, dt.month, dt.day, dt.hours, dt.minutes, dt.seconds, dt.millieSeconds)
         }
 
-        override fun getName(): String {
-            return "DATE_AND_TIME"
-        }
 
         override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
             return visitor.visit(this)
         }
-    }
-
-    companion object {
-
-        /** Constant `DATE`  */
-        val DATE = Date()
-        /** Constant `TIME_OF_DAY`  */
-        val TIME_OF_DAY = TimeOfDay()
-        /** Constant `DATE_AND_TIME`  */
-        val DATE_AND_TIME = DateAndTime()
     }
 }

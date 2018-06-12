@@ -32,9 +32,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import static org.junit.Assert.*;
+import java.io.IOException;
 
-import java.io.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by weigl on 02.08.16.
@@ -44,7 +45,7 @@ public class ValidExpressionTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> setup() throws IOException {
-        return TestUtils.loadLines("/edu/kit/iti/formal/automation/st/expressions/valid.txt");
+        return TestUtils.INSTANCE.loadLines("/edu/kit/iti/formal/automation/st/expressions/valid.txt");
     }
 
     @Parameterized.Parameter

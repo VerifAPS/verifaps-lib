@@ -23,8 +23,7 @@ package edu.kit.iti.formal.automation.datatypes.promotion
  */
 
 import edu.kit.iti.formal.automation.datatypes.AnyDt
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by weigl on 24.11.16.
@@ -32,25 +31,7 @@ import java.util.ArrayList
  * @author weigl
  * @version $Id: $Id
  */
-class TableTypePromotion : TypePromotion {
-    private val table = ArrayList<Array<AnyDt>>()
-
-    /**
-     *
-     * Constructor for TableTypePromotion.
-     */
-    constructor() {}
-
-    /**
-     *
-     * Constructor for TableTypePromotion.
-     *
-     * @param table a [java.util.List] object.
-     */
-    constructor(table: List<Array<AnyDt>>) {
-        this.table = table
-    }
-
+class TableTypePromotion(val table: ArrayList<Array<AnyDt>> = arrayListOf()) : TypePromotion {
     /** {@inheritDoc}  */
     override fun getPromotion(a: AnyDt, b: AnyDt): AnyDt? {
         for (ary in table) {

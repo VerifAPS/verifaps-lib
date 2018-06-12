@@ -22,29 +22,10 @@
 
 package edu.kit.iti.formal.automation.st;
 
-import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.scope.Scope;
-import edu.kit.iti.formal.automation.oo.OOIEC61131Facade;
-import edu.kit.iti.formal.automation.scope.InstanceScope;
-import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
-import edu.kit.iti.formal.automation.visitors.Utils;
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 /**
  * Test analysis of instance hierarchies.
  *
  * @author Augusto Modanese
- */
 public class InstanceAnalysisTest {
     @Test
     public void testInstanceHierarchy() throws IOException {
@@ -81,3 +62,4 @@ public class InstanceAnalysisTest {
                 instancesCParents);
     }
 }
+*/

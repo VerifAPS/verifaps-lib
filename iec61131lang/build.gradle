@@ -1,12 +1,26 @@
-import java.text.DateFormat
+plugins {
+    //    id 'org.junit.platform.gradle.plugin' version '1.0.0'
+}
 
 apply plugin: 'antlr'
 
 description = 'iec61131lang'
 
+
+repositories {
+    maven { url "http://dl.bintray.com/jetbrains/spek" }
+}
+
+
 dependencies {
     compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.1'
     antlr group: 'org.antlr', name: 'antlr4', version: '4.7.1'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
+
+    testCompile 'org.jetbrains.spek:spek-api:1.1.5'
+    testRuntime 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
 }
 
 generateGrammarSource {

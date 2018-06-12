@@ -24,7 +24,6 @@ package edu.kit.iti.formal.automation.datatypes
 
 import java.math.BigInteger
 import java.util.*
-import java.util.stream.Collectors
 
 /**
  *
@@ -35,33 +34,6 @@ import java.util.stream.Collectors
  */
 object DataTypes {
     val DEFAULT = BigInteger.ZERO
-    val SINT = SInt()
-    val USINT = USInt()
-    val UINT = UInt()
-    val INT = Int()
-    val UDINT = UDInt()
-    val DINT = DInt()
-    val ULINT = ULInt()
-    val LINT = LInt()
-    val UNKNWON_SIGNED_INT: AnyInt = AnySignedInt.Arbitrary(-1)
-    val UNKNWON_UNSIGNED_INT: AnyUnsignedInt = AnyUnsignedInt.Arbitrary(-1)
-    val ANY_INT: AnyInt = object : AnySignedInt(-1) {
-        override fun next(): Optional<AnyInt>? {
-            return null
-        }
-
-        override fun asUnsgined(): AnyUnsignedInt {
-            return UNKNWON_UNSIGNED_INT
-        }
-
-        override fun asSigned(): AnyInt {
-            return UNKNWON_SIGNED_INT
-        }
-
-        override fun isValid(value: Long): Boolean {
-            return true
-        }
-    }
     val VOID: AnyDt = object : AnyDt("VOID") {
         override fun repr(obj: Any): String {
             return "void"
@@ -82,14 +54,14 @@ object DataTypes {
     val dataTypeNames: Set<String>
         get() = map.keys
 
-    val integers: List<AnyInt>
-        get() = getIntegers(AnyInt::class.java)
+    val integers: Array<AnyInt>
+        get() = signedIntegers + unSignedIntegers
 
-    val signedIntegers: List<AnyInt>
-        get() = getIntegers(AnySignedInt::class.java)
+    val signedIntegers: Array<AnyInt>
+        get() = arrayOf(INT, SINT, DINT, LINT)
 
-    val unSignedIntegers: List<AnyInt>
-        get() = getIntegers(AnyUnsignedInt::class.java)
+    val unSignedIntegers: Array<AnyInt>
+        get() = arrayOf(UINT, USINT, UDINT, ULINT)
 
     init {
         add(AnyBit.BOOL)
@@ -110,8 +82,8 @@ object DataTypes {
         add(AnyReal.LREAL)
         add(AnyReal.REAL)
 
-        add(IECString.STRING_8BIT)
-        add(IECString.STRING_16BIT)
+        add(IECString.STRING)
+        add(IECString.WSTRING)
 
         add(TimeType.TIME_TYPE)
 
@@ -123,12 +95,12 @@ object DataTypes {
         map["DT"] = AnyDate.DATE_AND_TIME
         map["T"] = TimeType.TIME_TYPE
 
-        map["VOID"] = AnyReference.ANY_REF
+        map["VOID"] = ReferenceDt.ANY_REF
     }
 
     internal fun add(any: AnyDt) {
-        map[any.getName()] = any
-        map[any.getName().replace("_", "")] = any
+        map[any.name] = any
+        map[any.name.replace("_", "")] = any
     }
 
     /**
@@ -138,21 +110,22 @@ object DataTypes {
      * @param name a [java.lang.String] object.
      * @return a [edu.kit.iti.formal.automation.datatypes.AnyDt] object.
      */
-    fun getDataType(name: String): AnyDt {
+    fun getDataType(name: String): AnyDt? {
         return map[name]
     }
 
+    /*
     fun getIntegers(anyIntClass: Class<out AnyInt>): List<AnyInt> {
-        val list = get<out AnyInt>(anyIntClass)
+        val list = get(anyIntClass)
         list.sort(Comparator.comparingInt<AnyInt> { o -> o.bitLength })
         return list
     }
+    */
 
-    private operator fun <T : AnyDt> get(anyClazz: Class<T>): List<T> {
-        return map.values.stream().filter { a -> anyClazz.isAssignableFrom(a.javaClass) }
-                .collect<List<AnyDt>, Any>(Collectors.toList()) as List<T>
-    }
+    private operator fun <T : AnyDt> get(anyClazz: Class<T>) =
+            map.values.filter { anyClazz.isAssignableFrom(it.javaClass) }
 
+    @JvmOverloads
     fun findSuitableInteger(s: BigInteger, signed: Boolean): AnyInt {
         return findSuitableInteger(s,
                 if (signed)
@@ -163,7 +136,7 @@ object DataTypes {
     }
 
     @JvmOverloads
-    fun findSuitableInteger(s: BigInteger, integerTypes: Iterable<AnyInt> = integers): AnyInt {
+    fun findSuitableInteger(s: BigInteger, integerTypes: Array<AnyInt> = integers): AnyInt {
         if (s == BigInteger.ZERO) return INT
 
         for (anyInt in integerTypes) {

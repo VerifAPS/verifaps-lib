@@ -16,7 +16,7 @@ import java.util.stream.Collectors
  * TODO change methods to support both classes and interfaces
  *
  * @author Augusto Modanese
- */
+ *
 object OOUtils {
     /**
      * @return (a shallow clone of) the class' local scope when accounting for inheritance
@@ -172,3 +172,4 @@ object OOUtils {
         return fullScope
     }
 }
+*/

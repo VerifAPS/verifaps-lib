@@ -4,6 +4,60 @@ plugins {
     id "com.github.hierynomus.license" version "0.14.0" apply false
     id "com.jfrog.bintray" version "1.7.3" apply false
     id 'com.palantir.git-version' version '0.10.1' apply false
+    id "org.jetbrains.dokka" version "0.9.17"
+}
+
+dokka {
+
+    // List of files with module and package documentation
+    // http://kotlinlang.org/docs/reference/kotlin-doc.html#module-and-package-documentation
+
+    includes = ['README.md']
+
+    outputFormat = "html"
+    outputDirectory = "$buildDir/dokka"
+
+    // List of files with module and package documentation
+    // http://kotlinlang.org/docs/reference/kotlin-doc.html#module-and-package-documentation
+    samples = []
+
+    // These tasks will be used to determine source directories and classpath
+    kotlinTasks {
+        //defaultKotlinTasks() + subprojects*.compileKotlin
+        project(":smv-model").compileKotlin
+    }
+
+    sourceDirs = files('smv-model/src/main/kotlin') + files("iec61131lang/src/main/kotlin")
+
+    // Use default or set to custom path to cache directory
+    // to enable package-list caching
+    // When set to default, caches stored in $USER_HOME/.cache/dokka
+    cacheRoot = 'default'
+
+    // Use to include or exclude non public members.
+    includeNonPublic = true
+
+    // Do not output deprecated members. Applies globally, can be overridden by packageOptions
+    skipDeprecated = false
+
+    // Emit warnings about not documented members. Applies globally, also can be overridden by packageOptions
+    reportUndocumented = false
+
+    skipEmptyPackages = false // Do not create index pages for empty packages
+
+    impliedPlatforms = ["JVM"] // See platforms section of documentation
+
+    jdkVersion = 8
+
+    // No default documentation link to kotlin-stdlib
+    noStdlibLink = false
+
+
+    linkMapping {
+        dir = "src/main/kotlin"
+        url = "https://github.com/Verifaps/verifaps-lib/tree/master/"
+        suffix = "#L"
+    }
 }
 
 allprojects {
@@ -43,10 +97,18 @@ subprojects {
     apply plugin: 'kotlin'
     apply plugin: 'maven'
 
+
     ext.kotlin_version = '1.2.41'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
+
+    compileKotlin {
+        kotlinOptions {
+            suppressWarnings = true
+            jvmTarget = "1.8"
+        }
+    }
 
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
@@ -95,6 +157,8 @@ subprojects {
             }
         }
     }
+
+
 
     publishing {
         repositories {

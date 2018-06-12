@@ -39,12 +39,12 @@ class ECoreXMLGenerator
  * @param clazzes a [java.lang.Class] object.
  */
 @SafeVarargs
-constructor(vararg clazzes: Class<out Top<*>>) {
+constructor(vararg clazzes: Class<out Top>) {
 
-    private val clazzes: Array<Class<out Top<*>>>
+    private val clazzes: Array<Class<out Top>>
 
     init {
-        this.clazzes = clazzes
+        this.clazzes = clazzes as Array<Class<out Top>>
     }
 
     private fun run() {
@@ -81,7 +81,7 @@ constructor(vararg clazzes: Class<out Top<*>>) {
                     System.err.println("ERROR")
                 }
 
-                if (Top<*>::class.java!!.isAssignableFrom(type)) {
+                if (Top::class.java!!.isAssignableFrom(type)) {
                     System.out.format(
                             "\t<eStructuralFeatures xsi:type=\"ecore:EReference\" name=\"%s\" upperBound=\"-1\" eType=\"#//%s\" />%n",
                             f.name, type.simpleName)
@@ -105,12 +105,12 @@ constructor(vararg clazzes: Class<out Top<*>>) {
          */
         @JvmStatic
         fun main(args: Array<String>) {
-            ECoreXMLGenerator(Top<*>::class.java, AssignmentStatement::class.java, BinaryExpression::class.java, CaseCondition::class.java,
+            ECoreXMLGenerator(Top::class.java, AssignmentStatement::class.java, BinaryExpression::class.java, CaseCondition::class.java,
                     CaseStatement::class.java, CommentStatement::class.java, ConfigurationDeclaration::class.java, Deref::class.java,
                     DirectVariable::class.java, ExitStatement::class.java, Expression::class.java, ExpressionList::class.java, ForStatement::class.java,
                     FunctionBlockDeclaration::class.java, Invocation::class.java, InvocationStatement::class.java, GuardedStatement::class.java,
                     Location::class.java, Reference::class.java, RepeatStatement::class.java, ResourceDeclaration::class.java,
-                    ReturnStatement::class.java, Statement::class.java, SymbolicReference::class.java, HasScope<*>::class.java,
+                    ReturnStatement::class.java, Statement::class.java, SymbolicReference::class.java, //HasScope::class.java,
                     UnaryExpression::class.java, IfStatement::class.java, WhileStatement::class.java).run()
         }
     }

@@ -22,9 +22,9 @@ package edu.kit.iti.formal.automation.visitors
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements
 import edu.kit.iti.formal.automation.st.StructuredTextHtmlPrinter
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
+import edu.kit.iti.formal.automation.st.ast.TopLevelElements
 
 /**
  *
@@ -34,14 +34,6 @@ import edu.kit.iti.formal.automation.st.StructuredTextPrinter
  * @version $Id: $Id
  */
 object VFactory {
-    /**
-     *
-     * ast2Html.
-     *
-     * @param elements a [edu.kit.iti.formal.automation.visitors.Visitable] object.
-     * @param comments a boolean.
-     * @return a [java.lang.String] object.
-     */
     fun ast2Html(elements: Visitable, comments: Boolean): String {
         val stp = StructuredTextHtmlPrinter()
         stp.isPrintComments = comments
@@ -79,7 +71,7 @@ object VFactory {
     fun ast2St(st0ast: TopLevelElements, comments: Boolean): String {
         val stp = StructuredTextPrinter()
         stp.isPrintComments = comments
-        st0ast.accept<Any>(stp)
+        st0ast.accept(stp)
         return stp.string
     }
 
@@ -95,15 +87,8 @@ object VFactory {
         val stp = StructuredTextHtmlPrinter()
         stp.isPrintComments = comments
         stp.preamble()
-        st0ast.accept<Any>(stp)
+        st0ast.accept(stp)
         stp.closeHtml()
         return stp.string
     }
 }
-/**
- *
- * ast2St.
- *
- * @param a a [edu.kit.iti.formal.automation.visitors.Visitable] object.
- * @return a [java.lang.String] object.
- */

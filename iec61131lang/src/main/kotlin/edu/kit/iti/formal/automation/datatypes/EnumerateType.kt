@@ -28,9 +28,8 @@ import java.util.*
  * Created by weigl on 10.06.14.
  *
  * @author weigl
- * @version $Id: $Id
  */
-class EnumerateType(override var name: String = "ENUM",
+class EnumerateType(name: String = "ENUM",
                     var allowedValues: MutableList<String> = ArrayList())
     : AnyDt(name) {
 
@@ -59,11 +58,7 @@ class EnumerateType(override var name: String = "ENUM",
     }
 
     /** {@inheritDoc}  */
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitor<T>) = visitor.visit(this)
 
-    fun isAllowedValue(value: String): Boolean {
-        return this.allowedValues.contains(value)
-    }
+    fun isAllowedValue(value: String) = this.allowedValues.contains(value)
 }

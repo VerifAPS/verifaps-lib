@@ -4,14 +4,14 @@ import java.math.BigInteger
 import java.util.*
 
 open class AnyInt(var bitLength: kotlin.Int = 0, var isSigned: Boolean = false) : AnyNum() {
-    val upperBound: BigInteger
+    open val upperBound: BigInteger
         get() =
             if (isSigned)
                 BigInteger.ONE.shiftLeft(bitLength - 1).subtract(BigInteger.ONE)
             else
                 BigInteger.ONE.shiftLeft(bitLength).subtract(BigInteger.ONE)
 
-    val lowerBound: BigInteger
+    open val lowerBound: BigInteger
         get() {
             if (isSigned)
                 return BigInteger.ZERO
@@ -87,6 +87,7 @@ open class AnyInt(var bitLength: kotlin.Int = 0, var isSigned: Boolean = false) 
     }
 }
 
+object ANY_INT : AnyInt(-1, true)
 
 object UDINT : AnyInt(32, false) {
     override fun next(): Optional<AnyInt> = Optional.of(ULINT)
@@ -160,12 +161,12 @@ object LINT : AnyInt(64) {
 
 object UInt : AnyInt(16, false) {
     override fun next(): Optional<AnyInt> {
-        return Optional.of(DataTypes.UDINT)
+        return Optional.of(UDINT)
     }
 
     override fun asUnsigned() = this
     override fun asSigned(): AnyInt {
-        return DataTypes.DINT
+        return DINT
     }
 
     override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
@@ -176,7 +177,7 @@ object UInt : AnyInt(16, false) {
 
 object DINT : AnyInt(32) {
     override fun next(): Optional<AnyInt> {
-        return Optional.ofNullable(DataTypes.LINT)
+        return Optional.ofNullable(LINT)
     }
 
     override fun asSigned() = this
@@ -187,3 +188,25 @@ object DINT : AnyInt(32) {
     }
 }
 
+
+/**
+ * Created by weigl on 10.06.14.
+ *
+ * @author weigl
+ * @version $Id: $Id
+ */
+data class RangeType(
+        var bottom: BigInteger = BigInteger.ZERO,
+        var top: BigInteger = BigInteger.ZERO,
+        var base: AnyInt = INT) : AnyInt(base.bitLength, base.isSigned) {
+
+    override val upperBound: BigInteger
+        get() = top
+
+    override val lowerBound: BigInteger
+        get() = bottom
+
+    override fun repr(obj: Any) = base.repr(obj)
+    override fun next(): Optional<AnyInt> = Optional.empty()
+    override fun <T> accept(visitor: DataTypeVisitor<T>) = visitor.visit(this)
+}

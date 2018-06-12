@@ -22,14 +22,13 @@ package edu.kit.iti.formal.automation.st
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.Cloneable
-
 /**
  * @param <T> an class which is identifiable
  * @author Alexander Weigl
  * @since 04.03.2017
 </T> */
-data class RefTo<T : Identifiable>(private var name: String?, private var identified: T?) : Cloneable<RefTo<*>> {
+data class RefTo<T : Identifiable>(private var name: String?,
+                                   private var identified: T?) : Cloneable<RefTo<*>> {
     var identifier: String?
         get() = if (obj != null) obj!!.name else name
         set(new) {
@@ -41,7 +40,7 @@ data class RefTo<T : Identifiable>(private var name: String?, private var identi
         set(value) {
             // TODO: assertion should be changed
             //assert name == null || obj == null || obj.getName().equals(name);
-            this.obj = value
+            identified = value
         }
 
 
@@ -53,4 +52,8 @@ data class RefTo<T : Identifiable>(private var name: String?, private var identi
     constructor(obj: T) : this(obj.name, obj)
 
     override fun clone(): RefTo<T> = RefTo(identifier, obj)
+    fun resolve(func: (String) -> T?) {
+        if (identifier != null)
+            obj = func(identifier!!)
+    }
 }

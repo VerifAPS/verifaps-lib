@@ -75,7 +75,7 @@ public class DefaultInitValue implements InitValueTranslator {
 
         @Override
         public Value visit(TimeType timeType) {
-            return new Values.VTime(TimeType.Companion.getTIME_TYPE(), new TimeValue());
+            return new Values.VTime(TimeType.Companion.getTIME_TYPE(), new TimeData());
         }
     }
 }

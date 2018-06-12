@@ -34,8 +34,9 @@ import java.util.*
  * @author weigl
  * @version $Id: $Id
  */
+
 open class AstVisitor<T> : DefaultVisitor<T>() {
-    protected lateinit var scope: Scope
+    //protected lateinit var scope: Scope
     //protected val stack: Stack<Top> = Stack()
 
     override fun defaultVisit(obj: Any?): T? {
@@ -62,7 +63,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(integerCondition: CaseCondition.IntegerCondition): T? {
-        integerCondition.value!!.accept(this)
+        integerCondition.value.accept(this)
         return null
     }
 
@@ -79,8 +80,8 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(binaryExpression: BinaryExpression): T? {
-        binaryExpression.leftExpr!!.accept(this)
-        binaryExpression.rightExpr!!.accept(this)
+        binaryExpression.leftExpr.accept(this)
+        binaryExpression.rightExpr.accept(this)
         return null
     }
 
@@ -123,7 +124,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(caseStatement: CaseStatement): T? {
-        caseStatement.expression!!.accept(this)
+        caseStatement.expression.accept(this)
         for (c in caseStatement.cases)
             c.accept(this)
 
@@ -137,7 +138,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      */
     override fun visit(statements: StatementList): T? {
         for (s in statements)
-            s?.accept(this)
+            s.accept(this)
         return null
     }
 
@@ -224,8 +225,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
      * {@inheritDoc}
      */
     override fun visit(localScope: Scope): T? {
-        scope = localScope
-        for (vd in localScope.asMap().values)
+        for (vd in localScope)
             vd.accept(this)
         return defaultVisit(localScope)
     }
@@ -245,10 +245,6 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
         return super.visit(variableDeclaration)
     }
 
-    override fun visit(location: Location): T? {
-        return super.visit(location)
-    }
-
     override fun visit(arrayinit: ArrayInitialization): T? {
         for (init in arrayinit.initValues)
             init.accept(this)
@@ -265,7 +261,7 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
     }
 
     override fun visit(parameter: InvocationParameter): T? {
-        parameter.expression!!.accept(this)
+        parameter.expression.accept(this)
         return super.visit(parameter)
     }
 
@@ -278,22 +274,6 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
         if (stringTypeDeclaration.initialization != null)
             stringTypeDeclaration.initialization!!.accept(this)
         return super.visit(stringTypeDeclaration)
-    }
-
-    override fun visit(structureTypeDeclaration: StructureTypeDeclaration): T? {
-        return super.visit(structureTypeDeclaration)
-    }
-
-    override fun visit(subRangeTypeDeclaration: SubRangeTypeDeclaration): T? {
-        return super.visit(subRangeTypeDeclaration)
-    }
-
-    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration): T? {
-        return super.visit(simpleTypeDeclaration)
-    }
-
-    override fun visit(commentStatement: CommentStatement): T? {
-        return super.visit(commentStatement)
     }
 
     override fun visit(structureInitialization: StructureInitialization): T? {
@@ -328,68 +308,18 @@ open class AstVisitor<T> : DefaultVisitor<T>() {
         return super.visit(globalVariableListDeclaration)
     }
 
-    override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration): T? {
-        return super.visit(arrayTypeDeclaration)
-    }
-
-    override fun visit(exitStatement: ExitStatement): T? {
-        return super.visit(exitStatement)
-    }
-
-    override fun visit(configurationDeclaration: ConfigurationDeclaration): T? {
-        return super.visit(configurationDeclaration)
-    }
-
-    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration): T? {
-        return super.visit(enumerationTypeDeclaration)
-    }
-
-    override fun visit(resourceDeclaration: ResourceDeclaration): T? {
-        return super.visit(resourceDeclaration)
-    }
-
-    override fun visit(returnStatement: ReturnStatement): T? {
-        return super.visit(returnStatement)
-    }
-
-    override fun visit(deref: Deref): T? {
-        return super.visit(deref)
-    }
-
-    override fun visit(symbolicReference: SymbolicReference): T? {
-        return super.visit(symbolicReference)
-    }
-
     override fun visit(referenceValue: ReferenceValue): T? {
         referenceValue.referenceTo.accept(this)
         return super.visit(referenceValue)
     }
 
-    override fun visit(ptd: PointerTypeDeclaration): T? {
-        return super.visit(ptd)
-    }
+}
 
-    override fun visit(init: IdentifierInitializer): T? {
-        return super.visit(init)
-    }
 
-    override fun visit(literal: Literal): T? {
-        return super.visit(literal)
-    }
-
-    override fun visit(referenceSpecification: ReferenceSpecification): T? {
-        return super.visit(referenceSpecification)
-    }
-
-    override fun visit(sfcStep: SFCStep): T? {
-        return super.visit(sfcStep)
-    }
-
-    override fun visit(actionDeclaration: ActionDeclaration): T? {
-        return super.visit(actionDeclaration)
-    }
-
-    override fun visit(sfcNetwork: SFCNetwork): T? {
-        return super.visit(sfcNetwork)
+open class AstVisitorWithScope<T> : AstVisitor<T>() {
+    protected lateinit var scope: Scope
+    override fun visit(localScope: Scope): T? {
+        scope = localScope
+        return super.visit(localScope)
     }
 }

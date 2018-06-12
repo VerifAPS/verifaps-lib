@@ -44,7 +44,9 @@ class DataTypeNotDefinedException : RuntimeException {
  */
 class VariableNotDefinedException(
         val scope: Scope,
-        val reference: SymbolicReference) : IECException("Variable: " + reference.identifier + " not defined in the given localScope " + scope)
+        val reference: String) : IECException("Variable: $reference not defined in the given localScope $scope") {
+    constructor(scope: Scope, reference: SymbolicReference) : this(scope, reference.identifier)
+}
 
 class DataTypeNotResolvedException(message: String) : IECException(message)
 
@@ -62,17 +64,13 @@ class FunctionUndefinedException(val invocation: Invocation) : IECException()
 
 class TypeConformityException(
         val expression: Expression,
-        val expectedDataTypes: Array<AnyDt>, vararg actual: AnyDt?) : IECException() {
-    val actualDatatypes: Array<AnyDt>
+        val expectedDataTypes: Array<AnyDt>,
+        vararg actual: AnyDt?) : IECException() {
+    val actualDatatypes: Array<out AnyDt?> = actual
 
-    init {
-        this.actualDatatypes = actual
-    }
-
-    override fun getMessage(): String {
-        return String.format("Type(s) violated in %s %nExpected:%s %nGot:%s %n ",
+    override val message: String?
+        get() = String.format("Type(s) violated in %s %nExpected:%s %nGot:%s %n ",
                 IEC61131Facade.print(expression),
                 Arrays.toString(this.expectedDataTypes),
                 Arrays.toString(this.actualDatatypes))
-    }
 }

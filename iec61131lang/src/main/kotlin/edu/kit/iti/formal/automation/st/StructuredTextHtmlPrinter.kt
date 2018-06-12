@@ -36,37 +36,18 @@ import org.antlr.v4.runtime.Token
  * @author weigl
  * @version $Id: $Id
  */
-open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
+open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
 
     private var sb = HTMLCodeWriter()
-    /**
-     *
-     * isPrintComments.
-     *
-     * @return a boolean.
-     */
-    /**
-     *
-     * Setter for the field `printComments`.
-     *
-     * @param printComments a boolean.
-     */
     var isPrintComments: Boolean = false
-
-    /**
-     *
-     * getString.
-     *
-     * @return a [java.lang.String] object.
-     */
     val string: String
         get() = sb.toString()
 
     /**
      * {@inheritDoc}
      */
-    override fun defaultVisit(visitable: Visitable): Any? {
-        sb.div(Sections.ERROR).append("not implemented: ").append(visitable.javaClass)
+    override fun defaultVisit(obj: Any?): Unit? {
+        sb.div(Sections.ERROR).append("not implemented: ").append(obj!!::class.java)
         sb.end()
         return null
     }
@@ -74,7 +55,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(exitStatement: ExitStatement): Any? {
+    override fun visit(exitStatement: ExitStatement): Unit? {
 
         sb.div(Sections.STATEMENT, Sections.KEYWORD).append("EXIT")
         sb.end().append(";")
@@ -85,9 +66,9 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(integerCondition: CaseCondition.IntegerCondition): Any? {
+    override fun visit(integerCondition: CaseCondition.IntegerCondition): Unit? {
         sb.div(Sections.CASE_INTEGER_CONDITION)
-        integerCondition.value!!.accept<Any>(this)
+        integerCondition.value!!.accept(this)
         sb.end()
         return null
     }
@@ -95,16 +76,16 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(enumeration: CaseCondition.Enumeration): Any? {
+    override fun visit(enumeration: CaseCondition.Enumeration): Unit? {
         sb.div(Sections.CASE_ENUM_CONDITION)
         if (enumeration.start === enumeration.stop) {
             sb.appendIdent()
-            enumeration.start.accept<Any>(this)
+            enumeration.start.accept(this)
         } else {
             sb.appendIdent()
-            enumeration.start.accept<Any>(this)
+            enumeration.start.accept(this)
             sb.append("..")
-            enumeration.stop!!.accept<Any>(this)
+            enumeration.stop!!.accept(this)
         }
         sb.end()
         return null
@@ -113,14 +94,14 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(binaryExpression: BinaryExpression): Any? {
+    override fun visit(binaryExpression: BinaryExpression): Unit? {
         sb.div(Sections.BINARY_EXPRESSION)
         sb.append('(')
-        binaryExpression.leftExpr!!.accept<Any>(this)
+        binaryExpression.leftExpr!!.accept(this)
         sb.div(Sections.OPERATOR, Sections.KEYWORD)
-        sb.append(" ").append(binaryExpression.operator!!.symbol()).append(" ")
+        sb.append(" ").append(binaryExpression.operator!!.symbol).append(" ")
         sb.end().end()
-        binaryExpression.rightExpr!!.accept<Any>(this)
+        binaryExpression.rightExpr!!.accept(this)
         sb.append(')')
         sb.end()
         return null
@@ -129,11 +110,11 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(assignStatement: AssignmentStatement): Any? {
+    override fun visit(assignStatement: AssignmentStatement): Unit? {
         sb.div(Sections.ASSIGNMENT)
-        assignStatement.location.accept<Any>(this)
+        assignStatement.location.accept(this)
         sb.operator(":=")
-        assignStatement.expression.accept<Any>(this)
+        assignStatement.expression.accept(this)
         sb.seperator(";").end()
         return null
     }
@@ -141,8 +122,8 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration): Any? {
-        sb.div(Sections.TYPE_DECL_ENUM).div(Sections.TYPE_NAME).append(enumerationTypeDeclaration.typeName)
+    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration): Unit? {
+        sb.div(Sections.TYPE_DECL_ENUM).div(Sections.TYPE_NAME).append(enumerationTypeDeclaration.name)
         sb.end().seperator(":")
 
         sb.div(Sections.TYPE_DECL_DECL).append("(")
@@ -160,11 +141,11 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(repeatStatement: RepeatStatement): Any? {
+    override fun visit(repeatStatement: RepeatStatement): Unit? {
         sb.div(Sections.REPEAT).keyword("REPEAT")
         repeatStatement.statements.accept(this)
         sb.keyword(" UNTIL ")
-        repeatStatement.condition.accept<Any>(this)
+        repeatStatement.condition.accept(this)
         sb.keyword("END_REPEAT")
         sb.end()
         return null
@@ -173,9 +154,9 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(whileStatement: WhileStatement): Any? {
+    override fun visit(whileStatement: WhileStatement): Unit? {
         sb.div(Sections.WHILE).keyword("WHILE")
-        whileStatement.condition.accept<Any>(this)
+        whileStatement.condition.accept(this)
         sb.keyword(" DO ")
         whileStatement.statements.accept(this)
         sb.keyword("END_WHILE")
@@ -186,11 +167,11 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(unaryExpression: UnaryExpression): Any? {
+    override fun visit(unaryExpression: UnaryExpression): Unit? {
         sb.div(Sections.UNARY_EXPRESSION, Sections.OPERATOR)
-                .append(unaryExpression.operator.symbol())
+                .append(unaryExpression.operator.symbol)
         sb.end().append(" ")
-        unaryExpression.expression.accept<Any>(this)
+        unaryExpression.expression.accept(this)
         sb.end()
         return null
     }
@@ -198,7 +179,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(typeDeclarations: TypeDeclarations): Any? {
+    override fun visit(typeDeclarations: TypeDeclarations): Unit? {
         sb.div(Sections.TYPE_DECL).keyword("TYPE")
         for (decl in typeDeclarations) {
             decl.accept(this)
@@ -211,12 +192,12 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(caseStatement: CaseStatement): Any? {
+    override fun visit(caseStatement: CaseStatement): Unit? {
         sb.div(Sections.CASE_STATEMENT).keyword("CASE")
-        caseStatement.expression!!.accept<Any>(this)
+        caseStatement.expression!!.accept(this)
         sb.keyword(" OF ")
         for (c in caseStatement.cases) {
-            c.accept<Any>(this)
+            c.accept(this)
         }
         sb.keyword("END_CASE")
         sb.end()
@@ -226,7 +207,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(symbolicReference: Location): Any? {
+    override fun visit(symbolicReference: Location): Unit? {
         /*TODO
         sb.variable(symbolicReference.getName());
 
@@ -252,14 +233,14 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(statements: StatementList): Any? {
+    override fun visit(statements: StatementList): Unit? {
         sb.div(Sections.STATEMENT_BLOCK)
         for (stmt in statements) {
             if (stmt == null) {
                 sb.append("{*ERROR: stmt null*}")
             } else {
                 sb.div(Sections.STATEMENT)
-                stmt.accept<Any>(this)
+                stmt.accept(this)
                 sb.end()
             }
         }
@@ -270,9 +251,9 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(programDeclaration: ProgramDeclaration): Any? {
+    override fun visit(programDeclaration: ProgramDeclaration): Unit? {
         sb.div(Sections.PROGRAM).keyword("PROGRAM")
-        sb.div(Sections.VARIABLE).append(programDeclaration.programName)
+        sb.div(Sections.VARIABLE).append(programDeclaration.name)
         sb.end().append('\n')
 
         programDeclaration.scope.accept(this)
@@ -297,10 +278,10 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(expressions: ExpressionList): Any? {
+    override fun visit(expressions: ExpressionList): Unit? {
         sb.append(Sections.EXPRESSION_LIST)
         for (e in expressions) {
-            e.accept<Any>(this)
+            e.accept(this)
             sb.seperator(",")
         }
         sb.deleteLastSeparator().end()
@@ -310,7 +291,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(invocation: Invocation): Any? {
+    override fun visit(invocation: Invocation): Unit? {
         sb.div(Sections.FUNC_CALL)
         sb.append(invocation.calleeName).append("(")
 
@@ -330,14 +311,14 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(forStatement: ForStatement): Any? {
+    override fun visit(forStatement: ForStatement): Unit? {
         sb.div(Sections.FOR)
         sb.keyword("FOR")
-        sb.variable(forStatement.variable)
+        sb.variable(forStatement.variable!!)
         sb.append(" := ")
-        forStatement.start!!.accept<Any>(this)
+        forStatement.start!!.accept(this)
         sb.keyword("TO")
-        forStatement.stop!!.accept<Any>(this)
+        forStatement.stop!!.accept(this)
         sb.keyword("DO")
         forStatement.statements.accept(this)
         sb.decreaseIndent().nl()
@@ -349,7 +330,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration): Any? {
+    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration): Unit? {
         sb.div(Sections.FB).keyword("FUNCTION_BLOCK ").variable(functionBlockDeclaration.name)
 
         functionBlockDeclaration.scope.accept(this)
@@ -362,7 +343,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(returnStatement: ReturnStatement): Any? {
+    override fun visit(returnStatement: ReturnStatement): Unit? {
         sb.keyword("RETURN").ts()
         return null
     }
@@ -370,7 +351,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(ifStatement: IfStatement): Any? {
+    override fun visit(ifStatement: IfStatement): Unit? {
         sb.div(Sections.IFSTATEMENT)
 
         for (i in 0 until ifStatement.conditionalBranches.size) {
@@ -379,7 +360,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
             else
                 sb.keyword("ELSIF")
 
-            ifStatement.conditionalBranches[i].condition.accept<Any>(this)
+            ifStatement.conditionalBranches[i].condition.accept(this)
             sb.keyword("THEN")
             sb.div("thenblock")
             ifStatement.conditionalBranches[i].statements.accept(this)
@@ -397,18 +378,18 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(fbc: InvocationStatement): Any? {
-        fbc.invocation.accept<Any>(this)
+    override fun visit(fbc: InvocationStatement): Unit? {
+        fbc.invocation.accept(this)
         return null
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(aCase: CaseStatement.Case): Any? {
+    override fun visit(aCase: Case): Unit? {
         sb.div(Sections.CASE)
         for (cc in aCase.conditions) {
-            cc.accept<Any>(this)
+            cc.accept(this)
             sb.seperator(",")
         }
         sb.deleteLastSeparator()
@@ -422,11 +403,11 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration<*>): Any? {
-        sb.div(Sections.TYPE_DECL_SIMPLE).type(simpleTypeDeclaration.baseTypeName)
+    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration): Unit? {
+        sb.div(Sections.TYPE_DECL_SIMPLE).type(simpleTypeDeclaration.baseType.identifier)
         if (simpleTypeDeclaration.initialization != null) {
             sb.operator(" := ")
-            simpleTypeDeclaration.initialization!!.accept<Any>(this)
+            simpleTypeDeclaration.initialization!!.accept(this)
         }
         sb.end()
         return null
@@ -435,9 +416,9 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(localScope: Scope): Any? {
+    override fun visit(localScope: Scope): Unit? {
         sb.div(Sections.VARIABLES_DEFINITIONS)
-        for (vd in localScope.asMap().values) {
+        for (vd in localScope.variables) {
             sb.div(Sections.VARIABLES_DEFINITION)
 
             if (vd.isInput)
@@ -466,11 +447,11 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
             sb.variable(vd.name)
 
             sb.seperator(":")
-            sb.type(vd.dataTypeName)
+            sb.type(vd.dataTypeName!!)
 
             if (vd.init != null) {
                 sb.operator(" := ")
-                vd.init!!.accept<Any>(this)
+                vd.init!!.accept(this)
             }
 
             sb.keyword("END_VAR").end()
@@ -482,7 +463,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Any>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(commentStatement: CommentStatement): Any? {
+    override fun visit(commentStatement: CommentStatement): Unit? {
         if (isPrintComments) {
             sb.div(Sections.COMMENT).append("{*").append(commentStatement.comment).append("*}")
             sb.end()

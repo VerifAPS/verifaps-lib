@@ -24,17 +24,9 @@ package edu.kit.iti.formal.automation.datatypes
 
 import edu.kit.iti.formal.automation.st.ast.InterfaceDeclaration
 
-/**
- * @author Augusto Modanese
- */
-class InterfaceDataType(override name: String = "<empty>") : RecordType(name) {
-    var interfaceDeclaration: InterfaceDeclaration? = null
-        set(interfaceDeclaration) {
-            field = this.interfaceDeclaration
-        }
-
-    override fun repr(obj: Any): String? {
-        return "INTERFACE " + this.interfaceDeclaration!!.name
+class InterfaceDataType(var interfaceDeclaration: InterfaceDeclaration) : AnyDt(interfaceDeclaration.name){
+    override fun repr(obj: Any): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun <T> accept(visitor: DataTypeVisitor<T>): T? {

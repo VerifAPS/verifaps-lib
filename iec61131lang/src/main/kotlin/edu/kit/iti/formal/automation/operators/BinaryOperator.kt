@@ -34,14 +34,10 @@ import edu.kit.iti.formal.automation.datatypes.promotion.TypePromotion
  * @author Alexander Weigl
  * @version 1
  */
-open class BinaryOperator(private val symbol: String, private val validType: AnyDt) : Operator {
+open class BinaryOperator(override val symbol: String, private val validType: AnyDt) : Operator {
     protected var promoter: TypePromotion = DefaultTypePromoter()
     override val expectedDataTypes: Array<AnyDt>
         get() = arrayOf(validType, validType)
-
-    init {
-        Operators.register(symbol, this)
-    }
 
     /**
      *
@@ -54,22 +50,7 @@ open class BinaryOperator(private val symbol: String, private val validType: Any
         return argument.javaClass.isAssignableFrom(validType.javaClass)
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    override fun symbol(): String {
-        return symbol
-    }
-
-    /**
-     *
-     * getPromotedType.
-     *
-     * @param left  a [edu.kit.iti.formal.automation.datatypes.AnyDt] object.
-     * @param right a [edu.kit.iti.formal.automation.datatypes.AnyDt] object.
-     * @return a [edu.kit.iti.formal.automation.datatypes.AnyDt] object.
-     */
-    fun getPromotedType(left: AnyDt, right: AnyDt): AnyDt {
+    fun getPromotedType(left: AnyDt, right: AnyDt): AnyDt? {
         return promoter.getPromotion(left, right)
     }
 
@@ -77,13 +58,9 @@ open class BinaryOperator(private val symbol: String, private val validType: Any
     override fun equals(o: Any?): Boolean {
         if (this === o) return true
         if (o == null || javaClass != o.javaClass) return false
-
         val that = o as BinaryOperator?
-
-        return if (symbol != null) symbol == that!!.symbol else that!!.symbol == null
+        return symbol == that!!.symbol
     }
 
-    override fun hashCode(): Int {
-        return symbol?.hashCode() ?: 0
-    }
+    override fun hashCode(): Int = symbol.hashCode()
 }
