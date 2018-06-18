@@ -53,7 +53,7 @@ open class AnyInt(var bitLength: kotlin.Int = 0, var isSigned: Boolean = false) 
         return result
     }
 
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
         return visitor.visit(this)
     }
 
@@ -93,7 +93,7 @@ object UDINT : AnyInt(32, false) {
     override fun next(): Optional<AnyInt> = Optional.of(ULINT)
     override fun asUnsigned() = this
     override fun asSigned() = LINT
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
         return visitor.visit(this)
     }
 }
@@ -103,7 +103,7 @@ object ULINT : AnyInt(64, false) {
     override fun next() = Optional.empty<AnyInt>()
     override fun asSigned() = LINT
     override fun asUnsigned() = this
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
         return visitor.visit(this)
     }
 }
@@ -113,7 +113,7 @@ object SINT : AnyInt(8) {
     override fun next() = Optional.of(INT)
     override fun asSigned() = this
     override fun asUnsigned() = USINT
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
         return visitor.visit(this)
     }
 }
@@ -122,7 +122,7 @@ object USINT : AnyInt(8, false) {
     override fun asUnsigned() = this
     override fun next() = Optional.of(UINT)
     override fun asSigned() = SINT
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
         return visitor.visit(this)
     }
 }
@@ -132,7 +132,7 @@ object INT : AnyInt(16) {
     override fun next() = Optional.ofNullable(DINT)
     override fun asUnsigned() = UINT
     override fun asSigned() = this
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
         return visitor.visit(this)
     }
 }
@@ -142,7 +142,7 @@ object UINT : AnyInt(16, false) {
     override fun next() = Optional.ofNullable(UDINT)
     override fun asUnsigned() = UINT
     override fun asSigned() = INT
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
         return visitor.visit(this)
     }
 }
@@ -153,7 +153,7 @@ object LINT : AnyInt(64) {
 
     override fun asSigned() = this
     override fun asUnsigned() = ULINT
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
         return visitor.visit(this)
     }
 }
@@ -169,7 +169,7 @@ object UInt : AnyInt(16, false) {
         return DINT
     }
 
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
         return visitor.visit(this)
     }
 }
@@ -183,7 +183,7 @@ object DINT : AnyInt(32) {
     override fun asSigned() = this
     override fun asUnsigned() = UDINT
 
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
         return visitor.visit(this)
     }
 }
@@ -208,5 +208,5 @@ data class RangeType(
 
     override fun repr(obj: Any) = base.repr(obj)
     override fun next(): Optional<AnyInt> = Optional.empty()
-    override fun <T> accept(visitor: DataTypeVisitor<T>) = visitor.visit(this)
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
 }

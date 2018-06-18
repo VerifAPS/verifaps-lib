@@ -135,7 +135,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
     }
 
     fun filterByFlags(flags: Int): List<VariableDeclaration> {
-        return variables.filter { it.`is`(flags) }
+        return variables.filter { it.isType(flags) }
     }
 
     fun hasVariable(variable: String): Boolean {
@@ -178,7 +178,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
 
         val q: AnyDt?
         if (a) {
-            q = FunctionBlockDataType(functionBlocks.lookup(name))
+            q = FunctionBlockDataType(functionBlocks.lookup(name)!!)
             types[name] = q
             return q
         }
@@ -244,6 +244,18 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
     fun resolveAction(name: String) = actions.lookup(name)
     fun registerAction(a: ActionDeclaration) = actions.register(a.name, a)
 
+    fun resolveVariable(variable: SymbolicReference): VariableDeclaration? {
+        if (variable.identifier in variables) {
+            return variables[variable.identifier]
+        } else {
+            return parent?.resolveVariable(variable)
+        }
+    }
+
+
+    fun isGlobalVariable(variable: SymbolicReference): Boolean {
+        return topLevel?.resolveVariable(variable) != null
+    }
 
     override fun clone(): Scope {
         val gs = Scope(parent)
@@ -284,7 +296,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
 
     fun filterByFlags(vararg flag: Int): List<VariableDeclaration> {
         return variables.filter { it ->
-            flag.find { f -> it.`is`(f) } != null
+            flag.find { f -> it.isType(f) } != null
         }
     }
 
@@ -320,7 +332,7 @@ class Namespace<T : Identifiable>() {
 
     internal fun register(key: String, obj: T) {
         if (key == "")
-            throw IllegalArgumentException("Registering empty string is not allowed")
+            throw IllegalArgumentException("Registering empty string isType not allowed")
         map += obj
     }
 
@@ -329,4 +341,5 @@ class Namespace<T : Identifiable>() {
     fun values(): Collection<T> {
         return map
     }
+
 }

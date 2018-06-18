@@ -1,45 +1,34 @@
 package edu.kit.iti.formal.automation.analysis
 
-import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
 
-class CheckForTypes : AstVisitorWithScope<Unit>() {
-    private val reporter: Reporter? = null
+class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>() {
+    override fun defaultVisit(obj: Any) {}
 
-    override fun visit(symbolicReference: SymbolicReference): Unit? {
+    override fun visit(symbolicReference: SymbolicReference) {
         if (null == scope.getVariable(symbolicReference.identifier))
-            reporter!!.report(
+            reporter.report(
                     symbolicReference.startPosition,
                     "Could not find variable " + symbolicReference.identifier + ".",
                     "var-resolve", "error")
-        return null    //super.visit(symbolicReference)
     }
 
-    override fun visit(functionDeclaration: FunctionDeclaration): Unit? {
+    override fun visit(functionDeclaration: FunctionDeclaration) {
         if (!functionDeclaration.returnType.isIdentified) {
-            reporter!!.report(functionDeclaration.startPosition,
+            reporter.report(functionDeclaration.startPosition,
                     "Return type " + functionDeclaration.returnType.identifier + " not found.",
                     "type-resolve", "error")
         }
         super.visit(functionDeclaration)
-        return null
     }
 
-    override fun visit(localScope: Scope): Unit? {
-        super.visit(localScope)
-        return null
-    }
-
-    override fun visit(invocation: InvocationStatement): Unit? {
+    override fun visit(invocation: InvocationStatement) {
         invocation.callee.accept(this)
-
-        return null
     }
 
-    override fun visit(invocation: Invocation): Unit? {
+    override fun visit(invocation: Invocation) {
         invocation.callee.accept(this)
-        return null
     }
 
     interface Reporter {

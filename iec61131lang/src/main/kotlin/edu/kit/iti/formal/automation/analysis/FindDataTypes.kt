@@ -8,56 +8,58 @@ import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
  * @author Alexander Weigl, Augusto Modanese
  * @version 1 (25.06.17)
  */
-class FindDataTypes(val globalScope: Scope) : AstVisitorWithScope<Any>() {
-    override fun visit(pd: ProgramDeclaration): Any? {
+class FindDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
+    override fun defaultVisit(obj: Any) {}
+
+    override fun visit(pd: ProgramDeclaration) {
         goIntoScope(pd)
         scope.registerProgram(pd)
-        pd.actions.forEach { n, a -> pd.scope.registerAction(a) }
-        return null
+        pd.actions.forEach { a -> pd.scope.registerAction(a) }
+        
     }
 
-    override fun visit(fbd: FunctionBlockDeclaration): Any? {
+    override fun visit(fbd: FunctionBlockDeclaration) {
         goIntoScope(fbd)
         scope.registerFunctionBlock(fbd)
         fbd.actions.forEach { scope.registerAction(it)  }
         fbd.methods.forEach { scope.registerMethod(it); }
         goOutoScope()
-        return null
+        
     }
 
-    override fun visit(functionDeclaration: FunctionDeclaration): Any? {
+    override fun visit(functionDeclaration: FunctionDeclaration) {
         goIntoScope(functionDeclaration)
         scope.registerFunction(functionDeclaration)
         goOutoScope()
-        return null
+        
     }
 
-    override fun visit(subRangeTypeDeclaration: SubRangeTypeDeclaration): Any? {
+    override fun visit(subRangeTypeDeclaration: SubRangeTypeDeclaration) {
         scope.registerType(subRangeTypeDeclaration)
-        return null
+        
     }
 
-    override fun visit(variableDeclaration: VariableDeclaration): Any? {
+    override fun visit(variableDeclaration: VariableDeclaration) {
         //weigl: do not register anonymous datatype, or references to data types.
         /*
         if (variableDeclaration.getTypeDeclaration() instanceof ArrayTypeDeclaration)
             variableDeclaration.getTypeDeclaration().accept(this);
         return super.visit(variableDeclaration);
         */
-        return null
+        
     }
 
-    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration): Any? {
+    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration) {
         scope.registerType(simpleTypeDeclaration)
-        return null //super.visit(simpleTypeDeclaration)
+         //super.visit(simpleTypeDeclaration)
     }
 
-    override fun visit(ptd: PointerTypeDeclaration): Any? {
+    override fun visit(ptd: PointerTypeDeclaration) {
         scope.registerType(ptd)
         return super.visit(ptd)
     }
 
-    override fun visit(clazz: ClassDeclaration): Any? {
+    override fun visit(clazz: ClassDeclaration) {
         scope.registerClass(clazz)
         goIntoScope(clazz)
         clazz.methods.forEach { scope.registerMethod(it) }
@@ -65,49 +67,49 @@ class FindDataTypes(val globalScope: Scope) : AstVisitorWithScope<Any>() {
         return super.visit(clazz)
     }
 
-    override fun visit(interfaceDeclaration: InterfaceDeclaration): Any? {
+    override fun visit(interfaceDeclaration: InterfaceDeclaration) {
         //goIntoScope(interfaceDeclaration)
         scope.registerInterface(interfaceDeclaration)
-        return null //super.visit(interfaceDeclaration)
+         //super.visit(interfaceDeclaration)
     }
 
-    override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration): Any? {
+    override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration) {
         scope.registerType(arrayTypeDeclaration)
-        return null
+        
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration): Any? {
+    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
         scope.registerType(enumerationTypeDeclaration)
-        return null
+        
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(stringTypeDeclaration: StringTypeDeclaration): Any? {
+    override fun visit(stringTypeDeclaration: StringTypeDeclaration) {
         scope.registerType(stringTypeDeclaration)
-        return null
+        
     }
 
-    override fun visit(typeDeclarations: TypeDeclarations): Any? {
+    override fun visit(typeDeclarations: TypeDeclarations) {
         for (td in typeDeclarations)
             td.accept(this)
-        return null
+        
     }
 
-    override fun visit(structureTypeDeclaration: StructureTypeDeclaration): Any? {
+    override fun visit(structureTypeDeclaration: StructureTypeDeclaration) {
         scope.registerType(structureTypeDeclaration)
-        return null
+        
     }
 
-    override fun visit(gvl: GlobalVariableListDeclaration): Any? {
+    override fun visit(gvl: GlobalVariableListDeclaration) {
         gvl.scope = scope // global variables does not open an own scope.
         scope.addVariables(gvl.scope)
         //return super.visit(gvl)
-        return null
+        
     }
 
     private fun goIntoScope(hasScope: HasScope) {

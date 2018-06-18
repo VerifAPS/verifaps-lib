@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.st.util
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -25,7 +25,6 @@ package edu.kit.iti.formal.automation.st.util
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.Visitable
 import java.util.*
-import java.util.stream.Collectors
 
 /**
  * Created by weigl on 10/07/14.
@@ -34,6 +33,7 @@ import java.util.stream.Collectors
  * @version $Id: $Id
  */
 class WriteBeforeReadIdentifier : AstVisitor<WriteBeforeReadIdentifier.WBRState>() {
+    override fun defaultVisit(obj: Any): WBRState = current!!
 
     private var current: WBRState? = null
 
@@ -75,7 +75,7 @@ class WriteBeforeReadIdentifier : AstVisitor<WriteBeforeReadIdentifier.WBRState>
     }
 
     /** {@inheritDoc}  */
-    override fun visit(assignmentStatement: AssignmentStatement): WBRState? {
+    override fun visit(assignmentStatement: AssignmentStatement): WBRState {
         val wbrState = WBRState()
         current = wbrState
         assignmentStatement.expression.accept(this)
@@ -91,7 +91,7 @@ class WriteBeforeReadIdentifier : AstVisitor<WriteBeforeReadIdentifier.WBRState>
     }*/
 
     /** {@inheritDoc}  */
-    override fun visit(statements: StatementList): WBRState? {
+    override fun visit(statements: StatementList): WBRState {
         val state = WBRState()
         for (s in statements) {
             val w = s.accept(this)
@@ -118,7 +118,7 @@ class WriteBeforeReadIdentifier : AstVisitor<WriteBeforeReadIdentifier.WBRState>
     }
 
     /** {@inheritDoc}  */
-    override fun visit(commentStatement: CommentStatement): WBRState? {
+    override fun visit(commentStatement: CommentStatement): WBRState {
         return WBRState()
     }
 
@@ -146,7 +146,7 @@ class WriteBeforeReadIdentifier : AstVisitor<WriteBeforeReadIdentifier.WBRState>
     }
 
     /** {@inheritDoc}  */
-    override fun visit(guardedStatement: GuardedStatement): WBRState? {
+    override fun visit(guardedStatement: GuardedStatement): WBRState {
         val state = WBRState()
         current = state
 
@@ -164,7 +164,7 @@ class WriteBeforeReadIdentifier : AstVisitor<WriteBeforeReadIdentifier.WBRState>
     }
 
     /** {@inheritDoc}  */
-    override fun visit(aCase: Case): WBRState? {
+    override fun visit(aCase: Case): WBRState {
         return aCase.statements.accept(this)
     }
 
@@ -199,7 +199,7 @@ class WriteBeforeReadIdentifier : AstVisitor<WriteBeforeReadIdentifier.WBRState>
     }
 
     /** {@inheritDoc}  */
-    override fun visit(programDeclaration: ProgramDeclaration): WBRState? {
+    override fun visit(programDeclaration: ProgramDeclaration): WBRState {
         return programDeclaration.stBody!!.accept(this)
     }
 

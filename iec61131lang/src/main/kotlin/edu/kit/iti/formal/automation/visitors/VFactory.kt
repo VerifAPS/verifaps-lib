@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.visitors
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.visitors
 
 import edu.kit.iti.formal.automation.st.StructuredTextHtmlPrinter
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements
+import edu.kit.iti.formal.automation.st.ast.PouElements
 
 /**
  *
@@ -64,11 +64,11 @@ object VFactory {
      *
      * ast2St.
      *
-     * @param st0ast a [edu.kit.iti.formal.automation.st.ast.TopLevelElements] object.
+     * @param st0ast a [edu.kit.iti.formal.automation.st.ast.PouElements] object.
      * @param comments a boolean.
      * @return a [java.lang.String] object.
      */
-    fun ast2St(st0ast: TopLevelElements, comments: Boolean): String {
+    fun ast2St(st0ast: PouElements, comments: Boolean): String {
         val stp = StructuredTextPrinter()
         stp.isPrintComments = comments
         st0ast.accept(stp)
@@ -79,11 +79,11 @@ object VFactory {
      *
      * ast2Html.
      *
-     * @param st0ast a [edu.kit.iti.formal.automation.st.ast.TopLevelElements] object.
+     * @param st0ast a [edu.kit.iti.formal.automation.st.ast.PouElements] object.
      * @param comments a boolean.
      * @return a [java.lang.String] object.
      */
-    fun ast2Html(st0ast: TopLevelElements, comments: Boolean): String {
+    fun ast2Html(st0ast: PouElements, comments: Boolean): String {
         val stp = StructuredTextHtmlPrinter()
         stp.isPrintComments = comments
         stp.preamble()

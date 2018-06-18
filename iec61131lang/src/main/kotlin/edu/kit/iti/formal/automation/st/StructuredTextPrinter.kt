@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.st
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.st
  */
 
 import com.google.common.collect.HashMultimap
-import edu.kit.iti.formal.automation.datatypes.IECArray
+import edu.kit.iti.formal.automation.datatypes.ArrayType
 import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue
 import edu.kit.iti.formal.automation.datatypes.values.Value
 import edu.kit.iti.formal.automation.operators.Operator
@@ -50,7 +50,7 @@ class StructuredTextPrinter
         get() = sb.toString()
 
 
-    override fun defaultVisit(visitable: Any?): Unit? {
+    override fun defaultVisit(visitable: Any) {
         throw IllegalArgumentException("not implemented: " + visitable!!::class.java)
     }
 
@@ -265,7 +265,7 @@ class StructuredTextPrinter
         sb.nl()
 
         if (!pd.actions.isEmpty()) {
-            pd.actions.forEach { k, v -> v.accept(this) }
+            pd.actions.forEach { v -> v.accept(this) }
             sb.nl()
         }
 
@@ -315,7 +315,7 @@ class StructuredTextPrinter
                     sb.append(" := ")
             }
 
-            entry.expression!!.accept(this)
+            entry.expression.accept(this)
             sb.append(", ")
             params = true
         }
@@ -472,9 +472,7 @@ class StructuredTextPrinter
 
         functionDeclaration.scope.accept(this)
 
-        if (functionDeclaration.stBody != null) {
-            functionDeclaration.stBody.accept(this)
-        }
+        functionDeclaration.stBody?.accept(this)
 
         sb.decreaseIndent().nl().append("END_FUNCTION").nl().nl()
         return null
@@ -609,8 +607,8 @@ class StructuredTextPrinter
     }
 
     private fun variableDataType(vd: VariableDeclaration) {
-        if (vd.dataType.obj is IECArray) {
-            val dataType = vd.dataType as IECArray
+        if (vd.dataType.obj is ArrayType) {
+            val dataType = vd.dataType as ArrayType
             sb.append(" ARRAY[")
             for (range in dataType.ranges) {
                 range.start.accept(this)

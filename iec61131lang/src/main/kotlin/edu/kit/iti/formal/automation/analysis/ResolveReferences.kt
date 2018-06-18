@@ -4,12 +4,12 @@
  * %%
  * Copyright (C) 2017 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -55,11 +55,11 @@ class ResolveReferences(scope: Scope) : AstVisitor<Any> {
                     for (i in 0 until ref.derefCount)
                         identifiedObjectDataType = (identifiedObjectDataType as ReferenceType).of
                     // Array access yields array field type
-                    if (identifiedObjectDataType is IECArray && ref.subscripts != null)
+                    if (identifiedObjectDataType isType ArrayType && ref.subscripts != null)
                         identifiedObjectDataType = identifiedObjectDataType.fieldType
                     if (ref.hasSub())
-                        if (identifiedObjectDataType is ClassDataType) {
-                            if (refVariable.dataType !is ReferenceType && refVariable.dataType !is InterfaceDataType)
+                        if (identifiedObjectDataType isType ClassDataType) {
+                            if (refVariable.dataType !isType ReferenceType && refVariable.dataType !isType InterfaceDataType)
                                 ref.effectiveDataType = refVariable.dataType
                             nextTopLevelScopeElement = identifiedObjectDataType.clazz
                             nextScope = OOUtils.getEffectiveScope((nextTopLevelScopeElement as ClassDeclaration?)!!)
@@ -71,13 +71,13 @@ class ResolveReferences(scope: Scope) : AstVisitor<Any> {
                 }// Variable in scope
 
                 // Method
-                if (currentTopLevelScopeElement is ClassDeclaration && OOUtils.hasMethodWithInheritance(currentTopLevelScopeElement as ClassDeclaration,
+                if (currentTopLevelScopeElement isType ClassDeclaration && OOUtils.hasMethodWithInheritance(currentTopLevelScopeElement as ClassDeclaration,
                                 ref.identifier)) {
                     val method = OOUtils.getMethod(currentTopLevelScopeElement as ClassDeclaration,
                             ref.identifier)
                     ref.identifiedObject = method
                     ref.dataType = method.returnType
-                } else if (currentTopLevelScopeElement is InterfaceDeclaration && OOUtils.hasMethodWithInheritance(currentTopLevelScopeElement as InterfaceDeclaration,
+                } else if (currentTopLevelScopeElement isType InterfaceDeclaration && OOUtils.hasMethodWithInheritance(currentTopLevelScopeElement as InterfaceDeclaration,
                                 ref.identifier)) {
                     val method = OOUtils.getMethod(currentTopLevelScopeElement as InterfaceDeclaration,
                             ref.identifier)
@@ -93,15 +93,15 @@ class ResolveReferences(scope: Scope) : AstVisitor<Any> {
                         ref.sub!!.dataType = method.returnType
                         ref.dataType = ref.sub!!.dataType
                     }
-                } else if (currentTopLevelScopeElement is FunctionDeclaration && ref.identifier == (currentTopLevelScopeElement as FunctionDeclaration).name) {
+                } else if (currentTopLevelScopeElement isType FunctionDeclaration && ref.identifier == (currentTopLevelScopeElement as FunctionDeclaration).name) {
                     ref.identifiedObject = currentTopLevelScopeElement
                     ref.dataType = (currentTopLevelScopeElement as FunctionDeclaration).returnType
                 } else if (globalScope!!.functions.containsKey(ref.identifier)) {
                     ref.identifiedObject = globalScope.resolveFunction(ref.identifier)
                     ref.dataType = (ref.identifiedObject as FunctionDeclaration).returnType
                 } else if (ref.hasSub()) {
-                    if (ref.identifiedObject is VariableDeclaration
-                            && identifiedObjectDataType is ClassDataType
+                    if (ref.identifiedObject isType VariableDeclaration
+                            && identifiedObjectDataType isType ClassDataType
                             && OOUtils.hasMethod(identifiedObjectDataType.clazz,
                                     ref.sub!!.identifier)) {
                         ref.sub!!.identifiedObject = OOUtils.getMethod(identifiedObjectDataType.clazz,
@@ -128,7 +128,7 @@ class ResolveReferences(scope: Scope) : AstVisitor<Any> {
                 // Function return value
                 // SUPER (may only reference methods)
 
-                // Assert identified object is set for the reference
+                // Assert identified object isType set for the reference
                 //assert ref.getObj() != null;
             } catch (e: ClassCastException) {
                 e.printStackTrace()

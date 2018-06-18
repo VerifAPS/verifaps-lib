@@ -13,38 +13,35 @@ import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
  * @version 1
  * @since 25.11.16
  */
-class ResolveDataTypes : AstVisitorWithScope<Any>() {
-    override fun visit(programDeclaration: ProgramDeclaration): Any? {
-        super.visit(programDeclaration)
-        return null
-    }
+class ResolveDataTypes : AstVisitorWithScope<Unit>() {
+    override fun defaultVisit(obj: Any) {}
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(functionDeclaration: FunctionDeclaration): Any? {
+    override fun visit(functionDeclaration: FunctionDeclaration) {
         super.visit(functionDeclaration)
         functionDeclaration.returnType.resolve(scope::resolveDataType)
-        return null
+
     }
 
-    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration): Any? {
+    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) {
         return super.visit(functionBlockDeclaration)
     }
 
-    override fun visit(localScope: Scope): Any? {
+    override fun visit(localScope: Scope) {
         scope = localScope
         scope.variables.forEach { vd ->
-            vd.dataType.resolve(scope::resolveDataType)
-            if (vd.init != null) {
-                vd.init!!.accept(this)
+            if (vd.dataType == null)
+                vd.dataType = vd.typeDeclaration?.getDataType(localScope)
+            if (vd.initValue == null) {
+                vd.initValue = vd.init?.getValue()
             }
         }
-        return null
     }
 
 
-    override fun visit(classDeclaration: ClassDeclaration): Any? {
+    override fun visit(classDeclaration: ClassDeclaration) {
         if (classDeclaration.parent.identifier != null) {
             classDeclaration.parent.resolve(scope::resolveClass)
             //assert(classDeclaration.parentClass != null)
@@ -54,28 +51,28 @@ class ResolveDataTypes : AstVisitorWithScope<Any>() {
         return super.visit(classDeclaration)
     }
 
-    override fun visit(interfaceDeclaration: InterfaceDeclaration): Any? {
+    override fun visit(interfaceDeclaration: InterfaceDeclaration) {
         val seq = interfaceDeclaration.interfaces
         seq.forEach { it.resolve(scope::resolveInterface) }
         return super.visit(interfaceDeclaration)
     }
 
-    override fun visit(methodDeclaration: MethodDeclaration): Any? {
+    override fun visit(methodDeclaration: MethodDeclaration) {
         super.visit(methodDeclaration)
         methodDeclaration.returnType.resolve(scope::resolveDataType)
-        return null
+
     }
 
-    override fun visit(globalVariableListDeclaration: GlobalVariableListDeclaration): Any? {
-        return super.visit(globalVariableListDeclaration)
+    override fun visit(gvlDecl: GlobalVariableListDeclaration) {
+        return super.visit(gvlDecl)
     }
 
-    override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration): Any? {
+    override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration) {
         arrayTypeDeclaration.baseType.resolve(scope::resolveDataType)
         return super.visit(arrayTypeDeclaration)
     }
 
-    override fun visit(ref: SymbolicReference): Any? {
+    override fun visit(ref: SymbolicReference) {
         val first = ref.identifier
         try {
             val dataType = scope.resolveDataType(first)
@@ -90,17 +87,14 @@ class ResolveDataTypes : AstVisitorWithScope<Any>() {
         } catch (e: DataTypeNotDefinedException) {
         }
 
-        return null
+
     }
 
-    override fun visit(literal: Literal): Any? {
+    override fun visit(literal: Literal) {
         try {
             literal.dataType.resolve(scope::resolveDataType)
         } catch (e: ClassCastException) {
         } catch (e: DataTypeNotDefinedException) {
         }
-
-        return null
     }
-
 }

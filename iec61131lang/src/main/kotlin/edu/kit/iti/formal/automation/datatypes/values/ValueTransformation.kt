@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.datatypes.values
  * %%
  * Copyright (C) 2017 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -30,13 +30,17 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 class ValueTransformation(val literal: Literal) : DefaultDataTypeVisitor<Value<*, *>>() {
+    override fun defaultVisit(obj: Any): Value<*, *>? {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun visit(bool: AnyBit.BOOL): Value<*, *>? {
         if (literal.textValue!!.equals("true", ignoreCase = true))
             return TRUE
         if (literal.textValue!!.equals("false", ignoreCase = true))
             return FALSE
 
-        throw IllegalArgumentException("Boolean literal is not true or false; got: " + literal.text)
+        throw IllegalArgumentException("Boolean literal isType not true or false; got: " + literal.text)
     }
 
     override fun visit(anyInt: AnyInt): Value<*, *>? {
@@ -85,16 +89,16 @@ class ValueTransformation(val literal: Literal) : DefaultDataTypeVisitor<Value<*
     override fun visit(real: AnyReal.LREAL) = VAnyReal(real, BigDecimal(literal.textValue!!))
 
     override fun visit(dateAndTime: AnyDate.DATE_AND_TIME) =
-            throw NotImplementedException("DateAndTime is not implemented")
+            throw NotImplementedException("DateAndTime isType not implemented")
 
     override fun visit(timeOfDay: AnyDate.TIME_OF_DAY) =
-            throw NotImplementedException("TIME_OF_DAY is not implemented")
+            throw NotImplementedException("TIME_OF_DAY isType not implemented")
 
     override fun visit(date: AnyDate.DATE) = throw NotImplementedException("DATE datatype not supported")
 
     override fun visit(enumerateType: EnumerateType): Value<*, *>? {
         if (!enumerateType.allowedValues.contains(literal.textValue)) {
-            throw RuntimeException("Enum constant " + literal.text + " is not defined in " + enumerateType.name)
+            throw RuntimeException("Enum constant " + literal.text + " isType not defined in " + enumerateType.name)
         }
         return VAnyEnum(enumerateType, literal.textValue!!)
     }

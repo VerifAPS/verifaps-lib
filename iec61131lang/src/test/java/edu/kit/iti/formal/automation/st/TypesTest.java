@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.st;
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -25,7 +25,7 @@ package edu.kit.iti.formal.automation.st;
 import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.PouElements;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -67,7 +67,7 @@ public class TypesTest {
 
     @Test
     public void testCopy() throws IOException {
-        TopLevelElements ast = IEC61131Facade.INSTANCE.file(CharStreams.fromFileName(testFile));
+        PouElements ast = IEC61131Facade.INSTANCE.file(CharStreams.fromFileName(testFile));
         Assert.assertEquals(ast, ast.clone());
     }
 }

@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.datatypes
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -41,7 +41,7 @@ abstract class AnyDate(name: String = "ANY_DATE") : AnyDt(name) {
                     dt.year, dt.month, dt.day)
         }
 
-        override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
+        override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
             return visitor.visit(this)
         }
     }
@@ -53,7 +53,7 @@ abstract class AnyDate(name: String = "ANY_DATE") : AnyDt(name) {
                     dt.hours, dt.minutes, dt.seconds, dt.millieseconds)
         }
 
-        override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
+        override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
             return visitor.visit(this)
         }
     }
@@ -66,8 +66,6 @@ abstract class AnyDate(name: String = "ANY_DATE") : AnyDt(name) {
         }
 
 
-        override fun <T> accept(visitor: DataTypeVisitor<T>): T? {
-            return visitor.visit(this)
-        }
+        override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
     }
 }

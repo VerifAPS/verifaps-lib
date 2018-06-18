@@ -1,82 +1,56 @@
 package edu.kit.iti.formal.automation.run
 
+import edu.kit.iti.formal.automation.datatypes.AnyDt
+import edu.kit.iti.formal.automation.datatypes.RecordType
+import edu.kit.iti.formal.automation.datatypes.values.RecordValue
 import edu.kit.iti.formal.automation.datatypes.values.Value
-import edu.kit.iti.formal.automation.run.stexceptions.ExecutionException
-import java.util.*
 
+typealias EValue = Value<*, *>
 
-/**
- * State contains the variables values (-> the state of execution)
- * it contains value in the form of Optional<ExpressionValue>>. This form is needed since variables can be
- * initialized without a value. A variable that has not been defined will be "null" if queried
- * and will be Optional.empty() if defined but not initialized
- */
-sealed class State : HashMap<String, Optional<ExpressionValue>>() {
-    /**
-     * returns the value of a variable, that has been initialized (e.g. has a value)
-     * if the given variable has not been initialized the returned value will be null
-     */
-    fun getInitialized(key: String) : ExpressionValue? = get(key)?.orElse(null)
+class State(val impl: MutableMap<String, EValue> = HashMap<String, EValue>()/*val parent: State?*/) {
+    fun declare(key: String, dataType: AnyDt) = declare(key, ExecutionFacade.getDefaultValue(dataType))
+    fun <T : AnyDt, S : Any> declare(key: String, value: Value<T, S>) = impl.put(key, value)
+    operator fun get(name: String) = impl[name]
+    operator fun contains(key: String) = key in impl
 
-    /**
-     * define a Variable with name [key].
-     */
-    //TODO make sure that defineVariable(key) always adds the variable to the local scope.
-    fun defineVariable(key: String) = put(key, Optional.empty())
-
-    /**
-     * updates the value of a defined variable to [value].
-     * [key] is variable name
-     * @throws ExecutionException if variable is not defined
-     */
-    fun updateValue(key: String, value: ExpressionValue): Optional<ExpressionValue>? {
-        if (!isDefined(key)) throw ExecutionException("Variable \"$key\" is not defined")
-        return put(key, Optional.of(value))
-    }
-
-    /**
-     * is the variable with name [key] initialized
-     */
-    fun isInitialized(key: String) = get(key)?.isPresent ?: false // return true, if get(key) contains a value; false otherwise
-
-    /**
-     * is the variable with name [key] defined?
-     */
-    fun isDefined(key: String) = containsKey(key)
-}
-
-/**
- * Root State of a State-Tree
- */
-class TopState : State()
-
-/**
- * NestedState represents a State, that has a parent
- */
-class NestedState(private val parentState: State) : State() {
-    override fun get(key: String): Optional<ExpressionValue>? {
-        return super.get(key) ?: return parentState[key]
-    }
-
-    override fun put(key: String, value: Optional<ExpressionValue>): Optional<ExpressionValue>? {
-        if (parentState.contains(key)) {
-            return parentState.put(key, value)
+    operator fun get(name: List<String>): EValue? {
+        if (name.isEmpty()) return null
+        if (name.size == 1) return this[name[0]]
+        try {
+            val o = impl[name[0]] as Value<RecordType, RecordValue>
+            val state = State(o.value.fieldValues)
+            val r = 1..(name.size)
+            return state[name.slice(r)]
+        } catch (e: ClassCastException) {
+            return null
         }
-        return super.put(key, value)
     }
 
-    override fun containsKey(key: String): Boolean {
-        return super.containsKey(key).or(parentState.containsKey(key))
+    operator fun contains(key: List<String>) = get(key) != null
+    operator fun plusAssign(values: Map<String, EValue>) {
+        impl += values
     }
 
-    override fun containsValue(value: Optional<ExpressionValue>): Boolean {
-        return super.containsValue(value).or(parentState.containsValue(value))
+    operator fun set(name: List<String>, value: EValue) {
+        if (name.isEmpty()) return
+        if (name.size == 1) this[name[0]] = value
+        try {
+            val o = impl[name[0]] as Value<RecordType, RecordValue>
+            val state = State(o.value.fieldValues)
+            val r = 1..(name.size)
+            state[name.slice(r)] = value
+        } catch (e: ClassCastException) {
+            return
+        }
     }
 
-    override fun remove(key: String, value: Optional<ExpressionValue>): Boolean {
-        val isRemoved = super.remove(key, value)
-        if (isRemoved) return true
-        return parentState.remove(key, value)
+    operator fun set(name: String, value: EValue) {
+        impl[name] = value
+    }
+
+    fun clone(): State {
+        //TODO copy
+        val s = State(HashMap(impl))
+        return s
     }
 }
-

@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.sfclang
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -37,7 +37,7 @@ fun split(s: String): Splitted {
     return if (t.matches()) {
         Splitted(t.group("prefix"), t.group("radix"), t.group("value"))
     } else {
-        throw IllegalArgumentException("Argument is not well word: expected form " + PATTERN.pattern())
+        throw IllegalArgumentException("Argument isType not well word: expected form " + PATTERN.pattern())
     }
 }
 

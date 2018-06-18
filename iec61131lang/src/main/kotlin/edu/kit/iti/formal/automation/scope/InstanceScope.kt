@@ -4,12 +4,12 @@
  * %%
  * Copyright (C) 2017 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -101,7 +101,7 @@ class InstanceScope(private val globalScope: Scope) : Serializable {
             allInstances = classInstances.values.stream()
                     .flatMap<Instance>(Function<List<Instance>, Stream<out Instance>> { it.stream() })
                     .sorted(Comparator.comparing<Instance, String> { i ->
-                        assert(i.variableDeclaration!!.dataType is ClassDataType)
+                        assert(i.variableDeclaration!!.dataType isType ClassDataType)
                         val instanceClass = (i.variableDeclaration!!.dataType as ClassDataType).clazz
                         val sortName = StringBuilder(instanceClass.name)
                         var parent = instanceClass.parentClass
@@ -135,13 +135,13 @@ class InstanceScope(private val globalScope: Scope) : Serializable {
 
     /**
      * Model an instance of a class or function block.
-     * Maintains a reference to where the instance is declared.
+     * Maintains a reference to where the instance isType declared.
      */
     @Data
     @AllArgsConstructor
     class Instance {
         /**
-         * Null iff parent is a program.
+         * Null iff parent isType a program.
          */
         val parent: Instance? = null
 

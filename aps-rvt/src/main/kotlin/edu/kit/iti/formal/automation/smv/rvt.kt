@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.smv
 
+import edu.kit.iti.formal.automation.smv.ModuleBuilder
 import edu.kit.iti.formal.smv.ModuleType
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.SMVPrinter

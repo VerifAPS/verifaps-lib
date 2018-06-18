@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation;
  * %%
  * Copyright (C) 2018 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation;
  */
 
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.PouElements;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import org.junit.Test;
 
@@ -37,15 +37,15 @@ import java.io.IOException;
 public class PipelineTest {
     @Test
     public void test() throws IOException {
-        TopLevelElements tle = IEC61131Facade.INSTANCE.file(new File("src/test/resources/edu/kit/iti/formal/automation/st/Crane.st"));
+        PouElements tle = IEC61131Facade.INSTANCE.file(new File("src/test/resources/edu/kit/iti/formal/automation/st/Crane.st"));
         IEC61131Facade.INSTANCE.resolveDataTypes(tle);
-        tle = SymbExFacade.simplify(tle);
+        tle = SymbExFacade.INSTANCE.simplify(tle);
 
         StructuredTextPrinter printer = new StructuredTextPrinter();
         tle.accept(printer);
         String s = printer.getString();
         System.out.println(s);
-        SMVModule mod = SymbExFacade.evaluateProgram(tle);
+        SMVModule mod = SymbExFacade.INSTANCE.evaluateProgram(tle);
         System.out.println(mod);
     }
 }

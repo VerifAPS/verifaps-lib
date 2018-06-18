@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -22,19 +22,25 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
-import edu.kit.iti.formal.automation.analysis.*
+import edu.kit.iti.formal.automation.analysis.FindDataTypes
+import edu.kit.iti.formal.automation.analysis.ResolveDataTypes
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
-import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.automation.st.ast.Expression
+import edu.kit.iti.formal.automation.st.ast.PouElements
+import edu.kit.iti.formal.automation.st.ast.StatementList
+import edu.kit.iti.formal.automation.st.ast.Top
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
-
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
+import java.net.URL
+import java.nio.charset.Charset
 import java.nio.file.Path
 
 /**
@@ -111,24 +117,24 @@ object IEC61131Facade {
         return statements(CharStreams.fromString(input))
     }
 
-    fun file(input: CharStream): TopLevelElements {
+    fun file(input: CharStream): PouElements {
         val parser = getParser(input)
-        val tle = parser.start().accept(IECParseTreeToAST()) as TopLevelElements
+        val tle = parser.start().accept(IECParseTreeToAST()) as PouElements
         parser.errorReporter.throwException()
         return tle
     }
 
     @Throws(IOException::class)
-    fun file(s: Path): TopLevelElements {
+    fun file(s: Path): PouElements {
         return file(CharStreams.fromPath(s))
     }
 
     @Throws(IOException::class)
-    fun file(f: File): TopLevelElements {
+    fun file(f: File): PouElements {
         return file(f.toPath())
     }
 
-    fun resolveDataTypes(elements: TopLevelElements): Scope {
+    fun resolveDataTypes(elements: PouElements): Scope {
         val scope = Scope.defaultScope()
         val fdt = FindDataTypes(scope)
         val rdt = ResolveDataTypes()
@@ -143,4 +149,6 @@ object IEC61131Facade {
         return getParser(CharStreams.fromString(s))
     }
 
+    fun file(resource: InputStream) = file(CharStreams.fromStream(resource, Charset.defaultCharset()))
 }
+

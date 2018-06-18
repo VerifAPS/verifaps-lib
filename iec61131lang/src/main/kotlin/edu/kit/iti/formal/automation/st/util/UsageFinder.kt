@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.st.util
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -24,8 +24,7 @@ package edu.kit.iti.formal.automation.st.util
 
 import edu.kit.iti.formal.automation.st.ast.AssignmentStatement
 import edu.kit.iti.formal.automation.visitors.Visitable
-
-import java.util.HashSet
+import java.util.*
 
 /**
  * Created by weigl on 10/07/14.
@@ -33,20 +32,22 @@ import java.util.HashSet
  * @author weigl
  * @version $Id: $Id
  */
-class UsageFinder : AstVisitor<Any>() {
+class UsageFinder : AstVisitor<Unit>() {
+    override fun defaultVisit(obj: Any) {}
+
     var writtenReferences: MutableSet<String> = HashSet()
     var readedReference: Set<String> = HashSet()
 
-    override fun visit(assignmentStatement: AssignmentStatement): Any? {
+    override fun visit(assignmentStatement: AssignmentStatement) {
         writtenReferences.add(assignmentStatement.location.toString())
         assignmentStatement.expression.accept(this)
-        return null
+        
     }
 
     /*@Override
     public Object accept(SymbolicReference symbolicReference) {
         readedReference.add(symbolicReference.getName());
-        return null;
+        ;
     }*/
 
     companion object {

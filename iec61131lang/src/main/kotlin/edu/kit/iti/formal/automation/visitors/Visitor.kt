@@ -159,9 +159,10 @@ interface Visitor<T> {
 
     fun visit(invocation: InvocationStatement): T
 
-    fun visit(elements: TopLevelElements): T
+    fun visit(elements: PouElements): T
 
     fun visit(empty: EMPTY_EXPRESSION): T {
         TODO("not implemented")
     }
+
 }

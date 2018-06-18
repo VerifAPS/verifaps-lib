@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.visitors
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -26,19 +26,18 @@ package edu.kit.iti.formal.automation.visitors
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements
+import edu.kit.iti.formal.automation.st.ast.PouElements
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.Lexer
 import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.ParseTree
 import java.lang.reflect.Method
-import java.util.*
 
 /**
  * Created by weigla on 09.06.2014.*/
 object Utils {
-    fun findProgram(tles: TopLevelElements): ProgramDeclaration? {
+    fun findProgram(tles: PouElements): ProgramDeclaration? {
         for (t in tles)
             if (t is ProgramDeclaration)
                 return t

@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.datatypes.values
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -54,7 +54,7 @@ data class TimeofDayData(var hours: Int = 0, var minutes: Int = 0,
                 val t = TimeofDayData(hour, min, sec, ms)
                 return VToD(AnyDate.TIME_OF_DAY, t)
             } else {
-                throw IllegalArgumentException("Given string is not a time of day value.")
+                throw IllegalArgumentException("Given string isType not a time of day value.")
             }
         }
     }

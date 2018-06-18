@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.sfclang
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -36,46 +36,48 @@ import edu.kit.iti.formal.automation.st.util.CodeWriter
  * @author weigl
  * @version $Id: $Id
  */
-class DotPrinter : AstVisitor<Void>() {
+class DotPrinter : AstVisitor<Unit>() {
+    override fun defaultVisit(obj: Any) {}
+
     private val cw = CodeWriter()
 
-    override fun visit(decl: SFCImplementation): Void? {
+    override fun visit(decl: SFCImplementation) {
         cw.append("digraph g {").increaseIndent()
         cw.nl()
         decl.networks.forEach { n -> visit(n) }
         cw.decreaseIndent()
         cw.nl().append("}")
-        return null
+        
     }
 
-    override fun visit(n: SFCNetwork): Void? {
+    override fun visit(n: SFCNetwork) {
         cw.append("digraph f {").increaseIndent()
         cw.nl()
         n.steps.forEach { s -> s.accept(this) }
         cw.decreaseIndent()
         cw.nl().append("}")
-        return null
+        
     }
 
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(decl: SFCStep): Void? {
+    override fun visit(decl: SFCStep) {
         cw.nl().append(decl.name)
         cw.append(" [label=\"" + decl.name + "\", shape=rectangle]")
-        return null
+        
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(decl: SFCTransition): Void? {
+    override fun visit(decl: SFCTransition) {
         for (from in decl.from!!) {
             for (to in decl.to!!)
                 cw.nl().append(from).append(" -> ").append(to).append(";")
         }
-        return null
+        
     }
 
     companion object {

@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.parser
  * %%
  * Copyright (C) 2017 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -46,11 +46,11 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     //private lateinit var currentTopLevelScopeElement: HasScope
 
     override fun visitStart(
-            ctx: IEC61131Parser.StartContext): TopLevelElements {
-        val ast = TopLevelElements()
+            ctx: IEC61131Parser.StartContext): PouElements {
+        val ast = PouElements()
         ast.ruleContext = ctx
         ctx.library_element_declaration().forEach { l ->
-            val accept = l.accept(this) as TopLevelElement
+            val accept = l.accept(this) as PouElement
             if (accept != null)
                 ast.add(accept)
         }
@@ -123,7 +123,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitReference_value(ctx: IEC61131Parser.Reference_valueContext): Any {
-        TODO("This is wrong, a value is not a syntax element")
+        TODO("This isType wrong, a value isType not a syntax element")
         //val ast = ReferenceValue()
         //ast.ruleContext = ctx
         //ast.referenceTo = ctx.ref_to.accept(this) as SymbolicReference
@@ -155,14 +155,21 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             ctx.map { a -> a.accept(this) as T }
                     .toMutableList()
 
-    private fun <T> oneOf(vararg children: ParserRuleContext): T? {
+    private fun <T> oneOf(vararg children: ParserRuleContext?): T? {
+        val fnn = children.find { it != null }
+        if (fnn != null) {
+            return fnn.accept(this) as T
+        } else {
+            return null
+        }
+        /*
         val call = { r: ParserRuleContext -> if (r != null) r.accept(this) as T else null }
         for (c in children) {
             val a = call(c)
             if (a != null)
                 return a
         }
-        return null
+        return null*/
     }
 
     override fun visitType_declaration(
@@ -198,14 +205,13 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         //if(ctx.data_type_name() != null)
         {
             val t = visitData_type_name(ctx.data_type_name())
-            t.initialization = init
+            t.setInit(init)
             return t
         }
     }
 
     override fun visitInitializations_identifier(
-            ctx: IEC61131Parser.Initializations_identifierContext)
-            = IdentifierInitializer(null, ctx.IDENTIFIER().text)
+            ctx: IEC61131Parser.Initializations_identifierContext) = IdentifierInitializer(null, ctx.IDENTIFIER().text)
 
     override fun visitSubrange_spec_init(
             ctx: IEC61131Parser.Subrange_spec_initContext): SubRangeTypeDeclaration {

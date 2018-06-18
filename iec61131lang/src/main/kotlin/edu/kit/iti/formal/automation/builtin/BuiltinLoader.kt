@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.builtin
  * %%
  * Copyright (C) 2018 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -23,15 +23,12 @@ package edu.kit.iti.formal.automation.builtin
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements
+import edu.kit.iti.formal.automation.st.ast.PouElements
 import org.apache.commons.io.IOUtils
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.io.IOException
 import java.net.URISyntaxException
-import java.net.URL
-import java.nio.file.Path
 import java.nio.file.Paths
 
 /**
@@ -44,18 +41,18 @@ object BuiltinLoader {
     private val logger = LoggerFactory.getLogger(BuiltinLoader::class.java!!)
 
     @Throws(IOException::class, URISyntaxException::class)
-    fun loadDefault(): TopLevelElements {
+    fun loadDefault(): PouElements {
         return loadFromClasspath(DEFAULT_LIST)
     }
 
     @Throws(IOException::class, URISyntaxException::class)
-    private fun loadFromClasspath(indexFile: String): TopLevelElements {
+    private fun loadFromClasspath(indexFile: String): PouElements {
         val resource = BuiltinLoader::class.java!!.getResource(indexFile)
                 ?: throw RuntimeException("Could not find $indexFile in classpath.")
         val p = Paths.get(resource.toURI())
         val lines = IOUtils.readLines(resource.openStream(), "utf-8")
         val prefix = p.getParent()
-        val tle = TopLevelElements()
+        val tle = PouElements()
         lines.forEach { it ->
             try {
                 val load = prefix.resolve(it)

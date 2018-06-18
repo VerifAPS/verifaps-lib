@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.datatypes
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%s
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -32,7 +32,7 @@ import java.util.*
  * @version $Id: $Id
  */
 abstract class AnyBit(var bitLength: Int = 0) : AnyDt() {
-    override fun <T> accept(visitor: DataTypeVisitor<T>): T? = visitor.visit(this)
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 
     override fun repr(obj: Any): String {
         if (obj is Bits) {
@@ -57,23 +57,23 @@ abstract class AnyBit(var bitLength: Int = 0) : AnyDt() {
             return "FALSE"
         }
 
-        override fun <T> accept(visitor: DataTypeVisitor<T>) = visitor.visit(this)
+        override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
     }
 
     object BYTE : AnyBit(8) {
-        override fun <T> accept(visitor: DataTypeVisitor<T>) = visitor.visit(this)
+        override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
     }
 
     object WORD : AnyBit(16) {
-        override fun <T> accept(visitor: DataTypeVisitor<T>) = visitor.visit(this)
+        override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
     }
 
     object DWORD : AnyBit(32) {
-        override fun <T> accept(visitor: DataTypeVisitor<T>) = visitor.visit(this)
+        override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
     }
 
     object LWORD : AnyBit(64) {
-        override fun <T> accept(visitor: DataTypeVisitor<T>) = visitor.visit(this)
+        override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
     }
 
     companion object {

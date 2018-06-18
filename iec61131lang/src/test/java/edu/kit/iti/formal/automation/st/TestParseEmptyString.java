@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.st;
  * %%
  * Copyright (C) 2016 - 2017 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.st;
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.PouElements;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class TestParseEmptyString {
 
     @Test//(expected = ErrorReporter.IEC61131ParserException.class)
     public void testParseEmptyString() {
-        TopLevelElements tle = IEC61131Facade.INSTANCE.file(CharStreams.fromString(""));
+        PouElements tle = IEC61131Facade.INSTANCE.file(CharStreams.fromString(""));
         Assert.assertEquals(0, tle.size());
     }
 }

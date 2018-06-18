@@ -4,12 +4,12 @@
  * %%
  * Copyright (C) 2018 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -36,13 +36,13 @@ object OOIEC61131Facade {
      * @param globalScope Global scope after data types have been resolved.
      * @return The instance scope containing all instances.
      */
-    fun findInstances(element: TopLevelElement<*>, globalScope: Scope): InstanceScope {
+    fun findInstances(element: PouElement<*>, globalScope: Scope): InstanceScope {
         val instanceScope = InstanceScope(globalScope)
         element.accept(FindInstances(instanceScope))
         return instanceScope
     }
 
-    fun findEffectiveSubtypes(topLevelElements: TopLevelElements,
+    fun findEffectiveSubtypes(topLevelElements: PouElements,
                               globalScope: Scope, instanceScope: InstanceScope): EffectiveSubtypeScope {
         val findEffectiveSubtypes = FindEffectiveSubtypes(globalScope, instanceScope)
         var i: Int
@@ -52,7 +52,7 @@ object OOIEC61131Facade {
             topLevelElements.accept<Any>(findEffectiveSubtypes)
             i++
         }
-        //System.out.println("Done: fixpoint is " + findEffectiveSubtypes.fixpointReached() + " after " + i + " steps");
+        //System.out.println("Done: fixpoint isType " + findEffectiveSubtypes.fixpointReached() + " after " + i + " steps");
         return findEffectiveSubtypes.effectiveSubtypeScope
     }
 }

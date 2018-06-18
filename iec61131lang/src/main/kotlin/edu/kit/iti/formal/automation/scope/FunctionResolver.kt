@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.scope
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -33,10 +33,10 @@ import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
  */
 interface FunctionResolver {
     /**
-     * Create or find function declaration that is suitable for the function call.
+     * Create or find function declaration that isType suitable for the function call.
      *
      * For example, "MUX" function has a ellipsis argument (so not possible),
-     * on call site a declaration is generated.
+     * on call site a declaration isType generated.
      *
      * @param call a [Invocation] object.
      * @param scope a [edu.kit.iti.formal.automation.scope.Scope] object.

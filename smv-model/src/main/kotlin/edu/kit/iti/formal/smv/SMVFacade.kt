@@ -85,6 +85,11 @@ object SMVFacade {
     }
 
     @JvmStatic
+    fun reducerKt(op: SBinaryOperator): (SMVExpr, SMVExpr) -> SMVExpr =
+        { a: SMVExpr, b: SMVExpr -> SBinaryExpression(a, op, b) }
+
+
+    @JvmStatic
     fun NOT(e: SMVExpr): SUnaryExpression {
         return SUnaryExpression(SUnaryOperator.NEGATE, e)
     }

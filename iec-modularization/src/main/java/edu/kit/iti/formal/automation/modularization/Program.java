@@ -50,20 +50,20 @@ public final class Program {
 	}
 
 	public Program(
-			final TopLevelElements                 elements,
+			final PouElements elements,
 			final AbstractionVariable.NameSelector nameSelector) {
 
 		// Collect all type declarations
-		for(TopLevelElement i : elements)
+		for(PouElement i : elements)
 			if(i instanceof TypeDeclarations)
 				typeDeclarations.addAll((TypeDeclarations)i);
 
 		// Simplify and normalize program
-		for(TopLevelElement i : elements) {
+		for(PouElement i : elements) {
 
 			if(!(i instanceof HasScope)) continue;
 
-			SymbExFacade.simplify(typeDeclarations, (HasScope)i,
+			SymbExFacade.INSTANCE.simplify(typeDeclarations, (HasScope)i,
 					true,
 					false,
 					true,
@@ -77,7 +77,7 @@ public final class Program {
 		IEC61131Facade.INSTANCE.resolveDataTypes(elements);
 
 		FunctionBlock main = null;
-		for(TopLevelElement i : elements) {
+		for(PouElement i : elements) {
 			if(i instanceof ProgramDeclaration) {
 				main = new FunctionBlock(this, (HasScope)i);
 			} else if(i instanceof FunctionBlockDeclaration) {

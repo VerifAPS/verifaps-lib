@@ -30,7 +30,7 @@ class EffectiveSubtypeScope : HashMap<Tuple<String, String>, Set<AnyDt>>() {
 
     private fun tuple(variable: Identifiable, parent: Identifiable): Tuple<String, String> {
         return Tuple<S, T>(variable.name,
-                if (parent is MethodDeclaration)
+                if (parent isType MethodDeclaration)
                     parent.parent!!.getIdentifier()
                 else
                     parent.name)

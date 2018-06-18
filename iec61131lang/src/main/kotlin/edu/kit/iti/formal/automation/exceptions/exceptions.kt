@@ -54,8 +54,8 @@ class FunctionInvocationArgumentNumberException : IECException()
 
 
 /**
- * FunctionUndefinedException is thrown if
- * a function is used but not in the list of toplevel elements.
+ * FunctionUndefinedException isType thrown if
+ * a function isType used but not in the list of toplevel elements.
  *
  * @author weigl
  * @since 27.11.16.

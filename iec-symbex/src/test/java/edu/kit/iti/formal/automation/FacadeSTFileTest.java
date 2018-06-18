@@ -4,12 +4,12 @@
  * %%
  * Copyright (C) 2017 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author Augusto Modanese
- */
+ *
 @RunWith(Parameterized.class)
 public class FacadeSTFileTest {
     private static final String RESOURCES_PATH = "edu/kit/iti/formal/automation/smv/eval";
@@ -76,7 +76,7 @@ public class FacadeSTFileTest {
         return getSTFiles();
     }
 
-    private static int countStatements(TopLevelElements code) {
+    private static int countStatements(PouElements code) {
         StatementCounter counter = new StatementCounter();
         code.accept(counter);
         return counter.count;
@@ -103,25 +103,25 @@ public class FacadeSTFileTest {
     @Test(timeout = 10 * 1000)  // this may take as much as >=2m; set longer timeout when running complex tests
     public void testSMVEvaluateProgram() throws IOException, InterruptedException {
         System.out.println(file.getName());
-        TopLevelElements code = IEC61131Facade.INSTANCE.file(file);
+        PouElements code = IEC61131Facade.INSTANCE.file(file);
         System.out.println("Found " + code.stream()
                 .filter(tle -> tle instanceof ClassDeclaration)
                 .collect(Collectors.toList())
                 .size() + " classes");
         //System.out.print(countStatements(code) + " statements");
-        code = SymbExFacade.simplifyOO(code, true);
+        code = SymbExFacade.INSTANCE.simplifyOO(code, true);
         PrintWriter pw = new PrintWriter(Paths.get(getSMVDirectory() + "/" + file.getName() + "oo").toString());
         System.out.println("Wrote STOO file");
         pw.println(IEC61131Facade.INSTANCE.print(code));
         pw.close();
         code = IEC61131Facade.INSTANCE.file(file);
-        code = SymbExFacade.simplifyOO(code);
+        code = SymbExFacade.INSTANCE.simplifyOO(code);
         //System.out.print(countStatements(code) + " statements after simplification");
         pw = new PrintWriter(Paths.get(getSMVDirectory() + "/" + file.getName() + "0").toString());
         pw.println(IEC61131Facade.INSTANCE.print(code));
         pw.close();
         System.out.println("Wrote ST0 file");
-        SMVModule module = SymbExFacade.evaluateProgram(code, true);
+        SMVModule module = SymbExFacade.INSTANCE.evaluateProgram(code, true);
         SMVModule mainModule = createMainModule(module);
         write(mainModule, getSMVFile().toString(), false);
         write(module, getSMVFile().toString(), true);
@@ -133,7 +133,7 @@ public class FacadeSTFileTest {
         processBuilder.command("nuXmv", getSMVFile().toString());
         nuxmv = processBuilder.start();
         Assert.assertEquals(nuxmv.waitFor(), 0);
-        */
+        *
     }
 
     @After
@@ -208,3 +208,4 @@ public class FacadeSTFileTest {
         }
     }
 }
+*/

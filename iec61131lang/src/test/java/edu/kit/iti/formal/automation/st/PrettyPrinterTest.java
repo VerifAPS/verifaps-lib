@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.st;
  * %%
  * Copyright (C) 2018 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -25,7 +25,7 @@ package edu.kit.iti.formal.automation.st;
 import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.parser.ErrorReporter;
 import edu.kit.iti.formal.automation.st.ast.Top;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.PouElements;
 import org.antlr.v4.runtime.CharStreams;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -55,10 +55,10 @@ public class PrettyPrinterTest {
                 .replaceAll("\\s+", " ");
     }
 
-    public static void testPrettyPrintByEquals(TopLevelElements tle) throws IOException {
+    public static void testPrettyPrintByEquals(PouElements tle) throws IOException {
         String printed = IEC61131Facade.INSTANCE.print(tle);
         try {
-            TopLevelElements newTle = IEC61131Facade.INSTANCE.file(CharStreams.fromString(printed));
+            PouElements newTle = IEC61131Facade.INSTANCE.file(CharStreams.fromString(printed));
             for (int i = 0; i < Math.min(tle.size(), newTle.size()); i++) {
                 Assert.assertEquals(tle.get(i), newTle.get(i));
             }

@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.visitors
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -33,13 +33,13 @@ import edu.kit.iti.formal.automation.st.ast.*
  * @version $Id: $Id
  */
 open class DefaultVisitor<T>() : DefaultVisitorNN<T?>() {
-    override fun defaultVisit(obj: Any?): T? = null
+    override fun defaultVisit(obj: Any): T? = null
 }
 
 abstract class DefaultVisitorNN<T> : Visitor<T> {
-    abstract fun defaultVisit(obj: Any?): T
+    abstract fun defaultVisit(obj: Any): T
 
-    override fun visit(elements: TopLevelElements): T = defaultVisit(elements)
+    override fun visit(elements: PouElements): T = defaultVisit(elements)
     override fun visit(location: Location): T = defaultVisit(location)
     override fun visit(initializations: ArrayInitialization): T = defaultVisit(initializations)
     override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration): T = defaultVisit(arrayTypeDeclaration)

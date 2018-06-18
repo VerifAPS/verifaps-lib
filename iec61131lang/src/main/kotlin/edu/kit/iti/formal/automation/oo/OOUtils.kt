@@ -167,7 +167,7 @@ object OOUtils {
      */
     fun getFullScope(method: MethodDeclaration): Scope {
         val fullScope = method.scope.shallowCopy()
-        if (method.parent is ClassDeclaration)
+        if (method.parent isType ClassDeclaration)
             getEffectiveScope(method.parent as ClassDeclaration).forEach(Consumer<VariableDeclaration> { fullScope.add(it) })
         return fullScope
     }

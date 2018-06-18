@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.st;
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -28,7 +28,7 @@ import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
 import edu.kit.iti.formal.automation.parser.IEC61131Parser;
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
 import edu.kit.iti.formal.automation.scope.Scope;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.PouElements;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
@@ -84,14 +84,14 @@ public class ProgramTest {
         parser.addErrorListener(new NiceErrorListener(testFile.getName()));
         IEC61131Parser.StartContext ctx = parser.start();
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
-        TopLevelElements sl = (TopLevelElements) ctx.accept(new IECParseTreeToAST());
+        PouElements sl = (PouElements) ctx.accept(new IECParseTreeToAST());
         Assert.assertEquals(sl, sl.clone());
     }
 
     /*
     @Test
     public void testParseTreetoAST() throws IOException {
-        TopLevelElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
+        PouElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
         // Compare generated and original code
         Assert.assertEquals(IEC61131Facade.print(tle),
                 Files.readAllLines(Paths.get(testFile)).stream().collect(Collectors.joining("\n")));
@@ -100,7 +100,7 @@ public class ProgramTest {
 
     @Test
     public void testResolveDataTypes() throws IOException {
-        TopLevelElements tle = IEC61131Facade.INSTANCE.file(testFile);
+        PouElements tle = IEC61131Facade.INSTANCE.file(testFile);
         Scope gs = IEC61131Facade.INSTANCE.resolveDataTypes(tle);
         /*for (ClassDeclaration classDeclaration : gs.getClasses().values()) {
             Assert.assertTrue(
@@ -121,20 +121,20 @@ public class ProgramTest {
 
    // @Test
     public void testPrintTopLevelElements() throws IOException {
-        TopLevelElements tle = IEC61131Facade.INSTANCE.file(testFile);
+        PouElements tle = IEC61131Facade.INSTANCE.file(testFile);
         PrettyPrinterTest.testPrettyPrintByString(tle, testFile);
     }
 
     @Test
     public void testPrintTopLevelElementsByEquals() throws IOException {
-        TopLevelElements tle = IEC61131Facade.INSTANCE.file(testFile);
+        PouElements tle = IEC61131Facade.INSTANCE.file(testFile);
         PrettyPrinterTest.testPrettyPrintByEquals(tle);
     }
 
     /*
     @Test
     public void testEffectiveSubtypes() throws IOException {
-        TopLevelElements tle = IEC61131Facade.INSTANCE.file(testFile);
+        PouElements tle = IEC61131Facade.INSTANCE.file(testFile);
         Scope gs = IEC61131Facade.INSTANCE.resolveDataTypes(tle);
         EffectiveSubtypeScope subtypeScope = OOIEC61131Facade.INSTANCE.findEffectiveSubtypes(tle, gs, new InstanceScope(gs));
         AstVisitor<Object> effectiveSubtypesPrinter = new AstVisitor<Object>() {

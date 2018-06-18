@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.sfclang
  * %%
  * Copyright (C) 2018 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -26,9 +26,6 @@ import com.google.common.collect.HashMultimap
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
-import lombok.Getter
-import lombok.RequiredArgsConstructor
-import lombok.Setter
 import org.antlr.v4.runtime.CommonToken
 
 import java.util.function.Supplier
@@ -37,19 +34,10 @@ import java.util.function.Supplier
  * @author Alexander Weigl
  * @version 1 (23.02.18)
  */
-@RequiredArgsConstructor
-class SFC2ST : Supplier<StatementList> {
-    private val name: String? = null
-    @Getter
-    val network: SFCNetwork? = null
-    @Getter
-    val scope: Scope? = null
-    @Getter
+class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope) : Supplier<StatementList> {
     val stBody = StatementList()
-    @Getter
     val enumDecl = EnumerationTypeDeclaration()
-    @Getter
-    @Setter
+
     var isSfcReset: Boolean = false
         set(sfcReset) {
             field = isSfcReset

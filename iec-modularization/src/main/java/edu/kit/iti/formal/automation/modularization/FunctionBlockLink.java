@@ -195,9 +195,9 @@ public final class FunctionBlockLink {
                         dstFb2.activatedInstance.getLink();
 
         final SMVModule moduleMain = new SMVModule("main");
-        final SMVModule module1 = SymbExFacade.evaluateProgram(
+        final SMVModule module1 = SymbExFacade.INSTANCE.evaluateProgram(
                 dstFb1.declaration, fb1.program.typeDeclarations);
-        final SMVModule module2 = SymbExFacade.evaluateProgram(
+        final SMVModule module2 = SymbExFacade.INSTANCE.evaluateProgram(
                 dstFb2.declaration, fb2.program.typeDeclarations);
 
         moduleMain.setName("main");

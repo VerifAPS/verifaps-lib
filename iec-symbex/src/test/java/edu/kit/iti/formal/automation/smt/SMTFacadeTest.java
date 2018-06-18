@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation.smt;
  * %%
  * Copyright (C) 2017 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -24,7 +24,7 @@ package edu.kit.iti.formal.automation.smt;
 
 import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.SymbExFacade;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.PouElements;
 import edu.kit.iti.formal.smv.ast.SMVModule;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Assume;
@@ -41,15 +41,15 @@ import java.io.InputStream;
 public class SMTFacadeTest {
     @Test
     public void testTranslateTrafficLights() throws IOException {
-        /*InputStream is = getClass().getResourceAsStream(
+        /*InputStream isType = getClass().getResourceAsStream(
                 "traffic_light_bools.st");*/
         InputStream is = new FileInputStream("src/test/resources/traffic_light_bools.st");
         Assume.assumeNotNull(is);
-        TopLevelElements code = IEC61131Facade.INSTANCE.file(CharStreams.fromStream(is));
+        PouElements code = IEC61131Facade.INSTANCE.file(CharStreams.fromStream(is));
         IEC61131Facade.INSTANCE.resolveDataTypes(code);
-        TopLevelElements symplifiedCode = SymbExFacade.simplify(code);
-        SMVModule module = SymbExFacade.evaluateProgram(symplifiedCode);
-        SMTProgram program = SMTFacade.translate(module);
+        PouElements symplifiedCode = SymbExFacade.INSTANCE.simplify(code);
+        SMVModule module = SymbExFacade.INSTANCE.evaluateProgram(symplifiedCode);
+        SMTProgram program = SMTFacade.INSTANCE.translate(module);
         System.out.println(program.getPreamble());
         System.out.println(program.getStepDefinition(true, "_0"));
         System.out.println(program.getStepDefinition(false, "_1"));

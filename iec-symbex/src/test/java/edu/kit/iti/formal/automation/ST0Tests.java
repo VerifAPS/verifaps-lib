@@ -6,12 +6,12 @@ package edu.kit.iti.formal.automation;
  * %%
  * Copyright (C) 2017 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.PouElements;
 import edu.kit.iti.formal.automation.st0.STSimplifier;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Assert;
@@ -46,9 +46,9 @@ public class ST0Tests {
     }
 
     private void assertResultST0(String file) throws IOException {
-        TopLevelElements st = IEC61131Facade.INSTANCE.file(
+        PouElements st = IEC61131Facade.INSTANCE.file(
                 CharStreams.fromStream(getClass().getResourceAsStream(file + ".st")));
-        TopLevelElements st0exp = IEC61131Facade.INSTANCE.file(
+        PouElements st0exp = IEC61131Facade.INSTANCE.file(
                 CharStreams.fromStream(getClass().getResourceAsStream(file + ".st0")));
 
         IEC61131Facade.INSTANCE.resolveDataTypes(st);

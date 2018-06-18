@@ -4,12 +4,12 @@
  * %%
  * Copyright (C) 2017 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -31,7 +31,7 @@ package edu.kit.iti.formal.automation.analysis
  * invocations and assignments to infer possible subtypes.
  *
  *
- * Intended to be repeatedly called until a fixpoint is reached.
+ * Intended to be repeatedly called until a fixpoint isType reached.
  *
  *
  * Usage:
@@ -108,7 +108,7 @@ class FindEffectiveSubtypes : AstVisitor<*> {
 
     override fun visit(variableDeclaration: VariableDeclaration): Any? {
         // Base case
-        if (variableDeclaration.dataType is ClassDataType) {
+        if (variableDeclaration.dataType isType ClassDataType) {
             effectiveSubtypeScope.registerVariable(variableDeclaration)
             registerType(variableDeclaration, variableDeclaration.dataType!!)
         } else if (containsInstance(variableDeclaration))
@@ -120,7 +120,7 @@ class FindEffectiveSubtypes : AstVisitor<*> {
         val top: Top<*>
         try {
             top = resolveReference(assignmentStatement.location as SymbolicReference).a
-            if (top is VariableDeclaration) {
+            if (top isType VariableDeclaration) {
                 // We are only interested in variables (may also catch, e.g., function return values)
                 if (containsInstance(top))
                     registerTypes(top, resolveTypes(assignmentStatement.expression))
@@ -161,12 +161,12 @@ class FindEffectiveSubtypes : AstVisitor<*> {
      */
     private fun resolveTypes(expression: Expression): MutableSet<AnyDt> {
         var dataTypes: MutableSet<AnyDt> = HashSet()
-        if (expression is Invocation)
+        if (expression isType Invocation)
             dataTypes.add((resolveReference(expression.callee).a as Invocable).returnType)
-        else if (expression is SymbolicReference) {
+        else if (expression isType SymbolicReference) {
             val variable = resolveReference(expression).a as VariableDeclaration
             dataTypes.addAll(effectiveSubtypeScope.getTypes(variable))
-        } else if (expression is ReferenceValue)
+        } else if (expression isType ReferenceValue)
             dataTypes = resolveTypes(expression.referenceTo)
         else {
             // TODO other cases
@@ -187,13 +187,13 @@ class FindEffectiveSubtypes : AstVisitor<*> {
         var reference = reference
         while (reference.hasSub())
             reference = reference.sub
-        if (reference.identifiedObject is VariableDeclaration)
+        if (reference.identifiedObject isType VariableDeclaration)
         // TODO replace null with something relevant
             return Tuple<Top<*>, HasScope<*>>(reference.identifiedObject as VariableDeclaration, null)
-        else if (reference.identifiedObject is MethodDeclaration)
+        else if (reference.identifiedObject isType MethodDeclaration)
             return Tuple<Top<*>, T>(reference.identifiedObject as MethodDeclaration,
                     (reference.identifiedObject as MethodDeclaration).parent)
-        else if (reference.identifiedObject is FunctionDeclaration)
+        else if (reference.identifiedObject isType FunctionDeclaration)
             return Tuple<Top<*>, HasScope<*>>(reference.identifiedObject as FunctionDeclaration, null)//((VariableDeclaration) reference.getObj()).getParent());
         throw DataTypeNotDefinedException(
                 "Unknown reference '" + reference + "' at " + currentTopLevelScopeElement!!.identifier)
@@ -202,9 +202,9 @@ class FindEffectiveSubtypes : AstVisitor<*> {
     companion object {
 
         fun containsInstance(variable: VariableDeclaration): Boolean {
-            return (variable.dataType is ClassDataType
-                    || variable.dataType is InterfaceDataType
-                    || variable.dataType is ReferenceType)
+            return (variable.dataType isType ClassDataType
+                    || variable.dataType isType InterfaceDataType
+                    || variable.dataType isType ReferenceType)
         }
     }
 }

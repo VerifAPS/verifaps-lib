@@ -4,12 +4,12 @@
  * %%
  * Copyright (C) 2017 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -18,19 +18,17 @@
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
- */
 
 package edu.kit.iti.formal.automation;
 
 import edu.kit.iti.formal.automation.oo.OOIEC61131Facade;
-import edu.kit.iti.formal.automation.scope.Scope;
 import edu.kit.iti.formal.automation.scope.EffectiveSubtypeScope;
 import edu.kit.iti.formal.automation.scope.InstanceScope;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElement;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.scope.Scope;
+import edu.kit.iti.formal.automation.st.ast.PouElement;
+import edu.kit.iti.formal.automation.st.ast.PouElements;
 import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
 import edu.kit.iti.formal.automation.visitors.Utils;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +45,6 @@ import java.util.Objects;
 
 /**
  * @author Augusto Modanese
- */
 @RunWith(Parameterized.class)
 public class STOOIntegrationTests {
     private static final String RESOURCES_PATH = "edu/kit/iti/formal/automation/st/stoo/integration";
@@ -67,14 +64,14 @@ public class STOOIntegrationTests {
     }
 
     private static STOOSimplifier.State processSTFile(File f) throws IOException {
-        TopLevelElements topLevelElements =  IEC61131Facade.INSTANCE.file(f);
-        Scope globalScope = IEC61131Facade.INSTANCE.resolveDataTypes(topLevelElements);
-        TopLevelElement program = Utils.INSTANCE.findProgram(topLevelElements);
+        PouElements pouElements =  IEC61131Facade.INSTANCE.file(f);
+        Scope globalScope = IEC61131Facade.INSTANCE.resolveDataTypes(pouElements);
+        PouElement program = Utils.INSTANCE.findProgram(pouElements);
         assert program != null;
         InstanceScope instanceScope = OOIEC61131Facade.INSTANCE.findInstances(program, globalScope);
         EffectiveSubtypeScope effectiveSubtypeScope =
-                OOIEC61131Facade.INSTANCE.findEffectiveSubtypes(topLevelElements, globalScope, instanceScope);
-        return new STOOSimplifier.State(program, topLevelElements, globalScope, instanceScope, effectiveSubtypeScope);
+                OOIEC61131Facade.INSTANCE.findEffectiveSubtypes(pouElements, globalScope, instanceScope);
+        return new STOOSimplifier.State(program, pouElements, globalScope, instanceScope, effectiveSubtypeScope);
     }
 
     private static STOOSimplifier.State processSTFile(Path path) throws IOException {
@@ -91,11 +88,11 @@ public class STOOIntegrationTests {
         System.out.println(file.getName());
 
         STOOSimplifier.State st = processSTFile(file);
-        TopLevelElements st1Expected = processSTFile(Paths.get(file.toPath() + "oo")).getTopLevelElements();
+        PouElements st1Expected = processSTFile(Paths.get(file.toPath() + "oo")).getTopLevelElements();
 
         STOOSimplifier simplifier = new STOOSimplifier(st);
         simplifier.simplify();
-        TopLevelElements st1Actual = st.getTopLevelElements();
+        PouElements st1Actual = st.getTopLevelElements();
 
         Collections.sort(st1Actual);
         Collections.sort(st1Expected);
@@ -103,3 +100,4 @@ public class STOOIntegrationTests {
         Assert.assertEquals(IEC61131Facade.INSTANCE.print(st1Expected), IEC61131Facade.INSTANCE.print(st1Actual));
     }
 }
+*/

@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.modularization;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.PouElements;
 
 import java.util.*;
 
@@ -73,8 +73,8 @@ public final class ModularProver {
 	}
 
 	public ModularProver(
-			final TopLevelElements prgm1,
-			final TopLevelElements prgm2) {
+			final PouElements prgm1,
+			final PouElements prgm2) {
 
 		_program1 = new Program(prgm1, AbstractionVariable::getName1);
 		_program2 = new Program(prgm2, AbstractionVariable::getName2);
