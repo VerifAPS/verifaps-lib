@@ -65,7 +65,7 @@ class TableDataTypeTranslator : TypeTranslator {
                     .with(if (i < 0) SMVTypes.unsigned(-i)
                     else SMVTypes.signed(i))
         } else {
-            return SVariable.create(vdecl.name).with(translate(vdecl.dataType.obj!!))
+            return SVariable.create(vdecl.name).with(translate(vdecl.dataType!!))
         }
     }
 }

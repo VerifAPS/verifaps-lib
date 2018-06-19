@@ -28,7 +28,17 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
     }
 
     override fun visit(invocation: Invocation) {
-        invocation.callee.accept(this)
+        scope.resolveFunction(invocation) ?: reporter.report(invocation.startPosition,
+                "Return type ${invocation.callee} not found.",
+                "function-resolve", "error")
+    }
+
+    override fun visit(variableDeclaration: VariableDeclaration) {
+        variableDeclaration.initValue
+                ?: reporter.report(variableDeclaration.startPosition, "Could not determine initial value for variable", "init-value", "error")
+
+        variableDeclaration.dataType
+                ?: reporter.report(variableDeclaration.startPosition, "Could not determine data type of variable", "type-resolve", "error")
     }
 
     interface Reporter {

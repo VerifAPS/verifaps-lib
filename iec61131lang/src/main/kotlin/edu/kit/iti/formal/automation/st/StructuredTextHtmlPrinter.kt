@@ -446,7 +446,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
             sb.variable(vd.name)
 
             sb.seperator(":")
-            sb.type(vd.dataTypeName!!)
+            sb.type(vd.dataType?.name)
 
             if (vd.init != null) {
                 sb.operator(" := ")

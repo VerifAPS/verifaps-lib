@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
-import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType
 import edu.kit.iti.formal.automation.datatypes.TimeType
 import edu.kit.iti.formal.automation.datatypes.values.VAnyEnum
 import edu.kit.iti.formal.automation.operators.Operators
@@ -15,6 +14,9 @@ class ExpressionVisitor(private val state: State,
 
     override fun defaultVisit(obj: Any) =
             TODO("missing visitor for visitable ${obj.toString()}")
+
+    override fun visit(parameter: InvocationParameter): EValue = parameter.expression.accept(this)
+
 
     override fun visit(functionCall: Invocation): EValue {
         val functionDeclaration = scope.resolveFunction(functionCall.calleeName)
@@ -68,11 +70,11 @@ class ExpressionVisitor(private val state: State,
 
 
     override fun visit(symbolicReference: SymbolicReference): EValue {
-        val variableName = symbolicReference.identifier
-
+        val variableName = symbolicReference.asPath()
         val variableState = state[variableName]
                 ?: throw ExecutionException("Variable $variableName not found")
-
+        return variableState
+        /*
         var dataType = symbolicReference.dataType(scope)
         if (dataType is FunctionBlockDataType) {
             val structValue = state[symbolicReference.identifier]!!//.orElseThrow { ExecutionException("variable not defined") }.value
@@ -89,6 +91,7 @@ class ExpressionVisitor(private val state: State,
 
         return variableState
         //.orElseThrow { throw ExecutionException("Variable $variableName not initialized") }
+*/
     }
 
     override fun visit(binaryExpression: BinaryExpression): EValue {

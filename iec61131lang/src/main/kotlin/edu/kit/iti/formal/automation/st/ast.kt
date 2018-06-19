@@ -495,7 +495,8 @@ data class IfStatement(
 }
 
 data class InvocationStatement(var invocation: Invocation = Invocation()) : Statement() {
-    val parameters = invocation.parameters
+    val parameters: MutableList<InvocationParameter>
+        get() = invocation.parameters
 
     var calleeName: String
         get() = invocation.calleeName
@@ -632,8 +633,7 @@ data class SymbolicReference @JvmOverloads constructor(
     @Throws(VariableNotDefinedException::class)
     override fun dataType(scope: Scope): AnyDt {
         try {
-            TODO()
-            //return scope.getVariable(this).dataType.obj!!
+            return scope.getVariable(this).dataType!!
         } catch (e: Exception) {
             throw VariableNotDefinedException(scope, this)
         }
@@ -675,7 +675,7 @@ data class Invocation(
         get() = parameters.filter { it.isOutput }
 
     var calleeName: String
-        get() = callee.toString()
+        get() = callee.identifier
         set(calleeName) {
             callee = SymbolicReference(calleeName)
         }
@@ -1276,7 +1276,7 @@ class Literal : Initialization {
     private fun asValue(transformer: DataTypeVisitor<Value<*, *>>): Value<*, *> =
             if (dataType.obj == null)
                 throw IllegalStateException(
-                        "no identified data type. given data type name " + dataType.identifier!!)
+                        "No identified data type. Given data type name " + dataType.identifier!!)
             else
                 dataType.obj!!.accept(transformer)!!
 
@@ -1562,7 +1562,7 @@ class VariableBuilder(val scope: VariableScope) {
     fun baseType(baseType: String) = type(baseType)
 
     private fun type(baseType: String): VariableBuilder {
-        val td = SimpleTypeDeclaration()
+        val td = SimpleTypeDeclaration(baseType)
         td.baseType.identifier = baseType
         return type(td)
     }
@@ -1708,9 +1708,10 @@ data class VariableDeclaration(
         return name.compareTo(o.name)
     }
 
+    /*
     override fun toString(): String {
         return "$name : ${dataType?.name} := $init"
-    }
+    }*/
 
     /*    override fun clone(): VariableDeclaration {
             val vd = VariableDeclaration(name, type, typeDeclaration!!)

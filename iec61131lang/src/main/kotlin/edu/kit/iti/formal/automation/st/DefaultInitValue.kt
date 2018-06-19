@@ -38,8 +38,11 @@ import java.math.BigInteger
  */
 object DefaultInitValue : InitValueTranslator {
     override fun getInit(type: AnyDt): Value<*, *> = type.accept(InitValueVisitor)
+
     object InitValueVisitor : DataTypeVisitorNN<Value<*, *>> {
-        override fun defaultVisit(obj: Any): Value<*, *> = throw IllegalArgumentException("unsupported data type")
+        override fun defaultVisit(obj: Any): Value<*, *> = throw IllegalArgumentException("unsupported data type: $obj")
+
+
 
         override fun visit(anyInt: AnyInt): Value<*, *> {
             return VAnyInt(anyInt, BigInteger.ZERO)
@@ -96,11 +99,7 @@ object DefaultInitValue : InitValueTranslator {
         override fun visit(recordType: RecordType): Value<*, *> {
             val s = VStruct(recordType, RecordValue())
             recordType.fields.forEach {
-                val v =
-                        if (it.init != null) {
-                            it.init!!.accept(EvaluateInitialization)
-                        } else it.dataType!!.accept(this)
-                s.value.fieldValues[it.name] = v
+                s.value.fieldValues[it.name] = it.initValue!!
             }
             return s
         }

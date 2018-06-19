@@ -3,6 +3,7 @@ package edu.kit.iti.formal.automation.analysis
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
 import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.st.DefaultInitValue
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
 
@@ -13,8 +14,17 @@ import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
  * @version 1
  * @since 25.11.16
  */
-class ResolveDataTypes : AstVisitorWithScope<Unit>() {
-    override fun defaultVisit(obj: Any) {}
+class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
+    init {
+        scope = globalScope
+    }
+
+    override fun defaultVisit(obj: Any) {
+        when (obj) {
+            is TypeDeclaration -> obj.initialization?.accept(this)
+        }
+
+    }
 
     /**
      * {@inheritDoc}
@@ -22,7 +32,6 @@ class ResolveDataTypes : AstVisitorWithScope<Unit>() {
     override fun visit(functionDeclaration: FunctionDeclaration) {
         super.visit(functionDeclaration)
         functionDeclaration.returnType.resolve(scope::resolveDataType)
-
     }
 
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) {
@@ -32,14 +41,9 @@ class ResolveDataTypes : AstVisitorWithScope<Unit>() {
     override fun visit(localScope: Scope) {
         scope = localScope
         scope.variables.forEach { vd ->
-            if (vd.dataType == null)
-                vd.dataType = vd.typeDeclaration?.getDataType(localScope)
-            if (vd.initValue == null) {
-                vd.initValue = vd.init?.getValue()
-            }
+            vd.accept(this)
         }
     }
-
 
     override fun visit(classDeclaration: ClassDeclaration) {
         if (classDeclaration.parent.identifier != null) {
@@ -92,9 +96,24 @@ class ResolveDataTypes : AstVisitorWithScope<Unit>() {
 
     override fun visit(literal: Literal) {
         try {
-            literal.dataType.resolve(scope::resolveDataType)
+            if (!literal.dataType.isIdentified)
+                literal.dataType.resolve(scope::resolveDataType)
         } catch (e: ClassCastException) {
         } catch (e: DataTypeNotDefinedException) {
+        }
+    }
+
+    override fun visit(structureTypeDeclaration: StructureTypeDeclaration) {
+        structureTypeDeclaration.fields.forEach { it.accept(this) }
+    }
+
+    override fun visit(it: VariableDeclaration) {
+        super.visit(it)
+
+        it.dataType = it.typeDeclaration!!.getDataType(scope)
+        it.initValue = it.init?.getValue()
+        if (it.initValue == null && it.dataType != null) {
+            it.initValue = DefaultInitValue.getInit(it.dataType!!)
         }
     }
 }

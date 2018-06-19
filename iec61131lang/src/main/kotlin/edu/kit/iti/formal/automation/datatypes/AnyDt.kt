@@ -58,4 +58,7 @@ abstract class AnyDt : Identifiable {
     abstract fun repr(obj: Any): String
 
     abstract fun <T> accept(visitor: DataTypeVisitorNN<T>): T
+
+    override fun toString() = name
 }
+

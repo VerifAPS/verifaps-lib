@@ -250,7 +250,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             ctx: IEC61131Parser.Array_specificationContext): ArrayTypeDeclaration {
         val ast = ArrayTypeDeclaration()
         //Utils.setPosition(ast, ctx.ARRAY(), ctx.non_generic_type_name.ctx);
-        ast.baseType.identifier = ctx.non_generic_type_name().text
+        ast.baseType.identifier = ctx.non_generic_type_name()?.text
         for (src in ctx.ranges) {
             ast.addSubRange(src.accept(this) as Range)
         }

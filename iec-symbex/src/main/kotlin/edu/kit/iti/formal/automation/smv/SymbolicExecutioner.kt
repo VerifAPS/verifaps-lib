@@ -48,7 +48,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     var operationMap: OperationMap = DefaultOperationMap()
     var typeTranslator: TypeTranslator = DefaultTypeTranslator()
     var valueTranslator: ValueTranslator = DefaultValueTranslator()
-    var initValueTranslator: InitValueTranslator = DefaultInitValue()
+    var initValueTranslator: InitValueTranslator = DefaultInitValue
 
     //region state handling
     private val state = Stack<SymbolicState>()
@@ -81,9 +81,10 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
 
     fun lift(vd: VariableDeclaration): SVariable {
         try {
-            if (vd.dataType.obj == null) {
-                vd.dataType.obj = scope!!.resolveDataType(vd.dataTypeName!!)
-            }
+            /*
+            if (vd.dataType == null) {
+                vd.dataType = scope!!.resolveDataType(vd.dataType)
+            }*/
             return varCache.computeIfAbsent(vd.name) { this.typeTranslator.translate(vd) }
         } catch (e: NullPointerException) {
             throw UnknownDatatype("Datatype not given/inferred for variable " + vd.name, e)
@@ -202,7 +203,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
                 td!!.initialization!!.accept(this)
             } else {
                 calleeState[lift(vd)] = this.valueTranslator.translate(
-                        this.initValueTranslator.getInit(vd.dataType.obj!!))
+                        this.initValueTranslator.getInit(vd.dataType!!))
             }
             //}
         }
@@ -237,7 +238,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
 
         for (outputVar in fd.scope.filterByFlags(VariableDeclaration.OUTPUT))
             calleeState[lift(outputVar)] = this.valueTranslator.translate(
-                    this.initValueTranslator.getInit(outputVar.dataType.obj!!))
+                    this.initValueTranslator.getInit(outputVar.dataType!!))
 
         push(calleeState)
         //endregion

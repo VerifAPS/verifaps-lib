@@ -8,35 +8,36 @@ import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
  * @author Alexander Weigl, Augusto Modanese
  * @version 1 (25.06.17)
  */
-class FindDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
+class RegisterDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
+    init {
+        scope = globalScope
+    }
+
     override fun defaultVisit(obj: Any) {}
 
     override fun visit(pd: ProgramDeclaration) {
-        goIntoScope(pd)
         scope.registerProgram(pd)
+        goIntoScope(pd)
         pd.actions.forEach { a -> pd.scope.registerAction(a) }
-        
+        goOutoScope()
     }
 
     override fun visit(fbd: FunctionBlockDeclaration) {
-        goIntoScope(fbd)
         scope.registerFunctionBlock(fbd)
-        fbd.actions.forEach { scope.registerAction(it)  }
+        goIntoScope(fbd)
+        fbd.actions.forEach { scope.registerAction(it) }
         fbd.methods.forEach { scope.registerMethod(it); }
         goOutoScope()
-        
     }
 
     override fun visit(functionDeclaration: FunctionDeclaration) {
-        goIntoScope(functionDeclaration)
         scope.registerFunction(functionDeclaration)
+        goIntoScope(functionDeclaration)
         goOutoScope()
-        
     }
 
     override fun visit(subRangeTypeDeclaration: SubRangeTypeDeclaration) {
         scope.registerType(subRangeTypeDeclaration)
-        
     }
 
     override fun visit(variableDeclaration: VariableDeclaration) {
@@ -46,12 +47,12 @@ class FindDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
             variableDeclaration.getTypeDeclaration().accept(this);
         return super.visit(variableDeclaration);
         */
-        
+
     }
 
     override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration) {
         scope.registerType(simpleTypeDeclaration)
-         //super.visit(simpleTypeDeclaration)
+        //super.visit(simpleTypeDeclaration)
     }
 
     override fun visit(ptd: PointerTypeDeclaration) {
@@ -70,12 +71,12 @@ class FindDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
     override fun visit(interfaceDeclaration: InterfaceDeclaration) {
         //goIntoScope(interfaceDeclaration)
         scope.registerInterface(interfaceDeclaration)
-         //super.visit(interfaceDeclaration)
+        //super.visit(interfaceDeclaration)
     }
 
     override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration) {
         scope.registerType(arrayTypeDeclaration)
-        
+
     }
 
     /**
@@ -83,7 +84,7 @@ class FindDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
      */
     override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
         scope.registerType(enumerationTypeDeclaration)
-        
+
     }
 
     /**
@@ -91,29 +92,30 @@ class FindDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
      */
     override fun visit(stringTypeDeclaration: StringTypeDeclaration) {
         scope.registerType(stringTypeDeclaration)
-        
+
     }
 
     override fun visit(typeDeclarations: TypeDeclarations) {
         for (td in typeDeclarations)
             td.accept(this)
-        
+
     }
 
     override fun visit(structureTypeDeclaration: StructureTypeDeclaration) {
         scope.registerType(structureTypeDeclaration)
-        
+
     }
 
     override fun visit(gvl: GlobalVariableListDeclaration) {
         gvl.scope = scope // global variables does not open an own scope.
         scope.addVariables(gvl.scope)
         //return super.visit(gvl)
-        
+
     }
 
     private fun goIntoScope(hasScope: HasScope) {
-        hasScope.scope.parent = scope
+        if (scope != null)
+            hasScope.scope.parent = scope
         scope = hasScope.scope
     }
 

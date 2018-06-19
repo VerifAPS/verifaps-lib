@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
-import edu.kit.iti.formal.automation.analysis.FindDataTypes
+import edu.kit.iti.formal.automation.analysis.RegisterDataTypes
 import edu.kit.iti.formal.automation.analysis.ResolveDataTypes
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.IEC61131Parser
@@ -39,7 +39,6 @@ import org.antlr.v4.runtime.CommonTokenStream
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
-import java.net.URL
 import java.nio.charset.Charset
 import java.nio.file.Path
 
@@ -136,8 +135,8 @@ object IEC61131Facade {
 
     fun resolveDataTypes(elements: PouElements): Scope {
         val scope = Scope.defaultScope()
-        val fdt = FindDataTypes(scope)
-        val rdt = ResolveDataTypes()
+        val fdt = RegisterDataTypes(scope)
+        val rdt = ResolveDataTypes(scope)
         //val rr = ResolveReferences(scope)
         elements.accept(fdt)
         elements.accept(rdt)

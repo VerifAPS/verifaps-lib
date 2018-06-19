@@ -97,8 +97,8 @@ class ValueTransformation(val literal: Literal) : DefaultDataTypeVisitor<Value<*
     override fun visit(date: AnyDate.DATE) = throw NotImplementedException("DATE datatype not supported")
 
     override fun visit(enumerateType: EnumerateType): Value<*, *>? {
-        if (!enumerateType.allowedValues.contains(literal.textValue)) {
-            throw RuntimeException("Enum constant " + literal.text + " isType not defined in " + enumerateType.name)
+        if (!enumerateType.contains(literal.textValue!!)) {
+            throw RuntimeException("Enum constant ${literal.textValue} not defined in type: ${enumerateType.name}")
         }
         return VAnyEnum(enumerateType, literal.textValue!!)
     }

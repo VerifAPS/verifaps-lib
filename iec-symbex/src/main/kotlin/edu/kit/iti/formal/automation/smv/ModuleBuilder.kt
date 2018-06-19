@@ -47,7 +47,7 @@ class ModuleBuilder(val program: ProgramDeclaration,
     //private Map<VariableDeclaration, SVariable> vars = new HashMap<>();
     var typeTranslator: TypeTranslator = DefaultTypeTranslator.INSTANCE
     var valueTranslator = DefaultValueTranslator.INSTANCE
-    var initValueTranslator: InitValueTranslator = DefaultInitValue.INSTANCE
+    var initValueTranslator: InitValueTranslator = DefaultInitValue
 
     override fun run() {
         module.name = program.name
@@ -103,7 +103,7 @@ class ModuleBuilder(val program: ProgramDeclaration,
             e = sv!!.accept(SymbolicExecutioner())!!
         } else {
             e = this.valueTranslator.translate(
-                    this.initValueTranslator.getInit(s.dataType.obj!!))
+                    this.initValueTranslator.getInit(s.dataType!!))
         }
         val a = SAssignment(`var`, e)
         module.initAssignments.add(a)

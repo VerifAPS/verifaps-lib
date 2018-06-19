@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.datatypes
  * #L%
  */
 
-import java.util.*
+import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration
 
 /**
  * Created by weigl on 10.06.14.
@@ -30,7 +30,7 @@ import java.util.*
  * @author weigl
  */
 class EnumerateType(name: String = "ENUM",
-                    var allowedValues: MutableList<String> = ArrayList())
+                    var allowedValues: MutableMap<String, Int> = hashMapOf())
     : AnyDt(name) {
 
     val bitlength: Int
@@ -38,15 +38,20 @@ class EnumerateType(name: String = "ENUM",
             return Math.ceil(Math.log(allowedValues.size.toDouble())).toInt()
         }
 
-    var defValue: String? = null
-        set(defValue) {
-            assert(defValue != null && isAllowedValue(field!!))
-            field = defValue
-        }
+    lateinit var defValue: String
 
     constructor(name: String, allowedValues: MutableList<String>,
-                defValue: String = allowedValues[0]) : this(name, allowedValues) {
+                defValue: String = allowedValues[0]) : this(name) {
+        allowedValues.forEachIndexed { index, s -> this.allowedValues[s] = index }
         this.defValue = defValue
+    }
+
+    constructor(etd: EnumerationTypeDeclaration) : this() {
+        name = etd.name
+        etd.allowedValues.zip(etd.values).forEach { (a, b) ->
+            allowedValues.put(a.text!!.toUpperCase(), b)
+        }
+        defValue = etd.allowedValues[0].text.toUpperCase()
     }
 
     /** {@inheritDoc}  */
@@ -61,4 +66,24 @@ class EnumerateType(name: String = "ENUM",
     override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
 
     fun isAllowedValue(value: String) = this.allowedValues.contains(value)
+    operator fun contains(textValue: String) = textValue.toUpperCase() in allowedValues
+
+    override fun toString(): String = "ENUM $name"
+
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is EnumerateType) return false
+
+        if (allowedValues != other.allowedValues) return false
+        if (defValue != other.defValue) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = allowedValues.hashCode()
+        result = 31 * result + defValue.hashCode()
+        return result
+    }
 }

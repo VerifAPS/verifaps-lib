@@ -76,7 +76,7 @@ class DefaultTypeTranslator : TypeTranslator {
         }
 
         override fun visit(enumerateType: EnumerateType): SMVType {
-            return EnumType(enumerateType.allowedValues)
+            return EnumType(enumerateType.allowedValues.keys.toMutableList())
         }
 
         override fun visit(timeType: TimeType): SMVType {

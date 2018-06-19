@@ -42,8 +42,7 @@ class TimerToCounter(private val cycleTime: Long) : AstMutableVisitor() {
     }
 
     override fun visit(vd: VariableDeclaration): VariableDeclaration {
-        if (Objects.requireNonNull(vd.dataType.identifier)
-                        .equals("TIME", ignoreCase = true) || vd.dataType.obj === TimeType.TIME_TYPE) {
+        if (vd.dataType === TimeType.TIME_TYPE) {
 
             val newVariable = VariableDeclaration(vd.name, vd.type, UINT)
             var cycles = 0

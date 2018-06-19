@@ -100,7 +100,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
 
     /**
      * {@inheritDoc}
-     */
+     *
     override fun toString(): String {
         val sb = StringBuilder("Scope{")
         for (vd in variables) {
@@ -111,7 +111,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
         sb.delete(sb.length - 1, sb.length)
         sb.append("}")
         return sb.toString()
-    }
+    }*/
 
     @Throws(VariableNotDefinedException::class)
     fun getVariable(reference: SymbolicReference): VariableDeclaration {
@@ -184,7 +184,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
         }
 
         if (b) {
-            q = dataTypes.lookup(name)!!.getDataType(this)
+            q = dataTypes.lookup(name)!!.getDataType(this)!!
             types[name] = q
             return q
         }

@@ -33,11 +33,34 @@ import java.math.BigInteger
  * @version $Id: $Id
  */
 sealed class Value<T : AnyDt, S : Any>(
-        val dataType: T, val value: S
-)
+        val dataType: T, val value: S) {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Value<*, *>) return false
+
+        if (dataType != other.dataType) return false
+        if (value != other.value) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = dataType.hashCode()
+        result = 31 * result + value.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "Value{$dataType}($value)"
+    }
+}
 
 
-class VAnyInt(dt: AnyInt, v: BigInteger) : Value<AnyInt, BigInteger>(dt, v)
+class VAnyInt(dt: AnyInt, v: BigInteger) : Value<AnyInt, BigInteger>(dt, v) {
+    constructor(dt: AnyInt, v: Long) : this(dt, BigInteger.valueOf(v))
+
+}
 
 class VClass(dt: ClassDataType, v: Map<String, Value<*, *>>)
     : Value<ClassDataType, Map<String, Value<*, *>>>(dt, v)
@@ -55,7 +78,7 @@ class VDate(dt: AnyDate.DATE, v: DateData) : Value<AnyDate.DATE, DateData>(dt, v
 class VTime(dt: TimeType, v: TimeData) : Value<TimeType, TimeData>(dt, v)
 class VDateAndTime(dt: AnyDate.DATE_AND_TIME, v: DateAndTimeData) : Value<AnyDate.DATE_AND_TIME, DateAndTimeData>(dt, v)
 class VTimeOfDay(dt: AnyDate.TIME_OF_DAY, v: TimeofDayData) : Value<AnyDate.TIME_OF_DAY, TimeofDayData>(dt, v)
-class VAnyEnum(dt: EnumerateType, v: String) : Value<EnumerateType, String>(dt, v)
+class VAnyEnum(dt: EnumerateType, v: String) : Value<EnumerateType, String>(dt, v.toUpperCase())
 class VToD(dt: AnyDate.TIME_OF_DAY, v: TimeofDayData) : Value<AnyDate.TIME_OF_DAY, TimeofDayData>(dt, v)
 class VStruct(dt: RecordType, v: RecordValue) : Value<RecordType, RecordValue>(dt, v)
 class VArray(dt: ArrayType, v: MultiDimArrayValue) : Value<ArrayType, MultiDimArrayValue>(dt, v)

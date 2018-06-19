@@ -63,7 +63,7 @@ class StructEmbedding : ST0Transformation {
 
         override fun visit(localScope: Scope) {
             localScope
-                    .filter { it.dataType.obj is RecordType }
+                    .filter { it.dataType is RecordType }
                     .forEach {
                         val struct = it.dataType as RecordType
                         struct.fields.forEach { field ->
@@ -79,8 +79,8 @@ class StructEmbedding : ST0Transformation {
             val initialization = structVariable.typeDeclaration!!.initialization as StructureInitialization?
             val newVariable = VariableDeclaration(structVariable.name + "$" + field.name,
                     structVariable.type or field.type,
-                    field.dataType.obj!!)
-            newVariable.typeDeclaration!!.baseType = field.dataType.copy()
+                    field.dataType!!)
+            newVariable.typeDeclaration!!.baseType.obj = field.dataType!!
             if (initialization != null)
                 newVariable.typeDeclaration!!.setInit(initialization.initValues[field.name])
             return newVariable

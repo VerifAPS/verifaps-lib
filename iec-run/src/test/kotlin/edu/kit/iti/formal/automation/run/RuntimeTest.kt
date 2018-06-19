@@ -1,10 +1,16 @@
 package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.datatypes.EnumerateType
+import edu.kit.iti.formal.automation.datatypes.INT
+import edu.kit.iti.formal.automation.datatypes.UINT
+import edu.kit.iti.formal.automation.datatypes.values.FALSE
+import edu.kit.iti.formal.automation.datatypes.values.TRUE
+import edu.kit.iti.formal.automation.datatypes.values.VAnyEnum
+import edu.kit.iti.formal.automation.datatypes.values.VAnyInt
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import java.util.*
 
 class RuntimeTest {
     @Before
@@ -15,179 +21,167 @@ class RuntimeTest {
     @Test
     fun testIfStatement() {
         val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.testIfStatement.st"))
+        println(ast.toString())
         val state = ExecutionFacade.execute(ast)
-        assertEquals(arrayListOf(
-                "number" to Optional.of(300),
-                "n2" to Optional.of(4),
-                "active" to Optional.of(true)).toString(),
-                state.impl.map { it.key to it.value }.toString())
+        assertEquals(hashMapOf(
+                "number" to VAnyInt(INT, 300),
+                "n2" to VAnyInt(INT, 4),
+                "active" to TRUE),
+                state)
     }
-    /*
+
     @Test
     fun testVariableReference() {
-        val ast = getAst(this.javaClass.getResource("runtimeTest.testVariableReference.st"))
-        val topState = TopState()
-        ast.accept<AnyDt>(Runtime(topState))
-        print("result of execution: $topState")
-        assertEquals(
-                HashSet(listOf(
-                        "b2" to Optional.of(true),
-                        "n8" to Optional.of(true),
-                        "n9" to Optional.of(true),
-                        "number" to Optional.of(-19),
-                        "n2" to Optional.of(-1),
-                        "n10" to Optional.of(false),
-                        "b" to Optional.of(false),
-                        "n3" to Optional.of(4),
-                        "n4" to Optional.empty(),
-                        "n5" to Optional.of(6),
-                        "n6" to Optional.of(6),
-                        "n7" to Optional.of(-1)
-                        )).toString(),
-                HashSet(topState.map { it.key to it.value.map { it.value } }).toString()
-        )
-
+        val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.testVariableReference.st"))
+        val state = ExecutionFacade.execute(ast)
+        print("result of execution: $state")
+        assertEquals(hashMapOf(
+                "b2" to TRUE,
+                "n8" to TRUE,
+                "n9" to TRUE,
+                "number" to VAnyInt(INT, -19),
+                "n2" to VAnyInt(INT, -1),
+                "n10" to FALSE,
+                "b" to FALSE,
+                "n3" to VAnyInt(INT, 4),
+                "n4" to VAnyInt(INT, 0),
+                "n5" to VAnyInt(INT, 6),
+                "n6" to VAnyInt(INT, 6),
+                "n7" to VAnyInt(INT, -1)
+        ),
+                state)
     }
 
     @Test
     fun advancedTest() {
-        val ast = getAst(this.javaClass.getResource("runtimeTest.advancedTest.st"))
-        val topState = TopState()
-        ast.accept<AnyDt>(Runtime(topState))
+        val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.advancedTest.st"))
+        val state = ExecutionFacade.execute(ast)
         println("final state:")
-        topState.forEach {
+        state.forEach {
             println(it)
         }
     }
 
     @Test
     fun elevatorTest() {
-        val ast = getAst(this.javaClass.getResource("runtimeTest.elevatorTest.st"))
-
-        val topState = TopState()
-        val exec = IecRunFascade(ast)
-
-        topState["ButtonPressed"] = Optional.of(Values.VBool(AnyBit.BOOL, true) as EValue)
-        exec.executeCode(topState)
-
+        val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.elevatorTest.st"))
+        val ec = ExecutionFacade.createExecutionContext(ast)
+        val input1 = State()
+        input1["ButtonPressed"] = TRUE
+        ec.executeCycle(input = input1)
         println("1st state:")
-        topState.forEach {
+        ec.lastState.forEach {
             println(it)
         }
 
-        assertEquals(
-                HashSet(listOf(
-                        "RequestedPos" to Optional.of(5),
-                        "CurrentPos" to Optional.of(3),
-                        "Motor" to Optional.of("GoUp"),
-                        "ButtonPressed" to Optional.of(true),
-                        "Door" to Optional.of("Closed")
-                )).toString(),
-                HashSet(topState.map { it.key to it.value.map { it.value } }).toString()
-        )
+        val enumMotorState = ec.entryPoint.scope.resolveDataType("MOTOR_STATE") as EnumerateType
+        val enumDoorState = ec.entryPoint.scope.resolveDataType("DOOR_STATE") as EnumerateType
 
+        assertEquals(hashMapOf("RequestedPos" to VAnyInt(INT, 5),
+                "CurrentPos" to VAnyInt(INT, 3),
+                "Motor" to VAnyEnum(enumMotorState, "GoUp"),
+                "ButtonPressed" to TRUE,
+                "Door" to VAnyEnum(enumDoorState, "Closed")
+        ), ec.lastState)
 
-
-        topState["CurrentPos"] = Optional.of(Values.VAnyInt(AnyInt.getDataTypeFor(5, false), BigInteger.valueOf(5)) as EValue)
-
-        exec.executeCode(topState)
-
+        val input2 = State()
+        input2["CurrentPos"] = VAnyInt(UINT, 5)
+        ec.executeCycle(input = input2)
         println("2nd state:")
-        topState.forEach {
-            println(it)
-        }
+        ec.lastState.forEach { println(it) }
 
-        assertEquals(
-                HashSet(listOf(
-                        "RequestedPos" to Optional.of(5),
-                        "CurrentPos" to Optional.of(5),
-                        "Motor" to Optional.of("Stationary"),
-                        "ButtonPressed" to Optional.of(true),
-                        "Door" to Optional.of("Open")
-                )).toString(),
-                HashSet(topState.map { it.key to it.value.map { it.value } }).toString()
-        )
-
-
+        assertEquals(hashMapOf(
+                "RequestedPos" to VAnyInt(INT, 5),
+                "CurrentPos" to VAnyInt(UINT, 5),
+                "Motor" to VAnyEnum(enumMotorState, "Stationary"),
+                "ButtonPressed" to TRUE,
+                "Door" to VAnyEnum(enumDoorState, "Open")
+        ), ec.lastState)
     }
 
     @Test
     fun forLoopTest() {
-        val ast = getAst(this.javaClass.getResource("runtimeTest.forLoopTest.st"))
-        val topState = TopState()
-        ast.accept<AnyDt>(Runtime(topState))
+        val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.forLoopTest.st"))
+        val state = ExecutionFacade.execute(ast)
         println("final state:")
-        topState.forEach {
+        state.forEach {
             println(it)
         }
-        assertEquals(BigInteger.valueOf(32), topState["Var1"]!!.get().value)
+        assertEquals(VAnyInt(INT, 32), state["Var1"]!!)
     }
 
     @Test
     fun whileLoopTest() {
-        val ast = getAst(this.javaClass.getResource("runtimeTest.whileLoopTest.st"))
-        val topState = TopState()
-        ast.accept<AnyDt>(Runtime(topState))
+        val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.whileLoopTest.st"))
+        val state = ExecutionFacade.execute(ast)
         println("final state:")
-        topState.forEach {
+        state.forEach {
             println(it)
         }
-        assertEquals(BigInteger.valueOf(32), topState["Var1"]!!.get().value)
-        assertEquals(BigInteger.valueOf(0), topState["counter"]!!.get().value)
+        assertEquals(VAnyInt(INT, 32), state["Var1"])
+        assertEquals(VAnyInt(INT, 0), state["counter"])
     }
 
     @Test
     fun repeatLoopTest() {
-        val ast = getAst(this.javaClass.getResource("runtimeTest.repeatLoopTest.st"))
-        val topState = TopState()
-        ast.accept<AnyDt>(Runtime(topState))
+        val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.repeatLoopTest.st"))
+        val state = ExecutionFacade.execute(ast)
         println("final state:")
-        topState.forEach {
+        state.forEach {
             println(it)
         }
-        assertEquals(BigInteger.valueOf(32), topState["Var1"]!!.get().value)
-        assertEquals(BigInteger.valueOf(0), topState["counter"]!!.get().value)
+        assertEquals(VAnyInt(INT, 32), state["Var1"])
+        assertEquals(VAnyInt(INT, 0), state["counter"])
     }
 
     @Test
     fun functionBlockTest() {
-        val ast = getAst(this.javaClass.getResource("runtimeTest.functionBlockTest.st"))
-        val topState = TopState()
-        IEC61131Facade.resolveDataTypes(ast)
-        val runtime = Runtime(topState)
-        ast.accept<AnyDt>(runtime)
-        println("final state:")
-
-        topState.forEach {
-            println(it)
-        }
+        val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.functionBlockTest.st"))
+        //val state = ExecutionFacade.execute(ast)
+        val exec = ExecutionFacade.createExecutionContext(ast)
+        exec.lastState.forEach { println(it) }
+        exec.executeCycle()
+        exec.lastState.forEach { println(it) }
     }
 
     @Test
     fun structTest() {
-        val ast = getAst(this.javaClass.getResource("runtimeTest.structTest.st"))
-        val topState = TopState()
-        val exec = IecRunFascade(ast)
-        exec.executeCode()
-
-        println("final state")
-        topState.forEach {
-
-            println(it)
-        }
+        val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.structTest.st"))
+        val state = ExecutionFacade.execute(ast)
+        state.forEach { println(it) }
     }
 
     @Test
     fun functionTest() {
-        val ast = getAst(this.javaClass.getResource("runtimeTest.functionTest.st"))
-        val topState = TopState()
-        val runtime = Runtime(topState, Stack())
-        ast.accept<AnyDt>(runtime)
-        println("final state:")
-
-        assertEquals(BigInteger.valueOf(-162), topState["Var1"]!!.get().value)
-        assertEquals(BigInteger.valueOf(7), topState["x"]!!.get().value)
-        assertEquals(BigInteger.valueOf(8), topState["y"]!!.get().value)
+        val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.functionTest.st"))
+        val state = ExecutionFacade.execute(ast)
+        state.forEach { println(it) }
+        assertEquals(VAnyInt(INT, -162), state["Var1"])
+        assertEquals(VAnyInt(INT, 7), state["x"])
+        assertEquals(VAnyInt(INT, 8), state["y"])
     }
-*/
+
+    @Test
+    fun cyclesTest() {
+        val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.cycles.st"))
+        val exec = ExecutionFacade.createExecutionContext(ast)
+        var counter: Long = 0
+
+        println(exec.lastState)
+        assertEquals(VAnyInt(INT, counter), exec.lastState["counter"])
+
+        val execTime = arrayListOf<Long>()
+        for (i in 1..10000.toLong()) {
+            val startTime = System.nanoTime()
+            val state = exec.executeCycle(
+                    "I" to VAnyInt(INT, i))
+            val stopTime = System.nanoTime()
+            execTime.add(stopTime - startTime)
+
+            counter = if (counter + i > 1000) 0 else counter + i
+            assertEquals(VAnyInt(INT, counter), state["counter"])
+        }
+
+        println("Average cycle time: ${execTime.average()/1000/1000} ms")
+    }
 }

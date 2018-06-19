@@ -34,14 +34,23 @@ abstract class AnyReal : AnyNum() {
         val d = obj as Double
         return javaClass.getName().toUpperCase() + "#" + d
     }
+
     override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
 
 
     object REAL : AnyReal() {
+        init {
+            name = "REAL"
+        }
+
         override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
     }
 
     object LREAL : AnyReal() {
+        init {
+            name = "LREAL"
+        }
+
         override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
     }
 }

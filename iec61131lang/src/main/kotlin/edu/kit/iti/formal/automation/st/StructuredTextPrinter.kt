@@ -607,7 +607,7 @@ class StructuredTextPrinter
     }
 
     private fun variableDataType(vd: VariableDeclaration) {
-        if (vd.dataType.obj is ArrayType) {
+        if (vd.dataType is ArrayType) {
             val dataType = vd.dataType as ArrayType
             sb.append(" ARRAY[")
             for (range in dataType.ranges) {
@@ -619,7 +619,7 @@ class StructuredTextPrinter
             sb.deleteLast()
             sb.append("] OF ").append(dataType.fieldType!!.name)
         } else {
-            sb.append(vd.dataType.identifier!!)
+            sb.append(vd.dataType!!)
         }
     }
 

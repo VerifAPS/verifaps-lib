@@ -31,7 +31,7 @@ PROGRAM Elevator
 
   IF RequestedPos = CurrentPos THEN
     Motor := MOTOR_STATE#Stationary;
-    Door := MOTOR_STATE#Open;
+    Door := DOOR_STATE#Open;
   END_IF
 
 END_PROGRAM

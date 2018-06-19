@@ -34,7 +34,7 @@ interface TypeTranslator {
     fun translate(datatype: AnyDt): SMVType
 
     open fun translate(vdecl: VariableDeclaration): SVariable {
-        return SVariable.create(vdecl.name).with(translate(vdecl.dataType.obj!!))
+        return SVariable.create(vdecl.name).with(translate(vdecl.dataType!!))
     }
 
 }

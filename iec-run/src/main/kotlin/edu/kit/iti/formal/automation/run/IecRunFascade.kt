@@ -19,7 +19,6 @@ object ExecutionFacade {
     fun execute(pous: PouElements): State =
             createExecutionContext(pous).executeCycle()
 
-
     fun createExecutionContext(pous: PouElements): IECExecutorContext {
         val program = Utils.findProgram(pous)
         return when (program) {
@@ -45,7 +44,7 @@ object ExecutionFacade {
             createInitialState(entry.scope)
 
     fun createInitialState(scope: Scope): State {
-        val v = DefaultInitValue.INSTANCE.getInit(RecordType(scope.variables))
+        val v = DefaultInitValue.getInit(RecordType(scope.variables))
                 as Value<RecordType, RecordValue>
         return State(v.value.fieldValues)
     }
@@ -54,7 +53,7 @@ object ExecutionFacade {
         val state = createInitialState(func.scope)
         setMatchingArgToParam(params, func.scope.variables, state)
         val runtime = Runtime(state, func.scope)
-        runtime.visit(func)
+        runtime.visit(func.stBody!!)
         return if (func.returnType.obj != AnyDt.VOID)
             runtime.state[func.name]!!
         else VVOID
@@ -67,7 +66,7 @@ object ExecutionFacade {
                 .forEachIndexed { i, vd -> state[vd.name] = parameters[i] }
     }
 
-    fun getDefaultValue(dataType: AnyDt): EValue = DefaultInitValue.INSTANCE.getInit(dataType)
+    fun getDefaultValue(dataType: AnyDt): EValue = DefaultInitValue.getInit(dataType)
     fun evaluateExpression(state: State, scope: Scope, expression: Expression): EValue =
             expression.accept(ExpressionVisitor(state, scope))
 }
@@ -75,6 +74,8 @@ object ExecutionFacade {
 class IECExecutorContext(val ast: PouElements, val entryPoint: PouExecutable) {
     val states: MutableList<State> = arrayListOf()
     val initialState: State
+    val lastState: State
+        get() = states[states.size - 1]
 
     init {
         states.add(ExecutionFacade.createInitialState(entryPoint))
@@ -87,10 +88,19 @@ class IECExecutorContext(val ast: PouElements, val entryPoint: PouExecutable) {
         return State
     }
 
-    fun executeCycle(state: State = states[states.size - 1]): State {
+    fun executeCycle(vararg inputs: Pair<String, EValue>): State {
+        val inputState = State()
+        inputs.forEach { (t, v) -> inputState[t] = v }
+        return executeCycle(input = inputState)
+    }
+
+    fun executeCycle(state: State = states[states.size - 1],
+                     input: State = State()): State {
         val s = state.clone()
+        s += input
         val rt = Runtime(s, entryPoint.scope)
         entryPoint.accept(rt)
-        return states[states.size - 1]
+        states += s
+        return s
     }
 }

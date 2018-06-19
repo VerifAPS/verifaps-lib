@@ -57,6 +57,10 @@ open class AnyInt(var bitLength: kotlin.Int = 0, var isSigned: Boolean = false) 
         return visitor.visit(this)
     }
 
+    override fun toString(): String {
+        return name
+    }
+
     companion object {
         fun getDataTypeFor(number: Int, unsigned: Boolean): AnyInt {
             val values: Array<AnyInt>

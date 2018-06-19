@@ -57,6 +57,7 @@ abstract class AnyBit(var bitLength: Int = 0) : AnyDt() {
             return "FALSE"
         }
 
+        override fun toString(): String = name
         override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
     }
 

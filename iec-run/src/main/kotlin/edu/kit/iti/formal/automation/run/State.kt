@@ -4,13 +4,15 @@ import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.RecordType
 import edu.kit.iti.formal.automation.datatypes.values.RecordValue
 import edu.kit.iti.formal.automation.datatypes.values.Value
+import java.util.*
 
 typealias EValue = Value<*, *>
 
-class State(val impl: MutableMap<String, EValue> = HashMap<String, EValue>()/*val parent: State?*/) {
+class State(private val impl: MutableMap<String, EValue> = HashMap()/*val parent: State?*/)
+    : MutableMap<String, EValue> by impl {
     fun declare(key: String, dataType: AnyDt) = declare(key, ExecutionFacade.getDefaultValue(dataType))
     fun <T : AnyDt, S : Any> declare(key: String, value: Value<T, S>) = impl.put(key, value)
-    operator fun get(name: String) = impl[name]
+    //operator fun get(name: String) = impl[name]
     operator fun contains(key: String) = key in impl
 
     operator fun get(name: List<String>): EValue? {
@@ -19,7 +21,7 @@ class State(val impl: MutableMap<String, EValue> = HashMap<String, EValue>()/*va
         try {
             val o = impl[name[0]] as Value<RecordType, RecordValue>
             val state = State(o.value.fieldValues)
-            val r = 1..(name.size)
+            val r = 1..(name.size - 1)
             return state[name.slice(r)]
         } catch (e: ClassCastException) {
             return null
@@ -37,7 +39,7 @@ class State(val impl: MutableMap<String, EValue> = HashMap<String, EValue>()/*va
         try {
             val o = impl[name[0]] as Value<RecordType, RecordValue>
             val state = State(o.value.fieldValues)
-            val r = 1..(name.size)
+            val r = 1..(name.size-1)
             state[name.slice(r)] = value
         } catch (e: ClassCastException) {
             return
@@ -53,4 +55,7 @@ class State(val impl: MutableMap<String, EValue> = HashMap<String, EValue>()/*va
         val s = State(HashMap(impl))
         return s
     }
+
+    override fun toString(): String = map { (k, v) -> k to v }.toString()
+
 }

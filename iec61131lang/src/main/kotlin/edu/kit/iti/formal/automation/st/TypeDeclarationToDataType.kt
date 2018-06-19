@@ -9,6 +9,9 @@ import java.math.BigInteger
 class TypeDeclarationToDataType(val scope: Scope) : AstVisitor<AnyDt?>() {
     override fun defaultVisit(obj: Any) = throw IllegalArgumentException("$obj is not a type declaration")
 
+    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration)
+         = EnumerateType(enumerationTypeDeclaration)
+
     override fun visit(stringTypeDeclaration: StringTypeDeclaration): AnyDt {
         //val stringType = IECString
         return stringTypeDeclaration.baseType.obj!!
@@ -32,7 +35,7 @@ class TypeDeclarationToDataType(val scope: Scope) : AstVisitor<AnyDt?>() {
     }
 
     override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration): AnyDt? {
-        return scope.resolveDataType(simpleTypeDeclaration.name)
+        return scope.resolveDataType(simpleTypeDeclaration.baseType.identifier!!)
     }
 
 

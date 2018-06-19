@@ -52,7 +52,7 @@ class FunctionBlockEmbedding : ST0Transformation {
         outer.statements = ae.embedd()
 
         for (vd in decls) {
-            val type = vd.dataType.obj
+            val type = vd.dataType
             if (type is FunctionBlockDataType) {
                 val inner = CodeWithScope(type.functionBlock)
                 outer.statements = embeddFunctionBlocksImpl(outer, vd, inner)

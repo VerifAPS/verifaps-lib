@@ -206,6 +206,9 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
 
     override fun traverse(functionBlockDeclaration: FunctionBlockDeclaration) {
         //currentFullScope = OOUtils.getEffectiveScope(functionBlockDeclaration);
+        functionBlockDeclaration.scope.accept(visitor)
+        functionBlockDeclaration.actions.forEach { it.accept(visitor) }
+        functionBlockDeclaration.methods.forEach { it.accept(visitor) }
         if (functionBlockDeclaration.stBody != null)
             functionBlockDeclaration.stBody!!.accept(visitor)
         if (functionBlockDeclaration.sfcBody != null)
@@ -254,10 +257,6 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
     override fun traverse(variableDeclaration: VariableDeclaration) {
         if (null != variableDeclaration.typeDeclaration) {
             variableDeclaration.typeDeclaration!!.accept(visitor)
-        }
-
-        if (null != variableDeclaration.init) {
-            variableDeclaration.init!!.accept(visitor)
         }
     }
 
@@ -737,6 +736,11 @@ open class AstTraversal : DefaultVisitorNN<Unit>() {
 
 abstract class AstVisitor<T> : DefaultVisitorNN<T>() {
     protected var traversalPolicy: ITraversal<T> = ImmutableTraversal(this)
+
+    override fun visit(elements: PouElements): T {
+        traversalPolicy.traverse(elements)
+        return super.visit(elements)
+    }
 
     override fun visit(assignmentStatement: AssignmentStatement): T {
         traversalPolicy.traverse(assignmentStatement)

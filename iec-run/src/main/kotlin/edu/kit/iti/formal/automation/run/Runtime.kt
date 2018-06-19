@@ -43,7 +43,7 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> =
         val innerValue = state[fbName]!! as Value<RecordType, RecordValue>
         val innerState = State(innerValue.value.fieldValues)
         val fbDataType =
-                (peekScope().resolveVariable(fbc.callee)?.dataType?.obj) as FunctionBlockDataType?
+                (peekScope().resolveVariable(fbc.callee)?.dataType) as FunctionBlockDataType?
                         ?: throw IllegalStateException()
         val fb = fbDataType.functionBlock
 
@@ -217,11 +217,11 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> =
     private fun peekScope() = definitionScopeStack.peek()
 }
 
-private fun SymbolicReference.asPath(): List<String> {
+fun SymbolicReference.asPath(): List<String> {
     val l = arrayListOf<String>()
     var cur = this
     do {
-        l += this.identifier
+        l += cur.identifier
         cur = cur.sub ?: return l
     } while (true)
 }
