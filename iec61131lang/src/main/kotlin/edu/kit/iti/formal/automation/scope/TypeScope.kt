@@ -35,7 +35,7 @@ import java.util.*
  * @version $Id: $Id
  */
 class TypeScope private constructor(private val impl: TreeMap<String, AnyDt> = TreeMap())
-    : MutableMap<String, AnyDt> by impl, Cloneable<TypeScope> {
+    : MutableMap<String, AnyDt> by impl, Cloneable {
 
     fun register(vararg any: AnyDt) {
         for (a in any)

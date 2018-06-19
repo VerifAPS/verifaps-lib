@@ -32,9 +32,8 @@ open class AnyInt(var bitLength: kotlin.Int = 0, var isSigned: Boolean = false) 
     open fun asUnsigned() = if (isSigned) AnyInt(bitLength, false) else this
     open fun asSigned() = if (isSigned) this else AnyInt(bitLength, true)
 
-    open fun isValid(value: Long): Boolean {
-        val v = BigInteger.valueOf(value)
-        return lowerBound <= v && v <= upperBound
+    open fun isValid(value: BigInteger): Boolean {
+        return value in lowerBound..upperBound
     }
 
     override fun equals(o: Any?): Boolean {

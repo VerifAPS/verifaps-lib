@@ -27,8 +27,8 @@ package edu.kit.iti.formal.automation.st
  * @author Alexander Weigl
  * @since 04.03.2017
 </T> */
-data class RefTo<T : Identifiable>(private var name: String?,
-                                   private var identified: T?) : Cloneable<RefTo<*>> {
+class RefTo<T : Identifiable>(private var name: String?,
+                              private var identified: T?) : Cloneable {
     var identifier: String?
         get() = if (obj != null) obj!!.name else name
         set(new) {
@@ -48,7 +48,7 @@ data class RefTo<T : Identifiable>(private var name: String?,
         get() = obj != null
 
     constructor() : this(null, null)
-    constructor(identifier: String) : this(identifier, null)
+    constructor(identifier: String?) : this(identifier, null)
     constructor(obj: T) : this(obj.name, obj)
 
     override fun clone(): RefTo<T> = RefTo(identifier, obj)
@@ -56,4 +56,25 @@ data class RefTo<T : Identifiable>(private var name: String?,
         if (identifier != null)
             obj = func(identifier!!)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is RefTo<*>) return false
+
+        if (identified != null && identified == other.identified) return true
+        if (name == other.name) return true
+        return false
+    }
+
+    override fun hashCode(): Int {
+        var result = name?.hashCode() ?: 0
+        result = 31 * result + (identified?.hashCode() ?: 0)
+        return result
+    }
+
+    override fun toString(): String {
+        return "RefTo(name=$name, identified=$identified)"
+    }
+
+
 }

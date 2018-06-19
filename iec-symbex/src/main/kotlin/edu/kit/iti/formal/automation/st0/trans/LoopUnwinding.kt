@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.st0.trans
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
@@ -59,7 +60,7 @@ class LoopUnwinding : AstMutableVisitor() {
         val loopVar: Expression = SymbolicReference(loopVariable)
         var i = start
         while (i < stop) {
-            replacer.replacements[loopVar] = Literal.integer(i.toInt())
+            replacer.replacements[loopVar] = IntegerLit(INT, i.toBigInteger())
             sl.addAll(replacer.replace())
             i += step
         }

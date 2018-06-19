@@ -43,7 +43,6 @@ object DefaultInitValue : InitValueTranslator {
         override fun defaultVisit(obj: Any): Value<*, *> = throw IllegalArgumentException("unsupported data type: $obj")
 
 
-
         override fun visit(anyInt: AnyInt): Value<*, *> {
             return VAnyInt(anyInt, BigInteger.ZERO)
         }
@@ -89,7 +88,10 @@ object DefaultInitValue : InitValueTranslator {
         }
 
         override fun visit(classDataType: ClassDataType): Value<*, *> {
-            return RecordType(classDataType.clazz.scope.variables).accept(this)
+            return when (classDataType) {
+                is ClassDataType.ClassDt -> RecordType(classDataType.clazz.scope.variables).accept(this)
+                else -> VNULL
+            }
         }
 
         override fun visit(functionBlockDataType: FunctionBlockDataType): Value<*, *> {

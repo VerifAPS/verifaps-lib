@@ -7,7 +7,6 @@ import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException
 import edu.kit.iti.formal.automation.st.Cloneable
 import edu.kit.iti.formal.automation.st.Identifiable
 import edu.kit.iti.formal.automation.st.LookupList
-import edu.kit.iti.formal.automation.st.LookupListFactory
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.Visitable
 import edu.kit.iti.formal.automation.visitors.Visitor
@@ -20,9 +19,20 @@ import kotlin.collections.ArrayList
  * @author Alexander Weigl
  * @version 1 (13.06.14)
  */
-class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
+data class Scope(
+        var programs: Namespace<ProgramDeclaration> = Namespace<ProgramDeclaration>(),
+        var functionBlocks: Namespace<FunctionBlockDeclaration> = Namespace<FunctionBlockDeclaration>(),
+        var functions: Namespace<FunctionDeclaration> = Namespace<FunctionDeclaration>(),
+        var dataTypes: Namespace<TypeDeclaration> = Namespace<TypeDeclaration>(),
+        var functionResolvers: MutableList<FunctionResolver> = LinkedList(),
+        var types: TypeScope = TypeScope.builtin(),
+        var classes: Namespace<ClassDeclaration> = Namespace<ClassDeclaration>(),
+        var interfaces: Namespace<InterfaceDeclaration> = Namespace<InterfaceDeclaration>(),
+        val variables: VariableScope = LookupList(),
+        val actions: Namespace<ActionDeclaration> = Namespace(),
+        val methods: Namespace<MethodDeclaration> = Namespace()
+) : Visitable, Iterable<VariableDeclaration>, Cloneable {
     override fun iterator(): Iterator<VariableDeclaration> = variables.iterator()
-
     private val allowedEnumValues = HashMap<String, EnumerateType>()
 
     var parent: Scope? = null
@@ -46,18 +56,6 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
             }
             field = parent
         }
-
-    var programs = Namespace<ProgramDeclaration>()
-    var functionBlocks = Namespace<FunctionBlockDeclaration>()
-    var functions = Namespace<FunctionDeclaration>()
-    var dataTypes = Namespace<TypeDeclaration>()
-    var functionResolvers: MutableList<FunctionResolver> = LinkedList()
-    var types = TypeScope.builtin()
-    var classes = Namespace<ClassDeclaration>()
-    var interfaces = Namespace<InterfaceDeclaration>()
-    val variables: VariableScope = LookupListFactory.create()
-    val actions: Namespace<ActionDeclaration> = Namespace()
-    val methods: Namespace<MethodDeclaration> = Namespace()
 
 
     val topLevel: Scope
@@ -102,15 +100,15 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
      * {@inheritDoc}
      *
     override fun toString(): String {
-        val sb = StringBuilder("Scope{")
-        for (vd in variables) {
-            sb.append(vd.name).append(":").append(vd.dataType)
-            if (vd.init != null) sb.append(" := ").append(vd.init)
-            sb.append("},")
-        }
-        sb.delete(sb.length - 1, sb.length)
-        sb.append("}")
-        return sb.toString()
+    val sb = StringBuilder("Scope{")
+    for (vd in variables) {
+    sb.append(vd.name).append(":").append(vd.dataType)
+    if (vd.init != null) sb.append(" := ").append(vd.init)
+    sb.append("},")
+    }
+    sb.delete(sb.length - 1, sb.length)
+    sb.append("}")
+    return sb.toString()
     }*/
 
     @Throws(VariableNotDefinedException::class)
@@ -161,6 +159,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
         }
     }
 
+    internal fun <T : AnyDt?> resolveDataType0(name: String) = resolveDataType(name) as T
 
     fun resolveDataType(name: String): AnyDt? {
         if (types.containsKey(name))
@@ -191,7 +190,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
 
         if (c) {
             val cd = classes.lookup(name)!!
-            q = ClassDataType(cd)
+            q = ClassDataType.ClassDt(cd)
             types[name] = q
             return q
         }
@@ -300,6 +299,9 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
         }
     }
 
+    fun resolveEnumByValue(value: String): EnumerateType? =
+            this.allowedEnumValues[value] ?: parent?.resolveEnumByValue(value)
+
     companion object {
         fun defaultScope(): Scope {
             val g = Scope()
@@ -310,7 +312,7 @@ class Scope() : Visitable, Iterable<VariableDeclaration>, Cloneable<Scope> {
     }
 }
 
-class Namespace<T : Identifiable>() {
+class Namespace<T : Identifiable>() where T : Cloneable {
     private val map: LookupList<T> = LookupList()
     internal var parent: Supplier<Namespace<T>>? = null
 

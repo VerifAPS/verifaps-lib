@@ -46,12 +46,12 @@ class GlobalVariableListEmbedding : ST0Transformation {
             state.theProgram!!.scope.add(v)
         }
 
-        state.theProgram!!.scope.parent!!.forEach { v ->
+        /*state.theProgram!!.scope.parent!!.forEach { v ->
             // **** Renaming disabled! ****
             //v.setName(GVL_NEW_PREFIX + v.getName());
             v.type = VariableDeclaration.GLOBAL
             state.theProgram!!.scope.add(v)
-        }
+        }*/
     }
 
     internal class GVLRenameVisitor : AstMutableVisitor() {

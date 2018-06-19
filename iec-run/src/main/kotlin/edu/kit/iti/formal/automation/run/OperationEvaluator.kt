@@ -30,7 +30,8 @@ object OperationEvaluator {
      * normalize the Expression's Value to its DataType
      */
     public fun normalizeInt(value: VAnyInt): VAnyInt {
-        val type = value.dataType
+        val (type, v) = value
+        if(type.isValid(v)) return value
         //if negative and unsigned -> offset value into positive region
         val mask = BigInteger.valueOf(2).pow(type.bitLength).subtract(BigInteger.valueOf(1))
         if (!type.isSigned && value.value < BigInteger.ZERO) {
@@ -40,7 +41,6 @@ object OperationEvaluator {
         while (newValue > type.upperBound) {
             newValue -= (type.upperBound - type.lowerBound + BigInteger.valueOf(1))
         }
-
         return VAnyInt(type, newValue)
     }
 

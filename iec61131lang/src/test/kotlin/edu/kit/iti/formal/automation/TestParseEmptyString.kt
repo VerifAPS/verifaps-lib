@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.st;
+package edu.kit.iti.formal.automation
 
 /*-
  * #%L
@@ -22,20 +22,19 @@ package edu.kit.iti.formal.automation.st;
  * #L%
  */
 
-import edu.kit.iti.formal.automation.IEC61131Facade;
-import edu.kit.iti.formal.automation.st.ast.PouElements;
-import org.antlr.v4.runtime.CharStreams;
-import org.junit.Assert;
-import org.junit.Test;
+import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.st.ast.PouElements
+import org.antlr.v4.runtime.CharStreams
+import org.junit.Assert
+import org.junit.Test
 
 /**
  * @author Philipp Krüger
  */
-public class TestParseEmptyString {
-
+class TestParseEmptyString {
     @Test//(expected = ErrorReporter.IEC61131ParserException.class)
-    public void testParseEmptyString() {
-        PouElements tle = IEC61131Facade.INSTANCE.file(CharStreams.fromString(""));
-        Assert.assertEquals(0, tle.size());
+    fun testParseEmptyString() {
+        val tle = IEC61131Facade.file(CharStreams.fromString(""))
+        Assert.assertEquals(0, tle.size.toLong())
     }
 }

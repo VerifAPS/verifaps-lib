@@ -29,6 +29,7 @@ import edu.kit.iti.formal.automation.visitors.DefaultVisitorNN
 import edu.kit.iti.formal.automation.visitors.Visitable
 import edu.kit.iti.formal.automation.visitors.Visitor
 import java.util.*
+import kotlin.collections.ArrayList
 
 interface ITraversal<T> {
     val visitor: Visitor<T>
@@ -427,7 +428,7 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
 
     override fun traverse(integerCondition: CaseCondition.IntegerCondition) {
         val sv = integerCondition.value.accept(visitor) as Literal
-        integerCondition.value = sv
+        integerCondition.value = sv as IntegerLit
     }
 
 
@@ -575,7 +576,8 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
 
 
     override fun traverse(localScope: Scope) {
-        for (variable in localScope) {
+        val variables = ArrayList(localScope.variables)
+        for (variable in variables) {
             //assert variable.getParent() != null;
             val newVariable = variable.accept(visitor) as VariableDeclaration
             if (newVariable == null)

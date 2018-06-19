@@ -22,12 +22,9 @@ package edu.kit.iti.formal.automation.st0
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.AnyBit
-import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
 import edu.kit.iti.formal.automation.st0.trans.ST0Transformation
-import org.apache.commons.lang3.NotImplementedException
 
 class TrivialBranchReducer : ST0Transformation {
     override fun transform(state: STSimplifier.State) {
@@ -44,43 +41,26 @@ class TrivialBranchReducer : ST0Transformation {
             val newIfStatement = IfStatement()
             for (guardedStatement in ifStatement.conditionalBranches) {
                 guardedStatement.statements = guardedStatement.statements.accept(this) as StatementList
-                var value = false
-                if (guardedStatement.condition is Literal)
-                    value = evaluateTrivialCondition(guardedStatement.condition as Literal)
-                else if (guardedStatement.condition is BinaryExpression
-                        && (guardedStatement.condition as BinaryExpression).leftExpr is Literal
-                        && (guardedStatement.condition as BinaryExpression).rightExpr is Literal)
-                    value = evaluateTrivialCondition(guardedStatement.condition as BinaryExpression)
-                else
-                // non-trivial statement
-                    newIfStatement.addGuardedCommand(guardedStatement)
-                // Handle trivial guard
-                if (value && newIfStatement.conditionalBranches.size == 0)
-                    return guardedStatement.statements.accept(this) as Statement
-                else if (value) {
-                    newIfStatement.elseBranch = guardedStatement.statements
-                    return newIfStatement
+                var value = evaluateTrivialCondition(guardedStatement.condition)
+                when (value) {
+                    true -> {
+                        newIfStatement.conditionalBranches.size == 0
+                        return guardedStatement.statements.accept(this) as Statement
+                    }
+                    false -> {
+                        newIfStatement.elseBranch = guardedStatement.statements
+                        return newIfStatement
+                    }
+                    null -> newIfStatement.addGuardedCommand(guardedStatement)
                 }
-                // else continue
             }
             newIfStatement.elseBranch = ifStatement.elseBranch.accept(this) as StatementList
             return newIfStatement
         }
 
-        private fun evaluateTrivialCondition(literal: Literal): Boolean {
-            if (literal.dataType.obj != AnyBit.BOOL)
-                throw IllegalArgumentException()
-            return literal.textValue == "TRUE"
-        }
-
-        private fun evaluateTrivialCondition(binaryExpression: BinaryExpression): Boolean {
-            if (binaryExpression.leftExpr !is Literal || binaryExpression.rightExpr !is Literal)
-                throw IllegalArgumentException()
-            val left = Integer.valueOf((binaryExpression.leftExpr as Literal).text)
-            val right = Integer.valueOf((binaryExpression.rightExpr as Literal).text)
-            if (binaryExpression.operator != Operators.EQUALS)
-                throw NotImplementedException("")
-            return left == right
+        private fun evaluateTrivialCondition(condition: Expression): Boolean? {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
     }
 }
+

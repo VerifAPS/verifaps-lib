@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.analysis
 
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
+import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue
@@ -96,10 +97,22 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
 
     override fun visit(literal: Literal) {
         try {
-            if (!literal.dataType.isIdentified)
-                literal.dataType.resolve(scope::resolveDataType)
+            when (literal) {
+                is IntegerLit -> {
+                    literal.dataType.resolve(scope::resolveDataType0)
+                    if(!literal.dataType.isIdentified)
+                        literal.dataType.obj = INT
+                }
+                is RealLit -> literal.dataType.resolve(scope::resolveDataType0)
+                is EnumLit -> {
+                    literal.dataType.resolve(scope::resolveDataType0)
+                    if (!literal.dataType.isIdentified) {
+                        literal.dataType.obj = scope.resolveEnumByValue(literal.value)
+                    }
+                }
+                is BitLit -> literal.dataType.resolve(scope::resolveDataType0)
+            }
         } catch (e: ClassCastException) {
-        } catch (e: DataTypeNotDefinedException) {
         }
     }
 

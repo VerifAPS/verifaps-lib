@@ -84,7 +84,7 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
                 .forEach { aa ->
                     stBody.add(AssignmentStatement(
                             SymbolicReference(aa.actionName),
-                            Literal.FALSE
+                            BooleanLit.LFALSE
                     ))
                 }
     }
@@ -97,7 +97,7 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
         for (step in network!!.steps) {
             val _case = Case()
             val cc = CaseCondition.Enumeration(
-                    Literal(enumDecl.name, step.name))
+                    EnumLit(enumDecl.name, step.name))
             _case.conditions = arrayListOf(cc)
             statement.addCase(_case)
             val sl = _case.statements
@@ -114,13 +114,13 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
             if (p1.size > 0) {
                 sl.add(checkForTransit)
             }
-            sl.add(AssignmentStatement(SymbolicReference(transitVariable), Literal.FALSE))
+            sl.add(AssignmentStatement(SymbolicReference(transitVariable), BooleanLit.LFALSE))
 
             // S+N, R
             step.events.stream().filter { aa -> aa.qualifier!!.qualifier == SFCActionQualifier.Qualifier.SET || aa.qualifier!!.qualifier == SFCActionQualifier.Qualifier.NON_STORED }
                     .forEach { aa ->
                         if (scope!!.hasVariable(aa.actionName)) {
-                            sl.add(AssignmentStatement(SymbolicReference(aa.actionName), Literal.TRUE))
+                            sl.add(AssignmentStatement(SymbolicReference(aa.actionName), BooleanLit.LTRUE))
                         } else {
                             sl.add(InvocationStatement(aa.actionName))
                         }
@@ -128,7 +128,7 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
             step.events.stream().filter { aa -> aa.qualifier!!.qualifier == SFCActionQualifier.Qualifier.OVERRIDING_RESET }
                     .forEach { aa ->
                         if (scope!!.hasVariable(aa.actionName)) {
-                            sl.add(AssignmentStatement(SymbolicReference(aa.actionName), Literal.FALSE))
+                            sl.add(AssignmentStatement(SymbolicReference(aa.actionName), BooleanLit.LFALSE))
                         } else {
                             //Not handled!
                         }
@@ -139,9 +139,9 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
             step.outgoing.forEach { t ->
                 val _ifguard = IfStatement()
                 val then = StatementList()
-                then.add(AssignmentStatement(SymbolicReference(transitVariable), Literal.TRUE))
+                then.add(AssignmentStatement(SymbolicReference(transitVariable), BooleanLit.LTRUE))
                 then.add(AssignmentStatement(SymbolicReference(stateVariable),
-                        Literal(enumDecl.name, t.to!!.iterator().next().name)))
+                        EnumLit(enumDecl.name, t.to!!.iterator().next().name)))
                 //TODO assert t.getTo().size() == 1
                 _ifguard.addGuardedCommand(t.guard, then)
                 sl.add(_ifguard)
@@ -191,7 +191,7 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
 
         scope.builder().identifiers(transitVariable!!)
                 .boolType()
-                .setInitialization(Literal.FALSE)
+                .setInitialization(BooleanLit.LFALSE)
                 .close()
     }
 

@@ -20,7 +20,7 @@
  * #L%
  */
 
-package edu.kit.iti.formal.automation.st;
+package edu.kit.iti.formal.automation;
 
 /**
  * Test analysis of effective subtypes.

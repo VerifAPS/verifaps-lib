@@ -35,6 +35,9 @@ import java.math.BigInteger
 sealed class Value<T : AnyDt, S : Any>(
         val dataType: T, val value: S) {
 
+    operator fun component1() = dataType
+    operator fun component2() = value
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Value<*, *>) return false
@@ -84,3 +87,4 @@ class VStruct(dt: RecordType, v: RecordValue) : Value<RecordType, RecordValue>(d
 class VArray(dt: ArrayType, v: MultiDimArrayValue) : Value<ArrayType, MultiDimArrayValue>(dt, v)
 
 object VVOID : Value<AnyDt.VOID, Unit>(AnyDt.VOID, Unit)
+object VNULL : Value<ClassDataType.AnyClassDt, Unit>(ClassDataType.AnyClassDt, Unit)

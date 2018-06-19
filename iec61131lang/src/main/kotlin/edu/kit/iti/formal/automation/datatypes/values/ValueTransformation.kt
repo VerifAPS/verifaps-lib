@@ -28,7 +28,7 @@ import edu.kit.iti.formal.automation.st.ast.Literal
 import org.apache.commons.lang3.NotImplementedException
 import java.math.BigDecimal
 import java.math.BigInteger
-
+/*
 class ValueTransformation(val literal: Literal) : DefaultDataTypeVisitor<Value<*, *>>() {
     override fun defaultVisit(obj: Any): Value<*, *>? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -36,9 +36,9 @@ class ValueTransformation(val literal: Literal) : DefaultDataTypeVisitor<Value<*
 
     override fun visit(bool: AnyBit.BOOL): Value<*, *>? {
         if (literal.textValue!!.equals("true", ignoreCase = true))
-            return TRUE
+            return LTRUE
         if (literal.textValue!!.equals("false", ignoreCase = true))
-            return FALSE
+            return LFALSE
 
         throw IllegalArgumentException("Boolean literal isType not true or false; got: " + literal.text)
     }
@@ -108,3 +108,4 @@ class ValueTransformation(val literal: Literal) : DefaultDataTypeVisitor<Value<*
     //  override fun visit(string: IECString.STRING): Value<*, *>? = VIECString(string, literal.text)
     //   override fun visit(wString: IECString.WSTRING): Value<*, *>? = VIECString(wString, literal.text)
 }
+*/

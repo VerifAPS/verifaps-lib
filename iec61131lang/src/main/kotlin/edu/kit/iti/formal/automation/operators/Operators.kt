@@ -83,7 +83,10 @@ object Operators {
     }
 
     fun lookup(operator: String): Operator {
-        return TABLE[operator]!!
+        if (operator.toUpperCase() !in TABLE) {
+            throw IllegalArgumentException("Operator $operator is not defined")
+        }
+        return TABLE[operator.toUpperCase()]!!
     }
 
     fun register(op: Operator) = register(op.symbol, op)

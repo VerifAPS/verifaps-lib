@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.scope
  */
 
 import edu.kit.iti.formal.automation.datatypes.AnyDt
+import edu.kit.iti.formal.automation.datatypes.AnyInt
 import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.datatypes.promotion.DefaultTypePromoter
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException
@@ -74,7 +75,7 @@ class FunctionResolverMUX : FunctionResolver {
 
     private fun createCase(i: Int): Case {
         val c = Case()
-        c.addCondition(CaseCondition.IntegerCondition(Literal(INT, "" + i)))
+        c.addCondition(CaseCondition.IntegerCondition(IntegerLit(INT, i.toBigInteger())))
         c.statements.add(AssignmentStatement(SymbolicReference("MUX"),
                 SymbolicReference("a$i")))
         return c

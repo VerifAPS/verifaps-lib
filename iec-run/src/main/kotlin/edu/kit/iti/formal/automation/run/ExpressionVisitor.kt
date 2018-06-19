@@ -1,8 +1,5 @@
 package edu.kit.iti.formal.automation.run
 
-import edu.kit.iti.formal.automation.datatypes.EnumerateType
-import edu.kit.iti.formal.automation.datatypes.TimeType
-import edu.kit.iti.formal.automation.datatypes.values.VAnyEnum
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.run.stexceptions.ExecutionException
 import edu.kit.iti.formal.automation.scope.Scope
@@ -56,7 +53,7 @@ class ExpressionVisitor(private val state: State,
 
         }
 
-        val resolvedDataType = literal.dataType.obj
+        /*val resolvedDataType = literal.dataType()
         if (resolvedDataType is EnumerateType) {
             return VAnyEnum(resolvedDataType, literal.textValue!!)
         }
@@ -65,6 +62,7 @@ class ExpressionVisitor(private val state: State,
             TODO()
             //return Values.VAnyReal(resolvedDataType, BigDecimal.valueOf(0))
         }
+    */
         TODO("implement other cases for $literal")
     }
 

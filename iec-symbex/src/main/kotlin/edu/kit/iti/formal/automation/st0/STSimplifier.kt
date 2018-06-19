@@ -59,7 +59,7 @@ class STSimplifier(inputElements: PouElements) {
         //transformations.add(SFCResetReplacer.getINSTANCE());
         transformations.add(RemoveActionsFromProgram())
         transformations.add(ConstantEmbedder())  // EXPERIMENTAL
-        transformations.add(TrivialBranchReducer())  // EXPERIMENTAL
+        //transformations.add(TrivialBranchReducer())  // EXPERIMENTAL
     }
 
     fun transform() {

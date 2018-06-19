@@ -101,7 +101,7 @@ public class Graph2Ast {
             ifEntry.addGuardedCommand(gc);
             sl.add(ifEntry);
         }
-        sl.add(assignment(TRANSIT_VARIABLE, "FALSE"));
+        sl.add(assignment(TRANSIT_VARIABLE, "LFALSE"));
         sl.comment("end(onEntry)");
 
         //build in active
@@ -112,7 +112,7 @@ public class Graph2Ast {
 
         sl.comment("begin(transition)");
         IfStatement transitions = new IfStatement();
-        Statement assignExitTrue = assignment(TRANSIT_VARIABLE, "TRUE");
+        Statement assignExitTrue = assignment(TRANSIT_VARIABLE, "LTRUE");
 
         for (SFCGraph.Transition t : n.outgoing) {
             StatementList assignNextState = IEC61131Facade.statements(String.format("%s := %s#%s;",

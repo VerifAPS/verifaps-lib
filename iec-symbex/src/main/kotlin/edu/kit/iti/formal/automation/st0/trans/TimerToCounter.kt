@@ -29,7 +29,7 @@ import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
 import edu.kit.iti.formal.automation.st0.STSimplifier
 import edu.kit.iti.formal.automation.visitors.Visitable
-import java.util.*
+import java.math.BigInteger
 
 /**
  * @author Alexander Weigl (06.07.2014), Augusto Modanese
@@ -45,16 +45,15 @@ class TimerToCounter(private val cycleTime: Long) : AstMutableVisitor() {
         if (vd.dataType === TimeType.TIME_TYPE) {
 
             val newVariable = VariableDeclaration(vd.name, vd.type, UINT)
-            var cycles = 0
-            if (vd.init != null) {
+            var cycles = if (vd.init != null) {
                 val value = (vd.init as Literal).asValue()
                 val data = value!!.value as TimeData
-                cycles = (data.milliseconds / cycleTime).toInt()
+                BigInteger.valueOf((data.milliseconds / cycleTime).toLong())
             } else {
-                cycles = 0
+                BigInteger.ZERO
             }
 
-            val newVal = Literal.integer(cycles)
+            val newVal = IntegerLit(UINT, cycles)
             val sd = SimpleTypeDeclaration()
             sd.initialization = newVal
             sd.baseType.obj = UINT
@@ -65,15 +64,17 @@ class TimerToCounter(private val cycleTime: Long) : AstMutableVisitor() {
         return super.visit(vd)
     }
 
-    override fun visit(literal: Literal): Expression {
-        if (literal.dataType.obj == TimeType.TIME_TYPE) {
-            val value = literal.asValue()
-            val data = value!!.value as TimeData
-            val cycles = (data.milliseconds / this.cycleTime).toInt()
-            return Literal.integer(cycles)
-        }
-        return super.visit(literal)
-    }
+    override fun visit(literal: Literal) =
+            when (literal) {
+                is TimeLit -> {
+                    val value = literal.asValue()
+                    val data = value.value
+                    val cycles = (data.milliseconds / this.cycleTime).toInt()
+                    IntegerLit(UINT, cycles.toBigInteger())
+                }
+                else -> super.visit(literal)
+            }
+
 
     companion object {
         var DEFAULT_CYCLE_TIME: Long = 4

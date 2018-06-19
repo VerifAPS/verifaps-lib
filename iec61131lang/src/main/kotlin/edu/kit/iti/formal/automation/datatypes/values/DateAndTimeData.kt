@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.automation.datatypes.values
 
+import edu.kit.iti.formal.automation.sfclang.split
+
 data class DateAndTimeData(var date: DateData = DateData(),
                            var tod: TimeofDayData = TimeofDayData()) {
     var hours: Int
@@ -46,4 +48,15 @@ data class DateAndTimeData(var date: DateData = DateData(),
 
     constructor(years: Int, months: Int, days: Int, hours: Int, minutes: Int, seconds: Int)
             : this(DateData(years, months, days), TimeofDayData(hours, minutes, seconds))
+
+    companion object {
+        fun parse(str: String): DateAndTimeData {
+            val (_, _, value) = split(str)
+            val a = value.substring(0, "yyyy-mm-dd".length)
+            val b = value.substring("yyyy-mm-dd-".length)
+            val date = DateData.parse(a)
+            val tod = TimeofDayData.parse(b)
+            return DateAndTimeData(date, tod)
+        }
+    }
 }

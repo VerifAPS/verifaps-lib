@@ -23,7 +23,6 @@ package edu.kit.iti.formal.automation.st0
  */
 
 import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.DefaultVisitorNN
 
 /**

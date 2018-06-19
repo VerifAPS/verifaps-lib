@@ -54,7 +54,7 @@ public class FacadeTest {
         //System.out.println(state);
         Assert.assertNotEquals(null, state);
         Assert.assertEquals(
-                "case a : b; TRUE : c; esac".replaceAll("\\s", ""),
+                "case a : b; LTRUE : c; esac".replaceAll("\\s", ""),
                 state.repr().replaceAll("\\s", ""));
     }
 

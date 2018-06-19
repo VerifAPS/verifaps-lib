@@ -26,7 +26,6 @@ import edu.kit.iti.formal.automation.st.Statements
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
 import edu.kit.iti.formal.automation.st0.STSimplifier
-import org.antlr.v4.runtime.CommonToken
 
 /**
  * Created by weigl on 28/10/14.
@@ -42,7 +41,7 @@ class SFCResetReplacer : AstMutableVisitor() {
                         expression,
                         AssignmentStatement(
                                 SymbolicReference(identifier.replace("SFCReset", "_state")),
-                                Literal.enumerate(CommonToken(-1, "Init"))
+                                EnumLit(null, "Init")
                         ))
             }
         } catch (e: ClassCastException) {

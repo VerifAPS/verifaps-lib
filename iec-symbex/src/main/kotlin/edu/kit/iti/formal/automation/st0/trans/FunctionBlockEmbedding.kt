@@ -63,7 +63,7 @@ class FunctionBlockEmbedding : ST0Transformation {
 
 
     private fun embeddFunctionBlocksImpl(outer: CodeWithScope, instance: VariableDeclaration, inner: CodeWithScope): StatementList {
-        assert(!outer.statements.isEmpty())
+        assert(outer.statements.isNotEmpty()) { "non empty outer statements" }
 
         //recursive call:
         val toBeEmbedded = embeddFunctionBlocks(inner)

@@ -23,15 +23,23 @@ package edu.kit.iti.formal.automation.parser
  */
 
 import com.google.common.collect.Streams
+import edu.kit.iti.formal.automation.datatypes.AnyInt
+import edu.kit.iti.formal.automation.datatypes.IECString
+import edu.kit.iti.formal.automation.datatypes.values.DateAndTimeData
+import edu.kit.iti.formal.automation.datatypes.values.DateData
+import edu.kit.iti.formal.automation.datatypes.values.TimeData
+import edu.kit.iti.formal.automation.datatypes.values.TimeofDayData
 import edu.kit.iti.formal.automation.operators.BinaryOperator
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.scope.TypeScope
 import edu.kit.iti.formal.automation.sfclang.split
 import edu.kit.iti.formal.automation.st.RefTo
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.setAll
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
+import java.math.BigInteger
 import java.util.*
 
 /**
@@ -44,6 +52,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     private lateinit var sfc: SFCImplementation
     private lateinit var currentStep: SFCStep
     //private lateinit var currentTopLevelScopeElement: HasScope
+    private var tscope = TypeScope.builtin()
 
     override fun visitStart(
             ctx: IEC61131Parser.StartContext): PouElements {
@@ -57,77 +66,107 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         return ast
     }
 
+    fun split2(text: String) = text.split(Regex("#"), 1)
+    fun split3(text: String) = text.split(Regex("#"), 3)
+
+
     override fun visitCast(ctx: IEC61131Parser.CastContext): Literal {
-        val ast = Literal.enumerate(ctx.CAST_LITERAL().symbol)
+        val (dt, _, v) = split(ctx.CAST_LITERAL().text)
+        val ast = EnumLit(dt, v)
+        //ast.originalToken = ctx.CAST_LITERAL().symbol
         ast.ruleContext = ctx
         return ast
     }
 
     override fun visitInteger(ctx: IEC61131Parser.IntegerContext): Any {
-        val ast = Literal.integer(ctx.INTEGER_LITERAL().symbol,
-                ctx.MINUS() != null)
+        val text = ctx.INTEGER_LITERAL().symbol
+        val splitted = split(text.text)
+
+        val dt = splitted.prefix
+        val v = splitted.value
+        val ordinal = splitted.ordinal?.toInt() ?: 10
+
+        var int = BigInteger(v.replace("_", ""), ordinal)
+        if (ctx.MINUS() != null)
+            int *= -BigInteger.ONE
+        val ast = IntegerLit(dt, int)
+        try {
+            //weigl: quick type for common integer type
+            if (dt in tscope)
+                ast.dataType.obj = tscope[dt] as AnyInt
+        } catch (e: ClassCastException) {
+        }
         ast.ruleContext = ctx
         return ast
     }
 
     override fun visitBits(ctx: IEC61131Parser.BitsContext): Any {
-        val ast = Literal.word(ctx.BITS_LITERAL().symbol)
+        val text = ctx.BITS_LITERAL().symbol
+        val splitted = split(text.text)
+        val dt = splitted.prefix
+        val v = splitted.value
+        if (v.equals("false", true))
+            return BooleanLit(false)
+        if (v.equals("true", true))
+            return BooleanLit(true)
+
+
+        val ordinal = splitted.ordinal?.toInt() ?: 10
+        val ast = BitLit(dt, v.toLong(ordinal))
         ast.ruleContext = ctx
         return ast
     }
 
     override fun visitReal(ctx: IEC61131Parser.RealContext): Any {
-        val ast = Literal.real(ctx.REAL_LITERAL().symbol)
+        val (dt, _, v) = split(ctx.REAL_LITERAL().text)
+        val ast = RealLit(dt, v.toBigDecimal())
         ast.ruleContext = ctx
         return ast
     }
 
     override fun visitString(ctx: IEC61131Parser.StringContext): Any {
-        val ast = if (ctx.STRING_LITERAL() != null)
-            Literal.string(ctx.STRING_LITERAL().symbol, false)
-        else
-            Literal.string(ctx.WSTRING_LITERAL().symbol, false)
+        val ast = StringLit(
+                if (ctx.STRING_LITERAL() != null) IECString.STRING.name
+                else IECString.WSTRING.name,
+                ctx.text)
         ast.ruleContext = ctx
         return ast
     }
 
     override fun visitTime(ctx: IEC61131Parser.TimeContext): Any {
-        val ast = Literal.time(ctx.TIME_LITERAL().symbol)
+        val ast = TimeLit(value = TimeData(ctx.text))
         ast.ruleContext = ctx
         return ast
     }
 
-    override fun visitTimeofday(
-            ctx: IEC61131Parser.TimeofdayContext): Any {
-        val ast = Literal.timeOfDay(ctx.TOD_LITERAL().symbol)
+    override fun visitTimeofday(ctx: IEC61131Parser.TimeofdayContext): Any {
+        val ast = ToDLit(value = TimeofDayData.parse(ctx.TOD_LITERAL().text!!))
         ast.ruleContext = ctx
         return ast
     }
 
     override fun visitDate(ctx: IEC61131Parser.DateContext): Any {
-        val ast = Literal.date(ctx.DATE_LITERAL().symbol)
+        val ast = DateLit(value = DateData.parse(ctx.DATE_LITERAL().text!!))
         ast.ruleContext = ctx
         return ast
     }
 
     override fun visitDatetime(ctx: IEC61131Parser.DatetimeContext): Any {
-        val ast = Literal.dateAndTime(ctx.DATETIME().symbol)
+        val ast = DateAndTimeLit(value = DateAndTimeData.parse(ctx.DATETIME().text))
         ast.ruleContext = ctx
         return ast
     }
 
     override fun visitRef_null(ctx: IEC61131Parser.Ref_nullContext): Any {
-        val ast = Literal.ref_null(ctx.NULL().symbol)
+        val ast = NullLit()
         ast.ruleContext = ctx
         return ast
     }
 
     override fun visitReference_value(ctx: IEC61131Parser.Reference_valueContext): Any {
-        TODO("This isType wrong, a value isType not a syntax element")
-        //val ast = ReferenceValue()
-        //ast.ruleContext = ctx
-        //ast.referenceTo = ctx.ref_to.accept(this) as SymbolicReference
-        //return ast
+        val ast = Invocation("ref")
+        ast.addParameter(InvocationParameter(ctx.ref_to.accept(this) as SymbolicReference))
+        return ast
     }
 
     override fun visitData_type_declaration(
@@ -183,7 +222,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             return t
         } else if (ctx.enumerated_specification() != null) {
             val t = visitEnumerated_specification(ctx.enumerated_specification())
-            t.initialization = init as SymbolicReference?
+            t.initialization = init as IdentifierInitializer?
             return t
         } else if (ctx.string_type_declaration() != null) {
             val t = visitString_type_declaration(ctx.string_type_declaration())
@@ -225,7 +264,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitSubrange(ctx: IEC61131Parser.SubrangeContext) =
-            Range(ctx.c.accept(this) as Literal, ctx.d.accept(this) as Literal)
+            Range(ctx.c.accept(this) as IntegerLit, ctx.d.accept(this) as IntegerLit)
 
     override fun visitEnumerated_specification(
             ctx: IEC61131Parser.Enumerated_specificationContext): EnumerationTypeDeclaration {
@@ -236,7 +275,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         for (i in ctx.name.indices) {
             ast.addValue(ctx.name[i])
             if (ctx.integer(i) != null) {
-                ast.setInt(ctx.integer(i).accept(this) as Literal)
+                ast.setInt(ctx.integer(i).accept(this) as IntegerLit)
             }
         }
 
@@ -273,8 +312,10 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             ctx: IEC61131Parser.Array_initial_elementsContext): Any {
         val initializations = ArrayList<Initialization>()
         var count = 1
-        if (ctx.integer() != null)
-            count = Integer.parseInt((ctx.integer().accept(this) as Literal).textValue!!)
+        if (ctx.integer() != null) {
+            val lit = ctx.integer().accept(this) as IntegerLit
+            count = lit.value.toInt()
+        }
         for (i in 0 until count)
             initializations.add(ctx.array_initial_element().accept(this) as Initialization)
         return initializations
@@ -768,11 +809,10 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitCase_condition(ctx: IEC61131Parser.Case_conditionContext): Any {
         var cc: CaseCondition? = null
         if (ctx.IDENTIFIER() != null) {
-            cc = CaseCondition.Enumeration(
-                    Literal.enumerate(ctx.IDENTIFIER().symbol))
+            cc = CaseCondition.Enumeration(EnumLit(null, ctx.IDENTIFIER().text))
         }
         if (ctx.integer() != null) {
-            cc = CaseCondition.IntegerCondition(ctx.integer().accept(this) as Literal)
+            cc = CaseCondition.IntegerCondition(ctx.integer().accept(this) as IntegerLit)
         }
         if (ctx.subrange() != null) {
             val r = ctx.subrange().accept(this) as Range

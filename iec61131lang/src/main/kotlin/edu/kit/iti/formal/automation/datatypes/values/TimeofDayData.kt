@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.datatypes.values
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.AnyDate
 import edu.kit.iti.formal.automation.sfclang.split
 import java.util.regex.Pattern
 
@@ -36,7 +35,7 @@ import java.util.regex.Pattern
 data class TimeofDayData(var hours: Int = 0, var minutes: Int = 0,
                          var seconds: Int = 0, var millieseconds: Int = 0) {
     companion object {
-        fun parse(tod: String): Value<AnyDate.TIME_OF_DAY, TimeofDayData> {
+        fun parse(tod: String): TimeofDayData {
             val pattern = Pattern.compile(
                     "(?<hour>\\d?\\d):(?<min>\\d?\\d)(:(?<sec>\\d?\\d))?(.(?<ms>\\d+))?")
             val s = split(tod)
@@ -52,7 +51,7 @@ data class TimeofDayData(var hours: Int = 0, var minutes: Int = 0,
                 val sec = parseInt("sec")
                 val ms = parseInt("ms")
                 val t = TimeofDayData(hour, min, sec, ms)
-                return VToD(AnyDate.TIME_OF_DAY, t)
+                return t
             } else {
                 throw IllegalArgumentException("Given string isType not a time of day value.")
             }

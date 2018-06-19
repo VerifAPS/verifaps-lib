@@ -4,9 +4,7 @@ import com.google.common.base.Strings
 import com.google.common.collect.ImmutableMap
 import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.*
-import edu.kit.iti.formal.automation.datatypes.values.VAnyInt
-import edu.kit.iti.formal.automation.datatypes.values.Value
-import edu.kit.iti.formal.automation.datatypes.values.ValueTransformation
+import edu.kit.iti.formal.automation.datatypes.values.*
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotResolvedException
 import edu.kit.iti.formal.automation.exceptions.IECException
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException
@@ -14,22 +12,21 @@ import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException
 import edu.kit.iti.formal.automation.operators.BinaryOperator
 import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.sfclang.split
 import edu.kit.iti.formal.automation.st.*
 import edu.kit.iti.formal.automation.st.Cloneable
-import edu.kit.iti.formal.automation.st.util.Tuple
 import edu.kit.iti.formal.automation.visitors.Visitable
 import edu.kit.iti.formal.automation.visitors.Visitor
-import org.antlr.v4.runtime.CommonToken
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
 import java.io.Serializable
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.util.*
 import java.util.function.Consumer
 import kotlin.collections.ArrayList
 import kotlin.reflect.full.memberProperties
 
-sealed class Top : Visitable, edu.kit.iti.formal.automation.st.Cloneable<Top>,
+sealed class Top : Visitable, Cloneable,
         HasRuleContext, Serializable {
     override var ruleContext: ParserRuleContext? = null
 
@@ -77,18 +74,26 @@ data class NamespaceDeclaration(
         var fqName: Array<String> = arrayOf(),
         val pous: PouElements = PouElements(),
         override var scope: Scope = Scope()) : HasScope, Top() {
+    override fun clone(): NamespaceDeclaration {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun <T> accept(visitor: Visitor<T>): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
 
 data class ConfigurationDeclaration(override var scope: Scope) : HasScope, PouElement() {
+    override fun clone(): Top {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override val name: String = "<configuration>"
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
 
 class RefList<T : Identifiable>(private var impl: ArrayList<RefTo<T>> = arrayListOf()) : MutableList<RefTo<T>> by impl,
-        Cloneable<RefList<T>> {
+        Cloneable {
     fun add(element: String) = add(RefTo(element))
 
     override fun clone(): RefList<T> {
@@ -96,6 +101,8 @@ class RefList<T : Identifiable>(private var impl: ArrayList<RefTo<T>> = arrayLis
         forEach { list += it.clone() }
         return list
     }
+
+    override fun toString() = impl.toString()
 }
 
 data class FunctionBlockDeclaration(
@@ -103,7 +110,7 @@ data class FunctionBlockDeclaration(
         override var scope: Scope = Scope(),
         override var stBody: StatementList? = null,
         override var sfcBody: SFCImplementation? = null,
-        var actions: LookupList<ActionDeclaration> = LookupListFactory.create(),
+        var actions: LookupList<ActionDeclaration> = LookupList(),
         var isFinal: Boolean = false,
         var isAbstract: Boolean = false,
         val interfaces: RefList<InterfaceDeclaration> = RefList(),
@@ -156,13 +163,11 @@ data class TypeDeclarations(private val declarations: MutableList<TypeDeclaratio
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-    /*
     override fun clone(): TypeDeclarations {
         val td = TypeDeclarations()
-        td.ruleContext = (ruleContext)
-        forEach { t -> td.add(t.clone()) }
-        return td
-    }*/
+        cloneList(td, this)
+        return rctxHelper(td, this)
+    }
 
     fun declares(typeName: String): Boolean {
         for (td in this) {
@@ -207,13 +212,13 @@ data class InterfaceDeclaration(
         var methods: MutableList<MethodDeclaration> = arrayListOf()
 ) : PouElement(), Identifiable {
 
-    /*fun clone(): InterfaceDeclaration {
+    override fun clone(): InterfaceDeclaration {
         val i = InterfaceDeclaration()
         i.name = name
         methods.forEach { method -> i.methods.add(method.clone()) }
-        interfaces.forEach { intf -> i.interfaces.add(intf.copy()) }
+        interfaces.forEach { intf -> i.interfaces.add(intf.clone()) }
         return i
-    }*/
+    }
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
@@ -232,15 +237,14 @@ data class FunctionDeclaration(
         }
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
-    /*
-    fun clone(): FunctionDeclaration {
+    override fun clone(): FunctionDeclaration {
         val fd = FunctionDeclaration()
+        fd.scope = scope?.clone()
         fd.name = this.name
-        fd.returnType = returnType.copy()
-        fd.stBody = stBody.clone()
+        fd.returnType = returnType.clone()
+        fd.stBody = stBody?.clone()
         return fd
     }
-    */
 }
 
 data class GlobalVariableListDeclaration(
@@ -271,18 +275,17 @@ data class MethodDeclaration(
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-    /*
     override fun clone(): MethodDeclaration {
         val md = MethodDeclaration()
         md.accessSpecifier = accessSpecifier
-        md.final_ = final_
-        md.abstract_ = abstract_
+        md.isAbstract = isAbstract
+        md.isFinal = isFinal
         md.isOverride = isOverride
-        md.scope = scope.copy()
+        md.scope = scope.clone()
         md.name = this.name
-        md.returnType = returnType.copy()
+        md.returnType = returnType.clone()
         return md
-    }*/
+    }
 }
 //endregion
 
@@ -294,7 +297,7 @@ object EMPTY_EXPRESSION : Expression() {
 }
 
 abstract class Statement : Top() {
-    override fun clone(): Statement = super.clone() as Statement
+    abstract override fun clone(): Statement
 }
 
 data class RepeatStatement(var condition: Expression = EMPTY_EXPRESSION, var statements: StatementList = StatementList()) : Statement() {
@@ -352,15 +355,15 @@ data class CaseStatement(
         cases.add(cs)
     }
 
-    /*
+
     override fun clone(): CaseStatement {
         val c = CaseStatement()
         c.ruleContext = ruleContext
         c.expression = expression!!.clone()
         cases.forEach { cs -> c.addCase(cs.clone()) }
-        c.elseCase = Utils.copyNull<StatementList>(elseCase)
+        c.elseCase = elseCase?.clone()
         return c
-    }*/
+    }
 }
 
 data class Case(
@@ -372,14 +375,12 @@ data class Case(
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-/*        override fun clone(): Case {
-            val c = Case()
-            c.conditions = conditions.stream()
-                    .map<CaseCondition>(Function<CaseCondition, CaseCondition> { it.copy() })
-                    .collect<List<CaseCondition>, Any>(Collectors.toList())
-            c.statements = statements.clone()
-            return c
-        }*/
+    override fun clone(): Case {
+        val c = Case()
+        cloneList(c.conditions, conditions)
+        c.statements = statements.clone()
+        return c
+    }
 }
 
 class ExitStatement : Statement() {
@@ -391,8 +392,18 @@ class ExitStatement : Statement() {
         return es
     }
 
-    companion object {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ExitStatement) return false
+        return true
+    }
 
+    override fun hashCode(): Int {
+        return 23423532
+    }
+
+
+    companion object {
         var EXIT_STATMENT = ExitStatement()
     }
 }
@@ -404,6 +415,17 @@ class ReturnStatement : Statement() {
         rt.ruleContext = ruleContext
         return rt
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ReturnStatement) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return 696996
+    }
+
 }
 
 data class ForStatement(
@@ -459,13 +481,11 @@ data class GuardedStatement(
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-    /*override fun clone(): GuardedStatement {
-        val gs = GuardedStatement()
+    override fun clone(): GuardedStatement {
+        val gs = GuardedStatement(condition.clone(), statements.clone())
         gs.ruleContext = gs.ruleContext
-        gs.condition = condition.clone()
-        gs.statements = statements.clone()
         return gs
-    }*/
+    }
 }
 
 data class IfStatement(
@@ -486,12 +506,12 @@ data class IfStatement(
         conditionalBranches.add(gc)
     }
 
-    /*override fun clone(): IfStatement {
-        val `isType` = IfStatement()
-        conditionalBranches.forEach { gs -> `isType`.addGuardedCommand(gs.clone()) }
-        `isType`.elseBranch = this.elseBranch.clone()
-        return `isType`
-    }*/
+    override fun clone(): IfStatement {
+        val stmt = IfStatement()
+        cloneList(stmt.conditionalBranches, conditionalBranches)
+        stmt.elseBranch = this.elseBranch.clone()
+        return rctxHelper(stmt, this)
+    }
 }
 
 data class InvocationStatement(var invocation: Invocation = Invocation()) : Statement() {
@@ -517,12 +537,12 @@ data class InvocationStatement(var invocation: Invocation = Invocation()) : Stat
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-    /*
+
     override fun clone(): InvocationStatement {
         val f = InvocationStatement()
-        f.invocation=(invocation.copy())
+        f.invocation = (invocation.copy())
         return f
-    }*/
+    }
 }
 // endregion
 
@@ -532,7 +552,7 @@ abstract class Expression : Top() {
     @Throws(VariableNotDefinedException::class, TypeConformityException::class)
     abstract fun dataType(localScope: Scope): AnyDt
 
-    override fun clone() = super.clone() as Expression
+    abstract override fun clone(): Expression
 }
 
 data class BinaryExpression(
@@ -578,12 +598,11 @@ data class UnaryExpression(
         return a
     }
 
-    /*
     override fun clone(): UnaryExpression {
         val ue = UnaryExpression(operator, expression.clone())
         ue.ruleContext = ruleContext
         return ue
-    }*/
+    }
 }
 
 data class SymbolicReference @JvmOverloads constructor(
@@ -639,18 +658,17 @@ data class SymbolicReference @JvmOverloads constructor(
         }
     }
 
-    /*
+
     override fun clone(): SymbolicReference {
         val sr = SymbolicReference()
         sr.ruleContext = ruleContext
-        sr.identifier = identifier!!.copy()
-        sr.subscripts = Utils.copyNull(subscripts)
-        sr.sub = Utils.copyNull(sub)
+        sr.identifier = identifier
+        sr.subscripts = subscripts?.clone()
+        sr.sub = sub?.clone()
         sr.derefCount = derefCount
         sr.dataType = dataType
-        sr.effectiveDataType = effectiveDataType
         return sr
-    }*/
+    }
 
     /*
     override fun toString(): String {
@@ -735,18 +753,18 @@ data class Invocation(
         }
     }
 
-/*    override fun clone(): Invocation {
-        val fc = Invocation(this)
+    override fun clone(): Invocation {
+        val fc = Invocation(calleeName)
         fc.ruleContext = ruleContext
         fc.callee = callee.clone()
-        fc.parameters = parameters.map { it.copy() }
+        cloneList(fc.parameters, parameters)
         return fc
     }
-*/
+
 }
 
 data class InvocationParameter(
-        var name: String? = "<empty>",
+        var name: String? = null,
         var isOutput: Boolean = false,
         var expression: Expression = EMPTY_EXPRESSION
 ) : Top(), Comparable<InvocationParameter> {
@@ -755,10 +773,7 @@ data class InvocationParameter(
 
     constructor(expr: Expression) : this(expression = expr)
 
-    /*
-    fun clone(): InvocationParameter {
-        return Parameter(this.name, isOutput, this.expression!!.clone())
-    }*/
+    override fun clone() = InvocationParameter(this.name, isOutput, this.expression.clone())
 
     override fun <T> accept(visitor: Visitor<T>): T {
         return visitor.visit(this)
@@ -774,12 +789,13 @@ data class InvocationParameter(
 
 
 //region Type
-interface TypeDeclaration : HasRuleContext, Identifiable, Visitable {
+interface TypeDeclaration : HasRuleContext, Identifiable, Visitable, Cloneable {
     abstract override var name: String
     //var dataType: AnyDt
     @property:Deprecated("should be an type declaration")
     abstract var baseType: RefTo<AnyDt>
     abstract val initialization: Initialization?
+    override fun clone(): TypeDeclaration
 
     @Throws(IECException::class)
     fun getDataType(scope: Scope): AnyDt? =
@@ -802,22 +818,21 @@ data class SimpleTypeDeclaration(
     }
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
-/*    override fun clone(): SimpleTypeDeclaration {
+    override fun clone(): SimpleTypeDeclaration {
         val std = SimpleTypeDeclaration()
+        std.name = name
+        std.baseType = baseType.clone()
         std.ruleContext = (ruleContext)
-        std.baseType = baseType
-        std.baseTypeName = baseTypeName
-        std.typeName = typeName
-        std.initialization = Utils.copyNull<T>(initialization)
+        std.initialization = initialization?.clone()
         return std
-    }*/
+    }
 }
 
 data class StructureTypeDeclaration(
         override var name: String = "<empty>",
         override var baseType: RefTo<AnyDt> = RefTo(),
         override var initialization: StructureInitialization? = null,
-        var fields: VariableScope = LookupListFactory.create()
+        var fields: VariableScope = LookupList()
 ) : TypeDeclaration, Top() {
     override fun setInit(init: Initialization?) {
         initialization = init as StructureInitialization?
@@ -830,18 +845,16 @@ data class StructureTypeDeclaration(
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-    /*
-        override fun clone(): StructureTypeDeclaration {
-            val t = StructureTypeDeclaration()
-            t.ruleContext = ruleContext
-            t.initialization = Utils.copyNull<StructureInitialization>(initialization)
-            fields.forEach { k, v -> t.fields[k] = v.clone() }
-            t.typeName = typeName
-            t.baseType = baseType
-            t.baseTypeName = baseTypeName
-            return t
-        }
-    */
+    override fun clone(): StructureTypeDeclaration {
+        val t = StructureTypeDeclaration()
+        t.ruleContext = ruleContext
+        t.initialization = initialization?.clone()
+        t.fields = fields.clone()
+        t.baseType = baseType.clone()
+        return t
+    }
+
+
     fun addField(text: String, accept: TypeDeclaration): VariableDeclaration {
         val vd = VariableDeclaration(name = text, typeDeclaration = accept)
         fields.add(vd)
@@ -869,31 +882,32 @@ data class SubRangeTypeDeclaration(
         return rt
     }*/
 
-    /*    override fun clone(): SubRangeTypeDeclaration {
-            val t = SubRangeTypeDeclaration()
-            t.range = Utils.copyNull(range)
-            t.typeName = typeName
-            t.baseType = baseType
-            t.baseTypeName = baseTypeName
-            t.initialization = Utils.copyNull<Literal>(initialization)
-            return t
-        }
-    */
+    override fun clone(): SubRangeTypeDeclaration {
+        val t = SubRangeTypeDeclaration()
+        t.range = range?.clone()
+        t.baseType = baseType.clone()
+        t.initialization = initialization?.clone()
+        return t
+    }
+
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
 
 data class EnumerationTypeDeclaration(
         override var name: String = "<empty>",
         override var baseType: RefTo<AnyDt> = RefTo(),
-        override var initialization: SymbolicReference? = null
+        override var initialization: IdentifierInitializer? = null
 ) : TypeDeclaration, Top() {
+    override fun clone(): EnumerationTypeDeclaration {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     var allowedValues: MutableList<Token> = LinkedList()
     var values: MutableList<Int> = ArrayList()
     private var counter: Int = 0
 
     override fun setInit(init: Initialization?) {
-        initialization = init as SymbolicReference?
+        initialization = init as IdentifierInitializer?
     }
 
 
@@ -941,10 +955,10 @@ override fun clone(): EnumerationTypeDeclaration {
 }
 */
 
-    fun setInt(value: Literal) {
-        val v = value.asValue() as VAnyInt
-        values[values.size - 1] = v.value.toInt()
-        counter = v.value.toInt() + 1
+    fun setInt(value: IntegerLit) {
+        val v = value.value.toInt()
+        values[values.size - 1] = v
+        counter = v + 1
     }
 }
 
@@ -963,18 +977,14 @@ data class ArrayTypeDeclaration(
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-    /*
     override fun clone(): ArrayTypeDeclaration {
         val atd = ArrayTypeDeclaration()
         atd.ruleContext = ruleContext
-        ranges.forEach { range -> atd.ranges.add(range.clone()) }
-        atd.typeName = typeName
-        atd.baseType = baseType
-        atd.baseTypeName = baseTypeName
-        atd.initialization = Utils.copyNull<ArrayInitialization>(initialization)
+        cloneList(atd.ranges, ranges)
+        atd.baseType = baseType.clone()
+        atd.initialization = initialization?.clone()
         return atd
     }
-    */
 
     fun addSubRange(ast: Range) {
         ranges.add(ast)
@@ -1003,21 +1013,13 @@ class StringTypeDeclaration(
     }
 
 
-/*    override fun getDataType(scope: Scope): AnyDt? {
-        baseType = (IECString.STRING_16BIT)
-        return baseType
-    }
-
     override fun clone(): StringTypeDeclaration {
         val t = StringTypeDeclaration()
         t.initialization = initialization!!.clone()
-        t.typeName = typeName
-        t.baseType = baseType
-        t.baseTypeName = baseTypeName
+        t.baseType = baseType.clone()
         t.size = size!!.clone()
         return t
     }
-    */
 
     override fun <S> accept(visitor: Visitor<S>): S = visitor.visit(this)
 }
@@ -1032,21 +1034,8 @@ class PointerTypeDeclaration(
         initialization = init as Literal?
     }
 
-
-    /*
-    override fun getDataType(scope: Scope): PointerType? {
-        val pt = PointerType(super.getDataType(scope))
-        baseType = pt
-        return pt
-    }*/
-
-
     override fun <S> accept(visitor: Visitor<S>): S = visitor.visit(this)
-
-    /*
-    override fun clone(): PointerTypeDeclaration {
-        return PointerTypeDeclaration(baseTypeName)
-    }*/
+    override fun clone() = rctxHelper(PointerTypeDeclaration(name, baseType.clone(), initialization?.clone()), this)
 }
 
 class ReferenceTypeDeclaration(
@@ -1063,19 +1052,19 @@ class ReferenceTypeDeclaration(
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-    /* override fun clone(): ReferenceTypeDeclaration {
+    override fun clone(): ReferenceTypeDeclaration {
         val rs = ReferenceTypeDeclaration()
         rs.refTo = refTo
         rs.baseType = baseType
         return rs
-    }*/
+    }
 }
 //endregion
 
 
 //region Initialization
 abstract class Initialization : Expression() {
-    override fun clone() = super.clone() as Initialization
+    abstract override fun clone(): Initialization
     fun getValue(): Value<*, *> = accept(EvaluateInitialization)
 }
 
@@ -1117,13 +1106,11 @@ data class StructureInitialization(
         TODO()
     }
 
-    /*
     override fun clone(): StructureInitialization {
         val st = StructureInitialization()
-        st.structureName = structureName
-        st.initValues = HashMap(initValues)
+        cloneMap(st.initValues, initValues)
         return st
-    }*/
+    }
 }
 
 class IdentifierInitializer(var enumType: EnumerateType? = null,
@@ -1134,11 +1121,7 @@ class IdentifierInitializer(var enumType: EnumerateType? = null,
         return enumType!!
     }
 
-    /*
-    override fun clone(): IdentifierInitializer {
-        return IdentifierInitializer(value).setEnumType(enumType)
-    }
-    */
+    override fun clone() = rctxHelper(IdentifierInitializer(enumType, value), this)
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
@@ -1153,23 +1136,24 @@ abstract class CaseCondition() : Top() {
         override fun <T> accept(visitor: Visitor<T>): T {
             return visitor.visit(this)
         }
-        /*
+
         override fun clone(): Range {
-            val r = Range(this.start!!.clone(), Utils.copyNull<Literal>(this.stop))
+            val r = Range(range.copy())
+            r.start = start?.clone()
+            r.stop = stop?.clone()
             r.ruleContext = (ruleContext)
             return r
         }
-    */
     }
 
-    data class IntegerCondition(var value: Literal) : CaseCondition() {
+    data class IntegerCondition(var value: IntegerLit) : CaseCondition() {
         override fun <T> accept(visitor: Visitor<T>): T {
             return visitor.visit(this)
         }
 
-        /*override fun clone(): IntegerCondition {
-            return IntegerCondition(this.value!!.clone())
-        }*/
+        override fun clone(): IntegerCondition {
+            return IntegerCondition(this.value.clone())
+        }
     }
 
     data class Enumeration(var start: Literal, var stop: Literal? = null) : CaseCondition() {
@@ -1179,12 +1163,11 @@ abstract class CaseCondition() : Top() {
             return visitor.visit(this)
         }
 
-        /*
         override fun clone(): Enumeration {
-            val e = Enumeration(start.clone(), if (stop != null) stop!!.clone() else null)
+            val e = Enumeration(start.clone(), stop?.clone())
             e.ruleContext = (ruleContext)
             return e
-        }*/
+        }
     }
 }
 
@@ -1194,9 +1177,9 @@ class Deref(private val reference: Reference) : Reference() {
         return reference.dataType(localScope)//TODO
     }
 
-/*    override fun clone(): Deref {
+    override fun clone(): Deref {
         return Deref(reference.clone())
-    }*/
+    }
 }
 
 class DirectVariable(s: String) : Reference() {
@@ -1221,7 +1204,115 @@ interface Invocable : Identifiable {
     val returnType: RefTo<out AnyDt>
 }
 
-class Literal : Initialization {
+sealed class Literal() : Initialization() {
+    //var originalToken: Token? = null
+
+    abstract fun dataType(): AnyDt?
+    override fun dataType(localScope: Scope) = dataType()!!
+    override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
+    abstract fun asValue(): Value<*, *>?
+    abstract override fun clone(): Literal
+    /*= asValue(ValueTransformation(this))
+private fun asValue(transformer: DataTypeVisitor<Value<*, *>>): Value<*, *> =
+    if (dataType.obj == null)
+        throw IllegalStateException(
+                "No identified data type. Given data type name " + dataType)
+    else
+        dataType.accept(transformer)!!*/
+
+}
+
+data class IntegerLit(var dataType: RefTo<AnyInt> = RefTo<AnyInt>(),
+                      var value: BigInteger) : Literal() {
+    constructor(dt: String?, v: BigInteger) : this(RefTo(dt), v)
+    constructor(dt: AnyInt, v: BigInteger) : this(RefTo(dt), v)
+
+    override fun dataType() = dataType.obj
+    override fun asValue() = VAnyInt(dataType.obj!!, value)
+    override fun clone() = copy()
+}
+
+
+data class StringLit(var dataType: RefTo<IECString> = RefTo(), var value: String) : Literal() {
+    constructor(dt: String?, v: String) : this(RefTo(dt), v)
+
+    override fun dataType() = dataType.obj
+    override fun asValue() = VIECString(dataType.obj!!, value)
+    override fun clone() = copy()
+}
+
+data class RealLit(var dataType: RefTo<AnyReal> = RefTo(), var value: BigDecimal) : Literal() {
+    constructor(dt: String?, v: BigDecimal) : this(RefTo(dt), v)
+
+    override fun dataType() = dataType.obj
+    override fun asValue() = VAnyReal(dataType.obj!!, value)
+    override fun clone() = copy()
+}
+
+data class EnumLit(var dataType: RefTo<EnumerateType> = RefTo(), var value: String) : Literal() {
+    constructor(dataType: String?, value: String) : this(RefTo(dataType), value)
+
+    override fun dataType() = dataType.obj
+    override fun asValue() = VAnyEnum(dataType.obj!!, value)
+    override fun clone() = copy()
+}
+
+class NullLit() : Literal() {
+    override fun clone() = rctxHelper(NullLit(), this)
+    override fun dataType() = ClassDataType.AnyClassDt
+    override fun asValue() = VNULL
+}
+
+data class ToDLit(var value: TimeofDayData) : Literal() {
+    override fun dataType() = AnyDate.TIME_OF_DAY
+    override fun asValue() = VToD(AnyDate.TIME_OF_DAY, value)
+    override fun clone() = copy()
+}
+
+data class DateLit(var value: DateData) : Literal() {
+    override fun dataType() = AnyDate.DATE
+    override fun asValue() = VDate(AnyDate.DATE, value)
+    override fun clone() = copy()
+}
+
+data class TimeLit(var value: TimeData) : Literal() {
+    override fun dataType() = TimeType.TIME_TYPE
+    override fun asValue() = VTime(dataType(), value)
+    override fun clone() = copy()
+}
+
+data class DateAndTimeLit(var value: DateAndTimeData) : Literal() {
+    override fun dataType() = AnyDate.DATE_AND_TIME
+    override fun asValue() = VDateAndTime(dataType(), value)
+    override fun clone() = copy()
+}
+
+data class BooleanLit(var value: Boolean) : Literal() {
+    companion object {
+        val LFALSE = BooleanLit(false)
+        val LTRUE = BooleanLit(true)
+    }
+
+    override fun asValue() = if (value) TRUE else FALSE
+    override fun dataType() = AnyBit.BOOL
+    override fun clone() = copy()
+}
+
+data class BitLit(var dataType: RefTo<AnyBit> = RefTo(), var value: Long) : Literal() {
+    constructor(dt: String?, v: Long) : this(RefTo(dt), v)
+
+    override fun dataType() = dataType.obj
+    override fun asValue() = VAnyBit(dataType.obj!!, Bits(value, dataType.obj!!.bitLength))
+    override fun clone() = copy()
+}
+
+data class UnindentifiedLit(var value: String) : Literal() {
+    override fun asValue() = null
+    override fun dataType() = null
+    override fun clone() = copy()
+}
+
+/*class LiteralOld : Initialization {
     val dataType = RefTo<AnyDt>()
     var dataTypeExplicit: Boolean = false
     var token: Token? = null
@@ -1241,12 +1332,12 @@ class Literal : Initialization {
     val text: String
         get() = (if (signed) "-" else "") + token!!.text
 
-    constructor(dataTypeName: String?, symbol: Token) {
+    constructor() {}
+
+    constructor(symbol: Token) {
         token = symbol
         dataType.identifier = dataTypeName
-        assert(dataTypeName != null)
     }
-
 
     constructor(dataTypeName: String?, symbol: String) {
         token = CommonToken(-1, symbol)
@@ -1280,19 +1371,18 @@ class Literal : Initialization {
             else
                 dataType.obj!!.accept(transformer)!!
 
-/*
-override fun clone(): Literal {
-    val l = Literal(dataTypeName, getToken())
-    l.dataTypeExplicit = dataTypeExplicit
-    l.signed = signed
-    l.dataType.setIdentifier(dataType.identifier)
-    l.dataType.setIdentifiedObject(dataType.obj)
-    return l
-}*/
+    override fun clone(): Literal {
+        val l = Literal(dataTypeName, token)
+        l.dataTypeExplicit = dataTypeExplicit
+        l.signed = signed
+        l.dataType.setIdentifier(dataType.identifier)
+        l.dataType.setIdentifiedObject(dataType.obj)
+        return l
+    }
 
     companion object {
-        val FALSE = Literal(AnyBit.BOOL, "FALSE")
-        val TRUE = Literal(AnyBit.BOOL, "TRUE")
+        val LFALSE = Literal(AnyBit.BOOL, "LFALSE")
+        val LTRUE = Literal(AnyBit.BOOL, "LTRUE")
 
         fun integer(token: Token, signed: Boolean): Literal {
             val l = Literal(ANY_INT, token)
@@ -1311,7 +1401,7 @@ override fun clone(): Literal {
         }
 
         fun bool(symbol: Token): Literal {
-            assert("TRUE".equals(symbol.text, ignoreCase = true) || "FALSE".equals(symbol.text, ignoreCase = true))
+            assert("LTRUE".equals(symbol.text, ignoreCase = true) || "LFALSE".equals(symbol.text, ignoreCase = true))
             return Literal(AnyBit.BOOL, symbol)
         }
 
@@ -1319,9 +1409,9 @@ override fun clone(): Literal {
             val s = symbol.text
             val first = split(s)
 
-            if ("TRUE".equals(first.value, ignoreCase = true))
+            if ("LTRUE".equals(first.value, ignoreCase = true))
                 return bool(symbol)
-            if ("FALSE".equals(first.value, ignoreCase = true))
+            if ("LFALSE".equals(first.value, ignoreCase = true))
                 return bool(symbol)
 
 
@@ -1373,27 +1463,21 @@ override fun clone(): Literal {
             return Literal(ReferenceDt.ANY_REF, symbol)
         }
     }
-}
+}*/
 
 class Location : Expression {
     internal var path: MutableList<Reference> = ArrayList(5)
 
-
     constructor() {}
-
-
     constructor(path: MutableList<Reference>) {
         this.path = path
     }
 
-
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
-
 
     fun add(ast: Reference) {
         path.add(ast)
     }
-
 
     fun lastDeref() {
         val deref = Deref(path[path.size - 1])
@@ -1411,14 +1495,12 @@ class Location : Expression {
         TODO("Not implemented")
     }
 
-    /*
     override fun clone(): Location {
-        val l = Location(
-                path.stream().map<Reference>(Function<Reference, Reference> { it.copy() })
-                        .collect<List<Reference>, Any>(Collectors.toList()))
+        val l = Location()
+        cloneList(l.path, path)
         l.ruleContext = ruleContext
         return l
-    }*/
+    }
 }
 
 
@@ -1443,7 +1525,20 @@ class StatementList(private var list: MutableList<Statement> = arrayListOf())
         add(CommentStatement(format, *args))
     }
 
+    override fun toString() = list.toString()
+
+
     override fun clone(): StatementList = StatementList(map { it.clone() })
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is StatementList) return false
+        if (list != other.list) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return list.hashCode()
+    }
 }
 
 data class ExpressionList(private val expressions: MutableList<Expression> = arrayListOf())
@@ -1466,14 +1561,11 @@ data class ExpressionList(private val expressions: MutableList<Expression> = arr
 data class Position(
         val lineNumber: Int = -1,
         val charInLine: Int = -1,
-        val offset: Int = -1) : edu.kit.iti.formal.automation.st.Cloneable<Position> {
+        val offset: Int = -1) : edu.kit.iti.formal.automation.st.Cloneable {
 
     constructor(token: Token) : this(token.line, token.charPositionInLine, token.startIndex) {}
 
-    /*
-    public override fun clone(): Position {
-        return Position(lineNumber, charInLine, offset)
-    }*/
+    public override fun clone() = copy()
 
     override fun toString(): String {
         return "@$lineNumber:$charInLine"
@@ -1483,7 +1575,7 @@ data class Position(
 
 
 abstract class Reference : Initialization() {
-    //abstract override fun clone(): Reference
+    abstract override fun clone(): Reference
 }
 
 class VariableBuilder(val scope: VariableScope) {
@@ -1713,17 +1805,13 @@ data class VariableDeclaration(
         return "$name : ${dataType?.name} := $init"
     }*/
 
-    /*    override fun clone(): VariableDeclaration {
-            val vd = VariableDeclaration(name, type, typeDeclaration!!)
-            if (dataType != null)
-                vd.dataType = dataType
-            vd.init = init
-            vd.parent = vd.parent
-            return vd
-        }
-    */
+    override fun clone(): VariableDeclaration {
+        val vd = VariableDeclaration(name, type, typeDeclaration?.clone())
+        if (dataType != null)
+            vd.dataType = dataType
+        return vd
+    }
 
-    override fun clone() = super.clone() as VariableDeclaration
 
     class FlagCounter {
         private var internal = 1
@@ -1780,22 +1868,19 @@ interface HasRuleContext {
         get() = Position(ruleContext!!.stop)
 }
 
-data class Range(val start: Literal, val stop: Literal) : Cloneable<Range> {
-
+data class Range(val start: IntegerLit, val stop: IntegerLit) : Cloneable {
     val startValue: Int
-        get() = Integer.valueOf(start.text)
-
+        get() = start.value.intValueExact()
     val stopValue: Int
-        get() = Integer.valueOf(stop.text)
+        get() = start.value.intValueExact()
 
-    constructor(start: Int, stop: Int) : this(Literal.integer(start), Literal.integer(stop)) {}
+    override fun clone() = Range(start.clone(), stop.clone())
+}
 
-    constructor(p: Tuple<Int, Int>) : this(p.a, p.b) {}
 
-    /*
-    override fun clone(): Range {
-        return Range(start.clone(), stop.clone())
-    }*/
+private fun <T : Top> rctxHelper(target: T, source: T): T {
+    target.ruleContext = source.ruleContext
+    return target
 }
 
 enum class AccessSpecifier(val flag: Int) {
@@ -1818,18 +1903,16 @@ data class ActionDeclaration(
         override var name: String = "<empty>",
         var stBody: StatementList? = null,
         var sfcBody: SFCImplementation? = null
-) : Top(), Invocable {
+) : Identifiable, Top(), Invocable {
     override val returnType: RefTo<out AnyDt> = RefTo(AnyDt.VOID)
 
-    /*fun clone(): ActionDeclaration {
+    override fun clone(): ActionDeclaration {
         val a = ActionDeclaration()
         a.name = this.name
-        if (stBody != null)
-            a.stBody = stBody!!.clone()
-        if (sfcBody != null)
-            a.sfcBody = sfcBody!!.clone()
-        return a
-    }*/
+        a.stBody = stBody?.clone()
+        a.sfcBody = sfcBody?.clone()
+        return rctxHelper(a, this)
+    }
 
     override fun <T> accept(visitor: Visitor<T>): T {
         return visitor.visit(this)
@@ -1896,13 +1979,13 @@ data class SFCImplementation(
         return visitor.visit(this)
     }
 
-    /*
-    fun clone(): SFCImplementation {
+    override fun clone(): SFCImplementation {
         val sfc = SFCImplementation()
-        networks.forEach { a -> sfc.networks.add(a.clone()) }
-        throw IllegalStateException("not implemented yet!")
-    }*/
+        cloneList(sfc.networks, networks)
+        return rctxHelper(sfc, this)
+    }
 }
+
 
 data class SFCStep(var name: String = "<empty>") : Top() {
     var isInitial: Boolean = false
@@ -1918,17 +2001,15 @@ data class SFCStep(var name: String = "<empty>") : Top() {
         return aa
     }
 
-    /*fun clone(): SFCStep {
+    override fun clone(): SFCStep {
         val s = SFCStep()
         s.name = name
         s.isInitial = this.isInitial
-        s.events = events.stream()
-                .map { e -> e.copy() }
-                .collect<List<AssociatedAction>, Any>(Collectors.toList())
+        cloneList(s.events, events)
         s.outgoing = ArrayList(outgoing)
         s.incoming = ArrayList(incoming)
         return s
-    }*/
+    }
 
     override fun <T> accept(visitor: Visitor<T>): T {
         return visitor.visit(this)
@@ -1936,15 +2017,33 @@ data class SFCStep(var name: String = "<empty>") : Top() {
 
     data class AssociatedAction(
             var qualifier: SFCActionQualifier? = null,
-            var actionName: String = "<empty>") {
-        /*fun copy(): AssociatedAction {
+            var actionName: String = "<empty>") : Cloneable {
+        override fun clone(): AssociatedAction {
             val aa = AssociatedAction()
             aa.actionName = this.actionName
             aa.qualifier = this.qualifier!!.copy()
             return aa
-        }*/
+        }
     }
 }
+
+
+private fun <T : Cloneable> cloneList(target: MutableCollection<in T>, source: Collection<out T>) {
+    source.forEach { target += it.clone() as T }
+}
+
+private fun <K, V : Cloneable> cloneMap(target: MutableMap<K, V>, source: Map<K, V>) {
+    source.forEach { k, v -> target.put(k, v.clone() as V) }
+}
+
+/*
+private fun <E : Cloneable<*>> Collection<E>.clone(): MutableList<E> {
+    val target = arrayListOf<E>()
+    target.ensureCapacity(size)
+    cloneList(target, this);
+    return target
+}
+*/
 
 class SFCTransition : Top() {
     var from: Set<SFCStep>? = null
@@ -1968,13 +2067,13 @@ class SFCTransition : Top() {
             field = this.priority
         }
 
-    /*fun clone(): Top<*> {
+    override fun clone(): SFCTransition {
         val t = SFCTransition()
         t.name = this.name
         t.from = this.from //TODO deep clone
         t.to = this.to // TODO deep clone
         return t
-    }*/
+    }
 
     override fun <T> accept(visitor: Visitor<T>): T {
         return visitor.visit(this)
@@ -1988,16 +2087,14 @@ class SFCTransition : Top() {
 }
 
 class SFCNetwork(var steps: MutableList<SFCStep> = ArrayList()) : Top() {
-
     val initialStep: SFCStep?
         get() = steps.stream().filter({ it.isInitial }).findFirst().orElse(null)
 
-    /*
-    fun clone(): SFCNetwork {
+    override fun clone(): SFCNetwork {
         val sfcNetwork = SFCNetwork()
-        sfcNetwork.steps = steps.stream().map { n -> n.clone() }.collect<List<SFCStep>, Any>(Collectors.toList())
+        cloneList(sfcNetwork.steps, steps)
         return sfcNetwork
-    }*/
+    }
 
     override fun <T> accept(visitor: Visitor<T>): T {
         return visitor.visit(this)

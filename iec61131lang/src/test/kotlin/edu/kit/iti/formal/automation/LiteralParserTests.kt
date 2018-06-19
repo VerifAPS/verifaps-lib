@@ -62,13 +62,13 @@ class LiteralParserTests {
     @Throws(Exception::class)
     fun parseTimeOfDayLiteral1() {
         Assert.assertEquals(TimeofDayData(20, 61, 0, 0),
-                TimeofDayData.parse("20:61").value)
+                TimeofDayData.parse("20:61"))
 
         Assert.assertEquals(TimeofDayData(20, 61, 10, 0),
-                TimeofDayData.parse("20:61:10").value)
+                TimeofDayData.parse("20:61:10"))
 
         Assert.assertEquals(TimeofDayData(20, 61, 62, 1005),
-                TimeofDayData.parse("20:61:62.1005").value)
+                TimeofDayData.parse("20:61:62.1005"))
     }
 
 }

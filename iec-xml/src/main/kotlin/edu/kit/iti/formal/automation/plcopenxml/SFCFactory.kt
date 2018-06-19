@@ -26,6 +26,7 @@ import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.parser.ErrorReporter
 import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.automation.st.ast.BooleanLit.Companion.LTRUE
 import org.jdom2.Attribute
 import org.jdom2.Element
 import org.jdom2.Text
@@ -182,7 +183,7 @@ class SFCFactory(private val sfcElement: Element) : Supplier<SFCImplementation> 
             }
 
         } else {
-            t.guard = (Literal(AnyBit.BOOL, "TRUE"))
+            t.guard = LTRUE
         }
         return t
     }

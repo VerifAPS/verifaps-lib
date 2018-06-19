@@ -33,20 +33,19 @@ class UtilsTest {
     @Test
     @Throws(Exception::class)
     fun split1() {
-        val a = split("abc#12#111")
-        Assert.assertEquals("abc", a.prefix)
-        Assert.assertEquals("12", a.ordinal)
-        Assert.assertEquals("111", a.value)
+        val (dt, radix, value) = split("abc#12#111")
+        Assert.assertEquals("abc", dt)
+        Assert.assertEquals(12, radix)
+        Assert.assertEquals("111", value)
     }
 
     @Test
     @Throws(Exception::class)
     fun split2() {
-        val a = split("12#111")
-        System.out.println(a)
-        Assert.assertFalse(a.prefix != null)
-        Assert.assertEquals("12", a.ordinal)
-        Assert.assertEquals("111", a.value)
+        val (dt, r, v) = split("12#111")
+        Assert.assertFalse(dt != null)
+        Assert.assertEquals(12, r)
+        Assert.assertEquals("111", v)
     }
 
 

@@ -23,13 +23,9 @@ package edu.kit.iti.formal.automation.st0.trans
  */
 
 import edu.kit.iti.formal.automation.Console
-import edu.kit.iti.formal.automation.datatypes.AnyInt
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.st.ast.BinaryExpression
-import edu.kit.iti.formal.automation.st.ast.Literal
-import edu.kit.iti.formal.automation.st.ast.SymbolicReference
-import edu.kit.iti.formal.automation.st.ast.UnaryExpression
+import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
 import java.math.BigInteger
 
@@ -69,10 +65,11 @@ class IntegerExpressionEvaluator(private val scope: Scope) : AstVisitor<BigInteg
         return left
     }
 
-    override fun visit(tsScalarValue: Literal): BigInteger {
-        return if (tsScalarValue.dataType is AnyInt) {
-            (tsScalarValue.asValue()!!.value as BigInteger)
-        } else BigInteger.ZERO
+    override fun visit(literal: Literal): BigInteger {
+        return when (literal) {
+            is IntegerLit -> literal.value
+            else -> BigInteger.ZERO
+        }
     }
 
     override fun visit(symbolicReference: SymbolicReference): BigInteger {

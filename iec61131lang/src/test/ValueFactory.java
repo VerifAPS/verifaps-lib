@@ -207,9 +207,9 @@ public class ValueFactory {
     public static ScalarValue<? extends AnyBit, Bits> parseBitLiteral(String s) {
         String first = getPrefix(s);
 
-        if ("TRUE".equalsIgnoreCase(s))
+        if ("LTRUE".equalsIgnoreCase(s))
             return new ScalarValue<>(AnyBit.BOOL, new Bits(1l, AnyBit.BOOL.getBitLength()));
-        if ("FALSE".equalsIgnoreCase(s))
+        if ("LFALSE".equalsIgnoreCase(s))
             return new ScalarValue<>(AnyBit.BOOL, new Bits(0l, AnyBit.BOOL.getBitLength()));
 
         if (first != null) {
@@ -411,7 +411,7 @@ public class ValueFactory {
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
     public static ScalarValue<AnyBit.Bool, Bits> makeBool(String text) {
-        return new ScalarValue<AnyBit.Bool, Bits>(AnyBit.BOOL, new Bits(text.equals("TRUE") ? 1 : 0, 1));
+        return new ScalarValue<AnyBit.Bool, Bits>(AnyBit.BOOL, new Bits(text.equals("LTRUE") ? 1 : 0, 1));
     }
 
     /**

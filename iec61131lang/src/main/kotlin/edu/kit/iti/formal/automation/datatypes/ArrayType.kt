@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.sfclang;
+package edu.kit.iti.formal.automation.datatypes
 
 /*-
  * #%L
@@ -10,32 +10,38 @@ package edu.kit.iti.formal.automation.sfclang;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
 
-import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.Token;
-import org.junit.Test;
+import edu.kit.iti.formal.automation.st.ast.Range
+import java.util.*
 
 /**
- * Created by weigl on 07.02.16.
+ * Created by weigl on 07/10/14.
+ *
+ * @author weigl
+ * @version $Id: $Id
  */
-public class TokenTest {
-    @Test public void sfcTok() {
-        IEC61131Lexer lexer = new IEC61131Lexer(new ANTLRInputStream("SFC"));
-        for (Token t:
-             lexer.getAllTokens()) {
-            //System.out.println(t.getType());
-        }
+class ArrayType(name: String, val fieldType: AnyDt, var ranges: MutableList<Range> = ArrayList()) : AnyDt(name) {
+    constructor(fieldType: AnyDt, ranges: List<Range>)
+            : this("ARRAY OF ${fieldType.name}", fieldType, ranges.toMutableList())
+
+    /*
+    constructor(arrayTypeDeclaration: ArrayTypeDeclaration) {
+        fieldType = arrayTypeDeclaration.baseType
+        ranges = arrayTypeDeclaration.ranges
     }
+    */
+
+    override fun repr(obj: Any): String = TODO()
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 }

@@ -21,6 +21,7 @@
  */
 package edu.kit.iti.formal.automation.smv
 
+import org.junit.Assume
 import org.junit.Test
 import kotlin.test.assertTrue
 
@@ -31,13 +32,25 @@ import kotlin.test.assertTrue
 class RvtAppTest {
     @Test
     fun testVerifySimple(): Unit {
+        assumeNuxmv()
         val old = "simple1_new"
         val new = "simple1_old"
         assertEqualBehaviour(old, new)
     }
 
+    private fun assumeNuxmv() {
+        try{
+            var pb = ProcessBuilder("nuxmv")
+            var p = pb.start()
+            p.waitFor()
+        }catch (e : Exception){
+            Assume.assumeFalse(true)
+        }
+    }
+
     @Test
     fun testVerifyCasesIf(): Unit {
+        assumeNuxmv()
         val old = "caseif_old"
         val new = "caseif_new"
         assertEqualBehaviour(old, new)

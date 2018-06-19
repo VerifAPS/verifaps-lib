@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.st0.trans
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.UINT
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
 import edu.kit.iti.formal.automation.st0.STSimplifier
@@ -42,8 +43,8 @@ class ArrayEmbedder : ST0Transformation {
                     val (_, baseType, initialization, ranges) = (arrayVariable.typeDeclaration!! as ArrayTypeDeclaration)
                     assert(initialization != null)
                     for ((start, stop) in ranges) {
-                        val rangeMin = Integer.parseInt(start.text)
-                        val rangeMax = Integer.parseInt(stop.text)
+                        val rangeMin = start.value.toInt()
+                        val rangeMax = stop.value.toInt()
                         // TODO multiple ranges
                         for (i in rangeMin..rangeMax) {
                             val init = initialization!!.initValues[i - rangeMin]
@@ -87,7 +88,7 @@ class ArrayEmbedder : ST0Transformation {
                 symbolicReference.identifier = "$toRename$$access"
                 symbolicReference.subscripts = null
             } else if (subscript is SymbolicReference && symbolicReference == subscript)
-                return Literal.integer(access)// Set constant value for subscript (if it isType a symbolic reference)
+                return IntegerLit(UINT, access.toBigInteger())// Set constant value for subscript (if it isType a symbolic reference)
             return super.visit(symbolicReference)
         }
     }

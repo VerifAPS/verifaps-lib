@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.automation.datatypes
 
+import edu.kit.iti.formal.automation.st.ast.ClassDeclaration
+
 /*-
  * #%L
  * iec61131lang
@@ -22,8 +24,6 @@ package edu.kit.iti.formal.automation.datatypes
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.ClassDeclaration
-
 /**
  * This data type represents a class.
  *
@@ -31,10 +31,13 @@ import edu.kit.iti.formal.automation.st.ast.ClassDeclaration
  * @version 1
  * @since 04.03.17
  */
-class ClassDataType(val clazz: ClassDeclaration) : AnyDt(clazz.name) {
-    override fun repr(obj: Any): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+sealed class ClassDataType(name: String) : AnyDt(name) {
+    object AnyClassDt : ClassDataType("BOTTOM")
+    class ClassDt(val clazz: ClassDeclaration) : ClassDataType(clazz.name)
+    class InterfaceDt(val clazz: InterfaceDataType) : ClassDataType(clazz.name)
+
+    override fun repr(obj: Any) =
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 
     /* override var fields: Scope
          get() = Scope(OOUtils.getEffectiveScope(clazz).parallelStream()

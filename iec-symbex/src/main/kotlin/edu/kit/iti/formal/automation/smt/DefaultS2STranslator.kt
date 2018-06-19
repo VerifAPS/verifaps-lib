@@ -72,7 +72,7 @@ class DefaultS2STranslator : S2SDataTypeTranslator {
     override fun translate(l: SLiteral): Sexp {
 
         if (l.dataType === SMVTypes.BOOLEAN)
-            return newAtomicSexp(if (l.value.toString().equals("TRUE", ignoreCase = true)) "true" else "false")
+            return newAtomicSexp(if (l.value.toString().equals("LTRUE", ignoreCase = true)) "true" else "false")
 
         val prefix = "#b"
         if (l.dataType is SMVWordType) {

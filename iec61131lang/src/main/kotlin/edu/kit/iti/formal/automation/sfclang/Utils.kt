@@ -23,7 +23,6 @@ package edu.kit.iti.formal.automation.sfclang
  */
 
 import java.math.BigInteger
-import java.util.*
 import java.util.regex.Pattern
 
 internal var PATTERN = Pattern.compile("((?<prefix>\\D\\w*?)#)?((?<radix>\\d+?)#)?(?<value>.*)")
@@ -35,7 +34,8 @@ fun getUniqueName(prefix: String = "", postfix: String = "") = "$prefix${++uniqu
 fun split(s: String): Splitted {
     val t = PATTERN.matcher(s)
     return if (t.matches()) {
-        Splitted(t.group("prefix"), t.group("radix"), t.group("value"))
+        val rd = t.group("radix")?.toInt()
+        Splitted(t.group("prefix"), rd, t.group("value")!!)
     } else {
         throw IllegalArgumentException("Argument isType not well word: expected form " + PATTERN.pattern())
     }
@@ -47,15 +47,11 @@ fun getIntegerLiteralValue(text: String, sign: Boolean): BigInteger {
 }
 
 data class Splitted(
-        val prefix: String? = null,
-        val ordinal: String? = null,
-        val value: String? = null) {
+        val prefix: String?,
+        val ordinal: Int?,
+        val value: String) {
 
-    fun number(): BigInteger {
-        var r = 10
-        if (ordinal != null) {
-            r = Integer.parseInt(ordinal)
-        }
-        return BigInteger(value!!, r)
+    fun number(defaultRadix: Int = 10): BigInteger {
+        return BigInteger(value, ordinal ?: defaultRadix)
     }
 }
