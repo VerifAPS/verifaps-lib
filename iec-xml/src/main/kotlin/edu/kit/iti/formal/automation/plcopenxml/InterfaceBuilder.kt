@@ -24,7 +24,9 @@ package edu.kit.iti.formal.automation.plcopenxml
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.st.RefTo
 import edu.kit.iti.formal.automation.st.ast.Literal
+import edu.kit.iti.formal.automation.st.ast.SimpleTypeDeclaration
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import org.jdom2.Element
 import java.util.function.Supplier
@@ -36,11 +38,7 @@ import java.util.function.Supplier
  * @version 1 (20.02.18)
  */
 class InterfaceBuilder(val interfaze: Element) : Supplier<Scope> {
-    var scope = Scope()
-        set(scope) {
-            field = this.scope
-        }
-
+    val scope = Scope()
     override fun get(): Scope {
         val d = Scope()
         add(interfaze.getChild("inputVars"), d, VariableDeclaration.INPUT)
@@ -55,17 +53,14 @@ class InterfaceBuilder(val interfaze: Element) : Supplier<Scope> {
             return
         }
 
-        val builder = d.builder()
-        builder.push(flags)
-
         for (e in vars.getChildren("variable")) {
             val name = e.getAttributeValue("name")
             val datatype = getDatatype(e.getChild("type"))
             val initValue = getInitialValue(e.getChild("initialValue"))
-            builder.identifiers(name)
-                    .setInitialization(initValue!!)
-                    .baseType(datatype)
-                    .create()
+            val vd = VariableDeclaration(name, flags, SimpleTypeDeclaration(
+                    baseType = RefTo(datatype),
+                    initialization = initValue))
+            scope.variables += vd
         }
     }
 
@@ -78,13 +73,9 @@ class InterfaceBuilder(val interfaze: Element) : Supplier<Scope> {
         }
     }
 
-
     private fun getInitialValue(initialValue: org.jdom2.Element?): Literal? {
-        if (initialValue == null)
-            return null
-
+        if (initialValue == null) return null
         val simpleValue = initialValue.getChild("simpleValue") ?: return null
-
         return IEC61131Facade.expr(simpleValue.getAttributeValue("value")) as Literal
     }
 }

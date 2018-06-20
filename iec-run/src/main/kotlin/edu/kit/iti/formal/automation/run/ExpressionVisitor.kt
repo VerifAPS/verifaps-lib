@@ -40,31 +40,8 @@ class ExpressionVisitor(private val state: State,
         }
     }
 
-    override fun visit(literal: Literal): EValue {
-        /*literal.asValue() does either throw an exception or returns null, if no direct value isType available
-        DISCUSS: isType this intentional or accidental? better way distinguishing between RefTo and other?
-        (isType RefTo) did not work  -> solve be using resolveDataType*/
-        try {
-            val asValue = literal.asValue()
-            if (asValue != null) {
-                return asValue
-            }
-        } catch (npe: NullPointerException) {
-
-        }
-
-        /*val resolvedDataType = literal.dataType()
-        if (resolvedDataType is EnumerateType) {
-            return VAnyEnum(resolvedDataType, literal.textValue!!)
-        }
-        //DISCUSS: Time-Literal has resolvedDataType LREAL ?!
-        if (resolvedDataType is TimeType) {
-            TODO()
-            //return Values.VAnyReal(resolvedDataType, BigDecimal.valueOf(0))
-        }
-    */
-        TODO("implement other cases for $literal")
-    }
+    override fun visit(literal: Literal): EValue = literal.asValue()
+            ?: throw IllegalStateException("No value from literal $literal")
 
 
     override fun visit(symbolicReference: SymbolicReference): EValue {

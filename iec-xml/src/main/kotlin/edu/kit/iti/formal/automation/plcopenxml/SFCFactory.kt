@@ -23,7 +23,6 @@ package edu.kit.iti.formal.automation.plcopenxml
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.parser.ErrorReporter
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.ast.BooleanLit.Companion.LTRUE
@@ -244,7 +243,7 @@ class SFCFactory(private val sfcElement: Element) : Supplier<SFCImplementation> 
     //TODO @ToString(exclude = arrayOf("outgoing", "incoming"))
     open inner class Node(e: Element) : Comparable<Step> {
         var entry: Element? = null
-        var name: String
+        var name: String?
         var outgoing: MutableSet<Node> = HashSet()
         var incoming: MutableSet<Node> = HashSet()
         var localId: String? = null
@@ -262,7 +261,9 @@ class SFCFactory(private val sfcElement: Element) : Supplier<SFCImplementation> 
         }
 
         override fun compareTo(o: Step): Int {
-            return name.compareTo(o.name)
+            if (name == null || o.name == null)
+                return 0
+            return name!!.compareTo(o.name!!)
         }
 
         open fun getTransitions(incoming: Boolean): List<PseudoTransition> {
@@ -276,7 +277,7 @@ class SFCFactory(private val sfcElement: Element) : Supplier<SFCImplementation> 
             while (!queue.isEmpty()) {
                 val n = queue.remove()
                 if (n is Step) {
-                    stepsFrom.add(n.name)
+                    stepsFrom.add(n.name!!)
                 } else {
                     if (n is JumpStep) {
                         stepsFrom.add(n.jumpTo)
@@ -365,13 +366,13 @@ class SFCFactory(private val sfcElement: Element) : Supplier<SFCImplementation> 
         }
 
         override fun getTransitions(incoming: Boolean): List<PseudoTransition> {
-            return listOf(PseudoTransition(name, this))
+            return listOf(PseudoTransition(name!!, this))
         }
 
         fun createSFCStep(): SFCStep {
             val ss = SFCStep()
             ss.isInitial = initial
-            ss.name = name
+            ss.name = name!!
             parseActionBlock(localId, ss.events)
 
             if (onWhile != null && !onWhile!!.isEmpty())
