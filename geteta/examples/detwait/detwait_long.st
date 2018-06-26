@@ -1,0 +1,12 @@
+PROGRAM dw
+VAR_INPUT  i:INT; END_VAR
+VAR_OUTPUT o:INT; END_VAR
+VAR s : INT; END_VAR
+
+IF i = 0 THEN
+    s := 0;
+ELSEIF i > 0 THEN
+    s := s + 1;
+END_IF
+o := s;
+END_PROGRAM

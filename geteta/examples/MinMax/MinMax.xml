@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-table xmlns="http://formal.iti.kit.edu/exteta-1.0" version="1.0">
+    <variables>
+        <variable data-type="ENUM" io="input" name="mode"/>
+        <variable data-type="BOOLEAN" io="input" name="learn"/>
+        <variable data-type="INT" io="input" name="I"/>
+        <variable data-type="INT" io="output" name="Q"/>
+        <variable data-type="BOOLEAN" io="output" name="W"/>
+
+        <constraint name="p" data-type="INT" constraint="0"/>
+        <constraint name="q" data-type="INT" constraint="5"/>
+    </variables>
+    <steps>
+        <step duration="[1,-]">
+            <cell>Active</cell>
+            <cell>-</cell>
+            <cell>-</cell>
+            <cell>0</cell>
+            <cell>false</cell>
+        </step>
+        <!-- learning -->
+        <block duration="[1,-]">
+            <step duration="[1,-]">
+                <cell>Learn</cell>
+                <cell>false</cell>
+                <cell>-</cell>
+                <cell>0</cell>
+                <cell>false</cell>
+            </step>
+            <step duration="[1,-]">
+                <cell>Learn</cell>
+                <cell>true</cell>
+                <cell>[p,q]</cell>
+                <cell>[p,q]</cell>
+                <cell>false</cell>
+            </step>
+        </block>
+        <block duration="[1,-]">
+            <!-- normal operation -->
+            <block>
+                <step duration="[0,-]">
+                    <cell>Active</cell>
+                    <cell>-</cell>
+                    <cell>[p,q]</cell>
+                    <cell>[p,q]</cell>
+                    <cell>false</cell>
+                </step>
+            </block>
+            <!-- alarm: to high -->
+            <block>
+                <step duration="[10,10]">
+                    <cell>Active</cell>
+                    <cell>-</cell>
+                    <cell>&gt;q</cell>
+                    <cell>&lt;=q</cell>
+                    <cell>false</cell>
+                </step>
+                <step duration="[1,-]">
+                    <cell>Active</cell>
+                    <cell>-</cell>
+                    <cell>&gt;q</cell>
+                    <cell>&lt;=q</cell>
+                    <cell>true</cell>
+                </step>
+            </block>
+            <!--cooldown-->
+            <block>
+                <step duration="[5,5]">
+                    <cell>Active</cell>
+                    <cell>-</cell>
+                    <cell>[p,q]</cell>
+                    <cell>[p,q]</cell>
+                    <cell>true</cell>
+                </step>
+                <step duration="[1,-]">
+                    <cell>Active</cell>
+                    <cell>-</cell>
+                    <cell>[p,q]</cell>
+                    <cell>[p,q]</cell>
+                    <cell>false</cell>
+                </step>
+            </block>
+            <!-- alarm to low -->
+            <block>
+                <step duration="[10,10]">
+                    <cell>Active</cell>
+                    <cell>-</cell>
+                    <cell>&lt;p</cell>
+                    <cell>&gt;=p</cell>
+                    <cell>false</cell>
+                </step>
+                <step duration="[1,-]">
+                    <cell>Active</cell>
+                    <cell>-</cell>
+                    <cell>&lt;p</cell>
+                    <cell>&gt;=p</cell>
+                    <cell>true</cell>
+                </step>
+            </block>
+            <!--cooldown-->
+            <block>
+                <step duration="[5,5]">
+                    <cell>Active</cell>
+                    <cell>-</cell>
+                    <cell>[p,q]</cell>
+                    <cell>[p,q]</cell>
+                    <cell>true</cell>
+                </step>
+                <step duration="[1,-]">
+                    <cell>Active</cell>
+                    <cell>-</cell>
+                    <cell>[p,q]</cell>
+                    <cell>[p,q]</cell>
+                    <cell>false</cell>
+                </step>
+            </block>
+        </block>
+    </steps>
+</test-table>

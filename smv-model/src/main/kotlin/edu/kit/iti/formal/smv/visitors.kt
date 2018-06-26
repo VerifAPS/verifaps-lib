@@ -45,26 +45,26 @@ abstract class SMVAstMutableVisitor : SMVAstVisitor<SMVAst> {
     override fun visit(top: SMVAst) = top
     override fun visit(v: SVariable) = v
 
-    override fun visit(be: SBinaryExpression): SMVAst {
+    override fun visit(be: SBinaryExpression): SMVExpr {
         be.left = be.left.accept(this) as SMVExpr
         be.right = be.right.accept(this) as SMVExpr
         return be
     }
 
-    override fun visit(ue: SUnaryExpression): SMVAst {
+    override fun visit(ue: SUnaryExpression): SMVExpr{
         ue.expr = ue.expr.accept(this) as SMVExpr
         return ue
     }
 
-    override fun visit(l: SLiteral): SMVAst = l
+    override fun visit(l: SLiteral): SMVExpr= l
 
-    override fun visit(a: SAssignment): SMVAst {
+    override fun visit(a: SAssignment): SAssignment{
         a.expr = a.expr.accept(this) as SMVExpr
         a.target = a.target.accept(this) as SVariable
         return a
     }
 
-    override fun visit(ce: SCaseExpression): SMVAst {
+    override fun visit(ce: SCaseExpression): SMVExpr {
         for (c in ce.cases) {
             c.condition = c.condition.accept(this) as SMVExpr
             c.then = c.then.accept(this) as SMVExpr

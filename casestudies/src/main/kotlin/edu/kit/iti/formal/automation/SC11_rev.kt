@@ -2,12 +2,8 @@ package edu.kit.iti.formal.automation
 
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.sfclang.ast.ActionDeclaration
-import edu.kit.iti.formal.automation.sfclang.ast.SFC2ST
-import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration
-import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
-import edu.kit.iti.formal.automation.st.ast.TypeDeclarations
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
+import edu.kit.iti.formal.automation.sfclang.SFC2ST
+import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.Utils
 import org.jdom2.JDOMException
 import java.io.File
@@ -45,7 +41,7 @@ object SC11_rev {
             }
         }
 
-        tles.add(0, typeDecls);
+        tles.add(0, typeDecls)
         tles.addAll(IEC61131Facade.file(File("ton.st").absoluteFile))
         IEC61131Facade.resolveDataTypes(tles)
         File("SC11_rev.st").writer().use {
@@ -56,7 +52,7 @@ object SC11_rev {
 
         val stles = SymbExFacade.simplify(tles)
         // we need to trick with the input/output variables
-        Utils.findProgram(tles).scope.forEach {
+        Utils.findProgram(tles)?.scope?.forEach {
             if (it.name.startsWith("Actuator_"))
                 it.type = it.type or VariableDeclaration.OUTPUT
             if (it.name.startsWith("Sensor_"))
@@ -70,8 +66,8 @@ object SC11_rev {
 
 
         val smv = SymbExFacade.evaluateProgram(
-                stles[1] as ProgramDeclaration?,
-                stles[0] as TypeDeclarations?)
+                stles[1] as ProgramDeclaration,
+                stles[0] as TypeDeclarations)
 
         File("SC12f.smv").writer().use {
             it.write(smv.toString())
@@ -93,13 +89,13 @@ object SC11_rev {
     private fun translate(fbd: FunctionBlockDeclaration) {
         if (fbd.sfcBody != null) {
             val ss = SFC2ST(fbd.name,
-                    fbd.sfcBody.networks[0],
+                    fbd.sfcBody?.networks!![0],
                     fbd.scope
             )
             fbd.stBody = ss.get()
             typeDecls.add(ss.enumDecl)
         }
-        translate(fbd.name, fbd.scope, fbd.actions.values)
+        translate(fbd.name, fbd.scope, fbd.actions)
     }
 
     private fun translate(name: String, scope: Scope, actions: Collection<ActionDeclaration>) {
@@ -119,14 +115,14 @@ object SC11_rev {
 
     private fun translate(pd: ProgramDeclaration) {
         if (pd.sfcBody != null) {
-            val ss = SFC2ST(pd.programName,
-                    pd.sfcBody.networks[0],
+            val ss = SFC2ST(pd.name,
+                    pd.sfcBody?.networks!![0],
                     pd.scope
             )
             pd.stBody = ss.get()
             typeDecls.add(ss.enumDecl)
         }
-        translate(pd.programName, pd.scope, pd.actions.values)
+        translate(pd.name, pd.scope, pd.actions)
 
     }
 }

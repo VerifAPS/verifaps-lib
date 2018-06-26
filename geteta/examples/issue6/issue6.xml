@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-table xmlns="http://formal.iti.kit.edu/exteta-1.0" version="1.0">
+    <variables>
+        <variable data-type="INT" io="input" name="var_CurrentPos"/>
+        <variable data-type="INT" io="input" name="var_RequestedPos"/>
+        <variable data-type="BOOLEAN" io="input" name="var_ButtonPressed"/>
+        <variable data-type="ENUM" io="output" name="var_Motor"/>
+        <variable data-type="ENUM" io="output" name="var_Door"/>
+        <constraint constraint="1" data-type="INT" name="var_current"/>
+        <constraint constraint="3" data-type="INT" name="var_requested"/>
+    </variables>
+    <steps>
+        <step duration="[1,1]">
+            <cell>var_current</cell>
+            <cell>var_requested</cell>
+            <cell>TRUE</cell>
+            <cell>var_GoUp</cell>
+            <cell>var_Closed</cell>
+        </step>
+        <step duration="[1,1]">
+            <cell>= var_current + 1</cell>
+            <cell>var_requested</cell>
+            <cell>TRUE</cell>
+            <cell>var_GoUp</cell>
+            <cell>var_Closed</cell>
+        </step>
+        <step duration="[1,1]">
+            <cell>= var_current + 2</cell>
+            <cell>var_requested</cell>
+            <cell>TRUE</cell>
+            <cell>var_Stationary</cell>
+            <cell>var_Open</cell>
+        </step>
+    </steps>
+</test-table>

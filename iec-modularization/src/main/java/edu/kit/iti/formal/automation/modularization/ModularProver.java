@@ -16,13 +16,13 @@ package edu.kit.iti.formal.automation.modularization;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
+import edu.kit.iti.formal.automation.st.ast.PouElements;
 
 import java.util.*;
 
@@ -73,8 +73,8 @@ public final class ModularProver {
 	}
 
 	public ModularProver(
-			final TopLevelElements prgm1,
-			final TopLevelElements prgm2) {
+			final PouElements prgm1,
+			final PouElements prgm2) {
 
 		_program1 = new Program(prgm1, AbstractionVariable::getName1);
 		_program2 = new Program(prgm2, AbstractionVariable::getName2);

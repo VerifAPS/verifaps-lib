@@ -4,17 +4,17 @@
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -207,9 +207,9 @@ public class ValueFactory {
     public static ScalarValue<? extends AnyBit, Bits> parseBitLiteral(String s) {
         String first = getPrefix(s);
 
-        if ("TRUE".equalsIgnoreCase(s))
+        if ("LTRUE".equalsIgnoreCase(s))
             return new ScalarValue<>(AnyBit.BOOL, new Bits(1l, AnyBit.BOOL.getBitLength()));
-        if ("FALSE".equalsIgnoreCase(s))
+        if ("LFALSE".equalsIgnoreCase(s))
             return new ScalarValue<>(AnyBit.BOOL, new Bits(0l, AnyBit.BOOL.getBitLength()));
 
         if (first != null) {
@@ -411,7 +411,7 @@ public class ValueFactory {
      * @return a {@link edu.kit.iti.formal.automation.datatypes.values.ScalarValue} object.
      */
     public static ScalarValue<AnyBit.Bool, Bits> makeBool(String text) {
-        return new ScalarValue<AnyBit.Bool, Bits>(AnyBit.BOOL, new Bits(text.equals("TRUE") ? 1 : 0, 1));
+        return new ScalarValue<AnyBit.Bool, Bits>(AnyBit.BOOL, new Bits(text.equals("LTRUE") ? 1 : 0, 1));
     }
 
     /**
@@ -507,7 +507,7 @@ public class ValueFactory {
             DateData date = new DateData(year, month, day);
             return new ScalarValue<>(AnyDate.DATE, date);
         } else {
-            throw new IllegalArgumentException("given string is not a time of day value");
+            throw new IllegalArgumentException("given string isType not a time of day value");
         }
     }
 
@@ -551,7 +551,7 @@ public class ValueFactory {
             return new ScalarValue<>(AnyDate.TIME_OF_DAY, tod);
 
         } else {
-            throw new IllegalArgumentException("given string is not a time of day value");
+            throw new IllegalArgumentException("given string isType not a time of day value");
         }
     }
 

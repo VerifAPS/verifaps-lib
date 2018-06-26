@@ -9,11 +9,9 @@ VAR_OUTPUT
     Q  : BOOL := TRUE;
 END_VAR
 
-    Q := IN && IN2;
+    Q := IN AND IN2;
 
 END_FUNCTION_BLOCK
-
-
 
 PROGRAM  Analogsensor
 
@@ -22,7 +20,7 @@ PROGRAM  Analogsensor
       e : BOOL;
     END_VAR
 
-    timeout(IN := TRUE, IN2 := TRUE, Q := False);
+    timeout(IN := TRUE, IN2 := TRUE);
 
     e := timeout.Q;
 

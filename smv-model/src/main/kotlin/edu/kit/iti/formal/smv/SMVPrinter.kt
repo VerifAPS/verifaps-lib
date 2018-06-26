@@ -103,9 +103,9 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
         stream.print(m.name)
         if (!m.moduleParameters.isEmpty()) {
             stream.print("(");
-            for (e in 0..m.moduleParameters.size) {
-                m.moduleParameters[e].accept(this)
-                if (e + 1 < m.moduleParameters.size) stream.print(", ")
+            m.moduleParameters.forEachIndexed { index, sVariable ->
+                sVariable.accept(this)
+                if (index + 1 < m.moduleParameters.size) stream.print(", ")
             }
             stream.print(")")
         }

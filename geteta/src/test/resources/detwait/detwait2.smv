@@ -1,0 +1,45 @@
+MODULE TTable(i, o)
+VAR
+	s1_1 : boolean;
+	s2_1 : boolean;
+	s3_1 : boolean;
+	_$ERROR : boolean;
+	_$SENTINEL : boolean;
+-- end of VAR
+DEFINE
+	s1_fail := s1_in & !s1_out;
+	s1_fwd := s1_in & s1_out;
+	s1_in := TRUE;
+	s1_keep := !s2_fwd & s1_in & s1_out;
+	s1_out := TRUE;
+	s2_fail := s2_in & !s2_out;
+	s2_fwd := s2_in & s2_out;
+	s2_in := 0sd16_1 = i;
+	s2_keep := !s3_fwd & s2_in & s2_out;
+	s2_out := 0sd16_1 = o;
+	s3_fail := s3_in & !s3_out;
+	s3_fwd := s3_in & s3_out;
+	s3_in := 0sd16_2 = i;
+	s3_out := 0sd16_2 = o;
+	s_1_1_fail := s1_1 & s1_fail;
+	s_1_1_fwd := s1_1 & s1_fwd;
+	s_2_1_fail := s2_1 & s2_fail;
+	s_2_1_fwd := s2_1 & s2_fwd;
+	s_3_1_fail := s3_1 & s3_fail;
+	s_3_1_fwd := s3_1 & s3_fwd;
+LTLSPEC
+	(G(F(s2_in))) & (G(F(s3_in))) -> (F(!s1_1 & !s2_1 & !s3_1 & !_$ERROR | s_3_1_fwd));
+
+INVARSPEC
+	_$ERROR -> s1_1 | s2_1 | s3_1 | _$SENTINEL;
+
+INIT
+	s1_1 & !s2_1 & !s3_1 & !_$ERROR & !_$SENTINEL;
+ASSIGN
+	next(s1_1) := FALSE | s1_1 & s1_keep;
+	next(s2_1) := s_1_1_fwd | s2_1 & s2_keep;
+	next(s3_1) := s_2_1_fwd;
+	next(_$ERROR) := s_1_1_fail | s_2_1_fail | s_3_1_fail;
+	next(_$SENTINEL) := s_3_1_fwd | _$SENTINEL;
+
+-- end of module TTable

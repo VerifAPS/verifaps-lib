@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.modularization;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -195,9 +195,9 @@ public final class FunctionBlockLink {
                         dstFb2.activatedInstance.getLink();
 
         final SMVModule moduleMain = new SMVModule("main");
-        final SMVModule module1 = SymbExFacade.evaluateProgram(
+        final SMVModule module1 = SymbExFacade.INSTANCE.evaluateProgram(
                 dstFb1.declaration, fb1.program.typeDeclarations);
-        final SMVModule module2 = SymbExFacade.evaluateProgram(
+        final SMVModule module2 = SymbExFacade.INSTANCE.evaluateProgram(
                 dstFb2.declaration, fb2.program.typeDeclarations);
 
         moduleMain.setName("main");

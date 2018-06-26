@@ -23,8 +23,8 @@ interface SOperator {
  * @author Alexander Weigl
  * @version 1 (09.04.18)
  */
-abstract class SMVAst {
-    final fun repr(): String = SMVPrinter.toString(this)
+sealed class SMVAst {
+    fun repr(): String = SMVPrinter.toString(this)
     abstract fun <T> accept(visitor: SMVAstVisitor<T>): T
 }
 
@@ -49,7 +49,6 @@ data class SBinaryExpression(var left: SMVExpr,
 
     override val dataType: SMVType?
         get() = SMVTypes.infer(left.dataType!!, right.dataType!!)
-
 
     override fun inModule(module: String): SBinaryExpression {
         return SBinaryExpression(left.inModule(module),
@@ -256,11 +255,11 @@ abstract class SMVExpr : SMVAst() {
         return op(SBinaryOperator.EQUAL, e)
     }
 
-    fun and(e: SMVExpr): SBinaryExpression {
+    infix fun and(e: SMVExpr): SBinaryExpression {
         return op(SBinaryOperator.AND, e)
     }
 
-    fun or(e: SMVExpr): SBinaryExpression {
+    infix fun or(e: SMVExpr): SBinaryExpression {
         return op(SBinaryOperator.OR, e)
     }
 

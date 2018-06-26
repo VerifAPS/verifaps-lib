@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-table xmlns="http://formal.iti.kit.edu/exteta-1.0" version="1.0">
+    <variables>
+        <variable data-type="BOOLEAN" io="input" name="var_TPSet"/>
+        <variable data-type="INT" io="input" name="var_SensorInput"/>
+        <variable data-type="INT" io="input" name="var_TPy"/>
+        <variable data-type="ENUM" io="input" name="var_OperationMode"/>
+        <variable data-type="INT" io="output" name="var_SensorOutput"/>
+        <constraint constraint="&gt;=-10, &lt;=-5" data-type="INT"
+                    name="var_x1"/>
+        <constraint constraint="&gt;=10, &lt;=15" data-type="INT"
+                    name="var_x2"/>
+        <constraint constraint="&gt;=10, &lt;=25" data-type="INT"
+                    name="var_y1"/>
+        <constraint constraint="&gt;=0, &lt;=5" data-type="INT" name="var_y2"/>
+    </variables>
+    <steps>
+        <step duration="-">
+            <cell>-</cell>
+            <cell>-</cell>
+            <cell>-</cell>
+            <cell>var_Op</cell>
+            <cell>0</cell>
+        </step>
+        <step duration="[1,10]">
+            <cell>0</cell>
+            <cell>-</cell>
+            <cell>-</cell>
+            <cell>var_Teach</cell>
+            <cell>0</cell>
+        </step>
+        <step duration="1">
+            <cell>1</cell>
+            <cell>var_x1</cell>
+            <cell>var_y1</cell>
+            <cell>var_Teach</cell>
+            <cell>0</cell>
+        </step>
+        <step duration="[1,10]">
+            <cell>0</cell>
+            <cell>-</cell>
+            <cell>-</cell>
+            <cell>var_Teach</cell>
+            <cell>0</cell>
+        </step>
+        <step duration="1">
+            <cell>-</cell>
+            <cell>var_x2, &lt;&gt;var_x1</cell>
+            <cell>var_y2</cell>
+            <cell>var_Teach</cell>
+            <cell>0</cell>
+        </step>
+        <step duration="1">
+            <cell>-</cell>
+            <cell>-</cell>
+            <cell>-</cell>
+            <cell>var_Teach</cell>
+            <cell>0</cell>
+        </step>
+        <step duration="[10,10]">
+            <cell>-</cell>
+            <cell>-</cell>
+            <cell>-</cell>
+            <cell>var_Op</cell>
+            <cell>=var_y1+(var_y2-var_y1)/(var_x2-var_x1)*(var_SensorInput -
+                var_x1)
+            </cell>
+        </step>
+    </steps>
+</test-table>

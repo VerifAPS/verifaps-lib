@@ -606,6 +606,11 @@ XOR
 	X O R
 ;
 
+NAMESPACE:  N A M E S P A C E;
+END_NAMESPACE: E N D UNDERSCORE N A M E S P A C E;
+
+USING: U S I N G;
+
 /*******
  * Constants
  */
