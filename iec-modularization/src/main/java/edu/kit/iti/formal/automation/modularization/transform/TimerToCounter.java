@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.modularization.transform;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -57,7 +57,7 @@ public class TimerToCounter extends StatementListModifier {
 
         dst.add(new VariableDeclaration(
                 src.getName() + "$" + name,
-                VariableDeclaration.LOCAL,
+                VariableDeclaration.Companion.getLOCAL(),
                 type));
     }
 
@@ -115,20 +115,20 @@ public class TimerToCounter extends StatementListModifier {
             isInTrue.addGuardedCommand(in, isInTrueThen);
 
             isInTrueThen.add(new AssignmentStatement(
-                    q, new BinaryExpression(et, pt, Operators.EQUALS)));
+                    q, new BinaryExpression(et, pt, Operators.INSTANCE.getEQUALS())));
             isInTrueThen.add(isElapsed);
 
             isElapsed.addGuardedCommand(
-                    new UnaryExpression(Operators.NOT, q), isElapsedThen);
+                    new UnaryExpression(Operators.INSTANCE.getNOT(), q), isElapsedThen);
 
             isElapsedThen.add(new AssignmentStatement(et, new BinaryExpression(
-                    et, _createLiteral(DataTypes.INT, "1"),
-                    Operators.ADD)));
+                    et, _createLiteral(DataTypes.INSTANCE.getINT(), "1"),
+                    Operators.INSTANCE.getADD())));
 
             isInTrueElse.add(new AssignmentStatement(
-                    q, _createLiteral(AnyBit.BOOL, "FALSE")));
+                    q, _createLiteral(AnyBit.Companion.getBOOL(), "FALSE")));
             isInTrueElse.add(new AssignmentStatement(
-                    et, _createLiteral(DataTypes.INT, "0")));
+                    et, _createLiteral(DataTypes.INSTANCE.getINT(), "0")));
 
             _addToCurrentList(isInTrue);
 

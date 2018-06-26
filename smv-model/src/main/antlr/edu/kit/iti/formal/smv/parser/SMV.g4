@@ -121,22 +121,22 @@ expr
     ;
 
 stateExpr:
-    | stateExpr op='->' stateExpr
-    | stateExpr op='<->' stateExpr
-    | stateExpr op=('|' | 'xor' | 'xnor')stateExpr
-    | stateExpr op='&' stateExpr
-    | stateExpr op=('=' | '!=' | '<' | '>' | '<=' | '>=') stateExpr
+     unaryop=('!'|'-') stateExpr
     | stateExpr op='in' stateExpr
     | stateExpr op='union'  stateExpr
-    | stateExpr op='>>' stateExpr
-    | stateExpr op='<<' stateExpr
-    | stateExpr op='-' stateExpr
-    | stateExpr op='+' stateExpr
-    | stateExpr op='*' stateExpr
-    | stateExpr op='mod' stateExpr
-    | stateExpr op='::' stateExpr
     | stateExpr op='/' stateExpr
-    | unaryop=('!'|'-') stateExpr
+    | stateExpr op='mod' stateExpr
+    | stateExpr op='*' stateExpr
+    | stateExpr op='+' stateExpr
+    | stateExpr op='-' stateExpr
+    | stateExpr op='::' stateExpr
+    | stateExpr op='<<' stateExpr
+    | stateExpr op='>>' stateExpr
+    | stateExpr op=('=' | '!=' | '<' | '>' | '<=' | '>=') stateExpr
+    | stateExpr op='&' stateExpr
+    | stateExpr op=('|' | 'xor' | 'xnor') stateExpr
+    | stateExpr op='<->' stateExpr
+    | stateExpr op='->' stateExpr
     | terminalAtom
     ;
 
@@ -164,14 +164,13 @@ casesExpr :
 caseBranch :
 	cond=expr ':' val=expr ';';
 
-NUMBER:
-	'-'? INT;
+NUMBER: INT;
 
 SL_COMMENT:
 	'--' ~('\n' | '\r')* ('\r'? '\n')? -> channel(HIDDEN);
 
 WORD:
-	'0' ('u' | 's')? ('b' | 'B' | 'o' | 'O' | '_' | 'd' | 'D' | 'h' | 'H') INT? '_' ('a'..'f' | 'A.' . 'F' | INT)*;
+    '0' ('u' | 's')? ('b' | 'B' | 'o' | 'O' | '_' | 'd' | 'D' | 'h' | 'H') INT? '_' ('a'..'f' | 'A.' . 'F' | INT)*;
 
 ID:
 	('A'..'Z' | 'a'..'z' | '_' | '$' | '#' | '-' | '.')+;

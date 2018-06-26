@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.modularization;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -49,8 +49,8 @@ public final class FunctionBlockInstance {
 			this.csNode        = new GraphNode<>(this);
 			this.activationBit = new VariableDeclaration(
 					name + "$act$" + id,
-					VariableDeclaration.OUTPUT,
-					AnyBit.BOOL);
+                    VariableDeclaration.Companion.getOUTPUT(),
+                    AnyBit.Companion.getBOOL());
 
 			instance .callSites.add(this);
 			caller.ir.callSites.put(fbCallStmt, this);

@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.modularization.transform;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -64,13 +64,13 @@ public final class CtrlStatementNormalizer extends AstVisitor<Object> {
 
 		return start == stop ?
 				new BinaryExpression(
-						_caseExpression, start, Operators.EQUALS) :
+						_caseExpression, start, Operators.INSTANCE.getEQUALS()) :
 				new BinaryExpression(
 					new BinaryExpression(
-							_caseExpression, start, Operators.GREATER_EQUALS),
+							_caseExpression, start, Operators.INSTANCE.getGREATER_EQUALS()),
 					new BinaryExpression(
-							_caseExpression, stop,  Operators.LESS_EQUALS),
-					Operators.AND);
+							_caseExpression, stop, Operators.INSTANCE.getLESS_EQUALS()),
+                        Operators.INSTANCE.getAND());
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public final class CtrlStatementNormalizer extends AstVisitor<Object> {
 	@Override
 	public final Object visit(final CaseCondition.IntegerCondition intCond) {
 		return new BinaryExpression(
-				_caseExpression, intCond.getValue(), Operators.EQUALS);
+				_caseExpression, intCond.getValue(), Operators.INSTANCE.getEQUALS());
 	}
 
 	@Override
@@ -119,7 +119,7 @@ public final class CtrlStatementNormalizer extends AstVisitor<Object> {
 				branchCondition = new BinaryExpression(
 						branchCondition,
 						(Expression)liCond.next().accept(this),
-						Operators.OR);
+                        Operators.INSTANCE.getOR());
 
 			curElseStmt = _aggregateToElseBranch(
 					branchCondition, branch.getStatements(), curElseStmt);

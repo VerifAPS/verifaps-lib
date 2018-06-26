@@ -6,17 +6,17 @@ package edu.kit.iti.formal.automation.plcopenxml;
  * %%
  * Copyright (C) 2016 Alexander Weigl
  * %%
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -101,7 +101,7 @@ public class Graph2Ast {
             ifEntry.addGuardedCommand(gc);
             sl.add(ifEntry);
         }
-        sl.add(assignment(TRANSIT_VARIABLE, "FALSE"));
+        sl.add(assignment(TRANSIT_VARIABLE, "LFALSE"));
         sl.comment("end(onEntry)");
 
         //build in active
@@ -112,7 +112,7 @@ public class Graph2Ast {
 
         sl.comment("begin(transition)");
         IfStatement transitions = new IfStatement();
-        Statement assignExitTrue = assignment(TRANSIT_VARIABLE, "TRUE");
+        Statement assignExitTrue = assignment(TRANSIT_VARIABLE, "LTRUE");
 
         for (SFCGraph.Transition t : n.outgoing) {
             StatementList assignNextState = IEC61131Facade.statements(String.format("%s := %s#%s;",

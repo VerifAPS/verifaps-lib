@@ -1,20 +1,26 @@
 CLASS C
+
   VAR
     ID : INT;
   END_VAR
+
 END_CLASS
 
 CLASS B
+
   VAR
     MY_C : C := (ID := 42);
   END_VAR
+
 END_CLASS
 
 CLASS A
+
   VAR
     B1 : B;
     B2 : B;
   END_VAR
+
 END_CLASS
 
 PROGRAM MY_PROGRAM
@@ -23,4 +29,6 @@ PROGRAM MY_PROGRAM
     MY_B : B;
     MY_C : C;
   END_VAR
+
+
 END_PROGRAM

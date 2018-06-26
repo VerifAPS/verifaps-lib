@@ -16,7 +16,7 @@ package edu.kit.iti.formal.automation.modularization;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
@@ -47,7 +47,7 @@ public final class InlinedFunctionBlock {
 
 			_addToCurrentList(new AssignmentStatement(
 					new SymbolicReference(callSite.activationBit.getName()),
-					new Literal          (AnyBit.BOOL, literal)));
+					new Literal          (AnyBit.Companion.getBOOL(), literal)));
 		}
 
 		private void _addCallSiteInputAssignments(
@@ -98,7 +98,7 @@ public final class InlinedFunctionBlock {
 							fbInstance.type.inlinedAll;
 
 			for(Statement i : inlinedFb.declaration.getStBody()) {
-				final Statement stmtCopy = i.copy();
+				final Statement stmtCopy = i.clone();
 				stmtCopy.accept(prefixAdder);
 				_addToCurrentList(stmtCopy);
 			}
@@ -141,13 +141,13 @@ public final class InlinedFunctionBlock {
 			this.callSite      = callSite;
 			this.activationBit = new VariableDeclaration(
 					activatedInstance.name + "$act$" + callSite.id,
-					VariableDeclaration.OUTPUT,
-					AnyBit.BOOL);
+                    VariableDeclaration.Companion.getOUTPUT(),
+                    AnyBit.Companion.getBOOL());
 
 			for(String i : type.getLink().getCommonVariables(type, true))
 				variables.put(i, new VariableDeclaration(
 						activatedInstance.name + "$" + i + "$" + callSite.id,
-						VariableDeclaration.OUTPUT,
+                        VariableDeclaration.Companion.getOUTPUT(),
 						type.in.get(i).getDataType()));
 
 			activationVariables.put(callSite, this);
@@ -216,7 +216,7 @@ public final class InlinedFunctionBlock {
 
 		for(VariableDeclaration i : declaration.getScope())
 			if(original.out.containsKey(i.getName()))
-				i.setType(VariableDeclaration.LOCAL);
+				i.setType(VariableDeclaration.Companion.getLOCAL());
 
 		for(Activation i : activationVariables.values()) {
 			localScope.add(i.activationBit);
@@ -252,13 +252,13 @@ public final class InlinedFunctionBlock {
 		for(AbstractionVariable i : abstractionVars.values())
 			declaration.getScope().add(new VariableDeclaration(
 					nameSelector.getName(i),
-					VariableDeclaration.INPUT,
+                    VariableDeclaration.Companion.getINPUT(),
 					i.type));
 
 		// Add the variables of the function block itself
-		_addVariables("", VariableDeclaration.INPUT,  original.in.values());
-		_addVariables("", VariableDeclaration.OUTPUT, original.out.values());
-		_addVariables("", VariableDeclaration.LOCAL,  original.local.values());
+		_addVariables("", VariableDeclaration.Companion.getINPUT(),  original.in.values());
+		_addVariables("", VariableDeclaration.Companion.getOUTPUT(), original.out.values());
+		_addVariables("", VariableDeclaration.Companion.getLOCAL(),  original.local.values());
 
 		// Create local variables for all inlined instances
 		for(FunctionBlockInstance i : original.fbInstances.values()) {
@@ -266,14 +266,14 @@ public final class InlinedFunctionBlock {
 			// The input variables are added anyway, but most could be removed
 			// for abstracted instances if the code writing them is also removed
 			_addVariables(
-					i.name + "$", VariableDeclaration.LOCAL, i.type.in.values());
+					i.name + "$", VariableDeclaration.Companion.getLOCAL(), i.type.in.values());
 
 			if(config.getState(i) == InstanceState.ABSTRACTED) continue;
 
 			_addVariables(
-					i.name + "$", VariableDeclaration.LOCAL, i.type.out.values());
+					i.name + "$", VariableDeclaration.Companion.getLOCAL(), i.type.out.values());
 			_addVariables(
-					i.name + "$", VariableDeclaration.LOCAL, i.type.local.values());
+					i.name + "$", VariableDeclaration.Companion.getLOCAL(), i.type.local.values());
 		}
 
 		//final StructuredTextPrinter stp = new StructuredTextPrinter();

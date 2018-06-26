@@ -6,7 +6,7 @@ import com.xenomachina.argparser.default
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements
+import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.smv.NuXMVInvariantsCommand
 import edu.kit.iti.formal.smv.NuXMVProcess
 import edu.kit.iti.formal.smv.ast.SMVModule
@@ -132,7 +132,7 @@ class TransformationPipeline(var diableST0: Boolean = false) {
 
     fun run(filename: String): SMVModule {
         try {
-            var elements: TopLevelElements;
+            var elements: PouElements;
             if (filename.endsWith(".xml")) {
                 elements = IECXMLFacade.readPLCOpenXml(filename)
             } else {

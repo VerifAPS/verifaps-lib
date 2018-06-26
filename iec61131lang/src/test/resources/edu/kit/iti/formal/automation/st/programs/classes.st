@@ -7,12 +7,15 @@ INTERFACE ROOM
 END_INTERFACE
 
 FUNCTION_BLOCK ROOM_CTRL
-VAR_INPUT
-  RM : ROOM;
-END_VAR
+
 VAR_EXTERNAL
   DAYTIME : DATE; // global time definition
 END_VAR
+
+VAR_INPUT
+  RM : ROOM;
+END_VAR
+
   IF (RM = NULL) THEN // always test on valid reference!
     RETURN;
   END_IF

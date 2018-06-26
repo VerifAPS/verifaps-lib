@@ -6,9 +6,8 @@ import edu.kit.iti.formal.automation.analysis.CheckForTypes
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
-import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.st.util.AstVisitor
+import edu.kit.iti.formal.automation.st.ast.Position
+import edu.kit.iti.formal.automation.st.ast.PouElements
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.atn.ATNConfigSet
 import org.antlr.v4.runtime.dfa.DFA
@@ -20,6 +19,7 @@ import java.util.*
  * @version 1 (18.03.18)
  */
 object Flycheck {
+
     @JvmStatic
     fun main(args: Array<String>) {
         val arguments = FlycheckArgs(ArgParser(args, ArgParser.Mode.POSIX))
@@ -33,15 +33,16 @@ object Flycheck {
 
             val errorListener = MyAntlrErrorListener(it)
             parser.addErrorListener(errorListener)
+            val myReporter = object : CheckForTypes.Reporter {
+                override fun report(position: Position, msg: String, category: String, error: String) {
+                    Flycheck.print(it, position.lineNumber, position.charInLine, msg, category, error)
+                }
+            }
 
             val ctx = parser.start()
-            val tles = ctx.accept(IECParseTreeToAST()) as TopLevelElements
+            val tles = ctx.accept(IECParseTreeToAST()) as PouElements
             IEC61131Facade.resolveDataTypes(tles)
-            tles.accept<Any>(CheckForTypes(
-                    CheckForTypes.Reporter { position, msg, category, error ->
-                        Flycheck.print(it, position.lineNumber, position.charInLine, msg, category, error)
-                    }
-            ))
+            tles.accept(CheckForTypes(myReporter))
         }
 
     }

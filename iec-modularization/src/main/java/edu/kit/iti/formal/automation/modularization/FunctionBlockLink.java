@@ -10,20 +10,23 @@ package edu.kit.iti.formal.automation.modularization;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public
+ *
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
 
 import edu.kit.iti.formal.automation.SymbExFacade;
+import edu.kit.iti.formal.smv.ModuleType;
 import edu.kit.iti.formal.smv.SMVFacade;
+import edu.kit.iti.formal.smv.SMVType;
+import edu.kit.iti.formal.smv.SMVTypes;
 import edu.kit.iti.formal.smv.ast.*;
 
 import java.util.*;
@@ -35,6 +38,7 @@ public final class FunctionBlockLink {
     public final VariableMapping varMappingIn;
     public final VariableMapping varMappingOut;
     private State _state = State.NOT_CHECKED;
+
     public FunctionBlockLink(
             final FunctionBlock fb1,
             final FunctionBlock fb2) {
@@ -190,10 +194,10 @@ public final class FunctionBlockLink {
                 dstFb1.activatedInstance.getLink() ==
                         dstFb2.activatedInstance.getLink();
 
-        final SMVModule moduleMain = new SMVModule();
-        final SMVModule module1 = SymbExFacade.evaluateProgram(
+        final SMVModule moduleMain = new SMVModule("main");
+        final SMVModule module1 = SymbExFacade.INSTANCE.evaluateProgram(
                 dstFb1.declaration, fb1.program.typeDeclarations);
-        final SMVModule module2 = SymbExFacade.evaluateProgram(
+        final SMVModule module2 = SymbExFacade.INSTANCE.evaluateProgram(
                 dstFb2.declaration, fb2.program.typeDeclarations);
 
         moduleMain.setName("main");
@@ -226,12 +230,12 @@ public final class FunctionBlockLink {
             if (varMappingIn.unmapped1.contains(sVarName)) {
 
                 newSVar = new SVariable(
-                        "v1$" + sVarName, sVar.getDatatype());
+                        "v1$" + sVarName, sVar.getDataType());
 
             } else if (varMappingIn.var2ByVar1.containsKey(sVarName)) {
 
                 newSVar = new SVariable(
-                        "c$" + inputVars.size(), sVar.getDatatype());
+                        "c$" + inputVars.size(), sVar.getDataType());
                 commonValues.put(
                         varMappingIn.var2ByVar1.get(sVarName), newSVar);
 
@@ -242,7 +246,7 @@ public final class FunctionBlockLink {
 
                 assert abstVar.isCommon(); // TODO: remove later
                 newSVar = new SVariable(
-                        "a$" + inputVars.size(), sVar.getDatatype());
+                        "a$" + inputVars.size(), sVar.getDataType());
                 commonValues.put(abstVar.name2, newSVar);
             }
 
@@ -262,7 +266,7 @@ public final class FunctionBlockLink {
 
                 if (varMappingIn.unmapped2.contains(sVarName))
                     newSVar = new SVariable(
-                            "v2$" + sVarName, sVar.getDatatype());
+                            "v2$" + sVarName, sVar.getDataType());
 
                 assert newSVar != null;
                 inputVars.add(newSVar);
@@ -273,9 +277,9 @@ public final class FunctionBlockLink {
 
         // Add instances for both function block modules
         moduleMain.getStateVars().add(new SVariable(
-                "fb1", new SMVType.Module(module1.getName(), paramValues1)));
+                "fb1", new ModuleType(module1.getName(), paramValues1)));
         moduleMain.getStateVars().add(new SVariable(
-                "fb2", new SMVType.Module(module2.getName(), paramValues2)));
+                "fb2", new ModuleType(module2.getName(), paramValues2)));
 
         // Only the state variables that considered to be output are collected
         // in this map
@@ -285,9 +289,9 @@ public final class FunctionBlockLink {
 
         // Store all output types
         for (SVariable i : module1.getStateVars())
-            stateTypes1.put(i.getName(), i.getDatatype());
+            stateTypes1.put(i.getName(), i.getDataType());
         for (SVariable i : module2.getStateVars())
-            stateTypes2.put(i.getName(), i.getDatatype());
+            stateTypes2.put(i.getName(), i.getDataType());
 
         if (dstFb1.activatedInstance != null) {
 
@@ -309,7 +313,7 @@ public final class FunctionBlockLink {
         //		STemporalOperator.G,
         //		SMVFacade.combine(SBinaryOperator.AND, invarEquations)));
         moduleMain.getInvariantSpecs().add(
-                SMVFacade.combine(SBinaryOperator.AND, invarEquations));
+                SMVFacade.INSTANCE.combine(SBinaryOperator.AND, invarEquations));
 
         return smvVerifier.verify(
                 fileName, false, moduleMain, module1, module2);
@@ -345,9 +349,9 @@ public final class FunctionBlockLink {
         dstEquations.add(new SBinaryExpression(
                 new SVariable(
                         "fb1." + activation1.activationBit.getName(),
-                        SMVType.BOOLEAN),
+                        SMVTypes.BOOLEAN.INSTANCE),
                 SBinaryOperator.IMPL,
-                SMVFacade.combine(SBinaryOperator.AND, implyEquations)));
+                SMVFacade.INSTANCE.combine(SBinaryOperator.AND, implyEquations)));
     }
 
     private void _createInstanceLink(
