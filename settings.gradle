@@ -8,6 +8,7 @@ include ':iec-run'
 include ':aps-rvt'
 include ':casestudies'
 include ':flycheck'
+include ':geteta'
 
 project(':iec-symbex').projectDir = "$rootDir/iec-symbex" as File
 project(':iec61131lang').projectDir = "$rootDir/iec61131lang" as File

@@ -41,6 +41,6 @@ class ConformanceInvariantTransformer : TableTransformer {
                 tt.errorVariable,
                 states)
 
-        tt.tableModule.invarSpec.add(invar)
+        tt.tableModule.invariantSpecs.add(invar)
     }
 }

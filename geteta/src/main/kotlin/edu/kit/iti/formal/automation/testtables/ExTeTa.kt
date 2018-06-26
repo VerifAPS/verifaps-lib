@@ -25,7 +25,7 @@ import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
 import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException
 import edu.kit.iti.formal.automation.exceptions.UnknownVariableException
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements
+import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.TypeDeclarations
 import edu.kit.iti.formal.automation.testtables.algorithms.OmegaSimplifier
 import edu.kit.iti.formal.automation.testtables.builder.TableTransformation
@@ -34,7 +34,6 @@ import edu.kit.iti.formal.automation.testtables.io.Report
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
 import edu.kit.iti.formal.automation.testtables.monitor.MonitorGeneration
 import edu.kit.iti.formal.automation.visitors.Utils
-import edu.kit.iti.formal.automation.visitors.Visitor
 import edu.kit.iti.formal.smv.ast.SMVModule
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
@@ -47,7 +46,6 @@ object ExTeTa {
     @JvmStatic
     fun main(args: Array<String>) {
         Locale.setDefault(Locale.US)
-
         try {
             val cli = parse(args)
             run(cli)
@@ -125,7 +123,7 @@ object ExTeTa {
             val mg = MonitorGeneration(table)
             val fbs = mg.call()
             val stp = StructuredTextPrinter()
-            fbs.accept<Any>(stp as Visitor<out Any>)
+            fbs.accept(stp)
             println(stp.string)
         } else {
             val modCode = evaluate(cli.hasOption("no-simplify"), code)
@@ -152,11 +150,11 @@ object ExTeTa {
         }
     }
 
-    private fun evaluate(disableSimplify: Boolean, code: TopLevelElements): SMVModule {
+    private fun evaluate(disableSimplify: Boolean, code: PouElements): SMVModule {
         if (!disableSimplify)
             return SymbExFacade.evaluateProgram(code)
         else {
-            val program = Utils.findProgram(code)
+            val program = Utils.findProgram(code)!!
             return SymbExFacade.evaluateProgram(program, code[0] as TypeDeclarations,
                     program.scope)
         }

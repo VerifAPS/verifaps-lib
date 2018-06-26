@@ -255,11 +255,11 @@ abstract class SMVExpr : SMVAst() {
         return op(SBinaryOperator.EQUAL, e)
     }
 
-    fun and(e: SMVExpr): SBinaryExpression {
+    infix fun and(e: SMVExpr): SBinaryExpression {
         return op(SBinaryOperator.AND, e)
     }
 
-    fun or(e: SMVExpr): SBinaryExpression {
+    infix fun or(e: SMVExpr): SBinaryExpression {
         return op(SBinaryOperator.OR, e)
     }
 

@@ -21,7 +21,7 @@ package edu.kit.iti.formal.automation.testtables.model
 
 
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
-import edu.kit.iti.formal.automation.st.ast.TopLevelElement
+import edu.kit.iti.formal.automation.st.ast.PouElement
 import edu.kit.iti.formal.automation.testtables.io.IOFacade
 import edu.kit.iti.formal.automation.testtables.model.options.PropertyInitializer
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
@@ -108,9 +108,10 @@ class GeneralizedTestTable {
         //options = null // reset options
     }
 
-    fun addFunctions(file: List<TopLevelElement<*>>) {
+    fun addFunctions(file: List<PouElement>) {
         for (e in file) {
-            functions[e.identifier] = e as FunctionDeclaration
+            if(e is FunctionDeclaration)
+                functions[e.name] = e
         }
     }
 

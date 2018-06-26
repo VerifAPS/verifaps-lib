@@ -42,7 +42,7 @@ package edu.kit.iti.formal.automation.testtables.monitor
  */
 
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements
+import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import java.util.concurrent.Callable
@@ -51,28 +51,28 @@ import java.util.concurrent.Callable
  * @author Alexander Weigl
  * @version 1 (23.03.17)
  */
-class MonitorGeneration(internal val gtt: GeneralizedTestTable) : Callable<TopLevelElements> {
+class MonitorGeneration(internal val gtt: GeneralizedTestTable) : Callable<PouElements> {
     internal val fb = FunctionBlockDeclaration()
 
     @Throws(Exception::class)
-    override fun call(): TopLevelElements {
+    override fun call(): PouElements {
         val vars = fb.scope.builder()
         vars.push(VariableDeclaration.INPUT)
 
         // IOVariables -> VAR_INPUT
         gtt.ioVariables.values.forEach { v ->
             vars.identifiers(v.name)
-                    .setBaseType(v.dataType.value()).create()
+                    .baseType(v.dataType.value()).create()
         }
 
         // VAR_OUTPUT WARNING : BOOL; END_VAR
         vars.clear().push(VariableDeclaration.OUTPUT).identifiers("WARNING")
-                .setBaseType("BOOL").close()
+                .baseType("BOOL").close()
 
         for (i in 0 until gtt.region!!.count()) {
-            vars.identifiers(String.format("ROW_%2d", i)).setBaseType("BOOL").close()
+            vars.identifiers(String.format("ROW_%2d", i)).baseType("BOOL").close()
         }
 
-        return TopLevelElements(listOf(fb))
+        return PouElements(mutableListOf(fb))
     }
 }

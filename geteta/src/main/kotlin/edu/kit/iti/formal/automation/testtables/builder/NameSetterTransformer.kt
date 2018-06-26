@@ -33,6 +33,6 @@ class NameSetterTransformer : TableTransformer {
         if (gtt.name == null || gtt.name!!.isEmpty()) {
             Report.fatal("No table name given.")
         }
-        mt.name = gtt.name
+        mt.name = gtt.name!!
     }
 }

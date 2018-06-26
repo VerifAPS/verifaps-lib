@@ -19,9 +19,6 @@
  */
 package edu.kit.iti.formal.automation.testtables.model
 
-import lombok.Data
-import lombok.RequiredArgsConstructor
-
 /**
  * @author Alexander Weigl
  * @version 1 (01.02.18)

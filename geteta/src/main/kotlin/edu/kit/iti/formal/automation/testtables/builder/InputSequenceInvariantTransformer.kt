@@ -44,6 +44,6 @@ class InputSequenceInvariantTransformer : TableTransformer {
                 .map { v -> v.smvVariable as SMVExpr }
                 .reduce { a, b -> a.or(b) }
 
-        tt.tableModule.invarSpec.add(states)
+        tt.tableModule.invariantSpecs.add(states)
     }
 }

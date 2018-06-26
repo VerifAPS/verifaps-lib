@@ -21,8 +21,8 @@ package edu.kit.iti.formal.automation.testtables.model
 
 
 import edu.kit.iti.formal.automation.testtables.schema.IoVariable
+import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.SMVExpr
-import edu.kit.iti.formal.smv.ast.SMVType
 import edu.kit.iti.formal.smv.ast.SVariable
 import java.util.*
 import kotlin.collections.ArrayList
@@ -46,16 +46,16 @@ open class State(id: String) : TableNode(id) {
     val outgoing: MutableSet<State> = HashSet()
 
     /** variable of input contraint definition */
-    val defOutput = SVariable("s" + id + "_out", SMVType.BOOLEAN)
-    val defForward = SVariable("s" + id + "_fwd", SMVType.BOOLEAN)
-    val defFailed = SVariable("s" + id + "_fail", SMVType.BOOLEAN)
-    val defInput = SVariable("s" + id + "_in", SMVType.BOOLEAN)
+    val defOutput = SVariable("s" + id + "_out", SMVTypes.BOOLEAN)
+    val defForward = SVariable("s" + id + "_fwd", SMVTypes.BOOLEAN)
+    val defFailed = SVariable("s" + id + "_fail", SMVTypes.BOOLEAN)
+    val defInput = SVariable("s" + id + "_in", SMVTypes.BOOLEAN)
 
     /**
      * The predicate that allows keeping in this state.
      * Only necessary iff duration is DET_WAIT.
      */
-    val defKeep = SVariable("s" + id + "_keep", SMVType.BOOLEAN)
+    val defKeep = SVariable("s" + id + "_keep", SMVTypes.BOOLEAN)
 
 
     override val automataStates: MutableList<AutomatonState> = ArrayList()

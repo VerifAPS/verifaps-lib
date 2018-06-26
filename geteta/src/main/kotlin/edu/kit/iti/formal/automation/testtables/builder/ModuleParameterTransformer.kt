@@ -26,7 +26,7 @@ package edu.kit.iti.formal.automation.testtables.builder
 class ModuleParameterTransformer : TableTransformer {
     override fun accept(tt: ConstructionModel) {
         tt.testTable.ioVariables.keys.forEach {
-            tt.tableModule.moduleParameter.add(
+            tt.tableModule.moduleParameters.add(
                     tt.testTable.getSMVVariable(it))
         }
     }

@@ -55,11 +55,11 @@ class ConcreteTableInvariantTransformer : TableTransformer {
         tableModule.initAssignments.add(
                 SAssignment(sentinel, SLiteral.FALSE))
         //forbid sentinel
-        tableModule.invarSpec.add(sentinel.not())
+        tableModule.invariantSpecs.add(sentinel.not())
 
         //Strengthen the _fwd literals
         rows.forEach outer@{ s ->
-            val clock = tableModule.clocks[s]
+            val clock = tt.clocks[s]
             val id = s.id
 
             val cycles = cto.getCount(id, s.duration.lower)
@@ -78,11 +78,16 @@ class ConcreteTableInvariantTransformer : TableTransformer {
             }
 
             // 0dX_<cycles>
-            val count = SLiteral.create(cycles)
-                    .`as`(clock!!.smvType)
+            val count = SLiteral.create(cycles).with(clock!!.dataType!!)
 
             val fwd = tableModule.definitions[s.defForward]
-            tableModule.definitions[s.defForward] = fwd?.and(clock.equal(count))
+            if(fwd!=null) {
+                fwd.expr = fwd.expr.and(clock.equal(count))
+            }
         }
     }
+}
+
+private operator fun Iterable<SAssignment>.get(svar: SVariable): SAssignment? {
+    return find { it.target == svar }
 }

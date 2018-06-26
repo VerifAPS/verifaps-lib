@@ -21,11 +21,7 @@ package edu.kit.iti.formal.automation.testtables.builder
 
 
 import edu.kit.iti.formal.automation.testtables.io.IOFacade
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.automation.testtables.schema.ConstraintVariable
 import edu.kit.iti.formal.automation.testtables.schema.DataType
-import edu.kit.iti.formal.smv.ast.SMVModule
-import edu.kit.iti.formal.smv.ast.SVariable
 
 /**
  * Created by weigl on 17.12.16.
@@ -35,12 +31,12 @@ class ConstraintVariableTransformer : TableTransformer {
         val gtt = tt.testTable
         val mt = tt.tableModule
         for (cv in gtt.constraintVariable.values) {
-            val `var` = gtt.getSMVVariable(cv.name)
+            val svar = gtt.getSMVVariable(cv.name)
             if (cv.dataType == DataType.ENUM) {
-                `var`.datatype = tt.superEnumType
+                svar.dataType = tt.superEnumType
             }
-            mt.frozenVars.add(`var`)
-            mt.init.add(IOFacade.parseCellExpression(cv.constraint, `var`, gtt))
+            mt.frozenVars.add(svar)
+            mt.initExpr.add(IOFacade.parseCellExpression(cv.constraint, svar, gtt))
             //TODO add invar for each frozenvar
         }
     }

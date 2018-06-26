@@ -22,9 +22,8 @@ package edu.kit.iti.formal.automation.testtables.builder
 
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
+import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.ast.SMVModule
-import edu.kit.iti.formal.smv.ast.SMVType
-import edu.kit.iti.formal.smv.ast.SVariable
 import java.util.*
 import java.util.function.Consumer
 
@@ -32,7 +31,7 @@ class TableTransformation(
         val testTable: GeneralizedTestTable,
         val superEnumType: SMVType) {
 
-    val model = ConstructionModel(superEnumType, testTable)
+    val model = ConstructionModel(superEnumType, testTable, hashMapOf())
     val transformers = LinkedList<Consumer<ConstructionModel>>()
 
     init {

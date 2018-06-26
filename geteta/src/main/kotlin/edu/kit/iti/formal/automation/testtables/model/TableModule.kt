@@ -18,28 +18,3 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  */
 package edu.kit.iti.formal.automation.testtables.model
-
-
-import edu.kit.iti.formal.smv.ast.SMVModule
-import edu.kit.iti.formal.smv.ast.SVariable
-
-import java.util.HashMap
-
-/**
- * @author Alexander Weigl
- * @version 1 (11.12.16)
- */
-class TableModule : SMVModule() {
-    val clocks: Map<State, SVariable> = HashMap()
-
-    override fun setName(name: String) {
-        this.name = name
-    }
-
-    fun getStateVar(s: String): SVariable? {
-        val ret: SVariable? = null
-        for (v in stateVars)
-            if (v.name == s) return v
-        return null
-    }
-}

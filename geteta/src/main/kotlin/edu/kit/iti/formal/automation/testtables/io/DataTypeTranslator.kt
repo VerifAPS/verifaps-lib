@@ -21,8 +21,9 @@ package edu.kit.iti.formal.automation.testtables.io
 
 
 import edu.kit.iti.formal.automation.testtables.schema.DataType
-import edu.kit.iti.formal.smv.ast.GroundDataType
-import edu.kit.iti.formal.smv.ast.SMVType
+import edu.kit.iti.formal.smv.SMVType
+import edu.kit.iti.formal.smv.SMVTypes
+import edu.kit.iti.formal.smv.SMVWordType
 
 import java.util.HashMap
 import java.util.function.Function
@@ -34,24 +35,24 @@ class DataTypeTranslator : Function<DataType, SMVType?> {
     private val map = HashMap<DataType, SMVType>()
 
     init {
-        map[DataType.INT] = SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, 16)
-        map[DataType.LINT] = SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, 64)
-        map[DataType.SINT] = SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, 8)
-        map[DataType.DINT] = SMVType.SMVTypeWithWidth(GroundDataType.SIGNED_WORD, 32)
+        map[DataType.INT] = SMVWordType(true, 16)
+        map[DataType.LINT] = SMVWordType(true, 64)
+        map[DataType.SINT] = SMVWordType(true, 8)
+        map[DataType.DINT] = SMVWordType(true, 32)
 
-        map[DataType.UINT] = SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, 16)
-        map[DataType.ULINT] = SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, 64)
-        map[DataType.USINT] = SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, 8)
-        map[DataType.UDINT] = SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, 32)
-
-
-        map[DataType.WORD] = SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, 16)
-        map[DataType.DWORD] = SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, 32)
-        map[DataType.LWORD] = SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, 64)
-        map[DataType.BYTE] = SMVType.SMVTypeWithWidth(GroundDataType.UNSIGNED_WORD, 8)
+        map[DataType.UINT] = SMVWordType(false, 16)
+        map[DataType.ULINT] = SMVWordType(false, 64)
+        map[DataType.USINT] = SMVWordType(false, 8)
+        map[DataType.UDINT] = SMVWordType(false, 32)
 
 
-        map[DataType.BOOLEAN] = SMVType.BOOLEAN
+        map[DataType.WORD] = SMVWordType(false, 16)
+        map[DataType.DWORD] = SMVWordType(false, 32)
+        map[DataType.LWORD] = SMVWordType(false, 64)
+        map[DataType.BYTE] = SMVWordType(false, 8)
+
+
+        map[DataType.BOOLEAN] = SMVTypes.BOOLEAN
     }
 
     override fun apply(dataType: DataType): SMVType? {

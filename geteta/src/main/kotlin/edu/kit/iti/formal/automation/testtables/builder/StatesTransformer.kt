@@ -102,7 +102,7 @@ class StatesTransformer : AbstractTransformer() {
         model.tableModule.stateVars.add(`var`)
 
         //initialize state variable with true iff isStartState
-        model.tableModule.init.add(if (automatonState.isStartState) `var` else `var`.not())
+        model.tableModule.initExpr.add(if (automatonState.isStartState) `var` else `var`.not())
 
         //If one predeccor is true, then we are true.
         var incoming: Stream<State.AutomatonState> = automatonState.incoming.stream()
@@ -153,7 +153,7 @@ class StatesTransformer : AbstractTransformer() {
         model.tableModule.stateVars.add(model.errorVariable)
 
         // disable in the beginning
-        model.tableModule.init.add(model.errorVariable.not())
+        model.tableModule.initExpr.add(model.errorVariable.not())
 
         val e = model.testTable.region!!.flat().stream()
                 .flatMap { s -> s.automataStates.stream() }
@@ -168,7 +168,7 @@ class StatesTransformer : AbstractTransformer() {
         val sentinel = model.sentinelVariable
         val tm = model.tableModule
         tm.stateVars.add(sentinel)
-        tm.init.add(sentinel.not())
+        tm.initExpr.add(sentinel.not())
         val e = model.sentinelState.automataStates[0].incoming.stream()
                 .map { it.defForward }
                 .map { fwd -> fwd as SMVExpr }

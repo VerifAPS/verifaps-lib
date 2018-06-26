@@ -21,9 +21,10 @@ package edu.kit.iti.formal.automation.testtables.algorithms
 
 import edu.kit.iti.formal.automation.testtables.exception.SpecificationInterfaceMisMatchException
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
+import edu.kit.iti.formal.smv.ModuleType
 import edu.kit.iti.formal.smv.SMVFacade
+import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.ast.SMVModule
-import edu.kit.iti.formal.smv.ast.SMVType
 import edu.kit.iti.formal.smv.ast.SVariable
 
 /**
@@ -33,30 +34,30 @@ import edu.kit.iti.formal.smv.ast.SVariable
 class BinaryModelGluer(private val options: TableOptions,
                        private val table: SMVModule,
                        private val code: SMVModule) : Runnable {
-    val product = SMVModule()
+    val product = SMVModule("main")
 
     override fun run() {
         product.name = MAIN_MODULE
-        product.inputVars.addAll(code.moduleParameter)
+        product.inputVars.addAll(code.moduleParameters)
 
         product.stateVars.add(
                 SVariable(CODE_MODULE,
-                        SMVType.Module(code.name,
-                                code.moduleParameter)))
-        val tableParameters = table.moduleParameter.map { v ->
-            if (v in code.moduleParameter) {
+                        ModuleType(code.name,
+                                code.moduleParameters)))
+        val tableParameters = table.moduleParameters.map { v ->
+            if (v in code.moduleParameters) {
                 v
             } else {
                 //output of program code
                 if (v !in code.stateVars) {
                     throw SpecificationInterfaceMisMatchException(code, v)
                 }
-                val variable = SVariable("${CODE_MODULE}.v", v.smvType)
+                val variable = SVariable("${CODE_MODULE}.v", v.dataType!!)
                 if (options.isUseNext) SMVFacade.next(variable) else variable
             }
         }
         product.stateVars.add(SVariable(TABLE_MODULE,
-                SMVType.Module(table.name, tableParameters)))
+                ModuleType(table.name, tableParameters)))
     }
 
     companion object {

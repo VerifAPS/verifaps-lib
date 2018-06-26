@@ -26,8 +26,8 @@ import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.schema.DataType
 import edu.kit.iti.formal.automation.testtables.schema.Variable
+import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.ast.SMVExpr
-import edu.kit.iti.formal.smv.ast.SMVType
 import edu.kit.iti.formal.smv.ast.SVariable
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream

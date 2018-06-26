@@ -59,6 +59,6 @@ class SReference(var cycles: Int, var variable: SVariable) {
      */
     fun asVariable(): SVariable {
         val newName = Facade.getHistoryName(variable, Math.abs(cycles))
-        return SVariable(newName, variable.smvType)
+        return SVariable(newName, variable.dataType!!)
     }
 }

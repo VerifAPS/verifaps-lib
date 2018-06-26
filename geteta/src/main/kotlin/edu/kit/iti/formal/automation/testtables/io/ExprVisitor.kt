@@ -24,8 +24,8 @@ import edu.kit.iti.formal.automation.testtables.exception.IllegalExpressionExcep
 import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionParser
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
+import edu.kit.iti.formal.smv.EnumType
 import edu.kit.iti.formal.smv.ast.*
-import lombok.experimental.`var`
 import java.util.*
 
 /**
@@ -67,7 +67,7 @@ class ExprVisitor(private val columnVariable: SVariable, private val gtt: Genera
     }
 
     override fun visitI(ctx: CellExpressionParser.IContext): SMVExpr {
-        return SLiteral.create(java.lang.Long.parseLong(ctx.text)).`as`(columnVariable.smvType)
+        return SLiteral.create(java.lang.Long.parseLong(ctx.text)).with(columnVariable.dataType!!)
     }
 
     override fun visitConstantTrue(ctx: CellExpressionParser.ConstantTrueContext): SMVExpr {
@@ -86,7 +86,7 @@ class ExprVisitor(private val columnVariable: SVariable, private val gtt: Genera
         return columnVariable.op(relop, ctx.expr().accept(this))
     }
 
-    private fun getsBinaryOperator(op: String): SBinaryOperator? {
+    private fun getsBinaryOperator(op: String): SBinaryOperator {
         when (op) {
             "<=" -> return SBinaryOperator.LESS_EQUAL
             ">=" -> return SBinaryOperator.GREATER_EQUAL
@@ -96,7 +96,7 @@ class ExprVisitor(private val columnVariable: SVariable, private val gtt: Genera
             ">" -> return SBinaryOperator.GREATER_THAN
             "<>", "!=" -> return SBinaryOperator.NOT_EQUAL
         }
-        return null
+        throw IllegalStateException("$op not found as an binary operator for SMV")
     }
 
     override fun visitInterval(ctx: CellExpressionParser.IntervalContext): SMVExpr {
@@ -125,7 +125,7 @@ class ExprVisitor(private val columnVariable: SVariable, private val gtt: Genera
     override fun visitCompare(ctx: CellExpressionParser.CompareContext): SMVExpr {
         val op = getsBinaryOperator(ctx.op.text)
         return SBinaryExpression(ctx.left.accept(this),
-                op!!, ctx.right.accept(this))
+                op, ctx.right.accept(this))
     }
 
     override fun visitMod(ctx: CellExpressionParser.ModContext): SMVExpr {
@@ -179,8 +179,9 @@ class ExprVisitor(private val columnVariable: SVariable, private val gtt: Genera
                 variable
         } else {
             if (isReference)
-                throw IllegalExpressionException("You referenced a variable $varText, but it is not found as a defined io-variable.")
-            SLiteral(ENUM_TYPE, varText)
+                throw IllegalExpressionException("You referenced a variable $varText, " +
+                        "but it is not found as a defined io-variable.")
+            SLiteral(varText, ENUM_TYPE)
         }
     }
 
@@ -221,6 +222,6 @@ class ExprVisitor(private val columnVariable: SVariable, private val gtt: Genera
     }
 
     companion object {
-        private val ENUM_TYPE = SMVType.EnumType(LinkedList())
+        private val ENUM_TYPE = EnumType(LinkedList())
     }
 }

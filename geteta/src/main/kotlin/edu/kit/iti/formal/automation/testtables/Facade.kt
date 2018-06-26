@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.testtables
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.AnyInt
 import edu.kit.iti.formal.automation.datatypes.DataTypes
+import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
@@ -34,9 +35,12 @@ import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.SReference
 import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
+import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.automation.visitors.Visitor
+import edu.kit.iti.formal.smv.EnumType
+import edu.kit.iti.formal.smv.SMVType
+import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.SMVModule
-import edu.kit.iti.formal.smv.ast.SMVType
 import edu.kit.iti.formal.smv.ast.SVariable
 import org.antlr.v4.runtime.CharStreams
 import java.io.File
@@ -53,47 +57,10 @@ object Facade {
     }
 
     @Throws(IOException::class)
-    fun readProgram(optionValue: String): TopLevelElements {
+    fun readProgram(optionValue: String): PouElements {
         val a = IEC61131Facade.file(CharStreams.fromFileName(optionValue))
         IEC61131Facade.resolveDataTypes(a)
-        resolveEnumsAndSetInts(a)
         return a
-    }
-
-    private fun resolveEnumsAndSetInts(a: TopLevelElements) {
-        val astVisitor = object : AstVisitor<Unit>() {
-            lateinit var global: Scope
-
-            override fun visit(decl: ProgramDeclaration) {
-                this.global = decl.scope.parent
-            }
-
-            override fun visit(declaration: VariableDeclaration) {
-                if (declaration.dataType is AnyInt) {
-                    declaration.dataType = DataTypes.INT
-                    if (declaration.init != null && declaration.init is Literal) {
-                        val l = declaration.init as Literal?
-                        l!!.dataType = DataTypes.INT
-                    }
-                }
-            }
-
-            override fun visit(literal: Literal) {
-                if (!literal.isDataTypeExplicit && literal.dataType is AnyInt) {
-                    literal.isDataTypeExplicit = true
-                    literal.dataType = DataTypes.INT
-                } else {
-                    if (literal.dataType == null) {
-                        val dt = literal.dataTypeName
-                        if (dt != null && !dt.isEmpty()) {
-                            val a = global.resolveDataType(dt)
-                            literal.dataType = a
-                        }
-                    }
-                }
-            }
-        }
-        a.accept<Unit>(astVisitor as Visitor<*>)
     }
 
     fun delay(ref: SReference): DelayModuleBuilder {
@@ -129,22 +96,34 @@ object Facade {
         return adapter.isVerified
     }
 
-    fun createSuperEnum(code: TopLevelElements): SMVType {
-        val sec = SuperEnumCreator()
-        code.accept<Void>(sec)
-        return sec.getType()
+    fun createSuperEnum(scope: Scope) : EnumType {
+        val allowedValues =
+                scope.dataTypes.values()
+                        .filter { it is EnumerationTypeDeclaration }
+                        .map { it as EnumerationTypeDeclaration }
+                        .flatMap { it.allowedValues.map { it.text } }
+        return EnumType(allowedValues)
     }
 
+    fun createSuperEnum(code: PouElements): SMVType {
+        val scope = Utils.findProgram(code)?.scope
+        if(scope !=null)
+            return createSuperEnum(code)
+        throw IllegalStateException("No program found in given source code")
+    }
+/*
     private class SuperEnumCreator : AstVisitor<Unit?>() {
-        private val type = SMVType.EnumType(ArrayList())
+        override fun defaultVisit(obj: Any): Unit? = null
+        private val seq = ArrayList<String>()
+        private val type = EnumType(seq)
 
         fun getType(): SMVType {
             return type
         }
 
         override fun visit(etd: EnumerationTypeDeclaration): Unit? {
-            type.values.addAll(etd.allowedValues.map { it.text })
+            seq.addAll(etd.allowedValues.map { it.text })
             return null
         }
-    }
+    }*/
 }

@@ -1,35 +1,23 @@
 import org.unbrokendome.gradle.plugins.xjc.XjcGenerate
 
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.2.30"
     id 'org.unbroken-dome.xjc' version '1.1.3'
-    id 'io.franzbecker.gradle-lombok' version '1.11'
-    id "com.github.hierynomus.license" version "0.14.0"
-
     //coverage
-    id 'net.saliman.cobertura' version '2.3.1'
-    id 'com.github.kt3k.coveralls' version '2.8.2'
-//    id "io.github.ddimtirov.codacy" version "0.1.0"
+    //id 'net.saliman.cobertura' version '2.3.1'
+    //id 'com.github.kt3k.coveralls' version '2.8.2'
+//id "io.github.ddimtirov.codacy" version "0.1.0"
 }
 
-apply plugin: 'java'
-apply plugin: 'kotlin'
-apply plugin: 'maven'
 apply plugin: 'antlr'
-apply plugin: 'idea'
-//apply plugin: 'application'
 
-ext.kotlin_version = '1.2.30'
+//apply plugin: 'application'
 group = 'edu.kit.iti.formal'
-version = '0.6.0-SNAPSHOT'
+version = '0.7.0-SNAPSHOT'
 //mainClassName = "edu.kit.iti.formal.automation.testtables.ExTeTa"
 
 description = """
     Generalized Test Table
 """
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 def antlrOutputDir = file("build/generated-src/antlr")
 def xjcOutputDir = file("build/generated-src/xjc")
@@ -44,20 +32,15 @@ repositories {
 
 dependencies {
     compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
-    compile group: 'commons-io', name: 'commons-io', version: '2.5'
-    compile group: 'edu.kit.iti.formal', name: 'iec61131lang', version: '1.5.0-SNAPSHOT'
-    compile group: 'edu.kit.iti.formal', name: 'iec-symbex', version: '1.5.0-SNAPSHOT'
-    compile group: 'edu.kit.iti.formal', name: 'smv-model', version: '1.5.0-SNAPSHOT'
-    testCompile 'junit:junit:4.12'
+    compile project(':iec-symbex')
     antlr group: 'org.antlr', name: 'antlr4', version: 4.7
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile 'com.github.jferard:fastods:0.4.1'
 }
 
 sourceSets {
     main {
         java {
-            srcDirs antlrOutputDir, xjcOutputDir
+            srcDirs "src/main/java", xjcOutputDir, antlrOutputDir
         }
     }
 }
@@ -98,6 +81,7 @@ task xjcGenerateReport(type: XjcGenerate) {
 compileJava.dependsOn xjcGenerateExteta
 compileJava.dependsOn xjcGenerateReport
 
+/*
 license {
     mapping("java", "PHP")
     mapping("kt", "PHP")
@@ -112,8 +96,9 @@ license {
 }
 
 //Checks does not work
-licenseMain.enabled=false
-licenseTest.enabled=false
+licenseMain.enabled = false
+licenseTest.enabled = false
+*/
 
 task jarDist(type: Jar) {
     classifier = "exe"
@@ -138,10 +123,10 @@ task run(type: JavaExec) {
     }
 }
 
-// coverage
+/* coverage
 cobertura.coverageFormats = ['html', 'xml'] // coveralls plugin depends on xml format report
 tasks.coveralls {
     //dependsOn 'check'
 }
-
+*/
 

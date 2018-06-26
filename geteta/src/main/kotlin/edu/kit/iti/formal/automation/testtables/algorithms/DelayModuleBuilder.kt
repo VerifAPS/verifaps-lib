@@ -19,11 +19,11 @@
  */
 package edu.kit.iti.formal.automation.testtables.algorithms
 
+import edu.kit.iti.formal.smv.ModuleType
+import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.ast.SAssignment
 import edu.kit.iti.formal.smv.ast.SMVModule
-import edu.kit.iti.formal.smv.ast.SMVType
 import edu.kit.iti.formal.smv.ast.SVariable
-import java.lang.String
 
 /**
  * created on 15.12.16
@@ -33,32 +33,32 @@ import java.lang.String
  */
 class DelayModuleBuilder(private val variable: SVariable, cycles: Int) : Runnable {
     val historyLength: Int
-    private val datatype: SMVType?
-    var moduleType: SMVType = SMVType.Module("...")
-    val module = SMVModule()
+    private val dataType: SMVType?
+    var moduleType: SMVType = ModuleType("...")
+    val module = SMVModule("...")
 
     init {
 
         historyLength = Math.abs(cycles)
         assert(historyLength > 0)
-        datatype = variable.datatype
+        dataType = variable.dataType
         module.name = String.format("History_%d_of_%s", historyLength, variable.name)
 
-        if (datatype == null)
-            throw IllegalArgumentException("No datatype given")
+        if (dataType == null)
+            throw IllegalArgumentException("No dataType given")
 
     }
 
     override fun run() {
         // one module parameter
-        val mp = SVariable("val", datatype)
-        module.moduleParameter.add(mp)
+        val mp = SVariable("val", dataType!!)
+        module.moduleParameters.add(mp)
 
         // state variables
         val vars = arrayOfNulls<SVariable>(historyLength + 1)
         vars[0] = mp
         for (i in 1..historyLength) {
-            val v = SVariable("_$$i", datatype)
+            val v = SVariable("_$$i", dataType)
             vars[i] = v
             module.stateVars.add(v)
         }
@@ -66,11 +66,11 @@ class DelayModuleBuilder(private val variable: SVariable, cycles: Int) : Runnabl
         // next($<i>) = $<i-1>
         for (i in 1..vars.size) {
             module.nextAssignments.add(
-                    SAssignment(vars[i], vars[i - 1])
+                    SAssignment(vars[i]!!, vars[i - 1]!!)
             )
         }
 
         // type
-        moduleType = SMVType.Module(module.name, variable)
+        moduleType = ModuleType(module.name, variable)
     }
 }
