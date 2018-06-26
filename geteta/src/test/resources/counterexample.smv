@@ -1,0 +1,13 @@
+MODULE main
+IVAR
+        x : signed word[4];
+
+VAR
+        s : unsigned word[100];
+
+
+INVARSPEC s!=0d100_0;
+
+ASSIGN
+init(s) := 0d100_1;
+next(s) := unsigned( signed(s) + resize(x,100) );

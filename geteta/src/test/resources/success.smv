@@ -1,0 +1,8 @@
+MODULE main
+VAR dbz : boolean;
+
+INVARSPEC ! dbz;
+
+ASSIGN
+init(dbz) := FALSE;
+next(dbz) := FALSE;

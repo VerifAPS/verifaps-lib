@@ -1,0 +1,63 @@
+<!--
+
+    geteta
+
+    Copyright (C) 2016-2018 -- Alexander Weigl <weigl@kit.edu>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public
+    License along with this program.  If not, see
+    <http://www.gnu.org/licenses/gpl-3.0.html>.
+
+-->
+<test-table xmlns="http://formal.iti.kit.edu/exteta-1.1" version="1.1">
+    <variables>
+        <variable io="input" name="i" data-type="BOOLEAN"/>
+        <variable io="output" name="o" data-type="BOOLEAN"/>
+    </variables>
+    <steps>
+        <step duration="[1,1]">
+            <cell>T</cell>
+            <cell>F</cell>
+        </step>
+        <step duration="[1,1]">
+            <cell>T</cell>
+            <cell>F</cell>
+        </step>
+        <block>
+            <step duration="[1,1]">
+                <cell>T</cell>
+                <cell>F</cell>
+            </step>
+            <step duration="omega">
+                <cell>T</cell>
+                <cell>F</cell>
+            </step>
+            <step duration="[1,1]">
+                <cell>T</cell>
+                <cell>F</cell>
+            </step>
+            <step duration="[1,1]">
+                <cell>T</cell>
+                <cell>F</cell>
+            </step>
+        </block>
+        <step duration="[1,1]">
+            <cell>T</cell>
+            <cell>F</cell>
+        </step>
+        <step duration="[1,1]">
+            <cell>T</cell>
+            <cell>F</cell>
+        </step>
+    </steps>
+</test-table>
