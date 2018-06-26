@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
+import edu.kit.iti.formal.automation.analysis.MaintainInitialValues
 import edu.kit.iti.formal.automation.analysis.RegisterDataTypes
 import edu.kit.iti.formal.automation.analysis.ResolveDataTypes
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
@@ -33,6 +34,7 @@ import edu.kit.iti.formal.automation.st.ast.Expression
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.StatementList
 import edu.kit.iti.formal.automation.st.ast.Top
+import edu.kit.iti.formal.automation.visitors.Visitable
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -140,14 +142,28 @@ object IEC61131Facade {
         //val rr = ResolveReferences(scope)
         elements.accept(fdt)
         elements.accept(rdt)
+        elements.accept(MaintainInitialValues())
         //elements.accept(rr)
         return scope
     }
+
+    fun resolveDataTypes(scope: Scope = Scope.defaultScope(), vararg elements: Visitable): Scope {
+        val fdt = RegisterDataTypes(scope)
+        val rdt = ResolveDataTypes(scope)
+        //val rr = ResolveReferences(scope)
+        elements.forEach { it.accept(fdt) }
+        elements.forEach { it.accept(rdt) }
+        elements.forEach { it.accept(MaintainInitialValues()) }
+        //elements.accept(rr)
+        return scope
+    }
+
 
     fun getParser(s: String): IEC61131Parser {
         return getParser(CharStreams.fromString(s))
     }
 
     fun file(resource: InputStream) = file(CharStreams.fromStream(resource, Charset.defaultCharset()))
+
 }
 

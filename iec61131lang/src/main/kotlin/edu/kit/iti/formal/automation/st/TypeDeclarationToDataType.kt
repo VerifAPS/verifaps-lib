@@ -7,14 +7,18 @@ import edu.kit.iti.formal.automation.st.util.AstVisitor
 import java.math.BigInteger
 
 class TypeDeclarationToDataType(val scope: Scope) : AstVisitor<AnyDt?>() {
-    override fun defaultVisit(obj: Any) = throw IllegalArgumentException("$obj is not a type declaration")
+    override fun defaultVisit(obj: Any) = throw IllegalArgumentException("$obj is not handled")
+
+    override fun visit(rtd : ReferenceTypeDeclaration)
+            = ReferenceDt(rtd.refTo.accept(this)!!)
 
     override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration)
          = EnumerateType(enumerationTypeDeclaration)
 
     override fun visit(stringTypeDeclaration: StringTypeDeclaration): AnyDt {
         //val stringType = IECString
-        return stringTypeDeclaration.baseType.obj!!
+        //TODO
+        return IECString.WSTRING
     }
 
     override fun visit(structureTypeDeclaration: StructureTypeDeclaration): AnyDt {
@@ -40,7 +44,9 @@ class TypeDeclarationToDataType(val scope: Scope) : AstVisitor<AnyDt?>() {
 
 
     override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration): AnyDt {
-        val at = ArrayType(arrayTypeDeclaration.name, arrayTypeDeclaration.baseType.obj!!, arrayTypeDeclaration.ranges)
+        val at = ArrayType(arrayTypeDeclaration.name,
+                arrayTypeDeclaration.baseType.obj!!,
+                arrayTypeDeclaration.ranges)
         return at
     }
 }

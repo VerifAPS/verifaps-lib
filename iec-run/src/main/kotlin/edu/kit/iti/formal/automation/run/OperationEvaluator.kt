@@ -31,11 +31,11 @@ object OperationEvaluator {
      */
     public fun normalizeInt(value: VAnyInt): VAnyInt {
         val (type, v) = value
-        if(type.isValid(v)) return value
+        if (type.isValid(v)) return value
         //if negative and unsigned -> offset value into positive region
         val mask = BigInteger.valueOf(2).pow(type.bitLength).subtract(BigInteger.valueOf(1))
         if (!type.isSigned && value.value < BigInteger.ZERO) {
-            TODO("make positive")
+            return VAnyInt(type, -v) //TODO not correct overflow
         }
         var newValue = value.value
         while (newValue > type.upperBound) {

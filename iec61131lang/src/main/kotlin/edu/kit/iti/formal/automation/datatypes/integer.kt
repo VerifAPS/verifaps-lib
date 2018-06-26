@@ -13,11 +13,10 @@ open class AnyInt(var bitLength: kotlin.Int = 0, var isSigned: Boolean = false) 
 
     open val lowerBound: BigInteger
         get() {
-            if (isSigned)
+            if (!isSigned)
                 return BigInteger.ZERO
-            else {
+            else
                 return BigInteger.ONE.shiftLeft(bitLength - 1).negate()
-            }
         }
 
     constructor(bitLength: kotlin.Int) : this(bitLength, true)

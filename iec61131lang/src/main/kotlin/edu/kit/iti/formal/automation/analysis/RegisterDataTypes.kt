@@ -15,6 +15,10 @@ class RegisterDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
 
     override fun defaultVisit(obj: Any) {}
 
+    override fun visit(elements: PouElements) {
+        super.visit(elements)
+    }
+
     override fun visit(pd: ProgramDeclaration) {
         scope.registerProgram(pd)
         goIntoScope(pd)
@@ -26,7 +30,7 @@ class RegisterDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
         scope.registerFunctionBlock(fbd)
         goIntoScope(fbd)
         fbd.actions.forEach { scope.registerAction(it) }
-        fbd.methods.forEach { scope.registerMethod(it); }
+        fbd.methods.forEach { scope.registerMethod(it); it.scope.parent = scope }
         goOutoScope()
     }
 
@@ -63,9 +67,8 @@ class RegisterDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
     override fun visit(clazz: ClassDeclaration) {
         scope.registerClass(clazz)
         goIntoScope(clazz)
-        clazz.methods.forEach { scope.registerMethod(it) }
+        clazz.methods.forEach { scope.registerMethod(it); it.scope.parent = scope }
         goOutoScope()
-        return super.visit(clazz)
     }
 
     override fun visit(interfaceDeclaration: InterfaceDeclaration) {

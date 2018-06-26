@@ -22,100 +22,140 @@
 
 package edu.kit.iti.formal.automation.st0.trans
 
+import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.RecordType
+import edu.kit.iti.formal.automation.datatypes.values.VStruct
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
 import edu.kit.iti.formal.automation.st.util.AstTraversal
+import edu.kit.iti.formal.automation.st.util.setAll
 import edu.kit.iti.formal.automation.st0.STSimplifier
-import edu.kit.iti.formal.automation.visitors.Visitable
-import edu.kit.iti.formal.automation.visitors.Visitor
 import java.util.*
 
 /**
  * @author Augusto Modanese
- */
-class StructEmbedding : ST0Transformation {
-    private var state: STSimplifier.State? = null
-
+ * @author Alexander Weigl
+ * */
+object StructEmbedding : ST0Transformation {
     override fun transform(state: STSimplifier.State) {
-        this.state = state
-        process(state.functions.values)
-        process(state.theProgram!!)
+        val se = FindDeclaredStructs()
+        state.theProgram?.accept(se)
+        state.functionBlocks.forEach { _, f -> f.accept(se) }
+        state.functions.forEach { _, f -> f.accept(se) }
     }
+}
 
-    private fun process(visitables: Collection<Visitable>) {
-        visitables.forEach { this.process(it) }
-    }
+private class FindDeclaredStructs
+    : AstTraversal() {
+    override fun defaultVisit(obj: Any) {}
 
-    private fun process(visitable: Visitable) {
-        val structEmbeddingVisitor = StructEmbeddingVisitor()
-        visitable.accept(structEmbeddingVisitor)
-        for (renameVisitor in structEmbeddingVisitor.renameVisitors) {
-            state!!.functions.values.forEach { f -> f.accept(renameVisitor) }
-            state!!.theProgram!!.accept(renameVisitor)
+    override fun visit(functionDeclaration: FunctionDeclaration) = process(functionDeclaration)
+    override fun visit(fbd: FunctionBlockDeclaration) = process(fbd)
+    override fun visit(pd: ProgramDeclaration) = process(pd)
+
+
+    internal fun process(visitable: PouExecutable) {
+        val structVars = visitable.scope.variables.filter { it.dataType is RecordType }
+        if (structVars.isEmpty()) return
+
+        var body = visitable.stBody!!.clone()
+        for (vd in structVars) {
+            body = embedStruct(visitable.scope, vd, body)
         }
+        visitable.stBody = body
+        embedStruct(structVars, visitable.scope.variables)
     }
 
-    private class StructEmbeddingVisitor : AstTraversal() {
+}
 
-        internal val renameVisitors: MutableList<Visitor<Any>> = ArrayList()
 
-        override fun visit(localScope: Scope) {
-            localScope
-                    .filter { it.dataType is RecordType }
-                    .forEach {
-                        val struct = it.dataType as RecordType
-                        struct.fields.forEach { field ->
-                            localScope.add(createStructVariable(field, it))
-                        }
-                        renameVisitors.add(StructRenameVisitor(it.name, struct))
-                        localScope.asMap().remove(it.name)
-                    }
-        }
-
-        private fun createStructVariable(field: VariableDeclaration,
-                                         structVariable: VariableDeclaration): VariableDeclaration {
-            val initialization = structVariable.typeDeclaration!!.initialization as StructureInitialization?
-            val newVariable = VariableDeclaration(structVariable.name + "$" + field.name,
-                    structVariable.type or field.type,
-                    field.dataType!!)
-            newVariable.typeDeclaration!!.baseType.obj = field.dataType!!
-            if (initialization != null)
-                newVariable.typeDeclaration!!.setInit(initialization.initValues[field.name])
-            return newVariable
-        }
+private fun embedStruct(scope: Scope, vd: VariableDeclaration, body: StatementList): StatementList = body.accept(StructEmbeddingVisitor(scope, vd)) as StatementList
+private fun embedStruct(structVars: List<VariableDeclaration>, scope: VariableScope) {
+    scope.removeAll(structVars)
+    for (sv in structVars) {
+        scope.addAll(createStructVariables(sv))
     }
+}
 
-    private class StructRenameVisitor(private val structName: String,
-                                      private val structType: RecordType) : AstMutableVisitor() {
-
-        override fun visit(invocation: Invocation): Expression {
-            for (parameter in ArrayList<InvocationParameter>(invocation.parameters)) {
-                if (parameter.expression is SymbolicReference) {
-                    val symbolicReference = parameter.expression as SymbolicReference
-                    if (symbolicReference.identifier == structName && !symbolicReference.hasSub()) {
-                        // Found structure being passed as parameter
-                        invocation.parameters.remove(parameter)
-                        for (field in structType.fields)
-                            invocation.addParameter(InvocationParameter(
-                                    if (parameter.name != null)
-                                        "${parameter.name}$${field.name}"
-                                    else
-                                        null,
-                                    parameter.isOutput,
-                                    SymbolicReference("$structName$${field.name}")))
-                    }
-                }
+fun createStructVariables(sv: VariableDeclaration): Collection<VariableDeclaration> {
+    when (sv.dataType) {
+        is RecordType -> { // recursion for struct, => list of variables + prefix
+            val rt = sv.dataType as RecordType
+            val (rtv, rv) = sv.initValue as VStruct
+            return rt.fields.flatMap {
+                createStructVariables(it)
+            }.map {
+                val v = rv.fieldValues[it.name]
+                if (v != null && it.initValue == null)
+                    it.initValue = v
+                it.name = "${sv.name}$${it.name}"
+                it.type = sv.type
+                it
             }
-            return super.visit(invocation)
+        }
+        else -> {
+            val newVariable = sv.clone() // just clone, prefix in caller
+            return Collections.singleton(newVariable)
+        }
+    }
+}
+
+
+private class StructEmbeddingVisitor(val scope: Scope, val vd: VariableDeclaration) : AstMutableVisitor() {
+    override fun visit(invocation: Invocation): Expression {
+        val newParameter = ArrayList<InvocationParameter>()
+        for (parameter in invocation.parameters) {
+            val expr = parameter.expression
+            if (expr is SymbolicReference && expr.identifier == vd.name) {
+                newParameter.addAll(expandParameters(parameter,
+                        vd.dataType as RecordType,
+                        expr))
+                // Found structure being passed as parameter
+                newParameter.remove(parameter)
+            } else newParameter.add(parameter)
+        }
+        invocation.parameters.setAll(newParameter)
+        return invocation
+    }
+
+    private fun expandParameters(parameter: InvocationParameter,
+                                 rt: RecordType,
+                                 expr: SymbolicReference)
+            : Collection<InvocationParameter> {
+        var path = expr.toPath()
+        path = path.subList(1, path.size)
+        var subFields = rt.fields
+        for (it in path) {
+            val sub = subFields[it]
+                    ?: throw IllegalStateException("Try to access a composed variable, but inner field not found.")
+            if (sub.dataType is RecordType)
+                subFields = (sub.dataType as RecordType).fields
+            else {
+                // paramter ends in a single value
+                return Collections.singleton(
+                        InvocationParameter(
+                                if (parameter.name != null) "${parameter.name}"
+                                else null,
+                                parameter.isOutput,
+                                SymbolicReference(expr.toPath().joinToString("$"))))
+            }
+            break
         }
 
-        override fun visit(symbolicReference: SymbolicReference): Expression {
-            return if (symbolicReference.identifier == structName && symbolicReference.hasSub())
-                SymbolicReference(structName + "$" + symbolicReference.sub!!.identifier)
-            else super.visit(symbolicReference)
+        return subFields.map {
+            InvocationParameter(
+                    if (parameter.name != null) "${parameter.name}$${it.name}"
+                    else null,
+                    parameter.isOutput,
+                    SymbolicReference("${expr.toPath().joinToString()}$${it.name}"))
         }
+    }
+
+    override fun visit(symbolicReference: SymbolicReference): Expression {
+        return if (symbolicReference.identifier == vd.name && symbolicReference.hasSub())
+            SymbolicReference(symbolicReference.toPath().joinToString("$"))
+        else super.visit(symbolicReference)
     }
 }
 

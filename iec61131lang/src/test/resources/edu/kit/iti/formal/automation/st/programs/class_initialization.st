@@ -30,7 +30,7 @@ END_CLASS
 PROGRAM MyProgram
   VAR
     student_id_card : ID_Card := (id := 42);
-    student : Student := (id := student_id_card, name := "Toby");
+    student : Student := (id := (id:=42), name := "Toby");
     fake_student : Student := (id_card := null, name := "Victor");
     verif : Verifier;
   END_VAR

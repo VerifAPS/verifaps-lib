@@ -6,6 +6,7 @@ import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue
 import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.automation.st.util.AstVisitor
 import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
 
 /**
@@ -45,6 +46,11 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
             vd.accept(this)
         }
     }
+
+    /*
+    override fun visit(init : IdentifierInitializer) {
+
+    }*/
 
     override fun visit(classDeclaration: ClassDeclaration) {
         if (classDeclaration.parent.identifier != null) {
@@ -91,16 +97,15 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
 
         } catch (e: DataTypeNotDefinedException) {
         }
-
-
     }
+
 
     override fun visit(literal: Literal) {
         try {
             when (literal) {
                 is IntegerLit -> {
                     literal.dataType.resolve(scope::resolveDataType0)
-                    if(!literal.dataType.isIdentified)
+                    if (!literal.dataType.isIdentified)
                         literal.dataType.obj = INT
                 }
                 is RealLit -> literal.dataType.resolve(scope::resolveDataType0)
@@ -110,6 +115,7 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
                         literal.dataType.obj = scope.resolveEnumByValue(literal.value)
                     }
                 }
+                is StringLit -> literal.dataType.resolve(scope::resolveDataType0)
                 is BitLit -> literal.dataType.resolve(scope::resolveDataType0)
             }
         } catch (e: ClassCastException) {
@@ -121,12 +127,20 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
     }
 
     override fun visit(it: VariableDeclaration) {
-        super.visit(it)
+        //super.visit(it)
+        it.typeDeclaration?.accept(this)
+        it.dataType = it.typeDeclaration?.getDataType(scope)
+    }
+}
 
-        it.dataType = it.typeDeclaration!!.getDataType(scope)
-        it.initValue = it.init?.getValue()
-        if (it.initValue == null && it.dataType != null) {
-            it.initValue = DefaultInitValue.getInit(it.dataType!!)
+class MaintainInitialValues : AstVisitor<Unit>() {
+    override fun defaultVisit(obj: Any) {}
+    override fun visit(vd: VariableDeclaration) {
+        if (vd.initValue != null) return
+        vd.initValue = vd.init?.getValue()
+        if (vd.initValue == null && vd.dataType != null) {
+            vd.initValue = DefaultInitValue.getInit(vd.dataType!!)
         }
     }
+
 }

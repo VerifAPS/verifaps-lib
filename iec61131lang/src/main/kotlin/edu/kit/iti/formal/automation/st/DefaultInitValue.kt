@@ -43,6 +43,8 @@ object DefaultInitValue : InitValueTranslator {
         override fun defaultVisit(obj: Any): Value<*, *> = throw IllegalArgumentException("unsupported data type: $obj")
 
 
+        override fun visit(reference: ReferenceDt): Value<*, *> = VNULL
+
         override fun visit(anyInt: AnyInt): Value<*, *> {
             return VAnyInt(anyInt, BigInteger.ZERO)
         }
@@ -94,6 +96,10 @@ object DefaultInitValue : InitValueTranslator {
             }
         }
 
+        override fun visit(interfaceDataType: InterfaceDataType): Value<*, *> {
+            return VNULL
+        }
+
         override fun visit(functionBlockDataType: FunctionBlockDataType): Value<*, *> {
             return functionBlockDataType.asRecord().accept(this)
         }
@@ -101,7 +107,12 @@ object DefaultInitValue : InitValueTranslator {
         override fun visit(recordType: RecordType): Value<*, *> {
             val s = VStruct(recordType, RecordValue())
             recordType.fields.forEach {
-                s.value.fieldValues[it.name] = it.initValue!!
+                s.value.fieldValues[it.name] =
+                        when {it.initValue != null -> it.initValue!!
+                            it.init != null -> it.init?.getValue()!!
+                            it.dataType != null -> it.dataType?.accept(this)!!
+                            else -> throw IllegalStateException("Could not determine initial value for variable: $it")
+                        }
             }
             return s
         }
@@ -124,7 +135,7 @@ object EvaluateInitialization : AstVisitor<Value<*, *>>() {
     override fun defaultVisit(obj: Any) = TODO()
     override fun visit(arrayinit: ArrayInitialization): Value<*, *> {
         val v = arrayinit.initValues.map { it.accept(this) }
-        TODO()
+        return VArray(ArrayType(v[0].dataType, arrayListOf()), MultiDimArrayValue(v))
     }
 
     override fun visit(si: StructureInitialization): Value<*, *> {

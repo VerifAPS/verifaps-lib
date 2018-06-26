@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.st
  */
 
 import com.google.common.collect.HashMultimap
+import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.ArrayType
 import edu.kit.iti.formal.automation.datatypes.IECString
 import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue
@@ -57,11 +58,11 @@ class StructuredTextPrinter
 
     override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration) {
         sb.append("ARRAY[")
-        arrayTypeDeclaration.ranges.forEachIndexed {i,it->
+        arrayTypeDeclaration.ranges.forEachIndexed { i, it ->
             it.start.accept(this)
             sb.append("..")
             it.stop.accept(this)
-            if(i<arrayTypeDeclaration.ranges.size-1)
+            if (i < arrayTypeDeclaration.ranges.size - 1)
                 sb.append(", ")
         }
         sb.append("] OF ")
@@ -325,7 +326,8 @@ class StructuredTextPrinter
      * {@inheritDoc}
      */
     override fun visit(invocation: Invocation) {
-        sb.append(invocation.calleeName).append("(")
+        invocation.callee.accept(this)
+        sb.append("(")
 
         var params = false
         for (entry in invocation.parameters) {
@@ -344,8 +346,7 @@ class StructuredTextPrinter
 
         if (params)
             sb.deleteLast(2)
-        sb.append(");")
-
+        sb.append(")")
     }
 
     /**
@@ -371,34 +372,32 @@ class StructuredTextPrinter
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) {
         sb.append("FUNCTION_BLOCK ")
 
-        /*
-        if (functionBlockDeclaration.isFinal())
-            sb.append("FINAL ");
-        if (functionBlockDeclaration.isAbstract_())
-            sb.append("ABSTRACT ");
-        */
+
+        if (functionBlockDeclaration.isFinal)
+            sb.append("FINAL ")
+        if (functionBlockDeclaration.isAbstract)
+            sb.append("ABSTRACT ")
 
         sb.append(functionBlockDeclaration.name)
 
-        /*String parent = functionBlockDeclaration.getParent().getName();
-        if (parent != null)
-            sb.append(" EXTENDS ").append(parent);
+        if (functionBlockDeclaration.parent.identifier != null) {
+            sb.append(" EXTENDS ").append(functionBlockDeclaration.parent.identifier!!)
+        }
 
-        String interfaces = functionBlockDeclaration.getInterfaces().stream()
-                .map(RefTo::getName)
-                .collect(Collectors.joining(", "));
-        if (!interfaces.isEmpty())
-            sb.append(" IMPLEMENTS ").append(interfaces);
-        */
-
+        if (functionBlockDeclaration.interfaces.isNotEmpty()) {
+            val interf = functionBlockDeclaration.interfaces
+                    .map { it.identifier!! }
+                    .joinToString(", ")
+            sb.append(" IMPLEMENTS ").append(interf);
+        }
         sb.increaseIndent().nl()
         functionBlockDeclaration.scope.accept(this)
         sb.nl()
 
-        /*if (!functionBlockDeclaration.getMethods().isEmpty()) {
-            functionBlockDeclaration.getMethods().forEach(m -> m.accept(this));
-            sb.nl();
-        }*/
+        if (functionBlockDeclaration.methods.isNotEmpty()) {
+            functionBlockDeclaration.methods.forEach { it.accept(this) }
+            sb.nl()
+        }
 
         if (!functionBlockDeclaration.actions.isEmpty()) {
             functionBlockDeclaration.actions.forEach { v -> v.accept(this) }
@@ -522,9 +521,7 @@ class StructuredTextPrinter
      * {@inheritDoc}
      */
     override fun visit(returnStatement: ReturnStatement) {
-        sb.appendIdent()
-        sb.append("RETURN;")
-
+        sb.nl().append("RETURN;")
     }
 
     /**
@@ -568,7 +565,7 @@ class StructuredTextPrinter
     override fun visit(fbc: InvocationStatement) {
         sb.nl()
         fbc.invocation.accept(this)
-
+        sb.append(";")
     }
 
     /**
@@ -593,11 +590,10 @@ class StructuredTextPrinter
      */
     override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration) {
         sb.append(simpleTypeDeclaration.baseType.identifier!!)
-        if (simpleTypeDeclaration.initialization != null) {
+        /*if (simpleTypeDeclaration.initialization != null) {
             sb.append(" := ")
             simpleTypeDeclaration.initialization!!.accept(this)
-        }
-
+        }*/
     }
 
     override fun visit(structureTypeDeclaration: StructureTypeDeclaration) {
@@ -619,10 +615,10 @@ class StructuredTextPrinter
         sb.append(" .. ")
         subRangeTypeDeclaration.range!!.stop.accept(this)
         sb.append(")")
-        if (subRangeTypeDeclaration.initialization != null) {
+        /*if (subRangeTypeDeclaration.initialization != null) {
             sb.append(" := ")
             subRangeTypeDeclaration.initialization!!.accept(this)
-        }
+        }*/
         sb.append(";")
 
     }
@@ -711,7 +707,7 @@ class StructuredTextPrinter
     }
 
     override fun visit(localScope: Scope) {
-        val variables = LookupList(localScope.variables)
+        val variables = VariableScope(localScope.variables)
         val varType = HashMultimap.create<Int, VariableDeclaration>(3, variables.size / 3 + 1)
         variables.forEach { v -> varType.put(v.type, v) }
 
@@ -748,6 +744,10 @@ class StructuredTextPrinter
                 if (vd.init != null) {
                     sb.append(" := ")
                     vd.init!!.accept(this)
+                } else if (vd.initValue != null) {
+                    sb.append(" := ")
+                    val (dt,v) = vd.initValue as Value<*,*>
+                    sb.append(dt.repr(v))
                 }
                 sb.append(";")
             }

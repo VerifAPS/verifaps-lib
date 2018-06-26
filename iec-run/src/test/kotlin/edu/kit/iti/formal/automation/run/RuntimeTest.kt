@@ -171,7 +171,7 @@ class RuntimeTest {
         assertEquals(VAnyInt(INT, counter), exec.lastState["counter"])
 
         val execTime = arrayListOf<Long>()
-        for (i in 1..10000.toLong()) {
+        for (i in 1..1000.toLong()) {
             val startTime = System.nanoTime()
             val state = exec.executeCycle(
                     "I" to VAnyInt(INT, i))

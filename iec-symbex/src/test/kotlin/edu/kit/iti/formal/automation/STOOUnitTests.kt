@@ -1,4 +1,4 @@
-/*
+package edu.kit.iti.formal.automation/*
  * #%L
  * iec61131lang
  * %%

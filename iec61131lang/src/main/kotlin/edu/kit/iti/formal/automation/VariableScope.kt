@@ -25,6 +25,7 @@ package edu.kit.iti.formal.automation
 import com.sun.org.apache.xpath.internal.operations.Variable
 import edu.kit.iti.formal.automation.st.Cloneable
 import edu.kit.iti.formal.automation.st.LookupList
+import edu.kit.iti.formal.automation.st.SetLookupList
 import edu.kit.iti.formal.automation.st.ast.Initialization
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import java.io.Serializable
@@ -35,7 +36,7 @@ import java.util.*
  *
  * @author weigl
  */
-typealias VariableScope = LookupList<VariableDeclaration>
+typealias VariableScope = SetLookupList<VariableDeclaration>
 
 
 /*data class VariableScope(

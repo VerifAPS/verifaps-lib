@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.plcopenxml
  */
 
 import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.st.ArrayLookupList
 import edu.kit.iti.formal.automation.st.LookupList
 import edu.kit.iti.formal.automation.st.ast.*
 import org.jdom2.Document
@@ -91,7 +92,7 @@ class PCLOpenXMLBuilder(private val filename: File) {
         private val xpathFactory = XPathFactory.instance()
 
         private fun buildActions(e: Element): LookupList<ActionDeclaration> {
-            val map = LookupList<ActionDeclaration>()
+            val map = ArrayLookupList<ActionDeclaration>()
             val actions = xpathFactory.compile("./actions/action", Filters.element())
             val elements = actions.evaluate(e)
             for (action in elements) {

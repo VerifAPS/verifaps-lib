@@ -40,7 +40,7 @@ import java.util.*
  * Created by weigl on 26.11.16.
  */
 open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
-    override fun defaultVisit(obj: Any) = TODO()
+    override fun defaultVisit(obj: Any) = throw IllegalStateException("Symbolic Executioner does not handle $obj")
 
     //region getter and setters
     var scope: Scope? = Scope.defaultScope()
@@ -87,7 +87,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
             }*/
             return varCache.computeIfAbsent(vd.name) { this.typeTranslator.translate(vd) }
         } catch (e: NullPointerException) {
-            throw UnknownDatatype("Datatype not given/inferred for variable " + vd.name, e)
+            throw UnknownDatatype("Datatype not given/inferred for variable $vd ${vd.dataType}", e)
         }
 
     }
@@ -141,7 +141,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     override fun visit(programDeclaration: ProgramDeclaration): SCaseExpression? {
         scope = programDeclaration.scope
 
-        push(SymbolicState(scope!!.asMap().size))
+        push(SymbolicState())
 
         // initialize root state
         for (vd in scope!!) {
@@ -165,7 +165,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
 
     override fun visit(statements: StatementList): SCaseExpression? {
         for (s in statements) {
-            if (s is ExitStatement) {
+            if (s is ExitStatement || s is ReturnStatement) { //TODO throw exception to handle everything
                 return null
             }
             s.accept(this)
@@ -179,32 +179,27 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
 
     override fun visit(invocation: Invocation): SMVExpr? {
         assert(scope != null)
-        val fd = scope!!.resolveFunction(invocation) ?: throw FunctionUndefinedException(invocation)
+        val fd = scope?.resolveFunction(invocation) ?: throw FunctionUndefinedException(invocation)
 
-//initialize data structure
+        //initialize data structure
         val calleeState = SymbolicState(globalState)
         val callerState = peek()
 
         //region register function name as output variable
-        if (null == fd.scope.getVariable(fd.name)) {//&& fd.getReturnType() != null) {
-            fd.scope.builder()
-                    .baseType(fd.returnType.identifier!!)
-                    .push(VariableDeclaration.OUTPUT)
-                    .identifiers(fd.name)
-                    .create()
+        try {
+            fd.scope.getVariable(fd.name)
+        } catch (e: VariableNotDefinedException) {
+            val vd = VariableDeclaration(fd.name, VariableDeclaration.OUTPUT, fd.returnType.obj!!)
+            vd.initValue = initValueTranslator.getInit(fd.returnType.obj!!)
+            fd.scope.add(vd)
         }
         //endregion
 
         //region local variables (declaration and initialization)
         for (vd in fd.scope.variables) {
             //if (!calleeState.containsKey(vd.getName())) {
-            val td = vd.typeDeclaration
-            if (td != null && td!!.initialization != null) {
-                td!!.initialization!!.accept(this)
-            } else {
-                calleeState[lift(vd)] = this.valueTranslator.translate(
-                        this.initValueTranslator.getInit(vd.dataType!!))
-            }
+            val expr = this.valueTranslator.translate(vd.initValue!!)
+            calleeState[lift(vd)] = expr
             //}
         }
         //endregion
@@ -261,12 +256,10 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         }
 
         //fd.getReturnType() != null
-        calleeState[lift(Objects.requireNonNull<VariableDeclaration>(fd.scope.getVariable(fd.name)))]
-        //: null;
-        return null
+        return calleeState[fd.name]
     }
 
-    //endregion
+//endregion
 
     override fun visit(statement: IfStatement): SCaseExpression? {
         val branchStates = SymbolicBranches()
@@ -327,4 +320,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         return be.accept(this)!!
         //TODO rework case conditions
     }
+
+    //ignore
+    override fun visit(commentStatement: CommentStatement) = null
 }

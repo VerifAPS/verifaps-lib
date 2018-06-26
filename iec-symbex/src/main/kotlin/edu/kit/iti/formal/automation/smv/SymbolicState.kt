@@ -24,18 +24,23 @@ package edu.kit.iti.formal.automation.smv
 
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Created by weigl on 27.11.16.
  */
-class SymbolicState : ConcurrentHashMap<SVariable, SMVExpr> {
+data class SymbolicState(private val map: HashMap<SVariable, SMVExpr> = HashMap())
+    : MutableMap<SVariable, SMVExpr> by map {
+    constructor(m: Map<out SVariable, SMVExpr>) : this() {
+        putAll(m)
+    }
 
-    constructor(initialCapacity: Int, loadFactor: Float) : super(initialCapacity, loadFactor) {}
+    operator fun get(x: String) = this[keys.find { it.name.equals(x, true) }]
 
-    constructor(initialCapacity: Int) : super(initialCapacity) {}
-
-    constructor() {}
-
-    constructor(m: Map<out SVariable, SMVExpr>) : super(m) {}
+    override fun toString(): String {
+        val sb = StringBuffer()
+        map.entries.joinTo(sb, prefix = "{", postfix = "}") { (k, v) ->
+            "${k.name}=${v.repr()}"
+        }
+        return sb.toString()
+    }
 }

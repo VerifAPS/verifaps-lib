@@ -126,7 +126,6 @@ interface ITraversal<T> {
  *
  */
 open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
-
     override fun traverse(assignmentStatement: AssignmentStatement) {
         assignmentStatement.expression.accept(visitor)
         assignmentStatement.location.accept(visitor)
@@ -288,7 +287,8 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
     }
 
     override fun traverse(structureInitialization: StructureInitialization) {
-        structureInitialization.initValues.values.forEach { v -> v.accept(visitor) }
+        structureInitialization.initValues
+                .values.forEach { v -> v.accept(visitor) }
     }
 
     override fun traverse(clazz: ClassDeclaration) {
@@ -517,6 +517,7 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
     }
 
 
+
     override fun traverse(forStatement: ForStatement) {
         forStatement.start = forStatement.start.accept(visitor) as Expression
         forStatement.statements = forStatement.statements.accept(visitor) as StatementList
@@ -546,7 +547,7 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
     }
 
     override fun traverse(parameter: InvocationParameter) {
-        parameter.expression = parameter.expression!!.accept(visitor) as Expression
+        parameter.expression = parameter.expression.accept(visitor) as Expression
     }
 
     fun <U : Visitable> visitList(seq: MutableCollection<U>): Collection<U> = seq.map { it.accept(visitor) as U }
@@ -858,22 +859,22 @@ abstract class AstVisitor<T> : DefaultVisitorNN<T>() {
 
     override fun visit(invocation: Invocation): T {
         traversalPolicy.traverse(invocation)
-        return super<DefaultVisitorNN>.visit(invocation)
+        return super.visit(invocation)
     }
 
     override fun visit(parameter: InvocationParameter): T {
         traversalPolicy.traverse(parameter)
-        return super<DefaultVisitorNN>.visit(parameter)
+        return super.visit(parameter)
     }
 
     override fun visit(invocation: InvocationStatement): T {
         traversalPolicy.traverse(invocation)
-        return super<DefaultVisitorNN>.visit(invocation)
+        return super.visit(invocation)
     }
 
     override fun visit(stringTypeDeclaration: StringTypeDeclaration): T {
         traversalPolicy.traverse(stringTypeDeclaration)
-        return super<DefaultVisitorNN>.visit(stringTypeDeclaration)
+        return super.visit(stringTypeDeclaration)
     }
 
     override fun visit(structureInitialization: StructureInitialization): T {

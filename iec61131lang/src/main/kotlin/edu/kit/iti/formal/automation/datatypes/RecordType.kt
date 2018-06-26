@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.datatypes
  */
 
 import edu.kit.iti.formal.automation.VariableScope
+import edu.kit.iti.formal.automation.st.ArrayLookupList
 import edu.kit.iti.formal.automation.st.LookupList
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 
@@ -32,7 +33,7 @@ import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
  * @author weigl
  * @version $Id: $Id
  */
-data class RecordType(val fields: VariableScope = LookupList())
+data class RecordType(val fields: VariableScope = VariableScope())
     : AnyDt() {
 
     fun addField(name: String, dataType: AnyDt)

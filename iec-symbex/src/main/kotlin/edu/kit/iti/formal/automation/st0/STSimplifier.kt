@@ -55,7 +55,7 @@ class STSimplifier(inputElements: PouElements) {
         transformations.add(LoopUnwinding.transformation)
         transformations.add(TimerToCounter.INSTANCE)
         transformations.add(ArrayEmbedder())
-        transformations.add(StructEmbedding())
+        transformations.add(StructEmbedding)
         //transformations.add(SFCResetReplacer.getINSTANCE());
         transformations.add(RemoveActionsFromProgram())
         transformations.add(ConstantEmbedder())  // EXPERIMENTAL

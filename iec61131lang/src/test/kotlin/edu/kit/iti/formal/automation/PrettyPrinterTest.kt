@@ -61,11 +61,10 @@ object PrettyPrinterTest {
         println(printed)
         try {
             val newTle = IEC61131Facade.file(CharStreams.fromString(printed))
-            IEC61131Facade.resolveDataTypes(newTle)
+            //IEC61131Facade.resolveDataTypes(newTle)
             for (i in 0 until Math.min(tle.size, newTle.size)) {
-                //Assert.assertEquals(tle[i], newTle[i])
-                Assert.assertEquals(tle[i].toString(), newTle[i].toString())
-
+                Assert.assertEquals(tle[i], newTle[i])
+                //Assert.assertEquals(tle[i].toString(), newTle[i].toString())
             }
             Assert.assertEquals(tle, newTle)
         } catch (e: ErrorReporter.IEC61131ParserException) {
@@ -73,7 +72,7 @@ object PrettyPrinterTest {
                     e.print(printed.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray(), "\n---\n")
             )
         } finally {
-            System.err.println(printed)
+           //System.err.println(printed)
         }
     }
 

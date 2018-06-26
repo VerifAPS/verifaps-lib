@@ -22,6 +22,8 @@
 package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.datatypes.AnyInt
+import edu.kit.iti.formal.automation.datatypes.INT
+import edu.kit.iti.formal.automation.datatypes.UINT
 import edu.kit.iti.formal.automation.datatypes.values.VAnyInt
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -38,18 +40,12 @@ class OperationEvaluatorTest {
 
     @Test
     fun normalizeIntTest() {
-        val a = AnyInt.getDataTypeFor(7, false)
-        val b = AnyInt.getDataTypeFor(15, false)
-        val c = AnyInt.getDataTypeFor(15, true)
-
-        println("using type ${a} with lowerBound ${a.lowerBound} and upperBound ${a.upperBound}")
-        println("using type ${b} with lowerBound ${b.lowerBound} and upperBound ${b.upperBound}")
         assertEquals(
-                VAnyInt(a, BigInteger.valueOf(-4)),
-                OperationEvaluator.normalizeInt(VAnyInt(a, BigInteger.valueOf(4))))
+                VAnyInt(INT, BigInteger.valueOf(4)),
+                OperationEvaluator.normalizeInt(VAnyInt(INT, 4)))
         assertEquals(
-                VAnyInt(b, BigInteger.valueOf(-8)),
-                OperationEvaluator.normalizeInt(VAnyInt(b, BigInteger.valueOf(8)))
+                VAnyInt(UINT, 8),
+                OperationEvaluator.normalizeInt(VAnyInt(UINT, -8))
         )
     }
 

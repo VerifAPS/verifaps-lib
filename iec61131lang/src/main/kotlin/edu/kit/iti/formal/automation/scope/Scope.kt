@@ -4,6 +4,7 @@ import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException
+import edu.kit.iti.formal.automation.st.ArrayLookupList
 import edu.kit.iti.formal.automation.st.Cloneable
 import edu.kit.iti.formal.automation.st.Identifiable
 import edu.kit.iti.formal.automation.st.LookupList
@@ -19,21 +20,22 @@ import kotlin.collections.ArrayList
  * @author Alexander Weigl
  * @version 1 (13.06.14)
  */
-data class Scope(
-        var programs: Namespace<ProgramDeclaration> = Namespace<ProgramDeclaration>(),
-        var functionBlocks: Namespace<FunctionBlockDeclaration> = Namespace<FunctionBlockDeclaration>(),
-        var functions: Namespace<FunctionDeclaration> = Namespace<FunctionDeclaration>(),
-        var dataTypes: Namespace<TypeDeclaration> = Namespace<TypeDeclaration>(),
-        var functionResolvers: MutableList<FunctionResolver> = LinkedList(),
-        var types: TypeScope = TypeScope.builtin(),
-        var classes: Namespace<ClassDeclaration> = Namespace<ClassDeclaration>(),
-        var interfaces: Namespace<InterfaceDeclaration> = Namespace<InterfaceDeclaration>(),
-        val variables: VariableScope = LookupList(),
-        val actions: Namespace<ActionDeclaration> = Namespace(),
-        val methods: Namespace<MethodDeclaration> = Namespace()
-) : Visitable, Iterable<VariableDeclaration>, Cloneable {
+data class Scope(val variables: VariableScope = VariableScope())
+    : Visitable, Iterable<VariableDeclaration>, Cloneable {
     override fun iterator(): Iterator<VariableDeclaration> = variables.iterator()
     private val allowedEnumValues = HashMap<String, EnumerateType>()
+
+    var programs: Namespace<ProgramDeclaration> = Namespace<ProgramDeclaration>()
+    var functionBlocks: Namespace<FunctionBlockDeclaration> = Namespace<FunctionBlockDeclaration>()
+    var functions: Namespace<FunctionDeclaration> = Namespace<FunctionDeclaration>()
+    var dataTypes: Namespace<TypeDeclaration> = Namespace<TypeDeclaration>()
+    var functionResolvers: MutableList<FunctionResolver> = LinkedList()
+    var types: TypeScope = TypeScope.builtin()
+    var classes: Namespace<ClassDeclaration> = Namespace<ClassDeclaration>()
+    var interfaces: Namespace<InterfaceDeclaration> = Namespace<InterfaceDeclaration>()
+    val actions: Namespace<ActionDeclaration> = Namespace()
+    val methods: Namespace<MethodDeclaration> = Namespace()
+
 
     var parent: Scope? = null
         set(parent) {
@@ -165,40 +167,29 @@ data class Scope(
         if (types.containsKey(name))
             return types[name]
 
-        val a = functionBlocks.containsKey(name)
-        val b = dataTypes.containsKey(name)
-        val c = classes.containsKey(name)
-        val d = interfaces.containsKey(name)
+        val a = resolveFunctionBlock(name)
+        val b = dataTypes.lookup(name)
+        val c = resolveClass(name)
+        val d = resolveInterface(name)
 
         //if (a && b || a && c || b && c) {
-        if (a && b || b && c) {
+        val ambigue = arrayListOf(a, b, c, d)
+                .map { if (it != null) 1 else 0 }
+                .sum() > 1
+
+        if (ambigue) {
             System.err.println("Ambiguity in Name Resolution for: $name")
         }
 
-        val q: AnyDt?
-        if (a) {
-            q = FunctionBlockDataType(functionBlocks.lookup(name)!!)
-            types[name] = q
-            return q
+        val q = when {
+            a != null -> FunctionBlockDataType(a)
+            b != null -> b.getDataType(this)!!
+            c != null -> ClassDataType.ClassDt(c)
+            d != null -> InterfaceDataType(d)
+            else -> null
         }
-
-        if (b) {
-            q = dataTypes.lookup(name)!!.getDataType(this)!!
-            types[name] = q
-            return q
-        }
-
-        if (c) {
-            val cd = classes.lookup(name)!!
-            q = ClassDataType.ClassDt(cd)
-            types[name] = q
-            return q
-        }
-
-        if (d) {
-            q = InterfaceDataType(interfaces.lookup(name)!!)
-            types[name] = q
-            return q
+        if (q != null) {
+            types[name] = q; return q
         }
 
         //Reference this seems to be the wrong place
@@ -217,7 +208,7 @@ data class Scope(
         if (this.parent != null)
             return this.parent!!.resolveDataType(name)
 
-        throw DataTypeNotDefinedException("Could not find: $name")
+        throw DataTypeNotDefinedException("Could not find data type for name: $name")
         //return null;
     }
 
@@ -313,7 +304,7 @@ data class Scope(
 }
 
 class Namespace<T : Identifiable>() where T : Cloneable {
-    private val map: LookupList<T> = LookupList()
+    private val map: LookupList<T> = ArrayLookupList()
     internal var parent: Supplier<Namespace<T>>? = null
 
     fun streamAll(): Stream<T> =
@@ -328,8 +319,7 @@ class Namespace<T : Identifiable>() where T : Cloneable {
 
     internal fun lookup(key: String): T? {
         val v = map[key]
-        if (v != null) return v
-        return if (parent?.get() != null) parent!!.get().lookup(key) else null
+        return v ?: parent?.get()?.lookup(key)
     }
 
     internal fun register(key: String, obj: T) {

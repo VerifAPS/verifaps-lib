@@ -35,8 +35,7 @@ import edu.kit.iti.formal.smv.ast.*
  * @version 1 (15.04.17)
  */
 class DefaultOperationMap : OperationMap {
-    override fun translateBinaryOperator(left: SMVExpr,
-                                         operator: BinaryOperator, right: SMVExpr): SMVExpr {
+    override fun translateBinaryOperator(left: SMVExpr, operator: BinaryOperator, right: SMVExpr): SMVExpr {
         if (operator == SBinaryOperator.DIV) {
             return div(left, right)
         }
