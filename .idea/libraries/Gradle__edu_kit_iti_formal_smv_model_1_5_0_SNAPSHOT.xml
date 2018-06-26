@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: edu.kit.iti.formal:smv-model:1.5.0-SNAPSHOT">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/edu/kit/iti/formal/smv-model/1.5.0-SNAPSHOT/smv-model-1.5.0-SNAPSHOT.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
