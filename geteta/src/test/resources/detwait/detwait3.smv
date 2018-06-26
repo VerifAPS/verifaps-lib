@@ -1,0 +1,69 @@
+MODULE TTable(i, o)
+VAR
+	s1_1 : boolean;
+	s2_1 : boolean;
+	s3_1 : boolean;
+	s4_1 : boolean;
+	s5_1 : boolean;
+	s6_1 : boolean;
+	_$ERROR : boolean;
+	_$SENTINEL : boolean;
+-- end of VAR
+DEFINE
+	s1_fail := s1_in & !s1_out;
+	s1_fwd := s1_in & s1_out;
+	s1_in := TRUE;
+	s1_keep := !s2_fwd & s1_in & s1_out;
+	s1_out := TRUE;
+	s2_fail := s2_in & !s2_out;
+	s2_fwd := s2_in & s2_out;
+	s2_in := 0sd16_1 = i;
+	s2_keep := !(s3_fwd | s4_fwd | s5_fwd | s6_fwd) & s2_in & s2_out;
+	s2_out := 0sd16_1 = o;
+	s3_fail := s3_in & !s3_out;
+	s3_fwd := s3_in & s3_out;
+	s3_in := 0sd16_2 = i;
+	s3_out := 0sd16_2 = o;
+	s4_fail := s4_in & !s4_out;
+	s4_fwd := s4_in & s4_out;
+	s4_in := 0sd16_3 = i;
+	s4_out := 0sd16_3 = o;
+	s5_fail := s5_in & !s5_out;
+	s5_fwd := s5_in & s5_out;
+	s5_in := 0sd16_4 = i;
+	s5_out := 0sd16_4 = o;
+	s6_fail := s6_in & !s6_out;
+	s6_fwd := s6_in & s6_out;
+	s6_in := 0sd16_5 = i;
+	s6_out := 0sd16_5 = o;
+	s_1_1_fail := s1_1 & s1_fail;
+	s_1_1_fwd := s1_1 & s1_fwd;
+	s_2_1_fail := s2_1 & s2_fail;
+	s_2_1_fwd := s2_1 & s2_fwd;
+	s_3_1_fail := s3_1 & s3_fail;
+	s_3_1_fwd := s3_1 & s3_fwd;
+	s_4_1_fail := s4_1 & s4_fail;
+	s_4_1_fwd := s4_1 & s4_fwd;
+	s_5_1_fail := s5_1 & s5_fail;
+	s_5_1_fwd := s5_1 & s5_fwd;
+	s_6_1_fail := s6_1 & s6_fail;
+	s_6_1_fwd := s6_1 & s6_fwd;
+LTLSPEC
+	(G(F(s2_in))) & (G(F(s3_in))) & (G(F(s4_in))) & (G(F(s5_in))) & (G(F(s6_in))) -> (F(!s1_1 & !s2_1 & !s3_1 & !s4_1 & !s5_1 & !s6_1 & !_$ERROR | s_6_1_fwd));
+
+INVARSPEC
+	_$ERROR -> s1_1 | s2_1 | s3_1 | s4_1 | s5_1 | s6_1 | _$SENTINEL;
+
+INIT
+	s1_1 & !s2_1 & !s3_1 & !s4_1 & !s5_1 & !s6_1 & !_$ERROR & !_$SENTINEL;
+ASSIGN
+	next(s1_1) := FALSE | s1_1 & s1_keep;
+	next(s2_1) := s_1_1_fwd | s2_1 & s2_keep;
+	next(s3_1) := s_2_1_fwd;
+	next(s4_1) := s_3_1_fwd | s_2_1_fwd;
+	next(s5_1) := s_3_1_fwd | s_2_1_fwd | s_4_1_fwd;
+	next(s6_1) := s_3_1_fwd | s_2_1_fwd | s_4_1_fwd | s_5_1_fwd;
+	next(_$ERROR) := s_1_1_fail | s_2_1_fail | s_3_1_fail | s_4_1_fail | s_5_1_fail | s_6_1_fail;
+	next(_$SENTINEL) := s_6_1_fwd | _$SENTINEL;
+
+-- end of module TTable

@@ -3,7 +3,11 @@
   <component name="CheckStyle-IDEA">
     <option name="configuration">
       <map>
+<<<<<<< HEAD
         <entry key="checkstyle-version" value="8.7" />
+=======
+        <entry key="checkstyle-version" value="8.4" />
+>>>>>>> 4f502d72346d1ecfc38c00b0840dac66dae6b490
         <entry key="copy-libs" value="false" />
         <entry key="location-0" value="BUNDLED:(bundled):Sun Checks" />
         <entry key="location-1" value="BUNDLED:(bundled):Google Checks" />

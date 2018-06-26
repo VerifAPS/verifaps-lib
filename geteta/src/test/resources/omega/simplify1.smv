@@ -1,0 +1,83 @@
+MODULE TTable(i, o)
+VAR
+	s1_1 : boolean;
+	s2_1 : boolean;
+	s3_1 : boolean;
+	s4_1 : boolean;
+	s5_1 : boolean;
+	s6_1 : boolean;
+	s7_1 : boolean;
+	s8_1 : boolean;
+	_$ERROR : boolean;
+	_$SENTINEL : boolean;
+-- end of VAR
+DEFINE
+	s1_fail := s1_in & !s1_out;
+	s1_fwd := s1_in & s1_out;
+	s1_in := T = i;
+	s1_out := F = o;
+	s2_fail := s2_in & !s2_out;
+	s2_fwd := s2_in & s2_out;
+	s2_in := T = i;
+	s2_out := F = o;
+	s3_fail := s3_in & !s3_out;
+	s3_fwd := s3_in & s3_out;
+	s3_in := T = i;
+	s3_out := F = o;
+	s4_fail := s4_in & !s4_out;
+	s4_fwd := s4_in & s4_out;
+	s4_in := T = i;
+	s4_out := F = o;
+	s5_fail := s5_in & !s5_out;
+	s5_fwd := s5_in & s5_out;
+	s5_in := T = i;
+	s5_out := F = o;
+	s6_fail := s6_in & !s6_out;
+	s6_fwd := s6_in & s6_out;
+	s6_in := T = i;
+	s6_out := F = o;
+	s7_fail := s7_in & !s7_out;
+	s7_fwd := s7_in & s7_out;
+	s7_in := T = i;
+	s7_out := F = o;
+	s8_fail := s8_in & !s8_out;
+	s8_fwd := s8_in & s8_out;
+	s8_in := T = i;
+	s8_out := F = o;
+	s_1_1_fail := s1_1 & s1_fail;
+	s_1_1_fwd := s1_1 & s1_fwd;
+	s_2_1_fail := s2_1 & s2_fail;
+	s_2_1_fwd := s2_1 & s2_fwd;
+	s_3_1_fail := s3_1 & s3_fail;
+	s_3_1_fwd := s3_1 & s3_fwd;
+	s_4_1_fail := s4_1 & s4_fail;
+	s_4_1_fwd := s4_1 & s4_fwd;
+	s_5_1_fail := s5_1 & s5_fail;
+	s_5_1_fwd := s5_1 & s5_fwd;
+	s_6_1_fail := s6_1 & s6_fail;
+	s_6_1_fwd := s6_1 & s6_fwd;
+	s_7_1_fail := s7_1 & s7_fail;
+	s_7_1_fwd := s7_1 & s7_fwd;
+	s_8_1_fail := s8_1 & s8_fail;
+	s_8_1_fwd := s8_1 & s8_fwd;
+LTLSPEC
+	TRUE -> (F(!s1_1 & !s2_1 & !s3_1 & !s4_1 & !s5_1 & !s6_1 & !s7_1 & !s8_1 & !_$ERROR | s_8_1_fwd));
+
+INVARSPEC
+	_$ERROR -> s1_1 | s2_1 | s3_1 | s4_1 | s5_1 | s6_1 | s7_1 | s8_1 | _$SENTINEL;
+
+INIT
+	s1_1 & !s2_1 & !s3_1 & !s4_1 & !s5_1 & !s6_1 & !s7_1 & !s8_1 & !_$ERROR & !_$SENTINEL;
+ASSIGN
+	next(s1_1) := FALSE;
+	next(s2_1) := s_1_1_fwd;
+	next(s3_1) := s_2_1_fwd;
+	next(s4_1) := s_4_1_fwd | s_3_1_fwd;
+	next(s5_1) := FALSE;
+	next(s6_1) := FALSE;
+	next(s7_1) := FALSE;
+	next(s8_1) := FALSE;
+	next(_$ERROR) := s_1_1_fail | s_2_1_fail | s_3_1_fail | s_4_1_fail | s_5_1_fail | s_6_1_fail | s_7_1_fail | s_8_1_fail;
+	next(_$SENTINEL) := FALSE | _$SENTINEL;
+
+-- end of module TTable

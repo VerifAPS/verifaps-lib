@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+<<<<<<< HEAD
   <component name="CommitMessageInspectionProfile">
     <profile version="1.0">
       <inspection_tool class="BodyLimit" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -7,6 +8,8 @@
       <inspection_tool class="SubjectLimit" enabled="true" level="WARNING" enabled_by_default="true" />
     </profile>
   </component>
+=======
+>>>>>>> 4f502d72346d1ecfc38c00b0840dac66dae6b490
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$" vcs="Git" />

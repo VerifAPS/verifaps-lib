@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-table xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="http://formal.iti.kit.edu/exteta-1.0"
+            xsi:schemaLocation="http://formal.iti.kit.edu/exteta-1.0 ../src/main/xsd/exteta-1.0.xsd "
+            name="Ta"
+            version="1.0">
+
+    <variables>
+        <variable data-type="INT" io="input" name="i"/>
+        <variable data-type="INT" io="output" name="o"/>
+    </variables>
+
+    <steps> <!--0-->
+        <step duration="5"><!-- 1 -->
+            <cell>-</cell>
+            <cell>i</cell>
+        </step>
+        <block duration="-"> <!-- 2 -->
+            <step duration="-"> <!-- 3 -->
+                <cell>1</cell>
+                <cell>1</cell>
+            </step>
+            <step duration="2"> <!-- 4 -->
+                <cell>2</cell>
+                <cell>4</cell>
+            </step>
+            <step duration="[1,-]"> <!-- 5 -->
+                <cell>3</cell>
+                <cell>1</cell>
+            </step>
+        </block>
+        <step> <!-- 6 -->
+            <cell>1</cell>
+            <cell>1</cell>
+        </step>
+    </steps>
+</test-table>

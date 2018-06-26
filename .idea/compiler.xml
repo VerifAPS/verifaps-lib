@@ -4,5 +4,12 @@
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
     </annotationProcessing>
+<<<<<<< HEAD
+=======
+    <bytecodeTargetLevel>
+      <module name="geteta_main" target="1.8" />
+      <module name="geteta_test" target="1.8" />
+    </bytecodeTargetLevel>
+>>>>>>> 4f502d72346d1ecfc38c00b0840dac66dae6b490
   </component>
 </project>
