@@ -27,14 +27,14 @@ dokka {
         project(":smv-model").compileKotlin
     }
 
-    sourceDirs = files('smv-model/src/main/kotlin') +\
-            files("iec61131lang/src/main/kotlin") +\
-            files("iec-symbex/src/main/kotlin") +\
-            files("iec-run/src/main/kotlin") +\
-            files("iec-xml/src/main/kotlin") +\
-            files("flycheck/src/main/kotlin") +\
-            files("casestudies/src/main/kotlin") +\
-            files("iec-modularization/src/main/kotlin")
+    sourceDirs = files('smv-model/src/main/kotlin') + \
+             files("iec61131lang/src/main/kotlin") + \
+             files("iec-symbex/src/main/kotlin") + \
+             files("iec-run/src/main/kotlin") + \
+             files("iec-xml/src/main/kotlin") + \
+             files("flycheck/src/main/kotlin") + \
+             files("casestudies/src/main/kotlin") + \
+             files("iec-modularization/src/main/kotlin")
 
     // Use default or set to custom path to cache directory
     // to enable package-list caching
@@ -91,6 +91,7 @@ allprojects {
             downloadSources = true
         }
     }
+
 }
 
 subprojects {
@@ -120,6 +121,7 @@ subprojects {
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
     }
+
     repositories {
         mavenLocal()
         maven { url "http://repo.maven.apache.org/maven2" }
@@ -197,4 +199,6 @@ subprojects {
     //Checks does not work
     licenseMain.enabled = false
     licenseTest.enabled = false
+
+    sourceSets { test { resources { srcDirs "../share/test-resources" } } }
 }
