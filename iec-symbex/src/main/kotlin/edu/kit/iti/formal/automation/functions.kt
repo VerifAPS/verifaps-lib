@@ -31,28 +31,26 @@ import edu.kit.iti.formal.smv.ast.SUnaryOperator
 /**
  * Created by weigl on 26.11.16.
  */
-object Utils {
-    fun getSMVOperator(operator: BinaryOperator) = when (operator.symbol) {
-        "+" -> SBinaryOperator.PLUS
-        "-" -> SBinaryOperator.MINUS
-        "*" -> SBinaryOperator.MUL
-        "/" -> SBinaryOperator.DIV
-        "MOD" -> SBinaryOperator.MOD
-        "AND" -> SBinaryOperator.AND
-        "OR" -> SBinaryOperator.OR
-        "<" -> SBinaryOperator.LESS_THAN
-        "<=" -> SBinaryOperator.LESS_EQUAL
-        ">" -> SBinaryOperator.GREATER_THAN
-        ">=" -> SBinaryOperator.GREATER_EQUAL
-        "=" -> SBinaryOperator.EQUAL
-        "<>" -> SBinaryOperator.NOT_EQUAL
-        else -> throw OperatorNotFoundException("Could not find: " + operator.symbol)
-    }
-
-    fun getSMVOperator(operator: UnaryOperator) =
-            when (operator.symbol) {
-                "NOT" -> SUnaryOperator.NEGATE
-                "-" -> SUnaryOperator.MINUS
-                else -> throw OperatorNotFoundException("Could not find ${operator.symbol}")
-            }
+fun getSMVOperator(operator: BinaryOperator) = when (operator.symbol) {
+    "+" -> SBinaryOperator.PLUS
+    "-" -> SBinaryOperator.MINUS
+    "*" -> SBinaryOperator.MUL
+    "/" -> SBinaryOperator.DIV
+    "MOD" -> SBinaryOperator.MOD
+    "AND" -> SBinaryOperator.AND
+    "OR" -> SBinaryOperator.OR
+    "<" -> SBinaryOperator.LESS_THAN
+    "<=" -> SBinaryOperator.LESS_EQUAL
+    ">" -> SBinaryOperator.GREATER_THAN
+    ">=" -> SBinaryOperator.GREATER_EQUAL
+    "=" -> SBinaryOperator.EQUAL
+    "<>" -> SBinaryOperator.NOT_EQUAL
+    else -> throw OperatorNotFoundException("Could not find: " + operator.symbol)
 }
+
+fun getSMVOperator(operator: UnaryOperator) =
+        when (operator.symbol) {
+            "NOT" -> SUnaryOperator.NEGATE
+            "-" -> SUnaryOperator.MINUS
+            else -> throw OperatorNotFoundException("Could not find ${operator.symbol}")
+        }

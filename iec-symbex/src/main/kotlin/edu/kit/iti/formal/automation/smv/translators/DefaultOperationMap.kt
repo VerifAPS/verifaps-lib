@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.smv.translators
  * #L%
  */
 
-import edu.kit.iti.formal.automation.Utils
+import edu.kit.iti.formal.automation.getSMVOperator
 import edu.kit.iti.formal.automation.operators.BinaryOperator
 import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.smv.SMVFacade
@@ -39,13 +39,13 @@ class DefaultOperationMap : OperationMap {
         if (operator == SBinaryOperator.DIV) {
             return div(left, right)
         }
-        val op = Utils.getSMVOperator(operator)
+        val op = getSMVOperator(operator)
         return SBinaryExpression(left, op, right)
     }
 
     override fun translateUnaryOperator(operator: UnaryOperator,
                                         sub: SMVExpr): SMVExpr {
-        return SUnaryExpression(Utils.getSMVOperator(operator), sub)
+        return SUnaryExpression(getSMVOperator(operator), sub)
     }
 
     /**

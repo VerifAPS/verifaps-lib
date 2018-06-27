@@ -1,7 +1,0 @@
-TYPE
-S : STRUCT
-    A: INT;
-    B: INT:= 3;
-    C: BOOL;
-END_STRUCT;
-END_TYPE
