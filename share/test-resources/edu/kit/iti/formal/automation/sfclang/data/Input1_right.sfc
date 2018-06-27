@@ -1,0 +1,25 @@
+FUNCTION_BLOCK I1R
+
+    VAR_INPUT   i : bool; j :bool; END_VAR
+    VAR_OUTPUT  o : int; END_VAR
+
+    INITIAL_STEP A:
+    END_STEP
+
+
+    STEP Su:
+	Sub_active(N);
+END_STEP
+
+ACTION Sub_active: o := o - 1; END_ACTION
+    STEP Ad:
+	Add_active(N);
+END_STEP
+
+ACTION Add_active: o := o + 1; END_ACTION
+    
+    TRANSITION FROM A  TO Add := i and not j ; END_TRANSITION
+    TRANSITION FROM A  TO Sub := j and not i ; END_TRANSITION
+    TRANSITION FROM Add  TO A := true ; END_TRANSITION
+    TRANSITION FROM Sub  TO A := true ; END_TRANSITION
+END_FUNCTION_BLOCK

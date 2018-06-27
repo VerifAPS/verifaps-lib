@@ -1,0 +1,14 @@
+FUNCTION_BLOCK Types1R
+
+    VAR_OUTPUT 
+        o : uint;
+    END_VAR
+
+    INITIAL_STEP A:
+        A_active(N);
+    END_STEP
+    ACTION A_active
+        o := 257;
+    end_action
+
+END_FUNCTION_BLOCK

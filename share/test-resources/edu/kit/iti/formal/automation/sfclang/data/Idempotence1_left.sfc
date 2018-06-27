@@ -1,0 +1,21 @@
+FUNCTION_BLOCK I1L
+
+    VAR_OUTPUT 
+        o : bool;
+    END_VAR
+    
+    VAR_INPUT
+        i : int;
+    END_VAR
+
+    INITIAL_STEP A:
+        
+    END_STEP
+    
+    TRANSITION FROM A  TO B := true ; END_TRANSITION
+    STEP B:
+	B_active(N);
+END_STEP
+
+ACTION B_active: o := true; END_ACTION
+END_FUNCTION_BLOCK
