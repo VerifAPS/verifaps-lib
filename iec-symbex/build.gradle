@@ -4,3 +4,6 @@ dependencies {
     compile project(':smv-model')
     compile group: 'de.tu-dresden.inf.lat.jsexp', name: 'jsexp', version: '0.2.2'
 }
+
+
+println(sourceSets.test.resources.srcDirs)
