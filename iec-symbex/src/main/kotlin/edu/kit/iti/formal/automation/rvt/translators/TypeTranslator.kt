@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.smv.translators
+package edu.kit.iti.formal.automation.rvt.translators
 
 /*-
  * #%L
@@ -22,22 +22,19 @@ package edu.kit.iti.formal.automation.smv.translators
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.values.Value
-import edu.kit.iti.formal.smv.ast.SLiteral
+import edu.kit.iti.formal.automation.datatypes.AnyDt
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
+import edu.kit.iti.formal.smv.SMVType
+import edu.kit.iti.formal.smv.ast.SVariable
 
 /**
  * @author Alexander Weigl
- * @version 1 (16.10.17)
  */
-class DefaultValueTranslator : ValueTranslator {
-    var tt: TypeTranslator = DefaultTypeTranslator.INSTANCE
+interface TypeTranslator {
+    fun translate(datatype: AnyDt): SMVType
 
-    override fun translate(init: Value<*, *>): SLiteral {
-        return SLiteral.create(init.value)
-                .with(this.tt.translate(init.dataType))
+    open fun translate(vdecl: VariableDeclaration): SVariable {
+        return SVariable.create(vdecl.name).with(translate(vdecl.dataType!!))
     }
 
-    companion object {
-        val INSTANCE: ValueTranslator = DefaultValueTranslator()
-    }
 }

@@ -1,3 +1,6 @@
+apply plugin: "application"
+mainClassName = "edu.kit.iti.formal.automation.FlycheckKt"
+
 description = ''
 dependencies {
     compile project(':iec61131lang')
@@ -10,4 +13,10 @@ dependencies {
 
 task fatJar(type : Jar) {
     with jar
+}
+
+kotlin {
+    experimental {
+        coroutines "error"
+    }
 }

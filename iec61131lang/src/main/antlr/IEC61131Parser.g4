@@ -269,9 +269,11 @@ array_initial_element
 structure_declaration
 :
 	STRUCT
-	(ids += IDENTIFIER COLON tds += type_declaration SEMICOLON)*
+	(ids += varName COLON tds += type_declaration SEMICOLON)*
 	END_STRUCT
 ;
+
+varName: IDENTIFIER;
 
 structure_initialization
 :

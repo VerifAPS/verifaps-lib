@@ -1614,7 +1614,10 @@ data class Position(
         val charInLine: Int = -1,
         val offset: Int = -1) : edu.kit.iti.formal.automation.st.Cloneable {
 
-    constructor(token: Token) : this(token.line, token.charPositionInLine, token.startIndex) {}
+    constructor(token: Token?) : this(token?.line ?: -1,
+            token?.charPositionInLine ?: -1,
+            token?.startIndex ?: -1) {
+    }
 
     public override fun clone() = copy()
 
@@ -1632,7 +1635,7 @@ abstract class Reference : Initialization() {
 class VariableBuilder(val scope: VariableScope) {
     private val stack = Stack<Int>()
     private var initialization: Initialization? = null
-    private var identifiers: List<String>? = null
+    private var identifiers: MutableList<ParserRuleContext> = arrayListOf()
     private var type: TypeDeclaration? = null
     private val pEnd: Position? = null
     private val pStart: Position? = null
@@ -1641,7 +1644,7 @@ class VariableBuilder(val scope: VariableScope) {
 
 
     fun clear(): VariableBuilder {
-        identifiers = null
+        identifiers = ArrayList()
         return this
     }
 
@@ -1724,8 +1727,9 @@ class VariableBuilder(val scope: VariableScope) {
 
 
     fun create(): VariableBuilder {
-        for (id in identifiers!!) {
-            val vd = VariableDeclaration(id, peek(), type!!)
+        for (id in identifiers) {
+            val vd = VariableDeclaration(id.text, peek(), type!!)
+            vd.ruleContext = id
             this.scope.add(vd)
         }
         return this
@@ -1737,15 +1741,12 @@ class VariableBuilder(val scope: VariableScope) {
     }
 
 
-    fun identifiers(ast: List<String>): VariableBuilder {
-        identifiers = ast
+    fun identifiers(ast: List<out ParserRuleContext>): VariableBuilder {
+        identifiers.addAll(ast)
         return this
     }
 
-
-    fun identifiers(vararg functionName: String): VariableBuilder {
-        return identifiers(Arrays.asList(*functionName))
-    }
+    fun identifiers(vararg e: ParserRuleContext) = identifiers(e.toList())
 }
 
 data class VariableDeclaration(
@@ -1910,10 +1911,10 @@ interface HasRuleContext {
     val ruleContext: ParserRuleContext?
 
     val startPosition: Position
-        get() = Position(ruleContext!!.start)
+        get() = Position(ruleContext?.start)
 
     val endPosition: Position
-        get() = Position(ruleContext!!.stop)
+        get() = Position(ruleContext?.stop)
 }
 
 data class Range(val start: IntegerLit, val stop: IntegerLit) : Cloneable {
@@ -1968,7 +1969,7 @@ data class SFCActionQualifier(
         var time: Expression = EMPTY_EXPRESSION
 ) {
     fun hasTime(): Boolean {
-        return qualifier!!.hasTime
+        return qualifier.hasTime
     }
 
     /*fun copy(): SFCActionQualifier {

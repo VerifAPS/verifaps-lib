@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.parser
  * #L%
  */
 
-import com.google.common.collect.Streams
 import edu.kit.iti.formal.automation.datatypes.AnyInt
 import edu.kit.iti.formal.automation.datatypes.IECString
 import edu.kit.iti.formal.automation.datatypes.values.DateAndTimeData
@@ -331,10 +330,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val ast = StructureTypeDeclaration()
         val localScope = Scope()
         gather = localScope.builder()
-        Streams.forEachPair<Token, IEC61131Parser.Type_declarationContext>(ctx.ids.stream(), ctx.tds.stream()
-        ) { id, type ->
-            gather.identifiers(id.text)
-                    .type(type.accept(this) as TypeDeclaration).close()
+        ctx.ids.zip(ctx.tds).forEach { (id, type) ->
+            gather.identifiers(id).type(type.accept(this) as TypeDeclaration).close()
         }
         //gather = null
         ast.fields = localScope.variables
@@ -422,7 +419,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitVar_decl_inner(ctx: IEC61131Parser.Var_decl_innerContext): Any? {
         for (i in 0 until ctx.type_declaration().size) {
-            gather.identifiers(ctx.identifier_list(i).accept(this) as List<String>)
+            gather.identifiers(ctx.identifier_list())
                     .type(ctx.type_declaration(i).accept(this) as TypeDeclaration)
                     .close()
         }

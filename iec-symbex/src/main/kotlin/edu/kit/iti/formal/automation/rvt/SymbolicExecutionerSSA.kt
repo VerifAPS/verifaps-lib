@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.smv
+package edu.kit.iti.formal.automation.rvt
 
 /*-
  * #%L

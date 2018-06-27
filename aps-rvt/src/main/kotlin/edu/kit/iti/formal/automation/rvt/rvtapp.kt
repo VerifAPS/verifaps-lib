@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.smv
+package edu.kit.iti.formal.automation.rvt
 
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.DefaultHelpFormatter

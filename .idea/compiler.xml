@@ -23,6 +23,8 @@
       <module name="iec61131lang_test" target="1.8" />
       <module name="smv-model_main" target="1.8" />
       <module name="smv-model_test" target="1.8" />
+      <module name="web-backend_main" target="1.8" />
+      <module name="web-backend_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -8,7 +8,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/casestudies/casestudies.iml" filepath="$PROJECT_DIR$/.idea/modules/casestudies/casestudies.iml" group="casestudies" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/casestudies/casestudies_main.iml" filepath="$PROJECT_DIR$/.idea/modules/casestudies/casestudies_main.iml" group="casestudies" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/casestudies/casestudies_test.iml" filepath="$PROJECT_DIR$/.idea/modules/casestudies/casestudies_test.iml" group="casestudies" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/flycheck.iml" filepath="$PROJECT_DIR$/.idea/modules/flycheck.iml" group="flycheck" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/flycheck/flycheck.iml" filepath="$PROJECT_DIR$/.idea/modules/flycheck/flycheck.iml" group="flycheck" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/flycheck/flycheck_main.iml" filepath="$PROJECT_DIR$/.idea/modules/flycheck/flycheck_main.iml" group="flycheck" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/flycheck/flycheck_test.iml" filepath="$PROJECT_DIR$/.idea/modules/flycheck/flycheck_test.iml" group="flycheck" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/geteta/geteta.iml" filepath="$PROJECT_DIR$/.idea/modules/geteta/geteta.iml" group="geteta" />
@@ -29,7 +29,10 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/smv-model/smv-model.iml" filepath="$PROJECT_DIR$/.idea/modules/smv-model/smv-model.iml" group="smv-model" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/smv-model/smv-model_main.iml" filepath="$PROJECT_DIR$/.idea/modules/smv-model/smv-model_main.iml" group="smv-model" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/smv-model/smv-model_test.iml" filepath="$PROJECT_DIR$/.idea/modules/smv-model/smv-model_test.iml" group="smv-model" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/verifaps-lib.iml" filepath="$PROJECT_DIR$/.idea/verifaps-lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/verifaps-lib.iml" filepath="$PROJECT_DIR$/.idea/modules/verifaps-lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/web-backend/web-backend.iml" filepath="$PROJECT_DIR$/.idea/modules/web-backend/web-backend.iml" group="web-backend" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/web-backend/web-backend_main.iml" filepath="$PROJECT_DIR$/.idea/modules/web-backend/web-backend_main.iml" group="web-backend" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/web-backend/web-backend_test.iml" filepath="$PROJECT_DIR$/.idea/modules/web-backend/web-backend_test.iml" group="web-backend" />
     </modules>
   </component>
 </project>

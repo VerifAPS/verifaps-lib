@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package edu.kit.iti.formal.automation.smv
+package edu.kit.iti.formal.automation.rvt
 
 import org.junit.Assume
 import org.junit.Test

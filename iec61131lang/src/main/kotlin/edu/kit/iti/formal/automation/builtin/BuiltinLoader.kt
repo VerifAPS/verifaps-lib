@@ -26,10 +26,12 @@ import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import org.apache.commons.io.IOUtils
 import org.slf4j.LoggerFactory
-
 import java.io.IOException
 import java.net.URISyntaxException
+import java.nio.file.FileSystemNotFoundException
+import java.nio.file.FileSystems
 import java.nio.file.Paths
+
 
 /**
  * @author Alexander Weigl
@@ -49,7 +51,13 @@ object BuiltinLoader {
     private fun loadFromClasspath(indexFile: String): PouElements {
         val resource = BuiltinLoader::class.java!!.getResource(indexFile)
                 ?: throw RuntimeException("Could not find $indexFile in classpath.")
-        val p = Paths.get(resource.toURI())
+        val uri = resource.toURI()
+        val p = try {
+            Paths.get(uri)
+        } catch (e: FileSystemNotFoundException) {
+            val zipfs = FileSystems.newFileSystem(uri, mapOf("create" to "true"))
+            Paths.get(uri)
+        }
         val lines = IOUtils.readLines(resource.openStream(), "utf-8")
         val prefix = p.getParent()
         val tle = PouElements()

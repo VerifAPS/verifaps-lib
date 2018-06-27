@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.smv
+package edu.kit.iti.formal.automation.rvt
 
 /*-
  * #%L
@@ -27,7 +27,7 @@ import edu.kit.iti.formal.automation.datatypes.values.VAnyEnum
 import edu.kit.iti.formal.automation.exceptions.*
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.smv.translators.*
+import edu.kit.iti.formal.automation.rvt.translators.*
 import edu.kit.iti.formal.automation.st.DefaultInitValue
 import edu.kit.iti.formal.automation.st.InitValueTranslator
 import edu.kit.iti.formal.automation.st.ast.*

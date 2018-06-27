@@ -144,7 +144,7 @@ object ExTeTa {
 
             if (Report.message.getCounterexample() != null) {
                 /*CounterExampleAnalyzer cea = new CounterExampleAnalyzer(table,
-                        Report.getMessage());
+                        Report.getMessages());
                 cea.run();*/
             }
         }

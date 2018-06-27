@@ -1,0 +1,46 @@
+apply plugin: 'application'
+mainClassName = "edu.kit.iti.formal.automation.web.BackendKt"
+description = ''
+
+ext.ktor_version = '0.9.3'
+
+
+repositories {
+    jcenter()
+    maven { url "https://dl.bintray.com/kotlin/ktor" }
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
+
+dependencies {
+    compile project(':flycheck')
+    compile project(':geteta')
+    compile project(':aps-rvt')
+
+    compile "io.ktor:ktor-server-core:$ktor_version"
+    compile "io.ktor:ktor-server-netty:$ktor_version"
+    compile "io.ktor:ktor-server-core:$ktor_version"
+    compile "io.ktor:ktor-html-builder:$ktor_version"
+    compile "io.ktor:ktor-server-host-common:$ktor_version"
+    compile "io.ktor:ktor-gson:$ktor_version"
+    compile "io.ktor:ktor-locations:$ktor_version"
+    compile "io.ktor:ktor-metrics:$ktor_version"
+    compile "io.ktor:ktor-server-sessions:$ktor_version"
+    compile "io.ktor:ktor-websockets:$ktor_version"
+    testCompile "io.ktor:ktor-server-tests:$ktor_version"
+    testCompile "io.ktor:ktor-server-core:$ktor_version"
+    testCompile "io.ktor:ktor-html-builder:$ktor_version"
+    testCompile "io.ktor:ktor-server-host-common:$ktor_version"
+    testCompile "io.ktor:ktor-gson:$ktor_version"
+    testCompile "io.ktor:ktor-locations:$ktor_version"
+    testCompile "io.ktor:ktor-metrics:$ktor_version"
+    testCompile "io.ktor:ktor-server-sessions:$ktor_version"
+    testCompile "io.ktor:ktor-websockets:$ktor_version"
+    compile "io.ktor:ktor-network-tls:$ktor_version"
+
+    compile group: 'com.xenomachina', name: 'kotlin-argparser', version: '2.0.4'
+}
