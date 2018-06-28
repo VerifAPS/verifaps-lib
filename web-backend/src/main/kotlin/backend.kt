@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.web
 
 import edu.kit.iti.formal.automation.FlycheckRunner
+import edu.kit.iti.formal.automation.rvt.RvtApp
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
@@ -164,14 +165,65 @@ fun Application.geteta() {
 
 }
 
+val rvtAppFolder = File("rvtapps")
 fun Application.rvt() {
     routing {
         post("/equal") {
-            val aps = RvtApp
-
+            try {
+                val code = call.receive<String>()
+                val app = RvtApp.createRvtForSingleSource(code)
+                app.outputFolder = File.createTempFile("rvtapp", "", rvtAppFolder)
+                app.outputFolder.mkdirs()
+                call.respond(RvtResponse(app.nuxmvCommands.commands))
+            } catch (e: Exception) {
+                call.respond(e)
+            }
         }
     }
 }
+
+data class RpcResponse(
+        /** A String specifying the version of the JSON-RPC protocol. MUST be exactly "2.0".*/
+        val jsonrpc: String = "2.0",
+
+        /**
+         * This member is REQUIRED on success.
+         * This member MUST NOT exist if there was an error invoking the method.
+         * The value of this member is determined by the method invoked on the Server.
+         */
+        val result: Any?,
+
+        /**
+         * This member is REQUIRED on error.
+         * This member MUST NOT exist if there was no error triggered during invocation.
+         * The value for this member MUST be an Object as defined in section 5.1.
+         */
+        val error: Any?,
+        /** This member is REQUIRED.
+         * It MUST be the same as the value of the id member in the Request Object.
+         * If there was an error in detecting the id in the Request object(e.g. Parse error/Invalid Request), it MUST be Null.
+         * Either the result member or error member MUST be included, but both members MUST NOT be included.
+         */
+        val id: Int
+)
+
+data class JsonError(
+        /** A Number that indicates the error type that occurred. This MUST be an integer.*/
+        val code: Int,
+        /** A String providing a short description of the error. The message SHOULD be limited to a concise single sentence. */
+        val message: String,
+        /** A Primitive or Structured value that contains additional information about the error.
+         * This may be omitted.
+         * The value of this member is defined by the Server (e.g. detailed error information,
+         *nested errors etc.).
+         */
+        val data: Any?
+)
+
+data class RvtResponse(
+        val commands: Array<out String>
+
+)
 
 fun Application.flycheck() {
     routing {
