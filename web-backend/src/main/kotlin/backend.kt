@@ -102,7 +102,9 @@ fun Application.entry() {
     }*/
 
     install(Routing) {
-        flycheck()
+        basics()
+        geteta()
+        rvt()
     }
 
     routing {
@@ -111,44 +113,6 @@ fun Application.entry() {
             files("static")
         }
         // get("/") { call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain) }
-
-        get("/html-dsl") {
-            call.respondHtml {
-                body {
-                    h1 { +"HTML" }
-                    ul {
-                        for (n in 1..10) {
-                            li { +"$n" }
-                        }
-                    }
-                }
-            }
-        }
-
-
-        get("/json/gson") {
-            call.respond(mapOf("hello" to "world"))
-        }
-
-        post("/form") {
-            val multipart = call.receiveMultipart()
-            call.respondWrite {
-                if (!call.request.isMultipart()) {
-                    appendln("Not a multipart request")
-                } else {
-                    while (true) {
-                        val part = multipart.readPart() ?: break
-                        when (part) {
-                            is PartData.FormItem ->
-                                appendln("FormItem: ${part.name} = ${part.value}")
-                            is PartData.FileItem ->
-                                appendln("FileItem: ${part.name} -> ${part.originalFileName} of ${part.contentType}")
-                        }
-                        part.dispose()
-                    }
-                }
-            }
-        }
 
         install(StatusPages) {
             exception<AuthenticationException> { cause ->
@@ -161,26 +125,6 @@ fun Application.entry() {
     }
 }
 
-fun Application.geteta() {
-
-}
-
-val rvtAppFolder = File("rvtapps")
-fun Application.rvt() {
-    routing {
-        post("/equal") {
-            try {
-                val code = call.receive<String>()
-                val app = RvtApp.createRvtForSingleSource(code)
-                app.outputFolder = File.createTempFile("rvtapp", "", rvtAppFolder)
-                app.outputFolder.mkdirs()
-                call.respond(RvtResponse(app.nuxmvCommands.commands))
-            } catch (e: Exception) {
-                call.respond(e)
-            }
-        }
-    }
-}
 
 data class RpcResponse(
         /** A String specifying the version of the JSON-RPC protocol. MUST be exactly "2.0".*/
@@ -220,28 +164,4 @@ data class JsonError(
         val data: Any?
 )
 
-data class RvtResponse(
-        val commands: Array<out String>
 
-)
-
-fun Application.flycheck() {
-    routing {
-        post("/flycheck") {
-            val code = call.receive<String>()
-            val runner = FlycheckRunner(
-                    Collections.singletonList(CharStreams.fromString(code))
-            )
-            try {
-                runner.run()
-                call.respond(runner.messages)
-            } catch (e: Exception) {
-                call.respondText {
-                    val s = PrintWriter(StringWriter())
-                    e.printStackTrace(s)
-                    s.toString()
-                }
-            }
-        }
-    }
-}

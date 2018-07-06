@@ -11,6 +11,7 @@ import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.smv.NuXMVInvariantsCommand
+import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.smv.NuXMVProcess
 import edu.kit.iti.formal.smv.ast.SMVModule
 import org.antlr.v4.runtime.CharStream
@@ -108,15 +109,14 @@ class RvtApp(var oldVersion: () -> SMVModule,
         return this
     }
 
-    fun verify(): Boolean {
+    fun verify(): NuXMVOutput {
         if (outputSMV != null) {
             val mc = NuXMVProcess(outputSMV!!)
             mc.commands = nuxmvCommands.commands as Array<String>
             mc.executablePath = System.getenv().getOrDefault("NUXMV", "nuxmv")
             mc.outputFile = File(outputFolder, nuxmvOutput)
             mc.workingDirectory = outputFolder
-            val result = mc.call()
-            return result.isVerified
+            return mc.call()
         } else {
             build()
             return verify()
