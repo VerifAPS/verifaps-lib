@@ -20,7 +20,7 @@
 package edu.kit.iti.formal.automation.testtables.model
 
 
-import edu.kit.iti.formal.automation.testtables.schema.IoVariable
+import edu.kit.iti.formal.automation.testtables.model.IoVariable
 import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
@@ -83,7 +83,7 @@ open class State(id: String) : TableNode(id) {
     constructor(id: Int) : this(id.toString())
 
     fun add(v: IoVariable, e: SMVExpr) {
-        val a = if (v.io == "input") inputExpr else outputExpr
+        val a = if (v.io == IoVariableType.INPUT || v.io == IoVariableType.STATE_INPUT) inputExpr else outputExpr
         a.add(e)
     }
 

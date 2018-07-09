@@ -21,7 +21,7 @@ package edu.kit.iti.formal.automation.testtables.builder
 
 
 import edu.kit.iti.formal.automation.testtables.algorithms.DelayModuleBuilder
-import edu.kit.iti.formal.automation.testtables.Facade
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.smv.ast.SVariable
 
 /**
@@ -42,7 +42,7 @@ class BackwardsReferencesTransformer : TableTransformer {
         val b = DelayModuleBuilder(variable, history!!)
         b.run()
         //Add Var
-        val `var` = SVariable(Facade.getHistoryName(variable),
+        val `var` = SVariable(GetetaFacade.getHistoryName(variable),
                 b.moduleType)
         tt!!.tableModule.stateVars.add(`var`)
 

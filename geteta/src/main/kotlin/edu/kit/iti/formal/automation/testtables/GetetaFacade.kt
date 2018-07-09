@@ -21,12 +21,9 @@ package edu.kit.iti.formal.automation.testtables
 
 
 import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.datatypes.AnyInt
-import edu.kit.iti.formal.automation.datatypes.DataTypes
-import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.st.util.AstVisitor
+import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration
+import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.testtables.algorithms.BinaryModelGluer
 import edu.kit.iti.formal.automation.testtables.algorithms.DelayModuleBuilder
 import edu.kit.iti.formal.automation.testtables.io.TableReader
@@ -36,10 +33,8 @@ import edu.kit.iti.formal.automation.testtables.model.SReference
 import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
 import edu.kit.iti.formal.automation.visitors.Utils
-import edu.kit.iti.formal.automation.visitors.Visitor
 import edu.kit.iti.formal.smv.EnumType
 import edu.kit.iti.formal.smv.SMVType
-import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
 import org.antlr.v4.runtime.CharStreams
@@ -48,7 +43,8 @@ import java.io.IOException
 import java.util.*
 import javax.xml.bind.JAXBException
 
-object Facade {
+object GetetaFacade {
+    @JvmStatic
     @Throws(JAXBException::class)
     fun readTable(filename: String): GeneralizedTestTable {
         val tr = TableReader(File(filename))

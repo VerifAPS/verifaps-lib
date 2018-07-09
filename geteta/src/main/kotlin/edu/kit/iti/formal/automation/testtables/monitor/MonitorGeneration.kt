@@ -60,9 +60,9 @@ class MonitorGeneration(internal val gtt: GeneralizedTestTable) : Callable<PouEl
         vars.push(VariableDeclaration.INPUT)
 
         // IOVariables -> VAR_INPUT
-        gtt.ioVariables.values.forEach { v ->
-            vars.identifiers(v.name)
-                    .baseType(v.dataType.value()).create()
+        gtt.ioVariables.forEach { v ->
+            //vars.identifiers(v.name)
+            //        .baseType(v.dataType).create()
         }
 
         // VAR_OUTPUT WARNING : BOOL; END_VAR

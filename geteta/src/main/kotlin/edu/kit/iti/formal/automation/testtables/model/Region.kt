@@ -30,9 +30,6 @@ import java.util.*
  */
 class Region(id: String) : TableNode(id) {
     override var children: MutableList<TableNode> = ArrayList()
-        set(children) {
-            field = this.children
-        }
 
     override val isLeaf: Boolean
         get() = false

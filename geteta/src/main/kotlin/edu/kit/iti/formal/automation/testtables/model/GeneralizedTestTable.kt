@@ -20,30 +20,65 @@
 package edu.kit.iti.formal.automation.testtables.model
 
 
+import edu.kit.iti.formal.automation.datatypes.AnyDt
+import edu.kit.iti.formal.automation.st.ArrayLookupList
+import edu.kit.iti.formal.automation.st.Cloneable
+import edu.kit.iti.formal.automation.st.Identifiable
+import edu.kit.iti.formal.automation.st.SetLookupList
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
-import edu.kit.iti.formal.automation.st.ast.PouElement
+import edu.kit.iti.formal.automation.testtables.algorithms.StateReachability
 import edu.kit.iti.formal.automation.testtables.io.IOFacade
 import edu.kit.iti.formal.automation.testtables.model.options.PropertyInitializer
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
-import edu.kit.iti.formal.automation.testtables.schema.ConstraintVariable
-import edu.kit.iti.formal.automation.testtables.schema.IoVariable
-import edu.kit.iti.formal.automation.testtables.schema.Variable
+import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
-
 import java.util.*
+
+sealed class Variable : Identifiable, Cloneable {
+    abstract override var name: String
+    abstract var dataType: AnyDt
+}
+
+enum class IoVariableType {
+    INPUT, OUTPUT, STATE_INPUT, STATE_OUTPUT
+}
+
+data class IoVariable(
+        override var name: String,
+        override var dataType: AnyDt,
+        var io: IoVariableType) : Variable() {
+    override fun clone() = copy()
+    var realName: String = name
+
+
+    val isInput
+        get() = io == IoVariableType.INPUT || io == IoVariableType.STATE_INPUT
+
+    val isOutput
+        get() = !isInput
+
+}
+
+data class ConstraintVariable(
+        override var name: String,
+        override var dataType: AnyDt,
+        var constraint: SMVExpr = SLiteral.TRUE)
+    : Variable() {
+    override fun clone() = copy()
+}
 
 /**
  * @author Alexander Weigl
  * @version 2
  */
 class GeneralizedTestTable {
-    val ioVariables = LinkedHashMap<String, IoVariable>()
-    private val constraintVariables = HashMap<String, ConstraintVariable>()
+    val ioVariables = ArrayLookupList<IoVariable>()
+    val constraintVariables = SetLookupList<ConstraintVariable>()
     private val variableMap = HashMap<String, SVariable>()
     private val properties = Properties(
             System.getProperties())
-    private val functions = HashMap<String, FunctionDeclaration>()
+    val functions = SetLookupList<FunctionDeclaration>()
     val references = HashMap<SVariable, Int>()
     var region: Region? = null
 
@@ -53,9 +88,6 @@ class GeneralizedTestTable {
         o
     }
     var name: String? = null
-
-    val constraintVariable: Map<String, ConstraintVariable>
-        get() = constraintVariables
 
     fun clearReachability() {
         for (s in this.region!!.flat()) {
@@ -70,15 +102,12 @@ class GeneralizedTestTable {
         }
     }
 
-    fun getIoVariables(): Map<String, IoVariable> {
-        return ioVariables
-    }
-
+    fun getSMVVariable(text: IoVariable): SVariable = getSMVVariable(text.name)
     fun getSMVVariable(text: String): SVariable {
-        variableMap.computeIfAbsent(text) { k ->
+        return variableMap.computeIfAbsent(text) { k ->
             IOFacade.asSMVVariable(getVariable(k))
         }
-        return variableMap[text] ?: error("Looked up non-existing variable.")
+        //return variableMap[text] ?: error("Looked up non-existing variable.")
     }
 
     fun isVariable(text: String) = text in ioVariables || text in constraintVariables
@@ -96,11 +125,11 @@ class GeneralizedTestTable {
     }
 
     fun add(v: IoVariable) {
-        ioVariables[v.name] = v
+        ioVariables += v
     }
 
     fun add(v: ConstraintVariable) {
-        constraintVariables[v.name] = v
+        constraintVariables += v
     }
 
     fun addOption(key: String, value: String) {
@@ -108,21 +137,7 @@ class GeneralizedTestTable {
         //options = null // reset options
     }
 
-    fun addFunctions(file: List<PouElement>) {
-        for (e in file) {
-            if(e is FunctionDeclaration)
-                functions[e.name] = e
-        }
-    }
-
-    fun getIoVariables(i: Int): IoVariable? {
-        var k = 0
-        for (v in ioVariables.values) {
-            if (k++ == i)
-                return v
-        }
-        return null
-    }
+    fun getIoVariables(i: Int): IoVariable = ioVariables[i]
 
     fun getReferences(): Map<SVariable, Int> {
         return references

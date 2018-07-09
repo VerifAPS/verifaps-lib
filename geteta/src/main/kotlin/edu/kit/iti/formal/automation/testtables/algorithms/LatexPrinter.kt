@@ -2,9 +2,9 @@ package edu.kit.iti.formal.automation.testtables.algorithms
 
 import com.google.common.collect.Streams
 import edu.kit.iti.formal.automation.testtables.PrintTable
-import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionBaseVisitor
-import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionLexer
-import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionParser
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import org.antlr.v4.runtime.ParserRuleContext
 import org.apache.commons.lang3.NotImplementedException
 import java.util.*
@@ -14,7 +14,7 @@ import java.util.stream.Stream
  * @author Alexander Weigl
  * @version 1 (01.03.18)
  */
-class LatexPrinter : CellExpressionBaseVisitor<String>() {
+class LatexPrinter : TestTableLanguageBaseVisitor<String>() {
     /*  private static final String LATEX_DONTCARE = " \\dontcare ";
       private static final String LATEX_TRUE = " \\TRUE ";
       private static final String LATEX_FALSE = " \\FALSE ";
@@ -42,7 +42,7 @@ class LatexPrinter : CellExpressionBaseVisitor<String>() {
         }
     }
 
-    override fun visitCell(ctx: CellExpressionParser.CellContext): String {
+    override fun visitCell(ctx: TestTableLanguageParser.CellContext): String {
         return accept(ctx.chunk()).reduce { t, u -> "$t, $u" }.orElse("")
     }
 
@@ -55,40 +55,40 @@ class LatexPrinter : CellExpressionBaseVisitor<String>() {
         return if (x != null) x.accept(this) else ""
     }
 
-    override fun visitChunk(ctx: CellExpressionParser.ChunkContext): String {
+    override fun visitChunk(ctx: TestTableLanguageParser.ChunkContext): String {
         return oneOf(ctx.constant(), ctx.interval(), ctx.expr(),
                 ctx.dontcare(), ctx.singlesided(), ctx.variable())
     }
 
-    override fun visitDontcare(ctx: CellExpressionParser.DontcareContext): String {
+    override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext): String {
         return latex("DONTCARE")
     }
 
-    override fun visitI(ctx: CellExpressionParser.IContext): String {
+    override fun visitI(ctx: TestTableLanguageParser.IContext): String {
         return ctx.text
     }
 
-    override fun visitConstantInt(ctx: CellExpressionParser.ConstantIntContext): String {
+    override fun visitConstantInt(ctx: TestTableLanguageParser.ConstantIntContext): String {
         return oneOf(ctx.i())
     }
 
-    override fun visitConstantTrue(ctx: CellExpressionParser.ConstantTrueContext): String {
+    override fun visitConstantTrue(ctx: TestTableLanguageParser.ConstantTrueContext): String {
         return latex("TRUE")
     }
 
-    override fun visitConstantFalse(ctx: CellExpressionParser.ConstantFalseContext): String {
+    override fun visitConstantFalse(ctx: TestTableLanguageParser.ConstantFalseContext): String {
         return latex("FALSE")
     }
 
-    override fun visitSinglesided(ctx: CellExpressionParser.SinglesidedContext): String {
+    override fun visitSinglesided(ctx: TestTableLanguageParser.SinglesidedContext): String {
         return ctx.relational_operator().accept(this) + " " + ctx.expr().accept(this)
     }
 
-    override fun visitInterval(ctx: CellExpressionParser.IntervalContext): String {
+    override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext): String {
         return "[" + ctx.lower.accept(this) + ", " + ctx.upper.accept(this) + "]"
     }
 
-    override fun visitRelational_operator(ctx: CellExpressionParser.Relational_operatorContext): String {
+    override fun visitRelational_operator(ctx: TestTableLanguageParser.Relational_operatorContext): String {
         when (ctx.text) {
             "<=" -> return "\\leq"
             ">=" -> return "\\geq"
@@ -97,32 +97,32 @@ class LatexPrinter : CellExpressionBaseVisitor<String>() {
         }
     }
 
-    override fun visitMinus(ctx: CellExpressionParser.MinusContext): String {
+    override fun visitMinus(ctx: TestTableLanguageParser.MinusContext): String {
         return "-" + ctx.sub.accept(this)
     }
 
-    override fun visitNegation(ctx: CellExpressionParser.NegationContext): String {
+    override fun visitNegation(ctx: TestTableLanguageParser.NegationContext): String {
         return latex("NEGATION", ctx.sub)
     }
 
-    override fun visitParens(ctx: CellExpressionParser.ParensContext): String {
+    override fun visitParens(ctx: TestTableLanguageParser.ParensContext): String {
         return latex("PARENS", ctx.sub)
     }
 
-    override fun visitCompare(ctx: CellExpressionParser.CompareContext): String {
-        val a = CellExpressionLexer.VOCABULARY.getSymbolicName(ctx.op.type)
+    override fun visitCompare(ctx: TestTableLanguageParser.CompareContext): String {
+        val a = TestTableLanguageLexer.VOCABULARY.getSymbolicName(ctx.op.type)
         return latex("COMPARE_$a", ctx.left, ctx.right)
     }
 
-    override fun visitMod(ctx: CellExpressionParser.ModContext): String {
+    override fun visitMod(ctx: TestTableLanguageParser.ModContext): String {
         return latex("MOD", ctx.left, ctx.right)
     }
 
-    override fun visitMult(ctx: CellExpressionParser.MultContext): String {
+    override fun visitMult(ctx: TestTableLanguageParser.MultContext): String {
         return latex("MULT", ctx.left, ctx.right)
     }
 
-    override fun visitFunctioncall(ctx: CellExpressionParser.FunctioncallContext): String {
+    override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): String {
         return latex("FUNCTION", ctx.n.text, ctx.expr().stream())
     }
 
@@ -134,43 +134,43 @@ class LatexPrinter : CellExpressionBaseVisitor<String>() {
         )
     }
 
-    override fun visitLogicalAnd(ctx: CellExpressionParser.LogicalAndContext): String {
+    override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext): String {
         return latex("LAND", ctx.left, ctx.right)
     }
 
-    override fun visitPlus(ctx: CellExpressionParser.PlusContext): String {
+    override fun visitPlus(ctx: TestTableLanguageParser.PlusContext): String {
         return latex("PLUS", ctx.left, ctx.right)
     }
 
-    override fun visitDiv(ctx: CellExpressionParser.DivContext): String {
+    override fun visitDiv(ctx: TestTableLanguageParser.DivContext): String {
         return latex("DIV", ctx.left, ctx.right)
     }
 
-    override fun visitInequality(ctx: CellExpressionParser.InequalityContext): String {
+    override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext): String {
         return latex("NOTEQUAL", ctx.left, ctx.right)
     }
 
-    override fun visitLogicalXor(ctx: CellExpressionParser.LogicalXorContext): String {
+    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext): String {
         return latex("XOR", ctx.left, ctx.right)
     }
 
-    override fun visitLogicalOr(ctx: CellExpressionParser.LogicalOrContext): String {
+    override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext): String {
         return latex("LOR", ctx.left, ctx.right)
     }
 
-    override fun visitEquality(ctx: CellExpressionParser.EqualityContext): String {
+    override fun visitEquality(ctx: TestTableLanguageParser.EqualityContext): String {
         return latex("EQUAL", ctx.left, ctx.right)
     }
 
-    override fun visitSubstract(ctx: CellExpressionParser.SubstractContext): String {
+    override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext): String {
         return latex("SUB", ctx.left, ctx.right)
     }
 
-    override fun visitVariable(ctx: CellExpressionParser.VariableContext): String {
+    override fun visitVariable(ctx: TestTableLanguageParser.VariableContext): String {
         return PrintTable.escape(ctx.IDENTIFIER().symbol.text) + if (ctx.RBRACKET() != null) "[" + ctx.i().accept(this) + "]" else ""
     }
 
-    override fun visitGuardedcommand(ctx: CellExpressionParser.GuardedcommandContext): String {
+    override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext): String {
         throw NotImplementedException("guarded command to latex is not implemented")
     }
 }

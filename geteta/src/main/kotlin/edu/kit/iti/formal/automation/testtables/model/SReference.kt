@@ -20,7 +20,7 @@
 package edu.kit.iti.formal.automation.testtables.model
 
 
-import edu.kit.iti.formal.automation.testtables.Facade
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.io.Report
 import edu.kit.iti.formal.smv.ast.SVariable
 
@@ -58,7 +58,7 @@ class SReference(var cycles: Int, var variable: SVariable) {
      * @return
      */
     fun asVariable(): SVariable {
-        val newName = Facade.getHistoryName(variable, Math.abs(cycles))
+        val newName = GetetaFacade.getHistoryName(variable, Math.abs(cycles))
         return SVariable(newName, variable.dataType!!)
     }
 }

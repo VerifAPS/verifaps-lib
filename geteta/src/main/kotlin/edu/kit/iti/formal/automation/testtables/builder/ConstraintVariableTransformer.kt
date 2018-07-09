@@ -30,13 +30,13 @@ class ConstraintVariableTransformer : TableTransformer {
     override fun accept(tt: ConstructionModel) {
         val gtt = tt.testTable
         val mt = tt.tableModule
-        for (cv in gtt.constraintVariable.values) {
+        for (cv in gtt.constraintVariables) {
             val svar = gtt.getSMVVariable(cv.name)
             if (cv.dataType == DataType.ENUM) {
                 svar.dataType = tt.superEnumType
             }
             mt.frozenVars.add(svar)
-            mt.initExpr.add(IOFacade.parseCellExpression(cv.constraint, svar, gtt))
+            mt.initExpr.add(cv.constraint)
             //TODO add invar for each frozenvar
         }
     }

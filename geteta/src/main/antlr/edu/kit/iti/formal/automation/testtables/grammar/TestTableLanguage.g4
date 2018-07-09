@@ -1,8 +1,49 @@
-grammar CellExpression;
+grammar TestTableLanguage;
 
 @header{
 }
 
+//structure level
+file  : table*;
+table : 'table' IDENTIFIER '{'
+            signature*
+            freeVariable*
+            opts?
+            group
+            function*
+         '}';
+
+opts : 'options' '{' (kv)*  '}';
+kv: key=IDENTIFIER '=' (constant|variable) osem;
+
+signature : 'var' state='state'? io=('input'|'output')
+    name=IDENTIFIER ('as' newName=IDENTIFIER)?
+    (',' name=IDENTIFIER ('as' newName=IDENTIFIER)?)*
+    ':' dt=IDENTIFIER osem
+;
+
+osem : ';'?;
+
+group : 'group' (id=i)? time? '{' (group|row)* '}';
+
+row : 'row' (id=i)? time? '{' (kc osem)* '}';
+kc: key=IDENTIFIER '=' value=cell;
+time :
+      MINUS #timeDontCare
+    | op=(GREATER_EQUALS | GREATER_THAN) INTEGER  (pflag='>>')? #timeSingleSided
+    | (fixed_interval (pflag='>>')?)           #timeInterval
+    | omega='omega'                           #timeOmega
+    ;
+
+freeVariable:
+    'gvar' name=IDENTIFIER ':' dt=IDENTIFIER ('with' constraint=cell)?
+;
+
+vardt : arg=IDENTIFIER':' dt=IDENTIFIER;
+function : 'function' name=IDENTIFIER '(' vardt (',' vardt)*  ')'
+            ':' rt=IDENTIFIER STCODE ;
+
+//
 cell : chunk (COMMA chunk)*;
 
 chunk :
@@ -76,7 +117,7 @@ fixed_interval :
     ( dc=MINUS
     | LBRACKET a=i COMMA (inf=MINUS | b=i) RBRACKET
     | a=i COMMA (inf=MINUS | b=i)
-    | c=i) EOF
+    | c=i) //EOF
 ;
 
 AND: '&' | 'AND';
@@ -114,6 +155,6 @@ fragment DIGIT: '0' .. '9';
 fragment NUMBER: DIGIT+;
 //FLOAT:   '-'? NUMBER '.' NUMBER?;
 INTEGER: NUMBER;
-
+STCODE : '`' ~[`]* '`';
 
 WS: (' '|'\n'|'\r')+ -> skip;

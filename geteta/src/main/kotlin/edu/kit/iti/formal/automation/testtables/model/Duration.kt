@@ -76,6 +76,11 @@ data class Duration(var lower: Int = 1, var upper: Int = 1) {
     val bound: Int
         get() = Math.max(1, Math.max(lower, upper))
 
+    /**
+     * Progressflag
+     */
+    var pflag: Boolean = false
+
     fun invariant(): Boolean {
         return true//(upper >= lower || isUnbounded()) && lower >= 0;
     }

@@ -21,11 +21,14 @@ package edu.kit.iti.formal.automation.testtables.io
 
 
 import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.testtables.model.Duration
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.automation.testtables.model.Region
-import edu.kit.iti.formal.automation.testtables.model.State
+import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
+import edu.kit.iti.formal.automation.testtables.model.*
 import edu.kit.iti.formal.automation.testtables.schema.*
+import edu.kit.iti.formal.automation.testtables.schema.ConstraintVariable
+import edu.kit.iti.formal.automation.testtables.schema.IoVariable
+import edu.kit.iti.formal.smv.ast.SLiteral
+import edu.kit.iti.formal.smv.ast.SVariable
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.w3c.dom.Element
@@ -72,7 +75,8 @@ class TableReader(private val input: File) {
 
         val func = xml.functions
         if (!func.isEmpty()) {
-            product.addFunctions(IEC61131Facade.file(CharStreams.fromString(func)))
+            val elements = IEC61131Facade.file(CharStreams.fromString(func))
+            elements.forEach { if (it is FunctionDeclaration) product.functions += it }
         }
     }
 
@@ -126,7 +130,7 @@ class TableReader(private val input: File) {
 
         for (i in 0 until product.ioVariables.size) {
             val v = product.getIoVariables(i)
-            val name = v!!.name
+            val name = v.name
 
             val cellContent = get(cells, name)
             s.entryForColumn[name] = cellContent
@@ -162,21 +166,34 @@ class TableReader(private val input: File) {
         Report.debug("%d variables found",
                 xml.variables.variableOrConstraint.size)
 
+        val scope = Scope.defaultScope()
+
         for (o in xml.variables.variableOrConstraint) {
             if (o is IoVariable) {
                 Report.debug("\t %s : %s", o.name, o.dataType)
-                product.add(o)
+                val v = edu.kit.iti.formal.automation.testtables.model.IoVariable(o.name,
+                        scope.resolveDataType(o.dataType.name),
+                        if (o.io == "input") IoVariableType.INPUT else IoVariableType.OUTPUT
+                )
+                product.add(v)
             }
 
             if (o is ConstraintVariable) {
                 Report.debug("\t %s : %s", o.name, o.dataType)
-                product.add(o)
+                val expr = if (o.constraint != null) {
+                    val a = SVariable(o.name)
+                    IOFacade.parseCellExpression(o.constraint, a, product)
+                } else {
+                    SLiteral.TRUE
+                }
+                val v = edu.kit.iti.formal.automation.testtables.model.ConstraintVariable(o.name,
+                        scope.resolveDataType(o.dataType.name), expr)
+                product.add(v)
             }
         }
 
-        product.ioVariables.forEach { k, v ->
-            if (v.dataType == null || v.name == null || v.name
-                            .isEmpty() || v.io == null || v.io.isEmpty())
+        product.ioVariables.forEach { v ->
+            if (v.name.isEmpty())
                 throw IllegalArgumentException(
                         "variable $v is bad")
         }

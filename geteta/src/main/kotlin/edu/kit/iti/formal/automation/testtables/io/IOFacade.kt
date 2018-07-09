@@ -20,29 +20,30 @@
 package edu.kit.iti.formal.automation.testtables.io
 
 
-import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionLexer
-import edu.kit.iti.formal.automation.testtables.grammar.CellExpressionParser
+import edu.kit.iti.formal.automation.datatypes.AnyDt
+import edu.kit.iti.formal.automation.smv.translators.DefaultTypeTranslator
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.automation.testtables.schema.DataType
-import edu.kit.iti.formal.automation.testtables.schema.Variable
 import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
+import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
+import java.io.File
 
 /**
  * Created by weigl on 10.12.16.
  */
 object IOFacade {
-    fun createParser(input: String?): CellExpressionParser {
-        assert(input != null)
-        val lexer = CellExpressionLexer(CharStreams.fromString(input!!))
+    fun createParser(input: CharStream): TestTableLanguageParser {
+        val lexer = TestTableLanguageLexer(input)
         lexer.removeErrorListeners()
         lexer.addErrorListener(ThrowingErrorListener.INSTANCE)
 
-        val parser = CellExpressionParser(CommonTokenStream(lexer))
+        val parser = TestTableLanguageParser(CommonTokenStream(lexer))
 
         parser.removeErrorListeners()
         parser.addErrorListener(ThrowingErrorListener.INSTANCE)
@@ -50,21 +51,32 @@ object IOFacade {
         return parser
     }
 
+    fun createParser(input: String) = createParser(CharStreams.fromString(input))
+
     /**
      * @param cell
      * @param column
      * @param vars
      * @return
      */
-    fun parseCellExpression(cell: String?, column: SVariable,
+    fun parseCellExpression(cell: String, column: SVariable,
                             vars: GeneralizedTestTable): SMVExpr {
-        assert(cell != null)
         val p = createParser(cell).cell()
         val ev = ExprVisitor(column, vars)
         val expr = p.accept(ev)
         Report.debug("parsed: %s to %s", cell, expr)
         return expr
     }
+
+
+    fun parseCellExpression(cell: TestTableLanguageParser.CellContext, column: SVariable,
+                            vars: GeneralizedTestTable): SMVExpr {
+        val ev = ExprVisitor(column, vars)
+        val expr = cell.accept(ev)
+        Report.debug("parsed: %s to %s", cell, expr)
+        return expr
+    }
+
 
     fun parseDuration(duration: String): Duration {
         if (duration.equals("omega", ignoreCase = true)) {
@@ -98,12 +110,28 @@ object IOFacade {
         return d
     }
 
-    fun asSMVVariable(column: Variable): SVariable {
+    fun asSMVVariable(column: edu.kit.iti.formal.automation.testtables.model.Variable): SVariable {
         return SVariable(column.name, getSMVDataType(column.dataType))
     }
 
-    private fun getSMVDataType(dataType: DataType): SMVType {
-        return DataTypeTranslator.INSTANCE.apply(dataType)
+    private fun getSMVDataType(dataType: AnyDt): SMVType {
+        return DefaultTypeTranslator.INSTANCE.translate(dataType)
                 ?: error("Data type $dataType is not supported by DataTypeTranslator")
+    }
+
+
+    @JvmStatic
+    fun parseTable(input: String) = parseTable(CharStreams.fromString(input))
+
+    @JvmStatic
+    fun parseTable(input: File) = parseTable(CharStreams.fromFileName(input.absolutePath))
+
+    @JvmStatic
+    fun parseTable(input: CharStream): GeneralizedTestTable {
+        val parser = createParser(input)
+        val ctx = parser.file()
+        val ttlb = TestTableLanguageBuilder()
+        ctx.accept(ttlb)
+        return ttlb.testTables.get(0)
     }
 }

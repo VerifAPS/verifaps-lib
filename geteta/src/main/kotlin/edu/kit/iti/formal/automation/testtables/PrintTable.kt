@@ -48,7 +48,6 @@ import edu.kit.iti.formal.automation.testtables.algorithms.LatexPrinter
 import edu.kit.iti.formal.automation.testtables.io.IOFacade
 import edu.kit.iti.formal.automation.testtables.io.TableReader
 import edu.kit.iti.formal.automation.testtables.model.*
-import edu.kit.iti.formal.automation.testtables.schema.IoVariable
 import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
@@ -89,14 +88,12 @@ object PrintTable {
 
     @Throws(JAXBException::class)
     private fun print(s: String) {
-        table = Facade.readTable(s)
+        table = GetetaFacade.readTable(s)
         totalNumSteps = table!!.region!!.count()
         fillColumns()
 
-        input = table!!.ioVariables.values
-                .filter { v -> v.io == "input" }
-        output = table!!.ioVariables.values
-                .filter { v -> v.io == "output" }
+        input = table!!.ioVariables.filter { it.isInput }
+        output = table!!.ioVariables.filter { it.isOutput }
 
         val depth = table!!.region!!.depth()
 
@@ -141,7 +138,7 @@ object PrintTable {
     }
 
     private fun fillColumns() {
-        table!!.ioVariables.keys.forEach { k -> columns[k] = ArrayList() }
+        table!!.ioVariables.forEach { columns[it.name] = ArrayList() }
 
         //prefill
         table!!.region!!.flat()
@@ -188,7 +185,6 @@ object PrintTable {
             e.printStackTrace()
             throw e
         }
-
     }
 
     internal fun escape(s: String): String {

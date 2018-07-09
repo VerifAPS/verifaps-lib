@@ -163,9 +163,9 @@ data class Scope(val variables: VariableScope = VariableScope())
 
     internal fun <T : AnyDt?> resolveDataType0(name: String) = resolveDataType(name) as T
 
-    fun resolveDataType(name: String): AnyDt? {
+    fun resolveDataType(name: String): AnyDt {
         if (types.containsKey(name))
-            return types[name]
+            return types[name]!!
 
         val a = resolveFunctionBlock(name)
         val b = dataTypes.lookup(name)

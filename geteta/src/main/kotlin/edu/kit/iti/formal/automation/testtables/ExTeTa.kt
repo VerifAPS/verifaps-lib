@@ -98,7 +98,7 @@ object ExTeTa {
         }
 
         //
-        var table = Facade.readTable(tableFilename)
+        var table = GetetaFacade.readTable(tableFilename)
         val os = OmegaSimplifier(table)
         os.run()
         if (!os.ignored.isEmpty()) {
@@ -109,7 +109,7 @@ object ExTeTa {
 
 
         //
-        val code = Facade.readProgram(codeFilename)
+        val code = GetetaFacade.readProgram(codeFilename)
 
         if (cli.getOptionValue('m') != null)
             when (cli.getOptionValue('m')) {
@@ -127,11 +127,11 @@ object ExTeTa {
             println(stp.string)
         } else {
             val modCode = evaluate(cli.hasOption("no-simplify"), code)
-            val superEnumType = Facade.createSuperEnum(code)
+            val superEnumType = GetetaFacade.createSuperEnum(code)
             val tt = TableTransformation(table,
                     superEnumType)
             val modTable = tt.transform()
-            val mainModule = Facade
+            val mainModule = GetetaFacade
                     .glue(modTable, modCode, table.options)
 
             val modules = LinkedList<SMVModule>()
@@ -139,7 +139,7 @@ object ExTeTa {
             modules.add(modTable)
             modules.add(modCode)
             modules.addAll(tt.model.helperModules)
-            val b = Facade.runNuXMV(tableFilename, modules,
+            val b = GetetaFacade.runNuXMV(tableFilename, modules,
                     table.options.verificationTechnique)
 
             if (Report.message.getCounterexample() != null) {
