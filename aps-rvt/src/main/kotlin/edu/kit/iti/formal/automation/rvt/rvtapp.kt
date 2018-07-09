@@ -1,20 +1,23 @@
-package edu.kit.iti.formal.automation.smv
+package edu.kit.iti.formal.automation.rvt
 
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.DefaultHelpFormatter
 import com.xenomachina.argparser.default
+import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
+import edu.kit.iti.formal.automation.builtin.BuiltinLoader
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.st.ast.PouElements
+import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.smv.NuXMVInvariantsCommand
+import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.smv.NuXMVProcess
 import edu.kit.iti.formal.smv.ast.SMVModule
-import mu.KLogging
+import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.apache.commons.io.FileUtils
 import java.io.File
-import java.io.IOException
 import java.nio.charset.Charset
 
 
@@ -64,8 +67,10 @@ fun main(args: Array<String>) {
     val parser = ArgParser(args, helpFormatter = hf)
     val arguments = RvtArgs(parser)
 
-    val rvtApp = RvtApp(arguments.oldVersion, arguments.newVersion);
-    rvtApp.disableSimplifier = arguments.disableST0Pipeline
+    val rvtApp = RvtApp(
+            TransformationPipeline.create(arguments.oldVersion, arguments.disableST0Pipeline),
+            TransformationPipeline.create(arguments.newVersion, arguments.disableST0Pipeline))
+
     rvtApp.outputFolder = File(arguments.outputDirectory)
     rvtApp.outputSmvName = arguments.outputSMVOutputName
 
@@ -74,10 +79,8 @@ fun main(args: Array<String>) {
         rvtApp.verify()
 }
 
-class RvtApp(var oldVersionFilename: String,
-             var newVersionFilename: String) {
-    companion object : KLogging()
-
+class RvtApp(var oldVersion: () -> SMVModule,
+             var newVersion: () -> SMVModule) {
     var disableSimplifier: Boolean = false
     var outputFolder = File("output")
     var outputSmvName = "module.smv"
@@ -87,11 +90,10 @@ class RvtApp(var oldVersionFilename: String,
     private var outputSMV: File? = null
 
     fun build(): RvtApp {
-        var st2Pipe = TransformationPipeline(disableSimplifier)
-        val oldModule = st2Pipe.run(oldVersionFilename)
-        val newModule = st2Pipe.run(newVersionFilename)
+        val oldModule = oldVersion()
+        val newModule = newVersion()
 
-        logger.info("Bundling modules $oldVersionFilename with $newVersionFilename")
+        Console.info("Bundling modules $oldVersion with $newVersion")
         val rvt = RegressionVerification(
                 newVersion = newModule,
                 oldVersion = oldModule)
@@ -99,7 +101,7 @@ class RvtApp(var oldVersionFilename: String,
 
         outputSMV = File(outputFolder, outputSmvName)
 
-        logger.info("Create ouput folder $outputFolder")
+        Console.info("Create ouput folder $outputFolder")
         outputFolder.mkdirs()
         outputSMV!!.bufferedWriter().use { fw ->
             rvt.writeTo(fw)
@@ -107,48 +109,73 @@ class RvtApp(var oldVersionFilename: String,
         return this
     }
 
-    fun verify(): Boolean {
+    fun verify(): NuXMVOutput {
         if (outputSMV != null) {
             val mc = NuXMVProcess(outputSMV!!)
             mc.commands = nuxmvCommands.commands as Array<String>
             mc.executablePath = System.getenv().getOrDefault("NUXMV", "nuxmv")
             mc.outputFile = File(outputFolder, nuxmvOutput)
             mc.workingDirectory = outputFolder
-            val result = mc.call()
-            return result.isVerified
+            return mc.call()
         } else {
             build()
             return verify()
         }
     }
 
+    companion object {
+        /**
+         * Finds the first two programs in the given code and creates an [RvtApp]
+         * with the other elements.
+         */
+        fun createRvtForSingleSource(code: String): RvtApp {
+            val elements = IEC61131Facade.file(CharStreams.fromString(code))
+            elements.addAll(BuiltinLoader.loadDefault())
+            val (fst, snd) = separatePrograms(elements)
+
+            val aps = RvtApp(
+                    oldVersion = { TransformationPipeline(false).run(fst) },
+                    newVersion = { TransformationPipeline(false).run(snd) })
+
+            return aps
+        }
+    }
+}
+
+fun separatePrograms(elements: PouElements): Pair<PouElements, PouElements> {
+    val (fst, snd) = elements.filter { it is ProgramDeclaration }
+    val copy = PouElements(elements)
+    copy.removeAll { it is ProgramDeclaration }
+    val a = PouElements(copy);a.add(fst)
+    val b = PouElements(copy);b.add(snd)
+    return a to b
 }
 
 /**
  *
  */
 class TransformationPipeline(var diableST0: Boolean = false) {
-    companion object : KLogging()
+    companion object {
+        fun create(filename: String, disableSimp: Boolean) = { TransformationPipeline(disableSimp).run(filename) }
+        fun create(input: CharStream, disableSimp: Boolean) = { TransformationPipeline(disableSimp).run(input) }
+    }
 
     fun run(filename: String): SMVModule {
-        try {
-            var elements: PouElements;
-            if (filename.endsWith(".xml")) {
-                elements = IECXMLFacade.readPLCOpenXml(filename)
-            } else {
-                val content = FileUtils.readFileToString(File(filename), Charset.defaultCharset())
-                elements = IEC61131Facade.file(CharStreams.fromString(content))
-            }
-
-            if (!diableST0) {
-                logger.info("running tranformation to ST0")
-                elements = SymbExFacade.simplify(elements)
-            }
-            return SymbExFacade.evaluateProgram(elements)
-        } catch (e: IOException) {
-            e.printStackTrace()
-            throw e
-        }
-
+        var elements: PouElements =
+                if (filename.endsWith(".xml")) {
+                    IECXMLFacade.readPLCOpenXml(filename)
+                } else {
+                    val content = FileUtils.readFileToString(File(filename), Charset.defaultCharset())
+                    IEC61131Facade.file(CharStreams.fromString(content))
+                }
+        return run(elements)
     }
+
+    fun run(filename: CharStream) = run(IEC61131Facade.file(filename))
+
+    fun run(elements: PouElements): SMVModule {
+        IEC61131Facade.resolveDataTypes(elements)
+        return SymbExFacade.evaluateProgram(elements, diableST0)
+    }
+
 }

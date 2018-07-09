@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation
  */
 
 import edu.kit.iti.formal.automation.datatypes.INT
-import edu.kit.iti.formal.automation.smv.SymbolicExecutioner
+import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import org.junit.Assert
 import org.junit.Before

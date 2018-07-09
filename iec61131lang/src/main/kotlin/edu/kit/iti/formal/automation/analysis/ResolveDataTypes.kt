@@ -129,7 +129,15 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
     override fun visit(it: VariableDeclaration) {
         //super.visit(it)
         it.typeDeclaration?.accept(this)
-        it.dataType = it.typeDeclaration?.getDataType(scope)
+        ignoreDataTypeNotDefined { it.dataType = it.typeDeclaration?.getDataType(scope) }
+    }
+
+    private fun ignoreDataTypeNotDefined(func: () -> Unit) {
+        try {
+            func()
+        } catch (e: DataTypeNotDefinedException) {
+            
+        }
     }
 }
 

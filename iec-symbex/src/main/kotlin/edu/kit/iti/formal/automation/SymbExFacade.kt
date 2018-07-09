@@ -23,10 +23,10 @@ package edu.kit.iti.formal.automation
  */
 
 import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.smv.ModuleBuilder
-import edu.kit.iti.formal.automation.smv.SymbolicExecutioner
-import edu.kit.iti.formal.automation.smv.SymbolicState
-import edu.kit.iti.formal.automation.smv.translators.DefaultTypeTranslator
+import edu.kit.iti.formal.automation.rvt.ModuleBuilder
+import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
+import edu.kit.iti.formal.automation.rvt.SymbolicState
+import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st0.STSimplifier
 import edu.kit.iti.formal.automation.st0.trans.*

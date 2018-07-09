@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.automation.st
 
+import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
+
 /*-
  * #%L
  * iec61131lang
@@ -54,7 +56,10 @@ class RefTo<T : Identifiable>(private var name: String?,
     override fun clone(): RefTo<T> = RefTo(identifier, obj)
     fun resolve(func: (String) -> T?) {
         if (identifier != null)
-            obj = func(identifier!!)
+            try {
+                obj = func(identifier!!)
+            } catch (e: DataTypeNotDefinedException) {
+            }
     }
 
     override fun equals(other: Any?): Boolean {

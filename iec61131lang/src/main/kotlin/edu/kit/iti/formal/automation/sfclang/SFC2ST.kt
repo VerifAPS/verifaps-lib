@@ -23,8 +23,11 @@ package edu.kit.iti.formal.automation.sfclang
  */
 
 import com.google.common.collect.HashMultimap
+import edu.kit.iti.formal.automation.datatypes.AnyBit
+import edu.kit.iti.formal.automation.datatypes.values.FALSE
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.st.RefTo
 import edu.kit.iti.formal.automation.st.ast.*
 import org.antlr.v4.runtime.CommonToken
 
@@ -42,6 +45,7 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
         set(sfcReset) {
             field = isSfcReset
         }
+
     private var stateVariable: String? = null
     private var transitVariable: String? = null
 
@@ -184,15 +188,17 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
         stateVariable = "_" + name + "_state"
         transitVariable = "_" + name + "_transit"
 
-        scope!!.builder().identifiers(stateVariable!!)
-                .type(enumDecl)
-                .setInitialization(IdentifierInitializer(null, network!!.initialStep!!.name))
-                .close()
+        val vdState = VariableDeclaration(stateVariable!!, 0, enumDecl)
+        enumDecl.initialization = IdentifierInitializer(null, network.initialStep!!.name)
+        val vdTransit = VariableDeclaration(transitVariable!!, 0,
+                SimpleTypeDeclaration(baseType = RefTo(AnyBit.BOOL),
+                        initialization = BooleanLit.LFALSE
+                ))
+        vdTransit.initValue = FALSE
+        vdTransit.dataType = AnyBit.BOOL
 
-        scope.builder().identifiers(transitVariable!!)
-                .boolType()
-                .setInitialization(BooleanLit.LFALSE)
-                .close()
+        scope.add(vdState)
+        scope.add(vdTransit)
     }
 
     private fun extractStates() {

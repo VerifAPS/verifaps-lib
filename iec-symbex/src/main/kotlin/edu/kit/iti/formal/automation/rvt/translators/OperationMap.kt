@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.smv.translators
+package edu.kit.iti.formal.automation.rvt.translators
 
 /*-
  * #%L
@@ -22,19 +22,17 @@ package edu.kit.iti.formal.automation.smv.translators
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.AnyDt
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
-import edu.kit.iti.formal.smv.SMVType
-import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.automation.operators.BinaryOperator
+import edu.kit.iti.formal.automation.operators.UnaryOperator
+import edu.kit.iti.formal.smv.ast.SMVExpr
 
 /**
  * @author Alexander Weigl
+ * @version 1 (15.04.17)
  */
-interface TypeTranslator {
-    fun translate(datatype: AnyDt): SMVType
+interface OperationMap {
+    fun translateBinaryOperator(left: SMVExpr, operator: BinaryOperator,
+                                right: SMVExpr): SMVExpr
 
-    open fun translate(vdecl: VariableDeclaration): SVariable {
-        return SVariable.create(vdecl.name).with(translate(vdecl.dataType!!))
-    }
-
+    fun translateUnaryOperator(operator: UnaryOperator, sub: SMVExpr): SMVExpr
 }

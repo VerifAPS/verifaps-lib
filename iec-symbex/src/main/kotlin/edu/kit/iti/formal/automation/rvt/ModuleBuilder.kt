@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.smv
+package edu.kit.iti.formal.automation.rvt
 
 /*-
  * #%L
@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.smv
  * #L%
  */
 
-import edu.kit.iti.formal.automation.smv.translators.*
+import edu.kit.iti.formal.automation.rvt.translators.*
 import edu.kit.iti.formal.automation.st.DefaultInitValue
 import edu.kit.iti.formal.automation.st.InitValueTranslator
 import edu.kit.iti.formal.automation.st.ast.Literal

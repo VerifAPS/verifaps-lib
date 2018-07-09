@@ -101,7 +101,7 @@ class NuXMVProcess(var moduleFile: File) : Callable<NuXMVOutput> {
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
-        return NuXMVOutput(NuXMVAnswer.ERROR)
+        return NuXMVOutput.Error()
     }
 
     @Throws(IOException::class)
@@ -123,14 +123,13 @@ class NuXMVProcess(var moduleFile: File) : Callable<NuXMVOutput> {
 /**
  *
  */
-class CounterExample(
+data class CounterExample(
         var type: Int = 0,
         var id: Int = 0,
         var desc: String = "",
         val inputVariables: MutableSet<String> = hashSetOf(),
         val states: MutableList<MutableMap<String, String>> = arrayListOf()
 ) {
-
     companion object {
         fun load(text: String): CounterExample {
             val ce = CounterExample()
@@ -162,24 +161,15 @@ class CounterExample(
     }
 }
 
-enum class NuXMVAnswer {
-    VERIFIED, COUNTER_EXAMPLE, ERROR
-}
-
 /**
  * Represents an output of a nuxmv run.
  * @author Alexander Weigl
  * @version 2
  */
-class NuXMVOutput(
-        val state: NuXMVAnswer,
-        val errors: List<String> = arrayListOf(),
-        val counterExample: CounterExample? = null
-) {
-    val hasErrors: Boolean
-        get() = errors.isNotEmpty()
-    val isVerified: Boolean
-        get() = state == NuXMVAnswer.VERIFIED
+sealed class NuXMVOutput {
+    object Verified : NuXMVOutput()
+    class Error(val errors: List<String> = arrayListOf()) : NuXMVOutput()
+    class NotVerified(val counterExample: CounterExample) : NuXMVOutput()
 }
 
 /**
@@ -196,7 +186,7 @@ fun parseXmlOutput(text: String): NuXMVOutput {
 
     if (predError(text)) {
         val errors = lines.filter(predError)
-        return NuXMVOutput(NuXMVAnswer.ERROR, errors)
+        return NuXMVOutput.Error(errors)
     }
 
     val idxCex = lines.indexOfFirst {
@@ -206,7 +196,28 @@ fun parseXmlOutput(text: String): NuXMVOutput {
         val closing = lines.lastIndexOf("</counter-example>")
         val xml = lines.slice(idxCex..closing)
                 .joinToString("\n")
-        return NuXMVOutput(NuXMVAnswer.COUNTER_EXAMPLE, counterExample = CounterExample.load(xml))
+        return NuXMVOutput.NotVerified(CounterExample.load(xml))
     }
-    return NuXMVOutput(NuXMVAnswer.VERIFIED)
+    return NuXMVOutput.Verified
 }
+
+/**
+ */
+fun getNuXmvVersion(command: String): String {
+    val builder = ProcessBuilder(command)
+            .redirectErrorStream(true)
+    val process = builder.start()
+    //val stdin = process.outputStream
+    val stdout = process.inputStream
+
+    //stdin.bufferedWriter().write("quit\n")
+    val lines = stdout.bufferedReader().readLines()
+    return getNuXmvVersion(lines)
+}
+
+fun getNuXmvVersion(lines: List<String>): String {
+    //*** This is nuXmv 1.1.1 (compiled on Wed Jun  1 10:18:42 2016)
+    val l = lines[0]
+    return l.substringAfter("This is").substringBefore('(')
+}
+

@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.smv.translators
+package edu.kit.iti.formal.automation.rvt.translators
 
 /*-
  * #%L
@@ -22,17 +22,22 @@ package edu.kit.iti.formal.automation.smv.translators
  * #L%
  */
 
-import edu.kit.iti.formal.automation.operators.BinaryOperator
-import edu.kit.iti.formal.automation.operators.UnaryOperator
-import edu.kit.iti.formal.smv.ast.SMVExpr
+import edu.kit.iti.formal.automation.datatypes.values.Value
+import edu.kit.iti.formal.smv.ast.SLiteral
 
 /**
  * @author Alexander Weigl
- * @version 1 (15.04.17)
+ * @version 1 (16.10.17)
  */
-interface OperationMap {
-    fun translateBinaryOperator(left: SMVExpr, operator: BinaryOperator,
-                                right: SMVExpr): SMVExpr
+class DefaultValueTranslator : ValueTranslator {
+    var tt: TypeTranslator = DefaultTypeTranslator.INSTANCE
 
-    fun translateUnaryOperator(operator: UnaryOperator, sub: SMVExpr): SMVExpr
+    override fun translate(init: Value<*, *>): SLiteral {
+        return SLiteral.create(init.value)
+                .with(this.tt.translate(init.dataType))
+    }
+
+    companion object {
+        val INSTANCE: ValueTranslator = DefaultValueTranslator()
+    }
 }

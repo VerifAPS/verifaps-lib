@@ -33,31 +33,28 @@ object Console {
         writeln(String.format(msg, *args))
     }
 
-    private fun writeln(level: Level, msg: String) {
+
+    fun writeln(lvl: Level?, msg: String, vararg args: Any?) {
+        val level = lvl ?: Level.INFO
+        if (level.ordinal < currentLevel.ordinal) return
+
         writeTimestamp()
         var lString = "[%6s]".format(level)
         lString =
                 when (level) {
-                    Level.DEBUG -> colorizeFg(Color.Cyan,lString)
+                    Level.DEBUG -> colorizeFg(Color.Cyan, lString)
                     Level.INFO -> colorizeFg(Color.Blue, lString)
                     Level.WARN -> colorizeFg(Color.Yellow, lString)
                     Level.ERROR -> colorize(Color.Red, Color.White, lString)
                     Level.FATAL -> colorize(Color.White, Color.Red, lString)
                 }
-        out.println("$lString $msg")
+        out.println("$lString ${msg.format(args)}")
     }
 
     fun writeln(lvl: Level?, msg: () -> String) {
         val level = lvl ?: Level.INFO
         if (level >= currentLevel) {
             writeln(lvl, msg())
-        }
-    }
-
-    fun writeln(lvl: Level?, msg: String, vararg args: Any) {
-        val level = lvl ?: Level.INFO
-        if (level.ordinal >= currentLevel.ordinal) {
-            writeln(lvl, msg)
         }
     }
 
@@ -75,25 +72,29 @@ object Console {
         Black, Red, Green, Yellow, Blue, Magenta, Cyan, White
     }
 
-    private val CSI = "\u0027["
+
+    private val FIRST_ESC_CHAR: Char = 27.toChar()
+    private val SECOND_ESC_CHAR = '['
+    private val CSI = FIRST_ESC_CHAR.toString() + SECOND_ESC_CHAR
+    //"\u0027["
 
     fun colorizeFg(color: Color, s: String) =
-            "$CSI[${color.ordinal + 30}m$s$CSI[0m"
+            "$CSI${color.ordinal + 30}m$s${CSI}0m"
 
     fun colorizeBg(color: Color, s: String) =
-            "$CSI[${color.ordinal + 40}m$s$CSI[0m"
+            "$CSI${color.ordinal + 40}m$s${CSI}0m"
 
     fun colorizeFg256(n: Int, s: String) =
-            "$CSI[38;5;$n;m$s$CSI[0m"
+            "${CSI}38;5;$n;m$s${CSI}0m"
 
     fun colorizeBg256(n: Int, g: Int, b: Int, s: String) =
-            "$CSI[48;5;$n;m$s$CSI[0m"
+            "${CSI}48;5;$n;m$s${CSI}0m"
 
     fun colorizeFgRgb(r: Int, g: Int, b: Int, s: String) =
-            "$CSI[38;2;$r;$g;$b;m$s$CSI[0m"
+            "${CSI}38;2;$r;$g;$b;m$s${CSI}0m"
 
     fun colorizeBgRgb(r: Int, g: Int, b: Int, s: String) =
-            "$CSI[48;2;$r;$g;$b;m$s$CSI[0m"
+            "${CSI}48;2;$r;$g;$b;m$s${CSI}0m"
 
     fun colorize(fg: Console.Color, bg: Console.Color, s: String) = colorizeFg(fg, colorizeBg(bg, s))
 }
