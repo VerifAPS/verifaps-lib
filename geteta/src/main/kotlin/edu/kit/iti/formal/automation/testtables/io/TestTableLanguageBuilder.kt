@@ -92,11 +92,12 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBa
     override fun visitRow(ctx: TestTableLanguageParser.RowContext): State {
         val id = ctx.id?.text?.toInt() ?: ++currentId;
         val s = State(id)
+        s.duration = ctx.time().accept(TimeParser())
         ctx.kc().forEach {
             val name = it.key.text
-            val column = gtt.getSMVVariable(it.key.text)
-            val cell = IOFacade.parseCellExpression(it.cell(), column, gtt);
-            s.add(gtt.ioVariables[name]!!, cell)
+            //val column = gtt.getSMVVariable(it.key.text)
+            //val cell = IOFacade.exprToSMV(it.cell(), column, gtt);
+            s.rawFields[gtt.ioVariables[name]!!] = it.cell()
         }
         return s
     }
@@ -104,39 +105,31 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBa
 
 class TimeParser : TestTableLanguageBaseVisitor<Duration>() {
     override fun visitTimeSingleSided(ctx: TestTableLanguageParser.TimeSingleSidedContext): Duration {
-        val d = Duration()
-        d.lower = ctx.INTEGER().text.toInt()
-        if (ctx.op.text == ">")
-            d.lower += 1
-        d.upper = -1
-        if (ctx.pflag != null) d.pflag = true
-        assert(d.invariant())
-        return d
+        val lower =
+                ctx.INTEGER().text.toInt() +
+                        if (ctx.op.text == ">") 1 else 0
+        return Duration.OpenInterval(
+                lower, ctx.pflag != null
+        )
     }
 
-    override fun visitTimeInterval(ctx: TestTableLanguageParser.TimeIntervalContext): Duration {
-        val p = ctx.fixed_interval()
-        val d = Duration()
-        if (p.c != null) {
-            val i = Integer.parseInt(p.c.text)
-            d.lower = i
-            d.upper = i
-        } else if (p.dc != null) {
-            d.lower = 0
-            d.upper = -1
-        } else {
-            d.lower = Integer.parseInt(p.a.text)
-            if (p.inf != null)
-                d.upper = -1
-            else
-                d.upper = Integer.parseInt(p.b.text)
-        }
-        if (ctx.pflag != null) d.pflag = true
-        assert(d.invariant())
-        return d
+    override fun visitTimeClosedInterval(ctx: TestTableLanguageParser.TimeClosedIntervalContext): Duration {
+        return Duration.ClosedInterval(
+                ctx.l.text.toInt(),
+                ctx.u.text.toInt(),
+                ctx.pflag != null)
     }
 
-    override fun visitTimeDontCare(ctx: TestTableLanguageParser.TimeDontCareContext?): Duration = Duration()
+    override fun visitTimeOpenInterval(ctx: TestTableLanguageParser.TimeOpenIntervalContext): Duration {
+        return Duration.OpenInterval(ctx.l.text.toInt(), ctx.pflag != null)
+    }
 
-    override fun visitTimeOmega(ctx: TestTableLanguageParser.TimeOmegaContext) = Duration.OMEGA
+    override fun visitTimeFixed(ctx: TestTableLanguageParser.TimeFixedContext): Duration {
+        val i = ctx.INTEGER().text.toInt()
+        return Duration.ClosedInterval(i, i, false)
+    }
+
+    override fun visitTimeDontCare(ctx: TestTableLanguageParser.TimeDontCareContext?): Duration = Duration.OpenInterval(0, false)
+
+    override fun visitTimeOmega(ctx: TestTableLanguageParser.TimeOmegaContext) = Duration.Omega
 }

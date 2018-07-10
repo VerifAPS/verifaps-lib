@@ -29,9 +29,11 @@ group : 'group' (id=i)? time? '{' (group|row)* '}';
 row : 'row' (id=i)? time? '{' (kc osem)* '}';
 kc: key=IDENTIFIER '=' value=cell;
 time :
-      MINUS #timeDontCare
+      MINUS (pflag='>>')? #timeDontCare
     | op=(GREATER_EQUALS | GREATER_THAN) INTEGER  (pflag='>>')? #timeSingleSided
-    | (fixed_interval (pflag='>>')?)           #timeInterval
+    | LBRACKET l=INTEGER COMMA (u=INTEGER) RBRACKET (pflag='>>')? #timeClosedInterval
+    | LBRACKET l=INTEGER COMMA MINUS RBRACKET (pflag='>>')? #timeOpenInterval
+    | INTEGER #timeFixed
     | omega='omega'                           #timeOmega
     ;
 
@@ -113,13 +115,6 @@ guardedcommand
       FI    // guarded command (case)
 ;
 
-fixed_interval :
-    ( dc=MINUS
-    | LBRACKET a=i COMMA (inf=MINUS | b=i) RBRACKET
-    | a=i COMMA (inf=MINUS | b=i)
-    | c=i) //EOF
-;
-
 AND: '&' | 'AND';
 ARROW_RIGHT: '=>';
 COMMA:	',';
@@ -158,3 +153,5 @@ INTEGER: NUMBER;
 STCODE : '`' ~[`]* '`';
 
 WS: (' '|'\n'|'\r')+ -> skip;
+COMMENT      : '/*' .*? '*/' -> channel(HIDDEN);
+LINE_COMMENT : '//' ~[\r\n]* -> channel(HIDDEN);

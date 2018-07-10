@@ -55,13 +55,13 @@ class CellExpressionAmbiguityTest {
 
     @Test(expected = ProgramAbortionException::class)
     fun testInvalidReferencePositive() {
-        IOFacade.parseCellExpression("b[2]", SVariable.create("a").asBool(), CellExpressionTest.defaultTestTable())
+        IOFacade.exprToSMV("b[2]", SVariable.create("a").asBool(), CellExpressionTest.defaultTestTable())
     }
 
 
     @Test
     fun testValidReferenceZero() {
-        IOFacade.parseCellExpression("b[0]", SVariable.create("a").asBool(), CellExpressionTest.defaultTestTable())
+        IOFacade.exprToSMV("b[0]", SVariable.create("a").asBool(), CellExpressionTest.defaultTestTable())
     }
 
     companion object {
@@ -69,7 +69,7 @@ class CellExpressionAmbiguityTest {
 
         fun parse(cell: String): SMVExpr {
 
-            return IOFacade.parseCellExpression(cell, defaultVar(), CellExpressionTest.defaultTestTable())
+            return IOFacade.exprToSMV(cell, defaultVar(), CellExpressionTest.defaultTestTable())
         }
 
         private fun defaultVar(): SVariable {

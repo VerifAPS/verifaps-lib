@@ -128,7 +128,6 @@ class PropertyInitializer(private var value: Any?, private val properties: Prope
     }
 
     companion object {
-
         fun initialize(value: Any, properties: Properties) {
             PropertyInitializer(value, properties).inject("")
         }

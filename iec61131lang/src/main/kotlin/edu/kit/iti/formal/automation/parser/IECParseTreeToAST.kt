@@ -286,12 +286,15 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitArray_specification(
             ctx: IEC61131Parser.Array_specificationContext): ArrayTypeDeclaration {
-        val ast = ArrayTypeDeclaration()
-        //Utils.setPosition(ast, ctx.ARRAY(), ctx.non_generic_type_name.ctx);
-        ast.baseType.identifier = ctx.non_generic_type_name()?.text
-        for (src in ctx.ranges) {
+        val ast = ArrayTypeDeclaration(
+                type = if (ctx.non_generic_type_name() != null)
+                    SimpleTypeDeclaration(ctx.non_generic_type_name()!!.text)
+                else
+                    ctx.string_type_declaration().accept(this) as StringTypeDeclaration
+        )
+
+        for (src in ctx.ranges)
             ast.addSubRange(src.accept(this) as Range)
-        }
         return ast
     }
 
@@ -331,7 +334,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val localScope = Scope()
         gather = localScope.builder()
         ctx.ids.zip(ctx.tds).forEach { (id, type) ->
-            gather.identifiers(id).type(type.accept(this) as TypeDeclaration).close()
+            gather.identifiers(id.IDENTIFIER().symbol).type(type.accept(this) as TypeDeclaration).close()
         }
         //gather = null
         ast.fields = localScope.variables
@@ -392,8 +395,9 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitGlobal_variable_list_declaration(ctx: IEC61131Parser.Global_variable_list_declarationContext): Any {
         val gvl = GlobalVariableListDeclaration()
         gather = gvl.scope.builder()
+        gather.push(VariableDeclaration.GLOBAL)
         ctx.var_decl_inner().accept(this)
-        gather.mix(VariableDeclaration.GLOBAL);
+
         //gvl.scope.forEach { v -> v.parent = gvl }
         //gather = null
         return gvl
@@ -419,7 +423,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitVar_decl_inner(ctx: IEC61131Parser.Var_decl_innerContext): Any? {
         for (i in 0 until ctx.type_declaration().size) {
-            gather.identifiers(ctx.identifier_list())
+            val seq = ctx.identifier_list(i).names
+            gather.identifiers(seq)
                     .type(ctx.type_declaration(i).accept(this) as TypeDeclaration)
                     .close()
         }

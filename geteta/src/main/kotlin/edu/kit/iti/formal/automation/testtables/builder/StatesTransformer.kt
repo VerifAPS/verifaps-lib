@@ -19,6 +19,7 @@
  */
 package edu.kit.iti.formal.automation.testtables.builder
 
+import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.automation.testtables.model.State
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.*
@@ -32,8 +33,8 @@ import java.util.stream.Stream
  */
 class StatesTransformer : AbstractTransformer() {
     override fun transform() {
-        val flat = model.testTable.region!!.flat()
-        flat.forEach({ this.introduceState(it) })
+        val flat = model.testTable.region.flat()
+        flat.forEach { this.introduceState(it) }
         insertErrorState()
         insertSentinel()
     }
@@ -128,6 +129,7 @@ class StatesTransformer : AbstractTransformer() {
                 .reduce(SMVFacade.reducer(SBinaryOperator.OR))
                 .orElse(SLiteral.FALSE)
 
+
         if (automatonState.state.duration.isDeterministicWait) {
             // If this state is true, it stays true, until
             // no successor was correctly guessed.
@@ -155,7 +157,7 @@ class StatesTransformer : AbstractTransformer() {
         // disable in the beginning
         model.tableModule.initExpr.add(model.errorVariable.not())
 
-        val e = model.testTable.region!!.flat().stream()
+        val e = model.testTable.region.flat().stream()
                 .flatMap { s -> s.automataStates.stream() }
                 .map { s -> s.defFailed as SMVExpr }
                 .reduce { a, b -> a.or(b) }
@@ -182,3 +184,11 @@ class StatesTransformer : AbstractTransformer() {
         model.tableModule.definitions[defOutput] = combine
     }
 }
+
+private val Duration.isDeterministicWait: Boolean
+    get() =
+        when (this) {
+            is Duration.OpenInterval -> pflag
+            is Duration.ClosedInterval -> pflag
+            else -> false
+        }

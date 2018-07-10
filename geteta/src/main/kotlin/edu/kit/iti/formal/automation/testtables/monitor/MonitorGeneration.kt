@@ -41,6 +41,7 @@ package edu.kit.iti.formal.automation.testtables.monitor
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
@@ -66,11 +67,9 @@ class MonitorGeneration(internal val gtt: GeneralizedTestTable) : Callable<PouEl
         }
 
         // VAR_OUTPUT WARNING : BOOL; END_VAR
-        vars.clear().push(VariableDeclaration.OUTPUT).identifiers("WARNING")
-                .baseType("BOOL").close()
-
-        for (i in 0 until gtt.region!!.count()) {
-            vars.identifiers(String.format("ROW_%2d", i)).baseType("BOOL").close()
+        fb.scope.add(VariableDeclaration("WARNING", VariableDeclaration.OUTPUT, AnyBit.BOOL))
+        for (i in 0 until gtt.region.count()) {
+            fb.scope.add(VariableDeclaration("ROW_$i", VariableDeclaration.OUTPUT, AnyBit.BOOL))
         }
 
         return PouElements(mutableListOf(fb))

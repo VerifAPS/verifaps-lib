@@ -611,6 +611,8 @@ END_NAMESPACE: E N D UNDERSCORE N A M E S P A C E;
 
 USING: U S I N G;
 
+PERSISTENT : P E R S I S T E N T;
+
 /*******
  * Constants
  */
@@ -910,23 +912,12 @@ StringCharacters
 	~["]
 ;
 
-STRING_LITERAL
-:
-	[']
-	(
-		StringCharacters
-		| '$\''
-	)* [']
-;
 
-WSTRING_LITERAL
-:
-	["]
-	(
-		StringCharacters
-		| '$"'
-	)* ["]
-;
+//fragment ESCDQ : '\\"' | '\\\\' ;
+//fragment ESCSQ : '\\\'' | '\\\\' ;
+
+STRING_LITERAL: '\'' ~[']*? '\'';
+WSTRING_LITERAL: '"' ~["]*? '"';
 
 IDENTIFIER
 :

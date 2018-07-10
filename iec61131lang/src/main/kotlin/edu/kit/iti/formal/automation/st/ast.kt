@@ -998,11 +998,11 @@ override fun clone(): EnumerationTypeDeclaration {
 
 data class ArrayTypeDeclaration(
         override var name: String = ANONYM,
-        override var baseType: RefTo<AnyDt> = RefTo(),
+        var type: TypeDeclaration,
         override var initialization: ArrayInitialization? = null,
         val ranges: MutableList<Range> = arrayListOf())
     : TypeDeclaration, Top() {
-    private var type: ArrayType? = null
+    override var baseType = RefTo<AnyDt>()
 
     override fun setInit(init: Initialization?) {
         initialization = init as ArrayInitialization?
@@ -1012,11 +1012,12 @@ data class ArrayTypeDeclaration(
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
     override fun clone(): ArrayTypeDeclaration {
-        val atd = ArrayTypeDeclaration()
+        val atd = ArrayTypeDeclaration(
+                name, type.clone(), initialization?.clone()
+        )
         atd.ruleContext = ruleContext
         cloneList(atd.ranges, ranges)
         atd.baseType = baseType.clone()
-        atd.initialization = initialization?.clone()
         return atd
     }
 
@@ -1261,8 +1262,8 @@ data class IntegerLit(var dataType: RefTo<AnyInt> = RefTo<AnyInt>(INT),
     constructor(dt: String?, v: BigInteger) : this(RefTo(dt), v)
     constructor(dt: AnyInt, v: BigInteger) : this(RefTo(dt), v)
 
-    override fun dataType() = dataType.obj
-    override fun asValue() = VAnyInt(dataType.obj!!, value)
+    override fun dataType():AnyInt = dataType.obj ?: INT
+    override fun asValue() = VAnyInt(dataType(), value)
     override fun clone() = copy()
 }
 
@@ -1635,7 +1636,7 @@ abstract class Reference : Initialization() {
 class VariableBuilder(val scope: VariableScope) {
     private val stack = Stack<Int>()
     private var initialization: Initialization? = null
-    private var identifiers: MutableList<ParserRuleContext> = arrayListOf()
+    private var identifiers: MutableList<Token> = arrayListOf()
     private var type: TypeDeclaration? = null
     private val pEnd: Position? = null
     private val pStart: Position? = null
@@ -1729,7 +1730,7 @@ class VariableBuilder(val scope: VariableScope) {
     fun create(): VariableBuilder {
         for (id in identifiers) {
             val vd = VariableDeclaration(id.text, peek(), type!!)
-            vd.ruleContext = id
+            vd.token = id
             this.scope.add(vd)
         }
         return this
@@ -1741,12 +1742,19 @@ class VariableBuilder(val scope: VariableScope) {
     }
 
 
-    fun identifiers(ast: List<out ParserRuleContext>): VariableBuilder {
+    fun identifiers(ast: List<Token>): VariableBuilder {
+        identifiers.clear()
         identifiers.addAll(ast)
         return this
     }
 
-    fun identifiers(vararg e: ParserRuleContext) = identifiers(e.toList())
+    fun identifiers(ast: Token): VariableBuilder {
+        identifiers.clear()
+        identifiers.add(ast)
+        return this
+    }
+
+    //fun identifiers(vararg e: ParserRuleContext) = identifiers(e.toList())
 }
 
 data class VariableDeclaration(
@@ -1815,6 +1823,14 @@ data class VariableDeclaration(
         get() = isType(PRIVATE)
 
     var initValue: Value<*, *>? = null
+
+    var token: Token? = null
+
+    override val startPosition: Position
+        get() = Position(token)
+
+    override val endPosition: Position
+        get() = startPosition
 
     constructor(name: String, type: Int, td: TypeDeclaration?) : this(name, type) {
         typeDeclaration = td

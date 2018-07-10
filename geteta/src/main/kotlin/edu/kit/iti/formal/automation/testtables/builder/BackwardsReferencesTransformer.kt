@@ -34,7 +34,7 @@ class BackwardsReferencesTransformer : TableTransformer {
 
     override fun accept(tt: ConstructionModel) {
         this.tt = tt
-        tt.testTable.references
+        tt.variableContext.refs
                 .forEach{ variable, history -> this.addDelayModule(variable, history) }
     }
 

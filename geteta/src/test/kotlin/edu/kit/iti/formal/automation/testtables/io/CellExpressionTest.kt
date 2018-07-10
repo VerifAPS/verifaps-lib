@@ -43,7 +43,7 @@ class CellExpressionTest(private var expr: String) {
     @Test
     fun parse() {
         val v = SVariable.create("Q").withSigned(16)
-        val e = IOFacade.parseCellExpression(expr, v, gtt)
+        val e = IOFacade.exprToSMV(expr, v, gtt)
         println(e)
     }
 

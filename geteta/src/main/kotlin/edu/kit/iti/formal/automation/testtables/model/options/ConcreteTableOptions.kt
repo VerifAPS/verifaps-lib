@@ -20,8 +20,8 @@
 package edu.kit.iti.formal.automation.testtables.model.options
 
 
-import java.util.Properties
-import java.util.TreeMap
+import edu.kit.iti.formal.automation.testtables.model.Duration
+import java.util.*
 
 /**
  * Created by weigl on 16.12.16.
@@ -29,8 +29,12 @@ import java.util.TreeMap
 class ConcreteTableOptions : InitializableFromProperties {
     private val stepCounter = TreeMap<String, Int>()
 
-    fun getCount(step: String, defaultValue: Int): Int {
-        return (stepCounter as java.util.Map<String, Int>).getOrDefault(step, defaultValue)
+    fun getCount(step: String, defaultValue: Duration): Int {
+        return stepCounter[step] ?: when (defaultValue) {
+            is Duration.Omega -> 10
+            is Duration.OpenInterval -> defaultValue.lower
+            is Duration.ClosedInterval -> (defaultValue.lower + defaultValue.upper) / 2
+        }
     }
 
     override fun initialize(namespace: String, p: Properties) {

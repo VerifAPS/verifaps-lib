@@ -1,10 +1,7 @@
 package edu.kit.iti.formal.automation.parser
 
 import com.google.common.base.Strings
-import org.antlr.v4.runtime.BaseErrorListener
-import org.antlr.v4.runtime.RecognitionException
-import org.antlr.v4.runtime.Recognizer
-import org.antlr.v4.runtime.Token
+import org.antlr.v4.runtime.*
 import java.util.*
 import java.util.function.Supplier
 
@@ -18,16 +15,20 @@ class ErrorReporter : BaseErrorListener() {
 
     override fun syntaxError(recognizer: Recognizer<*, *>?, offendingSymbol: Any?, line: Int,
                              charPositionInLine: Int, msg: String?, e: RecognitionException?) {
+
+        val parser = recognizer as Parser
+        val stack = parser.ruleInvocationStack.joinToString(", ")
+
         val se = SyntaxError(
                 recognizer = recognizer,
                 offendingSymbol = offendingSymbol as Token?,
                 source = offendingSymbol?.getTokenSource()?.getSourceName(),
                 line = line,
                 charPositionInLine = charPositionInLine,
-                msg = msg)
+                msg = msg, stack = stack)
 
         if (isPrint) {
-            System.err.printf("[syntax-error] %s:%d:%d: %s%n", se.source, line, charPositionInLine, msg)
+            System.err.printf("[syntax-error] %s:%d:%d: %s (%s)%n", se.source, line, charPositionInLine, msg, stack)
         }
         errors.add(se)
     }
@@ -67,7 +68,8 @@ class ErrorReporter : BaseErrorListener() {
             val line: Int = 0,
             val charPositionInLine: Int = 0,
             val msg: String? = "",
-            val source: String? = null) {
+            val source: String? = null,
+            val stack: String) {
         fun getBeatifulErrorMessage(lines: Array<String>): String {
             return ("syntax-error in " + positionAsUrl() + "\n"
                     + msg + "\n" + showInInput(lines) + "\n")

@@ -21,23 +21,28 @@ package edu.kit.iti.formal.automation.testtables
 
 
 import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.datatypes.AnyDt
+import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.testtables.algorithms.BinaryModelGluer
 import edu.kit.iti.formal.automation.testtables.algorithms.DelayModuleBuilder
-import edu.kit.iti.formal.automation.testtables.io.TableReader
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
+import edu.kit.iti.formal.automation.testtables.io.*
 import edu.kit.iti.formal.automation.testtables.io.xmv.NuXMVAdapter
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.automation.testtables.model.SReference
-import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique
+import edu.kit.iti.formal.automation.testtables.model.*
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
 import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.smv.EnumType
 import edu.kit.iti.formal.smv.SMVType
+import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
+import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -50,6 +55,69 @@ object GetetaFacade {
         val tr = TableReader(File(filename))
         tr.run()
         return tr.product
+    }
+
+
+    fun createParser(input: CharStream): TestTableLanguageParser {
+        val lexer = TestTableLanguageLexer(input)
+        lexer.removeErrorListeners()
+        lexer.addErrorListener(ThrowingErrorListener.INSTANCE)
+
+        val parser = TestTableLanguageParser(CommonTokenStream(lexer))
+
+        parser.removeErrorListeners()
+        parser.addErrorListener(ThrowingErrorListener.INSTANCE)
+
+        return parser
+    }
+
+    fun createParser(input: String) = createParser(CharStreams.fromString(input))
+
+    fun parseCell(cell: String): TestTableLanguageParser.CellContext =
+            createParser(cell).cell()!!
+
+    fun exprToSMV(cell: TestTableLanguageParser.CellContext, column: SVariable,
+                  vars: ParseContext): SMVExpr {
+        val ev = ExprVisitor(column, vars)
+        val expr = cell.accept(ev)
+        Report.debug("parsed: %s to %s", cell, expr)
+        return expr
+    }
+
+    fun parseDuration(duration: String): Duration {
+        val parser = createParser(duration)
+        val p = parser.time()
+        return p.accept(TimeParser())
+    }
+
+    fun asSMVVariable(column: edu.kit.iti.formal.automation.testtables.model.Variable): SVariable {
+        return SVariable(column.name, getSMVDataType(column.dataType))
+    }
+
+    private fun getSMVDataType(dataType: AnyDt): SMVType {
+        return DefaultTypeTranslator.INSTANCE.translate(dataType)
+                ?: error("Data type $dataType is not supported by DataTypeTranslator")
+    }
+
+
+    @JvmStatic
+    fun parseTable(input: String) = parseTable(CharStreams.fromString(input))
+
+    @JvmStatic
+    fun parseTable(input: File) = parseTable(CharStreams.fromFileName(input.absolutePath))
+
+    @JvmStatic
+    fun parseTable(input: CharStream): GeneralizedTestTable {
+        val parser = createParser(input)
+        val ctx = parser.file()
+        val ttlb = TestTableLanguageBuilder()
+        ctx.accept(ttlb)
+        return ttlb.testTables.get(0)
+    }
+
+    fun exprsToSMV(vc: ParseContext, constraints: Map<IoVariable, TestTableLanguageParser.CellContext>)
+            : Collection<SMVExpr> = constraints.map { (t, u) ->
+        exprToSMV(u, vc.getSMVVariable(t.name)!!, vc)
     }
 
     @Throws(IOException::class)
@@ -92,7 +160,7 @@ object GetetaFacade {
         return adapter.isVerified
     }
 
-    fun createSuperEnum(scope: Scope) : EnumType {
+    fun createSuperEnum(scope: Scope): EnumType {
         val allowedValues =
                 scope.dataTypes.values()
                         .filter { it is EnumerationTypeDeclaration }
@@ -101,12 +169,42 @@ object GetetaFacade {
         return EnumType(allowedValues)
     }
 
+
     fun createSuperEnum(code: PouElements): SMVType {
         val scope = Utils.findProgram(code)?.scope
-        if(scope !=null)
+        if (scope != null)
             return createSuperEnum(code)
         throw IllegalStateException("No program found in given source code")
     }
+
+    fun generateInterface(name: String = "anonym",
+                          scope: Scope = Scope.defaultScope(),
+                          includeState: Boolean = true): String {
+        val s = StringBuilder()
+        s.append("table $name {\n")
+        scope.filter { it.isInput }.forEach {
+            s.append("\n\tvar input ${it.name} : ${it.dataType?.name}")
+        }
+
+        scope.filter { it.isOutput }.forEach {
+            s.append("\n\tvar output ${it.name} : ${it.dataType?.name}")
+        }
+
+        if (includeState) {
+            scope.filter { !it.isOutput && !it.isInput }.forEach {
+                s.append("\n\tvar state input ${it.name} : ${it.dataType?.name} as ${it.name}_pre")
+                s.append("\n\tvar state output ${it.name} : ${it.dataType?.name} as ${it.name}_post")
+            }
+        }
+
+        s.append("\n\n\toptions{}")
+        s.append("\n\n\tgroup{\n\t}")
+
+        s.append("}")
+        return s.toString()
+    }
+
+
 /*
     private class SuperEnumCreator : AstVisitor<Unit?>() {
         override fun defaultVisit(obj: Any): Unit? = null

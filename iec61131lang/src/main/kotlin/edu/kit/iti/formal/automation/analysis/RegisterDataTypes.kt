@@ -110,8 +110,8 @@ class RegisterDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
     }
 
     override fun visit(gvl: GlobalVariableListDeclaration) {
-        gvl.scope = scope // global variables does not open an own scope.
         scope.addVariables(gvl.scope)
+        gvl.scope = scope // global variables does not open an own scope.
         //return super.visit(gvl)
 
     }

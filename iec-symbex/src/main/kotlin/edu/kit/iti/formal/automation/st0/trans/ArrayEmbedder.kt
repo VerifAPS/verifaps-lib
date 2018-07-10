@@ -22,7 +22,9 @@ package edu.kit.iti.formal.automation.st0.trans
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.UINT
+import edu.kit.iti.formal.automation.st.RefTo
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
 import edu.kit.iti.formal.automation.st0.STSimplifier
@@ -40,7 +42,9 @@ class ArrayEmbedder : ST0Transformation {
         state.theProgram!!.scope.variables
                 .filter { it.typeDeclaration is ArrayTypeDeclaration }
                 .forEach { arrayVariable ->
-                    val (_, baseType, initialization, ranges) = (arrayVariable.typeDeclaration!! as ArrayTypeDeclaration)
+                    val (_, typeDel, initialization, ranges) = (arrayVariable.typeDeclaration!! as ArrayTypeDeclaration)
+                    val groundType = typeDel.getDataType(state.theProgram!!.scope)!!
+
                     assert(initialization != null)
                     for ((start, stop) in ranges) {
                         val rangeMin = start.value.toInt()
@@ -50,9 +54,7 @@ class ArrayEmbedder : ST0Transformation {
                             val init = initialization!!.initValues[i - rangeMin]
                             val `var` = VariableDeclaration(
                                     "${arrayVariable.name}$$i",
-                                    SimpleTypeDeclaration(
-                                            baseType = baseType,
-                                            initialization = init))
+                                    SimpleTypeDeclaration("anonym", RefTo<AnyDt>(groundType), init))
                             if (arrayVariable.isGlobal) {
                                 `var`.type = VariableDeclaration.GLOBAL
                                 state.theProgram!!.scope.add(`var`)

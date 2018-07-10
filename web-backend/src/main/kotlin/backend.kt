@@ -1,41 +1,30 @@
 package edu.kit.iti.formal.automation.web
 
-import edu.kit.iti.formal.automation.FlycheckRunner
-import edu.kit.iti.formal.automation.rvt.RvtApp
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
-import io.ktor.content.PartData
 import io.ktor.content.files
 import io.ktor.content.static
 import io.ktor.features.*
 import io.ktor.gson.gson
-import io.ktor.html.respondHtml
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.network.tls.certificates.generateCertificate
-import io.ktor.request.isMultipart
 import io.ktor.request.path
 import io.ktor.request.receive
-import io.ktor.request.receiveMultipart
 import io.ktor.response.respond
 import io.ktor.response.respondText
-import io.ktor.response.respondWrite
 import io.ktor.routing.Routing
-import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.routing
-import kotlinx.html.body
-import kotlinx.html.h1
-import kotlinx.html.li
-import kotlinx.html.ul
 import org.antlr.v4.runtime.CharStreams
 import org.slf4j.event.Level
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.util.*
 
 //fun main(args: Array<String>): Unit = io.ktor.server.netty.DevelopmentEngine.main(args)
 
@@ -108,6 +97,10 @@ fun Application.entry() {
     }
 
     routing {
+        post("/echo") {
+            call.respondText { call.receive<String>() }
+        }
+
         // Static feature. Try to access `/static/ktor_logo.svg`
         static("/static") {
             files("static")

@@ -19,6 +19,7 @@
  */
 package edu.kit.iti.formal.automation.testtables.algorithms
 
+import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.Region
 import edu.kit.iti.formal.automation.testtables.model.State
@@ -48,20 +49,18 @@ class OmegaSimplifier(val product: GeneralizedTestTable) : Runnable {
         val newRegion = Region(region!!.id)
         for (state in region.children) {
             if (abort) {
-                if (!state.isLeaf) {
-                    recur(state as Region)
-                } else {
-                    ignored.add(state as State)
+                when (state) {
+                    is Region -> recur(state)
+                    else -> ignored.add(state as State)
                 }
             } else {
-                if (!state.isLeaf) {
-                    newRegion.children.add(recur(state as Region))
-                } else {
-                    newRegion.children.add(state)
+                when (state) {
+                    is Region ->
+                        newRegion.children.add(recur(state as Region))
+                    is State ->
+                        newRegion.children.add(state)
                 }
-                if (state.duration.isOmega) {
-                    abort = true
-                }
+                if (state.duration === Duration.Omega) abort = true
             }
         }
         return newRegion

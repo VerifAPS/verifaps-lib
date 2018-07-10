@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.testtables.io
 import edu.kit.iti.formal.automation.testtables.exception.IllegalExpressionException
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
+import edu.kit.iti.formal.automation.testtables.model.ParseContext
 import edu.kit.iti.formal.smv.EnumType
 import edu.kit.iti.formal.smv.ast.*
 import java.util.*
@@ -32,14 +32,14 @@ import java.util.*
  * Created by weigl on 09.12.16.
  */
 class ExprVisitor(private val columnVariable: SVariable,
-                  private val gtt: GeneralizedTestTable) : TestTableLanguageBaseVisitor<SMVExpr>() {
+                  private val context: ParseContext) : TestTableLanguageBaseVisitor<SMVExpr>() {
 
     override fun visitCell(ctx: TestTableLanguageParser.CellContext): SMVExpr {
         return ctx.chunk().map { this.visitChunk(it) }
                 .reduce { a, b -> SBinaryExpression(a, SBinaryOperator.AND, b) }
     }
 
-    override fun visitChunk(ctx: TestTableLanguageParser.ChunkContext): SMVExpr {
+    override fun visitChunk(ctx: TestTableLanguageParser.ChunkContext): SMVExpr{
         if (ctx.constant() != null) {
             val constant = ctx.constant().accept(this)
             return constant.equal(columnVariable)
@@ -59,28 +59,28 @@ class ExprVisitor(private val columnVariable: SVariable,
         throw IllegalStateException("No one of the N contexts matches")
     }
 
-    override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext): SMVExpr {
+    override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext): SMVExpr{
         return SLiteral.TRUE
     }
 
-    override fun visitConstantInt(ctx: TestTableLanguageParser.ConstantIntContext): SMVExpr {
+    override fun visitConstantInt(ctx: TestTableLanguageParser.ConstantIntContext): SMVExpr{
         return ctx.i().accept(this)
     }
 
-    override fun visitI(ctx: TestTableLanguageParser.IContext): SMVExpr {
+    override fun visitI(ctx: TestTableLanguageParser.IContext): SMVExpr{
         return SLiteral.create(java.lang.Long.parseLong(ctx.text)).with(columnVariable.dataType!!)
     }
 
-    override fun visitConstantTrue(ctx: TestTableLanguageParser.ConstantTrueContext): SMVExpr {
+    override fun visitConstantTrue(ctx: TestTableLanguageParser.ConstantTrueContext): SMVExpr{
         return SLiteral.TRUE
     }
 
-    override fun visitConstantFalse(ctx: TestTableLanguageParser.ConstantFalseContext): SMVExpr {
+    override fun visitConstantFalse(ctx: TestTableLanguageParser.ConstantFalseContext): SMVExpr{
         return SLiteral.FALSE
     }
 
 
-    override fun visitSinglesided(ctx: TestTableLanguageParser.SinglesidedContext): SMVExpr {
+    override fun visitSinglesided(ctx: TestTableLanguageParser.SinglesidedContext): SMVExpr{
         val op = ctx.relational_operator().getStart().text
         val relop = getsBinaryOperator(op)
 
@@ -100,7 +100,7 @@ class ExprVisitor(private val columnVariable: SVariable,
         throw IllegalStateException("$op not found as an binary operator for SMV")
     }
 
-    override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext): SMVExpr {
+    override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext): SMVExpr{
         val a = ctx.lower.accept(this)
         val b = ctx.upper.accept(this)
 
@@ -110,72 +110,72 @@ class ExprVisitor(private val columnVariable: SVariable,
                 SBinaryExpression(columnVariable, SBinaryOperator.LESS_EQUAL, b))
     }
 
-    override fun visitMinus(ctx: TestTableLanguageParser.MinusContext): SMVExpr {
+    override fun visitMinus(ctx: TestTableLanguageParser.MinusContext): SMVExpr{
         return SUnaryExpression(SUnaryOperator.MINUS, ctx.expr().accept(this))
     }
 
 
-    override fun visitNegation(ctx: TestTableLanguageParser.NegationContext): SMVExpr {
+    override fun visitNegation(ctx: TestTableLanguageParser.NegationContext): SMVExpr{
         return SUnaryExpression(SUnaryOperator.NEGATE, ctx.expr().accept(this))
     }
 
-    override fun visitParens(ctx: TestTableLanguageParser.ParensContext): SMVExpr {
+    override fun visitParens(ctx: TestTableLanguageParser.ParensContext): SMVExpr{
         return ctx.expr().accept(this)
     }
 
-    override fun visitCompare(ctx: TestTableLanguageParser.CompareContext): SMVExpr {
+    override fun visitCompare(ctx: TestTableLanguageParser.CompareContext): SMVExpr{
         val op = getsBinaryOperator(ctx.op.text)
         return SBinaryExpression(ctx.left.accept(this),
                 op, ctx.right.accept(this))
     }
 
-    override fun visitMod(ctx: TestTableLanguageParser.ModContext): SMVExpr {
+    override fun visitMod(ctx: TestTableLanguageParser.ModContext): SMVExpr{
         return SBinaryExpression(ctx.left.accept(this), SBinaryOperator.MOD, ctx.right.accept(this))
     }
 
-    override fun visitPlus(ctx: TestTableLanguageParser.PlusContext): SMVExpr {
+    override fun visitPlus(ctx: TestTableLanguageParser.PlusContext): SMVExpr{
         return SBinaryExpression(ctx.left.accept(this), SBinaryOperator.PLUS, ctx.right.accept(this))
     }
 
-    override fun visitDiv(ctx: TestTableLanguageParser.DivContext): SMVExpr {
+    override fun visitDiv(ctx: TestTableLanguageParser.DivContext): SMVExpr{
         return SBinaryExpression(ctx.left.accept(this), SBinaryOperator.DIV, ctx.right.accept(this))
     }
 
-    override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext): SMVExpr {
+    override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext): SMVExpr{
         return SBinaryExpression(ctx.left.accept(this), SBinaryOperator.NOT_EQUAL, ctx.right.accept(this))
     }
 
-    override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext): SMVExpr {
+    override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext): SMVExpr{
         return SBinaryExpression(ctx.left.accept(this), SBinaryOperator.MINUS, ctx.right.accept(this))
     }
 
-    override fun visitMult(ctx: TestTableLanguageParser.MultContext): SMVExpr {
+    override fun visitMult(ctx: TestTableLanguageParser.MultContext): SMVExpr{
         return SBinaryExpression(ctx.left.accept(this), SBinaryOperator.MUL, ctx.right.accept(this))
     }
 
-    override fun visitBinguardedCommand(ctx: TestTableLanguageParser.BinguardedCommandContext): SMVExpr {
+    override fun visitBinguardedCommand(ctx: TestTableLanguageParser.BinguardedCommandContext): SMVExpr{
         return ctx.guardedcommand().accept(this)
     }
 
-    override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): SMVExpr {
+    override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): SMVExpr{
         //TODO call function/symbolic execution
         val args = ctx.expr().map { c -> c.accept(this) }
         return SFunction(ctx.IDENTIFIER().text,
                 *args.toTypedArray())
     }
 
-    override fun visitBvariable(ctx: TestTableLanguageParser.BvariableContext): SMVExpr {
+    override fun visitBvariable(ctx: TestTableLanguageParser.BvariableContext): SMVExpr{
         return ctx.variable().accept(this)
     }
 
-    override fun visitVariable(ctx: TestTableLanguageParser.VariableContext): SMVExpr {
+    override fun visitVariable(ctx: TestTableLanguageParser.VariableContext): SMVExpr{
         val varText = ctx.IDENTIFIER().text
         val isReference = ctx.RBRACKET() != null
 
-        return if (gtt.isVariable(varText)) {
-            val variable = gtt.getSMVVariable(varText)
+        return if (varText in context) {
+            val variable = context.getSMVVariable(varText)!!
             if (isReference)
-                gtt.getReference(variable, Integer.parseInt(ctx.i().text))
+                context.getReference(variable, Integer.parseInt(ctx.i().text))
             else
                 variable
         } else {
@@ -186,27 +186,27 @@ class ExprVisitor(private val columnVariable: SVariable,
         }
     }
 
-    override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext): SMVExpr {
+    override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext): SMVExpr{
         return SBinaryExpression(ctx.left.accept(this), SBinaryOperator.AND, ctx.right.accept(this))
     }
 
-    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext): SMVExpr {
+    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext): SMVExpr{
         return SBinaryExpression(ctx.left.accept(this), SBinaryOperator.XOR, ctx.right.accept(this))
     }
 
-    override fun visitBconstant(ctx: TestTableLanguageParser.BconstantContext): SMVExpr {
+    override fun visitBconstant(ctx: TestTableLanguageParser.BconstantContext): SMVExpr{
         return ctx.constant().accept(this)
     }
 
-    override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext): SMVExpr {
+    override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext): SMVExpr{
         return SBinaryExpression(ctx.left.accept(this), SBinaryOperator.OR, ctx.right.accept(this))
     }
 
-    override fun visitEquality(ctx: TestTableLanguageParser.EqualityContext): SMVExpr {
+    override fun visitEquality(ctx: TestTableLanguageParser.EqualityContext): SMVExpr{
         return SBinaryExpression(ctx.left.accept(this), SBinaryOperator.EQUAL, ctx.right.accept(this))
     }
 
-    override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext): SMVExpr {
+    override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext): SMVExpr{
         val c = SCaseExpression()
         try {
             var i = 0

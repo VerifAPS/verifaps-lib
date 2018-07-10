@@ -20,7 +20,7 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
 
-import edu.kit.iti.formal.automation.testtables.io.IOFacade
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.schema.DataType
 
 /**
@@ -31,12 +31,18 @@ class ConstraintVariableTransformer : TableTransformer {
         val gtt = tt.testTable
         val mt = tt.tableModule
         for (cv in gtt.constraintVariables) {
-            val svar = gtt.getSMVVariable(cv.name)
+            val svar = tt.variableContext.getSMVVariable(cv.name)!!
             if (cv.dataType == DataType.ENUM) {
                 svar.dataType = tt.superEnumType
             }
             mt.frozenVars.add(svar)
-            mt.initExpr.add(cv.constraint)
+
+            if (cv.constraint != null) {
+                mt.initExpr.add(
+                        GetetaFacade.exprToSMV(cv.constraint!!,
+                                tt.variableContext.getSMVVariable(cv.name)!!,
+                                tt.variableContext))
+            }
             //TODO add invar for each frozenvar
         }
     }

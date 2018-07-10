@@ -27,7 +27,7 @@ class ModuleParameterTransformer : TableTransformer {
     override fun accept(tt: ConstructionModel) {
         tt.testTable.ioVariables.forEach {
             tt.tableModule.moduleParameters.add(
-                    tt.testTable.getSMVVariable(it))
+                    tt.variableContext.getSMVVariable(it))
         }
     }
 }

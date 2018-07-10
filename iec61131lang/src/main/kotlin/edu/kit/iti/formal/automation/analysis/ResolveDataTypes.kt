@@ -79,8 +79,13 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
     }
 
     override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration) {
-        arrayTypeDeclaration.baseType.resolve(scope::resolveDataType)
         return super.visit(arrayTypeDeclaration)
+    }
+
+    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration) {
+        ignoreDataTypeNotDefined {
+            simpleTypeDeclaration.baseType.resolve(scope::resolveDataType)
+        }
     }
 
     override fun visit(ref: SymbolicReference) {
@@ -98,7 +103,6 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
         } catch (e: DataTypeNotDefinedException) {
         }
     }
-
 
     override fun visit(literal: Literal) {
         try {
@@ -136,7 +140,7 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
         try {
             func()
         } catch (e: DataTypeNotDefinedException) {
-            
+
         }
     }
 }

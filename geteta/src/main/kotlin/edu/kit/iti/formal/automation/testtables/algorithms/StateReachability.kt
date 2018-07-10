@@ -21,7 +21,6 @@ package edu.kit.iti.formal.automation.testtables.algorithms
 
 
 import edu.kit.iti.formal.automation.testtables.builder.ConstructionModel
-import edu.kit.iti.formal.automation.testtables.builder.SingleState
 import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.automation.testtables.model.Region
 import edu.kit.iti.formal.automation.testtables.model.State
@@ -55,19 +54,20 @@ import kotlin.collections.ArrayList
  * @version 2 (12.12.16)
  */
 class StateReachability(
-        private val sentinel: SingleState,
-        private val root: Region) {
+        private val sentinel: State,
+        root: Region) {
 
     private val flatList: MutableList<State>
 
     constructor(model: ConstructionModel) :
-            this(model.sentinelState, model.testTable.region!!)
+            this(model.sentinelState, model.testTable.region)
 
     init {
-        sentinel.duration = Duration(1, 1)
+        sentinel.duration = Duration.ClosedInterval(1, 1)
         flatList = ArrayList(root.flat())
         val lastState = flatList[flatList.size - 1]
-        if (!lastState.duration.isOmega) {
+
+        if (lastState.duration !== edu.kit.iti.formal.automation.testtables.model.Duration.Omega) {
             flatList.add(sentinel)
         }
 
@@ -164,11 +164,8 @@ class StateReachability(
         }
 
         //Regions can be isSkippable
-
-        r.children.forEach { s ->
-            if (!s.isLeaf) {
-                addRegions(s as Region)
-            }
+        r.children.forEach {
+            if (it is Region) addRegions(it)
         }
     }
 
@@ -180,7 +177,7 @@ class StateReachability(
      */
     private fun initTable() {
         for (i in 0 until flatList.size - 1) {
-            if (flatList[i].duration.isOmega) {
+            if (flatList[i].duration === Duration.Omega) {
                 break
             }
             flatList[i].outgoing.add(flatList[i + 1])

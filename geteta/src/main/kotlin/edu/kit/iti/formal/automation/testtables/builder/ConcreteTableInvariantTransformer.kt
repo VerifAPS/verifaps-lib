@@ -40,7 +40,7 @@ import edu.kit.iti.formal.smv.ast.SVariable
 class ConcreteTableInvariantTransformer : TableTransformer {
     override fun accept(tt: ConstructionModel) {
         val cto = tt.testTable.options.concreteTableOptions
-        val rows = tt.testTable.region!!.flat()
+        val rows = tt.testTable.region.flat()
         val tableModule = tt.tableModule
 
         val lastRow = rows[rows.size - 1].defForward
@@ -62,7 +62,7 @@ class ConcreteTableInvariantTransformer : TableTransformer {
             val clock = tt.clocks[s]
             val id = s.id
 
-            val cycles = cto.getCount(id, s.duration.lower)
+            val cycles = cto.getCount(id, s.duration)
 
             if (clock == null) {
                 Report.info("Step %d has no clock, could not " + "enforce count of %d cycles.", id, cycles)
@@ -73,12 +73,12 @@ class ConcreteTableInvariantTransformer : TableTransformer {
             //validity check of user-wanted cycles
             if (!s.duration.contains(cycles)) {
                 throw IllegalClockCyclesException(
-                        String.format("Cycles %d are out of range [%d,%d] for State %d",
-                                cycles, s.duration.lower, s.duration.upper, id))
+                        String.format("Cycles %d are out of range %s for State %d",
+                                cycles, s.duration, id))
             }
 
             // 0dX_<cycles>
-            val count = SLiteral.create(cycles).with(clock!!.dataType!!)
+            val count = SLiteral.create(cycles).with(clock.dataType!!)
 
             val fwd = tableModule.definitions[s.defForward]
             if(fwd!=null) {

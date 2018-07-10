@@ -235,7 +235,7 @@ array_specification
 :
 	| ARRAY LBRACKET ranges += subrange
 	  (COMMA ranges += subrange)*
-	  RBRACKET OF non_generic_type_name
+	  RBRACKET OF (string_type_declaration|non_generic_type_name)
 
 ;
 //TODO need to clarify https://infosys.beckhoff.com/english.php?content=../content/1033/tcplccontrol/html/tcplcctrl_array.htm&id=
@@ -269,17 +269,17 @@ array_initial_element
 structure_declaration
 :
 	STRUCT
-	(ids += varName COLON tds += type_declaration SEMICOLON)*
+	(ids += name COLON tds += type_declaration SEMICOLON)*
 	END_STRUCT
 ;
 
-varName: IDENTIFIER;
+name : IDENTIFIER;
 
 structure_initialization
 :
 	LPAREN
-	(IDENT += IDENTIFIER) ASSIGN (init += initializations)
-	( COMMA (IDENT += IDENTIFIER) ASSIGN (init += initializations))*
+	(IDENT += name) ASSIGN (init += initializations)
+	( COMMA (IDENT += name) ASSIGN (init += initializations))*
 	RPAREN
 ;
 
@@ -301,15 +301,12 @@ reference_value
 
 identifier_list
 :
-	names += IDENTIFIER
-	(
-		COMMA names += IDENTIFIER
-	)*
+	names+=name	(COMMA names+=name )*
 ;
 
 function_declaration
 :
-	FUNCTION identifier = IDENTIFIER COLON
+	FUNCTION identifier=name COLON
 	( returnET=elementary_type_name	| returnID=IDENTIFIER)
 	var_decls
 	funcBody END_FUNCTION
@@ -428,7 +425,7 @@ program_declaration
 
 global_variable_list_declaration
 :
-    VAR_GLOBAL
+    VAR_GLOBAL (RETAIN|PERSISTENT|CONSTANT)*
         var_decl_inner
     END_VAR
 ;

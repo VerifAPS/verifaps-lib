@@ -23,12 +23,11 @@ package edu.kit.iti.formal.automation.testtables.io
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.model.*
 import edu.kit.iti.formal.automation.testtables.schema.*
 import edu.kit.iti.formal.automation.testtables.schema.ConstraintVariable
 import edu.kit.iti.formal.automation.testtables.schema.IoVariable
-import edu.kit.iti.formal.smv.ast.SLiteral
-import edu.kit.iti.formal.smv.ast.SVariable
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.w3c.dom.Element
@@ -110,9 +109,9 @@ class TableReader(private val input: File) {
         val duration = steps.duration
         if (duration == null) {
             Report.info("Duration is not given, assume '[1,1]'")
-            r.duration = Duration(1, 1)
+            r.duration = Duration.ClosedInterval(1, 1)
         } else {
-            r.duration = IOFacade.parseDuration(duration)
+            r.duration = GetetaFacade.parseDuration(duration)
         }
         for (o in steps.stepOrBlock) {
             if (o is Step) {
@@ -131,9 +130,8 @@ class TableReader(private val input: File) {
         for (i in 0 until product.ioVariables.size) {
             val v = product.getIoVariables(i)
             val name = v.name
-
             val cellContent = get(cells, name)
-            s.entryForColumn[name] = cellContent
+            /*
             val cellValue: String =
                     if (cellContent == null || cellContent.isEmpty())
                         lastColumnValue.getOrElse(i, {
@@ -142,14 +140,16 @@ class TableReader(private val input: File) {
                             DEFAULT_CELL_VALUE
                         })
                     else cellContent
-
+                    */
             try {
-                val e = IOFacade.parseCellExpression(cellValue,
-                        product.getSMVVariable(name), product)
-                s.add(v, e)
-                this.lastColumnValue[i] = cellValue
+                if (cellContent != null)
+                    s.rawFields[v] = GetetaFacade.parseCell(cellContent)
+                else
+                    s.rawFields[v] = null
+
+                //this.lastColumnValue[i] = cellContent
             } catch (pce: ParseCancellationException) {
-                Report.error("Error during parsing '%s'  for column '%s' (%d) and row '%d'", cellValue,
+                Report.error("Error during parsing '%s'  for column '%s' (%d) and row '%d'", cellContent,
                         name, i, s.id)
                 Report.error(pce.message)
                 throw pce
@@ -157,8 +157,7 @@ class TableReader(private val input: File) {
 
 
         }
-
-        s.duration = IOFacade.parseDuration(step.duration)
+        s.duration = GetetaFacade.parseDuration(step.duration)
         return s
     }
 
@@ -181,10 +180,9 @@ class TableReader(private val input: File) {
             if (o is ConstraintVariable) {
                 Report.debug("\t %s : %s", o.name, o.dataType)
                 val expr = if (o.constraint != null) {
-                    val a = SVariable(o.name)
-                    IOFacade.parseCellExpression(o.constraint, a, product)
+                    GetetaFacade.parseCell(o.constraint)
                 } else {
-                    SLiteral.TRUE
+                    null
                 }
                 val v = edu.kit.iti.formal.automation.testtables.model.ConstraintVariable(o.name,
                         scope.resolveDataType(o.dataType.name), expr)
@@ -200,7 +198,7 @@ class TableReader(private val input: File) {
     }
 
     companion object {
-        private val DEFAULT_CELL_VALUE = "-"
+        private const val DEFAULT_CELL_VALUE = "-"
         operator fun get(cells: List<Element>, name: String): String? {
             return cells.stream()
                     .filter { c -> c.tagName == name && c.firstChild != null }

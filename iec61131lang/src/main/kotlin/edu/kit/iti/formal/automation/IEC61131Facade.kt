@@ -22,9 +22,7 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
-import edu.kit.iti.formal.automation.analysis.MaintainInitialValues
-import edu.kit.iti.formal.automation.analysis.RegisterDataTypes
-import edu.kit.iti.formal.automation.analysis.ResolveDataTypes
+import edu.kit.iti.formal.automation.analysis.*
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
@@ -72,6 +70,7 @@ object IEC61131Facade {
         val p = IEC61131Parser(CommonTokenStream(lexer))
         p.errorListeners.clear()
         p.addErrorListener(p.errorReporter)
+        //   p.errorHandler = BailErrorStrategy()
         return p
     }
 
@@ -142,6 +141,8 @@ object IEC61131Facade {
         //val rr = ResolveReferences(scope)
         elements.accept(fdt)
         elements.accept(rdt)
+        elements.accept(rdt)
+        elements.accept(RewriteEnums)
         elements.accept(MaintainInitialValues())
         //elements.accept(rr)
         return scope
@@ -153,6 +154,7 @@ object IEC61131Facade {
         //val rr = ResolveReferences(scope)
         elements.forEach { it.accept(fdt) }
         elements.forEach { it.accept(rdt) }
+        elements.forEach { it.accept(RewriteEnums) }
         elements.forEach { it.accept(MaintainInitialValues()) }
         //elements.accept(rr)
         return scope
@@ -165,5 +167,18 @@ object IEC61131Facade {
 
     fun file(resource: InputStream) = file(CharStreams.fromStream(resource, Charset.defaultCharset()))
 
+    fun filer(input: CharStream): Pair<PouElements, List<ReporterMessage>> {
+        val p = file(input)
+        resolveDataTypes(p)
+        return p to check(p)
+    }
+
+    fun filer(input: File) = filer(CharStreams.fromFileName(input.absolutePath))
+
+    fun check(p: PouElements): MutableList<ReporterMessage> {
+        val r = CheckForTypes.DefaultReporter()
+        p.accept(CheckForTypes(r))
+        return r.messages
+    }
 }
 
