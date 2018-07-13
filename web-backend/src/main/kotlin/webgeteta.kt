@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.web
 
-import edu.kit.iti.formal.automation.st.ast.PouElements
+import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
@@ -20,6 +20,7 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.*
 
+
 /**
  *
  * @author Alexander Weigl
@@ -27,11 +28,13 @@ import java.util.*
  */
 fun Route.geteta() {
     post("/geteta/generate") {
-        val code = context.receive<PouElements>()
+        val str = context.receive<String>()
+        val code = IEC61131Facade.file(CharStreams.fromString(str))
+        IEC61131Facade.resolveDataTypes(code)
         val program = Utils.findProgram(code)
         if (program != null) {
             context.respondText(ContentType.Text.Plain) {
-                GetetaFacade.generateInterface(scope = program.scope)
+                GetetaFacade.generateInterface("tt_"+program.name, scope = program.scope)
             }
             return@post
         }

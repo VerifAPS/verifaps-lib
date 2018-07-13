@@ -27,17 +27,16 @@ import java.util.*
 
 
 class HTMLCodeWriter : CodeWriter() {
-    private var lastSeperatorInsertPosition: Int = 0
     private val lastIsDiv = Stack<Boolean>()
 
     operator fun div(clazzes: String): HTMLCodeWriter {
-        sb.append("<div class=\"").append(clazzes.toLowerCase()).append("\">")
+        stream.append("<div class=\"").append(clazzes.toLowerCase()).append("\">")
         lastIsDiv.push(true)
         return this
     }
 
     fun span(clazzes: String): HTMLCodeWriter {
-        sb.append("<span class=\"")
+        stream.append("<span class=\"")
                 .append(clazzes.toLowerCase())
                 .append("\">")
         lastIsDiv.push(false)
@@ -45,7 +44,7 @@ class HTMLCodeWriter : CodeWriter() {
     }
 
     fun end(): HTMLCodeWriter {
-        sb.append(if (lastIsDiv.pop()) "</div>" else "</span>")
+        stream.append(if (lastIsDiv.pop()) "</div>" else "</span>")
         return this
     }
 
@@ -97,7 +96,6 @@ class HTMLCodeWriter : CodeWriter() {
 
 
     fun seperator(s: String): HTMLCodeWriter {
-        lastSeperatorInsertPosition = length
         span(Sections.SEPARATOR).append(s)
         return this.end()
     }
@@ -119,7 +117,7 @@ class HTMLCodeWriter : CodeWriter() {
 
 
     fun type(baseTypeName: String?): HTMLCodeWriter {
-        span(Sections.TYPE_NAME).append(baseTypeName?:"<<<null>>>")
+        span(Sections.TYPE_NAME).append(baseTypeName ?: "<<<null>>>")
         return this.end()
     }
 
@@ -127,16 +125,5 @@ class HTMLCodeWriter : CodeWriter() {
     fun operator(s: String): HTMLCodeWriter {
         span(Sections.OPERATOR).append(s)
         return this.end()
-    }
-
-
-    fun deleteLastSeparator(): HTMLCodeWriter {
-        sb.setLength(lastSeperatorInsertPosition)
-        return this
-
-    }
-
-    companion object {
-        private val serialVersionUID = -6017826265536761012L
     }
 }

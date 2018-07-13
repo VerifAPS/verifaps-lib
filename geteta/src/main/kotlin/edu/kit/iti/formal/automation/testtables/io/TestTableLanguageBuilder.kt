@@ -3,10 +3,10 @@ package edu.kit.iti.formal.automation.testtables.io
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.*
+import org.antlr.v4.runtime.CharStreams
 
 /**
  *
@@ -61,14 +61,9 @@ class TestTableLanguageBuilder : TestTableLanguageBaseVisitor<Unit>() {
     }
 
     override fun visitFunction(ctx: TestTableLanguageParser.FunctionContext) {
-        val fd = FunctionDeclaration(ctx.name.text)
-        fd.returnType.identifier = ctx.rt.text
-        fd.stBody = IEC61131Facade.statements(ctx.STCODE().text)
-        ctx.vardt().forEach {
-            fd.scope.add(VariableDeclaration(it.arg.text, VariableDeclaration.INPUT,
-                    scope.resolveDataType(it.dt.text)))
-        }
-        current.functions += fd
+        val code = ctx.FUNCTION().text
+        val pou = IEC61131Facade.file(CharStreams.fromString(code))
+        current.functions += pou[0] as FunctionDeclaration
     }
 }
 

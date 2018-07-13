@@ -1,17 +1,20 @@
 table Ta {
     var input i : INT
-    var output o,c : INT
-
-    group {
-        step [10,-] {
-            i = -
-            o = i
-            c = 42
-        }
-    }
-
+    var output o : INT
+    var output c : INT
+    
+    
     options {
         mode = CONCRETE_TABLE
         cycles.1 = 100
+        }
+    
+    group 0  {
+        row 1 {
+            i: -
+            o: i
+            c: 42
+        }
     }
+    
 }

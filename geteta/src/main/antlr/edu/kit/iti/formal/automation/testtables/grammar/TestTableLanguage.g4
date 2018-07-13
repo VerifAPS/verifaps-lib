@@ -27,7 +27,7 @@ osem : ';'?;
 group : 'group' (id=i)? time? '{' (group|row)* '}';
 
 row : 'row' (id=i)? time? '{' (kc osem)* '}';
-kc: key=IDENTIFIER '=' value=cell;
+kc: key=IDENTIFIER ':' value=cell;
 time :
       MINUS (pflag='>>')? #timeDontCare
     | op=(GREATER_EQUALS | GREATER_THAN) INTEGER  (pflag='>>')? #timeSingleSided
@@ -42,8 +42,13 @@ freeVariable:
 ;
 
 vardt : arg=IDENTIFIER':' dt=IDENTIFIER;
-function : 'function' name=IDENTIFIER '(' vardt (',' vardt)*  ')'
-            ':' rt=IDENTIFIER STCODE ;
+
+
+/*function : 'function' name=IDENTIFIER '(' vardt (',' vardt)*  ')'
+            ':' rt=IDENTIFIER STCODE ;*/
+
+function : FUNCTION;
+FUNCTION : ('FUNCTION'|'function') .*? ('END_FUNCTION'|'end_function');
 
 //
 cell : chunk (COMMA chunk)*;

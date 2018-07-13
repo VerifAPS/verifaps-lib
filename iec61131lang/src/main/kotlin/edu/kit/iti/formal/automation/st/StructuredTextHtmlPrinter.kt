@@ -132,7 +132,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
             sb.end().seperator(",")
         }
 
-        sb.deleteLastSeparator().append(")")
+        sb.append(")")
         sb.ts().end().end()
         return null
     }
@@ -282,8 +282,8 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
         for (e in expressions) {
             e.accept(this)
             sb.seperator(",")
-        }
-        sb.deleteLastSeparator().end()
+        }//TODO
+        sb.end()
         return null
     }
 
@@ -301,8 +301,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
             params = true
         }
 
-        if (params)
-            sb.deleteLastSeparator()
+        //TODO
         sb.append(");")
         return null
     }
@@ -391,7 +390,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
             cc.accept(this)
             sb.seperator(",")
         }
-        sb.deleteLastSeparator()
+        //TODO
         sb.seperator(":")
 
         aCase.statements.accept(this)

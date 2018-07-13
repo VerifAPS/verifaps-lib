@@ -21,6 +21,9 @@ package edu.kit.iti.formal.automation.testtables.io
 
 
 import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.datatypes.AnyBit
+import edu.kit.iti.formal.automation.datatypes.EnumerateType
+import edu.kit.iti.formal.automation.datatypes.values.VAnyBit
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
@@ -39,8 +42,15 @@ import javax.xml.bind.JAXBException
 
 class TableReader(private val input: File) {
     val product = GeneralizedTestTable()
+    val scope = Scope.defaultScope()
+
     private var stepNumber = 0
     private val lastColumnValue = TreeMap<Int, String>()
+
+    init {
+        scope.types.register("ENUM", EnumerateType("ENUM", arrayListOf("a")))
+        scope.types.register("BOOLEAN", AnyBit.BOOL)
+    }
 
     @Throws(JAXBException::class)
     fun run() {
@@ -130,7 +140,7 @@ class TableReader(private val input: File) {
         for (i in 0 until product.ioVariables.size) {
             val v = product.getIoVariables(i)
             val name = v.name
-            val cellContent = get(cells, name)
+            val cellContent = get(cells, name, i)
             /*
             val cellValue: String =
                     if (cellContent == null || cellContent.isEmpty())
@@ -165,7 +175,6 @@ class TableReader(private val input: File) {
         Report.debug("%d variables found",
                 xml.variables.variableOrConstraint.size)
 
-        val scope = Scope.defaultScope()
 
         for (o in xml.variables.variableOrConstraint) {
             if (o is IoVariable) {
@@ -199,11 +208,19 @@ class TableReader(private val input: File) {
 
     companion object {
         private const val DEFAULT_CELL_VALUE = "-"
-        operator fun get(cells: List<Element>, name: String): String? {
-            return cells.stream()
-                    .filter { c -> c.tagName == name && c.firstChild != null }
-                    .map { n -> n.firstChild.nodeValue }
-                    .findFirst().orElse(null)
+        operator fun get(cells: List<Element>, name: String, pos: Int): String? {
+            val namedCell = cells.find { it.tagName == name }
+            if (namedCell != null) {
+                if (namedCell.firstChild != null)
+                    return namedCell.firstChild.nodeValue
+            } else {
+                try {
+                    val indexedCell = cells.filter { it.tagName == "cell" }[pos]
+                    return indexedCell.firstChild.nodeValue
+                } catch (e: IndexOutOfBoundsException) {
+                }
+            }
+            return null
         }
     }
 

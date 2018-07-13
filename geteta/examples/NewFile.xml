@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<test-table xmlns="http://formal.iti.kit.edu/exteta-1.0"
+<test-table xmlns="http://formal.iti.kit.edu/exteta-1.1"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://formal.iti.kit.edu/exteta-1.0 ../src/main/xsd/exteta-1.0.xsd "
             name="Ta"
-            version="1.0">
+            version="1.1">
 
     <variables>
         <variable data-type="INT" io="input" name="sensor"/>

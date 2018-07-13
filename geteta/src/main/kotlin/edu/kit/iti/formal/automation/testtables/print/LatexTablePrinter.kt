@@ -200,8 +200,8 @@ class LatexTablePrinter(val gtt: GeneralizedTestTable) {
                     String.format("$\\geq%s$", d.lower) + (if (d.pflag) "\\DWAIT" else "")
             }
 
-    private operator fun get(s: List<Element>, varName: String, lastRow: Boolean): String {
-        val value = TableReader.get(s, varName)
+    private operator fun get(s: List<Element>, varName: String, pos: Int, lastRow: Boolean): String {
+        val value = TableReader.get(s, varName, pos)
         val cacheValue = cache[varName]
         if (value != null) { //value defined
             cache[varName] = value //save into cache

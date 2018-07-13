@@ -148,16 +148,7 @@ class StructuredTextPrinter
      */
     override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
         sb.nl().append(enumerationTypeDeclaration.name).append(" : ")
-
-        sb.append("(")
-
-        for (s in enumerationTypeDeclaration.allowedValues)
-            sb.append(s.text).append(" , ")
-
-        sb.deleteLast(3)
-        sb.append(");")
-
-
+        enumerationTypeDeclaration.allowedValues.joinTo(sb, ", ", "(", ");")
     }
 
     override fun visit(init: IdentifierInitializer) {
@@ -247,13 +238,7 @@ class StructuredTextPrinter
             sb.append("^")
 
         if (symbolicReference.subscripts != null && !symbolicReference.subscripts!!.isEmpty()) {
-            sb.append('[')
-            for (expr in symbolicReference.subscripts!!) {
-                expr.accept(this)
-                sb.append(',')
-            }
-            sb.deleteLast()
-            sb.append(']')
+            symbolicReference.subscripts!!.joinTo(sb, ", ", "[", "]") { it.accept(this) }
         }
 
         if (symbolicReference.sub != null) {
@@ -314,12 +299,7 @@ class StructuredTextPrinter
      * {@inheritDoc}
      */
     override fun visit(expressions: ExpressionList) {
-        for (e in expressions) {
-            e.accept(this)
-            sb.append(", ")
-        }
-        sb.deleteLast(2)
-
+        expressions.joinTo(sb) { it.accept(this) }
     }
 
     /**
@@ -327,26 +307,16 @@ class StructuredTextPrinter
      */
     override fun visit(invocation: Invocation) {
         invocation.callee.accept(this)
-        sb.append("(")
-
-        var params = false
-        for (entry in invocation.parameters) {
-            if (entry.name != null) {
-                sb.append(entry.name!!)
-                if (entry.isOutput)
+        invocation.parameters.joinTo(sb, ", ", "(", ")") {
+            if (it.name != null) {
+                sb.append(it.name!!)
+                if (it.isOutput)
                     sb.append(" => ")
                 else
                     sb.append(" := ")
             }
-
-            entry.expression.accept(this)
-            sb.append(", ")
-            params = true
+            it.expression.accept(this)
         }
-
-        if (params)
-            sb.deleteLast(2)
-        sb.append(")")
     }
 
     /**
@@ -573,16 +543,11 @@ class StructuredTextPrinter
      */
     override fun visit(aCase: Case) {
         sb.nl()
-        for (cc in aCase.conditions) {
-            cc.accept(this)
-            sb.append(", ")
-        }
-        sb.deleteLast(2)
+        aCase.conditions.joinTo(sb) { it.accept(this) }
         sb.append(":")
-        sb.increaseIndent()
-        aCase.statements.accept(this)
-        sb.decreaseIndent()
-
+        sb.block() {
+            aCase.statements.accept(this@StructuredTextPrinter)
+        }
     }
 
     /**
@@ -627,14 +592,12 @@ class StructuredTextPrinter
         if (vd.dataType is ArrayType) {
             val dataType = vd.dataType as ArrayType
             sb.append(" ARRAY[")
-            for (range in dataType.ranges) {
+            dataType.ranges.joinTo(sb) { range ->
                 range.start.accept(this)
                 sb.append("..")
                 range.stop.accept(this)
-                sb.append(",")
             }
-            sb.deleteLast()
-            sb.append("] OF ").append(dataType.fieldType!!.name)
+            sb.append("] OF ").append(dataType.fieldType.name)
         } else {
             vd.typeDeclaration?.accept(this)
         }
@@ -695,15 +658,9 @@ class StructuredTextPrinter
     }
 
     override fun visit(initializations: ArrayInitialization) {
-        sb.append("[")
-        initializations.initValues.forEach {
+        initializations.initValues.joinTo(sb, ", ", "[", "]") {
             it.accept(this)
-            sb.append(", ")
         }
-        // Added an extra ", "
-        sb.deleteLast(2)
-        sb.append("]")
-
     }
 
     override fun visit(localScope: Scope) {
@@ -746,7 +703,7 @@ class StructuredTextPrinter
                     vd.init!!.accept(this)
                 } else if (vd.initValue != null) {
                     sb.append(" := ")
-                    val (dt,v) = vd.initValue as Value<*,*>
+                    val (dt, v) = vd.initValue as Value<*, *>
                     sb.append(dt.repr(v))
                 }
                 sb.append(";")
@@ -758,15 +715,11 @@ class StructuredTextPrinter
     }
 
     override fun visit(structureInitialization: StructureInitialization) {
-        sb.append("(")
-        structureInitialization.initValues.entries.stream().forEach { initialization ->
-            sb.append(initialization.key).append(" := ")
-            initialization.value.accept(this)
-            sb.append(", ")
+        structureInitialization.initValues.joinTo(sb, ", ", "(", ")")
+        { t, v ->
+            sb.append(t).append(" := ")
+            v.accept(this)
         }
-        // Added an extra ", "
-        sb.deleteLast(2)
-        sb.append(")")
 
     }
 
@@ -780,10 +733,10 @@ class StructuredTextPrinter
     }
 
     private fun visit(aa: SFCStep.AssociatedAction) {
-        sb.nl().append(aa.actionName!!).append('(').append(aa.qualifier!!.qualifier!!.symbol)
-        if (aa.qualifier!!.qualifier!!.hasTime) {
+        sb.nl().append(aa.actionName).append('(').append(aa.qualifier!!.qualifier.symbol)
+        if (aa.qualifier!!.qualifier.hasTime) {
             sb.append(", ")
-            aa.qualifier!!.time!!.accept(this)
+            aa.qualifier!!.time.accept(this)
         }
         sb.append(");")
     }
@@ -962,4 +915,34 @@ class StructuredTextPrinter
             return p.string
         }
     }
+}
+
+private fun <K, V, A : Appendable> Map<K, V>.joinTo(buffer: A,
+                                                    separator: String = ",", prefix: String = "", postfix: String = "",
+                                                    transform: (K, V) -> Unit) {
+    val kv = entries.toList()
+    buffer.append(prefix)
+    if (isNotEmpty()) {
+        for (i in 0 until size - 1) {
+            transform(kv[i].key, kv[i].value)
+            buffer.append(separator)
+        }
+        transform(kv[kv.lastIndex].key, kv[kv.lastIndex].value)
+    }
+    buffer.append(postfix)
+}
+
+private fun <T, A : Appendable> List<T>.joinTo(buffer: A,
+                                               separator: String = ",", prefix: String = "", postfix: String = "",
+                                               transform: (T) -> Unit) {
+    buffer.append(prefix)
+    if (isNotEmpty()) {
+        for (i in 0 until size - 1) {
+            transform(this[i])
+            buffer.append(separator)
+        }
+        transform(this[lastIndex])
+    }
+    buffer.append(postfix)
+
 }

@@ -21,8 +21,8 @@ package edu.kit.iti.formal.automation.testtables.io
 
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.algorithms.StateReachability
-import edu.kit.iti.formal.automation.testtables.builder.SingleState
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
+import edu.kit.iti.formal.automation.testtables.model.State
 import org.junit.After
 import org.junit.Assert
 import org.junit.Test
@@ -151,8 +151,8 @@ class StateReachabilityTest {
 
 
     fun getReachabilityString(gtt: GeneralizedTestTable): String {
-        val sentinelState = SingleState("SENTINEL")
-        val reachable: StateReachability = StateReachability(sentinelState, gtt.region!!)
+        val sentinelState = State("SENTINEL")
+        val reachable: StateReachability = StateReachability(sentinelState, gtt.region)
 
         return gtt.region!!.flat()
                 .joinToString("\n") { s ->

@@ -21,9 +21,11 @@ package edu.kit.iti.formal.automation.testtables.io
 
 
 import edu.kit.iti.formal.automation.datatypes.INT
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.IoVariable
 import edu.kit.iti.formal.automation.testtables.model.IoVariableType
+import edu.kit.iti.formal.automation.testtables.model.ParseContext
 import edu.kit.iti.formal.smv.ast.SVariable
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,15 +37,17 @@ import org.junit.runners.Parameterized
 @RunWith(Parameterized::class)
 class CellExpressionTest(private var expr: String) {
     private val gtt: GeneralizedTestTable
+    private val pc: ParseContext
 
     init {
         this.gtt = defaultTestTable()
+        pc = gtt.generateParseContext()
     }
 
     @Test
     fun parse() {
         val v = SVariable.create("Q").withSigned(16)
-        val e = IOFacade.exprToSMV(expr, v, gtt)
+        val e = GetetaFacade.exprToSMV(expr, v, pc)
         println(e)
     }
 

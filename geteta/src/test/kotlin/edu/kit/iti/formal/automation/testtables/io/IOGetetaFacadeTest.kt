@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.io
 
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import org.antlr.v4.runtime.CharStreams
 import org.junit.Assume
 import org.junit.Test
@@ -13,8 +14,7 @@ class IOGetetaFacadeTest {
     fun testGrammar() {
         val resourceAsStream = javaClass.getResourceAsStream("/dsl/detwait3.tt.txt")
         Assume.assumeNotNull(resourceAsStream)
-        val gtt = IOFacade.parseTable(CharStreams.fromStream(
-                resourceAsStream))
+        val gtt = GetetaFacade.parseTable(CharStreams.fromStream(resourceAsStream))
         println(gtt)
     }
 }

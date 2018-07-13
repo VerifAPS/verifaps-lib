@@ -23,8 +23,6 @@ package edu.kit.iti.formal.smv
 
 import org.junit.Test
 
-import org.junit.Assert.*
-
 /**
  * @author Alexander Weigl
  * @version 1 (14.09.17)
@@ -35,12 +33,10 @@ class McKtTest {
         val resource = javaClass.getResource("/cex.xml")
         val xml = resource.readText()
         val out = parseXmlOutput(xml)
-        assertFalse(out.hasErrors)
-        assertEquals(0, out.errors.size)
-        assertNotNull(out.counterExample)
-
-        assertEquals(false, out.isVerified)
-        println(out.counterExample)
+        when (out) {
+            is NuXMVOutput.Error -> assert(false) { "no errors expected" }
+            is NuXMVOutput.Verified -> assert(false) { "ce expteced" }
+            is NuXMVOutput.NotVerified -> println(out.counterExample)
+        }
     }
-
 }

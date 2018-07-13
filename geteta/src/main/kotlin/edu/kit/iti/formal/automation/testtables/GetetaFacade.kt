@@ -76,6 +76,9 @@ object GetetaFacade {
     fun parseCell(cell: String): TestTableLanguageParser.CellContext =
             createParser(cell).cell()!!
 
+    fun exprToSMV(cell: String, column: SVariable,
+                  vars: ParseContext): SMVExpr = exprToSMV(parseCell(cell), column, vars)
+
     fun exprToSMV(cell: TestTableLanguageParser.CellContext, column: SVariable,
                   vars: ParseContext): SMVExpr {
         val ev = ExprVisitor(column, vars)
@@ -85,6 +88,8 @@ object GetetaFacade {
     }
 
     fun parseDuration(duration: String): Duration {
+        if (duration == "wait")//old style
+            return Duration.OpenInterval(0, true)
         val parser = createParser(duration)
         val p = parser.time()
         return p.accept(TimeParser())
@@ -200,7 +205,7 @@ object GetetaFacade {
         s.append("\n\n\toptions{}")
         s.append("\n\n\tgroup{\n\t}")
 
-        s.append("}")
+        s.append("\n}")
         return s.toString()
     }
 

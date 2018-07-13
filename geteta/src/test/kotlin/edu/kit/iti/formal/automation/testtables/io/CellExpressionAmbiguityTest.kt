@@ -20,6 +20,7 @@
 package edu.kit.iti.formal.automation.testtables.io
 
 
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.exception.ProgramAbortionException
 import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVExpr
@@ -43,8 +44,6 @@ class CellExpressionAmbiguityTest {
 
     @Test
     fun testReference() {
-
-
         Assert.assertEquals(
                 SVariable.create("b__history._$2").withUnsigned(16)
                         .equal(defaultVar()),
@@ -55,21 +54,20 @@ class CellExpressionAmbiguityTest {
 
     @Test(expected = ProgramAbortionException::class)
     fun testInvalidReferencePositive() {
-        IOFacade.exprToSMV("b[2]", SVariable.create("a").asBool(), CellExpressionTest.defaultTestTable())
+        GetetaFacade.exprToSMV("b[2]", SVariable.create("a").asBool(), pc)
     }
 
 
     @Test
     fun testValidReferenceZero() {
-        IOFacade.exprToSMV("b[0]", SVariable.create("a").asBool(), CellExpressionTest.defaultTestTable())
+        GetetaFacade.exprToSMV("b[0]", SVariable.create("a").asBool(), pc)
     }
 
     companion object {
-
+        val pc = CellExpressionTest.defaultTestTable().generateParseContext()
 
         fun parse(cell: String): SMVExpr {
-
-            return IOFacade.exprToSMV(cell, defaultVar(), CellExpressionTest.defaultTestTable())
+            return GetetaFacade.exprToSMV(cell, defaultVar(), pc)
         }
 
         private fun defaultVar(): SVariable {

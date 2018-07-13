@@ -135,6 +135,14 @@ class GeneralizedTestTable(
     val DEFAULT_CELL_CONTENT = "-"
 
     fun generateSmvExpression(): ParseContext {
+        val vc = generateParseContext()
+        region.flat().forEach {
+            it.generateSmvExpression(vc)
+        }
+        return vc
+    }
+
+    fun generateParseContext(): ParseContext {
         val vc = ParseContext()
         constraintVariables.forEach {
             vc.getSMVVariable(it)
@@ -142,10 +150,6 @@ class GeneralizedTestTable(
         ioVariables.forEach {
             vc.getSMVVariable(it)
             vc.fillers[it] = GetetaFacade.parseCell(DEFAULT_CELL_CONTENT)
-        }
-
-        region.flat().forEach {
-            it.generateSmvExpression(vc)
         }
         return vc
     }
