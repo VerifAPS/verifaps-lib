@@ -98,7 +98,7 @@ object ExTeTa {
         }
 
         //
-        var table = GetetaFacade.readTable(tableFilename)
+        var table = GetetaFacade.parseTableXML(tableFilename)
         val os = OmegaSimplifier(table)
         os.run()
         if (!os.ignored.isEmpty()) {

@@ -125,7 +125,9 @@ data class EnumType(var values: List<String>) : SMVType {
     }
 
     override fun toString(): String {
-        return "{" + values.reduce { a, b -> "$a, $b" } + "}"
+        return if (values.isEmpty()) "{}"
+        else
+            "{" + values.reduce { a, b -> "$a, $b" } + "}"
     }
 }
 

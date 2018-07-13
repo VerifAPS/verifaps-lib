@@ -4,16 +4,17 @@ table Ta {
     var output c : INT
     
     
-    options {
-        mode = CONCRETE_TABLE
-        cycles.1 = 100
-        }
     
     group 0 [1, 1] {
-        row 1 >= 10{
+        row 1 [10, 10]{
             i: -
             o: i
             c: 42
+        }
+        row 2 >= 10{
+            i: -
+            o: i
+            c: 41
         }
     }
     

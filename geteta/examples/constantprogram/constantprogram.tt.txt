@@ -4,10 +4,6 @@ table Ta {
     var output c : INT
     
     
-    options {
-        mode = CONCRETE_TABLE
-        cycles.1 = 100
-        }
     
     group 0 [1, 1] {
         row 1 >= 10{

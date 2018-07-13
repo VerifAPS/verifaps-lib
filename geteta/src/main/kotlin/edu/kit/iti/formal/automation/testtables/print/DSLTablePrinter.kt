@@ -83,11 +83,11 @@ class DSLTablePrinter(val stream: CodeWriter) {
         }
     }
 
-    fun print(d: Duration) = when (d) {
+    fun print(d: Duration) = stream.write(when (d) {
         is Duration.Omega -> "omega"
         is Duration.ClosedInterval -> "[${d.lower}, ${d.upper}]" + (if (d.pflag) ">>" else "")
         is Duration.OpenInterval -> ">= ${d.lower}" + (if (d.pflag) ">>" else "")
-    }
+    })
 
     fun print(fs: FunctionDeclaration) {
         val stp = StructuredTextPrinter()

@@ -14,7 +14,7 @@ class IOGetetaFacadeTest {
     fun testGrammar() {
         val resourceAsStream = javaClass.getResourceAsStream("/dsl/detwait3.tt.txt")
         Assume.assumeNotNull(resourceAsStream)
-        val gtt = GetetaFacade.parseTable(CharStreams.fromStream(resourceAsStream))
+        val gtt = GetetaFacade.parseTableDSL(CharStreams.fromStream(resourceAsStream))
         println(gtt)
     }
 }

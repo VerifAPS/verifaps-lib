@@ -1,6 +1,8 @@
 package edu.kit.iti.formal.automation.testtables.io
 
 import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.datatypes.AnyBit
+import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
@@ -17,6 +19,10 @@ class TestTableLanguageBuilder : TestTableLanguageBaseVisitor<Unit>() {
     val testTables = arrayListOf<GeneralizedTestTable>()
     private lateinit var current: GeneralizedTestTable
     private val scope = Scope.defaultScope()
+    init {
+        scope.types.register("ENUM", EnumerateType("ENUM", arrayListOf("a"), "a"))
+        scope.types.register("BOOLEAN", AnyBit.BOOL)
+    }
 
     override fun visitTable(ctx: TestTableLanguageParser.TableContext) {
         current = GeneralizedTestTable()

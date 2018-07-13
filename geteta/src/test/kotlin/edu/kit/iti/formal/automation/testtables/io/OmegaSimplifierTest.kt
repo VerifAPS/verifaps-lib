@@ -44,7 +44,7 @@ class OmegaSimplifierTest {
 
     @Throws(JAXBException::class)
     private fun test(filename: String): String {
-        val gtt = GetetaFacade.readTable("src/test/resources/omega/$filename")
+        val gtt = GetetaFacade.parseTableXML("src/test/resources/omega/$filename")
         val os = OmegaSimplifier(gtt)
         os.run()
         return os.ignored.joinToString { it.id }

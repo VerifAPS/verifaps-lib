@@ -1,0 +1,18 @@
+table TTable {
+    var output o : ENUM ENUM
+    
+    
+    
+    group 0 [1, 1] {
+        row 1 [1, 1]{
+            o: a
+        }
+        row 2 [1, 1]{
+            o: b
+        }
+        row 3 [1, 1]{
+            o: c
+        }
+    }
+    
+}

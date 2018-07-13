@@ -1,0 +1,113 @@
+table TTable {
+    var input mode : ENUM ENUM
+    var input learn : BOOL
+    var input I : INT
+    var output Q : INT
+    var output W : BOOL
+    
+    gvar p : INT with 0
+    gvar q : INT with 5
+    
+    
+    group 0 [1, 1] {
+        row 1 >= 1{
+            mode: Active
+            learn: -
+            I: -
+            Q: 0
+            W: false
+        }
+        group 2 >= 1 {
+            row 3 >= 1{
+                mode: Learn
+                learn: false
+                I: -
+                Q: 0
+                W: false
+            }
+            row 4 >= 1{
+                mode: Learn
+                learn: true
+                I: [p,q]
+                Q: [p,q]
+                W: false
+            }
+        }
+        group 5 >= 1 {
+            group 6 [1, 1] {
+                row 7 >= 0{
+                    mode: Active
+                    learn: -
+                    I: [p,q]
+                    Q: [p,q]
+                    W: false
+                }
+            }
+            group 8 [1, 1] {
+                row 9 [10, 10]{
+                    mode: Active
+                    learn: -
+                    I: >q
+                    Q: <=q
+                    W: false
+                }
+                row 10 >= 1{
+                    mode: Active
+                    learn: -
+                    I: >q
+                    Q: <=q
+                    W: true
+                }
+            }
+            group 11 [1, 1] {
+                row 12 [5, 5]{
+                    mode: Active
+                    learn: -
+                    I: [p,q]
+                    Q: [p,q]
+                    W: true
+                }
+                row 13 >= 1{
+                    mode: Active
+                    learn: -
+                    I: [p,q]
+                    Q: [p,q]
+                    W: false
+                }
+            }
+            group 14 [1, 1] {
+                row 15 [10, 10]{
+                    mode: Active
+                    learn: -
+                    I: <p
+                    Q: >=p
+                    W: false
+                }
+                row 16 >= 1{
+                    mode: Active
+                    learn: -
+                    I: <p
+                    Q: >=p
+                    W: true
+                }
+            }
+            group 17 [1, 1] {
+                row 18 [5, 5]{
+                    mode: Active
+                    learn: -
+                    I: [p,q]
+                    Q: [p,q]
+                    W: true
+                }
+                row 19 >= 1{
+                    mode: Active
+                    learn: -
+                    I: [p,q]
+                    Q: [p,q]
+                    W: false
+                }
+            }
+        }
+    }
+    
+}

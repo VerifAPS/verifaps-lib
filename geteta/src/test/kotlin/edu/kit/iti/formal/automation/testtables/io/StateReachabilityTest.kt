@@ -42,7 +42,7 @@ class StateReachabilityTest {
     @Test
     @Throws(JAXBException::class)
     fun testReachabilityDetWait1() {
-        val gtt = GetetaFacade.readTable("src/test/resources/detwait/detwait1.xml")
+        val gtt = GetetaFacade.parseTableXML("src/test/resources/detwait/detwait1.xml")
         val out = getReachabilityString(gtt)
         Assert.assertEquals("1#(2)\n" + "2#(-1)", out)
     }
@@ -50,7 +50,7 @@ class StateReachabilityTest {
     @Test
     @Throws(JAXBException::class)
     fun testReachabilityDetWait2() {
-        val gtt = GetetaFacade.readTable("src/test/resources/detwait/detwait2.xml")
+        val gtt = GetetaFacade.parseTableXML("src/test/resources/detwait/detwait2.xml")
         val out = getReachabilityString(gtt)
         println(out)
         Assert.assertEquals("1#(2)\n" +
@@ -62,7 +62,7 @@ class StateReachabilityTest {
     @Test
     @Throws(JAXBException::class)
     fun testReachabilityDetWait3() {
-        val gtt = GetetaFacade.readTable("src/test/resources/detwait/detwait3.xml")
+        val gtt = GetetaFacade.parseTableXML("src/test/resources/detwait/detwait3.xml")
         val out = getReachabilityString(gtt)
         println(out)
         Assert.assertEquals("1#(2)\n" +
@@ -75,7 +75,7 @@ class StateReachabilityTest {
     @Test
     @Throws(JAXBException::class)
     fun testReachabilityOmega1() {
-        val gtt = GetetaFacade.readTable("src/test/resources/omega/reachability1.xml")
+        val gtt = GetetaFacade.parseTableXML("src/test/resources/omega/reachability1.xml")
         val out = getReachabilityString(gtt)
         println(out)
         Assert.assertEquals("1#(2)\n" +
@@ -87,7 +87,7 @@ class StateReachabilityTest {
     @Test
     @Throws(JAXBException::class)
     fun testReachability1() {
-        val gtt = GetetaFacade.readTable("src/test/resources/reachability/reachability1.xml")
+        val gtt = GetetaFacade.parseTableXML("src/test/resources/reachability/reachability1.xml")
         val out = getReachabilityString(gtt)
         println(out)
         Assert.assertEquals("1#(2)\n" +
@@ -99,7 +99,7 @@ class StateReachabilityTest {
     @Test
     @Throws(JAXBException::class)
     fun testReachability4() {
-        val gtt = GetetaFacade.readTable("src/test/resources/reachability/reachability4.xml")
+        val gtt = GetetaFacade.parseTableXML("src/test/resources/reachability/reachability4.xml")
         val out = getReachabilityString(gtt)
         println(out)
         Assert.assertEquals("1#(3)\n" +
@@ -115,7 +115,7 @@ class StateReachabilityTest {
     @Test
     @Throws(JAXBException::class)
     fun testReachability2() {
-        val gtt = GetetaFacade.readTable("src/test/resources/reachability/reachability2.xml")
+        val gtt = GetetaFacade.parseTableXML("src/test/resources/reachability/reachability2.xml")
         val out = getReachabilityString(gtt)
         println(out)
         Assert.assertEquals("1#(2,3,4)\n" +
@@ -127,7 +127,7 @@ class StateReachabilityTest {
     @Test
     @Throws(JAXBException::class)
     fun testReachability3() {
-        val gtt = GetetaFacade.readTable("src/test/resources/reachability/reachability3.xml")
+        val gtt = GetetaFacade.parseTableXML("src/test/resources/reachability/reachability3.xml")
         val out = getReachabilityString(gtt)
         println(out)
         Assert.assertEquals("1#(7)\n" +
@@ -141,7 +141,7 @@ class StateReachabilityTest {
     @Test
     @Throws(JAXBException::class)
     fun testReachability5() {
-        val gtt = GetetaFacade.readTable("src/test/resources/reachability/reachability5.xml")
+        val gtt = GetetaFacade.parseTableXML("src/test/resources/reachability/reachability5.xml")
         val out = getReachabilityString(gtt)
         println(out)
         Assert.assertEquals("1#(3)\n" +

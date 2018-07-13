@@ -70,7 +70,7 @@ class SMVModuleBuilderTest {
 
     @Throws(JAXBException::class, IOException::class)
     fun test(table: String, expectedSMVFile: String) {
-        val gtt = GetetaFacade.readTable(table)
+        val gtt = GetetaFacade.parseTableXML(table)
         val expected = FileUtils.readFileToString(java.io.File(expectedSMVFile), "utf-8")
         val enumType = GetetaFacade.createSuperEnum(Scope())
         val tt = TableTransformation(gtt, enumType)

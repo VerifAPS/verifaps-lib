@@ -4,7 +4,6 @@ import edu.kit.iti.formal.automation.st.util.CodeWriter
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.print.DSLTablePrinter
 import java.io.File
-import java.io.PrintWriter
 
 /**
  * Translate every gtt in xml to the new dsl format.
@@ -23,7 +22,7 @@ object Translate {
                 .forEach {
                     try {
                         val dsl = File(it.parentFile, it.nameWithoutExtension + ".tt.txt")
-                        val gtt = GetetaFacade.readTable(it.absolutePath)
+                        val gtt = GetetaFacade.parseTableXML(it.absolutePath)
                         dsl.bufferedWriter().use {
                             DSLTablePrinter(CodeWriter(it)).print(gtt)
                         }

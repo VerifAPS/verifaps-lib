@@ -10,8 +10,10 @@ import io.ktor.application.call
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
+import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Route
+import io.ktor.routing.get
 import io.ktor.routing.post
 import kotlinx.html.*
 import kotlinx.html.stream.appendHTML
@@ -20,13 +22,43 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.*
 
+data class GetetaExample(val name: String,
+                         val code: String,
+                         val testtable: String)
 
-/**
- *
- * @author Alexander Weigl
- * @version 1 (06.07.18)
- */
+object GetetaExamplesRepo {
+    val examples: List<GetetaExample>
+
+    init {
+        val prefix = "/examples/geteta/"
+
+        fun read(p: String) =
+                GetetaExamplesRepo.javaClass.getResourceAsStream(prefix + p)
+                        .bufferedReader().useLines { it.joinToString("\n") }
+
+        fun load(name: String): GetetaExample {
+            return try {
+                val (base, name) = name.split('|')
+                val code = read("$base.st")
+                val tt = read("$base.tt.txt")
+                GetetaExample(name, code, tt)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                GetetaExample(name, "", "")
+            }
+        }
+
+        val index = read("index")
+        examples = index.lines().map { load(it) }
+    }
+}
+
+
 fun Route.geteta() {
+    get("/geteta/examples") {
+        call.respond(GetetaExamplesRepo.examples)
+    }
+
     post("/geteta/generate") {
         val str = context.receive<String>()
         val code = IEC61131Facade.file(CharStreams.fromString(str))
@@ -34,7 +66,7 @@ fun Route.geteta() {
         val program = Utils.findProgram(code)
         if (program != null) {
             context.respondText(ContentType.Text.Plain) {
-                GetetaFacade.generateInterface("tt_"+program.name, scope = program.scope)
+                GetetaFacade.generateInterface("tt_" + program.name, scope = program.scope)
             }
             return@post
         }
@@ -46,16 +78,22 @@ fun Route.geteta() {
 
     post("/geteta/render") {
         val table = call.receive<String>()
-        val gtt = GetetaFacade.parseTable(CharStreams.fromString(table))
-        call.respondText(ContentType.Text.Html) {
-            val backend = StringWriter()
-            val stream = PrintWriter(backend)
-            try {
-                HTMLTablePrinter(gtt, stream).print()
-            } catch (e: Exception) {
-                e.printStackTrace(stream)
+        try {
+            val gtt = GetetaFacade.parseTableDSL(CharStreams.fromString(table))
+            call.respondText(ContentType.Text.Html) {
+                val backend = StringWriter()
+                val stream = PrintWriter(backend)
+                try {
+                    HTMLTablePrinter(gtt, stream).print()
+                } catch (e: Exception) {
+                    e.printStackTrace(stream)
+                    e.printStackTrace()
+                }
+                backend.toString()
             }
-            backend.toString()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            call.respondText(ContentType.Text.Plain) { e.message ?: "ERROR" }
         }
     }
 
@@ -181,7 +219,7 @@ object HtmlExprPrinter : TestTableLanguageBaseVisitor<String>() {
     val MATH_LE = "&le;"
     val MATH_GE = "&ge;"
     val OMEGA = "&infin;"
-    val DONTCARE = "&mid;"
+    val DONTCARE = "&dash;"
     val MATH_AND = "&and;"
     val MATH_OR = "&or;"
 

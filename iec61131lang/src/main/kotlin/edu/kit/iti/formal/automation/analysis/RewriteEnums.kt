@@ -8,20 +8,23 @@ import edu.kit.iti.formal.automation.st.ast.SymbolicReference
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
 
 object RewriteEnums : AstMutableVisitor() {
-    private lateinit var lastScope: Scope
+    private var lastScope: Scope? = null
 
     override fun visit(localScope: Scope): Scope {
         lastScope = localScope
-        return lastScope
+        return localScope
     }
 
     override fun visit(symbolicReference: SymbolicReference): Expression {
-        if (lastScope.resolveVariable(symbolicReference) == null) {
-            val enum0 = lastScope.resolveEnumByValue(symbolicReference.identifier)
-            if (enum0 != null) return EnumLit(RefTo(enum0), symbolicReference.identifier)
-            val enum1 = lastScope.resolveEnum(symbolicReference.identifier)
-            if (enum1 != null && symbolicReference.hasSub())
-                return EnumLit(RefTo(enum1), symbolicReference.sub!!.identifier)
+        val scope = lastScope
+        if (scope != null) {
+            if (scope.resolveVariable(symbolicReference) == null) {
+                val enum0 = scope.resolveEnumByValue(symbolicReference.identifier)
+                if (enum0 != null) return EnumLit(RefTo(enum0), symbolicReference.identifier)
+                val enum1 = scope.resolveEnum(symbolicReference.identifier)
+                if (enum1 != null && symbolicReference.hasSub())
+                    return EnumLit(RefTo(enum1), symbolicReference.sub!!.identifier)
+            }
         }
         return symbolicReference
     }

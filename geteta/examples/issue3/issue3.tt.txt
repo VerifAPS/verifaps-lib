@@ -1,0 +1,24 @@
+table TTable {
+    var output var_I : INT
+    var output var_J : INT
+    var output var_SUM : INT
+    var input var_FLAG : BOOL
+    
+    
+    
+    group 0 [1, 1] {
+        row 1 >= 4{
+            var_I: =3MOD4
+            var_J: [1,2]
+            var_SUM: =var_SUM[-1]+var_J
+            var_FLAG: FALSE
+        }
+        row 2 [1, 1]{
+            var_I: =3+3
+            var_J: -
+            var_SUM: -
+            var_FLAG: TRUE
+        }
+    }
+    
+}

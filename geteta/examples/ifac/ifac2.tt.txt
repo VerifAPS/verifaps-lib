@@ -1,0 +1,67 @@
+table TTable {
+    var input TPy : INT
+    var input TPSet : INT
+    var input Mode : ENUM ENUM
+    var input SensorInput : INT
+    var output SensorOutput : INT
+    var input iY : INT
+    
+    gvar x1 : INT with -
+    gvar x2 : INT with -
+    gvar y1 : INT with -
+    gvar y2 : INT with -
+    
+    
+    group 0 [1, 1] {
+        row 1 >= 0{
+            TPy: 0
+            TPSet: -
+            Mode: Op
+            SensorInput: -
+            SensorOutput: 0
+        }
+        row 2 [1, 10]{
+            TPy: -
+            TPSet: 0
+            Mode: Teach
+            SensorInput: -
+            SensorOutput: 0
+        }
+        row 3 [1, 1]{
+            TPy: y1
+            TPSet: 1
+            Mode: Teach
+            SensorInput: x1
+            SensorOutput: 0
+        }
+        row 4 [1, 10]{
+            TPy: -
+            TPSet: 0
+            Mode: Teach
+            SensorInput: -
+            SensorOutput: 0
+        }
+        row 5 [1, 1]{
+            TPy: y1
+            TPSet: 1
+            Mode: Teach
+            SensorInput: x1
+            SensorOutput: 0
+        }
+        row 6 [1, 1]{
+            TPy: -
+            TPSet: -
+            Mode: Teach
+            SensorInput: -
+            SensorOutput: 0
+        }
+        row 7 [1, 1]{
+            TPy: -
+            TPSet: -
+            Mode: Op
+            SensorInput: -
+            SensorOutput: =y1+(y2-y1)/(x2-x1)*(X-x1)
+        }
+    }
+    
+}

@@ -1,0 +1,19 @@
+table TTable {
+    var input var_A : INT
+    var input var_B : BOOL
+    var output var_C : INT
+    var output var_D : ENUM ENUM
+    
+    gvar var_someFreeVar : ENUM ENUM with var_literalOne
+    
+    
+    group 0 [1, 1] {
+        row 1 [1, 1]{
+            var_A: -
+            var_B: =FALSE
+            var_C: -
+            var_D: var_someFreeVar
+        }
+    }
+    
+}

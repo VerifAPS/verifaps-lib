@@ -1,0 +1,38 @@
+table Ta {
+    var input sensor : INT
+    var output actuator : BOOL
+    
+    gvar XX : BOOL with [2,10]
+    
+    
+    group 0 [1, 1] {
+        row 1 [1, 1]{
+            sensor: 1
+            actuator: true
+        }
+        row 2 [1, 5]{
+            sensor: 1
+            actuator: sensor*2
+        }
+        row 3 >= 0{
+            sensor: =prev(actuator)
+            actuator: =SEL(TRUE,FALSE,TRUE)
+        }
+    }
+    FUNCTION SEL : BOOL
+        
+        VAR_INPUT 
+            a : BOOL;
+            b : BOOL;
+            c : BOOL;
+        END_VAR
+        
+        IF a THEN
+            SEL := b;
+        ELSE
+            SEL := c;
+        END_IF
+    END_FUNCTION
+    
+    
+}

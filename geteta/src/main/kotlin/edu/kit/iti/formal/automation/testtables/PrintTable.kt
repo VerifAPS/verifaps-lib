@@ -53,8 +53,8 @@ object PrintTable {
     fun main(args: Array<String>) {
         args.forEach {
             val gtt =
-                    if (it.endsWith("xml")) GetetaFacade.readTable(it)
-                    else GetetaFacade.parseTable(File(it))
+                    if (it.endsWith("xml")) GetetaFacade.parseTableXML(it)
+                    else GetetaFacade.parseTableDSL(File(it))
             val printer = LatexTablePrinter(gtt)
             printer.print()
             println(printer.backend.toString())

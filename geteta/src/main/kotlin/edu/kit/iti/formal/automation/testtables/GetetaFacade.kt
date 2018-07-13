@@ -51,7 +51,7 @@ import javax.xml.bind.JAXBException
 object GetetaFacade {
     @JvmStatic
     @Throws(JAXBException::class)
-    fun readTable(filename: String): GeneralizedTestTable {
+    fun parseTableXML(filename: String): GeneralizedTestTable {
         val tr = TableReader(File(filename))
         tr.run()
         return tr.product
@@ -106,13 +106,13 @@ object GetetaFacade {
 
 
     @JvmStatic
-    fun parseTable(input: String) = parseTable(CharStreams.fromString(input))
+    fun parseTableDSL(input: String) = parseTableDSL(CharStreams.fromString(input))
 
     @JvmStatic
-    fun parseTable(input: File) = parseTable(CharStreams.fromFileName(input.absolutePath))
+    fun parseTableDSL(input: File) = parseTableDSL(CharStreams.fromFileName(input.absolutePath))
 
     @JvmStatic
-    fun parseTable(input: CharStream): GeneralizedTestTable {
+    fun parseTableDSL(input: CharStream): GeneralizedTestTable {
         val parser = createParser(input)
         val ctx = parser.file()
         val ttlb = TestTableLanguageBuilder()
