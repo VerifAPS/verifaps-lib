@@ -271,8 +271,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         ast.ruleContext = ctx
 
 
-        for (i in ctx.name.indices) {
-            ast.addValue(ctx.name[i])
+        for (i in ctx.value.indices) {
+            ast.addValue(ctx.value[i])
             if (ctx.integer(i) != null) {
                 ast.setInt(ctx.integer(i).accept(this) as IntegerLit)
             }
@@ -424,6 +424,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitVar_decl_inner(ctx: IEC61131Parser.Var_decl_innerContext): Any? {
         for (i in 0 until ctx.type_declaration().size) {
             val seq = ctx.identifier_list(i).names
+                    .map { it.IDENTIFIER().symbol }
+
             gather.identifiers(seq)
                     .type(ctx.type_declaration(i).accept(this) as TypeDeclaration)
                     .close()
@@ -941,8 +943,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val transition = SFCTransition()
         transition.ruleContext = ctx
 
-        if (ctx.name != null)
-            transition.name = ctx.name.text
+        if (ctx.id != null)
+            transition.name = ctx.id.text
 
         if (ctx.INTEGER_LITERAL() != null) {
             val s = split(ctx.INTEGER_LITERAL().text)

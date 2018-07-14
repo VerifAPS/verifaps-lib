@@ -1,15 +1,5 @@
 package edu.kit.iti.formal.automation.oo
 
-import com.google.common.collect.Streams
-import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.st.RefTo
-import edu.kit.iti.formal.automation.st.ast.ClassDeclaration
-import edu.kit.iti.formal.automation.st.ast.InterfaceDeclaration
-import edu.kit.iti.formal.automation.st.ast.MethodDeclaration
-
-import java.util.ArrayList
-import java.util.stream.Collectors
-
 /**
  * Misc OO utils. Offloads logic from AST classes.
  *

@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.testtables.io.xmv
 
 import edu.kit.iti.formal.automation.testtables.io.Report
 import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique
-import org.apache.commons.io.IOUtils
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
@@ -110,7 +109,7 @@ class NuXMVProcess(var commands: Array<String>,
     private fun createIC3CommandFile() {
         workingDirectory.mkdirs()
         val f = File(workingDirectory, COMMANDS_FILE)
-        FileWriter(f).use { fw -> IOUtils.writeLines(Arrays.asList(*commands), "\n", fw) }
+        FileWriter(f).use { fw -> commands.joinTo(fw, "\n") }
     }
 
     companion object {

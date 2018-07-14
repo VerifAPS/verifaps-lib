@@ -16,7 +16,6 @@ import edu.kit.iti.formal.smv.NuXMVProcess
 import edu.kit.iti.formal.smv.ast.SMVModule
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
-import org.apache.commons.io.FileUtils
 import java.io.File
 import java.nio.charset.Charset
 
@@ -165,8 +164,7 @@ class TransformationPipeline(var diableST0: Boolean = false) {
                 if (filename.endsWith(".xml")) {
                     IECXMLFacade.readPLCOpenXml(filename)
                 } else {
-                    val content = FileUtils.readFileToString(File(filename), Charset.defaultCharset())
-                    IEC61131Facade.file(CharStreams.fromString(content))
+                    IEC61131Facade.file(File(filename))
                 }
         return run(elements)
     }

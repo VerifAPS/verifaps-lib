@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.sfclang
  * #L%
  */
 
-import com.google.common.collect.HashMultimap
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.values.FALSE
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
@@ -30,7 +29,6 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.RefTo
 import edu.kit.iti.formal.automation.st.ast.*
 import org.antlr.v4.runtime.CommonToken
-
 import java.util.function.Supplier
 
 /**
@@ -65,11 +63,18 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
     }
 
     private fun actionAnalyses() {
-        //System.out.println(name);
-        val actionMap = HashMultimap.create<String, SFCActionQualifier.Qualifier>()
-        network!!.steps.stream().flatMap<SFCStep.AssociatedAction> { s -> s.events.stream() }
-                .filter { aa -> scope!!.hasVariable(aa.actionName) }
-                .forEach { aa -> actionMap.put(aa.actionName, aa.qualifier!!.qualifier) }
+        //System.out.printlnstream()(name);
+        val actionMap = hashMapOf<String, MutableSet<SFCActionQualifier.Qualifier>>()
+        network.steps
+                .flatMap { it.events }
+                .filter { scope.hasVariable(it.actionName) }
+                .forEach {
+                    actionMap.compute(it.actionName) { key, set ->
+                        val s = if (set != null) set else hashSetOf()
+                        s.add(it.qualifier!!.qualifier)
+                        s
+                    }
+                }
         println(actionMap)
 
         /*network.getSteps().stream().flatMap(s -> s.getOutgoing().stream())

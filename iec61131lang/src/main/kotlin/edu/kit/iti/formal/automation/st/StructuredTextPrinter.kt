@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.st
  * #L%
  */
 
-import com.google.common.collect.HashMultimap
 import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.ArrayType
 import edu.kit.iti.formal.automation.datatypes.IECString
@@ -665,53 +664,51 @@ class StructuredTextPrinter
 
     override fun visit(localScope: Scope) {
         val variables = VariableScope(localScope.variables)
-        val varType = HashMultimap.create<Int, VariableDeclaration>(3, variables.size / 3 + 1)
-        variables.forEach { v -> varType.put(v.type, v) }
+        variables.groupBy { it.type }
+                .forEach { type, v ->
+                    val vars = v.toMutableList()
+                    vars.sortWith(compareBy { it.name })
 
-        for (type in varType.keySet()) {
-            val vars = ArrayList(varType.get(type!!))
-            vars.sort()
-            //By { a, b -> a.compareTo(b) }
-            sb.nl().append("VAR")
+                    //By { a, b -> a.compareTo(b) }
+                    sb.nl().append("VAR")
 
-            if (VariableDeclaration.INPUT and type >= VariableDeclaration.INOUT) {
-                sb.append("_INOUT")
-            } else {
-                if (VariableDeclaration.INPUT and type != 0)
-                    sb.append("_INPUT")
-                if (VariableDeclaration.OUTPUT and type != 0)
-                    sb.append("_OUTPUT")
-                if (VariableDeclaration.EXTERNAL and type != 0)
-                    sb.append("_EXTERNAL")
-                if (VariableDeclaration.GLOBAL and type != 0)
-                    sb.append("_GLOBAL")
-                if (VariableDeclaration.TEMP and type != 0)
-                    sb.append("TEMP")
-            }
-            sb.append(" ")
-            if (VariableDeclaration.CONSTANT and type != 0)
-                sb.append("CONSTANT ")
-            if (VariableDeclaration.RETAIN and type != 0)
-                sb.append("RETAIN ")
-            sb.increaseIndent()
-            for (vd in vars) {
-                sb.nl()
-                sb.append(vd.name).append(" : ")
-                variableDataType(vd)
-                if (vd.init != null) {
-                    sb.append(" := ")
-                    vd.init!!.accept(this)
-                } else if (vd.initValue != null) {
-                    sb.append(" := ")
-                    val (dt, v) = vd.initValue as Value<*, *>
-                    sb.append(dt.repr(v))
+                    if (VariableDeclaration.INPUT and type >= VariableDeclaration.INOUT) {
+                        sb.append("_INOUT")
+                    } else {
+                        if (VariableDeclaration.INPUT and type != 0)
+                            sb.append("_INPUT")
+                        if (VariableDeclaration.OUTPUT and type != 0)
+                            sb.append("_OUTPUT")
+                        if (VariableDeclaration.EXTERNAL and type != 0)
+                            sb.append("_EXTERNAL")
+                        if (VariableDeclaration.GLOBAL and type != 0)
+                            sb.append("_GLOBAL")
+                        if (VariableDeclaration.TEMP and type != 0)
+                            sb.append("TEMP")
+                    }
+                    sb.append(" ")
+                    if (VariableDeclaration.CONSTANT and type != 0)
+                        sb.append("CONSTANT ")
+                    if (VariableDeclaration.RETAIN and type != 0)
+                        sb.append("RETAIN ")
+                    sb.increaseIndent()
+                    for (vd in vars) {
+                        sb.nl()
+                        sb.append(vd.name).append(" : ")
+                        variableDataType(vd)
+                        if (vd.init != null) {
+                            sb.append(" := ")
+                            vd.init!!.accept(this)
+                        } else if (vd.initValue != null) {
+                            sb.append(" := ")
+                            val (dt, v) = vd.initValue as Value<*, *>
+                            sb.append(dt.repr(v))
+                        }
+                        sb.append(";")
+                    }
+                    sb.decreaseIndent().nl().append("END_VAR")
+                    sb.nl()
                 }
-                sb.append(";")
-            }
-            sb.decreaseIndent().nl().append("END_VAR")
-            sb.nl()
-        }
-
     }
 
     override fun visit(structureInitialization: StructureInitialization) {

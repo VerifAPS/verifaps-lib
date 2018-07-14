@@ -16,7 +16,7 @@ dependencies {
     compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.1'
     antlr group: 'org.antlr', name: 'antlr4', version: '4.7.1'
 
-    compile 'io.arrow-kt:arrow-core:0.7.2'
+   /* compile 'io.arrow-kt:arrow-core:0.7.2'
     compile 'io.arrow-kt:arrow-syntax:0.7.2'
     compile 'io.arrow-kt:arrow-typeclasses:0.7.2'
     compile 'io.arrow-kt:arrow-data:0.7.2'
@@ -51,22 +51,17 @@ generateGrammarSource {
 
 compileKotlin.dependsOn << generateGrammarSource
 
-task createVersionFile(type: Copy) {
+jar {
     def v = versionDetails()
-    def map = [
-            'version'       : project.version,
-            'lastTag'       : v.lastTag,
-            'commitDistance': v.commitDistance,
-            'hash'          : v.gitHash,
-            'hashFull'      : v.gitHashFull, // full 40-character Git commit hash
-            'branchName'    : v.branchName, // isType null if the repository in detached HEAD mode
-            'isClean'       : v.isCleanTag,
-            'buildTime'     : new Date().toString(),
-    ]
-    from("../share/Version.kt") {
-        expand(map)
+    manifest {
+        attributes(
+                'version': project.version,
+                'lastTag': v.lastTag,
+                'commitDistance': v.commitDistance,
+                'hash': v.gitHash,
+                'hashFull': v.gitHashFull, // full 40-character Git commit hash
+                'branchName': v.branchName, // isType null if the repository in detached HEAD mode
+                'isClean': v.isCleanTag,
+                'buildTime': new Date().toString())
     }
-    into("${project.buildDir}/generated-src/antlr/main/edu/kit/iti/formal/automation")
 }
-
-processResources.dependsOn createVersionFile

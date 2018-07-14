@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.automation.st.ast
 
-import com.google.common.base.Strings
 import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.datatypes.values.*
@@ -13,6 +12,7 @@ import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.*
 import edu.kit.iti.formal.automation.st.Cloneable
+import edu.kit.iti.formal.automation.times
 import edu.kit.iti.formal.automation.visitors.Visitable
 import edu.kit.iti.formal.automation.visitors.Visitor
 import org.antlr.v4.runtime.ParserRuleContext
@@ -485,11 +485,11 @@ data class CommentStatement(var comment: String) : Statement() {
 
     companion object {
         fun box(s: String, vararg args: Any): Statement {
-            var s = s
-            val line = Strings.repeat("*", 79)
-            s = (line + "\n *" + Strings.padEnd(String.format(s, *args) + "   ", 79, '*')
-                    + "\n " + line)
-            return CommentStatement(s)
+            var s = String.format(s, *args)
+            val rest = "*" * (79 - 2 - s.length)
+            val line = "*" * 79
+            return CommentStatement(
+                    "$line\n * $s $rest\n $line")
         }
 
         fun single(fmt: String, vararg args: Any): Statement {
@@ -1262,7 +1262,7 @@ data class IntegerLit(var dataType: RefTo<AnyInt> = RefTo<AnyInt>(INT),
     constructor(dt: String?, v: BigInteger) : this(RefTo(dt), v)
     constructor(dt: AnyInt, v: BigInteger) : this(RefTo(dt), v)
 
-    override fun dataType():AnyInt = dataType.obj ?: INT
+    override fun dataType(): AnyInt = dataType.obj ?: INT
     override fun asValue() = VAnyInt(dataType(), value)
     override fun clone() = copy()
 }

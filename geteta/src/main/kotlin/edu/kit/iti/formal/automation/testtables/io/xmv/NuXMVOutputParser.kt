@@ -44,7 +44,6 @@ package edu.kit.iti.formal.automation.testtables.io.xmv
 import edu.kit.iti.formal.automation.testtables.io.Report
 import edu.kit.iti.formal.automation.testtables.report.Assignment
 import edu.kit.iti.formal.automation.testtables.report.Counterexample
-import org.apache.commons.io.FileUtils
 import java.io.File
 import java.io.IOException
 import java.util.regex.Pattern
@@ -59,7 +58,7 @@ class NuXMVOutputParser(private val inputLines: Stream<String>) {
     private var current: MutableList<Assignment>? = null
 
     @Throws(IOException::class)
-    constructor(input: File) : this(FileUtils.readFileToString(input, "utf-8"))
+    constructor(input: File) : this(input.readText())
 
     constructor(content: String) : this(NEWLINE.splitAsStream(content))
 
@@ -69,7 +68,7 @@ class NuXMVOutputParser(private val inputLines: Stream<String>) {
         //ce.getStep().add(currentStep);
 
         inputLines.map { it.trim({ it <= ' ' }) }
-                  .forEach { handle(it) }
+                .forEach { handle(it) }
 
         if (ceFound) {
             Report.setErrorLevel("not-verified")

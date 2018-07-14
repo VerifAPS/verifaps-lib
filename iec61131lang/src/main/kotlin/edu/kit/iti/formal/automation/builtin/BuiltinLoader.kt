@@ -24,7 +24,6 @@ package edu.kit.iti.formal.automation.builtin
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.st.ast.PouElements
-import org.apache.commons.io.IOUtils
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.net.URISyntaxException
@@ -58,10 +57,10 @@ object BuiltinLoader {
             val zipfs = FileSystems.newFileSystem(uri, mapOf("create" to "true"))
             Paths.get(uri)
         }
-        val lines = IOUtils.readLines(resource.openStream(), "utf-8")
+        val text = resource.readText()
         val prefix = p.getParent()
         val tle = PouElements()
-        lines.forEach { it ->
+        text.splitToSequence('\n').forEach { it ->
             try {
                 val load = prefix.resolve(it)
                 val a = IEC61131Facade.file(load)

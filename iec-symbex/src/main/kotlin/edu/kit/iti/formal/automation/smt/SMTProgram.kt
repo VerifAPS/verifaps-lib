@@ -1,12 +1,10 @@
 package edu.kit.iti.formal.automation.smt
 
-import com.google.common.collect.Streams
 import de.tudresden.inf.lat.jsexp.Sexp
 import de.tudresden.inf.lat.jsexp.SexpFactory.newAtomicSexp
 import de.tudresden.inf.lat.jsexp.SexpFactory.newNonAtomicSexp
 import de.tudresden.inf.lat.jsexp.SexpParserException
 import java.util.*
-import java.util.stream.Stream
 
 /**
  * This class represents a reactive program in SMT formulas.
@@ -70,7 +68,7 @@ class SMTProgram(
             val s = createSortSexp(STATE_NAME, this.stateDataTypes)
             val i = createSortSexp(STATE_NAME, this.inputDataTypes)
             val t = createSortSexp(NEW_STATE_NAME, this.stateDataTypes)
-            val args = toSexp(Streams.concat(s, i, t))
+            val args = toSexp(s + i + t)
             func.add(args)
 
             func.add(newAtomicSexp(SMT_BOOLEAN))
@@ -120,7 +118,7 @@ class SMTProgram(
             return sb.toString()
         }
 
-    private fun toSexp(sortSexp: Stream<Sexp>): Sexp {
+    private fun toSexp(sortSexp: Collection<Sexp>): Sexp {
         val list = newNonAtomicSexp()
         sortSexp.forEach { list.add(it) }
         return list
@@ -136,22 +134,14 @@ class SMTProgram(
     }
     */
 
-    fun getDefineSteps(prefix: String, suffix: String): Stream<Sexp> {
-        return Streams.concat(
-                getDefineInputTypes(prefix, suffix),
-                getDefineStateTypes(prefix, suffix)
-        )
-    }
+    fun getDefineSteps(prefix: String, suffix: String) =
+            getDefineInputTypes(prefix, suffix) + getDefineStateTypes(prefix, suffix)
 
-    fun getDefineStateTypes(prefix: String, suffix: String): Stream<Sexp> {
-        return this.stateDataTypes.entries.stream()
-                .map { e -> createDefineConst(prefix + e.key + suffix, e.value) }
-    }
+    fun getDefineStateTypes(prefix: String, suffix: String) = this.stateDataTypes.entries
+            .map { e -> createDefineConst(prefix + e.key + suffix, e.value) }
 
-    fun getDefineInputTypes(prefix: String, suffix: String): Stream<Sexp> {
-        return this.inputDataTypes.entries.stream()
-                .map { e -> createDefineConst(prefix + e.key + suffix, e.value) }
-    }
+    fun getDefineInputTypes(prefix: String, suffix: String) = this.inputDataTypes.entries
+            .map { e -> createDefineConst(prefix + e.key + suffix, e.value) }
 
     private fun createDefineConst(name: String, sort: Sexp): Sexp {
         val s = newNonAtomicSexp()
@@ -169,7 +159,7 @@ class SMTProgram(
         val init = getDefineInputTypes("", suffix)
         val next = getDefineStateTypes("", suffix)
 
-        val vars = if (withInput) Stream.concat(init, next) else next
+        val vars = if (withInput) (init + next) else next
 
         vars.forEach { sexp ->
             sb.append(sexp.toIndentedString())
@@ -219,16 +209,12 @@ class SMTProgram(
          *
          * @param dt
          */
-        private fun createSortSexp(prefix: String, dt: Map<String, Sexp>): Stream<Sexp> {
-            return dt.entries.stream()
-                    .map { entry ->
-                        val s = newNonAtomicSexp()
-                        s.add(newAtomicSexp(prefix + entry.key))
-                        s.add(entry.value)
-                        s
-                    }
-        }
+        private fun createSortSexp(prefix: String, dt: Map<String, Sexp>) =
+                dt.entries.map { entry ->
+                    val s = newNonAtomicSexp()
+                    s.add(newAtomicSexp(prefix + entry.key))
+                    s.add(entry.value)
+                    s
+                }
     }
-
-
 }

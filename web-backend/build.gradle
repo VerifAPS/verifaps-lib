@@ -1,9 +1,13 @@
+plugins {
+//    id 'com.google.cloud.tools.jib' version '0.9.6'
+}
+
 apply plugin: 'application'
 mainClassName = "edu.kit.iti.formal.automation.web.BackendKt"
 description = ''
+version = "0.9-SNAPSHOT"
 
 ext.ktor_version = '0.9.3'
-
 
 repositories {
     jcenter()
@@ -44,3 +48,34 @@ dependencies {
 
     compile group: 'com.xenomachina', name: 'kotlin-argparser', version: '2.0.4'
 }
+
+task jarDist(type: Jar) {
+    classifier = "exe"
+    entryCompression = ZipEntryCompression.DEFLATED
+    with jar
+    manifest {
+        attributes "Main-Class": "edu.kit.iti.formal.automation.web.BackendKt"
+    }
+
+    from {
+        sourceSets.main.output
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+jarDist.dependsOn project(':flycheck').jar
+jarDist.dependsOn project(':geteta').jar
+
+jarDist.dependsOn jar
+
+/*
+jib {
+    from {
+        image = 'openjdk:alpine'
+    }
+    container {
+        jvmFlags = ['-Xms512m', '-Xdebug']
+        mainClass = mainClassName
+        ports = ['3000']
+    }
+}
+*/

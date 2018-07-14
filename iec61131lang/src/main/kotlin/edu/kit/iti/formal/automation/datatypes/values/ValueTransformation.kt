@@ -22,12 +22,6 @@ package edu.kit.iti.formal.automation.datatypes.values
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.*
-import edu.kit.iti.formal.automation.sfclang.getIntegerLiteralValue
-import edu.kit.iti.formal.automation.st.ast.Literal
-import org.apache.commons.lang3.NotImplementedException
-import java.math.BigDecimal
-import java.math.BigInteger
 /*
 class ValueTransformation(val literal: Literal) : DefaultDataTypeVisitor<Value<*, *>>() {
     override fun defaultVisit(obj: Any): Value<*, *>? {

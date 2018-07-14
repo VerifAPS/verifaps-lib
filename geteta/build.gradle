@@ -2,18 +2,13 @@ import org.unbrokendome.gradle.plugins.xjc.XjcGenerate
 
 plugins {
     id 'org.unbroken-dome.xjc' version '1.1.3'
-    //coverage
-    //id 'net.saliman.cobertura' version '2.3.1'
-    //id 'com.github.kt3k.coveralls' version '2.8.2'
-//id "io.github.ddimtirov.codacy" version "0.1.0"
 }
 
 apply plugin: 'antlr'
-
-//apply plugin: 'application'
+apply plugin: 'application'
 group = 'edu.kit.iti.formal'
-version = '0.7.0-SNAPSHOT'
-//mainClassName = "edu.kit.iti.formal.automation.testtables.ExTeTa"
+version = '0.8.0-SNAPSHOT'
+mainClassName = "edu.kit.iti.formal.automation.testtables.ExTeTa"
 
 description = """
     Generalized Test Table
@@ -80,6 +75,10 @@ task xjcGenerateReport(type: XjcGenerate) {
 
 compileJava.dependsOn xjcGenerateExteta
 compileJava.dependsOn xjcGenerateReport
+compileJava.dependsOn generateGrammarSource
+compileKotlin.dependsOn xjcGenerateReport
+compileKotlin.dependsOn xjcGenerateExteta
+compileKotlin.dependsOn generateGrammarSource
 
 /*
 license {
@@ -100,6 +99,7 @@ licenseMain.enabled = false
 licenseTest.enabled = false
 */
 
+/*
 task jarDist(type: Jar) {
     classifier = "exe"
     entryCompression = ZipEntryCompression.DEFLATED
@@ -114,19 +114,20 @@ task jarDist(type: Jar) {
     }
 }
 jarDist.dependsOn jar
+*/
 
-task run(type: JavaExec) {
+task runapp(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'edu.kit.iti.formal.automation.testtables.ExTeTa'
     if (project.hasProperty("appArgs")) {
         args Eval.me(appArgs)
     }
 }
-
-/* coverage
-cobertura.coverageFormats = ['html', 'xml'] // coveralls plugin depends on xml format report
-tasks.coveralls {
-    //dependsOn 'check'
+task startScriptTTPrint(type: CreateStartScripts) {
+    description "Latex Printer for Test Tables"
+    classpath = startScripts.classpath
+    outputDir = startScripts.outputDir
+    mainClassName = 'edu.kit.iti.formal.automation.testtables.PrintTable'
+    applicationName = 'ttprint'
 }
-*/
-
+applicationDistribution.from(startScriptTTPrint) {into 'bin'}

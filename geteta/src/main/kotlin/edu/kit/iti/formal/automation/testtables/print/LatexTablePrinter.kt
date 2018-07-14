@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.automation.testtables.print
 
-import com.google.common.collect.ImmutableList
-import com.google.common.collect.Streams
 import edu.kit.iti.formal.automation.st.util.Tuple
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
@@ -12,7 +10,6 @@ import org.antlr.v4.runtime.ParserRuleContext
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.ParseException
-import org.apache.commons.lang3.NotImplementedException
 import org.w3c.dom.Element
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -46,7 +43,7 @@ class LatexTablePrinter(val gtt: GeneralizedTestTable) {
     val drawLines = LinkedHashMap<String, String>()
     val markCounter = Counter()
     val lastTikzMarkColumn = HashMap<String, Int>()
-    val specialChars = ImmutableList.of("_", "^", "~", "$", "%", "#", "&", "{", "}")
+    val specialChars = listOf("_", "^", "~", "$", "%", "#", "&", "{", "}")
     val totalNumSteps = gtt.region.count()
     val columns = LinkedHashMap<String, ArrayList<String>>()
     val depth = gtt.region.depth()
@@ -274,17 +271,15 @@ class LatexTablePrinter(val gtt: GeneralizedTestTable) {
       private static final String LATEX_XOR = " \\mathrm{xor} ";
       private static final String LATEX_OR = " \\lor ";
   */
-        fun latex(command: String, args: Stream<String>): String {
-            return "\\$command" +
-                    args.map { a -> "{$a}" }
-                            .reduce { t, u -> "$t$u" }
+        fun latex(command: String, args: Iterable<String>): String {
+            return "\\$command" + args.map { "{$it}" }.joinToString("")
         }
 
         fun latex(command: String, vararg args: ParserRuleContext): String {
             return if (args.isEmpty()) {
                 "\\$command"
             } else {
-                latex(command, Arrays.stream(args).map { a -> a.accept(this) })
+                latex(command, args.map { it.accept(this) })
             }
         }
 
@@ -369,15 +364,13 @@ class LatexTablePrinter(val gtt: GeneralizedTestTable) {
         }
 
         override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): String {
-            return latex("FUNCTION", ctx.n.text, ctx.expr().stream())
+            return latex("FUNCTION", ctx.n.text, ctx.expr())
         }
 
-        private fun latex(command: String, n: String, stream: Stream<out ParserRuleContext>): String {
-            return latex(command,
-                    Streams.concat(setOf(n).stream(),
-                            stream.map { a -> a.accept(this) }
-                    )
-            )
+        private fun latex(command: String, n: String, stream: Collection<ParserRuleContext>): String {
+            val list = stream.map { a -> a.accept(this) }.toMutableList()
+            list.add(0, n)
+            return latex(command, list)
         }
 
         override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext): String {
@@ -417,7 +410,7 @@ class LatexTablePrinter(val gtt: GeneralizedTestTable) {
         }
 
         override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext): String {
-            throw NotImplementedException("guarded command to latex is not implemented")
+            throw TODO("guarded command to latex is not implemented")
         }
     }
 }

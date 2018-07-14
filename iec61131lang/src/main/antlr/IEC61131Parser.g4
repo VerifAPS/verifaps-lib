@@ -222,8 +222,8 @@ subrange
 enumerated_specification
 :
 	(LPAREN
-		    name+=IDENTIFIER ( ASSIGN integer )?
-			( COMMA name+=IDENTIFIER
+		    value+=IDENTIFIER ( ASSIGN integer )?
+			( COMMA value+=IDENTIFIER
     		  ( ASSIGN integer )?
 		    )*
 	 RPAREN)
@@ -815,7 +815,7 @@ exit_statement
  action_association : actionName=IDENTIFIER '(' actionQualifier ? ( ',' indicatorName=IDENTIFIER )* ')';
  actionQualifier : IDENTIFIER (COMMA expression )?;
  //actionTime: TIME_LITERAL | IDENTIFIER;
- transition : TRANSITION name=IDENTIFIER? ( LPAREN PRIORITY ASSIGN INTEGER_LITERAL RPAREN)?
+ transition : TRANSITION id=IDENTIFIER? ( LPAREN PRIORITY ASSIGN INTEGER_LITERAL RPAREN)?
                 FROM from=steps TO to=steps transitionCond END_TRANSITION;
  steps : IDENTIFIER | LPAREN IDENTIFIER ( COMMA IDENTIFIER )+ RPAREN;
  transitionCond : ASSIGN expression SEMICOLON /*| COLON ( FBD_Network | LD_Rung ) | ':=' IL_Simple_Inst*/;

@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.parser
 
-import com.google.common.base.Strings
+import edu.kit.iti.formal.automation.times
 import org.antlr.v4.runtime.*
 import java.util.*
 import java.util.function.Supplier
@@ -80,8 +80,8 @@ class ErrorReporter : BaseErrorListener() {
             val sb = StringBuilder()
             sb.append(line)
                     .append("\n")
-                    .append(Strings.repeat(" ", charPositionInLine - 1))
-                    .append(Strings.repeat("^", offendingSymbol?.text?.length ?: 0))
+                    .append(" " * (charPositionInLine - 1))
+                    .append("^" * (offendingSymbol?.text?.length ?: 0))
             return sb.toString()
         }
 
