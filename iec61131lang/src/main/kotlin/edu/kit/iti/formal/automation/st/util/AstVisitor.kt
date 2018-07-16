@@ -278,7 +278,8 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
     }
 
     override fun traverse(invocation: InvocationStatement) {
-        invocation.invocation.accept(visitor)
+        invocation.callee.accept(visitor)
+        invocation.parameters.forEach { it.accept(visitor) }
     }
 
     override fun traverse(stringTypeDeclaration: StringTypeDeclaration) {
@@ -491,13 +492,14 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
 
 
     override fun traverse(statements: StatementList) {
-        val r = StatementList()
-        for (s in statements) {
+        val copy = statements.toList()
+        statements.clear()
+        for (s in copy.toList()) {
             val stmt = s.accept(visitor)
             if (stmt is StatementList) {
-                r.addAll(stmt)
+                statements.addAll(stmt)
             } else
-                r.add(stmt as Statement)
+                statements.add(stmt as Statement)
         }
     }
 
@@ -515,7 +517,6 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
                         .map { p -> p.accept(visitor) as InvocationParameter }
         )
     }
-
 
 
     override fun traverse(forStatement: ForStatement) {
@@ -543,7 +544,10 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
 
 
     override fun traverse(fbc: InvocationStatement) {
-        fbc.invocation = fbc.invocation.accept(visitor) as Invocation
+        fbc.callee = fbc.callee.accept(visitor) as SymbolicReference
+        fbc.parameters = fbc.parameters
+                .map { it.accept(visitor) as InvocationParameter }
+                .toMutableList()
     }
 
     override fun traverse(parameter: InvocationParameter) {
@@ -907,6 +911,7 @@ abstract class AstVisitor<T> : DefaultVisitorNN<T>() {
         traversalPolicy.traverse(referenceValue)
         return super<DefaultVisitorNN>.visit(referenceValue)
     }
+
 }
 
 open abstract class AstVisitorWithScope<T> : AstVisitor<T>() {
@@ -916,6 +921,7 @@ open abstract class AstVisitorWithScope<T> : AstVisitor<T>() {
         return super.visit(localScope)
     }
 }
+
 
 
 /**

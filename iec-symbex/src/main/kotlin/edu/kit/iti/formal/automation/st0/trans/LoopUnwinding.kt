@@ -26,58 +26,44 @@ import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
-import edu.kit.iti.formal.automation.st0.STSimplifier
-import edu.kit.iti.formal.automation.visitors.Visitable
+import edu.kit.iti.formal.automation.st0.TransformationState
 
 /**
  * Created by weigl on 03/10/14.
  */
-class LoopUnwinding : AstMutableVisitor() {
-    private lateinit var scope: Scope
-
-    fun defaultVisit(visitable: Visitable): Any {
-        return visitable
+class LoopUnwinding : CodeTransformation {
+    override fun transform(state: TransformationState): TransformationState {
+        state.stBody = state.stBody.accept(LoopUnwindingImpl(state.scope)) as StatementList
+        return state
     }
 
-    override fun visit(localScope: Scope): Scope {
-        scope = localScope
-        return scope
-    }
-
-    override fun visit(forStatement: ForStatement): Statement {
-        val start = eval(forStatement.start)
-        val stop = eval(forStatement.stop)
-        var step = 1
-        if (forStatement.step != null) {
-            step = eval(forStatement.step!!).toInt()
-        }
-
-        val loopVariable = forStatement.variable
-
-        val sl = StatementList()
-
-        val replacer = ExpressionReplacer(forStatement.statements) // evtl. clone
-        val loopVar: Expression = SymbolicReference(loopVariable)
-        var i = start
-        while (i < stop) {
-            replacer.replacements[loopVar] = IntegerLit(INT, i.toBigInteger())
-            sl.addAll(replacer.replace())
-            i += step
-        }
-        return sl
-    }
-
-    private fun eval(expr: Expression): Long {
-        val iee = IntegerExpressionEvaluator(scope)
-        return expr.accept(iee).longValueExact()
-    }
-
-    companion object {
-        val transformation = object : ST0Transformation {
-            override fun transform(state: STSimplifier.State) {
-                val loopUnwinding = LoopUnwinding()
-                state.theProgram = state.theProgram!!.accept(loopUnwinding) as ProgramDeclaration
+    class LoopUnwindingImpl(private var scope: Scope) : AstMutableVisitor() {
+        override fun visit(forStatement: ForStatement): Statement {
+            val start = eval(forStatement.start)
+            val stop = eval(forStatement.stop)
+            var step = 1
+            if (forStatement.step != null) {
+                step = eval(forStatement.step!!).toInt()
             }
+
+            val loopVariable = forStatement.variable
+
+            val sl = StatementList()
+
+            val replacer = ExpressionReplacer(forStatement.statements) // evtl. clone
+            val loopVar: Expression = SymbolicReference(loopVariable)
+            var i = start
+            while (i < stop) {
+                replacer.replacements[loopVar] = IntegerLit(INT, i.toBigInteger())
+                sl.addAll(replacer.replace())
+                i += step
+            }
+            return sl
+        }
+
+        private fun eval(expr: Expression): Long {
+            val iee = IntegerExpressionEvaluator(scope)
+            return expr.accept(iee).longValueExact()
         }
     }
 }

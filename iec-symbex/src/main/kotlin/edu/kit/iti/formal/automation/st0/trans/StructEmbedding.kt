@@ -30,45 +30,20 @@ import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
 import edu.kit.iti.formal.automation.st.util.AstTraversal
 import edu.kit.iti.formal.automation.st.util.setAll
-import edu.kit.iti.formal.automation.st0.STSimplifier
+import edu.kit.iti.formal.automation.st0.TransformationState
 import java.util.*
 
 /**
  * @author Augusto Modanese
  * @author Alexander Weigl
  * */
-object StructEmbedding : ST0Transformation {
-    override fun transform(state: STSimplifier.State) {
-        val se = FindDeclaredStructs()
-        state.theProgram?.accept(se)
-        state.functionBlocks.forEach { _, f -> f.accept(se) }
-        state.functions.forEach { _, f -> f.accept(se) }
+object StructEmbedding : CodeTransformation {
+    override fun transform(state: TransformationState): TransformationState {
+        //val se = FindDeclaredStructs()
+        //state.stBody = state.stBody.accept(this) as StatementList
+        return state
     }
 }
-
-private class FindDeclaredStructs
-    : AstTraversal() {
-    override fun defaultVisit(obj: Any) {}
-
-    override fun visit(functionDeclaration: FunctionDeclaration) = process(functionDeclaration)
-    override fun visit(fbd: FunctionBlockDeclaration) = process(fbd)
-    override fun visit(pd: ProgramDeclaration) = process(pd)
-
-
-    internal fun process(visitable: PouExecutable) {
-        val structVars = visitable.scope.variables.filter { it.dataType is RecordType }
-        if (structVars.isEmpty()) return
-
-        var body = visitable.stBody!!.clone()
-        for (vd in structVars) {
-            body = embedStruct(visitable.scope, vd, body)
-        }
-        visitable.stBody = body
-        embedStruct(structVars, visitable.scope.variables)
-    }
-
-}
-
 
 private fun embedStruct(scope: Scope, vd: VariableDeclaration, body: StatementList): StatementList = body.accept(StructEmbeddingVisitor(scope, vd)) as StatementList
 private fun embedStruct(structVars: List<VariableDeclaration>, scope: VariableScope) {

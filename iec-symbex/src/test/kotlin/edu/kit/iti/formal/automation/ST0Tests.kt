@@ -22,13 +22,10 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
-import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.st.ast.PouElements
-import edu.kit.iti.formal.automation.st0.STSimplifier
+import edu.kit.iti.formal.automation.visitors.Utils
 import org.antlr.v4.runtime.CharStreams
 import org.junit.Assert
 import org.junit.Test
-
 import java.io.IOException
 
 /**
@@ -50,19 +47,15 @@ class ST0Tests {
 
     @Throws(IOException::class)
     private fun assertResultST0(file: String) {
-        var st = IEC61131Facade.file(
+        var (st, _) = IEC61131Facade.filer(
                 CharStreams.fromStream(javaClass.getResourceAsStream("$file.st")))
         val st0exp = IEC61131Facade.file(
                 CharStreams.fromStream(javaClass.getResourceAsStream("$file.st0")))
 
-        IEC61131Facade.resolveDataTypes(st)
+        val entry = Utils.findProgram(st)!!
+        val simplified = SymbExFacade.simplify(entry)
 
-        val stSimplifier = STSimplifier(st)
-        stSimplifier.addDefaultPipeline()
-        stSimplifier.transform()
-        st = stSimplifier.processed
-
-        Assert.assertEquals(IEC61131Facade.print(st0exp), IEC61131Facade.print(st))
+        Assert.assertEquals(IEC61131Facade.print(st0exp, false), IEC61131Facade.print(simplified, false))
     }
 
 }

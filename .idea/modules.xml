@@ -2,37 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/aps-rvt/aps-rvt.iml" filepath="$PROJECT_DIR$/.idea/modules/aps-rvt/aps-rvt.iml" group="aps-rvt" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/aps-rvt/aps-rvt_main.iml" filepath="$PROJECT_DIR$/.idea/modules/aps-rvt/aps-rvt_main.iml" group="aps-rvt" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/aps-rvt/aps-rvt_test.iml" filepath="$PROJECT_DIR$/.idea/modules/aps-rvt/aps-rvt_test.iml" group="aps-rvt" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/casestudies/casestudies.iml" filepath="$PROJECT_DIR$/.idea/modules/casestudies/casestudies.iml" group="casestudies" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/casestudies/casestudies_main.iml" filepath="$PROJECT_DIR$/.idea/modules/casestudies/casestudies_main.iml" group="casestudies" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/casestudies/casestudies_test.iml" filepath="$PROJECT_DIR$/.idea/modules/casestudies/casestudies_test.iml" group="casestudies" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/flycheck/flycheck.iml" filepath="$PROJECT_DIR$/.idea/modules/flycheck/flycheck.iml" group="flycheck" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/flycheck/flycheck_main.iml" filepath="$PROJECT_DIR$/.idea/modules/flycheck/flycheck_main.iml" group="flycheck" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/flycheck/flycheck_test.iml" filepath="$PROJECT_DIR$/.idea/modules/flycheck/flycheck_test.iml" group="flycheck" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/geteta/geteta.iml" filepath="$PROJECT_DIR$/.idea/modules/geteta/geteta.iml" group="geteta" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/geteta/geteta_main.iml" filepath="$PROJECT_DIR$/.idea/modules/geteta/geteta_main.iml" group="geteta" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/geteta/geteta_test.iml" filepath="$PROJECT_DIR$/.idea/modules/geteta/geteta_test.iml" group="geteta" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec-run/iec-run.iml" filepath="$PROJECT_DIR$/.idea/modules/iec-run/iec-run.iml" group="iec-run" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec-run/iec-run_main.iml" filepath="$PROJECT_DIR$/.idea/modules/iec-run/iec-run_main.iml" group="iec-run" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec-run/iec-run_test.iml" filepath="$PROJECT_DIR$/.idea/modules/iec-run/iec-run_test.iml" group="iec-run" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec-symbex/iec-symbex.iml" filepath="$PROJECT_DIR$/.idea/modules/iec-symbex/iec-symbex.iml" group="iec-symbex" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec-symbex/iec-symbex_main.iml" filepath="$PROJECT_DIR$/.idea/modules/iec-symbex/iec-symbex_main.iml" group="iec-symbex" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec-symbex/iec-symbex_test.iml" filepath="$PROJECT_DIR$/.idea/modules/iec-symbex/iec-symbex_test.iml" group="iec-symbex" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec-xml/iec-xml.iml" filepath="$PROJECT_DIR$/.idea/modules/iec-xml/iec-xml.iml" group="iec-xml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec-xml/iec-xml_main.iml" filepath="$PROJECT_DIR$/.idea/modules/iec-xml/iec-xml_main.iml" group="iec-xml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec-xml/iec-xml_test.iml" filepath="$PROJECT_DIR$/.idea/modules/iec-xml/iec-xml_test.iml" group="iec-xml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec61131lang/iec61131lang.iml" filepath="$PROJECT_DIR$/.idea/modules/iec61131lang/iec61131lang.iml" group="iec61131lang" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec61131lang/iec61131lang_main.iml" filepath="$PROJECT_DIR$/.idea/modules/iec61131lang/iec61131lang_main.iml" group="iec61131lang" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec61131lang/iec61131lang_test.iml" filepath="$PROJECT_DIR$/.idea/modules/iec61131lang/iec61131lang_test.iml" group="iec61131lang" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/smv-model/smv-model.iml" filepath="$PROJECT_DIR$/.idea/modules/smv-model/smv-model.iml" group="smv-model" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/smv-model/smv-model_main.iml" filepath="$PROJECT_DIR$/.idea/modules/smv-model/smv-model_main.iml" group="smv-model" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/smv-model/smv-model_test.iml" filepath="$PROJECT_DIR$/.idea/modules/smv-model/smv-model_test.iml" group="smv-model" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/verifaps-lib.iml" filepath="$PROJECT_DIR$/.idea/modules/verifaps-lib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/web-backend/web-backend.iml" filepath="$PROJECT_DIR$/.idea/modules/web-backend/web-backend.iml" group="web-backend" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/web-backend/web-backend_main.iml" filepath="$PROJECT_DIR$/.idea/modules/web-backend/web-backend_main.iml" group="web-backend" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/web-backend/web-backend_test.iml" filepath="$PROJECT_DIR$/.idea/modules/web-backend/web-backend_test.iml" group="web-backend" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/verifaps-lib.iml" filepath="$PROJECT_DIR$/.idea/verifaps-lib.iml" />
     </modules>
   </component>
 </project>

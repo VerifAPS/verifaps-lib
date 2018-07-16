@@ -22,13 +22,13 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
+import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.smv.ast.SVariable
 import org.antlr.v4.runtime.CharStreams
 import org.junit.Assert
 import org.junit.Assume
 import org.junit.Test
-
 import java.io.IOException
 
 /**
@@ -41,8 +41,7 @@ class FacadeTest {
     fun testEvaluateFunction() {
         val resource = javaClass.getResourceAsStream("/edu/kit/iti/formal/automation/st/func_sel.st")
         Assume.assumeNotNull(resource)
-        val toplevels = IEC61131Facade.file(CharStreams.fromStream(resource))
-        IEC61131Facade.resolveDataTypes(toplevels)
+        val (toplevels, error) = IEC61131Facade.filer(CharStreams.fromStream(resource))
         val func = toplevels[0] as FunctionDeclaration
         val state = SymbExFacade.evaluateFunction(func,
                 SVariable.create("a").asBool(),
@@ -61,13 +60,8 @@ class FacadeTest {
     @Throws(IOException::class)
     fun testModuleBuilder() {
         val resource = javaClass.getResourceAsStream("/edu/kit/iti/formal/automation/st/symbextest.st")
-        val toplevels = IEC61131Facade.file(CharStreams.fromStream(resource))
-        IEC61131Facade.resolveDataTypes(toplevels)
-
-        val globalScope = IEC61131Facade.resolveDataTypes(toplevels)
-        val module = SymbExFacade.evaluateProgram(
-                toplevels[2] as ProgramDeclaration,
-                toplevels[0] as TypeDeclarations, globalScope)
+        val (toplevels, ok) = IEC61131Facade.filer(CharStreams.fromStream(resource))
+        val module = SymbExFacade.evaluateProgram(toplevels[2] as ProgramDeclaration)
         println(module)
         //System.out.println(state);
         //Assert.assertEquals();

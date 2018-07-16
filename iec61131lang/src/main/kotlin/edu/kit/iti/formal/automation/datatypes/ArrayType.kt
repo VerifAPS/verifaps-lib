@@ -44,4 +44,16 @@ class ArrayType(name: String, val fieldType: AnyDt, var ranges: MutableList<Rang
 
     override fun repr(obj: Any): String = TODO()
     override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
+
+    fun allIndices() =
+            ranges.map { IntRange(it.startValue, it.stopValue) }
+                    .fold(listOf(listOf())) { acc: List<List<Int>>, range: IntRange ->
+                        acc.flatMap { l ->
+                            range.map { r ->
+                                l + r
+                            }
+                        }
+                    }
+
+    fun dimSize(d: Int): Int = ranges[d].stopValue
 }

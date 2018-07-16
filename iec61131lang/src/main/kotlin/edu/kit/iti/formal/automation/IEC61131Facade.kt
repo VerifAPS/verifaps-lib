@@ -32,6 +32,7 @@ import edu.kit.iti.formal.automation.st.ast.Expression
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.StatementList
 import edu.kit.iti.formal.automation.st.ast.Top
+import edu.kit.iti.formal.automation.st.util.CodeWriter
 import edu.kit.iti.formal.automation.visitors.Visitable
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
@@ -39,6 +40,7 @@ import org.antlr.v4.runtime.CommonTokenStream
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.io.StringWriter
 import java.nio.charset.Charset
 import java.nio.file.Path
 
@@ -84,23 +86,14 @@ object IEC61131Facade {
      * @param ast a [edu.kit.iti.formal.automation.st.ast.Top] object.
      * @return a [java.lang.String] object.
      */
-    fun print(ast: Top, comments: Boolean): String {
-        val stp = StructuredTextPrinter()
+    fun print(ast: Top, comments: Boolean = true): String {
+        val sw = StringWriter()
+        val stp = StructuredTextPrinter(CodeWriter(sw))
         stp.isPrintComments = comments
         ast.accept(stp)
-        return stp.string
+        return sw.toString()
     }
 
-    fun print(statements: StatementList): String {
-        val stp = StructuredTextPrinter()
-        statements.accept(stp)
-        return stp.string
-    }
-
-
-    fun print(top: Top?): String {
-        return print(top!!, false)
-    }
 
     /**
      *
@@ -134,16 +127,17 @@ object IEC61131Facade {
         return file(f.toPath())
     }
 
-    fun resolveDataTypes(elements: PouElements): Scope {
-        val scope = Scope.defaultScope()
+    fun resolveDataTypes(elements: PouElements, scope: Scope = Scope.defaultScope()): Scope {
         val fdt = RegisterDataTypes(scope)
         val rdt = ResolveDataTypes(scope)
         //val rr = ResolveReferences(scope)
         elements.accept(fdt)
         elements.accept(rdt)
         elements.accept(rdt)
+
         elements.accept(RewriteEnums)
         elements.accept(MaintainInitialValues())
+
         //elements.accept(rr)
         return scope
     }

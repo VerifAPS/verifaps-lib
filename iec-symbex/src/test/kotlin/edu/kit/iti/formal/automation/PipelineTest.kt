@@ -22,13 +22,8 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
-import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
-import edu.kit.iti.formal.automation.st.ast.PouElements
-import edu.kit.iti.formal.smv.ast.SMVModule
 import org.junit.Test
-
 import java.io.File
 import java.io.IOException
 
@@ -40,8 +35,7 @@ class PipelineTest {
     @Test
     @Throws(IOException::class)
     fun test() {
-        var tle = IEC61131Facade.file(File("src/test/resources/edu/kit/iti/formal/automation/st/Crane.st"))
-        IEC61131Facade.resolveDataTypes(tle)
+        var (tle, ok) = IEC61131Facade.filer(File("src/test/resources/edu/kit/iti/formal/automation/st/Crane.st"))
         tle = SymbExFacade.simplify(tle)
 
         val printer = StructuredTextPrinter()

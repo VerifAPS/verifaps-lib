@@ -22,39 +22,25 @@
 
 package edu.kit.iti.formal.automation.st0.trans
 
-import edu.kit.iti.formal.automation.st.ast.Expression
-import edu.kit.iti.formal.automation.st.ast.SymbolicReference
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
-import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
-import edu.kit.iti.formal.automation.st0.STSimplifier
+import edu.kit.iti.formal.automation.st0.TransformationState
 
 /**
  * Embed the GVL in the program's scope and rename the GVL variables accordingly.
  *
  * @author Augusto Modanese, Alexander Weigl
  */
-class GlobalVariableListEmbedding : ST0Transformation {
-    override fun transform(state: STSimplifier.State) {
-        // Squash "GVL" prefix with variable name
-        //state.inputElements.accept(new GVLRenameVisitor());
-
-        // Move variable declarations to program
-        state.globalVariableList.scope.forEach { v ->
-            // **** Renaming disabled! ****
-            //v.setName(GVL_NEW_PREFIX + v.getName());
-            v.type = VariableDeclaration.GLOBAL
-            state.theProgram!!.scope.add(v)
+class GlobalVariableListEmbedding : CodeTransformation {
+    override fun transform(state: TransformationState): TransformationState {
+        val global = state.scope.topLevel
+        global.variables.forEach {
+            it.type = VariableDeclaration.GLOBAL
+            state.scope.add(it)
         }
-
-        /*state.theProgram!!.scope.parent!!.forEach { v ->
-            // **** Renaming disabled! ****
-            //v.setName(GVL_NEW_PREFIX + v.getName());
-            v.type = VariableDeclaration.GLOBAL
-            state.theProgram!!.scope.add(v)
-        }*/
+        return state
     }
 
-    internal class GVLRenameVisitor : AstMutableVisitor() {
+   /* internal class GVLRenameVisitor : AstMutableVisitor() {
         override fun visit(symbolicReference: SymbolicReference): Expression {
             if (symbolicReference.hasSub())
                 symbolicReference.sub!!.accept(this)
@@ -65,17 +51,5 @@ class GlobalVariableListEmbedding : ST0Transformation {
             }
             return super.visit(symbolicReference)
         }
-    }
-
-    companion object {
-        /**
-         * Prefix to access GVL variables.
-         */
-        private val GVL_NAME = "GVL"
-
-        /**
-         * New prefix to rename variables with.
-         */
-        private val GVL_NEW_PREFIX = "GVL" + "$"
-    }
+    }*/
 }

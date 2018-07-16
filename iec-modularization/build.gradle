@@ -1,7 +1,7 @@
+apply plugin: 'application'
 
 description = ''
 dependencies {
-  compile project(':iec61131lang')
-  compile project(':smv-model')
-  compile project(':iec-symbex')
+    compile project(':aps-rvt')
+    compile group: 'com.xenomachina', name: 'kotlin-argparser', version: '2.0.7'
 }

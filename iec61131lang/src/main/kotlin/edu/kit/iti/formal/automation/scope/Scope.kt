@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.scope
 
+import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
@@ -25,14 +26,14 @@ data class Scope(val variables: VariableScope = VariableScope())
     override fun iterator(): Iterator<VariableDeclaration> = variables.iterator()
     private val allowedEnumValues = HashMap<String, EnumerateType>()
 
-    var programs: Namespace<ProgramDeclaration> = Namespace<ProgramDeclaration>()
-    var functionBlocks: Namespace<FunctionBlockDeclaration> = Namespace<FunctionBlockDeclaration>()
-    var functions: Namespace<FunctionDeclaration> = Namespace<FunctionDeclaration>()
-    var dataTypes: Namespace<TypeDeclaration> = Namespace<TypeDeclaration>()
+    var programs: Namespace<ProgramDeclaration> = Namespace()
+    var functionBlocks: Namespace<FunctionBlockDeclaration> = Namespace()
+    var functions: Namespace<FunctionDeclaration> = Namespace()
+    var dataTypes: Namespace<TypeDeclaration> = Namespace()
     var functionResolvers: MutableList<FunctionResolver> = LinkedList()
     var types: TypeScope = TypeScope.builtin()
-    var classes: Namespace<ClassDeclaration> = Namespace<ClassDeclaration>()
-    var interfaces: Namespace<InterfaceDeclaration> = Namespace<InterfaceDeclaration>()
+    var classes: Namespace<ClassDeclaration> = Namespace()
+    var interfaces: Namespace<InterfaceDeclaration> = Namespace()
     val actions: Namespace<ActionDeclaration> = Namespace()
     val methods: Namespace<MethodDeclaration> = Namespace()
 
@@ -66,6 +67,24 @@ data class Scope(val variables: VariableScope = VariableScope())
             while (s!!.parent != null) s = s.parent
             return s
         }
+
+
+    fun getDefinedPous(): List<PouElement> {
+        val p = PouElements()
+        p.addAll(programs.values())
+        p.addAll(functionBlocks.values())
+        p.addAll(functions.values())
+        p.addAll(classes.values())
+        p.addAll(interfaces.values())
+        return p
+    }
+
+
+    fun getVisitiblePous(): List<PouElement> {
+        val top = (parent?.getVisitiblePous() ?: listOf())
+        return getDefinedPous() + top
+    }
+
 
     constructor(parent: Scope?) : this() {
         this.parent = parent
@@ -145,6 +164,7 @@ data class Scope(val variables: VariableScope = VariableScope())
     fun resolveProgram(key: String) = programs.lookup(key)
     fun resolveFunctionBlock(key: String) = functionBlocks.lookup(key)
     fun resolveFunction(key: String) = functions.lookup(key)
+
     fun registerProgram(programDeclaration: ProgramDeclaration) = programs.register(programDeclaration.name!!, programDeclaration)
     fun registerFunction(functionDeclaration: FunctionDeclaration) = functions.register(functionDeclaration.name, functionDeclaration)
 
@@ -221,6 +241,9 @@ data class Scope(val variables: VariableScope = VariableScope())
         return if (this.parent != null) this.parent!!.resolveFunction(invocation) else null
     }
 
+    fun resolveMethod(name: String) = methods.lookup(name)
+
+
     fun registerClass(clazz: ClassDeclaration) =
             classes.register(clazz.name, clazz)
 
@@ -244,7 +267,7 @@ data class Scope(val variables: VariableScope = VariableScope())
 
 
     fun isGlobalVariable(variable: SymbolicReference): Boolean {
-        return topLevel?.resolveVariable(variable) != null
+        return topLevel.resolveVariable(variable) === resolveVariable(variable)
     }
 
     override fun clone(): Scope {
@@ -293,6 +316,105 @@ data class Scope(val variables: VariableScope = VariableScope())
     fun resolveEnumByValue(value: String): EnumerateType? =
             this.allowedEnumValues[value] ?: parent?.resolveEnumByValue(value)
 
+
+    //region call resolver
+    fun resolveInvocation(callee: SymbolicReference): Invoked? {
+        val resolvers = listOf(
+                this::resolveProgramInvocation,
+                this::resolveActionInvocation,
+                this::resolveFunctionBlockInvocation,
+                this::resolveFunctionInvocation
+                //,                this::resolveMethodInvocation
+        )
+
+        val resolved = resolvers.map { it(callee) }.filter { it != null }
+        if (resolved.isEmpty())
+            return null
+
+        if (resolved.size > 1) {
+            Console.warn("Ambiguous call for reference in $callee")
+        }
+
+        return resolved[0]
+    }
+
+    fun resolveProgramInvocation(callee: SymbolicReference): Invoked? {
+        if (!callee.hasSub()) {
+            val p = programs.lookup(callee.identifier)
+            if (p != null) return Invoked.Program(p)
+        }
+        return null
+    }
+
+    fun resolveActionInvocation(callee: SymbolicReference): Invoked.Action? {
+        if (!callee.hasSub()) {
+            val a = resolveAction(callee.identifier)
+            return if (a != null) Invoked.Action(a, this) else null
+        }
+
+        val subScope = resolveProgram(callee.identifier)?.scope ?: resolveSubScope(callee)
+        if (subScope != null) {
+            return subScope.resolveActionInvocation(callee.sub!!)
+        }
+        return null
+    }
+
+    fun resolveFunctionBlockInvocation(callee: SymbolicReference): Invoked.FunctionBlock? {
+        if (!callee.hasSub()) {
+            val a = resolveVariable(callee)
+            val fb = (a?.dataType as FunctionBlockDataType?)?.functionBlock
+            return if (fb != null) Invoked.FunctionBlock(fb) else null
+        }
+        val subScope = resolveSubScope(callee)
+        if (subScope != null) {
+            return subScope.resolveFunctionBlockInvocation(callee.sub!!)
+        }
+        return null
+    }
+
+    fun resolveFunctionInvocation(callee: SymbolicReference): Invoked.Function? {
+        if (!callee.hasSub()) {
+            val func = resolveFunction(callee.identifier)
+            if (func != null) {
+                return Invoked.Function(func)
+            }
+        }
+        return null
+    }
+
+    /*TODO tracker, this and parent pointer
+    fun resolveMethodInvocation(callee: SymbolicReference, self: ClassDataType): Invoked.Method? {
+        if (!callee.hasSub()) {
+            val a = resolveMethod(callee.identifier)
+            return if (a != null) Invoked.Method(a) else null
+        }
+        val subScope = resolveSubScope(callee)
+        if (subScope != null) {
+            return subScope.resolveMethodInvocation(callee.sub!!)
+        }
+        return null
+    }
+    */
+
+    //endregion
+
+
+    /**
+     * Tries to resolve the scope behind a reference, e.g. a function block or class instance, or a program.
+     */
+    fun resolveSubScope(sr: SymbolicReference): Scope? {
+        val vd = resolveVariable(sr)
+        val dt = vd?.dataType
+        if (dt != null) {
+            return when (dt) {
+                is FunctionBlockDataType -> dt.functionBlock.scope
+                is ClassDataType.ClassDt -> dt.clazz.scope
+                else -> null
+            }
+        }
+        return resolveProgram(sr.identifier)?.scope
+    }
+
     companion object {
         fun defaultScope(): Scope {
             val g = Scope()
@@ -303,7 +425,7 @@ data class Scope(val variables: VariableScope = VariableScope())
     }
 }
 
-class Namespace<T : Identifiable>() where T : Cloneable {
+class Namespace<T>() where T : Identifiable, T : Cloneable {
     private val map: LookupList<T> = ArrayLookupList()
     internal var parent: Supplier<Namespace<T>>? = null
 

@@ -84,8 +84,7 @@ object DefaultInitValue : InitValueTranslator {
 
         override fun visit(arrayType: ArrayType): Value<*, *> {
             val init = arrayType.fieldType.accept(this)
-            val value = MultiDimArrayValue(arrayType.ranges, init)
-
+            val value = MultiDimArrayValue(arrayType, init)
             return VArray(arrayType, value)
         }
 
@@ -108,10 +107,11 @@ object DefaultInitValue : InitValueTranslator {
             val s = VStruct(recordType, RecordValue())
             recordType.fields.forEach {
                 s.value.fieldValues[it.name] =
-                        when {it.initValue != null -> it.initValue!!
+                        when {
+                            it.initValue != null -> it.initValue!!
                             it.init != null -> it.init?.getValue()!!
                             it.dataType != null -> it.dataType?.accept(this)!!
-                            else -> throw IllegalStateException("Could not determine initial value for variable: $it")
+                            else -> VVOID // throw IllegalStateException("Could not determine initial value for variable: $it")
                         }
             }
             return s
@@ -135,7 +135,8 @@ object EvaluateInitialization : AstVisitor<Value<*, *>>() {
     override fun defaultVisit(obj: Any) = TODO()
     override fun visit(arrayinit: ArrayInitialization): Value<*, *> {
         val v = arrayinit.initValues.map { it.accept(this) }
-        return VArray(ArrayType(v[0].dataType, arrayListOf()), MultiDimArrayValue(v))
+        val type = ArrayType(v[0].dataType, arrayListOf())
+        return VArray(type, MultiDimArrayValue(type, v))
     }
 
     override fun visit(si: StructureInitialization): Value<*, *> {

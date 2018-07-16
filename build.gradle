@@ -201,5 +201,6 @@ subprojects {
     licenseMain.enabled = false
     licenseTest.enabled = false
 
-    sourceSets { test { resources { srcDirs "../share/test-resources" } } }
+
+    //sourceSets { test { resources { srcDirs "../share/test-resources" } } }
 }

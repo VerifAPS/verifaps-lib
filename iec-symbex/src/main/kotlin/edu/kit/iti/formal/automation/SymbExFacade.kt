@@ -22,14 +22,12 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
-import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.rvt.ModuleBuilder
 import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
 import edu.kit.iti.formal.automation.rvt.SymbolicState
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.st0.STSimplifier
-import edu.kit.iti.formal.automation.st0.trans.*
+import edu.kit.iti.formal.automation.st0.SimplifierPipelineST0
 import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
@@ -38,7 +36,7 @@ import java.util.*
 
 /**
  * @author Alexander Weigl
- * @version 1 (12.12.16)
+ * @version 2 (12.12.16)
  */
 object SymbExFacade {
     fun evaluateFunction(decl: FunctionDeclaration, vararg args: SMVExpr): SMVExpr {
@@ -62,15 +60,28 @@ object SymbExFacade {
         return fc.accept(se) as SMVExpr
     }
 
-    /**
-     * @param elements
-     * @return
-     */
+    fun getDefaultSimplifier(): SimplifierPipelineST0 =
+            SimplifierPipelineST0()
+                    .addGlobalVariableListEmbedding()
+                    .addCallEmbedding()
+                    .addLoopUnwinding()
+                    .addArrayEmbedding()
+                    .addStructEmbedding()
+                    .addTimerToCounter()
+
+    fun simplify(exec: PouExecutable): PouExecutable {
+        val stSimplifier = getDefaultSimplifier()
+        return stSimplifier.transform(exec)
+    }
+
     fun simplify(elements: PouElements): PouElements {
-        val stSimplifier = STSimplifier(elements)
-        stSimplifier.addDefaultPipeline()
-        stSimplifier.transform()
-        return stSimplifier.processed
+        val stSimplifier = getDefaultSimplifier()
+        val p = PouElements()
+        elements.filter { it is PouExecutable }
+                .map { it as PouExecutable }
+                .map(stSimplifier::transform)
+                .forEach { p.add(it) }
+        return p
     }
 
     /*    public static PouElements simplifyOO(PouElements elements) {
@@ -107,78 +118,29 @@ object SymbExFacade {
      * }
      */
 
-    fun simplify(types: TypeDeclarations,
-                 pou: PouExecutable,
-                 unwindLoops: Boolean,
-                 timerToCounter: Boolean,
-                 embedArrays: Boolean,
-                 replaceSFCReset: Boolean) {
 
-        val elements = PouElements()
-        elements.add(types)
-        elements.add(pou)
+    @JvmOverloads
+    fun evaluateProgram(exec: PouExecutable, skipSimplify: Boolean = false): SMVModule {
+        val elements = exec.scope.getVisitiblePous()
+        IEC61131Facade.resolveDataTypes(PouElements(elements.toMutableList()), exec.scope.topLevel)
+        val a = if (skipSimplify) exec else simplify(exec)
 
-        val simplified = simplify(
-                elements, false,
-                unwindLoops, timerToCounter, embedArrays, replaceSFCReset)
+        val se = SymbolicExecutioner(exec.scope.topLevel)
+        a.accept(se)
 
-        var simpleProgram: ProgramDeclaration? = null
-        for (i in simplified) {
-            if (i is ProgramDeclaration) {
-                simpleProgram = i
-                break
-            }
-        }
-    }
-
-    fun simplify(elements: PouElements,
-                 embedFunctionBlocks: Boolean,
-                 unwindLoops: Boolean,
-                 timerToCounter: Boolean,
-                 embedArrays: Boolean,
-                 replaceSFCReset: Boolean): PouElements {
-        val stSimplifier = STSimplifier(elements)
-        val transformations = stSimplifier.transformations
-
-        if (embedFunctionBlocks) {
-            transformations.add(FunctionBlockEmbedding())
-        }
-        if (unwindLoops) {
-            transformations.add(LoopUnwinding.transformation)
-        }
-        if (timerToCounter) {
-            transformations.add(TimerToCounter.INSTANCE)
-        }
-        if (embedArrays) {
-            transformations.add(ArrayEmbedder())
-        }
-        if (replaceSFCReset) {
-            transformations.add(SFCResetReplacer.transformation)
-        }
-
-        stSimplifier.transform()
-        return stSimplifier.processed
+        val moduleBuilder = ModuleBuilder(exec, se.peek())
+        moduleBuilder.run()
+        return moduleBuilder.module
     }
 
     @JvmOverloads
     fun evaluateProgram(elements: PouElements, skipSimplify: Boolean = false): SMVModule {
         val a = if (skipSimplify) elements else simplify(elements)
-        val globalScope = IEC61131Facade.resolveDataTypes(a)
-        return evaluateProgram(Utils.findProgram(a)!!,
-                a[0] as TypeDeclarations, globalScope)
-    }
-
-    @JvmOverloads
-    fun evaluateProgram(decl: ProgramDeclaration,
-                        types: TypeDeclarations, globalScope: Scope? = null): SMVModule {
-        val se = SymbolicExecutioner(globalScope)
-        decl.accept(se)
-        val moduleBuilder = ModuleBuilder(decl, types, se.peek())
-        moduleBuilder.run()
-        return moduleBuilder.module
+        return evaluateProgram(Utils.findProgram(a)
+                ?: throw IllegalStateException("Could not find any program in the given set of POUs"), skipSimplify)
     }
 
     fun asSVariable(vd: VariableDeclaration): SVariable {
         return DefaultTypeTranslator().translate(vd)
     }
-}// If global scope isType null, symbolic executioner will be instanced with the default scope
+}

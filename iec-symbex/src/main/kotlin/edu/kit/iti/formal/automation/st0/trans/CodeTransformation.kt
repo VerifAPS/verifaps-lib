@@ -1,10 +1,12 @@
 package edu.kit.iti.formal.automation.st0.trans
 
+import edu.kit.iti.formal.automation.st0.TransformationState
+
 /*-
  * #%L
  * iec-symbex
  * %%
- * Copyright (C) 2018 Alexander Weigl
+ * Copyright (C) 2017 Alexander Weigl
  * %%
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -22,14 +24,12 @@ package edu.kit.iti.formal.automation.st0.trans
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st0.STSimplifier
-
 /**
  * @author Alexander Weigl
- * @version 1 (18.02.18)
+ * @version 1 (28.06.17)
  */
-class RemoveActionsFromProgram : ST0Transformation {
-    override fun transform(state: STSimplifier.State) {
-        state.theProgram!!.actions.clear()
-    }
+interface CodeTransformation {
+    fun transform(state: TransformationState): TransformationState
+//    public open fun transform(state: TransformationState): TransformationState =
+    //           next.transform(transform(state))
 }

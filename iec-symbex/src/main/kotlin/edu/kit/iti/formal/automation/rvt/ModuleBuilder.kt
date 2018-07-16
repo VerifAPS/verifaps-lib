@@ -25,10 +25,7 @@ package edu.kit.iti.formal.automation.rvt
 import edu.kit.iti.formal.automation.rvt.translators.*
 import edu.kit.iti.formal.automation.st.DefaultInitValue
 import edu.kit.iti.formal.automation.st.InitValueTranslator
-import edu.kit.iti.formal.automation.st.ast.Literal
-import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
-import edu.kit.iti.formal.automation.st.ast.TypeDeclarations
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
+import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.smv.ast.SAssignment
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
@@ -39,12 +36,13 @@ import java.util.*
  * @author Alexander Weigl
  * @version 1 (12.12.16)
  */
-class ModuleBuilder(val program: ProgramDeclaration,
-                    val types: TypeDeclarations,
+class ModuleBuilder(val program: PouExecutable,
                     val finalState: SymbolicState) : Runnable {
+
     val module = SMVModule("")
-    val vardeps: VariableDependency = VariableDependency(finalState)
+    //val vardeps: VariableDependency = VariableDependency(finalState)
     //private Map<VariableDeclaration, SVariable> vars = new HashMap<>();
+
     var typeTranslator: TypeTranslator = DefaultTypeTranslator.INSTANCE
     var valueTranslator = DefaultValueTranslator.INSTANCE
     var initValueTranslator: InitValueTranslator = DefaultInitValue

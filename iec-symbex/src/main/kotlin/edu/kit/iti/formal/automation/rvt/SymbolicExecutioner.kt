@@ -22,12 +22,10 @@ package edu.kit.iti.formal.automation.rvt
  * #L%
  */
 
-import edu.kit.iti.formal.automation.datatypes.EnumerateType
-import edu.kit.iti.formal.automation.datatypes.values.VAnyEnum
 import edu.kit.iti.formal.automation.exceptions.*
 import edu.kit.iti.formal.automation.operators.Operators
-import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.rvt.translators.*
+import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue
 import edu.kit.iti.formal.automation.st.InitValueTranslator
 import edu.kit.iti.formal.automation.st.ast.*
@@ -113,23 +111,14 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     }
 
     override fun visit(symbolicReference: SymbolicReference): SMVExpr {
-        if (symbolicReference.dataType == null && !symbolicReference.hasSub()) {
-            // TODO fix this dirty workaround
-            try {
-                symbolicReference.dataType = scope!!.resolveDataType(symbolicReference.identifier)
-            } catch (ignored: DataTypeNotDefinedException) {
-                // pass
-            } catch (ignored: ClassCastException) {
-            }
-
-        }
-        return if (symbolicReference.dataType is EnumerateType && (symbolicReference.dataType as EnumerateType)
+        return peek()[lift(symbolicReference)]!!
+        /* Enum already be resoled
+        if (symbolicReference.dataType is EnumerateType && (symbolicReference.dataType as EnumerateType)
                         .allowedValues.contains(symbolicReference.identifier))
             this.valueTranslator.translate(VAnyEnum(
                     symbolicReference.dataType as EnumerateType,
                     symbolicReference.identifier))
-        else
-            peek()[lift(symbolicReference)]!!
+        else*/
     }
 
     //endregion
@@ -173,9 +162,10 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         return null
     }
 
+    /*Unsupported should already rolled out by ST0 Transformation
     override fun visit(fbc: InvocationStatement): SMVExpr {
         return visit(fbc.invocation)!!
-    }
+    }*/
 
     override fun visit(invocation: Invocation): SMVExpr? {
         assert(scope != null)
@@ -246,12 +236,14 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         val outputParameters = invocation.outputParameters
         val outputVars = fd.scope.filterByFlags(
                 VariableDeclaration.OUTPUT, VariableDeclaration.INOUT)
+
         for (parameter in outputParameters) {
-            val o = outputVars.stream().filter { iv -> iv.name == parameter.name }.findAny()
-            if (o.isPresent && parameter.expression is SymbolicReference
-                    && (parameter.expression as SymbolicReference).dataType !is EnumerateType)
-                peek().replace(lift(parameter.expression as SymbolicReference),
-                        returnState[lift(o.get())]!!)
+            val o = outputVars.find { it.name == parameter.name }
+            val expr = parameter.expression
+            if (o != null && parameter.expression is SymbolicReference) {
+                val symVar = lift(expr as SymbolicReference)
+                peek().replace(symVar, returnState[lift(o)]!!)
+            }
             // TODO handle parameter.getExpression() instanceof Literal, etc.
         }
 

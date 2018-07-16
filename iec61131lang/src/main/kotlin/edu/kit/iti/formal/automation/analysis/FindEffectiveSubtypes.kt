@@ -162,7 +162,7 @@ class FindEffectiveSubtypes : AstVisitor<*> {
     private fun resolveTypes(expression: Expression): MutableSet<AnyDt> {
         var dataTypes: MutableSet<AnyDt> = HashSet()
         if (expression isType Invocation)
-            dataTypes.add((resolveReference(expression.callee).a as Invocable).returnType)
+            dataTypes.add((resolveReference(expression.callee).a as Invoked).returnType)
         else if (expression isType SymbolicReference) {
             val variable = resolveReference(expression).a as VariableDeclaration
             dataTypes.addAll(effectiveSubtypeScope.getTypes(variable))

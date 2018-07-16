@@ -8,6 +8,7 @@ import edu.kit.iti.formal.automation.exceptions.IECException
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException
 import edu.kit.iti.formal.automation.operators.BinaryOperator
+import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.*
@@ -114,13 +115,11 @@ data class FunctionBlockDeclaration(
         var actions: LookupList<ActionDeclaration> = ArrayLookupList(),
         val interfaces: RefList<InterfaceDeclaration> = RefList(),
         val methods: MutableList<MethodDeclaration> = arrayListOf()
-) : PouExecutable(), Invocable {
+) : PouExecutable() {
 
     var parent: RefTo<FunctionBlockDeclaration> = RefTo()
     var isFinal: Boolean = false
     var isAbstract: Boolean = false
-
-    override val returnType = RefTo(AnyDt.VOID)
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
     override fun clone(): FunctionBlockDeclaration = copy()
@@ -191,7 +190,9 @@ interface HasSfcBody {
 }
 
 interface HasBody : HasSfcBody, HasStBody
-abstract class PouExecutable : PouElement(), HasScope, HasBody, Visitable
+abstract class PouExecutable : PouElement(), HasScope, HasBody, Visitable {
+    abstract override fun clone(): PouExecutable
+}
 
 
 data class ProgramDeclaration(
@@ -248,9 +249,9 @@ class InterfaceDeclaration(
 data class FunctionDeclaration(
         override var name: String = ANONYM,
         override var scope: Scope = Scope(),
-        override var returnType: RefTo<AnyDt> = RefTo(),
+        var returnType: RefTo<AnyDt> = RefTo(),
         override var stBody: StatementList? = StatementList()
-) : PouExecutable(), Invocable {
+) : PouExecutable() {
 
     override var sfcBody: SFCImplementation?
         get() = null
@@ -280,9 +281,9 @@ data class GlobalVariableListDeclaration(
 
 data class MethodDeclaration(
         override var name: String = ANONYM,
-        override var returnType: RefTo<AnyDt> = RefTo(),
+        var returnType: RefTo<AnyDt> = RefTo(),
         var stBody: StatementList = StatementList()
-) : HasScope, Top(), Invocable, Identifiable {
+) : HasScope, Top(), Identifiable {
 
     var accessSpecifier: AccessSpecifier = AccessSpecifier.PROTECTED
     var isFinal: Boolean = false
@@ -372,7 +373,7 @@ data class AssignmentStatement(var location: Reference,
 
 data class CaseStatement(
         var expression: Expression = EMPTY_EXPRESSION,
-        val cases: MutableList<Case> = arrayListOf(),
+        var cases: MutableList<Case> = arrayListOf(),
         var elseCase: StatementList? = StatementList())
     : Statement() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
@@ -537,33 +538,28 @@ data class IfStatement(
     }
 }
 
-data class InvocationStatement(var invocation: Invocation = Invocation()) : Statement() {
-    val parameters: MutableList<InvocationParameter>
-        get() = invocation.parameters
+data class InvocationStatement(
+        var callee: SymbolicReference = SymbolicReference(),
+        var parameters: MutableList<InvocationParameter> = arrayListOf()) : Statement() {
+    var invoked: Invoked? = null
 
-    var calleeName: String
-        get() = invocation.calleeName
-        set(calleeName) {
-            invocation.calleeName = calleeName
-        }
-
-    val callee: SymbolicReference
-        get() = invocation.callee
 
     val inputParameters: List<InvocationParameter>
-        get() = invocation.inputParameters
+        get() = parameters.filter { !it.isOutput }
 
     val outputParameters: List<InvocationParameter>
-        get() = invocation.outputParameters
+        get() = parameters.filter { it.isOutput }
 
-    constructor(fnName: String, vararg expr: Expression) : this(Invocation(fnName, *expr))
+
+    constructor(fnName: String, vararg expr: Expression)
+            : this(SymbolicReference(fnName), expr.map { InvocationParameter(it) }.toMutableList())
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-
     override fun clone(): InvocationStatement {
         val f = InvocationStatement()
-        f.invocation = (invocation.copy())
+        f.callee = callee.clone()
+        f.parameters = parameters.map { it.clone() }.toMutableList()
         return f
     }
 }
@@ -576,6 +572,22 @@ abstract class Expression : Top() {
     abstract fun dataType(localScope: Scope): AnyDt
 
     abstract override fun clone(): Expression
+
+    operator fun plus(right: Expression): Expression = BinaryExpression(this, Operators.ADD, right)
+    operator fun minus(right: Expression): Expression = BinaryExpression(this, Operators.SUB, right)
+    operator fun times(right: Expression): Expression = BinaryExpression(this, Operators.MULT, right)
+    operator fun div(right: Expression): Expression = BinaryExpression(this, Operators.DIV, right)
+
+    infix fun eq(right: Expression): Expression = BinaryExpression(this, Operators.EQUALS, right)
+    infix fun neq(right: Expression): Expression = BinaryExpression(this, Operators.NOT_EQUALS, right)
+    infix fun le(right: Expression): Expression = BinaryExpression(this, Operators.LESS_EQUALS, right)
+    infix fun lt(right: Expression): Expression = BinaryExpression(this, Operators.LESS_THAN, right)
+    infix fun ge(right: Expression): Expression = BinaryExpression(this, Operators.GREATER_EQUALS, right)
+    infix fun gt(right: Expression): Expression = BinaryExpression(this, Operators.GREATER_THAN, right)
+
+    operator fun not() = UnaryExpression(Operators.NOT, this)
+    operator fun unaryMinus() = UnaryExpression(Operators.MINUS, this)
+
 }
 
 data class BinaryExpression(
@@ -631,8 +643,9 @@ data class UnaryExpression(
 data class SymbolicReference @JvmOverloads constructor(
         var identifier: String = ANONYM,
         var subscripts: ExpressionList? = null,
-        var sub: SymbolicReference? = null,
-        var dataType: AnyDt? = null) : Reference() {
+        var sub: SymbolicReference? = null
+//        var dataType: AnyDt? = null
+) : Reference() {
 
     var derefCount = 0
 
@@ -689,7 +702,7 @@ data class SymbolicReference @JvmOverloads constructor(
         sr.subscripts = subscripts?.clone()
         sr.sub = sub?.clone()
         sr.derefCount = derefCount
-        sr.dataType = dataType
+        //sr.dataType = dataType
         return sr
     }
 
@@ -718,7 +731,7 @@ data class Invocation(
         var callee: SymbolicReference = SymbolicReference(),
         val parameters: MutableList<InvocationParameter> = arrayListOf()
 ) : Expression() {
-    private var invoked: RefTo<Invocable> = RefTo()
+    var invoked: Invoked? = null
 
     val inputParameters: List<InvocationParameter>
         get() = parameters.filter { it.isInput }
@@ -780,8 +793,17 @@ data class Invocation(
 
     @Throws(DataTypeNotResolvedException::class)
     override fun dataType(localScope: Scope): AnyDt {
-        return if (invoked.isIdentified) {
-            invoked.obj!!.returnType.obj!!
+        val invoked = invoked
+        return if (invoked != null) {
+            when (invoked) {
+                is Invoked.Program -> throw DataTypeNotResolvedException("Invocation calls to a program. Programs have no return types")
+                is Invoked.FunctionBlock -> throw DataTypeNotResolvedException("Invocation calls to a FB. FB have no return types")
+                is Invoked.Action -> throw DataTypeNotResolvedException("Invocation calls to an action. Action have no return types")
+                is Invoked.Function -> invoked.function.returnType.obj
+                        ?: throw DataTypeNotResolvedException("Return type of function ${invoked.function} is not resolved")
+                is Invoked.Method -> invoked.method.returnType.obj
+                        ?: throw DataTypeNotResolvedException("Return type of method ${invoked.method} is not resolved")
+            }
         } else {
             throw DataTypeNotResolvedException("Return type of function isType not set")
         }
@@ -1235,8 +1257,12 @@ class DirectVariable(s: String) : Reference() {
 
 }
 
-interface Invocable : Identifiable {
-    val returnType: RefTo<out AnyDt>
+sealed class Invoked {
+    class Program(val program: ProgramDeclaration) : Invoked()
+    class FunctionBlock(val fb: FunctionBlockDeclaration) : Invoked()
+    class Function(val function: FunctionDeclaration) : Invoked()
+    class Method(val method: MethodDeclaration, val onClass: ClassDataType) : Invoked()
+    class Action(val action: ActionDeclaration, val scope: Scope) : Invoked()
 }
 
 sealed class Literal() : Initialization() {
@@ -1940,6 +1966,7 @@ data class Range(val start: IntegerLit, val stop: IntegerLit) : Cloneable {
         get() = start.value.intValueExact()
 
     override fun clone() = Range(start.clone(), stop.clone())
+    fun toIntRange(): IntRange = startValue..stopValue
 }
 
 
@@ -1964,9 +1991,7 @@ data class ActionDeclaration(
         override var name: String = ANONYM,
         var stBody: StatementList? = null,
         var sfcBody: SFCImplementation? = null
-) : Identifiable, Top(), Invocable {
-    override val returnType: RefTo<out AnyDt> = RefTo(AnyDt.VOID)
-
+) : Identifiable, Top() {
     override fun clone(): ActionDeclaration {
         val a = ActionDeclaration()
         a.name = this.name
