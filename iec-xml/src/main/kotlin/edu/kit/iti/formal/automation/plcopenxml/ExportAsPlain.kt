@@ -22,10 +22,9 @@ package edu.kit.iti.formal.automation.plcopenxml
  * #L%
  */
 
-import edu.kit.iti.formal.automation.IEC61131Facade
 import org.jdom2.JDOMException
-
 import java.io.IOException
+import java.io.OutputStreamWriter
 
 /**
  * @author Alexander Weigl
@@ -35,6 +34,8 @@ object ExportAsPlain {
     @Throws(JDOMException::class, IOException::class)
     @JvmStatic
     fun main(args: Array<String>) {
-        println(IEC61131Facade.print(IECXMLFacade.readPLCOpenXml(args[0])))
+        for (arg in args) {
+            IECXMLFacade.extractPLCOpenXml(arg, OutputStreamWriter(System.out))
+        }
     }
 }
