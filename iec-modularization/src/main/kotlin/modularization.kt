@@ -2,7 +2,8 @@ package edu.kit.iti.formal.automation.modularization
 
 import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.automation.st.ast.PouElements
+import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.smv.NuXMVInvariantsCommand
 import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.smv.NuXMVProcess
@@ -22,7 +23,7 @@ fun readProgramsOrError(p: String): PouElements {
  * @author Alexander Weigl
  * @version 1 (14.07.18)
  */
-class ModularProver(val args: ModularizationArgs) {
+class ModularProver(val args: ModularizationApp) {
     val oldProgram = ModularProgram(args.old)
     val newProgram = ModularProgram(args.new)
     var prove: Pred = { false }
@@ -30,9 +31,12 @@ class ModularProver(val args: ModularizationArgs) {
         args.allowedCallSites
                 .map {
                     val (a, b) = it.split("=")
-                    val o = oldProgram.callSites.find { it.vars.joinToString(".") == a }
-                    val n = newProgram.callSites.find { it.vars.joinToString(".") == a }
-                    o!! to n!!
+                    val o = oldProgram.callSites.find { it.repr() == a }
+                            ?: throw IllegalArgumentException("could not find $a")
+                    val n = newProgram.callSites.find { it.repr() == b }
+                            ?: throw IllegalArgumentException("could not find $a")
+
+                    o to n
                 }
     }
     val proveStrategy: ProofStrategy = DefaultStrategy(this)
@@ -40,11 +44,11 @@ class ModularProver(val args: ModularizationArgs) {
     fun printCallSites(): Unit {
         Console.info("Call sites for the old program: ${oldProgram.filename}")
         oldProgram.callSites.forEach {
-            Console.info("%s in line %s", it.repr(), it.statement.startPosition)
+            Console.info("${it.repr()} in line ${it.statement.startPosition}")
         }
         Console.info("Call sites for the new program: ${newProgram.filename}")
         newProgram.callSites.forEach {
-            Console.info("%s in line %s", it.repr(), it.statement.startPosition)
+            Console.info("${it.repr()} in line ${it.statement.startPosition}")
         }
     }
 

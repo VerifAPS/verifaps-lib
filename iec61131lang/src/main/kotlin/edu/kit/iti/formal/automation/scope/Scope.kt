@@ -435,7 +435,7 @@ class Namespace<T>() where T : Identifiable, T : Cloneable {
             else map.stream()
 
     internal constructor(other: Namespace<T>) : this() {
-        map.addAll(other.map)
+        other.map.forEach { register(it.name, it) }
         parent = other.parent
     }
 
@@ -447,6 +447,11 @@ class Namespace<T>() where T : Identifiable, T : Cloneable {
     internal fun register(key: String, obj: T) {
         if (key == "")
             throw IllegalArgumentException("Registering empty string isType not allowed")
+
+        val a = map[key]
+        if (a != null) {
+            map.remove(a)
+        }
         map += obj
     }
 

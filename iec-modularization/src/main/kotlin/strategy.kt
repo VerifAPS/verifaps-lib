@@ -23,7 +23,8 @@ class DefaultStrategy(val mp: ModularProver) : ProofStrategy {
         return equalBodiesUnderAbstraction(a, b, abstractAllowed, arrayListOf(a.name), arrayListOf(b.name))
     }
 
-    fun createEquivalencePO(a: PouExecutable, b: PouExecutable, abstractAllowed: CallSiteMapping, oP: List<String>, oN: List<String>): RegressionVerification {
+    fun createEquivalencePO(a: PouExecutable, b: PouExecutable, abstractAllowed: CallSiteMapping,
+                            oP: List<String>, oN: List<String>): RegressionVerification {
         val aa = abstractAllowed.filter { (a, b) -> a.isPrefix(oP) && b.isPrefix(oN) }
 
         val oldAbstractedInvocation = aa.map { (a, _) -> a }

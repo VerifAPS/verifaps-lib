@@ -560,6 +560,7 @@ data class InvocationStatement(
         val f = InvocationStatement()
         f.callee = callee.clone()
         f.parameters = parameters.map { it.clone() }.toMutableList()
+        f.invoked = invoked
         return f
     }
 }

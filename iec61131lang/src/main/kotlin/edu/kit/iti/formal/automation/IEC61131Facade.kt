@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation
  */
 
 import edu.kit.iti.formal.automation.analysis.*
+import edu.kit.iti.formal.automation.builtin.BuiltinLoader
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
@@ -37,10 +38,7 @@ import edu.kit.iti.formal.automation.visitors.Visitable
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
-import java.io.File
-import java.io.IOException
-import java.io.InputStream
-import java.io.StringWriter
+import java.io.*
 import java.nio.charset.Charset
 import java.nio.file.Path
 
@@ -88,10 +86,14 @@ object IEC61131Facade {
      */
     fun print(ast: Top, comments: Boolean = true): String {
         val sw = StringWriter()
-        val stp = StructuredTextPrinter(CodeWriter(sw))
+        printTo(sw, ast, comments)
+        return sw.toString()
+    }
+
+    fun printTo(stream: Writer, ast: Top, comments: Boolean = false) {
+        val stp = StructuredTextPrinter(CodeWriter(stream))
         stp.isPrintComments = comments
         ast.accept(stp)
-        return sw.toString()
     }
 
 
@@ -161,18 +163,21 @@ object IEC61131Facade {
 
     fun file(resource: InputStream) = file(CharStreams.fromStream(resource, Charset.defaultCharset()))
 
-    fun filer(input: CharStream): Pair<PouElements, List<ReporterMessage>> {
+    fun filer(input: CharStream, builtins: Boolean = false): Pair<PouElements, List<ReporterMessage>> {
         val p = file(input)
+        if (builtins)
+            p.addAll(BuiltinLoader.loadDefault())
         resolveDataTypes(p)
         return p to check(p)
     }
 
-    fun filer(input: File) = filer(CharStreams.fromFileName(input.absolutePath))
+    fun filer(input: File, builtins: Boolean = false) = filer(CharStreams.fromFileName(input.absolutePath), builtins)
 
     fun check(p: PouElements): MutableList<ReporterMessage> {
         val r = CheckForTypes.DefaultReporter()
         p.accept(CheckForTypes(r))
         return r.messages
     }
+
 }
 

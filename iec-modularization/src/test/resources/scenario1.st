@@ -364,3 +364,28 @@ CASE _state OF
     END_CASE
 END_FUNCTION_BLOCK
 
+FUNCTION_BLOCK TON
+
+VAR_INPUT
+    IN : BOOL;
+    PT : USINT;
+END_VAR
+
+VAR_OUTPUT
+    Q  : BOOL;
+    ET : USINT;
+END_VAR
+
+IF IN THEN
+    Q:= ET = USINT#0;
+    IF ET > USINT#0 THEN
+        ET := ET - USINT#1;
+    ELSE
+        ET := USINT#0;
+    END_IF
+ELSE
+    Q  := FALSE;
+    ET := PT;
+END_IF
+
+END_FUNCTION_BLOCK

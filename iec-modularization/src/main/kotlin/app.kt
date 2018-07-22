@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.automation.modularization
 
-import com.xenomachina.argparser.ArgParser
-import com.xenomachina.argparser.default
+import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.options.*
 import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.sfclang.getUniqueName
 import java.io.File
@@ -12,41 +12,43 @@ import java.io.File
  * @version 1 (15.07.18)
  */
 
-class ModularizationArgs(parser: ArgParser) {
-    val v by parser.flagging("enable verbose mode")
-    val old by parser.storing("old program ")
-    val new by parser.storing("new program")
-    val list: Boolean by parser.flagging("show call sites")
-    val run: Boolean by parser.flagging("run prover")
-    val allowedCallSites by parser.positionalList("-x", "call sites to abstract")
-    val outputFolder by parser.storing("-o", "output folder") { File(this) }
-            .default(File(getUniqueName("output_")))
-
-    fun readProgramsOrError() = readProgramsOrError(old) to readProgramsOrError(new)
+object ModApp {
+    @JvmStatic
+    fun main(args: Array<String>) {
+        ModularizationApp().main(args)
+    }
 }
 
 
-object ModularizationApp {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        ArgParser(args).parseInto(::ModularizationArgs).run {
-            main(this)
-        }
-    }
+class ModularizationApp() : CliktCommand() {
+    val v by option("-v", help = "enable verbose mode").flag()
+    val old by option("--old", help = "old program ").required()
+    val new by option("--new", help = "new program").required()
+    val list: Boolean by option("--list", "-l", help = "show call sites").flag()
+    val run: Boolean by option("--run", "-r", help = "run prover").flag()
+    val allowedCallSites by option("-s", "--site", help = "call sites to abstract").multiple()
+    val outputFolder by option("-o", "--output", help = "output folder")
+            .convert { File(it) }
+            .default(File(getUniqueName("output_")))
 
-    @JvmStatic
-    fun main(args: ModularizationArgs) {
-        val m = ModularProver(args)
-        if (args.list) {
+
+    fun readProgramsOrError() = readProgramsOrError(old) to readProgramsOrError(new)
+
+    override fun run() {
+        val m = ModularProver(this)
+        if (list) {
             m.printCallSites()
         } else {
-            Console.info("Output folder: ${args.outputFolder}")
+            Console.info("Output folder: ${outputFolder}")
+            m.printCallSites()
             Console.info("Generate SMV files")
             m.createFiles()
-            if (args.run) {
+            Console.info("Files generated")
+            if (run) {
+                Console.info("Start solvers")
                 m.runSolvers()
+                Console.info("Solvers ran")
             }
         }
     }
 }
-

@@ -165,6 +165,8 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
 
     override fun visit(invocation: InvocationStatement): Statement {
         val invoked = invocation.invoked
+                ?: throw IllegalStateException("Invocation was not resolved. Abort. $invocation")
+
         if (invoked is Invoked.FunctionBlock) {
             val state = TransformationState(invoked.fb)
             val prefix = invocation.callee.toPath().joinToString(SCOPE_SEPARATOR)
