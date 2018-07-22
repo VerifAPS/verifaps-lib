@@ -1,12 +1,6 @@
 package edu.kit.iti.formal.automation.plcopenxml
 
-import edu.kit.iti.formal.automation.parser.IEC61131Lexer
-import edu.kit.iti.formal.automation.st.RefTo
-import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration
-import edu.kit.iti.formal.automation.st.ast.SimpleTypeDeclaration
-import edu.kit.iti.formal.automation.st.ast.StructureTypeDeclaration
 import edu.kit.iti.formal.automation.st.util.CodeWriter
-import org.antlr.v4.runtime.CommonToken
 import org.jdom2.Element
 import org.jdom2.filter.Filters
 import org.jdom2.xpath.XPathFactory
@@ -45,20 +39,19 @@ abstract class XMLTranslatorXPath(protected val xpath: String) : XMLTranslator {
  */
 object StructTranslator : XMLTranslatorXPath("./baseType/struct") {
     override fun translate(e: Element, writer: CodeWriter) {
-        val name = e.getAttributeValue("name")
-        val td = StructureTypeDeclaration(name)
-
-        writer.append("STRUCT")
-
         val q = xpathFactory.compile("$xpath/variable", Filters.element())
+
+        val name = e.getAttributeValue("name")
+        writer.nl().append("$name : STRUCT").increaseIndent()
         for (variable in q.evaluate(e)) {
             val n = variable.getAttributeValue("name")
             val dt = VariableDeclXML.getDatatype(variable.getChild("type"))
             val doc = variable.getChild("documentation")?.getChild("xhtml")?.textTrim
-            td.addField(n, SimpleTypeDeclaration(baseType = RefTo(dt)))
+            if (doc != null) writer.nl().append("$n : $dt; (* $doc *)")
+            else writer.nl().append("$n : $dt;")
         }
 
-        writer.append("END_STRUCT;")
+        writer.decreaseIndent().nl().append("END_STRUCT;")
     }
 }
 
@@ -68,10 +61,9 @@ object StructTranslator : XMLTranslatorXPath("./baseType/struct") {
 object EnumTranslator : XMLTranslatorXPath("./baseType/enum") {
     override fun translate(e: Element, writer: CodeWriter) {
         val name = e.getAttributeValue("name")
-        val td = EnumerationTypeDeclaration(name, RefTo(), null)
-        val vq = xpathFactory.compile("$xpath/values/value@name", Filters.attribute())
+        writer.nl().append("$name : ")
+        val vq = xpathFactory.compile("$xpath/values/value/@name", Filters.attribute())
         val values = vq.evaluate(e)
-        for (a in values)
-            td.addValue(CommonToken(IEC61131Lexer.IDENTIFIER, a.value))
+        values.joinTo(writer, ", ", "(", ");") { it.value }
     }
 }

@@ -51,7 +51,7 @@ class PCLOpenXMLBuilder(private val filename: File, private val writer: CodeWrit
     }
 
     val dataTypes: List<Element> by lazy {
-        val e = xpathFactory.compile("//datatype", Filters.element())
+        val e = xpathFactory.compile("//dataType", Filters.element())
         e.evaluate(document)
     }
 

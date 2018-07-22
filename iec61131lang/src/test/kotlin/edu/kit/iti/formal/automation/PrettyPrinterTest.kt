@@ -28,7 +28,6 @@ import edu.kit.iti.formal.automation.st.StructuredTextPrinter
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.Top
 import org.antlr.v4.runtime.CharStreams
-import org.apache.commons.io.FileUtils
 import org.junit.Assert
 import java.io.File
 import java.io.IOException
@@ -40,7 +39,7 @@ import java.io.IOException
 object PrettyPrinterTest {
     @Throws(IOException::class)
     fun testPrettyPrintByString(astNode: Top, file: File) {
-        val content = FileUtils.readFileToString(file, "utf-8")
+        val content = file.readText()
         val printed = StructuredTextPrinter.print(astNode)
         Assert.assertEquals(
                 clean(content), clean(printed))
