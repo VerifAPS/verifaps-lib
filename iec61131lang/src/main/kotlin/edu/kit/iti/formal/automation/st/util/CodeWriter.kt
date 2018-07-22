@@ -63,4 +63,9 @@ open class CodeWriter(var stream: Writer = StringWriter())
         function()
         decreaseIndent()
     }
+
+    fun appendReformat(text: String): CodeWriter {
+        text.splitToSequence('\n').forEach { nl().append(it) }
+        return this
+    }
 }

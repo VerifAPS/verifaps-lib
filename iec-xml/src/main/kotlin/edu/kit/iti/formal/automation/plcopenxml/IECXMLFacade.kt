@@ -23,19 +23,34 @@ package edu.kit.iti.formal.automation.plcopenxml
  */
 
 import edu.kit.iti.formal.automation.st.ast.PouElements
+import edu.kit.iti.formal.automation.st.util.CodeWriter
 import org.jdom2.JDOMException
-
 import java.io.File
 import java.io.IOException
+import java.io.StringWriter
+import java.io.Writer
 
 /**
  * @author Alexander Weigl
  * @version 1 (15.06.17)
+ * @version 2 (22.07.18)
  */
 object IECXMLFacade {
     @Throws(JDOMException::class, IOException::class)
+    fun extractPLCOpenXml(filename: String, sink: Writer) {
+        PCLOpenXMLBuilder(File(filename), CodeWriter(sink)).run()
+        sink.flush()
+    }
+
+    @Throws(JDOMException::class, IOException::class)
+    fun extractPLCOpenXml(filename: String): String {
+        val writer = StringWriter()
+        extractPLCOpenXml(filename, writer)
+        return writer.toString()
+    }
+
+    @Throws(JDOMException::class, IOException::class)
     fun readPLCOpenXml(filename: String): PouElements {
-        val b = PCLOpenXMLBuilder(File(filename))
-        return b.build()
+        TODO()
     }
 }

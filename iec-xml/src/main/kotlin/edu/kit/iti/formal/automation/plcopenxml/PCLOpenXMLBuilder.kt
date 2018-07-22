@@ -22,10 +22,7 @@ package edu.kit.iti.formal.automation.plcopenxml
  * #L%
  */
 
-import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.st.ArrayLookupList
-import edu.kit.iti.formal.automation.st.LookupList
-import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.automation.st.util.CodeWriter
 import org.jdom2.Document
 import org.jdom2.Element
 import org.jdom2.JDOMException
@@ -39,37 +36,46 @@ import org.xml.sax.Attributes
 import org.xml.sax.SAXException
 import java.io.File
 import java.io.IOException
+import java.util.*
 
 /**
  * Created by weigl on 23/06/14.
  */
-class PCLOpenXMLBuilder(private val filename: File) {
-    private var document: Document? = null
+class PCLOpenXMLBuilder(private val filename: File, private val writer: CodeWriter) {
 
-    val poUs: Iterable<Element>
-        get() {
-            val e = xpathFactory.compile("//pou", Filters.element())
-            return e.evaluate(document)
+    lateinit var document: Document
 
-        }
+    val pous: List<Element> by lazy {
+        val e = xpathFactory.compile("//pou", Filters.element())
+        e.evaluate(document)
+    }
+
+    val dataTypes: List<Element> by lazy {
+        val e = xpathFactory.compile("//dataType", Filters.element())
+        e.evaluate(document)
+    }
 
     @Throws(IOException::class, JDOMException::class)
-    protected fun loadXml(): Document {
+    fun run() {
+        document = loadXml()
+        build()
+    }
+
+    @Throws(IOException::class, JDOMException::class)
+    private fun loadXml(): Document {
         val saxBuilder = SAXBuilder()
         saxBuilder.saxHandlerFactory = FACTORY
         return saxBuilder.build(filename)
     }
 
     @Throws(JDOMException::class, IOException::class)
-    fun build(): PouElements {
-        document = loadXml()
-        document!!.rootElement.namespace = Namespace.NO_NAMESPACE
-        val ast = PouElements()
-        for (e in poUs) {
-            ast.add(buildPOU(e)!!)
-        }
-        return ast
+    fun build() {
+        document.rootElement.namespace = Namespace.NO_NAMESPACE
+        writer.append("// Extracted from %s on %s%n%n", filename, Date())
+        DataTypeExtractor(dataTypes, writer).run()
+        PouExtractor(pous, writer).run()
     }
+
 
     companion object {
         /**
@@ -90,79 +96,5 @@ class PCLOpenXMLBuilder(private val filename: File) {
             }
         }
         private val xpathFactory = XPathFactory.instance()
-
-        private fun buildActions(e: Element): LookupList<ActionDeclaration> {
-            val map = ArrayLookupList<ActionDeclaration>()
-            val actions = xpathFactory.compile("./actions/action", Filters.element())
-            val elements = actions.evaluate(e)
-            for (action in elements) {
-                val ad = buildAction(action)
-                map.add(ad)
-            }
-            return map
-        }
-
-        private fun buildAction(action: Element): ActionDeclaration {
-            val ad = ActionDeclaration()
-            ad.name = action.getAttributeValue("name")
-            ad.stBody = buildSTForPOU(action)
-            ad.sfcBody = buildSFCForPOU(action)
-            return ad
-        }
-
-        private fun buildPOU(e: Element): PouElement? {
-            when (e.getAttributeValue("pouType")) {
-                "functionBlock" -> return buildFunctionBlock(e)
-                "program" -> return buildProgram(e)
-                "function" -> return buildFunction(e)
-            }
-            return null
-        }
-
-        private fun buildFunction(e: Element): FunctionDeclaration {
-            val fd = FunctionDeclaration()
-            fd.name = e.getAttributeValue("name")
-            fd.scope = InterfaceBuilder(e.getChild("interface")).get()
-            fd.stBody = buildSTForPOU(e)!!
-            //TODO how to find the return type fd.setReturnType();
-            return fd
-        }
-
-        private fun buildFunctionBlock(e: Element): FunctionBlockDeclaration {
-            val pd = FunctionBlockDeclaration()
-            pd.name = e.getAttributeValue("name")
-            pd.scope = InterfaceBuilder(e.getChild("interface")).get()
-            pd.stBody = buildSTForPOU(e)
-            pd.sfcBody = buildSFCForPOU(e)
-            pd.actions = buildActions(e)
-            return pd
-        }
-
-        private fun buildProgram(e: Element): ProgramDeclaration {
-            val pd = ProgramDeclaration()
-            pd.name = (e.getAttributeValue("name"))
-            pd.scope = InterfaceBuilder(e.getChild("interface"))
-                    .get()
-            pd.stBody = buildSTForPOU(e)
-            pd.sfcBody = buildSFCForPOU(e)
-            pd.actions = buildActions(e)
-            return pd
-        }
-
-        private fun buildSFCForPOU(e: Element): SFCImplementation? {
-            val getSTBody = xpathFactory.compile("./body/SFC", Filters.element())
-            val sfcElement = getSTBody.evaluateFirst(e)
-            return if (sfcElement != null) {
-                SFCFactory(sfcElement).get()
-            } else null
-        }
-
-        private fun buildSTForPOU(e: Element): StatementList? {
-            val getSTBody = xpathFactory.compile("./body/ST/xhtml/text()", Filters.text())
-            val code = getSTBody.evaluateFirst(e)
-            return if (code != null) {
-                IEC61131Facade.statements(code.text)
-            } else null
-        }
     }
 }
