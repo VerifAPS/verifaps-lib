@@ -32,8 +32,8 @@ import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
  * @author weigl
  * @version $Id: $Id
  */
-data class RecordType(val fields: VariableScope = VariableScope())
-    : AnyDt() {
+data class RecordType(override var name: String, val fields: VariableScope = VariableScope())
+    : AnyDt(name) {
 
     fun addField(name: String, dataType: AnyDt) = fields.add(VariableDeclaration(name, dataType))
 

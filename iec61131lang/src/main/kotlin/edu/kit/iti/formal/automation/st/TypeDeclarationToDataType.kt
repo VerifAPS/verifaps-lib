@@ -21,7 +21,7 @@ class TypeDeclarationToDataType(val scope: Scope) : AstVisitor<AnyDt?>() {
     }
 
     override fun visit(structureTypeDeclaration: StructureTypeDeclaration): AnyDt {
-        val rt = RecordType()
+        val rt = RecordType(structureTypeDeclaration.name)
         rt.fields += structureTypeDeclaration.fields
         return rt
     }

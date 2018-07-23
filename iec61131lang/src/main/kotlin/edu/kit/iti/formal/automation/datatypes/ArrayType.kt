@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.datatypes
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.values.MultiDimArrayValue
 import edu.kit.iti.formal.automation.st.ast.Range
 import java.util.*
 
@@ -42,7 +43,11 @@ class ArrayType(name: String, val fieldType: AnyDt, var ranges: MutableList<Rang
     }
     */
 
-    override fun repr(obj: Any): String = TODO()
+    override fun repr(obj: Any): String {
+        val ary = obj as MultiDimArrayValue
+        return ary.data.joinToString(",") { fieldType.repr(it.value) }
+    }
+
     override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 
     fun allIndices() =

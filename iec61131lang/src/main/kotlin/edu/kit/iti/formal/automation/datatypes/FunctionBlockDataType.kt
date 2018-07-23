@@ -40,7 +40,7 @@ data class FunctionBlockDataType(var functionBlock: FunctionBlockDeclaration) : 
     }
 
     fun asRecord(): RecordType {
-        val rt = RecordType(functionBlock.scope.variables)
+        val rt = RecordType(functionBlock.name, functionBlock.scope.variables)
         return rt
     }
 

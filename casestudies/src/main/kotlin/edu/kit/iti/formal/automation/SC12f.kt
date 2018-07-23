@@ -3,10 +3,7 @@ package edu.kit.iti.formal.automation
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.sfclang.SFC2ST
-import edu.kit.iti.formal.automation.st.ast.ActionDeclaration
-import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration
-import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
-import edu.kit.iti.formal.automation.st.ast.TypeDeclarations
+import edu.kit.iti.formal.automation.st.ast.*
 import org.jdom2.JDOMException
 import java.io.File
 import java.io.IOException
@@ -57,8 +54,7 @@ object Sc12f {
         println(File("SC12f.st0").absolutePath + " written!")
 
 
-        val smv = SymbExFacade.evaluateProgram(
-                stles.get(1) as ProgramDeclaration, stles.get(0) as TypeDeclarations)
+        val smv = SymbExFacade.evaluateProgram(stles.get(1) as PouElements)
         File("SC12f.smv").writer().use {
             it.write(smv.toString())
         }

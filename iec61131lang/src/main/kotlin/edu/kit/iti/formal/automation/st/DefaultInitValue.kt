@@ -90,7 +90,7 @@ object DefaultInitValue : InitValueTranslator {
 
         override fun visit(classDataType: ClassDataType): Value<*, *> {
             return when (classDataType) {
-                is ClassDataType.ClassDt -> RecordType(classDataType.clazz.scope.variables).accept(this)
+                is ClassDataType.ClassDt -> RecordType(classDataType.name, classDataType.clazz.scope.variables).accept(this)
                 else -> VNULL
             }
         }
@@ -135,12 +135,12 @@ object EvaluateInitialization : AstVisitor<Value<*, *>>() {
     override fun defaultVisit(obj: Any) = TODO()
     override fun visit(arrayinit: ArrayInitialization): Value<*, *> {
         val v = arrayinit.initValues.map { it.accept(this) }
-        val type = ArrayType(v[0].dataType, arrayListOf())
-        return VArray(type, MultiDimArrayValue(type, v))
+        val type = ArrayType(v[0].dataType, listOf())
+        return VArray(type, MultiDimArrayValue(type, ArrayList(v)))
     }
 
     override fun visit(si: StructureInitialization): Value<*, *> {
-        val s = VStruct(RecordType(), RecordValue())
+        val s = VStruct(RecordType("ANONYM"), RecordValue())
         si.initValues.forEach { name, init ->
             s.value.fieldValues[name] = init.accept(this)
         }

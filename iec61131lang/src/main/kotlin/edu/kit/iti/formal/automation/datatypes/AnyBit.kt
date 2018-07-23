@@ -35,11 +35,9 @@ abstract class AnyBit(var bitLength: Int = 0) : AnyDt() {
     override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 
     override fun repr(obj: Any): String {
-        if (obj is Bits) {
+        if (obj is Bits)
             if (obj.register > 0)
-                return (javaClass.name.toUpperCase() + "#2#"
-                        + java.lang.Long.toBinaryString(obj.register))
-        }
+                return (name.toUpperCase() + "#2#" + java.lang.Long.toBinaryString(obj.register))
         return ""
     }
 

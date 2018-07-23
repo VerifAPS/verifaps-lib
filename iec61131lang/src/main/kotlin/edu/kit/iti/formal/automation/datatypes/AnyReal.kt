@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.automation.datatypes
 
+import java.math.BigDecimal
+
 /*-
  * #%L
  * iec61131lang
@@ -31,8 +33,8 @@ package edu.kit.iti.formal.automation.datatypes
  */
 abstract class AnyReal : AnyNum() {
     override fun repr(obj: Any): String {
-        val d = obj as Double
-        return javaClass.getName().toUpperCase() + "#" + d
+        val d = obj as BigDecimal
+        return name.toUpperCase() + "#" + d
     }
 
     override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)

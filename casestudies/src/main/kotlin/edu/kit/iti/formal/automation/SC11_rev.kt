@@ -65,10 +65,7 @@ object SC11_rev {
         println(File("SC11_rev.st0").absolutePath + " written!")
 
 
-        val smv = SymbExFacade.evaluateProgram(
-                stles[1] as ProgramDeclaration,
-                stles[0] as TypeDeclarations)
-
+        val smv = SymbExFacade.evaluateProgram(stles)
         File("SC12f.smv").writer().use {
             it.write(smv.toString())
         }
