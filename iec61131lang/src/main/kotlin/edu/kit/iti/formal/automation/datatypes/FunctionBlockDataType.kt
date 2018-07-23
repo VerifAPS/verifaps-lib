@@ -43,4 +43,8 @@ data class FunctionBlockDataType(var functionBlock: FunctionBlockDeclaration) : 
         val rt = RecordType(functionBlock.scope.variables)
         return rt
     }
+
+    override var name: String
+        get() = functionBlock.name
+        set(value) {}
 }

@@ -1,27 +1,37 @@
 package edu.kit.iti.formal.automation.datatypes.values
 
-import edu.kit.iti.formal.automation.st.ast.Range
+import edu.kit.iti.formal.automation.datatypes.ArrayType
 
-class MultiDimArrayValue() {
-    var data: Array<Value<*, *>> = arrayOf()
+class MultiDimArrayValue(
+        private val type: ArrayType,
+        private var data: ArrayList<Value<*, *>> = arrayListOf()) {
 
-    constructor(ranges: MutableList<Range>, init: Value<*, *>) : this() {
-        val sz = ranges.map { it.stopValue - it.startValue + 1 }.reduce { a, b -> a * b }
-        data = Array(sz, { init })
+    constructor (arrayType: ArrayType, init: Value<*, *>) : this(arrayType) {
+        arrayType.allIndices().forEach { this[it] = init }
     }
 
-    constructor(values: List<Value<*, *>>) : this() {
-        data = values.toTypedArray()
+    constructor(type: ArrayType, v: List<Value<*, *>>) : this(type) {
+        data.addAll(v)
     }
 
+    fun pos(seq: List<Int>): Int {
+        //see https://en.wikipedia.org/wiki/Row-_and_column-major_order#Address_calculation_in_general
+        val d = seq.size
 
-    fun get(x: Int): Unit {
-
+        var sum = 0
+        for (k in 0 until d) {
+            var prod = 1
+            for (l in (k + 1) until d) {
+                prod *= type.dimSize(l)
+            }
+            sum += prod * seq[k]
+        }
+        return sum
     }
 
-
-    fun set(x: Int): Unit {
-
+    operator fun set(it: List<Int>, value: Value<*, *>) {
+        data[pos(it)] = value
     }
 
+    operator fun get(it: List<Int>) = data[pos(it)]
 }

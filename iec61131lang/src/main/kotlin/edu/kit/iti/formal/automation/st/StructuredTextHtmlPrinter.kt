@@ -27,8 +27,6 @@ import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.HTMLCodeWriter
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.automation.visitors.Sections
-import edu.kit.iti.formal.automation.visitors.Visitable
-import org.antlr.v4.runtime.Token
 
 /**
  * Created by weigla on 15.06.2014.
@@ -54,28 +52,28 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
     /**
      * {@inheritDoc}
      */
-    override fun visit(exitStatement: ExitStatement): Unit? {
+    override fun visit(exitStatement: ExitStatement) {
 
         sb.div(Sections.STATEMENT, Sections.KEYWORD).append("EXIT")
         sb.end().append(";")
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(integerCondition: CaseCondition.IntegerCondition): Unit? {
+    override fun visit(integerCondition: CaseCondition.IntegerCondition) {
         sb.div(Sections.CASE_INTEGER_CONDITION)
         integerCondition.value!!.accept(this)
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(enumeration: CaseCondition.Enumeration): Unit? {
+    override fun visit(enumeration: CaseCondition.Enumeration) {
         sb.div(Sections.CASE_ENUM_CONDITION)
         if (enumeration.start === enumeration.stop) {
             sb.appendIdent()
@@ -87,13 +85,13 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
             enumeration.stop!!.accept(this)
         }
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(binaryExpression: BinaryExpression): Unit? {
+    override fun visit(binaryExpression: BinaryExpression) {
         sb.div(Sections.BINARY_EXPRESSION)
         sb.append('(')
         binaryExpression.leftExpr!!.accept(this)
@@ -103,25 +101,25 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
         binaryExpression.rightExpr!!.accept(this)
         sb.append(')')
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(assignStatement: AssignmentStatement): Unit? {
+    override fun visit(assignStatement: AssignmentStatement) {
         sb.div(Sections.ASSIGNMENT)
         assignStatement.location.accept(this)
         sb.operator(":=")
         assignStatement.expression.accept(this)
         sb.seperator(";").end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration): Unit? {
+    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
         sb.div(Sections.TYPE_DECL_ENUM).div(Sections.TYPE_NAME).append(enumerationTypeDeclaration.name)
         sb.end().seperator(":")
 
@@ -134,64 +132,64 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
 
         sb.append(")")
         sb.ts().end().end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(repeatStatement: RepeatStatement): Unit? {
+    override fun visit(repeatStatement: RepeatStatement) {
         sb.div(Sections.REPEAT).keyword("REPEAT")
         repeatStatement.statements.accept(this)
         sb.keyword(" UNTIL ")
         repeatStatement.condition.accept(this)
         sb.keyword("END_REPEAT")
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(whileStatement: WhileStatement): Unit? {
+    override fun visit(whileStatement: WhileStatement) {
         sb.div(Sections.WHILE).keyword("WHILE")
         whileStatement.condition.accept(this)
         sb.keyword(" DO ")
         whileStatement.statements.accept(this)
         sb.keyword("END_WHILE")
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(unaryExpression: UnaryExpression): Unit? {
+    override fun visit(unaryExpression: UnaryExpression) {
         sb.div(Sections.UNARY_EXPRESSION, Sections.OPERATOR)
                 .append(unaryExpression.operator.symbol)
         sb.end().append(" ")
         unaryExpression.expression.accept(this)
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(typeDeclarations: TypeDeclarations): Unit? {
+    override fun visit(typeDeclarations: TypeDeclarations) {
         sb.div(Sections.TYPE_DECL).keyword("TYPE")
         for (decl in typeDeclarations) {
             decl.accept(this)
         }
         sb.keyword("END_TYPE")
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(caseStatement: CaseStatement): Unit? {
+    override fun visit(caseStatement: CaseStatement) {
         sb.div(Sections.CASE_STATEMENT).keyword("CASE")
         caseStatement.expression!!.accept(this)
         sb.keyword(" OF ")
@@ -200,13 +198,13 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
         }
         sb.keyword("END_CASE")
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(symbolicReference: Location): Unit? {
+    override fun visit(symbolicReference: Location) {
         /*TODO
         sb.variable(symbolicReference.getName());
 
@@ -226,13 +224,13 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
 			sb.append(".");
 			symbolicReference.getSub().accept(this);
 		}*/
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(statements: StatementList): Unit? {
+    override fun visit(statements: StatementList) {
         sb.div(Sections.STATEMENT_BLOCK)
         for (stmt in statements) {
             if (stmt == null) {
@@ -244,13 +242,13 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
             }
         }
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(programDeclaration: ProgramDeclaration): Unit? {
+    override fun visit(programDeclaration: ProgramDeclaration) {
         sb.div(Sections.PROGRAM).keyword("PROGRAM")
         sb.div(Sections.VARIABLE).append(programDeclaration.name)
         sb.end().append('\n')
@@ -260,7 +258,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
         programDeclaration.stBody!!.accept(this)
         sb.keyword("END_PROGRAM")
         sb.end()
-        return null
+
     }
 
     /**
@@ -270,46 +268,44 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
      * sb.div(Sections.VALUE).span(tsScalarValue.getDataType().getName())
      * .append(tsScalarValue.getDataType().repr(tsScalarValue.getValue()));
      * sb.end().end();
-     * return null;
+     * ;
      * }
      */
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(expressions: ExpressionList): Unit? {
+    override fun visit(expressions: ExpressionList) {
         sb.append(Sections.EXPRESSION_LIST)
         for (e in expressions) {
             e.accept(this)
             sb.seperator(",")
         }//TODO
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(invocation: Invocation): Unit? {
+    override fun visit(invocation: Invocation) {
         sb.div(Sections.FUNC_CALL)
-        sb.append(invocation.calleeName).append("(")
+        sb.append(invocation.calleeName)
+        visitInvocationParameters(invocation.parameters)
 
-        var params = false
-        for (entry in invocation.parameters) {
-            entry.accept(this)
-            sb.seperator(",")
-            params = true
-        }
-
-        //TODO
-        sb.append(");")
-        return null
     }
+
+    private fun visitInvocationParameters(parameters: MutableList<InvocationParameter>) {
+        sb.append("(")
+        parameters.joinTo(sb, ",") { it.accept(this) }
+        sb.append(")")
+    }
+
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(forStatement: ForStatement): Unit? {
+    override fun visit(forStatement: ForStatement) {
         sb.div(Sections.FOR)
         sb.keyword("FOR")
         sb.variable(forStatement.variable!!)
@@ -322,34 +318,34 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
         sb.decreaseIndent().nl()
         sb.append("END_FOR")
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration): Unit? {
+    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) {
         sb.div(Sections.FB).keyword("FUNCTION_BLOCK ").variable(functionBlockDeclaration.name)
 
         functionBlockDeclaration.scope.accept(this)
 
         functionBlockDeclaration.stBody!!.accept(this)
         sb.keyword("END_FUNCTION_BLOCK").ts().end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(returnStatement: ReturnStatement): Unit? {
+    override fun visit(returnStatement: ReturnStatement) {
         sb.keyword("RETURN").ts()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(ifStatement: IfStatement): Unit? {
+    override fun visit(ifStatement: IfStatement) {
         sb.div(Sections.IFSTATEMENT)
 
         for (i in 0 until ifStatement.conditionalBranches.size) {
@@ -370,21 +366,22 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
             ifStatement.elseBranch.accept(this)
         }
         sb.keyword("END_IF").ts().end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(fbc: InvocationStatement): Unit? {
-        fbc.invocation.accept(this)
-        return null
+    override fun visit(fbc: InvocationStatement) {
+        fbc.callee.accept(this)
+        visitInvocationParameters(fbc.parameters)
+        sb.append(";")
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(aCase: Case): Unit? {
+    override fun visit(aCase: Case) {
         sb.div(Sections.CASE)
         for (cc in aCase.conditions) {
             cc.accept(this)
@@ -395,26 +392,26 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
 
         aCase.statements.accept(this)
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration): Unit? {
+    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration) {
         sb.div(Sections.TYPE_DECL_SIMPLE).type(simpleTypeDeclaration.baseType.identifier)
         if (simpleTypeDeclaration.initialization != null) {
             sb.operator(" := ")
             simpleTypeDeclaration.initialization!!.accept(this)
         }
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(localScope: Scope): Unit? {
+    override fun visit(localScope: Scope) {
         sb.div(Sections.VARIABLES_DEFINITIONS)
         for (vd in localScope.variables) {
             sb.div(Sections.VARIABLES_DEFINITION)
@@ -455,18 +452,18 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
             sb.keyword("END_VAR").end()
         }
         sb.end()
-        return null
+
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun visit(commentStatement: CommentStatement): Unit? {
+    override fun visit(commentStatement: CommentStatement) {
         if (isPrintComments) {
             sb.div(Sections.COMMENT).append("{*").append(commentStatement.comment).append("*}")
             sb.end()
         }
-        return null
+
 
     }
 

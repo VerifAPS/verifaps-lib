@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
-import edu.kit.iti.formal.automation.analysis.ResolveDataTypes
 import edu.kit.iti.formal.automation.parser.ErrorReporter
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
 import edu.kit.iti.formal.automation.st.ast.PouElements

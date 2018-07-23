@@ -79,7 +79,7 @@ class FunctionBlockEmbedder(private val instanceName: String,
             }
         }
 
-        sl.add(CommentStatement.single("Call of %s:%s", instanceName, fbc.calleeName))
+        sl.add(CommentStatement.single("Call of %s:%s", instanceName, fbc.callee.identifier))
         if (sub == null) {//insert main statement block
             sl.addAll(this.toEmbedd)
         } else {

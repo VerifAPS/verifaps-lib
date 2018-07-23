@@ -23,8 +23,7 @@ package edu.kit.iti.formal.automation.datatypes
  */
 
 import edu.kit.iti.formal.automation.VariableScope
-import edu.kit.iti.formal.automation.st.ArrayLookupList
-import edu.kit.iti.formal.automation.st.LookupList
+import edu.kit.iti.formal.automation.datatypes.values.RecordValue
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 
 /**
@@ -36,9 +35,15 @@ import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 data class RecordType(val fields: VariableScope = VariableScope())
     : AnyDt() {
 
-    fun addField(name: String, dataType: AnyDt)
-            = fields.add(VariableDeclaration(name, dataType))
+    fun addField(name: String, dataType: AnyDt) = fields.add(VariableDeclaration(name, dataType))
 
-    override fun repr(obj: Any) = TODO()
+    override fun repr(obj: Any): String {
+        val record = obj as RecordValue
+        return record.fieldValues.entries
+                .joinToString(", ", "(", ")") { (k, v) ->
+                    k + "=" + v.dataType.repr(v.value)
+                }
+    }
+
     override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
 }

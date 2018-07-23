@@ -1,4 +1,3 @@
-
 (* from: http://www.fernhillsoftware.com/help/iec-61131/common-elements/standard-function-blocks/down-counter.html *)
 Function_Block CTD
         Var_Input CD : BOOL R_EDGE; LD : BOOL; PV : INT; End_Var

@@ -757,9 +757,12 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitInvocation_statement(ctx: IEC61131Parser.Invocation_statementContext): Any {
-        val `is` = InvocationStatement()
-        `is`.invocation = ctx.invocation().accept(this) as Invocation
-        return `is`
+        val call = InvocationStatement()
+        val o = ctx.invocation().accept(this) as Invocation
+        call.callee = o.callee
+        call.parameters = o.parameters
+        call.ruleContext = ctx
+        return call
     }
 
     override fun visitParam_assignment(

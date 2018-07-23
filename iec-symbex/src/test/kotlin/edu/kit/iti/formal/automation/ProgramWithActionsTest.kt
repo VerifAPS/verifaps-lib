@@ -22,7 +22,11 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
+import edu.kit.iti.formal.automation.st.ast.PouExecutable
+import edu.kit.iti.formal.automation.st0.TransformationState
+import edu.kit.iti.formal.automation.st0.trans.ActionEmbedder
 import org.antlr.v4.runtime.CharStreams
+import org.junit.Assert
 import org.junit.Test
 
 import java.io.IOException
@@ -35,10 +39,18 @@ class ProgramWithActionsTest {
     @Test
     @Throws(IOException::class)
     fun test() {
-        val tle = IEC61131Facade.file(CharStreams.fromStream(
+        val (tle, ok) = IEC61131Facade.filer(CharStreams.fromStream(
                 javaClass.getResourceAsStream("program_with_actions.st")
         ))
-        val newTle = SymbExFacade.simplify(tle)
-        println(IEC61131Facade.print(newTle))
+        val newTle = ActionEmbedder().transform(TransformationState(tle[0] as PouExecutable))
+        val out = IEC61131Facade.print(newTle.stBody,false)
+        val exp = """
+IF (i < INT#0) THEN
+    s := (s - i);
+ELSE
+    s := (s + i);
+END_IF
+o := s;"""
+        Assert.assertEquals(exp, out)
     }
 }

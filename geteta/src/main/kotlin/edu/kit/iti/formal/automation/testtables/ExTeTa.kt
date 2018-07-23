@@ -26,7 +26,6 @@ import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException
 import edu.kit.iti.formal.automation.exceptions.UnknownVariableException
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
 import edu.kit.iti.formal.automation.st.ast.PouElements
-import edu.kit.iti.formal.automation.st.ast.TypeDeclarations
 import edu.kit.iti.formal.automation.testtables.algorithms.OmegaSimplifier
 import edu.kit.iti.formal.automation.testtables.builder.TableTransformation
 import edu.kit.iti.formal.automation.testtables.exception.GetetaException
@@ -151,13 +150,7 @@ object ExTeTa {
     }
 
     private fun evaluate(disableSimplify: Boolean, code: PouElements): SMVModule {
-        if (!disableSimplify)
-            return SymbExFacade.evaluateProgram(code)
-        else {
-            val program = Utils.findProgram(code)!!
-            return SymbExFacade.evaluateProgram(program, code[0] as TypeDeclarations,
-                    program.scope)
-        }
+        return SymbExFacade.evaluateProgram(Utils.findProgram(code)!!, disableSimplify)
     }
 
     @Throws(ParseException::class)

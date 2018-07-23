@@ -25,12 +25,20 @@ package edu.kit.iti.formal.automation.st0.trans
 import edu.kit.iti.formal.automation.st.Statements
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
-import edu.kit.iti.formal.automation.st0.STSimplifier
+import edu.kit.iti.formal.automation.st0.TransformationState
 
 /**
  * Created by weigl on 28/10/14.
  */
-class SFCResetReplacer : AstMutableVisitor() {
+class SFCResetReplacer : CodeTransformation {
+    override fun transform(state: TransformationState): TransformationState {
+        state.stBody = state.stBody.accept(SFCResetReplacerImpl()) as StatementList
+        return state
+    }
+}
+
+
+class SFCResetReplacerImpl : AstMutableVisitor() {
     override fun visit(assignmentStatement: AssignmentStatement): Statement {
         try {
             val (identifier) = assignmentStatement.location as SymbolicReference
@@ -46,17 +54,6 @@ class SFCResetReplacer : AstMutableVisitor() {
             }
         } catch (e: ClassCastException) {
         }
-
         return super.visit(assignmentStatement)
-    }
-
-    companion object {
-        val transformation = object : ST0Transformation {
-            override fun transform(state: STSimplifier.State) {
-                val srr = SFCResetReplacer()
-                state.theProgram = state.theProgram!!.accept(srr) as ProgramDeclaration
-            }
-        }
-
     }
 }

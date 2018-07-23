@@ -86,18 +86,19 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
         ignoreDataTypeNotDefined {
             simpleTypeDeclaration.baseType.resolve(scope::resolveDataType)
         }
+        super.visit(simpleTypeDeclaration)
     }
 
     override fun visit(ref: SymbolicReference) {
         val first = ref.identifier
         try {
-            val dataType = scope.resolveDataType(first)
-            val et = dataType as EnumerateType?
-            ref.dataType = et
-            if (ref.sub != null) {
+            //val dataType = scope.resolveDataType(first)
+            //val et = dataType as EnumerateType?
+            //ref.dataType = et
+            /*if (ref.sub != null) {
                 val second = (ref.sub as SymbolicReference).identifier
                 // TODO...?
-            }
+            }*/
         } catch (e: ClassCastException) {
 
         } catch (e: DataTypeNotDefinedException) {
@@ -134,6 +135,14 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
         //super.visit(it)
         it.typeDeclaration?.accept(this)
         ignoreDataTypeNotDefined { it.dataType = it.typeDeclaration?.getDataType(scope) }
+    }
+
+    override fun visit(invocation: InvocationStatement) {
+        invocation.invoked = scope.resolveInvocation(invocation.callee)
+    }
+
+    override fun visit(invocation: Invocation) {
+        super.visit(invocation)
     }
 
     private fun ignoreDataTypeNotDefined(func: () -> Unit) {

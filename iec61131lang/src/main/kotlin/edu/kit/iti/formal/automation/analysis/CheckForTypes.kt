@@ -28,6 +28,10 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
     }
 
     override fun visit(invocation: InvocationStatement) {
+        invocation.invoked ?: reporter.report(invocation,
+                "Invocation unresolved: ${invocation.callee}.",
+                "invocation-resolve", "warn")
+
         invocation.callee.accept(this)
     }
 

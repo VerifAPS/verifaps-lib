@@ -47,14 +47,14 @@ abstract class AnyBit(var bitLength: Int = 0) : AnyDt() {
         override fun repr(obj: Any): String {
             if (obj is Bits) {
                 if (obj.register > 0)
-                    return "LTRUE"
+                    return "TRUE"
             }
 
             if (obj is Boolean) {
                 if (obj)
-                    return "LTRUE"
+                    return "TRUE"
             }
-            return "LFALSE"
+            return "FALSE"
         }
 
         override fun toString(): String = name

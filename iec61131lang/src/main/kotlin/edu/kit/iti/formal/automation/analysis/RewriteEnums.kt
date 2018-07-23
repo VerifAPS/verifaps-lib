@@ -21,6 +21,7 @@ object RewriteEnums : AstMutableVisitor() {
             if (scope.resolveVariable(symbolicReference) == null) {
                 val enum0 = scope.resolveEnumByValue(symbolicReference.identifier)
                 if (enum0 != null) return EnumLit(RefTo(enum0), symbolicReference.identifier)
+
                 val enum1 = scope.resolveEnum(symbolicReference.identifier)
                 if (enum1 != null && symbolicReference.hasSub())
                     return EnumLit(RefTo(enum1), symbolicReference.sub!!.identifier)

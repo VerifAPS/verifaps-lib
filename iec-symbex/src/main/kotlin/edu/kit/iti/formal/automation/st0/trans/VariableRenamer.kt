@@ -30,16 +30,20 @@ import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
 /**
  * @author Alexander Weigl (26.06.2014)
  */
-class VariableRenamer(private val statements: StatementList?,
-                      private val newName: (String) -> String)
-//assert !functionBody.isEmpty();
+class VariableRenamer(
+        private val isGlobal: (SymbolicReference) -> Boolean,
+        private val statements: StatementList?,
+        private val newName: (String) -> String)
     : AstMutableVisitor() {
 
     override fun visit(symbolicReference: SymbolicReference): Expression {
-        val name = newName(symbolicReference.identifier)
-        val ref = SymbolicReference(name, symbolicReference.sub)
-        ref.subscripts = symbolicReference.subscripts
-        return ref
+        if (!isGlobal(symbolicReference)) {
+            val name = newName(symbolicReference.identifier)
+            val ref = SymbolicReference(name, symbolicReference.sub)
+            ref.subscripts = symbolicReference.sub?.subscripts
+            return ref
+        }
+        return symbolicReference
     }
 
     fun rename(): StatementList {

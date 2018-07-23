@@ -36,9 +36,21 @@ data class Tuple<S, T>(val a: S, val b: T) {
     }
 }
 
-data class Either<S, T>(val a: S?, val b: T?) {
+sealed class Either<L, R> {
+    data class Left<L, R>(val l: L) : Either<L, R>()
+    data class Right<L, R>(val r: R) : Either<L, R>()
+
+    infix fun <Rp> bind(f: (R) -> (Either<L, Rp>)): Either<L, Rp> {
+        return when (this) {
+            is Either.Left<L, R> -> Left<L, Rp>(this.l)
+            is Either.Right<L, R> -> f(this.r)
+        }
+    }
+
+    infix fun <Rp> seq(e: Either<L, Rp>): Either<L, Rp> = e
+
     companion object {
-        fun <T, S> make1(a: T) = Either(a, null)
-        fun <T, S> make2(b: S) = Either(null, b)
+        fun <L, R> ret(a: R) = Either.Right<L, R>(a)
+        fun <L, R> fail(msg: String): Either.Right<L, R> = throw Exception(msg)
     }
 }

@@ -26,7 +26,6 @@ fun commonVariables(a: Collection<SVariable>,
     return set
 }
 
-
 /**
  *
  */
@@ -134,7 +133,6 @@ open class RegressionVerification(
         addStateVariables()
         addProofObligation(oldInstanceName, newInstanceName)
         //TODO fix constants or SVariables
-
     }
 
     open fun writeTo(writer: Writer) {

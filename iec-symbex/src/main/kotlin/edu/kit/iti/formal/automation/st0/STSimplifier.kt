@@ -22,123 +22,60 @@ package edu.kit.iti.formal.automation.st0
  * #L%
  */
 
+import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.st.ast.PouExecutable
+import edu.kit.iti.formal.automation.st.ast.SFCImplementation
+import edu.kit.iti.formal.automation.st.ast.StatementList
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.automation.st0.trans.*
-import edu.kit.iti.formal.automation.st.ast.*
 
-import java.util.ArrayList
-import java.util.HashMap
+open class MultiCodeTransformation(val transformations: MutableList<CodeTransformation> = arrayListOf())
+    : CodeTransformation {
+    override fun transform(state: TransformationState): TransformationState =
+            transformations.fold(state) { s, t -> t.transform(s) }
+}
 
 /**
- * @author Alexander Weigl (26.06.2014), Augusto Modanese
- * @version 1
+ * @author Alexander Weigl (26.06.2014)
+ * @version 2
  */
-class STSimplifier(inputElements: PouElements) {
-    internal val transformations = ArrayList<ST0Transformation>()
-    private val state = State()
+class SimplifierPipelineST0 : CodeTransformation {
+    val pipeline = MultiCodeTransformation()
 
-    val processed: PouElements
-        get() {
-            val l = PouElements()
-            l.add(state.allTypeDeclaration)
-            l.addAll(state.functions.values)
-            l.add(state.theProgram!!)
-            return l
-        }
+    fun add(ct: CodeTransformation) = also { pipeline.transformations += ct }
+    fun addGlobalVariableListEmbedding() = add(GlobalVariableListEmbedding())
 
-    init {
-        state.inputElements = inputElements
+    fun addCallEmbedding() = add(CallEmbedding())
+    fun addLoopUnwinding() = add(LoopUnwinding())
+    fun addTimerToCounter() = add(TimerSimplifier())
+    fun addArrayEmbedding() = add(ArrayEmbedder())
+    fun addStructEmbedding() = add(StructEmbedding)
+    fun addSFCResetHandling() = add(SFCResetReplacer())
+    //fun addRemoveAction() = add(RemoveActionsFromProgram())
+    //fun funConstantEmbedding() = add(ConstantEmbedding())  // EXPERIMENTAL
+    fun addTrivialBranchReducer() = add(TrivialBranchReducer())
+
+    fun transform(exec: PouExecutable): PouExecutable {
+        val state = TransformationState(exec)
+        val nState = transform(state)
+        exec.scope = nState.scope
+        exec.stBody = nState.stBody
+        //exec.sfcBody = nState.sfcBody
+        return exec
     }
 
-    fun addDefaultPipeline() {
-        transformations.add(GlobalVariableListEmbedding())
-        transformations.add(FunctionBlockEmbedding())
-        transformations.add(LoopUnwinding.transformation)
-        transformations.add(TimerToCounter.INSTANCE)
-        transformations.add(ArrayEmbedder())
-        transformations.add(StructEmbedding)
-        //transformations.add(SFCResetReplacer.getINSTANCE());
-        transformations.add(RemoveActionsFromProgram())
-        transformations.add(ConstantEmbedder())  // EXPERIMENTAL
-        //transformations.add(TrivialBranchReducer())  // EXPERIMENTAL
-    }
+    override fun transform(state: TransformationState): TransformationState =
+            pipeline.transform(state)
+}
 
-    fun transform() {
-        initializeState()
-        for (t in transformations) {
-            t.transform(state)
-        }
-    }
+val PROGRAM_VARIABLE = VariableDeclaration.FLAG_COUNTER.get()
 
-    fun getTransformations(): List<ST0Transformation> {
-        return transformations
-    }
+data class TransformationState(
+        var scope: Scope,
+        var stBody: StatementList = StatementList(),
+        var sfcBody: SFCImplementation = SFCImplementation()
+) {
+    constructor(exec: PouExecutable) : this(exec.scope, exec.stBody ?: StatementList(), exec.sfcBody
+            ?: SFCImplementation())
 
-    /**
-     * Register FUNCTION AND FUNCTIONBLOCKS
-     */
-    fun initializeState() {
-        var programs = 0
-        for (tle in state.inputElements!!) {
-            if (tle is ProgramDeclaration) {
-                programs++
-                state.theProgram = tle
-            } else if (tle is FunctionBlockDeclaration) {
-                state.functionBlocks[tle.name] = tle
-            } else if (tle is TypeDeclarations) {
-                appendTypeDeclarations(tle)
-            } else if (tle is FunctionDeclaration) {
-                state.functions[tle.name] = tle
-            } else if (tle is GlobalVariableListDeclaration) {
-                val (scope) = tle
-                state.globalVariableList.scope.addVariables(scope)
-            } else {
-                throw IllegalArgumentException("TLE: " + tle.javaClass + " isType not handled yet.")
-            }
-        }
-
-        if (programs != 1 || state.theProgram == null) {
-            println(state.inputElements!!.size)
-            throw IllegalArgumentException("There must be exactly one program in the List of TLE. " + programs + " found. Elements: " + state.inputElements!!.size)
-        }
-    }
-
-    /**
-     * @return Whether we are transforming OO code
-     */
-    /*public boolean isTransformingOO() {
-        return state.stooState != null;
-    }*/
-
-    private fun appendTypeDeclarations(typeDeclarations: TypeDeclarations) {
-        for (td in typeDeclarations) {
-            var allowed = true
-            if (td is StructureTypeDeclaration) {
-                state.structs[td.name] = td
-                continue
-            }
-            when (td.baseType.identifier) {
-                "SINT", "INT", "LINT", "DINT", "UINT", "USINT", "ULINT", "UDINT", "BOOL", "ENUM" -> allowed = true
-                else -> allowed = false
-            }
-            if (allowed)
-                state.allTypeDeclaration.add(td)
-            else
-                throw IllegalArgumentException("There isType an unsupported type declared! " + td.name + " with baseType type " + td.baseType)
-        }
-    }
-
-    class State {
-        var inputElements: PouElements? = null
-        var theProgram: ProgramDeclaration? = null
-        var functionBlocks: MutableMap<String, FunctionBlockDeclaration> = HashMap()
-        var functions: MutableMap<String, FunctionDeclaration> = HashMap()
-        var structs: MutableMap<String, StructureTypeDeclaration> = HashMap()
-        var allTypeDeclaration = TypeDeclarations()
-        var globalVariableList: GlobalVariableListDeclaration = GlobalVariableListDeclaration()
-        //public STOOSimplifier.State stooState;
-    }
-
-    companion object {
-        val PROGRAM_VARIABLE = VariableDeclaration.FLAG_COUNTER.get()
-    }
 }

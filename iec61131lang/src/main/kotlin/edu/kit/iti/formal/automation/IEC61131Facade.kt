@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation
  */
 
 import edu.kit.iti.formal.automation.analysis.*
+import edu.kit.iti.formal.automation.builtin.BuiltinLoader
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
@@ -32,13 +33,12 @@ import edu.kit.iti.formal.automation.st.ast.Expression
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.StatementList
 import edu.kit.iti.formal.automation.st.ast.Top
+import edu.kit.iti.formal.automation.st.util.CodeWriter
 import edu.kit.iti.formal.automation.visitors.Visitable
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
-import java.io.File
-import java.io.IOException
-import java.io.InputStream
+import java.io.*
 import java.nio.charset.Charset
 import java.nio.file.Path
 
@@ -84,23 +84,18 @@ object IEC61131Facade {
      * @param ast a [edu.kit.iti.formal.automation.st.ast.Top] object.
      * @return a [java.lang.String] object.
      */
-    fun print(ast: Top, comments: Boolean): String {
-        val stp = StructuredTextPrinter()
+    fun print(ast: Top, comments: Boolean = true): String {
+        val sw = StringWriter()
+        printTo(sw, ast, comments)
+        return sw.toString()
+    }
+
+    fun printTo(stream: Writer, ast: Top, comments: Boolean = false) {
+        val stp = StructuredTextPrinter(CodeWriter(stream))
         stp.isPrintComments = comments
         ast.accept(stp)
-        return stp.string
     }
 
-    fun print(statements: StatementList): String {
-        val stp = StructuredTextPrinter()
-        statements.accept(stp)
-        return stp.string
-    }
-
-
-    fun print(top: Top?): String {
-        return print(top!!, false)
-    }
 
     /**
      *
@@ -134,16 +129,17 @@ object IEC61131Facade {
         return file(f.toPath())
     }
 
-    fun resolveDataTypes(elements: PouElements): Scope {
-        val scope = Scope.defaultScope()
+    fun resolveDataTypes(elements: PouElements, scope: Scope = Scope.defaultScope()): Scope {
         val fdt = RegisterDataTypes(scope)
         val rdt = ResolveDataTypes(scope)
         //val rr = ResolveReferences(scope)
         elements.accept(fdt)
         elements.accept(rdt)
         elements.accept(rdt)
+
         elements.accept(RewriteEnums)
         elements.accept(MaintainInitialValues())
+
         //elements.accept(rr)
         return scope
     }
@@ -167,18 +163,21 @@ object IEC61131Facade {
 
     fun file(resource: InputStream) = file(CharStreams.fromStream(resource, Charset.defaultCharset()))
 
-    fun filer(input: CharStream): Pair<PouElements, List<ReporterMessage>> {
+    fun filer(input: CharStream, builtins: Boolean = false): Pair<PouElements, List<ReporterMessage>> {
         val p = file(input)
+        if (builtins)
+            p.addAll(BuiltinLoader.loadDefault())
         resolveDataTypes(p)
         return p to check(p)
     }
 
-    fun filer(input: File) = filer(CharStreams.fromFileName(input.absolutePath))
+    fun filer(input: File, builtins: Boolean = false) = filer(CharStreams.fromFileName(input.absolutePath), builtins)
 
     fun check(p: PouElements): MutableList<ReporterMessage> {
         val r = CheckForTypes.DefaultReporter()
         p.accept(CheckForTypes(r))
         return r.messages
     }
+
 }
 

@@ -1,7 +1,13 @@
+apply plugin: 'application'
 
 description = ''
+
+repositories {
+    maven { url "https://dl.bintray.com/ajalt/maven" }
+    maven { url 'https://jitpack.io' }
+}
+
 dependencies {
-  compile project(':iec61131lang')
-  compile project(':smv-model')
-  compile project(':iec-symbex')
+    compile project(':aps-rvt')
+    implementation 'com.github.ajalt:clikt:1.3.0'
 }

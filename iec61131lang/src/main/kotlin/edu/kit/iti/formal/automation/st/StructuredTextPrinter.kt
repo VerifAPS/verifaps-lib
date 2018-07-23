@@ -42,8 +42,8 @@ import java.util.*
  * @version $Id: $Id
  */
 class StructuredTextPrinter
-@JvmOverloads constructor(private val literals: StringLiterals = SL_ST) : AstVisitor<Unit>() {
-    var sb = CodeWriter()
+@JvmOverloads constructor(var sb: CodeWriter = CodeWriter()) : AstVisitor<Unit>() {
+    private val literals: StringLiterals = SL_ST
     var bodyPrinting = BodyPrinting.ST
     var isPrintComments: Boolean = false
 
@@ -306,7 +306,11 @@ class StructuredTextPrinter
      */
     override fun visit(invocation: Invocation) {
         invocation.callee.accept(this)
-        invocation.parameters.joinTo(sb, ", ", "(", ")") {
+        visitInvocationParameter(invocation.parameters)
+    }
+
+    private fun visitInvocationParameter(parameters: MutableList<InvocationParameter>) {
+        parameters.joinTo(sb, ", ", "(", ")") {
             if (it.name != null) {
                 sb.append(it.name!!)
                 if (it.isOutput)
@@ -533,7 +537,8 @@ class StructuredTextPrinter
      */
     override fun visit(fbc: InvocationStatement) {
         sb.nl()
-        fbc.invocation.accept(this)
+        fbc.callee.accept(this)
+        visitInvocationParameter(fbc.parameters)
         sb.append(";")
     }
 
@@ -691,6 +696,9 @@ class StructuredTextPrinter
                         sb.append("CONSTANT ")
                     if (VariableDeclaration.RETAIN and type != 0)
                         sb.append("RETAIN ")
+                    sb.append(" ")
+                    //sb.append(type)
+
                     sb.increaseIndent()
                     for (vd in vars) {
                         sb.nl()
@@ -929,9 +937,9 @@ private fun <K, V, A : Appendable> Map<K, V>.joinTo(buffer: A,
     buffer.append(postfix)
 }
 
-private fun <T, A : Appendable> List<T>.joinTo(buffer: A,
-                                               separator: String = ",", prefix: String = "", postfix: String = "",
-                                               transform: (T) -> Unit) {
+public fun <T, A : Appendable> List<T>.joinTo(buffer: A,
+                                              separator: String = ",", prefix: String = "", postfix: String = "",
+                                              transform: (T) -> Unit) {
     buffer.append(prefix)
     if (isNotEmpty()) {
         for (i in 0 until size - 1) {

@@ -21,9 +21,10 @@
  */
 package edu.kit.iti.formal.automation.rvt
 
+import edu.kit.iti.formal.smv.NuXMVOutput
+import org.junit.Assert
 import org.junit.Assume
 import org.junit.Test
-import kotlin.test.assertTrue
 
 /**
  * @author Alexander Weigl
@@ -39,11 +40,11 @@ class RvtAppTest {
     }
 
     private fun assumeNuxmv() {
-        try{
+        try {
             var pb = ProcessBuilder("nuxmv")
             var p = pb.start()
             p.waitFor()
-        }catch (e : Exception){
+        } catch (e: Exception) {
             Assume.assumeFalse(true)
         }
     }
@@ -57,9 +58,10 @@ class RvtAppTest {
     }
 
     private fun assertEqualBehaviour(old: String, new: String) {
-        val app = RvtApp("src/test/resources/$old.st",
-                        "src/test/resources/$new.st")
+        val app = RvtApp(
+                TransformationPipeline.create("src/test/resources/$old.st", false),
+                TransformationPipeline.create("src/test/resources/$new.st", false))
         app.build()
-        assertTrue(app.verify());
+        Assert.assertEquals(NuXMVOutput.Verified, app.verify());
     }
 }
