@@ -1,8 +1,6 @@
 package edu.kit.iti.formal.automation.plcopenxml
 
-import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.st.ast.Literal
-import edu.kit.iti.formal.automation.st.util.CodeWriter
+import edu.kit.iti.formal.util.CodeWriter
 import org.jdom2.Element
 
 /**
@@ -28,7 +26,7 @@ object InterfaceBuilder : XMLTranslatorFind {
 
     private fun translateVars(vars: Element?, writer: CodeWriter, suffix: String = "") {
         if (vars == null) return
-        writer.append("VAR$suffix").block {
+        writer.nl().nl().append("VAR$suffix").block {
             for (e in vars.getChildren("variable")) {
                 val name = e.getAttributeValue("name")
                 val datatype = VariableDeclXML.getDatatype(e.getChild("type"))
@@ -56,9 +54,9 @@ object VariableDeclXML {
         }
     }
 
-    fun getInitialValue(initialValue: Element?): Literal? {
+    fun getInitialValue(initialValue: Element?): String? {
         if (initialValue == null) return null
         val simpleValue = initialValue.getChild("simpleValue") ?: return null
-        return IEC61131Facade.expr(simpleValue.getAttributeValue("value")) as Literal
+        return simpleValue.text
     }
 }

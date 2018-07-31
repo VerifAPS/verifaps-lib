@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.plcopenxml
  * #L%
  */
 
-import edu.kit.iti.formal.automation.IEC61131Facade
 import joptsimple.OptionParser
 import org.jdom2.JDOMException
 
@@ -36,7 +35,7 @@ import java.io.IOException
 object Extractor {
     var toSt0: Boolean = false
     lateinit var output: File
-
+    //TODO
     @Throws(JDOMException::class, IOException::class)
     @JvmStatic
     fun main(args: Array<String>) {
@@ -48,10 +47,6 @@ object Extractor {
         }
 
         toSt0 = options.has("0")
-
         val input = options.nonOptionArguments()[0].toString()
-        val toplevel = IECXMLFacade.readPLCOpenXml(input)
-        val out = IEC61131Facade.print(toplevel)
-        println(out)
     }
 }

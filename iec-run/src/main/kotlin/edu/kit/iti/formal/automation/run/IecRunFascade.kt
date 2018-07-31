@@ -44,7 +44,7 @@ object ExecutionFacade {
             createInitialState(entry.scope)
 
     fun createInitialState(scope: Scope): State {
-        val v = DefaultInitValue.getInit(RecordType(scope.variables))
+        val v = DefaultInitValue.getInit(RecordType(fields = scope.variables))
                 as Value<RecordType, RecordValue>
         return State(v.value.fieldValues)
     }

@@ -869,6 +869,7 @@ data class SimpleTypeDeclaration(
         override var baseType: RefTo<AnyDt> = RefTo(),
         override var initialization: Initialization? = null
 ) : TypeDeclaration, Top() {
+    constructor(dt: AnyDt, init: Initialization?) : this(baseType = RefTo(dt), initialization = init)
 
     override fun setInit(init: Initialization?) {
         initialization = init
@@ -1073,9 +1074,9 @@ class StringTypeDeclaration(
 
     override fun clone(): StringTypeDeclaration {
         val t = StringTypeDeclaration()
-        t.initialization = initialization!!.clone()
+        t.initialization = initialization?.clone()
         t.baseType = baseType.clone()
-        t.size = size!!.clone()
+        t.size = size?.clone()
         return t
     }
 
@@ -1288,6 +1289,7 @@ data class IntegerLit(var dataType: RefTo<AnyInt> = RefTo<AnyInt>(INT),
                       var value: BigInteger) : Literal() {
     constructor(dt: String?, v: BigInteger) : this(RefTo(dt), v)
     constructor(dt: AnyInt, v: BigInteger) : this(RefTo(dt), v)
+    constructor(intVal: VAnyInt) : this(intVal.dataType, intVal.value)
 
     override fun dataType(): AnyInt = dataType.obj ?: INT
     override fun asValue() = VAnyInt(dataType(), value)

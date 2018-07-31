@@ -34,7 +34,7 @@ import java.util.*
  */
 class ArrayType(name: String, val fieldType: AnyDt, var ranges: MutableList<Range> = ArrayList()) : AnyDt(name) {
     constructor(fieldType: AnyDt, ranges: List<Range>)
-            : this("ARRAY OF ${fieldType.name}", fieldType, ranges.toMutableList())
+            : this(ANONYM_DATATYPE, fieldType, ranges.toMutableList())
 
     /*
     constructor(arrayTypeDeclaration: ArrayTypeDeclaration) {
@@ -61,4 +61,14 @@ class ArrayType(name: String, val fieldType: AnyDt, var ranges: MutableList<Rang
                     }
 
     fun dimSize(d: Int): Int = ranges[d].stopValue
+
+
+    override fun reprDecl(): String {
+        return if (isAnonym())
+            ranges.joinToString(", ", " ARRAY[", "] of ${fieldType.reprDecl()}") {
+                "${it.startValue}..${it.stopValue}"
+            }
+        else
+            name
+    }
 }

@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.plcopenxml
 
-import edu.kit.iti.formal.automation.st.util.CodeWriter
+import edu.kit.iti.formal.util.CodeWriter
 import org.jdom2.Element
 
 /**
@@ -14,7 +14,7 @@ open class DataTypeExtractor(val datatypes: List<Element>,
     fun run() {
         writer.append("TYPE").increaseIndent()
         datatypes.forEach { translate(it) }
-        writer.decreaseIndent().nl().append("END_TYPE")
+        writer.decreaseIndent().nl().append("END_TYPE").nl().nl()
     }
 
     private fun translate(e: Element) {

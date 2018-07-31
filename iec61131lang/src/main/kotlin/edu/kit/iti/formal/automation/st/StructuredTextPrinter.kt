@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.st
  */
 
 import edu.kit.iti.formal.automation.VariableScope
-import edu.kit.iti.formal.automation.datatypes.ArrayType
+import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.IECString
 import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue
 import edu.kit.iti.formal.automation.datatypes.values.Value
@@ -32,7 +32,7 @@ import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
-import edu.kit.iti.formal.automation.st.util.CodeWriter
+import edu.kit.iti.formal.util.CodeWriter
 import java.util.*
 
 /**
@@ -592,20 +592,20 @@ class StructuredTextPrinter
 
     }
 
+    val variableDeclarationUseDataType = false
     private fun variableDataType(vd: VariableDeclaration) {
-        if (vd.dataType is ArrayType) {
-            val dataType = vd.dataType as ArrayType
-            sb.append(" ARRAY[")
-            dataType.ranges.joinTo(sb) { range ->
-                range.start.accept(this)
-                sb.append("..")
-                range.stop.accept(this)
-            }
-            sb.append("] OF ").append(dataType.fieldType.name)
+        val dt = vd.dataType
+        if (variableDeclarationUseDataType && dt != null) {
+            variableDataType(dt)
         } else {
             vd.typeDeclaration?.accept(this)
         }
     }
+
+    fun variableDataType(dt: AnyDt): Unit {
+        sb.append(dt.reprDecl())
+    }
+
 
     /**
      * {@inheritDoc}
@@ -617,8 +617,6 @@ class StructuredTextPrinter
             sb.append(commentStatement.comment)
             sb.append(literals.comment_close())
         }
-
-
     }
 
     /**

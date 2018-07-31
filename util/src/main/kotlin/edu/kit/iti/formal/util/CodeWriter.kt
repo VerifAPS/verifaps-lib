@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.st.util
+package edu.kit.iti.formal.util
 
 import java.io.StringWriter
 import java.io.Writer
@@ -58,11 +58,16 @@ open class CodeWriter(var stream: Writer = StringWriter())
         return write(String.format(fmt, *args))
     }
 
-    fun block(function: CodeWriter.() -> Unit) {
+    fun block(text: String = "", nl: Boolean = false, function: CodeWriter.() -> Unit): CodeWriter {
+        append(text)
+        if (nl) nl()
         increaseIndent()
         function()
         decreaseIndent()
+        if (nl) nl()
+        return this
     }
+
 
     fun appendReformat(text: String): CodeWriter {
         text.splitToSequence('\n').forEach { nl().append(it) }

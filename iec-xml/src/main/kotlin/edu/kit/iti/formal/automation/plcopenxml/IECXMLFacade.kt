@@ -22,8 +22,7 @@ package edu.kit.iti.formal.automation.plcopenxml
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.PouElements
-import edu.kit.iti.formal.automation.st.util.CodeWriter
+import edu.kit.iti.formal.util.CodeWriter
 import org.jdom2.JDOMException
 import java.io.File
 import java.io.IOException
@@ -47,10 +46,5 @@ object IECXMLFacade {
         val writer = StringWriter()
         extractPLCOpenXml(filename, writer)
         return writer.toString()
-    }
-
-    @Throws(JDOMException::class, IOException::class)
-    fun readPLCOpenXml(filename: String): PouElements {
-        TODO()
     }
 }

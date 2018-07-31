@@ -27,7 +27,7 @@ import edu.kit.iti.formal.automation.st.ast.SFCNetwork
 import edu.kit.iti.formal.automation.st.ast.SFCStep
 import edu.kit.iti.formal.automation.st.ast.SFCTransition
 import edu.kit.iti.formal.automation.st.util.AstVisitor
-import edu.kit.iti.formal.automation.st.util.CodeWriter
+import edu.kit.iti.formal.util.CodeWriter
 
 /**
  *

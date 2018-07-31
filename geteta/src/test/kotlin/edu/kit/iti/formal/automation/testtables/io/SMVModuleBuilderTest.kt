@@ -26,7 +26,6 @@ package edu.kit.iti.formal.automation.testtables.io
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.builder.TableTransformation
-import org.apache.commons.io.FileUtils
 import org.junit.Assert
 import org.junit.Test
 
@@ -71,7 +70,7 @@ class SMVModuleBuilderTest {
     @Throws(JAXBException::class, IOException::class)
     fun test(table: String, expectedSMVFile: String) {
         val gtt = GetetaFacade.parseTableXML(table)
-        val expected = FileUtils.readFileToString(java.io.File(expectedSMVFile), "utf-8")
+        val expected = java.io.File(expectedSMVFile).readText()
         val enumType = GetetaFacade.createSuperEnum(Scope())
         val tt = TableTransformation(gtt, enumType)
         val module = tt.transform()

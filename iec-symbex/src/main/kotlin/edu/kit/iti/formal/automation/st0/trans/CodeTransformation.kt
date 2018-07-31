@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st0.trans
 
+import edu.kit.iti.formal.automation.st.ast.StatementList
 import edu.kit.iti.formal.automation.st0.TransformationState
 
 /*-
@@ -32,4 +33,13 @@ interface CodeTransformation {
     fun transform(state: TransformationState): TransformationState
 //    public open fun transform(state: TransformationState): TransformationState =
     //           next.transform(transform(state))
+}
+
+interface STCodeTransformation : CodeTransformation {
+    override fun transform(state: TransformationState): TransformationState {
+        state.stBody = transform(state.stBody)
+        return state
+    }
+
+    fun transform(stBody: StatementList): StatementList
 }

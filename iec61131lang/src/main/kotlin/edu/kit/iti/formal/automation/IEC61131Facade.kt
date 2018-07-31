@@ -33,7 +33,7 @@ import edu.kit.iti.formal.automation.st.ast.Expression
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.StatementList
 import edu.kit.iti.formal.automation.st.ast.Top
-import edu.kit.iti.formal.automation.st.util.CodeWriter
+import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.automation.visitors.Visitable
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams

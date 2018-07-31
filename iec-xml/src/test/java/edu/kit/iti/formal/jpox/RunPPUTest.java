@@ -36,7 +36,15 @@ import java.io.IOException;
 public class RunPPUTest {
     @Test
     public void test() throws JDOMException, IOException {
-        IECXMLFacade.INSTANCE.extractPLCOpenXml(
+        String out = IECXMLFacade.INSTANCE.extractPLCOpenXml(
                 new File("src/test/resources/test.xml").getAbsolutePath());
+        System.out.println(out);
+    }
+
+    @Test
+    public void testPPUNew() throws JDOMException, IOException {
+        String out = IECXMLFacade.INSTANCE.extractPLCOpenXml(
+                new File("ppu.xml").getAbsolutePath());
+        System.out.println(out);
     }
 }

@@ -60,5 +60,13 @@ abstract class AnyDt : Identifiable {
     abstract fun <T> accept(visitor: DataTypeVisitorNN<T>): T
 
     override fun toString() = name
+    open fun reprDecl(): String = "n/a"
+
+    fun isAnonym(): Boolean = name.equals(ANONYM_DATATYPE)
+
+    companion object {
+        val ANONYM_DATATYPE = "ANONYM"
+    }
+
 }
 

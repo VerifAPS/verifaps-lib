@@ -19,9 +19,7 @@ class IntegerPromotion : TypePromotion {
     private fun findNext(a: AnyInt, b: AnyInt): AnyInt {
         var (signed, unsigned) = if (a.isSigned) Pair(a, b) else Pair(b, a)
         while (signed.upperBound < unsigned.upperBound) {
-            if (signed.next().isPresent)
-                signed = signed.next().get()
-            else break
+            signed = signed.next() ?: break
         }
         return signed
     }

@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.io
 
-import edu.kit.iti.formal.automation.st.util.CodeWriter
+import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.print.DSLTablePrinter
 import java.io.File

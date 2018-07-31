@@ -2,7 +2,7 @@ package edu.kit.iti.formal.automation.testtables.print
 
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
-import edu.kit.iti.formal.automation.st.util.CodeWriter
+import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.automation.testtables.model.*
 import java.util.*
 

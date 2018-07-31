@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.plcopenxml
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.util.CodeWriter
+import edu.kit.iti.formal.util.CodeWriter
 import org.jdom2.Document
 import org.jdom2.Element
 import org.jdom2.JDOMException

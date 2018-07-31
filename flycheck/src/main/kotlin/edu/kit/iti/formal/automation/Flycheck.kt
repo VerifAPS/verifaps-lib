@@ -20,33 +20,30 @@ class FlycheckArgs(parser: ArgParser) {
     val include by parser.adding("folder for looking includes").default(arrayListOf("."))
     val files by parser.positionalList(help = "Files to check").default(arrayListOf())
 }
+object FlycheckMain {
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val arguments = FlycheckArgs(ArgParser(args, ArgParser.Mode.POSIX))
+        main(arguments)
+    }
 
-/**
- *
- * @author Alexander Weigl
- * @version 1 (18.03.18)
- */
-fun main(args: Array<String>) {
-    val arguments = FlycheckArgs(ArgParser(args, ArgParser.Mode.POSIX))
-    main(arguments)
-}
+    fun main(arguments: FlycheckArgs) {
+        val base = BuiltinLoader.loadDefault()
 
-fun main(arguments: FlycheckArgs) {
-    val base = BuiltinLoader.loadDefault()
-
-    val r = FlycheckRunner(
-            arguments.files.map { CharStreams.fromFileName(it) },
-            base,
-            arguments.verbose,
-            arguments.include
-    )
-    r.run()
-    r.messages.forEach {
-        val level = Console.Level.valueOf(it.level.toUpperCase())
-
-        Console.writeln(level,
-                "(${it.sourceName}@${it.lineNumber}:${it.charInLine}) ${it.message} (${it.category})"
+        val r = FlycheckRunner(
+                arguments.files.map { CharStreams.fromFileName(it) },
+                base,
+                arguments.verbose,
+                arguments.include
         )
+        r.run()
+        r.messages.forEach {
+            val level = Console.Level.valueOf(it.level.toUpperCase())
+
+            Console.writeln(level,
+                    "(${it.sourceName}@${it.lineNumber}:${it.charInLine}) ${it.message} (${it.category})"
+            )
+        }
     }
 }
 

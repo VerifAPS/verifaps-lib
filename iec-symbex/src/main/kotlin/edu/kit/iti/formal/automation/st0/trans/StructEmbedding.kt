@@ -25,10 +25,9 @@ package edu.kit.iti.formal.automation.st0.trans
 import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.RecordType
 import edu.kit.iti.formal.automation.datatypes.values.VStruct
-import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.st.DefaultInitValue
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
-import edu.kit.iti.formal.automation.st.util.AstTraversal
 import edu.kit.iti.formal.automation.st.util.setAll
 import edu.kit.iti.formal.automation.st0.TransformationState
 import java.util.*
@@ -39,25 +38,29 @@ import java.util.*
  * */
 object StructEmbedding : CodeTransformation {
     override fun transform(state: TransformationState): TransformationState {
-        //val se = FindDeclaredStructs()
-        //state.stBody = state.stBody.accept(this) as StatementList
+        val structVars = state.scope.variables.filter { it.dataType is RecordType }
+        expandStructureVariables(structVars, state.scope.variables)
+        structVars.forEach {
+            state.stBody = rewriteBody(it, state.stBody)
+        }
+
         return state
     }
 }
 
-private fun embedStruct(scope: Scope, vd: VariableDeclaration, body: StatementList): StatementList = body.accept(StructEmbeddingVisitor(scope, vd)) as StatementList
-private fun embedStruct(structVars: List<VariableDeclaration>, scope: VariableScope) {
+private fun rewriteBody(vd: VariableDeclaration, body: StatementList): StatementList = body.accept(StructEmbeddingVisitor(vd)) as StatementList
+
+private fun expandStructureVariables(structVars: List<VariableDeclaration>, scope: VariableScope) {
     scope.removeAll(structVars)
-    for (sv in structVars) {
-        scope.addAll(createStructVariables(sv))
-    }
+    for (sv in structVars) scope.addAll(createStructVariables(sv))
 }
 
 fun createStructVariables(sv: VariableDeclaration): Collection<VariableDeclaration> {
     when (sv.dataType) {
         is RecordType -> { // recursion for struct, => list of variables + prefix
             val rt = sv.dataType as RecordType
-            val (rtv, rv) = sv.initValue as VStruct
+            val (_, rv) = (sv.initValue ?: DefaultInitValue.getInit(sv.dataType!!)) as VStruct
+
             return rt.fields.flatMap {
                 createStructVariables(it)
             }.map {
@@ -77,11 +80,12 @@ fun createStructVariables(sv: VariableDeclaration): Collection<VariableDeclarati
 }
 
 
-private class StructEmbeddingVisitor(val scope: Scope, val vd: VariableDeclaration) : AstMutableVisitor() {
-    override fun visit(invocation: Invocation): Expression {
+private class StructEmbeddingVisitor(val vd: VariableDeclaration) : AstMutableVisitor() {
+    /*override fun visit(invocation: Invocation): Expression {
         val newParameter = ArrayList<InvocationParameter>()
         for (parameter in invocation.parameters) {
-            val expr = parameter.expression
+            val expr = parameter.expression.accept(this) as Expression
+            parameter.expression = expr;
             if (expr is SymbolicReference && expr.identifier == vd.name) {
                 newParameter.addAll(expandParameters(parameter,
                         vd.dataType as RecordType,
@@ -92,7 +96,7 @@ private class StructEmbeddingVisitor(val scope: Scope, val vd: VariableDeclarati
         }
         invocation.parameters.setAll(newParameter)
         return invocation
-    }
+    }*/
 
     private fun expandParameters(parameter: InvocationParameter,
                                  rt: RecordType,

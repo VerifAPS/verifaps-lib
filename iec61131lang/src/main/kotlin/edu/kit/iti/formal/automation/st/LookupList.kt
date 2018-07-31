@@ -17,6 +17,8 @@ interface LookupList<T> : MutableCollection<T>, Cloneable
         return false
     }
 
+    fun removeAllByName(seq: Collection<String>)= seq.forEach { remove(it) }
+
     fun replace(name: String, variable: T): Boolean {
         remove(name)
         return add(variable)

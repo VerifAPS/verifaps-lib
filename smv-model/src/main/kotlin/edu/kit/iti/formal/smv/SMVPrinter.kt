@@ -158,11 +158,12 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
     }
 
     private fun printSection(section: String, exprs: List<SMVExpr>) {
-        if (exprs.size > 0) {
-            for (e in exprs) {
-                if (e == null) continue
-                stream.print(section);stream.print("\n\t")
-                stream.print(e.accept(this));stream.print(";\n\n")
+        if (exprs.isNotEmpty()) {
+            exprs.forEach { e ->
+                stream.print(section)
+                stream.print("\n\t")
+                e.accept(this)
+                stream.print(";\n\n")
             }
         }
     }

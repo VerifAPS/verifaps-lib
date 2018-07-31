@@ -31,6 +31,8 @@ import edu.kit.iti.formal.automation.st0.trans.*
 
 open class MultiCodeTransformation(val transformations: MutableList<CodeTransformation> = arrayListOf())
     : CodeTransformation {
+    constructor(vararg t: CodeTransformation) : this(t.toMutableList())
+
     override fun transform(state: TransformationState): TransformationState =
             transformations.fold(state) { s, t -> t.transform(s) }
 }

@@ -10,6 +10,7 @@ include ':casestudies'
 include ':flycheck'
 include ':geteta'
 include ':web-backend'
+include ':util'
 
 
 project(':iec-symbex').projectDir = "$rootDir/iec-symbex" as File

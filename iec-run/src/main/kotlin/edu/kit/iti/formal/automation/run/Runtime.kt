@@ -39,7 +39,7 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> =
     }
 
     override fun visit(fbc: InvocationStatement) {
-        val fbName = fbc.calleeName
+        val fbName = fbc.callee.identifier
         val innerValue = state[fbName]!! as Value<RecordType, RecordValue>
         val innerState = State(innerValue.value.fieldValues)
         val fbDataType =

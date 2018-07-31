@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.rvt
  * #L%
  */
 
+import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.exceptions.*
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.rvt.translators.*
@@ -94,7 +95,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         return if (varCache.containsKey(vd.identifier))
             varCache[vd.identifier]!!
         else
-            throw UnknownVariableException("Variable access to not declared variable: $vd")
+            throw UnknownVariableException("Variable access to not declared variable: ${IEC61131Facade.print(vd)}. Line: ${vd.startPosition}")
     }
 
     //region rewriting of expressions using the current state

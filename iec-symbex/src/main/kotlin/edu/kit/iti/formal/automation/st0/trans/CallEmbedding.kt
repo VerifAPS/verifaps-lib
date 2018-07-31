@@ -32,11 +32,11 @@ class CallEmbedding : CodeTransformation {
 
 class ActionEmbedder : CodeTransformation {
     override fun transform(state: TransformationState): TransformationState {
-        state.stBody = state.stBody.accept(ActionEmbedderImpl(state)) as StatementList
+        state.stBody = state.stBody.accept(ActionEmbedderImpl()) as StatementList
         return state
     }
 
-    private class ActionEmbedderImpl(val cws: TransformationState) : AstMutableVisitor() {
+    private class ActionEmbedderImpl : AstMutableVisitor() {
         override fun visit(fbc: InvocationStatement): Statement {
             try {
                 val ainvoke = fbc.invoked as Invoked.Action
@@ -180,6 +180,16 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
             val state = TransformationState(invoked.scope, invoked.action.stBody!!, SFCImplementation())
             return getBody(prefix, state)
         }
+
+        if (invoked is Invoked.Function) {
+            val s = StatementList()
+            //s += CommentStatement.single("Removed function invocation to ${invoked.function.name}")
+            s += CommentStatement.single("TODO for feature: Embedd function body after substitution to cover global effects.")
+            s.addAll(invoked.function.stBody!!)
+            return s
+        }
+
+
         return invocation
     }
 }

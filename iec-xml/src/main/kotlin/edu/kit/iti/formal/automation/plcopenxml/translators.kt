@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.plcopenxml
 
-import edu.kit.iti.formal.automation.st.util.CodeWriter
+import edu.kit.iti.formal.util.CodeWriter
 import org.jdom2.Element
 import org.jdom2.filter.Filters
 import org.jdom2.xpath.XPathFactory

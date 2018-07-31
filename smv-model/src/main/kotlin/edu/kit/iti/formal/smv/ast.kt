@@ -251,7 +251,7 @@ abstract class SMVExpr : SMVAst() {
         return SQuantified(STemporalOperator.U, this, other)
     }
 
-    fun equal(e: SMVExpr): SBinaryExpression {
+    infix fun equal(e: SMVExpr): SBinaryExpression {
         return op(SBinaryOperator.EQUAL, e)
     }
 
@@ -278,7 +278,7 @@ abstract class SMVExpr : SMVAst() {
         return SUnaryExpression(SUnaryOperator.MINUS, this)
     }
 
-    fun implies(e: SMVExpr): SMVExpr {
+    infix fun implies(e: SMVExpr): SMVExpr {
         return op(SBinaryOperator.IMPL, e)
     }
 

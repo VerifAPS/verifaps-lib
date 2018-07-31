@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.plcopenxml
 
-import edu.kit.iti.formal.automation.st.util.CodeWriter
+import edu.kit.iti.formal.util.CodeWriter
 import org.jdom2.Element
 import org.jdom2.filter.Filters
 
@@ -35,7 +35,7 @@ object Actions : XMLTranslatorXPath("./actions") {
 object Action : XMLTranslator {
     override fun isCapableOf(e: Element): Boolean = e.name == "action"
     override fun translate(e: Element, writer: CodeWriter) {
-        writer.nl().append("ACTION ${e.getAttributeValue("name")}").increaseIndent().nl()
+        writer.nl().append("ACTION ${e.getAttributeValue("name")}").increaseIndent()
         STBody.translate(e, writer)
         SFCBody.translate(e, writer)
         writer.decreaseIndent().nl().append("END_ACTION")
@@ -96,7 +96,7 @@ object SFCBody : XMLTranslatorXPath("./body/SFC") {
         val getSTBody = xpathFactory.compile("./body/SFC", Filters.element())
         val sfcElement = getSTBody.evaluateFirst(e)
         if (sfcElement != null) {
-            SFCFactory(sfcElement).get()
+            SFCFactory(sfcElement, writer).run()
         }
     }
 }
@@ -112,6 +112,6 @@ object STBody : XMLTranslatorXPath("./body/ST/xhtml") {
 
 object FBDBody : XMLTranslatorXPath("./body/FBD") {
     override fun translate(e: Element, writer: CodeWriter) {
-        FBDTranslator(e, writer).run()
+        //FBDTranslator(e, writer).run()
     }
 }

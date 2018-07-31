@@ -20,7 +20,6 @@
 package edu.kit.iti.formal.automation.testtables.io
 
 import edu.kit.iti.formal.automation.testtables.ExTeTa
-import org.apache.commons.io.IOUtils
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,23 +53,24 @@ class FullStackTest(
         commands.add("-cp")
         commands.add(classpath)
         commands.add(className)
-        commands.addAll(Arrays.asList(*args!!))
+        commands.addAll(Arrays.asList(*args))
 
         println(commands.stream().reduce { a, b -> "$a $b" }.get())
 
         val builder = ProcessBuilder(commands)
-                .directory(File(workingDir!!).absoluteFile)
+                .directory(File(workingDir).absoluteFile)
         builder.environment()["NUXMV"] = NUXMV
         val process = builder.start()
         process.waitFor()
 
-        val output = IOUtils.toString(process.inputStream, "utf-8")
+        val output = process.inputStream.bufferedReader().useLines { it.joinToString() }
         println(output)
-        IOUtils.copy(process.errorStream, System.err)
+
+        process.errorStream.copyTo(System.err)
 
         Assert.assertEquals(0, process.exitValue().toLong())
         val lines = output.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        Assert.assertEquals("STATUS: " + status!!, lines[lines.size - 1])
+        Assert.assertEquals("STATUS: " + status, lines[lines.size - 1])
     }
 
     companion object {

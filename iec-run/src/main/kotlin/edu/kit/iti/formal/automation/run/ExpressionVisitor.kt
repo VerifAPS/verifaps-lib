@@ -17,8 +17,7 @@ class ExpressionVisitor(private val state: State,
 
     override fun visit(functionCall: Invocation): EValue {
         val functionDeclaration = scope.resolveFunction(functionCall.calleeName)
-        if (functionDeclaration == null)
-            TODO("Could not find function ${functionCall.calleeName}")
+                ?: TODO("Could not find function ${functionCall.calleeName}")
         val evaluatedParams = functionCall.parameters.map { it.accept(this)!! }
         val returnValue = ExecutionFacade.evaluateFunction(functionDeclaration, evaluatedParams)
         return returnValue
@@ -92,7 +91,4 @@ class ExpressionVisitor(private val state: State,
             else -> TODO("operator ${binaryExpression.operator.symbol} isType not implemented (${binaryExpression.operator.toString()})")
         }
     }
-
-
 }
-
