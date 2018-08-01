@@ -148,8 +148,7 @@ data class ModuleType(
         val printer = SMVPrinter(PrintWriter(stream))
         return String.format("${moduleName}(%s)",
                 if (parameters.size > 0) {
-                    parameters.map { v -> v.toString() }//v.accept(printer) }
-                            .reduce { a, b -> "$a, $b" }
+                    parameters.joinToString(", ") { it.repr() }
                 } else "")
     }
 }

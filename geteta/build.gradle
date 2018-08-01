@@ -7,7 +7,6 @@ plugins {
 apply plugin: 'antlr'
 apply plugin: 'application'
 group = 'edu.kit.iti.formal'
-version = '0.8.0-SNAPSHOT'
 mainClassName = "edu.kit.iti.formal.automation.testtables.ExTeTa"
 
 description = """

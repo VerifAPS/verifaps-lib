@@ -1,9 +1,43 @@
-description = 'frontend'
+apply plugin: 'application'
+
+description = 'Case Studies of VerifAPS'
 dependencies {
     compile project(':iec61131lang')
     compile project(':smv-model')
     compile project(':iec-xml')
     compile project(':iec-symbex')
-    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.2.21'
-    testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test', version: '1.2.21'
 }
+
+
+task createScriptKastelDemonstrator(type: CreateStartScripts) {
+    mainClassName = "edu.kit.iti.formal.automation.KastelDemonstrator"
+    classpath = startScripts.classpath
+    outputDir = startScripts.outputDir
+    applicationName = 'kastel-demo'
+    defaultJvmOpts = ["-Xms1024m", "-Xmx2048m"]
+}
+
+task createScriptSc12f(type: CreateStartScripts) {
+    mainClassName = "edu.kit.iti.formal.automation.Sc12f"
+    classpath = startScripts.classpath
+    outputDir = startScripts.outputDir
+    applicationName = 'sc12f'
+    defaultJvmOpts = ["-Xms1024m", "-Xmx2048m"]
+}
+
+task createScriptSc11_rev(type: CreateStartScripts) {
+    mainClassName = "edu.kit.iti.formal.automation.SC11_rev"
+    classpath = startScripts.classpath
+    outputDir = startScripts.outputDir
+    applicationName = 'sc11-rev'
+    defaultJvmOpts = ["-Xms1024m", "-Xmx2048m"]
+}
+
+applicationDistribution.into("bin") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(createScriptKastelDemonstrator)
+    from(createScriptSc12f)
+    from(createScriptSc11_rev)
+    fileMode = 0755
+}
+

@@ -11,8 +11,12 @@ import edu.kit.iti.formal.automation.st0.trans.CodeTransformation
 import edu.kit.iti.formal.automation.st0.trans.RealToInt
 import edu.kit.iti.formal.automation.st0.trans.STCodeTransformation
 import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.smv.HistoryModuleBuilder
 import edu.kit.iti.formal.smv.ModuleType
 import edu.kit.iti.formal.smv.SMVPrinter
+import edu.kit.iti.formal.smv.SMVTypes
+import edu.kit.iti.formal.smv.ast.SAssignment
+import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
 import java.io.File
@@ -70,9 +74,12 @@ object KastelDemonstrator {
         Console.writeln("File $simpFile written")
 
 
+        //degrade INT with
+        INT.bitLength = 7
+
         val module = SymbExFacade.evaluateProgram(simplified, true)
         val isHigh = { v: String ->
-            v.endsWith("Velocity")
+            false //all equal //v.endsWith("Velocity")
         }
         val imb = IFModelBuilder(module, isHigh)
         imb.run()
@@ -96,10 +103,13 @@ object AssignmentDScratch : STCodeTransformation, AstMutableVisitor() {
     }
 }
 
+
 class IFModelBuilder(private val code: SMVModule,
-                     val isHigh: (String) -> Boolean) : Runnable {
+                     val isHigh: (String) -> Boolean, private val historyLength: Int = 10) : Runnable {
+    val loweq = SVariable("lowEq", SMVTypes.BOOLEAN)
+    val hmb = HistoryModuleBuilder("HistoryLowEq", listOf(loweq), historyLength)
     val main = SMVModule("main")
-    val product = arrayListOf(main, code)
+    val product = arrayListOf(main, code, hmb.module)
 
     override fun run() {
         main.name = MAIN_MODULE
@@ -117,20 +127,31 @@ class IFModelBuilder(private val code: SMVModule,
                 }
                 .reduce { a, b -> a and b }
 
+        // History of low inputs.
+        hmb.run()
+        val historyLowEq = SVariable("hLowEq", hmb.moduleType)
+        main.definitions.add(SAssignment(loweq, inputLow))
+        main.stateVars.add(historyLowEq)
+
 
         val outV = code.definitions.map { it.target } + code.stateVars
-        val stateLow = outV.filter { !isHigh(it.name) }
+        val lowOutput = outV.filter { !isHigh(it.name) }
+        /*val stateLow =          outV.filter { !isHigh(it.name) }
                 .map {
                     it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
                 }
                 .reduce { a, b -> a and b }
+        */
 
+        val history = hmb.module.stateVars.map { it.inModule(historyLowEq.name) }
+        val premise = (history + loweq).reduce { acc: SMVExpr, sVariable: SMVExpr ->
+            acc.and(sVariable)
+        }
 
-        outV.filter { !isHigh(it.name) }
-                .forEach {
-                    val eq = it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
-                    main.invariantSpecs.add(inputLow implies eq)
-                }
+        lowOutput.forEach {
+            val eq = it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
+            main.invariantSpecs.add(premise implies eq)
+        }
         //main.invariantSpecs.add( inputLow implies  stateLow)
     }
 
@@ -143,10 +164,10 @@ class IFModelBuilder(private val code: SMVModule,
         val FIRST_RUN = "fst"
         val MAIN_MODULE = "main"
     }
-
 }
 
-fun <T> nonNullSeq(seq : Collection<T?>) : List<T> {
+
+fun <T> nonNullSeq(seq: Collection<T?>): List<T> {
     val al = ArrayList<T>()
     seq.forEach { it?.let { al += it } }
     return al

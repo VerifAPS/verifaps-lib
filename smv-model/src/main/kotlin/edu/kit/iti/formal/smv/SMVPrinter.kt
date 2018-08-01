@@ -115,7 +115,7 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
         printVariables("FROZENVAR", m.frozenVars)
         printVariables("VAR", m.stateVars)
 
-        printAssignments("DEFINE", m.definitions)
+        printDefinition(m.definitions)
 
         printSection("LTLSPEC", m.ltlSpec)
         printSection("CTLSPEC", m.ctlSpec)
@@ -142,6 +142,18 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
             ;stream.print(
                     SMVFacade.combine(SBinaryOperator.AND, exprs).accept(this)
             );stream.print(";\n")
+        }
+    }
+
+
+    private fun printDefinition(assignments: List<SAssignment>) {
+        stream.printf("DEFINE\n")
+        for ((target, expr) in assignments) {
+            stream.print("\t")
+            stream.print(target.name)
+            stream.print(" := ")
+            expr.accept(this)
+            stream.print(";\n")
         }
     }
 

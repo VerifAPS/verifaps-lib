@@ -5,6 +5,7 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.sfclang.SFC2ST
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.Utils
+import org.antlr.v4.runtime.CharStreams
 import org.jdom2.JDOMException
 import java.io.File
 import java.io.IOException
@@ -22,7 +23,8 @@ object SC11_rev {
         val start = System.currentTimeMillis()
 
         val f = "/home/weigl/Documents/IMPROVE/Papiere/at2018/data/case3/Scenario11_Final_rev.xml"
-        val tles = IECXMLFacade.readPLCOpenXml(f)
+        val code = IECXMLFacade.extractPLCOpenXml(f)
+        val tles = IEC61131Facade.file(CharStreams.fromString(code))
 
         System.out.printf("// Reading Time: %d ms%n", System.currentTimeMillis() - start)
 

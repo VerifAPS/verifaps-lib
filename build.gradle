@@ -1,6 +1,5 @@
 plugins {
     id "org.jetbrains.kotlin.jvm" version "1.2.41" apply false
-    //id 'io.franzbecker.gradle-lombok' version '1.11' apply false
     id "com.github.hierynomus.license" version "0.14.0" apply false
     id "com.jfrog.bintray" version "1.7.3" apply false
     id 'com.palantir.git-version' version '0.10.1' apply false
@@ -8,7 +7,6 @@ plugins {
 }
 
 dokka {
-
     // List of files with module and package documentation
     // http://kotlinlang.org/docs/reference/kotlin-doc.html#module-and-package-documentation
 
@@ -72,7 +70,7 @@ allprojects {
     apply plugin: 'idea'
     apply plugin: 'com.palantir.git-version'
 
-    group = 'edu.kit.iti.formal'
+    group = 'edu.kit.iti.formal.automation'
 
     ext.gitVersion = versionDetails()
     if (ext.gitVersion.lastTag) {
@@ -91,7 +89,6 @@ allprojects {
             downloadSources = true
         }
     }
-
 }
 
 subprojects {
@@ -106,7 +103,7 @@ subprojects {
     apply plugin: 'maven'
 
 
-    ext.kotlin_version = '1.2.50'
+    ext.kotlin_version = '1.2.60'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -168,8 +165,6 @@ subprojects {
         }
     }
 
-
-
     publishing {
         repositories {
             maven {
@@ -182,7 +177,6 @@ subprojects {
         failOnError = false
         verbose = false
     }
-
 
     license {
         mapping("java", "PHP")
@@ -200,7 +194,6 @@ subprojects {
     //Checks does not work
     licenseMain.enabled = false
     licenseTest.enabled = false
-
 
     //sourceSets { test { resources { srcDirs "../share/test-resources" } } }
 }

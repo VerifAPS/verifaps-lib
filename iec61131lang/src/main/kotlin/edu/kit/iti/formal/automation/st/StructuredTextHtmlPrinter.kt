@@ -24,9 +24,9 @@ package edu.kit.iti.formal.automation.st
 
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.st.util.HTMLCodeWriter
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
-import edu.kit.iti.formal.automation.visitors.Sections
+import edu.kit.iti.formal.util.HTMLCodeWriter
+import edu.kit.iti.formal.util.Sections
 
 /**
  * Created by weigla on 15.06.2014.

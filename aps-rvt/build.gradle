@@ -1,6 +1,6 @@
 apply plugin: 'application'
 mainClassName = "edu.kit.iti.formal.automation.rvt.RvtappKt"
-description = ''
+description = 'Regression Verification Frontend'
 
 dependencies {
     compile project(':iec61131lang')

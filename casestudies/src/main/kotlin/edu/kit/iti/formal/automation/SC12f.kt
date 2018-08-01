@@ -4,6 +4,7 @@ import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.sfclang.SFC2ST
 import edu.kit.iti.formal.automation.st.ast.*
+import org.antlr.v4.runtime.CharStreams
 import org.jdom2.JDOMException
 import java.io.File
 import java.io.IOException
@@ -20,8 +21,8 @@ object Sc12f {
     fun main(args: Array<String>) {
         val start = System.currentTimeMillis()
         val f = "/home/weigl/Scenario12f.xml"
-        val tles = IECXMLFacade.readPLCOpenXml(f)
-
+        val code = IECXMLFacade.extractPLCOpenXml(f)
+        val tles = IEC61131Facade.file(CharStreams.fromString(code))
         System.out.printf("// Reading Time: %d ms%n", System.currentTimeMillis() - start)
 
         File("SC12f.iec61131").writer().use {
