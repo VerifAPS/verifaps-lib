@@ -22,43 +22,9 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.*
 
-data class GetetaExample(val name: String,
-                         val code: String,
-                         val testtable: String)
-
-object GetetaExamplesRepo {
-    val examples: List<GetetaExample>
-
-    init {
-        val prefix = "/examples/geteta/"
-
-        fun read(p: String) =
-                GetetaExamplesRepo.javaClass.getResourceAsStream(prefix + p)
-                        .bufferedReader().useLines { it.joinToString("\n") }
-
-        fun load(name: String): GetetaExample {
-            return try {
-                val (base, name) = name.split('|')
-                val code = read("$base.st")
-                val tt = read("$base.tt.txt")
-                GetetaExample(name, code, tt)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                GetetaExample(name, "", "")
-            }
-        }
-
-        val index = read("index")
-        examples = index.lines().map { load(it) }
-    }
-}
 
 
 fun Route.geteta() {
-    get("/geteta/examples") {
-        call.respond(GetetaExamplesRepo.examples)
-    }
-
     post("/geteta/generate") {
         val str = context.receive<String>()
         val code = IEC61131Facade.file(CharStreams.fromString(str))

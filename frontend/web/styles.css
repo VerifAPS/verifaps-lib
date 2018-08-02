@@ -1,0 +1,164 @@
+body {
+  margin: 0;
+  padding: 0; }
+
+.header {
+  border-bottom: 1px solid #ccc;
+  background: aliceblue; }
+  .header h1 {
+    margin: 0;
+    padding: .2em;
+    font-size: 12pt; }
+  .header h2 {
+    font-size: 10pt; }
+  .header form {
+    padding: .5em; }
+
+/*
+.tt-syntax-help {
+  &span.s {
+    font-weight: bold;
+    text-decoration: underline;
+  }
+
+  &span.t {
+    text-decoration: underline;
+  }
+}*/
+.tt-syntax-help {
+  color: cadetblue; }
+  .tt-syntax-help span.s {
+    font-weight: bold;
+    color: black; }
+  .tt-syntax-help span.t {
+    color: black;
+    text-decoration: underline; }
+
+#check-results {
+  font-family: monospace; }
+
+.gutter-errors {
+  width: 10px;
+  background: red; }
+
+.gutter-warnings {
+  width: 10px;
+  background: red; }
+
+/* Visual Styles */
+*, *:after, *:before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
+body {
+  -webkit-font-smoothing: antialiased; }
+
+.pc-tab {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto; }
+  .pc-tab ul {
+    list-style: none;
+    margin: 0;
+    padding: 0; }
+    .pc-tab ul li label {
+      font-family: "Raleway";
+      float: left;
+      padding: 15px 25px;
+      border: 1px solid #ddd;
+      border-bottom: 0;
+      background: #eeeeee;
+      color: #444; }
+      .pc-tab ul li label:hover {
+        background: #dddddd; }
+      .pc-tab ul li label:active {
+        background: #ffffff; }
+    .pc-tab ul li:not(:last-child) label {
+      border-right-width: 0; }
+
+#tt-render-result tr.categories th {
+  text-transform: uppercase;
+  font-size: 110%; }
+#tt-render-result tr.variables {
+  border-bottom: black solid 1px; }
+  #tt-render-result tr.variables th {
+    padding: 0.5em; }
+#tt-render-result tbody td.row-number {
+  font-weight: bold;
+  border-right: 1px black solid; }
+#tt-render-result tbody td {
+  font-family: monospace; }
+#tt-render-result tbody tr:nth-child(2n) {
+  background: #cdf; }
+#tt-render-result tbody tr:nth-child(2n+1) {
+  background: #fef; }
+#tt-render-result tbody td.time {
+  text-align: center; }
+
+/*!
+ * StyleSheet for JQuery splitter Plugin version 0.27.1
+ * Copyright (C) 2010-2018 Jakub Jankiewicz <http://jcubic.pl/me>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+.splitter_panel {
+  position: relative; }
+
+.splitter_panel .vsplitter {
+  background-color: grey;
+  cursor: col-resize;
+  z-index: 900;
+  width: 7px; }
+
+.splitter_panel .hsplitter {
+  background-color: #5F5F5F;
+  cursor: row-resize;
+  z-index: 800;
+  height: 7px; }
+
+.splitter_panel .vsplitter.splitter-invisible,
+.splitter_panel .hsplitter.splitter-invisible {
+  background: none; }
+
+.splitter_panel .vsplitter, .splitter_panel .left_panel, .splitter_panel .right_panel,
+.splitter_panel .hsplitter, .splitter_panel .top_panel, .splitter_panel .bottom_panel {
+  position: absolute;
+  overflow: auto; }
+
+.splitter_panel .vsplitter, .splitter_panel .left_panel, .splitter_panel .right_panel {
+  height: 100%; }
+
+.splitter_panel .hsplitter, .splitter_panel .top_panel, .splitter_panel .bottom_panel {
+  width: 100%; }
+
+.splitter_panel .top_panel, .splitter_panel .left_panel, .splitter_panel .vsplitter {
+  top: 0; }
+
+.splitter_panel .top_panel, .splitter_panel .bottom_panel, .splitter_panel .left_panel, .splitter_panel .hsplitter {
+  left: 0; }
+
+.splitter_panel .bottom_panel {
+  bottom: 0; }
+
+.splitter_panel .right_panel {
+  right: 0; }
+
+.splitterMask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000; }

@@ -1,0 +1,37 @@
+buildscript {
+    ext.kotlin_version = '1.2.51'
+    repositories {
+        jcenter()
+        maven {
+            url "https://dl.bintray.com/kotlin/kotlin-eap"
+        }
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+// apply kotlin2js
+apply plugin: 'kotlin2js'
+
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlinx:kotlinx-html-js:0.6.11"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
+    testCompile "org.jetbrains.kotlin:kotlin-test-js:$kotlin_version"
+}
+
+// configure kotlin compiler
+compileKotlin2Js {
+    //kotlinOptions.metaInfo = true
+    kotlinOptions.outputFile = "web/${project.name}.js"
+    //"$project.buildDir.path/js/${project.name}.js"
+    kotlinOptions.sourceMap = true
+    //kotlinOptions.moduleKind = 'commonjs'
+    //kotlinOptions.main = "main"
+}

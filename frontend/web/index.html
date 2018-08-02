@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <meta charset="UTF-8">
+    <title>Structured Text Workbench</title>
+
+    <script src="kotlin.js"></script>
+
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="codemirror/theme/monokai.css">
+    <script src="codemirror/lib/codemirror.js"></script>
+    <script src="codemirror/addon/dialog/dialog.js"></script>
+    <link rel="stylesheet" href="codemirror/addon/dialog/dialog.css">
+    <script src="codemirror/addon/selection/active-line.js"></script>
+    <script src="codemirror/addon/edit/matchbrackets.js"></script>
+    <script src="codemirror/addon/edit/closebrackets.js"></script>
+    <script src="codemirror/addon/comment/comment.js"></script>
+    <script src="codemirror/addon/comment/continuecomment.js"></script>
+    <script src="codemirror/addon/runmode/runmode.js"></script>
+    <script src="codemirror/addon/runmode/colorize.js"></script>
+    <link rel="stylesheet" href="codemirror/addon/hint/show-hint.css">
+    <script src="codemirror/addon/hint/show-hint.js"></script>
+    <script src="codemirror/mode/clike/clike.js"></script>
+    <script src="codemirror/mode/javascript/javascript.js"></script>
+    <script src="codemirror/addon/mode/simple.js"></script>
+
+
+    <script type="text/javascript" src="jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="jquery.splitter.js"></script>
+    <link rel="stylesheet" href="jquery-ui/themes/base/base.css">
+    <script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
+
+
+    <!--
+    <link rel="stylesheet" href="purecss/pure-min.css"/>
+    <link rel="stylesheet" href="purecss/grids-min.css"/>
+    <link rel="stylesheet" href="purecss/buttons-min.css"/>
+    <link rel="stylesheet" href="purecss/forms-min.css"/>
+    <link rel="stylesheet" href="purecss/menus-core-min.css"/>
+    <link rel="stylesheet" href="purecss/menus-horizontal-min.css"/>
+    <link rel="stylesheet" href="purecss/menus-dropdown-min.css"/>
+    -->
+
+    <!--
+      <script type="text/javascript" src="jquery-circle-progress/dist/circle-progress.js"></script>
+      <script type="text/javascript" src="a11ytree/src/js/jquery.a11yTree.js"></script>
+      <script type="text/javascript" src="jsdifflib/difflib.js"></script>
+
+-->
+    <script src="jquery-ui/ui/widget.js"></script>
+    <script src="jquery-ui/ui/unique-id.js"></script>
+    <script src="jquery-ui/ui/widgets/mouse.js"></script>
+    <script src="jquery-ui/ui/widgets/sortable.js"></script>
+    <script src="jquery-ui/ui/widgets/tabs.js"></script>
+    <script src="jquery-ui/ui/widgets/accordion.js"></script>
+    <link rel="stylesheet" href="jquery-ui/themes/base/all.css"/>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="header" id="header">
+    <div style="float:left">
+        <h1>Playground: Verification of Automated Production Systems</h1>
+        <h2>
+            <a href="https://formal.iti.kit.edu/" class="pure-menu-heading pure-menu-link">
+                Application-oriented Formal Verification
+            </a>
+        </h2>
+    </div>
+    <div style="float:right">
+        <div style="padding: .5em;">
+            <a href="https://kit.edu">
+                <img src="http://www.kit.edu/img/intern/kit_logo_V2_de.svg" style="height:3em">
+            </a>
+        </div>
+    </div>
+    <div style="clear: both"></div>
+</div>
+<div id="body">
+    <div id="editor">
+    </div>
+    <div>
+        <div id="tabs">
+            <ul>
+                <li><a href="#tabs-examples">Examples</a></li>
+                <li><a href="#tabs-1">Simple Checks</a></li>
+                <li><a href="#tabs-2">Test Table</a></li>
+                <li><a href="#tabs-3">Regression Verification</a></li>
+            </ul>
+
+            <div id="tabs-examples">
+                <h2>Examples</h2>
+                <div id="examples"></div>
+            </div>
+
+            <div id="tabs-1">
+                <form class="pure-form">
+                    <label for="checks">Check:</label>
+                    <select id="checks" class=""></select>
+                    <button id="run-check">Run</button>
+                </form>
+
+                <hr>
+                <div class="outer-check-results">
+                    <h3>Results</h3>
+                    <div id="check-results">
+                        No current results.
+                    </div>
+                </div>
+            </div>
+
+            <div id="tabs-2">
+                <form class="pure-form">
+                    <label>Examples</label>
+                    <select id="tt-example"></select>
+                    <a id="tt-btn-load-code" class="pure-button">Load ST Code</a>
+                    <a id="tt-btn-load-testtable" class="pure-button">Load Test table</a>
+
+                    <div class="pure-button-group" role="group" aria-label="" style="margin-top: 1.5em;">
+                        <a id="btn-tt-generate" class="pure-button">New table for interface</a>
+
+                        <a href="#" class="pure-button button-secondary">Verify</a>
+                    </div>
+
+                </form>
+                <hr>
+                <div id="tt-editor"></div>
+
+                <div id="tt-accordion">
+                    <h3>Syntax Overview</h3>
+                    <div class="tt-help">
+                        <p>
+                            The blue marked words are the keywords. The underline words are terminal symbols, e.g.
+                            name
+                            is
+                            an identifier and type a valid IEC61131 type.
+
+                            The bold symbols are meta symbol for marking optional or repeating grammar structures.
+                        </p>
+
+                        <pre class="tt-syntax-help">
+table <span class="t">name</span> {
+    <span class="s">(</span> var state<span class="s">?</span> <span class="s">(</span>input<span class="s">|</span>output<span
+                                class="s">)</span> <span class="t">name</span> : <span class="t">type</span><span
+                                class="s"> )*</span>
+
+    <span class="s">(</span> gvar <span class="t">name</span> : <span class="t">type</span> with <span
+                                class="t">constraint</span> <span class="s">)*</span>
+
+    options {
+        <span class="s">(</span><span class="t">key</span> = <span class="t">constant</span><span class="s">)*</span>
+    }
+
+    group {
+        <span class="s">(</span> row <span class="t">id</span><span class="s">?</span> <span class="t">time</span><span
+                                class="s">?</span> { <span class="s">(</span><span class="t">variable</span> = <span
+                                class="t">constraint</span><span class="s">)*</span> }
+        <span class="s">|</span> group <span class="t">id</span><span class="s">?</span> <span
+                                class="t">time</span><span class="s">?</span> { ... }
+
+    }
+
+    function <span class="t">name</span> ( <span class="t">args</span> ) `<span class="t">list of structuredtext statements</span>`
+}
+</pre>
+                    </div>
+                    <h3>Rendered Table</h3>
+                    <div>
+                        <a id="btn-tt-render" class="pure-button">Show as HTML</a>
+                        <div id="tt-render-result"></div>
+                    </div>
+                    <h3>Verification Results</h3>
+                    <div id="tt-verification-results"></div>
+
+                </div>
+            </div>
+
+            <div id="tabs-3">
+                <h2>Second</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laborum nesciunt ipsum dolore error
+                    repellendus officiis aliquid a, vitae reprehenderit, accusantium vero, ad. Obcaecati numquam
+                    sapiente cupiditate. Praesentium eaque, quae error!</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perferendis, maiores.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="frontend.js"></script>
+
+</body>
+</html>

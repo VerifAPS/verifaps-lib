@@ -5,6 +5,9 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/aps-rvt/aps-rvt.iml" filepath="$PROJECT_DIR$/.idea/modules/aps-rvt/aps-rvt.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/casestudies/casestudies.iml" filepath="$PROJECT_DIR$/.idea/modules/casestudies/casestudies.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/flycheck/flycheck.iml" filepath="$PROJECT_DIR$/.idea/modules/flycheck/flycheck.iml" />
+      <module fileurl="file://$PROJECT_DIR$/frontend/frontend.iml" filepath="$PROJECT_DIR$/frontend/frontend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend_main.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend_main.iml" group="frontend" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend_test.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend_test.iml" group="frontend" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/geteta/geteta.iml" filepath="$PROJECT_DIR$/.idea/modules/geteta/geteta.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec-modularization/iec-modularization.iml" filepath="$PROJECT_DIR$/.idea/modules/iec-modularization/iec-modularization.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec-run/iec-run.iml" filepath="$PROJECT_DIR$/.idea/modules/iec-run/iec-run.iml" />
