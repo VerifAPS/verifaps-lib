@@ -31,7 +31,7 @@ class ConstraintVariableTransformer : TableTransformer {
         val gtt = tt.testTable
         val mt = tt.tableModule
         for (cv in gtt.constraintVariables) {
-            val svar = tt.variableContext.getSMVVariable(cv.name)!!
+            val svar = cv.internalVariable(gtt.programRuns)
             if (cv.dataType == DataType.ENUM) {
                 svar.dataType = tt.superEnumType
             }
@@ -40,8 +40,7 @@ class ConstraintVariableTransformer : TableTransformer {
             if (cv.constraint != null) {
                 mt.initExpr.add(
                         GetetaFacade.exprToSMV(cv.constraint!!,
-                                tt.variableContext.getSMVVariable(cv.name)!!,
-                                tt.variableContext))
+                                svar, 0, tt.variableContext))
             }
             //TODO add invar for each frozenvar
         }

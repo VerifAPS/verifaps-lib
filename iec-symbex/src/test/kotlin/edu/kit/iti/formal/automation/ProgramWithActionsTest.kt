@@ -39,7 +39,7 @@ class ProgramWithActionsTest {
     @Test
     @Throws(IOException::class)
     fun test() {
-        val (tle, ok) = IEC61131Facade.filer(CharStreams.fromStream(
+        val (tle, ok) = IEC61131Facade.fileResolve(CharStreams.fromStream(
                 javaClass.getResourceAsStream("program_with_actions.st")
         ))
         val newTle = ActionEmbedder().transform(TransformationState(tle[0] as PouExecutable))

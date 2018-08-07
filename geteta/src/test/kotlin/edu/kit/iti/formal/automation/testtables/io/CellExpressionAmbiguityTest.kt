@@ -54,20 +54,20 @@ class CellExpressionAmbiguityTest {
 
     @Test(expected = ProgramAbortionException::class)
     fun testInvalidReferencePositive() {
-        GetetaFacade.exprToSMV("b[2]", SVariable.create("a").asBool(), pc)
+        GetetaFacade.exprToSMV("b[2]", SVariable.create("a").asBool(), 0, pc)
     }
 
 
     @Test
     fun testValidReferenceZero() {
-        GetetaFacade.exprToSMV("b[0]", SVariable.create("a").asBool(), pc)
+        GetetaFacade.exprToSMV("b[0]", SVariable.create("a").asBool(), 0, pc)
     }
 
     companion object {
-        val pc = CellExpressionTest.defaultTestTable().generateParseContext()
+        val pc = CellExpressionTest.defaultTestTable().parseContext
 
         fun parse(cell: String): SMVExpr {
-            return GetetaFacade.exprToSMV(cell, defaultVar(), pc)
+            return GetetaFacade.exprToSMV(cell, defaultVar(), 0, pc)
         }
 
         private fun defaultVar(): SVariable {

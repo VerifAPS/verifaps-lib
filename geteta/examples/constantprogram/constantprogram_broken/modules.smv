@@ -1,0 +1,132 @@
+MODULE main
+IVAR
+	i : signed word[16];
+-- end of IVAR
+VAR
+	code : constantprogram(i);
+	table : Ta(i, next(code.o), next(code.c));
+-- end of VAR
+
+-- end of module main
+
+MODULE Ta(i, o, c)
+VAR
+	s1_1 : boolean;
+	s1_2 : boolean;
+	s1_3 : boolean;
+	s1_4 : boolean;
+	s1_5 : boolean;
+	s1_6 : boolean;
+	s1_7 : boolean;
+	s1_8 : boolean;
+	s1_9 : boolean;
+	s1_10 : boolean;
+	s2_1 : boolean;
+	s2_2 : boolean;
+	s2_3 : boolean;
+	s2_4 : boolean;
+	s2_5 : boolean;
+	s2_6 : boolean;
+	s2_7 : boolean;
+	s2_8 : boolean;
+	s2_9 : boolean;
+	s2_10 : boolean;
+	_$ERROR : boolean;
+	_$SENTINEL : boolean;
+-- end of VAR
+DEFINE
+	s1_fail := s1_in & !s1_out;
+	s1_fwd := s1_in & s1_out;
+	s1_in := TRUE;
+	s1_out := i = o & 0sd16_42 = c;
+	s2_fail := s2_in & !s2_out;
+	s2_fwd := s2_in & s2_out;
+	s2_in := TRUE;
+	s2_out := i = o & 0sd16_41 = c;
+	s_1_10_fail := s1_10 & s1_fail;
+	s_1_10_fwd := s1_10 & s1_fwd;
+	s_1_1_fail := s1_1 & s1_fail;
+	s_1_1_fwd := s1_1 & s1_fwd;
+	s_1_2_fail := s1_2 & s1_fail;
+	s_1_2_fwd := s1_2 & s1_fwd;
+	s_1_3_fail := s1_3 & s1_fail;
+	s_1_3_fwd := s1_3 & s1_fwd;
+	s_1_4_fail := s1_4 & s1_fail;
+	s_1_4_fwd := s1_4 & s1_fwd;
+	s_1_5_fail := s1_5 & s1_fail;
+	s_1_5_fwd := s1_5 & s1_fwd;
+	s_1_6_fail := s1_6 & s1_fail;
+	s_1_6_fwd := s1_6 & s1_fwd;
+	s_1_7_fail := s1_7 & s1_fail;
+	s_1_7_fwd := s1_7 & s1_fwd;
+	s_1_8_fail := s1_8 & s1_fail;
+	s_1_8_fwd := s1_8 & s1_fwd;
+	s_1_9_fail := s1_9 & s1_fail;
+	s_1_9_fwd := s1_9 & s1_fwd;
+	s_2_10_fail := s2_10 & s2_fail;
+	s_2_10_fwd := s2_10 & s2_fwd;
+	s_2_1_fail := s2_1 & s2_fail;
+	s_2_1_fwd := s2_1 & s2_fwd;
+	s_2_2_fail := s2_2 & s2_fail;
+	s_2_2_fwd := s2_2 & s2_fwd;
+	s_2_3_fail := s2_3 & s2_fail;
+	s_2_3_fwd := s2_3 & s2_fwd;
+	s_2_4_fail := s2_4 & s2_fail;
+	s_2_4_fwd := s2_4 & s2_fwd;
+	s_2_5_fail := s2_5 & s2_fail;
+	s_2_5_fwd := s2_5 & s2_fwd;
+	s_2_6_fail := s2_6 & s2_fail;
+	s_2_6_fwd := s2_6 & s2_fwd;
+	s_2_7_fail := s2_7 & s2_fail;
+	s_2_7_fwd := s2_7 & s2_fwd;
+	s_2_8_fail := s2_8 & s2_fail;
+	s_2_8_fwd := s2_8 & s2_fwd;
+	s_2_9_fail := s2_9 & s2_fail;
+	s_2_9_fwd := s2_9 & s2_fwd;
+LTLSPEC
+	TRUE -> (F(!s1_1 & !s1_2 & !s1_3 & !s1_4 & !s1_5 & !s1_6 & !s1_7 & !s1_8 & !s1_9 & !s1_10 & !s2_1 & !s2_2 & !s2_3 & !s2_4 & !s2_5 & !s2_6 & !s2_7 & !s2_8 & !s2_9 & !s2_10 & !_$ERROR | s_2_10_fwd));
+
+INVARSPEC
+	_$ERROR -> s1_1 | s1_2 | s1_3 | s1_4 | s1_5 | s1_6 | s1_7 | s1_8 | s1_9 | s1_10 | s2_1 | s2_2 | s2_3 | s2_4 | s2_5 | s2_6 | s2_7 | s2_8 | s2_9 | s2_10 | _$SENTINEL;
+
+INIT
+	s1_1 & !s1_2 & !s1_3 & !s1_4 & !s1_5 & !s1_6 & !s1_7 & !s1_8 & !s1_9 & !s1_10 & !s2_1 & !s2_2 & !s2_3 & !s2_4 & !s2_5 & !s2_6 & !s2_7 & !s2_8 & !s2_9 & !s2_10 & !_$ERROR & !_$SENTINEL;
+ASSIGN
+	next(s1_1) := FALSE;
+	next(s1_2) := s_1_1_fwd;
+	next(s1_3) := s_1_2_fwd;
+	next(s1_4) := s_1_3_fwd;
+	next(s1_5) := s_1_4_fwd;
+	next(s1_6) := s_1_5_fwd;
+	next(s1_7) := s_1_6_fwd;
+	next(s1_8) := s_1_7_fwd;
+	next(s1_9) := s_1_8_fwd;
+	next(s1_10) := s_1_9_fwd;
+	next(s2_1) := s_1_10_fwd;
+	next(s2_2) := s_2_1_fwd;
+	next(s2_3) := s_2_2_fwd;
+	next(s2_4) := s_2_3_fwd;
+	next(s2_5) := s_2_4_fwd;
+	next(s2_6) := s_2_5_fwd;
+	next(s2_7) := s_2_6_fwd;
+	next(s2_8) := s_2_7_fwd;
+	next(s2_9) := s_2_8_fwd;
+	next(s2_10) := s_2_9_fwd | s_2_10_fwd;
+	next(_$ERROR) := s_1_1_fail | s_1_2_fail | s_1_3_fail | s_1_4_fail | s_1_5_fail | s_1_6_fail | s_1_7_fail | s_1_8_fail | s_1_9_fail | s_1_10_fail | s_2_1_fail | s_2_2_fail | s_2_3_fail | s_2_4_fail | s_2_5_fail | s_2_6_fail | s_2_7_fail | s_2_8_fail | s_2_9_fail | s_2_10_fail;
+	next(_$SENTINEL) := s_2_10_fwd | _$SENTINEL;
+
+-- end of module Ta
+
+MODULE constantprogram(i)
+VAR
+	c : signed word[16];
+	o : signed word[16];
+-- end of VAR
+ASSIGN
+	init(c) := 0sd16_0;
+	init(o) := 0sd16_0;
+	next(c) := 0sd16_42;
+	next(o) := i;
+
+-- end of module constantprogram
+

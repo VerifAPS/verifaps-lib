@@ -1,0 +1,211 @@
+*** This is nuXmv 1.1.1 (compiled on Wed Jun  1 10:18:42 2016)
+*** Copyright (c) 2014-2016, Fondazione Bruno Kessler
+
+*** For more information on nuXmv see https://nuxmv.fbk.eu
+*** or email to <nuxmv@list.fbk.eu>.
+*** Please report bugs at https://nuxmv.fbk.eu/bugs
+*** (click on "Login Anonymously" to access)
+*** Alternatively write to <nuxmv@list.fbk.eu>.
+
+*** This version of nuXmv is linked to NuSMV 2.6.0.
+*** For more information on NuSMV see <http://nusmv.fbk.eu>
+*** or email to <nusmv-users@list.fbk.eu>.
+*** Copyright (C) 2010-2014, Fondazione Bruno Kessler
+
+*** This version of nuXmv is linked to the CUDD library version 2.4.1
+*** Copyright (c) 1995-2004, Regents of the University of Colorado
+
+*** This version of nuXmv is linked to the MiniSat SAT solver. 
+*** See http://minisat.se/MiniSat.html
+*** Copyright (c) 2003-2006, Niklas Een, Niklas Sorensson
+*** Copyright (c) 2007-2010, Niklas Sorensson
+
+*** This version of nuXmv is linked to MathSAT
+*** Copyright (C) 2009-2016 by Fondazione Bruno Kessler
+*** Copyright (C) 2009-2016 by University of Trento
+*** See http://mathsat.fbk.eu
+
+nuXmv > nuXmv > nuXmv > Number of Input Variables: 1
+    1: boolean
+Number of State Variables: 61
+   58: boolean
+    3: signed word[16]
+Number of Frozen Variables: 0
+  i : boolean
+  
+  code.macro : signed word[16]
+  
+  code.micro : signed word[16]
+  
+  code.o : signed word[16]
+  
+  table.s1_1 : boolean
+  
+  table.s2_1 : boolean
+  
+  table.s2_2 : boolean
+  
+  table.s3_1 : boolean
+  
+  table.s3_2 : boolean
+  
+  table.s3_3 : boolean
+  
+  table.s4_1 : boolean
+  
+  table.s4_2 : boolean
+  
+  table.s4_3 : boolean
+  
+  table.s4_4 : boolean
+  
+  table.s5_1 : boolean
+  
+  table.s5_2 : boolean
+  
+  table.s5_3 : boolean
+  
+  table.s5_4 : boolean
+  
+  table.s5_5 : boolean
+  
+  table.s6_1 : boolean
+  
+  table.s6_2 : boolean
+  
+  table.s6_3 : boolean
+  
+  table.s6_4 : boolean
+  
+  table.s6_5 : boolean
+  
+  table.s6_6 : boolean
+  
+  table.s7_1 : boolean
+  
+  table.s7_2 : boolean
+  
+  table.s7_3 : boolean
+  
+  table.s7_4 : boolean
+  
+  table.s7_5 : boolean
+  
+  table.s7_6 : boolean
+  
+  table.s7_7 : boolean
+  
+  table.s8_1 : boolean
+  
+  table.s8_2 : boolean
+  
+  table.s8_3 : boolean
+  
+  table.s8_4 : boolean
+  
+  table.s8_5 : boolean
+  
+  table.s8_6 : boolean
+  
+  table.s8_7 : boolean
+  
+  table.s8_8 : boolean
+  
+  table.s9_1 : boolean
+  
+  table.s9_2 : boolean
+  
+  table.s9_3 : boolean
+  
+  table.s9_4 : boolean
+  
+  table.s9_5 : boolean
+  
+  table.s9_6 : boolean
+  
+  table.s9_7 : boolean
+  
+  table.s9_8 : boolean
+  
+  table.s9_9 : boolean
+  
+  table.s9_10 : boolean
+  
+  table.s10_1 : boolean
+  
+  table.s10_2 : boolean
+  
+  table.s10_3 : boolean
+  
+  table.s10_4 : boolean
+  
+  table.s10_5 : boolean
+  
+  table.s10_6 : boolean
+  
+  table.s10_7 : boolean
+  
+  table.s10_8 : boolean
+  
+  table.s10_9 : boolean
+  
+  table.s10_10 : boolean
+  
+  table._$ERROR : boolean
+  
+  table._$SENTINEL : boolean
+  
+Number of bits: 107 (0 frozen, 1 input, 106 state)
+nuXmv > nuXmv > nuXmv > -- no proof or counterexample found with bound 4
+-- no proof or counterexample found with bound 5
+-- no proof or counterexample found with bound 6
+-- no proof or counterexample found with bound 7
+-- no proof or counterexample found with bound 8
+-- no proof or counterexample found with bound 9
+-- no proof or counterexample found with bound 10
+-- no proof or counterexample found with bound 11
+-- no proof or counterexample found with bound 12
+-- no proof or counterexample found with bound 13
+-- no proof or counterexample found with bound 14
+-- no proof or counterexample found with bound 15
+-- no proof or counterexample found with bound 16
+-- no proof or counterexample found with bound 17
+-- no proof or counterexample found with bound 18
+-- no proof or counterexample found with bound 19
+-- no proof or counterexample found with bound 20
+-- no proof or counterexample found with bound 21
+-- no proof or counterexample found with bound 22
+-- no proof or counterexample found with bound 23
+-- no proof or counterexample found with bound 24
+-- no proof or counterexample found with bound 25
+-- no proof or counterexample found with bound 26
+-- no proof or counterexample found with bound 27
+-- no proof or counterexample found with bound 28
+-- no proof or counterexample found with bound 29
+-- no proof or counterexample found with bound 30
+-- no proof or counterexample found with bound 31
+-- no proof or counterexample found with bound 32
+-- no proof or counterexample found with bound 33
+-- no proof or counterexample found with bound 34
+-- no proof or counterexample found with bound 35
+-- no proof or counterexample found with bound 36
+-- no proof or counterexample found with bound 37
+-- no proof or counterexample found with bound 38
+-- no proof or counterexample found with bound 39
+-- no proof or counterexample found with bound 40
+-- no proof or counterexample found with bound 41
+-- no proof or counterexample found with bound 42
+-- no proof or counterexample found with bound 43
+-- no proof or counterexample found with bound 44
+-- no proof or counterexample found with bound 45
+-- no proof or counterexample found with bound 46
+-- no proof or counterexample found with bound 47
+-- no proof or counterexample found with bound 48
+-- no proof or counterexample found with bound 49
+-- no proof or counterexample found with bound 50
+-- no proof or counterexample found with bound 51
+-- no proof or counterexample found with bound 52
+-- no proof or counterexample found with bound 53
+-- no proof or counterexample found with bound 54
+-- invariant (_$ERROR -> ((((((((((((((((((((((((((((((((((((((((((((((((((((((((s1_1 | s2_1) | s2_2) | s3_1) | s3_2) | s3_3) | s4_1) | s4_2) | s4_3) | s4_4) | s5_1) | s5_2) | s5_3) | s5_4) | s5_5) | s6_1) | s6_2) | s6_3) | s6_4) | s6_5) | s6_6) | s7_1) | s7_2) | s7_3) | s7_4) | s7_5) | s7_6) | s7_7) | s8_1) | s8_2) | s8_3) | s8_4) | s8_5) | s8_6) | s8_7) | s8_8) | s9_1) | s9_2) | s9_3) | s9_4) | s9_5) | s9_6) | s9_7) | s9_8) | s9_9) | s9_10) | s10_1) | s10_2) | s10_3) | s10_4) | s10_5) | s10_6) | s10_7) | s10_8) | s10_9) | s10_10) | _$SENTINEL)) IN table is true
+nuXmv > 

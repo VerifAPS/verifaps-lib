@@ -71,8 +71,8 @@ class SMVModuleBuilderTest {
     fun test(table: String, expectedSMVFile: String) {
         val gtt = GetetaFacade.parseTableXML(table)
         val expected = java.io.File(expectedSMVFile).readText()
-        val enumType = GetetaFacade.createSuperEnum(Scope())
-        val tt = TableTransformation(gtt, enumType)
+        val enumType = GetetaFacade.createSuperEnum(listOf(Scope()))
+        val tt = TableTransformation(gtt, enumType, true)
         val module = tt.transform()
         val output = module.toString()
         Assert.assertEquals(expected, output)

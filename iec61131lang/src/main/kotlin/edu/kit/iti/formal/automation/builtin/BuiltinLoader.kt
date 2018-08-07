@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.builtin
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.st.ast.PouElements
+import org.antlr.v4.runtime.CharStreams
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.net.URISyntaxException
@@ -63,7 +64,7 @@ object BuiltinLoader {
         text.splitToSequence('\n').forEach { it ->
             try {
                 val load = prefix.resolve(it)
-                val a = IEC61131Facade.file(load)
+                val a = IEC61131Facade.file(CharStreams.fromPath(load))
                 tle.addAll(a)
             } catch (e: IOException) {
                 logger.error("could not parse built in $it", e)

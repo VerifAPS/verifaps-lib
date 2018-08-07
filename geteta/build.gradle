@@ -7,7 +7,7 @@ plugins {
 apply plugin: 'antlr'
 apply plugin: 'application'
 group = 'edu.kit.iti.formal'
-mainClassName = "edu.kit.iti.formal.automation.testtables.ExTeTa"
+mainClassName = "edu.kit.iti.formal.automation.testtables.Geteta"
 
 description = """
     Generalized Test Table
@@ -21,14 +21,16 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven { url "http://formal.iti.kit.edu/maven2" }
+    maven { url 'https://jitpack.io' }
     maven { url "http://repo.maven.apache.org/maven2" }
+//    maven { url "https://dl.bintray.com/ajalt/maven" }
 }
 
 dependencies {
-    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
     compile project(':iec-symbex')
     antlr group: 'org.antlr', name: 'antlr4', version: 4.7
     compile 'com.github.jferard:fastods:0.4.1'
+    implementation 'com.github.ajalt:clikt:1.3.0'
 }
 
 sourceSets {
@@ -104,7 +106,7 @@ task jarDist(type: Jar) {
     entryCompression = ZipEntryCompression.DEFLATED
     with jar
     manifest {
-        attributes "Main-Class": "edu.kit.iti.formal.automation.testtables.ExTeTa"
+        attributes "Main-Class": "edu.kit.iti.formal.automation.testtables.Geteta"
     }
 
     from {
@@ -117,7 +119,7 @@ jarDist.dependsOn jar
 
 task runapp(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
-    main = 'edu.kit.iti.formal.automation.testtables.ExTeTa'
+    main = 'edu.kit.iti.formal.automation.testtables.Geteta'
     if (project.hasProperty("appArgs")) {
         args Eval.me(appArgs)
     }
@@ -129,4 +131,4 @@ task startScriptTTPrint(type: CreateStartScripts) {
     mainClassName = 'edu.kit.iti.formal.automation.testtables.PrintTable'
     applicationName = 'ttprint'
 }
-applicationDistribution.from(startScriptTTPrint) {into 'bin'}
+applicationDistribution.from(startScriptTTPrint) { into 'bin' }

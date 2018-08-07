@@ -19,15 +19,23 @@
  */
 package edu.kit.iti.formal.automation.testtables.builder
 
+import edu.kit.iti.formal.smv.ModuleType
+
 
 /**
  * Created by weigl on 17.12.16.
  */
 class ModuleParameterTransformer : TableTransformer {
     override fun accept(tt: ConstructionModel) {
-        tt.testTable.ioVariables.forEach {
+        tt.testTable.programVariables.forEach {
             tt.tableModule.moduleParameters.add(
                     tt.variableContext.getSMVVariable(it))
         }
+
+        tt.ttType = ModuleType(tt.tableModule.name,
+                tt.testTable.programVariables.map {
+                    it.externalVariable(tt.variableContext.programRuns)
+                }
+        )
     }
 }

@@ -19,11 +19,8 @@
  */
 package edu.kit.iti.formal.automation.testtables.algorithms
 
-import edu.kit.iti.formal.automation.testtables.exception.SpecificationInterfaceMisMatchException
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
 import edu.kit.iti.formal.smv.ModuleType
-import edu.kit.iti.formal.smv.SMVFacade
-import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
 
@@ -32,37 +29,27 @@ import edu.kit.iti.formal.smv.ast.SVariable
  * @version 1 (13.12.16)
  */
 class BinaryModelGluer(private val options: TableOptions,
-                       private val table: SMVModule,
-                       private val code: SMVModule) : Runnable {
+                       private val tableModule: SMVModule,
+                       private val tableType: ModuleType,
+                       private val code: List<SMVModule>,
+                       private val programRunNames: List<String>) : Runnable {
     val product = SMVModule("main")
 
     override fun run() {
         product.name = MAIN_MODULE
-        product.inputVars.addAll(code.moduleParameters)
+        product.inputVars.addAll(code.flatMap { it.moduleParameters })
 
-        product.stateVars.add(
-                SVariable(CODE_MODULE,
-                        ModuleType(code.name,
-                                code.moduleParameters)))
-        val tableParameters = table.moduleParameters.map { v ->
-            if (v in code.moduleParameters) {
-                v
-            } else {
-                //output of program code
-                if (v !in code.stateVars) {
-                    throw SpecificationInterfaceMisMatchException(code, v)
-                }
-                val variable = SVariable("${CODE_MODULE}.v", v.dataType!!)
-                if (options.isUseNext) SMVFacade.next(variable) else variable
-            }
+        programRunNames.zip(code).forEach { (name, code) ->
+            product.stateVars.add(
+                    SVariable(name,
+                            ModuleType(code.name, code.moduleParameters)))
         }
-        product.stateVars.add(SVariable(TABLE_MODULE,
-                ModuleType(table.name, tableParameters)))
+
+        product.stateVars.add(SVariable(TABLE_MODULE,tableType))
     }
 
     companion object {
-        val TABLE_MODULE = "table"
-        val CODE_MODULE = "code"
-        val MAIN_MODULE = ""
+        val TABLE_MODULE = "tableModule"
+        val MAIN_MODULE = "main"
     }
 }

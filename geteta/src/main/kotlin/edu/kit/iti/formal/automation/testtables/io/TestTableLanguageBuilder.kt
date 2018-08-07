@@ -3,6 +3,7 @@ package edu.kit.iti.formal.automation.testtables.io
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
+import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
@@ -15,10 +16,11 @@ import org.antlr.v4.runtime.CharStreams
  * @author Alexander Weigl
  * @version 1 (06.07.18)
  */
-class TestTableLanguageBuilder : TestTableLanguageBaseVisitor<Unit>() {
+class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
     val testTables = arrayListOf<GeneralizedTestTable>()
     private lateinit var current: GeneralizedTestTable
     private val scope = Scope.defaultScope()
+
     init {
         scope.types.register("ENUM", EnumerateType("ENUM", arrayListOf("a"), "a"))
         scope.types.register("BOOLEAN", AnyBit.BOOL)
@@ -42,27 +44,46 @@ class TestTableLanguageBuilder : TestTableLanguageBaseVisitor<Unit>() {
     }
 
     override fun visitSignature(ctx: TestTableLanguageParser.SignatureContext) {
+        val dt = scope.resolveDataType(ctx.dt.text)
         val isState = ctx.state != null
-        val newName: String? = ctx.newName?.text
-        val v = IoVariable(ctx.name.text, scope.resolveDataType(ctx.dt.text),
-                if (isState) {
-                    if (ctx.io.text == "input") IoVariableType.STATE_INPUT
-                    else IoVariableType.STATE_OUTPUT
-                } else {
-                    if (ctx.io.text == "input") IoVariableType.INPUT
-                    else IoVariableType.OUTPUT
-                })
-        if (newName != null) {
-            v.realName = v.name
-            v.name = newName
+        val type = if (isState) {
+            if (ctx.io.text == "input") IoVariableType.STATE_INPUT
+            else IoVariableType.STATE_OUTPUT
+        } else {
+            if (ctx.io.text == "input") IoVariableType.INPUT
+            else IoVariableType.OUTPUT
         }
-        current.add(v)
+        val lt = DefaultTypeTranslator.INSTANCE.translate(dt)
+
+        ctx.variableDefinition().forEach {
+            when (it) {
+                is TestTableLanguageParser.VariableAliasDefinitionContext -> {
+                    val newName: String? = it.newName?.text
+                    val realName = it.n.text
+                    val programRun = if (it.RV_SEPARATOR() != null)
+                        it.INTEGER().text.toInt() else 0
+                    val v = ProgramVariable(realName, dt, lt, type, programRun)
+                    if (newName != null) {
+                        v.realName = v.name
+                        v.name = newName
+                    }
+                    current.add(v)
+                }
+                is TestTableLanguageParser.VariableRunsDefinitionContext -> {
+                    val realName = it.n.text
+                    it.INTEGER().map { it.text.toInt() }.forEach { i ->
+                        val v = ProgramVariable(realName, dt, lt, type, i)
+                        current.add(v)
+                    }
+                }
+            }
+        }
     }
 
     override fun visitFreeVariable(ctx: TestTableLanguageParser.FreeVariableContext) {
-        val fv = ConstraintVariable(ctx.name.text, scope.resolveDataType(ctx.dt.text)
-
-        )
+        val dt = scope.resolveDataType(ctx.dt.text)
+        val lt = DefaultTypeTranslator.INSTANCE.translate(dt)
+        val fv = ConstraintVariable(ctx.name.text, dt, lt)
         current.add(fv)
     }
 
@@ -77,7 +98,7 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBa
     var currentId = 0
 
     override fun visitGroup(ctx: TestTableLanguageParser.GroupContext): Region {
-        val id = ctx.id?.text?.toInt() ?: ++currentId;
+        val id = ctx.id?.text?.toInt() ?: ++currentId
         val r = Region(id)
         if (ctx.time() != null)
             r.duration = ctx.time().accept(TimeParser())
@@ -93,12 +114,17 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBa
     override fun visitRow(ctx: TestTableLanguageParser.RowContext): State {
         val id = ctx.id?.text?.toInt() ?: ++currentId;
         val s = State(id)
-        s.duration = ctx.time().accept(TimeParser())
+        s.duration = ctx.time()?.accept(TimeParser()) ?: Duration.ClosedInterval(1, 1)
         ctx.kc().forEach {
-            val name = it.key.text
+            val name = it.IDENTIFIER().text
+            val run = it.INTEGER()?.text?.toInt()
             //val column = gtt.getSMVVariable(it.key.text)
             //val cell = IOFacade.exprToSMV(it.cell(), column, gtt);
-            s.rawFields[gtt.ioVariables[name]!!] = it.cell()
+            s.rawFields[gtt.getProgramVariables(name, run)] = it.cell()
+        }
+
+        if (ctx.pause() != null) {
+            s.pauseProgramRuns = ctx.pause().INTEGER().map { it.text.toInt() }.toMutableList()
         }
         return s
     }

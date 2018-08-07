@@ -17,6 +17,8 @@ dependencies {
     antlr group: 'org.antlr', name: 'antlr4', version: '4.7.1'
 
     compile project(':util')
+    compile project(':iec-xml')
+
    /* compile 'io.arrow-kt:arrow-core:0.7.2'
     compile 'io.arrow-kt:arrow-syntax:0.7.2'
     compile 'io.arrow-kt:arrow-typeclasses:0.7.2'

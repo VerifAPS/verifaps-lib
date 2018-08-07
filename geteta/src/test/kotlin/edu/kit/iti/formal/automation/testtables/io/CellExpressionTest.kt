@@ -23,9 +23,10 @@ package edu.kit.iti.formal.automation.testtables.io
 import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.automation.testtables.model.IoVariable
 import edu.kit.iti.formal.automation.testtables.model.IoVariableType
 import edu.kit.iti.formal.automation.testtables.model.ParseContext
+import edu.kit.iti.formal.automation.testtables.model.ProgramVariable
+import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.SVariable
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,13 +42,13 @@ class CellExpressionTest(private var expr: String) {
 
     init {
         this.gtt = defaultTestTable()
-        pc = gtt.generateParseContext()
+        pc = gtt.parseContext
     }
 
     @Test
     fun parse() {
         val v = SVariable.create("Q").withSigned(16)
-        val e = GetetaFacade.exprToSMV(expr, v, pc)
+        val e = GetetaFacade.exprToSMV(expr, v, 0, pc)
         println(e)
     }
 
@@ -62,7 +63,7 @@ class CellExpressionTest(private var expr: String) {
         }
 
         private fun iovar(name: String, io: String) =
-                IoVariable(name, INT,
+                ProgramVariable(name, INT, SMVTypes.signed(16),
                         if (io == "input") IoVariableType.INPUT else IoVariableType.OUTPUT)
 
         val CASES = arrayOf(">2", "<52152343243214234", "!=6", "<>-16134", "-243261", "a", "a+b", "(a)+(((b+c)+d))/2", "convert(a,2)", "TRUE", "true", "false", "FALSE", "a[-5]", "[2+2, 6]", "[-61+2, -61]")

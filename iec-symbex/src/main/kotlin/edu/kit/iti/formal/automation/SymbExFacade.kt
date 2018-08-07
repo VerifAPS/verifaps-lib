@@ -121,7 +121,7 @@ object SymbExFacade {
 
     @JvmOverloads
     fun evaluateProgram(exec: PouExecutable, skipSimplify: Boolean = false): SMVModule {
-        val elements = exec.scope.getVisitiblePous()
+        val elements = exec.scope.getVisiblePous()
         IEC61131Facade.resolveDataTypes(PouElements(elements.toMutableList()), exec.scope.topLevel)
         val a = if (skipSimplify) exec else simplify(exec)
 

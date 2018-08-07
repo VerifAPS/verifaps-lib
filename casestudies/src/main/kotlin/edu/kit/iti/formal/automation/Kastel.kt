@@ -34,7 +34,7 @@ object KastelDemonstrator {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        val (pous, errors) = IEC61131Facade.filer(INPUT_FILE)
+        val (pous, errors) = IEC61131Facade.fileResolve(INPUT_FILE)
         errors.forEach {
             println("${it.sourceName}:${it.lineNumber} :: ${it.message} (${it.category}) ")
         }

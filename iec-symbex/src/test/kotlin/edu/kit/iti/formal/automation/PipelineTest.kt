@@ -35,7 +35,7 @@ class PipelineTest {
     @Test
     @Throws(IOException::class)
     fun test() {
-        var (tle, ok) = IEC61131Facade.filer(File("src/test/resources/edu/kit/iti/formal/automation/st/Crane.st"))
+        var (tle, ok) = IEC61131Facade.fileResolve(File("src/test/resources/edu/kit/iti/formal/automation/st/Crane.st"))
         tle = SymbExFacade.simplify(tle)
 
         val printer = StructuredTextPrinter()

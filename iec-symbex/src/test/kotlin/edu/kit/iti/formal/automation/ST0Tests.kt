@@ -47,7 +47,7 @@ class ST0Tests {
 
     @Throws(IOException::class)
     private fun assertResultST0(file: String) {
-        var (st, _) = IEC61131Facade.filer(
+        var (st, _) = IEC61131Facade.fileResolve(
                 CharStreams.fromStream(javaClass.getResourceAsStream("$file.st")))
         val st0exp = IEC61131Facade.file(
                 CharStreams.fromStream(javaClass.getResourceAsStream("$file.st0")))

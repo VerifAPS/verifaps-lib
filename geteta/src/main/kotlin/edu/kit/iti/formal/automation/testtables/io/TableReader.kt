@@ -23,14 +23,14 @@ package edu.kit.iti.formal.automation.testtables.io
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
-import edu.kit.iti.formal.automation.datatypes.values.VAnyBit
+import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.model.*
 import edu.kit.iti.formal.automation.testtables.schema.*
 import edu.kit.iti.formal.automation.testtables.schema.ConstraintVariable
-import edu.kit.iti.formal.automation.testtables.schema.IoVariable
+import edu.kit.iti.formal.smv.SMVType
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.w3c.dom.Element
@@ -40,6 +40,7 @@ import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
 import javax.xml.bind.JAXBException
 
+@Deprecated("xml is not maintained for future releases")
 class TableReader(private val input: File) {
     val product = GeneralizedTestTable()
     val scope = Scope.defaultScope()
@@ -54,7 +55,7 @@ class TableReader(private val input: File) {
 
     @Throws(JAXBException::class)
     fun run() {
-        Report.debug("read xml file %s", input)
+        //Report.debug("read xml file %s", input)
 
         val jc = JAXBContext
                 .newInstance(ObjectFactory::class.java)
@@ -63,7 +64,7 @@ class TableReader(private val input: File) {
                 .unmarshal(input) as JAXBElement<*>
         val xml = root.value as TestTable
 
-        Report.debug("xml file successfully read", input)
+        //Report.debug("xml file successfully read", input)
 
         translateName(xml)
         translateOptions(xml)
@@ -78,7 +79,7 @@ class TableReader(private val input: File) {
 
     private fun translateFunction(xml: TestTable) {
         if (xml.functions == null) {
-            Report.info("No functions given in table file.")
+            //Report.info("No functions given in table file.")
             return
         }
 
@@ -92,13 +93,13 @@ class TableReader(private val input: File) {
     private fun translateOptions(xml: TestTable) {
         if (xml.options == null || xml.options.option
                         .isEmpty()) {
-            Report.info("No options in table file.")
+            //Report.info("No options in table file.")
             return
         }
 
         for (o in xml.options.option) {
             product.addOption(o.key, o.value)
-            Report.info("Option %s set to %s", o.key, o.value)
+            //Report.info("Option %s set to %s", o.key, o.value)
         }
     }
 
@@ -118,7 +119,7 @@ class TableReader(private val input: File) {
         val r = Region(stepNumber++)
         val duration = steps.duration
         if (duration == null) {
-            Report.info("Duration is not given, assume '[1,1]'")
+            //Report.info("Duration is not given, assume '[1,1]'")
             r.duration = Duration.ClosedInterval(1, 1)
         } else {
             r.duration = GetetaFacade.parseDuration(duration)
@@ -137,7 +138,7 @@ class TableReader(private val input: File) {
         val s = State(stepNumber++)
         val cells = step.any.map { Element::class.java.cast(it) }
 
-        for (i in 0 until product.ioVariables.size) {
+        for (i in 0 until product.programVariables.size) {
             val v = product.getIoVariables(i)
             val name = v.name
             val cellContent = get(cells, name, i)
@@ -159,9 +160,9 @@ class TableReader(private val input: File) {
 
                 //this.lastColumnValue[i] = cellContent
             } catch (pce: ParseCancellationException) {
-                Report.error("Error during parsing '%s'  for column '%s' (%d) and row '%d'", cellContent,
-                        name, i, s.id)
-                Report.error(pce.message)
+                //Report.error("Error during parsing '%s'  for column '%s' (%d) and row '%d'", cellContent,
+                //name, i, s.id)
+                //Report.error(pce.message)
                 throw pce
             }
 
@@ -172,34 +173,36 @@ class TableReader(private val input: File) {
     }
 
     private fun translateVariables(xml: TestTable) {
-        Report.debug("%d variables found",
-                xml.variables.variableOrConstraint.size)
+        //Report.debug("%d variables found",
+        //                xml.variables.variableOrConstraint.size)
 
 
         for (o in xml.variables.variableOrConstraint) {
+            val dt = scope.resolveDataType(o.dataType.name)
+            val lt: SMVType = DefaultTypeTranslator.INSTANCE.translate(dt)
+
             if (o is IoVariable) {
-                Report.debug("\t %s : %s", o.name, o.dataType)
-                val v = edu.kit.iti.formal.automation.testtables.model.IoVariable(o.name,
-                        scope.resolveDataType(o.dataType.name),
+                //Report.debug("\t %s : %s", o.name, o.dataType)
+                val v = edu.kit.iti.formal.automation.testtables.model.ProgramVariable(o.name,
+                        dt, lt,
                         if (o.io == "input") IoVariableType.INPUT else IoVariableType.OUTPUT
                 )
                 product.add(v)
             }
 
             if (o is ConstraintVariable) {
-                Report.debug("\t %s : %s", o.name, o.dataType)
+                //Report.debug("\t %s : %s", o.name, o.dataType)
                 val expr = if (o.constraint != null) {
                     GetetaFacade.parseCell(o.constraint)
                 } else {
                     null
                 }
-                val v = edu.kit.iti.formal.automation.testtables.model.ConstraintVariable(o.name,
-                        scope.resolveDataType(o.dataType.name), expr)
+                val v = edu.kit.iti.formal.automation.testtables.model.ConstraintVariable(o.name, dt, lt, expr)
                 product.add(v)
             }
         }
 
-        product.ioVariables.forEach { v ->
+        product.programVariables.forEach { v ->
             if (v.name.isEmpty())
                 throw IllegalArgumentException(
                         "variable $v is bad")

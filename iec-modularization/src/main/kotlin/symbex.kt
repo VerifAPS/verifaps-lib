@@ -13,13 +13,11 @@ import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
 import edu.kit.iti.formal.smv.ast.SMVModule
 import java.io.File
 import java.math.BigInteger
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.createCoroutine
 
 fun createProgramWithAbstraction(a: PouExecutable, abstractedInvocation: List<CallSite>) = rewriteInvocation(a, abstractedInvocation)
 
 fun evaluateProgramWithAbstraction(exec: PouExecutable, abstractedInvocation: List<CallSite>): SMVModule {
-    val elements = exec.scope.getVisitiblePous()
+    val elements = exec.scope.getVisiblePous()
 
     val abstracted =
             if (abstractedInvocation.isEmpty()) exec

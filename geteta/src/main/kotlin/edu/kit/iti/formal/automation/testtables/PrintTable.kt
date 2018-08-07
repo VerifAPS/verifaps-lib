@@ -56,7 +56,7 @@ object PrintTable {
                     if (it.endsWith("xml")) GetetaFacade.parseTableXML(it)
                     else GetetaFacade.parseTableDSL(File(it))
             val printer = LatexTablePrinter(gtt)
-            printer.print()
+            printer.run()
             println(printer.backend.toString())
         }
     }

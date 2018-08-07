@@ -1,0 +1,160 @@
+MODULE main
+IVAR
+	i : boolean;
+-- end of IVAR
+VAR
+	code : cycles(i);
+	table : TTable(next(code.o));
+-- end of VAR
+ASSIGN
+
+-- end of module main
+
+MODULE TTable(o)
+VAR
+	s1_1 : boolean;
+	s2_1 : boolean;
+	s3_1 : boolean;
+	s4_1 : boolean;
+	s5_1 : boolean;
+	s6_1 : boolean;
+	s7_1 : boolean;
+	s8_1 : boolean;
+	s9_1 : boolean;
+	s9_2 : boolean;
+	s9_3 : boolean;
+	s9_4 : boolean;
+	s9_5 : boolean;
+	s9_6 : boolean;
+	s9_7 : boolean;
+	s9_8 : boolean;
+	s9_9 : boolean;
+	s9_10 : boolean;
+	_$ERROR : boolean;
+	_$SENTINEL : boolean;
+-- end of VAR
+DEFINE
+	s1_fail := s1_in & !s1_out;
+	s1_fwd := s1_in & s1_out;
+	s1_in := TRUE;
+	s1_out := 0sd16_1 = o;
+	s2_fail := s2_in & !s2_out;
+	s2_fwd := s2_in & s2_out;
+	s2_in := TRUE;
+	s2_out := 0sd16_2 = o;
+	s3_fail := s3_in & !s3_out;
+	s3_fwd := s3_in & s3_out;
+	s3_in := TRUE;
+	s3_out := 0sd16_3 = o;
+	s4_fail := s4_in & !s4_out;
+	s4_fwd := s4_in & s4_out;
+	s4_in := TRUE;
+	s4_out := 0sd16_4 = o;
+	s5_fail := s5_in & !s5_out;
+	s5_fwd := s5_in & s5_out;
+	s5_in := TRUE;
+	s5_out := 0sd16_5 = o;
+	s6_fail := s6_in & !s6_out;
+	s6_fwd := s6_in & s6_out;
+	s6_in := TRUE;
+	s6_out := 0sd16_6 = o;
+	s7_fail := s7_in & !s7_out;
+	s7_fwd := s7_in & s7_out;
+	s7_in := TRUE;
+	s7_out := 0sd16_8 = o;
+	s8_fail := s8_in & !s8_out;
+	s8_fwd := s8_in & s8_out;
+	s8_in := TRUE;
+	s8_out := 0sd16_9 = o;
+	s9_fail := s9_in & !s9_out;
+	s9_fwd := s9_in & s9_out;
+	s9_in := TRUE;
+	s9_out := 0sd16_10 = o;
+	s_1_1_fail := s1_1 & s1_fail;
+	s_1_1_fwd := s1_1 & s1_fwd;
+	s_2_1_fail := s2_1 & s2_fail;
+	s_2_1_fwd := s2_1 & s2_fwd;
+	s_3_1_fail := s3_1 & s3_fail;
+	s_3_1_fwd := s3_1 & s3_fwd;
+	s_4_1_fail := s4_1 & s4_fail;
+	s_4_1_fwd := s4_1 & s4_fwd;
+	s_5_1_fail := s5_1 & s5_fail;
+	s_5_1_fwd := s5_1 & s5_fwd;
+	s_6_1_fail := s6_1 & s6_fail;
+	s_6_1_fwd := s6_1 & s6_fwd;
+	s_7_1_fail := s7_1 & s7_fail;
+	s_7_1_fwd := s7_1 & s7_fwd;
+	s_8_1_fail := s8_1 & s8_fail;
+	s_8_1_fwd := s8_1 & s8_fwd;
+	s_9_10_fail := s9_10 & s9_fail;
+	s_9_10_fwd := s9_10 & s9_fwd;
+	s_9_1_fail := s9_1 & s9_fail;
+	s_9_1_fwd := s9_1 & s9_fwd;
+	s_9_2_fail := s9_2 & s9_fail;
+	s_9_2_fwd := s9_2 & s9_fwd;
+	s_9_3_fail := s9_3 & s9_fail;
+	s_9_3_fwd := s9_3 & s9_fwd;
+	s_9_4_fail := s9_4 & s9_fail;
+	s_9_4_fwd := s9_4 & s9_fwd;
+	s_9_5_fail := s9_5 & s9_fail;
+	s_9_5_fwd := s9_5 & s9_fwd;
+	s_9_6_fail := s9_6 & s9_fail;
+	s_9_6_fwd := s9_6 & s9_fwd;
+	s_9_7_fail := s9_7 & s9_fail;
+	s_9_7_fwd := s9_7 & s9_fwd;
+	s_9_8_fail := s9_8 & s9_fail;
+	s_9_8_fwd := s9_8 & s9_fwd;
+	s_9_9_fail := s9_9 & s9_fail;
+	s_9_9_fwd := s9_9 & s9_fwd;
+LTLSPEC
+	TRUE -> (F(!s1_1 & !s2_1 & !s3_1 & !s4_1 & !s5_1 & !s6_1 & !s7_1 & !s8_1 & !s9_1 & !s9_2 & !s9_3 & !s9_4 & !s9_5 & !s9_6 & !s9_7 & !s9_8 & !s9_9 & !s9_10 & !_$ERROR | s_9_10_fwd));
+
+INVARSPEC
+	_$ERROR -> s1_1 | s2_1 | s3_1 | s4_1 | s5_1 | s6_1 | s7_1 | s8_1 | s9_1 | s9_2 | s9_3 | s9_4 | s9_5 | s9_6 | s9_7 | s9_8 | s9_9 | s9_10 | _$SENTINEL;
+
+INIT
+	s1_1 & !s2_1 & !s3_1 & !s4_1 & !s5_1 & !s6_1 & !s7_1 & !s8_1 & !s9_1 & !s9_2 & !s9_3 & !s9_4 & !s9_5 & !s9_6 & !s9_7 & !s9_8 & !s9_9 & !s9_10 & !_$ERROR & !_$SENTINEL;
+ASSIGN
+	next(s1_1) := FALSE;
+	next(s2_1) := s_1_1_fwd;
+	next(s3_1) := s_2_1_fwd;
+	next(s4_1) := s_3_1_fwd;
+	next(s5_1) := s_4_1_fwd;
+	next(s6_1) := s_5_1_fwd;
+	next(s7_1) := s_6_1_fwd;
+	next(s8_1) := s_7_1_fwd;
+	next(s9_1) := s_8_1_fwd;
+	next(s9_2) := s_9_1_fwd;
+	next(s9_3) := s_9_2_fwd;
+	next(s9_4) := s_9_3_fwd;
+	next(s9_5) := s_9_4_fwd;
+	next(s9_6) := s_9_5_fwd;
+	next(s9_7) := s_9_6_fwd;
+	next(s9_8) := s_9_7_fwd;
+	next(s9_9) := s_9_8_fwd;
+	next(s9_10) := s_9_9_fwd;
+	next(_$ERROR) := s_1_1_fail | s_2_1_fail | s_3_1_fail | s_4_1_fail | s_5_1_fail | s_6_1_fail | s_7_1_fail | s_8_1_fail | s_9_1_fail | s_9_2_fail | s_9_3_fail | s_9_4_fail | s_9_5_fail | s_9_6_fail | s_9_7_fail | s_9_8_fail | s_9_9_fail | s_9_10_fail;
+	next(_$SENTINEL) := s_9_10_fwd | _$SENTINEL;
+
+-- end of module TTable
+
+MODULE cycles(i)
+VAR
+	macro : signed word[16];
+	micro : signed word[16];
+	o : signed word[16];
+-- end of VAR
+ASSIGN
+	init(macro) := 0sd16_1;
+	init(micro) := 0sd16_1;
+	init(o) := 0sd16_0;
+	next(macro) := case 
+micro - 0sd16_1 = 0sd16_0 : macro + 0sd16_1; TRUE : macro; 
+esac;
+	next(micro) := case 
+micro - 0sd16_1 = 0sd16_0 : macro + 0sd16_1; TRUE : micro - 0sd16_1; 
+esac;
+	next(o) := macro;
+
+-- end of module cycles
+

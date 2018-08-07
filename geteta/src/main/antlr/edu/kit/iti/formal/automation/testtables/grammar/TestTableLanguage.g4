@@ -17,22 +17,28 @@ opts : 'options' '{' (kv)*  '}';
 kv: key=IDENTIFIER '=' (constant|variable) osem;
 
 signature : 'var' state='state'? io=('input'|'output')
-    name=IDENTIFIER ('as' newName=IDENTIFIER)?
-    (',' name=IDENTIFIER ('as' newName=IDENTIFIER)?)*
+    variableDefinition (',' variableDefinition)*
     ':' dt=IDENTIFIER osem
+;
+
+variableDefinition :
+        INTEGER RV_SEPARATOR  n=IDENTIFIER ('as' newName=IDENTIFIER)? #variableAliasDefinition
+      | n=IDENTIFIER ('of' INTEGER+ )? #variableRunsDefinition
 ;
 
 osem : ';'?;
 
 group : 'group' (id=i)? time? '{' (group|row)* '}';
 
-row : 'row' (id=i)? time? '{' (kc osem)* '}';
-kc: key=IDENTIFIER ':' value=cell;
+row : 'row' (id=i)? time? '{' (pause osem) (kc osem)* '}';
+kc: (INTEGER RV_SEPARATOR) IDENTIFIER ':' value=cell;
+pause: 'pause' INTEGER+;
+
 time :
       MINUS (pflag='>>')? #timeDontCare
-    | op=(GREATER_EQUALS | GREATER_THAN) INTEGER  (pflag='>>')? #timeSingleSided
-    | LBRACKET l=INTEGER COMMA (u=INTEGER) RBRACKET (pflag='>>')? #timeClosedInterval
-    | LBRACKET l=INTEGER COMMA MINUS RBRACKET (pflag='>>')? #timeOpenInterval
+    | op=(GREATER_EQUALS | GREATER_THAN) INTEGER  (pflag=PFLAG)? #timeSingleSided
+    | LBRACKET l=INTEGER COMMA (u=INTEGER) RBRACKET (pflag=PFLAG)? #timeClosedInterval
+    | LBRACKET l=INTEGER COMMA MINUS RBRACKET (pflag=PFLAG)? #timeOpenInterval
     | INTEGER #timeFixed
     | omega='omega'                           #timeOmega
     ;
@@ -106,8 +112,8 @@ expr
 	| variable #bvariable
 ;
 
-variable :
-      IDENTIFIER (LBRACKET i RBRACKET)?
+variable:
+       (INTEGER RV_SEPARATOR)? IDENTIFIER (LBRACKET i RBRACKET)?
 ;
 
 // if
@@ -120,6 +126,7 @@ guardedcommand
       FI    // guarded command (case)
 ;
 
+PFLAG: '>>'|'_p';
 AND: '&' | 'AND';
 ARROW_RIGHT: '=>';
 COMMA:	',';
@@ -151,11 +158,12 @@ F : 'FALSE' | 'false';
 
 IDENTIFIER:  [a-zA-Z_] [$a-zA-Z0-9_]*;
 
+RV_SEPARATOR : '|>'|'·'|'$';
+
 fragment DIGIT: '0' .. '9';
 fragment NUMBER: DIGIT+;
 //FLOAT:   '-'? NUMBER '.' NUMBER?;
 INTEGER: NUMBER;
-STCODE : '`' ~[`]* '`';
 
 WS: (' '|'\n'|'\r')+ -> skip;
 COMMENT      : '/*' .*? '*/' -> channel(HIDDEN);

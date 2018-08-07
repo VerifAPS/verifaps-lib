@@ -20,22 +20,6 @@
 package edu.kit.iti.formal.automation.testtables.io
 
 
-import edu.kit.iti.formal.automation.datatypes.AnyDt
-import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
-import edu.kit.iti.formal.automation.testtables.model.Duration
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.automation.testtables.model.IoVariable
-import edu.kit.iti.formal.automation.testtables.model.ParseContext
-import edu.kit.iti.formal.smv.SMVType
-import edu.kit.iti.formal.smv.ast.SMVExpr
-import edu.kit.iti.formal.smv.ast.SVariable
-import org.antlr.v4.runtime.CharStream
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
-import java.io.File
-
 /**
  * Created by weigl on 10.12.16.
  */

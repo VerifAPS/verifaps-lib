@@ -19,7 +19,7 @@
  */
 package edu.kit.iti.formal.automation.testtables.io
 
-import edu.kit.iti.formal.automation.testtables.ExTeTa
+import edu.kit.iti.formal.automation.testtables.GetetaApp
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,7 +45,7 @@ class FullStackTest(
                 File.separator + "bin" +
                 File.separator + "java"
         val classpath = System.getProperty("java.class.path")
-        val className = ExTeTa::class.java.canonicalName
+        val className = GetetaApp::class.java.canonicalName
 
 
         val commands = ArrayList<String>()

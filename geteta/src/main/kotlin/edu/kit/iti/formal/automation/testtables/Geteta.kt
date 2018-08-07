@@ -20,83 +20,46 @@
 package edu.kit.iti.formal.automation.testtables
 
 
+import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.required
 import edu.kit.iti.formal.automation.SymbExFacade
-import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
-import edu.kit.iti.formal.automation.exceptions.FunctionUndefinedException
-import edu.kit.iti.formal.automation.exceptions.UnknownVariableException
-import edu.kit.iti.formal.automation.st.StructuredTextPrinter
 import edu.kit.iti.formal.automation.st.ast.PouElements
-import edu.kit.iti.formal.automation.testtables.algorithms.OmegaSimplifier
-import edu.kit.iti.formal.automation.testtables.builder.TableTransformation
-import edu.kit.iti.formal.automation.testtables.exception.GetetaException
 import edu.kit.iti.formal.automation.testtables.io.Report
-import edu.kit.iti.formal.automation.testtables.model.options.Mode
-import edu.kit.iti.formal.automation.testtables.monitor.MonitorGeneration
 import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.smv.ast.SMVModule
-import org.apache.commons.cli.CommandLine
-import org.apache.commons.cli.DefaultParser
-import org.apache.commons.cli.ParseException
-import java.io.IOException
-import java.util.*
-import javax.xml.bind.JAXBException
 
-object ExTeTa {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        Locale.setDefault(Locale.US)
-        try {
-            val cli = parse(args)
-            run(cli)
-        } catch (e: FunctionUndefinedException) {
-            e.printStackTrace()
-            Report.fatal("Could not call %s",
-                    e.invocation.calleeName)
-        } catch (e: UnknownVariableException) {
-            Report.fatal(e.message)
-        } catch (e: ParseException) {
-            Report.fatal(e.message)
-        } catch (e: DataTypeNotDefinedException) {
-            Report.fatal("Could not parse the given ST sources. There is an unknown datatype. %s",
-                    e.message)
-            e.printStackTrace()
-        } catch (e: JAXBException) {
-            Report.fatal("%s: %s", e.javaClass.simpleName,
-                    e.message)
-        } catch (e: IOException) {
-            Report.fatal("IOExcepton: %s", e.message)
-        } catch (e: GetetaException) {
-            Report.fatal("%s: %s", e.javaClass.simpleName,
-                    e.message)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            if (e.message == null) {
-                Report.fatal(e.javaClass.name)
-            } else {
-                Report.fatal("%s: %s", e.javaClass.simpleName, e.message)
-            }
-        }
+class GetetaApp : CliktCommand(
+        epilog = "Geteta -- Tooling for Generalized Test Tables.",
+        name = "geteta.sh") {
+    val xmlModeOutput by option("x", help = "enable XML mode")
+            .flag(default = false)
 
-    }
+    val disableSimplify by option("--no-simplify", help = "disable")
+            .flag(default = false)
 
-    @Throws(Exception::class)
-    fun run(cli: CommandLine) {
-        // xml
-        Report.XML_MODE = cli.hasOption("x")
+    val table by option("-t", "--table", help = "the xml file of the table", metavar = "FILE")
+            .required()
 
-        //
+    val outputFolder by option("-o", "--output", help = "Output directory")
+
+    val codeFiles by option("-c", "--code", help = "program files")
+
+    val mode by option("-m", "--mode", help = "Verification Mode")
+
+    val verificationTechnique by option("-v", "--technique",
+            help = "verification technique")
+
+    override fun run() {
         Runtime.getRuntime().addShutdownHook(Thread(Runnable { Report.close() }))
 
-        //
-        val tableFilename = cli.getOptionValue("t")
-        val codeFilename = cli.getOptionValue("c")
-
-        if (tableFilename == null || codeFilename == null) {
+        if (codeFiles == null) {
             Report.fatal("No code or table file given.")
             System.exit(1)
         }
 
-        //
+        /*TODO
         var table = GetetaFacade.parseTableXML(tableFilename)
         val os = OmegaSimplifier(table)
         os.run()
@@ -128,7 +91,8 @@ object ExTeTa {
             val modCode = evaluate(cli.hasOption("no-simplify"), code)
             val superEnumType = GetetaFacade.createSuperEnum(code)
             val tt = TableTransformation(table,
-                    superEnumType)
+                    superEnumType,
+                    true)
             val modTable = tt.transform()
             val mainModule = GetetaFacade
                     .glue(modTable, modCode, table.options)
@@ -147,25 +111,16 @@ object ExTeTa {
                 cea.run();*/
             }
         }
+        */
     }
 
     private fun evaluate(disableSimplify: Boolean, code: PouElements): SMVModule {
         return SymbExFacade.evaluateProgram(Utils.findProgram(code)!!, disableSimplify)
     }
+}
 
-    @Throws(ParseException::class)
-    private fun parse(args: Array<String>): CommandLine {
-        val clp = DefaultParser()
+class FunctionVerification : CliktCommand() {
+    override fun run() {
 
-        val options = org.apache.commons.cli.Options()
-        options.addOption("x", false, "enable XML mode")
-        options.addOption("", "no-simplify", false, "disable")
-        options.addOption("t", "table", true, "the xml file of the table")
-        options.addOption("o", "output", true, "ouput")
-        options.addOption("c", "code", true, "program files")
-        options.addOption("m", "mode", true, "mode")
-        options.addOption("v", "technique", true, "verification technique")
-
-        return clp.parse(options, args, true)
     }
 }

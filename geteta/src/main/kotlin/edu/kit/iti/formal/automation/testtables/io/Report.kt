@@ -33,6 +33,7 @@ import javax.xml.bind.Marshaller
  * @author Alexander Weigl
  * @version 1 (11.12.16)
  */
+@Deprecated("""....""")
 object Report {
     var XML_MODE = false
     internal var START_TIME = System.currentTimeMillis()

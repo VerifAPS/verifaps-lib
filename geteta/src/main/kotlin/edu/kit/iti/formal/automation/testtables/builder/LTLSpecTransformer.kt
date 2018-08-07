@@ -43,6 +43,7 @@ package edu.kit.iti.formal.automation.testtables.builder
 
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.SBinaryOperator
+import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVExpr
 
 /**
@@ -76,11 +77,16 @@ class LTLSpecTransformer : TableTransformer {
                 .filter { state -> state != tt.sentinelState }
                 .map { it.defInput }
                 .map { s -> s.eventually().globally() as SMVExpr }
-                .reduce { a, b -> a.and(b) }
+                .reduce(SLiteral.TRUE) { a, b -> a.and(b) }
 
         val ltlspec = fairness
                 .implies(noStateSelected.or(lastStateForward).eventually())
 
         tt.tableModule.ltlSpec.add(ltlspec)
     }
+}
+
+public inline fun <T> List<T>.reduce(default: T, operation: (T, T) -> T): T {
+    if (size == 0) return default
+    return this.reduce(operation)
 }

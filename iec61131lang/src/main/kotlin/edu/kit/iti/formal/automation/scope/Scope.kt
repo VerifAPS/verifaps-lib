@@ -80,8 +80,8 @@ data class Scope(val variables: VariableScope = VariableScope())
     }
 
 
-    fun getVisitiblePous(): List<PouElement> {
-        val top = (parent?.getVisitiblePous() ?: listOf())
+    fun getVisiblePous(): List<PouElement> {
+        val top = (parent?.getVisiblePous() ?: listOf())
         return getDefinedPous() + top
     }
 

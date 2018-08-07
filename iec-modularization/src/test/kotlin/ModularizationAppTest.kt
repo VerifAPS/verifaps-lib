@@ -11,7 +11,7 @@ import org.junit.Test
 class ModularizationAppTest {
     fun testListCallSite(p: String) {
         val (p, e) =
-                IEC61131Facade.filer(CharStreams.fromStream(
+                IEC61131Facade.fileResolve(CharStreams.fromStream(
                         javaClass.getResourceAsStream(p)))
         val cfs = CallSiteFinder(Utils.findProgram(p)!!, p)
         cfs.run()

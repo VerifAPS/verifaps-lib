@@ -1,24 +1,18 @@
-
 package edu.kit.iti.formal.automation.testtables
 
 
-import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration
-import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.testtables.algorithms.BinaryModelGluer
 import edu.kit.iti.formal.automation.testtables.algorithms.DelayModuleBuilder
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.io.*
-import edu.kit.iti.formal.automation.testtables.io.xmv.NuXMVAdapter
 import edu.kit.iti.formal.automation.testtables.model.*
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
-import edu.kit.iti.formal.automation.visitors.Utils
-import edu.kit.iti.formal.smv.EnumType
-import edu.kit.iti.formal.smv.SMVType
+import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
@@ -26,8 +20,7 @@ import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import java.io.File
-import java.io.IOException
-import java.util.*
+import java.io.PrintWriter
 import javax.xml.bind.JAXBException
 
 object GetetaFacade {
@@ -58,12 +51,11 @@ object GetetaFacade {
     fun parseCell(cell: String): TestTableLanguageParser.CellContext =
             createParser(cell).cell()!!
 
-    fun exprToSMV(cell: String, column: SVariable,
-                  vars: ParseContext): SMVExpr = exprToSMV(parseCell(cell), column, vars)
+    fun exprToSMV(cell: String, column: SVariable, programRun: Int, vars: ParseContext): SMVExpr = exprToSMV(parseCell(cell), column, programRun, vars)
 
     fun exprToSMV(cell: TestTableLanguageParser.CellContext, column: SVariable,
-                  vars: ParseContext): SMVExpr {
-        val ev = ExprVisitor(column, vars)
+                  programRun: Int, vars: ParseContext): SMVExpr {
+        val ev = ExprVisitor(column, programRun, vars)
         val expr = cell.accept(ev)
         Report.debug("parsed: %s to %s", cell, expr)
         return expr
@@ -77,6 +69,7 @@ object GetetaFacade {
         return p.accept(TimeParser())
     }
 
+    @Deprecated("use external/internalVariable")
     fun asSMVVariable(column: edu.kit.iti.formal.automation.testtables.model.Variable): SVariable {
         return SVariable(column.name, getSMVDataType(column.dataType))
     }
@@ -86,7 +79,7 @@ object GetetaFacade {
                 ?: error("Data type $dataType is not supported by DataTypeTranslator")
     }
 
-
+    val DEFAULT_PROGRAM_RUN_NAME = { it: Int -> "_$it$" }
     @JvmStatic
     fun parseTableDSL(input: String) = parseTableDSL(CharStreams.fromString(input))
 
@@ -102,16 +95,9 @@ object GetetaFacade {
         return ttlb.testTables.get(0)
     }
 
-    fun exprsToSMV(vc: ParseContext, constraints: Map<IoVariable, TestTableLanguageParser.CellContext>)
+    fun exprsToSMV(vc: ParseContext, constraints: Map<ProgramVariable, TestTableLanguageParser.CellContext>)
             : Collection<SMVExpr> = constraints.map { (t, u) ->
-        exprToSMV(u, vc.getSMVVariable(t.name)!!, vc)
-    }
-
-    @Throws(IOException::class)
-    fun readProgram(optionValue: String): PouElements {
-        val a = IEC61131Facade.file(CharStreams.fromFileName(optionValue))
-        IEC61131Facade.resolveDataTypes(a)
-        return a
+        exprToSMV(u, vc.getSMVVariable(t.programRun, t.name), t.programRun, vc)
     }
 
     fun delay(ref: SReference): DelayModuleBuilder {
@@ -120,16 +106,17 @@ object GetetaFacade {
     }
 
 
-    fun glue(modTable: SMVModule, modCode: SMVModule, options: TableOptions): SMVModule {
-        val mg = BinaryModelGluer(options, modTable, modCode)
+    fun glue(modTable: SMVModule, tableType: ModuleType,
+             modCode: List<SMVModule>, programRunNames: List<String>, options: TableOptions): SMVModule {
+        val mg = BinaryModelGluer(options, modTable, tableType, modCode, programRunNames)
         mg.run()
         return mg.product
     }
 
-    fun runNuXMV(tableFilename: String,
-                 technique: VerificationTechnique, vararg modules: SMVModule): Boolean {
-        return runNuXMV(tableFilename, Arrays.asList(*modules), technique)
-    }
+    /*
+    fun runNuXMV(folder: String, technique: VerificationTechnique, vararg modules: SMVModule): NuXMVOutput {
+        return runNuXMV(folder, Arrays.asList(*modules), technique)
+    }*/
 
     fun getHistoryName(variable: SVariable, cycles: Int): String {
         return getHistoryName(variable) + "._$" + cycles
@@ -140,28 +127,28 @@ object GetetaFacade {
     }
 
     fun runNuXMV(tableFilename: String,
-                 modules: List<SMVModule>, vt: VerificationTechnique): Boolean {
-        val adapter = NuXMVAdapter(File(tableFilename), modules)
-        adapter.technique = vt
-        adapter.run()
-        return adapter.isVerified
+                 modules: List<SMVModule>, vt: VerificationTechnique): NuXMVOutput {
+        val outputFolder = File(tableFilename)
+        val moduleFile = File(outputFolder, "modules.smv")
+        moduleFile.bufferedWriter().use { w ->
+            val p = SMVPrinter(PrintWriter(w))
+            modules.forEach { it.accept(p) }
+        }
+        val adapter = NuXMVProcess(moduleFile)
+        adapter.workingDirectory = outputFolder
+        adapter.commands = vt.commands
+        return adapter.call()
     }
 
-    fun createSuperEnum(scope: Scope): EnumType {
+    fun createSuperEnum(scopes: List<Scope>): EnumType {
         val allowedValues =
-                scope.dataTypes.values()
-                        .filter { it is EnumerationTypeDeclaration }
-                        .map { it as EnumerationTypeDeclaration }
-                        .flatMap { it.allowedValues.map { it.text } }
+                scopes.flatMap { scope ->
+                    scope.dataTypes.values()
+                            .filter { it is EnumerationTypeDeclaration }
+                            .map { it as EnumerationTypeDeclaration }
+                            .flatMap { it.allowedValues.map { it.text } }
+                }
         return EnumType(allowedValues)
-    }
-
-
-    fun createSuperEnum(code: PouElements): SMVType {
-        val scope = Utils.findProgram(code)?.scope
-        if (scope != null)
-            return createSuperEnum(code)
-        throw IllegalStateException("No program found in given source code")
     }
 
     fun generateInterface(name: String = "anonym",
@@ -190,7 +177,6 @@ object GetetaFacade {
         s.append("\n}")
         return s.toString()
     }
-
 
 /*
     private class SuperEnumCreator : AstVisitor<Unit?>() {

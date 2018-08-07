@@ -61,7 +61,7 @@ class MonitorGeneration(internal val gtt: GeneralizedTestTable) : Callable<PouEl
         vars.push(VariableDeclaration.INPUT)
 
         // IOVariables -> VAR_INPUT
-        gtt.ioVariables.forEach { v ->
+        gtt.programVariables.forEach { v ->
             //vars.identifiers(v.name)
             //        .baseType(v.dataType).create()
         }

@@ -6,10 +6,14 @@ import edu.kit.iti.formal.automation.st.Identifiable
 import edu.kit.iti.formal.automation.st.LookupList
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.automation.testtables.VARIABLE_PAUSE
+import edu.kit.iti.formal.automation.testtables.algorithms.BinaryModelGluer
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.options.PropertyInitializer
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
+import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.SMVTypes
+import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
 import java.util.*
@@ -24,12 +28,31 @@ enum class IoVariableType {
 sealed class Variable : Identifiable {
     abstract override var name: String
     abstract var dataType: AnyDt
+    abstract var logicType: SMVType
+
+    open fun externalVariable(programRunNames: List<String>) = internalVariable(programRunNames).inModule(BinaryModelGluer.TABLE_MODULE)
+    open fun internalVariable(programRunNames: List<String>) = SVariable(name, logicType)
 }
 
-data class IoVariable(
+data class ProgramVariable(
         override var name: String,
         override var dataType: AnyDt,
-        var io: IoVariableType) : Variable() {
+        override var logicType: SMVType,
+        var io: IoVariableType,
+        var programRun: Int = 0) : Variable() {
+
+    /**
+     *
+     */
+    override fun externalVariable(programRunNames: List<String>) =
+            SVariable("${programRunNames[programRun]}.$realName", logicType)
+
+    /**
+     *
+     */
+    override fun internalVariable(programRunNames: List<String>): SVariable = SVariable("${programRunNames[programRun]}$$realName", logicType)
+
+
     var realName: String = name
 
     val isInput
@@ -42,16 +65,19 @@ data class IoVariable(
 data class ConstraintVariable(
         override var name: String,
         override var dataType: AnyDt,
+        override var logicType: SMVType,
         var constraint: TestTableLanguageParser.CellContext? = null)
     : Variable()
 
-class ParseContext(val vars: MutableMap<Variable, SVariable> = hashMapOf(),
-                   val refs: MutableMap<SVariable, Int> = hashMapOf(),
-                   val fillers: MutableMap<IoVariable, TestTableLanguageParser.CellContext> = hashMapOf()) {
+class ParseContext(
+        val programRuns: List<String>,
+        val vars: MutableMap<Variable, SVariable> = hashMapOf(),
+        val refs: MutableMap<SVariable, Int> = hashMapOf(),
+        val fillers: MutableMap<ProgramVariable, TestTableLanguageParser.CellContext> = hashMapOf()) {
 
     public fun isVariable(v: Variable) = v in vars
     public fun getSMVVariable(v: Variable) =
-            vars.computeIfAbsent(v) { GetetaFacade.asSMVVariable(it) }
+            vars.computeIfAbsent(v) { v.internalVariable(programRuns) }
 
     fun getReference(columnVariable: SVariable, i: Int): SMVExpr {
         if (i == 0) {
@@ -65,20 +91,27 @@ class ParseContext(val vars: MutableMap<Variable, SVariable> = hashMapOf(),
     }
 
     operator fun contains(varText: String) = vars.values.any { it.name == varText }
-    fun getSMVVariable(v: String?): SVariable? {
-        if (v == null) return null
-        val va = vars.keys.find { it.name == v } ?: return null
+
+    fun getSMVVariable(programRun: Int?, v: String): SVariable {
+        val va = if (programRun != null)
+            vars.keys.find { it.name == v && (it as? ProgramVariable)?.programRun == programRun }
+                    ?: throw IllegalArgumentException("Could not find a variable for $programRun|>$v in signature.")
+        else
+            vars.keys.find { it.name == v }
+                    ?: throw IllegalArgumentException("Could not find a variable for $v in signature.")
+
         return getSMVVariable(va)
     }
 }
 
 class GeneralizedTestTable(
         var name: String = "anonym",
-        val ioVariables: MutableList<IoVariable> = ArrayList<IoVariable>(),
+        val programVariables: MutableList<ProgramVariable> = ArrayList<ProgramVariable>(),
         val constraintVariables: MutableList<ConstraintVariable> = ArrayList<ConstraintVariable>(),
         var properties: Properties = Properties(),
         var region: Region = Region(0),
-        val functions: LookupList<FunctionDeclaration> = ArrayLookupList()
+        val functions: LookupList<FunctionDeclaration> = ArrayLookupList(),
+        var programRuns: List<String> = arrayListOf()
 ) {
     val options: TableOptions by lazy {
         val o = TableOptions()
@@ -99,16 +132,16 @@ class GeneralizedTestTable(
         }
     }
 
-    /*fun getSMVVariable(text: IoVariable): SVariable = getSMVVariable(text.name)
+    /*fun getSMVVariable(text: ProgramVariable): SVariable = getSMVVariable(text.name)
     override fun getSMVVariable(text: String): SVariable {
         return variableMap.computeIfAbsent(text) { k ->
             IOFacade.asSMVVariable(getVariable(k))
         }
     }*/
 
-    /*fun isVariable(text: String) = text in ioVariables || text in constraintVariables
+    /*fun isVariable(text: String) = text in programVariables || text in constraintVariables
     private fun getVariable(text: String): Variable {
-        val a = ioVariables[text]
+        val a = programVariables[text]
         val b = constraintVariables[text]
 
         if (a != null && b != null)
@@ -118,8 +151,8 @@ class GeneralizedTestTable(
         return a ?: b ?: error("Could not found a variable with $text in signature.")
     }*/
 
-    fun add(v: IoVariable) {
-        ioVariables += v
+    fun add(v: ProgramVariable) {
+        programVariables += v
     }
 
     fun add(v: ConstraintVariable) {
@@ -130,28 +163,37 @@ class GeneralizedTestTable(
         properties[key] = value
     }
 
-    fun getIoVariables(i: Int): IoVariable = ioVariables[i]
+    fun getIoVariables(i: Int): ProgramVariable = programVariables[i]
 
     val DEFAULT_CELL_CONTENT = "-"
 
     fun generateSmvExpression(): ParseContext {
-        val vc = generateParseContext()
         region.flat().forEach {
-            it.generateSmvExpression(vc)
+            it.generateSmvExpression(parseContext)
         }
-        return vc
+        return parseContext
     }
 
-    fun generateParseContext(): ParseContext {
-        val vc = ParseContext()
+    val parseContext: ParseContext by lazy {
+        val vc = ParseContext(programRuns)
         constraintVariables.forEach {
             vc.getSMVVariable(it)
         }
-        ioVariables.forEach {
+        programVariables.forEach {
             vc.getSMVVariable(it)
             vc.fillers[it] = GetetaFacade.parseCell(DEFAULT_CELL_CONTENT)
         }
-        return vc
+        vc
+    }
+
+    fun getProgramVariables(name: String, run: Int?): ProgramVariable {
+        val pv = if (run == null) {
+            programVariables.find { it.name == name }
+        } else {
+            programVariables.find { (it.name == name || it.realName == name) && it.programRun == run }
+        }
+
+        return pv ?: throw IllegalStateException("Could not find variable: $run|>$name.")
     }
 }
 
@@ -259,7 +301,8 @@ data class Region(override val id: String,
 }
 
 data class State(override val id: String,
-                 val rawFields: MutableMap<IoVariable, TestTableLanguageParser.CellContext?> = linkedMapOf()) : TableNode(id) {
+                 val rawFields: MutableMap<ProgramVariable, TestTableLanguageParser.CellContext?>
+                 = linkedMapOf()) : TableNode(id) {
 
     /** Input constraints as list. */
     val inputExpr: MutableList<SMVExpr> = arrayListOf()
@@ -273,18 +316,21 @@ data class State(override val id: String,
     /** outgoing states */
     val outgoing: MutableSet<State> = HashSet()
 
-    /** variable of input contraint definition */
-    val defOutput = SVariable("s" + id + "_out", SMVTypes.BOOLEAN)
-    val defForward = SVariable("s" + id + "_fwd", SMVTypes.BOOLEAN)
-    val defFailed = SVariable("s" + id + "_fail", SMVTypes.BOOLEAN)
-    val defInput = SVariable("s" + id + "_in", SMVTypes.BOOLEAN)
+    val defOutput = SVariable("s${id}_out", SMVTypes.BOOLEAN)
+    val defForward = SVariable("s${id}_fwd", SMVTypes.BOOLEAN)
+    val defFailed = SVariable("s${id}_fail", SMVTypes.BOOLEAN)
+    val defInput = SVariable("s${id}_in", SMVTypes.BOOLEAN)
 
     /**
      * The predicate that allows keeping in this state.
-     * Only necessary iff duration is DET_WAIT.
+     * Only necessary iff duration has progress flag.
      */
-    val defKeep = SVariable("s" + id + "_keep", SMVTypes.BOOLEAN)
+    val defKeep = SVariable("s${id}_keep", SMVTypes.BOOLEAN)
 
+    /**
+     * name of runs to pause in that specific state.
+     */
+    var pauseProgramRuns: MutableList<Int> = arrayListOf()
 
     override val automataStates: MutableList<AutomatonState> = ArrayList()
         get() {
@@ -312,7 +358,7 @@ data class State(override val id: String,
     constructor(id: Int) : this(id.toString())
 
     /*
-    fun add(v: IoVariable, e: SMVExpr) {
+    fun add(v: ProgramVariable, e: SMVExpr) {
         val a = if (v.io == IoVariableType.INPUT || v.io == IoVariableType.STATE_INPUT) inputExpr else outputExpr
         a.add(e)
     }
@@ -336,7 +382,7 @@ data class State(override val id: String,
         inputExpr.clear()
         outputExpr.clear()
 
-        val new = HashMap<IoVariable, TestTableLanguageParser.CellContext>()
+        val new = HashMap<ProgramVariable, TestTableLanguageParser.CellContext>()
         for (k in vc.fillers.keys.toHashSet()) {
             val v = rawFields[k]
             if (v != null) {
@@ -351,6 +397,12 @@ data class State(override val id: String,
 
         inputExpr.addAll(GetetaFacade.exprsToSMV(vc, new.filter { it.key.isInput }))
         outputExpr.addAll(GetetaFacade.exprsToSMV(vc, new.filter { it.key.isOutput }))
+
+        pauseProgramRuns.forEach {
+            val pauseFalse = SLiteral.TRUE equal vc.getSMVVariable(it, VARIABLE_PAUSE)
+
+        }
+
     }
 
     inner class AutomatonState(private val position: Int, private val name: String) {

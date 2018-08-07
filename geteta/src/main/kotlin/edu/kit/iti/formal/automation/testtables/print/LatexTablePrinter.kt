@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.automation.testtables.print
 
+import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.options.option
 import edu.kit.iti.formal.automation.st.util.Tuple
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
@@ -7,9 +9,6 @@ import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.io.TableReader
 import edu.kit.iti.formal.automation.testtables.model.*
 import org.antlr.v4.runtime.ParserRuleContext
-import org.apache.commons.cli.CommandLine
-import org.apache.commons.cli.DefaultParser
-import org.apache.commons.cli.ParseException
 import org.w3c.dom.Element
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -20,7 +19,9 @@ import java.util.stream.Stream
  * @author Alexander Weigl
  * @version 1 (01.02.18)
  */
-class LatexTablePrinter(val gtt: GeneralizedTestTable) {
+class LatexTablePrinter(val gtt: GeneralizedTestTable) : CliktCommand() {
+    val format by option()
+
     var backend = StringWriter()
     var stream: PrintWriter = PrintWriter(backend)
 
@@ -36,8 +37,8 @@ class LatexTablePrinter(val gtt: GeneralizedTestTable) {
 
     private var currentRow = 0
 
-    val input = gtt.ioVariables.filter { it.isInput }
-    val output = gtt.ioVariables.filter { it.isOutput }
+    val input = gtt.programVariables.filter { it.isInput }
+    val output = gtt.programVariables.filter { it.isOutput }
     val durations = Stack<Tuple<Duration, Int>>()
     val cache = HashMap<String, String>()
     val drawLines = LinkedHashMap<String, String>()
@@ -48,7 +49,7 @@ class LatexTablePrinter(val gtt: GeneralizedTestTable) {
     val columns = LinkedHashMap<String, ArrayList<String>>()
     val depth = gtt.region.depth()
 
-    public fun print() {
+    public override fun run() {
         fillColumns()
 
         stream.write(FILE_PREAMBLE)
@@ -89,7 +90,7 @@ class LatexTablePrinter(val gtt: GeneralizedTestTable) {
     }
 
     private fun fillColumns() {
-        gtt.ioVariables.forEach { columns[it.name] = ArrayList() }
+        gtt.programVariables.forEach { columns[it.name] = ArrayList() }
 
         //prefill
         gtt.region.flat().forEach { s ->
@@ -155,21 +156,6 @@ class LatexTablePrinter(val gtt: GeneralizedTestTable) {
         printRegionLatex(b.children)
     }
 
-    /*
-    private static int countSteps(Block b) {
-        int count = 0;
-        for (Object o : b.getStepOrBlock()) {
-            if (o instanceof Step) {
-                count += 1;
-            }
-            if (o instanceof Block) {
-                count += countSteps((Block) o);
-            }
-        }
-        return count;
-    }
-    */
-
     private fun printStep(s: State) {
         System.out.printf("%2d", currentRow++)
         //List<Element> any = s.getAny().stream().map(Element.class::cast).collect(Collectors.toList());
@@ -228,14 +214,6 @@ class LatexTablePrinter(val gtt: GeneralizedTestTable) {
         }
         lastTikzMarkColumn[varName] = c
         return String.format("\\tikzmark{%s%s}", varName, c)
-    }
-
-    @Throws(ParseException::class)
-    fun parse(args: Array<String>): CommandLine {
-        val clp = DefaultParser()
-        val options = org.apache.commons.cli.Options()
-        options.addOption("f", "format", true, "output format")
-        return clp.parse(options, args, true)
     }
 
 

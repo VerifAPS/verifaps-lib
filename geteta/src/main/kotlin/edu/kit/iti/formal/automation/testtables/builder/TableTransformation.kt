@@ -29,13 +29,19 @@ import java.util.function.Consumer
 
 class TableTransformation(
         val testTable: GeneralizedTestTable,
-        val superEnumType: SMVType) {
+        val superEnumType: SMVType,
+        relational: Boolean = false) {
 
     val model = ConstructionModel(superEnumType, testTable, hashMapOf())
     val transformers = LinkedList<Consumer<ConstructionModel>>()
 
     init {
         transformers.clear()
+        if (relational)
+            transformers.add(PauseAdder)
+
+        transformers.add(GenerateSmvExpression)
+
         transformers.add(NameSetterTransformer())
         transformers.add(ModuleParameterTransformer())
         transformers.add(StatesTransformer())

@@ -31,8 +31,6 @@ import edu.kit.iti.formal.automation.st0.TransformationState
  */
 interface CodeTransformation {
     fun transform(state: TransformationState): TransformationState
-//    public open fun transform(state: TransformationState): TransformationState =
-    //           next.transform(transform(state))
 }
 
 interface STCodeTransformation : CodeTransformation {

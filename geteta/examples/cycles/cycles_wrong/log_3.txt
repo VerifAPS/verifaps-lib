@@ -1,0 +1,209 @@
+*** This is nuXmv 1.1.1 (compiled on Wed Jun  1 10:18:42 2016)
+*** Copyright (c) 2014-2016, Fondazione Bruno Kessler
+
+*** For more information on nuXmv see https://nuxmv.fbk.eu
+*** or email to <nuxmv@list.fbk.eu>.
+*** Please report bugs at https://nuxmv.fbk.eu/bugs
+*** (click on "Login Anonymously" to access)
+*** Alternatively write to <nuxmv@list.fbk.eu>.
+
+*** This version of nuXmv is linked to NuSMV 2.6.0.
+*** For more information on NuSMV see <http://nusmv.fbk.eu>
+*** or email to <nusmv-users@list.fbk.eu>.
+*** Copyright (C) 2010-2014, Fondazione Bruno Kessler
+
+*** This version of nuXmv is linked to the CUDD library version 2.4.1
+*** Copyright (c) 1995-2004, Regents of the University of Colorado
+
+*** This version of nuXmv is linked to the MiniSat SAT solver. 
+*** See http://minisat.se/MiniSat.html
+*** Copyright (c) 2003-2006, Niklas Een, Niklas Sorensson
+*** Copyright (c) 2007-2010, Niklas Sorensson
+
+*** This version of nuXmv is linked to MathSAT
+*** Copyright (C) 2009-2016 by Fondazione Bruno Kessler
+*** Copyright (C) 2009-2016 by University of Trento
+*** See http://mathsat.fbk.eu
+
+nuXmv > nuXmv > nuXmv > Number of Input Variables: 1
+    1: boolean
+Number of State Variables: 23
+    3: signed word[16]
+   20: boolean
+Number of Frozen Variables: 0
+  i : boolean
+  
+  code.macro : signed word[16]
+  
+  code.micro : signed word[16]
+  
+  code.o : signed word[16]
+  
+  table.s1_1 : boolean
+  
+  table.s2_1 : boolean
+  
+  table.s3_1 : boolean
+  
+  table.s4_1 : boolean
+  
+  table.s5_1 : boolean
+  
+  table.s6_1 : boolean
+  
+  table.s7_1 : boolean
+  
+  table.s8_1 : boolean
+  
+  table.s9_1 : boolean
+  
+  table.s9_2 : boolean
+  
+  table.s9_3 : boolean
+  
+  table.s9_4 : boolean
+  
+  table.s9_5 : boolean
+  
+  table.s9_6 : boolean
+  
+  table.s9_7 : boolean
+  
+  table.s9_8 : boolean
+  
+  table.s9_9 : boolean
+  
+  table.s9_10 : boolean
+  
+  table._$ERROR : boolean
+  
+  table._$SENTINEL : boolean
+  
+Number of bits: 69 (0 frozen, 1 input, 68 state)
+nuXmv > nuXmv > nuXmv > -- invariant (_$ERROR -> ((((((((((((((((((s1_1 | s2_1) | s3_1) | s4_1) | s5_1) | s6_1) | s7_1) | s8_1) | s9_1) | s9_2) | s9_3) | s9_4) | s9_5) | s9_6) | s9_7) | s9_8) | s9_9) | s9_10) | _$SENTINEL)) IN table is false
+-- as demonstrated by the following execution sequence
+Trace Description: IC3 counterexample 
+Trace Type: Counterexample 
+  -> State: 1.1 <-
+    code.micro = 0sd16_1
+    code.macro = 0sd16_1
+    table.s1_1 = TRUE
+    table.s2_1 = FALSE
+    table.s3_1 = FALSE
+    table.s4_1 = FALSE
+    table.s5_1 = FALSE
+    table.s6_1 = FALSE
+    table.s7_1 = FALSE
+    table.s8_1 = FALSE
+    table.s9_1 = FALSE
+    table.s9_2 = FALSE
+    table.s9_3 = FALSE
+    table.s9_4 = FALSE
+    table.s9_5 = FALSE
+    table.s9_6 = FALSE
+    table.s9_7 = FALSE
+    table.s9_8 = FALSE
+    table.s9_9 = FALSE
+    table.s9_10 = FALSE
+    table._$SENTINEL = FALSE
+    table._$ERROR = FALSE
+    code.o = 0sd16_0
+    table.s9_in = TRUE
+    table.s8_in = TRUE
+    table.s7_in = TRUE
+    table.s6_in = TRUE
+    table.s5_in = TRUE
+    table.s4_in = TRUE
+    table.s3_in = TRUE
+    table.s2_in = TRUE
+    table.s1_in = TRUE
+    table.s9_out = FALSE
+    table.s9_fwd = FALSE
+    table.s9_fail = TRUE
+    table.s8_out = FALSE
+    table.s8_fwd = FALSE
+    table.s8_fail = TRUE
+    table.s7_out = FALSE
+    table.s7_fwd = FALSE
+    table.s7_fail = TRUE
+    table.s6_out = FALSE
+    table.s6_fwd = FALSE
+    table.s6_fail = TRUE
+    table.s5_out = FALSE
+    table.s5_fwd = FALSE
+    table.s5_fail = TRUE
+    table.s4_out = FALSE
+    table.s4_fwd = FALSE
+    table.s4_fail = TRUE
+    table.s3_out = FALSE
+    table.s3_fwd = FALSE
+    table.s3_fail = TRUE
+    table.s2_out = FALSE
+    table.s2_fwd = FALSE
+    table.s2_fail = TRUE
+    table.s1_out = TRUE
+    table.s1_fwd = TRUE
+    table.s1_fail = FALSE
+    table.s_9_9_fwd = FALSE
+    table.s_9_9_fail = FALSE
+    table.s_9_8_fwd = FALSE
+    table.s_9_8_fail = FALSE
+    table.s_9_7_fwd = FALSE
+    table.s_9_7_fail = FALSE
+    table.s_9_6_fwd = FALSE
+    table.s_9_6_fail = FALSE
+    table.s_9_5_fwd = FALSE
+    table.s_9_5_fail = FALSE
+    table.s_9_4_fwd = FALSE
+    table.s_9_4_fail = FALSE
+    table.s_9_3_fwd = FALSE
+    table.s_9_3_fail = FALSE
+    table.s_9_2_fwd = FALSE
+    table.s_9_2_fail = FALSE
+    table.s_9_1_fwd = FALSE
+    table.s_9_1_fail = FALSE
+    table.s_9_10_fwd = FALSE
+    table.s_9_10_fail = FALSE
+    table.s_8_1_fwd = FALSE
+    table.s_8_1_fail = FALSE
+    table.s_7_1_fwd = FALSE
+    table.s_7_1_fail = FALSE
+    table.s_6_1_fwd = FALSE
+    table.s_6_1_fail = FALSE
+    table.s_5_1_fwd = FALSE
+    table.s_5_1_fail = FALSE
+    table.s_4_1_fwd = FALSE
+    table.s_4_1_fail = FALSE
+    table.s_3_1_fwd = FALSE
+    table.s_3_1_fail = FALSE
+    table.s_2_1_fwd = FALSE
+    table.s_2_1_fail = FALSE
+    table.s_1_1_fwd = TRUE
+    table.s_1_1_fail = FALSE
+  -> State: 1.2 <-
+    code.micro = 0sd16_2
+    code.macro = 0sd16_2
+    table.s1_1 = FALSE
+    table.s2_1 = TRUE
+    code.o = 0sd16_1
+    table.s2_out = TRUE
+    table.s2_fwd = TRUE
+    table.s2_fail = FALSE
+    table.s1_out = FALSE
+    table.s1_fwd = FALSE
+    table.s1_fail = TRUE
+    table.s_2_1_fwd = TRUE
+    table.s_1_1_fwd = FALSE
+  -> State: 1.3 <-
+    code.micro = 0sd16_1
+    table.s2_1 = FALSE
+    table.s3_1 = TRUE
+    code.o = 0sd16_2
+    table.s_3_1_fail = TRUE
+    table.s_2_1_fwd = FALSE
+  -> State: 1.4 <-
+    code.micro = 0sd16_3
+    code.macro = 0sd16_3
+    table.s3_1 = FALSE
+    table._$ERROR = TRUE
+nuXmv > 

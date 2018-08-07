@@ -10,7 +10,7 @@ import edu.kit.iti.formal.smv.NuXMVProcess
 import java.io.File
 
 fun readProgramsOrError(p: String): PouElements {
-    val (c, ok) = IEC61131Facade.filer(File(p))
+    val (c, ok) = IEC61131Facade.fileResolve(File(p))
     if (ok.isNotEmpty()) {
         ok.forEach { Console.fatal(it.print()) }
         throw IllegalStateException("Aborted due to errors")

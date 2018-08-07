@@ -41,7 +41,7 @@ class FacadeTest {
     fun testEvaluateFunction() {
         val resource = javaClass.getResourceAsStream("/edu/kit/iti/formal/automation/st/func_sel.st")
         Assume.assumeNotNull(resource)
-        val (toplevels, error) = IEC61131Facade.filer(CharStreams.fromStream(resource))
+        val (toplevels, error) = IEC61131Facade.fileResolve(CharStreams.fromStream(resource))
         val func = toplevels[0] as FunctionDeclaration
         val state = SymbExFacade.evaluateFunction(func,
                 SVariable.create("a").asBool(),
@@ -60,7 +60,7 @@ class FacadeTest {
     @Throws(IOException::class)
     fun testModuleBuilder() {
         val resource = javaClass.getResourceAsStream("/edu/kit/iti/formal/automation/st/symbextest.st")
-        val (toplevels, ok) = IEC61131Facade.filer(CharStreams.fromStream(resource))
+        val (toplevels, ok) = IEC61131Facade.fileResolve(CharStreams.fromStream(resource))
         val module = SymbExFacade.evaluateProgram(toplevels[2] as ProgramDeclaration)
         println(module)
         //System.out.println(state);

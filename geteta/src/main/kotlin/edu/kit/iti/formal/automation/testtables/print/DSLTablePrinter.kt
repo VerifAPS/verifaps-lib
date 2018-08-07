@@ -15,7 +15,7 @@ class DSLTablePrinter(val stream: CodeWriter) {
     fun print(gtt: GeneralizedTestTable) {
         stream.append("table ${gtt.name} {")
         stream.increaseIndent()
-        gtt.ioVariables.forEach(this::print)
+        gtt.programVariables.forEach(this::print)
         stream.nl()
         gtt.constraintVariables.forEach(this::print)
         stream.nl()
@@ -28,7 +28,7 @@ class DSLTablePrinter(val stream: CodeWriter) {
         stream.decreaseIndent().nl().append("}")
     }
 
-    fun print(v: IoVariable) {
+    fun print(v: ProgramVariable) {
         stream.nl().append("var ").append(
                 when (v.io) {
                     IoVariableType.INPUT -> "input "
