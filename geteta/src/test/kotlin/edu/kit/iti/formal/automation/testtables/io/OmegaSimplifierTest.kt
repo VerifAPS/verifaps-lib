@@ -38,7 +38,7 @@ class OmegaSimplifierTest {
     @Throws(Exception::class)
     fun run_omga_simplify1() {
         val ignored = test("simplify1.xml")
-        Assert.assertEquals("5,6,7,8", ignored)
+        Assert.assertEquals("s05, s06, s07, s08", ignored)
     }
 
 
@@ -54,14 +54,14 @@ class OmegaSimplifierTest {
     @Throws(Exception::class)
     fun run_omga_simplify2() {
         val ignored = test("simplify2.xml")
-        Assert.assertEquals("6,7,8,9", ignored)
+        Assert.assertEquals("s06, s07, s08, s09", ignored)
     }
 
     @Test
     @Throws(Exception::class)
     fun run_omga_simplify3() {
         val ignored = test("simplify3.xml")
-        Assert.assertEquals("22,23,24", ignored)
+        Assert.assertEquals("s22, s23, s24", ignored)
     }
 
 }

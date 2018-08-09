@@ -21,24 +21,22 @@ package edu.kit.iti.formal.automation.testtables.model.options
 
 
 import edu.kit.iti.formal.automation.testtables.model.Duration
-import java.util.*
 
 /**
  * Created by weigl on 16.12.16.
  */
-class ConcreteTableOptions : InitializableFromProperties {
-    private val stepCounter = TreeMap<String, Int>()
+class ConcreteTableOptions(val properties: MutableMap<String, String>) {
 
     fun getCount(step: String, defaultValue: Duration): Int {
-        return stepCounter[step] ?: when (defaultValue) {
+        return properties["cycles.$step"]?.toInt() ?: when (defaultValue) {
             is Duration.Omega -> 10
             is Duration.OpenInterval -> defaultValue.lower
             is Duration.ClosedInterval -> (defaultValue.lower + defaultValue.upper) / 2
         }
     }
 
-    override fun initialize(namespace: String, p: Properties) {
-        val nslength = namespace.length + 1
+    init {
+        /*val nslength = namespace.length + 1
         for ((key1, value) in p) {
             val key = key1.toString()
             if (key.startsWith(namespace)) {
@@ -46,6 +44,6 @@ class ConcreteTableOptions : InitializableFromProperties {
                 val count = Integer.parseInt(value.toString())
                 stepCounter[step] = count
             }
-        }
+        }*/
     }
 }

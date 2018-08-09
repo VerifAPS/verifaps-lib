@@ -53,7 +53,7 @@ class SFCFactory(internal val sfcElement: Element,
     }
 
     private fun writeTransition(from: String, to: String, condition: String) {
-        writer.nl().append("TRANSITION FROM $from TO $to := $condition END_TRANSITION")
+        writer.nl().printf("TRANSITION FROM $from TO $to := $condition END_TRANSITION")
     }
 
     val QUALIFIER_ONENTRY = "P0"
@@ -62,18 +62,18 @@ class SFCFactory(internal val sfcElement: Element,
 
     private fun writeStep(step: SfcElementAccess.Step) {
         writer.nl().nl()
-        if (step.initial) writer.append("INITIAL_")
-        writer.append("STEP ${step.name} : (*Local Id: ${step.localId} *)")
+        if (step.initial) writer.printf("INITIAL_")
+        writer.printf("STEP ${step.name} : (*Local Id: ${step.localId} *)")
         writer.block {
-            step.onEntry?.let { writer.nl().append("$it($QUALIFIER_ONENTRY);") }
-            step.onExit?.let { writer.nl().append("$it(${QUALIFIER_ONEXIT});") }
-            step.onWhile?.let { writer.nl().append("$it($QUALIFIER_ONWHILE);") }
+            step.onEntry?.let { writer.nl().printf("$it($QUALIFIER_ONENTRY);") }
+            step.onExit?.let { writer.nl().printf("$it(${QUALIFIER_ONEXIT});") }
+            step.onWhile?.let { writer.nl().printf("$it($QUALIFIER_ONWHILE);") }
 
             step.actionBlock?.let {
-                //TODO            writer.append("(* TODO handle action blocks *)")
+                //TODO            writer.printf("(* TODO handle action blocks *)")
             }
         }
-        writer.nl().append("END_STEP")
+        writer.nl().printf("END_STEP")
     }
 }
 

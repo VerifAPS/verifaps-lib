@@ -35,10 +35,10 @@ object Actions : XMLTranslatorXPath("./actions") {
 object Action : XMLTranslator {
     override fun isCapableOf(e: Element): Boolean = e.name == "action"
     override fun translate(e: Element, writer: CodeWriter) {
-        writer.nl().append("ACTION ${e.getAttributeValue("name")}").increaseIndent()
+        writer.nl().printf("ACTION ${e.getAttributeValue("name")}").increaseIndent()
         STBody.translate(e, writer)
         SFCBody.translate(e, writer)
-        writer.decreaseIndent().nl().append("END_ACTION")
+        writer.decreaseIndent().nl().printf("END_ACTION")
     }
 }
 
@@ -51,19 +51,19 @@ object FunctionTranslator : POUTranslator("function") {
     override fun translate(e: Element, writer: CodeWriter) {
         val name = e.getAttributeValue("name")
         val returnType = VariableDeclXML.getDatatype(e.getChild("interface").getChild("returnType"))
-        writer.append("FUNCTION $name : $returnType")
+        writer.printf("FUNCTION $name : $returnType")
                 .increaseIndent().nl()
         InterfaceBuilder.translate(e, writer)
         STBody.translate(e, writer)
         FBDBody.translate(e, writer)
-        writer.decreaseIndent().nl().append("END_FUNCTION")
+        writer.decreaseIndent().nl().printf("END_FUNCTION")
     }
 }
 
 object FunctionBlockTranslator : POUTranslator("functionBlock") {
     override fun translate(e: Element, writer: CodeWriter) {
         val name = e.getAttributeValue("name")
-        writer.append("FUNCTION_BLOCK $name").increaseIndent().nl()
+        writer.printf("FUNCTION_BLOCK $name").increaseIndent().nl()
 
         InterfaceBuilder.translate(e, writer)
         Actions.translate(e, writer)
@@ -71,14 +71,14 @@ object FunctionBlockTranslator : POUTranslator("functionBlock") {
         SFCBody.translate(e, writer)
         FBDBody.translate(e, writer)
 
-        writer.decreaseIndent().nl().append("END_FUNCTION_BLOCK").nl()
+        writer.decreaseIndent().nl().printf("END_FUNCTION_BLOCK").nl()
     }
 }
 
 object ProgramTranslator : POUTranslator("program") {
     override fun translate(e: Element, writer: CodeWriter) {
         val name = (e.getAttributeValue("name"))
-        writer.append("PROGRAM $name").increaseIndent().nl()
+        writer.printf("PROGRAM $name").increaseIndent().nl()
 
         InterfaceBuilder.translate(e, writer)
         Actions.translate(e, writer)
@@ -86,7 +86,7 @@ object ProgramTranslator : POUTranslator("program") {
         SFCBody.translate(e, writer)
         FBDBody.translate(e, writer)
 
-        writer.decreaseIndent().nl().append("END_PROGRAM").nl()
+        writer.decreaseIndent().nl().printf("END_PROGRAM").nl()
     }
 }
 

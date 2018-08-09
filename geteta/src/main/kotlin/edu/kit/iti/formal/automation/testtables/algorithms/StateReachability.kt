@@ -20,15 +20,14 @@
 package edu.kit.iti.formal.automation.testtables.algorithms
 
 
-import edu.kit.iti.formal.automation.testtables.builder.ConstructionModel
 import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.automation.testtables.model.Region
-import edu.kit.iti.formal.automation.testtables.model.State
+import edu.kit.iti.formal.automation.testtables.model.TableRow
 import java.util.*
 import kotlin.collections.ArrayList
 
 /**
- * Calculation of the State/Row reachability.
+ * Calculation of the TableRow/Row reachability.
  *
  *
  * A *i*th row can reach (directly) the *j*th row iff
@@ -39,35 +38,22 @@ import kotlin.collections.ArrayList
  *
  *  1.
  * *i*th row is the end of block and *j*th row is the beginning of the same block.
- *
- *
- *
- *
  * This resolution is programmed as a fixpoint algorithm.
- *
- *
- *
  * Currently supports of blocks and arbitrary durations.
  *
  *
  * @author Alexander Weigl
  * @version 2 (12.12.16)
  */
-class StateReachability(
-        private val sentinel: State,
-        root: Region) {
-
-    private val flatList: MutableList<State>
-
-    constructor(model: ConstructionModel) :
-            this(model.sentinelState, model.testTable.region)
+class StateReachability(root: Region) {
+    val sentinel: TableRow = TableRow("END")
+    private val flatList: MutableList<TableRow>
 
     init {
         sentinel.duration = Duration.ClosedInterval(1, 1)
         flatList = ArrayList(root.flat())
-        val lastState = flatList[flatList.size - 1]
-
-        if (lastState.duration !== edu.kit.iti.formal.automation.testtables.model.Duration.Omega) {
+        val lastState = flatList.last()
+        if (lastState.duration !is Duration.Omega) {
             flatList.add(sentinel)
         }
 
@@ -75,10 +61,11 @@ class StateReachability(
         addRegions(root)
         fixpoint()
         maintainIncomning()
-        maintainAutomata()
+        //maintainAutomata()
         isInitialReachable()
     }
 
+    /*
     private fun maintainAutomata() {
         for (state in flatList) {
             val astates = state.automataStates
@@ -111,10 +98,11 @@ class StateReachability(
         }
     }
 
-    private fun connect(a: State.AutomatonState, b: State.AutomatonState) {
+    private fun connect(a: TableRow.AutomatonState, b: TableRow.AutomatonState) {
         a.outgoing.add(b)
         b.incoming.add(a)
     }
+    */
 
     private fun maintainIncomning() {
         for (out in flatList) {
@@ -135,7 +123,7 @@ class StateReachability(
             //for each row
             for (state in flatList) {
                 val oldSize = state.outgoing.size
-                val reached = HashSet<State>(flatList.size)
+                val reached = HashSet<TableRow>(flatList.size)
                 //foreach reachable state
                 for (reachable in state.outgoing) {
                     // if reachable state is isSkippable, add their reachable state list
@@ -185,7 +173,7 @@ class StateReachability(
     }
 
     private fun isInitialReachable() {
-        val queue = LinkedList<State>()
+        val queue = LinkedList<TableRow>()
         queue.add(flatList[0])
         while (!queue.isEmpty()) {
             val s = queue.remove()

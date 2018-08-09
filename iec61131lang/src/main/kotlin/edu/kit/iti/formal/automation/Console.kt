@@ -48,7 +48,8 @@ object Console {
                     Level.ERROR -> colorize(Color.Red, Color.White, lString)
                     Level.FATAL -> colorize(Color.White, Color.Red, lString)
                 }
-        out.println("$lString ${msg.format(args)}")
+        val a = msg.format(*args)
+        out.println("$lString $a")
     }
 
     fun writeln(lvl: Level?, msg: () -> String) {

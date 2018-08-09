@@ -55,7 +55,8 @@ data class SMVWordType(
                         if (signed) "s" else "u",
                         width,
                         value.abs().toString())
-            else -> TODO()
+            is Long -> format(BigInteger.valueOf(value))
+            else -> TODO("not implemented for ${value.javaClass}")
         }
     }
 }

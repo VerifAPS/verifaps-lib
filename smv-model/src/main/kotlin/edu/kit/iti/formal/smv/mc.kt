@@ -46,17 +46,17 @@ typealias NuXMVOutputParser = (txt: String) -> NuXMVOutput
  * @author Alexander Weigl
  */
 class ProcessRunner(val commandLine: Array<String>,
-                    val stdin: File) : Callable<String> {
-
-    var stdoutFile = File("stdout.log")
-    //var stderrFile = File("stderr.log")
-    var workingDirectory = File("")
+                    val stdin: File,
+                    var workingDirectory: File = File("."),
+                    var stdoutFile: File = File(workingDirectory, "stdout.log")
+) : Callable<String> {
 
     override fun call(): String {
         val pb = ProcessBuilder(*commandLine)
                 //.redirectError(stderrFile)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .directory(workingDirectory)
+                .redirectErrorStream(true)
                 .redirectOutput(stdoutFile)
                 .redirectInput(stdin)
         val process = pb.start()
@@ -69,10 +69,6 @@ class ProcessRunner(val commandLine: Array<String>,
     }
 }
 
-private fun println(fmt: String, vararg obj: Any?) {
-    System.out.format(fmt, *obj)
-}
-
 /**
  *
  * @author Alexander Weigl
@@ -81,7 +77,7 @@ class NuXMVProcess(var moduleFile: File) : Callable<NuXMVOutput> {
     var commands: Array<String> = arrayOf("quit")
     var executablePath = "nuXmv"
     var workingDirectory = moduleFile.parentFile
-    var outputFile = File("nuxmv.log")
+    var outputFile = File(workingDirectory, "nuxmv.log")
     var result: NuXMVOutput? = null
     var outputParser: NuXMVOutputParser = ::parseXmlOutput
 
@@ -93,8 +89,10 @@ class NuXMVProcess(var moduleFile: File) : Callable<NuXMVOutput> {
             logger.info("Working Directory: {}", workingDirectory)
             logger.info("Result in {}", outputFile)
             val commandFile = createIC3CommandFile()
-            val pr = ProcessRunner(commands, commandFile)
-            pr.stdoutFile = outputFile
+            val pr = ProcessRunner(commands,
+                    commandFile,
+                    workingDirectory,
+                    outputFile)
             val output = pr.call()
             result = outputParser(output)
             return result!!
@@ -109,8 +107,7 @@ class NuXMVProcess(var moduleFile: File) : Callable<NuXMVOutput> {
         workingDirectory.mkdirs()
         val f = File(workingDirectory, COMMAND_FILE)
         f.bufferedWriter().use { fw ->
-            PREAMBLE.forEach { fw.write(it + "\n") }
-            commands.forEach { fw.write(it + "\n") }
+            (PREAMBLE + commands + POSTAMBLE).forEach { fw.write(it + "\n") }
         }
         return f
     }
@@ -130,6 +127,16 @@ data class CounterExample(
         val inputVariables: MutableSet<String> = hashSetOf(),
         val states: MutableList<MutableMap<String, String>> = arrayListOf()
 ) {
+    operator fun get(cycle: Int, name: String): String? =
+            try {
+                states[cycle][name]
+            } catch (e: IndexOutOfBoundsException) {
+                null
+            }
+
+    val stateSize: Int get() = states.size
+
+
     companion object {
         fun load(text: String): CounterExample {
             val ce = CounterExample()
@@ -140,18 +147,19 @@ data class CounterExample(
             ce.id = Integer.parseInt(root.getAttributeValue("id"))
             ce.desc = root.getAttributeValue("desc")
 
-            root.getChildren("node").forEach {
+            root.getChildren("node").forEach { node ->
                 val m = HashMap<String, String>()
-                if (it.getChild("state") != null) {
-                    val state = it.getChild("state").getChildren("value")
-                    state.forEach { m[it.getAttributeValue("variable")] = it.textTrim }
+                node.getChild("state")?.getChildren("value")?.forEach {
+                    m[it.getAttributeValue("variable")] = it.textTrim
                 }
-                if (it.getChild("input") != null) {
-                    val input = it.getChild("input").getChildren("value")
-                    input.forEach {
-                        ce.inputVariables.add(it.getAttributeValue("variable"))
-                        m[it.getAttributeValue("variable")] = it.textTrim
-                    }
+
+                node.getChild("combinatorial")?.getChildren("value")?.forEach {
+                    m[it.getAttributeValue("variable")] = it.textTrim
+                }
+
+                node.getChild("input")?.getChildren("value")?.forEach {
+                    ce.inputVariables.add(it.getAttributeValue("variable"))
+                    m[it.getAttributeValue("variable")] = it.textTrim
                 }
                 ce.states += m
             }
@@ -177,15 +185,16 @@ sealed class NuXMVOutput {
  */
 fun parseXmlOutput(text: String): NuXMVOutput {
     val lines = text.split('\n')
-    val predError = { it: String ->
+    val errorLinePredicate = { it: String ->
         //empirical
         it.contains("error")
+                || it.contains("syntax error")
                 || it.contains("TYPE ERROR")
                 || it.contains("undefined")
     }
 
-    if (predError(text)) {
-        val errors = lines.filter(predError)
+    if (errorLinePredicate(text)) {
+        val errors = lines.filter(errorLinePredicate)
         return NuXMVOutput.Error(errors)
     }
 

@@ -42,20 +42,20 @@ class DotPrinter : AstVisitor<Unit>() {
     private val cw = CodeWriter()
 
     override fun visit(decl: SFCImplementation) {
-        cw.append("digraph g {").increaseIndent()
+        cw.printf("digraph g {").increaseIndent()
         cw.nl()
         decl.networks.forEach { n -> visit(n) }
         cw.decreaseIndent()
-        cw.nl().append("}")
+        cw.nl().printf("}")
         
     }
 
     override fun visit(n: SFCNetwork) {
-        cw.append("digraph f {").increaseIndent()
+        cw.printf("digraph f {").increaseIndent()
         cw.nl()
         n.steps.forEach { s -> s.accept(this) }
         cw.decreaseIndent()
-        cw.nl().append("}")
+        cw.nl().printf("}")
         
     }
 
@@ -64,8 +64,8 @@ class DotPrinter : AstVisitor<Unit>() {
      * {@inheritDoc}
      */
     override fun visit(decl: SFCStep) {
-        cw.nl().append(decl.name)
-        cw.append(" [label=\"" + decl.name + "\", shape=rectangle]")
+        cw.nl().printf(decl.name)
+        cw.printf(" [label=\"" + decl.name + "\", shape=rectangle]")
         
     }
 
@@ -75,7 +75,7 @@ class DotPrinter : AstVisitor<Unit>() {
     override fun visit(decl: SFCTransition) {
         for (from in decl.from!!) {
             for (to in decl.to!!)
-                cw.nl().append(from).append(" -> ").append(to).append(";")
+                cw.nl().print(from).printf(" -> ").print(to).printf(";")
         }
         
     }

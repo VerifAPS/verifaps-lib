@@ -44,7 +44,7 @@ class ProgramTest(var testFile: File) {
     public void testParseTreetoAST() throws IOException {
         PouElements tle = IEC61131Facade.file(new ANTLRFileStream(testFile));
         // Compare generated and original code
-        Assert.assertEquals(IEC61131Facade.print(tle),
+        Assert.assertEquals(IEC61131Facade.printf(tle),
                 Files.readAllLines(Paths.get(testFile)).stream().collect(Collectors.joining("\n")));
     }
     */

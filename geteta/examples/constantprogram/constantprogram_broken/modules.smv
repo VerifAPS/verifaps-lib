@@ -3,125 +3,150 @@ IVAR
 	i : signed word[16];
 -- end of IVAR
 VAR
-	code : constantprogram(i);
-	table : Ta(i, next(code.o), next(code.c));
--- end of VAR
-
--- end of module main
-
-MODULE Ta(i, o, c)
-VAR
-	s1_1 : boolean;
-	s1_2 : boolean;
-	s1_3 : boolean;
-	s1_4 : boolean;
-	s1_5 : boolean;
-	s1_6 : boolean;
-	s1_7 : boolean;
-	s1_8 : boolean;
-	s1_9 : boolean;
-	s1_10 : boolean;
-	s2_1 : boolean;
-	s2_2 : boolean;
-	s2_3 : boolean;
-	s2_4 : boolean;
-	s2_5 : boolean;
-	s2_6 : boolean;
-	s2_7 : boolean;
-	s2_8 : boolean;
-	s2_9 : boolean;
-	s2_10 : boolean;
-	_$ERROR : boolean;
-	_$SENTINEL : boolean;
+	code$ : constantprogram(i);
+	tableModule : table(code$.i, next(code$.o), next(code$.c));
 -- end of VAR
 DEFINE
-	s1_fail := s1_in & !s1_out;
-	s1_fwd := s1_in & s1_out;
-	s1_in := TRUE;
-	s1_out := i = o & 0sd16_42 = c;
-	s2_fail := s2_in & !s2_out;
-	s2_fwd := s2_in & s2_out;
-	s2_in := TRUE;
-	s2_out := i = o & 0sd16_41 = c;
-	s_1_10_fail := s1_10 & s1_fail;
-	s_1_10_fwd := s1_10 & s1_fwd;
-	s_1_1_fail := s1_1 & s1_fail;
-	s_1_1_fwd := s1_1 & s1_fwd;
-	s_1_2_fail := s1_2 & s1_fail;
-	s_1_2_fwd := s1_2 & s1_fwd;
-	s_1_3_fail := s1_3 & s1_fail;
-	s_1_3_fwd := s1_3 & s1_fwd;
-	s_1_4_fail := s1_4 & s1_fail;
-	s_1_4_fwd := s1_4 & s1_fwd;
-	s_1_5_fail := s1_5 & s1_fail;
-	s_1_5_fwd := s1_5 & s1_fwd;
-	s_1_6_fail := s1_6 & s1_fail;
-	s_1_6_fwd := s1_6 & s1_fwd;
-	s_1_7_fail := s1_7 & s1_fail;
-	s_1_7_fwd := s1_7 & s1_fwd;
-	s_1_8_fail := s1_8 & s1_fail;
-	s_1_8_fwd := s1_8 & s1_fwd;
-	s_1_9_fail := s1_9 & s1_fail;
-	s_1_9_fwd := s1_9 & s1_fwd;
-	s_2_10_fail := s2_10 & s2_fail;
-	s_2_10_fwd := s2_10 & s2_fwd;
-	s_2_1_fail := s2_1 & s2_fail;
-	s_2_1_fwd := s2_1 & s2_fwd;
-	s_2_2_fail := s2_2 & s2_fail;
-	s_2_2_fwd := s2_2 & s2_fwd;
-	s_2_3_fail := s2_3 & s2_fail;
-	s_2_3_fwd := s2_3 & s2_fwd;
-	s_2_4_fail := s2_4 & s2_fail;
-	s_2_4_fwd := s2_4 & s2_fwd;
-	s_2_5_fail := s2_5 & s2_fail;
-	s_2_5_fwd := s2_5 & s2_fwd;
-	s_2_6_fail := s2_6 & s2_fail;
-	s_2_6_fwd := s2_6 & s2_fwd;
-	s_2_7_fail := s2_7 & s2_fail;
-	s_2_7_fwd := s2_7 & s2_fwd;
-	s_2_8_fail := s2_8 & s2_fail;
-	s_2_8_fwd := s2_8 & s2_fwd;
-	s_2_9_fail := s2_9 & s2_fail;
-	s_2_9_fwd := s2_9 & s2_fwd;
-LTLSPEC
-	TRUE -> (F(!s1_1 & !s1_2 & !s1_3 & !s1_4 & !s1_5 & !s1_6 & !s1_7 & !s1_8 & !s1_9 & !s1_10 & !s2_1 & !s2_2 & !s2_3 & !s2_4 & !s2_5 & !s2_6 & !s2_7 & !s2_8 & !s2_9 & !s2_10 & !_$ERROR | s_2_10_fwd));
 
+-- end of module main
+MODULE table(code$i, code$o, code$c)
+VAR
+	__ERROR__ : boolean;
+	__SENTINEL__ : boolean;
+	s01_01 : boolean;
+	s01_02 : boolean;
+	s01_03 : boolean;
+	s01_04 : boolean;
+	s01_05 : boolean;
+	s01_06 : boolean;
+	s01_07 : boolean;
+	s01_08 : boolean;
+	s01_09 : boolean;
+	s01_10 : boolean;
+	s02_01 : boolean;
+	s02_02 : boolean;
+	s02_03 : boolean;
+	s02_04 : boolean;
+	s02_05 : boolean;
+	s02_06 : boolean;
+	s02_07 : boolean;
+	s02_08 : boolean;
+	s02_09 : boolean;
+	s02_10 : boolean;
+-- end of VAR
+DEFINE
+	s01_out_c := 0sd16_42 = code$c;
+	s01_out_o := code$i = code$o;
+	s01_out := s01_out_c & s01_out_o;
+	s01_in_i := TRUE;
+	s01_in := s01_in_i;
+	s01_keep := FALSE;
+	s01_fail := s01_in & !s01_out;
+	s01_fwd := s01_in & s01_out;
+	s02_out_c := 0sd16_41 = code$c;
+	s02_out_o := code$i = code$o;
+	s02_out := s02_out_c & s02_out_o;
+	s02_in_i := TRUE;
+	s02_in := s02_in_i;
+	s02_keep := FALSE;
+	s02_fail := s02_in & !s02_out;
+	s02_fwd := s02_in & s02_out;
+	s01_01_fwd := s01_01 & s01_fwd;
+	s01_01_fail := s01_01 & s01_fail;
+	s01_01_keep := s01_01 & !s01_keep;
+	s01_02_fwd := s01_02 & s01_fwd;
+	s01_02_fail := s01_02 & s01_fail;
+	s01_02_keep := s01_02 & !s01_keep;
+	s01_03_fwd := s01_03 & s01_fwd;
+	s01_03_fail := s01_03 & s01_fail;
+	s01_03_keep := s01_03 & !s01_keep;
+	s01_04_fwd := s01_04 & s01_fwd;
+	s01_04_fail := s01_04 & s01_fail;
+	s01_04_keep := s01_04 & !s01_keep;
+	s01_05_fwd := s01_05 & s01_fwd;
+	s01_05_fail := s01_05 & s01_fail;
+	s01_05_keep := s01_05 & !s01_keep;
+	s01_06_fwd := s01_06 & s01_fwd;
+	s01_06_fail := s01_06 & s01_fail;
+	s01_06_keep := s01_06 & !s01_keep;
+	s01_07_fwd := s01_07 & s01_fwd;
+	s01_07_fail := s01_07 & s01_fail;
+	s01_07_keep := s01_07 & !s01_keep;
+	s01_08_fwd := s01_08 & s01_fwd;
+	s01_08_fail := s01_08 & s01_fail;
+	s01_08_keep := s01_08 & !s01_keep;
+	s01_09_fwd := s01_09 & s01_fwd;
+	s01_09_fail := s01_09 & s01_fail;
+	s01_09_keep := s01_09 & !s01_keep;
+	s01_10_fwd := s01_10 & s01_fwd;
+	s01_10_fail := s01_10 & s01_fail;
+	s01_10_keep := s01_10 & !s01_keep;
+	s02_01_fwd := s02_01 & s02_fwd;
+	s02_01_fail := s02_01 & s02_fail;
+	s02_01_keep := s02_01 & !s02_keep;
+	s02_02_fwd := s02_02 & s02_fwd;
+	s02_02_fail := s02_02 & s02_fail;
+	s02_02_keep := s02_02 & !s02_keep;
+	s02_03_fwd := s02_03 & s02_fwd;
+	s02_03_fail := s02_03 & s02_fail;
+	s02_03_keep := s02_03 & !s02_keep;
+	s02_04_fwd := s02_04 & s02_fwd;
+	s02_04_fail := s02_04 & s02_fail;
+	s02_04_keep := s02_04 & !s02_keep;
+	s02_05_fwd := s02_05 & s02_fwd;
+	s02_05_fail := s02_05 & s02_fail;
+	s02_05_keep := s02_05 & !s02_keep;
+	s02_06_fwd := s02_06 & s02_fwd;
+	s02_06_fail := s02_06 & s02_fail;
+	s02_06_keep := s02_06 & !s02_keep;
+	s02_07_fwd := s02_07 & s02_fwd;
+	s02_07_fail := s02_07 & s02_fail;
+	s02_07_keep := s02_07 & !s02_keep;
+	s02_08_fwd := s02_08 & s02_fwd;
+	s02_08_fail := s02_08 & s02_fail;
+	s02_08_keep := s02_08 & !s02_keep;
+	s02_09_fwd := s02_09 & s02_fwd;
+	s02_09_fail := s02_09 & s02_fail;
+	s02_09_keep := s02_09 & !s02_keep;
+	s02_10_fwd := s02_10 & s02_fwd;
+	s02_10_fail := s02_10 & s02_fail;
+	s02_10_keep := s02_10 & !s02_keep;
 INVARSPEC
-	_$ERROR -> s1_1 | s1_2 | s1_3 | s1_4 | s1_5 | s1_6 | s1_7 | s1_8 | s1_9 | s1_10 | s2_1 | s2_2 | s2_3 | s2_4 | s2_5 | s2_6 | s2_7 | s2_8 | s2_9 | s2_10 | _$SENTINEL;
+	__ERROR__ -> s01_01 | s01_02 | s01_03 | s01_04 | s01_05 | s01_06 | s01_07 | s01_08 | s01_09 | s01_10 | s02_01 | s02_02 | s02_03 | s02_04 | s02_05 | s02_06 | s02_07 | s02_08 | s02_09 | s02_10 | __SENTINEL__;
 
 INIT
-	s1_1 & !s1_2 & !s1_3 & !s1_4 & !s1_5 & !s1_6 & !s1_7 & !s1_8 & !s1_9 & !s1_10 & !s2_1 & !s2_2 & !s2_3 & !s2_4 & !s2_5 & !s2_6 & !s2_7 & !s2_8 & !s2_9 & !s2_10 & !_$ERROR & !_$SENTINEL;
+	s01_01 & !s01_02 & !s01_03 & !s01_04 & !s01_05 & !s01_06 & !s01_07 & !s01_08 & !s01_09 & !s01_10 & !s02_01 & !s02_02 & !s02_03 & !s02_04 & !s02_05 & !s02_06 & !s02_07 & !s02_08 & !s02_09 & !s02_10 & !__ERROR__ & !__SENTINEL__;
 ASSIGN
-	next(s1_1) := FALSE;
-	next(s1_2) := s_1_1_fwd;
-	next(s1_3) := s_1_2_fwd;
-	next(s1_4) := s_1_3_fwd;
-	next(s1_5) := s_1_4_fwd;
-	next(s1_6) := s_1_5_fwd;
-	next(s1_7) := s_1_6_fwd;
-	next(s1_8) := s_1_7_fwd;
-	next(s1_9) := s_1_8_fwd;
-	next(s1_10) := s_1_9_fwd;
-	next(s2_1) := s_1_10_fwd;
-	next(s2_2) := s_2_1_fwd;
-	next(s2_3) := s_2_2_fwd;
-	next(s2_4) := s_2_3_fwd;
-	next(s2_5) := s_2_4_fwd;
-	next(s2_6) := s_2_5_fwd;
-	next(s2_7) := s_2_6_fwd;
-	next(s2_8) := s_2_7_fwd;
-	next(s2_9) := s_2_8_fwd;
-	next(s2_10) := s_2_9_fwd | s_2_10_fwd;
-	next(_$ERROR) := s_1_1_fail | s_1_2_fail | s_1_3_fail | s_1_4_fail | s_1_5_fail | s_1_6_fail | s_1_7_fail | s_1_8_fail | s_1_9_fail | s_1_10_fail | s_2_1_fail | s_2_2_fail | s_2_3_fail | s_2_4_fail | s_2_5_fail | s_2_6_fail | s_2_7_fail | s_2_8_fail | s_2_9_fail | s_2_10_fail;
-	next(_$SENTINEL) := s_2_10_fwd | _$SENTINEL;
+	next(__ERROR__) := s01_01_fail | s01_02_fail | s01_03_fail | s01_04_fail | s01_05_fail | s01_06_fail | s01_07_fail | s01_08_fail | s01_09_fail | s01_10_fail | s02_01_fail | s02_02_fail | s02_03_fail | s02_04_fail | s02_05_fail | s02_06_fail | s02_07_fail | s02_08_fail | s02_09_fail | s02_10_fail;
+	next(__SENTINEL__) := s02_10_fwd | __SENTINEL__;
+	next(s01_01) := FALSE;
+	next(s01_02) := s01_01_fwd;
+	next(s01_03) := s01_02_fwd;
+	next(s01_04) := s01_03_fwd;
+	next(s01_05) := s01_04_fwd;
+	next(s01_06) := s01_05_fwd;
+	next(s01_07) := s01_06_fwd;
+	next(s01_08) := s01_07_fwd;
+	next(s01_09) := s01_08_fwd;
+	next(s01_10) := s01_09_fwd;
+	next(s02_01) := s01_10_fwd;
+	next(s02_02) := s02_01_fwd;
+	next(s02_03) := s02_02_fwd;
+	next(s02_04) := s02_03_fwd;
+	next(s02_05) := s02_04_fwd;
+	next(s02_06) := s02_05_fwd;
+	next(s02_07) := s02_06_fwd;
+	next(s02_08) := s02_07_fwd;
+	next(s02_09) := s02_08_fwd;
+	next(s02_10) := s02_09_fwd | s02_10_keep;
 
--- end of module Ta
-
+-- end of module table
 MODULE constantprogram(i)
 VAR
 	c : signed word[16];
 	o : signed word[16];
 -- end of VAR
+DEFINE
 ASSIGN
 	init(c) := 0sd16_0;
 	init(o) := 0sd16_0;
@@ -129,4 +154,3 @@ ASSIGN
 	next(o) := i;
 
 -- end of module constantprogram
-

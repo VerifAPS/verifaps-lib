@@ -19,21 +19,39 @@
  */
 package edu.kit.iti.formal.automation.testtables.model.options
 
-
 import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
+
 
 /**
  * Created by weigl on 16.12.16.
  */
-class TableOptions {
-    @get:Property("mode")
-    var mode: Mode = Mode.CONFORMANCE
-    @get:Property("technique")
-    var verificationTechnique = VerificationTechnique.IC3
-    @get:Property(value = "cycles")
-    var concreteTableOptions = ConcreteTableOptions()
-    @get:Property(value = "datatype")
-    var dataTypeOptions = DataTypeOptions()
-    @get:Property("usenext")
-    var isUseNext = true
+class TableOptions(val properties: MutableMap<String, String>) {
+    var mode: Mode
+            by properties.convert(Mode.CONFORMANCE) { Mode.valueOf(it) }
+
+    val verificationTechnique: VerificationTechnique
+            by properties.convert(VerificationTechnique.IC3) { VerificationTechnique.valueOf(it) }
+
+    var cycles: ConcreteTableOptions = ConcreteTableOptions(properties)
+    var dataTypeOptions = DataTypeOptions(properties)
+    var relational: Boolean = false
 }
+
+fun <R, T> Map<String, String>.convert(default: T, func: (String) -> T): ReadWriteProperty<R, T> {
+    return object : ReadWriteProperty<R, T> {
+        var overwritten: T? = null
+        override fun setValue(thisRef: R, property: KProperty<*>, value: T) {
+            overwritten = value
+        }
+
+        override fun getValue(thisRef: R, property: KProperty<*>): T {
+            if (overwritten != null) return overwritten!!
+            val v = this@convert[property.name]
+            return if (v == null) return default
+            else func(v)
+        }
+    }
+}
+

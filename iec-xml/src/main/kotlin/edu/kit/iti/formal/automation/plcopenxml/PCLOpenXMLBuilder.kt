@@ -71,7 +71,7 @@ class PCLOpenXMLBuilder(private val filename: File, private val writer: CodeWrit
     @Throws(JDOMException::class, IOException::class)
     fun build() {
         document.rootElement.namespace = Namespace.NO_NAMESPACE
-        writer.append("// Extracted from %s on %s%n%n", filename, Date())
+        writer.printf("// Extracted from %s on %s%n%n", filename, Date())
         DataTypeExtractor(dataTypes, writer).run()
         PouExtractor(pous, writer).run()
     }

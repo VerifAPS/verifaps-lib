@@ -123,12 +123,12 @@ data class Scope(val variables: VariableScope = VariableScope())
     override fun toString(): String {
     val sb = StringBuilder("Scope{")
     for (vd in variables) {
-    sb.append(vd.name).append(":").append(vd.dataType)
-    if (vd.init != null) sb.append(" := ").append(vd.init)
-    sb.append("},")
+    sb.printf(vd.name).printf(":").printf(vd.dataType)
+    if (vd.init != null) sb.printf(" := ").printf(vd.init)
+    sb.printf("},")
     }
     sb.delete(sb.length - 1, sb.length)
-    sb.append("}")
+    sb.printf("}")
     return sb.toString()
     }*/
 

@@ -31,6 +31,7 @@ import edu.kit.iti.formal.smv.ast.SVariable
  * @author Alexander Weigl
  * @version 1
  */
+@Deprecated("In favour HistoryModuleBuilder")
 class DelayModuleBuilder(private val variable: SVariable, cycles: Int) : Runnable {
     val historyLength: Int
     private val dataType: SMVType?

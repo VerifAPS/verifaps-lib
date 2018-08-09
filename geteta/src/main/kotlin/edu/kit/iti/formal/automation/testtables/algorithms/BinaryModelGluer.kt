@@ -21,6 +21,7 @@ package edu.kit.iti.formal.automation.testtables.algorithms
 
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
 import edu.kit.iti.formal.smv.ModuleType
+import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
 
@@ -30,7 +31,7 @@ import edu.kit.iti.formal.smv.ast.SVariable
  */
 class BinaryModelGluer(private val options: TableOptions,
                        private val tableModule: SMVModule,
-                       private val tableType: ModuleType,
+                       private val tableType: SMVType,
                        private val code: List<SMVModule>,
                        private val programRunNames: List<String>) : Runnable {
     val product = SMVModule("main")

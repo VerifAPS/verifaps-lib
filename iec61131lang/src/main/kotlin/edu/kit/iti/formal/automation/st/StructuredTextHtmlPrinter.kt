@@ -45,7 +45,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
      * {@inheritDoc}
      */
     override fun defaultVisit(obj: Any) {
-        sb.div(Sections.ERROR).append("not implemented: ").append(obj::class.java)
+        sb.div(Sections.ERROR).printf("not implemented: ").print(obj::class.java)
         sb.end()
     }
 
@@ -54,8 +54,8 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
      */
     override fun visit(exitStatement: ExitStatement) {
 
-        sb.div(Sections.STATEMENT, Sections.KEYWORD).append("EXIT")
-        sb.end().append(";")
+        sb.div(Sections.STATEMENT, Sections.KEYWORD).printf("EXIT")
+        sb.end().printf(";")
         sb.end()
 
     }
@@ -81,7 +81,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
         } else {
             sb.appendIdent()
             enumeration.start.accept(this)
-            sb.append("..")
+            sb.printf("..")
             enumeration.stop!!.accept(this)
         }
         sb.end()
@@ -96,7 +96,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
         sb.append('(')
         binaryExpression.leftExpr!!.accept(this)
         sb.div(Sections.OPERATOR, Sections.KEYWORD)
-        sb.append(" ").append(binaryExpression.operator!!.symbol).append(" ")
+        sb.printf(" ").printf(binaryExpression.operator!!.symbol).printf(" ")
         sb.end().end()
         binaryExpression.rightExpr!!.accept(this)
         sb.append(')')
@@ -120,17 +120,17 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
      * {@inheritDoc}
      */
     override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
-        sb.div(Sections.TYPE_DECL_ENUM).div(Sections.TYPE_NAME).append(enumerationTypeDeclaration.name)
+        sb.div(Sections.TYPE_DECL_ENUM).div(Sections.TYPE_NAME).printf(enumerationTypeDeclaration.name)
         sb.end().seperator(":")
 
-        sb.div(Sections.TYPE_DECL_DECL).append("(")
+        sb.div(Sections.TYPE_DECL_DECL).printf("(")
 
         for (s in enumerationTypeDeclaration.allowedValues) {
-            sb.div(Sections.VALUE).append(s.text)
+            sb.div(Sections.VALUE).printf(s.text)
             sb.end().seperator(",")
         }
 
-        sb.append(")")
+        sb.printf(")")
         sb.ts().end().end()
 
     }
@@ -166,8 +166,8 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
      */
     override fun visit(unaryExpression: UnaryExpression) {
         sb.div(Sections.UNARY_EXPRESSION, Sections.OPERATOR)
-                .append(unaryExpression.operator.symbol)
-        sb.end().append(" ")
+                .printf(unaryExpression.operator.symbol)
+        sb.end().printf(" ")
         unaryExpression.expression.accept(this)
         sb.end()
 
@@ -211,17 +211,17 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
 
 		if (symbolicReference.getSubscripts() != null && !symbolicReference.getSubscripts().isEmpty()) {
 
-			sb.div(Sections.SUBSCRIPT).append('[');
+			sb.div(Sections.SUBSCRIPT).printf('[');
 			for (Expression expr : symbolicReference.getSubscripts()) {
 				expr.accept(this);
-				sb.append(',');
+				sb.printf(',');
 			}
-			sb.append(']');
+			sb.printf(']');
 			sb.end();
 		}
 
 		if (symbolicReference.getSub() != null) {
-			sb.append(".");
+			sb.printf(".");
 			symbolicReference.getSub().accept(this);
 		}*/
 
@@ -234,7 +234,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
         sb.div(Sections.STATEMENT_BLOCK)
         for (stmt in statements) {
             if (stmt == null) {
-                sb.append("{*ERROR: stmt null*}")
+                sb.printf("{*ERROR: stmt null*}")
             } else {
                 sb.div(Sections.STATEMENT)
                 stmt.accept(this)
@@ -250,7 +250,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
      */
     override fun visit(programDeclaration: ProgramDeclaration) {
         sb.div(Sections.PROGRAM).keyword("PROGRAM")
-        sb.div(Sections.VARIABLE).append(programDeclaration.name)
+        sb.div(Sections.VARIABLE).printf(programDeclaration.name)
         sb.end().append('\n')
 
         programDeclaration.scope.accept(this)
@@ -266,7 +266,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
      *
      * @Override public Object visit(ScalarValue tsScalarValue) {
      * sb.div(Sections.VALUE).span(tsScalarValue.getDataType().getName())
-     * .append(tsScalarValue.getDataType().repr(tsScalarValue.getValue()));
+     * .printf(tsScalarValue.getDataType().repr(tsScalarValue.getValue()));
      * sb.end().end();
      * ;
      * }
@@ -276,7 +276,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
      * {@inheritDoc}
      */
     override fun visit(expressions: ExpressionList) {
-        sb.append(Sections.EXPRESSION_LIST)
+        sb.print(Sections.EXPRESSION_LIST)
         for (e in expressions) {
             e.accept(this)
             sb.seperator(",")
@@ -290,15 +290,15 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
      */
     override fun visit(invocation: Invocation) {
         sb.div(Sections.FUNC_CALL)
-        sb.append(invocation.calleeName)
+        sb.printf(invocation.calleeName)
         visitInvocationParameters(invocation.parameters)
 
     }
 
     private fun visitInvocationParameters(parameters: MutableList<InvocationParameter>) {
-        sb.append("(")
+        sb.printf("(")
         parameters.joinTo(sb, ",") { it.accept(this) }
-        sb.append(")")
+        sb.printf(")")
     }
 
 
@@ -309,14 +309,14 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
         sb.div(Sections.FOR)
         sb.keyword("FOR")
         sb.variable(forStatement.variable!!)
-        sb.append(" := ")
+        sb.printf(" := ")
         forStatement.start!!.accept(this)
         sb.keyword("TO")
         forStatement.stop!!.accept(this)
         sb.keyword("DO")
         forStatement.statements.accept(this)
         sb.decreaseIndent().nl()
-        sb.append("END_FOR")
+        sb.printf("END_FOR")
         sb.end()
 
     }
@@ -375,7 +375,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
     override fun visit(fbc: InvocationStatement) {
         fbc.callee.accept(this)
         visitInvocationParameters(fbc.parameters)
-        sb.append(";")
+        sb.printf(";")
     }
 
     /**
@@ -437,7 +437,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
             else
                 sb.keyword("NON_RETAIN")
 
-            sb.append(" ")
+            sb.printf(" ")
 
             sb.variable(vd.name)
 
@@ -460,7 +460,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
      */
     override fun visit(commentStatement: CommentStatement) {
         if (isPrintComments) {
-            sb.div(Sections.COMMENT).append("{*").append(commentStatement.comment).append("*}")
+            sb.div(Sections.COMMENT).printf("{*").printf(commentStatement.comment).printf("*}")
             sb.end()
         }
 
@@ -488,7 +488,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
      * closeHtml.
      */
     fun closeHtml() {
-        sb.append("</body></html>")
+        sb.printf("</body></html>")
     }
 
     /**

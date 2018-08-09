@@ -42,16 +42,16 @@ object StructTranslator : XMLTranslatorXPath("./baseType/struct") {
         val q = xpathFactory.compile("$xpath/variable", Filters.element())
 
         val name = e.getAttributeValue("name")
-        writer.nl().append("$name : STRUCT").increaseIndent()
+        writer.nl().printf("$name : STRUCT").increaseIndent()
         for (variable in q.evaluate(e)) {
             val n = variable.getAttributeValue("name")
             val dt = VariableDeclXML.getDatatype(variable.getChild("type"))
             val doc = variable.getChild("documentation")?.getChild("xhtml")?.textTrim
-            if (doc != null) writer.nl().append("$n : $dt; (* $doc *)")
-            else writer.nl().append("$n : $dt;")
+            if (doc != null) writer.nl().printf("$n : $dt; (* $doc *)")
+            else writer.nl().printf("$n : $dt;")
         }
 
-        writer.decreaseIndent().nl().append("END_STRUCT;")
+        writer.decreaseIndent().nl().printf("END_STRUCT;")
     }
 }
 
@@ -61,7 +61,7 @@ object StructTranslator : XMLTranslatorXPath("./baseType/struct") {
 object EnumTranslator : XMLTranslatorXPath("./baseType/enum") {
     override fun translate(e: Element, writer: CodeWriter) {
         val name = e.getAttributeValue("name")
-        writer.nl().append("$name : ")
+        writer.nl().printf("$name : ")
         val vq = xpathFactory.compile("$xpath/values/value/@name", Filters.attribute())
         val values = vq.evaluate(e)
         values.joinTo(writer, ", ", "(", ");") { it.value }

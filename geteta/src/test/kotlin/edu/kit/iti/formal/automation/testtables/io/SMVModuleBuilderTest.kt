@@ -25,7 +25,7 @@ package edu.kit.iti.formal.automation.testtables.io
 
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.builder.TableTransformation
+import edu.kit.iti.formal.automation.testtables.builder.SmvConstructionPipeline
 import org.junit.Assert
 import org.junit.Test
 
@@ -52,29 +52,26 @@ class SMVModuleBuilderTest {
     }
 
     @Test
-    @Throws(JAXBException::class, IOException::class)
     fun testDetWait3() {
         test("src/test/resources/detwait/detwait3.xml",
-                "src/test/resources/detwait/detwait1.smv")
+                "src/test/resources/detwait/detwait3.smv")
     }
 
 
     @Test
-    @Throws(JAXBException::class, IOException::class)
     fun testOmega1() {
         test("src/test/resources/omega/simplify1.xml",
                 "src/test/resources/omega/simplify1.smv")
     }
 
 
-    @Throws(JAXBException::class, IOException::class)
     fun test(table: String, expectedSMVFile: String) {
         val gtt = GetetaFacade.parseTableXML(table)
         val expected = java.io.File(expectedSMVFile).readText()
         val enumType = GetetaFacade.createSuperEnum(listOf(Scope()))
-        val tt = TableTransformation(gtt, enumType, true)
-        val module = tt.transform()
-        val output = module.toString()
+        val tt = GetetaFacade.constructSMV(gtt, enumType)
+        val module = tt.tableModule
+        val output = module.repr()
         Assert.assertEquals(expected, output)
     }
 }

@@ -38,7 +38,7 @@ class SFCLangPrinter : AstVisitor<Any>()    private CodeWriter cw = new CodeWrit
         stPrinter.setCodeWriter(cw);
     }
 
-    public static String print(SFCImplementation a) {
+    public static String printf(SFCImplementation a) {
         SFCLangPrinter p = new SFCLangPrinter();
         a.visit(p);
         return p.cw.toString();
@@ -46,7 +46,7 @@ class SFCLangPrinter : AstVisitor<Any>()    private CodeWriter cw = new CodeWrit
 
     @Override
     public Object visit(SFCImplementation decl) {
-        cw.keyword("sfc").append(" ").append(decl.getName()).nl()
+        cw.keyword("sfc").printf(" ").printf(decl.getName()).nl()
                 .increaseIndent();
 
         stPrinter.visit(decl.getScope());
@@ -70,7 +70,7 @@ class SFCLangPrinter : AstVisitor<Any>()    private CodeWriter cw = new CodeWrit
     }
 
     private void printAction(FunctionBlockDeclaration fbd) {
-        cw.nl().keyword("action").append(" ").append(fbd.getName());
+        cw.nl().keyword("action").printf(" ").printf(fbd.getName());
         cw.increaseIndent();
         cw.nl();
         stPrinter.visit(fbd.getScope());
@@ -81,14 +81,14 @@ class SFCLangPrinter : AstVisitor<Any>()    private CodeWriter cw = new CodeWrit
 
     @Override
     public Object visit(StepDeclaration decl) {
-        cw.nl().keyword("step").append(" ").append(decl.getName());
+        cw.nl().keyword("step").printf(" ").printf(decl.getName());
         cw.increaseIndent();
 
         for (Map.Entry<String, List<String>> entry :
                 decl.getEvents().entrySet()) {
             //FIXME
             for (String actionName : entry.getValue())
-                cw.nl().keyword("on").append(" ").append(entry.getKey()).append(" ").append(actionName);
+                cw.nl().keyword("on").printf(" ").printf(entry.getKey()).printf(" ").printf(actionName);
         }
 
         cw.decreaseIndent();
@@ -99,7 +99,7 @@ class SFCLangPrinter : AstVisitor<Any>()    private CodeWriter cw = new CodeWrit
 
     private void appendEvents(List<String> seq, String type) {
         if (!seq.isEmpty()) {
-            cw.nl().keyword("on").append(" ").keyword(type).append(" ");
+            cw.nl().keyword("on").printf(" ").keyword(type).printf(" ");
             printList(seq);
             cw.nl();
         }
@@ -107,7 +107,7 @@ class SFCLangPrinter : AstVisitor<Any>()    private CodeWriter cw = new CodeWrit
 
     private void printList(List<String> seq) {
         for (String n : seq) {
-            cw.append(n).append(", ");
+            cw.printf(n).printf(", ");
         }
         cw.deleteLast(2);
     }
@@ -120,12 +120,12 @@ class SFCLangPrinter : AstVisitor<Any>()    private CodeWriter cw = new CodeWrit
 
     @Override
     public Object visit(TransitionDeclaration decl) {
-        cw.nl().keyword("goto").append(" ");
+        cw.nl().keyword("goto").printf(" ");
         decl.getGuard().accept(stPrinter);
-        cw.append(" ").keyword("::").append(" ");
+        cw.printf(" ").keyword("::").printf(" ");
 
         printList(decl.getFrom());
-        cw.append(" ").append("->").append(" ");
+        cw.printf(" ").printf("->").printf(" ");
         printList(decl.getTo());
 
         return null;

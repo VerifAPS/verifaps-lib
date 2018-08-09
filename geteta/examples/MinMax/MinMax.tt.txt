@@ -1,5 +1,5 @@
 table TTable {
-    var input mode : ENUM ENUM
+    var input mode : ENUM
     var input learn : BOOL
     var input I : INT
     var output Q : INT

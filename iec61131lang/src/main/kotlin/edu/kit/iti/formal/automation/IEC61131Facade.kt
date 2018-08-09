@@ -136,7 +136,7 @@ object IEC61131Facade {
             fileResolve(inputs.map { CharStreams.fromFileName(it.absolutePath) }, builtins)
 
 
-    fun readProgramsWithLibrary(libraryElements: List<File>, program: List<File>, disableSimplify: Boolean)
+    fun readProgramsWithLibrary(libraryElements: List<File>, program: List<File>)
             : List<PouExecutable> {
         return program.map {
             val (elements, error) = IEC61131Facade.filefr(libraryElements + it)

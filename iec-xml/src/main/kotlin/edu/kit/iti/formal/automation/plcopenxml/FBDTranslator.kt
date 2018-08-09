@@ -20,20 +20,20 @@ class FBDTranslator(val e: Element, val writer: CodeWriter) {
             translateBlock(block)
         }
 
-        writer.append("VAR").block {
+        writer.printf("VAR").block {
             nodes.filter { !it.callTypeIsFunction }
                     .forEach {
-                        nl().append("${it.instanceName} : ${it.type};")
+                        nl().printf("${it.instanceName} : ${it.type};")
                     }
         }
-        writer.nl().append("END_VAR").nl()
+        writer.nl().printf("END_VAR").nl()
 
         nodes.forEach {
             writer.nl()
             if (it.callTypeIsFunction) {
-                writer.append("${it.assignTo} := ${it.type}")
+                writer.printf("${it.assignTo} := ${it.type}")
             } else {
-                writer.append(it.instanceName)
+                writer.printf(it.instanceName)
             }
 
             it.inputVariables

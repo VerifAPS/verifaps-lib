@@ -23,101 +23,13 @@ package edu.kit.iti.formal.automation.testtables.model.options
 /**
  * Created by weigl on 16.12.16.
  */
-class DataTypeOptions {
-
-    private var widthInt = 16
-
-    private var widthUInt = 16
-
-    private var widthSInt = 8
-
-    private var widthUSInt = 8
-
-    private var widthLInt = 64
-
-    private var widthULInt = 64
-
-    private var widthDInt = 32
-
-    private var widthUDInt = 32
-
-    @Property("int")
-    fun getWidthInt(): Int {
-        return widthInt
-    }
-
-    fun setWidthInt(widthInt: Int): DataTypeOptions {
-        this.widthInt = widthInt
-        return this
-    }
-
-    @Property("uint")
-    fun getWidthUInt(): Int {
-        return widthUInt
-    }
-
-    fun setWidthUInt(widthUInt: Int): DataTypeOptions {
-        this.widthUInt = widthUInt
-        return this
-    }
-
-    @Property("sint")
-    fun getWidthSInt(): Int {
-        return widthSInt
-    }
-
-    fun setWidthSInt(widthSInt: Int): DataTypeOptions {
-        this.widthSInt = widthSInt
-        return this
-    }
-
-    @Property("usint")
-    fun getWidthUSInt(): Int {
-        return widthUSInt
-    }
-
-    fun setWidthUSInt(widthUSInt: Int): DataTypeOptions {
-        this.widthUSInt = widthUSInt
-        return this
-    }
-
-    @Property("lint")
-    fun getWidthLInt(): Int {
-        return widthLInt
-    }
-
-    fun setWidthLInt(widthLInt: Int): DataTypeOptions {
-        this.widthLInt = widthLInt
-        return this
-    }
-
-    @Property("ulint")
-    fun getWidthULInt(): Int {
-        return widthULInt
-    }
-
-    fun setWidthULInt(widthULInt: Int): DataTypeOptions {
-        this.widthULInt = widthULInt
-        return this
-    }
-
-    @Property("dint")
-    fun getWidthDInt(): Int {
-        return widthDInt
-    }
-
-    fun setWidthDInt(widthDInt: Int): DataTypeOptions {
-        this.widthDInt = widthDInt
-        return this
-    }
-
-    fun getWidthUDInt(): Int {
-        return widthUDInt
-    }
-
-    @Property("udint")
-    fun setWidthUDInt(widthUDInt: Int): DataTypeOptions {
-        this.widthUDInt = widthUDInt
-        return this
-    }
+class DataTypeOptions(val map: MutableMap<String, String> = HashMap()) {
+    val widthInt: Int by map.convert(16) { it.toInt() }
+    val widthUInt: Int by map.convert(16) { it.toInt() }
+    val widthSInt: Int by map.convert(8) { it.toInt() }
+    val widthUSInt: Int by map.convert(8) { it.toInt() }
+    val widthLInt: Int by map.convert(32) { it.toInt() }
+    val widthULInt: Int by map.convert(32) { it.toInt() }
+    val widthDInt: Int by map.convert(64) { it.toInt() }
+    val widthUDInt: Int by map.convert(64) { it.toInt() }
 }

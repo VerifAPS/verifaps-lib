@@ -6,14 +6,12 @@ import edu.kit.iti.formal.automation.st.Identifiable
 import edu.kit.iti.formal.automation.st.LookupList
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.VARIABLE_PAUSE
 import edu.kit.iti.formal.automation.testtables.algorithms.BinaryModelGluer
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
-import edu.kit.iti.formal.automation.testtables.model.options.PropertyInitializer
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
+import edu.kit.iti.formal.automation.testtables.rtt.VARIABLE_PAUSE
 import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.SMVTypes
-import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
 import java.util.*
@@ -31,6 +29,7 @@ sealed class Variable : Identifiable {
     abstract var logicType: SMVType
 
     open fun externalVariable(programRunNames: List<String>) = internalVariable(programRunNames).inModule(BinaryModelGluer.TABLE_MODULE)
+
     open fun internalVariable(programRunNames: List<String>) = SVariable(name, logicType)
 }
 
@@ -50,7 +49,7 @@ data class ProgramVariable(
     /**
      *
      */
-    override fun internalVariable(programRunNames: List<String>): SVariable = SVariable("${programRunNames[programRun]}$$realName", logicType)
+    override fun internalVariable(programRunNames: List<String>): SVariable = SVariable("${programRunNames[programRun]}$realName", logicType)
 
 
     var realName: String = name
@@ -70,12 +69,13 @@ data class ConstraintVariable(
     : Variable()
 
 class ParseContext(
-        val programRuns: List<String>,
+        val relational: Boolean = false,
+        val programRuns: List<String> = listOf(),
         val vars: MutableMap<Variable, SVariable> = hashMapOf(),
         val refs: MutableMap<SVariable, Int> = hashMapOf(),
         val fillers: MutableMap<ProgramVariable, TestTableLanguageParser.CellContext> = hashMapOf()) {
 
-    public fun isVariable(v: Variable) = v in vars
+    public fun isVariable(v: String) = v in this
     public fun getSMVVariable(v: Variable) =
             vars.computeIfAbsent(v) { v.internalVariable(programRuns) }
 
@@ -90,7 +90,7 @@ class ParseContext(
         }
     }
 
-    operator fun contains(varText: String) = vars.values.any { it.name == varText }
+    operator fun contains(varText: String) = vars.keys.any { it.name == varText }
 
     fun getSMVVariable(programRun: Int?, v: String): SVariable {
         val va = if (programRun != null)
@@ -108,27 +108,25 @@ class GeneralizedTestTable(
         var name: String = "anonym",
         val programVariables: MutableList<ProgramVariable> = ArrayList<ProgramVariable>(),
         val constraintVariables: MutableList<ConstraintVariable> = ArrayList<ConstraintVariable>(),
-        var properties: Properties = Properties(),
+        var properties: MutableMap<String, String> = HashMap(),
         var region: Region = Region(0),
         val functions: LookupList<FunctionDeclaration> = ArrayLookupList(),
         var programRuns: List<String> = arrayListOf()
 ) {
     val options: TableOptions by lazy {
-        val o = TableOptions()
-        PropertyInitializer.initialize(o, properties)
-        o
+        TableOptions(properties)
     }
 
     fun clearReachability() {
         for (s in this.region.flat()) {
             s.outgoing.clear()
             s.incoming.clear()
-            s.automataStates.clear()
+            /*s.automataStates.clear()
 
             for (a in s.automataStates) {
                 a.outgoing.clear()
                 a.incoming.clear()
-            }
+            }*/
         }
     }
 
@@ -175,7 +173,7 @@ class GeneralizedTestTable(
     }
 
     val parseContext: ParseContext by lazy {
-        val vc = ParseContext(programRuns)
+        val vc = ParseContext(options.relational, programRuns)
         constraintVariables.forEach {
             vc.getSMVVariable(it)
         }
@@ -185,6 +183,8 @@ class GeneralizedTestTable(
         }
         vc
     }
+    val maxProgramRun: Int
+        get() = programVariables.map { it.programRun }.maxBy { it } ?: 0
 
     fun getProgramVariables(name: String, run: Int?): ProgramVariable {
         val pv = if (run == null) {
@@ -195,6 +195,19 @@ class GeneralizedTestTable(
 
         return pv ?: throw IllegalStateException("Could not find variable: $run|>$name.")
     }
+
+    fun ensureProgramRuns() {
+        val max = 1 + maxProgramRun
+        if (max == 1 && programRuns.isEmpty()) {
+            programRuns += "code\$"
+        } else {
+            while (programRuns.size < max) {
+                programRuns += "_${programRuns.size}\$"
+            }
+        }
+    }
+
+    fun getTableRow(rowId: String) = region.flat().find { it.id == rowId }
 }
 
 operator fun <T : Identifiable> Iterable<T>.get(text: String) = find { it.name == text }
@@ -238,8 +251,7 @@ sealed class Duration {
         override val isSkippable: Boolean
             get() = lower == 0
         override val isRepeatable: Boolean
-            get() = true
-
+            get() = !isOneStep
     }
 
     /**
@@ -277,62 +289,61 @@ sealed class Duration {
 }
 
 sealed class TableNode(open val id: String, var duration: Duration = Duration.ClosedInterval(1, 1, false)) {
-    abstract val automataStates: List<State.AutomatonState>
+    //abstract val automataStates: List<TableRow.AutomatonState>
 
     abstract fun count(): Int
-    abstract fun flat(): List<State>
+    abstract fun flat(): List<TableRow>
     abstract fun depth(): Int
 }
 
 data class Region(override val id: String,
                   var children: MutableList<TableNode> = arrayListOf()) : TableNode(id) {
 
-    override val automataStates: List<State.AutomatonState> by lazy {
-        val seq = java.util.ArrayList<State.AutomatonState>(100)
+    /*override val automataStates: List<TableRow.AutomatonState> by lazy {
+        val seq = java.util.ArrayList<TableRow.AutomatonState>(100)
         flat().forEach { state -> seq.addAll(state.automataStates) }
         seq
-    }
+    }*/
 
-    constructor(id: Int) : this("" + id)
+    constructor(id: Int) : this("$id")
 
     override fun count(): Int = this.children.sumBy { it.count() }
-    override fun flat(): List<State> = this.children.flatMap { a -> a.flat() }
+    override fun flat(): List<TableRow> = this.children.flatMap { a -> a.flat() }
     override fun depth() = 1 + (this.children.maxBy { it.depth() }?.depth() ?: 0)
 }
 
-data class State(override val id: String,
-                 val rawFields: MutableMap<ProgramVariable, TestTableLanguageParser.CellContext?>
-                 = linkedMapOf()) : TableNode(id) {
+data class TableRow(override val id: String) : TableNode(id) {
+    val rawFields: MutableMap<ProgramVariable, TestTableLanguageParser.CellContext?> = linkedMapOf()
 
     /** Input constraints as list. */
-    val inputExpr: MutableList<SMVExpr> = arrayListOf()
+    val inputExpr: MutableMap<String, SMVExpr> = hashMapOf()
 
     /** Output constraints as list. */
-    val outputExpr: MutableList<SMVExpr> = arrayListOf()
+    val outputExpr: MutableMap<String, SMVExpr> = hashMapOf()
 
-    /** incoming states */
-    val incoming: MutableSet<State> = HashSet()
+    /** incoming rowStates */
+    val incoming: MutableSet<TableRow> = HashSet()
 
-    /** outgoing states */
-    val outgoing: MutableSet<State> = HashSet()
+    /** outgoing rowStates */
+    val outgoing: MutableSet<TableRow> = HashSet()
 
-    val defOutput = SVariable("s${id}_out", SMVTypes.BOOLEAN)
-    val defForward = SVariable("s${id}_fwd", SMVTypes.BOOLEAN)
-    val defFailed = SVariable("s${id}_fail", SMVTypes.BOOLEAN)
-    val defInput = SVariable("s${id}_in", SMVTypes.BOOLEAN)
+    val defOutput = SVariable("${id}_out", SMVTypes.BOOLEAN)
+    val defForward = SVariable("${id}_fwd", SMVTypes.BOOLEAN)
+    val defFailed = SVariable("${id}_fail", SMVTypes.BOOLEAN)
+    val defInput = SVariable("${id}_in", SMVTypes.BOOLEAN)
 
     /**
      * The predicate that allows keeping in this state.
      * Only necessary iff duration has progress flag.
      */
-    val defKeep = SVariable("s${id}_keep", SMVTypes.BOOLEAN)
+    val defProgress = SVariable("${id}_keep", SMVTypes.BOOLEAN)
 
     /**
      * name of runs to pause in that specific state.
      */
     var pauseProgramRuns: MutableList<Int> = arrayListOf()
 
-    override val automataStates: MutableList<AutomatonState> = ArrayList()
+    /*override val automataStates: MutableList<AutomatonState> = ArrayList()
         get() {
             if (field.isEmpty()) {
                 val duration = duration
@@ -351,32 +362,16 @@ data class State(override val id: String,
             assert(field.size != 0)
             return field
         }
+    */
 
     var isInitialReachable: Boolean = false
     var isEndState: Boolean = false
 
     constructor(id: Int) : this(id.toString())
 
-    /*
-    fun add(v: ProgramVariable, e: SMVExpr) {
-        val a = if (v.io == IoVariableType.INPUT || v.io == IoVariableType.STATE_INPUT) inputExpr else outputExpr
-        a.add(e)
-    }
-    */
-
-    override fun count(): Int {
-        return 1
-    }
-
-    override fun flat(): List<State> {
-        val l = LinkedList<State>()
-        l.add(this)
-        return l
-    }
-
-    override fun depth(): Int {
-        return 0
-    }
+    override fun count(): Int = 1
+    override fun flat(): List<TableRow> = listOf(this)
+    override fun depth(): Int = 0
 
     fun generateSmvExpression(vc: ParseContext) {
         inputExpr.clear()
@@ -395,69 +390,18 @@ data class State(override val id: String,
         }
         rawFields.putAll(new)
 
-        inputExpr.addAll(GetetaFacade.exprsToSMV(vc, new.filter { it.key.isInput }))
-        outputExpr.addAll(GetetaFacade.exprsToSMV(vc, new.filter { it.key.isOutput }))
+        inputExpr.putAll(
+                GetetaFacade.exprsToSMV(vc, new.filter { it.key.isInput })
+        )
+        outputExpr.putAll(GetetaFacade.exprsToSMV(vc, new.filter { it.key.isOutput }))
 
-        pauseProgramRuns.forEach {
-            val pauseFalse = SLiteral.TRUE equal vc.getSMVVariable(it, VARIABLE_PAUSE)
-
-        }
-
-    }
-
-    inner class AutomatonState(private val position: Int, private val name: String) {
-        val incoming: MutableSet<AutomatonState> = HashSet()
-        val outgoing: MutableSet<AutomatonState> = HashSet()
-
-        constructor(count: Int) : this(count, "${State@ id}_$id")
-
-        val isOptional: Boolean
-            get() {
-                val duration = duration
-                return when (duration) {
-                    is Duration.Omega -> false
-                    is Duration.ClosedInterval -> position >= duration.lower
-                    is Duration.OpenInterval -> position >= duration.lower
-                }
+        if (vc.relational)
+            vc.programRuns.mapIndexed { i, s ->
+                val pexpr = if (i in pauseProgramRuns)
+                    vc.getSMVVariable(i, VARIABLE_PAUSE)
+                else vc.getSMVVariable(i, VARIABLE_PAUSE).not()
+                inputExpr.put(VARIABLE_PAUSE, pexpr)
             }
 
-        val isFirst: Boolean
-            get() = position == 1
-
-        val state: State
-            get() = this@State
-
-        val smvVariable: SVariable = SVariable.create("s_$name").asBool()
-
-        val defForward: SVariable = SVariable.create("s_${name}_fwd").asBool()
-
-        val defFailed: SVariable = SVariable.create("s_${name}_fail").asBool()
-
-        /**
-         * Returns true iff this is the automaton state that can infinitely repeated.
-         *
-         * @return
-         */
-        val isUnbounded: Boolean
-            get() {
-                val duration = duration
-                return when (duration) {
-                    is Duration.Omega -> true
-                    is Duration.ClosedInterval -> false
-                    is Duration.OpenInterval -> position == duration.lower
-                }
-            }
-
-        val isStartState: Boolean
-            get() = isInitialReachable && isFirst
-
-        val isEndState: Boolean
-            get() = if (outgoing.isEmpty()) {
-                true //TODO check for omega?
-            } else {
-                outgoing.stream()
-                        .map { s -> s.isEndState || s.isOptional }
-                        .reduce { a, b -> a or b }.orElse(false)
-            }
     }
 }

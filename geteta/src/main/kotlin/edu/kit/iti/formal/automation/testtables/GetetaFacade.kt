@@ -1,17 +1,24 @@
 package edu.kit.iti.formal.automation.testtables
 
 
+import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration
 import edu.kit.iti.formal.automation.testtables.algorithms.BinaryModelGluer
 import edu.kit.iti.formal.automation.testtables.algorithms.DelayModuleBuilder
+import edu.kit.iti.formal.automation.testtables.builder.AutomataTransformerState
+import edu.kit.iti.formal.automation.testtables.builder.AutomatonBuilderPipeline
+import edu.kit.iti.formal.automation.testtables.builder.SmvConstructionPipeline
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.io.*
 import edu.kit.iti.formal.automation.testtables.model.*
+import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
+import edu.kit.iti.formal.automation.testtables.viz.CounterExampleAnalyzer
+import edu.kit.iti.formal.automation.testtables.viz.Mapping
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
@@ -48,21 +55,22 @@ object GetetaFacade {
 
     fun createParser(input: String) = createParser(CharStreams.fromString(input))
 
-    fun parseCell(cell: String): TestTableLanguageParser.CellContext =
-            createParser(cell).cell()!!
+    fun parseCell(cell: String, enableRelational: Boolean = true): TestTableLanguageParser.CellContext =
+            createParser(cell).also { it.relational = true }.cell()!!
 
-    fun exprToSMV(cell: String, column: SVariable, programRun: Int, vars: ParseContext): SMVExpr = exprToSMV(parseCell(cell), column, programRun, vars)
+    fun exprToSMV(cell: String, column: SVariable, programRun: Int, vars: ParseContext): SMVExpr = exprToSMV(parseCell(cell, vars.relational),
+            column, programRun, vars)
 
     fun exprToSMV(cell: TestTableLanguageParser.CellContext, column: SVariable,
                   programRun: Int, vars: ParseContext): SMVExpr {
         val ev = ExprVisitor(column, programRun, vars)
         val expr = cell.accept(ev)
-        Report.debug("parsed: %s to %s", cell, expr)
+        Console.debug("parsed: %s to %s", cell, expr)
         return expr
     }
 
     fun parseDuration(duration: String): Duration {
-        if (duration == "wait")//old style
+        if (duration == "wait")//old attributes
             return Duration.OpenInterval(0, true)
         val parser = createParser(duration)
         val p = parser.time()
@@ -95,10 +103,11 @@ object GetetaFacade {
         return ttlb.testTables.get(0)
     }
 
-    fun exprsToSMV(vc: ParseContext, constraints: Map<ProgramVariable, TestTableLanguageParser.CellContext>)
-            : Collection<SMVExpr> = constraints.map { (t, u) ->
-        exprToSMV(u, vc.getSMVVariable(t.programRun, t.name), t.programRun, vc)
-    }
+    fun exprsToSMV(vc: ParseContext,
+                   constraints: Map<ProgramVariable, TestTableLanguageParser.CellContext>)
+            : Map<String, SMVExpr> = constraints.map { (t, u) ->
+        t.name to exprToSMV(u, vc.getSMVVariable(t.programRun, t.name), t.programRun, vc)
+    }.toMap()
 
     fun delay(ref: SReference): DelayModuleBuilder {
         return DelayModuleBuilder(ref.variable,
@@ -106,7 +115,7 @@ object GetetaFacade {
     }
 
 
-    fun glue(modTable: SMVModule, tableType: ModuleType,
+    fun glue(modTable: SMVModule, tableType: SMVType,
              modCode: List<SMVModule>, programRunNames: List<String>, options: TableOptions): SMVModule {
         val mg = BinaryModelGluer(options, modTable, tableType, modCode, programRunNames)
         mg.run()
@@ -126,15 +135,17 @@ object GetetaFacade {
         return variable.name + "__history"
     }
 
-    fun runNuXMV(tableFilename: String,
+    fun runNuXMV(folder: String,
                  modules: List<SMVModule>, vt: VerificationTechnique): NuXMVOutput {
-        val outputFolder = File(tableFilename)
+        val outputFolder = File(folder)
+        outputFolder.mkdirs()
         val moduleFile = File(outputFolder, "modules.smv")
         moduleFile.bufferedWriter().use { w ->
             val p = SMVPrinter(PrintWriter(w))
             modules.forEach { it.accept(p) }
         }
         val adapter = NuXMVProcess(moduleFile)
+        adapter.executablePath = System.getenv("NUXMV") ?: "nuXmv"
         adapter.workingDirectory = outputFolder
         adapter.commands = vt.commands
         return adapter.call()
@@ -177,6 +188,32 @@ object GetetaFacade {
         s.append("\n}")
         return s.toString()
     }
+
+    /**
+     * Read XML or DSL format.
+     */
+    fun readTable(file: File): GeneralizedTestTable {
+        return if (file.name.endsWith("xml"))
+            parseTableXML(file.absolutePath)
+        else
+            parseTableDSL(file)
+    }
+
+    fun constructTable(table: GeneralizedTestTable) =
+            AutomatonBuilderPipeline(table).transform()
+
+    fun constructSMV(table: GeneralizedTestTable, superEnum: EnumType) =
+            SmvConstructionPipeline(constructTable(table), superEnum).transform()
+
+    fun constructSMV(automaton: AutomataTransformerState, superEnum: EnumType) =
+            SmvConstructionPipeline(automaton, superEnum).transform()
+
+    fun analyzeCounterExample(automaton: TestTableAutomaton, testTable: GeneralizedTestTable, counterExample: CounterExample): MutableList<Mapping> {
+        val analyzer = CounterExampleAnalyzer(automaton, testTable, counterExample)
+        analyzer.run()
+        return analyzer.rowMapping
+    }
+
 
 /*
     private class SuperEnumCreator : AstVisitor<Unit?>() {

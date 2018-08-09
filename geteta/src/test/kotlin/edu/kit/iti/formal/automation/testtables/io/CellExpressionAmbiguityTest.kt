@@ -35,9 +35,9 @@ class CellExpressionAmbiguityTest {
 
     @Test
     fun testBoolean() {
-        val `var` = SVariable.create("a").asBool()
+        val v = SVariable.create("a").asBool()
         Assert.assertEquals(
-                SLiteral.TRUE.equal(`var`),
+                SLiteral.TRUE.equal(v),
                 parse("TRUE")
         )
     }
@@ -45,7 +45,7 @@ class CellExpressionAmbiguityTest {
     @Test
     fun testReference() {
         Assert.assertEquals(
-                SVariable.create("b__history._$2").withUnsigned(16)
+                SVariable.create("_0\$b__history._$2").withUnsigned(16)
                         .equal(defaultVar()),
                 parse("b[-2]")
         )
@@ -54,7 +54,8 @@ class CellExpressionAmbiguityTest {
 
     @Test(expected = ProgramAbortionException::class)
     fun testInvalidReferencePositive() {
-        GetetaFacade.exprToSMV("b[2]", SVariable.create("a").asBool(), 0, pc)
+        GetetaFacade.exprToSMV("b[2]",
+                SVariable.create("a").asBool(), 0, pc)
     }
 
 

@@ -53,20 +53,29 @@ class CellExpressionTest(private var expr: String) {
     }
 
     companion object {
-        internal fun defaultTestTable(): GeneralizedTestTable {
+        internal fun defaultTestTable(run: Int = 0): GeneralizedTestTable {
             val gtt = GeneralizedTestTable()
-            gtt.add(iovar("a", "input"))
-            gtt.add(iovar("b", "input"))
-            gtt.add(iovar("c", "input"))
-            gtt.add(iovar("d", "input"))
+            gtt.add(iovar("a", "input", run))
+            gtt.add(iovar("a", "input", 1))
+            gtt.add(iovar("b", "input", run))
+            gtt.add(iovar("c", "input", run))
+            gtt.add(iovar("d", "input", run))
+            gtt.ensureProgramRuns()
             return gtt
         }
 
-        private fun iovar(name: String, io: String) =
+        private fun iovar(name: String, io: String, run: Int) =
                 ProgramVariable(name, INT, SMVTypes.signed(16),
-                        if (io == "input") IoVariableType.INPUT else IoVariableType.OUTPUT)
+                        if (io == "input") IoVariableType.INPUT else IoVariableType.OUTPUT,
+                        run)
 
-        val CASES = arrayOf(">2", "<52152343243214234", "!=6", "<>-16134", "-243261", "a", "a+b", "(a)+(((b+c)+d))/2", "convert(a,2)", "TRUE", "true", "false", "FALSE", "a[-5]", "[2+2, 6]", "[-61+2, -61]")
+        val CASES = arrayOf(">2",
+                "<52152343243214234", "!=6", "<>-16134", "-243261", "a",
+                "a+b", "(a)+(((b+c)+d))/2", "convert(a,2)", "TRUE", "true", "false",
+                "FALSE", "a[-5]", "[2+2, 6]", "[-61+2, -61]",
+                "0|>a", "0\$a + |>a", "·"
+        )
+
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
         fun genTests(): List<Array<Any>> {

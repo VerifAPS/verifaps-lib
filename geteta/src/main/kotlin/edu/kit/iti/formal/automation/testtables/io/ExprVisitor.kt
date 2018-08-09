@@ -151,16 +151,22 @@ class ExprVisitor(private val columnVariable: SVariable,
     }
 
     override fun visitVariable(ctx: TestTableLanguageParser.VariableContext): SMVExpr {
-        val programRun = if (ctx.RV_SEPARATOR() == null) {
-            columnProgramRun
-        } else {
-            ctx.INTEGER().text.toInt()
+        val programRun = when {
+            ctx.RV_SEPARATOR() == null -> columnProgramRun
+            ctx.INTEGER() != null -> ctx.INTEGER().text.toInt()
+            else -> columnProgramRun?.let { 1 - it } // other run
         }
-        val varText = ctx.IDENTIFIER().text
+
+        val varText =
+                if (ctx.RV_SEPARATOR() != null && ctx.IDENTIFIER() == null)
+                    columnVariable.name
+                else
+                    ctx.IDENTIFIER().text
+
         val isReference = ctx.RBRACKET() != null
 
-        return if (varText in context) {
-            val variable = context.getSMVVariable(programRun, varText)!!
+        return if ( varText in context) {
+            val variable = context.getSMVVariable(programRun, varText)
             if (isReference)
                 context.getReference(variable, Integer.parseInt(ctx.i().text))
             else

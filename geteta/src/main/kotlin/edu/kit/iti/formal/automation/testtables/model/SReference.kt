@@ -20,8 +20,8 @@
 package edu.kit.iti.formal.automation.testtables.model
 
 
+import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.io.Report
 import edu.kit.iti.formal.smv.ast.SVariable
 
 /**
@@ -30,8 +30,8 @@ import edu.kit.iti.formal.smv.ast.SVariable
 class SReference(var cycles: Int, var variable: SVariable) {
     init {
         if (cycles >= 0) {
-            Report.fatal("Only support for negative reference (looking backwards).")
-            Report.abort()
+            Console.fatal("Only support for negative reference (looking backwards).")
+            System.exit(0)
         }
     }
 

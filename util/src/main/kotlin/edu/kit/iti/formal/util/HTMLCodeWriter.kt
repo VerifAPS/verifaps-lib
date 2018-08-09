@@ -78,7 +78,7 @@ class HTMLCodeWriter : CodeWriter() {
                 + "    <link rel=\"stylesheet/less\" type=\"text/css\" href=\"style.less\"/>\n"
                 + "    <script src=\"less.js\"></script>" + "    <link href=\"style.css\"/>" + "<style>" + ""
                 + "</style>" + "</head>\n" + "<body>")
-        append(s)
+        printf(s)
         return this
     }
 
@@ -107,17 +107,17 @@ class HTMLCodeWriter : CodeWriter() {
 
 
     fun seperator(s: String): HTMLCodeWriter {
-        span(Sections.SEPARATOR).append(s)
+        span(Sections.SEPARATOR).printf(s)
         return this.end()
     }
 
 
     fun variable(variable: String): HTMLCodeWriter {
         if (variable.contains("$")) {
-            span(Sections.SPECIAL_VARIABLE).span(Sections.VARIABLE).append(variable)
+            span(Sections.SPECIAL_VARIABLE).span(Sections.VARIABLE).printf(variable)
             return this.end().end()
         }
-        span(Sections.VARIABLE).append(variable)
+        span(Sections.VARIABLE).printf(variable)
         return this.end()
     }
 
@@ -128,13 +128,13 @@ class HTMLCodeWriter : CodeWriter() {
 
 
     fun type(baseTypeName: String?): HTMLCodeWriter {
-        span(Sections.TYPE_NAME).append(baseTypeName ?: "<<<null>>>")
+        span(Sections.TYPE_NAME).printf(baseTypeName ?: "<<<null>>>")
         return this.end()
     }
 
 
     fun operator(s: String): HTMLCodeWriter {
-        span(Sections.OPERATOR).append(s)
+        span(Sections.OPERATOR).printf(s)
         return this.end()
     }
 }

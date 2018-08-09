@@ -3,9 +3,14 @@ grammar TestTableLanguage;
 @header{
 }
 
+@members {
+    public boolean relational = false;
+}
+
 //structure level
 file  : table*;
-table : 'table' IDENTIFIER '{'
+table : (r='relational' {relational=true;})?
+        'table' IDENTIFIER '{'
             signature*
             freeVariable*
             opts?
@@ -22,17 +27,18 @@ signature : 'var' state='state'? io=('input'|'output')
 ;
 
 variableDefinition :
-        INTEGER RV_SEPARATOR  n=IDENTIFIER ('as' newName=IDENTIFIER)? #variableAliasDefinition
-      | n=IDENTIFIER ('of' INTEGER+ )? #variableRunsDefinition
+        {!relational}? n=IDENTIFIER ('as' newName=IDENTIFIER)? #variableAliasDefinitionSimple
+      | {relational}? INTEGER RV_SEPARATOR  n=IDENTIFIER ('as' newName=IDENTIFIER)? #variableAliasDefinitionRelational
+      | {relational}? n=IDENTIFIER ('of' INTEGER+) #variableRunsDefinition
 ;
 
 osem : ';'?;
 
-group : 'group' (id=i)? time? '{' (group|row)* '}';
+group : 'group' (id=IDENTIFIER|idi=i)? time? '{' (group|row)* '}';
 
-row : 'row' (id=i)? time? '{' (pause osem) (kc osem)* '}';
-kc: (INTEGER RV_SEPARATOR) IDENTIFIER ':' value=cell;
-pause: 'pause' INTEGER+;
+row : 'row' (id=IDENTIFIER|idi=i)? time? '{' (pause osem)? (kc osem)* '}';
+kc: ({relational}? INTEGER RV_SEPARATOR)? IDENTIFIER ':' value=cell;
+pause: {relational}? 'pause' INTEGER+;
 
 time :
       MINUS (pflag='>>')? #timeDontCare
@@ -113,7 +119,8 @@ expr
 ;
 
 variable:
-       (INTEGER RV_SEPARATOR)? IDENTIFIER (LBRACKET i RBRACKET)?
+    IDENTIFIER (LBRACKET i RBRACKET)?
+    | {relational}? INTEGER? RV_SEPARATOR IDENTIFIER? (LBRACKET i RBRACKET)?
 ;
 
 // if

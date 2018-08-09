@@ -31,6 +31,8 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
         testTables += current
         current.name = ctx.IDENTIFIER().text
         visitChildren(ctx)
+
+        current.options.relational = ctx.r != null
     }
 
     override fun visitGroup(ctx: TestTableLanguageParser.GroupContext) {
@@ -57,11 +59,20 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
 
         ctx.variableDefinition().forEach {
             when (it) {
-                is TestTableLanguageParser.VariableAliasDefinitionContext -> {
+                is TestTableLanguageParser.VariableAliasDefinitionSimpleContext -> {
                     val newName: String? = it.newName?.text
                     val realName = it.n.text
-                    val programRun = if (it.RV_SEPARATOR() != null)
-                        it.INTEGER().text.toInt() else 0
+                    val v = ProgramVariable(realName, dt, lt, type)
+                    if (newName != null) {
+                        v.realName = v.name
+                        v.name = newName
+                    }
+                    current.add(v)
+                }
+                is TestTableLanguageParser.VariableAliasDefinitionRelationalContext -> {
+                    val newName: String? = it.newName?.text
+                    val realName = it.n.text
+                    val programRun = it.INTEGER().text.toInt()
                     val v = ProgramVariable(realName, dt, lt, type, programRun)
                     if (newName != null) {
                         v.realName = v.name
@@ -98,7 +109,7 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBa
     var currentId = 0
 
     override fun visitGroup(ctx: TestTableLanguageParser.GroupContext): Region {
-        val id = ctx.id?.text?.toInt() ?: ++currentId
+        val id = ctx.id?.text ?: "g"+(ctx.idi?.text?.toInt() ?: ++currentId)
         val r = Region(id)
         if (ctx.time() != null)
             r.duration = ctx.time().accept(TimeParser())
@@ -111,9 +122,9 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBa
     }
 
 
-    override fun visitRow(ctx: TestTableLanguageParser.RowContext): State {
-        val id = ctx.id?.text?.toInt() ?: ++currentId;
-        val s = State(id)
+    override fun visitRow(ctx: TestTableLanguageParser.RowContext): TableRow {
+        val id = ctx.id?.text ?: "r"+(ctx.idi?.text?.toInt() ?: ++currentId)
+        val s = TableRow(id)
         s.duration = ctx.time()?.accept(TimeParser()) ?: Duration.ClosedInterval(1, 1)
         ctx.kc().forEach {
             val name = it.IDENTIFIER().text

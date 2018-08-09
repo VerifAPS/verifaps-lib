@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.testtables.algorithms
 import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.Region
-import edu.kit.iti.formal.automation.testtables.model.State
+import edu.kit.iti.formal.automation.testtables.model.TableRow
 import java.util.*
 
 /**
@@ -30,7 +30,7 @@ import java.util.*
  * @version 1 (01.02.18)
  */
 class OmegaSimplifier(val product: GeneralizedTestTable) : Runnable {
-    val ignored = ArrayList<State>()
+    val ignored = ArrayList<TableRow>()
     private var abort = false
 
     override fun run() {
@@ -40,7 +40,7 @@ class OmegaSimplifier(val product: GeneralizedTestTable) : Runnable {
 
     /**
      * Traverse and copy the tree structure until an \omega appeares as duration, then
-     * keep traversing but do not copy. The states are capture to [.ignored]
+     * keep traversing but do not copy. The rowStates are capture to [.ignored]
      *
      * @param region
      * @return
@@ -51,13 +51,13 @@ class OmegaSimplifier(val product: GeneralizedTestTable) : Runnable {
             if (abort) {
                 when (state) {
                     is Region -> recur(state)
-                    else -> ignored.add(state as State)
+                    else -> ignored.add(state as TableRow)
                 }
             } else {
                 when (state) {
                     is Region ->
                         newRegion.children.add(recur(state as Region))
-                    is State ->
+                    is TableRow ->
                         newRegion.children.add(state)
                 }
                 if (state.duration === Duration.Omega) abort = true

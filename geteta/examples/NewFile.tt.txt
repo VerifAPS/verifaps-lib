@@ -5,16 +5,16 @@ table Ta {
     gvar XX : BOOL with [2,10]
     
     
-    group 0 [1, 1] {
-        row 1 [1, 1]{
-            sensor: 1
-            actuator: true
+    group R [1, 1] {
+        row A {
+            sensor: 1;
+            actuator: true;
         }
-        row 2 [1, 5]{
+        row B [1, 5]{
             sensor: 1
             actuator: sensor*2
         }
-        row 3 >= 0{
+        row C >=0 {
             sensor: =prev(actuator)
             actuator: =SEL(TRUE,FALSE,TRUE)
         }

@@ -299,6 +299,9 @@ abstract class SMVExpr : SMVAst() {
     operator fun get(range: IntRange): SMVExpr {
         return bitAccess(range.start.toLong(), range.last.toLong())
     }
+
+    fun inNext(): SFunction =
+            SFunction("next", this)
     //endregion
 }
 

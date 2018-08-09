@@ -19,6 +19,6 @@
 
     <options>
         <option key="mode" value="CONCRETE_TABLE"/>
-        <option key="cycles.1" value="100"/>
+        <option key="cycles.s01" value="100"/>
     </options>
 </test-table>

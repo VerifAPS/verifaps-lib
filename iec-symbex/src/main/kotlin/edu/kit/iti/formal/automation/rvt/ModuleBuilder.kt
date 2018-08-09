@@ -39,7 +39,7 @@ import java.util.*
 class ModuleBuilder(val program: PouExecutable,
                     val finalState: SymbolicState) : Runnable {
 
-    val module = SMVModule("")
+    val module = SMVModule(program.name)
     //val vardeps: VariableDependency = VariableDependency(finalState)
     //private Map<VariableDeclaration, SVariable> vars = new HashMap<>();
 

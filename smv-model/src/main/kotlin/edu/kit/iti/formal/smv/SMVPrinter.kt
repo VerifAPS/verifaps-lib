@@ -27,6 +27,8 @@ import org.jetbrains.annotations.NotNull
 import java.io.*
 
 class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
+    val sort = true
+
     override fun visit(top: SMVAst) {
         throw IllegalArgumentException("not implemented for $top")
     }
@@ -137,11 +139,11 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
 
     private fun printSectionSingle(section: String, exprs: List<SMVExpr>) {
         if (!exprs.isEmpty()) {
-            stream.print(section);stream.print("\n")
+            stream.print(section)
+            stream.print("\n")
             stream.print("\t")
-            ;stream.print(
-                    SMVFacade.combine(SBinaryOperator.AND, exprs).accept(this)
-            );stream.print(";\n")
+            exprs.conjunction().accept(this)
+            stream.print(";\n")
         }
     }
 
@@ -157,7 +159,8 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
         }
     }
 
-    private fun printAssignments(func: String, assignments: List<SAssignment>) {
+    private fun printAssignments(func: String, a: List<SAssignment>) {
+        val assignments = if (sort) a.sortedBy { it.target.name } else a
         for ((target, expr) in assignments) {
             stream.print("\t")
             stream.print(func)
@@ -221,7 +224,11 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
         }
     }
 
-    private fun printVariables(type: String, vars: List<SVariable>) {
+    private fun printVariables(type: String, v: List<SVariable>) {
+        val vars =
+                if (sort) v.sorted()
+                else v
+
         if (vars.isNotEmpty()) {
             stream.print(type)
             stream.print('\n')

@@ -7,7 +7,6 @@ import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.builtin.BuiltinLoader
-import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.smv.NuXMVInvariantsCommand
@@ -17,7 +16,6 @@ import edu.kit.iti.formal.smv.ast.SMVModule
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import java.io.File
-import java.nio.charset.Charset
 
 
 /**
@@ -160,12 +158,7 @@ class TransformationPipeline(var diableST0: Boolean = false) {
     }
 
     fun run(filename: String): SMVModule {
-        var elements: PouElements =
-                if (filename.endsWith(".xml")) {
-                    IECXMLFacade.readPLCOpenXml(filename)
-                } else {
-                    IEC61131Facade.file(File(filename))
-                }
+        var elements: PouElements = IEC61131Facade.file(File(filename))
         return run(elements)
     }
 

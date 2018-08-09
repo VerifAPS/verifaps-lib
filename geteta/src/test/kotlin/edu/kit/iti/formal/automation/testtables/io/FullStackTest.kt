@@ -19,7 +19,8 @@
  */
 package edu.kit.iti.formal.automation.testtables.io
 
-import edu.kit.iti.formal.automation.testtables.GetetaApp
+import edu.kit.iti.formal.automation.testtables.apps.Geteta
+import edu.kit.iti.formal.automation.testtables.apps.GetetaApp
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,6 +38,12 @@ class FullStackTest(
         var workingDir: String,
         var args: Array<String>,
         var status: String) {
+
+    @Test
+    fun testIntern() {
+        GetetaApp().main(args)
+    }
+
     @Test
     @Throws(IOException::class, InterruptedException::class)
     fun testExtern() {
@@ -45,16 +52,11 @@ class FullStackTest(
                 File.separator + "bin" +
                 File.separator + "java"
         val classpath = System.getProperty("java.class.path")
-        val className = GetetaApp::class.java.canonicalName
+        val className = Geteta::class.java.canonicalName
 
 
-        val commands = ArrayList<String>()
-        commands.add(javaBin)
-        commands.add("-cp")
-        commands.add(classpath)
-        commands.add(className)
+        val commands = arrayListOf(javaBin, "-cp", classpath, className)
         commands.addAll(Arrays.asList(*args))
-
         println(commands.stream().reduce { a, b -> "$a $b" }.get())
 
         val builder = ProcessBuilder(commands)
@@ -69,8 +71,8 @@ class FullStackTest(
         process.errorStream.copyTo(System.err)
 
         Assert.assertEquals(0, process.exitValue().toLong())
-        val lines = output.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        Assert.assertEquals("STATUS: " + status, lines[lines.size - 1])
+        println(output)
+        Assert.assertTrue(output.endsWith("STATUS: $status"))
     }
 
     companion object {
@@ -100,7 +102,8 @@ class FullStackTest(
         }
 
         private fun addCase(wd: String, status: String, args: String) {
-            CASES.add(arrayOf(wd, args.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray(), status))
+            CASES.add(arrayOf(wd, args.split(" ".toRegex())
+                    .dropLastWhile { it.isEmpty() }.toTypedArray(), status))
         }
 
         @JvmStatic

@@ -134,8 +134,8 @@ class TableReader(private val input: File) {
         return r
     }
 
-    private fun translateStep(step: Step): State {
-        val s = State(stepNumber++)
+    private fun translateStep(step: Step): TableRow {
+        val s = TableRow("s%02d".format(stepNumber++))
         val cells = step.any.map { Element::class.java.cast(it) }
 
         for (i in 0 until product.programVariables.size) {

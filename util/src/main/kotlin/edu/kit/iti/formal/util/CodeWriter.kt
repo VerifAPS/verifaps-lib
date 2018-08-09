@@ -15,7 +15,7 @@ open class CodeWriter(var stream: Writer = StringWriter())
 
     var uppercaseKeywords = true
     var ident = "    "
-    var identDepth = 0
+    protected var identDepth = 0
 
     fun write(x: String): CodeWriter {
         stream.write(x)
@@ -40,7 +40,7 @@ open class CodeWriter(var stream: Writer = StringWriter())
     }
 
     open fun keyword(keyword: String): CodeWriter {
-        return append(if (uppercaseKeywords) keyword.toUpperCase() else keyword.toLowerCase())
+        return printf(if (uppercaseKeywords) keyword.toUpperCase() else keyword.toLowerCase())
     }
 
     fun nl(): CodeWriter {
@@ -49,17 +49,20 @@ open class CodeWriter(var stream: Writer = StringWriter())
         return this
     }
 
-    fun append(vararg args: Any): CodeWriter {
+    fun println(arg: String): CodeWriter = print(arg).nl()
+    fun print(args: String): CodeWriter = write(args)
+
+    fun print(vararg args: Any): CodeWriter {
         args.forEach { write(it.toString()) }
         return this
     }
 
-    fun append(fmt: String, vararg args: Any): CodeWriter {
+    fun printf(fmt: String, vararg args: Any): CodeWriter {
         return write(String.format(fmt, *args))
     }
 
     fun block(text: String = "", nl: Boolean = false, function: CodeWriter.() -> Unit): CodeWriter {
-        append(text)
+        printf(text)
         if (nl) nl()
         increaseIndent()
         function()
@@ -70,7 +73,7 @@ open class CodeWriter(var stream: Writer = StringWriter())
 
 
     fun appendReformat(text: String): CodeWriter {
-        text.splitToSequence('\n').forEach { nl().append(it) }
+        text.splitToSequence('\n').forEach { nl().printf(it) }
         return this
     }
 }

@@ -13,7 +13,7 @@ import java.util.*
  */
 class DSLTablePrinter(val stream: CodeWriter) {
     fun print(gtt: GeneralizedTestTable) {
-        stream.append("table ${gtt.name} {")
+        stream.printf("table ${gtt.name} {")
         stream.increaseIndent()
         gtt.programVariables.forEach(this::print)
         stream.nl()
@@ -25,11 +25,11 @@ class DSLTablePrinter(val stream: CodeWriter) {
         stream.nl()
         gtt.functions.forEach(this::print)
 
-        stream.decreaseIndent().nl().append("}")
+        stream.decreaseIndent().nl().printf("}")
     }
 
     fun print(v: ProgramVariable) {
-        stream.nl().append("var ").append(
+        stream.nl().printf("var ").printf(
                 when (v.io) {
                     IoVariableType.INPUT -> "input "
                     IoVariableType.OUTPUT -> "output "
@@ -38,47 +38,47 @@ class DSLTablePrinter(val stream: CodeWriter) {
                 })
 
         if (v.realName == v.name) {
-            stream.append(v.name).append(" : ").append(v.dataType)
+            stream.printf(v.name).printf(" : ").print(v.dataType)
         } else {
-            stream.append(v.realName).append(" : ").append(v.dataType).append(" as ")
-                    .append(v.name)
+            stream.printf(v.realName).printf(" : ").print(v.dataType).printf(" as ")
+                    .printf(v.name)
         }
     }
 
     fun print(v: ConstraintVariable) {
-        stream.nl().append("gvar ").append(v.name).append(" : ").append(v.dataType)
+        stream.nl().printf("gvar ").printf(v.name).printf(" : ").print(v.dataType)
         if (v.constraint != null) {
-            stream.append(" with ").append(v.constraint!!.text)
+            stream.printf(" with ").printf(v.constraint!!.text)
         }
     }
 
     fun print(p: Properties) {
         if (p.isEmpty) return
-        stream.nl().append("options {").increaseIndent()
+        stream.nl().printf("options {").increaseIndent()
         p.forEach { t, u ->
-            stream.nl().append("$t = $u")
+            stream.nl().printf("$t = $u")
         }
-        stream.nl().decreaseIndent().append("}")
+        stream.nl().decreaseIndent().printf("}")
     }
 
     fun print(r: TableNode) {
         stream.nl()
         when (r) {
             is Region -> {
-                stream.append("group ${r.id} ")
+                stream.printf("group ${r.id} ")
                 print(r.duration)
-                stream.append(" {").increaseIndent()
+                stream.printf(" {").increaseIndent()
                 r.children.forEach { print(it) }
-                stream.decreaseIndent().nl().append("}")
+                stream.decreaseIndent().nl().printf("}")
             }
-            is State -> {
-                stream.append("row ${r.id} ")
+            is TableRow -> {
+                stream.printf("row ${r.id} ")
                 print(r.duration)
-                stream.append("{").increaseIndent()
+                stream.printf("{").increaseIndent()
                 r.rawFields
                         .filter { (_, u) -> u != null }
-                        .forEach { (t, u) -> stream.nl().append("${t.name}: ${u?.text}") }
-                stream.decreaseIndent().nl().append("}")
+                        .forEach { (t, u) -> stream.nl().printf("${t.name}: ${u?.text}") }
+                stream.decreaseIndent().nl().printf("}")
             }
         }
     }

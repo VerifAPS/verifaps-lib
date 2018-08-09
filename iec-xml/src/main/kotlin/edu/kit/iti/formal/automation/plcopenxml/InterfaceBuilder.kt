@@ -26,19 +26,19 @@ object InterfaceBuilder : XMLTranslatorFind {
 
     private fun translateVars(vars: Element?, writer: CodeWriter, suffix: String = "") {
         if (vars == null) return
-        writer.nl().nl().append("VAR$suffix").block {
+        writer.nl().nl().printf("VAR$suffix").block {
             for (e in vars.getChildren("variable")) {
                 val name = e.getAttributeValue("name")
                 val datatype = VariableDeclXML.getDatatype(e.getChild("type"))
                 val initValue = VariableDeclXML.getInitialValue(e.getChild("initialValue"))
                 nl()
-                append("$name : $datatype")
+                printf("$name : $datatype")
                 if (initValue != null)
-                    append(":= $initValue")
-                append(";")
+                    printf(":= $initValue")
+                printf(";")
             }
         }
-        writer.nl().append("END_VAR")
+        writer.nl().printf("END_VAR")
     }
 
 }
