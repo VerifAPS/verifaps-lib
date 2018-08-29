@@ -36,9 +36,7 @@ abstract class AnyDt : Identifiable {
             TODO("not implemented")
         }
 
-        override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-            TODO("not implemented")
-        }
+        override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 
         init {
             name = "VOID"

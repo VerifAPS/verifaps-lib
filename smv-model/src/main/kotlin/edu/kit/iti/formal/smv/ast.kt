@@ -383,6 +383,8 @@ data class SVariable(var name: String) : SMVExpr(), Comparable<SVariable> {
         return SVariable.create("$module.$name").with(dataType)
     }
 
+    infix fun assignTo(expr: SMVExpr) = SAssignment(this, expr)
+
     class Builder(name: String) {
         internal var v = SVariable(name)
 

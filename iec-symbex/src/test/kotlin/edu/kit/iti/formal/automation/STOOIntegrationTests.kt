@@ -97,7 +97,7 @@ public class STOOIntegrationTests {
         Collections.sort(st1Actual);
         Collections.sort(st1Expected);
 
-        Assert.assertEquals(IEC61131Facade.INSTANCE.print(st1Expected), IEC61131Facade.INSTANCE.print(st1Actual));
+        Assert.assertEquals(IEC61131Facade.INSTANCE.printf(st1Expected), IEC61131Facade.INSTANCE.printf(st1Actual));
     }
 }
 */

@@ -93,6 +93,11 @@ class ParseContext(
     operator fun contains(varText: String) = vars.keys.any { it.name == varText }
 
     fun getSMVVariable(programRun: Int?, v: String): SVariable {
+        val globalVar = vars.keys.find { it.name == v }
+        if (globalVar != null && globalVar is ConstraintVariable) {
+            return getSMVVariable(globalVar)
+        }
+
         val va = if (programRun != null)
             vars.keys.find { it.name == v && (it as? ProgramVariable)?.programRun == programRun }
                     ?: throw IllegalArgumentException("Could not find a variable for $programRun|>$v in signature.")

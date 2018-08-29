@@ -11,14 +11,8 @@ import edu.kit.iti.formal.automation.st0.trans.CodeTransformation
 import edu.kit.iti.formal.automation.st0.trans.RealToInt
 import edu.kit.iti.formal.automation.st0.trans.STCodeTransformation
 import edu.kit.iti.formal.automation.visitors.Utils
-import edu.kit.iti.formal.smv.HistoryModuleBuilder
-import edu.kit.iti.formal.smv.ModuleType
-import edu.kit.iti.formal.smv.SMVPrinter
-import edu.kit.iti.formal.smv.SMVTypes
-import edu.kit.iti.formal.smv.ast.SAssignment
-import edu.kit.iti.formal.smv.ast.SMVExpr
-import edu.kit.iti.formal.smv.ast.SMVModule
-import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.smv.*
+import edu.kit.iti.formal.smv.ast.*
 import java.io.File
 import java.io.PrintWriter
 import java.math.BigInteger
@@ -41,6 +35,7 @@ object KastelDemonstrator {
 
         val program = Utils.findProgram(pous)!!
 
+        //Custom program transformation
         AssignmentDScratch.transform(
                 SeqParamsActiveStep.transform(TransformationState(program))
         )
@@ -49,6 +44,7 @@ object KastelDemonstrator {
 
         UsageFinder.markVariablesByUsage(simplified)
 
+        //Custom program transformation
         val t = MultiCodeTransformation(
                 RealToInt(),
                 RemoveVSObj,
@@ -66,26 +62,27 @@ object KastelDemonstrator {
                 "stHmiInt\$stReq\$stMan\$bStartVel",
                 flag = VariableDeclaration.INPUT)
 
-
         val simpFile = File(FOLDER, "Simplified.st")
         simpFile.bufferedWriter().use {
             IEC61131Facade.printTo(it, simplified, true)
         }
         Console.writeln("File $simpFile written")
 
-
-        //degrade INT with
+        //degrade INT width
         INT.bitLength = 7
 
         val module = SymbExFacade.evaluateProgram(simplified, true)
         val isHigh = { v: String ->
-            false //all equal //v.endsWith("Velocity")
+            val b = v.endsWith("Velocity")
+            Console.info("%35s %s", v, (if (b) "high" else "low"))
+            b
         }
-        val imb = IFModelBuilder(module, isHigh)
+        //val imb = IFModelBuilder(module, isHigh)
+        val imb = PrivacyModelBuilder(module, isHigh)
         imb.run()
 
 
-        val smvFile = File(FOLDER, "noif.smv")
+        val smvFile = File(FOLDER, "noif_${imb.historyLength}.smv")
         smvFile.bufferedWriter().use {
             imb.product.forEach { m -> m.accept(SMVPrinter(PrintWriter(it))) }
         }
@@ -100,6 +97,104 @@ object AssignmentDScratch : STCodeTransformation, AstMutableVisitor() {
             return StatementList()
         }
         return assignmentStatement
+    }
+}
+
+
+/**
+ * * Self composition, from two equal states
+ * * inserting information
+ * * forgetting information in [historyLength] cycles.
+ */
+class PrivacyModelBuilder(private val code: SMVModule,
+                          val isHigh: (String) -> Boolean,
+                          val historyLength: Int = 10) : Runnable {
+    val inputEqualVar = SVariable("inputEqual", SMVTypes.BOOLEAN)
+    val inputLowVar = SVariable("inputLow", SMVTypes.BOOLEAN)
+    val hmb = HistoryModuleBuilder("HistoryEqualInput", listOf(inputEqualVar), historyLength)
+    val main = SMVModule("main")
+    val product = arrayListOf(main, code, hmb.module)
+
+    override fun run() {
+        main.name = MAIN_MODULE
+
+        code.inputVars.addAll(code.moduleParameters)
+        code.moduleParameters.clear()
+
+        // forget starting state
+        code.initExpr.clear()
+        code.initAssignments.clear()
+
+        instantiateCode(FIRST_RUN)
+        instantiateCode(SECOND_RUN)
+
+        //equal starting state
+        main.initExpr.add(
+                code.stateVars
+                        .map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
+                        .conjunction())
+
+
+        val lowEqual = code.inputVars.filter { !isHigh(it.name) }
+                .map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
+                .reduce { a, b -> a and b }
+
+        val highEqual = code.inputVars.filter { isHigh(it.name) }
+                .map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
+                .reduce { a, b -> a and b }
+
+
+        //first phase, insert information
+        val inputLow = lowEqual
+        main.definitions.add(inputLowVar assignTo inputLow)
+
+        // equal output
+        val inputEqual = inputLowVar and highEqual
+        main.definitions.add(inputEqualVar assignTo inputEqual)
+
+        //Equality
+        val alwaysLowEqual = SVariable("__alwaysLowEqual", SMVTypes.BOOLEAN)
+        main.stateVars.add(alwaysLowEqual)
+        main.initAssignments.add(alwaysLowEqual assignTo SLiteral.TRUE)
+        main.nextAssignments.add(alwaysLowEqual assignTo (alwaysLowEqual and inputLowVar))
+
+
+        // History of Equal Inputs.
+        hmb.run()
+        val historyLowEq = SVariable("hInputEq", hmb.moduleType)
+        main.stateVars.add(historyLowEq)
+
+
+        val outV = code.definitions.map { it.target } + code.stateVars
+        val lowOutput = outV//.filter { !isHigh(it.name) }
+        /*val inputLowVar =          outV.filter { !isHigh(it.name) }
+                .map {
+                    it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
+                }
+                .reduce { a, b -> a and b }
+        */
+
+        val history = hmb.module.stateVars.map { it.inModule(historyLowEq.name) }
+        val premise = (history + inputEqualVar + alwaysLowEqual)
+                .reduce { acc: SMVExpr, sVariable: SMVExpr ->
+                    acc.and(sVariable)
+                }
+
+        lowOutput.forEach {
+            val eq = it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
+            main.invariantSpecs.add(premise implies eq)
+        }
+        //main.invariantSpecs.add( inputLowVar implies  inputLowVar)
+    }
+
+    private fun instantiateCode(nameOfRun: String) {
+        main.stateVars.add(SVariable(nameOfRun, ModuleType(code.name)))
+    }
+
+    companion object {
+        val SECOND_RUN = "snd"
+        val FIRST_RUN = "fst"
+        val MAIN_MODULE = "main"
     }
 }
 
@@ -130,13 +225,13 @@ class IFModelBuilder(private val code: SMVModule,
         // History of low inputs.
         hmb.run()
         val historyLowEq = SVariable("hLowEq", hmb.moduleType)
-        main.definitions.add(SAssignment(loweq, inputLow))
+        main.definitions.add(loweq assignTo inputLow)
         main.stateVars.add(historyLowEq)
 
 
         val outV = code.definitions.map { it.target } + code.stateVars
         val lowOutput = outV.filter { !isHigh(it.name) }
-        /*val stateLow =          outV.filter { !isHigh(it.name) }
+        /*val inputLowVar =          outV.filter { !isHigh(it.name) }
                 .map {
                     it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
                 }
@@ -152,7 +247,7 @@ class IFModelBuilder(private val code: SMVModule,
             val eq = it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
             main.invariantSpecs.add(premise implies eq)
         }
-        //main.invariantSpecs.add( inputLow implies  stateLow)
+        //main.invariantSpecs.add( inputLowVar implies  inputLowVar)
     }
 
     private fun instantiateCode(nameOfRun: String) {

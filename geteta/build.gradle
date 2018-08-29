@@ -5,9 +5,7 @@ plugins {
 }
 
 apply plugin: 'antlr'
-apply plugin: 'application'
 group = 'edu.kit.iti.formal'
-mainClassName = "edu.kit.iti.formal.automation.testtables.Geteta"
 
 description = """
     Generalized Test Table
@@ -125,14 +123,8 @@ task runapp(type: JavaExec) {
         args Eval.me(appArgs)
     }
 }
-task startScriptTTPrint(type: CreateStartScripts) {
-    description "Latex Printer for Test Tables"
-    classpath = startScripts.classpath
-    outputDir = startScripts.outputDir
-    mainClassName = 'edu.kit.iti.formal.automation.testtables.PrintTable'
-    applicationName = 'ttprint'
-}
-applicationDistribution.from(startScriptTTPrint) { into 'bin' }
+
+//applicationDistribution.from(startScriptTTPrint) { into 'bin' }
 
 
 test {

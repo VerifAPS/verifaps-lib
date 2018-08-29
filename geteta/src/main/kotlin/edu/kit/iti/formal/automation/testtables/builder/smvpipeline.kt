@@ -135,7 +135,8 @@ object RegisterDefines : SmvConstructionTransformer {
                     .map { it.defInput }
                     .disjunction()
         } else SLiteral.FALSE
-        model.define(s.defProgress, progress)
+
+        model.define(s.defProgress, s.defForward and progress.not())
 
         // define failed predicate
         model.define(s.defFailed, s.defInput and s.defOutput.not())
@@ -236,7 +237,7 @@ class ManagingGlobalVariables : SmvConstructionTransformer {
                         GetetaFacade.exprToSMV(cv.constraint!!,
                                 svar, 0, model.variableContext))
             }
-            mt.invariants.add(svar equal svar.next())
+            //            mt.invariants.add(svar equal svar.inNext())
         }
     }
 }

@@ -1,6 +1,4 @@
-TYPE
-  OperationMode : (Learn , Active);
-END_TYPE
+TYPE OperationMode : (Learn , Active); END_TYPE
 
 FUNCTION SEL : INT
 VAR_INPUT

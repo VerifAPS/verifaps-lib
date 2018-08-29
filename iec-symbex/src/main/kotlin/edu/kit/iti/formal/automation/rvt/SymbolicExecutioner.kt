@@ -171,8 +171,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     }*/
 
     override fun visit(invocation: Invocation): SMVExpr? {
-        assert(scope != null)
-        val fd = scope?.resolveFunction(invocation) ?: throw FunctionUndefinedException(invocation)
+        val fd = scope.resolveFunction(invocation) ?: throw FunctionUndefinedException(invocation)
 
         //initialize data structure
         val calleeState = SymbolicState(globalState)
@@ -200,7 +199,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         //region transfer variables
         val parameters = invocation.parameters
         val inputVars = fd.scope.filterByFlags(
-                VariableDeclaration.INPUT or VariableDeclaration.INOUT or VariableDeclaration.OUTPUT)
+                VariableDeclaration.INPUT or VariableDeclaration.INOUT)
 
         if (parameters.size > inputVars.size) {
             //System.err.println(fd.getFunctionName());

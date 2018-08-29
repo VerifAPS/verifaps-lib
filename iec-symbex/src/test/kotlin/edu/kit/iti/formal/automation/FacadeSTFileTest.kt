@@ -78,8 +78,8 @@ import java.util.stream.Collectors
  * return counter.count;
  * }
  *
- * private static void write(SMVModule m, String fileName, boolean append) {
- * SMVPrinter.toFile(m, new File(fileName), append);
+ * private static void write(SMVModule m, String fileName, boolean printf) {
+ * SMVPrinter.toFile(m, new File(fileName), printf);
  * }
  *
  * private Path getSMVFile() {
@@ -102,17 +102,17 @@ import java.util.stream.Collectors
  * .filter(tle -> tle instanceof ClassDeclaration)
  * .collect(Collectors.toList())
  * .size() + " classes");
- * //System.out.print(countStatements(code) + " statements");
+ * //System.out.printf(countStatements(code) + " statements");
  * code = SymbExFacade.INSTANCE.simplifyOO(code, true);
  * PrintWriter pw = new PrintWriter(Paths.get(getSMVDirectory() + "/" + file.getName() + "oo").toString());
  * System.out.println("Wrote STOO file");
- * pw.println(IEC61131Facade.INSTANCE.print(code));
+ * pw.println(IEC61131Facade.INSTANCE.printf(code));
  * pw.close();
  * code = IEC61131Facade.INSTANCE.file(file);
  * code = SymbExFacade.INSTANCE.simplifyOO(code);
- * //System.out.print(countStatements(code) + " statements after simplification");
+ * //System.out.printf(countStatements(code) + " statements after simplification");
  * pw = new PrintWriter(Paths.get(getSMVDirectory() + "/" + file.getName() + "0").toString());
- * pw.println(IEC61131Facade.INSTANCE.print(code));
+ * pw.println(IEC61131Facade.INSTANCE.printf(code));
  * pw.close();
  * System.out.println("Wrote ST0 file");
  * SMVModule module = SymbExFacade.INSTANCE.evaluateProgram(code, true);

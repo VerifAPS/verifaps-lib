@@ -97,7 +97,8 @@ object IEC61131Facade {
         val rdt = ResolveDataTypes(scope)
         //val rr = ResolveReferences(scope)
         elements.accept(fdt)
-        elements.accept(rdt)
+        elements.accept(EnsureFunctionReturnValue)
+
         elements.accept(rdt)
 
         elements.accept(RewriteEnums)

@@ -65,4 +65,5 @@ interface DataTypeVisitorNN<out T> {
     fun visit(classDataType: ClassDataType): T = defaultVisit(classDataType)
     fun visit(interfaceDataType: InterfaceDataType): T = defaultVisit(interfaceDataType)
     fun visit(functionBlockDataType: FunctionBlockDataType): T = defaultVisit(functionBlockDataType)
+    fun visit(void: AnyDt.VOID) : T = defaultVisit(void)
 }
