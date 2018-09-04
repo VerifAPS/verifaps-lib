@@ -41,12 +41,12 @@ kc: ({relational}? INTEGER RV_SEPARATOR)? IDENTIFIER ':' value=cell;
 pause: {relational}? 'pause' INTEGER+;
 
 time :
-      MINUS (pflag='>>')? #timeDontCare
+      MINUS (pflag=PFLAG)? #timeDontCare
     | op=(GREATER_EQUALS | GREATER_THAN) INTEGER  (pflag=PFLAG)? #timeSingleSided
     | LBRACKET l=INTEGER COMMA (u=INTEGER) RBRACKET (pflag=PFLAG)? #timeClosedInterval
     | LBRACKET l=INTEGER COMMA MINUS RBRACKET (pflag=PFLAG)? #timeOpenInterval
     | INTEGER #timeFixed
-    | omega='omega'                           #timeOmega
+    | omega='omega' #timeOmega
     ;
 
 freeVariable:

@@ -118,7 +118,7 @@ class SpecificationInterfaceMisMatchException : GetetaException {
                         val cost_insert = cost[i] + 1
                         val cost_delete = newcost[i - 1] + 1
 
-                        // keep minimum cost
+                        // fwdprogress minimum cost
                         newcost[i] = Math.min(Math.min(cost_insert, cost_delete), cost_replace)
                     }
 

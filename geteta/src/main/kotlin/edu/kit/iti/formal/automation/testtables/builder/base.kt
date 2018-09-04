@@ -59,11 +59,11 @@ class SMVConstructionModel(val superEnumType: SMVType, state: AutomataTransforme
     fun getStateVariable(ss: RowState) =
             SVariable(ss.name, SMVTypes.BOOLEAN)
 
-    fun getFwd(ss: RowState): SVariable =
+    fun getAccept(ss: RowState): SVariable =
             SVariable(ss.fwd, SMVTypes.BOOLEAN)
 
-    fun getKeep(ss: RowState): SVariable =
-            SVariable(ss.keep, SMVTypes.BOOLEAN)
+    fun getAcceptProgress(ss: RowState): SVariable =
+            SVariable(ss.fwdprogress, SMVTypes.BOOLEAN)
 
     fun getFail(ss: RowState): SVariable =
             SVariable(ss.fail, SMVTypes.BOOLEAN)
@@ -82,7 +82,7 @@ class SMVConstructionModel(val superEnumType: SMVType, state: AutomataTransforme
     val tableModule = SMVModule("...")
     val helperModules: MutableList<SMVModule> = LinkedList<SMVModule>()
 
-    val sentinelState = stateReachability.sentinel
+    val sentinelState = stateReachability.endSentinel
     val stateError = SVariable(automaton.stateError.name, SMVTypes.BOOLEAN)
     var stateSentinel = SVariable(automaton.stateSentinel.name, SMVTypes.BOOLEAN)
     var ttType: ModuleType? = null

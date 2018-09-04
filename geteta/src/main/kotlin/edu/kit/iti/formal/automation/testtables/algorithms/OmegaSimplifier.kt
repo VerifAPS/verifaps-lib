@@ -40,13 +40,14 @@ class OmegaSimplifier(val product: GeneralizedTestTable) : Runnable {
 
     /**
      * Traverse and copy the tree structure until an \omega appeares as duration, then
-     * keep traversing but do not copy. The rowStates are capture to [.ignored]
+     * fwdprogress traversing but do not copy. The rowStates are capture to [.ignored]
      *
      * @param region
      * @return
      */
-    private fun recur(region: Region?): Region {
-        val newRegion = Region(region!!.id)
+    private fun recur(region: Region): Region {
+        val newRegion = Region(region.id)
+        newRegion.duration = region.duration
         for (state in region.children) {
             if (abort) {
                 when (state) {
@@ -56,7 +57,7 @@ class OmegaSimplifier(val product: GeneralizedTestTable) : Runnable {
             } else {
                 when (state) {
                     is Region ->
-                        newRegion.children.add(recur(state as Region))
+                        newRegion.children.add(recur(state))
                     is TableRow ->
                         newRegion.children.add(state)
                 }

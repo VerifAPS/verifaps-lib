@@ -574,10 +574,12 @@ abstract class Expression : Top() {
 
     abstract override fun clone(): Expression
 
-    operator fun plus(right: Expression): Expression = BinaryExpression(this, Operators.ADD, right)
-    operator fun minus(right: Expression): Expression = BinaryExpression(this, Operators.SUB, right)
-    operator fun times(right: Expression): Expression = BinaryExpression(this, Operators.MULT, right)
-    operator fun div(right: Expression): Expression = BinaryExpression(this, Operators.DIV, right)
+    infix fun and(right: Expression): Expression = BinaryExpression(this, Operators.AND, right)
+    infix fun or(right: Expression): Expression = BinaryExpression(this, Operators.OR, right)
+    infix fun plus(right: Expression): Expression = BinaryExpression(this, Operators.ADD, right)
+    infix fun minus(right: Expression): Expression = BinaryExpression(this, Operators.SUB, right)
+    infix fun times(right: Expression): Expression = BinaryExpression(this, Operators.MULT, right)
+    infix fun div(right: Expression): Expression = BinaryExpression(this, Operators.DIV, right)
 
     infix fun eq(right: Expression): Expression = BinaryExpression(this, Operators.EQUALS, right)
     infix fun neq(right: Expression): Expression = BinaryExpression(this, Operators.NOT_EQUALS, right)
@@ -586,8 +588,8 @@ abstract class Expression : Top() {
     infix fun ge(right: Expression): Expression = BinaryExpression(this, Operators.GREATER_EQUALS, right)
     infix fun gt(right: Expression): Expression = BinaryExpression(this, Operators.GREATER_THAN, right)
 
-    operator fun not() = UnaryExpression(Operators.NOT, this)
-    operator fun unaryMinus() = UnaryExpression(Operators.MINUS, this)
+    fun not() = UnaryExpression(Operators.NOT, this)
+    fun unaryMinus() = UnaryExpression(Operators.MINUS, this)
 
 }
 

@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
-import edu.kit.iti.formal.automation.datatypes.values.TRUE
 import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.TableRow
@@ -8,6 +7,7 @@ import edu.kit.iti.formal.automation.testtables.model.automata.RowState
 import edu.kit.iti.formal.automation.testtables.model.automata.SpecialState
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 import edu.kit.iti.formal.automation.testtables.model.automata.TransitionType
+import edu.kit.iti.formal.automation.testtables.model.isOptional
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
 import kotlin.collections.set
 
@@ -21,8 +21,8 @@ class AutomatonBuilderPipeline(
                 else
                     RowStateCreator(),
                 TransitionCreator(),
-                InitialReachability(),
-                AddMutualExclusionForStates())
+                InitialReachability()
+        )//AddMutualExclusionForStates())
     }
 
     fun transform(): AutomataTransformerState {
@@ -61,12 +61,12 @@ class InitialAutomataCreator : AbstractTransformer<AutomataTransformerState>() {
                 .map { fwd -> fwd as SMVExpr }
                 .reduce(SMVFacade.reducer(SBinaryOperator.OR))
                 .orElse(SLiteral.FALSE)
-        val a = SAssignment(sentinel, e.or(sentinel))
+        val a = SAssignment(endSentinel, e.or(endSentinel))
         tm.nextAssignments.add(a)
 */
 
 /**
- * Creates the rowStates and definition for each row and cycle including error and sentinel.
+ * Creates the rowStates and definition for each row and cycle including error and endSentinel.
  * Created by weigl on 17.12.16.
  *
  * @version 3
@@ -82,7 +82,7 @@ open class RowStateCreator : AbstractTransformer<AutomataTransformerState>() {
         return when (duration) {
             is Duration.Omega -> {
                 val a = RowState(s, 1)
-                a.strongRepetition=true
+                a.strongRepetition = true
                 listOf(a)
             }
             is Duration.OpenInterval ->
@@ -118,11 +118,22 @@ open class RowStateCreator : AbstractTransformer<AutomataTransformerState>() {
     }
 }
 
+/**
+ * Creates an mutual exclusion for states, based on the progress flag.
+ *
 class AddMutualExclusionForStates : AbstractTransformer<AutomataTransformerState>() {
-    override fun transform() {
-        //TODO("not implemented")
-    }
+override fun transform() {
+model.testTable.region.flat().forEach {
+if(it.duration.pflag){
+val astate = model.automaton.getState(it,)
+model.automaton.mutualExclusiveStates.computeIfAbsent()
+it.outgoing
 }
+}
+
+//TODO("not implemented")
+}
+}*/
 
 class InitialReachability : AbstractTransformer<AutomataTransformerState>() {
     override fun transform() {
@@ -145,14 +156,14 @@ class TransitionCreator : AbstractTransformer<AutomataTransformerState>() {
     }
 
     private fun sentinelTransitions() {
-        val sentinel = model.stateReachability.sentinel
+        val sentinel = model.stateReachability.endSentinel
         val sentinelState = model.automaton.stateSentinel
 
         sentinel.incoming.forEach { it ->
             model.automaton.getStates(it)
                     ?.filter { it.optional }
                     ?.forEach { oFrom ->
-                        model.automaton.addTransition(oFrom, sentinelState, TransitionType.FWD)
+                        model.automaton.addTransition(oFrom, sentinelState, TransitionType.ACCEPT)
                     }
         }
     }
@@ -161,9 +172,12 @@ class TransitionCreator : AbstractTransformer<AutomataTransformerState>() {
         model.automaton.rowStates.values.flatMap { it }
                 .filter { it.weakRepeat || it.strongRepetition }
                 .forEach {
-                    model.automaton.addTransition(it, it, TransitionType.KEEP)
+                    model.automaton.addTransition(it, it,
+                            transitionTypeAccept(it.row.duration))
                 }
-        model.automaton.addTransition(model.automaton.stateSentinel, model.automaton.stateSentinel, TransitionType.TRUE)
+
+        model.automaton.addTransition(model.automaton.stateSentinel,
+                model.automaton.stateSentinel, TransitionType.TRUE)
     }
 
     private fun errorTransitions() {
@@ -179,18 +193,21 @@ class TransitionCreator : AbstractTransformer<AutomataTransformerState>() {
     private fun internalTransitions(s: TableRow) {
         model.automaton.getStates(s)?.let { states ->
             states.zipWithNext { a, b ->
-                model.automaton.addTransition(a, b, TransitionType.FWD)
+                val pflag = s.duration.pflag && s.duration.isOptional(a.time)
+                model.automaton.addTransition(a, b,
+                        if (pflag) TransitionType.ACCEPT_PROGRESS else TransitionType.ACCEPT)
             }
         }
     }
 
     private fun externalTransitions(s: TableRow) {
         val jumpOut = model.automaton.getStates(s)?.filter { it.optional } ?: listOf()
-        s.outgoing.filter { it != model.stateReachability.sentinel }
+        s.outgoing.filter { it != model.stateReachability.endSentinel }
                 .forEach { to ->
                     model.automaton.getFirstState(to)?.let { toState ->
                         jumpOut.forEach { out ->
-                            model.automaton.addTransition(out, toState, TransitionType.FWD)
+                            model.automaton.addTransition(out, toState,
+                                    transitionTypeAccept(s.duration))
                         }
                     }
                 }
@@ -280,3 +297,8 @@ is Duration.ClosedInterval -> pflag
 else -> false
 }
  */
+
+
+private fun transitionTypeAccept(duration: Duration) =
+        if (duration.pflag) TransitionType.ACCEPT_PROGRESS
+        else TransitionType.ACCEPT

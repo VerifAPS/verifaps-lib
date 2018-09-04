@@ -23,11 +23,9 @@ package edu.kit.iti.formal.automation.testtables.algorithms
 import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.automation.testtables.model.Region
 import edu.kit.iti.formal.automation.testtables.model.TableRow
-import java.util.*
-import kotlin.collections.ArrayList
 
 /**
- * Calculation of the TableRow/Row reachability.
+ * Calculation of the TableRow/Row initTable.
  *
  *
  * A *i*th row can reach (directly) the *j*th row iff
@@ -46,63 +44,68 @@ import kotlin.collections.ArrayList
  * @version 2 (12.12.16)
  */
 class StateReachability(root: Region) {
-    val sentinel: TableRow = TableRow("END")
+    val startSentinel: TableRow = TableRow("START")
+    val endSentinel: TableRow = TableRow("END")
     private val flatList: MutableList<TableRow>
 
     init {
-        sentinel.duration = Duration.ClosedInterval(1, 1)
+        startSentinel.duration = Duration.ClosedInterval(1, 1)
+        endSentinel.duration = Duration.ClosedInterval(1, 1)
         flatList = ArrayList(root.flat())
-        val lastState = flatList.last()
-        if (lastState.duration !is Duration.Omega) {
-            flatList.add(sentinel)
+        flatList.add(endSentinel)
+
+        val startSet = hashSetOf(startSentinel)
+        val endRows = initTable(startSet, root)
+        endRows.forEach {
+            if (it.duration !is Duration.Omega)
+                it.outgoing.add(endSentinel)
         }
 
-        initTable()
-        addRegions(root)
+        //addRegions(root)
         fixpoint()
         maintainIncomning()
         //maintainAutomata()
         isInitialReachable()
     }
 
-    /*
-    private fun maintainAutomata() {
-        for (state in flatList) {
-            val astates = state.automataStates
-            for (i in astates.indices) {
-                val a = astates[i]
+/*
+private fun maintainAutomata() {
+    for (state in flatList) {
+        val astates = state.automataStates
+        for (i in astates.indices) {
+            val a = astates[i]
 
-                if (a.isFirst) {
-                    val s = a.state
-                    s.incoming
-                            .flatMap { it.automataStates }
-                            .filter { it.isOptional }
-                            .forEach { b -> connect(b, a) }
-                }
-
-                //
-                if (i + 1 < astates.size) {
-                    connect(a, astates[i + 1])
-                }
-
-                //connect to first automata state in every next row
-                if (a.isOptional) {
-                    state.outgoing.forEach { next -> connect(a, next.automataStates[0]) }
-                }
-
-                if (a.isUnbounded) {
-                    connect(a, a)
-                }
+            if (a.isFirst) {
+                val s = a.state
+                s.incoming
+                        .flatMap { it.automataStates }
+                        .filter { it.isOptional }
+                        .forEach { b -> connect(b, a) }
             }
-            state.isEndState = state.outgoing.contains(sentinel)
-        }
-    }
 
-    private fun connect(a: TableRow.AutomatonState, b: TableRow.AutomatonState) {
-        a.outgoing.add(b)
-        b.incoming.add(a)
+            //
+            if (i + 1 < astates.size) {
+                connect(a, astates[i + 1])
+            }
+
+            //connect to first automata state in every next row
+            if (a.isOptional) {
+                state.outgoing.forEach { next -> connect(a, next.automataStates[0]) }
+            }
+
+            if (a.isUnbounded) {
+                connect(a, a)
+            }
+        }
+        state.isEndState = state.outgoing.contains(endSentinel)
     }
-    */
+}
+
+private fun connect(a: TableRow.AutomatonState, b: TableRow.AutomatonState) {
+    a.outgoing.add(b)
+    b.incoming.add(a)
+}
+*/
 
     private fun maintainIncomning() {
         for (out in flatList) {
@@ -158,22 +161,50 @@ class StateReachability(root: Region) {
     }
 
     /**
-     * Initialize the table with the direct reachability.
-     * 1. i-th row can reach (i+1)-th row
+     * Initialize the table with the direct initTable.
+     * 1. i-th row can reach (i+1)-th row,
+     *    except it is within an group with omega duration.
      * 2. End of the region, to beginning of a region.
+    except it is within an group with omega duration.
      * 3. Abort on \omega!
      */
-    private fun initTable() {
-        for (i in 0 until flatList.size - 1) {
-            if (flatList[i].duration === Duration.Omega) {
-                break
+    private fun initTable(lastRows: Set<TableRow>, region: Region): MutableSet<TableRow> {
+        var lastRows = lastRows.toMutableSet()
+        if (region.duration.isRepeatable) {
+            val last = region.flat().last()
+            if (last.duration !is Duration.Omega) {
+                lastRows.add(last)
             }
-            flatList[i].outgoing.add(flatList[i + 1])
         }
+
+        for (tn in region.children) {
+            when (tn) {
+                is TableRow -> {
+                    lastRows.forEach { it.outgoing.add(tn) }
+                    lastRows.clear()
+                    lastRows.add(tn)
+                }
+                is Region -> {
+                    val lr = initTable(lastRows, tn)
+                    if (!tn.duration.isSkippable) {
+                        lastRows.clear()
+                    }
+                    lastRows.addAll(lr)
+                }
+
+            }
+            if (tn.duration is Duration.Omega) {
+                lastRows.clear()
+            }
+        }
+        if(region.duration is Duration.Omega) lastRows.clear()
+        return lastRows
     }
 
     private fun isInitialReachable() {
-        val queue = LinkedList<TableRow>()
+        startSentinel.outgoing.forEach { it.isInitialReachable = true }
+
+        /*val queue = LinkedList<TableRow>()
         queue.add(flatList[0])
         while (!queue.isEmpty()) {
             val s = queue.remove()
@@ -185,6 +216,6 @@ class StateReachability(root: Region) {
 
             if (s.duration.isSkippable)
                 queue.addAll(s.outgoing)
-        }
+        }*/
     }
 }

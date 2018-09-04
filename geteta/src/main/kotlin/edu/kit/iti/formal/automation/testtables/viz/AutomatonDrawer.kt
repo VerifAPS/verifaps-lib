@@ -7,6 +7,7 @@ import edu.kit.iti.formal.automation.testtables.model.automata.AutomatonState
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 import edu.kit.iti.formal.automation.testtables.model.automata.Transition
 import edu.kit.iti.formal.automation.testtables.model.automata.TransitionType
+import edu.kit.iti.formal.automation.testtables.model.repr
 import edu.kit.iti.formal.util.CodeWriter
 import java.io.File
 
@@ -95,7 +96,7 @@ class AutomatonDrawer(val outputFile: File,
                 is TableRow -> addStates(it, writer)
             }
         }
-        writer.nl().print("label=\"group ${region.id} (${region.duration})\";")
+        writer.nl().print("label=\"group ${region.id} ${region.duration.repr()}\";")
                 .nl().print("color=black; attributes=dotted;")
                 .nl().decreaseIndent().nl().write("}").nl()
     }
@@ -115,7 +116,7 @@ class AutomatonDrawer(val outputFile: File,
     private fun transition(t: Transition): String {
         val color =
                 when(t.type) {
-                    TransitionType.FWD ->"green"
+                    TransitionType.ACCEPT ->"green"
                     TransitionType.FAIL->"red"
                     else -> "black"
                 }

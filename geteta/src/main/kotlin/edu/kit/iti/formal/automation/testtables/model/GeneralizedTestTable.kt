@@ -293,6 +293,22 @@ sealed class Duration {
     abstract operator fun contains(cycles: Int): Boolean
 }
 
+
+fun Duration.repr(): String =
+        when (this) {
+            is Duration.ClosedInterval -> "[$lower, $upper]"
+            Duration.Omega -> "omega"
+            is Duration.OpenInterval -> ">=$lower"
+        }
+
+fun Duration.isOptional(time: Int): Boolean =
+        when (this) {
+            is Duration.ClosedInterval -> lower <= time
+            Duration.Omega -> false
+            is Duration.OpenInterval -> lower <= time
+        }
+
+
 sealed class TableNode(open val id: String, var duration: Duration = Duration.ClosedInterval(1, 1, false)) {
     //abstract val automataStates: List<TableRow.AutomatonState>
 
@@ -341,7 +357,7 @@ data class TableRow(override val id: String) : TableNode(id) {
      * The predicate that allows keeping in this state.
      * Only necessary iff duration has progress flag.
      */
-    val defProgress = SVariable("${id}_keep", SMVTypes.BOOLEAN)
+    val defProgress = SVariable("${id}_progress", SMVTypes.BOOLEAN)
 
     /**
      * name of runs to pause in that specific state.

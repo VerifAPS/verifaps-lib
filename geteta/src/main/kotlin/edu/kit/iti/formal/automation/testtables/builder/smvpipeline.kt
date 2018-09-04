@@ -102,8 +102,8 @@ object DefineTransitions : AbstractTransformer<SMVConstructionModel>() {
         val expr =
                 transitions[it]?.map { t ->
                     when (t.type) {
-                        TransitionType.FWD -> model.getFwd(t.from as RowState)
-                        TransitionType.KEEP -> model.getKeep(t.from as RowState)
+                        TransitionType.ACCEPT -> model.getAccept(t.from as RowState)
+                        TransitionType.ACCEPT_PROGRESS -> model.getAcceptProgress(t.from as RowState)
                         TransitionType.FAIL -> model.getFail(t.from as RowState)
                         TransitionType.TRUE -> model.getVariable(it)
                     }
@@ -152,9 +152,10 @@ object RegisterDefines : SmvConstructionTransformer {
      */
     private fun stateDefines(model: SMVConstructionModel, ss: RowState) {
         val stateVar = model.getStateVariable(ss)
-        model.define(model.getFwd(ss), stateVar and ss.row.defForward)
+        model.define(model.getAccept(ss), stateVar and ss.row.defForward)
         model.define(model.getFail(ss), stateVar and ss.row.defFailed)
-        model.define(model.getKeep(ss), stateVar and ss.row.defProgress.not())
+        model.define(model.getAcceptProgress(ss),
+                model.getAccept(ss) and ss.row.defProgress.not())
     }
 }
 
@@ -346,7 +347,7 @@ class InputSequenceInvariantTransformer : SmvConstructionTransformer {
 /**
  * This transformer modifies the state in two ways
  *
- *  1. forbids the sentinel state
+ *  1. forbids the endSentinel state
  *  1. Strengthen forward definitions to the given cycles in the options
  *
  *

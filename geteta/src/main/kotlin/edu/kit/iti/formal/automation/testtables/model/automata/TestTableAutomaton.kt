@@ -16,7 +16,7 @@ data class Transition(
 )
 
 enum class TransitionType {
-    FWD, KEEP, FAIL, TRUE
+    ACCEPT, ACCEPT_PROGRESS, FAIL, TRUE
 }
 
 sealed class AutomatonState(open val name: String) {
@@ -29,8 +29,8 @@ sealed class AutomatonState(open val name: String) {
 data class SpecialState(override val name: String) : AutomatonState(name)
 data class RowState(val row: TableRow, val time: Int)
     : AutomatonState("%s_%02d".format(row.id, time)) {
-    val fwd = "${name}_fwd"
-    val keep = "${name}_keep"
+    val fwd = "${name}_accept"
+    val fwdprogress = "${name}_acceptp"
     val fail = "${name}_fail"
 }
 

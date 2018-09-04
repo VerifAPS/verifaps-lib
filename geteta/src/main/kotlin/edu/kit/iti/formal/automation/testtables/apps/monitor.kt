@@ -1,6 +1,13 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.options.convert
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.required
+import com.github.ajalt.clikt.parameters.types.file
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.automation.testtables.monitor.MonitorGenerationST
 
 /**
  *
@@ -13,9 +20,30 @@ object Monitor {
     fun main(args: Array<String>) = MonitorApp().main(args)
 }
 
-class MonitorApp : CliktCommand() {
-    override fun run() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+enum class CodeOutput {
+    STRCUTURED_TEXT, ESTEREL, CPP
+}
 
+class MonitorApp : CliktCommand() {
+    val table by option("--table", help = "table file", metavar = "FILE")
+            .file(exists = true, readable = true).required()
+
+    val format by option("--format", "-f", help = "code format")
+            .convert { CodeOutput.valueOf(it) }.default(CodeOutput.STRCUTURED_TEXT)
+
+    override fun run() {
+        val gtt = GetetaFacade.readTable(table)
+        gtt.ensureProgramRuns()
+        gtt.generateSmvExpression()
+        val automaton = GetetaFacade.constructTable(gtt).automaton
+
+        val output =
+                when (format) {
+                    CodeOutput.STRCUTURED_TEXT ->
+                        MonitorGenerationST.generate(gtt, automaton)
+                    CodeOutput.ESTEREL -> TODO()
+                    CodeOutput.CPP -> TODO()
+                }
+        println(output)
+    }
 }
