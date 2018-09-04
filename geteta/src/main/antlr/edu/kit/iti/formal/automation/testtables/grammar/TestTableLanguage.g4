@@ -133,9 +133,8 @@ guardedcommand
       FI    // guarded command (case)
 ;
 
-PFLAG: '>>'|'_p';
+PFLAG: '>>' | '_p';
 AND: '&' | 'AND';
-ARROW_RIGHT: '=>';
 COMMA:	',';
 DIV: '/';
 EQUALS: '=';
@@ -158,7 +157,7 @@ RPAREN: ')';
 XOR: 'XOR' | 'xor';
 IF: 'if';
 FI: 'fi';
-ELSE: 'else';
+//ELSE: 'else';
 GUARD: '::';
 T : 'TRUE' | 'true';
 F : 'FALSE' | 'false';

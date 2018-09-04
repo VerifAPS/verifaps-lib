@@ -62,18 +62,4 @@ task jarDist(type: Jar) {
 }
 jarDist.dependsOn project(':flycheck').jar
 jarDist.dependsOn project(':geteta').jar
-
 jarDist.dependsOn jar
-
-/*
-jib {
-    from {
-        image = 'openjdk:alpine'
-    }
-    container {
-        jvmFlags = ['-Xms512m', '-Xdebug']
-        mainClass = mainClassName
-        ports = ['3000']
-    }
-}
-*/

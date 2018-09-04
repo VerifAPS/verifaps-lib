@@ -2,6 +2,7 @@ package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
+import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
@@ -45,6 +46,11 @@ class Reteta : CliktCommand(
     val programs by option("-P", "--program", metavar = "NAME")
             .convert { File(it) }
             .multiple()
+
+    val nuxmv by option("--nuxmv", help = "Path to nuXmv binary.", envvar = "NUXMV")
+            .file(exists = true)
+            .required()
+
 
     override fun run() {
         if (!table.exists() || programs.isEmpty()) {
@@ -93,6 +99,7 @@ class Reteta : CliktCommand(
         modules.addAll(augmentedPrograms)
         modules.addAll(tt.helperModules)
         val b = GetetaFacade.runNuXMV(
+                nuxmv.absolutePath,
                 this.table.nameWithoutExtension, modules,
                 table.options.verificationTechnique)
     }

@@ -39,6 +39,22 @@ open class SMVAstDefaultVisitor<T> : SMVAstVisitor<T?> {
     override fun visit(quantified: SQuantified): T? = defaultVisit(quantified)
 }
 
+
+abstract class SMVAstDefaultVisitorNN<T> : SMVAstVisitor<T> {
+    protected abstract fun defaultVisit(top: SMVAst): T
+    override fun visit(top: SMVAst): T = defaultVisit(top)
+    override fun visit(v: SVariable): T = defaultVisit(v)
+    override fun visit(be: SBinaryExpression): T = defaultVisit(be)
+    override fun visit(ue: SUnaryExpression): T = defaultVisit(ue)
+    override fun visit(l: SLiteral): T = defaultVisit(l)
+    override fun visit(a: SAssignment): T = defaultVisit(a)
+    override fun visit(ce: SCaseExpression): T = defaultVisit(ce)
+    override fun visit(smvModule: SMVModule): T = defaultVisit(smvModule)
+    override fun visit(func: SFunction): T = defaultVisit(func)
+    override fun visit(quantified: SQuantified): T = defaultVisit(quantified)
+}
+
+
 /**
  */
 abstract class SMVAstMutableVisitor : SMVAstVisitor<SMVAst> {
@@ -51,14 +67,14 @@ abstract class SMVAstMutableVisitor : SMVAstVisitor<SMVAst> {
         return be
     }
 
-    override fun visit(ue: SUnaryExpression): SMVExpr{
+    override fun visit(ue: SUnaryExpression): SMVExpr {
         ue.expr = ue.expr.accept(this) as SMVExpr
         return ue
     }
 
-    override fun visit(l: SLiteral): SMVExpr= l
+    override fun visit(l: SLiteral): SMVExpr = l
 
-    override fun visit(a: SAssignment): SAssignment{
+    override fun visit(a: SAssignment): SAssignment {
         a.expr = a.expr.accept(this) as SMVExpr
         a.target = a.target.accept(this) as SVariable
         return a

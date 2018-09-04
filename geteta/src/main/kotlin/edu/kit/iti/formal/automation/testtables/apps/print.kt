@@ -54,12 +54,9 @@ class PrinterApp : CliktCommand() {
                     Format.HTML -> HTMLTablePrinter(gtt, sink)
                 }
 
-
-        if (standalone)
-            printer.printPreamble()
+        if (standalone) printer.printPreamble()
         printer.print()
-        if (standalone)
-            printer.printPostamble()
+        if (standalone) printer.printPostamble()
     }
 }
 

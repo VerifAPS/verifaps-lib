@@ -96,7 +96,7 @@ class InvocationRewriter(val prefix: String, val scope: Scope, val callSite: Cal
                             .filter { it.isOutput }
 
             val cnt = SymbolicReference(prefix + "_ccnt")
-            val counterIncr = AssignmentStatement(cnt, cnt + IntegerLit(UINT, BigInteger.ONE))
+            val counterIncr = AssignmentStatement(cnt, cnt plus IntegerLit(UINT, BigInteger.ONE))
 
             list += counterIncr
 

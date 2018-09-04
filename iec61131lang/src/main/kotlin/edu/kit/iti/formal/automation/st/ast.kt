@@ -51,6 +51,7 @@ interface HasScope {
 
 //region Declaration and Toplevel
 abstract class PouElement : Top(), Identifiable, Comparable<PouElement> {
+    var comment: String = ""
     override fun compareTo(pouElement: PouElement): Int {
         return name.compareTo(pouElement.name)
     }
@@ -728,6 +729,14 @@ data class SymbolicReference @JvmOverloads constructor(
                 + if (sub == null) "" else "." + sub!!.toString())
     }*/
 }
+
+//Helpers
+fun <T : Expression> Iterable<T>.disjunction() = reduce { a: Expression, b: Expression -> a or b }
+fun <T : Expression> Iterable<T>.conjunction() = reduce { a: Expression, b: Expression -> a and b }
+fun <T : Expression> Iterable<T>.sum() = reduce { a: Expression, b: Expression -> a plus b }
+fun <T : Expression> Iterable<T>.substract() = reduce { a: Expression, b: Expression -> a minus b }
+fun <T : Expression> Iterable<T>.product() = reduce { a: Expression, b: Expression -> a times b }
+fun <T : Expression> Iterable<T>.division() = reduce { a: Expression, b: Expression -> a div b }
 //endregion
 
 data class Invocation(
@@ -845,7 +854,6 @@ data class InvocationParameter(
             0
     }
 }
-
 
 //region Type
 interface TypeDeclaration : HasRuleContext, Identifiable, Visitable, Cloneable {
@@ -1584,9 +1592,7 @@ class Location : Expression {
 class StatementList(private var list: MutableList<Statement> = arrayListOf())
     : Statement(), MutableList<Statement> by list {
 
-    constructor(vararg then: Statement) : this() {
-        list = ArrayList(Arrays.asList(*then))
-    }
+    constructor(vararg then: Statement) : this(list = ArrayList(Arrays.asList(*then)))
 
     constructor(statements: StatementList) : this() {
         addAll(statements)

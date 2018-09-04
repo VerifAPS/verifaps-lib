@@ -116,16 +116,22 @@ task jarDist(type: Jar) {
 jarDist.dependsOn jar
 */
 
-task runapp(type: JavaExec) {
+task run(type: JavaExec) {
+    group = "run"
     classpath = sourceSets.main.runtimeClasspath
     main = 'edu.kit.iti.formal.automation.testtables.Geteta'
     if (project.hasProperty("appArgs")) {
-        args Eval.me(appArgs)
+        args Eval.me(project.property("appArgs"))
     }
 }
 
-//applicationDistribution.from(startScriptTTPrint) { into 'bin' }
-
+task runConstantprogram(type: JavaExec) {
+    group = "run"
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'edu.kit.iti.formal.automation.testtables.Geteta'
+    workingDir "examples/constantprogram"
+    args << "--code" << "constantprogram.st " << "--table " << "constantprogram.tt.txt"
+}
 
 test {
     exclude '**/AutomataDrawerTest.class'

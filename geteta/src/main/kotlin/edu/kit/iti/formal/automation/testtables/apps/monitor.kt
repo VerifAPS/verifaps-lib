@@ -14,7 +14,6 @@ import edu.kit.iti.formal.automation.testtables.monitor.MonitorGenerationST
  * @author Alexander Weigl
  * @version 1 (08.08.18)
  */
-
 object Monitor {
     @JvmStatic
     fun main(args: Array<String>) = MonitorApp().main(args)
@@ -24,11 +23,13 @@ enum class CodeOutput {
     STRCUTURED_TEXT, ESTEREL, CPP
 }
 
-class MonitorApp : CliktCommand() {
-    val table by option("--table", help = "table file", metavar = "FILE")
+class MonitorApp : CliktCommand(name = "ttmonitor",
+        help = "Construction of monitors from test tables for Runtime Verification") {
+    val table by option("--table,-t", help = "table file", metavar = "FILE")
             .file(exists = true, readable = true).required()
 
-    val format by option("--format", "-f", help = "code format")
+    val format by option("--format", "-f", help = "code format, possible values: " +
+            CodeOutput.values().joinToString(",") { it.name })
             .convert { CodeOutput.valueOf(it) }.default(CodeOutput.STRCUTURED_TEXT)
 
     override fun run() {

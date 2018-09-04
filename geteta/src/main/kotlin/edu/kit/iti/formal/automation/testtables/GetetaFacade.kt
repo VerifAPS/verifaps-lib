@@ -17,17 +17,20 @@ import edu.kit.iti.formal.automation.testtables.io.*
 import edu.kit.iti.formal.automation.testtables.model.*
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
+import edu.kit.iti.formal.automation.testtables.print.DSLTablePrinter
 import edu.kit.iti.formal.automation.testtables.viz.CounterExampleAnalyzer
 import edu.kit.iti.formal.automation.testtables.viz.Mapping
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.util.CodeWriter
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import java.io.File
 import java.io.PrintWriter
+import java.io.StringWriter
 import javax.xml.bind.JAXBException
 
 object GetetaFacade {
@@ -135,8 +138,9 @@ object GetetaFacade {
         return variable.name + "__history"
     }
 
-    fun runNuXMV(folder: String,
-                 modules: List<SMVModule>, vt: VerificationTechnique): NuXMVOutput {
+    fun runNuXMV(nuXmvPath: String, folder: String,
+                 modules: List<SMVModule>,
+                 vt: VerificationTechnique): NuXMVOutput {
         val outputFolder = File(folder)
         outputFolder.mkdirs()
         val moduleFile = File(outputFolder, "modules.smv")
@@ -145,7 +149,7 @@ object GetetaFacade {
             modules.forEach { it.accept(p) }
         }
         val adapter = NuXMVProcess(moduleFile)
-        adapter.executablePath = System.getenv("NUXMV") ?: "nuXmv"
+        adapter.executablePath = nuXmvPath
         adapter.workingDirectory = outputFolder
         adapter.commands = vt.commands
         return adapter.call()
@@ -212,6 +216,13 @@ object GetetaFacade {
         val analyzer = CounterExampleAnalyzer(automaton, testTable, counterExample)
         analyzer.run()
         return analyzer.rowMapping
+    }
+
+    fun print(gtt: GeneralizedTestTable): String {
+        val stream = StringWriter()
+        val p = DSLTablePrinter(CodeWriter(stream))
+        p.print(gtt)
+        return stream.toString()
     }
 
 

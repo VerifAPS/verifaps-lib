@@ -20,7 +20,7 @@ def mainClasses = [
         , 'ttprint'     : 'edu.kit.iti.formal.automation.testtables.apps.Printer'
         , 'reteta'      : 'edu.kit.iti.formal.automation.testtables.apps.Reteta'
         , 'ttmonitor'   : 'edu.kit.iti.formal.automation.testtables.apps.Monitor'
-        , 'ttsynth'     : 'edu.kit.iti.formal.automation.testtables.apps.Synthizer'
+//        , 'ttsynth'     : 'edu.kit.iti.formal.automation.testtables.apps.Synthizer'
         , 'rvt'         : "edu.kit.iti.formal.automation.rvt.RvtappKt"
         , 'flycheck'    : "edu.kit.iti.formal.automation.FlycheckKt"
 ]
@@ -34,9 +34,9 @@ mainClasses.each { a, b ->
         classpath = startScripts.classpath
         outputDir = startScripts.outputDir
         mainClassName = b
-        startScripts.classpath.files.each {
+        /*startScripts.classpath.files.each {
             c -> println(c)
-        }
+        }*/
     }
     applicationDistribution.from(t) { into("bin") }
     //createStartScript.dependsOn t

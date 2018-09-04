@@ -253,11 +253,7 @@ class StructuredTextPrinter
      */
     override fun visit(statements: StatementList) {
         for (stmt in statements) {
-            if (stmt == null) {
-                sb.printf("{*ERROR: stmt null*}")
-            } else {
-                stmt.accept(this)
-            }
+            stmt.accept(this)
         }
 
     }
@@ -266,6 +262,7 @@ class StructuredTextPrinter
      * {@inheritDoc}
      */
     override fun visit(pd: ProgramDeclaration) {
+        printComment(pd.comment)
         sb.printf("PROGRAM ").printf(pd.name).increaseIndent()
         pd.scope.accept(this)
 
@@ -343,9 +340,8 @@ class StructuredTextPrinter
      * {@inheritDoc}
      */
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) {
+        printComment(functionBlockDeclaration.comment)
         sb.printf("FUNCTION_BLOCK ")
-
-
         if (functionBlockDeclaration.isFinal)
             sb.printf("FINAL ")
         if (functionBlockDeclaration.isAbstract)
@@ -382,6 +378,14 @@ class StructuredTextPrinter
 
     }
 
+    private fun printComment(comment: String) {
+        if (comment.isNotBlank()) {
+            sb.printf(literals.comment_open())
+            sb.printf(comment)
+            sb.printf(literals.comment_close()+"\n")
+        }
+    }
+
     override fun visit(interfaceDeclaration: InterfaceDeclaration) {
         sb.printf("INTERFACE ").printf(interfaceDeclaration.name)
 
@@ -400,6 +404,7 @@ class StructuredTextPrinter
     }
 
     override fun visit(clazz: ClassDeclaration) {
+        printComment(clazz.comment)
         sb.printf("CLASS ")
 
         if (clazz.isFinal)
@@ -456,6 +461,7 @@ class StructuredTextPrinter
     }
 
     override fun visit(functionDeclaration: FunctionDeclaration) {
+        printComment(functionDeclaration.comment)
         sb.printf("FUNCTION ").printf(functionDeclaration.name)
 
         val returnType = functionDeclaration.returnType.identifier
@@ -687,7 +693,7 @@ class StructuredTextPrinter
                         if (VariableDeclaration.GLOBAL and type != 0)
                             sb.printf("_GLOBAL")
                         if (VariableDeclaration.TEMP and type != 0)
-                            sb.printf("TEMP")
+                            sb.printf("_TEMP")
                     }
                     sb.printf(" ")
                     if (VariableDeclaration.CONSTANT and type != 0)
