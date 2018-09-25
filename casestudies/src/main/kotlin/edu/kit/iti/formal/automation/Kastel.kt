@@ -1,6 +1,9 @@
 package edu.kit.iti.formal.automation
 
+import edu.kit.iti.formal.automation.datatypes.DINT
 import edu.kit.iti.formal.automation.datatypes.INT
+import edu.kit.iti.formal.automation.datatypes.LINT
+import edu.kit.iti.formal.automation.datatypes.UINT
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
@@ -69,7 +72,10 @@ object KastelDemonstrator {
         Console.writeln("File $simpFile written")
 
         //degrade INT width
-        INT.bitLength = 7
+        UINT.bitLength = 4
+        INT.bitLength = 4
+        LINT.bitLength = 4
+        DINT.bitLength = 4
 
         val module = SymbExFacade.evaluateProgram(simplified, true)
         val isHigh = { v: String ->
