@@ -65,14 +65,14 @@ class DefaultTypeTranslator : TypeTranslator {
             throw IllegalTypeException("Could not match")
         }
 
-        override fun visit(inttype: AnyInt): SMVType {
+        override fun visit(anyInt: AnyInt): SMVType {
             /*TODO: Make this configurable
             return new SMVType.SMVTypeWithWidth(
                 inttype.isSigned() ?
                         GroundDataType.SIGNED_WORD :
                         GroundDataType.UNSIGNED_WORD, inttype.getBitLength());
         */
-            return SMVWordType(true, WORD_LENGTH)
+            return SMVWordType(true, anyInt.bitLength)
         }
 
         override fun visit(enumerateType: EnumerateType): SMVType {

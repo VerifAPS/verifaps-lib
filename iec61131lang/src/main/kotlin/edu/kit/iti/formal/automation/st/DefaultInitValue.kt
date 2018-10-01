@@ -40,7 +40,8 @@ object DefaultInitValue : InitValueTranslator {
     override fun getInit(type: AnyDt): Value<*, *> = type.accept(InitValueVisitor)
 
     object InitValueVisitor : DataTypeVisitorNN<Value<*, *>> {
-        override fun defaultVisit(obj: Any): Value<*, *> = throw IllegalArgumentException("unsupported data type: $obj")
+        override fun defaultVisit(obj: Any): Value<*, *>
+                = throw IllegalArgumentException("unsupported data type: $obj")
 
 
         override fun visit(reference: ReferenceDt): Value<*, *> = VNULL

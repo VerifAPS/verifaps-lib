@@ -78,9 +78,9 @@ dontcare : '-';
 // 16132 | 261.232 | -152
 i : '-'? INTEGER;
 constant :
-      i #constantInt
-    | T   #constantTrue
-    | F   #constantFalse
+      i  #constantInt
+    | T  #constantTrue
+    | F  #constantFalse
     ;
 
 // >6 , <2, =6, >=6

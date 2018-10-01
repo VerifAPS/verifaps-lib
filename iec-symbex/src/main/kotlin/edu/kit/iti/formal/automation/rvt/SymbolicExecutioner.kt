@@ -39,7 +39,8 @@ import java.util.*
  * Created by weigl on 26.11.16.
  */
 open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
-    override fun defaultVisit(obj: Any) = throw IllegalStateException("Symbolic Executioner does not handle $obj")
+    override fun defaultVisit(obj: Any)
+            = throw IllegalStateException("Symbolic Executioner does not handle $obj")
 
     //region getter and setters
     var scope: Scope = Scope.defaultScope()

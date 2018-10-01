@@ -32,7 +32,7 @@ import edu.kit.iti.formal.automation.testtables.algorithms.OmegaSimplifier
 import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
 import edu.kit.iti.formal.automation.testtables.viz.AutomatonDrawer
-import edu.kit.iti.formal.automation.testtables.viz.ODSTableWriter
+import edu.kit.iti.formal.automation.testtables.viz.ODSCounterExampleWriter
 import edu.kit.iti.formal.smv.NuXMVOutput
 import java.io.File
 
@@ -159,7 +159,7 @@ class GetetaApp : CliktCommand(
                 if (mappings.isEmpty()) {
                     Console.warn("no row mapping found!")
                 } else if (odsExport != null) {
-                    val w = ODSTableWriter(b.counterExample, gtt, mappings)
+                    val w = ODSCounterExampleWriter(b.counterExample, gtt, mappings)
                     w.run()
                     w.writer.saveAs(odsExport)
                     FastOds.openFile(odsExport)

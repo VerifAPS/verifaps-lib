@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation
 
-import edu.kit.iti.formal.automation.datatypes.INT
+import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
@@ -12,7 +12,10 @@ import edu.kit.iti.formal.automation.st0.trans.RealToInt
 import edu.kit.iti.formal.automation.st0.trans.STCodeTransformation
 import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.smv.*
-import edu.kit.iti.formal.smv.ast.*
+import edu.kit.iti.formal.smv.ast.SLiteral
+import edu.kit.iti.formal.smv.ast.SMVExpr
+import edu.kit.iti.formal.smv.ast.SMVModule
+import edu.kit.iti.formal.smv.ast.SVariable
 import java.io.File
 import java.io.PrintWriter
 import java.math.BigInteger
@@ -28,6 +31,9 @@ object KastelDemonstrator {
 
     @JvmStatic
     fun main(args: Array<String>) {
+        SINT.bitLength = 10; INT.bitLength = 10; DINT.bitLength = 10;LINT.bitLength = 10
+        USINT.bitLength = 10; UINT.bitLength = 10;UDINT.bitLength = 10; ULINT.bitLength = 10
+
         val (pous, errors) = IEC61131Facade.fileResolve(INPUT_FILE)
         errors.forEach {
             println("${it.sourceName}:${it.lineNumber} :: ${it.message} (${it.category}) ")
@@ -68,25 +74,24 @@ object KastelDemonstrator {
         }
         Console.writeln("File $simpFile written")
 
-        //degrade INT width
-        INT.bitLength = 7
-
         val module = SymbExFacade.evaluateProgram(simplified, true)
         val isHigh = { v: String ->
-            val b = v.endsWith("Velocity")
+            val b = false// v.endsWith("Velocity")
             Console.info("%35s %s", v, (if (b) "high" else "low"))
             b
         }
-        //val imb = IFModelBuilder(module, isHigh)
-        val imb = PrivacyModelBuilder(module, isHigh)
-        imb.run()
 
+        for (historyLength in listOf(2, 3, 5, 7, 10)) {
+            //val imb = IFModelBuilder(module, isHigh)
+            val imb = PrivacyModelBuilder(module, isHigh, historyLength)
+            imb.run()
 
-        val smvFile = File(FOLDER, "noif_${imb.historyLength}.smv")
-        smvFile.bufferedWriter().use {
-            imb.product.forEach { m -> m.accept(SMVPrinter(PrintWriter(it))) }
+            val smvFile = File(FOLDER, "noif_${imb.historyLength}.smv")
+            smvFile.bufferedWriter().use {
+                imb.product.forEach { m -> m.accept(SMVPrinter(PrintWriter(it))) }
+            }
+            Console.writeln("File $smvFile written")
         }
-        Console.writeln("File $smvFile written")
     }
 }
 
@@ -109,9 +114,12 @@ object AssignmentDScratch : STCodeTransformation, AstMutableVisitor() {
 class PrivacyModelBuilder(private val code: SMVModule,
                           val isHigh: (String) -> Boolean,
                           val historyLength: Int = 10) : Runnable {
-    val inputEqualVar = SVariable("inputEqual", SMVTypes.BOOLEAN)
-    val inputLowVar = SVariable("inputLow", SMVTypes.BOOLEAN)
-    val hmb = HistoryModuleBuilder("HistoryEqualInput", listOf(inputEqualVar), historyLength)
+    val strongEqualInVar = SVariable("strongEqualIn", SMVTypes.BOOLEAN)
+    val softEqualInVar = SVariable("softEqualIn", SMVTypes.BOOLEAN)
+    val hmb = HistoryModuleBuilder("HisStrongEqual",
+            listOf(strongEqualInVar),
+            historyLength)
+
     val main = SMVModule("main")
     val product = arrayListOf(main, code, hmb.module)
 
@@ -134,29 +142,37 @@ class PrivacyModelBuilder(private val code: SMVModule,
                         .map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
                         .conjunction())
 
+        val lowVar = code.inputVars.filter { !isHigh(it.name) }
+        val highVar = code.inputVars.filter { isHigh(it.name) }
 
-        val lowEqual = code.inputVars.filter { !isHigh(it.name) }
-                .map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
-                .reduce { a, b -> a and b }
+        val lowEqual =
+                if (lowVar.isEmpty())
+                    SLiteral.TRUE
+                else
+                    lowVar.map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
+                            .reduce { a, b -> a and b }
 
-        val highEqual = code.inputVars.filter { isHigh(it.name) }
-                .map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
-                .reduce { a, b -> a and b }
+        val highEqual =
+                if (highVar.isEmpty())
+                    SLiteral.TRUE
+                else
+                    highVar.map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
+                            .reduce { a, b -> a and b }
 
 
         //first phase, insert information
         val inputLow = lowEqual
-        main.definitions.add(inputLowVar assignTo inputLow)
+        main.definitions.add(softEqualInVar assignTo inputLow)
 
         // equal output
-        val inputEqual = inputLowVar and highEqual
-        main.definitions.add(inputEqualVar assignTo inputEqual)
+        val inputEqual = softEqualInVar and highEqual
+        main.definitions.add(strongEqualInVar assignTo inputEqual)
 
         //Equality
         val alwaysLowEqual = SVariable("__alwaysLowEqual", SMVTypes.BOOLEAN)
         main.stateVars.add(alwaysLowEqual)
         main.initAssignments.add(alwaysLowEqual assignTo SLiteral.TRUE)
-        main.nextAssignments.add(alwaysLowEqual assignTo (alwaysLowEqual and inputLowVar))
+        main.nextAssignments.add(alwaysLowEqual assignTo (alwaysLowEqual and softEqualInVar))
 
 
         // History of Equal Inputs.
@@ -167,7 +183,7 @@ class PrivacyModelBuilder(private val code: SMVModule,
 
         val outV = code.definitions.map { it.target } + code.stateVars
         val lowOutput = outV//.filter { !isHigh(it.name) }
-        /*val inputLowVar =          outV.filter { !isHigh(it.name) }
+        /*val softEqualInVar =          outV.filter { !isHigh(it.name) }
                 .map {
                     it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
                 }
@@ -175,7 +191,7 @@ class PrivacyModelBuilder(private val code: SMVModule,
         */
 
         val history = hmb.module.stateVars.map { it.inModule(historyLowEq.name) }
-        val premise = (history + inputEqualVar + alwaysLowEqual)
+        val premise = (history + strongEqualInVar + alwaysLowEqual)
                 .reduce { acc: SMVExpr, sVariable: SMVExpr ->
                     acc.and(sVariable)
                 }
@@ -184,7 +200,7 @@ class PrivacyModelBuilder(private val code: SMVModule,
             val eq = it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
             main.invariantSpecs.add(premise implies eq)
         }
-        //main.invariantSpecs.add( inputLowVar implies  inputLowVar)
+        //main.invariantSpecs.add( softEqualInVar implies  softEqualInVar)
     }
 
     private fun instantiateCode(nameOfRun: String) {
@@ -231,7 +247,7 @@ class IFModelBuilder(private val code: SMVModule,
 
         val outV = code.definitions.map { it.target } + code.stateVars
         val lowOutput = outV.filter { !isHigh(it.name) }
-        /*val inputLowVar =          outV.filter { !isHigh(it.name) }
+        /*val softEqualInVar =          outV.filter { !isHigh(it.name) }
                 .map {
                     it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
                 }
@@ -247,7 +263,7 @@ class IFModelBuilder(private val code: SMVModule,
             val eq = it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
             main.invariantSpecs.add(premise implies eq)
         }
-        //main.invariantSpecs.add( inputLowVar implies  inputLowVar)
+        //main.invariantSpecs.add( softEqualInVar implies  softEqualInVar)
     }
 
     private fun instantiateCode(nameOfRun: String) {

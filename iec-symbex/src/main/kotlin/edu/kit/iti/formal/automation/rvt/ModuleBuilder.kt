@@ -56,13 +56,13 @@ class ModuleBuilder(val program: PouExecutable,
         val inputVars = program.scope
                 .filterByFlags(VariableDeclaration.INPUT)
 
-
         // TODO fix so this terminates
         //Set<SVariable> stateVariables = vardeps.dependsOn(outputVars, inputVars);
 
         // Using this workaround instead
         val stateVariables = finalState.keys
-                .filter { (name) -> inputVars.stream().noneMatch { v2 -> v2.name == name } }
+                .filter { (name) ->
+                    inputVars.stream().noneMatch { v2 -> v2.name == name } }
 
         val outputVarNames = outputVars.map(VariableDeclaration::name)
         for (`var` in stateVariables) {
