@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
+import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.automation.st0.TransformationState
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
@@ -14,6 +15,7 @@ import edu.kit.iti.formal.automation.testtables.rtt.RTTCodeAugmentation
 import edu.kit.iti.formal.smv.ast.SMVModule
 import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 object RetetaApp {
     @JvmStatic
@@ -58,11 +60,13 @@ class Reteta : CliktCommand(
             System.exit(1)
         }
         //read program
-        val programs = IEC61131Facade.readProgramsWithLibrary(library, programs)
+        val programs = readPrograms()
+
+
         val superEnumType = GetetaFacade.createSuperEnum(programs.map { it.scope })
 
         val programRunNames = programs.mapIndexed { index, it ->
-            "${it.name.toLowerCase()}$$index"
+            "${it!!.name.toLowerCase()}$$index"
         }
 
         //read table
@@ -102,6 +106,19 @@ class Reteta : CliktCommand(
                 nuxmv.absolutePath,
                 this.table.nameWithoutExtension, modules,
                 table.options.verificationTechnique)
+    }
+
+    fun readPrograms(): List<PouExecutable> {
+        val programs = IEC61131Facade.readProgramsWithLibrary(library, programs)
+        return if (programs.any { it != null }) {
+            Console.fatal("In some given program there is no PROGRAM declaration!")
+            System.exit(1)
+            listOf()
+        } else {
+            val a = ArrayList<PouExecutable>()
+            programs.forEach { if (it != null) a.add(it) }
+            a
+        }
     }
 }
 

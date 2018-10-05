@@ -53,7 +53,7 @@ class SymbolicBranches : ConcurrentHashMap<SVariable, SCaseExpression>() {
      */
     fun asCompressed(): SymbolicState {
         val sb = SymbolicState()
-        entries.parallelStream().forEach { entry -> sb[entry.key] = entry.value.compress() }
+        entries.forEach { entry -> sb[entry.key] = entry.value.compress() }
         return sb
     }
 }

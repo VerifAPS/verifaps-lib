@@ -40,5 +40,4 @@ class AddStuttering : CodeTransformation {
         )
         scope.add(vd)
     }
-
 }

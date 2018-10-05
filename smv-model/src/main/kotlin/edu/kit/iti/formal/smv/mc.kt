@@ -191,6 +191,7 @@ fun parseXmlOutput(text: String): NuXMVOutput {
                 || it.contains("syntax error")
                 || it.contains("TYPE ERROR")
                 || it.contains("undefined")
+                || it.contains("too few actual parameters")
     }
 
     if (errorLinePredicate(text)) {

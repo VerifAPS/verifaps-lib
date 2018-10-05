@@ -58,10 +58,12 @@ class RvtAppTest {
     }
 
     private fun assertEqualBehaviour(old: String, new: String) {
-        val app = RvtApp(
-                TransformationPipeline.create("src/test/resources/$old.st", false),
-                TransformationPipeline.create("src/test/resources/$new.st", false))
-        app.build()
-        Assert.assertEquals(NuXMVOutput.Verified, app.verify());
+        val app = RvtApsApp()
+        app.parse(arrayOf(
+                "--old", "src/test/resources/$old.st",
+                "--new", "src/test/resources/$new.st")
+        )
+        app.run()
+        Assert.assertEquals(NuXMVOutput.Verified, app.nuxmvResult);
     }
 }

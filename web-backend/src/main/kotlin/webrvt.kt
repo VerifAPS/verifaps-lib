@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.web
 
-import edu.kit.iti.formal.automation.rvt.RvtApp
+import edu.kit.iti.formal.automation.rvt.RvtApsPipeline
 import edu.kit.iti.formal.smv.NuXMVOutput
 import io.ktor.application.call
 import io.ktor.html.respondHtml
@@ -28,7 +28,7 @@ fun Route.rvt() {
     post("/equal") {
         try {
             val code = call.receive<String>()
-            val app = RvtApp.createRvtForSingleSource(code)
+            val app = RvtApsPipeline.createRvtForSingleSource(code)
             app.outputFolder = File.createTempFile("rvtapp", "", rvtAppFolder)
             app.outputFolder.mkdirs()
             app.build()

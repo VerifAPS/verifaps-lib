@@ -35,6 +35,7 @@ import edu.kit.iti.formal.automation.testtables.viz.AutomatonDrawer
 import edu.kit.iti.formal.automation.testtables.viz.ODSCounterExampleWriter
 import edu.kit.iti.formal.smv.NuXMVOutput
 import java.io.File
+import java.lang.IllegalStateException
 
 object Geteta {
     @JvmStatic
@@ -46,8 +47,6 @@ object Geteta {
 class GetetaApp : CliktCommand(
         epilog = "Geteta -- Tooling for Generalized Test Tables.",
         name = "geteta.sh") {
-
-
     //val xmlModeOutput by option("-x", help = "enable XML mode")
     //        .flag(default = false)
 
@@ -97,7 +96,8 @@ class GetetaApp : CliktCommand(
 
         //
         Console.info("Parse program ${program.absolutePath} with libraries ${library}")
-        val code = IEC61131Facade.readProgramsWithLibrary(library, listOf(program))[0]
+        val code = IEC61131Facade.readProgramsWithLibrary(library, listOf(program))[0] ?:
+                throw IllegalStateException("No program given in $program")
 
         if (mode != null)
             gtt.options.mode = mode!!

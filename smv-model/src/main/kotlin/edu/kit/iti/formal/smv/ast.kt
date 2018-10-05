@@ -166,20 +166,13 @@ data class SFunction(
     }
 }
 
+//TODO split up into words, boolean, int, float ...
 data class SLiteral(var value: Any, override var dataType: SMVType? = null)
     : SMVExpr() {
 
     override fun inModule(module: String): SLiteral {
         return SLiteral(value, dataType)
     }
-
-
-    /*override fun toString(): String {
-        return when (dataType) {
-            null -> value.toString()
-            else -> dataType!!.format(value)
-        }
-    }*/
 
     override fun <T> accept(visitor: SMVAstVisitor<T>): T {
         return visitor.visit(this)
@@ -222,6 +215,7 @@ data class SLiteral(var value: Any, override var dataType: SMVType? = null)
         }
     }
 }
+
 
 abstract class SMVExpr : SMVAst() {
     abstract val dataType: SMVType?

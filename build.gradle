@@ -25,14 +25,14 @@ dokka {
         project(":smv-model").compileKotlin
     }
 
-    sourceDirs = files('smv-model/src/main/kotlin') + \
-             files("iec61131lang/src/main/kotlin") + \
-             files("iec-symbex/src/main/kotlin") + \
-             files("iec-run/src/main/kotlin") + \
-             files("iec-xml/src/main/kotlin") + \
-             files("flycheck/src/main/kotlin") + \
-             files("casestudies/src/main/kotlin") + \
-             files("iec-modularization/src/main/kotlin")
+    sourceDirs = files('smv-model/src/main/kotlin') +  \
+              files("iec61131lang/src/main/kotlin") +  \
+              files("iec-symbex/src/main/kotlin") +  \
+              files("iec-run/src/main/kotlin") +  \
+              files("iec-xml/src/main/kotlin") +  \
+              files("flycheck/src/main/kotlin") +  \
+              files("casestudies/src/main/kotlin") +  \
+              files("iec-modularization/src/main/kotlin")
 
     // Use default or set to custom path to cache directory
     // to enable package-list caching
@@ -131,7 +131,10 @@ subprojects {
         compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
         compile group: 'org.jetbrains', name: 'annotations', version: '15.0'
         compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-        compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+        //compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+        compile 'org.slf4j:slf4j-jdk14:1.7.25'
+        compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.6.10'
+
         //compile group: 'commons-io', name: 'commons-io', version: '2.6'
         //compile group: 'com.google.guava', name: 'guava', version: '23.6-jre'
         //compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'

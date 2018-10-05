@@ -29,7 +29,6 @@ import java.math.BigInteger
  * @author Alexander Weigl
  * @version 1 (04.09.18)
  */
-
 object MonitorGenerationST : MonitorGeneration {
     override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton): String {
         val mg = MonitorGenerationSTImpl(gtt, automaton)
@@ -248,8 +247,9 @@ operator fun SMVExpr.contains(fvar: Variable): Boolean =
             override fun visit(func: SFunction): Boolean = func.arguments.any { it.accept(this) }
         })
 
-
 private fun VariableDeclaration.ref() = SymbolicReference(name)
+
+//TODO should be externalize into Symbex!
 private fun SMVExpr.toStExpression(): Expression = this.accept(SMVToStVisitor)
 
 object SMVToStVisitor : SMVAstVisitor<Expression> {

@@ -1,7 +1,12 @@
 package edu.kit.iti.formal.automation
 
-import com.xenomachina.argparser.ArgParser
-import com.xenomachina.argparser.default
+import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.multiple
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.multiple
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.analysis.CheckForTypes
 import edu.kit.iti.formal.automation.analysis.ReporterMessage
 import edu.kit.iti.formal.automation.builtin.BuiltinLoader
@@ -12,36 +17,35 @@ import edu.kit.iti.formal.automation.st.ast.PouElements
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.atn.ATNConfigSet
 import org.antlr.v4.runtime.dfa.DFA
+import java.io.File
 import java.util.*
 
-
-class FlycheckArgs(parser: ArgParser) {
-    val verbose by parser.flagging(help = "enable verbose mode").default(false)
-    val include by parser.adding("folder for looking includes").default(arrayListOf("."))
-    val files by parser.positionalList(help = "Files to check").default(arrayListOf())
-}
-object FlycheckMain {
+object Flycheck {
     @JvmStatic
-    fun main(args: Array<String>) {
-        val arguments = FlycheckArgs(ArgParser(args, ArgParser.Mode.POSIX))
-        main(arguments)
-    }
+    fun main(args: Array<String>) = FlycheckApp().main(args)
+}
 
-    fun main(arguments: FlycheckArgs) {
+class FlycheckApp : CliktCommand() {
+    val verbose by option(help = "enable verbose mode").flag()
+    val include by option("-L", help = "folder for looking includes")
+            .file()
+            .multiple()
+
+    val files by argument(name = "FILE", help = "Files to check")
+            .file()
+            .multiple()
+
+    override fun run() {
         val base = BuiltinLoader.loadDefault()
-
         val r = FlycheckRunner(
-                arguments.files.map { CharStreams.fromFileName(it) },
+                files.map { CharStreams.fromFileName(it.absolutePath) },
                 base,
-                arguments.verbose,
-                arguments.include
+                verbose,
+                include
         )
         r.run()
         r.messages.forEach {
-            val level = Console.Level.valueOf(it.level.toUpperCase())
-
-            Console.writeln(level,
-                    "(${it.sourceName}@${it.lineNumber}:${it.charInLine}) ${it.message} (${it.category})"
+            Console.writeln("[${it.level.toUpperCase()}] (${it.sourceName}@${it.lineNumber}:${it.charInLine}) ${it.message} (${it.category})"
             )
         }
     }
@@ -51,7 +55,7 @@ class FlycheckRunner(
         val streams: List<CharStream>,
         val library: PouElements = PouElements(),
         val verbose: Boolean = false,
-        val includeStubs: MutableList<String> = arrayListOf()) {
+        val includeStubs: List<File> = arrayListOf()) {
 
     private val reporter = CheckForTypes.DefaultReporter()
     val messages: MutableList<ReporterMessage>

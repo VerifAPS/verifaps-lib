@@ -42,7 +42,6 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     override fun defaultVisit(obj: Any)
             = throw IllegalStateException("Symbolic Executioner does not handle $obj")
 
-    //region getter and setters
     var scope: Scope = Scope.defaultScope()
     private val varCache = HashMap<String, SVariable>()
     var operationMap: OperationMap = DefaultOperationMap()
@@ -50,7 +49,6 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     var valueTranslator: ValueTranslator = DefaultValueTranslator()
     var initValueTranslator: InitValueTranslator = DefaultInitValue
 
-    //region state handling
     private val state = Stack<SymbolicState>()
     private var globalState = SymbolicState()
     private var caseExpression: Expression? = null
@@ -63,7 +61,6 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         if (globalScope != null)
             this.scope = globalScope
     }
-    //endregion
 
     fun peek(): SymbolicState {
         return state.peek()

@@ -80,6 +80,12 @@ open class RegressionVerification(
         val uncoveredOld = ArrayList<SVariable>(oldVersion.moduleParameters)
         val uncoveredNew = ArrayList<SVariable>(newVersion.moduleParameters)
 
+        logger.info {
+            "Common input variables: " + commonInput.joinToString {
+                "(${it.first.name}, ${it.second.name})"
+            }
+        }
+
         for ((first, second) in commonInput) {
             assert(first.dataType == second.dataType) { "Datatypes are not equal for ${first} and ${second}" }
             glueModule.inputVars.add(first)
@@ -87,6 +93,9 @@ open class RegressionVerification(
             uncoveredOld.remove(first)
             uncoveredNew.remove(second)
         }
+
+        logger.info { "Old exclusive variables: " + uncoveredOld.joinToString { it.name } }
+        logger.info { "New exclusive variables: " + uncoveredNew.joinToString { it.name } }
 
         handleSpecialInputVariables(uncoveredOld, uncoveredNew);
     }
@@ -96,7 +105,8 @@ open class RegressionVerification(
      * @param uncoveredNew
      */
     protected open fun handleSpecialInputVariables(uncoveredOld: List<SVariable>, uncoveredNew: List<SVariable>) {
-
+        uncoveredNew.forEach { glueModule.inputVars.add(it) }
+        uncoveredOld.forEach { glueModule.inputVars.add(it) }
     }
 
     protected open fun addStateVariables() {
@@ -105,7 +115,6 @@ open class RegressionVerification(
         glueModule.stateVars.add(oldModuleInstance)
         glueModule.stateVars.add(newModuleInstance)
     }
-
 
     protected open fun addProofObligation(oldName: String, newName: String) {
         val output = commonOutputVariables()
@@ -194,8 +203,10 @@ open class ReVeWithMiter(oldVersion: SMVModule, newVersion: SMVModule, val miter
         )
 
         glueModule.stateVars.add(miterVar)
-        glueModule.ltlSpec.add(miter.ltlSpec?.inModule(miterInstanceName)!!)
-        glueModule.invariantSpecs.add(miter.invarSpec?.inModule(miterInstanceName)!!)
+        if (miter.ltlSpec != null)
+            glueModule.ltlSpec.add(miter.ltlSpec?.inModule(miterInstanceName)!!)
+        if (miter.invarSpec != null)
+            glueModule.invariantSpecs.add(miter.invarSpec?.inModule(miterInstanceName)!!)
     }
 
     override fun writeTo(writer: Writer) {
@@ -206,7 +217,6 @@ open class ReVeWithMiter(oldVersion: SMVModule, newVersion: SMVModule, val miter
 
 open class GloballyMiter(oldVersion: SMVModule, newVersion: SMVModule)
     : Miter(oldVersion, newVersion) {
-
 
     override fun build() {
         module.name = "GloballyMiter"
@@ -245,18 +255,22 @@ private fun SVariable.prefix(prefix: String): SVariable {
     return SVariable(prefix + this.name, this.dataType!!)
 }
 
-open class UntilMiter(oldVersion: SMVModule, newVersion: SMVModule, val inner: Miter)
+open class UntilMiter(
+        val endCondtion: SMVExpr,
+        oldVersion: SMVModule, newVersion: SMVModule, val inner: Miter)
     : Miter(oldVersion, newVersion) {
     var triggerCondition = SVariable.bool("END_TRIGGER_POINT")
 
-    open fun event(expr: SMVExpr) {
-        module.definitions[triggerCondition] = expr
+    open fun event() {
+        module.definitions[triggerCondition] = endCondtion
     }
 
     override fun build() {
         inner.build()
         module.name = "UntilMiter"
         module.moduleParameters.addAll(inner.module.moduleParameters)
+        parameterIsNew.addAll(inner.parameterIsNew)
+        event()
 
         module.stateVars.add(
                 SVariable.create("inner")
@@ -271,7 +285,6 @@ open class UntilMiter(oldVersion: SMVModule, newVersion: SMVModule, val inner: M
         module.nextAssignments.add(
                 // next(premise) = premise & !EVENT
                 SAssignment(end, end.and(triggerCondition.not())))
-
         invarSpec = end.implies(inner.invarSpec?.inModule("inner")!!)
     }
 

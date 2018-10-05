@@ -137,16 +137,38 @@ object IEC61131Facade {
             fileResolve(inputs.map { CharStreams.fromFileName(it.absolutePath) }, builtins)
 
 
-    fun readProgramsWithLibrary(libraryElements: List<File>, program: List<File>)
-            : List<PouExecutable> {
-        return program.map {
+    /**
+     *
+     */
+    fun readProgramsWithLibrary(libraryElements: List<File>, programs: List<File>): List<PouExecutable?> =
+            readProgramsWithLibrary(libraryElements, programs, Utils::findProgram)
+
+
+    /**
+     *
+     */
+    fun readProgramsWithLibrary(libraryElements: List<File>, programs: List<File>, select: String): List<PouExecutable?> =
+            readProgramsWithLibrary(libraryElements, programs) { seq ->
+                seq.find { it.name == select } as? PouExecutable
+            }
+
+    /**
+     *
+     */
+    fun readProgramsWithLibrary(libraryElements: List<File>,
+                                programs: List<File>,
+                                selector: (PouElements) -> PouExecutable?)
+            : List<PouExecutable?> {
+        return programs.map {
             val (elements, error) = IEC61131Facade.filefr(libraryElements + it)
             error.forEach { Console.warn(it.print()) }
-            Utils.findProgram(elements)
-                    ?: throw IllegalStateException("No program found in File: ${it.absolutePath}")
+            selector(elements)
         }
     }
 
+    /**
+     *
+     */
     fun check(p: PouElements): MutableList<ReporterMessage> {
         val r = CheckForTypes.DefaultReporter()
         p.accept(CheckForTypes(r))

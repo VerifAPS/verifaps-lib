@@ -21,7 +21,8 @@ def mainClasses = [
         , 'reteta'      : 'edu.kit.iti.formal.automation.testtables.apps.Reteta'
         , 'ttmonitor'   : 'edu.kit.iti.formal.automation.testtables.apps.Monitor'
 //        , 'ttsynth'     : 'edu.kit.iti.formal.automation.testtables.apps.Synthizer'
-        , 'rvt'         : "edu.kit.iti.formal.automation.rvt.RvtappKt"
+        , 'rvt'         : "edu.kit.iti.formal.automation.rvt.RvtAps"
+        , 'tt-unwind'   : "edu.kit.iti.formal.automation.rvt"
         , 'flycheck'    : "edu.kit.iti.formal.automation.FlycheckKt"
 ]
 
