@@ -1,9 +1,6 @@
 package edu.kit.iti.formal.smv
 
-import edu.kit.iti.formal.smv.ast.SFunction
-import edu.kit.iti.formal.smv.ast.SLiteral
-import edu.kit.iti.formal.smv.ast.SMVExpr
-import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.smv.ast.*
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.math.BigDecimal
@@ -20,9 +17,7 @@ import java.util.regex.Pattern
 interface SMVType {
     fun format(value: Any): String
     fun read(str: String): Any
-    fun valueOf(str: String) =
-            SLiteral(read(str), this)
-
+    fun valueOf(str: String): SLiteral
     fun repr(): String
 }
 
@@ -30,7 +25,7 @@ data class SMVWordType(
         val signed: Boolean,
         val width: Int) : SMVType {
 
-    override fun valueOf(str: String) = SLiteral(read(str), this)
+    override fun valueOf(str: String) = SWordLiteral(read(str), this)
 
     override fun read(str: String): BigInteger {
         val re = Pattern.compile("(?<sign>-)?0(?<t>s|u)d(?<w>\\d+)_(?<v>\\d+)")
@@ -62,6 +57,8 @@ data class SMVWordType(
 }
 
 object SMVTypes {
+    val GENERIC_ENUM = EnumType(listOf())
+
     object INT : SMVType {
         override fun valueOf(str: String): SLiteral {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -122,7 +119,7 @@ data class EnumType(var values: List<String>) : SMVType {
         if (!values.contains(value)) {
             throw IllegalArgumentException()
         }
-        return SLiteral(value, this)
+        return SEnumLiteral(value, this)
     }
 
     override fun toString(): String {

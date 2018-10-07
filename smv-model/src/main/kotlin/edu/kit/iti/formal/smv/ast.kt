@@ -2,6 +2,7 @@ package edu.kit.iti.formal.smv.ast
 
 import edu.kit.iti.formal.smv.*
 import org.antlr.v4.runtime.Token
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 import kotlin.collections.ArrayList
@@ -166,33 +167,24 @@ data class SFunction(
     }
 }
 
-//TODO split up into words, boolean, int, float ...
-data class SLiteral(var value: Any, override var dataType: SMVType? = null)
-    : SMVExpr() {
-
-    override fun inModule(module: String): SLiteral {
-        return SLiteral(value, dataType)
-    }
-
-    override fun <T> accept(visitor: SMVAstVisitor<T>): T {
-        return visitor.visit(this)
-    }
+sealed class SLiteral(open val value: Any, override val dataType: SMVType) : SMVExpr() {
+    override fun <T> accept(visitor: SMVAstVisitor<T>): T = visitor.visit(this)
 
     companion object {
         @JvmStatic
-        val TRUE = SLiteral(true, SMVTypes.BOOLEAN)
+        val TRUE = SBooleanLiteral(true)
+
         @JvmStatic
-        val FALSE = SLiteral(false, SMVTypes.BOOLEAN)
+        val FALSE = SBooleanLiteral(false)
 
         @JvmStatic
         fun integer(from: Long) = integer(BigInteger.valueOf(from))
 
         @JvmStatic
-        fun integer(from: BigInteger) = SLiteral.create(from).with(SMVTypes.INT)
+        fun integer(from: BigInteger) = SIntegerLiteral(from)
 
-        @JvmStatic
+        /*@JvmStatic
         fun create(value: Any) = LiteralBuilder(value)
-
 
         class LiteralBuilder(value: Any) {
             private val literal = SLiteral(value)
@@ -212,8 +204,42 @@ data class SLiteral(var value: Any, override var dataType: SMVType? = null)
                 literal.dataType = type
                 return literal
             }
-        }
+        }*/
     }
+}
+
+data class SIntegerLiteral(override var value: BigInteger)
+    : SLiteral(value, SMVTypes.INT) {
+    override fun inModule(module: String): SMVExpr = SIntegerLiteral(value)
+}
+
+data class SFloatLiteral(override var value: BigDecimal)
+    : SLiteral(value, SMVTypes.FLOAT) {
+    override fun inModule(module: String): SMVExpr = SFloatLiteral(value)
+}
+
+data class SWordLiteral(override var value: BigInteger,
+                        override var dataType: SMVWordType)
+    : SLiteral(value, dataType) {
+    override fun inModule(module: String): SMVExpr = SWordLiteral(value, dataType)
+}
+
+data class SBooleanLiteral(override var value: Boolean)
+    : SLiteral(value, SMVTypes.BOOLEAN) {
+    override fun inModule(module: String): SMVExpr = SBooleanLiteral(value)
+}
+
+data class SEnumLiteral(override var value: String,
+                        override var dataType: EnumType = SMVTypes.GENERIC_ENUM)
+    : SLiteral(value, dataType) {
+    override fun inModule(module: String): SMVExpr = SEnumLiteral(value)
+}
+
+// Use with caution!
+data class SGenericLiteral(override var value: Any,
+                    override var dataType: SMVType)
+    : SLiteral(value, dataType) {
+    override fun inModule(module: String): SMVExpr = SGenericLiteral(value,dataType)
 }
 
 

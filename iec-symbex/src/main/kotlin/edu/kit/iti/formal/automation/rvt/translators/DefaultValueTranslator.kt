@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.rvt.translators
  */
 
 import edu.kit.iti.formal.automation.datatypes.values.Value
+import edu.kit.iti.formal.smv.ast.SGenericLiteral
 import edu.kit.iti.formal.smv.ast.SLiteral
 
 /**
@@ -33,8 +34,7 @@ class DefaultValueTranslator : ValueTranslator {
     var tt: TypeTranslator = DefaultTypeTranslator.INSTANCE
 
     override fun translate(init: Value<*, *>): SLiteral {
-        return SLiteral.create(init.value)
-                .with(this.tt.translate(init.dataType))
+        return SGenericLiteral(init.value, this.tt.translate(init.dataType))
     }
 
     companion object {

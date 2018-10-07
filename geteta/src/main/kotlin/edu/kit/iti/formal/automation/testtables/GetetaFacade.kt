@@ -66,7 +66,7 @@ object GetetaFacade {
 
     fun exprToSMV(cell: TestTableLanguageParser.CellContext, column: SVariable,
                   programRun: Int, vars: ParseContext): SMVExpr {
-        val ev = ExprVisitor(column, programRun, vars)
+        val ev = TblLanguageToSmv(column, programRun, vars)
         val expr = cell.accept(ev)
         Console.debug("parsed: %s to %s", cell, expr)
         return expr

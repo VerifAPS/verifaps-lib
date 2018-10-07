@@ -7,14 +7,15 @@ import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.ParseContext
 import edu.kit.iti.formal.smv.EnumType
 import edu.kit.iti.formal.smv.ast.*
+import java.math.BigInteger
 import java.util.*
 
 /**
  * Created by weigl on 09.12.16.
  */
-class ExprVisitor(private val columnVariable: SVariable,
-                  private val columnProgramRun: Int?,
-                  private val context: ParseContext) : TestTableLanguageBaseVisitor<SMVExpr>() {
+class TblLanguageToSmv(private val columnVariable: SVariable,
+                       private val columnProgramRun: Int?,
+                       private val context: ParseContext) : TestTableLanguageBaseVisitor<SMVExpr>() {
 
     override fun visitCell(ctx: TestTableLanguageParser.CellContext): SMVExpr {
         return ctx.chunk().map { this.visitChunk(it) }
@@ -50,7 +51,7 @@ class ExprVisitor(private val columnVariable: SVariable,
     }
 
     override fun visitI(ctx: TestTableLanguageParser.IContext): SMVExpr {
-        return SLiteral.create(java.lang.Long.parseLong(ctx.text)).with(columnVariable.dataType!!)
+        return SIntegerLiteral(BigInteger(ctx.text))
     }
 
     override fun visitConstantTrue(ctx: TestTableLanguageParser.ConstantTrueContext): SMVExpr {
@@ -150,6 +151,10 @@ class ExprVisitor(private val columnVariable: SVariable,
         return ctx.variable().accept(this)
     }
 
+    override fun visitEnum(ctx: TestTableLanguageParser.EnumContext): SMVExpr {
+        return SEnumLiteral(ctx.text)
+    }
+
     override fun visitVariable(ctx: TestTableLanguageParser.VariableContext): SMVExpr {
         val programRun = when {
             ctx.RV_SEPARATOR() == null -> columnProgramRun
@@ -175,7 +180,7 @@ class ExprVisitor(private val columnVariable: SVariable,
             if (isReference)
                 throw IllegalExpressionException("You referenced a variable $varText, " +
                         "but it is not found as a defined program variable.")
-            SLiteral(varText.toUpperCase(), ENUM_TYPE)
+            SEnumLiteral(varText.toUpperCase())
         }
     }
 

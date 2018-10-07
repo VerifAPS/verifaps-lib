@@ -59,8 +59,13 @@ class DefaultOperationMap : OperationMap {
      */
     protected fun div(dividend: SMVExpr, divisor: SMVExpr): SMVExpr {
         return SMVFacade.caseexpr(
-                divisor.equal(SLiteral.create(0).with(divisor.dataType!!)),
-                SLiteral.create(0).with(dividend.dataType!!), SLiteral.TRUE,
+                // if b=0
+                divisor.equal(SGenericLiteral(0, divisor.dataType!!)),
+                //then 0
+                SGenericLiteral(0, dividend.dataType!!),
+                //else
+                SLiteral.TRUE,
+                //return a/b
                 SBinaryExpression(dividend, SBinaryOperator.DIV, divisor))
     }
 }

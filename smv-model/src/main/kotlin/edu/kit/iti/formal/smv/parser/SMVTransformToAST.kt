@@ -232,14 +232,11 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
     }
 
     override fun visitWordValue(ctx: SMVParser.WordValueContext): Any {
-        val p = ctx.getText().split("_")
-        val gdt = if (p[0].get(1) == 's')
-            true
-        else
-            false
+        val p = ctx.text.split("_")
+        val gdt = p[0][1] == 's'
 
         val bits = Integer.parseInt(p[0].substring(3))
-        return SLiteral.create(BigInteger(p[1])).with(bits, gdt)
+        return SWordLiteral(BigInteger(p[1]), SMVWordType(gdt, bits))
     }
 
     override fun visitRangeExpr(ctx: SMVParser.RangeExprContext): Any {
@@ -313,11 +310,11 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
     }
 
     override fun visitIntegerLiteral(ctx: SMVParser.IntegerLiteralContext): Any {
-        return SLiteral(BigInteger(ctx.value.getText()), SMVTypes.INT)
+        return SIntegerLiteral(BigInteger(ctx.value.getText()))
     }
 
     override fun visitFloatLiteral(ctx: SMVParser.FloatLiteralContext): Any {
-        return SLiteral(BigDecimal(ctx.value.getText()), SMVTypes.FLOAT)
+        return SFloatLiteral(BigDecimal(ctx.value.getText()))
     }
 
     override fun visitCaseBranch(ctx: SMVParser.CaseBranchContext): Any {
