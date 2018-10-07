@@ -1,102 +1,34 @@
-# verifaps-maven-parent
+# verifaps-lib 
 
-Parent POM for Verifaps Projects
+Library and programs for the verification of software for automated production systems.
 
-## How to use
+* License: GPLv3
+* Homepage: https://formal.iti.kit.edu/verifaps 
 
-Add following into your `pom.xml`:
+## How to build
+
+Create all programs: 
 
 ```
-<project>
-    ...
-    <parent>
-        <groupId>edu.kit.iti.formal</groupId>
-        <artifactId>verifaps</artifactId>
-        <version>1.2.0</version>
-    </parent>
-
-    <repositories>
-        <repository>
-            <id>institute</id>
-            <url>http://formal.iti.kit.edu/</url>
-        </repository>
-    </repositories>
-    ...
-</project>
+$ ./gradlew :casestudies:installDist
 ```
 
+You can find the programs in `./casestudies/build/install/casestudies/bin`.
 
-## Features and Settings
+Test project:
 
-* Plugins
-  * Checkstyle
-  * FindBugs
-  * License Plugin
-    * Default License: `${license.identifier}` (gpl_v3)
-    * inceptionYear: `${license.inceptionYear}`  (2016)
-    * copyrightOwners: `${license.copyrightOwner}` (Alexander Weigl)
-* Repositories:
-  * http://formal.iti.kit.edu/
-* Dependencies
-  * `junit:junit:4.12`
+```
+$ ./gradlew check
+```
 
+## Project overview
 
-## Useful Commands
-
-* Deploy to local folder:
-
-
-  ```
-  mvn -DperformRelease=true [-DskipTests=true] deploy
-  ```
-
-* Generate and deploy website:
-
-  ```
-  mvn site:site site:deploy
-  ```
-
-* Update license headers:
-
-  ```
-  mvn license:update-file-header
-  ```
-
-  *You should commit before executing*
-
-* Fix JavaDoc
-  ```
-  mvn javadoc:fix
-  ```
-  *You should commit before executing*
-
-
-## Changelog
-
-### 1.2.0
-
-* Add JXR 
-* Add Surefire Reports
-
-### 1.1.0
-
-* Introduce `${local.deploy.site}` and `${local.deploy.repository}` properties.
-
-### 1.0.0
-
-* Initial version
-
-
-
-
-## Authors
-
-* Alexander Weigl <weigl@kit.edu>
-
-
-
-
-
-<!-- Local Variables: -->
-<!-- ispell-dictionary: "english" -->
-<!-- End: -->
+* iec61131-lang -- Parser and AST for StructuredText and Sequential Function Chart.
+* geteta -- Framework for generalized Test Tables.
+* casestudies -- contains generic programs and programs for specific case studies.
+* flycheck  -- interface for syntax and type checking of Structured Text files.
+* iec-modularization -- Modularized regression verification.
+* iec-run -- Interpreter for Structured Text
+* iec-xml -- Loading and Parsing of PCLOpenXML projects.
+* smv-model -- Model and parser for SMV. Also includes nuXmv interface.
+* web-backend -- Backend for the web frontend. (upcoming)
