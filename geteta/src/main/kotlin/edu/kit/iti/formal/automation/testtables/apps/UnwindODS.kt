@@ -1,13 +1,22 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.multiple
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.file
+import edu.kit.iti.formal.automation.Console
+import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.viz.ODSCounterExampleWriter
-import edu.kit.iti.formal.automation.testtables.viz.ODSDebugTable
+import edu.kit.iti.formal.automation.testtables.viz.DefaultTableStyle
 import edu.kit.iti.formal.automation.testtables.viz.TableUnwinder
+import edu.kit.iti.formal.automation.testtables.viz.createTableWithProgram
+import edu.kit.iti.formal.automation.testtables.viz.createTableWithoutProgram
+import java.util.logging.Level
 
 /**
  *
@@ -24,19 +33,48 @@ object UnwindODSApp {
 
 class UnwindODS : CliktCommand(
         epilog = "UnwindODS -- Tooling for Relational Test Tables.",
-        name = "tt-unwind.sh") {
-    val table by option("-t", "--table", help = "the xml file of the table", metavar = "FILE")
+        name = "tt-debug.sh") {
+    val table by argument(help = "the xml file of the table", name = "table")
             .file()
-            .required()
+            .multiple()
 
     val outputFile by option("-o", "--output", help = "Output ODS file")
             .file().required()
 
+    val library by option("-L", "--library", help = "ST code to be weaved in")
+            .file().multiple()
+
+    val program by option("-p", "--program", help = "ST code to be weaved in")
+            .file()
+
+    val selector: String by option("--name", help = "Name of Program or function block")
+            .default("main")
+
     override fun run() {
-        val gtt = GetetaFacade.readTable(table)
-        val unwinded = TableUnwinder(gtt, HashMap())() //use default
-        val tblWriter = ODSDebugTable(gtt, unwinded)
-        tblWriter.run()
-        tblWriter.writer.saveAs(outputFile)
+        Console.configureLoggingConsole(Level.FINEST)
+        Console.info("Program: {} ith library {}", program, library)
+        val smvModule = if (program != null) {
+            IEC61131Facade.readProgramsWithLibrary(library, listOf(program!!), selector)[0]?.let {
+                SymbExFacade.evaluateProgram(it)
+            }
+        } else null
+
+        Console.info("Program {} found!", if (smvModule != null) "" else "not")
+
+
+        table.forEach { file ->
+            val gtt = GetetaFacade.readTable(file)
+            val unwinded = TableUnwinder(gtt, HashMap())() //use default
+            Console.info("Unwinded tabe contains {} rows", unwinded.size)
+
+            val table =
+                    if (smvModule != null)
+                        createTableWithProgram(smvModule, gtt, DefaultTableStyle, unwinded)
+                    else
+                        createTableWithoutProgram(gtt, DefaultTableStyle, unwinded)
+
+            table.run()
+            table.writer.saveAs(outputFile)
+        }
     }
 }

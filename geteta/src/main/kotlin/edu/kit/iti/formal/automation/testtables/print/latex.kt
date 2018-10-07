@@ -45,10 +45,13 @@ fun escape(s: String, chars: Array<String> = LATEX_SPECIAL_CHARS): String {
 
 abstract class AbstractTablePrinter(protected val gtt: GeneralizedTestTable,
                                     protected val stream: CodeWriter) : TablePrinter {
-    protected val helper = PrinterHelper(gtt, this::cellFormatter)
 
-
+    protected var helper : PrinterHelper
     protected var currentRow = 0
+
+    init {
+        helper = PrinterHelper(gtt, this::cellFormatter)
+    }
 
     val input = gtt.programVariables.filter { it.isInput }
     val output = gtt.programVariables.filter { it.isOutput }
@@ -216,7 +219,6 @@ class LatexTablePrinter(gtt: GeneralizedTestTable,
 
     override fun cellFormatter(c: TestTableLanguageParser.CellContext): String {
         return c.accept(LatexPrinter(options))
-
     }
 
     private fun beautifyDuration(d: Duration): String =

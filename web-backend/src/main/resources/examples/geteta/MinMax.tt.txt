@@ -5,8 +5,8 @@ table TTable {
     var output Q : INT
     var output W : BOOL
     
-    gvar p : INT with 0
-    gvar q : INT with 5
+    gvar min : INT with 0
+    gvar max : INT with 5
     
     
     group 0 [1, 1] {
@@ -28,8 +28,8 @@ table TTable {
             row 4 >= 1{
                 mode: Learn
                 learn: true
-                I: [p,q]
-                Q: [p,q]
+                I: [min,max]
+                Q: [min,max]
                 W: false
             }
         }
@@ -38,8 +38,8 @@ table TTable {
                 row 7 >= 0{
                     mode: Active
                     learn: -
-                    I: [p,q]
-                    Q: [p,q]
+                    I: [min,max]
+                    Q: [min,max]
                     W: false
                 }
             }
@@ -47,15 +47,15 @@ table TTable {
                 row 9 [10, 10]{
                     mode: Active
                     learn: -
-                    I: >q
-                    Q: <=q
+                    I: >max
+                    Q: <=max
                     W: false
                 }
                 row 10 >= 1{
                     mode: Active
                     learn: -
-                    I: >q
-                    Q: <=q
+                    I: >max
+                    Q: <=max
                     W: true
                 }
             }
@@ -63,15 +63,15 @@ table TTable {
                 row 12 [5, 5]{
                     mode: Active
                     learn: -
-                    I: [p,q]
-                    Q: [p,q]
+                    I: [min,max]
+                    Q: [min,max]
                     W: true
                 }
                 row 13 >= 1{
                     mode: Active
                     learn: -
-                    I: [p,q]
-                    Q: [p,q]
+                    I: [min,max]
+                    Q: [min,max]
                     W: false
                 }
             }
@@ -79,15 +79,15 @@ table TTable {
                 row 15 [10, 10]{
                     mode: Active
                     learn: -
-                    I: <p
-                    Q: >=p
+                    I: <min
+                    Q: >=min
                     W: false
                 }
                 row 16 >= 1{
                     mode: Active
                     learn: -
-                    I: <p
-                    Q: >=p
+                    I: <min
+                    Q: >=min
                     W: true
                 }
             }
@@ -95,15 +95,15 @@ table TTable {
                 row 18 [5, 5]{
                     mode: Active
                     learn: -
-                    I: [p,q]
-                    Q: [p,q]
+                    I: [min,max]
+                    Q: [min,max]
                     W: true
                 }
                 row 19 >= 1{
                     mode: Active
                     learn: -
-                    I: [p,q]
-                    Q: [p,q]
+                    I: [min,max]
+                    Q: [min,max]
                     W: false
                 }
             }

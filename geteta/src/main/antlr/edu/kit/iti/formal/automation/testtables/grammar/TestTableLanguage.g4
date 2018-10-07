@@ -4,13 +4,15 @@ grammar TestTableLanguage;
     import java.util.*;
 }
 
-@members {
+@parser::members {
     public boolean relational = false;
-    public Set<String> variables = new HashSet<>();
+}
+    /*public Set<String> variables = new HashSet<>();
 
 
-	private boolean isVariable(Token value) {
-		return variables.contains(value.getText());
+	private boolean isVariable() {
+        String next = getCurrentToken().getText();
+		return variables.contains(next);
 	}
 
     private void addVariable(Token realName, Token newName) {
@@ -18,6 +20,7 @@ grammar TestTableLanguage;
         if (tok != null) {variables.add(tok.getText()); }
     }
 }
+*/
 
 //structure level
 file  : table*;
@@ -39,12 +42,9 @@ signature : 'var' state='state'? io=('input'|'output')
 ;
 
 variableDefinition :
-        {!relational}? n=IDENTIFIER ('as' newName=IDENTIFIER)?
-            { addVariable($n, $newName); } #variableAliasDefinitionSimple
-      | {relational}? INTEGER RV_SEPARATOR  n=IDENTIFIER ('as' newName=IDENTIFIER)?
-            { addVariable($n, $newName); } #variableAliasDefinitionRelational
-      | {relational}? n=IDENTIFIER ('of' INTEGER+)
-            { addVariable($n, null);  }#variableRunsDefinition
+        {!relational}? n=IDENTIFIER ('as' newName=IDENTIFIER)?                      #variableAliasDefinitionSimple
+      | {relational}? INTEGER RV_SEPARATOR  n=IDENTIFIER ('as' newName=IDENTIFIER)? #variableAliasDefinitionRelational
+      | {relational}? n=IDENTIFIER ('of' INTEGER+)                                  #variableRunsDefinition
 ;
 
 osem : ';'?;
@@ -66,7 +66,6 @@ time :
 
 freeVariable:
     'gvar' name=IDENTIFIER ':' dt=IDENTIFIER ('with' constraint=cell)?
-                { addVariable($name, null);  }
 ;
 
 vardt : arg=IDENTIFIER':' dt=IDENTIFIER;
@@ -97,7 +96,6 @@ constant :
       i  #constantInt
     | T  #constantTrue
     | F  #constantFalse
-    | value=IDENTIFIER {!isVariable($value)}? #enum
     ;
 
 // >6 , <2, =6, >=6
@@ -136,9 +134,8 @@ expr
 ;
 
 variable:
-    ( name=IDENTIFIER (LBRACKET i RBRACKET)?
+        name=IDENTIFIER (LBRACKET i RBRACKET)?
       | {relational}? INTEGER? RV_SEPARATOR name=IDENTIFIER? (LBRACKET i RBRACKET)?
-    ) {isVariable($name);}
 ;
 
 // if

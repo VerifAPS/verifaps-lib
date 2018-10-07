@@ -36,15 +36,15 @@ object Console {
         logger.addHandler(handler)
     }
 
-    fun debug(msg: String, vararg args: Any) = rootLogger.debug(msg, *args)
+    fun debug(msg: String, vararg args: Any?) = rootLogger.debug(msg, *args)
 
-    fun info(msg: String, vararg args: Any) = rootLogger.info(msg, *args)
+    fun info(msg: String, vararg args: Any?) = rootLogger.info(msg, *args)
 
-    fun error(msg: String, vararg args: Any) = rootLogger.error(msg, *args)
+    fun error(msg: String, vararg args: Any?) = rootLogger.error(msg, *args)
 
-    fun warn(msg: String, vararg args: Any) = rootLogger.warn(msg, *args)
+    fun warn(msg: String, vararg args: Any?) = rootLogger.warn(msg, *args)
 
-    fun fatal(msg: String, vararg args: Any) = rootLogger.error(msg, *args)
+    fun fatal(msg: String, vararg args: Any?) = rootLogger.error(msg, *args)
 
     private val FIRST_ESC_CHAR: Char = 27.toChar()
     private val SECOND_ESC_CHAR = '['

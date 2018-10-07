@@ -151,9 +151,9 @@ class TblLanguageToSmv(private val columnVariable: SVariable,
         return ctx.variable().accept(this)
     }
 
-    override fun visitEnum(ctx: TestTableLanguageParser.EnumContext): SMVExpr {
+    /*override fun visitEnum(ctx: TestTableLanguageParser.EnumContext): SMVExpr {
         return SEnumLiteral(ctx.text)
-    }
+    }*/
 
     override fun visitVariable(ctx: TestTableLanguageParser.VariableContext): SMVExpr {
         val programRun = when {
