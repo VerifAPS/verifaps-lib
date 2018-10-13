@@ -213,10 +213,8 @@ class GeneralizedTestTable(
     }
 
     fun getTableRow(rowId: String) = region.flat().find { it.id == rowId }
-    fun isProgramVariable(variable: String): Boolean
-            = programVariables.any { it.name == variable }
-    fun isConstraintVariable(variable: String): Boolean
-            = constraintVariables.any { it.name == variable }
+    fun isProgramVariable(variable: String): Boolean = programVariables.any { it.name == variable }
+    fun isConstraintVariable(variable: String): Boolean = constraintVariables.any { it.name == variable }
 }
 
 operator fun <T : Identifiable> Iterable<T>.get(text: String) = find { it.name == text }
@@ -428,5 +426,10 @@ data class TableRow(override val id: String) : TableNode(id) {
                 inputExpr.put(VARIABLE_PAUSE, pexpr)
             }
 
+    }
+
+    fun constraintOf(v: ProgramVariable): SMVExpr? {
+        val name = v.name
+        return inputExpr[name] ?: outputExpr[name]
     }
 }

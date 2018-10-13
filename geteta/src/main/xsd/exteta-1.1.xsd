@@ -71,7 +71,7 @@
         <sequence minOccurs="0" maxOccurs="unbounded">
             <any/>
             <!-- <choice> <element name="const" type="tns:cellSimpleValueType" />
-                <element name="capture" type="string" /> <element name="expr" type="tns:cellExpressionType"
+                <element name="capture" type="text" /> <element name="expr" type="tns:cellExpressionType"
                 /> <element name="dontcare" type="tns:cellDontCareType" /> <element name="rel"
                 type="tns:cellRelationType" /> </choice> -->
         </sequence>
@@ -108,7 +108,7 @@
         </restriction>
     </simpleType>
 
-    <!-- <simpleType name="cellType"> <restriction base="string"></restriction>
+    <!-- <simpleType name="cellType"> <restriction base="text"></restriction>
         </simpleType> <simpleType name="cellSimpleValueType"> <restriction base="tns:cellType"></restriction>
         </simpleType> <simpleType name="cellDontCareType"> <restriction base="tns:cellType"></restriction>
         </simpleType> <simpleType name="cellRelationType"> <restriction base="tns:cellType"></restriction>

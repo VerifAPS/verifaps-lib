@@ -11,7 +11,9 @@ include ':flycheck'
 include ':geteta'
 include ':web-backend'
 include ':util'
+include ':smt'
 
+project(':smt').projectDir = "$rootDir/smt" as File
 
 project(':iec-symbex').projectDir = "$rootDir/iec-symbex" as File
 project(':iec61131lang').projectDir = "$rootDir/iec61131lang" as File
