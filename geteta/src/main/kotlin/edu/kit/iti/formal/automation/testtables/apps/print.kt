@@ -10,6 +10,7 @@ import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.print.HTMLTablePrinter
 import edu.kit.iti.formal.automation.testtables.print.LatexTablePrinter
+import edu.kit.iti.formal.automation.testtables.print.TextTablePrinter
 import edu.kit.iti.formal.util.CodeWriter
 import java.io.OutputStreamWriter
 
@@ -24,10 +25,10 @@ object Printer {
 }
 
 class PrinterApp : CliktCommand() {
-    enum class Format { HTML, LATEX }
+    enum class Format { HTML, LATEX, TEXT }
 
-    val format by option()
-            .convert { Format.valueOf(it) }
+    val format by option("-f", "--format")
+            .convert { Format.valueOf(it.toUpperCase()) }
             .default(Format.LATEX)
 
     val output by option("--output",
@@ -45,18 +46,20 @@ class PrinterApp : CliktCommand() {
         val gtt = GetetaFacade.readTable(file)
 
         val o = output
-
-        val sink = CodeWriter(o?.let { o.bufferedWriter() } ?: OutputStreamWriter(System.out))
+        val stream = o?.let { o.bufferedWriter() } ?: OutputStreamWriter(System.out)
+        val sink = CodeWriter(stream)
 
         val printer =
                 when (format) {
                     Format.LATEX -> LatexTablePrinter(gtt, sink)
                     Format.HTML -> HTMLTablePrinter(gtt, sink)
+                    Format.TEXT -> TextTablePrinter(gtt, sink)
                 }
 
         if (standalone) printer.printPreamble()
         printer.print()
         if (standalone) printer.printPostamble()
+        stream.flush()
     }
 }
 

@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.parser
 
-import edu.kit.iti.formal.automation.times
+import edu.kit.iti.formal.util.times
 import org.antlr.v4.runtime.*
 import java.util.*
 import java.util.function.Supplier

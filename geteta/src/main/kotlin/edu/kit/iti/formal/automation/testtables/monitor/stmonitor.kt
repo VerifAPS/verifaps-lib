@@ -12,6 +12,7 @@ import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.automation.st.Statements
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.automation.testtables.apps.bindsConstraintVariable
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.ConstraintVariable
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
@@ -101,7 +102,7 @@ object MonitorGenerationST : MonitorGeneration {
                     val oneOfRowStates = states.map { SymbolicReference(it.name) }
                             .disjunction()
                     row.rawFields.forEach { pvar, ctx ->
-                        val bind = getBinding(ctx, fvar)
+                        val bind = bindsConstraintVariable(ctx, fvar)
                         if (bind) {
                             stBody.add(0, Statements.ifthen(boundFlag.not() and oneOfRowStates,
                                     SymbolicReference(fvar.name) assignTo SymbolicReference(pvar.name),
@@ -113,21 +114,7 @@ object MonitorGenerationST : MonitorGeneration {
             }
         }
 
-        private fun getBinding(ctx: TestTableLanguageParser.CellContext?, fvar: ConstraintVariable)
-                : Boolean {
-            return ctx?.chunk()?.filter { chunk ->
-                val variable = chunk.variable()
-                val ss = chunk.singlesided()
-                if (ss != null) {
-                    val e = ss.expr() as? TestTableLanguageParser.VariableContext
-                    if (e == null || ss.relational_operator().text == "=") false
-                    else e.IDENTIFIER().equals(fvar.name)
-                } else if (variable != null) {
-                    variable.IDENTIFIER().text == fvar.name
-                } else
-                    false
-            }?.isNotEmpty() ?: false
-        }
+
 
         private fun updateOutput() {
             val error = SymbolicReference(errorOutput.name)

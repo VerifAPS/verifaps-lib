@@ -76,4 +76,15 @@ open class CodeWriter(var stream: Writer = StringWriter())
         text.splitToSequence('\n').forEach { nl().printf(it) }
         return this
     }
+
+    fun cblock(head: String, tail: String, function: CodeWriter.() -> Unit): CodeWriter {
+        printf(head)
+        increaseIndent()
+        nl()
+        function()
+        decreaseIndent()
+        nl()
+        printf(tail)
+        return this
+    }
 }

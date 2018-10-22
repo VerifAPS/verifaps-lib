@@ -27,6 +27,7 @@ import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.util.HTMLCodeWriter
 import edu.kit.iti.formal.util.Sections
+import edu.kit.iti.formal.util.joinInto
 
 /**
  * Created by weigla on 15.06.2014.
@@ -297,7 +298,7 @@ open class StructuredTextHtmlPrinter : DefaultVisitor<Unit>() {
 
     private fun visitInvocationParameters(parameters: MutableList<InvocationParameter>) {
         sb.printf("(")
-        parameters.joinTo(sb, ",") { it.accept(this) }
+        parameters.joinInto(sb, ",") { it.accept(this) }
         sb.printf(")")
     }
 

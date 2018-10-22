@@ -33,6 +33,7 @@ data class PrintCellContent(
     val inBetween: Boolean
         get() = !beginGroup && !endGroup
 }
+
 typealias CellPrinter = (TestTableLanguageParser.CellContext) -> String
 
 class PrinterHelper(gtt: GeneralizedTestTable,
