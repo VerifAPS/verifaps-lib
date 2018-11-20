@@ -43,79 +43,6 @@ fun escape(s: String, chars: Array<String> = LATEX_SPECIAL_CHARS): String {
     return t
 }
 
-abstract class AbstractTablePrinter(protected val gtt: GeneralizedTestTable,
-                                    protected val stream: CodeWriter) : TablePrinter {
-
-    protected var helper : PrinterHelper
-    protected var currentRow = 0
-
-    init {
-        helper = PrinterHelper(gtt, this::cellFormatter)
-    }
-
-    val input = gtt.programVariables.filter { it.isInput }
-    val output = gtt.programVariables.filter { it.isOutput }
-    val durations = Stack<Pair<Duration, Int>>()
-    val depth = gtt.region.depth()
-
-
-    protected abstract fun contentBegin()
-    protected abstract fun tableBegin()
-    protected abstract fun tableEnd()
-    protected abstract fun contentEnd()
-    protected abstract fun regionEnd()
-    protected abstract fun regionBegin()
-    protected abstract fun rowBegin()
-    protected abstract fun rowEnd()
-
-    protected abstract fun printGroupDuration(dur: Duration, rowSpan: Int)
-    protected abstract fun printCell(v: ProgramVariable)
-    protected abstract fun printRowDuration(duration: Duration)
-
-    override fun print() {
-        contentBegin()
-        tableBegin()
-        printRegion(gtt.region.children)
-        tableEnd()
-        contentEnd()
-    }
-
-    private fun printRegion(region: List<TableNode>) {
-        region.forEach { o ->
-            when (o) {
-                is TableRow -> printStep(o)
-                is Region -> {
-                    regionBegin()
-                    printRegion(o)
-                    regionEnd()
-                }
-            }
-        }
-    }
-
-    private fun printRegion(b: Region) {
-        durations.push(b.duration to b.count())
-        printRegion(b.children)
-    }
-
-    private fun printStep(s: TableRow) {
-        rowBegin()
-        currentRow++
-
-        input.forEach { v -> printCell(v) }
-        output.forEach { v -> printCell(v) }
-
-        printRowDuration(s.duration)
-        while (!durations.empty()) {
-            val (dur, rowSpan) = durations.pop()
-            printGroupDuration(dur, rowSpan)
-        }
-        rowEnd()
-    }
-
-    abstract fun cellFormatter(c: TestTableLanguageParser.CellContext): String
-}
-
 class LatexTablePrinter(gtt: GeneralizedTestTable,
                         stream: CodeWriter,
                         val options: LatexTablePrinterOptions = LatexTablePrinterOptions()
@@ -133,7 +60,6 @@ class LatexTablePrinter(gtt: GeneralizedTestTable,
     override fun printPostamble() {
         stream.printf("\n\\end{document}\n")
     }
-
 
     override fun contentBegin() {}
 
@@ -190,7 +116,7 @@ class LatexTablePrinter(gtt: GeneralizedTestTable,
         System.out.printf("\\\\%n")
     }
 
-    override fun printCell(v: ProgramVariable) {
+    override fun printCell(v: ProgramVariable, row: TableRow) {
         val cell = helper.columns[v.name]?.get(currentRow - 1)!!
         stream.printf(" & %15s",
                 if (options.noRepetitionLines)

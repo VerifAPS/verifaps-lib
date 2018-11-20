@@ -7,6 +7,9 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
+import edu.kit.iti.formal.automation.testtables.model.ConstraintVariable
+import edu.kit.iti.formal.automation.testtables.monitor.CMonitorGenerator
 import edu.kit.iti.formal.automation.testtables.monitor.MonitorGenerationST
 
 /**
@@ -20,17 +23,17 @@ object Monitor {
 }
 
 enum class CodeOutput {
-    STRCUTURED_TEXT, ESTEREL, CPP
+    STRCUTURED_TEXT, ESTEREL, CPP,C
 }
 
 class MonitorApp : CliktCommand(name = "ttmonitor",
         help = "Construction of monitors from test tables for Runtime Verification") {
-    val table by option("--table,-t", help = "table file", metavar = "FILE")
+    val table by option("--table","-t", help = "table file", metavar = "FILE")
             .file(exists = true, readable = true).required()
 
     val format by option("--format", "-f", help = "code format, possible values: " +
             CodeOutput.values().joinToString(",") { it.name })
-            .convert { CodeOutput.valueOf(it) }.default(CodeOutput.STRCUTURED_TEXT)
+            .convert { CodeOutput.valueOf(it.toUpperCase()) }.default(CodeOutput.STRCUTURED_TEXT)
 
     override fun run() {
         val gtt = GetetaFacade.readTable(table)
@@ -43,8 +46,25 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
                     CodeOutput.STRCUTURED_TEXT ->
                         MonitorGenerationST.generate(gtt, automaton)
                     CodeOutput.ESTEREL -> TODO()
+                    CodeOutput.C -> CMonitorGenerator.generate(gtt,automaton)
                     CodeOutput.CPP -> TODO()
                 }
         println(output)
     }
+}
+
+
+fun bindsConstraintVariable(ctx: TestTableLanguageParser.CellContext?, fvar: ConstraintVariable): Boolean {
+    return ctx?.chunk()?.filter { chunk ->
+        val variable = chunk.variable()
+        val ss = chunk.singlesided()
+        if (ss != null) {
+            val e = ss.expr() as? TestTableLanguageParser.VariableContext
+            if (e == null || ss.relational_operator().text == "=") false
+            else e.IDENTIFIER().equals(fvar.name)
+        } else if (variable != null) {
+            variable.IDENTIFIER().text == fvar.name
+        } else
+            false
+    }?.isNotEmpty() ?: false
 }

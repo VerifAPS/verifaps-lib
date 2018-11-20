@@ -19,7 +19,6 @@ import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVModule
 import org.antlr.v4.runtime.CharStreams
 import java.io.File
-import java.util.logging.Level
 
 object RvtAps {
     @JvmStatic
@@ -100,7 +99,7 @@ class RvtApsApp : CliktCommand(
     val untilMiterEndTrigger by option("--until-miter-cond", metavar = "FILE").file()
 
     override fun run() {
-        Console.configureLoggingConsole(Level.FINEST)
+        Console.configureLoggingConsole()
 
         val newModule = loadPouExecutable(library, newVersion, newName)
         val oldModule = loadPouExecutable(library, oldVersion, oldName)

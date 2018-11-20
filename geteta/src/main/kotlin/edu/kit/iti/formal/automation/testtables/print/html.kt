@@ -5,6 +5,7 @@ import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.ProgramVariable
+import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.util.CodeWriter
 
 /**
@@ -94,8 +95,8 @@ class HTMLTablePrinter(gtt: GeneralizedTestTable, stream: CodeWriter,
         """)
     }
 
-    override fun printCell(v: ProgramVariable) {
-        val cell = helper.columns[v.name]?.get(currentRow - 1)!!
+    override fun printCell(v: ProgramVariable, row: TableRow) {
+        val cell = helper.columns[v.name]?.get(currentRow)!!
         val content = cell.content
         val c =
                 if (cell.inBetween) "in-between"

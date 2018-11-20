@@ -4,7 +4,6 @@ import java.io.StringWriter
 import java.io.Writer
 
 /**
- *
  * CodeWriter class.
  *
  * @author weigla (15.06.2014)
@@ -74,6 +73,17 @@ open class CodeWriter(var stream: Writer = StringWriter())
 
     fun appendReformat(text: String): CodeWriter {
         text.splitToSequence('\n').forEach { nl().printf(it) }
+        return this
+    }
+
+    fun cblock(head: String, tail: String, function: CodeWriter.() -> Unit): CodeWriter {
+        printf(head)
+        increaseIndent()
+        nl()
+        function()
+        decreaseIndent()
+        nl()
+        printf(tail)
         return this
     }
 }

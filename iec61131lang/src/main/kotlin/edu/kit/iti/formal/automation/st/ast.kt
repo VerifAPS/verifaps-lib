@@ -13,7 +13,7 @@ import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.*
 import edu.kit.iti.formal.automation.st.Cloneable
-import edu.kit.iti.formal.automation.times
+import edu.kit.iti.formal.util.times
 import edu.kit.iti.formal.automation.visitors.Visitable
 import edu.kit.iti.formal.automation.visitors.Visitor
 import org.antlr.v4.runtime.ParserRuleContext

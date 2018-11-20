@@ -33,6 +33,7 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
 import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.util.joinInto
 import java.util.*
 
 /**
@@ -237,7 +238,7 @@ class StructuredTextPrinter
             sb.printf("^")
 
         if (symbolicReference.subscripts != null && !symbolicReference.subscripts!!.isEmpty()) {
-            symbolicReference.subscripts!!.joinTo(sb, ", ", "[", "]") { it.accept(this) }
+            symbolicReference.subscripts!!.joinInto(sb, ", ", "[", "]") { it.accept(this) }
         }
 
         if (symbolicReference.sub != null) {
@@ -295,7 +296,7 @@ class StructuredTextPrinter
      * {@inheritDoc}
      */
     override fun visit(expressions: ExpressionList) {
-        expressions.joinTo(sb) { it.accept(this) }
+        expressions.joinInto(sb) { it.accept(this) }
     }
 
     /**
@@ -307,7 +308,7 @@ class StructuredTextPrinter
     }
 
     private fun visitInvocationParameter(parameters: MutableList<InvocationParameter>) {
-        parameters.joinTo(sb, ", ", "(", ")") {
+        parameters.joinInto(sb, ", ", "(", ")") {
             if (it.name != null) {
                 sb.printf(it.name!!)
                 if (it.isOutput)
@@ -553,7 +554,7 @@ class StructuredTextPrinter
      */
     override fun visit(aCase: Case) {
         sb.nl()
-        aCase.conditions.joinTo(sb) { it.accept(this) }
+        aCase.conditions.joinInto(sb) { it.accept(this) }
         sb.printf(":")
         sb.block() {
             aCase.statements.accept(this@StructuredTextPrinter)
@@ -666,7 +667,7 @@ class StructuredTextPrinter
     }
 
     override fun visit(initializations: ArrayInitialization) {
-        initializations.initValues.joinTo(sb, ", ", "[", "]") {
+        initializations.initValues.joinInto(sb, ", ", "[", "]") {
             it.accept(this)
         }
     }
@@ -724,7 +725,7 @@ class StructuredTextPrinter
     }
 
     override fun visit(structureInitialization: StructureInitialization) {
-        structureInitialization.initValues.joinTo(sb, ", ", "(", ")")
+        structureInitialization.initValues.joinInto(sb, ", ", "(", ")")
         { t, v ->
             sb.printf(t).printf(" := ")
             v.accept(this)
@@ -926,32 +927,3 @@ class StructuredTextPrinter
     }
 }
 
-private fun <K, V, A : Appendable> Map<K, V>.joinTo(buffer: A,
-                                                    separator: String = ",", prefix: String = "", postfix: String = "",
-                                                    transform: (K, V) -> Unit) {
-    val kv = entries.toList()
-    buffer.append(prefix)
-    if (isNotEmpty()) {
-        for (i in 0 until size - 1) {
-            transform(kv[i].key, kv[i].value)
-            buffer.append(separator)
-        }
-        transform(kv[kv.lastIndex].key, kv[kv.lastIndex].value)
-    }
-    buffer.append(postfix)
-}
-
-public fun <T, A : Appendable> List<T>.joinTo(buffer: A,
-                                              separator: String = ",", prefix: String = "", postfix: String = "",
-                                              transform: (T) -> Unit) {
-    buffer.append(prefix)
-    if (isNotEmpty()) {
-        for (i in 0 until size - 1) {
-            transform(this[i])
-            buffer.append(separator)
-        }
-        transform(this[lastIndex])
-    }
-    buffer.append(postfix)
-
-}

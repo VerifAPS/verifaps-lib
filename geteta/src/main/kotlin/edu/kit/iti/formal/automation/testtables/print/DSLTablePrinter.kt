@@ -4,7 +4,6 @@ import edu.kit.iti.formal.automation.st.StructuredTextPrinter
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.automation.testtables.model.*
-import java.util.*
 
 /**
  *
@@ -52,8 +51,8 @@ class DSLTablePrinter(val stream: CodeWriter) {
         }
     }
 
-    fun print(p: Properties) {
-        if (p.isEmpty) return
+    fun print(p: MutableMap<String, String>) {
+        if (p.isEmpty()) return
         stream.nl().printf("options {").increaseIndent()
         p.forEach { t, u ->
             stream.nl().printf("$t = $u")

@@ -15,7 +15,7 @@ import org.junit.Test
 class RuntimeTest {
     @Before
     fun setUp() {
-        System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE")
+        //System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE")
     }
 
     @Test

@@ -13,7 +13,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/iec61131lang/iec61131lang.iml" filepath="$PROJECT_DIR$/.idea/modules/iec61131lang/iec61131lang.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/smv-model/smv-model.iml" filepath="$PROJECT_DIR$/.idea/modules/smv-model/smv-model.iml" />
       <module fileurl="file://$PROJECT_DIR$/util/util.iml" filepath="$PROJECT_DIR$/util/util.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/verifaps-lib.iml" filepath="$PROJECT_DIR$/.idea/verifaps-lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/verifaps-lib.iml" filepath="$PROJECT_DIR$/.idea/modules/verifaps-lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/web-backend/web-backend.iml" filepath="$PROJECT_DIR$/.idea/modules/web-backend/web-backend.iml" />
     </modules>
   </component>
