@@ -6,8 +6,10 @@ import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.ProgramVariable
 import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.util.center
 import edu.kit.iti.formal.util.times
 import java.io.StringWriter
+import javax.swing.SwingConstants
 
 /**
  *  ```
@@ -21,6 +23,9 @@ import java.io.StringWriter
  * @version 1 (22.10.18)
  */
 
+/**
+ * Class holds the characters for drawing the borders.
+ */
 data class AsciiBorderCharacters(
         val TOP_LEFT: Char,
         val TOP_MID: Char,
@@ -34,40 +39,76 @@ data class AsciiBorderCharacters(
         val HORIZONTAL: Char,
         val VERTICAL: Char)
 
+/**
+ * Single frame borders:
+ * ```
+┌──┬──┐
+│  │  │
+├──┼──┤
+│  │  │
+└──┴──┘
+ * ```
+ * @author Alexander Weigl
+ * @version 1 (22.10.18)
+ */
 val SINGLE_BORDER = AsciiBorderCharacters('┌',
         '┬', '┐', '├',
         '┼', '┤', '└',
         '┴', '┘', '─', '│')
 
+/**
+ * Double frame borders:
+ *  ```
+╔══╦══╗
+║  ║  ║
+╠══╬══╣
+║  ║  ║
+╚══╩══╝
+ * ```
+ * @author Alexander Weigl
+ * @version 1 (22.10.18)
+ */
 val DOUBLE_BORDER = AsciiBorderCharacters('╔',
         '╦', '╗', '╠',
         '╬', '╣', '╚',
         '╩', '╝', '═',
         '║')
 
+/**
+ * Options for Text printing.
+ */
 data class TextPrinterOptions(
-        var MIN_WIDTH_COLUMN: Int = 8,
-        var DONT_CARE: String = "-",
-        var REPEAT_LINES: Boolean = false,
-        var REPEAT_REPLACEMENT: String = "",
-        var BORDER: AsciiBorderCharacters = SINGLE_BORDER,
-        val PADDING: Int = 1 // spaces left and right
-        , val MIDDLE_LINES: Boolean = false
-) {
-}
+        var columnMinWidth: Int = 8,
+        var dontCareChar: String = "-",
+        var printEmptyCells: Boolean = false,
+        var emptyCellReplacement: String = "",
+        var border: AsciiBorderCharacters = SINGLE_BORDER,
+        val spacePadding: Int = 1 // spaces left and right
+        , val drawLinesBetweenRows: Boolean = false
+)
 
-
+/**
+ * Represents a text cell
+ */
 data class Cell(
         var content: String,
         var spanRows: Int = 1,
         var spanColumns: Int = 1,
-        var width: Int = -1
+        /**
+         * -1 for unset width, 0 for removal, otherwise contains width in characters
+         */
+        var width: Int = -1,
+        /**
+         * Orientation of the cell.
+         * One of [SwingConstants.LEFT], [SwingConstants.CENTER] or
+         * [SwingConstants.RIGHT]
+         */
+        var orientation: Int = SwingConstants.LEFT
 )
 
 class TextTablePrinter(gtt: GeneralizedTestTable,
                        stream: CodeWriter,
-                       val options: TextPrinterOptions = TextPrinterOptions()
-) : AbstractTablePrinter(gtt, stream) {
+                       val options: TextPrinterOptions = TextPrinterOptions()) : AbstractTablePrinter(gtt, stream) {
     lateinit var grid: Array<Array<Cell>>
     var column = 0
 
@@ -79,12 +120,19 @@ class TextTablePrinter(gtt: GeneralizedTestTable,
         grid = Array(rows) { Array(columns) { Cell("") } }
 
         grid[0][0].content = "#"
+        grid[0][0].orientation = SwingConstants.CENTER
+
         grid[0][1].content = "INPUT"
         grid[0][1].spanColumns = input.size
+        grid[0][1].orientation = SwingConstants.CENTER
+
         grid[0][1 + input.size].content = "OUTPUT"
         grid[0][1 + input.size].spanColumns = output.size
+        grid[0][1 + input.size].orientation = SwingConstants.CENTER
+
         grid[0][1 + input.size + output.size].content = "DURATION"
         grid[0][1 + input.size + output.size].spanColumns = depth
+        grid[0][1 + input.size + output.size].orientation = SwingConstants.CENTER
 
         val variables = (input + output).map { it.name }
         variables.forEachIndexed { i, it ->
@@ -143,31 +191,40 @@ class GridPrinter(
             printBorderHT(grid[row])
         if (row == 1 || row == 2)
             printBorderHM(grid[row])
-        if (row > 2 && options.MIDDLE_LINES)
+        if (row > 2 && options.drawLinesBetweenRows)
             printBorderHM(grid[row])
 
-        stream.print(options.BORDER.VERTICAL)
-        cells.joinTo(stream, options.BORDER.VERTICAL.toString()) {
-            String.format(" %-${it.width - 2}s ", it.content)
+        stream.print(options.border.VERTICAL)
+        cells.joinTo(stream, options.border.VERTICAL.toString()) {
+            when (it.orientation) {
+                SwingConstants.LEFT ->
+                    String.format(" %${it.width - 2}s ", it.content)
+                SwingConstants.CENTER ->
+                    it.content.center(it.width)
+                SwingConstants.RIGHT ->
+                    String.format(" %-${it.width - 2}s ", it.content)
+                else -> throw IllegalStateException("Illegal orientation supplied")
+            }
         }
-        stream.print(options.BORDER.VERTICAL)
+        stream.print(options.border.VERTICAL)
         stream.nl()
     }
 
+
     private fun printBorderHT(cells: Array<Cell>) =
-            printBorderH(cells, options.BORDER.TOP_LEFT,
-                    options.BORDER.TOP_MID, options.BORDER.TOP_RIGHT,
-                    options.BORDER.HORIZONTAL)
+            printBorderH(cells, options.border.TOP_LEFT,
+                    options.border.TOP_MID, options.border.TOP_RIGHT,
+                    options.border.HORIZONTAL)
 
     private fun printBorderHM(cells: Array<Cell>) =
-            printBorderH(cells, options.BORDER.MID_LEFT,
-                    options.BORDER.MID_MID, options.BORDER.MID_RIGHT,
-                    options.BORDER.HORIZONTAL)
+            printBorderH(cells, options.border.MID_LEFT,
+                    options.border.MID_MID, options.border.MID_RIGHT,
+                    options.border.HORIZONTAL)
 
     private fun printBorderHB(cells: Array<Cell>) =
-            printBorderH(cells, options.BORDER.BOT_LEFT,
-                    options.BORDER.BOT_MID, options.BORDER.BOT_RIGHT,
-                    options.BORDER.HORIZONTAL)
+            printBorderH(cells, options.border.BOT_LEFT,
+                    options.border.BOT_MID, options.border.BOT_RIGHT,
+                    options.border.HORIZONTAL)
 
 
     private fun printBorderH(cells: Array<Cell>,
@@ -187,9 +244,9 @@ class GridPrinter(
         for (c in 0 until columns) {
             val cells = grid.map { it[c] }
             val width = cells.asSequence()
-                    .map { options.PADDING * 2 + if (it.width < 0) it.content.length else it.width }
-                    .max() ?: options.MIN_WIDTH_COLUMN
-            cells.forEach { it.width = Math.max(options.MIN_WIDTH_COLUMN, width) }
+                    .map { options.spacePadding * 2 + if (it.width < 0) it.content.length else it.width }
+                    .max() ?: options.columnMinWidth
+            cells.forEach { it.width = Math.max(options.columnMinWidth, width) }
         }
     }
 
@@ -203,7 +260,7 @@ class GridPrinter(
                 var cell = seq[idx]
                 if (cell.spanColumns > 1) {
                     val consumed = seq.slice(idx + 1 until idx + cell.spanColumns)
-                    val w = consumed.sumBy { it.width +  options.PADDING }
+                    val w = consumed.sumBy { it.width + options.spacePadding }
                     cell.width += w
                     consumed.forEach { it.width = 0 }
                     idx += cell.spanColumns;

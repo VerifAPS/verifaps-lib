@@ -16,7 +16,6 @@ import edu.kit.iti.formal.automation.testtables.viz.DefaultTableStyle
 import edu.kit.iti.formal.automation.testtables.viz.TableUnwinder
 import edu.kit.iti.formal.automation.testtables.viz.createTableWithProgram
 import edu.kit.iti.formal.automation.testtables.viz.createTableWithoutProgram
-import java.util.logging.Level
 
 /**
  *
@@ -51,7 +50,7 @@ class UnwindODS : CliktCommand(
             .default("main")
 
     override fun run() {
-        Console.configureLoggingConsole(Level.FINEST)
+        Console.configureLoggingConsole()
         Console.info("Program: {} ith library {}", program, library)
         val smvModule = if (program != null) {
             IEC61131Facade.readProgramsWithLibrary(library, listOf(program!!), selector)[0]?.let {

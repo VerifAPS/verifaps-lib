@@ -4,7 +4,6 @@ import java.io.StringWriter
 import java.io.Writer
 
 /**
- *
  * CodeWriter class.
  *
  * @author weigla (15.06.2014)

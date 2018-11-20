@@ -29,7 +29,7 @@ object Console {
                         }, record.message)
     }
 
-    fun configureLoggingConsole(level: Level) {
+    fun configureLoggingConsole() {
         val logger = Logger.getLogger("")
         val handler = StreamHandler(System.out, formatter)
         logger.handlers.forEach(logger::removeHandler)

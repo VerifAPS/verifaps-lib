@@ -31,6 +31,8 @@ object KastelDemonstrator {
 
     @JvmStatic
     fun main(args: Array<String>) {
+        Console.configureLoggingConsole()
+
         SINT.bitLength = 10; INT.bitLength = 10; DINT.bitLength = 10;LINT.bitLength = 10
         USINT.bitLength = 10; UINT.bitLength = 10;UDINT.bitLength = 10; ULINT.bitLength = 10
 
@@ -76,8 +78,10 @@ object KastelDemonstrator {
 
         val module = SymbExFacade.evaluateProgram(simplified, true)
         val isHigh = { v: String ->
-            val b = false// v.endsWith("Velocity")
-            Console.info("%35s %s", v, (if (b) "high" else "low"))
+            val b = v in listOf(
+                    "ReadStatusAxis1\$ConstantVelocity"
+                    )// v.endsWith("Velocity")
+            Console.info(String.format("%35s %s", v, (if (b) "high" else "low")))
             b
         }
 
@@ -107,7 +111,8 @@ object AssignmentDScratch : STCodeTransformation, AstMutableVisitor() {
 
 
 /**
- * * Self composition, from two equal states
+ * * Self composition
+ * * start from two equal states
  * * inserting information
  * * forgetting information in [historyLength] cycles.
  */
@@ -142,23 +147,19 @@ class PrivacyModelBuilder(private val code: SMVModule,
                         .map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
                         .conjunction())
 
+        // low variables
         val lowVar = code.inputVars.filter { !isHigh(it.name) }
+
+        // high variables
         val highVar = code.inputVars.filter { isHigh(it.name) }
 
-        val lowEqual =
-                if (lowVar.isEmpty())
-                    SLiteral.TRUE
-                else
-                    lowVar.map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
-                            .reduce { a, b -> a and b }
+        fun conjunction(v: List<SVariable>) =
+                if (v.isEmpty()) SLiteral.TRUE
+                else v.map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
+                        .conjunction()
 
-        val highEqual =
-                if (highVar.isEmpty())
-                    SLiteral.TRUE
-                else
-                    highVar.map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
-                            .reduce { a, b -> a and b }
-
+        val lowEqual = conjunction(lowVar)
+        val highEqual = conjunction(highVar)
 
         //first phase, insert information
         val inputLow = lowEqual
@@ -168,38 +169,29 @@ class PrivacyModelBuilder(private val code: SMVModule,
         val inputEqual = softEqualInVar and highEqual
         main.definitions.add(strongEqualInVar assignTo inputEqual)
 
-        //Equality
+        // flag: signals that soft equivalence is maintained
         val alwaysLowEqual = SVariable("__alwaysLowEqual", SMVTypes.BOOLEAN)
         main.stateVars.add(alwaysLowEqual)
         main.initAssignments.add(alwaysLowEqual assignTo SLiteral.TRUE)
         main.nextAssignments.add(alwaysLowEqual assignTo (alwaysLowEqual and softEqualInVar))
 
-
         // History of Equal Inputs.
         hmb.run()
-        val historyLowEq = SVariable("hInputEq", hmb.moduleType)
+        val historyLowEq = SVariable("hInputStrongEq", hmb.moduleType)
         main.stateVars.add(historyLowEq)
 
 
-        val outV = code.definitions.map { it.target } + code.stateVars
-        val lowOutput = outV//.filter { !isHigh(it.name) }
-        /*val softEqualInVar =          outV.filter { !isHigh(it.name) }
-                .map {
-                    it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
-                }
-                .reduce { a, b -> a and b }
-        */
-
+        val lowOutput = code.definitions.map { it.target } + code.stateVars
         val history = hmb.module.stateVars.map { it.inModule(historyLowEq.name) }
         val premise = (history + strongEqualInVar + alwaysLowEqual)
                 .reduce { acc: SMVExpr, sVariable: SMVExpr ->
                     acc.and(sVariable)
                 }
 
-        lowOutput.forEach {
-            val eq = it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
-            main.invariantSpecs.add(premise implies eq)
-        }
+        main.invariantSpecs.add(premise implies
+                conjunction(lowOutput))
+
+        //    val eq = it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
         //main.invariantSpecs.add( softEqualInVar implies  softEqualInVar)
     }
 
@@ -326,6 +318,11 @@ object SeqParamsActiveStep : CodeTransformation, AstMutableVisitor() {
     }
 }
 
+/**
+ * The remaining program contains division, that are not meaningful
+ * anymore (because of the degrading of floats to int), i.e.
+ * (i/1000)*1000.
+ */
 object IntLit1000To1 : STCodeTransformation, AstMutableVisitor() {
     val _1000 = BigInteger.valueOf(1000)
     override fun transform(stBody: StatementList): StatementList = stBody.accept(this) as StatementList
