@@ -34,6 +34,7 @@ object Console {
         val handler = StreamHandler(System.out, formatter)
         logger.handlers.forEach(logger::removeHandler)
         logger.addHandler(handler)
+        handler.flush()
     }
 
     fun debug(msg: String, vararg args: Any?) = rootLogger.debug(msg, *args)

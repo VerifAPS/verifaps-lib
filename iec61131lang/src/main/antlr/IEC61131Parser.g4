@@ -809,7 +809,7 @@ exit_statement
 
  // Table 54 - 61 - Sequential Function Chart (SFC)
  sfc:  sfc_network+;
- sfc_network : init_step (step | transition | action )*;
+ sfc_network : init_step (step | transition /*| action */)*;
  init_step : INITIAL_STEP step_name=IDENTIFIER COLON ( action_association SEMICOLON )* END_STEP;
  step : STEP step_name=IDENTIFIER COLON ( action_association SEMICOLON )* END_STEP;
  action_association : actionName=IDENTIFIER '(' actionQualifier ? ( ',' indicatorName=IDENTIFIER )* ')';
@@ -817,7 +817,7 @@ exit_statement
  //actionTime: TIME_LITERAL | IDENTIFIER;
  transition : TRANSITION id=IDENTIFIER? ( LPAREN PRIORITY ASSIGN INTEGER_LITERAL RPAREN)?
                 FROM from=steps TO to=steps transitionCond END_TRANSITION;
- steps : IDENTIFIER | LPAREN IDENTIFIER ( COMMA IDENTIFIER )+ RPAREN;
+ steps : IDENTIFIER | LPAREN IDENTIFIER ( COMMA IDENTIFIER )* RPAREN;
  transitionCond : ASSIGN expression SEMICOLON /*| COLON ( FBD_Network | LD_Rung ) | ':=' IL_Simple_Inst*/;
  action : ACTION IDENTIFIER COLON? body END_ACTION;
 //

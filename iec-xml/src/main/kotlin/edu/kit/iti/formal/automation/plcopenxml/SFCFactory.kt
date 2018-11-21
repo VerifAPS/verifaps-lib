@@ -53,7 +53,13 @@ class SFCFactory(internal val sfcElement: Element,
     }
 
     private fun writeTransition(from: String, to: String, condition: String) {
-        writer.nl().printf("TRANSITION FROM $from TO $to := $condition END_TRANSITION")
+        if(condition == "()")
+            // If a transition has no condition it is hidden in the diagram.
+            // This occurs, for example if you make jumps into simultaneous divergence.
+            // Then a sim. convergence is added, which has transition to all "open" ends with no guard.
+            // I hate PCLOpenXML. Why not protobuf!
+            return
+        writer.nl().printf("TRANSITION FROM $from TO $to := $condition; END_TRANSITION")
     }
 
     val QUALIFIER_ONENTRY = "P0"

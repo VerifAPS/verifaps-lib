@@ -12,9 +12,11 @@ open class DataTypeExtractor(val datatypes: List<Element>,
                              val writer: CodeWriter,
                              val translator: List<XMLTranslator> = listOf(EnumTranslator, StructTranslator)) {
     fun run() {
-        writer.printf("TYPE").increaseIndent()
-        datatypes.forEach { translate(it) }
-        writer.decreaseIndent().nl().printf("END_TYPE").nl().nl()
+        if (datatypes.isNotEmpty()) {
+            writer.printf("TYPE").increaseIndent()
+            datatypes.forEach { translate(it) }
+            writer.decreaseIndent().nl().printf("END_TYPE").nl().nl()
+        }
     }
 
     private fun translate(e: Element) {

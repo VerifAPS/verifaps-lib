@@ -66,11 +66,10 @@ object IEC61131Facade {
         return tle
     }
 
-    var teeXmlParser = true
 
     @Throws(IOException::class)
-    fun file(f: File): PouElements {
-        return if (f.endsWith("xml")) {
+    fun file(f: File, teeXmlParser: Boolean = true): PouElements {
+        return if (f.extension == "xml") {
             val out = IECXMLFacade.extractPLCOpenXml(f.absolutePath)
             if (teeXmlParser) {
                 val stfile = File(f.parentFile, f.nameWithoutExtension + ".st")
