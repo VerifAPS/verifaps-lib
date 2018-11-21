@@ -9,6 +9,7 @@ import edu.kit.iti.formal.smv.ast.SVariable
 import java.io.PrintWriter
 import java.util.*
 import java.util.concurrent.Callable
+import kotlin.collections.HashMap
 
 /**
  *
@@ -38,7 +39,22 @@ class AbstractInterpretationSfc(val sfcDiff: DifferenceSfc, val leftScope: Scope
             Console.info("Change is $change.")
             iter++
         } while (change)
-        //TODO Taint guards!
+
+        updateGuards()
+    }
+
+    private fun updateGuards() {
+        sfcDiff.states.values.forEach { to ->
+            val leftT = to.leftIncomingTransitions
+            val rightT = to.rightIncomingTransitions
+            val incomingStates = leftT.keys + rightT.keys
+            incomingStates.forEach { from ->
+                val leftGuard = leftT[from]
+                val rightGuard = rightT[from]
+                to.abstractGuard[from] = updateAssignment(from.abstractVariable, leftGuard, rightGuard)
+            }
+        }
+
     }
 
     private fun updateState(it: DifferenceState): Boolean {
@@ -200,6 +216,7 @@ data class DifferenceState(val name: String) {
     val abstractVariable: MutableMap<String, TaintEq> = HashMap()
     val leftIncomingTransitions: MutableMap<DifferenceState, SMVExpr> = HashMap()
     val rightIncomingTransitions: MutableMap<DifferenceState, SMVExpr> = HashMap()
+    val abstractGuard: MutableMap<DifferenceState, TaintEq> = HashMap()
 }
 
 class DifferenceSfc {
@@ -211,21 +228,25 @@ class DifferenceSfc {
         stream.write("digraph G {\nnode[shape=none]\n")
         states.values.forEach {
             val variables = TreeSet(it.leftAssignments.keys + it.rightAssignments.keys)
-            val htmlLabel = """<tr><td colspan="4">${it.name}</td></tr>""" +
+            val allEqual = it.abstractVariable.values.all { it == TaintEq.EQUAL }
+            val color = if (allEqual) "green" else "red"
+            val htmlLabel = """<tr><td colspan="4"><B><U>${it.name}</U></B></td></tr>""" +
                     variables.joinToString("\n") { v ->
-                        val la = it.leftAssignments[v]?.repr().htmlEscape()
-                        val ra = it.rightAssignments[v]?.repr().htmlEscape()
+                        val la = ""// it.leftAssignments[v]?.repr().htmlEscape()
+                        val ra =""// it.rightAssignments[v]?.repr().htmlEscape()
                         val taint = it.abstractVariable[v]?.toString()
-                        "<tr><td>$v</td><td>${la}</td><td>${ra}</td><td>$taint</td></tr>"
+                        "<tr><td><B>$v</B></td><td>${la}</td><td>${ra}</td><td color=\"$color\">$taint</td></tr>"
                     }
-            stream.write("${it.name} [label=<<table>$htmlLabel</table>> ]\n")
+            stream.write("${it.name} [color=$color,label=<<table CELLBORDER=\"0\">$htmlLabel</table>> ]\n")
         }
         states.values.forEach { to ->
             val fromNodes = to.leftIncomingTransitions.keys + to.rightIncomingTransitions.keys
             fromNodes.forEach { from ->
                 val left = to.leftIncomingTransitions[from]?.repr()
                 val right = to.rightIncomingTransitions[from]?.repr()
-                stream.write("${from.name} -> ${to.name} [label=\"${left} // ${right}\"]\n")
+                val taint = to.abstractGuard[from]
+                val color = if (taint == TaintEq.EQUAL) "green" else "red"
+                stream.write("${from.name} -> ${to.name} [color=$color,label=\"$taint ($left // $right)\"]\n")
             }
         }
         stream.write("}\n")
