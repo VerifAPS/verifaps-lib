@@ -1,6 +1,7 @@
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.IEC61131Facade
@@ -28,26 +29,33 @@ class AbstractIntEqSfcApp : CliktCommand() {
 
     val leftFile by option("--left", "-l")
             .file()
-            .default(File("Scenario3v1_Final.xml"))
-//            .required()
+            .required()
 
     val rightFile by option("--right", "-r")
             .file()
-            .default(File("Scenario5v1_Final.xml"))
-//            .required()
+            .required()
+
+    val output: File by option("--output").file().default(File("output.dot"))
 
     override fun run() {
         Console.configureLoggingConsole()
+        AbstractIntEqSfc(sfcName, leftFile, rightFile, output).run()
+    }
+}
+
+class AbstractIntEqSfc(val sfcName: String,
+                       val leftFile: File,
+                       val rightFile: File,
+                       val outputFile: File) : Runnable {
+    override fun run() {
         val leftSfc = getSfc(leftFile)
         val rightSfc = getSfc(rightFile)
-
-        val diffSfc = ConstructDifferenceSfc(leftSfc, rightSfc).call()
+        val diffSfc = ConstructDifferenceSfc(leftSfc, rightSfc, true).call()
 
         val analyzer = AbstractInterpretationSfc(diffSfc, leftSfc.scope, rightSfc.scope)
         analyzer.run()
 
-
-        File("test.dot").bufferedWriter().use {
+        outputFile.bufferedWriter().use {
             diffSfc.toDot(PrintWriter(it))
         }
     }
@@ -75,5 +83,4 @@ class AbstractIntEqSfcApp : CliktCommand() {
         FBRemoveInstance().transform(TransformationState(fb))
         return fb
     }
-
 }

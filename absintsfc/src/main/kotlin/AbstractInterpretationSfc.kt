@@ -62,7 +62,8 @@ class AbstractInterpretationSfc(val sfcDiff: DifferenceSfc, val leftScope: Scope
         val incomingNode = it.leftIncomingTransitions.keys + it.rightIncomingTransitions.keys
 
         val incomingTaint =
-                if (incomingNode.isEmpty()) hashMapOf()
+                if (incomingNode.isEmpty())
+                    allVariables.map { it to TaintEq.EQUAL }.toMap()
                 else
                     incomingNode.map { it.abstractVariable }
                             .reduce { a, b ->
@@ -90,7 +91,7 @@ class AbstractInterpretationSfc(val sfcDiff: DifferenceSfc, val leftScope: Scope
         return it.abstractVariable.any { (v, eq) -> eq != oldState[v] }
     }
 
-    private fun updateAssignment(incomingTaint: MutableMap<String, TaintEq>,
+    private fun updateAssignment(incomingTaint: Map<String, TaintEq>,
                                  leftExpr: SMVExpr?,
                                  rightExpr: SMVExpr?): TaintEq {
         val equal = leftExpr == rightExpr
@@ -125,7 +126,7 @@ private fun SMVExpr?.getVariables(): Set<String> {
     return a.variables
 }
 
-class ConstructDifferenceSfc(val leftPou: FunctionBlockDeclaration, val rightPou: FunctionBlockDeclaration)
+class ConstructDifferenceSfc(val leftPou: FunctionBlockDeclaration, val rightPou: FunctionBlockDeclaration, val prefill: Boolean)
     : Callable<DifferenceSfc> {
     val diffSfc = DifferenceSfc()
     val leftNetwork = leftPou.sfcBody?.networks!![0]
@@ -138,15 +139,27 @@ class ConstructDifferenceSfc(val leftPou: FunctionBlockDeclaration, val rightPou
         prepareActions(leftActions, leftPou)
         prepareActions(rightActions, rightPou)
 
+        if(prefill) {
+            val leftEqualState = executeAction(leftPou, StatementList())
+            val rightEqualState = executeAction(leftPou, StatementList())
+            val stateNames = (leftNetwork.steps + rightNetwork.steps).map { it.name }
+            // populate all steps with id assignments.
+            stateNames.forEach {
+                val diffStep = diffSfc.getState(it)
+                leftEqualState.forEach { t, u -> diffStep.leftAssignments[t.name] = u }
+                rightEqualState.forEach { t, u -> diffStep.rightAssignments[t.name] = u }
+            }
+        }
+
         leftNetwork.steps.forEach {
             val diffStep = diffSfc.getState(it.name)
-            translateAction(diffStep.leftAssignments, it.events, leftActions)
+            translateAction(diffStep.leftAssignments, it.events, leftActions, leftPou)
             translateTransitions(diffStep.leftIncomingTransitions, it.incoming, leftEvaluator)
         }
 
         rightNetwork.steps.forEach {
             val diffStep = diffSfc.getState(it.name)
-            translateAction(diffStep.rightAssignments, it.events, rightActions)
+            translateAction(diffStep.rightAssignments, it.events, rightActions, rightPou)
             translateTransitions(diffStep.rightIncomingTransitions, it.incoming, rightEvaluator)
         }
 
@@ -166,7 +179,7 @@ class ConstructDifferenceSfc(val leftPou: FunctionBlockDeclaration, val rightPou
         val se = SymbolicExecutioner(pou.scope.parent)
         program.accept(se)
         //remove to many assignments
-        val state = se.peek().filter { (k, v) -> k != v }
+        val state = se.peek()//.filter { (k, v) -> k != v }
         return SymbolicState(state)
     }
 
@@ -201,12 +214,17 @@ class ConstructDifferenceSfc(val leftPou: FunctionBlockDeclaration, val rightPou
 
     private fun translateAction(assignments: MutableMap<String, SMVExpr>,
                                 events: Collection<SFCStep.AssociatedAction>,
-                                actions: Map<String, SymbolicState>) {
-        for (a in events) {
-            actions[a.actionName]?.let { state ->
-                state.forEach { a, v -> assignments[a.name] = v }
+                                actions: Map<String, SymbolicState>,
+                                pou: FunctionBlockDeclaration) {
+        if (events.isEmpty()) { // Assume empty action block
+            val state = executeAction(pou, StatementList())
+            state.forEach { a, v -> assignments[a.name] = v }
+        } else
+            for (a in events) {
+                actions[a.actionName]?.let { state ->
+                    state.forEach { a, v -> assignments[a.name] = v }
+                }
             }
-        }
     }
 }
 
@@ -232,10 +250,12 @@ class DifferenceSfc {
             val color = if (allEqual) "green" else "red"
             val htmlLabel = """<tr><td colspan="4"><B><U>${it.name}</U></B></td></tr>""" +
                     variables.joinToString("\n") { v ->
-                        val la = ""// it.leftAssignments[v]?.repr().htmlEscape()
-                        val ra =""// it.rightAssignments[v]?.repr().htmlEscape()
-                        val taint = it.abstractVariable[v]?.toString()
-                        "<tr><td><B>$v</B></td><td>${la}</td><td>${ra}</td><td color=\"$color\">$taint</td></tr>"
+                        val la = it.leftAssignments[v]?.repr().htmlEscape()
+                        val ra = it.rightAssignments[v]?.repr().htmlEscape()
+                        val taint = it.abstractVariable[v]
+                        val c = if (taint == TaintEq.EQUAL) "green" else "red"
+                        "<tr><td><B>$v</B></td><td>${la}</td><td>${ra}</td>" +
+                                "<td><font color=\"$c\">$taint</font></td></tr>"
                     }
             stream.write("${it.name} [color=$color,label=<<table CELLBORDER=\"0\">$htmlLabel</table>> ]\n")
         }
