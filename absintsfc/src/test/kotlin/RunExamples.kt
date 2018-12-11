@@ -14,6 +14,8 @@ class RunExamples {
                     createExample("Scenario5v1_Final.xml", "Scenario7v1_Final.xml", "Crane", "Magazin", "Stamp") +
                     createExample("Scenario7_Final.xml", "Scenario8_Final.xml", "Crane", "Magazin", "Stamp") +
                     createExample("Scenario8_Final.xml", "Scenario9_Final.xml", "Crane", "Magazin", "Stamp") +
+                    createExample("E3.A.st", "E3.B.st", "A") +
+                    createExample("E1.A.st", "E1.B.st", "A") +
                     createExample("Scenario9_Final.xml", "Scenario10_Final.xml", "Crane", "Magazin", "Stamp")
 
     fun createExample(left: String, right: String, vararg pou: String) =

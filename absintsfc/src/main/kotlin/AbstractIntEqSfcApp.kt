@@ -11,8 +11,13 @@ import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st0.MultiCodeTransformation
 import edu.kit.iti.formal.automation.st0.TransformationState
 import edu.kit.iti.formal.automation.st0.trans.*
+import org.graphstream.graph.Node
+import org.graphstream.ui.swingViewer.DefaultView
 import java.io.File
 import java.io.PrintWriter
+import org.graphstream.graph.implementations.SingleGraph
+
+
 
 fun main(args: Array<String>) = AbstractIntEqSfcApp().main(args)
 
@@ -58,6 +63,8 @@ class AbstractIntEqSfc(val sfcName: String,
         outputFile.bufferedWriter().use {
             diffSfc.toDot(PrintWriter(it))
         }
+
+//        view(diffSfc)
     }
 
     private fun getSfc(file: File): FunctionBlockDeclaration {

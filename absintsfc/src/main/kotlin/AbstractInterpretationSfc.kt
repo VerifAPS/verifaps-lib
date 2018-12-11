@@ -3,13 +3,15 @@ import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
 import edu.kit.iti.formal.automation.rvt.SymbolicState
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.smv.SMVAstDefaultVisitor
+import edu.kit.iti.formal.smv.SMVAstScanner
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
+import java.awt.Color
 import java.io.PrintWriter
 import java.util.*
 import java.util.concurrent.Callable
 import kotlin.collections.HashMap
+import kotlin.math.roundToInt
 
 /**
  *
@@ -114,7 +116,7 @@ class AbstractInterpretationSfc(val sfcDiff: DifferenceSfc, val leftScope: Scope
 }
 
 private fun SMVExpr?.getVariables(): Set<String> {
-    class SmvFindNameVisitor : SMVAstDefaultVisitor<Unit>() {
+    class SmvFindNameVisitor : SMVAstScanner() {
         val variables = TreeSet<String>()
         override fun visit(v: SVariable) {
             variables.add(v.name)
@@ -139,7 +141,7 @@ class ConstructDifferenceSfc(val leftPou: FunctionBlockDeclaration, val rightPou
         prepareActions(leftActions, leftPou)
         prepareActions(rightActions, rightPou)
 
-        if(prefill) {
+        if (prefill) {
             val leftEqualState = executeAction(leftPou, StatementList())
             val rightEqualState = executeAction(leftPou, StatementList())
             val stateNames = (leftNetwork.steps + rightNetwork.steps).map { it.name }
@@ -242,22 +244,37 @@ class DifferenceSfc {
     fun getState(x: String) =
             states.computeIfAbsent(x) { DifferenceState(it) }
 
-    fun toDot(stream: PrintWriter): Unit {
+    fun toDot(stream: PrintWriter,
+              showExprs: Boolean = false,
+              showEqualVars: Boolean = false,
+              showNoVariables: Boolean = false): Unit {
         stream.write("digraph G {\nnode[shape=none]\n")
         states.values.forEach {
-            val variables = TreeSet(it.leftAssignments.keys + it.rightAssignments.keys)
-            val allEqual = it.abstractVariable.values.all { it == TaintEq.EQUAL }
-            val color = if (allEqual) "green" else "red"
+            val variables = it.abstractVariable.keys
+            val numEqualVars =
+                    it.abstractVariable.values.filter { it == TaintEq.EQUAL }
+                            .size
+
+            val color = interpolate(Color.RED, Color.GREEN, numEqualVars.toDouble() / variables.size)
+            val variablesToBeShown =
+                    when {
+                        showNoVariables -> setOf()
+                        showEqualVars -> variables
+                        else -> variables.filter { v -> it.abstractVariable[v] == TaintEq.NOT_EQUAL }
+                    }
+
             val htmlLabel = """<tr><td colspan="4"><B><U>${it.name}</U></B></td></tr>""" +
-                    variables.joinToString("\n") { v ->
-                        val la = it.leftAssignments[v]?.repr().htmlEscape()
-                        val ra = it.rightAssignments[v]?.repr().htmlEscape()
+                    variablesToBeShown.joinToString("\n") { v ->
+                        val la =
+                                if (showExprs) it.leftAssignments[v]?.repr().htmlEscape() else ""
+                        val ra =
+                                if (showExprs) it.rightAssignments[v]?.repr().htmlEscape() else ""
                         val taint = it.abstractVariable[v]
                         val c = if (taint == TaintEq.EQUAL) "green" else "red"
                         "<tr><td><B>$v</B></td><td>${la}</td><td>${ra}</td>" +
                                 "<td><font color=\"$c\">$taint</font></td></tr>"
                     }
-            stream.write("${it.name} [color=$color,label=<<table CELLBORDER=\"0\">$htmlLabel</table>> ]\n")
+            stream.write("${it.name} [color=\"$color\",label=<<table CELLBORDER=\"0\">$htmlLabel</table>> ]\n")
         }
         states.values.forEach { to ->
             val fromNodes = to.leftIncomingTransitions.keys + to.rightIncomingTransitions.keys
@@ -271,6 +288,16 @@ class DifferenceSfc {
         }
         stream.write("}\n")
         stream.flush()
+    }
+
+    private fun interpolate(red: Color, green: Color, factor: Double): String {
+        fun lr(a: Int, b: Int) = (a * (1 - factor) + b * factor).roundToInt()
+
+        val r = lr(red.red, green.red)
+        val g = lr(red.green, green.green)
+        val b = lr(red.blue, green.blue)
+
+        return String.format("#%02X%02X%02X", r, g, b)
     }
 }
 
