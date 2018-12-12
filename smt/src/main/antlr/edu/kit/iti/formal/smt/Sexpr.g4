@@ -8,6 +8,7 @@ PAREN_OPEN : '(';
 PAREN_CLOSE : ')';
 
 NUMBER : [0-9]+;
-SYMBOL :      [a-zA-Z_0-9\-]+
-            | '|' [a-zA-Z_0-9 \n\r\t\-]+ '|';
+
+fragment SYMLETTER : ~[ ()\n\r\t\f];
+SYMBOL : '|' (SYMLETTER|[() \n\r\t\-])+ '|' | SYMLETTER+;
 WS : [ \n\r\t] -> skip;

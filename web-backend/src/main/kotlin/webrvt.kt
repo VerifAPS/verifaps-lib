@@ -29,16 +29,16 @@ fun Route.rvt() {
         try {
             val code = call.receive<String>()
             val app = RvtApsPipeline.createRvtForSingleSource(code)
-            app.outputFolder = File.createTempFile("rvtapp", "", rvtAppFolder)
-            app.outputFolder.mkdirs()
+            //app.outputFolder = File.createTempFile("rvtapp", "", rvtAppFolder)
+            //app.outputFolder.mkdirs()
             app.build()
             val b = app.verify()
-            val r = RvtResponse(app.nuxmvCommands.commands, b)
+            /*val r = RvtResponse(app.nuxmvCommands.commands, b)
             if (call.request.header("Content-Type") == "application/json") {
                 call.respond(r)
             } else {
                 call.respondHtml { }
-            }
+            }*/
         } catch (e: Exception) {
             call.respond(e)
         }

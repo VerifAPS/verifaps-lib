@@ -81,12 +81,12 @@ FUNCTION : ('FUNCTION'|'function') .*? ('END_FUNCTION'|'end_function');
 cell : chunk (COMMA chunk)*;
 
 chunk :
-	  dontcare
-	| variable
-	| constant
-	| singlesided
-    | interval
-	| expr
+	  dontcare      #cdontcare
+	| variable      #cvariable
+	| constant      #cconstant
+	| singlesided   #csinglesided
+    | interval      #cinterval
+	| expr          #cexpr
 ;
 
 dontcare : '-';

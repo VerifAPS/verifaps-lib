@@ -38,7 +38,7 @@ class SSA2SMT(val input: SMVModule) : Runnable {
     var fnTranslator: S2SFunctionTranslator = DefaultS2SFunctionTranslator()
 
     override fun run() {
-        val v = Smv2SMTVisitor(fnTranslator, dtTranslator)
+        val v = Smv2SmtVisitor(fnTranslator, dtTranslator)
 
         //rewrite initial assignments
         input.initAssignments.forEach { (target, expr) ->
@@ -62,18 +62,19 @@ class SSA2SMT(val input: SMVModule) : Runnable {
     }
 }
 
-class Smv2SMTVisitor(val fnTranslator: S2SFunctionTranslator,
-                     val dtTranslator: S2SDataTypeTranslator) : SMVAstVisitor<SExpr> {
+class Smv2SmtVisitor(val fnTranslator: S2SFunctionTranslator,
+                     val dtTranslator: S2SDataTypeTranslator,
+                     val statePrefix: String = SMTProgram.STATE_NAME) : SMVAstVisitor<SExpr> {
     override fun visit(top: SMVAst): SExpr {
         throw IllegalStateException("illegal AST node discovered!")
     }
 
     override fun visit(v: SVariable): SExpr {
         /*SExpr access = newNonAtomicSExpr();
-        access.add(newAtomicSExpr(v.getName()));
-        access.add(newAtomicSExpr(SMTProgram.STATE_NAME));
+        access.add(SSymbol(v.getName()));
+        access.add(SSymbol(SMTProgram.STATE_NAME));
         */
-        return SSymbol(SMTProgram.STATE_NAME + v.name)
+        return SSymbol(statePrefix + v.name)
     }
 
     override fun visit(be: SBinaryExpression): SExpr {

@@ -22,7 +22,8 @@ package edu.kit.iti.formal.automation.smt
  * #L%
  */
 
-import de.tudresden.inf.lat.jsexp.Sexp
+import edu.kit.iti.formal.smt.SExpr
+import edu.kit.iti.formal.smt.SSymbol
 import edu.kit.iti.formal.smv.EnumType
 import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.SMVTypes
@@ -30,9 +31,7 @@ import edu.kit.iti.formal.smv.SMVWordType
 import edu.kit.iti.formal.smv.ast.SBinaryOperator
 import edu.kit.iti.formal.smv.ast.SFunction
 import edu.kit.iti.formal.smv.ast.SUnaryOperator
-import java.util.HashMap
-
-import de.tudresden.inf.lat.jsexp.SexpFactory.newAtomicSexp
+import java.util.*
 
 /**
  * http://smtlib.cs.uiowa.edu/Logics/QF_BV.smt2
@@ -42,47 +41,40 @@ import de.tudresden.inf.lat.jsexp.SexpFactory.newAtomicSexp
  */
 class DefaultS2SFunctionTranslator : S2SFunctionTranslator {
 
-    override fun translateOperator(operator: SBinaryOperator, typeLeft: SMVType, rightType: SMVType): Sexp {
-        val defaultValue = "not-found-operator-" + operator.symbol()
+    override fun translateOperator(operator: SBinaryOperator, typeLeft: SMVType, rightType: SMVType): SExpr {
+        val defaultValue = "not-found-operator-${operator.symbol()}-$typeLeft-$rightType"
 
-        if (typeLeft === SMVTypes.BOOLEAN) {
-            return newAtomicSexp((logicalOperators as java.util.Map<SBinaryOperator, String>).getOrDefault(operator,
-                    defaultValue))
+        val lookup = when (typeLeft) {
+            SMVTypes.BOOLEAN -> logicalOperators
+            is SMVWordType -> {
+                val (signed) = typeLeft
+                if (signed) bvsOperators
+                else bvuOperators
+            }
+            is EnumType -> bvuOperators
+            SMVTypes.INT -> arithOperators
+            else -> HashMap()
         }
-
-        if (typeLeft is SMVWordType) {
-            val (signed) = typeLeft
-            return if (signed)
-                newAtomicSexp((bvsOperators as java.util.Map<SBinaryOperator, String>).getOrDefault(operator, defaultValue))
-            else
-                newAtomicSexp((bvuOperators as java.util.Map<SBinaryOperator, String>).getOrDefault(operator, defaultValue))
-        }
-
-        if (typeLeft is EnumType) {
-            return newAtomicSexp((bvuOperators as java.util.Map<SBinaryOperator, String>).getOrDefault(operator, defaultValue))
-        }
-
-        throw IllegalArgumentException()
+        val value = lookup[operator] ?: defaultValue
+        return SSymbol(value)
     }
 
-    override fun translateOperator(operator: SUnaryOperator, type: SMVType): Sexp {
-        val bvneg = newAtomicSexp("bvneg")
-        val not = newAtomicSexp("not")
-        when (operator) {
-            SUnaryOperator.MINUS -> return bvneg
-            SUnaryOperator.NEGATE -> return not
+    override fun translateOperator(operator: SUnaryOperator, type: SMVType): SExpr {
+        val bvneg = SSymbol("bvneg")
+        val not = SSymbol("not")
+        return when (operator) {
+            SUnaryOperator.MINUS -> bvneg
+            SUnaryOperator.NEGATE -> not
         }
-        throw IllegalArgumentException()
     }
 
-    override fun translateOperator(func: SFunction, args: List<Sexp>): Sexp
-            = TODO("translation of various functions")
+    override fun translateOperator(func: SFunction, args: List<SExpr>): SExpr = TODO("translation of various functions")
 
     companion object {
         internal var logicalOperators: MutableMap<SBinaryOperator, String> = HashMap()
         internal var bvuOperators: MutableMap<SBinaryOperator, String> = HashMap()
         internal var bvsOperators: MutableMap<SBinaryOperator, String> = HashMap()
-        internal var arithOperators: Map<SBinaryOperator, String> = HashMap()
+        internal var arithOperators: MutableMap<SBinaryOperator, String> = HashMap()
 
         init {
             logicalOperators[SBinaryOperator.AND] = "and"
@@ -122,6 +114,19 @@ class DefaultS2SFunctionTranslator : S2SFunctionTranslator {
             bvuOperators[SBinaryOperator.LESS_EQUAL] = "bvule"
             bvuOperators[SBinaryOperator.LESS_THAN] = "bvult"
 
+            arithOperators[SBinaryOperator.NOT_EQUAL] = "distinct"
+            arithOperators[SBinaryOperator.MUL] = "*"
+            arithOperators[SBinaryOperator.PLUS] = "+"
+            arithOperators[SBinaryOperator.DIV] = "div"
+            arithOperators[SBinaryOperator.XOR] = "xor"
+            arithOperators[SBinaryOperator.EQUAL] = "="
+            //arithOperators[SBinaryOperator.XNOR] = ""
+            arithOperators[SBinaryOperator.MINUS] = "-"
+            arithOperators[SBinaryOperator.MOD] = "mod"
+            arithOperators[SBinaryOperator.GREATER_EQUAL] = ">="
+            arithOperators[SBinaryOperator.GREATER_THAN] = ">"
+            arithOperators[SBinaryOperator.LESS_EQUAL] = "<="
+            arithOperators[SBinaryOperator.LESS_THAN] = "<"
         }
     }
 }

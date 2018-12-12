@@ -18,32 +18,21 @@ class TblLanguageToSmv(private val columnVariable: SVariable,
                        private val context: ParseContext) : TestTableLanguageBaseVisitor<SMVExpr>() {
 
     override fun visitCell(ctx: TestTableLanguageParser.CellContext): SMVExpr {
-        return ctx.chunk().map { this.visitChunk(it) }
+        return ctx.chunk().map { it.accept(this)}
                 .reduce { a, b -> SBinaryExpression(a, SBinaryOperator.AND, b) }
     }
 
-    override fun visitChunk(ctx: TestTableLanguageParser.ChunkContext): SMVExpr {
-        if (ctx.constant() != null) {
-            val constant = ctx.constant().accept(this)
-            return constant.equal(columnVariable)
-        }
-        if (ctx.dontcare() != null)
-            return ctx.dontcare().accept(this)
-        if (ctx.interval() != null)
-            return ctx.interval().accept(this)
-        if (ctx.singlesided() != null)
-            return ctx.singlesided().accept(this)
-        if (ctx.expr() != null)
-            return ctx.expr().accept(this)
-        if (ctx.variable() != null) {
-            val v = ctx.variable().accept(this)
-            return v.equal(columnVariable)
-        }
-        throw IllegalStateException("No one of the N contexts matches")
+    override fun visitCconstant(ctx: TestTableLanguageParser.CconstantContext): SMVExpr {
+        val constant = ctx.constant().accept(this)
+        return constant.equal(columnVariable)
     }
 
     override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext): SMVExpr {
         return SLiteral.TRUE
+    }
+
+    override fun visitCvariable(ctx: TestTableLanguageParser.CvariableContext): SMVExpr {
+        return ctx.variable().accept(this).equal(columnVariable)
     }
 
     override fun visitConstantInt(ctx: TestTableLanguageParser.ConstantIntContext): SMVExpr {

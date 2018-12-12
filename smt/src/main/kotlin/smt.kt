@@ -1,10 +1,7 @@
 package edu.kit.iti.formal.smt
 
-import org.antlr.v4.runtime.CharStream
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
+import java.io.PrintWriter
 import java.math.BigInteger
-
 
 /**
  *
@@ -16,7 +13,7 @@ sealed class SExpr {
     abstract override fun toString(): String
 }
 
-abstract class SAtom() : SExpr() {
+abstract class SAtom : SExpr() {
     override val isAtom: Boolean
         get() = true
 }
@@ -36,21 +33,27 @@ data class SSymbol(var text: String) : SAtom() {
         text = text.trim('|')
     }
 
-    override fun toString() = "|$text|"
+    override fun toString() = if (text.any { Character.isWhitespace(it) }) "|$text|" else text
 }
 
-data class SList(internal val list: ArrayList<SExpr> = ArrayList()) : MutableList<SExpr> by list, SExpr() {
+data class SList(val list: ArrayList<SExpr> = ArrayList()) : MutableList<SExpr> by list, SExpr() {
     constructor(list: List<SExpr>) : this(ArrayList(list))
     constructor(vararg args: SExpr) : this() {
         args.forEach { add(it) }
     }
+
     constructor(symbol: String, vararg args: SExpr) : this() {
         add(SSymbol(symbol))
         args.forEach { add(it) }
     }
+
     constructor(symbol: String, args: List<SExpr>) : this() {
         list += SSymbol(symbol)
         list.addAll(args)
+    }
+
+    constructor(expr: Collection<SExpr>) : this() {
+        list.addAll(expr)
     }
 
     override val isAtom: Boolean
@@ -58,31 +61,13 @@ data class SList(internal val list: ArrayList<SExpr> = ArrayList()) : MutableLis
 
     override fun toString() = list
             .joinToString(" ", "(", ")") { it.toString() }
+
+    companion object {
+        fun singleton(s: SExpr): SList = SList(listOf(s))
+    }
 }
 
 object SmtFacade {
-    fun createParser(stream: CharStream): SexprParser {
-        val lexer = SexprLexer(stream)
-        val parser = SexprParser(CommonTokenStream(lexer))
-        return parser
-    }
-
-    fun createParser(stream: String) = createParser(CharStreams.fromString(stream))
-
-    fun parse(stream: CharStream): ArrayList<SExpr> {
-        val p = createParser(stream)
-        val ctx = p.file()
-        val t = SexprParseTreeTransformer()
-        val ast = ctx.accept(t) as SList
-        return ast.list
-    }
-
-    fun parseExpr(stream: CharStream): SExpr {
-        val p = createParser(stream)
-        val ctx = p.sexpr()
-        val t = SexprParseTreeTransformer()
-        return ctx.accept(t)
-    }
 
 
     /**
@@ -136,6 +121,18 @@ object SmtFacade {
         }
         return result
     }
+
+}
+
+/**
+ * TODO No idea to make this nice and efficient.
+ */
+class PrettyPrint(val writer: PrintWriter) {
+    fun prettyPrint(seq: Collection<SExpr>) {
+        seq.forEach { prettyPrint(it) }
+    }
+
+    fun prettyPrint(sexpr: SExpr) {}
 }
 
 class SexprParseTreeTransformer : SexprBaseVisitor<SExpr>() {
@@ -148,8 +145,5 @@ class SexprParseTreeTransformer : SexprBaseVisitor<SExpr>() {
 
     override fun visitS(ctx: SexprParser.SContext) = SSymbol(ctx.SYMBOL().text)
 
-    override fun visitList(ctx: SexprParser.ListContext?): SExpr {
-
-        return super.visitList(ctx)
-    }
+    override fun visitList(ctx: SexprParser.ListContext?) = SList(ctx?.sexpr()?.map { it.accept(this) } ?: listOf())
 }

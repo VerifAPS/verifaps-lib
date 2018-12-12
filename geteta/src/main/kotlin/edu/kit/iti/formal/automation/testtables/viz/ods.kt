@@ -1,8 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.viz
 
-import com.github.jferard.fastods.OdsFactory
-import com.github.jferard.fastods.Table
-import com.github.jferard.fastods.TableCell
+import com.github.jferard.fastods.*
 import com.github.jferard.fastods.datastyle.DataStyle
 import com.github.jferard.fastods.datastyle.createFloatStyleBuilder
 import com.github.jferard.fastods.style.BorderAttribute
@@ -15,6 +13,7 @@ import edu.kit.iti.formal.automation.sfclang.getUniqueName
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.*
+import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.smv.CounterExample
 import edu.kit.iti.formal.smv.EnumType
 import edu.kit.iti.formal.smv.SMVAstDefaultVisitorNN
@@ -578,7 +577,7 @@ class Smv2OdsFml(val var2column: Map<String, Int>,
             when (l.dataType) {
                 is EnumType -> '"' + l.value.toString() + '"'
                 is SMVTypes.BOOLEAN -> {
-                    if (l.value.toString().equals("TRUE",true))
+                    if (l.value.toString().equals("TRUE", true))
                         "TRUE()" else "FALSE()"
                 }
                 else -> l.value.toString()
@@ -609,24 +608,14 @@ class ODSFormulaPrinter(
             ctx.chunk().joinToString("; ", "AND(", ")") { it.accept(this) }
 
 
-    override fun visitChunk(ctx: TestTableLanguageParser.ChunkContext): String {
-        if (ctx.constant() != null) {
-            val constant = ctx.constant().accept(this)
-            return constant + "=" + columnOf(variable, 0)
-        }
-        if (ctx.dontcare() != null)
-            return ctx.dontcare().accept(this)
-        if (ctx.interval() != null)
-            return ctx.interval().accept(this)
-        if (ctx.singlesided() != null)
-            return ctx.singlesided().accept(this)
-        if (ctx.expr() != null)
-            return ctx.expr().accept(this)
-        if (ctx.variable() != null) {
-            val v = ctx.variable().accept(this)
-            return v + "=" + columnOf(variable, 0)
-        }
-        throw IllegalStateException("No one of the N contexts matches")
+    override fun visitCconstant(ctx: TestTableLanguageParser.CconstantContext): String {
+        val constant = ctx.constant().accept(this)
+        return constant + "=" + columnOf(variable, 0)
+    }
+
+    override fun visitCvariable(ctx: TestTableLanguageParser.CvariableContext): String {
+        val v = ctx.variable().accept(this)
+        return v + "=" + columnOf(variable, 0)
     }
 
     override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext) = "TRUE()"
@@ -733,16 +722,20 @@ object DefaultTableStyle : TableStyle {
             .parentCellStyle(styleValues).build()
 
     override var styleCategoryHeader = TableCellStyle.builder("category header")
-            .backgroundColor("#ff00ff")
+            .backgroundColor(SColor("#ff00ff"))
             .fontWeightBold()
             .textAlign(TableCellStyle.Align.CENTER)
             .build()
 
+    class SColor(val s: String) : Color {
+        override fun hexValue() = s
+    }
+
     var styleVariableHeader = TableCellStyle.builder("variable header")
-            .backgroundColor("#cccccc")
+            .backgroundColor(SColor("#cccccc"))
             .fontWeightBold()
             .textAlign(TableCellStyle.Align.CENTER)
-            .borderBottom(SimpleLength.pt(1.0), "#000000", BorderAttribute.Style.SOLID)
+            .borderBottom(SimpleLength.pt(1.0), SimpleColor.BLACK, BorderAttribute.Style.SOLID)
             .build()
 
     override val styleInputVariableHeader: TableCellStyle = TableCellStyle.builder("variable input header")

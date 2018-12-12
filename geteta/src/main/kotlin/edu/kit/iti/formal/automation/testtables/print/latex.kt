@@ -280,11 +280,6 @@ class LatexPrinter(val options: LatexTablePrinterOptions) : TestTableLanguageBas
         return if (x != null) x.accept(this) else ""
     }
 
-    override fun visitChunk(ctx: TestTableLanguageParser.ChunkContext): String {
-        return oneOf(ctx.constant(), ctx.interval(), ctx.expr(),
-                ctx.dontcare(), ctx.singlesided(), ctx.variable())
-    }
-
     override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext): String {
         return latex("DONTCARE")
     }

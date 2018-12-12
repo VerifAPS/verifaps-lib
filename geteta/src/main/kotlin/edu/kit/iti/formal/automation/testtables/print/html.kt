@@ -143,9 +143,7 @@ class HTMLTablePrinter(gtt: GeneralizedTestTable, stream: CodeWriter,
 }
 
 class HtmlExprPrinter(val options: HtmlTablePrinterOptions) : TestTableLanguageBaseVisitor<String>() {
-
     override fun visitCell(ctx: TestTableLanguageParser.CellContext) = ctx.chunk().joinToString(",") { it.accept(this) }
-    override fun visitChunk(ctx: TestTableLanguageParser.ChunkContext) = visitChildren(ctx)
 
     override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext?): String = options.dontCare
     override fun visitI(ctx: TestTableLanguageParser.IContext) = span("integer", ctx.text)
