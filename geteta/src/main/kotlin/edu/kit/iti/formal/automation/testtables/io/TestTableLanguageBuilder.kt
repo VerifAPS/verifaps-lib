@@ -95,6 +95,9 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
         val dt = scope.resolveDataType(ctx.dt.text)
         val lt = DefaultTypeTranslator.INSTANCE.translate(dt)
         val fv = ConstraintVariable(ctx.name.text, dt, lt)
+        ctx.cell().let {
+            fv.constraint = it
+        }
         current.add(fv)
     }
 
@@ -123,7 +126,7 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBa
 
 
     override fun visitRow(ctx: TestTableLanguageParser.RowContext): TableRow {
-        val id = ctx.id?.text ?: "r"+(ctx.idi?.text?.toInt() ?: ++currentId)
+        val id = ctx.id?.text ?: String.format("r%02d", ctx.idi?.text?.toInt() ?: ++currentId)
         val s = TableRow(id)
         s.duration = ctx.time()?.accept(TimeParser()) ?: Duration.ClosedInterval(1, 1)
         ctx.kc().forEach {

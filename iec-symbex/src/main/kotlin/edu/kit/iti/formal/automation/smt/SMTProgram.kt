@@ -1,9 +1,9 @@
 package edu.kit.iti.formal.automation.smt
 
-import de.tudresden.inf.lat.jsexp.Sexp
-import de.tudresden.inf.lat.jsexp.SexpFactory.newAtomicSexp
-import de.tudresden.inf.lat.jsexp.SexpFactory.newNonAtomicSexp
-import de.tudresden.inf.lat.jsexp.SexpParserException
+import edu.kit.iti.formal.smt.SExpr
+import edu.kit.iti.formal.smt.SExprFacade.sexpr
+import edu.kit.iti.formal.smt.SList
+import edu.kit.iti.formal.smt.SSymbol
 import java.util.*
 
 /**
@@ -25,66 +25,54 @@ import java.util.*
  * @version 1 (15.10.17)
  */
 class SMTProgram(
-        var inputDataTypes: MutableMap<String, Sexp> = HashMap(),
-        var stateDataTypes: MutableMap<String, Sexp> = HashMap(),
-        var initPredicates: MutableMap<String, Sexp> = TreeMap(),
-        var nextPredicates: MutableMap<String, Sexp> = TreeMap(),
+        var inputDataTypes: MutableMap<String, SExpr> = HashMap(),
+        var stateDataTypes: MutableMap<String, SExpr> = HashMap(),
+        var initPredicates: MutableMap<String, SExpr> = TreeMap(),
+        var nextPredicates: MutableMap<String, SExpr> = TreeMap(),
         var initFuncName: String = "init",
         var nextFuncName: String = "next") {
 
-    val initFunction: Sexp
-        @Throws(SexpParserException::class)
+    val initFunction: SExpr
         get() {
-            val func = newNonAtomicSexp()
-            func.add(newAtomicSexp(DEFINE_FUNCTION))
-            func.add(newAtomicSexp(this.initFuncName))
-            func.add(toSexp(createSortSexp(STATE_NAME, this.stateDataTypes)))
-            func.add(newAtomicSexp(SMT_BOOLEAN))
-            func.add(initBody)
-            return func
+            return sexpr(
+                    DEFINE_FUNCTION, initFuncName,
+                    sexpr(createSortSExpr(STATE_NAME, stateDataTypes)),
+                    SMT_BOOLEAN,
+                    initBody)
         }
 
-    protected val initBody: Sexp
+    protected val initBody: SExpr
         get() {
-            val body = newNonAtomicSexp()
-            body.add(newAtomicSexp("and"))
+            val body = SList(SSymbol("and"))
             this.initPredicates.forEach { name, pred ->
-                val eq = newNonAtomicSexp()
-                eq.add(newAtomicSexp("="))
-                eq.add(newAtomicSexp(STATE_NAME + newAtomicSexp(name)))
+                val eq = SList()
+                eq.add(SSymbol("="))
+                eq.add(SSymbol(STATE_NAME + SSymbol(name)))
                 eq.add(pred)
                 body.add(eq)
             }
             return body
         }
 
-    val nextFunction: Sexp
-        @Throws(SexpParserException::class)
+    val nextFunction: SExpr
         get() {
-            val func = newNonAtomicSexp()
-            func.add(newAtomicSexp(DEFINE_FUNCTION))
-            func.add(newAtomicSexp(this.nextFuncName))
 
-            val s = createSortSexp(STATE_NAME, this.stateDataTypes)
-            val i = createSortSexp(STATE_NAME, this.inputDataTypes)
-            val t = createSortSexp(NEW_STATE_NAME, this.stateDataTypes)
-            val args = toSexp(s + i + t)
-            func.add(args)
-
-            func.add(newAtomicSexp(SMT_BOOLEAN))
-            func.add(nextBody)
+            val s = createSortSExpr(STATE_NAME, this.stateDataTypes)
+            val i = createSortSExpr(STATE_NAME, this.inputDataTypes)
+            val t = createSortSExpr(NEW_STATE_NAME, this.stateDataTypes)
+            val args = toSExpr(s + i + t)
+            val func = sexpr(DEFINE_FUNCTION, this.nextFuncName, args, SMT_BOOLEAN, nextBody)
             return func
         }
 
-    protected val nextBody: Sexp
-        @Throws(SexpParserException::class)
+    protected val nextBody: SExpr
         get() {
-            val body = newNonAtomicSexp()
-            body.add(newAtomicSexp("and"))
+            val body = SList()
+            body.add(SSymbol("and"))
             this.nextPredicates.forEach { name, pred ->
-                val eq = newNonAtomicSexp()
-                eq.add(newAtomicSexp("="))
-                eq.add(newAtomicSexp(NEW_STATE_NAME + name))
+                val eq = SList()
+                eq.add(SSymbol("="))
+                eq.add(SSymbol(NEW_STATE_NAME + name))
                 eq.add(pred)
                 body.add(eq)
             }
@@ -106,30 +94,21 @@ class SMTProgram(
             }
 
 
-            try {
-                val init = initFunction
-                val next = nextFunction
-                sb.append(init.toIndentedString()).append("\n\n")
-                sb.append(next.toIndentedString()).append("\n\n")
-            } catch (e: SexpParserException) {
-                e.printStackTrace()
-            }
-
+            val init = initFunction
+            val next = nextFunction
+            sb.append(init.toString()).append("\n\n")
+            sb.append(next.toString()).append("\n\n")
             return sb.toString()
         }
 
-    private fun toSexp(sortSexp: Collection<Sexp>): Sexp {
-        val list = newNonAtomicSexp()
-        sortSexp.forEach { list.add(it) }
-        return list
-    }
+    private fun toSExpr(sortSExpr: Collection<SExpr>): SExpr = SList(sortSExpr)
 
     /*
-    public Sexp getStateDataType() throws SexpParserException {
+    public SExpr getStateDataType() throws SExprParserException {
         return createRecord(stateDataTypeName, stateDataTypes);
     }
 
-    public Sexp getInputDataType() throws SexpParserException {
+    public SExpr getInputDataType() throws SExprParserException {
         return createRecord(getInputDataTypeName(), inputDataTypes);
     }
     */
@@ -143,13 +122,8 @@ class SMTProgram(
     fun getDefineInputTypes(prefix: String, suffix: String) = this.inputDataTypes.entries
             .map { e -> createDefineConst(prefix + e.key + suffix, e.value) }
 
-    private fun createDefineConst(name: String, sort: Sexp): Sexp {
-        val s = newNonAtomicSexp()
-        s.add(newAtomicSexp("declare-const"))
-        s.add(newAtomicSexp(name))
-        s.add(sort)
-        return s
-    }
+    private fun createDefineConst(name: String, sort: SExpr): SExpr =
+            sexpr("declare-const", name, sort)
 
     /**
      * @return
@@ -161,35 +135,33 @@ class SMTProgram(
 
         val vars = if (withInput) (init + next) else next
 
-        vars.forEach { sexp ->
-            sb.append(sexp.toIndentedString())
-                    .append("\n\n")
+        vars.forEach { SExpr ->
+            sb.append(SExpr.toString()).append("\n\n")
         }
         return sb.toString()
     }
 
-    fun getAssertInit(suffix: String): Sexp {
-        val asser = newNonAtomicSexp()
-        asser.add(newAtomicSexp("assert"))
-        val app = newNonAtomicSexp()
+    fun getAssertInit(suffix: String): SExpr {
+        val asser = SList(SSymbol("assert"))
+        val app = SList()
         asser.add(app)
-        app.add(newAtomicSexp(this.initFuncName))
-        this.stateDataTypes.keys.forEach { name -> app.add(newAtomicSexp(name + suffix)) }
+        app.add(SSymbol(this.initFuncName))
+        this.stateDataTypes.keys.forEach { name -> app.add(SSymbol(name + suffix)) }
         return asser
     }
 
-    fun getAssertNext(previousSuffix: String, nextSuffix: String): Sexp {
-        val asser = newNonAtomicSexp()
-        asser.add(newAtomicSexp("assert"))
-        val app = newNonAtomicSexp()
-        app.add(newAtomicSexp(this.nextFuncName))
+    fun getAssertNext(previousSuffix: String, nextSuffix: String): SExpr {
+        val asser = SList()
+        asser.add(SSymbol("assert"))
+        val app = SList()
+        app.add(SSymbol(this.nextFuncName))
         asser.add(app)
-        this.stateDataTypes.keys.forEach { name -> app.add(newAtomicSexp(name + previousSuffix)) }
+        this.stateDataTypes.keys.forEach { name -> app.add(SSymbol(name + previousSuffix)) }
 
 
-        this.inputDataTypes.keys.forEach { name -> app.add(newAtomicSexp(name + previousSuffix)) }
+        this.inputDataTypes.keys.forEach { name -> app.add(SSymbol(name + previousSuffix)) }
 
-        this.stateDataTypes.keys.forEach { name -> app.add(newAtomicSexp(name + nextSuffix)) }
+        this.stateDataTypes.keys.forEach { name -> app.add(SSymbol(name + nextSuffix)) }
 
         return asser
     }
@@ -205,14 +177,14 @@ class SMTProgram(
         val DECLARE_DATATYPES = "declare-datatypes"
 
         /**
-         * adds the given arguments in the map into the given sexps.
+         * adds the given arguments in the map into the given SExprs.
          *
          * @param dt
          */
-        private fun createSortSexp(prefix: String, dt: Map<String, Sexp>) =
+        private fun createSortSExpr(prefix: String, dt: Map<String, SExpr>) =
                 dt.entries.map { entry ->
-                    val s = newNonAtomicSexp()
-                    s.add(newAtomicSexp(prefix + entry.key))
+                    val s = SList()
+                    s.add(SSymbol(prefix + entry.key))
                     s.add(entry.value)
                     s
                 }

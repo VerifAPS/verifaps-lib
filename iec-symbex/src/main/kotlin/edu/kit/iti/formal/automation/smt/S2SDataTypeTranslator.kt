@@ -22,7 +22,7 @@ package edu.kit.iti.formal.automation.smt
  * #L%
  */
 
-import de.tudresden.inf.lat.jsexp.Sexp
+import edu.kit.iti.formal.smt.SExpr
 import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.ast.SLiteral
 
@@ -31,6 +31,6 @@ import edu.kit.iti.formal.smv.ast.SLiteral
  * @version 1 (15.10.17)
  */
 interface S2SDataTypeTranslator {
-    fun translate(datatype: SMVType): Sexp
-    fun translate(l: SLiteral): Sexp
+    fun translate(datatype: SMVType): SExpr
+    fun translate(l: SLiteral): SExpr
 }

@@ -22,19 +22,13 @@ package edu.kit.iti.formal.automation.smt
  * #L%
  */
 
-import de.tudresden.inf.lat.jsexp.Sexp
-import de.tudresden.inf.lat.jsexp.SexpFactory
-import de.tudresden.inf.lat.jsexp.SexpParserException
+import edu.kit.iti.formal.smt.*
 import edu.kit.iti.formal.smv.EnumType
 import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.SMVWordType
 import edu.kit.iti.formal.smv.ast.SLiteral
-
 import java.math.BigInteger
-
-import de.tudresden.inf.lat.jsexp.SexpFactory.newAtomicSexp
-import de.tudresden.inf.lat.jsexp.SexpFactory.newNonAtomicSexp
 
 /**
  * Default translator for types from smv to smt. Uses bit vectors!
@@ -44,51 +38,48 @@ import de.tudresden.inf.lat.jsexp.SexpFactory.newNonAtomicSexp
  */
 class DefaultS2STranslator : S2SDataTypeTranslator {
 
-    override fun translate(datatype: SMVType): Sexp {
+    override fun translate(datatype: SMVType): SExpr {
         if (SMVTypes.BOOLEAN == datatype)
-            return newAtomicSexp(SMTProgram.SMT_BOOLEAN)
+            return SSymbol(SMTProgram.SMT_BOOLEAN)
 
         if (datatype is SMVWordType) {
             val width = datatype.width
-            val bv = newNonAtomicSexp()
-            bv.add(newAtomicSexp("_"))
-            bv.add(newAtomicSexp("BitVec"))
-            bv.add(newAtomicSexp(width.toString()))
+            val bv = SList()
+            bv.add(SSymbol("_"))
+            bv.add(SSymbol("BitVec"))
+            bv.add(SSymbol(width.toString()))
             return bv
         }
 
         if (datatype is EnumType) {
-            try {
-                return SexpFactory.parse("(_ BitVec 16)")
-            } catch (e: SexpParserException) {
-                e.printStackTrace()
-            }
-
+            return SExprFacade.parseExpr("(_ BitVec 16)")
         }
 
         throw IllegalArgumentException()
     }
 
-    override fun translate(l: SLiteral): Sexp {
-
-        if (l.dataType === SMVTypes.BOOLEAN)
-            return newAtomicSexp(if (l.value.toString().equals("LTRUE", ignoreCase = true)) "true" else "false")
-
-        val prefix = "#b"
-        if (l.dataType is SMVWordType) {
-            val t = l.dataType as SMVWordType?
-            val b = l.value as BigInteger
-            return newAtomicSexp("#b" + twoComplement(b, t!!.width))
+    override fun translate(l: SLiteral): SExpr {
+        val dataType = l.dataType
+        when (dataType) {
+            SMVTypes.BOOLEAN ->
+                return SSymbol(if (l.value.toString().equals("TRUE", ignoreCase = true)) "true" else "false")
+            is SMVWordType -> {
+                val prefix = "#b"
+                val b = l.value as BigInteger
+                return SSymbol("#b" + twoComplement(b, dataType.width))
+            }
+            is EnumType -> {
+                val et = l.dataType as EnumType?
+                val value = l.value as String
+                val i = et!!.values.indexOf(value)
+                return SSymbol("#b" + twoComplement(BigInteger.valueOf(i.toLong()), 16))
+            }
+            SMVTypes.INT -> {
+                return SInteger(l.value as BigInteger)
+            }
+            else ->
+                throw IllegalArgumentException("Unsupported data type: ${l.dataType}")
         }
-
-        if (l.dataType is EnumType) {
-            val et = l.dataType as EnumType?
-            val value = l.value as String
-            val i = et!!.values.indexOf(value)
-            return newAtomicSexp("#b" + twoComplement(BigInteger.valueOf(i.toLong()), 16))
-        }
-
-        throw IllegalArgumentException()
     }
 
     companion object {

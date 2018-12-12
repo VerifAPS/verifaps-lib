@@ -22,9 +22,9 @@ package edu.kit.iti.formal.automation.smt
  * #L%
  */
 
-import de.tudresden.inf.lat.jsexp.Sexp
-import de.tudresden.inf.lat.jsexp.SexpFactory.newAtomicSexp
-import de.tudresden.inf.lat.jsexp.SexpFactory.newNonAtomicSexp
+import edu.kit.iti.formal.smt.SExpr
+import edu.kit.iti.formal.smt.SList
+import edu.kit.iti.formal.smt.SSymbol
 import edu.kit.iti.formal.smv.SMVAstVisitor
 import edu.kit.iti.formal.smv.ast.*
 
@@ -34,23 +34,14 @@ import edu.kit.iti.formal.smv.ast.*
  */
 class SSA2SMT(val input: SMVModule) : Runnable {
     val product = SMTProgram()
-
     var dtTranslator: S2SDataTypeTranslator = DefaultS2STranslator()
-        set(dtTranslator) {
-            field = this.dtTranslator
-        }
-
     var fnTranslator: S2SFunctionTranslator = DefaultS2SFunctionTranslator()
-        set(fnTranslator) {
-            field = this.fnTranslator
-        }
-
 
     override fun run() {
-        val v = Smv2SMTVisitor()
+        val v = Smv2SmtVisitor(fnTranslator, dtTranslator)
 
         //rewrite initial assignments
-        input!!.initAssignments.forEach { (target, expr) ->
+        input.initAssignments.forEach { (target, expr) ->
             product.initPredicates[target.name] = expr.accept(v)
         }
 
@@ -69,85 +60,86 @@ class SSA2SMT(val input: SMVModule) : Runnable {
             product.inputDataTypes[it.name] = this.dtTranslator.translate(it.dataType!!)
         }
     }
+}
+
+class Smv2SmtVisitor(val fnTranslator: S2SFunctionTranslator,
+                     val dtTranslator: S2SDataTypeTranslator,
+                     val statePrefix: String = SMTProgram.STATE_NAME) : SMVAstVisitor<SExpr> {
+    override fun visit(top: SMVAst): SExpr {
+        throw IllegalStateException("illegal AST node discovered!")
+    }
+
+    override fun visit(v: SVariable): SExpr {
+        /*SExpr access = newNonAtomicSExpr();
+        access.add(SSymbol(v.getName()));
+        access.add(SSymbol(SMTProgram.STATE_NAME));
+        */
+        return SSymbol(statePrefix + v.name)
+    }
+
+    override fun visit(be: SBinaryExpression): SExpr {
+        val left = be.left.accept(this)
+        val right = be.right.accept(this)
+        val op = fnTranslator.translateOperator(be.operator,
+                be.left.dataType!!, be.right.dataType!!)
+
+        val call = SList()
+        call.add(op)
+        call.add(left)
+        call.add(right)
+        return call
+    }
+
+    override fun visit(ue: SUnaryExpression): SExpr {
+        val right = ue.expr.accept(this)
+        val op = fnTranslator.translateOperator(ue.operator, ue.expr.dataType!!)
+        val call = SList()
+        call.add(op)
+        call.add(right)
+        return call
+    }
+
+    override fun visit(l: SLiteral): SExpr {
+        return dtTranslator.translate(l)
+    }
+
+    override fun visit(a: SAssignment): SExpr {
+        throw IllegalStateException("illegal AST node discovered!")
+    }
+
+    override fun visit(ce: SCaseExpression): SExpr {
+        return ifThenElse(ce.cases, 0)
+    }
+
+    override fun visit(func: SFunction): SExpr {
+        val args = func.arguments.map { arg -> arg.accept(this) }
+        return fnTranslator.translateOperator(func, args)
+    }
+
+    override fun visit(smvModule: SMVModule): SExpr {
+        throw IllegalStateException("illegal AST node discovered!")
+    }
 
 
-    internal inner class Smv2SMTVisitor : SMVAstVisitor<Sexp> {
-        override fun visit(top: SMVAst): Sexp {
-            throw IllegalStateException("illegal AST node discovered!")
+    override fun visit(quantified: SQuantified): SExpr {
+        throw IllegalStateException("illegal AST node discovered! SQuantified not allowed in assignments")
+    }
+
+    private fun ifThenElse(cases: List<SCaseExpression.Case>, n: Int): SExpr {
+        if (n >= cases.size) {
+            throw IllegalArgumentException()
         }
 
-        override fun visit(v: SVariable): Sexp {
-            /*Sexp access = newNonAtomicSexp();
-            access.add(newAtomicSexp(v.getName()));
-            access.add(newAtomicSexp(SMTProgram.STATE_NAME));
-            */
-            return newAtomicSexp(SMTProgram.STATE_NAME + v.name)
+        if (n == cases.size - 1) {//last element
+            // ignoring the last condition for well-definedness
+            return cases[n].then.accept(this)
         }
 
-        override fun visit(be: SBinaryExpression): Sexp {
-            val left = be.left.accept(this)
-            val right = be.right.accept(this)
-            val op = fnTranslator.translateOperator(be.operator,
-                    be.left.dataType!!, be.right.dataType!!)
-
-            val call = newNonAtomicSexp()
-            call.add(op)
-            call.add(left)
-            call.add(right)
-            return call
-        }
-
-        override fun visit(ue: SUnaryExpression): Sexp {
-            val right = ue.expr.accept(this)
-            val op = fnTranslator.translateOperator(ue.operator, ue.expr.dataType!!)
-            val call = newNonAtomicSexp()
-            call.add(op)
-            call.add(right)
-            return call
-        }
-
-        override fun visit(l: SLiteral): Sexp {
-            return dtTranslator.translate(l)
-        }
-
-        override fun visit(a: SAssignment): Sexp {
-            throw IllegalStateException("illegal AST node discovered!")
-        }
-
-        override fun visit(ce: SCaseExpression): Sexp {
-            return ifThenElse(ce.cases, 0)
-        }
-
-        override fun visit(func: SFunction): Sexp {
-            val args = func.arguments.map { arg -> arg.accept(this) }
-            return fnTranslator.translateOperator(func, args)
-        }
-
-        override fun visit(smvModule: SMVModule): Sexp {
-            throw IllegalStateException("illegal AST node discovered!")
-        }
-
-
-        override fun visit(quantified: SQuantified): Sexp {
-            throw IllegalStateException("illegal AST node discovered! SQuantified not allowed in assignments")
-        }
-
-        private fun ifThenElse(cases: List<SCaseExpression.Case>, n: Int): Sexp {
-            if (n >= cases.size) {
-                throw IllegalArgumentException()
-            }
-
-            if (n == cases.size - 1) {//last element
-                // ignoring the last condition for well-definedness
-                return cases[n].then.accept(this)
-            }
-
-            val ite = newNonAtomicSexp()
-            ite.add(newAtomicSexp("ite"))
-            ite.add(cases[n].condition.accept(this))
-            ite.add(cases[n].then.accept(this))
-            ite.add(ifThenElse(cases, n + 1))
-            return ite
-        }
+        val ite = SList()
+        ite.add(SSymbol("ite"))
+        ite.add(cases[n].condition.accept(this))
+        ite.add(cases[n].then.accept(this))
+        ite.add(ifThenElse(cases, n + 1))
+        return ite
     }
 }
