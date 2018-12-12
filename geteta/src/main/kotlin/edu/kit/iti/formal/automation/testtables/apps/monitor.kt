@@ -56,15 +56,17 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
 
 fun bindsConstraintVariable(ctx: TestTableLanguageParser.CellContext?, fvar: ConstraintVariable): Boolean {
     return ctx?.chunk()?.filter { chunk ->
-        val variable = chunk.variable()
-        val ss = chunk.singlesided()
-        if (ss != null) {
-            val e = ss.expr() as? TestTableLanguageParser.VariableContext
-            if (e == null || ss.relational_operator().text == "=") false
-            else e.IDENTIFIER().equals(fvar.name)
-        } else if (variable != null) {
-            variable.IDENTIFIER().text == fvar.name
-        } else
-            false
+        val ss = chunk.getChild(0)
+        when (ss) {
+            is TestTableLanguageParser.SinglesidedContext -> {
+                val e = ss.expr() as? TestTableLanguageParser.VariableContext
+                if (e == null || ss.relational_operator().text == "=") false
+                else e.IDENTIFIER().equals(fvar.name)
+            }
+            is TestTableLanguageParser.CvariableContext -> {
+                ss.variable().IDENTIFIER().text == fvar.name
+            }
+            else -> false
+        }
     }?.isNotEmpty() ?: false
 }

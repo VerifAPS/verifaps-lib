@@ -102,7 +102,7 @@ object MonitorGenerationST : MonitorGeneration {
                     val oneOfRowStates = states.map { SymbolicReference(it.name) }
                             .disjunction()
                     row.rawFields.forEach { pvar, ctx ->
-                        val bind = getBinding(ctx, fvar)
+                        val bind = bindsConstraintVariable(ctx, fvar)
                         if (bind) {
                             stBody.add(0, Statements.ifthen(boundFlag.not() and oneOfRowStates,
                                     SymbolicReference(fvar.name) assignTo SymbolicReference(pvar.name),
@@ -112,24 +112,6 @@ object MonitorGenerationST : MonitorGeneration {
                     }
                 }
             }
-        }
-
-        private fun getBinding(ctx: TestTableLanguageParser.CellContext?, fvar: ConstraintVariable)
-                : Boolean {
-            return ctx?.chunk()?.filter { chunk ->
-                val ss = chunk.getChild(0)
-                when (ss) {
-                    is TestTableLanguageParser.SinglesidedContext -> {
-                        val e = ss.expr() as? TestTableLanguageParser.VariableContext
-                        if (e == null || ss.relational_operator().text == "=") false
-                        else e.IDENTIFIER().equals(fvar.name)
-                    }
-                    is TestTableLanguageParser.CvariableContext -> {
-                        ss.variable().IDENTIFIER().text == fvar.name
-                    }
-                    else -> false
-                }
-            }?.isNotEmpty() ?: false
         }
 
         private fun updateOutput() {
