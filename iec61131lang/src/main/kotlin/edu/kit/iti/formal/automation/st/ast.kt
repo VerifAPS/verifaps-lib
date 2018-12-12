@@ -13,9 +13,9 @@ import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.*
 import edu.kit.iti.formal.automation.st.Cloneable
-import edu.kit.iti.formal.util.times
 import edu.kit.iti.formal.automation.visitors.Visitable
 import edu.kit.iti.formal.automation.visitors.Visitor
+import edu.kit.iti.formal.util.times
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
 import java.io.Serializable
@@ -732,6 +732,7 @@ data class SymbolicReference @JvmOverloads constructor(
 
 //Helpers
 fun <T : Expression> Iterable<T>.disjunction() = reduce { a: Expression, b: Expression -> a or b }
+
 fun <T : Expression> Iterable<T>.conjunction() = reduce { a: Expression, b: Expression -> a and b }
 fun <T : Expression> Iterable<T>.sum() = reduce { a: Expression, b: Expression -> a plus b }
 fun <T : Expression> Iterable<T>.substract() = reduce { a: Expression, b: Expression -> a minus b }
@@ -2057,17 +2058,13 @@ data class SFCActionQualifier(
         var OVERRIDING_RESET = SFCActionQualifier(Qualifier.OVERRIDING_RESET)
         var SET = SFCActionQualifier(Qualifier.SET)
     }
-
 }
 
 data class SFCImplementation(
-        val networks: MutableList<SFCNetwork> = ArrayList<SFCNetwork>(),
-        var actions: MutableList<ActionDeclaration> = ArrayList()
+        val networks: MutableList<SFCNetwork> = ArrayList<SFCNetwork>()
+        //weigl: actions now in PouExecutable
+        // var actions: MutableList<ActionDeclaration> = ArrayList()
 ) : Top() {
-
-    fun getAction(name: String): ActionDeclaration? {
-        return this.actions.stream().filter { a: ActionDeclaration -> a.name == name }.findFirst().orElse(null)
-    }
 
     /**
      * {@inheritDoc}
@@ -2143,26 +2140,11 @@ private fun <E : Cloneable<*>> Collection<E>.clone(): MutableList<E> {
 */
 
 class SFCTransition : Top() {
-    var from: Set<SFCStep>? = null
-        set(from) {
-            field = this.from
-        }
-    var to: Set<SFCStep>? = null
-        set(to) {
-            field = this.to
-        }
-    var guard: Expression? = null
-        set(guard) {
-            field = this.guard
-        }
-    var name: String? = null
-        set(name) {
-            field = this.name
-        }
+    var from: MutableSet<SFCStep> = HashSet()
+    var to: MutableSet<SFCStep> = HashSet()
+    var guard: Expression = BooleanLit.LTRUE
+    var name: String = ANONYM
     var priority: Int = 0
-        set(priority) {
-            field = this.priority
-        }
 
     override fun clone(): SFCTransition {
         val t = SFCTransition()
@@ -2178,7 +2160,7 @@ class SFCTransition : Top() {
 
     class PriorityComparison : Comparator<SFCTransition> {
         override fun compare(o1: SFCTransition, o2: SFCTransition): Int {
-            return Integer.compare(o1.priority, o2.priority)
+            return Integer.compare(o1.priority ?: 0, o2.priority)
         }
     }
 }

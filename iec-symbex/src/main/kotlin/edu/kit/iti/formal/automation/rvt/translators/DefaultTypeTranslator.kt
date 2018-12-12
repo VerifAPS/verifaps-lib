@@ -40,7 +40,7 @@ class DefaultTypeTranslator : TypeTranslator {
     }
 
     internal inner class DefaultTranslatorVisitor : DataTypeVisitorNN<SMVType> {
-        override fun defaultVisit(obj: Any) = TODO()
+        override fun defaultVisit(obj: Any) = throw IllegalStateException("Not implemented for $obj")
 
         override fun visit(real: AnyReal) = TODO()
         override fun visit(real: AnyReal.REAL) = TODO()

@@ -30,7 +30,7 @@ object InterfaceBuilder : XMLTranslatorFind {
             for (e in vars.getChildren("variable")) {
                 val name = e.getAttributeValue("name")
                 val datatype = VariableDeclXML.getDatatype(e.getChild("type"))
-                val initValue = VariableDeclXML.getInitialValue(e.getChild("initialValue"))
+                val initValue = VariableDeclXML.getInitialValue(e)
                 nl()
                 printf("$name : $datatype")
                 if (initValue != null)
@@ -54,9 +54,11 @@ object VariableDeclXML {
         }
     }
 
-    fun getInitialValue(initialValue: Element?): String? {
-        if (initialValue == null) return null
-        val simpleValue = initialValue.getChild("simpleValue") ?: return null
-        return simpleValue.text
+    fun getInitialValue(variable: Element?): String? {
+        if (variable == null)
+            return null
+        return variable.getChild("initialValue")
+                ?.getChild("simpleValue")
+                ?.getAttributeValue("value")
     }
 }

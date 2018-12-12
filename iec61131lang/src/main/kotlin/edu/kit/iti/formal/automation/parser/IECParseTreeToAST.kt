@@ -488,7 +488,9 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         ast.scope = ctx.var_decls().accept(this) as Scope
         ast.methods.addAll(ctx.methods().accept(this) as List<MethodDeclaration>)
 
-        ctx.action().forEach { act -> ast.addAction(act.accept(this) as ActionDeclaration) }
+        ctx.action().forEach { act ->
+            ast.addAction(act.accept(this) as ActionDeclaration)
+        }
 
         if (ctx.body().statement_list() != null)
             ast.stBody = ctx.body().statement_list().accept(this) as StatementList
@@ -884,7 +886,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             network.steps.add(visitStep(stepContext))
         }
 
-        ctx.action().forEach { a -> sfc!!.actions.add(visitAction(a)) }
+        //ctx.action().forEach { a -> sfc!!.actions.add(visitAction(a)) }
 
         ctx.transition().forEach { t -> visitTransition(t) }
 
@@ -906,8 +908,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitInit_step(ctx: IEC61131Parser.Init_stepContext): SFCStep {
         currentStep = SFCStep()
-        currentStep!!.name = ctx.step_name.text
-        currentStep!!.isInitial = true
+        currentStep.name = ctx.step_name.text
+        currentStep.isInitial = true
         visitActionAssociations(ctx.action_association())
         return currentStep
     }
@@ -929,20 +931,20 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         for (qual in SFCActionQualifier.Qualifier.values()) {
             if (qual.symbol.equals(q, ignoreCase = true)) qualifier.qualifier = qual
         }
-        currentStep!!.addAction(qualifier, ctx.actionName.text)
+        currentStep.addAction(qualifier, ctx.actionName.text)
         return null
     }
 
     override fun visitStep(ctx: IEC61131Parser.StepContext): SFCStep {
-        val s = SFCStep()
-        currentStep!!.name = ctx.step_name.text
-        currentStep!!.isInitial = false
+        currentStep = SFCStep()
+        currentStep.name = ctx.step_name.text
+        currentStep.isInitial = false
         visitActionAssociations(ctx.action_association())
+        currentStep.ruleContext = ctx
         return currentStep
     }
 
     override fun visitTransition(ctx: IEC61131Parser.TransitionContext): Any {
-        assert(network != null)
         val transition = SFCTransition()
         transition.ruleContext = ctx
 
@@ -958,10 +960,14 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         transition.to = visitSteps(ctx.to)
         transition.from = visitSteps(ctx.from)
         transition.guard = ctx.transitionCond().expression().accept(this) as Expression
+
+        transition.from.forEach { it.outgoing.add(transition) }
+        transition.to.forEach { it.incoming.add(transition) }
+
         return transition
     }
 
-    override fun visitSteps(ctx: IEC61131Parser.StepsContext): Set<SFCStep> {
+    override fun visitSteps(ctx: IEC61131Parser.StepsContext): MutableSet<SFCStep> {
         return ctx.IDENTIFIER()
                 .map { n -> network.getStep(n.symbol.text) }
                 .filter { it.isPresent() }

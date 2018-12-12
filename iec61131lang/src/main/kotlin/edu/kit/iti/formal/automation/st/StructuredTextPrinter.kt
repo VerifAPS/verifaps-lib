@@ -762,9 +762,8 @@ class StructuredTextPrinter
     }
 
     override fun visit(sfc: SFCImplementation) {
-        sfc.actions.forEach { a -> a.accept(this) }
+        //sfc.actions.forEach { a -> a.accept(this) }
         sfc.networks.forEach { n -> n.accept(this) }
-
     }
 
     override fun visit(transition: SFCTransition) {

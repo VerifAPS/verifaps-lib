@@ -25,4 +25,5 @@ project(':aps-rvt').projectDir = "$rootDir/aps-rvt" as File
 project(':casestudies').projectDir = "$rootDir/casestudies" as File
 
 //include 'asdl'
+include 'absintsfc'
 

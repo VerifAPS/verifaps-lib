@@ -55,6 +55,58 @@ abstract class SMVAstDefaultVisitorNN<T> : SMVAstVisitor<T> {
 }
 
 
+open class SMVAstScanner : SMVAstVisitor<Unit> {
+    override fun visit(top: SMVAst) = defaultVisit(top)
+    override fun visit(v: SVariable) = defaultVisit(v)
+    protected fun defaultVisit(ast: SMVAst) {}
+
+    override fun visit(be: SBinaryExpression) {
+        be.left.accept(this)
+        be.right.accept(this)
+    }
+
+    override fun visit(ue: SUnaryExpression) {
+        ue.expr.accept(this)
+    }
+
+    override fun visit(l: SLiteral) = defaultVisit(l)
+
+    override fun visit(a: SAssignment) {
+        a.expr.accept(this)
+        a.target.accept(this)
+    }
+
+    override fun visit(ce: SCaseExpression) {
+        for (c in ce.cases) {
+            c.condition.accept(this)
+            c.then.accept(this)
+        }
+    }
+
+    override fun visit(smvModule: SMVModule) {
+        smvModule.ctlSpec.forEach { it.accept(this) }
+        smvModule.ltlSpec.forEach { it.accept(this) }
+        smvModule.initAssignments.forEach { it.accept(this) }
+        smvModule.initExpr.forEach { it.accept(this) }
+        smvModule.definitions.forEach { it.accept(this) }
+        smvModule.frozenVars.forEach { it.accept(this) }
+        smvModule.inputVars.forEach { it.accept(this) }
+        smvModule.stateVars.forEach { it.accept(this) }
+        smvModule.invariantSpecs.forEach { it.accept(this) }
+        smvModule.invariants.forEach { it.accept(this) }
+        smvModule.moduleParameters.forEach { it.accept(this) }
+        smvModule.nextAssignments.forEach { it.accept(this) }
+        smvModule.transExpr.forEach { it.accept(this) }
+    }
+
+    override fun visit(func: SFunction) = defaultVisit(func)
+    override fun visit(quantified: SQuantified) {
+        quantified.quantified
+                .forEach { it.accept(this) }
+
+    }
+}
+
 /**
  */
 abstract class SMVAstMutableVisitor : SMVAstVisitor<SMVAst> {

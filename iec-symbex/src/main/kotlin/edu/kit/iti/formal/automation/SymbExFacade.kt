@@ -26,6 +26,7 @@ import edu.kit.iti.formal.automation.rvt.ModuleBuilder
 import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
 import edu.kit.iti.formal.automation.rvt.SymbolicState
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
+import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st0.SimplifierPipelineST0
 import edu.kit.iti.formal.automation.visitors.Utils
@@ -142,5 +143,14 @@ object SymbExFacade {
 
     fun asSVariable(vd: VariableDeclaration): SVariable {
         return DefaultTypeTranslator().translate(vd)
+    }
+
+    fun evaluateStatements(seq: StatementList, scope: Scope): SymbolicState {
+        val program = ProgramDeclaration(scope = scope, stBody = seq)
+        IEC61131Facade.resolveDataTypes(PouElements(arrayListOf(program)))
+        val symbex = SymbolicExecutioner(scope)
+        symbex.scope = scope
+        program.accept(symbex)
+        return symbex.peek()
     }
 }

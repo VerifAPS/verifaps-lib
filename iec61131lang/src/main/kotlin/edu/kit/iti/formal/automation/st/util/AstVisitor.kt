@@ -387,7 +387,7 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
 
     override fun traverse(sfc: SFCImplementation) {
         sfc.networks.forEach { it.accept(visitor) }
-        sfc.actions.forEach { it.accept(visitor) }
+        //sfc.actions.forEach { it.accept(visitor) }
     }
 
     override fun traverse(transition: SFCTransition) {
@@ -859,6 +859,11 @@ abstract class AstVisitor<T> : DefaultVisitorNN<T>() {
     override fun visit(arrayinit: ArrayInitialization): T {
         traversalPolicy.traverse(arrayinit)
         return super<DefaultVisitorNN>.visit(arrayinit)
+    }
+
+    override fun visit(actionDeclaration: ActionDeclaration): T {
+        traversalPolicy.traverse(actionDeclaration)
+        return super.visit(actionDeclaration)
     }
 
     override fun visit(invocation: Invocation): T {
