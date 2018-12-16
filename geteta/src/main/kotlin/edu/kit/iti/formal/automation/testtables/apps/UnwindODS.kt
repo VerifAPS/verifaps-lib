@@ -60,11 +60,14 @@ class UnwindODS : CliktCommand(
 
         Console.info("Program {} found!", if (smvModule != null) "" else "not")
 
-
         table.forEach { file ->
             val gtt = GetetaFacade.readTable(file)
             val unwinded = TableUnwinder(gtt, HashMap())() //use default
             Console.info("Unwinded tabe contains {} rows", unwinded.size)
+            gtt.constraintVariables.forEach {
+                Console.info("You need to define a cell for {} : {}, manually",
+                        it.name, it.dataType.name)
+            }
 
             val table =
                     if (smvModule != null)
@@ -74,6 +77,7 @@ class UnwindODS : CliktCommand(
 
             table.run()
             table.writer.saveAs(outputFile)
+            Console.info("Table written to {}", outputFile.absolutePath)
         }
     }
 }

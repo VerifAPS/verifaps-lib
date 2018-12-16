@@ -79,7 +79,10 @@ object KastelDemonstrator {
         val module = SymbExFacade.evaluateProgram(simplified, true)
         val isHigh = { v: String ->
             val b = v in listOf(
-                    "ReadStatusAxis1\$ConstantVelocity"
+                    //unused: "ReadStatusAxis1\$ConstantVelocity"
+                    "ActStep\$rVelocity"
+                    //,"MoveVelAxis1\$InVelocity"
+                    //,"ReadActVelAxis1\$Velocity"
                     )// v.endsWith("Velocity")
             Console.info(String.format("%35s %s", v, (if (b) "high" else "low")))
             b

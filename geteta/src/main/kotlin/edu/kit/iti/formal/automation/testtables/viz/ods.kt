@@ -2,6 +2,7 @@ package edu.kit.iti.formal.automation.testtables.viz
 
 import com.github.jferard.fastods.*
 import com.github.jferard.fastods.datastyle.DataStyle
+import com.github.jferard.fastods.datastyle.DataStyles
 import com.github.jferard.fastods.datastyle.createFloatStyleBuilder
 import com.github.jferard.fastods.style.BorderAttribute
 import com.github.jferard.fastods.style.TableCellStyle
@@ -222,7 +223,7 @@ fun createTableWithoutProgram(gtt: GeneralizedTestTable, tableStyle: TableStyle,
 
     gtt.programVariables.filter { it.isInput }
             .forEach {
-                val group = arrayOf(inputCategory, it.name)
+                val group = arrayOf(inputCategory, "${it.name} : ${it.dataType.name}")
                 cat += ValueDebugColumn(group, it, RandomValueOracle)
                 cat += ConstraintDebugColumn(group, it)
             }
@@ -232,7 +233,7 @@ fun createTableWithoutProgram(gtt: GeneralizedTestTable, tableStyle: TableStyle,
     styleMap[outputCategory] = tableStyle.styleCategoryHeader
     gtt.programVariables.filter { it.isOutput }
             .forEach {
-                val group = arrayOf(outputCategory, it.name)
+                val group = arrayOf(outputCategory, "${it.name} : ${it.dataType.name}")
                 cat += ValueDebugColumn(group, it, RandomValueOracle)
                 cat += ConstraintDebugColumn(group, it)
             }
@@ -374,7 +375,7 @@ class ValueDebugColumn(group: Array<String>,
             is TestTableLanguageParser.ConstantTrueContext ->
                 cell.setBooleanValue(true)
             is TestTableLanguageParser.ConstantIntContext -> {
-                cell.setStringValue((first as TestTableLanguageParser.ConstantIntContext).text)
+                cell.setStringValue((first as TestTableLanguageParser.CconstantContext).text)
             }
             else -> {
                 val dt = programVar.dataType
@@ -394,7 +395,6 @@ class ConstraintDebugColumn(group: Array<String>,
     override fun writeCell(cell: TableCell, cindex: Int, row: TableRow, table: ODSDebugTable) {
         val constraint = row.rawFields[programVar]!!
         val fml = constraint.accept(table.formulaTblPrinter(programVar.name))
-        println(fml)
         cell.setFormula(fml)
     }
 }
@@ -466,9 +466,9 @@ class ODSDebugTable(
             for ((text, rspan) in runLengthEncoding) {
                 val cell = row.getOrCreateCell(count)
                 cell.setStringValue(text)
-                //cell.setStyle(col.getCategoryStyle(cat))
+                cell.setStyle(tableStyle.styleCategoryHeader)
                 if (rspan - 1 >= 0)
-                    cell.setColumnsSpanned(rspan - 1)
+                    cell.setColumnsSpanned(rspan)
                 count += rspan
             }
             ++currentRow
@@ -481,8 +481,13 @@ class ODSDebugTable(
         val row = currentTable.nextRow()
         val cell = row.walker
         categories.forEachIndexed { cindex, it ->
-            it.writeCell(row.getOrCreateCell(cindex), cindex, trow, this)
-//            cell.next()
+            val cell = row.getOrCreateCell(cindex)
+            it.writeCell(cell, cindex, trow, this)
+            //TODO for next version: Draw borders between varaibles
+            // This is currently not nice to implement
+            /*if(cindex in categoryBorders) {
+                cell.setStyle()
+            }*/
         }
         ++currentRow
     }
@@ -640,7 +645,7 @@ class ODSFormulaPrinter(
 
     override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext): String =
             "AND(" + ctx.lower.accept(this) + "<=" + columnOf(variable, 0) + "; " +
-                    columnOf(variable, 0) + ">=" + ctx.upper.accept(this) + ")"
+                    columnOf(variable, 0) + "<=" + ctx.upper.accept(this) + ")"
 
     override fun visitMinus(ctx: TestTableLanguageParser.MinusContext) = "-" + ctx.expr().accept(this)
 
@@ -716,41 +721,42 @@ object DefaultTableStyle : TableStyle {
 
     var styleValues = TableCellStyle.builder("values")
             .build()
-    override var styleOutputValue = TableCellStyle.builder("values output")
+    override var styleOutputValue = TableCellStyle.builder("values_output")
             .parentCellStyle(styleValues).build()
-    override val styleInputValue = TableCellStyle.builder("values input")
+    override val styleInputValue = TableCellStyle.builder("values_input")
             .parentCellStyle(styleValues).build()
 
-    override var styleCategoryHeader = TableCellStyle.builder("category header")
-            .backgroundColor(SColor("#ff00ff"))
+    override var styleCategoryHeader = TableCellStyle.builder("category_header")
+            .backgroundColor(SColor("ff00ff"))
             .fontWeightBold()
             .textAlign(TableCellStyle.Align.CENTER)
+            .borderAll(SimpleLength.pt(1.0), SimpleColor.BLACK, BorderAttribute.Style.SOLID)
             .build()
 
     class SColor(val s: String) : Color {
         override fun hexValue() = s
     }
 
-    var styleVariableHeader = TableCellStyle.builder("variable header")
-            .backgroundColor(SColor("#cccccc"))
+    var styleVariableHeader = TableCellStyle.builder("variable_header")
+            .backgroundColor(SColor("cccccc"))
             .fontWeightBold()
             .textAlign(TableCellStyle.Align.CENTER)
             .borderBottom(SimpleLength.pt(1.0), SimpleColor.BLACK, BorderAttribute.Style.SOLID)
             .build()
 
-    override val styleInputVariableHeader: TableCellStyle = TableCellStyle.builder("variable input header")
+    override val styleInputVariableHeader: TableCellStyle = TableCellStyle.builder("variable_input_header")
             .parentCellStyle(styleVariableHeader)
             .build()
 
-    override val styleOutputVariableHeader = TableCellStyle.builder("variable output header")
+    override val styleOutputVariableHeader = TableCellStyle.builder("variable_output_header")
             .parentCellStyle(styleVariableHeader)
             .build()
 
-    override val styleRowIdHeader: TableCellStyle = TableCellStyle.builder("variable rowid header")
+    override val styleRowIdHeader: TableCellStyle = TableCellStyle.builder("variable_rowid_header")
             .parentCellStyle(styleVariableHeader)
             .build()
 
-    val styleRowTimeHeader: TableCellStyle = TableCellStyle.builder("variable time header")
+    val styleRowTimeHeader: TableCellStyle = TableCellStyle.builder("variable_time_header")
             .parentCellStyle(styleVariableHeader)
             .build()
 }
