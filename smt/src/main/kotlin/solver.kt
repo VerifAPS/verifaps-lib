@@ -1,57 +1,145 @@
 package edu.kit.iti.formal.smt
 
-import org.antlr.v4.runtime.CharStreams
-import java.io.InputStreamReader
-import java.io.Reader
-import java.util.concurrent.TimeUnit
-
 /**
  *
  * @author Alexander Weigl
  * @version 1 (11.12.18)
  */
+
+import edu.kit.iti.formal.util.findProgram
+import org.antlr.v4.runtime.CharStreams
+import java.io.File
+import java.io.Reader
+import java.io.Writer
+import java.util.concurrent.TimeUnit
+
 interface SmtSolver {
-    fun start(): Process
-    fun send(sexpr: SExpr)
+    fun send(sexpr: String)
+    fun send(sexpr: SExpr) = send(sexpr.toString())
     fun send(sexpr: Collection<SExpr>) {
         sexpr.forEach { send(it) }
     }
 
-    fun readResponse(): SExpr
+    fun read(): SExpr
 }
 
-//taken from stvs and modified
-abstract class SmtSolverCLI(
-        var timeout: Long = 10,
-        var z3Command: Array<String> = arrayOf("z3", "-in", "-smt2"))
-    : SmtSolver {
-    var process: Process? = null
+interface InteractiveSmtSolver : SmtSolver {
+    fun start()
+    fun dispose()
+}
 
-    override fun start(): Process {
-        val processBuilder = ProcessBuilder(*z3Command)
-        process = processBuilder.start()
-        return process!!
-    }
+interface CliSmtSolver : SmtSolver {
+    fun run(timeout: Long, unit: TimeUnit)
+    fun readAll(): List<SExpr>
+}
 
-    override fun send(smt: SExpr) = send(smt.toString())
+class CliSmtSolverImpl(
+        val smtFile: File = File.createTempFile("verifaps_", ".smt2"),
+        val command: Array<String>) : CliSmtSolver {
+    val out = smtFile.bufferedWriter()
+    var smtOut: Reader? = null
 
-    fun send(smt: String) {
-        val process = process
-        if (process != null) {
-            process.outputStream.use {
-                it.write(smt.toByteArray())
-                it.flush()
-            }
+    companion object {
+        fun getZ3(): CliSmtSolverImpl {
+            val z3 = findProgram("z3")
+                    ?: throw IllegalStateException("Could not find z3 in \$PATH.")
+            return CliSmtSolverImpl(command = arrayOf(z3.absolutePath, "-smt2"))
         }
     }
 
-    override fun readResponse(): SExpr {
-        val reader = readFirstSexpr(InputStreamReader(process?.inputStream))
+    override fun send(sexpr: String) {
+        out.write(sexpr + "\n")
+    }
+
+    override fun read(): SExpr {
+        val s = smtOut ?: throw IllegalStateException("SMT process not started before read.")
+        val reader = readFirstSexpr(s)
+        return SExprFacade.parseExpr(CharStreams.fromString(reader))
+    }
+
+    override fun run(timeout: Long, unit: TimeUnit) {
+        out.close()
+        val pb = ProcessBuilder(*command, smtFile.absolutePath)
+                .redirectErrorStream(true)
+
+        val process = pb.start()
+
+        smtOut = process.inputStream.reader()
+        process.waitFor(timeout, unit)
+    }
+
+    override fun readAll(): List<SExpr> {
+        val s = smtOut ?: throw IllegalStateException("SMT process not started before read.")
+        val text = s.readText()
+        return SExprFacade.parse(CharStreams.fromString(text))
+    }
+}
+
+class TeeSolverCLI(val writeTo: Writer, val solver: InteractiveSmtSolver) : InteractiveSmtSolver {
+    override fun send(sexpr: String) {
+        writeTo.write(sexpr)
+        writeTo.flush()
+        solver.send(sexpr)
+    }
+
+    override fun read(): SExpr = solver.read().also {
+        writeTo.write(it.toString())
+    }
+
+    override fun dispose() {
+        solver.dispose()
+        writeTo.close()
+    }
+
+    override fun start() = solver.start()
+}
+
+//taken from stvs and modified
+class InteractiveSmtSolverImpl(
+        var timeout: Long = 10,
+        var command: Array<String> = arrayOf("z3", "-in", "-smt2")) : InteractiveSmtSolver {
+
+    var process: Process? = null
+    var smtIn: Writer? = null
+    var smtOut: Reader? = null
+
+    companion object {
+        fun getZ3(): InteractiveSmtSolverImpl {
+            val z3 = findProgram("z3")
+                    ?: throw IllegalStateException("Could not find z3 in \$PATH.")
+            return InteractiveSmtSolverImpl(command = arrayOf(z3.absolutePath, "-in", "-smt2"))
+        }
+
+    }
+
+    override fun dispose() {
+        send("(exit)")
+        process?.destroyForcibly()
+    }
+
+    override fun start() {
+        val processBuilder = ProcessBuilder(*command)
+        process = processBuilder.start()
+        smtIn = process!!.outputStream.writer()
+        smtOut = process!!.inputStream.reader()
+    }
+
+    override fun send(sexpr: String) {
+        val s = smtIn ?: throw IllegalStateException("SMT process not started before read.")
+        with(s) {
+            write(sexpr)
+            flush()
+        }
+    }
+
+    override fun read(): SExpr {
+        val s = smtOut ?: throw IllegalStateException("SMT process not started before read.")
+        val reader = readFirstSexpr(s)
         return SExprFacade.parseExpr(CharStreams.fromString(reader))
     }
 
     private fun quit(): Int {
-        send("(quit)")
+        send("(exit)")
         process?.waitFor(timeout, TimeUnit.SECONDS)
         try {
             val exitValue = process?.waitFor() ?: -1
@@ -61,7 +149,6 @@ abstract class SmtSolverCLI(
         return -1
     }
 }
-
 
 internal fun readFirstSexpr(reader: Reader): String {
     val readSexpr = StringBuilder()

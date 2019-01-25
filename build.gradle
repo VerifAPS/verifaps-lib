@@ -103,7 +103,7 @@ subprojects {
     apply plugin: 'maven'
 
 
-    ext.kotlin_version = '1.3.11'
+    ext.kotlin_version = '1.3.20'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8

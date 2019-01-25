@@ -8,7 +8,7 @@ import java.io.StringReader
  * @author Alexander Weigl
  * @version 1 (11.12.18)
  */
-class SolverKtTest {
+class ParserTest {
     @TestFactory
     fun testReadFirstSexpr(): Collection<DynamicTest> =
             listOf(

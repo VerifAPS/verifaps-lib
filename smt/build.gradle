@@ -10,6 +10,8 @@ repositories { mavenCentral() }
 
 dependencies {
     antlr group: 'org.antlr', name: 'antlr4', version: 4.7
+    compile project(":util")
+
     testCompileOnly(
             'junit:junit:4.12'
     )
