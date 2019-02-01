@@ -20,13 +20,67 @@ import org.antlr.v4.runtime.dfa.DFA
 import java.io.File
 import java.util.*
 
+
 object Flycheck {
     @JvmStatic
     fun main(args: Array<String>) = FlycheckApp().main(args)
 }
 
+object FlycheckInteractive {
+    @JvmStatic
+    fun main(args: Array<String>) {
+        println("{version:\"0.9\"}")
+        val reader = System.`in`.bufferedReader()
+        do {
+            val line = reader.readLine() ?: break
+            if (line.isEmpty()) continue
+            FlycheckApp().main(parseArgs(line))
+        } while (true)
+    }
+
+    /**
+     * from https://stackoverflow.com/questions/1082953/shlex-alternative-for-java
+     * license. unlicense/public domain
+     */
+    @JvmStatic
+    fun parseArgs(argString: CharSequence): List<String> {
+        val tokens = ArrayList<String>()
+        var escaping = false
+        var quoteChar = ' '
+        var quoting = false
+        var current = StringBuilder()
+        for (i in 0 until argString.length) {
+            val c = argString[i]
+            if (escaping) {
+                current.append(c)
+                escaping = false
+            } else if (c == '\\' && !(quoting && quoteChar == '\'')) {
+                escaping = true
+            } else if (quoting && c == quoteChar) {
+                quoting = false
+            } else if (!quoting && (c == '\'' || c == '"')) {
+                quoting = true
+                quoteChar = c
+            } else if (!quoting && Character.isWhitespace(c)) {
+                if (current.length > 0) {
+                    tokens.add(current.toString())
+                    current = StringBuilder()
+                }
+            } else {
+                current.append(c)
+            }
+        }
+        if (current.isNotEmpty()) {
+            tokens.add(current.toString())
+        }
+        return tokens
+    }
+}
+
 class FlycheckApp : CliktCommand() {
     val verbose by option(help = "enable verbose mode").flag()
+    val interactiveFormat by option("--json", help = "Flag for enabling json, line based format")
+            .flag()
     val include by option("-L", help = "folder for looking includes")
             .file()
             .multiple()
@@ -44,9 +98,19 @@ class FlycheckApp : CliktCommand() {
                 include
         )
         r.run()
-        r.messages.forEach {
-            Console.writeln("[${it.level.toUpperCase()}] (${it.sourceName}@${it.lineNumber}:${it.charInLine}) ${it.message} (${it.category})"
-            )
+        if (interactiveFormat) {
+            print("[")
+            r.messages.joinToString(",") {
+                "{level:\"${it.level.toUpperCase()}\", file: \"${it.sourceName}\", " +
+                        "line:${it.lineNumber}, offset:${it.charInLine}," +
+                        "message: ${it.message}, category: \"${it.category}\"}"
+            }
+            print("]")
+            println()
+        } else {
+            r.messages.forEach {
+                Console.writeln("[${it.level.toUpperCase()}] (${it.sourceName}@${it.lineNumber}:${it.charInLine}) ${it.message} (${it.category})")
+            }
         }
     }
 }
