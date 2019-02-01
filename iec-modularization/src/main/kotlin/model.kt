@@ -42,7 +42,8 @@ class ModularProgram(val filename: String) {
 data class CallSite(val vars: List<String>, val number: Int, val statement: InvocationStatement) {
     fun repr(): String = vars.joinToString(".") + ".$number"
     fun correspond(other: CallSite) =
-            vars.subList(1, vars.lastIndex) == other.vars.subList(1, other.vars.lastIndex) && other.number == number
+            vars.subList(1, vars.lastIndex) == other.vars.subList(1, other.vars.lastIndex)
+                    && other.number == number
 
     fun isPrefix(ids: List<String>) = ids.size <= vars.size && ids.zip(vars).all { (a, b) -> a == b }
 }
@@ -57,7 +58,6 @@ data class CallSiteContext(val vars: Stack<String> = Stack(),
 
     fun startCall(c: InvocationStatement): CallSite {
         vars.push(c.callee.identifier)
-
         val currentNo = invocationCounter.peek().computeIfAbsent(c.callee.identifier) { 0 }
         val cs = CallSite(vars.toList(), currentNo, c)
         invocationCounter.peek().put(c.callee.identifier, 1 + currentNo)

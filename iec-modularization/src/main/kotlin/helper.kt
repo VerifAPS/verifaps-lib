@@ -21,12 +21,11 @@ class SearchForInvocation : AstVisitor<Unit>() {
     override fun visit(invocation: InvocationStatement) {
         foundInvocation = true
     }
-
 }
 
-private fun closedBody(stBody: Top): Boolean {
+fun Top.containsInvocations(): Boolean {
     val sfi = SearchForInvocation()
-    stBody.accept(sfi)
+    this.accept(sfi)
     return sfi.foundInvocation
 }
 //

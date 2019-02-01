@@ -129,18 +129,3 @@ class InvocationRewriter(val prefix: String, val scope: Scope, val callSite: Cal
 val TYPE_COUNTER = VariableDeclaration.FLAG_COUNTER.get() or VariableDeclaration.LOCAL
 val TYPE_INPUT_FUNCTION_BLOCK = VariableDeclaration.FLAG_COUNTER.get() or VariableDeclaration.OUTPUT
 val TYPE_OUTPUT_FUNCTION_BLOCK = VariableDeclaration.FLAG_COUNTER.get() or VariableDeclaration.INPUT
-
-/*
-class Foo<E, T : List<E>> {
-    fun add(x: T): T = x
-}
-
-fun a(): Unit {
-    val foo = Foo<String, List<String>>()
-    fun b(f : Foo<in String, *>): Unit {
-        f.add()
-    }
-
-
-}*/
-

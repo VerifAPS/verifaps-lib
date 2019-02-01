@@ -7,6 +7,7 @@ import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.smv.NuXMVInvariantsCommand
 import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.smv.NuXMVProcess
+import edu.kit.iti.formal.smv.ast.SMVAst
 import java.io.File
 
 fun readProgramsOrError(p: String): PouElements {
@@ -39,9 +40,12 @@ class ModularProver(val args: ModularizationApp) {
                     o to n
                 }
     }
-    val proveStrategy: ProofStrategy = DefaultStrategy(this)
+    /*val proveStrategy: ProofEqualityStrategy = DefaultEqualityStrategy(this)
+    val topLevelState : SMVAst
+    val topLevelOutput : SMVAst
+    */
 
-    fun printCallSites(): Unit {
+    fun printCallSites() {
         Console.info("Call sites for the old program: ${oldProgram.filename}")
         oldProgram.callSites.forEach {
             Console.info("${it.repr()} in line ${it.statement.startPosition}")
@@ -54,7 +58,7 @@ class ModularProver(val args: ModularizationApp) {
 
     fun createFiles() {
         args.outputFolder.mkdirs()
-        prove = proveStrategy.createTask(oldProgram.entry, newProgram.entry, callSitePairs)
+        //prove = proveStrategy.createTask(oldProgram.entry, newProgram.entry, callSitePairs)
     }
 
     fun runSolvers() {
