@@ -68,6 +68,16 @@ data class Scope(val variables: VariableScope = VariableScope())
             return s
         }
 
+    val allVisibleVariables: VariableScope
+        get() {
+            val vars = VariableScope()
+            vars.addAll(variables)
+            parent?.let {
+                vars.addAll(it.allVisibleVariables)
+            }
+            return vars
+        }
+
 
     fun getDefinedPous(): List<PouElement> {
         val p = PouElements()

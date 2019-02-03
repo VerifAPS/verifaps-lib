@@ -38,7 +38,7 @@ object KastelDemonstrator {
 
         val (pous, errors) = IEC61131Facade.fileResolve(INPUT_FILE)
         errors.forEach {
-            println("${it.sourceName}:${it.lineNumber} :: ${it.message} (${it.category}) ")
+            println("${it.sourceName}:${it.startLine} :: ${it.message} (${it.category}) ")
         }
 
         val program = Utils.findProgram(pous)!!

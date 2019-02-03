@@ -4,7 +4,22 @@ import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
+import edu.kit.iti.formal.util.dlevenshtein
 import org.antlr.v4.runtime.Token
+
+/**
+ * Similarity is defined via degree of levensthein of the low-case strings.
+ * Percentage of changed characters.
+ */
+fun variableSimilarity(expected: String, defined: String): Double =
+        dlevenshtein(expected.toLowerCase(), defined.toLowerCase()).toDouble() / expected.length
+
+fun Iterable<String>.similarCandidates(reference: String, threshold: Double = .9) =
+        this.map { it to variableSimilarity(reference, it) }
+                .sortedByDescending { it.second }
+                .filter { it.second > threshold }
+                .map { it.first }
+
 
 class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>() {
     override fun defaultVisit(obj: Any) {}
@@ -13,9 +28,14 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
         try {
             scope.getVariable(symbolicReference.identifier)
         } catch (e: VariableNotDefinedException) {
+            val candidates = scope.allVisibleVariables.map { it.name }
+                    .similarCandidates(symbolicReference.identifier)
+                    .joinToString(", ")
+
             reporter.report(
                     node = symbolicReference,
-                    message = "Could not find variable " + symbolicReference.identifier + ".",
+                    message = "Could not find variable ${symbolicReference.identifier}. " +
+                            "Possible candidates are: $candidates",
                     category = "var-resolve", level = "error")
         }
     }
@@ -59,19 +79,29 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
     interface Reporter {
         fun report(e: ReporterMessage)
         fun report(sourceName: String = "",
-                   lineNumber: Int = -1,
-                   charInLine: Int = -1,
+                   startLine: Int = -1,
+                   startOffset: Int = -1,
+                   endLine: Int = -1,
+                   endOffset: Int = -1,
                    message: String = "",
                    category: String = "",
                    level: String = "") = report(ReporterMessage(
-                sourceName, lineNumber, charInLine, message, category, level))
+                sourceName, startLine, startOffset, endLine, endOffset, message, category, level))
 
-        fun report(node: Top, message: String, category: String, level: String) = report(node.ruleContext?.start, message, category, level)
+        fun report(node: Top, message: String, category: String, level: String) = report(
+                sourceName = node.ruleContext?.start?.tokenSource?.sourceName ?: "",
+                startLine = node.startPosition.lineNumber,
+                startOffset = node.startPosition.offset,
+                endLine = node.endPosition.lineNumber,
+                endOffset = node.endPosition.offset,
+                message = message, category = category, level = level)
 
         fun report(node: Token?, message: String, category: String, level: String) = report(
                 sourceName = node?.tokenSource?.sourceName ?: "",
-                lineNumber = node?.line ?: 0,
-                charInLine = node?.charPositionInLine ?: 0,
+                startLine = node?.line ?: 0,
+                startOffset = node?.charPositionInLine ?: 0,
+                endLine = (node?.line ?: 0) + (node?.text?.count { it == '\n' } ?: 0),
+                endOffset = (node?.charPositionInLine ?: 0) + (node?.stopIndex ?: 0) - (node?.startIndex ?: 0),
                 message = message, category = category, level = level)
     }
 
@@ -85,12 +115,37 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
 
 data class ReporterMessage(
         val sourceName: String = "",
-        val lineNumber: Int = -1,
-        val charInLine: Int = -1,
+        val startLine: Int = -1,
+        val startOffset: Int = -1,
+        val endLine: Int = -1,
+        val endOffset: Int = -1,
         val message: String = "",
         val category: String = "",
         val level: String = "") {
-    fun print() =
-            "[$level] $sourceName:$lineNumber:$charInLine $message [$category]"
+
+    fun toHuman() =
+            "[$level] $sourceName:$startLine:$startOffset $message [$category]"
+
+    fun toJson() = toMap().toJson()
+
+    fun toMap() =
+            mapOf("level" to level.toUpperCase(),
+                    "file" to sourceName,
+                    "startLine" to startLine,
+                    "startOffset" to startOffset,
+                    "endLine" to endLine,
+                    "endOffset" to endOffset,
+                    "message" to message,
+                    "category" to category)
+
 }
 
+
+fun <V> Map<String, V>.toJson(): String =
+        this.entries.joinToString(", ", "{", "}") { (k, v) ->
+            val a = when (v) {
+                is String -> "\"${v.replace("\"", "\\\"")}\""
+                else -> v.toString()
+            }
+            "\"${k}\" : $a"
+        }

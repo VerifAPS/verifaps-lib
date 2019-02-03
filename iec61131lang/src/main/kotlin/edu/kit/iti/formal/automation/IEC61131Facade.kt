@@ -160,7 +160,7 @@ object IEC61131Facade {
             : List<PouExecutable?> {
         return programs.map {
             val (elements, error) = IEC61131Facade.filefr(libraryElements + it)
-            error.forEach { Console.warn(it.print()) }
+            error.forEach { Console.warn(it.toHuman()) }
             selector(elements)
         }
     }

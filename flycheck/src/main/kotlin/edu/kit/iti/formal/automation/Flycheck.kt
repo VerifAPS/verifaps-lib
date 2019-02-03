@@ -21,20 +21,20 @@ import java.io.File
 import java.util.*
 
 
-object Flycheck {
+object Check {
     @JvmStatic
-    fun main(args: Array<String>) = FlycheckApp().main(args)
+    fun main(args: Array<String>) = CheckApp().main(args)
 }
 
-object FlycheckInteractive {
+object Flycheck {
     @JvmStatic
     fun main(args: Array<String>) {
-        println("{version:\"0.9\"}")
+        //println("{version:\"0.9\"}")
         val reader = System.`in`.bufferedReader()
         do {
             val line = reader.readLine() ?: break
             if (line.isEmpty()) continue
-            FlycheckApp().main(parseArgs(line))
+            CheckApp().main(parseArgs(line))
         } while (true)
     }
 
@@ -77,7 +77,7 @@ object FlycheckInteractive {
     }
 }
 
-class FlycheckApp : CliktCommand() {
+class CheckApp : CliktCommand() {
     val verbose by option(help = "enable verbose mode").flag()
     val interactiveFormat by option("--json", help = "Flag for enabling json, line based format")
             .flag()
@@ -99,17 +99,12 @@ class FlycheckApp : CliktCommand() {
         )
         r.run()
         if (interactiveFormat) {
-            print("[")
-            r.messages.joinToString(",") {
-                "{level:\"${it.level.toUpperCase()}\", file: \"${it.sourceName}\", " +
-                        "line:${it.lineNumber}, offset:${it.charInLine}," +
-                        "message: ${it.message}, category: \"${it.category}\"}"
-            }
-            print("]")
-            println()
+            val msg = r.messages.joinToString(",") { it.toJson() }
+            print("[$msg]\n")
+            System.out.flush()
         } else {
             r.messages.forEach {
-                Console.writeln("[${it.level.toUpperCase()}] (${it.sourceName}@${it.lineNumber}:${it.charInLine}) ${it.message} (${it.category})")
+                Console.writeln("[${it.level.toUpperCase()}] (${it.sourceName}@${it.startLine}:${it.startOffset}) ${it.message} (${it.category})")
             }
         }
     }
@@ -125,7 +120,7 @@ class FlycheckRunner(
     val messages: MutableList<ReporterMessage>
         get() = reporter.messages
 
-    private val errorListener = MyAntlrErrorListener(messages)
+    private val errorListener = MyAntlrErrorListener(reporter)
 
     fun run() {
         streams.forEach { parse(it) }
@@ -149,12 +144,16 @@ class FlycheckRunner(
         library.accept(CheckForTypes(reporter))
     }
 
-    internal class MyAntlrErrorListener(private val messages: MutableCollection<ReporterMessage>)
+    internal class MyAntlrErrorListener(private val reporter: CheckForTypes.DefaultReporter)
         : ANTLRErrorListener {
         override fun syntaxError(recognizer: Recognizer<*, *>?, offendingSymbol: Any?, line: Int,
                                  charPositionInLine: Int, msg: String?, e: RecognitionException?) {
-            val file = (offendingSymbol as Token?)?.tokenSource?.sourceName
-            messages += ReporterMessage(file ?: "", line, charPositionInLine, msg!!, "syntax", "level")
+            val token = (offendingSymbol as Token)
+            reporter.report(
+                    node = token,
+                    message = msg!!,
+                    category = "syntax",
+                    level = "ERROR")
         }
 
         override fun reportAttemptingFullContext(recognizer: Parser?, dfa: DFA?, startIndex: Int, stopIndex: Int, conflictingAlts: BitSet?, configs: ATNConfigSet?) {}

@@ -1,5 +1,4 @@
 import edu.kit.iti.formal.automation.Flycheck
-import edu.kit.iti.formal.automation.FlycheckApp
 import java.io.File
 import kotlin.test.Test
 

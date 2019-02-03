@@ -19,12 +19,12 @@ import java.io.Writer
     var isPrintComments: Boolean = false
 
     override fun defaultVisit(obj: Any) {
-        sb.print(SemanticClasses.ERROR, "not implemented: ")
-                .print(obj::class.java)
+        sb.cliFormat(SemanticClasses.ERROR, "not implemented: ")
+                .cliFormat(obj::class.java)
     }
 
     override fun visit(exitStatement: ExitStatement) {
-        sb.print(STATEMENT, KEYWORD, "EXIT").print(";")
+        sb.cliFormat(STATEMENT, KEYWORD, "EXIT").cliFormat(";")
     }
 
 
@@ -36,7 +36,7 @@ import java.io.Writer
 
 
     override fun visit(enumeration: CaseCondition.Enumeration) {
-        sb.print(CASE_ENUM_CONDITION)
+        sb.cliFormat(CASE_ENUM_CONDITION)
         if (enumeration.start === enumeration.stop) {
             sb.appendIdent()
             enumeration.start.accept(this)
@@ -52,10 +52,10 @@ import java.io.Writer
 
 
     override fun visit(binaryExpression: BinaryExpression) {
-        sb.print(BINARY_EXPRESSION)
+        sb.cliFormat(BINARY_EXPRESSION)
         sb.append('(')
         binaryExpression.leftExpr.accept(this)
-        sb.print(OPERATOR, KEYWORD)
+        sb.cliFormat(OPERATOR, KEYWORD)
         sb.printf(" ").printf(binaryExpression.operator!!.symbol).printf(" ")
         sb.close().close()
         binaryExpression.rightExpr.accept(this)
@@ -68,21 +68,21 @@ import java.io.Writer
     override fun visit(assignStatement: AssignmentStatement) {
         sb.semblock(ASSIGNMENT) {
             assignStatement.location.accept(this)
-            sb.print(OPERATOR, ":=")
+            sb.cliFormat(OPERATOR, ":=")
             assignStatement.expression.accept(this)
         }
-        sb.print(OPERATOR, ";")
+        sb.cliFormat(OPERATOR, ";")
     }
 
 
     override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
-        sb.print(TYPE_DECL_ENUM).print(TYPE_NAME).printf(enumerationTypeDeclaration.name)
+        sb.cliFormat(TYPE_DECL_ENUM).cliFormat(TYPE_NAME).printf(enumerationTypeDeclaration.name)
         sb.close().seperator(":")
 
-        sb.print(TYPE_DECL_DECL).printf("(")
+        sb.cliFormat(TYPE_DECL_DECL).printf("(")
 
         for (s in enumerationTypeDeclaration.allowedValues) {
-            sb.print(VALUE).printf(s.text)
+            sb.cliFormat(VALUE).printf(s.text)
             sb.close().seperator(",")
         }
 
@@ -92,7 +92,7 @@ import java.io.Writer
 
 
     override fun visit(repeatStatement: RepeatStatement) {
-        sb.print(REPEAT).keyword("REPEAT")
+        sb.cliFormat(REPEAT).keyword("REPEAT")
         repeatStatement.statements.accept(this)
         sb.keyword(" UNTIL ")
         repeatStatement.condition.accept(this)
@@ -103,7 +103,7 @@ import java.io.Writer
 
 
     override fun visit(whileStatement: WhileStatement) {
-        sb.print(WHILE).keyword("WHILE")
+        sb.cliFormat(WHILE).keyword("WHILE")
         whileStatement.condition.accept(this)
         sb.keyword(" DO ")
         whileStatement.statements.accept(this)
@@ -114,7 +114,7 @@ import java.io.Writer
 
 
     override fun visit(unaryExpression: UnaryExpression) {
-        sb.print(UNARY_EXPRESSION, OPERATOR)
+        sb.cliFormat(UNARY_EXPRESSION, OPERATOR)
                 .printf(unaryExpression.operator.symbol)
         sb.close().printf(" ")
         unaryExpression.expression.accept(this)
@@ -124,7 +124,7 @@ import java.io.Writer
 
 
     override fun visit(typeDeclarations: TypeDeclarations) {
-        sb.print(TYPE_DECL).keyword("TYPE")
+        sb.cliFormat(TYPE_DECL).keyword("TYPE")
         for (decl in typeDeclarations) {
             decl.accept(this)
         }
@@ -135,7 +135,7 @@ import java.io.Writer
 
 
     override fun visit(caseStatement: CaseStatement) {
-        sb.print(CASE_STATEMENT).keyword("CASE")
+        sb.cliFormat(CASE_STATEMENT).keyword("CASE")
         caseStatement.expression!!.accept(this)
         sb.keyword(" OF ")
         for (c in caseStatement.cases) {
@@ -154,7 +154,7 @@ import java.io.Writer
 
 		if (symbolicReference.getSubscripts() != null && !symbolicReference.getSubscripts().isEmpty()) {
 
-			sb.print(SUBSCRIPT).printf('[');
+			sb.cliFormat(SUBSCRIPT).printf('[');
 			for (Expression expr : symbolicReference.getSubscripts()) {
 				expr.accept(this);
 				sb.printf(',');
@@ -172,12 +172,12 @@ import java.io.Writer
 
 
     override fun visit(statements: StatementList) {
-        sb.print(STATEMENT_BLOCK)
+        sb.cliFormat(STATEMENT_BLOCK)
         for (stmt in statements) {
             if (stmt == null) {
                 sb.printf("{*ERROR: stmt null*}")
             } else {
-                sb.print(STATEMENT)
+                sb.cliFormat(STATEMENT)
                 stmt.accept(this)
                 sb.close()
             }
@@ -188,8 +188,8 @@ import java.io.Writer
 
 
     override fun visit(programDeclaration: ProgramDeclaration) {
-        sb.print(PROGRAM).keyword("PROGRAM")
-        sb.print(VARIABLE).printf(programDeclaration.name)
+        sb.cliFormat(PROGRAM).keyword("PROGRAM")
+        sb.cliFormat(VARIABLE).printf(programDeclaration.name)
         sb.close().append('\n')
 
         programDeclaration.scope.accept(this)
@@ -204,7 +204,7 @@ import java.io.Writer
      * {@inheritDoc}
      *
      * @Override public Object visit(ScalarValue tsScalarValue) {
-     * sb.print(VALUE).span(tsScalarValue.getDataType().getName())
+     * sb.cliFormat(VALUE).span(tsScalarValue.getDataType().getName())
      * .printf(tsScalarValue.getDataType().repr(tsScalarValue.getValue()));
      * sb.close().close();
      * ;
@@ -213,7 +213,7 @@ import java.io.Writer
 
 
     override fun visit(expressions: ExpressionList) {
-        sb.print(EXPRESSION_LIST)
+        sb.cliFormat(EXPRESSION_LIST)
         for (e in expressions) {
             e.accept(this)
             sb.seperator(",")
@@ -224,7 +224,7 @@ import java.io.Writer
 
 
     override fun visit(invocation: Invocation) {
-        sb.print(FUNC_CALL)
+        sb.cliFormat(FUNC_CALL)
         sb.printf(invocation.calleeName)
         visitInvocationParameters(invocation.parameters)
 
@@ -238,7 +238,7 @@ import java.io.Writer
 
 
     override fun visit(forStatement: ForStatement) {
-        sb.print(FOR)
+        sb.cliFormat(FOR)
         sb.keyword("FOR")
         sb.variable(forStatement.variable!!)
         sb.printf(" := ")
@@ -255,7 +255,7 @@ import java.io.Writer
 
 
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) {
-        sb.print(FB).keyword("FUNCTION_BLOCK ").variable(functionBlockDeclaration.name)
+        sb.cliFormat(FB).keyword("FUNCTION_BLOCK ").variable(functionBlockDeclaration.name)
 
         functionBlockDeclaration.scope.accept(this)
 
@@ -272,7 +272,7 @@ import java.io.Writer
 
 
     override fun visit(ifStatement: IfStatement) {
-        sb.print(IFSTATEMENT)
+        sb.cliFormat(IFSTATEMENT)
 
         for (i in 0 until ifStatement.conditionalBranches.size) {
             if (i == 0)
@@ -282,7 +282,7 @@ import java.io.Writer
 
             ifStatement.conditionalBranches[i].condition.accept(this)
             sb.keyword("THEN")
-            sb.print("thenblock")
+            sb.cliFormat("thenblock")
             ifStatement.conditionalBranches[i].statements.accept(this)
             sb.close()
         }
@@ -304,7 +304,7 @@ import java.io.Writer
 
 
     override fun visit(aCase: Case) {
-        sb.print(CASE)
+        sb.cliFormat(CASE)
         for (cc in aCase.conditions) {
             cc.accept(this)
             sb.seperator(",")
@@ -319,7 +319,7 @@ import java.io.Writer
 
 
     override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration) {
-        sb.print(TYPE_DECL_SIMPLE).type(simpleTypeDeclaration.baseType.identifier)
+        sb.cliFormat(TYPE_DECL_SIMPLE).type(simpleTypeDeclaration.baseType.identifier)
         if (simpleTypeDeclaration.initialization != null) {
             sb.operator(" := ")
             simpleTypeDeclaration.initialization!!.accept(this)
@@ -330,9 +330,9 @@ import java.io.Writer
 
 
     override fun visit(localScope: Scope) {
-        sb.print(VARIABLES_DEFINITIONS)
+        sb.cliFormat(VARIABLES_DEFINITIONS)
         for (vd in localScope.variables) {
-            sb.print(VARIABLES_DEFINITION)
+            sb.cliFormat(VARIABLES_DEFINITION)
 
             if (vd.isInput)
                 sb.keyword("VAR_INPUT")
@@ -376,7 +376,7 @@ import java.io.Writer
 
     override fun visit(commentStatement: CommentStatement) {
         if (isPrintComments) {
-            sb.print(COMMENT).printf("{*").printf(commentStatement.comment).printf("*}")
+            sb.cliFormat(COMMENT).printf("{*").printf(commentStatement.comment).printf("*}")
             sb.close()
         }
 

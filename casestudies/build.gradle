@@ -20,10 +20,11 @@ def mainClasses = [
         , 'ttprint'     : 'edu.kit.iti.formal.automation.testtables.apps.Printer'
         , 'reteta'      : 'edu.kit.iti.formal.automation.testtables.apps.Reteta'
         , 'ttmonitor'   : 'edu.kit.iti.formal.automation.testtables.apps.Monitor'
-//        , 'ttsynth'     : 'edu.kit.iti.formal.automation.testtables.apps.Synthizer'
+        , 'ttsynth'     : 'edu.kit.iti.formal.automation.testtables.apps.Synthizer'
         , 'rvt'         : "edu.kit.iti.formal.automation.rvt.RvtAps"
         , 'tt-unwind'   : "edu.kit.iti.formal.automation.rvt"
-        , 'flycheck'    : "edu.kit.iti.formal.automation.FlycheckKt"
+        , 'flycheck'    : "edu.kit.iti.formal.automation.Flycheck"
+        , 'check'       : "edu.kit.iti.formal.automation.Check"
 ]
 
 
@@ -40,7 +41,7 @@ mainClasses.each { a, b ->
         }*/
     }
     applicationDistribution.from(t) { into("bin") }
-    //createStartScript.dependsOn t
+    t.dependsOn startScripts
 }
 
 applicationDistribution.into("bin") {
