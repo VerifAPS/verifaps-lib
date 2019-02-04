@@ -169,8 +169,8 @@ object IEC61131Facade {
      *
      */
     fun check(p: PouElements): MutableList<ReporterMessage> {
-        val r = CheckForTypes.DefaultReporter()
-        p.accept(CheckForTypes(r))
+        val r = DefaultReporter()
+        getCheckers(r).forEach { p.accept(it) }
         return r.messages
     }
 

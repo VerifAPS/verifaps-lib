@@ -22,9 +22,10 @@ package edu.kit.iti.formal.automation.operators
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.AnyDt
-import edu.kit.iti.formal.automation.datatypes.promotion.DefaultTypePromoter
-import edu.kit.iti.formal.automation.datatypes.promotion.TypePromotion
+import edu.kit.iti.formal.automation.datatypes.AnyNum
+import edu.kit.iti.formal.automation.datatypes.promoteWith
 
 /**
  * BinaryOperator represents a binary operator, e.g. addition +, multiply *, etc.
@@ -35,24 +36,12 @@ import edu.kit.iti.formal.automation.datatypes.promotion.TypePromotion
  * @version 1
  */
 open class BinaryOperator(override val symbol: String, private val validType: AnyDt) : Operator {
-    protected var promoter: TypePromotion = DefaultTypePromoter()
     override val expectedDataTypes: Array<AnyDt>
         get() = arrayOf(validType, validType)
 
-    /**
-     *
-     * isTypeConform.
-     *
-     * @param argument a [edu.kit.iti.formal.automation.datatypes.AnyDt] object.
-     * @return a boolean.
-     */
-    fun isTypeConform(argument: AnyDt): Boolean {
-        return argument.javaClass.isAssignableFrom(validType.javaClass)
-    }
+    fun isTypeConform(argument: AnyDt): Boolean = argument.isAssignableTo(validType)
 
-    fun getPromotedType(left: AnyDt, right: AnyDt): AnyDt? {
-        return promoter.getPromotion(left, right)
-    }
+    open fun getDataType(left: AnyDt, right: AnyDt): AnyDt? = left promoteWith right
 
 
     override fun equals(o: Any?): Boolean {
@@ -63,4 +52,8 @@ open class BinaryOperator(override val symbol: String, private val validType: An
     }
 
     override fun hashCode(): Int = symbol.hashCode()
+}
+
+class ComparisonOperator internal constructor(symbol: String) : BinaryOperator(symbol, AnyNum()){
+    override fun getDataType(left: AnyDt, right: AnyDt): AnyDt? = AnyBit.BOOL
 }

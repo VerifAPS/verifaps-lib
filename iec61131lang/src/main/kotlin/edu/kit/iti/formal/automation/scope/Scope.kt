@@ -191,7 +191,7 @@ data class Scope(val variables: VariableScope = VariableScope())
         }
     }
 
-    internal fun <T : AnyDt?> resolveDataType0(name: String) = resolveDataType(name) as T
+    internal fun <T : AnyDt?> resolveDataType0(name: String) = resolveDataType(name) as? T
 
     fun resolveDataType(name: String): AnyDt {
         if (types.containsKey(name))
@@ -215,7 +215,7 @@ data class Scope(val variables: VariableScope = VariableScope())
             a != null -> FunctionBlockDataType(a)
             b != null -> b.getDataType(this)!!
             c != null -> ClassDataType.ClassDt(c)
-            d != null -> InterfaceDataType(d)
+            d != null -> ClassDataType.InterfaceDt(d)
             else -> null
         }
         if (q != null) {
@@ -227,8 +227,8 @@ data class Scope(val variables: VariableScope = VariableScope())
         //    return ReferenceType(resolveDataType(name.substring(7)))
 
         // Void
-        if (name == "VOID")
-            return DataTypes.VOID
+        if (name.equals("VOID", true))
+            return VOID
 
         // Enum
         val enumerateType = resolveEnum(name)

@@ -23,9 +23,8 @@ package edu.kit.iti.formal.automation.scope
  */
 
 import edu.kit.iti.formal.automation.datatypes.AnyDt
-import edu.kit.iti.formal.automation.datatypes.AnyInt
 import edu.kit.iti.formal.automation.datatypes.INT
-import edu.kit.iti.formal.automation.datatypes.promotion.DefaultTypePromoter
+import edu.kit.iti.formal.automation.datatypes.getPromotion
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException
 import edu.kit.iti.formal.automation.st.ast.*
@@ -60,13 +59,12 @@ class FunctionResolverMUX : FunctionResolver {
         val fd = FunctionDeclaration(name = "MUX")
         val stmt = CaseStatement()
         fd.returnType.obj = datatypes[1]
-        val dtp = DefaultTypePromoter()
         for (i in datatypes.indices) {
             fd.scope.add(VariableDeclaration("a$i",
                     VariableDeclaration.INPUT, datatypes[i]))
             if (i > 0) {
                 stmt.addCase(createCase(i))
-                fd.returnType.obj = dtp.getPromotion(fd.returnType.obj!!, datatypes[i])
+                fd.returnType.obj = getPromotion(fd.returnType.obj!!, datatypes[i])
             }
         }
         fd.stBody?.add(stmt)

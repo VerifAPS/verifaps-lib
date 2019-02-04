@@ -38,44 +38,44 @@ class TypePromotionTest {
 
     @Test
     fun testSignedInteger() {
-        assertEquals(LINT, ip.getPromotion(LINT, SINT))
-        assertEquals(LINT, ip.getPromotion(LINT, INT))
-        assertEquals(LINT, ip.getPromotion(LINT, DINT))
-        assertEquals(LINT, ip.getPromotion(SINT, LINT))
-        assertEquals(LINT, ip.getPromotion(INT, LINT))
-        assertEquals(LINT, ip.getPromotion(DINT, LINT))
-        assertEquals(LINT, ip.getPromotion(LINT, LINT))
+        assertEquals(LINT, LINT promoteWith SINT)
+        assertEquals(LINT, LINT promoteWith INT)
+        assertEquals(LINT, LINT promoteWith DINT)
+        assertEquals(LINT, SINT promoteWith LINT)
+        assertEquals(LINT, INT promoteWith LINT)
+        assertEquals(LINT, DINT promoteWith LINT)
+        assertEquals(LINT, LINT promoteWith LINT)
 
 
-        assertEquals(SINT, ip.getPromotion(SINT, SINT))
-        assertEquals(INT, ip.getPromotion(SINT, INT))
-        assertEquals(DINT, ip.getPromotion(SINT, DINT))
+        assertEquals(SINT, SINT promoteWith SINT)
+        assertEquals(INT, SINT promoteWith INT)
+        assertEquals(DINT, SINT promoteWith DINT)
 
-        assertEquals(INT, ip.getPromotion(INT, SINT))
-        assertEquals(INT, ip.getPromotion(INT, INT))
-        assertEquals(DINT, ip.getPromotion(INT, DINT))
-        assertEquals(LINT, ip.getPromotion(INT, LINT))
+        assertEquals(INT, INT promoteWith SINT)
+        assertEquals(INT, INT promoteWith INT)
+        assertEquals(DINT, INT promoteWith DINT)
+        assertEquals(LINT, INT promoteWith LINT)
 
     }
 
     @Test
     fun testUnSignedInteger() {
-        assertEquals(ULINT, ip.getPromotion(ULINT, USINT))
-        assertEquals(ULINT, ip.getPromotion(ULINT, UINT))
-        assertEquals(ULINT, ip.getPromotion(ULINT, UDINT))
-        assertEquals(ULINT, ip.getPromotion(USINT, ULINT))
-        assertEquals(ULINT, ip.getPromotion(UINT, ULINT))
-        assertEquals(ULINT, ip.getPromotion(UDINT, ULINT))
-        assertEquals(ULINT, ip.getPromotion(ULINT, ULINT))
+        assertEquals(ULINT, ULINT promoteWith USINT)
+        assertEquals(ULINT, ULINT promoteWith UINT)
+        assertEquals(ULINT, ULINT promoteWith UDINT)
+        assertEquals(ULINT, USINT promoteWith ULINT)
+        assertEquals(ULINT, UINT promoteWith ULINT)
+        assertEquals(ULINT, UDINT promoteWith ULINT)
+        assertEquals(ULINT, ULINT promoteWith ULINT)
 
-        assertEquals(USINT, ip.getPromotion(USINT, USINT))
-        assertEquals(UINT, ip.getPromotion(USINT, UINT))
-        assertEquals(UDINT, ip.getPromotion(USINT, UDINT))
+        assertEquals(USINT, USINT promoteWith USINT)
+        assertEquals(UINT, USINT promoteWith UINT)
+        assertEquals(UDINT, USINT promoteWith UDINT)
 
-        assertEquals(UINT, ip.getPromotion(UINT, USINT))
-        assertEquals(UINT, ip.getPromotion(UINT, UINT))
-        assertEquals(UDINT, ip.getPromotion(UINT, UDINT))
-        assertEquals(ULINT, ip.getPromotion(UINT, ULINT))
+        assertEquals(UINT, UINT promoteWith USINT)
+        assertEquals(UINT, UINT promoteWith UINT)
+        assertEquals(UDINT, UINT promoteWith UDINT)
+        assertEquals(ULINT, UINT promoteWith ULINT)
 
     }
 
@@ -88,20 +88,23 @@ class TypePromotionTest {
 
     @Test
     fun integerMixed() {
-        val ip = IntegerPromotion()
-        assertEquals(DINT, ip.getPromotion(INT, UINT))
-        assertEquals(DINT, ip.getPromotion(UINT, INT))
+        assertEquals(DINT, INT promoteWith UINT)
+        assertEquals(DINT, UINT promoteWith INT)
     }
 
 
     @Test
     fun nonConformity() {
-        assertEquals(null, ip.getPromotion(INT, AnyBit.WORD))
+        assertEquals(null, INT promoteWith AnyBit.WORD)
     }
 
     @Test
     @Throws(VariableNotDefinedException::class, TypeConformityException::class)
     fun basicOperators() {
+        assertDataType(SINT, "-SINT#2")
+        assertDataType(DINT, "-UINT#2")
+        assertDataType(UINT, "UINT#2")
+
         assertDataType(DINT, "-SINT#2 + UINT#2")
         assertDataType(LINT, "-SINT#2 - LINT#2")
         assertDataType(SINT, "-SINT#2")
@@ -138,9 +141,4 @@ class TypePromotionTest {
     fun typeMismatch() {
         assertDataType(AnyReal.LREAL, "TRUE + INT#2", vd)
     }
-
-    companion object {
-        internal var ip = IntegerPromotion.INSTANCE
-    }
-
 }

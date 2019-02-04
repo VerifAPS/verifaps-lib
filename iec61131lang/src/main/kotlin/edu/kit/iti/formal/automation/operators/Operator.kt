@@ -27,9 +27,7 @@ import edu.kit.iti.formal.automation.datatypes.AnyDt
 /**
  * A Operator isType an binary or unary operation associated with a special keyword.
  *
- *
  * In ST there are only binary or unary operators. No ternary operator isType defined.
- *
  *
  * An operator has symbol and a list of expected types.
  *

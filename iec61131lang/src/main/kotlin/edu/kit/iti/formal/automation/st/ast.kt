@@ -570,8 +570,8 @@ data class InvocationStatement(
 
 //region Expressions
 abstract class Expression : Top() {
-    @Throws(VariableNotDefinedException::class, TypeConformityException::class)
-    abstract fun dataType(localScope: Scope): AnyDt
+    @Throws(VariableNotDefinedException::class, TypeConformityException::class, DataTypeNotResolvedException::class)
+    abstract fun dataType(localScope: Scope = Scope.defaultScope()): AnyDt
 
     abstract override fun clone(): Expression
 
@@ -606,12 +606,10 @@ data class BinaryExpression(
     override fun dataType(localScope: Scope): AnyDt {
         val a = leftExpr.dataType(localScope)
         val b = rightExpr.dataType(localScope)
-        val c = operator.getPromotedType(a, b) ?: throw TypeConformityException(
+        val c = operator.getDataType(a, b) ?: throw TypeConformityException(
                 this, operator.expectedDataTypes, a, b
         )
-        return operator.getPromotedType(a, b) ?: throw TypeConformityException(
-                this, operator.expectedDataTypes, a, b
-        )
+        return c
     }
 
     override fun clone(): Expression {
@@ -1279,21 +1277,9 @@ sealed class Invoked {
 }
 
 sealed class Literal() : Initialization() {
-    //var originalToken: Token? = null
-
-    abstract fun dataType(): AnyDt?
-    override fun dataType(localScope: Scope) = dataType()!!
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
-    abstract fun asValue(): Value<*, *>?
+    abstract fun asValue(scope: Scope = Scope.defaultScope()): Value<*, *>?
     abstract override fun clone(): Literal
-    /*= asValue(ValueTransformation(this))
-private fun asValue(transformer: DataTypeVisitor<Value<*, *>>): Value<*, *> =
-    if (dataType.obj == null)
-        throw IllegalStateException(
-                "No identified data type. Given data type name " + dataType)
-    else
-        dataType.accept(transformer)!!*/
-
 }
 
 data class IntegerLit(var dataType: RefTo<AnyInt> = RefTo<AnyInt>(INT),
@@ -1302,8 +1288,9 @@ data class IntegerLit(var dataType: RefTo<AnyInt> = RefTo<AnyInt>(INT),
     constructor(dt: AnyInt, v: BigInteger) : this(RefTo(dt), v)
     constructor(intVal: VAnyInt) : this(intVal.dataType, intVal.value)
 
-    override fun dataType(): AnyInt = dataType.obj ?: INT
-    override fun asValue() = VAnyInt(dataType(), value)
+    override fun dataType(localScope: Scope) = dataType.checkAndresolveDt(localScope, INT)
+
+    override fun asValue(scope: Scope) = VAnyInt(dataType(scope), value)
     override fun clone() = copy()
 }
 
@@ -1311,31 +1298,39 @@ data class IntegerLit(var dataType: RefTo<AnyInt> = RefTo<AnyInt>(INT),
 data class StringLit(var dataType: RefTo<IECString> = RefTo(), var value: String) : Literal() {
     constructor(dt: String?, v: String) : this(RefTo(dt), v)
 
-    override fun dataType() = dataType.obj
-    override fun asValue() = VIECString(dataType.obj!!, value)
+    override fun dataType(localScope: Scope) = dataType.obj!!
+    override fun asValue(scope: Scope) = VIECString(dataType(scope), value)
     override fun clone() = copy()
 }
 
 data class RealLit(var dataType: RefTo<AnyReal> = RefTo(), var value: BigDecimal) : Literal() {
     constructor(dt: String?, v: BigDecimal) : this(RefTo(dt), v)
 
-    override fun dataType() = dataType.obj
-    override fun asValue() = VAnyReal(dataType.obj!!, value)
+    override fun dataType(localScope: Scope) = dataType.checkAndresolveDt(localScope, AnyReal.REAL)
+
+    override fun asValue(scope: Scope) = VAnyReal(dataType(scope), value)
     override fun clone() = copy()
+}
+
+private fun <T : AnyDt> RefTo<T>.checkAndresolveDt(localScope: Scope, default: T? = null): T {
+    obj?.let { return it }
+    resolve { localScope.resolveDataType0(it) }
+    if (obj == null) return default ?: throw DataTypeNotResolvedException("Datatype of ${identifier} is not defined")
+    else return obj!!
 }
 
 data class EnumLit(var dataType: RefTo<EnumerateType> = RefTo(), var value: String) : Literal() {
     constructor(dataType: String?, value: String) : this(RefTo(dataType), value)
 
-    override fun dataType() = dataType.obj
-    override fun asValue() = VAnyEnum(dataType.obj!!, value)
+    override fun dataType(localScope: Scope) = dataType.checkAndresolveDt(localScope)
+    override fun asValue(scope: Scope) = VAnyEnum(dataType.obj!!, value)
     override fun clone() = copy()
 }
 
 class NullLit() : Literal() {
     override fun clone() = rctxHelper(NullLit(), this)
-    override fun dataType() = ClassDataType.AnyClassDt
-    override fun asValue() = VNULL
+    override fun dataType(localScope: Scope) = ClassDataType.AnyClassDt
+    override fun asValue(scope: Scope) = VNULL
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is NullLit) return false
@@ -1349,26 +1344,26 @@ class NullLit() : Literal() {
 }
 
 data class ToDLit(var value: TimeofDayData) : Literal() {
-    override fun dataType() = AnyDate.TIME_OF_DAY
-    override fun asValue() = VToD(AnyDate.TIME_OF_DAY, value)
+    override fun dataType(localScope: Scope) = AnyDate.TIME_OF_DAY
+    override fun asValue(scope: Scope) = VToD(AnyDate.TIME_OF_DAY, value)
     override fun clone() = copy()
 }
 
 data class DateLit(var value: DateData) : Literal() {
-    override fun dataType() = AnyDate.DATE
-    override fun asValue() = VDate(AnyDate.DATE, value)
+    override fun dataType(localScope: Scope) = AnyDate.DATE
+    override fun asValue(scope: Scope) = VDate(AnyDate.DATE, value)
     override fun clone() = copy()
 }
 
 data class TimeLit(var value: TimeData) : Literal() {
-    override fun dataType() = TimeType.TIME_TYPE
-    override fun asValue() = VTime(dataType(), value)
+    override fun dataType(localScope: Scope) = TimeType.TIME_TYPE
+    override fun asValue(scope: Scope) = VTime(dataType(scope), value)
     override fun clone() = copy()
 }
 
 data class DateAndTimeLit(var value: DateAndTimeData) : Literal() {
-    override fun dataType() = AnyDate.DATE_AND_TIME
-    override fun asValue() = VDateAndTime(dataType(), value)
+    override fun dataType(localScope: Scope) = AnyDate.DATE_AND_TIME
+    override fun asValue(scope: Scope) = VDateAndTime(dataType(scope), value)
     override fun clone() = copy()
 }
 
@@ -1378,22 +1373,22 @@ data class BooleanLit(var value: Boolean) : Literal() {
         val LTRUE = BooleanLit(true)
     }
 
-    override fun asValue() = if (value) TRUE else FALSE
-    override fun dataType() = AnyBit.BOOL
+    override fun asValue(localScope: Scope) = if (value) TRUE else FALSE
+    override fun dataType(scope: Scope) = AnyBit.BOOL
     override fun clone() = copy()
 }
 
 data class BitLit(var dataType: RefTo<AnyBit> = RefTo(), var value: Long) : Literal() {
     constructor(dt: String?, v: Long) : this(RefTo(dt), v)
 
-    override fun dataType() = dataType.obj
-    override fun asValue() = VAnyBit(dataType.obj!!, Bits(value, dataType.obj!!.bitLength))
+    override fun dataType(localScope: Scope) = dataType.checkAndresolveDt(localScope)
+    override fun asValue(scope: Scope) = VAnyBit(dataType.obj!!, Bits(value, dataType.obj!!.bitLength))
     override fun clone() = copy()
 }
 
 data class UnindentifiedLit(var value: String) : Literal() {
-    override fun asValue() = null
-    override fun dataType() = null
+    override fun asValue(localScope: Scope) = null
+    override fun dataType(scope: Scope) = throw DataTypeNotResolvedException("Datatype of UnindentifiedLit is not defined")
     override fun clone() = copy()
 }
 

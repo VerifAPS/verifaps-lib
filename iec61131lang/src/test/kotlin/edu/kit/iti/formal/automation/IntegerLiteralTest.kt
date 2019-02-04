@@ -25,8 +25,6 @@ package edu.kit.iti.formal.automation
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
 import edu.kit.iti.formal.automation.st.ast.IntegerLit
-import edu.kit.iti.formal.automation.st.ast.Literal
-import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized

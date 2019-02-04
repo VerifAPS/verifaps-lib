@@ -2,6 +2,7 @@ package edu.kit.iti.formal.automation.analysis
 
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.INT
+import edu.kit.iti.formal.automation.datatypes.VOID
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue
@@ -159,7 +160,7 @@ class MaintainInitialValues : AstVisitor<Unit>() {
     override fun visit(vd: VariableDeclaration) {
         if (vd.initValue != null) return
         vd.initValue = vd.init?.getValue()
-        if (vd.initValue == null && vd.dataType != null && vd.dataType != AnyDt.VOID) {
+        if (vd.initValue == null && vd.dataType != null && vd.dataType != VOID) {
             vd.initValue = DefaultInitValue.getInit(vd.dataType!!)
         }
     }

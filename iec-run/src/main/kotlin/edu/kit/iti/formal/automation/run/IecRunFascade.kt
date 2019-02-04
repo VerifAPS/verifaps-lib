@@ -4,6 +4,7 @@ import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.RecordType
+import edu.kit.iti.formal.automation.datatypes.VOID
 import edu.kit.iti.formal.automation.datatypes.values.RecordValue
 import edu.kit.iti.formal.automation.datatypes.values.VVOID
 import edu.kit.iti.formal.automation.datatypes.values.Value
@@ -54,7 +55,7 @@ object ExecutionFacade {
         setMatchingArgToParam(params, func.scope.variables, state)
         val runtime = Runtime(state, func.scope)
         runtime.visit(func.stBody!!)
-        return if (func.returnType.obj != AnyDt.VOID)
+        return if (func.returnType.obj != VOID)
             runtime.state[func.name]!!
         else VVOID
     }

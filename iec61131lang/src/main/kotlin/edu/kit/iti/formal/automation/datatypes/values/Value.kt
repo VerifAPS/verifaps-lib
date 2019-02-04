@@ -86,5 +86,5 @@ class VToD(dt: AnyDate.TIME_OF_DAY, v: TimeofDayData) : Value<AnyDate.TIME_OF_DA
 class VStruct(dt: RecordType, v: RecordValue) : Value<RecordType, RecordValue>(dt, v)
 class VArray(dt: ArrayType, v: MultiDimArrayValue) : Value<ArrayType, MultiDimArrayValue>(dt, v)
 
-object VVOID : Value<AnyDt.VOID, Unit>(AnyDt.VOID, Unit)
+object VVOID : Value<VOID, Unit>(VOID, Unit)
 object VNULL : Value<ClassDataType.AnyClassDt, Unit>(ClassDataType.AnyClassDt, Unit)

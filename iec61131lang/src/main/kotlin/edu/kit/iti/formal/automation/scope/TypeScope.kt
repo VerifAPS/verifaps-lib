@@ -64,7 +64,7 @@ class TypeScope private constructor(private val impl: TreeMap<String, AnyDt> = T
             e.register(AnyDate.TIME_OF_DAY, AnyDate.DATE_AND_TIME, AnyDate.DATE,
                     TimeType.TIME_TYPE)
             e.register(AnyReal.REAL, AnyReal.LREAL)
-            e.register(AnyDt.VOID)
+            e.register(VOID)
             return e
         }
     }

@@ -96,9 +96,9 @@ object DefaultInitValue : InitValueTranslator {
             }
         }
 
-        override fun visit(interfaceDataType: InterfaceDataType): Value<*, *> {
+        /*override fun visit(interfaceDataType: InterfaceDataType): Value<*, *> {
             return VNULL
-        }
+        }*/
 
         override fun visit(functionBlockDataType: FunctionBlockDataType): Value<*, *> {
             return functionBlockDataType.asRecord().accept(this)
