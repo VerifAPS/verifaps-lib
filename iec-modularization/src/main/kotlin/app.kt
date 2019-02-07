@@ -42,7 +42,7 @@ class ModularizationApp() : CliktCommand() {
             Console.info("Output folder: ${outputFolder}")
             m.printCallSites()
             Console.info("Generate SMV files")
-            m.createFiles()
+            m.prepare()
             Console.info("Files generated")
             if (run) {
                 Console.info("Start solvers")

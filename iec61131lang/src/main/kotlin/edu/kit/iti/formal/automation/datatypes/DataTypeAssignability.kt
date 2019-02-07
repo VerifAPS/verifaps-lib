@@ -1,13 +1,14 @@
 package edu.kit.iti.formal.automation.datatypes
 
 import edu.kit.iti.formal.automation.analysis.CheckForTypes
+import edu.kit.iti.formal.automation.analysis.DefaultReporter
 import edu.kit.iti.formal.automation.st.ast.ClassDeclaration
 import edu.kit.iti.formal.automation.st.ast.InterfaceDeclaration
 import java.util.*
 import java.util.concurrent.Callable
 
 class DataTypeAssignability(val expected: AnyDt) : DataTypeVisitorNN<Boolean> {
-    val reporter = CheckForTypes.DefaultReporter()
+    val reporter = DefaultReporter()
 
     override fun defaultVisit(obj: Any): Boolean = false
 

@@ -1,31 +1,52 @@
 package edu.kit.iti.formal.automation.modularization
 
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
-import java.util.concurrent.TimeUnit
 
-
-enum class ProofState {
+enum class ProofTaskState {
+    /**
+     * Uninitialized proof state.
+     * Before VCG files (smv, smt) are generated...
+     */
     UNPREPARED,
+    /**
+     * Waiting on other proof tasks
+     */
     BLOCKED,
+    /**
+     * waiting on a free slot in the executor
+     */
     PENDING,
+    /**
+     * Work in progress
+     */
     RUNNING,
-    FINISHED_VALID, FINISHED_INVALID, FINISHED_SKIPPED,
+    /**
+     * finished with a valid
+     */
+    FINISHED_VALID,
+    /**
+     * finished with a counter example
+     */
+    FINISHED_INVALID,
+    /**
+     * finished, property is valid and does not need to be checked.
+     */
+    FINISHED_SKIPPED,
+    /**
+     * error state, proof invalid, ...
+     */
     ERROR
 }
 
-class ProofExecutor(topTask: ProofTask, done: () -> Unit = {}) {
-    val tasks: List<ProofTask> = taskList(topTask)
-    val semaphore = Semaphore(1- tasks.size, false)
-
-    private fun taskList(topTask: ProofTask): List<ProofTask> {
-        val seq = arrayListOf(topTask)
-        topTask.predecessors.forEach { seq.addAll(taskList(it)) }
-        return seq
-    }
+class ProofExecutor(val tasks: List<ProofTask>,
+                    val executor: ExecutorService = Executors.newFixedThreadPool(4)) {
+    private val semaphore = Semaphore(1 - tasks.size, false)
 
     private val displayThread = Thread {
         while (true) {
+            if (Thread.currentThread().isInterrupted) break
             display()
             val finished = tasks.sumBy { if (it.finished) 1 else 0 }
             println("Finished: $finished")
@@ -33,20 +54,19 @@ class ProofExecutor(topTask: ProofTask, done: () -> Unit = {}) {
             Thread.sleep(100)
         }
     }
-    private var executor = Executors.newFixedThreadPool(4)
 
     fun display() {
-        print(String.format("\u001b[%dA", tasks.size)) // Move up
-        print("\u001b[2K") // Erase line content
+        print(String.format("\u001b[%dA", 1 + tasks.size)) // Move up
+        val eraseLine = "\u001b[2K" // Erase line content
         tasks.forEach {
-            println("${it.desc}\t\t${it.state}\t${it.time}")
+            println("$eraseLine${it.desc}\t\t${it.state}\t${it.time}")
         }
     }
 
     private fun runPossible() {
         tasks.forEach {
             if (it.startable) {
-                it.status = ProofState.PENDING
+                it.status = ProofTaskState.PENDING
                 executor.submit {
                     it.run()
                     runPossible()
@@ -61,6 +81,7 @@ class ProofExecutor(topTask: ProofTask, done: () -> Unit = {}) {
         displayThread.start()
         runPossible()
         semaphore.acquire()
+        displayThread.interrupt()
         /*do {
             if (barrier.isBroken) {
                 executor.shutdownNow()
@@ -74,34 +95,36 @@ class ProofExecutor(topTask: ProofTask, done: () -> Unit = {}) {
 abstract class ProofTask {
     var time: Long = -1
     var desc: String = "<anonym>"
-    internal var status: ProofState = ProofState.UNPREPARED
+    internal var status: ProofTaskState = ProofTaskState.UNPREPARED
     val predecessors = arrayListOf<ProofTask>()
 
     val state
         get() = status
+
     val startable: Boolean
         get() = !finished && predecessors.all { it.finished }
+
     val finished: Boolean
-        get() = state == ProofState.FINISHED_SKIPPED || state == ProofState.FINISHED_VALID || state == ProofState.FINISHED_INVALID
+        get() = state == ProofTaskState.FINISHED_SKIPPED || state == ProofTaskState.FINISHED_VALID || state == ProofTaskState.FINISHED_INVALID
 
     fun prepare() {
         init()
-        status = ProofState.BLOCKED
+        status = ProofTaskState.BLOCKED
     }
 
     fun run() {
-        status = ProofState.RUNNING
+        status = ProofTaskState.RUNNING
         try {
             val timeBefore = System.currentTimeMillis()
             val r = prove()
             time = System.currentTimeMillis() - timeBefore
             status = when (r) {
-                null -> ProofState.FINISHED_SKIPPED
-                true -> ProofState.FINISHED_VALID
-                false -> ProofState.FINISHED_INVALID
+                null -> ProofTaskState.FINISHED_SKIPPED
+                true -> ProofTaskState.FINISHED_VALID
+                false -> ProofTaskState.FINISHED_INVALID
             }
         } catch (e: Exception) {
-            status = ProofState.ERROR
+            status = ProofTaskState.ERROR
         }
     }
 
@@ -109,6 +132,13 @@ abstract class ProofTask {
     abstract protected fun init()
 }
 
+
+interface VCGGenerator {
+    fun generate(mp: ModularProver): Collection<ProofTask>
+}
+interface EqualityStrategy {}
+interface ParameterCheck {}
+interface ActivationCheck {}
 
 // class DefaultEqualityStrategy(val mp: ModularProver) {
 // fun createTask(a: ProgramDeclaration, b: ProgramDeclaration, abstractAllowed: CallSiteMapping)

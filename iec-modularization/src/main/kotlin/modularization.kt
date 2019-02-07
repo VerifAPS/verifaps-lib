@@ -7,13 +7,12 @@ import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.smv.NuXMVInvariantsCommand
 import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.smv.NuXMVProcess
-import edu.kit.iti.formal.smv.ast.SMVAst
 import java.io.File
 
 fun readProgramsOrError(p: String): PouElements {
     val (c, ok) = IEC61131Facade.fileResolve(File(p))
     if (ok.isNotEmpty()) {
-        ok.forEach { Console.fatal(it.print()) }
+        ok.forEach { Console.fatal(it.toHuman()) }
         throw IllegalStateException("Aborted due to errors")
     }
     return c
@@ -27,7 +26,6 @@ fun readProgramsOrError(p: String): PouElements {
 class ModularProver(val args: ModularizationApp) {
     val oldProgram = ModularProgram(args.old)
     val newProgram = ModularProgram(args.new)
-    var prove: Pred = { false }
     val callSitePairs: CallSiteMapping by lazy {
         args.allowedCallSites
                 .map {
@@ -40,10 +38,7 @@ class ModularProver(val args: ModularizationApp) {
                     o to n
                 }
     }
-    /*val proveStrategy: ProofEqualityStrategy = DefaultEqualityStrategy(this)
-    val topLevelState : SMVAst
-    val topLevelOutput : SMVAst
-    */
+    lateinit var proofTasks: List<ProofTask>
 
     fun printCallSites() {
         Console.info("Call sites for the old program: ${oldProgram.filename}")
@@ -56,8 +51,11 @@ class ModularProver(val args: ModularizationApp) {
         }
     }
 
-    fun createFiles() {
+    //private val proveStrategy: ProveStrategy
+
+    fun prepare() {
         args.outputFolder.mkdirs()
+        //proofTasks = proveStrategy.equalityOf(oldProgram, newProgram, callSitePairs, stateCondition)
         //prove = proveStrategy.createTask(oldProgram.entry, newProgram.entry, callSitePairs)
     }
 
@@ -65,6 +63,27 @@ class ModularProver(val args: ModularizationApp) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
+
+/*
+    * Introduce new a parameter for each instance and count activations.
+    * Prove equality of all parameter calls/activation in each sub module.
+    * Prove equality of module under abstraction
+*/
+
+class ProveStrategy{
+    fun equalityOf(oldProgram: ModularProgram,
+                   newProgram: ModularProgram,
+                   callSitePairs: CallSiteMapping,
+                   stateCondition: Any): List<ProofTask> {
+        return listOf()
+    }
+
+    fun equalActivation(oldProgram: ModularProgram, newProgram: ModularProgram, callSite: CallSite) {
+        // slice program
+        // translate stateCondition
+    }
+}
+
 
 abstract class PredTask(val name: String) : Pred {
     abstract fun check(): Boolean

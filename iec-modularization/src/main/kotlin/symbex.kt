@@ -14,7 +14,13 @@ import edu.kit.iti.formal.smv.ast.SMVModule
 import java.io.File
 import java.math.BigInteger
 
-fun createProgramWithAbstraction(a: PouExecutable, abstractedInvocation: List<CallSite>) = rewriteInvocation(a, abstractedInvocation)
+val TYPE_COUNTER = VariableDeclaration.FLAG_COUNTER.get() or VariableDeclaration.LOCAL
+val TYPE_INPUT_FUNCTION_BLOCK = VariableDeclaration.FLAG_COUNTER.get() or VariableDeclaration.OUTPUT
+val TYPE_OUTPUT_FUNCTION_BLOCK = VariableDeclaration.FLAG_COUNTER.get() or VariableDeclaration.INPUT
+
+
+fun createProgramWithAbstraction(a: PouExecutable, abstractedInvocation: List<CallSite>)
+        = rewriteInvocation(a, abstractedInvocation)
 
 fun evaluateProgramWithAbstraction(exec: PouExecutable, abstractedInvocation: List<CallSite>): SMVModule {
     val elements = exec.scope.getVisiblePous()
@@ -125,7 +131,3 @@ class InvocationRewriter(val prefix: String, val scope: Scope, val callSite: Cal
     }
 
 }
-
-val TYPE_COUNTER = VariableDeclaration.FLAG_COUNTER.get() or VariableDeclaration.LOCAL
-val TYPE_INPUT_FUNCTION_BLOCK = VariableDeclaration.FLAG_COUNTER.get() or VariableDeclaration.OUTPUT
-val TYPE_OUTPUT_FUNCTION_BLOCK = VariableDeclaration.FLAG_COUNTER.get() or VariableDeclaration.INPUT

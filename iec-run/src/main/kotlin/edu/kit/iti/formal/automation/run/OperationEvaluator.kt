@@ -3,8 +3,7 @@ package edu.kit.iti.formal.automation.run
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.AnyInt
 import edu.kit.iti.formal.automation.datatypes.AnyReal
-import edu.kit.iti.formal.automation.datatypes.promotion.IntegerPromotion
-import edu.kit.iti.formal.automation.datatypes.promotion.RealPromotion
+import edu.kit.iti.formal.automation.datatypes.promoteWith
 import edu.kit.iti.formal.automation.datatypes.values.VAnyInt
 import edu.kit.iti.formal.automation.datatypes.values.VAnyReal
 import edu.kit.iti.formal.automation.datatypes.values.VBool
@@ -45,8 +44,7 @@ object OperationEvaluator {
     }
 
     private fun add(leftValue: VAnyInt, rightValue: VAnyInt): VAnyInt {
-        val integerPromotion = IntegerPromotion()
-        val promotedType = integerPromotion.getPromotion(leftValue.dataType, rightValue.dataType)
+        val promotedType = leftValue.dataType promoteWith rightValue.dataType
         if (promotedType is AnyInt) {
             return normalizeInt(VAnyInt(promotedType,
                     leftValue.value.add(rightValue.value)))
@@ -55,8 +53,7 @@ object OperationEvaluator {
     }
 
     private fun add(leftValue: VAnyReal, rightValue: VAnyReal): VAnyReal {
-        val realPromotion = RealPromotion()
-        val promotedType = realPromotion.getPromotion(leftValue.dataType, rightValue.dataType)
+        val promotedType = (leftValue.dataType promoteWith rightValue.dataType)
         if (promotedType is AnyReal) {
             return VAnyReal(promotedType, leftValue.value)
         }

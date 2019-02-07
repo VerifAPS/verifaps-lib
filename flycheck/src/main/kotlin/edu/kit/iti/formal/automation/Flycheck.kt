@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.analysis.CheckForTypes
+import edu.kit.iti.formal.automation.analysis.DefaultReporter
 import edu.kit.iti.formal.automation.analysis.ReporterMessage
 import edu.kit.iti.formal.automation.builtin.BuiltinLoader
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
@@ -116,7 +117,7 @@ class FlycheckRunner(
         val verbose: Boolean = false,
         val includeStubs: List<File> = arrayListOf()) {
 
-    private val reporter = CheckForTypes.DefaultReporter()
+    private val reporter = DefaultReporter()
     val messages: MutableList<ReporterMessage>
         get() = reporter.messages
 
@@ -144,7 +145,7 @@ class FlycheckRunner(
         library.accept(CheckForTypes(reporter))
     }
 
-    internal class MyAntlrErrorListener(private val reporter: CheckForTypes.DefaultReporter)
+    internal class MyAntlrErrorListener(private val reporter: DefaultReporter)
         : ANTLRErrorListener {
         override fun syntaxError(recognizer: Recognizer<*, *>?, offendingSymbol: Any?, line: Int,
                                  charPositionInLine: Int, msg: String?, e: RecognitionException?) {
