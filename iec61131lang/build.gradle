@@ -56,3 +56,7 @@ jar {
                 'buildTime': new Date().toString())
     }
 }
+
+test {
+    exclude '**/SFCLangParserTest.class'
+}

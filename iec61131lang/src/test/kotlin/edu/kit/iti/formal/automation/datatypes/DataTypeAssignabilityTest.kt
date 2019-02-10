@@ -36,8 +36,8 @@ class DataTypeAssignabilityTest {
         assertTrue(AnyBit.BOOL.isAssignableTo(AnyBit.DWORD))
         assertTrue(AnyBit.BOOL.isAssignableTo(AnyBit.LWORD))
         assertTrue(AnyBit.BOOL.isAssignableTo(AnyBit.WORD))
-        assertTrue(AnyBit.BOOL.isAssignableTo(INT))
-        assertTrue(AnyBit.BOOL.isAssignableTo(SINT))
+        assertFalse(AnyBit.BOOL.isAssignableTo(INT))
+        assertFalse(AnyBit.BOOL.isAssignableTo(SINT))
     }
 
     @Test
