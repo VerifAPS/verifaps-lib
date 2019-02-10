@@ -2,7 +2,7 @@ import edu.kit.iti.formal.smt.CliSmtSolverImpl
 import edu.kit.iti.formal.smt.InteractiveSmtSolverImpl
 import edu.kit.iti.formal.util.findProgram
 import org.junit.Assert
-import org.junit.AssumptionViolatedException
+import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit
 
@@ -15,7 +15,7 @@ class Z3Test {
     @Test
     fun testZ3Interactive() {
         val z3 = findProgram("z3")
-                ?: throw AssumptionViolatedException("Could not find z3 in \$PATH.")
+        Assumptions.assumeTrue { z3 != null }
         val solver = InteractiveSmtSolverImpl.getZ3()
         solver.start()
         solver.send("""
@@ -58,7 +58,7 @@ class Z3Test {
     @Test
     fun testZ3Cli() {
         val z3 = findProgram("z3")
-                ?: throw AssumptionViolatedException("Could not find z3 in \$PATH.")
+        Assumptions.assumeTrue(z3 != null)
         val solver = CliSmtSolverImpl.getZ3()
         solver.send("""
                 ; This example illustrates basic arithmetic and
