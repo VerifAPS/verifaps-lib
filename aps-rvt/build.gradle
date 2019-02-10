@@ -1,3 +1,5 @@
+//apply plugin: 'antlr'
+
 description = 'Regression Verification Frontend'
 
 dependencies {
@@ -9,3 +11,11 @@ dependencies {
     //compile group: 'com.xenomachina', name: 'kotlin-argparser', version: '2.0.4'
     implementation 'com.github.ajalt:clikt:1.3.0'
 }
+/*
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += ["-visitor", "-long-messages", "-package", "edu.kit.iti.formal.automation.rvt"]
+    outputDirectory file("${project.buildDir}/generated-src/antlr/main/edu/kit/iti/formal/automation/rvt")
+}
+compileKotlin.dependsOn << generateGrammarSource
+*/

@@ -50,10 +50,17 @@ jobs:
 
       - store_test_results:
           path: ~/junit
+
       - store_artifacts:
           path: ~/junit
 
-#    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+      - run: gradle :casestudies:assemble
+
+      - store_artifacts:
+          path: casestudies/build/dist/*
+
+
+  #    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
  #   - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
 #    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
 #    - find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;

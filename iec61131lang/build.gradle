@@ -1,16 +1,12 @@
-plugins {
-    //    id 'org.junit.platform.gradle.plugin' version '1.0.0'
-}
+plugins {}
 
 apply plugin: 'antlr'
 
 description = 'iec61131lang'
 
-
 repositories {
     maven { url "http://dl.bintray.com/jetbrains/spek" }
 }
-
 
 dependencies {
     compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.1'
@@ -42,7 +38,6 @@ generateGrammarSource {
     maxHeapSize = "64m"
     arguments += ["-visitor", "-long-messages", "-package", "edu.kit.iti.formal.automation.parser"]
     outputDirectory file("${project.buildDir}/generated-src/antlr/main/edu/kit/iti/formal/automation/parser")
-    println(arguments)
 }
 
 compileKotlin.dependsOn << generateGrammarSource

@@ -8,7 +8,7 @@ import java.io.File
  * @version 1 (16.07.18)
  */
 class ModularizationIntegrationTest {
-    @Test
+    //TODO @Test
     fun testProgram(): Unit {
         val old = File("src/test/resources/program1.st").absolutePath
         val new = File("src/test/resources/program2.st").absolutePath
@@ -18,7 +18,7 @@ class ModularizationIntegrationTest {
         ModApp.main(args)
     }
 
-    @Test
+    //TODO @Test
     fun testScenario(): Unit {
         val old = File("src/test/resources/scenario1.st").absolutePath
         val new = File("src/test/resources/scenario0.st").absolutePath

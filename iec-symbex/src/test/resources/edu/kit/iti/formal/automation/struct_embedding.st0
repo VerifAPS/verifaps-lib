@@ -5,6 +5,10 @@ FUNCTION g : INT
         a$y : INT := INT#0;
     END_VAR
 
+    VAR_OUTPUT
+        g : INT := INT#0;
+    END_VAR
+
     g := (a$x + a$y);
 END_FUNCTION
 
@@ -14,6 +18,10 @@ FUNCTION A_f : INT
         _SELF$x : INT := INT#0;
         _SELF$y : INT := INT#0;
         z : INT := INT#0;
+    END_VAR
+
+    VAR_OUTPUT
+        A_f : INT := INT#0;
     END_VAR
 
     IF (_SELF$x > z) THEN

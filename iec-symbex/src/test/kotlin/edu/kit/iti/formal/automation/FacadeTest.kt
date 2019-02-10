@@ -51,7 +51,7 @@ class FacadeTest {
         Assert.assertNotEquals(null, state)
         Assert.assertEquals(
                 "case \n" +
-                        "b : c; TRUE : FALSE; \n" +
+                        "a : b; TRUE : c; \n" +
                         "esac",
                 state.repr())
     }

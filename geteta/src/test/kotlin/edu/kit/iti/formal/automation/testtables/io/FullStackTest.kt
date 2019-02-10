@@ -21,7 +21,9 @@ package edu.kit.iti.formal.automation.testtables.io
 
 import edu.kit.iti.formal.automation.testtables.apps.Geteta
 import edu.kit.iti.formal.automation.testtables.apps.GetetaApp
+import edu.kit.iti.formal.util.findProgram
 import org.junit.Assert
+import org.junit.Assume
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -57,11 +59,15 @@ class FullStackTest(
 
         val commands = arrayListOf(javaBin, "-cp", classpath, className)
         commands.addAll(Arrays.asList(*args))
-        println(commands.stream().reduce { a, b -> "$a $b" }.get())
+        //println(commands.stream().reduce { a, b -> "$a $b" }.get())
 
         val builder = ProcessBuilder(commands)
                 .directory(File(workingDir).absoluteFile)
-        builder.environment()["NUXMV"] = NUXMV
+        val nuxmv = findProgram(NUXMV)
+
+        Assume.assumeNotNull(nuxmv)
+
+        builder.environment()["NUXMV"] = nuxmv!!.absolutePath
         val process = builder.start()
         process.waitFor()
 
@@ -95,10 +101,7 @@ class FullStackTest(
             addCase("examples/cycles", "not-verified",
                     "-t cycles_wrong.xml -c cycles.st")
 
-
-
-
-            NUXMV = (System.getenv() as java.util.Map<String, String>).getOrDefault("NUXMV", "nuXmv")
+            NUXMV = (System.getenv() as Map<String, String>).getOrDefault("NUXMV", "nuXmv")
         }
 
         private fun addCase(wd: String, status: String, args: String) {

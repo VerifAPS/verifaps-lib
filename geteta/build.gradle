@@ -135,4 +135,7 @@ task runConstantprogram(type: JavaExec) {
 
 test {
     exclude '**/AutomataDrawerTest.class'
+    exclude '**/SmtEncoderTest.class'
+    exclude '**/FullStackTest.class'
+    exclude "**/SMVModuleBuilderTest.class"
 }

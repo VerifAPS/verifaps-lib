@@ -4,6 +4,3 @@ dependencies {
     compile project(':smv-model')
     compile project(':smt')
 }
-
-
-println(sourceSets.test.resources.srcDirs)

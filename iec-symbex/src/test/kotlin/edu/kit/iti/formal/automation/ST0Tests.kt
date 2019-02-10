@@ -26,7 +26,6 @@ import edu.kit.iti.formal.automation.visitors.Utils
 import org.antlr.v4.runtime.CharStreams
 import org.junit.Assert
 import org.junit.Test
-import java.io.IOException
 
 /**
  * @author Alexander Weigl
@@ -34,28 +33,22 @@ import java.io.IOException
  */
 class ST0Tests {
     @Test
-    @Throws(IOException::class)
-    fun fbEmbedding1() {
-        assertResultST0("fbembedding_1")
-    }
+    fun fbEmbedding1() =
+            assertResultST0("fbembedding_1")
 
     @Test
-    @Throws(IOException::class)
-    fun structEmbedding() {
-        assertResultST0("struct_embedding")
-    }
+    fun structEmbedding() =
+            assertResultST0("struct_embedding")
 
-    @Throws(IOException::class)
     private fun assertResultST0(file: String) {
         var (st, _) = IEC61131Facade.fileResolve(
                 CharStreams.fromStream(javaClass.getResourceAsStream("$file.st")))
         val st0exp = IEC61131Facade.file(
                 CharStreams.fromStream(javaClass.getResourceAsStream("$file.st0")))
 
-        val entry = Utils.findProgram(st)!!
-        val simplified = SymbExFacade.simplify(entry)
-
-        Assert.assertEquals(IEC61131Facade.print(st0exp, false), IEC61131Facade.print(simplified, false))
+        //val entry = Utils.findProgram(st)!!
+        val simplified = SymbExFacade.simplify(st)
+        Assert.assertEquals(IEC61131Facade.print(st0exp, false),
+                IEC61131Facade.print(simplified, false))
     }
-
 }

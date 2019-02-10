@@ -81,7 +81,7 @@ fun createStructVariables(sv: VariableDeclaration): Collection<VariableDeclarati
 
 
 private class StructEmbeddingVisitor(val vd: VariableDeclaration) : AstMutableVisitor() {
-    /*override fun visit(invocation: Invocation): Expression {
+    override fun visit(invocation: Invocation): Expression {
         val newParameter = ArrayList<InvocationParameter>()
         for (parameter in invocation.parameters) {
             val expr = parameter.expression.accept(this) as Expression
@@ -96,11 +96,9 @@ private class StructEmbeddingVisitor(val vd: VariableDeclaration) : AstMutableVi
         }
         invocation.parameters.setAll(newParameter)
         return invocation
-    }*/
+    }
 
-    private fun expandParameters(parameter: InvocationParameter,
-                                 rt: RecordType,
-                                 expr: SymbolicReference)
+    private fun expandParameters(parameter: InvocationParameter, rt: RecordType, expr: SymbolicReference)
             : Collection<InvocationParameter> {
         var path = expr.toPath()
         path = path.subList(1, path.size)

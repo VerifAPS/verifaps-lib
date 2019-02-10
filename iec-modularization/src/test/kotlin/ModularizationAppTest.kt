@@ -20,7 +20,7 @@ class ModularizationAppTest {
         }
     }
 
-    @Test
+/*    @Test
     fun listCallSites0() = testListCallSite("/program.st")
 
     @Test
@@ -28,7 +28,7 @@ class ModularizationAppTest {
 
     @Test
     fun listCallSites2() = testListCallSite("/program2.st")
-
+*/
     @Test
     fun listCallSites3() = testListCallSite("/scenario0.st")
 

@@ -144,8 +144,21 @@ data class Scope(val variables: VariableScope = VariableScope())
 
     @Throws(VariableNotDefinedException::class)
     fun getVariable(reference: SymbolicReference): VariableDeclaration {
-        if (reference.identifier in variables)
-            return (variables[reference.identifier] as VariableDeclaration?)!!
+        if (reference.identifier in variables) {
+            val vd = variables[reference.identifier]!!
+            if (reference.hasSub() && vd.dataType != null) {
+                val dt = vd.dataType!!
+                val scope = when (dt) {
+                    is FunctionBlockDataType -> dt.functionBlock.scope
+                    is RecordType -> Scope(dt.fields)
+                    is ClassDataType.ClassDt -> dt.clazz.scope
+                    else -> throw VariableNotDefinedException(this, reference)
+                }
+                return scope.getVariable(reference.sub!!)
+            } else {
+                return vd
+            }
+        }
         throw VariableNotDefinedException(this, reference)
     }
 
