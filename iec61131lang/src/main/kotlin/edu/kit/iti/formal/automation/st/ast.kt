@@ -114,9 +114,9 @@ data class FunctionBlockDeclaration(
         override var stBody: StatementList? = null,
         override var sfcBody: SFCImplementation? = null,
         var actions: LookupList<ActionDeclaration> = ArrayLookupList(),
-        val interfaces: RefList<InterfaceDeclaration> = RefList(),
-        val methods: MutableList<MethodDeclaration> = arrayListOf()
-) : PouExecutable() {
+        override val interfaces: RefList<InterfaceDeclaration> = RefList(),
+        override val methods: MutableList<MethodDeclaration> = arrayListOf()
+) : PouExecutable(), HasMethods, Classifier {
 
     var parent: RefTo<FunctionBlockDeclaration> = RefTo()
     var isFinal: Boolean = false
@@ -147,12 +147,100 @@ data class ClassDeclaration(
         override var scope: Scope = Scope(),
         var isFinal: Boolean = false,
         var isAbstract: Boolean = false,
-        val interfaces: RefList<InterfaceDeclaration> = RefList(),
-        val methods: MutableList<MethodDeclaration> = arrayListOf(),
-        val parent: RefTo<ClassDeclaration> = RefTo<ClassDeclaration>()) : HasScope, PouElement() {
+        override val interfaces: RefList<InterfaceDeclaration> = RefList(),
+        override val methods: MutableList<MethodDeclaration> = arrayListOf(),
+        val parent: RefTo<ClassDeclaration> = RefTo<ClassDeclaration>()) :
+        HasInterfaces,
+        HasScope, HasMethods, PouElement(), Classifier {
 
     override fun clone() = copy()
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
+}
+
+
+val InterfaceDeclaration.definedMethods: List<Pair<HasMethods, MethodDeclaration>>
+    get() {
+        val seq = arrayListOf<Pair<HasMethods, MethodDeclaration>>()
+        for (iface in allInterfaces) {
+            for (it in iface.methods)
+                seq.add(iface to it)
+        }
+        return seq
+    }
+
+infix fun MethodDeclaration.sameSignature(other: MethodDeclaration): Boolean {
+    if (name != other.name)
+        return false
+
+    val input1 = scope.variables.filter { it.isInput }
+    val input2 = scope.variables.filter { it.isInput }
+
+    for (v1 in input1) {
+        val v2 = input2.find { it.name == v1.name } ?: return false
+        if (v2.dataType != v1.dataType) return false
+    }
+
+    for (v2 in input2) {
+        val v1 = input2.find { it.name == v2.name } ?: return false
+        if (v2.dataType != v1.dataType) return false
+    }
+    return true
+}
+
+val ClassDeclaration.declaredMethods: Collection<Pair<HasMethods, MethodDeclaration>>
+    get() {
+        val seq = arrayListOf<Pair<HasMethods, MethodDeclaration>>()
+        for (iface in allInterfaces) {
+            for (it in iface.methods)
+                seq.add(iface to it)
+        }
+        return seq
+    }
+
+val ClassDeclaration.definedMethods: Collection<Pair<HasMethods, MethodDeclaration>>
+    get() {
+        val seq = arrayListOf<Pair<HasMethods, MethodDeclaration>>()
+        for (iface in parents) {
+            for (it in iface.methods)
+                seq.add(iface to it)
+        }
+        return seq
+    }
+
+val ClassDeclaration.parents: List<ClassDeclaration>
+    get() {
+        var c = parent.obj
+        val seq = arrayListOf<ClassDeclaration>()
+        while (c != null) {
+            seq.add(c)
+            c = parent.obj;
+        }
+        return seq
+    }
+
+val ClassDeclaration.allInterfaces: List<InterfaceDeclaration>
+    get() {
+        val seq = arrayListOf<InterfaceDeclaration>()
+        interfaces.forEach { it.obj?.let { seq.add(it); seq.addAll(it.allInterfaces) } }
+        parents.forEach { c ->
+            c.interfaces.forEach { it.obj?.let { seq.add(it); seq.addAll(it.allInterfaces) } }
+        }
+        return seq
+    }
+
+val InterfaceDeclaration.allInterfaces: List<InterfaceDeclaration>
+    get() {
+        val seq = arrayListOf<InterfaceDeclaration>()
+        interfaces.forEach {
+            it.obj?.let { seq.add(it); seq.addAll(it.allInterfaces) }
+        }
+        return seq
+    }
+
+
+
+interface HasInterfaces : Identifiable{
+    val interfaces: RefList<InterfaceDeclaration>
 }
 
 data class TypeDeclarations(private val declarations: MutableList<TypeDeclaration> = arrayListOf())
@@ -191,6 +279,11 @@ interface HasSfcBody {
 }
 
 interface HasBody : HasSfcBody, HasStBody
+
+interface HasMethods : Identifiable {
+    val methods: MutableList<MethodDeclaration>
+}
+
 abstract class PouExecutable : PouElement(), HasScope, HasBody, Visitable {
     abstract override fun clone(): PouExecutable
 }
@@ -213,9 +306,9 @@ data class ProgramDeclaration(
 
 class InterfaceDeclaration(
         override var name: String = "",
-        var interfaces: RefList<InterfaceDeclaration> = RefList(),
-        var methods: MutableList<MethodDeclaration> = arrayListOf()
-) : PouElement(), Identifiable {
+        override var interfaces: RefList<InterfaceDeclaration> = RefList(),
+        override var methods: MutableList<MethodDeclaration> = arrayListOf()
+) : HasInterfaces, HasMethods, PouElement(), Identifiable, Classifier {
 
 
     override fun clone(): InterfaceDeclaration {
@@ -291,6 +384,7 @@ data class MethodDeclaration(
     var isAbstract: Boolean = false
     var isOverride: Boolean = false
     var parent: Classifier? = null
+    var overrides: Pair<HasMethods, MethodDeclaration>? = null
 
     override var scope: Scope = Scope()
 
@@ -349,7 +443,7 @@ data class WhileStatement(var condition: Expression = EMPTY_EXPRESSION, var stat
     }
 }
 
-data class AssignmentStatement(var location: Reference,
+data class AssignmentStatement(var location: SymbolicReference,
                                var expression: Expression = EMPTY_EXPRESSION,
                                var reference: Boolean = false) : Statement() {
 
@@ -858,7 +952,7 @@ data class InvocationParameter(
 interface TypeDeclaration : HasRuleContext, Identifiable, Visitable, Cloneable {
     abstract override var name: String
     //var dataType: AnyDt
-    @property:Deprecated("should be an type declaration")
+    @property:Deprecated("should be an type DECLARATION")
     abstract var baseType: RefTo<AnyDt>
     abstract val initialization: Initialization?
     override fun clone(): TypeDeclaration
@@ -931,7 +1025,7 @@ data class StructureTypeDeclaration(
 
 data class SubRangeTypeDeclaration(
         override var name: String = ANONYM,
-        override var baseType: RefTo<AnyDt> = RefTo(),//TODO false, should be type declaration
+        override var baseType: RefTo<AnyDt> = RefTo(),//TODO false, should be type DECLARATION
         override var initialization: Literal? = null,//TODO Refine to integer literal
         var range: Range? = null)
     : TypeDeclaration, Top() {
@@ -1987,10 +2081,7 @@ enum class AccessSpecifier(val flag: Int) {
     PROTECTED(VariableDeclaration.PRIVATE), PRIVATE(VariableDeclaration.PUBLIC);
 }
 
-interface Classifier {
-    val interfaces: List<RefTo<InterfaceDeclaration>>
-    val methods: List<MethodDeclaration>
-}
+interface Classifier : HasMethods, HasInterfaces, Identifiable
 
 
 //region SFC
@@ -2180,3 +2271,4 @@ class SFCNetwork(var steps: MutableList<SFCStep> = ArrayList()) : Top() {
 }
 
 //endregion
+

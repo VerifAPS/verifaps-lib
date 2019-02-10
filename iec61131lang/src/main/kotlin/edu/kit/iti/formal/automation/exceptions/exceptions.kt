@@ -42,10 +42,20 @@ class DataTypeNotDefinedException : RuntimeException {
  *
  * @author weigl
  */
-class VariableNotDefinedException(
-        val scope: Scope,
-        val reference: String) : IECException("Variable: $reference not defined in the given localScope $scope") {
-    constructor(scope: Scope, reference: SymbolicReference) : this(scope, reference.identifier)
+class VariableNotDefinedException(message: String) : IECException(message) {
+    var scope: Scope? = null
+    var reference: SymbolicReference? = null
+
+    constructor(scope: Scope, reference: SymbolicReference)
+            : this("Variable: $reference not defined in the given localScope $scope") {
+        this.scope = scope
+        this.reference = reference
+    }
+
+    constructor(scope: Scope, reference: String)
+            : this("Variable: $reference not defined in the given localScope $scope") {
+        this.scope = scope
+    }
 }
 
 class DataTypeNotResolvedException(message: String) : IECException(message)

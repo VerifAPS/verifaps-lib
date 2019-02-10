@@ -423,7 +423,7 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
 
     override fun traverse(assignmentStatement: AssignmentStatement) {
         assignmentStatement.expression = assignmentStatement.expression.accept(visitor) as Expression
-        assignmentStatement.location = assignmentStatement.location.accept(visitor) as Reference
+        assignmentStatement.location = assignmentStatement.location.accept(visitor) as SymbolicReference
     }
 
 

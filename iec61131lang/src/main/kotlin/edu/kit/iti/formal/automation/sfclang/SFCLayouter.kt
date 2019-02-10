@@ -38,8 +38,8 @@ class SFCLayouter/*
 
     private final SFCImplementation sfcDeclaration;
 
-    public SFCLayouter(SFCImplementation declaration) {
-        sfcDeclaration = declaration;
+    public SFCLayouter(SFCImplementation DECLARATION) {
+        sfcDeclaration = DECLARATION;
     }
 
     public void widthOfSubSfc(StepDeclaration step) {

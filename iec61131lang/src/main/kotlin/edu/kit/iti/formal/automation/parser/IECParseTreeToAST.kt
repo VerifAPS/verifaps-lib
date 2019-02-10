@@ -58,7 +58,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val ast = PouElements()
         ast.ruleContext = ctx
         ctx.library_element_declaration().forEach { l ->
-            val accept = l.accept(this) as PouElement
+            val accept = l.accept(this) as? PouElement
             if (accept != null)
                 ast.add(accept)
         }
@@ -83,7 +83,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
         val dt = splitted.prefix
         val v = splitted.value
-        val ordinal = splitted.ordinal?.toInt() ?: 10
+        val ordinal = splitted.ordinal ?: 10
 
         var int = BigInteger(v.replace("_", ""), ordinal)
         if (ctx.MINUS() != null)
@@ -110,7 +110,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             return BooleanLit(true)
 
 
-        val ordinal = splitted.ordinal?.toInt() ?: 10
+        val ordinal = splitted.ordinal ?: 10
         val ast = BitLit(dt, v.toLong(ordinal))
         ast.ruleContext = ctx
         return ast
@@ -704,7 +704,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitAssignment_statement(
             ctx: IEC61131Parser.Assignment_statementContext): Any {
         val ast = AssignmentStatement(
-                ctx.a.accept(this) as Reference,
+                ctx.a.accept(this) as SymbolicReference,
                 ctx.expression().accept(this) as Expression)
         ast.reference = ctx.RASSIGN() != null
         ast.isAssignmentAttempt = ctx.ASSIGN_ATTEMPT() != null
@@ -741,7 +741,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitSubscript_list(
             ctx: IEC61131Parser.Subscript_listContext): ExpressionList {
-        return ExpressionList(allOf<Expression>(ctx.expression()) as MutableList<Expression>)
+        return ExpressionList(allOf<Expression>(ctx.expression()))
     }
 
     override fun visitDirect_variable(
@@ -874,7 +874,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitSfc(ctx: IEC61131Parser.SfcContext): Any {
         sfc = SFCImplementation()
-        ctx.sfc_network().forEach { nc -> sfc!!.networks.add(visitSfc_network(nc)) }
+        ctx.sfc_network().forEach { nc -> sfc.networks.add(visitSfc_network(nc)) }
         return sfc
     }
 

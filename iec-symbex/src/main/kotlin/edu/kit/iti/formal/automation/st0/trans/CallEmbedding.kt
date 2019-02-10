@@ -110,7 +110,7 @@ class FBEmbeddParameters : CodeTransformation {
                 invocation.outputParameters.forEach { (name, _, expression) ->
                     if (name != null) {
                         invocation.callee.copy(sub = SymbolicReference(name))
-                        stmt += AssignmentStatement(expression as Reference, SymbolicReference(name))
+                        stmt += AssignmentStatement(expression as SymbolicReference, SymbolicReference(name))
                     } else {
                         throw IllegalStateException("Output parameter in function block call w/o name.")
                     }

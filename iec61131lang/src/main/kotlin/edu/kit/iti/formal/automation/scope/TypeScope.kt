@@ -34,7 +34,7 @@ import java.util.*
  * @author weigl
  * @version $Id: $Id
  */
-class TypeScope private constructor(private val impl: TreeMap<String, AnyDt> = TreeMap())
+class TypeScope private constructor(private val impl: TreeMap<String, AnyDt> = TreeMap(String.CASE_INSENSITIVE_ORDER))
     : MutableMap<String, AnyDt> by impl, Cloneable {
 
     fun register(vararg any: AnyDt) {

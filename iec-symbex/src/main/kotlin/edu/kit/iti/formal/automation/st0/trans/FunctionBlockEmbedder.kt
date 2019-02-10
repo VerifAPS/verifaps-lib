@@ -97,7 +97,7 @@ class FunctionBlockEmbedder(private val instanceName: String,
             if (name != null) {
                 val name = renameVariable(name)
                 val assign = AssignmentStatement(
-                        expression as Reference,
+                        expression as SymbolicReference,
                         SymbolicReference(name)
                 )
                 sl.add(assign)

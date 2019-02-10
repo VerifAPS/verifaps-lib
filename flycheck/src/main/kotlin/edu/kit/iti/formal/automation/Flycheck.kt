@@ -7,8 +7,9 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
-import edu.kit.iti.formal.automation.analysis.CheckForTypes
-import edu.kit.iti.formal.automation.analysis.DefaultReporter
+import edu.kit.iti.formal.automation.analysis.ReportCategory
+import edu.kit.iti.formal.automation.analysis.ReportLevel
+import edu.kit.iti.formal.automation.analysis.Reporter
 import edu.kit.iti.formal.automation.analysis.ReporterMessage
 import edu.kit.iti.formal.automation.builtin.BuiltinLoader
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
@@ -80,8 +81,7 @@ object Flycheck {
 
 class CheckApp : CliktCommand() {
     val verbose by option(help = "enable verbose mode").flag()
-    val interactiveFormat by option("--json", help = "Flag for enabling json, line based format")
-            .flag()
+    val format by option("--json", help = "Flag for enabling json, line based format").flag()
     val include by option("-L", help = "folder for looking includes")
             .file()
             .multiple()
@@ -99,13 +99,13 @@ class CheckApp : CliktCommand() {
                 include
         )
         r.run()
-        if (interactiveFormat) {
+        if (format) {
             val msg = r.messages.joinToString(",") { it.toJson() }
             print("[$msg]\n")
             System.out.flush()
         } else {
             r.messages.forEach {
-                Console.writeln("[${it.level.toUpperCase()}] (${it.sourceName}@${it.startLine}:${it.startOffset}) ${it.message} (${it.category})")
+                Console.writeln("[${it.level}] (${it.sourceName}@${it.startLine}:${it.startOffset}) ${it.message} (${it.category})")
             }
         }
     }
@@ -117,7 +117,9 @@ class FlycheckRunner(
         val verbose: Boolean = false,
         val includeStubs: List<File> = arrayListOf()) {
 
-    private val reporter = DefaultReporter()
+    val underInvestigation: PouElements = PouElements()
+
+    private val reporter = Reporter()
     val messages: MutableList<ReporterMessage>
         get() = reporter.messages
 
@@ -125,7 +127,9 @@ class FlycheckRunner(
 
     fun run() {
         streams.forEach { parse(it) }
-        types()
+        resolve()
+        check()
+        printMessages()
     }
 
     fun parse(stream: CharStream) {
@@ -138,14 +142,27 @@ class FlycheckRunner(
         val ctx = parser.start()
         val tles = ctx.accept(IECParseTreeToAST()) as PouElements
         library.addAll(tles)
+        underInvestigation.addAll(tles)
     }
 
-    fun types() {
+
+    private fun resolve() {
         IEC61131Facade.resolveDataTypes(library)
-        library.accept(CheckForTypes(reporter))
     }
 
-    internal class MyAntlrErrorListener(private val reporter: DefaultReporter)
+    fun check() {
+        messages.addAll(IEC61131Facade.check(underInvestigation))
+    }
+
+    private fun printMessages() {
+        messages.forEach { printMessage(it) }
+    }
+
+    private fun printMessage(message: ReporterMessage) {
+        println(message.toHuman())
+    }
+
+    internal class MyAntlrErrorListener(private val reporter: Reporter)
         : ANTLRErrorListener {
         override fun syntaxError(recognizer: Recognizer<*, *>?, offendingSymbol: Any?, line: Int,
                                  charPositionInLine: Int, msg: String?, e: RecognitionException?) {
@@ -153,8 +170,8 @@ class FlycheckRunner(
             reporter.report(
                     node = token,
                     message = msg!!,
-                    category = "syntax",
-                    level = "ERROR")
+                    category = ReportCategory.SYNTAX,
+                    level = ReportLevel.ERROR)
         }
 
         override fun reportAttemptingFullContext(recognizer: Parser?, dfa: DFA?, startIndex: Int, stopIndex: Int, conflictingAlts: BitSet?, configs: ATNConfigSet?) {}

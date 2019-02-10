@@ -94,15 +94,14 @@ object IEC61131Facade {
     fun resolveDataTypes(elements: PouElements, scope: Scope = Scope.defaultScope()): Scope {
         val fdt = RegisterDataTypes(scope)
         val rdt = ResolveDataTypes(scope)
+        val oo = ResolveOO(scope)
         //val rr = ResolveReferences(scope)
         elements.accept(fdt)
         elements.accept(EnsureFunctionReturnValue)
-
         elements.accept(rdt)
-
         elements.accept(RewriteEnums)
         elements.accept(MaintainInitialValues())
-
+        elements.accept(oo)
         //elements.accept(rr)
         return scope
     }
@@ -169,7 +168,7 @@ object IEC61131Facade {
      *
      */
     fun check(p: PouElements): MutableList<ReporterMessage> {
-        val r = DefaultReporter()
+        val r = Reporter()
         getCheckers(r).forEach { p.accept(it) }
         return r.messages
     }
