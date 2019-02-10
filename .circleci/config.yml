@@ -57,7 +57,7 @@ jobs:
       - run: gradle :casestudies:assemble
 
       - store_artifacts:
-          path: casestudies/build/dist/*
+          path: casestudies/build/distributions/*
 
 
   #    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
