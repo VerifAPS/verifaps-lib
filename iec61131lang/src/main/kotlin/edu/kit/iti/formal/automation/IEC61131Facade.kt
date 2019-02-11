@@ -191,5 +191,13 @@ object IEC61131Facade {
         ast.accept(stp)
     }
 
+    fun translateToSt(name: String, scope: Scope, sfc: SFCImplementation): StatementList {
+        TODO() //Aktuelle Schritt: {STEP_$name}
+    }
+
+    fun tranlsateSfc(elements: PouElements) {
+        elements.forEach { it.accept(TranslateSfcToSt) }
+    }
+
 }
 

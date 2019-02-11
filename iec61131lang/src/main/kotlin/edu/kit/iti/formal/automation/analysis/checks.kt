@@ -7,6 +7,7 @@ import edu.kit.iti.formal.automation.exceptions.DataTypeNotResolvedException
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException
 import edu.kit.iti.formal.automation.st.Identifiable
 import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.automation.st.util.AstVisitor
 import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
 import edu.kit.iti.formal.util.dlevenshtein
 import org.antlr.v4.runtime.Token
@@ -124,6 +125,7 @@ class CheckForLiterals(private val reporter: Reporter) : AstVisitorWithScope<Uni
         }
     }
 }
+
 
 class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>() {
     override fun defaultVisit(obj: Any) {}

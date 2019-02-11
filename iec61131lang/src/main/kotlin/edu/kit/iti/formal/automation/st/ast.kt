@@ -2087,9 +2087,9 @@ interface Classifier : HasMethods, HasInterfaces, Identifiable
 //region SFC
 data class ActionDeclaration(
         override var name: String = ANONYM,
-        var stBody: StatementList? = null,
-        var sfcBody: SFCImplementation? = null
-) : Identifiable, Top() {
+        override var stBody: StatementList? = null,
+        override var sfcBody: SFCImplementation? = null
+) : Identifiable, HasBody, Top() {
     override fun clone(): ActionDeclaration {
         val a = ActionDeclaration()
         a.name = this.name
