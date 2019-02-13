@@ -1,3 +1,4 @@
+import edu.kit.iti.formal.util.findProgram
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
@@ -28,10 +29,13 @@ class RunExamples {
                             File("examples/$left.$right.$p.dot"))
                     Assumptions.assumeTrue(a.leftFile.exists() && a.rightFile.exists())
                     a.run()
-                    ProcessBuilder("/usr/bin/dot", "-Tsvg", "-o", "$left.$right.$p.svg", "$left.$right.$p.dot")
-                            .inheritIO()
-                            .directory(File("examples"))
-                            .start()
+                    val dot = findProgram("dot")
+                    if (dot != null) {
+                        ProcessBuilder(dot.absolutePath, "-Tsvg", "-o", "$left.$right.$p.svg", "$left.$right.$p.dot")
+                                .inheritIO()
+                                .directory(File("examples"))
+                                .start()
+                    }
                 }
             }
 }
