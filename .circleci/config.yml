@@ -41,7 +41,7 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests!
-      - run: gradle test --continue
+      - run: gradle test --continue --parallel
 
       - run:
           name: Save test results
