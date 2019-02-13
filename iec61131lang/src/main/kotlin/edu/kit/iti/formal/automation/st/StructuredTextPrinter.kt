@@ -66,7 +66,7 @@ class StructuredTextPrinter
                 sb.printf(", ")
         }
         sb.printf("] OF ")
-        sb.printf(arrayTypeDeclaration.baseType.identifier!!)
+        sb.printf(arrayTypeDeclaration.baseType.identifier?:"<missing>")
     }
 
     override fun visit(stringTypeDeclaration: StringTypeDeclaration) {

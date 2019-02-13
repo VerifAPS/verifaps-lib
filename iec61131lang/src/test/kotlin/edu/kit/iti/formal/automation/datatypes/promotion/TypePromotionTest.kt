@@ -9,6 +9,7 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.*
@@ -20,7 +21,7 @@ class TypePromotionTest {
     internal var vd = Scope()
     internal var et = EnumerateType("states", Arrays.asList("X", "Y", "Z"))
 
-    @BeforeAll
+    @BeforeEach
     fun setup() {
         vd = Scope()
         vd.add(VariableDeclaration("a", UINT))

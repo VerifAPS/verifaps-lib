@@ -7,6 +7,7 @@ import edu.kit.iti.formal.automation.st.ast.*
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
+import java.util.regex.Pattern
 
 
 sealed class AnyDt(override var name: String = "ANY") : Identifiable {
@@ -269,6 +270,58 @@ abstract class IECString : AnyDt() {
     object STRING : IECString() {
         override fun repr(obj: Any) = "WSTRING#'$obj'"
         override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
+    }
+
+    companion object {
+        /**
+         * Interprets escape chars in IEC strings.
+        Escape Sequences
+        The dollar sign ($) is used as an escape character to insert any character code into a string.
+
+        Sequence	Usage	Description
+        $$	Both	Dollar sign ($) character
+        $'	Single	Apostrophe (') character
+        $"	Double	Double quotation mark (") character
+        $L	Both	Line feed (U+000A) character
+        $N	Both	Line feed (U+000A) character
+        $R	Both	Carriage return (U+000D) character
+        $T	Both	Horizontal tab (U+0009) character
+        $nn	Single	Single byte character, where nn is the two digit hexadecimal value of the character
+        $nnnn	Double	Double byte character, where nnnn is the four digit hexadecimal value of the character
+         */
+        fun interpret(str: String): String = when {
+            str.startsWith("'") -> interpret(str.trim('\''), false)
+            str.startsWith("\"") -> interpret(str.trim('"'), true)
+            else -> interpret(str, true)
+        }
+
+        @JvmStatic
+        fun interpret(str: String, wide: Boolean): String {
+            val sb = StringBuffer()
+            val bytes = if (wide) 4 else 2
+            val pattern = Pattern.compile("[\$]([\"'NLRTnlrt]|[0-9]{$bytes})")
+            val m = pattern.matcher(str)
+            while (m.find()) {
+                val replacement = when (m.group(1).toUpperCase()) {
+                    "$" -> "$"
+                    "'" -> "'"
+                    "\"" -> "\""
+                    "L" -> "\u000A"
+                    "N" -> "\u000A"
+                    "R" -> "\u000D"
+                    "T" -> "\t"
+                    else -> {
+                        val v = m.group(1)
+                        //$nn	Single	Single byte character, where nn is the two digit hexadecimal value of the character
+                        //$nnnn	Double	Double byte character, where nnnn is the four digit hexadecimal value of the character
+                        v.toInt().toChar().toString()
+                    }
+                }
+                m.appendReplacement(sb, replacement);
+            }
+            m.appendTail(sb);
+            return sb.toString()
+        }
     }
 }
 

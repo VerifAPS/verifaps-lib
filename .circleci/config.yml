@@ -32,6 +32,8 @@ jobs:
           - v1-dependencies-
 
       - run: gradle dependencies
+      - run: gradle classes --parallel
+      - run: gradle testClasses --parallel
 
       - save_cache:
           paths:

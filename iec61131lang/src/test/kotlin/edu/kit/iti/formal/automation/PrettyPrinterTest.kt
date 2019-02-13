@@ -30,6 +30,8 @@ import org.antlr.v4.runtime.CharStreams
 import org.junit.jupiter.api.Assertions
 import java.io.File
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Path
 
 /**
  * @author Alexander Weigl
@@ -37,8 +39,8 @@ import java.io.IOException
  */
 object PrettyPrinterTest {
     @Throws(IOException::class)
-    fun testPrettyPrintByString(astNode: Top, file: File) {
-        val content = file.readText()
+    fun testPrettyPrintByString(astNode: Top, file: Path) {
+        val content = Files.newBufferedReader(file).readText()
         val printed = StructuredTextPrinter.print(astNode)
         Assertions.assertEquals(
                 clean(content), clean(printed))

@@ -916,8 +916,8 @@ StringCharacters
 //fragment ESCDQ : '\\"' | '\\\\' ;
 //fragment ESCSQ : '\\\'' | '\\\\' ;
 
-STRING_LITERAL: '\'' ~[']*? '\'';
-WSTRING_LITERAL: '"' ~["]*? '"';
+STRING_LITERAL: '\'' ('$' (['$LNRTlnrt] | [0-9][0-9])  | ~['])*? '\'';
+WSTRING_LITERAL: '"' ('$' (["$LNRTlnrt] | [0-9][0-9][0-9][0-9])  | ~["])*? '"';
 
 IDENTIFIER
 :

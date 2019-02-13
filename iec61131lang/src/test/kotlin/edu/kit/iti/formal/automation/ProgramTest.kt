@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation
 
+import LoadHelp
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
@@ -8,16 +9,15 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
-import java.io.File
-import java.util.*
+import java.nio.file.Path
 
 object ProgramTest {
-    @ParameterizedTest @MethodSource("getPrograms")
-    fun testParser(testFile: File) {
-        val lexer = IEC61131Lexer(CharStreams.fromPath(testFile!!.toPath()))
+    @ParameterizedTest
+    @MethodSource("getPrograms")
+    fun testParser(testFile: Path) {
+        val lexer = IEC61131Lexer(CharStreams.fromPath(testFile))
         /*
         Vocabulary v = lexer.getVocabulary();
         for (Token t : lexer.getAllTokens()) {
@@ -27,7 +27,7 @@ object ProgramTest {
         }
 */
         val parser = IEC61131Parser(CommonTokenStream(lexer))
-        parser.addErrorListener(NiceErrorListener(testFile!!.name))
+        parser.addErrorListener(NiceErrorListener(testFile.toString()))
         val ctx = parser.start()
         Assertions.assertEquals(0, parser.numberOfSyntaxErrors.toLong())
         val sl = ctx.accept(IECParseTreeToAST()) as PouElements
@@ -45,9 +45,10 @@ object ProgramTest {
     */
 
 
-    @ParameterizedTest @MethodSource("getPrograms")
-    fun testResolveDataTypes(testFile: File) {
-        val tle = IEC61131Facade.file(testFile!!)
+    @ParameterizedTest
+    @MethodSource("getPrograms")
+    fun testResolveDataTypes(testFile: Path) {
+        val tle = IEC61131Facade.file(testFile)
         val gs = IEC61131Facade.resolveDataTypes(tle)
         /*for (ClassDeclaration classDeclaration : gs.getClasses().values()) {
             Assertions.assertTrue(
@@ -66,39 +67,23 @@ object ProgramTest {
         }*/
     }
 
-    @ParameterizedTest @MethodSource("getPrograms")
+    @ParameterizedTest
+    @MethodSource("getPrograms")
     @Disabled
-    fun testPrintTopLevelElements(testFile: File) {
-        val tle = IEC61131Facade.file(testFile!!)
+    fun testPrintTopLevelElements(testFile: Path) {
+        val tle = IEC61131Facade.file(testFile)
         PrettyPrinterTest.testPrettyPrintByString(tle, testFile)
     }
 
-    @ParameterizedTest @MethodSource("getPrograms")
-    fun testPrintTopLevelElementsByEquals(testFile: File) {
-        val tle = IEC61131Facade.file(testFile!!)
+    @ParameterizedTest
+    @MethodSource("getPrograms")
+    fun testPrintTopLevelElementsByEquals(testFile: Path) {
+        val tle = IEC61131Facade.file(testFile)
         PrettyPrinterTest.testPrettyPrintByEquals(tle)
     }
 
     @JvmStatic
-    internal fun getResources(folder: String): Array<File>? {
-        val f = ProgramTest::class.java.classLoader.getResource(folder)
-        if (f == null) {
-            System.err.format("Could not find %s%n", folder)
-            return arrayOf()
-        }
-        val file = File(f.file)
-        return file.listFiles()
-    }
-
-    @JvmStatic
-    fun getPrograms(): Iterable<Array<Any>> {
-        val resources = getResources("edu/kit/iti/formal/automation/st/programs")
-        val list = ArrayList<Array<Any>>()
-        for (f in resources!!) {
-            list.add(arrayOf(f))
-        }
-        return list
-    }
+    fun getPrograms() = LoadHelp.getPrograms()
 
     /*
     @Test

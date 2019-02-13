@@ -1,17 +1,22 @@
 package edu.kit.iti.formal.automation
 
 
+import TestUtils
 import org.antlr.v4.runtime.CharStreams
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 
 /**
  * @author Alexander Weigl
  * @version 1 (02.08.16)
  */
 object InValidExpressionTest {
-    private fun testInValidExpression(invalid: String) {
+
+    @ParameterizedTest
+    @MethodSource("getExpressions")
+    fun testInValidExpression(invalid: String) {
         val parser = IEC61131Facade.getParser(CharStreams.fromString(invalid))
         var error = try {
             val ctx = parser.expression()
@@ -29,9 +34,7 @@ object InValidExpressionTest {
         assertTrue(error)
     }
 
-    @TestFactory
-    fun setup(): Iterable<DynamicTest> =
-            TestUtils.loadLines("/edu/kit/iti/formal/automation/st/expressions/invalid.txt")
-                    .map { DynamicTest.dynamicTest(it) { testInValidExpression(it) } }
+    @JvmStatic
+    fun getExpressions() = TestUtils.loadLines("/edu/kit/iti/formal/automation/st/expressions/invalid.txt")
 }
 

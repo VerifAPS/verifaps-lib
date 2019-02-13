@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test
 class SymbolicExecutionTest {
     private lateinit var se: SymbolicExecutioner
 
-    @BeforeAll
+    @BeforeEach
     fun setupExecutioner() {
         se = SymbolicExecutioner()
         arrayOf("a", "b", "c", "d", "e", "f")

@@ -17,6 +17,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import java.io.*
 import java.nio.charset.Charset
+import java.nio.file.Path
 
 /**
  * IEC61131Facade class.
@@ -58,7 +59,7 @@ object IEC61131Facade {
     }
 
     fun statements(input: String): StatementList = statements(CharStreams.fromString(input))
-
+    fun file(path: Path): PouElements = file(CharStreams.fromPath(path))
     fun file(input: CharStream): PouElements {
         val parser = getParser(input)
         val tle = parser.start().accept(IECParseTreeToAST()) as PouElements

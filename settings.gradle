@@ -26,4 +26,5 @@ project(':casestudies').projectDir = "$rootDir/casestudies" as File
 
 //include 'asdl'
 include 'absintsfc'
+include 'utils-test'
 

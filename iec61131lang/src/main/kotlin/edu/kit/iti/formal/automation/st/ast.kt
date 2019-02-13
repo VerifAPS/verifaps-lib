@@ -214,6 +214,7 @@ val ClassDeclaration.parents: List<ClassDeclaration>
         while (c != null) {
             seq.add(c)
             c = parent.obj;
+            if(c in seq) break
         }
         return seq
     }
@@ -1390,9 +1391,9 @@ data class IntegerLit(var dataType: RefTo<AnyInt> = RefTo<AnyInt>(INT),
 
 
 data class StringLit(var dataType: RefTo<IECString> = RefTo(), var value: String) : Literal() {
-    constructor(dt: String?, v: String) : this(RefTo(dt), v)
+    constructor(dt: IECString, v: String) : this(RefTo(dt.name, dt), v)
 
-    override fun dataType(localScope: Scope) = dataType.obj!!
+    override fun dataType(localScope: Scope) = dataType.obj ?: IECString.STRING
     override fun asValue(scope: Scope) = VIECString(dataType(scope), value)
     override fun clone() = copy()
 }

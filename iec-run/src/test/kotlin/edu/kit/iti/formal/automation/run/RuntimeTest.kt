@@ -8,16 +8,10 @@ import edu.kit.iti.formal.automation.datatypes.values.FALSE
 import edu.kit.iti.formal.automation.datatypes.values.TRUE
 import edu.kit.iti.formal.automation.datatypes.values.VAnyEnum
 import edu.kit.iti.formal.automation.datatypes.values.VAnyInt
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 
 class RuntimeTest {
-    @BeforeAll
-    fun setUp() {
-        //System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE")
-    }
-
     @Test
     fun testIfStatement() {
         val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.testIfStatement.st"))

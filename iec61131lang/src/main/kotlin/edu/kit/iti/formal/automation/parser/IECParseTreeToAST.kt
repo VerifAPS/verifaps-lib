@@ -125,8 +125,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitString(ctx: IEC61131Parser.StringContext): Any {
         val ast = StringLit(
-                if (ctx.STRING_LITERAL() != null) IECString.STRING.name
-                else IECString.WSTRING.name,
+                if (ctx.STRING_LITERAL() != null) IECString.STRING
+                else IECString.WSTRING,
                 ctx.text)
         ast.ruleContext = ctx
         return ast

@@ -1,3 +1,4 @@
+import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
 import java.io.File
@@ -25,6 +26,7 @@ class RunExamples {
                             File("examples/$left"),
                             File("examples/$right"),
                             File("examples/$left.$right.$p.dot"))
+                    Assumptions.assumeTrue(a.leftFile.exists() && a.rightFile.exists())
                     a.run()
                     ProcessBuilder("/usr/bin/dot", "-Tsvg", "-o", "$left.$right.$p.svg", "$left.$right.$p.dot")
                             .inheritIO()
