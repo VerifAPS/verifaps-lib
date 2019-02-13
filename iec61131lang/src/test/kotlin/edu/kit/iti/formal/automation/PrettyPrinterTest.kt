@@ -27,7 +27,7 @@ import edu.kit.iti.formal.automation.st.StructuredTextPrinter
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.Top
 import org.antlr.v4.runtime.CharStreams
-import org.junit.Assert
+import org.junit.jupiter.api.Assertions
 import java.io.File
 import java.io.IOException
 
@@ -40,7 +40,7 @@ object PrettyPrinterTest {
     fun testPrettyPrintByString(astNode: Top, file: File) {
         val content = file.readText()
         val printed = StructuredTextPrinter.print(astNode)
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 clean(content), clean(printed))
     }
 
@@ -61,10 +61,10 @@ object PrettyPrinterTest {
             val newTle = IEC61131Facade.file(CharStreams.fromString(printed))
             //IEC61131Facade.resolveDataTypes(newTle)
             for (i in 0 until Math.min(tle.size, newTle.size)) {
-                Assert.assertEquals(tle[i], newTle[i])
-                //Assert.assertEquals(tle[i].toString(), newTle[i].toString())
+                Assertions.assertEquals(tle[i], newTle[i])
+                //Assertions.assertEquals(tle[i].toString(), newTle[i].toString())
             }
-            Assert.assertEquals(tle, newTle)
+            Assertions.assertEquals(tle, newTle)
         } catch (e: ErrorReporter.IEC61131ParserException) {
             System.err.println(
                     e.print(printed.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray(), "\n---\n")

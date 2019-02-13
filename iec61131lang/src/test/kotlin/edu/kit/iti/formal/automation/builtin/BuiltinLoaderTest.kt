@@ -23,8 +23,8 @@ package edu.kit.iti.formal.automation.builtin
  */
 
 import edu.kit.iti.formal.automation.st.ast.PouElements
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+ import org.junit.jupiter.api.Test
 
 /**
  * @author Alexander Weigl
@@ -35,6 +35,6 @@ class BuiltinLoaderTest {
     @Throws(Exception::class)
     fun loadDefault() {
         val tle = BuiltinLoader.loadDefault()
-        Assert.assertTrue(tle.size > 0)
+        Assertions.assertTrue(tle.size > 0)
     }
 }

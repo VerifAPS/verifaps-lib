@@ -26,8 +26,8 @@ import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st0.TransformationState
 import edu.kit.iti.formal.automation.st0.trans.ActionEmbedder
 import org.antlr.v4.runtime.CharStreams
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+ import org.junit.jupiter.api.Test
 
 import java.io.IOException
 
@@ -51,6 +51,6 @@ ELSE
     s := (s + i);
 END_IF
 o := s;"""
-        Assert.assertEquals(exp, out)
+        Assertions.assertEquals(exp, out)
     }
 }

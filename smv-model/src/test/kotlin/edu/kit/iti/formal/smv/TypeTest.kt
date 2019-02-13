@@ -22,10 +22,9 @@ package edu.kit.iti.formal.smv
  * #L%
  */
 
-import junit.framework.Assert
-import org.junit.Test
-
-import java.util.Arrays
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import java.util.*
 
 /**
  * @author Alexander Weigl
@@ -39,12 +38,10 @@ class TypeTest {
         val b = SMVTypes.BOOLEAN
         val e = EnumType(Arrays.asList("a", "b", "c"))
 
-        Assert.assertEquals("unsigned word[10]", u10.repr())
-        Assert.assertEquals("boolean", b.repr())
-        Assert.assertEquals("signed word[0]", s0.repr())
-        Assert.assertEquals("{a, b, c}", e.repr())
-
-
+        Assertions.assertEquals("unsigned word[10]", u10.repr())
+        Assertions.assertEquals("boolean", b.repr())
+        Assertions.assertEquals("signed word[0]", s0.repr())
+        Assertions.assertEquals("{a, b, c}", e.repr())
     }
 
 }

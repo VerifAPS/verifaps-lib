@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.automation.testtables.smtconcrete
 
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import org.junit.Test
+ import org.junit.jupiter.api.Test
 import java.io.File
 
 /**

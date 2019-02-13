@@ -1,5 +1,5 @@
 import edu.kit.iti.formal.asdl.ADSL
-import org.junit.Test
+ import org.junit.jupiter.api.Test
 
 /**
  *

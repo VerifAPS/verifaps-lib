@@ -25,8 +25,8 @@ package edu.kit.iti.formal.automation.smt
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import org.antlr.v4.runtime.CharStreams
-import org.junit.Assume
-import org.junit.Test
+import org.junit.jupiter.api.Assumptions
+import org.junit.jupiter.api.Test
 
 import java.io.FileInputStream
 import java.io.IOException
@@ -42,7 +42,6 @@ class SMTFacadeTest {
         /*InputStream isType = getClass().getResourceAsStream(
                 "traffic_light_bools.st");*/
         val `is` = FileInputStream("src/test/resources/traffic_light_bools.st")
-        Assume.assumeNotNull(`is`)
         val code = IEC61131Facade.file(CharStreams.fromStream(`is`))
         IEC61131Facade.resolveDataTypes(code)
         val symplifiedCode = SymbExFacade.simplify(code)

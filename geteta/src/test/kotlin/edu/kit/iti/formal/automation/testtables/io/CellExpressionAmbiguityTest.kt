@@ -25,8 +25,9 @@ import edu.kit.iti.formal.automation.testtables.exception.ProgramAbortionExcepti
 import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 /**
  * Created by weigl on 15.12.16.
@@ -36,7 +37,7 @@ class CellExpressionAmbiguityTest {
     @Test
     fun testBoolean() {
         val v = SVariable.create("a").asBool()
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 SLiteral.TRUE.equal(v),
                 parse("TRUE")
         )
@@ -44,7 +45,7 @@ class CellExpressionAmbiguityTest {
 
     @Test
     fun testReference() {
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 SVariable.create("_0\$b__history._$2").withUnsigned(16)
                         .equal(defaultVar()),
                 parse("b[-2]")
@@ -52,10 +53,12 @@ class CellExpressionAmbiguityTest {
     }
 
 
-    @Test(expected = ProgramAbortionException::class)
+    @Test
     fun testInvalidReferencePositive() {
-        GetetaFacade.exprToSMV("b[2]",
-                SVariable.create("a").asBool(), 0, pc)
+        assertThrows<ProgramAbortionException> {
+            GetetaFacade.exprToSMV("b[2]",
+                    SVariable.create("a").asBool(), 0, pc)
+        }
     }
 
 

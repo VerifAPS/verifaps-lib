@@ -22,32 +22,19 @@ package edu.kit.iti.formal.smv.parser
  * #L%
  */
 
-import org.junit.Assert
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.DynamicTest
+import org.junit.jupiter.api.TestFactory
 
-import java.io.IOException
-
-@RunWith(Parameterized::class)
-class BadExpressionTest {
-    @Parameterized.Parameter
-    var testExpression: String? = null
-
-
-    @Test
-    @Throws(IOException::class)
-    fun test() {
+object BadExpressionTest {
+    fun test(testExpression: String) {
         val slp = TestHelper.getParser(testExpression!!)
         val e = slp.expr()
-        Assert.assertNotEquals(0, slp.numberOfSyntaxErrors.toLong())
+        Assertions.assertNotEquals(0, slp.numberOfSyntaxErrors.toLong())
     }
 
-    companion object {
-        @JvmStatic
-        @Parameterized.Parameters(name = "{0}")
-        @Throws(IOException::class)
-        fun getBadExpressions() = TestHelper.loadLines("badexpr.txt", 1)
-    }
-
+    @TestFactory
+    fun getBadExpressions() =
+            TestHelper.loadLines("badexpr.txt", 1)
+                    .map { DynamicTest.dynamicTest(it[0].toString()) { test(it[0].toString()) } }
 }

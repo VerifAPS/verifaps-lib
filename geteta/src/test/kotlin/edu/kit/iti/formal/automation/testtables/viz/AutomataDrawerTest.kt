@@ -2,8 +2,7 @@ package edu.kit.iti.formal.automation.testtables.viz
 
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.builder.AutomatonBuilderPipeline
-import org.junit.Test
-import org.junit.experimental.categories.Category
+import org.junit.jupiter.api.Test
 import java.io.File
 
 /**
@@ -12,14 +11,11 @@ import java.io.File
  */
 class AutomataDrawerTest {
     @Test
-    fun testSimple(): Unit {
-        renderAndShow("examples/NewFile.tt.txt")
-    }
+    fun testSimple() =
+            renderAndShow("examples/NewFile.tt.txt")
 
     @Test
-    fun testMinMax(): Unit {
-        renderAndShow("examples/MinMax/MinMax.tt.txt")
-    }
+    fun testMinMax() = renderAndShow("examples/MinMax/MinMax.tt.txt")
 
 
     private fun renderAndShow(file: String) {

@@ -26,8 +26,8 @@ package edu.kit.iti.formal.automation.testtables.io
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.builder.SmvConstructionPipeline
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+ import org.junit.jupiter.api.Test
 
 import javax.xml.bind.JAXBException
 import java.io.IOException
@@ -72,6 +72,6 @@ class SMVModuleBuilderTest {
         val tt = GetetaFacade.constructSMV(gtt, enumType)
         val module = tt.tableModule
         val output = module.repr()
-        Assert.assertEquals(expected, output)
+        Assertions.assertEquals(expected, output)
     }
 }

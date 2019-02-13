@@ -1,7 +1,7 @@
 import edu.kit.iti.formal.smt.CliSmtSolverImpl
 import edu.kit.iti.formal.smt.InteractiveSmtSolverImpl
 import edu.kit.iti.formal.util.findProgram
-import org.junit.Assert
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit
@@ -43,8 +43,8 @@ class Z3Test {
         (get-model)""")
 
         val isSat2 = solver.read()
-        Assert.assertEquals("sat", isSat1.toString())
-        Assert.assertEquals("unsat", isSat2.toString())
+        Assertions.assertEquals("sat", isSat1.toString())
+        Assertions.assertEquals("unsat", isSat2.toString())
 
         println(isSat1)
         println(model1)
@@ -52,7 +52,7 @@ class Z3Test {
 
         solver.dispose()
         //not working always:
-        // Assert.assertFalse(solver.process!!.isAlive)
+        // Assertions.assertFalse(solver.process!!.isAlive)
     }
 
     @Test
@@ -80,8 +80,8 @@ class Z3Test {
         solver.run(10, TimeUnit.SECONDS)
         val (isSat1, model1, isSat2) = solver.readAll()
 
-        Assert.assertEquals("sat", isSat1.toString())
-        Assert.assertEquals("unsat", isSat2.toString())
+        Assertions.assertEquals("sat", isSat1.toString())
+        Assertions.assertEquals("unsat", isSat2.toString())
 
         println(isSat1)
         println(model1)

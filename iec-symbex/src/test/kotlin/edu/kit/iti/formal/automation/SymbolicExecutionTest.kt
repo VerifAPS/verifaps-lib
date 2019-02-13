@@ -25,9 +25,10 @@ package edu.kit.iti.formal.automation
 import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alexander Weigl
@@ -36,7 +37,7 @@ import org.junit.Test
 class SymbolicExecutionTest {
     private lateinit var se: SymbolicExecutioner
 
-    @Before
+    @BeforeAll
     fun setupExecutioner() {
         se = SymbolicExecutioner()
         arrayOf("a", "b", "c", "d", "e", "f")
@@ -53,7 +54,7 @@ class SymbolicExecutionTest {
                         "b := 2*a+c;")
         IEC61131Facade.resolveDataTypes(elements = *arrayOf(list))
         list.accept(se)
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "{a=0sd16_2, b=0sd16_2 * 0sd16_2 + 0sd16_2 + 0sd16_3, c=0sd16_2 + 0sd16_3}",
                 se.peek().toString()
         )
@@ -65,7 +66,7 @@ class SymbolicExecutionTest {
                 "a := 2; c:= 4; b:=0; IF a = 2 THEN b := 2; ELSE b := 1; c:=2; END_IF;")
         IEC61131Facade.resolveDataTypes(elements = *arrayOf(list))
         list.accept(se)
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "{a=0sd16_2, b=case \n" +
                         "0sd16_2 = 0sd16_2 : 0sd16_2; TRUE : 0sd16_1; \n" +
                         "esac, c=case \n" +
@@ -97,10 +98,10 @@ class SymbolicExecutionTest {
         list.accept(se);
 
         ss.forEach((key, value) -> {
-            Assert.assertEquals(value, se.peek().get(key));
+            Assertions.assertEquals(value, se.peek().get(key));
         });
 
-        //Assert.assertEquals(ss, se.peek());
+        //Assertions.assertEquals(ss, se.peek());
     }
     */
 }

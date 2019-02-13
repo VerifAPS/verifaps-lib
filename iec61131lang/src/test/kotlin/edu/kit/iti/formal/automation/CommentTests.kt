@@ -24,8 +24,8 @@ package edu.kit.iti.formal.automation
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import org.antlr.v4.runtime.CharStreams
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+ import org.junit.jupiter.api.Test
 import java.util.*
 
 /**
@@ -41,10 +41,10 @@ class CommentTests {
         val v = l.vocabulary
         val names = toks.map { t -> v.getSymbolicName(t.type) }
 
-        Assert.assertEquals(Arrays.asList(
+        Assertions.assertEquals(Arrays.asList(
                 "COMMENT", "WS", "IDENTIFIER", "WS", "MULT", "RPAREN"
         ), names)
-        Assert.assertEquals(6, toks.size.toLong())
+        Assertions.assertEquals(6, toks.size.toLong())
     }
 
 
@@ -56,8 +56,8 @@ class CommentTests {
         val v = l.vocabulary
         val names = toks.map { t -> v.getSymbolicName(t.type) }
 
-        Assert.assertEquals("COMMENT", names[0])
-        Assert.assertEquals(1, toks.size.toLong())
+        Assertions.assertEquals("COMMENT", names[0])
+        Assertions.assertEquals(1, toks.size.toLong())
     }
 
 

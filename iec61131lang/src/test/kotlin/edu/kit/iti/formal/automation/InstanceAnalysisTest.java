@@ -39,26 +39,26 @@ public class InstanceAnalysisTest {
         InstanceScope instanceScope = OOIEC61131Facade.INSTANCE.findInstances(myProgram, globalScope);
 
         // Assert correct number of instances
-        Assert.assertEquals(instanceScope.getInstancesOfClass("A").size(), 1);
-        Assert.assertEquals(instanceScope.getInstancesOfClass("B").size(), 3);
-        Assert.assertEquals(instanceScope.getInstancesOfClass("C").size(), 4);
+        Assertions.assertEquals(instanceScope.getInstancesOfClass("A").size(), 1);
+        Assertions.assertEquals(instanceScope.getInstancesOfClass("B").size(), 3);
+        Assertions.assertEquals(instanceScope.getInstancesOfClass("C").size(), 4);
 
         // Assert parent instances are correct
         // Instances of A
         InstanceScope.Instance instanceA = instanceScope.getInstancesOfClass("A").get(0);
-        Assert.assertNull(instanceA.getParent());
+        Assertions.assertNull(instanceA.getParent());
         // Instances of B
         List<InstanceScope.Instance> instancesB = instanceScope.getInstancesOfClass("B");
         Set<InstanceScope.Instance> instancesBParents = new HashSet<>();
         instancesBParents.add(null); // MY_PROGRAM
         instancesBParents.add(instanceA); // MY_A
-        Assert.assertEquals(instancesB.stream().map(InstanceScope.Instance::getParent).collect(Collectors.toSet()),
+        Assertions.assertEquals(instancesB.stream().map(InstanceScope.Instance::getParent).collect(Collectors.toSet()),
                 instancesBParents);
         // Instances of C
         List<InstanceScope.Instance> instancesC = instanceScope.getInstancesOfClass("C");
         Set<InstanceScope.Instance> instancesCParents = new HashSet<>(instancesB);
         instancesCParents.add(null);
-        Assert.assertEquals(instancesC.stream().map(InstanceScope.Instance::getParent).collect(Collectors.toSet()),
+        Assertions.assertEquals(instancesC.stream().map(InstanceScope.Instance::getParent).collect(Collectors.toSet()),
                 instancesCParents);
     }
 }

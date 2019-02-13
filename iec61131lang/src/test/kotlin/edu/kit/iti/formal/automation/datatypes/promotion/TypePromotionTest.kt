@@ -7,9 +7,10 @@ import edu.kit.iti.formal.automation.exceptions.TypeConformityException
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.util.*
 
 /**
@@ -19,7 +20,7 @@ class TypePromotionTest {
     internal var vd = Scope()
     internal var et = EnumerateType("states", Arrays.asList("X", "Y", "Z"))
 
-    @Before
+    @BeforeAll
     fun setup() {
         vd = Scope()
         vd.add(VariableDeclaration("a", UINT))
@@ -82,7 +83,6 @@ class TypePromotionTest {
 
     @Test
     fun conversionInteger() {
-
     }
 
 
@@ -119,26 +119,25 @@ class TypePromotionTest {
     }
 
     @Test
-    @Throws(VariableNotDefinedException::class, TypeConformityException::class)
     fun functions() {
         //assertDataType(INT, "MAX(2,3)", null);
     }
 
-    @Throws(VariableNotDefinedException::class, TypeConformityException::class)
     private fun assertDataType(dt: AnyDt?, sexpr: String, scope: Scope = vd) {
         assertEquals(dt, IEC61131Facade.expr(sexpr).dataType(scope))
     }
 
-    @Test(expected = VariableNotDefinedException::class)
-    @Throws(VariableNotDefinedException::class, TypeConformityException::class)
-
+    @Test
     fun testVariableNotDefined() {
-        assertDataType(AnyReal.LREAL, "LLLL", vd)
+        assertThrows<VariableNotDefinedException> {
+            assertDataType(AnyReal.LREAL, "LLLL", vd)
+        }
     }
 
-    @Test(expected = TypeConformityException::class)
-    @Throws(VariableNotDefinedException::class, TypeConformityException::class)
+    @Test
     fun typeMismatch() {
-        assertDataType(AnyReal.LREAL, "TRUE + INT#2", vd)
+        assertThrows<TypeConformityException> {
+            assertDataType(AnyReal.LREAL, "TRUE + INT#2", vd)
+        }
     }
 }

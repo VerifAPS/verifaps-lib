@@ -23,25 +23,21 @@ package edu.kit.iti.formal.smv.parser
  */
 
 
-import edu.kit.iti.formal.smv.SMVPrinter
 import edu.kit.iti.formal.smv.ast.SMVModule
 import org.antlr.v4.runtime.CharStreams
-import org.junit.Assert
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
-import java.io.IOException
 
 /**
  * @author Alexander Weigl
  * @version 1 (10.06.17)
  */
-@RunWith(Parameterized::class)
-class ModuleTests(val f: File) {
-    @Test
-    @Throws(IOException::class)
-    public fun parse() {
+object ModuleTests {
+    @ParameterizedTest
+    @MethodSource("getScripts")
+    fun parse(f: File) {
         val l = SMVLexer(CharStreams.fromFileName(f!!.absolutePath))
         l.allTokens.forEach { println(it) }
 
@@ -54,14 +50,10 @@ class ModuleTests(val f: File) {
             //SMVPrinter.toFile(m, File(f!!.absolutePath + ".smv"))
             System.out.println(m.toString())
         }
-        Assert.assertEquals(0, slp.numberOfSyntaxErrors.toLong())
+        Assertions.assertEquals(0, slp.numberOfSyntaxErrors.toLong())
     }
 
-    companion object {
-        @JvmStatic
-        @Parameterized.Parameters(name = "{0}")
-        @Throws(IOException::class)
-        public fun getScripts() = TestHelper.getResourcesAsParameters("edu/kit/iti/formal/smv/parser/modules")
-    }
-
+    @JvmStatic
+    fun getScripts()
+            = TestHelper.getResourcesAsParameters("edu/kit/iti/formal/smv/parser/modules")
 }

@@ -22,20 +22,16 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
-import java.io.BufferedReader
 import java.io.IOException
-import java.io.InputStreamReader
 import java.util.*
 
 /**
  * Created by weigl on 14.11.16.
  */
 object TestUtils {
-
-
     @Throws(IOException::class)
-    fun loadLines(filename: String): Iterable<Array<Any>> {
-        val validExpression = ArrayList<Array<Any>>(4096)
+    fun loadLines(filename: String): List<String> {
+        val validExpression = ArrayList<String>(4096)
         val ve = TestUtils::class.java.getResourceAsStream(filename)
 
         if (ve == null) {
@@ -43,10 +39,11 @@ object TestUtils {
             return validExpression
         }
 
-        val stream = BufferedReader(InputStreamReader(ve))
-        stream.forEachLine {
-            if (!it.startsWith("#"))
-                validExpression.add(arrayOf(it))
+        ve.bufferedReader().use { stream ->
+            stream.forEachLine {
+                if (!it.startsWith("#"))
+                    validExpression.add(it)
+            }
         }
 
         println("Found: " + filename + " with " + validExpression.size + " lines!")

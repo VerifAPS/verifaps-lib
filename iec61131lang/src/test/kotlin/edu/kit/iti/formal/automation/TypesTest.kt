@@ -5,36 +5,31 @@ import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import org.antlr.v4.runtime.ANTLRFileStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
-import org.junit.Assert
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
-import java.io.IOException
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import java.util.*
 
-
-@RunWith(Parameterized::class)
-class TypesTest(val testFile: String) {
-    @Test
-    @Throws(IOException::class)
-    fun testParser() {
+class TypesTest {
+    @ParameterizedTest
+    @MethodSource("getTypeTests")
+    fun testParser(testFile: String) {
         val lexer = IEC61131Lexer(ANTLRFileStream(testFile))
         val parser = IEC61131Parser(CommonTokenStream(lexer))
         parser.data_type_declaration()
-        Assert.assertEquals(0, parser.numberOfSyntaxErrors.toLong())
+        Assertions.assertEquals(0, parser.numberOfSyntaxErrors.toLong())
     }
 
-    @Test
-    @Throws(IOException::class)
-    fun testCopy() {
+    @ParameterizedTest
+    @MethodSource("getTypeTests")
+    fun testCopy(testFile: String) {
         val ast = IEC61131Facade.file(CharStreams.fromFileName(testFile))
-        Assert.assertEquals(ast, ast.clone())
+        Assertions.assertEquals(ast, ast.clone())
     }
 
     companion object {
         @JvmStatic
-        @Parameterized.Parameters(name = "{0}")
-        fun get(): ArrayList<Array<Any>> {
+        fun getTypeTests(): ArrayList<Array<Any>> {
             val resources = ProgramTest.getResources("edu/kit/iti/formal/automation/st/types")
             val list = ArrayList<Array<Any>>()
             for (f in resources!!) {

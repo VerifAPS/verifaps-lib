@@ -4,8 +4,9 @@ import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration
 import edu.kit.iti.formal.automation.st.ast.TypeDeclarations
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import org.antlr.v4.runtime.CharStreams
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 import java.util.*
 
 /**

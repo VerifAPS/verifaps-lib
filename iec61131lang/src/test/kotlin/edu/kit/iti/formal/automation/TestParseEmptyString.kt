@@ -25,8 +25,8 @@ package edu.kit.iti.formal.automation
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import org.antlr.v4.runtime.CharStreams
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+ import org.junit.jupiter.api.Test
 
 /**
  * @author Philipp Krüger
@@ -35,6 +35,6 @@ class TestParseEmptyString {
     @Test//(expected = ErrorReporter.IEC61131ParserException.class)
     fun testParseEmptyString() {
         val tle = IEC61131Facade.file(CharStreams.fromString(""))
-        Assert.assertEquals(0, tle.size.toLong())
+        Assertions.assertEquals(0, tle.size.toLong())
     }
 }

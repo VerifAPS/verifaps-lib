@@ -24,8 +24,8 @@ package edu.kit.iti.formal.automation
 
 import edu.kit.iti.formal.automation.datatypes.values.TimeData
 import edu.kit.iti.formal.automation.st.ast.Literal
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+ import org.junit.jupiter.api.Test
 
 /**
  * @author Alexander Weigl
@@ -36,7 +36,7 @@ class TimeLiteralTest {
     fun test1() {
         val literal = IEC61131Facade.expr("TIME#1s500ms") as Literal
         val value = literal.asValue()
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 TimeData(1500.0).internal,
                 (value?.value as TimeData).internal)
     }

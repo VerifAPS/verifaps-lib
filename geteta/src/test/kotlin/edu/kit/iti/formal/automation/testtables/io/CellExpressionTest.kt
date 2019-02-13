@@ -28,15 +28,20 @@ import edu.kit.iti.formal.automation.testtables.model.ParseContext
 import edu.kit.iti.formal.automation.testtables.model.ProgramVariable
 import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.SVariable
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
+import org.junit.jupiter.api.DynamicTest
+import org.junit.jupiter.api.TestFactory
 
 /**
  * Created by weigl on 15.12.16.
  */
-@RunWith(Parameterized::class)
-class CellExpressionTest(private var expr: String) {
+object CellExpressionTest {
+    @TestFactory
+    fun createExpressionTests(): List<DynamicTest> {
+        return CASES.map {
+            DynamicTest.dynamicTest(it) { parse(it) }
+        }
+    }
+
     private val gtt: GeneralizedTestTable
     private val pc: ParseContext
 
@@ -45,41 +50,32 @@ class CellExpressionTest(private var expr: String) {
         pc = gtt.parseContext
     }
 
-    @Test
-    fun parse() {
+    fun parse(expr: String) {
         val v = SVariable.create("Q").withSigned(16)
         val e = GetetaFacade.exprToSMV(expr, v, 0, pc)
         println(e)
     }
 
-    companion object {
-        internal fun defaultTestTable(run: Int = 0): GeneralizedTestTable {
-            val gtt = GeneralizedTestTable()
-            gtt.add(iovar("a", "input", run))
-            gtt.add(iovar("a", "input", 1))
-            gtt.add(iovar("b", "input", run))
-            gtt.add(iovar("c", "input", run))
-            gtt.add(iovar("d", "input", run))
-            gtt.ensureProgramRuns()
-            return gtt
-        }
-
-        private fun iovar(name: String, io: String, run: Int) =
-                ProgramVariable(name, INT, SMVTypes.signed(16),
-                        if (io == "input") IoVariableType.INPUT else IoVariableType.OUTPUT,
-                        run)
-
-        val CASES = arrayOf(">2",
-                "<52152343243214234", "!=6", "<>-16134", "-243261", "a",
-                "a+b", "(a)+(((b+c)+d))/2", "convert(a,2)", "TRUE", "true", "false",
-                "FALSE", "a[-5]", "[2+2, 6]", "[-61+2, -61]",
-                "0|>a", "0\$a + |>a", "·"
-        )
-
-        @JvmStatic
-        @Parameterized.Parameters(name = "{0}")
-        fun genTests(): List<Array<Any>> {
-            return CASES.map { s -> arrayOf<Any>(s) }
-        }
+    internal fun defaultTestTable(run: Int = 0): GeneralizedTestTable {
+        val gtt = GeneralizedTestTable()
+        gtt.add(iovar("a", "input", run))
+        gtt.add(iovar("a", "input", 1))
+        gtt.add(iovar("b", "input", run))
+        gtt.add(iovar("c", "input", run))
+        gtt.add(iovar("d", "input", run))
+        gtt.ensureProgramRuns()
+        return gtt
     }
+
+    private fun iovar(name: String, io: String, run: Int) =
+            ProgramVariable(name, INT, SMVTypes.signed(16),
+                    if (io == "input") IoVariableType.INPUT else IoVariableType.OUTPUT,
+                    run)
+
+    val CASES = arrayOf(">2",
+            "<52152343243214234", "!=6", "<>-16134", "-243261", "a",
+            "a+b", "(a)+(((b+c)+d))/2", "convert(a,2)", "TRUE", "true", "false",
+            "FALSE", "a[-5]", "[2+2, 6]", "[-61+2, -61]",
+            "0|>a", "0\$a + |>a", "·"
+    )
 }

@@ -22,33 +22,36 @@ package edu.kit.iti.formal.automation.testtables.io
 import edu.kit.iti.formal.automation.testtables.apps.Geteta
 import edu.kit.iti.formal.automation.testtables.apps.GetetaApp
 import edu.kit.iti.formal.util.findProgram
-import org.junit.Assert
-import org.junit.Assume
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assumptions
+import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
 import java.io.File
-import java.io.IOException
 import java.util.*
 
 /**
  * @author Alexander Weigl
  * @version 1 (02.02.18)
  */
-@RunWith(Parameterized::class)
-class FullStackTest(
-        var workingDir: String,
-        var args: Array<String>,
-        var status: String) {
+object FullStackTest {
+    private var NUXMV = (System.getenv() as Map<String, String>).getOrDefault("NUXMV", "nuXmv")
 
-    @Test
-    fun testIntern() {
+    /*var workingDir: String,
+    var args: Array<String>,
+    var status: String*/
+
+    @ParameterizedTest
+    @ArgumentsSource(TestArguments::class)
+    fun testIntern(workingDir: String, args: Array<String>, status: String) {
         GetetaApp().main(args)
     }
 
-    @Test
-    @Throws(IOException::class, InterruptedException::class)
-    fun testExtern() {
+    @ParameterizedTest
+    @ArgumentsSource(TestArguments::class)
+    fun testExtern(workingDir: String, args: Array<String>, status: String) {
         val javaHome = System.getProperty("java.home")
         val javaBin = javaHome +
                 File.separator + "bin" +
@@ -65,7 +68,7 @@ class FullStackTest(
                 .directory(File(workingDir).absoluteFile)
         val nuxmv = findProgram(NUXMV)
 
-        Assume.assumeNotNull(nuxmv)
+        Assumptions.assumeTrue(nuxmv != null)
 
         builder.environment()["NUXMV"] = nuxmv!!.absolutePath
         val process = builder.start()
@@ -76,43 +79,41 @@ class FullStackTest(
 
         process.errorStream.copyTo(System.err)
 
-        Assert.assertEquals(0, process.exitValue().toLong())
+        Assertions.assertEquals(0, process.exitValue().toLong())
         println(output)
-        Assert.assertTrue(output.endsWith("STATUS: $status"))
+        Assertions.assertTrue(output.endsWith("STATUS: $status"))
     }
 
-    companion object {
-        private val CASES = ArrayList<Array<Any>>()
-        var NUXMV: String
+
+    data class TestArgument(var wd: String, var status: String, var args: Array<String>) : Arguments {
+        override fun get(): Array<Any> = arrayOf(wd, args, status)
+    }
+
+    object TestArguments : ArgumentsProvider {
+        private val CASES = ArrayList<TestArgument>()
 
         init {
             addCase("examples/constantprogram", "verified",
-                    "-t constantprogram.xml -c constantprogram.st")
+                    "-t", "constantprogram.xml", "-c", "constantprogram.st")
 
             addCase("examples/constantprogram", "not-verified",
-                    "-t constantprogram_broken.xml -c constantprogram.st")
+                    "-t", "constantprogram_broken.xml", "-c", "constantprogram.st")
 
             addCase("examples/constantprogram", "not-verified",
-                    "-t constantprogram_concrete.xml -c constantprogram.st")
+                    "-t", "constantprogram_concrete.xml", "-c", "constantprogram.st")
 
             addCase("examples/cycles", "verified",
-                    "-t cycles.xml -c cycles.st")
+                    "-t", "cycles.xml", "-c", "cycles.st")
 
             addCase("examples/cycles", "not-verified",
-                    "-t cycles_wrong.xml -c cycles.st")
-
-            NUXMV = (System.getenv() as Map<String, String>).getOrDefault("NUXMV", "nuXmv")
+                    "-t", "cycles_wrong.xml", "-c", "cycles.st")
         }
 
-        private fun addCase(wd: String, status: String, args: String) {
-            CASES.add(arrayOf(wd, args.split(" ".toRegex())
-                    .dropLastWhile { it.isEmpty() }.toTypedArray(), status))
+        private fun addCase(wd: String, status: String, vararg args: String) {
+            CASES += TestArgument(wd, status, args as Array<String>)
         }
 
-        @JvmStatic
-        @Parameterized.Parameters(name = "{0}")
-        fun args(): Collection<Array<Any>> {
-            return CASES
-        }
+        override fun provideArguments(context: ExtensionContext?) = CASES.stream()
     }
 }
+

@@ -25,8 +25,8 @@ package edu.kit.iti.formal.automation.testtables.io
 
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.algorithms.OmegaSimplifier
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+ import org.junit.jupiter.api.Test
 import javax.xml.bind.JAXBException
 
 /**
@@ -38,7 +38,7 @@ class OmegaSimplifierTest {
     @Throws(Exception::class)
     fun run_omga_simplify1() {
         val ignored = test("simplify1.xml")
-        Assert.assertEquals("s05, s06, s07, s08", ignored)
+        Assertions.assertEquals("s05, s06, s07, s08", ignored)
     }
 
 
@@ -54,14 +54,14 @@ class OmegaSimplifierTest {
     @Throws(Exception::class)
     fun run_omga_simplify2() {
         val ignored = test("simplify2.xml")
-        Assert.assertEquals("s06, s07, s08, s09", ignored)
+        Assertions.assertEquals("s06, s07, s08, s09", ignored)
     }
 
     @Test
     @Throws(Exception::class)
     fun run_omga_simplify3() {
         val ignored = test("simplify3.xml")
-        Assert.assertEquals("s22, s23, s24", ignored)
+        Assertions.assertEquals("s22, s23, s24", ignored)
     }
 
 }

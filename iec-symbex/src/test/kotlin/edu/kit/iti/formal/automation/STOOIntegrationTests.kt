@@ -30,8 +30,8 @@ import edu.kit.iti.formal.automation.st.ast.PouElements;
 import edu.kit.iti.formal.automation.stoo.STOOSimplifier;
 import edu.kit.iti.formal.automation.visitors.Utils;
 import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+ import org.junit.jupiter.api.Test;
+;
 import org.junit.runners.Parameterized;
 
 import java.io.File;
@@ -97,7 +97,7 @@ public class STOOIntegrationTests {
         Collections.sort(st1Actual);
         Collections.sort(st1Expected);
 
-        Assert.assertEquals(IEC61131Facade.INSTANCE.printf(st1Expected), IEC61131Facade.INSTANCE.printf(st1Actual));
+        Assertions.assertEquals(IEC61131Facade.INSTANCE.printf(st1Expected), IEC61131Facade.INSTANCE.printf(st1Actual));
     }
 }
 */

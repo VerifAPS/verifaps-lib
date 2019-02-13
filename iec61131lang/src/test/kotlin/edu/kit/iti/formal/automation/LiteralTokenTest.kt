@@ -24,33 +24,22 @@ package edu.kit.iti.formal.automation
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import org.antlr.v4.runtime.ANTLRInputStream
-import org.junit.Assert
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 /**
  * Created by weigl on 15.12.16.
  */
-@RunWith(Parameterized::class)
-class LiteralTokenTest(var expr: String) {
-    @Test
-    fun testTokens() {
+object LiteralTokenTest {
+    @ParameterizedTest
+    @ValueSource(strings = arrayOf("47474.759",
+            "LWORD#2#11010", "0.456_262", "1.34E-12", "1e1", "1.34e1",
+            "T#5d14h12m18s5ms", "T#5d_14h_12m_18s_5ms", "TIME#5d_14h_12m_5ms"))
+    fun testTokens(expr: String) {
         val lexer = IEC61131Lexer(ANTLRInputStream(expr!!))
         val toks = lexer.allTokens
         println(toks)
-        Assert.assertEquals(1, toks.size.toLong())
-    }
-
-    companion object {
-        internal var CASES = arrayOf(
-                //"LWORD#2#22020",
-                "47474.759", "LWORD#2#11010", "0.456_262", "1.34E-12", "1e1", "1.34e1", "T#5d14h12m18s5ms", "T#5d_14h_12m_18s_5ms", "TIME#5d_14h_12m_5ms")
-
-        @JvmStatic
-        @Parameterized.Parameters(name = "{0}")
-        fun data(): Collection<Array<Any>> {
-            return TestUtils.asParameters(CASES)
-        }
+        Assertions.assertEquals(1, toks.size.toLong())
     }
 }

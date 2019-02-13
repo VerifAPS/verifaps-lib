@@ -8,12 +8,12 @@ import edu.kit.iti.formal.automation.datatypes.values.FALSE
 import edu.kit.iti.formal.automation.datatypes.values.TRUE
 import edu.kit.iti.formal.automation.datatypes.values.VAnyEnum
 import edu.kit.iti.formal.automation.datatypes.values.VAnyInt
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeAll
 
 class RuntimeTest {
-    @Before
+    @BeforeAll
     fun setUp() {
         //System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE")
     }

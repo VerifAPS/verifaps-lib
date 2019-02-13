@@ -26,9 +26,9 @@ import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.smv.ast.SVariable
 import org.antlr.v4.runtime.CharStreams
-import org.junit.Assert
-import org.junit.Assume
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assumptions
+import org.junit.jupiter.api.Test
 import java.io.IOException
 
 /**
@@ -40,7 +40,7 @@ class FacadeTest {
     @Throws(IOException::class)
     fun testEvaluateFunction() {
         val resource = javaClass.getResourceAsStream("/edu/kit/iti/formal/automation/st/func_sel.st")
-        Assume.assumeNotNull(resource)
+        Assumptions.assumeTrue(null != resource)
         val (toplevels, error) = IEC61131Facade.fileResolve(CharStreams.fromStream(resource))
         val func = toplevels[0] as FunctionDeclaration
         val state = SymbExFacade.evaluateFunction(func,
@@ -48,8 +48,8 @@ class FacadeTest {
                 SVariable.create("b").asBool(),
                 SVariable.create("c").asBool())
         //System.out.println(state);
-        Assert.assertNotEquals(null, state)
-        Assert.assertEquals(
+        Assertions.assertNotEquals(null, state)
+        Assertions.assertEquals(
                 "case \n" +
                         "a : b; TRUE : c; \n" +
                         "esac",
@@ -64,6 +64,6 @@ class FacadeTest {
         val module = SymbExFacade.evaluateProgram(toplevels[2] as ProgramDeclaration)
         println(module)
         //System.out.println(state);
-        //Assert.assertEquals();
+        //Assertions.assertEquals();
     }
 }

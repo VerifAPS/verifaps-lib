@@ -2,7 +2,7 @@ import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.modularization.CallSiteFinder
 import edu.kit.iti.formal.automation.visitors.Utils
 import org.antlr.v4.runtime.CharStreams
-import org.junit.Test
+ import org.junit.jupiter.api.Test
 
 /**
  * @author Alexander Weigl

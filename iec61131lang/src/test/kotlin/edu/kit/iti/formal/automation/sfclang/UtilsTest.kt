@@ -22,8 +22,8 @@ package edu.kit.iti.formal.automation.sfclang
  * #L%
  */
 
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+ import org.junit.jupiter.api.Test
 
 /**
  * @author Alexander Weigl
@@ -34,18 +34,18 @@ class UtilsTest {
     @Throws(Exception::class)
     fun split1() {
         val (dt, radix, value) = split("abc#12#111")
-        Assert.assertEquals("abc", dt)
-        Assert.assertEquals(12, radix)
-        Assert.assertEquals("111", value)
+        Assertions.assertEquals("abc", dt)
+        Assertions.assertEquals(12, radix)
+        Assertions.assertEquals("111", value)
     }
 
     @Test
     @Throws(Exception::class)
     fun split2() {
         val (dt, r, v) = split("12#111")
-        Assert.assertFalse(dt != null)
-        Assert.assertEquals(12, r)
-        Assert.assertEquals("111", v)
+        Assertions.assertFalse(dt != null)
+        Assertions.assertEquals(12, r)
+        Assertions.assertEquals("111", v)
     }
 
 
@@ -54,10 +54,10 @@ class UtilsTest {
     fun split3() {
         val a = split("abc#def")
         System.out.println(a)
-        Assert.assertTrue(a.prefix != null)
-        Assert.assertFalse(a.ordinal != null)
-        Assert.assertEquals("abc", a.prefix)
-        Assert.assertEquals("def", a.value)
+        Assertions.assertTrue(a.prefix != null)
+        Assertions.assertFalse(a.ordinal != null)
+        Assertions.assertEquals("abc", a.prefix)
+        Assertions.assertEquals("def", a.value)
     }
 
 }

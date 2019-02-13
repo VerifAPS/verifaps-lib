@@ -25,8 +25,8 @@ import edu.kit.iti.formal.automation.datatypes.AnyInt
 import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.datatypes.UINT
 import edu.kit.iti.formal.automation.datatypes.values.VAnyInt
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 import java.math.BigInteger
 
 class OperationEvaluatorTest {

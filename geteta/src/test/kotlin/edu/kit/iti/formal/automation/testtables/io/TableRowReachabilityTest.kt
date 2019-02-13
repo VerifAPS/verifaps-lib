@@ -23,9 +23,8 @@ import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.algorithms.StateReachability
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.TableRow
-import org.junit.After
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import javax.xml.bind.JAXBException
 
 /**
@@ -33,26 +32,20 @@ import javax.xml.bind.JAXBException
  * @version 1 (02.02.18)
  */
 class TableRowReachabilityTest {
-    @After
-    fun reporting() {
-    }
-
     @Test
-    @Throws(JAXBException::class)
     fun testReachabilityDetWait1() {
         val gtt = GetetaFacade.parseTableXML("src/test/resources/detwait/detwait1.xml")
         val out = getReachabilityString(gtt)
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "s01#(s02)\ns02#(END)", out)
     }
 
     @Test
-    @Throws(JAXBException::class)
     fun testReachabilityDetWait2() {
         val gtt = GetetaFacade.parseTableXML("src/test/resources/detwait/detwait2.xml")
         val out = getReachabilityString(gtt)
         println(out)
-        Assert.assertEquals("s01#(s02,s03)\n" +
+        Assertions.assertEquals("s01#(s02,s03)\n" +
                 "s02#(s03)\n" +
                 "s03#(END)", out)
     }
@@ -63,7 +56,7 @@ class TableRowReachabilityTest {
         val gtt = GetetaFacade.parseTableXML("src/test/resources/detwait/detwait3.xml")
         val out = getReachabilityString(gtt)
         println(out)
-        Assert.assertEquals("s01#(s02,s03,s04,s05,s06)\n" +
+        Assertions.assertEquals("s01#(s02,s03,s04,s05,s06)\n" +
                 "s02#(s03,s04,s05,s06)\n" +
                 "s03#(s04,s05,s06)\n" +
                 "s04#(s05,s06)\n" +
@@ -78,7 +71,7 @@ class TableRowReachabilityTest {
         val gtt = GetetaFacade.parseTableXML("src/test/resources/omega/reachability1.xml")
         val out = getReachabilityString(gtt)
         println(out)
-        Assert.assertEquals("s01#(s02)\n" +
+        Assertions.assertEquals("s01#(s02)\n" +
                 "s02#(s03,s04)\n" +
                 "s03#(s04)\n" +
                 "s04#()", out)
@@ -90,7 +83,7 @@ class TableRowReachabilityTest {
         val gtt = GetetaFacade.parseTableXML("src/test/resources/reachability/reachability1.xml")
         val out = getReachabilityString(gtt)
         println(out)
-        Assert.assertEquals("s01#(s02)\n" +
+        Assertions.assertEquals("s01#(s02)\n" +
                 "s02#(s03,s04)\n" +
                 "s03#(s04)\n" +
                 "s04#(END)", out)
@@ -102,7 +95,7 @@ class TableRowReachabilityTest {
         val gtt = GetetaFacade.parseTableXML("src/test/resources/reachability/reachability4.xml")
         val out = getReachabilityString(gtt)
         println(out)
-        Assert.assertEquals("s01#(s03)\n" +
+        Assertions.assertEquals("s01#(s03)\n" +
                 "s03#(s05)\n" +
                 "s05#(s03,s07)\n" +
                 "s07#(s05,s09)\n" +
@@ -118,7 +111,7 @@ class TableRowReachabilityTest {
         val gtt = GetetaFacade.parseTableXML("src/test/resources/reachability/reachability2.xml")
         val out = getReachabilityString(gtt)
         println(out)
-        Assert.assertEquals("s01#(s02,s03,s04)\n" +
+        Assertions.assertEquals("s01#(s02,s03,s04)\n" +
                 "s02#(s03,s04)\n" +
                 "s03#(s04)\n" +
                 "s04#(END)", out)
@@ -130,7 +123,7 @@ class TableRowReachabilityTest {
         val gtt = GetetaFacade.parseTableXML("src/test/resources/reachability/reachability3.xml")
         val out = getReachabilityString(gtt)
         println(out)
-        Assert.assertEquals("s01#(s07)\n" +
+        Assertions.assertEquals("s01#(s07)\n" +
                 "s07#(s07,s08)\n" +
                 "s08#(s09,s10)\n" +
                 "s09#(s10)\n" +
@@ -144,7 +137,7 @@ class TableRowReachabilityTest {
         val gtt = GetetaFacade.parseTableXML("src/test/resources/reachability/reachability5.xml")
         val out = getReachabilityString(gtt)
         println(out)
-        Assert.assertEquals("s01#(s03)\n" +
+        Assertions.assertEquals("s01#(s03)\n" +
                 "s03#(s03,s04)\n" +
                 "s04#(END)", out)
     }

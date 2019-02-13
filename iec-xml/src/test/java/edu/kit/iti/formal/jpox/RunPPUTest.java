@@ -24,7 +24,7 @@ package edu.kit.iti.formal.jpox;
 
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade;
 import org.jdom2.JDOMException;
-import org.junit.Test;
+ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;

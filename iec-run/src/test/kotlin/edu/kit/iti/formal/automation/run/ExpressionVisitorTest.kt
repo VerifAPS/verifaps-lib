@@ -9,8 +9,8 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.AssignmentStatement
 import edu.kit.iti.formal.automation.st.util.AstVisitor
 import edu.kit.iti.formal.automation.visitors.Visitable
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 class ExpressionVisitorTest {
     @Test
@@ -33,6 +33,6 @@ class ExpressionVisitorTest {
                 .zip(arrayOf(VBool(AnyBit.BOOL, true),
                         VAnyInt(INT, -19),
                         VAnyInt(INT, 3)))
-                .forEach { (a, b) -> Assert.assertEquals(a, b) }
+                .forEach { (a, b) -> Assertions.assertEquals(a, b) }
     }
 }

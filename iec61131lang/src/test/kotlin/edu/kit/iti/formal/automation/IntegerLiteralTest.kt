@@ -25,54 +25,46 @@ package edu.kit.iti.formal.automation
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
 import edu.kit.iti.formal.automation.st.ast.IntegerLit
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+
 import java.util.*
 
 /**
  * @author Alexander Weigl
  * @version 1 (03.03.17)
  */
-@RunWith(Parameterized::class)
-class IntegerLiteralTest(
-        var input: String,
-        var literalDataType: AnyDt,
-        var value: Long,
-        var valueDataType: AnyDt,
-        var explicit: Boolean) {
-
+object IntegerLiteralTest {
     private fun getLiteral(s: String?) =
             IEC61131Facade.getParser(s!!).constant().accept(IECParseTreeToAST()) as IntegerLit
 
-    @Test
-    fun testIntegerLiteral() {
+    @ParameterizedTest
+    @MethodSource("integers")
+    fun testIntegerLiteral(input: String, literalDataType: AnyDt, value: Long,
+                           valueDataType: AnyDt, explicit: Boolean) {
         val p = getLiteral(input)
         println(p)
-        //Assert.assertEquals(literalDataType, p.dataType.obj)
-        //Assert.assertEquals(input, p.)
-        //Assert.assertEquals(
+        //Assertions.assertEquals(literalDataType, p.dataType.obj)
+        //Assertions.assertEquals(input, p.)
+        //Assertions.assertEquals(
         //        BigInteger.valueOf(value),
         //        p.asValue().getValue());
-        //Assert.assertEquals(
+        //Assertions.assertEquals(
         //        valueDataType, p.asValue().getDataType());
     }
 
-    companion object {
-        @JvmStatic
-        @Parameterized.Parameters(name = "{0}")
-        fun integers(): Iterable<Array<Any>> {
-            return Arrays.asList(
-                    arrayOf("16#F", ANY_INT, 15, USINT, false),
-                    arrayOf("-16#F", ANY_INT, -15, SINT, false),
-                    arrayOf("16#FFFFFDABC", ANY_INT, 68719467196L, LINT, false),
-                    arrayOf("8#71164424", ANY_INT, 15001876, DINT, false),
-                    arrayOf("SINT#16#F", SINT, 15, SINT, true),
-                    arrayOf("-UINT#16#F", UINT, -15, SINT, true),
-                    arrayOf("70000", ANY_INT, 70000, DINT, false),
-                    arrayOf("-1", ANY_INT, -1, INT, false)
-            )
-        }
+    @JvmStatic
+    fun integers(): Iterable<Array<Any>> {
+        return Arrays.asList(
+                arrayOf("16#F", ANY_INT, 15, USINT, false),
+                arrayOf("-16#F", ANY_INT, -15, SINT, false),
+                arrayOf("16#FFFFFDABC", ANY_INT, 68719467196L, LINT, false),
+                arrayOf("8#71164424", ANY_INT, 15001876, DINT, false),
+                arrayOf("SINT#16#F", SINT, 15, SINT, true),
+                arrayOf("-UINT#16#F", UINT, -15, SINT, true),
+                arrayOf("70000", ANY_INT, 70000, DINT, false),
+                arrayOf("-1", ANY_INT, -1, INT, false)
+        )
     }
-
 }

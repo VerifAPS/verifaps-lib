@@ -2,8 +2,8 @@ package edu.kit.iti.formal.automation.smt
 
 import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVAst
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+ import org.junit.jupiter.api.Test
 
 /**
  * @author Alexander Weigl
@@ -20,6 +20,6 @@ class Smv2SmtVisitorTest {
         val v = Smv2SmtVisitor(fnTranslator = DefaultS2SFunctionTranslator(), dtTranslator = DefaultS2STranslator(),
                 statePrefix = "")
         val res = smv.accept(v)
-        Assert.assertEquals(exp, res.toString())
+        Assertions.assertEquals(exp, res.toString())
     }
 }

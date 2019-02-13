@@ -22,9 +22,9 @@
 package edu.kit.iti.formal.automation.rvt
 
 import edu.kit.iti.formal.smv.NuXMVOutput
-import org.junit.Assert
-import org.junit.Assume
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assumptions.assumeFalse
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alexander Weigl
@@ -45,12 +45,12 @@ class RvtAppTest {
             var p = pb.start()
             p.waitFor()
         } catch (e: Exception) {
-            Assume.assumeFalse(true)
+            assumeFalse(true)
         }
     }
 
     @Test
-    fun testVerifyCasesIf(): Unit {
+    fun testVerifyCasesIf() {
         assumeNuxmv()
         val old = "caseif_old"
         val new = "caseif_new"
@@ -64,6 +64,6 @@ class RvtAppTest {
                 "--new", "src/test/resources/$new.st")
         )
         app.run()
-        Assert.assertEquals(NuXMVOutput.Verified, app.nuxmvResult);
+        assertEquals(NuXMVOutput.Verified, app.nuxmvResult);
     }
 }
