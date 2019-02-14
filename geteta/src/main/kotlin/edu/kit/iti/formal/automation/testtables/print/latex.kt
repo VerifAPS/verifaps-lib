@@ -51,6 +51,8 @@ class LatexTablePrinter(gtt: GeneralizedTestTable,
     val markCounter = Counter()
     val lastTikzMarkColumn = HashMap<String, Int>()
 
+    init{init()}
+
     override fun printPreamble() {
         stream.printf("\\documentclass{standalone}\n")
         options.customStyFile.joinTo(stream) { "\\usepackage{$it}\n" }

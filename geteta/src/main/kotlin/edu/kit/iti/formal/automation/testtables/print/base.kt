@@ -124,17 +124,16 @@ class Counter {
 abstract class AbstractTablePrinter(protected val gtt: GeneralizedTestTable,
                                     protected val stream: CodeWriter) : TablePrinter {
 
-    protected var helper: PrinterHelper
+    protected lateinit var helper: PrinterHelper
     protected var currentRow = 0
     val input = gtt.programVariables.filter { it.isInput }
     val output = gtt.programVariables.filter { it.isOutput }
     val durations = Stack<Pair<Duration, Int>>()
     val depth = gtt.region.depth()
 
-    init {
+    fun init() {
         helper = PrinterHelper(gtt, this::cellFormatter)
     }
-
 
     override fun printPreamble() {}
     override fun printPostamble() {}

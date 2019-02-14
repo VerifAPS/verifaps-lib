@@ -37,18 +37,22 @@ class HtmlTablePrinterOptions {
 class HTMLTablePrinter(gtt: GeneralizedTestTable, stream: CodeWriter,
                        val options: HtmlTablePrinterOptions = HtmlTablePrinterOptions()
 ) : AbstractTablePrinter(gtt, stream) {
+    init {
+        init()
+    }
+
     override fun contentBegin() {
     }
 
     override fun tableBegin() {
         val inputVars =
-                input.joinToString {
-                    """<th class="varheader input">${it.name}</th>\n"""
+                input.joinToString(" ") {
+                    """<th class="varheader input">${it.name}</th>"""
                 }
 
         val outputVars =
-                output.joinToString {
-                    """<th class="varheader output">${it.name}</th>\n"""
+                output.joinToString(" ") {
+                    """<th class="varheader output">${it.name}</th>"""
                 }
 
         stream.println("""
@@ -115,15 +119,17 @@ class HTMLTablePrinter(gtt: GeneralizedTestTable, stream: CodeWriter,
     }
 
     override fun printPreamble() {
+        val style = javaClass.getResourceAsStream("/gtt-basic.css").bufferedReader().readText()
+
         stream.println("""
             <html>
                 <head>
-                    <attributes>
-                    </attributes>
-                    <link rel="stylesheet" href="gtt-attributes.css"/>
+                    <style>
+                        $style
+                    </style>
+                    <link rel="stylesheet" href="gtt-user.css"/>
                 </head>
-                <body>
-        """.trimIndent())
+                <body>""".trimIndent())
 
     }
 
@@ -219,7 +225,7 @@ class HtmlExprPrinter(val options: HtmlTablePrinterOptions) : TestTableLanguageB
                 .joinToString("\n") { (a, b) ->
                     a.accept(this) + "::" + b.accept(this)
                 }
-        return """if\ n${body}\nfi"""
+        return """if\n${body}\nfi"""
     }
 }
 

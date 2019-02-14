@@ -8,8 +8,6 @@
 
 ;;COMMENT      : "/*" .*? "*/" -> channel(HIDDEN);
 
-
-
 (setq -test-table-mode-font-lock
       (let* ((keywords '("relational" "table" "options"
                          ">>" "_p"
@@ -28,7 +26,7 @@
              (bconstant-re (regexp-opt bconstant 'words))
              (operators-re (regexp-opt operators 'words))
              (seperators-re (regexp-opt seperators 'words))
-             (number-re (rx (+ (any num) (? "." (any num)) (? (any "eE") (any num)))))
+             (number-re (rx bow (+ (any num) (? "." (any num)) (? (any "eE") (any num))) eow))
              (line-comment-re (rx "//" (* nonl) eol)))
 
         (let* ((identifier-plain
@@ -54,10 +52,33 @@
 
 ;;COMMENT      : "/*" .*? "*/" -> channel(HIDDEN);
 
-(defvar test-table-mode-map nil "")
+(defcustom test-table-mode-ttprint
+  "/home/weigl/work/verifaps-lib/casestudies/build/install/casestudies/bin/ttprint"
+  "Path to the test table print command")
+
+(require 'eww)
+
+(defun test-table-mode-preview ()
+  "."
+  (interactive)
+  (save-buffer)
+  (let* ((buffer (current-buffer))
+         (filename (buffer-file-name))
+         (html-file (concat filename ".html")))
+
+    (let ((process (start-process
+                    "*ttprint*" html-file
+                    test-table-mode-ttprint
+                    "--format" "html"
+                    "--output" html-file
+                    "--standalone" filename)))
+      (eww-open-file html-file))))
+
+(defvar test-table-mode-map nil ".")
 (progn
   (setq test-table-mode-map (make-sparse-keymap))
-  (define-key test-table-mode-map (kbd "C-c C-a") #'(lambda () (message "test"))))
+  (define-key test-table-mode-map (kbd "C-c C-a")
+    #'test-table-mode-preview))
 
 ;;"{" "}"
 ;;"(" ")"
@@ -90,12 +111,12 @@
   :syntax-table test-table-mode-syntax-table
 
   (setq-local comment-start "/*")
-  (setq-local comment-end "*)")
+  (setq-local comment-end "*/")
   (setq-local font-lock-defaults '(-test-table-mode-font-lock nil nil)) ;set CASE-FOLD t
   (message "test-table-mode executed")
   )
 
-(add-to-list 'auto-mode-alist  '(".tt.txt\\'" . test-table-mode))
+(add-to-list 'auto-mode-alist  '(".tt.txt\\'" . test-table-mode) '(".gtt\\'" . test-table-mode))
 
 
 (provide 'test-table-mode)

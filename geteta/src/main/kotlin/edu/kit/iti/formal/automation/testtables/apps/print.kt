@@ -34,7 +34,7 @@ class PrinterApp : CliktCommand() {
     val output by option("--output",
             metavar = "FILE",
             help = "Print output to the given file.")
-            .file(writable = true)
+            .file()
 
     val standalone by option("--standalone", help = "Standalone version (include preamble/postamble)")
             .flag(default = true)

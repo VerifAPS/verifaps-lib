@@ -112,6 +112,10 @@ class TextTablePrinter(gtt: GeneralizedTestTable,
     lateinit var grid: Array<Array<Cell>>
     var column = 0
 
+    init {
+        init()
+    }
+
     override fun cellFormatter(c: TestTableLanguageParser.CellContext): String = c.text
 
     override fun tableBegin() {
