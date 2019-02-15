@@ -28,7 +28,7 @@ public class RunPPUTest {
     private void test(String location) throws URISyntaxException, IOException {
         URL res = getClass().getResource(location);
         Assumptions.assumeTrue(res != null);
-        String out = IECXMLFacade.INSTANCE.extractPLCOpenXml(res.openStream());
+        String out = IECXMLFacade.INSTANCE.extractPLCOpenXml(res);
         System.out.println(out);
     }
 }

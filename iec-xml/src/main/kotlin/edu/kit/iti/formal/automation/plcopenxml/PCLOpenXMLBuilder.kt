@@ -35,13 +35,13 @@ import org.jdom2.xpath.XPathFactory
 import org.xml.sax.Attributes
 import org.xml.sax.SAXException
 import java.io.IOException
-import java.io.Reader
+import java.net.URL
 import java.util.*
 
 /**
  * Created by weigl on 23/06/14.
  */
-class PCLOpenXMLBuilder(private val stream: Reader, private val writer: CodeWriter) {
+class PCLOpenXMLBuilder(private val stream: URL, private val writer: CodeWriter) {
     lateinit var document: Document
 
     val pous: List<Element> by lazy {
