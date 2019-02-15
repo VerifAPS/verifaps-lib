@@ -828,7 +828,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             cc = CaseCondition.Range(Range(r.start, r.stop))
         }
         if (ctx.cast() != null) {
-            cc = CaseCondition.Enumeration(ctx.cast().accept(this) as Literal)
+            cc = CaseCondition.Enumeration(ctx.cast().accept(this) as EnumLit)
         }
         cc!!.ruleContext = ctx
         return cc

@@ -1319,8 +1319,8 @@ abstract class CaseCondition() : Top() {
         }
     }
 
-    data class Enumeration(var start: Literal, var stop: Literal? = null) : CaseCondition() {
-        constructor(start: Literal) : this(start, start)
+    data class Enumeration(var start: EnumLit, var stop: EnumLit? = null) : CaseCondition() {
+        constructor(start: EnumLit) : this(start, start)
 
         override fun <T> accept(visitor: Visitor<T>): T {
             return visitor.visit(this)

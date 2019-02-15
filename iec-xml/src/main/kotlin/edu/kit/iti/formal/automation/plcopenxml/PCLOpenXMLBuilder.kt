@@ -34,15 +34,14 @@ import org.jdom2.input.sax.SAXHandlerFactory
 import org.jdom2.xpath.XPathFactory
 import org.xml.sax.Attributes
 import org.xml.sax.SAXException
-import java.io.File
 import java.io.IOException
+import java.io.Reader
 import java.util.*
 
 /**
  * Created by weigl on 23/06/14.
  */
-class PCLOpenXMLBuilder(private val filename: File, private val writer: CodeWriter) {
-
+class PCLOpenXMLBuilder(private val stream: Reader, private val writer: CodeWriter) {
     lateinit var document: Document
 
     val pous: List<Element> by lazy {
@@ -65,13 +64,13 @@ class PCLOpenXMLBuilder(private val filename: File, private val writer: CodeWrit
     private fun loadXml(): Document {
         val saxBuilder = SAXBuilder()
         saxBuilder.saxHandlerFactory = FACTORY
-        return saxBuilder.build(filename)
+        return saxBuilder.build(stream)
     }
 
     @Throws(JDOMException::class, IOException::class)
     fun build() {
         document.rootElement.namespace = Namespace.NO_NAMESPACE
-        writer.printf("// Extracted from %s on %s%n%n", filename, Date())
+        writer.printf("// Extracted from %s on %s%n%n", stream, Date())
         DataTypeExtractor(dataTypes, writer).run()
         PouExtractor(pous, writer).run()
     }

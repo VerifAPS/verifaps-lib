@@ -59,12 +59,28 @@ object IEC61131Facade {
     }
 
     fun statements(input: String): StatementList = statements(CharStreams.fromString(input))
-    fun file(path: Path): PouElements = file(CharStreams.fromPath(path))
+
     fun file(input: CharStream): PouElements {
         val parser = getParser(input)
         val tle = parser.start().accept(IECParseTreeToAST()) as PouElements
         parser.errorReporter.throwException()
         return tle
+    }
+
+
+    fun file(path: Path, tee: File? = null): PouElements {
+        return if (path.endsWith("xml")) {
+            val out = IECXMLFacade.extractPLCOpenXml(path)
+            if (tee != null) {
+                tee.bufferedWriter()?.use {
+                    it.write(out)
+                }
+                file(tee)
+            } else {
+                file(CharStreams.fromString(out, path.toString()))
+            }
+        } else
+            file(CharStreams.fromPath(path))
     }
 
 

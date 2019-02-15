@@ -1,13 +1,11 @@
 import java.io.File
 import java.io.IOException
 import java.net.URISyntaxException
-import java.net.URLDecoder
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
-import java.util.jar.JarFile
 import java.util.stream.Collectors
 
 
@@ -66,13 +64,42 @@ object LoadHelp {
             /* A JAR path */
             //strip out only the JAR file
             val jarPath = dirURL.path.substring(5, dirURL.path.indexOf("!"))
-            val jar = JarFile(URLDecoder.decode(jarPath, "UTF-8"))
             val fs = FileSystems.newFileSystem(Paths.get(jarPath), javaClass.classLoader)
             val dir = fs.getPath(path)
             return Files.list(dir).collect(Collectors.toList())
         }
         throw UnsupportedOperationException("Cannot list files for URL $dirURL")
     }
+
+
+    fun getResource(path: String, clazz: Class<*> = LoadHelp::class.java): Path? {
+        var dirURL = clazz.classLoader.getResource(path)
+        if (dirURL == null) return null
+
+        if (dirURL != null && dirURL.protocol.equals("file")) {
+            return File(dirURL.toURI()).toPath()
+        }
+
+        if (dirURL == null) {
+            /*
+             * In case of a jar file, we can't actually find a directory.
+             * Have to assume the same jar as clazz.
+             */
+            val me = clazz.name.replace(".", "/") + ".class"
+            dirURL = clazz.classLoader.getResource(me)
+        }
+
+        if (dirURL!!.protocol.equals("jar")) {
+            /* A JAR path */
+            //strip out only the JAR file
+            val jarPath = dirURL.path.substring(5, dirURL.path.indexOf("!"))
+            val fs = FileSystems.newFileSystem(Paths.get(jarPath), javaClass.classLoader)
+            val dir = fs.getPath(path)
+            return dir
+        }
+        throw UnsupportedOperationException("Cannot list files for URL $dirURL")
+    }
+
 
     fun getPrograms() = LoadHelp.getResources("edu/kit/iti/formal/automation/st/programs")
     fun getStatements() = LoadHelp.getResources("edu/kit/iti/formal/automation/st/statements")

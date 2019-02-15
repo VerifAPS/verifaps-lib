@@ -434,8 +434,8 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
 
 
     override fun traverse(enumeration: CaseCondition.Enumeration) {
-        enumeration.start = enumeration.start.accept(visitor) as Literal
-        enumeration.stop = enumeration.stop!!.accept(visitor) as Literal
+        enumeration.start = enumeration.start.accept(visitor) as EnumLit
+        enumeration.stop = enumeration.stop!!.accept(visitor) as EnumLit
     }
 
 
