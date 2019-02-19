@@ -1,8 +1,9 @@
+import java.text.SimpleDateFormat
+
 plugins {
     id "org.jetbrains.kotlin.jvm" version "1.3.21" apply false
-    id "com.github.hierynomus.license" version "0.14.0" apply false
+    //id "com.github.hierynomus.license" version "0.14.0" apply false
     id "com.jfrog.bintray" version "1.7.3" apply false
-    id 'com.palantir.git-version' version '0.10.1' apply false
     id "org.jetbrains.dokka" version "0.9.17"
 }
 
@@ -25,14 +26,14 @@ dokka {
         project(":smv-model").compileKotlin
     }
 
-    sourceDirs = files('smv-model/src/main/kotlin') +   \
-               files("iec61131lang/src/main/kotlin") +   \
-               files("iec-symbex/src/main/kotlin") +   \
-               files("iec-run/src/main/kotlin") +   \
-               files("iec-xml/src/main/kotlin") +   \
-               files("flycheck/src/main/kotlin") +   \
-               files("casestudies/src/main/kotlin") +   \
-               files("iec-modularization/src/main/kotlin")
+    sourceDirs = files('smv-model/src/main/kotlin') +           \
+                       files("iec61131lang/src/main/kotlin") +           \
+                       files("iec-symbex/src/main/kotlin") +           \
+                       files("iec-run/src/main/kotlin") +           \
+                       files("iec-xml/src/main/kotlin") +           \
+                       files("flycheck/src/main/kotlin") +           \
+                       files("casestudies/src/main/kotlin") +           \
+                       files("iec-modularization/src/main/kotlin")
 
     // Use default or set to custom path to cache directory
     // to enable package-list caching
@@ -68,20 +69,9 @@ dokka {
 allprojects {
     apply plugin: 'maven'
     apply plugin: 'idea'
-    apply plugin: 'com.palantir.git-version'
 
     group = 'edu.kit.iti.formal.automation'
-
-    ext.gitVersion = versionDetails()
-    if (ext.gitVersion.lastTag) {
-        version = ext.gitVersion.lastTag.replace("v", "")
-        if (!ext.gitVersion.isClean) {
-            version = "${version}-SNAPSHOT"
-        }
-    }
-
-    //println(ext.gitVersion)
-    //println(version)
+    version "0.9"
 
     idea {
         module {
@@ -96,8 +86,7 @@ subprojects {
     apply plugin: 'maven-publish'
     apply plugin: "com.jfrog.bintray"
     apply plugin: "org.jetbrains.kotlin.jvm"
-    //apply plugin: 'io.franzbecker.gradle-lombok'
-    apply plugin: "com.github.hierynomus.license"
+    //apply plugin: "com.github.hierynomus.license"
     apply plugin: 'java'
     apply plugin: 'java-library'
     apply plugin: 'kotlin'
@@ -164,6 +153,43 @@ subprojects {
         useJUnitPlatform()
     }
 
+    task versionInfo(type: WriteProperties) {
+            outputFile = new java.io.File(sourceSets.main.resources.srcDirs.first(), "META-INF/version.property")
+            def gitversion = "git describe --tags".execute()
+            gitversion.waitFor()
+            def gv = gitversion.in.readLines().get(0)
+
+            setProperties([
+                    "project-name"   : project.name ?: "",
+                    "project-version": project.version ?: "0",
+                    "description"    : description ?: "",
+                    'built-by'       : System.properties['user.name'],
+                    'build-timestamp': new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
+                    'build-revision' : gv,
+                    'created-by'     : "Gradle ${gradle.gradleVersion}",
+                    'build-jdk'      : "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+                    'build-os'       : "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
+            ])
+    }
+
+    processResources.dependsOn << versionInfo
+
+    jar {
+        manifest {
+            attributes(
+                    "Implementation-Title": project.name,
+                    "Implementation-Version": version ?: "0",
+                    "Description": description,
+                    'Built-By': System.properties['user.name'],
+                    'Build-Timestamp': new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
+                    'Build-Revision': "git describe".execute(),
+                    'Created-By': "Gradle ${gradle.gradleVersion}",
+                    'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+                    'Build-OS': "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
+            )
+        }
+    }
+
     bintray {
         user = System.getenv('BINTRAY_USER')
         key = System.getenv('BINTRAY_KEY')
@@ -202,6 +228,7 @@ subprojects {
         verbose = false
     }
 
+    /*
     license {
         mapping("java", "PHP")
         mapping("kt", "PHP")
@@ -214,10 +241,10 @@ subprojects {
         exclude "*.g4"
         exclude "*.smv"
     }
-
+    */
     //Checks does not work
-    licenseMain.enabled = false
-    licenseTest.enabled = false
+    //licenseMain.enabled = false
+    //licenseTest.enabled = false
 
     //sourceSets { test { resources { srcDirs "../share/test-resources" } } }
 }

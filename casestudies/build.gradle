@@ -12,19 +12,20 @@ dependencies {
 }
 
 def mainClasses = [
-        "modularization": "edu.kit.iti.formal.automation.modularization.ModApp"
-        , 'kastel-demo' : "edu.kit.iti.formal.automation.KastelDemonstrator"
-        , 'sc12f'       : "edu.kit.iti.formal.automation.Sc12f"
-        , 'sc11-rev'    : "edu.kit.iti.formal.automation.SC11_rev"
-        , "geteta"      : "edu.kit.iti.formal.automation.testtables.apps.Geteta"
-        , 'ttprint'     : 'edu.kit.iti.formal.automation.testtables.apps.Printer'
-        , 'reteta'      : 'edu.kit.iti.formal.automation.testtables.apps.Reteta'
-        , 'ttmonitor'   : 'edu.kit.iti.formal.automation.testtables.apps.Monitor'
-        , 'ttsynth'     : 'edu.kit.iti.formal.automation.testtables.apps.Synthizer'
-        , 'rvt'         : "edu.kit.iti.formal.automation.rvt.RvtAps"
-        , 'tt-unwind'   : "edu.kit.iti.formal.automation.rvt"
-        , 'flycheck'    : "edu.kit.iti.formal.automation.Flycheck"
-        , 'check'       : "edu.kit.iti.formal.automation.Check"
+        "modularization"     : "edu.kit.iti.formal.automation.modularization.ModApp"
+        , 'kastel-demo'      : "edu.kit.iti.formal.automation.KastelDemonstrator"
+        , 'sc12f'            : "edu.kit.iti.formal.automation.Sc12f"
+        , 'sc11-rev'         : "edu.kit.iti.formal.automation.SC11_rev"
+        , "geteta"           : "edu.kit.iti.formal.automation.testtables.apps.Geteta"
+        , 'ttprint'          : 'edu.kit.iti.formal.automation.testtables.apps.Printer'
+        , 'reteta'           : 'edu.kit.iti.formal.automation.testtables.apps.Reteta'
+        , 'ttmonitor'        : 'edu.kit.iti.formal.automation.testtables.apps.Monitor'
+        , 'ttsynth'          : 'edu.kit.iti.formal.automation.testtables.apps.Synthizer'
+        , 'rvt'              : "edu.kit.iti.formal.automation.rvt.RvtAps"
+        , 'tt-unwind'        : "edu.kit.iti.formal.automation.rvt"
+        , 'flycheck'         : "edu.kit.iti.formal.automation.Flycheck"
+        , 'check'            : "edu.kit.iti.formal.automation.Check"
+        , 'verifaps-versions': "edu.kit.iti.formal.util.Version"
 ]
 
 

@@ -5,11 +5,13 @@ plugins {
 }
 
 apply plugin: 'antlr'
-group = 'edu.kit.iti.formal'
+group = 'edu.kit.iti.formal.automation'
 
 description = """
     Generalized Test Table
 """
+
+version = "0.9-SNAPSHOT"
 
 def antlrOutputDir = file("build/generated-src/antlr")
 def xjcOutputDir = file("build/generated-src/xjc")

@@ -109,9 +109,8 @@ object STBody : XMLTranslatorXPath("./body/ST/xhtml") {
     }
 }
 
-
 object FBDBody : XMLTranslatorXPath("./body/FBD") {
     override fun translate(e: Element, writer: CodeWriter) {
-        //FBDTranslator(e, writer).run()
+        FBDTranslator(e, writer).run()
     }
 }

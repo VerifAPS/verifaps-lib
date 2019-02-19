@@ -27,21 +27,6 @@ generateGrammarSource {
 
 compileKotlin.dependsOn << generateGrammarSource
 
-jar {
-    def v = versionDetails()
-    manifest {
-        attributes(
-                'version': project.version,
-                'lastTag': v.lastTag,
-                'commitDistance': v.commitDistance,
-                'hash': v.gitHash,
-                'hashFull': v.gitHashFull, // full 40-character Git commit hash
-                'branchName': v.branchName, // isType null if the repository in detached HEAD mode
-                'isClean': v.isCleanTag,
-                'buildTime': new Date().toString())
-    }
-}
-
 test {
     exclude '**/SFCLangParserTest.class'
 }

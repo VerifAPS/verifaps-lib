@@ -5,20 +5,42 @@ import org.jdom2.Element
 import org.jdom2.filter.Filters
 import org.jdom2.xpath.XPathFactory
 
+//TODO: Edges could be negated
+//TODO: Storage modifier
+//TODO: Edge modifier
 class FBDTranslator(val e: Element, val writer: CodeWriter) {
     val blockVariables = arrayListOf<Pair<String, String>>()
     val xpathFactory = XPathFactory.instance()
+    val nodes: List<FBDNode>
 
-    val nodes = arrayListOf<FBDNode>()
+    init {
+        val nodes = xpathFactory.compile("./body/FBD/block", Filters.element()).evaluate(e)
+                .map { translateBlock(it) }
+
+        nodes.forEach { n ->
+            n.predessorBlocks = n.connectionIn.mapNotNull { ref -> nodes.find { it.id == ref } }
+        }
+
+        var fixpt: Boolean
+        do {
+            fixpt = true
+            for (node in nodes) {
+                val predOrder =
+                        (node.predessorBlocks.asSequence().map { it.executionOrder }.max() ?: -1) + 1
+                if (node.executionOrder != predOrder) {
+                    fixpt = false
+                    node.executionOrder = predOrder
+                }
+            }
+        } while (fixpt)
+
+        this.nodes = nodes.sortedBy { it.executionOrder }
+    }
 
     //private val connectionInIds = xpathFactory.compile("//connectionPointIn/connection@refLocalId", Filters.attribute())
     private val inVar = xpathFactory.compile("./inputVariables/variable", Filters.element())
 
     fun run() {
-        val blocks = xpathFactory.compile("./body/FBD/block", Filters.element()).evaluate(e)
-        for (block in blocks) {
-            translateBlock(block)
-        }
 
         writer.printf("VAR").block {
             nodes.filter { !it.callTypeIsFunction }
@@ -38,7 +60,8 @@ class FBDTranslator(val e: Element, val writer: CodeWriter) {
 
             it.inputVariables
                     .sortedWith(compareBy { it.first })
-                    .joinTo(writer, ", ", "(", ");", -1) { (formal, expr) ->
+                    .joinTo(writer, ", ", "(", ");", -1)
+                    { (formal, expr) ->
                         if (it.callTypeIsFunction) expr
                         else "$formal := $expr"
                     }
@@ -46,13 +69,12 @@ class FBDTranslator(val e: Element, val writer: CodeWriter) {
         writer.nl()
     }
 
-    private fun translateBlock(block: Element) {
+    private fun translateBlock(block: Element): FBDNode {
         val id = block.getAttributeValue("localId")
         val type = block.getAttributeValue("typeName")
         val iName = block.getAttributeValue("instanceName") ?: type.toLowerCase()
         val node = FBDNode(id, type)
         node.instanceName = iName
-        nodes.add(node)
         //node.connectionIn.addAll(connectionInIds.evaluate(block).map { it.value })
 
         val ct = xpathFactory.compile(".//CallType", Filters.element()).evaluateFirst(block)
@@ -72,6 +94,8 @@ class FBDTranslator(val e: Element, val writer: CodeWriter) {
             val outVar = findExpr.evaluateFirst(e)
             node.assignTo = outVar?.getChildText("expression")
         }
+
+        return node
     }
 
 
@@ -84,11 +108,12 @@ class FBDTranslator(val e: Element, val writer: CodeWriter) {
 
 data class FBDNode(
         val id: String,
-        val type: String
-) {
+        val type: String) {
     var instanceName: String = type.toLowerCase()
     val connectionIn = arrayListOf<String>()
+    var predessorBlocks = listOf<FBDNode>()
     val inputVariables = arrayListOf<Pair<String, String>>()
     var callTypeIsFunction = false
     var assignTo: String? = null
+    var executionOrder: Int = 0;
 }
