@@ -1,4 +1,4 @@
-table T {
+relational table T {
    var output c of 0 1 : INT
 
     group omega  {

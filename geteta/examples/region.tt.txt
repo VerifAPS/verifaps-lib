@@ -2,7 +2,7 @@ table Ta {
     var input i : INT
     var output o : INT
     
-    
+    prev
     
     group 0 [1, 1] {
         row 1 [5, 5]{

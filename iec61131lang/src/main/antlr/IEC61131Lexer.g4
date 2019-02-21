@@ -29,6 +29,12 @@ fragment X:('x'|'X');
 fragment Y:('y'|'Y');
 fragment Z:('z'|'Z');
 
+IL_CODE: '//IL' .*? (END_FUNCTION|END_METHOD|END_FUNCTION_BLOCK|END_PROGRAM)
+         {//TODO eject to two tokens!
+
+         };
+
+
 /******
  * DATATYPES
  */

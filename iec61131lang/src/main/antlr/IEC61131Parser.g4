@@ -2,6 +2,10 @@ parser grammar IEC61131Parser;
 
 options {tokenVocab = IEC61131Lexer;}
 
+@header{
+ import java.util.*;
+}
+
 @members {
     private ErrorReporter errorReporter = new ErrorReporter();
     public ErrorReporter getErrorReporter() { return errorReporter;}
@@ -40,20 +44,20 @@ using_directive
 
 library_element_declaration
 :
-	data_type_declaration
+	  data_type_declaration
 	| function_declaration
-    | class_declaration
-    | interface_declaration
+  | class_declaration
+  | interface_declaration
 	| function_block_declaration
 	| program_declaration
 	| global_variable_list_declaration
-    | namespace_declaration
+  | namespace_declaration
 //	| configuration_declaration
 ;
 
 constant
 :
-      integer
+    integer
 	| real
 	| string
 	| time
@@ -707,15 +711,12 @@ invocation_statement
 
 
 variable
-
 :
 	direct_variable
 	| symbolic_variable
 ;
 
-symbolic_variable
-
-:
+symbolic_variable :
     //x^[a,252]
 	a=(IDENTIFIER|SUPER|THIS)
 	(
@@ -730,9 +731,7 @@ symbolic_variable
 	)?
 ;
 
-subscript_list
-
-:
+subscript_list:
 	LBRACKET expression
 	(COMMA expression)* RBRACKET
 ;
@@ -821,44 +820,3 @@ exit_statement
  transitionCond : ASSIGN expression SEMICOLON /*| COLON ( FBD_Network | LD_Rung ) | ':=' IL_Simple_Inst*/;
  action : ACTION IDENTIFIER COLON? body END_ACTION;
 //
-
-/*
-start_sfc 
-:
-	SFC name=IDENTIFIER
-	var_decls
-	(     action_declaration
-		| goto_declaration
-		| step_declaration
-	)* END_SFC
-;
-
-goto_declaration
-:
-	GOTO guard=expression DCOLON from=identifier_list RIGHTARROW to=identifier_list SEMICOLON?
-;
-
-action_declaration
-:
-	ACTION	(name = IDENTIFIER)?
-	var_decls
-	body=statement_list
-	END_ACTION
-;
-
-step_declaration
-:
-	STEP name=IDENTIFIER
-	(event)*
-	END_STEP
-;
-
-event
-:
-	ON type=IDENTIFIER
-	(
-		ACTION body=statement_list
-		END_ACTION
-		| action=IDENTIFIER
-    )
-;
