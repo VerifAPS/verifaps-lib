@@ -32,14 +32,16 @@ options {tokenVocab = IlLexer;}
 	}
 }
 
-ilBody : ilInstruction+;
-ilInstruction : (label=IDENTIFIER COLON)? ilInstr EOL;
+ilBody : EOL? ilInstruction+ EOL?;
+ilInstruction : (label=IDENTIFIER COLON)? ilInstr (EOL|EOF);
 
 ilSInstr : ilSimple | ilExpr | ilFunctionCall | ilFormalFunctionCall ;
-ilInstr : ilSimple | ilExpr | ilFunctionCall | ilFormalFunctionCall |  ilJump        | ilCall;
+ilInstr  : ilSimple | ilExpr | ilFunctionCall | ilFormalFunctionCall |  ilJump  | ilCall;
+
+ilSInstrList : (ilSInstr EOL)+;
 
 ilSimple:             op=simple_op ilOperand?;
-ilExpr:               op=exprOperator (LPAREN ilOperand? ilSInstr RPAREN | ilOperand?);
+ilExpr:               op=exprOperator (LPAREN ilOperand? EOL ilSInstrList RPAREN | ilOperand?);
 ilFunctionCall:       op=symbolic_variable (ilOperand (COMMA ilOperand)?)?;
 ilFormalFunctionCall: op=symbolic_variable LPAREN EOL (param_assignment (',' param_assignment)*)? RPAREN;
 ilJump:               op=jump_op label=IDENTIFIER;

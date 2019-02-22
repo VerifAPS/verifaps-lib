@@ -1,13 +1,21 @@
 package edu.kit.iti.formal.automation.il
 
+import edu.kit.iti.formal.automation.datatypes.AnyInt
+import edu.kit.iti.formal.automation.datatypes.IECString
+import edu.kit.iti.formal.automation.datatypes.values.DateAndTimeData
+import edu.kit.iti.formal.automation.datatypes.values.DateData
+import edu.kit.iti.formal.automation.datatypes.values.TimeData
+import edu.kit.iti.formal.automation.datatypes.values.TimeofDayData
 import edu.kit.iti.formal.automation.operators.BinaryOperator
 import edu.kit.iti.formal.automation.operators.Operators
-import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
 import edu.kit.iti.formal.automation.parser.IlParser
 import edu.kit.iti.formal.automation.parser.IlParserBaseVisitor
+import edu.kit.iti.formal.automation.scope.TypeScope
+import edu.kit.iti.formal.automation.sfclang.split
 import edu.kit.iti.formal.automation.st.ast.*
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
+import java.math.BigInteger
 
 /**
  *
@@ -42,15 +50,22 @@ class IlTransformToAst : IlParserBaseVisitor<Any>() {
     private fun oneOf(vararg ctxs: ParserRuleContext?) =
             ctxs.find { it != null }?.accept(this)
 
-    override fun visitIlSimple(ctx: IlParser.IlSimpleContext)
-            = SimpleInstr(SimpleOperand.valueOf(ctx.op.text),
+    override fun visitIlSimple(ctx: IlParser.IlSimpleContext) = SimpleInstr(SimpleOperand.valueOf(ctx.op.text),
             ctx.ilOperand().accept(this) as IlOperand)
             .also { it.ruleContext = ctx }
 
     override fun visitIlExpr(ctx: IlParser.IlExprContext) = ExprInstr(ExprOperand.valueOf(ctx.op.text),
             ctx.ilOperand()?.accept(this) as? IlOperand,
-            ctx.ilSInstr()?.accept(this) as? IlBody)
+            ctx.ilSInstrList()?.accept(this) as? IlBody)
             .also { it.ruleContext = ctx }
+
+    override fun visitIlSInstrList(ctx: IlParser.IlSInstrListContext): IlBody {
+        val body = IlBody()
+        ctx.ilSInstr().forEach {
+            body += it.accept(this) as IlInstr
+        }
+        return body
+    }
 
     override fun visitIlFunctionCall(ctx: IlParser.IlFunctionCallContext) = FunctionCallInstr(ctx.symbolic_variable().accept(this) as SymbolicReference,
             ctx.ilOperand().map { it.accept(this) as IlOperand }.toMutableList())
@@ -112,7 +127,6 @@ class IlTransformToAst : IlParserBaseVisitor<Any>() {
 
 
     //copied
-
     override fun visitSymbolic_variable(ctx: IlParser.Symbolic_variableContext): Any {
         //TODO REWORK
         val ast = SymbolicReference()
@@ -245,6 +259,107 @@ class IlTransformToAst : IlParserBaseVisitor<Any>() {
         }
         i.ruleContext = (ctx)
         return i
+    }
+
+    override fun visitCast(ctx: IlParser.CastContext): Literal {
+        val (dt, _, v) = split(ctx.CAST_LITERAL().text)
+        val ast = EnumLit(dt, v)
+        //ast.originalToken = ctx.CAST_LITERAL().symbol
+        ast.ruleContext = ctx
+        return ast
+    }
+
+    private val tscope = TypeScope.builtin()
+
+    override fun visitInteger(ctx: IlParser.IntegerContext): Any {
+        val text = ctx.INTEGER_LITERAL().symbol
+        val splitted = split(text.text)
+
+        val dt = splitted.prefix
+        val v = splitted.value
+        val ordinal = splitted.ordinal ?: 10
+
+        var int = BigInteger(v.replace("_", ""), ordinal)
+        if (ctx.MINUS() != null)
+            int *= -BigInteger.ONE
+        val ast = IntegerLit(dt, int)
+        try {
+            //weigl: quick type for common integer type
+            if (dt in tscope)
+                ast.dataType.obj = tscope[dt] as AnyInt
+        } catch (e: ClassCastException) {
+        }
+        ast.ruleContext = ctx
+        return ast
+    }
+
+    override fun visitBits(ctx: IlParser.BitsContext): Any {
+        val text = ctx.BITS_LITERAL().symbol
+        val splitted = split(text.text)
+        val dt = splitted.prefix
+        val v = splitted.value
+        if (v.equals("false", true))
+            return BooleanLit(false)
+        if (v.equals("true", true))
+            return BooleanLit(true)
+
+
+        val ordinal = splitted.ordinal ?: 10
+        val ast = BitLit(dt, v.toLong(ordinal))
+        ast.ruleContext = ctx
+        return ast
+    }
+
+    override fun visitReal(ctx: IlParser.RealContext): Any {
+        val (dt, _, v) = split(ctx.REAL_LITERAL().text)
+        val ast = RealLit(dt, v.toBigDecimal())
+        ast.ruleContext = ctx
+        return ast
+    }
+
+    override fun visitString(ctx: IlParser.StringContext): Any {
+        val ast = StringLit(
+                if (ctx.STRING_LITERAL() != null) IECString.STRING
+                else IECString.WSTRING,
+                ctx.text)
+        ast.ruleContext = ctx
+        return ast
+    }
+
+    override fun visitTime(ctx: IlParser.TimeContext): Any {
+        val ast = TimeLit(value = TimeData(ctx.text))
+        ast.ruleContext = ctx
+        return ast
+    }
+
+    override fun visitTimeofday(ctx: IlParser.TimeofdayContext): Any {
+        val ast = ToDLit(value = TimeofDayData.parse(ctx.TOD_LITERAL().text!!))
+        ast.ruleContext = ctx
+        return ast
+    }
+
+    override fun visitDate(ctx: IlParser.DateContext): Any {
+        val ast = DateLit(value = DateData.parse(ctx.DATE_LITERAL().text!!))
+        ast.ruleContext = ctx
+        return ast
+    }
+
+    override fun visitDatetime(ctx: IlParser.DatetimeContext): Any {
+        val ast = DateAndTimeLit(value = DateAndTimeData.parse(ctx.DATETIME().text))
+        ast.ruleContext = ctx
+        return ast
+    }
+
+    override fun visitRef_null(ctx: IlParser.Ref_nullContext): Any {
+        val ast = NullLit()
+        ast.ruleContext = ctx
+        return ast
+    }
+
+    override fun visitReference_value(ctx: IlParser.Reference_valueContext): Any {
+        val ast = Invocation("ref")
+        ast.addParameter(InvocationParameter(ctx.ref_to.accept(this) as SymbolicReference))
+        return ast
     }
 
 

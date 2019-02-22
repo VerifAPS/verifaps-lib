@@ -65,10 +65,6 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         return ast
     }
 
-    fun split2(text: String) = text.split(Regex("#"), 1)
-    fun split3(text: String) = text.split(Regex("#"), 3)
-
-
     override fun visitCast(ctx: IEC61131Parser.CastContext): Literal {
         val (dt, _, v) = split(ctx.CAST_LITERAL().text)
         val ast = EnumLit(dt, v)

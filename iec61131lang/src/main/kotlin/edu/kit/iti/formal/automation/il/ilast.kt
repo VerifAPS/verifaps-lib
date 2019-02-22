@@ -79,6 +79,12 @@ data class IlBody(private val seq: MutableList<IlInstr> = arrayListOf())
     : MutableList<IlInstr> by seq, IlAst() {
     override fun clone() = copy()
     override fun <T> accept(visitor: IlVisitor<T>): T = visitor.visit(this)
+    fun findMarked(jump: String): IlInstr? {
+        return find { it.labelled?.let { it == jump } ?: false }
+    }
+
+    fun posMarked(jump: String): Int? =
+            findMarked(jump)?.let{ indexOf(it) }
 }
 
 abstract class IlInstr : IlAst() {
