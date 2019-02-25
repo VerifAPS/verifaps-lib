@@ -6,7 +6,7 @@ import org.jdom2.filter.Filters
 import org.jdom2.xpath.XPathFactory
 
 //TODO: Edges could be negated
-//TODO: Storage modifier
+//TODO: Storage modifier (S=, R=)
 //TODO: Edge modifier
 class FBDTranslator(val e: Element, val writer: CodeWriter) {
     val blockVariables = arrayListOf<Pair<String, String>>()
@@ -32,7 +32,7 @@ class FBDTranslator(val e: Element, val writer: CodeWriter) {
                     node.executionOrder = predOrder
                 }
             }
-        } while (fixpt)
+        } while (!fixpt)
 
         this.nodes = nodes.sortedBy { it.executionOrder }
     }
@@ -41,8 +41,7 @@ class FBDTranslator(val e: Element, val writer: CodeWriter) {
     private val inVar = xpathFactory.compile("./inputVariables/variable", Filters.element())
 
     fun run() {
-
-        writer.printf("VAR").block {
+        writer.nl().printf("VAR").block {
             nodes.filter { !it.callTypeIsFunction }
                     .forEach {
                         nl().printf("${it.instanceName} : ${it.type};")
@@ -97,7 +96,6 @@ class FBDTranslator(val e: Element, val writer: CodeWriter) {
 
         return node
     }
-
 
     private fun getExpr(refTo: String): String {
         val findExpr = xpathFactory.compile("./body/FBD/inVariable[@localId='$refTo']", Filters.element())
