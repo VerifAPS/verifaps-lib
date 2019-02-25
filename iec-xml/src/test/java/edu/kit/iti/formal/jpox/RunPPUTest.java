@@ -17,7 +17,7 @@ import java.nio.file.Paths;
  */
 public class RunPPUTest {
     @Test
-    public void test() throws URISyntaxException, IOException { test("src/test/resources/test.xml");
+    public void test() throws URISyntaxException, IOException { test("test.xml");
     }
 
     @Test
