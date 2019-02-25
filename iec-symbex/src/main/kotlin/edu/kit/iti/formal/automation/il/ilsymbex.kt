@@ -13,10 +13,8 @@ import edu.kit.iti.formal.automation.st.ast.Invoked
 import edu.kit.iti.formal.automation.st.ast.Literal
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference
 import edu.kit.iti.formal.smv.SMVFacade
-import edu.kit.iti.formal.smv.ast.SBinaryOperator
-import edu.kit.iti.formal.smv.ast.SLiteral
-import edu.kit.iti.formal.smv.ast.SMVExpr
-import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.smv.ast.*
+import edu.kit.iti.formal.smv.joinToExpr
 import java.util.concurrent.Callable
 
 /**
@@ -28,7 +26,14 @@ class IlSymbex(ilBody: IlBody, maximalSteps: Int = 1000, scope: Scope) : Callabl
     private val context = IlSymbexContext(scope)
 
     init {
-        context.onFork(Path(0, maximalSteps, ilBody, context))
+        val state = SymbolicState()
+        scope.variables.forEach { vd ->
+            val v = context.varCache.computeIfAbsent(vd.name) {
+                SVariable(vd.name, context.typeTranslator.translate(vd.dataType!!))
+            }
+            state[v] = v
+        }
+        context.onFork(Path(0, maximalSteps, ilBody, context, state = state))
     }
 
     override fun call(): SymbolicState {
@@ -37,8 +42,30 @@ class IlSymbex(ilBody: IlBody, maximalSteps: Int = 1000, scope: Scope) : Callabl
             context.running.remove(p)
             p.run()
         }
-        //TODO("combine several final states")
-        return context.terminated.first().state
+        if (context.terminated.size == 1) {
+            return context.terminated.first().state
+        } else {
+            return SymbolicState().also { case ->
+                for (vd in context.scope) {
+                    val v = context.varCache[vd.name]!!
+                    val states = context.terminated.map { path ->
+                        val cond = path.pathCondition.joinToExpr(default = SLiteral.TRUE)
+                        val expr = path.state[v] ?: v
+                        cond to expr
+                    }
+                    val ve =
+                            if (states.all { (a, b) -> b == states.first().second })
+                                states.first().second
+                            else {
+                                SCaseExpression().also {
+                                    states.forEach { (a, b) -> it.addCase(a, b) }
+                                    it.addCase(SLiteral.TRUE, v)
+                                }
+                            }
+                    case[v] = ve
+                }
+            }
+        }
     }
 }
 
@@ -98,7 +125,7 @@ internal data class Path(
         private val subMode: Boolean = false,
         internal val state: SymbolicState = SymbolicState(),
         private var accumulator: SMVExpr = SLiteral.TRUE,
-        internal val pathCondition: List<SMVExpr> = listOf()) : Runnable, IlTraversalVisitor() {
+        internal var pathCondition: Set<SMVExpr> = hashSetOf()) : Runnable, IlTraversalVisitor() {
     private val remainingJumps = HashMap<Int, Int>()
 
     private val current: IlInstr
@@ -129,8 +156,9 @@ internal data class Path(
     private fun fork(cond: SMVExpr, forkedPC: Int) {
         val other = copy(
                 currentIdx = forkedPC,
-                state = state.copy(), //TODO check for deep copy
-                pathCondition = pathCondition + cond)
+                state = SymbolicState(state), //TODO check for deep copy
+                pathCondition = HashSet(pathCondition) + cond)
+        pathCondition = pathCondition + cond.not()
         context.onFork(other)
     }
 
@@ -248,6 +276,7 @@ internal data class Path(
             var cond = accumulator
             if (N) cond = cond.not()
             fork(cond, pos)
+            currentIdx++
         } else {
             currentIdx = pos
         }
@@ -308,7 +337,7 @@ internal data class Path(
     }
 
     private fun exec(sub: IlBody): SMVExpr {
-        val other = copy(0, subMode = true, ilBody = sub)
+        val other = copy(0, subMode = true, ilBody = sub, pathCondition = hashSetOf())
         other.run()
         return other.accumulator
     }

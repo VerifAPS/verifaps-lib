@@ -22,9 +22,16 @@ package edu.kit.iti.formal.automation.rvt.translators
  * #L%
  */
 
+import edu.kit.iti.formal.automation.datatypes.AnyBit
+import edu.kit.iti.formal.automation.datatypes.AnyInt
+import edu.kit.iti.formal.automation.datatypes.values.Bits
 import edu.kit.iti.formal.automation.datatypes.values.Value
+import edu.kit.iti.formal.smv.SMVWordType
+import edu.kit.iti.formal.smv.ast.SBooleanLiteral
 import edu.kit.iti.formal.smv.ast.SGenericLiteral
 import edu.kit.iti.formal.smv.ast.SLiteral
+import edu.kit.iti.formal.smv.ast.SWordLiteral
+import java.math.BigInteger
 
 /**
  * @author Alexander Weigl
@@ -34,7 +41,15 @@ class DefaultValueTranslator : ValueTranslator {
     var tt: TypeTranslator = DefaultTypeTranslator.INSTANCE
 
     override fun translate(init: Value<*, *>): SLiteral {
-        return SGenericLiteral(init.value, this.tt.translate(init.dataType))
+        val (dt, v) = init
+        val smvDt = this.tt.translate(init.dataType)
+
+        return when (dt) {
+            is AnyBit.BOOL -> SBooleanLiteral(v as Boolean)
+            is AnyInt -> SWordLiteral(v as BigInteger, smvDt as SMVWordType)
+            is AnyBit -> SWordLiteral((v as Bits).toBigInt(), smvDt as SMVWordType)
+            else -> SGenericLiteral(init.value, smvDt)
+        }
     }
 
     companion object {

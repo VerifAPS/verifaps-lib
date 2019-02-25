@@ -46,6 +46,36 @@ class IlSymbexTest {
         Assertions.assertEquals(A, B)
     }
 
-    private fun parseBody(s: String) = IEC61131Facade.InstructionList.parseBody(s)
+    @Test
+    fun ilSymbexJmpTest() {
+        val scope = Scope.defaultScope()
+        scope.variables += VariableDeclaration("A", AnyBit.BOOL)
+        scope.variables += VariableDeclaration("B", AnyBit.BOOL)
+        scope.variables += VariableDeclaration("X", AnyBit.BOOL)
+        scope.variables += VariableDeclaration("Y", AnyBit.BOOL)
 
+        val ilBody = parseBody("""LD 5
+            ST A
+            EQ B
+            JMPC next
+            LD A
+            ADD B
+            ST A
+            next:
+            ST X
+        """.trimIndent())
+
+        val sw = StringWriter()
+        ilBody.accept(IlPrinter(CodeWriter(sw)))
+        println(sw)
+
+        val symbex = IlSymbex(ilBody, 10, scope)
+        val state = symbex.call()
+        println(state)
+        val A = state["A"]
+        val B = state["B"]
+        Assertions.assertEquals(A, B)
+    }
+
+    private fun parseBody(s: String) = IEC61131Facade.InstructionList.parseBody(s)
 }

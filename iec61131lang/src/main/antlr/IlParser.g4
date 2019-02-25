@@ -12,13 +12,15 @@ options {tokenVocab = IlLexer;}
   public static Set<String> JUMP_OPERANDS;
 
   static {
-    SIMPLE_OPERANDS = setOf("LD", "LDN", "ST", "STN", "ST?", "NOT", "S", "R", "S1", "R1", "CLK", "CU", "CD", "PV", "IN", "PT");
+    SIMPLE_OPERANDS = setOf("LD", "LDN", "ST", "STN", "ST?", "NOT",
+    "RET", "RETC", "RETCN", "S", "R", "S1", "R1", "CLK", "CU", "CD", "PV", "IN", "PT");
 
     EXPR_OPERANDS = setOf("AND" , "&" , "OR" , "XOR" , "ANDN" , "&N" , "ORN" , "XORN" , "ADD" ,
                           "SUB" , "MUL" , "DIV" , "MOD" , "GT" , "GE" , "EQ" , "LT" , "LE" , "NE");
 
     CALL_OPERANDS = setOf("CAL", "CALC", "CALCN");
-    JUMP_OPERANDS = setOf("RT", "RETC", "RETCN") ;
+    JUMP_OPERANDS = setOf("JMP", "JMPC", "JMPCN") ;
+    //JUMP_OPERANDS = setOf("RT", "RETC", "RETCN") ;
   }
 
 	private boolean check(Set<String> jumpOperands) {
@@ -36,7 +38,7 @@ ilBody : EOL? ilInstruction+ EOL?;
 ilInstruction : (label=IDENTIFIER COLON)? ilInstr (EOL|EOF);
 
 ilSInstr : ilSimple | ilExpr | ilFunctionCall | ilFormalFunctionCall ;
-ilInstr  : ilSimple | ilExpr | ilFunctionCall | ilFormalFunctionCall |  ilJump  | ilCall;
+ilInstr  : ilSimple | ilExpr |  ilJump  | ilCall | ilFunctionCall | ilFormalFunctionCall;
 
 ilSInstrList : (ilSInstr EOL)+;
 

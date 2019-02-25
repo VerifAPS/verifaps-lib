@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.automation.datatypes.values
 
+import java.math.BigInteger
+
 /*-
  * #%L
  * iec61131lang
@@ -67,4 +69,5 @@ data class Bits(val register: Long = 0, val nbits: Int = 1) {
     fun and(other: Bits): Bits = Bits(register and other.register, nbits)
     fun or(other: Bits) = Bits(register or other.register, nbits)
     fun xor(other: Bits): Bits = Bits(register xor other.register, nbits)
+    fun toBigInt() = BigInteger.valueOf(register)
 }
