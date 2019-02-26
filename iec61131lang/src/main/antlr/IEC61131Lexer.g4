@@ -1,6 +1,5 @@
 lexer grammar IEC61131Lexer;
 
-
 /** Fragments for case insensitivity */
 fragment A:('a'|'A');
 fragment B:('b'|'B');
@@ -340,6 +339,8 @@ INTERVAL
 :
 	I N T E R V A L
 ;
+
+JMP: J M P;
 
 NIL
 :

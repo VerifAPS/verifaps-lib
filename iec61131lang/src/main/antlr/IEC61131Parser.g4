@@ -687,19 +687,28 @@ statement_list
 
 statement
 :
-	  assignment_statement SEMICOLON
+	    assignment_statement SEMICOLON
    	| invocation_statement SEMICOLON
-	| return_statement SEMICOLON
-	| if_statement
+  	| return_statement SEMICOLON
+  	| jump_statement SEMICOLON
+  	| label_statement SEMICOLON
+	  | if_statement
     | case_statement
-	| for_statement
-	| while_statement
-	| repeat_statement
-	| exit_statement SEMICOLON
+    | for_statement
+    | while_statement
+    | repeat_statement
+    | exit_statement SEMICOLON
+;
+
+jump_statement
+: JMP id=IDENTIFIER
+;
+
+label_statement
+: id=IDENTIFIER COLON
 ;
 
 assignment_statement
-
 :
 	a=variable (ASSIGN_ATTEMPT|RASSIGN|ASSIGN) expression
 ;
@@ -815,7 +824,7 @@ exit_statement
  actionQualifier : IDENTIFIER (COMMA expression )?;
  //actionTime: TIME_LITERAL | IDENTIFIER;
  transition : TRANSITION id=IDENTIFIER? ( LPAREN PRIORITY ASSIGN INTEGER_LITERAL RPAREN)?
-                FROM from=steps TO to=steps transitionCond END_TRANSITION;
+              FROM from=steps TO to=steps transitionCond END_TRANSITION;
  steps : IDENTIFIER | LPAREN IDENTIFIER ( COMMA IDENTIFIER )* RPAREN;
  transitionCond : ASSIGN expression SEMICOLON /*| COLON ( FBD_Network | LD_Rung ) | ':=' IL_Simple_Inst*/;
  action : ACTION IDENTIFIER COLON? body END_ACTION;
