@@ -3,8 +3,9 @@ package edu.kit.iti.formal.automation
 import edu.kit.iti.formal.automation.analysis.*
 import edu.kit.iti.formal.automation.builtin.BuiltinLoader
 import edu.kit.iti.formal.automation.il.IlBody
-import edu.kit.iti.formal.automation.il.IlTransformToAst
-import edu.kit.iti.formal.automation.parser.*
+import edu.kit.iti.formal.automation.parser.IEC61131Lexer
+import edu.kit.iti.formal.automation.parser.IEC61131Parser
+import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
@@ -215,6 +216,7 @@ object IEC61131Facade {
     }
 
     object InstructionList {
+        /*
         fun getParser(input: Token): IlParser {
             return getParser(
                     CharStreams.fromString(input.text),
@@ -234,16 +236,19 @@ object IEC61131Facade {
             p.addErrorListener(p.errorReporter)
             return p
         }
-
         fun parseBody(token: Token): IlBody {
             val ctx = getParser(token).ilBody()
             return ctx.accept(IlTransformToAst()) as IlBody
         }
+        */
 
 
         fun parseBody(token: String): IlBody {
-            val ctx = getParser(CharStreams.fromString(token)).ilBody()
-            return ctx.accept(IlTransformToAst()) as IlBody
+            val lexer = IEC61131Lexer(CharStreams.fromString(token))
+            lexer.pushMode(1)
+            val parser = IEC61131Parser(CommonTokenStream(lexer))
+            val ctx = parser.ilBody()
+            return ctx.accept(IECParseTreeToAST()) as IlBody
         }
 
         private class ShiftedTokenFactory(val offset: Int = 0,

@@ -31,37 +31,40 @@ class Il2St(val ilBody: IlBody) : Callable<Pair<VariableScope, StatementList>> {
      * JMP{C,N}
      */
     fun jump(jump: String, C: Boolean = false, N: Boolean = false): Statement {
-        val pos = ilBody.posMarked(jump)
+        //val pos = ilBody.posMarked(jump)
         return when {
             N -> Statements.ifthen(
                     accumulator.top.not(),
-                    ReturnStatement())
+                    JumpStatement(jump))
             C -> Statements.ifthen(
                     accumulator.top,
-                    ReturnStatement())
-            else -> ReturnStatement()
+                    JumpStatement(jump))
+            else -> JumpStatement(jump)
         }
     }
 
     inner class Impl : IlTraversalVisitor() {
         override fun defaultVisit(top: IlAst) {}
         override fun visit(ret: RetInstr) {
-            when (ret.type) {
+            label(ret)
+            append(when (ret.type) {
                 ReturnOperand.RET -> factory.ret()
                 ReturnOperand.RETC -> factory.ret(C = true)
                 ReturnOperand.RETCN -> factory.ret(N = true)
-            }
+            })
         }
 
         override fun visit(j: JumpInstr) {
-            when (j.type) {
+            label(j)
+            append(when (j.type) {
                 JumpOperand.JMP -> jump(j.target)
                 JumpOperand.JMPC -> jump(j.target, C = true)
                 JumpOperand.JMPCN -> jump(j.target, N = true)
-            }
+            })
         }
 
         override fun visit(simple: SimpleInstr) {
+            label(simple)
             when (simple.type) {
                 SimpleOperand.NOT -> factory.not()
                 SimpleOperand.LD -> factory.load(simple.operand!!)
@@ -90,10 +93,11 @@ class Il2St(val ilBody: IlBody) : Callable<Pair<VariableScope, StatementList>> {
         }
 
         private fun append(any: Statement) {
-
+            product.add(any)
         }
 
         override fun visit(funCall: FunctionCallInstr) {
+            label(funCall)
             val inv = Invocation(funCall.function,
                     funCall.operands.map {
                         val e = when (it) {
@@ -106,6 +110,8 @@ class Il2St(val ilBody: IlBody) : Callable<Pair<VariableScope, StatementList>> {
         }
 
         override fun visit(e: ExprInstr) {
+            label(e)
+
             val binary = e.operand.stOperator
             val sub = e.instr ?: IlBody()
             e.operandi?.also {
@@ -130,11 +136,18 @@ class Il2St(val ilBody: IlBody) : Callable<Pair<VariableScope, StatementList>> {
         }
 
         override fun visit(call: CallInstr) {
+            label(call)
             when (call.type) {
                 CallOperand.CAL -> factory.makeCall(call)
                 CallOperand.CALC -> factory.makeCall(call, C = true)
                 CallOperand.CALCN -> factory.makeCall(call, N = true)
                 CallOperand.IMPLICIT_CALLED -> factory.makeCall(call)
+            }
+        }
+
+        private fun label(instr: IlInstr) {
+            instr.labelled?.also {
+                append(LabelStatement(it))
             }
         }
     }
@@ -186,7 +199,7 @@ class IlStatementFactory(val accumulator: Accumulator) {
         accumulator.push(accumulator.top.not())
     }
 
-    fun reset(operand: IlOperand) : Statement{
+    fun reset(operand: IlOperand): Statement {
         val ref = (operand as IlOperand.Variable).ref
         return Statements.ifthen(accumulator.top, AssignmentStatement(ref, LFALSE))
     }

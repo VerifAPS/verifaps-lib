@@ -67,4 +67,7 @@ interface Visitor<T> {
     fun visit(empty: EMPTY_EXPRESSION): T {
         TODO("not implemented")
     }
+
+    fun visit(jump: JumpStatement): T
+    fun visit(label: LabelStatement): T
 }

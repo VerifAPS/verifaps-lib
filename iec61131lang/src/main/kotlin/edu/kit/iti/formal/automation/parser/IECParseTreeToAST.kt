@@ -28,6 +28,7 @@ import edu.kit.iti.formal.automation.datatypes.values.DateAndTimeData
 import edu.kit.iti.formal.automation.datatypes.values.DateData
 import edu.kit.iti.formal.automation.datatypes.values.TimeData
 import edu.kit.iti.formal.automation.datatypes.values.TimeofDayData
+import edu.kit.iti.formal.automation.il.*
 import edu.kit.iti.formal.automation.operators.BinaryOperator
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.scope.Scope
@@ -971,4 +972,104 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
                 .toHashSet()
     }
 
+
+    //region il
+    override fun visitIlBody(ctx: IEC61131Parser.IlBodyContext): IlBody {
+        val body = IlBody()
+        ctx.ilInstruction().map { it.accept(this) }.forEach { body.add(it as IlInstr) }
+        return body
+    }
+
+    override fun visitIlInstruction(ctx: IEC61131Parser.IlInstructionContext): IlInstr {
+        val instr: IlInstr = ctx.ilInstr().accept(this) as IlInstr
+        if (ctx.COLON() != null) {
+            instr.labelled = ctx.IDENTIFIER()?.text
+        }
+        instr.ruleContext = ctx
+        return instr
+    }
+
+    override fun visitIlInstr(ctx: IEC61131Parser.IlInstrContext) =
+            oneOf<IlInstr>(ctx.ilCall(), ctx.ilExpr(), ctx.ilFormalFunctionCall(), ctx.ilJump(), ctx.ilSimple(),
+                    ctx.ilFunctionCall())!!
+
+
+    override fun visitIlSInstr(ctx: IEC61131Parser.IlSInstrContext) =
+            oneOf<IlInstr>(ctx.ilExpr(), ctx.ilFormalFunctionCall(), ctx.ilSimple(), ctx.ilFunctionCall())!!
+
+    override fun visitIlSimple(ctx: IEC61131Parser.IlSimpleContext) = SimpleInstr(SimpleOperand.valueOf(ctx.op.text),
+            ctx.ilOperand().accept(this) as IlOperand)
+            .also { it.ruleContext = ctx }
+
+    override fun visitIlExpr(ctx: IEC61131Parser.IlExprContext) = ExprInstr(ExprOperand.valueOf(ctx.op.text),
+            ctx.ilOperand()?.accept(this) as? IlOperand,
+            ctx.ilSInstrList()?.accept(this) as? IlBody)
+            .also { it.ruleContext = ctx }
+
+    override fun visitIlSInstrList(ctx: IEC61131Parser.IlSInstrListContext): IlBody {
+        val body = IlBody()
+        ctx.ilSInstr().forEach {
+            body += it.accept(this) as IlInstr
+        }
+        return body
+    }
+
+    override fun visitIlFunctionCall(ctx: IEC61131Parser.IlFunctionCallContext) = FunctionCallInstr(ctx.symbolic_variable().accept(this) as SymbolicReference,
+            ctx.ilOperand().map { it.accept(this) as IlOperand }.toMutableList())
+            .also { it.ruleContext = ctx }
+
+    override fun visitIlFormalFunctionCall(ctx: IEC61131Parser.IlFormalFunctionCallContext): CallInstr {
+        return CallInstr(CallOperand.IMPLICIT_CALLED,
+                ctx.symbolic_variable().accept(this) as SymbolicReference,
+                ctx.il_param_assignment().map { it.accept(this) as IlParameter }.toMutableList())
+                .also { it.ruleContext = ctx }
+    }
+
+    override fun visitIlJump(ctx: IEC61131Parser.IlJumpContext) = JumpInstr(JumpOperand.valueOf(ctx.op.text), ctx.label.text)
+            .also { it.ruleContext = ctx }
+
+    override fun visitIlCall(ctx: IEC61131Parser.IlCallContext): CallInstr {
+        val callInstr = CallInstr(CallOperand.valueOf(ctx.op.text),
+                ctx.symbolic_variable().accept(this) as SymbolicReference,
+                ctx.il_param_assignment()
+                        .map { it.accept(this) as IlParameter }.toMutableList())
+
+        val seq = if (ctx.LPAREN() != null) {
+            ctx.ilOperand()
+                    .map { it.accept(this) as IlOperand }
+                    .map { IlParameter(right = it) }
+        } else {
+            ctx.il_param_assignment().map { it.accept(this) as IlParameter }
+        }
+        callInstr.parameters = seq.toMutableList()
+
+        return callInstr
+    }
+
+    override fun visitIlOperand(ctx: IEC61131Parser.IlOperandContext): Any {
+        if (ctx.constant() != null) {
+            val const = ctx.constant()!!.accept(this) as Literal
+            return IlOperand.Constant(const).also { it.ruleContext = ctx.symbolic_variable() }
+        }
+
+        if (ctx.symbolic_variable() != null) {
+            val a = ctx.symbolic_variable()
+            val sr = a.accept(this) as SymbolicReference
+            return IlOperand.Variable(sr).also { it.ruleContext = ctx.symbolic_variable() }
+        }
+
+        throw IllegalStateException()
+    }
+
+    override fun visitIl_param_assignment(ctx: IEC61131Parser.Il_param_assignmentContext): IlParameter {
+        return IlParameter(negated = ctx.NOT() != null, input = ctx.ASSIGN() != null,
+                left = ctx.id.text,
+                right = if (ctx.ASSIGN() != null)
+                    ctx.arg.accept(this) as IlOperand
+                else
+                    IlOperand.Variable(SymbolicReference(ctx.target.text))
+        )
+
+    }
+    //endregion
 }

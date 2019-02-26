@@ -95,4 +95,6 @@ abstract class DefaultVisitorNN<T> : Visitor<T> {
     override fun visit(referenceValue: ReferenceValue): T = defaultVisit(referenceValue)
     override fun visit(globalVariableListDeclaration: GlobalVariableListDeclaration): T = defaultVisit(globalVariableListDeclaration)
     override fun visit(empty: EMPTY_EXPRESSION) = defaultVisit(empty)
+    override fun visit(jump: JumpStatement)  = defaultVisit(jump)
+    override fun visit(label: LabelStatement) = defaultVisit(label)
 }

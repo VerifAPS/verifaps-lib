@@ -377,8 +377,8 @@ function_block_declaration
 
 body :
       sfc
-    | /*| ladder_diagram | fb_diagram | instruction_list |*/
-      statement_list;
+    | IL_CODE ilBody /*| ladder_diagram | fb_diagram | instruction_list |*/
+    | statement_list;
 
 funcBody : /*ladder_diagram | fb_diagram | instruction_list |*/
             statement_list;
@@ -829,3 +829,39 @@ exit_statement
  transitionCond : ASSIGN expression SEMICOLON /*| COLON ( FBD_Network | LD_Rung ) | ':=' IL_Simple_Inst*/;
  action : ACTION IDENTIFIER COLON? body END_ACTION;
 //
+
+
+ilBody : EOL? ilInstruction+ EOL?;
+ilInstruction : (label=IDENTIFIER COLON)? EOL? ilInstr (EOL|EOF);
+
+ilSInstr : ilSimple | ilExpr | ilFunctionCall | ilFormalFunctionCall ;
+ilInstr  : ilSimple | ilExpr |  ilJump  | ilCall | ilFunctionCall | ilFormalFunctionCall;
+
+ilSInstrList : (ilSInstr EOL)+;
+
+ilSimple:             op=simple_op ilOperand?;
+ilExpr:               op=exprOperator (LPAREN ilOperand? EOL ilSInstrList RPAREN | ilOperand?);
+ilFunctionCall:       op=symbolic_variable (ilOperand (COMMA ilOperand)?)?;
+ilFormalFunctionCall: op=symbolic_variable LPAREN EOL (il_param_assignment (',' il_param_assignment)*)? RPAREN;
+ilJump:               op=jump_op label=IDENTIFIER;
+
+ilCall:               op=call_op symbolic_variable
+                      ( LPAREN EOL (il_param_assignment (',' il_param_assignment)*)? RPAREN
+                      | (ilOperand (',' ilOperand)*)?
+                      )
+                    ;
+
+ilOperand: constant | symbolic_variable;
+
+jump_op      : IL_JMP |  IL_JMPC | IL_JMPCN;
+call_op      : IL_CAL | IL_CALC | IL_CALCN;
+simple_op    : IL_RET | IL_RETC | IL_RETCN | IL_LD | IL_LDN | IL_ST | IL_STN | IL_STQ |
+               IL_NOT | IL_S | IL_R | IL_S1  | IL_R1 | IL_CLK |  IL_CU | IL_CD | IL_PV | IL_IN | IL_PT;
+exprOperator : AND| OR| XOR| IL_ANDN |IL_ORN |IL_XORN |IL_ADD |
+               IL_SUB | IL_MUL | IL_DIV | MOD | IL_GT | IL_GE |
+               IL_EQ | IL_LT | IL_LE | IL_NE;
+
+il_param_assignment:
+	NOT? id=IDENTIFIER ARROW_RIGHT arg=ilOperand
+	| (id=IDENTIFIER ASSIGN)? target=IDENTIFIER
+;

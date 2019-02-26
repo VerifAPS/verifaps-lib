@@ -7,6 +7,7 @@ import edu.kit.iti.formal.automation.exceptions.DataTypeNotResolvedException
 import edu.kit.iti.formal.automation.exceptions.IECException
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException
+import edu.kit.iti.formal.automation.il.IlBody
 import edu.kit.iti.formal.automation.operators.BinaryOperator
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.operators.UnaryOperator
@@ -113,6 +114,7 @@ data class FunctionBlockDeclaration(
         override var scope: Scope = Scope(),
         override var stBody: StatementList? = null,
         override var sfcBody: SFCImplementation? = null,
+        override var ilBody: IlBody? = null,
         var actions: LookupList<ActionDeclaration> = ArrayLookupList(),
         override val interfaces: RefList<InterfaceDeclaration> = RefList(),
         override val methods: MutableList<MethodDeclaration> = arrayListOf()
@@ -214,7 +216,7 @@ val ClassDeclaration.parents: List<ClassDeclaration>
         while (c != null) {
             seq.add(c)
             c = parent.obj;
-            if(c in seq) break
+            if (c in seq) break
         }
         return seq
     }
@@ -239,8 +241,7 @@ val InterfaceDeclaration.allInterfaces: List<InterfaceDeclaration>
     }
 
 
-
-interface HasInterfaces : Identifiable{
+interface HasInterfaces : Identifiable {
     val interfaces: RefList<InterfaceDeclaration>
 }
 
@@ -279,7 +280,11 @@ interface HasSfcBody {
     var sfcBody: SFCImplementation?
 }
 
-interface HasBody : HasSfcBody, HasStBody
+interface HasIlBody {
+    var ilBody: IlBody?
+}
+
+interface HasBody : HasSfcBody, HasStBody, HasIlBody
 
 interface HasMethods : Identifiable {
     val methods: MutableList<MethodDeclaration>
@@ -295,6 +300,7 @@ data class ProgramDeclaration(
         override var scope: Scope = Scope(),
         override var stBody: StatementList? = null,
         override var sfcBody: SFCImplementation? = null,
+        override var ilBody: IlBody? = null,
         var actions: LookupList<ActionDeclaration> = ArrayLookupList()
 ) : PouExecutable(), Identifiable {
     override fun clone() = copy()
@@ -345,8 +351,9 @@ data class FunctionDeclaration(
         override var name: String = ANONYM,
         override var scope: Scope = Scope(),
         var returnType: RefTo<AnyDt> = RefTo(),
-        override var stBody: StatementList? = StatementList()
-) : PouExecutable() {
+        override var stBody: StatementList? = StatementList(),
+        override var ilBody: IlBody? = null)
+    : PouExecutable() {
 
     override var sfcBody: SFCImplementation?
         get() = null
@@ -421,6 +428,7 @@ object EMPTY_EXPRESSION : Expression() {
 abstract class Statement : Top() {
     abstract override fun clone(): Statement
 }
+
 
 data class RepeatStatement(var condition: Expression = EMPTY_EXPRESSION, var statements: StatementList = StatementList()) : Statement() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
@@ -529,6 +537,18 @@ class ExitStatement : Statement() {
         var EXIT_STATMENT = ExitStatement()
     }
 }
+
+data class JumpStatement(var target : String) : Statement() {
+    override fun clone() = copy().also { it.ruleContext = ruleContext }
+    override fun <T> accept(visitor: Visitor<T>): T  = visitor.visit(this)
+}
+
+data class LabelStatement(var label : String) : Statement() {
+    override fun clone() = copy().also { it.ruleContext = ruleContext }
+    override fun <T> accept(visitor: Visitor<T>): T  = visitor.visit(this)
+}
+
+
 
 class ReturnStatement : Statement() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
@@ -2089,8 +2109,9 @@ interface Classifier : HasMethods, HasInterfaces, Identifiable
 data class ActionDeclaration(
         override var name: String = ANONYM,
         override var stBody: StatementList? = null,
-        override var sfcBody: SFCImplementation? = null
-) : Identifiable, HasBody, Top() {
+        override var sfcBody: SFCImplementation? = null,
+        override var ilBody: IlBody? = null)
+    : Identifiable, HasBody, Top() {
     override fun clone(): ActionDeclaration {
         val a = ActionDeclaration()
         a.name = this.name

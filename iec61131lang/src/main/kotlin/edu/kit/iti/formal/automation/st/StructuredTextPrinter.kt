@@ -1,32 +1,11 @@
 package edu.kit.iti.formal.automation.st
 
-/*-
- * #%L
- * iec61131lang
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
- * This program isType free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program isType distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a clone of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
 import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.IECString
 import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue
 import edu.kit.iti.formal.automation.datatypes.values.Value
+import edu.kit.iti.formal.automation.il.IlPrinter
 import edu.kit.iti.formal.automation.operators.Operator
 import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.automation.scope.Scope
@@ -45,7 +24,7 @@ import java.util.*
 class StructuredTextPrinter
 @JvmOverloads constructor(var sb: CodeWriter = CodeWriter()) : AstVisitor<Unit>() {
     private val literals: StringLiterals = SL_ST
-    var bodyPrinting = BodyPrinting.ST
+    var bodyPrintingOrder = listOf(BodyPrinting.ST, BodyPrinting.SFC, BodyPrinting.IL)
     var isPrintComments: Boolean = false
 
     val string: String
@@ -66,7 +45,7 @@ class StructuredTextPrinter
                 sb.printf(", ")
         }
         sb.printf("] OF ")
-        sb.printf(arrayTypeDeclaration.baseType.identifier?:"<missing>")
+        sb.printf(arrayTypeDeclaration.baseType.identifier ?: "<missing>")
     }
 
     override fun visit(stringTypeDeclaration: StringTypeDeclaration) {
@@ -274,10 +253,9 @@ class StructuredTextPrinter
             sb.nl()
         }
 
-        printBody(pd.stBody, pd.sfcBody)
+        printBody(pd)
 
         sb.decreaseIndent().nl().printf("END_PROGRAM").nl()
-
     }
 
 
@@ -373,7 +351,7 @@ class StructuredTextPrinter
             functionBlockDeclaration.actions.forEach { v -> v.accept(this) }
         }
 
-        printBody(functionBlockDeclaration.stBody, functionBlockDeclaration.sfcBody)
+        printBody(functionBlockDeclaration)
 
         sb.decreaseIndent().nl().printf("END_FUNCTION_BLOCK").nl().nl()
 
@@ -383,7 +361,7 @@ class StructuredTextPrinter
         if (comment.isNotBlank()) {
             sb.printf(literals.comment_open())
             sb.printf(comment)
-            sb.printf(literals.comment_close()+"\n")
+            sb.printf(literals.comment_close() + "\n")
         }
     }
 
@@ -473,7 +451,7 @@ class StructuredTextPrinter
 
         functionDeclaration.scope.accept(this)
 
-        functionDeclaration.stBody?.accept(this)
+        printBody(functionDeclaration)
 
         sb.decreaseIndent().nl().printf("END_FUNCTION").nl().nl()
 
@@ -534,7 +512,7 @@ class StructuredTextPrinter
 
     override fun visit(ad: ActionDeclaration) {
         sb.nl().printf("ACTION ").printf(ad.name).increaseIndent()
-        printBody(ad.stBody, ad.sfcBody)
+        printBody(ad)
         sb.decreaseIndent().nl().printf("END_ACTION")
 
     }
@@ -790,18 +768,18 @@ class StructuredTextPrinter
 
     }
 
-    private fun printBody(stBody: StatementList?, sfcBody: SFCImplementation?) {
-        when (bodyPrinting) {
-            StructuredTextPrinter.BodyPrinting.ST -> if (stBody != null) {
-                stBody.accept(this)
-            } else {
-                sfcBody?.accept(this)
+    private fun printBody(a: HasBody) {
+        val stBody = a.stBody
+        val sfcBody = a.sfcBody
+        val ilBody = a.ilBody
+
+        loop@ for (type in bodyPrintingOrder) {
+            when (type) {
+                BodyPrinting.ST -> stBody?.accept(this) ?: continue@loop
+                BodyPrinting.SFC -> sfcBody?.accept(this) ?: continue@loop
+                BodyPrinting.IL -> ilBody?.accept(IlPrinter(sb)) ?: continue@loop
             }
-            StructuredTextPrinter.BodyPrinting.SFC -> if (sfcBody != null) {
-                sfcBody.accept(this)
-            } else {
-                stBody?.accept(this)
-            }
+            break@loop
         }
     }
 
@@ -809,13 +787,12 @@ class StructuredTextPrinter
      *
      * clear.
      */
-
     fun clear() {
         sb = CodeWriter()
     }
 
     enum class BodyPrinting {
-        ST, SFC
+        ST, SFC, IL
     }
 
     open class StringLiterals {
@@ -923,6 +900,14 @@ class StructuredTextPrinter
             astNode.accept(p)
             return p.string
         }
+    }
+
+    override fun visit(jump: JumpStatement) {
+        sb.nl().write("JMP ${jump.target};")
+    }
+
+    override fun visit(label: LabelStatement) {
+        sb.nl().write("${label.label}:")
     }
 }
 
