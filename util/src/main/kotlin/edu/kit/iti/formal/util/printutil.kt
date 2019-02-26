@@ -16,7 +16,9 @@ public fun <K, V, A : Appendable> Map<K, V>.joinInto(buffer: A,
 }
 
 public fun <T, A : Appendable> List<T>.joinInto(buffer: A,
-                                                separator: String = ",", prefix: String = "", postfix: String = "",
+                                                separator: String = ",",
+                                                prefix: String = "",
+                                                postfix: String = "",
                                                 transform: (T) -> Unit) {
     buffer.append(prefix)
     if (isNotEmpty()) {

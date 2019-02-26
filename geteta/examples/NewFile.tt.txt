@@ -15,7 +15,7 @@ table Ta {
             actuator: sensor*2
         }
         row C >=0 {
-            sensor: =prev(actuator)
+            sensor: =2(actuator)
             actuator: =SEL(TRUE,FALSE,TRUE)
         }
     }

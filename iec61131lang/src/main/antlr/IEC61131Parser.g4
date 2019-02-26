@@ -2,6 +2,10 @@ parser grammar IEC61131Parser;
 
 options {tokenVocab = IEC61131Lexer;}
 
+@header{
+ import java.util.*;
+}
+
 @members {
     private ErrorReporter errorReporter = new ErrorReporter();
     public ErrorReporter getErrorReporter() { return errorReporter;}
@@ -40,20 +44,20 @@ using_directive
 
 library_element_declaration
 :
-	data_type_declaration
+	  data_type_declaration
 	| function_declaration
-    | class_declaration
-    | interface_declaration
+  | class_declaration
+  | interface_declaration
 	| function_block_declaration
 	| program_declaration
 	| global_variable_list_declaration
-    | namespace_declaration
+  | namespace_declaration
 //	| configuration_declaration
 ;
 
 constant
 :
-      integer
+    integer
 	| real
 	| string
 	| time
@@ -373,8 +377,8 @@ function_block_declaration
 
 body :
       sfc
-    | /*| ladder_diagram | fb_diagram | instruction_list |*/
-      statement_list;
+    | IL_CODE ilBody /*| ladder_diagram | fb_diagram | instruction_list |*/
+    | statement_list;
 
 funcBody : /*ladder_diagram | fb_diagram | instruction_list |*/
             statement_list;
@@ -683,19 +687,28 @@ statement_list
 
 statement
 :
-	  assignment_statement SEMICOLON
+	    assignment_statement SEMICOLON
    	| invocation_statement SEMICOLON
-	| return_statement SEMICOLON
-	| if_statement
+  	| return_statement SEMICOLON
+  	| jump_statement SEMICOLON
+  	| label_statement SEMICOLON
+	  | if_statement
     | case_statement
-	| for_statement
-	| while_statement
-	| repeat_statement
-	| exit_statement SEMICOLON
+    | for_statement
+    | while_statement
+    | repeat_statement
+    | exit_statement SEMICOLON
+;
+
+jump_statement
+: JMP id=IDENTIFIER
+;
+
+label_statement
+: id=IDENTIFIER COLON
 ;
 
 assignment_statement
-
 :
 	a=variable (ASSIGN_ATTEMPT|RASSIGN|ASSIGN) expression
 ;
@@ -707,15 +720,12 @@ invocation_statement
 
 
 variable
-
 :
 	direct_variable
 	| symbolic_variable
 ;
 
-symbolic_variable
-
-:
+symbolic_variable :
     //x^[a,252]
 	a=(IDENTIFIER|SUPER|THIS)
 	(
@@ -730,9 +740,7 @@ symbolic_variable
 	)?
 ;
 
-subscript_list
-
-:
+subscript_list:
 	LBRACKET expression
 	(COMMA expression)* RBRACKET
 ;
@@ -816,49 +824,44 @@ exit_statement
  actionQualifier : IDENTIFIER (COMMA expression )?;
  //actionTime: TIME_LITERAL | IDENTIFIER;
  transition : TRANSITION id=IDENTIFIER? ( LPAREN PRIORITY ASSIGN INTEGER_LITERAL RPAREN)?
-                FROM from=steps TO to=steps transitionCond END_TRANSITION;
+              FROM from=steps TO to=steps transitionCond END_TRANSITION;
  steps : IDENTIFIER | LPAREN IDENTIFIER ( COMMA IDENTIFIER )* RPAREN;
  transitionCond : ASSIGN expression SEMICOLON /*| COLON ( FBD_Network | LD_Rung ) | ':=' IL_Simple_Inst*/;
  action : ACTION IDENTIFIER COLON? body END_ACTION;
 //
 
-/*
-start_sfc 
-:
-	SFC name=IDENTIFIER
-	var_decls
-	(     action_declaration
-		| goto_declaration
-		| step_declaration
-	)* END_SFC
-;
 
-goto_declaration
-:
-	GOTO guard=expression DCOLON from=identifier_list RIGHTARROW to=identifier_list SEMICOLON?
-;
+ilBody : EOL? ilInstruction+ EOL?;
+ilInstruction : (label=IDENTIFIER COLON)? EOL? ilInstr (EOL|EOF);
 
-action_declaration
-:
-	ACTION	(name = IDENTIFIER)?
-	var_decls
-	body=statement_list
-	END_ACTION
-;
+ilSInstr : ilSimple | ilExpr | ilFunctionCall | ilFormalFunctionCall ;
+ilInstr  : ilSimple | ilExpr |  ilJump  | ilCall | ilFunctionCall | ilFormalFunctionCall;
 
-step_declaration
-:
-	STEP name=IDENTIFIER
-	(event)*
-	END_STEP
-;
+ilSInstrList : (ilSInstr EOL)+;
 
-event
-:
-	ON type=IDENTIFIER
-	(
-		ACTION body=statement_list
-		END_ACTION
-		| action=IDENTIFIER
-    )
+ilSimple:             op=simple_op ilOperand?;
+ilExpr:               op=exprOperator (LPAREN ilOperand? EOL ilSInstrList RPAREN | ilOperand?);
+ilFunctionCall:       op=symbolic_variable (ilOperand (COMMA ilOperand)?)?;
+ilFormalFunctionCall: op=symbolic_variable LPAREN EOL (il_param_assignment (',' il_param_assignment)*)? RPAREN;
+ilJump:               op=jump_op label=IDENTIFIER;
+
+ilCall:               op=call_op symbolic_variable
+                      ( LPAREN EOL (il_param_assignment (',' il_param_assignment)*)? RPAREN
+                      | (ilOperand (',' ilOperand)*)?
+                      )
+                    ;
+
+ilOperand: constant | symbolic_variable;
+
+jump_op      : IL_JMP |  IL_JMPC | IL_JMPCN;
+call_op      : IL_CAL | IL_CALC | IL_CALCN;
+simple_op    : IL_RET | IL_RETC | IL_RETCN | IL_LD | IL_LDN | IL_ST | IL_STN | IL_STQ |
+               IL_NOT | IL_S | IL_R | IL_S1  | IL_R1 | IL_CLK |  IL_CU | IL_CD | IL_PV | IL_IN | IL_PT;
+exprOperator : AND| OR| XOR| IL_ANDN |IL_ORN |IL_XORN |IL_ADD |
+               IL_SUB | IL_MUL | IL_DIV | MOD | IL_GT | IL_GE |
+               IL_EQ | IL_LT | IL_LE | IL_NE;
+
+il_param_assignment:
+	NOT? id=IDENTIFIER ARROW_RIGHT arg=ilOperand
+	| (id=IDENTIFIER ASSIGN)? target=IDENTIFIER
 ;

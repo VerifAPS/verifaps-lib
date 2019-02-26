@@ -8,14 +8,15 @@ import org.jdom2.xpath.XPathFactory
 //TODO: Edges could be negated
 //TODO: Storage modifier (S=, R=)
 //TODO: Edge modifier
+//TODO: Jumps and Marks
 class FBDTranslator(val e: Element, val writer: CodeWriter) {
     val blockVariables = arrayListOf<Pair<String, String>>()
     val xpathFactory = XPathFactory.instance()
     val nodes: List<FBDNode>
 
     init {
-        val nodes = xpathFactory.compile("./body/FBD/block", Filters.element()).evaluate(e)
-                .map { translateBlock(it) }
+        val nodes = xpathFactory.compile("./body/FBD/block",
+                Filters.element()).evaluate(e).map { translateBlock(it) }
 
         nodes.forEach { n ->
             n.predessorBlocks = n.connectionIn.mapNotNull { ref -> nodes.find { it.id == ref } }
@@ -37,8 +38,8 @@ class FBDTranslator(val e: Element, val writer: CodeWriter) {
         this.nodes = nodes.sortedBy { it.executionOrder }
     }
 
-    //private val connectionInIds = xpathFactory.compile("//connectionPointIn/connection@refLocalId", Filters.attribute())
-    private val inVar = xpathFactory.compile("./inputVariables/variable", Filters.element())
+    private val inVar = xpathFactory.compile("./inputVariables/variable",
+            Filters.element())
 
     fun run() {
         writer.nl().printf("VAR").block {

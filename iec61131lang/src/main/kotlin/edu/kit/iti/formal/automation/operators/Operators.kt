@@ -45,9 +45,9 @@ object Operators {
     val SUB = BinaryOperator("-", AnyNum.ANY_NUM)
     val DIV = BinaryOperator("/", AnyNum.ANY_NUM)
     val MOD = BinaryOperator("MOD", AnyNum.ANY_NUM)
-    val AND = BinaryOperator("AND", AnyBit.BOOL)
-    val OR = BinaryOperator("OR", AnyBit.BOOL)
-    val XOR = BinaryOperator("XOR", AnyBit.BOOL)
+    val AND = BooleanOperator("AND")
+    val OR = BooleanOperator("OR")
+    val XOR = BooleanOperator("XOR")
     val POWER = BinaryOperator("**", AnyNum())
     // Comparison
     val EQUALS = ComparisonOperator("=")
@@ -56,9 +56,8 @@ object Operators {
     val GREATER_THAN = ComparisonOperator(">")
     val GREATER_EQUALS = ComparisonOperator(">=")
     val LESS_EQUALS = ComparisonOperator("<=")
-
-
     //
+
     private val TABLE: MutableMap<String, Operator> = mutableMapOf()
 
     init {

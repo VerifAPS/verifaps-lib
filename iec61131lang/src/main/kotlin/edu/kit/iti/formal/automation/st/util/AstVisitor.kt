@@ -927,8 +927,6 @@ open abstract class AstVisitorWithScope<T> : AstVisitor<T>() {
     }
 }
 
-
-
 /**
  *
  * AstMutableVisitor class.

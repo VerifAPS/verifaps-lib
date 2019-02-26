@@ -388,6 +388,7 @@ data class ReporterMessage(
         var level: ReportLevel = ERROR,
         var candidates: MutableList<String> = arrayListOf()) {
 
+
     fun toHuman() =
             "[$level] $sourceName:$startLine:$startOffset $message [$category]"
 

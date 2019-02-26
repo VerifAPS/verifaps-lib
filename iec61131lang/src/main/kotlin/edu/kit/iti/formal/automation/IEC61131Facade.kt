@@ -2,6 +2,7 @@ package edu.kit.iti.formal.automation
 
 import edu.kit.iti.formal.automation.analysis.*
 import edu.kit.iti.formal.automation.builtin.BuiltinLoader
+import edu.kit.iti.formal.automation.il.IlBody
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
@@ -12,9 +13,7 @@ import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.automation.visitors.Visitable
 import edu.kit.iti.formal.util.CodeWriter
-import org.antlr.v4.runtime.CharStream
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.*
 import java.io.*
 import java.nio.charset.Charset
 import java.nio.file.Path
@@ -72,7 +71,7 @@ object IEC61131Facade {
         return if (path.endsWith("xml")) {
             val out = IECXMLFacade.extractPLCOpenXml(path)
             if (tee != null) {
-                tee.bufferedWriter()?.use {
+                tee.bufferedWriter().use {
                     it.write(out)
                 }
                 file(tee)
@@ -212,9 +211,61 @@ object IEC61131Facade {
         TODO() //Aktuelle Schritt: {STEP_$name}
     }
 
-    fun tranlsateSfc(elements: PouElements) {
+    fun translateSfc(elements: PouElements) {
         elements.forEach { it.accept(TranslateSfcToSt) }
     }
 
+    object InstructionList {
+        /*
+        fun getParser(input: Token): IlParser {
+            return getParser(
+                    CharStreams.fromString(input.text),
+                    ShiftedTokenFactory(input))
+        }
+
+        fun getParser(input: CharStream, position: Position): IlParser {
+            return getParser(input, ShiftedTokenFactory(position))
+        }
+
+        fun getParser(input: CharStream, tokenFactory: TokenFactory<*>? = null): IlParser {
+            val lexer = IlLexer(input)
+            if (tokenFactory != null)
+                lexer.tokenFactory = tokenFactory
+            val p = IlParser(CommonTokenStream(lexer))
+            p.errorListeners.clear()
+            p.addErrorListener(p.errorReporter)
+            return p
+        }
+        fun parseBody(token: Token): IlBody {
+            val ctx = getParser(token).ilBody()
+            return ctx.accept(IlTransformToAst()) as IlBody
+        }
+        */
+
+
+        fun parseBody(token: String): IlBody {
+            val lexer = IEC61131Lexer(CharStreams.fromString(token))
+            lexer.pushMode(1)
+            val parser = IEC61131Parser(CommonTokenStream(lexer))
+            val ctx = parser.ilBody()
+            return ctx.accept(IECParseTreeToAST()) as IlBody
+        }
+
+        private class ShiftedTokenFactory(val offset: Int = 0,
+                                          val offsetLine: Int = 0,
+                                          val offsetChar: Int = 0) : CommonTokenFactory() {
+            constructor(position: Position) : this(position.offset, position.lineNumber, position.charInLine)
+            constructor(token: Token) : this(token.startIndex, token.line, token.charPositionInLine)
+
+            override fun create(source: org.antlr.v4.runtime.misc.Pair<TokenSource, CharStream>?, type: Int, text: String?, channel: Int, start: Int, stop: Int, line: Int, charPositionInLine: Int): CommonToken {
+                val token = super.create(source, type, text, channel, start, stop, line, charPositionInLine)
+                token.startIndex += offset
+                token.stopIndex += offset
+                token.charPositionInLine += offsetChar
+                token.line += offsetLine
+                return token
+            }
+        }
+    }
 }
 

@@ -1,6 +1,5 @@
 lexer grammar IEC61131Lexer;
 
-
 /** Fragments for case insensitivity */
 fragment A:('a'|'A');
 fragment B:('b'|'B');
@@ -28,6 +27,8 @@ fragment W:('w'|'W');
 fragment X:('x'|'X');
 fragment Y:('y'|'Y');
 fragment Z:('z'|'Z');
+
+IL_CODE: '//IL\n' -> pushMode(il);
 
 /******
  * DATATYPES
@@ -334,6 +335,8 @@ INTERVAL
 :
 	I N T E R V A L
 ;
+
+JMP: J M P;
 
 NIL
 :
@@ -950,3 +953,98 @@ DIRECT_VARIABLE_LITERAL
 ;
 
 ERROR_CHAR : .;
+
+mode il;
+IL_END_FUNCTION: END_FUNCTION -> type(END_FUNCTION), popMode;
+IL_END_FUNCTION_BLOCK: END_FUNCTION_BLOCK -> type(END_FUNCTION_BLOCK), popMode ;
+IL_END_PROGRAM: END_PROGRAM -> type(END_PROGRAM), popMode;
+IL_END_ACTION: END_ACTION -> type(END_ACTION), popMode;
+
+IL_ADD                     : 'ADD';
+IL_AND                     : ('AND' | '&') -> type(AND);
+IL_ANDN                    : 'ANDN' | '&N';
+IL_ARROW_RIGHT             : ARROW_RIGHT -> type(ARROW_RIGHT);
+IL_ASSIGN                  : ASSIGN -> type(ASSIGN);
+IL_BITS_LITERAL            : BITS_LITERAL -> type(BITS_LITERAL);
+IL_CAL                     : 'CAL';
+IL_CALC                    : 'CALC';
+IL_CALCN                   : 'CALCN';
+IL_CARET                   : CARET -> type(CARET);
+IL_CAST_LITERAL            : CAST_LITERAL -> type(CAST_LITERAL);
+IL_CD                      : 'CD';
+IL_CLK                     : 'CLK';
+IL_COMMA                   : COMMA -> type(COMMA);
+IL_CU                      : 'CU';
+IL_DATETIME                : DATETIME -> type(DATETIME);
+IL_DATE_LITERAL            : DATE_LITERAL -> type(DATE_LITERAL);
+IL_DIRECT_VARIABLE_LITERAL : DIRECT_VARIABLE_LITERAL -> type(DIRECT_VARIABLE_LITERAL);
+IL_OP_DIV                  : DIV -> type(DIV);
+IL_DIV                     : 'DIV';
+IL_DOT                     : DOT -> type(DOT);
+IL_EQ                      : 'EQ';
+IL_EQUALS                  : EQUALS -> type(EQUALS);
+IL_GE                      : 'GE';
+IL_GREATER_EQUALS          : GREATER_EQUALS -> type(GREATER_EQUALS);
+IL_GREATER_THAN            : GREATER_THAN -> type(GREATER_THAN);
+IL_GT                      : 'GT';
+IL_IN                      : 'IN';
+IL_INTEGER_LITERAL         : INTEGER_LITERAL -> type(INTEGER_LITERAL);
+IL_JMP                     : 'JMP';
+IL_JMPC                    : 'JMPC';
+IL_JMPCN                   : 'JMPCN';
+IL_LBRACKET                : LBRACKET -> type(LBRACKET);
+IL_LD                      : 'LD';
+IL_LDN                     : 'LDN';
+IL_LE                      : 'LE';
+IL_LESS_EQUALS             : LESS_EQUALS -> type(LESS_EQUALS);
+IL_LESS_THAN               : LESS_THAN -> type(LESS_THAN);
+IL_LPAREN                  : LPAREN -> type(LPAREN);
+IL_LT                      : 'LT';
+IL_MINUS                   : MINUS -> type(MINUS);
+IL_MOD                     : 'MOD';
+IL_MUL                     : 'MUL';
+IL_MULT                    : MULT -> type(MULT);
+IL_NE                      : 'NE';
+IL_NOT                     : 'NOT';
+IL_NOT_EQUALS              : NOT_EQUALS -> type(NOT_EQUALS);
+IL_NULL                    : NULL -> type(NULL);
+IL_OR                      : 'OR' -> type(OR);
+IL_ORN                     : 'ORN';
+IL_PLUS                    : PLUS -> type(PLUS);
+IL_POWER                   : POWER -> type(POWER);
+IL_PT                      : 'PT';
+IL_PV                      : 'PV';
+IL_R1                      : 'R1';
+IL_R                       : 'R';
+IL_RBRACKET                : RBRACKET -> type(RBRACKET);
+IL_REAL_LITERAL            : REAL_LITERAL -> type(REAL_LITERAL);
+IL_REF                     : REF -> type(REF);
+IL_RET                     : 'RET';
+IL_RETC                    : 'RETC';
+IL_RETCN                   : 'RETCN';
+IL_RPAREN                  : RPAREN -> type(RPAREN);
+IL_S1                      : 'S1';
+IL_S                       : 'S';
+IL_SEMICOLON               : SEMICOLON -> type(SEMICOLON);
+IL_COLON                   : COLON -> type(COLON);
+IL_ST                      : 'ST';
+IL_STN                     : 'STN';
+IL_STQ                     : 'ST?';
+IL_STRING_LITERAL          : STRING_LITERAL -> type(STRING_LITERAL);
+IL_SUB                     : 'SUB';
+IL_TIME_LITERAL            : TIME_LITERAL -> type(TIME_LITERAL);
+IL_TOD_LITERAL             : TOD_LITERAL -> type(TOD_LITERAL);
+IL_WSTRING_LITERAL         : WSTRING_LITERAL -> type(WSTRING_LITERAL);
+IL_XOR                     : XOR -> type(XOR);
+IL_XORN                    : 'XORN';
+
+IL_IDENTIFIER: IDENTIFIER -> type(IDENTIFIER);
+
+EOL: '\n'+;
+
+IL_WS: [ \r\t]+ -> type(WS), channel ( HIDDEN );
+
+IL_COMMENT: COMMENT -> type(COMMENT);
+IL_LINE_COMMENT: LINE_COMMENT -> type(LINE_COMMENT);
+
+IL_ERROR_CHAR: ERROR_CHAR -> type(ERROR_CHAR);
