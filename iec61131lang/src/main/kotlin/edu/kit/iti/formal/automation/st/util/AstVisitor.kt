@@ -184,7 +184,9 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
 
     override fun traverse(programDeclaration: ProgramDeclaration) {
         programDeclaration.scope.accept(visitor)
-        programDeclaration.stBody!!.accept(visitor)
+        programDeclaration.stBody?.accept(visitor)
+        programDeclaration.sfcBody?.accept(visitor)
+        //programDeclaration.ilBody?.accept(visitor)
     }
 
     override fun traverse(expressions: ExpressionList) {
@@ -506,7 +508,8 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
 
     override fun traverse(programDeclaration: ProgramDeclaration) {
         programDeclaration.scope = programDeclaration.scope.accept(visitor) as Scope
-        programDeclaration.stBody = programDeclaration.stBody!!.accept(visitor) as StatementList
+        programDeclaration.stBody = programDeclaration.stBody?.accept(visitor) as StatementList?
+        programDeclaration.sfcBody = programDeclaration.sfcBody?.accept(visitor) as SFCImplementation?
     }
 
 
