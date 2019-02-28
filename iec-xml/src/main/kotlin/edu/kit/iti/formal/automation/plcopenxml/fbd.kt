@@ -29,11 +29,11 @@ internal fun operatorSymbol(name: String) =
 //TODO: Storage modifier (S=, R=)
 //TODO: Edge modifier
 //TODO: Jumps and Marks
-class FBDTranslator(val e: Element, val writer: CodeWriter) {
+class FBDTranslator(val fbd: Element, val writer: CodeWriter) {
     val nodes: List<FbdNode>
 
     init {
-        val nodes = e.getChild("body").getChild("FBD").children.mapNotNull { translateBlock(it) }
+        val nodes = fbd.children.mapNotNull { translateBlock(it) }
         nodes.forEach { n ->
             n.predessorBlocks = n.predessorIds.mapNotNull { ref -> nodes.find { it.id == ref } }
         }
@@ -104,9 +104,11 @@ enum class FBDCallType { UNKNOWN, FUNCTION, OPERATOR, EXECUTE }
 sealed class FbdNode(val block: Element, val network: FBDTranslator) {
     val id: String by lazy { block.getAttributeValue("localId") }
     val networkId by lazy {
-        //This is a codesys assumption!
-        if (id[1] != '0') throw IllegalStateException("I am not tested for more than 9 FBD networks!")
-        id[0].toInt() - 49
+        if (id.length > 5) {
+            //This is a codesys assumption!
+            if (id[1] != '0') throw IllegalStateException("I am not tested for more than 9 FBD networks!")
+            id[0].toInt() - 49
+        } else 0
     }
     var executionOrder = 0
 
@@ -126,17 +128,16 @@ sealed class FbdNode(val block: Element, val network: FBDTranslator) {
     abstract fun getSlot(formalParameterName: String?): String?
 }
 
-
 class FbdBlock(e: Element, network: FBDTranslator) : FbdNode(e, network) {
     val type: String by lazy { block.getAttributeValue("typeName") }
     val instanceName: String by lazy {
         block.getAttributeValue("instanceName") ?: this.type.toLowerCase()
     }
 
-
     val callType: FBDCallType by lazy {
         when (type.toLowerCase()) {
             "mux" -> FBDCallType.FUNCTION
+            "add" -> FBDCallType.OPERATOR
             else -> {
                 val ct = xpathFactory.compile(".//CallType", Filters.element()).evaluateFirst(block)
                 when (ct?.textTrim) {
@@ -157,7 +158,6 @@ class FbdBlock(e: Element, network: FBDTranslator) : FbdNode(e, network) {
     }
     */
 
-
     val executeBody: String? by lazy {
         val key = "http://www.3s-software.com/plcopenxml/stcode"
         //val query = xpathFactory.compile(".//data[@name=\"$key\"]/STCode/text()", Filters.textOnly())
@@ -167,7 +167,8 @@ class FbdBlock(e: Element, network: FBDTranslator) : FbdNode(e, network) {
     }
 
     override fun getSlot(formalParameterName: String?): String? {
-        val neg = outputVariables.find { it.formalParameter == formalParameterName }?.negated ?: false
+        val variable = outputVariables.find { it.formalParameter.equals(formalParameterName, true) }
+        val neg = variable?.negated ?: false
         val prefix = (if (neg) "NOT " else "")
         return when (callType) {
             FBDCallType.EXECUTE -> {
@@ -185,16 +186,16 @@ class FbdBlock(e: Element, network: FBDTranslator) : FbdNode(e, network) {
         FBDCallType.OPERATOR -> {
             val opSymbol = operatorSymbol(instanceName)
             val terms = inputVariables
-                    .sortedWith(compareBy(BlockVariable::formalParameter))
+                    //.sortedWith(compareBy(BlockVariable::formalParameter))
                     .joinToString(opSymbol, "(", ")") { network.getSlot(it) }
             terms
         }
-        FBDCallType.FUNCTION -> "$instanceName(${getArguments()})"
+        FBDCallType.FUNCTION -> "$type(${getArguments()})"
         else -> ""
     }
 
     private fun getArguments() = inputVariables
-            .sortedWith(compareBy(BlockVariable::formalParameter))
+            //.sortedWith(compareBy(BlockVariable::formalParameter))
             .joinToString(", ") {
                 val e = network.getSlot(it)
                 if (callType == FBDCallType.FUNCTION) e
@@ -279,7 +280,6 @@ class OutVariable(e: Element, network: FBDTranslator) : FbdNode(e, network) {
     }
     val variable = BlockVariable(e)
 
-
     override val predessorIds by lazy {
         val v = variable.connectionInId
         if (v != null) listOf(v) else listOf()
@@ -290,7 +290,8 @@ class OutVariable(e: Element, network: FBDTranslator) : FbdNode(e, network) {
 
     override fun write(writer: CodeWriter) {
         val value = network.getSlot(variable)
-        writer.write(expression!!).write(" := ").write(value).write(";")
+        val not = if (variable.negated) "NOT " else ""
+        writer.write("$expression := $not $value;");
     }
 }
 
@@ -327,7 +328,7 @@ class BlockVariable(val element: Element) {
     }
 
     val negated: Boolean by lazy {
-        "TRUE" == element.getAttributeValue("negated")
+        "true" == element.getAttributeValue("negated")
     }
 
     val stored: Boolean = false
