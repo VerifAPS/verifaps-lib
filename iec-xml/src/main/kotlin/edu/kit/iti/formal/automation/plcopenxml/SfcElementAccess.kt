@@ -214,7 +214,7 @@ class SfcElementAccess(val sfcElement: Element) {
 
         val conditionId by lazy {
             conditionRefId.evaluateFirst(t).value
-                    ?: throw IllegalStateException("Following element does not have a transition guard:$t")
+                    ?: throw IllegalStateException("Following block does not have a transition guard:$t")
         }
 
         val condition: String by lazy {
