@@ -364,7 +364,7 @@ data class FunctionDeclaration(
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
     override fun clone(): FunctionDeclaration {
         val fd = FunctionDeclaration()
-        fd.scope = scope?.clone()
+        fd.scope = scope.clone()
         fd.name = this.name
         fd.returnType = returnType.clone()
         fd.stBody = stBody?.clone()
@@ -457,9 +457,6 @@ data class AssignmentStatement(var location: SymbolicReference,
                                var reference: Boolean = false) : Statement() {
 
     var isAssignmentAttempt: Boolean = false
-        set(assignmentAttempt) {
-            field = isAssignmentAttempt
-        }
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
@@ -489,7 +486,7 @@ data class CaseStatement(
     override fun clone(): CaseStatement {
         val c = CaseStatement()
         c.ruleContext = ruleContext
-        c.expression = expression!!.clone()
+        c.expression = expression.clone()
         cases.forEach { cs -> c.addCase(cs.clone()) }
         c.elseCase = elseCase?.clone()
         return c
@@ -538,16 +535,15 @@ class ExitStatement : Statement() {
     }
 }
 
-data class JumpStatement(var target : String) : Statement() {
+data class JumpStatement(var target: String) : Statement() {
     override fun clone() = copy().also { it.ruleContext = ruleContext }
-    override fun <T> accept(visitor: Visitor<T>): T  = visitor.visit(this)
+    override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
 
-data class LabelStatement(var label : String) : Statement() {
+data class LabelStatement(var label: String) : Statement() {
     override fun clone() = copy().also { it.ruleContext = ruleContext }
-    override fun <T> accept(visitor: Visitor<T>): T  = visitor.visit(this)
+    override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
-
 
 
 class ReturnStatement : Statement() {
@@ -584,9 +580,8 @@ data class ForStatement(
         fs.ruleContext = ruleContext
         fs.variable = variable
         fs.start = start.clone()
-        fs.stop = stop!!.clone()
-        if (step != null)
-            fs.step = step!!.clone()
+        fs.stop = stop.clone()
+        fs.step = step?.clone()
         fs.statements = statements.clone()
         return fs
     }
@@ -1763,16 +1758,28 @@ data class Position(
         val charInLine: Int = -1,
         val offset: Int = -1) : edu.kit.iti.formal.automation.st.Cloneable {
 
-    constructor(token: Token?) : this(token?.line ?: -1,
-            token?.charPositionInLine ?: -1,
-            token?.startIndex ?: -1) {
+    companion object {
+        fun start(token: Token?) =
+                Position(token?.line ?: -1,
+                        token?.charPositionInLine ?: -1,
+                        token?.startIndex ?: -1)
+
+        fun end(token: Token?): Position {
+            return if (token == null) Position()
+            else {
+                val text = token.text?:""
+                val newlines = text.count { it == '\n' }
+                Position(token.line+ newlines,
+                        text.length - Math.max(0, text.lastIndexOf('\n')),
+                        token.stopIndex)
+            }
+        }
+
     }
 
-    public override fun clone() = copy()
+    override fun clone() = copy()
 
-    override fun toString(): String {
-        return "@$lineNumber:$charInLine"
-    }
+    override fun toString(): String = "@$lineNumber:$charInLine"
 }
 //endregion 
 
@@ -1975,10 +1982,10 @@ data class VariableDeclaration(
     var token: Token? = null
 
     override val startPosition: Position
-        get() = Position(token)
+        get() = Position.start(token)
 
     override val endPosition: Position
-        get() = startPosition
+        get() = Position.end(token)
 
     constructor(name: String, type: Int, td: TypeDeclaration?) : this(name, type) {
         typeDeclaration = td
@@ -2075,10 +2082,10 @@ interface HasRuleContext {
     val ruleContext: ParserRuleContext?
 
     val startPosition: Position
-        get() = Position(ruleContext?.start)
+        get() = Position.start(ruleContext?.start)
 
     val endPosition: Position
-        get() = Position(ruleContext?.stop)
+        get() = Position.end(ruleContext?.stop)
 }
 
 data class Range(val start: IntegerLit, val stop: IntegerLit) : Cloneable {

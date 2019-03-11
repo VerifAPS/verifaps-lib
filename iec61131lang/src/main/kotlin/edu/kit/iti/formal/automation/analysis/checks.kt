@@ -3,19 +3,19 @@ package edu.kit.iti.formal.automation.analysis
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.analysis.ReportCategory.*
 import edu.kit.iti.formal.automation.analysis.ReportLevel.*
+import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotResolvedException
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException
+import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.Identifiable
 import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.st.util.AstVisitor
 import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
 import edu.kit.iti.formal.util.dlevenshtein
 import org.antlr.v4.runtime.Token
 import kotlin.math.ceil
 import kotlin.math.log
 
-fun getCheckers(reporter: Reporter)
-        = listOf(CheckForTypes(reporter), CheckForLiterals(reporter), CheckForOO(reporter))
+fun getCheckers(reporter: Reporter) = listOf(CheckForTypes(reporter), CheckForLiterals(reporter), CheckForOO(reporter))
 
 /**
  * Similarity is defined via degree of levensthein of the low-case strings.
@@ -138,11 +138,10 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
                     .similarCandidates(symbolicReference.identifier)
                     .joinToString(", ")
 
-            reporter.report(
-                    node = symbolicReference,
-                    message = "Could not find variable ${symbolicReference.identifier}. " +
+            reporter.report(symbolicReference,
+                    "Could not find variable ${symbolicReference.identifier}. " +
                             "Possible candidates are: $candidates",
-                    category = VARIABLE_NOT_RESOLVED)
+                    VARIABLE_NOT_RESOLVED)
         }
     }
 
@@ -159,7 +158,57 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
         invocation.invoked ?: reporter.report(invocation,
                 "Invocation unresolved: ${invocation.callee}.",
                 INVOCATION_RESOLVE, WARN)
-        //invocation.callee.accept(this)
+
+        if (invocation.invoked != null) {
+            //TODO check for recursive call
+            //reporter.report(invocation, "Invocation unresolved: ${invocation.callee}.",
+            //        INVOCATION_RESOLVE, WARN)
+        }
+
+        invocation.inputParameters.forEach {
+            it.expression.accept(this@CheckForTypes)
+            val dt = inferDataTypeOrNull(it.expression)
+            val dtIn = invocation.invoked?.findInputVariable(it.name)
+
+            if (dtIn == null) {
+                reporter.report(it,
+                        "Could not resolve data type for input variable: ${it.name}.",
+                        VARIABLE_NOT_RESOLVED, ERROR)
+            } else {
+                if (dt != null) {
+                    if (!dt.isAssignableTo(dtIn)) {
+                        reporter.report(it,
+                                "Type mismatch ($dt <= $dtIn)  for expression ${it.expression.toHuman()} and parameter ${it.name}.",
+                                VARIABLE_NOT_RESOLVED, ERROR)
+                    }
+                }
+            }
+        }
+
+        invocation.outputParameters.forEach {
+            it.expression.accept(this@CheckForTypes)
+            val ref = it.expression as? SymbolicReference
+            if (ref == null) {
+                reporter.report(it, "Only refs", INVOCATION_RESOLVE, WARN)
+            } else {
+                val dt = inferDataTypeOrNull(it.expression)
+                val dtIn = invocation.invoked?.findInputVariable(it.name)
+
+                if (dtIn == null) {
+                    reporter.report(it,
+                            "Could not resolve data type for input variable: ${it.name}.",
+                            VARIABLE_NOT_RESOLVED, ERROR)
+                } else {
+                    if (dt != null) {
+                        if (!dt.isAssignableTo(dtIn)) {
+                            reporter.report(it,
+                                    "Type mismatch ($dt <= $dtIn)  for expression ${it.expression.toHuman()} and parameter ${it.name}.",
+                                    VARIABLE_NOT_RESOLVED, ERROR)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun visit(invocation: Invocation) {
@@ -206,6 +255,8 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
     }
 
     override fun visit(assignmentStatement: AssignmentStatement) {
+        assignmentStatement.expression.accept(this)
+
         try {
             val vd = scope.getVariable(assignmentStatement.location)
             if (vd.isInput || vd.isConstant) {
@@ -218,22 +269,46 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
                     VARIABLE_NOT_RESOLVED)
         }
 
-        try {
-            val lhsType = assignmentStatement.location.dataType(scope)
-            val rhsType = assignmentStatement.expression.dataType(scope)
+        val lhsType = inferDataTypeOrNull(assignmentStatement.location, scope)
+        val rhsType = inferDataTypeOrNull(assignmentStatement.expression, scope)
+
+        if (lhsType != null && rhsType != null) {
             if (!rhsType.isAssignableTo(lhsType)) {
                 reporter.report(assignmentStatement,
                         "Assignment type conflict between $rhsType and $lhsType",
                         ASSIGNMENT_TYPE_CONFLICT)
             }
+        }
+    }
+
+    override fun visit(forStatement: ForStatement) {
+        super.visit(forStatement)
+    }
+
+    private fun inferDataTypeOrNull(expr: Expression, s: Scope = scope): AnyDt? {
+        return try {
+            expr.dataType(s)
         } catch (e: VariableNotDefinedException) {
             reporter.report(e.reference!!,
-                    "Could not resolve variable.",
-                    PERMISSION)
+                    "Could not resolve variable: ${e.reference.toHuman()}",
+                    VARIABLE_NOT_RESOLVED)
+            null
         } catch (e: DataTypeNotResolvedException) {
-            reporter.report(assignmentStatement.expression,
-                    e.message!!, PERMISSION)
+            reporter.report(expr, e.message!!, INFER)
+            null
         }
+    }
+}
+
+private fun Invoked?.findInputVariable(name: String?): AnyDt? {
+    return if (name == null) null
+    else when (this) {
+        is Invoked.Program -> this.program.scope.variables[name]?.dataType
+        is Invoked.FunctionBlock -> this.fb.scope.variables[name]?.dataType
+        is Invoked.Function -> this.function.scope.variables[name]?.dataType
+        is Invoked.Method -> this.method.scope.variables[name]?.dataType
+        is Invoked.Action -> null
+        null -> null
     }
 }
 
@@ -283,7 +358,7 @@ class CheckForOO(private val reporter: Reporter) : AstVisitorWithScope<Unit>() {
                     (if (clazz != null)
                         (clazz!!.declaredMethods + clazz!!.definedMethods)
                     else interfaze!!.definedMethods)
-                            .filter { (w, m) -> m.name == method.name }
+                            .filter { (_, m) -> m.name == method.name }
                             .joinToString { (w, m) -> "${w.name}.${m.name}" }
             reporter.report(method, "Method is declared as override, but does not override any method. Candidates are: $candidates")
         }
@@ -296,7 +371,7 @@ class CheckForOO(private val reporter: Reporter) : AstVisitorWithScope<Unit>() {
 }
 
 enum class ReportCategory {
-    UNKNOWN,
+    UNKNOWN, INFER,
     DATATYPE_NOT_FOUND,
     LITERAL_UNKNOWN,
     LITERAL_RANGE_EXCEEDED,
@@ -341,56 +416,63 @@ class Reporter(val messages: MutableList<ReporterMessage> = ArrayList()) {
         messages += e
     }
 
-    fun report(init: ReporterMessage.() -> Unit) {
+    fun report(init: ReporterMessage.() -> Unit): ReporterMessage {
         val rm = ReporterMessage()
         init(rm)
         report(rm)
+        return rm
     }
 
-    fun report(sourceName: String = "",
-               startLine: Int = -1,
-               startOffset: Int = -1,
-               endLine: Int = -1,
-               endOffset: Int = -1,
-               message: String = "",
-               category: ReportCategory = UNKNOWN,
-               level: ReportLevel = ERROR) = report(ReporterMessage(
-            sourceName, startLine, startOffset, endLine, endOffset, message, category, level))
+    fun report(node: Top, msg: String, cat: ReportCategory = UNKNOWN,
+               lvl: ReportLevel = ERROR) = report {
+        position(node)
+        message = msg
+        category = cat
+        level = lvl
+    }
 
-    fun report(node: Top, message: String, category: ReportCategory = UNKNOWN,
-               level: ReportLevel = ERROR) = report(
-            sourceName = node.ruleContext?.start?.tokenSource?.sourceName ?: "",
-            startLine = node.startPosition.lineNumber,
-            startOffset = node.startPosition.offset,
-            endLine = node.endPosition.lineNumber,
-            endOffset = node.endPosition.offset,
-            message = message, category = category, level = level)
-
-    fun report(node: Token?, message: String, category: ReportCategory,
-               level: ReportLevel = ERROR) = report(
-            sourceName = node?.tokenSource?.sourceName ?: "",
-            startLine = node?.line ?: 0,
-            startOffset = node?.charPositionInLine ?: 0,
-            endLine = (node?.line ?: 0) + (node?.text?.count { it == '\n' } ?: 0),
-            endOffset = (node?.charPositionInLine ?: 0) + (node?.stopIndex ?: 0) - (node?.startIndex ?: 0),
-            message = message, category = category, level = level)
+    fun report(node: Token?, msg: String, cat: ReportCategory,
+               lvl: ReportLevel = ERROR) = report {
+        position(node)
+        message = msg
+        category = cat
+        level = lvl
+    }
 }
 
 
 data class ReporterMessage(
         var sourceName: String = "",
-        var startLine: Int = -1,
-        var startOffset: Int = -1,
-        var endLine: Int = -1,
-        var endOffset: Int = -1,
         var message: String = "",
+        var start: Position = Position(),
+        var end: Position = Position(),
         var category: ReportCategory = UNKNOWN,
         var level: ReportLevel = ERROR,
         var candidates: MutableList<String> = arrayListOf()) {
 
+    val length: Int
+        get() = end.offset - start.offset + 1
+
+    val startLine
+        get() = start.lineNumber
+
+    val endLine
+        get() = end.lineNumber
+
+    val startOffsetInLine
+        get() = start.charInLine
+
+    val endOffsetInLine
+        get() = end.charInLine
+
+    val startOffset
+        get() = start.offset
+
+    val endOffset
+        get() = end.offset
 
     fun toHuman() =
-            "[$level] $sourceName:$startLine:$startOffset $message [$category]"
+            "[$level] $sourceName:$startLine:$startOffsetInLine $message [$category]"
 
     fun toJson() = toMap().toJson()
 
@@ -398,26 +480,26 @@ data class ReporterMessage(
             mapOf("level" to level,
                     "file" to sourceName,
                     "startLine" to startLine,
-                    "startOffset" to startOffset,
+                    "startOffsetInLine" to startOffsetInLine,
                     "endLine" to endLine,
-                    "endOffset" to endOffset,
+                    "endOffsetInLine" to endOffsetInLine,
                     "message" to message,
                     "category" to category)
 
     fun position(node: Token?) {
         sourceName = node?.tokenSource?.sourceName ?: ""
-        startLine = node?.line ?: 0
-        startOffset = node?.charPositionInLine ?: 0
-        endLine = (node?.line ?: 0) + (node?.text?.count { it == '\n' } ?: 0)
-        endOffset = (node?.charPositionInLine ?: 0) + (node?.stopIndex ?: 0) - (node?.startIndex ?: 0)
+        if (node != null) {
+            start = Position.start(node)
+            end = Position.end(node)
+        }
     }
 
     fun position(node: Top?) {
         sourceName = node?.ruleContext?.start?.tokenSource?.sourceName ?: ""
-        startLine = node?.startPosition?.lineNumber ?: -1
-        startOffset = node?.startPosition?.offset ?: 0
-        endLine = node?.endPosition?.lineNumber ?: -1
-        endOffset = node?.endPosition?.offset ?: 0
+        if (node != null) {
+            start = node.startPosition
+            end = node.endPosition
+        }
     }
 
     fun error() {
@@ -440,5 +522,5 @@ fun <V> Map<String, V>.toJson(): String =
                 is String -> "\"${v.replace("\"", "\\\"")}\""
                 else -> v.toString()
             }
-            "\"${k}\" : $a"
+            "\"$k\" : $a"
         }

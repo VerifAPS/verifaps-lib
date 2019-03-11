@@ -2,24 +2,24 @@ package me.tomassetti.kanvas
 
 import me.tomassetti.antlr4c3.ParserStack
 import me.tomassetti.antlr4c3.api.completionsWithContextIgnoringSemanticPredicates
-import me.tomassetti.kanvas.Debugging.*
+import me.tomassetti.kanvas.Debugging.NONE
 import me.tomassetti.kolasu.model.Node
 import org.antlr.v4.runtime.CommonToken
 import org.antlr.v4.runtime.Lexer
 import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.Vocabulary
-import org.antlr.v4.runtime.atn.*
+import org.antlr.v4.runtime.atn.ATN
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 import java.util.*
 
 interface TokenType {
-    val type : Int
+    val type: Int
 }
 
 interface EditorContext {
-    fun preceedingTokens() : List<Token>
-    fun cachedAst() : Node?
+    fun preceedingTokens(): List<Token>
+    fun cachedAst(): Node?
 }
 
 data class AutoCompletionContext(val preecedingTokens: List<Token>,
@@ -30,15 +30,14 @@ data class AutoCompletionContext(val preecedingTokens: List<Token>,
  * The goal of this is to find the type of tokens that can be used in a given context
  */
 interface AutoCompletionSuggester {
-    fun autoCompletionContext(editorContext: EditorContext) : AutoCompletionContext
+    fun autoCompletionContext(editorContext: EditorContext): AutoCompletionContext
 }
 
 data class TokenTypeImpl(override val type: Int) : TokenType
 
-class EditorContextImpl(val code: String, val antlrLexerFactory: AntlrLexerFactory, val textPanel: TextPanel) : EditorContext {
-    override fun cachedAst(): Node? {
-        return textPanel.cachedRoot
-    }
+class EditorContextImpl(val code: String, val antlrLexerFactory: AntlrLexerFactory,
+                        val nodeSupplier: () -> Node?) : EditorContext {
+    override fun cachedAst(): Node? = nodeSupplier()
 
     override fun preceedingTokens(): List<Token> {
         val lexer = antlrLexerFactory.create(code)
@@ -78,7 +77,7 @@ enum class Debugging {
     ALL
 }
 
-fun Lexer.toList() : List<Token> {
+fun Lexer.toList(): List<Token> {
     val res = LinkedList<Token>()
     do {
         var next = this.nextToken()

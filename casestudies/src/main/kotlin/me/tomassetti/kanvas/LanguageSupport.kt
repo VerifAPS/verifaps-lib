@@ -10,9 +10,6 @@ import org.antlr.v4.runtime.Lexer
 import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.Vocabulary
 import org.antlr.v4.runtime.atn.ATN
-import org.fife.ui.autocomplete.BasicCompletion
-import org.fife.ui.autocomplete.Completion
-import org.fife.ui.autocomplete.CompletionProvider
 import org.fife.ui.rsyntaxtextarea.Style
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme
 import java.awt.Color
@@ -27,16 +24,16 @@ enum class IssueType {
     ERROR
 }
 
-data class Issue(val type : IssueType, val message: String,
+data class Issue(val type: IssueType, val message: String,
                  val line: Int, val offset: Int, val length: Int)
 
-interface Validator<RootNode: Node> {
-    fun validate(parsingResult: ParsingResult<RootNode>, context: Context) : List<Issue>
+interface Validator<RootNode : Node> {
+    fun validate(parsingResult: ParsingResult<RootNode>, context: Context): List<Issue>
 }
 
 interface Context {
     fun register(name: String, data: Object?)
-    fun get(name: String) : Object?
+    fun get(name: String): Object?
 }
 
 open class SimpleContext : Context {
@@ -52,11 +49,11 @@ open class SimpleContext : Context {
 }
 
 interface ContextCreator {
-    fun create() : Context
+    fun create(): Context
 }
 
-interface LanguageSupport<RootNode: Node> {
-    val syntaxScheme : SyntaxScheme
+interface LanguageSupport<RootNode : Node> {
+    val syntaxScheme: SyntaxScheme
     val antlrLexerFactory: AntlrLexerFactory
     val parserData: ParserData?
     val propositionProvider: PropositionProvider
@@ -69,20 +66,20 @@ interface LanguageSupport<RootNode: Node> {
  * Information provided to contextualize autocompletion
  */
 data class AutocompletionSurroundingInformation(val cachedAstRoot: Node?,
-                                  val preecedingTokens: List<Token>,
-                                  val rulesStack: List<Int>,
-                                  val pointInCode: Point)
+                                                val preecedingTokens: List<Token>,
+                                                val rulesStack: List<Int>,
+                                                val pointInCode: Point)
 
 interface PropositionProvider {
     fun fromTokenType(autocompletionSurroundingInformation: AutocompletionSurroundingInformation,
-                      tokenType: Int, context: Context) : List<String>
+                      tokenType: Int, context: Context): List<String>
 }
 
 class DefaultLanguageSupport(val languageSupport: LanguageSupport<*>) : PropositionProvider {
     override fun fromTokenType(autocompletionSurroundingInformation: AutocompletionSurroundingInformation,
                                tokenType: Int, context: Context): List<String> {
         val res = LinkedList<String>()
-        var proposition : String? = languageSupport.parserData!!.vocabulary.getLiteralName(tokenType)
+        var proposition: String? = languageSupport.parserData!!.vocabulary.getLiteralName(tokenType)
         if (proposition != null) {
             if (proposition.startsWith("'") && proposition.endsWith("'")) {
                 proposition = proposition.substring(1, proposition.length - 1)
@@ -93,11 +90,11 @@ class DefaultLanguageSupport(val languageSupport: LanguageSupport<*>) : Proposit
     }
 }
 
-class EverythingOkValidator<RootNode:Node> : Validator<RootNode> {
+class EverythingOkValidator<RootNode : Node> : Validator<RootNode> {
     override fun validate(parsingResult: ParsingResult<RootNode>, context: Context): List<Issue> = emptyList()
 }
 
-abstract class BaseLanguageSupport<RootNode:Node> : LanguageSupport<RootNode> {
+abstract class BaseLanguageSupport<RootNode : Node> : LanguageSupport<RootNode> {
 
     override val propositionProvider: PropositionProvider
         get() = DefaultLanguageSupport(this)
@@ -121,7 +118,7 @@ class DefaultSyntaxScheme : SyntaxScheme(false) {
 
 class DummyParser : Parser<Node> {
     override fun parse(inputStream: InputStream, withValidation: Boolean): ParsingResult<Node> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 }
 
@@ -146,11 +143,10 @@ object noneLanguageSupport : BaseLanguageSupport<Node>() {
 object languageSupportRegistry {
     private val extensionsMap = HashMap<String, LanguageSupport<*>>()
 
-    fun register(extension : String, languageSupport: LanguageSupport<*>) {
+    fun register(extension: String, languageSupport: LanguageSupport<*>) {
         extensionsMap[extension] = languageSupport
     }
-    fun languageSupportForExtension(extension : String) : LanguageSupport<*>
-            = extensionsMap.getOrDefault(extension, noneLanguageSupport)
-    fun languageSupportForFile(file : File) : LanguageSupport<*>
-            = languageSupportForExtension(file.extension)
+
+    fun languageSupportForExtension(extension: String): LanguageSupport<*> = extensionsMap.getOrDefault(extension, noneLanguageSupport)
+    fun languageSupportForFile(file: File): LanguageSupport<*> = languageSupportForExtension(file.extension)
 }

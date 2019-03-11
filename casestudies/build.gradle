@@ -9,6 +9,26 @@ dependencies {
     compile project(':aps-rvt')
     compile project(':flycheck')
     compile project(':iec-run')
+
+    // https://mvnrepository.com/artifact/com.fifesoft/autocomplete
+    compile group: 'com.fifesoft', name: 'autocomplete', version: '3.0.0'
+
+    compile 'me.tomassetti:kolasu:0.1.1'
+    compile group: 'org.javassist', name: 'javassist', version: '3.21.0-GA'
+    compile 'me.tomassetti.antlr4c3:antlr4-c3-kotlin:0.1.0'
+    // https://mvnrepository.com/artifact/com.fifesoft/rsyntaxtextarea
+    compile group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '3.0.2'
+    // https://mvnrepository.com/artifact/com.fifesoft/rstaui
+    compile group: 'com.fifesoft', name: 'rstaui', version: '3.0.0'
+    // https://mvnrepository.com/artifact/com.fifesoft/spellchecker
+    compile group: 'com.fifesoft', name: 'spellchecker', version: '3.0.0'
+
+    compile group: 'de.sciss', name: 'weblaf', version: '2.1.4'
+
+    // https://mvnrepository.com/artifact/org.xhtmlrenderer/flying-saucer-core
+    compile group: 'org.xhtmlrenderer', name: 'flying-saucer-core', version: '9.1.18'
+
+    //implementation 'me.tomassetti.kanvas:kanvas-core:0.2.1'
 }
 
 def mainClasses = [

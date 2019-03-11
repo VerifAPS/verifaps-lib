@@ -17,6 +17,5 @@ table TTable {
             i: TRUE
             o: FALSE
         }
-    }
-    
-}
+    }  
+} 
