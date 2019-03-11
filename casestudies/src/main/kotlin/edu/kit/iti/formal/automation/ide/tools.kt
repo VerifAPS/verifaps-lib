@@ -8,11 +8,11 @@ import edu.kit.iti.formal.automation.st.ast.Literal
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.automation.visitors.Utils
-import jdk.nashorn.internal.runtime.ParserException
 import org.antlr.v4.runtime.CharStreams
 import java.awt.BorderLayout
 import java.awt.Component
 import java.io.File
+import java.lang.Exception
 import javax.swing.*
 import javax.swing.table.AbstractTableModel
 import javax.swing.table.DefaultTableCellRenderer
@@ -71,7 +71,7 @@ class RunnerWindow(val lookup: Lookup,
                         .filter { it.isOutput || it.isLocal }
                         .sortedBy { it.name }
             }
-        } catch (e: ParserException) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
         tableModel.fireTableStructureChanged()
