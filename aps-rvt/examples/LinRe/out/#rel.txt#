@@ -1,0 +1,532 @@
+*** This is nuXmv 1.1.1 (compiled on Wed Jun  1 10:18:42 2016)
+*** Copyright (c) 2014-2016, Fondazione Bruno Kessler
+
+*** For more information on nuXmv see https://nuxmv.fbk.eu
+*** or email to <nuxmv@list.fbk.eu>.
+*** Please report bugs at https://nuxmv.fbk.eu/bugs
+*** (click on "Login Anonymously" to access)
+*** Alternatively write to <nuxmv@list.fbk.eu>.
+
+*** This version of nuXmv is linked to NuSMV 2.6.0.
+*** For more information on NuSMV see <http://nusmv.fbk.eu>
+*** or email to <nusmv-users@list.fbk.eu>.
+*** Copyright (C) 2010-2014, Fondazione Bruno Kessler
+
+*** This version of nuXmv is linked to the CUDD library version 2.4.1
+*** Copyright (c) 1995-2004, Regents of the University of Colorado
+
+*** This version of nuXmv is linked to the MiniSat SAT solver. 
+*** See http://minisat.se/MiniSat.html
+*** Copyright (c) 2003-2006, Niklas Een, Niklas Sorensson
+*** Copyright (c) 2007-2010, Niklas Sorensson
+
+*** This version of nuXmv is linked to MathSAT
+*** Copyright (C) 2009-2016 by Fondazione Bruno Kessler
+*** Copyright (C) 2009-2016 by University of Trento
+*** See http://mathsat.fbk.eu
+
+Number of Input Variables: 4
+    2: signed word[16]
+    1: boolean
+    1: {OP, TEACH}
+Number of State Variables: 42
+   32: signed word[16]
+    2: {TEACHING, NOTEACHPOINTS, INVALIDTEACHPOINTS, OK, INVALIDINPUTVALUE}
+    6: boolean
+    2: {OP, TEACH}
+Number of Frozen Variables: 0
+  OperationMode : {OP, TEACH}
+  
+  SensorInput : signed word[16]
+  
+  TPSet : boolean
+  
+  TPy : signed word[16]
+  
+  __new__.ICONST : signed word[16]
+  
+  __new__.SENSORINPUT_MAX : signed word[16]
+  
+  __new__.SENSORINPUT_MIN : signed word[16]
+  
+  __new__.SensorOutput : signed word[16]
+  
+  __new__.Status : {TEACHING, NOTEACHPOINTS, INVALIDTEACHPOINTS, (other 2 values)}
+  
+  __new__.TEACHTIMEOUT : signed word[16]
+  
+  __new__.initial : boolean
+  
+  __new__.lastmode : {OP, TEACH}
+  
+  __new__.m : signed word[16]
+  
+  __new__.t : signed word[16]
+  
+  __new__.teachstep : signed word[16]
+  
+  __new__.timeout$ET : signed word[16]
+  
+  __new__.timeout$IN : boolean
+  
+  __new__.timeout$PT : signed word[16]
+  
+  __new__.timeout$Q : boolean
+  
+  __new__.x1 : signed word[16]
+  
+  __new__.x2 : signed word[16]
+  
+  __new__.x_temp : signed word[16]
+  
+  __new__.y1 : signed word[16]
+  
+  __new__.y2 : signed word[16]
+  
+  __new__.y_temp : signed word[16]
+  
+  __old__.ICONST : signed word[16]
+  
+  __old__.SENSORINPUT_MAX : signed word[16]
+  
+  __old__.SENSORINPUT_MIN : signed word[16]
+  
+  __old__.SensorOutput : signed word[16]
+  
+  __old__.Status : {TEACHING, NOTEACHPOINTS, INVALIDTEACHPOINTS, (other 2 values)}
+  
+  __old__.TEACHTIMEOUT : signed word[16]
+  
+  __old__.initial : boolean
+  
+  __old__.lastmode : {OP, TEACH}
+  
+  __old__.m : signed word[16]
+  
+  __old__.t : signed word[16]
+  
+  __old__.teachstep : signed word[16]
+  
+  __old__.timeout$ET : signed word[16]
+  
+  __old__.timeout$IN : boolean
+  
+  __old__.timeout$PT : signed word[16]
+  
+  __old__.timeout$Q : boolean
+  
+  __old__.x1 : signed word[16]
+  
+  __old__.x2 : signed word[16]
+  
+  __old__.x_temp : signed word[16]
+  
+  __old__.y1 : signed word[16]
+  
+  __old__.y2 : signed word[16]
+  
+  __old__.y_temp : signed word[16]
+  
+Number of bits: 560 (0 frozen, 34 input, 526 state)
+-- no proof or counterexample found with bound 4
+-- no proof or counterexample found with bound 5
+-- invariant eq_SensorOutput_SensorOutput  is false
+-- as demonstrated by the following execution sequence
+<counter-example type="0" id="1" desc="IC3 counterexample" >
+	<node>
+		<state id="1">
+			<value variable="__new__.Status">OK</value>
+			<value variable="__old__.Status">OK</value>
+			<value variable="__new__.initial">FALSE</value>
+			<value variable="__new__.SensorOutput">0sd16_0</value>
+			<value variable="__new__.SENSORINPUT_MIN">0sd16_0</value>
+			<value variable="__new__.SENSORINPUT_MAX">0sd16_4095</value>
+			<value variable="__new__.ICONST">0sd16_1000</value>
+			<value variable="__new__.m">0sd16_0</value>
+			<value variable="__new__.t">0sd16_0</value>
+			<value variable="__new__.lastmode">OP</value>
+			<value variable="__new__.teachstep">0sd16_0</value>
+			<value variable="__new__.x2">0sd16_0</value>
+			<value variable="__new__.x1">0sd16_0</value>
+			<value variable="__new__.timeout$PT">0sd16_0</value>
+			<value variable="__new__.timeout$ET">0sd16_0</value>
+			<value variable="__new__.y1">0sd16_0</value>
+			<value variable="__new__.y2">0sd16_0</value>
+			<value variable="__new__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__new__.timeout$IN">FALSE</value>
+			<value variable="__new__.timeout$Q">FALSE</value>
+			<value variable="__new__.x_temp">0sd16_0</value>
+			<value variable="__new__.y_temp">0sd16_0</value>
+			<value variable="__old__.initial">FALSE</value>
+			<value variable="__old__.SensorOutput">0sd16_0</value>
+			<value variable="__old__.SENSORINPUT_MIN">0sd16_0</value>
+			<value variable="__old__.SENSORINPUT_MAX">0sd16_4095</value>
+			<value variable="__old__.ICONST">0sd16_1000</value>
+			<value variable="__old__.m">0sd16_0</value>
+			<value variable="__old__.t">0sd16_0</value>
+			<value variable="__old__.lastmode">OP</value>
+			<value variable="__old__.teachstep">0sd16_0</value>
+			<value variable="__old__.x2">0sd16_0</value>
+			<value variable="__old__.x1">0sd16_0</value>
+			<value variable="__old__.timeout$PT">0sd16_0</value>
+			<value variable="__old__.timeout$ET">0sd16_0</value>
+			<value variable="__old__.y1">0sd16_0</value>
+			<value variable="__old__.y2">0sd16_0</value>
+			<value variable="__old__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__old__.timeout$IN">FALSE</value>
+			<value variable="__old__.timeout$Q">FALSE</value>
+			<value variable="__old__.x_temp">0sd16_0</value>
+			<value variable="__old__.y_temp">0sd16_0</value>
+			<value variable="eq_SensorOutput_SensorOutput">TRUE</value>
+		</state>
+		<input id="2">
+			<value variable="OperationMode">OP</value>
+			<value variable="TPy">0sd16_0</value>
+			<value variable="SensorInput">-0sd16_32768</value>
+			<value variable="TPSet">FALSE</value>
+		</input>
+	</node>
+	<node>
+		<state id="2">
+			<value variable="__new__.Status">NOTEACHPOINTS</value>
+			<value variable="__old__.Status">NOTEACHPOINTS</value>
+			<value variable="__new__.initial">TRUE</value>
+			<value variable="__new__.SensorOutput">0sd16_0</value>
+			<value variable="__new__.SENSORINPUT_MIN">0sd16_0</value>
+			<value variable="__new__.SENSORINPUT_MAX">0sd16_4095</value>
+			<value variable="__new__.ICONST">0sd16_1000</value>
+			<value variable="__new__.m">0sd16_0</value>
+			<value variable="__new__.t">0sd16_0</value>
+			<value variable="__new__.lastmode">OP</value>
+			<value variable="__new__.teachstep">0sd16_0</value>
+			<value variable="__new__.x2">0sd16_0</value>
+			<value variable="__new__.x1">0sd16_0</value>
+			<value variable="__new__.timeout$PT">0sd16_0</value>
+			<value variable="__new__.timeout$ET">0sd16_0</value>
+			<value variable="__new__.y1">0sd16_0</value>
+			<value variable="__new__.y2">0sd16_0</value>
+			<value variable="__new__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__new__.timeout$IN">FALSE</value>
+			<value variable="__new__.timeout$Q">FALSE</value>
+			<value variable="__new__.x_temp">0sd16_0</value>
+			<value variable="__new__.y_temp">0sd16_0</value>
+			<value variable="__old__.initial">TRUE</value>
+			<value variable="__old__.SensorOutput">0sd16_0</value>
+			<value variable="__old__.SENSORINPUT_MIN">0sd16_0</value>
+			<value variable="__old__.SENSORINPUT_MAX">0sd16_4095</value>
+			<value variable="__old__.ICONST">0sd16_1000</value>
+			<value variable="__old__.m">0sd16_0</value>
+			<value variable="__old__.t">0sd16_0</value>
+			<value variable="__old__.lastmode">OP</value>
+			<value variable="__old__.teachstep">0sd16_0</value>
+			<value variable="__old__.x2">0sd16_0</value>
+			<value variable="__old__.x1">0sd16_0</value>
+			<value variable="__old__.timeout$PT">0sd16_0</value>
+			<value variable="__old__.timeout$ET">0sd16_0</value>
+			<value variable="__old__.y1">0sd16_0</value>
+			<value variable="__old__.y2">0sd16_0</value>
+			<value variable="__old__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__old__.timeout$IN">FALSE</value>
+			<value variable="__old__.timeout$Q">FALSE</value>
+			<value variable="__old__.x_temp">0sd16_0</value>
+			<value variable="__old__.y_temp">0sd16_0</value>
+			<value variable="eq_SensorOutput_SensorOutput">TRUE</value>
+		</state>
+		<input id="3">
+			<value variable="OperationMode">TEACH</value>
+			<value variable="TPy">0sd16_0</value>
+			<value variable="SensorInput">0sd16_0</value>
+			<value variable="TPSet">TRUE</value>
+		</input>
+	</node>
+	<node>
+		<state id="3">
+			<value variable="__new__.Status">TEACHING</value>
+			<value variable="__old__.Status">TEACHING</value>
+			<value variable="__new__.initial">TRUE</value>
+			<value variable="__new__.SensorOutput">0sd16_0</value>
+			<value variable="__new__.SENSORINPUT_MIN">0sd16_0</value>
+			<value variable="__new__.SENSORINPUT_MAX">0sd16_4095</value>
+			<value variable="__new__.ICONST">0sd16_1000</value>
+			<value variable="__new__.m">0sd16_0</value>
+			<value variable="__new__.t">0sd16_0</value>
+			<value variable="__new__.lastmode">OP</value>
+			<value variable="__new__.teachstep">0sd16_1</value>
+			<value variable="__new__.x2">0sd16_0</value>
+			<value variable="__new__.x1">0sd16_0</value>
+			<value variable="__new__.timeout$PT">0sd16_5000</value>
+			<value variable="__new__.timeout$ET">0sd16_5000</value>
+			<value variable="__new__.y1">0sd16_0</value>
+			<value variable="__new__.y2">0sd16_0</value>
+			<value variable="__new__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__new__.timeout$IN">FALSE</value>
+			<value variable="__new__.timeout$Q">FALSE</value>
+			<value variable="__new__.x_temp">0sd16_0</value>
+			<value variable="__new__.y_temp">0sd16_0</value>
+			<value variable="__old__.initial">TRUE</value>
+			<value variable="__old__.SensorOutput">0sd16_0</value>
+			<value variable="__old__.SENSORINPUT_MIN">0sd16_0</value>
+			<value variable="__old__.SENSORINPUT_MAX">0sd16_4095</value>
+			<value variable="__old__.ICONST">0sd16_1000</value>
+			<value variable="__old__.m">0sd16_0</value>
+			<value variable="__old__.t">0sd16_0</value>
+			<value variable="__old__.lastmode">OP</value>
+			<value variable="__old__.teachstep">0sd16_1</value>
+			<value variable="__old__.x2">0sd16_0</value>
+			<value variable="__old__.x1">0sd16_0</value>
+			<value variable="__old__.timeout$PT">0sd16_5000</value>
+			<value variable="__old__.timeout$ET">0sd16_5000</value>
+			<value variable="__old__.y1">0sd16_0</value>
+			<value variable="__old__.y2">0sd16_0</value>
+			<value variable="__old__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__old__.timeout$IN">FALSE</value>
+			<value variable="__old__.timeout$Q">FALSE</value>
+			<value variable="__old__.x_temp">0sd16_0</value>
+			<value variable="__old__.y_temp">0sd16_0</value>
+			<value variable="eq_SensorOutput_SensorOutput">TRUE</value>
+		</state>
+		<input id="4">
+			<value variable="OperationMode">TEACH</value>
+			<value variable="TPy">0sd16_1023</value>
+			<value variable="SensorInput">0sd16_4095</value>
+			<value variable="TPSet">TRUE</value>
+		</input>
+	</node>
+	<node>
+		<state id="4">
+			<value variable="__new__.Status">TEACHING</value>
+			<value variable="__old__.Status">TEACHING</value>
+			<value variable="__new__.initial">TRUE</value>
+			<value variable="__new__.SensorOutput">0sd16_0</value>
+			<value variable="__new__.SENSORINPUT_MIN">0sd16_0</value>
+			<value variable="__new__.SENSORINPUT_MAX">0sd16_4095</value>
+			<value variable="__new__.ICONST">0sd16_1000</value>
+			<value variable="__new__.m">0sd16_0</value>
+			<value variable="__new__.t">0sd16_0</value>
+			<value variable="__new__.lastmode">TEACH</value>
+			<value variable="__new__.teachstep">0sd16_1</value>
+			<value variable="__new__.x2">0sd16_0</value>
+			<value variable="__new__.x1">0sd16_4095</value>
+			<value variable="__new__.timeout$PT">0sd16_5000</value>
+			<value variable="__new__.timeout$ET">0sd16_5000</value>
+			<value variable="__new__.y1">0sd16_1023</value>
+			<value variable="__new__.y2">0sd16_0</value>
+			<value variable="__new__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__new__.timeout$IN">FALSE</value>
+			<value variable="__new__.timeout$Q">FALSE</value>
+			<value variable="__new__.x_temp">0sd16_0</value>
+			<value variable="__new__.y_temp">0sd16_0</value>
+			<value variable="__old__.initial">TRUE</value>
+			<value variable="__old__.SensorOutput">0sd16_0</value>
+			<value variable="__old__.SENSORINPUT_MIN">0sd16_0</value>
+			<value variable="__old__.SENSORINPUT_MAX">0sd16_4095</value>
+			<value variable="__old__.ICONST">0sd16_1000</value>
+			<value variable="__old__.m">0sd16_0</value>
+			<value variable="__old__.t">0sd16_0</value>
+			<value variable="__old__.lastmode">TEACH</value>
+			<value variable="__old__.teachstep">0sd16_1</value>
+			<value variable="__old__.x2">0sd16_0</value>
+			<value variable="__old__.x1">0sd16_4095</value>
+			<value variable="__old__.timeout$PT">0sd16_5000</value>
+			<value variable="__old__.timeout$ET">0sd16_5000</value>
+			<value variable="__old__.y1">0sd16_1023</value>
+			<value variable="__old__.y2">0sd16_0</value>
+			<value variable="__old__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__old__.timeout$IN">FALSE</value>
+			<value variable="__old__.timeout$Q">FALSE</value>
+			<value variable="__old__.x_temp">0sd16_0</value>
+			<value variable="__old__.y_temp">0sd16_0</value>
+			<value variable="eq_SensorOutput_SensorOutput">TRUE</value>
+		</state>
+		<input id="5">
+			<value variable="OperationMode">TEACH</value>
+			<value variable="TPy">0sd16_0</value>
+			<value variable="SensorInput">-0sd16_32768</value>
+			<value variable="TPSet">FALSE</value>
+		</input>
+	</node>
+	<node>
+		<state id="5">
+			<value variable="__new__.Status">TEACHING</value>
+			<value variable="__old__.Status">TEACHING</value>
+			<value variable="__new__.initial">TRUE</value>
+			<value variable="__new__.SensorOutput">0sd16_0</value>
+			<value variable="__new__.SENSORINPUT_MIN">0sd16_0</value>
+			<value variable="__new__.SENSORINPUT_MAX">0sd16_4095</value>
+			<value variable="__new__.ICONST">0sd16_1000</value>
+			<value variable="__new__.m">0sd16_0</value>
+			<value variable="__new__.t">0sd16_0</value>
+			<value variable="__new__.lastmode">TEACH</value>
+			<value variable="__new__.teachstep">0sd16_2</value>
+			<value variable="__new__.x2">0sd16_0</value>
+			<value variable="__new__.x1">0sd16_4095</value>
+			<value variable="__new__.timeout$PT">0sd16_5000</value>
+			<value variable="__new__.timeout$ET">0sd16_5000</value>
+			<value variable="__new__.y1">0sd16_1023</value>
+			<value variable="__new__.y2">0sd16_0</value>
+			<value variable="__new__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__new__.timeout$IN">FALSE</value>
+			<value variable="__new__.timeout$Q">FALSE</value>
+			<value variable="__new__.x_temp">0sd16_0</value>
+			<value variable="__new__.y_temp">0sd16_0</value>
+			<value variable="__old__.initial">TRUE</value>
+			<value variable="__old__.SensorOutput">0sd16_0</value>
+			<value variable="__old__.SENSORINPUT_MIN">0sd16_0</value>
+			<value variable="__old__.SENSORINPUT_MAX">0sd16_4095</value>
+			<value variable="__old__.ICONST">0sd16_1000</value>
+			<value variable="__old__.m">0sd16_0</value>
+			<value variable="__old__.t">0sd16_0</value>
+			<value variable="__old__.lastmode">TEACH</value>
+			<value variable="__old__.teachstep">0sd16_2</value>
+			<value variable="__old__.x2">0sd16_0</value>
+			<value variable="__old__.x1">0sd16_4095</value>
+			<value variable="__old__.timeout$PT">0sd16_5000</value>
+			<value variable="__old__.timeout$ET">0sd16_5000</value>
+			<value variable="__old__.y1">0sd16_1023</value>
+			<value variable="__old__.y2">0sd16_0</value>
+			<value variable="__old__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__old__.timeout$IN">FALSE</value>
+			<value variable="__old__.timeout$Q">FALSE</value>
+			<value variable="__old__.x_temp">0sd16_0</value>
+			<value variable="__old__.y_temp">0sd16_0</value>
+			<value variable="eq_SensorOutput_SensorOutput">TRUE</value>
+		</state>
+		<input id="6">
+			<value variable="OperationMode">TEACH</value>
+			<value variable="TPy">0sd16_1132</value>
+			<value variable="SensorInput">0sd16_4033</value>
+			<value variable="TPSet">TRUE</value>
+		</input>
+	</node>
+	<node>
+		<state id="6">
+			<value variable="__new__.Status">TEACHING</value>
+			<value variable="__old__.Status">TEACHING</value>
+			<value variable="__new__.initial">TRUE</value>
+			<value variable="__new__.SensorOutput">0sd16_0</value>
+			<value variable="__new__.SENSORINPUT_MIN">0sd16_0</value>
+			<value variable="__new__.SENSORINPUT_MAX">0sd16_4095</value>
+			<value variable="__new__.ICONST">0sd16_1000</value>
+			<value variable="__new__.m">0sd16_0</value>
+			<value variable="__new__.t">0sd16_0</value>
+			<value variable="__new__.lastmode">TEACH</value>
+			<value variable="__new__.teachstep">0sd16_3</value>
+			<value variable="__new__.x2">0sd16_4033</value>
+			<value variable="__new__.x1">0sd16_4095</value>
+			<value variable="__new__.timeout$PT">0sd16_5000</value>
+			<value variable="__new__.timeout$ET">0sd16_5000</value>
+			<value variable="__new__.y1">0sd16_1023</value>
+			<value variable="__new__.y2">0sd16_1132</value>
+			<value variable="__new__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__new__.timeout$IN">FALSE</value>
+			<value variable="__new__.timeout$Q">FALSE</value>
+			<value variable="__new__.x_temp">0sd16_0</value>
+			<value variable="__new__.y_temp">0sd16_0</value>
+			<value variable="__old__.initial">TRUE</value>
+			<value variable="__old__.SensorOutput">0sd16_0</value>
+			<value variable="__old__.SENSORINPUT_MIN">0sd16_0</value>
+			<value variable="__old__.SENSORINPUT_MAX">0sd16_4095</value>
+			<value variable="__old__.ICONST">0sd16_1000</value>
+			<value variable="__old__.m">0sd16_0</value>
+			<value variable="__old__.t">0sd16_0</value>
+			<value variable="__old__.lastmode">TEACH</value>
+			<value variable="__old__.teachstep">0sd16_3</value>
+			<value variable="__old__.x2">0sd16_4033</value>
+			<value variable="__old__.x1">0sd16_4095</value>
+			<value variable="__old__.timeout$PT">0sd16_5000</value>
+			<value variable="__old__.timeout$ET">0sd16_5000</value>
+			<value variable="__old__.y1">0sd16_1023</value>
+			<value variable="__old__.y2">0sd16_1132</value>
+			<value variable="__old__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__old__.timeout$IN">FALSE</value>
+			<value variable="__old__.timeout$Q">FALSE</value>
+			<value variable="__old__.x_temp">0sd16_0</value>
+			<value variable="__old__.y_temp">0sd16_0</value>
+			<value variable="eq_SensorOutput_SensorOutput">TRUE</value>
+		</state>
+		<input id="7">
+			<value variable="OperationMode">TEACH</value>
+			<value variable="TPy">0sd16_0</value>
+			<value variable="SensorInput">0sd16_0</value>
+			<value variable="TPSet">FALSE</value>
+		</input>
+	</node>
+	<node>
+		<state id="7">
+			<value variable="__new__.Status">OK</value>
+			<value variable="__old__.Status">OK</value>
+			<value variable="__new__.initial">TRUE</value>
+			<value variable="__new__.SensorOutput">0sd16_0</value>
+			<value variable="__new__.SENSORINPUT_MIN">0sd16_0</value>
+			<value variable="__new__.SENSORINPUT_MAX">0sd16_4095</value>
+			<value variable="__new__.ICONST">0sd16_1000</value>
+			<value variable="__new__.m">0sd16_356</value>
+			<value variable="__new__.t">0sd16_1138</value>
+			<value variable="__new__.lastmode">TEACH</value>
+			<value variable="__new__.teachstep">0sd16_3</value>
+			<value variable="__new__.x2">0sd16_4095</value>
+			<value variable="__new__.x1">0sd16_4033</value>
+			<value variable="__new__.timeout$PT">0sd16_5000</value>
+			<value variable="__new__.timeout$ET">0sd16_5000</value>
+			<value variable="__new__.y1">0sd16_1132</value>
+			<value variable="__new__.y2">0sd16_1023</value>
+			<value variable="__new__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__new__.timeout$IN">FALSE</value>
+			<value variable="__new__.timeout$Q">FALSE</value>
+			<value variable="__new__.x_temp">0sd16_4095</value>
+			<value variable="__new__.y_temp">0sd16_1023</value>
+			<value variable="__old__.initial">TRUE</value>
+			<value variable="__old__.SensorOutput">0sd16_0</value>
+			<value variable="__old__.SENSORINPUT_MIN">0sd16_0</value>
+			<value variable="__old__.SENSORINPUT_MAX">0sd16_4095</value>
+			<value variable="__old__.ICONST">0sd16_1000</value>
+			<value variable="__old__.m">-0sd16_356</value>
+			<value variable="__old__.t">-0sd16_1126</value>
+			<value variable="__old__.lastmode">TEACH</value>
+			<value variable="__old__.teachstep">0sd16_3</value>
+			<value variable="__old__.x2">0sd16_4095</value>
+			<value variable="__old__.x1">0sd16_4033</value>
+			<value variable="__old__.timeout$PT">0sd16_5000</value>
+			<value variable="__old__.timeout$ET">0sd16_5000</value>
+			<value variable="__old__.y1">0sd16_1132</value>
+			<value variable="__old__.y2">0sd16_1023</value>
+			<value variable="__old__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__old__.timeout$IN">FALSE</value>
+			<value variable="__old__.timeout$Q">FALSE</value>
+			<value variable="__old__.x_temp">0sd16_4095</value>
+			<value variable="__old__.y_temp">0sd16_1023</value>
+			<value variable="eq_SensorOutput_SensorOutput">TRUE</value>
+		</state>
+		<input id="8">
+			<value variable="OperationMode">OP</value>
+			<value variable="TPy">-0sd16_1</value>
+			<value variable="SensorInput">0sd16_336</value>
+			<value variable="TPSet">TRUE</value>
+		</input>
+	</node>
+	<node>
+		<state id="8">
+			<value variable="__new__.SensorOutput">0sd16_1127</value>
+			<value variable="__new__.m">0sd16_356</value>
+			<value variable="__new__.t">0sd16_1138</value>
+			<value variable="__new__.x2">0sd16_4095</value>
+			<value variable="__new__.x1">0sd16_4033</value>
+			<value variable="__new__.y1">0sd16_1132</value>
+			<value variable="__new__.y2">0sd16_1023</value>
+			<value variable="__old__.SensorOutput">-0sd16_1115</value>
+			<value variable="__old__.m">-0sd16_356</value>
+			<value variable="__old__.t">-0sd16_1126</value>
+			<value variable="__old__.x2">0sd16_4095</value>
+			<value variable="__old__.x1">0sd16_4033</value>
+			<value variable="__old__.y1">0sd16_1132</value>
+			<value variable="__old__.y2">0sd16_1023</value>
+			<value variable="__old__.TEACHTIMEOUT">0sd16_5000</value>
+			<value variable="__old__.timeout$IN">FALSE</value>
+			<value variable="__old__.timeout$Q">FALSE</value>
+			<value variable="__old__.x_temp">0sd16_4095</value>
+			<value variable="__old__.y_temp">0sd16_1023</value>
+			<value variable="eq_SensorOutput_SensorOutput">FALSE</value>
+		</state>
+	</node>
+	<loops> </loops>
+</counter-example>

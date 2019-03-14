@@ -24,36 +24,42 @@ grammar TestTableLanguage;
 
 //structure level
 file  : table*;
-table : (r='relational' {relational=true;})?
-        'table' IDENTIFIER '{'
+table : (r=RELATIONAL {relational=true;})?
+        TABLE IDENTIFIER LBRACE
             signature*
             freeVariable*
             opts?
             group
             function*
-         '}';
+         RBRACE;
 
-opts : 'options' '{' (kv)*  '}';
+opts : OPTIONS LBRACE (kv)*  RBRACE;
 kv: key=IDENTIFIER '=' (constant|variable) osem;
-
 signature : 'var' state='state'? io=('input'|'output')
     variableDefinition (',' variableDefinition)*
     ':' dt=IDENTIFIER osem
 ;
 
 variableDefinition :
-        {!relational}? n=IDENTIFIER ('as' newName=IDENTIFIER)?                      #variableAliasDefinitionSimple
+        {!relational}? n=IDENTIFIER (AS newName=IDENTIFIER)?                      #variableAliasDefinitionSimple
       | {relational}? INTEGER RV_SEPARATOR  n=IDENTIFIER ('as' newName=IDENTIFIER)? #variableAliasDefinitionRelational
-      | {relational}? n=IDENTIFIER ('of' INTEGER+)                                  #variableRunsDefinition
+      | {relational}? n=IDENTIFIER (OF INTEGER+)                                  #variableRunsDefinition
 ;
 
 osem : ';'?;
 
-group : 'group' (id=IDENTIFIER|idi=i)? time? '{' (group|row)* '}';
+group : GROUP (id=IDENTIFIER|idi=i)? time? LBRACE (group|row)* RBRACE;
 
-row : 'row' (id=IDENTIFIER|idi=i)? time? '{' (pause osem)? (kc osem)* '}';
+row : ROW (id=IDENTIFIER|idi=i)? time? LBRACE (pause osem)? (kc osem)* RBRACE;
 kc: ({relational}? INTEGER RV_SEPARATOR)? IDENTIFIER ':' value=cell;
-pause: {relational}? 'pause' INTEGER+;
+pause: {relational}? PAUSE INTEGER+;
+
+AS:'as';
+OF:'OF';
+OPTIONS:'options';
+PAUSE:'pause';
+ROW:'row';
+GROUP:'group';
 
 time :
       MINUS (pflag=PFLAG)? #timeDontCare
@@ -61,15 +67,19 @@ time :
     | LBRACKET l=INTEGER COMMA (u=INTEGER) RBRACKET (pflag=PFLAG)? #timeClosedInterval
     | LBRACKET l=INTEGER COMMA MINUS RBRACKET (pflag=PFLAG)? #timeOpenInterval
     | INTEGER #timeFixed
-    | omega='omega' #timeOmega
+    | omega=OMEGA #timeOmega
     ;
 
+OMEGA:'omega';
+
 freeVariable:
-    'gvar' name=IDENTIFIER ':' dt=IDENTIFIER ('with' constraint=cell)?
+    GVAR name=IDENTIFIER COLON dt=IDENTIFIER (WITH constraint=cell)?
 ;
+GVAR:'gvar';
+WITH:'with';
 
-vardt : arg=IDENTIFIER':' dt=IDENTIFIER;
-
+vardt : arg=IDENTIFIER COLON dt=IDENTIFIER;
+COLON:':';
 
 /*function : 'function' name=IDENTIFIER '(' vardt (',' vardt)*  ')'
             ':' rt=IDENTIFIER STCODE ;*/
@@ -148,6 +158,10 @@ guardedcommand
       FI    // guarded command (case)
 ;
 
+RELATIONAL : 'relational';
+TABLE:'table';
+LBRACE:'{';
+RBRACE:'}';
 PFLAG: '>>' | '_p';
 AND: '&' | 'AND';
 COMMA:	',';
@@ -186,6 +200,6 @@ fragment NUMBER: DIGIT+;
 //FLOAT:   '-'? NUMBER '.' NUMBER?;
 INTEGER: NUMBER;
 
-WS: (' '|'\n'|'\r')+ -> skip;
+WS: (' '|'\n'|'\r')+ -> channel(HIDDEN);
 COMMENT      : '/*' .*? '*/' -> channel(HIDDEN);
 LINE_COMMENT : '//' ~[\r\n]* -> channel(HIDDEN);

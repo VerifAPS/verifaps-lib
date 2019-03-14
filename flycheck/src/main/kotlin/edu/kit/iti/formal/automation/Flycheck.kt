@@ -105,7 +105,7 @@ class CheckApp : CliktCommand() {
             System.out.flush()
         } else {
             r.messages.forEach {
-                Console.writeln("[${it.level}] (${it.sourceName}@${it.startLine}:${it.startOffset}) ${it.message} (${it.category})")
+                Console.writeln("[${it.level}] (${it.sourceName}@${it.startLine}:${it.startOffsetInLine}) ${it.message} (${it.category})")
             }
         }
     }
@@ -167,11 +167,9 @@ class FlycheckRunner(
         override fun syntaxError(recognizer: Recognizer<*, *>?, offendingSymbol: Any?, line: Int,
                                  charPositionInLine: Int, msg: String?, e: RecognitionException?) {
             val token = (offendingSymbol as Token)
-            reporter.report(
-                    node = token,
-                    message = msg!!,
-                    category = ReportCategory.SYNTAX,
-                    level = ReportLevel.ERROR)
+            reporter.report(token, msg!!,
+                    ReportCategory.SYNTAX,
+                    ReportLevel.ERROR)
         }
 
         override fun reportAttemptingFullContext(recognizer: Parser?, dfa: DFA?, startIndex: Int, stopIndex: Int, conflictingAlts: BitSet?, configs: ATNConfigSet?) {}

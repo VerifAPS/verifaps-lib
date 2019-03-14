@@ -103,7 +103,7 @@ object GetetaFacade {
         val ctx = parser.file()
         val ttlb = TestTableLanguageBuilder()
         ctx.accept(ttlb)
-        return ttlb.testTables.get(0)
+        return ttlb.testTables[0]
     }
 
     fun exprsToSMV(vc: ParseContext,

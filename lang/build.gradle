@@ -1,0 +1,39 @@
+plugins {}
+
+apply plugin: 'antlr'
+
+description = 'iec61131lang'
+
+repositories {
+    maven { url "http://dl.bintray.com/jetbrains/spek" }
+}
+
+dependencies {
+    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.1'
+    antlr group: 'org.antlr', name: 'antlr4', version: '4.7.1'
+
+    compile project(':util')
+    compile project(':xml')
+
+    testCompile 'org.mdkt.compiler:InMemoryJavaCompiler:1.3.0'
+    compile group: 'com.squareup', name: 'javapoet', version: '1.9.0'
+}
+
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += ["-visitor", "-long-messages", "-package", "edu.kit.iti.formal.automation.parser"]
+    outputDirectory file("${project.buildDir}/generated-src/antlr/main/edu/kit/iti/formal/automation/parser")
+}
+
+task generateILGrammar(type: AntlrTask) {
+        maxHeapSize = "64m"
+        arguments += ["-visitor", "-long-messages", "-package", "edu.kit.iti.formal.automation.parser"]
+        outputDirectory file("${project.buildDir}/generated-src/antlr/main/edu/kit/iti/formal/automation/parser")
+}
+
+processResources.dependsOn << generateGrammarSource
+processResources.dependsOn << generateILGrammar
+
+test {
+    exclude '**/SFCLangParserTest.class'
+}

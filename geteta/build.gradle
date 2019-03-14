@@ -1,8 +1,5 @@
-import org.unbrokendome.gradle.plugins.xjc.XjcGenerate
 
-plugins {
-    id 'org.unbroken-dome.xjc' version '1.1.3'
-}
+plugins {}
 
 apply plugin: 'antlr'
 group = 'edu.kit.iti.formal.automation'
@@ -14,8 +11,6 @@ description = """
 version = "0.9-SNAPSHOT"
 
 def antlrOutputDir = file("build/generated-src/antlr")
-def xjcOutputDir = file("build/generated-src/xjc")
-
 
 repositories {
     mavenCentral()
@@ -27,17 +22,19 @@ repositories {
 }
 
 dependencies {
-    compile project(':iec-symbex')
-    antlr group: 'org.antlr', name: 'antlr4', version: 4.7
+    compile project(':symbex')
+    antlr group: 'org.antlr', name: 'antlr4', version: '4.7.2'
     compile 'com.github.jferard:fastods:0.6.0'
     implementation 'com.github.ajalt:clikt:1.3.0'
     compile 'io.github.config4k:config4k:0.4.0'
+
+    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
 }
 
 sourceSets {
     main {
         java {
-            srcDirs "src/main/java", xjcOutputDir, antlrOutputDir
+            srcDirs "src/main/java", antlrOutputDir
         }
     }
 }
@@ -59,27 +56,7 @@ generateGrammarSource {
     arguments << '-visitor'
 }
 
-xjcGenerate.enabled = false
-
-task xjcGenerateExteta(type: XjcGenerate) {
-    docLanguage = "en"
-    source = file('src/main/xsd/exteta-1.1.xsd')
-    outputDirectory = xjcOutputDir
-    targetPackage = "edu.kit.iti.formal.automation.testtables.schema"
-}
-
-task xjcGenerateReport(type: XjcGenerate) {
-    source = fileTree('src/main/xsd/') { include 'report.xsd' }
-    outputDirectory = xjcOutputDir
-    docLanguage = "en"
-    targetPackage = "edu.kit.iti.formal.automation.testtables.report"
-}
-
-compileJava.dependsOn xjcGenerateExteta
-compileJava.dependsOn xjcGenerateReport
 compileJava.dependsOn generateGrammarSource
-compileKotlin.dependsOn xjcGenerateReport
-compileKotlin.dependsOn xjcGenerateExteta
 compileKotlin.dependsOn generateGrammarSource
 
 /*
