@@ -56,7 +56,7 @@ jobs:
       - store_artifacts:
           path: ~/junit
 
-      - run: gradle :casestudies:assemble
+      - run: gradle :ide:assemble
 
       - store_artifacts:
           path: casestudies/build/distributions/*
