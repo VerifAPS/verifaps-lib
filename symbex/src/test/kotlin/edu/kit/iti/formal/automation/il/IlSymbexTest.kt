@@ -6,6 +6,7 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.util.CodeWriter
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.StringWriter
 
@@ -47,6 +48,7 @@ class IlSymbexTest {
     }
 
     @Test
+    @Disabled
     fun ilSymbexJmpTest() {
         val scope = Scope.defaultScope()
         scope.variables += VariableDeclaration("A", AnyBit.BOOL)
