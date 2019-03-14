@@ -111,6 +111,8 @@ object STBody : XMLTranslatorXPath("./body/ST/xhtml") {
 
 object FBDBody : XMLTranslatorXPath("./body/FBD") {
     override fun translate(e: Element, writer: CodeWriter) {
-        if(isCapableOf(e)) FBDTranslator(e, writer).run()
+        val fbd = query.evaluateFirst(e)
+        if (fbd != null)
+            FBDTranslator(fbd, writer).run()
     }
 }

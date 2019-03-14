@@ -4,7 +4,7 @@ import edu.kit.iti.formal.util.CodeWriter
 import org.jdom2.Element
 
 /**
- * Construct from an &lt;interface&gt; and [edu.kit.iti.formal.automation.scope.Scope]
+ * Extracts the interface elements into VAR...END_VAR
  *
  * @author Alexander Weigl
  * @version 1 (20.02.18)
@@ -40,9 +40,7 @@ object InterfaceBuilder : XMLTranslatorFind {
         }
         writer.nl().printf("END_VAR")
     }
-
 }
-
 
 object VariableDeclXML {
     fun getDatatype(e: Element): String {
