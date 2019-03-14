@@ -1,0 +1,1180 @@
+MODULE main
+IVAR
+	OperationMode : {OP, TEACH};
+	SensorInput : signed word[16];
+	TPSet : boolean;
+	TPy : signed word[16];
+-- end of IVAR
+VAR
+	__new__ : Analogsensor_new(OperationMode, SensorInput, TPSet, TPy);
+	__old__ : Analogsensor_old(OperationMode, SensorInput, TPSet, TPy);
+-- end of VAR
+DEFINE
+	eq_SensorOutput_SensorOutput := __old__.SensorOutput = __new__.SensorOutput;
+LTLSPEC
+	G( eq_SensorOutput_SensorOutput);
+
+INVARSPEC
+	eq_SensorOutput_SensorOutput;
+
+
+-- end of module main
+--------------------------------------------------------------------------------
+MODULE Analogsensor_old(OperationMode, SensorInput, TPSet, TPy)
+VAR
+	ICONST : signed word[16];
+	SENSORINPUT_MAX : signed word[16];
+	SENSORINPUT_MIN : signed word[16];
+	SensorOutput : signed word[16];
+	Status : {TEACHING, NOTEACHPOINTS, INVALIDTEACHPOINTS, OK, INVALIDINPUTVALUE};
+	TEACHTIMEOUT : signed word[16];
+	initial : boolean;
+	lastmode : {OP, TEACH};
+	m : signed word[16];
+	t : signed word[16];
+	teachstep : signed word[16];
+	timeout$ET : signed word[16];
+	timeout$IN : boolean;
+	timeout$PT : signed word[16];
+	timeout$Q : boolean;
+	x1 : signed word[16];
+	x2 : signed word[16];
+	x_temp : signed word[16];
+	y1 : signed word[16];
+	y2 : signed word[16];
+	y_temp : signed word[16];
+-- end of VAR
+DEFINE
+ASSIGN
+	init(ICONST) := 0sd16_1000;
+	init(SENSORINPUT_MAX) := 0sd16_4095;
+	init(SENSORINPUT_MIN) := 0sd16_0;
+	init(SensorOutput) := 0sd16_0;
+	init(Status) := OK;
+	init(TEACHTIMEOUT) := 0sd16_5000;
+	init(initial) := FALSE;
+	init(lastmode) := OP;
+	init(m) := 0sd16_0;
+	init(t) := 0sd16_0;
+	init(teachstep) := 0sd16_0;
+	init(timeout$ET) := 0sd16_0;
+	init(timeout$IN) := FALSE;
+	init(timeout$PT) := 0sd16_0;
+	init(timeout$Q) := FALSE;
+	init(x1) := 0sd16_0;
+	init(x2) := 0sd16_0;
+	init(x_temp) := 0sd16_0;
+	init(y1) := 0sd16_0;
+	init(y2) := 0sd16_0;
+	init(y_temp) := 0sd16_0;
+	next(ICONST) := ICONST;
+	next(SENSORINPUT_MAX) := SENSORINPUT_MAX;
+	next(SENSORINPUT_MIN) := SENSORINPUT_MIN;
+	next(SensorOutput) := case 
+!initial : SensorOutput; TRUE : case 
+OperationMode = OP : case 
+Status = OK & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : m * SensorInput / ICONST + t; TRUE : 0sd16_0; 
+esac; OperationMode = TEACH | TRUE : SensorOutput; 
+esac; 
+esac;
+	next(Status) := case 
+!initial : NOTEACHPOINTS; TRUE : case 
+OperationMode = OP : Status; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : TEACHING; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : Status; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+(case 
+x1 > x2 : x1; TRUE : x2; 
+esac) - (case 
+x1 > x2 : x2; TRUE : x1; 
+esac) != 0sd16_0 : OK; TRUE : INVALIDTEACHPOINTS; 
+esac; TRUE : Status; 
+esac; TRUE : Status; 
+esac; 
+esac;
+	next(TEACHTIMEOUT) := TEACHTIMEOUT;
+	next(initial) := case 
+!initial : TRUE; TRUE : initial; 
+esac;
+	next(lastmode) := case 
+!initial : OperationMode; TRUE : case 
+OperationMode = OP : OperationMode; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : case 
+case 
+TRUE : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) = 0sd16_0; TRUE : FALSE; 
+esac : OP; TRUE : OperationMode; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : OperationMode; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : case 
+case 
+TRUE : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) = 0sd16_0; TRUE : FALSE; 
+esac : OP; TRUE : OperationMode; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+(case 
+x1 > x2 : x1; TRUE : x2; 
+esac) - (case 
+x1 > x2 : x2; TRUE : x1; 
+esac) != 0sd16_0 : OperationMode; TRUE : OP; 
+esac; TRUE : OperationMode; 
+esac; TRUE : OperationMode; 
+esac; 
+esac;
+	next(m) := case 
+!initial : m; TRUE : case 
+OperationMode = OP : m; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : m; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+(case 
+x1 > x2 : x1; TRUE : x2; 
+esac) - (case 
+x1 > x2 : x2; TRUE : x1; 
+esac) != 0sd16_0 : ((case 
+x1 > x2 : y1; TRUE : y2; 
+esac) - (case 
+x1 > x2 : y2; TRUE : y1; 
+esac)) * ICONST / ((case 
+x1 > x2 : x2; TRUE : x1; 
+esac) - (case 
+x1 > x2 : x1; TRUE : x2; 
+esac)); TRUE : m; 
+esac; TRUE : m; 
+esac; TRUE : m; 
+esac; 
+esac;
+	next(t) := case 
+!initial : t; TRUE : case 
+OperationMode = OP : t; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : t; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+(case 
+x1 > x2 : x1; TRUE : x2; 
+esac) - (case 
+x1 > x2 : x2; TRUE : x1; 
+esac) != 0sd16_0 : ((case 
+x1 > x2 : y1; TRUE : y2; 
+esac) - (case 
+x1 > x2 : y2; TRUE : y1; 
+esac)) * ICONST / ((case 
+x1 > x2 : x2; TRUE : x1; 
+esac) - (case 
+x1 > x2 : x1; TRUE : x2; 
+esac)) * (case 
+x1 > x2 : x2; TRUE : x1; 
+esac) / ICONST - (case 
+x1 > x2 : y2; TRUE : y1; 
+esac); TRUE : t; 
+esac; TRUE : t; 
+esac; TRUE : t; 
+esac; 
+esac;
+	next(teachstep) := case 
+!initial : teachstep; TRUE : case 
+OperationMode = OP : teachstep; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : 0sd16_1; TRUE : case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : case 
+TPSet = FALSE : 0sd16_2; TRUE : case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : 0sd16_3; TRUE : case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 | TRUE : case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac; 
+esac; TRUE : teachstep; 
+esac; 
+esac;
+	next(timeout$ET) := case 
+!initial : timeout$ET; TRUE : case 
+OperationMode = OP : timeout$ET; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : case 
+FALSE : case 
+(case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac) > 0sd16_0 : (case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac; TRUE : case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : case 
+FALSE : case 
+(case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac) > 0sd16_0 : (case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac; TRUE : case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 | TRUE : case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac; 
+esac; TRUE : timeout$ET; 
+esac; 
+esac;
+	next(timeout$IN) := case 
+!initial : timeout$IN; TRUE : case 
+OperationMode = OP : timeout$IN; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : FALSE; TRUE : TRUE; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : case 
+lastmode != OperationMode : FALSE; TRUE : timeout$IN; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : FALSE; TRUE : TRUE; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 | TRUE : case 
+lastmode != OperationMode : FALSE; TRUE : timeout$IN; 
+esac; 
+esac; TRUE : timeout$IN; 
+esac; 
+esac;
+	next(timeout$PT) := case 
+!initial : timeout$PT; TRUE : case 
+OperationMode = OP : timeout$PT; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : TEACHTIMEOUT; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : timeout$PT; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : TEACHTIMEOUT; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 | TRUE : timeout$PT; 
+esac; TRUE : timeout$PT; 
+esac; 
+esac;
+	next(timeout$Q) := case 
+!initial : timeout$Q; TRUE : case 
+OperationMode = OP : timeout$Q; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : case 
+FALSE : (case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac) = 0sd16_0; TRUE : FALSE; 
+esac; TRUE : case 
+TRUE : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) = 0sd16_0; TRUE : FALSE; 
+esac; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : case 
+lastmode != OperationMode : case 
+FALSE : timeout$ET = 0sd16_0; TRUE : FALSE; 
+esac; TRUE : timeout$Q; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : case 
+FALSE : (case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac) = 0sd16_0; TRUE : FALSE; 
+esac; TRUE : case 
+TRUE : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) = 0sd16_0; TRUE : FALSE; 
+esac; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 | TRUE : case 
+lastmode != OperationMode : case 
+FALSE : timeout$ET = 0sd16_0; TRUE : FALSE; 
+esac; TRUE : timeout$Q; 
+esac; 
+esac; TRUE : timeout$Q; 
+esac; 
+esac;
+	next(x1) := case 
+!initial : 0sd16_0; TRUE : case 
+OperationMode = OP : x1; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : SensorInput; TRUE : x1; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : x1; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+x1 > x2 : x2; TRUE : x1; 
+esac; TRUE : x1; 
+esac; TRUE : x1; 
+esac; 
+esac;
+	next(x2) := case 
+!initial : 0sd16_0; TRUE : case 
+OperationMode = OP : x2; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : x2; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : SensorInput; TRUE : x2; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+x1 > x2 : x1; TRUE : x2; 
+esac; TRUE : x2; 
+esac; TRUE : x2; 
+esac; 
+esac;
+	next(x_temp) := case 
+!initial : x_temp; TRUE : case 
+OperationMode = OP : x_temp; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : x_temp; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+x1 > x2 : x1; TRUE : x_temp; 
+esac; TRUE : x_temp; 
+esac; TRUE : x_temp; 
+esac; 
+esac;
+	next(y1) := case 
+!initial : 0sd16_0; TRUE : case 
+OperationMode = OP : y1; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : TPy; TRUE : y1; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : y1; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+x1 > x2 : y2; TRUE : y1; 
+esac; TRUE : y1; 
+esac; TRUE : y1; 
+esac; 
+esac;
+	next(y2) := case 
+!initial : 0sd16_0; TRUE : case 
+OperationMode = OP : y2; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : y2; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : TPy; TRUE : y2; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+x1 > x2 : y1; TRUE : y2; 
+esac; TRUE : y2; 
+esac; TRUE : y2; 
+esac; 
+esac;
+	next(y_temp) := case 
+!initial : y_temp; TRUE : case 
+OperationMode = OP : y_temp; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : y_temp; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+x1 > x2 : y1; TRUE : y_temp; 
+esac; TRUE : y_temp; 
+esac; TRUE : y_temp; 
+esac; 
+esac;
+
+-- end of module Analogsensor_old
+--------------------------------------------------------------------------------
+MODULE Analogsensor_new(OperationMode, SensorInput, TPSet, TPy)
+VAR
+	ICONST : signed word[16];
+	SENSORINPUT_MAX : signed word[16];
+	SENSORINPUT_MIN : signed word[16];
+	SensorOutput : signed word[16];
+	Status : {TEACHING, NOTEACHPOINTS, INVALIDTEACHPOINTS, OK, INVALIDINPUTVALUE};
+	TEACHTIMEOUT : signed word[16];
+	initial : boolean;
+	lastmode : {OP, TEACH};
+	m : signed word[16];
+	t : signed word[16];
+	teachstep : signed word[16];
+	timeout$ET : signed word[16];
+	timeout$IN : boolean;
+	timeout$PT : signed word[16];
+	timeout$Q : boolean;
+	x1 : signed word[16];
+	x2 : signed word[16];
+	x_temp : signed word[16];
+	y1 : signed word[16];
+	y2 : signed word[16];
+	y_temp : signed word[16];
+-- end of VAR
+DEFINE
+ASSIGN
+	init(ICONST) := 0sd16_1000;
+	init(SENSORINPUT_MAX) := 0sd16_4095;
+	init(SENSORINPUT_MIN) := 0sd16_0;
+	init(SensorOutput) := 0sd16_0;
+	init(Status) := OK;
+	init(TEACHTIMEOUT) := 0sd16_5000;
+	init(initial) := FALSE;
+	init(lastmode) := OP;
+	init(m) := 0sd16_0;
+	init(t) := 0sd16_0;
+	init(teachstep) := 0sd16_0;
+	init(timeout$ET) := 0sd16_0;
+	init(timeout$IN) := FALSE;
+	init(timeout$PT) := 0sd16_0;
+	init(timeout$Q) := FALSE;
+	init(x1) := 0sd16_0;
+	init(x2) := 0sd16_0;
+	init(x_temp) := 0sd16_0;
+	init(y1) := 0sd16_0;
+	init(y2) := 0sd16_0;
+	init(y_temp) := 0sd16_0;
+	next(ICONST) := ICONST;
+	next(SENSORINPUT_MAX) := SENSORINPUT_MAX;
+	next(SENSORINPUT_MIN) := SENSORINPUT_MIN;
+	next(SensorOutput) := case 
+!initial : SensorOutput; TRUE : case 
+OperationMode = OP : case 
+Status = OK & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : m * SensorInput / ICONST + t; TRUE : 0sd16_0; 
+esac; OperationMode = TEACH | TRUE : SensorOutput; 
+esac; 
+esac;
+	next(Status) := case 
+!initial : NOTEACHPOINTS; TRUE : case 
+OperationMode = OP : Status; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : TEACHING; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : Status; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+(case 
+x1 > x2 : x1; TRUE : x2; 
+esac) - (case 
+x1 > x2 : x2; TRUE : x1; 
+esac) != 0sd16_0 : OK; TRUE : INVALIDTEACHPOINTS; 
+esac; TRUE : Status; 
+esac; TRUE : Status; 
+esac; 
+esac;
+	next(TEACHTIMEOUT) := TEACHTIMEOUT;
+	next(initial) := case 
+!initial : TRUE; TRUE : initial; 
+esac;
+	next(lastmode) := case 
+!initial : OperationMode; TRUE : case 
+OperationMode = OP : OperationMode; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : case 
+case 
+TRUE : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) = 0sd16_0; TRUE : FALSE; 
+esac : OP; TRUE : OperationMode; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : OperationMode; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : case 
+case 
+TRUE : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) = 0sd16_0; TRUE : FALSE; 
+esac : OP; TRUE : OperationMode; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+(case 
+x1 > x2 : x1; TRUE : x2; 
+esac) - (case 
+x1 > x2 : x2; TRUE : x1; 
+esac) != 0sd16_0 : OperationMode; TRUE : OP; 
+esac; TRUE : OperationMode; 
+esac; TRUE : OperationMode; 
+esac; 
+esac;
+	next(m) := case 
+!initial : m; TRUE : case 
+OperationMode = OP : m; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : m; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+(case 
+x1 > x2 : x1; TRUE : x2; 
+esac) - (case 
+x1 > x2 : x2; TRUE : x1; 
+esac) != 0sd16_0 : ((case 
+x1 > x2 : y1; TRUE : y2; 
+esac) - (case 
+x1 > x2 : y2; TRUE : y1; 
+esac)) * ICONST / ((case 
+x1 > x2 : x1; TRUE : x2; 
+esac) - (case 
+x1 > x2 : x2; TRUE : x1; 
+esac)); TRUE : m; 
+esac; TRUE : m; 
+esac; TRUE : m; 
+esac; 
+esac;
+	next(t) := case 
+!initial : t; TRUE : case 
+OperationMode = OP : t; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : t; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+(case 
+x1 > x2 : x1; TRUE : x2; 
+esac) - (case 
+x1 > x2 : x2; TRUE : x1; 
+esac) != 0sd16_0 : (case 
+x1 > x2 : y2; TRUE : y1; 
+esac) - ((case 
+x1 > x2 : y1; TRUE : y2; 
+esac) - (case 
+x1 > x2 : y2; TRUE : y1; 
+esac)) * ICONST / ((case 
+x1 > x2 : x1; TRUE : x2; 
+esac) - (case 
+x1 > x2 : x2; TRUE : x1; 
+esac)) * (case 
+x1 > x2 : x2; TRUE : x1; 
+esac) / ICONST; TRUE : t; 
+esac; TRUE : t; 
+esac; TRUE : t; 
+esac; 
+esac;
+	next(teachstep) := case 
+!initial : teachstep; TRUE : case 
+OperationMode = OP : teachstep; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : 0sd16_1; TRUE : case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : case 
+TPSet = FALSE : 0sd16_2; TRUE : case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : 0sd16_3; TRUE : case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 | TRUE : case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac; 
+esac; TRUE : teachstep; 
+esac; 
+esac;
+	next(timeout$ET) := case 
+!initial : timeout$ET; TRUE : case 
+OperationMode = OP : timeout$ET; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : case 
+FALSE : case 
+(case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac) > 0sd16_0 : (case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac; TRUE : case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : case 
+FALSE : case 
+(case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac) > 0sd16_0 : (case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac; TRUE : case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 | TRUE : case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac; 
+esac; TRUE : timeout$ET; 
+esac; 
+esac;
+	next(timeout$IN) := case 
+!initial : timeout$IN; TRUE : case 
+OperationMode = OP : timeout$IN; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : FALSE; TRUE : TRUE; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : case 
+lastmode != OperationMode : FALSE; TRUE : timeout$IN; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : FALSE; TRUE : TRUE; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 | TRUE : case 
+lastmode != OperationMode : FALSE; TRUE : timeout$IN; 
+esac; 
+esac; TRUE : timeout$IN; 
+esac; 
+esac;
+	next(timeout$PT) := case 
+!initial : timeout$PT; TRUE : case 
+OperationMode = OP : timeout$PT; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : TEACHTIMEOUT; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : timeout$PT; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : TEACHTIMEOUT; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 | TRUE : timeout$PT; 
+esac; TRUE : timeout$PT; 
+esac; 
+esac;
+	next(timeout$Q) := case 
+!initial : timeout$Q; TRUE : case 
+OperationMode = OP : timeout$Q; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : case 
+FALSE : (case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac) = 0sd16_0; TRUE : FALSE; 
+esac; TRUE : case 
+TRUE : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) = 0sd16_0; TRUE : FALSE; 
+esac; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : case 
+lastmode != OperationMode : case 
+FALSE : timeout$ET = 0sd16_0; TRUE : FALSE; 
+esac; TRUE : timeout$Q; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : case 
+FALSE : (case 
+TRUE : case 
+(case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) > 0sd16_0 : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : TEACHTIMEOUT; 
+esac) = 0sd16_0; TRUE : FALSE; 
+esac; TRUE : case 
+TRUE : (case 
+lastmode != OperationMode : case 
+FALSE : case 
+timeout$ET > 0sd16_0 : timeout$ET - 0sd16_1; TRUE : 0sd16_0; 
+esac; TRUE : timeout$PT; 
+esac; TRUE : timeout$ET; 
+esac) = 0sd16_0; TRUE : FALSE; 
+esac; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 | TRUE : case 
+lastmode != OperationMode : case 
+FALSE : timeout$ET = 0sd16_0; TRUE : FALSE; 
+esac; TRUE : timeout$Q; 
+esac; 
+esac; TRUE : timeout$Q; 
+esac; 
+esac;
+	next(x1) := case 
+!initial : 0sd16_0; TRUE : case 
+OperationMode = OP : x1; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : SensorInput; TRUE : x1; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : x1; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+x1 > x2 : x2; TRUE : x1; 
+esac; TRUE : x1; 
+esac; TRUE : x1; 
+esac; 
+esac;
+	next(x2) := case 
+!initial : 0sd16_0; TRUE : case 
+OperationMode = OP : x2; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : x2; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : SensorInput; TRUE : x2; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+x1 > x2 : x1; TRUE : x2; 
+esac; TRUE : x2; 
+esac; TRUE : x2; 
+esac; 
+esac;
+	next(x_temp) := case 
+!initial : x_temp; TRUE : case 
+OperationMode = OP : x_temp; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : x_temp; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+x1 > x2 : x1; TRUE : x_temp; 
+esac; TRUE : x_temp; 
+esac; TRUE : x_temp; 
+esac; 
+esac;
+	next(y1) := case 
+!initial : 0sd16_0; TRUE : case 
+OperationMode = OP : y1; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : TPy; TRUE : y1; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : y1; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+x1 > x2 : y2; TRUE : y1; 
+esac; TRUE : y1; 
+esac; TRUE : y1; 
+esac; 
+esac;
+	next(y2) := case 
+!initial : 0sd16_0; TRUE : case 
+OperationMode = OP : y2; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 : y2; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : case 
+TPSet & SensorInput >= SENSORINPUT_MIN & SensorInput <= SENSORINPUT_MAX : TPy; TRUE : y2; 
+esac; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+x1 > x2 : y1; TRUE : y2; 
+esac; TRUE : y2; 
+esac; TRUE : y2; 
+esac; 
+esac;
+	next(y_temp) := case 
+!initial : y_temp; TRUE : case 
+OperationMode = OP : y_temp; OperationMode = TEACH : case 
+(case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_0 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_1 | (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_2 : y_temp; (case 
+lastmode != OperationMode : 0sd16_0; TRUE : teachstep; 
+esac) = 0sd16_3 : case 
+x1 > x2 : y1; TRUE : y_temp; 
+esac; TRUE : y_temp; 
+esac; TRUE : y_temp; 
+esac; 
+esac;
+
+-- end of module Analogsensor_new
+--------------------------------------------------------------------------------
