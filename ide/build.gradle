@@ -30,6 +30,16 @@ dependencies {
 
     compile group: 'com.miglayout', name: 'miglayout-swing', version: '5.2'
     compile 'dk.navicon:vldocking:3.0.4'
+
+
+    compile group: 'org.netbeans.api', name: 'org-netbeans-swing-outline', version: 'RELEASE802'
+    //implementation 'me.tomassetti.kanvas:kanvas-core:0.2.1'
+}
+
+repositories{
+    maven {
+        url = "http://bits.netbeans.org/maven2/"
+    }
 }
 
 def mainClasses = [

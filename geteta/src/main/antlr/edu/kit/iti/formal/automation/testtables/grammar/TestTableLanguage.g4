@@ -200,6 +200,7 @@ fragment NUMBER: DIGIT+;
 //FLOAT:   '-'? NUMBER '.' NUMBER?;
 INTEGER: NUMBER;
 
-WS: (' '|'\n'|'\r')+ -> channel(HIDDEN);
+WS: (' '|'\n'|'\r'|'\t')+ -> channel(HIDDEN);
 COMMENT      : '/*' .*? '*/' -> channel(HIDDEN);
 LINE_COMMENT : '//' ~[\r\n]* -> channel(HIDDEN);
+ERROR_CHAR:. -> channel(HIDDEN);

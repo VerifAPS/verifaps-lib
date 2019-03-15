@@ -4,8 +4,8 @@ import com.vlsolutions.swing.docking.DockKey
 import com.vlsolutions.swing.docking.Dockable
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.print.HTMLTablePrinter
-import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
+import edu.kit.iti.formal.automation.testtables.model.*
 import me.tomassetti.kanvas.*
 import me.tomassetti.kolasu.model.Node
 import org.antlr.v4.runtime.CharStreams
@@ -19,15 +19,25 @@ import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult
 import org.fife.ui.rtextarea.RTextScrollPane
+import org.netbeans.swing.outline.DefaultOutlineModel
+import org.netbeans.swing.outline.Outline
+import org.netbeans.swing.outline.RenderDataProvider
+import org.netbeans.swing.outline.RowModel
 import java.awt.BorderLayout
+import java.awt.Color
 import java.awt.Component
 import java.awt.Font
-import java.awt.LayoutManager
 import java.io.File
 import java.io.StringWriter
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
+import javax.swing.event.EventListenerList
+import javax.swing.event.TreeModelListener
+import javax.swing.table.AbstractTableModel
+import javax.swing.table.DefaultTableCellRenderer
+import javax.swing.tree.TreeModel
+import javax.swing.tree.TreePath
 import kotlin.properties.Delegates
 
 
@@ -87,6 +97,7 @@ abstract class TabbedPanel() : JPanel(true), Closeable, Dockable {
  */
 abstract class EditorPane : TabbedPanel(), Saveable, HasFont {
     abstract val languageSupport: LanguageSupport<*>
+
     var file: File? by Delegates.observable<File?>(null) { prop, old, new ->
         firePropertyChange(prop.name, old, new)
     }
@@ -216,7 +227,8 @@ class STEditor(lookup: Lookup) : CodeEditor(lookup) {
 class TTEditor(lookup: Lookup) : CodeEditor(lookup) {
     val splitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT)
     //var swingbox = org.xhtmlrenderer.simple.XHTMLPanel()
-    var swingbox = JEditorPane()
+    //var swingbox = JEditorPane()
+    var swingbox = Outline()
     val viewRender = JScrollPane(swingbox)
 
     val timer = Timer(500) { e -> render() }
@@ -224,13 +236,26 @@ class TTEditor(lookup: Lookup) : CodeEditor(lookup) {
     fun render() {
         try {
             val gtt = GetetaFacade.parseTableDSL(textArea.text)
-            val sw = StringWriter()
+            val ioCompare = compareBy<ProgramVariable> { it.io }
+            val nameCompare = compareBy<ProgramVariable> { it.name }
+            val cmp = ioCompare.thenComparing(nameCompare)
+            val vars = gtt.programVariables.toMutableList()
+            vars.sortWith(cmp)
+            val treeModel = TTTableModel(gtt)
+            val rowModel = TTRowModel(vars)
+            val mdl = DefaultOutlineModel.createOutlineModel(
+                    treeModel, rowModel, true, "Groups")
+            swingbox.model = mdl
+            swingbox.isRootVisible = true
+
+
+            /*val sw = StringWriter()
             val pp = HTMLTablePrinter(gtt, CodeWriter(sw))
             pp.printPreamble()
             pp.print()
             pp.printPostamble()
             print(sw.toString())
-            swingbox.text = sw.toString()
+            swingbox.text = sw.toString()*/
             /*swingbox.setDocumentFromString(sw.toString(),
                     File(".").toURI().toString(),
                     XhtmlNamespaceHandler())
@@ -242,8 +267,36 @@ class TTEditor(lookup: Lookup) : CodeEditor(lookup) {
 
     init {
         languageSupport = TestTableLanguageSupport(lookup)
-        swingbox.isEditable = false
-        swingbox.contentType = "text/html"
+
+        splitPane.resizeWeight = 1.0
+        splitPane.dividerLocation = (0.7 * width).toInt()
+
+        swingbox.setDefaultRenderer(TestTableLanguageParser.CellContext::class.java,
+                object : DefaultTableCellRenderer() {
+                    override fun getTableCellRendererComponent(table: JTable?, value: Any?, isSelected: Boolean,
+                                                               hasFocus: Boolean, row: Int, column: Int): Component {
+                        val ctx =
+                                when (value) {
+                                    is TestTableLanguageParser.CellContext -> value.text
+                                    is TableNode -> value.id
+                                    else -> value.toString()
+                                }
+                        return super.getTableCellRendererComponent(table, ctx, isSelected, hasFocus, row, column)
+                    }
+                })
+
+        swingbox.renderDataProvider = object : RenderDataProvider {
+            override fun getTooltipText(o: Any?): String = ""
+            override fun getIcon(o: Any?): Icon? = null
+            override fun getBackground(o: Any?): Color = Color.WHITE
+            override fun getDisplayName(o: Any?): String = when (o) {
+                is TableNode -> o.id
+                else -> ""
+            }
+
+            override fun getForeground(o: Any?): Color = Color.black
+            override fun isHtmlDisplayName(o: Any?): Boolean = false
+        }
 
         timer.isRepeats = false
         removeAll()
@@ -261,5 +314,86 @@ class TTEditor(lookup: Lookup) : CodeEditor(lookup) {
 
     fun update() {
         timer.restart()
+    }
+}
+
+class TTRowModel(val columns: List<ProgramVariable>) : RowModel {
+    override fun getValueFor(node: Any?, column: Int): Any {
+        if (column == 0 && node is TableNode) {
+            return node.duration.repr()
+        }
+        if (node is TableRow) {
+            val c = columns[column - 1]
+            return node.rawFields[c] ?: ""
+        }
+        return ""
+    }
+
+    override fun setValueFor(node: Any?, column: Int, value: Any?) {}
+    override fun isCellEditable(node: Any?, column: Int): Boolean = false
+    override fun getColumnName(column: Int): String = when (column) {
+        0 -> "Duration"
+        else -> columns[column - 1].name
+    }
+
+    override fun getColumnClass(column: Int): Class<*> = TestTableLanguageParser.CellContext::class.java
+    override fun getColumnCount(): Int = 1 + columns.size
+}
+
+class TTTableModel(val gtt: GeneralizedTestTable) : TreeModel {
+    protected var listenerList: EventListenerList = EventListenerList()
+
+    override fun getRoot() = gtt.region
+    override fun isLeaf(node: Any?): Boolean = node !is Region
+    override fun getChildCount(parent: Any?): Int = if (parent is Region) parent.children.size else 0
+    override fun removeTreeModelListener(l: TreeModelListener?) = listenerList.add(TreeModelListener::class.java, l)
+    override fun addTreeModelListener(l: TreeModelListener?) = listenerList.add(TreeModelListener::class.java, l)
+
+    override fun valueForPathChanged(path: TreePath?, newValue: Any?) {
+        println("listenerList = ${listenerList}")
+    }
+
+    override fun getIndexOfChild(parent: Any?, child: Any?): Int {
+        if (parent is Region && child is TableNode) {
+            return parent.children.indexOf(child)
+        }
+        return -1
+    }
+
+    override fun getChild(parent: Any?, index: Int): Any? {
+        if (parent is Region) return parent.children[index]
+        return null
+    }
+}
+
+open class MyTableModel<T>(rows: Int, cols: Int) : AbstractTableModel() {
+    var _rowCount = rows
+        set(value) {
+            field = value
+            ensureCells()
+        }
+
+    var _colCount = cols
+        set(value) {
+            field = value
+            ensureCells()
+        }
+
+    val values = ArrayList<ArrayList<T?>>()
+
+    fun ensureCells() {
+        values.ensureCapacity(rowCount)
+        while (values.size < rowCount) {
+            values.add(ArrayList(columnCount))
+        }
+        values.forEach { row -> while (row.size < columnCount) row.add(null) }
+    }
+
+    override fun getRowCount(): Int = _rowCount
+    override fun getColumnCount(): Int = _colCount
+
+    override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
+        ensureCells()
+        return values[rowIndex][columnIndex]
     }
 }
