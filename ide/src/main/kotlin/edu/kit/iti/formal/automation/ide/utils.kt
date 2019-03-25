@@ -1,5 +1,11 @@
 package edu.kit.iti.formal.automation.ide
 
+import org.flexdock.docking.Dockable
+import org.flexdock.docking.DockingManager
+import org.flexdock.docking.DockingPort
+import org.flexdock.docking.defaults.DockableComponentWrapper
+import org.flexdock.docking.props.DockablePropertySet
+import java.awt.Component
 import java.awt.LayoutManager
 import java.awt.event.ActionEvent
 import javax.swing.*
@@ -62,41 +68,4 @@ fun createAction(name: String, menuPath: String, accel: KeyStroke? = null,
         myAction.smallIcon = IconFontSwing.buildIcon(fontIcon, 16f)
     }
     return myAction
-}
-
-abstract class TabbedPanel() : JPanel(true) {
-
-    constructor(l: LayoutManager) : this() {
-        layout = l
-    }
-
-    val tabPane: JTabbedPane?
-        get() = parent as? JTabbedPane
-
-    var title: String? = null
-        set(value) {
-            tabPane?.also {
-                it.setTitleAt(it.indexOfComponent(this), value)
-            }
-            firePropertyChange("title", field, value)
-            field = value
-        }
-
-    var icon: Icon? = null
-        set(value) {
-            tabPane?.also {
-                it.setIconAt(it.indexOfComponent(this), value)
-            }
-            firePropertyChange("icon", field, value)
-            field = value
-        }
-
-    var tip: String? = null
-        set(value) {
-            tabPane?.also {
-                it.setToolTipTextAt(it.indexOfComponent(this), value)
-            }
-            firePropertyChange("tip", field, value)
-            field = value
-        }
 }

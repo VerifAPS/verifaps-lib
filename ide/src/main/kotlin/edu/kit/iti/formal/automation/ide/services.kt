@@ -20,6 +20,10 @@ interface Messager {
     fun display(msg: String, icon: Icon? = null)
 }
 
+interface FileOpen {
+    fun open(file: File)
+}
+
 interface GetFileChooser {
     val fileChooser: JFileChooser
 }
@@ -142,6 +146,16 @@ class Lookup(val parent: Lookup? = null) {
         if (p != null) t += p
         return t
     }
+
+    fun <T : Any> getAllSubtypes(service: Class<T>): Sequence<T> {
+        val seq = parent?.getAllSubtypes(service) ?: emptySequence()
+        val s = serviceMap.values
+                .asSequence()
+                .flatMap { it.asSequence() }
+                .mapNotNull { it as? T }
+        return s + seq
+    }
+
 
     inline fun <reified T> getAll() = getAll(T::class.java)
 

@@ -155,9 +155,9 @@ subprojects {
 
     task versionInfo(type: WriteProperties) {
             outputFile = new java.io.File(sourceSets.main.resources.srcDirs.first(), "META-INF/version.property")
-            def gitversion = "git describe --tags".execute()
-            gitversion.waitFor()
-            def gv = gitversion.in.readLines().get(0)
+            def gitversion = "1"//"git describe --tags".execute()
+            //gitversion.waitFor()
+            def gv = "1.0" //gitversion.in.readLines().get(0)
 
             setProperties([
                     "project-name"   : project.name ?: "",
@@ -182,7 +182,6 @@ subprojects {
                     "Description": description,
                     'Built-By': System.properties['user.name'],
                     'Build-Timestamp': new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
-                    'Build-Revision': "git describe".execute(),
                     'Created-By': "Gradle ${gradle.gradleVersion}",
                     'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
                     'Build-OS': "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"

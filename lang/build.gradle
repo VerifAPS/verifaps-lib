@@ -25,14 +25,14 @@ generateGrammarSource {
     outputDirectory file("${project.buildDir}/generated-src/antlr/main/edu/kit/iti/formal/automation/parser")
 }
 
-task generateILGrammar(type: AntlrTask) {
+/*task generateILGrammar(type: AntlrTask) {
         maxHeapSize = "64m"
         arguments += ["-visitor", "-long-messages", "-package", "edu.kit.iti.formal.automation.parser"]
         outputDirectory file("${project.buildDir}/generated-src/antlr/main/edu/kit/iti/formal/automation/parser")
 }
+*/
 
-processResources.dependsOn << generateGrammarSource
-processResources.dependsOn << generateILGrammar
+compileJava.dependsOn << generateGrammarSource
 
 test {
     exclude '**/SFCLangParserTest.class'

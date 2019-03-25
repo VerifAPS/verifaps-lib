@@ -17,8 +17,11 @@ import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult
 import org.fife.ui.rtextarea.RTextScrollPane
+import org.flexdock.docking.Dockable
+import org.flexdock.docking.DockingManager
 import java.awt.BorderLayout
 import java.awt.Font
+import java.awt.LayoutManager
 import java.io.File
 import java.io.StringWriter
 import javax.swing.*
@@ -26,25 +29,69 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import kotlin.properties.Delegates
 
+
+interface Saveable {
+    fun saveAs()
+    fun save()
+}
+
+interface Closeable {
+    fun close()
+}
+
+interface HasFont {
+    var textFont : Font
+}
+
+
+abstract class TabbedPanel() : JPanel(true), Closeable {
+    constructor(l: LayoutManager) : this() {
+        layout = l
+    }
+
+    var title: String? = null
+        set(value) {
+            dockable.dockingProperties.dockableDesc = value
+            firePropertyChange("title", field, value)
+            field = value
+        }
+
+    var icon: Icon? = null
+        set(value) {
+            dockable.dockingProperties.tabIcon = value
+            firePropertyChange("icon", field, value)
+            field = value
+        }
+
+    /*var tip: String? = null
+        set(value) {
+            dockable.putClientProperty(DockablePropertySet.TOOLTP, value)
+            firePropertyChange("tip", field, value)
+            field = value
+        }
+     */
+
+    val dockable: Dockable  by lazy {
+        DockingManager.registerDockable(this, title ?: "UNKOWN")
+    }
+}
+
 /**
  *
  * @author Alexander Weigl
  * @version 1 (11.03.19)
  */
-abstract class EditorPane : TabbedPanel() {
+abstract class EditorPane : TabbedPanel(), Saveable, HasFont {
     abstract val languageSupport: LanguageSupport<*>
-
     var file: File? by Delegates.observable<File?>(null) { prop, old, new ->
         firePropertyChange(prop.name, old, new)
     }
 
-    private fun tabbedPane() = this.parent as JTabbedPane
-    private fun index() = tabbedPane().indexOfComponent(this)
-    fun close() {
-        tabbedPane().removeTabAt(index())
+    override fun close() {
+        DockingManager.undock(dockable)
     }
 
-    abstract var textFont: Font
+    abstract override var textFont: Font
 
     init {
         addPropertyChangeListener("file") { evt ->
@@ -53,8 +100,8 @@ abstract class EditorPane : TabbedPanel() {
         }
     }
 
-    abstract fun save()
-    abstract fun saveAs()
+    abstract override fun save()
+    abstract override fun saveAs()
 }
 
 abstract class CodeEditor(lookup: Lookup) : EditorPane() {

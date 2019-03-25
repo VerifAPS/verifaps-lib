@@ -26,6 +26,8 @@ import javax.swing.table.DefaultTableCellRenderer
  */
 class RunnerWindow(val lookup: Lookup,
                    val stEditor: STEditor) : TabbedPanel(BorderLayout()) {
+    override fun close() {}
+
     val toolBar = JToolBar()
 
     var elements: PouElements = PouElements()
@@ -250,6 +252,8 @@ class RunnerWindow(val lookup: Lookup,
 }
 
 class GetetaWindow(lookup: Lookup) : TabbedPanel() {
+    override fun close() {}
+
     val cboStEditor = JComboBox<STEditor>()
     val cboPou = JComboBox<PouExecutable>()
     val cboTable = JComboBox<TTEditor>()

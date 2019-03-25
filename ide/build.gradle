@@ -30,6 +30,14 @@ dependencies {
 
     compile group: 'com.miglayout', name: 'miglayout-swing', version: '5.2'
 
+
+    compile group: 'de.richtercloud', name: 'flexdock-core', version: '1.2.3'
+    compile group: 'de.richtercloud', name: 'flexdock-drag', version: '1.2.3'
+    compile group: 'de.richtercloud', name: 'flexdock-view', version: '1.2.3'
+    compile group: 'de.richtercloud', name: 'flexdock-perspective', version: '1.2.3'
+
+
+
     //implementation 'me.tomassetti.kanvas:kanvas-core:0.2.1'
 }
 

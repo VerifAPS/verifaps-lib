@@ -1,9 +1,9 @@
-build-jdk=1.8.0_201 (Oracle Corporation 25.201-b09)
-build-os=Linux amd64 4.20.14-200.fc29.x86_64
-build-revision=v0.9-271-g054ac9d
-build-timestamp=2019-03-14T02\:35\:30.287+0100
+build-jdk=12 (AdoptOpenJDK openj9-0.13.0)
+build-os=Windows 10 amd64 10.0
+build-revision=1.0
+build-timestamp=2019-03-24T03\:06\:57.532+0100
 built-by=weigl
-created-by=Gradle 5.0
+created-by=Gradle 5.3
 description=
 project-name=ide
 project-version=0.9
