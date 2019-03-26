@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.ide
 
-import java.util.function.Consumer
+import kotlin.reflect.KClass
 
 /**
  *
@@ -8,19 +8,17 @@ import java.util.function.Consumer
  * @version 1 (13.03.19)
  */
 class EventBus {
-    private val map
-            = hashMapOf<Class<*>, MutableList<Consumer<*>>>()
+    private val map = hashMapOf<KClass<*>, MutableList<(Any) -> Unit>>()
 
-    private fun <T> get(c: Class<T>): MutableList<Consumer<T>> {
+    private fun <T> get(c: KClass<*>): MutableList<(T) -> Unit> {
         if (c !in map) {
-            val n = ArrayList<Consumer<T>>() as MutableList<Consumer<T>>
-            map.put(c, n.toMutableList())
+            map[c] = arrayListOf()
         }
-        return map[c] as MutableList<Consumer<T>>
+        return map[c] as MutableList<(T) -> Unit>
     }
 
-    public fun <T> register(c: Class<T>, f: Consumer<T>) {
-        val seq = get(c)
+    public fun <T : Any> register(c: KClass<T>, f: (T) -> Unit) {
+        val seq: MutableList<(T) -> Unit> = get(c)
         seq.add(f)
     }
 
@@ -32,10 +30,12 @@ class EventBus {
         }
     }
 
-    public fun post(event: Any) {
-        get(event.javaClass).forEach {
-            it.accept(event)
-        }
+    public inline fun <reified T : Any> listenTo(noinline f: (T) -> Unit) =
+            register<T>(T::class, f)
+
+    public fun <T : Any> post(event: T) {
+        val seq: MutableList<(T) -> Unit> = get(event::class)
+        seq.forEach { it(event) }
     }
 }
 

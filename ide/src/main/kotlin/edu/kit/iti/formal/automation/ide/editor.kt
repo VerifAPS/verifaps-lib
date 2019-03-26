@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.automation.ide
 
+import com.vlsolutions.swing.docking.DockKey
+import com.vlsolutions.swing.docking.Dockable
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.print.HTMLTablePrinter
@@ -17,9 +19,8 @@ import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult
 import org.fife.ui.rtextarea.RTextScrollPane
-import org.flexdock.docking.Dockable
-import org.flexdock.docking.DockingManager
 import java.awt.BorderLayout
+import java.awt.Component
 import java.awt.Font
 import java.awt.LayoutManager
 import java.io.File
@@ -40,40 +41,43 @@ interface Closeable {
 }
 
 interface HasFont {
-    var textFont : Font
+    var textFont: Font
 }
 
 
-abstract class TabbedPanel() : JPanel(true), Closeable {
+abstract class TabbedPanel() : JPanel(true), Closeable, Dockable {
+    val _dockKey = DockKey(Math.random().toString())
+
     constructor(l: LayoutManager) : this() {
         layout = l
+        title = "UNKNOWN"
     }
 
     var title: String? = null
         set(value) {
-            dockable.dockingProperties.dockableDesc = value
             firePropertyChange("title", field, value)
             field = value
+            _dockKey.tabName = value
+            _dockKey.name = value
         }
 
     var icon: Icon? = null
         set(value) {
-            dockable.dockingProperties.tabIcon = value
+            _dockKey.icon = value
             firePropertyChange("icon", field, value)
             field = value
         }
 
-    /*var tip: String? = null
+    var tip: String? = null
         set(value) {
-            dockable.putClientProperty(DockablePropertySet.TOOLTP, value)
+            _dockKey.tooltip = tip
             firePropertyChange("tip", field, value)
             field = value
         }
-     */
 
-    val dockable: Dockable  by lazy {
-        DockingManager.registerDockable(this, title ?: "UNKOWN")
-    }
+
+    override fun getComponent(): Component = this
+    override fun getDockKey(): DockKey = _dockKey
 }
 
 /**
@@ -88,7 +92,7 @@ abstract class EditorPane : TabbedPanel(), Saveable, HasFont {
     }
 
     override fun close() {
-        DockingManager.undock(dockable)
+        //DockingManager.undock(dockable)
     }
 
     abstract override var textFont: Font
@@ -201,6 +205,11 @@ class STEditor(lookup: Lookup) : CodeEditor(lookup) {
             override fun isEnabled(): Boolean = true
         })
 
+        _dockKey.isCloseEnabled = true
+        _dockKey.isFloatEnabled = false
+        _dockKey.isAutoHideEnabled = false
+        _dockKey.isNotification = false
+        _dockKey.isMaximizeEnabled = true
     }
 }
 

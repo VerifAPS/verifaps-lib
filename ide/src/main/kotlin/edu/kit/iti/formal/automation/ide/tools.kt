@@ -8,16 +8,23 @@ import edu.kit.iti.formal.automation.st.ast.Literal
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.automation.testtables.print.HTMLTablePrinter
 import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.util.CodeWriter
 import net.miginfocom.layout.CC
 import net.miginfocom.swing.MigLayout
 import org.antlr.v4.runtime.CharStreams
 import java.awt.BorderLayout
 import java.awt.Component
+import java.awt.LayoutManager
 import java.io.File
+import java.io.StringWriter
 import javax.swing.*
 import javax.swing.table.AbstractTableModel
 import javax.swing.table.DefaultTableCellRenderer
+
+abstract class ToolPane(layout: LayoutManager = BorderLayout()) : TabbedPanel(layout)
 
 /**
  *
@@ -25,7 +32,7 @@ import javax.swing.table.DefaultTableCellRenderer
  * @version 1 (11.03.19)
  */
 class RunnerWindow(val lookup: Lookup,
-                   val stEditor: STEditor) : TabbedPanel(BorderLayout()) {
+                   val stEditor: STEditor) : ToolPane(BorderLayout()) {
     override fun close() {}
 
     val toolBar = JToolBar()
@@ -251,7 +258,7 @@ class RunnerWindow(val lookup: Lookup,
     }
 }
 
-class GetetaWindow(lookup: Lookup) : TabbedPanel() {
+class GetetaWindow(lookup: Lookup) : ToolPane() {
     override fun close() {}
 
     val cboStEditor = JComboBox<STEditor>()
@@ -312,3 +319,39 @@ class GetetaWindow(lookup: Lookup) : TabbedPanel() {
 
     }
 }
+
+class GetetaPreview(lookup: Lookup) : ToolPane() {
+    override fun close() {}
+
+    val lookup = Lookup(lookup)
+    var swingbox = JEditorPane()
+    val viewRender = JScrollPane(swingbox)
+
+    init {
+        title = "Test Table Preview"
+        _dockKey.isCloseEnabled = false
+        EVENT_BUS.listenTo(this::render)
+    }
+
+    fun render(event: EventGetetaUpdate) {
+        try {
+            val gtt = GetetaFacade.parseTableDSL(event.text)
+            val sw = StringWriter()
+            val pp = HTMLTablePrinter(gtt, CodeWriter(sw))
+            pp.printPreamble()
+            pp.print()
+            pp.printPostamble()
+            print(sw.toString())
+            swingbox.text = sw.toString()
+            /*swingbox.setDocumentFromString(sw.toString(),
+                    File(".").toURI().toString(),
+                    XhtmlNamespaceHandler())
+                    */
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+}
+
+class EventGetetaUpdate(val text: String)

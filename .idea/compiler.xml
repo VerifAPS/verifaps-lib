@@ -4,5 +4,51 @@
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="edu.kit.iti.formal.aps-rvt.main" target="1.8" />
+      <module name="edu.kit.iti.formal.aps-rvt.test" target="1.8" />
+      <module name="edu.kit.iti.formal.casestudies.main" target="1.8" />
+      <module name="edu.kit.iti.formal.casestudies.test" target="1.8" />
+      <module name="edu.kit.iti.formal.flycheck.main" target="1.8" />
+      <module name="edu.kit.iti.formal.flycheck.test" target="1.8" />
+      <module name="edu.kit.iti.formal.iec-run.main" target="1.8" />
+      <module name="edu.kit.iti.formal.iec-run.test" target="1.8" />
+      <module name="edu.kit.iti.formal.iec-symbex.main" target="1.8" />
+      <module name="edu.kit.iti.formal.iec-symbex.test" target="1.8" />
+      <module name="edu.kit.iti.formal.iec-xml.main" target="1.8" />
+      <module name="edu.kit.iti.formal.iec-xml.test" target="1.8" />
+      <module name="edu.kit.iti.formal.iec61131lang.main" target="1.8" />
+      <module name="edu.kit.iti.formal.iec61131lang.test" target="1.8" />
+      <module name="edu.kit.iti.formal.smv-model.main" target="1.8" />
+      <module name="edu.kit.iti.formal.smv-model.test" target="1.8" />
+      <module name="verifaps.absintsfc.main" target="1.8" />
+      <module name="verifaps.absintsfc.test" target="1.8" />
+      <module name="verifaps.aps-rvt.main" target="1.8" />
+      <module name="verifaps.aps-rvt.test" target="1.8" />
+      <module name="verifaps.flycheck.main" target="1.8" />
+      <module name="verifaps.flycheck.test" target="1.8" />
+      <module name="verifaps.geteta.main" target="1.8" />
+      <module name="verifaps.geteta.test" target="1.8" />
+      <module name="verifaps.ide.main" target="1.8" />
+      <module name="verifaps.ide.test" target="1.8" />
+      <module name="verifaps.lang.main" target="1.8" />
+      <module name="verifaps.lang.test" target="1.8" />
+      <module name="verifaps.modularization.main" target="1.8" />
+      <module name="verifaps.modularization.test" target="1.8" />
+      <module name="verifaps.run.main" target="1.8" />
+      <module name="verifaps.run.test" target="1.8" />
+      <module name="verifaps.smt.main" target="1.8" />
+      <module name="verifaps.smt.test" target="1.8" />
+      <module name="verifaps.smv.main" target="1.8" />
+      <module name="verifaps.smv.test" target="1.8" />
+      <module name="verifaps.symbex.main" target="1.8" />
+      <module name="verifaps.symbex.test" target="1.8" />
+      <module name="verifaps.util.main" target="1.8" />
+      <module name="verifaps.util.test" target="1.8" />
+      <module name="verifaps.utils-test.main" target="1.8" />
+      <module name="verifaps.utils-test.test" target="1.8" />
+      <module name="verifaps.xml.main" target="1.8" />
+      <module name="verifaps.xml.test" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

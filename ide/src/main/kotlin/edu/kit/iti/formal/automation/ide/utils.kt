@@ -1,14 +1,10 @@
 package edu.kit.iti.formal.automation.ide
 
-import org.flexdock.docking.Dockable
-import org.flexdock.docking.DockingManager
-import org.flexdock.docking.DockingPort
-import org.flexdock.docking.defaults.DockableComponentWrapper
-import org.flexdock.docking.props.DockablePropertySet
-import java.awt.Component
-import java.awt.LayoutManager
 import java.awt.event.ActionEvent
-import javax.swing.*
+import javax.swing.AbstractAction
+import javax.swing.Action
+import javax.swing.Icon
+import javax.swing.KeyStroke
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 

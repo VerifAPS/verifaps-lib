@@ -1,11 +1,12 @@
 package edu.kit.iti.formal.automation.ide
 
 import com.alee.extended.tree.FileTreeNode
+import com.vlsolutions.swing.docking.Dockable
+import com.vlsolutions.swing.docking.DockingConstants
+import com.vlsolutions.swing.docking.DockingDesktop
+import com.vlsolutions.swing.docking.RelativeDockablePosition
 import me.tomassetti.kanvas.languageSupportRegistry
 import me.tomassetti.kanvas.noneLanguageSupport
-import org.flexdock.docking.DockingManager
-import org.flexdock.docking.DockingPort
-import org.flexdock.docking.defaults.DefaultDockingPort
 import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
@@ -121,7 +122,7 @@ class Ide(rootLookup: Lookup) : JFrame(), GetFileChooser, FileOpen {
         }
     }
 
-    var globalPort = DefaultDockingPort()
+    var globalPort = DockingDesktop()
 
 
     init {
@@ -158,61 +159,33 @@ class Ide(rootLookup: Lookup) : JFrame(), GetFileChooser, FileOpen {
         contentPane.add(defaultToolBar, BorderLayout.NORTH)
         contentPane.add(globalPort, BorderLayout.CENTER)
 
-        val portWest = DefaultDockingPort()
-        val portEast = DefaultDockingPort()
-        val portSouth = DefaultDockingPort()
-
-        //DockingManager.dock(portWest, globalPort as DockingPort, DockingManager.WEST_REGION)
-        //DockingManager.dock(portEast, globalPort as DockingPort, DockingManager.EAST_REGION)
-        //DockingManager.dock(portSouth, globalPort as DockingPort, DockingManager.SOUTH_REGION)
-
-        portWest.dockingProperties.tabPlacement = JTabbedPane.TOP
-        portEast.dockingProperties.tabPlacement = JTabbedPane.TOP
-        portSouth.dockingProperties.tabPlacement = JTabbedPane.TOP
-        globalPort.dockingProperties.tabPlacement = JTabbedPane.TOP
-
-
-
-        globalPort.isSingleTabAllowed = true
-        portWest.isSingleTabAllowed = true
-        portSouth.isSingleTabAllowed = true
-        globalPort.isSingleTabAllowed = true
-
-        //splitPaneRoot.orientation = JSplitPane.VERTICAL_SPLIT
-        //splitPaneRoot.leftComponent = tabbedEditors
-        //splitPaneRoot.rightComponent = tabbedTools
-        //contentPane.add(splitPaneRoot)
-
-
-        addEditorTab(STEditor(rootLookup))
-
-
         jMenuBar = JMenuBar()
         actions.sortedBy { it.priority }
                 .forEach { jMenuBar import it }
         addRecentFiles()
-        pack()
 
-        if (width < 500)
-            size = Dimension(500, 500)
-
-        //splitPaneRoot.isOneTouchExpandable = true
-        //splitPaneRoot.dividerLocation = height
-        //splitPaneRoot.resizeWeight = 1.0
         val tree = FileTreePanel(lookup)
-        globalPort.dock(tree.dockable, DockingManager.WEST_REGION)
-        tree.title = "File Navigator"
+        addEditorTab(STEditor(rootLookup))
+        globalPort.addDockable(tree, RelativeDockablePosition.LEFT_CENTER)
+        addToolTab(GetetaPreview(lookup))
+        addToolTab(GetetaWindow(lookup))
 
-        DockingManager.setMainDockingPort(this, globalPort.persistentId)
+        size = Dimension(700, 800)
     }
 
-    var lastEditor: EditorPane? = null
+    fun getDockable(pred: (Dockable?) -> Boolean): Dockable? {
+        return when {
+            pred(globalPort.selectedDockable) -> globalPort.selectedDockable
+            else -> globalPort.dockables.findLast { pred(it.dockable) && it.isDocked }?.dockable
+        }
+    }
+
     fun addEditorTab(editor: EditorPane) {
-        if (lastEditor != null)
-            DockingManager.getDockable(lastEditor).dock(editor.dockable, DockingManager.CENTER_REGION)
+        val editorPane: Dockable? = getDockable { it is EditorPane }
+        if (editorPane == null)
+            globalPort.addDockable(editor, RelativeDockablePosition.TOP_CENTER)
         else
-            DockingManager.dock(editor.dockable, globalPort as DockingPort, DockingManager.CENTER_REGION)
-        lastEditor = editor
+            globalPort.createTab(editorPane, editor, 0, true)
         lookup.register(editor)
     }
 
@@ -262,8 +235,13 @@ class Ide(rootLookup: Lookup) : JFrame(), GetFileChooser, FileOpen {
     }
 
     private fun addToolTab(window: TabbedPanel) {
-        //tabbedTools.addTab(window.title, window.icon, window, window.toolTipText)
-        DockingManager.dock(window.dockable, globalPort as DockingPort, DockingManager.SOUTH_REGION)
+        val otherToolWindow = getDockable { it is ToolPane && it != null }
+        if (otherToolWindow != null)
+            globalPort.createTab(otherToolWindow, window, 0, true)
+        else {
+            val editor = getDockable { it is EditorPane } ?: window
+            globalPort.split(editor, window, DockingConstants.SPLIT_BOTTOM)// RelativeDockablePosition.LEFT_CENTER)
+        }
         lookup.register(window)
     }
 
@@ -376,12 +354,7 @@ private fun JComponent.getOrCreate(key: String): JMenu {
     return m
 }
 
-
 class FileTreePanel(lookup: Lookup) : TabbedPanel(BorderLayout()) {
-    override fun close() {
-        //Not closeable
-    }
-
     val lookup = Lookup(lookup)
     val contextMenu = JPopupMenu()
     val treeFiles = JTree(DefaultTreeModel(FolderTreeNode(File(".").absoluteFile, this::fileFilter)))
@@ -422,6 +395,9 @@ class FileTreePanel(lookup: Lookup) : TabbedPanel(BorderLayout()) {
     val actionRefresh = createAction("Refresh", "") {}
 
     init {
+        title = "Navigator"
+        dockKey.isCloseEnabled = false
+
         treeFiles.addMouseListener(object : MouseAdapter() {
             override fun mouseReleased(e: MouseEvent) {
                 println(e.isPopupTrigger)
@@ -447,6 +423,10 @@ class FileTreePanel(lookup: Lookup) : TabbedPanel(BorderLayout()) {
         }
         add(JScrollPane(treeFiles))
     }
+
+
+    //Not closeable
+    override fun close() {}
 
 
     private fun fileFilter(file: File): Boolean {
