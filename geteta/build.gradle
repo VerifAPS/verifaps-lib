@@ -98,7 +98,7 @@ jarDist.dependsOn jar
 task run(type: JavaExec) {
     group = "run"
     classpath = sourceSets.main.runtimeClasspath
-    main = 'edu.kit.iti.formal.automation.testtables.Geteta'
+    main = 'edu.kit.iti.formal.automation.testtables.apps.Geteta'
     if (project.hasProperty("appArgs")) {
         args Eval.me(project.property("appArgs"))
     }
