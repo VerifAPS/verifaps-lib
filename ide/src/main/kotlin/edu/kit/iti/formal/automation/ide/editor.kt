@@ -261,7 +261,6 @@ class TTEditor(lookup: Lookup) : CodeEditor(lookup) {
                     XhtmlNamespaceHandler())
                     */
         } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 

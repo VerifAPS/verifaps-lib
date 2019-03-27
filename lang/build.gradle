@@ -9,8 +9,8 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.1'
-    antlr group: 'org.antlr', name: 'antlr4', version: '4.7.1'
+    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.2'
+    antlr group: 'org.antlr', name: 'antlr4', version: '4.7.2'
 
     compile project(':util')
     compile project(':xml')

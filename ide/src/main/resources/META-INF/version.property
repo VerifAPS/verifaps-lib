@@ -1,9 +1,0 @@
-build-jdk=12 (AdoptOpenJDK openj9-0.13.0)
-build-os=Windows 10 amd64 10.0
-build-revision=1.0
-build-timestamp=2019-03-24T03\:06\:57.532+0100
-built-by=weigl
-created-by=Gradle 5.3
-description=
-project-name=ide
-project-version=0.9

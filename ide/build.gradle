@@ -23,10 +23,10 @@ dependencies {
     // https://mvnrepository.com/artifact/com.fifesoft/spellchecker
     compile group: 'com.fifesoft', name: 'spellchecker', version: '3.0.0'
 
-    compile group: 'de.sciss', name: 'weblaf', version: '2.1.4'
+    //compile group: 'de.sciss', name: 'weblaf', version: '2.1.4'
 
     // https://mvnrepository.com/artifact/org.xhtmlrenderer/flying-saucer-core
-    compile group: 'org.xhtmlrenderer', name: 'flying-saucer-core', version: '9.1.18'
+    //compile group: 'org.xhtmlrenderer', name: 'flying-saucer-core', version: '9.1.18'
 
     compile group: 'com.miglayout', name: 'miglayout-swing', version: '5.2'
     compile 'dk.navicon:vldocking:3.0.4'
