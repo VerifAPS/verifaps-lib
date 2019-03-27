@@ -23,10 +23,7 @@ import org.netbeans.swing.outline.DefaultOutlineModel
 import org.netbeans.swing.outline.Outline
 import org.netbeans.swing.outline.RenderDataProvider
 import org.netbeans.swing.outline.RowModel
-import java.awt.BorderLayout
-import java.awt.Color
-import java.awt.Component
-import java.awt.Font
+import java.awt.*
 import java.io.File
 import java.io.StringWriter
 import javax.swing.*

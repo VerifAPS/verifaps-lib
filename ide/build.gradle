@@ -1,5 +1,5 @@
 apply plugin: 'application'
-mainClassName = ""
+mainClassName = "edu.kit.iti.formal.automation.ide.Ide"
 
 description = 'Case Studies and Executables of VerifAPS'
 dependencies {

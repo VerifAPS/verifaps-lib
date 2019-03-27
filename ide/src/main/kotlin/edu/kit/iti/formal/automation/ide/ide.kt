@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.automation.ide
 
-import com.alee.extended.tree.FileTreeNode
 import com.vlsolutions.swing.docking.Dockable
 import com.vlsolutions.swing.docking.DockingConstants
 import com.vlsolutions.swing.docking.DockingDesktop
@@ -365,7 +364,7 @@ class FileTreePanel(lookup: Lookup) : TabbedPanel(BorderLayout()) {
     }
 
     val actionGoUp = createAction("Go Up", "") {
-        val file = treeFiles.model.root as? FileTreeNode
+        val file = treeFiles.model.root as? FolderTreeNode
         if (file != null) {
             val m = DefaultTreeModel(FolderTreeNode(file.file.parentFile.absoluteFile, this::fileFilter))
             treeFiles.model = m
