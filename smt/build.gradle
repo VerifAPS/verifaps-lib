@@ -1,5 +1,5 @@
 apply plugin: 'antlr'
-group = 'edu.kit.iti.formal'
+
 description = """
     SMT stuff
 """

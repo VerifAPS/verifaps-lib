@@ -9,9 +9,6 @@ buildscript {
     }
 }
 
-group 'edu.kit.iti.formal'
-version '0.9-SNAPSHOT'
-
 apply plugin: 'java'
 apply plugin: 'kotlin'
 

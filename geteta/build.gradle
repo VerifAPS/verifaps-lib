@@ -2,13 +2,12 @@
 plugins {}
 
 apply plugin: 'antlr'
-group = 'edu.kit.iti.formal.automation'
 
 description = """
     Generalized Test Table
 """
 
-version = "0.9-SNAPSHOT"
+version = "0.9-beta"
 
 def antlrOutputDir = file("build/generated-src/antlr")
 
