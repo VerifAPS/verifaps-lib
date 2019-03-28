@@ -1,8 +1,6 @@
 description = "PCLOpenXML"
 dependencies {
-    //compile project(':iec61131lang')
     compile project(':util')
     compile group: 'org.jdom', name: 'jdom2', version: '2.0.6'
     compile group: 'jaxen', name: 'jaxen', version: '1.1.4'
-    //compile group: 'net.sf.jopt-simple', name: 'jopt-simple', version: '4.9'
 }

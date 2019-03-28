@@ -140,9 +140,11 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
 
     override fun visit(invocation: InvocationStatement) {
         invocation.invoked = scope.resolveInvocation(invocation.callee)
+        super.visit(invocation)
     }
 
     override fun visit(invocation: Invocation) {
+        invocation.invoked = scope.resolveInvocation(invocation.callee)
         super.visit(invocation)
     }
 

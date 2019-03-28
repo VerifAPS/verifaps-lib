@@ -12,6 +12,7 @@ import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
 import edu.kit.iti.formal.util.dlevenshtein
 import org.antlr.v4.runtime.Token
+import java.lang.Throwable
 import kotlin.math.ceil
 import kotlin.math.log
 
@@ -58,11 +59,10 @@ class CheckForLiterals(private val reporter: Reporter) : AstVisitorWithScope<Uni
                     DATATYPE_NOT_FOUND)
         } else {
             if (literal.value !in dt.allowedValues.keys) {
-                reporter.report {
-                    position(literal)
-                    message = "Value ${literal.value} not allowed in the enumeration type '$dt'. "
+                reporter.report(literal,
+                        "Value ${literal.value} not allowed in the enumeration type '$dt'. ",
+                        DATATYPE_NOT_FOUND) {
                     candidates.addAll(dt.allowedValues.keys.similarCandidates(literal.value))
-                    category = DATATYPE_NOT_FOUND
                 }
             }
         }
@@ -220,7 +220,15 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
                     FUNCTION_RESOLVE)
         } else {
             val expectedTypes = fd.scope.variables.filter { it.isInput }
-            val exprTypes = invocation.parameters.map { it.expression.dataType(scope) }
+            val exprTypes = invocation.parameters.map {
+                try {
+                    //val scope = invocation.invoked?.getCalleeScope()!!
+                    it.expression.dataType(scope)
+                } catch (e: DataTypeNotResolvedException) {
+                    e.printStackTrace()
+                    null
+                }
+            }
 
             if (expectedTypes.size != exprTypes.size) {
                 val invoc = IEC61131Facade.print(invocation)
@@ -231,7 +239,8 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
                 expectedTypes.zip(exprTypes).forEach { (vd, def) ->
                     val exp = vd.dataType
                     if (exp != null) {
-                        if (!def.isAssignableTo(exp)) {
+                        val c = def?.isAssignableTo(exp) ?: false
+                        if (!c) {
                             reporter.report(invocation,
                                     "Type mismatch for argument ${vd.name}: exptected ${exp} but got ${def}",
                                     ReportCategory.FUNCTION_CALL_TYPE_MISMATCH)
@@ -400,9 +409,10 @@ enum class ReportLevel {
 /**
  *
  */
-private fun Any?.toHuman(): String =
+fun Any?.toHuman(): String =
         when (this) {
             null -> "null"
+            is SymbolicReference -> IEC61131Facade.print(this)
             is ClassDeclaration -> "class '$name'"
             is InterfaceDeclaration -> "interface '$name'"
             is MethodDeclaration -> "method '${parent?.name}.$name'"
@@ -412,6 +422,15 @@ private fun Any?.toHuman(): String =
 
 
 class Reporter(val messages: MutableList<ReporterMessage> = ArrayList()) {
+    fun getCaller(): String {
+        val stackTrace = Throwable().stackTrace
+        val firstNonReporterEntry = stackTrace.find {
+            !it.className.startsWith(javaClass.name)
+        }
+        val caller = firstNonReporterEntry
+        return if (caller == null) "" else caller.toString()
+    }
+
     fun report(e: ReporterMessage) {
         messages += e
     }
@@ -424,19 +443,23 @@ class Reporter(val messages: MutableList<ReporterMessage> = ArrayList()) {
     }
 
     fun report(node: Top, msg: String, cat: ReportCategory = UNKNOWN,
-               lvl: ReportLevel = ERROR) = report {
+               lvl: ReportLevel = ERROR, init: ReporterMessage.() -> Unit = {}) = report {
         position(node)
         message = msg
         category = cat
         level = lvl
+        checkerId = getCaller()
+        init(this)
     }
 
     fun report(node: Token?, msg: String, cat: ReportCategory,
-               lvl: ReportLevel = ERROR) = report {
+               lvl: ReportLevel = ERROR, init: ReporterMessage.() -> Unit = {}) = report {
         position(node)
         message = msg
         category = cat
         level = lvl
+        checkerId = getCaller()
+        init(this)
     }
 }
 
@@ -448,7 +471,8 @@ data class ReporterMessage(
         var end: Position = Position(),
         var category: ReportCategory = UNKNOWN,
         var level: ReportLevel = ERROR,
-        var candidates: MutableList<String> = arrayListOf()) {
+        var candidates: MutableList<String> = arrayListOf(),
+        var checkerId: String = "") {
 
     val length: Int
         get() = end.offset - start.offset + 1
@@ -472,7 +496,7 @@ data class ReporterMessage(
         get() = end.offset
 
     fun toHuman() =
-            "[$level] $sourceName:$startLine:$startOffsetInLine $message [$category]"
+            "[$level] $sourceName:$startLine:$startOffsetInLine $message [$category] ($checkerId)"
 
     fun toJson() = toMap().toJson()
 
@@ -484,6 +508,7 @@ data class ReporterMessage(
                     "endLine" to endLine,
                     "endOffsetInLine" to endOffsetInLine,
                     "message" to message,
+                    "checkerId" to checkerId,
                     "category" to category)
 
     fun position(node: Token?) {

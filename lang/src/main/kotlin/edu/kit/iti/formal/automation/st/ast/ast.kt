@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.st.ast
 
 import edu.kit.iti.formal.automation.VariableScope
+import edu.kit.iti.formal.automation.analysis.toHuman
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.datatypes.values.*
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotResolvedException
@@ -926,7 +927,7 @@ data class Invocation(
                         ?: throw DataTypeNotResolvedException("Return type of method ${invoked.method} is not resolved")
             }
         } else {
-            throw DataTypeNotResolvedException("Return type of function isType not set")
+            throw DataTypeNotResolvedException("Call to function ${callee.toHuman()} could not be resolved.")
         }
     }
 
@@ -1379,6 +1380,16 @@ class DirectVariable(s: String) : Reference() {
 }
 
 sealed class Invoked {
+    fun getCalleeScope(): Scope? {
+        return when(this){
+            is Program -> program.scope
+            is FunctionBlock -> fb.scope
+            is Function -> function.scope
+            is Method -> method.scope
+            is Action -> scope
+        }
+    }
+
     class Program(val program: ProgramDeclaration) : Invoked()
     class FunctionBlock(val fb: FunctionBlockDeclaration) : Invoked()
     class Function(val function: FunctionDeclaration) : Invoked()

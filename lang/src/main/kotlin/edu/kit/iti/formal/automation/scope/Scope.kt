@@ -337,7 +337,9 @@ data class Scope(val variables: VariableScope = VariableScope())
     }
 
     fun resolveEnumByValue(value: String): EnumerateType? =
-            this.allowedEnumValues[value] ?: parent?.resolveEnumByValue(value)
+            value.toUpperCase().let {
+                this.allowedEnumValues[it] ?: parent?.resolveEnumByValue(it)
+            }
 
 
     //region call resolver

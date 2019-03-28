@@ -86,28 +86,26 @@ class CheckApp : CliktCommand() {
             .file()
             .multiple()
 
+    val includeBuiltIn by option("-b", help = "")
+            .flag("-B")
+
     val files by argument(name = "FILE", help = "Files to check")
             .file()
             .multiple()
 
     override fun run() {
-        val base = BuiltinLoader.loadDefault()
+        Console.configureLoggingConsole()
+
+        val base = if (includeBuiltIn) BuiltinLoader.loadDefault() else PouElements()
+
         val r = FlycheckRunner(
                 files.map { CharStreams.fromFileName(it.absolutePath) },
                 base,
                 verbose,
+                format,
                 include
         )
         r.run()
-        if (format) {
-            val msg = r.messages.joinToString(",") { it.toJson() }
-            print("[$msg]\n")
-            System.out.flush()
-        } else {
-            r.messages.forEach {
-                Console.writeln("[${it.level}] (${it.sourceName}@${it.startLine}:${it.startOffsetInLine}) ${it.message} (${it.category})")
-            }
-        }
     }
 }
 
@@ -115,6 +113,7 @@ class FlycheckRunner(
         val streams: List<CharStream>,
         val library: PouElements = PouElements(),
         val verbose: Boolean = false,
+        val json: Boolean = false,
         val includeStubs: List<File> = arrayListOf()) {
 
     val underInvestigation: PouElements = PouElements()
@@ -126,9 +125,13 @@ class FlycheckRunner(
     private val errorListener = MyAntlrErrorListener(reporter)
 
     fun run() {
+        Console.writeln("Start with parsing")
         streams.forEach { parse(it) }
+        Console.writeln("Resolving...")
         resolve()
+        Console.writeln("Checking...")
         check()
+        Console.writeln("Print.")
         printMessages()
     }
 
@@ -155,11 +158,26 @@ class FlycheckRunner(
     }
 
     private fun printMessages() {
-        messages.forEach { printMessage(it) }
+        if (messages.isEmpty()) {
+            if (json) {
+                println("{ok:true}")
+            } else {
+                Console.writeln("Everything is fine.")
+            }
+
+        } else {
+            if (json) {
+                val msg = messages.joinToString(",") { it.toJson() }
+                print("[$msg]\n")
+                System.out.flush()
+            } else {
+                messages.forEach { Console.writeln(it.toHuman()) }
+            }
+        }
     }
 
     private fun printMessage(message: ReporterMessage) {
-        println(message.toHuman())
+
     }
 
     internal class MyAntlrErrorListener(private val reporter: Reporter)
