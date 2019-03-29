@@ -25,6 +25,13 @@ jobs:
     steps:
       - checkout
 
+      - run
+        name:
+        command:
+          - javac -version
+          - z3 -version
+          - nuXmv -version
+
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -57,10 +64,11 @@ jobs:
       - store_artifacts:
           path: ~/junit
 
-      - run: gradle :ide:assemble
+      - run: gradle :ide:assembleDist
 
       - store_artifacts:
-          path: casestudies/build/distributions/*
+          path:
+            - ide/build/distributions/*
 
 
   #    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
