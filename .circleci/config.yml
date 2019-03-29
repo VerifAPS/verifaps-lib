@@ -25,12 +25,12 @@ jobs:
     steps:
       - checkout
 
-      - run
-        name:
-        command:
-          - javac -version
-          - z3 -version
-          - nuXmv -version
+      - run:
+          name:
+          command:
+            - javac -version
+            - z3 -version
+            - nuXmv -version
 
       # Download and cache dependencies
       - restore_cache:
