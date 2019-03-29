@@ -30,7 +30,7 @@ jobs:
           command: |
             javac -version
             z3 -version
-            nuXmv -version
+            echo "quit" | nuXmv
 
       # Download and cache dependencies
       - restore_cache:
