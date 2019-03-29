@@ -1,5 +1,5 @@
 #!/bin/sh -x
-BIN=`pwd`/ide/build/distributions/ide/bin/
+BIN=`pwd`/ide/build/install/ide/bin/
 
 if [ ! -f $BIN ]; then
     echo "Could not find binary folder: $BIN"

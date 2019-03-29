@@ -26,11 +26,15 @@ jobs:
       - run: gradle classes
       - run: gradle testClasses
 
+      - persist_to_workspace
+        root: ~/repo
+        paths:
+          - "*/build/*"
+          - "build/*"
+
       - save_cache:
           paths:
             - ~/.gradle
-            - "*/build"
-            - build
             - .gradle
           key: gradle-repo-v1-{{ .Branch }}-{{ checksum "build.gradle" }}
 
@@ -57,6 +61,9 @@ jobs:
             - gradle-repo-v1-{{ .Branch }}-{{ checksum "build.gradle" }}
             - gradle-repo-v1-{{ .Branch }}-
             - gradle-repo-v1-
+
+      - attach_workspace:
+          at: ~/repo
 
       - run: gradle --continue --build-cache check
 
@@ -94,7 +101,10 @@ jobs:
             - gradle-repo-v1-{{ .Branch }}-
             - gradle-repo-v1-
 
-      - run: gradle --build-cache --info :ide:assembleDist
+      - attach_workspace:
+          at: ~/repo
+
+      - run: gradle --build-cache --info :ide:installDist :ide:assembleDist
 
       - run:
           name: Integration Tests
