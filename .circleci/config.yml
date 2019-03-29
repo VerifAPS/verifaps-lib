@@ -67,8 +67,7 @@ jobs:
       - run: gradle :ide:assembleDist
 
       - store_artifacts:
-          path:
-            - ide/build/distributions/*
+          path: ide/build/distributions/*
 
 
   #    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
