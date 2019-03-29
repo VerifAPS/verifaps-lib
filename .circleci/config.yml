@@ -17,7 +17,7 @@ jobs:
       - restore_cache:
           keys:
             # when lock file changes, use increasingly general patterns to restore cache
-            - gradle-repo-v1-{{ .Branch }}-{{ checksum "dependencies.lockfile" }}
+            - gradle-repo-v1-{{ .Branch }}-{{ checksum "build.gradle" }}
             - gradle-repo-v1-{{ .Branch }}-
             - gradle-repo-v1-
 
@@ -31,7 +31,7 @@ jobs:
             - "*/build"
             - build
             - .gradle
-          key: gradle-repo-v1-{{ .Branch }}-{{ checksum "dependencies.lockfile" }}
+          key: gradle-repo-v1-{{ .Branch }}-{{ checksum "build.gradle" }}
 
   test:
     docker:
@@ -52,7 +52,7 @@ jobs:
       - restore_cache:
           keys:
             # when lock file changes, use increasingly general patterns to restore cache
-            - gradle-repo-v1-{{ .Branch }}-{{ checksum "dependencies.lockfile" }}
+            - gradle-repo-v1-{{ .Branch }}-{{ checksum "build.gradle" }}
             - gradle-repo-v1-{{ .Branch }}-
             - gradle-repo-v1-
 
@@ -87,7 +87,7 @@ jobs:
       - restore_cache:
           keys:
             # when lock file changes, use increasingly general patterns to restore cache
-            - gradle-repo-v1-{{ .Branch }}-{{ checksum "dependencies.lockfile" }}
+            - gradle-repo-v1-{{ .Branch }}-{{ checksum "build.gradle" }}
             - gradle-repo-v1-{{ .Branch }}-
             - gradle-repo-v1-
 
@@ -120,7 +120,7 @@ jobs:
       - restore_cache:
           keys:
             # when lock file changes, use increasingly general patterns to restore cache
-            - gradle-repo-v1-{{ .Branch }}-{{ checksum "dependencies.lockfile" }}
+            - gradle-repo-v1-{{ .Branch }}-{{ checksum "build.gradle" }}
             - gradle-repo-v1-{{ .Branch }}-
             - gradle-repo-v1-
 
