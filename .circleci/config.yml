@@ -87,3 +87,9 @@ jobs:
 
       - store_artifacts:
           path: ide/build/distributions/*
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - test
+      - integration-tests
