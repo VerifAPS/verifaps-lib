@@ -103,14 +103,6 @@ task run(type: JavaExec) {
     }
 }
 
-task runConstantprogram(type: JavaExec) {
-    group = "run"
-    classpath = sourceSets.main.runtimeClasspath
-    main = 'edu.kit.iti.formal.automation.testtables.Geteta'
-    workingDir "examples/constantprogram"
-    args << "--code" << "constantprogram.st " << "--table " << "constantprogram.tt.txt"
-}
-
 test {
     exclude '**/AutomataDrawerTest.class'
     exclude '**/SmtEncoderTest.class'
