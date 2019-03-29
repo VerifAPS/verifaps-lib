@@ -102,6 +102,9 @@ jobs:
 
       - run: gradle --build-cache :ide:installDist :ide:assembleDist
 
+      - store_artifacts:
+          path: ide/build/distributions/
+
       - run:
           name: Integration Tests
           command: |
@@ -110,8 +113,6 @@ jobs:
             bash -x share/integration-tests.sh
 
 
-      - store_artifacts:
-          path: ide/build/distributions/*
 
   deploy:
     docker:
