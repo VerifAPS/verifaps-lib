@@ -4,6 +4,35 @@
 #
 version: 2
 jobs:
+  build:
+    docker:
+      - image: wadoon/verifaps-test:latest
+    working_directory: ~/repo
+    environment:
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+    steps:
+      - checkout
+      - run: javac -version
+      - restore_cache:
+          keys:
+            # when lock file changes, use increasingly general patterns to restore cache
+            - gradle-repo-v1-{{ .Branch }}-{{ checksum "dependencies.lockfile" }}
+            - gradle-repo-v1-{{ .Branch }}-
+            - gradle-repo-v1-
+
+      - run: gradle dependencies
+      - run: gradle classes
+      - run: gradle testClasses
+
+      - save_cache:
+          paths:
+            - ~/.gradle
+            - "*/build"
+            - build
+            - .gradle
+          key: gradle-repo-v1-{{ .Branch }}-{{ checksum "dependencies.lockfile" }}
+
   test:
     docker:
       - image: wadoon/verifaps-test:latest
@@ -22,17 +51,10 @@ jobs:
 
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
-            - v1-dependencies-
-
-      - run: gradle dependencies
-      - run: gradle classes
-      - run: gradle testClasses
-
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
+            # when lock file changes, use increasingly general patterns to restore cache
+            - gradle-repo-v1-{{ .Branch }}-{{ checksum "dependencies.lockfile" }}
+            - gradle-repo-v1-{{ .Branch }}-
+            - gradle-repo-v1-
 
       - run: gradle --continue check
 
@@ -45,9 +67,6 @@ jobs:
 
       - store_test_results:
           path: ~/junit
-
-#      - store_artifacts:
-#          path: ~/junit
 
   integration-tests:
     docker:
@@ -67,14 +86,10 @@ jobs:
 
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-      - save_cache:
-          paths:
-            - ~/.gradle
-            - build
-          key: v1-dependencies-{{ checksum "build.gradle" }}
+            # when lock file changes, use increasingly general patterns to restore cache
+            - gradle-repo-v1-{{ .Branch }}-{{ checksum "dependencies.lockfile" }}
+            - gradle-repo-v1-{{ .Branch }}-
+            - gradle-repo-v1-
 
       - run: gradle :ide:assembleDist
 
@@ -85,11 +100,44 @@ jobs:
             which z3
             share/integration-tests.sh
 
+
       - store_artifacts:
           path: ide/build/distributions/*
+
+  deploy:
+    docker:
+      - image: wadoon/verifaps-test:latest
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: "Versions"
+          command: |
+            javac -version
+            z3 -version
+            echo $(echo "quit" | nuXmv -int | head -n 1)
+
+      - restore_cache:
+          keys:
+            # when lock file changes, use increasingly general patterns to restore cache
+            - gradle-repo-v1-{{ .Branch }}-{{ checksum "dependencies.lockfile" }}
+            - gradle-repo-v1-{{ .Branch }}-
+            - gradle-repo-v1-
+
+
 workflows:
   version: 2
   build_and_test:
     jobs:
-      - test
-      - integration-tests
+      - build
+      - test:
+          requires:
+            - build
+      - integration-tests:
+          requires:
+            - build
+      - deploy:
+          type: approval # <<< This key-value pair will set your workflow to a status of "On Hold"
+          requires:
+            - test
+            - integration-tests
