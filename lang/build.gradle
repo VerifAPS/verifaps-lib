@@ -33,6 +33,7 @@ generateGrammarSource {
 */
 
 compileJava.dependsOn << generateGrammarSource
+compileKotlin.dependsOn << generateGrammarSource
 
 test {
     exclude '**/SFCLangParserTest.class'
