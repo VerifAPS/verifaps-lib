@@ -67,10 +67,10 @@ jobs:
 
       - run:
           name: Integration Tests
-          command:
-            - which nuXmv
-            - which z3
-            - share/integration-tests.sh
+          command: |
+            which nuXmv
+            which z3
+            share/integration-tests.sh
 
       - store_artifacts:
           path: ide/build/distributions/*
