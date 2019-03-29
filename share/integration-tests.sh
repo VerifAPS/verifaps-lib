@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash -x
 BIN=`pwd`/ide/build/install/ide/bin/
 
 if [ ! -d $BIN ]; then
