@@ -56,7 +56,7 @@ jobs:
             - gradle-repo-v1-{{ .Branch }}-
             - gradle-repo-v1-
 
-      - run: gradle --continue check
+      - run: gradle --continue --build-cache check
 
       - run:
           name: Save test results
@@ -91,14 +91,14 @@ jobs:
             - gradle-repo-v1-{{ .Branch }}-
             - gradle-repo-v1-
 
-      - run: gradle :ide:assembleDist
+      - run: gradle --build-cache :ide:assembleDist
 
       - run:
           name: Integration Tests
           command: |
             which nuXmv
             which z3
-            share/integration-tests.sh
+            sh -x share/integration-tests.sh
 
 
       - store_artifacts:
