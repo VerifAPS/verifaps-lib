@@ -22,11 +22,11 @@ jobs:
       - run: gradle classes
       - run: gradle testClasses
 
-      - persist_to_workspace
-        root: ~/repo
-        paths:
-          - "*/build/*"
-          - "build/*"
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - "*/build/*"
+            - "build/*"
 
       - save_cache:
           paths:
