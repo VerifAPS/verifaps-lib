@@ -107,7 +107,7 @@ jobs:
           command: |
             which nuXmv
             which z3
-            sh -x share/integration-tests.sh
+            bash -x share/integration-tests.sh
 
 
       - store_artifacts:
