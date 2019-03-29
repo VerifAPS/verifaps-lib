@@ -100,7 +100,7 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run: gradle --build-cache --info :ide:installDist :ide:assembleDist
+      - run: gradle --build-cache :ide:installDist :ide:assembleDist
 
       - run:
           name: Integration Tests

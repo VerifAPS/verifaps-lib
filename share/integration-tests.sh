@@ -1,7 +1,7 @@
 #!/bin/sh -x
 BIN=`pwd`/ide/build/install/ide/bin/
 
-if [ ! -f $BIN ]; then
+if [ ! -d $BIN ]; then
     echo "Could not find binary folder: $BIN"
     exit 1
 fi
