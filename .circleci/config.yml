@@ -4,27 +4,15 @@
 #
 version: 2
 jobs:
-  build:
+  test:
     docker:
-      # specify the version you desire here
-      #- image: circleci/openjdk:8-jdk
       - image: wadoon/verifaps-test:latest
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
     working_directory: ~/repo
-
     environment:
-      # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
       TERM: dumb
-
     steps:
       - checkout
-
       - run:
           name: "Versions"
           command: |
@@ -32,23 +20,21 @@ jobs:
             z3 -version
             echo $(echo "quit" | nuXmv -int | head -n 1)
 
-      # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "build.gradle" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-
 
       - run: gradle dependencies
-      - run: gradle classes --parallel
-      - run: gradle testClasses --parallel
+      - run: gradle classes
+      - run: gradle testClasses
 
       - save_cache:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
-      - run: gradle --continue --parallel check
+      - run: gradle --continue check
 
       - run:
           name: Save test results
@@ -60,8 +46,35 @@ jobs:
       - store_test_results:
           path: ~/junit
 
-      - store_artifacts:
-          path: ~/junit
+#      - store_artifacts:
+#          path: ~/junit
+
+  integration-tests:
+    docker:
+      - image: wadoon/verifaps-test:latest
+    working_directory: ~/repo
+    environment:
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+    steps:
+      - checkout
+      - run:
+          name: "Versions"
+          command: |
+            javac -version
+            z3 -version
+            echo $(echo "quit" | nuXmv -int | head -n 1)
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - save_cache:
+          paths:
+            - ~/.gradle
+            - build
+          key: v1-dependencies-{{ checksum "build.gradle" }}
 
       - run: gradle :ide:assembleDist
 
@@ -74,9 +87,3 @@ jobs:
 
       - store_artifacts:
           path: ide/build/distributions/*
-
-
-  #    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
- #   - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
-#    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
-#    - find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
