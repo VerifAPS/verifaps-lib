@@ -26,6 +26,18 @@ import javax.swing.table.DefaultTableCellRenderer
 
 abstract class ToolPane(layout: LayoutManager = BorderLayout()) : TabbedPanel(layout)
 
+
+val actionGeteta = createAction(name = "Geteta", menuPath = "Tools", prio = 10,
+        fontIcon = FontAwesomeSolid.TABLE) {
+
+}
+
+val actionReteta = createAction(name = "Reteta", menuPath = "Tools", prio = 10,
+        fontIcon = FontAwesomeSolid.TABLET) {
+
+}
+
+
 /**
  *
  * @author Alexander Weigl
@@ -303,8 +315,6 @@ class GetetaWindow(lookup: Lookup) : ToolPane() {
 
     private fun updatePouElements() {
         cboPou.removeAllItems()
-
-
     }
 
     private fun updateData() {
@@ -316,8 +326,10 @@ class GetetaWindow(lookup: Lookup) : ToolPane() {
 
         stEditor.forEach { cboStEditor.addItem(it) }
         ttEditor.forEach { cboTable.addItem(it) }
-
     }
+}
+
+class RetetaWindow(lookup: Lookup) {
 }
 
 class GetetaPreview(lookup: Lookup) : ToolPane() {

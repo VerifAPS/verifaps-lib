@@ -25,7 +25,10 @@ import kotlin.properties.Delegates
  * @author Alexander Weigl
  * @version 1 (10.03.19)
  */
-class Ide(rootLookup: Lookup) : JFrame(), GetFileChooser, FileOpen {
+class Ide(rootLookup: Lookup) : JFrame(),
+        GetFileChooser, FileOpen,
+        TabManagement, ActionService {
+
     private var fontSize: Float by Delegates.observable(12f) { prop, _, new ->
         if (fontSize < 6f) fontSize = 6f
         else {
@@ -61,17 +64,10 @@ class Ide(rootLookup: Lookup) : JFrame(), GetFileChooser, FileOpen {
             return cur as? TabbedPanel
         }
 
-
     override val fileChooser = JFileChooser()
     val defaultToolBar = JToolBar()
 
-    val actions = arrayListOf<MyAction>()
-
-    val actionGeteta = createAction(name = "Geteta", menuPath = "Tools", prio = 10,
-            fontIcon = FontAwesomeSolid.TABLE) { runGeteta() }
-
-    val actionReteta = createAction(name = "Reteta", menuPath = "Tools", prio = 10,
-            fontIcon = FontAwesomeSolid.TABLET) { runReteta() }
+    val actions = arrayListOf<IdeAction>()
 
     val actionSaveAs = createAction(name = "Save As", menuPath = "File", prio = 3,
             fontIcon = FontAwesomeSolid.SAVE) { saveAs() }
@@ -100,7 +96,7 @@ class Ide(rootLookup: Lookup) : JFrame(), GetFileChooser, FileOpen {
             KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK),
             fontIcon = FontAwesomeSolid.MINUS) { --fontSize }
 
-    val recentFiles by lookup.with<RecentFiles>()
+    val recentFiles by lookup.with<RecentFilesService>()
 
     val actionClearRecentFiles = createAction("Clear recent files",
             "File.Recent Files", prio = 5) {
@@ -123,10 +119,10 @@ class Ide(rootLookup: Lookup) : JFrame(), GetFileChooser, FileOpen {
 
     var globalPort = DockingDesktop()
 
-
     init {
         lookup.register<GetFileChooser>(this)
         lookup.register<FileOpen>(this)
+        lookup.register<ProblemList>(ProblemList())
 
 
         editorFactories.add {
@@ -164,12 +160,55 @@ class Ide(rootLookup: Lookup) : JFrame(), GetFileChooser, FileOpen {
         addRecentFiles()
 
         val tree = FileTreePanel(lookup)
-        addEditorTab(STEditor(rootLookup))
+        addEditorTab(STEditor(lookup))
         globalPort.addDockable(tree, RelativeDockablePosition.LEFT_CENTER)
         addToolTab(GetetaPreview(lookup))
         addToolTab(GetetaWindow(lookup))
+        addToolTab(ProblemPanel(lookup))
 
         size = Dimension(700, 800)
+
+        invalidate()
+        revalidate()
+        revalidate()
+        repaint()
+        repaint()
+    }
+
+    override fun registerAction(act: IdeAction) {
+        actions += act
+        addActionIntoMenubar(act)
+        addActionIntoToolbar(act)
+    }
+
+    private fun addActionIntoToolbar(act: IdeAction) {
+        if (act.toolbarId == null) {
+            defaultToolBar.add(act)
+        }
+    }
+
+    override fun deregisterAction(act: IdeAction) {
+        actions += act
+        removeActionFromMenubar(act)
+        removeActionFromToolbar(act)
+    }
+
+    private fun removeActionFromToolbar(act: IdeAction) {
+        if (act.toolbarId != null) {
+            for (it in defaultToolBar.components) {
+                if (it is JButton && it.action == act) {
+                    defaultToolBar.remove(it)
+                    break
+                }
+            }
+        }
+    }
+
+    private fun removeActionFromMenubar(act: IdeAction) {
+        if (act.menuPath.isNotEmpty()) {
+            //TODO
+            val a = jMenuBar.getOrCreate(act.menuPath)
+        }
     }
 
     fun getDockable(pred: (Dockable?) -> Boolean): Dockable? {
@@ -179,7 +218,7 @@ class Ide(rootLookup: Lookup) : JFrame(), GetFileChooser, FileOpen {
         }
     }
 
-    fun addEditorTab(editor: EditorPane) {
+    override fun addEditorTab(editor: EditorPane) {
         val editorPane: Dockable? = getDockable { it is EditorPane }
         if (editorPane == null)
             globalPort.addDockable(editor, RelativeDockablePosition.TOP_CENTER)
@@ -225,15 +264,7 @@ class Ide(rootLookup: Lookup) : JFrame(), GetFileChooser, FileOpen {
         }
     }
 
-    private fun runReteta() {
-    }
-
-    private fun runGeteta() {
-        val gw = GetetaWindow(lookup)
-        addToolTab(gw)
-    }
-
-    private fun addToolTab(window: TabbedPanel) {
+    override fun addToolTab(window: ToolPane) {
         val otherToolWindow = getDockable { it is ToolPane && it != null }
         if (otherToolWindow != null)
             globalPort.createTab(otherToolWindow, window, 0, true)
@@ -267,7 +298,7 @@ class Ide(rootLookup: Lookup) : JFrame(), GetFileChooser, FileOpen {
         jMenuBar.getOrCreate("File").getOrCreate("Recent Files").removeAll()
         recentFiles.recentFiles
                 .map { rf ->
-                    createAction(rf.absolutePath, m, prio = i++, register = false, fontIcon = FontAwesomeSolid.SAVE) {
+                    createAction(rf.absolutePath, m, prio = i++, fontIcon = FontAwesomeSolid.SAVE) {
                         open(rf)
                     }
                 }
@@ -275,40 +306,11 @@ class Ide(rootLookup: Lookup) : JFrame(), GetFileChooser, FileOpen {
                 .forEach { jMenuBar import it }
     }
 
-    private fun createAction(name: String, menuPath: String, accel: KeyStroke? = null,
-                             prio: Int = 0,
-                             shortDesc: String? = null,
-                             longDesc: String? = null,
-                             smallIcon: Icon? = null,
-                             largeIcon: Icon? = null,
-                             register: Boolean = true,
-                             fontIcon: FontIcon? = null,
-                             f: () -> Unit): MyAction {
-        val myAction = LambdaAction(f)
-        myAction.priority = prio
-        myAction.name = name
-        myAction.menuPath = menuPath
-        myAction.accelerator = accel
-        myAction.shortDescription = shortDesc
-        myAction.longDescription = longDesc
-        myAction.smallIcon = smallIcon
-        myAction.largeIcon = largeIcon
-
-        if (fontIcon != null) {
-            myAction.largeIcon = IconFontSwing.buildIcon(fontIcon, 24f)
-            myAction.smallIcon = IconFontSwing.buildIcon(fontIcon, 16f)
-        }
-
-        if (register)
-            actions += myAction
-        return myAction
-    }
-
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
             val rootLookup = Lookup()
-            rootLookup.register<RecentFiles>(RecentFilesImpl())
+            rootLookup.register<RecentFilesService>(RecentFilesImpl())
             rootLookup.register(Colors())
 
             //https://tomassetti.me/kanvas-generating-simple-ide-antlr-grammar/

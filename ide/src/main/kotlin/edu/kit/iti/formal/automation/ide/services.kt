@@ -4,6 +4,7 @@ import java.awt.Color
 import java.io.File
 import java.util.*
 import java.util.function.Consumer
+import javax.swing.Action
 import javax.swing.Icon
 import javax.swing.JFileChooser
 import kotlin.collections.ArrayList
@@ -28,6 +29,16 @@ interface GetFileChooser {
     val fileChooser: JFileChooser
 }
 
+interface ActionService {
+    fun registerAction(act: IdeAction)
+    fun deregisterAction(act: IdeAction)
+}
+
+interface TabManagement {
+    fun addToolTab(pane: ToolPane)
+    fun addEditorTab(pane: EditorPane)
+}
+
 class Colors {
     val BLUE = Color(74, 72, 133)
     val LIGHT_BLUE = Color(148, 198, 206)
@@ -41,7 +52,7 @@ class Colors {
 
 typealias RecentFilesUpdateListener = Consumer<List<File>>
 
-interface RecentFiles {
+interface RecentFilesService {
     val defaultFile: File
     val recentFiles: List<File>
 
@@ -56,7 +67,7 @@ interface RecentFiles {
     operator fun contains(f: File): Boolean
 }
 
-class RecentFilesImpl : RecentFiles {
+class RecentFilesImpl : RecentFilesService {
     protected var listenerList = arrayListOf<RecentFilesUpdateListener>()
 
     override val recentFiles = arrayListOf<File>()

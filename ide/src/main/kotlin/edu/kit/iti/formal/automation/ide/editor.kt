@@ -193,6 +193,10 @@ abstract class CodeEditor(lookup: Lookup) : EditorPane() {
 }
 
 class STEditor(lookup: Lookup) : CodeEditor(lookup) {
+    val problemList by super.lookup.with<ProblemList>()
+
+    val editorId = "" + Math.random()
+
     init {
         languageSupport = IECLanguageSupport(lookup)
 
@@ -207,6 +211,7 @@ class STEditor(lookup: Lookup) : CodeEditor(lookup) {
                     result.addNotice(DefaultParserNotice(this, it.message,
                             it.startLine, it.startOffset, it.length))
                 }
+                problemList.set(editorId, issues)
                 return result
             }
 

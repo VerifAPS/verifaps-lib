@@ -14,14 +14,15 @@ import kotlin.reflect.KProperty
  * @version 1 (11.03.19)
  */
 
-class LambdaAction(val lambda: () -> Unit) : MyAction() {
+class LambdaAction(val lambda: () -> Unit) : IdeAction() {
     override fun actionPerformed(e: ActionEvent?) = lambda()
 }
 
 val ACTION_MENU_PATH_KEY = "MENU_PATH"
 val ACTION_PRIO_KEY = "PRIO_KEY"
+val ACTION_TOOLBAR_KEY = "TOOLBAR_KEY"
 
-abstract class MyAction : AbstractAction() {
+abstract class IdeAction : AbstractAction() {
     var name: String? by map(Action.NAME)
     var largeIcon: Icon? by map(Action.LARGE_ICON_KEY)
     var smallIcon: Icon? by map(Action.SMALL_ICON)
@@ -33,10 +34,11 @@ abstract class MyAction : AbstractAction() {
     var selected: Boolean? by map(Action.SELECTED_KEY)
     var menuPath: String by map(ACTION_MENU_PATH_KEY)
     var priority: Int by map(ACTION_PRIO_KEY)
+    var toolbarId: String? by map(ACTION_TOOLBAR_KEY)
 
-    inner class map<T>(val key: String) : ReadWriteProperty<MyAction, T> {
-        override fun getValue(thisRef: MyAction, property: KProperty<*>): T = getValue(key) as T
-        override fun setValue(thisRef: MyAction, property: KProperty<*>, value: T) = putValue(key, value)
+    inner class map<T>(val key: String) : ReadWriteProperty<IdeAction, T> {
+        override fun getValue(thisRef: IdeAction, property: KProperty<*>): T = getValue(key) as T
+        override fun setValue(thisRef: IdeAction, property: KProperty<*>, value: T) = putValue(key, value)
     }
 }
 
@@ -48,7 +50,7 @@ fun createAction(name: String, menuPath: String, accel: KeyStroke? = null,
                  smallIcon: Icon? = null,
                  largeIcon: Icon? = null,
                  fontIcon: FontIcon? = null,
-                 f: () -> Unit): MyAction {
+                 f: () -> Unit): IdeAction {
     val myAction = LambdaAction(f)
     myAction.priority = prio
     myAction.name = name
