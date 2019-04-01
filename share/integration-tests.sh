@@ -1,34 +1,29 @@
-#!/bin/bash -x
 BIN=`pwd`/ide/build/install/ide/bin/
+TESTS=`pwd`/share/integration-tests/
+
+if [ ! -d $BIN ]; then
+    BIN=$(readlink -f ../ide/build/install/ide/bin/)
+    TESTS=$(readlink -f ./integration-tests/)
+fi
 
 if [ ! -d $BIN ]; then
     echo "Could not find binary folder: $BIN"
     exit 1
 fi
 
-PATH=$PATH:$BIN
-
-function _run() {
-    p=$(pwd)
-    $0
-    cd $p
-}
-
-function geteta_help() {
-    geteta.sh --help
-}
-
-function geteta_constant_program() {
-    cd geteta/examples/constantprogram
-    geteta.sh --code constantprogram.st --table constantprogram.tt.txt
-}
 
 
+export PATH=$PATH:$BIN
+BATS=$(readlink -f $TESTS/../bats-core-1.1.0/bin/bats)
 
+
+echo $BIN
+echo $TESTS
+echo $BATS
 
 #############################################################################
 ## run tests
 
-_run geteta_help
 
-_run geteta_constant_program
+(cd ..; # always run in root
+ $BATS -r  ${TESTS}/)
