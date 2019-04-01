@@ -25,5 +25,5 @@ echo $BATS
 ## run tests
 
 
-(cd ..; # always run in root
+(cd $TESTS/../..; # always run in root
  $BATS -r  ${TESTS}/)

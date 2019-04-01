@@ -110,8 +110,7 @@ jobs:
           command: |
             which nuXmv
             which z3
-            bash -x share/integration-tests.sh
-
+            share/integration-tests.sh
 
 
   deploy:
