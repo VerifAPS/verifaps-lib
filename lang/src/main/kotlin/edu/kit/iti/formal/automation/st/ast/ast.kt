@@ -2165,10 +2165,11 @@ data class SFCActionQualifier(
         TIME_LIMITED("L", true),
         STORE_AND_DELAY("SD", true),
         STORE_AND_LIMITED("SL", true),
-        STORE_DELAYED("D", true),
+        STORE_DELAYED("D", true),           //could be renamed to TIME_DELAYED
         DELAYED_AND_STORED("DS", true),
-        RAISING("P1 ", false),
-        FALLING("P0", false)
+        RAISING("P1", false),               //could be renamed to RISING
+        FALLING("P0", false),
+        PULSE("P", false)
     }
 
     companion object {
