@@ -6,8 +6,10 @@ import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVis
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.ParseContext
 import edu.kit.iti.formal.smv.EnumType
+import edu.kit.iti.formal.smv.SMVFacade
+import edu.kit.iti.formal.smv.SMVTypes
+import edu.kit.iti.formal.smv.SMVWordType
 import edu.kit.iti.formal.smv.ast.*
-import java.math.BigInteger
 import java.util.*
 
 /**
@@ -18,7 +20,7 @@ class TblLanguageToSmv(private val columnVariable: SVariable,
                        private val context: ParseContext) : TestTableLanguageBaseVisitor<SMVExpr>() {
 
     override fun visitCell(ctx: TestTableLanguageParser.CellContext): SMVExpr {
-        return ctx.chunk().map { it.accept(this)}
+        return ctx.chunk().map { it.accept(this) }
                 .reduce { a, b -> SBinaryExpression(a, SBinaryOperator.AND, b) }
     }
 
@@ -40,7 +42,18 @@ class TblLanguageToSmv(private val columnVariable: SVariable,
     }
 
     override fun visitI(ctx: TestTableLanguageParser.IContext): SMVExpr {
-        return SIntegerLiteral(BigInteger(ctx.text))
+        val text = ctx.text
+        if (SMVFacade.isWordLiteral(text))
+            return SMVFacade.parseWordLiteral(text)
+        else {
+            val value = ctx.text.toBigInteger()
+            if (columnVariable.dataType == SMVTypes.INT) {
+                return SIntegerLiteral(value)
+            } else {
+                return SWordLiteral(value,
+                        (columnVariable.dataType as SMVWordType?) ?: SMVTypes.signed(16))
+            }
+        }
     }
 
     override fun visitConstantTrue(ctx: TestTableLanguageParser.ConstantTrueContext): SMVExpr {
@@ -159,7 +172,7 @@ class TblLanguageToSmv(private val columnVariable: SVariable,
 
         val isReference = ctx.RBRACKET() != null
 
-        return if ( varText in context) {
+        return if (varText in context) {
             val variable = context.getSMVVariable(programRun, varText)
             if (isReference)
                 context.getReference(variable, Integer.parseInt(ctx.i().text))

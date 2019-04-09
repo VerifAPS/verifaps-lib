@@ -34,8 +34,8 @@ import edu.kit.iti.formal.automation.testtables.model.options.Mode
 import edu.kit.iti.formal.automation.testtables.viz.AutomatonDrawer
 import edu.kit.iti.formal.automation.testtables.viz.ODSCounterExampleWriter
 import edu.kit.iti.formal.smv.NuXMVOutput
+import edu.kit.iti.formal.util.findProgram
 import java.io.File
-import java.lang.IllegalStateException
 
 object Geteta {
     @JvmStatic
@@ -62,9 +62,10 @@ class GetetaApp : CliktCommand(
     val library by option("-L", "--library", help = "library files").file().multiple()
     val program by option("-P", "--program", "-c", help = "program files").file(exists = true, readable = true).required()
 
-    val nuxmv by option("--nuxmv", help = "Path to nuXmv binary.", envvar = "NUXMV")
-            .file(exists = true)
-            .required()
+    val nuxmv by option("--nuxmv",
+            help = "Path to nuXmv binary. You can also set the environment variable \$NUXMV",
+            envvar = "NUXMV")
+            .default("nuXmv")
 
     val mode by option("-m", "--mode", help = "Verification Mode")
             .convert { Mode.valueOf(it) }
@@ -82,11 +83,11 @@ class GetetaApp : CliktCommand(
             help = "verification technique").convert { VerificationTechnique.valueOf(it) }.default(VerificationTechnique.IC3)
 
     override fun run() {
+        Console.configureLoggingConsole()
         Console.info("Use table file ${table.absolutePath}")
         var gtt = GetetaFacade.readTable(table.absoluteFile)
 
         Console.info("Apply omega simplification")
-
         val os = OmegaSimplifier(gtt); os.run()
         if (!os.ignored.isEmpty()) {
             gtt = os.product
@@ -96,8 +97,8 @@ class GetetaApp : CliktCommand(
 
         //
         Console.info("Parse program ${program.absolutePath} with libraries ${library}")
-        val code = IEC61131Facade.readProgramsWithLibrary(library, listOf(program))[0] ?:
-                throw IllegalStateException("No program given in $program")
+        val code = IEC61131Facade.readProgramsWithLibrary(library, listOf(program))[0]
+                ?: throw IllegalStateException("No program given in $program")
 
         if (mode != null)
             gtt.options.mode = mode!!
@@ -136,6 +137,12 @@ class GetetaApp : CliktCommand(
 
         val folder = File(this.table.parent, this.table.nameWithoutExtension).absolutePath
         Console.info("Run nuXmv: $nuxmv in $folder using ${gtt.options.verificationTechnique}")
+        val nuxmv = findProgram(nuxmv)
+        if (nuxmv == null) {
+            Console.error("Could not find ${this.nuxmv}.")
+            System.exit(1)
+            return
+        }
         val b = GetetaFacade.runNuXMV(
                 nuxmv.absolutePath,
                 folder,
@@ -148,6 +155,14 @@ class GetetaApp : CliktCommand(
                     is NuXMVOutput.Error -> "error"
                     is NuXMVOutput.NotVerified -> "not-verified"
                 }
+
+        val errorLevel =
+                when (b) {
+                    is NuXMVOutput.Error -> 1
+                    else -> 0
+                }
+
+
 
         if (b is NuXMVOutput.NotVerified) {
             if (runAnalyzer) {
@@ -171,6 +186,7 @@ class GetetaApp : CliktCommand(
             }
         }
         Console.info("STATUS: $status")
+        System.exit(errorLevel)
     }
 }
 

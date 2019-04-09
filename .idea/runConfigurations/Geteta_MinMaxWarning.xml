@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Geteta MinMaxWarning" type="JetRunConfigurationType" factoryName="Kotlin">
-    <module name="verifaps.geteta.main" />
+    <module name="geteta" />
     <option name="VM_PARAMETERS" value="" />
     <option name="PROGRAM_PARAMETERS" value="--row-map --ods test.ods -t MinMax.tt.txt -c MinMax.st " />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
