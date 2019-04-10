@@ -64,7 +64,7 @@ for file in $TESTS/*; do
   source $file
   for test in ${EXPORTED_TESTS[@]}; do
      runTest $test
-     gerror=$(( $gerror + $? ))   
+     gerror=$(( $gerror + $? ))
   done
 done
 exit ${gerror}

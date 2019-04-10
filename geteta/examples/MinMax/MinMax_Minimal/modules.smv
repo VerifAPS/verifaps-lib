@@ -1,0 +1,171 @@
+MODULE main
+IVAR
+	I : signed word[16];
+	learn : boolean;
+	mode : {ACTIVE, LEARN};
+-- end of IVAR
+VAR
+	code$ : MinMax(I, learn, mode);
+	tableModule : table(code$.mode, code$.learn, code$.I, next(code$.Q), next(code$.W));
+-- end of VAR
+DEFINE
+
+-- end of module main
+MODULE table(code$mode, code$learn, code$I, code$Q, code$W)
+FROZENVAR
+	"max" : signed word[16];
+	"min" : signed word[16];
+-- end of FROZENVAR
+VAR
+	__ERROR__ : boolean;
+	__SENTINEL__ : boolean;
+	r02_01 : boolean;
+	r04_01 : boolean;
+	r05_01 : boolean;
+-- end of VAR
+DEFINE
+	r02_out_Q := 0sd16_0 = code$Q;
+	r02_out_W := TRUE = code$W;
+	r02_out := r02_out_Q & r02_out_W;
+	r02_in_mode := ACTIVE = code$mode;
+	r02_in_I := TRUE;
+	r02_in_learn := TRUE;
+	r02_in := r02_in_mode & r02_in_I & r02_in_learn;
+	r02_progress := r02_fwd & !FALSE;
+	r02_fail := r02_in & !r02_out;
+	r02_fwd := r02_in & r02_out;
+	r04_out_Q := 0sd16_0 = code$Q;
+	r04_out_W := FALSE = code$W;
+	r04_out := r04_out_Q & r04_out_W;
+	r04_in_mode := LEARN = code$mode;
+	r04_in_I := TRUE;
+	r04_in_learn := FALSE = code$learn;
+	r04_in := r04_in_mode & r04_in_I & r04_in_learn;
+	r04_progress := r04_fwd & !FALSE;
+	r04_fail := r04_in & !r04_out;
+	r04_fwd := r04_in & r04_out;
+	r05_out_Q := "min" <= code$Q & code$Q <= "max";
+	r05_out_W := FALSE = code$W;
+	r05_out := r05_out_Q & r05_out_W;
+	r05_in_mode := LEARN = code$mode;
+	r05_in_I := "min" <= code$I & code$I <= "max";
+	r05_in_learn := TRUE = code$learn;
+	r05_in := r05_in_mode & r05_in_I & r05_in_learn;
+	r05_progress := r05_fwd & !FALSE;
+	r05_fail := r05_in & !r05_out;
+	r05_fwd := r05_in & r05_out;
+	r02_01_accept := r02_01 & r02_fwd;
+	r02_01_fail := r02_01 & r02_fail;
+	r02_01_acceptp := r02_01_accept & !r02_progress;
+	r05_01_accept := r05_01 & r05_fwd;
+	r05_01_fail := r05_01 & r05_fail;
+	r05_01_acceptp := r05_01_accept & !r05_progress;
+	r04_01_accept := r04_01 & r04_fwd;
+	r04_01_fail := r04_01 & r04_fail;
+	r04_01_acceptp := r04_01_accept & !r04_progress;
+INVARSPEC
+	__ERROR__ -> r02_01 | r05_01 | r04_01 | __SENTINEL__;
+
+INIT
+	r02_01 & !r05_01 & !r04_01 & !__ERROR__ & !__SENTINEL__ & 0sd16_0 = "min" & 0sd16_5 = "max";
+ASSIGN
+	next(__ERROR__) := r02_01_fail | r04_01_fail | r05_01_fail;
+	next(__SENTINEL__) := r05_01_accept | __SENTINEL__;
+	next(r02_01) := r02_01_accept;
+	next(r04_01) := r02_01_accept | r05_01_accept | r04_01_accept;
+	next(r05_01) := r04_01_accept | r05_01_accept;
+
+-- end of module table
+MODULE MinMax(I, learn, mode)
+VAR
+	Q : signed word[16];
+	W : boolean;
+	WAIT_AFTER_WARNING : signed word[16];
+	WAIT_BEFORE_WARNING : signed word[16];
+	cntHeat : signed word[16];
+	cntQuench : signed word[16];
+	lower : signed word[16];
+	upper : signed word[16];
+-- end of VAR
+DEFINE
+ASSIGN
+	init(Q) := 0sd16_0;
+	init(W) := FALSE;
+	init(WAIT_AFTER_WARNING) := 0sd16_3;
+	init(WAIT_BEFORE_WARNING) := 0sd16_3;
+	init(cntHeat) := 0sd16_3;
+	init(cntQuench) := 0sd16_3;
+	init(lower) := 0sd16_32766;
+	init(upper) := -0sd16_32767;
+	next(Q) := case 
+mode = LEARN : 0sd16_0; TRUE : case 
+upper < lower : 0sd16_0; TRUE : case 
+upper <= (case 
+lower >= I : lower; TRUE : I; 
+esac) : upper; TRUE : case 
+lower >= I : lower; TRUE : I; 
+esac; 
+esac; 
+esac; 
+esac;
+	next(W) := case 
+mode = LEARN : FALSE; TRUE : case 
+upper < lower : TRUE; TRUE : case 
+I != (case 
+upper <= (case 
+lower >= I : lower; TRUE : I; 
+esac) : upper; TRUE : case 
+lower >= I : lower; TRUE : I; 
+esac; 
+esac) : case 
+cntHeat - 0sd16_1 = 0sd16_0 : TRUE; TRUE : W; 
+esac; TRUE : case 
+cntQuench - 0sd16_1 = 0sd16_0 : FALSE; TRUE : W; 
+esac; 
+esac; 
+esac; 
+esac;
+	next(WAIT_AFTER_WARNING) := WAIT_AFTER_WARNING;
+	next(WAIT_BEFORE_WARNING) := WAIT_BEFORE_WARNING;
+	next(cntHeat) := case 
+mode = LEARN : cntHeat; TRUE : case 
+upper < lower : cntHeat; TRUE : case 
+I != (case 
+upper <= (case 
+lower >= I : lower; TRUE : I; 
+esac) : upper; TRUE : case 
+lower >= I : lower; TRUE : I; 
+esac; 
+esac) : cntHeat - 0sd16_1; TRUE : WAIT_BEFORE_WARNING; 
+esac; 
+esac; 
+esac;
+	next(cntQuench) := case 
+mode = LEARN : cntQuench; TRUE : case 
+upper < lower : cntQuench; TRUE : case 
+I != (case 
+upper <= (case 
+lower >= I : lower; TRUE : I; 
+esac) : upper; TRUE : case 
+lower >= I : lower; TRUE : I; 
+esac; 
+esac) : WAIT_AFTER_WARNING; TRUE : cntQuench - 0sd16_1; 
+esac; 
+esac; 
+esac;
+	next(lower) := case 
+mode = LEARN : case 
+learn : case 
+lower <= I : lower; TRUE : I; 
+esac; TRUE : lower; 
+esac; TRUE : lower; 
+esac;
+	next(upper) := case 
+mode = LEARN : case 
+learn : case 
+upper >= I : upper; TRUE : I; 
+esac; TRUE : upper; 
+esac; TRUE : upper; 
+esac;
+
+-- end of module MinMax

@@ -15,7 +15,7 @@ function geteta_constantprogram() {
 
 function geteta_minmax_minimal() {
     cd geteta/examples/MinMax
-    geteta -c MinMax.st --table MinMax_Minimal.tt
+    geteta -c MinMax.st --table MinMax_Minimal.gtt
 }
 
 function geteta_minmax() {
@@ -25,7 +25,7 @@ function geteta_minmax() {
 
 function geteta_minmax_broken() {
     cd geteta/examples/MinMax
-    geteta -c MinMax.st --table MinMax_Broken.tt
+    geteta -c MinMax.st --table MinMax_Broken.gtt
 }
 
 EXPORTED_TESTS=(geteta_help geteta_constantprogram geteta_minmax_minimal geteta_minmax geteta_minmax_broken)
