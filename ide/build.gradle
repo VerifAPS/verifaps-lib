@@ -49,7 +49,7 @@ def mainClasses = [
         , 'sc11-rev'         : "edu.kit.iti.formal.automation.SC11_rev"
         , "geteta"           : "edu.kit.iti.formal.automation.testtables.apps.Geteta"
         , 'ttprint'          : 'edu.kit.iti.formal.automation.testtables.apps.Printer'
-        , 'reteta'           : 'edu.kit.iti.formal.automation.testtables.apps.Reteta'
+        , 'reteta'           : 'edu.kit.iti.formal.automation.testtables.apps.RetetaApp'
         , 'ttmonitor'        : 'edu.kit.iti.formal.automation.testtables.apps.Monitor'
         , 'ttsynth'          : 'edu.kit.iti.formal.automation.testtables.apps.Synthizer'
         , 'rvt'              : "edu.kit.iti.formal.automation.rvt.RvtAps"
