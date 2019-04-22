@@ -1,31 +1,71 @@
 package edu.kit.iti.formal.automation.ide
 
-import com.vlsolutions.swing.docking.Dockable
-import com.vlsolutions.swing.docking.DockingConstants
-import com.vlsolutions.swing.docking.DockingDesktop
-import com.vlsolutions.swing.docking.RelativeDockablePosition
+import bibliothek.gui.dock.common.CControl
+import bibliothek.gui.dock.common.CGrid
+import bibliothek.gui.dock.common.intern.CDockable
+import bibliothek.gui.dock.util.Priority
+import edu.kit.iti.formal.automation.ide.tools.GetetaPreview
 import me.tomassetti.kanvas.languageSupportRegistry
-import me.tomassetti.kanvas.noneLanguageSupport
+import org.fife.ui.rsyntaxtextarea.folding.CurlyFoldParser
+import org.fife.ui.rsyntaxtextarea.folding.FoldParser
+import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager
 import java.awt.*
 import java.awt.event.KeyEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 import java.io.File
 import java.text.ParseException
-import java.util.*
 import javax.swing.*
-import javax.swing.tree.DefaultTreeCellRenderer
-import javax.swing.tree.DefaultTreeModel
-import javax.swing.tree.TreeNode
 import kotlin.properties.Delegates
 
+class EditorFactory(val lookup: Lookup) {
+    val editorFactories = arrayListOf<(File) -> CodeEditor?>()
+
+    init {
+        editorFactories.add {
+            if (it.name.endsWith("gtt")) TTEditor(lookup).also { e ->
+                e.file = it
+                e.textArea.text = it.readText()
+                e.dirty = false
+            }
+            else null
+        }
+
+        editorFactories.add {
+            if (it.name.endsWith("st")
+                    || it.name.endsWith("iec")
+                    || it.name.endsWith("iec61131")) STEditor(lookup).also { e ->
+                e.file = it
+                e.textArea.text = it.readText()
+                e.dirty = false
+            }
+            else null
+        }
+
+        editorFactories.add {
+            UnknownTextEditor(lookup).also { e ->
+                e.file = it
+                e.textArea.text = it.readText()
+                e.dirty = false
+            }
+        }
+    }
+
+    fun get(file: File): CodeEditor? {
+        for (it in editorFactories) {
+            val p = it(file)
+            if (p != null) {
+                return p
+            }
+        }
+        return null
+    }
+}
 
 /**
  *
  * @author Alexander Weigl
  * @version 1 (10.03.19)
  */
-class Ide(rootLookup: Lookup) : JFrame(),
+class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
         GetFileChooser, FileOpen,
         TabManagement, ActionService {
 
@@ -40,29 +80,21 @@ class Ide(rootLookup: Lookup) : JFrame(),
     val lookup = Lookup(rootLookup)
 
     var defaultFont by Delegates.observable(Font(Font.MONOSPACED, Font.PLAIN, 12)) { _, _, new ->
-        lookup.getAll<EditorPane>().forEach {
+        lookup.getAll<CodeEditor>().forEach {
             it.textFont = new
         }
     }
 
-    val editorFactories = arrayListOf<(File) -> EditorPane?>()
-
-    val allEditors: List<EditorPane>
+    val allEditors: List<CodeEditor>
         get() {
             return lookup.getAll()
         }
 
-    val currentEditor: EditorPane?
-        get() = currentTabbedPanel as? EditorPane
+    val currentEditor: CodeEditor?
+        get() = currentTabbedPanel as? CodeEditor
 
-    val currentTabbedPanel: TabbedPanel?
-        get() {
-            var cur = focusOwner
-            while (cur != null && cur !is TabbedPanel) {
-                cur = cur.parent
-            }
-            return cur as? TabbedPanel
-        }
+    val currentTabbedPanel: CDockable?
+        get() = globalPort.controller.focusedDockable as? CDockable
 
     override val fileChooser = JFileChooser()
     val defaultToolBar = JToolBar()
@@ -71,14 +103,11 @@ class Ide(rootLookup: Lookup) : JFrame(),
 
     val actionSaveAs = createAction(name = "Save As", menuPath = "File", prio = 3,
             fontIcon = FontAwesomeSolid.SAVE) { saveAs() }
-
     val actionRun = createAction(name = "Run", menuPath = "Tools", prio = 9,
             fontIcon = FontAwesomeSolid.RUNNING) { runCurrentProgram() }
-
     val actionSave = createAction("Save", "File",
             KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), 2,
             fontIcon = FontAwesomeRegular.SAVE) { save() }
-
     val actionNew = createAction("New", "File",
             KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK), 0,
             fontIcon = FontAwesomeRegular.FILE) { createCodeEditor() }
@@ -87,14 +116,15 @@ class Ide(rootLookup: Lookup) : JFrame(),
             fontIcon = FontAwesomeRegular.FOLDER_OPEN) { open() }
     val actionClose = createAction("Close", "File",
             KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_DOWN_MASK), 4,
-            fontIcon = FontAwesomeSolid.WINDOW_CLOSE) { close() }
-
+            fontIcon = FontAwesomeSolid.WINDOW_CLOSE) { /*close()*/ }
     val actionIncrFontSize = createAction("Increase Font Size", "View",
             KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK),
             fontIcon = FontAwesomeSolid.PLUS) { ++fontSize }
     val actionDecrFontSize = createAction("Decrease Font Size", "View",
             KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK),
             fontIcon = FontAwesomeSolid.MINUS) { --fontSize }
+
+    val editorFactory = EditorFactory(lookup)
 
     val recentFiles by lookup.with<RecentFilesService>()
 
@@ -103,7 +133,6 @@ class Ide(rootLookup: Lookup) : JFrame(),
         recentFiles.clear()
         addRecentFiles()
     }
-
 
     private fun runCurrentProgram() {
         val editor = (null as? STEditor)
@@ -117,29 +146,43 @@ class Ide(rootLookup: Lookup) : JFrame(),
         }
     }
 
-    var globalPort = DockingDesktop()
+    var globalPort = CControl()
 
     init {
         lookup.register<GetFileChooser>(this)
         lookup.register<FileOpen>(this)
         lookup.register<ProblemList>(ProblemList())
 
+        globalPort.controller.icons.also {
+            val p = Priority.CLIENT
 
-        editorFactories.add {
-            if (it.name.endsWith("tt.txt")) TTEditor(lookup).also { e ->
-                e.file = it
-                e.textArea.text = it.readText()
-            }
-            else null
-        }
-        editorFactories.add {
-            if (it.name.endsWith("st")
-                    || it.name.endsWith("iec")
-                    || it.name.endsWith("iec61131")) STEditor(lookup).also { e ->
-                e.file = it
-                e.textArea.text = it.readText()
-            }
-            else null
+            it.setIcon("locationmanager.normalize", p,
+                    IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_RESTORE, 12f))
+
+            it.setIcon("locationmanager.maximize", p,
+                    IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_MAXIMIZE, 12f))
+
+            it.setIcon("locationmanager.minimize", p,
+                    IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_MINIMIZE, 12f))
+
+            it.setIcon("locationmanager.externalize", p,
+                    IconFontSwing.buildIcon(FontAwesomeSolid.EXTERNAL_LINK_SQUARE_ALT, 12f))
+
+            it.setIcon("locationmanager.unexternalize", p,
+                    IconFontSwing.buildIcon(FontAwesomeSolid.MOUSE_POINTER, 12f))
+
+            it.setIcon("locationmanager.unmaximize_externalized", p,
+                    IconFontSwing.buildIcon(FontAwesomeSolid.EXTERNAL_LINK_ALT, 12f))
+
+            it.setIcon("screen.maximize", p,
+                    IconFontSwing.buildIcon(FontAwesomeRegular.EDIT, 12f))
+
+            it.setIcon("close", p,
+                    IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_CLOSE, 12f))
+
+
+//            setIcon("replace", p,
+//                    IconFontSwing.buildIcon(FontAwesomeRegular., 12f))
         }
 
         defaultToolBar.add(actionNew)
@@ -149,10 +192,10 @@ class Ide(rootLookup: Lookup) : JFrame(),
 
         title = "IEC61131 Mini Ide"
         iconImage = IconFontSwing.buildImage(FontAwesomeSolid.PENCIL_RULER, 16f)
-        defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+        defaultCloseOperation = EXIT_ON_CLOSE
         contentPane.layout = BorderLayout(5, 5)
         contentPane.add(defaultToolBar, BorderLayout.NORTH)
-        contentPane.add(globalPort, BorderLayout.CENTER)
+        contentPane.add(globalPort.contentArea, BorderLayout.CENTER)
 
         jMenuBar = JMenuBar()
         actions.sortedBy { it.priority }
@@ -160,11 +203,28 @@ class Ide(rootLookup: Lookup) : JFrame(),
         addRecentFiles()
 
         val tree = FileTreePanel(lookup)
-        addEditorTab(STEditor(lookup))
-        globalPort.addDockable(tree, RelativeDockablePosition.LEFT_CENTER)
-        addToolTab(GetetaPreview(lookup))
-        addToolTab(GetetaWindow(lookup))
-        addToolTab(ProblemPanel(lookup))
+        val grid = CGrid(globalPort)
+        grid.add(0.0, 0.0, 0.1, 0.5, tree)
+
+        if (initialFiles.isEmpty()) {
+            val editor = STEditor(lookup)
+            grid.add(1.0, 0.0, 5.0, 4.0, editor)
+        } else {
+            val docks = initialFiles.mapNotNull(editorFactory::get)
+            docks.forEach(lookup::register)
+            grid.add(1.0, 0.0, 5.0, 4.0,
+                    *(docks.map { it }.toTypedArray()))
+        }
+        val tools = listOf(
+                GetetaPreview(lookup),
+                GetetaWindow(lookup),
+                RetetaWindow(lookup),
+                ProblemPanel(lookup))
+
+        grid.add(1.0, 4.0, 5.0, 1.0, *(tools.toTypedArray()))
+
+        globalPort.contentArea.deploy(grid)
+
 
         size = Dimension(700, 800)
 
@@ -211,34 +271,37 @@ class Ide(rootLookup: Lookup) : JFrame(),
         }
     }
 
-    fun getDockable(pred: (Dockable?) -> Boolean): Dockable? {
-        return when {
-            pred(globalPort.selectedDockable) -> globalPort.selectedDockable
+    fun getDockable(pred: (CDockable?) -> Boolean): CDockable? {
+
+        /*return when {
+            pred(globalPort.cDockableCount) -> globalPort.selectedDockable
             else -> globalPort.dockables.findLast { pred(it.dockable) && it.isDocked }?.dockable
         }
+         */
+        return null
     }
 
-    override fun addEditorTab(editor: EditorPane) {
-        val editorPane: Dockable? = getDockable { it is EditorPane }
-        if (editorPane == null)
-            globalPort.addDockable(editor, RelativeDockablePosition.TOP_CENTER)
-        else
-            globalPort.createTab(editorPane, editor, 0, true)
+    override fun addEditorTab(editor: CodeEditor) {
+        val e = globalPort.getCDockable(1)
         lookup.register(editor)
+        globalPort.addDockable(editor)
+        editor.setLocationsAside(e)
+        editor.isVisible = true
+        //globalPort.createTab(editorPane, editor, 0, true)
     }
 
     fun createCodeEditor() = addEditorTab(STEditor(lookup))
 
-    fun close(editor: Closeable? = currentTabbedPanel) {
+    fun close(editor: Closeable?) {
         editor?.also {
             it.close()
         }
     }
 
-    fun saveAs(editor: EditorPane? = currentEditor) =
+    fun saveAs(editor: CodeEditor? = currentEditor) =
             editor?.also { it.saveAs() }
 
-    fun save(editor: EditorPane? = currentEditor) {
+    fun save(editor: CodeEditor? = currentEditor) {
         editor?.also { it.save() }
     }
 
@@ -255,31 +318,19 @@ class Ide(rootLookup: Lookup) : JFrame(),
             recentFiles.add(f)
             addRecentFiles()
         }
-        for (it in editorFactories) {
-            val p = it(f)
-            if (p != null) {
-                addEditorTab(p)
-                break
-            }
-        }
+        editorFactory.get(f)?.let(this::addEditorTab)
     }
 
     override fun addToolTab(window: ToolPane) {
         val otherToolWindow = getDockable { it is ToolPane && it != null }
-        if (otherToolWindow != null)
-            globalPort.createTab(otherToolWindow, window, 0, true)
-        else {
-            val editor = getDockable { it is EditorPane } ?: window
-            globalPort.split(editor, window, DockingConstants.SPLIT_BOTTOM)// RelativeDockablePosition.LEFT_CENTER)
-        }
+        globalPort.addDockable(window)
         lookup.register(window)
     }
 
-    fun createAndShowKanvasGUI() {
+    fun showFrame() {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
         try {
             val xToolkit = Toolkit.getDefaultToolkit()
-            println("XTOOLKIT " + xToolkit)
             val awtAppClassNameField = xToolkit.javaClass.getDeclaredField("awtAppClassName")
             awtAppClassNameField.isAccessible = true
             awtAppClassNameField.set(xToolkit, title)
@@ -311,20 +362,29 @@ class Ide(rootLookup: Lookup) : JFrame(),
         fun main(args: Array<String>) {
             val rootLookup = Lookup()
             rootLookup.register<RecentFilesService>(RecentFilesImpl())
-            rootLookup.register(Colors())
+            rootLookup.register(Colors)
 
             //https://tomassetti.me/kanvas-generating-simple-ide-antlr-grammar/
             val iecSupport = IECLanguageSupport(rootLookup)
             val ttSupport = TestTableLanguageSupport(rootLookup)
             languageSupportRegistry.register("st", iecSupport)
             languageSupportRegistry.register("iec61131", iecSupport)
+            languageSupportRegistry.register(".gtt", ttSupport)
             languageSupportRegistry.register(".tt", ttSupport)
-            languageSupportRegistry.register(".tt.txt", ttSupport)
+            languageSupportRegistry.register(".tt.txtFolder", ttSupport)
             languageSupportRegistry.register(".testtable", ttSupport)
+
+            FoldParserManager.get().addFoldParserMapping("text/test-table", CurlyFoldParser())
+            FoldParserManager.get().addFoldParserMapping("text/st", STFoldParser())
+
+
+            UIManager.put("Tree.collapsedIcon", IconFontSwing.buildIcon(FontAwesomeRegular.CARET_SQUARE_RIGHT, 12f))
+            UIManager.put("Tree.expandedIcon", IconFontSwing.buildIcon(FontAwesomeSolid.CARET_SQUARE_DOWN, 12f))
+
 
             val ide = Ide(rootLookup)
             SwingUtilities.invokeLater {
-                ide.createAndShowKanvasGUI()
+                ide.showFrame()
                 args.forEach {
                     val f = File(it)
                     ide.open(f)
@@ -333,6 +393,7 @@ class Ide(rootLookup: Lookup) : JFrame(),
         }
     }
 }
+
 
 private infix fun JMenuBar.import(it: Action) {
     it.getValue(ACTION_MENU_PATH_KEY)?.also { path ->
@@ -355,103 +416,3 @@ private fun JComponent.getOrCreate(key: String): JMenu {
     return m
 }
 
-class FileTreePanel(lookup: Lookup) : TabbedPanel(BorderLayout()) {
-    val lookup = Lookup(lookup)
-    val contextMenu = JPopupMenu()
-    val treeFiles = JTree(DefaultTreeModel(FolderTreeNode(File(".").absoluteFile, this::fileFilter)))
-
-    val actionOpenFile = createAction("Open File", "") {
-        val file = treeFiles.selectionModel.selectionPath.lastPathComponent as FolderTreeNode
-        lookup.get<FileOpen>().open(file.file)
-    }
-
-    val actionGoUp = createAction("Go Up", "") {
-        val file = treeFiles.model.root as? FolderTreeNode
-        if (file != null) {
-            val m = DefaultTreeModel(FolderTreeNode(file.file.parentFile.absoluteFile, this::fileFilter))
-            treeFiles.model = m
-        }
-    }
-
-    val actionGoInto = createAction("Go Into", "") {
-        val file = treeFiles.selectionModel?.selectionPath?.lastPathComponent as? FolderTreeNode
-        if (file != null) {
-            val m = DefaultTreeModel(FolderTreeNode(file.file, this::fileFilter))
-            treeFiles.model = m
-        }
-    }
-
-    val actionOpenExplorer = createAction("Open in Explorer", "") {
-    }
-
-    val actionOpenSystem = createAction("Open in System", "") {
-        val file = treeFiles.selectionModel?.selectionPath?.lastPathComponent as? FolderTreeNode
-        if (file != null) {
-            val m = DefaultTreeModel(FolderTreeNode(file.file, this::fileFilter))
-            treeFiles.model = m
-        }
-    }
-
-
-    val actionRefresh = createAction("Refresh", "") {}
-
-    init {
-        title = "Navigator"
-        dockKey.isCloseEnabled = false
-
-        treeFiles.addMouseListener(object : MouseAdapter() {
-            override fun mouseReleased(e: MouseEvent) {
-                println(e.isPopupTrigger)
-                if (e.isPopupTrigger) {
-                    contextMenu.show(e.component, e.x, e.y)
-                    println("FileTreePanel.mousePressed")
-                }
-            }
-        })
-
-        contextMenu.add(actionGoUp)
-        contextMenu.add(actionGoInto)
-        contextMenu.add(actionOpenFile)
-        contextMenu.add(actionRefresh)
-        contextMenu.add(actionOpenExplorer)
-        contextMenu.add(actionOpenSystem)
-
-        treeFiles.cellRenderer = object : DefaultTreeCellRenderer() {
-            override fun getTreeCellRendererComponent(tree: JTree?, value: Any?, sel: Boolean, expanded: Boolean, leaf: Boolean, row: Int, hasFocus: Boolean): Component {
-                val f = value as FolderTreeNode
-                return super.getTreeCellRendererComponent(tree, f.file.name, sel, expanded, leaf, row, hasFocus)
-            }
-        }
-        add(JScrollPane(treeFiles))
-    }
-
-
-    //Not closeable
-    override fun close() {}
-
-
-    private fun fileFilter(file: File): Boolean {
-        if (file.isDirectory) return true
-        return languageSupportRegistry.languageSupportForFile(file) != noneLanguageSupport
-    }
-}
-
-data class FolderTreeNode(val file: File,
-                          val filter: (File) -> Boolean) : TreeNode {
-    var children: List<FolderTreeNode> = arrayListOf()
-        get() {
-            if (field.isEmpty())
-                field = file.listFiles()
-                        .filter(filter)
-                        .map { FolderTreeNode(it, filter) }
-            return field
-        }
-
-    override fun children(): Enumeration<out TreeNode> = Collections.enumeration(children)
-    override fun isLeaf(): Boolean = !file.isDirectory
-    override fun getChildCount(): Int = children.size
-    override fun getParent(): TreeNode = FolderTreeNode(file.parentFile, filter)
-    override fun getChildAt(childIndex: Int): TreeNode = children[childIndex]
-    override fun getIndex(node: TreeNode?): Int = children.indexOf(node)
-    override fun getAllowsChildren(): Boolean = isLeaf
-}

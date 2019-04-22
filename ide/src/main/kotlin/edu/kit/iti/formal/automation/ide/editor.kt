@@ -1,11 +1,9 @@
 package edu.kit.iti.formal.automation.ide
 
-import com.vlsolutions.swing.docking.DockKey
-import com.vlsolutions.swing.docking.Dockable
+import bibliothek.gui.dock.common.DefaultMultipleCDockable
+import bibliothek.gui.dock.common.NullMultipleCDockableFactory
 import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
-import edu.kit.iti.formal.automation.testtables.model.*
+import edu.kit.iti.formal.automation.parser.ErrorReporter
 import me.tomassetti.kanvas.*
 import me.tomassetti.kolasu.model.Node
 import org.antlr.v4.runtime.CharStreams
@@ -18,23 +16,17 @@ import org.fife.ui.rsyntaxtextarea.parser.AbstractParser
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult
+import org.fife.ui.rtextarea.Gutter
 import org.fife.ui.rtextarea.RTextScrollPane
-import org.netbeans.swing.outline.DefaultOutlineModel
-import org.netbeans.swing.outline.Outline
-import org.netbeans.swing.outline.RenderDataProvider
-import org.netbeans.swing.outline.RowModel
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Font
 import java.io.File
-import java.io.StringWriter
-import javax.swing.*
+import java.lang.Exception
+import java.lang.NullPointerException
+import javax.swing.JFileChooser
+import javax.swing.Timer
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
-import javax.swing.event.EventListenerList
-import javax.swing.event.TreeModelListener
-import javax.swing.table.AbstractTableModel
-import javax.swing.table.DefaultTableCellRenderer
-import javax.swing.tree.TreeModel
-import javax.swing.tree.TreePath
 import kotlin.properties.Delegates
 
 
@@ -51,76 +43,51 @@ interface HasFont {
     var textFont: Font
 }
 
-
-abstract class TabbedPanel() : JPanel(true), Closeable, Dockable {
-    val _dockKey = DockKey(Math.random().toString())
-
+/*abstract class TabbedPanel() : JPanel(true), Closeable {
     constructor(l: LayoutManager) : this() {
         layout = l
         title = "UNKNOWN"
+    }
+
+    open val dockable: CDockable? by lazy {
+        DefaultSingleCDockable(javaClass.toString(), icon, title, this)
+                .also {
+                    it.setLocation(CLocation.base().normalSouth(.2))
+                }
     }
 
     var title: String? = null
         set(value) {
             firePropertyChange("title", field, value)
             field = value
-            _dockKey.tabName = value
-            _dockKey.name = value
         }
 
     var icon: Icon? = null
         set(value) {
-            _dockKey.icon = value
             firePropertyChange("icon", field, value)
             field = value
         }
 
     var tip: String? = null
         set(value) {
-            _dockKey.tooltip = tip
             firePropertyChange("tip", field, value)
             field = value
         }
 
 
-    override fun getComponent(): Component = this
-    override fun getDockKey(): DockKey = _dockKey
+    fun getComponent(): Component = this
 }
+*/
 
-/**
- *
- * @author Alexander Weigl
- * @version 1 (11.03.19)
- */
-abstract class EditorPane : TabbedPanel(), Saveable, HasFont {
-    abstract val languageSupport: LanguageSupport<*>
+val dockableFactory = NullMultipleCDockableFactory.NULL
 
-    var file: File? by Delegates.observable<File?>(null) { prop, old, new ->
-        firePropertyChange(prop.name, old, new)
-    }
-
-    override fun close() {
-        //DockingManager.undock(dockable)
-    }
-
-    abstract override var textFont: Font
-
-    init {
-        addPropertyChangeListener("file") { evt ->
-            if (evt.newValue != null)
-                title = (evt.newValue as File).name
-        }
-    }
-
-    abstract override fun save()
-    abstract override fun saveAs()
-}
-
-abstract class CodeEditor(lookup: Lookup) : EditorPane() {
-    val lookup = Lookup(lookup)
+abstract class CodeEditor(lookup: Lookup) : DefaultMultipleCDockable(dockableFactory), Saveable, HasFont, Closeable {
+    private val DIRTY_MARKER = '*'
     private val colors: Colors by lookup.with()
 
-    override var languageSupport: LanguageSupport<Node> = noneLanguageSupport
+    val lookup = Lookup(lookup)
+
+    var languageSupport: LanguageSupport<Node> = noneLanguageSupport
         set(value) {
             (textArea.document as RSyntaxDocument).setSyntaxStyle(AntlrTokenMaker(value.antlrLexerFactory))
             textArea.syntaxScheme = value.syntaxScheme
@@ -128,14 +95,24 @@ abstract class CodeEditor(lookup: Lookup) : EditorPane() {
         }
 
     val textArea = RSyntaxTextArea(20, 60)
+
     val viewPort = RTextScrollPane(textArea)
-    val gutter = RSyntaxUtilities.getGutter(textArea)
+
+    val gutter: Gutter = RSyntaxUtilities.getGutter(textArea)
 
     var cachedRoot: Node? = null
 
     val code: String
         get() = textArea.document.getText(0, textArea.document.length)
 
+    var dirty = false
+        set(value) {
+            field = value
+            titleText = if (!value)
+                titleText.trim(DIRTY_MARKER)
+            else
+                titleText.trim(DIRTY_MARKER) + DIRTY_MARKER
+        }
 
     override var textFont: Font
         get() = textArea.font
@@ -144,13 +121,33 @@ abstract class CodeEditor(lookup: Lookup) : EditorPane() {
             gutter.lineNumberFont = value
         }
 
+    var file: File? by Delegates.observable<File?>(null) { prop, old, new ->
+        titleText = (new?.name ?: "EMPTY") + (if (dirty) "*" else "")
+    }
+
     init {
-        layout = BorderLayout()
         (textArea.document as RSyntaxDocument).setSyntaxStyle(AntlrTokenMaker(languageSupport.antlrLexerFactory))
         val context = languageSupport.contextCreator.create()
         textArea.syntaxScheme = languageSupport.syntaxScheme
         textArea.isCodeFoldingEnabled = true
         textArea.currentLineHighlightColor = colors.HIGHTLIGHT_LINE
+        textArea.background = colors.background
+
+        textArea.document.addDocumentListener(object : DocumentListener {
+            override fun changedUpdate(e: DocumentEvent?) {
+                dirty = true
+            }
+
+            override fun insertUpdate(e: DocumentEvent?) {
+                dirty = true
+            }
+
+            override fun removeUpdate(e: DocumentEvent?) {
+                dirty = true
+            }
+        })
+
+
         /*textArea.addParser(object : AbstractParser() {
             override fun parse(doc: RSyntaxDocument, style: String): ParseResult {
                 val kolasuParseResult =
@@ -171,7 +168,15 @@ abstract class CodeEditor(lookup: Lookup) : EditorPane() {
         val provider = createCompletionProvider(languageSupport, context, { cachedRoot })
         val ac = AutoCompletion(provider)
         ac.install(textArea)
+        contentPane.layout = BorderLayout()
+        titleText = "EMPTY"
+        isCloseable = true
         add(viewPort)
+    }
+
+
+    override fun close() {
+        //DockingManager.undock(dockable)
     }
 
     override fun save() {
@@ -179,16 +184,20 @@ abstract class CodeEditor(lookup: Lookup) : EditorPane() {
         if (file == null) saveAs() else file.writeText(code)
     }
 
-
     override fun saveAs() {
         val fc = lookup.get<GetFileChooser>().fileChooser
-        val res = fc.showSaveDialog(this)
+        val res = fc.showSaveDialog(contentPane)
         if (res == JFileChooser.APPROVE_OPTION) {
             file = fc.selectedFile
             save()
-            title = fc.selectedFile.name
             languageSupport = languageSupportRegistry.languageSupportForFile(fc.selectedFile) as LanguageSupport<Node>
         }
+    }
+}
+
+class UnknownTextEditor(lookup: Lookup) : CodeEditor(lookup) {
+    init {
+        languageSupport = noneLanguageSupport
     }
 }
 
@@ -198,203 +207,56 @@ class STEditor(lookup: Lookup) : CodeEditor(lookup) {
     val editorId = "" + Math.random()
 
     init {
+        textArea.syntaxEditingStyle = "text/st"
         languageSupport = IECLanguageSupport(lookup)
+        textArea.isCodeFoldingEnabled = true
 
         textArea.addParser(object : AbstractParser() {
             val result = DefaultParseResult(this)
             override fun parse(doc: RSyntaxDocument, style: String): ParseResult {
                 result.clearNotices()
                 val input = DocumentReader(doc)
-                val stream = CharStreams.fromReader(input, title)
-                val (_, issues) = IEC61131Facade.fileResolve(stream, false)
-                issues.forEach {
-                    result.addNotice(DefaultParserNotice(this, it.message,
-                            it.startLine, it.startOffset, it.length))
+                val stream = CharStreams.fromReader(input, titleText)
+                try {
+                    val (_, issues) = IEC61131Facade.fileResolve(stream, false)
+                    issues.forEach {
+                        result.addNotice(DefaultParserNotice(this, it.message,
+                                it.startLine, it.startOffset, it.length))
+                    }
+                    problemList.set(editorId, issues)
+                } catch (e: ErrorReporter.IEC61131ParserException) {
+                    e.errors.forEach {
+                        result.addNotice(DefaultParserNotice(this, it.msg,
+                                it.line, it.offendingSymbol?.startIndex ?: -1,
+                                it.offendingSymbol?.text?.length ?: -1))
+                    }
+                } catch (e: Exception) {
                 }
-                problemList.set(editorId, issues)
                 return result
+
             }
 
             override fun isEnabled(): Boolean = true
         })
-
-        _dockKey.isCloseEnabled = true
-        _dockKey.isFloatEnabled = false
-        _dockKey.isAutoHideEnabled = false
-        _dockKey.isNotification = false
-        _dockKey.isMaximizeEnabled = true
     }
 }
 
 class TTEditor(lookup: Lookup) : CodeEditor(lookup) {
-    val splitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT)
-    //var swingbox = org.xhtmlrenderer.simple.XHTMLPanel()
-    //var swingbox = JEditorPane()
-    var swingbox = Outline()
-    val viewRender = JScrollPane(swingbox)
-
-    val timer = Timer(500) { e -> render() }
-
-    fun render() {
-        try {
-            val gtt = GetetaFacade.parseTableDSL(textArea.text)
-            val ioCompare = compareBy<ProgramVariable> { it.io }
-            val nameCompare = compareBy<ProgramVariable> { it.name }
-            val cmp = ioCompare.thenComparing(nameCompare)
-            val vars = gtt.programVariables.toMutableList()
-            vars.sortWith(cmp)
-            val treeModel = TTTableModel(gtt)
-            val rowModel = TTRowModel(vars)
-            val mdl = DefaultOutlineModel.createOutlineModel(
-                    treeModel, rowModel, true, "Groups")
-            swingbox.model = mdl
-            swingbox.isRootVisible = true
-
-
-            /*val sw = StringWriter()
-            val pp = HTMLTablePrinter(gtt, CodeWriter(sw))
-            pp.printPreamble()
-            pp.print()
-            pp.printPostamble()
-            print(sw.toString())
-            swingbox.text = sw.toString()*/
-            /*swingbox.setDocumentFromString(sw.toString(),
-                    File(".").toURI().toString(),
-                    XhtmlNamespaceHandler())
-                    */
-        } catch (e: Exception) {
-        }
-    }
+    val timer = Timer(500) { _ -> EVENT_BUS.post(EventGetetaUpdate(textArea.text)) }
 
     init {
         languageSupport = TestTableLanguageSupport(lookup)
-
-        splitPane.resizeWeight = 1.0
-        splitPane.dividerLocation = (0.7 * width).toInt()
-
-        swingbox.setDefaultRenderer(TestTableLanguageParser.CellContext::class.java,
-                object : DefaultTableCellRenderer() {
-                    override fun getTableCellRendererComponent(table: JTable?, value: Any?, isSelected: Boolean,
-                                                               hasFocus: Boolean, row: Int, column: Int): Component {
-                        val ctx =
-                                when (value) {
-                                    is TestTableLanguageParser.CellContext -> value.text
-                                    is TableNode -> value.id
-                                    else -> value.toString()
-                                }
-                        return super.getTableCellRendererComponent(table, ctx, isSelected, hasFocus, row, column)
-                    }
-                })
-
-        swingbox.renderDataProvider = object : RenderDataProvider {
-            override fun getTooltipText(o: Any?): String = ""
-            override fun getIcon(o: Any?): Icon? = null
-            override fun getBackground(o: Any?): Color = Color.WHITE
-            override fun getDisplayName(o: Any?): String = when (o) {
-                is TableNode -> o.id
-                else -> ""
-            }
-
-            override fun getForeground(o: Any?): Color = Color.black
-            override fun isHtmlDisplayName(o: Any?): Boolean = false
-        }
-
-        timer.isRepeats = false
-        removeAll()
-        splitPane.leftComponent = viewPort
-        splitPane.rightComponent = viewRender
-        add(splitPane)
 
         textArea.document.addDocumentListener(object : DocumentListener {
             override fun changedUpdate(e: DocumentEvent?) = update()
             override fun insertUpdate(e: DocumentEvent?) = update()
             override fun removeUpdate(e: DocumentEvent?) = update()
         })
-        render()
+        timer.isRepeats = false
+        //render()
     }
 
     fun update() {
         timer.restart()
-    }
-}
-
-class TTRowModel(val columns: List<ProgramVariable>) : RowModel {
-    override fun getValueFor(node: Any?, column: Int): Any {
-        if (column == 0 && node is TableNode) {
-            return node.duration.repr()
-        }
-        if (node is TableRow) {
-            val c = columns[column - 1]
-            return node.rawFields[c] ?: ""
-        }
-        return ""
-    }
-
-    override fun setValueFor(node: Any?, column: Int, value: Any?) {}
-    override fun isCellEditable(node: Any?, column: Int): Boolean = false
-    override fun getColumnName(column: Int): String = when (column) {
-        0 -> "Duration"
-        else -> columns[column - 1].name
-    }
-
-    override fun getColumnClass(column: Int): Class<*> = TestTableLanguageParser.CellContext::class.java
-    override fun getColumnCount(): Int = 1 + columns.size
-}
-
-class TTTableModel(val gtt: GeneralizedTestTable) : TreeModel {
-    protected var listenerList: EventListenerList = EventListenerList()
-
-    override fun getRoot() = gtt.region
-    override fun isLeaf(node: Any?): Boolean = node !is Region
-    override fun getChildCount(parent: Any?): Int = if (parent is Region) parent.children.size else 0
-    override fun removeTreeModelListener(l: TreeModelListener?) = listenerList.add(TreeModelListener::class.java, l)
-    override fun addTreeModelListener(l: TreeModelListener?) = listenerList.add(TreeModelListener::class.java, l)
-
-    override fun valueForPathChanged(path: TreePath?, newValue: Any?) {
-        println("listenerList = ${listenerList}")
-    }
-
-    override fun getIndexOfChild(parent: Any?, child: Any?): Int {
-        if (parent is Region && child is TableNode) {
-            return parent.children.indexOf(child)
-        }
-        return -1
-    }
-
-    override fun getChild(parent: Any?, index: Int): Any? {
-        if (parent is Region) return parent.children[index]
-        return null
-    }
-}
-
-open class MyTableModel<T>(rows: Int, cols: Int) : AbstractTableModel() {
-    var _rowCount = rows
-        set(value) {
-            field = value
-            ensureCells()
-        }
-
-    var _colCount = cols
-        set(value) {
-            field = value
-            ensureCells()
-        }
-
-    val values = ArrayList<ArrayList<T?>>()
-
-    fun ensureCells() {
-        values.ensureCapacity(rowCount)
-        while (values.size < rowCount) {
-            values.add(ArrayList(columnCount))
-        }
-        values.forEach { row -> while (row.size < columnCount) row.add(null) }
-    }
-
-    override fun getRowCount(): Int = _rowCount
-    override fun getColumnCount(): Int = _colCount
-
-    override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
-        ensureCells()
-        return values[rowIndex][columnIndex]
     }
 }

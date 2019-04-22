@@ -68,7 +68,7 @@ public class ProblemList : AbstractTableModel() {
     override fun getColumnName(column: Int): String = COLUMNS[column]
 }
 
-public class ProblemPanel(lookup: Lookup) : ToolPane() {
+public class ProblemPanel(lookup: Lookup) : ToolPane("problems") {
     val lookup = Lookup(lookup)
     val problems by lookup.with<ProblemList>()
     val listProblems = JTable(problems)
@@ -77,7 +77,7 @@ public class ProblemPanel(lookup: Lookup) : ToolPane() {
 
 
     init {
-        title = "Problems"
+        titleText = "Problems"
         listProblems.model = problems
         listProblems.setDefaultRenderer(Position::class.java,
                 object : DefaultTableCellRenderer() {
@@ -98,6 +98,4 @@ public class ProblemPanel(lookup: Lookup) : ToolPane() {
         add(toolbar, BorderLayout.NORTH)
         add(scrollPane)
     }
-
-    override fun close() {}
 }
