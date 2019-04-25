@@ -1,23 +1,46 @@
 package edu.kit.iti.formal.automation.st
 
+import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.builtin.BuiltinLoader
 import edu.kit.iti.formal.automation.datatypes.AnyBit
+import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.TimeType
 import edu.kit.iti.formal.automation.datatypes.values.TimeData
+import edu.kit.iti.formal.automation.datatypes.values.Value
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.automation.st.ast.SFCActionQualifier.Qualifier.NON_STORED
+import edu.kit.iti.formal.automation.st.ast.SFCActionQualifier.Qualifier.OVERRIDING_RESET
+import edu.kit.iti.formal.automation.st.ast.SFCActionQualifier.Qualifier.SET
+import edu.kit.iti.formal.automation.st.ast.SFCActionQualifier.Qualifier.TIME_LIMITED
+import edu.kit.iti.formal.automation.st.ast.SFCActionQualifier.Qualifier.STORE_DELAYED
+import edu.kit.iti.formal.automation.st.ast.SFCActionQualifier.Qualifier.PULSE
+import edu.kit.iti.formal.automation.st.ast.SFCActionQualifier.Qualifier.STORE_AND_DELAY
+import edu.kit.iti.formal.automation.st.ast.SFCActionQualifier.Qualifier.DELAYED_AND_STORED
+import edu.kit.iti.formal.automation.st.ast.SFCActionQualifier.Qualifier.STORE_AND_LIMITED
+import edu.kit.iti.formal.automation.st.ast.SFCActionQualifier.Qualifier.RAISING
+import edu.kit.iti.formal.automation.st.ast.SFCActionQualifier.Qualifier.FALLING
+import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
 
 class TranslationToSt(private val index: Int = 0, private val network: SFCNetwork, val scope: Scope,
-                      private val finalScan: Boolean = false) {
-    val st = StatementList()
+                      private val finalScan: Boolean = false, private val sfcFlags: Boolean = false) {
+    var st = StatementList()
     var transitions: Map<MutableSet<SFCStep>, List<SFCTransition>> = mapOf()
     var actions: MutableMap<String, ActionInfo> = mutableMapOf()
 
-    fun translate(): StatementList {
+    init {
+        transitions = network.steps.flatMap { it.outgoing }.distinct().sortedByDescending {
+            it.priority }.groupBy { it.from }
+        initActionDatastructure()
+    }
+
+    fun get(): StatementList { //TODO
         this.assignStepVariables()
         this.processTransitions()
         this.controlActions()
         this.runActions()
+        this.addSfcFlags()
         return this.st
     }
 
@@ -26,27 +49,28 @@ class TranslationToSt(private val index: Int = 0, private val network: SFCNetwor
     }
 
     fun assignStepVariables() {
+        IEC61131Facade.resolveDataTypes(BuiltinLoader.loadDefault(), scope)
         network.steps.forEach {
             val varName = stepName(it.name)
             if (!scope.variables.contains(varName)) {
-                var stepType = when (it.isInitial) {
-                    true -> StepType.Type.XINIT
-                    false -> StepType.Type.XT
+                if (it.isInitial) {
+                    scope.variables.add(VariableDeclaration(varName, scope.resolveDataType("xt"))) //TODO
+                } else {
+                    scope.variables.add(VariableDeclaration(varName, scope.resolveDataType("xt")))
                 }
-                scope.variables.add(VariableDeclaration(varName,
-                        scope.resolveDataType(StepType.toLowerCaseString(stepType))))
             }
         }
     }
 
     fun processTransitions() {
-        transitions = network.steps.flatMap { it.outgoing }.distinct()
-                .sortedByDescending { it.priority }.groupBy { it.from }
         transitions.forEach { transition ->
             val ifBranches = mutableListOf<GuardedStatement>()
             transition.value.forEach {
-                //guard will be wrong if a step in the second or higher network is referenced
-                var transitionIf = it.guard
+                var guard = ExpressionList(mutableListOf(it.guard))
+                if (index > 0) {
+                    AstMutableVisitorWithReplacedStepNames().visit(guard)
+                }
+                var transitionIf = guard.first()
                 val ifAssignments = StatementList()
                 it.from.forEach { step ->
                     transitionIf = subRef(stepName(step.name), "X") and transitionIf
@@ -64,7 +88,6 @@ class TranslationToSt(private val index: Int = 0, private val network: SFCNetwor
     }
 
     fun controlActions() {
-        puzzleActions()
         createTimeVars()
         buildActionControl()
     }
@@ -94,86 +117,105 @@ class TranslationToSt(private val index: Int = 0, private val network: SFCNetwor
             val actionT = it.key + "_T"
             scope.variables.add(VariableDeclaration(actionQ, AnyBit.BOOL))
             val stepsInQualifiers = it.value.actionStepsInQualifiers
-            val qN = SFCActionQualifier.Qualifier.NON_STORED
-            val qR = SFCActionQualifier.Qualifier.OVERRIDING_RESET
-            val qS = SFCActionQualifier.Qualifier.SET
-            val qL = SFCActionQualifier.Qualifier.TIME_LIMITED
-            val qD = SFCActionQualifier.Qualifier.STORE_DELAYED
-            val qP = SFCActionQualifier.Qualifier.PULSE
-            val qSD = SFCActionQualifier.Qualifier.STORE_AND_DELAY
-            val qDS = SFCActionQualifier.Qualifier.DELAYED_AND_STORED
-            val qSL = SFCActionQualifier.Qualifier.STORE_AND_LIMITED
-            val qP1 = SFCActionQualifier.Qualifier.RAISING
-            val qP0 = SFCActionQualifier.Qualifier.FALLING
             val resettingSteps: Expression =
-                    (stepsInQualifiers[qR]?.mapRef()?:listOf(BooleanLit(false))).chainORs()
-            if (stepsInQualifiers.contains(qN)) {
-                st.add(assignRefExpr(actionQ, stepsWithThisActionBlock(stepsInQualifiers.getValue(qN))))
+                    (stepsInQualifiers[OVERRIDING_RESET]?.mapRef()?:listOf(BooleanLit(false))).chainORs()
+            if (NON_STORED in stepsInQualifiers) {
+                st.add(assignRefExpr(actionQ, stepsWithThisActionBlock(stepsInQualifiers.getValue(NON_STORED))))
             }
-            if (stepsInQualifiers.contains(qS)) {
+            if (SET in stepsInQualifiers) {
                 val rsName = it.key + "_S_FF"
-                moduleRS(rsName, stepsWithThisActionBlock(stepsInQualifiers.getValue(qS)), resettingSteps)
+                moduleRS(rsName, stepsWithThisActionBlock(stepsInQualifiers.getValue(SET)), resettingSteps)
                 oredAssign(SymbolicReference(actionQ), subRef(rsName, "Q1"))
             }
-            if (stepsInQualifiers.contains(qL)) {
+            if (TIME_LIMITED in stepsInQualifiers) {
                 val tonName = it.key + "_L_TMR"
-                val stepsL = stepsWithThisActionBlock(stepsInQualifiers.getValue(qL))
+                val stepsL = stepsWithThisActionBlock(stepsInQualifiers.getValue(TIME_LIMITED))
                 moduleTON(tonName, stepsL, SymbolicReference(actionT))
                 oredAndNotAssign(SymbolicReference(actionQ), stepsL, subRef(tonName, "Q"))
             }
-            if (stepsInQualifiers.contains(qD)) {
+            if (STORE_DELAYED in stepsInQualifiers) {
                 val tonName = it.key + "_D_TMR"
-                moduleTON(tonName, stepsWithThisActionBlock(stepsInQualifiers.getValue(qD)), SymbolicReference(actionT))
+                moduleTON(tonName, stepsWithThisActionBlock(stepsInQualifiers.getValue(STORE_DELAYED)),
+                        SymbolicReference(actionT))
                 oredAssign(SymbolicReference(actionQ), subRef(tonName, "Q"))
             }
-            if (stepsInQualifiers.contains(qP)) {
+            if (PULSE in stepsInQualifiers) {
                 val trigName = it.key + "_P_TRIG"
-                moduleRTRIG(trigName, stepsWithThisActionBlock(stepsInQualifiers.getValue(qP)))
+                moduleRTRIG(trigName, stepsWithThisActionBlock(stepsInQualifiers.getValue(PULSE)))
                 oredAssign(SymbolicReference(actionQ), subRef(trigName, "Q"))
             }
-            if (stepsInQualifiers.contains(qSD)) {
+            if (STORE_AND_DELAY in stepsInQualifiers) {
                 val rsName = it.key + "_SD_FF"
                 val tonName = it.key + "_SD_TMR"
-                moduleRS(rsName, stepsWithThisActionBlock(stepsInQualifiers.getValue(qSD)), resettingSteps)
+                moduleRS(rsName, stepsWithThisActionBlock(stepsInQualifiers.getValue(STORE_AND_DELAY)), resettingSteps)
                 moduleTON(tonName, subRef(rsName, "Q1"), SymbolicReference(actionT))
                 oredAssign(SymbolicReference(actionQ), subRef(tonName, "Q"))
             }
-            if (stepsInQualifiers.contains(qDS)) {
+            if (DELAYED_AND_STORED in stepsInQualifiers) {
                 val tonName = it.key + "_DS_TMR"
                 val rsName = it.key + "_DS_FF"
-                moduleTON(tonName, stepsWithThisActionBlock(stepsInQualifiers.getValue(qDS)),
+                moduleTON(tonName, stepsWithThisActionBlock(stepsInQualifiers.getValue(DELAYED_AND_STORED)),
                         SymbolicReference(actionT))
                 moduleRS(rsName, subRef(tonName, "Q"), resettingSteps)
                 oredAssign(SymbolicReference(actionQ), subRef(tonName, "Q"))
             }
-            if (stepsInQualifiers.contains(qSL)) {
+            if (STORE_AND_LIMITED in stepsInQualifiers) {
                 val rsName = it.key + "_SL_FF"
                 val tonName = it.key + "_SL_TMR"
                 val rsQ = subRef(rsName, "Q1")
-                moduleRS(rsName, stepsWithThisActionBlock(stepsInQualifiers.getValue(qSL)), resettingSteps)
+                moduleRS(rsName, stepsWithThisActionBlock(stepsInQualifiers.getValue(STORE_AND_LIMITED)),
+                        resettingSteps)
                 moduleTON(tonName, rsQ, SymbolicReference(actionT))
                 oredAndNotAssign(SymbolicReference(actionQ), rsQ, subRef(tonName, "Q"))
             }
             if (finalScan) {
-                if (stepsInQualifiers.contains(qR)) { andedNotAssign(SymbolicReference(actionQ), resettingSteps) }
+                if (stepsInQualifiers.contains(OVERRIDING_RESET)) { andedNotAssign(SymbolicReference(actionQ),
+                        resettingSteps) }
                 val trigName = it.key + "_Q_TRIG"
                 moduleFTRIG(trigName, SymbolicReference(actionQ))
                 oredAssign(SymbolicReference(actionQ), subRef(trigName, "Q"))
             }
-            if (stepsInQualifiers.contains(qP1)) {
+            if (RAISING in stepsInQualifiers) {
                 val trigName = it.key + "_P1_TRIG"
-                moduleRTRIG(trigName, stepsWithThisActionBlock(stepsInQualifiers.getValue(qP1)))
+                moduleRTRIG(trigName, stepsWithThisActionBlock(stepsInQualifiers.getValue(RAISING)))
                 oredAssign(SymbolicReference(actionQ), subRef(trigName, "Q"))
             }
-            if (stepsInQualifiers.contains(qP0)) {
+            if (FALLING in stepsInQualifiers) {
                 val trigName = it.key + "_P0_TRIG"
-                moduleFTRIG(trigName, stepsWithThisActionBlock(stepsInQualifiers.getValue(qP0)))
+                moduleFTRIG(trigName, stepsWithThisActionBlock(stepsInQualifiers.getValue(FALLING)))
                 oredAssign(SymbolicReference(actionQ), subRef(trigName, "Q"))
             }
-            if (!finalScan && stepsInQualifiers.contains(qR)) {
+            if (!finalScan && stepsInQualifiers.contains(OVERRIDING_RESET)) {
                 andedNotAssign(SymbolicReference(actionQ), resettingSteps)
             }
         }
+    }
+
+    fun addSfcFlags() {
+        if (sfcFlags) {
+            val newSt = StatementList()
+            val ifAssignments = StatementList()
+            scope.variables.forEach {
+                //TODO
+                ifAssignments.add(AssignmentStatement(SymbolicReference(it.name)))
+            }
+            addToScope(listOf("SFCInit", "SFCReset", "SFCPause"), AnyBit.BOOL)
+            newSt.add(IfStatement(mutableListOf(GuardedStatement(SymbolicReference("SFCInit") or
+                    SymbolicReference("SFCReset"), ifAssignments))))
+            newSt.add(IfStatement(mutableListOf(GuardedStatement(UnaryExpression(Operators.NOT,
+                    SymbolicReference("SFCInit") or SymbolicReference("SFCPause")), st))))
+            st = newSt
+        }
+    }
+
+    private fun addToScope(name: String, type: AnyDt) {
+        if (!scope.variables.contains(name)) {
+            scope.variables.add(VariableDeclaration(name, type))
+        }
+    }
+
+    private fun addToScope(names: List<String>, type: AnyDt) {
+        names.forEach { addToScope(it, type) }
     }
 
     private fun moduleFTRIG(name: String, clk: Expression) {
@@ -228,9 +270,7 @@ class TranslationToSt(private val index: Int = 0, private val network: SFCNetwor
             if (it.value.actionBlockPairs.fold(false) { acc, pair ->
                         acc || pair.first.hasTime() }) {
                 val actionT = it.key + "_T"
-                if(!scope.variables.contains(actionT)) {
-                    scope.variables.add(VariableDeclaration(actionT, TimeType.TIME_TYPE))
-                }
+                addToScope(actionT, TimeType.TIME_TYPE)
                 val ifBranches = mutableListOf<GuardedStatement>()
                 it.value.actionBlockPairs.filter { maybeTimedActionBlockPair ->
                     maybeTimedActionBlockPair.first.hasTime() }.forEach { timedActionBlockPair ->
@@ -242,9 +282,9 @@ class TranslationToSt(private val index: Int = 0, private val network: SFCNetwor
         }
     }
 
-    private fun puzzleActions() {
+    private fun initActionDatastructure() {
         network.steps.forEach { step -> step.events.forEach {
-            val qualifier = it.qualifier?: SFCActionQualifier(SFCActionQualifier.Qualifier.NON_STORED)
+            val qualifier = it.qualifier?: SFCActionQualifier(NON_STORED)
             val name = stepName(step.name)
             if (actions.containsKey(it.actionName)) {
                 actions.getValue(it.actionName).addActionBlock(qualifier, name)
@@ -283,9 +323,21 @@ class TranslationToSt(private val index: Int = 0, private val network: SFCNetwor
     private fun stepName(name: String): String {
         return if (index > 0) { index.toString() + '_' + name } else { name }
     }
+
+    private inner class AstMutableVisitorWithReplacedStepNames : AstMutableVisitor() {
+        override fun visit(symbolicReference: SymbolicReference): Expression {
+            for (i in 0 until network.steps.size - 1) {
+                if (symbolicReference.identifier == network.steps[i].name) {
+                    symbolicReference.identifier = stepName(network.steps[i].name)
+                    break
+                }
+            }
+            return super.visit(symbolicReference) as SymbolicReference
+        }
+    }
 }
 
-object StepType {
+/**object StepType {
     enum class Type {
         XT,
         XINIT
@@ -315,7 +367,7 @@ object StepType {
     fun toLowerCaseString(typeName: StepType.Type): String {
         return typeName.toString().toLowerCase()
     }
-}
+}*/
 
 class ActionInfo(sfcActionQualifier: SFCActionQualifier, step: String) {
     var actionBlockPairs: MutableList<Pair<SFCActionQualifier, String>> = mutableListOf()

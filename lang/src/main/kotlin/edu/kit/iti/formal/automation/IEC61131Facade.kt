@@ -211,8 +211,7 @@ object IEC61131Facade {
 
     fun translateToSt(scope: Scope, sfc: SFCImplementation): StatementList {
         val st = StatementList()
-        StepType.stepTypeInformation(scope)
-        sfc.networks.forEachIndexed { index, network -> st.add(TranslationToSt(index, network, scope).translate()) }
+        sfc.networks.forEachIndexed { index, network -> st.add(TranslationToSt(index, network, scope).get()) }
         return st
     }
 
