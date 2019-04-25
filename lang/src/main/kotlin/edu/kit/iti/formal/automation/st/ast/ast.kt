@@ -1895,7 +1895,7 @@ class VariableBuilder(val scope: VariableScope) {
 
     fun create(): VariableBuilder {
         for (id in identifiers) {
-            val vd = VariableDeclaration(id.text, peek(), type!!)
+            val vd = VariableDeclaration(id.text.trim('`'), peek(), type!!)
             vd.token = id
             this.scope.add(vd)
         }

@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.automation.plcopenxml
 
 import edu.kit.iti.formal.util.CodeWriter
-import org.xml.sax.InputSource
 import java.io.*
 import java.net.URL
 import java.nio.file.Path
@@ -30,4 +29,15 @@ object IECXMLFacade {
     fun extractPLCOpenXml(filename: String) = extractPLCOpenXml(File(filename))
     fun extractPLCOpenXml(filename: File) = extractPLCOpenXml(filename.toURI().toURL())
     fun extractPLCOpenXml(filename: Path) = extractPLCOpenXml(filename.toUri().toURL())
+
+
+    val SFC_KEYWORDS = setOf("step", "end_step", "transition", "end_transition")
+    fun quoteVariable(name: String): String =
+            if(name.toLowerCase() in SFC_KEYWORDS) "`$name`" else name
+
+    fun quoteStBody(body: String): String {
+        return body.replace("\\b\\w+\\b".toRegex()) {
+            quoteVariable(it.value)
+        }
+    }
 }
