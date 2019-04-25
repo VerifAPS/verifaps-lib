@@ -220,7 +220,7 @@ class SfcElementAccess(val sfcElement: Element) {
         val condition: String by lazy {
             val q = xpf.compile(qExpression, Filters.text(), hashMapOf("id" to "id") as Map<String, Any>?)
             q.setVariable("id", conditionId)
-            q.evaluateFirst(sfcElement).textTrim ?: "no condition found for $conditionId"
+            q.evaluateFirst(sfcElement).textTrim.trim(';') ?: "no condition found for $conditionId"
         }
 
         override val transitions: Collection<Trans>

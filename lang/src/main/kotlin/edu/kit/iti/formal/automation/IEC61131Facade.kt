@@ -8,9 +8,8 @@ import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.st.StepType
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
-import edu.kit.iti.formal.automation.st.TranslationToSt
+import edu.kit.iti.formal.automation.st.TranslationSfcToSt
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.automation.visitors.Visitable
@@ -209,9 +208,10 @@ object IEC61131Facade {
         ast.accept(stp)
     }
 
-    fun translateToSt(scope: Scope, sfc: SFCImplementation): StatementList {
+    fun translateToSt(name: String, scope: Scope, sfc: SFCImplementation): StatementList {
         val st = StatementList()
-        sfc.networks.forEachIndexed { index, network -> st.add(TranslationToSt(index, network, scope).get()) }
+        sfc.networks.forEachIndexed { index, network ->
+            st.add(TranslationSfcToSt(index, name, network, scope).call()) }
         return st
     }
 

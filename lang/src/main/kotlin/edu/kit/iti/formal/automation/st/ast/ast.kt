@@ -700,7 +700,7 @@ abstract class Expression : Top() {
     infix fun ge(right: Expression): Expression = BinaryExpression(this, Operators.GREATER_EQUALS, right)
     infix fun gt(right: Expression): Expression = BinaryExpression(this, Operators.GREATER_THAN, right)
 
-    fun not() = UnaryExpression(Operators.NOT, this)
+    operator fun not() = UnaryExpression(Operators.NOT, this)
     fun unaryMinus() = UnaryExpression(Operators.MINUS, this)
 
 }

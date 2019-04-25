@@ -14,7 +14,7 @@ object TranslateSfcToSt : AstVisitorWithScope<Unit>() {
         programDeclaration.sfcBody?.also {
             if (programDeclaration.stBody == null) {
                 programDeclaration.stBody = IEC61131Facade
-                        .translateToSt(programDeclaration.name, programDeclaration.scope, it)
+                        .translateToSt("", programDeclaration.scope, it)
             }
         }
     }
@@ -31,7 +31,7 @@ object TranslateSfcToSt : AstVisitorWithScope<Unit>() {
         super.visit(functionBlockDeclaration)
         functionBlockDeclaration.sfcBody?.also {
             if (functionBlockDeclaration.stBody == null) {
-                functionBlockDeclaration.stBody = IEC61131Facade.translateToSt(functionBlockDeclaration.name,
+                functionBlockDeclaration.stBody = IEC61131Facade.translateToSt("",
                         functionBlockDeclaration.scope, it)
             }
         }

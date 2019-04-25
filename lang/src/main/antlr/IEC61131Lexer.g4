@@ -251,11 +251,6 @@ END_FUNCTION_BLOCK
 	 E N D UNDERSCORE F U N C T I O N UNDERSCORE B L O C K
 ;
 
-END_GVL
-:
-    E N D UNDERSCORE G V L
-;
-
 END_IF
 :
 	E N D '_' I F
@@ -313,17 +308,12 @@ FUNCTION
 
 FUNCTION_BLOCK
 :
-	F U N C T I O  N '_' B L O C K
+	F U N C T I O N '_' B L O C K
 ;
 
 F_EDGE
 :
 	F '_' E D G E
-;
-
-GVL
-:
-    G V L
 ;
 
 IF
@@ -925,6 +915,7 @@ WSTRING_LITERAL: '"' ('$' (["$LNRTlnrt] | [0-9][0-9][0-9][0-9])  | ~["])*? '"';
 IDENTIFIER
 :
 	[a-zA-Z_] [$a-zA-Z0-9_]*
+| '`' [a-zA-Z_] [$a-zA-Z0-9_]* '`'
 ;
 
 
