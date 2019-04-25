@@ -3,6 +3,7 @@ package edu.kit.iti.formal.automation.plcopenxml
 import edu.kit.iti.formal.util.CodeWriter
 import org.jdom2.Element
 
+
 /**
  * Extracts the interface elements into VAR...END_VAR
  *
@@ -32,9 +33,9 @@ object InterfaceBuilder : XMLTranslatorFind {
                 val datatype = VariableDeclXML.getDatatype(e.getChild("type"))
                 val initValue = VariableDeclXML.getInitialValue(e)
                 nl()
-                printf("$name : $datatype")
+                printf("${IECXMLFacade.quoteVariable(name)} : $datatype")
                 if (initValue != null)
-                    printf(":= $initValue")
+                    printf(" := $initValue")
                 printf(";")
             }
         }
@@ -45,10 +46,11 @@ object InterfaceBuilder : XMLTranslatorFind {
 object VariableDeclXML {
     fun getDatatype(e: Element): String {
         val derived = e.getChild("derived")
-        return if (derived != null) {
-            derived.getAttributeValue("name")
-        } else {
-            e.children[0].name
+        val array = e.getChild("array")
+        return when {
+            derived != null -> derived.getAttributeValue("name")
+            array!=null-> getArray(array)
+            else -> e.children[0].name
         }
     }
 
@@ -58,5 +60,18 @@ object VariableDeclXML {
         return variable.getChild("initialValue")
                 ?.getChild("simpleValue")
                 ?.getAttributeValue("value")
+    }
+
+    private fun getArray(type: Element): String {
+        /* <array>
+                <dimension lower="0" upper="127" />
+                <baseType>
+                    <BYTE />
+                </baseType>
+           </array> */
+        val lower = type.getChild("dimension").getAttributeValue("lower")
+        val upper = type.getChild("dimension").getAttributeValue("upper")
+        val baseType = getDatatype(type.getChild("baseType"))
+        return "ARRAY[$lower..$upper] OF $baseType"
     }
 }

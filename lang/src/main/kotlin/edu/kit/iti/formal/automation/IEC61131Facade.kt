@@ -9,6 +9,7 @@ import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
+import edu.kit.iti.formal.automation.st.TranslationSfcToSt
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.automation.visitors.Visitable
@@ -208,11 +209,16 @@ object IEC61131Facade {
     }
 
     fun translateToSt(name: String, scope: Scope, sfc: SFCImplementation): StatementList {
-        TODO() //Aktuelle Schritt: {STEP_$name}
+        val st = StatementList()
+        sfc.networks.forEachIndexed { index, network ->
+            st.add(TranslationSfcToSt(index, name, network, scope).call()) }
+        return st
     }
 
     fun translateSfc(elements: PouElements) {
-        elements.forEach { it.accept(TranslateSfcToSt) }
+        elements.forEach {
+            it.accept(TranslateSfcToSt)
+        }
     }
 
     object InstructionList {
@@ -222,11 +228,9 @@ object IEC61131Facade {
                     CharStreams.fromString(input.text),
                     ShiftedTokenFactory(input))
         }
-
         fun getParser(input: CharStream, position: Position): IlParser {
             return getParser(input, ShiftedTokenFactory(position))
         }
-
         fun getParser(input: CharStream, tokenFactory: TokenFactory<*>? = null): IlParser {
             val lexer = IlLexer(input)
             if (tokenFactory != null)
@@ -268,4 +272,3 @@ object IEC61131Facade {
         }
     }
 }
-

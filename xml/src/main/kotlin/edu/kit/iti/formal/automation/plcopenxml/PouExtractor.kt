@@ -104,8 +104,11 @@ object SFCBody : XMLTranslatorXPath("./body/SFC") {
 object STBody : XMLTranslatorXPath("./body/ST/xhtml") {
     override fun translate(e: Element, writer: CodeWriter) {
         val stBody = query.evaluateFirst(e)
-        if (stBody != null)
-            writer.nl().appendReformat(stBody.textTrim)
+        if (stBody != null) {
+            val body = stBody.textTrim
+            val body2 = IECXMLFacade.quoteStBody(body)
+            writer.nl().appendReformat(body2)
+        }
     }
 }
 

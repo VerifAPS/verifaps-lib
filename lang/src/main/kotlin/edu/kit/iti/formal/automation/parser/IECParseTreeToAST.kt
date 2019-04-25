@@ -412,7 +412,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitVar_decl(ctx: IEC61131Parser.Var_declContext): Any? {
-        gather!!.clear()
+        gather.clear()
         ctx.variable_keyword().accept(this)
         ctx.var_decl_inner().accept(this)
         return null
@@ -721,7 +721,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val ast = SymbolicReference()
         ast.ruleContext = ctx
 
-        ast.identifier = ctx.a.text
+        ast.identifier = ctx.a.text.trim('`')
         ast.sub = if (ctx.DOT() != null)
             ctx.other.accept(this) as SymbolicReference
         else

@@ -700,7 +700,7 @@ abstract class Expression : Top() {
     infix fun ge(right: Expression): Expression = BinaryExpression(this, Operators.GREATER_EQUALS, right)
     infix fun gt(right: Expression): Expression = BinaryExpression(this, Operators.GREATER_THAN, right)
 
-    fun not() = UnaryExpression(Operators.NOT, this)
+    operator fun not() = UnaryExpression(Operators.NOT, this)
     fun unaryMinus() = UnaryExpression(Operators.MINUS, this)
 
 }
@@ -1895,7 +1895,7 @@ class VariableBuilder(val scope: VariableScope) {
 
     fun create(): VariableBuilder {
         for (id in identifiers) {
-            val vd = VariableDeclaration(id.text, peek(), type!!)
+            val vd = VariableDeclaration(id.text.trim('`'), peek(), type!!)
             vd.token = id
             this.scope.add(vd)
         }
@@ -2165,10 +2165,11 @@ data class SFCActionQualifier(
         TIME_LIMITED("L", true),
         STORE_AND_DELAY("SD", true),
         STORE_AND_LIMITED("SL", true),
-        STORE_DELAYED("D", true),
+        STORE_DELAYED("D", true),           //could be renamed to TIME_DELAYED
         DELAYED_AND_STORED("DS", true),
-        RAISING("P1 ", false),
-        FALLING("P0", false)
+        RAISING("P1", false),               //could be renamed to RISING
+        FALLING("P0", false),
+        PULSE("P", false)
     }
 
     companion object {

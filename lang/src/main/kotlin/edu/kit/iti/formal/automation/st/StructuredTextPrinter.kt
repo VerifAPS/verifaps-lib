@@ -492,7 +492,7 @@ class StructuredTextPrinter
             if (i == 0)
                 sb.printf("IF ")
             else
-                sb.printf("ELSEIF ")
+                sb.printf("ELSIF ")
 
             ifStatement.conditionalBranches[i].condition.accept(this)
 
