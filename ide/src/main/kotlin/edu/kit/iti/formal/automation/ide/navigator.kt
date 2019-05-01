@@ -88,6 +88,8 @@ class FileTreePanel(val lookup: Lookup) : DefaultSingleCDockable("file-tree", "N
     init {
         titleIcon = IconFontSwing.buildIcon(FontAwesomeSolid.COMPASS, 12f)
 
+        treeFiles.border = BorderFactory.createEmptyBorder(10,10,10,10)
+
         treeFiles.addMouseListener(object : MouseAdapter() {
             override fun mouseReleased(e: MouseEvent) {
                 if (e.isPopupTrigger) {
