@@ -228,6 +228,8 @@ class STFoldParser : FoldParser {
                     "\\bFOR\\b" to "\\bEND_FOR\\b",
                     "\\bWHILE\\b" to "\\bEND_WHILE\\b",
                     "\\bVAR.*\\b" to "\\bEND_VAR\\b",
+                    "\\bACTION.*\\b" to "\\bEND_ACTION\\b",
+                    "\\bSTEP.*\\b" to "\\bEND_STEP\\b",
                     "\\bPROGRAM\\b" to "\\bEND_PROGRAM\\b"
             ))
 

@@ -1,15 +1,22 @@
 package edu.kit.iti.formal.automation.ide
 
+import bibliothek.gui.Dockable
 import bibliothek.gui.dock.common.CControl
 import bibliothek.gui.dock.common.CGrid
 import bibliothek.gui.dock.common.intern.CDockable
+import bibliothek.gui.dock.common.intern.DefaultCommonDockable
 import bibliothek.gui.dock.util.Priority
+import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.ide.tools.GetetaPreview
+import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import me.tomassetti.kanvas.languageSupportRegistry
+import org.antlr.v4.runtime.CharStreams
 import org.fife.ui.rsyntaxtextarea.folding.CurlyFoldParser
-import org.fife.ui.rsyntaxtextarea.folding.FoldParser
 import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Dimension
+import java.awt.Font
+import java.awt.Toolkit
 import java.awt.event.KeyEvent
 import java.io.File
 import java.text.ParseException
@@ -25,6 +32,18 @@ class EditorFactory(val lookup: Lookup) {
                 e.file = it
                 e.textArea.text = it.readText()
                 e.dirty = false
+            }
+            else null
+        }
+
+
+        editorFactories.add {
+            if (it.name.endsWith("xml")) STEditor(lookup).also { e ->
+                val stCode = IECXMLFacade.extractPLCOpenXml(it)
+                val f = File(it.parentFile, it.nameWithoutExtension + ".st")
+                e.file = f
+                e.textArea.text = stCode
+                e.dirty = true
             }
             else null
         }
@@ -91,10 +110,10 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
         }
 
     val currentEditor: CodeEditor?
-        get() = currentTabbedPanel as? CodeEditor
+        get() = currentTabbedPanel?.dockable as? CodeEditor
 
-    val currentTabbedPanel: CDockable?
-        get() = globalPort.controller.focusedDockable as? CDockable
+    val currentTabbedPanel: DefaultCommonDockable?
+        get() = globalPort.controller.focusedDockable as DefaultCommonDockable
 
     override val fileChooser = JFileChooser()
     val defaultToolBar = JToolBar()
@@ -134,6 +153,19 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
         addRecentFiles()
     }
 
+    val actionTranslateSfc = createAction("Translate all Sfc to St code",
+            "File") {
+        currentEditor?.also {
+            val file = File(it.file?.parentFile, it.file?.nameWithoutExtension +
+                    "_translated." + it.file?.extension)
+            val elements = IEC61131Facade.file(CharStreams.fromString(it.text))
+            IEC61131Facade.translateSfc(elements)
+            file.bufferedWriter().use {
+                IEC61131Facade.printTo(it, elements, true)
+            }
+            open(file)
+        }
+    }
     private fun runCurrentProgram() {
         val editor = (null as? STEditor)
         if (editor != null) {
@@ -198,8 +230,9 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
         contentPane.add(globalPort.contentArea, BorderLayout.CENTER)
 
         jMenuBar = JMenuBar()
-        actions.sortedBy { it.priority }
-                .forEach { jMenuBar import it }
+        registerAction(actionTranslateSfc)
+//        actions.sortedBy { it.priority }
+ //               .forEach { jMenuBar import it }
         addRecentFiles()
 
         val tree = FileTreePanel(lookup)

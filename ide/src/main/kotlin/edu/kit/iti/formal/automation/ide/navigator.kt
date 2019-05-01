@@ -162,7 +162,7 @@ class FileTreePanel(val lookup: Lookup) : DefaultSingleCDockable("file-tree", "N
 
     private fun fileFilter(file: File): Boolean {
         if (file.isDirectory) return true
-        val suffixes = listOf("gtt", "st", "iec", "txtFolder")
+        val suffixes = listOf("gtt", "st", "iec", "txt", "xml")
         return file.extension in suffixes
     }
 }

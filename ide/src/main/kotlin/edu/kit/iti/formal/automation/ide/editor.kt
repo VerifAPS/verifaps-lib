@@ -22,7 +22,6 @@ import java.awt.BorderLayout
 import java.awt.Font
 import java.io.File
 import java.lang.Exception
-import java.lang.NullPointerException
 import javax.swing.JFileChooser
 import javax.swing.Timer
 import javax.swing.event.DocumentEvent
@@ -76,16 +75,19 @@ interface HasFont {
 
 
     fun getComponent(): Component = this
-}
-*/
+}*/
 
 val dockableFactory = NullMultipleCDockableFactory.NULL
 
 abstract class CodeEditor(lookup: Lookup) : DefaultMultipleCDockable(dockableFactory), Saveable, HasFont, Closeable {
+    val lookup = Lookup(lookup)
     private val DIRTY_MARKER = '*'
     private val colors: Colors by lookup.with()
-
-    val lookup = Lookup(lookup)
+    var text: String
+        get() = textArea.text
+        set(value) {
+            textArea.text = value
+        }
 
     var languageSupport: LanguageSupport<Node> = noneLanguageSupport
         set(value) {
@@ -126,6 +128,7 @@ abstract class CodeEditor(lookup: Lookup) : DefaultMultipleCDockable(dockableFac
     }
 
     init {
+        contentPane.layout = BorderLayout()
         (textArea.document as RSyntaxDocument).setSyntaxStyle(AntlrTokenMaker(languageSupport.antlrLexerFactory))
         val context = languageSupport.contextCreator.create()
         textArea.syntaxScheme = languageSupport.syntaxScheme
@@ -190,6 +193,7 @@ abstract class CodeEditor(lookup: Lookup) : DefaultMultipleCDockable(dockableFac
         if (res == JFileChooser.APPROVE_OPTION) {
             file = fc.selectedFile
             save()
+            //titleText = fc.selectedFile.name
             languageSupport = languageSupportRegistry.languageSupportForFile(fc.selectedFile) as LanguageSupport<Node>
         }
     }
