@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.automation.ide
 
+import bibliothek.gui.dock.common.CLocation
+import bibliothek.gui.dock.common.DefaultSingleCDockable
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.values.Value
 import edu.kit.iti.formal.automation.run.ExecutionFacade
@@ -8,45 +10,30 @@ import edu.kit.iti.formal.automation.st.ast.Literal
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
-import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.print.HTMLTablePrinter
 import edu.kit.iti.formal.automation.visitors.Utils
-import edu.kit.iti.formal.util.CodeWriter
 import net.miginfocom.layout.CC
 import net.miginfocom.swing.MigLayout
 import org.antlr.v4.runtime.CharStreams
 import java.awt.BorderLayout
 import java.awt.Component
-import java.awt.LayoutManager
 import java.io.File
-import java.io.StringWriter
 import javax.swing.*
 import javax.swing.table.AbstractTableModel
 import javax.swing.table.DefaultTableCellRenderer
 
-abstract class ToolPane(layout: LayoutManager = BorderLayout()) : TabbedPanel(layout)
-
-
-val actionGeteta = createAction(name = "Geteta", menuPath = "Tools", prio = 10,
-        fontIcon = FontAwesomeSolid.TABLE) {
-
+abstract class ToolPane(id: String) : DefaultSingleCDockable(id) {
+    init {
+        setLocation(CLocation.base().normalSouth(.2))
+        isCloseable = false
+    }
 }
-
-val actionReteta = createAction(name = "Reteta", menuPath = "Tools", prio = 10,
-        fontIcon = FontAwesomeSolid.TABLET) {
-
-}
-
 
 /**
  *
  * @author Alexander Weigl
  * @version 1 (11.03.19)
  */
-class RunnerWindow(val lookup: Lookup,
-                   val stEditor: STEditor) : ToolPane(BorderLayout()) {
-    override fun close() {}
-
+class RunnerWindow(val lookup: Lookup, val stEditor: STEditor) : ToolPane("runner-window") {
     val toolBar = JToolBar()
 
     var elements: PouElements = PouElements()
@@ -62,7 +49,7 @@ class RunnerWindow(val lookup: Lookup,
     val actionRecalculate = createAction("Rebuild", "") { updateModel(); }
 
     init {
-        title = "Run: ${stEditor.title}"
+        titleText = "Run: ${stEditor.titleText}"
 
         toolBar.add(actionLoad)
         toolBar.add(actionSaveAs)
@@ -105,7 +92,7 @@ class RunnerWindow(val lookup: Lookup,
     fun load(file: File? = null) {
         if (file == null) {
             val fc = lookup.get<GetFileChooser>().fileChooser
-            if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            if (fc.showOpenDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
                 load(fc.selectedFile)
             }
         } else {
@@ -116,7 +103,7 @@ class RunnerWindow(val lookup: Lookup,
     fun saveAs(file: File? = null) {
         if (file == null) {
             val fc = lookup.get<GetFileChooser>().fileChooser
-            if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            if (fc.showSaveDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
                 saveAs(fc.selectedFile)
             }
         } else {
@@ -270,18 +257,15 @@ class RunnerWindow(val lookup: Lookup,
     }
 }
 
-class GetetaWindow(lookup: Lookup) : ToolPane() {
-    override fun close() {}
-
+class GetetaWindow(val lookup: Lookup) : ToolPane("geteta-window") {
     val cboStEditor = JComboBox<STEditor>()
     val cboPou = JComboBox<PouExecutable>()
     val cboTable = JComboBox<TTEditor>()
-    val lookup = Lookup(lookup)
 
     init {
-        title = "Geteta"
-        icon = IconFontSwing.buildIcon(FontAwesomeSolid.TABLE, 16f)
-        layout = MigLayout()
+        titleText = "Geteta"
+        titleIcon = IconFontSwing.buildIcon(FontAwesomeSolid.TABLE, 16f)
+        contentPane.layout = MigLayout()
 
         val lblProgram = JLabel("Program: ")
         lblProgram.labelFor = cboStEditor
@@ -294,12 +278,12 @@ class GetetaWindow(lookup: Lookup) : ToolPane() {
 
         add(lblTable)
         add(cboTable)
-        lookup.addChangeListener(STEditor::class.java, this::updateData)
+        lookup.addChangeListener(CodeEditor::class.java, this::updateData)
         lookup.addChangeListener(TTEditor::class.java, this::updateData)
 
         cboTable.renderer = object : DefaultListCellRenderer() {
             override fun getListCellRendererComponent(list: JList<*>?, value: Any?, index: Int, isSelected: Boolean, cellHasFocus: Boolean): Component {
-                val a = (value as TabbedPanel?)?.title
+                val a = (value as CodeEditor?)?.titleText
                 return super.getListCellRendererComponent(list, a, index, isSelected, cellHasFocus)
             }
         }
@@ -318,52 +302,46 @@ class GetetaWindow(lookup: Lookup) : ToolPane() {
     }
 
     private fun updateData() {
-        val stEditor = lookup.getAll<STEditor>()
-        val ttEditor = lookup.getAll<TTEditor>()
-
         cboStEditor.removeAllItems()
         cboTable.removeAllItems()
 
-        stEditor.forEach { cboStEditor.addItem(it) }
-        ttEditor.forEach { cboTable.addItem(it) }
+        val editors = lookup.getAll<CodeEditor>()
+        editors.mapNotNull { it as? STEditor }
+                .forEach(cboStEditor::addItem)
+
+        editors.mapNotNull { it as? TTEditor }
+                .forEach(cboTable::addItem)
     }
 }
 
-class RetetaWindow(lookup: Lookup) {
-}
-
-class GetetaPreview(lookup: Lookup) : ToolPane() {
-    override fun close() {}
-
-    val lookup = Lookup(lookup)
-    var swingbox = JEditorPane()
-    val viewRender = JScrollPane(swingbox)
+class RetetaWindow(val lookup: Lookup) : ToolPane("reteta-window") {
+    val cboTable = JComboBox<TTEditor>()
+    val listAllPous = JList<PouExecutable>()
+    val listSelectedPous = JList<PouExecutable>()
 
     init {
-        title = "Test Table Preview"
-        _dockKey.isCloseEnabled = false
-        EVENT_BUS.listenTo(this::render)
-    }
+        titleText = "Reteta"
+        titleIcon = IconFontSwing.buildIcon(FontAwesomeSolid.TABLE, 16f)
 
-    fun render(event: EventGetetaUpdate) {
-        try {
-            val gtt = GetetaFacade.parseTableDSL(event.text)
-            val sw = StringWriter()
-            val pp = HTMLTablePrinter(gtt, CodeWriter(sw))
-            pp.printPreamble()
-            pp.print()
-            pp.printPostamble()
-            print(sw.toString())
-            swingbox.text = sw.toString()
-            /*swingbox.setDocumentFromString(sw.toString(),
-                    File(".").toURI().toString(),
-                    XhtmlNamespaceHandler())
-                    */
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
+        val root: JPanel = contentPane as JPanel
+        root.layout = MigLayout()
 
+        val lblTable = JLabel("Table: ")
+        root.add(lblTable)
+        root.add(cboTable, "wrap")
+
+
+        val lblAllPous = JLabel("All POUs")
+        root.add(lblAllPous, "center")
+
+        root.add(JLabel())
+
+        val lblSelPous = JLabel("Selected POUs")
+        root.add(lblSelPous, "wrap, center")
+
+        root.add(JScrollPane(listAllPous), "spany 2")
+        root.add(JButton(">"))
+        root.add(JScrollPane(listSelectedPous), "spany 2,wrap")
+        root.add(JButton("<"))
+    }
 }
-
-class EventGetetaUpdate(val text: String)

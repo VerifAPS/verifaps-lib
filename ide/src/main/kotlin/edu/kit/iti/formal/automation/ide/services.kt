@@ -1,6 +1,8 @@
 package edu.kit.iti.formal.automation.ide
 
+import org.fife.ui.rsyntaxtextarea.Style
 import java.awt.Color
+import java.awt.Font
 import java.io.File
 import java.util.*
 import java.util.function.Consumer
@@ -36,17 +38,78 @@ interface ActionService {
 
 interface TabManagement {
     fun addToolTab(pane: ToolPane)
-    fun addEditorTab(pane: EditorPane)
+    fun addEditorTab(pane: CodeEditor)
 }
 
-class Colors {
+//https://atelierbram.github.io/syntax-highlighting/atelier-schemes/dune/
+object Colors {
+    val defaultFont = Font(Font.MONOSPACED, 0, 12)
+
+    val base00 = Color.decode("#20201d")
+    val base01 = Color.decode("#292824")
+    val base02 = Color.decode("#6e6b5e")
+    val base03 = Color.decode("#7d7a68")
+    val base04 = Color.decode("#999580")
+    val base05 = Color.decode("#a6a28c")
+    val base06 = Color.decode("#e8e4cf")
+    val base07 = Color.decode("#fefbec")
+    val base08 = Color.decode("#d73737")
+    val base09 = Color.decode("#b65611")
+    val base0a = Color.decode("#ae9513")
+    val base0b = Color.decode("#60ac39")
+    val base0c = Color.decode("#1fad83")
+    val base0d = Color.decode("#6684e1")
+    val base0e = Color.decode("#b854d4")
+    val base0f = Color.decode("#d43552")
+
+    val red = base08
+    val orange = base09
+    val yellow = base0a
+    val green = base0b
+    val cyan = base0c
+    val blue = base0d
+    val violet = base0e
+    val magenta = base0f
+
+    private fun hsl(h: Int, s: Int, l: Int): Color = Color.getHSBColor(h / 360f, s / 100f, l / 100f)
+
+    private fun style(init: Style.() -> Unit): Style {
+        val style = Style()
+        style.font = defaultFont
+        style.foreground = Color.BLACK
+        init(style)
+        return style
+    }
+
+    val background = base07
+
+    val control = style { foreground = violet }
+
+    val structural = style { foreground = violet }
+
+    val identifier = style { foreground = red }
+
+    val literal = style { foreground = green }
+
+    val comment = style { foreground = base05 }
+
+    val default = style {}
+
+    val error = style {
+        foreground = red
+        underline = true
+    }
+
+    val types = style { foreground = blue }
+
+
     val BLUE = Color(74, 72, 133)
     val LIGHT_BLUE = Color(148, 198, 206)
     val VIOLET = Color(175, 137, 193)
     val DARK_VIOLET = Color(107, 8, 114)
     val DARK_GREEN = Color(2, 113, 129)
     val BACKGROUND = Color(200, 200, 200)
-    val HIGHTLIGHT_LINE = Color(255, 255, 255)
+    val HIGHTLIGHT_LINE = base06
     val GREY = Color(109, 109, 109)
 }
 
@@ -130,7 +193,7 @@ class Lookup(val parent: Lookup? = null) {
     fun <T> get(service: Class<T>): T {
         val t = getList(service)
         return if (t.isEmpty()) {
-            if (parent != null) parent!!.get(service)
+            if (parent != null) parent.get(service)
             else throw IllegalStateException("Service $service not registered")
         } else {
             t.first()

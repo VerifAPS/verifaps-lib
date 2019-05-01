@@ -31,6 +31,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import java.util.*
 import java.util.function.BinaryOperator
+import java.util.regex.Pattern
 
 /**
  * Created by weigl on 26.11.16.
@@ -86,7 +87,7 @@ object SMVFacade {
 
     @JvmStatic
     fun reducerKt(op: SBinaryOperator): (SMVExpr, SMVExpr) -> SMVExpr =
-        { a: SMVExpr, b: SMVExpr -> SBinaryExpression(a, op, b) }
+            { a: SMVExpr, b: SMVExpr -> SBinaryExpression(a, op, b) }
 
 
     @JvmStatic
@@ -123,6 +124,29 @@ object SMVFacade {
 
     fun getParser(stream: CharStream): SMVParser {
         return SMVParser(CommonTokenStream(SMVLexer(stream)))
+    }
+
+    val PATTERN_WORD_LITERAL = Pattern.compile("0([us])([dxo])(\\d+)_(\\d+)")
+
+    fun isWordLiteral(text: String): Boolean {
+        val m = PATTERN_WORD_LITERAL.matcher(text)
+        return m.matches()
+    }
+
+    fun parseWordLiteral(text: String): SMVExpr {
+        val m = PATTERN_WORD_LITERAL.matcher(text)
+        if (m.matches()) {
+            val signed = m.group(1) == "s"
+            val ord = when (m.group(2)) {
+                "x" -> 16
+                "o" -> 8
+                else -> 10
+            }
+            val digits = m.group(3).toInt()
+            val value = m.group(4).toBigInteger(ord)
+            return SWordLiteral(value, SMVWordType(signed, digits))
+        }
+        throw IllegalArgumentException()
     }
 }
 

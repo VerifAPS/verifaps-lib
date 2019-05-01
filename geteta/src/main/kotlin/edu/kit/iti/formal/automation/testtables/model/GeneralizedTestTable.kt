@@ -312,8 +312,6 @@ fun Duration.isOptional(time: Int): Boolean =
 
 
 sealed class TableNode(open val id: String, var duration: Duration = Duration.ClosedInterval(1, 1, false)) {
-    //abstract val automataStates: List<TableRow.AutomatonState>
-
     abstract fun count(): Int
     abstract fun flat(): List<TableRow>
     abstract fun depth(): Int
@@ -321,13 +319,6 @@ sealed class TableNode(open val id: String, var duration: Duration = Duration.Cl
 
 data class Region(override val id: String,
                   var children: MutableList<TableNode> = arrayListOf()) : TableNode(id) {
-
-    /*override val automataStates: List<TableRow.AutomatonState> by lazy {
-        val seq = java.util.ArrayList<TableRow.AutomatonState>(100)
-        flat().forEach { state -> seq.addAll(state.automataStates) }
-        seq
-    }*/
-
     constructor(id: Int) : this("$id")
 
     override fun count(): Int = this.children.sumBy { it.count() }

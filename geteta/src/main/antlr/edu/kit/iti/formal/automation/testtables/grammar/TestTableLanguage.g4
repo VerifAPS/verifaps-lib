@@ -34,15 +34,15 @@ table : (r=RELATIONAL {relational=true;})?
          RBRACE;
 
 opts : OPTIONS LBRACE (kv)*  RBRACE;
-kv: key=IDENTIFIER '=' (constant|variable) osem;
-signature : 'var' state='state'? io=('input'|'output')
-    variableDefinition (',' variableDefinition)*
-    ':' dt=IDENTIFIER osem
+kv: key=IDENTIFIER (EQUALS|COLON) (constant|variable) osem;
+signature : VAR state=STATE? io=(INPUT|OUTPUT)
+    variableDefinition (COMMA variableDefinition)*
+    COLON dt=IDENTIFIER osem
 ;
 
 variableDefinition :
         {!relational}? n=IDENTIFIER (AS newName=IDENTIFIER)?                      #variableAliasDefinitionSimple
-      | {relational}? INTEGER RV_SEPARATOR  n=IDENTIFIER ('as' newName=IDENTIFIER)? #variableAliasDefinitionRelational
+      | {relational}? INTEGER RV_SEPARATOR  n=IDENTIFIER (AS newName=IDENTIFIER)? #variableAliasDefinitionRelational
       | {relational}? n=IDENTIFIER (OF INTEGER+)                                  #variableRunsDefinition
 ;
 
@@ -51,15 +51,9 @@ osem : ';'?;
 group : GROUP (id=IDENTIFIER|idi=i)? time? LBRACE (group|row)* RBRACE;
 
 row : ROW (id=IDENTIFIER|idi=i)? time? LBRACE (pause osem)? (kc osem)* RBRACE;
-kc: ({relational}? INTEGER RV_SEPARATOR)? IDENTIFIER ':' value=cell;
+kc: ({relational}? INTEGER RV_SEPARATOR)? IDENTIFIER COLON value=cell;
 pause: {relational}? PAUSE INTEGER+;
 
-AS:'as';
-OF:'OF';
-OPTIONS:'options';
-PAUSE:'pause';
-ROW:'row';
-GROUP:'group';
 
 time :
       MINUS (pflag=PFLAG)? #timeDontCare
@@ -99,9 +93,9 @@ chunk :
 	| expr          #cexpr
 ;
 
-dontcare : '-';
+dontcare : MINUS;
 // 16132 | 261.232 | -152
-i : '-'? INTEGER;
+i : MINUS? INTEGER;
 constant :
       i  #constantInt
     | T  #constantTrue
@@ -154,10 +148,23 @@ variable:
 // fi
 guardedcommand
 : 
-      IF (GUARD c=expr '->' t=expr )+
+      IF (GUARD c=expr ARROW_RIGHT t=expr )+
       FI    // guarded command (case)
 ;
 
+
+
+VAR:'var';
+AS:'as';
+OF:'OF';
+OPTIONS:'options';
+PAUSE:'pause';
+ROW:'row';
+GROUP:'group';
+STATE: 'state';
+ARROW_RIGHT: '->';
+INPUT: 'input';
+OUTPUT: 'output';
 RELATIONAL : 'relational';
 TABLE:'table';
 LBRACE:'{';

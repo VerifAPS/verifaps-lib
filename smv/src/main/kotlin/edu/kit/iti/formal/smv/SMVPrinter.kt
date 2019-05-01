@@ -235,7 +235,7 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
 
             for (svar in vars) {
                 stream.print('\t')
-                stream.print(svar.name)
+                printQuoted(svar.name)
                 stream.print(" : ")
                 stream.print(svar.dataType?.repr())
                 stream.print(";\n")
@@ -248,8 +248,17 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
     }
 
 
-    override fun visit(v: SVariable) {
-        stream.print(v.name)
+    private val RESERVED_KEYWORDS = hashSetOf("A", "E", "F", "G", "INIT", "MODULE", "case", "easc",
+            "next", "init", "TRUE", "FALSE", "in", "mod", "union", "process", "AU", "EU", "U", "V", "S",
+            "T", "EG", "EX", "EF", "AG", "AX", "AF", "X", "Y", "Z", "H", "O", "min", "max")
+
+    override fun visit(v: SVariable) = printQuoted(v.name)
+
+    fun printQuoted(name: String) {
+        if (name in RESERVED_KEYWORDS)
+            stream.print("\"$name\"")
+        else
+            stream.print(name)
     }
 
     companion object {

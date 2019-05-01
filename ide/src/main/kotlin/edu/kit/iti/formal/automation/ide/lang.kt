@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.ide
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
+import edu.kit.iti.formal.automation.parser.IEC61131Lexer.*
 import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
@@ -11,10 +12,20 @@ import me.tomassetti.kolasu.model.Node
 import me.tomassetti.kolasu.parsing.ParsingResult
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.Lexer
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.fife.ui.rsyntaxtextarea.Style
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme
+import org.fife.ui.rsyntaxtextarea.folding.Fold
+import org.fife.ui.rsyntaxtextarea.folding.FoldParser
+import org.fife.ui.rsyntaxtextarea.folding.FoldType
 import java.awt.Color
+import java.awt.Font
 import java.io.InputStream
+import java.util.*
+import javax.swing.text.BadLocationException
+
+val editorFont = Font(Font.MONOSPACED, 0, 12)
+
 
 /**
  *
@@ -46,15 +57,24 @@ class IECLanguageSupport(lookup: Lookup) : BaseLanguageSupport<Node>() {
 
 class TestTableSyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
     private val colors: Colors by lookup.with()
+
     private val STRUCTURAL_KEYWORDS = setOf(
             TestTableLanguageLexer.OPTIONS,
             TestTableLanguageLexer.TABLE,
             TestTableLanguageLexer.FUNCTION,
             TestTableLanguageLexer.OF,
             TestTableLanguageLexer.WITH,
+            TestTableLanguageLexer.VAR,
+            TestTableLanguageLexer.GVAR,
             TestTableLanguageLexer.AS,
             TestTableLanguageLexer.IF,
-            TestTableLanguageLexer.FI
+            TestTableLanguageLexer.FI,
+            TestTableLanguageLexer.GROUP,
+            TestTableLanguageLexer.ROW,
+            TestTableLanguageLexer.INPUT,
+            TestTableLanguageLexer.OUTPUT,
+            TestTableLanguageLexer.VAR,
+            TestTableLanguageLexer.STATE
     )
     private val SEPS = setOf(
             TestTableLanguageLexer.RBRACE,
@@ -71,18 +91,17 @@ class TestTableSyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
     )
 
     override fun getStyle(index: Int): Style {
-        val style = Style()
-        style.foreground = when (index) {
-            in STRUCTURAL_KEYWORDS -> colors.DARK_VIOLET
-            in LITERALS -> colors.VIOLET
-            in SEPS -> colors.DARK_GREEN
-            TestTableLanguageLexer.IDENTIFIER -> colors.BLUE
-            TestTableLanguageLexer.COMMENT -> colors.GREY
-            TestTableLanguageLexer.LINE_COMMENT -> colors.GREY
+        return when (index) {
+            //in SEPS -> colors.DARK_GREEN
             //TestTableLanguageLexer.ERROR_CHAR -> RED
-            else -> Color.BLACK
+            in STRUCTURAL_KEYWORDS -> colors.structural
+            //in CONTROL_KEYWORDS -> colors.control
+            in LITERALS -> colors.literal
+            IDENTIFIER -> colors.identifier
+            TestTableLanguageLexer.COMMENT -> colors.comment
+            TestTableLanguageLexer.LINE_COMMENT -> colors.comment
+            else -> colors.default
         }
-        return style
     }
 }
 
@@ -102,96 +121,164 @@ class TestTableLanguageSupport(lookup: Lookup) : BaseLanguageSupport<Node>() {
 
 class IEC61131SyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
     val colors: Colors by lookup.with()
-    val STRUCTURAL_KEYWORDS = setOf(
-            IEC61131Lexer.PROGRAM,
-            IEC61131Lexer.INITIAL_STEP,
-            IEC61131Lexer.TRANSITION,
-            IEC61131Lexer.END_TRANSITION,
-            IEC61131Lexer.END_VAR,
-            IEC61131Lexer.VAR,
-            IEC61131Lexer.VAR_ACCESS,
-            IEC61131Lexer.VAR_CONFIG,
-            IEC61131Lexer.VAR_EXTERNAL,
-            IEC61131Lexer.VAR_GLOBAL,
-            IEC61131Lexer.VAR_INPUT,
-            IEC61131Lexer.VAR_IN_OUT,
-            IEC61131Lexer.VAR_OUTPUT,
-            IEC61131Lexer.VAR_TEMP,
-            IEC61131Lexer.END_PROGRAM,
-            IEC61131Lexer.END_ACTION,
-            IEC61131Lexer.END_CASE,
-            IEC61131Lexer.END_CLASS,
-            IEC61131Lexer.END_CONFIGURATION,
-            IEC61131Lexer.END_FUNCTION_BLOCK,
-            IEC61131Lexer.FUNCTION_BLOCK,
-            IEC61131Lexer.FUNCTION,
-            IEC61131Lexer.END_FUNCTION,
-            IEC61131Lexer.END_INTERFACE,
-            IEC61131Lexer.END_METHOD,
-            IEC61131Lexer.INTERFACE,
-            IEC61131Lexer.METHOD,
-            IEC61131Lexer.END_NAMESPACE,
-            IEC61131Lexer.NAMESPACE,
-            IEC61131Lexer.END_STEP,
-            IEC61131Lexer.STEP,
-            IEC61131Lexer.ACTION
-    )
-    val DATATYPE_KEYWORD = setOf(
-            IEC61131Lexer.ANY_BIT,
-            IEC61131Lexer.ARRAY,
-            IEC61131Lexer.STRING,
-            IEC61131Lexer.WSTRING,
-            IEC61131Lexer.ANY_DATE,
-            IEC61131Lexer.ANY_INT,
-            IEC61131Lexer.ANY_NUM,
-            IEC61131Lexer.ANY_REAL,
-            IEC61131Lexer.REAL,
-            IEC61131Lexer.LREAL,
-            IEC61131Lexer.INT,
-            IEC61131Lexer.DINT,
-            IEC61131Lexer.UDINT,
-            IEC61131Lexer.SINT,
-            IEC61131Lexer.USINT,
-            IEC61131Lexer.ULINT,
-            IEC61131Lexer.DINT,
-            IEC61131Lexer.LINT,
-            IEC61131Lexer.DATE,
-            IEC61131Lexer.DATE_AND_TIME,
-            IEC61131Lexer.TIME,
-            IEC61131Lexer.WORD,
-            IEC61131Lexer.LWORD,
-            IEC61131Lexer.DWORD,
-            IEC61131Lexer.BOOL
-    )
-    val LITERALS = setOf(
-            IEC61131Lexer.DATE_LITERAL,
-            IEC61131Lexer.INTEGER_LITERAL,
-            IEC61131Lexer.BITS_LITERAL,
-            IEC61131Lexer.CAST_LITERAL,
-            IEC61131Lexer.DIRECT_VARIABLE_LITERAL,
-            IEC61131Lexer.REAL_LITERAL,
-            IEC61131Lexer.STRING_LITERAL,
-            IEC61131Lexer.TOD_LITERAL,
-            IEC61131Lexer.TIME_LITERAL,
-            IEC61131Lexer.WSTRING_LITERAL
+    private val STRUCTURAL_KEYWORDS = setOf(
+            PROGRAM,
+            INITIAL_STEP,
+            TRANSITION,
+            END_TRANSITION,
+            END_VAR,
+            VAR,
+            VAR_ACCESS,
+            VAR_CONFIG,
+            VAR_EXTERNAL,
+            VAR_GLOBAL,
+            VAR_INPUT,
+            VAR_IN_OUT,
+            VAR_OUTPUT,
+            VAR_TEMP,
+            END_PROGRAM,
+            END_ACTION,
+            END_CASE,
+            END_CLASS,
+            END_CONFIGURATION,
+            END_FUNCTION_BLOCK,
+            FUNCTION_BLOCK,
+            FUNCTION,
+            END_FUNCTION,
+            END_INTERFACE,
+            END_METHOD,
+            INTERFACE,
+            METHOD,
+            END_NAMESPACE,
+            NAMESPACE,
+            END_STEP,
+            STEP,
+            STRUCT, END_STRUCT,
+            CONFIGURATION, END_CONFIGURATION,
+            ACTION, END_ACTION)
+
+    private val DATATYPE_KEYWORD = setOf(
+            ANY_BIT,
+            ARRAY,
+            STRING,
+            WSTRING,
+            ANY_DATE,
+            ANY_INT,
+            ANY_NUM,
+            ANY_REAL,
+            REAL,
+            LREAL,
+            INT,
+            DINT,
+            UDINT,
+            SINT,
+            USINT,
+            ULINT,
+            DINT,
+            LINT,
+            DATE,
+            DATE_AND_TIME,
+            TIME,
+            WORD,
+            LWORD,
+            DWORD,
+            BOOL)
+
+    private val LITERALS = setOf(
+            DATE_LITERAL,
+            INTEGER_LITERAL,
+            BITS_LITERAL,
+            CAST_LITERAL,
+            DIRECT_VARIABLE_LITERAL,
+            REAL_LITERAL,
+            STRING_LITERAL,
+            TOD_LITERAL,
+            TIME_LITERAL,
+            WSTRING_LITERAL
     )
 
+    val CONTROL_KEYWORDS = setOf(
+            IF, ELSE, ELSEIF, FOR, END_FOR, WHILE, END_WHILE, REPEAT, END_REPEAT,
+            DO, THEN, UNTIL, TO, WITH, CASE, END_CASE, OF
+    )
 
     override fun getStyle(index: Int): Style {
-        val style = Style()
-        val color = when (index) {
-            in STRUCTURAL_KEYWORDS -> colors.DARK_VIOLET
-            in LITERALS -> colors.VIOLET
-            in DATATYPE_KEYWORD -> colors.DARK_GREEN
-            IEC61131Lexer.IDENTIFIER -> colors.BLUE
-            IEC61131Lexer.COMMENT -> colors.GREY
-            IEC61131Lexer.LINE_COMMENT -> colors.GREY
-            IEC61131Lexer.ERROR_CHAR -> Color.RED
-            else -> Color.BLACK
+        return when (index) {
+            in STRUCTURAL_KEYWORDS -> colors.structural
+            in CONTROL_KEYWORDS -> colors.control
+            in LITERALS -> colors.literal
+            in DATATYPE_KEYWORD -> colors.types
+            IDENTIFIER -> colors.identifier
+            COMMENT -> colors.comment
+            LINE_COMMENT -> colors.comment
+            ERROR_CHAR -> colors.error
+            else -> colors.default
         }
-        if (color != null) {
-            style.foreground = color
+    }
+}
+
+
+class STFoldParser : FoldParser {
+    private val OPEN_KEYWORDS =
+            regex(hashMapOf("\\bTHEN\\b" to "\\bEND_IF\\b",
+                    "\\bFUNCTION\\b" to "\\bEND_FUNCTION\\b",
+                    "\\bFUNCTION_BLOCK\\b" to "\\bEND_FUNCTION_BLOCK\\b",
+                    "\\bCLASS\\b" to "\\bEND_CLASS\\b",
+                    "\\bMETHOD\\b" to "\\bEND_METHOD\\b",
+                    "\\bFOR\\b" to "\\bEND_FOR\\b",
+                    "\\bWHILE\\b" to "\\bEND_WHILE\\b",
+                    "\\bVAR.*\\b" to "\\bEND_VAR\\b",
+                    "\\bACTION.*\\b" to "\\bEND_ACTION\\b",
+                    "\\bSTEP.*\\b" to "\\bEND_STEP\\b",
+                    "\\bPROGRAM\\b" to "\\bEND_PROGRAM\\b"
+            ))
+
+    private fun regex(map: HashMap<String, String>): List<Pair<Regex, Regex>> = map.map { (k, v) ->
+        k.toRegex(RegexOption.IGNORE_CASE) to v.toRegex(RegexOption.IGNORE_CASE)
+    }
+
+    override fun getFolds(textArea: RSyntaxTextArea): List<Fold> {
+        val folds = ArrayList<Fold>()
+        val expected = LinkedList<Pair<Regex, Fold>>()
+
+
+        try {
+            var offset = 0
+            val lines = textArea.text.splitToSequence('\n')
+            lines.forEachIndexed { idx, line ->
+                val match = expected.indexOfFirst { (regex, _) ->
+                    regex.containsMatchIn(line)
+                }
+
+                if (match > -1) {
+                    for (i in 0..match) {
+                        val (_, f) = expected.pollFirst()
+                        f.endOffset = offset
+                        folds += f
+                    }
+                }
+
+                loop@ for ((open, close) in OPEN_KEYWORDS) {
+                    when {
+                        open.containsMatchIn(line) && close.containsMatchIn(line) -> {
+                            val f = Fold(FoldType.CODE, textArea, offset)
+                            f.endOffset = offset + line.length
+                            expected.addFirst(close to f)
+                            break@loop
+                        }
+                        open.containsMatchIn(line) -> {
+                            expected.addFirst(
+                                    close to Fold(FoldType.CODE, textArea, offset))
+                            break@loop
+                        }
+                    }
+                }
+
+                offset += line.length + 1
+            }
+        } catch (ble: BadLocationException) {
+            ble.printStackTrace()
         }
-        return style
+        return folds
     }
 }

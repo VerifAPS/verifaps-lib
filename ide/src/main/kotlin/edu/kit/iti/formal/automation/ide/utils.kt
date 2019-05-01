@@ -1,18 +1,26 @@
 package edu.kit.iti.formal.automation.ide
 
+import bibliothek.gui.dock.common.action.CAction
+import bibliothek.gui.dock.common.action.CButton
+import bibliothek.gui.dock.common.action.core.CommonSimpleButtonAction
+import bibliothek.gui.dock.common.intern.DefaultCDockable
 import java.awt.event.ActionEvent
-import javax.swing.AbstractAction
-import javax.swing.Action
-import javax.swing.Icon
-import javax.swing.KeyStroke
+import javax.swing.*
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
+import java.util.ArrayList
+import java.io.IOException
+import java.awt.Desktop
+import java.io.File
+import java.net.URI
 
-/**
- *
- * @author Alexander Weigl
- * @version 1 (11.03.19)
- */
+
+fun DefaultCDockable.addAction(action: IdeAction) {
+    val act = CButton(action.name, action.smallIcon)
+    act.addActionListener(action)
+    //TODO register property change listener
+    addAction(act)
+}
 
 class LambdaAction(val lambda: () -> Unit) : IdeAction() {
     override fun actionPerformed(e: ActionEvent?) = lambda()
@@ -43,7 +51,9 @@ abstract class IdeAction : AbstractAction() {
 }
 
 
-fun createAction(name: String, menuPath: String, accel: KeyStroke? = null,
+fun createAction(name: String,
+                 menuPath: String = "",
+                 accel: KeyStroke? = null,
                  prio: Int = 0,
                  shortDesc: String? = null,
                  longDesc: String? = null,
@@ -66,4 +76,209 @@ fun createAction(name: String, menuPath: String, accel: KeyStroke? = null,
         myAction.smallIcon = IconFontSwing.buildIcon(fontIcon, 16f)
     }
     return myAction
+}
+
+interface DesktopServices {
+
+}
+
+
+object DesktopApi {
+    val os: EnumOS
+        get() {
+            val s = System.getProperty("os.name").toLowerCase()
+            return when {
+                s.contains("win") -> return EnumOS.windows
+                s.contains("mac") -> return EnumOS.macos
+                s.contains("solaris") -> return EnumOS.solaris
+                s.contains("sunos") -> return EnumOS.solaris
+                s.contains("linux") -> return EnumOS.linux
+                s.contains("unix") -> return EnumOS.linux
+                else -> EnumOS.unknown
+            }
+        }
+
+    fun browse(uri: URI): Boolean {
+        if (openSystemSpecific(uri.toString())) return true
+        return browseDESKTOP(uri)
+    }
+
+    fun open(file: File): Boolean {
+
+        if (openSystemSpecific(file.path)) return true
+
+        return if (openDESKTOP(file)) true else false
+
+    }
+
+    fun edit(file: File): Boolean {
+        // you can try something like
+        // runCommand("gimp", "%s", file.getPath())
+        // based on user preferences.
+        if (openSystemSpecific(file.path)) return true
+        return if (editDESKTOP(file)) true else false
+    }
+
+
+    private fun openSystemSpecific(what: String): Boolean {
+
+        val os = os
+
+        if (os.isLinux) {
+            if (runCommand("kde-open", "%s", what)) return true
+            if (runCommand("gnome-open", "%s", what)) return true
+            if (runCommand("xdg-open", "%s", what)) return true
+        }
+
+        if (os.isMac) {
+            if (runCommand("open", "%s", what)) return true
+        }
+
+        if (os.isWindows) {
+            if (runCommand("explorer", "%s", what)) return true
+        }
+
+        return false
+    }
+
+    private fun browseDESKTOP(uri: URI): Boolean {
+        logOut("Trying to use Desktop.getDesktop().browse() with " + uri.toString())
+        try {
+            if (!Desktop.isDesktopSupported()) {
+                logErr("Platform is not supported.")
+                return false
+            }
+
+            if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                logErr("BROWSE is not supported.")
+                return false
+            }
+
+            Desktop.getDesktop().browse(uri)
+
+            return true
+        } catch (t: Throwable) {
+            logErr("Error using desktop browse.", t)
+            return false
+        }
+
+    }
+
+    private fun openDESKTOP(file: File): Boolean {
+        logOut("Trying to use Desktop.getDesktop().open() with $file")
+        try {
+            if (!Desktop.isDesktopSupported()) {
+                logErr("Platform is not supported.")
+                return false
+            }
+
+            if (!Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+                logErr("OPEN is not supported.")
+                return false
+            }
+
+            Desktop.getDesktop().open(file)
+
+            return true
+        } catch (t: Throwable) {
+            logErr("Error using desktop open.", t)
+            return false
+        }
+
+    }
+
+    private fun editDESKTOP(file: File): Boolean {
+        logOut("Trying to use Desktop.getDesktop().edit() with $file")
+        try {
+            if (!Desktop.isDesktopSupported()) {
+                logErr("Platform is not supported.")
+                return false
+            }
+
+            if (!Desktop.getDesktop().isSupported(Desktop.Action.EDIT)) {
+                logErr("EDIT is not supported.")
+                return false
+            }
+
+            Desktop.getDesktop().edit(file)
+
+            return true
+        } catch (t: Throwable) {
+            logErr("Error using desktop edit.", t)
+            return false
+        }
+
+    }
+
+
+    private fun runCommand(command: String, args: String, file: String): Boolean {
+
+        logOut("Trying to exec:\n   cmd = $command\n   args = $args\n   %s = $file")
+
+        val parts = prepareCommand(command, args, file)
+
+        try {
+            val p = Runtime.getRuntime().exec(parts) ?: return false
+
+            try {
+                val retval = p.exitValue()
+                if (retval == 0) {
+                    logErr("Process ended immediately.")
+                    return false
+                } else {
+                    logErr("Process crashed.")
+                    return false
+                }
+            } catch (itse: IllegalThreadStateException) {
+                logErr("Process is running.")
+                return true
+            }
+
+        } catch (e: IOException) {
+            logErr("Error running command.", e)
+            return false
+        }
+
+    }
+
+
+    private fun prepareCommand(command: String, args: String?, file: String): Array<String> {
+        val parts = ArrayList<String>()
+        parts.add(command)
+        if (args != null) {
+            for (s in args.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()) {
+                val a = String.format(s, file) // put in the filename thing
+                parts.add(a.trim { it <= ' ' })
+            }
+        }
+        return parts.toTypedArray()
+    }
+
+    private fun logErr(msg: String, t: Throwable) {
+        System.err.println(msg)
+        t.printStackTrace()
+    }
+
+    private fun logErr(msg: String) {
+        System.err.println(msg)
+    }
+
+    private fun logOut(msg: String) {
+        println(msg)
+    }
+
+    enum class EnumOS {
+        linux, macos, solaris, unknown, windows;
+
+        val isLinux: Boolean
+            get() = this == linux || this == solaris
+
+
+        val isMac: Boolean
+            get() = this == macos
+
+
+        val isWindows: Boolean
+            get() = this == windows
+    }
 }

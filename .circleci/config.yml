@@ -101,7 +101,7 @@ jobs:
           at: ~/repo
 
       - run: gradle --build-cache :ide:installDist :ide:assembleDist
-
+      
       - store_artifacts:
           path: ide/build/distributions/
 
@@ -110,8 +110,7 @@ jobs:
           command: |
             which nuXmv
             which z3
-            bash -x share/integration-tests.sh
-
+            share/integration-tests.sh
 
 
   deploy:
@@ -119,21 +118,21 @@ jobs:
       - image: wadoon/verifaps-test:latest
     working_directory: ~/repo
     steps:
-      - checkout
-      - run:
-          name: "Versions"
-          command: |
-            javac -version
-            z3 -version
-            echo $(echo "quit" | nuXmv -int | head -n 1)
-
+      - attach_workspace:
+          at: ~/repo               
       - restore_cache:
           keys:
             # when lock file changes, use increasingly general patterns to restore cache
             - gradle-repo-v1-{{ .Branch }}-{{ checksum "build.gradle" }}
             - gradle-repo-v1-{{ .Branch }}-
             - gradle-repo-v1-
-
+      - run: gradle --build-cache :ide:installDist :ide:assembleDist
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            go get github.com/tcnksm/ghr
+            VERSION=$(share/gitflow-version.sh)
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
 
 workflows:
@@ -148,7 +147,11 @@ workflows:
           requires:
             - build
       - deploy:
-          type: approval # <<< This key-value pair will set your workflow to a status of "On Hold"
+          #type: approval # <<< This key-value pair will set your workflow to a status of "On Hold"
           requires:
             - test
             - integration-tests
+          filters:
+            branches:
+              only: master
+

@@ -29,10 +29,10 @@ class TranslationSfcToSt(index: Int = 0,
 
     init {
         pipelineSteps = mutableListOf(
-                this::assignStepVariables as PipelineStep,
-                this::processTransitions as PipelineStep,
+                AssignStepVariables,
+                ProcessTransitions,
                 ControlActions(),
-                this::runActions as PipelineStep
+                RunActions
         )
 
         if (sfcFlags) {
@@ -47,175 +47,6 @@ class TranslationSfcToSt(index: Int = 0,
         pipelineSteps.forEach { it(pipelineData) }
         return pipelineData.stBody
     }
-
-    fun assignStepVariables(data: PipelineData) {
-        data.run {
-            IEC61131Facade.resolveDataTypes(BuiltinLoader.loadDefault(), scope)
-            network.steps.forEach {
-                val varName = data.stepName(it.name, index)
-                if (!scope.variables.contains(varName)) {
-                    val xtvar = VariableDeclaration(varName, scope.resolveDataType("xt"))
-                    scope.variables.add(xtvar)
-                    if (it.isInitial) {
-                        val m: MutableMap<String, Initialization> = mutableMapOf("x" to LTRUE)
-                        xtvar.typeDeclaration = StructureTypeDeclaration("XT",
-                                initialization = StructureInitialization(m))
-                    }
-                }
-            }
-        }
-    }
-
-    fun processTransitions(data: PipelineData) {
-        data.run {
-            transitions.forEach { transition ->
-                val ifBranches = mutableListOf<GuardedStatement>()
-                transition.value.forEach {
-                    val guard = ExpressionList(mutableListOf(it.guard))
-                    if (index > 0) {
-                        AstMutableVisitorWithReplacedStepNames(data).visit(guard)
-                    }
-                    var transitionIf = guard.first()
-                    val ifAssignments = StatementList()
-                    it.from.forEach { step ->
-                        transitionIf = subRef(stepName(step.name, index), "X") and transitionIf
-                        ifAssignments += (stepName(step.name, index).assignTo("_X", BooleanLit(false)))
-                    }
-                    it.to.forEach { step ->
-                        ifAssignments += stepName(step.name).assignTo("_X", BooleanLit(true))
-                        ifAssignments += stepName(step.name).assignTo("_T", TimeLit(TimeData()))
-                    }
-                    ifBranches.add(GuardedStatement(transitionIf, ifAssignments))
-                }
-                stBody.add(IfStatement(ifBranches))
-            }
-            assignAndReset()
-        }
-    }
-
-    fun runActions(data: PipelineData) {
-        data.run {
-            actions.keys.forEach {
-                val actionQ = SymbolicReference(it + "_Q")
-                if (scope.hasVariable(it)) {
-                    stBody.add(it assignTo actionQ)
-                } else {
-                    stBody.add(Statements.ifthen(actionQ, InvocationStatement(SymbolicReference(it))))
-                }
-                stBody.add(actionQ assignTo LFALSE)
-            }
-            network.steps.forEach {
-                val varName = stepName(it.name)
-                val addition = varName.assignTo("T", subRef(varName, "T") plus SymbolicReference("CYCLE_TIME"))
-                stBody.add(Statements.ifthen(subRef(varName, "X"), addition))
-            }
-        }
-    }
-
-
-    class ControlActions : PipelineStep {
-        val handlers = listOf<ActionQualifierHandler>(
-                DelayedAndStored,
-                NonStored,
-                SetHandler,
-                TimeLimited,
-                TimeDelayed,
-                Pulse,
-                StoreAndDelay,
-                StoreAndLimited)
-
-        val secondaryHandler = listOf(Raising, Falling)
-
-
-        override operator fun invoke(data: PipelineData) {
-            data.createTimeVars()
-            data.buildActionControl()
-        }
-
-        fun PipelineData.createTimeVars() {
-            actions.forEach {
-                if (it.value.actionBlockPairs.fold(false) { acc, pair ->
-                            acc || pair.first.hasTime()
-                        }) {
-                    val actionT = it.key + "_T"
-                    addToScope(actionT, TimeType.TIME_TYPE)
-                    val ifBranches = mutableListOf<GuardedStatement>()
-                    it.value.actionBlockPairs.filter { maybeTimedActionBlockPair ->
-                        maybeTimedActionBlockPair.first.hasTime()
-                    }.forEach { timedActionBlockPair ->
-                        ifBranches.add(GuardedStatement(subRef(timedActionBlockPair.second, "X"),
-                                StatementList(actionT assignTo timedActionBlockPair.first.time)))
-                    }
-                    stBody.add(IfStatement(ifBranches))
-                }
-            }
-        }
-
-        fun PipelineData.buildActionControl() {
-            actions.forEach {
-                val (name, info) = it
-                val actionQ = info.actionQ
-                scope.variables.add(VariableDeclaration(actionQ, AnyBit.BOOL))
-
-                val stepsInQualifiers = it.value.actionStepsInQualifiers
-
-                stepsInQualifiers.forEach { (qualifier, steps) ->
-                    for (handler in handlers) {
-                        if (qualifier == handler.qualifier) {
-                            handler(it.value, steps, this)
-                        }
-                    }
-                }
-
-                if (finalScan) {
-                    if (stepsInQualifiers.contains(OVERRIDING_RESET)) {
-                        andedNotAssign(SymbolicReference(actionQ), it.value.resetExpr)
-                    }
-                    val trigName = name + "_Q_TRIG"
-                    moduleFTRIG(trigName, SymbolicReference(actionQ))
-                    oredAssign(SymbolicReference(actionQ), subRef(trigName, "Q"))
-                }
-
-                stepsInQualifiers.forEach { (qualifier, steps) ->
-                    for (handler in secondaryHandler) {
-                        if (qualifier == handler.qualifier) {
-                            handler(it.value, steps, this)
-                        }
-                    }
-                }
-
-                if (!finalScan && stepsInQualifiers.contains(OVERRIDING_RESET)) {
-                    andedNotAssign(SymbolicReference(actionQ), it.value.resetExpr)
-                }
-            }
-        }
-    }
-
-    class SfcFlagIntroduction : PipelineStep {
-
-        val SUPPORTED_SFC_FLAGS: MutableList<String> = mutableListOf()
-
-        val SFC_INIT = createFlag("SFCInit")
-        val SFC_RESET = createFlag("SFCReset")
-        val SFC_PAUSE = createFlag("SFCPause")
-
-        private fun createFlag(s: String): SymbolicReference = SymbolicReference(s).also {
-            SUPPORTED_SFC_FLAGS += s
-        }
-
-        override fun invoke(data: PipelineData) {
-            val newSt = StatementList()
-            val ifAssignments = data.resetStatements
-            data.addToScope(SUPPORTED_SFC_FLAGS, AnyBit.BOOL)
-            newSt.add(IfStatement(
-                    mutableListOf(GuardedStatement(SFC_INIT or SFC_RESET, ifAssignments))))
-
-            newSt.add(IfStatement(mutableListOf(GuardedStatement(
-                    !(SFC_INIT or SFC_PAUSE), data.stBody))))
-            data.stBody = newSt
-        }
-    }
-
 }
 
 private fun stepsWithThisActionBlock(stepNames: Collection<String>) = stepNames.mapRef().chainORs()
@@ -239,7 +70,7 @@ private fun String.assignTo(sub: String, expr: Expression) =
         AssignmentStatement(subRef(this, sub), expr)
 
 private fun String.assignSubTo(sub: String) =
-        AssignmentStatement(subRef(this, sub), subRef(this, '_' + sub))
+        AssignmentStatement(subRef(this, sub), subRef(this, "_$sub"))
 
 private class AstMutableVisitorWithReplacedStepNames(val data: PipelineData) : AstMutableVisitor() {
     override fun visit(symbolicReference: SymbolicReference): Expression {
@@ -285,6 +116,178 @@ return typeName.toString().toLowerCase()
 }
 }*/
 
+object AssignStepVariables : PipelineStep {
+    override fun invoke(data: PipelineData) {
+        data.run {
+            IEC61131Facade.resolveDataTypes(BuiltinLoader.loadDefault(), scope)
+            network.steps.forEach {
+                val varName = data.stepName(it.name, index)
+                if (!scope.variables.contains(varName)) {
+                    val xtvar = VariableDeclaration(varName, scope.resolveDataType("xt"))
+                    scope.variables.add(xtvar)
+                    if (it.isInitial) {
+                        val m: MutableMap<String, Initialization> = mutableMapOf("x" to LTRUE)
+                        xtvar.typeDeclaration = StructureTypeDeclaration("XT",
+                                initialization = StructureInitialization(m))
+                    }
+                }
+            }
+        }
+    }
+}
+
+object ProcessTransitions : PipelineStep {
+    override fun invoke(data: PipelineData) {
+        data.run {
+            transitions.forEach { transition ->
+                val ifBranches = mutableListOf<GuardedStatement>()
+                transition.value.forEach {
+                    val guard = ExpressionList(mutableListOf(it.guard))
+                    if (index > 0) {
+                        AstMutableVisitorWithReplacedStepNames(data).visit(guard)
+                    }
+                    var transitionIf = guard.first()
+                    val ifAssignments = StatementList()
+                    it.from.forEach { step ->
+                        transitionIf = subRef(stepName(step.name, index), "X") and transitionIf
+                        ifAssignments += (stepName(step.name, index).assignTo("_X", BooleanLit(false)))
+                    }
+                    it.to.forEach { step ->
+                        ifAssignments += stepName(step.name).assignTo("_X", BooleanLit(true))
+                        ifAssignments += stepName(step.name).assignTo("_T", TimeLit(TimeData()))
+                    }
+                    ifBranches.add(GuardedStatement(transitionIf, ifAssignments))
+                }
+                stBody.add(IfStatement(ifBranches))
+            }
+            assignAndReset()
+        }
+    }
+}
+
+object RunActions : PipelineStep {
+    override fun invoke(data: PipelineData) {
+        data.run {
+            actions.keys.forEach {
+                val actionQ = SymbolicReference(it + "_Q")
+                if (scope.hasVariable(it)) {
+                    stBody.add(it assignTo actionQ)
+                } else {
+                    stBody.add(Statements.ifthen(actionQ, InvocationStatement(SymbolicReference(it))))
+                }
+                stBody.add(actionQ assignTo LFALSE)
+            }
+            network.steps.forEach {
+                val varName = stepName(it.name)
+                val addition = varName.assignTo("T", subRef(varName, "T") plus SymbolicReference("CYCLE_TIME"))
+                stBody.add(Statements.ifthen(subRef(varName, "X"), addition))
+            }
+        }
+    }
+}
+
+class ControlActions : PipelineStep {
+    val handlers = listOf<ActionQualifierHandler>(
+            DelayedAndStored,
+            NonStored,
+            SetHandler,
+            TimeLimited,
+            TimeDelayed,
+            Pulse,
+            StoreAndDelay,
+            StoreAndLimited)
+
+    val secondaryHandler = listOf(Raising, Falling)
+
+
+    override operator fun invoke(data: PipelineData) {
+        data.createTimeVars()
+        data.buildActionControl()
+    }
+
+    fun PipelineData.createTimeVars() {
+        actions.forEach {
+            if (it.value.actionBlockPairs.fold(false) { acc, pair ->
+                        acc || pair.first.hasTime()
+                    }) {
+                val actionT = it.key + "_T"
+                addToScope(actionT, TimeType.TIME_TYPE)
+                val ifBranches = mutableListOf<GuardedStatement>()
+                it.value.actionBlockPairs.filter { maybeTimedActionBlockPair ->
+                    maybeTimedActionBlockPair.first.hasTime()
+                }.forEach { timedActionBlockPair ->
+                    ifBranches.add(GuardedStatement(subRef(timedActionBlockPair.second, "X"),
+                            StatementList(actionT assignTo timedActionBlockPair.first.time)))
+                }
+                stBody.add(IfStatement(ifBranches))
+            }
+        }
+    }
+
+    fun PipelineData.buildActionControl() {
+        actions.forEach {
+            val (name, info) = it
+            val actionQ = info.actionQ
+            scope.variables.add(VariableDeclaration(actionQ, AnyBit.BOOL))
+
+            val stepsInQualifiers = it.value.actionStepsInQualifiers
+
+            stepsInQualifiers.forEach { (qualifier, steps) ->
+                for (handler in handlers) {
+                    if (qualifier == handler.qualifier) {
+                        handler(it.value, steps, this)
+                    }
+                }
+            }
+
+            if (finalScan) {
+                if (stepsInQualifiers.contains(OVERRIDING_RESET)) {
+                    andedNotAssign(SymbolicReference(actionQ), it.value.resetExpr)
+                }
+                val trigName = name + "_Q_TRIG"
+                moduleFTRIG(trigName, SymbolicReference(actionQ))
+                oredAssign(SymbolicReference(actionQ), subRef(trigName, "Q"))
+            }
+
+            stepsInQualifiers.forEach { (qualifier, steps) ->
+                for (handler in secondaryHandler) {
+                    if (qualifier == handler.qualifier) {
+                        handler(it.value, steps, this)
+                    }
+                }
+            }
+
+            if (!finalScan && stepsInQualifiers.contains(OVERRIDING_RESET)) {
+                andedNotAssign(SymbolicReference(actionQ), it.value.resetExpr)
+            }
+        }
+    }
+}
+
+class SfcFlagIntroduction : PipelineStep {
+
+    val SUPPORTED_SFC_FLAGS: MutableList<String> = mutableListOf()
+
+    val SFC_INIT = createFlag("SFCInit")
+    val SFC_RESET = createFlag("SFCReset")
+    val SFC_PAUSE = createFlag("SFCPause")
+
+    private fun createFlag(s: String): SymbolicReference = SymbolicReference(s).also {
+        SUPPORTED_SFC_FLAGS += s
+    }
+
+    override fun invoke(data: PipelineData) {
+        val newSt = StatementList()
+        val ifAssignments = data.resetStatements
+        data.addToScope(SUPPORTED_SFC_FLAGS, AnyBit.BOOL)
+        newSt.add(IfStatement(
+                mutableListOf(GuardedStatement(SFC_INIT or SFC_RESET, ifAssignments))))
+
+        newSt.add(IfStatement(mutableListOf(GuardedStatement(
+                !(SFC_INIT or SFC_PAUSE), data.stBody))))
+        data.stBody = newSt
+    }
+}
 
 abstract class ActionQualifierHandler(val qualifier: SFCActionQualifier.Qualifier) {
     abstract operator fun invoke(actionInfo: ActionInfo, steps: Set<String>, data: PipelineData)
@@ -384,7 +387,7 @@ object Falling : ActionQualifierHandler(FALLING) {
 }
 
 
-data class PipelineData(val index: Int = 0, val name : String,
+data class PipelineData(val index: Int = 0, val name: String,
                         val network: SFCNetwork,
                         val scope: Scope,
                         val finalScan: Boolean = false,
