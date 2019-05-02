@@ -7,8 +7,8 @@ options {tokenVocab = IEC61131Lexer;}
 }
 
 @members {
-    private ErrorReporter errorReporter = new ErrorReporter();
-    public ErrorReporter getErrorReporter() { return errorReporter;}
+private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 }
 
 start

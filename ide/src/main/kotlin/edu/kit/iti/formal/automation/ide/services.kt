@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.ide
 
+import edu.kit.iti.formal.automation.st.ast.Position
 import org.fife.ui.rsyntaxtextarea.Style
 import java.awt.Color
 import java.awt.Font
@@ -12,6 +13,11 @@ import javax.swing.JFileChooser
 import kotlin.collections.ArrayList
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
+import org.fife.rsta.ui.search.ReplaceToolBar
+import org.fife.rsta.ui.search.FindToolBar
+import org.fife.rsta.ui.search.ReplaceDialog
+import org.fife.rsta.ui.search.FindDialog
+
 
 /**
  *
@@ -21,6 +27,10 @@ import kotlin.reflect.KProperty
 //Services
 interface Messager {
     fun display(msg: String, icon: Icon? = null)
+}
+
+interface JumpService {
+    fun jumpTo(editor: CodeEditor, position: Position)
 }
 
 interface FileOpen {
@@ -41,9 +51,19 @@ interface TabManagement {
     fun addEditorTab(pane: CodeEditor)
 }
 
+interface EditingDialogs {
+    fun openReplaceDialog(codeEditor: CodeEditor)
+    fun openSearchDialog(codeEditor: CodeEditor)
+}
+
+interface StatusService {
+    fun publishMessage(status: String)
+}
+
+
 //https://atelierbram.github.io/syntax-highlighting/atelier-schemes/dune/
 object Colors {
-    val defaultFont = Font(Font.MONOSPACED, 0, 12)
+    var defaultFont = Font(Font.MONOSPACED, 0, 12)
 
     val base00 = Color.decode("#20201d")
     val base01 = Color.decode("#292824")

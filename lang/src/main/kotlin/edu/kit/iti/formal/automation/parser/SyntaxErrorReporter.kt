@@ -9,7 +9,7 @@ import java.util.function.Supplier
  * @author Alexander Weigl
  * @version 1 (18.02.18)
  */
-class ErrorReporter : BaseErrorListener() {
+class SyntaxErrorReporter : BaseErrorListener() {
     var isPrint = true
     private val errors = ArrayList<SyntaxError>()
 
@@ -37,25 +37,25 @@ class ErrorReporter : BaseErrorListener() {
         return !errors.isEmpty()
     }
 
-    @Throws(ErrorReporter.IEC61131ParserException::class)
+    @Throws(SyntaxErrorReporter.ParserException::class)
     fun throwException() {
         if (hasErrors())
-            throw IEC61131ParserException("", errors)
+            throw ParserException("", errors)
     }
 
-    @Throws(ErrorReporter.IEC61131ParserException::class)
+    @Throws(SyntaxErrorReporter.ParserException::class)
     fun throwException(lines: Array<String>) {
         if (hasErrors()) {
             val msg = errors.joinToString(separator = "\n---\n",
                     transform = { it.getBeatifulErrorMessage(lines) })
 
-            throw IEC61131ParserException(
+            throw ParserException(
                     msg,
                     Collections.unmodifiableList(errors))
         }
     }
 
-    @Throws(ErrorReporter.IEC61131ParserException::class)
+    @Throws(SyntaxErrorReporter.ParserException::class)
     fun throwException(lines: Supplier<Array<String>>) {
         if (hasErrors()) {
             throwException(lines.get())
@@ -90,7 +90,7 @@ class ErrorReporter : BaseErrorListener() {
         }
     }
 
-    class IEC61131ParserException(msg: String, ts: List<SyntaxError>)
+    class ParserException(msg: String, ts: List<SyntaxError>)
         : RuntimeException(msg) {
         val errors: List<SyntaxError> = ts
 

@@ -45,13 +45,13 @@ object GetetaFacade {
 
     fun createParser(input: CharStream): TestTableLanguageParser {
         val lexer = TestTableLanguageLexer(input)
-        lexer.removeErrorListeners()
-        lexer.addErrorListener(ThrowingErrorListener.INSTANCE)
-
         val parser = TestTableLanguageParser(CommonTokenStream(lexer))
 
+        lexer.removeErrorListeners()
+        lexer.addErrorListener(parser.errorReporter)
+
         parser.removeErrorListeners()
-        parser.addErrorListener(ThrowingErrorListener.INSTANCE)
+        parser.addErrorListener(parser.errorReporter)
 
         return parser
     }

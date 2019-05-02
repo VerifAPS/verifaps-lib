@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.ide
 
-import org.slf4j.Logger
+import edu.kit.iti.formal.automation.st.ast.Position
 import org.slf4j.LoggerFactory
 import kotlin.reflect.KClass
 
@@ -12,21 +12,18 @@ import kotlin.reflect.KClass
 class EventBus {
     private val map = hashMapOf<KClass<*>, MutableList<(Any) -> Unit>>()
 
-    val logger = LoggerFactory.getLogger(EventBus::class.java)
+    private val logger = LoggerFactory.getLogger(EventBus::class.java)
 
     private fun <T> get(c: KClass<*>): MutableList<(T) -> Unit> {
-        if (c !in map) {
-            map[c] = arrayListOf()
-        }
-        return map[c] as MutableList<(T) -> Unit>
+        return map.computeIfAbsent(c) { arrayListOf() } as MutableList<(T) -> Unit>
     }
 
-    public fun <T : Any> register(c: KClass<T>, f: (T) -> Unit) {
+    fun <T : Any> register(c: KClass<T>, f: (T) -> Unit) {
         val seq: MutableList<(T) -> Unit> = get(c)
         seq.add(f)
     }
 
-    public fun register(obj: Any) {
+    fun register(obj: Any) {
         obj.javaClass.methods.forEach {
             if (it.getAnnotation(Subscribe::class.java) == null) {
                 register(it)
@@ -46,7 +43,7 @@ class EventBus {
 
 val EVENT_BUS = EventBus()
 
-class EventGetetaUpdate(val text: String)
+data class EventGetetaUpdate(val text: String)
 
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Subscribe

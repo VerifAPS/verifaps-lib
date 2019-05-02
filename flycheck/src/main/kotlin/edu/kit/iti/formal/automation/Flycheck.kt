@@ -180,7 +180,7 @@ class FlycheckRunner(
 
     }
 
-    internal class MyAntlrErrorListener(private val reporter: Reporter)
+    class MyAntlrErrorListener(private val reporter: Reporter)
         : ANTLRErrorListener {
         override fun syntaxError(recognizer: Recognizer<*, *>?, offendingSymbol: Any?, line: Int,
                                  charPositionInLine: Int, msg: String?, e: RecognitionException?) {
