@@ -1,10 +1,20 @@
 grammar TestTableLanguage;
 
 @header{
-    import java.util.*;
+import java.util.*;
+import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter;
+}
+
+
+@lexer::members {
+private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 }
 
 @parser::members {
+private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
+
     public boolean relational = false;
 }
     /*public Set<String> variables = new HashSet<>();
@@ -26,8 +36,7 @@ grammar TestTableLanguage;
 file  : table*;
 table : (r=RELATIONAL {relational=true;})?
         TABLE IDENTIFIER LBRACE
-            signature*
-            freeVariable*
+            (signature | freeVariable)*
             opts?
             group
             function*

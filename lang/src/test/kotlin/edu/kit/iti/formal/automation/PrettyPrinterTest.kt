@@ -22,13 +22,12 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
-import edu.kit.iti.formal.automation.parser.ErrorReporter
+import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.Top
 import org.antlr.v4.runtime.CharStreams
 import org.junit.jupiter.api.Assertions
-import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -67,7 +66,7 @@ object PrettyPrinterTest {
                 //Assertions.assertEquals(tle[i].toString(), newTle[i].toString())
             }
             Assertions.assertEquals(tle, newTle)
-        } catch (e: ErrorReporter.IEC61131ParserException) {
+        } catch (e: SyntaxErrorReporter.ParserException) {
             System.err.println(
                     e.print(printed.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray(), "\n---\n")
             )

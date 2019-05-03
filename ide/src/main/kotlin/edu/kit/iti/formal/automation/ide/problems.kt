@@ -6,35 +6,38 @@ import edu.kit.iti.formal.automation.analysis.ReporterMessage
 import edu.kit.iti.formal.automation.st.ast.Position
 import java.awt.BorderLayout
 import java.awt.Component
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.*
 import javax.swing.table.AbstractTableModel
 import javax.swing.table.DefaultTableCellRenderer
 
 public class Problem(
         val message: ReporterMessage,
-        val editorId: String
+        val editorId: CodeEditor
 )
 
 public class ProblemList : AbstractTableModel() {
     private val seq = arrayListOf<Problem>()
-    private val COLUMNS = listOf<String>(
+    private val COLUMNS = listOf(
             "File", "Message", "Position", "Category", "Level"
     )
 
-    fun add(editorId: String, msgs: Collection<ReporterMessage>) {
+
+    fun add(editorId: CodeEditor, msgs: Collection<ReporterMessage>) {
         val oldSize = seq.size
         msgs.forEach { seq += Problem(it, editorId) }
         fireTableDataChanged()
     }
 
-    fun remove(editorId: String, msgs: Collection<ReporterMessage>) {
+    fun remove(editorId: CodeEditor, msgs: Collection<ReporterMessage>) {
         val old = seq.filter { it.editorId == editorId }
         seq.removeAll(old)
         fireTableDataChanged()
 
     }
 
-    fun set(editorId: String, msgs: Collection<ReporterMessage>) {
+    fun set(editorId: CodeEditor, msgs: Collection<ReporterMessage>) {
         val old = seq.filter { it.editorId == editorId }
         seq.removeAll(old)
         msgs.forEach { seq += Problem(it, editorId) }
@@ -66,15 +69,20 @@ public class ProblemList : AbstractTableModel() {
 
     override fun findColumn(columnName: String?): Int = COLUMNS.indexOf(columnName)
     override fun getColumnName(column: Int): String = COLUMNS[column]
+    operator fun get(row: Int): Problem  = seq[row]
 }
 
 public class ProblemPanel(lookup: Lookup) : ToolPane("problems") {
-    val lookup = Lookup(lookup)
+    private val jumpService by lookup.with<JumpService>()
     val problems by lookup.with<ProblemList>()
     val listProblems = JTable(problems)
     val scrollPane = JScrollPane(listProblems)
     val toolbar = JToolBar()
 
+
+    val actionCopy = createAction("Copy", accel = KeyStroke.getKeyStroke("Ctrl-c")) {
+        println("Todo")
+    }
 
     init {
         titleText = "Problems"
@@ -95,7 +103,15 @@ public class ProblemPanel(lookup: Lookup) : ToolPane("problems") {
                     }
                 })
 
-        add(toolbar, BorderLayout.NORTH)
+        listProblems.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (e.clickCount == 2 && e.button == MouseEvent.BUTTON1) {
+                    val row = listProblems.rowAtPoint(e.point)
+                    val p = problems[row]
+                    jumpService.jumpTo(p.editorId, p.message.start)
+                }
+            }
+        })
         add(scrollPane)
     }
 }

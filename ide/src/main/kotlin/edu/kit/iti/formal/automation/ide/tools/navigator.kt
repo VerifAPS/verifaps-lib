@@ -1,6 +1,7 @@
-package edu.kit.iti.formal.automation.ide
+package edu.kit.iti.formal.automation.ide.tools
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable
+import edu.kit.iti.formal.automation.ide.*
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Desktop
@@ -23,8 +24,8 @@ interface Navigator {
 
 class FileTreePanel(val lookup: Lookup) : DefaultSingleCDockable("file-tree", "Navigator") {
     val contextMenu = JPopupMenu()
-    val treeFiles = JTree(DefaultTreeModel(FolderTreeNode(File(".").absoluteFile, this::fileFilter)))
-    val txtFolder = JTextField(File(".").absolutePath)
+    val treeFiles = JTree(DefaultTreeModel(FolderTreeNode(File("").absoluteFile, this::fileFilter)))
+    val txtFolder = JTextField(File("").absolutePath)
 
     val actionOpenFile = createAction("Open File",
             accel = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
@@ -195,7 +196,7 @@ data class FolderTreeNode(val file: File, val filter: (File) -> Boolean) : TreeN
 }
 
 
-private fun JTree.expandSubTree(it: TreePath) {
+fun JTree.expandSubTree(it: TreePath) {
     this.expandPath(it)
     val last = it.lastPathComponent
     val childCount = getModel().getChildCount(last)

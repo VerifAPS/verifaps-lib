@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Assertions
  * @author Philipp Krüger
  */
 class TestParseEmptyString {
-    @Test//(expected = ErrorReporter.IEC61131ParserException.class)
+    @Test//(expected = SyntaxErrorReporter.ParserException.class)
     fun testParseEmptyString() {
         val tle = IEC61131Facade.file(CharStreams.fromString(""))
         Assertions.assertEquals(0, tle.size.toLong())

@@ -1,27 +1,38 @@
 package edu.kit.iti.formal.automation.ide
 
-import bibliothek.gui.Dockable
 import bibliothek.gui.dock.common.CControl
 import bibliothek.gui.dock.common.CGrid
 import bibliothek.gui.dock.common.intern.CDockable
 import bibliothek.gui.dock.common.intern.DefaultCommonDockable
 import bibliothek.gui.dock.util.Priority
+import edu.kit.iti.formal.automation.ide.tools.FileTreePanel
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.ide.tools.GetetaPreview
+import edu.kit.iti.formal.automation.ide.tools.OverviewPanel
+import edu.kit.iti.formal.automation.st.ast.Position
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import me.tomassetti.kanvas.languageSupportRegistry
 import org.antlr.v4.runtime.CharStreams
+import org.fife.rsta.ui.search.*
 import org.fife.ui.rsyntaxtextarea.folding.CurlyFoldParser
 import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager
-import java.awt.BorderLayout
-import java.awt.Dimension
-import java.awt.Font
-import java.awt.Toolkit
 import java.awt.event.KeyEvent
 import java.io.File
 import java.text.ParseException
 import javax.swing.*
 import kotlin.properties.Delegates
+import java.awt.*
+import org.fife.rsta.ui.search.SearchEvent
+import javax.swing.JOptionPane
+import org.fife.ui.rtextarea.SearchEngine
+import javax.swing.UIManager
+import javax.swing.text.BadLocationException
+import org.fife.rsta.ui.GoToDialog
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
+import org.fife.ui.rtextarea.SearchResult
+import java.util.*
+import javax.swing.KeyStroke
+
 
 class EditorFactory(val lookup: Lookup) {
     val editorFactories = arrayListOf<(File) -> CodeEditor?>()
@@ -86,13 +97,14 @@ class EditorFactory(val lookup: Lookup) {
  */
 class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
         GetFileChooser, FileOpen,
-        TabManagement, ActionService {
+        TabManagement, ActionService, JumpService, StatusService {
 
     private var fontSize: Float by Delegates.observable(12f) { prop, _, new ->
         if (fontSize < 6f) fontSize = 6f
         else {
             defaultFont = defaultFont.deriveFont(new)
             jMenuBar.font = jMenuBar.font.deriveFont(new)
+            lookup.get<Colors>().defaultFont = defaultFont
         }
     }
 
@@ -100,7 +112,7 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
 
     var defaultFont by Delegates.observable(Font(Font.MONOSPACED, Font.PLAIN, 12)) { _, _, new ->
         lookup.getAll<CodeEditor>().forEach {
-            it.textFont = new
+           // it.textFont = new
         }
     }
 
@@ -113,7 +125,7 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
         get() = currentTabbedPanel?.dockable as? CodeEditor
 
     val currentTabbedPanel: DefaultCommonDockable?
-        get() = globalPort.controller.focusedDockable as DefaultCommonDockable
+        get() = globalPort?.controller?.focusedDockable as? DefaultCommonDockable
 
     override val fileChooser = JFileChooser()
     val defaultToolBar = JToolBar()
@@ -166,6 +178,16 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
             open(file)
         }
     }
+
+    val lblStatus = JLabel()
+    val statusBar = Box(BoxLayout.X_AXIS)?.also {
+        it.add(lblStatus)
+    }
+
+    override fun publishMessage(status: String) {
+        lblStatus.text = status
+    }
+
     private fun runCurrentProgram() {
         val editor = (null as? STEditor)
         if (editor != null) {
@@ -178,12 +200,31 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
         }
     }
 
+
+    val editingDialogs = EditingDialogsImpl(this)
+
+    val actionShowFindDialog = createAction("Find...", "Edit",
+            accel = KeyStroke.getKeyStroke("ctrl shift typed f")) {
+        currentEditor?.let {
+            editingDialogs.openSearchDialog(it)
+        }
+    }
+    val actionShowReplaceDialog = createAction("Replace...", "Edit",
+            accel = KeyStroke.getKeyStroke("ctrl shift typed r")) {
+        currentEditor?.let {
+            editingDialogs.openReplaceDialog(it)
+        }
+    }
+
+
     var globalPort = CControl()
 
     init {
         lookup.register<GetFileChooser>(this)
         lookup.register<FileOpen>(this)
         lookup.register<ProblemList>(ProblemList())
+        lookup.register<JumpService>(this)
+        lookup.register<EditingDialogs>(editingDialogs)
 
         globalPort.controller.icons.also {
             val p = Priority.CLIENT
@@ -228,16 +269,29 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
         contentPane.layout = BorderLayout(5, 5)
         contentPane.add(defaultToolBar, BorderLayout.NORTH)
         contentPane.add(globalPort.contentArea, BorderLayout.CENTER)
+        contentPane.add(statusBar, BorderLayout.SOUTH)
 
         jMenuBar = JMenuBar()
-        registerAction(actionTranslateSfc)
-//        actions.sortedBy { it.priority }
- //               .forEach { jMenuBar import it }
+        val actions = listOf(
+                actionTranslateSfc,
+                actionShowFindDialog,
+                actionShowReplaceDialog,
+                actionSaveAs,
+                actionRun,
+                actionSave,
+                actionNew,
+                actionOpen,
+                actionClose,
+                actionIncrFontSize,
+                actionDecrFontSize)
+        actions.sortedBy { it.priority }
+                .forEach { jMenuBar import it }
         addRecentFiles()
 
         val tree = FileTreePanel(lookup)
+        val overview = OverviewPanel(lookup)
         val grid = CGrid(globalPort)
-        grid.add(0.0, 0.0, 0.1, 0.5, tree)
+        grid.add(0.0, 0.0, 0.1, 0.5, tree, overview)
 
         if (initialFiles.isEmpty()) {
             val editor = STEditor(lookup)
@@ -248,13 +302,13 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
             grid.add(1.0, 0.0, 5.0, 4.0,
                     *(docks.map { it }.toTypedArray()))
         }
-        val tools = listOf(
+        val tools = arrayOf(
                 GetetaPreview(lookup),
                 GetetaWindow(lookup),
                 RetetaWindow(lookup),
                 ProblemPanel(lookup))
 
-        grid.add(1.0, 4.0, 5.0, 1.0, *(tools.toTypedArray()))
+        grid.add(1.0, 4.0, 5.0, 1.0, *tools)
 
         globalPort.contentArea.deploy(grid)
 
@@ -266,6 +320,8 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
         revalidate()
         repaint()
         repaint()
+
+        publishMessage("Welcome!")
     }
 
     override fun registerAction(act: IdeAction) {
@@ -315,7 +371,8 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
     }
 
     override fun addEditorTab(editor: CodeEditor) {
-        val e = globalPort.getCDockable(1)
+        val e = getDockable { it is CodeEditor }
+                ?: globalPort.focusHistory.history.first()
         lookup.register(editor)
         globalPort.addDockable(editor)
         editor.setLocationsAside(e)
@@ -360,6 +417,11 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
         lookup.register(window)
     }
 
+    override fun jumpTo(editor: CodeEditor, position: Position) {
+        globalPort.controller.setFocusedDockable(editor.intern(), true)
+        editor.textArea.caretPosition = position.offset
+    }
+
     fun showFrame() {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
         try {
@@ -375,6 +437,30 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
     }
 
     fun addActionIntoMenubar(act: Action) = jMenuBar import act
+
+    val actionGotoLine = createAction("Go To Line...", accel = KeyStroke.getKeyStroke("Ctrl-l")) {
+        /*if (findDialog.isVisible()) {
+            findDialog.setVisible(false)
+        }
+        if (replaceDialog.isVisible()) {
+            replaceDialog.setVisible(false)
+        }
+         */
+        val dialog = GoToDialog(this)
+        currentEditor?.textArea?.let { textArea ->
+            dialog.maxLineNumberAllowed = textArea.lineCount
+            dialog.isVisible = true
+            val line = dialog.lineNumber
+            if (line > 0) {
+                try {
+                    textArea.caretPosition = textArea.getLineStartOffset(line - 1)
+                } catch (ble: BadLocationException) { // Never happens
+                    UIManager.getLookAndFeel().provideErrorFeedback(textArea)
+                    ble.printStackTrace()
+                }
+            }
+        }
+    }
 
     private fun addRecentFiles() {
         val m = "File.Recent Files"
@@ -393,6 +479,8 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
+            Locale.setDefault(Locale.ENGLISH)
+
             val rootLookup = Lookup()
             rootLookup.register<RecentFilesService>(RecentFilesImpl())
             rootLookup.register(Colors)
@@ -424,6 +512,76 @@ class Ide(rootLookup: Lookup, vararg initialFiles: File) : JFrame(),
                 }
             }
         }
+    }
+}
+
+class DefaultSearchListener(private val textArea: RSyntaxTextArea? = null,
+                            private val lookup: Lookup? = null) : SearchListener {
+
+    override fun searchEvent(e: SearchEvent) {
+        val type = e.type
+        val context = e.searchContext
+        var result: SearchResult? = when (type) {
+            SearchEvent.Type.MARK_ALL -> SearchEngine.markAll(textArea, context)
+            SearchEvent.Type.FIND -> {
+                SearchEngine.find(textArea, context)?.also {
+                    if (!it.wasFound()) {
+                        UIManager.getLookAndFeel().provideErrorFeedback(textArea)
+                    }
+                }
+            }
+            SearchEvent.Type.REPLACE -> {
+                SearchEngine.replace(textArea, context)?.also {
+                    if (!it.wasFound()) {
+                        UIManager.getLookAndFeel().provideErrorFeedback(textArea)
+                    }
+                }
+            }
+            SearchEvent.Type.REPLACE_ALL -> {
+                SearchEngine.replaceAll(textArea, context)?.also {
+                    JOptionPane.showMessageDialog(textArea, it.count.toString() + " occurrences replaced.")
+                }
+            }
+            else -> SearchEngine.markAll(textArea, context)
+        }
+
+        val text: String = when {
+            result!!.wasFound() -> "Text found; occurrences marked: " + result.markedCount
+            type == SearchEvent.Type.MARK_ALL && result.markedCount > 0 ->
+                "Occurrences marked: " + result.markedCount
+            type == SearchEvent.Type.MARK_ALL -> ""
+            else -> "Text not found"
+        }
+        lookup?.get<StatusService>()?.publishMessage(text)
+    }
+
+    override fun getSelectedText(): String? = textArea?.selectedText
+}
+
+class EditingDialogsImpl(owner: Frame) : EditingDialogs {
+    var lastSearchListener = DefaultSearchListener()
+    val findDialog: FindDialog = FindDialog(owner, lastSearchListener)
+    val replaceDialog = ReplaceDialog(owner, lastSearchListener)
+
+    init {
+        val context = findDialog.searchContext
+        replaceDialog.searchContext = context
+    }
+
+    override fun openSearchDialog(codeEditor: CodeEditor) {
+        findDialog.removeSearchListener(lastSearchListener)
+        lastSearchListener = DefaultSearchListener(codeEditor.textArea)
+        findDialog.addSearchListener(lastSearchListener)
+        replaceDialog.isVisible = false
+        findDialog.isVisible = true
+    }
+
+    override fun openReplaceDialog(codeEditor: CodeEditor) {
+        findDialog.removeSearchListener(lastSearchListener)
+        lastSearchListener = DefaultSearchListener(codeEditor.textArea)
+        findDialog.addSearchListener(lastSearchListener)
+        findDialog.isVisible = false
+        replaceDialog.isVisible = true
     }
 }
 

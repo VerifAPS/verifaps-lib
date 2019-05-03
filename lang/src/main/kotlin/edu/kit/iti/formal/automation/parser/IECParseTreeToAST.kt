@@ -161,7 +161,9 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitReference_value(ctx: IEC61131Parser.Reference_valueContext): Any {
         val ast = Invocation("ref")
-        ast.addParameter(InvocationParameter(ctx.ref_to.accept(this) as SymbolicReference))
+        val p = InvocationParameter(ctx.ref_to.accept(this) as SymbolicReference)
+        p.ruleContext = ctx.ref_to
+        ast.addParameter(p)
         return ast
     }
 
@@ -767,6 +769,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitParam_assignment(
             ctx: IEC61131Parser.Param_assignmentContext): Any {
         val p = InvocationParameter()
+        p.ruleContext = ctx
         if (ctx.ARROW_RIGHT() != null) {
             p.isOutput = true
             p.expression = ctx.v.accept(this) as Expression

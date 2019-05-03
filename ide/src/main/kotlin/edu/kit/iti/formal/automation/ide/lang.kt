@@ -18,14 +18,10 @@ import org.fife.ui.rsyntaxtextarea.SyntaxScheme
 import org.fife.ui.rsyntaxtextarea.folding.Fold
 import org.fife.ui.rsyntaxtextarea.folding.FoldParser
 import org.fife.ui.rsyntaxtextarea.folding.FoldType
-import java.awt.Color
 import java.awt.Font
 import java.io.InputStream
 import java.util.*
 import javax.swing.text.BadLocationException
-
-val editorFont = Font(Font.MONOSPACED, 0, 12)
-
 
 /**
  *
@@ -216,7 +212,6 @@ class IEC61131SyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
         }
     }
 }
-
 
 class STFoldParser : FoldParser {
     private val OPEN_KEYWORDS =
