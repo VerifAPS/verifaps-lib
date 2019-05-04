@@ -100,7 +100,11 @@ object GetetaFacade {
     @JvmStatic
     fun parseTableDSL(input: CharStream): GeneralizedTestTable {
         val parser = createParser(input)
-        val ctx = parser.file()
+        return parseTableDSL(parser.file())
+    }
+
+    @JvmStatic
+    fun parseTableDSL(ctx:TestTableLanguageParser.FileContext): GeneralizedTestTable {
         val ttlb = TestTableLanguageBuilder()
         ctx.accept(ttlb)
         return ttlb.testTables[0]

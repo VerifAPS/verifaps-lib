@@ -82,14 +82,14 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
 
     val actionSaveAs = createAction(name = "Save As", menuPath = "File", prio = 3,
             fontIcon = FontAwesomeSolid.SAVE) { saveAs() }
-    val actionRun = createAction(name = "Run", menuPath = "Tools", prio = 9,
-            fontIcon = FontAwesomeSolid.RUNNING) { runCurrentProgram() }
     val actionSave = createAction("Save", "File",
             KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), 2,
             fontIcon = FontAwesomeRegular.SAVE) { save() }
     val actionNew = createAction("New", "File",
             KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK), 0,
             fontIcon = FontAwesomeRegular.FILE) { createCodeEditor() }
+    val actionRun = createAction(name = "Run", menuPath = "Tools", prio = 9,
+            fontIcon = FontAwesomeSolid.RUNNING) { runCurrentProgram() }
 
     private fun createCodeEditor() {
         val editor = CodeEditor(lookup, lookup.get<DockableCodeEditorFactory>())
@@ -132,7 +132,7 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
     }
 
     val lblStatus = JLabel()
-    val statusBar = Box(BoxLayout.X_AXIS)?.also {
+    val statusBar = Box(BoxLayout.X_AXIS).also {
         it.add(lblStatus)
     }
 
@@ -141,13 +141,11 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
     }
 
     private fun runCurrentProgram() {
-        val editor = (null as? CodeEditor)
-        if (editor != null) {
+        currentEditor?.let {
             try {
-                val runnerWindow = RunnerWindow(lookup, editor)
+                val runnerWindow = RunnerWindow(lookup, it)
                 addToolTab(runnerWindow)
             } catch (e: ParseException) {
-
             }
         }
     }
@@ -167,7 +165,6 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
             editingDialogs.openReplaceDialog(it)
         }
     }
-
 
     var globalPort = CControl()
 
@@ -227,13 +224,13 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
 
         jMenuBar = JMenuBar()
         val actions = listOf(
+                actionNew,
                 actionTranslateSfc,
                 actionShowFindDialog,
                 actionShowReplaceDialog,
                 actionSaveAs,
                 actionRun,
                 actionSave,
-                actionNew,
                 actionOpen,
                 actionClose,
                 actionIncrFontSize,
@@ -247,11 +244,14 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
         lookup.register<OutlineService>(overview)
         lookup.register<NavigatorService>(tree)
 
+        val getetaPreview = GetetaPreview(lookup)
         val tools = arrayOf(
-                GetetaPreview(lookup),
+                getetaPreview,
                 GetetaWindow(lookup),
                 RetetaWindow(lookup),
                 ProblemPanel(lookup))
+
+        lookup.register<GetetaPreviewService>(getetaPreview)
 
         if (configurationPaths.layoutFile.exists()) {
             globalPort.read(DataInputStream(configurationPaths.layoutFile.inputStream()))
@@ -471,6 +471,8 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
 
             val configPaths = ConfigurationPaths()
             val appConfig = ApplicationConfiguration()
+            appConfig.properties.load(configPaths.configuration.bufferedReader())
+
             rootLookup.register(configPaths)
             rootLookup.register(appConfig)
             rootLookup.register<RecentFilesService>(RecentFilesImpl(rootLookup))

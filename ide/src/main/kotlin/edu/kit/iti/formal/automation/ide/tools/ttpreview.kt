@@ -1,10 +1,7 @@
 package edu.kit.iti.formal.automation.ide.tools
 
-import edu.kit.iti.formal.automation.ide.EVENT_BUS
-import edu.kit.iti.formal.automation.ide.EventGetetaUpdate
 import edu.kit.iti.formal.automation.ide.Lookup
 import edu.kit.iti.formal.automation.ide.ToolPane
-import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.*
 import org.netbeans.swing.outline.DefaultOutlineModel
@@ -25,7 +22,11 @@ import javax.swing.tree.TreeModel
 import javax.swing.tree.TreePath
 
 
-class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview") {
+interface GetetaPreviewService {
+    fun render(text: GeneralizedTestTable)
+}
+
+class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview"), GetetaPreviewService {
     val outline = Outline()
     val viewRender = JScrollPane(outline)
 
@@ -33,7 +34,7 @@ class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview") {
         contentPane.layout = BorderLayout()
         contentPane.add(viewRender)
         titleText = "Test Table Preview"
-        EVENT_BUS.listenTo(this::render)
+
 
         outline.setDefaultRenderer(TestTableLanguageParser.CellContext::class.java,
                 object : DefaultTableCellRenderer() {
@@ -63,9 +64,8 @@ class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview") {
         }
     }
 
-    fun render(event: EventGetetaUpdate) {
+    override fun render(gtt: GeneralizedTestTable) {
         try {
-            val gtt = GetetaFacade.parseTableDSL(event.text)
             val ioCompare = compareBy<ProgramVariable> { it.io }
             val nameCompare = compareBy<ProgramVariable> { it.name }
             val cmp = ioCompare.thenComparing(nameCompare)
@@ -80,7 +80,6 @@ class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview") {
         } catch (e: Exception) {
         }
     }
-
 }
 
 class TTRowModel(val columns: List<ProgramVariable>) : RowModel {

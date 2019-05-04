@@ -85,7 +85,7 @@ class EditorFactoryImpl(val lookup: Lookup,
         return (ttSupport.extension
                 + iecSupport.extension
                 + smvSupport.extension
-                + NoneLanguageSupport.extension+ listOf("xml")).toSet()
+                + NoneLanguageSupport.extension + listOf("xml")).toSet()
     }
 
     val ttSupport = TestTableLanguageSupport(lookup)
@@ -151,7 +151,6 @@ class EditorFactoryImpl(val lookup: Lookup,
     }
 }
 
-
 class DockableCodeEditorFactory(var lookup: Lookup)
     : MultipleCDockableFactory<CodeEditor, CodeEditorData> {
     override fun write(p0: CodeEditor): CodeEditorData = CodeEditorData(p0.file)
@@ -167,9 +166,8 @@ class DockableCodeEditorFactory(var lookup: Lookup)
     override fun match(p0: CodeEditor?, p1: CodeEditorData?): Boolean = p0?.file == p1?.file
 }
 
-class CodeEditor(lookup: Lookup, factory: MultipleCDockableFactory<*, *>)
+class CodeEditor(val lookup: Lookup, factory: MultipleCDockableFactory<*, *>)
     : DefaultMultipleCDockable(factory), Saveable, HasFont, Closeable {
-    val lookup = Lookup(lookup)
     private val colors: Colors by lookup.with()
     var text: String
         get() = textArea.text
@@ -178,12 +176,14 @@ class CodeEditor(lookup: Lookup, factory: MultipleCDockableFactory<*, *>)
         }
 
     var languageSupport by Delegates.observable<LanguageSupport>(NoneLanguageSupport) { prop, old, new ->
-        textArea.clearParsers()
-        textArea.syntaxEditingStyle = new.mimeType
-        (textArea.document as RSyntaxDocument).setSyntaxStyle(AntlrTokenMaker(new.antlrLexerFactory))
-        textArea.syntaxScheme = new.syntaxScheme
-        textArea.addParser(new.createParser(this, lookup))
-        textArea.isCodeFoldingEnabled = new.isCodeFoldingEnabled
+        if (old != new) {
+            textArea.clearParsers()
+            textArea.syntaxEditingStyle = new.mimeType
+            (textArea.document as RSyntaxDocument).setSyntaxStyle(AntlrTokenMaker(new.antlrLexerFactory))
+            textArea.syntaxScheme = new.syntaxScheme
+            textArea.addParser(new.createParser(this, lookup))
+            textArea.isCodeFoldingEnabled = new.isCodeFoldingEnabled
+        }
     }
 
     val textArea = RSyntaxTextArea(20, 60)
@@ -292,6 +292,12 @@ class CodeEditor(lookup: Lookup, factory: MultipleCDockableFactory<*, *>)
     override fun save() {
         val file = file
         if (file == null) saveAs() else file.writeText(code)
+        file?.also {
+            lookup.get<EditorFactory>().getLanguage(it)?.also {
+                languageSupport = it
+            }
+        }
+        dirty = false
     }
 
     override fun saveAs() {
@@ -300,8 +306,6 @@ class CodeEditor(lookup: Lookup, factory: MultipleCDockableFactory<*, *>)
         if (res == JFileChooser.APPROVE_OPTION) {
             file = fc.selectedFile
             save()
-            //titleText = fc.selectedFile.name
-            //languageSupport = LanguageSupportRegistry.languageSupportForFile(fc.selectedFile) as LanguageSupport<Node>
         }
     }
 }

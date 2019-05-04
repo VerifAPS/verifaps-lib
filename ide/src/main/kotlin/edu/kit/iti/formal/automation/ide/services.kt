@@ -129,7 +129,7 @@ object Colors {
     val GREY = Color(109, 109, 109)
 }
 
-class Lookup(val parent: Lookup? = null) {
+/*class Lookup(val parent: Lookup? = null) {
     private val children = arrayListOf<Lookup>()
     private val serviceMap = hashMapOf<Class<*>, LinkedList<Any>>()
 
@@ -209,4 +209,71 @@ class Lookup(val parent: Lookup? = null) {
     }
 
     private class ALL {}
+}
+*/
+
+class Lookup() {
+    private val serviceMap = hashMapOf<Class<*>, LinkedList<Any>>()
+
+    private fun <T> getList(service: Class<T>): MutableList<T> = serviceMap.computeIfAbsent(service) { LinkedList<Any>() } as MutableList<T>
+
+    fun <T> get(service: Class<T>): T {
+        val t = getList(service)
+        return if (t.isEmpty()) {
+            throw IllegalStateException("Service $service not registered")
+        } else {
+            t.first()
+        }
+    }
+
+    inline fun <reified T> get() = get(T::class.java)
+    fun <T> register(obj: T, service: Class<T>) {
+        getList(service).add(0, obj!!)
+        firePropertyChange(service)
+    }
+
+    fun <T> deregister(obj: T, service: Class<T>) {
+        val b = getList(service).remove(obj)
+        if (b) firePropertyChange(service)
+    }
+
+    inline fun <reified T> deregister(obj: T) = deregister(obj, T::class.java)
+
+    fun <T> getAll(service: Class<T>): List<T> {
+        val t = ArrayList(getList(service))
+        return t
+    }
+
+    fun <T : Any> getAllSubtypes(service: Class<T>): Sequence<T> {
+        val seq = emptySequence<T>()
+        val s = serviceMap.values
+                .asSequence()
+                .flatMap { it.asSequence() }
+                .mapNotNull { it as? T }
+        return s + seq
+    }
+
+
+    inline fun <reified T> getAll() = getAll(T::class.java)
+
+    inline fun <reified T> register(obj: T) = register(obj, T::class.java)
+
+    inline fun <reified T> with(): ReadWriteProperty<Any, T> {
+        return object : ReadWriteProperty<Any, T> {
+            override fun getValue(thisRef: Any, property: KProperty<*>): T = get()
+            override fun setValue(thisRef: Any, property: KProperty<*>, value: T) = register(value)
+        }
+    }
+
+    val propertyListener = hashMapOf<Class<*>, MutableList<() -> Unit>>()
+    fun <T> getListeners(name: Class<T>) = propertyListener.computeIfAbsent(name) { LinkedList() }
+    fun addChangeListener(listener: () -> Unit) = addChangeListener(ALL::class.java, listener)
+    fun <T> addChangeListener(name: Class<T>, listener: () -> Unit) = getListeners(name).add(listener)
+    fun <T> removeChangeListener(name: Class<T>, listener: () -> Unit) = getListeners(name).remove(listener)
+    fun removeChangeListener(listener: () -> Unit) = removeChangeListener(ALL::class.java, listener)
+    fun firePropertyChange(name: Class<*>) {
+        getListeners(name).forEach { it() }
+        getListeners(ALL::class.java).forEach { it() }
+    }
+    private class ALL
 }
