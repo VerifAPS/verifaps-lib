@@ -6,17 +6,11 @@ import java.awt.Color
 import java.awt.Font
 import java.io.File
 import java.util.*
-import java.util.function.Consumer
-import javax.swing.Action
 import javax.swing.Icon
 import javax.swing.JFileChooser
 import kotlin.collections.ArrayList
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
-import org.fife.rsta.ui.search.ReplaceToolBar
-import org.fife.rsta.ui.search.FindToolBar
-import org.fife.rsta.ui.search.ReplaceDialog
-import org.fife.rsta.ui.search.FindDialog
 
 
 /**
@@ -103,6 +97,8 @@ object Colors {
 
     val background = base07
 
+    val separators = style { foreground = cyan }
+
     val control = style { foreground = violet }
 
     val structural = style { foreground = violet }
@@ -131,73 +127,6 @@ object Colors {
     val BACKGROUND = Color(200, 200, 200)
     val HIGHTLIGHT_LINE = base06
     val GREY = Color(109, 109, 109)
-}
-
-typealias RecentFilesUpdateListener = Consumer<List<File>>
-
-interface RecentFilesService {
-    val defaultFile: File
-    val recentFiles: List<File>
-
-    fun save(file: File = defaultFile)
-    fun load(file: File = defaultFile)
-    fun add(f: File)
-    fun clear()
-
-    fun addListener(l: RecentFilesUpdateListener)
-    fun removeListener(l: RecentFilesUpdateListener)
-
-    operator fun contains(f: File): Boolean
-}
-
-class RecentFilesImpl : RecentFilesService {
-    protected var listenerList = arrayListOf<RecentFilesUpdateListener>()
-
-    override val recentFiles = arrayListOf<File>()
-    override val defaultFile = File(System.getenv("HOME"), ".iec61131ide-recentfiles")
-
-    override fun add(f: File) {
-        recentFiles += f
-        fireListeners()
-    }
-
-    protected fun fireListeners() {
-        listenerList.forEach { it.accept(recentFiles) }
-    }
-
-    override fun addListener(l: RecentFilesUpdateListener) {
-        listenerList.add(l)
-    }
-
-    override fun removeListener(l: RecentFilesUpdateListener) {
-        listenerList.remove(l)
-    }
-
-    override fun contains(f: File): Boolean = f in recentFiles
-
-    init {
-        load()
-        Runtime.getRuntime().addShutdownHook(Thread { save() })
-    }
-
-    override fun load(file: File) {
-        if (defaultFile.exists()) {
-            defaultFile.useLines {
-                it.forEach { add(File(it)) }
-            }
-        }
-    }
-
-    override fun save(file: File) {
-        file.bufferedWriter().use { w ->
-            recentFiles.forEach {
-                w.write("${it.absolutePath}\n")
-            }
-        }
-    }
-
-    override fun clear() =
-            recentFiles.clear()
 }
 
 class Lookup(val parent: Lookup? = null) {

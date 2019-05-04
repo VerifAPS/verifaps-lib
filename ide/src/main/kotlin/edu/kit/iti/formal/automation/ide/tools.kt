@@ -33,7 +33,7 @@ abstract class ToolPane(id: String) : DefaultSingleCDockable(id) {
  * @author Alexander Weigl
  * @version 1 (11.03.19)
  */
-class RunnerWindow(val lookup: Lookup, val stEditor: STEditor) : ToolPane("runner-window") {
+class RunnerWindow(val lookup: Lookup, val stEditor: CodeEditor) : ToolPane("runner-window") {
     val toolBar = JToolBar()
 
     var elements: PouElements = PouElements()
@@ -258,9 +258,9 @@ class RunnerWindow(val lookup: Lookup, val stEditor: STEditor) : ToolPane("runne
 }
 
 class GetetaWindow(val lookup: Lookup) : ToolPane("geteta-window") {
-    val cboStEditor = JComboBox<STEditor>()
+    val cboStEditor = JComboBox<CodeEditor>()
     val cboPou = JComboBox<PouExecutable>()
-    val cboTable = JComboBox<TTEditor>()
+    val cboTable = JComboBox<CodeEditor>()
 
     init {
         titleText = "Geteta"
@@ -279,7 +279,6 @@ class GetetaWindow(val lookup: Lookup) : ToolPane("geteta-window") {
         add(lblTable)
         add(cboTable)
         lookup.addChangeListener(CodeEditor::class.java, this::updateData)
-        lookup.addChangeListener(TTEditor::class.java, this::updateData)
 
         cboTable.renderer = object : DefaultListCellRenderer() {
             override fun getListCellRendererComponent(list: JList<*>?, value: Any?, index: Int, isSelected: Boolean, cellHasFocus: Boolean): Component {
@@ -288,7 +287,7 @@ class GetetaWindow(val lookup: Lookup) : ToolPane("geteta-window") {
             }
         }
 
-        cboStEditor.renderer = cboTable.renderer as ListCellRenderer<in STEditor>?
+        cboStEditor.renderer = cboTable.renderer as ListCellRenderer<in CodeEditor>?
 
         cboStEditor.addActionListener {
             updatePouElements()
@@ -306,16 +305,16 @@ class GetetaWindow(val lookup: Lookup) : ToolPane("geteta-window") {
         cboTable.removeAllItems()
 
         val editors = lookup.getAll<CodeEditor>()
-        editors.mapNotNull { it as? STEditor }
+        editors.mapNotNull { it as? CodeEditor }
                 .forEach(cboStEditor::addItem)
 
-        editors.mapNotNull { it as? TTEditor }
+        editors.mapNotNull { it as? CodeEditor }
                 .forEach(cboTable::addItem)
     }
 }
 
 class RetetaWindow(val lookup: Lookup) : ToolPane("reteta-window") {
-    val cboTable = JComboBox<TTEditor>()
+    val cboTable = JComboBox<CodeEditor>()
     val listAllPous = JList<PouExecutable>()
     val listSelectedPous = JList<PouExecutable>()
 

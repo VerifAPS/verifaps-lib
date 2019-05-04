@@ -1,9 +1,116 @@
 grammar SMV;
 
+
+NOT:'!';
+AF:'AF';
+AG:'AG';
+AND:'&';
+ARRAY:'array';
+ASSIGN:'ASSIGN';
+AU:'AU';
+AX:'AX';
+BOOLEAN:'boolean';
+CASE:'case';
+COLON:':';
+COLONEQ:':=';
+COMMA: ',';
+COMPASSION:'COMPASSION';
+CONSTANTS:'CONSTANTS';
+CTLSPEC:'CTLSPEC';
+DCOLON:'::';
+DEFINE:'DEFINE';
+DIV:'/';
+DOT:'.';
+DOTDOT:'..';
+EF:'EF';
+EG:'EG';
+EQ: '=';
+EQUIV:'<->' ;
+ESAC:'esac';
+EU:'EU';
+EX:'EX';
+F:'F';
+FAIRNESS:'FAIRNESS';
+FALSE:'FALSE';
+FROZENVAR:'FROZENVAR';
+G:'G';
+GT:'>';
+GTE:'>=';
+H:'H';
+IMP:'->';
+IN:'in';
+INITBIG:'INIT';
+INIT:'init';
+INVAR:'INVAR';
+INVARSPEC:'INVARSPEC';
+ISA:'ISA';
+IVAR:'IVAR';
+JUSTICE:'JUSTICE';
+LBRACE:'}';
+LBRACKET:'[';
+LPAREN: '(';
+LT:'<';
+LTE:'<=';
+LTLSPEC:'LTLSPEC';
+MINUS:'-';
+MOD:'mod';
+MODULE:'MODULE';
+NAME:'NAME';
+NEQ:'!=';
+NEXT:'next';
+O:'O';
+OF:'of';
+OR:'|';
+PLUS:'+';
+PROCESS:'process';
+PSLSPEC:'PSLSPEC';
+RBRACE:'{';
+RBRACKET:']';
+RPAREN: ')';
+S:'S';
+SEMI:';';
+SHIFTL:'<<';
+SHIFTR:'>>';
+SIGNED:'signed';
+SPEC:'SPEC';
+STAR:'*';
+T:'T';
+TRANS:'TRANS';
+TRUE: 'TRUE';
+U:'U';
+UNION:'union';
+UNSIGNED:'unsigned';
+V:'V';
+VAR:'VAR';
+WORD:'word';
+X:'X';
+XNOR:'xnor';
+XOR:'xor';
+Y:'Y';
+Z:'Z';
+
+NUMBER: INT;
+
+SL_COMMENT:
+	'--' ~('\n' | '\r')* ('\r'? '\n')? -> channel(HIDDEN);
+
+WORD_LITERAL:
+    '0' ('u' | 's')? ('b' | 'B' | 'o' | 'O' | '_' | 'd' | 'D' | 'h' | 'H') INT? '_' ('a'..'f' | 'A.' . 'F' | INT)*;
+
+ID:
+	('A'..'Z' | 'a'..'z' | '_' | '$' | '#' | '-' | '.')+;
+
+fragment INT: ('0'..'9')+;
+FLOAT: INT '.' INT;
+
+
+WS:	(' ' | '\t' | '\r' | '\n')+ -> channel(HIDDEN);
+ERROR_CHAR:. -> channel(HIDDEN);
+
 modules: module+;
 
 module:
-	'MODULE' name=ID ('(' (params+=ID) (',' params+=ID)* ')')?
+	MODULE name=ID ( LPAREN  (params+=ID) (COMMA params+=ID)* RPAREN)?
 	(moduleElement)*
 	;
 
@@ -28,155 +135,140 @@ moduleElement
 
 //Also the single keyword 'VAR' is accepted (without anything else)
 variableDeclaration
-    : 'VAR' varBody*;
+    : VAR varBody*;
 
 iVariableDeclaration
-    : 'IVAR' varBody*;
+    : IVAR varBody*;
 
 frozenVariableDeclaration
-    : 'FROZENVAR' varBody*;
+    : FROZENVAR varBody*;
 
-varBody : name=ID ':' type ';';
+varBody : name=ID COLON type SEMI;
 
 defineDeclaration :
-	define='DEFINE' defineBody*;
+	define=DEFINE defineBody*;
 
 defineBody :
-	var=ID ':=' expr ';';
+	var=ID COLONEQ expr SEMI;
 
 constantsDeclaration :
-	'CONSTANTS' constants+=ID (',' constants+=ID)* ';';
+	CONSTANTS constants+=ID ( COMMA  constants+=ID)* SEMI;
 
 assignConstraint :
-	assign='ASSIGN' assignBody*;
+	assign=ASSIGN assignBody*;
 
 assignBody :
 	varBodyAssign | initBody | nextBody;
 
 varBodyAssign:
-	var=variableID ':=' assignment=expr ';';
+	var=variableID COLONEQ assignment=expr SEMI;
 
 initBody :
-	'init' '(' var=variableID ')' ':=' expr ';';
+	INITBIG LPAREN var=variableID RPAREN COLONEQ expr SEMI;
 
 nextBody:
-	'next' '(' var=variableID ')' ':=' expr ';';
+	NEXT LPAREN var=variableID RPAREN COLONEQ expr SEMI;
 
 trans :
-	'TRANS' expr ';'?;
+	TRANS expr SEMI?;
 
 init :
-	'INIT' expr ';'?;
+	INIT expr SEMI?;
 
 invar :
-	'INVAR' expr ';'?;
+	INVAR expr SEMI?;
 
 fairnessConstraint :
-	  ('FAIRNESS'|'JUSTICE') expr ';'?
-	| 'COMPASSION (' expr ',' expr ')' ';'?;
+	  (FAIRNESS|JUSTICE) expr SEMI?
+	| COMPASSION LPAREN expr  COMMA  expr RPAREN SEMI?;
 
 pslSpecification :
-	'PSLSPEC' ('NAME' name=ID ':=')? expr ';'?;
+	PSLSPEC (NAME name=ID COLONEQ)? expr SEMI?;
 
 invarSpecification
-	  : 'INVARSPEC' ('NAME' name=ID ':=')? expr ';'?
+	  : INVARSPEC (NAME name=ID COLONEQ)? expr SEMI?
 	  ;
 
 ctlSpecification
-	  : ('CTLSPEC'|'SPEC') ('NAME' name=ID ':=')? expr ';'?
+	  : (CTLSPEC|SPEC) (NAME name=ID COLONEQ)? expr SEMI?
 	  ;
 
-isaDeclaration : 'ISA' id=ID ';'?;
+isaDeclaration : ISA id=ID SEMI?;
 
 ltlSpecification :
-	'LTLSPEC' ('NAME' name=ID ':=')? expr ';'?;
+	LTLSPEC (NAME name=ID COLONEQ)? expr SEMI?;
 
 type :	simpleType | moduleType;
 
 simpleType
-    : 'boolean' #booleanType
-    | ('word' '[' bits=NUMBER ']') #wordType
-    | ('unsigned' 'word' '[' bits=NUMBER ']') #signedType
-    | ('signed word' '[' bits=NUMBER ']')  #unsignedType
-    | '{' expr (',' expr)* '}'  #enumType
-    | ((NUMBER|variableID) '..' (NUMBER|variableID))  #intervalType
-    | 'array' (NUMBER|variableID) '..' (NUMBER|variableID) 'of' simpleType #arrayType;
+    : BOOLEAN #booleanType
+    | (WORD LBRACKET bits=NUMBER RBRACKET) #wordType
+    | (UNSIGNED WORD LBRACKET bits=NUMBER RBRACKET) #signedType
+    | (SIGNED   WORD LBRACKET bits=NUMBER RBRACKET)  #unsignedType
+    | LBRACE expr ( COMMA  expr)* RBRACE  #enumType
+    | ((NUMBER|variableID) DOTDOT (NUMBER|variableID))  #intervalType
+    | ARRAY (NUMBER|variableID) DOTDOT (NUMBER|variableID) OF simpleType #arrayType;
 
 variableID :
-	ID (('.' ID) | ('[' (NUMBER | ID) ']') | ('[' NUMBER ':' NUMBER ']'))*;
-
+	ID  ((DOT ID)
+      | (LBRACKET (NUMBER | ID) RBRACKET)
+      | (LBRACKET NUMBER COLON NUMBER RBRACKET))*;
 
 moduleType :
-	  'process' mod=ID ('(' stateExpr (',' stateExpr)* ')')? #moduleTypeProcess
-	| mod=ID ('(' stateExpr (',' stateExpr)* ')')? #moduleTypeSimple
+	  PROCESS mod=ID (LPAREN stateExpr ( COMMA  stateExpr)* RPAREN)? #moduleTypeProcess
+	| mod=ID (LPAREN stateExpr ( COMMA  stateExpr)* RPAREN)? #moduleTypeSimple
 	;
 
 
 expr
-    : left=expr op=('AU'|'EU'|'U'|'V'|'S'|'T') right=expr #temporalBinExpr
-    | op=('EG' | 'EX' | 'EF' | 'AG' | 'AX' | 'AF'| 'X'
-         | 'G' | 'F' | 'Y' | 'Z' | 'H' | 'O') expr #temporalUnaryExpr
-    | '(' expr ')' #temporalParen
+    : left=expr op=(AU|EU|U|V|S|T) right=expr #temporalBinExpr
+    | op=(EG | EX | EF | AG | AX | AF| X
+         | G | F | Y | Z | H | O) expr #temporalUnaryExpr
+    | LPAREN expr RPAREN #temporalParen
     | stateExpr #exprStateExpr
     ;
 
+
 stateExpr:
-     unaryop=('!'|'-') stateExpr
-    | stateExpr op='in' stateExpr
-    | stateExpr op='union'  stateExpr
-    | stateExpr op='/' stateExpr
-    | stateExpr op='mod' stateExpr
-    | stateExpr op='*' stateExpr
-    | stateExpr op='+' stateExpr
-    | stateExpr op='-' stateExpr
-    | stateExpr op='::' stateExpr
-    | stateExpr op='<<' stateExpr
-    | stateExpr op='>>' stateExpr
-    | stateExpr op=('=' | '!=' | '<' | '>' | '<=' | '>=') stateExpr
-    | stateExpr op='&' stateExpr
-    | stateExpr op=('|' | 'xor' | 'xnor') stateExpr
-    | stateExpr op='<->' stateExpr
-    | stateExpr op='->' stateExpr
+     unaryop=(NOT|MINUS) stateExpr
+    | stateExpr op=IN stateExpr
+    | stateExpr op=UNION  stateExpr
+    | stateExpr op=DIV stateExpr
+    | stateExpr op=MOD stateExpr
+    | stateExpr op=STAR stateExpr
+    | stateExpr op=PLUS stateExpr
+    | stateExpr op=MINUS stateExpr
+    | stateExpr op=DCOLON stateExpr
+    | stateExpr op=SHIFTL stateExpr
+    | stateExpr op=SHIFTR stateExpr
+    | stateExpr op=(EQ | NEQ | LT | GT | LTE | GTE) stateExpr
+    | stateExpr op=AND stateExpr
+    | stateExpr op=(OR | XOR | XNOR) stateExpr
+    | stateExpr op=EQUIV stateExpr
+    | stateExpr op=IMP stateExpr
     | terminalAtom
     ;
 
 terminalAtom
-    : '(' stateExpr ')'                  # paren
-	| func=(ID|'next'|'init') '(' stateExpr (',' stateExpr)* ')'          # functionExpr
-	| casesExpr                          # casesExprAtom
-	| var=ID                             # variableAccess
-	| var=ID ('[' NUMBER ']')*           # arrayAccess
-	| value=ID ('.' dotted=terminalAtom | ('[' array+=NUMBER ']')*)? #variableDotted
-	| value=NUMBER #integerLiteral
-	| value=FLOAT #floatLiteral
-	| value='TRUE' #trueExpr
-	| value='FALSE' #falseExpr
-	| '{' stateExpr (',' stateExpr)* '}' #setExpr
-	| value=WORD # wordValue
-	| rangeExpr #rangeExpr2
+    : LPAREN stateExpr RPAREN                                                   # paren
+    | func=(ID|NEXT|INIT) LPAREN stateExpr ( COMMA  stateExpr)* RPAREN          # functionExpr
+    | casesExpr                                                                 # casesExprAtom
+    | var=ID                                                                    # variableAccess
+    | var=ID (LBRACKET NUMBER RBRACKET)*                                        # arrayAccess
+    | value=ID (DOT dotted=terminalAtom | (LBRACKET array+=NUMBER RBRACKET)*)?  # variableDotted
+    | value=NUMBER                                                              # integerLiteral
+    | value=FLOAT                                                               # floatLiteral
+    | value=TRUE                                                                # trueExpr
+    | value=FALSE                                                               # falseExpr
+    | LBRACE stateExpr ( COMMA  stateExpr)* RBRACE                              # setExpr
+    | value=WORD_LITERAL                                                        # wordValue
+    | rangeExpr                                                                 # rangeExpr2
     ;
 
-rangeExpr : lower=NUMBER '..' upper=NUMBER;
+rangeExpr : lower=NUMBER DOTDOT upper=NUMBER;
 
 casesExpr :
-	'case' (branches+=caseBranch)+ 'esac';
+	CASE (branches+=caseBranch)+ ESAC;
 
 caseBranch :
-	cond=expr ':' val=expr ';';
-
-NUMBER: INT;
-
-SL_COMMENT:
-	'--' ~('\n' | '\r')* ('\r'? '\n')? -> channel(HIDDEN);
-
-WORD:
-    '0' ('u' | 's')? ('b' | 'B' | 'o' | 'O' | '_' | 'd' | 'D' | 'h' | 'H') INT? '_' ('a'..'f' | 'A.' . 'F' | INT)*;
-
-ID:
-	('A'..'Z' | 'a'..'z' | '_' | '$' | '#' | '-' | '.')+;
-
-fragment INT: ('0'..'9')+;
-FLOAT: INT '.' INT;
-
-
-WS:	(' ' | '\t' | '\r' | '\n')+ -> channel(HIDDEN);
+	cond=expr COLON val=expr SEMI;

@@ -9,7 +9,6 @@ import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
-import java.lang.UnsupportedOperationException
 import java.util.*
 import javax.swing.*
 import javax.swing.tree.DefaultTreeCellRenderer
@@ -17,12 +16,14 @@ import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
 
-interface Navigator {
-    fun setRootFile(root: File)
+interface NavigatorService {
+    //fun setRootFile(root: File)
 }
 
 
-class FileTreePanel(val lookup: Lookup) : DefaultSingleCDockable("file-tree", "Navigator") {
+class FileTreePanel(val lookup: Lookup) :
+        DefaultSingleCDockable("file-tree", "Navigator"),
+        NavigatorService {
     val contextMenu = JPopupMenu()
     val treeFiles = JTree(DefaultTreeModel(FolderTreeNode(File("").absoluteFile, this::fileFilter)))
     val txtFolder = JTextField(File("").absolutePath)
@@ -31,7 +32,10 @@ class FileTreePanel(val lookup: Lookup) : DefaultSingleCDockable("file-tree", "N
             accel = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
             fontIcon = FontAwesomeRegular.EDIT) {
         val file = treeFiles.selectionModel.selectionPath.lastPathComponent as FolderTreeNode
-        lookup.get<FileOpen>().open(file.file)
+        if (file.file.isDirectory)
+            actionGoInto.actionPerformed(null)
+        else
+            lookup.get<FileOpen>().open(file.file)
     }
 
     val actionGoUp = createAction("Go Up",
@@ -89,11 +93,18 @@ class FileTreePanel(val lookup: Lookup) : DefaultSingleCDockable("file-tree", "N
     init {
         titleIcon = IconFontSwing.buildIcon(FontAwesomeSolid.COMPASS, 12f)
 
-        treeFiles.border = BorderFactory.createEmptyBorder(10,10,10,10)
+        treeFiles.border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
 
         treeFiles.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) = mouseReleased(e)
+            override fun mousePressed(e: MouseEvent) = mouseReleased(e)
+
             override fun mouseReleased(e: MouseEvent) {
                 if (e.isPopupTrigger) {
+                    val row = treeFiles.getRowForLocation(e.x, e.y)
+                    if (row != -1) {
+                        treeFiles.setSelectionRow(row)
+                    }
                     contextMenu.show(e.component, e.x, e.y)
                 }
             }
@@ -108,6 +119,16 @@ class FileTreePanel(val lookup: Lookup) : DefaultSingleCDockable("file-tree", "N
         contextMenu.addSeparator()
         contextMenu.add(actionOpenExplorer)
         contextMenu.add(actionOpenSystem)
+
+        actionOpenFile.activateKeystroke(treeFiles)
+        actionGoUp.activateKeystroke(treeFiles)
+        actionGoUp.activateKeystroke(treeFiles, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0))
+        actionGoInto.activateKeystroke(treeFiles)
+        actionGoInto.activateKeystroke(treeFiles, KeyStroke.getKeyStroke(KeyEvent.VK_PERIOD, 0))
+        actionExpandSubTree.activateKeystroke(treeFiles)
+        actionRefresh.activateKeystroke(treeFiles)
+        actionOpenExplorer.activateKeystroke(treeFiles)
+        actionOpenSystem.activateKeystroke(treeFiles)
 
         addAction(actionGoUp)
 
@@ -161,10 +182,14 @@ class FileTreePanel(val lookup: Lookup) : DefaultSingleCDockable("file-tree", "N
         add(JScrollPane(treeFiles))
     }
 
+    val suffixes by lazy {
+        lookup.get<EditorFactory>().getSupportedSuffixes()
+    }
+
     private fun fileFilter(file: File): Boolean {
-        if (file.isDirectory) return true
-        val suffixes = listOf("gtt", "st", "iec", "txt", "xml")
-        return file.extension in suffixes
+        return true
+        //if (file.isDirectory) return true
+        //return file.extension in suffixes
     }
 }
 
