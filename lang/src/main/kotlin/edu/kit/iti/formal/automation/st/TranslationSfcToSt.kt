@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.st
 
 import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.analysis.toHuman
 import edu.kit.iti.formal.automation.builtin.BuiltinLoader
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.AnyDt
@@ -27,26 +28,30 @@ class TranslationSfcToSt(index: Int = 0, name: String = "", network: SFCNetwork,
         if (sfcFlags) {
             val sfcFlagIntroduction = SfcFlagIntroduction()
             pipelineSteps += sfcFlagIntroduction
-            scope.variables.filter{ !sfcFlagIntroduction.supportedSfcFlags.contains(it.name) }.forEach {
-                if (it.init != null) {
-                    pipelineData.resetStatements += SymbolicReference(it.name) assignTo it.init
-                } else if (it.initValue != null) {
-                    val (type, _) = it.initValue as Value<*, *>
-                    val defaultVal: Expression = when (type.name) {
-                        "BOOL" -> LFALSE
-                        "SINT", "INT", "DINT", "LINT", "USINT", "UINT", "UDINT", "ULINT" ->
-                            IntegerLit(value = BigInteger.valueOf(0))
-                        "REAL", "LREAL" -> RealLit(value = BigDecimal.valueOf(0))
-                        "TIME", "LTIME" -> TimeLit(TimeData())
-                        "DATE", "LDATE" -> DateLit(DateData(1970))
-                        "TIME_OF_DAY", "TOD", "LTIME_OF_DAY", "LTOD" -> ToDLit(TimeofDayData())
-                        "DATE_AND_TIME", "DT", "LDATE_AND_TIME", "LDT" ->
-                            DateAndTimeLit(DateAndTimeData(DateData(1970), TimeofDayData()))
-                        "STRING", "WSTRING" -> StringLit(value = "")
-                        "CHAR", "WCHAR", "BYTE", "WORD", "DWORD", "LWORD" -> BitLit(value = 0)
-                        else -> UnindentifiedLit("0")
+            if (name.isEmpty()) {
+                scope.variables.filter{ !sfcFlagIntroduction.supportedSfcFlags.contains(it.name) }.forEach {
+                    if (it.init != null) {
+                        if ((it.clone().init!!.getValue().value as RecordValue).fieldValues["X"]!!.value as Boolean) {
+                            pipelineData.resetStatements += it.name.assignTo("X", LTRUE)
+                        } else { pipelineData.resetStatements += SymbolicReference(it.name) assignTo it.init }
+                    } else if (it.initValue != null) {
+                        val (type, _) = it.initValue as Value<*, *>
+                        val defaultVal: Expression = when (type.name) {
+                            "BOOL" -> LFALSE
+                            "SINT", "INT", "DINT", "LINT", "USINT", "UINT", "UDINT", "ULINT" ->
+                                IntegerLit(value = BigInteger.valueOf(0))
+                            "REAL", "LREAL" -> RealLit(value = BigDecimal.valueOf(0))
+                            "TIME", "LTIME" -> TimeLit(TimeData())
+                            "DATE", "LDATE" -> DateLit(DateData(1970))
+                            "TIME_OF_DAY", "TOD", "LTIME_OF_DAY", "LTOD" -> ToDLit(TimeofDayData())
+                            "DATE_AND_TIME", "DT", "LDATE_AND_TIME", "LDT" ->
+                                DateAndTimeLit(DateAndTimeData(DateData(1970), TimeofDayData()))
+                            "STRING", "WSTRING" -> StringLit(value = "")
+                            "CHAR", "WCHAR", "BYTE", "WORD", "DWORD", "LWORD" -> BitLit(value = 0)
+                            else -> UnindentifiedLit("0")
+                        }
+                        pipelineData.resetStatements += SymbolicReference(it.name) assignTo defaultVal
                     }
-                    pipelineData.resetStatements += SymbolicReference(it.name) assignTo defaultVal
                 }
             }
         }
@@ -63,7 +68,7 @@ class TranslationSfcToSt(index: Int = 0, name: String = "", network: SFCNetwork,
                     if (!scope.variables.contains(varName)) {
                         val xtVar = VariableDeclaration(varName, scope.resolveDataType("xt"))
                         if (it.isInitial) {
-                            val m: MutableMap<String, Initialization> = mutableMapOf("x" to LTRUE)
+                            val m: MutableMap<String, Initialization> = mutableMapOf("X" to LTRUE)
                             xtVar.typeDeclaration = StructureTypeDeclaration("xt",
                                     initialization = StructureInitialization(m))
                             resetStatements += varName.assignTo("X", LTRUE)
@@ -172,9 +177,10 @@ class TranslationSfcToSt(index: Int = 0, name: String = "", network: SFCNetwork,
         override operator fun invoke(data: PipelineData) {
             data.run {
                 actions.keys.forEach {
-                    val actionQ = SymbolicReference("${it}_Q")
-                    if (scope.hasVariable(it)) { stBody.add(it assignTo actionQ) }
-                    else { stBody.add(Statements.ifthen(actionQ, InvocationStatement(SymbolicReference(it)))) }
+                    val actionQ = SymbolicReference(actions[it]!!.actionQ)
+                    val name = actions[it]!!.originalName
+                    if (scope.hasVariable(name)) { stBody.add(it assignTo actionQ) }
+                    else { stBody.add(Statements.ifthen(actionQ, InvocationStatement(SymbolicReference(name)))) }
                     stBody.add(actionQ assignTo LFALSE)
                 }
                 network.steps.forEach {
@@ -361,9 +367,10 @@ data class PipelineData(val index: Int = 0, val name : String, val network: SFCN
             step.events.forEach {
                 val qualifier = it.qualifier ?: SFCActionQualifier(NON_STORED)
                 val stepName = stepName(step.name)
-                if (actions.containsKey(it.actionName)) {
-                    actions.getValue(it.actionName).addActionBlock(qualifier, stepName)
-                } else { actions[it.actionName] = ActionInfo(it.actionName, qualifier, stepName) }
+                val actionName = it.actionName.replace('.', '_')
+                if (actions.containsKey(actionName)) {
+                    actions.getValue(actionName).addActionBlock(qualifier, stepName)
+                } else { actions[actionName] = ActionInfo(it.actionName, qualifier, stepName) }
             }
         }
     }
@@ -436,16 +443,22 @@ data class PipelineData(val index: Int = 0, val name : String, val network: SFCN
 
 interface PipelineStep { operator fun invoke(data: PipelineData) }
 
-class ActionInfo(val name: String, sfcActionQualifier: SFCActionQualifier, val step: String) {
+class ActionInfo(var name: String, sfcActionQualifier: SFCActionQualifier, val step: String) {
     var actionBlockPairs: MutableList<Pair<SFCActionQualifier, String>> = mutableListOf()
     var actionStepsInQualifiers: MutableMap<SFCActionQualifier.Qualifier, MutableSet<String>> = mutableMapOf()
 
-    val actionQ = "${name}_Q"
-    val actionT = "${name}_T"
+    val originalName = name
+    val actionQ: String
+    val actionT: String
 
     val resetExpr by lazy { (actionStepsInQualifiers[OVERRIDING_RESET]?.mapRef() ?: listOf(LFALSE)).chainORs() }
 
-    init { addActionBlock(sfcActionQualifier, step) }
+    init {
+        name = name.replace('.', '_')
+        actionQ = "${name}_Q"
+        actionT = "${name}_T"
+        addActionBlock(sfcActionQualifier, step)
+    }
 
     fun addActionBlock(sfcActionQualifier: SFCActionQualifier, step: String) {
         actionBlockPairs.add(Pair(sfcActionQualifier, step))
