@@ -2169,7 +2169,8 @@ data class SFCActionQualifier(
         DELAYED_AND_STORED("DS", true),
         RAISING("P1", false),               //could be renamed to RISING
         FALLING("P0", false),
-        PULSE("P", false)
+        PULSE("P", false),
+        MAIN_ACTION("A", false)
     }
 
     companion object {

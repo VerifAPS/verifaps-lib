@@ -31,6 +31,4 @@ object TranslateSfcToSt : AstVisitorWithScope<Unit>() {
                     functionBlockDeclaration.scope, it)
         }
     }
-
-
 }

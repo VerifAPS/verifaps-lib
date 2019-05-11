@@ -210,7 +210,7 @@ object IEC61131Facade {
 
     fun translateToSt(scope: Scope, sfc: SFCImplementation, name: String = ""): StatementList {
         val st = StatementList()
-        sfc.networks.forEachIndexed { index, network -> st.add(TranslationSfcToSt(index, name, network, scope).call()) }
+        sfc.networks.forEachIndexed { index, network -> st.add(TranslationSfcToSt(network, name, index, scope).call()) }
         return st
     }
 
