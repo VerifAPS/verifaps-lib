@@ -552,12 +552,12 @@ class StructuredTextPrinter
 
     override fun visit(structureTypeDeclaration: StructureTypeDeclaration) {
         sb.printf(structureTypeDeclaration.name)
-        //sb.printf(": STRUCT").nl().increaseIndent()
+        sb.printf(": STRUCT").nl().increaseIndent()
         structureTypeDeclaration.fields.forEach { it ->
             sb.nl()
             it.accept(this)
         }
-        //sb.decreaseIndent().printf("END_STRUCT;").nl()
+        sb.decreaseIndent().printf("END_STRUCT;").nl()
 
     }
 
