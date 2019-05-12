@@ -51,7 +51,7 @@ class TranslationSfcToSt(network: SFCNetwork, name: String = "", index: Int = 0,
         pipelineData.run {
             scope.variables.filter{ !sfcFlagIntroduction.supportedSfcFlags.contains(it.name) }.forEach {
                 if (it.init != null) {
-                    if ((it.clone().init!!.getValue().value as RecordValue).fieldValues["X"]!!.value as Boolean)
+                    if ((it.clone().init!!.getValue().value as? RecordValue)?.fieldValues?.get("X")?.value == true)
                         resetStatements += it.name.assignTo("X", LTRUE)
                     else resetStatements += SymbolicReference(it.name) assignTo it.init
                 } else if (it.initValue != null) {
