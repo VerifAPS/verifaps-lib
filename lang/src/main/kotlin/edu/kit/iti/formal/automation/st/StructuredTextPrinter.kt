@@ -211,7 +211,7 @@ class StructuredTextPrinter
     }
 
     override fun visit(symbolicReference: SymbolicReference) {
-        sb.printf(symbolicReference.identifier)
+        sb.printf(quoteIdentifier(symbolicReference.identifier))
 
         for (i in 0 until symbolicReference.derefCount)
             sb.printf("^")
@@ -226,6 +226,15 @@ class StructuredTextPrinter
         }
 
 
+    }
+
+    val QUOTED_IDENTIFIER = listOf("STEP", "END_STEP", "TRANSITION", "END_TRANSITION", "INITIAL_STEP", "FROM")
+    private fun quoteIdentifier(identifier: String): String {
+        return if (identifier.toUpperCase() in QUOTED_IDENTIFIER) {
+            "`$identifier`"
+        } else {
+            identifier
+        }
     }
 
     /**
