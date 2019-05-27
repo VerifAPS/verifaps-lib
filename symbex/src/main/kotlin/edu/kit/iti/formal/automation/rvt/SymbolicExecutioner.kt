@@ -1,7 +1,12 @@
 package edu.kit.iti.formal.automation.rvt
 
+import com.ibm.dtfj.javacore.parser.j9.section.thread.ThreadPatternMatchers
+import com.ibm.dtfj.javacore.parser.j9.section.thread.ThreadPatternMatchers.scope
 import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.exceptions.*
+import edu.kit.iti.formal.automation.il.*
+import edu.kit.iti.formal.automation.il.Path
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.rvt.translators.*
 import edu.kit.iti.formal.automation.scope.Scope
@@ -11,97 +16,20 @@ import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.*
+import java.lang.IllegalArgumentException
 import java.util.*
 
 /**
  * Created by weigl on 26.11.16.
  */
-open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
-    override fun defaultVisit(obj: Any)
-            = throw IllegalStateException("Symbolic Executioner does not handle $obj")
+class StSymbolicExecutioner() {
+    val context: StSymbexContext
+    val scope: Scope
 
-    var scope: Scope = Scope.defaultScope()
-    private val varCache = HashMap<String, SVariable>()
-    var operationMap: OperationMap = DefaultOperationMap()
-    var typeTranslator: TypeTranslator = DefaultTypeTranslator()
-    var valueTranslator: ValueTranslator = DefaultValueTranslator()
-    var initValueTranslator: InitValueTranslator = DefaultInitValue
-
-    private val state = Stack<SymbolicState>()
-    private var globalState = SymbolicState()
-    private var caseExpression: Expression? = null
-
-    init {
-        push(SymbolicState(globalState))
+    constructor(exec: PouExecutable, maximalJumps: Int) : this() {
+        context =
     }
 
-    constructor(globalScope: Scope?) : this() {
-        if (globalScope != null)
-            this.scope = globalScope
-    }
-
-    fun peek(): SymbolicState {
-        return state.peek()
-    }
-
-    fun pop(): SymbolicState {
-        return state.pop()
-    }
-    //endregion
-
-    @JvmOverloads
-    fun push(map: SymbolicState = SymbolicState(peek())) {
-        state.push(map)
-    }
-
-    fun lift(vd: VariableDeclaration): SVariable {
-        try {
-            return varCache.computeIfAbsent(vd.name) { this.typeTranslator.translate(vd) }
-        } catch (e: NullPointerException) {
-            throw UnknownDatatype("Datatype not given/inferred for variable $vd ${vd.dataType}", e)
-        }
-
-    }
-
-    fun lift(vd: SymbolicReference): SVariable {
-        return if (varCache.containsKey(vd.identifier))
-            varCache[vd.identifier]!!
-        else
-            throw UnknownVariableException("Variable access to not declared variable: ${IEC61131Facade.print(vd)}. Line: ${vd.startPosition}")
-    }
-
-    //region rewriting of expressions using the current state
-    override fun visit(binaryExpression: BinaryExpression): SMVExpr {
-        val left = binaryExpression.leftExpr.accept(this)!!
-        val right = binaryExpression.rightExpr.accept(this)!!
-        return this.operationMap
-                .translateBinaryOperator(left, binaryExpression.operator, right)
-    }
-
-    override fun visit(u: UnaryExpression): SMVExpr {
-        val left = u.expression.accept(this)!!
-        return this.operationMap.translateUnaryOperator(u.operator, left)
-    }
-
-    override fun visit(symbolicReference: SymbolicReference): SMVExpr {
-        return peek()[lift(symbolicReference)]!!
-        /* Enum already be resoled
-        if (symbolicReference.dataType is EnumerateType && (symbolicReference.dataType as EnumerateType)
-                        .allowedValues.contains(symbolicReference.identifier))
-            this.valueTranslator.translate(VAnyEnum(
-                    symbolicReference.dataType as EnumerateType,
-                    symbolicReference.identifier))
-        else*/
-    }
-
-    //endregion
-
-    override fun visit(literal: Literal): SLiteral {
-        return this.valueTranslator.translate(literal)
-    }
-
-    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) = visit(functionBlockDeclaration as PouExecutable)
-    override fun visit(programDeclaration: ProgramDeclaration): SCaseExpression? = visit(programDeclaration as PouExecutable)
     fun visit(programDeclaration: PouExecutable): SCaseExpression? {
         scope = programDeclaration.scope
 
@@ -121,26 +49,41 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         return null
     }
 
-    override fun visit(assign: AssignmentStatement): SMVExpr? {
-        val s = peek()
-        s[lift(assign.location as SymbolicReference)] = assign.expression.accept(this)!!
-        return null
-    }
+    fun start() {
+        val state = SymbolicState.createInitialState(context::translateToSmv, ThreadPatternMatchers.scope)
+        context.onFork(Path(0, maximalJumps, context, state = state))
 
-    override fun visit(statements: StatementList): SCaseExpression? {
-        for (s in statements) {
-            if (s is ExitStatement || s is ReturnStatement) { //TODO throw exception to handle everything
-                return null
-            }
-            s.accept(this)
+        while (context.running.isNotEmpty()) {
+            val path = context.running.removeAt(0)
+            StSymbolicVisitor(path).run()
         }
-        return null
+    }
+}
+
+class SymbolicReturn : Throwable()
+class SymbolicExit : Throwable()
+
+open class StSymbolicVisitor(val path: StPath) : DefaultVisitor<SMVExpr>() {
+    override fun defaultVisit(obj: Any) = throw IllegalStateException("Symbolic Executioner does not handle $obj")
+
+    private val context = path.context
+
+    //region rewriting of expressions using the current state
+    override fun visit(binaryExpression: BinaryExpression): SMVExpr {
+        val left = binaryExpression.leftExpr.accept(this)!!
+        val right = binaryExpression.rightExpr.accept(this)!!
+        return context.operationMap.translateBinaryOperator(left, binaryExpression.operator, right)
     }
 
-    /*Unsupported should already rolled out by ST0 Transformation
-    override fun visit(fbc: InvocationStatement): SMVExpr {
-        return visit(fbc.invocation)!!
-    }*/
+    override fun visit(u: UnaryExpression): SMVExpr {
+        val left = u.expression.accept(this)!!
+        return context.operationMap.translateUnaryOperator(u.operator, left)
+    }
+
+    override fun visit(symbolicReference: SymbolicReference): SMVExpr {
+        return context.peek()[context.lift(symbolicReference)]
+                ?: throw IllegalArgumentException()
+    }
 
     override fun visit(invocation: Invocation): SMVExpr? {
         val fd = scope.resolveFunction(invocation) ?: throw FunctionUndefinedException(invocation)
@@ -225,23 +168,54 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         return calleeState[fd.name]
     }
 
-//endregion
+    override fun visit(literal: Literal): SLiteral {
+        return this.valueTranslator.translate(literal)
+    }
+    //endregion
+
+    //region ST Statements
+    override fun visit(assign: AssignmentStatement): SMVExpr? {
+        val s = context.peek()
+        s[context.lift(assign.location as SymbolicReference)] = assign.expression.accept(this)!!
+        return null
+    }
+
+    override fun visit(statements: StatementList): SCaseExpression? {
+        for (s in statements) {
+            if (s is ExitStatement || s is ReturnStatement) { //TODO throw exception to handle everything
+                return null
+            }
+            s.accept(this)
+        }
+        return null
+    }
+
+    override fun visit(fbc: InvocationStatement): SMVExpr {
+        when (fbc.invoked) {
+            is Invoked.Program -> TODO()
+            is Invoked.FunctionBlock -> TODO()
+            is Invoked.Function -> TODO()
+            is Invoked.Method -> TODO()
+            is Invoked.Action -> TODO()
+            null -> TODO()
+        }
+    }
 
     override fun visit(statement: IfStatement): SCaseExpression? {
         val branchStates = SymbolicBranches()
 
         for ((condition1, statements) in statement.conditionalBranches) {
             val condition = condition1.accept(this)!!
-            push()
+            context.push()
             statements.accept(this)
-            branchStates.addBranch(condition, pop())
+            branchStates.addBranch(condition, context.pop())
         }
 
-        push()
+        context.push()
         statement.elseBranch.accept(this)
-        branchStates.addBranch(SLiteral.TRUE, pop())
+        branchStates.addBranch(SLiteral.TRUE, context.pop())
 
-        peek().putAll(branchStates.asCompressed())
+        context.peek().putAll(branchStates.asCompressed())
         return null
     }
 
@@ -249,17 +223,46 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         val branchStates = SymbolicBranches()
         for (gs in caseStatement.cases) {
             val condition = buildCondition(caseStatement.expression, gs)
-            push()
+            context.push()
             gs.statements.accept(this)
-            branchStates.addBranch(condition, pop())
+            branchStates.addBranch(condition, context.pop())
         }
-        push()
+        context.push()
         caseStatement.elseCase!!.accept(this)
-        branchStates.addBranch(SLiteral.TRUE, pop())
-        peek().putAll(branchStates.asCompressed())
+        branchStates.addBranch(SLiteral.TRUE, context.pop())
+        context.peek().putAll(branchStates.asCompressed())
         return null
     }
 
+    override fun visit(whileStatement: WhileStatement): SMVExpr? {
+        return super.visit(whileStatement)
+    }
+
+    override fun visit(repeatStatement: RepeatStatement): SMVExpr? {
+        return super.visit(repeatStatement)
+    }
+
+    override fun visit(jump: JumpStatement): SMVExpr? {
+        //FORK
+        val C = jump.type == JumpOperand.JMPC
+        val N = jump.type == JumpOperand.JMPCN
+        val pos = stBody.posMarked(jump.target) ?: throw IllegalStateException("illegal jump position")
+
+        if (C || N) { //TODO check the jump map
+            var cond = accumulator
+            if (N) cond = cond.not()
+            fork(cond, pos)
+            currentIdx++
+        } else {
+            currentIdx = pos
+        }
+    }
+
+    override fun visit(exitStatement: ExitStatement): SMVExpr? = throw SymbolicExit()
+    override fun visit(returnStatement: ReturnStatement): SMVExpr? = throw SymbolicReturn()
+    //endregion
+
+    //region case support
     private fun buildCondition(e: Expression, c: Case): SMVExpr {
         caseExpression = e
         return c.conditions
@@ -280,13 +283,124 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         return be.accept(this)!!
     }
 
-
     override fun visit(e: CaseCondition.Enumeration): SMVExpr {
         val be = BinaryExpression(caseExpression!!, Operators.EQUALS, e.start)
         return be.accept(this)!!
         //TODO rework case conditions
     }
+    //endregion
 
     //ignore
     override fun visit(commentStatement: CommentStatement) = null
+
+    override fun visit(label: LabelStatement): SMVExpr? = null
+}
+
+
+class StSymbexContext {
+    val running = arrayListOf<StPath>()
+    val terminated = arrayListOf<StPath>()
+    val errorVariable: SVariable = SVariable.bool("PATH_DIVERGED")
+    val varCache = java.util.HashMap<String, SVariable>()
+    val typeTranslator: TypeTranslator = DefaultTypeTranslator()
+    val valueTranslator: ValueTranslator = DefaultValueTranslator()
+    var initValueTranslator: InitValueTranslator = DefaultInitValue
+    var operationMap: OperationMap = DefaultOperationMap()
+
+    val state = Stack<SymbolicState>()
+    var globalState = SymbolicState()
+    var caseExpression: Expression? = null
+
+    constructor(globalScope: Scope?) : this() {
+        if (globalScope != null)
+            scope = globalScope
+    }
+
+    fun peek(): SymbolicState {
+        return state.peek()
+    }
+
+    fun pop(): SymbolicState {
+        return state.pop()
+    }
+
+
+    @JvmOverloads
+    fun push(map: SymbolicState = SymbolicState(peek())) {
+        state.push(map)
+    }
+
+    fun lift(vd: VariableDeclaration): SVariable {
+        try {
+            return varCache.computeIfAbsent(vd.name) { this.typeTranslator.translate(vd) }
+        } catch (e: NullPointerException) {
+            throw UnknownDatatype("Datatype not given/inferred for variable $vd ${vd.dataType}", e)
+        }
+
+    }
+
+    fun lift(vd: SymbolicReference): SVariable {
+        return if (varCache.containsKey(vd.identifier))
+            varCache[vd.identifier]!!
+        else
+            throw UnknownVariableException("Variable access to not declared variable: ${IEC61131Facade.print(vd)}. Line: ${vd.startPosition}")
+    }
+
+    fun onFinish(p: StPath) {
+        //p.pc = ilBody.size + 1
+        terminated += p
+    }
+
+    fun onFork(p: StPath) {
+        running += p
+    }
+
+    fun translateToSmv(lit: Literal) =
+            valueTranslator.translate(lit)
+
+    fun translateToSmv(ref: SymbolicReference): SVariable =
+            varCache.computeIfAbsent(ref.identifier) {
+                typeTranslator.translate(scope.getVariable(ref))
+            }
+}
+
+data class StPath(
+        var currentIdx: Int = 0,
+        var remainingJumps: Int = 0,
+        val stBody: StatementList,
+        val context: StSymbexContext,
+        val subMode: Boolean = false,
+        val state: SymbolicState = SymbolicState(),
+        var pathCondition: Set<SMVExpr> = hashSetOf()) : Runnable {
+
+    private val ended: Boolean
+        get() = //(current as? RetInstr).type == ReturnOperand.RET||
+            currentIdx >= stBody.size
+
+
+    override fun run() {
+        while (!ended && remainingJumps > 0) {
+            //execute current state
+            remainingJumps--
+            current.accept(this)
+        }
+        if (!subMode) {
+            if (currentIdx >= stBody.size) {
+                state[context.errorVariable] = SLiteral.FALSE
+            } else
+                if (remainingJumps <= 0) {
+                    state[context.errorVariable] = SLiteral.TRUE
+                }
+            context.onFinish(this)
+        }
+    }
+
+    private fun fork(cond: SMVExpr, forkedPC: Int) {
+        val other = copy(
+                currentIdx = forkedPC,
+                state = SymbolicState(state), //TODO check for deep copy
+                pathCondition = HashSet(pathCondition) + cond)
+        pathCondition = pathCondition + cond.not()
+        context.onFork(other)
+    }
 }

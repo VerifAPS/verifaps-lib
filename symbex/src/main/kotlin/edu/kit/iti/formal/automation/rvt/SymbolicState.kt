@@ -22,8 +22,11 @@ package edu.kit.iti.formal.automation.rvt
  * #L%
  */
 
+import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
+import sun.awt.Symbol
 
 /**
  * Created by weigl on 27.11.16.
@@ -42,5 +45,16 @@ data class SymbolicState(private val map: HashMap<SVariable, SMVExpr> = HashMap(
             "${k.name}=${v.repr()}"
         }
         return sb.toString()
+    }
+
+    companion object {
+        fun createInitialState(supply: (VariableDeclaration) -> SVariable, scope: Scope): SymbolicState {
+            val ss = SymbolicState()
+            scope.variables.forEach { vd ->
+                val v = supply(vd)
+                ss[v] = v
+            }
+            return ss
+        }
     }
 }
