@@ -17,11 +17,12 @@ import org.antlr.v4.runtime.CommonToken
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.concurrent.Callable
+import kotlin.math.max
 
-class TranslationSfcToSt(network: SFCNetwork, name: String = "", index: Int = 0, scope: Scope, tokens: Int = 0,
+class TranslationSfcToSt(network: SFCNetwork, name: String = "", index: Int = 0, scope: Scope,
                          finalScan: Boolean = true, sfcFlags: Boolean = true): Callable<StatementList> {
 
-    private val pipelineData = PipelineData(network, name, index, scope, tokens, finalScan, sfcFlags)
+    private val pipelineData = PipelineData(network, name, index, scope, finalScan, sfcFlags)
     private val pipelineSteps: MutableList<PipelineStep>
 
     init {
@@ -421,11 +422,12 @@ object Falling: ActionQualifierHandler(FALLING) {
     }
 }
 
-data class PipelineData(val network: SFCNetwork, val name: String, val index: Int, val scope: Scope, val tokens: Int,
+data class PipelineData(val network: SFCNetwork, val name: String, val index: Int, val scope: Scope,
                         val finalScan: Boolean, val sfcFlags: Boolean) {
     val transitions: Map<MutableSet<SFCStep>, List<SFCTransition>> = network.steps.flatMap { it.outgoing }.distinct()
             .sortedByDescending { it.priority }.groupBy { it.from }
     val actions: MutableMap<String, ActionInfo> = mutableMapOf()
+    val tokens = transitions.values.flatten().map { it.to.size }.reduce { acc, i ->  max(acc, i)}
     val resetStatements: StatementList = StatementList()
     val stBody = StatementList()
     val enumName = name + network.nodeName + index
