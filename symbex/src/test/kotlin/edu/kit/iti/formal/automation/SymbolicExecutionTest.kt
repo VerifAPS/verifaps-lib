@@ -81,7 +81,7 @@ class SymbolicExecutionTest {
             J1:
                 c := 1;
                 d := 2;
-                JMP END
+                JMP END;
             J2:
                 a := 1;
                 b := 2;
