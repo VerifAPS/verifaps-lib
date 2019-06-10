@@ -26,7 +26,6 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
-import sun.awt.Symbol
 
 /**
  * Created by weigl on 27.11.16.

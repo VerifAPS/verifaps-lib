@@ -22,10 +22,14 @@ package edu.kit.iti.formal.automation.rvt
  * #L%
  */
 
-import edu.kit.iti.formal.automation.rvt.translators.*
+import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
+import edu.kit.iti.formal.automation.rvt.translators.DefaultValueTranslator
+import edu.kit.iti.formal.automation.rvt.translators.TypeTranslator
 import edu.kit.iti.formal.automation.st.DefaultInitValue
 import edu.kit.iti.formal.automation.st.InitValueTranslator
-import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.automation.st.ast.Literal
+import edu.kit.iti.formal.automation.st.ast.PouExecutable
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.smv.ast.SAssignment
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
@@ -37,7 +41,7 @@ import java.util.*
  * @version 1 (12.12.16)
  */
 class ModuleBuilder(val program: PouExecutable,
-                    val finalState: SymbolicState) : Runnable {
+                    private val finalState: SymbolicState) : Runnable {
 
     val module = SMVModule(program.name)
     //val vardeps: VariableDependency = VariableDependency(finalState)
@@ -62,7 +66,8 @@ class ModuleBuilder(val program: PouExecutable,
         // Using this workaround instead
         val stateVariables = finalState.keys
                 .filter { (name) ->
-                    inputVars.stream().noneMatch { v2 -> v2.name == name } }
+                    inputVars.stream().noneMatch { v2 -> v2.name == name }
+                }
 
         val outputVarNames = outputVars.map(VariableDeclaration::name)
         for (`var` in stateVariables) {
@@ -93,17 +98,17 @@ class ModuleBuilder(val program: PouExecutable,
         module.stateVars.add(s)
     }
 
-    private fun addInitAssignment(`var`: SVariable) {
-        val s = program.scope.getVariable(`var`.name)
+    private fun addInitAssignment(variable: SVariable) {
+        val s = program.scope.getVariable(variable.name)
         val e: SMVExpr
-        if (s!!.init != null) {
+        e = if (s!!.init != null) {
             val sv = s.init as Literal?
-            e = sv!!.accept(SymbolicExecutioner())!!
+            this.valueTranslator.translate(sv!!)
         } else {
-            e = this.valueTranslator.translate(
+            this.valueTranslator.translate(
                     this.initValueTranslator.getInit(s.dataType!!))
         }
-        val a = SAssignment(`var`, e)
+        val a = SAssignment(variable, e)
         module.initAssignments.add(a)
     }
 

@@ -244,7 +244,6 @@ class StructuredTextPrinter
         for (stmt in statements) {
             stmt.accept(this)
         }
-
     }
 
     /**

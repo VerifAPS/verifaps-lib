@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation
  */
 
 import edu.kit.iti.formal.automation.rvt.ModuleBuilder
-import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
+import edu.kit.iti.formal.automation.rvt.StSymbolicExecutioner
 import edu.kit.iti.formal.automation.rvt.SymbolicState
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
@@ -44,8 +44,8 @@ object SymbExFacade {
         return evaluateFunction(decl, Arrays.asList(*args))
     }
 
-    fun evaluateFunction(decl: FunctionDeclaration, ts: List<SMVExpr>): SMVExpr {
-        val se = SymbolicExecutioner()
+    fun evaluateFunction(decl: FunctionDeclaration, arguments: List<SMVExpr>, maximalJumps: Int = 10): SMVExpr {
+        val se = StSymbolicExecutioner(decl, maximalJumps)
         val state = SymbolicState()
         // <name>(i1,i2,i2,...)
         val fc = Invocation()
@@ -54,11 +54,12 @@ object SymbExFacade {
         for (vd in decl.scope
                 .filterByFlags(VariableDeclaration.INPUT)) {
             fc.parameters.add(InvocationParameter(SymbolicReference(vd.name)))
-            state[se.lift(vd)] = ts[i++]
+            state[se.context.lift(vd)] = arguments[i++]
         }
-        se.push(state)
+        se.startState = state
         se.scope!!.topLevel.registerFunction(decl)
-        return fc.accept(se) as SMVExpr
+        val ss = se.start()
+        return ss[decl.name] as SMVExpr
     }
 
     fun getDefaultSimplifier(): SimplifierPipelineST0 =
@@ -121,15 +122,14 @@ object SymbExFacade {
 
 
     @JvmOverloads
-    fun evaluateProgram(exec: PouExecutable, skipSimplify: Boolean = false): SMVModule {
+    fun evaluateProgram(exec: PouExecutable, skipSimplify: Boolean = false, maximalJumps: Int = 10): SMVModule {
         val elements = exec.scope.getVisiblePous()
         IEC61131Facade.resolveDataTypes(PouElements(elements.toMutableList()), exec.scope.topLevel)
         val a = if (skipSimplify) exec else simplify(exec)
 
-        val se = SymbolicExecutioner(exec.scope.topLevel)
-        a.accept(se)
-
-        val moduleBuilder = ModuleBuilder(exec, se.peek())
+        val se = StSymbolicExecutioner(exec, maximalJumps)
+        val finalState = se.start()
+        val moduleBuilder = ModuleBuilder(exec, finalState)
         moduleBuilder.run()
         return moduleBuilder.module
     }
@@ -145,12 +145,10 @@ object SymbExFacade {
         return DefaultTypeTranslator().translate(vd)
     }
 
-    fun evaluateStatements(seq: StatementList, scope: Scope): SymbolicState {
+    fun evaluateStatements(seq: StatementList, scope: Scope, maximalJumps: Int = 10): SymbolicState {
         val program = ProgramDeclaration(scope = scope, stBody = seq)
         IEC61131Facade.resolveDataTypes(PouElements(arrayListOf(program)))
-        val symbex = SymbolicExecutioner(scope)
-        symbex.scope = scope
-        program.accept(symbex)
-        return symbex.peek()
+        val symbex = StSymbolicExecutioner(scope, seq, maximalJumps)
+        return symbex.start()
     }
 }

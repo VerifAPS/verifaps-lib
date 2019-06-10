@@ -23,11 +23,9 @@ package edu.kit.iti.formal.automation
  */
 
 import edu.kit.iti.formal.automation.datatypes.INT
-import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
+import edu.kit.iti.formal.automation.rvt.SymbolicState
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 /**
@@ -35,45 +33,66 @@ import org.junit.jupiter.api.Test
  * @version 1 (27.11.16)
  */
 class SymbolicExecutionTest {
-    private lateinit var se: SymbolicExecutioner
-
-    @BeforeEach
-    fun setupExecutioner() {
-        se = SymbolicExecutioner()
+    fun runSymbolicExecutioner(body: String): SymbolicState {
+        val stBody = IEC61131Facade.statements(body)
+        println(IEC61131Facade.print(stBody))
+        val scope = edu.kit.iti.formal.automation.scope.Scope()
         arrayOf("a", "b", "c", "d", "e", "f")
                 .map { VariableDeclaration(it, 0, INT) }
-                .forEach { se.lift(it) }
+                .forEach { scope.variables.add(it) }
+        return SymbExFacade.evaluateStatements(stBody, scope)
     }
 
     @Test
     fun simpleTest() {
-        val list = IEC61131Facade.statements(
-                "a := 2;" +
-                        "c := 3;" +
-                        "c := a+c;" +
-                        "b := 2*a+c;")
-        IEC61131Facade.resolveDataTypes(elements = *arrayOf(list))
-        list.accept(se)
+        val body =
+                """
+                a := 2;  c := 3; c := a+c; b := 2*a+c;
+                """.trimIndent()
+        val actualState = runSymbolicExecutioner(body);
         Assertions.assertEquals(
-                "{a=0sd16_2, b=0sd16_2 * 0sd16_2 + 0sd16_2 + 0sd16_3, c=0sd16_2 + 0sd16_3}",
-                se.peek().toString()
+                "{a=0sd16_2, b=0sd16_2 * 0sd16_2 + 0sd16_2 + 0sd16_3, c=0sd16_2 + 0sd16_3, d=d, e=e, f=f}",
+                actualState.toString()
         )
     }
 
     @Test
     fun simpleIfTest() {
-        val list = IEC61131Facade.statements(
-                "a := 2; c:= 4; b:=0; IF a = 2 THEN b := 2; ELSE b := 1; c:=2; END_IF;")
-        IEC61131Facade.resolveDataTypes(elements = *arrayOf(list))
-        list.accept(se)
+        val body = "a := 2; c:= 4; b:=0; IF a = 2 THEN b := 2; ELSE b := 1; c:=2; END_IF;"
+        val actualState = runSymbolicExecutioner(body)
         Assertions.assertEquals(
                 "{a=0sd16_2, b=case \n" +
                         "0sd16_2 = 0sd16_2 : 0sd16_2; TRUE : 0sd16_1; \n" +
                         "esac, c=case \n" +
                         "0sd16_2 = 0sd16_2 : 0sd16_4; TRUE : 0sd16_2; \n" +
-                        "esac}",
-                se.peek().toString())
+                        "esac, d=d, e=e, f=f}",
+                actualState.toString())
     }
+
+    @Test
+    fun simpleJump() {
+        val body = """
+            if a <= 2 THEN
+                JMP J1;
+            elseif b >= 2 THEN
+                JMP J2;
+            END_IF
+
+            J1:
+                c := 1;
+                d := 2;
+                JMP END
+            J2:
+                a := 1;
+                b := 2;
+            END:
+                f := 2;
+        """.trimIndent()
+        val actualState = runSymbolicExecutioner(body)
+
+    }
+
+
 
     /*
     // Broken! and won't fix.

@@ -714,7 +714,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitStatement(ctx: IEC61131Parser.StatementContext): Any? {
         return oneOf<Any>(ctx.assignment_statement(), ctx.if_statement(), ctx.exit_statement(),
                 ctx.repeat_statement(), ctx.return_statement(), ctx.while_statement(),
-                ctx.case_statement(), ctx.invocation_statement(),
+                ctx.case_statement(), ctx.invocation_statement(), ctx.jump_statement(), ctx.label_statement(),
                 ctx.for_statement())
     }
 
@@ -814,6 +814,12 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         ast.statements = ctx.statement_list().accept(this) as StatementList
         return ast
     }
+
+    override fun visitJump_statement(ctx: IEC61131Parser.Jump_statementContext) =
+        JumpStatement(ctx.id.text)
+
+    override fun visitLabel_statement(ctx: IEC61131Parser.Label_statementContext)  =
+        LabelStatement(ctx.id.text)
 
     override fun visitCase_condition(ctx: IEC61131Parser.Case_conditionContext): Any {
         var cc: CaseCondition? = null

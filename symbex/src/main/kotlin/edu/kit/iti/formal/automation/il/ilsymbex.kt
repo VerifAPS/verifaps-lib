@@ -313,7 +313,7 @@ internal data class Path(
                 is IlOperand.Constant -> context.translateToSmv(it.literal)
             }
         }
-        val ret = SymbExFacade.evaluateFunction(decl.function, args)
+        val ret = SymbExFacade.evaluateFunction(decl.function, args, 100)
         accumulator = ret
         currentIdx++
     }
